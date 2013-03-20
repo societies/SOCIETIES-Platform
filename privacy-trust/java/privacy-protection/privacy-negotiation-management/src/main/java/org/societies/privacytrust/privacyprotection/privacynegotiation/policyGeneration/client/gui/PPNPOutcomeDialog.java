@@ -24,7 +24,7 @@
  */
 package org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.client.gui;
 
-import javax.swing.JFrame;
+/*import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.JPanel;
@@ -69,11 +69,9 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.Acti
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPOutcome;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyPreference;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyOutcomeConstants;
-import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.client.ClientResponsePolicyGenerator;
+import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.client.ClientResponsePolicyGenerator;*/
 
 
 
@@ -81,9 +79,9 @@ import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGen
  * @author  Administrator
  * @created March 4, 2010
  */
-public class PPNPOutcomeDialog extends JDialog implements ActionListener 
+public class PPNPOutcomeDialog /*extends JDialog implements ActionListener */ 
 {
-	static PPNPOutcomeDialog thePPNPOutcomeGUI;
+	/*static PPNPOutcomeDialog thePPNPOutcomeGUI;
 
 	JPanel pnBackPanel;
 
@@ -347,12 +345,12 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 
 		JScrollPane jsp = new JScrollPane(conditionsTable);
 		
-		/*Dimension d = jsp.getSize();
+		Dimension d = jsp.getSize();
 		double width = d.getWidth();
 		double height = d.getHeight() - 250.0;
 		Dimension newdim = new Dimension();
 		newdim.setSize(width, height);
-		conditionsTable.setSize(newdim);*/
+		conditionsTable.setSize(newdim);
 		gbcConditionsPanel.gridx = 2;
 		gbcConditionsPanel.gridy = 0;
 		gbcConditionsPanel.gridwidth = 1;
@@ -462,9 +460,9 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 		pnBackPanel.add( pnButtonsPanel );	
 		
 	}
-	/* (non-Javadoc)
+	 (non-Javadoc)
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
+	 
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		//TODO: send actions to UIM 
@@ -612,10 +610,10 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 	
 	private void setRequestedActionsAndConditions(){
 		List<Action> actions = this.requestItem.getActions();
-/*		if (actions.contains(ActionConstants.READ)){
+		if (actions.contains(ActionConstants.READ)){
 			this.chkboxREAD.setSelected(true);
 			this.chkboxREAD.setEnabled(false);
-		}*/
+		}
 		
 		for (int i=0; i<10; i++){
 			System.out.println("\n");
@@ -644,7 +642,7 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 		for (int i=0; i<10; i++){
 			System.out.println("\n");
 		}
-/*		if (actions.contains(ActionConstants.WRITE)){
+		if (actions.contains(ActionConstants.WRITE)){
 			this.chkboxWRITE.setSelected(true);
 			this.chkboxWRITE.setEnabled(false);
 		}
@@ -657,7 +655,7 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 		if (actions.contains(ActionConstants.DELETE)){
 			this.chkboxDELETE.setSelected(true);
 			this.chkboxDELETE.setEnabled(false);
-		}*/
+		}
 		
 		
 		List<Condition> conditions = this.requestItem.getConditions();
@@ -688,4 +686,4 @@ public class PPNPOutcomeDialog extends JDialog implements ActionListener
 	}
 
 
-} 
+*/} 

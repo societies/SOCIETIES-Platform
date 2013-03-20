@@ -28,10 +28,11 @@ package org.societies.api.internal.privacytrust.privacyprotection.model.privacyp
 import java.util.List;
 
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.Requestor;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
+
+@Deprecated
 public interface IAgreement {
 	
 	
@@ -45,5 +46,5 @@ public interface IAgreement {
 	
 	public void setUserPublicIdentity(IIdentity userPublicId);
 	
-	public Requestor getRequestor();
+	public RequestorBean getRequestor();
 }

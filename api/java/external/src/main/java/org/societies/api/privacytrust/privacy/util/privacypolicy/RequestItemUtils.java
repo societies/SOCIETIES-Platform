@@ -29,6 +29,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
@@ -135,5 +137,26 @@ public class RequestItemUtils {
 		.append(o1.getResource(), rhs.getResource())
 		.append(o1.isOptional(), rhs.isOptional())
 		.isEquals();
+	}
+	
+	public static String toString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem item){
+		StringBuilder builder = new StringBuilder();
+		builder.append("RequestItem [getActions()=");
+		for (Action action : item.getActions()){
+			
+			builder.append(action);
+		}
+		
+		builder.append(", getConditions()=");
+		
+		for (Condition condition: item.getConditions()){
+			builder.append(ConditionUtils.toString(condition));
+		}
+		builder.append(", isOptional()=");
+		builder.append(item.isOptional());
+		builder.append(", getResource()=");
+		builder.append(ResourceUtils.toString(item.getResource()));
+		builder.append("]");
+		return builder.toString();
 	}
 }

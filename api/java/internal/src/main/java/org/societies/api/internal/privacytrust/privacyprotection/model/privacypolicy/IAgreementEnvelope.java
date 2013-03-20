@@ -31,6 +31,7 @@ import java.util.zip.Checksum;
  * @author Elizabeth
  *
  */
+@Deprecated
 public interface IAgreementEnvelope {
 	
 	public IAgreement getAgreement();

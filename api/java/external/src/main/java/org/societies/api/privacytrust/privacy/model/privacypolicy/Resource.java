@@ -39,6 +39,7 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
  * @author Elizabeth
  *
  */
+@Deprecated
 public class Resource implements Serializable{
 
 	private DataIdentifier dataId;

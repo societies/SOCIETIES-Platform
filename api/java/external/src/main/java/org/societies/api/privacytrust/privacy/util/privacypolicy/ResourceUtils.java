@@ -135,7 +135,18 @@ public class ResourceUtils {
 
 	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource create(String dataIdUri) {
 		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource();
-		resource.setDataIdUri(dataIdUri);
+		DataIdentifier dataId;
+		try {
+			dataId = DataIdentifierFactory.fromUri(dataIdUri);
+			resource.setDataIdUri(dataId.getUri());
+			resource.setDataType(dataId.getType());
+			resource.setScheme(dataId.getScheme());
+		} catch (MalformedCtxIdentifierException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			resource.setDataIdUri(dataIdUri);
+		}
+
 		return resource;
 	}
 
@@ -179,5 +190,21 @@ public class ResourceUtils {
 		.append(o1.getDataType(), rhs.getDataType())
 		.append(o1.getScheme(), rhs.getScheme())
 		.isEquals();
+	}
+
+	public static String toString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource){
+		StringBuilder builder = new StringBuilder();
+		builder.append("Resource [getDataIdUri()=");
+		if (null==resource.getDataIdUri()){
+			builder.append("null");
+		}else{
+			builder.append(resource.getDataIdUri());
+		}
+		builder.append(", getDataType()=");
+		builder.append(resource.getDataType());
+		builder.append(", getScheme()=");
+		builder.append(resource.getScheme());
+		builder.append("]");
+		return builder.toString();
 	}
 }

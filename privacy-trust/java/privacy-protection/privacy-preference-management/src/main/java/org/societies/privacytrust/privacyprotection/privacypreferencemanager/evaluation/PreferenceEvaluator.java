@@ -26,6 +26,7 @@ package org.societies.privacytrust.privacyprotection.privacypreferencemanager.ev
 
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -37,12 +38,19 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ContextPreferenceCondition;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceCondition;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyCondition;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.TrustPreferenceCondition;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.OperatorConstants;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ppn.PPNPOutcome;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ppn.PPNPrivacyPreferenceTreeModel;
 
 
 
@@ -51,6 +59,7 @@ public class PreferenceEvaluator {
 	private PrivateContextCache contextCache;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private ITrustBroker trustBroker;
+	private List<Condition> conditions;
 	public PreferenceEvaluator(PrivateContextCache cache, ITrustBroker broker){
 		
 		this.contextCache = cache;
@@ -82,7 +91,7 @@ public class PreferenceEvaluator {
 			
 			
 			temp.put(p.getOutcome(), ctxIds);
-			//JOptionPane.showMessageDialog(null, "Evaluation: returning outcome: "+p.getOutcome().toString());
+			//JOptionPane.showMessageDiathis.logging.debug(null, "Evaluation: returning outcome: "+p.getOutcome().toString());
 			return temp;
 		}else{
 			return new Hashtable<IPrivacyOutcome,List<CtxIdentifier>>();
@@ -91,15 +100,15 @@ public class PreferenceEvaluator {
 	
 	
 	private IPrivacyPreference evaluatePreferenceInternal(IPrivacyPreference ptn){
-		log("evaluating preference");
+		this.logging.debug("evaluating preference");
 		//a non-context aware preference
 		if (ptn.isLeaf()){
-			log("preference is not context-dependent. returning IAction object"+ptn.getOutcome().toString());
+			this.logging.debug("preference is not context-dependent. returning IAction object"+ptn.getOutcome().toString());
 			return ptn;
 		}
 		//if the root object is null then the tree is split so we have to evaluate more than one tree
 		if (ptn.getUserObject()==null){
-			log("preference tree is split. we might have a conflict");
+			this.logging.debug("preference tree is split. we might have a conflict");
 			Enumeration<IPrivacyPreference> e = ptn.children();
 			ArrayList<IPrivacyPreference> prefList = new ArrayList<IPrivacyPreference>(); 
 			while (e.hasMoreElements()){
@@ -112,33 +121,33 @@ public class PreferenceEvaluator {
 			}
 			//if only one IOutcome is applicable with the current context return that
 			if (prefList.size()==1){
-				log("PrefEvaluator> Returning: "+ prefList.get(0).toString());
+				this.logging.debug("PrefEvaluator> Returning: "+ prefList.get(0).toString());
 				return prefList.get(0);
 			}
 			//if no IOutcome is applicable, return a null object
 			else if (prefList.size()==0){
-				log("PrefEvaluator> No preference applicable");
+				this.logging.debug("PrefEvaluator> No preference applicable");
 				return null;
 			}
 			//if more than one IOutcome objs is applicable, use conflict resolution and return the most applicable
 			else{
 				ConflictResolver cr = new ConflictResolver();
 				IPrivacyPreference io = cr.resolveConflicts(prefList);
-				log("PrefEvaluator> Returning: "+io.toString());
+				this.logging.debug("PrefEvaluator> Returning: "+io.toString());
 				return io;
 			}
 		}
 		//if the root node is not empty
 		else{
-			log("preference tree is not split. no conflicts here");
+			this.logging.debug("preference tree is not split. no conflicts here");
 			//and it's a condition
 			if (ptn.isBranch()){
 				//evaluate the condition
 				IPrivacyPreferenceCondition con = ptn.getCondition();
 				try {
 					if (evaluatesToTrue(con)){
-						//JOptionPane.showMessageDialog(null, con.toString()+" evaluated to true");
-						log(con.toString()+" is true - descending tree levels");
+						//JOptionPane.showMessageDiathis.logging.debug(null, con.toString()+" evaluated to true");
+						this.logging.debug(con.toString()+" is true - descending tree levels");
 						//traverse the tree in preorder traversal to evaluate all the conditions under this branch and find an Action 
 						Enumeration<IPrivacyPreference> e = ptn.children();
 						while (e.hasMoreElements()){
@@ -149,8 +158,8 @@ public class PreferenceEvaluator {
 							}
 						}		
 					}else{
-						//JOptionPane.showMessageDialog(null, con.toString()+" evaluated to false");
-						log(con.toString()+" is false - returning");
+						//JOptionPane.showMessageDiathis.logging.debug(null, con.toString()+" evaluated to false");
+						this.logging.debug(con.toString()+" is false - returning");
 					}
 				} catch (PrivacyException e) {
 					// TODO Auto-generated catch block
@@ -158,7 +167,7 @@ public class PreferenceEvaluator {
 				}
 			}//and it's not a condition but an Outcome (i.e. not a branch but a leaf)
 			else{
-				log("PrefEvaluator> Returning: "+ptn.getOutcome());
+				this.logging.debug("PrefEvaluator> Returning: "+ptn.getOutcome());
 				return ptn;
 			}
 		}
@@ -176,7 +185,7 @@ public class PreferenceEvaluator {
 			String currentContextValue = this.getValueFromContext(contextCond.getCtxIdentifier());
 			OperatorConstants operator = contextCond.getOperator();
 			
-			log("evaluating cond: "+contextCond.toString()+" against current value: "+currentContextValue);
+			this.logging.debug("evaluating cond: "+contextCond.toString()+" against current value: "+currentContextValue);
 			if (operator.equals(OperatorConstants.EQUALS)){
 				
 				return currentContextValue.equalsIgnoreCase(contextCond.getValue());
@@ -202,7 +211,21 @@ public class PreferenceEvaluator {
 				e.printStackTrace();
 				return false;
 			}
-		}else{
+		}else if (cond instanceof PrivacyCondition){
+			this.logging.debug("evaluating condition: "+cond.toString());
+			this.logging.debug("Conditions available from negotiation: "+conditions.size());
+			for (Condition condition : conditions){
+				if (((PrivacyCondition) cond).getCondition().getConditionConstant().equals(condition.getConditionConstant())){
+					this.logging.debug("Found same condition. "+cond.getType());
+					if (((PrivacyCondition) cond).getCondition().getValue().equals(condition.getValue())){
+						this.logging.debug("Conditions match. returning true");
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		else{
 			throw new PrivacyException("PM: Condition is not a Context condition");
 		}
 		
@@ -223,7 +246,7 @@ public class PreferenceEvaluator {
 		case LESS_THAN:
 			result = valueInContext < valueInPreference;
 			break;
-		default: log("Invalid Operator");
+		default: this.logging.debug("Invalid Operator");
 		}
 		
 		return result;
@@ -244,14 +267,46 @@ public class PreferenceEvaluator {
 		try{
 			return Integer.parseInt(str);
 		}catch (NumberFormatException nbe){
-			log("Could not parse String to int");
+			this.logging.debug("Could not parse String to int");
 			return 0;
 		}
 		
 	}
 	
-	private void log(String message){
-		this.logging.info(this.getClass().getName()+" : "+message);
+	public HashMap<RequestItem, ResponseItem> evaluatePPNPreferences(
+			Hashtable<RequestItem, PPNPrivacyPreferenceTreeModel> modelsHashtable) {
+
+		Enumeration<RequestItem> items = modelsHashtable.keys();
+		HashMap<RequestItem, ResponseItem> toReturn = new HashMap<RequestItem, ResponseItem>();
+		//for every requestItem, a list of responseItems will be created
+		//for each action in the requestItem, there will be a ResponseItem
+		while(items.hasMoreElements()){
+			RequestItem item = items.nextElement();
+			//set the conditions from the request policy
+			this.conditions = item.getConditions();
+			//evaluate all the preferences for this request item
+			PPNPrivacyPreferenceTreeModel model = modelsHashtable.get(item);
+				Hashtable<IPrivacyOutcome, List<CtxIdentifier>> outList = this.evaluatePreference(model.getRootPreference());
+				//we actually don't care about the ctxIdentifiers in the case of ppn as there will be no proactive actions for these preferences
+				IPrivacyOutcome temp = outList.keys().nextElement(); //there's only one key
+				if (temp instanceof PPNPOutcome){
+					PPNPOutcome outcome = (PPNPOutcome) temp;
+					ResponseItem respItem = new ResponseItem();
+					respItem.setDecision(outcome.getDecision());
+					respItem.setRequestItem(item);
+					toReturn.put(item, respItem);
+				}
+				
+			
+			
+		}
+		
+		return toReturn;
+	}
+
+	public Hashtable<IPrivacyOutcome, List<CtxIdentifier>> evaluateAccessCtrlPreference(IPrivacyPreference pref, List<Condition> conditions) {
+		this.conditions = conditions;
+		return this.evaluatePreference(pref);
 	}
 	
 
@@ -262,7 +317,7 @@ public class PreferenceEvaluator {
 			
 			ICtxEntity entity = sbroker.createEntity("Person");
 			if (entity==null){
-				System.out.println("entity is null");
+				this.logging.debug("entity is null");
 			}
 			ICtxEntityIdentifier entityID = entity.getCtxIdentifier();
 			ICtxAttribute symlocAttr = sbroker.createAttribute(entityID, CtxTypes.SYMBOLIC_LOCATION);
@@ -294,11 +349,11 @@ public class PreferenceEvaluator {
 			PreferenceEvaluator ev = new PreferenceEvaluator(cc);
 			Hashtable<IOutcome,List<CtxIdentifier>> result = ev.evaluatePreference(preference);
 			if (result!=null && (!result.isEmpty())){
-				System.out.println("got result. size: "+result.size());
+				this.logging.debug("got result. size: "+result.size());
 				Enumeration<IOutcome> outcomes = result.keys();
 				while (outcomes.hasMoreElements()){
 					IOutcome o = outcomes.nextElement();
-					System.out.println(o.toString());
+					this.logging.debug(o.toString());
 				}
 			}
 		} catch (ContextException e) {

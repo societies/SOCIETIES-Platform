@@ -183,4 +183,19 @@ public class ConditionUtils {
 		.append(o1.isOptional(), rhs.isOptional())
 		.isEquals();
 	}
+	
+	public static String toString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition condition){
+		
+			StringBuilder builder = new StringBuilder();
+			builder.append("Condition [getConditionConstant()=");
+			builder.append(condition.getConditionConstant());
+			builder.append(", isOptional()=");
+			builder.append(condition.isOptional());
+			builder.append(", getValue()=");
+			builder.append(condition.getValue());
+			builder.append("]");
+			return builder.toString();
+		
+
+	}
 }

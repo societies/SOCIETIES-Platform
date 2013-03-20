@@ -24,45 +24,49 @@
  */
 package org.societies.privacytrust.privacyprotection.privacypreferencemanager;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.identity.*;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.*;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.AccessControlPreferenceDetailsBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfPreferenceDetailsBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSPreferenceDetailsBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestorUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.*;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyOutcomeConstants;
-import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PreferenceEvaluator;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.accesscontrol.AccessControlPreferenceTreeModel;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.dobf.DObfPreferenceTreeModel;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ids.IDSPrivacyPreferenceTreeModel;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ppn.PPNPrivacyPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PrivateContextCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.management.PrivatePreferenceCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.PrivacyPreferenceConditionMonitor;
-
-import javax.swing.*;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * @author Elizabeth
@@ -70,7 +74,7 @@ import java.util.concurrent.ExecutionException;
  */
 
 public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
-	
+
 	private PrivatePreferenceCache prefCache;
 	private PrivateContextCache contextCache;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
@@ -78,60 +82,293 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	private ICtxBroker ctxBroker;
 
 	private ITrustBroker trustBroker;
-	
+
 	private PrivacyPreferenceConditionMonitor privacyPCM;
-	
+
 	private IPrivacyDataManagerInternal privacyDataManagerInternal;
-	
+
 	private IIdentityManager idm;
-	
+
 	private ICommManager commsMgr;
-	
+
 	private boolean test = false;
-	
+
 	private MessageBox myMessageBox;
-	
+
 	private IUserFeedback userFeedback;
+	private AccessControlPreferenceManager accCtrlMgr;
+	private IPrivacyAgreementManager agreementMgr;
+	private PPNegotiationPreferenceManager ppnMgr;
+	private IDSPreferenceManager idsMgr;
+
 	public PrivacyPreferenceManager(){
-        try {
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (InstantiationException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (UnsupportedLookAndFeelException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        UIManager.put("ClassLoader", ClassLoader.getSystemClassLoader());
+
+		try {
+			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		} catch (InstantiationException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		} catch (UnsupportedLookAndFeelException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+		UIManager.put("ClassLoader", ClassLoader.getSystemClassLoader());
 		if (this.myMessageBox==null){
 			myMessageBox = new MessageBox();
 		}
 	}
-	
+
 
 	public void initialisePrivacyPreferenceManager(ICtxBroker ctxBroker, ITrustBroker trustBroker){
-		this.setCtxBroker(ctxBroker);
+		this.ctxBroker = ctxBroker;
 		this.trustBroker = trustBroker;
-		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, privacyDataManagerInternal, idm);
+		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, privacyDataManagerInternal, commsMgr);
 		prefCache = new PrivatePreferenceCache(ctxBroker, this.idm);
 		contextCache = new PrivateContextCache(ctxBroker);
 		if (this.myMessageBox==null){
 			myMessageBox = new MessageBox();
 		}
 	}
-	
+
 	public void initialisePrivacyPreferenceManager(){
 		prefCache = new PrivatePreferenceCache(ctxBroker, this.idm);
 		contextCache = new PrivateContextCache(ctxBroker);
-		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, getprivacyDataManagerInternal(), idm);
+		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, this.privacyDataManagerInternal, commsMgr);
 		contextCache = new PrivateContextCache(ctxBroker);
 		if (this.myMessageBox==null){
 			myMessageBox = new MessageBox();
 		}
 	}
-	
+
+
+
+	private AccessControlPreferenceManager getAccessControlPreferenceManager(){
+		if (this.accCtrlMgr==null){
+			accCtrlMgr = new AccessControlPreferenceManager(prefCache, contextCache, userFeedback, trustBroker, ctxBroker, getAgreementMgr(), idm);
+		}
+		return accCtrlMgr;
+	}
+
+	private PPNegotiationPreferenceManager getPPNegotiationPreferenceManager(){
+		if (this.ppnMgr==null){
+			ppnMgr = new PPNegotiationPreferenceManager(prefCache, contextCache, privacyPCM, trustBroker);
+		}
+		return ppnMgr;
+	}
+
+	private DObfPrivacyPreferenceManager getDObfPreferenceManager(){
+		DObfPrivacyPreferenceManager dobfMgr = new DObfPrivacyPreferenceManager(prefCache, contextCache, trustBroker);
+		return dobfMgr;
+	}
+
+	private IDSPreferenceManager getIDSPreferenceManager(){
+		if (idsMgr ==null){
+			idsMgr = new IDSPreferenceManager(prefCache, contextCache, trustBroker);
+		}
+		return idsMgr;
+	}
+
+	@Override
+	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId,
+			List<Action> actions) throws PrivacyException {
+		// TODO Auto-generated method stub
+		AccessControlPreferenceManager  accCtrlMgr = getAccessControlPreferenceManager();
+		return accCtrlMgr.checkPermission(requestor, dataId, actions);
+	}
+
+	@Override
+	@Deprecated
+	public org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem checkPermission(Requestor requestor, DataIdentifier dataId,
+			List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions) throws PrivacyException {
+		// TODO Auto-generated method stub
+		AccessControlPreferenceManager  accCtrlMgr = getAccessControlPreferenceManager();
+		List<Action> actionBeanList = new ArrayList<Action>();
+		for (org.societies.api.privacytrust.privacy.model.privacypolicy.Action action: actions){
+			actionBeanList.add(ActionUtils.toActionBean(action));
+		}
+
+		return ResponseItemUtils.toResponseItem(accCtrlMgr.checkPermission(RequestorUtils.toRequestorBean(requestor), dataId, actionBeanList));
+	}
+	@Override
+	public boolean deleteAccCtrlPreference(
+			AccessControlPreferenceDetailsBean details) {
+		return this.getAccessControlPreferenceManager().deleteAccCtrlPreference(details);
+	}
+
+
+	@Override
+	public boolean deleteDObfPreference(DObfPreferenceDetailsBean details) {
+		return this.getDObfPreferenceManager().deleteDObfPreference(details);
+	}
+
+
+	@Override
+	public boolean deleteIDSPreference(IDSPreferenceDetailsBean details) {
+		return this.getIDSPreferenceManager().deleteIDSPreference(details);
+	}
+
+
+	@Override
+	public boolean deletePPNPreference(PPNPreferenceDetailsBean details) {
+		return this.getPPNegotiationPreferenceManager().deletePPNPreference(details);
+	}
+
+
+	@Override
+	public ResponseItem evaluateAccCtrlPreference(
+			AccessControlPreferenceDetailsBean details, List<Condition> conditions) {
+		try {
+			return this.getAccessControlPreferenceManager().evaluateAccCtrlPreference(details, conditions);
+		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			this.logging.debug("Could not evaluate AccCtrl preference for provided details");
+			return null;
+		}
+	}
+
+
+	@Override
+	public double evaluateDObfPreference(DObfPreferenceDetailsBean details) {
+		return this.getDObfPreferenceManager().evaluateDObfPreference(details);
+	}
+
+
+	@Override
+	public IIdentity evaluateIDSPreference(IDSPreferenceDetailsBean details) {
+		return this.getIDSPreferenceManager().evaluateIDSPreference(details);
+	}
+
+
+	@Override
+	public IIdentity evaluateIDSPreferences(IAgreement agreement,
+			List<IIdentity> identities) {
+		//TODO: return this.getIDSPreferenceManager().evaluateIDSPreferences(agreement, identities);
+		if (identities.size()>0){
+			return identities.get(0);
+		}
+		return null;
+	}
+
+
+	@Override
+	public AccessControlPreferenceTreeModel getAccCtrlPreference(
+			AccessControlPreferenceDetailsBean details) {
+		return this.getAccessControlPreferenceManager().getAccCtrlPreference(details);
+	}
+
+
+	@Override
+	public List<AccessControlPreferenceDetailsBean> getAccCtrlPreferenceDetails() {
+		return this.getAccessControlPreferenceManager().getAccCtrlPreferenceDetails();
+	}
+
+
+	@Override
+	public DObfPreferenceTreeModel getDObfPreference(
+			DObfPreferenceDetailsBean details) {
+		return this.getDObfPreferenceManager().getDObfPreference(details);
+	}
+
+
+	@Override
+	public List<DObfPreferenceDetailsBean> getDObfPreferenceDetails() {
+		return this.getDObfPreferenceManager().getDObfPreferenceDetails();
+	}
+
+
+	@Override
+	public IDSPrivacyPreferenceTreeModel getIDSPreference(
+			IDSPreferenceDetailsBean details) {
+		return this.getIDSPreferenceManager().getIDSPreference(details);
+	}
+
+
+	@Override
+	public List<IDSPreferenceDetailsBean> getIDSPreferenceDetails() {
+		return this.getIDSPreferenceManager().getIDSPreferenceDetails();
+	}
+
+
+	@Override
+	public PPNPrivacyPreferenceTreeModel getPPNPreference(
+			PPNPreferenceDetailsBean details) {
+		return this.getPPNegotiationPreferenceManager().getPPNPreference(details);
+	}
+
+
+	@Override
+	public List<PPNPreferenceDetailsBean> getPPNPreferenceDetails() {
+		return this.getPPNegotiationPreferenceManager().getPPNPreferenceDetails();
+	}
+
+
+	@Override
+	public boolean storeAccCtrlPreference(
+			AccessControlPreferenceDetailsBean details,
+			AccessControlPreferenceTreeModel model) {
+		this.logging.debug("request to store access control preferences for: "+ResourceUtils.toXmlString(details.getResource())+" \nand requestor: "+RequestorUtils.toXmlString(details.getRequestor()));
+		System.out.println("request to store access control preferences for: "+ResourceUtils.toXmlString(details.getResource())+" \nand requestor: "+RequestorUtils.toXmlString(details.getRequestor()));
+		return this.getAccessControlPreferenceManager().storeAccCtrlPreference(details, model);
+	}
+
+
+	@Override
+	public boolean storeDObfPreference(DObfPreferenceDetailsBean details,
+			DObfPreferenceTreeModel model) {
+		try {
+			return this.getDObfPreferenceManager().storeDObfPreference(details, model);
+		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+
+	@Override
+	public boolean storeIDSPreference(IDSPreferenceDetailsBean details,
+			IDSPrivacyPreferenceTreeModel model) {
+		try {
+			return this.getIDSPreferenceManager().storeIDSPreference(details, model);
+
+		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+
+	@Override
+	public boolean storePPNPreference(PPNPreferenceDetailsBean details,
+			PPNPrivacyPreferenceTreeModel model) {
+
+		try {
+			return this.getPPNegotiationPreferenceManager().storePPNPreference(details, model);
+		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+
+
+	}
+
+	@Override
+	public HashMap<RequestItem,ResponseItem> evaluatePPNPreferences(RequestPolicy requestPolicy) {
+		try {
+			return this.getPPNegotiationPreferenceManager().evaluatePPNPreferences(requestPolicy);
+		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return new HashMap<RequestItem, ResponseItem>();
+	}
+
+
 	/**
 	 * @return the ctxBroker
 	 */
@@ -158,988 +395,6 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	public void setTrustBroker(ITrustBroker trustBroker) {
 		this.trustBroker = trustBroker;
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#checkPermission(org.societies.api.identity.Requestor, org.societies.api.context.model.CtxAttributeIdentifier, java.util.List)
-	 */
-	@Override
-	public ResponseItem checkPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException{
-		
-		if (null==dataId){
-			this.logging.debug("requested permission for null CtxIdentifier. returning : null");
-			return null;
-			
-		}
-		this.logging.debug("checkPermission: \nRequestor: "+requestor.toString()+"\nctxId: "+dataId.getUri()+"\n and actions...");
-		
-		String actionList = "";
-		for (Action a : actions){
-			actionList = actionList.concat(a.toString());
-		}
-		List<Condition> conditions = new ArrayList<Condition>();
-		PPNPreferenceDetails details = new PPNPreferenceDetails(dataId.getType());
-		details.setAffectedDataId(dataId);
-		details.setRequestor(requestor);
-		IPrivacyPreferenceTreeModel model = prefCache.getPPNPreference(details);
-		if (model!=null){
-			this.logging.debug("Preference for specific request found");
-			return this.checkPreferenceForAccessControl(model, requestor, dataId, conditions, actions);
-		}
-
-		this.logging.debug("Preference for specific request NOT found");
-		details = new PPNPreferenceDetails(dataId.getType());
-		details.setRequestor(requestor);
-		model = this.prefCache.getPPNPreference(details);
-		if (model!=null){
-			this.logging.debug("Preference found specific to type and requestor but not for ctxId");
-			return this.checkPreferenceForAccessControl(model, requestor, dataId, conditions, actions);
-		}		
-
-		details = new PPNPreferenceDetails(dataId.getType());
-		details.setAffectedDataId(dataId);
-		model = this.prefCache.getPPNPreference(details);
-		if (model!=null){
-			this.logging.debug("Preference found specific to ctxId but not for requestor");
-			return this.checkPreferenceForAccessControl(model, requestor, dataId, conditions, actions);
-		}
-
-		details = new PPNPreferenceDetails(dataId.getType());
-		model = this.prefCache.getPPNPreference(details);
-		if (model!=null){
-			this.logging.debug("Preference found specific to type  but not for ctxId or requestor");
-			return this.checkPreferenceForAccessControl(model, requestor, dataId, conditions, actions);
-		}
-		
-		String allow  = "Allow";
-		String deny = "Deny";
-		String proposalText = requestor.getRequestorId().toString()+" is requesting access to: \n"
-				+ "resource:"+dataId.getType()+"\n("+dataId.getUri()+")\nto perform a "+actionList+" operation. \nAllow?";
-		List<String> response = new ArrayList<String>();
-		try {
-			response = this.userFeedback.getExplicitFB(ExpProposalType.ACKNACK, new ExpProposalContent(proposalText, new String[]{allow,deny})).get();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		/* int n = myMessageBox.showConfirmDialog(requestor.getRequestorId().toString()+" is requesting access to: \n"
-				+ "resource:"+dataId.getType()+"\n("+dataId.getUri()+")\nto perform a "+actionList+" operation. \nAllow?", "Access request", JOptionPane.YES_NO_OPTION);
-		
-		if (n==JOptionPane.YES_OPTION){
-			this.askToStoreDecision(requestor, dataId, conditions, actions, PrivacyOutcomeConstants.ALLOW);
-			return this.createResponseItem(requestor, dataId, actions, conditions, Decision.PERMIT);
-		}else{
-			this.askToStoreDecision(requestor, dataId, conditions, actions, PrivacyOutcomeConstants.BLOCK);
-			return this.createResponseItem(requestor, dataId, actions, conditions, Decision.DENY);
-		}*/
-		
-		if (response.contains(allow))
-		{
-			this.askToStoreDecision(requestor, dataId, conditions, actions, PrivacyOutcomeConstants.ALLOW);
-			return this.createResponseItem(requestor, dataId, actions, conditions, Decision.PERMIT);
-		}else{
-			this.askToStoreDecision(requestor, dataId, conditions, actions, PrivacyOutcomeConstants.BLOCK);
-			return this.createResponseItem(requestor, dataId, actions, conditions, Decision.DENY);
-		}
-	}
-
-	/*
-	 * SOCIETIES new method 
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#checkPermission(java.lang.String, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action, org.societies.api.comm.xmpp.datatypes.IIdentity)
-	 */
-/*	@Override
-	public ResponseItem checkPermission(Requestor requestor, String ctxType, List<Action> actions) throws PrivacyException{
-		this.logging.debug("checkPermission: \nRequestor: "+requestor.toString()+"\nctxType : "+ctxType+"\n and actions...");
-		PPNPreferenceDetails details = new PPNPreferenceDetails(ctxType);
-		details.setRequestor(requestor);
-		IPrivacyPreferenceTreeModel model = prefCache.getPPNPreference(details);
-		List<Condition> conditions = new ArrayList<Condition>();
-		if (model!=null){
-			this.logging.debug("Preference for specific request found");
-			return this.checkPreferenceForAccessControl(model, requestor, ctxType, conditions, actions);
-		}
-		this.logging.debug("Preference for specific request NOT found");
-		details = new PPNPreferenceDetails(ctxType);
-		model = prefCache.getPPNPreference(details);
-		if (model!=null){
-			return this.checkPreferenceForAccessControl(model, requestor, ctxType, conditions, actions);
-		}
-		String actionList = "";
-		for (Action a : actions){
-			actionList = actionList.concat(a.toString());
-		}
-		try {
-			Future<List<CtxIdentifier>> futureCtxIds = this.getCtxBroker().lookup(CtxModelType.ATTRIBUTE, ctxType);
-
-			List<CtxIdentifier> ctxIds = futureCtxIds.get();
-
-			CtxAttributeIdentifier ctxId;
-			if (ctxIds.size()==0){
-				this.logging.debug("CtxType: "+ctxType+" not found. Returning BLOCK decision");
-				return this.createResponseItem(requestor, ctxType, actions, conditions, Decision.DENY);
-			}else if (ctxIds.size()==1){
-				ctxId = (CtxAttributeIdentifier) ctxIds.get(0);
-			}else{
-				this.logging.debug("Asking the user: "+ctxType);
-				
-				ctxId = (CtxAttributeIdentifier) myMessageBox.showInputDialog(requestor.toString()+" is requesting access to: \n"
-						+ "resource:"+ctxType+"\n(to perform a "+actionList+" operation.\nSelect an attribute to provide access to or click cancel to abort.", 
-						"Access request", JOptionPane.PLAIN_MESSAGE, ctxIds.toArray(), ctxIds.get(0));
-				if (ctxId == null){
-					this.logging.debug("User aborted. Returning block");
-					this.askToStoreDecision(requestor, ctxId, conditions, actions, PrivacyOutcomeConstants.BLOCK);
-					return this.createResponseItem(requestor, ctxType, actions, conditions, Decision.DENY);
-				}
-			}
-				this.askToStoreDecision(requestor, ctxId, conditions, actions, PrivacyOutcomeConstants.ALLOW);
-				return this.createResponseItem(requestor, ctxType, actions, conditions, Decision.PERMIT);
-			
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return this.createResponseItem(requestor, ctxType, actions, conditions, Decision.DENY);
-
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return this.createResponseItem(requestor, ctxType, actions, conditions, Decision.DENY);
-
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return this.createResponseItem(requestor, ctxType, actions, conditions, Decision.DENY);
-
-		}
-
-	}*/
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#evaluateIDSPreferences(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement, java.util.List)
-	 */
-	@Override
-	public IIdentity evaluateIDSPreferences(IAgreement agreement, List<IIdentity> dpis){
-
-		IIdentity selectedIIdentity = this.evaluateIDSPreferenceBasedOnAllInfo(agreement, dpis);
-
-		if (selectedIIdentity==null){
-			selectedIIdentity = this.evaluateIDSPreferenceBasedOnProviderDPI(agreement, dpis);
-			if (selectedIIdentity == null){
-				selectedIIdentity = this.evaluateIDSPreferenceIrrespectiveOfRequestor(agreement, dpis);
-				if (selectedIIdentity == null){
-					return null;
-				}else if (selectedIIdentity instanceof InvalidIdentity){
-					//user wants to use a new DPI
-					return null;
-				}else{
-					return selectedIIdentity;
-				}
-			}else if (selectedIIdentity instanceof InvalidIdentity){
-				//user wants to use a new DPI
-				return null;
-			}else{
-				return selectedIIdentity;
-			}
-		}else if (selectedIIdentity instanceof InvalidIdentity){
-			//user wants to use a new DPI
-			return null;
-		}else{
-			return selectedIIdentity;
-		}
-
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#evaluatePPNP(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
-	 */
-	@Override
-	public ResponsePolicy evaluatePPNP(RequestPolicy request){
-		//TODO
-		return null;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#evaluatePPNPreference(java.lang.String)
-	 */
-	@Override
-	public List<IPrivacyOutcome> evaluatePPNPreference(String contextType) {
-		this.logging.debug("Request to evaluate Preferences referring to contextType: "+contextType);
-		List<IPrivacyOutcome> outcomes = new ArrayList<IPrivacyOutcome>();
-		List<IPrivacyPreferenceTreeModel> models = this.prefCache.getPPNPreferences(contextType);
-		this.logging.debug("Found "+models.size()+" preferences referring contextType: "+contextType);
-		for (IPrivacyPreferenceTreeModel model : models){
-			IPrivacyOutcome outcome = this.evaluatePreference(model.getRootPreference());
-			if (outcome!=null){
-				outcomes.add(outcome);
-			}
-		}
-		this.logging.debug("Number of applicable preferences: "+outcomes.size());
-		return outcomes;
-	}
-	
-	public IPrivacyOutcome evaluatePPNPreference(PPNPreferenceDetails detail){
-		IPrivacyPreferenceTreeModel model = this.prefCache.getPPNPreference(detail);
-		if (model==null){
-			this.logging.debug("Requested evaluation of PPN preference with details: "+detail.toString()+" but preference with these details does not exist");
-			return null;
-		}
-		IPrivacyOutcome outcome = this.evaluatePreference(model.getRootPreference());
-		
-		return outcome;
-	}
-
-	
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#evaluateIdSPreference(org.societies.api.identity.Requestor)
-	 */
-	public IIdentity evaluateIdSPreference(Requestor requestor){
-		List<IDSPreferenceDetails> details = this.prefCache.getIDSPreferenceDetails();
-		List<IIdentity> identities = new ArrayList<IIdentity>();
-		for (IDSPreferenceDetails detail : details){
-			if (detail.getRequestor().equals(requestor)){
-				identities.add(this.evaluateIDSPreference(detail));
-			}
-		}
-		
-		if (identities.size()==0){
-			return null;
-		}
-		if (identities.size()==1){
-			return identities.get(0);
-		}
-		
-		List<String> strCandidateIDs = new ArrayList<String>();
-		strCandidateIDs.add((new InvalidIdentity()).toString());
-
-		for (IIdentity userId : identities){
-
-			strCandidateIDs.add(userId.toString());
-		}
-		
-		String createNew = "Create new Identity";
-		strCandidateIDs.add(createNew);
-		String s = "";
-		if (requestor instanceof RequestorService){
-			s = this.askUserToSelectIdentityForStartingService((RequestorService) requestor, strCandidateIDs);
-		}else if (requestor instanceof RequestorCis){
-			s = this.askUserToSelectIdentityForJoiningCIS((RequestorCis) requestor, strCandidateIDs);
-		}else{
-			s = this.askUserToSelectIdentityForInteractingWithCSS(requestor, strCandidateIDs);
-		}
-		
-		for (IIdentity id : identities){
-			if (s.equalsIgnoreCase(id.toString())){
-				return id;
-			}
-		}
-		return new InvalidIdentity();
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#evaluateIDSPreference(org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails)
-	 */
-	@Override
-	public IIdentity evaluateIDSPreference(IDSPreferenceDetails details) {
-		IPrivacyPreferenceTreeModel model = this.prefCache.getIDSPreference(details);
-		IPrivacyOutcome out = this.evaluatePreference(model.getRootPreference());
-		if (out instanceof IdentitySelectionPreferenceOutcome){
-			return ((IdentitySelectionPreferenceOutcome) out).getIdentity();
-		}
-		return null;
-	}
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#evaluateDObfPreference(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, java.lang.String)
-	 */
-	@Override
-	public DObfOutcome evaluateDObfPreference(Requestor requestor, String dataType) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#evaluateDObfOutcome(org.societies.api.context.model.CtxIdentifier)
-	 */
-	@Override
-	public DObfOutcome evaluateDObfOutcome(CtxIdentifier arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#getIDSPreferenceDetails()
-	 */
-	@Override
-	public List<IDSPreferenceDetails> getIDSPreferenceDetails() {
-
-		return this.prefCache.getIDSPreferenceDetails();
-	}
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#getIDSPreferences(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity)
-	 */
-	@Override
-	public List<IPrivacyPreferenceTreeModel> getIDSPreferences( Requestor requestor, IIdentity affectedIIdentity) {
-		return this.prefCache.getIDSPreferences(affectedIIdentity, requestor);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#getIDSPreferences(org.societies.api.identity.IIdentity)
-	 */
-	@Override
-	public List<IPrivacyPreferenceTreeModel> getIDSPreferences(IIdentity userDPI) {
-		return this.prefCache.getIDSPreferences(userDPI);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#getIDSPreference(org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails)
-	 */
-	@Override
-	public IPrivacyPreferenceTreeModel getIDSPreference(IDSPreferenceDetails details) {
-		return this.prefCache.getIDSPreference(details);
-	}
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#getPPNPreferenceDetails()
-	 */
-	@Override
-	public List<PPNPreferenceDetails> getPPNPreferenceDetails() {
-		return this.prefCache.getPPNPreferenceDetails();
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#getPPNPreferences(java.lang.String)
-	 */
-	@Override
-	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType) {
-		return this.prefCache.getPPNPreferences(contextType);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#getPPNPreferences(java.lang.String, org.societies.api.context.model.CtxAttributeIdentifier)
-	 */
-	@Override
-	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, CtxAttributeIdentifier ctxID) {
-		return this.prefCache.getPPNPreferences(contextType, ctxID);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#getPPNPreferences(org.societies.api.identity.Requestor, java.lang.String)
-	 */
-	@Override
-	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(Requestor requestor, String contextType) {
-		return this.prefCache.getPPNPreferences(contextType, requestor);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#getPPNPreferences(org.societies.api.identity.Requestor, java.lang.String, org.societies.api.context.model.CtxAttributeIdentifier)
-	 */
-	@Override
-	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(Requestor requestor, String contextType, CtxAttributeIdentifier ctxID) {
-		return this.prefCache.getPPNPreferences(contextType, ctxID, requestor);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#getPPNPreference(org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPreferenceDetails)
-	 */
-	@Override
-	public IPrivacyPreferenceTreeModel getPPNPreference(PPNPreferenceDetails details) {
-		return this.prefCache.getPPNPreference(details);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#getDObfPreference(org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfPreferenceDetails)
-	 */
-	@Override
-	public IPrivacyPreferenceTreeModel getDObfPreference(DObfPreferenceDetails details){
-		return this.prefCache.getDObfPreference(details);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#getDObfPreferences()
-	 */
-	@Override
-	public List<DObfPreferenceDetails> getDObfPreferences(){
-		return this.prefCache.getDObfPreferences();
-	}
-	
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#storeIDSPreference(org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails, org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference)
-	 */
-	@Override
-	public void storeIDSPreference(IDSPreferenceDetails details, IPrivacyPreference preference) {
-		IPrivacyPreferenceTreeModel model = new IDSPrivacyPreferenceTreeModel(details.getAffectedDPI(),preference);
-		
-		if (details.getRequestor()!=null){
-			((IDSPrivacyPreferenceTreeModel) model).setRequestor(details.getRequestor());
-		}
-		this.prefCache.addIDSPreference(details, model);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#storePPNPreference(org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPreferenceDetails, org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference)
-	 */
-	@Override
-	public void storePPNPreference(PPNPreferenceDetails details, IPrivacyPreference preference){
-
-		PPNPrivacyPreferenceTreeModel model = new PPNPrivacyPreferenceTreeModel(details.getDataType(), preference);
-		if (details.getAffectedDataId()!=null){
-			model.setAffectedDataId(details.getAffectedDataId());
-		}
-		if (details.getRequestor()!=null){
-			model.setRequestor(details.getRequestor());
-		}
-		this.logging.debug("REquest to add preference :\n"+details.toString());
-		this.prefCache.addPPNPreference(details, model);
-		this.privacyPCM.updatePreferences(details, preference);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#deleteIDSPreference(org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails)
-	 */
-	@Override
-	public void deleteIDSPreference(IDSPreferenceDetails details){
-		this.prefCache.removeIDSPreference(details);
-	}
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#deleteIDSPreference(org.societies.api.identity.IIdentity)
-	 */
-	@Override
-	public void deleteIDSPreference(IIdentity userDPI) {
-		IDSPreferenceDetails details = new IDSPreferenceDetails(userDPI);
-		this.prefCache.removeIDSPreference(details);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#deleteIDSPreference(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity)
-	 */
-	@Override
-	public void deleteIDSPreference(Requestor requestor, IIdentity userIdentity) {
-		IDSPreferenceDetails details = new IDSPreferenceDetails(userIdentity);
-		details.setRequestor(requestor);
-		this.prefCache.removeIDSPreference(details);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#deletePPNPreference(java.lang.String)
-	 */
-	@Override
-	public void deletePPNPreference(String contextType){
-		PPNPreferenceDetails details = new PPNPreferenceDetails(contextType);
-		this.prefCache.removePPNPreference(details);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#deletePPNPreference(java.lang.String, org.societies.api.context.model.CtxAttributeIdentifier)
-	 */
-	@Override
-	public void deletePPNPreference(String contextType, CtxAttributeIdentifier affectedCtxID) {
-		PPNPreferenceDetails details = new PPNPreferenceDetails(contextType);
-		details.setAffectedDataId(affectedCtxID);
-		this.prefCache.removePPNPreference(details);
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#deletePPNPreference(org.societies.api.identity.Requestor, java.lang.String, org.societies.api.context.model.CtxAttributeIdentifier)
-	 */
-	@Override
-	public void deletePPNPreference(Requestor requestor, String contextType, CtxAttributeIdentifier affectedCtxID){
-		PPNPreferenceDetails details = new PPNPreferenceDetails(contextType);
-		details.setAffectedDataId(affectedCtxID);
-		details.setRequestor(requestor);
-		this.prefCache.removePPNPreference(details);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#deletePPNPreference(org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPreferenceDetails)
-	 */
-	@Override
-	public void deletePPNPreference(PPNPreferenceDetails details) {
-		this.prefCache.removePPNPreference(details);
-
-	}
-	
-	
-	/* 
-	 ******* PRIVATE METHODS BELOW ***************
-	 */
-	
-	
-	private ResponseItem checkPreferenceForAccessControl(IPrivacyPreferenceTreeModel model, Requestor requestor, DataIdentifier dataId, List<Condition> conditions, List<Action> actions){
-		this.logging.debug("Evaluating preference");
-		IPrivacyOutcome outcome = this.evaluatePreference(model.getRootPreference());
-		
-		String actionList = "";
-		for (Action a : actions){
-			actionList = actionList.concat(a.toString());
-		}
-		if (null==outcome){
-			this.logging.debug("Evaluation returned no result. Asking the user: "+dataId.getType());
-			
-			String allow = "Allow";
-			String deny = "Deny";
-			
-			
-			List<String> response = new ArrayList<String>();
-			
-			String proposalText = requestor.getRequestorId().toString()+" is requesting access to: \n"
-					+ "resource:"+dataId.getType()+"\n("+dataId.getUri()+")\nto perform a "+actionList+" operation.";
-			try {
-				response = this.userFeedback.getExplicitFB(ExpProposalType.ACKNACK, new ExpProposalContent(proposalText, new String[]{allow,deny})).get();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			if (response.contains(allow)){
-				this.askToStoreDecision(requestor, dataId, conditions, actions,  PrivacyOutcomeConstants.ALLOW);
-				return this.createResponseItem(requestor, dataId, actions, conditions, Decision.PERMIT);
-			}else{
-				this.askToStoreDecision(requestor, dataId, conditions, actions, PrivacyOutcomeConstants.BLOCK);
-				return this.createResponseItem(requestor, dataId, actions, conditions, Decision.DENY);
-			}
-			/*int n = myMessageBox.showConfirmDialog(requestor.getRequestorId().toString()+" is requesting access to: \n"
-					+ "resource:"+dataId.getType()+"\n("+dataId.getUri()+")\nto perform a "+actionList+" operation. \nAllow?", "Access request", JOptionPane.YES_NO_OPTION);
-			if (n==JOptionPane.YES_OPTION){
-				this.askToStoreDecision(requestor, dataId, conditions, actions,  PrivacyOutcomeConstants.ALLOW);
-				return this.createResponseItem(requestor, dataId, actions, conditions, Decision.PERMIT);
-			}else{
-				this.askToStoreDecision(requestor, dataId, conditions, actions, PrivacyOutcomeConstants.BLOCK);
-				return this.createResponseItem(requestor, dataId, actions, conditions, Decision.DENY);
-			}*/
-		}else{
-			if (((PPNPOutcome) outcome).getEffect()==PrivacyOutcomeConstants.ALLOW){
-				this.logging.debug("Returning PERMIT decision for resource: "+dataId.getUri());
-				return this.createResponseItem(requestor, dataId, actions, conditions, Decision.PERMIT);
-			}
-			this.logging.debug("Returning DENY decision for resource: "+dataId.getUri());
-			return this.createResponseItem(requestor, dataId, actions, conditions, Decision.DENY);
-		}
-	}
-
-	private ResponseItem createResponseItem(Requestor requestor, DataIdentifier dataId, List<Action> actions, List<Condition> conditions, Decision decision){
-	
-	/*
-	 * sfina: otan to request einai gia create, prosthetoume WRITE, DELETE kai READ
-	 * sfina2: otan to request einai gia write, prosthetoume READ
-	 */
-	actions = this.adjustActions(actions);
-	/*
-	 * telos sfinas
-	 */
-		RequestItem reqItem = new RequestItem(new Resource(dataId), actions, conditions);
-
-		ResponseItem respItem = new ResponseItem(reqItem, decision);
-		
-		
-		return respItem;
-	}
-	
-	private List<Action> adjustActions(List<Action> actions){
-		boolean hasCreate = false;
-		boolean hasWrite = false;
-		boolean hasDelete = false;
-		for (Action a: actions){
-			if (a.getActionType().equals(ActionConstants.CREATE)){
-				hasCreate = true;
-			}
-			if (a.getActionType().equals(ActionConstants.WRITE)){
-				hasWrite = true;
-			}
-			
-			if (a.getActionType().equals(ActionConstants.DELETE)){
-				hasDelete = true;
-			}
-		}
-		if (hasCreate){
-			actions = new ArrayList<Action>();
-			actions.add(new Action(ActionConstants.CREATE));
-			actions.add(new Action(ActionConstants.WRITE));
-			actions.add(new Action(ActionConstants.READ));
-			actions.add(new Action(ActionConstants.DELETE));
-		} else 	if (hasWrite){
-			actions = new ArrayList<Action>();
-			actions.add(new Action(ActionConstants.WRITE));
-			actions.add(new Action(ActionConstants.READ));
-			
-			if (hasDelete){
-				actions.add(new Action(ActionConstants.DELETE));
-			}
-		}
-		return actions;
-	}
-/*	private ResponseItem createResponseItem(Requestor requestor, String ctxType, List<Action> actions, List<Condition> conditions, Decision decision){
-		
-		 * sfina: otan to request einai gia create, prosthetoume WRITE, DELETE kai READ
-		 * sfina2: otan to request einai gia write, prosthetoume READ
-		 
-		actions = this.adjustActions(actions);
-		
-		 * telos sfinas
-		 
-		RequestItem reqItem = new RequestItem(new Resource(ctxType), actions, conditions);
-		ResponseItem respItem = new ResponseItem(reqItem, decision);
-		return respItem;
-	}*/
-/*	private ResponseItem checkPreferenceForAccessControl(IPrivacyPreferenceTreeModel model, Requestor requestor, String ctxType, List<Condition> conditions, List<Action> actions){
-		this.logging.debug("Evaluating preference");
-		IPrivacyOutcome outcome = this.evaluatePreference(model.getRootPreference());
-		if (null==outcome){
-			this.logging.debug("Evaluation did not return a result");
-
-			String actionList = "";
-			for (Action a : actions){
-				actionList = actionList.concat(a.toString());
-			}
-			try {
-				Future<List<CtxIdentifier>> futureCtxIds = this.getCtxBroker().lookup(CtxModelType.ATTRIBUTE, ctxType);
-
-				List<CtxIdentifier> ctxIds = futureCtxIds.get();
-
-				CtxAttributeIdentifier ctxId;
-				if (ctxIds.size()==0){
-					this.logging.debug("CtxType: "+ctxType+" not found. Returning DENY");
-					return this.createResponseItem(requestor, ctxType, actions, conditions, Decision.DENY);
-				}else if (ctxIds.size()==1){
-					ctxId = (CtxAttributeIdentifier) ctxIds.get(0);
-					this.logging.debug("Found 1 CtxType: "+ctxType+" in db. Asking permission from user");
-				}else{
-					this.logging.debug("Asking the user: "+ctxType);
-					ctxId = (CtxAttributeIdentifier) myMessageBox.showInputDialog(requestor.getRequestorId().toString()+" is requesting access to: \n"
-							+ "resource:"+ctxType+"\n(to perform a "+actionList+" operation.\nSelect an attribute to provide access to or click cancel to abort.", 
-							"Access request", JOptionPane.PLAIN_MESSAGE, ctxIds.toArray(), ctxIds.get(0));
-					if (ctxId == null){
-						this.logging.debug("User aborted. Returning block");
-						this.askToStoreDecision(requestor, ctxType, actions, conditions, PrivacyOutcomeConstants.BLOCK);
-						return this.createResponseItem(requestor, ctxType, actions, conditions, Decision.DENY);
-					}
-				}
-					this.askToStoreDecision(requestor, ctxId, conditions, actions, PrivacyOutcomeConstants.ALLOW);
-					return this.createResponseItem(requestor, ctxId, actions, conditions, Decision.PERMIT);
-				
-			} catch (CtxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return this.createResponseItem(requestor, ctxType, actions, conditions, Decision.DENY);
-
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return this.createResponseItem(requestor, ctxType, actions, conditions, Decision.DENY);
-
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return this.createResponseItem(requestor, ctxType, actions, conditions, Decision.DENY);
-
-			}
-		}else{
-			if (((PPNPOutcome) outcome).getEffect()==PrivacyOutcomeConstants.ALLOW){
-				return this.createResponseItem(requestor, ctxType, actions, conditions, Decision.PERMIT);
-			}
-			return this.createResponseItem(requestor, ctxType, actions, conditions, Decision.DENY);		}
-	}*/
-	private void askToStoreDecision(Requestor requestor, DataIdentifier dataId, List<Condition> conditions,List<Action> actions,  PrivacyOutcomeConstants decision){
-		
-		//int n = myMessageBox.showConfirmDialog("Do you want to store this decision permanently?", "Access request", JOptionPane.YES_NO_OPTION);
-		//if (n==JOptionPane.YES_OPTION){
-			
-			Resource r = new Resource(dataId);
-			List<Requestor> requestors = new ArrayList<Requestor>();
-			requestors.add(requestor);
-			RuleTarget ruleTarget = new RuleTarget(requestors, r, actions);
-			try {
-				PPNPOutcome outcome = new PPNPOutcome(decision, ruleTarget, new ArrayList<Condition>());
-				PrivacyPreference pref = new PrivacyPreference(outcome); 
-				PPNPrivacyPreferenceTreeModel model = new PPNPrivacyPreferenceTreeModel(dataId.getType(), pref);
-				model.setAffectedDataId(dataId);
-				model.setRequestor(requestor);
-				PPNPreferenceDetails details = new PPNPreferenceDetails(dataId.getType());
-				details.setAffectedDataId(dataId);
-				details.setRequestor(requestor);
-				this.prefCache.addPPNPreference(details, model);
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		//}
-	}
-
-/*	private void askToStoreDecision(Requestor requestor, String ctxType, List<Action> actions, List<Condition> conditions, PrivacyOutcomeConstants decision){
-		int n = myMessageBox.showConfirmDialog("Do you want to store this decision permanently?", "Access request", JOptionPane.YES_NO_OPTION);
-		if (n==JOptionPane.YES_OPTION){
-			
-			Resource r = new Resource(ctxType);
-			List<Requestor> requestors = new ArrayList<Requestor>();
-			requestors.add(requestor);
-			RuleTarget ruleTarget = new RuleTarget(requestors, r, actions);
-			try {
-				PPNPOutcome outcome = new PPNPOutcome(decision, ruleTarget, new ArrayList<Condition>());
-				PrivacyPreference pref = new PrivacyPreference(outcome); 
-				PPNPrivacyPreferenceTreeModel model = new PPNPrivacyPreferenceTreeModel(ctxType, pref);
-				model.setRequestor(requestor);
-				PPNPreferenceDetails details = new PPNPreferenceDetails(ctxType);
-				details.setRequestor(requestor);
-				this.prefCache.addPPNPreference(details, model);
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}*/
-	
-	private IPrivacyOutcome evaluatePreference(IPrivacyPreference privPref){
-		PreferenceEvaluator ppE = new PreferenceEvaluator(this.contextCache, trustBroker);
-		Hashtable<IPrivacyOutcome, List<CtxIdentifier>> results = ppE.evaluatePreference(privPref);
-		Enumeration<IPrivacyOutcome> outcomes = results.keys();
-		if (outcomes.hasMoreElements()){
-			return outcomes.nextElement();
-		}
-
-		return null;
-
-	}
-	
-	private class InvalidIdentity implements IIdentity{
-
-		public InvalidIdentity(){
-			
-		}
-
-		@Override
-		public String getJid() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public String getBareJid() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public String getDomain() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public String getIdentifier() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public IdentityType getType() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-		
-	}
-
-	private IIdentity evaluateIDSPreferenceBasedOnAllInfo(IAgreement agreement, List<IIdentity> dpis){
-		ArrayList<IdentitySelectionPreferenceOutcome> outcomes = new ArrayList<IdentitySelectionPreferenceOutcome>();
-		for (int i=0; i<dpis.size(); i++){
-			IDSPreferenceDetails details = new IDSPreferenceDetails(dpis.get(i));
-			details.setRequestor(agreement.getRequestor());
-			IPrivacyPreferenceTreeModel model = prefCache.getIDSPreference(details);
-			/*			if (model == null){
-				JOptionPane.showMessageDialog(null, "prefCache returned null model for details:"+details.toString());
-			}*/
-			if (model!=null){
-				
-			
-				IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
-				if (null!=outcome){
-					//JOptionPane.showMessageDialog(null, "Evaluation returned non-null outcome");
-					outcomes.add(outcome);
-				}
-			}
-		}	
-
-		if (outcomes.size()==0){
-			//JOptionPane.showMessageDialog(null, "No preference was applicable. returning null dpi");
-			return null;
-		}
-
-		if (outcomes.size()==1){
-			//JOptionPane.showMessageDialog(null, "ONE preference was applicable. returning dpi:"+outcomes.get(0).getIIdentity());
-			return outcomes.get(0).getIdentity();
-		}
-
-		if (outcomes.size()>1){
-			//JOptionPane.showMessageDialog(null, "MULTIPLE preferences were applicable. asking the user");
-			List<IIdentity> dpiList = new ArrayList<IIdentity>();
-			for (IdentitySelectionPreferenceOutcome out: outcomes){
-				dpiList.add(out.getIdentity());
-			}
-			return this.askUserToSelectIIdentity(agreement, dpiList);
-		}
-		return null;
-	}
-
-	private IIdentity evaluateIDSPreferenceBasedOnProviderDPI(IAgreement agreement, List<IIdentity> identities){
-		ArrayList<IdentitySelectionPreferenceOutcome> outcomes = new ArrayList<IdentitySelectionPreferenceOutcome>();
-		for (int i=0; i<identities.size(); i++){
-			IDSPreferenceDetails details = new IDSPreferenceDetails(identities.get(i));
-			details.setRequestor(agreement.getRequestor());
-			IPrivacyPreferenceTreeModel model = prefCache.getIDSPreference(details);
-			if (model!=null){
-				IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
-				if (null!=outcome){
-					outcomes.add(outcome);
-				}
-
-			}
-		}	
-
-		if (outcomes.size()==0){
-			return null;
-		}
-
-		if (outcomes.size()==1){
-			return outcomes.get(0).getIdentity();
-		}
-
-		if (outcomes.size()>1){
-			List<IIdentity> dpiList = new ArrayList<IIdentity>();
-			for (IdentitySelectionPreferenceOutcome out: outcomes){
-				dpiList.add(out.getIdentity());
-			}
-			return this.askUserToSelectIIdentity(agreement, dpiList);
-		}
-		return null;
-	}
-
-	private IIdentity evaluateIDSPreferenceIrrespectiveOfRequestor(IAgreement agreement, List<IIdentity> dpis){
-		ArrayList<IdentitySelectionPreferenceOutcome> outcomes = new ArrayList<IdentitySelectionPreferenceOutcome>();
-		for (int i=0; i<dpis.size(); i++){
-			IDSPreferenceDetails details = new IDSPreferenceDetails(dpis.get(i));
-			IPrivacyPreferenceTreeModel model = prefCache.getIDSPreference(details);
-
-			if (model!=null){
-				IdentitySelectionPreferenceOutcome outcome = (IdentitySelectionPreferenceOutcome) this.evaluatePreference(model.getRootPreference());
-				if (null!=outcome){
-					outcomes.add(outcome);
-				}
-			}
-		}	
-
-		if (outcomes.size()==0){
-			return null;
-		}
-
-		if (outcomes.size()==1){
-			return outcomes.get(0).getIdentity();
-		}
-
-		if (outcomes.size()>1){
-			List<IIdentity> dpiList = new ArrayList<IIdentity>();
-			for (IdentitySelectionPreferenceOutcome out: outcomes){
-				dpiList.add(out.getIdentity());
-			}
-			return this.askUserToSelectIIdentity(agreement, dpiList);
-		}
-		return null;
-	}
-
-	private IIdentity askUserToSelectIIdentity(IAgreement agreement, List<IIdentity> candidateIdentities){
-
-
-		List<String> strCandidateIDs = new ArrayList<String>();
-		strCandidateIDs.add((new InvalidIdentity()).toString());
-
-		for (IIdentity userId : candidateIdentities){
-
-			strCandidateIDs.add(userId.toString());
-		}
-
-		String s = "";
-		if (agreement.getRequestor() instanceof RequestorService){
-			s = this.askUserToSelectIdentityForStartingService((RequestorService) agreement.getRequestor(), strCandidateIDs);
-		}else if (agreement.getRequestor() instanceof RequestorCis){
-			s = this.askUserToSelectIdentityForJoiningCIS((RequestorCis) agreement.getRequestor(), strCandidateIDs);
-		}
-		
-
-
-		for (IIdentity id : candidateIdentities){
-			if (s.equalsIgnoreCase(id.toString())){
-				return id;
-			}
-		}
-		return new InvalidIdentity();
-	}
-	
-	private String askUserToSelectIdentityForStartingService(RequestorService requestor, List<String> strCandidates){
-		return strCandidates.get(0);
-		/*return (String) myMessageBox.showInputDialog(
-				"Select an IIdentity for starting session with service:\n",
-						"provided by: "+requestor.getRequestorId().toString()+
-						"\nwith serviceID: "+requestor.getRequestorServiceId().toString(),
-						JOptionPane.QUESTION_MESSAGE, 
-						strCandidates.toArray(), strCandidates.get(0));*/
-	}
-	
-	private String askUserToSelectIdentityForJoiningCIS(RequestorCis requestor, List<String> strCandidates){
-		return strCandidates.get(0);
-/*		return (String) myMessageBox.showInputDialog(
-				"Select an IIdentity for joining CIS:\n", 
-						"CIS id: "+requestor.getCisRequestorId().toString()+
-						 "\nadministered by: "+requestor.getRequestorId().toString(),
-						JOptionPane.QUESTION_MESSAGE, 
-						strCandidates.toArray(), strCandidates.get(0));*/
-	}
-	
-	private String askUserToSelectIdentityForInteractingWithCSS(Requestor requestor, List<String> strCandidates){
-		return strCandidates.get(0);
-/*		return (String) myMessageBox.showInputDialog(
-				"Select an IIdentity for interacting with  CSS:\n", 
-						"CSS id: "+requestor.getRequestorId().toString(),
-						JOptionPane.QUESTION_MESSAGE, 
-						strCandidates.toArray(), strCandidates.get(0));
-*/	}
-
-	public void addIDSDecision(Requestor requestor, IIdentity selectedDPI) {
-		IDSPreferenceDetails details = new IDSPreferenceDetails (selectedDPI);
-		details.setRequestor(requestor);
-		IPrivacyPreferenceTreeModel model = this.getIDSPreference(details);
-	}
 
 
 	/**
@@ -1156,9 +411,6 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	public void setprivacyDataManagerInternal(IPrivacyDataManagerInternal privacyDataManagerInternal) {
 		this.privacyDataManagerInternal = privacyDataManagerInternal;
 	}
-
-
-
 
 
 	/**
@@ -1206,18 +458,17 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	 */
 	public void setCommsMgr(ICommManager commsMgr) {
 		this.commsMgr = commsMgr;
-		this.idm = commsMgr.getIdManager();
+		this.setIdMgr(commsMgr.getIdManager());
 	}
 
+	public void setIdMgr(IIdentityManager identityManager){
+		this.idm = identityManager;
+	}
 
-
-
-
-	
 	public PrivacyPreferenceConditionMonitor getPCM(){
 		return privacyPCM;
 	}
-	
+
 	public PrivateContextCache getContextCache(){
 		return this.contextCache;
 	}
@@ -1239,20 +490,22 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	}
 
 
+	public IPrivacyAgreementManager getAgreementMgr() {
+		return agreementMgr;
+	}
 
-	/*	public static void main(String[] args){
-		PrivacyPreferenceManager pm = new PrivacyPreferenceManager();
-		Subject sub = new Subject(new DigitalPersonalIdentifier("Provider"));
-		ServiceResourceIdentifier sID = new PssServiceIdentifier("pss://Provider1234%5B574cb33a-6590-4aaa-a69c-565e83d645fd%5D@7596720118024345462");
-		ResponsePolicy policy = new ResponsePolicy(sub, new ArrayList<ResponseItem>(), NegotiationStatus.SUCCESSFUL);
-		NegotiationAgreement ag = new NegotiationAgreement(policy);
-		List<IIdentity> dpis = new ArrayList<IIdentity>();
-		dpis.add(new DigitalPersonalIdentifier("John"));
-		dpis.add(new DigitalPersonalIdentifier("Sarah"));
-		dpis.add(new DigitalPersonalIdentifier("Mark"));
-		IIdentity selectedDPI = pm.askUserToSelectIIdentity(ag, dpis);
-		System.out.println("Selected: "+selectedDPI.toUriString());
 
-	}*/
+	public void setAgreementMgr(IPrivacyAgreementManager agreementMgr) {
+		this.agreementMgr = agreementMgr;
+	}
+
+
+
+
+
+
+
+
+
 }
 

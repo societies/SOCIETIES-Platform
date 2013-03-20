@@ -24,37 +24,13 @@
  */
 package org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.client;
 
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.RequestorService;
-import org.societies.api.internal.personalisation.preference.IUserPreferenceManagement;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RuleTarget;
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ExpProposalType;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalType;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPOutcome;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyOutcomeConstants;
-import org.societies.privacytrust.privacyprotection.privacynegotiation.PrivacyPolicyNegotiationManager;
 
 /**
  * @author Elizabeth
  *
  */
 public class PPNPOutcomeLocator {
-
+/*
 	private IPrivacyPreferenceManager privPrefMgr;
 	private PPNPOutcome outcome;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
@@ -81,7 +57,7 @@ public class PPNPOutcomeLocator {
 		this.IDM = policyMgr.getIdm();
 	}
 
-	/*
+	
 	 * ALGORITHM:
 	 * Retrieve all PPN Preferences for the affected context TYPE
 	 * 
@@ -162,7 +138,7 @@ public class PPNPOutcomeLocator {
 	 * 			if no
 	 *				just send it to the UIM
 	 *			return the new outcome 		
-	 */
+	 
 	PPNPOutcome getPPNPOutcome(Requestor theRequestor, RequestItem item){
 
 		String contextType = item.getResource().getDataType();
@@ -188,7 +164,7 @@ public class PPNPOutcomeLocator {
 				}
 			}
 		}
-		/*		for (IPrivacyPreferenceTreeModel model : modelList){
+				for (IPrivacyPreferenceTreeModel model : modelList){
 			PPNPOutcome out = (PPNPOutcome) this.privPrefMgr.evaluatePreference(model.getRootPreference());
 			if (null!=out){
 				if (out.getRuleTarget()!=null){
@@ -204,15 +180,15 @@ public class PPNPOutcomeLocator {
 				}
 			}
 
-		}*/
+		}
 		if (theRequestor instanceof RequestorService){
 			if (keyOutcome.containsKey(SubjectConstant.IDENTITY_SERVICE_ID)){
 				//JOptionPane.showMessageDialog(null, SubjectConstant.IDENTITY_SERVICE_ID);
 				TimedNotificationGUI gui = new TimedNotificationGUI();
 
-				/*
+				
 				 * remove call to TimedNotifiactionGUI. should be moved to the checkPermissions method in PrivacypreferenceManager
-				 */
+				 
 				//boolean response = gui.showGUI(contextType);
 				boolean response = true;
 				if (response){
@@ -231,9 +207,9 @@ public class PPNPOutcomeLocator {
 				//JOptionPane.showMessageDialog(null, SubjectConstant.IDENTITY_GENERIC);
 
 				TimedNotificationGUI gui = new TimedNotificationGUI();
-				/*
+				
 				 * remove call to TimedNotifiactionGUI. the call to the gui should be moved to the checkPermissions method in PrivacypreferenceManager
-				 */
+				 
 				//boolean response = gui.showGUI(contextType);
 				boolean response = true;
 				if (response){
@@ -467,11 +443,11 @@ public class PPNPOutcomeLocator {
 		//TODO: we need a local identity for internal operations.  
 		//		IOutcome outcome = this.prefMgr.getPreference(null, "PolicyMgmt", this.myServiceID, "showPPNPNotifications");
 		boolean showNotif = true;
-		/*if (outcome!=null){
+		if (outcome!=null){
 			if (outcome.getvalue().equalsIgnoreCase("no")){
 				showNotif = false;
 			}
-		}*/
+		}
 		if (showNotif){
 		
 			String proposalText = "Implement Effect: PERMIT\n"
@@ -488,13 +464,13 @@ public class PPNPOutcomeLocator {
 			}
 			return true;
 			
-/*			int n = JOptionPane.showConfirmDialog(null, "Implement Effect: PERMIT\n"
+			int n = JOptionPane.showConfirmDialog(null, "Implement Effect: PERMIT\n"
 					+ "for resource:"+contextType+"?", "PrivacyPreference Evaluation", JOptionPane.YES_NO_OPTION);
 			if (n==JOptionPane.YES_OPTION){
 				return true;
 			}else{
 				return false;
-			}*/
+			}
 		}else{
 			return true;
 		}
@@ -548,18 +524,18 @@ public class PPNPOutcomeLocator {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-/*		PPNPOutcomeDialog guiDialog = new PPNPOutcomeDialog(requestor, this.getClass().getName(), item, this.privPrefMgr);
+		PPNPOutcomeDialog guiDialog = new PPNPOutcomeDialog(requestor, this.getClass().getName(), item, this.privPrefMgr);
 		this.outcome = guiDialog.getOutcome();
 		if (outcome==null){
 			log("OUTCOME IS NULL :(");
 		}else{
 			log("PPNPOutcomeLocator: got outcome");
-		}*/
+		}
 		return outcome;
 
 	}
 
 	private void log(String message){
 		this.logging.info(this.getClass().getName()+" : "+message);
-	}
+	}*/
 }

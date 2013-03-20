@@ -39,18 +39,24 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSPreferenceDetailsBean;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ContextPreferenceCondition;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails;
+
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceCondition;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IdentitySelectionPreferenceOutcome;
+
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyPreference;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.OperatorConstants;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ids.IDSPrivacyPreferenceTreeModel;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ids.IdentitySelectionPreferenceOutcome;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.CtxTypes;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager;
 
@@ -59,32 +65,52 @@ public class PrivacyPreferenceMerger {
 
 	private ICtxBroker broker;
 	private PrivacyPreferenceManager ppMgr;
+	private IIdentityManager idMgr;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 
 	public PrivacyPreferenceMerger(ICtxBroker broker, PrivacyPreferenceManager ppMgr){
 		this.broker = broker;
 		this.ppMgr = ppMgr;
+		this.idMgr = ppMgr.getCommsMgr().getIdManager();
 
 	}
 
-	public void addIDSDecision(IIdentity selectedDPI, Requestor requestor){
+	public void addIDSDecision(IIdentity selectedDPI, RequestorBean requestor){
 		ContextSnapshot snapshot = this.takeSnapshot();
-		IDSPreferenceDetails details = new IDSPreferenceDetails(selectedDPI);
+		IDSPreferenceDetailsBean details = new IDSPreferenceDetailsBean();
+		details.setAffectedIdentity(selectedDPI.getJid());
 		details.setRequestor(requestor);
 		IPrivacyPreferenceTreeModel existingModel = ppMgr.getIDSPreference(details);
 		if (existingModel==null){
-			this.ppMgr.storeIDSPreference(details, this.createIDSPreference(snapshot, details));
-		}else{
-			IPrivacyPreference mergedPreference = this.mergeIDSPreference(details, existingModel.getRootPreference(), snapshot);
-			if (mergedPreference!=null){
-				this.ppMgr.storeIDSPreference(details, mergedPreference);
+			IDSPrivacyPreferenceTreeModel model;
+			try {
+			
+				model = new IDSPrivacyPreferenceTreeModel(details, this.createIDSPreference(snapshot, details));
+				this.ppMgr.storeIDSPreference(details, model);
+			} catch (InvalidFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+			
+		}else{
+			IPrivacyPreference mergedPreference;
+			try {
+				mergedPreference = this.mergeIDSPreference(details, existingModel.getRootPreference(), snapshot);
+				if (mergedPreference!=null){
+					IDSPrivacyPreferenceTreeModel model = new IDSPrivacyPreferenceTreeModel(details, mergedPreference);
+					this.ppMgr.storeIDSPreference(details, model);
+				}
+			} catch (InvalidFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		}
 	}
 
 
 
-	public IPrivacyPreference mergeIDSPreference(IDSPreferenceDetails d, IPrivacyPreference node, ContextSnapshot snapshot){
+	public IPrivacyPreference mergeIDSPreference(IDSPreferenceDetailsBean d, IPrivacyPreference node, ContextSnapshot snapshot) throws InvalidFormatException{
 
 
 		if (node.isLeaf()){
@@ -285,9 +311,8 @@ public class PrivacyPreferenceMerger {
 		srlist.add(sr);
 		return srlist;
 	}
-	private IPrivacyPreference createIDSPreference(ContextSnapshot snapshot, IDSPreferenceDetails details){
-		IdentitySelectionPreferenceOutcome outcome = new IdentitySelectionPreferenceOutcome();
-		outcome.setIdentity(details.getAffectedDPI());
+	private IPrivacyPreference createIDSPreference(ContextSnapshot snapshot, IDSPreferenceDetailsBean details) throws InvalidFormatException{
+		IdentitySelectionPreferenceOutcome outcome = new IdentitySelectionPreferenceOutcome(this.idMgr.fromJid(details.getAffectedIdentity()));
 		IPrivacyPreference p = new PrivacyPreference(outcome);
 		List<SingleContextAttributeSnapshot> list = snapshot.getList();
 		for (SingleContextAttributeSnapshot s : list){

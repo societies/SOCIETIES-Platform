@@ -1,0 +1,438 @@
+/**
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+ * conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package org.societies.privacytrust.privacyprotection.privacypreferencemanager.test;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JOptionPane;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationIdentifier;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.CtxOriginType;
+import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.IdentityType;
+import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.util.RequestorUtils;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
+import org.societies.api.internal.privacytrust.trust.ITrustBroker;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.AccessControlPreferenceDetailsBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PrivacyOutcomeConstantsBean;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
+import org.societies.api.schema.identity.DataIdentifierScheme;
+import org.societies.api.schema.identity.RequestorCisBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyTypeConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyCondition;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyPreference;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.accesscontrol.AccessControlOutcome;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.accesscontrol.AccessControlPreferenceTreeModel;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.CtxTypes;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager;
+import org.springframework.scheduling.annotation.AsyncResult;
+
+/**
+ * @author Eliza
+ *
+ */
+public class TestAccCtrlPreferences {
+
+	
+	private static final String ACC_CTRL_PREFERENCE_1 = "accCtrl_preference_1";
+	//private static final String ACC_CTRL_PREFERENCE_2 = "accCtrl_preference_2";
+	private AccessControlPreferenceDetailsBean accCtrlDetails;
+	private AccessControlPreferenceTreeModel accCtrlmodel;
+	private RequestorCisBean requestorCisBean;
+
+	private ICommManager commsMgr = Mockito.mock(ICommManager.class);
+	private IIdentityManager idMgr = Mockito.mock(IIdentityManager.class);
+	private ICtxBroker ctxBroker = Mockito.mock(ICtxBroker.class);
+	private IPrivacyDataManagerInternal privacyDataManagerInternal = Mockito.mock(IPrivacyDataManagerInternal.class);
+	private ITrustBroker trustBroker = Mockito.mock(ITrustBroker.class);
+	private IUserFeedback userFeedback = Mockito.mock(IUserFeedback.class);
+	private IPrivacyAgreementManager agreementMgr = Mockito.mock(IPrivacyAgreementManager.class);
+	private PrivacyPreferenceManager privPrefMgr;
+	private Resource resourceWithID;
+	private List<Action> actions;
+	private ArrayList<Condition> conditions;
+	private Resource resourceWithoutID;
+	private IIdentity userId;
+	private CtxEntity userCtxEntity;
+	private CtxAttribute locationAttribute;
+	private CtxAssociation hasPrivacyPreferences;
+	private CtxEntity privacyPreferenceEntity;
+	private CtxAttribute accCtrl_1_CtxAttribute;
+	private CtxAttribute registryCtxAttribute;
+	private NegotiationAgreement agreement;
+	//private CtxAttribute accCtrl_2_CtxAttribute;
+	private RequestPolicy requestPolicy;
+	private RequestorCis requestorCis;
+
+	@Before
+	public void setUp(){
+		this.privPrefMgr  = new PrivacyPreferenceManager();
+		this.privPrefMgr.setCommsMgr(commsMgr);
+		this.privPrefMgr.setIdMgr(idMgr);
+		this.privPrefMgr.setCtxBroker(ctxBroker);
+		this.privPrefMgr.setprivacyDataManagerInternal(privacyDataManagerInternal);
+		this.privPrefMgr.setTrustBroker(trustBroker);
+		this.privPrefMgr.setUserFeedback(userFeedback);
+		this.privPrefMgr.setAgreementMgr(agreementMgr);
+		
+		this.setupRequestor();
+		this.setupContext();
+		this.setupPolicyDetails();
+		this.setupPolicy();
+		this.setupAgreement();
+		this.setupDetails();
+		this.setupAccCtrlModel();
+		this.mockAllIntegration();
+		this.privPrefMgr.initialisePrivacyPreferenceManager();
+	}
+	
+	
+	private void mockAllIntegration(){
+		try {
+			Mockito.when(commsMgr.getIdManager()).thenReturn(idMgr);
+			Mockito.when(idMgr.getThisNetworkNode()).thenReturn((INetworkNode) userId);
+			Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxTypes.PRIVACY_PREFERENCE_REGISTRY)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
+			List<CtxIdentifier> preferenceEntityList = new ArrayList<CtxIdentifier>();
+			preferenceEntityList.add(this.privacyPreferenceEntity.getId());
+			Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, CtxTypes.PRIVACY_PREFERENCE)).thenReturn(new AsyncResult<List<CtxIdentifier>>(preferenceEntityList));
+			Mockito.when(ctxBroker.lookup(CtxModelType.ASSOCIATION, CtxTypes.HAS_PRIVACY_PREFERENCES)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
+			IndividualCtxEntity weirdPerson = new IndividualCtxEntity(userCtxEntity.getId());
+			Mockito.when(ctxBroker.retrieveIndividualEntity(this.userId)).thenReturn(new AsyncResult<IndividualCtxEntity>(weirdPerson));
+			Mockito.when(ctxBroker.createAssociation(CtxTypes.HAS_PRIVACY_PREFERENCES)).thenReturn(new AsyncResult<CtxAssociation>(this.hasPrivacyPreferences));
+			Mockito.when(ctxBroker.createEntity(CtxTypes.PRIVACY_PREFERENCE)).thenReturn(new AsyncResult<CtxEntity>(privacyPreferenceEntity));
+			Mockito.when(ctxBroker.createAttribute(privacyPreferenceEntity.getId(), ACC_CTRL_PREFERENCE_1)).thenReturn(new AsyncResult<CtxAttribute>(accCtrl_1_CtxAttribute));
+			Mockito.when(ctxBroker.createAttribute(userCtxEntity.getId(), CtxTypes.PRIVACY_PREFERENCE_REGISTRY)).thenReturn(new AsyncResult<CtxAttribute>(registryCtxAttribute));
+			//Mockito.when(ctxBroker.createAttribute(privacyPreferenceEntity.getId(), ACC_CTRL_PREFERENCE_2)).thenReturn(new AsyncResult<CtxAttribute>(accCtrl_2_CtxAttribute));
+			Mockito.when(ctxBroker.updateAttribute(Mockito.eq(registryCtxAttribute.getId()), (Serializable) Mockito.anyObject())).thenReturn(new AsyncResult<CtxAttribute>(registryCtxAttribute));
+			Mockito.when(ctxBroker.updateAttribute(Mockito.eq(registryCtxAttribute.getId()), (Serializable) Mockito.anyObject())).thenReturn(new AsyncResult<CtxAttribute>(registryCtxAttribute));
+			Mockito.when(ctxBroker.updateAttribute(Mockito.eq(accCtrl_1_CtxAttribute.getId()), (Serializable) Mockito.anyObject())).thenReturn(new AsyncResult<CtxAttribute>(accCtrl_1_CtxAttribute));
+			//Mockito.when(ctxBroker.updateAttribute(Mockito.eq(accCtrl_2_CtxAttribute.getId()), (Serializable) Mockito.anyObject())).thenReturn(new AsyncResult<CtxAttribute>(accCtrl_2_CtxAttribute));
+			Mockito.when(ctxBroker.retrieve(locationAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.locationAttribute));
+			Mockito.when(ctxBroker.retrieve(accCtrl_1_CtxAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.accCtrl_1_CtxAttribute));
+			AgreementEnvelope agreementEnvelope;
+			agreementEnvelope = new AgreementEnvelope(agreement, new byte[]{}, new byte[]{});
+			Mockito.when(agreementMgr.getAgreement((Requestor) Mockito.anyObject())).thenReturn(agreementEnvelope);
+			String allow  = "Allow";
+			String deny = "Deny";
+			List<String> response = new ArrayList<String>();
+			response.add(allow);
+			//Mockito.when(userFeedback.getExplicitFB(Mockito.anyInt(), new ExpProposalContent(Mockito.anyString(), new String[]{allow,deny}))).thenReturn(new AsyncResult<List<String>>(response));
+			
+			//Mockito.when(ctxBroker.createEntity(CtxTypes.PRIVACY_PREFERENCE)).thenReturn(new AsyncResult<CtxEntity>(privacyPreferenceEntity));
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void testAllMethods() throws MalformedCtxIdentifierException, PrivacyException{
+
+		boolean stored = privPrefMgr.storeAccCtrlPreference(accCtrlDetails, accCtrlmodel);
+		Assert.assertTrue(stored);
+		
+		List<AccessControlPreferenceDetailsBean> accCtrlPreferenceDetails = privPrefMgr.getAccCtrlPreferenceDetails();
+		
+		Assert.assertNotNull(accCtrlPreferenceDetails);
+		
+		Assert.assertTrue(accCtrlPreferenceDetails.size()==1);
+		
+		Assert.assertEquals(this.accCtrlDetails, accCtrlPreferenceDetails.get(0));
+		
+		AccessControlPreferenceTreeModel accCtrlPreferenceModel = privPrefMgr.getAccCtrlPreference(accCtrlDetails);
+		Assert.assertNotNull(accCtrlPreferenceModel);
+		Assert.assertEquals(this.accCtrlmodel, accCtrlPreferenceModel);
+
+		Assert.assertEquals(ResourceUtils.getDataIdentifier(resourceWithID), this.locationAttribute.getId());
+		ResponseItem item = privPrefMgr.checkPermission(requestorCisBean, this.locationAttribute.getId(), actions);
+		Assert.assertNotNull(item);
+		
+		Assert.assertNotNull(item.getDecision());
+		
+		Assert.assertEquals(Decision.PERMIT, item.getDecision());
+		
+		/**
+		 * to be removed after refactoring of obj model
+		 */
+		org.societies.api.privacytrust.privacy.model.privacypolicy.Action action = new org.societies.api.privacytrust.privacy.model.privacypolicy.Action(org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants.READ);
+		List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actionObjList = new ArrayList<org.societies.api.privacytrust.privacy.model.privacypolicy.Action>();
+		actionObjList.add(action);
+		
+		org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem item2 = privPrefMgr.checkPermission(requestorCis, this.locationAttribute.getId(), actionObjList);
+		
+		Assert.assertNotNull(item2);
+		Assert.assertNotNull(item2.getDecision());
+		Assert.assertEquals(Decision.PERMIT, item.getDecision());
+
+		ResponseItem evRespItem = privPrefMgr.evaluateAccCtrlPreference(accCtrlDetails, conditions);
+		Assert.assertNotNull(evRespItem);
+		Assert.assertNotNull(evRespItem.getDecision());
+		Assert.assertEquals(Decision.PERMIT, evRespItem.getDecision());
+		
+		
+		boolean deleted = privPrefMgr.deleteAccCtrlPreference(accCtrlDetails);
+
+		Assert.assertTrue(deleted);
+		List<AccessControlPreferenceDetailsBean> accCtrlPreferenceDetails1 = privPrefMgr.getAccCtrlPreferenceDetails();
+		
+		Assert.assertNotNull(accCtrlPreferenceDetails1);
+		
+		Assert.assertTrue(accCtrlPreferenceDetails1.size()==0);
+		
+		
+		
+		AccessControlPreferenceTreeModel accCtrlPreferenceModel1 = privPrefMgr.getAccCtrlPreference(accCtrlDetails);
+		Assert.assertNull(accCtrlPreferenceModel1);
+
+
+
+		
+	}
+	private void setupAgreement() {
+		
+		this.agreement = new NegotiationAgreement(this.createResponseItems());
+		
+	}
+	private List<ResponseItem> createResponseItems() {
+		List<ResponseItem> respItems = new ArrayList<ResponseItem>();
+		for (RequestItem reqItem : this.requestPolicy.getRequestItems()){
+			ResponseItem respItem = new ResponseItem();
+			respItem.setDecision(Decision.PERMIT);
+			respItem.setRequestItem(reqItem);
+			respItems.add(respItem);
+		}
+		
+		return respItems;
+	}
+	private void setupPolicy() {
+		this.setupPolicyDetails();
+		this.requestPolicy = new RequestPolicy();
+		
+		this.requestPolicy.setPrivacyPolicyType(PrivacyPolicyTypeConstants.CIS);
+		
+		List<String> dataTypes = new ArrayList<String>();
+		dataTypes.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		dataTypes.add(CtxAttributeTypes.NAME);
+		dataTypes.add(CtxAttributeTypes.AGE);
+		dataTypes.add(CtxAttributeTypes.STATUS);
+		dataTypes.add("activityfeed");
+		List<RequestItem> requestItems = this.createRequestItems(dataTypes);
+		this.requestPolicy.setRequestItems(requestItems);
+		this.requestPolicy.setRequestor(requestorCisBean);
+		
+	}
+	
+	private List<RequestItem> createRequestItems(List<String> dataTypes){
+		List<RequestItem> requestItems = new ArrayList<RequestItem>();
+		for (String type : dataTypes){
+			RequestItem item = new RequestItem();
+			item.setActions(actions);
+			item.setConditions(conditions);
+			item.setOptional(false);
+			Resource resource = new Resource();
+			resource.setDataType(type);
+			if (type.equalsIgnoreCase("activityfeed")){
+				resource.setScheme(DataIdentifierScheme.CIS);
+			}else{
+				resource.setScheme(DataIdentifierScheme.CONTEXT);
+			}
+			item.setResource(resource);
+			requestItems.add(item);
+		}
+		
+		return requestItems;
+	}
+	private void setupRequestor() {
+		this.requestorCisBean = new RequestorCisBean();
+		IIdentity requestorIdentity = new MyIdentity(IdentityType.CSS, "cisAdmin", "ict-societies.eu");
+		
+		this.requestorCisBean.setRequestorId(requestorIdentity.getJid());
+		IIdentity cisIdentity = new MyIdentity(IdentityType.CIS, "myCis","ict-societies.eu");
+		this.requestorCisBean.setCisRequestorId(cisIdentity.getJid());
+		
+		requestorCis = new RequestorCis(requestorIdentity, cisIdentity);
+	}
+	
+	private  void setupDetails(){
+		
+		Action action = new Action();
+		action.setActionConstant(ActionConstants.READ);
+		this.accCtrlDetails  = new AccessControlPreferenceDetailsBean();
+		this.accCtrlDetails.setAction(action);
+		this.accCtrlDetails.setRequestor(requestorCisBean);
+		this.accCtrlDetails.setResource(resourceWithID);
+		
+	}
+	private void setupAccCtrlModel() {
+		AccessControlOutcome outcomeAllow  = new AccessControlOutcome(PrivacyOutcomeConstantsBean.ALLOW);
+		AccessControlOutcome outcomeBlock = new AccessControlOutcome(PrivacyOutcomeConstantsBean.BLOCK);
+		
+		IPrivacyPreference preferenceAllow = new PrivacyPreference(outcomeAllow);
+		IPrivacyPreference preferenceBlock = new PrivacyPreference(outcomeBlock);
+		
+		
+		for (Condition cond : conditions){
+			IPrivacyPreference conditionPreference = new PrivacyPreference(new PrivacyCondition(cond));
+			conditionPreference.add(preferenceAllow);
+			preferenceAllow = conditionPreference;
+		}
+		
+		
+		for (Condition cond : conditions){
+			Condition copiedCondition = new Condition();
+			copiedCondition.setConditionConstant(cond.getConditionConstant());
+			copiedCondition.setOptional(cond.isOptional());
+			copiedCondition.setValue(cond.getValue());
+			IPrivacyPreference conditionPreference = new PrivacyPreference(new PrivacyCondition(copiedCondition));
+			if (cond.getConditionConstant().equals(ConditionConstants.DATA_RETENTION_IN_HOURS)){
+				((PrivacyCondition) conditionPreference.getCondition()).getCondition().setValue("12");
+			}else{
+				((PrivacyCondition) conditionPreference.getCondition()).getCondition().setValue("No");
+			}
+			conditionPreference.add(preferenceBlock);
+			preferenceBlock = conditionPreference;
+		}
+		
+		IPrivacyPreference privacyPreference = new PrivacyPreference();
+		privacyPreference.add(preferenceAllow);
+		privacyPreference.add(preferenceBlock);
+		
+		System.out.println(((PrivacyPreference) privacyPreference).toString());
+		this.accCtrlmodel = new AccessControlPreferenceTreeModel(accCtrlDetails, privacyPreference);
+		
+	}
+
+	private void setupPolicyDetails() {
+		this.actions = new ArrayList<Action>();
+		Action read = new Action();
+		read.setActionConstant(ActionConstants.READ);
+		Action write = new Action();
+		write.setActionConstant(ActionConstants.WRITE);
+		Action create = new Action();
+		create.setActionConstant(ActionConstants.CREATE);
+		Action delete = new Action();
+		delete.setActionConstant(ActionConstants.DELETE);
+		
+		this.actions.add(read);
+/*		this.actions.add(create);
+		this.actions.add(write);
+		this.actions.add(delete);*/
+		
+		
+		this.conditions = new ArrayList<Condition>();
+		
+		Condition shareWithCisAdmin = new Condition();
+		shareWithCisAdmin.setConditionConstant(ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY);
+		shareWithCisAdmin.setValue("Yes");
+		shareWithCisAdmin.setOptional(false);
+		
+		Condition shareWithCisMembers = new Condition();
+		shareWithCisMembers.setConditionConstant(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY);
+		shareWithCisMembers.setValue("Yes");
+		shareWithCisMembers.setOptional(true);
+		
+		Condition dataRetentionHours = new Condition();
+		dataRetentionHours.setConditionConstant(ConditionConstants.DATA_RETENTION_IN_HOURS);
+		dataRetentionHours.setValue("24");
+		dataRetentionHours.setOptional(false);
+		
+		conditions.add(dataRetentionHours);
+		conditions.add(shareWithCisMembers);
+		conditions.add(shareWithCisAdmin);
+		
+		this.resourceWithoutID = new Resource();
+		this.resourceWithoutID.setDataType(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		this.resourceWithoutID.setScheme(DataIdentifierScheme.CONTEXT);
+		
+		this.resourceWithID = new Resource();
+		this.resourceWithID.setDataType(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		this.resourceWithID.setDataIdUri(this.locationAttribute.getId().getUri());
+		this.resourceWithID.setScheme(DataIdentifierScheme.CONTEXT);
+	}
+	private void setupContext() {
+		this.userId = new MyIdentity(IdentityType.CSS, "xcmanager","societies.local");
+		CtxEntityIdentifier ctxId = new CtxEntityIdentifier(userId.getJid(), "Person", new Long(1));
+		this.userCtxEntity = new CtxEntity(ctxId);
+		CtxAttributeIdentifier id = new CtxAttributeIdentifier(userCtxEntity.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC, new Long(1));
+		this.locationAttribute = new CtxAttribute(id);
+		this.locationAttribute.setStringValue("home");
+		this.locationAttribute.setValueType(CtxAttributeValueType.STRING);
+		this.locationAttribute.getQuality().setOriginType(CtxOriginType.SENSED);
+		hasPrivacyPreferences = new CtxAssociation(new CtxAssociationIdentifier(userId.getJid(), CtxTypes.HAS_PRIVACY_PREFERENCES, new Long(3)));
+		CtxEntityIdentifier preferenceEntityId_ = new CtxEntityIdentifier(userId.getJid(), CtxTypes.PRIVACY_PREFERENCE, new Long(2));
+
+		this.privacyPreferenceEntity = new CtxEntity(preferenceEntityId_);
+		
+		this.accCtrl_1_CtxAttribute = new CtxAttribute(new CtxAttributeIdentifier(this.privacyPreferenceEntity.getId(), ACC_CTRL_PREFERENCE_1, new Long(5)));
+		this.registryCtxAttribute = new CtxAttribute(new CtxAttributeIdentifier(userCtxEntity.getId(), CtxTypes.PRIVACY_PREFERENCE_REGISTRY, new Long(1)));
+		//this.accCtrl_2_CtxAttribute = new CtxAttribute(new CtxAttributeIdentifier(this.privacyPreferenceEntity.getId(), ACC_CTRL_PREFERENCE_2, new Long(6)));
+	}
+
+}

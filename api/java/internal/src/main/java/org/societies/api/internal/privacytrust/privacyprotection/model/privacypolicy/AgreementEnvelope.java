@@ -46,6 +46,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
  * @author Elizabeth
  *
  */
+@Deprecated
 public class AgreementEnvelope implements IAgreementEnvelope, Serializable{
 
 	private IAgreement agreement;

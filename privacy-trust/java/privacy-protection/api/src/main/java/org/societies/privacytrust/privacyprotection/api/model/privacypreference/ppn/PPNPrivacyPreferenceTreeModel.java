@@ -22,103 +22,92 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.api.model.privacypreference;
+package org.societies.privacytrust.privacyprotection.api.model.privacypreference.ppn;
 
 import java.io.Serializable;
 
-import org.societies.api.identity.Requestor;
-import org.societies.api.schema.identity.DataIdentifier;
+import javax.swing.tree.DefaultTreeModel;
+
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
 /**
- * Describe your class here...
- *
- * @author Eliza
+ * This class represents a tree model for Privacy Policy Negotiation Preferences and encapsulates a tree of IPrivacyPreference objects.
+ * @author Elizabeth
  *
  */
-public class DObfPreferenceDetails implements Serializable{
+public class PPNPrivacyPreferenceTreeModel extends DefaultTreeModel implements IPrivacyPreferenceTreeModel, Serializable {
 
-	private String dataType;
-	private DataIdentifier affectedDataId;
-	private Requestor requestor; 
+
 	
-	public DObfPreferenceDetails(String dataType) {
-		this.setDataType(dataType);
+	private IPrivacyPreference pref;
+	private final PPNPreferenceDetailsBean details;
+	
+	public PPNPrivacyPreferenceTreeModel(PPNPreferenceDetailsBean details, IPrivacyPreference preference){
+		super(preference);
+		this.details = details;
+
+		this.pref = preference;
 	}
 	
-	public DObfPreferenceDetails(DataIdentifier affectedDataId) {
-		this.setAffectedDataId(affectedDataId);
-	}
-
-	public Requestor getRequestor() {
-		return requestor;
-	}
-
-	public void setRequestor(Requestor requestor) {
-		this.requestor = requestor;
-	}
-
-	public DataIdentifier getAffectedDataId() {
-		return affectedDataId;
-	}
-
-	public void setAffectedDataId(DataIdentifier affectedDataId) {
-		this.affectedDataId = affectedDataId;
-	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((affectedDataId == null) ? 0 : affectedDataId.hashCode());
-		result = prime * result
-				+ ((getDataType() == null) ? 0 : getDataType().hashCode());
-		result = prime * result
-				+ ((requestor == null) ? 0 : requestor.hashCode());
+		result = prime * result + ((getDetails() == null) ? 0 : getDetails().hashCode());
+		result = prime * result + ((pref == null) ? 0 : pref.hashCode());
 		return result;
 	}
 
+
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		DObfPreferenceDetails other = (DObfPreferenceDetails) obj;
-		if (affectedDataId == null) {
-			if (other.affectedDataId != null)
+		}
+		PPNPrivacyPreferenceTreeModel other = (PPNPrivacyPreferenceTreeModel) obj;
+		if (getDetails() == null) {
+			if (other.getDetails() != null) {
 				return false;
-		} else if (!affectedDataId.equals(other.affectedDataId))
+			}
+		} else if (!getDetails().equals(other.getDetails())) {
 			return false;
-		if (getDataType() == null) {
-			if (other.getDataType() != null)
+		}
+
+		if (pref == null) {
+			if (other.pref != null) {
 				return false;
-		} else if (!getDataType().equals(other.getDataType()))
+			}
+		} else if (!pref.equals(other.pref)) {
 			return false;
-		if (requestor == null) {
-			if (other.requestor != null)
-				return false;
-		} else if (!requestor.equals(other.requestor))
-			return false;
+		}
 		return true;
 	}
 
+
 	@Override
-	public String toString() {
-		return "DObfPreferenceDetails [dataType=" + getDataType()
-				+ ", affectedDataId=" + affectedDataId + ", requestor="
-				+ requestor + "]";
+	public PrivacyPreferenceTypeConstants getPrivacyType() {
+		return PrivacyPreferenceTypeConstants.PRIVACY_POLICY_NEGOTIATION;
 	}
 
-	public String getDataType() {
-		return dataType;
+
+	@Override
+	public IPrivacyPreference getRootPreference() {
+		return this.pref;
 	}
 
-	public void setDataType(String dataType) {
-		this.dataType = dataType;
+
+	public PPNPreferenceDetailsBean getDetails() {
+		return details;
 	}
-	
-	
+
 }

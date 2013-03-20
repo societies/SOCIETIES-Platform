@@ -188,4 +188,31 @@ public class RequestorUtils {
 		}
 		return equalsBuilder.isEquals();
 	}
+	
+	public static String toString(RequestorBean bean){
+		if (bean instanceof RequestorCisBean){
+			StringBuilder builder = new StringBuilder();
+			builder.append("RequestorCisBean [cisRequestorId=");
+			builder.append(bean.getRequestorId());
+			builder.append(", getCisRequestorId()=");
+			builder.append(((RequestorCisBean) bean).getCisRequestorId());
+			builder.append("]");
+			return builder.toString();
+		}else if (bean instanceof RequestorServiceBean){
+			StringBuilder builder = new StringBuilder();
+			builder.append("RequestorServiceBean [requestorId=");
+			builder.append(bean.getRequestorId());
+			builder.append(", getRequestorServiceId()=");
+			builder.append(((RequestorServiceBean) bean).getRequestorServiceId());
+			builder.append("]");
+			return builder.toString();
+		}else{
+			StringBuilder builder = new StringBuilder();
+			builder.append("RequestorBean [getRequestorId()=");
+			builder.append(bean.getRequestorId());
+			builder.append("]");
+			return builder.toString();
+
+		}
+	}
 }

@@ -121,4 +121,14 @@ public class ResponseItemUtils {
 		.append(o1.getRequestItem(), rhs.getRequestItem())
 		.isEquals();
 	}
+	
+	public static String toString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem item){
+		StringBuilder builder = new StringBuilder();
+		builder.append("ResponseItem [getDecision()=");
+		builder.append(item.getDecision());
+		builder.append(", getRequestItem()=");
+		builder.append(item.getRequestItem());
+		builder.append("]");
+		return builder.toString();
+	}
 }
