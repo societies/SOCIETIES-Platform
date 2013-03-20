@@ -93,9 +93,9 @@
                           itemDescription="No service attachment"/>
 
             <f:selectItems value="#{profileSettings.availableServices}"
-                           var="item"
-                           itemLabel="#{item.serviceName}"
-                           itemDescription="#{item.serviceCategory} :: #{item.serviceDescription} :: #{item.serviceStatus}"/>
+                           var="responseItem"
+                           itemLabel="#{responseItem.serviceName}"
+                           itemDescription="#{responseItem.serviceCategory} :: #{responseItem.serviceDescription} :: #{responseItem.serviceStatus}"/>
         </p:selectOneMenu>
 
         <f:facet name="footer">
@@ -143,7 +143,7 @@
 
             <f:selectItems value="#{profileSettings.conditionOperators}"
                            var="item"
-                           itemLabel="#{item.description}"/>
+                           itemLabel="#{responseItem.description}"/>
         </p:selectOneMenu>
 
         <h:outputLabel for="addConditionValue" value="Condition value: *"
@@ -204,7 +204,7 @@
 
             <f:selectItems value="#{profileSettings.conditionOperators}"
                            var="item"
-                           itemLabel="#{item.description}"/>
+                           itemLabel="#{responseItem.description}"/>
         </p:selectOneMenu>
 
         <h:outputLabel for="conditionValue" value="Condition value: *"/>

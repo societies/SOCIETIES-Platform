@@ -39,21 +39,41 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.xhtml</url-pattern>
+    </servlet-mapping>
+
     <!-- PrimeFaces push servlet -->
-    <servlet>
+    <!--<servlet>
         <servlet-name>Push Servlet</servlet-name>
         <servlet-class>org.primefaces.push.PushServlet</servlet-class>
     </servlet>
 
-    <listener>
-        <listener-class>com.sun.faces.config.ConfigureListener</listener-class>
-    </listener>
+    <servlet-mapping>
+        <servlet-name>Push Servlet</servlet-name>
+        <url-pattern>/primepush/*</url-pattern>
+    </servlet-mapping>-->
 
-    <!-- Map these files with JSF -->
+    <!--<servlet>
+        <servlet-name>AtmosphereServlet</servlet-name>
+        <servlet-class>org.atmosphere.weblogic.AtmosphereWebLogicServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AtmosphereServlet</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>-->
+
+
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>/WEB-INF/applicationContext.xml</param-value>
     </context-param>
+
+    <listener>
+        <listener-class>com.sun.faces.config.ConfigureListener</listener-class>
+    </listener>
 
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -62,16 +82,6 @@
     <listener>
         <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
     </listener>
-
-    <servlet-mapping>
-        <servlet-name>Faces Servlet</servlet-name>
-        <url-pattern>*.xhtml</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>Push Servlet</servlet-name>
-        <url-pattern>/primepush/*</url-pattern>
-    </servlet-mapping>
 
 
 </web-app>

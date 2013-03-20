@@ -13,11 +13,17 @@
 
 
         <p:commandButton value="Send event"
-                         actionListener="#{ppNegotiationTest.sendEvent}"/>
-        <br/>
-        <br/>
+                         actionListener="#{ppNegotiationTest.sendEvent}"
+                         process="@this"/>
+
+        <p>
+            <p:outputLabel value="Negotiations in queue:" for="countLabel"/>
+            <p:inputText value="#{ppNegotiation.queuedNegotiationCount}" readonly="true" id="countLabel"/>
+        </p>
 
         <f:link value="Next page &gt;&gt;" outcome="privacy_policy_negotiation.xhtml"/>
+
+        <p:poll interval="2" update="countLabel" process="@this"/>
     </ui:define>
 </ui:composition>
 </html>

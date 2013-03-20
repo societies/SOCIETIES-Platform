@@ -14,17 +14,23 @@
     <h:outputStylesheet library="css" name="widget.css"/>
     <h:outputStylesheet library="css" name="slider.css"/>
     <h:outputStylesheet library="css" name="notification.css"/>
-    
+
+    <script type="text/javascript">
+        function handlePnb() {
+            if (document.getElementById('mainForm:pnbCount').value > 0) pnb.show();
+        }
+    </script>
+
     <!--h:outputScript library="js" name="jquery-v1.8.1.js"/-->
 
     <!-- Menu -->
     <h:outputScript library="js" name="webmenu_nav.js"/>
     <h:outputScript library="js" name="webpopup.js"/>
-    <h:outputScript library="js" name="jquery.ui.core.js"/>
-    <h:outputScript library="js" name="jquery.ui.widget.js"/>
-    <h:outputScript library="js" name="jquery.ui.slider.js"/>
-    <h:outputScript library="js" name="notification.js"/>
-    
+    <!--<h:outputScript library="js" name="jquery.ui.core.js"/>-->
+    <!--<h:outputScript library="js" name="jquery.ui.widget.js"/>-->
+    <!--<h:outputScript library="js" name="jquery.ui.slider.js"/>-->
+    <!--<h:outputScript library="js" name="notification.js"/>-->
+
     <!-- ToDo , move -->
     <h:outputScript library="js" name="cisajax.js"/>
 
@@ -46,8 +52,7 @@
 
         <!-- notification bar for a privacy policy negotiation request -->
         <p:notificationBar position="bottom" effect="slide" widgetVar="pnb" id="pnb"
-                           styleClass="bottom"
-                           rendered="#{ppNegotiation.currentNegotiationEvent ne null}">
+                           styleClass="bottom">
             The privacy policy negotatiator wants your attention! Mosey on over
             <a href="privacy_policy_negotiation.xhtml">here</a>.
             <p:commandLink value="(ignore)"
@@ -56,16 +61,12 @@
         </p:notificationBar>
 
         <!-- used to open the notification bar for a privacy policy negotiation request -->
-        <script type="text/javascript">
-            function handlePnb() {
-                pnb.show();
-            }
-        </script>
+        <h:inputHidden id="pnbCount" value="#{ppNegotiation.unseenNegotiationCount}"/>
 
         <!-- quick hack to get this working until PF push is working -->
-        <p:poll interval="5" update="pnb" process="pnb"/>
+        <p:poll interval="2" update="pnbCount" process="@this" oncomplete="handlePnb()"/>
         <!-- used to listen for responses if there is a privacy policy negotiation request -->
-        <!--p:socket onMessage="handlePnb" channel="/pnb"/-->
+        <!--<p:socket onMessage="handlePnb" channel="/pnb"/>-->
 
 
         <div id="wrapper" class="clearfix">
@@ -73,18 +74,19 @@
                 <!-- Header -->
                 <header id="header" class="grid_12">
                     <!-- LOGIN POPUP -->
-                    <ui:include src="../includes/loginbox.xhtml"/>
+                    <ui:include src="/includes/loginbox.xhtml"/>
                     <!-- END LOGIN POPUP -->
 
                     <!-- MENU -->
-                    <ui:include src="../includes/menu.xhtml"/>
+                    <ui:include src="/includes/menu.xhtml"/>
                     <!-- END MENU -->
                     <div id="notification-box" class="notification-popup">
-						<a href="#" class="close"><img src="images/close_pop.png" class="btn_close" title="Close Window" alt="Close" /></a>
-						<!-- form id="notification-form" method="post" class="notify" action="#"-->
-							<div class="notifications"></div>
-						<!-- /form -->
-					</div>
+                        <a href="#" class="close"><img src="images/close_pop.png" class="btn_close" title="Close Window"
+                                                       alt="Close"/></a>
+                        <!-- form id="notification-form" method="post" class="notify" action="#"-->
+                        <div class="notifications"></div>
+                        <!-- /form -->
+                    </div>
                     <div class="clear"></div>
                 </header>
 

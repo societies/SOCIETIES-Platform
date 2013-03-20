@@ -1,5 +1,7 @@
 package org.societies.simple.converters;
 
+import java.util.Arrays;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -7,6 +9,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.stream.InputNode;
 import org.simpleframework.xml.stream.OutputNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -16,6 +20,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class ItemConverterHelper {
+	
+	private static Logger LOG = LoggerFactory
+			.getLogger(ItemConverterHelper.class);
 	
 	private Serializer serializer;
 	private DocumentBuilder builder;
@@ -89,6 +96,16 @@ public class ItemConverterHelper {
 			thisNode.setAttribute("xmlns", anyElement.getNamespaceURI().toString());
 			thisNode.setReference(anyElement.getNamespaceURI().toString());
 		}
+		
+		// attributes have to be processed before child elements
+		NamedNodeMap attrs = anyElement.getAttributes();
+		for (int i=0; i<attrs.getLength(); i++) {
+			Node n = attrs.item(i);
+			if (n instanceof Attr) {
+				thisNode.setAttribute(n.getNodeName(), n.getNodeValue());
+			}
+		}
+		
 		NodeList childList = anyElement.getChildNodes();
 		boolean childElements = false;
 		for (int i=0; i<childList.getLength(); i++) {
@@ -102,14 +119,7 @@ public class ItemConverterHelper {
 			}
 		}
 		
-		NamedNodeMap attrs = anyElement.getAttributes();
-		for (int i=0; i<attrs.getLength(); i++) {
-			Node n = attrs.item(i);
-			if (n instanceof Attr) {
-				thisNode.setAttribute(n.getNodeName(), n.getNodeValue());
-			}
-		}
-		
+		// node value
 		if (anyElement.getNodeValue()!=null) {
 			thisNode.setValue(anyElement.getNodeValue());
 		}
