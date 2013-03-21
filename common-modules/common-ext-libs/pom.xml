@@ -108,6 +108,10 @@
 					<artifactId>geronimo-stax-api_1.0_spec</artifactId>
 					<groupId>org.apache.geronimo.specs</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>el-api</artifactId>
+					<groupId>org.apache.tomcat</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
