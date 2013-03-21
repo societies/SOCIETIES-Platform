@@ -1146,6 +1146,12 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 				request.setOrigin(CssRequestOrigin.REMOTE);
 				cssManagerRemote.updateCssRequest(request);
 		}
+		if(request.getRequestStatus() == (CssRequestStatusType.DELETEFRIEND)){
+			addActivityToCSSAF("CSS has Removed Friend " +request.getCssIdentity() +" from friends List");
+		}
+		if(request.getRequestStatus() == (CssRequestStatusType.CANCELLED)){
+			addActivityToCSSAF("CSS has Cancelled Friend Request sent to " +request.getCssIdentity());
+		}
 	}
 
 
@@ -1175,6 +1181,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 		System.out.println("~~~~~~~~~~~~~~~ sending Friend request : " +cssFriendId);
 		LOG.info("sending Friend request : " +cssFriendId);
 		cssManagerRemote.sendCssFriendRequest(cssFriendId);
+		addActivityToCSSAF("CSS has sent Friend Request to " +cssFriendId);
 	}
 
 
@@ -1644,6 +1651,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 					request.setOrigin(CssRequestOrigin.REMOTE);
 					cssManagerRemote.updateCssFriendRequest(request); 
 			}
+			addActivityToCSSAF("CSS has Accepted Friend Request from " +request.getCssIdentity());
 		}
 	/**
 	 * Determine if a CssNode object exists in the CssRecord maintained 
@@ -1707,6 +1715,8 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 					request.setOrigin(CssRequestOrigin.REMOTE);
 					cssManagerRemote.updateCssFriendRequest(request); 
 			}
+			
+			addActivityToCSSAF("CSS has Declined Friend Request received from " +request.getCssIdentity());
 		}
 
 	@Override
@@ -2510,6 +2520,8 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 				}
 			}
 		});
+		
+		addActivityToCSSAF("CSS has received a Friend Request from " +targetCSSid);
 	}
 
 	@Override
@@ -2563,6 +2575,7 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 				}
 			});
 		}	
+		addActivityToCSSAF("CSS Friend Request has been " +request.getRequestStatus() +" by " +identity.toString());
 	}
 
 	@Override
@@ -2572,6 +2585,11 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		pendingFR.setRequestStatus(CssRequestStatusType.ACCEPTED);
 		pendingFR.setOrigin(CssRequestOrigin.LOCAL);
 		acceptCssFriendRequest(pendingFR);
+		
+		addActivityToCSSAF("CSS Friend Request has been Accepted by " +identity.toString());
+		addActivityToCSSAF("CSS Friend Request has been " +pendingFR.getRequestStatus() +"by " +identity.toString());
+		
+		
 		
 		//UPDATE LOCAL DATABASE WITH THIS FRIEND REQUEST
 		//CssRequest request = new CssRequest();
