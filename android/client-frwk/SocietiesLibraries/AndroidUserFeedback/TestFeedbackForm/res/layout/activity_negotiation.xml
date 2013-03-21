@@ -11,7 +11,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:src="@drawable/societies_header" />
-    
+
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="302dp"
@@ -19,7 +19,8 @@
         android:layout_marginTop="5dp"
         android:background="@color/Blue"
         android:orientation="vertical" >
-		<TextView
+
+        <TextView
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,11 +35,13 @@
         android:layout_height="wrap_content"
         android:background="@color/Grey"
         android:orientation="vertical" >
+
         <TextView
             android:id="@+id/txtHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="asdf" />
+
         <Spinner
             android:id="@+id/spinResource"
             android:layout_width="match_parent"
@@ -53,24 +56,27 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:background="@color/Grey" >
-		<TableRow
+
+        <TableRow
             android:id="@+id/trHeader"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" 
-            android:background="@color/Blue">
+            android:layout_height="wrap_content"
+            android:background="@color/Blue" >
+
             <TextView
                 android:id="@+id/trConditionHdr"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:text="Conditions" 
+                android:text="Used for"
                 android:textColor="@color/Grey" />
+
             <TextView
                 android:id="@+id/trConditionValueHdr"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:text="Values" 
+                android:text="Allow"
                 android:textColor="@color/Grey" />
         </TableRow>
     </TableLayout>
@@ -79,7 +85,55 @@
         android:id="@+id/svConditions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
-        
     </ScrollView>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <GridLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_columnSpan="2"
+            android:layout_gravity="left"
+            android:layout_row="0"
+            android:text="Cancel" />
+
+        <Button
+            android:id="@+id/btnAccept"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="2"
+            android:layout_gravity="right"
+            android:layout_row="0"
+            android:text="Accept" />
+
+        <Space
+            android:layout_width="167dp"
+            android:layout_height="1dp"
+            android:layout_column="2"
+            android:layout_row="0" />
+
+        <Space
+            android:layout_width="74dp"
+            android:layout_height="1dp"
+            android:layout_column="0"
+            android:layout_row="0" />
+
+        <Space
+            android:layout_width="78dp"
+            android:layout_height="15dp"
+            android:layout_column="3" />
+    </GridLayout>
 
 </TableLayout>

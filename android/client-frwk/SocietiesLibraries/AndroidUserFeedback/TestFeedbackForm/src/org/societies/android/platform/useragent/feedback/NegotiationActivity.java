@@ -17,22 +17,27 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-public class NegotiationActivity extends Activity {
+public class NegotiationActivity extends Activity implements OnItemSelectedListener {
 
 	private static final String LOG_TAG = NegotiationActivity.class.getName();
 	private static final String EXTRA_PRIVACY_POLICY = "org.societies.userfeedback.eventInfo";
 	
 	private TextView[] requestLabels;  
 	private CheckBox[] requestCheckboxes; 
+	private TableLayout[] tblConditions;
+	private ScrollView svScroll;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,7 +62,8 @@ public class NegotiationActivity extends Activity {
 			Log.d(LOG_TAG, "RequestorServiceBean");
 		} 
 		TextView lblHeader = (TextView) findViewById(R.id.txtHeader);
-		lblHeader.setText(sHeader + "\r\n has requested access to the following data:");
+		//lblHeader.setText(sHeader + "\r\n has requested access to the following data:");
+		lblHeader.setText("The Community is requesting access to your personal info for the below uses. Please select what you would like to allow:");
 		
 		//GENERATE RESOURCE SPINNER
 		List<ResponseItem> responses = eventInfo.getResponsePolicy().getResponseItems();
@@ -69,46 +75,59 @@ public class NegotiationActivity extends Activity {
 		ArrayAdapter<String> adapter = new ArrayAdapter<String> (this, android.R.layout.simple_spinner_item, resourceItems);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinResources.setAdapter(adapter);
+		spinResources.setOnItemSelectedListener(this);
 		
-		//PROCESS EACH CONDITION
-		for(ResponseItem response: responses) {			
+		//PROCESS EACH RESPONSE
+		tblConditions = new TableLayout[responses.size()];
+		for(int a=0; a<responses.size(); a++) {
+			ResponseItem response = responses.get(a);
 			RequestItem request = response.getRequestItem();
 			List<Condition> conditions = request.getConditions();
 			
-			TableLayout tblConditions = (TableLayout) findViewById(R.id.tblConditions);
+			TableLayout tblCondition = new TableLayout(this);
+			tblCondition.setBackgroundResource(R.color.Grey);
 			
-			//Create all of the objects  
+			//Create Table row objects  
 			requestLabels = new TextView[conditions.size()];  
 			requestCheckboxes = new CheckBox[conditions.size()];
-			//ScrollView svScroll = new ScrollView(this);  
-			//LinearLayout llList = new LinearLayout(this);  
-			
+			//EACH CONDITION
 			for (int i=0; i<conditions.size(); i++) {
 				Condition condition = conditions.get(i);
 				boolean optional = condition.isOptional();
-				requestLabels[i] = new TextView(this);  
-				requestCheckboxes[i] = new CheckBox(this);  
-				//Set captions  
-				requestLabels[i].setText(condition.getConditionConstant().value());  
-				requestCheckboxes[i].setChecked(true);  
+				requestLabels[i] = new TextView(this);
+				requestCheckboxes[i] = new CheckBox(this);
+				//Set captions
+				requestLabels[i].setText(condition.getConditionConstant().value());
+				//requestCheckboxes[i].setChecked(Boolean.parseBoolean(condition.getValue()));
+				requestCheckboxes[i].setChecked(true);
+				requestCheckboxes[i].setEnabled(optional);
 				
 				TableRow row = new TableRow(this);
 				row.setId(i);
 				row.addView(requestLabels[i]);
 				row.addView(requestCheckboxes[i]);
 				
-				tblConditions.addView(row);
+				tblCondition.addView(row);
 			}
-			//Put the linear list in the ScrollView  
-			//svScroll.addView(tblConditions);   
-			//svScroll.addView(llList);
-			//Make the LinearList arrange the controls vertically  
-			//llList.setOrientation(LinearLayout.VERTICAL); 
-			//Instead of an XML layout, the ScrollView will be our content  
-			//setContentView(svScroll); 
-			break;
+			tblConditions[a] = tblCondition;
 		}
-        
+		svScroll = (ScrollView)findViewById(R.id.svConditions);
+		svScroll.addView(tblConditions[0]);
+		
+		//ACCEPT BUTTON EVENT HANDLER
+        Button btnAccept = (Button) findViewById(R.id.btnAccept);
+        btnAccept.setOnClickListener(new OnClickListener() {            
+        	public void onClick(View v) {
+        		
+        	}
+        });
+        //ACCEPT BUTTON EVENT HANDLER
+        Button btnCancel = (Button) findViewById(R.id.btnCancel);
+        btnCancel.setOnClickListener(new OnClickListener() {            
+        	public void onClick(View v) {
+        		
+        	}
+        });
     }
 
     @Override
@@ -116,4 +135,19 @@ public class NegotiationActivity extends Activity {
         getMenuInflater().inflate(R.menu.activity_negotiation, menu);
         return true;
     }
+
+	/* @see android.widget.AdapterView.OnItemSelectedListener#onItemSelected(android.widget.AdapterView, android.view.View, int, long) */
+	@Override
+	public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+		svScroll.removeAllViews();
+		svScroll.addView(tblConditions[position]);
+	}
+
+	/* @see android.widget.AdapterView.OnItemSelectedListener#onNothingSelected(android.widget.AdapterView) */
+	@Override
+	public void onNothingSelected(AdapterView<?> parent) {
+		
+	}
+	
+	
 }
