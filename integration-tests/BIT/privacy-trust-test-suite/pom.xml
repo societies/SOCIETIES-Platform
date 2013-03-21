@@ -32,6 +32,7 @@
 	    <module>policy-management-1244</module>
 	    <module>negotiation-management-1264</module>
 	    <module>trust-based-pref-eval-1678</module>
+	    <module>local-trust-eventing-1962</module>
 	</modules>
 
 </project>

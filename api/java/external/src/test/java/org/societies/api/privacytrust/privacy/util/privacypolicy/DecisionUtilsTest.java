@@ -24,49 +24,38 @@
  */
 package org.societies.api.privacytrust.privacy.util.privacypolicy;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import java.util.ArrayList;
-import java.util.List;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.ConditionUtils;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestItemUtils;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
-import org.societies.api.schema.identity.DataIdentifierScheme;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 
 /**
  * @author Olivier Maridat (Trialog)
  *
  */
-public class RequestPolicyUtilTest {
+public class DecisionUtilsTest {
 	@Test
-	public void testGetDataTypesWithScheme() {
-		RequestPolicy privacyPolicy = null;
-		DataIdentifierScheme schemeFilter = DataIdentifierScheme.CONTEXT;
+	public void testEqual() {
+		Decision decision1 = null;
+		Decision decision2 = null;
+		RequestPolicy notDecision = null;
 		// -- Null Privacy Policy
-		List<String> dataTypes = RequestPolicyUtils.getDataTypes(schemeFilter, privacyPolicy);
-		assertNull("Data type list of an null privacy policy should be null", dataTypes);
+		assertTrue("Same null decision should be equal", DecisionUtils.equal(decision1, decision1));
+		assertTrue("Null decisions should be equal", DecisionUtils.equal(decision1, decision2));
+		assertTrue("Null decision and null object should be equal", DecisionUtils.equal(decision1, notDecision));
 		// -- Empty Privacy Policy
-		privacyPolicy = new RequestPolicy();
-		dataTypes = RequestPolicyUtils.getDataTypes(schemeFilter, privacyPolicy);
-		assertNull("Data type list of an empty privacy policy should be null", dataTypes);
+		decision1 = Decision.DENY;
+		decision2 = Decision.INDETERMINATE;
+		notDecision = new RequestPolicy();
+		assertTrue("Same empty decision should be equal", DecisionUtils.equal(decision1, decision1));
 		// -- Privacy Policy
-		List<RequestItem> requestItems = new ArrayList<RequestItem>();
-		List<Condition> conditions = new ArrayList<Condition>();
-		conditions.add(ConditionUtils.create(ConditionConstants.SHARE_WITH_3RD_PARTIES, "Yes"));
-		requestItems.add(RequestItemUtils.create(ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.ABOUT), ActionUtils.createList(ActionConstants.READ), conditions));
-		privacyPolicy.setRequestItems(requestItems);
-		dataTypes = RequestPolicyUtils.getDataTypes(schemeFilter, privacyPolicy);
-		assertNotNull("Data type list of an empty privacy policy should be null", dataTypes);
+		assertTrue("Same decision should be equal", DecisionUtils.equal(decision1, decision1));
+		assertFalse("Different decisions should be equal", DecisionUtils.equal(decision1, decision2));
+		assertFalse("Different decisions should be equal (inverse)", DecisionUtils.equal(decision2, decision1));
+		decision2 = Decision.DENY;
+		assertTrue("Equal decisions should be equal", DecisionUtils.equal(decision1, decision2));
+		assertTrue("Equal decisions should be equal (inverse)", DecisionUtils.equal(decision2, decision1));
 	}
 }

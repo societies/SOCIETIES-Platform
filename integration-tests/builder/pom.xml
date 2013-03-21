@@ -44,6 +44,7 @@
 		<module>../BIT/privacy-trust-test-suite/data-management-1266</module>
 		<module>../BIT/privacy-trust-test-suite/policy-management-1244</module>
 		<module>../BIT/privacy-trust-test-suite/negotiation-management-1264</module>
+		<module>../BIT/privacy-trust-test-suite/local-trust-eventing-1962</module>
 		<!-- <module>../BIT/cis-services-test-suite/cis-share-service-962</module> -->
 		<module>../BIT/cis-services-test-suite/cis-list-services-964</module>
 		<module>../BIT/cis-test-suite/cis-management/create_cis#958</module>

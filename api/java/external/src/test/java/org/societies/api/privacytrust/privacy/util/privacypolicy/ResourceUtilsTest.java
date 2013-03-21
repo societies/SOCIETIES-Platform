@@ -25,21 +25,34 @@
 package org.societies.api.privacytrust.privacy.util.privacypolicy;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.util.DataIdentifierUtils;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 
 /**
  * @author Olivier Maridat (Trialog)
  *
  */
-public class ResourceUtilTest {
+public class ResourceUtilsTest {
 	@Test
 	public void testGetDataIdentifier() {
 		DataIdentifier actualDataId = null;
@@ -82,5 +95,44 @@ public class ResourceUtilTest {
 			fail("MalformedCtxIdentifierException");
 			e.printStackTrace();
 		}
+	}
+	
+	@Test
+	public void testEqual() {
+		Resource resource1 = null;
+		Resource resource2 = null;
+		Action notResource = null;
+		// -- Null Privacy Policy
+		assertTrue("Same null resource should be equal", ResourceUtils.equal(resource1, resource1));
+		assertTrue("Null resources should be equal", ResourceUtils.equal(resource1, resource2));
+		assertTrue("Null resource and null object should be equal", ResourceUtils.equal(resource1, notResource));
+		// -- Empty Privacy Policy
+		resource1 = new Resource();
+		resource2 = new Resource();
+		notResource = new Action();
+		assertTrue("Same empty resource should be equal", ResourceUtils.equal(resource1, resource1));
+		assertTrue("Empty resources should be equal", ResourceUtils.equal(resource1, resource2));
+		assertTrue("Empty resources should be equal (inverse)", ResourceUtils.equal(resource2, resource1));
+		assertFalse("Empty resource and empty object should not be equal", ResourceUtils.equal(resource1, notResource));
+		// -- Privacy Policy
+		List<Condition> conditions1 = new ArrayList<Condition>();
+		conditions1.add(ConditionUtils.create(ConditionConstants.SHARE_WITH_3RD_PARTIES, "Yes"));
+		List<Condition> conditions2 = new ArrayList<Condition>();
+		conditions2.add(ConditionUtils.create(ConditionConstants.SHARE_WITH_3RD_PARTIES, "Yes"));
+		conditions2.add(ConditionUtils.create(ConditionConstants.MAY_BE_INFERRED, "Yes"));
+		resource1 = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.ACTION);
+		assertTrue("Same resource should be equal", ResourceUtils.equal(resource1, resource1));
+		assertFalse("Different resources should be equal", ResourceUtils.equal(resource1, resource2));
+		assertFalse("Different resources should be equal (inverse)", ResourceUtils.equal(resource2, resource1));
+		resource2 = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.ABOUT);
+		assertFalse("Different resources should be equal (2)", ResourceUtils.equal(resource1, resource2));
+		assertFalse("Different resources should be equal (inverse) (2)", ResourceUtils.equal(resource2, resource1));
+		resource2 = ResourceUtils.create(DataIdentifierScheme.CONTEXT+"://"+CtxAttributeTypes.ACTION);
+		assertFalse("Different resources should be equal (2)", ResourceUtils.equal(resource1, resource2));
+		assertFalse("Different resources should be equal (inverse) (2)", ResourceUtils.equal(resource2, resource1));
+		resource2 = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.ACTION);
+		assertTrue("Equal resources should be equal", ResourceUtils.equal(resource1, resource2));
+		assertTrue("Equal resources should be equal (inverse)", ResourceUtils.equal(resource2, resource1));
+		assertFalse("resource and object should not be equal", ResourceUtils.equal(resource1, notResource));
 	}
 }
