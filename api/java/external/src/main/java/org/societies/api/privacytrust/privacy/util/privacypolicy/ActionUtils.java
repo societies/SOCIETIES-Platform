@@ -188,55 +188,58 @@ public class ActionUtils {
 		return contain(needle, haystack);
 	}
 
-//	public static boolean contains(List<Action> actionsToCheck, List<Action> actions) {
-//		return contains(actionsToCheck, actions, null);
-//	}
-//	/**
-//	 * 
-//	 * @param actionsToCheck
-//	 * @param actions
-//	 * @param intersection Will be filled with the intersection of the two list. It will works only if actions contains actionsToCheck
-//	 * @return
-//	 */
-//	public static boolean contains(List<Action> actionsToCheck, List<Action> actions, List<Action> intersection) {
-//		if (null == actions || actions.size() <= 0 || null == actionsToCheck || actionsToCheck.size() <= 0 || actions.size() < actionsToCheck.size()) {
-//			return false;
-//		}
-//		for(Action actionToCheck : actionsToCheck) {
-//			if (!contains(actionToCheck, actions)) {
-//				return false;
-//			}
-//			if (null != intersection) {
-//				intersection.add(actionToCheck);
-//			}
-//		}
-//		return true;
-//	}
-//
-//	public static boolean containsOr(List<Action> actionsToCheck, List<Action> actions) {
-//		if (null == actions || actions.size() <= 0 || null == actionsToCheck || actionsToCheck.size() <= 0 || actions.size() < actionsToCheck.size()) {
-//			return false;
-//		}
-//		for(Action actionToCheck : actionsToCheck) {
-//			if (contains(actionToCheck, actions)) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-//
-//	public static List<Action> intersect(List<Action> actionsToCheck, List<Action> actions) {
-//		if (null == actions || actions.size() <= 0 || null == actionsToCheck || actionsToCheck.size() <= 0 || actions.size() < actionsToCheck.size()) {
-//			return null;
-//		}
-//		List<Action> result = new ArrayList<Action>();
-//		for(Action actionToCheck : actionsToCheck) {
-//			if (contains(actionToCheck, actions)) {
-//				result.add(actionToCheck);
-//			}
-//		}
-//		return result;
-//	}
+	public static boolean contains(List<Action> actionsToCheck, List<Action> actions) {
+		return contains(actionsToCheck, actions, null);
+	}
+	/**
+	 * 
+	 * @param actionsToCheck
+	 * @param actions
+	 * @param intersection Will be filled with the intersection of the two list. It will works only if actions contains actionsToCheck
+	 * @return
+	 */
+	public static boolean contains(List<Action> actionsToCheck, List<Action> actions, List<Action> intersection) {
+		if (null == actions || actions.size() <= 0 || null == actionsToCheck || actionsToCheck.size() <= 0 || actions.size() < actionsToCheck.size()) {
+			return false;
+		}
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actionBeans = toActionBeans(actions);
+		for(Action actionToCheck : actionsToCheck) {
+			if (!contains(toActionBean(actionToCheck), actionBeans)) {
+				return false;
+			}
+			if (null != intersection) {
+				intersection.add(actionToCheck);
+			}
+		}
+		return true;
+	}
+
+	public static boolean containsOr(List<Action> actionsToCheck, List<Action> actions) {
+		if (null == actions || actions.size() <= 0 || null == actionsToCheck || actionsToCheck.size() <= 0 || actions.size() < actionsToCheck.size()) {
+			return false;
+		}
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actionBeans = toActionBeans(actions);
+		for(Action actionToCheck : actionsToCheck) {
+			if (!contains(toActionBean(actionToCheck), actionBeans)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static List<Action> intersect(List<Action> actionsToCheck, List<Action> actions) {
+		if (null == actions || actions.size() <= 0 || null == actionsToCheck || actionsToCheck.size() <= 0 || actions.size() < actionsToCheck.size()) {
+			return null;
+		}
+		List<Action> result = new ArrayList<Action>();
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actionBeans = toActionBeans(actions);
+		for(Action actionToCheck : actionsToCheck) {
+			if (!contains(toActionBean(actionToCheck), actionBeans)) {
+				result.add(actionToCheck);
+			}
+		}
+		return result;
+	}
 	
 	public static Action toAction(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action actionBean)
 	{
