@@ -65,7 +65,7 @@ public class ResponseItemUtils {
 		}
 		return sb.toString();
 	}
-
+	
 	public static String toString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem item){
 		StringBuilder builder = new StringBuilder();
 		builder.append("ResponseItem [getDecision()=");
@@ -74,6 +74,16 @@ public class ResponseItemUtils {
 		builder.append(item.getRequestItem());
 		builder.append("]");
 		return builder.toString();
+	}
+
+	public static String toString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> responseItems){
+		StringBuilder sb = new StringBuilder();
+		if (null != responseItems) {
+			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem responseItem : responseItems) {
+				sb.append(toString(responseItem));
+			}
+		}
+		return sb.toString();
 	}
 
 
