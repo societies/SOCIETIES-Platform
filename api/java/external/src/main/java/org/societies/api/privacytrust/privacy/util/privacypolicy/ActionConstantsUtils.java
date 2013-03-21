@@ -22,40 +22,24 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
+package org.societies.api.privacytrust.privacy.util.privacypolicy;
 
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
  */
-public class DecisionUtils {
-
-	public static String toXmlString(Decision decision){
-		StringBuilder sb = new StringBuilder();
-		if (null != decision) {
-			sb.append("\n<Decision>\n");
-			sb.append("\t<Attribute AttributeId=\"Decision\" DataType=\""+decision.getClass().getName()+"\">\n");
-			sb.append("\t\t<AttributeValue>"+decision.name()+"</AttributeValue>\n");
-			sb.append("\t</Attribute>\n");
-			sb.append("</Decision>");
-		}
-		return sb.toString();
-	}
-
-	@Deprecated
-	public static boolean equals(Decision o1, Object o2) {
-		return equal(o1, o2);
-	}
-	public static boolean equal(Decision o1, Object o2) {
+public class ActionConstantsUtils {
+	public static boolean equal(ActionConstants o1, Object o2) {
 		// -- Verify reference equality
 		if (o1 == o2) { return true; }
 		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
 		if (o1.getClass() != o2.getClass()) { return false; }
 		// -- Verify obj type
-		Decision rhs = (Decision) o2;
-		return o1.name().equals(rhs.name());
+		ActionConstants ro2 = (ActionConstants) o2;
+		return (o1.value().equals(ro2.value()));
 	}
 }

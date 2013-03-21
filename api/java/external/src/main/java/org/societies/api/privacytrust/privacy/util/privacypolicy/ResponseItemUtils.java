@@ -27,7 +27,6 @@ package org.societies.api.privacytrust.privacy.util.privacypolicy;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
@@ -37,14 +36,105 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
  * @author Olivier Maridat (Trialog)
  */
 public class ResponseItemUtils {
-	
+
 	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision decision, org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem requestItem) {
 		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem responseItem = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem();
 		responseItem.setDecision(decision);
 		responseItem.setRequestItem(requestItem);
 		return responseItem;
 	}
+
+
+	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem responseItem){
+		StringBuilder sb = new StringBuilder();
+		if (null != responseItem) {
+			sb.append("\n<Response>\n");
+			sb.append(DecisionUtils.toXmlString(responseItem.getDecision()));
+			sb.append(RequestItemUtils.toXmlString(responseItem.getRequestItem()));
+			sb.append("</Response>");
+		}
+		return sb.toString();
+	}
+
+	public static String toXmlString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> responseItems){
+		StringBuilder sb = new StringBuilder();
+		if (null != responseItems) {
+			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem responseItem : responseItems) {
+				sb.append(toXmlString(responseItem));
+			}
+		}
+		return sb.toString();
+	}
 	
+	public static String toString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem item){
+		StringBuilder builder = new StringBuilder();
+		builder.append("ResponseItem [getDecision()=");
+		builder.append(item.getDecision());
+		builder.append(", getRequestItem()=");
+		builder.append(item.getRequestItem());
+		builder.append("]");
+		return builder.toString();
+	}
+
+	public static String toString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> responseItems){
+		StringBuilder sb = new StringBuilder();
+		if (null != responseItems) {
+			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem responseItem : responseItems) {
+				sb.append(toString(responseItem));
+			}
+		}
+		return sb.toString();
+	}
+
+
+	public static boolean equal(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem o1, Object o2) {
+		// -- Verify reference equality
+		if (o1 == o2) { return true; }
+		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem ro2 = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem) o2;
+		return (DecisionUtils.equal(o1.getDecision(), ro2.getDecision())
+				&& RequestItemUtils.equal(o1.getRequestItem(), ro2.getRequestItem())
+				);
+	}
+	@Deprecated
+	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem o1, Object o2) {
+		return equal(o1, o2);
+	}
+
+	public static boolean equal(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> o1, Object o2) {
+		// -- Verify reference equality
+		if (o1 == o2) { return true; }
+		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> ro2 = (List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem>) o2;
+		if (o1.size() != ro2.size()) {
+			return false;
+		}
+		boolean result = true;
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem o1Entry : o1) {
+			result &= contain(o1Entry, ro2);
+		}
+		return result;
+	}
+
+	public static boolean contain(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem needle, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> haystack) {
+		if (null == haystack || haystack.size() <= 0 || null == needle) {
+			return false;
+		}
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem entry : haystack) {
+			if (equal(needle, entry)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+
 	public static ResponseItem toResponseItem(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem responseItemBean)
 	{
 		if (null == responseItemBean) {
@@ -86,49 +176,5 @@ public class ResponseItemUtils {
 			responseItemBeans.add(ResponseItemUtils.toResponseItemBean(responseItem));
 		}
 		return responseItemBeans;
-	}
-
-	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem responseItem){
-		StringBuilder sb = new StringBuilder();
-		if (null != responseItem) {
-			sb.append("\n<Response>\n");
-			sb.append(DecisionUtils.toXmlString(responseItem.getDecision()));
-			sb.append(RequestItemUtils.toXmlString(responseItem.getRequestItem()));
-			sb.append("</Response>");
-		}
-		return sb.toString();
-	}
-
-	public static String toXmlString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> responseItems){
-		StringBuilder sb = new StringBuilder();
-		if (null != responseItems) {
-			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem responseItem : responseItems) {
-				sb.append(toXmlString(responseItem));
-			}
-		}
-		return sb.toString();
-	}
-
-	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem o1, Object o2) {
-		// -- Verify reference equality
-		if (o2 == null) { return false; }
-		if (o1 == o2) { return true; }
-		if (o1.getClass() != o2.getClass()) { return false; }
-		// -- Verify obj type
-		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem) o2;
-		return new EqualsBuilder()
-		.append(o1.getDecision(), rhs.getDecision())
-		.append(o1.getRequestItem(), rhs.getRequestItem())
-		.isEquals();
-	}
-	
-	public static String toString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem item){
-		StringBuilder builder = new StringBuilder();
-		builder.append("ResponseItem [getDecision()=");
-		builder.append(item.getDecision());
-		builder.append(", getRequestItem()=");
-		builder.append(item.getRequestItem());
-		builder.append("]");
-		return builder.toString();
 	}
 }

@@ -49,6 +49,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataMan
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfPreferenceDetailsBean;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
@@ -60,12 +61,13 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ConditionUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
 import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfOutcome;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.DataObfuscationManager;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -408,16 +410,10 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		}
 
 		// -- Retrieve the obfuscation level
-		DObfOutcome dataObfuscationPreferences;
-		try {
-			dataObfuscationPreferences = privacyPreferenceManager.evaluateDObfPreference(RequestorUtils.toRequestor(requestor, commManager.getIdManager()), dataWrapper.getDataType());
-		} catch (InvalidFormatException e) {
-			throw new PrivacyException("Can't retrieve obfuscation level from privacy preferences. Requestor badly formatted.", e);
-		}
-		double obfuscationLevel = 1;
-		if (null != dataObfuscationPreferences) {
-			obfuscationLevel = dataObfuscationPreferences.getObfuscationLevel();
-		}
+		DObfPreferenceDetailsBean dataObfuscationPrefDetails = new DObfPreferenceDetailsBean();
+		dataObfuscationPrefDetails.setResource(ResourceUtils.create(DataIdentifierScheme.CONTEXT, dataWrapper.getDataType()));
+		dataObfuscationPrefDetails.setRequestor(requestor);
+		double obfuscationLevel = privacyPreferenceManager.evaluateDObfPreference(dataObfuscationPrefDetails);
 		// - Performance loggings
 		// Counter
 		IPerformanceMessage m = new PerformanceMessage();

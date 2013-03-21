@@ -274,7 +274,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 		// Quick log message
 		if(logger.isDebugEnabled()){
 						
-			if(serviceList.isEmpty())	
+			if(serviceList == null || serviceList.isEmpty())	
 				logger.debug("getServices: no services found!");
 			else{				
 				Iterator<Service> it = serviceList.iterator();
