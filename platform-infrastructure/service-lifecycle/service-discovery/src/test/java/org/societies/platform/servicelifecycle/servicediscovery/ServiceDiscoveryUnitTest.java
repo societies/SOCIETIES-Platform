@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,6 +56,7 @@ import org.societies.platform.servicelifecycle.servicediscovery.ServiceDiscovery
  *
  */
 public class ServiceDiscoveryUnitTest {
+	static final Logger logger = LoggerFactory.getLogger(ServiceDiscoveryUnitTest.class);
 
 
 	private ServiceDiscovery classUnderTest;
@@ -131,8 +134,8 @@ public class ServiceDiscoveryUnitTest {
 
 		} catch (Exception e)
 		{
-			e.printStackTrace();
-			fail("Shouldn't be here!");
+			logger.error("Shouldn't be here! "+e.getMessage(), e);
+			fail("Shouldn't be here! "+e.getMessage());
 		};	
 
 	}
