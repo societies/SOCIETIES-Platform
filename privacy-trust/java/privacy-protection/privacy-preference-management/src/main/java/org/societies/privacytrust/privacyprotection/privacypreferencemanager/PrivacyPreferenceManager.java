@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -46,6 +47,7 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.preferen
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSPreferenceDetailsBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestorUtils;
@@ -66,6 +68,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ppn.PPNPrivacyPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PrivateContextCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.management.PrivatePreferenceCache;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging.AccessControlPreferenceCreator;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.PrivacyPreferenceConditionMonitor;
 
 /**
@@ -100,6 +103,8 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	private IPrivacyAgreementManager agreementMgr;
 	private PPNegotiationPreferenceManager ppnMgr;
 	private IDSPreferenceManager idsMgr;
+	private IEventMgr eventMgr;
+	private AccessControlPreferenceCreator accCtrlPreferenceCreator;
 
 	public PrivacyPreferenceManager(){
 
@@ -137,6 +142,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		contextCache = new PrivateContextCache(ctxBroker);
 		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, this.privacyDataManagerInternal, commsMgr);
 		contextCache = new PrivateContextCache(ctxBroker);
+		this.accCtrlPreferenceCreator = new AccessControlPreferenceCreator(this);
 		if (this.myMessageBox==null){
 			myMessageBox = new MessageBox();
 		}
@@ -144,7 +150,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 
 
 
-	private AccessControlPreferenceManager getAccessControlPreferenceManager(){
+	public AccessControlPreferenceManager getAccessControlPreferenceManager(){
 		if (this.accCtrlMgr==null){
 			accCtrlMgr = new AccessControlPreferenceManager(prefCache, contextCache, userFeedback, trustBroker, ctxBroker, getAgreementMgr(), idm);
 		}
@@ -452,13 +458,16 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		return commsMgr;
 	}
 
+	public IIdentityManager getIdm(){
+		return this.idm;
+	}
 
 	/**
 	 * @param commsMgr the commsMgr to set
 	 */
 	public void setCommsMgr(ICommManager commsMgr) {
 		this.commsMgr = commsMgr;
-		this.setIdMgr(commsMgr.getIdManager());
+		this.idm = commsMgr.getIdManager();
 	}
 
 	public void setIdMgr(IIdentityManager identityManager){
@@ -500,12 +509,19 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	}
 
 
+	public IEventMgr getEventMgr() {
+		return eventMgr;
+	}
 
 
+	public void setEventMgr(IEventMgr eventMgr) {
+		this.eventMgr = eventMgr;
+	}
 
 
-
-
+	public AccessControlPreferenceCreator getAccCtrlPreferenceCreator() {
+		return accCtrlPreferenceCreator;
+	}
 
 }
 

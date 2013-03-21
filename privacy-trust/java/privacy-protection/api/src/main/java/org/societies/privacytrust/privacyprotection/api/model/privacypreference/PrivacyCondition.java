@@ -68,4 +68,39 @@ public class PrivacyCondition implements IPrivacyPreferenceCondition{
 		return condition;
 	}
 
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((condition == null) ? 0 : condition.hashCode());
+		return result;
+	}
+
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof PrivacyCondition)) {
+			return false;
+		}
+		PrivacyCondition other = (PrivacyCondition) obj;
+		if (condition == null) {
+			if (other.condition != null) {
+				return false;
+			}
+		} else if (!ConditionUtils.equals(condition,other.condition)) {
+			return false;
+		}
+		return true;
+	}
+
 }

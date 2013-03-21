@@ -50,12 +50,21 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
+import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.privacytrust.privacyprotection.INegotiationClient;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PPNegotiationEvent;
+import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
@@ -76,6 +85,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ppn.PPNPrivacyPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.CtxTypes;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging.AccessControlPreferenceCreator;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
@@ -105,6 +115,7 @@ public class TestPPNPreferences {
 	private CtxAttribute ppn_1_CtxAttribute;
 	private CtxEntity userCtxEntity;
 	private CtxAttribute registryCtxAttribute;
+	private Requestor requestorCis;
 
 	@Before
 	public void setUp(){
@@ -180,6 +191,9 @@ public class TestPPNPreferences {
 		Assert.assertEquals(0, ppnPreferenceDetails.size());
 		
 		Assert.assertNull(this.privPrefMgr.getPPNPreference(ppNetails));
+		
+
+		
 	}
 	
 
@@ -211,6 +225,7 @@ public class TestPPNPreferences {
 		this.requestorCisBean.setRequestorId(requestorIdentity.getJid());
 		IIdentity cisIdentity = new MyIdentity(IdentityType.CIS, "myCis","ict-societies.eu");
 		this.requestorCisBean.setCisRequestorId(cisIdentity.getJid());
+		this.requestorCis = new RequestorCis(requestorIdentity, cisIdentity);
 	}
 	
 	private void setupPPNModel() {

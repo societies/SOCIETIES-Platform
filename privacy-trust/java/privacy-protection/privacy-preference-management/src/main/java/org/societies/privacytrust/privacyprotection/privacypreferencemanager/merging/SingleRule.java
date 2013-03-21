@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ContextPreferenceCondition;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceCondition;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyCondition;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.TrustPreferenceCondition;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.OperatorConstants;
 
 
@@ -40,11 +42,11 @@ public class SingleRule{
 	private ArrayList<IPrivacyPreferenceCondition> conditions;
 	private IPrivacyOutcome outcome;
 	private int confidence;
-	
+
 	public SingleRule(){
 		this.conditions = new ArrayList<IPrivacyPreferenceCondition>();
 	}
-		
+
 	public void setConditions(ArrayList<IPrivacyPreferenceCondition> conditions) {
 		this.conditions = conditions;
 	}
@@ -60,8 +62,8 @@ public class SingleRule{
 	public IPrivacyOutcome getOutcome() {
 		return outcome;
 	}
-	
-	
+
+
 	public void setConfidence(int confidence) {
 		this.confidence = confidence;
 	}
@@ -69,8 +71,8 @@ public class SingleRule{
 	public int getConfidence() {
 		return confidence;
 	}
-	
-	
+
+
 
 	public String toString(){
 		String ret = "";
@@ -78,37 +80,55 @@ public class SingleRule{
 			ret = ret + " + "+ this.conditions.get(i).toString();
 		}
 		ret = ret + " > "+this.outcome.toString();
-		
+
 		return ret;
 	}
-	
+
 	public boolean hasCondition(IPrivacyPreferenceCondition pc){
+
+		/*		
 		//return this.conditions.contains(pc);
-		
+
 		//CtxAttributeIdentifier ctxId = pc.getCtxIdentifier();
 		String contextType = ((ContextPreferenceCondition) pc).getCtxIdentifier().getType();
 		System.out.println("%%%%%%%   Context name: "+contextType+" %%%%%%%%%%%%%%%%");
 		String value = ((ContextPreferenceCondition) pc).getValue();
 		OperatorConstants op = ((ContextPreferenceCondition) pc).getOperator();
-		
-		
-		for (int i=0; i< this.conditions.size(); i++){
-			IPrivacyPreferenceCondition con = this.conditions.get(i);
-			if (((ContextPreferenceCondition) con).getCtxIdentifier().getType().equals(contextType) && ((ContextPreferenceCondition) con).getValue().equals(value) && ((ContextPreferenceCondition) con).getOperator().equals(op)){
-				return true;
+
+		 */
+		for (IPrivacyPreferenceCondition mine : conditions){
+			if (mine instanceof ContextPreferenceCondition){
+				if (pc instanceof ContextPreferenceCondition){
+					if (((ContextPreferenceCondition) pc).equals(mine)){
+						return true;
+					}
+				}
+			}else if (mine instanceof TrustPreferenceCondition){
+				if (pc instanceof TrustPreferenceCondition){
+					if (((TrustPreferenceCondition) pc).equals(mine)){
+						return true;
+					}
+				}
+
+			}else if (mine instanceof PrivacyCondition){
+				if (pc instanceof PrivacyCondition){
+					if (((PrivacyCondition) pc).equals(mine)){
+						return true;
+					}
+				}		
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	public void removeCondition(IPrivacyPreferenceCondition pc){
 		//CtxAttributeIdentifier ctxId = pc.getCtxIdentifier();
 		String contextType = ((ContextPreferenceCondition) pc).getCtxIdentifier().getType();
 		String value = ((ContextPreferenceCondition) pc).getValue();
 		OperatorConstants op = ((ContextPreferenceCondition) pc).getOperator();
-		
-		
+
+
 		for (int i=0; i< this.conditions.size(); i++){
 			IPrivacyPreferenceCondition con = this.conditions.get(i);
 			if (((ContextPreferenceCondition) con).getCtxIdentifier().getType().equals(contextType) && ((ContextPreferenceCondition) con).getValue().equals(value) && ((ContextPreferenceCondition) con).getOperator().equals(op)){
@@ -116,44 +136,44 @@ public class SingleRule{
 			}
 		}
 	}
-	
+
 	public boolean equals(SingleRule sr){
-		
+
 		if (!(sr.getOutcome().equals(this.outcome))){
 			return false;
 		}
-		
+
 		return this.hasSameConditions(sr);
 	}
-	
+
 	private boolean hasSameConditions(SingleRule sr){
 		if (sr.getConditions().size()!=this.conditions.size()){
 			return false;
 		}
-		
+
 		for (int i=0; i<sr.getConditions().size(); i++){
 			IPrivacyPreferenceCondition pc = sr.getConditions().get(i);
 			if (!(this.hasCondition(pc))){
 				return false;
 			}
 		}
-		
+
 		for (int i=0; i<this.conditions.size(); i++){
 			IPrivacyPreferenceCondition pc = this.conditions.get(i);
 			if (!(sr.hasCondition(pc))){
 				return false;
 			}
 		}
-		
+
 		return true;		
 	}
 	public boolean conflicts(SingleRule sr){
 		if (sr.getOutcome().equals(this.outcome)){
 			return false;			
 		}
-		
+
 		return this.hasSameConditions(sr);
-		
+
 	}
 }
 
