@@ -27,9 +27,11 @@ package org.societies.api.privacytrust.privacy.util.privacypolicy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.util.DataIdentifierFactory;
+import org.societies.api.identity.util.DataIdentifierSchemeUtils;
 import org.societies.api.identity.util.DataTypeFactory;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
@@ -167,17 +169,51 @@ public class ResourceUtils {
 		return sb.toString();
 	}
 
+	@Deprecated
 	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource o1, Object o2) {
+		return equal(o1, o2);
+	}
+	public static boolean equal(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource o1, Object o2) {
 		// -- Verify reference equality
-		if (o2 == null) { return false; }
 		if (o1 == o2) { return true; }
+		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
 		if (o1.getClass() != o2.getClass()) { return false; }
 		// -- Verify obj type
-		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource) o2;
-		return new EqualsBuilder()
-		.append(o1.getDataIdUri(), rhs.getDataIdUri())
-		.append(o1.getDataType(), rhs.getDataType())
-		.append(o1.getScheme(), rhs.getScheme())
-		.isEquals();
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource ro2 = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource) o2;
+		return (StringUtils.equals(o1.getDataIdUri(), ro2.getDataIdUri())
+				&& StringUtils.equals(o1.getDataType(), ro2.getDataType())
+				&& DataIdentifierSchemeUtils.equal(o1.getScheme(), ro2.getScheme())
+				);
+	}
+
+	public static boolean equal(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource> o1, Object o2) {
+		// -- Verify reference equality
+		if (o1 == o2) { return true; }
+		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource> ro2 = (List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource>) o2;
+		if (o1.size() != ro2.size()) {
+			return false;
+		}
+		boolean result = true;
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource o1Entry : o1) {
+			result &= contain(o1Entry, ro2);
+		}
+		return result;
+	}
+	
+	public static boolean contain(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource needle, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource> haystack) {
+		if (null == haystack || haystack.size() <= 0 || null == needle) {
+			return false;
+		}
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource entry : haystack) {
+			if (equal(needle, entry)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

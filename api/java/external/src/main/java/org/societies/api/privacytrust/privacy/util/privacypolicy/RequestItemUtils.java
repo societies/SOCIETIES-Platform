@@ -44,7 +44,7 @@ public class RequestItemUtils {
 	 * @return
 	 */
 	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> conditions) {
-		return create(resource, actions, conditions, true);
+		return create(resource, actions, conditions, false);
 	}
 	
 	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> conditions, boolean optional) {
@@ -122,18 +122,55 @@ public class RequestItemUtils {
 		return sb.toString();
 	}
 
+	@Deprecated
 	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem o1, Object o2) {
+		return equal(o1, o2);
+	}
+	public static boolean equal(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem o1, Object o2) {
+		return equal(o1, o2, false);
+	}
+	public static boolean equal(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem o1, Object o2, boolean dontCheckOptional) {
 		// -- Verify reference equality
-		if (o2 == null) { return false; }
 		if (o1 == o2) { return true; }
+		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
 		if (o1.getClass() != o2.getClass()) { return false; }
 		// -- Verify obj type
-		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem) o2;
-		return new EqualsBuilder()
-		.append(o1.getActions(), rhs.getActions())
-		.append(o1.getConditions(), rhs.getConditions())
-		.append(o1.getResource(), rhs.getResource())
-		.append(o1.isOptional(), rhs.isOptional())
-		.isEquals();
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem ro2 = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem) o2;
+		return (ActionUtils.equal(o1.getActions(), ro2.getActions())
+				&& ConditionUtils.equal(o1.getConditions(), ro2.getConditions())
+				&& ResourceUtils.equal(o1.getResource(), ro2.getResource())
+				&& (dontCheckOptional || o1.isOptional() == ro2.isOptional())
+				);
+	}
+	
+	public static boolean equal(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem> o1, Object o2) {
+		// -- Verify reference equality
+		if (o1 == o2) { return true; }
+		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem> ro2 = (List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem>) o2;
+		if (o1.size() != ro2.size()) {
+			return false;
+		}
+		boolean result = true;
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem o1Entry : o1) {
+			result &= contain(o1Entry, ro2);
+		}
+		return result;
+	}
+	
+	public static boolean contain(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem needle, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem> haystack) {
+		if (null == haystack || haystack.size() <= 0 || null == needle) {
+			return false;
+		}
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem entry : haystack) {
+			if (equal(needle, entry)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
