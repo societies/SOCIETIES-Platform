@@ -108,7 +108,15 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 			}			
 		}else{
 			UIMEvent payload = new UIMEvent(owner, action);
-			InternalEvent event = new InternalEvent(EventTypes.UIM_STATIC_ACTION, "newaction", "org/societies/useragent/monitoring", payload);
+			InternalEvent event = new InternalEvent(EventTypes.UIM_STATIC_ACTION, "staticaction", "org/societies/useragent/monitoring", payload);
+			try {
+				this.eventMgr.publishInternalEvent(event);
+				this.LOG.debug("published event: "+EventTypes.UIM_STATIC_ACTION);
+			} catch (EMSException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				this.LOG.debug("Unable to publish event: "+EventTypes.UIM_STATIC_ACTION);
+			}
 		}
 
 
