@@ -25,14 +25,19 @@
 package org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.client;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
 import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestItemUtils;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
@@ -49,6 +54,8 @@ public class ClientResponsePolicyGenerator {
 
 	private IUserFeedback userFeedback;
 	private IPrivacyPreferenceManager privacyPreferenceManager;
+
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	public ClientResponsePolicyGenerator(PrivacyPolicyNegotiationManager policyMgr){
 		userFeedback = policyMgr.getUserFeedback();
 		privacyPreferenceManager = policyMgr.getPrivacyPreferenceManager();
@@ -59,7 +66,26 @@ public class ClientResponsePolicyGenerator {
 		
 		ResponsePolicy responsePolicy = new ResponsePolicy();
 		List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
-		responseItems.addAll(evaluatePPNPreferences.values());
+		
+
+		
+		for (RequestItem reqItem : requestItems){
+			boolean found = false;
+			Set<RequestItem> evaluatedKeys = evaluatePPNPreferences.keySet();
+			for (RequestItem key : evaluatedKeys){
+				if (RequestItemUtils.equal(reqItem, key)){
+					responseItems.add(evaluatePPNPreferences.get(key));
+					found =true;
+				}
+			}
+			
+			if (!found){
+				ResponseItem item = new ResponseItem();
+				item.setRequestItem(reqItem);
+				responseItems.add(item);
+			}
+			
+		}
 		
 		responsePolicy.setResponseItems(responseItems);
 		responsePolicy.setRequestor(providerPolicy.getRequestor());
@@ -70,9 +96,15 @@ public class ClientResponsePolicyGenerator {
 		negDetailsBean.setRequestor(providerPolicy.getRequestor());
 		try {
 			ResponsePolicy privacyNegotiationFB = userFeedback.getPrivacyNegotiationFB(responsePolicy, negDetailsBean).get();
-			privacyNegotiationFB.setRequestor(providerPolicy.getRequestor());
-			privacyNegotiationFB.setNegotiationStatus(NegotiationStatus.ONGOING);
+			if (privacyNegotiationFB.getNegotiationStatus().equals(NegotiationStatus.FAILED)){
+				privacyNegotiationFB.setRequestor(providerPolicy.getRequestor());
+				privacyNegotiationFB.setResponseItems(new ArrayList<ResponseItem>());
+				return privacyNegotiationFB;
+			}
 			
+			
+			privacyNegotiationFB.setNegotiationStatus(NegotiationStatus.ONGOING);
+			this.logging.debug("Generated user response policy. ResponsePolicy contains: "+privacyNegotiationFB.getResponseItems().size()+" responseItems");
 			return privacyNegotiationFB;
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

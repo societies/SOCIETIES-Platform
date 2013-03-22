@@ -691,6 +691,12 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 	@Override
 	public Future<ResponsePolicy> getPrivacyNegotiationFB(ResponsePolicy policy,
 			NegotiationDetailsBean details) {
+		this.LOG.debug("processing negotiationFeedback request");
+		if (policy==null){
+			this.LOG.debug("Policy parameter is null");
+		}else{
+			this.LOG.debug("Policy contains: "+policy.getResponseItems().size()+" responseItems");
+		}
 		UserFeedbackPrivacyNegotiationEvent event = new UserFeedbackPrivacyNegotiationEvent();
 		event.setNegotiationDetails(details);
 		event.setResponsePolicy(policy);

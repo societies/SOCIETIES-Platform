@@ -143,6 +143,7 @@ public class NegotiationClient implements INegotiationClient {
 			e.printStackTrace();
 		}
 		this.logging.debug("Received Provider RequestPolicy!");
+		this.logging.debug("Request policy contains: "+policy.getRequestItems().size()+" requestItems");
 		//this.logging.debug(policy.toString());
 		this.requestPolicy = policy;
 		List<String> notFoundTypes = this.dataTypesExist(policy);
@@ -213,7 +214,8 @@ public class NegotiationClient implements INegotiationClient {
 		else{
 			ResponsePolicy myResponsePolicy = this.findMyResponsePolicy(policy);
 			if (myResponsePolicy == null){
-				new TimedNotificationGUI().showGUI("Ignoring an invalid response policy", "message from: Privacy Policy Negotiation Client");
+				//new TimedNotificationGUI().showGUI("Ignoring an invalid response policy", "message from: Privacy Policy Negotiation Client");
+				this.logging.debug("Ignoring invalid response policy");
 				return;
 			}
 			this.logging.debug("Checking other party's response policy against user's response policy");
@@ -238,15 +240,13 @@ public class NegotiationClient implements INegotiationClient {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
-				
-
-
 			}else{
+				
 				this.logging.debug("Received ResponsePolicy does not match user's ResponsePolicy, failing negotiation");
-				new TimedNotificationGUI().showGUI("Response policy received from Provider\n"
+				
+/*				new TimedNotificationGUI().showGUI("Response policy received from Provider\n"
 						+"did not match user response policy.\n"
-						+"Aborted negotiation","message from: Privacy Policy Negotiation Client");
+						+"Aborted negotiation","message from: Privacy Policy Negotiation Client");*/
 				InternalEvent evt = this.createFailedNegotiationEvent();
 				try {
 					this.eventMgr.publishInternalEvent(evt);
