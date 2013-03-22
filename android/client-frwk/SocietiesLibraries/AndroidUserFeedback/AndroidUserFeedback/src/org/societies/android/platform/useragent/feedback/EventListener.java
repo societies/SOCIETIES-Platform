@@ -224,7 +224,8 @@ public class EventListener extends Service {
 		intent.putExtra(EXTRA_PRIVACY_POLICY, (Parcelable)policy);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
-		notifier.notifyMessage(description, eventType, NegotiationActivity.class, intent, "SOCIETIES");
+		//notifier.notifyMessage(description, eventType, NegotiationActivity.class, intent, "SOCIETIES");
+		startActivity(intent);
 	}
 
 }

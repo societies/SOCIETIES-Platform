@@ -2,9 +2,13 @@ package org.societies.android.platform.useragent.feedback;
 
 import java.util.List;
 
+import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.api.events.IPlatformEventsCallback;
+import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
+import org.societies.android.remote.helper.EventsHelper;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 import org.societies.api.schema.identity.RequestorBean;
-import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
@@ -13,7 +17,6 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Respons
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -23,6 +26,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TableLayout;
@@ -34,8 +38,11 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 	private static final String LOG_TAG = NegotiationActivity.class.getName();
 	private static final String EXTRA_PRIVACY_POLICY = "org.societies.userfeedback.eventInfo";
 	
-	private TextView[] requestLabels;  
-	private CheckBox[] requestCheckboxes; 
+	private EventsHelper eventsHelper;
+	UserFeedbackPrivacyNegotiationEvent eventInfo = null;
+	private boolean isEventsConnected = false;
+	private View[] requestControls;
+	private View[][] allResponses;
 	private TableLayout[] tblConditions;
 	private ScrollView svScroll;
 	
@@ -44,26 +51,22 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_negotiation);
+        eventsHelper = new EventsHelper(this);
         
         //GET EVENT OBJECT
         Intent intent = getIntent();
 		Bundle bundle = intent.getExtras();
-		UserFeedbackPrivacyNegotiationEvent eventInfo = bundle.getParcelable(EXTRA_PRIVACY_POLICY);
-		RequestorBean requestor = eventInfo.getNegotiationDetails().getRequestor();
+		eventInfo = bundle.getParcelable(EXTRA_PRIVACY_POLICY);
 		
 		//SET HEADER INFO
-		String sHeader = "";
-		if (requestor instanceof RequestorCisBean) {
-			Log.d(LOG_TAG, "RequestorCisBean");
-			sHeader = "Community: " + ((RequestorCisBean)requestor).getCisRequestorId() +   
-					  "\r\nAdmin: " + ((RequestorCisBean)requestor).getRequestorId();
-		} 
-		else if (requestor instanceof RequestorServiceBean) {
-			Log.d(LOG_TAG, "RequestorServiceBean");
+		RequestorBean requestor = eventInfo.getNegotiationDetails().getRequestor();
+		String sRequestorType = "community";
+		if (requestor instanceof RequestorServiceBean) {
+			sRequestorType = "installed service";
 		} 
 		TextView lblHeader = (TextView) findViewById(R.id.txtHeader);
 		//lblHeader.setText(sHeader + "\r\n has requested access to the following data:");
-		lblHeader.setText("The Community is requesting access to your personal info for the below uses. Please select what you would like to allow:");
+		lblHeader.setText("The " + sRequestorType + " is requesting access to your personal info for the following uses. Please select what you would like to allow:");
 		
 		//GENERATE RESOURCE SPINNER
 		List<ResponseItem> responses = eventInfo.getResponsePolicy().getResponseItems();
@@ -79,6 +82,7 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 		
 		//PROCESS EACH RESPONSE
 		tblConditions = new TableLayout[responses.size()];
+		allResponses = new View[responses.size()][]; 
 		for(int a=0; a<responses.size(); a++) {
 			ResponseItem response = responses.get(a);
 			RequestItem request = response.getRequestItem();
@@ -86,31 +90,38 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 			
 			TableLayout tblCondition = new TableLayout(this);
 			tblCondition.setBackgroundResource(R.color.Grey);
+			requestControls = new View[conditions.size()];
 			
-			//Create Table row objects  
-			requestLabels = new TextView[conditions.size()];  
-			requestCheckboxes = new CheckBox[conditions.size()];
 			//EACH CONDITION
 			for (int i=0; i<conditions.size(); i++) {
 				Condition condition = conditions.get(i);
 				boolean optional = condition.isOptional();
-				requestLabels[i] = new TextView(this);
-				requestCheckboxes[i] = new CheckBox(this);
-				//Set captions
-				requestLabels[i].setText(condition.getConditionConstant().value());
-				//requestCheckboxes[i].setChecked(Boolean.parseBoolean(condition.getValue()));
-				requestCheckboxes[i].setChecked(true);
-				requestCheckboxes[i].setEnabled(optional);
-				
+				TextView label = new TextView(this);
+				label.setText(condition.getConditionConstant().value());
+				//DATA TYPE - CHECKBOX/TEXTBOX
+				if (condition.getConditionConstant().value().startsWith("data")) {
+					EditText textbox = new EditText(this);
+					textbox.setText(condition.getValue());
+					requestControls[i] = textbox; 
+				}
+				else {
+					CheckBox checkbox = new CheckBox(this);
+					checkbox.setChecked(true);
+					checkbox.setEnabled(optional);
+					requestControls[i] = checkbox;
+				}				
 				TableRow row = new TableRow(this);
 				row.setId(i);
-				row.addView(requestLabels[i]);
-				row.addView(requestCheckboxes[i]);
+				//row.addView(requestLabels[i]);
+				row.addView(label);
+				row.addView(requestControls[i]);
 				
 				tblCondition.addView(row);
 			}
 			tblConditions[a] = tblCondition;
+			allResponses[a] = requestControls;
 		}
+		//ADD FIRST TABLE OF CONDITIONS TO SCROLL VIEW - OTHERS ADDED ON CHANGE EVENT
 		svScroll = (ScrollView)findViewById(R.id.svConditions);
 		svScroll.addView(tblConditions[0]);
 		
@@ -118,14 +129,15 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
         Button btnAccept = (Button) findViewById(R.id.btnAccept);
         btnAccept.setOnClickListener(new OnClickListener() {            
         	public void onClick(View v) {
-        		
+        		publishEvent();
+        		finish();
         	}
         });
-        //ACCEPT BUTTON EVENT HANDLER
+        //CANCEL BUTTON EVENT HANDLER
         Button btnCancel = (Button) findViewById(R.id.btnCancel);
         btnCancel.setOnClickListener(new OnClickListener() {            
         	public void onClick(View v) {
-        		
+        		finish(); //BASICALLY, IGNORE REQUEST
         	}
         });
     }
@@ -149,5 +161,32 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 		
 	}
 	
+	private void publishEvent() {
+		if (!isEventsConnected) {
+			eventsHelper.setUpService(new IMethodCallback() {
+				@Override
+				public void returnException(String result) { }
+				@Override
+				public void returnAction(String result) { }
+				@Override
+				public void returnAction(boolean resultFlag) { 
+					if (resultFlag) {
+						try {
+							eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT, NegotiationActivity.this.eventInfo, new IPlatformEventsCallback() {
+								@Override
+								public void returnException(int exception) { }
+								@Override
+								public void returnAction(int result) { }
+								@Override
+								public void returnAction(boolean resultFlag) { }
+							});
+						} catch (PlatformEventsHelperNotConnectedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			});
+		}
+	}
 	
 }

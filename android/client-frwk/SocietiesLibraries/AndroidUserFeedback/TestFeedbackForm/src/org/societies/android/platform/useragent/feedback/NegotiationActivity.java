@@ -23,6 +23,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TableLayout;
@@ -33,9 +34,10 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 
 	private static final String LOG_TAG = NegotiationActivity.class.getName();
 	private static final String EXTRA_PRIVACY_POLICY = "org.societies.userfeedback.eventInfo";
-	
-	private TextView[] requestLabels;  
-	private CheckBox[] requestCheckboxes; 
+
+	private UserFeedbackPrivacyNegotiationEvent eventInfo = null;
+	private View[] requestControls;
+	private View[][] allResponses;
 	private TableLayout[] tblConditions;
 	private ScrollView svScroll;
 	
@@ -48,22 +50,17 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
         //GET EVENT OBJECT
         Intent intent = getIntent();
 		Bundle bundle = intent.getExtras();
-		UserFeedbackPrivacyNegotiationEvent eventInfo = bundle.getParcelable(EXTRA_PRIVACY_POLICY);
-		RequestorBean requestor = eventInfo.getNegotiationDetails().getRequestor();
+		eventInfo = bundle.getParcelable(EXTRA_PRIVACY_POLICY);
 		
 		//SET HEADER INFO
-		String sHeader = "";
-		if (requestor instanceof RequestorCisBean) {
-			Log.d(LOG_TAG, "RequestorCisBean");
-			sHeader = "Community: " + ((RequestorCisBean)requestor).getCisRequestorId() +   
-					  "\r\nAdmin: " + ((RequestorCisBean)requestor).getRequestorId();
-		} 
-		else if (requestor instanceof RequestorServiceBean) {
-			Log.d(LOG_TAG, "RequestorServiceBean");
+		RequestorBean requestor = eventInfo.getNegotiationDetails().getRequestor();
+		String sRequestorType = "community";
+		if (requestor instanceof RequestorServiceBean) {
+			sRequestorType = "installed service";
 		} 
 		TextView lblHeader = (TextView) findViewById(R.id.txtHeader);
 		//lblHeader.setText(sHeader + "\r\n has requested access to the following data:");
-		lblHeader.setText("The Community is requesting access to your personal info for the below uses. Please select what you would like to allow:");
+		lblHeader.setText("The " + sRequestorType + " is requesting access to your personal info for the following uses. Please select what you would like to allow:");
 		
 		//GENERATE RESOURCE SPINNER
 		List<ResponseItem> responses = eventInfo.getResponsePolicy().getResponseItems();
@@ -79,6 +76,7 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 		
 		//PROCESS EACH RESPONSE
 		tblConditions = new TableLayout[responses.size()];
+		allResponses = new View[responses.size()][]; 
 		for(int a=0; a<responses.size(); a++) {
 			ResponseItem response = responses.get(a);
 			RequestItem request = response.getRequestItem();
@@ -86,31 +84,38 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 			
 			TableLayout tblCondition = new TableLayout(this);
 			tblCondition.setBackgroundResource(R.color.Grey);
+			requestControls = new View[conditions.size()];
 			
-			//Create Table row objects  
-			requestLabels = new TextView[conditions.size()];  
-			requestCheckboxes = new CheckBox[conditions.size()];
 			//EACH CONDITION
 			for (int i=0; i<conditions.size(); i++) {
 				Condition condition = conditions.get(i);
 				boolean optional = condition.isOptional();
-				requestLabels[i] = new TextView(this);
-				requestCheckboxes[i] = new CheckBox(this);
-				//Set captions
-				requestLabels[i].setText(condition.getConditionConstant().value());
-				//requestCheckboxes[i].setChecked(Boolean.parseBoolean(condition.getValue()));
-				requestCheckboxes[i].setChecked(true);
-				requestCheckboxes[i].setEnabled(optional);
-				
+				TextView label = new TextView(this);
+				label.setText(condition.getConditionConstant().value());
+				//DATA TYPE - CHECKBOX/TEXTBOX
+				if (condition.getConditionConstant().value().startsWith("data")) {
+					EditText textbox = new EditText(this);
+					textbox.setText(condition.getValue());
+					requestControls[i] = textbox; 
+				}
+				else {
+					CheckBox checkbox = new CheckBox(this);
+					checkbox.setChecked(true);
+					checkbox.setEnabled(optional);
+					requestControls[i] = checkbox;
+				}				
 				TableRow row = new TableRow(this);
 				row.setId(i);
-				row.addView(requestLabels[i]);
-				row.addView(requestCheckboxes[i]);
+				//row.addView(requestLabels[i]);
+				row.addView(label);
+				row.addView(requestControls[i]);
 				
 				tblCondition.addView(row);
 			}
 			tblConditions[a] = tblCondition;
+			allResponses[a] = requestControls;
 		}
+		//ADD FIRST TABLE OF CONDITIONS TO SCROLL VIEW - OTHERS ADDED ON CHANGE EVENT
 		svScroll = (ScrollView)findViewById(R.id.svConditions);
 		svScroll.addView(tblConditions[0]);
 		
