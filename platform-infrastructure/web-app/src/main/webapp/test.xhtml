@@ -2,7 +2,8 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                xmlns:f="http://java.sun.com/jsf/html"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jsf/core"
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
@@ -21,9 +22,63 @@
             <p:inputText value="#{ppNegotiation.queuedNegotiationCount}" readonly="true" id="countLabel"/>
         </p>
 
-        <f:link value="Next page &gt;&gt;" outcome="privacy_policy_negotiation.xhtml"/>
+        <h:link value="Next page &gt;&gt;" outcome="privacy_policy_negotiation.xhtml"/>
 
         <p:poll interval="2" update="countLabel" process="@this"/>
+
+        <p:commandButton value="Show dialog" onclick="#{p:widgetVar('dlg')}.show()"/>
+
+        <p:inputText value="input text"/>
+
+        <p:dialog id="dlg" widgetVar="dlg">
+            <p:panelGrid columns="2">
+                <c:facet name="header">
+                    <p:outputLabel value="Add Preference"/>
+                </c:facet>
+
+                <h:outputLabel for="addPreferenceName" value="Preference name: *"/>
+                <p:selectOneMenu effect="fold" editable="true" required="true" label="Preference name"
+                                 id="addPreferenceName">
+                    <c:selectItem itemLabel="meep"/>
+                    <c:selectItem itemLabel="meep"/>
+                    <c:selectItem itemLabel="meep"/>
+                    <c:selectItem itemLabel="meep"/>
+                </p:selectOneMenu>
+
+
+                <h:outputLabel for="addPreferecneService" value="Service: "/>
+                <p:selectOneMenu effect="fade"
+                                 id="addPreferecneService">
+                    <c:selectItem itemLabel="(none)"
+                                  itemDescription="No service attachment"/>
+
+                    <c:selectItem itemLabel="meep"/>
+                    <c:selectItem itemLabel="meep"/>
+                    <c:selectItem itemLabel="meep"/>
+                    <c:selectItem itemLabel="meep"/>
+                </p:selectOneMenu>
+
+                <c:facet name="footer">
+                    <p:commandButton value="Save" icon="ui-icon-check"
+                                     id="addPreferenceDialog_okButton"/>
+                    <p:commandButton value="Cancel" icon="ui-icon-"
+                                     id="addPreferenceDialog_cancelButton"/>
+                </c:facet>
+            </p:panelGrid> </p:dialog>
+
+        <p:contextMenu nodeType="condition">
+            <p:menuitem value="Add Condition"/>
+            <p:menuitem value="Add Condition and Outcome"/>
+            <p:separator/>
+            <p:menuitem value="Edit" disabled="true"/>
+            <p:menuitem value="Delete"/>
+            <p:submenu>
+                <p:menuitem value="Item 1"/>
+                <p:menuitem value="Item 2"/>
+                <p:menuitem value="Item 3"/>
+            </p:submenu>
+        </p:contextMenu>
+
     </ui:define>
 </ui:composition>
 </html>

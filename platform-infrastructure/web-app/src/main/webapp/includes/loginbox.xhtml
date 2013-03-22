@@ -2,39 +2,42 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:h="http://java.sun.com/jsf/html">
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
 
     <!-- LOGIN INCLUDE - only displayed if NOT logged in -->
     <ui:fragment rendered="#{!loginController.loggedIn}">
         <div class="login-form">
-            <a href="#login-box" class="login-window">LOGIN / REGISTER</a>
+            <a onclick="#{p:widgetVar('loginbox')}.show();">LOGIN / REGISTER"</a>
+
+            <!--<a href="#login-box" class="login-window">LOGIN / REGISTER</a>-->
         </div>
 
-        <div id="login-box" class="login-popup">
-            <a href="#" class="close"><h:graphicImage url="images/close_pop.png" class="btn_close"
-                                                      title="Close Window"
-                                                      alt="Close"/></a>
-            <fieldset class="textbox">
-                <label class="username">
-                    <span>Username</span>
-                </label>
-                <h:inputText id="username" path="username" placeholder="Username" width="100%"
-                             value="#{loginController.loginDialogUsername}"/>
-                <label class="password">
-                    <span>Password</span>
-                </label>
-                <h:inputSecret id="password" path="password" placeholder="Password" width="100%"
-                               value="#{loginController.loginDialogPassword}"/>
+        <p:dialog modal="true" id="loginbox" widgetVar="loginbox" appendToBody="true" resizable="false" header="Login">
 
-                <h:commandButton value="Sign in"
-                                 class="submit button"
+            <p:panelGrid columns="2">
+                <p:outputLabel for="username" value="Username"/>
+                <p:inputText id="username"
+                             value="#{loginController.loginDialogUsername}"/>
+
+                <p:outputLabel for="password" value="Password"/>
+                <p:password id="password"
+                            value="#{loginController.loginDialogPassword}"/>
+
+            </p:panelGrid>
+
+            <p>Don't have a login?
+                <a class="" href="new_account.xhtml">Sign Up</a>
+            </p>
+
+            <f:facet name="footer">
+                <p:commandButton value="Sign in"
+                                 process="username, password, @this"
                                  actionListener="#{loginController.loginButtonAction()}"/>
 
-                <p>Don't have a login?
-                    <a class="" href="new_account.xhtml">Sign Up</a>
-                </p>
-            </fieldset>
-        </div>
+            </f:facet>
+        </p:dialog>
     </ui:fragment>
 
     <!-- LOGOUT INCLUDE - only displayed if logged in -->
