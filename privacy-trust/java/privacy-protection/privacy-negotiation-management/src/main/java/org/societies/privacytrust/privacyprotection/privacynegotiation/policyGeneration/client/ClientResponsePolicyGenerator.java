@@ -96,12 +96,18 @@ public class ClientResponsePolicyGenerator {
 		negDetailsBean.setRequestor(providerPolicy.getRequestor());
 		try {
 			ResponsePolicy privacyNegotiationFB = userFeedback.getPrivacyNegotiationFB(responsePolicy, negDetailsBean).get();
+			if (privacyNegotiationFB==null){
+				ResponsePolicy emptyPolicy = new ResponsePolicy();
+				emptyPolicy.setRequestor(providerPolicy.getRequestor());
+				emptyPolicy.setNegotiationStatus(NegotiationStatus.FAILED);
+				return emptyPolicy;
+			}
 			if (privacyNegotiationFB.getNegotiationStatus().equals(NegotiationStatus.FAILED)){
 				privacyNegotiationFB.setRequestor(providerPolicy.getRequestor());
 				privacyNegotiationFB.setResponseItems(new ArrayList<ResponseItem>());
 				return privacyNegotiationFB;
-			}
 			
+			}
 			
 			privacyNegotiationFB.setNegotiationStatus(NegotiationStatus.ONGOING);
 			this.logging.debug("Generated user response policy. ResponsePolicy contains: "+privacyNegotiationFB.getResponseItems().size()+" responseItems");

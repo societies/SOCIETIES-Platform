@@ -28,8 +28,11 @@ package org.societies.useragent.feedback;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
@@ -42,6 +45,7 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
@@ -53,7 +57,6 @@ import org.societies.api.internal.useragent.model.FeedbackForm;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalType;
 import org.societies.api.osgi.event.EventTypes;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestorUtils;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
@@ -71,13 +74,15 @@ import org.springframework.scheduling.annotation.AsyncResult;
 
 public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subscriber{
 
+
 	//pubsub event schemas
 	private static final List<String> EVENT_SCHEMA_CLASSES = 
 			Collections.unmodifiableList(Arrays.asList(
 					"org.societies.api.schema.useragent.feedback.UserFeedbackBean",
 					"org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean",
 					"org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean",
-					"org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent"));
+					"org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent",
+					"org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent"));
 
 	//GUI types for forms
 	private static final String RADIO = "radio";
@@ -197,7 +202,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 				e.printStackTrace();
 			}
 		}
-		
+
 		//set result and remove id from hashmap
 		result = this.expResults.get(requestID);
 		this.expResults.remove(requestID);
@@ -246,7 +251,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 				e.printStackTrace();
 			}
 		}
-		
+
 		//set result and remove id from hashmap
 		result = this.impResults.get(requestID);
 		this.impResults.remove(requestID);
@@ -341,11 +346,16 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 		}else if (eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE)){
 			UserFeedbackPrivacyNegotiationEvent event = (UserFeedbackPrivacyNegotiationEvent) item;
 			this.negotiationResults.put(event.getNegotiationDetails(), event.getResponsePolicy());
-			this.negotiationResults.notifyAll();
+			synchronized (this.negotiationResults) {
+				this.negotiationResults.notifyAll();
+			}
 		}else if (eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE)){
 			UserFeedbackAccessControlEvent event = (UserFeedbackAccessControlEvent) item;
 			this.accessCtrlResults.put(event.getRequestID(), event.getResponseItems());
-			this.accessCtrlResults.notifyAll();
+			synchronized (this.accessCtrlResults) {
+				this.accessCtrlResults.notifyAll();
+			}
+
 		}
 	}
 
@@ -702,7 +712,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 		event.setResponsePolicy(policy);
 		try {
 			this.pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION, null, event);
-			while (!this.negotiationResults.containsKey(details)){
+			while (!this.containsKey(details)){
 				synchronized (this.negotiationResults) {
 					try {
 						this.negotiationResults.wait();
@@ -712,7 +722,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 					}
 				}
 			}
-				this.pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP, null, negotiationResults.get(details));
+			this.pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP, null, negotiationResults.get(details));
 		} catch (XMPPError e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -720,12 +730,26 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
-		
+
+
 
 		return new AsyncResult<ResponsePolicy>(negotiationResults.get(details));
 	}
 
+	private boolean containsKey(NegotiationDetailsBean details){
+		Iterator<NegotiationDetailsBean> it = this.negotiationResults.keySet().iterator();
+		while(it.hasNext()){
+			NegotiationDetailsBean next = it.next();
+			if (RequestorUtils.equals(next.getRequestor(), details.getRequestor())){
+				if (next.getNegotiationID()==details.getNegotiationID()){
+					return true;
+				}
+			}
+		}
+		return false;
+
+	}
+	
 	@Override
 	public Future<List<ResponseItem>> getAccessControlFB(Requestor requestor,
 			List<ResponseItem> items) {
@@ -737,8 +761,8 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 		event.setRequestID(requestID);
 		try {
 			this.pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_ACCESS_CONTROL, null, event);
-			
-			
+
+
 			while (!this.accessCtrlResults.containsKey(requestID)){
 				synchronized (this.accessCtrlResults) {
 					try {
@@ -749,7 +773,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 					}
 				}
 			}
-			
+
 			this.pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP, null, accessCtrlResults.get(requestID));
 		} catch (XMPPError e) {
 			// TODO Auto-generated catch block

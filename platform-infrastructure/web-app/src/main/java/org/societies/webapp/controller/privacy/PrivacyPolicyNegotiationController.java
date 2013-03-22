@@ -25,10 +25,18 @@ import java.util.*;
 @SessionScoped
 public class PrivacyPolicyNegotiationController extends BasePageController {
 
+	//pubsub event schemas
+	private static final List<String> EVENT_SCHEMA_CLASSES = 
+			Collections.unmodifiableList(Arrays.asList(
+					"org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent",
+					"org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent"));
 	 private static Logger logging = LoggerFactory.getLogger(PrivacyPolicyNegotiationController.class);
     private class PubSubListener implements Subscriber {
 
         public void registerForEvents() {
+        	
+        	
+        	
             if (logging.isDebugEnabled())
                 logging.debug("registerForEvents()");
 
@@ -38,6 +46,8 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
             }
 
             try {
+            	//register schema classes
+            	getPubsubClient().addSimpleClasses(EVENT_SCHEMA_CLASSES);
                 getPubsubClient().subscriberSubscribe(getUserService().getIdentity(),
                         EventTypes.UF_PRIVACY_NEGOTIATION,
                         this);
@@ -227,7 +237,7 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
         prepareEventForTransmission(responsePolicy);
 
-        responsePolicy.setNegotiationStatus(NegotiationStatus.SUCCESSFUL);
+        responsePolicy.setNegotiationStatus(NegotiationStatus.ONGOING);
 
         pubSubListener.sendResponse(responsePolicy, negotiationDetails);
 
@@ -384,7 +394,23 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
             }
 
         }
+        
+        clearResponseItemWrapper(responsePolicy);
     }
+
+	private void clearResponseItemWrapper(ResponsePolicy responsePolicy) {
+		for (ResponseItem item : responsePolicy.getResponseItems()){
+			RequestItem oldItem = item.getRequestItem();
+			RequestItem newItem = new RequestItem();
+			newItem.setActions(oldItem.getActions());
+			newItem.setConditions(oldItem.getConditions());
+			newItem.setOptional(oldItem.isOptional());
+			newItem.setResource(oldItem.getResource());
+			
+			item.setRequestItem(newItem);
+		}
+		
+	}
 
 
 }
