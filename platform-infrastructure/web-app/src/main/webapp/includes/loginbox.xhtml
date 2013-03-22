@@ -9,22 +9,19 @@
     <!-- LOGIN INCLUDE - only displayed if NOT logged in -->
     <ui:fragment rendered="#{!loginController.loggedIn}">
         <div class="login-form">
-            <a onclick="#{p:widgetVar('loginbox')}.show();">LOGIN / REGISTER"</a>
+            <a onclick="#{p:widgetVar('loginbox')}.show();">LOGIN / REGISTER</a>
 
             <!--<a href="#login-box" class="login-window">LOGIN / REGISTER</a>-->
         </div>
 
-        <p:dialog modal="true" id="loginbox" widgetVar="loginbox" appendToBody="true" resizable="false" header="Login">
+        <p:dialog id="loginbox" widgetVar="loginbox" resizable="false" header="Login" draggable="false" modal="false">
 
             <p:panelGrid columns="2">
                 <p:outputLabel for="username" value="Username"/>
-                <p:inputText id="username"
-                             value="#{loginController.loginDialogUsername}"/>
+                <p:inputText id="username" value="#{loginController.loginDialogUsername}"/>
 
                 <p:outputLabel for="password" value="Password"/>
-                <p:password id="password"
-                            value="#{loginController.loginDialogPassword}"/>
-
+                <p:password id="password" value="#{loginController.loginDialogPassword}"/>
             </p:panelGrid>
 
             <p>Don't have a login?
@@ -34,7 +31,9 @@
             <f:facet name="footer">
                 <p:commandButton value="Sign in"
                                  process="username, password, @this"
-                                 actionListener="#{loginController.loginButtonAction()}"/>
+                                 actionListener="#{loginController.loginButtonAction()}"
+                                 update="@form"
+                                 oncomplete="#{p:widgetVar('loginbox')}.hide();"/>
 
             </f:facet>
         </p:dialog>

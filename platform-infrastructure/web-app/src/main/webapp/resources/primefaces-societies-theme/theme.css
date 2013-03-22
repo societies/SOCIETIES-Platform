@@ -227,7 +227,6 @@
     text-align: center;
     overflow: visible; /* removes extra width in IE */
 
-
     background: -moz-linear-gradient(center top, #f7961b, #f26a36);
     background: -webkit-gradient(linear, left top, left bottom, from(#f7961b), to(#f26a36));
     background: -o-linear-gradient(top, #f7961b, #f26a36);
@@ -682,6 +681,16 @@ ul.ui-selectonemenu-items li {
     list-style-image: none;
 }
 
+.ui-selectonemenu-items-wrapper.ui-selectonemenu-items {
+    background-color: rgb(51, 51, 51);
+    background-image: none;
+    border-radius: 3px;
+    border: 2px solid rgb(221, 221, 221);
+    box-shadow: rgb(153, 153, 153) 0px 0px 20px 0px;
+    color: #cccccc;
+}
+
+
 .ui-menu .ui-menu {
     margin-top: -3px;
     position: absolute;
@@ -747,6 +756,12 @@ ul.ui-selectonemenu-items li {
 .ui-menu .ui-menu-icon {
     position: static;
     float: right;
+}
+
+/* Get rid of borders on panel grids */
+table.ui-panelgrid tr,
+table.ui-panelgrid td {
+    border: none;
 }
 
 .ui-progressbar {
