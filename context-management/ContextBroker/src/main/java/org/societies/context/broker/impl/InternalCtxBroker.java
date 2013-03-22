@@ -1740,7 +1740,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		if (modelType == null)
 			throw new NullPointerException("modelType can't be null");
 		//if (modelType == null) return this.lookup(type);
-		
+
 		if (type == null)
 			throw new NullPointerException("type can't be null");
 
@@ -2761,11 +2761,44 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Override
 	public Future<List<CtxIdentifier>> lookup(String type) throws CtxException {
 
-		LOG.debug("skata 2 internal empty type "+type );
+
 		Requestor req = null;
 		IIdentity id = null;
 
 		return this.lookup(req, id, type);
+	}
+
+	@Override
+	public Future<List<CtxModelObject>> retrieve(Requestor requestor,
+			List<CtxIdentifier> ctxIdList) throws CtxException {
+		
+		List<CtxModelObject> results = new ArrayList<CtxModelObject>();
+		
+		for(CtxIdentifier identifier : ctxIdList){
+			
+			CtxModelObject object = null;
+			
+			try {
+				object = this.retrieve(requestor, identifier).get();
+				results.add(object);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+				
+		}
+		return new AsyncResult<List<CtxModelObject>>(results);
+	}
+
+	@Override
+	public Future<List<CtxModelObject>> retrieve(List<CtxIdentifier> ctxIdList)
+			throws CtxException {
+
+		Requestor req = null;
+		return this.retrieve(req, ctxIdList);
 	}
 
 }

@@ -45,6 +45,7 @@ import junit.framework.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -62,6 +63,7 @@ import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
@@ -98,9 +100,14 @@ public class Tester {
 	private IIdentity serviceIdentity = null;
 	private ServiceResourceIdentifier myServiceID;
 
-	String remoteTargetID = "john.societies.local";
+	String remoteTargetID = "emma.ict-societies.eu";
+
+	//CtxEntityIdentifier cssOwnerEntityId ;
 	
-	CtxEntityIdentifier cssOwnerEntityId ;
+	CtxEntity deviceCtxEnt;
+	CtxAttribute ctxAttrDeviceNameFirst;
+	CtxAttribute ctxAttrDeviceNameLast;
+
 
 	public Tester(){
 
@@ -110,17 +117,29 @@ public class Tester {
 	public void setUp(){
 
 	}
+	
+	@After
+	public void tearDown(){
 
+		try {
+			LOG.info("*** tear down **** " );
+			this.externalCtxBroker.remove(this.requestorService, this.deviceCtxEnt.getId());
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
+	
 	@Test
 	public void Test(){
 
 		this.externalCtxBroker = LookableDataTypesTest.getCtxBroker();
 		this.commMgr = LookableDataTypesTest.getCommManager();
-		
-		
-		
-		
+
+
+
+
 		LOG.info("*** " + this.getClass() + " instantiated");
 
 		try {
@@ -152,10 +171,10 @@ public class Tester {
 		LOG.info("*** addCtxData ");
 		this.addCtxDataLocal();
 		//this.addCtxDataRemote();
-		
+
 		LOG.info("*** retrieveCtxData");
 		this.retrieveCtxDataLocal();
-		
+
 		//this.retrieveCtxDataRemote();
 	}
 
@@ -163,17 +182,18 @@ public class Tester {
 	private void addCtxDataLocal(){
 
 		try {
-			CtxEntity deviceCtxEnt = this.externalCtxBroker.createEntity(this.requestorService, this.cssOwnerId, CtxEntityTypes.DEVICE).get();
+			
+			this.deviceCtxEnt = this.externalCtxBroker.createEntity(this.requestorService, this.cssOwnerId, CtxEntityTypes.DEVICE).get();
 
-			CtxAttribute ctxAttrDeviceNameFirst = this.externalCtxBroker.createAttribute(this.requestorService, deviceCtxEnt.getId(), CtxAttributeTypes.NAME_FIRST).get();
-			ctxAttrDeviceNameFirst.setStringValue("MyFirstNameLocal");
+			CtxAttribute ctxAttrDeviceNameFirstTemp = this.externalCtxBroker.createAttribute(this.requestorService, this.deviceCtxEnt.getId(), CtxAttributeTypes.NAME_FIRST).get();
+			ctxAttrDeviceNameFirstTemp.setStringValue("MyFirstNameLocal");
 
-			CtxAttribute ctxAttrDeviceNameLast = this.externalCtxBroker.createAttribute(this.requestorService, deviceCtxEnt.getId(), CtxAttributeTypes.NAME_LAST).get();
-			ctxAttrDeviceNameLast.setStringValue("MyLastNameLocal");
+			CtxAttribute ctxAttrDeviceNameLastTemp = this.externalCtxBroker.createAttribute(this.requestorService, this.deviceCtxEnt.getId(), CtxAttributeTypes.NAME_LAST).get();
+			ctxAttrDeviceNameLastTemp.setStringValue("MyLastNameLocal");
 
 			// with this update the attribute is stored in Context DB
-			this.externalCtxBroker.update(requestorService, ctxAttrDeviceNameFirst).get();
-			this.externalCtxBroker.update(requestorService, ctxAttrDeviceNameLast).get();
+			this.ctxAttrDeviceNameFirst = (CtxAttribute) this.externalCtxBroker.update(requestorService, ctxAttrDeviceNameFirstTemp).get();
+			this.ctxAttrDeviceNameLast = (CtxAttribute) this.externalCtxBroker.update(requestorService, ctxAttrDeviceNameLastTemp).get();
 
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -187,16 +207,203 @@ public class Tester {
 		}
 
 	}
-	
-	
-	
-	
-	
-	private void addCtxDataRemote(){
-		
+
+
+
+
+	private void retrieveCtxDataLocal(){
+
+		LOG.info("*** retrieveCtxDataLocal : test new lookup method*** ");
+		try {
+			List<CtxIdentifier> ctxIdList = this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxAttributeTypes.NAME).get();
+			LOG.info("lookable list: "+ ctxIdList);
+			LOG.info("lookable list size : "+ ctxIdList.size());
+
+
+			List<CtxModelObject> ctxDataObjList = this.externalCtxBroker.retrieve(this.requestorService, ctxIdList).get();
+
+			CtxAttribute ctxAttributeNameFirstRetrieved = null;
+			CtxAttribute ctxAttributeNameLastRetrieved = null;
+			
+			LOG.info("ctxDataObjList : "+ ctxDataObjList);
+			LOG.info("ctxDataObjList : "+ ctxDataObjList.size());
+			
+			for(CtxModelObject  ctxDataObj : ctxDataObjList){
+
+				if( ctxDataObj instanceof CtxAttribute) {
+					CtxAttribute attrTemp = (CtxAttribute) ctxDataObj; 
+
+					if(attrTemp.getType().equalsIgnoreCase("nameFirst")){
+						ctxAttributeNameFirstRetrieved = attrTemp;
+						assertEquals(this.ctxAttrDeviceNameFirst.getId(), ctxAttributeNameFirstRetrieved.getId());
+						assertEquals("MyFirstNameLocal", ctxAttributeNameFirstRetrieved.getStringValue());
+						
+					} else if( attrTemp.getType().equalsIgnoreCase("nameLast")){
+						ctxAttributeNameLastRetrieved = attrTemp;
+						assertEquals(this.ctxAttrDeviceNameLast, ctxAttributeNameLastRetrieved);
+						assertEquals("MyLastNameLocal", ctxAttributeNameLastRetrieved.getStringValue());}
+				}
+			}
+
+			for(CtxIdentifier id :ctxIdList ){
+
+				if( id instanceof CtxAttributeIdentifier ){
+					CtxAttribute ctxAttribute = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
+
+					if(ctxAttribute.getType().equalsIgnoreCase("nameFirst")){
+						LOG.info("retrieved ctxAttribute id : "+ ctxAttribute.getId());
+						LOG.info("retrieved ctxAttribute value : "+ ctxAttribute.getStringValue());
+						assertEquals("MyFirstNameLocal", ctxAttribute.getStringValue());
+				
+					} if(ctxAttribute.getType().equalsIgnoreCase("nameLast")){
+						LOG.info("retrieved ctxAttribute id : "+ ctxAttribute.getId());
+						LOG.info("retrieved ctxAttribute value : "+ ctxAttribute.getStringValue());
+						assertEquals("MyLastNameLocal", ctxAttribute.getStringValue());
+					}
+
+				} else if( id instanceof CtxAssociationIdentifier ){
+					CtxAssociation ctxAssociation = (CtxAssociation) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
+					LOG.info("retrieved ctxAssociation id : "+ ctxAssociation.getId());
+				}
+			}
+
+
+
+
+
+			/*	
+			LOG.info("*** test lookup with null model type *** ");
+			List<CtxIdentifier> ctxIdListNullModelType = this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.NAME).get();	
+			LOG.info("ctxIdListNullModelType list: "+ ctxIdList);
+			LOG.info("ctxIdListNullModelType list size : "+ ctxIdList.size());
+
+			for(CtxIdentifier id :ctxIdListNullModelType ){
+
+				if( id instanceof CtxAttributeIdentifier ){
+					CtxAttribute ctxAttribute = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
+
+					if(ctxAttribute.getType().equalsIgnoreCase("nameFirst")){
+						LOG.info("retrieved ctxAttribute id : "+ ctxAttribute.getId());
+						LOG.info("retrieved ctxAttribute value : "+ ctxAttribute.getStringValue());
+						Assert.assertEquals("MyFirstNameLocal", ctxAttribute.getStringValue());
+					} if(ctxAttribute.getType().equalsIgnoreCase("nameLast")){
+						LOG.info("retrieved ctxAttribute id : "+ ctxAttribute.getId());
+						LOG.info("retrieved ctxAttribute value : "+ ctxAttribute.getStringValue());
+						Assert.assertEquals("MyLastNameLocal", ctxAttribute.getStringValue());
+					}
+
+				} else if( id instanceof CtxAssociationIdentifier ){
+					CtxAssociation ctxAssociation = (CtxAssociation) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
+					LOG.info("retrieved ctxAssociation id : "+ ctxAssociation.getId());
+				}
+			}
+
+			 */	
+
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+
+	}
+
+
+	/*
+	 * Ignore following tests, not complete yet
+	 */
+
+
+	private void retrieveCtxDataRemote(){
+
+		LOG.info("*** retrieveCtxDataRemote test new lookup method remote *** ");
 		try {
 			IIdentity remoteTarget = this.commMgr.getIdManager().fromJid(this.remoteTargetID);
-			
+
+			List<CtxIdentifier> ctxIdList = this.externalCtxBroker.lookup(this.requestorService, remoteTarget, CtxAttributeTypes.NAME).get();
+			LOG.info("remote lookable list: "+ ctxIdList);
+			LOG.info("remote lookable list size : "+ ctxIdList.size());
+
+			for(CtxIdentifier id :ctxIdList ){
+
+				if( id instanceof CtxAttributeIdentifier ){
+					CtxAttribute ctxAttribute = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
+
+					if(ctxAttribute.getType().equalsIgnoreCase("nameFirst")){
+						LOG.info("remote retrieved ctxAttribute id : "+ ctxAttribute.getId());
+						LOG.info("remote retrieved ctxAttribute value : "+ ctxAttribute.getStringValue());
+						assertEquals("MyFirstNameRemote", ctxAttribute.getStringValue());
+					} if(ctxAttribute.getType().equalsIgnoreCase("nameLast")){
+						LOG.info("remote retrieved ctxAttribute id : "+ ctxAttribute.getId());
+						LOG.info("remote retrieved ctxAttribute value : "+ ctxAttribute.getStringValue());
+						assertEquals("MyLastNameRemote", ctxAttribute.getStringValue());
+					}
+
+				} else if( id instanceof CtxAssociationIdentifier ){
+					CtxAssociation ctxAssociation = (CtxAssociation) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
+					LOG.info("retrieved ctxAssociation id : "+ ctxAssociation.getId());
+				}
+			}
+
+
+			LOG.info("*** remote test lookup with null model type *** ");
+			List<CtxIdentifier> ctxIdListNullModelType = this.externalCtxBroker.lookup(this.requestorService, remoteTarget, CtxModelType.ATTRIBUTE, CtxAttributeTypes.NAME).get();	
+
+			LOG.info("remote ctxIdListNullModelType list: "+ ctxIdListNullModelType);
+			LOG.info("remote ctxIdListNullModelType list size : "+ ctxIdListNullModelType.size());
+
+			for(CtxIdentifier id :ctxIdListNullModelType ){
+
+				LOG.info("remote retrieved ctxAttribute id : "+ id);
+
+				if( id instanceof CtxAttributeIdentifier ){
+					CtxAttribute ctxAttribute = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
+
+					if(ctxAttribute.getType().equalsIgnoreCase("nameFirst")){
+						LOG.info("remote retrieved ctxAttribute id : "+ ctxAttribute.getId());
+						LOG.info("remote retrieved ctxAttribute value : "+ ctxAttribute.getStringValue());
+						Assert.assertEquals("MyFirstNameRemote", ctxAttribute.getStringValue());
+					} if(ctxAttribute.getType().equalsIgnoreCase("nameLast")){
+						LOG.info("remote retrieved ctxAttribute id : "+ ctxAttribute.getId());
+						LOG.info("remote retrieved ctxAttribute value : "+ ctxAttribute.getStringValue());
+						Assert.assertEquals("MyLastNameRemote", ctxAttribute.getStringValue());
+					}
+
+				} else if( id instanceof CtxAssociationIdentifier ){
+					CtxAssociation ctxAssociation = (CtxAssociation) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
+					LOG.info("retrieved ctxAssociation id : "+ ctxAssociation.getId());
+				}
+			}			
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+
+	}
+
+
+
+	private void addCtxDataRemote(){
+
+		try {
+			IIdentity remoteTarget = this.commMgr.getIdManager().fromJid(this.remoteTargetID);
+
 			CtxEntity deviceCtxEnt = this.externalCtxBroker.createEntity(this.requestorService, remoteTarget, CtxEntityTypes.DEVICE).get();
 
 			/*
@@ -234,156 +441,6 @@ public class Tester {
 
 	}
 
-	private void retrieveCtxDataLocal(){
 
-		LOG.info("*** retrieveCtxDataLocal : test new lookup method*** ");
-		try {
-			List<CtxIdentifier> ctxIdList = this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxAttributeTypes.NAME).get();
-			LOG.info("lookable list: "+ ctxIdList);
-			LOG.info("lookable list size : "+ ctxIdList.size());
 
-			for(CtxIdentifier id :ctxIdList ){
-
-				if( id instanceof CtxAttributeIdentifier ){
-					CtxAttribute ctxAttribute = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
-								
-					if(ctxAttribute.getType().equalsIgnoreCase("nameFirst")){
-						LOG.info("retrieved ctxAttribute id : "+ ctxAttribute.getId());
-						LOG.info("retrieved ctxAttribute value : "+ ctxAttribute.getStringValue());
-						assertEquals("MyFirstNameLocal", ctxAttribute.getStringValue());
-					} if(ctxAttribute.getType().equalsIgnoreCase("nameLast")){
-						LOG.info("retrieved ctxAttribute id : "+ ctxAttribute.getId());
-						LOG.info("retrieved ctxAttribute value : "+ ctxAttribute.getStringValue());
-						assertEquals("MyLastNameLocal", ctxAttribute.getStringValue());
-					}
-					
-				} else if( id instanceof CtxAssociationIdentifier ){
-					CtxAssociation ctxAssociation = (CtxAssociation) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
-					LOG.info("retrieved ctxAssociation id : "+ ctxAssociation.getId());
-				}
-			}
-
-			
-			LOG.info("*** test lookup with null model type *** ");
-			List<CtxIdentifier> ctxIdListNullModelType = this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.NAME).get();	
-			LOG.info("ctxIdListNullModelType list: "+ ctxIdList);
-			LOG.info("ctxIdListNullModelType list size : "+ ctxIdList.size());
-
-			for(CtxIdentifier id :ctxIdListNullModelType ){
-
-				if( id instanceof CtxAttributeIdentifier ){
-					CtxAttribute ctxAttribute = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
-										
-					if(ctxAttribute.getType().equalsIgnoreCase("nameFirst")){
-						LOG.info("retrieved ctxAttribute id : "+ ctxAttribute.getId());
-						LOG.info("retrieved ctxAttribute value : "+ ctxAttribute.getStringValue());
-						Assert.assertEquals("MyFirstNameLocal", ctxAttribute.getStringValue());
-					} if(ctxAttribute.getType().equalsIgnoreCase("nameLast")){
-						LOG.info("retrieved ctxAttribute id : "+ ctxAttribute.getId());
-						LOG.info("retrieved ctxAttribute value : "+ ctxAttribute.getStringValue());
-						Assert.assertEquals("MyLastNameLocal", ctxAttribute.getStringValue());
-					}
-					
-				} else if( id instanceof CtxAssociationIdentifier ){
-					CtxAssociation ctxAssociation = (CtxAssociation) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
-					LOG.info("retrieved ctxAssociation id : "+ ctxAssociation.getId());
-				}
-			}
-			
-			
-			
-			
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
-
-	}
-
-	
-	
-	private void retrieveCtxDataRemote(){
-
-		LOG.info("*** retrieveCtxDataRemote test new lookup method remote *** ");
-		try {
-			IIdentity remoteTarget = this.commMgr.getIdManager().fromJid(this.remoteTargetID);
-			
-			List<CtxIdentifier> ctxIdList = this.externalCtxBroker.lookup(this.requestorService, remoteTarget, CtxAttributeTypes.NAME).get();
-			LOG.info("remote lookable list: "+ ctxIdList);
-			LOG.info("remote lookable list size : "+ ctxIdList.size());
-
-			for(CtxIdentifier id :ctxIdList ){
-
-				if( id instanceof CtxAttributeIdentifier ){
-					CtxAttribute ctxAttribute = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
-								
-					if(ctxAttribute.getType().equalsIgnoreCase("nameFirst")){
-						LOG.info("remote retrieved ctxAttribute id : "+ ctxAttribute.getId());
-						LOG.info("remote retrieved ctxAttribute value : "+ ctxAttribute.getStringValue());
-						assertEquals("MyFirstNameRemote", ctxAttribute.getStringValue());
-					} if(ctxAttribute.getType().equalsIgnoreCase("nameLast")){
-						LOG.info("remote retrieved ctxAttribute id : "+ ctxAttribute.getId());
-						LOG.info("remote retrieved ctxAttribute value : "+ ctxAttribute.getStringValue());
-						assertEquals("MyLastNameRemote", ctxAttribute.getStringValue());
-					}
-					
-				} else if( id instanceof CtxAssociationIdentifier ){
-					CtxAssociation ctxAssociation = (CtxAssociation) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
-					LOG.info("retrieved ctxAssociation id : "+ ctxAssociation.getId());
-				}
-			}
-
-			
-			LOG.info("*** remote test lookup with null model type *** ");
-			List<CtxIdentifier> ctxIdListNullModelType = this.externalCtxBroker.lookup(this.requestorService, remoteTarget, CtxModelType.ATTRIBUTE, CtxAttributeTypes.NAME).get();	
-			
-			LOG.info("remote ctxIdListNullModelType list: "+ ctxIdListNullModelType);
-			LOG.info("remote ctxIdListNullModelType list size : "+ ctxIdListNullModelType.size());
-
-			for(CtxIdentifier id :ctxIdListNullModelType ){
-				
-				LOG.info("remote retrieved ctxAttribute id : "+ id);
-				
-				if( id instanceof CtxAttributeIdentifier ){
-					CtxAttribute ctxAttribute = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
-										
-					if(ctxAttribute.getType().equalsIgnoreCase("nameFirst")){
-						LOG.info("remote retrieved ctxAttribute id : "+ ctxAttribute.getId());
-						LOG.info("remote retrieved ctxAttribute value : "+ ctxAttribute.getStringValue());
-						Assert.assertEquals("MyFirstNameRemote", ctxAttribute.getStringValue());
-					} if(ctxAttribute.getType().equalsIgnoreCase("nameLast")){
-						LOG.info("remote retrieved ctxAttribute id : "+ ctxAttribute.getId());
-						LOG.info("remote retrieved ctxAttribute value : "+ ctxAttribute.getStringValue());
-						Assert.assertEquals("MyLastNameRemote", ctxAttribute.getStringValue());
-					}
-					
-				} else if( id instanceof CtxAssociationIdentifier ){
-					CtxAssociation ctxAssociation = (CtxAssociation) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
-					LOG.info("retrieved ctxAssociation id : "+ ctxAssociation.getId());
-				}
-			}			
-			
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
-
-	}
-
-	
 }

@@ -428,7 +428,7 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	/**
 	 * Removes the specified context model object.
 	 * 
-	 * @param identifier
+	 * @param the {@link CtxIdentifier} of the context data object to be retrieved.
 	 * @throws CtxException 
 	 */
 	public Future<CtxModelObject> remove(CtxIdentifier identifier) throws CtxException;
@@ -437,10 +437,24 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	 * Retrieves the specified context model object. Automatically enables inference for Context Attributes
 	 * that does not fulfill QoC requirements or contain a null value.
 	 * 
-	 * @param identifier
+	 * @param the {@link CtxIdentifier} of the context data object to be retrieved
+	 * @return the {@link CtxModelObject} for the respective identifiers
 	 * @throws CtxException 
 	 */
 	public Future<CtxModelObject> retrieve(CtxIdentifier identifier) throws CtxException;
+	
+	/**
+	 * Retrieves the context model objects specified in the set. Automatically enables inference 
+	 * for Context Attributes that do not fulfill QoC requirements or contain a null value. 
+	 * The total volume of the data objects contained in the results may be high.   
+    
+	 * 
+	 * @param a list of {@link CtxIdentifier} of the context data object to be retrieved
+	 * @return a list of {@link CtxModelObject} for the respective identifiers
+	 * @throws CtxException 
+	 */
+	public Future<List<CtxModelObject>> retrieve(List<CtxIdentifier> ctxIdentifiersList) throws CtxException;
+	
 	
 	/**
 	 * Retrieves the specified CtxAttribute. Inference is enabled according to parameter enableInference.

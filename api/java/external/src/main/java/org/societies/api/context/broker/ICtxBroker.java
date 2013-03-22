@@ -380,6 +380,23 @@ public interface ICtxBroker {
 			final CtxIdentifier identifier) throws CtxException;
 
 	/**
+	 * Retrieves the context model objects specified in the set. Automatically enables inference 
+	 * for Context Attributes that do not fulfill QoC requirements or contain a null value. 
+	 * The total volume of the data objects contained in the results may be high.   
+	 * 
+	 * @param requestor
+	 *            the requestor on whose behalf to retrieve the identified
+	 *            context model object
+	 * @param set of identifiers
+	 * 
+	 * @throws CtxException 
+	 *  if there is a problem performing the retrieve operation
+	 */
+	public Future<List<CtxModelObject>> retrieve(final Requestor requestor, 
+			final List<CtxIdentifier> ctxIdentifiersList) throws CtxException;
+	
+		
+	/**
 	 * Retrieves the {@link CtxEntityIdentifier} of the 
 	 * {@link IndividualCtxEntity} which represents the owner of the identified
 	 * CSS. IndividualCtxEntities are most commonly of type
