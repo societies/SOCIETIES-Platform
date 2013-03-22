@@ -37,6 +37,7 @@ import org.societies.api.identity.Requestor;
  * @author Elizabeth
  *
  */
+@Deprecated
 public class ResponsePolicy implements Serializable{
 
 	private NegotiationStatus status;

@@ -26,12 +26,14 @@ package org.societies.privacytrust.privacyprotection.privacynegotiation.policyGe
 
 import java.util.List;
 
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
+
+
 
 /**
  * @author Elizabeth
@@ -56,7 +58,9 @@ public class ClientResponseChecker {
 					return false;
 				}else{
 					RequestItem requestItem = providerItem.getRequestItem();
-					providerItem = new ResponseItem(requestItem, Decision.PERMIT);
+					providerItem = new ResponseItem();
+					providerItem.setDecision(Decision.PERMIT);
+					providerItem.setRequestItem(requestItem);
 				}
 			}
 		}
@@ -112,7 +116,7 @@ public class ClientResponseChecker {
 	
 	private boolean containsAction(Action action, List<Action> actions){
 		for (Action a : actions){
-			if (a.getActionType().equals(a.getActionType())){
+			if (a.getActionConstant().equals(a.getActionConstant())){
 				return true;
 				
 			}
@@ -123,8 +127,8 @@ public class ClientResponseChecker {
 
 	private boolean containsCondition(Condition condition, List<Condition> conditions){
 		for (Condition con : conditions){
-			if (con.getConditionName().equals(condition.getConditionName())){
-				if (con.getValueAsString().equalsIgnoreCase(condition.getValueAsString())){
+			if (con.getConditionConstant().equals(condition.getConditionConstant())){
+				if (con.getValue().equalsIgnoreCase(condition.getValue())){
 					return true;
 				}
 			}

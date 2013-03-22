@@ -27,6 +27,7 @@ package org.societies.privacytrust.privacyprotection.privacypreferencemanager.ma
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -38,11 +39,15 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.AccessControlPreferenceTreeModelBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfPrivacyPreferenceTreeModelBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSPrivacyPreferenceTreeModelBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPrivacyPreferenceTreeModelBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.RegistryBean;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.accesscontrol.AccessControlPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.CtxTypes;
 import org.societies.privacytrust.privacyprotection.util.preference.PrivacyPreferenceUtils;
 
@@ -72,7 +77,7 @@ public class PreferenceRetriever {
 					Object obj = this.convertToObject(attr.getBinaryValue());
 					
 					if (obj==null){
-						this.logging.debug("PreferenceRegistry not found in DB for private DPI. Creating new registry");
+						this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 						return new Registry();
 					}
 					
@@ -81,14 +86,14 @@ public class PreferenceRetriever {
 						Registry registry = Registry.fromBean((RegistryBean) obj, idMgr);
 						return registry;
 					}else{
-						this.logging.debug("PreferenceRegistry not found in DB for private DPI. Creating new registry");
+						this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 						return new Registry();
 					}
 				}
-				this.logging.debug("PreferenceRegistry not found in DB for private DPI. Creating new registry");
+				this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 				return new Registry();
 			}
-			this.logging.debug("PreferenceRegistry not found in DB for private DPI. Creating new registry");
+			this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 			return new Registry();
 		} catch (CtxException e) {
 			this.logging.debug("Exception while loading PreferenceRegistry from DB ");
@@ -145,7 +150,13 @@ public class PreferenceRetriever {
 					return PrivacyPreferenceUtils.toIDSPrivacyPreferenceTreeModel((IDSPrivacyPreferenceTreeModelBean) obj, idMgr);
 				}
 				
-				//TODO: DOBF
+				if (obj instanceof DObfPrivacyPreferenceTreeModelBean){
+					return PrivacyPreferenceUtils.toDObfPreferenceTreeModel((DObfPrivacyPreferenceTreeModelBean) obj, idMgr);
+				}
+				
+				if (obj instanceof AccessControlPreferenceTreeModelBean){
+					return PrivacyPreferenceUtils.toAccCtrlPreferenceTreeModel((AccessControlPreferenceTreeModelBean) obj, idMgr);
+				}
 			}
 		}
 		catch (CtxException e) {
@@ -155,6 +166,12 @@ public class PreferenceRetriever {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

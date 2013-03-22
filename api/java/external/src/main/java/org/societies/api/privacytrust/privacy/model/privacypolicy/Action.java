@@ -40,6 +40,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.Targ
  * @author Elizabeth
  *
  */
+@Deprecated
 public class Action implements Serializable{
 
 	protected ActionConstants action;

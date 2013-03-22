@@ -35,7 +35,7 @@ import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSPreferenceDetailsBean;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PreferenceConditionExtractor;
@@ -48,7 +48,7 @@ import org.societies.privacytrust.privacyprotection.privacypreferencemanager.eva
  */
 public class IDSMonitor implements CtxChangeEventListener {
 	private final PrivacyPreferenceManager privPrefMgr;
-	Hashtable<CtxIdentifier, List<IDSPreferenceDetails>> monitoring = new Hashtable<CtxIdentifier, List<IDSPreferenceDetails>>();
+	Hashtable<CtxIdentifier, List<IDSPreferenceDetailsBean>> monitoring = new Hashtable<CtxIdentifier, List<IDSPreferenceDetailsBean>>();
 	private final ICtxBroker ctxBroker;
 	private final IIdentity userIdentity;
 
@@ -76,9 +76,9 @@ public class IDSMonitor implements CtxChangeEventListener {
 	}
 	
 	private void loadPreferenceDetails(){
-		List<IDSPreferenceDetails> details = privPrefMgr.getIDSPreferenceDetails();
+		List<IDSPreferenceDetailsBean> details = privPrefMgr.getIDSPreferenceDetails();
 
-		for (IDSPreferenceDetails detail: details){
+		for (IDSPreferenceDetailsBean detail: details){
 			PreferenceConditionExtractor extractor = new PreferenceConditionExtractor();
 			IPrivacyPreferenceTreeModel model = privPrefMgr.getIDSPreference(detail);
 			if (null!=model){
@@ -87,7 +87,7 @@ public class IDSMonitor implements CtxChangeEventListener {
 					if (monitoring.containsKey(ctxId)){
 						monitoring.get(ctxId).add(detail);
 					}else{
-						ArrayList<IDSPreferenceDetails> list = new ArrayList<IDSPreferenceDetails>();
+						ArrayList<IDSPreferenceDetailsBean> list = new ArrayList<IDSPreferenceDetailsBean>();
 						list.add(detail);
 						monitoring.put(ctxId, list);
 

@@ -64,6 +64,10 @@ public interface ITrustBroker {
 	/**
 	 * Registers the specified listener for updates of the trust value which
 	 * the identified trustor has assigned to the supplied trustee.
+	 * <p>
+	 * To unregister the specified listener, use the
+	 * {@link #unregisterTrustUpdateEventListener(ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId)}
+	 * method.
 	 * 
 	 * @param listener
 	 *            the listener to register for trust update events.
@@ -74,8 +78,9 @@ public interface ITrustBroker {
 	 *            the identifier of the entity whose trust value update events
 	 *            to register for.
 	 * @throws TrustException if the specified listener cannot be registered
-	 * @throws NullPointerException if any of the specified paramaters is 
+	 * @throws NullPointerException if any of the specified parameters is 
 	 *         <code>null</code>.
+	 * @see #unregisterTrustUpdateEventListener(ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId)
 	 * @since 0.5
 	 */
 	public void registerTrustUpdateEventListener(
@@ -86,6 +91,11 @@ public interface ITrustBroker {
 	/**
 	 * Unregisters the specified listener from updates of the trust value which
 	 * the identified trustor has assigned to the supplied trustee.
+	 * <p>
+	 * The method has no effect if the specified listener has not been 
+	 * previously registered using the 
+	 * {@link #registerTrustUpdateEventListener(ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId)}
+	 * method.
 	 * 
 	 * @param listener
 	 *            the listener to unregister from trust update events
@@ -98,6 +108,7 @@ public interface ITrustBroker {
 	 * @throws TrustException if the specified listener cannot be unregistered
 	 * @throws NullPointerException if any of the specified parameters is 
 	 *         <code>null</code>.
+	 * @see #registerTrustUpdateEventListener(ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId)
 	 * @since 0.5
 	 */
 	public void unregisterTrustUpdateEventListener(

@@ -104,9 +104,9 @@ import org.societies.webapp.service.UserService;
 public class CisManagerController {
 
 	
-	@Autowired
+	//@Autowired
 	private ICisManager cisManager;
-	@Autowired
+	//@Autowired
 	private ICommManager commMngrRef;
 	
 	@Autowired

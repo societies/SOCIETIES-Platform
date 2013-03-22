@@ -65,12 +65,14 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.AgreementEnvelopeUtils;
+import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.AgreementUtils;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
@@ -80,6 +82,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal;
@@ -351,10 +354,10 @@ public class PrivacyAgreementManagerInternalTest extends AbstractJUnit4SpringCon
 
 	private AgreementEnvelope getAgreementEnveloppe(Requestor requestor) throws IOException {
 		List<ResponseItem> responseItems = getResponseItems();
-		NegotiationAgreement agreement = new NegotiationAgreement(responseItems);
-		agreement.setRequestor(requestor);
+		NegotiationAgreement agreement = new NegotiationAgreement(ResponseItemUtils.toResponseItemBeans(responseItems));
+		agreement.setRequestor(RequestorUtils.toRequestorBean(requestor));
 		AgreementFinaliser finaliser = new AgreementFinaliser();
-		byte[] signature = finaliser.signAgreement(agreement);
+		byte[] signature = finaliser.signAgreement(AgreementUtils.toAgreementBean(agreement));
 		Key publicKey = finaliser.getPublicKey();
 		AgreementEnvelope agreementEnveloppe = new AgreementEnvelope(agreement, SerialisationHelper.serialise(publicKey), signature);
 		return agreementEnveloppe;
