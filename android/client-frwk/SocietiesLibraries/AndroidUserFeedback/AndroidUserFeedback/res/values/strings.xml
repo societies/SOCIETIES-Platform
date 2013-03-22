@@ -8,5 +8,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_negotiaion_form">NegotiaionForm</string>
+    <string name="title_activity_negotiation">Accept Privacy Policy</string>
 
 </resources>
