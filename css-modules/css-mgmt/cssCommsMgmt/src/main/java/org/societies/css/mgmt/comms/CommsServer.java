@@ -89,9 +89,11 @@ public IActivityFeed activityFeed = null;
 	
 	
 	public static final List<String> MESSAGE_BEAN_NAMESPACES = Collections.unmodifiableList(
-			  Arrays.asList("http://societies.org/api/schema/cssmanagement"));
+			  Arrays.asList("http://societies.org/api/schema/cssmanagement",
+					  "http://societies.org/api/schema/activityfeed" ));
 	public static final List<String> MESSAGE_BEAN_PACKAGES = Collections.unmodifiableList(
-			  Arrays.asList("org.societies.api.schema.cssmanagement"));
+			  Arrays.asList("org.societies.api.schema.cssmanagement", 
+					  "org.societies.api.schema.activityfeed"));
 
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
 
@@ -130,7 +132,9 @@ public IActivityFeed activityFeed = null;
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
 		Dbc.require("Message stanza cannot be null", stanza != null);
 		Dbc.require("Message payload cannot be null", payload != null);
-
+		
+		LOG.info("CSSManager remote invocation with stanza length: " + stanza.toString().length() +payload.getClass().getName().toString());
+		LOG.debug("CSSManager commsServer getQuery called ");
 		LOG.debug("CSSManager remote invocation with stanza length: " + stanza.toString().length());
 		
 
