@@ -105,7 +105,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 	}
 	
 	
-	@MediumTest
+//	@MediumTest
 	public void testRegistration() throws Exception {
 		this.latch = new CountDownLatch(1);
 		this.testCompleted = false;
@@ -124,7 +124,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 		assertTrue(this.testCompleted);
 	}
 	
-	@MediumTest
+//	@MediumTest
 	public void testSuccessfulLogin() throws Exception {
 		this.latch = new CountDownLatch(1);
 		this.testCompleted = false;
@@ -143,7 +143,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 		assertTrue(this.testCompleted);
 	}
 
-	@MediumTest
+//	@MediumTest
 	public void testBadUserLogin() throws Exception {
 		this.latch = new CountDownLatch(1);
 		this.testCompleted = false;
@@ -162,7 +162,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 		assertTrue(this.testCompleted);
 	}
 
-	@MediumTest
+//	@MediumTest
 	public void testBadPasswordLogin() throws Exception {
 		this.latch = new CountDownLatch(1);
 		this.testCompleted = false;
@@ -181,7 +181,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 		assertTrue(this.testCompleted);
 	}
 
-	@MediumTest
+//	@MediumTest
 	public void testCreateIdentity() throws Exception {
 		this.latch = new CountDownLatch(1);
 		this.testCompleted = false;

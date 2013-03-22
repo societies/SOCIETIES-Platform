@@ -76,8 +76,8 @@ public class AndroidCommsBase implements XMPPAgent {
 	private static final String PUBSUB_NAMESPACE_KEY = "http://jabber.org/protocol";
 	private static final boolean DEBUG_LOGGING = false;
 	
-	private static final String NOTIFICATION_TITLE = "Societies Communications Problem";
-	private static final String COMMS_NO_CONNECTIVITY = "NotConnected";
+	public static final String NOTIFICATION_TITLE = "Societies Communications Problem";
+	public static final String COMMS_NO_CONNECTIVITY = "NotConnected";
 	private static final String COMMS_CANNOT_REGISTER = "RegistrationError";
 	private static final String COMMS_CANNOT_UNREGISTER = "UnRegistrationError";
 	private static final String COMMS_CANNOT_SEND_MESSAGE = "SendMessageError";
