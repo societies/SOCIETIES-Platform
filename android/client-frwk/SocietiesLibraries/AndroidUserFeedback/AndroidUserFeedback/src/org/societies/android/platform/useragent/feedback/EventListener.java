@@ -220,11 +220,11 @@ public class EventListener extends Service {
 		AndroidNotifier notifier = new AndroidNotifier(EventListener.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
 		
 		//CREATE INTENT FOR LAUNCHING ACTIVITY
-		Intent intent = new Intent(this.getApplicationContext(), NegotiationForm.class);
+		Intent intent = new Intent(this.getApplicationContext(), NegotiationActivity.class);
 		intent.putExtra(EXTRA_PRIVACY_POLICY, (Parcelable)policy);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
-		notifier.notifyMessage(description, eventType, NegotiationForm.class, intent, "SOCIETIES");
+		notifier.notifyMessage(description, eventType, NegotiationActivity.class, intent, "SOCIETIES");
 	}
 
 }

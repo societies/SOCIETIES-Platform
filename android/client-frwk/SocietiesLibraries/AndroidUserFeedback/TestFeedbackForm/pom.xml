@@ -66,12 +66,14 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>org.societies.android.platform.events</groupId>
 			<artifactId>SocietiesPlatformEvents</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
+		 -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>

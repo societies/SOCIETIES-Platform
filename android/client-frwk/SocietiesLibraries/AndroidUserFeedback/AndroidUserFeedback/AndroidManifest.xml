@@ -27,8 +27,8 @@
         </service>
 
         <activity
-            android:name=".NegotiationForm"
-            android:label="@string/title_activity_negotiaion_form" >
+            android:name=".NegotiationActivity"
+            android:label="@string/title_activity_negotiation" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
