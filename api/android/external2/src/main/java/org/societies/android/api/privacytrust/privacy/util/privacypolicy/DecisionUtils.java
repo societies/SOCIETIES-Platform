@@ -45,10 +45,14 @@ public class DecisionUtils {
 		return sb.toString();
 	}
 
+	@Deprecated
 	public static boolean equals(Decision o1, Object o2) {
+		return equal(o1, o2);
+	}
+	public static boolean equal(Decision o1, Object o2) {
 		// -- Verify reference equality
-		if (o2 == null) { return false; }
 		if (o1 == o2) { return true; }
+		if (o2 == null) { return false; }
 		if (o1.getClass() != o2.getClass()) { return false; }
 		// -- Verify obj type
 		Decision rhs = (Decision) o2;

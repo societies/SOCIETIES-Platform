@@ -58,6 +58,17 @@ public class PrivacyPreference extends DefaultMutableTreeNode implements IPrivac
 
 
 	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("PrivacyPreference \n[userObject=");
+		builder.append(userObject);
+		builder.append("\n, children=");
+		builder.append(children);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	@Override
 	public Enumeration<IPrivacyPreference> breadthFirstEnumeration() {
 		return super.breadthFirstEnumeration();
 	}

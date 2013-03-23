@@ -31,9 +31,13 @@ import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.Requestor;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
+import org.societies.api.identity.util.RequestorUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestItemUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
+
 
 /**
  * The NegotiationAgreement class represents the agreement reached between the user and the service provider. 
@@ -45,10 +49,11 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponsePolicy
  * @author Elizabeth
  *
  */
+@Deprecated
 public class NegotiationAgreement implements IAgreement, Serializable {
 
 	private List<ResponseItem> items;
-	private Requestor requestor;
+	private RequestorBean requestor;
 	private IIdentity userId;
 	private IIdentity userPublicId;
 
@@ -90,7 +95,7 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 	}
 
 
-	public void setRequestor(Requestor requestor){
+	public void setRequestor(RequestorBean requestor){
 		this.requestor = requestor;
 	}
 	/*
@@ -113,7 +118,7 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 	}
 
 	@Override
-	public Requestor getRequestor() {
+	public RequestorBean getRequestor() {
 		// TODO Auto-generated method stub
 		return this.requestor;
 	}
@@ -146,13 +151,22 @@ public class NegotiationAgreement implements IAgreement, Serializable {
 		// -- Verify obj type
 		NegotiationAgreement rhs = (NegotiationAgreement) obj;
 		return new EqualsBuilder()
-			.append(this.getRequestor(), rhs.getRequestor())
 			.append(this.getUserIdentity(), rhs.getUserIdentity())
 			.append(this.getUserPublicIdentity(), rhs.getUserPublicIdentity())
-			.append(this.getRequestedItems(), rhs.getRequestedItems())
-			.isEquals();
+			.isEquals()
+			&& RequestorUtils.equal(this.getRequestor(), rhs.getRequestor())
+			&& ResponseItemUtils.equal(this.getRequestedItems(), rhs.getRequestedItems());
 	}
 
+
+	public String toString() {
+		StringBuilder sb = new StringBuilder("Agreement: [");
+		sb.append("requestor: "+RequestorUtils.toString(getRequestor())+", ");
+		sb.append("user id: "+getUserIdentity()+", ");
+		sb.append("user public id: "+getUserPublicIdentity()+", ");
+		sb.append("requested items: "+ResponseItemUtils.toString(getRequestedItems())+", ");
+		return sb.toString();
+	}
 
 }
 

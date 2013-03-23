@@ -56,7 +56,7 @@ public class MyIdentity implements INetworkNode,IIdentity, Serializable{
 
 	@Override
 	public String getJid() {
-		return type+"://"+identifier+"@"+domainIdentifier;
+		return type+"://"+identifier+"."+domainIdentifier;
 	}
 
 	@Override

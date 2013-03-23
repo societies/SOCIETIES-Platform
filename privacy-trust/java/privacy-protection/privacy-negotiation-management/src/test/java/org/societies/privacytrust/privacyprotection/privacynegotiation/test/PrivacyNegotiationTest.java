@@ -48,36 +48,40 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
-import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.preference.IUserPreferenceManagement;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PPNegotiationEvent;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RuleTarget;
 import org.societies.api.internal.privacytrust.privacyprotection.negotiation.FailedNegotiationEvent;
 import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Agreement;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PrivacyOutcomeConstantsBean;
+import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.schema.identity.DataIdentifierScheme;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.identity.RequestorCisBean;
+import org.societies.api.schema.identity.RequestorServiceBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyTypeConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
@@ -85,9 +89,10 @@ import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManage
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentityOption;
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentitySelection;
 import org.societies.privacytrust.privacyprotection.api.identity.ILinkabilityDetail;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPOutcome;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyOutcomeConstants;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyCondition;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyPreference;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ppn.PPNPOutcome;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.PrivacyPolicyNegotiationManager;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client.AgreementFinaliser;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -111,6 +116,8 @@ public class PrivacyNegotiationTest {
 	private INegotiationAgentRemote negAgent = Mockito.mock(INegotiationAgentRemote.class);
 	private IIdentitySelection ids = Mockito.mock(IIdentitySelection.class);
 	private IPrivacyPolicyManager privacyPolicyManager = Mockito.mock(IPrivacyPolicyManager.class);
+	private RequestorServiceBean requestorServiceBean;
+	private RequestorCisBean requestorCisBean;
 	private RequestorService requestorService;
 	private RequestorCis requestorCis;
 	private RequestPolicy servicePolicy;
@@ -123,7 +130,7 @@ public class PrivacyNegotiationTest {
 	private CtxAttribute statusAttribute;
 	private ResponsePolicy serviceResponsePolicy;
 	private AgreementEnvelope negotiationAgreementEnvelope;
-	private IAgreement agreement;
+	private Agreement agreement;
 	private PPNPOutcome locationOutcomeForService;
 	private PPNPOutcome statusOutcomeForService;
 	private ResponsePolicy cisResponsePolicy;
@@ -131,19 +138,27 @@ public class PrivacyNegotiationTest {
 	private PPNPOutcome statusOutcomeForCis;
 	private PPNegotiationEvent successfulEvent;
 	private FailedNegotiationEvent failedEvent;
+	private List<Action> actions;
+	private List<Condition> conditions;
 	private IUserFeedback userFeedback = Mockito.mock(IUserFeedback.class);
 
 	@Before
-	public void setUp(){
+	public void setUp() throws CtxException{
 		setupContext();
-		requestorService = this.getRequestorService();
-		requestorCis = this.getRequestorCis();
+		this.setupRequestorServiceBean();
+		this.setupRequestorCisBean();
+		this.setupRequestorCisObject();
+		this.setupRequestorServiceObject();
+
+		this.setupPolicyDetails();
+
 		this.servicePolicy = this.getServicePolicy();
 		this.cisPolicy = this.getCisPolicy();
 		this.serviceResponsePolicy = this.getServiceResponsePolicy();
 		this.cisResponsePolicy = this.getCisResponsePolicy();
+
 		this.createNegotiationAgreement();
-		this.setupPPNPOutcomes();
+
 		this.negotiationMgr = new PrivacyPolicyNegotiationManager();
 		this.negotiationMgr.setCtxBroker(ctxBroker);
 		this.negotiationMgr.setEventMgr(eventMgr);
@@ -157,59 +172,97 @@ public class PrivacyNegotiationTest {
 		this.negotiationMgr.setPrivacyPolicyManager(privacyPolicyManager);
 		this.negotiationMgr.setUserFeedback(userFeedback);
 		this.setupMockito();
-		
+
 		this.negotiationMgr.initialisePrivacyPolicyNegotiationManager();
 	}
-	
-	
 
 
+	private void setupMockito() throws CtxException{
+		
+		
+		Mockito.when(ctxBroker.retrieveIndividualEntity(this.userId)).thenReturn(new AsyncResult<IndividualCtxEntity>(this.userCtxEntity));
+		Mockito.when(negAgent.getPolicy((RequestorBean) Mockito.anyObject())).thenReturn(new AsyncResult<RequestPolicy>(servicePolicy));
+		//Mockito.when(negAgent.getPolicy(Mockito.eq(requestorCisBean))).thenReturn(new AsyncResult<RequestPolicy>(cisPolicy));
+		
+		Mockito.when(userFeedback.getPrivacyNegotiationFB((ResponsePolicy)Mockito.anyObject(), (NegotiationDetailsBean) Mockito.anyObject())).thenReturn(new AsyncResult<ResponsePolicy>(serviceResponsePolicy));
 
-	private void setupPPNPOutcomes() {
-		List<Requestor> subjectsService = new ArrayList<Requestor>();
-		subjectsService.add(requestorService);		
-		List<Requestor> subjectsCis = new ArrayList<Requestor>();
-		subjectsCis.add(requestorCis);	
-		Resource rLocation = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
-		List<Action> actions = new ArrayList<Action>();
-		actions.add(new Action(ActionConstants.READ));
-		List<Condition> conditions = new ArrayList<Condition>();
-		conditions.add(new Condition(ConditionConstants.DATA_RETENTION_IN_HOURS, "48"));
-		conditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "YES"));
-		conditions.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "YES"));
-		conditions.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "YES"));
-		
-		RuleTarget targetLocationForService = new RuleTarget(subjectsService, rLocation, actions);
-		
-		
-		Resource rStatus = new Resource(DataIdentifierScheme.CONTEXT,CtxAttributeTypes.STATUS);
-		
-		RuleTarget targetStatusForService = new RuleTarget(subjectsService, rStatus, actions);
-		
-		RuleTarget targetLocationForCis = new RuleTarget(subjectsCis, rLocation, actions);
-		
-		RuleTarget targetStatusForCis = new RuleTarget(subjectsCis, rStatus, actions);
-		try {
-			locationOutcomeForService = new PPNPOutcome(PrivacyOutcomeConstants.ALLOW, targetLocationForService, conditions);
-			
-			locationOutcomeForCis = new PPNPOutcome(PrivacyOutcomeConstants.ALLOW, targetLocationForCis, conditions);
-			statusOutcomeForService = new PPNPOutcome(PrivacyOutcomeConstants.ALLOW, targetStatusForService, conditions);
-			statusOutcomeForCis = new PPNPOutcome(PrivacyOutcomeConstants.ALLOW, targetStatusForCis, conditions);
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+
+		Mockito.when(idm.getThisNetworkNode()).thenReturn(this.userId);
+		Mockito.when(negAgent.negotiate((RequestorBean) Mockito.anyObject(), (ResponsePolicy) Mockito.anyObject())).thenReturn(new AsyncResult<ResponsePolicy>(serviceResponsePolicy));
+		//Mockito.when(negAgent.negotiate(Mockito.eq(requestorCisBean), (ResponsePolicy) Mockito.anyObject())).thenReturn(new AsyncResult<ResponsePolicy>(cisResponsePolicy));
+		Mockito.when(negAgent.acknowledgeAgreement((AgreementEnvelope) Mockito.anyObject())).thenReturn(new AsyncResult<Boolean>(true));
+		Mockito.when(ids.processIdentityContext((IAgreement) Mockito.anyObject())).thenReturn(this.getIdOptions());
+
+
 	}
+
+
+
+	private void setupPolicyDetails() {
+		this.setupActions();
+		this.setupConditions();
+
+	}
+
+
+	private void setupActions() {
+		this.actions= new ArrayList<Action>();
+		Action actionRead = new Action();
+		actionRead.setActionConstant(ActionConstants.READ);
+		Action actionWrite = new Action();
+		actionWrite.setActionConstant(ActionConstants.WRITE);
+		Action actionCreate = new Action();
+		actionCreate.setActionConstant(ActionConstants.CREATE);
+		Action actionDelete = new Action();
+		actionDelete.setActionConstant(ActionConstants.DELETE);
+	}
+
+
+
+
+
+	private void setupConditions() {
+
+		Condition conditionDataRetention = new Condition();
+		conditionDataRetention.setConditionConstant(ConditionConstants.DATA_RETENTION_IN_HOURS);
+		conditionDataRetention.setValue("48");
+
+		Condition conditionShare3p  = new Condition();
+		conditionShare3p.setConditionConstant(ConditionConstants.SHARE_WITH_3RD_PARTIES);
+		conditionShare3p.setValue("Yes");
+
+		Condition conditionRightToOptOut = new Condition();
+		conditionRightToOptOut.setConditionConstant(ConditionConstants.RIGHT_TO_OPTOUT);
+		conditionRightToOptOut.setValue("Yes");
+
+
+		Condition conditionStoreSecure = new Condition();
+		conditionStoreSecure.setConditionConstant(ConditionConstants.STORE_IN_SECURE_STORAGE);
+		conditionStoreSecure.setValue("Yes");
+
+		this.conditions  = new ArrayList<Condition>();
+		this.conditions.add(conditionStoreSecure);
+		this.conditions.add(conditionShare3p);
+		this.conditions.add(conditionDataRetention);
+		this.conditions.add(conditionRightToOptOut);
+	}
+
+
+
 
 
 	private void createNegotiationAgreement() {
 		AgreementFinaliser finaliser = new AgreementFinaliser();
-		agreement = new NegotiationAgreement(serviceResponsePolicy);
+		agreement = new Agreement();
+		agreement.setRequestedItems(serviceResponsePolicy.getResponseItems());
+		agreement.setRequestor(requestorServiceBean);
 		byte[] signature = finaliser.signAgreement(agreement);
 		Key publicKey = finaliser.getPublicKey();
 		try {
-			this.negotiationAgreementEnvelope = new AgreementEnvelope(agreement, SerialisationHelper.serialise(publicKey), signature);
+			this.negotiationAgreementEnvelope = new AgreementEnvelope();
+			this.negotiationAgreementEnvelope.setAgreement(agreement);
+			this.negotiationAgreementEnvelope.setPublicKey(SerialisationHelper.serialise(publicKey));
+			this.negotiationAgreementEnvelope.setSignature(signature);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -218,92 +271,73 @@ public class PrivacyNegotiationTest {
 
 	private ResponsePolicy getCisResponsePolicy() {
 		List<ResponseItem> responses = new ArrayList<ResponseItem>();
-		for (RequestItem requestItem : this.cisPolicy.getRequests()){
-			ResponseItem responseItem = new ResponseItem(requestItem, Decision.PERMIT);
+		for (RequestItem requestItem : this.cisPolicy.getRequestItems()){
+			ResponseItem responseItem = new ResponseItem();
+			responseItem.setDecision(Decision.PERMIT);
+			responseItem.setRequestItem(requestItem);
 			responses.add(responseItem);
 		}
-		ResponsePolicy response = new ResponsePolicy(this.requestorCis, responses, NegotiationStatus.SUCCESSFUL);
+		ResponsePolicy response = new ResponsePolicy();
+		response.setNegotiationStatus(NegotiationStatus.SUCCESSFUL);
+		response.setRequestor(this.requestorCisBean);
+		response.setResponseItems(responses);
 		return response;
 	}
 	private ResponsePolicy getServiceResponsePolicy() {
-		
+
 		List<ResponseItem> responses = new ArrayList<ResponseItem>();
-		for (RequestItem requestItem : this.servicePolicy.getRequests()){
-			ResponseItem responseItem = new ResponseItem(requestItem, Decision.PERMIT);
+		for (RequestItem requestItem : this.servicePolicy.getRequestItems()){
+			ResponseItem responseItem = new ResponseItem();
+			responseItem.setDecision(Decision.PERMIT);
+			responseItem.setRequestItem(requestItem);
 			responses.add(responseItem);
 		}
-		ResponsePolicy response = new ResponsePolicy(this.requestorService, responses, NegotiationStatus.SUCCESSFUL);
+		ResponsePolicy response = new ResponsePolicy();
+		response.setNegotiationStatus(NegotiationStatus.SUCCESSFUL);
+		response.setRequestor(this.requestorServiceBean);
+		response.setResponseItems(responses);
 		return response;
 	}
 
 
-	private void setupMockito(){
-		Mockito.when(negAgent.getPolicy(requestorService)).thenReturn(new AsyncResult<RequestPolicy>(servicePolicy));
-		Mockito.when(negAgent.getPolicy(requestorCis)).thenReturn(new AsyncResult<RequestPolicy>(cisPolicy));
-		
 
-		try {
-			Mockito.when(idm.getThisNetworkNode()).thenReturn(this.userId);
-			Mockito.when(ctxBroker.retrieveCssOperator()).thenReturn(new AsyncResult<IndividualCtxEntity>(userCtxEntity));
-			Mockito.when(ctxBroker.retrieveIndividualEntity(userId)).thenReturn(new AsyncResult<IndividualCtxEntity>(userCtxEntity));
-			List<IPrivacyOutcome> locationOutcomes = new ArrayList<IPrivacyOutcome>();
-			locationOutcomes.add(locationOutcomeForService);
-			locationOutcomes.add(locationOutcomeForCis);
-			List<IPrivacyOutcome> statusOutcomes = new ArrayList<IPrivacyOutcome>();
-			statusOutcomes.add(statusOutcomeForService);
-			statusOutcomes.add(statusOutcomeForCis);
-			Mockito.when(privacyPreferenceManager.evaluatePPNPreference(CtxAttributeTypes.LOCATION_SYMBOLIC)).thenReturn(locationOutcomes);
-			Mockito.when(privacyPreferenceManager.evaluatePPNPreference(CtxAttributeTypes.STATUS)).thenReturn(statusOutcomes);
-			Mockito.when(negAgent.negotiate(Mockito.eq(requestorService), (ResponsePolicy) Mockito.anyObject())).thenReturn(new AsyncResult<ResponsePolicy>(serviceResponsePolicy));
-			Mockito.when(negAgent.negotiate(Mockito.eq(requestorCis), (ResponsePolicy) Mockito.anyObject())).thenReturn(new AsyncResult<ResponsePolicy>(cisResponsePolicy));
-			Mockito.when(negAgent.acknowledgeAgreement((IAgreementEnvelope) Mockito.anyObject())).thenReturn(new AsyncResult<Boolean>(true));
-			Mockito.when(ids.processIdentityContext((IAgreement) Mockito.anyObject())).thenReturn(this.getIdOptions());
-			
-			
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-	
 	public List<IIdentityOption> getIdOptions(){
 		ArrayList<IIdentityOption> idOptions = new ArrayList<IIdentityOption>();
-		
+
 		IIdentityOption option = new IIdentityOption() {
-			
+
 			@Override
 			public IIdentity getReferenceIdentity() {
 				// TODO Auto-generated method stub
 				return userId;
 			}
-			
+
 			@Override
 			public List<ILinkabilityDetail> getOrderedLinkabilityDetailList() {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			public Map<IIdentity, ILinkabilityDetail> getLinkabilityDetailMap() {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			public int getIdentityContextMatch() {
 				// TODO Auto-generated method stub
 				return 0;
 			}
 		};
-		
+
 		idOptions.add(option);
 		return idOptions;
 	}
 	@Test
 	public void TestStartNegotiation(){
 
-		NegotiationDetails serviceDetails = new NegotiationDetails(requestorService, 0);
+		NegotiationDetails serviceDetails = new NegotiationDetails(this.requestorService, 0);
 		NegotiationDetails cisDetails = new NegotiationDetails(requestorCis, 0);		
 		try {
 			this.negotiationMgr.negotiateServicePolicy(serviceDetails);
@@ -320,24 +354,24 @@ public class PrivacyNegotiationTest {
 			TestCase.fail(e.getMessage());
 		}
 	}
-	
-	
-/*	@Test
+
+
+	/*	@Test
 	public void TestGetProviderPolicy(){
-		
+
 	}
-	
+
 	@Test
 	public void TestNegotiate(){
-		
+
 	}
 	@Test
 	public void TestAcknowledgeAgreement(){
-		
+
 	}*/
-	
-	
-	private RequestorService getRequestorService(){
+
+
+	private void setupRequestorServiceBean(){
 		IIdentity requestorId = new MyIdentity(IdentityType.CSS, "eliza","societies.org");
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 		serviceId.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
@@ -347,120 +381,115 @@ public class PrivacyNegotiationTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return new RequestorService(requestorId, serviceId);
+		this.requestorServiceBean = new RequestorServiceBean();
+		requestorServiceBean.setRequestorId(requestorId.getJid());
+		requestorServiceBean.setRequestorServiceId(serviceId);
+
 	}
-	
-	private RequestorCis getRequestorCis(){
+
+	private void setupRequestorServiceObject(){
+		IIdentity requestorId = new MyIdentity(IdentityType.CSS, "eliza","societies.org");
+		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
+		serviceId.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
+		try {
+			serviceId.setIdentifier(new URI("css://eliza@societies.org/HelloEarth"));
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.requestorService = new RequestorService(requestorId, serviceId);
+
+	}
+
+	private void setupRequestorCisBean(){
 		IIdentity requestorId = new MyIdentity(IdentityType.CSS, "me","domain.com");
 		IIdentity cisId = new MyIdentity(IdentityType.CIS, "Holidays", "domain.com");
-		return new RequestorCis(requestorId, cisId);
+		this.requestorCisBean = new RequestorCisBean();
+		requestorCisBean.setRequestorId(requestorId.getJid());
+		requestorCisBean.setCisRequestorId(cisId.getJid());
+
 	}
-	
+
+	private void setupRequestorCisObject(){
+		IIdentity requestorId = new MyIdentity(IdentityType.CSS, "me","domain.com");
+		IIdentity cisId = new MyIdentity(IdentityType.CIS, "Holidays", "domain.com");
+		this.requestorCis = new RequestorCis(requestorId,cisId);
+
+
+	}
 	private RequestPolicy getServicePolicy(){
-		/*
-		 * location requestItem
-		 */
-		Resource rLocation = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
-		List<Action> actions = new ArrayList<Action>();
-		actions.add(new Action(ActionConstants.READ));
-		List<Condition> conditions = new ArrayList<Condition>();
-		conditions.add(new Condition(ConditionConstants.DATA_RETENTION_IN_HOURS, "48"));
-		conditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "YES"));
-		conditions.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "YES"));
-		conditions.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "YES"));
-		RequestItem itemLocation = new RequestItem(rLocation, actions, conditions);
-		
-		
-		/*
-		 * status requestItem
-		 */
-		
-		Resource rStatus = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.STATUS);
-		List<Action> actions1 = new ArrayList<Action>();
-		actions1.add(new Action(ActionConstants.READ));
-		List<Condition> conditions1 = new ArrayList<Condition>();
-		conditions1.add(new Condition(ConditionConstants.DATA_RETENTION_IN_HOURS, "48"));
-		conditions1.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "YES"));
-		conditions1.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "YES"));
-		conditions1.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "YES"));
-		RequestItem itemStatus = new RequestItem(rStatus, actions1, conditions1);
-		
-		/* ----------------------------------------------------*/
-		 
-				
-		List<RequestItem> requests = new ArrayList<RequestItem>();
-		requests.add(itemLocation);
-		requests.add(itemStatus);
-		RequestPolicy policy = new RequestPolicy(this.requestorService, requests);
-		
-		
+
+		RequestPolicy policy = this.getPolicyWithoutRequestor();
+		policy.setRequestor(requestorServiceBean);
+
 		return policy;
-		
+
 	}
-	
-	
+
 	private RequestPolicy getCisPolicy(){
+		RequestPolicy policy = this.getPolicyWithoutRequestor();
+		policy.setRequestor(requestorCisBean);
+
+		return policy;
+	}
+	private RequestPolicy getPolicyWithoutRequestor(){
 		/*
 		 * location requestItem
 		 */
-		Resource rLocation = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
-		List<Action> actions = new ArrayList<Action>();
-		actions.add(new Action(ActionConstants.READ));
-		List<Condition> conditions = new ArrayList<Condition>();
-		conditions.add(new Condition(ConditionConstants.DATA_RETENTION_IN_HOURS, "48"));
-		conditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "YES"));
-		conditions.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "YES"));
-		conditions.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "YES"));
-		RequestItem itemLocation = new RequestItem(rLocation, actions, conditions);
-		
-		
+		Resource rLocation = new Resource();
+		rLocation.setScheme(DataIdentifierScheme.CONTEXT);
+		rLocation.setDataType(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		RequestItem itemLocation = new RequestItem();
+		itemLocation.setResource(rLocation);
+		itemLocation.setActions(actions);
+		itemLocation.setConditions(conditions);
+
+
 		/*
 		 * status requestItem
 		 */
-		
-		Resource rStatus = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.STATUS);
-		List<Action> actions1 = new ArrayList<Action>();
-		actions1.add(new Action(ActionConstants.READ));
-		List<Condition> conditions1 = new ArrayList<Condition>();
-		conditions1.add(new Condition(ConditionConstants.DATA_RETENTION_IN_HOURS, "48"));
-		conditions1.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "YES"));
-		conditions1.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "YES"));
-		conditions1.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "YES"));
-		RequestItem itemStatus = new RequestItem(rStatus, actions1, conditions1);
-		
+
+		Resource rStatus = new Resource();
+		rStatus.setScheme(DataIdentifierScheme.CONTEXT);
+		rStatus.setDataType(CtxAttributeTypes.STATUS);
+
+		RequestItem itemStatus = new RequestItem();
+		itemStatus.setResource(rStatus);
+		itemStatus.setActions(actions);
+		itemStatus.setConditions(conditions);
+
 		/* ----------------------------------------------------*/
-		 
-				
+
+
 		List<RequestItem> requests = new ArrayList<RequestItem>();
 		requests.add(itemLocation);
 		requests.add(itemStatus);
-		RequestPolicy policy = new RequestPolicy(this.requestorCis, requests);
-		
-		
+		RequestPolicy policy = new RequestPolicy();
+		policy.setPrivacyPolicyType(PrivacyPolicyTypeConstants.SERVICE);
+		policy.setRequestItems(requests);
 		return policy;
 	}
-	
-	
+
+
 	private void setupContext(){
 		this.userId = new MyIdentity(IdentityType.CSS, "xcmanager","societies.local");
 		CtxEntityIdentifier ctxId = new CtxEntityIdentifier(userId.getJid(), "Person", new Long(1));
 		this.userCtxEntity = new IndividualCtxEntity(ctxId);
-		
-		
+
+
 		ctxLocationAttributeId = new CtxAttributeIdentifier(userCtxEntity.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC, new Long(1));
 		ctxLocationAttributeId.setScheme(DataIdentifierScheme.CONTEXT);
 		locationAttribute = new CtxAttribute(ctxLocationAttributeId);
 		locationAttribute.setStringValue("home");
-		
-		
+
+
 		ctxStatusAttributeId = new CtxAttributeIdentifier(userCtxEntity.getId(), CtxAttributeTypes.STATUS, new Long(1));
 		ctxStatusAttributeId.setScheme(DataIdentifierScheme.CONTEXT);
 		statusAttribute = new CtxAttribute(ctxStatusAttributeId);
 		statusAttribute.setStringValue("busy");
-		
+
 		userCtxEntity.addAttribute(locationAttribute);
 		userCtxEntity.addAttribute(statusAttribute);
-		
-		
+
 	}
 }
