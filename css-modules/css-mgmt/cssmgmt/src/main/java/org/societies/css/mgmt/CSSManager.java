@@ -129,8 +129,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 	private static final String THIS_NODE = "XCManager.societies.local";
 	private static final List<String> cssPubsubClassList = Collections.unmodifiableList(
 		Arrays.asList("org.societies.api.schema.cssmanagement.CssEvent",
-				"org.societies.api.schema.css.directory.CssFriendEvent",
-				"http://societies.org/api/schema/activityfeed"));
+				"org.societies.api.schema.css.directory.CssFriendEvent"));
 
 	private ICssRegistry cssRegistry;
 	private ICssDirectoryRemote cssDirectoryRemote;
@@ -161,7 +160,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
          * added false as we don't want to create a pubsub node
          */
         activityFeed = getiActivityFeedManager().getOrCreateFeed(idManager.getThisNetworkNode().toString(), idManager.getThisNetworkNode().toString(), true);
-        
+        LOG.info("Activity feed is in cssManagerInit: " +activityFeed);
 		this.createMinimalCSSRecord(idManager.getCloudNode().getJid());
         
         this.randomGenerator = new Random();
@@ -313,6 +312,8 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 	 * @param activityVerb
 	 */
 	private void addActivityToCSSAF(String activityVerb){
+		
+		LOG.info("Activity feed is in addActivityToCSSAF: " +activityFeed);
 			
 		IActivity iActivity = activityFeed.getEmptyIActivity();
 		iActivity.setActor(idManager.getThisNetworkNode().toString());

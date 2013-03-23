@@ -76,24 +76,36 @@ public class CommsServer implements IFeatureServer {
 	private ICSSInternalManager cssManager;
 	private IIdentityManager idMgr;
 	private FriendFilter FriendFilter;
-public IActivityFeed activityFeed = null;
+	private IActivityFeed activityFeed;
 	
-	public IActivityFeed getActivityFeed() {
-		return activityFeed;
+	//public IActivityFeed getActivityFeed() {
+	//	return activityFeed;
+	//}
+
+
+//	private void setActivityFeed(IActivityFeed activityFeed) {
+//		this.activityFeed = activityFeed;
+//	}
+	
+	private IActivityFeedManager iActivityFeedManager;
+
+    
+    public IActivityFeedManager getiActivityFeedManager() {
+		return iActivityFeedManager;
 	}
 
-
-	private void setActivityFeed(IActivityFeed activityFeed) {
-		this.activityFeed = activityFeed;
+	public void setiActivityFeedManager(IActivityFeedManager iActivityFeedManager) {
+		this.iActivityFeedManager = iActivityFeedManager;
 	}
 	
 	
 	public static final List<String> MESSAGE_BEAN_NAMESPACES = Collections.unmodifiableList(
 			  Arrays.asList("http://societies.org/api/schema/cssmanagement",
-					  "http://societies.org/api/schema/activityfeed" ));
+					  "http://societies.org/api/schema/activityfeed"));
 	public static final List<String> MESSAGE_BEAN_PACKAGES = Collections.unmodifiableList(
 			  Arrays.asList("org.societies.api.schema.cssmanagement", 
-					  "org.societies.api.schema.activityfeed"));
+					  "org.societies.api.schema.activityfeed", 
+					  "org.societies.api.schema.activity.MarshaledActivity"));
 
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
 
@@ -110,6 +122,8 @@ public IActivityFeed activityFeed = null;
 			LOG.debug("Initialise with Communication Manager");
 			this.commManager.register(this);
 			idMgr = commManager.getIdManager();
+			LOG.info("Getting ActivityFeed from CommsServer Init");
+			activityFeed = getiActivityFeedManager().getOrCreateFeed(idMgr.getThisNetworkNode().toString(), idMgr.getThisNetworkNode().toString(), false);
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -308,32 +322,47 @@ public IActivityFeed activityFeed = null;
 			
 			// get Activities
 			if (c.getGetActivities() != null) {
-				LOG.debug("get activities called");
+				LOG.info("get activities called");
 				org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
+				LOG.info("back from marshaledactivityfeed result");
 				GetActivitiesResponse r = new GetActivitiesResponse();
+				LOG.info("back from marshaledactivityfeed response");
 				String senderJid = stanza.getFrom().getBareJid();
+				LOG.info("senderjid " +senderJid);
 				List<IActivity> iActivityList;
 				//List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.MarshaledActivity>();
 				
 				
+				LOG.info("activityFeed returns" +activityFeed);
+				//activityFeed = getiActivityFeedManager().getOrCreateFeed(idMgr.getThisNetworkNode().toString(), idMgr.getThisNetworkNode().toString(), false);
 				ActivityFeedClient d = new ActivityFeedClient();
+				LOG.info("activityfeedclient d " +d);
+				LOG.info("c.getGetActivities().getQuery() retruns " +c.getGetActivities().getQuery());
+				//LOG.info("c.getGetActivities().getQuery()isempty retruns " +c.getGetActivities().getQuery().isEmpty());
+				
 				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
 				//	r.setResult(false);
 				//}else{
 					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
-					if(c.getGetActivities().getQuery()==null  ||  c.getGetActivities().getQuery().isEmpty())
+					if(c.getGetActivities().getQuery()==null ){
+						LOG.info("setting if branch "  +c.getGetActivities().getTimePeriod());
+						LOG.info("Activity feed is in if: " +activityFeed);
 						activityFeed.getActivities(c.getGetActivities().getTimePeriod(),d);
-					else
-						activityFeed.getActivities(c.getGetActivities().getQuery(),c.getGetActivities().getTimePeriod(),d);										
-				//}
+						LOG.info("getting if activityFeed ");
+					}else{
+						LOG.info("setting else branch " );
+						activityFeed.getActivities(c.getGetActivities().getQuery(),c.getGetActivities().getTimePeriod(),d);	
+						
+				}
 				
 					MarshaledActivityFeed m = d.getActivityFeed();
-					
+					LOG.info("marshaledactivityfeedclient d " +m);
 					if(null != m && null != m.getGetActivitiesResponse()){
 						r.setMarshaledActivity(m.getGetActivitiesResponse().getMarshaledActivity());
 					}else{
 						LOG.warn("no callback object after immediate call of get activities");
 						// ill set an empty list
+						LOG.info("sending back empty activity feed list");
 						r.setMarshaledActivity(new ArrayList<org.societies.api.schema.activity.MarshaledActivity>());
 					}
 					
