@@ -324,11 +324,8 @@ public class CommsServer implements IFeatureServer {
 			if (c.getGetActivities() != null) {
 				LOG.info("get activities called");
 				org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
-				LOG.info("back from marshaledactivityfeed result");
 				GetActivitiesResponse r = new GetActivitiesResponse();
-				LOG.info("back from marshaledactivityfeed response");
 				String senderJid = stanza.getFrom().getBareJid();
-				LOG.info("senderjid " +senderJid);
 				List<IActivity> iActivityList;
 				//List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.MarshaledActivity>();
 				
@@ -336,33 +333,23 @@ public class CommsServer implements IFeatureServer {
 				LOG.info("activityFeed returns" +activityFeed);
 				//activityFeed = getiActivityFeedManager().getOrCreateFeed(idMgr.getThisNetworkNode().toString(), idMgr.getThisNetworkNode().toString(), false);
 				ActivityFeedClient d = new ActivityFeedClient();
-				LOG.info("activityfeedclient d " +d);
-				LOG.info("c.getGetActivities().getQuery() retruns " +c.getGetActivities().getQuery());
-				//LOG.info("c.getGetActivities().getQuery()isempty retruns " +c.getGetActivities().getQuery().isEmpty());
 				
 				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
 				//	r.setResult(false);
 				//}else{
 					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
-					if(c.getGetActivities().getQuery()==null ){
-						LOG.info("setting if branch "  +c.getGetActivities().getTimePeriod());
-						LOG.info("Activity feed is in if: " +activityFeed);
+					if(c.getGetActivities().getQuery()==null || c.getGetActivities().getQuery().isEmpty()){
 						activityFeed.getActivities(c.getGetActivities().getTimePeriod(),d);
-						LOG.info("getting if activityFeed ");
 					}else{
-						LOG.info("setting else branch " );
 						activityFeed.getActivities(c.getGetActivities().getQuery(),c.getGetActivities().getTimePeriod(),d);	
 						
 				}
 				
 					MarshaledActivityFeed m = d.getActivityFeed();
-					LOG.info("marshaledactivityfeedclient d " +m);
 					if(null != m && null != m.getGetActivitiesResponse()){
 						r.setMarshaledActivity(m.getGetActivitiesResponse().getMarshaledActivity());
 					}else{
-						LOG.warn("no callback object after immediate call of get activities");
 						// ill set an empty list
-						LOG.info("sending back empty activity feed list");
 						r.setMarshaledActivity(new ArrayList<org.societies.api.schema.activity.MarshaledActivity>());
 					}
 					

@@ -160,7 +160,6 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
          * added false as we don't want to create a pubsub node
          */
         activityFeed = getiActivityFeedManager().getOrCreateFeed(idManager.getThisNetworkNode().toString(), idManager.getThisNetworkNode().toString(), true);
-        LOG.info("Activity feed is in cssManagerInit: " +activityFeed);
 		this.createMinimalCSSRecord(idManager.getCloudNode().getJid());
         
         this.randomGenerator = new Random();
@@ -267,7 +266,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 				}
 				// internal eventing
 
-				LOG.info("minimal CSSRecord -> Generating CSS_Record to piush to context");
+				LOG.info("minimal CSSRecord -> Generating CSS_Record to push to context");
 
 				this.pushtoContext(cssProfile);
 
@@ -312,8 +311,6 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 	 * @param activityVerb
 	 */
 	private void addActivityToCSSAF(String activityVerb){
-		
-		LOG.info("Activity feed is in addActivityToCSSAF: " +activityFeed);
 			
 		IActivity iActivity = activityFeed.getEmptyIActivity();
 		iActivity.setActor(idManager.getThisNetworkNode().toString());
