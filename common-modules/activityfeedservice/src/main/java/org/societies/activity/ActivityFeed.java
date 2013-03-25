@@ -624,6 +624,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     }
 
     @Async
+    @Override
     public Future<List<IActivity>> getActivities(String query, String timePeriod, long n) {
 
         List<IActivity> iActivityList = null;
@@ -652,6 +653,30 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
        return new AsyncResult<List<IActivity>>(result);
     }
     
+    @Async
+    @Override
+    public Future<List<IActivity>> getActivities(String timePeriod, long n) {
+
+        List<IActivity> iActivityList = null;
+        List<IActivity> result = new ArrayList<IActivity>();
+        iActivityList = this.getActivitiesFromDB(timePeriod);
+        
+        if (iActivityList != null) {
+    	   Collections.sort(iActivityList,new Comparator<IActivity>() {
+               @Override
+               public int compare(IActivity iActivity, IActivity iActivity1) {
+                   return (Long.parseLong(iActivity.getPublished())>Long.parseLong(iActivity1.getPublished())) ? 1 : -1;
+               }
+           });
+    	  
+    	   if (n == 0 || n > iActivityList.size())
+    		   n = iActivityList.size();
+    	   
+    	   for(int i=0;i<n;i++)
+    		   result.add(iActivityList.get(i));
+        }
+        return new AsyncResult<List<IActivity>>(result);
+    }
       
     public void iactivToMarshActvList(List<IActivity> iActivityList, List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList){
 
