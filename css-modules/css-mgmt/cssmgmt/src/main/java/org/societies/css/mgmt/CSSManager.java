@@ -85,6 +85,7 @@ import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.WhoResponse;
@@ -2843,4 +2844,45 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		this.filter = filter;
 		
 	}
+
+	/* @see org.societies.api.internal.css.ICSSInternalManager#getActivities(java.lang.String) */
+	@Override
+	public Future<List<MarshaledActivity>> getActivities(String timePeriod, int limitResults) {
+		LOG.info("CSS MANAGER getActivities called");
+		List<MarshaledActivity> listSchemaActivities = new ArrayList<MarshaledActivity>();  
+		
+		try {
+			Future<List<IActivity>> result = activityFeed.getActivities(timePeriod, limitResults);
+			listSchemaActivities = ConvertIActivities(result.get());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		return new AsyncResult(listSchemaActivities); 
+	}
+	
+	private List<MarshaledActivity> ConvertIActivities(List<IActivity> listActivities) {
+		LOG.debug("CSS MANAGER ConvertIActivities: " + listActivities.size());
+		List<MarshaledActivity> listSchemaActivities = new ArrayList<MarshaledActivity>(); 
+		for (IActivity activity: listActivities) {
+			try {
+				org.societies.api.schema.activity.MarshaledActivity ma = new org.societies.api.schema.activity.MarshaledActivity();
+				ma.setActor(activity.getActor());
+				ma.setVerb(activity.getVerb());
+		        if(activity.getObject()!=null && activity.getObject().isEmpty() == false )
+		        	ma.setObject(activity.getObject());
+		        if(activity.getPublished()!=null && activity.getPublished().isEmpty() == false )
+		        	ma.setPublished(activity.getPublished());
+	
+		        if(activity.getTarget()!=null && activity.getTarget().isEmpty() == false )
+		        	ma.setTarget(activity.getTarget());
+		        listSchemaActivities.add(ma);
+			} catch (Exception ex) {
+				LOG.error("Exception converting to MarshaledActivity: " + ex);
+			}
+		}
+		return listSchemaActivities;
+	}
+	
 }
