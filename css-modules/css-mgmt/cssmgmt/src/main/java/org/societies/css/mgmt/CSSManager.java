@@ -1725,7 +1725,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 
 		
 		Integer filt = filter.getFilterFlag();
-		LOG.info("Friends filter contains: " +filt);
+		LOG.info("getSuggestedFriends Friends filter contains: " +filt);
 		
 		final Integer none	 		= 0x0000000000;
 		final int facebook   		= 0x0000000001;
@@ -1765,7 +1765,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		IIdentity myIdentity = null;
 		myIdentity = this.commManager.getIdManager().getThisNetworkNode();
 		
-		LOG.info("checking CIS BIT: ");
+		LOG.info("getSuggestedFriends checking CIS BIT: ");
 		//Check if the CIS_MEMBERS_BIT is set if it is use this as the base group
 		if(flag = BitCompareUtil.isCisMembersFlagged(filt)){
 			//get the list of CIS members from the CIS Manager
@@ -1863,7 +1863,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 			
 		}else{
 			// first get all the cssdirectory records
-			LOG.info("checking CSS Directory for Advertisements: ");
+			LOG.info("getSuggestedFriends checking CSS Directory for Advertisements: ");
 			CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
 
 			getCssDirectoryRemote().findAllCssAdvertisementRecords(callback);
@@ -1884,6 +1884,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 
 			
 			}
+			LOG.info("CssFriend size is: " +cssFriend.size());
 		}
 
 		// Generate the connector
@@ -2076,7 +2077,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	            	 flag = false;
 	             }	    
 	             
-	             LOG.info("NOW Compare the 2 Lists: ");
+	             LOG.info("getSuggestedFriends NOW Compare the 2 Lists: ");
 	             //compare the two lists
 	               if(commonFriends.size() != 0){
 	              	 
@@ -2094,10 +2095,11 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	  						}
 	  					}
 	               }else {
-	              	 for(int j = 0; j < cssFriends.size(); j++){
+	              	 for(int j = 0; j < cssFriend.size(); j++){
 	              		 commonFriends.put(cssFriend.get(j), none );
 	              	 }
 	               }
+	               LOG.info("getSuggestedFriends commonFriends size is now : " +commonFriends.size());
 	    
 		return new AsyncResult<HashMap<IIdentity, Integer>> (commonFriends);
 	}

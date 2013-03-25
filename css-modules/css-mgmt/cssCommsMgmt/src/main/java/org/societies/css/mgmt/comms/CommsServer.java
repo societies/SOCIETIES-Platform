@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -147,7 +148,7 @@ public class CommsServer implements IFeatureServer {
 		Dbc.require("Message stanza cannot be null", stanza != null);
 		Dbc.require("Message payload cannot be null", payload != null);
 		
-		LOG.info("CSSManager remote invocation with stanza length: " + stanza.toString().length() +payload.getClass().getName().toString());
+		LOG.debug("CSSManager remote invocation with stanza length: " + stanza.toString().length() +payload.getClass().getName().toString());
 		LOG.debug("CSSManager commsServer getQuery called ");
 		LOG.debug("CSSManager remote invocation with stanza length: " + stanza.toString().length());
 		
@@ -169,6 +170,9 @@ public class CommsServer implements IFeatureServer {
 			
 			Future<HashMap<IIdentity, Integer>> asyncFriendsFilterResult = null;
 			HashMap<IIdentity, Integer> FriendsFilterResult = null;
+			
+			Future<HashMap<CssAdvertisementRecord, Integer>> asyncFriendsFilterDetailsResult = null;
+			HashMap<CssAdvertisementRecord, Integer> FriendsFilterDetailsResult = null;
 		
 			LOG.debug("CSSManager remote invocation of method "
 					+ bean.getMethod().name());
@@ -223,7 +227,16 @@ public class CommsServer implements IFeatureServer {
 				asyncFriendsAdsResult = this.cssManager.getCssFriends();
 				break;
 			case SUGGESTED_FRIENDS:
-				asyncFriendsFilterResult = this.cssManager.getSuggestedFriends(FriendFilter);
+				LOG.info("CommsServer calling Suggested_Friends");
+				FriendFilter filter = this.cssManager.getFriendfilter();
+				if(filter == null){
+					filter = new FriendFilter();
+					filter.setFilterFlag(0x0000011111);
+				}
+				LOG.info("CommsServer FriendFilter is: " +FriendFilter);
+				//asyncFriendsFilterResult = this.cssManager.getSuggestedFriends(filter);
+				asyncFriendsFilterDetailsResult = this.cssManager.getSuggestedFriendsDetails(filter); 
+				LOG.info("CommsServer BACK from calling Suggested_Friends");
 				break;
 			case GET_FRIEND_REQUESTS:
 				asyncFriendsAdsResult = this.cssManager.getFriendRequests(); 
@@ -246,8 +259,12 @@ public class CommsServer implements IFeatureServer {
 					LOG.debug("Number of actual friends: " + friendsAdsResult.size());
 					break;
 				case SUGGESTED_FRIENDS:
-					FriendsFilterResult = asyncFriendsFilterResult.get();
-					LOG.debug("Number of suggested friends: " + FriendsFilterResult.size());
+					friendsAdsResult = new ArrayList<CssAdvertisementRecord>();
+					FriendsFilterDetailsResult = asyncFriendsFilterDetailsResult.get();
+					LOG.debug("Number of suggested friends: " + FriendsFilterDetailsResult.size());
+					for(Entry<CssAdvertisementRecord, Integer> entry : FriendsFilterDetailsResult.entrySet()){
+						friendsAdsResult.add(entry.getKey());	
+						}
 					break;
 				case GET_FRIEND_REQUESTS:
 					friendsAdsResult = asyncFriendsAdsResult.get();
@@ -274,7 +291,9 @@ public class CommsServer implements IFeatureServer {
 			CssManagerResultBean resultBean = new CssManagerResultBean();
 			resultBean.setResult(result);
 			resultBean.setResultAdvertList(friendsAdsResult);
+			resultBean.setResultAdvertList(friendsAdsResult);
 			resultBean.setResultCssRequestList(RequestResult);
+			
 
 			Dbc.ensure("CSSManager result bean cannot be null", resultBean != null);
 			return resultBean;
