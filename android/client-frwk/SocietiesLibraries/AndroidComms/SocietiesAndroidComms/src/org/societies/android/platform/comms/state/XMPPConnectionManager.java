@@ -27,7 +27,6 @@ package org.societies.android.platform.comms.state;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -55,6 +54,7 @@ import android.util.Log;
 
 /**
  * Manages the Societies Android Communications XMPP connection with a finite state machine (FSM)
+ * The main 
  *
  */
 
@@ -63,15 +63,17 @@ public class XMPPConnectionManager implements IConnectionState {
 	private final static String LOG_TAG = XMPPConnectionManager.class.getName();
 	private final static boolean DEBUG_LOGGING = true;
 	private final static String KEY_DIVIDER = ":"; 
+	//(a)Smack does not differentiate between different types of network problems and authentication and all
+	//exceptions are returned as the generic XMPPException
+	private final static String XMPP_AUTHENICATION_EXCEPTION_ID = "SASL authentication";
+	private final static int EVENT_PROCESSOR_SLEEP_INTERVAL = 200;
 	
 	private Context context;
 	private ConnectionState currentState;
-	private static XMPPConnectionManager xmppManager;
 	private XMPPConnection xmppConnection;
 	private Map <String, StateEventAction> fsmLookupTable;
 	private ConcurrentLinkedQueue <ConnectionEvent> eventQueue;
-	private boolean eventPending;
-	private final static ScheduledExecutorService queueSchedular = Executors.newSingleThreadScheduledExecutor();
+	private ScheduledExecutorService queueSchedular;
 
 	private XMPPConnectionProperties currentXmppConnectProps;
 	private XMPPConnectionProperties newXmppConnectProps;
@@ -79,26 +81,14 @@ public class XMPPConnectionManager implements IConnectionState {
 	
 	private Class<?> actionHandlerParams [] = {ConnectionState.class};
 	
-    /**
-     * This getter creates the XmppManager and inits the XmppManager
-     * with a new connection with the current preferences.
-     * TODO: Not threadsafe
-     * @param ctx
-     * @return
-     */
-    public static XMPPConnectionManager getInstance(Context ctx) {
-        if (xmppManager == null) {
-        	xmppManager = new XMPPConnectionManager(ctx);
-        }
-        return xmppManager;
-    }
-
-	private XMPPConnectionManager(Context context) {
-		this.context = context;
+	private long remoteCallId;
+	private String remoteCallClient;
+	private String remoteUserJid;
+	
+	public XMPPConnectionManager() {
 		this.currentState = IConnectionState.ConnectionState.Disconnected;
 		
 		this.eventQueue = new ConcurrentLinkedQueue<ConnectionEvent>();
-		this.eventPending = false;
 		this.xmppConnection = null;
 		this.currentXmppConnectProps = null;
 		this.newXmppConnectProps = null;
@@ -109,7 +99,16 @@ public class XMPPConnectionManager implements IConnectionState {
 	
 	@Override
 	public boolean isConnected() {
-		return this.xmppConnection.isConnected() && (this.currentState.equals(ConnectionState.Connected));
+		boolean retValue = false;
+		if 	(null != this.xmppConnection && this.xmppConnection.isConnected() && (this.currentState.equals(ConnectionState.Connected))) {
+			retValue = true;
+		}
+		return retValue;
+	}
+
+	@Override
+	public boolean isAuthenticated() {
+		return isConnected() && this.xmppConnection.isAuthenticated();
 	}
 
 	@Override
@@ -122,12 +121,19 @@ public class XMPPConnectionManager implements IConnectionState {
 	}
 	
 	@Override
-	public void enableConnection(XMPPConnectionProperties connectProps) {
+	public void enableConnection(XMPPConnectionProperties connectProps, Context context, String userJid, String client, long remoteCallId) {
 		Dbc.require("Connection properties cannot be null", null != connectProps);
+		Dbc.require("Context cannot be null", null != context);
+		Dbc.require("Client must be specified", null != client && client.length() > 0);
 		
 		if (DEBUG_LOGGING) {
 			Log.d(LOG_TAG, "enableConnection : " + connectProps.toString());
 		}
+		this.context = context;
+		this.remoteCallId = remoteCallId;
+		this.remoteCallClient = client;
+		this.remoteUserJid = userJid;
+		
 		this.newXmppConnectProps = connectProps;
 		if (null == this.currentXmppConnectProps) {
 			this.currentXmppConnectProps = connectProps;
@@ -137,13 +143,30 @@ public class XMPPConnectionManager implements IConnectionState {
 
 	}
 	@Override
-	public void disableConnection() {
+	public void disableConnection(String client, long remoteCallId) {
+		Dbc.require("Client must be specified", null != client && client.length() > 0);
+		
 		if (DEBUG_LOGGING) {
 			Log.d(LOG_TAG, "disableConnection");
 		}
-		this.addEventToQueue(ConnectionEvent.Disconnect);
+		if (this.isConnected()) {
+			this.remoteCallId = remoteCallId;
+			this.remoteCallClient = client;
+			this.addEventToQueue(ConnectionEvent.Disconnect);
+		}
 	}
-	
+	@Override
+    public XMPPConnection getValidConnection() throws NoXMPPConnectionAvailableException {
+    	XMPPConnection xmppConnection = null;
+    	if (this.isConnected() 
+    			&& this.getConnectionState().equals(IConnectionState.ConnectionState.Connected)) {
+    		xmppConnection = this.xmppConnection;
+    	} else {
+    		throw new NoXMPPConnectionAvailableException("XMPP connection unavailable, currently in state: " + this.getConnectionState().name());
+    	}
+    	return xmppConnection;
+    }
+
 	/**
 	 * Start a connection
 	 */
@@ -151,6 +174,8 @@ public class XMPPConnectionManager implements IConnectionState {
 		if (DEBUG_LOGGING) {
 			Log.d(LOG_TAG, "startEventProcessor");
 		}
+		
+		this.queueSchedular = Executors.newSingleThreadScheduledExecutor();
 		
 		final Runnable processQueue = new Runnable() {
 			
@@ -166,8 +191,9 @@ public class XMPPConnectionManager implements IConnectionState {
 				}
 			}
 		};
-		final ScheduledFuture processQueueTimer = queueSchedular.scheduleAtFixedRate(processQueue, 0, 100, TimeUnit.MILLISECONDS);
+		final ScheduledFuture processQueueTimer = queueSchedular.scheduleAtFixedRate(processQueue, 0, EVENT_PROCESSOR_SLEEP_INTERVAL, TimeUnit.MILLISECONDS);
 	}
+	
 	/**
 	 * End a connection
 	 */
@@ -189,22 +215,40 @@ public class XMPPConnectionManager implements IConnectionState {
 		}
 		ConnectionState formerState = this.currentState;
 		this.currentState = newState;
-		this.sendIntent(formerState, newState);
+		this.sendStateChangedIntent(formerState, newState);
 	}
 	/**
 	 * Send an intent of the current state
 	 * @param formerState
 	 * @param currentState
 	 */
-	private void sendIntent(ConnectionState formerState, ConnectionState currentState) {
+	private void sendStateChangedIntent(ConnectionState formerState, ConnectionState currentState) {
 		if (DEBUG_LOGGING) {
-			Log.d(LOG_TAG, "sendIntent");
+			Log.d(LOG_TAG, "send State Changed intent");
 		}
 		Intent intent = new Intent(IConnectionState.XMPP_CONNECTION_CHANGED);
 		intent.putExtra(IConnectionState.INTENT_FORMER_CONNECTION_STATE, formerState.ordinal());
 		intent.putExtra(IConnectionState.INTENT_CURRENT_CONNECTION_STATE, currentState.ordinal());
-		boolean connected = currentState.equals(ConnectionState.Connected);
-		intent.putExtra(IConnectionState.INTENT_CONNECTED, connected);
+		intent.putExtra(IConnectionState.INTENT_CONNECTED, currentState.equals(ConnectionState.Connected));
+		intent.putExtra(IConnectionState.INTENT_REMOTE_CALL_ID, this.remoteCallId);
+		intent.putExtra(IConnectionState.INTENT_REMOTE_CALL_CLIENT, this.remoteCallClient);
+		intent.putExtra(IConnectionState.INTENT_REMOTE_USER_JID, this.remoteUserJid);
+		this.context.sendBroadcast(intent);
+	}
+	/**
+	 * Send an intent of the current state
+	 * @param formerState
+	 * @param currentState
+	 */
+	private void sendLoginFailureIntent(String type, String failureMessage) {
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "send login failure intent, reason: " + failureMessage + " type: " + type);
+		}
+		Intent intent = new Intent(type);
+		intent.putExtra(IConnectionState.INTENT_FAILURE_DESCRIPTION, failureMessage);
+		intent.putExtra(IConnectionState.INTENT_REMOTE_CALL_ID, this.remoteCallId);
+		intent.putExtra(IConnectionState.INTENT_REMOTE_CALL_CLIENT, this.remoteCallClient);
+		intent.putExtra(IConnectionState.INTENT_REMOTE_USER_JID, this.remoteUserJid);
 		this.context.sendBroadcast(intent);
 	}
 	/**
@@ -264,33 +308,6 @@ public class XMPPConnectionManager implements IConnectionState {
 	
 	private static String generateKey(ConnectionState currentState, ConnectionEvent event) {
 		return currentState.name() + KEY_DIVIDER + event.name();
-	}
-	/**
-	 * Class that encapsulates the action to take and the next state that the FSM will be in
-	 * after the action handler has been invoked.
-	 *
-	 */
-	private class StateEventAction {
-		private ConnectionAction actionHandler;
-		private ConnectionState futureState;
-
-		public StateEventAction(ConnectionAction actionHandler, ConnectionState futureState) {
-			this.actionHandler = actionHandler;
-			this.futureState = futureState;
-		}
-		
-		public ConnectionAction getActionHandler() {
-			return actionHandler;
-		}
-		public void setActionHandler(ConnectionAction actionHandler) {
-			this.actionHandler = actionHandler;
-		}
-		public ConnectionState getFutureState() {
-			return futureState;
-		}
-		public void setFutureState(ConnectionState futureState) {
-			this.futureState = futureState;
-		}
 	}
 	/**
 	 * populate the FSM lookuptable
@@ -383,6 +400,11 @@ public class XMPPConnectionManager implements IConnectionState {
 			}
 		}
 	}
+	
+	/**
+	 * FSM action handlers
+	 */
+	
 	/**
 	 * Get things rolling. Declared as public to allow reflection.
 	 * 
@@ -406,11 +428,8 @@ public class XMPPConnectionManager implements IConnectionState {
 			Log.d(LOG_TAG, "authenticateConnection");
 		}
 
-		boolean retValue = false;
-		
 		if (!(this.xmppConnection.isConnected() && this.xmppConnection.isAuthenticated())) {
 				this.xmppConnection.connect();
-				
 				this.xmppConnection.login(this.newXmppConnectProps.getUserName(),
 										  this.newXmppConnectProps.getPassword(), 
 										  this.newXmppConnectProps.getNodeResource());
@@ -428,14 +447,17 @@ public class XMPPConnectionManager implements IConnectionState {
 			Log.d(LOG_TAG, "verifyAuthenticatedConnection : " + futureState.name());
 		}
 		if (this.xmppConnection.isConnected() && this.xmppConnection.isAuthenticated()) {
-			this.updateStatus(futureState);
-			this.createConnectionListener();
 			this.setupBroadcastReceiver();
+			this.createConnectionListener();
+			this.updateStatus(futureState);
+		} else {
+			this.addEventToQueue(ConnectionEvent.AttemptConnectionFailure);
+			this.sendLoginFailureIntent(IConnectionState.XMPP_AUTHENTICATION_FAILURE, AUTHENTICATION_FAILURE_MESSAGE);
 		}
 
 	}
 	/**
-	 * Initialise the XMPPConnection. Declared as public to allow refection.
+	 * Initialise the XMPPConnection. Declared as public to allow reflection.
 	 * 
 	 * @param futureState
 	 */
@@ -453,9 +475,21 @@ public class XMPPConnectionManager implements IConnectionState {
 				this.addEventToQueue(ConnectionEvent.AttemptConnectionSuccess);
 			} catch (XMPPException x) {
 				if (DEBUG_LOGGING){
-					Log.d(LOG_TAG, "Unable to authenticate connection");
-					this.addEventToQueue(ConnectionEvent.AttemptConnectionFailure);
+					Log.d(LOG_TAG, "Unable to establish XMPP connection");
 				}
+				
+				if (x.getMessage().contains(XMPP_AUTHENICATION_EXCEPTION_ID)) {
+					this.sendLoginFailureIntent(IConnectionState.XMPP_AUTHENTICATION_FAILURE, IConnectionState.AUTHENTICATION_FAILURE_MESSAGE);
+				} else {
+					this.sendLoginFailureIntent(IConnectionState.XMPP_CONNECTIVITY_FAILURE, CONNECTIVITY_FAILURE_MESSAGE);
+				}
+				this.addEventToQueue(ConnectionEvent.AttemptConnectionFailure);
+			} catch (Exception e) {
+				if (DEBUG_LOGGING){
+					Log.d(LOG_TAG, "Unable to establish XMPP connection");
+				}
+				this.sendLoginFailureIntent(IConnectionState.XMPP_CONNECTIVITY_FAILURE, CONNECTIVITY_FAILURE_MESSAGE);
+				this.addEventToQueue(ConnectionEvent.AttemptConnectionFailure);
 			}
 		}
 	}
@@ -466,9 +500,8 @@ public class XMPPConnectionManager implements IConnectionState {
 		}
 		if (null != this.xmppConnection && this.xmppConnection.isConnected()) {
 			this.xmppConnection.disconnect();
-		} else {
-			this.xmppConnection = null;
-		}
+		} 
+		this.xmppConnection = null;
 	}
 	/**
 	 * Carry out clean up tasks required. Declared as public to allow reflection.
@@ -513,6 +546,7 @@ public class XMPPConnectionManager implements IConnectionState {
 			this.addEventToQueue(ConnectionEvent.AttemptConnection);
 		} else {
 			this.addEventToQueue(ConnectionEvent.NoNetworkFound);
+			this.sendLoginFailureIntent(IConnectionState.XMPP_NO_NETWORK_FOUND_FAILURE, NO_NETWORK_FOUND_MESSAGE);
 		}
 	}
 	
@@ -580,6 +614,10 @@ public class XMPPConnectionManager implements IConnectionState {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "Received action: " + intent.getAction());
+			}
+
 			if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
 
 				boolean unConnected = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
@@ -600,6 +638,8 @@ public class XMPPConnectionManager implements IConnectionState {
 					boolean failover = intent.getBooleanExtra(ConnectivityManager.EXTRA_IS_FAILOVER, false);
 					
 					addEventToQueue(ConnectionEvent.NoNetworkFound);
+					XMPPConnectionManager.this.sendLoginFailureIntent(IConnectionState.XMPP_NO_NETWORK_FOUND_FAILURE, NO_NETWORK_FOUND_MESSAGE);
+
 				}
 			}
 		}
@@ -635,10 +675,11 @@ public class XMPPConnectionManager implements IConnectionState {
      * Unregister the broadcast receiver
      */
     private void teardownBroadcastReceiver() {
-		if (DEBUG_LOGGING) {
-		       Log.d(LOG_TAG, "Tear down connectivity changes broadcast receiver");
-		};
-    	this.context.unregisterReceiver(this.bReceiver);
+		if (null != this.bReceiver) {
+			if (DEBUG_LOGGING) {
+			       Log.d(LOG_TAG, "Tear down connectivity changes broadcast receiver");
+			};
+	    	this.context.unregisterReceiver(this.bReceiver);
+		}
     }
-    
 }

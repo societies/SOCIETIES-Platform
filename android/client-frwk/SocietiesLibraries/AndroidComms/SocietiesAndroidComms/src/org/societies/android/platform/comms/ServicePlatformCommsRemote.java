@@ -16,10 +16,11 @@ public class ServicePlatformCommsRemote extends Service {
 
 	private static final String LOG_TAG = ServicePlatformCommsRemote.class.getName();
 	private Messenger inMessenger;
+	private AndroidCommsBase serviceBase;
 
 	@Override
 	public void onCreate () {
-		AndroidCommsBase serviceBase = new AndroidCommsBase(this, true);
+		serviceBase = new AndroidCommsBase(this, true);
 		
 		this.inMessenger = new Messenger(new RemoteServiceHandler(serviceBase.getClass(), serviceBase, XMPPAgent.methodsArray));
 		Log.d(LOG_TAG, "ServicePlatformCommsRemote creation");
@@ -34,6 +35,7 @@ public class ServicePlatformCommsRemote extends Service {
 	@Override
 	public void onDestroy() {
 		Log.i(LOG_TAG, "ServicePlatformCommsRemote terminating");
+		serviceBase.cleanup();
 	}
 
 

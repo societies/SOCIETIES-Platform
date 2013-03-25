@@ -6,24 +6,19 @@ import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.jivesoftware.smack.XMPPException;
-import org.societies.android.api.comms.Callback;
 import org.societies.android.api.comms.XMPPAgent;
-import org.societies.android.api.events.IAndroidSocietiesEvents;
-import org.societies.android.platform.comms.AndroidCommsBase;
 import org.societies.android.platform.comms.container.ServicePlatformCommsTest;
 import org.societies.android.platform.comms.container.ServicePlatformCommsTest.TestPlatformCommsBinder;
+import org.societies.android.platform.comms.state.IConnectionState;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Parcelable;
 import android.test.ServiceTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.util.Log;
 
-import junit.framework.TestCase;
 
 /**
  * This test suite tests the Android Comms service which provides the gateway to the XMPP Societies communications
@@ -632,7 +627,6 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
         intentFilter.addAction(XMPPAgent.UNREGISTER_EXCEPTION);
         intentFilter.addAction(XMPPAgent.NEW_MAIN_IDENTITY);
         intentFilter.addAction(XMPPAgent.NEW_MAIN_IDENTITY_EXCEPTION);
-        
         return intentFilter;
 
     }
