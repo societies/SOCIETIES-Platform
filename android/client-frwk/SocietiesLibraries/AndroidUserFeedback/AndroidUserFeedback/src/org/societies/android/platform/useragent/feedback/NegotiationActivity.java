@@ -17,6 +17,8 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Respons
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -26,6 +28,8 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -69,7 +73,7 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 		lblHeader.setText("The " + sRequestorType + " is requesting access to your personal info for the following uses. Please select what you would like to allow:");
 		
 		//GENERATE RESOURCE SPINNER
-		List<ResponseItem> responses = eventInfo.getResponsePolicy().getResponseItems();
+		final List<ResponseItem> responses = eventInfo.getResponsePolicy().getResponseItems();
 		String[] resourceItems = new String[responses.size()];
 		for(int i=0; i<responses.size(); i++) {
 			resourceItems[i] = responses.get(i).getRequestItem().getResource().getDataType();
@@ -100,14 +104,44 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 				label.setText(condition.getConditionConstant().value());
 				//DATA TYPE - CHECKBOX/TEXTBOX
 				if (condition.getConditionConstant().value().startsWith("data")) {
-					EditText textbox = new EditText(this);
+					final EditText textbox = new EditText(this);
 					textbox.setText(condition.getValue());
+					textbox.setContentDescription(a + "_" + i);
+					textbox.addTextChangedListener(new TextWatcher() {
+						EditText thisTextBox = textbox;
+						
+						@Override
+						public void onTextChanged(CharSequence s, int start, int before, int count) { }
+						@Override
+						public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+						@Override
+						public void afterTextChanged(Editable s) {
+							String textValue = thisTextBox.getText().toString();
+							String posValues = (String)thisTextBox.getContentDescription();
+							String[] positions = posValues.split("_");
+							int responsePos = Integer.parseInt(positions[0]);
+							int conditionPos = Integer.parseInt(positions[1]);
+							responses.get(responsePos).getRequestItem().getConditions().get(conditionPos).setValue(textValue);
+						}
+					});
 					requestControls[i] = textbox; 
 				}
 				else {
 					CheckBox checkbox = new CheckBox(this);
 					checkbox.setChecked(true);
 					checkbox.setEnabled(optional);
+					checkbox.setContentDescription(a + "_" + i);
+					checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+						@Override
+						public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+							String conditionValue = (isChecked ? "YES" : "NO");
+							String posValues = (String)buttonView.getContentDescription();
+							String[] positions = posValues.split("_");
+							int responsePos = Integer.parseInt(positions[0]);
+							int conditionPos = Integer.parseInt(positions[1]);
+							responses.get(responsePos).getRequestItem().getConditions().get(conditionPos).setValue(conditionValue);
+						}
+					});
 					requestControls[i] = checkbox;
 				}				
 				TableRow row = new TableRow(this);
