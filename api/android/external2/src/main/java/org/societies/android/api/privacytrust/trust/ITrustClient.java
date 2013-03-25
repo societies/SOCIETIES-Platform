@@ -26,8 +26,9 @@ package org.societies.android.api.privacytrust.trust;
 
 import java.io.Serializable;
 
+import org.societies.android.api.common.ADate;
 import org.societies.android.api.css.manager.IServiceManager;
-import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceTypeBean;
+import org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
 
 /**
@@ -39,21 +40,20 @@ import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
 public interface ITrustClient extends IServiceManager {
 	
 	public static final String INTENT_RETURN_VALUE_KEY = 
-			"org.societies.android.api.privacytrust.trust.ReturnValue";
+			"org.societies.android.privacytrust.trust.ReturnValue";
     public static final String INTENT_RETURN_STATUS_KEY = 
-    		"org.societies.android.api.privacytrust.trust.ReturnStatus";
+    		"org.societies.android.privacytrust.trust.ReturnStatus";
     
     public static final String RETRIEVE_TRUST_VALUE = 
     		"org.societies.android.api.privacytrust.trust.RETRIEVE_TRUST_VALUE";
-    public static final String ADD_TRUST_EVIDENCE = 
+    public static final String ADD_DIRECT_TRUST_EVIDENCE = 
     		"org.societies.android.api.privacytrust.trust.ADD_TRUST_EVIDENCE";
 
     String methodsArray [] = {
     		"retrieveTrust(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId)",
-            "addTrustEvidence(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean subjectId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean objectId, org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceTypeBean type, org.societies.android.api.privacytrust.trust.ADate timestamp, Serializable info",
+            "addDirectTrustEvidence(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean subjectId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean objectId, org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean type, org.societies.android.api.common.ADate timestamp, Serializable info",
 			"startService()",
-			"stopService()"
-            };
+			"stopService()" };
 
 	/**
 	 * Retrieves the trust value which the specified trustor has assigned to the
@@ -73,7 +73,7 @@ public interface ITrustClient extends IServiceManager {
 			final TrustedEntityIdBean trustorId, final TrustedEntityIdBean trusteeId);
 	
 	/**
-	 * Adds the specified piece of trust evidence. The
+	 * Adds the specified piece of direct trust evidence. The
 	 * {@link ATrustedEntityId ATrustedEntityIds} of the subject and the object
 	 * this piece of evidence refers to, its type, as well as, the time the
 	 * evidence was recorded are also supplied. Finally, depending on the
@@ -99,7 +99,7 @@ public interface ITrustClient extends IServiceManager {
 	 *            timestamp parameter is <code>null</code>.
 	 * @since 0.5
 	 */
-	public void addTrustEvidence(final String client, 
+	public void addDirectTrustEvidence(final String client, 
 			final TrustedEntityIdBean subjectId, final TrustedEntityIdBean objectId,
 			final TrustEvidenceTypeBean type, final ADate timestamp, 
 			final Serializable info);

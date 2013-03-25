@@ -41,7 +41,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.schema.sns.socialdata.ConnectorBean;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataMessageBean;
 import org.societies.api.internal.schema.sns.socialdata.SocialdataResultBean;
-import org.societies.api.internal.schema.sns.socialdata.Socialnetwork;
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 import org.societies.platform.socialdata.utils.SocialDataCommsUtils;
 
 import android.app.Service;
@@ -107,7 +107,7 @@ public class SocialData extends Service implements ISocialData {
     public boolean startService() {
     	if (!connectedToComms) {
         	//NOT CONNECTED TO COMMS SERVICE YET
-        	Log.d(LOG_TAG, "CisDirectoryBase startService binding to comms");
+        	Log.d(LOG_TAG, "SocialData startService binding to comms");
 	        this.commMgr.bindCommsService(new IMethodCallback() {	
 				@Override
 				public void returnAction(boolean resultFlag) {
@@ -126,6 +126,11 @@ public class SocialData extends Service implements ISocialData {
 							}
 							@Override
 							public void returnAction(String result) { }
+							@Override
+							public void returnException(String result) {
+								// TODO Auto-generated method stub
+							}
+
 						});
 					} else {
 						Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
@@ -135,6 +140,11 @@ public class SocialData extends Service implements ISocialData {
 				}	
 				@Override
 				public void returnAction(String result) { }
+				@Override
+				public void returnException(String result) {
+					// TODO Auto-generated method stub
+				}
+
 			});
         }
     	else {
@@ -148,7 +158,7 @@ public class SocialData extends Service implements ISocialData {
     public boolean stopService() {
     	if (connectedToComms) {
         	//UNREGISTER AND DISCONNECT FROM COMMS
-        	Log.d(LOG_TAG, "CisDirectoryBase stopService unregistering namespaces");
+        	Log.d(LOG_TAG, "SocialData stopService unregistering namespaces");
         	commMgr.unregister(ELEMENT_NAMES, NAME_SPACES, new IMethodCallback() {
 				@Override
 				public void returnAction(boolean resultFlag) {
@@ -163,6 +173,11 @@ public class SocialData extends Service implements ISocialData {
 				}	
 				@Override
 				public void returnAction(String result) { }
+				@Override
+				public void returnException(String result) {
+					// TODO Auto-generated method stub
+				}
+
 			});
         }
     	else {
@@ -186,7 +201,7 @@ public class SocialData extends Service implements ISocialData {
 	}
 
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>ISocialData>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	public void addSocialConnector(String client, Socialnetwork socialNetwork, String token, long validity) {
+	public void addSocialConnector(String client, SocialNetwork socialNetwork, String token, long validity) {
 		Log.d(LOG_TAG, "addSocialConnector");	
 		
 		if (connectedToComms) {

@@ -481,11 +481,12 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 		public void onReceive(Context context, Intent intent) {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
 			
-			if (intent.getAction().equals(XMPPAgent.LOGIN)) {
-				assertNull(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+			if (intent.getAction().equals(XMPPAgent.LOGIN_EXCEPTION)) {
+				assertNotNull(intent.getStringExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY));
+				Log.d(LOG_TAG, intent.getStringExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY));
 				TestCommBase.this.testCompleted = true;
 				TestCommBase.this.latch.countDown();
-				
+
 			} else if (intent.getAction().equals(XMPPAgent.LOGOUT)) {
 				assertTrue(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 
@@ -504,11 +505,12 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 		public void onReceive(Context context, Intent intent) {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
 			
-			if (intent.getAction().equals(XMPPAgent.LOGIN)) {
-				assertNull(intent.getStringExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY));
+			if (intent.getAction().equals(XMPPAgent.LOGIN_EXCEPTION)) {
+				assertNotNull(intent.getStringExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY));
+				Log.d(LOG_TAG, intent.getStringExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY));
 				TestCommBase.this.testCompleted = true;
 				TestCommBase.this.latch.countDown();
-				
+
 			} else if (intent.getAction().equals(XMPPAgent.LOGOUT)) {
 				assertTrue(intent.getBooleanExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, false));
 
@@ -607,21 +609,29 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
         IntentFilter intentFilter = new IntentFilter();
         
         intentFilter.addAction(XMPPAgent.UN_REGISTER_COMM_MANAGER_RESULT);
+        intentFilter.addAction(XMPPAgent.UN_REGISTER_COMM_MANAGER_EXCEPTION);
         intentFilter.addAction(XMPPAgent.DESTROY_MAIN_IDENTITY);
         intentFilter.addAction(XMPPAgent.GET_DOMAIN_AUTHORITY_NODE);
         intentFilter.addAction(XMPPAgent.GET_IDENTITY);
         intentFilter.addAction(XMPPAgent.GET_ITEMS_RESULT);
+        intentFilter.addAction(XMPPAgent.GET_ITEMS_ERROR);
+        intentFilter.addAction(XMPPAgent.GET_ITEMS_EXCEPTION);
+        intentFilter.addAction(XMPPAgent.SEND_IQ_RESULT);
+        intentFilter.addAction(XMPPAgent.SEND_IQ_ERROR);
+        intentFilter.addAction(XMPPAgent.SEND_IQ_EXCEPTION);
+        intentFilter.addAction(XMPPAgent.SEND_MESSAGE_RESULT);
+        intentFilter.addAction(XMPPAgent.SEND_MESSAGE_EXCEPTION);
         intentFilter.addAction(XMPPAgent.IS_CONNECTED);
         intentFilter.addAction(XMPPAgent.LOGIN);
+        intentFilter.addAction(XMPPAgent.LOGIN_EXCEPTION);
         intentFilter.addAction(XMPPAgent.LOGOUT);
-        intentFilter.addAction(XMPPAgent.UN_REGISTER_COMM_MANAGER_EXCEPTION);
-        intentFilter.addAction(XMPPAgent.NEW_MAIN_IDENTITY);
         intentFilter.addAction(XMPPAgent.CONFIGURE_AGENT);
         intentFilter.addAction(XMPPAgent.REGISTER_RESULT);
+        intentFilter.addAction(XMPPAgent.REGISTER_EXCEPTION);
         intentFilter.addAction(XMPPAgent.UNREGISTER_RESULT);
-        intentFilter.addAction(XMPPAgent.SEND_IQ_RESULT);
-        intentFilter.addAction(XMPPAgent.SEND_MESSAGE_RESULT);
-        intentFilter.addAction(XMPPAgent.PUBSUB_EVENT);
+        intentFilter.addAction(XMPPAgent.UNREGISTER_EXCEPTION);
+        intentFilter.addAction(XMPPAgent.NEW_MAIN_IDENTITY);
+        intentFilter.addAction(XMPPAgent.NEW_MAIN_IDENTITY_EXCEPTION);
         
         return intentFilter;
 

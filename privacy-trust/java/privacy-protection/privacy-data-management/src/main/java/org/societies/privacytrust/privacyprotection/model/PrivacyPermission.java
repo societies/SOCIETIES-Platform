@@ -37,10 +37,10 @@ import javax.persistence.Table;
 
 
 import org.societies.api.context.model.MalformedCtxIdentifierException;
-import org.societies.api.identity.DataIdentifierFactory;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.identity.util.DataIdentifierFactory;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;

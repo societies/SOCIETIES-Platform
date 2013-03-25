@@ -110,6 +110,11 @@ public class FriendsManagerBase implements IFriendsManager {
 							}
 							@Override
 							public void returnAction(String result) { }
+							@Override
+							public void returnException(String result) {
+								// TODO Auto-generated method stub
+							}
+
 						});
 					} else {
 						Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
@@ -119,6 +124,11 @@ public class FriendsManagerBase implements IFriendsManager {
 				}	
 				@Override
 				public void returnAction(String result) { }
+				@Override
+				public void returnException(String result) {
+					// TODO Auto-generated method stub
+				}
+
 			});
         }
     	else {
@@ -147,6 +157,11 @@ public class FriendsManagerBase implements IFriendsManager {
 				}	
 				@Override
 				public void returnAction(String result) { }
+				@Override
+				public void returnException(String result) {
+					// TODO Auto-generated method stub
+				}
+
 			});
         }
     	else {
@@ -255,7 +270,7 @@ public class FriendsManagerBase implements IFriendsManager {
 
 	@Override
 	public void acceptFriendRequest(String client, String cssId) {
-		Log.d(LOG_TAG, "shareService called by client: " + client);
+		Log.d(LOG_TAG, "acceptFriendRequest called by client: " + client);
 		AsyncFriendRequests methodAsync = new AsyncFriendRequests();
 		String params[] = {client, cssId, IAndroidCSSManager.ACCEPT_FRIEND_REQUEST};
 		methodAsync.execute(params);

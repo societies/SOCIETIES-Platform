@@ -43,19 +43,21 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 	<!-- All Spring-OSGi Java projects to be included in nightly builds -->
 	<modules>
-		<!-- API -->
-		<module>../../api/java/internal</module>
+		
 		
 		<!-- SNS Connectors -->
-		<module>TwitterConnector</module>
-		<module>FoursquareConnector</module>
-		<module>FacebookConn</module>
-		<module>LinkedinConn</module>
-		<module>GooglePlusConnector</module>
-		<module>socialdata</module>
+		<module>connectors/TwitterConnector</module>
+		<module>connectors/FoursquareConnector</module>
+		<module>connectors/FacebookConnector</module>
+		<module>connectors/LinkedinConnector</module>
+		<module>connectors/GooglePlusConnector</module>
 		
 		<!-- Communications Infrastructure -->
 		<module>SocialDataComms</module>
-		<module>SocialDataCommsMgr</module>
+		
+		<module>socialdata</module>
+		
+		
+		
 	</modules>
 </project>

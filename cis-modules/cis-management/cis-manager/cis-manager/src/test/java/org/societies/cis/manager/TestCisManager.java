@@ -45,9 +45,7 @@ import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.cis.management.*;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
-import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.*;
 import org.societies.api.identity.IIdentityManager;
@@ -59,7 +57,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataMan
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
-import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
@@ -350,9 +347,9 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		//acitivity feed mocking
 		
 		when(mockActivityFeedManager.deleteFeed(anyString(), anyString())).thenReturn(true);
-		when(mockActivityFeedManager.getOrCreateFeed(anyString(), eq(TEST_CISID_1))).thenReturn(mockActivityFeed_1);
-		when(mockActivityFeedManager.getOrCreateFeed(anyString(), eq(TEST_CISID_2))).thenReturn(mockActivityFeed_2);
-		when(mockActivityFeedManager.getOrCreateFeed(anyString(), eq(TEST_CISID_3))).thenReturn(mockActivityFeed_3);
+		when(mockActivityFeedManager.getOrCreateFeed(anyString(), eq(TEST_CISID_1), eq(true))).thenReturn(mockActivityFeed_1);
+		when(mockActivityFeedManager.getOrCreateFeed(anyString(), eq(TEST_CISID_2), eq(true))).thenReturn(mockActivityFeed_2);
+		when(mockActivityFeedManager.getOrCreateFeed(anyString(), eq(TEST_CISID_3), eq(true))).thenReturn(mockActivityFeed_3);
 				
 
 		

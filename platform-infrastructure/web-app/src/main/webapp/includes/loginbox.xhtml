@@ -11,9 +11,9 @@
         </div>
 
         <div id="login-box" class="login-popup">
-            <a href="#" class="close"><img src="images/close_pop.png" class="btn_close"
-                                           title="Close Window"
-                                           alt="Close"/></a>
+            <a href="#" class="close"><h:graphicImage url="images/close_pop.png" class="btn_close"
+                                                      title="Close Window"
+                                                      alt="Close"/></a>
             <fieldset class="textbox">
                 <label class="username">
                     <span>Username</span>
@@ -26,8 +26,9 @@
                 <h:inputSecret id="password" path="password" placeholder="Password" width="100%"
                                value="#{loginController.loginDialogPassword}"/>
 
-                <h:commandButton class="submit button"
-                                 actionListener="#{loginController.loginButtonAction()}">Sign in</h:commandButton>
+                <h:commandButton value="Sign in"
+                                 class="submit button"
+                                 actionListener="#{loginController.loginButtonAction()}"/>
 
                 <p>Don't have a login?
                     <a class="" href="new_account.xhtml">Sign Up</a>
@@ -38,9 +39,9 @@
 
     <!-- LOGOUT INCLUDE - only displayed if logged in -->
     <ui:fragment rendered="#{loginController.loggedIn}">
-        <div class="login-form"><span>
+        <div class="login-form">
             Logged in as <strong><h:outputText value="#{loginController.username}"/></strong>
-            </span>
+            <h:commandLink action="#{loginController.logoutAction}">LOGOUT</h:commandLink>
         </div>
     </ui:fragment>
 </ui:composition>

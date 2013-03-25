@@ -25,6 +25,9 @@
 package org.societies.integration.test;
 
 import org.junit.runner.Result;
+import org.societies.integration.test.userfeedback.UserFeedbackMocker;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Specific test case class for integration test
@@ -51,6 +54,15 @@ public abstract class IntegrationTestCase {
 	 * Test case classes to launch on Virgo for this integration test case
 	 */
 	public final Class testCaseClasses[];
+	/**
+	 * Parameter : timeout
+	 */
+	private static int timeout;
+	/**
+	 * Parameter : user feedback mock manager
+	 * disabled by default
+	 */
+	private static UserFeedbackMocker userFeedbackMocker;
 	
 	/**
 	 * This constructor specifies the test case number
@@ -60,6 +72,7 @@ public abstract class IntegrationTestCase {
 		this.testCaseNumber = testCaseNumber;
 		this.testCaseClasses = testCaseClasses;
 		integrationTestUtils = new IntegrationTestUtils();
+		timeout = 5000;
 	}
 	
 	
@@ -72,5 +85,22 @@ public abstract class IntegrationTestCase {
 	 */
 	public Result run() {
 		return integrationTestUtils.run(testCaseNumber, testCaseClasses);
+	}
+	
+	
+	/* --- Dependency Injection --- */
+	public static int getTimeout() {
+		return timeout;
+	}
+	@Value("${timeout:2000}")
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
+	}
+	public static UserFeedbackMocker getUserFeedbackMocker() {
+		return userFeedbackMocker;
+	}
+	@Autowired
+	public void setUserFeedbackMocker(UserFeedbackMocker userFeedbackMocker) {
+		this.userFeedbackMocker = userFeedbackMocker;
 	}
 }

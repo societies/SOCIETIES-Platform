@@ -33,15 +33,15 @@ public class CreateCommunityCtx {
 
 	private static Logger LOG = LoggerFactory.getLogger(Test1108.class);
 
-	private IIdentity cssIDXCManager; 
-	private IIdentity cssIDJohn;
+	private IIdentity cssIDUniversity; 
+	private IIdentity cssIDEmma;
 
 	//private CommunityCtxEntity communityEntity;
-	private String targetXCManager = "XCManager.societies.local";
-	private String targetJohn = "john.societies.local";
+	private String targetUniversity = "University.ict-societies.eu";
+	private String targetEmma = "emma.ict-societies.eu";
 	
-	private IndividualCtxEntity XCManager;
-	private IndividualCtxEntity John;
+	private IndividualCtxEntity University;
+	private IndividualCtxEntity Emma;
 
 	private CtxAttributeIdentifier communityAttrTemperatureId = null;
 	private CtxAttributeIdentifier communityAttrInterestsId = null;
@@ -52,7 +52,7 @@ public class CreateCommunityCtx {
 	public ICommManager commManager;
 	//private INetworkNode cssNodeId;
 
-	//String cssPassword = "password.societies.local";
+	//String cssPassword = "password.ict-societies.eu";
 
 	public void setUp(){
 
@@ -75,38 +75,38 @@ public class CreateCommunityCtx {
 		CommunityCtxEntity communityEntity = null;
 
 		try {
-			this.cssIDXCManager = this.commManager.getIdManager().fromJid(targetXCManager);
-			this.cssIDJohn = this.commManager.getIdManager().fromJid(targetJohn);
+			this.cssIDUniversity = this.commManager.getIdManager().fromJid(targetUniversity);
+			this.cssIDEmma = this.commManager.getIdManager().fromJid(targetEmma);
 			
-			XCManager = this.ctxBroker.retrieveIndividualEntity(this.cssIDXCManager).get();
-			List<CtxIdentifier> XCManagerInterestList = this.ctxBroker.lookup(XCManager.getId(), CtxModelType.ATTRIBUTE, CtxAttributeTypes.INTERESTS).get();
-			CtxAttribute XCManagerInterestAttr = null;
+			University = this.ctxBroker.retrieveIndividualEntity(this.cssIDUniversity).get();
+			List<CtxIdentifier> UniversityInterestList = this.ctxBroker.lookup(University.getId(), CtxModelType.ATTRIBUTE, CtxAttributeTypes.INTERESTS).get();
+			CtxAttribute UniversityInterestAttr = null;
 			
-			if (XCManagerInterestList.size() ==0){
-				XCManagerInterestAttr = this.ctxBroker.createAttribute(XCManager.getId(), CtxAttributeTypes.INTERESTS).get();
+			if (UniversityInterestList.size() ==0){
+				UniversityInterestAttr = this.ctxBroker.createAttribute(University.getId(), CtxAttributeTypes.INTERESTS).get();
 			} else {
-				XCManagerInterestAttr = (CtxAttribute) this.ctxBroker.retrieve(XCManagerInterestList.get(0)).get();
+				UniversityInterestAttr = (CtxAttribute) this.ctxBroker.retrieve(UniversityInterestList.get(0)).get();
 			}
-			XCManagerInterestAttr.setStringValue("reading,socialnetworking,cinema,sports");
-			CtxAttribute XCManagerInterestsAttrUpdated = (CtxAttribute) this.ctxBroker.update(XCManagerInterestAttr).get();
+			UniversityInterestAttr.setStringValue("reading,socialnetworking,cinema,sports");
+			CtxAttribute UniversityInterestsAttrUpdated = (CtxAttribute) this.ctxBroker.update(UniversityInterestAttr).get();
 			
-			// john's interest (remote comm will initiate)
-			LOG.info("john identity : " + this.cssIDJohn.toString());
-			CtxEntityIdentifier johnEntityID = this.ctxBroker.retrieveIndividualEntityId(null, this.cssIDJohn).get();
-			LOG.info("john entity id : " + johnEntityID.toString());
-			//List<CtxIdentifier> johnInterestList = this.ctxBroker.lookup(johnEntityID, CtxModelType.ATTRIBUTE,CtxAttributeTypes.INTERESTS).get();
-			List<CtxIdentifier> johnInterestList = this.ctxBroker.lookup(null, this.cssIDJohn, CtxModelType.ATTRIBUTE,CtxAttributeTypes.INTERESTS).get();
+			// emma's interest (remote comm will initiate)
+			LOG.info("emma identity : " + this.cssIDEmma.toString());
+			CtxEntityIdentifier emmaEntityID = this.ctxBroker.retrieveIndividualEntityId(null, this.cssIDEmma).get();
+			LOG.info("emma entity id : " + emmaEntityID.toString());
+			//List<CtxIdentifier> emmaInterestList = this.ctxBroker.lookup(emmaEntityID, CtxModelType.ATTRIBUTE,CtxAttributeTypes.INTERESTS).get();
+			List<CtxIdentifier> emmaInterestList = this.ctxBroker.lookup(null, this.cssIDEmma, CtxModelType.ATTRIBUTE,CtxAttributeTypes.INTERESTS).get();
 			
-			CtxAttribute johnInterestAttr = null;
+			CtxAttribute emmaInterestAttr = null;
 			
-			if( johnInterestList.size() == 0){
-				johnInterestAttr = this.ctxBroker.createAttribute(johnEntityID, CtxAttributeTypes.INTERESTS).get();
+			if( emmaInterestList.size() == 0){
+				emmaInterestAttr = this.ctxBroker.createAttribute(emmaEntityID, CtxAttributeTypes.INTERESTS).get();
 			} else {
-				johnInterestAttr = (CtxAttribute) this.ctxBroker.retrieve(johnInterestList.get(0)).get();
+				emmaInterestAttr = (CtxAttribute) this.ctxBroker.retrieve(emmaInterestList.get(0)).get();
 			}
-			johnInterestAttr.setStringValue("cooking,horseRiding,restaurants,cinema");
+			emmaInterestAttr.setStringValue("cooking,horseRiding,restaurants,cinema");
 
-			CtxAttribute johnInterestAttrUpdated = (CtxAttribute) this.ctxBroker.update(johnInterestAttr).get();
+			CtxAttribute emmaInterestAttrUpdated = (CtxAttribute) this.ctxBroker.update(emmaInterestAttr).get();
 			
 			//Create CIS
 			
@@ -116,10 +116,10 @@ public class CreateCommunityCtx {
 			
 			LOG.info("try to retrieve ctxCommunityEntity of cisID : " + cisID );
 			
-//			//IIdentity cisID = Test1108.getCommManager().getIdManager().fromJid("cis-05ecbe3d-9577-445d-a652-a3ea2beeb7f2.societies.local");
-//			//IIdentity cisID = ('cis-05ecbe3d-9577-445d-a652-a3ea2beeb7f2.societies.local');
+//			//IIdentity cisID = Test1108.getCommManager().getIdManager().fromJid("cis-05ecbe3d-9577-445d-a652-a3ea2beeb7f2.ict-societies.eu");
+//			//IIdentity cisID = ('cis-05ecbe3d-9577-445d-a652-a3ea2beeb7f2.ict-societies.eu');
 //			//LOG.info("#@#@# Cis id "+cisID);
-//			LOG.info("#@#@# Test id "+cisID); //cis-05ecbe3d-9577-445d-a652-a3ea2beeb7f2.societies.local
+//			LOG.info("#@#@# Test id "+cisID); //cis-05ecbe3d-9577-445d-a652-a3ea2beeb7f2.ict-societies.eu
 //			//communityEntity = Test1108.getCtxBroker().createCommunityEntity(cisID).get();
 //			communityEntity = Test1108.getCtxBroker().createCommunityEntity(cisID).get();
 //			LOG.info("gCommunity Entity Created");
@@ -131,7 +131,7 @@ public class CreateCommunityCtx {
 			communityEntity = (CommunityCtxEntity) this.ctxBroker.retrieve(ctxCommunityEntityIdentifier).get();
 			LOG.info("ctxCommunityEntity members : " + communityEntity.getMembers());
 			
-			// only xcManager is member of the cis community, manually add john
+			// only university is member of the cis community, manually add emma
 			// this should be removed
 			
 			if (communityEntity.getMembers().size()==1){
@@ -141,7 +141,7 @@ public class CreateCommunityCtx {
 					for (CtxAssociationIdentifier assocID:comAssocIdSet){
 						hasMembersAssoc = (CtxAssociation) this.ctxBroker.retrieve(assocID).get();
 					}
-					hasMembersAssoc.addChildEntity(johnEntityID);
+					hasMembersAssoc.addChildEntity(emmaEntityID);
 					hasMembersAssoc = (CtxAssociation) this.ctxBroker.update(hasMembersAssoc).get(); 
 				}
 			}

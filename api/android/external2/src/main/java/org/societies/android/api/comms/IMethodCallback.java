@@ -16,4 +16,9 @@ public interface IMethodCallback {
 	 * @param result
 	 */
 	void returnAction(String result);
+	/**
+	 * A generic method to receive the callback exception
+	 * @param result
+	 */
+	void returnException(String result);
 }

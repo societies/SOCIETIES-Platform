@@ -79,6 +79,7 @@
     						!com.sun.xml.fastinfoset.*,
     						org.slf4j*;version="1.5.8",
     						org.simpleframework.xml.stream,
+    						org.hibernate.proxy;resolution:=optional,
     						*;resolution:=optional
     					</Import-Package>
     					<Export-Package>

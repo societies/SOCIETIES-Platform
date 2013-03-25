@@ -23,6 +23,7 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	 * as called methods usually involve making asynchronous calls. 
 	 */
 	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.platform.events.ReturnValue";
+	public static final String INTENT_EXCEPTION_VALUE_KEY = "org.societies.android.platform.events.ExceptionValue";
 
 	public static final String PUBLISH_EVENT = "org.societies.android.platform.events.PUBLISH_EVENT";
 	public static final String SUBSCRIBE_TO_ALL_EVENTS = "org.societies.android.platform.events.SUBSCRIBE_TO_ALL_EVENTS";
@@ -32,6 +33,15 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	public static final String UNSUBSCRIBE_FROM_EVENT = "org.societies.android.platform.events.UNSUBSCRIBE_FROM_EVENT";
 	public static final String UNSUBSCRIBE_FROM_EVENTS = "org.societies.android.platform.events.UNSUBSCRIBE_FROM_EVENTS";
 	public static final String NUM_EVENT_LISTENERS = "org.societies.android.platform.events.NUM_EVENT_LISTENERS";
+	public static final String CREATE_EVENT = "org.societies.android.platform.events.CREATE_EVENT";
+	public static final String DELETE_EVENT = "org.societies.android.platform.events.DELETE_EVENT";
+	/**
+	 * Invalid values to signify that invalid parameters have been provided to the remote service
+	 */
+	public static final int INVALID_PUBSUB_NODE = 0;
+	public static final int INVALID_SOCIETIES_INTENT = 1;
+	public static final int INVALID_SOCIETIES_INTENT_ALREADY_EXISTS = 2;
+	public static final int INVALID_PUBSUB_NODE_ALREADY_EXISTS = 3;
 
 	/**
 	 * Android intent Societies platform Pubsub related intents 
@@ -54,15 +64,14 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	final static String DEVICE_MANAGER_EVENTING_NODE_NAME_INTENT  = "org.societies.android.device.manager.EVENTING_NODE_NAME";	
 	
 	//UserFeedback intents
-	final static String USER_FEEDBACK_EXPLICIT_RESPONSE_INTENT = "org.societies.useragent.feedback.event.EXPLICIT_RESPONSE"; 
-	final static String USER_FEEDBACK_IMPLICIT_RESPONSE_INTENT = "org.societies.useragent.feedback.event.IMPLICIT_RESPONSE";
-	final static String USER_FEEDBACK_REQUEST_INTENT 		   = "org.societies.useragent.feedback.event.REQUEST"; 
-	final static String USER_FEEDBACK_SHOW_NOTIFICATION_INTENT = "org.societies.useragent.feedback.event.SHOW_NOTIFICATION_INTENT";
+	final static String UF_PRIVACY_NEGOTIATION_REQUEST_INTENT  = "org.societies.useragent.feedback.privacyNegotiation";
+	final static String UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT = "org.societies.useragent.feedback.privacyNegotiationResponse";
 	
 	//Array of Societies Android Pubsub Intents
 	//N.B. Must be in same order as societiesAndroidEvents array to allow successful translation
 	//N.B. These events must be created at Virgo container start-up
-	final static String societiesAndroidIntents [] = {CONTEXT_MANAGER_CREATED_INTENT,
+	final static String societiesAndroidIntents [] = {
+										 CONTEXT_MANAGER_CREATED_INTENT,
 										 CONTEXT_MANAGER_UPDATED_INTENT,
 										 CONTEXT_MANAGER_MODIFIED_INTENT,
 										 CONTEXT_MANAGER_REMOVED_INTENT,
@@ -73,10 +82,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 										 DEVICE_MANAGER_DEVICE_REGISTERED_INTENT,
 										 DEVICE_MANAGER_DEVICE_DISCONNECTED_INTENT,
 										 DEVICE_MANAGER_EVENTING_NODE_NAME_INTENT,
-										 USER_FEEDBACK_EXPLICIT_RESPONSE_INTENT,
-										 USER_FEEDBACK_IMPLICIT_RESPONSE_INTENT,
-										 USER_FEEDBACK_REQUEST_INTENT,
-										 USER_FEEDBACK_SHOW_NOTIFICATION_INTENT
+										 UF_PRIVACY_NEGOTIATION_REQUEST_INTENT,
+										 UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT
 										 };
 	
 	/**
@@ -100,14 +107,13 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	final static String DEVICE_MANAGER_EVENTING_NODE_NAME_EVENT  = "EVENTING_NODE_NAME";
 
 	//UserFeedback pubsub nodes
-	final static String USER_FEEDBACK_EXPLICIT_RESPONSE_EVENT = "org/societies/useragent/feedback/event/EXPLICIT_RESPONSE"; 
-	final static String USER_FEEDBACK_IMPLICIT_RESPONSE_EVENT = "org/societies/useragent/feedback/event/IMPLICIT_RESPONSE";
-	final static String USER_FEEDBACK_REQUEST_EVENT = "org/societies/useragent/feedback/event/REQUEST"; 
-	final static String USER_FEEDBACK_SHOW_NOTIFICATION_EVENT = "org/societies/useragent/feedback/event/SHOW_NOTIFICATION_EVENT"; 
+	final static String UF_PRIVACY_NEGOTIATION_REQUEST_EVENT  = "org/societies/useragent/feedback/privacyNegotiation";
+	final static String UF_PRIVACY_NEGOTIATION_RESPONSE_EVENT = "org/societies/useragent/feedback/privacyNegotiationResponse";
 	
 	//N.B. Must be in same order as societiesAndroidIntents array to allow successful translation
 	//N.B. These events must be created at Virgo container start-up
-	final static String societiesAndroidEvents [] = {CONTEXT_MANAGER_CREATED_EVENT,
+	final static String societiesAndroidEvents [] = {
+										 CONTEXT_MANAGER_CREATED_EVENT,
 										 CONTEXT_MANAGER_UPDATED_EVENT,
 										 CONTEXT_MANAGER_MODIFIED_EVENT,
 										 CONTEXT_MANAGER_REMOVED_EVENT,
@@ -118,10 +124,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 										 DEVICE_MANAGER_DEVICE_REGISTERED_EVENT,
 										 DEVICE_MANAGER_DEVICE_DISCONNECTED_EVENT,
 										 DEVICE_MANAGER_EVENTING_NODE_NAME_EVENT,
-										 USER_FEEDBACK_EXPLICIT_RESPONSE_EVENT,
-										 USER_FEEDBACK_IMPLICIT_RESPONSE_EVENT,
-										 USER_FEEDBACK_REQUEST_EVENT,
-										 USER_FEEDBACK_SHOW_NOTIFICATION_EVENT
+										 UF_PRIVACY_NEGOTIATION_REQUEST_EVENT,
+										 UF_PRIVACY_NEGOTIATION_RESPONSE_EVENT
 										 };
 
 	//Array of interface method signatures
@@ -135,7 +139,9 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 			"publishEvent(String client, String societiesIntent, Object payload)",
 			"getNumSubscribedNodes(String client)",
 			"startService()",
-			"stopService()"
+			"stopService()",
+			"createEvent(String client, String pubsubNode, String societiesIntent)",
+			"deleteEvent(String client, String pubsubNode)"
 	};
 
 	//Pubsub event payload classes
@@ -143,9 +149,9 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	static final String CSS_MANAGER_CLASS 	= "org.societies.api.schema.cssmanagement.CssEvent";
 	static final String CONTEXT_CLASS 		= "org.societies.api.schema.context.model.CtxIdentifierBean";
 	static final String FRIEND_EVENT_CLASS 	= "org.societies.api.schema.css.directory.CssFriendEvent";
-	static final String USER_FEEDBACK_EXP_RES_EVENT_CLASS = "org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean";
+	static final String UF_PRIVACY_CLASS 	= "org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent"; 
 	//N.B. Add any new event payload classes to this array - order is unimportant
-	final static String pubsubPayloadClasses [] = {CSS_MANAGER_CLASS, CONTEXT_CLASS, FRIEND_EVENT_CLASS, USER_FEEDBACK_EXP_RES_EVENT_CLASS};
+	final static String pubsubPayloadClasses [] = {CSS_MANAGER_CLASS, CONTEXT_CLASS, FRIEND_EVENT_CLASS, UF_PRIVACY_CLASS};
 	
 	final static String GENERIC_INTENT_PAYLOAD_KEY = "Pubsub_Payload_Key";
 	
@@ -226,7 +232,24 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	 * Obtain the current number of subscribed to events
 	 * 
 	 * @param client
-	 * @return int number of subscribed to events
+	 * @return int number of subscribed to events - returned via Android intent
 	 */
 	int getNumSubscribedNodes(String client);
+	
+	/**
+	 * Create a new Societies Pubsub node
+	 * @param client
+	 * @param pubsubNode Pubsub node to be used in Societies, e.g. org.3rdpartyservice.sampleevent
+	 * @param societiesIntent should use Societies format , i.e. org.societies.3rdpartyservice.sampleevent
+	 * @return boolean - returned via Android intent
+	 */
+	boolean createEvent(String client, String pubsubNode, String societiesIntent);
+	/**
+	 * Delete a Societies Pubsub node. Can only be used to delete Pubsub nodes previously created by the same client.
+	 * 
+	 * @param client
+	 * @param pubsubNode Pubsub node to be used in Societies, e.g. org.3rdpartyservice.sampleevent
+	 * @return boolean - returned via Android intent
+	 */
+	boolean deleteEvent(String client, String pubsubNode);
 }

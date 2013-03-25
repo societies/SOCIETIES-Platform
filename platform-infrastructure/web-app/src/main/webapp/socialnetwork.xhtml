@@ -10,12 +10,112 @@
 
     <ui:define name="body">
 
-        <p:commandButton value="Message!" actionListener="#{exampleController.showMeAMessage}"/>
-
-        <br/> <br/>
-
-        <p:outputLabel for="stringField">String field</p:outputLabel>
-        <p:inputText id="stringField" value="#{exampleController.stringProperty}"/>
+        <div class="hr grid_12 clearfix">&nbsp;</div>
+		<!-- Left Column -->
+		<section id="left_col" class="grid_8">
+			<div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a></div>
+			<section>	
+			<h4 class="form_title">Your Social Networks</h4>
+			<div class="hr dotted clearfix">&nbsp;</div>
+			<h6>Connected Networks</h6>
+			<ol class="keyinfolist">
+				<li class="keyinfo">
+					<figure class="gravatar">
+						<a href="#"><img alt="" src="images/Facebook.png" height="48" width="48" /></a>
+						<a class="keyinfo-reply-link" href="#">INFO</a>
+					</figure>
+					<div class="keyinfo_content">
+						<div class="clearfix">
+							<time datetime="2012-09-30T00:01Z" class="keyinfo-meta keyinfometadata">Location, Sep 30, 2012 at 0:01 am</time>
+							<br/>
+							<cite class="author_name"><a href="#">Facebook</a></cite>
+						</div>
+						<div class="keyinfo_text">
+							<p>Latest details... Aliquam risus elit, luctus vel, interdum vitae, malesuada eget, elit. </p>
+						</div>
+					</div>
+				</li>
+				<li class="keyinfo">
+					<figure class="gravatar">
+						<img alt="" src="images/Foursquare.png" height="48" width="48" />
+						<a class="keyinfo-reply-link" href="">INFO</a>
+					</figure>
+					<div class="keyinfo_content">
+						<div class="clearfix">
+							<time datetime="2012-09-30T00:01Z" class="keyinfo-meta keyinfometadata">Location, Sep 30, 2012 at 0:01 am</time>
+							<br/>
+							<cite class="author_name"><a href="">Foursquare</a></cite>
+						</div>
+						<div class="keyinfo_text">
+						<p>Latest details... Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque orci velit, malesuada et varius ac, egestas eget nunc. Donec non porttitor massa.</p>
+						</div>
+					</div>
+				</li>
+			</ol>
+			<h6>Connect to Other Social Networks</h6>
+			<ul class="social-network">
+				<li><a href="" ></a><img src="images/Linkedin.png" width="48" height="48" alt="Search"></li>
+				<li><a href="" ></a><img src="images/Twitter.png" width="48" height="48" alt="Search"></li>
+			</ul>
+			<div class="hr clearfix">&nbsp;</div>
+			</section>
+		</section>
+		
+		<!-- Right Column / Sidebar -->
+		<aside id="sidebar_right" class="grid_4">
+			<div class="sidebar_top_BG"></div>		
+			<div class="hr dotted clearfix">&nbsp;</div>	
+			<section>
+				<header>
+					<h3>Social Friends</h3>
+				</header>
+				<ul class="sidebar">
+					<li><a href="">John Doe</a></li>
+					<li><a href="">Tim Bloggs</a></li>
+				</ul>
+			</section>
+			<section>
+				<header>
+					<h3>Subscribed Groups</h3>
+				</header>
+				<ul class="sidebar">
+					<li><a href="">Group 1</a></li>
+					<li><a href="">Group 2</a></li>
+				</ul>
+			</section>
+			<section>
+				<header>
+					<h3>Connected Profiles</h3>
+				</header>
+				<div class="hr dotted clearfix">&nbsp;</div>
+				<ul class="contact_data">	
+					<li>Profile 1 - <a href="#">Profile 1</a></li>
+					<li>Profile 2 - <a href="#">Profile 2</a></li>
+				</ul> 
+			</section>
+			<section>
+				<header>
+					<h3>Other Activity</h3>
+				</header>
+				<div class="hr dotted clearfix">&nbsp;</div>
+				<ul class="contact_data">
+					<li>
+						<figure class="gravatar">
+						<img alt="" src="images/webcommunity_pic_sample1.jpg" height="48" width="48" />
+						</figure>
+						<strong>Community Name</strong> dolor sit amet, consectetur adipiscing elit. Ipsum dolor sit amet, elit.
+					</li>
+				</ul>
+				<ul class="contact_data">	
+					<li>Other Link - <a href="#">Link 1</a></li>
+					<li>Other Link - <a href="#">Link 2</a></li>
+					<li>Other Link - <a href="#">Link 3</a></li>
+				</ul> 
+			</section>
+			<div class="hr dotted clearfix">&nbsp;</div>
+			<div class="sidebar_bottom_BG"></div>
+		</aside>
+		<div class="hr grid_12 clearfix">&nbsp;</div>
 
     </ui:define>
 </ui:composition>

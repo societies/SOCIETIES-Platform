@@ -19,6 +19,9 @@ import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.management.ICis;
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -33,6 +36,7 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.css.BitCompareUtil;
 import org.societies.api.css.FriendFilter;
+import org.societies.api.css.directory.ICssDirectoryCallback;
 import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
@@ -47,6 +51,9 @@ import org.societies.api.internal.css.ICSSInternalManager;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
 import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.css.ICSSManager;
+import org.societies.api.schema.cis.community.CommunityMethods;
+import org.societies.api.schema.cis.community.Participant;
+import org.societies.api.schema.cis.community.WhoResponse;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.css.directory.CssFriendEvent;
 import org.societies.api.schema.cssmanagement.CssEvent;
@@ -67,10 +74,16 @@ import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.utilities.DBC.Dbc;
 
 import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
 //import org.societies.platform.socialdata.SocialData;
+
+import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeed;
+import org.societies.api.activity.IActivityFeedManager;
+import org.societies.activity.client.ActivityFeedClient;
 
 import org.apache.shindig.social.opensocial.model.Person;
 
@@ -113,6 +126,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
     private IIdentityManager idManager;
     private ICommManager commManager;
     private IIdentity pubsubID;
+    //private ICisManager cisManager;
     
     private Random randomGenerator;
     
@@ -126,6 +140,11 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
         this.idManager = commManager.getIdManager();
         
         this.pubsubID = idManager.getThisNetworkNode();
+        
+        this.getiActivityFeedManager();
+        
+        LOG.info("about to call createActivityFeed from cssManagerInit");
+        this.createCSSActivityfeed(idManager.getThisNetworkNode().toString(), iActivityFeedManager);
         
 		this.createMinimalCSSRecord(idManager.getCloudNode().getJid());
         
@@ -268,6 +287,33 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		IIdentity cssIdentity = null;
+		ActivityFeedClient client = new ActivityFeedClient();
+		//cssIdentity = idManager.getThisNetworkNode();
+		try {
+			cssIdentity = commManager.getIdManager().fromJid(idManager.getThisNetworkNode().toString());
+		}catch (InvalidFormatException ife) {
+
+			LOG.error("Invalid CSS IIdentity found in CSS record: " 
+						+ ife.getLocalizedMessage(), ife);
+		}
+			
+		LOG.info("cssIdentity is :" +cssIdentity);
+		IActivityFeed activityFeed = iActivityFeedManager.getOrCreateFeed(idManager.getThisNetworkNode().toString(), cssIdentity.getJid(), true);
+					
+		IActivity iActivity = activityFeed.getEmptyIActivity();
+		iActivity.setActor(idManager.getThisNetworkNode().toString());
+		iActivity.setObject(cssIdentity.getJid());
+		iActivity.setVerb("Minimal record created");
+
+		
+			
+		client.getActivityFeed();
+		
+			
+		activityFeed.addActivity(iActivity, new   ActivityFeedClient())  ;
+		
 	}
 	/**
 	 * Workaround for existing problem with database
@@ -830,6 +876,18 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 	public void setCtxBroker(ICtxBroker ctxBroker) {
 		this.ctxBroker = ctxBroker;
 	}
+	
+	private IActivityFeedManager iActivityFeedManager;
+
+    
+    public IActivityFeedManager getiActivityFeedManager() {
+		return iActivityFeedManager;
+	}
+
+	public void setiActivityFeedManager(IActivityFeedManager iActivityFeedManager) {
+		this.iActivityFeedManager = iActivityFeedManager;
+	}
+	
 	private ISocialData socialdata;
 
 	private FriendFilter filter;
@@ -842,6 +900,27 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 
 	public void setSocialData(ISocialData socialData) {
 		this.socialdata = socialData;
+	}
+	
+	@Autowired
+	private ICisManagerCallback ciscallback;
+	
+	public ICisManagerCallback getciscallback() {
+		return ciscallback;
+	}
+
+	public void setciscallback(ICisManagerCallback ciscallback) {
+		this.ciscallback = ciscallback;
+	}
+	
+	@Autowired
+	private ICisManager cisManager;
+	
+	public ICisManager getCisManager() {
+		return cisManager;
+	}
+	public void setCisManager(ICisManager cisManager) {
+		this.cisManager = cisManager;
 	}
 
 	/**
@@ -1628,14 +1707,385 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	@Override
 	public Future<HashMap<IIdentity, Integer>> getSuggestedFriends(
 			FriendFilter filter) {
-		// TODO Auto-generated method stub
+		ISocialData socialData = null;
 
+		
+		Integer filt = filter.getFilterFlag();
+		LOG.info("Friends filter contains: " +filt);
+		
+		final Integer none	 		= 0x0000000000;
+		final int facebook   		= 0x0000000001;
+		final int twitter   		= 0x0000000010;
+		final int linkedin   		= 0x0000000100;
+		final int foursquare 		= 0x0000001000;
+		final int googleplus 		= 0x0000010000;
+		final int CIS_MEMBERS_BIT 	= 0x0000100000;
+		
+		boolean flag = BitCompareUtil.isFacebookFlagged(filt);
+		
+		flag = BitCompareUtil.isTwitterFlagged(filt);
+		
+		flag = BitCompareUtil.isLinkedinFlagged(filt);
+		
+		flag = BitCompareUtil.isFoursquareFlagged(filt);
+		flag = BitCompareUtil.isGooglePlusFlagged(filt);
+		
+		List<CssAdvertisementRecord> recordList = new ArrayList<CssAdvertisementRecord>();
+		List<CssAdvertisementRecord> cssFriends = new ArrayList<CssAdvertisementRecord>();
+		List<IIdentity> cssFriend = new ArrayList<IIdentity>();
+		List<Person> snFriends = new ArrayList<Person>();
+		List<String> socialFriends = new ArrayList<String>();
+		List<ICis> cisList = new ArrayList<ICis>();	
+		List<String> facebookFriends = new ArrayList<String>();
+		List<String> twitterFriends = new ArrayList<String>();
+		List<String> linkedinFriends = new ArrayList<String>();
+		List<String> foursquareFriends = new ArrayList<String>();
+		List<String> googleplusFriends = new ArrayList<String>();
+		List<String> CISMembersFriends = new ArrayList<String>();
+		Future<List<CssAdvertisementRecordDetailed>> asynchallcss =  this.getCssAdvertisementRecordsFull();
+		List<CssAdvertisementRecordDetailed> allcssDetails = new ArrayList<CssAdvertisementRecordDetailed>();
+		
+		HashMap<IIdentity, Integer> commonFriends = new HashMap<IIdentity, Integer>();
+		String MyId = "";	
+		MyId = idManager.getThisNetworkNode().toString();
+		IIdentity myIdentity = null;
+		myIdentity = this.commManager.getIdManager().getThisNetworkNode();
+		
+		LOG.info("checking CIS BIT: ");
+		//Check if the CIS_MEMBERS_BIT is set if it is use this as the base group
+		if(flag = BitCompareUtil.isCisMembersFlagged(filt)){
+			//get the list of CIS members from the CIS Manager
+			ServiceResourceIdentifier myServiceID = new ServiceResourceIdentifier();
+			RequestorService service = new RequestorService(myIdentity, myServiceID);
+			ICisManagerCallback callback1 = this.getciscallback();
+			CommunityMethods result = new CommunityMethods();
+			WhoResponse who = new WhoResponse();
+			List<Participant> participant = new ArrayList<Participant>();
+			cisList = this.cisManager.getCisList();
+			LOG.info("getCisList returns : " +cisList);
+			if(cisList.size() > 0){
+				for(int i = 0; i < cisList.size(); i++){
+					try{
+						cisManager.getListOfMembers(service, this.getCommManager().getIdManager().fromJid(cisList.get(i).getCisId()), callback1);
+						//result = callback1.getComMethObj();
+						callback1.receiveResult(result);
+						participant = result.getWhoResponse().getParticipant();
+						
+					}catch (InvalidFormatException e) {	
+					 	e.printStackTrace();
+					}
+					
+					
+				}
+				
+				asynchallcss = this.getCssAdvertisementRecordsFull();
+				try {
+					allcssDetails = asynchallcss.get();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				}
+				
+				CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
 
+				getCssDirectoryRemote().findAllCssAdvertisementRecords(callback);
+				recordList = callback.getResultList();
+				
+				for (Participant part : participant){
+					
+					if (!part.getJid().equalsIgnoreCase(MyId)) {
+						for(int i = 0; i <recordList.size(); i++){
+							if(recordList.get(i).getId().equalsIgnoreCase(part.getJid())){
+								try {
+									cssFriend.add(this.commManager.getIdManager().fromJid(recordList.get(i).getId()));
+								} catch (InvalidFormatException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+						
+						}
+					
+					}else {
+						LOG.info("This is my OWN ID not adding it");
+					}
+				}
+				
+			
+			
+				//cssFriends.add((CssAdvertisementRecord) (participant));
+			}
+				
+			// first get all the cssdirectory records
+					
+					asynchallcss = this.getCssAdvertisementRecordsFull();
+					try {
+						allcssDetails = asynchallcss.get();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						e.printStackTrace();
+					}
+					
+					CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
 
+					getCssDirectoryRemote().findAllCssAdvertisementRecords(callback);
+					recordList = callback.getResultList();
 
+					for (CssAdvertisementRecord cssAdd : recordList){
+					
+						if (cssAdd.getId().equalsIgnoreCase(MyId)) {
+						LOG.info("This is my OWN ID not adding it");
+						}else {
+							try {
+								cssFriend.add((this.commManager.getIdManager().fromJid(cssAdd.getId())));
+							} catch (InvalidFormatException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+					}
+			
+		}else{
+			// first get all the cssdirectory records
+			LOG.info("checking CSS Directory for Advertisements: ");
+			CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
 
+			getCssDirectoryRemote().findAllCssAdvertisementRecords(callback);
+			recordList = callback.getResultList();
 
-		return null;
+			for (CssAdvertisementRecord cssAdd : recordList) {
+			
+				if (cssAdd.getId().equalsIgnoreCase(MyId)) {
+				LOG.info("This is my OWN ID not adding it");
+				}else {
+					try {
+						cssFriend.add((this.commManager.getIdManager().fromJid(cssAdd.getId())));
+					} catch (InvalidFormatException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
+			
+			}
+		}
+
+		// Generate the connector
+		LOG.info("Getting info from Social connectors: ");
+		Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
+		socialdata.updateSocialData();
+
+		while (it.hasNext()){
+		  ISocialConnector conn = it.next();
+		}
+		
+		String domain ="";
+		snFriends = (List<Person>) socialdata.getSocialPeople();
+
+	    Iterator<Person> itt = snFriends.iterator();
+	    int index =1;
+	    while(itt.hasNext()){
+	    	Person p =null;
+	    	String name = "";
+	    	try{
+	        	p = (Person) itt.next();
+	        	if (p.getName()!=null){
+	    			if (p.getName().getFormatted()!=null){
+	    				name = p.getName().getFormatted();
+	    				domain = p.getAccounts().get(0).getDomain();
+	    				
+	    				
+	    				if(domain.equalsIgnoreCase("facebook.com")){
+							filter.setFilterFlag(facebook);		
+		    				facebookFriends.add(name);    				
+	    				}
+	    				if(domain.equalsIgnoreCase("twitter.com")){
+	    					
+							filter.setFilterFlag(twitter);		
+							
+		    				twitterFriends.add(name);    				
+	    				}
+	    				if(domain.equalsIgnoreCase("linkedin.com")){
+	    					
+							filter.setFilterFlag(linkedin);		
+		    				linkedinFriends.add(name);    				
+	    				}
+	    				if(domain.equalsIgnoreCase("foursquare.com")){
+	    					
+							filter.setFilterFlag(foursquare);		
+							
+		    				foursquareFriends.add(name);    				
+	    				}
+	    				if(domain.equalsIgnoreCase("googleplus.com")){
+							filter.setFilterFlag(googleplus);		
+							
+		    				googleplusFriends.add(name);    				
+	    				}
+	    				
+	    			}
+	    				
+	    			else {
+	    				if(p.getName().getFamilyName()!=null) name = p.getName().getFamilyName();
+	    				if(p.getName().getGivenName()!=null){
+	    					if (name.length()>0)  name+=" ";
+	    					name +=p.getName().getGivenName();
+	    					
+	    					socialFriends.add(name);
+	    				}
+	    					  
+	    			
+	    			}
+	    				
+	    		}
+	    	}catch(Exception ex){name = "- NOT AVAILABLE -";}
+	    	index++;
+	    }
+		//}
+	    
+	    //compare the lists to create
+	    
+	    LOG.info("checking FACEBOOK BIT: ");
+	    flag = BitCompareUtil.isFacebookFlagged(filt);
+	   
+	    if(flag){
+	    	for (CssAdvertisementRecord friend : cssFriends) {
+	        	
+	        	boolean contains = facebookFriends.contains(friend.getName());
+	        	
+	        	
+	            if (facebookFriends.contains(friend.getName())) {
+	            	if (commonFriends.containsValue(friend)){
+	            			
+	            	}else {
+	            		
+	            		try {
+							commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), facebook);
+						} catch (InvalidFormatException e) {
+							e.printStackTrace();
+						}            		
+	            	}
+	            	
+	            }	
+	           
+	        }
+	    	flag = false;
+	    }
+	    LOG.info("checking TWITTER BIT: ");	
+	    flag = BitCompareUtil.isTwitterFlagged(filt);
+	    if(flag){
+	    	for (CssAdvertisementRecord friend : cssFriends) {
+	        	
+	            if (twitterFriends.contains(friend.getName())) {
+	            	if (commonFriends.containsValue(friend)){
+	            		
+	            	}else {
+	            		
+	            		try {
+							commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), twitter);
+						} catch (InvalidFormatException e) {
+							e.printStackTrace();
+						}
+	            	}
+	            	
+	            }
+	       
+	        }
+	    	flag = false;
+	    }
+	    LOG.info("checking LINKEDIN BIT: ");	
+	    flag = BitCompareUtil.isLinkedinFlagged(filt);
+	    if(flag){
+	    	for (CssAdvertisementRecord friend : cssFriends) {
+	        
+	            if (linkedinFriends.contains(friend.getName())) {
+	            	if (commonFriends.containsValue(friend)){
+	            		
+	            	}else {
+	            		try {
+							commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), linkedin);
+						} catch (InvalidFormatException e) {
+							e.printStackTrace();
+						}
+	            		
+	            	}
+	            	
+	            }
+	        }
+	    	flag = false;
+	    }
+	    	
+	    LOG.info("checking FOURSQUARE BIT: ");
+	    flag = BitCompareUtil.isFoursquareFlagged(filt);
+	    if(flag){
+	    	for (CssAdvertisementRecord friend : cssFriends) {
+	        	
+	            if (foursquareFriends.contains(friend.getName())) {
+	            	if (commonFriends.containsValue(friend)){
+	            		
+	            	}else {
+	            		try {
+							commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), foursquare);
+						} catch (InvalidFormatException e) {
+							e.printStackTrace();
+						}
+	            		
+	            	}
+	            	
+	            }
+	        }
+	    	flag = false;
+	    }
+	    LOG.info("checking GOOGLEPLUS BIT: ");
+	    flag = BitCompareUtil.isGooglePlusFlagged(filt);
+	    	
+
+	             if(flag){
+	            	 for (CssAdvertisementRecord friend : cssFriends) {
+	                 	
+	                     if (googleplusFriends.contains(friend.getName())) {
+	                     	if (commonFriends.containsValue(friend)){
+	                     		
+	                     	}else {
+	                     		try {
+									commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), googleplus);
+								} catch (InvalidFormatException e) {
+									e.printStackTrace();
+								}
+	                     		
+	                     	}
+	                     	
+	                     }
+	                  
+	                 }
+	            	 flag = false;
+	             }	    
+	             
+	             LOG.info("NOW Compare the 2 Lists: ");
+	             //compare the two lists
+	               if(commonFriends.size() != 0){
+	              	 
+	  	             for(int i = 0; i < cssFriend.size(); i++){
+	  					for(Entry<IIdentity, Integer> entry : commonFriends.entrySet()){
+	  						if(entry.getKey().equals(cssFriend.get(i))){	
+	  								LOG.info("commonFriends already has this entry : "+cssFriends.get(i).getName() +" with filter value: " +entry.getValue());
+	  							}else {
+	  								if(commonFriends.containsKey((cssFriend.get(i)))){
+	  									LOG.info("commonFriends has this entry already: ");
+	  								}else{
+	  									commonFriends.put(cssFriend.get(i), none );
+	  								}
+	  							}
+	  						}
+	  					}
+	               }else {
+	              	 for(int j = 0; j < cssFriends.size(); j++){
+	              		 commonFriends.put(cssFriend.get(j), none );
+	              	 }
+	               }
+	    
+		return new AsyncResult<HashMap<IIdentity, Integer>> (commonFriends);
 	}
 
 	@Override
@@ -1645,31 +2095,27 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 
 	ISocialData socialData = null;
 
+	
 	Integer filt = filter.getFilterFlag();
+	LOG.info("Friends filter contains: " +filt);
+	
+	final Integer none	 = 0x0000000000;
 	final int facebook   = 0x0000000001;
 	final int twitter   =  0x0000000010;
 	final int linkedin   = 0x0000000100;
 	final int foursquare = 0x0000001000;
 	final int googleplus = 0x0000010000;
+	final int CISMember	 = 0x0000100000;
 	
 	boolean flag = BitCompareUtil.isFacebookFlagged(filt);
-	LOG.info("Facebook filter is: " +flag);
+	
 	flag = BitCompareUtil.isTwitterFlagged(filt);
-	LOG.info("twitter filter is: " +flag);
+	
 	flag = BitCompareUtil.isLinkedinFlagged(filt);
-	LOG.info("linkedin filter is: " +flag);
+	
 	flag = BitCompareUtil.isFoursquareFlagged(filt);
-	LOG.info("foursquare filter is: " +flag);
 	flag = BitCompareUtil.isGooglePlusFlagged(filt);
-	LOG.info("googleplus filter is: " +flag);
-	
-	
-	LOG.info("Friends filter contains: " +filt);
-	LOG.info("Facebook filter contains: " +facebook);
-	LOG.info("twitter filter contains: " +twitter);
-	LOG.info("linkedin filter contains: " +linkedin);
-	LOG.info("foursquare filter contains: " +foursquare);
-	LOG.info("googleplus filter contains: " +googleplus);
+	flag = BitCompareUtil.isCisMembersFlagged(filt);
 	
 	List<CssAdvertisementRecord> recordList = new ArrayList<CssAdvertisementRecord>();
 	List<CssAdvertisementRecord> cssFriends = new ArrayList<CssAdvertisementRecord>();
@@ -1681,38 +2127,127 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 	List<String> linkedinFriends = new ArrayList<String>();
 	List<String> foursquareFriends = new ArrayList<String>();
 	List<String> googleplusFriends = new ArrayList<String>();
+	
+	List<ICis> cisList = new ArrayList<ICis>();
+	Future<List<CssAdvertisementRecordDetailed>> asynchallcss =  this.getCssAdvertisementRecordsFull();
+	List<CssAdvertisementRecordDetailed> allcssDetails = new ArrayList<CssAdvertisementRecordDetailed>();
 	HashMap<CssAdvertisementRecord, Integer> commonFriends = new HashMap<CssAdvertisementRecord, Integer>();
 	String MyId = "";	
 	MyId = idManager.getThisNetworkNode().toString();
-	LOG.info("MyId contains " +MyId);
+	IIdentity myIdentity = null;
+	myIdentity = this.commManager.getIdManager().getThisNetworkNode();
+	flag = BitCompareUtil.isCisMembersFlagged(filt);
+	//Check if the CIS_MEMBERS_BIT is set if it is use this as the base group
+	if(flag = BitCompareUtil.isCisMembersFlagged(filt)){
+		//get the list of CIS members from the CIS Manager
+		ServiceResourceIdentifier myServiceID = new ServiceResourceIdentifier();
+		RequestorService service = new RequestorService(myIdentity, myServiceID);
+		ICisManagerCallback callback1 = this.getciscallback();
+		CommunityMethods result = new CommunityMethods();
+		WhoResponse who = new WhoResponse();
+		List<Participant> participant = new ArrayList<Participant>();
+		cisList = this.cisManager.getCisList();
+		LOG.info("getCisList returns : " +cisList);
+		if(cisList.size() > 0){
+			for(int i = 0; i < cisList.size(); i++){
+				try{
+					cisManager.getListOfMembers(service, this.getCommManager().getIdManager().fromJid(cisList.get(i).getCisId()), callback1);
+					//result = callback1.getComMethObj();
+					callback1.receiveResult(result);
+					participant = result.getWhoResponse().getParticipant();
+					
+				}catch (InvalidFormatException e) {	
+				 	e.printStackTrace();
+				}
+				
+				
+			}
+			
+			asynchallcss = this.getCssAdvertisementRecordsFull();
+			try {
+				allcssDetails = asynchallcss.get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+			
+			CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
 
-	LOG.info("CSSManager getFriends method called ");
-
-	LOG.info("Contacting CSS Directory to get list of CSSs");
-
-	// first get all the cssdirectory records
-	CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
-
-	getCssDirectoryRemote().findAllCssAdvertisementRecords(callback);
-	recordList = callback.getResultList();
-
-	for (CssAdvertisementRecord cssAdd : recordList) {
-		LOG.info("Comparing Id contains " +cssAdd.getId());
-		if (cssAdd.getId().equalsIgnoreCase(MyId)) {
-			LOG.info("This is my OWN ID not adding it");
-		}else {
-			cssFriends.add((cssAdd));
+			getCssDirectoryRemote().findAllCssAdvertisementRecords(callback);
+			recordList = callback.getResultList();
+			
+			for (Participant part : participant){
+				
+				if (!part.getJid().equalsIgnoreCase(MyId)) {
+					for(int i = 0; i <recordList.size(); i++){
+						if(recordList.get(i).getId().equalsIgnoreCase(part.getJid())){
+							cssFriends.add(recordList.get(i));
+						}
+					
+					}
+				
+				}else {
+					LOG.info("This is my OWN ID not adding it");
+				}
+			}
+			
+		
+		
+			//cssFriends.add((CssAdvertisementRecord) (participant));
 		}
+			
+		// first get all the cssdirectory records
+				
+				asynchallcss = this.getCssAdvertisementRecordsFull();
+				try {
+					allcssDetails = asynchallcss.get();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				}
+				
+				CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
 
-		LOG.info("cssAdd.getName contains " +cssAdd.getName());
-		LOG.info("cssFriends contains " +cssFriends +" entries");
+				getCssDirectoryRemote().findAllCssAdvertisementRecords(callback);
+				recordList = callback.getResultList();
+
+				for (CssAdvertisementRecord cssAdd : recordList){
+				
+					if (cssAdd.getId().equalsIgnoreCase(MyId)) {
+					LOG.info("This is my OWN ID not adding it");
+					}else {
+						cssFriends.add((cssAdd));
+					}
+				}
+		
+	}else{
+		// first get all the cssdirectory records
+		LOG.info("checking CSS Directory for Adverts: ");
+		asynchallcss = this.getCssAdvertisementRecordsFull();
+		try {
+			allcssDetails = asynchallcss.get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		
+		CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
+
+		getCssDirectoryRemote().findAllCssAdvertisementRecords(callback);
+		recordList = callback.getResultList();
+
+		for (CssAdvertisementRecord cssAdd : recordList){
+		
+			if (cssAdd.getId().equalsIgnoreCase(MyId)) {
+			LOG.info("This is my OWN ID not adding it");
+			}else {
+				cssFriends.add((cssAdd));
+			}
+		}
 	}
-
-	LOG.info("cssFriends contains " +cssFriends);
-	LOG.info("CSS Directory contains " +cssFriends.size() +" entries");
-
-	LOG.info("Contacting SN Connector to get list");
-	LOG.info("getSocialData() returns " +getSocialData());
 
 	// Generate the connector
 	Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
@@ -1721,14 +2256,13 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 	while (it.hasNext()){
 	  ISocialConnector conn = it.next();
   	  
-	LOG.info("SocialNetwork connector contains " +conn.getConnectorName());
 
 	//socialdata.updateSocialData();
 	}
 	//it.next().getConnectorName();
 	String domain ="";
 	snFriends = (List<Person>) socialdata.getSocialPeople();
-	LOG.info("snFriends size is :" +snFriends.size());
+
     Iterator<Person> itt = snFriends.iterator();
     int index =1;
     while(itt.hasNext()){
@@ -1743,33 +2277,29 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
     				
     				
     				if(domain.equalsIgnoreCase("facebook.com")){
-    					LOG.info("Friends: " +name +" Domain: " +domain +" Setting Facebook Filter");
 						filter.setFilterFlag(facebook);		
-						LOG.info(index +" Friends: " +name +" Domain: " +domain);
 	    				facebookFriends.add(name);    				
     				}
     				if(domain.equalsIgnoreCase("twitter.com")){
-    					LOG.info("Friends: " +name +" Domain: " +domain +" Setting Twitter Filter");
+    					
 						filter.setFilterFlag(twitter);		
-						LOG.info(index +" Friends: " +name +" Domain: " +domain);
+						
 	    				twitterFriends.add(name);    				
     				}
     				if(domain.equalsIgnoreCase("linkedin.com")){
-    					LOG.info("Friends: " +name +" Domain: " +domain +" Setting Linkedin Filter");
+    					
 						filter.setFilterFlag(linkedin);		
-						LOG.info(index +" Friends: " +name +" Domain: " +domain);
 	    				linkedinFriends.add(name);    				
     				}
     				if(domain.equalsIgnoreCase("foursquare.com")){
-    					LOG.info("Friends: " +name +" Domain: " +domain +" Setting foursquare Filter");
+    					
 						filter.setFilterFlag(foursquare);		
-						LOG.info(index +" Friends: " +name +" Domain: " +domain);
+						
 	    				foursquareFriends.add(name);    				
     				}
     				if(domain.equalsIgnoreCase("googleplus.com")){
-    					LOG.info("Friends: " +name +" Domain: " +domain +" Setting googleplus Filter");
 						filter.setFilterFlag(googleplus);		
-						LOG.info(index +" Friends: " +name +" Domain: " +domain);
+						
 	    				googleplusFriends.add(name);    				
     				}
     				
@@ -1780,7 +2310,7 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
     				if(p.getName().getGivenName()!=null){
     					if (name.length()>0)  name+=" ";
     					name +=p.getName().getGivenName();
-    					LOG.info(index +" Friends:" +name);
+    					
     					socialFriends.add(name);
     				}
     					  
@@ -1795,34 +2325,25 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
     
     //compare the lists to create
     
-    LOG.info("CSS Friends List contains " +cssFriends.size() +" entries");
-    LOG.info("Social Friends List contains " +socialFriends.size() +" entries");
-    LOG.info("common Friends List contains " +commonFriends.size() +" entries");
-    
-    LOG.info("Facebook Friends List contains " +facebookFriends.size() +" entries");
-    LOG.info("Twitter Friends List contains " +twitterFriends.size() +" entries");
-    LOG.info("LinkedIn Friends List contains " +linkedinFriends.size() +" entries");
-    LOG.info("FourSquare Friends List contains " +foursquareFriends.size() +" entries");
-    LOG.info("GooglePlus Friends List contains " +googleplusFriends.size() +" entries");
     
     flag = BitCompareUtil.isFacebookFlagged(filt);
    
     if(flag){
     	for (CssAdvertisementRecord friend : cssFriends) {
-        	LOG.info("CSS Friends FACEBOOK iterator List contains " +friend.getName());
+        	
         	boolean contains = facebookFriends.contains(friend.getName());
         	
-        	LOG.info("facebookfriends contains is : " +contains +" and the value is: " +friend.getName());	
+        	
             if (facebookFriends.contains(friend.getName())) {
             	if (commonFriends.containsValue(friend)){
-            		LOG.info("This friend is already added to the list:" +friend);	
+            			
             	}else {
-            		LOG.info("Adding this friend to the facebook list:" +friend);
-            		commonFriends.put(friend, filt);            		
+            		LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +facebook);
+            		commonFriends.put(friend, facebook);            		
             	}
             	
             }	
-            LOG.info("This friend is not in the filter not adding to the facebook list:" +friend.getName() +friend.getId());
+           
         }
     	flag = false;
     }
@@ -1830,13 +2351,13 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
     flag = BitCompareUtil.isTwitterFlagged(filt);
     if(flag){
     	for (CssAdvertisementRecord friend : cssFriends) {
-        	LOG.info("CSS Friends TWITTER iterator List contains " +friend);
+        	
             if (twitterFriends.contains(friend.getName())) {
             	if (commonFriends.containsValue(friend)){
-            		LOG.info("This friend is already added to the list:" +friend);	
+            		
             	}else {
-            		LOG.info("Adding this friend to the twitter list:" +friend);
-            		commonFriends.put(friend, filt);
+            		LOG.info("twitter adding to commonfriends: " +friend.getName() +"with filter setting: " +twitter);
+            		commonFriends.put(friend, twitter);
             	}
             	
             }
@@ -1848,13 +2369,14 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
     flag = BitCompareUtil.isLinkedinFlagged(filt);
     if(flag){
     	for (CssAdvertisementRecord friend : cssFriends) {
-        	LOG.info("CSS Friends iterator List contains " +friend);
+        
             if (linkedinFriends.contains(friend.getName())) {
             	if (commonFriends.containsValue(friend)){
-            		LOG.info("This friend is already added to the list:" +friend);	
+            		
             	}else {
-            		commonFriends.put(friend, filt);
-            		LOG.info("Adding this friend to the linkedin list:" +friend);
+            		LOG.info("linkedin adding to commonfriends: " +friend.getName() +"with filter setting: " +linkedin);
+            		commonFriends.put(friend, linkedin);
+            		
             	}
             	
             }
@@ -1866,13 +2388,14 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
     flag = BitCompareUtil.isFoursquareFlagged(filt);
     if(flag){
     	for (CssAdvertisementRecord friend : cssFriends) {
-        	LOG.info("CSS Friends iterator List contains " +friend);
+        	
             if (foursquareFriends.contains(friend.getName())) {
             	if (commonFriends.containsValue(friend)){
-            		LOG.info("This friend is already added to the list:" +friend);	
+            		
             	}else {
-            		commonFriends.put(friend, filt);
-            		LOG.info("Adding this friend to the foursquare list:" +friend);
+            		LOG.info("4Square adding to commonfriends: " +friend.getName() +"with filter setting: " +foursquare);
+            		commonFriends.put(friend, foursquare);
+            		
             	}
             	
             }
@@ -1885,13 +2408,14 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 
              if(flag){
             	 for (CssAdvertisementRecord friend : cssFriends) {
-                 	LOG.info("CSS Friends iterator List contains " +friend);
+                 	
                      if (googleplusFriends.contains(friend.getName())) {
                      	if (commonFriends.containsValue(friend)){
-                     		LOG.info("This friend is already added to the list:" +friend);	
+                     		
                      	}else {
-                     		commonFriends.put(friend, filt);
-                     		LOG.info("Adding this friend to the googleplus list:" +friend);	
+                     		LOG.info("googleplus adding to commonfriends: " +friend.getName() +"with filter setting: " +googleplus);
+                     		commonFriends.put(friend, googleplus);
+                     		
                      	}
                      	
                      }
@@ -1900,60 +2424,42 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
             	 flag = false;
              }
     	
+           //compare the two lists
+             LOG.info(" NOW compare the two lists ");
              
-
-    //compare the two lists
-    LOG.info("Compare the two lists to generate a common Friends list");
-    int i = 1;
-   // for (int index =0; index < cssFriends.size(); index++)
-   // {
-/*    for (CssAdvertisementRecord friend : cssFriends) {
-    	LOG.info("CSS Friends iterator List contains " +friend);
-        if (socialFriends.contains(friend.getName())) {
-        	if (commonFriends.containsValue(friend)){
-        		LOG.info("This friend is already added to the list:" +friend);
-        	}else {
-        		commonFriends.put(friend, filt);
-        	}
-        	
-        }
-       // i++;
-    }
-*/    //}
-    LOG.info("common Friends List NOW contains " +commonFriends.size() +" entries");
-	//return commonFriends;
+             if(commonFriends.size() != 0){
+            	 
+	             for(int i = 0; i < cssFriends.size(); i++){
+	            	 LOG.info(" Outer for statement i = " +i);
+					for(Entry<CssAdvertisementRecord, Integer> entry : commonFriends.entrySet()){
+						if(entry.getKey().equals(cssFriends.get(i))){	
+								LOG.info("commonFriends already has this entry : "+cssFriends.get(i).getName() +" with filter value: " +entry.getValue());
+							}else {
+								if(commonFriends.containsKey((cssFriends.get(i)))){
+									LOG.info("commonFriends has this entry already: ");
+								}else{
+									commonFriends.put(cssFriends.get(i), none );
+									LOG.info("Putting this entry in commonFriends: "+cssFriends.get(i).getName() +" with filter value: " +none);
+								}
+							}
+						}
+					}
+             }else {
+            	 for(int j = 0; j < cssFriends.size(); j++){
+            		 commonFriends.put(cssFriends.get(j), none );
+            	 }
+             }
     
-    for(Entry<CssAdvertisementRecord, Integer> entry : commonFriends.entrySet()){
-		LOG.info("@@@@@@@@@@@@@@@@ CommonFriends entry:  "+entry.getKey().getId() + " = " + entry.getKey().getName());
-	}
-    LOG.info("@@@@@@@@@@@@@@@@@@ values of the commonFriends is: " +commonFriends.values()); 
-    LOG.info("@@@@@@@@@@@@@@@@@@ KeySet contains returns: " +commonFriends.keySet());
-   //LOG.info("@@@@@@@@@@@@@@@@@@ entrySet contains returns: " +commonFriends.entrySet().iterator().next().getKey().getId());
-    //LOG.info("@@@@@@@@@@@@@@@@@@ values of the commonFriends is: " +commonFriends.entrySet().iterator().next().getKey().getName()); 
 	return new AsyncResult<HashMap<CssAdvertisementRecord, Integer>> (commonFriends);
 	}
 
 	@Override
 	public void sendCSSFriendRequest(IIdentity identity, RequestorService service) {
 		//PUBLISH PUBSUB EVENT FOR THIS RECEIVED FRIEND REQUEST
-		CssAdvertisementRecord advert = new CssAdvertisementRecord();
-		advert.setId(identity.getBareJid());
-		advert.setName("TBD");
-
-		CssFriendEvent payload = new CssFriendEvent();
-		payload.setCssAdvert(advert);
-
-		try {
-			String status = this.pubSubManager.publisherPublish(pubsubID, CSSManagerEnums.CSS_FRIEND_REQUEST_RECEIVED_EVENT, Integer.toString(this.randomGenerator.nextInt()), payload);
-			LOG.debug("Published friend request received event for: " + identity.getBareJid() + ". Status: " + status);
-		} catch (XMPPError e) {
-			e.printStackTrace();
-		} catch (CommunicationException e) {
-			e.printStackTrace();
-		}
-
+		LOG.debug("Publishing friend request received event for: " + identity.getBareJid());
+				
 		//SAVE TO DATABASE
-		String targetCSSid = identity.toString();		
+		String targetCSSid = identity.toString();
 		CssRequest request = new CssRequest();
 		//request.setCssIdentity(targetCSSid);
 		request.setCssIdentity(service.getRequestorId().toString());
@@ -1980,37 +2486,33 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 				cssManagerRemote.updateCssFriendRequest(request);
 			}	
 		}
+		//GENERATE PUBSUB EVENT
+		List<String> idList = new ArrayList<String>();
+		idList.add(identity.getBareJid());
+		cssDirectoryRemote.searchByID(idList, new ICssDirectoryCallback() {
+			@Override
+			public void getResult(List<CssAdvertisementRecord> records) {
+				CssFriendEvent payload = new CssFriendEvent();
+				payload.setCssAdvert( records.get(0));
 
+				try {
+					String status = CSSManager.this.pubSubManager.publisherPublish(pubsubID, CSSManagerEnums.CSS_FRIEND_REQUEST_RECEIVED_EVENT, Integer.toString(CSSManager.this.randomGenerator.nextInt()), payload);
+					LOG.debug("Published Event Status: " + status);
+				} catch (XMPPError e) {
+					e.printStackTrace();
+				} catch (CommunicationException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	@Override
 	public void handleExternalFriendRequest(IIdentity identity, CssRequestStatusType statusType) {
-
-		if (statusType.equals(CssRequestStatusType.ACCEPTED)) {
-			//PUBLISH PUBSUB EVENT FOR THIS NEW FRIEND
-			CssAdvertisementRecord advert = new CssAdvertisementRecord();
-			advert.setId(identity.getBareJid());
-			advert.setName("TBD");
-			CssFriendEvent payload = new CssFriendEvent();
-			payload.setCssAdvert(advert);
-
-			try {
-				String status = this.pubSubManager.publisherPublish(pubsubID, CSSManagerEnums.CSS_FRIEND_REQUEST_ACCEPTED_EVENT, Integer.toString(this.randomGenerator.nextInt()), payload);
-				LOG.debug("Published friend accepted event for: " + identity.getBareJid() + ". Status: " + status);
-			} catch (XMPPError e) {
-				e.printStackTrace();
-			} catch (CommunicationException e) {
-				e.printStackTrace();
-			}
-		}
-		
 		//identity is who the request has come FROM
 		CssRequest request = new CssRequest();
-
 		request.setCssIdentity(identity.toString());
 		request.setRequestStatus(statusType);
-
-
 		LOG.info("handleExternalFriendRequest called : ");
 		LOG.info("Request from identity: " +identity);
 		LOG.info("Request  status: " +statusType);
@@ -2022,40 +2524,64 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		LOG.info("updateCssFriendRequest and we're back : " );
 		// If this was initiated locally then inform remote css
 		// We only want to sent messages to remote Css's for this function if we initiated the call locally
-		if (request.getOrigin() == CssRequestOrigin.LOCAL)
-		{
-
+		if (request.getOrigin() == CssRequestOrigin.LOCAL) {
 			// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
 			// otherwise send message to remote css
-
 			LOG.info("INSIDE IF STATEMENT -> Request  origin: " +request.getOrigin());
-				//called updateCssFriendRequest on remote
-				request.setOrigin(CssRequestOrigin.REMOTE);
-				cssManagerRemote.updateCssRequest(request);
+			//called updateCssFriendRequest on remote
+			request.setOrigin(CssRequestOrigin.REMOTE);
+			cssManagerRemote.updateCssRequest(request);
 		}
+		
+		//PUBLISH PUBSUB EVENT FOR THIS NEW FRIEND
+		if (statusType.equals(CssRequestStatusType.ACCEPTED)) {
+			//GENERATE PUBSUB EVENT
+			List<String> idList = new ArrayList<String>();
+			idList.add(identity.getBareJid());
+			cssDirectoryRemote.searchByID(idList, new ICssDirectoryCallback() {
+				@Override
+				public void getResult(List<CssAdvertisementRecord> records) {
+					CssFriendEvent payload = new CssFriendEvent();
+					payload.setCssAdvert( records.get(0));
+
+					try {
+						String status = CSSManager.this.pubSubManager.publisherPublish(pubsubID, CSSManagerEnums.CSS_FRIEND_REQUEST_ACCEPTED_EVENT, Integer.toString(CSSManager.this.randomGenerator.nextInt()), payload);
+						LOG.debug("Published Event Status: " + status);
+					} catch (XMPPError e) {
+						e.printStackTrace();
+					} catch (CommunicationException e) {
+						e.printStackTrace();
+					}
+				}
+			});
+		}	
 	}
 
 	@Override
 	public void handleInternalFriendRequest(IIdentity identity, CssRequestStatusType statusType) {
+		CssRequest pendingFR = new CssRequest();
+		pendingFR.setCssIdentity(identity.toString());
+		pendingFR.setRequestStatus(CssRequestStatusType.ACCEPTED);
+		pendingFR.setOrigin(CssRequestOrigin.LOCAL);
+		acceptCssFriendRequest(pendingFR);
+		
 		//UPDATE LOCAL DATABASE WITH THIS FRIEND REQUEST
-		CssRequest request = new CssRequest();
-
-		request.setCssIdentity(identity.toString());
-		LOG.info("handleInternalFriendRequest called : ");
-		LOG.info("Request from identity: " +identity);
-		LOG.info("Request  status: " +statusType);
-		try {
-			cssRegistry.updateCssFriendRequestRecord(request);
-			//cssRegistry.updateCssFriendRequestRecord(request);
-			cssRegistry.updateCssRequestRecord(request);
-		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		//CssRequest request = new CssRequest();
+		//request.setCssIdentity(identity.toString());
+		//LOG.info("handleInternalFriendRequest called : ");
+		//LOG.info("Request from identity: " +identity);
+		//LOG.info("Request  status: " +statusType);
+		//try {
+		//	cssRegistry.updateCssFriendRequestRecord(request);
+		//	//cssRegistry.updateCssFriendRequestRecord(request);
+		//	cssRegistry.updateCssRequestRecord(request);
+		//} catch (CssRegistrationException e) {
+		//	// TODO Auto-generated catch block
+		//	e.printStackTrace();
+		//}
 	}
 
 	public void pushtoContext(CssRecord record) {
@@ -2294,6 +2820,39 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		LOG.info("CSS MANAGER set friendfilter calledwith filt: " +filter.getFilterFlag());
 		this.filter = filter;
 		
+	}
+	
+public void createCSSActivityfeed(String cssOwner, IActivityFeedManager iActivityFeedManager) {
+		
+		LOG.info("createCSSActivity called with OWNER: " +cssOwner +"and activityfeedmanager: " +iActivityFeedManager);
+		 
+		IIdentity cssIdentity = null;
+		ActivityFeedClient client = new ActivityFeedClient();
+		//cssIdentity = idManager.getThisNetworkNode();
+		try {
+			cssIdentity = commManager.getIdManager().fromJid(cssOwner);
+		}catch (InvalidFormatException ife) {
+
+			LOG.error("Invalid CSS IIdentity found in CSS record: " 
+						+ ife.getLocalizedMessage(), ife);
+		}
+			
+		LOG.info("cssIdentity is :" +cssIdentity);
+		IActivityFeed activityFeed = iActivityFeedManager.getOrCreateFeed(cssOwner, cssIdentity.getJid(), true);
+					
+		IActivity iActivity = activityFeed.getEmptyIActivity();
+		iActivity.setActor(cssOwner);
+		iActivity.setObject(cssIdentity.getJid());
+		iActivity.setVerb("created");
+			
+		client.getActivityFeed();
+		
+			
+		activityFeed.addActivity(iActivity, new   ActivityFeedClient())  ;
+		LOG.info("getActivities called : ");
+		activityFeed.getActivities("1363657766804", client);
+		
+		LOG.info("@@@@ Back from call to getActivities: ");
 	}
 	
 

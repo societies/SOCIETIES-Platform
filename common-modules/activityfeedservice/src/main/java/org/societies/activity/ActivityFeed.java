@@ -24,6 +24,25 @@
  */
 package org.societies.activity;
 
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Future;
+
+import javax.persistence.Table;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Transient;
+
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.ActivityObject;
 import org.hibernate.Session;
@@ -50,12 +69,12 @@ import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
 import org.societies.api.schema.activityfeed.DeleteActivityResponse;
 import org.societies.api.schema.activityfeed.GetActivitiesResponse;
 
-import javax.persistence.*;
+
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 @Entity
 @Table(name = "org_societies_activity_ActivityFeed")
@@ -98,18 +117,13 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
         this.setSessionFactory(sessionFactory);
         this.setPubSubcli(pubSubcli);
     }
+    
+    
     public void connectPubSub(IIdentity ownerCSS){ //ASSUME PUBSUB NODE PERSISTING (CONFIGURATION), CHECK IF IT EXISTS
         this.ownerCSS = ownerCSS;
         // pubsub code
         LOG.debug("starting pubsub at activityfeed pubsub");
         if(null != pubSubcli && null != ownerCSS){
-//        	try {
-//				pubSubcli.addSimpleClasses(classList);
-//			} catch (ClassNotFoundException e1) {
-//				LOG.warn("error adding classes at pubsub at activityfeed pubsub");
-//				e1.printStackTrace();
-//
-//			}
             List<String> l = null;
             try {
                 l = pubSubcli.discoItems(ownerCSS, null);
@@ -170,10 +184,11 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
         }
         return ret;
     }
+    
+    
     @Override
-    public void addActivity(IActivity activity) {
-//        LOG.error("In addActivity for PeristedActivityFeed published:"+activity.getPublished()+" time: "+activity.getTime());
-        boolean err = false;
+    public void addActivityToDB(IActivity activity) {
+       boolean err = false;
         Activity newAct = new Activity(activity);
         newAct.setPublished(Long.toString(new Date().getTime())); // NOTICE THAT THE TIME IS BEING SET IN THE SERVER
         LOG.info("adding activity with id: "+ this.getId());
@@ -220,7 +235,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
         org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
         AddActivityResponse r = new AddActivityResponse();
 
-        this.addActivity(activity);
+        this.addActivityToDB(activity);
         r.setResult(true); //TODO. add a return on the activity feed method
 
         result.setAddActivityResponse(r);
@@ -228,11 +243,19 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
         c.receiveResult(result);
 
     }
-
-    synchronized public int cleanupFeed(String criteria) {
+    
+    
+    @Override
+    @Async
+    public void addActivity(IActivity activity) {
+                this.addActivityToDB(activity);
+    }
+    
+    
+     public int cleanupFeed(String criteria) {
         int ret = 0;
         String forever = "0 "+Long.toString(System.currentTimeMillis());
-        List<IActivity> toBeDeleted = getActivities(criteria,forever);
+        List<IActivity> toBeDeleted = getActivitiesFromDB(criteria,forever);
         Session session = null;
         Transaction t = null;
         try{
@@ -375,8 +398,8 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
 
     //timeperiod: "millisecondssinceepoch millisecondssinceepoch+n"
     //where n has to be equal to or greater than 0
-    public List<IActivity> getActivities(String timePeriod) {
-        LOG.info("in persisted activityfeed getActivities, gettin data from DB ownerID:"+this.getId());
+    public List<IActivity> getActivitiesFromDB(String timePeriod) {
+        LOG.info("in persisted activityfeed getActivitiesFromDB, gettin data from DB ownerID:"+this.getId());
         ArrayList<IActivity> ret = new ArrayList<IActivity>();
         String times[] = timePeriod.split(" ",2);
         if(times.length < 2){
@@ -423,9 +446,9 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
         return ret;
     }
 
-    public List<IActivity> getActivities(String query, String timePeriod) {
+    public List<IActivity> getActivitiesFromDB(String query, String timePeriod) {
         ArrayList<IActivity> ret = new ArrayList<IActivity>();
-        List<IActivity> tmp = this.getActivities(timePeriod);
+        List<IActivity> tmp = this.getActivitiesFromDB(timePeriod);
         if(tmp.size()==0) {
             LOG.error("time period did not contain any activities");
             return ret;
@@ -490,18 +513,19 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
         return ret;
     }
 
-    synchronized public List<IActivity> getActivities(String CssId, String query,
+    public List<IActivity> getActivitiesFromDB(String CssId, String query,
                                                       String timePeriod) {
-        return this.getActivities(query,timePeriod);
+        return this.getActivitiesFromDB(query,timePeriod);
     }
-
+    
+  
     @Override
     public void getActivities(String query, String timePeriod,
                               IActivityFeedCallback c) {
 
         LOG.debug("local get activities using query WITH CALLBACK called");
 
-        List<IActivity> iActivityList = this.getActivities(query,timePeriod);
+        List<IActivity> iActivityList = this.getActivitiesFromDB(query,timePeriod);
         org.societies.api.schema.activityfeed.MarshaledActivityFeed ac = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
         GetActivitiesResponse g = new GetActivitiesResponse();
         ac.setGetActivitiesResponse(g);
@@ -520,7 +544,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     public void getActivities(String timePeriod, long n, IActivityFeedCallback c) {
         LOG.debug("local get activities WITH CALLBACK called");
 
-        List<IActivity> iActivityList = this.getActivities(timePeriod);
+        List<IActivity> iActivityList = this.getActivitiesFromDB(timePeriod);
         List<IActivity> ret = new ArrayList<IActivity>();
         Collections.sort(iActivityList,new Comparator<IActivity>() {
             @Override
@@ -548,7 +572,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     public void getActivities(String timePeriod, IActivityFeedCallback c) {
         LOG.debug("local get activities WITH CALLBACK called");
 
-        List<IActivity> iActivityList = this.getActivities(timePeriod);
+        List<IActivity> iActivityList = this.getActivitiesFromDB(timePeriod);
         org.societies.api.schema.activityfeed.MarshaledActivityFeed ac = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
         GetActivitiesResponse g = new GetActivitiesResponse();
         ac.setGetActivitiesResponse(g);
@@ -566,7 +590,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     public void getActivities(String query, String timePeriod, long n, IActivityFeedCallback c) {
         LOG.debug("local get activities WITH CALLBACK called");
 
-        List<IActivity> iActivityList = this.getActivities(query,timePeriod);
+        List<IActivity> iActivityList = this.getActivitiesFromDB(query,timePeriod);
         List<IActivity> ret = new ArrayList<IActivity>();
         Collections.sort(iActivityList,new Comparator<IActivity>() {
             @Override
@@ -590,6 +614,36 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
         c.receiveResult(ac);
     }
 
+    @Async
+    public Future<List<IActivity>> getActivities(String query, String timePeriod, long n) {
+
+        List<IActivity> iActivityList = null;
+        List<IActivity> result = new ArrayList<IActivity>();
+        if (timePeriod == null || timePeriod.length() == 0)
+        	iActivityList = this.getActivitiesFromDB(query);
+        else	
+        	iActivityList = this.getActivitiesFromDB(query,timePeriod);
+       
+       if (iActivityList != null)
+       {
+    	   Collections.sort(iActivityList,new Comparator<IActivity>() {
+               @Override
+               public int compare(IActivity iActivity, IActivity iActivity1) {
+                   return (Long.parseLong(iActivity.getPublished())>Long.parseLong(iActivity1.getPublished())) ? 1 : -1;
+               }
+           });
+    	  
+    	   if (n == 0 || n > iActivityList.size())
+    		   n = iActivityList.size();
+    	   
+    	   for(int i=0;i<n;i++)
+    		   result.add(iActivityList.get(i));
+       }
+       
+       return new AsyncResult<List<IActivity>>(result);
+    }
+    
+      
     public void iactivToMarshActvList(List<IActivity> iActivityList, List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList){
 
         Iterator<IActivity> it = iActivityList.iterator();
@@ -683,4 +737,5 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     public void setSessionFactory(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
+
 }

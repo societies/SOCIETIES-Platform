@@ -49,8 +49,7 @@ import org.societies.android.platform.cssmanager.LocalCssDirectoryService.LocalC
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal;
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal.LocalSLMBinder;
 import org.societies.android.platform.socialdata.SocialData;
-import org.societies.android.platform.useragent.feedback.UserFeedbackLocal;
-import org.societies.android.platform.useragent.feedback.UserFeedbackLocal.LocalUserFeedbackBinder;
+import org.societies.android.platform.useragent.feedback.EventListener;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -76,7 +75,7 @@ public class SocietiesClientServicesController {
 	//timeout for bind, start and stop all services
 	private final static long TASK_TIMEOUT = 10000;
 	
-	private final static int NUM_SERVICES = 13;
+	private final static int NUM_SERVICES = 12;
 	
 	private final static int CIS_DIRECTORY_SERVICE 		= 0;
 	private final static int CIS_MANAGER_SERVICE 		= 1;
@@ -90,7 +89,6 @@ public class SocietiesClientServicesController {
 	private final static int PERSONALISATION_SERVICE 	= 9;
 	private final static int SLM_SERVICE_DISCO_SERVICE 	= 10;
 	private final static int FRIENDS_MANAGER_SERVICE 	= 11;
-	private final static int USER_FEEDBACK_SERVICE 		= 12;
 	
 	private Context context;
 	private CountDownLatch servicesBinded;
@@ -109,7 +107,6 @@ public class SocietiesClientServicesController {
 	private IServiceControl slmServiceControl;
 	private ISocialData snsConnectorService;
 	private IFriendsManager friendMgrService;
-	private IAndroidUserFeedback userFeedbackService;
 	
 	private long startTime;
 	
@@ -436,26 +433,6 @@ public class SocietiesClientServicesController {
 		}
 	};
 	
-	private ServiceConnection userFeedbackConnection = new ServiceConnection() {
-		
-		public void onServiceDisconnected(ComponentName name) {
-			Log.d(LOG_TAG, "Disconnecting from Platform User Feedback service");
-			SocietiesClientServicesController.this.connectedToServices[USER_FEEDBACK_SERVICE] = false;
-		}
-		
-		public void onServiceConnected(ComponentName name, IBinder service) {
-			Log.d(LOG_TAG, "Connecting to Platform User Feedback service");
-			SocietiesClientServicesController.this.connectedToServices[USER_FEEDBACK_SERVICE] = true;
-	
-			//Get a local binder
-			LocalUserFeedbackBinder binder = (LocalUserFeedbackBinder) service;
-			//Retrieve the local service API
-			SocietiesClientServicesController.this.userFeedbackService = (IAndroidUserFeedback) binder.getService();
-        	SocietiesClientServicesController.this.platformServiceConnections[USER_FEEDBACK_SERVICE] = this;
-			SocietiesClientServicesController.this.servicesBinded.countDown();
-		}
-	};
-	
 //  private ServiceConnection ???Connection = new ServiceConnection() {
 //
 //      public void onServiceDisconnected(ComponentName name) {
@@ -503,61 +480,80 @@ public class SocietiesClientServicesController {
     		
     		SocietiesClientServicesController.this.startTime = System.currentTimeMillis();
     		
-    		boolean retValue = true;
+    		boolean retValue = false;
     		Intent serviceIntent = null;
     		
     		//Remote Platform services
         	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android CIS Directory Service");
         	serviceIntent = new Intent(ICoreSocietiesServices.CIS_DIRECTORY_SERVICE_INTENT);
-        	SocietiesClientServicesController.this.context.bindService(serviceIntent, cisDirectoryConnection, Context.BIND_AUTO_CREATE);
+        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, cisDirectoryConnection, Context.BIND_AUTO_CREATE);
 
-        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android CIS Manager Service");
-        	serviceIntent = new Intent(ICoreSocietiesServices.CIS_MANAGER_SERVICE_INTENT);
-        	SocietiesClientServicesController.this.context.bindService(serviceIntent, cisManagerConnection, Context.BIND_AUTO_CREATE);
+        	if (retValue) {
+            	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android CIS Manager Service");
+            	serviceIntent = new Intent(ICoreSocietiesServices.CIS_MANAGER_SERVICE_INTENT);
+            	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, cisManagerConnection, Context.BIND_AUTO_CREATE);
+        	} else {
+        		Log.e(LOCAL_LOG_TAG, "Service does not exist");
+        	}
 
-        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android CIS Subscribed Service");
-        	serviceIntent = new Intent(ICoreSocietiesServices.CIS_MANAGER_SERVICE_INTENT);
-        	SocietiesClientServicesController.this.context.bindService(serviceIntent, cisSubscribedConnection, Context.BIND_AUTO_CREATE);
+        	if (retValue) {
+	        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android CIS Subscribed Service");
+	        	serviceIntent = new Intent(ICoreSocietiesServices.CIS_SUBSCRIBED_SERVICE_INTENT);
+	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, cisSubscribedConnection, Context.BIND_AUTO_CREATE);
+           	} else {
+        		Log.e(LOCAL_LOG_TAG, "Service does not exist");
+        	}
 
         	//LOCAL PLATFORM SERVICES
-        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android CSS Directory Service");
-        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, LocalCssDirectoryService.class);
-        	SocietiesClientServicesController.this.context.bindService(serviceIntent, cssDirectoryConnection, Context.BIND_AUTO_CREATE);
+        	if (retValue) {
+	        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android CSS Directory Service");
+	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, LocalCssDirectoryService.class);
+	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, cssDirectoryConnection, Context.BIND_AUTO_CREATE);
+           	} else {
+        		Log.e(LOCAL_LOG_TAG, "Service does not exist");
+        	}
 
-        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android SLM Service Discovery Service");
-        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, ServiceManagementLocal.class);
-        	SocietiesClientServicesController.this.context.bindService(serviceIntent, slmDiscoConnection, Context.BIND_AUTO_CREATE);
+        	if (retValue) {
+	        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android SLM Service Discovery Service");
+	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, ServiceManagementLocal.class);
+	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, slmDiscoConnection, Context.BIND_AUTO_CREATE);
+           	} else {
+        		Log.e(LOCAL_LOG_TAG, "Service does not exist");
+        	}
         	
-        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android SLM Service Control Service");
-        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, ServiceManagementLocal.class);
-        	SocietiesClientServicesController.this.context.bindService(serviceIntent, slmControlConnection, Context.BIND_AUTO_CREATE);
+        	if (retValue) {
+	        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android SLM Service Control Service");
+	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, ServiceManagementLocal.class);
+	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, slmControlConnection, Context.BIND_AUTO_CREATE);
+           	} else {
+        		Log.e(LOCAL_LOG_TAG, "Service does not exist");
+        	}
 
-        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android SNS Connectors Service");
-        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, SocialData.class);
-        	SocietiesClientServicesController.this.context.bindService(serviceIntent, snsSocialDataConnection, Context.BIND_AUTO_CREATE);
+        	if (retValue) {
+	        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android SNS Connectors Service");
+	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, SocialData.class);
+	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, snsSocialDataConnection, Context.BIND_AUTO_CREATE);
+           	} else {
+        		Log.e(LOCAL_LOG_TAG, "Service does not exist");
+        	}
         	
-        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Friends Manager Service");
-        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, FriendsManagerLocal.class);
-        	SocietiesClientServicesController.this.context.bindService(serviceIntent, friendsMgrConnection, Context.BIND_AUTO_CREATE);
+        	if (retValue) {
+	        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Friends Manager Service");
+	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, FriendsManagerLocal.class);
+	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, friendsMgrConnection, Context.BIND_AUTO_CREATE);
+           	} else {
+        		Log.e(LOCAL_LOG_TAG, "Service does not exist");
+        	}
         	
-        	Log.d(LOCAL_LOG_TAG, "Bind to Societies User Feedback Service");
-        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, UserFeedbackLocal.class);
-        	SocietiesClientServicesController.this.context.bindService(serviceIntent, userFeedbackConnection, Context.BIND_AUTO_CREATE);
-        	
-//    		Log.d(LOCAL_LOG_TAG, "Bind to Societies Android Personalisation Manager Service");
-//        	serviceIntent = new Intent(ICoreSocietiesServices.PERSONALISATION_SERVICE_INTENT);
-//        	SocietiesClientServicesController.this.context.bindService(serviceIntent, personalisationMgrConnection, Context.BIND_AUTO_CREATE);
-            
         	try {
         		//To prevent hanging this latch uses a timeout
         		SocietiesClientServicesController.this.servicesBinded.await(TASK_TIMEOUT, TimeUnit.MILLISECONDS);
+    			callback.returnAction(retValue);
     		} catch (InterruptedException e) {
     			retValue = false;
     			e.printStackTrace();
-    		} finally {
-    			callback.returnAction(retValue);
+    			callback.returnException(e.getMessage());
     		}
-
     		return null;
     	}
     }
@@ -609,12 +605,15 @@ public class SocietiesClientServicesController {
     		SocietiesClientServicesController.this.slmServiceControl.startService();
     		SocietiesClientServicesController.this.snsConnectorService.startService();
     		SocietiesClientServicesController.this.friendMgrService.startService();
-    		SocietiesClientServicesController.this.userFeedbackService.startService();
     		
     		//START "STARTED SERVICES"
         	//FRIENDS SERVICE
             Intent intentFriends = new Intent(SocietiesClientServicesController.this.context, EventService.class);
             SocietiesClientServicesController.this.context.startService(intentFriends);
+            //USERFEEDBACK EVENT LISTENER
+            Intent intentUserFeedback = new Intent(SocietiesClientServicesController.this.context, EventListener.class);
+            SocietiesClientServicesController.this.context.startService(intentUserFeedback);
+            
     		try {
 				SocietiesClientServicesController.this.servicesStarted.await(TASK_TIMEOUT, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
@@ -678,11 +677,15 @@ public class SocietiesClientServicesController {
     		SocietiesClientServicesController.this.slmServiceControl.stopService();
     		SocietiesClientServicesController.this.snsConnectorService.stopService();
     		SocietiesClientServicesController.this.friendMgrService.stopService();
-    		SocietiesClientServicesController.this.userFeedbackService.stopService();
+
     		//STOP "STARTED SERVICES"
         	//FRIENDS SERVICE
             Intent intentFriends = new Intent(SocietiesClientServicesController.this.context, EventService.class);
             SocietiesClientServicesController.this.context.stopService(intentFriends);
+            //USERFEEDBACK EVENT LISTENER
+            Intent intentUserFeedback = new Intent(SocietiesClientServicesController.this.context, EventListener.class);
+            SocietiesClientServicesController.this.context.stopService(intentUserFeedback);
+            
     		try {
 				SocietiesClientServicesController.this.servicesStopped.await(TASK_TIMEOUT, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {

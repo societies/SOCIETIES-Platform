@@ -9,6 +9,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Societies services - Social Data</title>
 <script type="text/javascript" src="js/socialdata.js"></script>
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="http://code.jquery.com/jquery-migrate-1.1.1.min.js"></script>
+<link href="css/socialdata.css" rel="stylesheet" type="text/css"  media="screen" />
+<!-- 
+
 <style>
 
 input.icon{
@@ -67,7 +72,7 @@ div#addConnector{
 
 
 </style>
-
+-->
 
 </head>
 
@@ -120,6 +125,7 @@ div#addConnector{
          <li><a href="#" onclick="exe('groups');">Show subscribed <strong>Groups</a></strong></li>
          <li><a href="#" onclick="exe('update');"> <strong>Update</strong></a></li>
          <li>Last update: ${lastupdate}</strong></li>
+         <jsp:include page="socialdatastatus.jsp" />
       </ul>
    </div>
 </div>
@@ -132,14 +138,20 @@ div#addConnector{
  
    <div id="popup" style="visibility:hidden" ><img src="images/loading.gif"> Loading connector data. Please wait... </div><br>
    <p> Connect your social network with Societies <br/>
-      
+      <!-- 
      <input class="icon" onclick="getToken('http://157.159.160.188:8080/examples/servlets/servlet/TwitterLoginServlet','twitter');" type="image" src="images/Twitter.jpg">
 	  
      <input class="icon" onclick="getToken('http://dev.lucasimone.eu/fb.php', 'facebook');" type="image" src="images/facebook.png">
      <input class="icon" onclick="getToken('http://157.159.160.188:8080/examples/servlets/servlet/FoursquareLoginServlet', 'foursquare');" type="image" src="images/Foursquare.png">
 	 <input class="icon" onclick="getToken('http://dev.lucasimone.eu/auth.php', 'Linkedin')" type="image" src="images/Linkedin.png">
-	 
+	   -->
+     
 	 <input class="icon" onclick="connectSN('connect_tw')" type="image" src="images/Twitter.jpg">
+	 <input class="icon" onclick="connectSN('connect_fq')" type="image" src="images/Foursquare.png">
+	 <input class="icon" onclick="connectSN('connect_lk')" type="image" src="images/Linkedin.png">
+	 <input class="icon" onclick="connectSN('connect_fb')" type="image" src="images/facebook.png">
+	 
+	 
    </p>
    <div id="addConnector">
   <form:form method="POST" action="socialdata.html" commandName="sdForm" name="sd">

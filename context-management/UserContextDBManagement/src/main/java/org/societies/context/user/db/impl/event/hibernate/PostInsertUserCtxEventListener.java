@@ -24,19 +24,12 @@
  */
 package org.societies.context.user.db.impl.event.hibernate;
 
-import java.util.Arrays;
-
 import org.hibernate.event.PostInsertEvent;
 import org.hibernate.event.PostInsertEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.context.event.CtxChangeEvent;
-import org.societies.api.context.model.CtxIdentifier;
 import org.societies.context.api.event.CtxChangeEventTopic;
-import org.societies.context.api.event.CtxEventScope;
-import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.user.db.impl.model.CtxModelObjectDAO;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Describe your class here...
@@ -51,14 +44,6 @@ public class PostInsertUserCtxEventListener implements PostInsertEventListener {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(PostInsertUserCtxEventListener.class);
 	
-	private static final String[] EVENT_TOPICS = new String[] { CtxChangeEventTopic.CREATED };
-	
-	private static final CtxEventScope EVENT_SCOPE = CtxEventScope.BROADCAST;
-	
-	/** The Context Event Mgmt service reference. */
-	@Autowired(required=true)
-	private ICtxEventMgr ctxEventMgr;
-	
 	PostInsertUserCtxEventListener() {
 		
 		if (LOG.isInfoEnabled())
@@ -72,24 +57,13 @@ public class PostInsertUserCtxEventListener implements PostInsertEventListener {
 	public void onPostInsert(PostInsertEvent event) {
 		
 		if (LOG.isTraceEnabled())
-			LOG.trace("Received PostInsertEvent for context hibernate entity " + event.getId());
+			LOG.trace("Received PostInsertEvent for context hibernate entity " + event.getEntity());
 		
 		// Ignore events for non CtxModelObjects
 		if (!(event.getEntity() instanceof CtxModelObjectDAO))
 			return;
 		
-		final CtxIdentifier ctxId = ((CtxModelObjectDAO) event.getEntity()).getId();
-		final CtxChangeEvent ctxChangeEvent = new CtxChangeEvent(ctxId); 
-		if (LOG.isDebugEnabled())
-			LOG.debug("Sending context change event " + ctxChangeEvent
-					+ " to topics '" + Arrays.toString(EVENT_TOPICS) 
-					+ "' with scope '" + EVENT_SCOPE + "'");
-		if (this.ctxEventMgr != null)
-			this.ctxEventMgr.post(ctxChangeEvent, EVENT_TOPICS, EVENT_SCOPE);
-		else
-			LOG.error("Could not send context change event '" + ctxChangeEvent
-					+ " to topics '" + Arrays.toString(EVENT_TOPICS) 
-					+ "' with scope '" + EVENT_SCOPE + "': "
-					+ "ICtxEventMgr service is not available");
+		final CtxModelObjectDAO ctxModelObject = (CtxModelObjectDAO) event.getEntity();
+		ctxModelObject.getEventTopics().add(CtxChangeEventTopic.CREATED);
 	}
 }

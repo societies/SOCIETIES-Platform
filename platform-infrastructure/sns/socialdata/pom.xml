@@ -67,21 +67,25 @@
 		</dependency>
 
 
-		<dependency>
-			<groupId>org.societies.platform</groupId>
-			<artifactId>facebook_connector</artifactId>
-			<version>${release.version}</version>
-			<scope>compile</scope>
-		</dependency>
-
-
+		
+	
+	
 		<dependency>
 			<groupId>org.societies.platform.socialdata</groupId>
 			<artifactId>SocialDataComms</artifactId>
 			<version>${release.version}</version>
 			<scope>compile</scope>
 		</dependency>
+ 	
 
+        <!--  CONNECTORS Available -->
+
+		<dependency>
+			<groupId>org.societies.platform</groupId>
+			<artifactId>facebook_connector</artifactId>
+			<version>${release.version}</version>
+			<scope>compile</scope>
+		</dependency>
 
 
 		<dependency>

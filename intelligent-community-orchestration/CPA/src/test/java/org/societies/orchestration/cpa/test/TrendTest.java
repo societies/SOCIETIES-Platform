@@ -122,29 +122,29 @@ public class TrendTest  extends JApplet {
         //System.out.println("sim.getActFeed().getActivities((t+1)+\" \"+Long.toString(System.currentTimeMillis()+100000000L)).size(): "+sim.getActFeed().getActivities(lastAct.getPublished()+" "+Long.toString(System.currentTimeMillis()+100000000L)).size());
 
         System.out.println("after setupview");
-        List<IActivity> actList = sim.getActFeed().getActivities(Long.toString(t + 3) + " " + Long.toString(System.currentTimeMillis() + 100000000L));
+        List<IActivity> actList = sim.getActFeed().getActivitiesFromDB(Long.toString(t + 3) + " " + Long.toString(System.currentTimeMillis() + 100000000L));
         IActivity lastAct = actList.get(actList.size()-1);
         this.sleep();
 
-        sim.getActFeed().addActivity(a2);
-        cpa.analyze(sim.getActFeed().getActivities(lastAct.getPublished()+" "+Long.toString(System.currentTimeMillis()+100000000L)));
-        actList = sim.getActFeed().getActivities(Long.toString(0) + " " + Long.toString(System.currentTimeMillis() + 100000000L));
+        sim.getActFeed().addActivityToDB(a2);
+        cpa.analyze(sim.getActFeed().getActivitiesFromDB(lastAct.getPublished()+" "+Long.toString(System.currentTimeMillis()+100000000L)));
+        actList = sim.getActFeed().getActivitiesFromDB(Long.toString(0) + " " + Long.toString(System.currentTimeMillis() + 100000000L));
         lastAct = actList.get(actList.size()-1);
         jf.setVisible(false);jf.setVisible(true);
         vv.revalidate();
         this.sleep();
 
         //cpa.analyze()
-        sim.getActFeed().addActivity(a3);
-        cpa.analyze(sim.getActFeed().getActivities(lastAct.getPublished()+" "+Long.toString(System.currentTimeMillis()+100000000L)));
-        actList = sim.getActFeed().getActivities(Long.toString(0) + " " + Long.toString(System.currentTimeMillis() + 100000000L));
+        sim.getActFeed().addActivityToDB(a3);
+        cpa.analyze(sim.getActFeed().getActivitiesFromDB(lastAct.getPublished()+" "+Long.toString(System.currentTimeMillis()+100000000L)));
+        actList = sim.getActFeed().getActivitiesFromDB(Long.toString(0) + " " + Long.toString(System.currentTimeMillis() + 100000000L));
         lastAct = actList.get(actList.size()-1);
         jf.setVisible(false);jf.setVisible(true);
         vv.revalidate();
         this.sleep();
 
-        sim.getActFeed().addActivity(a4);
-        cpa.analyze(sim.getActFeed().getActivities(lastAct.getPublished()+" "+Long.toString(System.currentTimeMillis()+100000000L)));
+        sim.getActFeed().addActivityToDB(a4);
+        cpa.analyze(sim.getActFeed().getActivitiesFromDB(lastAct.getPublished()+" "+Long.toString(System.currentTimeMillis()+100000000L)));
         jf.setVisible(false);jf.setVisible(true);
         vv.revalidate();
         List<String> topTrends = cpa.getGraph().topTrends(4);
@@ -242,15 +242,15 @@ public class TrendTest  extends JApplet {
         makeActs();
         setup();
         aFeed = sim.getActFeed();
-        sim.getActFeed().addActivity(pa1);sim.getActFeed().addActivity(pa2);sim.getActFeed().addActivity(pa3);sim.getActFeed().addActivity(pa4);
-        pa4.setActor("user11");pa4.setObject("jej");sim.getActFeed().addActivity(pa4);
-        pa4.setActor("user12");pa4.setObject("hej");sim.getActFeed().addActivity(pa4);
-        pa4.setActor("user13");pa4.setObject("jeh");sim.getActFeed().addActivity(pa4);
-        pa4.setActor("user14");pa4.setObject("jeg");sim.getActFeed().addActivity(pa4);
-        pa4.setActor("user15");pa4.setObject("oej");sim.getActFeed().addActivity(pa4);
-        pa4.setActor("user16");pa4.setObject("iej");sim.getActFeed().addActivity(pa4);
-        pa4.setActor("user17");pa4.setObject("aej");sim.getActFeed().addActivity(pa4);
-        sim.getActFeed().addActivity(a1);
+        sim.getActFeed().addActivityToDB(pa1);sim.getActFeed().addActivityToDB(pa2);sim.getActFeed().addActivityToDB(pa3);sim.getActFeed().addActivityToDB(pa4);
+        pa4.setActor("user11");pa4.setObject("jej");sim.getActFeed().addActivityToDB(pa4);
+        pa4.setActor("user12");pa4.setObject("hej");sim.getActFeed().addActivityToDB(pa4);
+        pa4.setActor("user13");pa4.setObject("jeh");sim.getActFeed().addActivityToDB(pa4);
+        pa4.setActor("user14");pa4.setObject("jeg");sim.getActFeed().addActivityToDB(pa4);
+        pa4.setActor("user15");pa4.setObject("oej");sim.getActFeed().addActivityToDB(pa4);
+        pa4.setActor("user16");pa4.setObject("iej");sim.getActFeed().addActivityToDB(pa4);
+        pa4.setActor("user17");pa4.setObject("aej");sim.getActFeed().addActivityToDB(pa4);
+        sim.getActFeed().addActivityToDB(a1);
         makeGraph();
         try {
             System.out.println("before setupview");
@@ -277,7 +277,7 @@ public class TrendTest  extends JApplet {
 
         cpa = new CPACreationPatterns();
         cpa.init();
-        cpa.analyze(sim.getActFeed().getActivities("0 "+Long.toString(System.currentTimeMillis()+100000000L)));
+        cpa.analyze(sim.getActFeed().getActivitiesFromDB("0 "+Long.toString(System.currentTimeMillis()+100000000L)));
         graph = cpa.getGraph();
 
         ((SocialGraphVertex)cpa.getGraph().getVertices().get(0)).setTrend(true);

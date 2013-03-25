@@ -75,4 +75,10 @@ public interface IActionConsumer {
 	 */
 	public boolean setIAction(IIdentity userId, IAction obj);
 
+    /**
+     * Used by the Personalisation Manager, this method should return a list of all preferences which
+     * the service implements and would like personalised
+     */
+    public List<PersonalisablePreferenceIdentifier> getPersonalisablePreferences();
+
 }

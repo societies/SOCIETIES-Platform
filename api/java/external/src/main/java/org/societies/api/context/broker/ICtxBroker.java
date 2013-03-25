@@ -79,7 +79,7 @@ public interface ICtxBroker {
 	 */
 	public Future<CtxEntity> createEntity(final Requestor requestor, 
 			final IIdentity targetId, final String type) throws CtxException;
-	
+
 	/**
 	 * Creates a {@link CtxAttribute} with the specified type which is
 	 * associated to the identified context entity (scope).
@@ -112,7 +112,7 @@ public interface ICtxBroker {
 	 */
 	public Future<CtxAssociation> createAssociation(final Requestor requestor, 
 			final IIdentity targetId, final String type) throws CtxException;
-	
+
 	/**
 	 * There are several methods missing that would express the similarity of context
 	 * values or objects in a quantifiable form (and not via a sorted list of
@@ -155,44 +155,70 @@ public interface ICtxBroker {
 	public Future<List<CtxIdentifier>> lookup(final Requestor requestor,
 			final IIdentity target, final CtxModelType modelType,
 			final String type) throws CtxException;
-	
+
+
 	/**
-	  * Looks up context model objects (i.e. attributes or associations) of the
-	  * specified type associated with the identified context entity. The 
-	  * method returns a list of {@link CtxIdentifier CtxIdentifiers}
-	  * referencing the context model objects that match the supplied criteria.
-	  * 
-	  * @param requestor
-	  *            the requestor on whose behalf to lookup the context model 
-	  *            objects
-	  * @param entityId
-	  *            the {@link CtxEntityIdentifier} of the entity where to
-	  *            lookup for matching model objects 
-	  * @param modelType
-	  *            the {@link CtxModelType} of the context model objects to
-	  *            lookup
-	  * @param type
-	  *            the type of the context model objects to lookup
-	  * @return a list of {@link CtxIdentifier CtxIdentifiers} referencing the
-	  *         context model objects that match the supplied criteria.
-	  * @throws CtxException
-	  *             if there is a problem performing the look-up operation 
-	  * @throws NullPointerException
-	  *             if any of the specified parameters is <code>null</code>
-	  * @throws IllegalArgumentException
-	  *             if the specified modelType is neither a {@link CtxModelType#ATTRIBUTE}
-	  *             nor a {@link CtxModelType#ASSOCIATION}
-	  * @since 0.4
-	  */
-	 public Future<List<CtxIdentifier>> lookup(final Requestor requestor, 
-			 final CtxEntityIdentifier entityId, final CtxModelType modelType,
-			 final String type) throws CtxException;
+	 * Looks up context model objects (i.e. entities, attributes or associations) of the
+	 * specified type.The method returns a list of {@link CtxIdentifier CtxIdentifiers}
+	 * referencing the context model objects that match the supplied criteria. 
+	 * 
+	 * This method exploits a context data hierarchy and performs in a dynamic manner 
+	 * additional queries related with the initially queried data type.  
+	 *  
+	 * @param requestor
+	 *            the requestor on whose behalf to lookup the context model 
+	 *            objects
+	 * @param type
+	 *            the type of the context model objects to lookup
+	 * @throws CtxException
+	 *             if there is a problem performing the look-up operation
+	 * @return a list of {@link CtxIdentifier CtxIdentifiers} referencing the
+	 *         context model objects that match the supplied criteria.
+	 * 
+	 */
+	public Future<List<CtxIdentifier>> lookup(final Requestor requestor,
+			final IIdentity target, final String type) throws CtxException;
+
+
+	/**
+	 * Looks up context model objects (i.e. attributes or associations) of the
+	 * specified type associated with the identified context entity. The 
+	 * method returns a list of {@link CtxIdentifier CtxIdentifiers}
+	 * referencing the context model objects that match the supplied criteria.
+	 * 
+	 * @param requestor
+	 *            the requestor on whose behalf to lookup the context model 
+	 *            objects
+	 * @param entityId
+	 *            the {@link CtxEntityIdentifier} of the entity where to
+	 *            lookup for matching model objects 
+	 * @param modelType
+	 *            the {@link CtxModelType} of the context model objects to
+	 *            lookup
+	 * @param type
+	 *            the type of the context model objects to lookup
+	 * @return a list of {@link CtxIdentifier CtxIdentifiers} referencing the
+	 *         context model objects that match the supplied criteria.
+	 * @throws CtxException
+	 *             if there is a problem performing the look-up operation 
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>
+	 * @throws IllegalArgumentException
+	 *             if the specified modelType is neither a {@link CtxModelType#ATTRIBUTE}
+	 *             nor a {@link CtxModelType#ASSOCIATION}
+	 * @since 0.4
+	 */
+	public Future<List<CtxIdentifier>> lookup(final Requestor requestor, 
+			final CtxEntityIdentifier entityId, final CtxModelType modelType,
+			final String type) throws CtxException;
 
 	/**
 	 * Looks up for a list of CtxEntities of  the specified type, containing the
 	 * specified attributes
 	 * 
 	 * @param requestor
+	 * 			  the requestor on whose behalf to lookup the context model 
+	 *            objects
 	 * @param targetCss
 	 *            the {@link IIdentity} of the CSS where to perform the look-up
 	 * @param entityType
@@ -206,17 +232,17 @@ public interface ICtxBroker {
 			final String entityType, final String attribType,
 			final Serializable minAttribValue,
 			final Serializable maxAttribValue) throws CtxException;
-	
+
 	/**
 	 * Registers the specified {@link CtxChangeEventListener} for changes
 	 * related to the context model object referenced by the specified
 	 * {@link CtxIdentifier}. Once registered, the CtxChangeEventListener
-     * will receive {@link CtxChangeEvent CtxChangeEvents} associated with the
-     * identified context model object.
-     * <p>
-     * To unregister the specified CtxChangeEventListener, use the
-     * {@link #unregisterFromChanges(CtxChangeEventListener, CtxIdentifier)}
-     * method.
+	 * will receive {@link CtxChangeEvent CtxChangeEvents} associated with the
+	 * identified context model object.
+	 * <p>
+	 * To unregister the specified CtxChangeEventListener, use the
+	 * {@link #unregisterFromChanges(CtxChangeEventListener, CtxIdentifier)}
+	 * method.
 	 * 
 	 * @param requestor
 	 *            the entity requesting to register for context changes
@@ -234,7 +260,7 @@ public interface ICtxBroker {
 	public void registerForChanges(final Requestor requestor, 
 			final CtxChangeEventListener listener, final CtxIdentifier ctxId)
 					throws CtxException;
-	
+
 	/**
 	 * Unregisters the specified {@link CtxChangeEventListener} from changes
 	 * related to the context model object referenced by the specified identifier.
@@ -263,12 +289,12 @@ public interface ICtxBroker {
 	 * {@link CtxChangeEvent CtxChangeEvents} associated with the context
 	 * attribute(s) of the specified scope and type. Note that if a
 	 * <code>null</code> type is specified then the supplied listener will
-     * receive events associated with any CtxAttribute under the given scope
-     * regardless of their type.
-     * <p>
-     * To unregister the specified CtxChangeEventListener, use the
-     * {@link #unregisterFromChanges(CtxChangeEventListener, CtxEntityIdentifier, String)}
-     * method.
+	 * receive events associated with any CtxAttribute under the given scope
+	 * regardless of their type.
+	 * <p>
+	 * To unregister the specified CtxChangeEventListener, use the
+	 * {@link #unregisterFromChanges(CtxChangeEventListener, CtxEntityIdentifier, String)}
+	 * method.
 	 * 
 	 * @param requestor
 	 *            the entity requesting to register for context changes
@@ -284,14 +310,14 @@ public interface ICtxBroker {
 	 *             if the registration process fails
 	 * @throws NullPointerException 
 	 *             if any of the listener, topics or scope parameter is
-     *             <code>null</code>
+	 *             <code>null</code>
 	 * @since 0.0.3
 	 */
 	public void registerForChanges(final Requestor requestor, 
 			final CtxChangeEventListener listener, 
 			final CtxEntityIdentifier scope, final String attrType)
 					throws CtxException;
-	
+
 	/**
 	 * Unregisters the specified {@link CtxChangeEventListener} from changes
 	 * related to the context attribute(s) with the supplied scope and type.
@@ -352,7 +378,7 @@ public interface ICtxBroker {
 	 */
 	public Future<CtxModelObject> retrieve(final Requestor requestor, 
 			final CtxIdentifier identifier) throws CtxException;
-	
+
 	/**
 	 * Retrieves the {@link CtxEntityIdentifier} of the 
 	 * {@link IndividualCtxEntity} which represents the owner of the identified
@@ -378,7 +404,7 @@ public interface ICtxBroker {
 	 */
 	public Future<CtxEntityIdentifier> retrieveIndividualEntityId(
 			final Requestor requestor, final IIdentity cssId) throws CtxException;
-	
+
 	/**
 	 * Retrieves the {@link CtxEntityIdentifier} of the 
 	 * {@link CommunityCtxEntity} which represents the identified CIS. All
@@ -456,7 +482,7 @@ public interface ICtxBroker {
 	public Future<List<CtxHistoryAttribute>> retrieveHistory(final Requestor requestor, 
 			final CtxAttributeIdentifier attrId, final Date startDate,
 			final Date endDate) throws CtxException;
-		
+
 	/**
 	 * Updates the specified {@link CtxModelObject}. The requestor on whose
 	 * behalf to update the context model object must also be specified. The
@@ -478,7 +504,7 @@ public interface ICtxBroker {
 	 */
 	public Future<CtxModelObject> update(final Requestor requestor,
 			final CtxModelObject object) throws CtxException;
-	
+
 	/**
 	 * 
 	 * @param requestor
@@ -510,7 +536,7 @@ public interface ICtxBroker {
 			final CtxEntityIdentifier community) throws CtxException;
 
 	/**
-     * Retrieves a list of Individual Context Entities that are members of the specified community Entity 
+	 * Retrieves a list of Individual Context Entities that are members of the specified community Entity 
 	 * (individuals or subcommunities).
 	 * 
 	 * @param requestor
@@ -530,5 +556,5 @@ public interface ICtxBroker {
 	 */
 	public Future<List<CtxEntityIdentifier>> retrieveParentCommunities(final Requestor requestor,
 			final CtxEntityIdentifier community) throws CtxException;
-	
+
 }

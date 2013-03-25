@@ -20,4 +20,35 @@
     </xs:restriction>
   </xs:simpleType>
   
+  <xs:simpleType name="trustValueTypeBean">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="direct"/>
+      <xs:enumeration value="indirect"/>
+      <xs:enumeration value="userPerceived"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="trustEvidenceTypeBean">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="rated"/>
+      <xs:enumeration value="friendedUser"/>
+      <xs:enumeration value="unfriendedUser"/>
+      <xs:enumeration value="joinedCommunity"/>
+      <xs:enumeration value="leftCommunity"/>
+      <xs:enumeration value="usedService"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:element name="trustUpdateEventBean">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="trustorId" type="tns:trustedEntityIdBean" minOccurs="1" nillable="false"/>
+	<xs:element name="trusteeId" type="tns:trustedEntityIdBean" minOccurs="1" nillable="false"/>
+	<xs:element name="valueType" type="tns:trustValueTypeBean" minOccurs="1" nillable="false"/>
+	<xs:element name="oldValue" type="xs:double" minOccurs="0"/>
+	<xs:element name="newValue" type="xs:double" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
 </xs:schema>

@@ -24,10 +24,13 @@
  */
 package org.societies.api.internal.personalisation.preference;
 
+import java.util.List;
 import java.util.concurrent.Future;
 
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.api.personalisation.model.IActionConsumer;
+import org.societies.api.personalisation.model.PersonalisablePreferenceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
@@ -46,4 +49,17 @@ public interface IUserPreferenceManagement {
 	 * @return
 	 */
 	public Future<IOutcome> getOutcome(IIdentity ownerId, ServiceResourceIdentifier serviceId, String preferenceName);
+
+    /**
+     * Register a service's personalisable preference
+     *
+     * @param actionConsumer The service which may interpret this preference
+     * @param preference The preference which can be personalised
+     */
+    void registerPersonalisableService(IActionConsumer actionConsumer, PersonalisablePreferenceIdentifier preference);
+
+    /**
+     * Returns a list of preferences which have been collected from registered personalisable services
+     */
+    public List<PersonalisablePreferenceIdentifier> getKnownPersonalisablePreferences();
 }

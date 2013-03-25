@@ -27,7 +27,9 @@ package org.societies.context.user.db.test;
 import static org.junit.Assert.*;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -583,6 +585,49 @@ public class UserCtxDBMgrTest {
 		assertTrue(ids.contains(entId2));
 	}
 
+	@Test
+	public void testLookupSetOfTypes() throws CtxException{
+		System.out.println("---- testLookupSetOfTypes");
+		   
+		Set<CtxIdentifier> ids;
+	    
+		// Create test entity.   
+		final CtxEntityIdentifier entId = this.userDB.createEntity(CtxEntityTypes.ORGANISATION).getId();
+		final CtxEntityIdentifier entId2 = this.userDB.createEntity(CtxEntityTypes.ORGANISATION).getId();
+		final CtxEntityIdentifier entId3 = this.userDB.createIndividualEntity(CSS_ID, CtxEntityTypes.SOCIAL_NETWORK).getId();
+		
+	    // Create test attribute.
+	    final CtxAttribute attribute = this.userDB.createAttribute(entId, CtxAttributeTypes.AFFILIATION);
+	    final CtxAttribute attribute2 = this.userDB.createAttribute(entId2, CtxAttributeTypes.AFFILIATION);
+	    final CtxAttribute attribute3 = this.userDB.createAttribute(entId3, CtxAttributeTypes.SOCIAL_NETWORK_CONNECTOR);
+	    
+	    final Set<String> types = new HashSet<String>();
+	    types.add(entId.getType());
+	    types.add(entId3.getType());
+	    //
+	    // Lookup entities
+	    //
+	    ids = userDB.lookup(CSS_ID, types);
+	    assertTrue(ids.contains(entId));
+	    assertEquals(3, ids.size());
+	              
+	    assertTrue(ids.contains(entId2));
+	    assertTrue(ids.contains(entId3));
+
+	    final Set<String> types2 = new HashSet<String>();
+	    types2.add(attribute.getType());
+	    types2.add(attribute3.getType());
+	    //
+	    // Lookup attributes
+	    //
+	    ids = userDB.lookup(attribute.getOwnerId(), types2);
+	    assertTrue(ids.contains(attribute.getId()));
+	    assertEquals(3, ids.size());
+	              
+	    assertTrue(ids.contains(attribute2.getId()));
+	    assertTrue(ids.contains(attribute3.getId()));
+	       
+   }
    /*
 	@Ignore
 	@Test

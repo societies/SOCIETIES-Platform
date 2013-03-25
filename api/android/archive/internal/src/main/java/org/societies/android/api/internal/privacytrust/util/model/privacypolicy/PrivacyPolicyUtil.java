@@ -36,7 +36,7 @@ import java.util.Map;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.android.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtil;
+import org.societies.android.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
 import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;

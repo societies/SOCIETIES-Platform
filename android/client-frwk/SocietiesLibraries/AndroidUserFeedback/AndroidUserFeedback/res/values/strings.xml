@@ -5,4 +5,8 @@
     <string name="app_name">Societies Notifications</string>
     <string name="societies_Notifications">SOCIETIES Notifications</string>
     <string name="notifications_description">Description</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_negotiaion_form">NegotiaionForm</string>
+
 </resources>

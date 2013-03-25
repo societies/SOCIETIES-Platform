@@ -188,7 +188,7 @@ public class InternalTrustBroker implements ITrustBroker {
 			final ITrustUpdateEventListener listener,
 			final TrustedEntityId trustorId, final TrustedEntityId trusteeId) 
 					throws TrustException {
-		// TODO Auto-generated method stub
+		
 		if (listener == null)
 			throw new NullPointerException("listener can't be null");
 		if (trustorId == null)
@@ -199,6 +199,11 @@ public class InternalTrustBroker implements ITrustBroker {
 		if (this.trustEventMgr == null)
 			throw new TrustBrokerException("Could not unregister trust update listener for entity (" 
 					+ trustorId	+ ", " + trusteeId + "): ITrustEventMgr service is not available");
+		final String[] topics = new String[] { TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
+		if (LOG.isDebugEnabled())
+			LOG.debug("Unregistering event listener for entity (" + trustorId 
+					+ ", " + trusteeId + ") from topics '" + Arrays.toString(topics) + "'");
+		this.trustEventMgr.unregisterUpdateListener(listener, topics, trustorId, trusteeId);
 	}
 	
 	private class RemoteRetrieveCallback implements IInternalTrustBrokerRemoteClientCallback {

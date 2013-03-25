@@ -33,18 +33,20 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote;
-import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
 import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.privacytrust.remote.PrivacyCommClientCallback;
+
 /**
  * Comms Client that initiates the remote communication
  *
@@ -53,12 +55,12 @@ import org.societies.privacytrust.remote.PrivacyCommClientCallback;
  */
 public class PrivacyDataManagerCommClient implements IPrivacyDataManagerRemote {
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerCommClient.class);
-	
+
 	private ICommManager commManager;
 	private PrivacyDataManagerCommClientCallback listeners;
 	private PrivacyCommClientCallback privacyCommClientCallback;
 
-	
+
 	public PrivacyDataManagerCommClient() {	
 	}
 
@@ -68,16 +70,17 @@ public class PrivacyDataManagerCommClient implements IPrivacyDataManagerRemote {
 	 */
 	@Override
 	public void checkPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions, IPrivacyDataManagerListener listener) throws PrivacyException {
-		LOG.info("#### checkPermission remote called");
+		// -- Search receiver
 		IIdentity toIdentity = commManager.getIdManager().getThisNetworkNode();
 		Stanza stanza = new Stanza(toIdentity);
-//		Stanza stanza = new Stanza(ownerId);
-		
+
+		// -- Register listener
 		listeners.privacyDataManagerlisteners.put(stanza.getId(), listener);
-		
+
+		// -- Create message
 		PrivacyDataManagerBean bean = new PrivacyDataManagerBean();
 		bean.setMethod(MethodType.CHECK_PERMISSION);
-		bean.setRequestor(Util.createRequestorBean(requestor));
+		bean.setRequestor(RequestorUtils.toRequestorBean(requestor));
 		bean.setDataIdUri(dataId.getUri());
 		bean.setActions(ActionUtils.toActionBeans(actions));
 		try {
@@ -86,39 +89,38 @@ public class PrivacyDataManagerCommClient implements IPrivacyDataManagerRemote {
 			LOG.error("CommunicationException: "+MethodType.CHECK_PERMISSION, e);
 			throw new PrivacyException("CommunicationException: "+MethodType.CHECK_PERMISSION, e);
 		}
-		LOG.info("#### checkPermission remote sent");
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote#obfuscateData(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener)
+	/*
+	 * (non-Javadoc)
+	 * @see org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote#obfuscateData(org.societies.api.schema.identity.RequestorBean, org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper, org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener)
 	 */
 	@Override
-	public void obfuscateData(Requestor requestor, IDataWrapper dataWrapper, IDataObfuscationListener listener) throws PrivacyException {
-		LOG.info("#### obfuscateData remote called");
-		
+	public void obfuscateData(RequestorBean requestor, DataWrapper dataWrapper, IDataObfuscationListener listener) throws PrivacyException {
+		// -- Search receiver
 		IIdentity toIdentity = commManager.getIdManager().getThisNetworkNode();
 		Stanza stanza = new Stanza(toIdentity);
-//		Stanza stanza = new Stanza(ownerId);
-		
+
+		// -- Register listener
 		listeners.dataObfuscationlisteners.put(stanza.getId(), listener);
-		
+
+		// -- Create message
 		PrivacyDataManagerBean bean = new PrivacyDataManagerBean();
 		bean.setMethod(MethodType.OBFUSCATE_DATA);
-		bean.setRequestor(Util.createRequestorBean(requestor));
-		bean.setDataIdUri(dataWrapper.getDataId().getUri());
+		bean.setRequestor(requestor);
+		bean.setDataWrapper(dataWrapper);
 		try {
 			this.commManager.sendIQGet(stanza, bean, privacyCommClientCallback);
 		} catch (CommunicationException e) {
 			LOG.error("CommunicationException: "+MethodType.OBFUSCATE_DATA, e);
-			throw new PrivacyException("CommunicationException: "+MethodType.OBFUSCATE_DATA, e);
+			throw new PrivacyException("Error during remote call: "+MethodType.OBFUSCATE_DATA, e);
 		}
-		LOG.info("#### obfuscateData remote sent");
 	}
 
-	
-	
+
+
 	// -- Dependency Injection
-	
+
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
 		LOG.info("[DependencyInjection] CommManager injected");

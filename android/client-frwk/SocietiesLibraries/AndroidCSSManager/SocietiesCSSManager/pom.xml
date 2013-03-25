@@ -55,8 +55,8 @@
 			<type>apklib</type>
 		</dependency>   
 		<dependency>
-		    <groupId>org.societies.android.platform.events.helper</groupId>
-   			<artifactId>SocietiesAndroidPlatformEventsHelper</artifactId>
+		   <groupId>org.societies.android.remote.helper</groupId>
+		   <artifactId>SocietiesAndroidRemoteHelpers</artifactId>
 		    <version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>

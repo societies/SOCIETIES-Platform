@@ -193,19 +193,21 @@ public class CssSuggestedFriendsController {
 			FriendFilter filter = new FriendFilter();
 			Integer filterFlag = 0x00000001111;
 			filter = cssLocalManager.getFriendfilter();
-			filterFlag = filter.getFilterFlag();
-			filter.setFilterFlag(filterFlag );
-			LOG.info("SuggestedFriendsController called with filter: " +filter);
+			if(filter==null){
+				filter = new FriendFilter();
+				filterFlag=0x00000011111;
+				filter.setFilterFlag(filterFlag);
+			}else{
+				filterFlag = filter.getFilterFlag();
+				filter.setFilterFlag(filterFlag );
+			}
 			
-//			int filterFlag = 0x0000000000;
-			
-			LOG.info("SuggestedFriends Controller filterflag to set is: " +filterFlag);
-			
-
+			LOG.info("About to call the suggestedFriendDetails with filterflag: " +filter);
 			Future<HashMap<CssAdvertisementRecord, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriendsDetails(filter); //suggestedFriends();
 			HashMap<CssAdvertisementRecord,Integer> snsSuggestedFriends = asynchSnsSuggestedFriends.get();
 
-			LOG.info("SuggestedFriendsController snsSuggestedFriends: " +snsSuggestedFriends +" Size is: " +snsSuggestedFriends.size());
+			LOG.info("Back from call the suggestedFriendDetails with result: " +snsSuggestedFriends);
+			
 
 			// Another Hack for the pilot!!!! DO Not copy!!!
 			// CssManager should return complete and intelligent list, but since
@@ -218,8 +220,6 @@ public class CssSuggestedFriendsController {
 
 			Future<List<CssRequest>> asynchFR = getCssLocalManager().findAllCssRequests();
 			List<CssRequest> friendReq = asynchFR.get();
-
-			LOG.info("SuggestedFriendsController allcssDetails size : " +allcssDetails.size());
 
 
 			for (int index = 0; index < allcssDetails.size(); index++) {
@@ -242,18 +242,47 @@ public class CssSuggestedFriendsController {
 
 							}
 						}
+							
+				//		}
+						LOG.info("snsSuggestedFriends size is now : "+snsSuggestedFriends.size());
+//						for (int index = 0; index < allcssDetails.size(); index++) {
+							for(Entry<CssAdvertisementRecord, Integer> entry : snsSuggestedFriends.entrySet()){
+								if(entry.getKey().getId().contains(allcssDetails.get(index).getResultCssAdvertisementRecord().getId())){
+								LOG.info("FOR LOOP entry is : "+entry.getKey().getName());
+									if(entry.getValue() == 0){	
+										LOG.info("otherFriends entry is : "+entry.getKey().getName());
+										LOG.info("otherFriends entry value is : "+entry.getValue());
+										if(otherFriends.contains(entry.getKey())){
+											LOG.info("otherfriends already has this entry: " +entry.getKey());
+										}else {
+											otherFriends.add(allcssDetails.get(index));
+											LOG.info("otherFriends size is now : "+otherFriends.size());
+											LOG.info("otherFriends adding : "+allcssDetails.get(index).getResultCssAdvertisementRecord().getName());
+										}
+									}else {
+										LOG.info("snsFriends entry value is : "+entry.getValue());
+										if(snsFriends.contains(entry.getKey())){
+											LOG.info("snsFriends already has this entry: " +entry.getKey());
+										}else {
+											LOG.info("snsFriends entry is : "+entry.getKey().getName());
+											snsFriends.add(allcssDetails.get(index));
+											LOG.info("snsFriends size is now : "+snsFriends.size());
+											LOG.info("snsFriends adding : "+allcssDetails.get(index).getResultCssAdvertisementRecord().getName());
+											}
+									}
+							}
+						}
 
 						// Now we want to check , if we have a pending FR from this people
 						// not friends yet, check that it's nt already in the
 						// sns suggested friends
-						boolean bAlreadySuggested = false;
+/*						boolean bAlreadySuggested = false;
 						
 						for(Entry<CssAdvertisementRecord, Integer> entry : snsSuggestedFriends.entrySet()){
 							
 							if(entry.getKey().getId().contains(allcssDetails.get(index).getResultCssAdvertisementRecord().getId())){	
 								bAlreadySuggested = true;
 								if(snsFriends.contains(entry.getKey())){
-									LOG.info("Already added NOT adding again");
 								}else {
 									snsFriends.add(allcssDetails.get(index));
 								}
@@ -262,13 +291,29 @@ public class CssSuggestedFriendsController {
 						}
 						if (bAlreadySuggested == false) {
 							otherFriends.add(allcssDetails.get(index));
-						}
+						} */
+							
 					}
 				}
 			}
-			LOG.info("SuggestedFriendsController otherFriends: " +otherFriends +"size : " +otherFriends.size());
-			LOG.info("SuggestedFriendsController snsFriends: " +snsFriends +"size : " +snsFriends.size());
-
+/*			LOG.info("snsSuggestedFriends size is now : "+snsSuggestedFriends.size());
+			for (int index = 0; index < allcssDetails.size(); index++) {
+				for(Entry<CssAdvertisementRecord, Integer> entry : snsSuggestedFriends.entrySet()){
+					
+					if(entry.getValue() == 0){	
+						LOG.info("otherFriends entry is : "+entry.getKey().getName());
+							otherFriends.add(allcssDetails.get(index));
+							LOG.info("otherFriends size is now : "+otherFriends.size());
+					}else {
+							LOG.info("otherFriends entry is : "+entry.getKey().getName());
+							snsFriends.add(allcssDetails.get(index));
+							LOG.info("snsFriends size is now : "+snsFriends.size());
+							}
+				}
+			}*/
+						
+			
+			
 			model.put("otherFriends", otherFriends);
 			model.put("snsFriends", snsFriends);
 			

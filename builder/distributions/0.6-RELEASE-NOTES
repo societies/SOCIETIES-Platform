@@ -1,0 +1,90 @@
+SOCIETIES Platform Release 0.6
+
+Change log since R0.5:
+- Multi-container distribution: 
+	- configured for 2 users containers 
+    - user1 run 'fullcontainer' plan, user2 runs 'usercontainer' plan
+    - Multi user configuration only works on Windows. Single user container is supported for both Windows and Linux.
+- Openfire domain changed from ‘societies.local’ to ‘ict-societies.eu’
+    - requires Openfire properties to be updated
+- removed 'xc.properties' and merged properties into 'org.societies.platform.properties'
+- Web context of Test Webapp changed to http://localhost:8080/societies-platform/
+
+Platform Features in Release 0.6:
+
+Virgo Platform Services
+
+- org.societies.activityfeed
+-- Provides an generic activity feed service that can be integrated with platform or 3 party services allowing for relevant activity 
+posts. In this release the activity is integrated with the CIS manager to associate activity feeds with created communities.
+- org.societies.security 
+-- low level security services, providing digital signatures to 3rd party services and policy negotiation process
+-- service policy negotiation, providing service client with access to service resources
+-- CIS policy negotiation
+- org.societies.privacy.and.trust
+-- The Trust Management & Evaluation framework provides the necessary infrastructure for 
+the maintenance and management of dynamically changing trustworthiness of stakeholders with respect to different domains of 
+collaboration. In this context, is assists an individual to assess the trustworthiness of the entities with whom they interact, 
+such as, other users, communities and services. Trust assessment is currently based on the experiences of the end-user.
+-- The Privacy Protection provides the necessary infrastructure to protect user's personal data. On the first hand, before 
+each third party service installation, or CIS joining, the user is prompted to accept the corresponding privacy policy and 
+modify his privacy preferences in consequences to protect his data exactly as he wanted. On the other hand, every time one 
+of the user's personal data is requested, the Privacy Preferences Engine checks the user's will, or ask the user for feedback, 
+before to release access to it.
+- org.societies.css.devicemgmt
+-- This component is the focal point for interaction with external devices. When a new device is detected via a specific device 
+driver, the latter driver informs this component which assigns it a Device ID. It then creates and maintains the device binding 
+table adding the device to both the Device Registry and the Service Registry. If the device is tagged as a “context source”, it 
+can raise an internal event to inform the context component of the status of the device (connected, disconnected, updated data).
+- org.societies.context.management
+-- It provides the functionality regarding the representation, collection, management, and sharing of context information and 
+the inference of higher level context attributes, in order to support the provision of context-aware experience to the css users. 
+-- The context model is used in order to represent all the necessary  information that describes the situation of a CSS entity 
+or a group of  entities that form a CIS. 
+-- The Context Broker component  manages access to current, past and  future context data. The past context refers to the data 
+stored in the  context history database. The future context information is provided on  the fly based on context prediction methods. 
+The Context Broker also  supports distributed context queries; it is a gateway to context data  and decides whether the local DB, 
+a remote DB or the Context Inference  Management need to be contacted to retrieve the requested context data.     
+- org.societies.css.management
+-- This component is responsible for managing the information relating to the CSS in terms of the users profile information, 
+logging in and out CSS nodes, CSS Advertisements and managing CSS users friends, returning suggested friends list filtered from 
+the user's social network connectors and CSS Directory advertisements and providing the interface to allow friend requests to be 
+sent and managed (accept, reject, remove etc..)
+- org.societies.cis.management
+-- The CisManagementBundle service exposes the Community/CIS management functions of the Societies platform. It offers an API for 
+managing (creating, modifing, joining, leaving and deleting) a CIS, its members and its activity feed. This bundle is also the 
+responsible of hosting the CISs created in its virgo container (the CISs created by the local CSS).
+- org.societies.service-lifecycle
+-- This component is responsible for mantaining and managing third-party services inside the platform, allowing users to add and 
+remove services, discover services on their own CSS or on CIS and also share services with CISs. It exposes methods that allow 
+third-party services to obtain their own runtime information as perceived by the platform, which is necessary to make use of most 
+SOCIETIES capabilities.
+- org.societies.sns
+-- SocialNetwork bundle is responsible to connect social networks with societies. With the use of specific connector, an user can 
+log in in his/her account and pull data from that social network and save in the context of societies. Such data is translate in a 
+common language with the use of open social data model. It is also possible to push data on behalf of the user. 
+- org.societies.useragent
+-- This component is responsible to proactively adapt user preferences and intents to 3rd party services. It resolves the conflict 
+between user intents and user preferences and decides what to follow. Then it may invoke the 3rd party services with user intent 
+or preferences. A set of user implicit and explicit feedback mechanisms are provided to allow users to control automated service 
+adaption. Besides, user monitoring modules are implemented to track users' actions, behaviours and choices of 3rd party services.
+- org.societies.personalisation
+-- SOCIETIES Personalisation is based on four distinct behavioural models; Nested If-Then-Else based User Preferences, 
+Dianne (Dynamic Incremental Assosiative Neural NEtwork), Conditonal Random fIelds uSer inTent (CRIST) and Context Aware User 
+Intent (CAUI) models. These are continually evaluated, updated and predict or suggest actions to be implemented by the system to 
+adapt the user's environment according to their wishes. In addition to the proactive implementation of personalisation, the 
+component also exposes an interface that allows services to explicitly request user intent and preference actions when 
+they need them. 
+
+Virgo Platform Infrastructure:
+
+- org.societies.domain-authority
+-- Directory services for CSSs and CISs
+-- REST file server: serving resources to authorized 3rd party service clients
+- org.societies.css.commfrwk
+-- The Communication Framework enables network communication based on XMPP, exposed through an high-level API that deals with 
+CSS and CIS Identities and Java objects. The framework handles the translation of Identities into XMPP addresses as well as the 
+serialization of the Java data objects (beans) and their routing to the appropriate component. Both Platform Services and Third 
+Party services can use it to communicate with remote components.
+- org.societies.webapp
+-- Test Web UI for creating user accounts and managing CSSs/CISs
