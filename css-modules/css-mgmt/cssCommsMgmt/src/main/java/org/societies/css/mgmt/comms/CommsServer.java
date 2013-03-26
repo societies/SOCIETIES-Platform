@@ -28,12 +28,15 @@ package org.societies.css.mgmt.comms;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -49,6 +52,7 @@ import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
+import org.societies.api.schema.cssmanagement.CssManagerResultBean.ResultActivities;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequest;
 import org.societies.api.schema.cssmanagement.CssRequestOrigin;
@@ -61,6 +65,7 @@ import org.societies.api.identity.RequestorService;
 import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
+import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.activityfeed.AddActivityResponse;
 import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
 import org.societies.api.schema.activityfeed.DeleteActivityResponse;
@@ -101,12 +106,9 @@ public class CommsServer implements IFeatureServer {
 	
 	
 	public static final List<String> MESSAGE_BEAN_NAMESPACES = Collections.unmodifiableList(
-			  Arrays.asList("http://societies.org/api/schema/cssmanagement",
-					  "http://societies.org/api/schema/activityfeed"));
+			  Arrays.asList("http://societies.org/api/schema/cssmanagement"));
 	public static final List<String> MESSAGE_BEAN_PACKAGES = Collections.unmodifiableList(
-			  Arrays.asList("org.societies.api.schema.cssmanagement", 
-					  "org.societies.api.schema.activityfeed", 
-					  "org.societies.api.schema.activity.MarshaledActivity"));
+			  Arrays.asList("org.societies.api.schema.cssmanagement"));
 
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
 
@@ -174,9 +176,9 @@ public class CommsServer implements IFeatureServer {
 			Future<HashMap<CssAdvertisementRecord, Integer>> asyncFriendsFilterDetailsResult = null;
 			HashMap<CssAdvertisementRecord, Integer> FriendsFilterDetailsResult = null;
 		
-			LOG.debug("CSSManager remote invocation of method "
-					+ bean.getMethod().name());
+			LOG.debug("CSSManager remote invocation of method " + bean.getMethod().name());
 
+			CssManagerResultBean resultBean = new CssManagerResultBean();
 			switch (bean.getMethod()) {
 
 			case REGISTER_XMPP_SERVER:
@@ -247,6 +249,23 @@ public class CommsServer implements IFeatureServer {
 			case FIND_ALL_CSS_FRIEND_REQUESTS:
 				asyncRequestResult = this.cssManager.findAllCssFriendRequests(); 
 				break;
+			case GET_CSS_ACTIVITIES:
+				//TODO: DEFAULT TIMESPAN TO 1/1/2000 TO NOW - NEED TO ADD TIMESPAN TO XSD
+				Date date = new Date();
+				long longDate=date.getTime();
+				String timespan = "1262304000000 " + longDate;
+								
+				Future<List<MarshaledActivity>> asyncActivitiesResult = this.cssManager.getActivities(timespan, 20);
+				ResultActivities results = new ResultActivities();
+				try {
+					results.setMarshaledActivity(asyncActivitiesResult.get());
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				} catch (ExecutionException e1) {
+					e1.printStackTrace();
+				}
+				resultBean.setResultActivities(results);
+				break;
 			default:
 				LOG.error("Bean method does not exist: " + bean.getMethod());
 				break;
@@ -274,6 +293,8 @@ public class CommsServer implements IFeatureServer {
 				case FIND_ALL_CSS_REQUESTS:
 					RequestResult = asyncRequestResult.get();
 					break;
+				case GET_CSS_ACTIVITIES:
+					break;
 				default:
 					// Since everything else seems to use this!!
 					result = asyncResult.get();
@@ -288,7 +309,6 @@ public class CommsServer implements IFeatureServer {
 			LOG.debug("CSSManager result");
 			LOG.debug("CSSManager remote invocation on thread" + Thread.currentThread()  + " " + Thread.activeCount());
 
-			CssManagerResultBean resultBean = new CssManagerResultBean();
 			resultBean.setResult(result);
 			resultBean.setResultAdvertList(friendsAdsResult);
 			resultBean.setResultAdvertList(friendsAdsResult);
@@ -297,156 +317,6 @@ public class CommsServer implements IFeatureServer {
 
 			Dbc.ensure("CSSManager result bean cannot be null", resultBean != null);
 			return resultBean;
-		}
-		
-		if (payload.getClass().equals(MarshaledActivityFeed.class)) {
-			LOG.info("activity feed type received");
-            MarshaledActivityFeed c = (MarshaledActivityFeed) payload;
-			
-			// delete Activity
-
-			if (c.getDeleteActivity() != null) {
-                MarshaledActivityFeed result = new MarshaledActivityFeed();
-				DeleteActivityResponse r = new DeleteActivityResponse();
-				String senderJid = stanza.getFrom().getBareJid();
-				
-				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
-				//	r.setResult(false);
-				//}else{
-					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
-				IActivity iActivity = activityFeed.getEmptyIActivity();
-				iActivity.setActor(c.getDeleteActivity().getMarshaledActivity().getActor());
-				iActivity.setObject(c.getDeleteActivity().getMarshaledActivity().getObject());
-				iActivity.setTarget(c.getDeleteActivity().getMarshaledActivity().getTarget());
-				iActivity.setVerb(c.getDeleteActivity().getMarshaledActivity().getVerb());
-
-				ActivityFeedClient d = new ActivityFeedClient();
-				activityFeed.deleteActivity(iActivity,d);
-				
-				MarshaledActivityFeed m = d.getActivityFeed();
-				
-				if(null != m && null != m.getDeleteActivityResponse()){
-					r.setResult(m.getDeleteActivityResponse().isResult());
-				}else{
-					LOG.warn("no callback object after immediate call of delecte activity feed");
-					r.setResult(false);
-				}
-
-				result.setDeleteActivityResponse(r);		
-				return result;
-
-			}				// END OF delete Activity
-
-			
-			
-			// get Activities
-			if (c.getGetActivities() != null) {
-				LOG.info("get activities called");
-				org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
-				GetActivitiesResponse r = new GetActivitiesResponse();
-				String senderJid = stanza.getFrom().getBareJid();
-				List<IActivity> iActivityList;
-				//List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList = new ArrayList<org.societies.api.schema.activity.MarshaledActivity>();
-				
-				
-				LOG.info("activityFeed returns" +activityFeed);
-				//activityFeed = getiActivityFeedManager().getOrCreateFeed(idMgr.getThisNetworkNode().toString(), idMgr.getThisNetworkNode().toString(), false);
-				ActivityFeedClient d = new ActivityFeedClient();
-				
-				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
-				//	r.setResult(false);
-				//}else{
-					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
-					if(c.getGetActivities().getQuery()==null || c.getGetActivities().getQuery().isEmpty()){
-						activityFeed.getActivities(c.getGetActivities().getTimePeriod(),d);
-					}else{
-						activityFeed.getActivities(c.getGetActivities().getQuery(),c.getGetActivities().getTimePeriod(),d);	
-						
-				}
-				
-					MarshaledActivityFeed m = d.getActivityFeed();
-					if(null != m && null != m.getGetActivitiesResponse()){
-						r.setMarshaledActivity(m.getGetActivitiesResponse().getMarshaledActivity());
-					}else{
-						// ill set an empty list
-						r.setMarshaledActivity(new ArrayList<org.societies.api.schema.activity.MarshaledActivity>());
-					}
-					
-					
-				result.setGetActivitiesResponse(r);		
-				return result;
-
-			}				// END OF get ACTIVITIES
-			
-			// add Activity
-
-			if (c.getAddActivity() != null) {
-				org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
-				AddActivityResponse r = new AddActivityResponse();
-				String senderJid = stanza.getFrom().getBareJid();
-				
-				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
-				//	r.setResult(false);
-				//}else{
-					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
-				IActivity iActivity = activityFeed.getEmptyIActivity();
-				iActivity.setActor(c.getAddActivity().getMarshaledActivity().getActor());
-				iActivity.setObject(c.getAddActivity().getMarshaledActivity().getObject());
-				iActivity.setTarget(c.getAddActivity().getMarshaledActivity().getTarget());
-				iActivity.setVerb(c.getAddActivity().getMarshaledActivity().getVerb());
-
-				ActivityFeedClient d = new ActivityFeedClient();
-				activityFeed.addActivity(iActivity,d);
-				
-				MarshaledActivityFeed m = d.getActivityFeed();
-				
-				if(null != m && null != m.getAddActivityResponse()){
-					r.setResult(m.getAddActivityResponse().isResult());
-				}else{
-					LOG.warn("no callback object after immediate call of add activity");
-					r.setResult(false);
-				}
-				
-				
-				result.setAddActivityResponse(r);		
-				return result;
-
-			}				// END OF add Activity
-			
-						
-			
-			// cleanup activities
-			if (c.getCleanUpActivityFeed() != null) {
-				org.societies.api.schema.activityfeed.MarshaledActivityFeed result = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
-				CleanUpActivityFeedResponse r = new CleanUpActivityFeedResponse();
-				String senderJid = stanza.getFrom().getBareJid();
-				
-				//if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
-				//	r.setResult(false);
-				//}else{
-					//if((!c.getCommunityName().isEmpty()) && (!c.getCommunityName().equals(this.getName()))) // if is not empty and is different from current value
-
-				ActivityFeedClient d = new ActivityFeedClient();
-				activityFeed.cleanupFeed(c.getCleanUpActivityFeed().getCriteria(),d);
-				
-				MarshaledActivityFeed m = d.getActivityFeed();
-				
-				if(null != m && null != m.getCleanUpActivityFeedResponse()){
-					r.setResult(m.getCleanUpActivityFeedResponse().getResult());
-				}else{
-					LOG.warn("no callback object after immediate call of clean up activity feed");
-					r.setResult(0);
-				}
-				
-				
-				result.setCleanUpActivityFeedResponse(r);		
-				return result;
-
-			}				// END OF cleanup activities
-
-			
-			
-			
 		}
 		
 		Dbc.ensure(this.getClass().getName() + " failure to interpret remote method invocation payload", true);

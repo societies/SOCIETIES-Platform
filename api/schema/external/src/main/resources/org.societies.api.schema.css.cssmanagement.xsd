@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema elementFormDefault="qualified" version="1.0"
 	targetNamespace="http://societies.org/api/schema/cssmanagement"
-	xmlns:tns="http://societies.org/api/schema/cssmanagement" xmlns:tnd="http://societies.org/api/schema/css/directory"
+	xmlns:tns="http://societies.org/api/schema/cssmanagement" 
+	xmlns:tnd="http://societies.org/api/schema/css/directory"
 	xmlns:tnl="http://societies.org/api/schema/servicelifecycle/model"
+	xmlns:ins="http://societies.org/api/schema/activity"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-
-	<xs:import namespace="http://societies.org/api/schema/servicelifecycle/model"
-		schemaLocation="org.societies.api.schema.servicelifecycle.model.xsd" />
-	<xs:import namespace="http://societies.org/api/schema/css/directory"
-		schemaLocation="org.societies.api.schema.css.directory.xsd" />
-		
-
+	<xs:import namespace="http://societies.org/api/schema/servicelifecycle/model" schemaLocation="org.societies.api.schema.servicelifecycle.model.xsd" />
+	<xs:import namespace="http://societies.org/api/schema/css/directory"		  schemaLocation="org.societies.api.schema.css.directory.xsd" />
+	<xs:import namespace="http://societies.org/api/schema/activity" 			  schemaLocation="org.societies.api.schema.activity.xsd"/>
+	
 	<xs:complexType name="cssNode">
 		<xs:sequence>
 			<xs:element name="identity" type="xs:string" minOccurs="0" />
@@ -59,7 +58,6 @@
 		</xs:sequence>
 	</xs:complexType>
 
-
 	<xs:complexType name="cssRequest">
 		<xs:sequence>
 			<xs:element name="cssIdentity" type="xs:string" minOccurs="0" />
@@ -68,8 +66,6 @@
 			<xs:element name="origin" type="tns:cssRequestOrigin" minOccurs="0"/>	
 		</xs:sequence>
 	</xs:complexType>
-
-
 
 	<xs:complexType name="cssInterfaceResult">
 		<xs:sequence>
@@ -81,14 +77,17 @@
 	<xs:element name="cssManagerResultBean">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="result" type="tns:cssInterfaceResult"
-					minOccurs="0" />
-				<xs:element name="resultAdvertList" type="tnd:cssAdvertisementRecord"
-					minOccurs="0" maxOccurs="unbounded" />
-				<xs:element name="resultServicelist" type="tnl:service"
-					minOccurs="0" maxOccurs="unbounded" />
-				<xs:element name="resultCssRequestList" type="tns:cssRequest"
-					minOccurs="0" maxOccurs="unbounded" />
+				<xs:element name="result" type="tns:cssInterfaceResult" minOccurs="0" />
+				<xs:element name="resultAdvertList" type="tnd:cssAdvertisementRecord" minOccurs="0" maxOccurs="unbounded" />
+				<xs:element name="resultServicelist" type="tnl:service" minOccurs="0" maxOccurs="unbounded" />
+				<xs:element name="resultCssRequestList" type="tns:cssRequest" minOccurs="0" maxOccurs="unbounded" />
+				<xs:element name='resultActivities'>
+					<xs:complexType>
+						<xs:sequence minOccurs='0' maxOccurs='unbounded'>
+							<xs:element ref='ins:MarshaledActivity'/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -114,6 +113,7 @@
 			<xs:enumeration value="deleteAdvertisementRecord" />
 			<xs:enumeration value="updateAdvertisementRecord" />
 			<xs:enumeration value="findAllCssAdvertisementRecords" />
+			<xs:enumeration value="getCssActivities" />
 
 			<xs:enumeration value="findAllCssServiceDetails" />
 			<xs:enumeration value="findAllCssFriendRequests" />
@@ -156,8 +156,7 @@
 	
 	<xs:complexType name="cssAdvertisementRecordDetailed">
 		<xs:sequence>
-				<xs:element name="resultCssAdvertisementRecord" type="tnd:cssAdvertisementRecord"
-					minOccurs="0"/>
+			<xs:element name="resultCssAdvertisementRecord" type="tnd:cssAdvertisementRecord" minOccurs="0"/>
 			<xs:element name="status" type="tns:cssRequestStatusType" minOccurs="0"/>
 			<xs:element name="origin" type="tns:cssRequestOrigin" minOccurs="0"/>
 		</xs:sequence>

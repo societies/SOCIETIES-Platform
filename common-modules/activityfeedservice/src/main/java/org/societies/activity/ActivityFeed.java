@@ -91,6 +91,9 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     @Transient
     protected static Logger LOG = LoggerFactory.getLogger(ActivityFeed.class);
 
+  
+    public boolean pubSubEnabled;
+    
     @Transient
     private PubsubClient pubSubcli;
     @Transient
@@ -98,9 +101,11 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     public ActivityFeed(String id, String owner){
         this.owner = owner; this.setId(id);
         initClass();
+        pubSubEnabled = false;
     }
     public ActivityFeed(){
         initClass();
+        pubSubEnabled = false;
     }
     public void initClass(){
         list = new HashSet<Activity>();// from Thomas
@@ -115,13 +120,17 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     // version with PubSub
     synchronized public void startUp(SessionFactory sessionFactory){
         this.setSessionFactory(sessionFactory);
-        this.setPubSubcli(pubSubcli);
+        if (pubSubEnabled)
+        	this.setPubSubcli(pubSubcli);
     }
     
     
     public void connectPubSub(IIdentity ownerCSS){ //ASSUME PUBSUB NODE PERSISTING (CONFIGURATION), CHECK IF IT EXISTS
         this.ownerCSS = ownerCSS;
         // pubsub code
+        if (!pubSubEnabled)
+        	return;
+        	
         LOG.debug("starting pubsub at activityfeed pubsub");
         if(null != pubSubcli && null != ownerCSS){
             List<String> l = null;
@@ -214,7 +223,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
         }
 
         // Publishing TO PUBSUB
-        if(false == err && getPubSubcli() !=null){
+        if(false == err && pubSubEnabled && getPubSubcli() !=null){
             try {
                 LOG.info("going to call pubsub");
                 getPubSubcli().publisherPublish(this.ownerCSS, this.getId(), Long.toString(actv_id), iactivToMarshActiv(newAct));
@@ -615,6 +624,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     }
 
     @Async
+    @Override
     public Future<List<IActivity>> getActivities(String query, String timePeriod, long n) {
 
         List<IActivity> iActivityList = null;
@@ -643,6 +653,30 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
        return new AsyncResult<List<IActivity>>(result);
     }
     
+    @Async
+    @Override
+    public Future<List<IActivity>> getActivities(String timePeriod, long n) {
+
+        List<IActivity> iActivityList = null;
+        List<IActivity> result = new ArrayList<IActivity>();
+        iActivityList = this.getActivitiesFromDB(timePeriod);
+        
+        if (iActivityList != null) {
+    	   Collections.sort(iActivityList,new Comparator<IActivity>() {
+               @Override
+               public int compare(IActivity iActivity, IActivity iActivity1) {
+                   return (Long.parseLong(iActivity.getPublished())>Long.parseLong(iActivity1.getPublished())) ? 1 : -1;
+               }
+           });
+    	  
+    	   if (n == 0 || n > iActivityList.size())
+    		   n = iActivityList.size();
+    	   
+    	   for(int i=0;i<n;i++)
+    		   result.add(iActivityList.get(i));
+        }
+        return new AsyncResult<List<IActivity>>(result);
+    }
       
     public void iactivToMarshActvList(List<IActivity> iActivityList, List<org.societies.api.schema.activity.MarshaledActivity> marshalledActivList){
 
