@@ -81,13 +81,14 @@
 				<xs:element name="resultAdvertList" type="tnd:cssAdvertisementRecord" minOccurs="0" maxOccurs="unbounded" />
 				<xs:element name="resultServicelist" type="tnl:service" minOccurs="0" maxOccurs="unbounded" />
 				<xs:element name="resultCssRequestList" type="tns:cssRequest" minOccurs="0" maxOccurs="unbounded" />
-				<xs:element name='resultActivities'>
-					<xs:complexType>
-						<xs:sequence minOccurs='0' maxOccurs='unbounded'>
-							<xs:element ref='ins:MarshaledActivity'/>
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name='getActivitiesResponse'>
+		<xs:complexType>
+			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
+				<xs:element ref='ins:MarshaledActivity'/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

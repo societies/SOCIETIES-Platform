@@ -35,8 +35,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -44,7 +43,6 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
-import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.css.ICSSManager;
 import org.societies.api.css.FriendFilter;
 import org.societies.api.internal.css.ICSSInternalManager;
@@ -52,7 +50,6 @@ import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
-import org.societies.api.schema.cssmanagement.CssManagerResultBean.ResultActivities;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequest;
 import org.societies.api.schema.cssmanagement.CssRequestOrigin;
@@ -178,7 +175,6 @@ public class CommsServer implements IFeatureServer {
 		
 			LOG.debug("CSSManager remote invocation of method " + bean.getMethod().name());
 
-			CssManagerResultBean resultBean = new CssManagerResultBean();
 			switch (bean.getMethod()) {
 
 			case REGISTER_XMPP_SERVER:
@@ -250,13 +246,13 @@ public class CommsServer implements IFeatureServer {
 				asyncRequestResult = this.cssManager.findAllCssFriendRequests(); 
 				break;
 			case GET_CSS_ACTIVITIES:
-				//TODO: DEFAULT TIMESPAN TO 1/1/2000 TO NOW - NEED TO ADD TIMESPAN TO XSD
+				//TODO: TIMESPAN DEFAULTS TO 1/1/2000 TO NOW - NEED TO ADD TIMESPAN TO XSD
 				Date date = new Date();
 				long longDate=date.getTime();
 				String timespan = "1262304000000 " + longDate;
 								
 				Future<List<MarshaledActivity>> asyncActivitiesResult = this.cssManager.getActivities(timespan, 20);
-				ResultActivities results = new ResultActivities();
+				GetActivitiesResponse results = new GetActivitiesResponse();
 				try {
 					results.setMarshaledActivity(asyncActivitiesResult.get());
 				} catch (InterruptedException e1) {
@@ -264,8 +260,7 @@ public class CommsServer implements IFeatureServer {
 				} catch (ExecutionException e1) {
 					e1.printStackTrace();
 				}
-				resultBean.setResultActivities(results);
-				break;
+				return results;
 			default:
 				LOG.error("Bean method does not exist: " + bean.getMethod());
 				break;
@@ -309,6 +304,7 @@ public class CommsServer implements IFeatureServer {
 			LOG.debug("CSSManager result");
 			LOG.debug("CSSManager remote invocation on thread" + Thread.currentThread()  + " " + Thread.activeCount());
 
+			CssManagerResultBean resultBean = new CssManagerResultBean();
 			resultBean.setResult(result);
 			resultBean.setResultAdvertList(friendsAdsResult);
 			resultBean.setResultAdvertList(friendsAdsResult);
