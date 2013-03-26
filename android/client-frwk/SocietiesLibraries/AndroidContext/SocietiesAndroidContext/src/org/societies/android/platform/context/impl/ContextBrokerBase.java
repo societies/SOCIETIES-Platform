@@ -137,6 +137,11 @@ public class ContextBrokerBase implements IInternalCtxClient{
 							}
 							@Override
 							public void returnAction(String result) { }
+							@Override
+							public void returnException(String result) {
+								// TODO Auto-generated method stub
+								
+							}
 						});
 					} else {
 						Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
@@ -146,6 +151,11 @@ public class ContextBrokerBase implements IInternalCtxClient{
 				}	
 				@Override
 				public void returnAction(String result) { }
+				@Override
+				public void returnException(String result) {
+					// TODO Auto-generated method stub
+					
+				}
 			});
         }
     	else {
@@ -174,6 +184,11 @@ public class ContextBrokerBase implements IInternalCtxClient{
 				}	
 				@Override
 				public void returnAction(String result) { }
+				@Override
+				public void returnException(String result) {
+					// TODO Auto-generated method stub
+					
+				}
 			});
         }
     	else {
