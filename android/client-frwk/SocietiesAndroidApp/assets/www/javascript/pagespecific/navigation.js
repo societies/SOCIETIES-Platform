@@ -39,6 +39,7 @@ var SocietiesNavigation = {
 	 */
 
 	homeAction: function() {
+		SocietiesLogin.loadCssActivities();
 		$.mobile.changePage($("#landing"), {transition: "slideup"});
 	},
 	/**

@@ -217,12 +217,12 @@ var SocietiesLogin = {
 		var currentValue = jQuery(elementId).val();
 		jQuery(elementId).val(currentValue + ": " + postfix);
 	},
+	
 	/**
 	 * @methodOf SocietiesLogin#
 	 * @description Actions carried in the event that a successful CSS Cloud login occurs
 	 * @returns null
 	 */
-
 	successfulCSSCloudLogin: function() {
 		console.log("Login to CSS Cloud node");
 
@@ -251,7 +251,6 @@ var SocietiesLogin = {
 			$.mobile.loadPage("communities_result.html");
 			$.mobile.loadPage("create_community.html");
 			//CSS FRIEND SET OF PAGES
-			//$.mobile.loadPage("friends_landing.html");
 			$.mobile.loadPage("my_friends_list.html");
 			$.mobile.loadPage("my_friends_details.html");
 			$.mobile.loadPage("suggested_societies_friends_list.html");
@@ -267,7 +266,81 @@ var SocietiesLogin = {
 		}
 		
 		window.plugins.SocietiesLocalCSSManager.loginCSS(success, failure);
+	},
+	
+	/**
+	 * @methodOf SocietiesLogin#
+	 * @description Actions carried to populate css activity feed
+	 * @returns null
+	 */
+	loadCssActivities: function() {
+		function success(data) {
+			//EMPTY TABLE - NEED TO LEAVE THE HEADER
+			while( $('ul#cssmgr_activity_feed').children().length >0 )
+				$('ul#cssmgr_activity_feed li:last').remove();
 
+			//FOREACH ACTIVITY
+			if(data.length > 0) {
+				console.log("data size: " + data.length);
+				for(var obj in data) {
+				    if(data.hasOwnProperty(obj)){
+					    for(var prop in data[obj]){
+					        if(data[obj].hasOwnProperty(prop)){
+					        	console.log(prop + ':' + data[obj][prop]);
+					        }
+					    }
+					}
+				}
+				
+				var mLastDate = "";
+				for (i=data.length-1; i >= 0 ; i--) {
+					//HEADER
+					console.log("published: " + data[i].published);
+					console.log("verb: " + data[i].verb);
+					var d = new Date();
+					d.setTime(data[i].published); 
+					var dateStr = d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
+					if (mLastDate != dateStr) {
+						mLastDate = dateStr;
+						$('ul#cssmgr_activity_feed').append("<li data-role=\"list-divider\">" + dateStr + "</li>" );
+					}
+					//DATA
+					var hours = d.getHours(),
+					    minutes = d.getMinutes();
+					if (minutes < 10)
+						minutes = "0" + minutes	
+					var suffix = "AM";
+					if (hours >= 12) {
+						suffix = "PM";
+						hours = hours - 12;
+					}
+					if (hours == 0)
+						hours = 12;
+					//BODY FORMATTING
+					//var n=data[i].actor.indexOf(".");
+					//var actorStr = data[i].actor.substring(0, n);
+					var tableEntry = "<li id=\"li" + data[i].published + "\"><a href=\"#\" onclick=\"return false;\">" +
+									 //"<h2>"+ actorStr + "</h2>" +
+						 	 		 "<p>" + data[i].verb + "</p>" + //+ " " + data[i].object + 
+						 	 		"<p class=\"ui-li-aside\">" + hours + ":" + minutes + " " + suffix + "</p>" + 
+						 	 		 "</a></li>";
+					$('ul#cssmgr_activity_feed').append(tableEntry);
+				}
+			}
+			$('ul#cssmgr_activity_feed').listview('refresh');
+			$('ul#cssmgr_activity_feed').trigger( "collapse" );
+			//EXPAND LIST IF SHORT
+			//if (data.length <3)
+			//	$('ul#cis_activity_feed').trigger( "expand" );
+		}
+		
+		function failure(data) {
+			var tableEntry = "<li><p>Error occurred retrieving activities: "+ data + "</p></li>";
+			$('ul#cssmgr_activity_feed').append(tableEntry);
+			$('ul#cssmgr_activity_feed').listview('refresh');
+		}
+		
+		window.plugins.SocietiesLocalCSSManager.getCssActivities(success, failure);
 	}
 }
 

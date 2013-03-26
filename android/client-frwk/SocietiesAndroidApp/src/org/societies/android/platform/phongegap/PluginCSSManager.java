@@ -409,9 +409,6 @@ public class PluginCSSManager extends Plugin {
 					String timePeriod = "1262304000000 " + toDate;
 					int limitResults = 20;
 					this.localCSSManager.getActivities(data.getString(0), timePeriod, limitResults);
-					result = new PluginResult(PluginResult.Status.OK);
-		            result.setKeepCallback(false);
-		            return result;
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -732,7 +729,7 @@ public class PluginCSSManager extends Plugin {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
 			
 			if (intent.getAction().equals(IAndroidCSSManager.LOGIN_CSS)) {
-				Toast.makeText(PluginCSSManager.this.ctx.getContext(), "Login successful", Toast.LENGTH_SHORT).show();
+				Toast.makeText(PluginCSSManager.this.ctx.getContext(), "Login successful", Toast.LENGTH_LONG).show();
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 4);
 				
 				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
