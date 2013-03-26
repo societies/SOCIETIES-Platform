@@ -42,25 +42,27 @@ public class ServicePlatformCommsTest extends Service {
 	
     private static final String LOG_TAG = ServicePlatformCommsTest.class.getName();
     private IBinder binder = null;
+    private AndroidCommsBase serviceBase;
     
     @Override
 	public void onCreate () {
-		this.binder = new TestPlatformCommsBinder();
+    	serviceBase = new AndroidCommsBase(ServicePlatformCommsTest.this, false);
+    	
+		this.binder = new TestPlatformCommsBinder(serviceBase);
 		Log.d(LOG_TAG, "ServicePlatformCommsTest service starting");
-	}
-
-	@Override
-	public void onDestroy() {
-		Log.d(LOG_TAG, "ServicePlatformCommsTest service terminating");
 	}
 
 	/**Create Binder object for local service invocation */
 	public class TestPlatformCommsBinder extends Binder {
+		private AndroidCommsBase service;
 		
+		TestPlatformCommsBinder(AndroidCommsBase service) {
+			super();
+			this.service = service;
+		}
 		public XMPPAgent getService() {
 			
-			AndroidCommsBase serviceBase = new AndroidCommsBase(ServicePlatformCommsTest.this, false);
-			return serviceBase;
+			return this.service;
 		}
 	}
 	
@@ -69,4 +71,10 @@ public class ServicePlatformCommsTest extends Service {
 		Log.d(LOG_TAG, "Return Binder for intent: " + intent.getAction());
 		return this.binder;
 	}
+	@Override
+	public void onDestroy() {
+		Log.i(LOG_TAG, "ServicePlatformCommsRemote terminating");
+		serviceBase.cleanup();
+	}
+
 }
