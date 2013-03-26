@@ -93,6 +93,8 @@ public class CtxDataInitiator {
 
 		this.cssOwnerId = this.getLocalIdentity();
 
+		System.out.println("************ CtxDataInitiator: ownerCtxId.getOwnerId()="+ownerCtxId.getOwnerId());
+		
 		try {
 
 			ownerCtxId = this.ctxBroker

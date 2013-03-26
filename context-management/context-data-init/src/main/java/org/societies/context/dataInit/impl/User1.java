@@ -71,13 +71,13 @@ public class User1 extends BaseUser{
 	@Override
 	public String getLocationSymbolic() {
 		
-		return "HWLectureTheater1";
+		return null;
 	}
 
 	@Override
 	public String getLocationCoordinates() {
 		
-		return "1234,1234";
+		return null;
 	}
 
 	@Override
