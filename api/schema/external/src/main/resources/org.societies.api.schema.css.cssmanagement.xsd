@@ -85,7 +85,7 @@
 		</xs:complexType>
 	</xs:element>
 	
-	<xs:element name='getActivitiesResponse'>
+	<xs:element name='cssManagerResultActivities'>
 		<xs:complexType>
 			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
 				<xs:element ref='ins:MarshaledActivity'/>

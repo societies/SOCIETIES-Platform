@@ -35,7 +35,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -43,12 +42,12 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
-import org.societies.api.css.ICSSManager;
 import org.societies.api.css.FriendFilter;
 import org.societies.api.internal.css.ICSSInternalManager;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
+import org.societies.api.schema.cssmanagement.CssManagerResultActivities;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequest;
@@ -56,51 +55,15 @@ import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
 import org.societies.utilities.DBC.Dbc;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorService;
-import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-
 import org.societies.api.schema.activity.MarshaledActivity;
-import org.societies.api.schema.activityfeed.AddActivityResponse;
-import org.societies.api.schema.activityfeed.CleanUpActivityFeedResponse;
-import org.societies.api.schema.activityfeed.DeleteActivityResponse;
-import org.societies.api.schema.activityfeed.GetActivitiesResponse;
-import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
-import org.societies.api.activity.IActivity;
-import org.societies.api.activity.IActivityFeed;
-import org.societies.api.activity.IActivityFeedManager;
-import org.societies.activity.client.ActivityFeedClient;
 
 public class CommsServer implements IFeatureServer {
 	private ICommManager commManager;
-	//private ICSSLocalManager cssManager;
 	private ICSSInternalManager cssManager;
-	private IIdentityManager idMgr;
 	private FriendFilter FriendFilter;
-	private IActivityFeed activityFeed;
-	
-	//public IActivityFeed getActivityFeed() {
-	//	return activityFeed;
-	//}
-
-
-//	private void setActivityFeed(IActivityFeed activityFeed) {
-//		this.activityFeed = activityFeed;
-//	}
-	
-	private IActivityFeedManager iActivityFeedManager;
-
-    
-    public IActivityFeedManager getiActivityFeedManager() {
-		return iActivityFeedManager;
-	}
-
-	public void setiActivityFeedManager(IActivityFeedManager iActivityFeedManager) {
-		this.iActivityFeedManager = iActivityFeedManager;
-	}
-	
 	
 	public static final List<String> MESSAGE_BEAN_NAMESPACES = Collections.unmodifiableList(
 			  Arrays.asList("http://societies.org/api/schema/cssmanagement"));
@@ -121,11 +84,7 @@ public class CommsServer implements IFeatureServer {
 		try {
 			LOG.debug("Initialise with Communication Manager");
 			this.commManager.register(this);
-			idMgr = commManager.getIdManager();
-			LOG.info("Getting ActivityFeed from CommsServer Init");
-			activityFeed = getiActivityFeedManager().getOrCreateFeed(idMgr.getThisNetworkNode().toString(), idMgr.getThisNetworkNode().toString(), false);
 		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -252,7 +211,7 @@ public class CommsServer implements IFeatureServer {
 				String timespan = "1262304000000 " + longDate;
 								
 				Future<List<MarshaledActivity>> asyncActivitiesResult = this.cssManager.getActivities(timespan, 20);
-				GetActivitiesResponse results = new GetActivitiesResponse();
+				CssManagerResultActivities results = new CssManagerResultActivities();
 				try {
 					results.setMarshaledActivity(asyncActivitiesResult.get());
 				} catch (InterruptedException e1) {

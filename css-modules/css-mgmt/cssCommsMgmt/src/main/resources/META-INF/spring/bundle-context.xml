@@ -25,7 +25,6 @@
   		init-method="initService">
   		<property name="commManager" ref="CommManagerBundle"/>
   		<property name="cssManager" ref="CSSManagerBundle"/>
-  		<property name="iActivityFeedManager" ref="activityFeedManager" />
   </bean>
 
   <bean id="CSSManagerRemote" 
