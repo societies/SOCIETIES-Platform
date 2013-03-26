@@ -198,6 +198,39 @@
 						{
 						"name" : "Bob Jones",
 						"id": "bob.societies.local" }
+					],
+		"cssActivityFeed": [{
+     				"actor": "john.societies.local",
+     				"verb": "CSS Record created",
+	                "object": "john.societies.local",
+	                "target" : "n/a",
+	                "published": "1332403882588"
+					},
+					{
+     				"actor": "john.societies.local",
+     				"verb": "joined a community",
+	                "object": "john.societies.local",
+	                "target" : "n/a",
+	                "published": "1332413890000"
+					},
+					{
+     				"actor": "john.societies.local",
+     				"verb": "shared a service",
+	                "object": "john.societies.local",
+	                "target" : "n/a",
+	                "published": "1332504090000"
+					}],
+		"cssActivityFeedFull": [
+					{"verb":"CSS Record created","published":"1364227971083","object":"john.societies.local","actor":"john.societies.local"},
+					{"verb":"CSS Record created","published":"1364228236724","object":"john.societies.local","actor":"john.societies.local"},
+					{"verb":"CSS Record created","published":"1364228591776","object":"john.societies.local","actor":"john.societies.local"},
+					{"verb":"CSS Record created","published":"1364229442909","object":"john.societies.local","actor":"john.societies.local"},
+					{"verb":"CSS Record created","published":"1364229669725","object":"john.societies.local","actor":"john.societies.local"},
+					{"verb":"CSS Record created","published":"1364229853603","object":"john.societies.local","actor":"john.societies.local"},
+					{"verb":"CSS Record created","published":"1364230131045","object":"john.societies.local","actor":"john.societies.local"},
+					{"verb":"CSS Record created","published":"1364230310746","object":"john.societies.local","actor":"john.societies.local"},
+					{"verb":"CSS Record created","published":"1364296314217","object":"john.societies.local","actor":"john.societies.local"},
+					{"verb":"CSS Record created","published":"1364304514982","object":"john.societies.local","actor":"john.societies.local"}
 					]
 	}
 }

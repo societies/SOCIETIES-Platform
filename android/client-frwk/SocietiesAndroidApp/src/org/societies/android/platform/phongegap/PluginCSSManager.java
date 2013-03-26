@@ -26,6 +26,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 package org.societies.android.platform.phongegap;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -41,6 +42,7 @@ import org.societies.android.platform.cssmanager.LocalCssDirectoryService;
 import org.societies.android.platform.cssmanager.ServiceCSSManagerLocal;
 import org.societies.android.platform.cssmanager.LocalCssDirectoryService.LocalCssDirectoryBinder;
 import org.societies.android.api.css.directory.IAndroidCssDirectory;
+import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
@@ -187,6 +189,7 @@ public class PluginCSSManager extends Plugin {
         intentFilter.addAction(IAndroidCSSManager.READ_PROFILE_REMOTE);
         intentFilter.addAction(IAndroidCSSManager.START_APP_SERVICES);
         intentFilter.addAction(IAndroidCSSManager.STOP_APP_SERVICES);
+        intentFilter.addAction(IAndroidCSSManager.GET_CSS_ACTIVITIES);
         
         intentFilter.addAction(IAndroidCssDirectory.FIND_ALL_CSS_ADVERTISEMENT_RECORDS);
         intentFilter.addAction(IAndroidCssDirectory.FIND_FOR_ALL_CSS);
@@ -399,7 +402,20 @@ public class PluginCSSManager extends Plugin {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			}  
+			}  else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 23))) {
+				try {
+					Date now = new Date();
+					long toDate = now.getTime();
+					String timePeriod = "1262304000000 " + toDate;
+					int limitResults = 20;
+					this.localCSSManager.getActivities(data.getString(0), timePeriod, limitResults);
+					result = new PluginResult(PluginResult.Status.OK);
+		            result.setKeepCallback(false);
+		            return result;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 			//>>>>>>>>>>>>>>>>>>>>>>>>IAndroidCisDirectory methods >>>>>>>>>>>>>>>>>>>>>>>
 			else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCssDirectory.methodsArray, 0))) {
 				try {
@@ -502,6 +518,7 @@ public class PluginCSSManager extends Plugin {
 		Log.d(LOG_TAG, "returnJavascriptResult called for intent: " + intent.getAction() + " and callback ID: " + methodCallbackId);	
 		CssRecord cssRecord = null;
 		CssAdvertisementRecord advertRecord [] = null;
+		MarshaledActivity activities[] = null;
 		PluginResult result = null;
 		boolean resultStatus = false;
 		
@@ -518,6 +535,13 @@ public class PluginCSSManager extends Plugin {
 			advertRecord = new CssAdvertisementRecord [parcels.length];
 			System.arraycopy(parcels, 0, advertRecord, 0, parcels.length);
 		} 
+		//MARSHALLED ACTIVITIES
+		else if (IAndroidCSSManager.GET_CSS_ACTIVITIES==intent.getAction() ) {
+			resultStatus = intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false);
+			Parcelable parcels[] = intent.getParcelableArrayExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY);
+			activities = new MarshaledActivity [parcels.length];
+			System.arraycopy(parcels, 0, activities, 0, parcels.length);
+		}
 		//CSS RECORDS 
 		else  {
 			resultStatus = intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false);
@@ -526,13 +550,20 @@ public class PluginCSSManager extends Plugin {
 		
 		Log.d(LOG_TAG, "Result status of remote call: " + resultStatus);
 		if (resultStatus) {
+			//CSS ADVERT RECORDS
 			if (IAndroidCssDirectory.FIND_ALL_CSS_ADVERTISEMENT_RECORDS==intent.getAction() || 
 					   IAndroidCssDirectory.FIND_FOR_ALL_CSS==intent.getAction() ||
 					   IAndroidCSSManager.GET_FRIEND_REQUESTS==intent.getAction() ||
 					   IAndroidCSSManager.GET_CSS_FRIENDS == intent.getAction() || 
 					   IAndroidCSSManager.SUGGESTED_FRIENDS == intent.getAction()) {
 				result = new PluginResult(PluginResult.Status.OK, convertCssAdvertisements(advertRecord));
-			} else {
+			}
+			//ACTIVITIES
+			else if (IAndroidCSSManager.GET_CSS_ACTIVITIES==intent.getAction() ) {
+				result = new PluginResult(PluginResult.Status.OK, convertMarshalledActivity(activities));
+			}
+			//CSS RECORDS
+			else {
 				result = new PluginResult(PluginResult.Status.OK, convertCssRecord(cssRecord));
 			}
 			result.setKeepCallback(false);
@@ -550,6 +581,23 @@ public class PluginCSSManager extends Plugin {
 		return resultStatus;
 	}
 	
+	/**
+     * Creates a JSONObject for a given {@link MarshaledActivity}
+     * 
+     * @param node
+     * @return JSONObject 
+     */
+    private JSONArray convertMarshalledActivity(MarshaledActivity activities[]) {
+        JSONArray jArray = null;
+		Gson gson = new Gson();
+		try {
+			jArray =  new JSONArray (new JSONTokener(gson.toJson(activities)));
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+        return jArray;
+    }
+    
     /**
      * Creates a JSONObject for a given {@link ACssAdvertisementRecord}
      * 
@@ -563,10 +611,8 @@ public class PluginCSSManager extends Plugin {
 			jArray =  new JSONArray (new JSONTokener(gson.toJson(adverts)));
 			LOG.d(LOG_TAG, gson.toJson(adverts));
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
         return jArray;
     }
 
@@ -797,7 +843,14 @@ public class PluginCSSManager extends Plugin {
 				if (methodCallbackId != null) {
 					PluginCSSManager.this.sendJavascriptResultForAppControl(methodCallbackId, intent, mapKey);
 				}
-			} 
+			} else if (intent.getAction().equals(IAndroidCSSManager.GET_CSS_ACTIVITIES)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCSSManager.methodsArray, 23);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			}  
 			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> IAndroidCssDirectory >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			else if (intent.getAction().equals(IAndroidCssDirectory.FIND_FOR_ALL_CSS)) {
 				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCssDirectory.methodsArray, 0);
