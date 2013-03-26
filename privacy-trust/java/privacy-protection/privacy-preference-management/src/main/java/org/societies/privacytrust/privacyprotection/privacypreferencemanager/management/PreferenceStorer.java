@@ -86,9 +86,11 @@ public class PreferenceStorer {
 	public void deletePreference(CtxIdentifier id){
 		CtxAttribute attrPreference;
 		try {
+			System.out.println("Deleting: "+id.toUriString());
 			attrPreference = (CtxAttribute) ctxBroker.retrieve(id).get();
 			if (attrPreference == null){
-				this.logging.debug("Cannot delete preference. Doesn't exist");
+				this.logging.debug("Cannot delete preference. Doesn't exist: "+id.toUriString());
+				
 			}else{
 				ctxBroker.remove(id);
 			}

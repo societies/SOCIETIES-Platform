@@ -71,6 +71,7 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.preferen
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PrivacyOutcomeConstantsBean;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
+import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
@@ -200,17 +201,21 @@ public class TestAccCtrlPreferences {
 			
 			Mockito.when(ctxBroker.retrieve(locationAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.locationAttribute));
 			Mockito.when(ctxBroker.retrieve(accCtrl_1_CtxAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.accCtrl_1_CtxAttribute));
+			Mockito.when(ctxBroker.retrieve(accCtrl_2_CtxAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.accCtrl_2_CtxAttribute));
+			Mockito.when(ctxBroker.retrieve(accCtrl_3_CtxAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.accCtrl_3_CtxAttribute));
+			Mockito.when(ctxBroker.retrieve(accCtrl_4_CtxAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.accCtrl_4_CtxAttribute));
+			Mockito.when(ctxBroker.retrieve(accCtrl_5_CtxAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.accCtrl_5_CtxAttribute));
 			AgreementEnvelope agreementEnvelope;
 			agreementEnvelope = new AgreementEnvelope(agreement, new byte[]{}, new byte[]{});
 			Mockito.when(agreementMgr.getAgreement((Requestor) Mockito.anyObject())).thenReturn(agreementEnvelope);
-			String allow  = "Allow";
+/*			String allow  = "Allow";
 			String deny = "Deny";
 			List<String> response = new ArrayList<String>();
-			response.add(allow);
-			//Mockito.when(userFeedback.getExplicitFB(Mockito.anyInt(), new ExpProposalContent(Mockito.anyString(), new String[]{allow,deny}))).thenReturn(new AsyncResult<List<String>>(response));
-			
-			//Mockito.when(ctxBroker.createEntity(CtxTypes.PRIVACY_PREFERENCE)).thenReturn(new AsyncResult<CtxEntity>(privacyPreferenceEntity));
-			
+			response.add(allow);*/
+			org.societies.api.privacytrust.privacy.model.privacypolicy.Action action = new org.societies.api.privacytrust.privacy.model.privacypolicy.Action(org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants.READ);
+			List<String> actionObjList = new ArrayList<String>();
+			actionObjList.add(action.getActionConstants().name());
+			Mockito.when(userFeedback.getExplicitFB(Mockito.eq(ExpProposalType.CHECKBOXLIST), (ExpProposalContent) Mockito.anyObject())).thenReturn(new AsyncResult<List<String>>(actionObjList));
 			List<CtxIdentifier> locationCtxIds = new ArrayList<CtxIdentifier>();
 			locationCtxIds.add(this.locationAttribute.getId());
 			Mockito.when(this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, locationAttribute.getType())).thenReturn(new AsyncResult<List<CtxIdentifier>>(locationCtxIds));
@@ -267,10 +272,10 @@ public class TestAccCtrlPreferences {
 		/**
 		 * to be removed after refactoring of obj model
 		 */
-		org.societies.api.privacytrust.privacy.model.privacypolicy.Action action = new org.societies.api.privacytrust.privacy.model.privacypolicy.Action(org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants.READ);
+		org.societies.api.privacytrust.privacy.model.privacypolicy.Action actionRead = new org.societies.api.privacytrust.privacy.model.privacypolicy.Action(org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants.READ);
 		List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actionObjList = new ArrayList<org.societies.api.privacytrust.privacy.model.privacypolicy.Action>();
-		actionObjList.add(action);
-		
+		actionObjList.add(actionRead);
+
 		org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem item2 = privPrefMgr.checkPermission(requestorCis, this.locationAttribute.getId(), actionObjList);
 		
 		/**
@@ -313,6 +318,22 @@ public class TestAccCtrlPreferences {
 		List<AccessControlPreferenceDetailsBean> accCtrlPreferenceDetails2 = privPrefMgr.getAccCtrlPreferenceDetails();
 		Assert.assertNotNull(accCtrlPreferenceDetails2);
 		Assert.assertTrue(accCtrlPreferenceDetails2.size()>0);
+		
+
+		for (AccessControlPreferenceDetailsBean   det: accCtrlPreferenceDetails2){
+			privPrefMgr.deleteAccCtrlPreference(det);
+		}
+		
+		List<AccessControlPreferenceDetailsBean> accCtrlPreferenceDetails3 = privPrefMgr.getAccCtrlPreferenceDetails();
+		Assert.assertTrue(accCtrlPreferenceDetails3.size()==0);
+	
+		org.societies.api.privacytrust.privacy.model.privacypolicy.Action actionCreate = new org.societies.api.privacytrust.privacy.model.privacypolicy.Action(org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants.CREATE);
+		actionObjList.add(actionCreate);
+		
+		org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem checkPermissionNotExistModel = privPrefMgr.checkPermission(requestorCis, this.locationAttribute.getId(), actionObjList);
+		Assert.assertFalse(checkPermissionNotExistModel.getRequestItem().getActions().contains(actionCreate));
+		Assert.assertTrue(checkPermissionNotExistModel.getRequestItem().getActions().contains(actionRead));
+		
 	}
 	private void setupAgreement() {
 		

@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javax.swing.JOptionPane;
 
@@ -226,14 +227,18 @@ public class AccessControlPreferenceManager {
 			details.setAction(action);
 			this.logging.debug("Retrieving preference for: "+PrivacyPreferenceUtils.toString(details));
 			this.logging.debug("Retrieved preference for: "+PrivacyPreferenceUtils.toString(details));
-			ResponseItem evaluationResult = this.evaluateAccCtrlPreference(details, conditions); 
-			//this.checkPreferenceForAccessControl(model, requestor, dataId, conditions, action);
-			if (evaluationResult!=null){
-				items.put(action, evaluationResult);
-			}else{
+			try{
+				ResponseItem evaluationResult = this.evaluateAccCtrlPreference(details, conditions); 
+				//this.checkPreferenceForAccessControl(model, requestor, dataId, conditions, action);
+				if (evaluationResult!=null){
+					items.put(action, evaluationResult);
+				}else{
+					notExistsPreference.add(action);
+				}
+			}
+			catch (PrivacyException pe){
 				notExistsPreference.add(action);
 			}
-
 
 		}
 
@@ -243,53 +248,56 @@ public class AccessControlPreferenceManager {
 		item.setDecision(Decision.PERMIT);
 		RequestItem reqItem = new RequestItem();		
 		reqItem.setResource(resource);
+		item.setRequestItem(reqItem);
 
 
+		String proposalText = requestor.getRequestorId().toString()+" is requesting access to perform the following actions to resource: \n"
+				+ "type: "+dataId.getType()+"\n(resource Id: "+dataId.getUri()+")\nSelect the actions you want to allow to be performed.";
+		String[] actionsStr = new String[notExistsPreference.size()];
+		int i = 0;
+		for (Action a: notExistsPreference){
+			actionsStr[i] = a.getActionConstant().name();
+			i++;
+		}
+		ExpProposalContent expContent = new ExpProposalContent(proposalText, actionsStr);
 
+		List<String> response;
+		try {
+			response = this.userFeedback.getExplicitFB(ExpProposalType.CHECKBOXLIST, expContent).get();
+			if (response.size()==actionsStr.length){
+				for (Action act : notExistsPreference){
+					this.storeDecision(requestor, dataId, conditions, act, PrivacyOutcomeConstantsBean.ALLOW);
+					item.getRequestItem().getActions().add(act);
+				}
+				item.setDecision(Decision.PERMIT);
 
-		String actionList = "";
-		for (Action a : notExistsPreference){
-			actionList = actionList.concat(a.toString());
-			//JOptionPane.showMessageDialog(null, "Not found preferences for: "+actionList);
-
-			String allow  = "Allow";
-			String deny = "Deny";
-			String proposalText = requestor.getRequestorId().toString()+" is requesting access to: \n"
-					+ "resource:"+dataId.getType()+"\n("+dataId.getUri()+")\nto perform a "+actionList+" operation. \nAllow?";
-			List<String> response = new ArrayList<String>();
-			try {
-				response = this.userFeedback.getExplicitFB(ExpProposalType.ACKNACK, new ExpProposalContent(proposalText, new String[]{allow,deny})).get();
-				if (response.contains(allow))
-				{
-					for (Action act : notExistsPreference){
+			}else if (response.size()==0){
+				item.setDecision(Decision.DENY);
+				for (Action act : notExistsPreference){
+					this.storeDecision(requestor, dataId, conditions, act, PrivacyOutcomeConstantsBean.BLOCK);
+				}
+			}else{
+				for (Action act: notExistsPreference){
+					if (response.contains(act.getActionConstant().name())){
 						this.storeDecision(requestor, dataId, conditions, act, PrivacyOutcomeConstantsBean.ALLOW);
 						item.getRequestItem().getActions().add(act);
-					}
-					item.setDecision(Decision.PERMIT);
-				}else{
-					for (Action act : notExistsPreference){
+						item.setDecision(Decision.PERMIT);
+					}else{
 						this.storeDecision(requestor, dataId, conditions, act, PrivacyOutcomeConstantsBean.BLOCK);
 
 					}
-					item.setDecision(Decision.DENY);
-
 				}
-				return item;
-				
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				item.setDecision(Decision.DENY);
-				return item;
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				item.setDecision(Decision.DENY);
-				return item;
 			}
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
-		
+
+
 		Enumeration<Action> actionkeys = items.keys();
 
 		while (actionkeys.hasMoreElements()){
@@ -300,85 +308,10 @@ public class AccessControlPreferenceManager {
 				item.setDecision(Decision.DENY);
 			}
 		}
-		
-		
+
+
 		return item;
 
-		/*AccessControlPreferenceTreeModel model = prefCache.getAccCtrlPreference(details);
-
-		if (model!=null){
-			JOptionPane.showMessageDialog(null, "chkPermission:Found acc ctrl preference ");
-			this.logging.debug("Preference for specific request found");
-			return this.checkPreferenceForAccessControl(model, requestor, dataId, conditions, actions);
-		}
-
-		JOptionPane.showMessageDialog(null, "chkPermission:NOT Found acc ctrl preference ");
-		this.logging.debug("Preference for specific request NOT found");
-		details = new AccessControlPreferenceDetailsBean();
-		resource = new Resource();
-		resource.setDataType(dataId.getType());
-		details.setResource(resource);
-		details.setRequestor(requestor);
-		model = this.prefCache.getAccCtrlPreference(details);
-		if (model!=null){
-			this.logging.debug("Preference found specific to type and requestor but not for ctxId");
-			return this.checkPreferenceForAccessControl(model, requestor, dataId, conditions, actions);
-		}		
-
-		details = new AccessControlPreferenceDetailsBean();
-		resource = new Resource();
-		resource.setDataIdUri(dataId.getUri());
-		resource.setDataType(dataId.getType());
-		resource.setScheme(dataId.getScheme());
-		details.setResource(resource);
-		model = this.prefCache.getAccCtrlPreference(details);
-		if (model!=null){
-			this.logging.debug("Preference found specific to ctxId but not for requestor");
-			return this.checkPreferenceForAccessControl(model, requestor, dataId, conditions, actions);
-		}
-
-		details = new AccessControlPreferenceDetailsBean();
-		resource = new Resource();
-		resource.setDataType(dataId.getType());
-		model = this.prefCache.getAccCtrlPreference(details);
-		if (model!=null){
-			this.logging.debug("Preference found specific to type  but not for ctxId or requestor");
-			return this.checkPreferenceForAccessControl(model, requestor, dataId, conditions, actions);
-		}
-
-		String allow  = "Allow";
-		String deny = "Deny";
-		String proposalText = requestor.getRequestorId().toString()+" is requesting access to: \n"
-				+ "resource:"+dataId.getType()+"\n("+dataId.getUri()+")\nto perform a "+actionList+" operation. \nAllow?";
-		List<String> response = new ArrayList<String>();
-		try {
-			response = this.userFeedback.getExplicitFB(ExpProposalType.ACKNACK, new ExpProposalContent(proposalText, new String[]{allow,deny})).get();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		 int n = myMessageBox.showConfirmDialog(requestor.getRequestorId().toString()+" is requesting access to: \n"
-				+ "resource:"+dataId.getType()+"\n("+dataId.getUri()+")\nto perform a "+actionList+" operation. \nAllow?", "Access request", JOptionPane.YES_NO_OPTION);
-
-		if (n==JOptionPane.YES_OPTION){
-			this.askToStoreDecision(requestor, dataId, conditions, actions, PrivacyOutcomeConstants.ALLOW);
-			return this.createResponseItem(requestor, dataId, actions, conditions, Decision.PERMIT);
-		}else{
-			this.askToStoreDecision(requestor, dataId, conditions, actions, PrivacyOutcomeConstants.BLOCK);
-			return this.createResponseItem(requestor, dataId, actions, conditions, Decision.DENY);
-		}
-
-		if (response.contains(allow))
-		{
-			this.storeDecision(requestor, dataId, conditions, actions, PrivacyOutcomeConstantsBean.ALLOW);
-			return this.createResponseItem(requestor, dataId, actions, conditions, Decision.PERMIT);
-		}else{
-			this.storeDecision(requestor, dataId, conditions, actions, PrivacyOutcomeConstantsBean.BLOCK);
-			return this.createResponseItem(requestor, dataId, actions, conditions, Decision.DENY);
-		}*/
 	}
 
 	private void storeDecision(RequestorBean requestor, DataIdentifier dataId, List<Condition> conditions,Action action,  PrivacyOutcomeConstantsBean decision){
@@ -417,28 +350,30 @@ public class AccessControlPreferenceManager {
 				CtxAttributeIdentifier ctxIdentifier = (CtxAttributeIdentifier) ResourceUtils.getDataIdentifier(resource);
 				CtxAttribute ctxAttribute = (CtxAttribute) this.ctxBroker.retrieve(ctxIdentifier).get();
 				if (ctxAttribute!=null){
-					if (ctxAttribute.getQuality().getOriginType().equals(CtxOriginType.INFERRED) || ctxAttribute.getQuality().getOriginType().equals(CtxOriginType.SENSED)){
-						ContextPreferenceCondition condition;
-						PrivacyPreference conditionPreference;
-						switch (ctxAttribute.getValueType()){
-						case DOUBLE:
-							condition = new ContextPreferenceCondition(ctxIdentifier, OperatorConstants.EQUALS, ctxAttribute.getDoubleValue().toString());
-							conditionPreference = new PrivacyPreference(condition);
-							conditionPreference.add(withAllConditionsPreference);
-							return conditionPreference;
+					if (null!=ctxAttribute.getQuality().getOriginType()){
+						if (ctxAttribute.getQuality().getOriginType().equals(CtxOriginType.INFERRED) || ctxAttribute.getQuality().getOriginType().equals(CtxOriginType.SENSED)){
+							ContextPreferenceCondition condition;
+							PrivacyPreference conditionPreference;
+							switch (ctxAttribute.getValueType()){
+							case DOUBLE:
+								condition = new ContextPreferenceCondition(ctxIdentifier, OperatorConstants.EQUALS, ctxAttribute.getDoubleValue().toString());
+								conditionPreference = new PrivacyPreference(condition);
+								conditionPreference.add(withAllConditionsPreference);
+								return conditionPreference;
 
-						case INTEGER:
-							condition = new ContextPreferenceCondition(ctxIdentifier, OperatorConstants.EQUALS, ctxAttribute.getIntegerValue().toString());
-							conditionPreference = new PrivacyPreference(condition);
-							conditionPreference.add(withAllConditionsPreference);
-							return conditionPreference;
-						case STRING: 
-							condition = new ContextPreferenceCondition(ctxIdentifier, OperatorConstants.EQUALS, ctxAttribute.getStringValue());
-							conditionPreference = new PrivacyPreference(condition);
-							conditionPreference.add(withAllConditionsPreference);
-							return conditionPreference;
+							case INTEGER:
+								condition = new ContextPreferenceCondition(ctxIdentifier, OperatorConstants.EQUALS, ctxAttribute.getIntegerValue().toString());
+								conditionPreference = new PrivacyPreference(condition);
+								conditionPreference.add(withAllConditionsPreference);
+								return conditionPreference;
+							case STRING: 
+								condition = new ContextPreferenceCondition(ctxIdentifier, OperatorConstants.EQUALS, ctxAttribute.getStringValue());
+								conditionPreference = new PrivacyPreference(condition);
+								conditionPreference.add(withAllConditionsPreference);
+								return conditionPreference;
+							}
+
 						}
-
 					}
 				}else{
 					throw new PrivacyException("Could not create access control preference as there was no ctxAttribute found in DB with the provided dataIdentifier");
