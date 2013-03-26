@@ -34,7 +34,7 @@
     <!-- ToDo , move -->
     <h:outputScript library="js" name="cisajax.js"/>
 
-    <ui:fragment rendered="#{!request.requestURI.endsWith('index.xhtml') and !loginController.loggedIn}">
+    <ui:fragment rendered="#{!loginController.loggedIn and noRedirect ne 'true'}">
         <!-- redirect to index page if not logged in -->
         <meta http-equiv="REFRESH" content="0;url=index.xhtml"/>
     </ui:fragment>
@@ -69,10 +69,11 @@
         <!--<p:socket onMessage="handlePnb" channel="/pnb"/>-->
 
 
-        <div id="wrapper" class="clearfix">
-            <div id="container" class="container_12 clearfix">
+        <div id="wrapper" class="clearfix wrapper">
+            <div id="container" class="container_12 clearfix container">
+
                 <!-- Header -->
-                <header id="header" class="grid_12">
+                <header id="header" class="grid_12 header">
                     <!-- LOGIN POPUP -->
                     <ui:include src="/includes/loginbox.xhtml"/>
                     <!-- END LOGIN POPUP -->
@@ -80,6 +81,7 @@
                     <!-- MENU -->
                     <ui:include src="/includes/menu.xhtml"/>
                     <!-- END MENU -->
+
                     <div id="notification-box" class="notification-popup">
                         <a href="#" class="close"><img src="images/close_pop.png" class="btn_close" title="Close Window"
                                                        alt="Close"/></a>
@@ -89,6 +91,7 @@
                     </div>
                     <div class="clear"></div>
                 </header>
+
 
                 <ui:insert name="body">
                     <!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->

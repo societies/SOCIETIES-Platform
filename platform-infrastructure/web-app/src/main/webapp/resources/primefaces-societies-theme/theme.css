@@ -227,14 +227,12 @@
     text-align: center;
     overflow: visible; /* removes extra width in IE */
 
-    background: -moz-linear-gradient(center top, #f7961b, #f26a36);
-    background: -webkit-gradient(linear, left top, left bottom, from(#f7961b), to(#f26a36));
-    background: -o-linear-gradient(top, #f7961b, #f26a36);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#f7961b', EndColorStr = '#f26a36');
+    background: #f1f1f1;
     border: 1px #000;
     border-radius: 4px 4px 4px 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
+
     color: #ffffff;
     cursor: pointer;
     display: inline-block;
@@ -244,12 +242,24 @@
     font-size: 16px;
 }
 
+button.ui-button.ui-highlighted-button {
+    border: 1px solid #F99B1C;
+    background: #F7961B;
+    background: -moz-linear-gradient(center top, #f7961b, #f26a36);
+    background: -webkit-gradient(linear, left top, left bottom, from(#f7961b), to(#f26a36));
+    background: -o-linear-gradient(top, #f7961b, #f26a36);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#f7961b', EndColorStr = '#f26a36');
+}
+
 .ui-button,
 .ui-button:link,
 .ui-button:visited,
 .ui-button:hover,
 .ui-button:active {
     text-decoration: none;
+    background: #f26a36;
+    border: 1px solid #000000;
+
 }
 
 /* to make room for the icon, a width needs to be set here */
@@ -350,6 +360,10 @@ input.ui-button::-moz-focus-inner,
 button.ui-button::-moz-focus-inner {
     border: 0;
     padding: 0;
+}
+
+.ui-contextmenu a {
+    color: #cccccc;
 }
 
 .ui-datepicker {
@@ -582,11 +596,6 @@ button.ui-button::-moz-focus-inner {
     border-radius: 3px;
     border: 2px solid rgb(221, 221, 221);
     box-shadow: rgb(153, 153, 153) 0px 0px 20px 0px;
-    color: #cccccc;
-}
-
-.ui-dialog.ui-widget-content p {
-    color: #cccccc;
 }
 
 .ui-dialog.ui-shadow {
@@ -597,6 +606,10 @@ button.ui-button::-moz-focus-inner {
 .ui-dialog .ui-dialog-titlebar {
     padding: .4em 1em;
     position: relative;
+}
+
+.ui-dialog .ui-dialog-titlebar .ui-dialog-titlebar-icon {
+    z-index: 100;
 }
 
 .ui-dialog .ui-dialog-title {
@@ -674,6 +687,51 @@ button.ui-button::-moz-focus-inner {
     outline: none;
 }
 
+.ui-menu-parent .ui-icon-triangle-1-e {
+
+}
+
+.ui-menu-child {
+    background: #202020 url("#{resource['primefaces-societies-theme:images/ui-bg_flat_75_202020_40x100.png']}") 50% 50% repeat-x;
+    list-style: none;
+    padding: 2px;
+    margin: 0;
+    display: block;
+    outline: none;
+}
+
+.ui-selectcheckboxmenu-panel {
+    background: #202020 url("#{resource['primefaces-societies-theme:images/ui-bg_flat_75_202020_40x100.png']}") 50% 50% repeat-x;
+    list-style: none;
+    padding: 2px;
+    margin: 0;
+    display: block;
+    outline: none;
+}
+
+ul.ui-selectlistbox-list li {
+    list-style: none;
+    list-style-image: none;
+}
+
+.ui-selectonemenu-items {
+    background: #202020 url("#{resource['primefaces-societies-theme:images/ui-bg_flat_75_202020_40x100.png']}") 50% 50% repeat-x;
+    list-style: none;
+    padding: 2px;
+    margin: 0;
+    display: block;
+    outline: none;
+}
+
+.ui-selectonelistbox {
+    background: #202020 url("#{resource['primefaces-societies-theme:images/ui-bg_flat_75_202020_40x100.png']}") 50% 50% repeat-x;
+    list-style: none;
+    padding: 2px;
+    margin: 0;
+    display: block;
+    outline: none;
+}
+
 /* Added to override default li style */
 ul.ui-menu-list li,
 ul.ui-selectonemenu-items li {
@@ -689,7 +747,6 @@ ul.ui-selectonemenu-items li {
     box-shadow: rgb(153, 153, 153) 0px 0px 20px 0px;
     color: #cccccc;
 }
-
 
 .ui-menu .ui-menu {
     margin-top: -3px;
@@ -747,7 +804,7 @@ ul.ui-selectonemenu-items li {
 
 /* left-aligned */
 .ui-menu .ui-icon {
-    position: absolute;
+    /*position: absolute;*/
     top: .2em;
     left: .2em;
 }
@@ -762,6 +819,14 @@ ul.ui-selectonemenu-items li {
 table.ui-panelgrid tr,
 table.ui-panelgrid td {
     border: none;
+}
+
+.ui-panelgrid-footer .ui-widget-header {
+    background: none;
+}
+
+.ui-valign-middle {
+    vertical-align: middle;
 }
 
 .ui-progressbar {
@@ -1007,11 +1072,6 @@ body .ui-tooltip {
 .ui-widget-content {
     border: 1px solid #d6d9dd;
     /*background: #202020 url("#{resource['primefaces-societies-theme:images/ui-bg_flat_75_202020_40x100.png']}") 50% 50% repeat-x;*/
-    color: #cccccc;
-}
-
-.ui-widget-content a {
-    color: #cccccc;
 }
 
 .ui-widget-header {
@@ -1021,19 +1081,16 @@ body .ui-tooltip {
     font-weight: bold;
 }
 
-.ui-widget-header a {
-    color: #ffffff;
-}
-
 /* Interaction states
 ----------------------------------*/
 .ui-state-default,
 .ui-widget-content .ui-state-default,
 .ui-widget-header .ui-state-default {
-    border: 1px solid #d3d3d3;
-    background: #f1f1f1 url("#{resource['primefaces-societies-theme:images/ui-bg_glass_75_f1f1f1_1x400.png']}") 50% 50% repeat-x;
+    /*background: #f1f1f1 url("#{resource['primefaces-societies-theme:images/ui-bg_glass_75_f1f1f1_1x400.png']}") 50% 50% repeat-x;*/
     font-weight: normal;
-    color: #555555;
+    /*color: #555555;*/
+    border-radius: 4px;
+    border: 1px solid #d6d9dd;
 }
 
 .ui-state-default a,
@@ -1152,7 +1209,7 @@ body .ui-tooltip {
 
 .ui-icon,
 .ui-widget-content .ui-icon {
-    background-image: url("#{resource['primefaces-societies-theme:images/ui-icons_222222_256x240.png']}");
+    background-image: url("#{resource['primefaces-societies-theme:images/ui-icons_888888_256x240.png']}");
 }
 
 .ui-widget-header .ui-icon {
@@ -1877,6 +1934,20 @@ body .ui-tooltip {
 
 .ui-icon-grip-diagonal-se {
     background-position: -80px -224px;
+}
+
+.ui-radiobutton-icon {
+    display: block;
+}
+
+.ui-inputfield {
+    background: #ffffff;
+    border-radius: 4px;
+    border: 1px solid #d6d9dd;
+}
+
+.ui-inputfield:focus {
+    border: 1px solid #777c82;
 }
 
 /* Misc visuals

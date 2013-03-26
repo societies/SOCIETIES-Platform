@@ -278,14 +278,15 @@ blockquote {
 }
 
 /* wrapper*/
-#wrapper {
+.wrapper {
     margin: 0;
     padding: 0;
     background: transparent url(../images/wrapbackground.png) center repeat-y;
 }
 
-#container {
+.container {
     background: #fafafa url(../images/container-BG.jpg) 0 90px no-repeat;
+    color: #777C82;
 }
 
 ul li ul,
@@ -413,6 +414,7 @@ ol {
 
 /* Header
 -------------------------------------------------------------- */
+.header,
 #header {
     margin: 0;
     padding: 0;
@@ -550,6 +552,7 @@ ul#navigation ul ul ul {
 
 /* Left Column
 -------------------------------------------------------------- */
+.left_col,
 #left_col {
 
     margin-right: 0;
@@ -557,6 +560,7 @@ ul#navigation ul ul ul {
 
 /* Right Column / Sidebar
 -------------------------------------------------------------- */
+.sidebar_right,
 #sidebar_right {
     margin-left: 30px;
     margin-right: 30px;
@@ -590,6 +594,7 @@ ul#navigation ul ul ul {
     background: #fff;
 }
 
+.sidebar_right h3,
 #sidebar_right h3 {
     color: #313639;
     font-size: 24px;
@@ -705,11 +710,13 @@ a.homeboxgrid {
 
 /* Main image on homepage
 -------------------------------------------------------------- */
+.featured.grid_12,
 #featured.grid_12 {
     margin: 0 10px 0 10px;
     padding-top: 20px;
 }
 
+.featured,
 #featured {
     margin: 30px 0 0 0;
     padding: 0 20px 0 20px;
@@ -974,7 +981,7 @@ h3.person_title {
 }
 
 /* IMPORTANT SIGNUP Form Input Styles----------------------- */
-.form_style_main input#smalltext,
+.form_style_main input.smalltext,
 .form_style_main textarea {
     float: left;
     padding: 8px;
@@ -987,12 +994,12 @@ h3.person_title {
     outline: none;
 }
 
-.form_style_main input#smalltext:focus,
+.form_style_main input.smalltext:focus,
 .form_style_main textarea:focus {
     border: 1px solid #777c82;
 }
 
-.form_style_main input#smalltext {
+.form_style_main input.smalltext {
     width: 400px;
 }
 
@@ -1113,7 +1120,8 @@ label {
     margin-right: 10px;
     float: left;
     clear: both;
-    /*width: 250px;*/ /* Seriously? */
+    /*width: 250px;*/
+    /* Seriously? */
 }
 
 div.option-group {
@@ -1282,16 +1290,19 @@ div.option-group {
 
 /* -------------------- Accordion Menu Styling ------------------------*/
 
+.accordion div.accordion-menu-header a,
 #accordion div.accordion-menu-header a {
     margin-left: 19px;
     font-size: 16px;
     color: #fff;
 }
 
+.accordion div.accordion-menu-header a:hover,
 #accordion div.accordion-menu-header a:hover {
     text-decoration: none;
 }
 
+.accordion div.accordion-menu-header,
 #accordion div.accordion-menu-header {
     background-color: #000;
     margin-bottom: 1px;

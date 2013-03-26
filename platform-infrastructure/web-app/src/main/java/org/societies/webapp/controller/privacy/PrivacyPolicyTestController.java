@@ -218,4 +218,8 @@ public class PrivacyPolicyTestController extends BasePageController {
         responseItem.setRequestItem(requestItem);
         return responseItem;
     }
+
+    public String[] getListOfStrings() {
+        return new String[]{"Item 1", "Item 2", "Item 3", "Item 4", "Item 5"};
+    }
 }
