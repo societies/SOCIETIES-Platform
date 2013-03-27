@@ -1,5 +1,7 @@
 package org.societies.android.api.comms;
 
+import org.societies.android.api.comms.xmpp.VCardParcel;
+
 /**
  * Mirror interface of org.societies.api.comm.xmpp.interfaces.ICommManager, adapted for Android. Check javadoc there.
  * 
@@ -21,8 +23,11 @@ public interface XMPPAgent {
 							  "logout(String client, long remoteCallId)",
 							  "destroyMainIdentity(String client, long remoteCallId)",
 							  "configureAgent(String client, String domainAuthorityNode, int xmppPort, String resource, boolean debug, long remoteCallId)",
-							  "login(String client, String identifier, String domain, String password, String host, long remoteCallId)"
-	};
+							  "login(String client, String identifier, String domain, String password, String host, long remoteCallId)", 
+							  "setVCard(String client, VCardParcel vCard)",
+							  "getVCard(String client)", 
+							  "getVCard(String client, String userId)"
+							};
 	
 	/**
 	 * Android Comms intents
@@ -60,6 +65,9 @@ public interface XMPPAgent {
 	public static final String SEND_MESSAGE_RESULT = "org.societies.android.platform.comms.SEND_MESSAGE_RESULT";
 	public static final String SEND_MESSAGE_EXCEPTION = "org.societies.android.platform.comms.SEND_MESSAGE_EXCEPTION";
 	public static final String PUBSUB_EVENT = "org.societies.android.platform.comms.PUBSUB_EVENT";
+	public static final String SET_VCARD 	 	= "org.societies.android.platform.comms.SET_VCARD";
+	public static final String GET_VCARD 	 	= "org.societies.android.platform.comms.GET_VCARD";
+	public static final String GET_USER_VCARD 	= "org.societies.android.platform.comms.GET_USER_VCARD";
 
 
 	public boolean register(String client, String[] elementNames, String[] namespaces, long remoteCallId);
@@ -119,4 +127,24 @@ public interface XMPPAgent {
 	public boolean destroyMainIdentity(String client, long remoteCallId);	
 	
 	public boolean configureAgent(String client, String domainAuthorityNode, int xmppPort, String resource, boolean debug, long remoteCallId);
+	
+	/**
+	 * Sets the VCard for the current user
+	 * @param vCard
+	 */
+	public void setVCard(String client, VCardParcel vCard);
+    
+	/**
+	 * Returns the VCard for the current user
+	 * @return
+	 */
+	public VCardParcel getVCard(String client);
+	
+	/**
+	 * Returns the VCard for a given user
+	 * @param userId
+	 * @return
+	 */
+	public VCardParcel getVCard(String client, String userId);
+    
 }
