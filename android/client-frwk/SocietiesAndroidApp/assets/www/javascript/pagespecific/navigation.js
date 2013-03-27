@@ -39,7 +39,7 @@ var SocietiesNavigation = {
 	 */
 
 	homeAction: function() {
-		SocietiesLogin.loadCssActivities();
+		SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.loadCssActivities);
 		$.mobile.changePage($("#landing"), {transition: "slideup"});
 	},
 	/**
