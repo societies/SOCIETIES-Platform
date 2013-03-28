@@ -70,8 +70,7 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 	public UserInheritance() {
 		LOG.info(this.getClass() + "UserCtxInheritance instantiated ");
 	}
-
-	public ArrayList<CtxAttributeBond> inheritCommunityCtx (CtxEntityIdentifier cssIdentifier, CtxEntityIdentifier cisIdentifier){
+	public ArrayList<CtxAttributeBond> getInherittedAttributes (CtxEntityIdentifier cssIdentifier, CtxEntityIdentifier cisIdentifier){
 		CtxEntity retrievedCSS = null;
 		CommunityCtxEntity retrievedCIS = null;
 		
@@ -89,6 +88,7 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 			Set<CtxAssociationIdentifier> cssAssociationsIdentifiers = retrievedCSS.getAssociations(CtxAssociationTypes.IS_MEMBER_OF);
 			
 			Set<CtxBond> cisBondsSet = retrievedCIS.getBonds();
+			Set<CtxAttribute> cisAttributeSet = retrievedCIS.getAttributes();
 			Set<CtxAttribute> cssAttributesSet = retrievedCSS.getAttributes();
 			
 			if (cisBondsSet.size()!=0 && cssAttributesSet.size()!=0){
@@ -98,8 +98,6 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 						CtxAttributeBond attrBond = (CtxAttributeBond) ctxBond;
 						for (CtxAttribute ctxAttribute:cssAttributesSet){
 							if (ctxBond.getType() == ctxAttribute.getType() && ctxAttribute.getStringValue()==null){ //&& attrBond.getMinValue()==attrBond.getMaxValue()){
-								
-								cssAttributesForInheritance.add(attrBond);
 								cssAttributesForInheritance.add(attrBond);
 							}
 							else{
@@ -215,7 +213,30 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 		return null;
 		
 	}
-	
+	@Override
+	public void getCIS(IIdentity arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void getContextAttribute(CtxAttributeIdentifier arg0,
+			CtxAttributeValueType arg1, IIdentity arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void inheritContextAttribute(CtxAttributeIdentifier arg0,
+			CtxAttributeValueType arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void resolveConflicts(ConflictResolutionAlgorithm arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 	
 	
 	
@@ -242,30 +263,6 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 		
 	}*/
 
-	@Override
-	public void getCIS(IIdentity arg0) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void getContextAttribute(CtxAttributeIdentifier arg0,
-			CtxAttributeValueType arg1, IIdentity arg2) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void inheritContextAttribute(CtxAttributeIdentifier arg0,
-			CtxAttributeValueType arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void resolveConflicts(ConflictResolutionAlgorithm arg0) {
-		// TODO Auto-generated method stub
-		
-	}
 
 }

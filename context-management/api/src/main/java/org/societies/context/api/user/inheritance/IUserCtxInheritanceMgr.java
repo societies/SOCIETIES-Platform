@@ -22,12 +22,16 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.api.user.inheritance;
+
 
 //import org.societies.api.mock.EntityIdentifier;
+import java.util.ArrayList;
+
 import org.societies.api.identity.IIdentity;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxEntityIdentifier;
 
 /**
  * @author <a href="mailto:ybouloudis@amitec.gr">Yiorgos Bouloudis</a> (AMITEC) 
@@ -39,34 +43,60 @@ public interface IUserCtxInheritanceMgr {
 	 * 
 	 * @param cisId
 	 * @since 0.0.1
-	 */
+	 *//*
+	@Deprecated
 	public void getCIS(IIdentity cisId);
-
-	/**
-	 * Gets the Context Attribe of an indicated type and CIS.
+	
+	*//**
+	 * Gets the Context Attribute of an indicated type and CIS.
 	 * 
 	 * @param contextAttributeIdentifier
 	 * @param type
 	 * @param cisId
 	 * @since 0.0.1
-	 */
+	 *//*
+	@Deprecated
 	public void getContextAttribute(CtxAttributeIdentifier contextAttributeIdentifier, CtxAttributeValueType type, IIdentity cisId);
 
-	/**
+	*//**
 	 * Inherits the Context Attribute of a specified type.
 	 * 
 	 * @param contextAttributeIdentifier
 	 * @param type
 	 * @since 0.0.1
-	 */
+	 *//*
+	
+	@Deprecated
 	public void inheritContextAttribute(CtxAttributeIdentifier contextAttributeIdentifier, CtxAttributeValueType type);
 
-	/**
+	*//**
 	 * Resolves conflicts using specified algorithms.
 	 * 
 	 * @param conflictResolutionsAlgorithms
 	 * @since 0.0.1
 	 */
-	public void resolveConflicts(ConflictResolutionAlgorithm conflictResolutionsAlgorithms);
-
+	//@Deprecated
+	////public void resolveConflicts(ConflictResolutionAlgorithm conflictResolutionsAlgorithms);
+	
+	/**
+	 * @author yboul
+	 * This method returns to the InferenceManager (IM) an arraylist with the attributes that have to be checked
+	 * about their quality and updated by the IM. If there is already an attribute set to the CSS different than that
+	 * set in the CIS then the attribute is flagged as conflicted (precision is set to (-1.0))
+	 * @since 0.6
+	 * @param cisIdentifier, the id of the cis
+	 * @param cssIdentifier, the id of the css 
+	 * @return An arraylist with attributes marked as conflicted or not
+	 */
+	public  ArrayList<CtxAttribute> getInherittedAttributes(CtxEntityIdentifier cisIdentifier, CtxEntityIdentifier cssIdentifier); 
+	
+	/**
+	 * @author yboul
+	 * This method sends the CSS attributes that have to be removed from a CSS, when CIS is no longer exist to the 
+	 * InferenceManager (IM)
+	 * @param cisIdentifier, the id of the cis
+	 * @param cssIdentifier, the id of the css 
+	 * @return An arraylist with the attributes that have to be removed
+	 */
+	public ArrayList<CtxAttribute> removeInherittedAttributes(CtxEntityIdentifier cisIdentifier, CtxEntityIdentifier cssIdentifier);
 }
