@@ -1,3 +1,5 @@
+package org.societies.context.user.inheritance.impl;
+
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
@@ -22,13 +24,11 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.user.inheritance.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
@@ -36,11 +36,12 @@ import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeBond;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
@@ -70,23 +71,49 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 		LOG.info(this.getClass() + "UserCtxInheritance instantiated ");
 	}
 
-	public CtxAttribute inheritCommunityCtx (CtxEntityIdentifier ctxEntId, CtxEntityIdentifier ctxComId){
+	public ArrayList<CtxAttributeBond> inheritCommunityCtx (CtxEntityIdentifier cssIdentifier, CtxEntityIdentifier cisIdentifier){
 		CtxEntity retrievedCSS = null;
 		CommunityCtxEntity retrievedCIS = null;
-		CtxModelObject cssObj = null;
-		CtxModelObject cisObj = null;
 		
 		ArrayList<CtxEntityIdentifier> cisEntityIdList = new ArrayList<CtxEntityIdentifier>();
 		ArrayList<CtxAttribute> cssCisCommonAttributes = new ArrayList<CtxAttribute>();
 		ArrayList<CtxAttribute> cssCisUncommonAttributes = new ArrayList<CtxAttribute>();
-		
+		ArrayList<CtxAttributeBond> cssAttributesForInheritance = new ArrayList<CtxAttributeBond>();
+		ArrayList<CtxAttributeBond> cssConflictedAttributesForInheritance = new ArrayList<CtxAttributeBond>();
 		//given the css' ctxId get the entity ids of the CIS that this css is member of
+	
 		try {
-			retrievedCSS =  (CtxEntity) this.internalCtxBroker.retrieve(ctxEntId).get();
-			retrievedCIS = (CommunityCtxEntity) this.internalCtxBroker.retrieve(ctxComId).get();
+			retrievedCSS =  (CtxEntity) this.internalCtxBroker.retrieve(cssIdentifier).get();
+			retrievedCIS = (CommunityCtxEntity) this.internalCtxBroker.retrieve(cisIdentifier).get();
 			
 			Set<CtxAssociationIdentifier> cssAssociationsIdentifiers = retrievedCSS.getAssociations(CtxAssociationTypes.IS_MEMBER_OF);
 			
+			Set<CtxBond> cisBondsSet = retrievedCIS.getBonds();
+			Set<CtxAttribute> cssAttributesSet = retrievedCSS.getAttributes();
+			
+			if (cisBondsSet.size()!=0 && cssAttributesSet.size()!=0){
+				for(CtxBond ctxBond:cisBondsSet){
+					
+					if (ctxBond instanceof CtxAttributeBond){
+						CtxAttributeBond attrBond = (CtxAttributeBond) ctxBond;
+						for (CtxAttribute ctxAttribute:cssAttributesSet){
+							if (ctxBond.getType() == ctxAttribute.getType() && ctxAttribute.getStringValue()==null){ //&& attrBond.getMinValue()==attrBond.getMaxValue()){
+								
+								cssAttributesForInheritance.add(attrBond);
+								cssAttributesForInheritance.add(attrBond);
+							}
+							else{
+								cssAttributesForInheritance.add(attrBond);
+							}
+					}
+				
+					}
+				}
+								
+				
+				
+				
+			}
 			if (cssAssociationsIdentifiers.size()!=0){			
 				for(CtxAssociationIdentifier ctxAssocId:cssAssociationsIdentifiers){
 					CtxAssociation assocObj = (CtxAssociation) this.internalCtxBroker.retrieve(ctxAssocId).get();
@@ -107,7 +134,7 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 							CtxAttributeIdentifier cssAttId = cssAtt.getId();
 							CtxAttributeIdentifier cisAttId = cisAtt.getId();
 							
-							callQoC(ctxEntId,  ctxComId,  cssAttId, cisAttId);
+							//callQoC(cssId,  cisId,  cssAttId, cisAttId);
 						}else {
 							cssCisUncommonAttributes.add(cisAtt);
 						}
@@ -128,12 +155,12 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 					for (String select:feedback){
 						for (CtxAttribute ctxAtt:cssCisUncommonAttributes){
 							if (ctxAtt.getStringValue()==select){
-								CtxAttribute ca = (CtxAttribute) this.internalCtxBroker.createAttribute(ctxEntId, select).get();
+								CtxAttribute ca = (CtxAttribute) this.internalCtxBroker.createAttribute(cssIdentifier, select).get();
 								ca.setStringValue(ctxAtt.getStringValue().toString());
 								ca.setValueType(CtxAttributeValueType.STRING);
 								ca = (CtxAttribute) this.internalCtxBroker.update(ca).get();
+								LOG.info("the aatribute that has been updated is "+ca.getStringValue());
 								
-								//retrievedCSS.addAttribute(ctxAtt);							
 							}
 						}
 					}
@@ -159,16 +186,40 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 		}
 
 
-		return null;
+		return cssAttributesForInheritance;
 
+	}
+	
+	public ArrayList<CtxAttributeBond> removeInheritedUserCtx (CtxEntityIdentifier cssIdentifier, CtxEntityIdentifier cisIdentifier){
+		try {
+			CtxEntity retrievedCSS = (CtxEntity) this.internalCtxBroker.retrieve(cssIdentifier).get();
+			CommunityCtxEntity retrievedCIS = (CommunityCtxEntity) this.internalCtxBroker.retrieve(cisIdentifier).get();
+			
+			Set<CtxBond> cisBondsSet = retrievedCIS.getBonds();
+			Set<CtxAttribute> cssAttributesSet = retrievedCSS.getAttributes();
+			
+			
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		return null;
+		
 	}
 	
 	
 	
 	
-	
-	
-	private void callQoC(CtxEntityIdentifier ctxEntId, CtxEntityIdentifier ctxComId,  CtxAttributeIdentifier cssCtxAttId, CtxAttributeIdentifier cisCtxAttId) {
+/*	private void callQoC(CtxEntityIdentifier ctxEntId, CtxEntityIdentifier ctxComId,  CtxAttributeIdentifier cssCtxAttId, CtxAttributeIdentifier cisCtxAttId) {
 		// TODO Auto-generated method stub, that will use the QoC to compare the quality of two attributes, one in a css and on in a cis
 		try {
 			CtxEntity retrievedCSS = (CtxEntity) this.internalCtxBroker.retrieve(ctxEntId).get();
@@ -189,7 +240,7 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 			e.printStackTrace();
 		}
 		
-	}
+	}*/
 
 	@Override
 	public void getCIS(IIdentity arg0) {

@@ -37,7 +37,6 @@ public class EstimateCommunityCtx {
 
 	private IIdentity cssIDUniversity;
 	private IIdentity cssIDEmma;
-
 	// run test in university's container
 	private String targetUniversity = "university.ict-societies.eu";
 	private String targetEmma= "emma.ict-societies.eu";
