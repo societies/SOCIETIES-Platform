@@ -29,8 +29,13 @@ import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.android.platform.androidutils.AndroidNotifier;
+import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
+import org.societies.android.platform.useragent.feedback.guis.AcknackPopup;
+import org.societies.android.platform.useragent.feedback.guis.CheckboxPopup;
+import org.societies.android.platform.useragent.feedback.guis.RadioPopup;
 import org.societies.android.remote.helper.EventsHelper;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
+import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 
 import android.app.Notification;
 import android.app.Service;
@@ -55,7 +60,6 @@ import android.util.Log;
 public class EventListener extends Service {
 
 	private static final String LOG_TAG = EventListener.class.getName();
-	private static final String EXTRA_PRIVACY_POLICY = "org.societies.userfeedback.eventInfo";
 	
 	//TRACKING CONNECTION TO EVENTS MANAGER
 	private boolean boundToEventMgrService = false;
@@ -147,10 +151,16 @@ public class EventListener extends Service {
 			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS)) {
 				Log.d(LOG_TAG, "Un-subscribed to events: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
 			}
-			//PUBSUB EVENT - payload is UserFeedbackPrivacyNegotiatioEvent 
+			//PRIVACY NEGOTIATION EVENT - payload is UserFeedbackPrivacyNegotiatioEvent 
 			else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_REQUEST_INTENT)) {
 				Log.d(LOG_TAG, "Privacy Negotiation event received");
 				UserFeedbackPrivacyNegotiationEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+				launchNegotiation(eventPayload);
+			}
+			//PERMISSION REQUEST EVENT - payload is UserFeedbackBean 
+			else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_REQUEST_INTENT)) {
+				Log.d(LOG_TAG, "General Permission request event received");
+				UserFeedbackBean eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
 				String description = "Accept privacy policy?";
 				addNotification(description, "Privacy Policy", eventPayload);
 			}
@@ -169,6 +179,7 @@ public class EventListener extends Service {
         intentFilter.addAction(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS);
         //PUBSUB INTENTS
         intentFilter.addAction(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_REQUEST_INTENT);
+        intentFilter.addAction(IAndroidSocietiesEvents.UF_REQUEST_INTENT);
         return intentFilter;
     }
     
@@ -186,7 +197,7 @@ public class EventListener extends Service {
 				if (resultFlag){
 					try {
 						//subscribing to all user feedback events. 
-						EventListener.this.eventsHelper.subscribeToEvent(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_REQUEST_INTENT, new IPlatformEventsCallback() {
+						EventListener.this.eventsHelper.subscribeToEvents(UserFeedbackActivityIntentExtra.USERFEEDBACK_NODES, new IPlatformEventsCallback() {
 							@Override
 							public void returnAction(int result) {
 								Log.d(LOG_TAG, "eventMgr callback: ReturnAction(int) called. ??");
@@ -213,19 +224,34 @@ public class EventListener extends Service {
 		});
 	}
 
-    private void addNotification(String description, String eventType, UserFeedbackPrivacyNegotiationEvent policy) {
+    private void launchNegotiation(UserFeedbackPrivacyNegotiationEvent policy) {
+    	//CREATE INTENT FOR LAUNCHING ACTIVITY
+		Intent intent = new Intent(this.getApplicationContext(), NegotiationActivity.class);
+		intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY, (Parcelable)policy);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
+	}
+    
+    private void addNotification(String description, String eventType, UserFeedbackBean policy) {
     	//CREATE ANDROID NOTIFICATION
 		int notifierflags [] = new int [1];
 		notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
 		AndroidNotifier notifier = new AndroidNotifier(EventListener.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
 		
-		//CREATE INTENT FOR LAUNCHING ACTIVITY
-		Intent intent = new Intent(this.getApplicationContext(), NegotiationActivity.class);
-		intent.putExtra(EXTRA_PRIVACY_POLICY, (Parcelable)policy);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		//DETERMINE WHICH ACTIVITY TO LAUNCH
+		Class activtyClass;
+		if (policy.getType()==0)
+			activtyClass = RadioPopup.class;
+		else if (policy.getType()==1)
+			activtyClass = CheckboxPopup.class;
+		else
+			activtyClass = AcknackPopup.class;
 		
-		//notifier.notifyMessage(description, eventType, NegotiationActivity.class, intent, "SOCIETIES");
-		startActivity(intent);
+		//CREATE INTENT FOR LAUNCHING ACTIVITY
+		Intent intent = new Intent(this.getApplicationContext(), activtyClass);
+		intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY, (Parcelable)policy);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		notifier.notifyMessage(description, eventType, activtyClass, intent, "SOCIETIES");
 	}
 
 }

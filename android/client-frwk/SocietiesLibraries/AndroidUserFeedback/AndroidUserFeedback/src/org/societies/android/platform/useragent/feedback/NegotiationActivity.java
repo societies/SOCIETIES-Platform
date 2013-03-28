@@ -6,6 +6,7 @@ import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
+import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
 import org.societies.android.remote.helper.EventsHelper;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 import org.societies.api.schema.identity.RequestorBean;
@@ -40,7 +41,6 @@ import android.widget.TextView;
 public class NegotiationActivity extends Activity implements OnItemSelectedListener {
 
 	private static final String LOG_TAG = NegotiationActivity.class.getName();
-	private static final String EXTRA_PRIVACY_POLICY = "org.societies.userfeedback.eventInfo";
 	
 	private EventsHelper eventsHelper;
 	UserFeedbackPrivacyNegotiationEvent eventInfo = null;
@@ -60,7 +60,7 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
         //GET EVENT OBJECT
         Intent intent = getIntent();
 		Bundle bundle = intent.getExtras();
-		eventInfo = bundle.getParcelable(EXTRA_PRIVACY_POLICY);
+		eventInfo = bundle.getParcelable(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY);
 		
 		//SET HEADER INFO
 		RequestorBean requestor = eventInfo.getNegotiationDetails().getRequestor();
