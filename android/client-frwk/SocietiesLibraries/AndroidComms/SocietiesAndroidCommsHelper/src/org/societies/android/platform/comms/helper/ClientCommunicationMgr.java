@@ -853,6 +853,8 @@ public class ClientCommunicationMgr {
         intentFilter.addAction(XMPPAgent.UNREGISTER_EXCEPTION);
         intentFilter.addAction(XMPPAgent.NEW_MAIN_IDENTITY);
         intentFilter.addAction(XMPPAgent.NEW_MAIN_IDENTITY_EXCEPTION);
+        intentFilter.addAction(XMPPAgent.GET_VCARD);
+        intentFilter.addAction(XMPPAgent.GET_USER_VCARD);
         return intentFilter;
     }
     
@@ -1878,6 +1880,54 @@ public class ClientCommunicationMgr {
     		return null;
     	}
     }
+    
+	/**Async task to invoke VCard functions
+     */
+    private class InvokeVCard extends AsyncTask<String, Void, String[]> {
+
+    	private final String LOCAL_LOG_TAG = InvokeVCard.class.getName();
+    	private String client;
+    	private long remoteCallId;
+
+    	/**
+    	 * Default Constructor
+    	 * 
+    	 * @param packageName
+    	 * @param client
+    	 */
+    	public InvokeVCard(String client, long remoteCallId) {
+    		this.client = client;
+    		this.remoteCallId = remoteCallId;
+    	}
+
+    	protected String[] doInBackground(String... params) {
+
+    		String targetMethod = params[0];
+    		
+    		//String targetMethod = XMPPAgent.methodsArray[8];
+    		android.os.Message outMessage = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(XMPPAgent.methodsArray, targetMethod), 0, 0);
+    		Bundle outBundle = new Bundle();
+
+    		//client param
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 0), this.client);
+    		if (DEBUG_LOGGING) Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		//
+    		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethod, 1), this.remoteCallId);
+    		if (DEBUG_LOGGING) Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+
+    		outMessage.setData(outBundle);
+    		if (DEBUG_LOGGING) Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethod);
+
+    		try {
+				targetService.send(outMessage);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+    		
+    		return null;
+    	}
+    }
+    
     /**
      * Create a stanza from a received packet
      * @param packet

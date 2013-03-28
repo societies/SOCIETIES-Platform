@@ -24,9 +24,9 @@ public interface XMPPAgent {
 							  "destroyMainIdentity(String client, long remoteCallId)",
 							  "configureAgent(String client, String domainAuthorityNode, int xmppPort, String resource, boolean debug, long remoteCallId)",
 							  "login(String client, String identifier, String domain, String password, String host, long remoteCallId)", 
-							  "setVCard(String client, VCardParcel vCard)",
-							  "getVCard(String client)", 
-							  "getVCard(String client, String userId)"
+							  "setVCard(String client, VCardParcel vCard)",				//15
+							  "getVCard(String client)", 								//16
+							  "getVCard(String client, String userId)"					//17
 							};
 	
 	/**
