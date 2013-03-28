@@ -81,10 +81,18 @@
 				<xs:element name="resultAdvertList" type="tnd:cssAdvertisementRecord" minOccurs="0" maxOccurs="unbounded" />
 				<xs:element name="resultServicelist" type="tnl:service" minOccurs="0" maxOccurs="unbounded" />
 				<xs:element name="resultCssRequestList" type="tns:cssRequest" minOccurs="0" maxOccurs="unbounded" />
+				<xs:element name="resultSuggestedFriends" type="tns:friendEntry" minOccurs="0" maxOccurs="unbounded" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 	
+   	<xs:complexType name="friendEntry" >
+       	<xs:sequence>
+           	<xs:element name="key" minOccurs="0" type="tnd:cssAdvertisementRecord"/>
+			<xs:element name="value" minOccurs="0" type="xs:int"/>
+		</xs:sequence>
+	</xs:complexType>
+    
 	<xs:element name='cssManagerResultActivities'>
 		<xs:complexType>
 			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
