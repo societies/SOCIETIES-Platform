@@ -1,4 +1,5 @@
 /**
+
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
  * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
@@ -25,6 +26,8 @@
 
 
 //import org.societies.api.mock.EntityIdentifier;
+package org.societies.context.api.user.inheritance;
+
 import java.util.ArrayList;
 
 import org.societies.api.identity.IIdentity;
