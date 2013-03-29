@@ -24,6 +24,7 @@
 			<version>${version.cm}</version>
 			<scope>provided</scope>
 		</dependency>
+
 	</dependencies>
 	<parent>
 		<groupId>org.societies</groupId>

@@ -78,8 +78,8 @@ public interface IUserCtxInheritanceMgr {
 	 * @param conflictResolutionsAlgorithms
 	 * @since 0.0.1
 	 */
-	//@Deprecated
-	////public void resolveConflicts(ConflictResolutionAlgorithm conflictResolutionsAlgorithms);
+	@Deprecated
+	public void resolveConflicts(ConflictResolutionAlgorithm conflictResolutionsAlgorithms);
 	
 	/**
 	 * @author yboul

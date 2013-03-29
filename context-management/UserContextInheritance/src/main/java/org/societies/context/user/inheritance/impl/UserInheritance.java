@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
@@ -42,21 +43,22 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
+import org.societies.context.api.community.inheritance.ICommunityCtxInheritanceMgr;
+import org.societies.context.api.user.inheritance.IUserCtxInheritanceMgr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.societies.context.api.user.db.IUserCtxDBMgr;
-import org.societies.context.api.user.inheritance.*;
 /**
  * @author yboul
  */
 
 @Service
-public class UserInheritance implements IUserCtxInheritanceMgr{
+public class UserInheritance implements IUserCtxInheritanceMgr {
 	
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(UserInheritance.class);
@@ -68,14 +70,14 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 	public UserInheritance() {
 		LOG.info(this.getClass() + "UserCtxInheritance instantiated ");
 	}
-	public ArrayList<CtxAttributeBond> getInherittedAttributes (CtxEntityIdentifier cssIdentifier, CtxEntityIdentifier cisIdentifier){
+	public ArrayList<CtxAttribute> getInherittedAttributes (CtxEntityIdentifier cssIdentifier, CtxEntityIdentifier cisIdentifier){
 		CtxEntity retrievedCSS = null;
 		CommunityCtxEntity retrievedCIS = null;
 		
 		ArrayList<CtxEntityIdentifier> cisEntityIdList = new ArrayList<CtxEntityIdentifier>();
 		ArrayList<CtxAttribute> cssCisCommonAttributes = new ArrayList<CtxAttribute>();
 		ArrayList<CtxAttribute> cssCisUncommonAttributes = new ArrayList<CtxAttribute>();
-		ArrayList<CtxAttributeBond> cssAttributesForInheritance = new ArrayList<CtxAttributeBond>();
+		ArrayList<CtxAttribute> cssAttributesForInheritance = new ArrayList<CtxAttribute>();
 		ArrayList<CtxAttributeBond> cssConflictedAttributesForInheritance = new ArrayList<CtxAttributeBond>();
 		//given the css' ctxId get the entity ids of the CIS that this css is member of
 	
@@ -96,10 +98,10 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 						CtxAttributeBond attrBond = (CtxAttributeBond) ctxBond;
 						for (CtxAttribute ctxAttribute:cssAttributesSet){
 							if (ctxBond.getType() == ctxAttribute.getType() && ctxAttribute.getStringValue()==null){ //&& attrBond.getMinValue()==attrBond.getMaxValue()){
-								cssAttributesForInheritance.add(attrBond);
+								//cssAttributesForInheritance.add(attrBond);
 							}
 							else{
-								cssAttributesForInheritance.add(attrBond);
+								//cssAttributesForInheritance.add(attrBond);
 							}
 					}
 				
@@ -212,6 +214,10 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 		
 	}
 
+	public ArrayList<CtxAttribute> removeInherittedAttributes (CtxEntityIdentifier cssIdentifier, CtxEntityIdentifier cisIdentifier){
+		return null;
+		
+	}
 
 
 

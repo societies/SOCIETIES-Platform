@@ -40,6 +40,12 @@
 			<version>${version.cm}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>user-context-inheritance</artifactId>
+			<version>0.6</version>
+			<type>bundle</type>
+		</dependency>
 	</dependencies>
 	<parent>
 		<groupId>org.societies</groupId>
