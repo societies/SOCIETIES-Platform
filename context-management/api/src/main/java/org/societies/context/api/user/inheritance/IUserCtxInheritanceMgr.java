@@ -84,8 +84,8 @@ public interface IUserCtxInheritanceMgr {
 	 * about their quality and updated by the IM. If there is already an attribute set to the CSS different than that
 	 * set in the CIS then the attribute is flagged as conflicted (precision is set to (-1.0))
 	 * @since 0.6
-	 * @param cisIdentifier, the id of the cis
-	 * @param cssIdentifier, the id of the css 
+	 * @param cisIdentifier, the cis' id from where the attributes will be inherited
+	 * @param cssIdentifier, the css' id that will inherit the attributes
 	 * @return An arraylist with attributes marked as conflicted or not
 	 */
 	public  ArrayList<CtxAttribute> getInherittedAttributes(CtxEntityIdentifier cisIdentifier, CtxEntityIdentifier cssIdentifier); 

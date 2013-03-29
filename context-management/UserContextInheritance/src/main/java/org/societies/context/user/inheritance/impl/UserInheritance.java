@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
@@ -49,10 +50,9 @@ import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.context.api.user.inheritance.ConflictResolutionAlgorithm;
-import org.societies.context.api.user.inheritance.IUserCtxInheritanceMgr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.societies.context.api.user.inheritance.*;
 /**
  * @author yboul
  */
@@ -213,28 +213,8 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 		return null;
 		
 	}
-	@Override
-	public void getCIS(IIdentity arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void getContextAttribute(CtxAttributeIdentifier arg0,
-			CtxAttributeValueType arg1, IIdentity arg2) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void inheritContextAttribute(CtxAttributeIdentifier arg0,
-			CtxAttributeValueType arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void resolveConflicts(ConflictResolutionAlgorithm arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+
+
 
 
 	
