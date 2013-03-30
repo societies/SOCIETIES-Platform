@@ -60,6 +60,7 @@ public class VCardParcel implements Parcelable {
     private String avatar;
     private Map<String, String> otherSimpleFields = new HashMap<String, String>();
     private Map<String, String> otherUnescapableFields = new HashMap<String, String>();
+    private String to;
 
     /**Set generic VCard field.
      *
@@ -401,6 +402,20 @@ public class VCardParcel implements Parcelable {
         setField(GenericField.FN, sb.toString());
     }
     
+    /**
+	 * @return the to
+	 */
+	public String getTo() {
+		return to;
+	}
+
+	/**
+	 * @param to the to to set
+	 */
+	public void setTo(String to) {
+		this.to = to;
+	}
+	
     public VCardParcel() {
     }
     
@@ -421,6 +436,7 @@ public class VCardParcel implements Parcelable {
     	organization = in.readString();
     	organizationUnit = in.readString();
     	avatar = in.readString();
+    	to = in.readString();
     	in.readMap(otherSimpleFields, VCardParcel.class.getClassLoader());
     	in.readMap(otherUnescapableFields, VCardParcel.class.getClassLoader());
     }
@@ -446,10 +462,11 @@ public class VCardParcel implements Parcelable {
 		dest.writeString(organization);
 		dest.writeString(organizationUnit);
 		dest.writeString(avatar);
+		dest.writeString(to);
 		dest.writeMap(otherSimpleFields);
 		dest.writeMap(otherUnescapableFields);
 	}
-	
+
 	public static final Parcelable.Creator<VCardParcel> CREATOR = new Parcelable.Creator<VCardParcel>() {
 		public VCardParcel createFromParcel(Parcel in) {
 			return new VCardParcel(in);

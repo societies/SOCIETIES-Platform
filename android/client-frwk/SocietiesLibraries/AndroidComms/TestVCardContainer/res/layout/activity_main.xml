@@ -14,8 +14,8 @@
 
     <ImageView
         android:id="@+id/imageView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="22dp"
@@ -24,7 +24,7 @@
         android:maxWidth="100dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_action_search" />
-
+<!-- centerInside -->
     <EditText
         android:id="@+id/editText1"
         android:layout_width="wrap_content"

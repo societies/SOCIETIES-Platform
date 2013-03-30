@@ -1166,13 +1166,14 @@ public class AndroidCommsBase implements XMPPAgent {
 		
 		VCard xmppCard = VCardUtilities.convertToXMPPVCard(vCard);		
 		try {
+			connect();	//THIS TASK MUST BE AUTHENTICATED 
 			xmppCard.save(connection);
 		} catch (XMPPException e1) {
 			e1.printStackTrace();
 		}
     }
     
-    public VCardParcel getVCard(String client, String userId) {
+    public VCardParcel getVCard(String client, long remoteCallId, String userId) {
     	//REQUIRED DUE TO ISSUE: https://code.google.com/p/asmack/issues/detail?id=14#c8
     	ProviderManager.getInstance().addIQProvider("vCard", "vcard-temp", new org.jivesoftware.smackx.provider.VCardProvider());
     	//RETURN INTENT
@@ -1181,12 +1182,12 @@ public class AndroidCommsBase implements XMPPAgent {
     	// IF NO VCARD RETURNED FROM SERVER OR EXCEPTION - RETURN NULL
 		VCard returnedCard = null;
 		try {
+			connect();	//THIS TASK MUST BE AUTHENTICATED
 			returnedCard = new VCard();
 			if (userId == null) {
 				returnedCard.load(connection);			//LOAD MY VCARD
 				intent.setAction(XMPPAgent.GET_VCARD);
-			}			
-			else {
+			} else {
 				returnedCard.load(connection, userId);	//LOAD ANOTHER USER VCARD
 				intent.setAction(XMPPAgent.GET_USER_VCARD);
 			}
@@ -1196,17 +1197,18 @@ public class AndroidCommsBase implements XMPPAgent {
 		VCardParcel parcelVCard = VCardUtilities.convertToParcelVCard(returnedCard);
 		
 		//SEND RETURN INTENT
-		if (AndroidCommsBase.this.restrictBroadcast) {
+		if (AndroidCommsBase.this.restrictBroadcast)
 			intent.setPackage(client);
-		}
+		
 		intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, parcelVCard);
-		AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+		intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+		this.serviceContext.sendBroadcast(intent);
 		
 		return null;
     }
     
-    public VCardParcel getVCard(String client) {
-    	return getVCard(client, null);
+    public VCardParcel getVCard(String client, long remoteCallId) {
+    	return getVCard(client, remoteCallId, null);
     }
     
 }
