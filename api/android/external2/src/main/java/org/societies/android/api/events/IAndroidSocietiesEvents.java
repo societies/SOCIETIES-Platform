@@ -66,6 +66,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	//UserFeedback intents
 	final static String UF_PRIVACY_NEGOTIATION_REQUEST_INTENT  = "org.societies.useragent.feedback.privacyNegotiation";
 	final static String UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT = "org.societies.useragent.feedback.privacyNegotiationResponse";
+	final static String UF_REQUEST_INTENT 		   			   = "org.societies.useragent.feedback.event.REQUEST";
+	final static String UF_RESPONSE_INTENT  				   = "org.societies.useragent.feedback.event.EXPLICIT_RESPONSE";
 	
 	//Array of Societies Android Pubsub Intents
 	//N.B. Must be in same order as societiesAndroidEvents array to allow successful translation
@@ -83,9 +85,10 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 										 DEVICE_MANAGER_DEVICE_DISCONNECTED_INTENT,
 										 DEVICE_MANAGER_EVENTING_NODE_NAME_INTENT,
 										 UF_PRIVACY_NEGOTIATION_REQUEST_INTENT,
-										 UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT
-										 };
-	
+										 UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT,
+										 UF_REQUEST_INTENT,
+										 UF_RESPONSE_INTENT
+										 };	
 	/**
 	 * Android intent Societies platform Pubsub related events
 	 */
@@ -109,6 +112,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	//UserFeedback pubsub nodes
 	final static String UF_PRIVACY_NEGOTIATION_REQUEST_EVENT  = "org/societies/useragent/feedback/privacyNegotiation";
 	final static String UF_PRIVACY_NEGOTIATION_RESPONSE_EVENT = "org/societies/useragent/feedback/privacyNegotiationResponse";
+	final static String UF_REQUEST_EVENT 					  = "org/societies/useragent/feedback/event/REQUEST";
+	final static String UF_RESPONSE_EVENT 					  = "org/societies/useragent/feedback/event/EXPLICIT_RESPONSE";
 	
 	//N.B. Must be in same order as societiesAndroidIntents array to allow successful translation
 	//N.B. These events must be created at Virgo container start-up
@@ -125,7 +130,9 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 										 DEVICE_MANAGER_DEVICE_DISCONNECTED_EVENT,
 										 DEVICE_MANAGER_EVENTING_NODE_NAME_EVENT,
 										 UF_PRIVACY_NEGOTIATION_REQUEST_EVENT,
-										 UF_PRIVACY_NEGOTIATION_RESPONSE_EVENT
+										 UF_PRIVACY_NEGOTIATION_RESPONSE_EVENT,
+										 UF_REQUEST_EVENT,
+										 UF_RESPONSE_EVENT
 										 };
 
 	//Array of interface method signatures
@@ -149,9 +156,10 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	static final String CSS_MANAGER_CLASS 	= "org.societies.api.schema.cssmanagement.CssEvent";
 	static final String CONTEXT_CLASS 		= "org.societies.api.schema.context.model.CtxIdentifierBean";
 	static final String FRIEND_EVENT_CLASS 	= "org.societies.api.schema.css.directory.CssFriendEvent";
-	static final String UF_PRIVACY_CLASS 	= "org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent"; 
+	static final String UF_PRIVACY_CLASS 	= "org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent";
+	static final String UF_RES_EVENT_CLASS  = "org.societies.api.schema.useragent.feedback.UserFeedbackBean";
 	//N.B. Add any new event payload classes to this array - order is unimportant
-	final static String pubsubPayloadClasses [] = {CSS_MANAGER_CLASS, CONTEXT_CLASS, FRIEND_EVENT_CLASS, UF_PRIVACY_CLASS};
+	final static String pubsubPayloadClasses [] = {CSS_MANAGER_CLASS, CONTEXT_CLASS, FRIEND_EVENT_CLASS, UF_PRIVACY_CLASS, UF_RES_EVENT_CLASS};
 	
 	final static String GENERIC_INTENT_PAYLOAD_KEY = "Pubsub_Payload_Key";
 	

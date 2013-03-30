@@ -42,6 +42,7 @@ import org.societies.android.platform.useragent.feedback.R;
 import org.societies.android.platform.useragent.feedback.R.layout;
 import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
+import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -63,37 +64,28 @@ import android.widget.TextView;
 
 public class AcknackPopup extends Activity{
 
-
+	private static final String CLIENT_NAME      = "org.societies.android.platform.useragent.feedback.guis.AcknackPopup";
 	private static final String LOG_TAG = AcknackPopup.class.getName();
 	EventsHelper eventsHelper = null;
 	private boolean isEventsConnected = false;
 	private String resultPayload = "";
-
-	private static final String CLIENT_NAME      = "org.societies.android.platform.useragent.feedback.guis.AcknackPopup";
-	private String requestID;
-	private String intentReturn;
-	private String clientID;
-
+	private UserFeedbackBean eventInfo;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.acknack_activity);
 
+		//RETRIEVE USERFEEDBACK BEAN FROM INTENT
 		Intent intent = getIntent();
 		Bundle bundle = intent.getExtras();
-		clientID = bundle.getString(UserFeedbackActivityIntentExtra.CLIENT_ID);
-		requestID = bundle.getString(UserFeedbackActivityIntentExtra.REQUEST_ID);
-		int type = bundle.getInt(UserFeedbackActivityIntentExtra.TYPE);
-		String proposalText = bundle.getString(UserFeedbackActivityIntentExtra.PROPOSAL_TEXT);
-		ArrayList<String> options = bundle.getStringArrayList(UserFeedbackActivityIntentExtra.OPTIONS);
-		intentReturn = bundle.getString(UserFeedbackActivityIntentExtra.INTENT_RETURN);
-
+		eventInfo = bundle.getParcelable(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY);
+		
 		TextView txtView = (TextView) findViewById(R.id.textView1);
-		txtView.setText(proposalText);
+		txtView.setText(eventInfo.getProposalText());
 		LinearLayout layout = (LinearLayout) findViewById(R.id.linearLayout1);
 
-		for (String option : options){
+		for (String option: eventInfo.getOptions()){
 			Button button = new Button(this);
 			button.setText(option);
 			button.setTag(option);
@@ -104,59 +96,35 @@ public class AcknackPopup extends Activity{
 				@Override
 				public void onClick(View v) {
 					AcknackPopup.this.resultPayload = (String) v.getTag();
-
 					Log.d(LOG_TAG, "Connected to eventsManager - resultFlag true");
 
-					//if (clientID.equalsIgnoreCase(AndroidUserFeedback.RETURN_TO_CLOUD)){
-						if (isEventsConnected){	    
-							publishEvent();	               
-						}else{	                
-							eventsHelper = new EventsHelper(AcknackPopup.this);	  
-							eventsHelper.setUpService(new IMethodCallback() {
-								@Override							
-								public void returnAction(String result) {		
-									Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");	
-								}
-								@Override							
-								public void returnAction(boolean resultFlag) {
-									Log.d(LOG_TAG, "eventMgr callback: ReturnAction(boolean) called. Connected");
-									if (resultFlag){		
-										isEventsConnected = true;
-										Log.d(LOG_TAG, "Connected to eventsManager - resultFlag true");		
-										publishEvent();								
-									}							
-								}
-								@Override
-								public void returnException(String result) {
-								}						
-							});	           
-						}
-
-					//}else{
-					//	returnResultToClient();
-					//}
+					if (isEventsConnected){	    
+						publishEvent();	               
+					}else{	                
+						eventsHelper = new EventsHelper(AcknackPopup.this);	  
+						eventsHelper.setUpService(new IMethodCallback() {
+							@Override							
+							public void returnAction(String result) {		
+								Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");	
+							}
+							@Override							
+							public void returnAction(boolean resultFlag) {
+								Log.d(LOG_TAG, "eventMgr callback: ReturnAction(boolean) called. Connected");
+								if (resultFlag){		
+									isEventsConnected = true;
+									Log.d(LOG_TAG, "Connected to eventsManager - resultFlag true");		
+									publishEvent();								
+								}							
+							}
+							@Override
+							public void returnException(String result) {
+							}						
+						});	           
+					}
 				}
-
-
 			});
-
 		}
 		Log.d(LOG_TAG, "onCreate in AcknackPopup");
-	}
-
-	private void returnResultToClient(){
-
-		ExpFeedbackResultBean bean = new ExpFeedbackResultBean();
-		List<String> feedback = new ArrayList<String>();
-		feedback.add(this.resultPayload);
-		bean.setFeedback(feedback);
-		bean.setRequestId(requestID);
-		Intent intent = new Intent(intentReturn);
-		intent.putExtra(IAndroidUserFeedback.INTENT_RETURN_VALUE, (Parcelable) bean);
-		//intent.setPackage(clientID);
-		intent.setAction(IAndroidUserFeedback.INTENT_RETURN_VALUE);
-		this.sendBroadcast(intent);
-		Log.d(LOG_TAG, "Sent broadcast intent");
 	}
 
 	private void publishEvent() {
@@ -165,8 +133,8 @@ public class AcknackPopup extends Activity{
 			List<String> feedback = new ArrayList<String>();    		
 			feedback.add(this.resultPayload);    		
 			bean.setFeedback(feedback);    		
-			bean.setRequestId(requestID);			
-			eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT, bean, new IPlatformEventsCallback() {				
+			bean.setRequestId(eventInfo.getRequestId());
+			eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_RESPONSE_INTENT, bean, new IPlatformEventsCallback() {
 				@Override				
 				public void returnAction(int result) {
 					}				
