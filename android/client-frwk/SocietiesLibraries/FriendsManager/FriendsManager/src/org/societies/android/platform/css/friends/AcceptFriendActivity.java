@@ -1,5 +1,6 @@
 package org.societies.android.platform.css.friends;
 
+import org.societies.android.api.comms.xmpp.VCardParcel;
 import org.societies.android.api.internal.cssmanager.IFriendsManager;
 import org.societies.android.platform.css.friends.FriendsManagerLocal.LocalFriendsManagerBinder;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
@@ -11,15 +12,18 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class AcceptFriendActivity extends Activity {
-
+	private static final String EXTRA_CSS_VCARD  = "org.societies.android.api.comms.xmpp.VCardParcel";
 	private static final String EXTRA_CSS_ADVERT = "org.societies.api.schema.css.directory.CssAdvertisementRecord";
 	private static final String LOG_TAG = AcceptFriendActivity.class.getName();
 	private static final String CLIENT_NAME      = "org.societies.android.platform.events.notifications.FriendsActivity";
@@ -75,6 +79,16 @@ public class AcceptFriendActivity extends Activity {
         		finish(); //BASICALLY, IGNORE REQUEST
         	}
         });
+        
+        //ADD IMAGE - IF AVAILABLE
+        VCardParcel vCard = (VCardParcel) getIntent().getParcelableExtra(EXTRA_CSS_VCARD);;
+	    byte[] avatarBytes = vCard.getAvatar();
+	    if (avatarBytes != null) {
+	    	Bitmap bMap = BitmapFactory.decodeByteArray(avatarBytes, 0, avatarBytes.length);
+	    
+	    	ImageView image = (ImageView) findViewById(R.id.imageView1);
+	    	image.setImageBitmap(bMap);
+	    }
     }
 
     @Override
