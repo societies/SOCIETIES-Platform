@@ -19,29 +19,35 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 public class MainActivity extends Activity {
 
 	private ClientCommunicationMgr ccm;
+	EditText logText = null;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        logText = (EditText)findViewById(R.id.editText1);
         this.ccm = new ClientCommunicationMgr(this, true);
         this.ccm.bindCommsService(new IMethodCallback() {
 			@Override
 			public void returnException(String result) { 
+				logText.setText("Exception binding to service: " + result);
 				Log.d(MainActivity.class.getName(), "Exception binding to service: " + result);
 			}
 			@Override
 			public void returnAction(String result) { 
+				logText.setText("return Action.flag: " + result);
 				Log.d(MainActivity.class.getName(), "return Action.flag: " + result);
 			}
 			@Override
-			public void returnAction(boolean resultFlag) { 
+			public void returnAction(boolean resultFlag) {
+				logText.setText("return Action.flag: " + resultFlag);
 				Log.d(MainActivity.class.getName(), "return Action.flag: " + resultFlag);
 			}
 		});        
@@ -58,7 +64,14 @@ public class MainActivity extends Activity {
         	public void onClick(View v) {
         		loadUser("jane@societies.local");
         	}
-        });        
+        });
+        //LOAD USER BUTTON EVENT HANDLER
+        Button btnNull = (Button) findViewById(R.id.button3);
+        btnNull.setOnClickListener(new OnClickListener() {            
+        	public void onClick(View v) {
+        		loadUser("bob@societies.local");
+        	}
+        });    
     }
 
     @Override
@@ -91,14 +104,19 @@ public class MainActivity extends Activity {
 		public void receiveMessage(Stanza arg0, Object arg1) { }
 
 		public void receiveResult(Stanza arg0, Object retValue) {
-			Log.d(VCardCallback.class.getName(), "CSSDirectoryCallback Callback receiveResult");
+			Log.d(VCardCallback.class.getName(), "VCardCallback Callback receiveResult");
 			
 			VCardParcel vCard = (VCardParcel)retValue;
 		    byte[] avatarBytes = vCard.getAvatar();
-		    Bitmap bMap = BitmapFactory.decodeByteArray(avatarBytes, 0, avatarBytes.length);
+		    if (avatarBytes != null) {
+		    	Bitmap bMap = BitmapFactory.decodeByteArray(avatarBytes, 0, avatarBytes.length);
 		    
-		    ImageView image = (ImageView) findViewById(R.id.imageView1);
-		    image.setImageBitmap(bMap);		
+		    	ImageView image = (ImageView) findViewById(R.id.imageView1);
+		    	image.setImageBitmap(bMap);
+		    	logText.setText(vCard.getTo());
+		    }
+		    else
+		    	logText.setText(vCard.getTo() + ": avatarbytes null");
 		}
 	}
 }
