@@ -86,7 +86,7 @@ public class AcceptFriendActivity extends Activity {
 	    if (avatarBytes != null) {
 	    	Bitmap bMap = BitmapFactory.decodeByteArray(avatarBytes, 0, avatarBytes.length);
 	    
-	    	ImageView image = (ImageView) findViewById(R.id.imageView1);
+	    	ImageView image = (ImageView) findViewById(R.id.imgProfilePic);
 	    	image.setImageBitmap(bMap);
 	    }
     }
@@ -100,7 +100,8 @@ public class AcceptFriendActivity extends Activity {
     @Override
 	public void onDestroy() {
 		Log.d(LOG_TAG, "FriendsActivity service terminating");
-		AcceptFriendActivity.this.getApplicationContext().unbindService(friendManagerConnection);
+		if (localFriendManager != null)
+			AcceptFriendActivity.this.getApplicationContext().unbindService(friendManagerConnection);
 		super.onDestroy();
 	}
     

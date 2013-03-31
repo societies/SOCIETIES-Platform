@@ -331,7 +331,7 @@ public class EventService extends Service {
 			
 			//CREATE INTENT FOR LAUNCHING ACTIVITY
 			Intent intent = new Intent(EventService.this.getApplicationContext(), AcceptFriendActivity.class);
-			intent.putExtra(EXTRA_CSS_ADVERT, (Parcelable)eventPayload);
+			intent.putExtra(EXTRA_CSS_ADVERT, (Parcelable)eventPayload.getCssAdvert());
 			intent.putExtra(EXTRA_CSS_VCARD, vCard);
 			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			
