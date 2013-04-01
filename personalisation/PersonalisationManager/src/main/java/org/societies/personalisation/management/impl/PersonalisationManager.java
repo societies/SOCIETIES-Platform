@@ -928,15 +928,15 @@ public class PersonalisationManager extends EventListener implements IPersonalis
                         logging.debug("Requested caui prediction");
                         List<IUserIntentAction> cauiActions = futureCauiActions.get();
                         logging.debug("cauiPrediction returned: " + cauiActions.size() + " outcomes");
-
+                        
                         Future<List<CRISTUserAction>> futureCristActions = cristPrediction.getCRISTPrediction(uimEvent.getUserId(), uimEvent.getAction());
                         logging.debug("Requested crist prediction");
-                        List<CRISTUserAction> cristActions = futureCristActions.get();
+/*                        List<CRISTUserAction> cristActions = futureCristActions.get();
                         logging.debug("cristPrediction returned: " + cristActions.size() + " outcomes");
                         for (CRISTUserAction action : cristActions) {
                             logging.debug("Crist outcome - parameter: " + action.getparameterName() + " - value: " + action.getvalue());
                         }
-
+*/
 
                         /**
                          * get intent outcomes
@@ -945,8 +945,8 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 
                         Hashtable<IUserIntentAction, CRISTUserAction> overlapping = new Hashtable<IUserIntentAction, CRISTUserAction>();
                         List<IOutcome> intentNonOverlapping = new ArrayList<IOutcome>();
-
-
+                        intentNonOverlapping.addAll(cauiActions);
+/*
                         for (IUserIntentAction caui : cauiActions) {
                             CRISTUserAction crist = exists(cristActions, caui);
                             if (null == crist) {
@@ -970,7 +970,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
                             CRISTUserAction crist = overlapping.get(caui);
                             intentNonOverlapping.add(resolveIntentConflicts(crist, caui));
                         }
-
+*/
 
                         /**
                          * get preference outcomes
