@@ -22,11 +22,10 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.context.impl;
+package org.societies.android.platform.context;
 
-import org.societies.android.api.context.ICtxClient;
+import org.societies.android.api.internal.context.IInternalCtxClient;
 import org.societies.android.api.utilities.RemoteServiceHandler;
-import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 
 import android.app.Service;
 import android.content.Intent;
@@ -53,7 +52,7 @@ public class ServiceContextBrokerRemote extends Service{
 
 		ContextBrokerBase serviceBase = new ContextBrokerBase(this.getApplicationContext());
 		
-		this.inMessenger = new Messenger(new RemoteServiceHandler(serviceBase.getClass(), serviceBase, ICtxClient.methodsArray));
+		this.inMessenger = new Messenger(new RemoteServiceHandler(serviceBase.getClass(), serviceBase, IInternalCtxClient.methodsArray));
 		Log.i(LOG_TAG, "ServiceContextBrokerRemote creation");
 	}
 

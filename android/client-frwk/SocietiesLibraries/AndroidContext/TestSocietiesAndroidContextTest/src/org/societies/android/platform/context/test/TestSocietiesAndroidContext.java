@@ -31,7 +31,7 @@ import org.societies.android.api.context.CtxException;
 import org.societies.android.api.context.ICtxClient;
 import org.societies.android.platform.context.container.TestAndroidContextBroker;
 import org.societies.android.platform.context.container.TestAndroidContextBroker.TestContextBrokerBinder;
-import org.societies.android.platform.context.impl.ContextBrokerBase;
+import org.societies.android.platform.context.ContextBrokerBase;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 
 import android.content.BroadcastReceiver;
@@ -83,20 +83,20 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 		//Remove them for the second way
 		Thread.sleep(TEST_END_DELAY);
         //ensure that service is shutdown to test if service leakage occurs
-        shutdownService();
+        super.shutdownService();
 		super.tearDown();
 	}
 
     private void unregisterReceiver(BroadcastReceiver receiver) {
         Log.d(LOG_TAG, "Unregister broadcast receiver");
-        getContext().unregisterReceiver(receiver);
+        super.getContext().unregisterReceiver(receiver);
     }
     
 	private class CtxBrokerBroadcastReceiver extends BroadcastReceiver{
-		private final String LOG_TAG = CtxBrokerBroadcastReceiver.class.getName();
+//		private final String LOG_TAG = CtxBrokerBroadcastReceiver.class.getName();
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.d(LOG_TAG, "Received action: " + intent.getAction());
+			Log.d(LOG_TAG, "ContextBrokerTest - Received action: " + intent.getAction());
 			TestSocietiesAndroidContext.this.receivedResult = true;
 			assertNotNull(intent.getParcelableExtra(ICtxClient.INTENT_RETURN_VALUE_KEY));
 			Log.d(LOG_TAG, "OnReceive finished");
@@ -105,7 +105,7 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 	}
 	
 	@MediumTest
-	public void testCreateEntity() throws URISyntaxException{
+	public void testCreateEntity() throws URISyntaxException, Exception{
 		this.testCompleted = false;
 		
 		BroadcastReceiver receiver = this.setupBroadcastReceiver();
@@ -123,14 +123,16 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 		requestor.setRequestorId("jane@societies.local");
 		
 		Log.d(LOG_TAG, "Requestor is: " + requestor.getRequestorId());
+		Log.d(LOG_TAG, "test createEntity start time: " + this.testStartTime);
 		try {
-			this.ctxBrokerService.createEntity(CLIENT_ID, requestor, "jane@societies.local", "entity");
+			this.ctxBrokerService.createEntity(CLIENT_ID, requestor, "jane.societies.local", "androidEntity");
 		} catch (CtxException e1) {
-			// TODO Auto-generated catch block
+
+			Log.e(LOG_TAG, "Failed to create entity: " + e1.getLocalizedMessage());
 			e1.printStackTrace();
 		}	
-//		Thread.sleep(DELAY);
-		while (!this.receivedResult){
+
+/*		while (!this.receivedResult){
 			try {
 //				Thread.sleep(1000);
 				Thread.sleep(DELAY);
@@ -138,8 +140,10 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
-		
+		}*/
+
+		Thread.sleep(DELAY);
+
 		Log.d(LOG_TAG, "Received result");
         unregisterReceiver(receiver);
         assertTrue(this.testCompleted);

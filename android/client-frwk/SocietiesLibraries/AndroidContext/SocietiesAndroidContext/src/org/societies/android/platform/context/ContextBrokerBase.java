@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.context.impl;
+package org.societies.android.platform.context;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -32,7 +32,7 @@ import java.util.List;
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.internal.context.IInternalCtxClient;
 import org.societies.android.api.context.CtxException;
-import org.societies.android.api.context.ICtxClient;
+//import org.societies.android.api.context.ICtxClient;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.comms.xmpp.XMPPError;
@@ -89,13 +89,13 @@ public class ContextBrokerBase implements IInternalCtxClient{
 	private boolean connectedToComms = false;
 	private boolean restrictBroadcast;
 
-	public ContextBrokerBase(Context applicationContext, ClientCommunicationMgr commMgr,
+/*	public ContextBrokerBase(Context applicationContext, ClientCommunicationMgr commMgr,
 			boolean restrictBroadcast) {
 		this.applicationContext = applicationContext;
 		this.commMgr = commMgr;
 		this.restrictBroadcast = restrictBroadcast;
 	}
-
+*/
 	/*the other way */
 	//Default constructor
     public ContextBrokerBase(Context applicationContext) {
@@ -104,9 +104,10 @@ public class ContextBrokerBase implements IInternalCtxClient{
     
     //Parameterised constructor
     public ContextBrokerBase(Context applicationContext, boolean restrictBroadcast) {
-    	Log.d(LOG_TAG, "Object created");
+    	Log.d(LOG_TAG, this.getClass().getName() + " instantiated");
     	
-    	this.applicationContext = applicationContext;    	
+    	this.applicationContext = applicationContext;
+    	this.restrictBroadcast = restrictBroadcast;
 		try {
 			//INSTANTIATE COMMS MANAGER
 			this.commMgr = new ClientCommunicationMgr(applicationContext, true);
@@ -124,9 +125,13 @@ public class ContextBrokerBase implements IInternalCtxClient{
 				public void returnAction(boolean resultFlag) {
 					Log.d(LOG_TAG, "Connected to comms: " + resultFlag);
 					if (resultFlag) {
-						connectedToComms = true;
+						ContextBrokerBase.this.connectedToComms = true;
 						//REGISTER NAMESPACES
-			        	commMgr.register(ELEMENT_NAMES, NAMESPACES, PACKAGES, new IMethodCallback() {
+						ContextBrokerBase.this.commMgr.register(
+								ContextBrokerBase.ELEMENT_NAMES, 
+								ContextBrokerBase.NAMESPACES, 
+								ContextBrokerBase.PACKAGES, 
+								new IMethodCallback() {
 							@Override
 							public void returnAction(boolean resultFlag) {
 								Log.d(LOG_TAG, "Namespaces registered: " + resultFlag);
@@ -161,7 +166,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
     	else {
     		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
     		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
-    		applicationContext.sendBroadcast(intent);
+    		ContextBrokerBase.this.applicationContext.sendBroadcast(intent);
     	}
 		return true;
     }
@@ -170,13 +175,13 @@ public class ContextBrokerBase implements IInternalCtxClient{
     	if (connectedToComms) {
         	//UNREGISTER AND DISCONNECT FROM COMMS
         	Log.d(LOG_TAG, "ContextBrokerBase stopService unregistering namespaces");
-        	commMgr.unregister(ELEMENT_NAMES, NAMESPACES, new IMethodCallback() {
+        	this.commMgr.unregister(ELEMENT_NAMES, NAMESPACES, new IMethodCallback() {
 				@Override
 				public void returnAction(boolean resultFlag) {
 					Log.d(LOG_TAG, "Unregistered namespaces: " + resultFlag);
-					connectedToComms = false;
+					ContextBrokerBase.this.connectedToComms = false;
 					
-					commMgr.unbindCommsService();
+					ContextBrokerBase.this.commMgr.unbindCommsService();
 					//SEND INTENT WITH SERVICE STOPPED STATUS
 	        		Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
 	        		intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
@@ -207,7 +212,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 			Intent intent = new Intent(method);
 			intent.putExtra(IServiceManager.INTENT_NOTSTARTED_EXCEPTION, true);
 			intent.setPackage(client);
-			applicationContext.sendBroadcast(intent);
+			ContextBrokerBase.this.applicationContext.sendBroadcast(intent);
 		}
 	}	
 	
@@ -218,14 +223,14 @@ public class ContextBrokerBase implements IInternalCtxClient{
 			String targetCss, String type) throws CtxException {
 		Log.d(LOG_TAG, "CreateEntity called by client: " + client);
 		
-		if (connectedToComms) {
+		if (this.connectedToComms) {
 			try {
 				IIdentityManager idm = this.commMgr.getIdManager();
 				IIdentity toIdentity;
 	
 	//			toIdentity = targetCss;
 				toIdentity = idm.fromJid(targetCss);
-				Stanza stanza = new Stanza(toIdentity);
+/*				Stanza stanza = new Stanza(toIdentity);*/
 				
 				CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
 				cbPacket.setMethod(BrokerMethodBean.CREATE_ENTITY);
@@ -241,10 +246,11 @@ public class ContextBrokerBase implements IInternalCtxClient{
 	//			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
 	
 				Log.d(LOG_TAG, "before Callback ");
-				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, ICtxClient.CREATE_ENTITY);
+				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.CREATE_ENTITY);
 				Log.d(LOG_TAG, "after Callback");
+				Stanza stanza = new Stanza(toIdentity);
 				this.commMgr.sendIQ(stanza, IQ.Type.SET, cbPacket, ctxBrokerCallBack);
-				Log.d(LOG_TAG, "sending stanza");
+				Log.d(LOG_TAG, "Sent IQ with stanza=" + stanza);
 			
 			} catch (CommunicationException e) {
 				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
@@ -253,7 +259,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
 	        } 						
 		} else {
-			broadcastServiceNotStarted(client, ICtxClient.CREATE_ENTITY);
+			broadcastServiceNotStarted(client, IInternalCtxClient.CREATE_ENTITY);
 		}
 		return null;
 
@@ -425,22 +431,26 @@ public class ContextBrokerBase implements IInternalCtxClient{
 			this.returnIntent = returnIntent;
 		}
 		
+		@Override
 		public List<String> getXMLNamespaces() {
 
-			return NAMESPACES;
+			return ContextBrokerBase.NAMESPACES;
 		}
 
+		@Override
 		public List<String> getJavaPackages() {
 
-			return PACKAGES;
+			return ContextBrokerBase.PACKAGES;
 		}
 
+		@Override
 		public void receiveResult(Stanza stanza, Object msgBean) {
 
-			Log.d(LOG_TAG, "ContextBroker Callback receiveResult");
+			Log.d(LOG_TAG, "ContextBroker Callback receiveResult: stanza=" + stanza
+					+ ", msgBean=" + msgBean);
 			
 			if (client != null) {
-				Intent intent = new Intent(returnIntent);
+				final Intent intent = new Intent(this.returnIntent);
 				
 				Log.d(LOG_TAG, "Return Stanza: " + stanza.toString());
 				if (msgBean==null)
@@ -452,6 +462,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 					
 					final CtxBrokerResponseBean payload = (CtxBrokerResponseBean) msgBean;
 					final BrokerMethodBean method = payload.getMethod();
+					Log.d(LOG_TAG, "calling method: " + method);
 					try {
 						switch (method) {
 						
@@ -465,44 +476,65 @@ public class ContextBrokerBase implements IInternalCtxClient{
 							final CtxEntityBean entityBean = payload.getCreateEntityBeanResult();
 //							final ACtxEntity entity = CtxModelBeanTranslator.getInstance().fromCtxEntityBean(entityBean);
 							//NOTIFY calling client
-							intent.putExtra(INTENT_RETURN_VALUE_KEY, (Parcelable) entityBean);
-							if (restrictBroadcast) {
+							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) entityBean);
+/*							if (restrictBroadcast) {
 								intent.setPackage(client);
 							}
 							ContextBrokerBase.this.applicationContext.sendBroadcast(intent);
-							Log.d(LOG_TAG, "SendBroadcast intent with ctxEntity object");
+							Log.d(LOG_TAG, "SendBroadcast intent with ctxEntity object");*/
 //							ContextBrokerBase.this.commMgr.unregister(ELEMENT_NAMES, NAMESPACES, ContextBrokerCallback());
 							
 							break;
+							
+						default:
+							Log.e(LOG_TAG, "Unsupported method in ContextBroker response bean: " + payload.getMethod());
 						}
 					}catch (Exception e) {
 
 						Log.e(LOG_TAG, "Could not handle result bean " + msgBean + ": "
 								+ e.getLocalizedMessage(), e);
 					}
+				} else {
+					
+					Log.e(LOG_TAG, "Received unexpected response bean in result: "
+							+ ((msgBean != null) ? msgBean.getClass() : "null"));
+					return;
 				}
 				
+				if (restrictBroadcast) {
+					intent.setPackage(client);
+				}
+				ContextBrokerBase.this.applicationContext.sendBroadcast(intent);
+				Log.d(LOG_TAG, "SendBroadcast intent with ctxEntity object");
 			}
 		}
 
+		@Override
 		public void receiveError(Stanza stanza, XMPPError error) {
 
-			Log.d(LOG_TAG, "CtxClient Callback receiveError: " + error.getApplicationError());
+			Log.d(LOG_TAG, "CtxClient Callback receiveError: stanza=" + stanza
+					+ ", error=" + error + ", ApplicationError=" + error.getApplicationError());
 		}
 
+		@Override
 		public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
 
-			Log.d(LOG_TAG, "CtxClient Callback receiveInfo");
+			Log.d(LOG_TAG, "CtxClient Callback receiveInfo: stanza=" + stanza
+					+ ", node=" + node + ", info=" +info);
 		}
 
+		@Override
 		public void receiveItems(Stanza stanza, String node, List<String> items) {
 
-			Log.d(LOG_TAG, "CtxClient Callback receiveItems");
+			Log.d(LOG_TAG, "CtxClient Callback receiveItems: stanza=" + stanza
+					+ ", node=" + node + ", items=" + items);
 		}
 
+		@Override
 		public void receiveMessage(Stanza stanza, Object payload) {
 
-			Log.d(LOG_TAG, "CtxClient Callback receiveMessage");
+			Log.d(LOG_TAG, "CtxClient Callback receiveMessage: stanza=" + stanza
+					+ ", payload=" + payload);
 		}
 	}
 

@@ -25,11 +25,8 @@
 package org.societies.android.platform.context.container;
 
 import java.lang.ref.WeakReference;
-import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
-import org.societies.android.api.context.ICtxClient;
-//import org.societies.android.platform.context.impl.mocks.MockClientCommunicationMgr;
-import org.societies.android.platform.context.impl.ContextBrokerBase;
-import org.societies.android.platform.context.impl.ServiceContextBrokerRemote;
+
+import org.societies.android.platform.context.ContextBrokerBase;
 
 import android.app.Service;
 import android.content.Intent;
@@ -46,18 +43,20 @@ import android.util.Log;
 public class TestAndroidContextBroker extends Service{
 
 	private static final String LOG_TAG = TestAndroidContextBroker.class.getName();
-	private IBinder binder;
+	private TestContextBrokerBinder binder;
 	
 	@Override
-	public IBinder onBind(Intent arg0) {
-		// TODO Auto-generated method stub
-		return binder;
+	public IBinder onBind(Intent intent) {
+
+		return this.binder;
 	}
 
 	/* ONE WAY */
     @Override
 	public void onCreate () {
-		this.binder = new TestContextBrokerBinder(new ContextBrokerBase(this, false));
+//		this.binder = new TestContextBrokerBinder(new ContextBrokerBase(this, false));
+    	this.binder = new TestContextBrokerBinder();
+    	this.binder.addouterClassreference(new ContextBrokerBase(this));
 		Log.d(LOG_TAG, "TestAndroidContextBroker service starting");
 	}
 	
@@ -77,7 +76,7 @@ public class TestAndroidContextBroker extends Service{
 	public static class TestContextBrokerBinder extends Binder {
 		private WeakReference<ContextBrokerBase> outerClassReference = null;
 		
-		public TestContextBrokerBinder(ContextBrokerBase instance) {
+		public void addouterClassreference(ContextBrokerBase instance) {
 			this.outerClassReference = new WeakReference<ContextBrokerBase>(instance);
 		}
 		
