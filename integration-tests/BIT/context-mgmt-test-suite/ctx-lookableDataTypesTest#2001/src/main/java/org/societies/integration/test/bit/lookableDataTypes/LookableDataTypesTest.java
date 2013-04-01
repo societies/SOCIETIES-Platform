@@ -44,7 +44,7 @@ public class LookableDataTypesTest extends IntegrationTestCase{
 		
 	
 	public LookableDataTypesTest(){
-		super(1111, new Class[]{Tester.class});
+		super(2001, new Class[]{Tester.class});
 	}
 
 	
