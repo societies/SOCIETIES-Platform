@@ -232,6 +232,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 				toIdentity = idm.fromJid(targetCss);
 /*				Stanza stanza = new Stanza(toIdentity);*/
 				
+				Log.d(LOG_TAG, "identity used = " + toIdentity.getJid());
 				CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
 				cbPacket.setMethod(BrokerMethodBean.CREATE_ENTITY);
 	
@@ -248,6 +249,9 @@ public class ContextBrokerBase implements IInternalCtxClient{
 				Log.d(LOG_TAG, "before Callback ");
 				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.CREATE_ENTITY);
 				Log.d(LOG_TAG, "after Callback");
+				toIdentity = this.commMgr.getIdManager().getCloudNode();
+				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
+				
 				Stanza stanza = new Stanza(toIdentity);
 				this.commMgr.sendIQ(stanza, IQ.Type.SET, cbPacket, ctxBrokerCallBack);
 				Log.d(LOG_TAG, "Sent IQ with stanza=" + stanza);
