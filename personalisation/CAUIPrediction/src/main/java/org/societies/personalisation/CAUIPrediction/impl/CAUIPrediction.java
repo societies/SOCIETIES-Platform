@@ -95,7 +95,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 	private List<IUserIntentAction> lastPredictedActions = new ArrayList<IUserIntentAction>();
 
 	int predictionRequestsCounter = 0;
-	int discoveryThreshold = 19;
+	int discoveryThreshold = 6;
 	boolean modelExist = false;
 
 	private IIdentity cssOwnerId;
@@ -200,7 +200,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 			// initiate caui model discovery
 			if(predictionRequestsCounter >= discoveryThreshold){
-				//LOG.info("Start CAUI model generation");
+				LOG.info("Start CAUI model generation");
 				this.cauiDiscovery.generateNewUserModel();	
 				predictionRequestsCounter = 0;
 			}

@@ -99,75 +99,45 @@ public class Tester {
 	@org.junit.Test
 	public void Test(){
 		try{
-
+			logging.info("start performing actions ");
 			if( !retrieveUserIntentModel() ){
 
-				for (int i=0; i<5; i++){
-					log("Step: "+i);
+				for (int i=0; i<3; i++){
+					//	log("Step: "+i);
 					//setContext("home", "free");
+					
 					Thread.sleep(500);
+					logging.info("action:"+i+" setBackgroundColour : red");
 					this.helloWorldService.setBackgroundColour(userId, "red");
-					Thread.sleep(2500);
-					//setContext("home", "busy");
-					Thread.sleep(500);
+					Thread.sleep(4500);
+					
+					logging.info("action:"+i+" setVolume : 10");
 					this.helloWorldService.setVolume(userId, "10");
-					Thread.sleep(2500);
+				//	Thread.sleep(4500);
+				//	logging.info("action:"+i+" setVolume : "+i);
+				//	this.helloWorldService.setVolume(userId, Integer.toString(i));
+					
+					
 					//setContext("work", "busy");
-					Thread.sleep(500);
-					this.helloWorldService.setBackgroundColour(userId, "black");
-					Thread.sleep(2500);
+					//Thread.sleep(500);
+					//this.helloWorldService.setBackgroundColour(userId, "black");
+					//Thread.sleep(2500);
 					//setContext("work", "free");
-					Thread.sleep(500);
-					this.helloWorldService.setVolume(userId, "50");
+					//Thread.sleep(500);
+					//this.helloWorldService.setVolume(userId, "50");
 					Thread.sleep(5000);
 				}
-				historyDataRetrieval();
-
-
-				System.out.println("1Tester: userId "+ userId);
-				System.out.println("1Tester: volume is 50 "+ this.helloWorldService.getVolume(userId));
-				Assert.assertEquals("50", this.helloWorldService.getVolume(userId));
-
-				System.out.println("2Tester: set background colour (red)");
-				this.helloWorldService.setBackgroundColour(userId, "red");
-				Thread.sleep(5000);
-
-				System.out.println("2Tester: get background colour (should be red)" +this.helloWorldService.getBackgroundColour(userId));
-
-				Thread.sleep(5000);
-				System.out.println("dynamic change of volume... ");
-				System.out.println("3Tester: volume should be 10 and it is:"+ this.helloWorldService.getVolume(userId));
-				Assert.assertEquals("10", this.helloWorldService.getVolume(userId));
-
-			} else {
-
-				System.out.println("Model exist ! "); 
-				
-				System.out.println("1Tester: userId "+ userId);
-				System.out.println("1Tester: get background colour: " +this.helloWorldService.getBackgroundColour(userId));
-				System.out.println("1Tester: get volume level: " +this.helloWorldService.getVolume(userId));
-				
-				System.out.println("set BackgroundColour to red ");
-				
-				this.helloWorldService.setBackgroundColour(userId, "red");
-				Thread.sleep(5000);
-				System.out.println("1Tester: get background colour (should be red) : " +this.helloWorldService.getBackgroundColour(userId));
-				
-				Thread.sleep(5000);
-				System.out.println("1 Tester: volume should be 10 (dynamic) "+ this.helloWorldService.getVolume(userId));
-				Assert.assertEquals("10", this.helloWorldService.getVolume(userId));
-			
-				System.out.println("2 Tester: userId "+ userId);
-				System.out.println("set BackgroundColour to black ");
-				this.helloWorldService.setBackgroundColour(userId, "black");
-				Thread.sleep(5000);
-				System.out.println("2 Tester: get background colour (should be black)" +this.helloWorldService.getBackgroundColour(userId));
-				
-				Thread.sleep(5000);
-				System.out.println("2 Tester: volume should be 50 (dynamic) "+ this.helloWorldService.getVolume(userId));
-				Assert.assertEquals("50", this.helloWorldService.getVolume(userId));
-				
 			}
+			historyDataRetrieval();
+			
+			logging.info("start predictions ");
+			logging.info("1 Tester: set background colour (red)");
+			this.helloWorldService.setBackgroundColour(userId, "red");
+		
+			Thread.sleep(6000);
+			System.out.println("dynamic change of volume... ");
+			System.out.println("2 Tester: volume should be 10 and it is:"+ this.helloWorldService.getVolume(userId));
+			Assert.assertEquals("10", this.helloWorldService.getVolume(userId));
 		}
 
 		catch (InterruptedException e) {
