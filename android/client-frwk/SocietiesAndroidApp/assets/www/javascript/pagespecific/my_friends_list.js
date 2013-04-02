@@ -86,6 +86,25 @@ var CSSFriendsServices = {
 	},
 	
 	showFriendDetailPage: function(data) {
+		function success(data) {
+			//DISPLAY PROFILE IMAGE IF AVAILABLE
+			
+			//$("img").attr({
+			//	  src: "/resources/hat.gif",
+			//	  title: "jQuery",
+			//	  alt: "jQuery Logo"
+			//	});
+			
+			if (data.avatar==null)
+				$("img#friendProfilePic").attr("src", "images/profile_pic_sample.jpg");
+			else
+				$("img#friendProfilePic").attr("src", data.avatar);
+		}
+		
+		function failure(data) {
+			console.log("Error retrieving avatar: " + data);
+		}
+		
 		//CSS Record OBJECT
 		var forename = data.foreName;
 		if (forename=="undefined")
@@ -104,6 +123,8 @@ var CSSFriendsServices = {
 			$('ul#friendInfoUL').listview('refresh');
 		}
 		catch(err) {}
+		//RETRIEVE PHOTO
+		window.plugins.SocietiesLocalCSSManager.getVCardUser(data.cssIdentity, success, failure);
 	},
 	
 	refreshSuggestedFriendsList: function() {
