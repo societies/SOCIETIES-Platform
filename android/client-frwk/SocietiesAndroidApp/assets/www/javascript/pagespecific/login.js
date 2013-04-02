@@ -291,12 +291,11 @@ var SocietiesLogin = {
 				//	    }
 				//	}
 				//}
-				
 				var mLastDate = "";
 				for (i=data.length-1; i >= 0 ; i--) {
 					//HEADER
-					console.log("published: " + data[i].published);
-					console.log("verb: " + data[i].verb);
+					//console.log("published: " + data[i].published);
+					//console.log("verb: " + data[i].verb);
 					var d = new Date();
 					d.setTime(data[i].published); 
 					var dateStr = d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
