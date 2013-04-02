@@ -131,11 +131,19 @@ public class Tester {
 			historyDataRetrieval();
 			
 			logging.info("start predictions ");
-			logging.info("1 Tester: set background colour (red)");
-			this.helloWorldService.setBackgroundColour(userId, "red");
+			logging.info("1 Tester: set background colour (black)");
+			this.helloWorldService.setBackgroundColour(userId, "black");
 		
-			Thread.sleep(6000);
-			System.out.println("dynamic change of volume... ");
+			Thread.sleep(5000);
+			// no prediction should be available for background: black
+			//Assert.assertEquals("", this.helloWorldService.getVolume(userId));
+			logging.info("1 Tester: volume equals: "+ this.helloWorldService.getVolume(userId));
+			
+			logging.info("2 Tester: set background colour (red)");
+			this.helloWorldService.setBackgroundColour(userId, "red");
+			Thread.sleep(5000);
+			
+			System.out.println("2 dynamic change of volume... ");
 			System.out.println("2 Tester: volume should be 10 and it is:"+ this.helloWorldService.getVolume(userId));
 			Assert.assertEquals("10", this.helloWorldService.getVolume(userId));
 		}

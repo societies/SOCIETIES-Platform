@@ -1026,6 +1026,8 @@ public class PersonalisationManager extends EventListener implements IPersonalis
                                 logging.debug("Intent Outcome " + i + " :" + intentNonOverlapping.get(i));
                             }
                         }
+                        // set null preferences
+                        prefNonOverlapping = new ArrayList<IOutcome>();
                         decisionMaker.makeDecision(intentNonOverlapping, prefNonOverlapping);
                     } else {
                         logging.debug("event: " + event.geteventType() + " not a " + EventTypes.UIM_EVENT);
