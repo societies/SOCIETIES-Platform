@@ -106,16 +106,25 @@ public class PrivacyPolicyUtils {
 			List<Condition> conditions = new ArrayList<Condition>();
 			// Public
 			PrivacyPolicyBehaviourConstants globalBaheviour = (PrivacyPolicyBehaviourConstants) configuration.get("globalBehaviour");
-			if (null != globalBaheviour && PrivacyPolicyBehaviourConstants.PUBLIC.name().equals(globalBaheviour)) {
+			if (null != globalBaheviour && PrivacyPolicyBehaviourConstants.PUBLIC.name().equals(globalBaheviour.name())) {
 				Condition condition = new Condition();
 				condition.setConditionConstant(ConditionConstants.SHARE_WITH_3RD_PARTIES);
-				condition.setValue("1");
+				condition.setValue("Yes");
+				conditions.add(condition);
 			}
 			// Members only
-			else if (null != globalBaheviour && PrivacyPolicyBehaviourConstants.MEMBERS_ONLY.name().equals(globalBaheviour)) {
+			else if (null != globalBaheviour && PrivacyPolicyBehaviourConstants.MEMBERS_ONLY.name().equals(globalBaheviour.name())) {
 				Condition condition = new Condition();
 				condition.setConditionConstant(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY);
-				condition.setValue("1");
+				condition.setValue("Yes");
+				conditions.add(condition);
+			}
+			// Private
+			else {
+				Condition condition = new Condition();
+				condition.setConditionConstant(ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY);
+				condition.setValue("Yes");
+				conditions.add(condition);
 			}
 			requestItem.setConditions(conditions);
 			requestItems.add(requestItem);
@@ -142,7 +151,9 @@ public class PrivacyPolicyUtils {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("globalBehaviour", globalBehaviour);
 		parameters.put("membershipCriteria", membershipCriteria);
-		parameters.putAll(configuration);
+		if (null != configuration) {
+			parameters.putAll(configuration);
+		}
 		return inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, parameters);
 	}
 
@@ -416,7 +427,7 @@ public class PrivacyPolicyUtils {
 					}
 				}
 			}
-			
+
 			// - Create the RequestorBean
 			if (providerIdentity != null) {
 				subject = RequestorUtils.create(providerIdentity, requestorIdentity);
