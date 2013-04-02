@@ -282,6 +282,7 @@ var SocietiesLogin = {
 			//FOREACH ACTIVITY
 			if(data.length > 0) {
 				console.log("data size: " + data.length);
+				/*
 				for(var obj in data) {
 				    if(data.hasOwnProperty(obj)){
 					    for(var prop in data[obj]){
@@ -291,12 +292,12 @@ var SocietiesLogin = {
 					    }
 					}
 				}
-				
+				*/
 				var mLastDate = "";
 				for (i=data.length-1; i >= 0 ; i--) {
 					//HEADER
-					console.log("published: " + data[i].published);
-					console.log("verb: " + data[i].verb);
+					//console.log("published: " + data[i].published);
+					//console.log("verb: " + data[i].verb);
 					var d = new Date();
 					d.setTime(data[i].published); 
 					var dateStr = d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
