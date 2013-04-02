@@ -56,6 +56,7 @@ public class AcknackPopup extends Activity{
 	private boolean isEventsConnected = false;
 	private String resultPayload = "";
 	private UserFeedbackBean eventInfo;
+	private boolean published = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -121,14 +122,18 @@ public class AcknackPopup extends Activity{
 			feedback.add(this.resultPayload);    		
 			bean.setFeedback(feedback);    		
 			bean.setRequestId(eventInfo.getRequestId());
-			eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_RESPONSE_INTENT, bean, new IPlatformEventsCallback() {
-				@Override				
-				public void returnAction(int result) { }
-				@Override				
-				public void returnAction(boolean resultFlag) { }
-				@Override
-				public void returnException(int exception) { }			
-			});
+			//TODO: THE PUBLISH EVENT IS OCCURING MULTIPLE TIMES - DYNAMICLY CREATED FORM?
+			if (!published) {
+				eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_RESPONSE_INTENT, bean, new IPlatformEventsCallback() {
+					@Override				
+					public void returnAction(int result) { }
+					@Override				
+					public void returnAction(boolean resultFlag) { }
+					@Override
+					public void returnException(int exception) { }			
+				});
+			}
+			published = true;
 			//FINISH
 			eventsHelper.tearDownService(new IMethodCallback() {
 				@Override
