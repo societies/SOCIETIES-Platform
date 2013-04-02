@@ -228,22 +228,24 @@
     overflow: visible; /* removes extra width in IE */
 
     background: #f1f1f1;
-    border: 1px #000;
+    border: 1px solid #000000;
     border-radius: 4px 4px 4px 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
 
-    color: #ffffff;
+    color: #000000;
     cursor: pointer;
     display: inline-block;
     padding: 6px 6px 4px;
     margin-top: 10px;
     width: 214px;
     font-size: 16px;
+    text-decoration: none;
 }
 
 button.ui-button.ui-highlighted-button {
     border: 1px solid #F99B1C;
+    color: #ffffff;
     background: #F7961B;
     background: -moz-linear-gradient(center top, #f7961b, #f26a36);
     background: -webkit-gradient(linear, left top, left bottom, from(#f7961b), to(#f26a36));
@@ -251,7 +253,7 @@ button.ui-button.ui-highlighted-button {
     filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#f7961b', EndColorStr = '#f26a36');
 }
 
-.ui-button,
+/*.ui-button,*/
 .ui-button:link,
 .ui-button:visited,
 .ui-button:hover,
@@ -259,7 +261,7 @@ button.ui-button.ui-highlighted-button {
     text-decoration: none;
     background: #f26a36;
     border: 1px solid #000000;
-
+    color: #ffffff;
 }
 
 /* to make room for the icon, a width needs to be set here */
@@ -709,6 +711,15 @@ button.ui-button::-moz-focus-inner {
     outline: none;
 }
 
+.ui-selectonelistbox {
+    background: #202020 url("#{resource['primefaces-societies-theme:images/ui-bg_flat_75_202020_40x100.png']}") 50% 50% repeat-x;
+    list-style: none;
+    padding: 2px;
+    margin: 0;
+    display: block;
+    outline: none;
+}
+
 ul.ui-selectlistbox-list li {
     list-style: none;
     list-style-image: none;
@@ -723,16 +734,6 @@ ul.ui-selectlistbox-list li {
     outline: none;
 }
 
-.ui-selectonelistbox {
-    background: #202020 url("#{resource['primefaces-societies-theme:images/ui-bg_flat_75_202020_40x100.png']}") 50% 50% repeat-x;
-    list-style: none;
-    padding: 2px;
-    margin: 0;
-    display: block;
-    outline: none;
-}
-
-/* Added to override default li style */
 ul.ui-menu-list li,
 ul.ui-selectonemenu-items li {
     list-style: none;

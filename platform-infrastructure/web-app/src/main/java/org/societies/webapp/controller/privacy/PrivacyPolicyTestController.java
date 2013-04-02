@@ -151,7 +151,7 @@ public class PrivacyPolicyTestController extends BasePageController {
         pubSubListener.sendEvent(responsePolicy, negotiationDetails);
     }
 
-    private ResponsePolicy buildResponsePolicy(RequestorBean requestorBean) {
+    private static ResponsePolicy buildResponsePolicy(RequestorBean requestorBean) {
         List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
         responseItems.add(buildResponseItem("http://this.is.a.win/", "winning"));
 //        responseItems.add(buildResponseItem("http://paddy.rules/", "paddy"));
@@ -164,7 +164,7 @@ public class PrivacyPolicyTestController extends BasePageController {
         return responsePolicy;
     }
 
-    private ResponseItem buildResponseItem(String uri, String dataType) {
+    private static ResponseItem buildResponseItem(String uri, String dataType) {
         Action action1 = new Action();
         action1.setActionConstant(ActionConstants.CREATE);
         action1.setOptional(true);
@@ -219,7 +219,4 @@ public class PrivacyPolicyTestController extends BasePageController {
         return responseItem;
     }
 
-    public String[] getListOfStrings() {
-        return new String[]{"Item 1", "Item 2", "Item 3", "Item 4", "Item 5"};
-    }
 }

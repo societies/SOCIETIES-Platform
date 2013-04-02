@@ -6,189 +6,210 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 template="templates/main_template.xhtml">
 
-    <!-- disable redirect to "index.xhtml" if we're not logged in -->
-    <ui:param name="noRedirect" value="true"/>
+<!-- disable redirect to "index.xhtml" if we're not logged in -->
+<ui:param name="noRedirect" value="true"/>
 
-    <ui:define name="html_head">
-        <title>SOCIEITES :: View Response Policy</title>
-    </ui:define>
+<ui:define name="html_head">
+    <title>SOCIEITES :: View Response Policy</title>
+</ui:define>
 
-    <ui:define name="body">
+<ui:define name="body">
 
-        <h1>SOCIETIES Style Guide</h1>
+    <h1>SOCIETIES Style Guide</h1>
 
-        <section style="border: 1px dashed #f00;" class="grid_8">
-            <h2>Partial width (9 columns)</h2>
+    <section style="border: 1px dashed #f00;" class="grid_8">
+        <h2>Partial width (9 columns)</h2>
 
-            <p>
-                <em>The dashed red border is added to show the limits of this area, and should not be used in a real page</em>
-            </p>
+        <p>
+            <em>The dashed red border is added to show the limits of this area, and should not be used in a real page</em>
+        </p>
 
-            <p:panelGrid columns="2">
-                <p:outputLabel for="normalButton" value="p:commandButton"/>
-                <p:commandButton value="Normal button" id="normalButton"/>
+        <p:panelGrid columns="2">
+            <p:outputLabel for="normalButton" value="p:commandButton"/>
+            <p:commandButton value="Normal button" id="normalButton"/>
 
-                <p:outputLabel for="highlightedButton" value="p:commandButton (highlighted)"/>
-                <p:commandButton value="Highlighted Button" id="highlightedButton"
-                                 styleClass="ui-highlighted-button"/>
+            <p:outputLabel for="highlightedButton" value="p:commandButton (highlighted)"/>
+            <p:commandButton value="Highlighted Button" id="highlightedButton"
+                             styleClass="ui-highlighted-button"/>
 
-                <p:outputLabel for="dialogButton" value="p:dialog"/>
-                <p:commandButton value="Show dialog" onclick="#{p:widgetVar('dlg')}.show()" id="dialogButton"/>
+            <p:outputLabel for="dialogButton" value="p:dialog"/>
+            <p:commandButton value="Show dialog" onclick="#{p:widgetVar('dlg')}.show()" id="dialogButton"/>
 
-                <p:outputLabel for="contextButton" value="p:contextMenu"/>
-                <h:outputText id="contextButton" value="Right click anywhere"/>
+            <p:outputLabel for="contextButton" value="p:contextMenu"/>
+            <h:outputText id="contextButton" value="Right click anywhere"/>
 
-                <p:outputLabel for="inputText" value="p:inputText"/>
-                <p:inputText value="input text" id="inputText"/>
+            <p:outputLabel for="inputText" value="p:inputText"/>
+            <p:inputText value="input text" id="inputText"/>
 
-                <p:outputLabel for="inputText" value="p:inputText (smalltext)"/>
-                <p:inputText value="input text" id="inputText" styleClass="smalltext"/>
+            <p:outputLabel for="inputTextSmallText" value="p:inputText (smalltext)"/>
+            <p:inputText value="input text" id="inputTextSmallText" styleClass="smalltext"/>
 
-                <p:outputLabel for="inputTextarea" value="p:inputTextarea"/>
-                <p:panel>
-                    <p:inputTextarea rows="5" cols="30" counter="counterLabel" maxlength="100" id="inputTextarea"
-                                     counterTemplate="{0} characters remaining." autoResize="false"/><br/>
-                    <h:outputText id="counterLabel"/>
-                </p:panel>
+            <p:outputLabel for="inputTextarea" value="p:inputTextarea"/>
+            <p:panel>
+                <p:inputTextarea rows="5" cols="30" counter="counterLabel" maxlength="100" id="inputTextarea"
+                                 counterTemplate="{0} characters remaining." autoResize="false"/><br/>
+                <h:outputText id="counterLabel"/>
+            </p:panel>
 
-                <p:outputLabel for="selectCheckboxMenu" value="p:selectCheckboxMenu"/>
-                <p:selectCheckboxMenu id="selectCheckboxMenu"
-                                      label="Pick some items"
-                                      filter="true" filterText="Filter" filterMatchMode="startsWith"
-                                      panelStyle="width:220px">
-                    <f:selectItems value="#{ppNegotiationTest.listOfStrings}"/>
-                </p:selectCheckboxMenu>
+            <p:outputLabel for="selectCheckboxMenu" value="p:selectCheckboxMenu"/>
+            <p:selectCheckboxMenu id="selectCheckboxMenu"
+                                  label="Pick some items"
+                                  filter="true" filterText="Filter" filterMatchMode="startsWith"
+                                  panelStyle="width:220px">
+                <f:selectItems value="#{styleguide.listOfStrings}"/>
+            </p:selectCheckboxMenu>
 
 
-                <p:outputLabel for="selectManyCheckbox" value="p:selectManyCheckbox"/>
-                <p:selectManyCheckbox layout="pageDirection" id="selectManyCheckbox">
-                    <f:selectItems value="#{ppNegotiationTest.listOfStrings}"/>
-                </p:selectManyCheckbox>
+            <p:outputLabel for="selectManyCheckbox" value="p:selectManyCheckbox"/>
+            <p:selectManyCheckbox layout="pageDirection" id="selectManyCheckbox">
+                <f:selectItems value="#{styleguide.listOfStrings}"/>
+            </p:selectManyCheckbox>
 
-                <p:outputLabel for="selectOneRadio" value="p:selectOneRadio"/>
-                <p:selectOneRadio id="selectOneRadio" layout="pageDirection">
-                    <f:selectItems value="#{ppNegotiationTest.listOfStrings}"/>
-                </p:selectOneRadio>
+            <p:outputLabel for="selectOneRadio" value="p:selectOneRadio"/>
+            <p:selectOneRadio id="selectOneRadio" layout="pageDirection">
+                <f:selectItems value="#{styleguide.listOfStrings}"/>
+            </p:selectOneRadio>
 
-                <p:outputLabel for="selectOneMenu" value="p:selectOneMenu"/>
-                <p:selectOneMenu id="selectOneMenu">
-                    <f:selectItems value="#{ppNegotiationTest.listOfStrings}"/>
-                </p:selectOneMenu>
+            <p:outputLabel for="selectOneMenu" value="p:selectOneMenu"/>
+            <p:selectOneMenu id="selectOneMenu">
+                <f:selectItems value="#{styleguide.listOfStrings}"/>
+            </p:selectOneMenu>
 
-                <p:outputLabel for="selectOneListbox" value="p:selectOneListbox"/>
-                <p:selectOneListbox id="selectOneListbox">
-                    <f:selectItems value="#{ppNegotiationTest.listOfStrings}"/>
-                </p:selectOneListbox>
+            <p:outputLabel for="selectOneListbox" value="p:selectOneListbox"/>
+            <p:selectOneListbox id="selectOneListbox">
+                <f:selectItems value="#{styleguide.listOfStrings}"/>
+            </p:selectOneListbox>
 
-                <p:outputLabel for="commandLink" value="p:commandLink"/>
-                <p:commandLink id="commandLink" value="Command Link"/>
+            <p:outputLabel for="commandLink" value="p:commandLink"/>
+            <p:commandLink id="commandLink" value="Command Link"/>
 
+            <p:outputLabel for="rating" value="p:rating"/>
+            <p:rating id="rating" stars="10" onRate="alert('You rated ' + value)"/>
+
+
+            <p:outputLabel for="slider" value="p:slider"/>
+            <p:panelGrid columns="1">
+                <p:slider for="txt6,txt7" id="slider" style="width:400px" range="true"
+                          display="displayRange" displayTemplate="Between {min} and {max}"/>
+                <h:outputText id="displayRange" value="Move the slider"/>
+                <h:inputHidden id="txt6" value="#{styleguide.sliderVal1}"/>
+                <h:inputHidden id="txt7" value="#{styleguide.sliderVal2}"/>
             </p:panelGrid>
 
-        </section>
+            <p:outputLabel for="spinner" value="p:spinner"/>
+            <p:spinner id="spinner" stepFactor="0.25"/>
 
-        <aside class="sidebar_right grid_3">
-            <p>Side nav bar</p>
+            <p:outputLabel for="inplace" value="p:inplace"/>
+            <p:inplace id="inplace" editor="true">
+                <p:inputText value="#{styleguide.stringVal}" label="text" id="inlineInputText"/>
+            </p:inplace>
 
-            <ul>
-                <li>Nav item</li>
-                <li>Nav item</li>
-            </ul>
+        </p:panelGrid>
 
-            <hr/>
+    </section>
 
-            <ul>
-                <li><a href="#">Nav link</a></li>
-                <li><a href="#">Nav link</a></li>
-            </ul>
+    <aside class="sidebar_right grid_3">
+        <p>Side nav bar</p>
 
-        </aside>
+        <ul>
+            <li>Nav item</li>
+            <li>Nav item</li>
+        </ul>
 
-        <section style="border: 1px dashed #f00;" class="grid_12">
-            <h2>Full width (12 columns)</h2>
+        <hr/>
 
-            <p>
-                <em>The dashed red border is added to show the limits of this area, and should not be used in a real page</em>
-            </p>
+        <ul>
+            <li><a href="#">Nav link</a></li>
+            <li><a href="#">Nav link</a></li>
+        </ul>
 
-            <p:outputLabel for="tabView" value="p:tabView"/><br/>
-            <p:tabView id="tabView">
-                <p:tab title="Tab 1">
-                    <p>Something something something 1</p>
-                </p:tab>
-                <p:tab title="Tab 2">
-                    <p>Something something something 2</p>
-                </p:tab>
-                <p:tab title="Tab 3">
-                    <p>Something something something 3</p>
-                </p:tab>
-            </p:tabView><br/><br/>
+    </aside>
 
-            <p:outputLabel for="accordionPanel" value="p:accordionPanel"/><br/>
-            <p:accordionPanel id="accordionPanel">
-                <p:tab title="Tab 1">
-                    <p>Something something something 1</p>
-                </p:tab>
-                <p:tab title="Tab 2">
-                    <p>Something something something 2</p>
-                </p:tab>
-                <p:tab title="Tab 3">
-                    <p>Something something something 3</p>
-                </p:tab>
-            </p:accordionPanel><br/><br/>
-        </section>
+    <section style="border: 1px dashed #f00;" class="grid_12">
+        <h2>Full width (12 columns)</h2>
 
-        <p:dialog id="dlg" widgetVar="dlg">
-            <p:panelGrid columns="2">
-                <f:facet name="header">
-                    <p:outputLabel value="Add Preference"/>
-                </f:facet>
+        <p>
+            <em>The dashed red border is added to show the limits of this area, and should not be used in a real page</em>
+        </p>
 
-                <h:outputLabel for="addPreferenceName" value="Preference name:"/>
-                <p:selectOneMenu effect="fold" editable="true" label="Preference name"
-                                 id="addPreferenceName">
-                    <f:selectItem itemLabel="meep"/>
-                    <f:selectItem itemLabel="meep"/>
-                    <f:selectItem itemLabel="meep"/>
-                    <f:selectItem itemLabel="meep"/>
-                </p:selectOneMenu>
+        <p:outputLabel for="tabView" value="p:tabView"/><br/>
+        <p:tabView id="tabView">
+            <p:tab title="Tab 1">
+                <p>Something something something 1</p>
+            </p:tab>
+            <p:tab title="Tab 2">
+                <p>Something something something 2</p>
+            </p:tab>
+            <p:tab title="Tab 3">
+                <p>Something something something 3</p>
+            </p:tab>
+        </p:tabView><br/><br/>
 
+        <p:outputLabel for="accordionPanel" value="p:accordionPanel"/><br/>
+        <p:accordionPanel id="accordionPanel">
+            <p:tab title="Tab 1">
+                <p>Something something something 1</p>
+            </p:tab>
+            <p:tab title="Tab 2">
+                <p>Something something something 2</p>
+            </p:tab>
+            <p:tab title="Tab 3">
+                <p>Something something something 3</p>
+            </p:tab>
+        </p:accordionPanel><br/><br/>
+    </section>
 
-                <h:outputLabel for="addPreferecneService" value="Service: "/>
-                <p:selectOneMenu effect="fade"
-                                 id="addPreferecneService">
-                    <f:selectItem itemLabel="(none)"
-                                  itemDescription="No service attachment"/>
+    <p:dialog id="dlg" widgetVar="dlg">
+        <p:panelGrid columns="2">
+            <f:facet name="header">
+                <p:outputLabel value="Add Preference"/>
+            </f:facet>
 
-                    <f:selectItem itemLabel="meep"/>
-                    <f:selectItem itemLabel="meep"/>
-                    <f:selectItem itemLabel="meep"/>
-                    <f:selectItem itemLabel="meep"/>
-                </p:selectOneMenu>
-
-                <f:facet name="footer">
-                    <p:commandButton value="Save" icon="ui-icon-check"
-                                     id="addPreferenceDialog_okButton"/>
-                    <p:commandButton value="Cancel"
-                                     id="addPreferenceDialog_cancelButton"/>
-                </f:facet>
-            </p:panelGrid>
-        </p:dialog>
-
-        <p:contextMenu nodeType="condition">
-            <p:menuitem value="Add Condition"/>
-            <p:menuitem value="Add Condition and Outcome"/>
-            <p:separator/>
-            <p:menuitem value="Edit" disabled="true"/>
-            <p:menuitem value="Delete"/>
-            <p:submenu label="Submenu">
-                <p:menuitem value="Item 1"/>
-                <p:menuitem value="Item 2"/>
-                <p:menuitem value="Item 3"/>
-            </p:submenu>
-        </p:contextMenu>
+            <h:outputLabel for="addPreferenceName" value="Preference name:"/>
+            <p:selectOneMenu effect="fold" editable="true" label="Preference name"
+                             id="addPreferenceName">
+                <f:selectItem itemLabel="meep"/>
+                <f:selectItem itemLabel="meep"/>
+                <f:selectItem itemLabel="meep"/>
+                <f:selectItem itemLabel="meep"/>
+            </p:selectOneMenu>
 
 
-    </ui:define>
+            <h:outputLabel for="addPreferecneService" value="Service: "/>
+            <p:selectOneMenu effect="fade"
+                             id="addPreferecneService">
+                <f:selectItem itemLabel="(none)"
+                              itemDescription="No service attachment"/>
+
+                <f:selectItem itemLabel="meep"/>
+                <f:selectItem itemLabel="meep"/>
+                <f:selectItem itemLabel="meep"/>
+                <f:selectItem itemLabel="meep"/>
+            </p:selectOneMenu>
+
+            <f:facet name="footer">
+                <p:commandButton value="Save" icon="ui-icon-check"
+                                 id="addPreferenceDialog_okButton"/>
+                <p:commandButton value="Cancel"
+                                 id="addPreferenceDialog_cancelButton"/>
+            </f:facet>
+        </p:panelGrid>
+    </p:dialog>
+
+    <p:contextMenu nodeType="condition">
+        <p:menuitem value="Add Condition"/>
+        <p:menuitem value="Add Condition and Outcome"/>
+        <p:separator/>
+        <p:menuitem value="Edit" disabled="true"/>
+        <p:menuitem value="Delete"/>
+        <p:submenu label="Submenu">
+            <p:menuitem value="Item 1"/>
+            <p:menuitem value="Item 2"/>
+            <p:menuitem value="Item 3"/>
+        </p:submenu>
+    </p:contextMenu>
+
+
+</ui:define>
 </ui:composition>
 </html>

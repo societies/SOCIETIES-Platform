@@ -10,10 +10,10 @@
 
 <h:head>
     <h:outputStylesheet library="css" name="style.css"/>
-    <h:outputStylesheet library="css" name="dialog.css"/>
+    <!--<h:outputStylesheet library="css" name="dialog.css"/>-->
     <!--<h:outputStylesheet library="css" name="widget.css"/>-->
-    <h:outputStylesheet library="css" name="slider.css"/>
-    <h:outputStylesheet library="css" name="notification.css"/>
+    <!--<h:outputStylesheet library="css" name="slider.css"/>-->
+    <!--<h:outputStylesheet library="css" name="notification.css"/>-->
 
     <script type="text/javascript">
         function handlePnb() {
@@ -32,7 +32,7 @@
     <!--<h:outputScript library="js" name="notification.js"/>-->
 
     <!-- ToDo , move -->
-    <h:outputScript library="js" name="cisajax.js"/>
+    <!--<h:outputScript library="js" name="cisajax.js"/>-->
 
     <ui:fragment rendered="#{!loginController.loggedIn and noRedirect ne 'true'}">
         <!-- redirect to index page if not logged in -->
@@ -64,7 +64,8 @@
         <h:inputHidden id="pnbCount" value="#{ppNegotiation.unseenNegotiationCount}"/>
 
         <!-- quick hack to get this working until PF push is working -->
-        <p:poll interval="2" update="pnbCount" process="@this" oncomplete="handlePnb()"/>
+        <p:poll interval="5" rendered="#{loginController.loggedIn}"
+                update="pnbCount" process="@this" oncomplete="handlePnb()"/>
         <!-- used to listen for responses if there is a privacy policy negotiation request -->
         <!--<p:socket onMessage="handlePnb" channel="/pnb"/>-->
 
