@@ -349,13 +349,13 @@ public class SocialData implements ISocialData{
 
 	@Override
 	public List<Object> getSocialActivity() {
-		List activities = new ArrayList();
+		List friends = new ArrayList();
 		Iterator it = socialActivities.values().iterator();
 		while (it.hasNext()){
 			Collection acts = (Collection)it.next();
-			activities.addAll(acts);
+			friends.addAll(acts);
 		}
-		return activities;
+		return friends;
 	}
 
 	@Override

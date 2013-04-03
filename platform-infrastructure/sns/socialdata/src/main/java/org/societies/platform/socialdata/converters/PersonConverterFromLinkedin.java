@@ -183,7 +183,11 @@ public class PersonConverterFromLinkedin implements PersonConverter {
 			
 			if (db.has("languages")) genLanguages();
 			
+		      
 			
+			if (db.has("pictureUrl")){
+			    person.setThumbnailUrl(db.getString("pictureUrl"));
+			}
 //			
 //			if (db.has(SCREEN_NAME))	person.setDisplayName(db.getString(SCREEN_NAME));
 //			if (db.has(DESCRIPTION))	person.setAboutMe(db.getString(DESCRIPTION));

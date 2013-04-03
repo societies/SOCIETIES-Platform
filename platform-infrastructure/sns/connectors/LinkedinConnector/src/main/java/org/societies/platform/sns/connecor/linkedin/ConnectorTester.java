@@ -34,8 +34,10 @@ public class ConnectorTester {
 	 * http://wd.teamlife.it/fbconnector.php that allows to get the access token
 	 */
 	public static void main(String[] args) {
-		String access_token = "6727558d-2b52-4ecc-96eb-e984c254ab7b,1c3497bf-1d5b-49f7-b2bd-1baa69b0254a";
+		String access_token = "";
 		
+		 access_token = "";
+		 
 		LinkedinConnector connector = new LinkedinConnector(access_token, "Societies User");
 		try {
 	
@@ -44,7 +46,7 @@ public class ConnectorTester {
 //			JSONObject json = new JSONObject(connector.getUserGroups());
 //			System.out.println("Groups\n:"+ json.toString(1));
 			
-			connector.post("ciao");
+			//connector.post("ciao");
 			
 			
 			// make the json payload using json-simple
@@ -66,7 +68,11 @@ public class ConnectorTester {
 //			
 //			System.out.println(jsonMap.toString(2));
 //			connector.post(jsonMap.toString(2));
-//			System.out.println("Friends:\n"+connector.getUserFriends());
+			//System.out.println("Friends:\n"+connector.getUserFriends());
+		        JSONObject data = new JSONObject(connector.getUserProfile());
+		    
+		       
+			System.out.println("Profile:\n"+data.toString(1));
 			
 			
 		} catch (Exception e) {
