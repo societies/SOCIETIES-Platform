@@ -197,9 +197,13 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 	private PluginResult executeGetPrivacyPolicy(JSONArray arguments) throws JsonSyntaxException, JSONException, PrivacyException {
 		// - Launch service method
 		//		RequestorBean owner = jsonHelper.fromJson(arguments.getString(0), RequestorBean.class);
+		JSONObject jsonRequestor = (JSONObject) arguments.get(0);
+		
 		RequestorCisBean owner = new RequestorCisBean();
-		owner.setRequestorId("university.societies.local");
-		owner.setCisRequestorId("cis-e86b61f1-e85a-4d2d-94b8-908817e08166.societies.local");
+		//owner.setRequestorId("university.societies.local");
+		//owner.setCisRequestorId("cis-e86b61f1-e85a-4d2d-94b8-908817e08166.societies.local");
+		owner.setRequestorId(jsonRequestor.getString("requestorId"));
+		owner.setCisRequestorId(jsonRequestor.getString("cisRequestId"));
 		privacyPolicyManagerService.getPrivacyPolicy(clientPackage, owner);
 
 		// - Inform the JS side: async mode
