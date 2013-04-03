@@ -36,8 +36,7 @@ import org.societies.android.api.events.PlatformEventsHelperNotConnectedExceptio
 import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
 import org.societies.android.api.internal.useragent.model.ExpProposalContent;
 import org.societies.android.api.internal.useragent.model.ExpProposalType;
-import org.societies.android.platform.events.helper.EventsHelper;
-import org.societies.android.platform.useragent.feedback.AndroidUserFeedbackService;
+import org.societies.android.remote.helper.EventsHelper;
 import org.societies.android.platform.useragent.feedback.container.TestContainerFeedbackService;
 import org.societies.android.platform.useragent.feedback.container.TestContainerFeedbackService.FeedbackContainerBinder;
 import org.societies.android.platform.useragent.feedback.guis.AcknackPopup;
@@ -63,14 +62,12 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 	private static final String LOG_TAG = TestUserFeedback.class.getName();
 	private static final String CLIENT_ID = LOG_TAG;
 
-
 	private Boolean receivedResult = false;
 	private EventsHelper eventsHelper;
 	private boolean isEventsConnected = false;
 
 	public TestUserFeedback() {
 		super(TestContainerFeedbackService.class);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -81,27 +78,26 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 		//setup eventsHelper
 		eventsHelper = new EventsHelper(this.getContext());
 		eventsHelper.setUpService(new IMethodCallback() {
-
-
-
 			@Override
 			public void returnAction(String result) {
 				Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");
-
 			}
 
 			@Override
 			public void returnAction(boolean resultFlag) {
 				Log.d(LOG_TAG, "eventMgr callback: ReturnAction(boolean) called. Connected");
 				isEventsConnected=true;
-
 			}
+
+			@Override
+			public void returnException(String arg0) { }
 		});
 
 	}
 
 	private class UserFeedbackBroadcastReceiver extends BroadcastReceiver{
 		private final String LOG_TAG = UserFeedbackBroadcastReceiver.class.getName();
+		
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
@@ -110,7 +106,6 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 			TestUserFeedback.this.receivedResult = true;
 			Log.d(LOG_TAG, "OnReceive finished");
 		}
-
 	}
 
 
@@ -121,10 +116,7 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 
 		FeedbackContainerBinder binder =  (FeedbackContainerBinder) bindService(userFeedbackIntent);
 
-
 		IAndroidUserFeedback ufService = (IAndroidUserFeedback) binder.getService();
-
-
 
 		ExpProposalContent proposal = new ExpProposalContent("Testing explicit proposal user feedback", new String[]{"Yes","No"});
 		ExpFeedbackResultBean bean = ufService.getExplicitFB(CLIENT_ID, ExpProposalType.ACKNACK, proposal);
@@ -147,10 +139,10 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 	public void testGetExplicitFBTriggerFromCloud(){
 		/*Intent userFeedbackIntent = new Intent(getContext(), this.getClass());
 		FeedbackContainerBinder binder = (FeedbackContainerBinder) bindService(userFeedbackIntent);
-
 		IAndroidUserFeedback ufService = binder.getService();*/
 
 		IAndroidUserFeedback ufService = new AndroidUserFeedbackService(getContext(), false);
+		
 		boolean started = ufService.startService();
 
 		if (started){
@@ -205,9 +197,7 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 		getContext().registerReceiver(receiver, intentFilter); 
 
 		Log.d(LOG_TAG, "Registered broadcast receiver");
-
 	}
-
 
 	/**
 	 * Create a suitable intent filter
@@ -243,18 +233,18 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 			}
 
 			eventsHelper.publishEvent(UserFeedbackEventTopics.REQUEST, bean, new IPlatformEventsCallback() {
-
 				@Override
 				public void returnAction(int arg0) {
 					Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");
-
 				}
 
 				@Override
 				public void returnAction(boolean arg0) {
 					Log.d(LOG_TAG, "eventMgr callback: ReturnAction(boolean) called. Published event");
-
 				}
+
+				@Override
+				public void returnException(int arg0) { }
 			});
 		} catch (PlatformEventsHelperNotConnectedException e) {
 			// TODO Auto-generated catch block
@@ -265,18 +255,19 @@ public class TestUserFeedback extends ServiceTestCase <TestContainerFeedbackServ
 
 	private void subscribeToEvent() {
 		try {
-			eventsHelper.subscribeToEvent(IAndroidSocietiesEvents.USER_FEEDBACK_EXPLICIT_RESPONSE_INTENT, new IPlatformEventsCallback() {
-				
+			eventsHelper.subscribeToEvent(IAndroidSocietiesEvents.UF_REQUEST_INTENT, new IPlatformEventsCallback() {
 				@Override
 				public void returnAction(int arg0) {
-					Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");
-					
+					Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");					
 				}
 				
 				@Override
 				public void returnAction(boolean arg0) {
 					Log.d(LOG_TAG, "eventMgr callback: ReturnAction(boolean) called. Subscribed to event");
 				}
+
+				@Override
+				public void returnException(int arg0) { }
 			});
 		} catch (PlatformEventsHelperNotConnectedException e) {
 			// TODO Auto-generated catch block
