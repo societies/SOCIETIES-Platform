@@ -54,6 +54,18 @@ public class ConditionUtils {
 		condition.setOptional(optional);
 		return condition;
 	}
+
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition createPrivate() {
+		return create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY, "Yes");
+	}
+	
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition createMembersOnly() {
+		return create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, "Yes");
+	}
+	
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition createPublic() {
+		return create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.SHARE_WITH_3RD_PARTIES, "Yes");
+	}
 	
 	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition condition){
 		StringBuilder sb = new StringBuilder();
