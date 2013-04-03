@@ -32,16 +32,16 @@ class Test {
 
 	// static String defaultAccessTokenString =
 	// "5ZAFZUGOUSFQAEDSWPCXQLJVMBFY1GDI41T5SNMUJP5B2QNA";
-	static String defaultAccessTokenString = "5ZAFZUGOUSFQAEDSWPCXQLJVMBFY1GDI41T5SNMUJP5B2QNA";
+	static String defaultAccessTokenString = "";
 
 	public static void main(String[] args) {
 		FoursquareConnectorImpl f = new FoursquareConnectorImpl(
 				defaultAccessTokenString, "yangdingqi");
 
-//		testProfileExtraction(f);
+		testProfileExtraction(f);
 //		testFriendsExtraction(f);
 //		testCheckinsExtraction(f);
-		testPostCheckins(f);
+//		testPostCheckins(f);
 	}
 
 	public static void testProfileExtraction(FoursquareConnectorImpl f) {

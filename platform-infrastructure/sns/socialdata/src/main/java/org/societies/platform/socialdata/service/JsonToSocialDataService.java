@@ -3,14 +3,13 @@ package org.societies.platform.socialdata.service;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.shindig.social.opensocial.model.ActivityEntry;
 import org.apache.shindig.social.opensocial.model.Group;
-import org.apache.shindig.social.opensocial.model.Person;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
-import org.societies.api.sns.Message;
 import org.societies.api.sns.SocialDataState;
 import org.societies.platform.socialdata.SocialData;
 
@@ -50,7 +49,8 @@ public class JsonToSocialDataService {
 		  
 		  SocialData sd= new SocialData();
 		  //System.out.println("Convert JSON to SocialDATA");
-		  String access_token = "6727558d-2b52-4ecc-96eb-e984c254ab7b,1c3497bf-1d5b-49f7-b2bd-1baa69b0254a";
+		  String access_token = "";
+		 
 		  HashMap<String, String> pars = new HashMap<String, String>();
 		  pars.put(ISocialConnector.AUTH_TOKEN, access_token);
 		  
@@ -59,6 +59,7 @@ public class JsonToSocialDataService {
 		  System.out.println("connector id:" + c.getID());
 		  System.out.println("connector token:" + c.getToken());
 		  System.out.println("connector name:" + c.getConnectorName());
+		  
 		  
 		  try {
 		    sd.addSocialConnector(c);
@@ -70,7 +71,7 @@ public class JsonToSocialDataService {
 		  
 		  while(sd.getStatus() != SocialDataState.WITH_SOME_SOCIAL_DATA){
 		     try {
-			Thread.sleep(1000);
+			Thread.sleep(500);
 			System.out.println(sd.getStatus());
 		    } catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -78,21 +79,21 @@ public class JsonToSocialDataService {
 		    }
 		  }
 		  
-		  for(Object p : sd.getSocialProfiles()){
-		      Person profile =(Person)p;
-		      System.out.println("Profile "+profile.getName().getFormatted());
-			  
-		  }
+//		  for(Object p : sd.getSocialProfiles()){
+//		      Person profile =(Person)p;
+//		      System.out.println("Profile "+profile.getName().getFormatted());
+//			  
+//		  }
 		  
-		  List<Object> groups =sd.getSocialGroups();
-		  for(Object g: groups){
-		      Group group = (Group)g;
-		      System.out.println("Group: "+ group.getTitle() + " " +group.getDescription());
+		  List<Object> feed =sd.getSocialActivity();
+		  for(Object o: feed){
+		      ActivityEntry elm = (ActivityEntry)o;
+		      System.out.println("feed-> "+elm.getContent());
 		  }
 		 
-		  Message msg = new Message();
-		  msg.setData("test 1");
-		  sd.postMessage(SocialNetwork.LINKEDIN, msg);
+//		  Message msg = new Message();
+//		  msg.setData("test 1");
+//		  sd.postMessage(SocialNetwork.LINKEDIN, msg);
 		  
 		  
 //		  try {

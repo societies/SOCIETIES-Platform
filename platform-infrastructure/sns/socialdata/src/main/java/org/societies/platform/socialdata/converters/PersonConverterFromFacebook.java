@@ -48,7 +48,7 @@ public class PersonConverterFromFacebook implements PersonConverter{
 	public static String INTERESTS		= "interests";
 	public static String MUSIC		    = "music";
 	public static String BOOKS		    = "books";
-	
+	public static String PICTURE		    = "picture";
 	
 	// portable contact ids
 	public static String GIVENAME 		= "givenName";
@@ -74,22 +74,29 @@ public class PersonConverterFromFacebook implements PersonConverter{
 			person.setId(db.getString(ID));
 			
 			//if(db.has(UCT)) person.setUtcOffset(db.getLong(UCT));
-			if (db.has(BIO))		 	person.setAboutMe(db.getString(BIO));
+			if (db.has(BIO))		person.setAboutMe(db.getString(BIO));
 			if (db.has(SPORTS)) 	 	person.setSports(setSports(db.getString(SPORTS)));
 			if (db.has(RELATIONSHIP)) 	person.setRelationshipStatus(db.getString(RELATIONSHIP));
-			if (db.has(RELIGION))       person.setReligion(db.getString(RELIGION));
+			if (db.has(RELIGION))           person.setReligion(db.getString(RELIGION));
 			if (db.has(LOCATION))		person.setCurrentLocation(setLocation(db.getString(LOCATION)));
 			if (db.has(ACCOUNTS))		person.setAccounts(setAccounts(db.getString(ACCOUNTS)));
-			if (db.has(WORKS))			person.setActivities(setActivities(WORKS));
+			if (db.has(WORKS))		person.setActivities(setActivities(WORKS));
 			if (db.has(PROFILELINK))	person.setProfileUrl(db.getString(PROFILELINK));
 			if (db.has(BIRTHDAY))		person.setBirthday(getBirthDay(db.getString(BIRTHDAY)));
-			if (db.has(GENDER))			person.setGender(gender(db.getString(GENDER)));
-			if (db.has(EMAIL))			person.setEmails(getMails(db.getString(EMAIL)));
-			if (db.has(PHOTOS))			person.setPhotos(getPhotos(db.getString(PHOTOS)));
+			if (db.has(GENDER))		person.setGender(gender(db.getString(GENDER)));
+			if (db.has(EMAIL))		person.setEmails(getMails(db.getString(EMAIL)));
+			if (db.has(PHOTOS))		person.setPhotos(getPhotos(db.getString(PHOTOS)));
 			if (db.has(TURNONS))		person.setTurnOns(jarrayToList(db.getString(TURNONS)));
-			if (db.has(MUSIC))		    person.setMusic(jarrayToList(db.getString(MUSIC)));
-			if (db.has(INTERESTS))	    person.setInterests(jarrayToList(db.getString(INTERESTS)));
+			if (db.has(MUSIC))		person.setMusic(jarrayToList(db.getString(MUSIC)));
+			if (db.has(INTERESTS))	        person.setInterests(jarrayToList(db.getString(INTERESTS)));
 			if (db.has(BOOKS))	    	person.setBooks(jarrayToList(db.getString(BOOKS)));					
+			if (db.has(PICTURE))		{
+			    try{
+			          person.setThumbnailUrl(db.getJSONObject(PICTURE).getJSONObject("data").getString("url"));
+			    }catch(Exception ex){}
+			    
+			 }
+			
 			
 			setAccount();
 		}
@@ -267,6 +274,7 @@ public class PersonConverterFromFacebook implements PersonConverter{
 			person.setDisplayName(getString(NAME));
 			name.setFormatted(getString(NAME));
 		}
+		if (name==null) name = new NameImpl();
 		
 		if (getString(FIRSTNAME)!=null)  name.setGivenName(getString(FIRSTNAME));
 		if (getString(LASTNAME) !=null) name.setFamilyName(getString(LASTNAME));

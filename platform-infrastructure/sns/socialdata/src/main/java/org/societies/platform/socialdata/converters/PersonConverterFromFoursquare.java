@@ -18,8 +18,11 @@ import org.apache.shindig.social.opensocial.model.ListField;
 import org.apache.shindig.social.opensocial.model.Name;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.apache.shindig.social.opensocial.model.Person.Gender;
+import org.eclipse.jetty.util.log.Log;
+import org.hamcrest.core.Is;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.societies.platform.socialdata.model.FieldsUtils;
 
 public class PersonConverterFromFoursquare implements PersonConverter {
 
@@ -59,28 +62,20 @@ public class PersonConverterFromFoursquare implements PersonConverter {
 
 	public Person load(String data){
 
+	    
+	       
 		person = new PersonImpl();
 
 		try{
 			response = new JSONObject(data);
-//			System.out.println(response);
-			
 			if (response.has("response")) {
-				JSONObject user = (JSONObject) response.get("response");
-//				System.out.println(user);
-				if (user.has("user")){
-					db = (JSONObject) user.get("user");
-//					System.out.println(db);
-					person.setId("foursquare:" +db.getString(ID));
-
-					if (db.has(DESCRIPTION))	person.setAboutMe(db.getString(DESCRIPTION));
-					if (db.has(GENDER))			person.setGender(gender(db.getString(GENDER)));
-					if (db.has(HOME_LOCATION))	person.setAddresses(setAddress(db.getString(HOME_LOCATION)));
-					if (db.has(CONTACT))		person.setEmails(getMails(db.getString(CONTACT)));
-					person.setName(genName());
-					setAccount();  
+				JSONObject jresponse = response.getJSONObject("response");
+				if (jresponse.has("user")) {
+				    db= jresponse.getJSONObject("user");
+				    return genPerson();	
 				}
 			}
+			
 			
 		}
 		catch (JSONException e) {
@@ -89,6 +84,95 @@ public class PersonConverterFromFoursquare implements PersonConverter {
 
 		
 		return person;
+	}
+	
+	public Person load(JSONObject data){
+
+		person = new PersonImpl();
+
+		try{
+		    
+		    db = data;
+		    return genPerson();
+			
+		}
+		catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		
+		return person;
+	}
+	
+	
+	
+	public Person genPerson() throws JSONException {
+	        
+//	        System.out.println("Person:"+db.getString(ID));
+	        person.setId("foursquare:" +db.getString(ID));
+
+		if (db.has(DESCRIPTION))	person.setAboutMe(db.getString(DESCRIPTION));
+		if (db.has(GENDER))			person.setGender(gender(db.getString(GENDER)));
+		if (db.has(HOME_LOCATION))	person.setAddresses(setAddress(db.getString(HOME_LOCATION)));
+		
+		setAccount();  
+		
+		if (db.has(CONTACT))		{
+		    JSONObject contacts = db.getJSONObject(CONTACT);
+		    if (contacts.has("email")){
+			String mail= contacts.getString("email");
+			person.setEmails(FieldsUtils.genList(mail, "home", true));
+		    }
+			
+		    if (contacts.has("phone")){
+			String phone = contacts.getString("phone");
+			person.setPhoneNumbers(FieldsUtils.genList(phone, "phone", true));	
+		    }
+		    
+		    List<ListField> sn_connected = new ArrayList<ListField>();
+		    if (contacts.has("twitter")){
+			String tw= contacts.getString("twitter");
+			sn_connected.add(FieldsUtils.genListField(tw, "SocialNetwork", false));
+		    }
+		    if (contacts.has("facebook")){
+			String fb= contacts.getString("facebook");
+			sn_connected.add(FieldsUtils.genListField(fb, "SocialNetwork", false));
+		    }
+		    
+		    person.setRelationshipStatus(db.getString("relationship"));
+		    
+		        				    	
+		}
+		person.setName(genName());
+		
+		setThumb();
+		
+		return person;
+	}
+
+
+
+	
+	private void setThumb() {
+	    if (db.has("photo")){
+		
+		try {
+		
+		    
+		    
+		    Object photo = db.get("photo");
+		    if (photo instanceof JSONObject){
+			JSONObject jphoto = db.getJSONObject("photo");
+			person.setThumbnailUrl(jphoto.getString("prefix") + "original" + jphoto.getString("suffix"));
+		    }
+		    else person.setThumbnailUrl((db.getString("photo")));
+		} catch (JSONException e) {
+		    
+		    e.printStackTrace();
+		}
+		
+	    }
+	    
 	}
 
 
@@ -116,6 +200,7 @@ public class PersonConverterFromFoursquare implements PersonConverter {
 			
 			account.setUsername(name);
 			account.setUserId(db.getString(ID));
+			
 		}
 		catch (JSONException e) {
 			e.printStackTrace();
@@ -153,19 +238,7 @@ public class PersonConverterFromFoursquare implements PersonConverter {
 
 	}
 
-	private List<ListField> getMails(String mail) throws JSONException{
-
-		
-		JSONObject obj = new JSONObject(mail);
-		
-		List<ListField> emails = new ArrayList<ListField>();
-		ListField email = new ListFieldImpl();
-		email.setPrimary(true);
-		email.setType("home");
-		email.setValue(obj.get("email").toString());
-		emails.add(email);
-		return emails;
-	}
+	
 
 	private Date getBirthDay(String date) {
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");

@@ -26,7 +26,7 @@
 package org.societies.android.platform.useragent.feedback.container;
 
 import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
-import org.societies.android.platform.useragent.feedback.AndroidUserFeedbackService;
+import org.societies.android.platform.useragent.feedback.EventListener;
 
 import android.app.Service;
 import android.content.Intent;
@@ -58,10 +58,11 @@ public class TestContainerFeedbackService extends Service{
 
 	public class FeedbackContainerBinder extends Binder {
 		public IAndroidUserFeedback getService() {
-			AndroidUserFeedbackService ufBase = new AndroidUserFeedbackService(getApplicationContext(),  false);
-			return ufBase;
+			//USERFEEDBACK EVENT LISTENER
+            Intent intentUserFeedback = new Intent(TestContainerFeedbackService.this.getApplicationContext(), EventListener.class);
+            TestContainerFeedbackService.this.getApplicationContext().startService(intentUserFeedback);
+			return null;
 		}
-	}
-	
+	}	
 
 }
