@@ -190,6 +190,24 @@
 			<version>1.7.1</version>
 		</dependency>
 
+		<!-- JFree Chart -->
+		<dependency>
+			<groupId>org.jfree.chart</groupId>
+			<artifactId>org.jfree.chart-library</artifactId>
+			<type>libd</type>
+			<version>1.0.9</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jfree.chart</groupId>
+			<artifactId>com.springsource.org.jfree.chart</artifactId>
+			<version>1.0.9</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>com.springsource.org.jfree</artifactId>
+			<version>1.0.12</version>
+		</dependency>
+
 		<!-- <dependency> <groupId>org.societies.api.schema</groupId> <artifactId>societies-api-schema</artifactId> 
 			<version>${release.version}</version> <scope>provided</scope> </dependency> -->
 		<dependency>
@@ -603,6 +621,17 @@
 							org.osgi.framework,
 							<!-- Form validation -->
 							javax.validation,
+							<!-- JFreeChart -->
+							org.jfree.chart;resolution:=optional,
+							org.jfree.chart.axis;resolution:=optional,
+							org.jfree.chart.entity;resolution:=optional,
+							org.jfree.chart.labels;resolution:=optional,
+							org.jfree.chart.plot;resolution:=optional,
+							org.jfree.chart.renderer.category;resolution:=optional,
+							org.jfree.chart.urls;resolution:=optional,
+							org.jfree.data.category;resolution:=optional,
+							org.jfree.data.general;resolution:=optional,
+							<!-- Other -->
 							*;resolution:=optional
 						</Import-Package>
 						<Bundle-ClassPath>WEB-INF/classes,.</Bundle-ClassPath>
@@ -725,6 +754,24 @@
 									<version>2.2.1</version>
 									<type>jar</type>
 									<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.jfree.chart</groupId>
+									<artifactId>org.jfree.chart-library</artifactId>
+									<version>1.0.9</version>
+									<type>libd</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.jfree.chart</groupId>
+									<artifactId>com.springsource.org.jfree.chart</artifactId>
+									<version>1.0.9</version>
+									<type>jar</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.jfree</groupId>
+									<artifactId>com.springsource.org.jfree</artifactId>
+									<version>1.0.12</version>
+									<type>jar</type>
 								</artifactItem>
 							</artifactItems>
 							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
