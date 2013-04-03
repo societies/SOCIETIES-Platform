@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.Requestor;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.ITrustNodeMgr;
@@ -81,6 +82,15 @@ public class TrustNodeMgr implements ITrustNodeMgr {
 	public Collection<TrustedEntityId> getMyIds() {
 		
 		return Collections.unmodifiableCollection(this.myTEIDs);
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.ITrustNodeMgr#getLocalRequestor()
+	 */
+	@Override
+	public Requestor getLocalRequestor() {
+		
+		return new Requestor(this.commMgr.getIdManager().getCloudNode());
 	}
 	
 	/*

@@ -117,14 +117,14 @@ public class TestLocalTrustEventing {
 	}
 
 	@Test
-	public void testTrustUpdateEventListener() {
+	public void testTrustUpdateEventListenerByTrustorAndTrustee() {
 
-		LOG.info("*** BEGIN testTrustUpdateEventListener");
+		LOG.info("*** BEGIN testTrustUpdateEventListenerByTrustorAndTrustee");
 		
 		Double oldTrustValue1 = null;
 		final MyTrustUpdateEventListener listener = new MyTrustUpdateEventListener();
 		try {
-			this.internalTrustBroker.registerTrustUpdateEventListener(
+			this.internalTrustBroker.registerTrustUpdateListener(
 					listener, this.myTeid, this.teid1);
 		} catch (TrustException te) {
 			fail("Failed to register TrustUpdateEvent listener: "
@@ -132,8 +132,8 @@ public class TestLocalTrustEventing {
 		}
 		
 		try {
-			oldTrustValue1 = this.internalTrustBroker.retrieveTrust(
-					this.myTeid, this.teid1).get();
+			oldTrustValue1 = this.internalTrustBroker.retrieveTrustValue(
+					this.myTeid, this.teid1, TrustValueType.USER_PERCEIVED).get();
 		} catch (Exception e) {
 			fail("Failed to retrieve trust: " + e.getLocalizedMessage());
 		}
@@ -155,13 +155,19 @@ public class TestLocalTrustEventing {
 			if (isLockReleased) {
 				final TrustUpdateEvent event = listener.getEvent();
 				assertNotNull("Received TrustUpdateEvent was null", event);
-				assertEquals("Received trustorId was incorrect", this.myTeid, event.getTrustorId());
-				assertEquals("Received trusteeId was incorrect", this.teid1, event.getTrusteeId());
-				assertEquals("Received trust value type was incorrect", TrustValueType.USER_PERCEIVED, event.getValueType());
-				assertEquals("Received old trust value was incorrect", oldTrustValue1, event.getOldValue());
-				final Double newTrustValue1 = this.internalTrustBroker.retrieveTrust(
-						this.myTeid, this.teid1).get();
-				assertEquals("Received new trust value was incorrect", newTrustValue1, event.getNewValue());
+				assertNotNull("Received TrustRelationship was null", event.getTrustRelationship());
+				assertEquals("Received trustorId was incorrect", this.myTeid, 
+						event.getTrustRelationship().getTrustorId());
+				assertEquals("Received trusteeId was incorrect", this.teid1, 
+						event.getTrustRelationship().getTrusteeId());
+				assertEquals("Received trust value type was incorrect", TrustValueType.USER_PERCEIVED,
+						event.getTrustRelationship().getTrustValueType());
+				final Double newTrustValue1 = this.internalTrustBroker.retrieveTrustValue(
+						this.myTeid, this.teid1, TrustValueType.USER_PERCEIVED).get();
+				assertEquals("Received new trust value was incorrect", newTrustValue1, 
+						event.getTrustRelationship().getTrustValue());
+				assertNotNull("Received timestamp was null", 
+						event.getTrustRelationship().getTimestamp());
 			} else {
 				fail("TrustUpdateEvent listener never received the event in the specified timeout: "
 						+ TestCase1962.getTimeout() + " msec");
@@ -173,7 +179,7 @@ public class TestLocalTrustEventing {
 		}
 		
 		try {
-			this.internalTrustBroker.unregisterTrustUpdateEventListener(
+			this.internalTrustBroker.unregisterTrustUpdateListener(
 					listener, this.myTeid, this.teid1);
 		} catch (TrustException te) {
 			fail("Failed to unregister TrustUpdateEvent listener: "

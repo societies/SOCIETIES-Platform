@@ -26,6 +26,7 @@ package org.societies.privacytrust.trust.api;
 
 import java.util.Collection;
 
+import org.societies.api.identity.Requestor;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 
 /**
@@ -48,6 +49,13 @@ public interface ITrustNodeMgr {
 	 *         whose behalf this node operates cannot be retrieved.
 	 */
 	public Collection<TrustedEntityId> getMyIds();
+	
+	/**
+	 * 
+	 * @return
+	 * @since 1.0
+	 */
+	public Requestor getLocalRequestor();
 	
 	/**
 	 * Returns <code>true</code> if this node is master; <code>false</code> otherwise.

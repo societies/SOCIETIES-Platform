@@ -37,7 +37,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.societies.api.privacytrust.trust.event.ITrustEventListener;
+import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.engine.IUserPerceivedTrustEngine;
@@ -89,8 +89,8 @@ public class UserPerceivedTrustEngineTest {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		
-		doNothing().when(mockTrustEventMgr).registerListener(
-				any(ITrustEventListener.class),	any(String[].class));
+		doNothing().when(mockTrustEventMgr).registerUpdateListener(
+				any(ITrustUpdateEventListener.class),	any(String[].class));
 	}
 
 	/**

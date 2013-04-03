@@ -39,14 +39,20 @@
     </xs:restriction>
   </xs:simpleType>
   
+  <xs:complexType name="trustRelationshipBean">
+    <xs:sequence>
+      <xs:element name="trustorId" type="tns:trustedEntityIdBean" minOccurs="1" nillable="false"/>
+	  <xs:element name="trusteeId" type="tns:trustedEntityIdBean" minOccurs="1" nillable="false"/>
+	  <xs:element name="trustValueType" type="tns:trustValueTypeBean" minOccurs="1" nillable="false"/>
+	  <xs:element name="trustValue" type="xs:double" minOccurs="1" nillable="false"/>
+	  <xs:element name="timestamp" type="xs:dateTime" minOccurs="1" nillable="false"/>
+	</xs:sequence>
+  </xs:complexType>
+  
   <xs:element name="trustUpdateEventBean">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="trustorId" type="tns:trustedEntityIdBean" minOccurs="1" nillable="false"/>
-	<xs:element name="trusteeId" type="tns:trustedEntityIdBean" minOccurs="1" nillable="false"/>
-	<xs:element name="valueType" type="tns:trustValueTypeBean" minOccurs="1" nillable="false"/>
-	<xs:element name="oldValue" type="xs:double" minOccurs="0"/>
-	<xs:element name="newValue" type="xs:double" minOccurs="0"/>
+        <xs:element name="trustRelationship" type="tns:trustRelationshipBean" minOccurs="1" nillable="false"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>

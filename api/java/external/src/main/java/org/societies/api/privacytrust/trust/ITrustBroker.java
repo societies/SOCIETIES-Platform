@@ -24,10 +24,15 @@
  */
 package org.societies.api.privacytrust.trust;
 
+import java.util.Set;
 import java.util.concurrent.Future;
 
+import org.societies.api.identity.Requestor;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
+import org.societies.api.privacytrust.trust.model.TrustRelationship;
+import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
@@ -36,83 +41,582 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  * communities and services.
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @see TrustRelationship
  * @since 0.4
  */
 @SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface ITrustBroker {
-
+	
 	/**
-	 * Retrieves the trust value which the specified trustor has assigned to the
-	 * supplied trustee. The method returns <code>null</code> if no trust value
-	 * has been assigned to the specified trustee by the given trustor.
-	 * 
+	 * Retrieves all trust relationships of the specified trustor. The method
+	 * returns an <i>empty</i> set if the identified trustor has not 
+	 * established any trust relationships. 
+	 *
+	 * @param requestor 
+	 *            (required)
 	 * @param trustorId
-	 *            the identifier of the entity which has assigned the trust
-	 *            value to retrieve.
-	 * @param trusteeId
-	 *            the identifier of the entity whose trust value to retrieve.
-	 * @return the trust value which the specified trustor has assigned to the
-	 *         supplied trustee.
-	 * @throws TrustException if the trust value cannot be retrieved.
-	 * @throws NullPointerException if any of the specified parameters is
-	 *         <code>null</code>
-	 * @since 0.5
+	 *            (required) the identifier of the entity whose trust
+	 *            relationships to retrieve.
+	 * @return all trust relationships of the specified trustor.
+	 * @throws TrustException if the trust relationships cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @since 1.0
 	 */
-	public Future<Double> retrieveTrust(final TrustedEntityId trustorId,
+	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final Requestor requestor, final TrustedEntityId trustorId)
+					throws TrustException;
+	
+	/**
+	 * Retrieves the trust relationships of the specified trustor with the
+	 * supplied trustee. The method returns an <i>empty</i> set if no trust
+	 * relationships exist between the identified trustor and trustee.
+	 *
+	 * @param requestor 
+	 *            (required)
+	 * @param trustorId
+	 *            (required) the identifier of the entity whose trust 
+	 *            relationships to retrieve.
+	 * @param trusteeId
+	 *            (required) the identifier of the entity trusted by the 
+	 *            specified trustor.
+	 * @return the trust relationships of the specified trustor with the 
+	 *         supplied trustee.
+	 * @throws TrustException if the trust relationships cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @since 1.0
+	 */
+	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final Requestor requestor, final TrustedEntityId trustorId,
 			final TrustedEntityId trusteeId) throws TrustException;
 	
 	/**
-	 * Registers the specified listener for updates of the trust value which
-	 * the identified trustor has assigned to the supplied trustee.
+	 * Retrieves the trust relationship of the specified type which the given
+	 * trustor has established with the supplied trustee. The method returns 
+	 * <code>null</code> if no trust relationship of the specified type has
+	 * been established with the supplied trustee by the given trustor.
+	 * 
+	 * @param requestor
+	 *            (required)
+	 * @param trustorId
+	 *            (required) the identifier of the entity which has assigned
+	 *            the trust value to retrieve.
+	 * @param trusteeId
+	 *            (required) the identifier of the entity whose trust value to
+	 *            retrieve.
+	 * @param trustValueType
+	 *            (required) the type of the trust value, i.e. one of 
+	 *            {@link TrustValueType#DIRECT DIRECT},
+	 *            {@link TrustValueType#INDIRECT INDIRECT}, or
+	 *            {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}.
+	 * @return the trust relationship of the specified type which the given
+	 *         trustor has established with the supplied trustee.
+	 * @throws TrustException if the trust relationship cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is
+	 *         <code>null</code>.
+	 * @since 1.0
+	 */
+	public Future<TrustRelationship> retrieveTrustRelationship(final Requestor requestor, 
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final TrustValueType trustValueType) throws TrustException;
+	
+	/**
+	 * Retrieves the trust value of the specified type which the given trustor
+	 * has assigned to the supplied trustee. The method returns 
+	 * <code>null</code> if no trust value of the specified type has been
+	 * assigned to the supplied trustee by the given trustor.
+	 * 
+	 * @param requestor
+	 *            (required)
+	 * @param trustorId
+	 *            (required) the identifier of the entity which has assigned
+	 *            the trust value to retrieve.
+	 * @param trusteeId
+	 *            (required) the identifier of the entity whose trust value to
+	 *            retrieve.
+	 * @param trustValueType
+	 *            (required) the type of the trust value, i.e. one of 
+	 *            {@link TrustValueType#DIRECT DIRECT},
+	 *            {@link TrustValueType#INDIRECT INDIRECT}, or
+	 *            {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}.
+	 * @return the trust value of the specified type which the given trustor
+	 *         has assigned to the supplied trustee.
+	 * @throws TrustException if the trust value cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is
+	 *         <code>null</code>.
+	 * @since 1.0
+	 */
+	public Future<Double> retrieveTrustValue(final Requestor requestor, 
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final TrustValueType trustValueType) throws TrustException;
+	
+	/**
+	 * Retrieves the trust relationships of the specified trustor matching the
+	 * supplied criteria. More specifically, the {@link TrustedEntityType type}
+	 * of the entities trusted by the trustor is also specified. The method
+	 * returns an <i>empty</i> set if no trust relationships match
+	 * the supplied criteria.
+	 *
+	 * @param requestor 
+	 *            (required)
+	 * @param trustorId
+	 *            (required) the identifier of the entity which has established
+	 *            the trust relationships to retrieve.
+	 * @param trusteeType
+	 *            (required) the {@link TrustedEntityType type} of the trusted
+	 *            entities to match, e.g. {@link TrustedEntityType#CSS CSS}.
+	 * @return the trust relationships of the specified trustor that match the
+	 *         specified criteria.
+	 * @throws TrustException if the trust relationships cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @since 1.0
+	 */
+	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final Requestor requestor, final TrustedEntityId trustorId,
+			final TrustedEntityType trusteeType) throws TrustException;
+	
+	/**
+	 * Retrieves the trust relationships of the specified trustor matching the
+	 * supplied criteria. More specifically, the trust value type, i.e. one of
+	 * {@link TrustValueType#DIRECT DIRECT}, 
+	 * {@link TrustValueType#INDIRECT INDIRECT}, or
+	 * {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}, is also specified.
+	 * The method returns an <i>empty</i> set if no trust relationships match
+	 * the supplied criteria.
+	 *
+	 * @param requestor 
+	 *            (required)
+	 * @param trustorId
+	 *            (required) the identifier of the entity which has established
+	 *            the trust relationships to retrieve.
+	 * @param trustValueType
+	 *            (required) the type of the trust value, i.e. one of 
+	 *            {@link TrustValueType#DIRECT DIRECT},
+	 *            {@link TrustValueType#INDIRECT INDIRECT}, or
+	 *            {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}.
+	 * @return the trust relationships of the specified trustor that match the
+	 *         specified criteria.
+	 * @throws TrustException if the trust relationships cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @since 1.0
+	 */
+	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final Requestor requestor, final TrustedEntityId trustorId,
+			final TrustValueType trustValueType) throws TrustException;
+	
+	/**
+	 * Retrieves the trust relationships of the specified trustor matching the
+	 * supplied criteria. More specifically, the {@link TrustedEntityType type}
+	 * of the entities trusted by the trustor and/or the trust value type, i.e. one of 
+	 * {@link TrustValueType#DIRECT DIRECT}, 
+	 * {@link TrustValueType#INDIRECT INDIRECT}, or
+	 * {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}, are also specified.
+	 * The method returns an <i>empty</i> set if no trust relationships match
+	 * the supplied criteria.
+	 *
+	 * @param requestor 
+	 *            (required)
+	 * @param trustorId
+	 *            (required) the identifier of the entity which has established
+	 *            the trust relationships to retrieve.
+	 * @param trusteeType
+	 *            (required) the {@link TrustedEntityType type} of the trusted
+	 *            entities to match, e.g. {@link TrustedEntityType#CSS CSS}.
+	 * @param trustValueType
+	 *            (required) the type of the trust value, i.e. one of 
+	 *            {@link TrustValueType#DIRECT DIRECT},
+	 *            {@link TrustValueType#INDIRECT INDIRECT}, or
+	 *            {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}.
+	 * @return the trust relationships of the specified trustor that match the
+	 *         specified criteria.
+	 * @throws TrustException if the trust relationships cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @since 1.0
+	 */
+	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final Requestor requestor, final TrustedEntityId trustorId,
+			final TrustedEntityType trusteeType, 
+			final TrustValueType trustValueType) throws TrustException;
+	
+	/**  
+	 * Registers the specified listener for updates of the trust values
+	 * assigned by the identified trustor.
 	 * <p>
 	 * To unregister the specified listener, use the
-	 * {@link #unregisterTrustUpdateEventListener(ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId)}
+	 * {@link #unregisterTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId)}
 	 * method.
 	 * 
+	 * @param requestor
+	 *            (required)
 	 * @param listener
+	 *            (required)
 	 *            the listener to register for trust update events.
 	 * @param trustorId
-	 *            the identifier of the entity which assigns the trust
-	 *            value whose updates to register for.
-	 * @param trusteeId
-	 *            the identifier of the entity whose trust value update events
-	 *            to register for.
+	 *            (required) the identifier of the entity which assigns the
+	 *            trust value whose updates to register for.
 	 * @throws TrustException if the specified listener cannot be registered
 	 * @throws NullPointerException if any of the specified parameters is 
 	 *         <code>null</code>.
-	 * @see #unregisterTrustUpdateEventListener(ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId)
-	 * @since 0.5
+	 * @see #unregisterTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId)
+	 * @since 1.0
 	 */
-	public void registerTrustUpdateEventListener(
+	public void registerTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId) throws TrustException;
+	
+	/**
+	 * Unregisters the specified listener from updates of the trust value which
+	 * the identified trustor assigns.
+	 * <p>
+	 * The method has no effect if the specified listener has not been 
+	 * previously registered using the 
+	 * {@link #registerTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId)}
+	 * method.
+	 * 
+	 * @param requestor
+	 *            (required)
+	 * @param listener
+	 *            (required) the listener to unregister from trust update events
+	 * @param trustorId
+	 *            (required) the identifier of the entity which assigns the trust
+	 *            value whose updates to unregister from.
+	 * @throws TrustException if the specified listener cannot be unregistered
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @see #registerTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId)
+	 * @since 1.0
+	 */
+	public void unregisterTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener,
+			final TrustedEntityId trustorId) throws TrustException;
+	
+	/**  
+	 * Registers the specified listener for updates of the trust values
+	 * assigned by the identified trustor to the supplied trustee.
+	 * <p>
+	 * To unregister the specified listener, use the
+	 * {@link #unregisterTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId)}
+	 * method.
+	 * 
+	 * @param requestor
+	 *            (required)
+	 * @param listener
+	 *            (required)
+	 *            the listener to register for trust update events.
+	 * @param trustorId
+	 *            (required) the identifier of the entity which assigns the
+	 *            trust value whose updates to register for.
+	 * @param trusteeId
+	 *            (required) the identifier of the entity whose trust value
+	 *            update events to register for.
+	 * @throws TrustException if the specified listener cannot be registered
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @see #unregisterTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId)
+	 * @since 1.0
+	 */
+	public void registerTrustUpdateListener(final Requestor requestor,
 			final ITrustUpdateEventListener listener, 
 			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
 					throws TrustException;
 	
 	/**
 	 * Unregisters the specified listener from updates of the trust value which
-	 * the identified trustor has assigned to the supplied trustee.
+	 * the identified trustor assigns to the supplied trustee.
 	 * <p>
 	 * The method has no effect if the specified listener has not been 
 	 * previously registered using the 
-	 * {@link #registerTrustUpdateEventListener(ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId)}
+	 * {@link #registerTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId)}
 	 * method.
 	 * 
+	 * @param requestor
+	 *            (required)
 	 * @param listener
-	 *            the listener to unregister from trust update events
+	 *            (required) the listener to unregister from trust update events
 	 * @param trustorId
-	 *            the identifier of the entity which assigns the trust
+	 *            (required) the identifier of the entity which assigns the trust
 	 *            value whose updates to unregister from.
 	 * @param trusteeId
-	 *            the identifier of the entity whose trust value update events
+	 *            (required) the identifier of the entity whose trust value update events
 	 *            to unregister from.
 	 * @throws TrustException if the specified listener cannot be unregistered
 	 * @throws NullPointerException if any of the specified parameters is 
 	 *         <code>null</code>.
-	 * @see #registerTrustUpdateEventListener(ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId)
-	 * @since 0.5
+	 * @see #registerTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId, TrustValueType)
+	 * @since 1.0
 	 */
-	public void unregisterTrustUpdateEventListener(
+	public void unregisterTrustUpdateListener(final Requestor requestor,
 			final ITrustUpdateEventListener listener,
 			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
+					throws TrustException;
+	
+	/**  
+	 * Registers the specified listener for updates of the trust values
+	 * assigned by the identified trustor to the supplied trustee. The type of
+	 * the trust value whose update events to register for is also specified.
+	 * <p>
+	 * To unregister the specified listener, use the
+	 * {@link #unregisterTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId, TrustValueType)}
+	 * method.
+	 * 
+	 * @param requestor
+	 *            (required)
+	 * @param listener
+	 *            (required)
+	 *            the listener to register for trust update events.
+	 * @param trustorId
+	 *            (required) the identifier of the entity which assigns the
+	 *            trust value whose updates to register for.
+	 * @param trusteeId
+	 *            (required) the identifier of the entity whose trust value
+	 *            update events to register for.
+	 * @param trustValueType
+	 *            (required) the type of the trust value, i.e. one of 
+	 *            {@link TrustValueType#DIRECT DIRECT},
+	 *            {@link TrustValueType#INDIRECT INDIRECT}, or
+	 *            {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}.
+	 * @throws TrustException if the specified listener cannot be registered
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @see #unregisterTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId, TrustValueType)
+	 * @since 1.0
+	 */
+	public void registerTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final TrustValueType trustValueType) throws TrustException;
+	
+	/**
+	 * Unregisters the specified listener from updates of the trust value which
+	 * the identified trustor assigns to the supplied trustee.
+	 * <p>
+	 * The method has no effect if the specified listener has not been 
+	 * previously registered using the 
+	 * {@link #registerTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId, TrustValueType)}
+	 * method.
+	 * 
+	 * @param requestor
+	 *            (required)
+	 * @param listener
+	 *            (required) the listener to unregister from trust update events
+	 * @param trustorId
+	 *            (required) the identifier of the entity which assigns the trust
+	 *            value whose updates to unregister from.
+	 * @param trusteeId
+	 *            (required) the identifier of the entity whose trust value update events
+	 *            to unregister from.
+	 * @param trustValueType
+	 *            (required) the type of the trust value, i.e. one of 
+	 *            {@link TrustValueType#DIRECT DIRECT},
+	 *            {@link TrustValueType#INDIRECT INDIRECT}, or
+	 *            {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}.
+	 * @throws TrustException if the specified listener cannot be unregistered
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @see #registerTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId, TrustValueType)
+	 * @since 1.0
+	 */
+	public void unregisterTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener,
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final TrustValueType trustValueType) throws TrustException;
+	
+	/**  
+	 * Registers the specified listener for updates of the trust values
+	 * assigned by the identified trustor to entities of the supplied 
+	 * {@link TrustedEntityType type}. So, for example, if 
+	 * {@link TrustedEntityType#CSS CSS} is specified, then only events related
+	 * with such entities will be received by the specified listener.
+	 * <p>
+	 * To unregister the specified listener, use the
+	 * {@link #unregisterTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustedEntityType)}
+	 * method.
+	 * 
+	 * @param requestor
+	 *            (required)
+	 * @param listener
+	 *            (required) the listener to register for trust update events.
+	 * @param trusteeType
+	 *            (required) the {@link TrustedEntityType type} of the trusted
+	 *            entities to match, e.g. {@link TrustedEntityType#CSS CSS}.
+	 * @throws TrustException if the specified listener cannot be registered
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @see #unregisterTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustedEntityType)
+	 * @since 1.0
+	 */
+	public void registerTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, final TrustedEntityType trusteeType)
+					throws TrustException;
+	
+	/**
+	 * Unregisters the specified listener from updates of the trust value which
+	 * the identified trustor assigns to entities of the supplied 
+	 * {@link TrustedEntityType type}.
+	 * <p>
+	 * The method has no effect if the specified listener has not been 
+	 * previously registered using the 
+	 * {@link #registerTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustedEntityType)}
+	 * method.
+	 * 
+	 * @param requestor
+	 *            (required)
+	 * @param listener
+	 *            (required) the listener to unregister from trust update 
+	 *            events.
+	 * @param trustorId
+	 *            (required) the identifier of the entity which assigns the 
+	 *            trust value whose update events to unregister from.
+	 * @param trusteeType
+	 *            (required) the {@link TrustedEntityType type} of the trusted
+	 *            entities to match, e.g. {@link TrustedEntityType#CSS CSS}; 
+	 *            otherwise <code>null</code> to match all entity types.
+	 * @throws TrustException if the specified listener cannot be unregistered
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @see #registerTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustedEntityType)
+	 * @since 1.0
+	 */
+	public void unregisterTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener,
+			final TrustedEntityId trustorId, final TrustedEntityType trusteeType)
+					throws TrustException;
+	
+	/**  
+	 * Registers the specified listener for updates of the trust values
+	 * assigned by the identified trustor. The type of the trust value whose
+	 * update events to register for is also specified.
+	 * <p>
+	 * To unregister the specified listener, use the
+	 * {@link #unregisterTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustValueType)}
+	 * method.
+	 * 
+	 * @param requestor
+	 *            (required)
+	 * @param listener
+	 *            (required) the listener to register for trust update events.
+	 * @param trustValueType
+	 *            (required) the type of the trust value, i.e. one of 
+	 *            {@link TrustValueType#DIRECT DIRECT},
+	 *            {@link TrustValueType#INDIRECT INDIRECT}, or
+	 *            {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}.
+	 * @throws TrustException if the specified listener cannot be registered
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @see #unregisterTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustValueType)
+	 * @since 1.0
+	 */
+	public void registerTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, 
+			final TrustValueType trustValueType) throws TrustException;
+	
+	/**
+	 * Unregisters the specified listener from updates of the trust value which
+	 * the identified trustor assigns.
+	 * <p>
+	 * The method has no effect if the specified listener has not been 
+	 * previously registered using the 
+	 * {@link #registerTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustValueType)}
+	 * method.
+	 * 
+	 * @param requestor
+	 *            (required)
+	 * @param listener
+	 *            (required) the listener to unregister from trust update 
+	 *            events.
+	 * @param trustorId
+	 *            (required) the identifier of the entity which assigns the 
+	 *            trust value whose update events to unregister from.
+	 * @param trustValueType
+	 *            (required) the type of the trust value, i.e. one of 
+	 *            {@link TrustValueType#DIRECT DIRECT},
+	 *            {@link TrustValueType#INDIRECT INDIRECT}, or
+	 *            {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}.
+	 * @throws TrustException if the specified listener cannot be unregistered
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @see #registerTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustValueType)
+	 * @since 1.0
+	 */
+	public void unregisterTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener,
+			final TrustedEntityId trustorId, 
+			final TrustValueType trustValueType) throws TrustException;
+	
+	/**  
+	 * Registers the specified listener for updates of the trust values
+	 * assigned by the identified trustor to entities of the supplied
+	 * {@link TrustedEntityType type}. Finally, the type of the trust value
+	 * whose update events to register for is also specified.
+	 * <p>
+	 * To unregister the specified listener, use the
+	 * {@link #unregisterTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustedEntityType, TrustValueType)}
+	 * method.
+	 * 
+	 * @param requestor
+	 *            (required)
+	 * @param listener
+	 *            (required) the listener to register for trust update events.
+	 * @param trusteeType
+	 *            (required) the {@link TrustedEntityType type} of the trusted
+	 *            entities to match, e.g. {@link TrustedEntityType#CSS CSS}.
+	 * @param trustValueType
+	 *            (required) the type of the trust value, i.e. one of 
+	 *            {@link TrustValueType#DIRECT DIRECT},
+	 *            {@link TrustValueType#INDIRECT INDIRECT}, or
+	 *            {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}.
+	 * @throws TrustException if the specified listener cannot be registered
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @see #unregisterTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustedEntityType, TrustValueType)
+	 * @since 1.0
+	 */
+	public void registerTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, final TrustedEntityType trusteeType, 
+			final TrustValueType trustValueType)
+					throws TrustException;
+	
+	/**
+	 * Unregisters the specified listener from updates of the trust value which
+	 * the identified trustor assigns.
+	 * <p>
+	 * The method has no effect if the specified listener has not been 
+	 * previously registered using the 
+	 * {@link #registerTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustedEntityType, TrustValueType)}
+	 * method.
+	 * 
+	 * @param requestor
+	 *            (required)
+	 * @param listener
+	 *            (required) the listener to unregister from trust update 
+	 *            events.
+	 * @param trustorId
+	 *            (required) the identifier of the entity which assigns the 
+	 *            trust value whose update events to unregister from.
+	 * @param trusteeType
+	 *            (required) the {@link TrustedEntityType type} of the trusted
+	 *            entities to match, e.g. {@link TrustedEntityType#CSS CSS}.
+	 * @param trustValueType
+	 *            (required) the type of the trust value, i.e. one of 
+	 *            {@link TrustValueType#DIRECT DIRECT},
+	 *            {@link TrustValueType#INDIRECT INDIRECT}, or
+	 *            {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}.
+	 * @throws TrustException if the specified listener cannot be unregistered
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @see #registerTrustUpdateListener(Requestor, ITrustUpdateEventListener, TrustedEntityId, TrustedEntityType, TrustValueType)
+	 * @since 1.0
+	 */
+	public void unregisterTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener,
+			final TrustedEntityId trustorId, final TrustedEntityType trusteeType, 
+			final TrustValueType trustValueType)
 					throws TrustException;
 }

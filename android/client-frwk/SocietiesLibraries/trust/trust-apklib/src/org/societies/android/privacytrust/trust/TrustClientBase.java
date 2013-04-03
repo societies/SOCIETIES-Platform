@@ -42,12 +42,14 @@ import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean;
+import org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
-import org.societies.api.internal.schema.privacytrust.trust.broker.RetrieveTrustBrokerRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.broker.RetrieveTrustBrokerResponseBean;
-import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustValueRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustValueResponseBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
@@ -71,13 +73,15 @@ public class TrustClientBase implements IInternalTrustClient {
 			"trustEvidenceCollectorRequestBean", "trustEvidenceCollectorResponseBean");
 	
 	private static final List<String> NAMESPACES = Arrays.asList(
+			"http://societies.org/api/schema/identity",
             "http://societies.org/api/schema/privacytrust/trust/model",
-			"http://societies.org/api/internal/schema/privacytrust/trust/broker",
+			"http://societies.org/api/schema/privacytrust/trust/broker",
 			"http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector");
 	
 	private static final List<String> PACKAGES = Arrays.asList(
-			"org.societies.api.internal.schema.privacytrust.trust.model",
-			"org.societies.api.internal.schema.privacytrust.trust.broker",
+			"org.societies.api.schema.identity",
+			"org.societies.api.schema.privacytrust.trust.model",
+			"org.societies.api.schema.privacytrust.trust.broker",
 			"org.societies.api.internal.schema.privacytrust.trust.evidence.collector");
 	
 	/** The Client Comm Mgr service reference. */
@@ -105,19 +109,62 @@ public class TrustClientBase implements IInternalTrustClient {
         }
     }
 
+    /*
+     * @see org.societies.android.api.privacytrust.trust.ITrustClient#retrieveTrustValue(java.lang.String, org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean)
+     */
+	@Override
+	public void retrieveTrustValue(final String client,
+			final RequestorBean requestor,
+			final TrustedEntityIdBean trustorId, 
+			final TrustedEntityIdBean trusteeId,
+			final TrustValueTypeBean trustValueType) {
+		
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		this.doRetrieveTrustValue(client, requestor, trustorId, trusteeId, trustValueType);
+	}
+	
 	/*
-	 * @see org.societies.android.api.privacytrust.trust.ITrustClient#retrieveTrust(java.lang.String, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean)
+	 * @see org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient#retrieveTrustValue(java.lang.String, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean)
 	 */
 	@Override
-	public void retrieveTrust(final String client, 
-			final TrustedEntityIdBean trustorId, final TrustedEntityIdBean trusteeId) {
+	public void retrieveTrustValue(final String client,
+			final TrustedEntityIdBean trustorId, 
+			final TrustedEntityIdBean trusteeId,
+			final TrustValueTypeBean trustValueType) {
 		
-		// TODO null checks?
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		this.doRetrieveTrustValue(client, null, trustorId, trusteeId, trustValueType);
+	}
+	
+	private void doRetrieveTrustValue(final String client, 
+			RequestorBean requestor, final TrustedEntityIdBean trustorId,
+			final TrustedEntityIdBean trusteeId,
+			final TrustValueTypeBean trustValueType) {
 		
 		final StringBuilder sb = new StringBuilder();
 		sb.append("Retrieving trust:");
 		sb.append(" client=");
 		sb.append(client);
+		sb.append(", requestor=");
+		sb.append(requestor);
 		sb.append(", trustorId=");
 		sb.append(trustorId.getEntityId());
 		sb.append(", trusteeId=");
@@ -127,14 +174,23 @@ public class TrustClientBase implements IInternalTrustClient {
 		if (this.connectedToComms) {
 			
 			try {
-				final RetrieveTrustBrokerRequestBean retrieveBean = new RetrieveTrustBrokerRequestBean();
+				if (requestor == null) {
+					requestor = new RequestorBean();
+					requestor.setRequestorId(
+							this.clientCommMgr.getIdManager().getThisNetworkNode().getJid());
+					Log.d(TAG, "requestor=" + requestor.getRequestorId());
+				}
+				
+				final TrustValueRequestBean retrieveBean = new TrustValueRequestBean();
+				retrieveBean.setRequestor(requestor);
 				retrieveBean.setTrustorId(trustorId);
 				retrieveBean.setTrusteeId(trusteeId);
+				retrieveBean.setTrustValueType(trustValueType);
 
 				final TrustBrokerRequestBean requestBean = new TrustBrokerRequestBean();
 				requestBean.setMethodName(
-						org.societies.api.internal.schema.privacytrust.trust.broker.MethodName.RETRIEVE);
-				requestBean.setRetrieve(retrieveBean);
+						org.societies.api.schema.privacytrust.trust.broker.MethodName.RETRIEVE_TRUST_VALUE);
+				requestBean.setRetrieveTrustValue(retrieveBean);
 
 				final ICommCallback retrieveTrustCallback = 
 						new TrustClientCommCallback(client, IInternalTrustClient.RETRIEVE_TRUST_VALUE); 
@@ -156,14 +212,41 @@ public class TrustClientBase implements IInternalTrustClient {
 	}
 	
 	/*
-	 * @see org.societies.android.api.privacytrust.trust.ITrustClient#addDirectTrustEvidence(java.lang.String, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean, org.societies.android.api.common.ADate, java.io.Serializable)
+	 * @see org.societies.android.api.privacytrust.trust.ITrustClient#addDirectTrustEvidence(java.lang.String, org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean, org.societies.android.api.common.ADate, java.io.Serializable)
 	 */
 	@Override
 	public void addDirectTrustEvidence(final String client, 
-			final TrustedEntityIdBean subjectId, final TrustedEntityIdBean objectId,
+			final RequestorBean requestor, final TrustedEntityIdBean subjectId,
+			final TrustedEntityIdBean objectId,
 			final TrustEvidenceTypeBean type, final ADate timestamp, 
 			final Serializable info) {
-		/* TODO null checks
+		
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (subjectId == null)
+			throw new NullPointerException("subjectId can't be null");
+		if (objectId == null)
+			throw new NullPointerException("objectId can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+		if (timestamp == null)
+			throw new NullPointerException("timestamp can't be null");
+		
+		this.doAddDirectTrustEvidence(client, null, subjectId, objectId, type, timestamp, info);
+	}
+	
+	/*
+	 * @see org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient#addDirectTrustEvidence(java.lang.String, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean, org.societies.android.api.common.ADate, java.io.Serializable)
+	 */
+	@Override
+	public void addDirectTrustEvidence(final String client, 
+			final TrustedEntityIdBean subjectId, 
+			final TrustedEntityIdBean objectId,
+			final TrustEvidenceTypeBean type, final ADate timestamp, 
+			final Serializable info) {
+		
 		if (client == null)
 			throw new NullPointerException("client can't be null");
 		if (subjectId == null)
@@ -173,12 +256,22 @@ public class TrustClientBase implements IInternalTrustClient {
 		if (type == null)
 			throw new NullPointerException("type can't be null");
 		if (timestamp == null)
-			throw new NullPointerException("timestamp can't be null");*/
+			throw new NullPointerException("timestamp can't be null");
+		
+		this.doAddDirectTrustEvidence(client, null, subjectId, objectId, type, timestamp, info);
+	}
+	
+	private void doAddDirectTrustEvidence(final String client,
+			RequestorBean requestor, final TrustedEntityIdBean subjectId,
+			final TrustedEntityIdBean objectId,	final TrustEvidenceTypeBean type,
+			final ADate timestamp, final Serializable info) {
 		
 		final StringBuilder sb = new StringBuilder();
 		sb.append("Adding direct trust evidence:");
 		sb.append(" client=");
 		sb.append(client);
+		sb.append(", requestor=");
+		sb.append(requestor);
 		sb.append(", subjectId=");
 		sb.append(subjectId.getEntityId());
 		sb.append(", objectId=");
@@ -194,8 +287,16 @@ public class TrustClientBase implements IInternalTrustClient {
 		if (this.connectedToComms) {
 			
 			try {
+				if (requestor == null) {
+					requestor = new RequestorBean();
+					requestor.setRequestorId(
+							this.clientCommMgr.getIdManager().getThisNetworkNode().getJid());
+					Log.d(TAG, "requestor=" + requestor.getRequestorId());
+				}
+				
 				final AddDirectEvidenceRequestBean addEvidenceBean = 
 						new AddDirectEvidenceRequestBean();
+				// 0. TODO requestor
 				// 1. subjectId
 				addEvidenceBean.setSubjectId(subjectId);
 				// 2. objectId
@@ -438,10 +539,10 @@ public class TrustClientBase implements IInternalTrustClient {
 								+ responseBean.getMethodName());
 				switch (responseBean.getMethodName()) {
 				
-				case RETRIEVE:
+				case RETRIEVE_TRUST_VALUE:
 					
-					final RetrieveTrustBrokerResponseBean retrieveBean =
-						responseBean.getRetrieve();
+					final TrustValueResponseBean retrieveBean =
+						responseBean.getRetrieveTrustValue();
 					if (retrieveBean == null) {
 						Log.e(TAG, "Trust Broker retrieve trust bean is null");
 						// TODO error handling

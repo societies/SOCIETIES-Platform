@@ -221,11 +221,11 @@ public class TrustRepository implements ITrustRepository {
 		
 		for (final TrustUpdateEvent event : result.getTrustUpdateEvents()) {
 			final String eventTopic;
-			if (TrustValueType.DIRECT == event.getValueType())
+			if (TrustValueType.DIRECT == event.getTrustRelationship().getTrustValueType())
 				eventTopic = TrustEventTopic.DIRECT_TRUST_UPDATED;
-			else if (TrustValueType.INDIRECT == event.getValueType())
+			else if (TrustValueType.INDIRECT == event.getTrustRelationship().getTrustValueType())
 				eventTopic = TrustEventTopic.INDIRECT_TRUST_UPDATED;
-			else //if (TrustValueType.USER_PERCEIVED == event.getValueType())
+			else //if (TrustValueType.USER_PERCEIVED == event.getTrustRelationship().getTrustValueType())
 				eventTopic = TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED;
 			if (this.trustEventMgr == null) {
 				LOG.error("Could not post TrustUpdateEvent " + event
