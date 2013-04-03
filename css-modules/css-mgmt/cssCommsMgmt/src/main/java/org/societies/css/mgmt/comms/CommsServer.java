@@ -53,6 +53,7 @@ import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequest;
 import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
+import org.societies.api.schema.cssmanagement.FriendEntry;
 import org.societies.utilities.DBC.Dbc;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
@@ -225,6 +226,7 @@ public class CommsServer implements IFeatureServer {
 				break;
 			}
 			
+			CssManagerResultBean resultBean = new CssManagerResultBean();
 			try {
 				switch (bean.getMethod()) {
 				case GET_CSS_FRIENDS:
@@ -232,12 +234,17 @@ public class CommsServer implements IFeatureServer {
 					LOG.debug("Number of actual friends: " + friendsAdsResult.size());
 					break;
 				case SUGGESTED_FRIENDS:
-					friendsAdsResult = new ArrayList<CssAdvertisementRecord>();
 					FriendsFilterDetailsResult = asyncFriendsFilterDetailsResult.get();
 					LOG.debug("Number of suggested friends: " + FriendsFilterDetailsResult.size());
-					for(Entry<CssAdvertisementRecord, Integer> entry : FriendsFilterDetailsResult.entrySet()){
-						friendsAdsResult.add(entry.getKey());	
-						}
+					
+					List<FriendEntry> results = new ArrayList<FriendEntry>();
+					for(Entry<CssAdvertisementRecord, Integer> entry : FriendsFilterDetailsResult.entrySet()) {
+						FriendEntry record = new FriendEntry();
+						record.setKey(entry.getKey());
+						record.setValue(entry.getValue());
+						results.add(record);	
+					}
+					resultBean.setResultSuggestedFriends(results);
 					break;
 				case GET_FRIEND_REQUESTS:
 					friendsAdsResult = asyncFriendsAdsResult.get();
@@ -263,12 +270,10 @@ public class CommsServer implements IFeatureServer {
 			LOG.debug("CSSManager result");
 			LOG.debug("CSSManager remote invocation on thread" + Thread.currentThread()  + " " + Thread.activeCount());
 
-			CssManagerResultBean resultBean = new CssManagerResultBean();
 			resultBean.setResult(result);
 			resultBean.setResultAdvertList(friendsAdsResult);
 			resultBean.setResultAdvertList(friendsAdsResult);
 			resultBean.setResultCssRequestList(RequestResult);
-			
 
 			Dbc.ensure("CSSManager result bean cannot be null", resultBean != null);
 			return resultBean;

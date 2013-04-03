@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.util.DataIdentifierUtils;
@@ -53,8 +55,12 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resourc
  *
  */
 public class ResourceUtilsTest {
+	private static Logger LOG = LoggerFactory.getLogger(ResourceUtilsTest.class.getName());
+	
 	@Test
 	public void testGetDataIdentifier() {
+		String testTitle = "GetDataIdentifier";
+		LOG.info(testTitle);
 		DataIdentifier actualDataId = null;
 		// -- Context data: scheme + type
 		try {
@@ -99,6 +105,8 @@ public class ResourceUtilsTest {
 	
 	@Test
 	public void testEqual() {
+		String testTitle = "Equal";
+		LOG.info(testTitle);
 		Resource resource1 = null;
 		Resource resource2 = null;
 		Action notResource = null;
@@ -127,7 +135,7 @@ public class ResourceUtilsTest {
 		resource2 = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.ABOUT);
 		assertFalse("Different resources should be equal (2)", ResourceUtils.equal(resource1, resource2));
 		assertFalse("Different resources should be equal (inverse) (2)", ResourceUtils.equal(resource2, resource1));
-		resource2 = ResourceUtils.create(DataIdentifierScheme.CONTEXT+"://"+CtxAttributeTypes.ACTION);
+		resource2 = ResourceUtils.create(DataIdentifierScheme.CONTEXT+"://emma.ict-societies.eu/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.ACTION+"/13");
 		assertFalse("Different resources should be equal (2)", ResourceUtils.equal(resource1, resource2));
 		assertFalse("Different resources should be equal (inverse) (2)", ResourceUtils.equal(resource2, resource1));
 		resource2 = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.ACTION);

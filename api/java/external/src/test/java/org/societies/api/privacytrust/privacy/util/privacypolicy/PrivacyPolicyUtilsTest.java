@@ -27,23 +27,25 @@ package org.societies.api.privacytrust.privacy.util.privacypolicy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jetty.util.log.Log;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.util.RequestorUtils;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyBehaviourConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 
@@ -112,7 +114,7 @@ public class PrivacyPolicyUtilsTest {
 		LOG.debug("**** Generated RequestPolicy ****");
 		LOG.debug(RequestPolicyUtils.toXmlString(retrievedPrivacyPolicy));
 		assertEquals("Privacy policy generated (xml) not equal to the original policy", RequestPolicyUtils.toXmlString(privacyPolicy), RequestPolicyUtils.toXmlString(retrievedPrivacyPolicy));
-//		assertTrue("Privacy policy generated not equal to the original policy", RequestPolicyUtils.equal(privacyPolicy, retrievedPrivacyPolicy));
+		//		assertTrue("Privacy policy generated not equal to the original policy", RequestPolicyUtils.equal(privacyPolicy, retrievedPrivacyPolicy));
 	}
 
 	@Test
@@ -134,5 +136,29 @@ public class PrivacyPolicyUtilsTest {
 		privacyPolicy.setRequestItems(requestItems);
 		dataTypes = PrivacyPolicyUtils.getDataTypes(schemeFilter, privacyPolicy);
 		assertNotNull("Data type list of an empty privacy policy should be null", dataTypes);
+	}
+
+	@Test
+	public void testInferCisPrivacyPolicy() {
+		String testTitle = "InferCisPrivacyPolicy: create a pre-privacy policy";
+		LOG.info(testTitle);
+
+		RequestPolicy privacyPolicyPrivate = null;
+		RequestPolicy privacyPolicyMembersOnly = null;
+		RequestPolicy privacyPolicyPublic = null;
+		try {
+			privacyPolicyPrivate = PrivacyPolicyUtils.inferCisPrivacyPolicy(PrivacyPolicyBehaviourConstants.PRIVATE, null);
+			privacyPolicyMembersOnly = PrivacyPolicyUtils.inferCisPrivacyPolicy(PrivacyPolicyBehaviourConstants.MEMBERS_ONLY, null);
+			privacyPolicyPublic = PrivacyPolicyUtils.inferCisPrivacyPolicy(PrivacyPolicyBehaviourConstants.PUBLIC, null);
+		} catch (PrivacyException e) {
+			LOG.error("[Test Exception] "+testTitle, e);
+			fail("Error "+e.getMessage()+": "+testTitle);
+		}
+		assertNotNull("Private privacy policy should not be null", privacyPolicyPrivate);
+		assertNotNull("Members only privacy policy should not be null", privacyPolicyMembersOnly);
+		assertNotNull("Public privacy policy should not be null", privacyPolicyPublic);
+		Log.debug("Private privacy policy: "+PrivacyPolicyUtils.toXacmlString(privacyPolicyPrivate)+"\n*******");
+		Log.debug("Members only privacy policy: "+PrivacyPolicyUtils.toXacmlString(privacyPolicyMembersOnly)+"\n*******");
+		Log.debug("Public privacy policy: "+PrivacyPolicyUtils.toXacmlString(privacyPolicyPublic)+"\n*******");
 	}
 }

@@ -255,7 +255,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	private void buildCriteriaFromDb(){
 		for (String s : membershipCritOnDb) { // loop through all my criterias
 			LOG.warn("on the loop to build criteria with crit = " + s);
-			String[] tokens = s.split(",");
+			String[] tokens = s.split(":");
 			if(tokens == null || tokens.length < 4){
 				LOG.warn("Badly coded criteria on db");
 				return;
@@ -287,11 +287,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 		String s = contextAtribute;
 		if(m.getRule() == null || m.getRule().getOperation() == null || m.getRule().getValues() == null
 				|| m.getRule().getValues().isEmpty()) return false;
-		s +=  "," + m.getRank();
-		s +=  "," + m.getRule().getOperation();
+		s +=  ":" + m.getRank();
+		s +=  ":" + m.getRule().getOperation();
 		LOG.warn("got operation");
 		for(int i=0; i<m.getRule().getValues().size() && i<2; i++){
-			s+=  "," + m.getRule().getValues().get(i);
+			s+=  ":" + m.getRule().getValues().get(i);
 		}
 		LOG.warn("calling the list add inside the add criteria and s = " + s);
 		membershipCritOnDb.add(s);
@@ -311,11 +311,11 @@ public class Cis implements IFeatureServer, ICisOwned {
 		String s = contextAtribute;
 		if(m.getRule() == null || m.getRule().getOperation() == null || m.getRule().getValues() == null
 				|| m.getRule().getValues().isEmpty()) return false;
-		s +=  "," + m.getRank();
-		s +=  "," + m.getRule().getOperation();
+		s +=  ":" + m.getRank();
+		s +=  ":" + m.getRule().getOperation();
 		LOG.warn("got operation");
 		for(int i=0; i<m.getRule().getValues().size() && i<2; i++){
-			s+=  "," + m.getRule().getValues().get(i);
+			s+=  ":" + m.getRule().getValues().get(i);
 		}
 		LOG.warn("calling the list add inside the add criteria and s = " + s);
 		membershipCritOnDb.add(s);
@@ -332,10 +332,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 			String s = contextAtribute;
 			if(m.getRule() == null || m.getRule().getOperation() == null || m.getRule().getValues() == null
 					|| m.getRule().getValues().isEmpty()) return false;
-			s +=  "," + m.getRank();
-			s +=  "," + m.getRule().getOperation();
+			s +=  ":" + m.getRank();
+			s +=  ":" + m.getRule().getOperation();
 			for(int i=0; i<m.getRule().getValues().size() && i<2; i++){
-				s+=  "," + m.getRule().getValues().get(i);
+				s+=  ":" + m.getRule().getValues().get(i);
 			}
 			if( membershipCritOnDb.remove(s) != true) return false;
 			this.updatePersisted(this);
