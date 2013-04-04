@@ -69,9 +69,9 @@ public class AcknackPopup extends Activity{
 		Bundle bundle = intent.getExtras();
 		eventInfo = bundle.getParcelable(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY);
 		
-		TextView txtView = (TextView) findViewById(R.id.textView1);
+		TextView txtView = (TextView) findViewById(R.id.ackNackProposalText);
 		txtView.setText(eventInfo.getProposalText());
-		LinearLayout layout = (LinearLayout) findViewById(R.id.linearLayout1);
+		LinearLayout layout = (LinearLayout) findViewById(R.id.ackNackInnerLinearLayout);
 
 		for (String option: eventInfo.getOptions()){
 			Button button = new Button(this);
