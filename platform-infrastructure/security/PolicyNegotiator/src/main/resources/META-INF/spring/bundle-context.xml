@@ -40,6 +40,45 @@
 		</property>
 	</bean>
 
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+
+		<property name="dataSource" ref="dataSource" />
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.show_sql">${show_sql:false}</prop>
+				<prop key="hibernate.cache.use_second_level_cache">${cache.use_second_level_cache:false}</prop>
+				<prop key="hibernate.hbm2ddl.auto">${hbm2ddl.auto:update}</prop>
+				<prop key="hibernate.format_sql">${format_sql:true}</prop>
+			</props>
+		</property>
+
+		<property name="annotatedClasses">
+			<list>
+				<value>org.societies.security.model.Foo</value>
+			</list>
+		</property>
+
+		<property name="annotatedPackages">
+			<list>
+				<value>org.societies.security.model</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- enable the configuration of transactional behavior based on annotations -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+
+	<bean id="fooDao" class="org.societies.security.dao.FooDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
 	<bean id="ProviderServiceMgr"
 		class="org.societies.security.policynegotiator.provider.ProviderServiceMgr"
 		>
@@ -57,6 +96,7 @@
         <property name="signatureMgr" ref="SignatureMgr"/>
         <property name="slaSignatureMgr" ref="SlaSignatureMgr"/>
         <property name="providerServiceMgr" ref="ProviderServiceMgr"/>
+        <property name="fooDao" ref="fooDao"/>
 	</bean>
 
 	<bean id="NegotiationRequester"

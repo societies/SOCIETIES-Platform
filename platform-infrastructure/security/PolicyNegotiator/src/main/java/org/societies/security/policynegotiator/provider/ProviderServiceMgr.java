@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.hibernate.SessionFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
@@ -60,6 +62,8 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
 	private static Logger LOG = LoggerFactory.getLogger(ProviderServiceMgr.class);
 
+	private SessionFactory sessionFactory;
+	
 	private IClientJarServerRemote clientJarServer;
 	private ISignatureMgr signatureMgr;
 	private INegotiationProviderRemote groupMgr;

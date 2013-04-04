@@ -60,7 +60,7 @@ public class NegotiationProviderUnitTest {
 		classUnderTest = new NegotiationProvider();
 		classUnderTest.setGroupMgr(groupMgrMock);
 		classUnderTest.setSignatureMgr(signatureMgrMock);
-		classUnderTest.init();
+		//classUnderTest.init();
 	}
 
 	/**

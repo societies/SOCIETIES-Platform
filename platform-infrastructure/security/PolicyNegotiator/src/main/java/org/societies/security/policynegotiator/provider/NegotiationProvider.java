@@ -44,6 +44,8 @@ import org.societies.api.internal.schema.security.policynegotiator.NegotiationTy
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
+import org.societies.security.dao.FooDao;
+import org.societies.security.model.Foo;
 import org.societies.security.policynegotiator.sla.SLA;
 import org.societies.security.policynegotiator.sla.Session;
 import org.societies.security.policynegotiator.sla.SopResource;
@@ -61,6 +63,7 @@ public class NegotiationProvider implements INegotiationProvider {
 	private ISlaSignatureMgr slaSignatureMgr;
 	private INegotiationProviderRemote groupMgr;
 	private ProviderServiceMgr providerServiceMgr;
+	private FooDao fooDao;
 	
 	/**
 	 * Negotiation sessions
@@ -80,12 +83,35 @@ public class NegotiationProvider implements INegotiationProvider {
 	}
 	
 //	@PostConstruct
-	public void init() {
+	public void init() throws Exception {
 		
 		//LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "xmlNodeId", "identity"));
 		//LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
 		
 		LOG.debug("init()");
+		
+		Foo foo = new Foo("juhu");
+		List<Foo> fooList;
+		
+		fooList = fooDao.getAll();
+		LOG.info("size of list = {}", fooList.size());
+		
+		fooDao.write(foo);
+		fooList = fooDao.getAll();
+		LOG.info("size of list = {}", fooList.size());
+		
+		foo.setStr("juhu3");
+		fooDao.update(foo);
+		fooList = fooDao.getAll();
+		LOG.info("size of list = {}", fooList.size());
+		for (Foo f : fooList) {
+			LOG.debug("id = {}, str = {}", f.getId(), f.getStr());
+		}
+
+		fooDao.delete(foo);
+		LOG.info("size of list = {}", fooList.size());
+
+		LOG.debug("init() end");
 	}
 	
 	// Getters and setters for beans
@@ -117,6 +143,20 @@ public class NegotiationProvider implements INegotiationProvider {
 		this.providerServiceMgr = providerServiceMgr;
 	}
 	
+	/**
+	 * @return the fooDao
+	 */
+	public FooDao getFooDao() {
+		return fooDao;
+	}
+
+	/**
+	 * @param fooDao the fooDao to set
+	 */
+	public void setFooDao(FooDao fooDao) {
+		this.fooDao = fooDao;
+	}
+
 	private SlaBean createSlaBean(boolean success, int sessionId, String sla) {
 		
 		SlaBean bean = new SlaBean();
