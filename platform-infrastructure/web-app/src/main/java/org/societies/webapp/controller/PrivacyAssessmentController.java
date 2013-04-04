@@ -35,7 +35,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.RequestScoped;
 import javax.validation.Valid;
 
 import org.jfree.chart.ChartFactory;
@@ -60,11 +61,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 
-@ManagedBean(name = "privacyAssessment")
-@SessionScoped
-public class PrivacyAssessmentController {
+@ManagedBean(name = "assessmentController")
+@RequestScoped
+public class PrivacyAssessmentController extends BasePageController {
 
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyAssessmentController.class);
+	private static final long serialVersionUID = 1073106046087768688L;
+
+//	private static Logger log = LoggerFactory.getLogger(PrivacyAssessmentController.class);
 	
 	private static final String RESULT = "result";
 
@@ -150,7 +153,7 @@ public class PrivacyAssessmentController {
 				//return (String[]) obj;
 				String[] labelsStr = new String[obj.length];
 				for (int k = 0; k < obj.length; k++) {
-					LOG.debug("obj2str: obj[{}] = {}", k, obj[k]);
+					log.debug("obj2str: obj[{}] = {}", k, obj[k]);
 					labelsStr[k] = (String) obj[k];
 				}
 				return labelsStr;
@@ -158,27 +161,27 @@ public class PrivacyAssessmentController {
 			else if (IIdentity.class.isAssignableFrom(clazz)) {
 				String[] labelsStr = new String[obj.length];
 				for (int k = 0; k < obj.length; k++) {
-					LOG.debug("obj2str: obj[{}] = {}", k, obj[k]);
+					log.debug("obj2str: obj[{}] = {}", k, obj[k]);
 					labelsStr[k] = obj[k] == null ? null : ((IIdentity) obj[k]).getJid();
 				}
 				return labelsStr;
 			}
 			else {
-				LOG.warn("Unsupported class: {}", clazz.getName());
+				log.warn("Unsupported class: {}", clazz.getName());
 				return new String[0];
 			}
 		}
 
 		public double[] getData() {
 			for (double d : data) {
-				LOG.debug("getData(): {}", d);
+				log.debug("getData(): {}", d);
 			}
 			return data;
 		}
 
 		public String[] getLabels() {
 			for (String s : labels) {
-				LOG.debug("getLabels(): {}", s);
+				log.debug("getLabels(): {}", s);
 			}
 			return labels;
 		}
@@ -187,7 +190,7 @@ public class PrivacyAssessmentController {
 	/**
 	 * OSGI service get auto injected
 	 */
-	@Autowired
+	@ManagedProperty(value = "#{PrivacyAssessment}")
 	private IAssessment assessment;
 	
 	public IAssessment getAssessment() {
@@ -195,14 +198,14 @@ public class PrivacyAssessmentController {
 	}
 
 	public void setAssessment(IAssessment sdService) {
-		LOG.debug("setAssessment()");
+		log.debug("setAssessment()");
 		this.assessment = sdService;
 	}
 
 	@RequestMapping(value = "/" + PageNames.PRIVACY_ASSESSMENT + ".html", method = RequestMethod.GET)
 	public ModelAndView privacyAssessment() {
 
-		LOG.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP GET");
+		log.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP GET");
 
 		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 		Map<String, Object> model = new HashMap<String, Object>();
@@ -238,23 +241,23 @@ public class PrivacyAssessmentController {
 	public ModelAndView privacyAssessment(@Valid PrivacyAssessmentForm assForm,
 			BindingResult result, Map model) {
 
-		LOG.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST");
+		log.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST");
 
 		if (result.hasErrors()) {
-			LOG.warn("BindingResult has errors");
+			log.warn("BindingResult has errors");
 			model.put(RESULT, "privacy assessment form error");
 			return new ModelAndView(PageNames.PRIVACY_ASSESSMENT, model);
 		}
 
 		if (assessment == null) {
-			LOG.warn("Privacy Assessment Service reference not avaiable");
+			log.warn("Privacy Assessment Service reference not avaiable");
 			model.put("errormsg", "Privacy Assessment Service reference not avaiable");
 			return new ModelAndView("error", model);
 		}
 
 		String presentationFormat = assForm.getPresentationFormat();
 		String subjectType = assForm.getAssessmentSubjectType();
-		LOG.debug("presentationFormat = {}, subjectType = {}", presentationFormat, subjectType);
+		log.debug("presentationFormat = {}, subjectType = {}", presentationFormat, subjectType);
 		Collection<PrivacyAssessmentForm> charts = new ArrayList<PrivacyAssessmentForm>();
 		
 		if (presentationFormat.equalsIgnoreCase(Presentation.Format.CHART)) {
@@ -276,7 +279,7 @@ public class PrivacyAssessmentController {
 				Map<IIdentity, Integer> identities;
 				identities = assessment.getNumDataTransmissionEventsForAllReceivers(
 						new Date(0), new Date());
-				LOG.debug("Number of identities data has been transmitted to: {}", identities.size());
+				log.debug("Number of identities data has been transmitted to: {}", identities.size());
 				plotData = new PlotData[] {mapToArrays(identities)};
 				plotDataLabels = new String[] {"data"};
 			}
@@ -294,16 +297,16 @@ public class PrivacyAssessmentController {
 				double[][] data = new double[2][size];
 				Iterator<IIdentity> iterator = assResult.keySet().iterator();
 				
-				LOG.debug("privacyAssessment(): size = {}", size);
+				log.debug("privacyAssessment(): size = {}", size);
 				
 				for (int k = 0; k < size; k++) {
 					labels[k] = iterator.next();
 					data[0][k] = assResult.get(labels[k]).getCorrWithDataAccessBySender();
 					data[1][k] = assResult.get(labels[k]).getCorrWithDataAccessByAll();
 					
-					LOG.debug("privacyAssessment(): label[{}] = {}", k, labels[k]);
-					LOG.debug("privacyAssessment(): data[0][{}] = {}", k, data[0][k]);
-					LOG.debug("privacyAssessment(): data[1][{}] = {}", k, data[1][k]);
+					log.debug("privacyAssessment(): label[{}] = {}", k, labels[k]);
+					log.debug("privacyAssessment(): data[0][{}] = {}", k, data[0][k]);
+					log.debug("privacyAssessment(): data[1][{}] = {}", k, data[1][k]);
 				}
 				
 				plotData = new PlotData[] {
@@ -329,16 +332,16 @@ public class PrivacyAssessmentController {
 				double[][] data = new double[2][size];
 				Iterator<String> iterator = assResult.keySet().iterator();
 				
-				LOG.debug("privacyAssessment(): size = {}", size);
+				log.debug("privacyAssessment(): size = {}", size);
 
 				for (int k = 0; k < size; k++) {
 					labels[k] = iterator.next();
 					data[0][k] = assResult.get(labels[k]).getCorrWithDataAccessBySender();
 					data[1][k] = assResult.get(labels[k]).getCorrWithDataAccessByAll();
 					
-					LOG.debug("privacyAssessment(): label[{}] = {}", k, labels[k]);
-					LOG.debug("privacyAssessment(): data[0][{}] = {}", k, data[0][k]);
-					LOG.debug("privacyAssessment(): data[1][{}] = {}", k, data[1][k]);
+					log.debug("privacyAssessment(): label[{}] = {}", k, labels[k]);
+					log.debug("privacyAssessment(): data[0][{}] = {}", k, data[0][k]);
+					log.debug("privacyAssessment(): data[1][{}] = {}", k, data[1][k]);
 				}
 				
 				plotData = new PlotData[] {
@@ -358,7 +361,7 @@ public class PrivacyAssessmentController {
 
 				Map<String, Integer> dataAccessClasses;
 				dataAccessClasses = assessment.getNumDataAccessEventsForAllClasses(new Date(0), new Date());
-				LOG.debug("Number of data access events (by class): {}", dataAccessClasses.size());
+				log.debug("Number of data access events (by class): {}", dataAccessClasses.size());
 				plotData = new PlotData[] {mapToArrays(dataAccessClasses)};
 				plotDataLabels = new String[] {"data"};
 			}
@@ -370,12 +373,12 @@ public class PrivacyAssessmentController {
 
 				Map<IIdentity, Integer> identities;
 				identities = assessment.getNumDataAccessEventsForAllIdentities(new Date(0), new Date());
-				LOG.debug("Number of data access events (by identity): {}", identities.size());
+				log.debug("Number of data access events (by identity): {}", identities.size());
 				plotData = new PlotData[] {mapToArrays(identities)};
 				plotDataLabels = new String[] {"data"};
 			}
 			else {
-				LOG.warn("Unexpected {}: {}", Presentation.SubjectTypes.class.getSimpleName(), subjectType);
+				log.warn("Unexpected {}: {}", Presentation.SubjectTypes.class.getSimpleName(), subjectType);
 				return privacyAssessment();
 			}
 			
@@ -391,7 +394,7 @@ public class PrivacyAssessmentController {
 //			charts.add(form2);
 			model.put("assessmentResults", charts);
 
-			LOG.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST end");
+			log.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST end");
 			return new ModelAndView(PageNames.PRIVACY_ASSESSMENT_CHART, model);
 		}
 		else if (presentationFormat.equalsIgnoreCase(Presentation.Format.TABLE)) {
@@ -400,11 +403,11 @@ public class PrivacyAssessmentController {
 			assResult = assessment.getAssessmentAllClasses();
 			model.put("assessmentResults", assResult.values());
 
-			LOG.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST end");
+			log.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST end");
 			return new ModelAndView(PageNames.PRIVACY_ASSESSMENT_TABLE, model);
 		}
 		else {
-			LOG.warn("Unexpected {}: {}", Presentation.Format.class.getSimpleName(), presentationFormat);
+			log.warn("Unexpected {}: {}", Presentation.Format.class.getSimpleName(), presentationFormat);
 			return privacyAssessment();
 		}
 	}
@@ -477,14 +480,14 @@ public class PrivacyAssessmentController {
 			File file = new File(contextPath + filename);
 			ChartUtilities.saveChartAsPNG(file, chart, width, height);
 		} catch(IOException e) {
-			LOG.warn("createBarchart(): ", e);
+			log.warn("createBarchart(): ", e);
 		}
 	}
 	
 	@RequestMapping(value = "/" + PageNames.PRIVACY_ASSESSMENT_SETTINGS + ".html", method = RequestMethod.GET)
 	public ModelAndView privacyAssessmentSettings() {
 
-		LOG.debug(PageNames.PRIVACY_ASSESSMENT_SETTINGS + " HTTP GET");
+		log.debug(PageNames.PRIVACY_ASSESSMENT_SETTINGS + " HTTP GET");
 
 		//CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 		Map<String, Object> model = new HashMap<String, Object>();
@@ -506,23 +509,23 @@ public class PrivacyAssessmentController {
 	public ModelAndView privacyAssessmentSettings(@Valid PrivacyAssessmentForm assForm,
 			BindingResult result, Map model) {
 
-		LOG.debug(PageNames.PRIVACY_ASSESSMENT_SETTINGS + " HTTP POST");
+		log.debug(PageNames.PRIVACY_ASSESSMENT_SETTINGS + " HTTP POST");
 
 		if (result.hasErrors()) {
-			LOG.warn("BindingResult has errors");
+			log.warn("BindingResult has errors");
 			model.put(RESULT, "privacy assessment form error");
 			return new ModelAndView("error", model);
 		}
 
 		if (assessment == null) {
-			LOG.warn("Privacy Assessment Service reference not avaiable");
+			log.warn("Privacy Assessment Service reference not avaiable");
 			model.put("errormsg", "Privacy Assessment Service reference not avaiable");
 			return new ModelAndView("error", model);
 		}
 
 		int autoAssessmentPeriod = assForm.getAutoReassessmentInSecs();
 		boolean assessNow = assForm.isAssessNow();
-		LOG.debug("autoReassessmentInSecs = {}, assessNow = {}", autoAssessmentPeriod, assessNow);
+		log.debug("autoReassessmentInSecs = {}, assessNow = {}", autoAssessmentPeriod, assessNow);
 		
 		try {
 			if (assessNow) {
@@ -536,10 +539,10 @@ public class PrivacyAssessmentController {
 		}
 		catch (Exception ex)
 		{
-			LOG.warn("", ex);
+			log.warn("", ex);
 		};
 
-		LOG.debug(PageNames.PRIVACY_ASSESSMENT_SETTINGS + " HTTP POST end");
+		log.debug(PageNames.PRIVACY_ASSESSMENT_SETTINGS + " HTTP POST end");
 		return privacyAssessment();
 	}
 }
