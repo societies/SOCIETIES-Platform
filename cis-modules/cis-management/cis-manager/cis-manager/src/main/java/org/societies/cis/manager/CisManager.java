@@ -64,6 +64,7 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
@@ -145,8 +146,19 @@ public class CisManager implements ICisManager, IFeatureServer {
 	private boolean privacyPolicyNegotiationIncluded;
     private IActivityFeedManager iActivityFeedManager;
     private IActivityFeed cssActivityFeed;
+    private ICssDirectoryRemote cssDirectoryRemote;
     
-    public IActivityFeedManager getiActivityFeedManager() {
+    /**@return the cssDirectoryRemote */
+	public ICssDirectoryRemote getCssDirectoryRemote() {
+		return cssDirectoryRemote;
+	}
+
+	/**@param cssDirectoryRemote the cssDirectoryRemote to set */
+	public void setCssDirectoryRemote(ICssDirectoryRemote cssDirectoryRemote) {
+		this.cssDirectoryRemote = cssDirectoryRemote;
+	}
+
+	public IActivityFeedManager getiActivityFeedManager() {
 		return iActivityFeedManager;
 	}
 
@@ -223,7 +235,7 @@ public class CisManager implements ICisManager, IFeatureServer {
 	
 	public void startup(){
 		//ActivityFeed ret = null;
-	
+		
 		Session session = sessionFactory.openSession();
 		try{
 			this.ownedCISs = session.createCriteria(Cis.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
@@ -256,14 +268,15 @@ public class CisManager implements ICisManager, IFeatureServer {
 					e.printStackTrace();
 				}
 			}
-	     }
+			element.setCssDirectoryRemote(this.cssDirectoryRemote);
+	    }
 		
 		//START UP THE ISUBSCRIBED INTERFACE FOR EACH COMMUNITY I'M A MEMBER OF
 		Iterator<CisSubscribedImp> i = this.subscribedCISs.iterator();		 
 		while(i.hasNext()){
 			CisSubscribedImp element = i.next();
-			 element.startAfterDBretrieval(this);
-	    }
+			element.startAfterDBretrieval(this);
+		}
 		
 		//CREATE THE CSS MANAGER ACTIVITY FEED
 		try {

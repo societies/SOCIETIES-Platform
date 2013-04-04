@@ -149,7 +149,7 @@ var	SocietiesCISListService = {
 					var tableEntry = "<li id=\"li" + data[i].published + "\"><a href=\"#\" onclick=\"return false;\">" +
 									 "<h2>"+ actorStr + "</h2>" +
 						 	 		 "<p>" + data[i].verb  + " " + data[i].object + "</p>" +
-						 	 		"<p class=\"ui-li-aside\">" + hours + ":" + minutes + " " + suffix + "</p>" + 
+						 	 		 "<p class=\"ui-li-aside\">" + hours + ":" + minutes + " " + suffix + "</p>" + 
 						 	 		 "</a>" + deleteTag + "</li>";
 					$('ul#cis_activity_feed').append(tableEntry);
 				}
@@ -270,8 +270,9 @@ var	SocietiesCISListService = {
 			
 			for (i  = 0; i < data.length; i++) {
 				//TODO: NEED TO GET NAME ADDED TO PARTICIPANT OBJECT. ONLY HAVE JID!
-				var n=data[i].jid.indexOf(".");
-				var identityStr = data[i].jid.substring(0, n);
+				//var n=data[i].jid.indexOf(".");
+				//var identityStr = data[i].jid.substring(0, n);
+				var identityStr = data[i].value;
 				//SEND FRIEND REQUEST LINK
 				var friendRequestATag = '<a href="#" onclick="SocietiesCISListService.sendFriendRequest(\'' + identityStr + '\', \'' + data[i].jid + '\', ' + i + ')">',
 					friendRequestATagClose = "</a>";
@@ -285,9 +286,11 @@ var	SocietiesCISListService = {
 					}
 				}
 				//TABLE ENTRY
-				var tableEntry = '<li id="li' + i + '">' + friendRequestATag + 
-								 '<h2>'+ data[i].jid + '</h2>' + 
-								 '<p>' + data[i].role  + '</p>' + friendRequestATagClose + removeMember + '</li>';
+				var tableEntry = '<li id="li' + i + '">' + friendRequestATag +
+								 '<img src="images/profile_pic.png" id="' + data[i].jid + '"/>' +
+								 '<h2>'+ data[i].value + '</h2>' +
+								 '<p class="ui-li-aside">' + data[i].role + '</p>' +
+								 '<p>' + data[i].jid  + '</p>' + friendRequestATagClose + removeMember + '</li>';
 				$('ul#cis_members').append(tableEntry);
 			}
 			$('ul#cis_members').listview('refresh');
