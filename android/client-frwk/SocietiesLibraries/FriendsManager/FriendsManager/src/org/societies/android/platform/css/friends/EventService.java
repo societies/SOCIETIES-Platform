@@ -246,8 +246,7 @@ public class EventService extends Service {
 
     private void addNotification(String description, String eventType, CssAdvertisementRecord advert) {
     	//CREATE ANDROID NOTIFICATION
-		int notifierflags [] = new int [1];
-		notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
+    	int notifierflags[] = new int[] {Notification.DEFAULT_SOUND, Notification.DEFAULT_VIBRATE, Notification.FLAG_AUTO_CANCEL};
 		AndroidNotifier notifier = new AndroidNotifier(EventService.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
 		
 		//CREATE INTENT FOR LAUNCHING ACTIVITY
@@ -260,8 +259,7 @@ public class EventService extends Service {
 
     private void addNotificationAccept(String description, String eventType, CssAdvertisementRecord advert) {
     	//CREATE ANDROID NOTIFICATION
-		int notifierflags [] = new int [1];
-		notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
+		int notifierflags[] = new int[] {Notification.DEFAULT_SOUND, Notification.DEFAULT_VIBRATE, Notification.FLAG_AUTO_CANCEL};
 		AndroidNotifier notifier = new AndroidNotifier(EventService.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
 		
 		//CREATE INTENT FOR LAUNCHING ACTIVITY
