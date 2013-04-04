@@ -23,7 +23,7 @@ public class LMDataEncoding {
 		String symbolicLocationString = "";
 		for (IZone zone : userLocation.getZones()){
 			if (!isRootZone(zone)){
-				symbolicLocationString += "("+zone.getId().getId()+"," + zone.getName()+")";
+				symbolicLocationString += "("+zone.getId().getId()+"." + zone.getName()+")";
 			}
 		}
 		return symbolicLocationString;
