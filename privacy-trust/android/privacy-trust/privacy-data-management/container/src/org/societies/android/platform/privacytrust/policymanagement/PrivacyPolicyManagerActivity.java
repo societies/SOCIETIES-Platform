@@ -29,6 +29,7 @@ import java.util.List;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.android.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
+import org.societies.android.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
 import org.societies.android.platform.privacytrust.R;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService.LocalBinder;
@@ -99,13 +100,13 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 				txtLocation.setText("Waiting");
 				RequestorCisBean owner = new RequestorCisBean();
 				owner.setRequestorId("university.societies.local");
-				owner.setCisRequestorId("cis-aa667d2a-9330-4d44-8c0d-c7d2df32a782.societies.local");
+				owner.setCisRequestorId("cis-c9140e94-bdc5-4644-b2ad-2bc10198d89c.societies.local");
 				if (R.id.btnLaunchTest1 == view.getId()) {
 					privacyPolicyManagerService.getPrivacyPolicy(this.getPackageName(), owner);
 				}
 				if (R.id.btnLaunchTest1bis == view.getId()) {
 					owner.setRequestorId("emma.societies.local");
-					owner.setCisRequestorId("cis-0ba9b78b-611d-4f45-ab04-87934edba84a.societies.local");
+					owner.setCisRequestorId("cis-a1fcced7-fae7-4253-a44f-27a281811ca1.societies.local");
 					privacyPolicyManagerService.getPrivacyPolicy(this.getPackageName(), owner);
 				}
 				else if (R.id.btnLaunchTest2 == view.getId() || R.id.btnLaunchTest3 == view.getId()) {
@@ -117,21 +118,9 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 						txtLocation.setText("Hum, but there is no default privacy policy");
 					}
 					else {
-						RequestItem requestItem = new RequestItem();
-						Resource resource = new Resource();
-						resource.setScheme(DataIdentifierScheme.CIS);
-						resource.setDataType("member-list");
-						requestItem.setResource(resource);
-						List<RequestItem> requestItemList = retrievedPrivacyPolicy.getRequestItems();
-						requestItemList.add(requestItem);
-						retrievedPrivacyPolicy.setRequestItems(requestItemList);
-						if (R.id.btnLaunchTest2 == view.getId()) {
-							privacyPolicyManagerService.updatePrivacyPolicy(this.getPackageName(), retrievedPrivacyPolicy);
-						}
-						else {
-							retrievedPrivacyPolicy.setRequestor(null);
-							privacyPolicyManagerService.updatePrivacyPolicy(this.getPackageName(), PrivacyPolicyUtils.toXmlString(retrievedPrivacyPolicy), owner);
-						}
+						RequestPolicy newPrivacyPolicy = PrivacyPolicyUtils.inferCisPrivacyPolicy(PrivacyPolicyBehaviourConstants.MEMBERS_ONLY, null);
+						newPrivacyPolicy.setRequestor(owner);
+						privacyPolicyManagerService.updatePrivacyPolicy(this.getPackageName(), retrievedPrivacyPolicy);
 					}
 				}
 				else if (R.id.btnLaunchTest4 == view.getId()) {
@@ -184,7 +173,7 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 		}
 		else if (R.id.btnConnect == v.getId()) {
 			Log.d(TAG, "Not implemented yet.");
-//			clientCommManager.login();
+			//			clientCommManager.login();
 		}
 		else if (R.id.btnReset == v.getId()) {
 			onButtonResetClick(v);
@@ -256,7 +245,7 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 			getApplicationContext().unbindService(inProcessServiceConnection);
 		}
 		// -- Logout
-//		clientCommManager.logout();
+		//		clientCommManager.logout();
 	}
 
 	private ServiceConnection inProcessServiceConnection = new ServiceConnection() {

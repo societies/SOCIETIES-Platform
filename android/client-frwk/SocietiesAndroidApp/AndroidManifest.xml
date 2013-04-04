@@ -88,6 +88,7 @@
                 <action android:name="org.societies.android.platform.cis.CisSubscribedRemote" />
    			</intent-filter>
    		</service>
+        <service android:name="org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService" />
         <service android:name="org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService" />
         <service android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidLocal" />
         <service

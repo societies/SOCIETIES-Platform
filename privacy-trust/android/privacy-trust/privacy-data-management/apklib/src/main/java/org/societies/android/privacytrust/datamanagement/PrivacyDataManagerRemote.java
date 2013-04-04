@@ -82,6 +82,7 @@ public class PrivacyDataManagerRemote {
 		clientCommManager = new ClientCommunicationMgr(context, true);
 		intentSender = new PrivacyDataIntentSender(context);
 		remoteReady = false;
+		bindToComms();
 	}
 
 	
@@ -91,6 +92,7 @@ public class PrivacyDataManagerRemote {
 		String action = MethodType.CHECK_PERMISSION.name();
 		try {
 			// -- Verify status
+			bindToComms();
 			if (!checkRemoteStatus(clientPackage, action)) {
 				return;
 			}
@@ -111,7 +113,7 @@ public class PrivacyDataManagerRemote {
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Sent stanza PrivacyDataManagerBean: "+action);
 		} catch (Exception e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(TAG, "Unexepected error: "+(null != e ? e.getMessage() : ""));
 			intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
 		}
 	}
@@ -122,6 +124,7 @@ public class PrivacyDataManagerRemote {
 		String action = MethodType.OBFUSCATE_DATA.name();
 		try {
 			// -- Verify status
+			bindToComms();
 			if (!checkRemoteStatus(clientPackage, action)) {
 				return;
 			}
@@ -141,7 +144,7 @@ public class PrivacyDataManagerRemote {
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Sent stanza PrivacyDataManagerBean: "+action);
 		} catch (Exception e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(TAG, "Unexepected error: "+(null != e ? e.getMessage() : ""));
 			intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
 		}
 	}
@@ -174,10 +177,17 @@ public class PrivacyDataManagerRemote {
 								PrivacyDataManagerRemote.this.context.sendBroadcast(intent);
 							}
 							@Override
-							public void returnAction(String result) { }
+							public void returnAction(String result) {
+								Log.d(TAG, "Register to comm: " + result);
+							}
 							@Override
 							public void returnException(String result) {
-								// TODO Auto-generated method stub
+								Log.e(TAG, "Error during comm registration: " + result);
+								remoteReady = false;
+								//SEND INTENT WITH SERVICE STARTED STATUS
+								Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+								intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, remoteReady);
+								PrivacyDataManagerRemote.this.context.sendBroadcast(intent);
 							}
 
 						});

@@ -78,10 +78,12 @@ public class PrivacyPolicyManagerRemote {
 
 	
 	public PrivacyPolicyManagerRemote(Context context)  {
+		Log.d(TAG, "PrivacyPolicyManagerRemote Constructor");
 		this.context = context;
 		clientCommManager = new ClientCommunicationMgr(context, true);
 		intentSender = new PrivacyPolicyIntentSender(context);
 		remoteReady = false;
+		bindToComms();
 	}
 
 
@@ -89,6 +91,7 @@ public class PrivacyPolicyManagerRemote {
 		String action = MethodType.GET_PRIVACY_POLICY.name();
 		try {
 			// -- Verify status
+			bindToComms();
 			if (!checkRemoteStatus(clientPackage, action)) {
 				return false;
 			}
@@ -107,17 +110,17 @@ public class PrivacyPolicyManagerRemote {
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::"+action);
 		} catch (InvalidFormatException e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(TAG, "Unexepected invalid format error: "+(null != e ? e.getMessage() : ""));
 			intentSender.sendIntentError(clientPackage, action, "Error: don't know who to contact");
 			return false;
 		}
 		catch (CommunicationException e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(TAG, "Unexepected comm error: "+(null != e ? e.getMessage() : ""));
 			intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
 			return false;
 		}
 		catch (Exception e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(TAG, "Unexepected error: "+(null != e ? e.getMessage() : ""));
 			intentSender.sendIntentError(clientPackage, action, "Unknown remote remote");
 			return false;
 		} 
@@ -138,6 +141,7 @@ public class PrivacyPolicyManagerRemote {
 		String action = MethodType.UPDATE_PRIVACY_POLICY.name();
 		try {
 			// -- Verify status
+			bindToComms();
 			if (!checkRemoteStatus(clientPackage, action)) {
 				return false;
 			}
@@ -167,6 +171,7 @@ public class PrivacyPolicyManagerRemote {
 		String action = MethodType.DELETE_PRIVACY_POLICY.name();
 		try {
 			// -- Verify status
+			bindToComms();
 			if (!checkRemoteStatus(clientPackage, action)) {
 				return false;
 			}
@@ -185,7 +190,7 @@ public class PrivacyPolicyManagerRemote {
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::" + action);
 		} catch (Exception e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(TAG, "Unexepected error: "+(null != e ? e.getMessage() : ""));
 			intentSender.sendIntentError(clientPackage, MethodType.DELETE_PRIVACY_POLICY.name(), "Error during the sending of remote request");
 			return false;
 		}
@@ -216,11 +221,17 @@ public class PrivacyPolicyManagerRemote {
 								context.sendBroadcast(intent);
 							}
 							@Override
-							public void returnAction(String result) { }
+							public void returnAction(String result) {
+								Log.d(TAG, "Register to comm: " + result);
+							}
 							@Override
 							public void returnException(String result) {
-								// TODO Auto-generated method stub
-					
+								Log.e(TAG, "Error during comm registration: " + result);
+								remoteReady = false;
+								//SEND INTENT WITH SERVICE STARTED STATUS
+								Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+								intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, remoteReady);
+								context.sendBroadcast(intent);
 							}
 
 						});
