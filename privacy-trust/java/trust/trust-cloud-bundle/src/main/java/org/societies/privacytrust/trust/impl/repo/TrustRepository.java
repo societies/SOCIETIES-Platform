@@ -201,12 +201,12 @@ public class TrustRepository implements ITrustRepository {
 		if (entity == null)
 			throw new NullPointerException("entity can't be null");
 		
-		ITrustedEntity result = null;
+		TrustedEntity result = null;
 		final Session session = sessionFactory.openSession();
 		Transaction tx = null;
 		try {
 			tx = session.beginTransaction();
-			result = (ITrustedEntity) session.merge(entity);
+			result = (TrustedEntity) session.merge(entity);
 			tx.commit();
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for entity " + entity);
@@ -219,7 +219,8 @@ public class TrustRepository implements ITrustRepository {
 				session.close();
 		}
 		
-		for (final TrustUpdateEvent event : result.getTrustUpdateEvents()) {
+		while (!result.getUpdateEventQueue().isEmpty()) {
+			final TrustUpdateEvent event = result.getUpdateEventQueue().poll();
 			final String eventTopic;
 			if (TrustValueType.DIRECT == event.getTrustRelationship().getTrustValueType())
 				eventTopic = TrustEventTopic.DIRECT_TRUST_UPDATED;
@@ -232,6 +233,9 @@ public class TrustRepository implements ITrustRepository {
 						+ " to topic '" + eventTopic + "': " 
 						+ "Trust Event Mgr is not available");
 			} else {
+				if (LOG.isDebugEnabled())
+					LOG.debug("Posting TrustUpdateEvent " + event
+							+ " to topic '" + eventTopic + "'");
 				this.trustEventMgr.postEvent(event, 
 						new String[] { eventTopic });
 			}

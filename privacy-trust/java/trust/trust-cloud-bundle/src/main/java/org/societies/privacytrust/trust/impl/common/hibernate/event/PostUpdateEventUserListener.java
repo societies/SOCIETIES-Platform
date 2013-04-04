@@ -88,21 +88,17 @@ public class PostUpdateEventUserListener implements PostUpdateEventListener {
 	            if (!TRUST_PROPERTY_MAP.containsKey(propName))
 	            	continue;
 	            
-	            final Object oldValue = event.getOldState()[i];
-	            final Object newValue = event.getState()[i];
+	            final Trust oldValue = (Trust) event.getOldState()[i];
+	            final Trust newValue = (Trust) event.getState()[i];
 	            if (areDifferent(oldValue, newValue)) {
-	            	
+	            	if (LOG.isDebugEnabled())
+	            		LOG.debug("Old trust: " + oldValue + ", New trust: " + newValue);
 	            	final TrustedEntity entity = (TrustedEntity) event.getEntity();
-	            	
 	            	final TrustedEntityId trustorId = entity.getTrustorId();
-	            	
 	            	final TrustedEntityId trusteeId = entity.getTrusteeId();
-
 	            	final TrustValueType trustValueType = TRUST_PROPERTY_MAP.get(propName);
-	            	
 	            	final Double newTrustValue = (newValue != null) 
-	            			? ((Trust) newValue).getValue() : null;
-	            	
+	            			? (newValue).getValue() : null;
 	            	final Date timestamp;
 	            	if (TrustValueType.DIRECT == trustValueType)
 	            		timestamp = entity.getDirectTrust().getLastUpdated();
@@ -116,23 +112,39 @@ public class PostUpdateEventUserListener implements PostUpdateEventListener {
 	            					trustValueType, newTrustValue, timestamp));
 	            	
 	            	if (LOG.isDebugEnabled())
-	            		LOG.debug("Adding TrustUpdateEvent " + trustUpdateEvent);
-	            	if (entity.getTrustUpdateEvents().contains(trustUpdateEvent))
-	            		entity.getTrustUpdateEvents().remove(trustUpdateEvent);
-	            	entity.getTrustUpdateEvents().add(trustUpdateEvent);
+	            		LOG.debug("Queueing TrustUpdateEvent " + trustUpdateEvent);
+	            	entity.getUpdateEventQueue().add(trustUpdateEvent);
 	            }
 	        }
 		}
 	}
 	
-	private static boolean areDifferent(final Object x, final Object y) {
+	private static boolean areDifferent(final Trust x, final Trust y) {
 		
 		if (x == y)
 			return false;
 		
 		if (x == null || y == null)
 			return true;
+
+		/*if (x.getLastModified() == null) {
+			if (y.getLastModified() != null)
+				return true;
+		} else if (!new Date(1000 * (x.getLastModified().getTime()/1000)).equals(
+				new Date(1000 * (y.getLastModified().getTime()/1000))))
+			return true;
+		if (x.getLastUpdated() == null) {
+			if (y.getLastUpdated() != null)
+				return true;
+		} else if (!new Date(1000 * (x.getLastUpdated().getTime()/1000)).equals(
+				new Date(1000 * (y.getLastUpdated().getTime()/1000))))
+			return true;*/
+		if (x.getValue() == null) {
+			if (y.getValue() != null)
+				return true;
+		} else if (!x.getValue().equals(y.getValue()))
+			return true;
 		
-		return (x.equals(y)) ? false : true;
+		return false;
 	}
 }
