@@ -81,6 +81,7 @@ import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Criteria;
@@ -100,6 +101,8 @@ import org.societies.api.schema.cis.manager.DeleteMemberNotification;
 import org.societies.api.schema.cis.manager.ListCrit;
 import org.societies.api.schema.cis.manager.ListResponse;
 import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyBehaviourConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.springframework.scheduling.annotation.AsyncResult;
 //import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 //import org.societies.api.schema.cis.community.Leave;
@@ -714,14 +717,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 				// TODO: maybe check if the attributes in the criteria are valid attributes (something from CtxAttributeTypes)
 				if(cisType != null && cisName != null){
-					String pPolicy;
-					if(create.getPrivacyPolicy() != null && 
-							create.getPrivacyPolicy().isEmpty() == false){
-						pPolicy = create.getPrivacyPolicy();
-					}else{
-						LOG.info("create came with an empty policy");
-						pPolicy = "<RequestPolicy></RequestPolicy>";	
-					};
+					//GENERATE MEMBERSHIP CRITERIA
 					Hashtable<String, MembershipCriteria> h = null;
 					MembershipCrit m = create.getCommunity().getMembershipCrit();
 					if (m!=null && m.getCriteria() != null && m.getCriteria().size()>0){
@@ -741,8 +737,30 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 							h.put(crit.getAttrib(), meb);
 						}
 					}
+					
+					//POLICY RECEIVED IS ENUM VALUE, CONVERT TO POLICY XML
+					String pPolicy = "membersOnly"; //DEFAULT VALUE
+					String privacyPolicyXml = "<RequestPolicy />";
+					if(create.getPrivacyPolicy() != null && create.getPrivacyPolicy().isEmpty() == false){
+						pPolicy = create.getPrivacyPolicy();
+					} 
+					PrivacyPolicyBehaviourConstants policyType = PrivacyPolicyBehaviourConstants.MEMBERS_ONLY; //DEFAULT
+					try {
+						policyType = PrivacyPolicyBehaviourConstants.fromValue(pPolicy);
+					} catch (IllegalArgumentException ex) {
+						//IGNORE - DEFAULT TO MEMBERS_ONLY
+						LOG.error("Exception parsing: " + pPolicy + ". " + ex);
+					}
+					//CALL POLICY UTILS TO CREATE XML FOR STORAGE
+					try {
+						RequestPolicy policyObj = PrivacyPolicyUtils.inferCisPrivacyPolicy(policyType, m);
+						privacyPolicyXml =  PrivacyPolicyUtils.toXacmlString(policyObj);
+					} catch (PrivacyException pEx) {
+						pEx.printStackTrace();
+					}
+					
 					// real create
-					Cis icis = (Cis) localCreateCis( cisName, cisType, cisDescription,h,pPolicy);
+					Cis icis = (Cis) localCreateCis(cisName, cisType, cisDescription, h, privacyPolicyXml);
 		
 					// sending the response back
 					if(icis !=null){

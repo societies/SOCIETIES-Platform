@@ -171,7 +171,9 @@ var	SocietiesPrivacyPolicyManagerService=(function(){
 			}
 
 			// Call
-			window.plugins.PrivacyPolicyManager.getPrivacyPolicy("test", showPrivacyPolicy, failure);
+			var owner = {"requestorId": ownerId,
+						 "cisRequestId": ownerCisId};
+			window.plugins.PrivacyPolicyManager.getPrivacyPolicy(owner, showPrivacyPolicy, failure);
 		},
 	};
 }());

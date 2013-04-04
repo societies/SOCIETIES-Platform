@@ -38,7 +38,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.model.CisAttributeTypes;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
@@ -89,46 +91,80 @@ public class PrivacyPolicyUtils {
 	@SuppressWarnings("rawtypes")
 	public static RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException {
 		RequestPolicy privacyPolicy = new RequestPolicy();
+		privacyPolicy.setPrivacyPolicyType(privacyPolicyType);
 		List<RequestItem> requestItems = new ArrayList<RequestItem>();
-		// Not private
+		
+		// --- Prepare common data
+		PrivacyPolicyBehaviourConstants globalBaheviour = PrivacyPolicyBehaviourConstants.PRIVATE;
 		if (configuration.containsKey("globalBehaviour")) {
-			// CIS Member list
-			RequestItem requestItem = new RequestItem();
-			Resource cisMemberList = new Resource();
-			cisMemberList.setScheme(DataIdentifierScheme.CIS);
-			cisMemberList.setDataType("cis-member-list");
-			requestItem.setResource(cisMemberList);
-			List<Action> actions = new ArrayList<Action>();
-			Action action = new Action();
-			action.setActionConstant(ActionConstants.READ);
-			actions.add(action);
-			requestItem.setActions(actions);
-			List<Condition> conditions = new ArrayList<Condition>();
-			// Public
-			PrivacyPolicyBehaviourConstants globalBaheviour = (PrivacyPolicyBehaviourConstants) configuration.get("globalBehaviour");
-			if (null != globalBaheviour && PrivacyPolicyBehaviourConstants.PUBLIC.name().equals(globalBaheviour.name())) {
-				Condition condition = new Condition();
-				condition.setConditionConstant(ConditionConstants.SHARE_WITH_3RD_PARTIES);
-				condition.setValue("Yes");
-				conditions.add(condition);
-			}
-			// Members only
-			else if (null != globalBaheviour && PrivacyPolicyBehaviourConstants.MEMBERS_ONLY.name().equals(globalBaheviour.name())) {
-				Condition condition = new Condition();
-				condition.setConditionConstant(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY);
-				condition.setValue("Yes");
-				conditions.add(condition);
-			}
-			// Private
-			else {
-				Condition condition = new Condition();
-				condition.setConditionConstant(ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY);
-				condition.setValue("Yes");
-				conditions.add(condition);
-			}
-			requestItem.setConditions(conditions);
+			globalBaheviour = (PrivacyPolicyBehaviourConstants) configuration.get("globalBehaviour");
+		}
+		// -- Actions: read
+		List<Action> actions = ActionUtils.createList(ActionConstants.READ);
+		// -- Conditions
+		List<Condition> conditions = new ArrayList<Condition>();
+		// - Common
+		conditions.add(ConditionUtils.create(ConditionConstants.STORE_IN_SECURE_STORAGE, "Yes"));
+		// - Visibility
+		// Public
+		if (PrivacyPolicyBehaviourConstants.PUBLIC.name().equals(globalBaheviour.name())) {
+			conditions.add(ConditionUtils.createPublic());
+		}
+		// Members only
+		else if (PrivacyPolicyBehaviourConstants.MEMBERS_ONLY.name().equals(globalBaheviour.name())) {
+			conditions.add(ConditionUtils.createMembersOnly());
+		}
+		// Private
+		else {
+			conditions.add(ConditionUtils.createPrivate());
+		}
+
+		// --- Add data
+		boolean optional = false;
+		// - CIS Member list
+		{
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CIS, CisAttributeTypes.MEMBER_LIST);
+			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
 			requestItems.add(requestItem);
 		}
+		// - Location symbolic
+		{
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
+			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
+			requestItems.add(requestItem);
+		}
+		optional = true;
+		// - Location coordinates
+		{
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_COORDINATES);
+			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
+			requestItems.add(requestItem);
+		}
+		// - Interests
+		{
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.INTERESTS);
+			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
+			requestItems.add(requestItem);
+		}
+		// - Email
+		{
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.EMAIL);
+			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
+			requestItems.add(requestItem);
+		}
+		// - Occupation
+		{
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.OCCUPATION);
+			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
+			requestItems.add(requestItem);
+		}
+		// - Occupation
+		{
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.WORK_POSITION);
+			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
+			requestItems.add(requestItem);
+		}
+		
 		privacyPolicy.setRequestItems(requestItems);
 		return privacyPolicy;
 	}
