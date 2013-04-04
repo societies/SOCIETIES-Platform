@@ -51,7 +51,9 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.packet.DiscoverItems;
+import org.jivesoftware.smackx.packet.VCard;
 import org.societies.android.api.comms.XMPPAgent;
+import org.societies.android.api.comms.xmpp.VCardParcel;
 import org.societies.android.api.comms.xmpp.XMPPNode;
 import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.utilities.DBC.Dbc;
@@ -1158,4 +1160,55 @@ public class AndroidCommsBase implements XMPPAgent {
 		}
     }
 
+    public void setVCard(String client, VCardParcel vCard) {
+		//REQUIRED DUE TO ISSUE: https://code.google.com/p/asmack/issues/detail?id=14#c8
+		ProviderManager.getInstance().addIQProvider("vCard", "vcard-temp", new org.jivesoftware.smackx.provider.VCardProvider());
+		
+		VCard xmppCard = VCardUtilities.convertToXMPPVCard(vCard);		
+		try {
+			connect();	//THIS TASK MUST BE AUTHENTICATED 
+			xmppCard.save(connection);
+		} catch (XMPPException e1) {
+			e1.printStackTrace();
+		}
+    }
+    
+    public VCardParcel getVCard(String client, long remoteCallId, String userId) {
+    	//REQUIRED DUE TO ISSUE: https://code.google.com/p/asmack/issues/detail?id=14#c8
+    	ProviderManager.getInstance().addIQProvider("vCard", "vcard-temp", new org.jivesoftware.smackx.provider.VCardProvider());
+    	//RETURN INTENT
+    	Intent intent = new Intent();
+    	
+    	// IF NO VCARD RETURNED FROM SERVER OR EXCEPTION - RETURN NULL
+		VCard returnedCard = null;
+		try {
+			connect();	//THIS TASK MUST BE AUTHENTICATED
+			returnedCard = new VCard();
+			if (userId == null) {
+				returnedCard.load(connection);			//LOAD MY VCARD
+				intent.setAction(XMPPAgent.GET_VCARD);
+			} else {
+				returnedCard.load(connection, userId);	//LOAD ANOTHER USER VCARD
+				intent.setAction(XMPPAgent.GET_USER_VCARD);
+			}
+		} catch (XMPPException e) {
+			e.printStackTrace();
+		}
+		VCardParcel parcelVCard = VCardUtilities.convertToParcelVCard(returnedCard);
+		
+		//SEND RETURN INTENT
+		if (AndroidCommsBase.this.restrictBroadcast)
+			intent.setPackage(client);
+		
+		intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, parcelVCard);
+		intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+		this.serviceContext.sendBroadcast(intent);
+		
+		return null;
+    }
+    
+    public VCardParcel getVCard(String client, long remoteCallId) {
+    	return getVCard(client, remoteCallId, null);
+    }
+    
 }
