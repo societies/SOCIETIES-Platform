@@ -72,7 +72,7 @@ function countConnectors(){
   function connectSN(sn){
 	   document.getElementById("method").value  = sn;
 	   document.sd.submit();
-	  	 
+//	    w = window.open("http://societies.lucasimone.eu/connect.php?sn=" + sn +"&from=http://societies.lucasimone.eu/print.php", "TEST1", "width=400,height=400,resizeable,scrollbars");
   }
   
   

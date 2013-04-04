@@ -209,6 +209,8 @@
 		<property name="trustBroker" ref="trustBroker"></property>
 		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal"></property>
 		<property name="userFeedback" ref="UserFeedbackGUI"></property>
+		<property name="agreementMgr" ref="privacyAgreementManager"></property>
+		<property name="eventMgr" ref="eventManager"></property>
 	</bean>
 
 

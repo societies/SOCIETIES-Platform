@@ -46,9 +46,11 @@ import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssEvent;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
+import org.societies.api.schema.cssmanagement.CssManagerResultActivities;
 import org.societies.api.schema.cssmanagement.CssManagerResultBean;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
@@ -94,7 +96,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 	//Pubsub packages
 	private static final String PUBSUB_CLASS = "org.societies.api.schema.cssmanagement.CssEvent";
 	//XMPP Communication namespaces and associated entities
-	private static final List<String> ELEMENT_NAMES = Arrays.asList("cssManagerMessageBean", "cssManagerResultBean");
+	private static final List<String> ELEMENT_NAMES = Arrays.asList("cssManagerMessageBean", "cssManagerResultBean", "cssManagerResultActivities");
     private static final List<String> NAME_SPACES = Arrays.asList("http://societies.org/api/schema/cssmanagement");
     private static final List<String> PACKAGES = Arrays.asList("org.societies.api.schema.cssmanagement");
     //default destination of communication - CSS Cloud node
@@ -788,7 +790,6 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 			Stanza stanza = new Stanza(ccm.getIdManager().fromJid(cssId));
 			ICommCallback callback = new CSSManagerCallback(client, IAndroidCSSManager.READ_PROFILE_REMOTE);
 			
-//			ccm.register(ELEMENT_NAMES, callback);
 			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(LOG_TAG, "Sent stanza");
 		} catch (InvalidFormatException ex) {
@@ -799,6 +800,26 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 		return null;
 	}
 
+	@Override
+	public MarshaledActivity[] getActivities(String client, String timePeriod, int limitResults) {
+		Dbc.require("Client parameter must have a value", null != client && client.length() > 0);
+		Dbc.require("Timeperiod parameter must have a value", null != timePeriod && timePeriod.length() > 0);
+		Dbc.require("LimitResults parameter must have a value", limitResults > 0);
+		Log.d(LOG_TAG, "getActivities called with client: " + client);
+		
+		CssManagerMessageBean messageBean = new CssManagerMessageBean();
+		messageBean.setMethod(MethodType.GET_CSS_ACTIVITIES);
+		try {
+			Stanza stanza = new Stanza(cloudNodeIdentity);
+			ICommCallback callback = new CSSManagerCallback(client, IAndroidCSSManager.GET_CSS_ACTIVITIES);
+			ccm.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
+			Log.d(LOG_TAG, "Sent stanza");
+		} catch (Exception e) {
+			Log.e(this.getClass().getName(), "Error when sending message stanza", e);
+        } 		
+		return null;
+	}
+	
 	public void sendFriendRequest(String client, String cssId) {
 		Log.d(LOG_TAG, "sendFriendRequest called by client: " + client + " for: " + cssId);
 		
@@ -1178,25 +1199,37 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 			
 			if (client != null) {
 				Intent intent = new Intent(returnIntent);
-				
-				CssManagerResultBean resultBean = (CssManagerResultBean) retValue;
-				//cssAdvertisementRecords
-				if (IAndroidCSSManager.SUGGESTED_FRIENDS == this.returnIntent || IAndroidCSSManager.GET_CSS_FRIENDS == this.returnIntent || IAndroidCSSManager.GET_FRIEND_REQUESTS==this.returnIntent) {
-					//ACssAdvertisementRecord advertArray [] = ACssAdvertisementRecord.getArray(resultBean.getResultAdvertList());
-					CssAdvertisementRecord advertArray[] = new CssAdvertisementRecord[resultBean.getResultAdvertList().size()]; 
-					advertArray = resultBean.getResultAdvertList().toArray(advertArray);
-					
-					intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, true);
-					
-					intent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, advertArray);
+
+				//CSS MANAGER RESULT BEAN
+				if (retValue instanceof CssManagerResultBean) {
+					CssManagerResultBean resultBean = (CssManagerResultBean) retValue;
+					//cssAdvertisementRecords
+					if (IAndroidCSSManager.SUGGESTED_FRIENDS == this.returnIntent || IAndroidCSSManager.GET_CSS_FRIENDS == this.returnIntent || IAndroidCSSManager.GET_FRIEND_REQUESTS==this.returnIntent) {
+						//ACssAdvertisementRecord advertArray [] = ACssAdvertisementRecord.getArray(resultBean.getResultAdvertList());
+						CssAdvertisementRecord advertArray[] = new CssAdvertisementRecord[resultBean.getResultAdvertList().size()]; 
+						advertArray = resultBean.getResultAdvertList().toArray(advertArray);
+						
+						intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, true);						
+						intent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, advertArray);
+					}
+					//cssRecords
+					else { 
+						intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, resultBean.getResult().isResultStatus());
+						//AndroidCSSRecord aRecord = AndroidCSSRecord.convertCssRecord(resultBean.getResult().getProfile());
+						CssRecord aRecord = resultBean.getResult().getProfile();
+						intent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, (Parcelable) aRecord);
+						this.updateLocalPersistence(aRecord);
+					}
 				}
-				//cssRecords
-				else { 
-					intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, resultBean.getResult().isResultStatus());
-					//AndroidCSSRecord aRecord = AndroidCSSRecord.convertCssRecord(resultBean.getResult().getProfile());
-					CssRecord aRecord = resultBean.getResult().getProfile();
-					intent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, (Parcelable) aRecord);
-					this.updateLocalPersistence(aRecord);
+				//ACTIVITIES HANDLED IN A SEPERATE BEAN DUE TO MARSHALED ACTIVITIES SCHEMA
+				else if (retValue instanceof CssManagerResultActivities) {
+					CssManagerResultActivities resultBean = (CssManagerResultActivities) retValue;
+					if (IAndroidCSSManager.GET_CSS_ACTIVITIES == this.returnIntent) {
+						MarshaledActivity[] activities = new MarshaledActivity[resultBean.getMarshaledActivity().size()];
+						activities = resultBean.getMarshaledActivity().toArray(activities);
+						intent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, activities);
+						intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, true);
+					}
 				}
 				
 				if (restrictBroadcast) {

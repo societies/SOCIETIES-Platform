@@ -149,7 +149,7 @@ div#addConnector{
 	 <input class="icon" onclick="connectSN('connect_tw')" type="image" src="images/Twitter.jpg">
 	 <input class="icon" onclick="connectSN('connect_fq')" type="image" src="images/Foursquare.png">
 	 <input class="icon" onclick="connectSN('connect_lk')" type="image" src="images/Linkedin.png">
-	 <input class="icon" onclick="connectSN('connect_fb')" type="image" src="images/facebook.png">
+	 <input class="icon" onclick="connectSN('connect_fb')" type="image" src="images/Facebook.png">
 	 
 	 
    </p>

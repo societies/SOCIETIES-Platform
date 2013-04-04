@@ -36,9 +36,9 @@ public class LinkedinConnector implements ISocialConnector {
 	public static final String ACTIVITIES_URL 		= "http://api.linkedin.com/v1/people/~/network/updates?scope=self";
 	public static final String POST_URL		 	= "http://api.linkedin.com/v1/people/~/shares";
 	
-	public static final String LK_CLIENT_ID			= "cysdprp40gxn";
-	public static final String LK_ClIENT_SECRET		= "faKKFat0QeJomJjv";
-	public static final String LK_CALLBACK_URL		= "http://127.0.0.1:8080/societies-test/doConnect.html?type=lk";
+	public static final String LK_CLIENT_ID			= "6cex9yffh2cd";
+	public static final String LK_ClIENT_SECRET		= "j1vTQq93i30q63fT";
+	public static final String LK_CALLBACK_URL		= "http://societies.lucasimone.eu/linkedin/callback.php";
 	public static final String LK_SCOPES			= "r_basicprofile,r_fullprofile,r_emailaddress,r_network,r_contactinfo,rw_nus,rw_groups";
 	
 	

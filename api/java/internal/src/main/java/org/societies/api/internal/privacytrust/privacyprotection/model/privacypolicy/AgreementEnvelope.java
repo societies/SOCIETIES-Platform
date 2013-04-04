@@ -46,6 +46,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
  * @author Elizabeth
  *
  */
+@Deprecated
 public class AgreementEnvelope implements IAgreementEnvelope, Serializable{
 
 	private IAgreement agreement;
@@ -168,9 +169,17 @@ public class AgreementEnvelope implements IAgreementEnvelope, Serializable{
 		AgreementEnvelope rhs = (AgreementEnvelope) obj;
 		return new EqualsBuilder()
 			.append(this.getAgreement(), rhs.getAgreement())
-			.append(this.getSignature(), rhs.getSignature())
-			.append(this.getPublicKeyAsString(), rhs.getPublicKeyAsString())
+//			.append(this.getSignature(), rhs.getSignature())
+//			.append(this.getPublicKeyAsString(), rhs.getPublicKeyAsString())
 			.isEquals();
+	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder("AgreementEnvelope: [");
+		sb.append("public key: "+getPublicKeyAsString()+", ");
+		sb.append("signature: "+getSignature()+", ");
+		sb.append("signature: "+getAgreement()+", ");
+		return sb.toString();
 	}
 	
 

@@ -1,5 +1,7 @@
 package org.societies.webapp.controller.privacy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
@@ -23,38 +25,48 @@ import java.util.*;
 @SessionScoped
 public class PrivacyPolicyNegotiationController extends BasePageController {
 
-
+	//pubsub event schemas
+	private static final List<String> EVENT_SCHEMA_CLASSES = 
+			Collections.unmodifiableList(Arrays.asList(
+					"org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent",
+					"org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent"));
+	 private static Logger logging = LoggerFactory.getLogger(PrivacyPolicyNegotiationController.class);
     private class PubSubListener implements Subscriber {
 
         public void registerForEvents() {
-            if (log.isTraceEnabled())
-                log.trace("registerForEvents()");
+        	
+        	
+        	
+            if (logging.isDebugEnabled())
+                logging.debug("registerForEvents()");
 
             if (getPubsubClient() == null) {
-                log.error("PubSubClient was null, cannot register for events");
+                logging.error("PubSubClient was null, cannot register for events");
                 return;
             }
 
             try {
+            	//register schema classes
+            	getPubsubClient().addSimpleClasses(EVENT_SCHEMA_CLASSES);
                 getPubsubClient().subscriberSubscribe(getUserService().getIdentity(),
                         EventTypes.UF_PRIVACY_NEGOTIATION,
                         this);
 
-                if (log.isDebugEnabled())
-                    log.debug("Subscribed to " + EventTypes.UF_PRIVACY_NEGOTIATION + " events");
+                if (logging.isDebugEnabled())
+                    logging.debug("Subscribed to " + EventTypes.UF_PRIVACY_NEGOTIATION + " events");
             } catch (Exception e) {
                 addGlobalMessage("Error subscribing to pubsub notifications",
                         e.getMessage(),
                         FacesMessage.SEVERITY_ERROR);
-                log.error("Error subscribing to pubsub notifications (id="
+                logging.error("Error subscribing to pubsub notifications (id="
                         + getUserService().getIdentity()
                         + " event=" + EventTypes.UF_PRIVACY_NEGOTIATION, e);
             }
         }
 
         public void sendResponse(ResponsePolicy responsePolicy, NegotiationDetailsBean negotiationDetails) {
-            if (log.isTraceEnabled())
-                log.trace("sendResponse(): privacyNegotiationResponse");
+            if (logging.isDebugEnabled())
+                logging.debug("sendResponse(): privacyNegotiationResponse");
 
             UserFeedbackPrivacyNegotiationEvent payload = new UserFeedbackPrivacyNegotiationEvent();
             payload.setResponsePolicy(responsePolicy);
@@ -69,14 +81,14 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
                 addGlobalMessage("Error publishing notification of completed negotiation",
                         e.getMessage(),
                         FacesMessage.SEVERITY_ERROR);
-                log.error("Error publishing notification of completed negotiation", e);
+                logging.error("Error publishing notification of completed negotiation", e);
             }
         }
 
         @Override
         public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object item) {
-            if (log.isTraceEnabled())
-                log.trace("pubsubEvent(): node=" + node + " item=" + item);
+            if (logging.isDebugEnabled())
+                logging.debug("pubsubEvent(): node=" + node + " item=" + item);
 
             // get the policy from the event payload
             UserFeedbackPrivacyNegotiationEvent privEvent = (UserFeedbackPrivacyNegotiationEvent) item;
@@ -93,16 +105,16 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
         @Override
         public void userLoggedIn() {
-            if (log.isTraceEnabled())
-                log.trace("userLoggedIn()");
+            if (logging.isDebugEnabled())
+                logging.debug("userLoggedIn()");
 
             pubSubListener.registerForEvents();
         }
 
         @Override
         public void userLoggedOut() {
-            if (log.isTraceEnabled())
-                log.trace("userLoggedOut()");
+            if (logging.isDebugEnabled())
+                logging.debug("userLoggedOut()");
         }
     }
 
@@ -118,7 +130,7 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     private final LoginListener loginListener = new LoginListener();
 
     public PrivacyPolicyNegotiationController() {
-        log.trace("PrivacyPolicyNegotiationController ctor()");
+        logging.debug("PrivacyPolicyNegotiationController ctor()");
     }
 
     public PubsubClient getPubsubClient() {
@@ -136,8 +148,8 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
     @SuppressWarnings("UnusedDeclaration")
     public void setUserService(UserService userService) {
-        if (log.isTraceEnabled())
-            log.trace("setUserService() = " + userService);
+        if (logging.isDebugEnabled())
+            logging.debug("setUserService() = " + userService);
 
         if (this.userService != null) {
             this.userService.removeLoginListener(loginListener);
@@ -192,7 +204,7 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     }
 
     public void completeNegotiation() {
-        log.trace("completeNegotiation()");
+        logging.debug("completeNegotiation()");
 
         unseenNegotiationCount = 0; // if we're requesting a negotiation object, we're marking all as seen
 
@@ -204,7 +216,7 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
             for (Action action : response.getRequestItem().getActions()) {
                 ActionWrapper wrapper = (ActionWrapper) action;
 
-                log.trace(String.format("%s: action %s selected = %s",
+                logging.debug(String.format("%s: action %s selected = %s",
                         response.getRequestItem().getResource().getDataIdUri(),
                         action.getActionConstant().name(),
                         wrapper.isSelected()));
@@ -225,7 +237,7 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
         prepareEventForTransmission(responsePolicy);
 
-        responsePolicy.setNegotiationStatus(NegotiationStatus.SUCCESSFUL);
+        responsePolicy.setNegotiationStatus(NegotiationStatus.ONGOING);
 
         pubSubListener.sendResponse(responsePolicy, negotiationDetails);
 
@@ -234,7 +246,7 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     }
 
     public void cancelNegotiation() {
-        log.trace("cancelNegotiation()");
+        logging.debug("cancelNegotiation()");
 
         unseenNegotiationCount = 0; // if we're requesting a negotiation object, we're marking all as seen
 
@@ -252,21 +264,21 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     }
 
 //    public void validateActions(FacesContext context, UIComponent component, Object value) throws ValidatorException {
-//        log.trace("validateActions()");
+//        logging.debug("validateActions()");
 //
 //        ((UIInput) component).setValid(false);
 //        SelectManyCheckbox checkbox= ((SelectManyCheckbox) component);
 //
-//        log.debug("component=" + component);
-//        log.debug("component.value=" + Arrays.toString((String[]) checkbox.getValue()));
-//        log.debug("value=" + Arrays.toString((String[]) value));
+//        logging.debug("component=" + component);
+//        logging.debug("component.value=" + Arrays.toString((String[]) checkbox.getValue()));
+//        logging.debug("value=" + Arrays.toString((String[]) value));
 //
 //        ((UIInput) component).setValid(true);
 //    }
 
 
     private void removeCurrentRequestFromQueue() {
-        log.trace("removeCurrentRequestFromQueue()");
+        logging.debug("removeCurrentRequestFromQueue()");
 
         unseenNegotiationCount = 0; // if we're requesting a negotiation object, we're marking all as seen
 
@@ -288,9 +300,16 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     }
 
     private void prepareEventForGUI(UserFeedbackPrivacyNegotiationEvent event) {
-        log.trace("prepareEventForGUI()");
+        logging.debug("prepareEventForGUI()");
 
-        for (ResponseItem response : event.getResponsePolicy().getResponseItems()) {
+		if (event.getResponsePolicy()==null){
+			this.logging.debug("Policy parameter is null");
+		}else{
+			this.logging.debug("Policy contains: "+event.getResponsePolicy().getResponseItems().size()+" responseItems");
+		}
+		List<ResponseItem> responseItems = event.getResponsePolicy().getResponseItems();
+        for (ResponseItem response : responseItems) {
+        	this.logging.debug("Processing item: "+response.getRequestItem().getResource().getDataType());
             RequestItemWrapper request = new RequestItemWrapper(response.getRequestItem());
             response.setRequestItem(request);
 
@@ -325,7 +344,7 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     }
 
     private void prepareEventForTransmission(ResponsePolicy responsePolicy) {
-        log.trace("prepareEventForTransmission()");
+        logging.debug("prepareEventForTransmission()");
         for (ResponseItem response : responsePolicy.getResponseItems()) {
             RequestItemWrapper requestWrapper = (RequestItemWrapper) response.getRequestItem();
             RequestItem request = requestWrapper.getRequestItem();
@@ -348,8 +367,8 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
             if (!requestWrapper.getSelectedActionNames().contains("READ"))
                 requestWrapper.getSelectedActionNames().add("READ");
 
-            if (log.isTraceEnabled())
-                log.trace("actions=" + Arrays.toString(requestWrapper.getSelectedActionNames().toArray()));
+            if (logging.isDebugEnabled())
+                logging.debug("actions=" + Arrays.toString(requestWrapper.getSelectedActionNames().toArray()));
 
 
             for (int i = 0; i < request.getActions().size(); i++) {
@@ -371,11 +390,27 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
             // TODO: remove after debugging
             for (Action action : request.getActions()) {
-                log.trace("action: " + action.getActionConstant());
+                logging.debug("action: " + action.getActionConstant());
             }
 
         }
+        
+        clearResponseItemWrapper(responsePolicy);
     }
+
+	private void clearResponseItemWrapper(ResponsePolicy responsePolicy) {
+		for (ResponseItem item : responsePolicy.getResponseItems()){
+			RequestItem oldItem = item.getRequestItem();
+			RequestItem newItem = new RequestItem();
+			newItem.setActions(oldItem.getActions());
+			newItem.setConditions(oldItem.getConditions());
+			newItem.setOptional(oldItem.isOptional());
+			newItem.setResource(oldItem.getResource());
+			
+			item.setRequestItem(newItem);
+		}
+		
+	}
 
 
 }

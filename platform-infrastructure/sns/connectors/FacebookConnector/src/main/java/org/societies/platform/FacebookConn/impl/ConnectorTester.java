@@ -29,18 +29,18 @@ public class ConnectorTester {
 	 * http://wd.teamlife.it/fbconnector.php that allows to get the access token
 	 */
 	public static void main(String[] args) {
-		String access_token = "AAAFs43XOj3IBANAuFLLTycEWZCiHLvqN1BH9f4OGyhQbWJ2GZC7D57XbITHafLpisDjx0B9OtZCx3hhoxZANUNqOl8FK6tzchZAthmjTQVwZDZD";
+		String access_token = "";
 		
-		access_token= "AAAFs43XOj3IBAN8bEdMuZBiMVyMYlwAYtT5nxu432Man4tIwL1xitpiqLdTYz8cuaBdGsrb6mJAgxab20ZBZC4jFDtvWZC0Xp4jtmFYttAZDZD";
+		//access_token= "";
 		FacebookConnectorImpl connector = new FacebookConnectorImpl(access_token, "Societies User");
 		
 		
 		
 		System.out.println("User Profile:"+connector.getUserProfile());
-		/*System.out.println("User Groups:"+connector.getUserGroups());
-		System.out.println("User Friends:"+connector.getUserFriends());
-		System.out.println("User Activies:"+connector.getUserActivities());	
-		*/
+//		System.out.println("User Groups:"+connector.getUserGroups());
+//		System.out.println("User Friends:"+connector.getUserFriends());
+//		System.out.println("User Activies:"+connector.getUserActivities());	
+		
 		
 		//System.out.println(" Profile:\n" + connector.getUserProfile());
 		//System.out.println(" GROUP:\n" + connector.getUserGroups());

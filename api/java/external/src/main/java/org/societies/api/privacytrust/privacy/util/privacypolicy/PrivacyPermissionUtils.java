@@ -100,11 +100,14 @@ public class PrivacyPermissionUtils {
 		return (now.getTime() > (privacyPermissionBean.getCreationDate().getTime() + privacyPermissionBean.getValidityDuration()));
 	}
 	
-
+	@Deprecated
 	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission o1, Object o2) {
+		return equal(o1, o2);
+	}
+	public static boolean equal(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission o1, Object o2) {
 		// -- Verify reference equality
-		if (o2 == null) { return false; }
 		if (o1 == o2) { return true; }
+		if (o2 == null) { return false; }
 		if (o1.getClass() != o2.getClass()) { return false; }
 		// -- Verify obj type
 		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPermission) o2;

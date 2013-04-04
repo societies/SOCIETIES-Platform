@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -35,93 +37,239 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfPreferenceDetails;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IDSPreferenceDetails;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.AccessControlPreferenceDetailsBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.AccessControlPreferenceTreeModelBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfPreferenceDetailsBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfPrivacyPreferenceTreeModelBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSPreferenceDetailsBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSPrivacyPreferenceTreeModelBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPrivacyPreferenceTreeModelBean;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestorUtils;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPreferenceDetails;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.accesscontrol.AccessControlPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.dobf.DObfPreferenceTreeModel;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ids.IDSPrivacyPreferenceTreeModel;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ppn.PPNPrivacyPreferenceTreeModel;
+import org.societies.privacytrust.privacyprotection.util.preference.PrivacyPreferenceUtils;
 
 public class PrivatePreferenceCache {
 
-	
+
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private Registry registry;
 	private PreferenceRetriever retriever;
 	private PreferenceStorer storer;
 	//the key refers to the ctxID of the (ppn) preference attribute (not the affected context attribute)
-	private Hashtable<CtxAttributeIdentifier, IPrivacyPreferenceTreeModel> ppnCtxIDtoModel;
+	private Hashtable<CtxAttributeIdentifier, PPNPrivacyPreferenceTreeModel> ppnCtxIDtoModel;
 	//the key refers to the ctxID of the (ids) preference attribute (not the affected context attribute)
-	private Hashtable<CtxAttributeIdentifier, IPrivacyPreferenceTreeModel> idsCtxIDtoModel;
+	private Hashtable<CtxAttributeIdentifier, IDSPrivacyPreferenceTreeModel> idsCtxIDtoModel;
 	//the key refers to the ctxID of the (ids) preference attribute (not the affected context attribute)
-	private Hashtable<CtxAttributeIdentifier, IPrivacyPreferenceTreeModel> dobfCtxIDtoModel;
+	private Hashtable<CtxAttributeIdentifier, DObfPreferenceTreeModel> dobfCtxIDtoModel;
+	//the key refers to the ctxID of the (accCtrl) preference attribute (not the affected context attribute)
+	private Hashtable<CtxAttributeIdentifier, AccessControlPreferenceTreeModel> accCtrlCtxIDtoModel;
+
 	private IIdentityManager idMgr;
-	
-	
+
+
 
 	public PrivatePreferenceCache(ICtxBroker broker, IIdentityManager idMgr){
 		this.idMgr = idMgr;
-		this.ppnCtxIDtoModel = new Hashtable<CtxAttributeIdentifier,IPrivacyPreferenceTreeModel>();
-		this.idsCtxIDtoModel = new Hashtable<CtxAttributeIdentifier, IPrivacyPreferenceTreeModel>();
+		this.ppnCtxIDtoModel = new Hashtable<CtxAttributeIdentifier,PPNPrivacyPreferenceTreeModel>();
+		this.idsCtxIDtoModel = new Hashtable<CtxAttributeIdentifier, IDSPrivacyPreferenceTreeModel>();
+		this.dobfCtxIDtoModel = new Hashtable<CtxAttributeIdentifier, DObfPreferenceTreeModel>();
+		this.accCtrlCtxIDtoModel = new Hashtable<CtxAttributeIdentifier, AccessControlPreferenceTreeModel>();
 		this.retriever = new PreferenceRetriever(broker, this.idMgr);
-		this.storer = new PreferenceStorer(broker);
+		this.storer = new PreferenceStorer(broker, idMgr);
 		this.registry = retriever.retrieveRegistry();
-		
+
 	}
-	
-	
-	public void addPPNPreference(PPNPreferenceDetails details, IPrivacyPreferenceTreeModel model){
+
+
+	public boolean addPPNPreference(PPNPreferenceDetailsBean details, PPNPrivacyPreferenceTreeModel model) {
 		printCacheContentsOnScreen("Before update");
 		this.logging.debug("REquest to add preference :\n"+details.toString());
 		CtxAttributeIdentifier preferenceCtxID = this.registry.getPPNPreference(details);
+		PPNPrivacyPreferenceTreeModelBean bean = PrivacyPreferenceUtils.toPPNPrivacyPreferenceTreeModelBean(model);
 		if (preferenceCtxID==null){
 			this.logging.debug("Registry did not contain preference details. Proceeding to add as new preference");
-			String name = this.registry.getNameForNewPreference(PrivacyPreferenceTypeConstants.PPNP);
-			preferenceCtxID = this.storer.storeNewPreference(model, name);
+			String name = this.registry.getNameForNewPreference(PrivacyPreferenceTypeConstants.PRIVACY_POLICY_NEGOTIATION);
+			try {
+				preferenceCtxID = this.storer.storeNewPreference(bean, name);
+			} catch (PrivacyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			}
 			this.registry.addPPNPreference(details, preferenceCtxID);
 			this.ppnCtxIDtoModel.put(preferenceCtxID, model);
-			this.storer.storeRegistry(registry);
+			try {
+				this.storer.storeRegistry(registry);
+			} catch (PrivacyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				this.logging.debug("Unable to update Registry after adding PPN preference");
+				return false;
+			}
 			this.logging.debug("Preference didn't exist. Created new context attribute");
 
 		}else{
 			this.logging.debug("Registry contained preference details. Proceeding to update existing preference");
-			this.storer.storeExisting(preferenceCtxID, model);
-			this.ppnCtxIDtoModel.put(preferenceCtxID, model);
-			this.logging.debug("Preference existed and updated.");
+			if (this.storer.storeExisting(preferenceCtxID, bean)){
+				this.ppnCtxIDtoModel.put(preferenceCtxID,  model);
+				this.logging.debug("Preference existed and updated.");
+			}else{
+				this.logging.debug("Unable to store PPN preference");
+				return false;
+			}
 
 		}
 		printCacheContentsOnScreen("After update");
-		
+		return true;
 	}
-	
 
-	public void addIDSPreference(IDSPreferenceDetails details, IPrivacyPreferenceTreeModel model){
+	public boolean addIDSPreference(IDSPreferenceDetailsBean details, IDSPrivacyPreferenceTreeModel model) {
 		printCacheContentsOnScreen("Before Update");
 		this.logging.debug("REquest to add preference :\n"+details.toString());
 		CtxAttributeIdentifier preferenceCtxID = this.registry.getIDSPreference(details);
+		IDSPrivacyPreferenceTreeModelBean bean = PrivacyPreferenceUtils.toIDSPreferenceTreeModelBean(model);
 		if (preferenceCtxID==null){
 			this.logging.debug("Registry did not contain preference details. Proceeding to add as new preference");
-			String name = this.registry.getNameForNewPreference(PrivacyPreferenceTypeConstants.IDS);
-			preferenceCtxID = this.storer.storeNewPreference(model, name);
-			if (preferenceCtxID!=null){
-				this.registry.addIDSPreference(details, preferenceCtxID);
-				this.idsCtxIDtoModel.put(preferenceCtxID, model);
-				this.storer.storeRegistry(registry);
-				this.logging.debug("Preference didn't exist. Created new context attribute");
-			}else{
+			String name = this.registry.getNameForNewPreference(PrivacyPreferenceTypeConstants.IDENTITY_SELECTION);
+			try {
+				preferenceCtxID = this.storer.storeNewPreference(bean, name);
+			} catch (PrivacyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 				this.logging.debug("Could not save IDS preference. Broker returned null ctx ID");
+				return false;
 			}
+			this.registry.addIDSPreference(details, preferenceCtxID);
+			this.idsCtxIDtoModel.put(preferenceCtxID, model);
+			try {
+				this.storer.storeRegistry(registry);
+			} catch (PrivacyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				this.logging.debug("Unable to update Registry after adding IDS preference");
+				return false;
+			}
+
+			this.logging.debug("Preference didn't exist. Created new context attribute");
 
 		}else{
 			this.logging.debug("Registry contained preference details. Proceeding to update existing preference");
-			this.idsCtxIDtoModel.put(preferenceCtxID, model);
-			this.storer.storeExisting(preferenceCtxID, model);
-			this.logging.debug("Preference existed and updated.");
+			if (this.storer.storeExisting(preferenceCtxID, bean)){
+				this.idsCtxIDtoModel.put(preferenceCtxID, model);
+				this.logging.debug("Preference existed and updated.");	
+			}else{
+				this.logging.debug("Unable to store IDS preference");
+				return false;
+			}
+
 
 		}
 		printCacheContentsOnScreen("After Update");	
+		return true;
 	}
-	public IPrivacyPreferenceTreeModel getPPNPreference(PPNPreferenceDetails details){
-		
+
+	public boolean addDObfPreference(DObfPreferenceDetailsBean details, DObfPreferenceTreeModel model){
+		printCacheContentsOnScreen("Before Update");
+		this.logging.debug("REquest to add preference :\n"+details.toString());
+		CtxAttributeIdentifier preferenceCtxID = this.registry.getDObfPreference(details);
+		DObfPrivacyPreferenceTreeModelBean bean = PrivacyPreferenceUtils.toDObfPrivacyPreferenceTreeModelBean(model);
+		if (preferenceCtxID==null){
+			this.logging.debug("Registry did not contain preference details. Proceeding to add as new preference");
+			String name = this.registry.getNameForNewPreference(PrivacyPreferenceTypeConstants.DATA_OBFUSCATION);
+			try {
+				preferenceCtxID = this.storer.storeNewPreference(bean, name);
+			} catch (PrivacyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				this.logging.debug("Could not save DObf preference. Broker returned null ctx ID");
+				return false;
+			}
+
+			this.registry.addDObfPreference(details, preferenceCtxID);
+			this.dobfCtxIDtoModel.put(preferenceCtxID, model);
+			try {
+				this.storer.storeRegistry(registry);
+			} catch (PrivacyException e) {
+				e.printStackTrace();
+				this.logging.debug("Unable to update Registry after adding DObf preference");
+				return false;
+			}
+			this.logging.debug("Preference didn't exist. Created new context attribute");
+
+		}else{
+			this.logging.debug("Registry contained preference details. Proceeding to update existing preference");
+			if (this.storer.storeExisting(preferenceCtxID, bean)){
+				this.dobfCtxIDtoModel.put(preferenceCtxID, model);
+				this.logging.debug("Preference existed and updated.");
+			}else{
+				this.logging.debug("Unable to store DObf preference");
+				return false;
+			}
+		}		
+		printCacheContentsOnScreen("After Update");		
+		return true;
+	}
+
+	public boolean addAccCtrlPreference(AccessControlPreferenceDetailsBean details, AccessControlPreferenceTreeModel model){
+		printCacheContentsOnScreen("Before Update");
+		this.logging.debug("REquest to add preference :\n"+details.toString());
+		this.logging.debug("REquest to add preference :\n"+details.toString());
+		CtxAttributeIdentifier preferenceCtxID = this.registry.getAccCtrlPreference(details);
+		AccessControlPreferenceTreeModelBean bean = PrivacyPreferenceUtils.toAccessControlPreferenceTreeModelBean(model);
+		if (preferenceCtxID==null){
+			this.logging.debug("Registry did not contain preference details. Proceeding to add as new preference");
+			this.logging.debug("Registry did not contain preference details. Proceeding to add as new preference");
+			String name = this.registry.getNameForNewPreference(PrivacyPreferenceTypeConstants.ACCESS_CONTROL);
+			try {
+				preferenceCtxID = this.storer.storeNewPreference(bean, name);
+			} catch (PrivacyException e) {
+				e.printStackTrace();
+				this.logging.debug("Could not save AccCtrl preference. Broker returned null ctx ID");
+				this.logging.debug("Could not save AccCtrl preference. Broker returned null ctx ID");
+				return false;
+			}
+
+			this.registry.addAccessCtrlPreference(details, preferenceCtxID);
+			this.accCtrlCtxIDtoModel.put(preferenceCtxID, model);
+			try {
+				this.storer.storeRegistry(registry);
+			} catch (PrivacyException e) {
+				e.printStackTrace();
+				this.logging.debug("Unable to update Registry after adding AccCtrl preference");
+				this.logging.debug("Unable to update Registry after adding AccCtrl preference");
+				return false;
+			}
+			this.logging.debug("Preference didn't exist. Created new context attribute");
+			this.logging.debug("Preference didn't exist. Created new context attribute");
+
+
+		}else{
+			this.logging.debug("Registry contained preference details. Proceeding to update existing preference");
+			this.logging.debug("Registry contained preference details. Proceeding to update existing preference");
+			if (this.storer.storeExisting(preferenceCtxID, bean)){
+				this.accCtrlCtxIDtoModel.put(preferenceCtxID, model);
+				this.logging.debug("Preference existed and updated.");
+				this.logging.debug("Preference existed and updated.");
+			}else{
+				this.logging.debug("Unable to store AccCtrl preference");
+				this.logging.debug("Unable to store AccCtrl preference");
+				return false;
+			}
+		}
+		printCacheContentsOnScreen("After Update");		
+
+		return true;
+	}
+
+	public PPNPrivacyPreferenceTreeModel getPPNPreference(PPNPreferenceDetailsBean details){
+
 		this.logging.debug("Request for preference: \n"+details.toString());
 		printCacheContentsOnScreen("No update");
 		CtxAttributeIdentifier preferenceCtxID = this.registry.getPPNPreference(details);
@@ -131,20 +279,25 @@ public class PrivatePreferenceCache {
 				return this.ppnCtxIDtoModel.get(preferenceCtxID);
 			}else{
 				this.logging.debug("Cache doesn't have preference. Will return obj if found in DB");
-				return this.retrievePPNPFromDB(preferenceCtxID);
+				try {
+					return this.retrievePPNPFromDB(preferenceCtxID);
+				} catch (PrivacyException e) {
+					this.logging.debug("PPN preference not found");
+					return null;
+				}
 			}
-			
+
 		}else{
 			this.logging.debug("NOt found preference, returning null");
 			return null;
 		}
 	}
-	
-	public IPrivacyPreferenceTreeModel getIDSPreference(IDSPreferenceDetails details){
-		
+
+	public IDSPrivacyPreferenceTreeModel getIDSPreference(IDSPreferenceDetailsBean details){
+
 		this.logging.debug("Request for preference: \n"+details.toString());
 		printCacheContentsOnScreen("No update");
-		
+
 		CtxAttributeIdentifier preferenceCtxID = this.registry.getIDSPreference(details);
 		if (preferenceCtxID!=null){
 			if (this.idsCtxIDtoModel.containsKey(preferenceCtxID)){
@@ -152,202 +305,209 @@ public class PrivatePreferenceCache {
 				return this.idsCtxIDtoModel.get(preferenceCtxID);
 			}else{
 				this.logging.debug("Found preference in registry. Cache doesn't have preference. Will return obj if found in DB");
-				return this.retrieveIDSPFromDB(preferenceCtxID);
+				try {
+					return this.retrieveIDSPFromDB(preferenceCtxID);
+				} catch (PrivacyException e) {
+					this.logging.debug("IDS preference not found");
+					return null;
+				}
 			}
-			
+
 		}else{
 			this.logging.debug("ERROR251 - Not found preference in registry, returning null");
 			return null;
 		}
 	}
-	
-	private IPrivacyPreferenceTreeModel retrievePPNPFromDB(CtxAttributeIdentifier preferenceCtxID){
-		this.logging.debug("Request to retrieve preference from DB");
-		IPrivacyPreferenceTreeModel model = this.retriever.retrievePreference(preferenceCtxID);
-		if (model!=null){
-			this.logging.debug("Preference found. returning");
-			this.ppnCtxIDtoModel.put(preferenceCtxID, model);
-			return model;
+
+	public DObfPreferenceTreeModel getDObfPreference(DObfPreferenceDetailsBean details){
+
+		this.logging.debug("Request for preference: \n"+details.toString());
+		printCacheContentsOnScreen("No update");
+
+		CtxAttributeIdentifier preferenceCtxID = this.registry.getDObfPreference(details);
+		if (preferenceCtxID!=null){
+			if (this.dobfCtxIDtoModel.containsKey(preferenceCtxID)){
+				this.logging.debug("Found preference in registry and cache. returning object");
+				return this.dobfCtxIDtoModel.get(preferenceCtxID);
+			}else{
+				this.logging.debug("Found preference in registry. Cache doesn't have preference. Will return obj if found in DB");
+				try {
+					return this.retrieveDObfPFromDB(preferenceCtxID);
+				} catch (PrivacyException e) {
+					this.logging.debug("DObf preference not found");
+					return null;
+				}
+			}
+
 		}else{
-			this.logging.debug("Preference not found. returning null");
+			this.logging.debug("ERROR251 - Not found preference in registry, returning null");
 			return null;
 		}
 	}
-	private IPrivacyPreferenceTreeModel retrieveIDSPFromDB(CtxAttributeIdentifier preferenceCtxID){
-		this.logging.debug("Request to retrieve preference from DB");
-		IPrivacyPreferenceTreeModel model = this.retriever.retrievePreference(preferenceCtxID);
-		if (model!=null){
-			this.logging.debug("Preference found. returning");
-			this.idsCtxIDtoModel.put(preferenceCtxID, model);
-			return model;
+
+	public AccessControlPreferenceTreeModel getAccCtrlPreference(AccessControlPreferenceDetailsBean details){
+
+		this.logging.debug("Request for preference: \n"+details.toString());
+		printCacheContentsOnScreen("No update");
+
+		CtxAttributeIdentifier preferenceCtxID = this.registry.getAccCtrlPreference(details);
+		
+		if (preferenceCtxID!=null){
+			//JOptionPane.showMessageDialog(null, "cache: Found preferenceCtxId: "+preferenceCtxID.getUri());
+			if (this.accCtrlCtxIDtoModel.containsKey(preferenceCtxID)){
+				//JOptionPane.showMessageDialog(null, "cache: accCtrlCtxIDtoModel contains "+preferenceCtxID.getUri());
+				this.logging.debug("Found preference in registry and cache. returning object");
+				return this.accCtrlCtxIDtoModel.get(preferenceCtxID);
+			}else{
+				//JOptionPane.showMessageDialog(null, "cache: accCtrlCtxIDtoModel DOES NOT contain "+preferenceCtxID.getUri());
+				this.logging.debug("Found preference in registry. Cache doesn't have preference. Will return obj if found in DB");
+				try {
+					return this.retrieveAccCtrlPFromDB(preferenceCtxID);
+				} catch (PrivacyException e) {
+					this.logging.debug("AccessCtrl preference not found");
+					return null;
+				}
+			}
+
 		}else{
-			this.logging.debug("Preference not found. returning null");
+			//JOptionPane.showMessageDialog(null, "cache: NOT Found preferenceCtxId");
+			this.logging.debug("ERROR251 - Not found preference in registry, returning null");
 			return null;
 		}
 	}
-	private IPrivacyPreferenceTreeModel findPPNPreference(CtxAttributeIdentifier preferenceCtxID){
+	private PPNPrivacyPreferenceTreeModel retrievePPNPFromDB(CtxAttributeIdentifier preferenceCtxID) throws PrivacyException{
+		this.logging.debug("Request to retrieve preference from DB");
+		IPrivacyPreferenceTreeModel model = this.retriever.retrievePreference(preferenceCtxID);
+
+		if (model!=null){
+			if (model instanceof PPNPrivacyPreferenceTreeModel){
+				this.logging.debug("Preference found. returning");
+				this.ppnCtxIDtoModel.put(preferenceCtxID, (PPNPrivacyPreferenceTreeModel) model);
+				return (PPNPrivacyPreferenceTreeModel) model;
+			}else{
+				this.logging.debug("FAILURE: Retrieved model from context DB not of type "+PPNPrivacyPreferenceTreeModel.class.getName());
+				throw new PrivacyException("FAILURE: Retrieved model from context DB not of type "+PPNPrivacyPreferenceTreeModel.class.getName());
+			}
+		}else{
+			this.logging.debug("PPNPreference not found. returning null");
+			throw new PrivacyException("PPN preference not found");
+		}
+
+	}
+	private IDSPrivacyPreferenceTreeModel retrieveIDSPFromDB(CtxAttributeIdentifier preferenceCtxID) throws PrivacyException{
+		this.logging.debug("Request to retrieve preference from DB");
+		IPrivacyPreferenceTreeModel model = this.retriever.retrievePreference(preferenceCtxID);
+
+		if (model!=null){
+			if (model instanceof IDSPrivacyPreferenceTreeModel){
+				this.logging.debug("Preference found. returning");
+				this.idsCtxIDtoModel.put(preferenceCtxID, (IDSPrivacyPreferenceTreeModel) model);
+				return (IDSPrivacyPreferenceTreeModel) model;
+			}else{
+				this.logging.debug("FAILURE: Retrieved model from context DB not of type "+IDSPrivacyPreferenceTreeModel.class.getName());
+				throw new PrivacyException("FAILURE: Retrieved model from context DB not of type "+IDSPrivacyPreferenceTreeModel.class.getName());
+			}
+		}else{
+			this.logging.debug("IDS Preference not found.");
+			throw new PrivacyException("IDS Preference not found.");
+		}
+	}
+
+	private DObfPreferenceTreeModel retrieveDObfPFromDB(CtxAttributeIdentifier preferenceCtxID) throws PrivacyException{
+		this.logging.debug("Request to retrieve preference from DB");
+		IPrivacyPreferenceTreeModel model = this.retriever.retrievePreference(preferenceCtxID);
+		if (model!=null){
+			if (model instanceof DObfPreferenceTreeModel){
+				this.logging.debug("Preference found. returning");
+				this.dobfCtxIDtoModel.put(preferenceCtxID, (DObfPreferenceTreeModel) model);
+				return (DObfPreferenceTreeModel) model;
+			}else{
+				this.logging.debug("FAILURE: Retrieved model from context DB not of type "+DObfPreferenceTreeModel.class.getName());
+				throw new PrivacyException("FAILURE: Retrieved model from context DB not of type "+DObfPreferenceTreeModel.class.getName());
+			}
+		}else{
+			this.logging.debug("DObf Preference not found.");
+			throw new PrivacyException("DObf Preference not found.");
+		}
+	}
+
+	private AccessControlPreferenceTreeModel retrieveAccCtrlPFromDB(CtxAttributeIdentifier preferenceCtxID) throws PrivacyException{
+		this.logging.debug("Request to retrieve preference from DB");
+		IPrivacyPreferenceTreeModel model = this.retriever.retrievePreference(preferenceCtxID);
+
+		if (model!=null){
+			if (model instanceof AccessControlPreferenceTreeModel){
+				this.logging.debug("Preference found. returning");
+				this.accCtrlCtxIDtoModel.put(preferenceCtxID, (AccessControlPreferenceTreeModel) model);
+				return (AccessControlPreferenceTreeModel) model;
+			}else{
+				this.logging.debug("FAILURE: Retrieved model from context DB not of type "+AccessControlPreferenceTreeModel.class.getName());
+				throw new PrivacyException("FAILURE: Retrieved model from context DB not of type "+AccessControlPreferenceTreeModel.class.getName());
+			}
+		}else{
+			this.logging.debug("Access control Preference not found.");
+			throw new PrivacyException("Access control Preference not found.");
+		}
+	}
+	private PPNPrivacyPreferenceTreeModel findPPNPreference(CtxAttributeIdentifier preferenceCtxID) throws PrivacyException{
 		if (this.ppnCtxIDtoModel.containsKey(preferenceCtxID)){
 			return this.ppnCtxIDtoModel.get(preferenceCtxID);
 		}else{
 			return this.retrievePPNPFromDB(preferenceCtxID);
 		}
 	}
-	private IPrivacyPreferenceTreeModel findIDSPreference(CtxAttributeIdentifier preferenceCtxID){
+	private IDSPrivacyPreferenceTreeModel findIDSPreference(CtxAttributeIdentifier preferenceCtxID) throws PrivacyException{
 		if (this.idsCtxIDtoModel.containsKey(preferenceCtxID)){
 			return this.idsCtxIDtoModel.get(preferenceCtxID);
 		}else{
 			return this.retrieveIDSPFromDB(preferenceCtxID);
 		}
 	}
-	
-	public IPrivacyPreferenceTreeModel getPPNPreference(String contextType, CtxAttributeIdentifier affectedCtxID, Requestor requestor){
-		PPNPreferenceDetails details = new PPNPreferenceDetails(contextType);
-		details.setAffectedDataId(affectedCtxID);
-		details.setRequestor(requestor);
-		return this.getPPNPreference(details);
-	}
-	
-	public IPrivacyPreferenceTreeModel getIDSPreference(IIdentity affectedDPI, Requestor requestor){
-		IDSPreferenceDetails details = new IDSPreferenceDetails(affectedDPI);
-		details.setRequestor(requestor);
-		return this.getIDSPreference(details);
-	}
-	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType){
-		this.logging.debug("Request for preferences for context type: \n"+contextType);
-		List<IPrivacyPreferenceTreeModel> modelList = new ArrayList<IPrivacyPreferenceTreeModel>();
-		List<CtxAttributeIdentifier> preferenceCtxIDs = this.registry.getPPNPreferences(contextType);
-		
-		for (CtxAttributeIdentifier ctxID : preferenceCtxIDs){
-			IPrivacyPreferenceTreeModel model = this.findPPNPreference(ctxID);
-			if (model!=null){
-				modelList.add(model);
-			}
-		}
-		
-		this.logging.debug("Found "+modelList.size()+" preferences for contextType: "+contextType);
-		return modelList;
-	}
-	
-	public List<IPrivacyPreferenceTreeModel> getIDSPreferences(IIdentity affectedDPI){
-		this.logging.debug("Request for IDS preferences for DPI: \n"+affectedDPI.toString());
-		List<IPrivacyPreferenceTreeModel> modelList = new ArrayList<IPrivacyPreferenceTreeModel>();
-		List<CtxAttributeIdentifier> preferenceCtxIDs = this.registry.getIDSPreferences(affectedDPI);
-		
-		for (CtxAttributeIdentifier ctxID : preferenceCtxIDs){
-			IPrivacyPreferenceTreeModel model = this.findIDSPreference(ctxID);
-			if (model!=null){
-				modelList.add(model);
-			}
-		}
-		
-		this.logging.debug("Found "+modelList.size()+" IDS preferences for dpi: "+affectedDPI.toString());
-		return modelList;
-	}
-	
-	
-	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, CtxAttributeIdentifier affectedCtxID){
-		this.logging.debug("Request for preferences for context type: \n"+contextType+" and affectedCtxID: "+affectedCtxID.toString());
-		List<IPrivacyPreferenceTreeModel> modelList = new ArrayList<IPrivacyPreferenceTreeModel>();
-		List<CtxAttributeIdentifier> preferenceCtxIDs = this.registry.getPPNPreferences(contextType, affectedCtxID);
-		
-		for (CtxAttributeIdentifier ctxID : preferenceCtxIDs){
-			IPrivacyPreferenceTreeModel model = this.findPPNPreference(ctxID);
-			if (model!=null){
-				modelList.add(model);
-			}
-		}
-		
-		this.logging.debug("Found "+modelList.size()+" preferences for contextType: "+contextType+" and affectedCtxID: "+affectedCtxID.toString());
 
-		return modelList;
-	}
-	
-	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, CtxAttributeIdentifier affectedCtxID, Requestor requestor){
-		this.logging.debug("Request for preferences for context type: \n"+contextType+" and affectedCtxID: "+affectedCtxID.toString());
-		List<IPrivacyPreferenceTreeModel> modelList = new ArrayList<IPrivacyPreferenceTreeModel>();
-		List<CtxAttributeIdentifier> preferenceCtxIDs = this.registry.getPPNPreferences(contextType, affectedCtxID, requestor);
-		
-		for (CtxAttributeIdentifier ctxID : preferenceCtxIDs){
-			IPrivacyPreferenceTreeModel model = this.findPPNPreference(ctxID);
-			if (model!=null){
-				modelList.add(model);
-			}
+	private IPrivacyPreferenceTreeModel findDObfPreference(CtxAttributeIdentifier preferenceCtxID) throws PrivacyException{
+		if (this.dobfCtxIDtoModel.containsKey(preferenceCtxID)){
+			return this.dobfCtxIDtoModel.get(preferenceCtxID);
+		}else{
+			return this.retrieveDObfPFromDB(preferenceCtxID);
 		}
-		
-		this.logging.debug("Found "+modelList.size()+" preferences for contextType: "+contextType+" and affectedCtxID: "+affectedCtxID.toString());
-
-		return modelList;
 	}
-	public List<IPrivacyPreferenceTreeModel> getIDSPreferences(IIdentity affectedDPI, Requestor requestor){
-		this.logging.debug("Request for IDS preferences for dpi: \n"+affectedDPI.toString()+", requestor: "+requestor.toString());
-		List<IPrivacyPreferenceTreeModel> modelList = new ArrayList<IPrivacyPreferenceTreeModel>();
-		List<CtxAttributeIdentifier> preferenceCtxIDs = this.registry.getIDSPreferences(affectedDPI, requestor);
-		
-		for (CtxAttributeIdentifier ctxID : preferenceCtxIDs){
-			IPrivacyPreferenceTreeModel model = this.findIDSPreference(ctxID);
-			if (model!=null){
-				modelList.add(model);
-			}
-		}
-		
-		this.logging.debug("Found "+modelList.size()+" IDS preferences for dpi: \n"+affectedDPI.toString()+", providerDPI: "+requestor.toString());
 
-		return modelList;
+	private IPrivacyPreferenceTreeModel findAccCtrlPreference(CtxAttributeIdentifier preferenceCtxID) throws PrivacyException{
+		if (this.accCtrlCtxIDtoModel.containsKey(preferenceCtxID)){
+			return this.accCtrlCtxIDtoModel.get(preferenceCtxID);
+		}else{
+			return this.retrieveAccCtrlPFromDB(preferenceCtxID);
+		}
 	}
-	
-	
-	
-	public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, Requestor requestor){
-		this.logging.debug("Request for preferences for context type: \n"+contextType+" and requestor: "+requestor.toString());
 
-		List<IPrivacyPreferenceTreeModel> modelList = new ArrayList<IPrivacyPreferenceTreeModel>();
-		List<CtxAttributeIdentifier> preferenceCtxIDs = this.registry.getPPNPreferences(contextType, requestor);
-		
-		for (CtxAttributeIdentifier ctxID : preferenceCtxIDs){
-			IPrivacyPreferenceTreeModel model = this.findPPNPreference(ctxID);
-			if (model!=null){
-				modelList.add(model);
-			}
-		}
-		this.logging.debug("Found "+modelList.size()+" preferences for contextType: "+contextType+" and requestor: "+requestor.toString());
-
-		return modelList;
-	}
-	
-	/*public List<IPrivacyPreferenceTreeModel> getPPNPreferences(String contextType, IIdentity dpi, ServiceResourceIdentifier serviceID){
-		this.logging.debug("Request for preferences for context type: \n"+contextType+" and requestorDPI: "+dpi.toString());
-
-		List<IPrivacyPreferenceTreeModel> modelList = new ArrayList<IPrivacyPreferenceTreeModel>();
-		List<CtxAttributeIdentifier> preferenceCtxIDs = this.registry.getPPNPreferences(contextType, requestor);
-		
-		for (CtxAttributeIdentifier ctxID : preferenceCtxIDs){
-			IPrivacyPreferenceTreeModel model = this.findPPNPreference(ctxID);
-			if (model!=null){
-				modelList.add(model);
-			}
-		}
-		this.logging.debug("Found "+modelList.size()+" preferences for contextType: "+contextType+" and requestorDPI: "+dpi.toString());
-
-		return modelList;
-	}*/
-	public void removePPNPreference(PPNPreferenceDetails details){
+	public boolean removePPNPreference(PPNPreferenceDetailsBean details){
 		this.logging.debug("Request to remove preference : \n"+details.toString());
 		CtxAttributeIdentifier preferenceCtxID = this.registry.getPPNPreference(details);
 		if (preferenceCtxID!=null){
 			this.storer.deletePreference(preferenceCtxID);
 			if (this.ppnCtxIDtoModel.containsKey(preferenceCtxID)){
-				
+
 				logging.debug("Deleting preference details:"+details.toString());
 				this.ppnCtxIDtoModel.remove(preferenceCtxID);
 				this.registry.removePPNPreference(details);
-				this.storer.storeRegistry(registry);
+				try {
+					this.storer.storeRegistry(registry);
+				} catch (PrivacyException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					this.logging.debug("Unable to store updated registry after deleting PPN preference");
+
+					return false;
+				}
+				return true;
 			}
 		}else{
 			this.logging.debug("Registry did not contain preference details: "+details.toString());
 		}
+		return false;
 	}
-	
-	public void removeIDSPreference(IDSPreferenceDetails details){
+
+	public boolean removeIDSPreference(IDSPreferenceDetailsBean details){
 		this.logging.debug("Request to remove preference : \n"+details.toString());
 		CtxAttributeIdentifier preferenceCtxID = this.registry.getIDSPreference(details);
 		if (preferenceCtxID!=null){
@@ -355,165 +515,101 @@ public class PrivatePreferenceCache {
 			if (this.idsCtxIDtoModel.containsKey(preferenceCtxID)){
 				this.idsCtxIDtoModel.remove(preferenceCtxID);
 				this.registry.removeIDSPreference(details);
-				this.storer.storeRegistry(registry);
+				try {
+					this.storer.storeRegistry(registry);
+				} catch (PrivacyException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					this.logging.debug("Unable to store updated registry after deleting IDS preference");
+					return false;
+				}
+				return true;
 			}
 		}else{
 			this.logging.debug("Preference Details not found in registry: "+details.toString());
 		}
+
+		return false;
 	}
-	
+
+	public boolean removeDObfPreference(DObfPreferenceDetailsBean details){
+		this.logging.debug("Request to remove preference : \n"+details.toString());
+		CtxAttributeIdentifier preferenceCtxID = this.registry.getDObfPreference(details);
+		if (preferenceCtxID!=null){
+			this.storer.deletePreference(preferenceCtxID);
+			if (this.dobfCtxIDtoModel.containsKey(preferenceCtxID)){
+				this.dobfCtxIDtoModel.remove(preferenceCtxID);
+				this.registry.removeDObfPreference(details);
+				try {
+					this.storer.storeRegistry(registry);
+
+				} catch (PrivacyException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					this.logging.debug("Unable to store updated registry after deleting DObf preference");
+					return false;
+				}
+				return true;
+			}
+		}else{
+			this.logging.debug("Preference Details not found in registry: "+details.toString());
+		}
+		return false;
+	}
+
+	public boolean removeAccCtrlPreference(AccessControlPreferenceDetailsBean details){
+		this.logging.debug("Request to remove preference : \n"+details.toString());
+		CtxAttributeIdentifier preferenceCtxID = this.registry.getAccCtrlPreference(details);
+		if (preferenceCtxID!=null){
+			this.storer.deletePreference(preferenceCtxID);
+			if (this.accCtrlCtxIDtoModel.containsKey(preferenceCtxID)){
+				this.accCtrlCtxIDtoModel.remove(preferenceCtxID);
+				this.registry.removeAccCtrlPreference(details);
+				try {
+					this.storer.storeRegistry(registry);
+				} catch (PrivacyException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					this.logging.debug("Unable to store updated registry after deleting AccCtrl preference");
+					return false;
+				}
+				return true;
+			}
+		}else{
+			this.logging.debug("Preference Details not found in registry: "+details.toString());
+		}
+		return false;
+	}
 	private void printCacheContentsOnScreen(String string){
-	
+
 		this.logging.debug("*********CACHE CONTENTS START "+string+"**************");
 		this.logging.debug(this.registry.toString());
 		this.logging.debug("*********CACHE CONTENTS END "+string+"**************");
 	}
 
-	
-	public List<PPNPreferenceDetails> getPPNPreferenceDetails(){
+
+	public List<PPNPreferenceDetailsBean> getPPNPreferenceDetails(){
 		return this.registry.getPPNPreferenceDetails();
 	}
-	
-	public List<IDSPreferenceDetails> getIDSPreferenceDetails(){
+
+	public List<IDSPreferenceDetailsBean> getIDSPreferenceDetails(){
 		return this.registry.getIDSPreferenceDetails();	
 	}
-	/*
-	 * OLD METHODS
-	 */
 
-
-	public IPrivacyPreferenceTreeModel getDObfPreference(DObfPreferenceDetails details) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	public List<DObfPreferenceDetails> getDObfPreferences() {
+	public List<DObfPreferenceDetailsBean> getDObfPreferenceDetails() {
 		return this.registry.getDObfPreferenceDetails();
 	}
-
-
-
-	/*	public ArrayList<IPrivacyPreferenceTreeModel> getPreferences(String contextType){
-	ArrayList<IPrivacyPreferenceTreeModel> prefList = new ArrayList<IPrivacyPreferenceTreeModel>();
-	List<CtxAttributeIdentifier> preferenceCtxIDs = this.registry.getPreferences(contextType);
-	for (CtxAttributeIdentifier id : preferenceCtxIDs){
-		if (this.ppnCtxIDtoModel.contains(id)){
-			prefList.add(this.ppnCtxIDtoModel.get(id));
-		}else{
-			IPrivacyPreferenceTreeModel model = this.retriever.retrievePreference(id);
-			if (model!=null){
-				this.ppnCtxIDtoModel.put(id, model);
-				if (null!=model.getAffectedContextIdentifier()){
-					this.affectedCtxIDtoPreferenceCtxIDMap.put(model.getAffectedContextIdentifier(), id);
-				}
-				prefList.add(model);
-			}
-		}
-	}
-		return prefList;
 	
-}*/
-
-/*	public Hashtable<String, ArrayList<IPrivacyPreferenceTreeModel>> getPreferences(ArrayList<String> contextTypes){
-	Hashtable<String, ArrayList<IPrivacyPreferenceTreeModel>>  table = new Hashtable<String, ArrayList<IPrivacyPreferenceTreeModel>>();
-	
-	for (String contextType : contextTypes){
-		ArrayList<IPrivacyPreferenceTreeModel> modelList = this.getPreferences(contextType);
-		table.put(contextType, modelList);
+	public List<AccessControlPreferenceDetailsBean> getAccCtrlPreferenceDetails(){
+		return this.registry.getAccCtrlPreferenceDetails();
 	}
-	
-	return table;
-}*/
 
 
 
 
 
-/*	public void storePreference(IPrivacyPreferenceTreeModel model){
-	if (model.getPrivacyType().equals(PrivacyPreferenceTypeConstants.PPNP)){
-		String contextType = model.getContextType();
-		CtxAttributeIdentifier affectedCtxID = model.getAffectedContextIdentifier();
-		boolean isSpecificToCtxID = (affectedCtxID != null);
-
-		if this preference is specific to a context attribute,
-		 * and a preference already exists that affects the
-		 * access permissions of this ctx attribute, this preference
-		 * has to overwrite the existing preference. if it doesnt exist,
-		 * it is stored as a new preference (specific to a ctx id)
-		 * if it is generic (i.e. it only affects a context type and not
-		 * a specific context attribute), the preference has to overwrite
-		 * the generic preference. if a generic preference for this context
-		 * type does not exist, it will be stored as a new preference. 
-		 
-		List<CtxAttributeIdentifier> preferenceCtxIDs = this.registry.getPreferences(contextType);
-		if (isSpecificToCtxID){
-			if (this.affectedCtxIDtoPreferenceCtxIDMap.contains(affectedCtxID)){
-				CtxAttributeIdentifier preferenceCtxID = this.getPreferenceCtxIDFromAffectedCtxID(affectedCtxID);
-				this.storer.storeExisting(preferenceCtxID, model);
-				return;
-			}
-		}else{
-			for (CtxAttributeIdentifier id : preferenceCtxIDs){
-				IPrivacyPreferenceTreeModel tempModel = this.getPreference(id);
-				if (tempModel!=null){
-					if (tempModel.getAffectedContextIdentifier()==null){
-						this.storer.storeExisting(id, model);
-						return;
-					}
-				}
-			}
-		}
-		
-		//if not found, it needs to be stored as a new preference
-
-		String newPrefName = this.registry.getNameForNewPreference(PrivacyPreferenceTypeConstants.PPNP);
-		CtxAttributeIdentifier newPreferenceCtxID = storer.storeNewPreference(model, newPrefName);
-		this.registry.addPreference(contextType, newPreferenceCtxID);
-		this.storer.storeRegistry(registry);
-		
-		
-	}else if (model.getPrivacyType().equals(PrivacyPreferenceTypeConstants.IDS)){
-
-		//TODO: DECIDE WHAT TO DO!!!
-	}
-}*/
 
 
-
-
-/*
- * 
- * @param contextType the affected contextType
- * @param ctxID	the affected ctxID. 
- * 	if the affected contextType is symloc then the ctxID will be the the ctxID of the symloc attribute as stored in the DB. 
- * In order to delete only the generic preference that affects any symloc attribute stored in the DB, insert null. 
- */
-/*	public void deletePreference(String contextType, CtxAttributeIdentifier affectedCtxID){
-	List<CtxAttributeIdentifier> preferenceCtxIDs = this.registry.getPreferences(contextType);
-	if (affectedCtxID==null){
-		for (CtxAttributeIdentifier id : preferenceCtxIDs){
-			IPrivacyPreferenceTreeModel tempModel = this.getPreference(id);
-			if (null==tempModel.getAffectedContextIdentifier()){
-				this.ppnCtxIDtoModel.remove(id);
-				this.registry.removePreference(contextType, id);
-				this.storer.deletePreference(id);
-			}
-		}
-	}else{
-		for (CtxAttributeIdentifier id: preferenceCtxIDs){
-			IPrivacyPreferenceTreeModel tempModel = this.getPreference(id);
-			if (null!=tempModel.getAffectedContextIdentifier()){
-				if (tempModel.getAffectedContextIdentifier().equals(affectedCtxID)){
-					this.ppnCtxIDtoModel.remove(id);
-					this.registry.removePreference(contextType, id);
-					this.storer.deletePreference(id);
-				}
-			}
-		}
-	}
-	
-}*/
 }
 
 

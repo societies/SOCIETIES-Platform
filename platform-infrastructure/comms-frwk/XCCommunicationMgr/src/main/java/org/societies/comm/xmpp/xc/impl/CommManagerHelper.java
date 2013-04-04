@@ -411,6 +411,7 @@ public class CommManagerHelper {
 			String message = e.getClass().getName() + ": Unable to create class for serialisation - " + e.getMessage();
 			return buildErrorResponse(originalFrom, id, message, e);
 		} catch (Exception e) {
+			LOG.error("Uncaught exception occurred", e);
 			String message = e.getClass().getName() + "Unable to serialise Simple element"; 
 			return buildErrorResponse(originalFrom, id, message, e);
 		}

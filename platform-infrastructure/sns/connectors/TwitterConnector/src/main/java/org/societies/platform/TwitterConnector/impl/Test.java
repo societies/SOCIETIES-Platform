@@ -35,7 +35,7 @@ class Test {
 		TwitterConnectorImpl t = new TwitterConnectorImpl(Token, "dingqi");
 
 		testProfileExtraction(t);
-		testFriendsExtraction(t);
+		//testFriendsExtraction(t);
 		
 		
 		

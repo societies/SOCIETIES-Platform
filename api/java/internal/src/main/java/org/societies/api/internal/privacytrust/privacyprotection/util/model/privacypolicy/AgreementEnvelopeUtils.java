@@ -24,9 +24,18 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
@@ -81,4 +90,74 @@ public class AgreementEnvelopeUtils {
 		}
 		return agreementEnvelopeBeans;
 	}
+	
+	public static Checksum calculateChecksum(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope agreement){
+		Checksum agreementCheckSum = new CRC32();
+		byte[] byteArray;
+		try {
+			byteArray = getBytes(agreement);
+			agreementCheckSum.update(byteArray, 0, byteArray.length);
+			return agreementCheckSum;
+			//long checksum = checksumEngine.getValue();
+			//System.out.println("Checksum: "+checksum);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private static byte[] getBytes(Object obj) throws java.io.IOException{
+		ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
+		ObjectOutputStream oos = new ObjectOutputStream(bos); 
+		oos.writeObject(obj);
+		oos.flush(); 
+		oos.close(); 
+		bos.close();
+		byte [] data = bos.toByteArray();
+		return data;
+	}
+
+
+	private static Object getObject(byte[] bytes){
+		ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+		try {
+			ObjectInputStream ois = new ObjectInputStream(bis);
+			return ois.readObject();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+
+	public static Key getPublicKey(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope agreement) {
+		return (Key) getObject(agreement.getPublicKey());
+	}
+	
+	
+	public static boolean equals(org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope agreement, Object obj) {
+		// -- Verify reference equality
+		if (obj == agreement) { return true; }
+		if (obj == null) { return false; }
+		
+		if (obj.getClass() != agreement.getClass()) {
+			return false;
+		}
+		
+		
+		// -- Verify obj type
+		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope rhs = (org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope) obj;
+		return new EqualsBuilder()
+			.append(agreement.getAgreementCheckSum(), rhs.getAgreementCheckSum())
+			.append(agreement.getSignature(), rhs.getSignature())
+			.append(agreement.getPublicKey(), agreement.getPublicKey())
+			.append(agreement.getAgreement(), agreement.getAgreement())
+			.isEquals();
+	}
+	
 }

@@ -26,6 +26,7 @@ public class FriendsConverterFromFacebook implements FriendsConverter{
 	    List<Account> accounts = new ArrayList<Account>();
 	    accounts.add(fb);
 		
+	      PersonConverterFromFacebook converter = new PersonConverterFromFacebook();
 		try {
 			JSONObject jdata  = new JSONObject(data);
 			if (jdata.has("error")){
@@ -43,14 +44,17 @@ public class FriendsConverterFromFacebook implements FriendsConverter{
 			
 			 
 			for (int i =0; i<jfriends.length();i++){
+			    
+			        
 				JSONObject jfriend = jfriends.getJSONObject(i);
-				Person p = new PersonImpl();
-				p.setId("facebook:"+jfriend.getString("id"));
-				p.setRelationshipStatus("friend");
-				p.setName(new NameImpl(jfriend.getString("name")));
-				p.setAccounts(accounts);
+				
+//				Person p = new PersonImpl();
+//				p.setId("facebook:"+jfriend.getString("id"));
+//				p.setRelationshipStatus("friend");
+//				p.setName(new NameImpl(jfriend.getString("name")));
+//				p.setAccounts(accounts);
 				//System.out.println(">>> new Friends"+p.getName().getFormatted());
-				friends.add(p);
+				friends.add(converter.load(jfriend.toString()));
 			}
 		} 
 		catch (JSONException e) {

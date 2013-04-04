@@ -176,6 +176,14 @@ window.plugins.SocietiesLocalCSSManager = {
 		else {
 			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'listAdvertisementRecords'));
 		}
+	},
+	getCssActivities: function(successCallback, errorCallback){
+		//if (phonegapdesktop.internal.randomException("getCssActivities")) {
+		//	errorCallback('A random error was generated');
+		//}
+		//else {
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'cssActivityFeedFull'));
+		//}
 	}
 }
 

@@ -39,6 +39,7 @@ import org.societies.api.identity.Requestor;
  * @author Elizabeth
  *
  */
+@Deprecated
 public class RequestPolicy implements Serializable{
 
 	private Requestor requestor;
