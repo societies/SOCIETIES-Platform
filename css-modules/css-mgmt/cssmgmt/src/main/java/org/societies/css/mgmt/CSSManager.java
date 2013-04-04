@@ -40,7 +40,6 @@ import java.util.concurrent.Future;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.activity.client.ActivityFeedClient;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.activity.IActivityFeedManager;
@@ -273,18 +272,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 
 				LOG.info("Generating CSS_Record_Event to notify Record has been created");
 
-//				LOG.info("Generating CSS_Record_Event to notify Record has been created");
-//				if(this.getEventMgr() != null){
-//					InternalEvent event = new InternalEvent(EventTypes.CSS_RECORD_EVENT, "CSS Record Created", this.idManager.getThisNetworkNode().toString(), cssProfile);
-//					try {
-//						LOG.info("Calling PublishInternalEvent with details :" +event.geteventType() +event.geteventName() +event.geteventSource() +event.geteventInfo());
-//						this.getEventMgr().publishInternalEvent(event);
-//					} catch (EMSException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//						LOG.error("error trying to internally publish SUBS CIS event");
-//					}
-//				}
+				addActivityToCSSAF("SOCIETIES profile published");
 			} else {
 				// if CssRecord already persisted remove all nodes and add cloud node
 
@@ -301,8 +289,6 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-			
-		addActivityToCSSAF("CSS Record created");
 	
 	}
 	
@@ -1147,10 +1133,32 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 				cssManagerRemote.updateCssRequest(request);
 		}
 		if(request.getRequestStatus() == (CssRequestStatusType.DELETEFRIEND)){
-			addActivityToCSSAF("CSS has Removed Friend " +request.getCssIdentity() +" from friends List");
+			List<String> listIDs = new ArrayList<String>();
+			listIDs.add(request.getCssIdentity());
+			final String who = request.getCssIdentity();
+			cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
+				@Override
+				public void getResult(List<CssAdvertisementRecord> resultList) {
+					if (resultList.size() > 0)
+						addActivityToCSSAF("Removed " + resultList.get(0).getName() + " from friends");
+					else
+						addActivityToCSSAF("Removed " + who + " from friends");
+				}
+			});
 		}
 		if(request.getRequestStatus() == (CssRequestStatusType.CANCELLED)){
-			addActivityToCSSAF("CSS has Cancelled Friend Request sent to " +request.getCssIdentity());
+			List<String> listIDs = new ArrayList<String>();
+			listIDs.add(request.getCssIdentity());
+			final String who = request.getCssIdentity();
+			cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
+				@Override
+				public void getResult(List<CssAdvertisementRecord> resultList) {
+					if (resultList.size() > 0)
+						addActivityToCSSAF("Cancelled friend request to " + resultList.get(0).getName());
+					else
+						addActivityToCSSAF("Cancelled friend request to " + who);
+				}
+			});
 		}
 	}
 
@@ -1181,7 +1189,20 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 		System.out.println("~~~~~~~~~~~~~~~ sending Friend request : " +cssFriendId);
 		LOG.info("sending Friend request : " +cssFriendId);
 		cssManagerRemote.sendCssFriendRequest(cssFriendId);
-		addActivityToCSSAF("CSS has sent Friend Request to " +cssFriendId);
+
+		//UPDATE ACTIVITY FEED
+		List<String> listIDs = new ArrayList<String>();
+		listIDs.add(cssFriendId);
+		final String who = cssFriendId;
+		cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
+			@Override
+			public void getResult(List<CssAdvertisementRecord> resultList) {
+				if (resultList.size() > 0)
+					addActivityToCSSAF("Sent " + resultList.get(0).getName() + " a friend request");
+				else
+					addActivityToCSSAF("Sent friend request to " + who);
+			}
+		});
 	}
 
 
@@ -1651,7 +1672,18 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 					request.setOrigin(CssRequestOrigin.REMOTE);
 					cssManagerRemote.updateCssFriendRequest(request); 
 			}
-			addActivityToCSSAF("CSS has Accepted Friend Request from " +request.getCssIdentity());
+			List<String> listIDs = new ArrayList<String>();
+			listIDs.add(request.getCssIdentity());
+			final String who = request.getCssIdentity();
+			cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
+				@Override
+				public void getResult(List<CssAdvertisementRecord> resultList) {
+					if (resultList.size() > 0)
+						addActivityToCSSAF(resultList.get(0).getName() + " accepted your friend request");
+					else
+						addActivityToCSSAF("Accepted friend request from " + who);
+				}
+			});
 		}
 	/**
 	 * Determine if a CssNode object exists in the CssRecord maintained 
@@ -1675,49 +1707,51 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	}
 
 	public void declineCssFriendRequest(CssRequest request) {
+		LOG.info("Decline Css Friend Request has been called");
+		LOG.info("declineCssFriendRequest status: " +request.getRequestStatus());
+		LOG.info("declineCssFriendRequest Origin: " +request.getOrigin());
+		LOG.info("declineCssFriendRequest ID: " +request.getCssIdentity());
 
-
-	LOG.info("Decline Css Friend Request has been called");
-	LOG.info("declineCssFriendRequest status: " +request.getRequestStatus());
-	LOG.info("declineCssFriendRequest Origin: " +request.getOrigin());
-	LOG.info("declineCssFriendRequest ID: " +request.getCssIdentity());
-
-
-			try {
-				cssRegistry.updateCssFriendRequestRecord(request);
-
-
-				} catch (CssRegistrationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-			// If this was initiated locally then inform remote css
-			// We only want to sent messages to remote Css's for this function if we initiated the call locally
-			if (request.getOrigin() == CssRequestOrigin.LOCAL)
-			{
-
-				// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
-				// otherwise send message to remote css
-
-					//called updateCssFriendRequest on remote
-					request.setOrigin(CssRequestOrigin.REMOTE);
-					//cssManagerRemote.acceptCssFriendRequest(request); 
-					cssManagerRemote.declineCssFriendRequest(request);
-			}
-			if (request.getOrigin() == CssRequestOrigin.REMOTE)
-			{
-
-				// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
-				// otherwise send message to remote css
-
-					//called updateCssFriendRequest on remote
-					request.setOrigin(CssRequestOrigin.REMOTE);
-					cssManagerRemote.updateCssFriendRequest(request); 
-			}
-			
-			addActivityToCSSAF("CSS has Declined Friend Request received from " +request.getCssIdentity());
+		try {
+			cssRegistry.updateCssFriendRequestRecord(request);
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+
+		// If this was initiated locally then inform remote css
+		// We only want to sent messages to remote Css's for this function if we initiated the call locally
+		if (request.getOrigin() == CssRequestOrigin.LOCAL) {
+			// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
+			// otherwise send message to remote css
+
+			//called updateCssFriendRequest on remote
+			request.setOrigin(CssRequestOrigin.REMOTE);
+			//cssManagerRemote.acceptCssFriendRequest(request); 
+			cssManagerRemote.declineCssFriendRequest(request);
+		}
+		if (request.getOrigin() == CssRequestOrigin.REMOTE) {
+			// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
+			// otherwise send message to remote css
+
+			//called updateCssFriendRequest on remote
+			request.setOrigin(CssRequestOrigin.REMOTE);
+			cssManagerRemote.updateCssFriendRequest(request); 
+		}
+		//ACTIVITY FEED
+		List<String> listIDs = new ArrayList<String>();
+		listIDs.add(request.getCssIdentity());
+		final String who = request.getCssIdentity();
+		cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
+			@Override
+			public void getResult(List<CssAdvertisementRecord> resultList) {
+				if (resultList.size() > 0)
+					addActivityToCSSAF(resultList.get(0).getName() + " declined your friend request");
+				else
+					addActivityToCSSAF("Declined friend request from " + who);
+			}
+		});
+	}
 
 	@Override
 	public Future<HashMap<IIdentity, Integer>> getSuggestedFriends(
@@ -2572,14 +2606,25 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 				}
 			}
 		});
-		
-		addActivityToCSSAF("CSS has received a Friend Request from " +targetCSSid);
+		//ACTIVITY FEED
+		List<String> listIDs = new ArrayList<String>();
+		listIDs.add(targetCSSid);
+		final String who = targetCSSid;
+		cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
+			@Override
+			public void getResult(List<CssAdvertisementRecord> resultList) {
+				if (resultList.size() > 0)
+					addActivityToCSSAF(resultList.get(0).getName() + " sent you a friend request");
+				else
+					addActivityToCSSAF("Recieved friend request from " + who);
+			}
+		});
 	}
 
 	@Override
 	public void handleExternalFriendRequest(IIdentity identity, CssRequestStatusType statusType) {
 		//identity is who the request has come FROM
-		CssRequest request = new CssRequest();
+		final CssRequest request = new CssRequest();
 		request.setCssIdentity(identity.toString());
 		request.setRequestStatus(statusType);
 		LOG.info("handleExternalFriendRequest called : ");
@@ -2626,8 +2671,20 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 					}
 				}
 			});
-		}	
-		addActivityToCSSAF("CSS Friend Request has been " +request.getRequestStatus() +" by " +identity.toString());
+		}
+		//ACTIVITY FEED
+		List<String> listIDs = new ArrayList<String>();
+		listIDs.add(request.getCssIdentity());
+		final String who = request.getCssIdentity();
+		cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
+			@Override
+			public void getResult(List<CssAdvertisementRecord> resultList) {
+				if (resultList.size() > 0)
+					addActivityToCSSAF("Friend request " + request.getRequestStatus() + " by " + resultList.get(0).getName());
+				else
+					addActivityToCSSAF("Friend request " + request.getRequestStatus() + " by " + who);
+			}
+		});
 	}
 
 	@Override
@@ -2638,11 +2695,21 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		pendingFR.setOrigin(CssRequestOrigin.LOCAL);
 		acceptCssFriendRequest(pendingFR);
 		
-		addActivityToCSSAF("CSS Friend Request has been Accepted by " +identity.toString());
-		addActivityToCSSAF("CSS Friend Request has been " +pendingFR.getRequestStatus() +"by " +identity.toString());
+		//ACTIVITY FEED
+		List<String> listIDs = new ArrayList<String>();
+		listIDs.add(identity.toString());
+		final String who = identity.toString();
+		cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
+			@Override
+			public void getResult(List<CssAdvertisementRecord> resultList) {
+				if (resultList.size() > 0)
+					addActivityToCSSAF(resultList.get(0).getName() + " accepted your friend request");
+				else
+					addActivityToCSSAF("Friend request accepted by " + who);
+			}
+		});
 		
-		
-		
+		//addActivityToCSSAF("CSS Friend Request has been " +pendingFR.getRequestStatus() +"by " +identity.toString());
 		//UPDATE LOCAL DATABASE WITH THIS FRIEND REQUEST
 		//CssRequest request = new CssRequest();
 		//request.setCssIdentity(identity.toString());
