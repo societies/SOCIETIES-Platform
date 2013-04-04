@@ -1761,6 +1761,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		List<CssAdvertisementRecordDetailed> allcssDetails = new ArrayList<CssAdvertisementRecordDetailed>();
 		
 		HashMap<IIdentity, Integer> commonFriends = new HashMap<IIdentity, Integer>();
+		HashMap<IIdentity, Integer> comparedFriends = new HashMap<IIdentity, Integer>();
 		String MyId = "";	
 		MyId = idManager.getThisNetworkNode().toString();
 		IIdentity myIdentity = null;
@@ -1889,76 +1890,97 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		}
 
 		// Generate the connector
-		LOG.info("Getting info from Social connectors: ");
 		Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
-		socialdata.updateSocialData();
-
-		while (it.hasNext()){
-		  ISocialConnector conn = it.next();
-		}
+		LOG.info("social connectors is " +socialdata.getSocialConnectors());
 		
+		LOG.info("Getting social friends");
 		String domain ="";
 		snFriends = (List<Person>) socialdata.getSocialPeople();
+		LOG.info("Social Friends snFriends list size is " +snFriends.size());
+		if (snFriends == null) {
+			LOG.info("Social Friends is Null");
+			snFriends = new ArrayList<Person>();
+		}
 
 	    Iterator<Person> itt = snFriends.iterator();
+	    LOG.info("Social Friends Iterator " +itt);
 	    int index =1;
 	    while(itt.hasNext()){
 	    	Person p =null;
-	    	String name = "";
-	    	try{
-	        	p = (Person) itt.next();
-	        	if (p.getName()!=null){
-	    			if (p.getName().getFormatted()!=null){
-	    				name = p.getName().getFormatted();
-	    				domain = p.getAccounts().get(0).getDomain();
+	    	
+	    		p = itt.next();
+
+				String name = "Username NA";
+				String img = "";
+				String link = "";
+				String thumb = "";
+				String id = null;
+				try {
+					if (p.getName() != null) {
+						if (p.getName().getFormatted() != null){
+							name = p.getName().getFormatted();
+							LOG.info("name formatted " +name);
+						}
+						else {
+							if (p.getName().getFamilyName() != null){
+								name = p.getName().getFamilyName();
+								LOG.info("name familyname " +name);
+							}
+							if (p.getName().getGivenName() != null) {
+								if (name.length() > 0)
+									name += " ";
+								name += p.getName().getGivenName();
+								LOG.info("name givenname " +name);
+							}
+						}
+
+					}
+
+					if (p.getAccounts() != null) {
+						if (p.getAccounts().size() > 0) {
+							domain = p.getAccounts().get(0).getDomain();
+							LOG.info("domain " +domain);
+						}
+					}
+					id = p.getId();
+					if (p.getId().contains(":")) {
+						id = p.getId().split(":")[0];
+						LOG.info("ID " +id);
+					}
+				} catch (Exception ex) {
+				LOG.error("Error while parsing the Person OBJ");
+				ex.printStackTrace();
+			}
+	    	
 	    				
-	    				
-	    				if(domain.equalsIgnoreCase("facebook.com")){
+	    				if(id.equalsIgnoreCase("facebook")){
 							filter.setFilterFlag(facebook);		
 		    				facebookFriends.add(name);    				
 	    				}
-	    				if(domain.equalsIgnoreCase("twitter.com")){
+	    				if(id.equalsIgnoreCase("twitter")){
 	    					
 							filter.setFilterFlag(twitter);		
 							
 		    				twitterFriends.add(name);    				
 	    				}
-	    				if(domain.equalsIgnoreCase("linkedin.com")){
+	    				if(id.equalsIgnoreCase("linkedin")){
 	    					
 							filter.setFilterFlag(linkedin);		
 		    				linkedinFriends.add(name);    				
 	    				}
-	    				if(domain.equalsIgnoreCase("foursquare.com")){
+	    				if(id.equalsIgnoreCase("foursquare")){
 	    					
 							filter.setFilterFlag(foursquare);		
 							
 		    				foursquareFriends.add(name);    				
 	    				}
-	    				if(domain.equalsIgnoreCase("googleplus.com")){
+	    				if(id.equalsIgnoreCase("googleplus")){
 							filter.setFilterFlag(googleplus);		
 							
 		    				googleplusFriends.add(name);    				
 	    				}
 	    				
-	    			}
-	    				
-	    			else {
-	    				if(p.getName().getFamilyName()!=null) name = p.getName().getFamilyName();
-	    				if(p.getName().getGivenName()!=null){
-	    					if (name.length()>0)  name+=" ";
-	    					name +=p.getName().getGivenName();
-	    					
-	    					socialFriends.add(name);
-	    				}
-	    					  
-	    			
-	    			}
-	    				
-	    		}
-	    	}catch(Exception ex){name = "- NOT AVAILABLE -";}
-	    	index++;
-	    }
-		//}
+				}
 	    
 	    //compare the lists to create
 	    
@@ -2086,23 +2108,24 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	  					for(Entry<IIdentity, Integer> entry : commonFriends.entrySet()){
 	  						if(entry.getKey().equals(cssFriend.get(i))){	
 	  								LOG.info("commonFriends already has this entry : "+cssFriends.get(i).getName() +" with filter value: " +entry.getValue());
+	  								comparedFriends.put(cssFriend.get(i), entry.getValue());
 	  							}else {
 	  								if(commonFriends.containsKey((cssFriend.get(i)))){
 	  									LOG.info("commonFriends has this entry already: ");
 	  								}else{
-	  									commonFriends.put(cssFriend.get(i), none );
+	  									comparedFriends.put(cssFriend.get(i), none);
 	  								}
 	  							}
 	  						}
 	  					}
 	               }else {
 	              	 for(int j = 0; j < cssFriend.size(); j++){
-	              		 commonFriends.put(cssFriend.get(j), none );
+	              		comparedFriends.put(cssFriend.get(j), none);
 	              	 }
 	               }
-	               LOG.info("getSuggestedFriends commonFriends size is now : " +commonFriends.size());
+	               LOG.info("getSuggestedFriends commonFriends size is now : " +comparedFriends.size());
 	    
-		return new AsyncResult<HashMap<IIdentity, Integer>> (commonFriends);
+		return new AsyncResult<HashMap<IIdentity, Integer>> (comparedFriends);
 	}
 
 	@Override
@@ -2149,6 +2172,10 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 	Future<List<CssAdvertisementRecordDetailed>> asynchallcss =  this.getCssAdvertisementRecordsFull();
 	List<CssAdvertisementRecordDetailed> allcssDetails = new ArrayList<CssAdvertisementRecordDetailed>();
 	HashMap<CssAdvertisementRecord, Integer> commonFriends = new HashMap<CssAdvertisementRecord, Integer>();
+	HashMap<CssAdvertisementRecord, Integer> comparedFriends = new HashMap<CssAdvertisementRecord, Integer>();
+	
+	
+	
 	String MyId = "";	
 	MyId = idManager.getThisNetworkNode().toString();
 	IIdentity myIdentity = null;
@@ -2259,7 +2286,7 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		for (CssAdvertisementRecord cssAdd : recordList){
 		
 			if (cssAdd.getId().equalsIgnoreCase(MyId)) {
-			LOG.info("This is my OWN ID not adding it");
+			LOG.info("@@@@@@@ This is my OWN ID not adding it");
 			}else {
 				cssFriends.add((cssAdd));
 			}
@@ -2268,77 +2295,96 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 
 	// Generate the connector
 	Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
-	socialdata.updateSocialData();
-
-	while (it.hasNext()){
-	  ISocialConnector conn = it.next();
-  	  
-
-	//socialdata.updateSocialData();
-	}
-	//it.next().getConnectorName();
+	LOG.info("social connectors is " +socialdata.getSocialConnectors());
+	
+	LOG.info("Getting social friends");
 	String domain ="";
 	snFriends = (List<Person>) socialdata.getSocialPeople();
+	LOG.info("Social Friends snFriends list size is " +snFriends.size());
+	if (snFriends == null) {
+		LOG.info("Social Friends is Null");
+		snFriends = new ArrayList<Person>();
+	}
 
     Iterator<Person> itt = snFriends.iterator();
+    LOG.info("Social Friends Iterator " +itt);
     int index =1;
     while(itt.hasNext()){
     	Person p =null;
-    	String name = "";
-    	try{
-        	p = (Person) itt.next();
-        	if (p.getName()!=null){
-    			if (p.getName().getFormatted()!=null){
-    				name = p.getName().getFormatted();
-    				domain = p.getAccounts().get(0).getDomain();
+    	
+    		p = itt.next();
+
+			String name = "Username NA";
+			String img = "";
+			String link = "";
+			String thumb = "";
+			String id = null;
+			try {
+				if (p.getName() != null) {
+					if (p.getName().getFormatted() != null){
+						name = p.getName().getFormatted();
+						LOG.debug("name formatted " +name);
+					}
+					else {
+						if (p.getName().getFamilyName() != null){
+							name = p.getName().getFamilyName();
+							LOG.debug("name familyname " +name);
+						}
+						if (p.getName().getGivenName() != null) {
+							if (name.length() > 0)
+								name += " ";
+							name += p.getName().getGivenName();
+							LOG.debug("name givenname " +name);
+						}
+					}
+
+				}
+
+				if (p.getAccounts() != null) {
+					if (p.getAccounts().size() > 0) {
+						domain = p.getAccounts().get(0).getDomain();
+						LOG.debug("domain " +domain);
+					}
+				}
+				id = p.getId();
+				if (p.getId().contains(":")) {
+					id = p.getId().split(":")[0];
+					LOG.debug("ID " +id);
+				}
+			} catch (Exception ex) {
+			LOG.error("Error while parsing the Person OBJ");
+			ex.printStackTrace();
+		}
+    	
     				
-    				
-    				if(domain.equalsIgnoreCase("facebook.com")){
+    				if(id.equalsIgnoreCase("facebook")){
 						filter.setFilterFlag(facebook);		
 	    				facebookFriends.add(name);    				
     				}
-    				if(domain.equalsIgnoreCase("twitter.com")){
+    				if(id.equalsIgnoreCase("twitter")){
     					
 						filter.setFilterFlag(twitter);		
 						
 	    				twitterFriends.add(name);    				
     				}
-    				if(domain.equalsIgnoreCase("linkedin.com")){
+    				if(id.equalsIgnoreCase("linkedin")){
     					
 						filter.setFilterFlag(linkedin);		
 	    				linkedinFriends.add(name);    				
     				}
-    				if(domain.equalsIgnoreCase("foursquare.com")){
+    				if(id.equalsIgnoreCase("foursquare")){
     					
 						filter.setFilterFlag(foursquare);		
 						
 	    				foursquareFriends.add(name);    				
     				}
-    				if(domain.equalsIgnoreCase("googleplus.com")){
+    				if(id.equalsIgnoreCase("googleplus")){
 						filter.setFilterFlag(googleplus);		
 						
 	    				googleplusFriends.add(name);    				
     				}
     				
-    			}
-    				
-    			else {
-    				if(p.getName().getFamilyName()!=null) name = p.getName().getFamilyName();
-    				if(p.getName().getGivenName()!=null){
-    					if (name.length()>0)  name+=" ";
-    					name +=p.getName().getGivenName();
-    					
-    					socialFriends.add(name);
-    				}
-    					  
-    			
-    			}
-    				
-    		}
-    	}catch(Exception ex){name = "- NOT AVAILABLE -";}
-    	index++;
-    }
-	//}
+			}
     
     //compare the lists to create
     
@@ -2451,23 +2497,27 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 					for(Entry<CssAdvertisementRecord, Integer> entry : commonFriends.entrySet()){
 						if(entry.getKey().equals(cssFriends.get(i))){	
 								LOG.info("commonFriends already has this entry : "+cssFriends.get(i).getName() +" with filter value: " +entry.getValue());
+								LOG.info("Adding this to the compared list : "+cssFriends.get(i).getName() +" with filter value: " +entry.getValue());
+								comparedFriends.put(cssFriends.get(i), entry.getValue());
 							}else {
 								if(commonFriends.containsKey((cssFriends.get(i)))){
 									LOG.info("commonFriends has this entry already: ");
 								}else{
-									commonFriends.put(cssFriends.get(i), none );
-									LOG.info("Putting this entry in commonFriends: "+cssFriends.get(i).getName() +" with filter value: " +none);
+									//commonFriends.put(cssFriends.get(i), none );
+									comparedFriends.put(cssFriends.get(i), none);
+									LOG.info("Putting this entry in comparedFriends: "+cssFriends.get(i).getName() +" with filter value: " +none);
 								}
 							}
 						}
 					}
              }else {
             	 for(int j = 0; j < cssFriends.size(); j++){
-            		 commonFriends.put(cssFriends.get(j), none );
+            		 LOG.info("Adding friends to comparedfriends list " +cssFriends.get(j).getName());
+            		 comparedFriends.put(cssFriends.get(j), none );
             	 }
              }
     
-	return new AsyncResult<HashMap<CssAdvertisementRecord, Integer>> (commonFriends);
+	return new AsyncResult<HashMap<CssAdvertisementRecord, Integer>> (comparedFriends);
 	}
 
 	@Override
