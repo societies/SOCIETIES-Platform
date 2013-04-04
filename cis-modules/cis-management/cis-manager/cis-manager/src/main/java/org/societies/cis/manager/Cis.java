@@ -1209,7 +1209,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 					//CHECK WHICH RECORD BELONGS TO WHO
 					for (Participant participant: listParticipants) {
 						if (record.getId().equals(participant.getJid()) )
-							participant.setValue(record.getName());
+							participant.setName(record.getName());
 					}
 				}
 				who.setParticipant(listParticipants);

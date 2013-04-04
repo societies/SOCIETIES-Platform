@@ -27,16 +27,16 @@
 	                    "communityJid" : "barca.soc.com"
 	     			},
 	     "getMembers" : [{"jid": "tom@societies.local", 
-	     				  "role": "owner",
-	     				  "value": "Tom Cruise"
+	     				  "role": "OWNER",
+	     				  "name": "Tom Cruise"
 	     				 },
 	     				 {"jid": "bob@societies.local", 
-	     				  "role": "participant",
-	     				  "value": "Robert DeNiro"
+	     				  "role": "PARTICIPANT",
+	     				  "name": "Robert DeNiro"
 	     				 },
 	     				 {"jid": "angie@societies.local", 
-	     				  "role": "participant",
-	     				  "value": "Angelina Jolie"
+	     				  "role": "PARTICIPANT",
+	     				  "name": "Angelina Jolie"
 	     				}],
 	     "listOfCISs": [{
 	     				"communityName": "flamengo",
