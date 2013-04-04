@@ -26,9 +26,12 @@ package org.societies.integration.test.bit.privacytrust;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
@@ -72,7 +75,10 @@ public class TestLocalTrustEventing {
 	private TrustedEntityId teid1;
 	private TrustedEntityId teid2;
 	
-	private CountDownLatch lock = new CountDownLatch(1);
+	private CountDownLatch lock;
+	
+	/** Hack to overcome MySQL inability to store millisecond info. */
+	private static int count = 0;
 
 	public TestLocalTrustEventing() {
 	}
@@ -117,11 +123,140 @@ public class TestLocalTrustEventing {
 	}
 
 	@Test
-	public void testTrustUpdateEventListenerByTrustorAndTrustee() {
+	public void testTrustUpdateListenerByTrustor() {
 
-		LOG.info("*** BEGIN testTrustUpdateEventListenerByTrustorAndTrustee");
+		LOG.info("*** testTrustUpdateListenerByTrustor BEGIN");
 		
-		Double oldTrustValue1 = null;
+		this.lock = new CountDownLatch(4);
+		
+		final MyTrustUpdateEventListener listener = new MyTrustUpdateEventListener();
+		try {
+			this.internalTrustBroker.registerTrustUpdateListener(
+					listener, this.myTeid);
+		} catch (TrustException te) {
+			fail("Failed to register TrustUpdateEvent listener: "
+					+ te.getLocalizedMessage());
+		}
+		
+		LOG.info("*** testTrustUpdateListenerByTrustor adding trust ratings");
+		try {
+			// This should should trigger two TrustUpdateEvents that *must* be caught by the listener
+			this.internalTrustEvidenceCollector.addDirectEvidence(
+					this.myTeid, this.teid2, TrustEvidenceType.RATED, 
+					new Date(new Date().getTime() + 1000 * count++), new Random().nextDouble());
+			// This should should trigger two TrustUpdateEvents that *must* be caught by the listener
+			this.internalTrustEvidenceCollector.addDirectEvidence(
+					this.myTeid, this.teid1, TrustEvidenceType.RATED, 
+					new Date(new Date().getTime() + 1000 * count++), new Random().nextDouble());
+		} catch (TrustException te) {
+			
+			fail("Failed to add trust rating: " + te.getLocalizedMessage());
+		}
+		
+		try {
+			boolean isLockReleased = this.lock.await(TestCase1962.getTimeout(), TimeUnit.MILLISECONDS);
+			if (isLockReleased) {
+				
+				// verify four events were received
+				assertEquals("Did not receive expected event(s)", 4, listener.events.size());
+				
+				boolean foundDirect1 = false;
+				boolean foundUserPerceived1 = false;
+				boolean foundDirect2 = false;
+				boolean foundUserPerceived2 = false;
+				Double trustValue = null;
+				
+				for (final TrustUpdateEvent event : listener.events) {
+				
+					assertNotNull("Received TrustRelationship was null", event.getTrustRelationship());
+					assertEquals("Received trustorId was incorrect", this.myTeid, 
+							event.getTrustRelationship().getTrustorId());
+					
+					// verify DIRECT trust update event for User 1
+					if (this.teid1.equals(event.getTrustRelationship().getTrusteeId())
+							&& TrustValueType.DIRECT == event.getTrustRelationship().getTrustValueType()) {
+				
+						trustValue = this.internalTrustBroker.retrieveTrustValue(
+								this.myTeid, this.teid1, TrustValueType.DIRECT).get();
+						assertEquals("Received new trust value was incorrect", trustValue, 
+								event.getTrustRelationship().getTrustValue());
+						assertNotNull("Received timestamp was null", 
+								event.getTrustRelationship().getTimestamp());
+						foundDirect1 = true;
+						
+					// verify USER_PERCEIVED trust update event for User 1
+					} else if (this.teid1.equals(event.getTrustRelationship().getTrusteeId())
+							&& TrustValueType.USER_PERCEIVED == event.getTrustRelationship().getTrustValueType()) {
+				
+						trustValue = this.internalTrustBroker.retrieveTrustValue(
+								this.myTeid, this.teid1, TrustValueType.USER_PERCEIVED).get();
+						assertEquals("Received new trust value was incorrect", trustValue, 
+								event.getTrustRelationship().getTrustValue());
+						assertNotNull("Received timestamp was null", 
+								event.getTrustRelationship().getTimestamp());
+						foundUserPerceived1 = true;
+						
+					// verify DIRECT trust update event for User 2
+					} else if (this.teid2.equals(event.getTrustRelationship().getTrusteeId())
+							&& TrustValueType.DIRECT == event.getTrustRelationship().getTrustValueType()) {
+				
+						trustValue = this.internalTrustBroker.retrieveTrustValue(
+								this.myTeid, this.teid2, TrustValueType.DIRECT).get();
+						assertEquals("Received new trust value was incorrect", trustValue, 
+								event.getTrustRelationship().getTrustValue());
+						assertNotNull("Received timestamp was null", 
+								event.getTrustRelationship().getTimestamp());
+						foundDirect2 = true;
+						
+					// verify USER_PERCEIVED trust update event for User 2
+					} else if (this.teid2.equals(event.getTrustRelationship().getTrusteeId())
+							&& TrustValueType.USER_PERCEIVED == event.getTrustRelationship().getTrustValueType()) {
+				
+						trustValue = this.internalTrustBroker.retrieveTrustValue(
+								this.myTeid, this.teid2, TrustValueType.USER_PERCEIVED).get();
+						assertEquals("Received new trust value was incorrect", trustValue, 
+								event.getTrustRelationship().getTrustValue());
+						assertNotNull("Received timestamp was null", 
+								event.getTrustRelationship().getTimestamp());
+						foundUserPerceived2 = true;
+					}
+				}
+				
+				assertTrue("Did not receive DIRECT TrustUpdateEvent for User 1", foundDirect1);
+				assertTrue("Did not receive USER_PERCEIVED TrustUpdateEvent for User 1", foundUserPerceived1);
+				assertTrue("Did not receive DIRECT TrustUpdateEvent for User 2", foundDirect2);
+				assertTrue("Did not receive USER_PERCEIVED TrustUpdateEvent for User 2", foundUserPerceived2);
+				
+			} else {
+				fail("TrustUpdateEvent listener never received the event(s) in the specified timeout: "
+						+ TestCase1962.getTimeout() + " msec");
+			}
+		} catch (InterruptedException ie) {
+			fail("Interrupted while executing test: " + ie.getLocalizedMessage());
+		} catch (ExecutionException ee) {
+			fail("Interrupted while retrieving trust value: " + ee.getLocalizedMessage());
+		} catch (TrustException te) {
+			fail("Failed to retrieve trust value: " + te.getLocalizedMessage());
+		}
+		
+		try {
+			this.internalTrustBroker.unregisterTrustUpdateListener(
+					listener, this.myTeid);
+		} catch (TrustException te) {
+			fail("Failed to unregister TrustUpdateEvent listener: "
+					+ te.getLocalizedMessage());
+		}
+		
+		LOG.info("*** testTrustUpdateListenerByTrustor END");
+	}
+	
+	@Test
+	public void testTrustUpdateListenerByTrustorAndTrustee() {
+
+		LOG.info("*** testTrustUpdateListenerByTrustorAndTrustee BEGIN");
+		
+		this.lock = new CountDownLatch(2);
+		
 		final MyTrustUpdateEventListener listener = new MyTrustUpdateEventListener();
 		try {
 			this.internalTrustBroker.registerTrustUpdateListener(
@@ -131,20 +266,16 @@ public class TestLocalTrustEventing {
 					+ te.getLocalizedMessage());
 		}
 		
+		LOG.info("*** testTrustUpdateListenerByTrustorAndTrustee adding trust ratings");
 		try {
-			oldTrustValue1 = this.internalTrustBroker.retrieveTrustValue(
-					this.myTeid, this.teid1, TrustValueType.USER_PERCEIVED).get();
-		} catch (Exception e) {
-			fail("Failed to retrieve trust: " + e.getLocalizedMessage());
-		}
-		
-		try {
-			// This should should trigger a TrustUpdateEvent that should *not* be caught by the listener
+			// This should should trigger two TrustUpdateEvents that should *not* be caught by the listener
 			this.internalTrustEvidenceCollector.addDirectEvidence(
-					this.myTeid, this.teid2, TrustEvidenceType.RATED, new Date(), new Random().nextDouble());
-			// This should should trigger a TrustUpdateEvent that *must* be caught by the listener
+					this.myTeid, this.teid2, TrustEvidenceType.RATED, 
+					new Date(new Date().getTime() + 1000 * count++), new Random().nextDouble());
+			// This should should trigger two TrustUpdateEvents that *must* be caught by the listener
 			this.internalTrustEvidenceCollector.addDirectEvidence(
-					this.myTeid, this.teid1, TrustEvidenceType.RATED, new Date(), new Random().nextDouble());
+					this.myTeid, this.teid1, TrustEvidenceType.RATED,
+					new Date(new Date().getTime() + 1000 * count++), new Random().nextDouble());
 		} catch (TrustException te) {
 			
 			fail("Failed to add trust rating: " + te.getLocalizedMessage());
@@ -153,7 +284,29 @@ public class TestLocalTrustEventing {
 		try {
 			boolean isLockReleased = this.lock.await(TestCase1962.getTimeout(), TimeUnit.MILLISECONDS);
 			if (isLockReleased) {
-				final TrustUpdateEvent event = listener.getEvent();
+				
+				// verify two events were received
+				assertEquals("Did not receive expected event(s)", 2, listener.events.size());
+				
+				// verify DIRECT trust update event
+				TrustUpdateEvent event = listener.events.get(0);
+				assertNotNull("Received TrustUpdateEvent was null", event);
+				assertNotNull("Received TrustRelationship was null", event.getTrustRelationship());
+				assertEquals("Received trustorId was incorrect", this.myTeid, 
+						event.getTrustRelationship().getTrustorId());
+				assertEquals("Received trusteeId was incorrect", this.teid1, 
+						event.getTrustRelationship().getTrusteeId());
+				assertEquals("Received trust value type was incorrect", TrustValueType.DIRECT,
+						event.getTrustRelationship().getTrustValueType());
+				Double newTrustValue1 = this.internalTrustBroker.retrieveTrustValue(
+						this.myTeid, this.teid1, TrustValueType.DIRECT).get();
+				assertEquals("Received DIRECT trust value was incorrect", newTrustValue1, 
+						event.getTrustRelationship().getTrustValue());
+				assertNotNull("Received timestamp was null", 
+						event.getTrustRelationship().getTimestamp());
+				
+				// verify USER_PERCEIVED trust update event
+				event = listener.events.get(1);
 				assertNotNull("Received TrustUpdateEvent was null", event);
 				assertNotNull("Received TrustRelationship was null", event.getTrustRelationship());
 				assertEquals("Received trustorId was incorrect", this.myTeid, 
@@ -162,20 +315,23 @@ public class TestLocalTrustEventing {
 						event.getTrustRelationship().getTrusteeId());
 				assertEquals("Received trust value type was incorrect", TrustValueType.USER_PERCEIVED,
 						event.getTrustRelationship().getTrustValueType());
-				final Double newTrustValue1 = this.internalTrustBroker.retrieveTrustValue(
+				newTrustValue1 = this.internalTrustBroker.retrieveTrustValue(
 						this.myTeid, this.teid1, TrustValueType.USER_PERCEIVED).get();
-				assertEquals("Received new trust value was incorrect", newTrustValue1, 
+				assertEquals("Received USER_PERCEIVED trust value was incorrect", newTrustValue1, 
 						event.getTrustRelationship().getTrustValue());
 				assertNotNull("Received timestamp was null", 
 						event.getTrustRelationship().getTimestamp());
+				
 			} else {
-				fail("TrustUpdateEvent listener never received the event in the specified timeout: "
+				fail("TrustUpdateEvent listener never received the event(s) in the specified timeout: "
 						+ TestCase1962.getTimeout() + " msec");
 			}
 		} catch (InterruptedException ie) {
 			fail("Interrupted while executing test: " + ie.getLocalizedMessage());
-		} catch (Exception e) {
-			fail("Failed to retrieve trust value: " + e.getLocalizedMessage());
+		} catch (ExecutionException ee) {
+			fail("Interrupted while retrieving trust value: " + ee.getLocalizedMessage());
+		} catch (TrustException te) {
+			fail("Failed to retrieve trust value: " + te.getLocalizedMessage());
 		}
 		
 		try {
@@ -186,17 +342,467 @@ public class TestLocalTrustEventing {
 					+ te.getLocalizedMessage());
 		}
 		
-		LOG.info("*** END testTrustUpdateEventListener");
+		LOG.info("*** testTrustUpdateListenerByTrustorAndTrustee END");
+	}
+	
+	@Test
+	public void testTrustUpdateEventListenerByTrustorAndTrusteeAndValueType() {
+
+		LOG.info("*** testTrustUpdateEventListenerByTrustorAndTrusteeAndValueType BEGIN");
+		
+		this.lock = new CountDownLatch(1);
+		
+		final MyTrustUpdateEventListener listener = new MyTrustUpdateEventListener();
+		try {
+			this.internalTrustBroker.registerTrustUpdateListener(
+					listener, this.myTeid, this.teid1, TrustValueType.DIRECT);
+		} catch (TrustException te) {
+			fail("Failed to register TrustUpdateEvent listener: "
+					+ te.getLocalizedMessage());
+		}
+		
+		LOG.info("*** testTrustUpdateListenerByTrustorAndTrusteeAndValueType adding trust ratings");
+		try {
+			// This should should trigger a DIRECT TrustUpdateEvent that should *not* be caught by the listener
+			this.internalTrustEvidenceCollector.addDirectEvidence(
+					this.myTeid, this.teid2, TrustEvidenceType.RATED, 
+					new Date(new Date().getTime() + 1000 * count++), new Random().nextDouble());
+			// This should should trigger a DIRECT TrustUpdateEvent that *must* be caught by the listener
+			this.internalTrustEvidenceCollector.addDirectEvidence(
+					this.myTeid, this.teid1, TrustEvidenceType.RATED, 
+					new Date(new Date().getTime() + 1000 * count++), new Random().nextDouble());
+		} catch (TrustException te) {
+			
+			fail("Failed to add trust rating: " + te.getLocalizedMessage());
+		}
+		
+		try {
+			boolean isLockReleased = this.lock.await(TestCase1962.getTimeout(), TimeUnit.MILLISECONDS);
+			if (isLockReleased) {
+				
+				// verify event were received
+				assertEquals("Did not receive expected event(s)", 1, listener.events.size());
+				
+				// verify DIRECT trust update event
+				TrustUpdateEvent event = listener.events.get(0);
+				assertNotNull("Received TrustUpdateEvent was null", event);
+				assertNotNull("Received TrustRelationship was null", event.getTrustRelationship());
+				assertEquals("Received trustorId was incorrect", this.myTeid, 
+						event.getTrustRelationship().getTrustorId());
+				assertEquals("Received trusteeId was incorrect", this.teid1, 
+						event.getTrustRelationship().getTrusteeId());
+				assertEquals("Received trust value type was incorrect", TrustValueType.DIRECT,
+						event.getTrustRelationship().getTrustValueType());
+				Double newTrustValue1 = this.internalTrustBroker.retrieveTrustValue(
+						this.myTeid, this.teid1, TrustValueType.DIRECT).get();
+				assertEquals("Received new trust value was incorrect", newTrustValue1, 
+						event.getTrustRelationship().getTrustValue());
+				assertNotNull("Received timestamp was null", 
+						event.getTrustRelationship().getTimestamp());
+				
+			} else {
+				fail("TrustUpdateEvent listener never received the event(s) in the specified timeout: "
+						+ TestCase1962.getTimeout() + " msec");
+			}
+		} catch (InterruptedException ie) {
+			fail("Interrupted while executing test: " + ie.getLocalizedMessage());
+		} catch (ExecutionException ee) {
+			fail("Interrupted while retrieving trust value: " + ee.getLocalizedMessage());
+		} catch (TrustException te) {
+			fail("Failed to retrieve trust value: " + te.getLocalizedMessage());
+		}
+		
+		try {
+			this.internalTrustBroker.unregisterTrustUpdateListener(
+					listener, this.myTeid, this.teid1, TrustValueType.DIRECT);
+		} catch (TrustException te) {
+			fail("Failed to unregister TrustUpdateEvent listener: "
+					+ te.getLocalizedMessage());
+		}
+		
+		LOG.info("*** testTrustUpdateEventListenerByTrustorAndTrusteeAndValueType END");
+	}
+	
+	@Test
+	public void testTrustUpdateListenerByTrustorAndCssType() {
+
+		LOG.info("*** testTrustUpdateListenerByTrustorAndCssType BEGIN");
+		
+		this.lock = new CountDownLatch(4);
+		
+		final MyTrustUpdateEventListener listener = new MyTrustUpdateEventListener();
+		try {
+			this.internalTrustBroker.registerTrustUpdateListener(
+					listener, this.myTeid, TrustedEntityType.CSS);
+		} catch (TrustException te) {
+			fail("Failed to register TrustUpdateEvent listener: "
+					+ te.getLocalizedMessage());
+		}
+		
+		LOG.info("*** testTrustUpdateListenerByTrustorAndCssType adding trust ratings");
+		try {
+			// This should should trigger two TrustUpdateEvents that *must* be caught by the listener
+			this.internalTrustEvidenceCollector.addDirectEvidence(
+					this.myTeid, this.teid2, TrustEvidenceType.RATED, 
+					new Date(new Date().getTime() + 1000 * count++), new Random().nextDouble());
+			// This should should trigger two TrustUpdateEvents that *must* be caught by the listener
+			this.internalTrustEvidenceCollector.addDirectEvidence(
+					this.myTeid, this.teid1, TrustEvidenceType.RATED, 
+					new Date(new Date().getTime() + 1000 * count++), new Random().nextDouble());
+		} catch (TrustException te) {
+			
+			fail("Failed to add trust rating: " + te.getLocalizedMessage());
+		}
+		
+		try {
+			boolean isLockReleased = this.lock.await(TestCase1962.getTimeout(), TimeUnit.MILLISECONDS);
+			if (isLockReleased) {
+				
+				// verify four events were received
+				assertEquals("Did not receive expected event(s)", 4, listener.events.size());
+				
+				boolean foundDirect1 = false;
+				boolean foundUserPerceived1 = false;
+				boolean foundDirect2 = false;
+				boolean foundUserPerceived2 = false;
+				Double trustValue = null;
+				
+				for (final TrustUpdateEvent event : listener.events) {
+				
+					assertNotNull("Received TrustRelationship was null", event.getTrustRelationship());
+					assertEquals("Received trustorId was incorrect", this.myTeid, 
+							event.getTrustRelationship().getTrustorId());
+					
+					// verify DIRECT trust update event for User 1
+					if (this.teid1.equals(event.getTrustRelationship().getTrusteeId())
+							&& TrustValueType.DIRECT == event.getTrustRelationship().getTrustValueType()) {
+				
+						trustValue = this.internalTrustBroker.retrieveTrustValue(
+								this.myTeid, this.teid1, TrustValueType.DIRECT).get();
+						assertEquals("Received new trust value was incorrect", trustValue, 
+								event.getTrustRelationship().getTrustValue());
+						assertNotNull("Received timestamp was null", 
+								event.getTrustRelationship().getTimestamp());
+						foundDirect1 = true;
+						
+					// verify USER_PERCEIVED trust update event for User 1
+					} else if (this.teid1.equals(event.getTrustRelationship().getTrusteeId())
+							&& TrustValueType.USER_PERCEIVED == event.getTrustRelationship().getTrustValueType()) {
+				
+						trustValue = this.internalTrustBroker.retrieveTrustValue(
+								this.myTeid, this.teid1, TrustValueType.USER_PERCEIVED).get();
+						assertEquals("Received new trust value was incorrect", trustValue, 
+								event.getTrustRelationship().getTrustValue());
+						assertNotNull("Received timestamp was null", 
+								event.getTrustRelationship().getTimestamp());
+						foundUserPerceived1 = true;
+						
+					// verify DIRECT trust update event for User 2
+					} else if (this.teid2.equals(event.getTrustRelationship().getTrusteeId())
+							&& TrustValueType.DIRECT == event.getTrustRelationship().getTrustValueType()) {
+				
+						trustValue = this.internalTrustBroker.retrieveTrustValue(
+								this.myTeid, this.teid2, TrustValueType.DIRECT).get();
+						assertEquals("Received new trust value was incorrect", trustValue, 
+								event.getTrustRelationship().getTrustValue());
+						assertNotNull("Received timestamp was null", 
+								event.getTrustRelationship().getTimestamp());
+						foundDirect2 = true;
+						
+					// verify USER_PERCEIVED trust update event for User 2
+					} else if (this.teid2.equals(event.getTrustRelationship().getTrusteeId())
+							&& TrustValueType.USER_PERCEIVED == event.getTrustRelationship().getTrustValueType()) {
+				
+						trustValue = this.internalTrustBroker.retrieveTrustValue(
+								this.myTeid, this.teid2, TrustValueType.USER_PERCEIVED).get();
+						assertEquals("Received new trust value was incorrect", trustValue, 
+								event.getTrustRelationship().getTrustValue());
+						assertNotNull("Received timestamp was null", 
+								event.getTrustRelationship().getTimestamp());
+						foundUserPerceived2 = true;
+					}
+				}
+				
+				assertTrue("Did not receive DIRECT TrustUpdateEvent for User 1", foundDirect1);
+				assertTrue("Did not receive USER_PERCEIVED TrustUpdateEvent for User 1", foundUserPerceived1);
+				assertTrue("Did not receive DIRECT TrustUpdateEvent for User 2", foundDirect2);
+				assertTrue("Did not receive USER_PERCEIVED TrustUpdateEvent for User 2", foundUserPerceived2);
+				
+			} else {
+				fail("TrustUpdateEvent listener never received the event(s) in the specified timeout: "
+						+ TestCase1962.getTimeout() + " msec");
+			}
+		} catch (InterruptedException ie) {
+			fail("Interrupted while executing test: " + ie.getLocalizedMessage());
+		} catch (ExecutionException ee) {
+			fail("Interrupted while retrieving trust value: " + ee.getLocalizedMessage());
+		} catch (TrustException te) {
+			fail("Failed to retrieve trust value: " + te.getLocalizedMessage());
+		}
+		
+		try {
+			this.internalTrustBroker.unregisterTrustUpdateListener(
+					listener, this.myTeid, TrustedEntityType.CSS);
+		} catch (TrustException te) {
+			fail("Failed to unregister TrustUpdateEvent listener: "
+					+ te.getLocalizedMessage());
+		}
+		
+		LOG.info("*** testTrustUpdateListenerByTrustorAndCssType END");
+	}
+	
+	@Test
+	public void testTrustUpdateListenerByTrustorAndCisType() {
+
+		LOG.info("*** testTrustUpdateListenerByTrustorAndCisType BEGIN");
+		
+		final MyTrustUpdateEventListener listener = new MyTrustUpdateEventListener();
+		try {
+			this.internalTrustBroker.registerTrustUpdateListener(
+					listener, this.myTeid, TrustedEntityType.CIS);
+		} catch (TrustException te) {
+			fail("Failed to register TrustUpdateEvent listener: "
+					+ te.getLocalizedMessage());
+		}
+		
+		LOG.info("*** testTrustUpdateListenerByTrustorAndCisType adding trust ratings");
+		try {
+			// This should should trigger two TrustUpdateEvents that must *not* be caught by the listener
+			this.internalTrustEvidenceCollector.addDirectEvidence(
+					this.myTeid, this.teid2, TrustEvidenceType.RATED, 
+					new Date(new Date().getTime() + 1000 * count++), new Random().nextDouble());
+			// This should should trigger two TrustUpdateEvents that must *not* be caught by the listener
+			this.internalTrustEvidenceCollector.addDirectEvidence(
+					this.myTeid, this.teid1, TrustEvidenceType.RATED, 
+					new Date(new Date().getTime() + 1000 * count++), new Random().nextDouble());
+		} catch (TrustException te) {
+			
+			fail("Failed to add trust rating: " + te.getLocalizedMessage());
+		}
+		
+		try {
+			Thread.sleep(TestCase1962.getTimeout());	
+		} catch (InterruptedException ie) {
+			fail("Interrupted while executing test: " + ie.getLocalizedMessage());
+		}
+		
+		// verify no events were received
+		assertEquals("Received unexpected event(s)", 0, listener.events.size());
+		
+		try {
+			this.internalTrustBroker.unregisterTrustUpdateListener(
+					listener, this.myTeid, TrustedEntityType.CIS);
+		} catch (TrustException te) {
+			fail("Failed to unregister TrustUpdateEvent listener: "
+					+ te.getLocalizedMessage());
+		}
+		
+		LOG.info("*** testTrustUpdateListenerByTrustorAndCisType END");
+	}
+	
+	@Test
+	public void testTrustUpdateListenerByTrustorAndValueType() {
+
+		LOG.info("*** testTrustUpdateListenerByTrustorAndValueType BEGIN");
+		
+		this.lock = new CountDownLatch(2);
+		
+		final MyTrustUpdateEventListener listener = new MyTrustUpdateEventListener();
+		try {
+			this.internalTrustBroker.registerTrustUpdateListener(
+					listener, this.myTeid, TrustValueType.USER_PERCEIVED);
+		} catch (TrustException te) {
+			fail("Failed to register TrustUpdateEvent listener: "
+					+ te.getLocalizedMessage());
+		}
+		
+		LOG.info("*** testTrustUpdateListenerByTrustorAndValueType adding trust ratings");
+		try {
+			// This should should trigger one TrustUpdateEvent that *must* be caught by the listener
+			this.internalTrustEvidenceCollector.addDirectEvidence(
+					this.myTeid, this.teid2, TrustEvidenceType.RATED, 
+					new Date(new Date().getTime() + 1000 * count++), new Random().nextDouble());
+			// This should should trigger one TrustUpdateEvent that *must* be caught by the listener
+			this.internalTrustEvidenceCollector.addDirectEvidence(
+					this.myTeid, this.teid1, TrustEvidenceType.RATED,
+					new Date(new Date().getTime() + 1000 * count++), new Random().nextDouble());
+		} catch (TrustException te) {
+			
+			fail("Failed to add trust rating: " + te.getLocalizedMessage());
+		}
+		
+		try {
+			boolean isLockReleased = this.lock.await(TestCase1962.getTimeout(), TimeUnit.MILLISECONDS);
+			if (isLockReleased) {
+				
+				// verify two events were received
+				assertEquals("Did not receive expected event(s)", 2, listener.events.size());
+				
+				boolean foundUserPerceived1 = false;
+				boolean foundUserPerceived2 = false;
+				Double trustValue = null;
+				
+				for (final TrustUpdateEvent event : listener.events) {
+				
+					assertNotNull("Received TrustRelationship was null", event.getTrustRelationship());
+					assertEquals("Received trustorId was incorrect", this.myTeid, 
+							event.getTrustRelationship().getTrustorId());
+						
+					// verify USER_PERCEIVED trust update event for User 1
+					if (this.teid1.equals(event.getTrustRelationship().getTrusteeId())
+							&& TrustValueType.USER_PERCEIVED == event.getTrustRelationship().getTrustValueType()) {
+				
+						trustValue = this.internalTrustBroker.retrieveTrustValue(
+								this.myTeid, this.teid1, TrustValueType.USER_PERCEIVED).get();
+						assertEquals("Received new trust value was incorrect", trustValue, 
+								event.getTrustRelationship().getTrustValue());
+						assertNotNull("Received timestamp was null", 
+								event.getTrustRelationship().getTimestamp());
+						foundUserPerceived1 = true;
+						
+					// verify USER_PERCEIVED trust update event for User 2
+					} else if (this.teid2.equals(event.getTrustRelationship().getTrusteeId())
+							&& TrustValueType.USER_PERCEIVED == event.getTrustRelationship().getTrustValueType()) {
+				
+						trustValue = this.internalTrustBroker.retrieveTrustValue(
+								this.myTeid, this.teid2, TrustValueType.USER_PERCEIVED).get();
+						assertEquals("Received new trust value was incorrect", trustValue, 
+								event.getTrustRelationship().getTrustValue());
+						assertNotNull("Received timestamp was null", 
+								event.getTrustRelationship().getTimestamp());
+						foundUserPerceived2 = true;
+					}
+				}
+				
+				assertTrue("Did not receive USER_PERCEIVED TrustUpdateEvent for User 1", foundUserPerceived1);
+				assertTrue("Did not receive USER_PERCEIVED TrustUpdateEvent for User 2", foundUserPerceived2);
+				
+			} else {
+				fail("TrustUpdateEvent listener never received the event(s) in the specified timeout: "
+						+ TestCase1962.getTimeout() + " msec");
+			}
+		} catch (InterruptedException ie) {
+			fail("Interrupted while executing test: " + ie.getLocalizedMessage());
+		} catch (ExecutionException ee) {
+			fail("Interrupted while retrieving trust value: " + ee.getLocalizedMessage());
+		} catch (TrustException te) {
+			fail("Failed to retrieve trust value: " + te.getLocalizedMessage());
+		}
+		
+		try {
+			this.internalTrustBroker.unregisterTrustUpdateListener(
+					listener, this.myTeid, TrustValueType.USER_PERCEIVED);
+		} catch (TrustException te) {
+			fail("Failed to unregister TrustUpdateEvent listener: "
+					+ te.getLocalizedMessage());
+		}
+		
+		LOG.info("*** testTrustUpdateListenerByTrustorAndValueType END");
+	}
+	
+	@Test
+	public void testTrustUpdateListenerByTrustorAndTrusteeTypeAndValueType() {
+
+		LOG.info("*** testTrustUpdateListenerByTrustorAndTrusteeTypeAndValueType BEGIN");
+		
+		this.lock = new CountDownLatch(2);
+		
+		final MyTrustUpdateEventListener listener = new MyTrustUpdateEventListener();
+		try {
+			this.internalTrustBroker.registerTrustUpdateListener(
+					listener, this.myTeid, TrustedEntityType.CSS, TrustValueType.DIRECT);
+		} catch (TrustException te) {
+			fail("Failed to register TrustUpdateEvent listener: "
+					+ te.getLocalizedMessage());
+		}
+		
+		LOG.info("*** testTrustUpdateListenerByTrustorAndTrusteeTypeAndValueType adding trust ratings");
+		try {
+			// This should should trigger one TrustUpdateEvent that *must* be caught by the listener
+			this.internalTrustEvidenceCollector.addDirectEvidence(
+					this.myTeid, this.teid2, TrustEvidenceType.RATED, 
+					new Date(new Date().getTime() + 1000 * count++), new Random().nextDouble());
+			// This should should trigger one TrustUpdateEvent that *must* be caught by the listener
+			this.internalTrustEvidenceCollector.addDirectEvidence(
+					this.myTeid, this.teid1, TrustEvidenceType.RATED,
+					new Date(new Date().getTime() + 1000 * count++), new Random().nextDouble());
+		} catch (TrustException te) {
+			
+			fail("Failed to add trust rating: " + te.getLocalizedMessage());
+		}
+		
+		try {
+			boolean isLockReleased = this.lock.await(TestCase1962.getTimeout(), TimeUnit.MILLISECONDS);
+			if (isLockReleased) {
+				
+				// verify two events were received
+				assertEquals("Did not receive expected event(s)", 2, listener.events.size());
+				
+				boolean foundDirect1 = false;
+				boolean foundDirect2 = false;
+				Double trustValue = null;
+				
+				for (final TrustUpdateEvent event : listener.events) {
+				
+					assertNotNull("Received TrustRelationship was null", event.getTrustRelationship());
+					assertEquals("Received trustorId was incorrect", this.myTeid, 
+							event.getTrustRelationship().getTrustorId());
+						
+					// verify DIRECT trust update event for User 1
+					if (this.teid1.equals(event.getTrustRelationship().getTrusteeId())
+							&& TrustValueType.DIRECT == event.getTrustRelationship().getTrustValueType()) {
+				
+						trustValue = this.internalTrustBroker.retrieveTrustValue(
+								this.myTeid, this.teid1, TrustValueType.DIRECT).get();
+						assertEquals("Received new trust value was incorrect", trustValue, 
+								event.getTrustRelationship().getTrustValue());
+						assertNotNull("Received timestamp was null", 
+								event.getTrustRelationship().getTimestamp());
+						foundDirect1 = true;
+						
+					// verify DIRECT trust update event for User 2
+					} else if (this.teid2.equals(event.getTrustRelationship().getTrusteeId())
+							&& TrustValueType.DIRECT == event.getTrustRelationship().getTrustValueType()) {
+				
+						trustValue = this.internalTrustBroker.retrieveTrustValue(
+								this.myTeid, this.teid2, TrustValueType.DIRECT).get();
+						assertEquals("Received new trust value was incorrect", trustValue, 
+								event.getTrustRelationship().getTrustValue());
+						assertNotNull("Received timestamp was null", 
+								event.getTrustRelationship().getTimestamp());
+						foundDirect2 = true;
+					}
+				}
+				
+				assertTrue("Did not receive DIRECT TrustUpdateEvent for User 1", foundDirect1);
+				assertTrue("Did not receive DIRECT TrustUpdateEvent for User 2", foundDirect2);
+				
+			} else {
+				fail("TrustUpdateEvent listener never received the event(s) in the specified timeout: "
+						+ TestCase1962.getTimeout() + " msec");
+			}
+		} catch (InterruptedException ie) {
+			fail("Interrupted while executing test: " + ie.getLocalizedMessage());
+		} catch (ExecutionException ee) {
+			fail("Interrupted while retrieving trust value: " + ee.getLocalizedMessage());
+		} catch (TrustException te) {
+			fail("Failed to retrieve trust value: " + te.getLocalizedMessage());
+		}
+		
+		try {
+			this.internalTrustBroker.unregisterTrustUpdateListener(
+					listener, this.myTeid, TrustedEntityType.CSS, TrustValueType.DIRECT);
+		} catch (TrustException te) {
+			fail("Failed to unregister TrustUpdateEvent listener: "
+					+ te.getLocalizedMessage());
+		}
+		
+		LOG.info("*** testTrustUpdateListenerByTrustorAndTrusteeTypeAndValueType END");
 	}
 	
 	private class MyTrustUpdateEventListener implements ITrustUpdateEventListener {
 
-		private TrustUpdateEvent event;
-		
-		private TrustUpdateEvent getEvent() {
-			
-			return this.event;
-		}
+		private final List<TrustUpdateEvent> events = new ArrayList<TrustUpdateEvent>();
 		
 		/*
 		 * @see org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener#onUpdate(org.societies.api.privacytrust.trust.event.TrustUpdateEvent)
@@ -204,7 +810,8 @@ public class TestLocalTrustEventing {
 		@Override
 		public void onUpdate(TrustUpdateEvent event) {
 			
-			this.event = event;
+			LOG.info("*** " + this + " received event " + event + " at " + new Date());
+			this.events.add(event);
 			lock.countDown();
 		}
 	}
