@@ -74,7 +74,7 @@ public class PrivacyDataManagerRemote {
 	private Context context;
 	private ClientCommunicationMgr clientCommManager;
 	private PrivacyDataIntentSender intentSender;
-	private boolean remoteReady;
+	private static boolean remoteReady;
 	
 
 	public PrivacyDataManagerRemote(Context context)  {

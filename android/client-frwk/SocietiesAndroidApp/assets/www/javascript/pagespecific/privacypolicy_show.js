@@ -39,7 +39,7 @@ var SocietiesDataUtil=(function(){
 	var conditionList = {"SHARE_WITH_3RD_PARTIES": "Shared with the world",
 	                     "SHARE_WITH_CIS_MEMBERS_ONLY": "Shared with community members",
 	                     "SHARE_WITH_CIS_OWNER_ONLY" : "Not shared",
-	                     "MAY_BE_INFERRED" : "Warning, this information may be inferred",
+	                     "MAY_BE_INFERRED" : "Warning, this data may be inferred",
 	                     "DATA_RETENTION_IN_SECONDS": "Data retention in seconds",
 	                     "DATA_RETENTION_IN_MINUTES": "Data retention in minutes",
 	                     "DATA_RETENTION_IN_HOURS": "Data retention in hours",
