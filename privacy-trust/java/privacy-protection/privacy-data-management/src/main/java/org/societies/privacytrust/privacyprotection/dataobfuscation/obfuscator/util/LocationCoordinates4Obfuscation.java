@@ -24,7 +24,8 @@
  */
 package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.util;
 
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.LocationCoordinates;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.LocationCoordinates;
+
 
 /**
  * Internal version of LocationCoordinates wrapper. It contains intermediate values
@@ -46,9 +47,10 @@ public class LocationCoordinates4Obfuscation extends LocationCoordinates {
 	 * @param longitude
 	 * @param accuracy
 	 */
-	public LocationCoordinates4Obfuscation(double latitude, double longitude,
-			double accuracy) {
-		super(latitude, longitude, accuracy);
+	public LocationCoordinates4Obfuscation(double latitude, double longitude, double accuracy) {
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.accuracy = accuracy;
 	}
 	
 	

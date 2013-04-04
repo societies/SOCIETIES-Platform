@@ -10,5 +10,5 @@ import org.societies.api.activity.IActivity;
  * To change this template use File | Settings | File Templates.
  */
 public interface ILocalActivityFeed {
-    public void addActivity(IActivity activity) ;
+    public void addActivityToDB(IActivity activity) ;
 }

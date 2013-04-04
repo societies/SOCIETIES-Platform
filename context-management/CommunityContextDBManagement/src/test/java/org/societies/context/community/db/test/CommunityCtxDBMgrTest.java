@@ -30,7 +30,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -78,6 +80,9 @@ public class CommunityCtxDBMgrTest {
 	private static final String CIS_IIDENTITY_STRING9 = "myCIS9.societies.local";
 	private static final String CIS_IIDENTITY_STRING10 = "myCIS10.societies.local";
 	private static final String CIS_IIDENTITY_STRING11 = "myCIS11.societies.local";
+	private static final String CIS_IIDENTITY_STRING12 = "myCIS12.societies.local";
+	private static final String CIS_IIDENTITY_STRING13 = "myCIS13.societies.local";
+	private static final String CIS_IIDENTITY_STRING14 = "myCIS14.societies.local";
 	private static final String CIS_IIDENTITY_COMMUNITY_PARENT = "myCISCommunityParent.societies.local";
 	private static final String CIS_IIDENTITY_ENTITY_CHILD = "myCISEntityChild.societies.local";
 
@@ -357,6 +362,56 @@ public class CommunityCtxDBMgrTest {
        assertEquals(1, ids.size());
 	}*/
    
+	
+	@Test
+	public void testLookupSetOfTypes() throws CtxException{
+		System.out.println("---- testLookupSetOfTypes");
+		   
+		Set<CtxIdentifier> ids;
+	    
+		// Create test entity.   
+		final CtxEntityIdentifier entId = communityDB.createEntity(CIS_IIDENTITY_STRING12, CtxEntityTypes.DEVICE).getId();
+	    final CtxEntityIdentifier entId2 = communityDB.createEntity(CIS_IIDENTITY_STRING13, CtxEntityTypes.DEVICE).getId();
+	    final CtxEntityIdentifier entId3 = communityDB.createEntity(CIS_IIDENTITY_STRING14, CtxEntityTypes.ORGANISATION).getId();
+	       
+	    // Create test attribute.
+	    final CtxAttribute attribute = 
+				this.communityDB.createAttribute(entId, CtxAttributeTypes.PHONES);
+	    final CtxAttribute attribute2 = 
+				this.communityDB.createAttribute(entId2, CtxAttributeTypes.PHONES);
+	    final CtxAttribute attribute3 = 
+				this.communityDB.createAttribute(entId3, CtxAttributeTypes.AFFILIATION);
+	    
+	    final Set<String> types = new HashSet<String>();
+	    types.add(entId.getType());
+	    types.add(entId3.getType());
+	    //
+	    // Lookup entities
+	    //
+	    ids = communityDB.lookup(CIS_IIDENTITY_STRING12, types);
+	    assertTrue(ids.contains(entId));
+	    assertEquals(entId.getOwnerId(),CIS_IIDENTITY_STRING12);
+	    assertEquals(3, ids.size());
+	              
+	    assertTrue(ids.contains(entId2));
+	    assertTrue(ids.contains(entId3));
+	    assertEquals(entId2.getOwnerId(),CIS_IIDENTITY_STRING13);
+
+	    final Set<String> types2 = new HashSet<String>();
+	    types2.add(attribute.getType());
+	    types2.add(attribute3.getType());
+	    //
+	    // Lookup attributes
+	    //
+	    ids = communityDB.lookup(attribute.getOwnerId(), types2);
+	    assertTrue(ids.contains(attribute.getId()));
+	    assertEquals(3, ids.size());
+	              
+	    assertTrue(ids.contains(attribute2.getId()));
+	    assertTrue(ids.contains(attribute3.getId()));
+	       
+   }
+	
    @Test
    public void testLookupCommunityCtxEntity() throws CtxException{
 	   

@@ -26,21 +26,27 @@ package org.societies.privacytrust.trust.impl.event;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.privacytrust.trust.event.ITrustEventListener;
-import org.societies.api.privacytrust.trust.event.TrustEvent;
-import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
-import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
-import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
-import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.CSSEventConstants;
 import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.privacytrust.trust.event.ITrustEventListener;
+import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
+import org.societies.api.privacytrust.trust.event.TrustEvent;
+import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
+import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
+import org.societies.api.privacytrust.trust.model.TrustValueType;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.ITrustEvidenceUpdateEventListener;
 import org.societies.privacytrust.trust.api.event.TrustEventMgrException;
@@ -60,36 +66,60 @@ import org.springframework.stereotype.Service;
 @Lazy(value = false)
 public class TrustEventMgr implements ITrustEventMgr {
 
-	private static final Logger LOG = LoggerFactory.getLogger(TrustEventMgr.class); 
+	private static final Logger LOG = LoggerFactory.getLogger(TrustEventMgr.class);
+	
+	private static final List<String> EVENT_SCHEMA_CLASSES = 
+			Collections.unmodifiableList(Arrays.asList(
+					"org.societies.api.schema.privacytrust.trust.model.TrustUpdateEventBean"));
 	
 	/** The platform Event Mgr service reference. */
 	@Autowired(required=true)
 	private IEventMgr eventMgr;
 	
-	TrustEventMgr() {
+	/** The PubsubClient service reference. */
+	private PubsubClient pubsubClient;
+	
+	private final ExecutorService localDispatchingService =
+			Executors.newSingleThreadExecutor();
+	
+	private final ExecutorService remoteDispatchingService =
+			Executors.newSingleThreadExecutor();
+	
+	@Autowired(required=true)
+	TrustEventMgr(PubsubClient pubsubClient) throws Exception {
 		
-		LOG.info(this.getClass() + " instantiated");
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
+		this.pubsubClient = pubsubClient;
+		try {
+			if (LOG.isDebugEnabled())
+				LOG.debug("Adding remote remote trust event payload classes '" 
+						+ EVENT_SCHEMA_CLASSES + "'");
+			this.pubsubClient.addSimpleClasses(EVENT_SCHEMA_CLASSES);
+			// TODO create nodes
+		} catch (Exception e) {
+			
+			LOG.error(this.getClass() + " could not be instantiated: "
+					+ e.getLocalizedMessage(), e);
+			throw e;
+		}
 	}
 	
 	/*
 	 * @see org.societies.privacytrust.trust.api.event.ITrustEventMgr#postEvent(org.societies.api.privacytrust.trust.event.TrustEvent, java.lang.String[])
 	 */
 	@Override
-	public void postEvent(final TrustEvent event, final String[] topics)
-			throws TrustEventMgrException {
+	public void postEvent(final TrustEvent event, final String[] topics) {
 		
 		if (event == null)
 			throw new NullPointerException("event can't be null");
 		if (topics == null)
 			throw new NullPointerException("topics can't be null");
 		
-		if (event instanceof TrustUpdateEvent)
-			this.postUpdateEvent((TrustUpdateEvent) event, topics);
-		else if (event instanceof TrustEvidenceUpdateEvent)
-			this.postEvidenceUpdateEvent((TrustEvidenceUpdateEvent) event, topics);
-		else
-			throw new TrustEventMgrException("Could not post event "
-					+ event + ": Unsupported TrustEvent implementation");
+		this.localDispatchingService.execute(new LocalTrustEventDispatcher(
+				event, topics));
+		/* TODO this.remoteDispatchingService.execute(new RemoteTrustEventDispatcher(
+				event, topics)); */
 	}
 	
 	/*
@@ -177,11 +207,11 @@ public class TrustEventMgr implements ITrustEventMgr {
 				topics,	filter);
 	}
 	
-	private void postUpdateEvent(final TrustUpdateEvent event, final String[] topics)
-			throws TrustEventMgrException {
+	private void postLocalUpdateEvent(final TrustUpdateEvent event, 
+			final String[] topics) {
 		
 		final TrustUpdateEventInfo eventInfo = new TrustUpdateEventInfo(
-				event.getOldValue(), event.getNewValue()); 
+				event.getValueType(), event.getOldValue(), event.getNewValue()); 
 		
 		for (int i = 0; i < topics.length; ++i) {
 			
@@ -189,10 +219,12 @@ public class TrustEventMgr implements ITrustEventMgr {
 					topics[i], event.getTrusteeId().toString(), 
 					event.getTrustorId().toString(), eventInfo);
 
-			if (this.eventMgr == null)
-				throw new TrustEventMgrException("Could not send TrustUpdateEvent '"
+			if (this.eventMgr == null) {
+				LOG.error("Could not send TrustUpdateEvent '"
 						+ event + "' to topic " + topics[i]
 						+ ": IEventMgr service is not available");
+				return;
+			}
 			try {
 				if (LOG.isDebugEnabled())
 					LOG.debug("Posting internal event"
@@ -204,7 +236,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 				this.eventMgr.publishInternalEvent(internalEvent);
 			} catch (EMSException emse) {
 
-				throw new TrustEventMgrException("Could not post internal event"
+				LOG.error("Could not post internal event"
 						+ ": type=" + internalEvent.geteventType()
 						+ ", name=" + internalEvent.geteventName()
 						+ ", source=" + internalEvent.geteventSource()
@@ -215,8 +247,8 @@ public class TrustEventMgr implements ITrustEventMgr {
 		}
 	}
 	
-	private void postEvidenceUpdateEvent(final TrustEvidenceUpdateEvent event,
-			final String[] topics) throws TrustEventMgrException {
+	private void postLocalEvidenceUpdateEvent(final TrustEvidenceUpdateEvent event,
+			final String[] topics) {
 		
 		for (int i = 0; i < topics.length; ++i) {
 			
@@ -224,10 +256,12 @@ public class TrustEventMgr implements ITrustEventMgr {
 					topics[i], event.getSource().getObjectId().toString(), 
 					event.getSource().getSubjectId().toString(), event.getSource());
 
-			if (this.eventMgr == null)
-				throw new TrustEventMgrException("Could not send TrustEvidenceUpdateEvent '"
+			if (this.eventMgr == null) {
+				LOG.error("Could not send TrustEvidenceUpdateEvent '"
 						+ event + "' to topic " + topics[i]
 						+ ": IEventMgr service is not available");
+				return;
+			}
 			try {
 				if (LOG.isDebugEnabled())
 					LOG.debug("Posting internal event"
@@ -239,7 +273,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 				this.eventMgr.publishInternalEvent(internalEvent);
 			} catch (EMSException emse) {
 
-				throw new TrustEventMgrException("Could not post internal event"
+				LOG.error("Could not post internal event"
 						+ ": type=" + internalEvent.geteventType()
 						+ ", name=" + internalEvent.geteventName()
 						+ ", source=" + internalEvent.geteventSource()
@@ -247,6 +281,39 @@ public class TrustEventMgr implements ITrustEventMgr {
 						+ " to topic " + topics[i]
 						+ ": " + emse.getLocalizedMessage(), emse);
 			}
+		}
+	}
+	
+	private class LocalTrustEventDispatcher implements Runnable {
+		
+		private final TrustEvent event;
+		
+		private final String[] topics;
+		
+		private LocalTrustEventDispatcher(TrustEvent event, String[] topics) {
+			
+			this.event = event;
+			this.topics = topics;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			
+			if (LOG.isDebugEnabled()) 
+				LOG.debug("Posting local trust event '" + this.event 
+						+ "' to topics '" + Arrays.toString(this.topics) + "'");
+			
+			if (this.event instanceof TrustUpdateEvent)
+				postLocalUpdateEvent((TrustUpdateEvent) event, topics);
+			else if (this.event instanceof TrustEvidenceUpdateEvent)
+				postLocalEvidenceUpdateEvent((TrustEvidenceUpdateEvent) event, topics);
+			else
+				LOG.error("Could not post local trust event "
+						+ this.event + ": Unsupported TrustEvent implementation '"
+						+ this.event.getClass() + "'");
 		}
 	}
 	
@@ -287,7 +354,8 @@ public class TrustEventMgr implements ITrustEventMgr {
 				final TrustedEntityId trustorId = new TrustedEntityId(internalEvent.geteventSource());
 				final TrustedEntityId trusteeId = new TrustedEntityId(internalEvent.geteventName());
 				final TrustUpdateEvent event = new TrustUpdateEvent(trustorId,
-						trusteeId, eventInfo.getOldValue(), eventInfo.getNewValue());
+						trusteeId, eventInfo.getValueType(),
+						eventInfo.getOldValue(), eventInfo.getNewValue());
 				if (LOG.isDebugEnabled())
 					LOG.debug("Forwarding TrustUpdateEvent " + event + " to listener");
 				this.listener.onUpdate(event);
@@ -316,15 +384,27 @@ public class TrustEventMgr implements ITrustEventMgr {
 	private class TrustUpdateEventInfo implements Serializable {
 		
 		private static final long serialVersionUID = -8227968800295980580L;
+		
+		private final TrustValueType valueType;
 
 		private final Double oldValue;
 		
 		private final Double newValue;
 		
-		private TrustUpdateEventInfo(final Double oldValue, final Double newValue) {
+		private TrustUpdateEventInfo(final TrustValueType valueType,
+				final Double oldValue, final Double newValue) {
 			
+			if (valueType == null)
+				throw new NullPointerException("valueType can't be null");
+			
+			this.valueType = valueType;
 			this.oldValue = oldValue;
 			this.newValue = newValue;
+		}
+		
+		private TrustValueType getValueType() {
+			
+			return this.valueType;
 		}
 		
 		private Double getOldValue() {
@@ -345,6 +425,8 @@ public class TrustEventMgr implements ITrustEventMgr {
 			
 			final StringBuilder sb = new StringBuilder();
 			sb.append("{");
+			sb.append("valueType=" + this.getValueType());
+			sb.append(",");
 			sb.append("oldValue=" + this.getOldValue());
 			sb.append(",");
 			sb.append("newValue=" + this.getNewValue());

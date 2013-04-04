@@ -24,6 +24,7 @@
 		<dependency>
 		    <groupId>org.societies.comm.xmpp</groupId>
 		    <artifactId>CommunicationFrameworkCommons</artifactId>
+		    <type>apklib</type>
 		    <version>${version.comm}</version>
 		</dependency>
 		<dependency>
@@ -44,6 +45,12 @@
 		<dependency>
 			<groupId>org.asmack</groupId>
 		    <artifactId>asmack</artifactId>
+		</dependency>
+        <dependency>
+   			<groupId>org.societies.android.platform.androidutils</groupId>
+		    <artifactId>SocietiesAndroidUtilities</artifactId>
+   			<version>${release.version}</version>
+   			<type>apklib</type>
 		</dependency>
 		<dependency>
 			<groupId>org.simpleframework</groupId>

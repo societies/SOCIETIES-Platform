@@ -3,6 +3,8 @@ package org.societies.api.internal.sns;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
+
 
 
 public interface ISocialConnector extends Serializable {
@@ -162,5 +164,9 @@ public interface ISocialConnector extends Serializable {
      */
     void post(String activityEntry);
     
-    
+    /**
+     * Provide the name of the SocialNetwork 
+     * @return {@link Socialnetwork}
+     */
+    SocialNetwork getSocialNetwork();    
 }

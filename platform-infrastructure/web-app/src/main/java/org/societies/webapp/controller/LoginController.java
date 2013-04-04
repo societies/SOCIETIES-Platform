@@ -15,34 +15,34 @@ import javax.faces.bean.SessionScoped;
 @SessionScoped // indicates the lifetime of this object
 public class LoginController extends BasePageController {
 
-    //    @Autowired
     @ManagedProperty(value = "#{userService}")
     private UserService userService;
-    //    @Autowired
+
     @ManagedProperty(value = "#{openfireLoginService}")
     private OpenfireLoginService openfireLoginService;
 
+    @SuppressWarnings("UnusedDeclaration")
     public UserService getUserService() {
         return userService;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public void setUserService(UserService userService) {
         log.trace("setUserService() has been called with " + userService);
         this.userService = userService;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public OpenfireLoginService getOpenfireLoginService() {
         return openfireLoginService;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public void setOpenfireLoginService(OpenfireLoginService openfireLoginService) {
         log.trace("setOpenfireLoginService() has been called with " + openfireLoginService);
         this.openfireLoginService = openfireLoginService;
     }
 
-    //    private boolean loggedIn = false;
-//    private String username = "";
-//    private String userID = "";
     private String loginDialogUsername;
     private String loginDialogPassword;
 
@@ -61,6 +61,15 @@ public class LoginController extends BasePageController {
             logoutAction();
         }
 
+        if (loginDialogUsername == null || loginDialogUsername.isEmpty()
+                || loginDialogPassword == null || loginDialogPassword.isEmpty()) {
+            String summary = "Login failed";
+            String detail = "Username or password were blank";
+            addGlobalMessage(summary, detail, FacesMessage.SEVERITY_WARN);
+
+            return "false";
+        }
+
         String result = openfireLoginService.doLogin(loginDialogUsername, loginDialogPassword);
         if (result == null) {
             String summary = "Login failed";
@@ -70,19 +79,11 @@ public class LoginController extends BasePageController {
             return "false";
         }
 
-        userService.setUserLoggedIn(true);
-        userService.loadUserDetailsFromCommMgr();
+        userService.login();
 
-//        setLoggedIn(true);
-//        username = userService.getUsername();
-//        userID = userService.getUserID();
-
-//        setUsername("paddy");
-//        setUserID("ermahgerd");
-
-        String summary = "User " + getUsername() + " logged in";
-        String detail = "User successfully logged in";
-        addGlobalMessage(summary, detail, FacesMessage.SEVERITY_INFO);
+//        String summary = "User " + getUsername() + " logged in";
+//        String detail = "User successfully logged in";
+//        addGlobalMessage(summary, detail, FacesMessage.SEVERITY_INFO);
 
         // clean up
         setLoginDialogUsername("");
@@ -100,10 +101,7 @@ public class LoginController extends BasePageController {
         String summary = "User " + getUsername() + " logged out";
         String detail = "User logged out";
 
-//        setLoggedIn(false);
-//        setUsername("");
-//        setUserID("");
-        userService.setUserLoggedIn(false);
+        userService.logout();
 
         addGlobalMessage(summary, detail, FacesMessage.SEVERITY_INFO);
 
@@ -111,8 +109,6 @@ public class LoginController extends BasePageController {
     }
 
     public boolean isLoggedIn() {
-//        log.trace("isLoggedIn()=" + loggedIn);
-//        return loggedIn;
         if (userService == null) {
             log.error("userService is null - cannot determine login state");
             return false;
@@ -121,55 +117,16 @@ public class LoginController extends BasePageController {
         return userService.isUserLoggedIn();
     }
 
-//    public void setLoggedIn(boolean loggedIn) {
-//        this.loggedIn = loggedIn;
-//    }
-
     public String getUsername() {
-//        return username;
         return userService.getUsername();
     }
 
-//    public void setUsername(String username) {
-//        this.username = username;
-//    }
-
+    @SuppressWarnings("UnusedDeclaration")
     public String getUserID() {
-//        return userID;
         return userService.getUserID();
     }
 
-//    public void setUserID(String userID) {
-//        this.userID = userID;
-//    }
-
     public IIdentity getIdentity() {
-//        return new IIdentity() {
-//            @Override
-//            public String getIdentifier() {
-//                return "id";
-//            }
-//
-//            @Override
-//            public String getDomain() {
-//                return "domain";
-//            }
-//
-//            @Override
-//            public IdentityType getType() {
-//                return IdentityType.CIS;
-//            }
-//
-//            @Override
-//            public String getJid() {
-//                return "jid";
-//            }
-//
-//            @Override
-//            public String getBareJid() {
-//                return "bare jid";
-//            }
-//        };
         return userService.getIdentity();
     }
 

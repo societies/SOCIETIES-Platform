@@ -72,11 +72,11 @@
 		<module>../../css-modules/device-mgmt/RFIDDriver/</module>
 
 		<!-- SNS: 1 bundle -->
-		<module>../../platform-infrastructure/sns/GooglePlusConnector</module>
-		<module>../../platform-infrastructure/sns/FacebookConn</module>
-		<module>../../platform-infrastructure/sns/FoursquareConnector</module>
-		<module>../../platform-infrastructure/sns/TwitterConnector</module>
-		<module>../../platform-infrastructure/sns/LinkedinConn</module>
+		<module>../../platform-infrastructure/sns/connectors/GooglePlusConnector</module>
+		<module>../../platform-infrastructure/sns/connectors/FacebookConnector</module>
+		<module>../../platform-infrastructure/sns/connectors/FoursquareConnector</module>
+		<module>../../platform-infrastructure/sns/connectors/TwitterConnector</module>
+		<module>../../platform-infrastructure/sns/connectors/LinkedinConnector</module>
 		<module>../../platform-infrastructure/sns/SocialDataComms</module>
 		<module>../../platform-infrastructure/sns/socialdata</module>
 		

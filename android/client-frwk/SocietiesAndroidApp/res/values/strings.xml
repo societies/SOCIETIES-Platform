@@ -10,5 +10,6 @@
     <!-- Activity for Friends Service -->
     <string name="title_activity_friends">FriendsActivity</string>
     <string name="societies_friend_request">SOCIETIES Friend Request</string>
-          
+    <!-- Activity for User Feedback -->
+    <string name="societies_Notifications">SOCIETIES Notifications</string>
 </resources>

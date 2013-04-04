@@ -24,10 +24,7 @@
  */
 package org.societies.privacytrust.privacyprotection.api;
 
-import java.util.concurrent.Future;
-
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 
 /**
@@ -52,7 +49,7 @@ public interface IDataObfuscationManager {
 	 * @return Obfuscated data wrapped in a DataWrapper (of the same type that the one used to instantiate the obfuscator)
 	 * @throws PrivacyException
 	 */
-	public IDataWrapper obfuscateData(IDataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException;
+	public DataWrapper obfuscateData(DataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException;
 
 	/**
 	 * Check if there is an obfuscated version of the data and return its ID.
@@ -69,5 +66,6 @@ public interface IDataObfuscationManager {
 	 * @return otherwise ID of the non-obfuscated data
 	 * @throws PrivacyException
 	 */
-	public IDataWrapper hasObfuscatedVersion(IDataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException;
+	@Deprecated
+	public DataWrapper hasObfuscatedVersion(DataWrapper dataWrapper, double obfuscationLevel) throws PrivacyException;
 }

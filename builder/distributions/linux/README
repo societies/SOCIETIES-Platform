@@ -1,0 +1,20 @@
+Societies Virgo Linux instructions
+
+In order to run the Virgo Container with a a relevant Societies distribution the following steps are required:
+
+1. The $VIRGO_HOME/bin/dmk.sh script needs to modified according to https://redmine.ict-societies.eu/projects/sp/wiki/Linux_Configuration#Linux-Virgo-start-script-dmksh
+
+2. Set the JAVA_OPTS environmental variable to -XX:MaxPermSize=128m. There are two ways of achieving this:
+
+a. insert the following fragment into the start of the $VIRGO_HOME/bin/startup.sh
+
+#increase the PermGen size to allow the Virgo Societies platform to deploy and work correctly
+export JAVA_OPTS=-XX:MaxPermSize=128m
+
+b. Run the setenv.sh (included in current directory) as follows:
+
+source setenv.sh
+
+Running it as ./setenv.sh or sh setenv.sh will set the variable only for the shell in which the script run and only for the duration of the running of the script
+
+3. It is currently not possible to run a multi-container Societies Virgo deployment on Linux as described in Societies Windows documentation.

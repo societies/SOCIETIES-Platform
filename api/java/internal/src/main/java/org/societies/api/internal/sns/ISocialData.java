@@ -3,7 +3,10 @@ package org.societies.api.internal.sns;
 import java.util.List;
 import java.util.Map;
 
-public interface ISocialData {
+import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
+import org.societies.api.sns.ISocialDataExternal;
+
+public interface ISocialData extends ISocialDataExternal{
 
 	// verbs
 	public static final String POST = "post";
@@ -25,23 +28,8 @@ public interface ISocialData {
 	public static final String COLLECTION = "collection";
 	public static final String PLACE = "places";
 	public static final String CHECKIN = "checkin";	
-	
-	public static final String POST_NAME = "name";
-	public static final String POST_TYPE = "type";	
-	public static final String POST_LAT = "lat";
-	public static final String POST_LON = "lon";
-	public static final String POST_FROM = "from";
-	public static final String POST_TO 	 = "to";
-	public static final String POST_MESSAGE = "message";
-	public static final String POST_PLACE = "place";
-	public static final String POST_DESCR = "description";
-	public static final String POST_LOCATION = "location";
-	
-	
-	
-	
-	
-    /**
+
+	/**
      * Add a new social connector to fetch data from a specific Social network
      * @param socialConnector Interface of the specific connector
      * @throws Exception 
@@ -109,7 +97,7 @@ public interface ISocialData {
       * @param params  to generate correctly the connector (Must be present the token)
       * @return the implementation of the spicific social connector castest as the interfeace ISocialConnector
       */
-    ISocialConnector createConnector(ISocialConnector.SocialNetwork socialNetworkName, Map<String, String> params);
+    ISocialConnector createConnector(SocialNetwork socialNetworkName, Map<String, String> params);
     
     
     /**
@@ -120,20 +108,21 @@ public interface ISocialData {
     boolean isAvailable(ISocialConnector connector);
     
     
-    /**
-     * The Method post a message (String) to a specifc SocialNetwork
-     * @param socialNetworkName  the name of the Social Network [Facebook, Twitter, Foursquare]
-     * @param message the String to be posted
-     */
-    void postMessage(ISocialConnector.SocialNetwork socialNetworkName, String message);
-    
-   /**
-    * This Method allow to post on a specific Social network more than a simple string, like events or checkin. 
-    * the data required are put in the MAP <key, value> in order to be correctly processed 
-    * 
-    * @param socialNetwork to send the data	
-    * @param data a MAP<String, Data> to instruct the connector to post the data on the SN
-    */
-    void postData(ISocialConnector.SocialNetwork socialNetwork, Map<String,?> data);
+//    /**
+//     * The Method post a message (String) to a specifc SocialNetwork
+//     * @param socialNetworkName  the name of the Social Network [Facebook, Twitter, Foursquare]
+//     * @param message the String to be posted
+//     */
+//    
+//    void postMessage(ISocialConnector.SocialNetwork socialNetworkName, String message);
+//    
+//   /**
+//    * This Method allow to post on a specific Social network more than a simple string, like events or checkin. 
+//    * the data required are put in the MAP <key, value> in order to be correctly processed 
+//    * 
+//    * @param socialNetwork to send the data	
+//    * @param data a MAP<String, Data> to instruct the connector to post the data on the SN
+//    */
+//    void postData(ISocialConnector.SocialNetwork socialNetwork, Map<String,?> data);
     
 }

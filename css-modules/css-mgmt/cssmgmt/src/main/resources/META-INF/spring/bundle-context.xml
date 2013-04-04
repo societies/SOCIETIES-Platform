@@ -31,6 +31,8 @@
 	  <property name="socialData" ref="socialData"/>
 	  <property name="eventMgr" ref="eventMgmtRef"/>
 	  <property name="ctxBroker" ref="ctxBroker"/>
+	  <property name="cisManager" ref="cisManager"/>
+	  <property name="iActivityFeedManager" ref="activityFeedManager" />
  
   </bean>
 

@@ -66,8 +66,8 @@ public class ActivityFeedManager implements IActivityFeedManager {
         this.sessionFactory = sessionFactory;
     }
     @Override
-    public IActivityFeed getOrCreateFeed(String owner, String feedId) {
-        LOG.info("In getOrCreateFeed .. ");
+    public IActivityFeed getOrCreateFeed(String owner, String feedId, Boolean bPubSub) {
+         LOG.info("In getOrCreateFeed .. ");
         for(IActivityFeed feed : feeds){
             if(((ActivityFeed)feed).getId().contentEquals(feedId)) {
                 if(!((ActivityFeed)feed).getOwner().contentEquals(owner)) {
@@ -90,7 +90,8 @@ public class ActivityFeedManager implements IActivityFeedManager {
         ActivityFeed ret = new ActivityFeed(feedId,owner);
         ret.setPubSubcli(this.pubSubClient);
         ret.startUp(this.sessionFactory);
-        ret.connectPubSub(identity);
+        if (bPubSub)
+        	ret.connectPubSub(identity);
 
         feeds.add(ret);
         persistNewFeed(ret);
@@ -109,14 +110,6 @@ public class ActivityFeedManager implements IActivityFeedManager {
                 return feeds.remove(cur);
             }
         }
-/*        for(IActivityFeed feed : feeds){
-            if(((ActivityFeed)feed).getId().contentEquals(feedId)) {
-                if(!((ActivityFeed)feed).getOwner().contentEquals(ownerId))
-                    return false;
-
-                return feeds.remove(feed);
-            }
-        }*/
         return false;
     }
     private boolean removeRecord(IActivityFeed feed){
@@ -199,5 +192,6 @@ public class ActivityFeedManager implements IActivityFeedManager {
         }
         return true;
     }
+	
 
 }

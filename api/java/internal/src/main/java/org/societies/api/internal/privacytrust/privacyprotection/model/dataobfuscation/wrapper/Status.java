@@ -25,6 +25,7 @@
 package org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.IObfuscable;
 
 /**
  * Status
@@ -32,7 +33,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
  * @author olivierm
  *
  */
-public class Status {
+@Deprecated
+public class Status extends IObfuscable {
 	private String status;
 	
 	public Status() {

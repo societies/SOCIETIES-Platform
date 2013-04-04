@@ -3,7 +3,7 @@
 	targetNamespace="http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacydatamanagement"
 	xmlns:tns="http://societies.org/api/internal/schema/privacytrust/privacyprotection/privacydatamanagement"
 	xmlns:ns2="http://societies.org/api/schema/identity"
-	xmlns:ns3="http://societies.org/api/internal/schema/privacytrust/model/dataobfuscation"
+	xmlns:ns3="http://societies.org/api/internal/schema/privacytrust/privacy/model/dataobfuscation"
 	xmlns:ns1="http://societies.org/api/internal/schema/privacytrust/privacyprotection/model/privacypolicy"
 	xmlns:ns4="http://societies.org/api/schema/privacytrust/privacy/model/privacypolicy"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -17,8 +17,8 @@
 		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.privacytrust.privacy.model.privacypolicy.xsd" />
 
 	<xs:import
-		namespace="http://societies.org/api/internal/schema/privacytrust/model/dataobfuscation"
-		schemaLocation="org.societies.api.internal.schema.privacytrust.model.dataobfuscation.xsd" />
+		namespace="http://societies.org/api/internal/schema/privacytrust/privacy/model/dataobfuscation"
+		schemaLocation="org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.xsd" />
 
 	<xs:import namespace="http://societies.org/api/schema/identity"
 		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.identity.xsd" />

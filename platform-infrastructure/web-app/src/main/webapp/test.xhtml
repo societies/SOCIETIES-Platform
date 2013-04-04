@@ -1,0 +1,31 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                template="templates/main_template.xhtml">
+
+    <ui:define name="html_head">
+        <title>SOCIEITES :: View Response Policy</title>
+    </ui:define>
+
+    <ui:define name="body">
+
+
+        <p:commandButton value="Send event"
+                         actionListener="#{ppNegotiationTest.sendEvent}"
+                         process="@this"/>
+
+        <p>
+            <p:outputLabel value="Negotiations in queue:" for="countLabel"/>
+            <p:inputText value="#{ppNegotiation.queuedNegotiationCount}" readonly="true" id="countLabel"/>
+        </p>
+
+        <h:link value="Next page &gt;&gt;" outcome="privacy_policy_negotiation.xhtml"/>
+
+        <p:poll interval="2" update="countLabel" process="@this"/>
+
+
+    </ui:define>
+</ui:composition>
+</html>

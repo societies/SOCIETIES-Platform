@@ -33,7 +33,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -66,6 +69,8 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.sns.ISocialConnector;
+import org.societies.api.internal.sns.ISocialData;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.context.broker.ICtxBroker;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -81,6 +86,7 @@ public class Tester {
 
 	private ICtxBroker externalCtxBroker;
 	private ICommManager commMgr;
+	private ISocialData socialData ; 
 
 	private static Logger LOG = LoggerFactory.getLogger(Tester.class);
 
@@ -110,6 +116,7 @@ public class Tester {
 
 		this.externalCtxBroker = CtxSNDataMgmt.getCtxBroker();
 		this.commMgr = CtxSNDataMgmt.getCommManager();
+		this.socialData = CtxSNDataMgmt.getSocialData();
 
 		LOG.info("*** " + this.getClass() + " instantiated");
 
@@ -140,9 +147,14 @@ public class Tester {
 		LOG.info("*** Starting examples...");
 
 
-		// TODO createRemoteEntity();
-		this.createFakeSNData();
+		// the following call will automatically add a fb connector 
+		// not working yet, need to add the connector via web app
+		//this.connectToSN();
+		
+		// the following call will retrieve sn data stored as context
 		this.retrieveSNData();
+		
+		
 	}
 
 
@@ -201,283 +213,106 @@ public class Tester {
 
 	}
 
-
-
-
-
-
-
-
+	
+	
 	/*
-	 * 
-	 * this will be substituted by real fb data
-	 */
-	private void createFakeSNData(){
+	private void connectToSN(){
 
+		LOG.info("Connect to jane societies fake fb account");
 
-		CtxEntityIdentifier cssOwnerEntityId;
-		try {
-			cssOwnerEntityId = this.externalCtxBroker.retrieveIndividualEntityId(this.requestorService, this.cssOwnerId).get();
-			LOG.info("*** Retrieved CSS owner context entity id " + cssOwnerEntityId);
-			CtxEntity individualEntity = (CtxEntity) this.externalCtxBroker.retrieve(this.requestorService, cssOwnerEntityId).get();
-			CtxAssociation assoc = null;
+		String access_token = "AAAFs43XOj3IBADXaH1hcC65BW8GR8AttMY4FTD6E0TTn1HqBgsqmcVlfMo0sQk6qXrIOqQ23Uyx4ufg323qsLrimmr8E4n4ihxZAHGwZDZD";
+		HashMap<String, String> pars = new HashMap<String, String>();
+		pars.put(ISocialConnector.AUTH_TOKEN, access_token);
 
+		LOG.info(" access_token " +  access_token);
 
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		ISocialConnector c = this.socialData.createConnector(ISocialConnector.SocialNetwork.Facebook, pars);
+		LOG.info("connector added " + c);
+		
+		String error = "";
+		
+		ISocialConnector con = this.socialData.createConnector(
+			      getSocialNetowkName(sdForm.getSnName()), params);
+			    error = "We are not able to create " + con.getConnectorName()
+			      + " connector!";
+			    this.socialData.addSocialConnector(con);
 
+			    content = "<b>Connector</b> ID:" + sdForm.getId() + " for "
+			      + sdForm.getSnName() + " with token: "
+			      + sdForm.getToken() + "<br>";
+			    model.put("sdForm", sdForm);
+
+			    Iterator<ISocialConnector> it = this.socialData.getSocialConnectors().iterator();
+			    String connLI = "";
+
+			    while (it.hasNext()) {
+			     ISocialConnector conn = it.next();
+
+			     connLI += "<li><img src='" + getSNIcon(conn) + "'> "
+			       + conn.getConnectorName()
+			       + " <a href=\"#\" onclick=\"disconnect('"
+			       + conn.getID()
+			       + "');\">Click here to disconnect</a></li>";
+
+			    }
+
+			    this.socialData.updateSocialData(); // this is required to read all
+			            // the SN Data.... (can take a
+			            // while).
+		
 	}
 
+	*/
+	
+	/*
+	@RequestMapping(value = "/socialdata.html", method = RequestMethod.GET)
+	public ModelAndView SocialDataForm() {
 
+		// CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
+		Map<String, Object> model = new HashMap<String, Object>();
 
+		// //ADD THE BEAN THAT CONTAINS ALL THE FORM DATA FOR THIS PAGE
+		SocialDataForm sdForm = new SocialDataForm();
+		model.put("sdForm", sdForm);
 
+		Iterator<ISocialConnector> it = socialdata.getSocialConnectors()
+				.iterator();
+		String connLI = "";
 
-	private CtxEntity getSnCtxEntity() {
+		while (it.hasNext()) {
+			ISocialConnector conn = it.next();
+			connLI += "<li><img src='" + getSNIcon(conn) + "'> "
+					+ conn.getConnectorName()
+					+ " <a href=\"#\" onclick=\"disconnect('" + conn.getID()
+					+ "');\">Click here to disconnect</a></li>";
 
-		IndividualCtxEntity individualEntity;
-		CtxEntityIdentifier individualEntityId;
+		}
 
-		CtxAssociation snsAssoc = null;
-		CtxEntity socialNetwork = null;
+		model.put("lastupdate", lastUpdate);
+		model.put("connectors", connLI);
+		return new ModelAndView("socialdata", model);
+	}
 
-		//fake sn name
-		String snName = "FACEBOOK";
-		//this.snName = connector.getConnectorName();
-
+	*/
+	
+	/*
+	private String getSNIcon(ISocialConnector conn) {
 		try {
-			individualEntityId = this.externalCtxBroker.retrieveIndividualEntityId(this.requestorService, this.cssOwnerId).get();
-
-			individualEntity = (IndividualCtxEntity) this.externalCtxBroker.retrieve(this.requestorService, individualEntityId).get();
-
-			Set<CtxAssociationIdentifier> snsAssocSet = individualEntity.getAssociations(CtxAssociationTypes.IS_CONNECTED_TO_SNS);
-			LOG.debug("There are "+ snsAssocSet.size() + " associations with SocialNetworks");
-
-			if (snsAssocSet.size() > 0) {
-
-				List<CtxAssociationIdentifier> snsAssocList = new ArrayList<CtxAssociationIdentifier>(snsAssocSet);
-				for(CtxAssociationIdentifier assocID : snsAssocList ){
-					snsAssoc = (CtxAssociation) this.externalCtxBroker.retrieve(this.requestorService, assocID).get();
-					Set<CtxEntityIdentifier>  snsEntitiesSet 	= snsAssoc.getChildEntities(CtxEntityTypes.SOCIAL_NETWORK);
-					List<CtxEntityIdentifier> snsEntitiesList 	= new ArrayList<CtxEntityIdentifier>(snsEntitiesSet);
-
-					LOG.debug("lookup SN association" + snName);
-					List<CtxEntityIdentifier> snEntList 		= this.lookupEntities(snsEntitiesList, CtxAttributeTypes.NAME, snName).get();
-
-					if (snEntList.size() > 0) {
-						socialNetwork = (CtxEntity) this.externalCtxBroker.retrieve(this.requestorService, snEntList.get(0)).get();
-						return socialNetwork;
-					}
-				}
-
-			}
-			//if (snsAssocSet.size() == 0) {
-
-			snsAssoc = this.externalCtxBroker.createAssociation(this.requestorService,this.cssOwnerId , CtxAssociationTypes.IS_CONNECTED_TO_SNS).get();
-			LOG.info("snsAssoc created ");
-
-			List<CtxEntityIdentifier> snEntitiesList = this.externalCtxBroker.lookupEntities(this.requestorService,this.cssOwnerId ,CtxEntityTypes.SOCIAL_NETWORK,CtxAttributeTypes.NAME, snName, snName).get();
-
-			if (snEntitiesList.size() == 0) {
-				socialNetwork = this.externalCtxBroker.createEntity(this.requestorService,this.cssOwnerId, CtxEntityTypes.SOCIAL_NETWORK).get();
-				LOG.info("SOCIAL_NETWORK entity created "+socialNetwork.getId());
-				CtxAttribute snsNameAttr = this.externalCtxBroker.createAttribute(this.requestorService, socialNetwork.getId(), CtxAttributeTypes.NAME).get();
-				snsNameAttr.setStringValue(snName);
-				this.externalCtxBroker.update(this.requestorService, snsNameAttr);
-
-			}
-
+			if (conn.getConnectorName().equalsIgnoreCase("facebook"))
+				return "images/Facebook.png";
+			else if (conn.getConnectorName().equalsIgnoreCase("twitter"))
+				return "images/Twitter.jpg";
+			else if (conn.getConnectorName().equalsIgnoreCase("linkedin"))
+				return "images/Linkedin.png";
+			else if (conn.getConnectorName().equalsIgnoreCase("foursquare"))
+				return "images/Foursquare.png";
 			else
-				socialNetwork = (CtxEntity) this.externalCtxBroker.retrieve(this.requestorService, snEntitiesList.get(0)).get();
-
-			snsAssoc.addChildEntity(socialNetwork.getId());
-			snsAssoc.addChildEntity(individualEntity.getId());
-			snsAssoc.setParentEntity(individualEntity.getId());
-			snsAssoc = (CtxAssociation) this.externalCtxBroker.update(this.requestorService,snsAssoc).get();
-			this.externalCtxBroker.update(this.requestorService, individualEntity);
-			//}
-
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+				return "images/social_network.png";
+		} catch (Exception ex) {
 		}
-
-		return socialNetwork;
-	}
-
-
-	/*
-
-	public void updateCtxProfile() {
-
-
-		//LOG.debug(" Updating profile data for " + connector.getConnectorName());
-
-		CtxEntityIdentifier cssOwnerEntityId;
-		cssOwnerEntityId = this.externalCtxBroker.retrieveIndividualEntityId(this.requestorService, this.cssOwnerId).get();
-
-		//this.snName = connector.getConnectorName();
-		CtxEntity socialNetworkEntity = this.getSnCtxEntity();
-
-
-		// Update Simple Profile
-	//	PersonConverter parser   = PersonConverterFactory.getPersonConverter(connector);
-//		Person profile			 = parser.load(connector.getUserProfile());
-
-//		updateStringFieldIfExists(snName, CtxAttributeTypes.TYPE);
-		updateStringFieldIfExist(profile.getAboutMe(), CtxAttributeTypes.ABOUT);		
-		updateStringFieldIfExist(profile.getProfileUrl(), CtxAttributeTypes.PROFILE_IMAGE_URL);		
-		updateStringFieldIfExist(profile.getDisplayName(), CtxAttributeTypes.NAME);
-
-		if (profile.getName()!=null){
-			updateStringFieldIfExist(profile.getName().getGivenName(),  CtxAttributeTypes.NAME_FIRST);
-			updateStringFieldIfExist(profile.getName().getFamilyName(), CtxAttributeTypes.NAME_LAST);
-		}
-		//		updateStringFieldIfExist(profile.getPhoneNumbers(), CtxAttributeTypes.PHONES);
-		updateStringFieldIfExist(profile.getPoliticalViews(), CtxAttributeTypes.POLITICAL_VIEWS);
-		updateStringFieldIfExist(profile.getPreferredUsername(), CtxAttributeTypes.USERNAME);	
-		updateStringFieldIfExist(profile.getThumbnailUrl(), CtxAttributeTypes.PROFILE_IMAGE_URL);
-		updateStringFieldIfExist(profile.getRelationshipStatus(), CtxAttributeTypes.STATUS);
-		updateStringFieldIfExist(profile.getReligion(), CtxAttributeTypes.RELIGIOUS_VIEWS);
-
-		if (profile.getGender()!=null)
-			updateStringFieldIfExist(profile.getGender().name(), CtxAttributeTypes.SEX);
-		if (profile.getBirthday()!=null)
-			updateStringFieldIfExist(profile.getBirthday().toGMTString(), CtxAttributeTypes.BIRTHDAY);
-		if (profile.getCurrentLocation()!=null)
-			updateStringFieldIfExist(profile.getCurrentLocation().getFormatted(), CtxAttributeTypes.LOCATION_SYMBOLIC);
-
-
-		updateStringFieldIfExist(profile.getBooks(), 			 CtxAttributeTypes.BOOKS);
-		updateStringFieldIfExist(profile.getMusic(),  			 CtxAttributeTypes.MUSIC);
-		updateStringFieldIfExist(profile.getInterests(),  		 CtxAttributeTypes.INTERESTS);
-		updateStringFieldIfExist(profile.getJobInterests(),  	 CtxAttributeTypes.JOBS_INTERESTS);
-		updateStringFieldIfExist(profile.getLanguagesSpoken(),   CtxAttributeTypes.LANGUAGES);
-		updateStringFieldIfExist(profile.getMovies(),  			 CtxAttributeTypes.MOVIES);
-		updateStringFieldIfExist(profile.getTurnOns(),  		 CtxAttributeTypes.TURNSON);
-		updateStringFieldIfExist(profile.getActivities(), 		 CtxAttributeTypes.ACTIVITIES);		
-//		updateStringFieldIfExist(profile.getEmails(), 		 	 CtxAttributeTypes.EMAIL);	
-
-
-		LOG.debug(" Updating Friends List ...");
-		// Add Friends List
-
-		FriendsConverter friendsParser = FriendsConveterFactory.getPersonConverter(connector);
-		List<Person> friends= friendsParser.load(connector.getUserFriends());
-	    storeFriendsIntoContextBroker(friends);
-
-
-	    LOG.debug(" Updating Groups list ...");
-	    // Add Group List
-	    GroupConverter groupConverter = GroupConveterFactory.getPersonConverter(connector);
-	    List<Group> groups = groupConverter.load(connector.getUserGroups());
-	    storeGroupsIntoContextBroker(groups);
-	}
-	 */
-
-
-	private void updateStringFieldIfExist(String value, String type) {
-		try {
-			if (value != null) {
-				LOG.info("update " + type + " data" + value);
-				//storeSocialDataIntoContextBroker(type, value);
-				//	LOG.info(snName + " entity updated with " + type + " data "+ socialNetworkEntity.getId());
-			}
-			else LOG.debug(type + " value is NULL");
-		} 
-		catch (Exception ex) {
-			LOG.error("Unable to store :" + type + " -> " + value + " because "+ ex, ex);
-		}
+		return "images/social_network.png";
 
 	}
-
-	private void updateStringFieldIfExist(List<String> listOfvalues, String type){
-
-		if (listOfvalues != null) {
-			//	String value = updateListData(listOfvalues);
-			//	updateStringFieldIfExist(value, type);
-		}
-		else LOG.debug(type + " value is NULL");
-	}
-
-
-	public Future<List<CtxEntityIdentifier>> lookupEntities(List<CtxEntityIdentifier> ctxEntityIDList, String ctxAttributeType, Serializable value){
-
-		List<CtxEntityIdentifier> entityList = new ArrayList<CtxEntityIdentifier>(); 
-		try {
-			for(CtxEntityIdentifier entityId :ctxEntityIDList){
-				CtxEntity entity = (CtxEntity) this.externalCtxBroker.retrieve(this.requestorService, entityId).get();
-
-				Set<CtxAttribute> ctxAttrSet = entity.getAttributes(ctxAttributeType);
-				for(CtxAttribute ctxAttr : ctxAttrSet){
-
-					if(this.compareAttributeValues(ctxAttr,value)) {
-						entityList.add(entityId);
-					}
-				}
-			}
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return new AsyncResult<List<CtxEntityIdentifier>>(entityList);
-	}
-
-	public static Boolean compareAttributeValues(CtxAttribute attribute, Serializable value){
-
-		Boolean areEqual = false;
-		if (value instanceof String ) {
-			if (attribute.getStringValue()!=null) {
-				String valueStr = attribute.getStringValue();
-				if(valueStr.equalsIgnoreCase(value.toString())) return true;             			
-			}
-		} else if (value instanceof Integer) {
-			if(attribute.getIntegerValue()!=null) {
-				Integer valueInt = attribute.getIntegerValue();
-				if(valueInt.equals((Integer)value)) return true;  
-			}
-		} else if (value instanceof Double) {
-			if(attribute.getDoubleValue()!=null) {
-				Double valueDouble = attribute.getDoubleValue();
-				if(valueDouble.equals((Double) value)) return true;             			
-			}
-		} else {
-			byte[] valueBytes;
-			byte[] attributeValueBytes;
-			try {
-				valueBytes = attribute.getBinaryValue();
-				attributeValueBytes = SerialisationHelper.serialise(value);
-				if (Arrays.equals(valueBytes, attributeValueBytes)) {
-					areEqual = true;
-					return true;
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}                		
-		}
-		return areEqual;
-	}
-
-
+*/
+	
 }

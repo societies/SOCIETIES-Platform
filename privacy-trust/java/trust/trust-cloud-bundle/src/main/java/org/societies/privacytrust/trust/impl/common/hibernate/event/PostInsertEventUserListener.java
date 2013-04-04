@@ -78,15 +78,13 @@ public class PostInsertEventUserListener implements PostInsertEventListener {
 			if (LOG.isDebugEnabled())
         		LOG.debug("Posting TrustEvidenceUpdateEvent " + trustEvidenceUpdateEvent
         				+ " to topic '" + topic + "'");
-			try {
+			if (this.trustEventMgr == null) {
+				LOG.error("Could not post TrustEvidenceUpdateEvent " 
+						+ trustEvidenceUpdateEvent + " to topic '" + topic 
+						+ "': Trust Event Mgr is not available");
+			} else {
 				this.trustEventMgr.postEvent(trustEvidenceUpdateEvent, 
 						new String[] { topic });
-			} catch (TrustEventMgrException teme) {
-				
-				LOG.error("Could not post TrustEvidenceUpdateEvent " 
-						+ trustEvidenceUpdateEvent
-        				+ " to topic '" + topic + "': " 
-						+ teme.getLocalizedMessage(), teme);
 			}
 		}
 	}

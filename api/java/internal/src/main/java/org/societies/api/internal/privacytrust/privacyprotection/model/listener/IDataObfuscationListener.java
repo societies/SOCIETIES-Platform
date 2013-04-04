@@ -25,16 +25,16 @@
 package org.societies.api.internal.privacytrust.privacyprotection.model.listener;
 
 import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 
 
 /**
  * This interface defines a listener for an obfuscation operation.
- * @author olivierm
+ * @author Olivier Maridat (Trialog)
  * @date 14 oct. 2011
  */
 public interface IDataObfuscationListener {
-	public void onObfuscationDone(IDataWrapper data);
+	public void onObfuscationDone(DataWrapper data);
 	public void onObfuscationCancelled(String msg);
 	public void onObfuscationAborted(String msg, Exception e);
 	public void onObfuscatedVersionRetrieved(CtxIdentifier dataId, boolean retrieved);

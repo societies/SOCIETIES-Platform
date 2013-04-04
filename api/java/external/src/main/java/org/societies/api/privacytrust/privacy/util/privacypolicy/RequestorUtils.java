@@ -40,10 +40,17 @@ import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
- * Tool class to manage conversion between Java type and Bean XMLschema generated type
+ * Deprecated use @link{org.societies.api.identity.util.RequestorUtils} instead
+ * @see org.societies.api.identity.util.RequestorUtils
  * @author Olivier Maridat (Trialog)
  */
+@Deprecated
 public class RequestorUtils {
+	/**
+	 * Deprecated use @link{org.societies.api.identity.util.RequestorUtils} instead
+	 * @see org.societies.api.identity.util.RequestorUtils
+	 */
+	@Deprecated
 	public static Requestor toRequestor(RequestorBean requestorBean, IIdentityManager identityManager) throws InvalidFormatException
 	{
 		if (null == requestorBean) {
@@ -60,6 +67,12 @@ public class RequestorUtils {
 		}
 		return new Requestor(requestorId);
 	}
+	
+	/**
+	 * Deprecated use @link{org.societies.api.identity.util.RequestorUtils} instead
+	 * @see org.societies.api.identity.util.RequestorUtils
+	 */
+	@Deprecated
 	public static List<Requestor> toRequestors(List<RequestorBean> requestorBeans, IIdentityManager identityManager) throws InvalidFormatException
 	{
 		if (null == requestorBeans) {
@@ -72,6 +85,11 @@ public class RequestorUtils {
 		return requestors;
 	}
 
+	/**
+	 * Deprecated use @link{org.societies.api.identity.util.RequestorUtils} instead
+	 * @see org.societies.api.identity.util.RequestorUtils
+	 */
+	@Deprecated
 	public static RequestorBean toRequestorBean(Requestor requestor)
 	{
 		if (null == requestor) {
@@ -94,6 +112,12 @@ public class RequestorUtils {
 		requestorBean.setRequestorId(requestorId);
 		return requestorBean;
 	}
+
+	/**
+	 * Deprecated use @link{org.societies.api.identity.util.RequestorUtils} instead
+	 * @see org.societies.api.identity.util.RequestorUtils
+	 */
+	@Deprecated
 	public static List<RequestorBean> toRequestorBeans(List<Requestor> requestors)
 	{
 		if (null == requestors) {
@@ -105,35 +129,23 @@ public class RequestorUtils {
 		}
 		return requestorBeans;
 	}
-	//	public static String getRequestorId(RequestorBean requestor) {
-	//		StringBuilder sb = new StringBuilder();
-	//		if (requestor instanceof RequestorCisBean) {
-	//			sb.append("CIS:");
-	//			sb.append(requestor.getRequestorId());
-	//			sb.append("|");
-	//			sb.append(((RequestorCisBean)requestor).getCisRequestorId());
-	//		}
-	//		else if (requestor instanceof RequestorServiceBean) {
-	//			String serviceOwnerJid = ServiceModelUtils.getJidFromServiceIdentifier(((RequestorServiceBean)requestor).getRequestorServiceId());
-	//			String serviceId = ServiceModelUtils.getServiceId64Encode((((RequestorServiceBean)requestor).getRequestorServiceId()));
-	//			sb.append("Service:");
-	//			sb.append(serviceOwnerJid);
-	//			sb.append("|");
-	//			sb.append(serviceId);
-	//		}
-	//		else {
-	//			sb.append("CSS:");
-	//			sb.append(requestor.getRequestorId());
-	//		}
-	//		return sb.toString();
-	//	}
-	
+
+	/**
+	 * Deprecated use @link{org.societies.api.identity.util.RequestorUtils} instead
+	 * @see org.societies.api.identity.util.RequestorUtils
+	 */
+	@Deprecated
 	public static RequestorBean create(String requestorId) {
 		RequestorBean requestor = new RequestorBean();
 		requestor.setRequestorId(requestorId);
 		return requestor;
 	}
 
+	/**
+	 * Deprecated use @link{org.societies.api.identity.util.RequestorUtils} instead
+	 * @see org.societies.api.identity.util.RequestorUtils
+	 */
+	@Deprecated
 	public static RequestorCisBean create(String requestorId, String requestorCisId) {
 		RequestorCisBean requestor = new RequestorCisBean();
 		requestor.setRequestorId(requestorId);
@@ -141,6 +153,11 @@ public class RequestorUtils {
 		return requestor;
 	}
 
+	/**
+	 * Deprecated use @link{org.societies.api.identity.util.RequestorUtils} instead
+	 * @see org.societies.api.identity.util.RequestorUtils
+	 */
+	@Deprecated
 	public static RequestorServiceBean create(String requestorId, ServiceResourceIdentifier requestorServiceId) {
 		RequestorServiceBean requestor = new RequestorServiceBean();
 		requestor.setRequestorId(requestorId);
@@ -148,6 +165,11 @@ public class RequestorUtils {
 		return requestor;
 	}
 
+	/**
+	 * Deprecated use @link{org.societies.api.identity.util.RequestorUtils} instead
+	 * @see org.societies.api.identity.util.RequestorUtils
+	 */
+	@Deprecated
 	public static String toXmlString(RequestorBean requestor){
 		StringBuilder sb = new StringBuilder();
 		if (null != requestor) {
@@ -170,6 +192,11 @@ public class RequestorUtils {
 		return sb.toString();
 	}
 
+	/**
+	 * Deprecated use @link{org.societies.api.identity.util.RequestorUtils} instead
+	 * @see org.societies.api.identity.util.RequestorUtils
+	 */
+	@Deprecated
 	public static boolean equals(RequestorBean o1, Object o2) {
 		// -- Verify reference equality
 		if (o2 == null) { return false; }
