@@ -39,7 +39,7 @@ var SocietiesDataUtil=(function(){
 	var conditionList = {"SHARE_WITH_3RD_PARTIES": "Shared with the world",
 	                     "SHARE_WITH_CIS_MEMBERS_ONLY": "Shared with community members",
 	                     "SHARE_WITH_CIS_OWNER_ONLY" : "Not shared",
-	                     "MAY_BE_INFERRED" : "Warning, this data may be inferred",
+	                     "MAY_BE_INFERRED" : "Warning, this information may be inferred",
 	                     "DATA_RETENTION_IN_SECONDS": "Data retention in seconds",
 	                     "DATA_RETENTION_IN_MINUTES": "Data retention in minutes",
 	                     "DATA_RETENTION_IN_HOURS": "Data retention in hours",
@@ -63,12 +63,17 @@ var SocietiesDataUtil=(function(){
 	/* ************************
 	 * 		Private Functions
 	 **************************/
+	 
+	function sortConditions(a, b) {
+		return a.conditionConstant > b.conditionConstant;
+	}
 
 	/* ************************
 	 * 		Public Elements
 	 **************************/
 	return{
 		conditionList: conditionList,
+		sortConditions: sortConditions,
 	
 		mapToAction : function(actionId){
 			if (undefined != actionList[actionId]) {
@@ -215,6 +220,7 @@ var	SocietiesPrivacyPolicyManagerService=(function(){
 				var whoCanAccess = PrivacyPolicyUtils.mapToWhoCanAccess(globalBehaviour);
 				if ("Nobody" != whoCanAccess) {
 					var actions = whoCanAccess+' can ';
+					requestItem.actions.sort();
 					for (var j=0; j<requestItem.actions.length; j++){
 						var action = requestItem.actions[j];
 						actions += '<span class="'+action.actionConstant+(("optional" in action) && action.optional ? " optional" : "")+'">'+SocietiesDataUtil.mapToAction(action.actionConstant)+'</span>';
@@ -235,6 +241,7 @@ var	SocietiesPrivacyPolicyManagerService=(function(){
 				// Conditions
 				if ("conditions" in requestItem && requestItem.conditions.length > 0) {
 					var conditions = '';
+					requestItem.conditions.sort(SocietiesDataUtil.sortConditions);
 					for (var j=0; j<requestItem.conditions.length; j++){
 						var condition = requestItem.conditions[j];
 						if (!PrivacyPolicyUtils.in_array(condition.value, PrivacyPolicyUtils.FALSE)) {
