@@ -123,7 +123,6 @@ public class PrivacyDataManagerRemote {
 		String action = MethodType.OBFUSCATE_DATA.name();
 		try {
 			// -- Verify status
-			bindToComms();
 			if (!checkRemoteStatus(clientPackage, action)) {
 				return;
 			}
@@ -173,6 +172,7 @@ public class PrivacyDataManagerRemote {
 								//SEND INTENT WITH SERVICE STARTED STATUS
 								Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
 								intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, resultFlag);
+								intent.putExtra("type", "PrivacyDataManager");
 								PrivacyDataManagerRemote.this.context.sendBroadcast(intent);
 							}
 							@Override
@@ -186,6 +186,7 @@ public class PrivacyDataManagerRemote {
 								//SEND INTENT WITH SERVICE STARTED STATUS
 								Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
 								intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, remoteReady);
+								intent.putExtra("type", "PrivacyDataManager");
 								PrivacyDataManagerRemote.this.context.sendBroadcast(intent);
 							}
 
@@ -193,6 +194,7 @@ public class PrivacyDataManagerRemote {
 					} else {
 						Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
 						intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
+						intent.putExtra("type", "PrivacyDataManager");
 						PrivacyDataManagerRemote.this.context.sendBroadcast(intent);
 					}
 				}	
@@ -208,6 +210,7 @@ public class PrivacyDataManagerRemote {
 		else {
 			Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
 			intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+			intent.putExtra("type", "PrivacyDataManager");
 			this.context.sendBroadcast(intent);
 		}
 	}
@@ -226,6 +229,7 @@ public class PrivacyDataManagerRemote {
 					//SEND INTENT WITH SERVICE STOPPED STATUS
 					Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
 					intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+					intent.putExtra("type", "PrivacyDataManager");
 					PrivacyDataManagerRemote.this.context.sendBroadcast(intent);
 				}	
 				@Override
@@ -260,18 +264,8 @@ public class PrivacyDataManagerRemote {
 	 */
 	private boolean checkRemoteStatus(String clientPackage, String action) {
 		if (!isRemoteReady()) {
-			try {
-				wait(5000);
-			}
-			catch(Exception e) {
-				intentSender.sendIntentErrorServiceNotStarted(clientPackage, action);
-				return false;
-			}
-			if (!isRemoteReady()) {
-				intentSender.sendIntentErrorServiceNotStarted(clientPackage, action);
-				return false;
-			}
-			
+			intentSender.sendIntentErrorServiceNotStarted(clientPackage, action);
+			return false;
 		}
 		return true;
 	}

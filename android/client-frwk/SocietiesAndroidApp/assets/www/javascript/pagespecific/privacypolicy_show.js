@@ -244,7 +244,10 @@ var	SocietiesPrivacyPolicyManagerService=(function(){
 					requestItem.conditions.sort(SocietiesDataUtil.sortConditions);
 					for (var j=0; j<requestItem.conditions.length; j++){
 						var condition = requestItem.conditions[j];
-						if (!PrivacyPolicyUtils.in_array(condition.value, PrivacyPolicyUtils.FALSE)) {
+						if (!PrivacyPolicyUtils.in_array(condition.value, PrivacyPolicyUtils.FALSE)
+								&& "SHARE_WITH_3RD_PARTIES" != condition.conditionConstant
+								&& "SHARE_WITH_CIS_MEMBERS_ONLY" != condition.conditionConstant
+								&& "SHARE_WITH_CIS_OWNER_ONLY" != condition.conditionConstant) {
 							conditions += '<span class="'+condition.conditionConstant+(("optional" in condition) && condition.optional ? " optional" : "")+'">'+SocietiesDataUtil.mapToCondition(condition.conditionConstant)+(!PrivacyPolicyUtils.in_array(condition.value, PrivacyPolicyUtils.TRUE) ? ': '+condition.value : '')+'</span>';
 							if (j != (requestItem.conditions.length-1)) {
 								conditions += '<br />';

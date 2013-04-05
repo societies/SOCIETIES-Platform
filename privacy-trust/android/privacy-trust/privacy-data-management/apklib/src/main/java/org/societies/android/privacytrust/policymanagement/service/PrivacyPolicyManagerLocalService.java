@@ -49,12 +49,12 @@ public class PrivacyPolicyManagerLocalService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		this.binder = new LocalBinder();
-//		if (!((PrivacyPolicyManager)((LocalBinder)binder).getService()).startService()) {
-//			Log.e(TAG, "Ouch, can't start this service (i.e. can't bind it to the SocietiesCommsApp)");
-//		}
-//		else {
-//			Log.d(TAG, "Starting service requested");
-//		}
+		if (!((PrivacyPolicyManager)((LocalBinder)binder).getService()).startService()) {
+			Log.e(TAG, "Ouch, can't start this service (i.e. can't bind it to the SocietiesCommsApp)");
+		}
+		else {
+			Log.d(TAG, "Starting service requested");
+		}
 	}
 
 	@Override

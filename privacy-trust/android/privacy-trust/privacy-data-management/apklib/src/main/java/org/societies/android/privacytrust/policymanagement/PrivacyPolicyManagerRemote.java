@@ -91,7 +91,6 @@ public class PrivacyPolicyManagerRemote {
 		String action = MethodType.GET_PRIVACY_POLICY.name();
 		try {
 			// -- Verify status
-			bindToComms();
 			if (!checkRemoteStatus(clientPackage, action)) {
 				return false;
 			}
@@ -141,7 +140,6 @@ public class PrivacyPolicyManagerRemote {
 		String action = MethodType.UPDATE_PRIVACY_POLICY.name();
 		try {
 			// -- Verify status
-			bindToComms();
 			if (!checkRemoteStatus(clientPackage, action)) {
 				return false;
 			}
@@ -171,7 +169,6 @@ public class PrivacyPolicyManagerRemote {
 		String action = MethodType.DELETE_PRIVACY_POLICY.name();
 		try {
 			// -- Verify status
-			bindToComms();
 			if (!checkRemoteStatus(clientPackage, action)) {
 				return false;
 			}
@@ -218,6 +215,7 @@ public class PrivacyPolicyManagerRemote {
 								//SEND INTENT WITH SERVICE STARTED STATUS
 								Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
 								intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, resultFlag);
+								intent.putExtra("type", "PrivacyPolicyManager");
 								context.sendBroadcast(intent);
 							}
 							@Override
@@ -231,6 +229,7 @@ public class PrivacyPolicyManagerRemote {
 								//SEND INTENT WITH SERVICE STARTED STATUS
 								Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
 								intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, remoteReady);
+								intent.putExtra("type", "PrivacyPolicyManager");
 								context.sendBroadcast(intent);
 							}
 
@@ -238,6 +237,7 @@ public class PrivacyPolicyManagerRemote {
 					} else {
 						Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
 						intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
+						intent.putExtra("type", "PrivacyPolicyManager");
 						context.sendBroadcast(intent);
 					}
 				}	
@@ -256,6 +256,7 @@ public class PrivacyPolicyManagerRemote {
 		else {
 			Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
 			intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+			intent.putExtra("type", "PrivacyPolicyManager");
 			this.context.sendBroadcast(intent);
 		}
 	}
@@ -274,6 +275,7 @@ public class PrivacyPolicyManagerRemote {
 					//SEND INTENT WITH SERVICE STOPPED STATUS
 					Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
 					intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+					intent.putExtra("type", "PrivacyPolicyManager");
 					context.sendBroadcast(intent);
 				}	
 				@Override
@@ -289,6 +291,7 @@ public class PrivacyPolicyManagerRemote {
 		else {
 			Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
 			intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+			intent.putExtra("type", "PrivacyPolicyManager");
 			this.context.sendBroadcast(intent);
 		}
 	}
@@ -309,17 +312,8 @@ public class PrivacyPolicyManagerRemote {
 	 */
 	private boolean checkRemoteStatus(String clientPackage, String action) {
 		if (!isRemoteReady()) {
-			try {
-				wait(5000);
-			}
-			catch(Exception e) {
-				intentSender.sendIntentErrorServiceNotStarted(clientPackage, action);
-				return false;
-			}
-			if (!isRemoteReady()) {
-				intentSender.sendIntentErrorServiceNotStarted(clientPackage, action);
-				return false;
-			}
+			intentSender.sendIntentErrorServiceNotStarted(clientPackage, action);
+			return false;
 		}
 		return true;
 	}

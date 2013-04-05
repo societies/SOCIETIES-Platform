@@ -72,6 +72,8 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 
 	/** Local data */
 	private boolean pluginIsInit = false;
+	private boolean serviceIsInit = false;
+	private int nbOfCall = 0;
 	private IPrivacyPolicyManager privacyPolicyManagerService = null;
 	private ServiceReceiver pivacyPolicyManagerReceiver = null;
 
@@ -87,6 +89,7 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 	public PluginResult execute(String methodName, JSONArray arguments, String callbackId) {
 		Log.d(TAG, "Execute: "+(null != methodName ? methodName : "Unknown method"));
 		Log.d(TAG, "Parameters: "+(null != arguments ? arguments.toString() : "No params"));
+		nbOfCall++;
 		// -- Plugin not initialized: initialize the plugin (it will be executed at the init end)
 		if (!pluginIsInit && null != methodName) {
 			return initPlugin(methodName, arguments, callbackId);
@@ -137,6 +140,11 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 	 * This method is called when the plugin is called (execution) and already initialized
 	 */
 	private PluginResult executePlugin(String methodName, JSONArray arguments, String callbackId) {
+		if (nbOfCall <= 0) {
+			nbOfCall = 0;
+			return null;
+		}
+		nbOfCall--;
 		Log.d(TAG, "Plugin Called");
 		
 		// --- Save the callback
@@ -180,11 +188,13 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 		Log.d(TAG, "Destroyed");
 		// -- Close the broadcast receiver
 		if (null != pivacyPolicyManagerReceiver) {
+			Log.d(TAG, "Unregister from intents");
 			this.ctx.getContext().unregisterReceiver(pivacyPolicyManagerReceiver);
 		}
 		// -- Unlink with services
 		if (pluginIsInit) {
 			pluginIsInit = false;
+			serviceIsInit = false;
 			this.ctx.getContext().unbindService(androidServiceConnection);
 		}
 	}
@@ -224,9 +234,23 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 		public void onReceive(Context context, Intent intent) {
 			Log.i(TAG, "Intent received: "+intent.getAction());
 			try {
+				// -- PrivacyPolicyManagerService started
+				if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STARTED_STATUS)) {
+					Log.d(TAG, "Service started message received: "+intent.getAction());
+					boolean ack =  intent.hasExtra(IServiceManager.INTENT_RETURN_VALUE_KEY) && intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
+					boolean isPrivacyPolicyManager =  intent.hasExtra("type") && "PrivacyPolicyManager".equals(intent.getStringExtra("type"));
+					// Execute the plugin
+					if (ack && isPrivacyPolicyManager) {
+						serviceIsInit = true;
+						if (pluginIsInit && serviceIsInit) {
+							executePlugin(methodName, arguments, callbackId);
+						}
+					}
+					return;
+				}
 				// -- Ack
 				boolean ack =  intent.hasExtra(IPrivacyPolicyManager.INTENT_RETURN_STATUS_KEY) && intent.getBooleanExtra(IPrivacyPolicyManager.INTENT_RETURN_STATUS_KEY, false);
-				Log.d(TAG, "Response received: "+intent.getAction()+(ack ? "with success" : "with an error"));
+				Log.d(TAG, "Privacy Response received: "+intent.getAction()+(ack ? " with success" : " with an error"));
 				// -- Get Privacy Policy
 				if (intent.getAction().equals(MethodType.GET_PRIVACY_POLICY.name())) {
 					JSONArray data = new JSONArray();
@@ -267,8 +291,10 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 			LocalBinder binder = (LocalBinder) service;
 			privacyPolicyManagerService = (IPrivacyPolicyManager) binder.getService();
 			pluginIsInit = true;
-			// Execute the plugin
-			executePlugin(methodName, arguments, callbackId);
+			// Wait for the init of the plugin
+			if (pluginIsInit && serviceIsInit) {
+				executePlugin(methodName, arguments, callbackId);
+			}
 		}
 	};
 }
