@@ -30,6 +30,7 @@ import org.apache.cordova.api.PluginResult.Status;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.identity.util.RequestorUtils;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.api.internal.privacytrust.intent.PrivacyPolicyIntentHelper;
@@ -112,6 +113,7 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 			Log.d(TAG, "Listen intents for PrivacyPolicy");
 			pivacyPolicyManagerReceiver = new ServiceReceiver();
 			IntentFilter intentFilter = new IntentFilter() ;
+			intentFilter.addAction(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
 			intentFilter.addAction(IPrivacyPolicyManager.INTENT_DEFAULT_ACTION);
 			intentFilter.addAction(MethodType.GET_PRIVACY_POLICY.name());
 			intentFilter.addAction(MethodType.UPDATE_PRIVACY_POLICY.name());
