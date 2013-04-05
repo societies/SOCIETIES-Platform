@@ -36,7 +36,7 @@ public class ConnectorTester {
 		
 		
 		
-		System.out.println("User Profile:"+connector.getUserProfile());
+		System.out.println("User Profile:"+connector.getUserActivities());
 //		System.out.println("User Groups:"+connector.getUserGroups());
 //		System.out.println("User Friends:"+connector.getUserFriends());
 //		System.out.println("User Activies:"+connector.getUserActivities());	

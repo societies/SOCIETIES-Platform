@@ -12,7 +12,8 @@ public interface FacebookConnector extends ISocialConnector {
 	public String CHECKINS   = "me/checkins";
 	public String HOME     	 = "me/home";
 	public String FRIENDS    = "me/friends?fields=about,address,age_range,bio,birthday,email,first_name,gender,hometown,id,languages,last_name,picture.type(normal),religion,quotes,political,username,relationship_status";
-	public String FEED     	 = "me/feed";
+//	public String FEED     	 = "me/feed";
+	public String FEED     	 = "me?fields=feed";
 	public String ALBUMS	 = "me/album";
 	public String FAMILY	 = "me/family";
 	public String INTERESTS	 = "me/interests";

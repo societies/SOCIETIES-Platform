@@ -6,35 +6,30 @@
 var CSSFriendsServices = {
 	
 	isFacebookFlagged: function(flag) {
-		var FACEBOOK_BIT=0x1;
+		var FACEBOOK_BIT=0x0000000001;
 		return (flag & FACEBOOK_BIT) === FACEBOOK_BIT; 
 	},
 			
 	isTwitterFlagged: function(flag) {
-		var TWITTER_BIT=0x2;
+		var TWITTER_BIT=0x0000000010;
 		return (flag & TWITTER_BIT) === TWITTER_BIT; 
 	},
 	
 	isLinkedinFlagged: function(flag) {
-		var LINKEDIN_BIT=0x4;
+		var LINKEDIN_BIT=0x0000000100;
 		return (flag & LINKEDIN_BIT) === LINKEDIN_BIT; 
 	},
 	
 	isFoursquareFlagged: function(flag) {
-		var FOURSQUARE_BIT=0x8;
+		var FOURSQUARE_BIT=0x0000001000;
 		return (flag & FOURSQUARE_BIT) === FOURSQUARE_BIT; 
 	},
 	
 	isGooglePlusFlagged: function(flag) {
-		var GOOGLEPLUS_BIT=0x16;
+		var GOOGLEPLUS_BIT=0x0000010000;
 		return (flag & GOOGLEPLUS_BIT) === GOOGLEPLUS_BIT; 
 	},
 	
-	isCisMembersFlagged: function(flag) {
-		var CIS_MEMBERS_BIT=0x32;
-		return (flag & CIS_MEMBERS_BIT) === CIS_MEMBERS_BIT; 
-	},
-			
 	/**
 	 * @methodOf Societies3PServices#
 	 * @description Refresh your friend requests
@@ -173,8 +168,6 @@ var CSSFriendsServices = {
 				images+='<img src="images/icons/foursquare-col.png" width="20" height="20" /> &nbsp;';
 			if (CSSFriendsServices.isGooglePlusFlagged(data[i].value))
 				images+='<img src="images/icons/googleplus-col.png" width="20" height="20" /> &nbsp;';
-			if (CSSFriendsServices.isCisMembersFlagged(data[i].value))
-				images+='<img src="images/community_profile_img_relevance.png" width="20" height="20" /> &nbsp;';
 			
 			//ADD TO LINE ITEM
 			var tableEntry = '<li id="li' + i + '"><a href="#" onclick="CSSFriendsServices.sendFriendRequest(\'' + data[i].key.name + '\', \'' + data[i].key.id + '\', ' + i + ')">' +

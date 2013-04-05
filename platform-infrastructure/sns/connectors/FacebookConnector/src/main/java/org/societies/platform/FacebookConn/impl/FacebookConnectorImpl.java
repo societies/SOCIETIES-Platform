@@ -323,7 +323,8 @@ public class FacebookConnectorImpl implements FacebookConnector {
 				List<BatchResponse> batchResponses = facebookClient.executeBatch(request);
 				response = batchResponses.get(0);
 				JsonObject activities = new JsonObject(response.getBody());
-				fullActivities = activities.getJsonArray("data");
+				JsonObject feed = activities.getJsonObject("feed");
+				fullActivities = feed.getJsonArray("data");
 				boolean goOn = activities.has("paging");
 				
 				

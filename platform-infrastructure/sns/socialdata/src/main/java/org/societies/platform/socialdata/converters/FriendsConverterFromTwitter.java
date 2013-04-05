@@ -20,8 +20,9 @@ public class FriendsConverterFromTwitter implements FriendsConverter{
 		List <Person> friends = new ArrayList<Person>();
 		Account tw = new AccountImpl();
 		tw.setDomain("twitter.com");
-	    List<Account> accounts = new ArrayList<Account>();
-	    accounts.add(tw);
+		List<Account> accounts = new ArrayList<Account>();
+		accounts.add(tw);
+		
 	    
 	    try{
 	    	JSONObject jdata  = new JSONObject(data);
@@ -31,14 +32,18 @@ public class FriendsConverterFromTwitter implements FriendsConverter{
 	    	
 	    	JSONArray  jfriends  =  null;
 	    	if (jdata.has("friends")){
+	    	                PersonConverterFromTwitter converter = new PersonConverterFromTwitter();
 				jfriends = jdata.getJSONArray("friends");
 				for (int i=0; i<jfriends.length();i++){
 					JSONObject jfriend = jfriends.getJSONObject(i);
-					Person p = new PersonImpl();
-					p.setId("twitter:"+jfriend.getString("id"));
-					p.setRelationshipStatus("friend");
-					p.setName(new NameImpl(jfriend.getString("name")));
-					p.setAccounts(accounts);
+					Person p = converter.load(jfriend.toString());
+					
+//					
+//					Person p = new PersonImpl();
+//					p.setId("twitter:"+jfriend.getString("id"));
+//					p.setRelationshipStatus("friend");
+//					p.setName(new NameImpl(jfriend.getString("name")));
+//					p.setAccounts(accounts);
 					//System.out.println(">>> new Friends"+p.getName().getFormatted());
 					friends.add(p);
 				}	

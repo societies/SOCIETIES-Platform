@@ -11,33 +11,18 @@
 		this file. There is no requirement to keep these definitions in a separate 
 		file if you do not want to. The rationale for keeping these definitions separate 
 		is to facilitate integration testing of the bundle outside of an OSGi container -->
-	<osgi:reference id="cisCommMgrFactory"
-		interface="org.societies.api.internal.comm.ICISCommunicationMgrFactory" />
-	<osgi:reference id="xcCommunication"
-		interface="org.societies.api.comm.xmpp.interfaces.ICommManager" />
-
-	<osgi:service ref="CisManagementBundle"
-		interface="org.societies.api.cis.management.ICisManager" />
-	<osgi:reference id="CisDirectoryRemote"
-		interface="org.societies.api.cis.directory.ICisDirectoryRemote" />
+	<osgi:service ref="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager" />
+	
+	<osgi:reference id="cisCommMgrFactory" interface="org.societies.api.internal.comm.ICISCommunicationMgrFactory" />
+	<osgi:reference id="xcCommunication" interface="org.societies.api.comm.xmpp.interfaces.ICommManager" />
+	<osgi:reference id="CisDirectoryRemote" interface="org.societies.api.cis.directory.ICisDirectoryRemote" />
 	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
-
-	<osgi:reference id="eventMgmtRef"
-		interface="org.societies.api.osgi.event.IEventMgr" />
-	<osgi:reference id="internalCtxBroker"
-		interface="org.societies.api.internal.context.broker.ICtxBroker" />
-
-	<osgi:reference id="PrivacyPolicyManager"
-		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager" />
-	<osgi:reference id="PrivacyDataManager"
-		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager" />
-
-	<osgi:reference id="NegotiationRequester"
-		interface="org.societies.api.internal.security.policynegotiator.INegotiation" />
-
-
-	<osgi:reference id="userFeedback"
-		interface="org.societies.api.internal.useragent.feedback.IUserFeedback" />
-    <osgi:reference id="activityFeedManager"
-        interface="org.societies.api.activity.IActivityFeedManager" />
+	<osgi:reference id="eventMgmtRef" interface="org.societies.api.osgi.event.IEventMgr" />
+	<osgi:reference id="internalCtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker" />
+	<osgi:reference id="PrivacyPolicyManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager" />
+	<osgi:reference id="PrivacyDataManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager" />
+	<osgi:reference id="NegotiationRequester" interface="org.societies.api.internal.security.policynegotiator.INegotiation" />
+	<osgi:reference id="userFeedback" interface="org.societies.api.internal.useragent.feedback.IUserFeedback" />
+    <osgi:reference id="activityFeedManager" interface="org.societies.api.activity.IActivityFeedManager" />
+    <osgi:reference id="cssDirectoryRemote" interface="org.societies.api.css.directory.ICssDirectoryRemote" />
 </beans>
