@@ -11,8 +11,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import sun.org.mozilla.javascript.internal.JavaScriptException;
-
 
 public class GroupConverterFromFoursquare implements GroupConverter {
 
