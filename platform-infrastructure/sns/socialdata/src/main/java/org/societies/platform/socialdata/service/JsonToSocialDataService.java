@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.shindig.social.opensocial.model.ActivityEntry;
-import org.apache.shindig.social.opensocial.model.Group;
+import org.apache.shindig.social.opensocial.model.Person;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,10 +55,11 @@ public class JsonToSocialDataService {
 		  pars.put(ISocialConnector.AUTH_TOKEN, access_token);
 		  
 
-		  ISocialConnector c = sd.createConnector(SocialNetwork.LINKEDIN, pars);
+		  ISocialConnector c = sd.createConnector(SocialNetwork.FACEBOOK, pars);
 		  System.out.println("connector id:" + c.getID());
 		  System.out.println("connector token:" + c.getToken());
 		  System.out.println("connector name:" + c.getConnectorName());
+		  
 		  
 		  
 		  try {
@@ -85,11 +86,17 @@ public class JsonToSocialDataService {
 //			  
 //		  }
 		  
-		  List<Object> feed =sd.getSocialActivity();
-		  for(Object o: feed){
-		      ActivityEntry elm = (ActivityEntry)o;
-		      System.out.println("feed-> "+elm.getContent());
+		  List<Object> friends 	        = sd.getSocialPeople();
+		  List<Object> feed 		= sd.getSocialActivity();
+		  
+		  
+		  for(Object o: friends){
+		      Person elm = (Person)o;
+		      System.out.println("Friends-> "+elm.getAccounts().get(0).getDomain() + " =NAME==> " + elm.getName().getFormatted() + " "+elm.getDisplayName());
 		  }
+		  
+		  
+		  
 		 
 //		  Message msg = new Message();
 //		  msg.setData("test 1");

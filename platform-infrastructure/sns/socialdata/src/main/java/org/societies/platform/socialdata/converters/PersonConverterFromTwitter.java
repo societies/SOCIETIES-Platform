@@ -15,6 +15,7 @@ import org.apache.shindig.social.core.model.PersonImpl;
 import org.apache.shindig.social.opensocial.model.Account;
 import org.apache.shindig.social.opensocial.model.Address;
 import org.apache.shindig.social.opensocial.model.ListField;
+import org.apache.shindig.social.opensocial.model.Name;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.apache.shindig.social.opensocial.model.Person.Gender;
 import org.json.JSONException;
@@ -61,16 +62,26 @@ public class PersonConverterFromTwitter implements PersonConverter {
 			db = new JSONObject(data);
 			if (db.has("error"))
 				return person;
-			person.setId("twitter:"+db.getString(ID));
-			//			System.out.println("id: "+db.getString(ID));
+			
+			person.setId(db.getString(ID));
+			
 			//if(db.has(UCT)) person.setUtcOffset(db.getLong(UCT));
-			if (db.has(NAME))			person.setName(new NameImpl(db.getString(NAME)));
-			if (db.has(SCREEN_NAME))	person.setDisplayName(db.getString(SCREEN_NAME));
-			if (db.has(DESCRIPTION))	person.setAboutMe(db.getString(DESCRIPTION));
-			if (db.has(LOCATION))		person.setCurrentLocation(setLocation(db.getString(LOCATION)));
+			if (db.has(NAME))	{
+			    Name name = new NameImpl(db.getString(NAME));
+			    name.setFormatted(db.getString(NAME));
+			    person.setName(name);
+			    
+		
+			}
+			
+			if (db.has(SCREEN_NAME))		person.setDisplayName(db.getString(SCREEN_NAME));
+			if (db.has(DESCRIPTION))		person.setAboutMe(db.getString(DESCRIPTION));
+			if (db.has(LOCATION))			person.setCurrentLocation(setLocation(db.getString(LOCATION)));
 //			if (db.has(EMAIL))			person.setEmails(getMails(db.getString(EMAIL)));
 //			if (db.has(BIRTHDAY))		person.setBirthday(getBirthDay(db.getString(BIRTHDAY)));
 //			if (db.has(GENDER))			person.setGender(gender(db.getString(GENDER)));
+			if (db.has("profile_image_url_https")) person.setThumbnailUrl(db.getString("profile_image_url_https"));
+			
 
 		}
 		catch (JSONException e) {
@@ -102,6 +113,8 @@ public class PersonConverterFromTwitter implements PersonConverter {
 			account.setDomain("twitter.com");
 			account.setUsername(db.getString(NAME));
 			account.setUserId(db.getString(ID));
+			if (db.has("screen_name"));
+				account.setUsername(db.getString("screen_name"));
 		}
 		catch (JSONException e) {
 			e.printStackTrace();
