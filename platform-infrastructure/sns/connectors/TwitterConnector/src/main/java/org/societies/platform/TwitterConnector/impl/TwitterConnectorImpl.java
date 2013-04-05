@@ -116,7 +116,7 @@ public class TwitterConnectorImpl implements TwitterConnector {
 			
 		} catch (JSONException e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			//e1.printStackTrace();
 		}
 		
 		if (res != null)
