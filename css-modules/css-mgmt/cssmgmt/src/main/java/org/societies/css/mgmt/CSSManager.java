@@ -1994,7 +1994,16 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	        	
 	        	
 	            if (facebookFriends.contains(friend.getName())) {
-	            	if (commonFriends.containsValue(friend)){
+	            	if (commonFriends.containsKey(friend)){
+            			int value = commonFriends.get(friend);
+                		int value1 = (value | facebook);
+                		try {
+							commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), value1);
+						} catch (InvalidFormatException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+                		LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
 	            			
 	            	}else {
 	            		
@@ -2016,7 +2025,16 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	    	for (CssAdvertisementRecord friend : cssFriends) {
 	        	
 	            if (twitterFriends.contains(friend.getName())) {
-	            	if (commonFriends.containsValue(friend)){
+	            	int value = commonFriends.get(friend);
+            		int value1 = (value | facebook);
+            		
+            		try {
+						commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), value1);
+					} catch (InvalidFormatException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+            		LOG.info("twitter adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
 	            		
 	            	}else {
 	            		
@@ -2026,8 +2044,6 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 							e.printStackTrace();
 						}
 	            	}
-	            	
-	            }
 	       
 	        }
 	    	flag = false;
@@ -2038,7 +2054,15 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	    	for (CssAdvertisementRecord friend : cssFriends) {
 	        
 	            if (linkedinFriends.contains(friend.getName())) {
-	            	if (commonFriends.containsValue(friend)){
+	            	int value = commonFriends.get(friend);
+            		int value1 = (value | linkedin);
+            		try {
+						commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), value1);
+					} catch (InvalidFormatException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+            		LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
 	            		
 	            	}else {
 	            		try {
@@ -2048,8 +2072,6 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 						}
 	            		
 	            	}
-	            	
-	            }
 	        }
 	    	flag = false;
 	    }
@@ -2060,7 +2082,16 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	    	for (CssAdvertisementRecord friend : cssFriends) {
 	        	
 	            if (foursquareFriends.contains(friend.getName())) {
-	            	if (commonFriends.containsValue(friend)){
+	            	int value = commonFriends.get(friend);
+            		int value1 = (value | foursquare
+            				);
+            		try {
+						commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), value1);
+					} catch (InvalidFormatException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+            		LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
 	            		
 	            	}else {
 	            		try {
@@ -2070,8 +2101,6 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 						}
 	            		
 	            	}
-	            	
-	            }
 	        }
 	    	flag = false;
 	    }
@@ -2410,7 +2439,6 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
             		if (commonFriends.containsKey(friend)){
             			int value = commonFriends.get(friend);
                 		int value1 = (value | facebook);
-                		LOG.info("new value is +++++ facebook friend " +value1);
                 		commonFriends.put(friend, value1);
                 		LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
             		}
@@ -2725,6 +2753,12 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			LOG.info("pushtoContext EMAIL value: " +value);
 			if (value != null && !value.isEmpty())
 				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.EMAIL, value);
+			
+			// HomeLocation
+			value = record.getHomeLocation();
+			LOG.info("pushtoContext HomeLocation value: " +value);
+			if (value != null && !value.isEmpty())
+				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.ADDRESS_HOME_CITY, value);
 			
 			// Entity
 			value2 = record.getEntity();
