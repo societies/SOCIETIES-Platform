@@ -2028,16 +2028,16 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	        	
 	        	
 	            if (facebookFriends.contains(friend.getName())) {
-	            	if (commonFriends.containsKey(friend)){
-            			int value = commonFriends.get(friend);
-                		int value1 = (value | facebook);
-                		try {
+	            	if(commonFriends.containsKey(friend)){
+		            	int value = commonFriends.get(friend);
+	            		int value1 = (value | linkedin);
+	            		try {
 							commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), value1);
 						} catch (InvalidFormatException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-                		LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
+	            		LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
 	            			
 	            	}else {
 	            		
@@ -2059,16 +2059,19 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	    	for (CssAdvertisementRecord friend : cssFriends) {
 	        	
 	            if (twitterFriends.contains(friend.getName())) {
-	            	int value = commonFriends.get(friend);
-            		int value1 = (value | facebook);
-            		
-            		try {
-						commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), value1);
-					} catch (InvalidFormatException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-            		LOG.info("twitter adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
+	            	if(commonFriends.containsKey(friend)){
+	            		int value = commonFriends.get(friend);
+	            		int value1 = (value | facebook);
+	            		
+	            		try {
+							commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), value1);
+						} catch (InvalidFormatException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+	            		LOG.info("twitter adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
+	            	}
+	            	
 	            		
 	            	}else {
 	            		
@@ -2088,15 +2091,18 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	    	for (CssAdvertisementRecord friend : cssFriends) {
 	        
 	            if (linkedinFriends.contains(friend.getName())) {
-	            	int value = commonFriends.get(friend);
-            		int value1 = (value | linkedin);
-            		try {
-						commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), value1);
-					} catch (InvalidFormatException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-            		LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
+	            	if(commonFriends.containsKey(friend)){
+	            		int value = commonFriends.get(friend);
+	            		int value1 = (value | linkedin);
+	            		try {
+							commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), value1);
+						} catch (InvalidFormatException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+	            		LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
+	            	}
+	            	
 	            		
 	            	}else {
 	            		try {
@@ -2116,16 +2122,18 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	    	for (CssAdvertisementRecord friend : cssFriends) {
 	        	
 	            if (foursquareFriends.contains(friend.getName())) {
-	            	int value = commonFriends.get(friend);
-            		int value1 = (value | foursquare
-            				);
-            		try {
-						commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), value1);
-					} catch (InvalidFormatException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-            		LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
+	            	if(commonFriends.containsKey(friend)){
+	            		int value = commonFriends.get(friend);
+	            		int value1 = (value | foursquare);
+	            		try {
+							commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), value1);
+						} catch (InvalidFormatException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+	            		LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
+	            	}
+	            	
 	            		
 	            	}else {
 	            		try {
@@ -2145,8 +2153,19 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	             if(flag){
 	            	 for (CssAdvertisementRecord friend : cssFriends) {
 	                 	
-	                     if (googleplusFriends.contains(friend.getName())) {
-	                     	if (commonFriends.containsValue(friend)){
+	            		 if (linkedinFriends.contains(friend.getName())) {
+	            			 if(commonFriends.containsKey(friend)){
+	            				int value = commonFriends.get(friend);
+	 	                 		int value1 = (value | googleplus);
+	 	                 		try {
+	 	     						commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), value1);
+	 	     					} catch (InvalidFormatException e) {
+	 	     						// TODO Auto-generated catch block
+	 	     						e.printStackTrace();
+	 	     					}
+	 	                 		LOG.info("googleplus adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
+	            			 }
+	     	            	
 	                     		
 	                     	}else {
 	                     		try {
@@ -2156,8 +2175,6 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 								}
 	                     		
 	                     	}
-	                     	
-	                     }
 	                  
 	                 }
 	            	 flag = false;
@@ -2420,39 +2437,36 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		}
     	
     				
-    				if(id.equalsIgnoreCase("facebook.com")){
+    				if(id.equalsIgnoreCase("facebook")){
 						filter.setFilterFlag(facebook);	
-						facebookFriends.add("Gerard Rainsford");
 	    				facebookFriends.add(name);    	
-	    				LOG.info("facebookFriends size is " +facebookFriends.size());
-	    				LOG.info("facebookFriends are " +facebookFriends);
+	    				LOG.debug("facebookFriends size is " +facebookFriends.size());
     				}
     				if(id.equalsIgnoreCase("twitter")){
     					
 						filter.setFilterFlag(twitter);		
 						
 	    				twitterFriends.add(name);
-	    				LOG.info("twitterFriends size is " +facebookFriends.size());
+	    				LOG.debug("twitterFriends size is " +facebookFriends.size());
     				}
     				if(id.equalsIgnoreCase("linkedin")){
     					
 						filter.setFilterFlag(linkedin);		
 	    				linkedinFriends.add(name);
-	    				LOG.info("linkedinFriends size is " +linkedinFriends.size());
-	    				LOG.info("linkedinFriends are " +linkedinFriends);
+	    				LOG.debug("linkedinFriends size is " +linkedinFriends.size());
     				}
     				if(id.equalsIgnoreCase("foursquare")){
     					
 						filter.setFilterFlag(foursquare);		
 						
 	    				foursquareFriends.add(name); 
-	    				LOG.info("foursquareFriends size is " +facebookFriends.size());
+	    				LOG.debug("foursquareFriends size is " +facebookFriends.size());
     				}
     				if(id.equalsIgnoreCase("googleplus")){
 						filter.setFilterFlag(googleplus);		
 						
 	    				googleplusFriends.add(name);    
-	    				LOG.info("googleplusFriends size is " +facebookFriends.size());
+	    				LOG.debug("googleplusFriends size is " +facebookFriends.size());
     				}
     				
 			}
@@ -2469,13 +2483,11 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
         	
         	
             if (facebookFriends.contains(friend.getName())) {
-            	if (commonFriends.containsValue(friend)){
-            		if (commonFriends.containsKey(friend)){
-            			int value = commonFriends.get(friend);
-                		int value1 = (value | facebook);
-                		commonFriends.put(friend, value1);
-                		LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
-            		}
+            	if (commonFriends.containsKey(friend)){
+            		int value = commonFriends.get(friend);
+                	int value1 = (value | facebook);
+                	commonFriends.put(friend, value1);
+                	LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
             			
             	}else {
             		LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +facebook);
@@ -2496,7 +2508,6 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
             	if (commonFriends.containsKey(friend)){
             		int value = commonFriends.get(friend);
             		int value1 = (value | twitter);
-            		LOG.info("new value is +++++ twitter friend " +value1);
             		commonFriends.put(friend, value1);
             		LOG.info("twitter adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
             		
@@ -2519,7 +2530,6 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
             	if (commonFriends.containsKey(friend)){
             		int value = commonFriends.get(friend);
             		int value1 = (value | linkedin);
-            		LOG.info("new value is +++++ Linkedin friend " +value1);
             		commonFriends.put(friend, value1);   
             		LOG.info("linkedin adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
             		
@@ -2543,7 +2553,6 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
             	if (commonFriends.containsKey(friend)){
             		int value = commonFriends.get(friend);
             		int value1 = (value | foursquare);
-            		LOG.info("new value is +++++ foursquare friend " +value1);
             		commonFriends.put(friend, value1);
             		LOG.info("4Square adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
             		
@@ -2568,7 +2577,6 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
                     	 if (commonFriends.containsKey(friend)){
                      		int value = commonFriends.get(friend);
                     		int value1 = (value | googleplus);
-                    		LOG.info("new value is +++++ googleplus friend " +value1);
                     		commonFriends.put(friend, value1);
                     		LOG.info("googleplus adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
                      		
