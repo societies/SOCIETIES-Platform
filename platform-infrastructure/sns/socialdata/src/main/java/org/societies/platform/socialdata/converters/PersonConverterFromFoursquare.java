@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.apache.shindig.social.core.model.AccountImpl;
 import org.apache.shindig.social.core.model.AddressImpl;
-import org.apache.shindig.social.core.model.ListFieldImpl;
 import org.apache.shindig.social.core.model.NameImpl;
 import org.apache.shindig.social.core.model.PersonImpl;
 import org.apache.shindig.social.opensocial.model.Account;
@@ -18,8 +17,6 @@ import org.apache.shindig.social.opensocial.model.ListField;
 import org.apache.shindig.social.opensocial.model.Name;
 import org.apache.shindig.social.opensocial.model.Person;
 import org.apache.shindig.social.opensocial.model.Person.Gender;
-import org.eclipse.jetty.util.log.Log;
-import org.hamcrest.core.Is;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.societies.platform.socialdata.model.FieldsUtils;
@@ -59,13 +56,22 @@ public class PersonConverterFromFoursquare implements PersonConverter {
 	private JSONObject response;
 	private Person 	   person;
 	private JSONObject db = null;
-
+	private List<Account> accounts;
+	
+	public PersonConverterFromFoursquare() {
+	    	Account linkedinAccounts = new AccountImpl();
+	    	linkedinAccounts.setDomain("foursquare.com");
+		accounts = new ArrayList<Account>();
+		accounts.add(linkedinAccounts);
+	}
+	
 	public Person load(String data){
 
 	    
-	       
+	        
 		person = new PersonImpl();
-
+		person.setAccounts(accounts);
+		
 		try{
 			response = new JSONObject(data);
 			if (response.has("response")) {

@@ -44,10 +44,10 @@ public interface TwitterConnector extends ISocialConnector {
 	public static final String TW_CALLBACK_URL	= "http://127.0.0.1:8080/societies-test/doConnect.html?type=tw";
 	
 	
-	/**
-	 * @return
-	 */
-	String getUserFollowers();
+//	/**
+//	 * @return
+//	 */
+//	String getUserFollowers();
 
 	/**
 	 * @param id

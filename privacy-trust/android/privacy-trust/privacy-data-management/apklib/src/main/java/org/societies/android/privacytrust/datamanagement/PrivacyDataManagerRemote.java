@@ -74,19 +74,20 @@ public class PrivacyDataManagerRemote {
 	private Context context;
 	private ClientCommunicationMgr clientCommManager;
 	private PrivacyDataIntentSender intentSender;
-	private boolean remoteReady;
-	
+	private static boolean remoteReady;
+
 
 	public PrivacyDataManagerRemote(Context context)  {
 		this.context = context;
 		clientCommManager = new ClientCommunicationMgr(context, true);
 		intentSender = new PrivacyDataIntentSender(context);
 		remoteReady = false;
+		bindToComms();
 	}
 
-	
+
 	// -- Access control
-	
+
 	public void checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		String action = MethodType.CHECK_PERMISSION.name();
 		try {
@@ -111,13 +112,13 @@ public class PrivacyDataManagerRemote {
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Sent stanza PrivacyDataManagerBean: "+action);
 		} catch (Exception e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(TAG, "Unexepected error: "+(null != e ? e.getMessage() : ""));
 			intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
 		}
 	}
 
 	// -- Obfuscation
-	
+
 	public void obfuscateData(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
 		String action = MethodType.OBFUSCATE_DATA.name();
 		try {
@@ -141,7 +142,7 @@ public class PrivacyDataManagerRemote {
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Sent stanza PrivacyDataManagerBean: "+action);
 		} catch (Exception e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(TAG, "Unexepected error: "+(null != e ? e.getMessage() : ""));
 			intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
 		}
 	}
@@ -171,19 +172,29 @@ public class PrivacyDataManagerRemote {
 								//SEND INTENT WITH SERVICE STARTED STATUS
 								Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
 								intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, resultFlag);
+								intent.putExtra("type", "PrivacyDataManager");
 								PrivacyDataManagerRemote.this.context.sendBroadcast(intent);
 							}
 							@Override
-							public void returnAction(String result) { }
+							public void returnAction(String result) {
+								Log.d(TAG, "Register to comm: " + result);
+							}
 							@Override
 							public void returnException(String result) {
-								// TODO Auto-generated method stub
+								Log.e(TAG, "Error during comm registration: " + result);
+								remoteReady = false;
+								//SEND INTENT WITH SERVICE STARTED STATUS
+								Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+								intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, remoteReady);
+								intent.putExtra("type", "PrivacyDataManager");
+								PrivacyDataManagerRemote.this.context.sendBroadcast(intent);
 							}
 
 						});
 					} else {
 						Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
 						intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
+						intent.putExtra("type", "PrivacyDataManager");
 						PrivacyDataManagerRemote.this.context.sendBroadcast(intent);
 					}
 				}	
@@ -199,6 +210,7 @@ public class PrivacyDataManagerRemote {
 		else {
 			Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
 			intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+			intent.putExtra("type", "PrivacyDataManager");
 			this.context.sendBroadcast(intent);
 		}
 	}
@@ -217,6 +229,7 @@ public class PrivacyDataManagerRemote {
 					//SEND INTENT WITH SERVICE STOPPED STATUS
 					Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
 					intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+					intent.putExtra("type", "PrivacyDataManager");
 					PrivacyDataManagerRemote.this.context.sendBroadcast(intent);
 				}	
 				@Override

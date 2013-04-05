@@ -732,8 +732,7 @@ public class SocialDataController {
 	private String getConnectorsHTML() {
 		// read list of CONNECTOR
 
-		Iterator<ISocialConnector> it = socialdata.getSocialConnectors()
-				.iterator();
+		Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
 		String connLI = "";
 
 		while (it.hasNext()) {
