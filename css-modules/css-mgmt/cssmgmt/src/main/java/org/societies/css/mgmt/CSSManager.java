@@ -302,7 +302,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 			e.printStackTrace();
 		}
 			
-		addActivityToCSSAF("CSS Record created");
+		//addActivityToCSSAF("CSS Record created");
 	
 	}
 	
@@ -2357,37 +2357,45 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		}
     	
     				
-    				if(id.equalsIgnoreCase("facebook")){
-						filter.setFilterFlag(facebook);		
-	    				facebookFriends.add(name);    				
+    				if(id.equalsIgnoreCase("facebook.com")){
+						filter.setFilterFlag(facebook);	
+						facebookFriends.add("Gerard Rainsford");
+	    				facebookFriends.add(name);    	
+	    				LOG.info("facebookFriends size is " +facebookFriends.size());
+	    				LOG.info("facebookFriends are " +facebookFriends);
     				}
     				if(id.equalsIgnoreCase("twitter")){
     					
 						filter.setFilterFlag(twitter);		
 						
-	    				twitterFriends.add(name);    				
+	    				twitterFriends.add(name);
+	    				LOG.info("twitterFriends size is " +facebookFriends.size());
     				}
     				if(id.equalsIgnoreCase("linkedin")){
     					
 						filter.setFilterFlag(linkedin);		
-	    				linkedinFriends.add(name);    				
+	    				linkedinFriends.add(name);
+	    				LOG.info("linkedinFriends size is " +linkedinFriends.size());
+	    				LOG.info("linkedinFriends are " +linkedinFriends);
     				}
     				if(id.equalsIgnoreCase("foursquare")){
     					
 						filter.setFilterFlag(foursquare);		
 						
-	    				foursquareFriends.add(name);    				
+	    				foursquareFriends.add(name); 
+	    				LOG.info("foursquareFriends size is " +facebookFriends.size());
     				}
     				if(id.equalsIgnoreCase("googleplus")){
 						filter.setFilterFlag(googleplus);		
 						
-	    				googleplusFriends.add(name);    				
+	    				googleplusFriends.add(name);    
+	    				LOG.info("googleplusFriends size is " +facebookFriends.size());
     				}
     				
 			}
     
     //compare the lists to create
-    
+      
     
     flag = BitCompareUtil.isFacebookFlagged(filt);
    
@@ -2399,6 +2407,13 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
         	
             if (facebookFriends.contains(friend.getName())) {
             	if (commonFriends.containsValue(friend)){
+            		if (commonFriends.containsKey(friend)){
+            			int value = commonFriends.get(friend);
+                		int value1 = (value | facebook);
+                		LOG.info("new value is +++++ facebook friend " +value1);
+                		commonFriends.put(friend, value1);
+                		LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
+            		}
             			
             	}else {
             		LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +facebook);
@@ -2416,7 +2431,12 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
     	for (CssAdvertisementRecord friend : cssFriends) {
         	
             if (twitterFriends.contains(friend.getName())) {
-            	if (commonFriends.containsValue(friend)){
+            	if (commonFriends.containsKey(friend)){
+            		int value = commonFriends.get(friend);
+            		int value1 = (value | twitter);
+            		LOG.info("new value is +++++ twitter friend " +value1);
+            		commonFriends.put(friend, value1);
+            		LOG.info("twitter adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
             		
             	}else {
             		LOG.info("twitter adding to commonfriends: " +friend.getName() +"with filter setting: " +twitter);
@@ -2434,7 +2454,12 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
     	for (CssAdvertisementRecord friend : cssFriends) {
         
             if (linkedinFriends.contains(friend.getName())) {
-            	if (commonFriends.containsValue(friend)){
+            	if (commonFriends.containsKey(friend)){
+            		int value = commonFriends.get(friend);
+            		int value1 = (value | linkedin);
+            		LOG.info("new value is +++++ Linkedin friend " +value1);
+            		commonFriends.put(friend, value1);   
+            		LOG.info("linkedin adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
             		
             	}else {
             		LOG.info("linkedin adding to commonfriends: " +friend.getName() +"with filter setting: " +linkedin);
@@ -2453,7 +2478,12 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
     	for (CssAdvertisementRecord friend : cssFriends) {
         	
             if (foursquareFriends.contains(friend.getName())) {
-            	if (commonFriends.containsValue(friend)){
+            	if (commonFriends.containsKey(friend)){
+            		int value = commonFriends.get(friend);
+            		int value1 = (value | foursquare);
+            		LOG.info("new value is +++++ foursquare friend " +value1);
+            		commonFriends.put(friend, value1);
+            		LOG.info("4Square adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
             		
             	}else {
             		LOG.info("4Square adding to commonfriends: " +friend.getName() +"with filter setting: " +foursquare);
@@ -2473,7 +2503,12 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
             	 for (CssAdvertisementRecord friend : cssFriends) {
                  	
                      if (googleplusFriends.contains(friend.getName())) {
-                     	if (commonFriends.containsValue(friend)){
+                    	 if (commonFriends.containsKey(friend)){
+                     		int value = commonFriends.get(friend);
+                    		int value1 = (value | googleplus);
+                    		LOG.info("new value is +++++ googleplus friend " +value1);
+                    		commonFriends.put(friend, value1);
+                    		LOG.info("googleplus adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
                      		
                      	}else {
                      		LOG.info("googleplus adding to commonfriends: " +friend.getName() +"with filter setting: " +googleplus);
