@@ -30,6 +30,8 @@ import org.apache.cordova.api.PluginResult.Status;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.societies.android.api.css.manager.IServiceManager;
+import org.societies.android.api.identity.util.RequestorUtils;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.api.internal.privacytrust.intent.PrivacyPolicyIntentHelper;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
@@ -70,6 +72,8 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 
 	/** Local data */
 	private boolean pluginIsInit = false;
+	private boolean serviceIsInit = false;
+	private int nbOfCall = 0;
 	private IPrivacyPolicyManager privacyPolicyManagerService = null;
 	private ServiceReceiver pivacyPolicyManagerReceiver = null;
 
@@ -85,6 +89,7 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 	public PluginResult execute(String methodName, JSONArray arguments, String callbackId) {
 		Log.d(TAG, "Execute: "+(null != methodName ? methodName : "Unknown method"));
 		Log.d(TAG, "Parameters: "+(null != arguments ? arguments.toString() : "No params"));
+		nbOfCall++;
 		// -- Plugin not initialized: initialize the plugin (it will be executed at the init end)
 		if (!pluginIsInit && null != methodName) {
 			return initPlugin(methodName, arguments, callbackId);
@@ -111,6 +116,7 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 			Log.d(TAG, "Listen intents for PrivacyPolicy");
 			pivacyPolicyManagerReceiver = new ServiceReceiver();
 			IntentFilter intentFilter = new IntentFilter() ;
+			intentFilter.addAction(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
 			intentFilter.addAction(IPrivacyPolicyManager.INTENT_DEFAULT_ACTION);
 			intentFilter.addAction(MethodType.GET_PRIVACY_POLICY.name());
 			intentFilter.addAction(MethodType.UPDATE_PRIVACY_POLICY.name());
@@ -134,6 +140,11 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 	 * This method is called when the plugin is called (execution) and already initialized
 	 */
 	private PluginResult executePlugin(String methodName, JSONArray arguments, String callbackId) {
+		if (nbOfCall <= 0) {
+			nbOfCall = 0;
+			return null;
+		}
+		nbOfCall--;
 		Log.d(TAG, "Plugin Called");
 		
 		// --- Save the callback
@@ -177,11 +188,13 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 		Log.d(TAG, "Destroyed");
 		// -- Close the broadcast receiver
 		if (null != pivacyPolicyManagerReceiver) {
+			Log.d(TAG, "Unregister from intents");
 			this.ctx.getContext().unregisterReceiver(pivacyPolicyManagerReceiver);
 		}
 		// -- Unlink with services
 		if (pluginIsInit) {
 			pluginIsInit = false;
+			serviceIsInit = false;
 			this.ctx.getContext().unbindService(androidServiceConnection);
 		}
 	}
@@ -196,14 +209,13 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 	 */
 	private PluginResult executeGetPrivacyPolicy(JSONArray arguments) throws JsonSyntaxException, JSONException, PrivacyException {
 		// - Launch service method
-		//		RequestorBean owner = jsonHelper.fromJson(arguments.getString(0), RequestorBean.class);
-		JSONObject jsonRequestor = (JSONObject) arguments.get(0);
-		
-		RequestorCisBean owner = new RequestorCisBean();
-		//owner.setRequestorId("university.societies.local");
-		//owner.setCisRequestorId("cis-e86b61f1-e85a-4d2d-94b8-908817e08166.societies.local");
-		owner.setRequestorId(jsonRequestor.getString("requestorId"));
-		owner.setCisRequestorId(jsonRequestor.getString("cisRequestId"));
+		RequestorCisBean owner = jsonHelper.fromJson(arguments.getString(0), RequestorCisBean.class);
+		Log.d(TAG, "Retrieving privacy policy from: "+RequestorUtils.toXmlString(owner));
+		// An other way to manage this
+//		JSONObject jsonRequestor = (JSONObject) arguments.get(0);
+//		RequestorCisBean owner = new RequestorCisBean();
+//		owner.setRequestorId(jsonRequestor.getString("requestorId"));
+//		owner.setCisRequestorId(jsonRequestor.getString("cisRequestId"));
 		privacyPolicyManagerService.getPrivacyPolicy(clientPackage, owner);
 
 		// - Inform the JS side: async mode
@@ -222,15 +234,32 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 		public void onReceive(Context context, Intent intent) {
 			Log.i(TAG, "Intent received: "+intent.getAction());
 			try {
+				// -- PrivacyPolicyManagerService started
+				if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STARTED_STATUS)) {
+					Log.d(TAG, "Service started message received: "+intent.getAction());
+					boolean ack =  intent.hasExtra(IServiceManager.INTENT_RETURN_VALUE_KEY) && intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
+					boolean isPrivacyPolicyManager =  intent.hasExtra("type") && "PrivacyPolicyManager".equals(intent.getStringExtra("type"));
+					// Execute the plugin
+					if (ack && isPrivacyPolicyManager) {
+						serviceIsInit = true;
+						if (pluginIsInit && serviceIsInit) {
+							executePlugin(methodName, arguments, callbackId);
+						}
+					}
+					return;
+				}
 				// -- Ack
 				boolean ack =  intent.hasExtra(IPrivacyPolicyManager.INTENT_RETURN_STATUS_KEY) && intent.getBooleanExtra(IPrivacyPolicyManager.INTENT_RETURN_STATUS_KEY, false);
+				Log.d(TAG, "Privacy Response received: "+intent.getAction()+(ack ? " with success" : " with an error"));
 				// -- Get Privacy Policy
 				if (intent.getAction().equals(MethodType.GET_PRIVACY_POLICY.name())) {
-					JSONObject data = new JSONObject();
+					JSONArray data = new JSONArray();
 					if(ack && intent.hasExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY)) {
 						RequestPolicy privacyPolicy = (RequestPolicy) intent.getSerializableExtra(IPrivacyPolicyManager.INTENT_RETURN_VALUE_KEY); // TODO Parcelable
 						String jsonPrivacyPolicy = jsonHelper.toJson(privacyPolicy, RequestPolicy.class);
-						data.put(PrivacyPolicyIntentHelper.RESULT_PRIVACY_POLICY, jsonPrivacyPolicy);
+						Log.d(TAG, "Privacy policy retrieved: "+jsonPrivacyPolicy);
+//						data.put(PrivacyPolicyIntentHelper.RESULT_PRIVACY_POLICY, jsonPrivacyPolicy);
+						data.put(jsonPrivacyPolicy);
 					}
 					// -- Send data
 					PluginResult result = new PluginResult(Status.OK, data);
@@ -238,7 +267,6 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 					success(result, callbackId);
 				}
 				else {
-					Log.d(TAG, "Response received: "+intent.getAction());
 					Log.e(TAG, "But this action is unknown, or data are missing");
 					// -- Send data
 					PluginResult result = new PluginResult(Status.INVALID_ACTION, "Response received: "+intent.getAction()+", but this action is unknown, or data are missing.");
@@ -246,7 +274,7 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 					error(result, callbackId);
 				}
 			}
-			catch (JSONException e) {
+			catch (Exception e) {
 				PluginResult result = new PluginResult(Status.ERROR, "Error during the JSON parsing of the result");
 				result.setKeepCallback(false);
 				error(result, callbackId);
@@ -263,8 +291,10 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 			LocalBinder binder = (LocalBinder) service;
 			privacyPolicyManagerService = (IPrivacyPolicyManager) binder.getService();
 			pluginIsInit = true;
-			// Execute the plugin
-			executePlugin(methodName, arguments, callbackId);
+			// Wait for the init of the plugin
+			if (pluginIsInit && serviceIsInit) {
+				executePlugin(methodName, arguments, callbackId);
+			}
 		}
 	};
 }
