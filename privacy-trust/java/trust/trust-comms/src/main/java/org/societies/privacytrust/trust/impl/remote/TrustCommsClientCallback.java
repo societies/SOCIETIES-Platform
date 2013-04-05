@@ -37,7 +37,6 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
 import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
-import org.societies.privacytrust.trust.impl.broker.remote.InternalTrustBrokerRemoteClientCallback;
 import org.societies.privacytrust.trust.impl.broker.remote.TrustBrokerRemoteClientCallback;
 import org.societies.privacytrust.trust.impl.evidence.remote.InternalTrustEvidenceCollectorRemoteClientCallback;
 import org.societies.privacytrust.trust.impl.evidence.remote.TrustEvidenceCollectorRemoteClientCallback;
@@ -55,25 +54,22 @@ public class TrustCommsClientCallback implements ICommCallback {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			Arrays.asList(
+					"http://societies.org/api/schema/identity",
 					"http://societies.org/api/schema/privacytrust/trust/model",
 					"http://societies.org/api/schema/privacytrust/trust/broker",
 					"http://societies.org/api/schema/privacytrust/trust/evidence/collector",
-					"http://societies.org/api/internal/schema/privacytrust/trust/broker",
 					"http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector"));
 	
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList(
+					"org.societies.api.schema.identity",
 					"org.societies.api.schema.privacytrust.trust.model",
 					"org.societies.api.schema.privacytrust.trust.broker",
 					"org.societies.api.schema.privacytrust.trust.evidence.collector",
-					"org.societies.api.internal.schema.privacytrust.trust.broker",
 					"org.societies.api.internal.schema.privacytrust.trust.evidence.collector"));
 
 	@Autowired(required=true)
 	private TrustBrokerRemoteClientCallback trustBrokerRemoteClientCallback;
-	
-	@Autowired(required=true)
-	private InternalTrustBrokerRemoteClientCallback internalTrustBrokerRemoteClientCallback;
 	
 	@Autowired(required=true)
 	private TrustEvidenceCollectorRemoteClientCallback trustEvidenceCollectorRemoteClientCallback;
@@ -130,9 +126,7 @@ public class TrustCommsClientCallback implements ICommCallback {
 			LOG.debug("receiveResult: payload=" + payload);
 		}
 
-		if (payload instanceof org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerResponseBean) {
-			this.internalTrustBrokerRemoteClientCallback.receiveResult(stanza, (TrustBrokerResponseBean) payload);
-		} else if (payload instanceof TrustBrokerResponseBean) {
+		if (payload instanceof TrustBrokerResponseBean) {
 			this.trustBrokerRemoteClientCallback.receiveResult(stanza, (TrustBrokerResponseBean) payload);
 		} else if (payload instanceof org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean) {
 			this.internalTrustEvidenceCollectorRemoteClientCallback.receiveResult(stanza, (TrustEvidenceCollectorResponseBean) payload);

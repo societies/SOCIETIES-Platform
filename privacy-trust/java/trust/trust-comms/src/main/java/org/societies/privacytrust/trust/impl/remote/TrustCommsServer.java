@@ -44,7 +44,6 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
 import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
-import org.societies.privacytrust.trust.impl.broker.remote.InternalTrustBrokerRemoteServer;
 import org.societies.privacytrust.trust.impl.broker.remote.TrustBrokerRemoteServer;
 import org.societies.privacytrust.trust.impl.evidence.remote.InternalTrustEvidenceCollectorRemoteServer;
 import org.societies.privacytrust.trust.impl.evidence.remote.TrustEvidenceCollectorRemoteServer;
@@ -64,24 +63,21 @@ public class TrustCommsServer implements IFeatureServer {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			Arrays.asList(
+					"http://societies.org/api/schema/identity",
 			  		"http://societies.org/api/schema/privacytrust/trust/model",
 			  		"http://societies.org/api/schema/privacytrust/trust/broker",
 			  		"http://societies.org/api/schema/privacytrust/trust/evidence/collector",
-			  		"http://societies.org/api/internal/schema/privacytrust/trust/broker",
 			  		"http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList(
+					"org.societies.api.schema.identity",
 			  		"org.societies.api.schema.privacytrust.trust.model",
 			  		"org.societies.api.schema.privacytrust.trust.broker",
 			  		"org.societies.api.schema.privacytrust.trust.evidence.collector",
-			  		"org.societies.api.internal.schema.privacytrust.trust.broker",
 			  		"org.societies.api.internal.schema.privacytrust.trust.evidence.collector"));
 	
 	@Autowired(required=true)
 	private TrustBrokerRemoteServer trustBrokerRemoteServer;
-	
-	@Autowired(required=true)
-	private InternalTrustBrokerRemoteServer internalTrustBrokerRemoteServer;
 	
 	@Autowired(required=true)
 	private TrustEvidenceCollectorRemoteServer trustEvidenceCollectorRemoteServer;
@@ -138,9 +134,7 @@ public class TrustCommsServer implements IFeatureServer {
 			LOG.debug("getQuery: payload=" + payload);
 		}
 
-		if (payload instanceof org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerRequestBean) {
-			return this.internalTrustBrokerRemoteServer.getQuery(stanza, payload);
-		} else if (payload instanceof TrustBrokerRequestBean) {
+		if (payload instanceof TrustBrokerRequestBean) {
 			return this.trustBrokerRemoteServer.getQuery(stanza, payload);
 		} else if (payload instanceof org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean) {
 				return this.internalTrustEvidenceCollectorRemoteServer.getQuery(stanza, payload);

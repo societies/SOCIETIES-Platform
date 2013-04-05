@@ -22,14 +22,44 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.trust.remote;
+package org.societies.api.privacytrust.trust.model.util;
+
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
+import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityType;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
- * Describe your class here...
+ * This class provides utility methods in order to instantiate 
+ * {@link TrustedEntityId TrustedEntityIds} from {@link IIdentity} or
+ * {@link ServiceResourceIdentifier} instances.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.8
+ * @since 1.0
  */
-public interface ITrustBrokerRemoteCallback 
-	extends org.societies.api.privacytrust.trust.remote.ITrustBrokerRemoteCallback {
+public class TrustedEntityIdFactory {
+
+	public static TrustedEntityId fromIIdentity(final IIdentity identity) 
+			throws MalformedTrustedEntityIdException {
+		
+		if (identity == null)
+			throw new NullPointerException("identity can't be null");
+		
+		if (IdentityType.CIS.equals(identity.getType()))
+			return new TrustedEntityId(TrustedEntityType.CIS, identity.getBareJid());
+		else
+			return new TrustedEntityId(TrustedEntityType.CSS, identity.getBareJid());
+	}
+	
+	public static TrustedEntityId fromServiceResourceIdentifier(
+			final ServiceResourceIdentifier sri) 
+					throws MalformedTrustedEntityIdException {
+		
+		if (sri == null)
+			throw new NullPointerException("sri can't be null");
+		
+		return new TrustedEntityId(TrustedEntityType.SVC, sri.getIdentifier().toString());
+	}
 }
