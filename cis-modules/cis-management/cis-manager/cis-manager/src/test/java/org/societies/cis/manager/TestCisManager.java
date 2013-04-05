@@ -337,6 +337,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 
 		
 		when(mockCcmFactory.getNewCommManager()).thenReturn(mockCISendpoint1,mockCISendpoint2,mockCISendpoint3);
+		when(mockCcmFactory.getNewCommManager(anyString())).thenReturn(mockCISendpoint1,mockCISendpoint2,mockCISendpoint3);
 		
 		this.mockingContext();
 
@@ -760,7 +761,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 	}
 	
-	//@Test
+	@Test
 	public void listdMembersOnOwnedCIS() throws InterruptedException, ExecutionException {
 
 		System.out.println("testing list members");
@@ -806,7 +807,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 cisManagerUnderTestInterface.deleteCis(Iciss.getCisId());
 	}
 	
-	@Ignore
+	//@Ignore
 	@Test
 	public void addActivity() throws InterruptedException, ExecutionException {
 
@@ -894,7 +895,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	///////////////////////////////////////////////////
 	// Local Interface with Callback Testing
 	//////////////////////////////////////////////////
-	@Ignore
+	//@Ignore
 	@Test
 	public void listdMembersOnOwnedCISwithCallback() throws InterruptedException, ExecutionException {
 
@@ -974,6 +975,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	
 	}
+	
 	@Ignore
 	@Test
 	public void getInfoWithCallback() throws InterruptedException, ExecutionException {
@@ -1039,7 +1041,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	}
 	
-	@Ignore
+	//@Ignore
 	@Test
 	public void setInfoWithCallback() throws InterruptedException, ExecutionException {
 
@@ -1107,7 +1109,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	}
 
-	@Ignore
+	//@Ignore
 	@Test
 	public void checkCriteria() throws InterruptedException, ExecutionException {
 
