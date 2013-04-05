@@ -69,7 +69,7 @@ public class PersonConverterFromFacebook implements PersonConverter{
 		try{
 			
 			db = new JSONObject(this.rawData);
-			person.setId(db.getString(ID));
+			person.setId("facebook:"+db.getString(ID));
 			
 			//if(db.has(UCT)) person.setUtcOffset(db.getLong(UCT));
 			if (db.has(BIO))		person.setAboutMe(db.getString(BIO));
