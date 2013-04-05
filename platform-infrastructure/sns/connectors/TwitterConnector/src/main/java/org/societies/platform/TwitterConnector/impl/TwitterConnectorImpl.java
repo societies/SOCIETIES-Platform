@@ -87,94 +87,94 @@ public class TwitterConnectorImpl implements TwitterConnector {
 		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FRIENDS_URL);
 		this.service.signRequest(twToken.getAccessToken(), request);
 		Response response = request.send();
+		JSONArray friends = new JSONArray();
 		JSONObject res = null;
+		
 		try {
 			res = new JSONObject(response.getBody());
+			JSONArray ids = res.getJSONArray("ids");
+			String idList="";
+			int index =0;
+			for(int i=0; i<ids.length();i++){
+			    if (idList.length()>0) idList+=",";
+			    if(index<100){
+				index++;
+				idList +=ids.getString(i);
+			    }
+			    else{
+				index=0;
+				friends = merge(friends, getOtherProfileJson(idList));
+				
+				
+				idList="";
+				
+			    }
+			    
+			}
+			res = new JSONObject();
+			res.put("friends", friends);
+			
 		} catch (JSONException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		
 		if (res != null)
 			return res.toString();
 		else
 			return null;
 	}
 
-//		public String getUserFriends() {
-//			OAuthRequest request = new OAuthRequest(Verb.GET, GET_FRIENDS_URL);
-//			this.service.signRequest(twToken.getAccessToken(), request);
-//			Response response = request.send();
-//			JSONObject res = null;
-//			try {
-//				res = new JSONObject(response.getBody());
-//			} catch (JSONException e1) {
-//				// TODO Auto-generated catch block
-//				e1.printStackTrace();
+
+
+//	public String getUserFollowers() {
+//		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FOLLOWERS_URL);
+//		this.service.signRequest(twToken.getAccessToken(), request);
+//		Response response = request.send();
+//		JSONObject res = null;
+//		JSONObject followers = new JSONObject();
+//		JSONArray followersList = new JSONArray();
+//		try {
+//			res = new JSONObject(response.getBody());
+//			JSONArray followersIDList = res.getJSONArray("ids");
+//
+//			J other = null;
+//
+//			for (int i = 0; i < followersIDList.length(); i++) {
+//				// System.out.println(friendsIDList.get(i).toString());
+//
+//				other = getOtherProfileJson(followersIDList.get(i).toString());
+//
+//				// System.out.println(other);
+//				if (!other.toString().contains(
+//						"No user matches for specified terms"))
+//					followersList.put(other);
+//				followers.put("friends", followersList);
 //			}
-//			JSONObject friends = new JSONObject();
-//			JSONArray friendsList = new JSONArray();
-//			// System.out.println(res.toString());
-//			try {
-//				JSONArray friendsIDList = res.getJSONArray("ids");
-//	
-//				JSONObject other = null;
-//	
-//				for (int i = 0; i < friendsIDList.length(); i++) {
-//					 System.out.println(friendsIDList.get(i).toString());
-//	
-//					other = getOtherProfileJson(friendsIDList.get(i).toString());
-//	
-//					 System.out.println(other);
-//					if (!other.toString().contains(
-//							"No user matches for specified terms"))
-//						friendsList.put(other);
-//					friends.put("friends", friendsList);
-//				}
-//			} catch (JSONException e) {
-//				return response.getBody();
-//			}
-//	
-//			if (res != null)
-//				// return res.toJSONString();
-//				return friends.toString();
-//			else
-//				return null;
+//		} catch (JSONException e) {
+//			response.getBody();
 //		}
+//
+//		if (res != null)
+//			// return res.toJSONString();
+//			return followers.toString();
+//		else
+//			return null;
+//
+//	}
 
-	public String getUserFollowers() {
-		OAuthRequest request = new OAuthRequest(Verb.GET, GET_FOLLOWERS_URL);
-		this.service.signRequest(twToken.getAccessToken(), request);
-		Response response = request.send();
-		JSONObject res = null;
-		JSONObject followers = new JSONObject();
-		JSONArray followersList = new JSONArray();
+	private JSONArray merge(JSONArray friends, JSONArray otherProfileJson) {
+	   
+	    JSONArray result = friends;
+	    for (int i=0; i<otherProfileJson.length();i++){
 		try {
-			res = new JSONObject(response.getBody());
-			JSONArray followersIDList = res.getJSONArray("ids");
-
-			JSONObject other = null;
-
-			for (int i = 0; i < followersIDList.length(); i++) {
-				// System.out.println(friendsIDList.get(i).toString());
-
-				other = getOtherProfileJson(followersIDList.get(i).toString());
-
-				// System.out.println(other);
-				if (!other.toString().contains(
-						"No user matches for specified terms"))
-					followersList.put(other);
-				followers.put("friends", followersList);
-			}
+		    result.put(otherProfileJson.get(i));
 		} catch (JSONException e) {
-			response.getBody();
+		    // TODO Auto-generated catch block
+		    e.printStackTrace();
 		}
-
-		if (res != null)
-			// return res.toJSONString();
-			return followers.toString();
-		else
-			return null;
-
+	    }
+	    return result;
 	}
 
 	public String getOtherProfileString(String id) {
@@ -186,18 +186,18 @@ public class TwitterConnectorImpl implements TwitterConnector {
 		JSONObject user = null;
 		try {
 			res = new JSONArray(response.getBody());
-			user = res.getJSONObject(0);
+			//user = res.getJSONObject(0);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if (res != null)
-			return user.toString();
+			return res.toString();
 		else
 			return null;
 	}
 
-	public JSONObject getOtherProfileJson(String id) {
+	public JSONArray getOtherProfileJson(String id) {
 		OAuthRequest request = new OAuthRequest(Verb.GET, GET_OTHER_PROFILE_URL
 				+ id);
 		this.service.signRequest(twToken.getAccessToken(), request);
@@ -206,13 +206,13 @@ public class TwitterConnectorImpl implements TwitterConnector {
 		JSONObject user = null;
 		try {
 			res = new JSONArray(response.getBody());
-			user = res.getJSONObject(0);
+			
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if (res != null)
-			return user;
+			return res;
 		else
 			return null;
 	}

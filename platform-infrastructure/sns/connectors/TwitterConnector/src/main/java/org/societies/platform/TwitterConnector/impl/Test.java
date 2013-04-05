@@ -34,8 +34,8 @@ class Test {
 		String Token = "";
 		TwitterConnectorImpl t = new TwitterConnectorImpl(Token, "dingqi");
 
-		testProfileExtraction(t);
-		//testFriendsExtraction(t);
+		//testProfileExtraction(t);
+		testFriendsExtraction(t);
 		
 		
 		
@@ -62,14 +62,14 @@ class Test {
 			System.out.println(r);
 	}
 
-	public static void testFollowersExtraction(TwitterConnector t) {
-		String r = null;
-		r = t.getUserFollowers();
-		if (r == null)
-			System.out.println("connection error");
-		else
-			System.out.println(r);
-	}
+//	public static void testFollowersExtraction(TwitterConnector t) {
+//		String r = null;
+//		r = t.getUserFollowers();
+//		if (r == null)
+//			System.out.println("connection error");
+//		else
+//			System.out.println(r);
+//	}
 
 	public static void testTweetsExtraction(TwitterConnector t) {
 		String r = null;
