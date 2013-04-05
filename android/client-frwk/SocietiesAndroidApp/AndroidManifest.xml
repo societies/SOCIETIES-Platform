@@ -70,6 +70,9 @@
         <service android:name="org.societies.android.platform.css.friends.FriendsManagerLocal" />
         <service android:name="org.societies.android.platform.css.friends.EventService" />
         <service android:name="org.societies.android.platform.useragent.feedback.EventListener" />
+        <service android:name="org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService" />
+        <service android:name="org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService" />
+        <service android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidLocal" />
         <!-- REMOTE SERVICES -->
         <service android:name="org.societies.android.platform.cis.CisDirectoryRemote" android:label="Cis Directory Remote" >
            <intent-filter>
@@ -88,9 +91,6 @@
                 <action android:name="org.societies.android.platform.cis.CisSubscribedRemote" />
    			</intent-filter>
    		</service>
-        <service android:name="org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService" />
-        <service android:name="org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService" />
-        <service android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidLocal" />
         <service
         	android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidRemote"
         	android:label="SocietiesPersonalisation">

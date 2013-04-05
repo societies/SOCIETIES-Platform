@@ -76,7 +76,7 @@ public class PrivacyPolicyManagerRemote {
 	private PrivacyPolicyIntentSender intentSender;
 	private static boolean remoteReady;
 
-	
+
 	public PrivacyPolicyManagerRemote(Context context)  {
 		Log.d(TAG, "PrivacyPolicyManagerRemote Constructor");
 		this.context = context;
@@ -197,7 +197,7 @@ public class PrivacyPolicyManagerRemote {
 		return true;
 	}
 
-	
+
 	// -- Comms
 
 	public void bindToComms() {
@@ -248,7 +248,7 @@ public class PrivacyPolicyManagerRemote {
 				@Override
 				public void returnException(String result) {
 					// TODO Auto-generated method stub
-					
+
 				}
 
 			});
@@ -281,7 +281,7 @@ public class PrivacyPolicyManagerRemote {
 				@Override
 				public void returnException(String result) {
 					// TODO Auto-generated method stub
-					
+
 				}
 
 			});
@@ -309,8 +309,17 @@ public class PrivacyPolicyManagerRemote {
 	 */
 	private boolean checkRemoteStatus(String clientPackage, String action) {
 		if (!isRemoteReady()) {
-			intentSender.sendIntentErrorServiceNotStarted(clientPackage, action);
-			return false;
+			try {
+				wait(5000);
+			}
+			catch(Exception e) {
+				intentSender.sendIntentErrorServiceNotStarted(clientPackage, action);
+				return false;
+			}
+			if (!isRemoteReady()) {
+				intentSender.sendIntentErrorServiceNotStarted(clientPackage, action);
+				return false;
+			}
 		}
 		return true;
 	}

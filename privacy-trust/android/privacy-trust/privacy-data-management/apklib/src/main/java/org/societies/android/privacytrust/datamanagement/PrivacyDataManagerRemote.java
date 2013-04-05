@@ -75,7 +75,7 @@ public class PrivacyDataManagerRemote {
 	private ClientCommunicationMgr clientCommManager;
 	private PrivacyDataIntentSender intentSender;
 	private static boolean remoteReady;
-	
+
 
 	public PrivacyDataManagerRemote(Context context)  {
 		this.context = context;
@@ -85,14 +85,13 @@ public class PrivacyDataManagerRemote {
 		bindToComms();
 	}
 
-	
+
 	// -- Access control
-	
+
 	public void checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		String action = MethodType.CHECK_PERMISSION.name();
 		try {
 			// -- Verify status
-			bindToComms();
 			if (!checkRemoteStatus(clientPackage, action)) {
 				return;
 			}
@@ -119,7 +118,7 @@ public class PrivacyDataManagerRemote {
 	}
 
 	// -- Obfuscation
-	
+
 	public void obfuscateData(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
 		String action = MethodType.OBFUSCATE_DATA.name();
 		try {
@@ -261,8 +260,18 @@ public class PrivacyDataManagerRemote {
 	 */
 	private boolean checkRemoteStatus(String clientPackage, String action) {
 		if (!isRemoteReady()) {
-			intentSender.sendIntentErrorServiceNotStarted(clientPackage, action);
-			return false;
+			try {
+				wait(5000);
+			}
+			catch(Exception e) {
+				intentSender.sendIntentErrorServiceNotStarted(clientPackage, action);
+				return false;
+			}
+			if (!isRemoteReady()) {
+				intentSender.sendIntentErrorServiceNotStarted(clientPackage, action);
+				return false;
+			}
+			
 		}
 		return true;
 	}

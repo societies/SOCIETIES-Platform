@@ -36,6 +36,7 @@ import org.societies.android.api.css.directory.IAndroidCssDirectory;
 import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.internal.cssmanager.IFriendsManager;
+import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.api.internal.servicelifecycle.IServiceControl;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.android.api.internal.sns.ISocialData;
@@ -50,6 +51,7 @@ import org.societies.android.platform.servicemonitor.ServiceManagementLocal;
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal.LocalSLMBinder;
 import org.societies.android.platform.socialdata.SocialData;
 import org.societies.android.platform.useragent.feedback.EventListener;
+import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -107,6 +109,7 @@ public class SocietiesClientServicesController {
 	private IServiceControl slmServiceControl;
 	private ISocialData snsConnectorService;
 	private IFriendsManager friendMgrService;
+	private IPrivacyPolicyManager privacyPolicyService;
 	
 	private long startTime;
 	
@@ -380,13 +383,21 @@ public class SocietiesClientServicesController {
 
         public void onServiceConnected(ComponentName name, IBinder service) {
         	Log.d(LOG_TAG, "Connecting to " + SERVICE_NAME + " service");
-
         	SocietiesClientServicesController.this.connectedToServices[PRIVACY_POLICY_SERVICE] = true;
-        	//get a remote binder
-        	SocietiesClientServicesController.this.allMessengers[PRIVACY_POLICY_SERVICE] = new Messenger(service);
-        	
+		
+			//Get a local binder
+        	PrivacyPolicyManagerLocalService.LocalBinder binder = (PrivacyPolicyManagerLocalService.LocalBinder) service;
+        	//Retrieve the local service API
+        	SocietiesClientServicesController.this.privacyPolicyService = (IPrivacyPolicyManager) binder.getService();
         	SocietiesClientServicesController.this.platformServiceConnections[PRIVACY_POLICY_SERVICE] = this;
         	SocietiesClientServicesController.this.servicesBinded.countDown();
+        	
+        	//SocietiesClientServicesController.this.connectedToServices[PRIVACY_POLICY_SERVICE] = true;
+        	//get a remote binder
+        	//SocietiesClientServicesController.this.allMessengers[PRIVACY_POLICY_SERVICE] = new Messenger(service);
+        	
+        	//SocietiesClientServicesController.this.platformServiceConnections[PRIVACY_POLICY_SERVICE] = this;
+        	//SocietiesClientServicesController.this.servicesBinded.countDown();
         	Log.d(LOG_TAG, "Time to bind to " + SERVICE_NAME + " service: " + Long.toString(System.currentTimeMillis() - SocietiesClientServicesController.this.startTime));
         }
     };
@@ -545,6 +556,14 @@ public class SocietiesClientServicesController {
         		Log.e(LOCAL_LOG_TAG, "Service does not exist");
         	}
         	
+        	if (retValue) {
+	        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Privacy Policy Service");
+	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, PrivacyPolicyManagerLocalService.class);
+	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, privacyPolicyConnection, Context.BIND_AUTO_CREATE);
+           	} else {
+        		Log.e(LOCAL_LOG_TAG, "Service does not exist");
+        	}
+        	
         	try {
         		//To prevent hanging this latch uses a timeout
         		SocietiesClientServicesController.this.servicesBinded.await(TASK_TIMEOUT, TimeUnit.MILLISECONDS);
@@ -605,6 +624,7 @@ public class SocietiesClientServicesController {
     		SocietiesClientServicesController.this.slmServiceControl.startService();
     		SocietiesClientServicesController.this.snsConnectorService.startService();
     		SocietiesClientServicesController.this.friendMgrService.startService();
+    		SocietiesClientServicesController.this.privacyPolicyService.startService();
     		
     		//START "STARTED SERVICES"
         	//FRIENDS SERVICE
@@ -677,6 +697,7 @@ public class SocietiesClientServicesController {
     		SocietiesClientServicesController.this.slmServiceControl.stopService();
     		SocietiesClientServicesController.this.snsConnectorService.stopService();
     		SocietiesClientServicesController.this.friendMgrService.stopService();
+    		SocietiesClientServicesController.this.privacyPolicyService.stopService();
 
     		//STOP "STARTED SERVICES"
         	//FRIENDS SERVICE

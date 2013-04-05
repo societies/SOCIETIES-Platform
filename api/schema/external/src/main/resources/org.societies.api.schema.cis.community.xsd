@@ -245,6 +245,7 @@
 				<xs:extension base='empty'>
 					<xs:attribute name='jid' type='xs:string' use='required'/>
 					<xs:attribute name='role' type='tns:participantRole'/>
+					<xs:attribute name='name' type='xs:string' />
 				</xs:extension>
 			</xs:simpleContent>
 		</xs:complexType>

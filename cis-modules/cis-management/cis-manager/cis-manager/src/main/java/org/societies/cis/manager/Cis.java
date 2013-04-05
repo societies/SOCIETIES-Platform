@@ -74,6 +74,8 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.css.directory.ICssDirectoryCallback;
+import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
@@ -115,6 +117,7 @@ import org.societies.api.schema.cis.manager.DeleteMemberNotification;
 import org.societies.api.schema.cis.manager.DeleteNotification;
 import org.societies.api.schema.cis.manager.Notification;
 import org.societies.api.schema.cis.manager.SubscribedTo;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
@@ -179,6 +182,8 @@ public class Cis implements IFeatureServer, ICisOwned {
 	IPrivacyPolicyManager privacyPolicyManager = null;
 	@Transient
 	IPrivacyDataManager privacyDataManager = null;
+	@Transient
+	private ICssDirectoryRemote cssDirectoryRemote;
 	
 	public IPrivacyDataManager getPrivacyDataManager() {
 		return privacyDataManager;
@@ -190,6 +195,16 @@ public class Cis implements IFeatureServer, ICisOwned {
 
 	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
 		this.privacyPolicyManager = privacyPolicyManager;
+	}
+
+	/**@return the cssDirectoryRemote */
+	public ICssDirectoryRemote getCssDirectoryRemote() {
+		return cssDirectoryRemote;
+	}
+
+	/**@param cssDirectoryRemote the cssDirectoryRemote to set */
+	public void setCssDirectoryRemote(ICssDirectoryRemote cssDirectoryRemote) {
+		this.cssDirectoryRemote = cssDirectoryRemote;
 	}
 
 	@Transient
@@ -1163,28 +1178,44 @@ public class Cis implements IFeatureServer, ICisOwned {
 	}
 	
 	@Override
-	public void getListOfMembers(ICisManagerCallback callback){
+	public void getListOfMembers(final ICisManagerCallback callback){
 		LOG.debug("getListOfMembers: callback");
 		LOG.debug("local get member list WITH CALLBACK called");
 
-		CommunityMethods c = new CommunityMethods();
-		WhoResponse w = new WhoResponse();
-		c.setWhoResponse(w);
-		w.setResult(true);
+		final CommunityMethods community = new CommunityMethods();
+		final WhoResponse who = new WhoResponse();
+		community.setWhoResponse(who);
+		who.setResult(true);
 		
-		Set<CisParticipant> s = this.getMembersCss();
-		Iterator<CisParticipant> it = s.iterator();
-		
-		List<Participant> l = new  ArrayList<Participant>();
+		List<String> listMemberIDs = new ArrayList<String>();					  //USED AS PARAM TO CSS DIR TO GET MEMBER NAMES
+		final List<Participant> listParticipants = new  ArrayList<Participant>(); //RETURNED TO CALLER
+	
+		//GET MEMBER LIST FROM DATABASE
+		final Set<CisParticipant> setParticipants = this.getMembersCss();
+		Iterator<CisParticipant> it = setParticipants.iterator();
 		while(it.hasNext()){
 			CisParticipant element = it.next();
 			Participant p = new Participant();
 			p.setJid(element.getMembersJid());
-			p.setRole( ParticipantRole.fromValue(element.getMtype().toString())   );
-			l.add(p);
+			p.setRole( ParticipantRole.fromValue(element.getMtype().toString()) );
+			listParticipants.add(p);
+			listMemberIDs.add(element.getMembersJid());
 	    }
-		w.setParticipant(l);
-		callback.receiveResult(c);	
+		//GET PARTICIPANT NAMES FROM CSS DIR
+		cssDirectoryRemote.searchByID(listMemberIDs, new ICssDirectoryCallback() {
+			@Override
+			public void getResult(List<CssAdvertisementRecord> results) {
+				for (CssAdvertisementRecord record: results) {
+					//CHECK WHICH RECORD BELONGS TO WHO
+					for (Participant participant: listParticipants) {
+						if (record.getId().equals(participant.getJid()) )
+							participant.setName(record.getName());
+					}
+				}
+				who.setParticipant(listParticipants);
+				callback.receiveResult(community);
+			}
+		});
 	}
 	
 	public void getListOfMembers(Requestor requestor, ICisManagerCallback callback){

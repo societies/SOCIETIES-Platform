@@ -201,9 +201,11 @@ public class PrivacyPolicyManagerPlugin extends Plugin {
 		// - Launch service method
 		RequestorCisBean owner = jsonHelper.fromJson(arguments.getString(0), RequestorCisBean.class);
 		Log.d(TAG, "Retrieving privacy policy from: "+RequestorUtils.toXmlString(owner));
+		// An other way to manage this
+//		JSONObject jsonRequestor = (JSONObject) arguments.get(0);
 //		RequestorCisBean owner = new RequestorCisBean();
-//		owner.setRequestorId("university.societies.local");
-//		owner.setCisRequestorId("cis-e86b61f1-e85a-4d2d-94b8-908817e08166.societies.local");
+//		owner.setRequestorId(jsonRequestor.getString("requestorId"));
+//		owner.setCisRequestorId(jsonRequestor.getString("cisRequestId"));
 		privacyPolicyManagerService.getPrivacyPolicy(clientPackage, owner);
 
 		// - Inform the JS side: async mode
