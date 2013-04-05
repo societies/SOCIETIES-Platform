@@ -465,9 +465,8 @@ public class CisManager implements ICisManager, IFeatureServer {
 							this.ccmFactory, this.privacyPolicyManager, this.sessionFactory,
 							description,cisCriteria,this.iActivityFeedManager);
 		cis.setPrivacyDataManager(privacyDataManager); // TODO: possibly move this to the constructor of the cis
-		if(cis == null)
-			return cis;
-
+		cis.setCssDirectoryRemote(this.cssDirectoryRemote);
+		
 		// PRIVACY POLICY CODE
 		try {
 			IIdentity cssOwnerId = this.cisManagerId;
