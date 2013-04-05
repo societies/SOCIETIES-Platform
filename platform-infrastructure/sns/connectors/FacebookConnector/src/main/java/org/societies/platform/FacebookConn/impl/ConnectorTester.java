@@ -29,7 +29,7 @@ public class ConnectorTester {
 	 * http://wd.teamlife.it/fbconnector.php that allows to get the access token
 	 */
 	public static void main(String[] args) {
-		String access_token = "AAAFPIhZAkC90BAJ0wxKH6PuhVXGKPXGocfGzRJObP3neaKZCKvyM6OMUIbZCLVIZCAoZBbzoO7elu40Dd5xhGP31yZCDb84IZCI1TZCZC5bNxFwZDZD";
+		String access_token = "";
 		
 		//access_token= "";
 		FacebookConnectorImpl connector = new FacebookConnectorImpl(access_token, "Societies User");
