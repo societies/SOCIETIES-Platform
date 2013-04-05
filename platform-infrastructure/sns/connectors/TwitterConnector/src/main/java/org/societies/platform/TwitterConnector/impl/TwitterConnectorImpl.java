@@ -111,6 +111,7 @@ public class TwitterConnectorImpl implements TwitterConnector {
 			    }
 			    
 			}
+			friends = merge(friends, getOtherProfileJson(idList));
 			res = new JSONObject();
 			res.put("friends", friends);
 			
