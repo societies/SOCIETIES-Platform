@@ -58,5 +58,10 @@
 	<osgi:reference id="deviceManager"
 		interface="org.societies.api.internal.css.devicemgmt.IDeviceManager"
 		cardinality="1..1" />
+		
+	<!-- context activity feed -->
+	<osgi:reference id="activityFeedMgr" 
+		interface="org.societies.api.activity.IActivityFeedManager" 
+		cardinality="1..1" />
 
 </beans>
