@@ -36,6 +36,12 @@ var CSSFriendsServices = {
 	 * @returns null
 	 */
 	refreshFriendRequests: function() {
+		function showAvatar(VCard) {
+			var n=VCard.identity.indexOf(".");
+			var identityStr = VCard.identity.substring(0, n);
+			$('img#' + identityStr).attr("src", VCard.avatar);
+		}
+		
 		function success(data) {
 			//UPDATE COUNT
 			$("span#myFriendRequests").html(data.length);
@@ -43,20 +49,23 @@ var CSSFriendsServices = {
 			//EMPTY TABLE - NEED TO LEAVE THE HEADER
 			while( $('ul#FriendRequestsListUL').children().length >1 )
 				$('ul#FriendRequestsListUL li:last').remove();
-			//DISPLAY SERVICES
+			//DISPLAY REQUESTS
 			for (i  = 0; i < data.length; i++) {
+				var n=data[i].id.indexOf(".");
+				var identityStr = data[i].id.substring(0, n);
 				var tableEntry = '<li id="li' + i + '"><a href="#" onclick="CSSFriendsServices.acceptFriendRequest(\'' + data[i].name + '\', \'' + data[i].id + '\', ' + i + ')">' +
-					'<img src="images/profile_pic.png" />' +
+					'<img src="images/profile_pic.png" id="' + identityStr + '" style="max-width:100px;" />' +
 					'<h2>' + data[i].name + '</h2>' + 
 					'<p>' + data[i].id + '</p>' +
 					'</a></li>';
-				jQuery('ul#FriendRequestsListUL').append(tableEntry);
+				$('ul#FriendRequestsListUL').append(tableEntry);
+				window.plugins.SocietiesLocalCSSManager.getVCardUser(data[i].id, showAvatar, failure);
 			}
 			$('ul#FriendRequestsListUL').listview('refresh');
 		}
 		
 		function failure(data) {
-			alert("refreshFriendRequests - failure: " + data);
+			console.log("refreshFriendRequests failure: " + data);
 		}
 		
 		window.plugins.SocietiesLocalCSSManager.getFriendRequests(success, failure);
@@ -70,6 +79,12 @@ var CSSFriendsServices = {
 	refreshFriendList: function() {
 		console.log("refreshFriendList");
 
+		function showAvatar(VCard) {
+			var n=VCard.identity.indexOf(".");
+			var identityStr = VCard.identity.substring(0, n);
+			$('img#' + identityStr).attr("src", VCard.avatar);
+		}
+		
 		function success(data) {
 			//UPDATE COUNT
 			$("span#myFriendsCount").html(data.length);
@@ -78,20 +93,23 @@ var CSSFriendsServices = {
 			while( $('ul#FriendsListDiv').children().length >1 )
 				$('ul#FriendsListDiv li:last').remove();
 
-			//DISPLAY SERVICES
+			//DISPLAY FRIENDS
 			for (i  = 0; i < data.length; i++) {
+				var n=data[i].id.indexOf(".");
+				var identityStr = data[i].id.substring(0, n);
 				var tableEntry = '<li><a href="#" onclick="CSSFriendsServices.showFriendDetails(\'' + data[i].id + '\')">' +
-					'<img src="images/profile_pic.png" />' +	
+					'<img src="images/profile_pic.png" id="' + identityStr + '" style="max-width:100px;" />' +
 					'<h2>' + data[i].name + '</h2>' + 
 					'<p>' + data[i].id + '</p>' +
 					'</a></li>';
 				$('ul#FriendsListDiv').append(tableEntry);
+				window.plugins.SocietiesLocalCSSManager.getVCardUser(data[i].id, showAvatar, failure);
 			}
 			$('ul#FriendsListDiv').listview('refresh');
 		}
 		
 		function failure(data) {
-			alert("refresh3PServices - failure: " + data);
+			console.log("refreshFriendList failure: " + data);
 		}
 		
 		window.plugins.SocietiesLocalCSSManager.getMyFriendsList(success, failure);
@@ -164,13 +182,23 @@ var CSSFriendsServices = {
 		}
 		
 		function failure(data) {
-			alert("refresh3PServices - failure: " + data);
+			alert("Error occured retrieving suggested friends: " + data);
 		}
 		
 		window.plugins.SocietiesLocalCSSManager.getSuggestedFriends(success, failure);
 	},
 	
 	displayFriendEntryRecords: function(data) {
+		function showAvatar(VCard) {
+			var n=VCard.identity.indexOf(".");
+			var identityStr = VCard.identity.substring(0, n);
+			$('img#' + identityStr).attr("src", VCard.avatar);
+		}
+		
+		function failure(data) {
+			console.log("Error retrieving avatar: " + data);
+		}
+		
 		//EMPTY TABLE - NEED TO LEAVE THE HEADER
 		while( $('ul#SuggestedFriendsListUL').children().length >1 )
 			$('ul#SuggestedFriendsListUL li:last').remove();
@@ -191,30 +219,46 @@ var CSSFriendsServices = {
 				images+='<img src="images/icons/googleplus-col.png" width="20" height="20" /> &nbsp;';
 			
 			//ADD TO LINE ITEM
+			var n=data[i].key.id.indexOf(".");
+			var identityStr = data[i].key.id.substring(0, n);
 			var tableEntry = '<li id="li' + i + '"><a href="#" onclick="CSSFriendsServices.sendFriendRequest(\'' + data[i].key.name + '\', \'' + data[i].key.id + '\', ' + i + ')">' +
-				'<img src="images/profile_pic.png" />' +
+				'<img src="images/profile_pic.png" id="' + identityStr + '" style="max-width:100px;" />' +
 				'<p class="ui-li-aside">' + images + '</p>' + 
 				'<h2>' + data[i].key.name + '</h2>' + 
 				'<p>' + data[i].key.id + '</p>' +
 				'</a></li>';
 			$('ul#SuggestedFriendsListUL').append(tableEntry);
+			window.plugins.SocietiesLocalCSSManager.getVCardUser(data[i].key.id, showAvatar, failure);
 		}
 		$('ul#SuggestedFriendsListUL').listview('refresh');
 	},
 	
 	displayCSSAdvertRecords: function(data) {
+		function showAvatar(VCard) {
+			var n=VCard.identity.indexOf(".");
+			var identityStr = VCard.identity.substring(0, n);
+			$('img#' + identityStr).attr("src", VCard.avatar);
+		}
+		
+		function failure(data) {
+			console.log("Error retrieving avatar: " + data);
+		}
+		
 		//EMPTY TABLE - NEED TO LEAVE THE HEADER
 		while( $('ul#SuggestedFriendsListUL').children().length >1 )
 			$('ul#SuggestedFriendsListUL li:last').remove();
 
 		//DISPLAY SUGGESTIONS
 		for (i  = 0; i < data.length; i++) {
+			var n=data[i].id.indexOf(".");
+			var identityStr = data[i].id.substring(0, n);
 			var tableEntry = '<li id="li' + i + '"><a href="#" onclick="CSSFriendsServices.sendFriendRequest(\'' + data[i].name + '\', \'' + data[i].id + '\', ' + i + ')">' +
-				'<img src="images/profile_pic.png" />' +	
+				'<img src="images/profile_pic.png" id="' + identityStr + '" style="max-width:100px;" />' +
 				'<h2>' + data[i].name + '</h2>' + 
 				'<p>' + data[i].id + '</p>' +
 				'</a></li>';
 			$('ul#SuggestedFriendsListUL').append(tableEntry);
+			window.plugins.SocietiesLocalCSSManager.getVCardUser(data[i].id, showAvatar, failure);
 		}
 		$('ul#SuggestedFriendsListUL').listview('refresh');
 	},
