@@ -263,23 +263,31 @@ var	SocietiesCISListService = {
 	},
 	
 	showCISMembers: function (cisId, bAdmin) {		
+		function showAvatar(VCard) {
+			var n=VCard.identity.indexOf(".");
+			var identityStr = VCard.identity.substring(0, n);
+			$('img#' + identityStr).attr("src", VCard.avatar);
+		}
+		
+		function showAvatarfailure(data) {
+			console.log("Error retrieving avatar: " + data);
+		}
+		
 		function success(data) {
 			//EMPTY TABLE - NEED TO LEAVE THE HEADER
 			while( $('ul#cis_members').children().length >0 )
 				$('ul#cis_members li:last').remove();
 			
 			for (i  = 0; i < data.length; i++) {
-				//TODO: NEED TO GET NAME ADDED TO PARTICIPANT OBJECT. ONLY HAVE JID!
-				//var n=data[i].jid.indexOf(".");
-				//var identityStr = data[i].jid.substring(0, n);
-				var identityStr = data[i].name;
+				var n=data[i].jid.indexOf(".");
+				var identityStr = data[i].jid.substring(0, n);
 				//SEND FRIEND REQUEST LINK
-				var friendRequestATag = '<a href="#" onclick="SocietiesCISListService.sendFriendRequest(\'' + identityStr + '\', \'' + data[i].jid + '\', ' + i + ')">',
+				var friendRequestATag = '<a href="#" onclick="SocietiesCISListService.sendFriendRequest(\'' + data[i].name + '\', \'' + data[i].jid + '\', ' + i + ')">',
 					friendRequestATagClose = "</a>";
 				//GENERATE REMOVE MEMBER LINK - ADMIN MODE ONLY
 				var removeMember = "";
 				if (bAdmin) {
-					removeMember = '<a href="#" onclick="SocietiesCISListService.removeMember(\'' + identityStr + '\', \'' + data[i].jid + '\', ' + i + ')">Remove Member</a>';
+					removeMember = '<a href="#" onclick="SocietiesCISListService.removeMember(\'' + data[i].name + '\', \'' + data[i].jid + '\', ' + i + ')">Remove Member</a>';
 					if (data[i].role == "owner") {
 						//PREVENT FRIEND REQUESTS TO SELF
 						friendRequestATag = "", friendRequestATagClose = "", removeMember="";
@@ -287,11 +295,12 @@ var	SocietiesCISListService = {
 				}
 				//TABLE ENTRY
 				var tableEntry = '<li id="li' + i + '">' + friendRequestATag +
-								 '<img src="images/profile_pic.png" id="' + data[i].jid + '"/>' +
-								 '<h2>'+ identityStr + '</h2>' +
+								 '<img src="images/profile_pic.png" id="' + identityStr + '" style="max-width:100px;" />' +
+								 '<h2>'+ data[i].name + '</h2>' +
 								 '<p class="ui-li-aside">' + data[i].role + '</p>' +
 								 '<p>' + data[i].jid  + '</p>' + friendRequestATagClose + removeMember + '</li>';
 				$('ul#cis_members').append(tableEntry);
+				window.plugins.SocietiesLocalCSSManager.getVCardUser(data[i].jid, showAvatar, showAvatarfailure);
 			}
 			$('ul#cis_members').listview('refresh');
 			$('ul#cis_members').trigger( "collapse" );

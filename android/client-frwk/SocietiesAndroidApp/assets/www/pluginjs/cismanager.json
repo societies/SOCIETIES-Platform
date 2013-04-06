@@ -26,17 +26,17 @@
 	                    "description": "soh barca",
 	                    "communityJid" : "barca.soc.com"
 	     			},
-	     "getMembers" : [{"jid": "tom@societies.local", 
+	     "getMembers" : [{"jid": "tom.societies.local", 
 	     				  "role": "OWNER",
 	     				  "name": "Tom Cruise"
 	     				 },
-	     				 {"jid": "bob@societies.local", 
+	     				 {"jid": "john.societies.local", 
 	     				  "role": "PARTICIPANT",
-	     				  "name": "Robert DeNiro"
+	     				  "name": "John Smith"
 	     				 },
-	     				 {"jid": "angie@societies.local", 
+	     				 {"jid": "jane.societies.local", 
 	     				  "role": "PARTICIPANT",
-	     				  "name": "Angelina Jolie"
+	     				  "name": "Jane Smith"
 	     				}],
 	     "listOfCISs": [{
 	     				"communityName": "flamengo",
