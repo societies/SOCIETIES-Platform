@@ -330,7 +330,7 @@ public class EventService extends Service {
 			//CREATE INTENT FOR LAUNCHING ACTIVITY
 			Intent intent = new Intent(EventService.this.getApplicationContext(), AcceptFriendActivity.class);
 			intent.putExtra(EXTRA_CSS_ADVERT, (Parcelable)eventPayload.getCssAdvert());
-			intent.putExtra(EXTRA_CSS_VCARD, vCard);
+			intent.putExtra(EXTRA_CSS_VCARD, (Parcelable)vCard);
 			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			
 			String description = eventPayload.getCssAdvert().getName() + " sent a friend request";

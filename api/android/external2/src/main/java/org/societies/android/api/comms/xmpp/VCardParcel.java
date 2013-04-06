@@ -28,6 +28,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,9 +45,10 @@ import android.os.Parcelable;
  * @author aleckey
  *
  */
-public class VCardParcel implements Parcelable {
+public class VCardParcel implements Parcelable, Serializable {
 
-    private Map<String, String> homePhones = new HashMap<String, String>();
+	private static final long serialVersionUID = 5983010238884829741L;
+	private Map<String, String> homePhones = new HashMap<String, String>();
     private Map<String, String> workPhones = new HashMap<String, String>();
     private Map<String, String> homeAddr = new HashMap<String, String>();
     private Map<String, String> workAddr = new HashMap<String, String>();

@@ -24,11 +24,24 @@
  */
 package org.societies.android.platform.comms;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import org.jivesoftware.smackx.packet.VCard;
 import org.societies.android.api.comms.xmpp.AddressField;
 import org.societies.android.api.comms.xmpp.GenericField;
 import org.societies.android.api.comms.xmpp.PhoneType;
 import org.societies.android.api.comms.xmpp.VCardParcel;
+
+import android.content.Context;
+import android.os.Environment;
+import android.util.Log;
 
 /**
  * Describe your class here...
@@ -38,6 +51,8 @@ import org.societies.android.api.comms.xmpp.VCardParcel;
  */
 public class VCardUtilities {
 
+	private static final String LOG_TAG = AndroidCommsBase.class.getName();
+	
 	/**
 	 * Converts a VCard to a Parcelable version
 	 * @param xmppVCard
@@ -121,4 +136,86 @@ public class VCardUtilities {
        	}
     	return vcard;
 	}
+	
+	/**
+	 * Retrieves a VCard from disk storage
+	 * @param filename
+	 * @return
+	 */
+	public static VCardParcel getVCardFromDisk(Context context, String userIdentity) {
+		VCardParcel vcard = null;
+		String filename = userIdentity + ".vcf";
+		//File file = context.getFileStreamPath(filename);
+		File root = Environment.getExternalStorageDirectory();
+	    File dir = new File(root.getAbsolutePath() + "/vcards");
+	    File file = new File(dir, filename);
+		
+		if(file.exists()){
+			Log.d(LOG_TAG, "File: " + userIdentity +".vcf exists. Retrieving...");
+			FileInputStream fis;
+			try {
+				fis = new FileInputStream(filename);
+				ObjectInputStream ois = new ObjectInputStream(fis);
+				vcard = (VCardParcel) ois.readObject();
+				ois.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			return vcard;
+		}
+	    else {
+	    	return null;
+	    }
+	}
+	
+	/**
+	 * Saves a VCard to disk storage
+	 * @param filename
+	 * @param vcard
+	 */
+	public static void saveVCardToDisk(Context context, String userIdentity, VCardParcel vcard) {
+		String filename = userIdentity + ".vcf";
+		
+		File root = Environment.getExternalStorageDirectory();
+	    File dir = new File(root.getAbsolutePath() + "/vcards");
+	    dir.mkdirs();
+		
+		FileOutputStream fOut;
+		ObjectOutputStream oos;
+		try {
+			//fOut = context.openFileOutput(filename, Context.MODE_WORLD_READABLE);
+			File file = new File(dir, filename);
+			fOut = new FileOutputStream(file);
+			oos = new ObjectOutputStream(fOut);
+			oos.writeObject(vcard);
+			oos.flush();
+			fOut.flush();
+			oos.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		Log.d(LOG_TAG, "File: " + userIdentity +".vcf succcessfully saved to disk");
+	}
+	
+	private static boolean checkExternalMedia() {
+	    boolean mExternalStorageWriteable = false;
+	    String state = Environment.getExternalStorageState();
+
+	    if (Environment.MEDIA_MOUNTED.equals(state)) {
+	        // Can read and write the media
+	        mExternalStorageWriteable = true;
+	    } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+	        mExternalStorageWriteable = false;
+	    } else {
+	        mExternalStorageWriteable = false;
+	    }
+	    return mExternalStorageWriteable;
+	}
+	
 }
