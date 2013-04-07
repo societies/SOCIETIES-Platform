@@ -63,7 +63,7 @@ public class PersonConverterFromTwitter implements PersonConverter {
 			if (db.has("error"))
 				return person;
 			
-			person.setId(db.getString(ID));
+			person.setId("twitter:" + db.getString(ID));
 			
 			//if(db.has(UCT)) person.setUtcOffset(db.getLong(UCT));
 			if (db.has(NAME))	{

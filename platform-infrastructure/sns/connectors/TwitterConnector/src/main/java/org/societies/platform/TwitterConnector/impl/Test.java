@@ -31,17 +31,17 @@ import org.societies.platform.TwitterConnector.TwitterConnector;
 class Test {
 
 	public static void main(String[] args) {
-		String Token = "";
+		String Token = "787965889-emwjMz8srYln1zlsi8ncfUF5iAigKDCHLNZPP7WS,3Lb5hvuxKABvHkvYVwbCaTJz5TT6RknRh2Ady8UTKw";
 		TwitterConnectorImpl t = new TwitterConnectorImpl(Token, "dingqi");
 
-		//testProfileExtraction(t);
+		testProfileExtraction(t);
 		testFriendsExtraction(t);
 		
 		
 		
 //		testTweetPost(t);
 //		testFollowersExtraction(t);
-//		testTweetsExtraction(t);
+		testTweetsExtraction(t);
 	}
 
 	public static void testProfileExtraction(TwitterConnector t) {
