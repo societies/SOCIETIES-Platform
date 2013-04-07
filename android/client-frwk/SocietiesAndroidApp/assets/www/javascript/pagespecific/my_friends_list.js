@@ -37,11 +37,11 @@ var CSSFriendsServices = {
 	 */
 	refreshFriendRequests: function() {
 		function showAvatar(VCard) {
-			var n=VCard.identity.indexOf(".");
-			var identityStr = VCard.identity.substring(0, n);
+			var n=VCard.to.indexOf(".");
+			var identityStr = VCard.to.substring(0, n);
 			var imageStr = VCard.avatar;
 			if (imageStr != null)
-				$('img#' + identityStr).attr("src", VCard.avatar);
+				$('img#' + identityStr).attr("src", "data:image/jpg;base64," + VCard.avatar);
 		}
 		
 		function success(data) {
@@ -82,11 +82,11 @@ var CSSFriendsServices = {
 		console.log("refreshFriendList");
 
 		function showAvatar(VCard) {
-			var n=VCard.identity.indexOf(".");
-			var identityStr = VCard.identity.substring(0, n);
+			var n=VCard.to.indexOf(".");
+			var identityStr = VCard.to.substring(0, n);
 			var imageStr = VCard.avatar;
 			if (imageStr != null)
-				$('img#' + identityStr).attr("src", VCard.avatar);
+				$('img#' + identityStr).attr("src", "data:image/jpg;base64," + VCard.avatar);
 		}
 		
 		function success(data) {
@@ -145,7 +145,7 @@ var CSSFriendsServices = {
 			if (data.avatar==null)
 				$("img#friendProfilePic").attr("src", "images/profile_pic_sample.jpg");
 			else
-				$("img#friendProfilePic").attr("src", data.avatar);
+				$("img#friendProfilePic").attr("src", "data:image/jpg;base64," + data.avatar);
 		}
 		
 		function failure(data) {
@@ -194,11 +194,11 @@ var CSSFriendsServices = {
 	
 	displayFriendEntryRecords: function(data) {
 		function showAvatar(VCard) {
-			var n=VCard.identity.indexOf(".");
-			var identityStr = VCard.identity.substring(0, n);
+			var n=VCard.to.indexOf(".");
+			var identityStr = VCard.to.substring(0, n);
 			var imageStr = VCard.avatar;
 			if (imageStr != null)
-				$('img#' + identityStr).attr("src", VCard.avatar);
+				$('img#' + identityStr).attr("src", "data:image/jpg;base64," + VCard.avatar);
 		}
 		
 		function failure(data) {
@@ -241,11 +241,11 @@ var CSSFriendsServices = {
 	
 	displayCSSAdvertRecords: function(data) {
 		function showAvatar(VCard) {
-			var n=VCard.identity.indexOf(".");
-			var identityStr = VCard.identity.substring(0, n);
+			var n=VCard.to.indexOf(".");
+			var identityStr = VCard.to.substring(0, n);
 			var imageStr = VCard.avatar;
 			if (imageStr != null)
-				$('img#' + identityStr).attr("src", VCard.avatar);
+				$('img#' + identityStr).attr("src", "data:image/jpg;base64," + VCard.avatar);
 		}
 		
 		function failure(data) {

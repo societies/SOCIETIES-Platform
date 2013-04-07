@@ -264,11 +264,11 @@ var	SocietiesCISListService = {
 	
 	showCISMembers: function (cisId, bAdmin) {		
 		function showAvatar(VCard) {
-			var n=VCard.identity.indexOf(".");
-			var identityStr = VCard.identity.substring(0, n);
+			var n=VCard.to.indexOf(".");
+			var identityStr = VCard.to.substring(0, n);
 			var imageStr = VCard.avatar;
 			if (imageStr != null)
-				$('img#' + identityStr).attr("src", VCard.avatar);
+				$('img#' + identityStr).attr("src", "data:image/jpg;base64," + VCard.avatar);
 		}
 		
 		function showAvatarfailure(data) {
