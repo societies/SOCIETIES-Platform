@@ -37,6 +37,10 @@
 	     				 {"jid": "jane.societies.local", 
 	     				  "role": "PARTICIPANT",
 	     				  "name": "Jane Smith"
+	     				},
+	     				{"jid": "bob.societies.local", 
+	     				  "role": "PARTICIPANT",
+	     				  "name": "Robert DeNiro"
 	     				}],
 	     "listOfCISs": [{
 	     				"communityName": "flamengo",

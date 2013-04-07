@@ -196,7 +196,9 @@ window.plugins.SocietiesLocalCSSManager = {
 		else if (userID=="jane.societies.local")
 			jsonMethod = "VCardJane";
 		else if (userID=="tom.societies.local")
-			jsonMethod = "VCardTom";	
+			jsonMethod = "VCardTom";
+		else if (userID=="bob.societies.local")
+			jsonMethod = "VCardBob";	
 		else
 			errorCallback("user vcard not found!");
 			

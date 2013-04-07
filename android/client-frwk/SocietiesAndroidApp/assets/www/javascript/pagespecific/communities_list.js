@@ -266,7 +266,9 @@ var	SocietiesCISListService = {
 		function showAvatar(VCard) {
 			var n=VCard.identity.indexOf(".");
 			var identityStr = VCard.identity.substring(0, n);
-			$('img#' + identityStr).attr("src", VCard.avatar);
+			var imageStr = VCard.avatar;
+			if (imageStr != null)
+				$('img#' + identityStr).attr("src", VCard.avatar);
 		}
 		
 		function showAvatarfailure(data) {

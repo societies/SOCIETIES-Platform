@@ -188,6 +188,10 @@
 						 {"id": "tom.societies.local",
 						  "name": "Tom Cruise",
 						  "uri": "tom.societies.local"
+						 },
+						 {"id": "bob.societies.local",
+						  "name": "Robert DeNiro",
+						  "uri": "bob.societies.local"
 						 }],
 		"getSuggestedFriends": [
 						 {"key": {
@@ -204,7 +208,12 @@
 						 		"id": "tom.societies.local",
 						  		"name": "Tom Cruise"
 						  		},
-						  "value": "27" }],
+						  "value": "27" },
+						 {"key": { 
+						 		"id": "bob.societies.local",
+						  		"name": "Robert DeNiro"
+						  		},
+						  "value": "256" }],
 		"listAdvertisementRecords": [{
 						"name" : "John Smith",
 						"id": "john.societies.local" },
@@ -213,7 +222,10 @@
 						"id": "jane.societies.local" },
 						{
 						"name" : "Tom Cruise",
-						"id": "tom.societies.local" }
+						"id": "tom.societies.local" },
+						{
+						"name" : "Robert DeNiro",
+						"id": "bob.societies.local" }
 					],
 		"cssActivityFeed": [{
      				"actor": "john.societies.local",
@@ -259,6 +271,9 @@
 		"VCardTom": { "FN": "Tom Cruise",
 					  "identity": "tom.societies.local",
 					  "avatar": "data:image/jpg;base64,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"
+					},
+		"VCardBob": { "FN": "Robert DeNiro",
+					  "identity": "bob.societies.local"
 					}
 	}
 }
