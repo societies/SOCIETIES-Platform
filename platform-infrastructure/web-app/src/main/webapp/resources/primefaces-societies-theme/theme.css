@@ -643,6 +643,10 @@ button.ui-button::-moz-focus-inner {
     background: none;
 }
 
+.ui-dialog .ui-dialog-content p {
+    color: #fff;
+}
+
 .ui-dialog .ui-dialog-content {
     position: relative;
     border: 0;

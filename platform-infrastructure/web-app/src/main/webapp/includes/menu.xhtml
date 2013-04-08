@@ -52,7 +52,7 @@
                         <p:ajax event="click" listener="#{notifications.resetUnreadNotifications}"
                                 update="notification-count"/>
 
-                        <h:outputText id="notification-count"
+                        <h:outputText id="notification-count" rendered="#{userService.userLoggedIn}"
                                       value="#{notifications.numUnreadNotifications}"/>
                     </p:commandLink>
                 </div>

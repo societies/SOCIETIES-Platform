@@ -3,7 +3,14 @@ package org.societies.webapp.controller;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
+import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
+import org.societies.api.schema.useragent.feedback.FeedbackMethodType;
+import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
+import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
+import org.societies.useragent.api.model.UserFeedbackEventTopics;
 import org.societies.webapp.ILoginListener;
 import org.societies.webapp.entity.NotificationQueueItem;
 import org.societies.webapp.service.UserService;
@@ -24,17 +31,27 @@ import java.util.*;
 @SessionScoped
 public class NotificationsController extends BasePageController {
 
+
     private class PubSubListener implements Subscriber {
         //pubsub event schemas
         private final List<String> EVENT_SCHEMA_CLASSES =
                 Collections.unmodifiableList(Arrays.asList(
+                        "org.societies.api.schema.useragent.feedback.UserFeedbackBean",
+                        "org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean",
+                        "org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean",
                         "org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent",
                         "org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent"));
         private final List<String> EVENT_TYPES =
                 Collections.unmodifiableList(Arrays.asList(
                         EventTypes.UF_PRIVACY_NEGOTIATION,
                         EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE,
-                        EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP));
+                        EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP,
+                        EventTypes.UF_PRIVACY_ACCESS_CONTROL,
+                        EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE,
+                        EventTypes.UF_PRIVACY_ACCESS_CONTROL_REMOVE_POPUP,
+                        UserFeedbackEventTopics.EXPLICIT_RESPONSE,
+                        UserFeedbackEventTopics.IMPLICIT_RESPONSE,
+                        UserFeedbackEventTopics.REQUEST));
 
         public void registerForEvents() {
 
@@ -98,16 +115,53 @@ public class NotificationsController extends BasePageController {
             }
 
             if (EventTypes.UF_PRIVACY_NEGOTIATION.equals(node)) {
-                if (log.isDebugEnabled()) {
-                    String fmt = "Adding notification item of type %s with ID %s";
-                    log.debug(String.format(fmt, item.getClass().getSimpleName(), itemId));
+                UserFeedbackPrivacyNegotiationEvent ppn = (UserFeedbackPrivacyNegotiationEvent) item;
+
+                negotiationQueue.add(NotificationQueueItem.forPrivacyPolicyNotification(pubsubService, node, itemId, ppn));
+                numUnreadNotifications++;
+
+            } else if (UserFeedbackEventTopics.REQUEST.equals(node)) {
+
+                UserFeedbackBean bean = (UserFeedbackBean) item;
+
+                String proposalText = bean.getProposalText();
+                String[] options = bean.getOptions().toArray(new String[bean.getOptions().size()]);
+
+                NotificationQueueItem newItem;
+
+                if (bean.getMethod() == FeedbackMethodType.GET_EXPLICIT_FB)
+                    switch (bean.getType()) {
+                        case ExpProposalType.ACKNACK:
+                            newItem = NotificationQueueItem.forAckNack(pubsubService, node, itemId, proposalText);
+                            break;
+                        case ExpProposalType.CHECKBOXLIST:
+                            newItem = NotificationQueueItem.forSelectMany(pubsubService, node, itemId, proposalText, options);
+                            break;
+                        case ExpProposalType.RADIOLIST:
+                            newItem = NotificationQueueItem.forSelectOne(pubsubService, node, itemId, proposalText, options);
+                            break;
+                        default:
+                            log.error("Unknown UserFeedbackBean type = " + bean.getType());
+                            return;
+                    }
+                else if (bean.getMethod() == FeedbackMethodType.GET_IMPLICIT_FB) {
+                    Date timeout = new Date(new Date().getTime() + bean.getTimeout());
+
+                    newItem = NotificationQueueItem.forTimedAbort(pubsubService, node, itemId, proposalText, timeout);
+                } else {
+                    log.error("Cannot handle UserFeedbackBean with method " + bean.getMethod().toString());
+                    return;
                 }
 
-                negotiationQueue.add(new NotificationQueueItem(pubsubService, node, itemId, item));
+                negotiationQueue.add(newItem);
                 numUnreadNotifications++;
-            } else if (EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE.equals(node)
-                    || EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP.equals(node)) {
 
+            } else if (EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE.equals(node)
+                    || EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP.equals(node)
+                    || EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE.equals(node)
+                    || EventTypes.UF_PRIVACY_ACCESS_CONTROL_REMOVE_POPUP.equals(node)
+                    || UserFeedbackEventTopics.EXPLICIT_RESPONSE.equals(node)
+                    || UserFeedbackEventTopics.IMPLICIT_RESPONSE.equals(node)) {
 
                 for (NotificationQueueItem nqi : negotiationQueue) {
                     if (nqi.getItemId().equals(itemId)) {
@@ -137,6 +191,46 @@ public class NotificationsController extends BasePageController {
 
             if (log.isDebugEnabled()) {
                 log.debug("numUnreadNotifications=" + numUnreadNotifications);
+            }
+        }
+
+        public void sendExplicitResponse(ExpFeedbackResultBean responseBean) {
+            if (log.isTraceEnabled())
+                log.trace("sendExplicitResponse()");
+
+            try {
+                getPubsubClient().publisherPublish(getUserService().getIdentity(),
+                        UserFeedbackEventTopics.EXPLICIT_RESPONSE,
+                        responseBean.getRequestId(),
+                        responseBean);
+
+                if (log.isDebugEnabled())
+                    log.debug("Sent " + UserFeedbackEventTopics.EXPLICIT_RESPONSE + " with ID " + responseBean.getRequestId());
+            } catch (Exception e) {
+                addGlobalMessage("Error publishing notification of completed explicit UF request",
+                        e.getMessage(),
+                        FacesMessage.SEVERITY_ERROR);
+                log.error("Error publishing notification of completed explicit UF request", e);
+            }
+        }
+
+        public void sendImplicitResponse(ImpFeedbackResultBean responseBean) {
+            if (log.isTraceEnabled())
+                log.trace("sendImplicitResponse()");
+
+            try {
+                getPubsubClient().publisherPublish(getUserService().getIdentity(),
+                        UserFeedbackEventTopics.IMPLICIT_RESPONSE,
+                        responseBean.getRequestId(),
+                        responseBean);
+
+                if (log.isDebugEnabled())
+                    log.debug("Sent " + UserFeedbackEventTopics.IMPLICIT_RESPONSE + " with ID " + responseBean.getRequestId());
+            } catch (Exception e) {
+                addGlobalMessage("Error publishing notification of completed implicit UF request",
+                        e.getMessage(),
+                        FacesMessage.SEVERITY_ERROR);
+                log.error("Error publishing notification of completed implicit UF request", e);
             }
         }
     }
@@ -212,5 +306,61 @@ public class NotificationsController extends BasePageController {
 
     public Queue<NotificationQueueItem> getNegotiationQueue() {
         return negotiationQueue;
+    }
+
+    public void submitItem(String itemId) {
+        // TODO: this should probably be refactored into a UserFeedbackEventController
+        // or something similar, in order to reduce coupling
+
+        log.debug("submitItem() id=" + itemId);
+
+        if (itemId == null) {
+            log.warn("Null itemId when calling submitItem(), cannot continue");
+            return;
+        }
+
+        // find the item
+        NotificationQueueItem selectedItem = null;
+        for (NotificationQueueItem item : negotiationQueue) {
+            if (itemId.equals(item.getItemId())) {
+                selectedItem = item;
+                break;
+            }
+        }
+
+        if (selectedItem == null) {
+            log.warn("selected ID not found when calling submitItem(), cannot continue");
+            return;
+        }
+
+
+        if (selectedItem.getType().equals(NotificationQueueItem.TYPE_ACK_NACK)
+                || selectedItem.getType().equals(NotificationQueueItem.TYPE_SELECT_ONE)
+                || selectedItem.getType().equals(NotificationQueueItem.TYPE_SELECT_MANY)) {
+            ExpFeedbackResultBean responseBean = new ExpFeedbackResultBean();
+            responseBean.setRequestId(selectedItem.getItemId());
+
+            List<String> feedback = new ArrayList<String>();
+
+            if (selectedItem.getType().equals(NotificationQueueItem.TYPE_SELECT_MANY)) {
+                // add all results
+                Collections.addAll(feedback, selectedItem.getResults());
+            } else {
+                // add one result
+                feedback.add(selectedItem.getResult());
+            }
+
+            responseBean.setFeedback(feedback);
+
+            pubSubListener.sendExplicitResponse(responseBean);
+        } else if (selectedItem.getType().equals(NotificationQueueItem.TYPE_TIMED_ABORT)) {
+            ImpFeedbackResultBean responseBean = new ImpFeedbackResultBean();
+            responseBean.setRequestId(selectedItem.getItemId());
+            responseBean.setAccepted(false);
+
+            pubSubListener.sendImplicitResponse(responseBean);
+        }
+
+
     }
 }

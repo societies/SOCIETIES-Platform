@@ -1,8 +1,7 @@
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                xmlns:h="http://java.sun.com/jsf/html"
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
@@ -12,18 +11,33 @@
     <ui:define name="body">
 
 
-        <p:commandButton value="Send event"
-                         actionListener="#{ppNegotiationTest.sendEvent}"
-                         process="@this"/>
+        <p:panelGrid columns="3">
+            <p:commandButton value="Send PPN"
+                             actionListener="#{ppNegotiationTest.sendPpnEvent}"
+                             process="@this"/>
+            <h:outputText value="."/>
+            <p:commandButton value="Send UF Timed Abort"
+                             actionListener="#{ppNegotiationTest.sendTimedAbortEvent}"
+                             process="@this"/>
 
-        <p>
-            <p:outputLabel value="Negotiations in queue:" for="countLabel"/>
-            <p:inputText value="#{privacyPolicyNegotiationListener.queuedNegotiationCount}" readonly="true" id="countLabel"/>
-        </p>
+            <p:commandButton value="Send UF Ack/Nack"
+                             actionListener="#{ppNegotiationTest.sendAckNackEvent}"
+                             process="@this"/>
+            <p:commandButton value="Send UF Select One"
+                             actionListener="#{ppNegotiationTest.sendSelectOneEvent}"
+                             process="@this"/>
+            <p:commandButton value="Send UF Select Many"
+                             actionListener="#{ppNegotiationTest.sendSelectManyEvent}"
+                             process="@this"/>
 
-        <h:link value="Next page &gt;&gt;" outcome="privacy_policy_negotiation.xhtml"/>
+            <p:panel>
+                <p:poll interval="2" update="countLabel" process="@this"/>
+                <p:outputLabel value="Negotiations in queue:" for="countLabel"/>
+                <p:inputText value="#{privacyPolicyNegotiationListener.queuedNegotiationCount}" readonly="true"
+                             id="countLabel"/>
+            </p:panel>
 
-        <p:poll interval="2" update="countLabel" process="@this"/>
+        </p:panelGrid>
 
 
     </ui:define>
