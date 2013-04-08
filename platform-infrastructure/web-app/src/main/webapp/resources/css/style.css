@@ -564,7 +564,7 @@ ul#navigation ul ul ul {
 #navigation div.notification-bubble a {
     width: 48px;
     height: 48px;
-    text-align: center;
+    text-align: right;
     vertical-align: middle;
     padding: 0;
 }
