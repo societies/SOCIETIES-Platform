@@ -26,9 +26,9 @@
 package org.societies.api.internal.useragent.model;
 
 public class ExpProposalType {
-	
-	public static int RADIOLIST = 0;
-	public static int CHECKBOXLIST = 1;
-	public static int ACKNACK = 2;
+
+    public static final int RADIOLIST = 0;
+    public static final int CHECKBOXLIST = 1;
+    public static final int ACKNACK = 2;
 
 }
