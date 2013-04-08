@@ -112,6 +112,22 @@ public class RadioPopup extends Activity {
         return true;
     }
 
+    @Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "CheckboxPopup terminating");
+		if (isEventsConnected) {
+			eventsHelper.tearDownService(new IMethodCallback() {
+				@Override
+				public void returnException(String result) { }
+				@Override
+				public void returnAction(String result) { }
+				@Override
+				public void returnAction(boolean resultFlag) { }
+			});
+		}
+		super.onDestroy();
+	}
+    
     private void publishEvent() {
         try {
             ExpFeedbackResultBean bean = new ExpFeedbackResultBean();
@@ -137,21 +153,7 @@ public class RadioPopup extends Activity {
                 });
             }
             published = true;
-
             //FINISH
-            eventsHelper.tearDownService(new IMethodCallback() {
-                @Override
-                public void returnException(String result) {
-                }
-
-                @Override
-                public void returnAction(String result) {
-                }
-
-                @Override
-                public void returnAction(boolean resultFlag) {
-                }
-            });
             finish();
         } catch (PlatformEventsHelperNotConnectedException e) {
             Log.e("RadioPopup.publishEvent()", "Error sending response", e);

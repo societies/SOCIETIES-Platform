@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -195,6 +196,22 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 		
 	}
 	
+	@Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "NegotiationActivity terminating");
+		if (isEventsConnected) {
+			eventsHelper.tearDownService(new IMethodCallback() {
+				@Override
+				public void returnException(String result) { }
+				@Override
+				public void returnAction(String result) { }
+				@Override
+				public void returnAction(boolean resultFlag) { }
+			});
+		}
+		super.onDestroy();
+	}
+	
 	private void publishEvent() {
 		if (!isEventsConnected) {
 			eventsHelper.setUpService(new IMethodCallback() {
@@ -206,6 +223,7 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 				public void returnAction(boolean resultFlag) { 
 					if (resultFlag) {
 						try {
+							isEventsConnected = true;
 							eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT, NegotiationActivity.this.eventInfo, new IPlatformEventsCallback() {
 								@Override
 								public void returnException(int exception) { }
