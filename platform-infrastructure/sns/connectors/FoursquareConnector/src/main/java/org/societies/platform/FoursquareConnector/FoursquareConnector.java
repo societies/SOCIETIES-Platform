@@ -32,7 +32,8 @@ public interface FoursquareConnector extends ISocialConnector {
 	public static final String USER_PROFILE = "https://api.foursquare.com/v2/users/self?oauth_token=";
 	public static final String RECENT_CHECKINS = "https://api.foursquare.com/v2/users/self/checkins?oauth_token=";
 	public static final String POST_CHECKINS = "https://api.foursquare.com/v2/checkins/add?oauth_token=";
-
+	public static final String FRIENDS = "https://api.foursquare.com/v2/users/self/friends?oauth_token=";
+	
 
 	static final String FQ_CLIENT_ID 	= "SZKIPIXWCQHOURERE4B5NHO3E2NFW4MRQRPI42B1Q5VLHJ1T";
 	static final String FQ_CLIENT_SECRET 	= "KVTR1YZKQWZL3BBYBE3MMAQRSVFLO11YE1S4JVYGU3QPBB4I";

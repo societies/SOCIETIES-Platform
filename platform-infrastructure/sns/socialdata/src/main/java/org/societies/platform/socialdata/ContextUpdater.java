@@ -38,7 +38,8 @@ import org.societies.platform.socialdata.converters.PersonConverterFactory;
 public class ContextUpdater {
 
     /** The logging facility. */
-    private static final Logger LOG = LoggerFactory .getLogger(ContextUpdater.class);
+    private static final Logger LOG = LoggerFactory
+	    .getLogger(ContextUpdater.class);
 
     ICtxBroker internalCtxBroker = null;
     IIdentity cssId = null;
@@ -69,10 +70,6 @@ public class ContextUpdater {
 	}
     };
 
-   
-    
-    
-    
     public void updateSocialData(List<ISocialConnector> connectors) {
 	this.connectors = connectors;
 	new Thread(updateCtxProfileThread).start();
@@ -91,53 +88,36 @@ public class ContextUpdater {
 
 	// updateStringFieldIfExists(snName, CtxAttributeTypes.TYPE);
 	updateStringFieldIfExist(profile.getAboutMe(), CtxAttributeTypes.ABOUT);
-	updateStringFieldIfExist(profile.getProfileUrl(),
-		CtxAttributeTypes.PROFILE_IMAGE_URL);
-	updateStringFieldIfExist(profile.getDisplayName(),
-		CtxAttributeTypes.NAME);
+	updateStringFieldIfExist(profile.getProfileUrl(), CtxAttributeTypes.PROFILE_IMAGE_URL);
+	updateStringFieldIfExist(profile.getDisplayName(), CtxAttributeTypes.NAME);
 
 	if (profile.getName() != null) {
-	    updateStringFieldIfExist(profile.getName().getGivenName(),
-		    CtxAttributeTypes.NAME_FIRST);
-	    updateStringFieldIfExist(profile.getName().getFamilyName(),
-		    CtxAttributeTypes.NAME_LAST);
+	    updateStringFieldIfExist(profile.getName().getGivenName(),CtxAttributeTypes.NAME_FIRST);
+	    updateStringFieldIfExist(profile.getName().getFamilyName(), CtxAttributeTypes.NAME_LAST);
 	}
 	// updateStringFieldIfExist(profile.getPhoneNumbers(),
 	// CtxAttributeTypes.PHONES);
-	updateStringFieldIfExist(profile.getPoliticalViews(),
-		CtxAttributeTypes.POLITICAL_VIEWS);
-	updateStringFieldIfExist(profile.getPreferredUsername(),
-		CtxAttributeTypes.USERNAME);
-	updateStringFieldIfExist(profile.getThumbnailUrl(),
-		CtxAttributeTypes.USERNAME);
-	updateStringFieldIfExist(profile.getRelationshipStatus(),
-		CtxAttributeTypes.STATUS);
-	updateStringFieldIfExist(profile.getReligion(),
-		CtxAttributeTypes.RELIGIOUS_VIEWS);
+	updateStringFieldIfExist(profile.getPoliticalViews(), CtxAttributeTypes.POLITICAL_VIEWS);
+	updateStringFieldIfExist(profile.getPreferredUsername(),CtxAttributeTypes.USERNAME);
+	updateStringFieldIfExist(profile.getThumbnailUrl(),CtxAttributeTypes.USERNAME);
+	updateStringFieldIfExist(profile.getRelationshipStatus(),CtxAttributeTypes.STATUS);
+	updateStringFieldIfExist(profile.getReligion(),CtxAttributeTypes.RELIGIOUS_VIEWS);
 
 	if (profile.getGender() != null)
-	    updateStringFieldIfExist(profile.getGender().name(),
-		    CtxAttributeTypes.SEX);
+	    updateStringFieldIfExist(profile.getGender().name(),CtxAttributeTypes.SEX);
 	if (profile.getBirthday() != null)
-	    updateStringFieldIfExist(profile.getBirthday().toGMTString(),
-		    CtxAttributeTypes.BIRTHDAY);
+	    updateStringFieldIfExist(profile.getBirthday().toGMTString(), CtxAttributeTypes.BIRTHDAY);
 	if (profile.getCurrentLocation() != null)
-	    updateStringFieldIfExist(profile.getCurrentLocation()
-		    .getFormatted(), CtxAttributeTypes.LOCATION_SYMBOLIC);
+	    updateStringFieldIfExist(profile.getCurrentLocation().getFormatted(), CtxAttributeTypes.LOCATION_SYMBOLIC);
 
 	updateStringFieldIfExist(profile.getBooks(), CtxAttributeTypes.BOOKS);
 	updateStringFieldIfExist(profile.getMusic(), CtxAttributeTypes.MUSIC);
-	updateStringFieldIfExist(profile.getInterests(),
-		CtxAttributeTypes.INTERESTS);
-	updateStringFieldIfExist(profile.getJobInterests(),
-		CtxAttributeTypes.JOBS_INTERESTS);
-	updateStringFieldIfExist(profile.getLanguagesSpoken(),
-		CtxAttributeTypes.LANGUAGES);
+	updateStringFieldIfExist(profile.getInterests(),CtxAttributeTypes.INTERESTS);
+	updateStringFieldIfExist(profile.getJobInterests(),CtxAttributeTypes.JOBS_INTERESTS);
+	updateStringFieldIfExist(profile.getLanguagesSpoken(),CtxAttributeTypes.LANGUAGES);
 	updateStringFieldIfExist(profile.getMovies(), CtxAttributeTypes.MOVIES);
-	updateStringFieldIfExist(profile.getTurnOns(),
-		CtxAttributeTypes.TURNSON);
-	updateStringFieldIfExist(profile.getActivities(),
-		CtxAttributeTypes.ACTIVITIES);
+	updateStringFieldIfExist(profile.getTurnOns(),CtxAttributeTypes.TURNSON);
+	updateStringFieldIfExist(profile.getActivities(),CtxAttributeTypes.ACTIVITIES);
 	// updateStringFieldIfExist(profile.getEmails(),
 	// CtxAttributeTypes.EMAIL);
 
@@ -187,21 +167,27 @@ public class ContextUpdater {
 	CtxEntity socialNetwork = null;
 
 	try {
-	    
-	    
-	    individualEntity = this.internalCtxBroker.retrieveIndividualEntity(this.cssId).get();
 
-	    Set<CtxAssociationIdentifier> snsAssocSet = individualEntity.getAssociations(CtxAssociationTypes.IS_CONNECTED_TO_SNS);
-	    LOG.debug("There are " + snsAssocSet.size()+ " associations with SocialNetworks");
+	    individualEntity = this.internalCtxBroker.retrieveIndividualEntity(
+		    this.cssId).get();
+
+	    Set<CtxAssociationIdentifier> snsAssocSet = individualEntity
+		    .getAssociations(CtxAssociationTypes.IS_CONNECTED_TO_SNS);
+	    LOG.debug("There are " + snsAssocSet.size()
+		    + " associations with SocialNetworks");
 
 	    if (snsAssocSet.size() > 0) {
 
-		List<CtxAssociationIdentifier> snsAssocList = new ArrayList<CtxAssociationIdentifier>(snsAssocSet);
+		List<CtxAssociationIdentifier> snsAssocList = new ArrayList<CtxAssociationIdentifier>(
+			snsAssocSet);
 		for (CtxAssociationIdentifier assocID : snsAssocList) {
 
-		    snsAssoc = (CtxAssociation) this.internalCtxBroker.retrieve(assocID).get();
-		    Set<CtxEntityIdentifier> snsEntitiesSet 	= snsAssoc.getChildEntities(CtxEntityTypes.SOCIAL_NETWORK);
-		    List<CtxEntityIdentifier> snsEntitiesList 	= new ArrayList<CtxEntityIdentifier>(snsEntitiesSet);
+		    snsAssoc = (CtxAssociation) this.internalCtxBroker
+			    .retrieve(assocID).get();
+		    Set<CtxEntityIdentifier> snsEntitiesSet = snsAssoc
+			    .getChildEntities(CtxEntityTypes.SOCIAL_NETWORK);
+		    List<CtxEntityIdentifier> snsEntitiesList = new ArrayList<CtxEntityIdentifier>(
+			    snsEntitiesSet);
 
 		    LOG.debug("lookup SN association" + snName);
 
@@ -209,13 +195,16 @@ public class ContextUpdater {
 		    // this.internalCtxBroker.lookupEntities(snsEntitiesList,
 		    // CtxAttributeTypes.NAME, snName).get();
 
-		    List<CtxEntityIdentifier> snEntList = this.internalCtxBroker.lookupEntities(snsEntitiesList,CtxAttributeTypes.TYPE, snName).get();
+		    List<CtxEntityIdentifier> snEntList = this.internalCtxBroker
+			    .lookupEntities(snsEntitiesList,
+				    CtxAttributeTypes.TYPE, snName).get();
 		    // List<CtxEntityIdentifier> snEntList =
 		    // this.internalCtxBroker.lookupEntities(snsEntitiesList,
 		    // CtxAttributeTypes.NAME, snName).get();
 
 		    if (snEntList.size() > 0) {
-			socialNetwork = (CtxEntity) this.internalCtxBroker.retrieve(snEntList.get(0)).get();
+			socialNetwork = (CtxEntity) this.internalCtxBroker
+				.retrieve(snEntList.get(0)).get();
 			return socialNetwork;
 		    }
 		}
@@ -223,38 +212,44 @@ public class ContextUpdater {
 	    }
 
 	    LOG.info("NO Asscotiation found  the User Entity");
-	    snsAssoc = this.internalCtxBroker.createAssociation(CtxAssociationTypes.IS_CONNECTED_TO_SNS).get();
+	    snsAssoc = this.internalCtxBroker.createAssociation(
+		    CtxAssociationTypes.IS_CONNECTED_TO_SNS).get();
 	    LOG.info("---> snsAssoc created ");
 
-	    List<CtxEntityIdentifier> snEntitiesList = this.internalCtxBroker.lookupEntities(CtxEntityTypes.SOCIAL_NETWORK, 
-		    						CtxAttributeTypes.TYPE, snName, snName).get();
+	    List<CtxEntityIdentifier> snEntitiesList = this.internalCtxBroker
+		    .lookupEntities(CtxEntityTypes.SOCIAL_NETWORK,
+			    CtxAttributeTypes.TYPE, snName, snName).get();
 
 	    if (snEntitiesList.size() == 0) {
-		
+
 		LOG.info("No SocialNetwork entity for this SN:" + snName);
-		socialNetwork = this.internalCtxBroker.createEntity(CtxEntityTypes.SOCIAL_NETWORK).get();
-		
-		LOG.info("SOCIAL_NETWORK entity created" + socialNetwork.getId());
-		CtxAttribute snsNameAttr = this.internalCtxBroker.createAttribute(socialNetwork.getId(), CtxAttributeTypes.TYPE).get();
+		socialNetwork = this.internalCtxBroker.createEntity(
+			CtxEntityTypes.SOCIAL_NETWORK).get();
+
+		LOG.info("SOCIAL_NETWORK entity created"
+			+ socialNetwork.getId());
+		CtxAttribute snsNameAttr = this.internalCtxBroker
+			.createAttribute(socialNetwork.getId(),
+				CtxAttributeTypes.TYPE).get();
 		snsNameAttr.setStringValue(snName);
 		this.internalCtxBroker.update(snsNameAttr);
 
 	    }
 
 	    else {
-		socialNetwork = (CtxEntity) this.internalCtxBroker.retrieve(snEntitiesList.get(0)).get();
+		socialNetwork = (CtxEntity) this.internalCtxBroker.retrieve(
+			snEntitiesList.get(0)).get();
 	    }
 
 	    LOG.debug("Add Association ...");
 	    snsAssoc.addChildEntity(socialNetwork.getId());
 	    snsAssoc.addChildEntity(individualEntity.getId());
 	    snsAssoc.setParentEntity(individualEntity.getId());
-	    snsAssoc = (CtxAssociation) this.internalCtxBroker.update(snsAssoc).get();
-	   
-	    
+	    snsAssoc = (CtxAssociation) this.internalCtxBroker.update(snsAssoc)
+		    .get();
+
 	    this.internalCtxBroker.update(individualEntity);
 
-	
 	} catch (InterruptedException e) {
 	    LOG.error("Error:" + e, e);
 	    e.printStackTrace();
@@ -269,7 +264,8 @@ public class ContextUpdater {
 	return socialNetwork;
     }
 
-    private CtxEntity storeSocialDataIntoContextBroker(String type, Serializable value) {
+    private CtxEntity storeSocialDataIntoContextBroker(String type,
+	    Serializable value) {
 
 	CtxAttribute attribute = null;
 
@@ -280,7 +276,8 @@ public class ContextUpdater {
 		LOG.info(">>>>> Updating user profile in context " + type
 			+ " values" + value);
 		List<CtxIdentifier> attributeIdentifiers = this.internalCtxBroker
-			.lookup(socialNetworkEntity.getId(),  CtxModelType.ATTRIBUTE, type).get();
+			.lookup(socialNetworkEntity.getId(),
+				CtxModelType.ATTRIBUTE, type).get();
 
 		if (attributeIdentifiers.size() > 0) {
 
@@ -327,30 +324,26 @@ public class ContextUpdater {
 	    if (socialNetworkEntity != null) {
 
 		LOG.info(">>>>> Check if FRIENDS fiels is already stored ");
-		List<CtxIdentifier> attributeFriendsIdentifiers = this.internalCtxBroker.lookup(socialNetworkEntity.getId(),
+		List<CtxIdentifier> attributeFriendsIdentifiers = this.internalCtxBroker
+			.lookup(socialNetworkEntity.getId(),
 				CtxModelType.ATTRIBUTE,
 				CtxAttributeTypes.FRIENDS).get();
-		
-		
-		
+
 		for (CtxIdentifier ctxID : attributeFriendsIdentifiers) {
 		    this.internalCtxBroker.remove(ctxID);
 		}
 
-		
 		attribute = this.internalCtxBroker.createAttribute(
-			socialNetworkEntity.getId(), 
-			CtxAttributeTypes.FRIENDS)
+			socialNetworkEntity.getId(), CtxAttributeTypes.FRIENDS)
 			.get();
-		
-		attribute = setAttrValueType(attribute,
-			CtxAttributeTypes.FRIENDS, 
-			friends.size() + " "+ snName + " friends");
-		
-		attribute = (CtxAttribute) this.internalCtxBroker.update(attribute).get();
 
-		
-		
+		attribute = setAttrValueType(attribute,
+			CtxAttributeTypes.FRIENDS, friends.size() + " "
+				+ snName + " friends");
+
+		attribute = (CtxAttribute) this.internalCtxBroker.update(
+			attribute).get();
+
 		for (Person friend : friends) {
 
 		    String name = "";
@@ -379,8 +372,9 @@ public class ContextUpdater {
 				}
 			    }
 			}
-			if (name.length()==0) name=friend.getId();
-			
+			if (name.length() == 0)
+			    name = friend.getId();
+
 			LOG.info("Add friend [attribute]:" + name);
 
 			attribute = this.internalCtxBroker.createAttribute(

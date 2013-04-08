@@ -63,13 +63,27 @@ public class ActionUtils {
 	}
 
 	/**
+	 * Create a list of mandatory actions
+	 * 
+	 * @param actionConstants Array of actions
+	 * @return List of mandatory actions
+	 */
+	public static List<Action> createList(ActionConstants... actionConstants) {
+		List<Action> actions = new ArrayList<Action>();
+		for (ActionConstants actionConstant : actionConstants) {
+			actions.add(create(actionConstant));
+		}
+		return actions;
+	}
+	
+	/**
 	 * Create a mandatory action
 	 * 
 	 * @param actionConstant
 	 * @return
 	 */
 	public static Action create(ActionConstants actionConstant) {
-		return create(actionConstant, true);
+		return create(actionConstant, false);
 	}
 
 	public static Action create(ActionConstants actionConstant, boolean optional) {

@@ -37,6 +37,7 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyTypeConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 
 /**
  * Utility class to manage RequestPolicy bean
@@ -139,7 +140,10 @@ public class RequestPolicyUtils {
 		}
 		return false;
 	}
-
+//
+//	public static RequestItem getRequestItem(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy privacyPolicy, Resource resourceTarger) {
+//		
+//	}
 
 	/**
 	 * Use PrivacyPolicyUtils.getDataTypes instead

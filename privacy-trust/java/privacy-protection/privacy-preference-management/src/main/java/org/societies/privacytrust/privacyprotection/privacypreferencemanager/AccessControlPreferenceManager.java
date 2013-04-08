@@ -45,6 +45,9 @@ import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.util.DataIdentifierFactory;
+import org.societies.api.identity.util.DataIdentifierUtils;
+import org.societies.api.identity.util.DataTypeDescriptionUtils;
+import org.societies.api.identity.util.DataTypeUtils;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager;
@@ -60,6 +63,7 @@ import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
+import org.societies.api.schema.identity.DataTypeDescription;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
@@ -250,9 +254,9 @@ public class AccessControlPreferenceManager {
 		reqItem.setResource(resource);
 		item.setRequestItem(reqItem);
 
-
-		String proposalText = requestor.getRequestorId().toString()+" is requesting access to perform the following actions to resource: \n"
-				+ "type: "+dataId.getType()+"\n(resource Id: "+dataId.getUri()+")\nSelect the actions you want to allow to be performed.";
+		DataTypeDescription dataTypeDescription =  (new DataTypeUtils()).getFriendlyDescription(dataId.getType());
+		String proposalText = requestor.getRequestorId().toString()+" is requesting access to your \"<span title=\""+dataTypeDescription.getFriendlyDescription()+"\">"+dataTypeDescription.getFriendlyName()+"</span>\" in order to perform the following actions.\n"
+				+ "Pick the allowed actions:";
 		String[] actionsStr = new String[notExistsPreference.size()];
 		int i = 0;
 		for (Action a: notExistsPreference){

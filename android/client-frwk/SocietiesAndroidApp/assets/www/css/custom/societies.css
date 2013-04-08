@@ -398,6 +398,19 @@ ul.menu{
     -o-transition: height 2s linear; /* Opera */    
 }
 
+.privacy_global-behaviour{
+font-size: 0.5em;
+vertical-align: middle;
+margin-right: 8px;
+position: relative;
+bottom: 0.2em;
+border: 1px solid gray;
+border-radius: 3px;
+padding: 1px;
+}
+.privacy_private{background-color: #2489CE;}
+.privacy_members-only{background-color: #7cc4e7;}
+.privacy_public{background-color: #bde1f3;}
 .profile_txt{
 margin-left:145px;
 }

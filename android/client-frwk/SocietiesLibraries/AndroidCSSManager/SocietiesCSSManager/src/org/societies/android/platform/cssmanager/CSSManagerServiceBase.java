@@ -55,6 +55,7 @@ import org.societies.api.schema.cssmanagement.CssManagerResultBean;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
+import org.societies.api.schema.cssmanagement.FriendEntry;
 import org.societies.api.schema.cssmanagement.MethodType;
 import org.societies.identity.IdentityManagerImpl;
 import org.societies.utilities.DBC.Dbc;
@@ -1204,10 +1205,17 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 				if (retValue instanceof CssManagerResultBean) {
 					CssManagerResultBean resultBean = (CssManagerResultBean) retValue;
 					//cssAdvertisementRecords
-					if (IAndroidCSSManager.SUGGESTED_FRIENDS == this.returnIntent || IAndroidCSSManager.GET_CSS_FRIENDS == this.returnIntent || IAndroidCSSManager.GET_FRIEND_REQUESTS==this.returnIntent) {
-						//ACssAdvertisementRecord advertArray [] = ACssAdvertisementRecord.getArray(resultBean.getResultAdvertList());
+					if (IAndroidCSSManager.GET_CSS_FRIENDS == this.returnIntent || IAndroidCSSManager.GET_FRIEND_REQUESTS==this.returnIntent) {
 						CssAdvertisementRecord advertArray[] = new CssAdvertisementRecord[resultBean.getResultAdvertList().size()]; 
 						advertArray = resultBean.getResultAdvertList().toArray(advertArray);
+						
+						intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, true);						
+						intent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, advertArray);
+					}
+					//FriendEntry array
+					if (IAndroidCSSManager.SUGGESTED_FRIENDS == this.returnIntent) {
+						FriendEntry advertArray[] = new FriendEntry[resultBean.getResultSuggestedFriends().size()]; 
+						advertArray = resultBean.getResultSuggestedFriends().toArray(advertArray);
 						
 						intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, true);						
 						intent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, advertArray);

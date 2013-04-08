@@ -5,6 +5,31 @@
  */
 var CSSFriendsServices = {
 	
+	isFacebookFlagged: function(flag) {
+		var FACEBOOK_BIT=0x0000000001;
+		return (flag & FACEBOOK_BIT) === FACEBOOK_BIT; 
+	},
+			
+	isTwitterFlagged: function(flag) {
+		var TWITTER_BIT=0x0000000010;
+		return (flag & TWITTER_BIT) === TWITTER_BIT; 
+	},
+	
+	isLinkedinFlagged: function(flag) {
+		var LINKEDIN_BIT=0x0000000100;
+		return (flag & LINKEDIN_BIT) === LINKEDIN_BIT; 
+	},
+	
+	isFoursquareFlagged: function(flag) {
+		var FOURSQUARE_BIT=0x0000001000;
+		return (flag & FOURSQUARE_BIT) === FOURSQUARE_BIT; 
+	},
+	
+	isGooglePlusFlagged: function(flag) {
+		var GOOGLEPLUS_BIT=0x0000010000;
+		return (flag & GOOGLEPLUS_BIT) === GOOGLEPLUS_BIT; 
+	},
+	
 	/**
 	 * @methodOf Societies3PServices#
 	 * @description Refresh your friend requests
@@ -114,7 +139,7 @@ var CSSFriendsServices = {
 			$("span#suggestedFriendsCount").html(data.length);
 			$("span#suggestedFriendsCount").css({ visibility: "visible"});			
 			//DISPLAY RECORDS
-			CSSFriendsServices.displayCSSAdvertRecords(data);
+			CSSFriendsServices.displayFriendEntryRecords(data);
 		}
 		
 		function failure(data) {
@@ -122,6 +147,38 @@ var CSSFriendsServices = {
 		}
 		
 		window.plugins.SocietiesLocalCSSManager.getSuggestedFriends(success, failure);
+	},
+	
+	displayFriendEntryRecords: function(data) {
+		//EMPTY TABLE - NEED TO LEAVE THE HEADER
+		while( $('ul#SuggestedFriendsListUL').children().length >1 )
+			$('ul#SuggestedFriendsListUL li:last').remove();
+
+		//DISPLAY SUGGESTIONS
+		for (i  = 0; i < data.length; i++) {
+			//GENERATE SNS IMAGES
+			var images="";
+			if (CSSFriendsServices.isFacebookFlagged(data[i].value))
+				images+='<img src="images/icons/facebook-col.png" width="20" height="20" /> &nbsp;';
+			if (CSSFriendsServices.isTwitterFlagged(data[i].value))
+				images+='<img src="images/icons/twitter-col.png" width="20" height="20" /> &nbsp;';
+			if (CSSFriendsServices.isLinkedinFlagged(data[i].value))
+				images+='<img src="images/icons/linkedin-col.png" width="20" height="20" /> &nbsp;';
+			if (CSSFriendsServices.isFoursquareFlagged(data[i].value))
+				images+='<img src="images/icons/foursquare-col.png" width="20" height="20" /> &nbsp;';
+			if (CSSFriendsServices.isGooglePlusFlagged(data[i].value))
+				images+='<img src="images/icons/googleplus-col.png" width="20" height="20" /> &nbsp;';
+			
+			//ADD TO LINE ITEM
+			var tableEntry = '<li id="li' + i + '"><a href="#" onclick="CSSFriendsServices.sendFriendRequest(\'' + data[i].key.name + '\', \'' + data[i].key.id + '\', ' + i + ')">' +
+				'<img src="images/profile_pic.png" />' +
+				'<p class="ui-li-aside">' + images + '</p>' + 
+				'<h2>' + data[i].key.name + '</h2>' + 
+				'<p>' + data[i].key.id + '</p>' +
+				'</a></li>';
+			$('ul#SuggestedFriendsListUL').append(tableEntry);
+		}
+		$('ul#SuggestedFriendsListUL').listview('refresh');
 	},
 	
 	displayCSSAdvertRecords: function(data) {
