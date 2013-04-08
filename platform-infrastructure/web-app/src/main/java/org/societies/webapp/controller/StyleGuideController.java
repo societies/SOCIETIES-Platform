@@ -5,14 +5,14 @@ import javax.faces.bean.SessionScoped;
 
 @ManagedBean(name = "styleguide")
 @SessionScoped
-public class StyleGuideController_renamed extends BasePageController {
+public class StyleGuideController extends BasePageController {
 
     private int sliderVal1 = 5;
     private int sliderVal2 = 25;
     private String stringVal = "some text";
 
-    public StyleGuideController_renamed() {
-        log.trace("StyleGuideController_renamed ctor()");
+    public StyleGuideController() {
+        log.trace("StyleGuideController ctor()");
     }
 
 
