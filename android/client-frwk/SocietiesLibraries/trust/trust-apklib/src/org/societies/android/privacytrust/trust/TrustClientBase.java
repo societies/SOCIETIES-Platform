@@ -160,7 +160,7 @@ public class TrustClientBase implements IInternalTrustClient {
 			final TrustValueTypeBean trustValueType) {
 		
 		final StringBuilder sb = new StringBuilder();
-		sb.append("Retrieving trust:");
+		sb.append("Retrieving trust value:");
 		sb.append(" client=");
 		sb.append(client);
 		sb.append(", requestor=");
@@ -234,7 +234,7 @@ public class TrustClientBase implements IInternalTrustClient {
 		if (timestamp == null)
 			throw new NullPointerException("timestamp can't be null");
 		
-		this.doAddDirectTrustEvidence(client, null, subjectId, objectId, type, timestamp, info);
+		this.doAddDirectTrustEvidence(client, requestor, subjectId, objectId, type, timestamp, info);
 	}
 	
 	/*
@@ -589,8 +589,10 @@ public class TrustClientBase implements IInternalTrustClient {
 				return;
 			}
 			
-			if(TrustClientBase.this.restrictBroadcast)
+			if (TrustClientBase.this.restrictBroadcast)
 				intent.setPackage(this.client);
+			intent.addFlags(Intent.FLAG_DEBUG_LOG_RESOLUTION);
+			Log.d(TrustClientBase.TAG, "receiveResult: broadcasting intent " + intent); 
 			TrustClientBase.this.androidContext.sendBroadcast(intent);
 		}
 

@@ -25,12 +25,17 @@
 package org.societies.android.privacytrust.trust.test;
 
 import java.util.Date;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.societies.android.api.common.ADate;
+import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.privacytrust.trust.ITrustClient;
 import org.societies.android.privacytrust.trust.container.TestServiceTrustClientLocal;
 import org.societies.android.privacytrust.trust.container.TestServiceTrustClientLocal.LocalTrustClientBinder;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean;
+import org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean;
 
@@ -43,186 +48,207 @@ import android.test.suitebuilder.annotation.MediumTest;
 import android.util.Log;
 
 /**
- * 1. Created identity must be deleted prior to test on XMPP server
- * 2. Ensure that test data in test source matches XMPP server and Virgo details
+ * 1. Ensure that {@link TestTrustClient#TEST_TRUSTOR_ID} matches the JID of
+ * the cloud node of the android client.
  */
 public class TestTrustClient extends ServiceTestCase<TestServiceTrustClientLocal> {
 
 	private static final String TAG = TestTrustClient.class.getName();
-	private static final String CLIENT = "org.societies.android.privacytrust.trust.test";
-	private static final int DELAY = 10000;
-	private static final int TEST_END_DELAY = 2000;
-	
-	// TEST VALUES
-	private static final String TEST_TRUSTOR_ID = "jane.societies.local";
-	private static final String TEST_TRUSTEE_ID = "john.societies.local";
-	private static final Double TEST_TRUST_RATING = 1.0d;
-	
-    private ITrustClient trustClient;
-    
-    private long testStartTime;
-    private long testEndTime;
-    private boolean testCompleted;
-	
-    public TestTrustClient() {
+	private static final String CLIENT = "org.societies.android.privacytrust.trust.container";
+	private static final long DELAY = 5000l;
 
-        super(TestServiceTrustClientLocal.class);
-    }
+	// TEST VALUES
+	private static final String TEST_TRUSTOR_ID = "university.ict-societies.eu"; // MUST MATCH THE CLOUD NODE!
+	private static final String TEST_TRUSTEE_ID = "bob.societies.local"; // ANY STRING WILL DO 
+	private static final Double TEST_TRUST_RATING = 1.0d;
+
+	private ITrustClient trustClient;
+
+	private BroadcastReceiver receiver;
+	private long testStartTime;
+	private long testEndTime;
+	private CountDownLatch serviceStartedSignal;
+	private CountDownLatch testDoneSignal;
+
+	public TestTrustClient() {
+
+		super(TestServiceTrustClientLocal.class);
+	}
 
 	protected void setUp() throws Exception {
-		
+
 		super.setUp();
-		
-        Intent commsIntent = new Intent(getContext(), TestServiceTrustClientLocal.class);
-        LocalTrustClientBinder binder = (LocalTrustClientBinder) bindService(commsIntent);
-        assertNotNull(binder);
-        this.trustClient = (ITrustClient) binder.getService();
-        trustClient.startService();
-        Thread.sleep(DELAY);
+
+		this.receiver = this.setupBroadcastReceiver();
+		this.serviceStartedSignal = new CountDownLatch(1);
+		Intent commsIntent = new Intent(getContext(), TestServiceTrustClientLocal.class);
+		LocalTrustClientBinder binder = (LocalTrustClientBinder) bindService(commsIntent);
+		assertNotNull(binder);
+		this.trustClient = (ITrustClient) binder.getService();
+		this.trustClient.startService();
+		assertTrue(this.serviceStartedSignal.await(DELAY, TimeUnit.MILLISECONDS));
 	}
 
 	protected void tearDown() throws Exception {
-		
-		Thread.sleep(TEST_END_DELAY);
-        //ensure that service is shutdown to test if service leakage occurs
-        super.shutdownService();
+
+		//ensure that the broadcast receiver is shutdown to prevent more than one active receiver
+		this.unregisterReceiver(this.receiver);
+		Thread.sleep(DELAY);
+		//ensure that service is shutdown to test if service leakage occurs
+		super.shutdownService();
 		super.tearDown();
 	}
 
 	@MediumTest
 	public void testAddDirectTrustEvidence() throws Exception {
-		
-		this.testCompleted = false;
-		BroadcastReceiver receiver = this.setupBroadcastReceiver();
+
+		this.testDoneSignal = new CountDownLatch(1);
 		this.testStartTime = System.currentTimeMillis();
 		this.testEndTime = this.testStartTime;
-		
+
+		final RequestorBean requestor = new RequestorBean();
+		requestor.setRequestorId(TEST_TRUSTOR_ID);
+
 		final TrustedEntityIdBean subjectId =
 				new TrustedEntityIdBean();
 		subjectId.setEntityId(TEST_TRUSTOR_ID);
 		subjectId.setEntityType(TrustedEntityTypeBean.CSS);
-		
+
 		final TrustedEntityIdBean objectId =
 				new TrustedEntityIdBean();
 		objectId.setEntityId(TEST_TRUSTEE_ID);
 		objectId.setEntityType(TrustedEntityTypeBean.CSS);
-		
+
 		Log.d(TAG, "testAddDirectTrustEvidence start time: " + this.testStartTime);
-        try {
-        	this.trustClient.addDirectTrustEvidence(CLIENT, subjectId, objectId, 
-        			TrustEvidenceTypeBean.RATED, new ADate(new Date()), TEST_TRUST_RATING);
-        } catch (Exception e) {
-        	Log.e(TAG, "Failed to add direct trust evidence: " + e.getLocalizedMessage(), e);
-        }
-        Thread.sleep(DELAY);
-		//ensure that the broadcast receiver is shutdown to prevent more than one active receiver
-        this.unregisterReceiver(receiver);
-        assertTrue(this.testCompleted);
+		try {
+			this.trustClient.addDirectTrustEvidence(CLIENT, requestor, 
+					subjectId, objectId, TrustEvidenceTypeBean.RATED,
+					new ADate(new Date()), TEST_TRUST_RATING);
+		} catch (Exception e) {
+			Log.e(TAG, "Failed to add direct trust evidence: " + e.getLocalizedMessage(), e);
+		}
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
 	}
-	
+
+	/**
+	 * MUST be run after {@link #testAddDirectTrustEvidence()}. 
+	 * 
+	 * @throws Exception
+	 */
 	@MediumTest
-	public void testRetrieveTrust() throws Exception {
-		
-		this.testCompleted = false;
-		BroadcastReceiver receiver = this.setupBroadcastReceiver();
+	public void testRetrieveTrustValue() throws Exception {
+
+		this.testDoneSignal = new CountDownLatch(1);
 		this.testStartTime = System.currentTimeMillis();
 		this.testEndTime = this.testStartTime;
-		
+
+		final RequestorBean requestor = new RequestorBean();
+		requestor.setRequestorId(TEST_TRUSTOR_ID);
+
 		final TrustedEntityIdBean trustorId =
 				new TrustedEntityIdBean();
 		trustorId.setEntityId(TEST_TRUSTOR_ID);
 		trustorId.setEntityType(TrustedEntityTypeBean.CSS);
-		
+
 		final TrustedEntityIdBean trusteeId =
 				new TrustedEntityIdBean();
 		trusteeId.setEntityId(TEST_TRUSTEE_ID);
 		trusteeId.setEntityType(TrustedEntityTypeBean.CSS);
-		
-		Log.d(TAG, "testRetrieveTrust start time: " + this.testStartTime);
-        try {
-        	this.trustClient.retrieveTrust(CLIENT, trustorId, trusteeId);
-        } catch (Exception e) {
-        	Log.e(TAG, "Failed to retrieve trust: " + e.getLocalizedMessage(), e);
-        }
-        Thread.sleep(DELAY);
-		//ensure that the broadcast receiver is shutdown to prevent more than one active receiver
-        this.unregisterReceiver(receiver);
-        assertTrue(this.testCompleted);
+
+		Log.d(TAG, "testRetrieveTrustValue start time: " + this.testStartTime);
+		try {
+			this.trustClient.retrieveTrustValue(CLIENT, 
+					requestor, trustorId, trusteeId, TrustValueTypeBean.USER_PERCEIVED);
+		} catch (Exception e) {
+			Log.e(TAG, "Failed to retrieve trust: " + e.getLocalizedMessage(), e);
+		}
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
 	}
-	
-    /**
-     * Create a broadcast receiver
-     * 
-     * @return the created broadcast receiver
-     */
-    private BroadcastReceiver setupBroadcastReceiver() {
 
-        Log.d(TAG, "Setting up main broadcast receiver");
-        BroadcastReceiver receiver = new MainReceiver();
-        super.getContext().registerReceiver(receiver, this.createTestIntentFilter());
-        Log.d(TAG, "Registered main broadcast receiver");
+	/**
+	 * Create a broadcast receiver
+	 * 
+	 * @return the created broadcast receiver
+	 */
+	private BroadcastReceiver setupBroadcastReceiver() {
 
-        return receiver;
-    }
-    
-    /**
-     * Unregister a broadcast receiver
-     * @param receiver
-     */
-    private void unregisterReceiver(BroadcastReceiver receiver) {
-    	
-        Log.d(TAG, "Unregistering broadcast receiver");
-        super.getContext().unregisterReceiver(receiver);
-    }
+		Log.d(TAG, "Setting up main broadcast receiver");
+		BroadcastReceiver receiver = new MainReceiver();
+		getContext().registerReceiver(receiver, this.createTestIntentFilter());
+		Log.d(TAG, "Registered main broadcast receiver");
 
-    /**
-     * Broadcast receiver to receive intent return values from service method calls
-     */
-    private class MainReceiver extends BroadcastReceiver {
+		return receiver;
+	}
 
-    	/*
-    	 * @see android.content.BroadcastReceiver#onReceive(android.content.Context, android.content.Intent)
-    	 */
-        @Override
-        public void onReceive(Context context, Intent intent) {
-        	
-	        Log.d(TAG, "Received action: " + intent.getAction());
-	
-	        if (intent.getAction().equals(ITrustClient.RETRIEVE_TRUST_VALUE)) {
-	        	
-	        	final Double trustValueThreshold = 0.4d;
-	        	final Double defaultTrustValue = -1.0d;
-	        	final Double trustValue = intent.getDoubleExtra(
-	        			ITrustClient.INTENT_RETURN_VALUE_KEY, defaultTrustValue);
-	        	Log.d(TAG, "Retrieved trust value: " + trustValue);
-	        	assertNotNull(trustValue);
-	        	assertFalse(trustValue.equals(defaultTrustValue));
-	        	assertTrue(trustValue > trustValueThreshold);
-                
-	        } else if (intent.getAction().equals(ITrustClient.ADD_DIRECT_TRUST_EVIDENCE)) {
-	        	
-	        	Log.d(TAG, "Added direct trust evidence");
-	        	// TODO the void is method. what to do?
-	        } 
-	        //signal that test has completed
-	        TestTrustClient.this.testCompleted = true;
-	        TestTrustClient.this.testEndTime = System.currentTimeMillis();
-            Log.d(TAG, intent.getAction() + " elapse time: " 
-            		+ (TestTrustClient.this.testEndTime - TestTrustClient.this.testStartTime));
-        }
-    }
+	/**
+	 * Unregister a broadcast receiver
+	 * @param receiver
+	 */
+	private void unregisterReceiver(BroadcastReceiver receiver) {
 
-    /**
-     * Create a suitable intent filter
-     * @return IntentFilter
-     */
-    private IntentFilter createTestIntentFilter() {
-        // register broadcast receiver to receive Trust Client return values 
-        IntentFilter intentFilter = new IntentFilter();
+		Log.d(TAG, "Unregistering broadcast receiver");
+		getContext().unregisterReceiver(receiver);
+	}
 
-        intentFilter.addAction(ITrustClient.RETRIEVE_TRUST_VALUE);
-        intentFilter.addAction(ITrustClient.ADD_DIRECT_TRUST_EVIDENCE);
-        
-        return intentFilter;
-    }
+	/**
+	 * Broadcast receiver to receive intent return values from service method calls
+	 */
+	private class MainReceiver extends BroadcastReceiver {
+
+		/*
+		 * @see android.content.BroadcastReceiver#onReceive(android.content.Context, android.content.Intent)
+		 */
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			Log.d(TAG, "Received action: " + intent.getAction());
+
+			if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STARTED_STATUS)) {
+				
+				final boolean serviceStarted = intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
+				Log.d(TAG, "Service started: " + serviceStarted);
+				assertTrue("Service not started", serviceStarted);
+				TestTrustClient.this.serviceStartedSignal.countDown();
+				return;
+
+			} else if (intent.getAction().equals(ITrustClient.RETRIEVE_TRUST_VALUE)) {
+
+				final Double trustValueThreshold = 0.4d;
+				final Double defaultTrustValue = -1.0d;
+				final Double trustValue = intent.getDoubleExtra(
+						ITrustClient.INTENT_RETURN_VALUE_KEY, defaultTrustValue);
+				Log.d(TAG, "Retrieved trust value: " + trustValue);
+				assertNotNull(trustValue);
+				assertFalse(trustValue.equals(defaultTrustValue));
+				assertTrue(trustValue > trustValueThreshold);
+
+			} else if (intent.getAction().equals(ITrustClient.ADD_DIRECT_TRUST_EVIDENCE)) {
+
+				Log.d(TAG, "Added direct trust evidence");
+				// TODO the method is void. what to do?
+			} 
+			TestTrustClient.this.testEndTime = System.currentTimeMillis();
+			Log.d(TAG, intent.getAction() + " elapse time: " 
+					+ (TestTrustClient.this.testEndTime - TestTrustClient.this.testStartTime));
+			TestTrustClient.this.testDoneSignal.countDown();
+		}
+	}
+
+	/**
+	 * Create a suitable intent filter
+	 * @return IntentFilter
+	 */
+	private IntentFilter createTestIntentFilter() {
+		// register broadcast receiver to receive Trust Client return values 
+		IntentFilter intentFilter = new IntentFilter();
+		Log.d(TAG, "intentFilter.addAction " + IServiceManager.INTENT_SERVICE_STARTED_STATUS); 
+		intentFilter.addAction(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+		Log.d(TAG, "intentFilter.addAction " + ITrustClient.RETRIEVE_TRUST_VALUE); 
+		intentFilter.addAction(ITrustClient.RETRIEVE_TRUST_VALUE);
+		Log.d(TAG, "intentFilter.addAction " + ITrustClient.ADD_DIRECT_TRUST_EVIDENCE); 
+		intentFilter.addAction(ITrustClient.ADD_DIRECT_TRUST_EVIDENCE);
+
+		Log.d(TAG, "created test intentFilter " + intentFilter); 
+		return intentFilter;
+	}
 }

@@ -41,14 +41,14 @@ import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
 public interface IInternalTrustClient extends ITrustClient {
 	
 	public static final String INTENT_RETURN_VALUE_KEY = 
-			"org.societies.android.privacytrust.trust.ReturnValue";
+			ITrustClient.INTENT_RETURN_VALUE_KEY;
     public static final String INTENT_RETURN_STATUS_KEY = 
-    		"org.societies.android.privacytrust.trust.ReturnStatus";
+    		ITrustClient.INTENT_RETURN_STATUS_KEY;
     
     public static final String RETRIEVE_TRUST_VALUE = 
-    		"org.societies.android.api.privacytrust.trust.RETRIEVE_TRUST_VALUE";
+    		ITrustClient.RETRIEVE_TRUST_VALUE;
     public static final String ADD_DIRECT_TRUST_EVIDENCE = 
-    		"org.societies.android.api.privacytrust.trust.ADD_DIRECT_TRUST_EVIDENCE";
+    		ITrustClient.ADD_DIRECT_TRUST_EVIDENCE;
 
     String methodsArray [] = {
     		"retrieveTrustValue(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
