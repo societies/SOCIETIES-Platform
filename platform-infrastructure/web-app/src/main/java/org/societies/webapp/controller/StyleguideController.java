@@ -8,7 +8,7 @@ import javax.faces.bean.SessionScoped;
 public class StyleGuideController extends BasePageController {
 
     private int sliderVal1 = 5;
-    private int sliderVal2 = 10;
+    private int sliderVal2 = 25;
     private String stringVal = "some text";
 
     public StyleGuideController() {
