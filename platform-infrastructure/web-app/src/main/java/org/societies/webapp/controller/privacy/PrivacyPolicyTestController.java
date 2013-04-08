@@ -16,6 +16,8 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +28,8 @@ public class PrivacyPolicyTestController extends BasePageController {
     private class PubSubListener implements Subscriber {
 
         public void registerForEvents() {
-            if (log.isTraceEnabled())
-                log.trace("registerForEvents()");
+//            if (log.isTraceEnabled())
+//                log.trace("registerForEvents()");
 
             if (getPubsubClient() == null) {
                 log.error("PubSubClient was null, cannot register for events");
@@ -50,17 +52,18 @@ public class PrivacyPolicyTestController extends BasePageController {
             }
         }
 
-        public void sendEvent(ResponsePolicy responsePolicy, NegotiationDetailsBean negotiationDetails) {
-            log.trace("sendEvent(): privacyNegotiation");
+        public void sendEvent(String itemId, ResponsePolicy responsePolicy, NegotiationDetailsBean negotiationDetails) {
+//            log.trace("sendEvent(): privacyNegotiation");
 
             UserFeedbackPrivacyNegotiationEvent payload = new UserFeedbackPrivacyNegotiationEvent();
             payload.setResponsePolicy(responsePolicy);
             payload.setNegotiationDetails(negotiationDetails);
 
+
             try {
                 getPubsubClient().publisherPublish(getUserService().getIdentity(),
                         EventTypes.UF_PRIVACY_NEGOTIATION,
-                        null,
+                        itemId,
                         payload);
 
             } catch (Exception e) {
@@ -74,7 +77,7 @@ public class PrivacyPolicyTestController extends BasePageController {
         @Override
         public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object item) {
             if (log.isTraceEnabled())
-                log.trace("pubsubEvent(): node=" + node + " item=" + item);
+                log.debug("pubsubEvent(): node=" + node + " item=" + item);
 
         }
 
@@ -84,16 +87,16 @@ public class PrivacyPolicyTestController extends BasePageController {
 
         @Override
         public void userLoggedIn() {
-            if (log.isTraceEnabled())
-                log.trace("userLoggedIn()");
+//            if (log.isTraceEnabled())
+//                log.trace("userLoggedIn()");
 
             pubSubListener.registerForEvents();
         }
 
         @Override
         public void userLoggedOut() {
-            if (log.isTraceEnabled())
-                log.trace("userLoggedOut()");
+//            if (log.isTraceEnabled())
+//                log.trace("userLoggedOut()");
         }
     }
 
@@ -126,8 +129,8 @@ public class PrivacyPolicyTestController extends BasePageController {
 
     @SuppressWarnings("UnusedDeclaration")
     public void setUserService(UserService userService) {
-        if (log.isTraceEnabled())
-            log.trace("setUserService() = " + userService);
+//        if (log.isTraceEnabled())
+//            log.trace("setUserService() = " + userService);
 
         if (this.userService != null) {
             this.userService.removeLoginListener(loginListener);
@@ -141,19 +144,24 @@ public class PrivacyPolicyTestController extends BasePageController {
         RequestorBean requestorBean = new RequestorBean();
         requestorBean.setRequestorId("req" + ++req_counter);
 
-        ResponsePolicy responsePolicy = buildResponsePolicy(requestorBean);
+        SecureRandom random = new SecureRandom();
+        String guid = new BigInteger(130, random).toString(32);
+
+        ResponsePolicy responsePolicy = buildResponsePolicy(guid, requestorBean);
 
 
         NegotiationDetailsBean negotiationDetails = new NegotiationDetailsBean();
         negotiationDetails.setRequestor(requestorBean);
         negotiationDetails.setNegotiationID(101);
 
-        pubSubListener.sendEvent(responsePolicy, negotiationDetails);
+        pubSubListener.sendEvent(guid, responsePolicy, negotiationDetails);
     }
 
-    private static ResponsePolicy buildResponsePolicy(RequestorBean requestorBean) {
+    private static ResponsePolicy buildResponsePolicy(String guid, RequestorBean requestorBean) {
+
+
         List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
-        responseItems.add(buildResponseItem("http://this.is.a.win/", "winning"));
+        responseItems.add(buildResponseItem("http://this.is.a.win/", "winning - " + guid));
 //        responseItems.add(buildResponseItem("http://paddy.rules/", "paddy"));
 //        responseItems.add(buildResponseItem("http://something.something.something/", "dark side"));
 

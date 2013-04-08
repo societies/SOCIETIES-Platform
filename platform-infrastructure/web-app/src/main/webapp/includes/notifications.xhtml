@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui">
+
+
+    <h:outputText value="This is a really dirty hack to ensure that the ppNegotation bean is initialized"
+                  rendered="#{privacyPolicyNegotiationListener.queuedNegotiationCount eq -1}"/>
+
+    <p:dialog id="notificationDialog" widgetVar="notificationDialog" resizable="true" header="Notifications"
+              draggable="true" modal="false">
+
+        <p:dataGrid id="notificationGrid" var="notification" value="#{notifications.negotiationQueue}"
+                    columns="1" emptyMessage="No notifications :(">
+
+            <p:panel header="#{notification.title}" style="text-align:center">
+                <h:panelGrid columns="1" style="width:100%">
+                    <h:outputText value="#{notification.title}"/>
+
+                    <h:outputText value="#{notification.arrivalDate}"/>
+
+                    <h:outputLink value="#{notification.infoLink}">More info</h:outputLink>
+                </h:panelGrid>
+            </p:panel>
+
+
+        </p:dataGrid>
+
+    </p:dialog>
+
+
+</ui:composition>
+</html>
