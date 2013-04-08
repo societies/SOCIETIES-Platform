@@ -316,7 +316,7 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 			Bitmap bitmap = ((BitmapDrawable)icon).getBitmap(); 
 			ByteArrayOutputStream stream = new ByteArrayOutputStream(); 
 			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream); 
-			byte[] bitmapdata = stream.toByteArray(); 
+			byte[] bitmapdata = stream.toByteArray();
 			String base64String = "data:image/png;base64," + Base64.encodeToString(bitmapdata, 0); 
 
 			//ADD PACKAGE INFO TO RETURNED ARRAY
@@ -332,7 +332,7 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 			newInfo.setApplicationDescription(desc);
 			newInfo.setVersionName(p.versionName);
 			newInfo.setVersionCode(p.versionCode);
-			newInfo.setIconAsB64string(base64String);
+			newInfo.setIcon(base64String);
 			res.add(newInfo);
 		}
 		return res;
