@@ -24,6 +24,9 @@
  */
 package org.societies.android.platform.useragent.feedback;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IPlatformEventsCallback;
@@ -67,7 +70,8 @@ public class EventListener extends Service {
 	private Looper mServiceLooper;
 	private ServiceHandler mServiceHandler;
 	private EventsHelper eventsHelper;
-
+	private Set<Integer> eventIds;
+	
 	// Handler that receives messages from the thread
 	private final class ServiceHandler extends Handler {
 		public ServiceHandler(Looper looper) {
@@ -77,6 +81,7 @@ public class EventListener extends Service {
 		@Override
 		public void handleMessage(Message msg) {
 			Log.d(this.getClass().getName(), "Message received in Userfeedback event thread");
+			eventIds = new HashSet<Integer>();
 			if (!boundToEventMgrService) {
 				setupBroadcastReceiver();
 				subscribeToEvents();
@@ -155,13 +160,18 @@ public class EventListener extends Service {
 			else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_REQUEST_INTENT)) {
 				Log.d(LOG_TAG, "Privacy Negotiation event received");
 				UserFeedbackPrivacyNegotiationEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
-				launchNegotiation(eventPayload);
+				//CHECK IF WE HAVE RECEIVED THIS ALREADY
+				int thisId = eventPayload.getNegotiationDetails().getNegotiationID();
+				if (!eventIds.contains(thisId)) {
+					eventIds.add(thisId);
+					launchNegotiation(eventPayload);
+				}
 			}
 			//PERMISSION REQUEST EVENT - payload is UserFeedbackBean 
 			else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_REQUEST_INTENT)) {
 				Log.d(LOG_TAG, "General Permission request event received");
 				UserFeedbackBean eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
-				String description = "Accept privacy policy?";
+				String description = eventPayload.getProposalText(); //"Accept privacy policy?";
 				addNotification(description, "Privacy Policy", eventPayload);
 			}
 		}

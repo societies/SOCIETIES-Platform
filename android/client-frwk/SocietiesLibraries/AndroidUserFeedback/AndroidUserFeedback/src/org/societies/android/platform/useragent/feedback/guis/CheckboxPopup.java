@@ -43,7 +43,7 @@ public class CheckboxPopup extends Activity {
         eventInfo = bundle.getParcelable(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY);
 
         //HEADER
-        TextView txtView = (TextView) findViewById(R.id.textView1);
+        TextView txtView = (TextView) findViewById(R.id.checkAckProposalText);
         txtView.setText(eventInfo.getProposalText());
         LinearLayout checkboxGroup = (LinearLayout) findViewById(R.id.radioAckRadioGroup);
         Button submitButton = (Button) findViewById(R.id.radioAckOkButton);
