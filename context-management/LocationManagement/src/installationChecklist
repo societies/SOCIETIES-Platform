@@ -15,8 +15,9 @@ CheckList:
 4. Make sure WAS is Up & Running
 5. Make sure the VG application is running (use Bertail to check logs for errors)
 6. In VG web app (on WAS) - Make sure the PZ_QUERY variable in PZClient points to PZ:
+	property should be:
 	"http://societies.local.macs.hw.ac.uk:9080/QueriesGatewayREST/RT/location/entity/";
-
-
-
- 
+7. Update the SocietiesResgistery bean params ( for VGProxy)
+	
+	The properties file is under: 
+		/ContextAwareWallWebApp/src/main/webapp/WEB-INF/applicationContext.xml
