@@ -184,6 +184,26 @@ window.plugins.SocietiesLocalCSSManager = {
 		//else {
 			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'cssActivityFeedFull'));
 		//}
+	},
+	getVCardUser: function(userID, successCallback, errorCallback){
+		//if (phonegapdesktop.internal.randomException("getCssActivities")) {
+		//	errorCallback('A random error was generated');
+		//}
+		//else {
+		var jsonMethod = "";
+		if (userID=="john.societies.local")
+			jsonMethod = "VCardJohn";
+		else if (userID=="jane.societies.local")
+			jsonMethod = "VCardJane";
+		else if (userID=="tom.societies.local")
+			jsonMethod = "VCardTom";
+		else if (userID=="bob.societies.local")
+			jsonMethod = "VCardBob";	
+		else
+			errorCallback("user vcard not found!");
+			
+		successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', jsonMethod));
+		//}
 	}
 }
 

@@ -53,7 +53,9 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.packet.DiscoverItems;
+import org.jivesoftware.smackx.packet.VCard;
 import org.societies.android.api.comms.XMPPAgent;
+import org.societies.android.api.comms.xmpp.VCardParcel;
 import org.societies.android.api.comms.xmpp.XMPPNode;
 import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.android.platform.comms.state.IConnectionState;
@@ -75,6 +77,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Parcelable;
 import android.util.Log;
 
 public class AndroidCommsBase implements XMPPAgent {
@@ -1256,7 +1259,6 @@ public class AndroidCommsBase implements XMPPAgent {
      * 
      */
     private class XMPPConnectionReceiver extends BroadcastReceiver {
-
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (DEBUG_LOGGING) {
@@ -1301,5 +1303,102 @@ public class AndroidCommsBase implements XMPPAgent {
 			
 			}
 		}
+    }
+    
+    public void setVCard(String client, VCardParcel vCard) {
+		//REQUIRED DUE TO ISSUE: https://code.google.com/p/asmack/issues/detail?id=14#c8
+		ProviderManager.getInstance().addIQProvider("vCard", "vcard-temp", new org.jivesoftware.smackx.provider.VCardProvider());
+		
+		VCard xmppCard = VCardUtilities.convertToXMPPVCard(vCard);		
+		try {
+			xmppCard.save(xmppConnectMgr.getValidConnection());
+		} catch (XMPPException e1) {
+			e1.printStackTrace();
+		} catch (NoXMPPConnectionAvailableException e) {
+			e.printStackTrace();
+		}
+    }
+    
+    public VCardParcel getVCard(String client, long remoteCallId, String userId) {
+    	//REQUIRED DUE TO ISSUE: https://code.google.com/p/asmack/issues/detail?id=14#c8
+    	ProviderManager.getInstance().addIQProvider("vCard", "vcard-temp", new org.jivesoftware.smackx.provider.VCardProvider());
+    	
+    	//CHECK IF WE HAVE THIS USER'S VCARD CACHED
+    	VCardParcel parcelVCard = null;
+    	if (userId != null)
+    		parcelVCard = VCardUtilities.getVCardFromDisk(this.serviceContext, userId);
+    	
+    	if (parcelVCard == null) {
+	    	//CONNECT TO XMPP SERVER AND RETRIEVE
+			try {
+				VCard returnedCard = new VCard();
+				returnedCard.load(xmppConnectMgr.getValidConnection());  //LOAD ANOTHER USER VCARD
+				parcelVCard = VCardUtilities.convertToParcelVCard(returnedCard);
+				//SAVE TO DISK
+				VCardUtilities.saveVCardToDisk(this.serviceContext, userId, parcelVCard);
+				
+				//SEND RETURN INTENT
+		    	Intent intent = new Intent(XMPPAgent.GET_USER_VCARD);
+		    	if (AndroidCommsBase.this.restrictBroadcast)
+					intent.setPackage(client);
+				intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, (Parcelable)parcelVCard);
+				intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+				this.serviceContext.sendBroadcast(intent);
+				
+			} catch (XMPPException e) {
+				e.printStackTrace();
+				
+			} catch (NoXMPPConnectionAvailableException e) {
+				Log.e(LOG_TAG, e.getMessage(), e);
+				//Send intent
+				Intent intent = new Intent(GET_USER_VCARD);
+				if (AndroidCommsBase.this.restrictBroadcast) {
+					intent.setPackage(client);
+				}
+				intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, (Parcelable)parcelVCard);
+				intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, "NoXMPPConnectionAvailableException");
+				intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+				intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+				AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+			}
+    	}
+		return null;
+    }
+    
+    public VCardParcel getVCard(String client, long remoteCallId) {
+    	//REQUIRED DUE TO ISSUE: https://code.google.com/p/asmack/issues/detail?id=14#c8
+    	ProviderManager.getInstance().addIQProvider("vCard", "vcard-temp", new org.jivesoftware.smackx.provider.VCardProvider());
+    	VCardParcel parcelVCard = null;
+
+		try {
+			VCard returnedCard = new VCard();
+			returnedCard.load(xmppConnectMgr.getValidConnection());
+			parcelVCard = VCardUtilities.convertToParcelVCard(returnedCard);
+			
+			//RETURN INTENT
+	    	Intent intent = new Intent(XMPPAgent.GET_VCARD);
+			if (AndroidCommsBase.this.restrictBroadcast)
+				intent.setPackage(client);
+			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, (Parcelable)parcelVCard);
+			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+			this.serviceContext.sendBroadcast(intent);
+			
+		} catch (XMPPException e) {
+			e.printStackTrace();
+			
+		} catch (NoXMPPConnectionAvailableException e) {
+			Log.e(LOG_TAG, e.getMessage(), e);
+			//Send intent
+			Intent intent = new Intent(GET_VCARD);
+			if (AndroidCommsBase.this.restrictBroadcast) {
+				intent.setPackage(client);
+			}
+			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, (Parcelable)parcelVCard);
+			intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, "NoXMPPConnectionAvailableException");
+			intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+		}
+		return null;
     }
 }

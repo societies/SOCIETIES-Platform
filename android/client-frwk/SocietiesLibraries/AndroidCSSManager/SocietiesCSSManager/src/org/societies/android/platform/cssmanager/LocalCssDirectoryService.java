@@ -28,11 +28,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.IQ;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.societies.android.api.cis.directory.ICisDirectory;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.ICommCallback;
 import org.societies.android.api.comms.xmpp.Stanza;
+import org.societies.android.api.comms.xmpp.VCardParcel;
 import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.css.directory.IAndroidCssDirectory;
@@ -43,10 +47,13 @@ import org.societies.api.schema.css.directory.CssDirectoryBean;
 import org.societies.api.schema.css.directory.MethodType;
 import org.societies.api.schema.css.directory.CssDirectoryBeanResult;
 
+import com.google.gson.Gson;
+
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.util.Log;
 
 /**
@@ -245,6 +252,26 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
 		return null;
 	}
 
+	@Override
+	public VCardParcel getUserVCard(String client, String userId) {
+		Log.d(LOG_TAG, "getUserVCard called by client: " + client);
+		if(connectedToComms) {
+			ICommCallback callback = new CSSDirectoryCallback(client, IAndroidCssDirectory.GET_USER_VCARD);
+			ccm.getVCard(userId, callback);
+		}
+		return null;
+	}
+
+	@Override
+	public VCardParcel getMyVCard(String client) {
+		Log.d(LOG_TAG, "getUserVCard called by client: " + client);
+		if(connectedToComms) {
+			ICommCallback callback = new CSSDirectoryCallback(client, IAndroidCssDirectory.GET_MY_VCARD);
+			ccm.getVCard(callback);
+		}
+		return null;
+	}
+	
 	/**
 	 * Callback used with Android Comms for CSSDirectory
 	 *
@@ -288,18 +315,38 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
 			if (client != null) {
 				Intent intent = new Intent(returnIntent);
 				
-				CssDirectoryBeanResult resultBean = (CssDirectoryBeanResult) retValue;
-				List<CssAdvertisementRecord> listRecords = resultBean.getResultCss();
-				CssAdvertisementRecord advertArray[] = resultBean.getResultCss().toArray(new CssAdvertisementRecord[listRecords.size()]);
-
-				intent.putExtra(IAndroidCssDirectory.INTENT_RETURN_STATUS_KEY, true);
-				intent.putExtra(IAndroidCssDirectory.INTENT_RETURN_VALUE_KEY, advertArray);
+				//CSS MANAGER RESULT BEAN
+				if (retValue instanceof CssDirectoryBeanResult) {
+					CssDirectoryBeanResult resultBean = (CssDirectoryBeanResult) retValue;
+					List<CssAdvertisementRecord> listRecords = resultBean.getResultCss();
+					CssAdvertisementRecord advertArray[] = resultBean.getResultCss().toArray(new CssAdvertisementRecord[listRecords.size()]);
+	
+					intent.putExtra(IAndroidCssDirectory.INTENT_RETURN_STATUS_KEY, true);
+					intent.putExtra(IAndroidCssDirectory.INTENT_RETURN_VALUE_KEY, advertArray);
+				}
+				//VCARD RETURNED
+				else if (retValue instanceof VCardParcel) {
+					VCardParcel vCard = (VCardParcel)retValue;
+					intent.putExtra(IAndroidCssDirectory.INTENT_RETURN_STATUS_KEY, true);
+					intent.putExtra(IAndroidCssDirectory.INTENT_RETURN_VALUE_KEY, (Parcelable)vCard);
+				}
 				intent.setPackage(client);
-
 				LocalCssDirectoryService.this.sendBroadcast(intent);
 				Log.d(LOG_TAG, "CSSDirectoryCallback Callback receiveResult sent return value: " + retValue);
 			}
 		}
 	}
+
+	private JSONObject convertCssNode(VCardParcel card) {
+        JSONObject jObj = new JSONObject();
+		Gson gson = new Gson();
+		try {
+			jObj =  (JSONObject) new JSONTokener(gson.toJson(card)).nextValue();
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+        return jObj;
+    }
 	
 }
