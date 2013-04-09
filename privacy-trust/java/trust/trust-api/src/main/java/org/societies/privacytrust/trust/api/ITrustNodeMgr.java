@@ -26,6 +26,7 @@ package org.societies.privacytrust.trust.api;
 
 import java.util.Collection;
 
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 
@@ -51,17 +52,33 @@ public interface ITrustNodeMgr {
 	public Collection<TrustedEntityId> getMyIds();
 	
 	/**
-	 * 
-	 * @return
-	 * @since 1.0
-	 */
-	public Requestor getLocalRequestor();
-	
-	/**
 	 * Returns <code>true</code> if this node is master; <code>false</code> otherwise.
 	 * 
 	 * @return <code>true</code> if this node is master; <code>false</code> otherwise.
 	 * @since 0.5
 	 */
 	public boolean isMaster();
+	
+	/**
+	 * Returns the local requestor on whose behalf this node operates.
+	 * 
+	 * @return the local requestor on whose behalf this node operates.
+	 * @since 1.0
+	 */
+	public Requestor getLocalRequestor();
+	
+	/**
+	 * Returns the {@link IIdentity} instance of the specified 
+	 * {@link TrustedEntityId}. 
+	 * 
+	 * @param teid 
+	 *            the {@link TrustedEntityId} from which to create the
+	 *            {@link IIdentity} instance.
+	 * @return the {@link IIdentity} instance of the specified 
+	 *         {@link TrustedEntityId}.
+	 * @throws NullPointerException if the specified teid is <code>null</code>.
+	 * @throws IllegalArgumentException if the specified teid is invalid.
+	 * @since 1.0
+	 */
+	public IIdentity fromId(final TrustedEntityId teid);
 }
