@@ -124,6 +124,15 @@ th {
 					<form:errors path="resources[${status.index}].resourceTypeCustom"
 						cssClass="error" />
 
+					<input type="checkbox" name="resources[${status.index}].optional"
+							id="resources${status.index}.optional1"
+							value="1"
+							<c:if test="${resource.optional}">checked="checked"</c:if>
+							class="inline"
+							/>
+					<form:label path="resources[${status.index}].optional"
+						class="inline">Optional?</form:label>
+						
 
 					<div class="clear"></div>
 
