@@ -210,7 +210,7 @@ public interface ITrustBroker {
 	/**
 	 * Retrieves the trust relationships of the specified trustor matching the
 	 * supplied criteria. More specifically, the {@link TrustedEntityType type}
-	 * of the entities trusted by the trustor and/or the trust value type, i.e. one of 
+	 * of the entities trusted by the trustor and the trust value type, i.e. one of 
 	 * {@link TrustValueType#DIRECT DIRECT}, 
 	 * {@link TrustValueType#INDIRECT INDIRECT}, or
 	 * {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}, are also specified.
