@@ -37,7 +37,13 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.societies.api.schema.useragent.feedback.FeedbackMethodType;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,15 +77,17 @@ public class UserFeedbackMocker implements Subscriber {
 			LOG.error("[Dependency Injection] UserFeedbackMocker is not ready. Missing dependencies.");
 			return;
 		}
-		LOG.info("### [UserFeedbackMock] init method");
+		LOG.info("### init method");
 		// -- Rettrieve cloud node JID
 		cloodNodeJid = commManager.getIdManager().getThisNetworkNode();
-		LOG.debug("### [UserFeedbackMock] Got my cloud ID: "+cloodNodeJid);
+		LOG.debug("### Got my cloud ID: "+cloodNodeJid);
 
 		// -- Register for events from created pubsub node
-		LOG.debug("### [UserFeedbackMock] Registering for user feedback pubsub node");
+		LOG.debug("### Registering for user feedback pubsub node");
 		try {
 			pubsub.subscriberSubscribe(cloodNodeJid, "org/societies/useragent/feedback/event/REQUEST", this);
+			pubsub.subscriberSubscribe(cloodNodeJid, EventTypes.UF_PRIVACY_NEGOTIATION, this);
+			pubsub.subscriberSubscribe(cloodNodeJid, EventTypes.UF_PRIVACY_ACCESS_CONTROL, this);
 			//pubsub.subscriberSubscribe(myCloudID, "org/societies/useragent/feedback/event/EXPLICIT_RESPONSE", this);
 			//pubsub.subscriberSubscribe(myCloudID, "org/societies/useragent/feedback/event/IMPLICIT_RESPONSE", this);
 		} catch (XMPPError e) {
@@ -87,14 +95,16 @@ public class UserFeedbackMocker implements Subscriber {
 		} catch (CommunicationException e) {
 			LOG.error("Can't subscribe to the userfeedback event due to communication exception", e);
 		}
-		LOG.debug("### [UserFeedbackMock] Pubsub registration complete!");
+		LOG.debug("### Pubsub registration complete!");
 	}
 
 	public void onDestroy() {
 		// -- Unregister to events
-		LOG.debug("### [UserFeedbackMock] Unregistering for user feedback pubsub node");
+		LOG.debug("### Unregistering for user feedback pubsub node");
 		try {
 			pubsub.subscriberUnsubscribe(cloodNodeJid, "org/societies/useragent/feedback/event/REQUEST", this);
+			pubsub.subscriberUnsubscribe(cloodNodeJid, EventTypes.UF_PRIVACY_NEGOTIATION, this);
+			pubsub.subscriberUnsubscribe(cloodNodeJid, EventTypes.UF_PRIVACY_ACCESS_CONTROL, this);
 		} catch (XMPPError e) {
 			LOG.error("Can't unsubscribe to the userfeedback event due to XMPPError", e);
 		} catch (CommunicationException e) {
@@ -110,59 +120,119 @@ public class UserFeedbackMocker implements Subscriber {
 			return;
 		}
 		// -- Not a relevant event
-		if(!eventTopic.equalsIgnoreCase("org/societies/useragent/feedback/event/REQUEST")) {
+		if(!eventTopic.equalsIgnoreCase("org/societies/useragent/feedback/event/REQUEST")
+				&& !eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_NEGOTIATION)
+				&& !eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_ACCESS_CONTROL)) {
+			LOG.error("Hum, bad event receive: "+eventTopic);
 			return;
 		}
 
 		// -- Retrieve data
-		UserFeedbackBean ufBean = (UserFeedbackBean)item;
-		LOG.debug("+++ [UserFeedbackMock] Received pubsub event with topic: "+eventTopic);
-		LOG.debug("+++ [UserFeedbackMock] "+ufBean.getMethod().name());
-		for (String string : ufBean.getOptions()) {
-			LOG.debug("+++ [UserFeedbackMock] option: " + string);
+		String requestId = "";
+		String method = "";
+		int type = -1;
+		UserFeedbackBean ufBean = null;
+		UserFeedbackPrivacyNegotiationEvent ufNegotiationBean = null;
+		UserFeedbackAccessControlEvent ufAccessControlBean = null;
+		if (eventTopic.equalsIgnoreCase("org/societies/useragent/feedback/event/REQUEST")) {
+			ufBean = (UserFeedbackBean)item;
+			requestId = ufBean.getRequestId();
+			method = ufBean.getMethod().value();
+			type = ufBean.getType();
+		}
+		else if (eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_NEGOTIATION)) {
+			ufNegotiationBean = (UserFeedbackPrivacyNegotiationEvent)item;
+			requestId = ufNegotiationBean.getRequestId();
+			method = ufNegotiationBean.getMethod().value();
+			type = ufNegotiationBean.getType();
+		}
+		else if (eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_ACCESS_CONTROL)) {
+			ufAccessControlBean = (UserFeedbackAccessControlEvent)item;
+			requestId = ufAccessControlBean.getRequestId();
+			method = ufAccessControlBean.getMethod().value();
+			type = ufAccessControlBean.getType();
+		}
+		UserFeedbackType feedbackType = UserFeedbackType.fromValue(method+":"+type);
+		LOG.debug("Received pubsub event with topic: "+eventTopic+" - "+feedbackType);
+		if (eventTopic.equalsIgnoreCase("org/societies/useragent/feedback/event/REQUEST")) {
+			for (String string : ufBean.getOptions()) {
+				LOG.debug("option: " + string);
+			}
 		}
 
 		// -- Find in configuration
-		UserFeedbackType feedbackType = UserFeedbackType.fromValue(ufBean.getMethod().value()+":"+ufBean.getType());
 		boolean userfeedbackReplied = false;
 		if (mockResults.containsKey(feedbackType)) {
-			LOG.debug("+++ [UserFeedbackMock] Configuration found for this explicit request: "+ feedbackType);
+			LOG.debug("Configuration found for this explicit request: "+ feedbackType);
 			UserFeedbackMockResult mockResult = mockResults.get(feedbackType);
 			// - Send result
 			if (null != mockResult.getResult() || mockResult.getResult().size() >= 0) {
 				userfeedbackReplied = true;
-				userFeedback.submitExplicitResponse(ufBean.getRequestId(), mockResult.getResult());
+				// Send as output the specified data list
+				if (eventTopic.equalsIgnoreCase("org/societies/useragent/feedback/event/REQUEST")) {
+					userFeedback.submitExplicitResponse(requestId, mockResult.getResult());
+				}
+				// Send as output the specified ResponsePolicy
+				else if (eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_NEGOTIATION)) {
+					userFeedback.submitExplicitResponse(requestId, ufNegotiationBean.getNegotiationDetails(), mockResult.getPrivacyAgreementResult());
+				}
 			}
 			// - Send result using option indexes
 			else if (null != mockResult.getResult() || mockResult.getResult().size() >= 0) {
 				userfeedbackReplied = true;
-				for(Integer resultIndex : mockResult.getResultIndexes()) {
-					if (ufBean.getOptions().contains(resultIndex)) {
-						mockResult.addResult(ufBean.getOptions().get(resultIndex));
+				// Send as output the input at the specified index
+				if (eventTopic.equalsIgnoreCase("org/societies/useragent/feedback/event/REQUEST")) {
+					for(Integer resultIndex : mockResult.getResultIndexes()) {
+						if (ufBean.getOptions().contains(resultIndex)) {
+							mockResult.addResult(ufBean.getOptions().get(resultIndex));
+						}
 					}
+					userFeedback.submitExplicitResponse(requestId, mockResult.getResult());
 				}
-				userFeedback.submitExplicitResponse(ufBean.getRequestId(), mockResult.getResult());
+				// Send as output a ResponsePolicy with request items equals to input request items at the specified index
+				else if (eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_NEGOTIATION)) {
+					ResponsePolicy responsePolicy = new ResponsePolicy();
+					responsePolicy.setNegotiationStatus(ufNegotiationBean.getResponsePolicy().getNegotiationStatus());
+					responsePolicy.setRequestor(ufNegotiationBean.getResponsePolicy().getRequestor());
+					List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
+					for(Integer resultIndex : mockResult.getResultIndexes()) {
+						if (ufNegotiationBean.getResponsePolicy().getResponseItems().size() >= resultIndex) {
+							responseItems.add(ufNegotiationBean.getResponsePolicy().getResponseItems().get(resultIndex));
+						}
+					}
+					responsePolicy.setResponseItems(responseItems);
+					userFeedback.submitExplicitResponse(requestId, ufNegotiationBean.getNegotiationDetails(), responsePolicy);
+				}
 			}
 
 			// - Manage usage of this result value
 			mockResult.incrNbOfusage(-1);
 			if (!mockResult.isUsable()) {
-				mockResults.remove(ufBean.getType());
+				mockResults.remove(feedbackType);
 			}
 		}
 
 		// -- Default behaviour
 		if (!userfeedbackReplied) {
-			LOG.debug("+++ [UserFeedbackMock] Use default configuration for this request: "+ feedbackType);
-			if (FeedbackMethodType.GET_EXPLICIT_FB.equals(ufBean.getMethod())) {
-				List<String> result = new ArrayList<String>();
-				result.add(ufBean.getOptions().size() > 0 ? ufBean.getOptions().get(0) : "Ouch!");
-				userFeedback.submitExplicitResponse(ufBean.getRequestId(), result);
+			LOG.debug("Use default configuration for this request: "+ feedbackType);
+			if (FeedbackMethodType.GET_EXPLICIT_FB.equals(method)) {
+				// Send as output the first input string
+				if (eventTopic.equalsIgnoreCase("org/societies/useragent/feedback/event/REQUEST")) {
+					LOG.debug("Send as output the first input string");
+					List<String> result = new ArrayList<String>();
+					result.add(ufBean.getOptions().size() > 0 ? ufBean.getOptions().get(0) : "Ouch!");
+					userFeedback.submitExplicitResponse(ufBean.getRequestId(), result);
+				}
+				// Send as output the input ResponsePolicy
+				else if (eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_NEGOTIATION)) {
+					LOG.debug("Send as output the input ResponsePolicy");
+					userFeedback.submitExplicitResponse(ufNegotiationBean.getRequestId(), ufNegotiationBean.getNegotiationDetails(), ufNegotiationBean.getResponsePolicy());
+				}
 			}
-			else if (FeedbackMethodType.GET_IMPLICIT_FB.equals(ufBean.getMethod())) {
+			else if (FeedbackMethodType.GET_IMPLICIT_FB.equals(method)) {
 				userFeedback.submitImplicitResponse(ufBean.getRequestId(), true);
 			}
-			else if (FeedbackMethodType.SHOW_NOTIFICATION.equals(ufBean.getMethod())) {
+			else if (FeedbackMethodType.SHOW_NOTIFICATION.equals(method)) {
 				userFeedback.submitImplicitResponse(ufBean.getRequestId(), true);
 			}
 		}

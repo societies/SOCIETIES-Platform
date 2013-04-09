@@ -19,12 +19,28 @@
 		http://www.springframework.org/schema/tx 
 		http://www.springframework.org/schema/tx/spring-tx.xsd" >
 
+	<import resource="classpath*:test-bundle-context.xml" />
+
+	<bean id="TestCaseProperties"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreResourceNotFound" value="true"></property>
+		<property name="locations">
+			<list>
+				<value>classpath:META-INF/spring/org.societies.integration.test.properties
+				</value>
+				<value>file:${CONFIG_DIR}/org.societies.integration.test.properties
+				</value>
+			</list>
+		</property>
+	</bean>
+	
     <bean
         id="TestCase1264"
         class="org.societies.integration.test.bit.privacynegotiationmanagement.TestCase1264"
-        depends-on="CommManager, PrivacyPolicyManager, PrivacyAgreementManager, PrivacyPolicyNegotiationManager, ctxBroker"
+        depends-on="commManager, PrivacyPolicyManager, PrivacyAgreementManager, PrivacyPolicyNegotiationManager, ctxBroker"
         init-method="run">
-        <property name="commManager" ref="CommManager" />
+        <property name="commManager" ref="commManager" />
         <property name="privacyPolicyManager" ref="PrivacyPolicyManager" />
         <property name="privacyAgreementManager" ref="PrivacyAgreementManager" />
         <property name="privacyPolicyNegotiationManager" ref="PrivacyPolicyNegotiationManager" />

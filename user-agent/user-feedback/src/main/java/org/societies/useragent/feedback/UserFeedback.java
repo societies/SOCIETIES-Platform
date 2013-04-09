@@ -57,6 +57,8 @@ import org.societies.api.internal.useragent.model.FeedbackForm;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalType;
 import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestItemUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
@@ -90,6 +92,8 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 	private static final String ACK = "ack";
 	private static final String ABORT = "abort";
 	private static final String NOTIFICATION = "notification";
+	private static final String PRIVACY_NEGOTIATION = "privacy-negotiation";
+	private static final String PRIVACY_ACCESS_CONTROL = "privacy-access-control";
 
 	Logger LOG = LoggerFactory.getLogger(UserFeedback.class);
 	ICtxBroker ctxBroker;
@@ -344,6 +348,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 			boolean impResult = impFeedbackBean.isAccepted();
 			this.processImpResponseEvent(impResponseID, impResult);
 		}else if (eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE)){
+			LOG.info("####### Receive event "+EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE);
 			UserFeedbackPrivacyNegotiationEvent event = (UserFeedbackPrivacyNegotiationEvent) item;
 			this.negotiationResults.put(event.getNegotiationDetails(), event.getResponsePolicy());
 			synchronized (this.negotiationResults) {
@@ -351,7 +356,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 			}
 		}else if (eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE)){
 			UserFeedbackAccessControlEvent event = (UserFeedbackAccessControlEvent) item;
-			this.accessCtrlResults.put(event.getRequestID(), event.getResponseItems());
+			this.accessCtrlResults.put(event.getRequestId(), event.getResponseItems());
 			synchronized (this.accessCtrlResults) {
 				this.accessCtrlResults.notifyAll();
 			}
@@ -434,17 +439,36 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 	public FeedbackForm getNextRequest() {
 		return requestMgr.getNextRequest();
 	}
-
+	
 	@Override
 	public void submitExplicitResponse(String requestID, List<String> result) {
 		//create user feedback response bean
 		ExpFeedbackResultBean resultBean = new ExpFeedbackResultBean();
 		resultBean.setRequestId(requestID);
 		resultBean.setFeedback(result);
-
+		
 		//fire response pubsub event to all user agents
 		try {
 			pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.EXPLICIT_RESPONSE, null, resultBean);
+		} catch (XMPPError e1) {
+			e1.printStackTrace();
+		} catch (CommunicationException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	@Override
+	public void submitExplicitResponse(String requestId, NegotiationDetailsBean negotiationDetails, ResponsePolicy result) {
+		//create user feedback response bean
+		UserFeedbackPrivacyNegotiationEvent resultBean = new UserFeedbackPrivacyNegotiationEvent();
+		resultBean.setRequestId(requestId);
+		resultBean.setNegotiationDetails(negotiationDetails);
+		resultBean.setResponsePolicy(result);
+
+		//fire response pubsub event to all user agents
+		try {
+			LOG.info("####### Publish "+EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE+": "+ResponseItemUtils.toXmlString(result.getResponseItems()));
+			pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, null, resultBean);
 		} catch (XMPPError e1) {
 			e1.printStackTrace();
 		} catch (CommunicationException e1) {
@@ -708,6 +732,10 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 			this.LOG.debug("Policy contains: "+policy.getResponseItems().size()+" responseItems");
 		}
 		UserFeedbackPrivacyNegotiationEvent event = new UserFeedbackPrivacyNegotiationEvent();
+		event.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+		event.setType(ExpProposalType.PRIVACY_NEGOTIATION);
+		String requestId = UUID.randomUUID().toString();
+		event.setRequestId(requestId);
 		event.setNegotiationDetails(details);
 		event.setResponsePolicy(policy);
 		try {
@@ -755,15 +783,17 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 			List<ResponseItem> items) {
 		// TODO Auto-generated method stub
 		UserFeedbackAccessControlEvent event = new UserFeedbackAccessControlEvent();
+		event.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+		event.setType(ExpProposalType.PRIVACY_ACCESS_CONTROL);
+		String requestId = UUID.randomUUID().toString();
+		event.setRequestId(requestId);
 		event.setRequestor(RequestorUtils.toRequestorBean(requestor));
 		event.setResponseItems(items);
-		String requestID = UUID.randomUUID().toString();
-		event.setRequestID(requestID);
 		try {
 			this.pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_ACCESS_CONTROL, null, event);
 
 
-			while (!this.accessCtrlResults.containsKey(requestID)){
+			while (!this.accessCtrlResults.containsKey(requestId)){
 				synchronized (this.accessCtrlResults) {
 					try {
 						this.accessCtrlResults.wait();
@@ -774,7 +804,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 				}
 			}
 
-			this.pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP, null, accessCtrlResults.get(requestID));
+			this.pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP, null, accessCtrlResults.get(requestId));
 		} catch (XMPPError e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -782,6 +812,6 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return new AsyncResult<List<ResponseItem>>(this.accessCtrlResults.get(requestID));
+		return new AsyncResult<List<ResponseItem>>(this.accessCtrlResults.get(requestId));
 	}
 }

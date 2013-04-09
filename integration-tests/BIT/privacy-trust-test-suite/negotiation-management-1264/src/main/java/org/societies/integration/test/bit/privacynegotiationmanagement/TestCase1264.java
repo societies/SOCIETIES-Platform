@@ -42,7 +42,7 @@ import org.societies.integration.test.IntegrationTestCase;
  *
  */
 public class TestCase1264 extends IntegrationTestCase {
-	private static Logger LOG = LoggerFactory.getLogger(TestCase1264.class.getSimpleName());
+	private static Logger LOG = LoggerFactory.getLogger(TestCase1264.class);
 
 	public static IPrivacyPolicyManager privacyPolicyManager;
 	public static IPrivacyAgreementManager privacyAgreementManager;
@@ -93,6 +93,10 @@ public class TestCase1264 extends IntegrationTestCase {
 		}
 		if (null == commManager.getIdManager()) {
 			LOG.info("[Dependency Injection] Missing IIdentityManager");
+			return false;
+		}
+		if (null == getUserFeedbackMocker()) {
+			LOG.info("[Dependency Injection] Missing UserFeedbackMock");
 			return false;
 		}
 		if (null == privacyPolicyManager) {

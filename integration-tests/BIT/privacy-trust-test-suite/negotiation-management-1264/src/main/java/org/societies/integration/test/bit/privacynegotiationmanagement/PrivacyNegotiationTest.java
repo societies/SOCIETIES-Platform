@@ -75,7 +75,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  *
  */
 public class PrivacyNegotiationTest {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyNegotiationTest.class.getSimpleName());
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyNegotiationTest.class);
 	public static Integer testCaseNumber = 0;
 
 	private RequestorService requestorService;
