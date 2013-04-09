@@ -74,8 +74,8 @@ public class TrustEventMgr implements ITrustEventMgr {
 	
 	private static final List<String> EVENT_REMOTE_TOPICS = 
 			Collections.unmodifiableList(Arrays.asList(
-					TrustEventTopic.DIRECT_TRUST_EVIDENCE_UPDATED,
-					TrustEventTopic.INDIRECT_TRUST_EVIDENCE_UPDATED,
+					TrustEventTopic.DIRECT_TRUST_UPDATED,
+					TrustEventTopic.INDIRECT_TRUST_UPDATED,
 					TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED));
 	
 	private static final List<String> EVENT_SCHEMA_CLASSES = 
