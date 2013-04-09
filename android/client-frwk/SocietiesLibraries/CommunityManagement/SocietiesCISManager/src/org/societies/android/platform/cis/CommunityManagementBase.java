@@ -714,16 +714,16 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 					Log.d(LOG_TAG, "CommunityManager Result!");
 					CommunityMethods communityMessage = (CommunityMethods) msgBean;
 					
-					// --------- JOIN RESPONSE ---------
-					if (communityMessage.getJoinResponse() != null) {
-						boolean bJoined = communityMessage.getJoinResponse().isResult();
-						if (bJoined) {
-							Parcelable joined = communityMessage.getJoinResponse();
-							//NOTIFY CALLING CLIENT
-							intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, joined);
-						}
-						intent.putExtra(ICisSubscribed.INTENT_RETURN_BOOLEAN, bJoined);
-					}
+					// --------- JOIN RESPONSE --------- moved to IQ
+					//if (communityMessage.getJoinResponse() != null) {
+					//	boolean bJoined = communityMessage.getJoinResponse().isResult();
+					//	if (bJoined) {
+					//		Parcelable joined = communityMessage.getJoinResponse();
+					//		//NOTIFY CALLING CLIENT
+					//		intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, joined);
+					//	}
+					//	intent.putExtra(ICisSubscribed.INTENT_RETURN_BOOLEAN, bJoined);
+					//}
 				}
 				intent.setPackage(client);
 				CommunityManagementBase.this.androidContext.sendBroadcast(intent);
@@ -788,6 +788,16 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 						boolean bSuccess = communityResponse.getDeleteMemberResponse().isResult();
 						//NOTIFY CALLING CLIENT
 						intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, bSuccess);
+					}
+					//JOIN RESPONSE 
+					if (communityResponse.getJoinResponse() != null) {
+						boolean bJoined = communityResponse.getJoinResponse().isResult();
+						if (bJoined) {
+							Parcelable joined = communityResponse.getJoinResponse();
+							//NOTIFY CALLING CLIENT
+							intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, joined);
+						}
+						intent.putExtra(ICisSubscribed.INTENT_RETURN_BOOLEAN, bJoined);
 					}
 				}
 				
