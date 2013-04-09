@@ -23,12 +23,14 @@
         </ul>
 
         <p:dataGrid var="notification" value="#{notifications.negotiationQueue}"
-                    columns="1" emptyMessage="No notifications :(" id="ppnPopupPanel">
+                    columns="1" emptyMessage="No notifications :(" id="notificationGrid">
 
             <h:outputText value="ID: #{notification.itemId}"/>
 
-            <p:panel header="#{notification.title}" rendered="#{notification.type eq 'PPN'}">
+            <p:panel header="#{notification.title}" rendered="#{notification.type eq 'PPN'}"
+                     id="ppnPopupPanel">
                 <!-- PRIVACY POLICY NEGOTIATION -->
+
                 <h:panelGrid columns="1">
                     <h:outputText value="#{notification.title}"/>
 
@@ -49,7 +51,7 @@
                         <f:selectItems value="#{notification.options}"/>
                         <p:ajax event="change"
                                 process="ackNackPopupPanel"
-                                update="ppnPopupPanel"
+                                update="notificationGrid"
                                 listener="#{notifications.submitItem(notification.itemId)}"/>
                     </p:selectOneButton>
                 </h:panelGrid>
@@ -65,7 +67,7 @@
                     </p:selectOneRadio>
 
                     <p:commandButton value="Submit" process="selectOnePopupPanel"
-                                     update="ppnPopupPanel"
+                                     update="notificationGrid"
                                      actionListener="#{notifications.submitItem(notification.itemId)}"/>
                 </h:panelGrid>
             </p:panel>
@@ -80,7 +82,7 @@
                     </p:selectManyCheckbox>
 
                     <p:commandButton value="Submit" process="selectManyPopupPanel"
-                                     update="ppnPopupPanel"
+                                     update="notificationGrid"
                                      actionListener="#{notifications.submitItem(notification.itemId)}"/>
                 </h:panelGrid>
             </p:panel>
@@ -92,7 +94,7 @@
                 <h:outputText value="#{notification.title}"/>
 
                 <p:commandButton value="Ok" process="notificationPopupPanel"
-                                 update="ppnPopupPanel"
+                                 update="notificationGrid"
                                  actionListener="#{notifications.submitItem(notification.itemId)}"/>
             </p:panel>
 
@@ -109,7 +111,7 @@
                     <f:viewParam name="result" value="#{notification.result}"/>
                 </f:metadata>
                 <p:commandButton value="Abort" process="timedAbortPopupPanel"
-                                 update="ppnPopupPanel"
+                                 update="notificationGrid"
                                  actionListener="#{notifications.submitItem(notification.itemId)}">
                     <f:param name="result" value="abort"/>
                 </p:commandButton>
