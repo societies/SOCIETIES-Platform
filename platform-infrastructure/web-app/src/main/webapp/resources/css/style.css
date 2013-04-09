@@ -569,7 +569,7 @@ ul#navigation ul ul ul {
     padding: 0;
 }
 
-#navigation div.notification-bubble span {
+#navigation div.notification-bubble span#mainForm\:notification-count {
     text-align: center;
     vertical-align: middle;
     margin: 10px 0 0 0;
@@ -579,7 +579,7 @@ ul#navigation ul ul ul {
     border: 1px solid #900;
 }
 
-div#mainForm\:notificationDialog #mainForm\:notificationGrid_content{
+div#mainForm\:notificationDialog #mainForm\:notificationGrid_content {
     border: none;
 }
 
@@ -988,7 +988,7 @@ h3.person_title {
     background: -moz-linear-gradient(center top, #f7961b, #f26a36);
     background: -webkit-gradient(linear, left top, left bottom, from(#f7961b), to(#f26a36));
     background: -o-linear-gradient(top, #f7961b, #f26a36);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#f7961b', EndColorStr = '#f26a36');
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#f7961b', EndColorStr='#f26a36');
     border-color: #000;
     border-width: 1px;
     border-radius: 4px 4px 4px 4px;
@@ -1006,7 +1006,7 @@ h3.person_title {
     color: #fff;
     border: 1px solid #000;
     background: #F26a36;
-    filter: progid:DXImageTransform.Microsoft.Gradient(gradientType = 0, startColorStr = #f26a36, endColorStr = #f26a36);
+    filter: progid:DXImageTransform.Microsoft.Gradient(gradientType=0, startColorStr=#f26a36, endColorStr=#f26a36);
     -ms-filter: "progid:DXImageTransform.Microsoft.Gradient(gradientType=0,startColorStr=#f26a36666,endColorStr=#f26a36666)";
     background: -webkit-gradient(linear, left top, left bottom, from(#f26a36), to(#f26a36));
     background: -moz-linear-gradient(top, #f26a36, #f26a36);
@@ -1299,7 +1299,7 @@ div.option-group {
     -o-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
-    filter: progid:DXImageTransform.Microsoft.Matrix(M11 = 0.7071067811865476, M12 = -0.7071067811865475, M21 = 0.7071067811865475, M22 = 0.7071067811865476, sizingMethod = 'auto expand');
+    filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.7071067811865476, M12=-0.7071067811865475, M21=0.7071067811865475, M22=0.7071067811865476, sizingMethod='auto expand');
     zoom: 1;
 }
 

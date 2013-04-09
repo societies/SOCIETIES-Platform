@@ -391,10 +391,6 @@ public class NotificationsController extends BasePageController {
         return numUnreadNotifications;
     }
 
-    public void resetUnreadNotifications() {
-        numUnreadNotifications = 0;
-    }
-
     public Queue<NotificationQueueItem> getNegotiationQueue() {
         return negotiationQueue;
     }

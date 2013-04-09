@@ -34,7 +34,7 @@
         <!-- TODO: Fix PrimeFaces push -->
         <!-- quick hack to get this working until PF push is working -->
         <p:poll interval="5" rendered="#{loginController.loggedIn}"
-                update="notification-count" process="@this"/>
+                update="notification-count-wrapper" process="@this"/>
         <!-- used to listen for responses if there is a pubsub notification -->
         <!--<p:socket onMessage="handlePnb" channel="/pnb"/>-->
 

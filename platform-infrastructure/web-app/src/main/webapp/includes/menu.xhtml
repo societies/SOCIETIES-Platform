@@ -49,11 +49,12 @@
                     <p:commandLink update="notificationDialog"
                                    oncomplete="#{p:widgetVar('notificationDialog')}.show();">
 
-                        <p:ajax event="click" listener="#{notifications.resetUnreadNotifications}"
-                                update="notification-count"/>
-
-                        <h:outputText id="notification-count" rendered="#{userService.userLoggedIn}"
-                                      value="#{notifications.numUnreadNotifications}"/>
+                        <p:outputPanel id="notification-count-wrapper">
+                            <h:outputText
+                                    id="notification-count"
+                                    rendered="#{userService.userLoggedIn and notifications.numUnreadNotifications gt 0}"
+                                    value="#{notifications.numUnreadNotifications}"/>
+                        </p:outputPanel>
                     </p:commandLink>
                 </div>
             </li>
