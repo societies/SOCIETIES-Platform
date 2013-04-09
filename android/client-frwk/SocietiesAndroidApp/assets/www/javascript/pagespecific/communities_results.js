@@ -99,6 +99,7 @@ var	SocietiesCisDirService = {
 				ServiceManagementServiceHelper.connectToServiceManagement(function() {
 									SocietiesCISListService.showCISServices(communityObj.communityJid); }
 									);
+				SocietiesPrivacyPolicyManagerService.getPrivacyPolicy('#getPrivacyPolicy', communityObj.ownerJid, communityObj.communityJid, false);
 				SocietiesCISListService.createSelectServices();
 			}
 		}
