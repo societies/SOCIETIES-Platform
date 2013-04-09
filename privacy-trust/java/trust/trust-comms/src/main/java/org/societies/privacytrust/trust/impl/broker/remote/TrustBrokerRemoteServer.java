@@ -118,12 +118,16 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 	@Override
 	public Object getQuery(Stanza stanza, Object bean) throws XMPPError {
 		
+		if (LOG.isDebugEnabled())
+			LOG.debug("getQuery: stanza=" + stanza + ", bean=" + bean);
 		if (!(bean instanceof TrustBrokerRequestBean))
-			throw new IllegalArgumentException("bean is not instance of TrustBrokerRequestBean");
+			throw new XMPPError(StanzaError.bad_request, "bean is not instance of TrustBrokerRequestBean");
 		
 		final TrustBrokerRequestBean requestBean = (TrustBrokerRequestBean) bean;
 		final TrustBrokerResponseBean responseBean = new TrustBrokerResponseBean();
 		
+		if (LOG.isDebugEnabled())
+			LOG.debug("getQuery: requestBean.getMethodName()=" + requestBean.getMethodName());
 		if (MethodName.RETRIEVE_TRUST_RELATIONSHIPS.equals(requestBean.getMethodName())) {
 			
 			final TrustRelationshipsRequestBean trustRelationshipsRequestBean =
@@ -151,6 +155,8 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 						&& trustRelationshipsRequestBean.getTrusteeType() == null
 						&& trustRelationshipsRequestBean.getTrustValueType() == null) {
 					
+					if (LOG.isDebugEnabled())
+						LOG.debug("getQuery: requestor=" + requestor + ", trustorId=" + trustorId);
 					result = this.trustBroker.retrieveTrustRelationships(
 							requestor, trustorId).get();
 					
@@ -158,6 +164,8 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 				
 					final TrustedEntityId trusteeId = TrustModelBeanTranslator.getInstance().
 							fromTrustedEntityIdBean(trustRelationshipsRequestBean.getTrusteeId());
+					if (LOG.isDebugEnabled())
+						LOG.debug("getQuery: requestor=" + requestor + ", trustorId=" + trustorId + ", trusteeId=" + trusteeId);
 					result = this.trustBroker.retrieveTrustRelationships(
 							requestor, trustorId, trusteeId).get();
 					
@@ -169,11 +177,15 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 				
 						final TrustValueType trustValueType = TrustModelBeanTranslator.getInstance().
 								fromTrustValueTypeBean(trustRelationshipsRequestBean.getTrustValueType());
+						if (LOG.isDebugEnabled())
+							LOG.debug("getQuery: requestor=" + requestor + ", trustorId=" + trustorId + ", trusteeType=" + trusteeType + ", trustValueType=" + trustValueType);
 						result = this.trustBroker.retrieveTrustRelationships(
 								requestor, trustorId, trusteeType, trustValueType).get();
 						
 					} else { // if (trustRelationshipsRequestBean.getTrustValueType() == null)
 				
+						if (LOG.isDebugEnabled())
+							LOG.debug("getQuery: requestor=" + requestor + ", trustorId=" + trustorId + ", trusteeType=" + trusteeType);
 						result = this.trustBroker.retrieveTrustRelationships(
 								requestor, trustorId, trusteeType).get();
 					}
@@ -181,6 +193,8 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 
 					final TrustValueType trustValueType = TrustModelBeanTranslator.getInstance().
 							fromTrustValueTypeBean(trustRelationshipsRequestBean.getTrustValueType());
+					if (LOG.isDebugEnabled())
+							LOG.debug("getQuery: requestor=" + requestor + ", trustorId=" + trustorId + ", trustValueType=" + trustValueType);
 					result = this.trustBroker.retrieveTrustRelationships(
 							requestor, trustorId, trustValueType).get();
 				} else {
@@ -202,6 +216,8 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 				
 			} catch (MalformedTrustedEntityIdException mteide) {
 				
+				LOG.error("Invalid TrustBroker remote retrieve trust relationships request: "
+						+ mteide.getLocalizedMessage(), mteide);
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust relationships request: "
 						+ mteide.getLocalizedMessage(), mteide);
@@ -210,6 +226,8 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 				throw xmppe;
 			} catch (Exception e) {
 				
+				LOG.error("Could not retrieve trust relationships: "
+						+ e.getLocalizedMessage(), e);
 				throw new XMPPError(StanzaError.internal_server_error, 
 						"Could not retrieve trust relationships: "
 						+ e.getLocalizedMessage(), e);
@@ -249,6 +267,8 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 						fromTrustedEntityIdBean(trustRelationshipRequestBean.getTrusteeId());
 				final TrustValueType trustValueType = TrustModelBeanTranslator.getInstance().
 						fromTrustValueTypeBean(trustRelationshipRequestBean.getTrustValueType());
+				if (LOG.isDebugEnabled())
+					LOG.debug("getQuery: requestor=" + requestor + ", trustorId=" + trustorId + ", trusteeId=" + trusteeId + ", trustValueType=" + trustValueType);
 				final TrustRelationship result = this.trustBroker.retrieveTrustRelationship(
 						requestor, trustorId, trusteeId, trustValueType).get();
 				
@@ -262,11 +282,15 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 				
 			} catch (MalformedTrustedEntityIdException mteide) {
 				
+				LOG.error("Invalid TrustBroker remote retrieve trust relationship request: "
+						+ mteide.getLocalizedMessage(), mteide);
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust relationship request: "
 						+ mteide.getLocalizedMessage(), mteide);
 			} catch (Exception e) {
 				
+				LOG.error("Could not retrieve trust relationship: "
+						+ e.getLocalizedMessage(), e);
 				throw new XMPPError(StanzaError.internal_server_error, 
 						"Could not retrieve trust relationship: "
 						+ e.getLocalizedMessage(), e);
@@ -318,11 +342,15 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 				
 			} catch (MalformedTrustedEntityIdException mteide) {
 				
+				LOG.error("Invalid TrustBroker remote retrieve trust value request: "
+						+ mteide.getLocalizedMessage(), mteide);
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust value request: "
 						+ mteide.getLocalizedMessage(), mteide);
 			} catch (Exception e) {
 				
+				LOG.error("Could not retrieve trust value: "
+						+ e.getLocalizedMessage(), e);
 				throw new XMPPError(StanzaError.internal_server_error, 
 						"Could not retrieve trust value: "
 						+ e.getLocalizedMessage(), e);
