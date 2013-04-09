@@ -78,6 +78,24 @@ public class PrivacyPolicyTestController extends BasePageController {
             }
         }
 
+        public void sendSimpleEvent(String requestID, String proposalText) {
+            //create user feedback bean to fire in pubsub event
+            UserFeedbackBean ufBean = new UserFeedbackBean();
+            ufBean.setRequestId(requestID);
+            ufBean.setProposalText(proposalText);
+            ufBean.setMethod(FeedbackMethodType.SHOW_NOTIFICATION);
+
+            //send pubsub event to all user agents
+            try {
+                getPubsubClient().publisherPublish(getUserService().getIdentity(), UserFeedbackEventTopics.REQUEST, requestID, ufBean);
+            } catch (Exception e) {
+                addGlobalMessage("Error publishing user feedback event",
+                        e.getMessage(),
+                        FacesMessage.SEVERITY_ERROR);
+                log.error("Error publishing user feedback event", e);
+            }
+        }
+
         public void sendExpFBEvent(String requestID, int type, String proposalText, String[] options) {
             //create user feedback bean to fire in pubsub event
             UserFeedbackBean ufBean = new UserFeedbackBean();
@@ -91,7 +109,7 @@ public class PrivacyPolicyTestController extends BasePageController {
 
             //send pubsub event to all user agents
             try {
-                getPubsubClient().publisherPublish(getUserService().getIdentity(), UserFeedbackEventTopics.REQUEST, null, ufBean);
+                getPubsubClient().publisherPublish(getUserService().getIdentity(), UserFeedbackEventTopics.REQUEST, requestID, ufBean);
             } catch (Exception e) {
                 addGlobalMessage("Error publishing user feedback event",
                         e.getMessage(),
@@ -111,7 +129,7 @@ public class PrivacyPolicyTestController extends BasePageController {
 
             //send pubsub event to all user agents
             try {
-                getPubsubClient().publisherPublish(getUserService().getIdentity(), UserFeedbackEventTopics.REQUEST, null, ufBean);
+                getPubsubClient().publisherPublish(getUserService().getIdentity(), UserFeedbackEventTopics.REQUEST, requestID, ufBean);
             } catch (Exception e) {
                 addGlobalMessage("Error publishing user feedback event",
                         e.getMessage(),
@@ -201,6 +219,14 @@ public class PrivacyPolicyTestController extends BasePageController {
         negotiationDetails.setNegotiationID(101);
 
         pubSubListener.sendPpnEvent(guid, responsePolicy, negotiationDetails);
+    }
+
+    public void sendSimpleNotifiationEvent() {
+        String requestID = UUID.randomUUID().toString();
+
+        String proposalText = "This is just a simple alert";
+
+        pubSubListener.sendSimpleEvent(requestID, proposalText);
     }
 
     public void sendAckNackEvent() {

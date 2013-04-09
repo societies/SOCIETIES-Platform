@@ -16,6 +16,9 @@
                 <p:commandButton value="Send PPN"
                                  actionListener="#{ppNegotiationTest.sendPpnEvent}"
                                  process="@this"/>
+                <p:commandButton value="Send Simple Msg"
+                                 actionListener="#{ppNegotiationTest.sendSimpleNotifiationEvent}"
+                                 process="@this"/>
             </p:row>
             <p:row>
                 <p:commandButton value="Send UF Ack/Nack"
