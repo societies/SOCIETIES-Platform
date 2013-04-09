@@ -87,7 +87,7 @@ public class AcceptFriendActivity extends Activity {
 	public void onDestroy() {
 		Log.d(LOG_TAG, "FriendsActivity service terminating");
 		if (localFriendManager !=null )
-			AcceptFriendActivity.this.getApplicationContext().unbindService(friendManagerConnection);
+			unbindService(friendManagerConnection);
 		super.onDestroy();
 	}
     

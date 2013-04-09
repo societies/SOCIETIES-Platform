@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -49,6 +50,7 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 	private View[][] allResponses;
 	private TableLayout[] tblConditions;
 	private ScrollView svScroll;
+	private boolean published = false;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -195,31 +197,51 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 		
 	}
 	
-	private void publishEvent() {
-		if (!isEventsConnected) {
-			eventsHelper.setUpService(new IMethodCallback() {
+	@Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "NegotiationActivity terminating");
+		if (isEventsConnected) {
+			eventsHelper.tearDownService(new IMethodCallback() {
 				@Override
 				public void returnException(String result) { }
 				@Override
 				public void returnAction(String result) { }
 				@Override
-				public void returnAction(boolean resultFlag) { 
-					if (resultFlag) {
-						try {
-							eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT, NegotiationActivity.this.eventInfo, new IPlatformEventsCallback() {
-								@Override
-								public void returnException(int exception) { }
-								@Override
-								public void returnAction(int result) { }
-								@Override
-								public void returnAction(boolean resultFlag) { }
-							});
-						} catch (PlatformEventsHelperNotConnectedException e) {
-							e.printStackTrace();
+				public void returnAction(boolean resultFlag) { }
+			});
+		}
+		super.onDestroy();
+	}
+	
+	private void publishEvent() {
+		if (!published) { //EVENT IS BEING PUBLISHED MULTIPLE TIMES
+			if (!isEventsConnected) {
+				eventsHelper.setUpService(new IMethodCallback() {
+					@Override
+					public void returnException(String result) { }
+					@Override
+					public void returnAction(String result) { }
+					@Override
+					public void returnAction(boolean resultFlag) { 
+						if (resultFlag) {
+							try {
+								isEventsConnected = true;
+								published = true;
+								eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT, NegotiationActivity.this.eventInfo, new IPlatformEventsCallback() {
+									@Override
+									public void returnException(int exception) { }
+									@Override
+									public void returnAction(int result) { }
+									@Override
+									public void returnAction(boolean resultFlag) { }
+								});
+							} catch (PlatformEventsHelperNotConnectedException e) {
+								e.printStackTrace();
+							}
 						}
 					}
-				}
-			});
+				});
+			}
 		}
 	}
 	
