@@ -37,9 +37,9 @@ var CSSFriendsServices = {
 	 */
 	refreshFriendRequests: function() {
 		function showAvatar(VCard) {
-			if (VCard.to != "") {
-				var n=VCard.to.indexOf(".");
-				var identityStr = VCard.to.substring(0, n);
+			if (VCard.from != null) {
+				var n=VCard.from.indexOf(".");
+				var identityStr = VCard.from.substring(0, n);
 				var imageStr = VCard.avatar;
 				if (imageStr != null)
 					$('img#' + identityStr).attr("src", "data:image/jpg;base64," + VCard.avatar);
@@ -84,9 +84,9 @@ var CSSFriendsServices = {
 		console.log("refreshFriendList");
 
 		function showAvatar(VCard) {
-			if (VCard.to != "") {
-				var n=VCard.to.indexOf(".");
-				var identityStr = VCard.to.substring(0, n);
+			if (VCard.from != null) {
+				var n=VCard.from.indexOf(".");
+				var identityStr = VCard.from.substring(0, n);
 				var imageStr = VCard.avatar;
 				if (imageStr != null)
 					$('img#' + identityStr).attr("src", "data:image/jpg;base64," + VCard.avatar);
@@ -198,9 +198,9 @@ var CSSFriendsServices = {
 	
 	displayFriendEntryRecords: function(data) {
 		function showAvatar(VCard) {
-			if (VCard.to != "") {
-				var n=VCard.to.indexOf(".");
-				var identityStr = VCard.to.substring(0, n);
+			if (VCard.from != null) {
+				var n=VCard.from.indexOf(".");
+				var identityStr = VCard.from.substring(0, n);
 				var imageStr = VCard.avatar;
 				if (imageStr != null)
 					$('img#' + identityStr).attr("src", "data:image/jpg;base64," + VCard.avatar);
@@ -247,9 +247,9 @@ var CSSFriendsServices = {
 	
 	displayCSSAdvertRecords: function(data) {
 		function showAvatar(VCard) {
-			if (VCard.to != "") {
-				var n=VCard.to.indexOf(".");
-				var identityStr = VCard.to.substring(0, n);
+			if (VCard.from != null) {
+				var n=VCard.from.indexOf(".");
+				var identityStr = VCard.from.substring(0, n);
 				var imageStr = VCard.avatar;
 				if (imageStr != null)
 					$('img#' + identityStr).attr("src", "data:image/jpg;base64," + VCard.avatar);

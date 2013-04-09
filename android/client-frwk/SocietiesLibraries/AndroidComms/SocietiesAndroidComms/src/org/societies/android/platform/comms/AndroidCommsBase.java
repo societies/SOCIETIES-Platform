@@ -1304,12 +1304,64 @@ public class AndroidCommsBase implements XMPPAgent {
 			}
 		}
     }
+
+    private class queryVCardPacketListener implements PacketListener {
+		String client;
+		long remoteCallId;
+		
+		public queryVCardPacketListener(String client, long remoteCallId) {
+			this.client = client;
+			this.remoteCallId = remoteCallId;
+		}
+
+		public void processPacket(Packet packet) {
+			IQ iq = (IQ)packet;
+			try {
+				AndroidCommsBase.this.xmppConnectMgr.getValidConnection().removePacketListener(this);
+				if(iq.getType() == IQ.Type.RESULT) {
+					//Send intent
+					Intent intent = new Intent(GET_USER_VCARD);
+					if (AndroidCommsBase.this.restrictBroadcast)
+						intent.setPackage(this.client);
+					//intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, packet.toXML());
+					VCard returnedCard = (VCard)packet;
+					VCardParcel parcelVCard = VCardUtilities.convertToParcelVCard(returnedCard);
+					intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, (Parcelable)parcelVCard);
+					intent.putExtra(INTENT_RETURN_CALL_ID_KEY, this.remoteCallId);
+					AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+					
+				} else if(iq.getType() == IQ.Type.ERROR) {
+					//Send intent
+					Intent intent = new Intent(GET_USER_VCARD);
+					if (AndroidCommsBase.this.restrictBroadcast)
+						intent.setPackage(this.client);
+					intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, packet.toXML());
+					intent.putExtra(INTENT_RETURN_CALL_ID_KEY, this.remoteCallId);
+					AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+					createNotification("Error invoking remote method: " + packet.toXML(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
+				}
+			} catch (NoXMPPConnectionAvailableException e) {
+				Log.e(LOG_TAG, e.getMessage(), e);
+				
+				//Send intent
+				Intent intent = new Intent(SEND_IQ_ERROR);
+				if (AndroidCommsBase.this.restrictBroadcast) {
+					intent.setPackage(client);
+				}
+				intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, "");
+				intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
+				intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+				intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+				AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+			}
+		}	
+	}
     
     public void setVCard(String client, VCardParcel vCard) {
 		//REQUIRED DUE TO ISSUE: https://code.google.com/p/asmack/issues/detail?id=14#c8
 		ProviderManager.getInstance().addIQProvider("vCard", "vcard-temp", new org.jivesoftware.smackx.provider.VCardProvider());
 		
-		VCard xmppCard = VCardUtilities.convertToXMPPVCard(vCard);		
+		VCard xmppCard = VCardUtilities.convertToXMPPVCard(vCard);
 		try {
 			xmppCard.save(xmppConnectMgr.getValidConnection());
 		} catch (XMPPException e1) {
@@ -1320,48 +1372,46 @@ public class AndroidCommsBase implements XMPPAgent {
     }
     
     public VCardParcel getVCard(String client, long remoteCallId, String userId) {
+    	Dbc.require("Client must be specified", null != client && client.length() > 0);
+		Dbc.require("userId must be specified", null != userId && userId.length() > 0);
+		if (DEBUG_LOGGING) Log.d(LOG_TAG, "getVCard userId: " + userId + " for client: " + client);
+		
     	//REQUIRED DUE TO ISSUE: https://code.google.com/p/asmack/issues/detail?id=14#c8
     	ProviderManager.getInstance().addIQProvider("vCard", "vcard-temp", new org.jivesoftware.smackx.provider.VCardProvider());
     	
-    	//CHECK IF WE HAVE THIS USER'S VCARD CACHED
-    	VCardParcel parcelVCard = null;
-    	if (userId != null)
-    		parcelVCard = VCardUtilities.getVCardFromDisk(this.serviceContext, userId);
-    	
-    	if (parcelVCard == null) {
-	    	//CONNECT TO XMPP SERVER AND RETRIEVE
-			try {
-				VCard returnedCard = new VCard();
-				returnedCard.load(xmppConnectMgr.getValidConnection());  //LOAD ANOTHER USER VCARD
-				parcelVCard = VCardUtilities.convertToParcelVCard(returnedCard);
-				//SAVE TO DISK
-				VCardUtilities.saveVCardToDisk(this.serviceContext, userId, parcelVCard);
-				
-				//SEND RETURN INTENT
-		    	Intent intent = new Intent(XMPPAgent.GET_USER_VCARD);
-		    	if (AndroidCommsBase.this.restrictBroadcast)
-					intent.setPackage(client);
-				intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, (Parcelable)parcelVCard);
-				intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
-				this.serviceContext.sendBroadcast(intent);
-				
-			} catch (XMPPException e) {
-				e.printStackTrace();
-				
-			} catch (NoXMPPConnectionAvailableException e) {
-				Log.e(LOG_TAG, e.getMessage(), e);
-				//Send intent
-				Intent intent = new Intent(GET_USER_VCARD);
-				if (AndroidCommsBase.this.restrictBroadcast) {
-					intent.setPackage(client);
-				}
-				intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, (Parcelable)parcelVCard);
-				intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, "NoXMPPConnectionAvailableException");
-				intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
-				intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
-				AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+    	String id = "123";
+    	String xml = "<iq id='123' to='" + userId + "' type='get'><vCard xmlns='vcard-temp'/></iq>"; 
+		try {
+			this.xmppConnectMgr.getValidConnection().addPacketListener(new queryVCardPacketListener(client, remoteCallId), new AndFilter(new PacketTypeFilter(IQ.class),new PacketIDFilter(id)));
+			this.xmppConnectMgr.getValidConnection().sendPacket(createPacketFromXml(xml));
+		} catch (NoXMPPConnectionAvailableException e) {
+			Log.e(LOG_TAG, e.getMessage(), e);
+			//Send intent
+			Intent intent = new Intent(SEND_IQ_EXCEPTION);
+			if (AndroidCommsBase.this.restrictBroadcast) {
+				intent.setPackage(client);
 			}
-    	}
+			intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
+			intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+			
+			createNotification("Error invoking remote method: " + e.getMessage(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
+		} catch (Exception e) {
+			Log.e(LOG_TAG, e.getMessage(), e);
+			//Send intent
+			Intent intent = new Intent(SEND_IQ_EXCEPTION);
+			if (AndroidCommsBase.this.restrictBroadcast) {
+				intent.setPackage(client);
+			}
+			intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
+			intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+			
+			createNotification("Error invoking remote method: " + e.getMessage(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
+		}
+		
 		return null;
     }
     
@@ -1372,6 +1422,7 @@ public class AndroidCommsBase implements XMPPAgent {
 
 		try {
 			VCard returnedCard = new VCard();
+			xmppConnectMgr.getValidConnection().connect();			//AUTHENTICATED CONNECTION
 			returnedCard.load(xmppConnectMgr.getValidConnection());
 			parcelVCard = VCardUtilities.convertToParcelVCard(returnedCard);
 			
@@ -1401,4 +1452,6 @@ public class AndroidCommsBase implements XMPPAgent {
 		}
 		return null;
     }
+    
+
 }

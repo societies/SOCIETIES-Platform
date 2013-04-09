@@ -87,6 +87,7 @@ public class VCardUtilities {
     	vcard.setOrganizationUnit(xmppVCard.getOrganizationUnit());
     	vcard.setAvatar(xmppVCard.getAvatar());
     	vcard.setTo(xmppVCard.getTo());
+    	vcard.setFrom(xmppVCard.getFrom());
     	//GENERIC FIELDS
     	for(GenericField type: GenericField.class.getEnumConstants()) {
     		String value = xmppVCard.getField(type.name());
@@ -129,6 +130,7 @@ public class VCardUtilities {
     	vcard.setOrganizationUnit(vcardParcel.getOrganizationUnit());
     	vcard.setAvatar(vcardParcel.getAvatar());
     	vcard.setTo(vcardParcel.getTo());
+    	vcard.setFrom(vcardParcel.getFrom());
     	//GENERIC FIELDS
     	for(GenericField type: GenericField.class.getEnumConstants()) {
     		String value = vcardParcel.getField(type);
