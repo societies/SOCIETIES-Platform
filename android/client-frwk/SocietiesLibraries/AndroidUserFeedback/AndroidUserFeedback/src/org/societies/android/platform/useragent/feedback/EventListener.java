@@ -71,6 +71,7 @@ public class EventListener extends Service {
 	private ServiceHandler mServiceHandler;
 	private EventsHelper eventsHelper;
 	private Set<Integer> eventIds;
+	private Set<String> eventGuids;
 	
 	// Handler that receives messages from the thread
 	private final class ServiceHandler extends Handler {
@@ -82,6 +83,7 @@ public class EventListener extends Service {
 		public void handleMessage(Message msg) {
 			Log.d(this.getClass().getName(), "Message received in Userfeedback event thread");
 			eventIds = new HashSet<Integer>();
+			eventGuids = new HashSet<String>();
 			if (!boundToEventMgrService) {
 				setupBroadcastReceiver();
 				subscribeToEvents();
@@ -171,8 +173,13 @@ public class EventListener extends Service {
 			else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_REQUEST_INTENT)) {
 				Log.d(LOG_TAG, "General Permission request event received");
 				UserFeedbackBean eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
-				String description = eventPayload.getProposalText(); //"Accept privacy policy?";
-				addNotification(description, "Privacy Policy", eventPayload);
+				String eventGuid = eventPayload.getRequestId();
+				//CHECK IF WE HAVE RECEIVED THIS ALREADY
+				if (!eventGuids.contains(eventGuid)) {
+					eventGuids.add(eventGuid);
+					String description = eventPayload.getProposalText();
+					addNotification(description, "Privacy Policy", eventPayload);
+				}
 			}
 		}
     }
