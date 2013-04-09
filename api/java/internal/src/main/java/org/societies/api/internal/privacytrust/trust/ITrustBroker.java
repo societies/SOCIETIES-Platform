@@ -194,8 +194,8 @@ public interface ITrustBroker extends org.societies.api.privacytrust.trust.ITrus
 	/**
 	 * Retrieves the trust relationships of the specified trustor matching the
 	 * supplied criteria. More specifically, the {@link TrustedEntityType type}
-	 * of the entities trusted by the trustor and/or the trust value type, i.e. one of 
-	 * {@link TrustValueType#DIRECT DIRECT}, 
+	 * of the entities trusted by the trustor and the trust value type, i.e. 
+	 * one of {@link TrustValueType#DIRECT DIRECT}, 
 	 * {@link TrustValueType#INDIRECT INDIRECT}, or
 	 * {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}, are also specified.
 	 * The method returns an <i>empty</i> set if no trust relationships match
