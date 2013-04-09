@@ -1213,7 +1213,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 						intent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, advertArray);
 					}
 					//FriendEntry array
-					if (IAndroidCSSManager.SUGGESTED_FRIENDS == this.returnIntent) {
+					else if (IAndroidCSSManager.SUGGESTED_FRIENDS == this.returnIntent) {
 						FriendEntry advertArray[] = new FriendEntry[resultBean.getResultSuggestedFriends().size()]; 
 						advertArray = resultBean.getResultSuggestedFriends().toArray(advertArray);
 						
@@ -1223,7 +1223,6 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 					//cssRecords
 					else { 
 						intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, resultBean.getResult().isResultStatus());
-						//AndroidCSSRecord aRecord = AndroidCSSRecord.convertCssRecord(resultBean.getResult().getProfile());
 						CssRecord aRecord = resultBean.getResult().getProfile();
 						intent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, (Parcelable) aRecord);
 						this.updateLocalPersistence(aRecord);
