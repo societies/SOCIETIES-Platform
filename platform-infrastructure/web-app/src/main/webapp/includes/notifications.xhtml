@@ -50,8 +50,6 @@
                                 update="ppnPopupPanel"
                                 listener="#{notifications.submitItem(notification.itemId)}"/>
                     </p:selectOneButton>
-
-
                 </h:panelGrid>
             </p:panel>
 
@@ -89,7 +87,19 @@
                      id="timedAbortPopupPanel">
                 <!-- TMIED ABORT -->
 
-                <h:outputText value="[[[ FINISH ME ]]]"/>
+                <h:outputText value="Time left: #{notification.friendlyTimeLeft}" id="timedAbortTimeLeft"/>
+                <p:poll interval="1" update="timedAbortTimeLeft"/>
+
+                <p>Click this button to cancel</p>
+
+                <f:metadata>
+                    <f:viewParam name="result" value="#{notification.result}"/>
+                </f:metadata>
+                <p:commandButton value="Abort" process="timedAbortPopupPanel"
+                                 actionListener="#{notifications.submitItem(notification.itemId)}"
+                                 oncomplete="#{p:widgetVar('timedAbortPopupPanel')}.hide();">
+                    <f:param name="result" value="abort"/>
+                </p:commandButton>
             </p:panel>
 
 

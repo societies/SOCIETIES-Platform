@@ -155,4 +155,31 @@ public class NotificationQueueItem implements Serializable {
 
         this.results = results;
     }
+
+    public String getFriendlyTimeLeft() {
+        if (timeoutTime == null)
+            return "forever";
+
+        long seconds = (timeoutTime.getTime() - new Date().getTime()) / 1000L;
+        if (seconds < 0L)
+            seconds = 0;
+
+        // hours:minutes
+        if (seconds > 3600) {
+            long minutes = ((seconds % 3600L) - (seconds % 60L)) / 60L;
+            long hours = (seconds - (seconds % 3600L)) / 3600L;
+
+            return hours + "hrs, " + minutes + "mins";
+        }
+
+        // minutes:seconds
+        if (seconds > 60) {
+            long minutes = (seconds - (seconds % 60L)) / 60L;
+
+            return minutes + "mins, " + (seconds % 60L) + "sec";
+        }
+
+        // seconds only
+        return seconds + "sec";
+    }
 }

@@ -230,12 +230,12 @@ public class PrivacyPolicyTestController extends BasePageController {
         pubSubListener.sendExpFBEvent(requestID, ExpProposalType.CHECKBOXLIST, proposalText, options);
     }
 
-    public void sendTimedAbortEvent() {
+    public void sendTimedAbortEvent(long sec) {
         String requestID = UUID.randomUUID().toString();
 
         String proposalText = "This is a timed abort";
 
-        pubSubListener.sendImpFBEvent(requestID, ImpProposalType.TIMED_ABORT, proposalText, 10000);
+        pubSubListener.sendImpFBEvent(requestID, ImpProposalType.TIMED_ABORT, proposalText, (int) sec * 1000);
     }
 
     private static ResponsePolicy buildResponsePolicy(String guid, RequestorBean requestorBean) {
