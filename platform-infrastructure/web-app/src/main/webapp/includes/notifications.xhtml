@@ -17,7 +17,9 @@
         <p>Bugs/incomplete:</p>
         <ul>
             <li>Wrong item disappearing on submit</li>
-            <li>Timed abort notification GUI</li>
+            <li>Remove Timed Abort from GUI when it expires</li>
+            <li>Input validation</li>
+            <li>Hide bubble number when zero</li>
         </ul>
 
         <p:dataGrid var="notification" value="#{notifications.negotiationQueue}"
@@ -83,6 +85,17 @@
                 </h:panelGrid>
             </p:panel>
 
+            <p:panel header="#{notification.title}" rendered="#{notification.type eq 'NOTIFICATION'}"
+                     id="notificationPopupPanel">
+                <!-- SIMPLE NOTIFICATION -->
+
+                <h:outputText value="#{notification.title}"/>
+
+                <p:commandButton value="Ok" process="notificationPopupPanel"
+                                 update="ppnPopupPanel"
+                                 actionListener="#{notifications.submitItem(notification.itemId)}"/>
+            </p:panel>
+
             <p:panel header="#{notification.title}" rendered="#{notification.type eq 'TIMED_ABORT'}"
                      id="timedAbortPopupPanel">
                 <!-- TMIED ABORT -->
@@ -96,8 +109,8 @@
                     <f:viewParam name="result" value="#{notification.result}"/>
                 </f:metadata>
                 <p:commandButton value="Abort" process="timedAbortPopupPanel"
-                                 actionListener="#{notifications.submitItem(notification.itemId)}"
-                                 oncomplete="#{p:widgetVar('timedAbortPopupPanel')}.hide();">
+                                 update="ppnPopupPanel"
+                                 actionListener="#{notifications.submitItem(notification.itemId)}">
                     <f:param name="result" value="abort"/>
                 </p:commandButton>
             </p:panel>

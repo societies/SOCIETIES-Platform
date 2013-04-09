@@ -31,6 +31,7 @@ import java.util.*;
 @SessionScoped
 public class NotificationsController extends BasePageController {
 
+    public static final String ABORT_STRING = "abort";
 
     private class PubSubListener implements Subscriber {
         //pubsub event schemas
@@ -114,6 +115,7 @@ public class NotificationsController extends BasePageController {
                 log.debug(String.format(fmt, item.getClass().getSimpleName(), itemId));
             }
 
+            // create the correct notification type for the incoming event
             if (EventTypes.UF_PRIVACY_NEGOTIATION.equals(node)) {
                 UserFeedbackPrivacyNegotiationEvent ppn = (UserFeedbackPrivacyNegotiationEvent) item;
 
@@ -129,25 +131,44 @@ public class NotificationsController extends BasePageController {
 
                 NotificationQueueItem newItem;
 
-                if (bean.getMethod() == FeedbackMethodType.GET_EXPLICIT_FB)
+                if (bean.getMethod() == FeedbackMethodType.GET_EXPLICIT_FB) {
                     switch (bean.getType()) {
                         case ExpProposalType.ACKNACK:
+                            // This is an AckNack notification
                             newItem = NotificationQueueItem.forAckNack(pubsubService, node, itemId, proposalText);
                             break;
+
                         case ExpProposalType.CHECKBOXLIST:
+                            // This is a select-many notification
                             newItem = NotificationQueueItem.forSelectMany(pubsubService, node, itemId, proposalText, options);
                             break;
+
                         case ExpProposalType.RADIOLIST:
+                            // This is a select-one notification
                             newItem = NotificationQueueItem.forSelectOne(pubsubService, node, itemId, proposalText, options);
                             break;
+
                         default:
                             log.error("Unknown UserFeedbackBean type = " + bean.getType());
                             return;
                     }
-                else if (bean.getMethod() == FeedbackMethodType.GET_IMPLICIT_FB) {
+
+                } else if (bean.getMethod() == FeedbackMethodType.GET_IMPLICIT_FB) {
+                    // This is a timed abort
                     Date timeout = new Date(new Date().getTime() + bean.getTimeout());
 
                     newItem = NotificationQueueItem.forTimedAbort(pubsubService, node, itemId, proposalText, timeout);
+
+                    // add to the list of timed aborts for the watcher thread
+                    synchronized (timedAbortsToWatch) {
+                        timedAbortsToWatch.add(newItem);
+                    }
+
+                } else if (bean.getMethod() == FeedbackMethodType.SHOW_NOTIFICATION) {
+                    // This is a simple (no response required) notification
+
+                    newItem = NotificationQueueItem.forNotification(pubsubService, node, itemId, proposalText);
+
                 } else {
                     log.error("Cannot handle UserFeedbackBean with method " + bean.getMethod().toString());
                     return;
@@ -164,17 +185,28 @@ public class NotificationsController extends BasePageController {
                     || UserFeedbackEventTopics.IMPLICIT_RESPONSE.equals(node)) {
 
                 for (NotificationQueueItem nqi : negotiationQueue) {
-                    if (nqi.getItemId().equals(itemId)) {
-                        if (log.isDebugEnabled()) {
-                            String fmt = "Removing notification item of type %s with ID %s";
-                            log.debug(String.format(fmt, item.getClass().getSimpleName(), itemId));
-                        }
+                    if (!nqi.getItemId().equals(itemId)) continue;
 
-                        numUnreadNotifications--;
-                        negotiationQueue.remove(nqi);
+                    if (log.isDebugEnabled()) {
+                        String fmt = "Removing notification item of type %s with ID %s";
+                        log.debug(String.format(fmt, item.getClass().getSimpleName(), itemId));
+                    }
+
+                    numUnreadNotifications--;
+                    negotiationQueue.remove(nqi);
+                    break;
+                }
+
+                // remove any timed aborts
+                synchronized (timedAbortsToWatch) {
+                    for (NotificationQueueItem nqi : timedAbortsToWatch) {
+                        if (!nqi.getItemId().equals(itemId)) continue;
+
+                        timedAbortsToWatch.remove(nqi);
                         break;
                     }
                 }
+
 
             } else {
                 if (log.isDebugEnabled()) {
@@ -252,8 +284,60 @@ public class NotificationsController extends BasePageController {
         }
     }
 
+    private class TimedAbortProcessor implements Runnable {
+
+        private boolean abort = false;
+        private final List<NotificationQueueItem> timedAbortsToWatch;
+
+        public TimedAbortProcessor(List<NotificationQueueItem> timedAbortsToWatch) {
+            this.timedAbortsToWatch = timedAbortsToWatch;
+        }
+
+        @Override
+        public void run() {
+            while (!abort) {
+                try {
+                    processTimedAborts();
+                } catch (Exception ex) {
+                    log.error("Error on timed abort processing thread", ex);
+                }
+
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                    log.error("Error sleeping on timed abort processing thread", ex);
+                }
+            }
+        }
+
+        public void stop() {
+            abort = true;
+        }
+
+        private void processTimedAborts() {
+            synchronized (timedAbortsToWatch) {
+                for (int i = 0; i < timedAbortsToWatch.size(); i++) {
+                    NotificationQueueItem ta = timedAbortsToWatch.get(i);
+
+                    // check if this TA has expired
+                    if (!new Date().after(ta.getTimeoutTime())) continue;
+
+                    // the TA has expired, send the response
+                    ta.setResult(null); // anything other than 'ABORT' is considered 'continue'
+                    submitItem(ta.getItemId());
+
+                    // remove from watch list
+                    timedAbortsToWatch.remove(i);
+                    i--;
+                }
+            }
+        }
+
+    }
+
     private final PubSubListener pubSubListener = new PubSubListener();
     private final LoginListener loginListener = new LoginListener();
+    private final Thread timedAbortProcessorThread;
 
     @ManagedProperty(value = "#{pubsubClient}")
     private PubsubClient pubsubClient;
@@ -261,11 +345,18 @@ public class NotificationsController extends BasePageController {
     @ManagedProperty(value = "#{userService}")
     private UserService userService;
 
+    private final List<NotificationQueueItem> timedAbortsToWatch = new ArrayList<NotificationQueueItem>();
     private final Queue<NotificationQueueItem> negotiationQueue = new LinkedList<NotificationQueueItem>();
     private int numUnreadNotifications;
 
+
     public NotificationsController() {
         log.trace("NotificationsController ctor()");
+
+        timedAbortProcessorThread = new Thread(new TimedAbortProcessor(timedAbortsToWatch));
+        timedAbortProcessorThread.setName("TimedAbortProcessor");
+        timedAbortProcessorThread.setDaemon(true);
+        timedAbortProcessorThread.start();
     }
 
     @SuppressWarnings("UnusedDeclaration")
@@ -341,7 +432,6 @@ public class NotificationsController extends BasePageController {
             responseBean.setRequestId(selectedItem.getItemId());
 
             List<String> feedback = new ArrayList<String>();
-
             if (selectedItem.getType().equals(NotificationQueueItem.TYPE_SELECT_MANY)) {
                 // add all results
                 Collections.addAll(feedback, selectedItem.getResults());
@@ -349,18 +439,25 @@ public class NotificationsController extends BasePageController {
                 // add one result
                 feedback.add(selectedItem.getResult());
             }
-
             responseBean.setFeedback(feedback);
 
             pubSubListener.sendExplicitResponse(responseBean);
+
         } else if (selectedItem.getType().equals(NotificationQueueItem.TYPE_TIMED_ABORT)) {
+
             ImpFeedbackResultBean responseBean = new ImpFeedbackResultBean();
             responseBean.setRequestId(selectedItem.getItemId());
-            responseBean.setAccepted(false);
+            responseBean.setAccepted(ABORT_STRING.equals(selectedItem.getResult()));
 
             pubSubListener.sendImplicitResponse(responseBean);
-        }
 
+        } else if (selectedItem.getType().equals(NotificationQueueItem.TYPE_NOTIFICATION)) {
+            // no response is required
+            // but we must manually remove item from queue
+            numUnreadNotifications--;
+            negotiationQueue.remove(selectedItem);
+
+        }
 
     }
 }

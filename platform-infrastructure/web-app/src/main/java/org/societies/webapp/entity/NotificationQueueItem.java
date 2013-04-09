@@ -17,6 +17,7 @@ public class NotificationQueueItem implements Serializable {
     public static final String TYPE_ACK_NACK = "ACK_NACK";
     public static final String TYPE_SELECT_ONE = "SELECT_ONE";
     public static final String TYPE_SELECT_MANY = "SELECT_MANY";
+    public static final String TYPE_NOTIFICATION = "NOTIFICATION";
     public static final String TYPE_UNKNOWN = "UNKNOWN";
 
 
@@ -39,6 +40,10 @@ public class NotificationQueueItem implements Serializable {
 
     public static NotificationQueueItem forSelectMany(IIdentity pubSubService, String pubSubNode, String itemId, String title, String[] options) {
         return new NotificationQueueItem(pubSubService, pubSubNode, itemId, TYPE_SELECT_MANY, title, options);
+    }
+
+    public static NotificationQueueItem forNotification(IIdentity pubSubService, String pubSubNode, String itemId, String title) {
+        return new NotificationQueueItem(pubSubService, pubSubNode, itemId, TYPE_NOTIFICATION, title, null);
     }
 
     private final Date arrivalDate;
@@ -182,4 +187,5 @@ public class NotificationQueueItem implements Serializable {
         // seconds only
         return seconds + "sec";
     }
+
 }
