@@ -233,7 +233,7 @@ public class PrivacyPolicyTestController extends BasePageController {
     public void sendTimedAbortEvent() {
         String requestID = UUID.randomUUID().toString();
 
-        String proposalText = "Pick MANY options";
+        String proposalText = "This is a timed abort";
 
         pubSubListener.sendImpFBEvent(requestID, ImpProposalType.TIMED_ABORT, proposalText, 10000);
     }

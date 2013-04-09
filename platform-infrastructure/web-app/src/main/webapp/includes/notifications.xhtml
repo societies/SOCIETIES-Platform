@@ -17,7 +17,6 @@
         <p>Bugs/incomplete:</p>
         <ul>
             <li>Wrong item disappearing on submit</li>
-            <li>Submit acknack events on button select</li>
             <li>Timed abort notification GUI</li>
         </ul>
 
@@ -49,12 +48,10 @@
                         <p:ajax event="change"
                                 process="ackNackPopupPanel"
                                 update="ppnPopupPanel"
-                                actionListener="#{notifications.submitItem(notification.itemId)}"/>
+                                listener="#{notifications.submitItem(notification.itemId)}"/>
                     </p:selectOneButton>
 
-                    <p:commandButton value="Submit (temporary button)" process="ackNackPopupPanel"
-                                     update="ppnPopupPanel"
-                                     actionListener="#{notifications.submitItem(notification.itemId)}"/>
+
                 </h:panelGrid>
             </p:panel>
 
