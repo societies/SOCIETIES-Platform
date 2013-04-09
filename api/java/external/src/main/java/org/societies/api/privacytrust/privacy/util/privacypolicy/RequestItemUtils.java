@@ -159,7 +159,7 @@ public class RequestItemUtils {
 		if (null == requestItemBean) {
 			return null;
 		}
-		return new RequestItem(ResourceUtils.toResource(requestItemBean.getResource()), ActionUtils.toActions(requestItemBean.getActions()), ConditionUtils.toConditions(requestItemBean.getConditions()));
+		return new RequestItem(ResourceUtils.toResource(requestItemBean.getResource()), ActionUtils.toActions(requestItemBean.getActions()), ConditionUtils.toConditions(requestItemBean.getConditions()), requestItemBean.isOptional());
 	}
 	public static List<RequestItem> toRequestItems(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem> requestItemBeans)
 	{
