@@ -127,12 +127,8 @@ public class TrustCommsServer implements IFeatureServer {
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
 		
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("getQuery: stanza.id=" + stanza.getId());
-			LOG.debug("getQuery: stanza.from=" + stanza.getFrom());
-			LOG.debug("getQuery: stanza.to=" + stanza.getTo());
-			LOG.debug("getQuery: payload=" + payload);
-		}
+		if (LOG.isDebugEnabled())
+			LOG.debug("getQuery: stanza=" + stanza + ", payload=" + payload);
 
 		if (payload instanceof TrustBrokerRequestBean) {
 			return this.trustBrokerRemoteServer.getQuery(stanza, payload);
@@ -155,14 +151,8 @@ public class TrustCommsServer implements IFeatureServer {
 	@Override
 	public Object setQuery(Stanza stanza, Object payload) throws XMPPError {
 		
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("setQuery: stanza.id=" + stanza.getId());
-			LOG.debug("setQuery: stanza.from=" + stanza.getFrom());
-			LOG.debug("setQuery: stanza.to=" + stanza.getTo());
-			LOG.debug("setQuery: payload=" + payload);
-		}
-
-		// TODO error?
+		if (LOG.isDebugEnabled())
+			LOG.debug("setQuery: stanza=" + stanza + ", payload=" + payload);
 		
 		return null;
 	}
@@ -173,11 +163,7 @@ public class TrustCommsServer implements IFeatureServer {
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
 		
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("receiveMessage: stanza.id=" + stanza.getId());
-			LOG.debug("receiveMessage: stanza.from=" + stanza.getFrom());
-			LOG.debug("receiveMessage: stanza.to=" + stanza.getTo());
-			LOG.debug("receiveMessage: payload=" + payload);
-		}		
+		if (LOG.isDebugEnabled())
+			LOG.debug("receiveMessage: stanza=" + stanza + ", payload=" + payload);
 	}
 }
