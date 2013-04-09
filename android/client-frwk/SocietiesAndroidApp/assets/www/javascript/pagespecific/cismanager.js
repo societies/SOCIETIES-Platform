@@ -132,6 +132,14 @@ var	SocietiesCISManagerService = {
 			//POPULATE THE MyServices SELECT BOX
 			ServiceManagementServiceHelper.connectToServiceManagement(SocietiesCISListService.createSelectServices);
 			
+			// -- Populate CIS Privacy Policy
+			var privacyPolicyHandler = '#getPrivacyPolicy';
+			// Clean
+			while($(privacyPolicyHandler).children().length >0)
+				$(privacyPolicyHandler+' li:last').remove();
+			// Call
+			SocietiesPrivacyPolicyManagerService.getPrivacyPolicy(privacyPolicyHandler, data.ownerJid, data.communityJid, true);
+			
 			$.mobile.changePage($("#community-details-page"), {transition: "fade"});
 		}
 	},
