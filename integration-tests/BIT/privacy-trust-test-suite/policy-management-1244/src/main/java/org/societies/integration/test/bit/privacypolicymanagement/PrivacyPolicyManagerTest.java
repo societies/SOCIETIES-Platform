@@ -182,6 +182,7 @@ public class PrivacyPolicyManagerTest {
 		RequestPolicy expectedPrivacyPolicy = null;
 		RequestPolicy privacyPolicy = null;
 		try {
+			TestCase1244.privacyPolicyManager.deletePrivacyPolicy(requestorService);
 			privacyPolicy = TestCase1244.privacyPolicyManager.getPrivacyPolicy(requestorService);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
@@ -216,6 +217,7 @@ public class PrivacyPolicyManagerTest {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
 			fail("Error: "+e.getMessage());
 		}
+		LOG.info("[#"+testCaseNumber+"] "+testTitle+": Retrieved privacy policy: "+privacyPolicy.toString());
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
 		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicy);
 		
@@ -559,7 +561,7 @@ public class PrivacyPolicyManagerTest {
 		extendedActions.add(new Action(ActionConstants.CREATE));
 		extendedActions.add(new Action(ActionConstants.WRITE));
 		extendedActions.add(new Action(ActionConstants.DELETE));
-		RequestItem someItem = new RequestItem(someResource, extendedActions, extendedConditions, false);
+		RequestItem someItem = new RequestItem(someResource, extendedActions, extendedConditions, true);
 		items.add(someItem);
 		return items;
 	}
