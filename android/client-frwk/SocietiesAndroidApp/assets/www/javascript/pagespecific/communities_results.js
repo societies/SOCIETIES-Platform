@@ -50,7 +50,7 @@ var	SocietiesCisDirService = {
 		
 		//DISPLAY COMMUNTIES
 		for (i  = 0; i < data.length; i++) {
-			var tableEntry = '<li><a href="#" onclick="SocietiesCisDirService.joinCIS(' + i + ')"><img src="images/community_profile_icon.png" class="profile_list" alt="logo" >' +
+			var tableEntry = '<li id="li' + i + '"><a href="#" onclick="SocietiesCisDirService.joinCIS(' + i + ')"><img src="images/community_profile_icon.png" class="profile_list" alt="logo" >' +
 							 '<h2>' + data[i].name + '</h2>' + 
 							 '<p>' + data[i].type + '</p>' + 
 							 '</a></li>';
@@ -65,6 +65,7 @@ var	SocietiesCisDirService = {
 		if ( cisAdvert ) {
 			//REQUEST JOIN
 			if (window.confirm("Request Join: " + cisAdvert.name + "?")) {
+				$('#li' + cisPos).remove().slideUp('slow');
 				SocietiesCISManagerService.getJoinResponse(cisAdvert);
 			}
 		}
