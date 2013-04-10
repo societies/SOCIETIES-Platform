@@ -31,7 +31,6 @@ import java.util.*;
 @SessionScoped
 public class NotificationsController extends BasePageController {
 
-    public static final String ABORT_STRING = "abort";
 
     private class PubSubListener implements Subscriber {
         //pubsub event schemas
@@ -111,67 +110,31 @@ public class NotificationsController extends BasePageController {
             }
 
             if (log.isDebugEnabled()) {
-                String fmt = "Event type %s with ID %s";
-                log.debug(String.format(fmt, item.getClass().getSimpleName(), itemId));
+                String fmt = "Event type %s, payload type %s, with message ID %s";
+                log.debug(String.format(fmt, node, item.getClass().getSimpleName(), itemId));
             }
 
             // create the correct notification type for the incoming event
             if (EventTypes.UF_PRIVACY_NEGOTIATION.equals(node)) {
                 UserFeedbackPrivacyNegotiationEvent ppn = (UserFeedbackPrivacyNegotiationEvent) item;
 
-                negotiationQueue.add(NotificationQueueItem.forPrivacyPolicyNotification(pubsubService, node, itemId, ppn));
+                negotiationQueue.add(NotificationQueueItem.forPrivacyPolicyNotification(pubsubService, node, String.valueOf(ppn.getNegotiationDetails().getNegotiationID()), ppn));
                 numUnreadNotifications++;
 
             } else if (UserFeedbackEventTopics.REQUEST.equals(node)) {
 
                 UserFeedbackBean bean = (UserFeedbackBean) item;
+                NotificationQueueItem newItem = createNotificationQueueItemFromUserFeedbackBean(pubsubService, node, bean);
 
-                String proposalText = bean.getProposalText();
-                String[] options = bean.getOptions().toArray(new String[bean.getOptions().size()]);
+                // if we get a null item back, something has gone wrong and we've already logged the error
+                if (newItem == null)
+                    return;
 
-                NotificationQueueItem newItem;
-
-                if (bean.getMethod() == FeedbackMethodType.GET_EXPLICIT_FB) {
-                    switch (bean.getType()) {
-                        case ExpProposalType.ACKNACK:
-                            // This is an AckNack notification
-                            newItem = NotificationQueueItem.forAckNack(pubsubService, node, itemId, proposalText);
-                            break;
-
-                        case ExpProposalType.CHECKBOXLIST:
-                            // This is a select-many notification
-                            newItem = NotificationQueueItem.forSelectMany(pubsubService, node, itemId, proposalText, options);
-                            break;
-
-                        case ExpProposalType.RADIOLIST:
-                            // This is a select-one notification
-                            newItem = NotificationQueueItem.forSelectOne(pubsubService, node, itemId, proposalText, options);
-                            break;
-
-                        default:
-                            log.error("Unknown UserFeedbackBean type = " + bean.getType());
-                            return;
-                    }
-
-                } else if (bean.getMethod() == FeedbackMethodType.GET_IMPLICIT_FB) {
-                    // This is a timed abort
-                    Date timeout = new Date(new Date().getTime() + bean.getTimeout());
-
-                    newItem = NotificationQueueItem.forTimedAbort(pubsubService, node, itemId, proposalText, timeout);
-
-                    // add to the list of timed aborts for the watcher thread
+                if (bean.getMethod() == FeedbackMethodType.GET_IMPLICIT_FB) {
+                    // This is a timed abort - add to the list of timed aborts for the watcher thread
                     synchronized (timedAbortsToWatch) {
                         timedAbortsToWatch.add(newItem);
                     }
-
-                } else if (bean.getMethod() == FeedbackMethodType.SHOW_NOTIFICATION) {
-                    // This is a simple (no response required) notification
-
-                    newItem = NotificationQueueItem.forNotification(pubsubService, node, itemId, proposalText);
-
-                } else {
-                    log.error("Cannot handle UserFeedbackBean with method " + bean.getMethod().toString());
-                    return;
                 }
 
                 negotiationQueue.add(newItem);
@@ -184,35 +147,27 @@ public class NotificationsController extends BasePageController {
                     || UserFeedbackEventTopics.EXPLICIT_RESPONSE.equals(node)
                     || UserFeedbackEventTopics.IMPLICIT_RESPONSE.equals(node)) {
 
-                for (NotificationQueueItem nqi : negotiationQueue) {
-                    if (!nqi.getItemId().equals(itemId)) continue;
 
-                    if (log.isDebugEnabled()) {
-                        String fmt = "Removing notification item of type %s with ID %s";
-                        log.debug(String.format(fmt, item.getClass().getSimpleName(), itemId));
-                    }
-
-                    numUnreadNotifications--;
-                    negotiationQueue.remove(nqi);
-                    break;
+                if (item instanceof UserFeedbackBean) {
+                    String id = ((UserFeedbackBean) item).getRequestId();
+                    removeNotificationQueueItem(id);
+                } else if (item instanceof ExpFeedbackResultBean) {
+                    String id = ((ExpFeedbackResultBean) item).getRequestId();
+                    removeNotificationQueueItem(id);
+                } else if (item instanceof ImpFeedbackResultBean) {
+                    String id = ((ImpFeedbackResultBean) item).getRequestId();
+                    removeNotificationQueueItem(id);
+                } else if (item instanceof UserFeedbackPrivacyNegotiationEvent) {
+                    String id = String.valueOf(((UserFeedbackPrivacyNegotiationEvent) item).getNegotiationDetails().getNegotiationID());
+                    removeNotificationQueueItem(id);
+                } else {
+                    log.warn(String.format("Unknown response payload type %s, attempting to remove by message ID", item.getClass().getSimpleName()));
+                    removeNotificationQueueItem(itemId);
                 }
-
-                // remove any timed aborts
-                synchronized (timedAbortsToWatch) {
-                    for (NotificationQueueItem nqi : timedAbortsToWatch) {
-                        if (!nqi.getItemId().equals(itemId)) continue;
-
-                        timedAbortsToWatch.remove(nqi);
-                        break;
-                    }
-                }
-
 
             } else {
-                if (log.isDebugEnabled()) {
-                    String fmt = "Unknown event type %s with ID %s";
-                    log.debug(String.format(fmt, item.getClass().getSimpleName(), itemId));
-                }
+                String fmt = "Unknown event type %s with ID %s";
+                log.warn(String.format(fmt, item.getClass().getSimpleName(), itemId));
             }
 
 
@@ -265,6 +220,83 @@ public class NotificationsController extends BasePageController {
                 log.error("Error publishing notification of completed implicit UF request", e);
             }
         }
+
+        private NotificationQueueItem createNotificationQueueItemFromUserFeedbackBean(IIdentity pubsubService, String node, UserFeedbackBean bean) {
+            String proposalText = bean.getProposalText();
+            String[] options = bean.getOptions().toArray(new String[bean.getOptions().size()]);
+
+            NotificationQueueItem newItem;
+
+            if (bean.getMethod() == FeedbackMethodType.GET_EXPLICIT_FB) {
+                switch (bean.getType()) {
+                    case ExpProposalType.ACKNACK:
+                        // This is an AckNack notification
+                        newItem = NotificationQueueItem.forAckNack(pubsubService, node, bean.getRequestId(), proposalText, options);
+                        break;
+
+                    case ExpProposalType.CHECKBOXLIST:
+                        // This is a select-many notification
+                        newItem = NotificationQueueItem.forSelectMany(pubsubService, node, bean.getRequestId(), proposalText, options);
+                        break;
+
+                    case ExpProposalType.RADIOLIST:
+                        // This is a select-one notification
+                        newItem = NotificationQueueItem.forSelectOne(pubsubService, node, bean.getRequestId(), proposalText, options);
+                        break;
+
+                    default:
+                        log.error("Unknown UserFeedbackBean type = " + bean.getType());
+                        return null;
+                }
+
+            } else if (bean.getMethod() == FeedbackMethodType.GET_IMPLICIT_FB) {
+                // This is a timed abort
+                Date timeout = new Date(new Date().getTime() + bean.getTimeout());
+
+                newItem = NotificationQueueItem.forTimedAbort(pubsubService, node, bean.getRequestId(), proposalText, timeout);
+
+            } else if (bean.getMethod() == FeedbackMethodType.SHOW_NOTIFICATION) {
+                // This is a simple (no response required) notification
+
+                newItem = NotificationQueueItem.forNotification(pubsubService, node, bean.getRequestId(), proposalText);
+
+            } else {
+                log.error("Cannot handle UserFeedbackBean with method " + bean.getMethod().toString());
+                return null;
+            }
+            return newItem;
+        }
+
+        private void removeNotificationQueueItem(String itemId) {
+            if (log.isDebugEnabled()) {
+                String fmt = "Removing notification item ID %s";
+                log.debug(String.format(fmt, itemId));
+            }
+
+            for (NotificationQueueItem nqi : negotiationQueue) {
+                if (!nqi.getItemId().equals(itemId)) continue;
+
+                if (log.isDebugEnabled()) {
+                    String fmt = "Removing notification item of type %s with ID %s";
+                    log.debug(String.format(fmt, nqi.getType(), itemId));
+                }
+
+                numUnreadNotifications--;
+                negotiationQueue.remove(nqi);
+                break;
+            }
+
+            // remove any timed aborts
+            synchronized (timedAbortsToWatch) {
+                for (NotificationQueueItem nqi : timedAbortsToWatch) {
+                    if (!nqi.getItemId().equals(itemId)) continue;
+
+                    timedAbortsToWatch.remove(nqi);
+                    break;
+                }
+            }
+        }
+
     }
 
     private class LoginListener implements ILoginListener {
@@ -335,8 +367,12 @@ public class NotificationsController extends BasePageController {
 
     }
 
+    public static final String ABORT_STRING = "abort";
+
+
     private final PubSubListener pubSubListener = new PubSubListener();
     private final LoginListener loginListener = new LoginListener();
+    @SuppressWarnings("FieldCanBeLocal")
     private final Thread timedAbortProcessorThread;
 
     @ManagedProperty(value = "#{pubsubClient}")

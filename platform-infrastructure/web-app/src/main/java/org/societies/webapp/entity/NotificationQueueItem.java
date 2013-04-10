@@ -29,9 +29,8 @@ public class NotificationQueueItem implements Serializable {
         return new NotificationQueueItem(pubSubService, pubSubNode, itemId, title, timeout);
     }
 
-    public static NotificationQueueItem forAckNack(IIdentity pubSubService, String pubSubNode, String itemId, String title) {
-        return new NotificationQueueItem(pubSubService, pubSubNode, itemId, TYPE_ACK_NACK, title,
-                new String[]{"Yes", "No"});
+    public static NotificationQueueItem forAckNack(IIdentity pubSubService, String pubSubNode, String itemId, String title, String[] options) {
+        return new NotificationQueueItem(pubSubService, pubSubNode, itemId, TYPE_ACK_NACK, title, options);
     }
 
     public static NotificationQueueItem forSelectOne(IIdentity pubSubService, String pubSubNode, String itemId, String title, String[] options) {
