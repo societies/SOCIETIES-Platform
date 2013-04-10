@@ -29,7 +29,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import org.slf4j.Logger;
@@ -40,6 +39,7 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.preference.IUserPreferenceManagement;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
@@ -57,6 +57,7 @@ import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
@@ -72,7 +73,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private IIdentity myPublicDPI;
 	private PolicyRetriever servicePolicyRetriever;
-	private Hashtable<Requestor, NegotiationClient> negClients ;
+	private Hashtable<RequestorBean, NegotiationClient> negClients ;
 	private LocalServiceStartedListener localServiceStartedListener; 
 	private IUserFeedback userFeedback;
 	private IUserPreferenceManagement prefMgr;
@@ -228,7 +229,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 
 
 		this.servicePolicyRetriever = new PolicyRetriever(this, this.getEventMgr());
-		this.negClients = new Hashtable<Requestor, NegotiationClient>();
+		this.negClients = new Hashtable<RequestorBean, NegotiationClient>();
 		/*
 		 * TODO: this has to start automatically
 		 * this.negAgent = new NegotiationAgent(this.myContext, this.myPublicDPI, this.getPrivacyPolicyRegMgr(), this.adMgr);
@@ -311,7 +312,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 			this.logging.debug("Starting new negotiation with cis: "+requestor.toString());
 			NegotiationClient negClient = new NegotiationClient(this.negotiationAgentRemote, this);
 			negClient.startPrivacyPolicyNegotiation(details, null);
-			this.negClients.put(requestor, negClient);
+			this.negClients.put(RequestorUtils.toRequestorBean(requestor), negClient);
 		}else{
 			throw new PrivacyException("Supplied Requestor not a CisRequestor");
 		}
@@ -377,7 +378,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 			this.logging.debug("Starting new negotiation with service: "+requestor.toString());
 			NegotiationClient negClient = new NegotiationClient(this.getNegotiationAgentRemote(), this);
 			negClient.startPrivacyPolicyNegotiation(details, null);
-			this.negClients.put(requestor, negClient);		
+			this.negClients.put(RequestorUtils.toRequestorBean(requestor), negClient);		
 		}
 	}
 
@@ -448,7 +449,7 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
 		}else if (event.geteventType().equals(EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT)){
 			PPNegotiationEvent ppnEvent = (PPNegotiationEvent) event.geteventInfo();
 
-			Requestor requestor = ppnEvent.getAgreement().getRequestor();
+			RequestorBean requestor = ppnEvent.getAgreement().getRequestor();
 			this.logging.debug("Received successfull Negotiation event for : "+requestor.toString());
 			if (this.negClients.containsKey(requestor)){
 				this.negClients.remove(requestor);

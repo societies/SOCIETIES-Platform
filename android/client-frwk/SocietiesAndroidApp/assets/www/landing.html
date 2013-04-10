@@ -24,29 +24,27 @@
     </div>
 
 	<div data-role="content" >
-    
-
 	    <ul data-role="listview" data-theme="c" data-divider-theme="b">
-	   
 	   		<li data-role="list-divider">
 	   			<div class="center">WHERE PERVASIVE MEETS SOCIAL</div>
 	   		</li>
 	   	</ul>	
-		
 		<div class="landing_graphic" ><img src="images/landing-image-option2.jpg" alt="slide"></div>
-  
- 
 		<ul data-role="listview" data-inset="true" id="listview" data-theme="c">
 			<li><a id="friends_anchor" href="#friends-landing">Friends</a></li>
 			<li><a id="communities_anchor" href="communities_landing.html">Communities</a></li>
 			<li><a id="myapps_anchor" href="#">Apps</a></li>
-
 		</ul>
-		
-
-	</div><!-- /content -->
+		<div data-role="collapsible" data-theme="b" data-content-theme="d" >
+			<h3>What SOCIETIES has done for you</h3>
+			<ul data-role="listview" data-theme="c" data-divider-theme="b" id="cssmgr_activity_feed" data-split-icon="delete">
+			<!-- ADD ACTIVITIES HERE -->
+			</ul>
+		</div>
+	</div>
+	<!-- /content -->
     
-     <div class="footer_fixed" data-role="footer" data-position="fixed">
+    <div class="footer_fixed" data-role="footer" data-position="fixed">
 		<ul class="nav">
 			<li class="btn-home">
 				<input id="home-button" type="image" alt="home" src="images/icons/home_logo.png"  data-role="none"/>

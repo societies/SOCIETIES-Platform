@@ -24,20 +24,20 @@
  */
 package org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring;
 
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceConditionMonitor;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PPNPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.dobf.DObfMonitor;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.ids.IDSMonitor;
-import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.ppnp.PPNMonitor;
 
 /**
  * Describe your class here...
@@ -48,7 +48,6 @@ import org.societies.privacytrust.privacyprotection.privacypreferencemanager.mon
 public class PrivacyPreferenceConditionMonitor implements IPrivacyPreferenceConditionMonitor{
 
 	private ICtxBroker ctxBroker;
-	private PPNMonitor ppnMonitor;
 	private DObfMonitor dobfMonitor;
 	private IDSMonitor idsMonitor;
 	private PrivacyPreferenceManager privPrefMgr;
@@ -56,12 +55,11 @@ public class PrivacyPreferenceConditionMonitor implements IPrivacyPreferenceCond
 	private IPrivacyDataManagerInternal privacyDataManager;
 	private IIdentity userIdentity;
 	
-	public PrivacyPreferenceConditionMonitor(ICtxBroker ctxBroker, PrivacyPreferenceManager privPrefMgr, IPrivacyDataManagerInternal privDataManager, IIdentityManager idm){
+	public PrivacyPreferenceConditionMonitor(ICtxBroker ctxBroker, PrivacyPreferenceManager privPrefMgr, IPrivacyDataManagerInternal privDataManager, ICommManager commsMgr){
 		this.ctxBroker = ctxBroker;
 		this.privacyDataManager = privDataManager;
-		this.idm = idm;
-		userIdentity = idm.getThisNetworkNode();
-		ppnMonitor = new PPNMonitor(userIdentity, privPrefMgr, ctxBroker, privacyDataManager);
+		this.idm = commsMgr.getIdManager();
+		userIdentity = commsMgr.getIdManager().getThisNetworkNode();
 		dobfMonitor = new DObfMonitor(userIdentity, privPrefMgr, ctxBroker);
 		idsMonitor = new IDSMonitor(userIdentity, ctxBroker, privPrefMgr);
 		
@@ -75,27 +73,5 @@ public class PrivacyPreferenceConditionMonitor implements IPrivacyPreferenceCond
 		
 	}
 
-
-	public void updatePreferences(PPNPreferenceDetails details,
-			IPrivacyPreference preference) {
-		this.ppnMonitor.updateDetails(details, preference);
-		
-	}
-
-
-	/**
-	 * @return the ppnMonitor
-	 */
-	public PPNMonitor getPpnMonitor() {
-		return ppnMonitor;
-	}
-
-
-	/**
-	 * @param ppnMonitor the ppnMonitor to set
-	 */
-	public void setPpnMonitor(PPNMonitor ppnMonitor) {
-		this.ppnMonitor = ppnMonitor;
-	}
 
 }

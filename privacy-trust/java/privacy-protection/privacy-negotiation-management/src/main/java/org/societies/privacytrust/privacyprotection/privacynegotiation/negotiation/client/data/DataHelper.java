@@ -36,10 +36,10 @@ import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.schema.identity.DataIdentifierScheme;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 
 /**
  * Describe your class here...
@@ -87,7 +87,7 @@ public class DataHelper{
 			if (resultSet.isEmpty()){
 				
 				for (Action a : item.getActions()){
-					if (a.getActionType().equals(ActionConstants.CREATE)){
+					if (a.getActionConstant().equals(ActionConstants.CREATE)){
 						return true;
 					}
 				}

@@ -74,7 +74,7 @@ public class ContextPreferenceCondition implements IPrivacyPreferenceCondition, 
 		return this.ctxID.getType()+" "+this.operator+" "+this.value;
 	}
 	
-	public boolean equals(IPrivacyPreferenceCondition ippc){
+/*	public boolean equals(IPrivacyPreferenceCondition ippc){
 		if (!(ippc instanceof ContextPreferenceCondition)){
 			return false;
 		}
@@ -90,14 +90,64 @@ public class ContextPreferenceCondition implements IPrivacyPreferenceCondition, 
 		}
 		
 		return true;
-	}
+	}*/
 
+	
+	
 	/* (non-Javadoc)
 	 * @see org.personalsmartspace.spm.preference.api.platform.IPrivacyPreferenceCondition#getType()
 	 */
 	@Override
 	public PrivacyConditionConstants getType() {
 		return PrivacyConditionConstants.CONTEXT;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((ctxID == null) ? 0 : ctxID.hashCode());
+		result = prime * result
+				+ ((myConditionType == null) ? 0 : myConditionType.hashCode());
+		result = prime * result
+				+ ((operator == null) ? 0 : operator.hashCode());
+		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof ContextPreferenceCondition)) {
+			return false;
+		}
+		ContextPreferenceCondition other = (ContextPreferenceCondition) obj;
+		if (ctxID == null) {
+			if (other.ctxID != null) {
+				return false;
+			}
+		} else if (!ctxID.equals(other.ctxID)) {
+			return false;
+		}
+		if (myConditionType != other.myConditionType) {
+			return false;
+		}
+		if (operator != other.operator) {
+			return false;
+		}
+		if (value == null) {
+			if (other.value != null) {
+				return false;
+			}
+		} else if (!value.equals(other.value)) {
+			return false;
+		}
+		return true;
 	}
 	
 }

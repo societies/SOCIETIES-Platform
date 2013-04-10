@@ -3,16 +3,22 @@
 	targetNamespace="http://societies.org/api/schema/privacytrust/trust/broker"   
 	xmlns:tns="http://societies.org/api/schema/privacytrust/trust/broker" 
 	xmlns:tnsm="http://societies.org/api/schema/privacytrust/trust/model"
+	xmlns:tnsid="http://societies.org/api/schema/identity"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<xs:import namespace="http://societies.org/api/schema/privacytrust/trust/model"
 		schemaLocation="org.societies.api.schema.privacytrust.trust.model.xsd" />
 		
+	<xs:import namespace="http://societies.org/api/schema/identity"
+		schemaLocation="org.societies.api.schema.identity.xsd" />
+		
 	<xs:element name="trustBrokerRequestBean">
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="methodName" type="tns:methodName" nillable="false" minOccurs="1"/>
-				<xs:element name="retrieve" type="tns:retrieveTrustBrokerRequestBean" nillable="false" minOccurs="0"/>
+				<xs:element name="retrieveTrustRelationships" type="tns:trustRelationshipsRequestBean" nillable="false" minOccurs="0"/>
+				<xs:element name="retrieveTrustRelationship" type="tns:trustRelationshipRequestBean" nillable="false" minOccurs="0"/>
+				<xs:element name="retrieveTrustValue" type="tns:trustValueRequestBean" nillable="false" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -21,25 +27,62 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="methodName" type="tns:methodName" nillable="false" minOccurs="1"/>
-				<xs:element name="retrieve" type="tns:retrieveTrustBrokerResponseBean" nillable="false" minOccurs="0"/>
+				<xs:element name="retrieveTrustRelationships" type="tns:trustRelationshipsResponseBean" nillable="false" minOccurs="0"/>
+				<xs:element name="retrieveTrustRelationship" type="tns:trustRelationshipResponseBean" nillable="false" minOccurs="0"/>
+				<xs:element name="retrieveTrustValue" type="tns:trustValueResponseBean" nillable="false" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 	
 	<xs:simpleType name="methodName">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="RETRIEVE"/>
+			<xs:enumeration value="RETRIEVE_TRUST_RELATIONSHIPS"/>
+			<xs:enumeration value="RETRIEVE_TRUST_RELATIONSHIP"/>
+			<xs:enumeration value="RETRIEVE_TRUST_VALUE"/>
 		</xs:restriction>
 	</xs:simpleType>
 	
-	<xs:complexType name="retrieveTrustBrokerRequestBean">
+	<xs:complexType name="trustRelationshipsRequestBean">
 		<xs:sequence>
+		    <xs:element name="requestor" type="tnsid:requestorBean" nillable="false" minOccurs="1"/>
 			<xs:element name="trustorId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
-			<xs:element name="trusteeId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
+			<xs:element name="trusteeId" type="tnsm:trustedEntityIdBean" minOccurs="0"/>
+			<xs:element name="trusteeType" type="tnsm:trustedEntityTypeBean" minOccurs="0"/>
+			<xs:element name="trustValueType" type="tnsm:trustValueTypeBean" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 	
-	<xs:complexType name="retrieveTrustBrokerResponseBean">
+	<xs:complexType name="trustRelationshipsResponseBean">
+		<xs:sequence>
+			<xs:element name="result" type="tnsm:trustRelationshipBean" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="trustRelationshipRequestBean">
+		<xs:sequence>
+		    <xs:element name="requestor" type="tnsid:requestorBean" nillable="false" minOccurs="1"/>
+			<xs:element name="trustorId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
+			<xs:element name="trusteeId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
+			<xs:element name="trustValueType" type="tnsm:trustValueTypeBean" nillable="false" minOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="trustRelationshipResponseBean">
+		<xs:sequence>
+			<xs:element name="result" type="tnsm:trustRelationshipBean" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="trustValueRequestBean">
+		<xs:sequence>
+		    <xs:element name="requestor" type="tnsid:requestorBean" nillable="false" minOccurs="1"/>
+			<xs:element name="trustorId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
+			<xs:element name="trusteeId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
+			<xs:element name="trustValueType" type="tnsm:trustValueTypeBean" nillable="false" minOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="trustValueResponseBean">
 		<xs:sequence>
 			<xs:element name="result" type="xs:double" minOccurs="0"/>
 		</xs:sequence>

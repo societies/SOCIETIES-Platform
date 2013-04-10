@@ -162,7 +162,14 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		return this.internalCtxBroker.retrieve(requestor, identifier);
 	}
 
-
+	@Override
+	public Future<List<CtxModelObject>> retrieve(Requestor requestor,
+			List<CtxIdentifier> ctxIdList) throws CtxException {
+		
+		return this.internalCtxBroker.retrieve(requestor, ctxIdList);
+	}
+	
+	
 	@Override
 	@Async
 	public Future<CtxEntityIdentifier> retrieveIndividualEntityId(
@@ -570,5 +577,6 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		}
 	}
 
+	
 
 }

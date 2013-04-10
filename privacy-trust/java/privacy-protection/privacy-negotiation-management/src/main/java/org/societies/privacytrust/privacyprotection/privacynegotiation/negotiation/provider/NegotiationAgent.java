@@ -30,14 +30,21 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
+import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.AgreementEnvelopeUtils;
+import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.AgreementUtils;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.provider.ProviderResponsePolicyGenerator;
 import org.springframework.scheduling.annotation.AsyncResult;
 
@@ -68,12 +75,12 @@ public class NegotiationAgent implements INegotiationAgent{
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent#getPolicy(org.societies.api.identity.Requestor)
 	 */
 	@Override
-	public Future<RequestPolicy> getPolicy(Requestor requestor) {
+	public Future<RequestPolicy> getPolicy(RequestorBean requestor) {
 		this.log("Returning requested policy for : "+requestor.toString());
 	
 		RequestPolicy requestedPolicy;
 		try {
-			requestedPolicy = this.getPolicyMgr().getPrivacyPolicy(requestor);
+			requestedPolicy = RequestPolicyUtils.toRequestPolicyBean(this.getPolicyMgr().getPrivacyPolicy(RequestorUtils.toRequestor(requestor, this.commsMgr.getIdManager())));
 			if (requestedPolicy==null){
 				log("RequestPolicy is NULL");
 			}else{
@@ -81,6 +88,9 @@ public class NegotiationAgent implements INegotiationAgent{
 			}
 			return new AsyncResult<RequestPolicy>(requestedPolicy);
 		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -101,11 +111,11 @@ public class NegotiationAgent implements INegotiationAgent{
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.INegotiationAgent#negotiate(org.societies.api.identity.Requestor, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponsePolicy)
 	 */
 	@Override
-	public Future<ResponsePolicy> negotiate(Requestor requestor, ResponsePolicy policy) {
+	public Future<ResponsePolicy> negotiate(RequestorBean requestor, ResponsePolicy policy) {
 		log("Received responsePolicy from client");
 		log(policy.toString());
 		try {
-			RequestPolicy myPolicy = this.getPolicyMgr().getPrivacyPolicy(requestor);
+			RequestPolicy myPolicy = RequestPolicyUtils.toRequestPolicyBean(this.getPolicyMgr().getPrivacyPolicy(RequestorUtils.toRequestor(requestor, this.commsMgr.getIdManager())));
 			if (myPolicy==null){
 				log("Could not retrieve MY POLICY!");
 			}
@@ -116,6 +126,9 @@ public class NegotiationAgent implements INegotiationAgent{
 		} catch (PrivacyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		return new AsyncResult<ResponsePolicy>(null);
@@ -124,24 +137,18 @@ public class NegotiationAgent implements INegotiationAgent{
 	 * @see org.personalsmartspace.spm.negotiation.api.platform.INegotiationAgent#acknowledgeAgreement(org.personalsmartspace.spm.negotiation.api.platform.IAgreementEnvelope)
 	 */
 	@Override
-	public Future<Boolean> acknowledgeAgreement(IAgreementEnvelope envelope) {
+	public Future<Boolean> acknowledgeAgreement(AgreementEnvelope envelope) {
 		log("Client requests to acknowledge agreement");
 		try{
-			Key key = envelope.getPublicKey();
+			
+			Key key = AgreementEnvelopeUtils.getPublicKey(envelope);
+			
 			log("Got Public Key from Agreement Envelope "+key.toString());
 		}catch(Exception e){
 			log("Could not retrieve Public Key from Agreement Envelope");
 			e.printStackTrace();
 		}
-		
-		
-		try{
-			String keyStr = envelope.getPublicKeyAsString();
-			log("Got Public Key AS STRING from Agreement Envelope \n"+keyStr);
-		}catch(Exception e){
-			log("Could not retrieve Public Key AS STRING from Agreement Envelope");
-			e.printStackTrace();
-		}
+
 		
 		return new AsyncResult<Boolean>(true);
 		

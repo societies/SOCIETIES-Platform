@@ -176,7 +176,7 @@ public class PrivacyDataManagerTest extends IntegrationTest
 			Random randomer = new Random((new Date()).getTime()); 
 			String randomValue = ""+randomer.nextInt(200);
 			DataIdentifier randomDataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+myCssId+"/"+randomValue);
-			TestCase1266.getUserFeedbackMocker().addReply(UserFeedbackType.ACKNACK, new UserFeedbackMockResult(1, "Allow"));
+			TestCase1266.getUserFeedbackMocker().addReply(UserFeedbackType.CHECKBOXLIST, new UserFeedbackMockResult(1, "READ"));
 			permission = TestCase1266.privacyDataManager.checkPermission(requestorCis, randomDataId, actionsRead);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
@@ -202,7 +202,7 @@ public class PrivacyDataManagerTest extends IntegrationTest
 		ResponseItem permission1 = null;
 		ResponseItem permission2 = null;
 		try {
-			TestCase1266.getUserFeedbackMocker().addReply(UserFeedbackType.ACKNACK, new UserFeedbackMockResult(1, "Allow"));
+			TestCase1266.getUserFeedbackMocker().addReply(UserFeedbackType.CHECKBOXLIST, new UserFeedbackMockResult(1, "READ"));
 			permission1 = TestCase1266.privacyDataManager.checkPermission(requestorCis, dataId, actionsRead);
 			TestCase1266.getUserFeedbackMocker().removeAllReplies(); // Just to be sure
 			permission2 = TestCase1266.privacyDataManager.checkPermission(requestorCis, dataId, actionsRead);

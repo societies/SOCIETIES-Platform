@@ -207,6 +207,7 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 						//reset failures counters
 						updateTaskFailures.set(0);
 					}else{
+						/*
 						//increment failures counters
 						updateTaskFailures.incrementAndGet();
 						log.error("update CSM failed! - This is the '"+updateTaskFailures.get() +"'th attempt ;  entity '"+networkNode.getJid());
@@ -216,6 +217,7 @@ public class LMAdapterImpl implements ILocationManagementAdapter {
 							log.error("Location Management - Update CSM failed in the '"+updateTaskFailures.get() +"' attempt ; stopping task !");
 							timer.cancel();
 						}
+						*/
 					}
 				}
 			}catch (IllegalStateException e) {

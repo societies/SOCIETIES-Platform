@@ -91,7 +91,7 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		LOG.info(this.getClass() + " instantiated");
 		
 		LOG.info("Registering for direct trust evidence updates...");
-		super.trustEventMgr.registerListener(
+		super.trustEventMgr.registerEvidenceUpdateListener(
 				new DirectTrustEvidenceUpdateListener(), 
 				new String[] { TrustEventTopic.DIRECT_TRUST_EVIDENCE_UPDATED });
 	}

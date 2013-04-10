@@ -30,10 +30,5 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
  */
 public enum PrivacyConditionConstants {
 	
-	CONTEXT ("context"), TRUST("trust");
-
-	private String type;
-	PrivacyConditionConstants(String type){
-		this.type = type;
-	}
+	CONTEXT, TRUST, PRIVACY;
 }

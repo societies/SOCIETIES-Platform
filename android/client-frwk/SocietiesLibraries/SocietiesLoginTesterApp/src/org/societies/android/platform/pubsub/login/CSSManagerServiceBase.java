@@ -44,6 +44,7 @@ import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssEvent;
 import org.societies.api.schema.cssmanagement.CssManagerMessageBean;
@@ -1474,5 +1475,10 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 	public void stopAppServices(String client) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public MarshaledActivity[] getActivities(String client, String timePeriod, int limitResults) {
+		return null;
 	}
 }

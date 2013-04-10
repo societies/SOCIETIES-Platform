@@ -143,10 +143,8 @@ public interface IActivityFeed {
 	
 	public void addActivity(IActivity activity);
 	
+	public Future<List<IActivity>> getActivities(String timePeriod, long n);
+	
 	public Future<List<IActivity>> getActivities(String query, String timePeriod, long n); 
-
-
-	
-	
 
 }

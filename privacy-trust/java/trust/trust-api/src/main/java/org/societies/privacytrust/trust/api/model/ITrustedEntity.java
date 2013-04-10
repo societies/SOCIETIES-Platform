@@ -25,9 +25,7 @@
 package org.societies.privacytrust.trust.api.model;
 
 import java.io.Serializable;
-import java.util.Set;
 
-import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 
 /**
@@ -78,13 +76,4 @@ public interface ITrustedEntity extends Serializable {
 	 * @return the user-perceived trust in this entity.
 	 */
 	public IUserPerceivedTrust getUserPerceivedTrust();
-	
-	/**
-	 * Returns the {@link TrustUpdateEvent trust update events} associated with
-	 * this entity.
-	 * 
-	 * @return
-	 * @since 1.0
-	 */
-	public Set<TrustUpdateEvent> getTrustUpdateEvents();
 }

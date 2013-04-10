@@ -50,6 +50,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 
 
 	public PrivacyPolicyManager(Context context)  {
+		Log.d(TAG, "PrivacyPolicyManager Constructor");
 		this.context = context;
 		privacyPolicyManagerRemote = new PrivacyPolicyManagerRemote(context);
 		intentSender = new PrivacyPolicyIntentSender(context);
@@ -284,12 +285,14 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 
 	@Override
 	public boolean startService() {
+		Log.d(TAG, "PrivacyPolicyManager startService");
 		privacyPolicyManagerRemote.bindToComms();
 		return true;
 	}
 
 	@Override
 	public boolean stopService() {
+		Log.d(TAG, "PrivacyPolicyManager stopService");
 		privacyPolicyManagerRemote.unbindFromComms();
 		return true;
 	}

@@ -30,12 +30,6 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
  */
 public enum PrivacyPreferenceTypeConstants {
 	
-	IDS("ids"), PPNP("ppnp"), DOBF("dobf");
+	IDENTITY_SELECTION, PRIVACY_POLICY_NEGOTIATION, DATA_OBFUSCATION, ACCESS_CONTROL, ATTRIBUTE_SELECTION;
 	
-	private String type;
-	
-	PrivacyPreferenceTypeConstants(String str){
-		this.type = str;
-	}
-
 }

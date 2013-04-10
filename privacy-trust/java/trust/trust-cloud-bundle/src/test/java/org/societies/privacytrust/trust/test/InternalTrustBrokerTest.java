@@ -29,20 +29,23 @@ import static org.mockito.Mockito.*;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.model.TrustRelationship;
+import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.ITrustNodeMgr;
@@ -65,7 +68,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = {"classpath:META-INF/spring/InternalTrustBrokerTest-context.xml"})
 public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTests {
 	
-	private static final String BASE_ID = "tbt";
+	private static final String BASE_ID = "itbt";
 	
 	private static final String TRUSTOR_CSS_ID = BASE_ID + "TrustorCssIIdentity";
 	
@@ -130,6 +133,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		myIds.add(trustorCssTeid);
 		when(mockTrustNodeMgr.getMyIds()).thenReturn(myIds);
 		when(mockTrustNodeMgr.isMaster()).thenReturn(true);
+		when(mockTrustNodeMgr.getLocalRequestor()).thenReturn(
+				mock(Requestor.class));
 	}
 
 	/**
@@ -138,151 +143,2333 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 	@After
 	public void tearDown() throws Exception {
 	}
-
+	
 	/**
-	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrust(TrustedEntityId, TrustedEntityId)}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId)}.
 	 * @throws TrustException 
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
 	 */
 	@Test
-	public void testRetrieveTrustedCssTrust() throws Exception {
+	public void testRetrieveAllTrustRelationships() throws Exception {
 		
 		// test params
-		final double trustValue1 = 0.5d;
-		final double trustValue2 = 0.8d;
+		final double cssDirectTrustValue1 = 0.1d;
+		final double cssIndirectTrustValue1 = 0.2d;
+		final double cssUserPerceivedTrustValue1 = 0.3d;
+		final double cisDirectTrustValue1 = 0.3d;
+		final double cisIndirectTrustValue1 = 0.5d;
+		final double cisUserPerceivedTrustValue1 = 0.6d;
+		final double serviceDirectTrustValue1 = 0.7d;
+		final double serviceIndirectTrustValue1 = 0.8d;
+		final double serviceUserPerceivedTrustValue1 = 0.9d;
 		
-		Double retrievedTrustValue;
+		Set<TrustRelationship> retrievedTrustRelationships;
 		
-		retrievedTrustValue = this.internalTrustBroker.retrieveTrust(
-				trustorCssTeid, trusteeCssTeid).get(); 
-		assertNull(retrievedTrustValue);
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustorCssTeid).get(); 
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
 		
-		// add trusted CSS with user perceived value set to trustValue1
+		// add trusted CSS with direct trust value
 		ITrustedCss trustedCss = (ITrustedCss) this.trustRepo.createEntity(
 				trustorCssTeid, trusteeCssTeid);
-		trustedCss.getUserPerceivedTrust().setValue(trustValue1);
+		trustedCss.getDirectTrust().setValue(cssDirectTrustValue1);
 		this.trustRepo.updateEntity(trustedCss);
 		
 		// verify
-		retrievedTrustValue = this.internalTrustBroker.retrieveTrust(
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId()).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(1, retrievedTrustRelationships.size());
+		TrustRelationship retrievedTrustRelationship = retrievedTrustRelationships.iterator().next();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.DIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(cssDirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// update trusted CSS with indirect trust value
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getIndirectTrust().setValue(cssIndirectTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId()).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(2, retrievedTrustRelationships.size());
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (TrustValueType.INDIRECT == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.INDIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(cssIndirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// update trusted CSS with user perceived trust value
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getUserPerceivedTrust().setValue(cssUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId()).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(3, retrievedTrustRelationships.size());
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (TrustValueType.USER_PERCEIVED == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.USER_PERCEIVED, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(cssUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// add trusted CIS with trust values
+		ITrustedCis trustedCis = (ITrustedCis) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCisTeid);
+		trustedCis.getDirectTrust().setValue(cisDirectTrustValue1);
+		trustedCis.getIndirectTrust().setValue(cisIndirectTrustValue1);
+		trustedCis.getUserPerceivedTrust().setValue(cisUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCis);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId()).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(6, retrievedTrustRelationships.size());
+		
+		// verify (trustor, trustedCis, direct)
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (trustorCssTeid.equals(tr.getTrustorId()) 
+					&& trusteeCisTeid.equals(tr.getTrusteeId()) 
+					&& TrustValueType.DIRECT == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(cisDirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// verify (trustor, trustedCis, indirect)
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (trustorCssTeid.equals(tr.getTrustorId()) 
+					&& trusteeCisTeid.equals(tr.getTrusteeId()) 
+					&& TrustValueType.INDIRECT == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(cisIndirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// verify (trustor, trustedCis, user perceived)
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (trustorCssTeid.equals(tr.getTrustorId()) 
+					&& trusteeCisTeid.equals(tr.getTrusteeId()) 
+					&& TrustValueType.USER_PERCEIVED == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(cisUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// add trusted Service with trust values
+		ITrustedService trustedService = (ITrustedService) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeServiceTeid);
+		trustedService.getDirectTrust().setValue(serviceDirectTrustValue1);
+		trustedService.getIndirectTrust().setValue(serviceIndirectTrustValue1);
+		trustedService.getUserPerceivedTrust().setValue(serviceUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedService);
+
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId()).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(9, retrievedTrustRelationships.size());
+
+		// verify (trustor, trustedService, direct)
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (trustorCssTeid.equals(tr.getTrustorId()) 
+					&& trusteeServiceTeid.equals(tr.getTrusteeId()) 
+					&& TrustValueType.DIRECT == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(serviceDirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+
+		// verify (trustor, trustedService, indirect)
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (trustorCssTeid.equals(tr.getTrustorId()) 
+					&& trusteeServiceTeid.equals(tr.getTrusteeId()) 
+					&& TrustValueType.INDIRECT == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(serviceIndirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+
+		// verify (trustor, trustedService, user perceived)
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (trustorCssTeid.equals(tr.getTrustorId()) 
+					&& trusteeServiceTeid.equals(tr.getTrusteeId()) 
+					&& TrustValueType.USER_PERCEIVED == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(serviceUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// remove created entities
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustedEntityId)}.
+	 * @throws TrustException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testRetrieveCssTrustRelationships() throws Exception {
+		
+		// test params
+		final double directTrustValue1 = 0.1d;
+		final double indirectTrustValue1 = 0.3d;
+		final double userPerceivedTrustValue1 = 0.5d;
+		
+		Set<TrustRelationship> retrievedTrustRelationships;
+		
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustorCssTeid, trusteeCssTeid).get(); 
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// add trusted CSS with direct trust value
+		ITrustedCss trustedCss = (ITrustedCss) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCssTeid);
+		trustedCss.getDirectTrust().setValue(directTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
 				trustedCss.getTrustorId(), trustedCss.getTrusteeId()).get();
-		assertNotNull(retrievedTrustValue);
-		assertEquals(new Double(trustValue1), retrievedTrustValue);
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(1, retrievedTrustRelationships.size());
+		TrustRelationship retrievedTrustRelationship = retrievedTrustRelationships.iterator().next();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.DIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(directTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// update trusted CSS with indirect trust value
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getIndirectTrust().setValue(indirectTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId()).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(2, retrievedTrustRelationships.size());
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (TrustValueType.INDIRECT == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.INDIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(indirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// update trusted CSS with user perceived trust value
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getUserPerceivedTrust().setValue(userPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId()).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(3, retrievedTrustRelationships.size());
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (TrustValueType.USER_PERCEIVED == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.USER_PERCEIVED, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// remove created entities
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustedEntityId)}.
+	 * @throws TrustException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testRetrieveCisTrustRelationships() throws Exception {
+		
+		// test params
+		final double directTrustValue1 = 0.1d;
+		final double indirectTrustValue1 = 0.3d;
+		final double userPerceivedTrustValue1 = 0.5d;
+		
+		Set<TrustRelationship> retrievedTrustRelationships;
+		
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustorCssTeid, trusteeCisTeid).get(); 
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// add trusted CIS with direct trust value
+		ITrustedCis trustedCis = (ITrustedCis) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCisTeid);
+		trustedCis.getDirectTrust().setValue(directTrustValue1);
+		this.trustRepo.updateEntity(trustedCis);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId()).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(1, retrievedTrustRelationships.size());
+		TrustRelationship retrievedTrustRelationship = retrievedTrustRelationships.iterator().next();
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCis.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCis.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.DIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(directTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// update trusted CIS with indirect trust value
+		trustedCis = (ITrustedCis) this.trustRepo.retrieveEntity(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId());
+		trustedCis.getIndirectTrust().setValue(indirectTrustValue1);
+		this.trustRepo.updateEntity(trustedCis);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId()).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(2, retrievedTrustRelationships.size());
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (TrustValueType.INDIRECT == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCis.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCis.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.INDIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(indirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// update trusted CIS with user perceived trust value
+		trustedCis = (ITrustedCis) this.trustRepo.retrieveEntity(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId());
+		trustedCis.getUserPerceivedTrust().setValue(userPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCis);
+
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId()).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(3, retrievedTrustRelationships.size());
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (TrustValueType.USER_PERCEIVED == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCis.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCis.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.USER_PERCEIVED, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// remove created entities
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustedEntityId)}.
+	 * @throws TrustException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testRetrieveServiceTrustRelationships() throws Exception {
+		
+		// test params
+		final double directTrustValue1 = 0.1d;
+		final double indirectTrustValue1 = 0.3d;
+		final double userPerceivedTrustValue1 = 0.5d;
+		
+		Set<TrustRelationship> retrievedTrustRelationships;
+		
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustorCssTeid, trusteeServiceTeid).get(); 
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// add trusted CIS with direct trust value
+		ITrustedService trustedService = (ITrustedService) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeServiceTeid);
+		trustedService.getDirectTrust().setValue(directTrustValue1);
+		this.trustRepo.updateEntity(trustedService);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedService.getTrustorId(), trustedService.getTrusteeId()).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(1, retrievedTrustRelationships.size());
+		TrustRelationship retrievedTrustRelationship = retrievedTrustRelationships.iterator().next();
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedService.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedService.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.DIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(directTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// update trusted Service with indirect trust value
+		trustedService = (ITrustedService) this.trustRepo.retrieveEntity(
+				trustedService.getTrustorId(), trustedService.getTrusteeId());
+		trustedService.getIndirectTrust().setValue(indirectTrustValue1);
+		this.trustRepo.updateEntity(trustedService);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedService.getTrustorId(), trustedService.getTrusteeId()).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(2, retrievedTrustRelationships.size());
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (TrustValueType.INDIRECT == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedService.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedService.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.INDIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(indirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// update trusted Service with user perceived trust value
+		trustedService = (ITrustedService) this.trustRepo.retrieveEntity(
+				trustedService.getTrustorId(), trustedService.getTrusteeId());
+		trustedService.getUserPerceivedTrust().setValue(userPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedService);
+
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedService.getTrustorId(), trustedService.getTrusteeId()).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(3, retrievedTrustRelationships.size());
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (TrustValueType.USER_PERCEIVED == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedService.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedService.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.USER_PERCEIVED, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// remove created entities
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationship(TrustedEntityId, TrustedEntityId, TrustValueType)}.
+	 * @throws TrustException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testRetrieveCssTrustRelationship() throws Exception {
+		
+		// test params
+		final double directTrustValue1 = 0.1d;
+		final double directTrustValue2 = 0.2d;
+		final double indirectTrustValue1 = 0.3d;
+		final double indirectTrustValue2 = 0.4d;
+		final double userPerceivedTrustValue1 = 0.5d;
+		final double userPerceivedTrustValue2 = 0.6d;
+		
+		TrustRelationship retrievedTrustRelationship;
+		
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustorCssTeid, trusteeCssTeid, TrustValueType.DIRECT).get(); 
+		assertNull(retrievedTrustRelationship);
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustorCssTeid, trusteeCssTeid, TrustValueType.INDIRECT).get(); 
+		assertNull(retrievedTrustRelationship);
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustorCssTeid, trusteeCssTeid, TrustValueType.USER_PERCEIVED).get(); 
+		assertNull(retrievedTrustRelationship);
+		
+		// add trusted CSS with trust values
+		ITrustedCss trustedCss = (ITrustedCss) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCssTeid);
+		trustedCss.getDirectTrust().setValue(directTrustValue1);
+		trustedCss.getIndirectTrust().setValue(indirectTrustValue1);
+		trustedCss.getUserPerceivedTrust().setValue(userPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.DIRECT).get();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.DIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(directTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.INDIRECT).get();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.INDIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(indirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.USER_PERCEIVED, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
 		
 		// update trusted CSS with user perceived value set to trustValue2
 		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
 				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
-		trustedCss.getUserPerceivedTrust().setValue(trustValue2);
+		trustedCss.getDirectTrust().setValue(directTrustValue2);
+		trustedCss.getIndirectTrust().setValue(indirectTrustValue2);
+		trustedCss.getUserPerceivedTrust().setValue(userPerceivedTrustValue2);
 		this.trustRepo.updateEntity(trustedCss);
+		
 		// verify
-		retrievedTrustValue = this.internalTrustBroker.retrieveTrust(
-				trustedCss.getTrustorId(), trustedCss.getTrusteeId()).get();
-		assertNotNull(retrievedTrustValue);
-		assertEquals(new Double(trustValue2), retrievedTrustValue);
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.DIRECT).get();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.DIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(directTrustValue2), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.INDIRECT).get();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.INDIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(indirectTrustValue2), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.USER_PERCEIVED, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(userPerceivedTrustValue2), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// remove created entities
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
 	}
-
+	
 	/**
-	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrust(TrustedEntityId, TrustedEntityId)}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationship(TrustedEntityId, TrustedEntityId, TrustValueType)}.
 	 * @throws TrustException 
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
 	 */
 	@Test
-	public void testRetrieveTrustedCisTrust() throws Exception {
+	public void testRetrieveCisTrustRelationship() throws Exception {
 		
 		// test params
-		final double trustValue1 = 0.5d;
-		final double trustValue2 = 0.8d;
+		final double directTrustValue1 = 0.1d;
+		final double directTrustValue2 = 0.2d;
+		final double indirectTrustValue1 = 0.3d;
+		final double indirectTrustValue2 = 0.4d;
+		final double userPerceivedTrustValue1 = 0.5d;
+		final double userPerceivedTrustValue2 = 0.6d;
 		
-		Double retrievedTrustValue;
+		TrustRelationship retrievedTrustRelationship;
 		
-		retrievedTrustValue = this.internalTrustBroker.retrieveTrust(
-				trustorCssTeid, trusteeCisTeid).get(); 
-		assertNull(retrievedTrustValue);
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustorCssTeid, trusteeCisTeid, TrustValueType.DIRECT).get(); 
+		assertNull(retrievedTrustRelationship);
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustorCssTeid, trusteeCisTeid, TrustValueType.INDIRECT).get(); 
+		assertNull(retrievedTrustRelationship);
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustorCssTeid, trusteeCisTeid, TrustValueType.USER_PERCEIVED).get(); 
+		assertNull(retrievedTrustRelationship);
 		
-		// add trusted CIS with user perceived value set to trustValue1
+		// add trusted CSS with trust values
 		ITrustedCis trustedCis = (ITrustedCis) this.trustRepo.createEntity(
-				trustorCssTeid, trusteeCisTeid);  
-		trustedCis.getUserPerceivedTrust().setValue(trustValue1);
+				trustorCssTeid, trusteeCisTeid);
+		trustedCis.getDirectTrust().setValue(directTrustValue1);
+		trustedCis.getIndirectTrust().setValue(indirectTrustValue1);
+		trustedCis.getUserPerceivedTrust().setValue(userPerceivedTrustValue1);
 		this.trustRepo.updateEntity(trustedCis);
 		
 		// verify
-		retrievedTrustValue = this.internalTrustBroker.retrieveTrust(
-				trustedCis.getTrustorId(), trustedCis.getTrusteeId()).get();
-		assertNotNull(retrievedTrustValue);
-		assertEquals(new Double(trustValue1), retrievedTrustValue);
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.DIRECT).get();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCis.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCis.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.DIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(directTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
 		
-		// update trusted CIS with user perceived value set to trustValue2
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.INDIRECT).get();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCis.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCis.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.INDIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(indirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCis.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCis.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.USER_PERCEIVED, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// update trusted CSS with user perceived value set to trustValue2
 		trustedCis = (ITrustedCis) this.trustRepo.retrieveEntity(
 				trustedCis.getTrustorId(), trustedCis.getTrusteeId());
-		trustedCis.getUserPerceivedTrust().setValue(trustValue2);
+		trustedCis.getDirectTrust().setValue(directTrustValue2);
+		trustedCis.getIndirectTrust().setValue(indirectTrustValue2);
+		trustedCis.getUserPerceivedTrust().setValue(userPerceivedTrustValue2);
 		this.trustRepo.updateEntity(trustedCis);
+		
 		// verify
-		retrievedTrustValue = this.internalTrustBroker.retrieveTrust(
-				trustedCis.getTrustorId(), trustedCis.getTrusteeId()).get();
-		assertNotNull(retrievedTrustValue);
-		assertEquals(new Double(trustValue2), retrievedTrustValue);
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.DIRECT).get();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCis.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCis.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.DIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(directTrustValue2), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.INDIRECT).get();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCis.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCis.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.INDIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(indirectTrustValue2), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCis.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCis.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.USER_PERCEIVED, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(userPerceivedTrustValue2), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// remove created entities
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
 	}
 	
 	/**
-	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrust(TrustedEntityId, TrustedEntityId)}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationship(TrustedEntityId, TrustedEntityId, TrustValueType)}.
 	 * @throws TrustException 
 	 * @throws ExecutionException 
 	 * @throws InterruptedException 
 	 */
 	@Test
-	public void testRetrieveTrustedServiceTrust() throws TrustException, InterruptedException, ExecutionException {
+	public void testRetrieveServiceTrustRelationship() throws Exception {
 		
 		// test params
-		final double trustValue1 = 0.5d;
-		final double trustValue2 = 0.8d;
+		final double directTrustValue1 = 0.1d;
+		final double directTrustValue2 = 0.2d;
+		final double indirectTrustValue1 = 0.3d;
+		final double indirectTrustValue2 = 0.4d;
+		final double userPerceivedTrustValue1 = 0.5d;
+		final double userPerceivedTrustValue2 = 0.6d;
 		
-		Double retrievedTrustValue;
+		TrustRelationship retrievedTrustRelationship;
 		
-		retrievedTrustValue = this.internalTrustBroker.retrieveTrust(
-				trustorCssTeid, trusteeServiceTeid).get(); 
-		assertNull(retrievedTrustValue);
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustorCssTeid, trusteeServiceTeid, TrustValueType.DIRECT).get(); 
+		assertNull(retrievedTrustRelationship);
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustorCssTeid, trusteeServiceTeid, TrustValueType.INDIRECT).get(); 
+		assertNull(retrievedTrustRelationship);
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustorCssTeid, trusteeServiceTeid, TrustValueType.USER_PERCEIVED).get(); 
+		assertNull(retrievedTrustRelationship);
 		
-		// add trusted service with user perceived value set to trustValue1 
+		// add trusted CSS with trust values
 		ITrustedService trustedService = (ITrustedService) this.trustRepo.createEntity(
-				trustorCssTeid, trusteeServiceTeid); 
-		trustedService.getUserPerceivedTrust().setValue(trustValue1);
+				trustorCssTeid, trusteeServiceTeid);
+		trustedService.getDirectTrust().setValue(directTrustValue1);
+		trustedService.getIndirectTrust().setValue(indirectTrustValue1);
+		trustedService.getUserPerceivedTrust().setValue(userPerceivedTrustValue1);
 		this.trustRepo.updateEntity(trustedService);
 		
 		// verify
-		retrievedTrustValue = this.internalTrustBroker.retrieveTrust(
-				trustedService.getTrustorId(), trustedService.getTrusteeId()).get();
-		assertNotNull(retrievedTrustValue);
-		assertEquals(new Double(trustValue1), retrievedTrustValue);
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.DIRECT).get();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedService.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedService.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.DIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(directTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
 		
-		// update trusted service with user perceived value set to trustValue2
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.INDIRECT).get();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedService.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedService.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.INDIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(indirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedService.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedService.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.USER_PERCEIVED, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// update trusted CSS with user perceived value set to trustValue2
 		trustedService = (ITrustedService) this.trustRepo.retrieveEntity(
 				trustedService.getTrustorId(), trustedService.getTrusteeId());
-		trustedService.getUserPerceivedTrust().setValue(trustValue2);
+		trustedService.getDirectTrust().setValue(directTrustValue2);
+		trustedService.getIndirectTrust().setValue(indirectTrustValue2);
+		trustedService.getUserPerceivedTrust().setValue(userPerceivedTrustValue2);
 		this.trustRepo.updateEntity(trustedService);
+		
 		// verify
-		retrievedTrustValue = this.internalTrustBroker.retrieveTrust(
-				trustedService.getTrustorId(), trustedService.getTrusteeId()).get();
-		assertNotNull(retrievedTrustValue);
-		assertEquals(new Double(trustValue2), retrievedTrustValue);
-	}
-	
-	/**
-	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateEventListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId)}.
-	 */
-	@Test
-	@Ignore
-	public void testRegisterTrustUpdateEventListener() {
-		fail("Not yet implemented");
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.DIRECT).get();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedService.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedService.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.DIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(directTrustValue2), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.INDIRECT).get();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedService.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedService.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.INDIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(indirectTrustValue2), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
+				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedService.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedService.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.USER_PERCEIVED, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(userPerceivedTrustValue2), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// remove created entities
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 
 	/**
-	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateEventListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, TrustedEntityId, TrustedEntityId)}.
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustValue(TrustedEntityId, TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)}.
+	 * @throws TrustException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
 	 */
 	@Test
-	@Ignore
-	public void testUnregisterTrustUpdateEventListener() {
-		fail("Not yet implemented");
+	public void testRetrieveCssTrustValue() throws Exception {
+		
+		// test params
+		final double directTrustValue1 = 0.1d;
+		final double directTrustValue2 = 0.2d;
+		final double indirectTrustValue1 = 0.3d;
+		final double indirectTrustValue2 = 0.4d;
+		final double userPerceivedTrustValue1 = 0.5d;
+		final double userPerceivedTrustValue2 = 0.6d;
+		
+		Double retrievedTrustValue;
+		
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustorCssTeid, trusteeCssTeid, TrustValueType.DIRECT).get(); 
+		assertNull(retrievedTrustValue);
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustorCssTeid, trusteeCssTeid, TrustValueType.INDIRECT).get(); 
+		assertNull(retrievedTrustValue);
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustorCssTeid, trusteeCssTeid, TrustValueType.USER_PERCEIVED).get(); 
+		assertNull(retrievedTrustValue);
+		
+		// add trusted CSS with trust values
+		ITrustedCss trustedCss = (ITrustedCss) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCssTeid);
+		trustedCss.getDirectTrust().setValue(directTrustValue1);
+		trustedCss.getIndirectTrust().setValue(indirectTrustValue1);
+		trustedCss.getUserPerceivedTrust().setValue(userPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.DIRECT).get();
+		assertNotNull(retrievedTrustValue);
+		assertEquals(new Double(directTrustValue1), retrievedTrustValue);
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.INDIRECT).get();
+		assertNotNull(retrievedTrustValue);
+		assertEquals(new Double(indirectTrustValue1), retrievedTrustValue);
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+		assertNotNull(retrievedTrustValue);
+		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustValue);
+		
+		// update trusted CSS with user perceived value set to trustValue2
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getDirectTrust().setValue(directTrustValue2);
+		trustedCss.getIndirectTrust().setValue(indirectTrustValue2);
+		trustedCss.getUserPerceivedTrust().setValue(userPerceivedTrustValue2);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.DIRECT).get();
+		assertNotNull(retrievedTrustValue);
+		assertEquals(new Double(directTrustValue2), retrievedTrustValue);
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.INDIRECT).get();
+		assertNotNull(retrievedTrustValue);
+		assertEquals(new Double(indirectTrustValue2), retrievedTrustValue);
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+		assertNotNull(retrievedTrustValue);
+		assertEquals(new Double(userPerceivedTrustValue2), retrievedTrustValue);
+		
+		// remove created entities
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
+	}
+
+	/**
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustValue(TrustedEntityId, TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)}.
+	 * @throws TrustException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testRetrieveCisTrustValue() throws Exception {
+		
+		// test params
+		final double directTrustValue1 = 0.1d;
+		final double directTrustValue2 = 0.2d;
+		final double indirectTrustValue1 = 0.3d;
+		final double indirectTrustValue2 = 0.4d;
+		final double userPerceivedTrustValue1 = 0.5d;
+		final double userPerceivedTrustValue2 = 0.6d;
+		
+		Double retrievedTrustValue;
+		
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustorCssTeid, trusteeCisTeid, TrustValueType.DIRECT).get(); 
+		assertNull(retrievedTrustValue);
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustorCssTeid, trusteeCisTeid, TrustValueType.INDIRECT).get(); 
+		assertNull(retrievedTrustValue);
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustorCssTeid, trusteeCisTeid, TrustValueType.USER_PERCEIVED).get(); 
+		assertNull(retrievedTrustValue);
+		
+		// add trusted CIS with trust values
+		ITrustedCis trustedCis = (ITrustedCis) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCisTeid);
+		trustedCis.getDirectTrust().setValue(directTrustValue1);
+		trustedCis.getIndirectTrust().setValue(indirectTrustValue1);
+		trustedCis.getUserPerceivedTrust().setValue(userPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCis);
+		
+		// verify
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.DIRECT).get();
+		assertNotNull(retrievedTrustValue);
+		assertEquals(new Double(directTrustValue1), retrievedTrustValue);
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.INDIRECT).get();
+		assertNotNull(retrievedTrustValue);
+		assertEquals(new Double(indirectTrustValue1), retrievedTrustValue);
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+		assertNotNull(retrievedTrustValue);
+		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustValue);
+		
+		// update trusted Cis with user perceived value set to trustValue2
+		trustedCis = (ITrustedCis) this.trustRepo.retrieveEntity(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId());
+		trustedCis.getDirectTrust().setValue(directTrustValue2);
+		trustedCis.getIndirectTrust().setValue(indirectTrustValue2);
+		trustedCis.getUserPerceivedTrust().setValue(userPerceivedTrustValue2);
+		this.trustRepo.updateEntity(trustedCis);
+		
+		// verify
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.DIRECT).get();
+		assertNotNull(retrievedTrustValue);
+		assertEquals(new Double(directTrustValue2), retrievedTrustValue);
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.INDIRECT).get();
+		assertNotNull(retrievedTrustValue);
+		assertEquals(new Double(indirectTrustValue2), retrievedTrustValue);
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+		assertNotNull(retrievedTrustValue);
+		assertEquals(new Double(userPerceivedTrustValue2), retrievedTrustValue);
+		
+		// remove created entities
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustValue(TrustedEntityId, TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)}.
+	 * @throws TrustException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testRetrieveServiceTrustValue() throws Exception {
+		
+		// test params
+		final double directTrustValue1 = 0.1d;
+		final double directTrustValue2 = 0.2d;
+		final double indirectTrustValue1 = 0.3d;
+		final double indirectTrustValue2 = 0.4d;
+		final double userPerceivedTrustValue1 = 0.5d;
+		final double userPerceivedTrustValue2 = 0.6d;
+		
+		Double retrievedTrustValue;
+		
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustorCssTeid, trusteeServiceTeid, TrustValueType.DIRECT).get(); 
+		assertNull(retrievedTrustValue);
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustorCssTeid, trusteeServiceTeid, TrustValueType.INDIRECT).get(); 
+		assertNull(retrievedTrustValue);
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustorCssTeid, trusteeServiceTeid, TrustValueType.USER_PERCEIVED).get(); 
+		assertNull(retrievedTrustValue);
+		
+		// add trusted CIS with trust values
+		ITrustedService trustedService = (ITrustedService) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeServiceTeid);
+		trustedService.getDirectTrust().setValue(directTrustValue1);
+		trustedService.getIndirectTrust().setValue(indirectTrustValue1);
+		trustedService.getUserPerceivedTrust().setValue(userPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedService);
+		
+		// verify
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.DIRECT).get();
+		assertNotNull(retrievedTrustValue);
+		assertEquals(new Double(directTrustValue1), retrievedTrustValue);
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.INDIRECT).get();
+		assertNotNull(retrievedTrustValue);
+		assertEquals(new Double(indirectTrustValue1), retrievedTrustValue);
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+		assertNotNull(retrievedTrustValue);
+		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustValue);
+		
+		// update trusted Service with user perceived value set to trustValue2
+		trustedService = (ITrustedService) this.trustRepo.retrieveEntity(
+				trustedService.getTrustorId(), trustedService.getTrusteeId());
+		trustedService.getDirectTrust().setValue(directTrustValue2);
+		trustedService.getIndirectTrust().setValue(indirectTrustValue2);
+		trustedService.getUserPerceivedTrust().setValue(userPerceivedTrustValue2);
+		this.trustRepo.updateEntity(trustedService);
+		
+		// verify
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.DIRECT).get();
+		assertNotNull(retrievedTrustValue);
+		assertEquals(new Double(directTrustValue2), retrievedTrustValue);
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.INDIRECT).get();
+		assertNotNull(retrievedTrustValue);
+		assertEquals(new Double(indirectTrustValue2), retrievedTrustValue);
+		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
+				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+		assertNotNull(retrievedTrustValue);
+		assertEquals(new Double(userPerceivedTrustValue2), retrievedTrustValue);
+		
+		// remove created entities
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustedEntityType)}.
+	 * @throws TrustException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testRetrieveAllCssTrustRelationships() throws Exception {
+		
+		// test params
+		final double cssDirectTrustValue1 = 0.1d;
+		final double cssIndirectTrustValue1 = 0.2d;
+		final double cssUserPerceivedTrustValue1 = 0.3d;
+		final double cisDirectTrustValue1 = 0.3d;
+		final double cisIndirectTrustValue1 = 0.5d;
+		final double cisUserPerceivedTrustValue1 = 0.6d;
+		final double serviceDirectTrustValue1 = 0.7d;
+		final double serviceIndirectTrustValue1 = 0.8d;
+		final double serviceUserPerceivedTrustValue1 = 0.9d;
+		
+		Set<TrustRelationship> retrievedTrustRelationships;
+		
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustorCssTeid, TrustedEntityType.CSS).get(); 
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// add trusted CSS with direct trust value
+		ITrustedCss trustedCss = (ITrustedCss) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCssTeid);
+		trustedCss.getDirectTrust().setValue(cssDirectTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustedEntityType.CSS).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(1, retrievedTrustRelationships.size());
+		TrustRelationship retrievedTrustRelationship = retrievedTrustRelationships.iterator().next();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.DIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(cssDirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// update trusted CSS with indirect trust value
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getIndirectTrust().setValue(cssIndirectTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustedEntityType.CSS).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(2, retrievedTrustRelationships.size());
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (TrustValueType.INDIRECT == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.INDIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(cssIndirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// update trusted CSS with user perceived trust value
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getUserPerceivedTrust().setValue(cssUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustedEntityType.CSS).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(3, retrievedTrustRelationships.size());
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (TrustValueType.USER_PERCEIVED == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.USER_PERCEIVED, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(cssUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// add trusted CIS with trust values
+		ITrustedCis trustedCis = (ITrustedCis) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCisTeid);
+		trustedCis.getDirectTrust().setValue(cisDirectTrustValue1);
+		trustedCis.getIndirectTrust().setValue(cisIndirectTrustValue1);
+		trustedCis.getUserPerceivedTrust().setValue(cisUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCis);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustedEntityType.CSS).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(3, retrievedTrustRelationships.size());
+				
+		// add trusted Service with trust values
+		ITrustedService trustedService = (ITrustedService) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeServiceTeid);
+		trustedService.getDirectTrust().setValue(serviceDirectTrustValue1);
+		trustedService.getIndirectTrust().setValue(serviceIndirectTrustValue1);
+		trustedService.getUserPerceivedTrust().setValue(serviceUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedService);
+
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustedEntityType.CSS).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(3, retrievedTrustRelationships.size());
+		
+		// remove created entities
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustedEntityType)}.
+	 * @throws TrustException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testRetrieveAllCisTrustRelationships() throws Exception {
+		
+		// test params
+		final double cssDirectTrustValue1 = 0.1d;
+		final double cssIndirectTrustValue1 = 0.2d;
+		final double cssUserPerceivedTrustValue1 = 0.3d;
+		final double cisDirectTrustValue1 = 0.3d;
+		final double cisIndirectTrustValue1 = 0.5d;
+		final double cisUserPerceivedTrustValue1 = 0.6d;
+		final double serviceDirectTrustValue1 = 0.7d;
+		final double serviceIndirectTrustValue1 = 0.8d;
+		final double serviceUserPerceivedTrustValue1 = 0.9d;
+		
+		Set<TrustRelationship> retrievedTrustRelationships;
+		
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustorCssTeid, TrustedEntityType.CIS).get(); 
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// add trusted CSS with direct trust value
+		ITrustedCss trustedCss = (ITrustedCss) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCssTeid);
+		trustedCss.getDirectTrust().setValue(cssDirectTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustedEntityType.CIS).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// update trusted CSS with indirect trust value
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getIndirectTrust().setValue(cssIndirectTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustedEntityType.CIS).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// update trusted CSS with user perceived trust value
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getUserPerceivedTrust().setValue(cssUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustedEntityType.CIS).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// add trusted CIS with trust values
+		ITrustedCis trustedCis = (ITrustedCis) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCisTeid);
+		trustedCis.getDirectTrust().setValue(cisDirectTrustValue1);
+		trustedCis.getIndirectTrust().setValue(cisIndirectTrustValue1);
+		trustedCis.getUserPerceivedTrust().setValue(cisUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCis);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustedEntityType.CIS).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(3, retrievedTrustRelationships.size());
+		
+		// verify (trustor, trustedCis, direct)
+		TrustRelationship retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (trustorCssTeid.equals(tr.getTrustorId()) 
+					&& trusteeCisTeid.equals(tr.getTrusteeId()) 
+					&& TrustValueType.DIRECT == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(cisDirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// verify (trustor, trustedCis, indirect)
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (trustorCssTeid.equals(tr.getTrustorId()) 
+					&& trusteeCisTeid.equals(tr.getTrusteeId()) 
+					&& TrustValueType.INDIRECT == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(cisIndirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// verify (trustor, trustedCis, user perceived)
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (trustorCssTeid.equals(tr.getTrustorId()) 
+					&& trusteeCisTeid.equals(tr.getTrusteeId()) 
+					&& TrustValueType.USER_PERCEIVED == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(cisUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// add trusted Service with trust values
+		ITrustedService trustedService = (ITrustedService) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeServiceTeid);
+		trustedService.getDirectTrust().setValue(serviceDirectTrustValue1);
+		trustedService.getIndirectTrust().setValue(serviceIndirectTrustValue1);
+		trustedService.getUserPerceivedTrust().setValue(serviceUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedService);
+
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustedEntityType.CIS).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(3, retrievedTrustRelationships.size());
+		
+		// remove created entities
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustedEntityType)}.
+	 * @throws TrustException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testRetrieveAllServiceTrustRelationships() throws Exception {
+		
+		// test params
+		final double cssDirectTrustValue1 = 0.1d;
+		final double cssIndirectTrustValue1 = 0.2d;
+		final double cssUserPerceivedTrustValue1 = 0.3d;
+		final double cisDirectTrustValue1 = 0.3d;
+		final double cisIndirectTrustValue1 = 0.5d;
+		final double cisUserPerceivedTrustValue1 = 0.6d;
+		final double serviceDirectTrustValue1 = 0.7d;
+		final double serviceIndirectTrustValue1 = 0.8d;
+		final double serviceUserPerceivedTrustValue1 = 0.9d;
+		
+		Set<TrustRelationship> retrievedTrustRelationships;
+		
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustorCssTeid, TrustedEntityType.SVC).get(); 
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// add trusted CSS with direct trust value
+		ITrustedCss trustedCss = (ITrustedCss) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCssTeid);
+		trustedCss.getDirectTrust().setValue(cssDirectTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustedEntityType.SVC).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// update trusted CSS with indirect trust value
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getIndirectTrust().setValue(cssIndirectTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustedEntityType.SVC).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// update trusted CSS with user perceived trust value
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getUserPerceivedTrust().setValue(cssUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustedEntityType.SVC).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// add trusted CIS with trust values
+		ITrustedCis trustedCis = (ITrustedCis) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCisTeid);
+		trustedCis.getDirectTrust().setValue(cisDirectTrustValue1);
+		trustedCis.getIndirectTrust().setValue(cisIndirectTrustValue1);
+		trustedCis.getUserPerceivedTrust().setValue(cisUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCis);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustedEntityType.SVC).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// add trusted Service with trust values
+		ITrustedService trustedService = (ITrustedService) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeServiceTeid);
+		trustedService.getDirectTrust().setValue(serviceDirectTrustValue1);
+		trustedService.getIndirectTrust().setValue(serviceIndirectTrustValue1);
+		trustedService.getUserPerceivedTrust().setValue(serviceUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedService);
+
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustedEntityType.SVC).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(3, retrievedTrustRelationships.size());
+
+		// verify (trustor, trustedService, direct)
+		TrustRelationship retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (trustorCssTeid.equals(tr.getTrustorId()) 
+					&& trusteeServiceTeid.equals(tr.getTrusteeId()) 
+					&& TrustValueType.DIRECT == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(serviceDirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+
+		// verify (trustor, trustedService, indirect)
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (trustorCssTeid.equals(tr.getTrustorId()) 
+					&& trusteeServiceTeid.equals(tr.getTrusteeId()) 
+					&& TrustValueType.INDIRECT == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(serviceIndirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+
+		// verify (trustor, trustedService, user perceived)
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (trustorCssTeid.equals(tr.getTrustorId()) 
+					&& trusteeServiceTeid.equals(tr.getTrusteeId()) 
+					&& TrustValueType.USER_PERCEIVED == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(serviceUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// remove created entities
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustValueType)}.
+	 * @throws TrustException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testRetrieveAllDirectTrustRelationships() throws Exception {
+		
+		// test params
+		final double cssDirectTrustValue1 = 0.1d;
+		final double cssIndirectTrustValue1 = 0.2d;
+		final double cssUserPerceivedTrustValue1 = 0.3d;
+		final double cisDirectTrustValue1 = 0.3d;
+		final double cisIndirectTrustValue1 = 0.5d;
+		final double cisUserPerceivedTrustValue1 = 0.6d;
+		final double serviceDirectTrustValue1 = 0.7d;
+		final double serviceIndirectTrustValue1 = 0.8d;
+		final double serviceUserPerceivedTrustValue1 = 0.9d;
+		
+		Set<TrustRelationship> retrievedTrustRelationships;
+		
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustorCssTeid, TrustValueType.DIRECT).get(); 
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// add trusted CSS with direct trust value
+		ITrustedCss trustedCss = (ITrustedCss) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCssTeid);
+		trustedCss.getDirectTrust().setValue(cssDirectTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustValueType.DIRECT).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(1, retrievedTrustRelationships.size());
+		TrustRelationship retrievedTrustRelationship = retrievedTrustRelationships.iterator().next();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.DIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(cssDirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// update trusted CSS with indirect trust value
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getIndirectTrust().setValue(cssIndirectTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustValueType.DIRECT).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(1, retrievedTrustRelationships.size());
+		
+		// update trusted CSS with user perceived trust value
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getUserPerceivedTrust().setValue(cssUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustValueType.DIRECT).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(1, retrievedTrustRelationships.size());
+		
+		// add trusted CIS with trust values
+		ITrustedCis trustedCis = (ITrustedCis) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCisTeid);
+		trustedCis.getDirectTrust().setValue(cisDirectTrustValue1);
+		trustedCis.getIndirectTrust().setValue(cisIndirectTrustValue1);
+		trustedCis.getUserPerceivedTrust().setValue(cisUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCis);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustValueType.DIRECT).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(2, retrievedTrustRelationships.size());
+		
+		// verify (trustor, trustedCis, direct)
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (trustorCssTeid.equals(tr.getTrustorId()) 
+					&& trusteeCisTeid.equals(tr.getTrusteeId()) 
+					&& TrustValueType.DIRECT == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(cisDirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// add trusted Service with trust values
+		ITrustedService trustedService = (ITrustedService) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeServiceTeid);
+		trustedService.getDirectTrust().setValue(serviceDirectTrustValue1);
+		trustedService.getIndirectTrust().setValue(serviceIndirectTrustValue1);
+		trustedService.getUserPerceivedTrust().setValue(serviceUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedService);
+
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustValueType.DIRECT).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(3, retrievedTrustRelationships.size());
+
+		// verify (trustor, trustedService, direct)
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (trustorCssTeid.equals(tr.getTrustorId()) 
+					&& trusteeServiceTeid.equals(tr.getTrusteeId()) 
+					&& TrustValueType.DIRECT == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(serviceDirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// remove created entities
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustValueType)}.
+	 * @throws TrustException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testRetrieveAllIndirectTrustRelationships() throws Exception {
+		
+		// test params
+		final double cssDirectTrustValue1 = 0.1d;
+		final double cssIndirectTrustValue1 = 0.2d;
+		final double cssUserPerceivedTrustValue1 = 0.3d;
+		final double cisDirectTrustValue1 = 0.3d;
+		final double cisIndirectTrustValue1 = 0.5d;
+		final double cisUserPerceivedTrustValue1 = 0.6d;
+		final double serviceDirectTrustValue1 = 0.7d;
+		final double serviceIndirectTrustValue1 = 0.8d;
+		final double serviceUserPerceivedTrustValue1 = 0.9d;
+		
+		Set<TrustRelationship> retrievedTrustRelationships;
+		
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustorCssTeid, TrustValueType.INDIRECT).get(); 
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// add trusted CSS with direct trust value
+		ITrustedCss trustedCss = (ITrustedCss) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCssTeid);
+		trustedCss.getDirectTrust().setValue(cssDirectTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustValueType.INDIRECT).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// update trusted CSS with indirect trust value
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getIndirectTrust().setValue(cssIndirectTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustValueType.INDIRECT).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(1, retrievedTrustRelationships.size());
+		TrustRelationship retrievedTrustRelationship = retrievedTrustRelationships.iterator().next();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.INDIRECT, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(cssIndirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// update trusted CSS with user perceived trust value
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getUserPerceivedTrust().setValue(cssUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustValueType.INDIRECT).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(1, retrievedTrustRelationships.size());
+		
+		// add trusted CIS with trust values
+		ITrustedCis trustedCis = (ITrustedCis) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCisTeid);
+		trustedCis.getDirectTrust().setValue(cisDirectTrustValue1);
+		trustedCis.getIndirectTrust().setValue(cisIndirectTrustValue1);
+		trustedCis.getUserPerceivedTrust().setValue(cisUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCis);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustValueType.INDIRECT).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(2, retrievedTrustRelationships.size());
+		
+		// verify (trustor, trustedCis, indirect)
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (trustorCssTeid.equals(tr.getTrustorId()) 
+					&& trusteeCisTeid.equals(tr.getTrusteeId()) 
+					&& TrustValueType.INDIRECT == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(cisIndirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// add trusted Service with trust values
+		ITrustedService trustedService = (ITrustedService) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeServiceTeid);
+		trustedService.getDirectTrust().setValue(serviceDirectTrustValue1);
+		trustedService.getIndirectTrust().setValue(serviceIndirectTrustValue1);
+		trustedService.getUserPerceivedTrust().setValue(serviceUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedService);
+
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustValueType.INDIRECT).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(3, retrievedTrustRelationships.size());
+
+		// verify (trustor, trustedService, indirect)
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (trustorCssTeid.equals(tr.getTrustorId()) 
+					&& trusteeServiceTeid.equals(tr.getTrusteeId()) 
+					&& TrustValueType.INDIRECT == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(serviceIndirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// remove created entities
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustValueType)}.
+	 * @throws TrustException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testRetrieveAllUserPerceivedTrustRelationships() throws Exception {
+		
+		// test params
+		final double cssDirectTrustValue1 = 0.1d;
+		final double cssIndirectTrustValue1 = 0.2d;
+		final double cssUserPerceivedTrustValue1 = 0.3d;
+		final double cisDirectTrustValue1 = 0.3d;
+		final double cisIndirectTrustValue1 = 0.5d;
+		final double cisUserPerceivedTrustValue1 = 0.6d;
+		final double serviceDirectTrustValue1 = 0.7d;
+		final double serviceIndirectTrustValue1 = 0.8d;
+		final double serviceUserPerceivedTrustValue1 = 0.9d;
+		
+		Set<TrustRelationship> retrievedTrustRelationships;
+		
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustorCssTeid, TrustValueType.USER_PERCEIVED).get(); 
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// add trusted CSS with direct trust value
+		ITrustedCss trustedCss = (ITrustedCss) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCssTeid);
+		trustedCss.getDirectTrust().setValue(cssDirectTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustValueType.USER_PERCEIVED).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// update trusted CSS with indirect trust value
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getIndirectTrust().setValue(cssIndirectTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustValueType.USER_PERCEIVED).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertTrue(retrievedTrustRelationships.isEmpty());
+		
+		// update trusted CSS with user perceived trust value
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getUserPerceivedTrust().setValue(cssUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustValueType.USER_PERCEIVED).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(1, retrievedTrustRelationships.size());
+		TrustRelationship retrievedTrustRelationship = retrievedTrustRelationships.iterator().next();
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustorId());
+		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+		assertNotNull(retrievedTrustRelationship.getTrusteeId());
+		assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+		assertNotNull(retrievedTrustRelationship.getTrustValueType());
+		assertEquals(TrustValueType.USER_PERCEIVED, retrievedTrustRelationship.getTrustValueType());
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(cssUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// add trusted CIS with trust values
+		ITrustedCis trustedCis = (ITrustedCis) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCisTeid);
+		trustedCis.getDirectTrust().setValue(cisDirectTrustValue1);
+		trustedCis.getIndirectTrust().setValue(cisIndirectTrustValue1);
+		trustedCis.getUserPerceivedTrust().setValue(cisUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCis);
+		
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustValueType.USER_PERCEIVED).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(2, retrievedTrustRelationships.size());
+		
+		// verify (trustor, trustedCis, user perceived)
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (trustorCssTeid.equals(tr.getTrustorId()) 
+					&& trusteeCisTeid.equals(tr.getTrusteeId()) 
+					&& TrustValueType.USER_PERCEIVED == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(cisUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// add trusted Service with trust values
+		ITrustedService trustedService = (ITrustedService) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeServiceTeid);
+		trustedService.getDirectTrust().setValue(serviceDirectTrustValue1);
+		trustedService.getIndirectTrust().setValue(serviceIndirectTrustValue1);
+		trustedService.getUserPerceivedTrust().setValue(serviceUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedService);
+
+		// verify
+		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+				trustedCss.getTrustorId(), TrustValueType.USER_PERCEIVED).get();
+		assertNotNull(retrievedTrustRelationships);
+		assertFalse(retrievedTrustRelationships.isEmpty());
+		assertEquals(3, retrievedTrustRelationships.size());
+
+		// verify (trustor, trustedService, user perceived)
+		retrievedTrustRelationship = null;
+		for (final TrustRelationship tr : retrievedTrustRelationships) {
+			if (trustorCssTeid.equals(tr.getTrustorId()) 
+					&& trusteeServiceTeid.equals(tr.getTrusteeId()) 
+					&& TrustValueType.USER_PERCEIVED == tr.getTrustValueType()) {
+				retrievedTrustRelationship = tr;
+				break;
+			}
+		}
+		assertNotNull(retrievedTrustRelationship);
+		assertNotNull(retrievedTrustRelationship.getTrustValue());
+		assertEquals(new Double(serviceUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
+		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		
+		// remove created entities
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustedEntityType, TrustValueType)}.
+	 * @throws TrustException 
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
+	 */
+	@Test
+	public void testRetrieveTrustRelationshipsByType() throws Exception {
+		
+		// test params
+		final double cssDirectTrustValue1 = 0.1d;
+		final double cssIndirectTrustValue1 = 0.2d;
+		final double cssUserPerceivedTrustValue1 = 0.3d;
+		final double cisDirectTrustValue1 = 0.3d;
+		final double cisIndirectTrustValue1 = 0.5d;
+		final double cisUserPerceivedTrustValue1 = 0.6d;
+		final double serviceDirectTrustValue1 = 0.7d;
+		final double serviceIndirectTrustValue1 = 0.8d;
+		final double serviceUserPerceivedTrustValue1 = 0.9d;
+		
+		Set<TrustRelationship> retrievedTrustRelationships;
+		
+		for (final TrustedEntityType entityType : TrustedEntityType.values()) {
+			for (final TrustValueType valueType : TrustValueType.values()) {
+				if (TrustedEntityType.LGC == entityType)
+					continue;
+				retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+						trustorCssTeid, entityType, valueType).get(); 
+				assertNotNull(retrievedTrustRelationships);
+				assertTrue(retrievedTrustRelationships.isEmpty());
+			}
+		}
+		
+		// add trusted CSS with direct trust value
+		ITrustedCss trustedCss = (ITrustedCss) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCssTeid);
+		trustedCss.getDirectTrust().setValue(cssDirectTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		for (final TrustedEntityType entityType : TrustedEntityType.values()) {
+			for (final TrustValueType valueType : TrustValueType.values()) {
+				if (TrustedEntityType.LGC == entityType)
+					continue;
+				retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+						trustorCssTeid, entityType, valueType).get(); 
+				if (TrustedEntityType.CSS == entityType && TrustValueType.DIRECT == valueType) {
+					assertNotNull(retrievedTrustRelationships);
+					assertFalse(retrievedTrustRelationships.isEmpty());
+					assertEquals(1, retrievedTrustRelationships.size());
+					TrustRelationship retrievedTrustRelationship = retrievedTrustRelationships.iterator().next();
+					assertNotNull(retrievedTrustRelationship);
+					assertNotNull(retrievedTrustRelationship.getTrustorId());
+					assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+					assertNotNull(retrievedTrustRelationship.getTrusteeId());
+					assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+					assertNotNull(retrievedTrustRelationship.getTrustValueType());
+					assertEquals(TrustValueType.DIRECT, retrievedTrustRelationship.getTrustValueType());
+					assertNotNull(retrievedTrustRelationship.getTrustValue());
+					assertEquals(new Double(cssDirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+					assertNotNull(retrievedTrustRelationship.getTimestamp());
+				} else {
+					assertNotNull(retrievedTrustRelationships);
+					assertTrue(retrievedTrustRelationships.isEmpty());
+				}
+			}
+		}
+		
+		// update trusted CSS with indirect trust value
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getIndirectTrust().setValue(cssIndirectTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+		
+		// verify
+		for (final TrustedEntityType entityType : TrustedEntityType.values()) {
+			for (final TrustValueType valueType : TrustValueType.values()) {
+				if (TrustedEntityType.LGC == entityType)
+					continue;
+				retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+						trustorCssTeid, entityType, valueType).get(); 
+				if (TrustedEntityType.CSS == entityType && TrustValueType.INDIRECT == valueType) {
+					assertNotNull(retrievedTrustRelationships);
+					assertFalse(retrievedTrustRelationships.isEmpty());
+					assertEquals(1, retrievedTrustRelationships.size());
+					TrustRelationship retrievedTrustRelationship = retrievedTrustRelationships.iterator().next();
+					assertNotNull(retrievedTrustRelationship);
+					assertNotNull(retrievedTrustRelationship.getTrustorId());
+					assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+					assertNotNull(retrievedTrustRelationship.getTrusteeId());
+					assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+					assertNotNull(retrievedTrustRelationship.getTrustValueType());
+					assertEquals(TrustValueType.INDIRECT, retrievedTrustRelationship.getTrustValueType());
+					assertNotNull(retrievedTrustRelationship.getTrustValue());
+					assertEquals(new Double(cssIndirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+					assertNotNull(retrievedTrustRelationship.getTimestamp());
+				} else if (TrustedEntityType.CSS == entityType && TrustValueType.DIRECT == valueType) {
+					assertNotNull(retrievedTrustRelationships);
+					assertFalse(retrievedTrustRelationships.isEmpty());
+					assertEquals(1, retrievedTrustRelationships.size());
+				} else {
+					assertNotNull(retrievedTrustRelationships);
+					assertTrue(retrievedTrustRelationships.isEmpty());
+				}
+			}
+		}
+		
+		// update trusted CSS with user perceived trust value
+		trustedCss = (ITrustedCss) this.trustRepo.retrieveEntity(
+				trustedCss.getTrustorId(), trustedCss.getTrusteeId());
+		trustedCss.getUserPerceivedTrust().setValue(cssUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCss);
+
+		// verify
+		for (final TrustedEntityType entityType : TrustedEntityType.values()) {
+			for (final TrustValueType valueType : TrustValueType.values()) {
+				if (TrustedEntityType.LGC == entityType)
+					continue;
+				retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+						trustorCssTeid, entityType, valueType).get(); 
+				if (TrustedEntityType.CSS == entityType && TrustValueType.USER_PERCEIVED == valueType) {
+					assertNotNull(retrievedTrustRelationships);
+					assertFalse(retrievedTrustRelationships.isEmpty());
+					assertEquals(1, retrievedTrustRelationships.size());
+					TrustRelationship retrievedTrustRelationship = retrievedTrustRelationships.iterator().next();
+					assertNotNull(retrievedTrustRelationship);
+					assertNotNull(retrievedTrustRelationship.getTrustorId());
+					assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+					assertNotNull(retrievedTrustRelationship.getTrusteeId());
+					assertEquals(trustedCss.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+					assertNotNull(retrievedTrustRelationship.getTrustValueType());
+					assertEquals(TrustValueType.USER_PERCEIVED, retrievedTrustRelationship.getTrustValueType());
+					assertNotNull(retrievedTrustRelationship.getTrustValue());
+					assertEquals(new Double(cssUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
+					assertNotNull(retrievedTrustRelationship.getTimestamp());
+				} else if (TrustedEntityType.CSS == entityType 
+						&& (TrustValueType.DIRECT == valueType 
+						|| TrustValueType.INDIRECT == valueType)) {
+					assertNotNull(retrievedTrustRelationships);
+					assertFalse(retrievedTrustRelationships.isEmpty());
+					assertEquals(1, retrievedTrustRelationships.size());
+				} else {
+					assertNotNull(retrievedTrustRelationships);
+					assertTrue(retrievedTrustRelationships.isEmpty());
+				}
+			}
+		}
+		
+		// add trusted CIS with trust values
+		ITrustedCis trustedCis = (ITrustedCis) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeCisTeid);
+		trustedCis.getDirectTrust().setValue(cisDirectTrustValue1);
+		trustedCis.getIndirectTrust().setValue(cisIndirectTrustValue1);
+		trustedCis.getUserPerceivedTrust().setValue(cisUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedCis);
+		
+		// verify
+		for (final TrustedEntityType entityType : TrustedEntityType.values()) {
+			for (final TrustValueType valueType : TrustValueType.values()) {
+				if (TrustedEntityType.LGC == entityType)
+					continue;
+				retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+						trustorCssTeid, entityType, valueType).get();
+				if (TrustedEntityType.CIS == entityType && TrustValueType.DIRECT == valueType) {
+					assertNotNull(retrievedTrustRelationships);
+					assertFalse(retrievedTrustRelationships.isEmpty());
+					assertEquals(1, retrievedTrustRelationships.size());
+					TrustRelationship retrievedTrustRelationship = retrievedTrustRelationships.iterator().next();
+					assertNotNull(retrievedTrustRelationship);
+					assertNotNull(retrievedTrustRelationship.getTrustorId());
+					assertEquals(trustedCis.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+					assertNotNull(retrievedTrustRelationship.getTrusteeId());
+					assertEquals(trustedCis.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+					assertNotNull(retrievedTrustRelationship.getTrustValueType());
+					assertEquals(TrustValueType.DIRECT, retrievedTrustRelationship.getTrustValueType());
+					assertNotNull(retrievedTrustRelationship.getTrustValue());
+					assertEquals(new Double(cisDirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+					assertNotNull(retrievedTrustRelationship.getTimestamp());
+				} else if (TrustedEntityType.CIS == entityType && TrustValueType.INDIRECT == valueType) {
+						assertNotNull(retrievedTrustRelationships);
+						assertFalse(retrievedTrustRelationships.isEmpty());
+						assertEquals(1, retrievedTrustRelationships.size());
+						TrustRelationship retrievedTrustRelationship = retrievedTrustRelationships.iterator().next();
+						assertNotNull(retrievedTrustRelationship);
+						assertNotNull(retrievedTrustRelationship.getTrustorId());
+						assertEquals(trustedCis.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+						assertNotNull(retrievedTrustRelationship.getTrusteeId());
+						assertEquals(trustedCis.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+						assertNotNull(retrievedTrustRelationship.getTrustValueType());
+						assertEquals(TrustValueType.INDIRECT, retrievedTrustRelationship.getTrustValueType());
+						assertNotNull(retrievedTrustRelationship.getTrustValue());
+						assertEquals(new Double(cisIndirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+						assertNotNull(retrievedTrustRelationship.getTimestamp());
+				} else if (TrustedEntityType.CIS == entityType && TrustValueType.USER_PERCEIVED == valueType) {
+					assertNotNull(retrievedTrustRelationships);
+					assertFalse(retrievedTrustRelationships.isEmpty());
+					assertEquals(1, retrievedTrustRelationships.size());
+					TrustRelationship retrievedTrustRelationship = retrievedTrustRelationships.iterator().next();
+					assertNotNull(retrievedTrustRelationship);
+					assertNotNull(retrievedTrustRelationship.getTrustorId());
+					assertEquals(trustedCis.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+					assertNotNull(retrievedTrustRelationship.getTrusteeId());
+					assertEquals(trustedCis.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+					assertNotNull(retrievedTrustRelationship.getTrustValueType());
+					assertEquals(TrustValueType.USER_PERCEIVED, retrievedTrustRelationship.getTrustValueType());
+					assertNotNull(retrievedTrustRelationship.getTrustValue());
+					assertEquals(new Double(cisUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
+					assertNotNull(retrievedTrustRelationship.getTimestamp());
+				} else if (TrustedEntityType.CSS == entityType) {
+					assertNotNull(retrievedTrustRelationships);
+					assertFalse(retrievedTrustRelationships.isEmpty());
+					assertEquals(1, retrievedTrustRelationships.size());
+				} else {
+					assertNotNull(retrievedTrustRelationships);
+					assertTrue(retrievedTrustRelationships.isEmpty());
+				}
+			}
+		}
+		
+		// add trusted Service with trust values
+		ITrustedService trustedService = (ITrustedService) this.trustRepo.createEntity(
+				trustorCssTeid, trusteeServiceTeid);
+		trustedService.getDirectTrust().setValue(serviceDirectTrustValue1);
+		trustedService.getIndirectTrust().setValue(serviceIndirectTrustValue1);
+		trustedService.getUserPerceivedTrust().setValue(serviceUserPerceivedTrustValue1);
+		this.trustRepo.updateEntity(trustedService);
+
+		// verify
+		for (final TrustedEntityType entityType : TrustedEntityType.values()) {
+			for (final TrustValueType valueType : TrustValueType.values()) {
+				if (TrustedEntityType.LGC == entityType)
+					continue;
+				retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
+						trustorCssTeid, entityType, valueType).get();
+				if (TrustedEntityType.SVC == entityType && TrustValueType.DIRECT == valueType) {
+					assertNotNull(retrievedTrustRelationships);
+					assertFalse(retrievedTrustRelationships.isEmpty());
+					assertEquals(1, retrievedTrustRelationships.size());
+					TrustRelationship retrievedTrustRelationship = retrievedTrustRelationships.iterator().next();
+					assertNotNull(retrievedTrustRelationship);
+					assertNotNull(retrievedTrustRelationship.getTrustorId());
+					assertEquals(trustedService.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+					assertNotNull(retrievedTrustRelationship.getTrusteeId());
+					assertEquals(trustedService.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+					assertNotNull(retrievedTrustRelationship.getTrustValueType());
+					assertEquals(TrustValueType.DIRECT, retrievedTrustRelationship.getTrustValueType());
+					assertNotNull(retrievedTrustRelationship.getTrustValue());
+					assertEquals(new Double(serviceDirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+					assertNotNull(retrievedTrustRelationship.getTimestamp());
+				} else if (TrustedEntityType.SVC == entityType && TrustValueType.INDIRECT == valueType) {
+						assertNotNull(retrievedTrustRelationships);
+						assertFalse(retrievedTrustRelationships.isEmpty());
+						assertEquals(1, retrievedTrustRelationships.size());
+						TrustRelationship retrievedTrustRelationship = retrievedTrustRelationships.iterator().next();
+						assertNotNull(retrievedTrustRelationship);
+						assertNotNull(retrievedTrustRelationship.getTrustorId());
+						assertEquals(trustedService.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+						assertNotNull(retrievedTrustRelationship.getTrusteeId());
+						assertEquals(trustedService.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+						assertNotNull(retrievedTrustRelationship.getTrustValueType());
+						assertEquals(TrustValueType.INDIRECT, retrievedTrustRelationship.getTrustValueType());
+						assertNotNull(retrievedTrustRelationship.getTrustValue());
+						assertEquals(new Double(serviceIndirectTrustValue1), retrievedTrustRelationship.getTrustValue());
+						assertNotNull(retrievedTrustRelationship.getTimestamp());
+				} else if (TrustedEntityType.SVC == entityType && TrustValueType.USER_PERCEIVED == valueType) {
+					assertNotNull(retrievedTrustRelationships);
+					assertFalse(retrievedTrustRelationships.isEmpty());
+					assertEquals(1, retrievedTrustRelationships.size());
+					TrustRelationship retrievedTrustRelationship = retrievedTrustRelationships.iterator().next();
+					assertNotNull(retrievedTrustRelationship);
+					assertNotNull(retrievedTrustRelationship.getTrustorId());
+					assertEquals(trustedService.getTrustorId(), retrievedTrustRelationship.getTrustorId());
+					assertNotNull(retrievedTrustRelationship.getTrusteeId());
+					assertEquals(trustedService.getTrusteeId(), retrievedTrustRelationship.getTrusteeId());
+					assertNotNull(retrievedTrustRelationship.getTrustValueType());
+					assertEquals(TrustValueType.USER_PERCEIVED, retrievedTrustRelationship.getTrustValueType());
+					assertNotNull(retrievedTrustRelationship.getTrustValue());
+					assertEquals(new Double(serviceUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
+					assertNotNull(retrievedTrustRelationship.getTimestamp());
+				} else {
+					assertNotNull(retrievedTrustRelationships);
+					assertFalse(retrievedTrustRelationships.isEmpty());
+					assertEquals(1, retrievedTrustRelationships.size());
+				}
+			}
+		}
+		
+		// remove created entities
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
+		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 }

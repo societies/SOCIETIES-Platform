@@ -40,6 +40,7 @@ import java.security.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Agreement;
 
 
 /**
@@ -55,7 +56,7 @@ public class AgreementFinaliser {
 
 	}
 
-	public byte[] signAgreement(IAgreement agreement){
+	public byte[] signAgreement(Agreement agreement){
 
 		this.generateKeys();
 		if (keypair==null){

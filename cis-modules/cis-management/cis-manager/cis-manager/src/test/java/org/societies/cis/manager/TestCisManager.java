@@ -48,6 +48,8 @@ import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.*;
+import org.societies.api.css.directory.ICssDirectoryCallback;
+import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.Requestor;
@@ -68,6 +70,7 @@ import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.identity.IdentityImpl;
 import org.societies.identity.NetworkNodeImpl;
@@ -116,6 +119,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	private IPrivacyDataManager mockIPrivacyDataManager;
 	private ICtxBroker mockContextBroker;
 	private INegotiation mockNegotiation;
+	private ICssDirectoryRemote mockCssDirectoryRemote;
 	
 	private Activity mockActivity;
 	
@@ -171,6 +175,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	Stanza stanza;
 	
+	//css Directory results
+	List<CssAdvertisementRecord> cssDirectoryResults;
 	
 	// context needed variable
 	Future<IndividualCtxEntity> futMockCtxEntityIdentifier;
@@ -224,18 +230,28 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 mockCity.setStringValue(city);
 		 mockStatus.setStringValue(status);
          mockReligion.setStringValue(religion);
-		 statusList = new ArrayList<CtxIdentifier>();
-		 cityList = new ArrayList<CtxIdentifier>();
-         religionList = new ArrayList<CtxIdentifier>();
+		 
+         statusList = new ArrayList<CtxIdentifier>();
 		 statusList.add(mockStatusId);
+		 
+		 cityList = new ArrayList<CtxIdentifier>();
 		 cityList.add(mockCityId);
-         religionList.add(mockReligionId);
+		 
+		 religionList = new ArrayList<CtxIdentifier>();
+		 religionList.add(mockReligionId);
+		 	
+		 cssDirectoryResults = new ArrayList<CssAdvertisementRecord>();
+		 CssAdvertisementRecord record = new CssAdvertisementRecord();
+		 record.setId("john.societies.local");
+		 record.setName("John Smith");
+		 cssDirectoryResults.add(record);
+		 
 		 futureStatusList= mock(Future.class);
 		 futureCityList= mock(Future.class);
          futureReligiousList = mock(Future.class);
 		 when(futureStatusList.get()).thenReturn(statusList );
 		 when(futureCityList.get()).thenReturn(cityList );
-        when(futureReligiousList.get()).thenReturn(religionList );
+		 when(futureReligiousList.get()).thenReturn(religionList );
 		 
 		 // mocking context broker
         LOG.info("mocking with: mockCtxEntityIdentifier = "+mockCtxEntityIdentifier.hashCode());
@@ -275,10 +291,13 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		mockIICisId_2 = mock (IIdentityManager.class);
 		mockIICisId_3 = mock (IIdentityManager.class);
 
-		// mocking the IcisDirectoryRemote
+		// mocking the Remote Directory (CSS and CIS)
 		mockICisDirRemote1 = mock (ICisDirectoryRemote.class);
-		//mockICisDirRemote2 = mock (ICisDirectoryRemote.class);
-		//mockICisDirRemote3 = mock (ICisDirectoryRemote.class);
+		doNothing().when(mockICisDirRemote1).addCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
+		doNothing().when(mockICisDirRemote1).deleteCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
+		
+		mockCssDirectoryRemote = mock (ICssDirectoryRemote.class);
+		doNothing().when(mockCssDirectoryRemote).searchByID(any(List.class), any(ICssDirectoryCallback.class));
 		
 		when(mockPrivacyPolicyManager.deletePrivacyPolicy(any(org.societies.api.identity.RequestorCis.class))).thenReturn(true);
 		when(mockPrivacyPolicyManager.updatePrivacyPolicy(anyString(),any(org.societies.api.identity.RequestorCis.class))).thenReturn(null);
@@ -287,11 +306,6 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		thenReturn(new ResponseItem(new RequestItem(null, null, null, true),Decision.PERMIT));
 		
 		doNothing().when(mockEventMgr).publishInternalEvent(any(org.societies.api.osgi.event.InternalEvent.class));
-		
-		doNothing().when(mockICisDirRemote1).addCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
-		doNothing().when(mockICisDirRemote1).deleteCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
-		
-			
 		
 		// creating a NetworkNordImpl for each Identity Manager		
 		testCisId_1 = new NetworkNodeImpl(TEST_CISID_1);
@@ -305,7 +319,6 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		when(mockIICisId_1.getThisNetworkNode()).thenReturn(testCisId_1);
 		when(mockIICisId_2.getThisNetworkNode()).thenReturn(testCisId_2);
 		when(mockIICisId_3.getThisNetworkNode()).thenReturn(testCisId_3);
-		
 		
 		when(mockCISendpoint1.UnRegisterCommManager()).thenReturn(true);
 		when(mockCISendpoint2.UnRegisterCommManager()).thenReturn(true);
@@ -324,12 +337,10 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 
 		
 		when(mockCcmFactory.getNewCommManager()).thenReturn(mockCISendpoint1,mockCISendpoint2,mockCISendpoint3);
+		when(mockCcmFactory.getNewCommManager(anyString())).thenReturn(mockCISendpoint1,mockCISendpoint2,mockCISendpoint3);
 		
 		this.mockingContext();
-		
-		
 
-		
 		// mocking activity feeds themselves
 		mockActivityFeed_1  = mock (IActivityFeed.class);
 		mockActivityFeed_2 = mock (IActivityFeed.class);
@@ -345,13 +356,11 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		doNothing().when(mockActivityFeed_3).addActivity(any(org.societies.api.activity.IActivity.class), any (org.societies.api.activity.IActivityFeedCallback.class));
 
 		//acitivity feed mocking
-		
 		when(mockActivityFeedManager.deleteFeed(anyString(), anyString())).thenReturn(true);
 		when(mockActivityFeedManager.getOrCreateFeed(anyString(), eq(TEST_CISID_1), eq(true))).thenReturn(mockActivityFeed_1);
 		when(mockActivityFeedManager.getOrCreateFeed(anyString(), eq(TEST_CISID_2), eq(true))).thenReturn(mockActivityFeed_2);
 		when(mockActivityFeedManager.getOrCreateFeed(anyString(), eq(TEST_CISID_3), eq(true))).thenReturn(mockActivityFeed_3);
-				
-
+		when(mockActivityFeedManager.getOrCreateFeed(anyString(), anyString(), eq(true))).thenReturn(mockActivityFeed_3);
 		
 		System.out.println("done mocking activities!");
 	}
@@ -752,7 +761,6 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 	}
 	
-	
 	@Test
 	public void listdMembersOnOwnedCIS() throws InterruptedException, ExecutionException {
 
@@ -799,7 +807,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 cisManagerUnderTestInterface.deleteCis(Iciss.getCisId());
 	}
 	
-	@Ignore
+	//@Ignore
 	@Test
 	public void addActivity() throws InterruptedException, ExecutionException {
 
@@ -967,7 +975,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	
 	}
-	//@Ignore
+	
+	@Ignore
 	@Test
 	public void getInfoWithCallback() throws InterruptedException, ExecutionException {
 
@@ -1031,6 +1040,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 icssRemote.getInfo(req,new GetInfoCallBack(IcissOwned));
 	
 	}
+	
 	//@Ignore
 	@Test
 	public void setInfoWithCallback() throws InterruptedException, ExecutionException {
@@ -1099,7 +1109,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	}
 
-
+	//@Ignore
 	@Test
 	public void checkCriteria() throws InterruptedException, ExecutionException {
 
@@ -1156,15 +1166,18 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	}
 	
 	private void setMockingOnCISManager(CisManager cisManagerUnderTest){
-		cisManagerUnderTest.setICommMgr(mockCSSendpoint); cisManagerUnderTest.setCcmFactory(mockCcmFactory); cisManagerUnderTest.setSessionFactory(sessionFactory);cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
-		cisManagerUnderTest.setEventMgr(mockEventMgr); cisManagerUnderTest.setInternalCtxBroker(mockContextBroker);
-		cisManagerUnderTest.setNegotiator(mockNegotiation);cisManagerUnderTest.setiActivityFeedManager(mockActivityFeedManager);
+		cisManagerUnderTest.setICommMgr(mockCSSendpoint); 
+		cisManagerUnderTest.setCcmFactory(mockCcmFactory); 
+		cisManagerUnderTest.setSessionFactory(sessionFactory);
+		cisManagerUnderTest.setiCisDirRemote(mockICisDirRemote1);
+		cisManagerUnderTest.setEventMgr(mockEventMgr); 
+		cisManagerUnderTest.setInternalCtxBroker(mockContextBroker);
+		cisManagerUnderTest.setNegotiator(mockNegotiation);
+		cisManagerUnderTest.setiActivityFeedManager(mockActivityFeedManager);
 		cisManagerUnderTest.setPrivacyDataManager(mockIPrivacyDataManager);
+		cisManagerUnderTest.setCssDirectoryRemote(mockCssDirectoryRemote);
 		
 		cisManagerUnderTest.init();
-		
 	}
-	
-
-	
+		
 }

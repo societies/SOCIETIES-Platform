@@ -42,6 +42,8 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeed;
 import org.societies.api.activity.IActivityFeedManager;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.attributes.Rule;
@@ -62,6 +64,7 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
@@ -81,6 +84,7 @@ import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Criteria;
@@ -100,6 +104,8 @@ import org.societies.api.schema.cis.manager.DeleteMemberNotification;
 import org.societies.api.schema.cis.manager.ListCrit;
 import org.societies.api.schema.cis.manager.ListResponse;
 import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyBehaviourConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.springframework.scheduling.annotation.AsyncResult;
 //import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 //import org.societies.api.schema.cis.community.Leave;
@@ -113,7 +119,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
  * @author Thomas Vilarinho (Sintef)
 */
 
-public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback{
+public class CisManager implements ICisManager, IFeatureServer {
 
 	int nbOfCreatedCIS = 0;
 	int nbOfSubscribedCIS = 0;
@@ -134,16 +140,25 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 	private INegotiation negotiator;
 	private IPrivacyDataManager privacyDataManager;
-
-	//private PubsubClient pubsubClient;
 	
 	private IUserFeedback iUsrFeedback = null;
 	//Autowiring gets and sets
 	private boolean privacyPolicyNegotiationIncluded;
     private IActivityFeedManager iActivityFeedManager;
-
+    private IActivityFeed cssActivityFeed;
+    private ICssDirectoryRemote cssDirectoryRemote;
     
-    public IActivityFeedManager getiActivityFeedManager() {
+    /**@return the cssDirectoryRemote */
+	public ICssDirectoryRemote getCssDirectoryRemote() {
+		return cssDirectoryRemote;
+	}
+
+	/**@param cssDirectoryRemote the cssDirectoryRemote to set */
+	public void setCssDirectoryRemote(ICssDirectoryRemote cssDirectoryRemote) {
+		this.cssDirectoryRemote = cssDirectoryRemote;
+	}
+
+	public IActivityFeedManager getiActivityFeedManager() {
 		return iActivityFeedManager;
 	}
 
@@ -163,25 +178,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	public INegotiation getNegotiator() {
 		return negotiator;
 	}
-
-	/*public PubsubClient getPubsubClient() {
-		return pubsubClient;
-	}
-
-	public void setPubsubClient(PubsubClient pubsubClient) {
-		LOG.info("pubsub set on CIS Manager");
-		this.pubsubClient = pubsubClient;
-		List<String> classList = Collections 
-				.unmodifiableList( Arrays.asList("org.societies.api.schema.activity.MarshaledActivity"));
-		
-    	try {
-    		pubsubClient.addSimpleClasses(classList);
-		} catch (ClassNotFoundException e1) {
-			LOG.warn("error adding classes at pubsub at activityfeed pubsub");
-			e1.printStackTrace();
-			
-		}
-	}*/
 
 	public IPrivacyDataManager getPrivacyDataManager() {
 		return privacyDataManager;
@@ -239,7 +235,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 	
 	public void startup(){
 		//ActivityFeed ret = null;
-	
+		
 		Session session = sessionFactory.openSession();
 		try{
 			this.ownedCISs = session.createCriteria(Cis.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
@@ -254,10 +250,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				session.close();
 		}
 		
-		
-		
-		Iterator<Cis> it = ownedCISs.iterator();
-		 
+		//CREATE EACH HOSTED COMMUNITY I OWN
+		Iterator<Cis> it = ownedCISs.iterator();		 
 		while(it.hasNext()){
 			 Cis element = it.next();
 			 element.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory(),this.privacyPolicyManager, 
@@ -272,51 +266,43 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				} catch (EMSException e) {
 					LOG.error("error trying to internally publish CREATE event");
 					e.printStackTrace();
-					
 				}
 			}
-
-			 
-	     }
+			element.setCssDirectoryRemote(this.cssDirectoryRemote);
+	    }
 		
-	//	for(Cis cis : ownedCISs){
-	//		cis.startAfterDBretrieval(this.getSessionFactory(),this.getCcmFactory());
-	//	}
-		Iterator<CisSubscribedImp> i = this.subscribedCISs.iterator();
-		 
+		//START UP THE ISUBSCRIBED INTERFACE FOR EACH COMMUNITY I'M A MEMBER OF
+		Iterator<CisSubscribedImp> i = this.subscribedCISs.iterator();		 
 		while(i.hasNext()){
 			CisSubscribedImp element = i.next();
-			 element.startAfterDBretrieval(this);
-	     }
-				
+			element.startAfterDBretrieval(this);
+		}
+		
+		//CREATE THE CSS MANAGER ACTIVITY FEED
+		try {
+			String myId = getiCommMgr().getIdManager().getThisNetworkNode().toString();
+			cssActivityFeed = getiActivityFeedManager().getOrCreateFeed(myId, myId, true);
+		} catch (Exception ex) {
+			LOG.error("Exception creating CSS Activity Feed: " + ex);
+		}
 	}
 
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
-					"http://societies.org/api/schema/activityfeed",	  		
-					"http://societies.org/api/schema/cis/community"));
-			//.singletonList("http://societies.org/api/schema/cis/manager");
+											 "http://societies.org/api/schema/cis/community"));
 	private final static List<String> PACKAGES = Collections
-		//	.singletonList("org.societies.api.schema.cis.manager");
 			.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
-					"org.societies.api.schema.activityfeed",
-					"org.societies.api.schema.cis.community"));
+											 "org.societies.api.schema.cis.community"));
 
-	private static Logger LOG = LoggerFactory
-			.getLogger(CisManager.class);
-	
+	private static Logger LOG = LoggerFactory.getLogger(CisManager.class);	
 	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage");
 
 	public CisManager() {
 			this.ownedCISs = new ArrayList<Cis>();	
 			this.subscribedCISs = new ArrayList<CisSubscribedImp>();
-			
-
-
 	}
 	
-	public void init(){
-		
+	public void init() {		
 		this.isDepencyInjectionDone(); // TODO: move this to other parts of the code and
 		// throw exceptions
 		
@@ -325,8 +311,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		
 		cisManagerId = getiCommMgr().getIdManager().getThisNetworkNode();
 		LOG.info("Jid = " + cisManagerId.getBareJid() + ", domain = " + cisManagerId.getDomain() );
-
-
 
 		try {
 			getiCommMgr().register((IFeatureServer) this);
@@ -343,9 +327,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		LOG.info("CISManager started up with "+this.ownedCISs.size()
 				+" owned CISes and "+this.subscribedCISs.size()+" subscribed CISes");
 	}
-
-
-
 
 
 	/**
@@ -481,14 +462,12 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				
 
 		Cis cis = new Cis(this.cisManagerId.getBareJid(), cisName, cisType, 
-		this.ccmFactory, this.privacyPolicyManager,this.sessionFactory
-		,description,cisCriteria,this.iActivityFeedManager);
+							this.ccmFactory, this.privacyPolicyManager, this.sessionFactory,
+							description,cisCriteria,this.iActivityFeedManager);
 		cis.setPrivacyDataManager(privacyDataManager); // TODO: possibly move this to the constructor of the cis
-		if(cis == null)
-			return cis;
-
+		cis.setCssDirectoryRemote(this.cssDirectoryRemote);
+		
 		// PRIVACY POLICY CODE
-
 		try {
 			IIdentity cssOwnerId = this.cisManagerId;
 			IIdentity cisId = getiCommMgr().getIdManager().fromJid(cis.getCisId());
@@ -510,17 +489,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			return null;
 		}
 
-		
-		
-		//
-		
-		
-		// persisting
-		//LOG.info("setting sessionfactory for new cis..: "+sessionFactory.hashCode());
-		//this.persist(cis);
-		//cis.setSessionFactory(sessionFactory);
-
-		
 		// advertising the CIS to global CIS directory
 		CisAdvertisementRecord cisAd = new CisAdvertisementRecord();
 		MembershipCrit m = new MembershipCrit();
@@ -533,6 +501,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		this.iCisDirRemote.addCisAdvertisementRecord(cisAd);
 		LOG.info("advertisement sent");
 		
+		//ADD TO CSS ACTIVITY FEED
+		addActivityToCssAF("Create new community: " + cisName, cis.getCisId());
+		
 		// sending internal event
 		if(this.getEventMgr() != null){
 			Community c = new Community();
@@ -543,14 +514,11 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			} catch (EMSException e) {
 				LOG.error("error trying to internally publish CREATE event");
 				e.printStackTrace();
-				
 			}
 		}
 		
 		if (getOwnedCISs().add(cis)){
 			ICisOwned i = cis;
-
-			
 			IPerformanceMessage perMess= new PerformanceMessage();
 			perMess.setSourceComponent(this.getClass()+"");
 			perMess.setD82TestTableName("S48");
@@ -563,7 +531,6 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		}else{
 			return null;
 		}
-		
 	}
 
 	// internal method used to register that the user has subscribed into a CIS
@@ -584,6 +551,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 			perMess.setPerformanceType(IPerformanceMessage.Quanitative);
 			perMess.setPerformanceNameValue((++nbOfSubscribedCIS)+"");
 			PERF_LOG.trace(perMess.toString());
+
+			//ADD TO CSS ACTIVITY FEED
+			addActivityToCssAF("Joined new community: " + record.getCisName(), record.getCisJID());
 			
 			// internal eventing
 			if(this.getEventMgr() != null){
@@ -628,6 +598,9 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 				perMess.setPerformanceType(IPerformanceMessage.Quanitative);
 				perMess.setPerformanceNameValue((++nbOfUnsubscribedCIS)+"");
 				PERF_LOG.trace(perMess.toString());
+
+				//ADD TO CSS ACTIVITY FEED
+				addActivityToCssAF("Left community: " + temp.getName(), temp.getCisId());
 				
 				//send the local event
 				if(this.getEventMgr() != null){
@@ -649,38 +622,8 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		}else{
 			return false;
 		}
-		
-
 	}
 
-
-
-/*
-	public List<CisRecord> getOwnedCisList() {
-		
-		List<CisRecord> l = new ArrayList<CisRecord>();
-
-		Iterator<Cis> it = getOwnedCISs().iterator();
-		 
-		while(it.hasNext()){
-			 Cis element = it.next();
-			 l.add(element.getCisRecord());
-			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
-	     }
-		
-		return l;
-	}
-
-	public List<CisRecord> getSubscribedCisList() {
-		
-		List<CisRecord> l = new ArrayList<CisRecord>(this.subscribedCISs);
-		return l;
-	}*/
-
-
-
-	
-	
 	@Override
 	public List<String> getJavaPackages() {
 		return  PACKAGES;
@@ -716,14 +659,7 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 
 				// TODO: maybe check if the attributes in the criteria are valid attributes (something from CtxAttributeTypes)
 				if(cisType != null && cisName != null){
-					String pPolicy;
-					if(create.getPrivacyPolicy() != null && 
-							create.getPrivacyPolicy().isEmpty() == false){
-						pPolicy = create.getPrivacyPolicy();
-					}else{
-						LOG.info("create came with an empty policy");
-						pPolicy = "<RequestPolicy></RequestPolicy>";	
-					};
+					//GENERATE MEMBERSHIP CRITERIA
 					Hashtable<String, MembershipCriteria> h = null;
 					MembershipCrit m = create.getCommunity().getMembershipCrit();
 					if (m!=null && m.getCriteria() != null && m.getCriteria().size()>0){
@@ -743,8 +679,30 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 							h.put(crit.getAttrib(), meb);
 						}
 					}
+					
+					//POLICY RECEIVED IS ENUM VALUE, CONVERT TO POLICY XML
+					String pPolicy = "membersOnly"; //DEFAULT VALUE
+					String privacyPolicyXml = "<RequestPolicy />";
+					if(create.getPrivacyPolicy() != null && create.getPrivacyPolicy().isEmpty() == false){
+						pPolicy = create.getPrivacyPolicy();
+					} 
+					PrivacyPolicyBehaviourConstants policyType = PrivacyPolicyBehaviourConstants.MEMBERS_ONLY; //DEFAULT
+					try {
+						policyType = PrivacyPolicyBehaviourConstants.fromValue(pPolicy);
+					} catch (IllegalArgumentException ex) {
+						//IGNORE - DEFAULT TO MEMBERS_ONLY
+						LOG.error("Exception parsing: " + pPolicy + ". " + ex);
+					}
+					//CALL POLICY UTILS TO CREATE XML FOR STORAGE
+					try {
+						RequestPolicy policyObj = PrivacyPolicyUtils.inferCisPrivacyPolicy(policyType, m);
+						privacyPolicyXml =  PrivacyPolicyUtils.toXacmlString(policyObj);
+					} catch (PrivacyException pEx) {
+						pEx.printStackTrace();
+					}
+					
 					// real create
-					Cis icis = (Cis) localCreateCis( cisName, cisType, cisDescription,h,pPolicy);
+					Cis icis = (Cis) localCreateCis(cisName, cisType, cisDescription, h, privacyPolicyXml);
 		
 					// sending the response back
 					if(icis !=null){
@@ -1590,6 +1548,18 @@ public class CisManager implements ICisManager, IFeatureServer{//, ICommCallback
 		this.privacyPolicyNegotiationIncluded = privacyPolicyNegotiationIncluded;
 	}
 
-
-
+	/**
+	 * Private method for adding activities
+	 * 
+	 * @param activityVerb
+	 */
+	private void addActivityToCssAF(String verb, String objectStr){
+			
+		IActivity iActivity = cssActivityFeed.getEmptyIActivity();
+		iActivity.setActor(getiCommMgr().getIdManager().getThisNetworkNode().toString());
+		iActivity.setObject(objectStr);
+		iActivity.setVerb(verb);
+			
+		cssActivityFeed.addActivity(iActivity);
+	}
 }

@@ -38,16 +38,16 @@ public interface TwitterConnector extends ISocialConnector {
 	public static final String POST_TWEET_URL = "https://api.twitter.com/1/statuses/update.json";
 	
 	
-	public static final String TW_CLIENT_ID 		= "LjzBv5lvg673UYJ4xp3CYw";
-	public static final String TW_CLIENT_SECRET	= "eHrtoM2A6mlix8L9kMacDi90IH46xoo6G5uceble6A";
+	public static final String TW_CLIENT_ID         = "ncgOVLIBj2ezwFdg1ynj2A";
+	public static final String TW_CLIENT_SECRET	= "Xtai6DrqtXmpxbgIch5Ut0sV9pyaYQ2rqiuIpSQL268";
 	
-	public static final String TW_CALLBACK_URL		= "http://127.0.0.1:8080/societies-test/doConnect.html?type=tw";
+	public static final String TW_CALLBACK_URL	= "http://127.0.0.1:8080/societies-test/doConnect.html?type=tw";
 	
 	
-	/**
-	 * @return
-	 */
-	String getUserFollowers();
+//	/**
+//	 * @return
+//	 */
+//	String getUserFollowers();
 
 	/**
 	 * @param id

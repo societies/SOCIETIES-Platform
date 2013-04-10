@@ -36,4 +36,7 @@ public class UserFeedbackActivityIntentExtra {
 	public static final String OPTIONS  = "options";
 	public static final String TYPE = "type";
 	public static final String INTENT_RETURN = "IntentReturn";
+	
+	public static final String EXTRA_PRIVACY_POLICY = "org.societies.userfeedback.eventInfo";
+	public static final String USERFEEDBACK_NODES 	= "org.societies.useragent.feedback";
 }

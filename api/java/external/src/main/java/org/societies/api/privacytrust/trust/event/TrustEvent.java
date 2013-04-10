@@ -42,6 +42,8 @@ public abstract class TrustEvent extends EventObject {
 	 * 
 	 * @param source
 	 *            the object upon which this event occurred.
+	 * @throws IllegalArgumentException
+	 *            if the specified source is <code>null</code>.
 	 */
 	public TrustEvent(Object source) {
 		

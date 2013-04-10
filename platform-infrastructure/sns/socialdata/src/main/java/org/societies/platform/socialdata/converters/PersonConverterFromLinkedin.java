@@ -62,10 +62,22 @@ public class PersonConverterFromLinkedin implements PersonConverter {
 	private String     rawData;
 	private JSONObject db;
 	private Person 	   person;
+	private List<Account> accounts;
+	
+	
+	public PersonConverterFromLinkedin() {
+	    	Account linkedinAccounts = new AccountImpl();
+	    	linkedinAccounts.setDomain("linkedin.com");
+		accounts = new ArrayList<Account>();
+		accounts.add(linkedinAccounts);
+	}
 
 	public Person load(String data){
 
 		person = new PersonImpl();
+		person.setAccounts(accounts);
+		
+		
 		this.rawData = data;
 
 		try{
@@ -183,7 +195,11 @@ public class PersonConverterFromLinkedin implements PersonConverter {
 			
 			if (db.has("languages")) genLanguages();
 			
+		      
 			
+			if (db.has("pictureUrl")){
+			    person.setThumbnailUrl(db.getString("pictureUrl"));
+			}
 //			
 //			if (db.has(SCREEN_NAME))	person.setDisplayName(db.getString(SCREEN_NAME));
 //			if (db.has(DESCRIPTION))	person.setAboutMe(db.getString(DESCRIPTION));

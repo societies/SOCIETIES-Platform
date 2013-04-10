@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.societies.android.api.cis.model.CisAttributeTypes;
+import org.societies.android.api.context.model.CtxAttributeTypes;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.identity.DataIdentifierScheme;
@@ -51,8 +53,6 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resourc
  * @created 18-dec.-2012 19:41:29
  */
 public class PrivacyPolicyUtils {
-	private final static String TAG = PrivacyPolicyUtils.class.getSimpleName();
-
 	/**
 	 * Generic function to help a developer or a user to create a privacy policy by inferring a default
 	 * one using information about the CIS or the 3P service. The privacy policy in
@@ -66,37 +66,80 @@ public class PrivacyPolicyUtils {
 	@SuppressWarnings("rawtypes")
 	public static RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException {
 		RequestPolicy privacyPolicy = new RequestPolicy();
+		privacyPolicy.setPrivacyPolicyType(privacyPolicyType);
 		List<RequestItem> requestItems = new ArrayList<RequestItem>();
-		// Not private
+
+		// --- Prepare common data
+		PrivacyPolicyBehaviourConstants globalBaheviour = PrivacyPolicyBehaviourConstants.PRIVATE;
 		if (configuration.containsKey("globalBehaviour")) {
-			// CIS Member list
-			RequestItem requestItem = new RequestItem();
-			Resource cisMemberList = new Resource();
-			cisMemberList.setScheme(DataIdentifierScheme.CIS);
-			cisMemberList.setDataType("cis-member-list");
-			requestItem.setResource(cisMemberList);
-			List<Action> actions = new ArrayList<Action>();
-			Action action = new Action();
-			action.setActionConstant(ActionConstants.READ);
-			actions.add(action);
-			requestItem.setActions(actions);
-			List<Condition> conditions = new ArrayList<Condition>();
-			// Public
-			PrivacyPolicyBehaviourConstants globalBaheviour = (PrivacyPolicyBehaviourConstants) configuration.get("globalBehaviour");
-			if (null != globalBaheviour && PrivacyPolicyBehaviourConstants.PUBLIC.name().equals(globalBaheviour)) {
-				Condition condition = new Condition();
-				condition.setConditionConstant(ConditionConstants.SHARE_WITH_3RD_PARTIES);
-				condition.setValue("1");
-			}
-			// Members only
-			else if (null != globalBaheviour && PrivacyPolicyBehaviourConstants.MEMBERS_ONLY.name().equals(globalBaheviour)) {
-				Condition condition = new Condition();
-				condition.setConditionConstant(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY);
-				condition.setValue("1");
-			}
-			requestItem.setConditions(conditions);
+			globalBaheviour = (PrivacyPolicyBehaviourConstants) configuration.get("globalBehaviour");
+		}
+		// -- Actions: read
+		List<Action> actions = ActionUtils.createList(ActionConstants.READ);
+		// -- Conditions
+		List<Condition> conditions = new ArrayList<Condition>();
+		// - Common
+		conditions.add(ConditionUtils.create(ConditionConstants.STORE_IN_SECURE_STORAGE, "Yes"));
+		// - Visibility
+		// Public
+		if (PrivacyPolicyBehaviourConstants.PUBLIC.name().equals(globalBaheviour.name())) {
+			conditions.add(ConditionUtils.createPublic());
+		}
+		// Members only
+		else if (PrivacyPolicyBehaviourConstants.MEMBERS_ONLY.name().equals(globalBaheviour.name())) {
+			conditions.add(ConditionUtils.createMembersOnly());
+		}
+		// Private
+		else {
+			conditions.add(ConditionUtils.createPrivate());
+		}
+
+		// --- Add data
+		boolean optional = false;
+		// - CIS Member list
+		{
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CIS, CisAttributeTypes.MEMBER_LIST);
+			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
 			requestItems.add(requestItem);
 		}
+		// - Location symbolic
+		{
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
+			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
+			requestItems.add(requestItem);
+		}
+		optional = true;
+		// - Location coordinates
+		{
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_COORDINATES);
+			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
+			requestItems.add(requestItem);
+		}
+		// - Interests
+		{
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.INTERESTS);
+			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
+			requestItems.add(requestItem);
+		}
+		// - Email
+		{
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.EMAIL);
+			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
+			requestItems.add(requestItem);
+		}
+		// - Occupation
+		{
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.OCCUPATION);
+			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
+			requestItems.add(requestItem);
+		}
+		// - Occupation
+		{
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.WORK_POSITION);
+			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
+			requestItems.add(requestItem);
+		}
+
 		privacyPolicy.setRequestItems(requestItems);
 		return privacyPolicy;
 	}

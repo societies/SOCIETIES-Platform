@@ -96,7 +96,7 @@ public class PrivacyLog implements IPrivacyLog {
 		
 		String senderClass = entry.getSenderClass();
 		if (!senderClassNames.contains(senderClass)) {
-			LOG.debug("append(): Adding new transmission class {}", sender);
+			LOG.debug("append(): Adding new transmission class {}", senderClass);
 			senderClassNames.add(senderClass);
 		}
 	}

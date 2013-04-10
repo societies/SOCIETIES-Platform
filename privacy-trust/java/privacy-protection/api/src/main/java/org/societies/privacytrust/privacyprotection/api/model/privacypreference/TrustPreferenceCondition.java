@@ -60,6 +60,19 @@ public class TrustPreferenceCondition implements IPrivacyPreferenceCondition, Se
 	}
 
 	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("TrustPreferenceCondition [trustId=");
+		builder.append(trustId);
+		builder.append(", myType=");
+		builder.append(myType);
+		builder.append(", trustThreshold=");
+		builder.append(trustThreshold);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
