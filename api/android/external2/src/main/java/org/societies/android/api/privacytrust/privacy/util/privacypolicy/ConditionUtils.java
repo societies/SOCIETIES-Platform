@@ -42,7 +42,7 @@ public class ConditionUtils {
 	 * @return
 	 */
 	public static Condition create(ConditionConstants conditionConstant, String value) {
-		return create(conditionConstant, value, true);
+		return create(conditionConstant, value, false);
 	}
 
 	public static Condition create(ConditionConstants conditionConstant, String value, boolean optional) {
@@ -52,6 +52,19 @@ public class ConditionUtils {
 		condition.setOptional(optional);
 		return condition;
 	}
+	
+	public static Condition createPrivate() {
+		return create(ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY, "Yes");
+	}
+	
+	public static Condition createMembersOnly() {
+		return create(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, "Yes");
+	}
+	
+	public static Condition createPublic() {
+		return create(ConditionConstants.SHARE_WITH_3RD_PARTIES, "Yes");
+	}
+
 
 	public static String toXmlString(Condition condition){
 		StringBuilder sb = new StringBuilder();

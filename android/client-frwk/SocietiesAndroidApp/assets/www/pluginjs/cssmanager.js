@@ -134,7 +134,7 @@ window.plugins.SocietiesLocalCSSManager = {
 			errorCallback('A random error was generated');
 		}
 		else {
-			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'listAdvertisementRecords'));
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'getSuggestedFriends'));
 		}
 	},
 	getFriendRequests: function(successCallback, errorCallback){

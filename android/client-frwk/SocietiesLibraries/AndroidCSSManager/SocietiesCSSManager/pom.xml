@@ -84,6 +84,12 @@
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
+		<dependency>
+			<groupId>org.societies.android</groupId>
+			<artifactId>privacytrust</artifactId>
+			<version>${version.pt}</version>
+			<type>apklib</type>
+		</dependency>
     </dependencies>
 
     <build>

@@ -122,7 +122,7 @@ public class PrivacyDataManagerTest extends IntegrationTest {
 			List<Action> actionsRead = new ArrayList<Action>();
 			actionsRead.add(new Action(ActionConstants.READ));
 			// Prepare UserFeedback
-			TestCase.getUserFeedbackMocker().addReply(UserFeedbackType.ACKNACK, new UserFeedbackMockResult(1, "Allow"));
+			TestCase.getUserFeedbackMocker().addReply(UserFeedbackType.CHECKBOXLIST, new UserFeedbackMockResult(1, "READ"));
 			// -- Call
 			TestCase.privacyDataManagerRemote.checkPermission(RequestorUtils.toRequestor(requestor, TestCase.commManager.getIdManager()), randomDataId, actionsRead, new IPrivacyDataManagerListener() {
 				@Override

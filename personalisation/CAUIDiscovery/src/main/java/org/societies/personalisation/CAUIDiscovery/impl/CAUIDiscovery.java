@@ -19,7 +19,9 @@
  */
 package org.societies.personalisation.CAUIDiscovery.impl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -46,6 +48,8 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.logging.IPerformanceMessage;
+import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.personalisation.model.IAction;
 //import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
@@ -59,11 +63,15 @@ import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 public class CAUIDiscovery implements ICAUIDiscovery{
 
 	public static final Logger LOG = LoggerFactory.getLogger(CAUIDiscovery.class);
+	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage");
 
 	public ICAUITaskManager cauiTaskManager;
 	private ICtxBroker ctxBroker;
 	private ICommManager commsMgr;
-	
+
+
+	IPerformanceMessage m;
+
 	//LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = null;
 	LinkedHashMap<String,HashMap<String,Double>> transProb = null;
 	HashMap<String,List<String>> contextActionsMap = new HashMap<String,List<String>>();
@@ -75,7 +83,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	public CAUIDiscovery(){
 		//actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
 		//remove after testing
-	//cauiTaskManager = new CAUITaskManager();
+		//cauiTaskManager = new CAUITaskManager();
 
 	}
 
@@ -103,13 +111,13 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		LOG.info(this.getClass().getName()+": Got commsMgr");
 		this.commsMgr = commsMgr;
 	}
-	
+
 	public ICommManager getCommsMgr() {
 		LOG.info(this.getClass().getName()+": Return CommsMgr");
 		return commsMgr;
 	}
 
-	
+
 
 	// constructor
 	public void initialiseCAUIDiscovery(){
@@ -120,7 +128,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	public void generateNewUserModel() {
 
 		LOG.debug("start model generation");
-	
+
 		if (retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION) != null ){
 
 			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData = retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION);
@@ -130,16 +138,16 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 			//LOG.info("3. Generate Transition Dictionary");
 			LinkedHashMap<List<String>,ActionDictObject> currentActCtxDictionary = generateTransitionsDictionary(mockData);
-					
+
 			//LOG.info("4. Generate Transition Propability Dictionary (step2)");
 			TransitionProbabilitiesCalc transProb  = new TransitionProbabilitiesCalc();
 			LinkedHashMap<String,HashMap<String,Double>> trans2ProbDictionary = transProb.calcTrans2Prob(currentActCtxDictionary);	
 			//printTransProbDictionary(trans2ProbDictionary);
 			//LOG.info("5. Assign context to actions");
-			
+
 			HashMap<String,List<String>> ctxActionsMap =  assignContextToAction(currentActCtxDictionary);
 			//LOG.info("5. Generate UserIntentModelData");
-	
+
 			ConstructUIModel cmodel = new ConstructUIModel(cauiTaskManager,ctxBroker); 
 			//LOG.info("5a trans2ProbDictionary "+ trans2ProbDictionary);
 			//LOG.info("5a ctxActionsMap "+ ctxActionsMap);
@@ -150,8 +158,14 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			//LOG.info("7. Store UserIntentModelData to ctx DB");
 
 			CtxAttribute ctxAttr = storeModelCtxDB(modelData);
-			LOG.info("model stored under attribute id: "+ctxAttr.getId());
-			LOG.info("modelData "+ modelData.getActionModel());
+			LOG.debug("model stored under attribute id: "+ctxAttr.getId());
+			LOG.debug("modelData "+ modelData.getActionModel());
+
+			// performance log code
+			byte entBytes [] = toByteArray(modelData);
+			long modelSize = entBytes.length;
+			this.predictionModelSizePerformanceLog(modelSize);
+			// end of performance log code
 			
 		}else LOG.info("not enough history data");
 	}
@@ -227,14 +241,14 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		this.actCtxDictionary = null;
 		LOG.info("model cleared "+this.actCtxDictionary);
 	}
-*/
+	 */
 
 
 
 	public LinkedHashMap<List<String>,ActionDictObject>  populateActionCtxDictionary(List<MockHistoryData> historyData){
 
 		LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
-		
+
 		int historySize = historyData.size();
 		LOG.debug("historySize "+historySize);
 
@@ -270,7 +284,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 						tempHocData = historyData.get(i+k);
 						//String tempNextActName = tempHocData.getActionValue();
 						String tempNextActName = tempHocData.getServiceId()+"#"+tempHocData.getParameterName()+"#"+tempHocData.getActionValue();
-						
+
 						actionNameObjTemp.add(tempNextActName);
 
 						//context
@@ -383,7 +397,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				dicObj = dic.get(actList);
 				int actionOccurences = dicObj.getTotalOccurences();
 				List<String> contextList = new ArrayList<String>();
-			
+
 				if(dicObj.getLocationContextMap() != null){
 					HashMap<List<String>,Integer> locMap = dicObj.getLocationContextMap();  
 					for(List<String> locationValues : locMap.keySet()){
@@ -421,9 +435,9 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 						}
 					}
 				}
-				*/
+				 */
 				results.put(action, contextList);
-			
+
 			}
 		}
 		return results;
@@ -486,7 +500,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	 *  Converts history data to a temporary list of mockHistoryData in order to be processed and stored in dictionary and model
 	 *  Escorting context values are converted to string objects. 
 	 */
-	
+
 	public List<MockHistoryData> convertHistoryData (Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData){
 
 		List<MockHistoryData> result = new ArrayList<MockHistoryData>();
@@ -496,9 +510,9 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			try {
 				IAction retrievedAction = (IAction) SerialisationHelper.deserialise(primaryHocAttr.getBinaryValue(), this.getClass().getClassLoader());
 				String serviceIdentString = retrievedAction.getServiceID().getServiceInstanceIdentifier();
-			
+
 				List<CtxHistoryAttribute> listHocAttrs = ctxHocTuples.get(primaryHocAttr);
-						
+
 				Map<String,String> context = new HashMap<String,String>();
 				for(int i=0; i<listHocAttrs.size(); i++){
 					CtxHistoryAttribute escortingHocAttr = listHocAttrs.get(i);
@@ -507,7 +521,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				}
 				MockHistoryData mockHocData = new MockHistoryData(retrievedAction.getparameterName(), retrievedAction.getvalue(), context,primaryHocAttr.getLastModified(),serviceIdentString);
 				result.add(mockHocData);
-				
+
 			}  catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -530,7 +544,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		} else if (attr.getDoubleValue() != null) {
 			valueStr = attr.getDoubleValue().toString();
 		} 
-		
+
 		return valueStr;
 	}
 
@@ -564,18 +578,18 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		CtxAttribute ctxAttrCAUIModel = null;
 		try {
 			byte[] binaryModel = SerialisationHelper.serialise(modelData);
-				
+
 			//CtxEntity operator = ctxBroker.retrieveCssOperator().get();
-			
+
 			final INetworkNode cssNodeId = commsMgr.getIdManager().getThisNetworkNode();
-			
+
 			final String cssOwnerStr = cssNodeId.getBareJid();
 			IIdentity cssOwnerId = commsMgr.getIdManager().fromJid(cssOwnerStr);
-			
+
 			//LOG.info("cssOwnerId "+cssOwnerId);
 			IndividualCtxEntity operator = ctxBroker.retrieveIndividualEntity(cssOwnerId).get();
 			//LOG.info("discovery operator retrieved "+operator);
-			
+
 			ctxAttrCAUIModel = lookupAttrHelp(CtxAttributeTypes.CAUI_MODEL);
 			if(ctxAttrCAUIModel != null){
 
@@ -584,7 +598,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				ctxAttrCAUIModel = ctxBroker.createAttribute(operator.getId(),CtxAttributeTypes.CAUI_MODEL).get();
 				ctxAttrCAUIModel = ctxBroker.updateAttribute(ctxAttrCAUIModel.getId(), binaryModel).get();
 			}
-		
+
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -604,6 +618,39 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		return ctxAttrCAUIModel;
 	}
 
+
+	void predictionModelSizePerformanceLog(long size){
+		m = new PerformanceMessage();
+		m.setSourceComponent(this.getClass()+"");
+		m.setD82TestTableName("S67");
+		m.setTestContext("Personalisation.CAUIUserIntent.IntentPredictionModel.Size");
+		m.setOperationType("IntentPredictionModelSize");//?
+		m.setPerformanceType(IPerformanceMessage.Quanitative);
+		m.setPerformanceNameValue("Size =" + size); 
+		PERF_LOG.trace(m.toString());
+	}
+
+
+
+
+
+	public byte[] toByteArray (Object obj)
+	{
+		byte[] bytes = null;
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		try {
+			ObjectOutputStream oos = new ObjectOutputStream(bos); 
+			oos.writeObject(obj);
+			oos.flush(); 
+			oos.close(); 
+			bos.close();
+			bytes = bos.toByteArray ();
+		}
+		catch (IOException ex) {
+			//TODO: Handle the exception
+		}
+		return bytes;
+	}
 
 	//*************** Model storage to hard drive *****************
 	/*
@@ -653,5 +700,5 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			e.printStackTrace();
 		}  
 	}
-*/
+	 */
 }

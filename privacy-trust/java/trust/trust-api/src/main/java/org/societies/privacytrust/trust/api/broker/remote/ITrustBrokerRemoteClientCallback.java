@@ -24,6 +24,11 @@
  */
 package org.societies.privacytrust.trust.api.broker.remote;
 
+import java.util.Set;
+
+import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.model.TrustRelationship;
+
 /**
  * Describe your class here...
  *
@@ -32,5 +37,32 @@ package org.societies.privacytrust.trust.api.broker.remote;
  */
 public interface ITrustBrokerRemoteClientCallback {
 	
-	public void onRetrievedTrust(Double value);
+	/**
+	 * 
+	 * @param trustRelationships
+	 * @since 1.0
+	 */
+	public void onRetrievedTrustRelationships(Set<TrustRelationship> trustRelationships);
+	
+	/**
+	 * 
+	 * @param trustRelationship
+	 * @since 1.0
+	 */
+	public void onRetrievedTrustRelationship(TrustRelationship trustRelationship);
+	
+	/**
+	 * 
+	 * @param trustValue
+	 * @since 1.0
+	 */
+	public void onRetrievedTrustValue(Double trustValue);
+	
+	/**
+	 * Associates an exception with this callback.
+	 * 
+	 * @param exception the exception to associate with this callback.
+	 * @since 1.0
+	 */
+	public void onException(TrustException exception);
 }

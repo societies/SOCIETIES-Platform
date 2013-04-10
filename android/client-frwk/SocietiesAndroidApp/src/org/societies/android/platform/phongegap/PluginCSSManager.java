@@ -46,6 +46,7 @@ import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
+import org.societies.api.schema.cssmanagement.FriendEntry;
 import org.societies.utilities.DBC.Dbc;
 
 import android.content.BroadcastReceiver;
@@ -516,15 +517,23 @@ public class PluginCSSManager extends Plugin {
 		CssRecord cssRecord = null;
 		CssAdvertisementRecord advertRecord [] = null;
 		MarshaledActivity activities[] = null;
+		FriendEntry friendEntries[] = null;
 		PluginResult result = null;
 		boolean resultStatus = false;
 		
 		//ADVERTISEMENT RECORDS	
-		if (IAndroidCSSManager.GET_FRIEND_REQUESTS==intent.getAction() || IAndroidCSSManager.GET_CSS_FRIENDS==intent.getAction() || IAndroidCSSManager.SUGGESTED_FRIENDS==intent.getAction()) {
+		if (IAndroidCSSManager.GET_FRIEND_REQUESTS==intent.getAction() || IAndroidCSSManager.GET_CSS_FRIENDS==intent.getAction()) {
 			resultStatus = intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false);
 			Parcelable parcels[] = intent.getParcelableArrayExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY);
 			advertRecord = new CssAdvertisementRecord [parcels.length];
 			System.arraycopy(parcels, 0, advertRecord, 0, parcels.length);
+		} 
+		//SUGGESTED FRIENDS	
+		if (IAndroidCSSManager.SUGGESTED_FRIENDS==intent.getAction()) {
+			resultStatus = intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false);
+			Parcelable parcels[] = intent.getParcelableArrayExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY);
+			friendEntries = new FriendEntry[parcels.length];
+			System.arraycopy(parcels, 0, friendEntries, 0, parcels.length);
 		} 
 		else if (IAndroidCssDirectory.FIND_ALL_CSS_ADVERTISEMENT_RECORDS==intent.getAction() || IAndroidCssDirectory.FIND_FOR_ALL_CSS==intent.getAction() ) {
 			resultStatus = intent.getBooleanExtra(IAndroidCssDirectory.INTENT_RETURN_STATUS_KEY, false);
@@ -551,9 +560,12 @@ public class PluginCSSManager extends Plugin {
 			if (IAndroidCssDirectory.FIND_ALL_CSS_ADVERTISEMENT_RECORDS==intent.getAction() || 
 					   IAndroidCssDirectory.FIND_FOR_ALL_CSS==intent.getAction() ||
 					   IAndroidCSSManager.GET_FRIEND_REQUESTS==intent.getAction() ||
-					   IAndroidCSSManager.GET_CSS_FRIENDS == intent.getAction() || 
-					   IAndroidCSSManager.SUGGESTED_FRIENDS == intent.getAction()) {
+					   IAndroidCSSManager.GET_CSS_FRIENDS == intent.getAction()) {
 				result = new PluginResult(PluginResult.Status.OK, convertCssAdvertisements(advertRecord));
+			}
+			//SUGGESTED FRIENDS = FriendEntry
+			else if (IAndroidCSSManager.SUGGESTED_FRIENDS == intent.getAction()) {
+				result = new PluginResult(PluginResult.Status.OK, convertFriendEntries(friendEntries));
 			}
 			//ACTIVITIES
 			else if (IAndroidCSSManager.GET_CSS_ACTIVITIES==intent.getAction() ) {
@@ -579,7 +591,24 @@ public class PluginCSSManager extends Plugin {
 	}
 	
 	/**
-     * Creates a JSONObject for a given {@link MarshaledActivity}
+     * Creates a JSONObject for a given {@link FriendEntry} array
+     * 
+     * @param node
+     * @return JSONObject 
+     */
+    private JSONArray convertFriendEntries(FriendEntry friendEntries[]) {
+        JSONArray jArray = null;
+		Gson gson = new Gson();
+		try {
+			jArray =  new JSONArray (new JSONTokener(gson.toJson(friendEntries)));
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+        return jArray;
+    }
+    
+	/**
+     * Creates a JSONObject for a given {@link MarshaledActivity} array
      * 
      * @param node
      * @return JSONObject 

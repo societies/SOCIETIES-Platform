@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
+import org.json.JSONObject;
 import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
 import org.societies.platform.FacebookConn.FacebookConnector;
 
@@ -70,7 +71,7 @@ public class FacebookConnectorImpl implements FacebookConnector {
 	public void setToken(String access_token) {
 		this.access_token = access_token;
 		facebookClient		= new DefaultFacebookClient(access_token);
-		this.id				= this.name + "_" + UUID.randomUUID();
+		this.id		        = this.name + "_" + UUID.randomUUID();
 		
 	}
 	public String getLastUpdate() {
@@ -179,6 +180,8 @@ public class FacebookConnectorImpl implements FacebookConnector {
 		}
 		
 		return "https://graph.facebook.com/"+path+"?access_token="+access_token+opt ;
+	
+	    	
 	}
 
 
@@ -196,24 +199,24 @@ public class FacebookConnectorImpl implements FacebookConnector {
 		BatchRequest reqINTEREST = new BatchRequestBuilder(INTERESTS).build();
 		BatchRequest reqMUSIC = new BatchRequestBuilder(MUSIC).build();
 		BatchRequest reqLIKES = new BatchRequestBuilder(LIKES).build();
-		//BatchRequest reqThumb = new BatchRequestBuilder(THUMB).build();
+		BatchRequest reqThumb = new BatchRequestBuilder(THUMB).build();
 		
 		
-		List<BatchResponse> batchResponses = facebookClient.executeBatch(reqME,reqBOOK,reqINTEREST,reqMUSIC, reqLIKES);
+		List<BatchResponse> batchResponses = facebookClient.executeBatch(reqME,reqBOOK,reqINTEREST,reqMUSIC, reqLIKES, reqThumb);
 		
 		BatchResponse responseMe   		= batchResponses.get(0);
 		BatchResponse responseBook	 	= batchResponses.get(1);
 		BatchResponse responseInterest	= batchResponses.get(2);
 		BatchResponse responseMusic	    = batchResponses.get(3);
 		BatchResponse responseLikes	    = batchResponses.get(4);
-		//BatchResponse responseThumb	    = batchResponses.get(5);
+		BatchResponse responseThumb	    = batchResponses.get(5);
 		
 		JsonObject me = new JsonObject(responseMe.getBody());
 //		System.out.println("ME:"+me.toString(1));		
 //		System.out.println("Book:"+responseBook.getBody());	
 //		System.out.println("Interest:"+responseInterest.getBody());	
 //		System.out.println("Music:"+responseMusic.getBody());	
-//		System.out.println("Likes:"+responseLikes.getBody());	
+		System.out.println("Likes:"+responseThumb.getBody());	
 		
 		
 		
@@ -221,7 +224,7 @@ public class FacebookConnectorImpl implements FacebookConnector {
 		me.put("books", convertToPluralField(responseBook.getBody()));
 		me.put("music", convertToPluralField(responseMusic.getBody()));
 		me.put("interest", convertToPluralField(responseInterest.getBody()));
-		//me.put("thumb", convertToPluralField(responseThumb.getBody()));
+		me.put("picture", new JSONObject(responseThumb.getBody()).getString("picture"));
 		return me.toString(1);   
 		}
 		  catch(Exception ex){
@@ -320,7 +323,8 @@ public class FacebookConnectorImpl implements FacebookConnector {
 				List<BatchResponse> batchResponses = facebookClient.executeBatch(request);
 				response = batchResponses.get(0);
 				JsonObject activities = new JsonObject(response.getBody());
-				fullActivities = activities.getJsonArray("data");
+				JsonObject feed = activities.getJsonObject("feed");
+				fullActivities = feed.getJsonArray("data");
 				boolean goOn = activities.has("paging");
 				
 				

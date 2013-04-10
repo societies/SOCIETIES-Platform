@@ -76,7 +76,7 @@ var	SocietiesCISManagerService = {
 		if ( data ) {
 			//VALID COMMUNITY OBJECT
 			var markup = "<h1>" + data.communityName + "</h1>" + 
-						 "<p>Type: " + data.communityType + "</p>" + 
+						 "<p>Category: " + data.communityType + "</p>" + 
 						 "<p>" + data.description + "</p>" + 
 						 "<p>Owner: " + data.ownerJid + "</p>";
 			$('input#cis_id').val(data.communityJid);

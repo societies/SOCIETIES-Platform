@@ -25,6 +25,7 @@ package org.societies.webapp.controller;
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -55,7 +56,6 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
 import org.societies.api.schema.sns.socialdata.model.SocialNetwork;
-import org.societies.platform.FacebookConn.FacebookConnector;
 import org.societies.platform.FoursquareConnector.FoursquareConnector;
 import org.societies.platform.TwitterConnector.TwitterConnector;
 import org.societies.platform.sns.connecor.linkedin.LinkedinConnector;
@@ -98,19 +98,7 @@ public class SocialDataController {
 	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	
 	
-//	private static final String FQ_CLIENT_ID 		= "SZKIPIXWCQHOURERE4B5NHO3E2NFW4MRQRPI42B1Q5VLHJ1T";
-//	private static final String FQ_CLIENT_SECRET 	= "KVTR1YZKQWZL3BBYBE3MMAQRSVFLO11YE1S4JVYGU3QPBB4I";
-//	
-//	private static final String TW_CLIENT_ID 		= "LjzBv5lvg673UYJ4xp3CYw";
-//	private static final String TW_CLIENT_SECRET	= "eHrtoM2A6mlix8L9kMacDi90IH46xoo6G5uceble6A";
-//
-//	private static final String LK_CLIENT_ID		= "cysdprp40gxn";
-//	private static final String LK_ClIENT_SECRET	= "faKKFat0QeJomJjv";
-//	
-//	
-//	private static final String FB_CLIENT_ID		= "427731297305104";
-//	private static final String FB_ClIENT_SECRET	= "34795f0cd520ba4190572d9b839f426d";
-	
+
 	public ISocialData getSocialData() {
 		return socialdata;
 	}
@@ -161,15 +149,14 @@ public class SocialDataController {
 			return "#";
 	}
 
-	private Token fb_request_token;
-	private Token tw_request_token;
-	private Token lk_request_token;
 	
-	
+	private String path = "";
 	
 	@RequestMapping(value = "/socialdata.html", method = RequestMethod.GET)
-	public ModelAndView SocialDataForm() {
+	public ModelAndView SocialDataForm(HttpServletRequest request) {
 
+	    
+	        path =  "http://" + request.getServerName() + ":" +request.getServerPort()  +  request.getContextPath();
 		// CREATE A HASHMAP OF ALL OBJECTS REQUIRED TO PROCESS THIS PAGE
 		Map<String, Object> model = new HashMap<String, Object>();
 
@@ -239,20 +226,7 @@ public class SocialDataController {
 		return null;
 	}
 	
-	
-	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/socialdatastatus.html", method = RequestMethod.GET)
-	public String getStatus(HttpServletResponse response){
-	   return ""+socialdata.getStatus();
-	}
-	
-	
-	@RequestMapping(value="/status", method=RequestMethod.GET)
-	public @ResponseBody String getSocialDataStatus(@RequestParam String name) {
-	   return ""+socialdata.getStatus();
-	}
-
-	
+		
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/socialdata.html", method = RequestMethod.POST)
@@ -281,66 +255,68 @@ public class SocialDataController {
 
 		if (ADD.equalsIgnoreCase(method)) {
 
-			logger.debug("Enter method ADD:");
-
-			// DO add Connectore HERE
-			res = "[" + method + "] new Social Connector ";
-			HashMap<String, String> params = new HashMap<String, String>();
-			params.put(ISocialConnector.AUTH_TOKEN, sdForm.getToken());
-
-			String error = "";
-			try {
-
-				ISocialConnector con = socialdata.createConnector(getSocialNetowkName(sdForm.getSnName()), params);
-				error = "We are not able to create " + con.getConnectorName()
-						+ " connector!";
-				socialdata.addSocialConnector(con);
-
-				content = "<b>Connector</b> ID:" + sdForm.getId() + " for "
-						+ sdForm.getSnName() + " with token: "
-						+ sdForm.getToken() + "<br>";
-				model.put("sdForm", sdForm);
-
-				Iterator<ISocialConnector> it = socialdata
-						.getSocialConnectors().iterator();
-				String connLI = "";
-
-				while (it.hasNext()) {
-					ISocialConnector conn = it.next();
-
-					connLI += "<li><img src='" + getSNIcon(conn) + "'> "
-							+ conn.getConnectorName()
-							+ " <a href=\"#\" onclick=\"disconnect('"
-							+ conn.getID()
-							+ "');\">Click here to disconnect</a></li>";
-
-				}
-
-				socialdata.updateSocialData(); // this is required to read all
-												// the SN Data.... (can take a
-												// while).
-				lastUpdate = dateFormat.format(new Date());
-				model.put("lastupdate", lastUpdate);
-				model.put("connectors", connLI);
-				return new ModelAndView("socialdata", model);
-			}
-
-			catch (Exception e) {
-				res = "Internal Error";
-				content = "<p> Unable to generate a connecotor with those parameters <p>";
-				content += "Error type is " + error + " trace: "
-						+ e.getMessage();
-				content += "<ul><li> Social Network:" + sdForm.getSnName()
-						+ "</li>";
-				content += "<li> Method:" + sdForm.getMethod() + "</li>";
-				Iterator<String> it = params.keySet().iterator();
-				while (it.hasNext()) {
-					String k = it.next();
-					content += "<li>" + k + ": " + params.get(k) + "</li>";
-				}
-				content += "</ul>";
-				e.printStackTrace();
-			}
+//			logger.debug("Enter method ADD:");
+//
+//			// DO add Connectore HERE
+//			res = "[" + method + "] new Social Connector ";
+//			HashMap<String, String> params = new HashMap<String, String>();
+//			params.put(ISocialConnector.AUTH_TOKEN, sdForm.getToken());
+//
+//			String error = "";
+//			try {
+//
+//				ISocialConnector con = socialdata.createConnector(getSocialNetowkName(sdForm.getSnName()), params);
+//				error = "We are not able to create " + con.getConnectorName()
+//						+ " connector!";
+//				socialdata.addSocialConnector(con);
+//
+//				content = "<b>Connector</b> ID:" + sdForm.getId() + " for "
+//						+ sdForm.getSnName() + " with token: "
+//						+ sdForm.getToken() + "<br>";
+//				model.put("sdForm", sdForm);
+//
+//				Iterator<ISocialConnector> it = socialdata
+//						.getSocialConnectors().iterator();
+//				String connLI = "";
+//
+//				while (it.hasNext()) {
+//					ISocialConnector conn = it.next();
+//
+//					connLI += "<li><img src='" + getSNIcon(conn) + "'> "
+//							+ conn.getConnectorName()
+//							+ " <a href=\"#\" onclick=\"disconnect('"
+//							+ conn.getID()
+//							+ "');\">Click here to disconnect</a></li>";
+//
+//				}
+//
+//				socialdata.updateSocialData(); // this is required to read all
+//												// the SN Data.... (can take a
+//												// while).
+//				lastUpdate = dateFormat.format(new Date());
+//				model.put("lastupdate", lastUpdate);
+//				model.put("connectors", connLI);
+//				return new ModelAndView("socialdata", model);
+//			}
+//
+//			catch (Exception e) {
+//				res = "Internal Error";
+//				content = "<p> Unable to generate a connecotor with those parameters <p>";
+//				content += "Error type is " + error + " trace: "
+//						+ e.getMessage();
+//				content += "<ul><li> Social Network:" + sdForm.getSnName()
+//						+ "</li>";
+//				content += "<li> Method:" + sdForm.getMethod() + "</li>";
+//				Iterator<String> it = params.keySet().iterator();
+//				while (it.hasNext()) {
+//					String k = it.next();
+//					content += "<li>" + k + ": " + params.get(k) + "</li>";
+//				}
+//				content += "</ul>";
+//				e.printStackTrace();
+//			}
+		    
+		    content ="Metodo non piu usato";
 
 		} else if (UPDATE.equalsIgnoreCase(method)) {
 			lastUpdate = dateFormat.format(new Date());
@@ -435,6 +411,7 @@ public class SocialDataController {
 				String domain = "";
 				String img = "";
 				String link = "";
+				String thumb = "";
 				try {
 					if (p.getName() != null) {
 						if (p.getName().getFormatted() != null)
@@ -463,6 +440,8 @@ public class SocialDataController {
 					img = "<img width='20px' src='" + getIcon(domain) + "'>";
 					link = "<a href='" + getBaseURL(domain, id) + "' sn="
 							+ domain + ">" + name + "</a>";
+					thumb = "<img width='20px' src='" + p.getThumbnailUrl() + "'>";
+					
 
 				}
 
@@ -472,7 +451,7 @@ public class SocialDataController {
 				}
 
 				content += "<li> " + img + "[ID][" + p.getId() + "]" + link
-						+ "]</li>";
+						+ "]"+ thumb +" </li>";
 
 			}
 			content += "</ul>";
@@ -512,6 +491,8 @@ public class SocialDataController {
 						id = p.getId().split(":")[1];
 					}
 
+				
+					
 					img = "<img width='20px' src='" + getIcon(p.getId()) + "'>";
 					link = "<a href='" + getBaseURL(domain, id) + "'>" + name
 							+ "</a>";
@@ -577,95 +558,21 @@ public class SocialDataController {
 				}
 			}
 			content += "</ul>";
-		} else if (CONNECT_TW.equalsIgnoreCase(method)) {
-
-			res = "<a href='socialdata.html'> Back to my Social Area </a>";
-			content = "connecting with to twitter....";
-			service = new ServiceBuilder()
-					.provider(TwitterApi.class)
-					.apiKey(TwitterConnector.TW_CLIENT_ID)
-					.apiSecret(TwitterConnector.TW_CLIENT_SECRET)
-					.callback("http://127.0.0.1:8080/societies-test/doConnect.html?type=tw")
-					.build();
-
-			tw_request_token = service.getRequestToken();
+		} else if (method.contains("connect_")) {
+		    try {
 			
-			
-			try {
-				response.sendRedirect(service.getAuthorizationUrl(tw_request_token));
-			} catch (IOException e) {
+			        String sn_name= method.replace("connect_", "");
+				response.sendRedirect("http://societies.lucasimone.eu/connect.php?sn="+sn_name+"&from="+ path + "/doConnect2.html");
+	           } 
+		   catch (IOException e) {
+		        logger.error("IO Exception LK:", e);
+		        e.printStackTrace();
+	           }
 
-				e.printStackTrace();
-			}
+	} else {
 
-		} else if (CONNECT_FQ.equalsIgnoreCase(method)) {
-			
-			Token EMPTY_TOKEN = null;
-			res = "<a href='socialdata.html'> Back to my Social Area </a>";
-			content = "connecting with to FQ....";
-			service = new ServiceBuilder()
-					.provider(Foursquare2Api.class)
-					.apiKey(FoursquareConnector.FQ_CLIENT_ID)
-					.apiSecret(FoursquareConnector.FQ_CLIENT_SECRET)
-					.callback(FoursquareConnector.FQ_CALLBACK_URL)
-					.build();
-
-			try {
-				response.sendRedirect(service.getAuthorizationUrl(EMPTY_TOKEN));
-			} catch (IOException e) {
-				logger.error("IO Exception FQ:",e);
-				e.printStackTrace();
-			}
-		
-		}
-		else if (CONNECT_LK.equalsIgnoreCase(method)) {
-				
-				res = "<a href='socialdata.html'> Back to my Social Area </a>";
-				content = "connecting with to LK....";
-				service = new ServiceBuilder()
-						.provider(LinkedInApi.class)
-						.scope(LinkedinConnector.LK_SCOPES)
-						.apiKey(LinkedinConnector.LK_CLIENT_ID)
-						.apiSecret(LinkedinConnector.LK_ClIENT_SECRET)
-						.callback(LinkedinConnector.LK_CALLBACK_URL)
-						.build();
-
-				try {
-					
-					lk_request_token = service.getRequestToken();
-					response.sendRedirect(service.getAuthorizationUrl(lk_request_token));
-				} catch (IOException e) {
-					logger.error("IO Exception LK:",e);
-					e.printStackTrace();
-				}
-
-		}
-		else if (CONNECT_FB.equalsIgnoreCase(method)) {
-					
-					res = "<a href='socialdata.html'> Back to my Social Area </a>";
-					content = "connecting with to LK....";
-					service = new ServiceBuilder()
-							.provider(FacebookApi.class)
-							.apiKey(FacebookConnector.FB_CLIENT_ID)
-							.apiSecret(FacebookConnector.FB_ClIENT_SECRET)
-							.scope("publish_checkins,publish_stream,create_event,read_stream,offline_access,user_groups,user_about_me,user_birthday,user_education_history,user_hometown,user_relationship_details,user_location,user_religion_politics,user_work_history,user_website,friends_religion_politics,user_activities,user_likes,user_interests")
-							.callback(FacebookConnector.FB_CALLBACK_URL)
-							.build();
-
-					try {
-						
-						
-						response.sendRedirect(service.getAuthorizationUrl(null));
-					} catch (IOException e) {
-						logger.error("IO Exception LK:",e);
-						e.printStackTrace();
-					}
-
-				} else {
-
-			content = "<p>Method:" + method + " NOT IMPLEMENTED/p>";
-		}
-		
+	    content = "<p>Method:" + method + " NOT IMPLEMENTED/p>";
+	}		
 
 		model.put("lastupdate", lastUpdate);
 		model.put("result_title", res);
@@ -680,100 +587,177 @@ public class SocialDataController {
 	
 	
 	
-	@RequestMapping(value = "/doConnect.html", method = RequestMethod.GET)
-	public ModelAndView doConnect() {
+//	@RequestMapping(value = "/doConnect.html", method = RequestMethod.GET)
+//	public ModelAndView doConnect() {
+//
+//		logger.debug("Entering  /doConnect.html");
+//
+//		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+//		
+//		String socialNetworkType 		=request.getParameter("type");
+//		String finalToken = "";
+//		
+//		
+//		if ("tw".equalsIgnoreCase(socialNetworkType)){
+//			
+//			String oauth_token_param       = request.getParameter("oauth_token");
+//			String oauth_verifier_param = request.getParameter("oauth_verifier");
+//			
+//			logger.debug("oauth_token param:"+oauth_token_param);
+//			logger.debug("oauth_verifier_param param:"+oauth_verifier_param);
+//			logger.debug("request Token:"+tw_request_token.toString());
+//			
+//			
+//			//Token oauth_token = service.getRequestToken();
+//			Verifier oauth_verifier = null;
+//			Token accessToken = null;
+//
+//			if (oauth_token_param != null && oauth_verifier_param!=null) {
+//		
+////				oauth_token 	 = new Token(oauth_token_param, "");
+//				oauth_verifier 	 = new Verifier(oauth_verifier_param);
+//				accessToken 	 = service.getAccessToken(tw_request_token, oauth_verifier);
+//				String tmp_token = accessToken.getToken() +  "," +   accessToken.getSecret();
+//				finalToken = tmp_token;
+//				
+//				
+//				
+//				logger.debug("TW Token: "+finalToken);
+//			}
+//		}
+//		else if ("fq".equalsIgnoreCase(socialNetworkType)){
+//			logger.debug("URL:"+ request.getQueryString());
+//			Token EMPTY_TOKEN = null;
+//			Token accessToken = null;
+//			
+//			String code 	= request.getParameter("code");
+//			finalToken 	= request.getParameter("oauth_token");
+//			Verifier vCode  = new Verifier(code);
+//			accessToken = service.getAccessToken(EMPTY_TOKEN, vCode);
+//			finalToken  = accessToken.getToken();
+//			
+//			
+//		}
+//		else if ("lk".equalsIgnoreCase(socialNetworkType)){
+//			logger.debug("LK URL:"+ request.getQueryString());
+//			
+//			
+//			String oauth_token_param 	= request.getParameter("oauth_token");
+//			String oauth_verifier_param 	= request.getParameter("oauth_verifier");
+//			
+//			//Token oauth_token = service.getRequestToken();
+//			Verifier oauth_verifier = null;
+//			Token accessToken = null;
+//
+//			if (oauth_verifier_param!=null) {
+//
+//				oauth_verifier 	 = new Verifier(oauth_verifier_param);
+//				accessToken 	 = service.getAccessToken(lk_request_token, oauth_verifier);
+//				String tmp_token = accessToken.getToken() +  "," +   accessToken.getSecret();
+//				finalToken = tmp_token;
+//				
+//				
+//				
+//				logger.debug("LK Token: "+finalToken);
+//			}
+//			
+//			
+//		}
+//		else if ("fb".equalsIgnoreCase(socialNetworkType)){
+//			logger.warn("FB URL:"+ request.getQueryString());
+//			String code 		= request.getParameter("code");
+//			Verifier vCode  = new Verifier(code);
+//			
+//			
+//			Token accessToken = service.getAccessToken(null, vCode);
+//			finalToken = accessToken.getToken();
+//			
+//		}
+//		
+//		// Redraw the GUI
+//
+//		
+//		
+//		
+//		String res = "Unable to add the "+socialNetworkType+ " Connector";
+//		String method = "Connect Twitter";
+//		String content = " --- ";
+//		String error = "";
+//		
+//		
+//		Map<String, Object> model = new HashMap<String, Object>();
+//		lastUpdate = dateFormat.format(new Date());
+//		model.put("lastupdate", lastUpdate);			
+//		SocialDataForm sdForm = new SocialDataForm();
+//		
+//		sdForm.setToken(finalToken);
+//		sdForm.setMethod(ADD);
+//		sdForm.setSnName(socialNetworkType);
+//		HashMap<String, String> params = new HashMap<String, String>();
+//		params.put(ISocialConnector.AUTH_TOKEN, sdForm.getToken());
+//		sdForm.setSnName(socialNetworkType);
+//		
+//		try {
+//
+//				ISocialConnector con = socialdata.createConnector(getSocialNetowkName(sdForm.getSnName()), params);
+//				error = "We are not able to create " + con.getConnectorName() + " connector!";
+//				
+//				
+//				
+//				
+//				
+//				socialdata.addSocialConnector(con);
+//				content = "<b>Connector</b> ID:" + sdForm.getId() + " for "
+// 						+ sdForm.getSnName() + " with token: "
+//						+ sdForm.getToken() + "<br>";
+//				model.put("sdForm", sdForm);
+//		}
+//		catch (Exception ex) {
+//			logger.error(" Errore creazione token :", ex);
+//		}
+//				
+//		socialdata.updateSocialData(); // this is required to read all the SN
+//		model.put("connectors", getConnectorsHTML());
+//		model.put("result_title", res);
+//		return new ModelAndView("socialdata", model);
+//
+//	}
 
-		logger.debug("Entering  /doConnect.html");
+	
+	
+	/**
+	 * Query social data to check the 
+	 * @return HTML Data with the list of available connectors
+	 */
+	private String getConnectorsHTML() {
+		// read list of CONNECTOR
+
+		Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
+		String connLI = "";
+
+		while (it.hasNext()) {
+			ISocialConnector conn = it.next();
+
+			connLI += "<li><img src='" + getSNIcon(conn) + "'> "
+					+ conn.getConnectorName()
+					+ " <a href=\"#\" onclick=\"disconnect('" + conn.getID()
+					+ "');\">Click here to disconnect</a></li>";
+
+		}
+		return connLI;
+	}
+	
+	
+	
+	@RequestMapping(value = "/doConnect2.html", method = RequestMethod.GET)
+	public ModelAndView doConnect2() {
+		
+	        logger.debug("Entering  /doConnect2.html");
 
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		
 		String socialNetworkType 		=request.getParameter("type");
-		String finalToken = "";
-		
-		
-		if ("tw".equalsIgnoreCase(socialNetworkType)){
-			
-			String oauth_token_param 		= request.getParameter("oauth_token");
-			String oauth_verifier_param 	= request.getParameter("oauth_verifier");
-			
-			logger.debug("oauth_token param:"+oauth_token_param);
-			logger.debug("oauth_verifier_param param:"+oauth_verifier_param);
-			logger.debug("request Token:"+tw_request_token.toString());
-			
-			
-			//Token oauth_token = service.getRequestToken();
-			Verifier oauth_verifier = null;
-			Token accessToken = null;
-
-			if (oauth_token_param != null && oauth_verifier_param!=null) {
-		
-//				oauth_token 	 = new Token(oauth_token_param, "");
-				oauth_verifier 	 = new Verifier(oauth_verifier_param);
-				accessToken 	 = service.getAccessToken(tw_request_token, oauth_verifier);
-				String tmp_token = accessToken.getToken() +  "," +   accessToken.getSecret();
-				finalToken = tmp_token;
-				
-				
-				
-				logger.debug("TW Token: "+finalToken);
-			}
-		}
-		else if ("fq".equalsIgnoreCase(socialNetworkType)){
-			logger.debug("URL:"+ request.getQueryString());
-			Token EMPTY_TOKEN = null;
-			Token accessToken = null;
-			
-			String code 	= request.getParameter("code");
-			finalToken 		= request.getParameter("oauth_token");
-			Verifier vCode  = new Verifier(code);
-			accessToken = service.getAccessToken(EMPTY_TOKEN, vCode);
-			finalToken  = accessToken.getToken();
-			
-			
-		}
-		else if ("lk".equalsIgnoreCase(socialNetworkType)){
-			logger.debug("LK URL:"+ request.getQueryString());
-			
-			
-			String oauth_token_param 		= request.getParameter("oauth_token");
-			String oauth_verifier_param 	= request.getParameter("oauth_verifier");
-			
-			//Token oauth_token = service.getRequestToken();
-			Verifier oauth_verifier = null;
-			Token accessToken = null;
-
-			if (oauth_verifier_param!=null) {
-
-				oauth_verifier 	 = new Verifier(oauth_verifier_param);
-				accessToken 	 = service.getAccessToken(lk_request_token, oauth_verifier);
-				String tmp_token = accessToken.getToken() +  "," +   accessToken.getSecret();
-				finalToken = tmp_token;
-				
-				
-				
-				logger.debug("LK Token: "+finalToken);
-			}
-			
-			
-		}
-		else if ("fb".equalsIgnoreCase(socialNetworkType)){
-			logger.warn("FB URL:"+ request.getQueryString());
-			String code 		= request.getParameter("code");
-			Verifier vCode  = new Verifier(code);
-			Token accessToken = service.getAccessToken(null, vCode);
-			finalToken = accessToken.getToken();
-			
-		}
-		
-		// Redraw the GUI
-
-		
-		
-		
-		String res = "Unable to add the "+socialNetworkType+ " Connector";
-		String method = "Connect Twitter";
-		String content = " --- ";
-		String error = "";
+		String token 				=request.getParameter("token");
 		
 		
 		Map<String, Object> model = new HashMap<String, Object>();
@@ -781,13 +765,16 @@ public class SocialDataController {
 		model.put("lastupdate", lastUpdate);			
 		SocialDataForm sdForm = new SocialDataForm();
 		
-		sdForm.setToken(finalToken);
+		sdForm.setToken(token);
 		sdForm.setMethod(ADD);
 		sdForm.setSnName(socialNetworkType);
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put(ISocialConnector.AUTH_TOKEN, sdForm.getToken());
 		sdForm.setSnName(socialNetworkType);
 		
+		String res = "Unable to add the "+socialNetworkType+ " Connector";
+		String content = " --- ";
+		String error = "";
 		try {
 
 				ISocialConnector con = socialdata.createConnector(getSocialNetowkName(sdForm.getSnName()), params);
@@ -814,32 +801,6 @@ public class SocialDataController {
 
 	}
 
-	
-	
-	/**
-	 * Query social data to check the 
-	 * @return HTML Data with the list of available connectors
-	 */
-	private String getConnectorsHTML() {
-		// read list of CONNECTOR
-
-		Iterator<ISocialConnector> it = socialdata.getSocialConnectors()
-				.iterator();
-		String connLI = "";
-
-		while (it.hasNext()) {
-			ISocialConnector conn = it.next();
-
-			connLI += "<li><img src='" + getSNIcon(conn) + "'> "
-					+ conn.getConnectorName()
-					+ " <a href=\"#\" onclick=\"disconnect('" + conn.getID()
-					+ "');\">Click here to disconnect</a></li>";
-
-		}
-		return connLI;
-	}
-	
-	
 	
 	/********* GUI Layout *********/
 	

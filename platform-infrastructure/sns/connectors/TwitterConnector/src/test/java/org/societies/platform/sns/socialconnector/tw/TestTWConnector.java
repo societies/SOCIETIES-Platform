@@ -41,7 +41,7 @@ public class TestTWConnector {
 	private static final Logger logger = Logger.getLogger(TestTWConnector.class.getSimpleName());
 	
 	
-	final static String Token = "13240782-Sbv5pdxObmYvt2jLUQx395V12KHSQLS7aaKUiV6it,syPWIOPAG0AO4uvo7bS30Ox2Hdb76OdEfO49OHQK8rE";
+	final static String Token = "";
 
 	@Before
 	public void setUp() {

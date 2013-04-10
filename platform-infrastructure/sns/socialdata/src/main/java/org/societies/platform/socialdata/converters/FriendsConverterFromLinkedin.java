@@ -31,57 +31,61 @@ public class FriendsConverterFromLinkedin implements FriendsConverter{
 			}
 	    	
 	    	JSONArray  jfriends  =  null;
+	    	PersonConverterFromLinkedin converter = new PersonConverterFromLinkedin();
 	    	if (jdata.has("values")){
 				jfriends = jdata.getJSONArray("values");
 				for (int i=0; i<jfriends.length();i++){
 					JSONObject jfriend = jfriends.getJSONObject(i);
-					Person p = new PersonImpl();
-					Name name = new NameImpl();
-					String formattedName= "";
-					if (jfriend.has("firstName")){
-						name.setGivenName(jfriend.getString("firstName"));
-						formattedName=name.getGivenName();
-					}
-					else 
-						name.setGivenName(jfriend.getString("--"));
-					
-					if (jfriend.has("lastName")){
-						name.setFamilyName(jfriend.getString("lastName"));
-						if (formattedName.length()>0) formattedName += " ";
-						formattedName += name.getFamilyName();
-					}
-					else
-						name.setFamilyName("--");
-					
-					name.setFormatted(formattedName);
-					
-					p.setName(name);
-					p.setId("linkedin:"+jfriend.getString("id"));
-					p.setRelationshipStatus("friend");
-					
-					p.setAccounts(accounts);
-					if (jfriend.has("headline"))
-						p.setAboutMe(jfriend.getString("headline"));
-					
-					if (jfriend.has("pictureUrl")){
-						// add ICON
-					}
-					
-					if (jfriend.has("location")){
-						JSONObject location = jfriend.getJSONObject("location");
-						if (location.has("name"))
-							p.setLivingArrangement(location.getString("name"));
-					}
-					
-					if( jfriend.has("siteStandardProfileRequest")){
-						JSONObject url =  jfriend.getJSONObject("siteStandardProfileRequest");
-						if (url.has("url"))
-							p.setProfileUrl(url.getString("url"));
-					}
-					if (jfriend.has("industry"))
-						p.setJobInterests(jfriend.getString("industry"));
-					//System.out.println(">>> new Friends"+p.getName().getFormatted());
-					friends.add(p);
+//					Person p = new PersonImpl();
+//					Name name = new NameImpl();
+//					String formattedName= "";
+//					if (jfriend.has("firstName")){
+//						name.setGivenName(jfriend.getString("firstName"));
+//						formattedName=name.getGivenName();
+//					}
+//					else 
+//						name.setGivenName(jfriend.getString("--"));
+//					
+//					if (jfriend.has("lastName")){
+//						name.setFamilyName(jfriend.getString("lastName"));
+//						if (formattedName.length()>0) formattedName += " ";
+//						formattedName += name.getFamilyName();
+//					}
+//					else
+//						name.setFamilyName("--");
+//					
+//					name.setFormatted(formattedName);
+//					
+//					p.setName(name);
+//					p.setId("linkedin:"+jfriend.getString("id"));
+//					p.setRelationshipStatus("friend");
+//					
+//					p.setAccounts(accounts);
+//					if (jfriend.has("headline"))
+//						p.setAboutMe(jfriend.getString("headline"));
+//					
+//					if (jfriend.has("pictureUrl")){
+//						// add ICON
+//					}
+//					
+//					if (jfriend.has("location")){
+//						JSONObject location = jfriend.getJSONObject("location");
+//						if (location.has("name"))
+//							p.setLivingArrangement(location.getString("name"));
+//					}
+//					
+//					if( jfriend.has("siteStandardProfileRequest")){
+//						JSONObject url =  jfriend.getJSONObject("siteStandardProfileRequest");
+//						if (url.has("url"))
+//							p.setProfileUrl(url.getString("url"));
+//					}
+//					if (jfriend.has("industry"))
+//						p.setJobInterests(jfriend.getString("industry"));
+//					//System.out.println(">>> new Friends"+p.getName().getFormatted());
+				    
+				    
+				    
+					friends.add(converter.load(jfriend.toString()));
 				}	
 			}
 			

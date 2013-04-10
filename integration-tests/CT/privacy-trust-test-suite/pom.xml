@@ -27,6 +27,7 @@
 	</parent>
 
 	<modules>
+	    <module>data-management-remote-1932</module>
 	    <module>policy-management-remote-1267</module>
 	</modules>
 

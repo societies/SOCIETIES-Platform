@@ -79,6 +79,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector {
 				.callback(
 						FQ_CALLBACK_URL)
 				.build();
+		
 		this.accessToken = new Token(this.accessTokenString, "");
 	}
 
@@ -101,7 +102,7 @@ public class FoursquareConnectorImpl implements FoursquareConnector {
 	}
 
 	public String getUserFriends() {
-		OAuthRequest request = new OAuthRequest(Verb.GET, USER_PROFILE
+		OAuthRequest request = new OAuthRequest(Verb.GET, FRIENDS
 				+ accessToken.getToken());
 		this.service.signRequest(accessToken, request);
 		Response response = request.send();
