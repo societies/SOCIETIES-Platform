@@ -44,7 +44,7 @@ public class UIDUpdateTest {
 
 	@Test
 	public void test() {
-		LOG.info("Monitor services #747 - Running UIDUpdateTest....");
+		LOG.info("Monitor services #1875 - Running UIDUpdateTest....");
 
 		//create action
 		IIdentity identity = TestCase747.commsMgr.getIdManager().getThisNetworkNode();
@@ -57,7 +57,7 @@ public class UIDUpdateTest {
 		}
 		IAction action1 = new Action(serviceId, "testService", "font", "large");
 		
-		LOG.info("Monitor services #747 - sending mock action to UAM");
+		LOG.info("Monitor services #1875 - sending mock action to UAM");
 		TestCase747.uam.monitor(identity, action1);
 		try {
 			Thread.sleep(1000);

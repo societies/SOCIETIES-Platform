@@ -42,7 +42,7 @@ public class TestCase774 extends IntegrationTestCase {
 	public void setCommManager(ICommManager commManager) { this.commManager = commManager; }
 	
 	public TestCase774() {
-		super(774, new Class[]{ MessageTestCase.class});
+		super(1854, new Class[]{ MessageTestCase.class});
 	}
 
 }

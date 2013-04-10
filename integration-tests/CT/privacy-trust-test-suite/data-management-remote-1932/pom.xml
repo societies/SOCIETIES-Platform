@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.integration.test.ct</groupId>
-	<artifactId>privacydatamanagementremote</artifactId>
+	<groupId>org.societies.integration.test</groupId>
+	<artifactId>ct.privacy_data_management_remote.1932</artifactId>
 	<name>#1932 Privacy Data Management Remote Test Suite</name>
 	<packaging>bundle</packaging>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>${release.version}</version>
 
 	<developers>
 		<developer>

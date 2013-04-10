@@ -2,10 +2,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>integration.test.bit.retrieveContextAs3pService_861</artifactId>
-	<name>3P Service set/get Context Data Integration Test (#861)</name>
+	<artifactId>bit.retrieve_context_as_3p_service.1868</artifactId>
+	<name>3P Service set/get Context Data Integration Test (#1868)</name>
 	<packaging>bundle</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${release.version}</version>
 
 	<developers>
 		<developer>

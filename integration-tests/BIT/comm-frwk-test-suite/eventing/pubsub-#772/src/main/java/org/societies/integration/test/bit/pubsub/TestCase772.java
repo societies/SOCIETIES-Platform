@@ -46,7 +46,7 @@ public class TestCase772 extends IntegrationTestCase {
 	public void setCommManager(ICommManager commManager) { this.commManager = commManager; }
 	
 	public TestCase772() {
-		super(772, new Class[]{ PubsubTestCase.class});
+		super(1853, new Class[]{ PubsubTestCase.class});
 	}
 
 }

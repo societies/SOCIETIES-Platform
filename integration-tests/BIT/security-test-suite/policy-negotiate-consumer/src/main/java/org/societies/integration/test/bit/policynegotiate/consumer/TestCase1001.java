@@ -31,13 +31,13 @@ public class TestCase1001 extends IntegrationTestCase {
 		// Call the super constructor
 		// with test case number
 		// and test case classes to run
-		//super(1001, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
-		super(1001, new Class[] {NominalTestCaseLowerTester.class});
+		//super(1879, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
+		super(1879, new Class[] {NominalTestCaseLowerTester.class});
 		NominalTestCaseLowerTester.testCaseNumber = 1001;
 	}
 
 	public void setNegotiator(INegotiation negotiator) {
-		LOG.debug("[#1001] setNegotiator()");
+		LOG.debug("[#1879] setNegotiator()");
 		TestCase1001.negotiator = negotiator;
 	}
 	
@@ -46,7 +46,7 @@ public class TestCase1001 extends IntegrationTestCase {
 	}
 
 	public void setGroupMgr(INegotiationProviderRemote groupMgr) {
-		LOG.debug("[#1001] setGroupMgr()");
+		LOG.debug("[#1879] setGroupMgr()");
 		TestCase1001.groupMgr = groupMgr;
 	}
 	
@@ -55,7 +55,7 @@ public class TestCase1001 extends IntegrationTestCase {
 	}
 
 	public void setProviderJid(String providerJid) {
-		LOG.debug("[#1001] setProviderJid()");
+		LOG.debug("[#1879] setProviderJid()");
 		TestCase1001.providerJid = providerJid;
 	}
 	
