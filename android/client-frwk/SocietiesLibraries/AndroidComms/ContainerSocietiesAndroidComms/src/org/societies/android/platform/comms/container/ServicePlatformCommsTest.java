@@ -74,7 +74,7 @@ public class ServicePlatformCommsTest extends Service {
 	@Override
 	public void onDestroy() {
 		Log.i(LOG_TAG, "ServicePlatformCommsRemote terminating");
-		serviceBase.cleanup();
+		serviceBase.serviceCleanup();
 	}
 
 }

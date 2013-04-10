@@ -504,7 +504,7 @@ public class SocietiesClientServicesController {
             	serviceIntent = new Intent(ICoreSocietiesServices.CIS_MANAGER_SERVICE_INTENT);
             	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, cisManagerConnection, Context.BIND_AUTO_CREATE);
         	} else {
-        		Log.e(LOCAL_LOG_TAG, "Service does not exist");
+        		Log.e(LOCAL_LOG_TAG, "CIS Manager Service does not exist");
         	}
 
         	if (retValue) {
@@ -512,7 +512,7 @@ public class SocietiesClientServicesController {
 	        	serviceIntent = new Intent(ICoreSocietiesServices.CIS_SUBSCRIBED_SERVICE_INTENT);
 	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, cisSubscribedConnection, Context.BIND_AUTO_CREATE);
            	} else {
-        		Log.e(LOCAL_LOG_TAG, "Service does not exist");
+        		Log.e(LOCAL_LOG_TAG, "CIS Subscribed Service does not exist");
         	}
 
         	//LOCAL PLATFORM SERVICES
@@ -521,7 +521,7 @@ public class SocietiesClientServicesController {
 	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, LocalCssDirectoryService.class);
 	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, cssDirectoryConnection, Context.BIND_AUTO_CREATE);
            	} else {
-        		Log.e(LOCAL_LOG_TAG, "Service does not exist");
+        		Log.e(LOCAL_LOG_TAG, "CSS Directory Service does not exist");
         	}
 
         	if (retValue) {
@@ -529,7 +529,7 @@ public class SocietiesClientServicesController {
 	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, ServiceManagementLocal.class);
 	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, slmDiscoConnection, Context.BIND_AUTO_CREATE);
            	} else {
-        		Log.e(LOCAL_LOG_TAG, "Service does not exist");
+        		Log.e(LOCAL_LOG_TAG, "SLM Service Discovery Service does not exist");
         	}
         	
         	if (retValue) {
@@ -537,7 +537,7 @@ public class SocietiesClientServicesController {
 	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, ServiceManagementLocal.class);
 	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, slmControlConnection, Context.BIND_AUTO_CREATE);
            	} else {
-        		Log.e(LOCAL_LOG_TAG, "Service does not exist");
+        		Log.e(LOCAL_LOG_TAG, "SLM Service Control Service does not exist");
         	}
 
         	if (retValue) {
@@ -545,7 +545,7 @@ public class SocietiesClientServicesController {
 	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, SocialData.class);
 	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, snsSocialDataConnection, Context.BIND_AUTO_CREATE);
            	} else {
-        		Log.e(LOCAL_LOG_TAG, "Service does not exist");
+        		Log.e(LOCAL_LOG_TAG, "SNS Connectors Service does not exist");
         	}
         	
         	if (retValue) {
@@ -553,7 +553,7 @@ public class SocietiesClientServicesController {
 	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, FriendsManagerLocal.class);
 	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, friendsMgrConnection, Context.BIND_AUTO_CREATE);
            	} else {
-        		Log.e(LOCAL_LOG_TAG, "Service does not exist");
+        		Log.e(LOCAL_LOG_TAG, "Friends Manager Service does not exist");
         	}
         	
         	if (retValue) {
@@ -561,7 +561,7 @@ public class SocietiesClientServicesController {
 	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, PrivacyPolicyManagerLocalService.class);
 	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, privacyPolicyConnection, Context.BIND_AUTO_CREATE);
            	} else {
-        		Log.e(LOCAL_LOG_TAG, "Service does not exist");
+        		Log.e(LOCAL_LOG_TAG, "Privacy Policy Service does not exist");
         	}
         	
         	try {
