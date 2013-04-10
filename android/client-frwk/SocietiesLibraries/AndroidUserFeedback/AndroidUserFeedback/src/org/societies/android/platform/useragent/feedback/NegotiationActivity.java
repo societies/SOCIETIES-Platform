@@ -140,7 +140,7 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 					checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 						@Override
 						public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-							String conditionValue = (isChecked ? "YES" : "NO");
+							String conditionValue = (isChecked ? "1" : "0");
 							String posValues = (String)buttonView.getContentDescription();
 							String[] positions = posValues.split("_");
 							int responsePos = Integer.parseInt(positions[0]);
