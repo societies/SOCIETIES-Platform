@@ -253,7 +253,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
 				
 				Stanza stanza = new Stanza(toIdentity);
-				this.commMgr.sendIQ(stanza, IQ.Type.SET, cbPacket, ctxBrokerCallBack);
+				this.commMgr.sendIQ(stanza, IQ.Type.GET, cbPacket, ctxBrokerCallBack);
 				Log.d(LOG_TAG, "Sent IQ with stanza=" + stanza);
 			
 			} catch (CommunicationException e) {
