@@ -61,7 +61,7 @@ public class PrivacyPolicyNegotiationListener extends BasePageController {
             }
         }
 
-        public void sendResponse(String itemId, ResponsePolicy responsePolicy, NegotiationDetailsBean negotiationDetails) {
+        public void sendResponse(ResponsePolicy responsePolicy, NegotiationDetailsBean negotiationDetails) {
             if (log.isDebugEnabled())
                 log.debug("sendResponse(): privacyNegotiationResponse");
 
@@ -72,11 +72,11 @@ public class PrivacyPolicyNegotiationListener extends BasePageController {
             try {
                 getPubsubClient().publisherPublish(getUserService().getIdentity(),
                         EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE,
-                        itemId,
+                        String.valueOf(negotiationDetails.getNegotiationID()),
                         payload);
 
                 if (log.isDebugEnabled())
-                    log.debug("Sent " + EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE + " with ID " + itemId);
+                    log.debug("Sent " + EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE + " with ID " + negotiationDetails.getNegotiationID());
             } catch (Exception e) {
                 addGlobalMessage("Error publishing notification of completed negotiation",
                         e.getMessage(),
@@ -88,7 +88,7 @@ public class PrivacyPolicyNegotiationListener extends BasePageController {
         @Override
         public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object item) {
             if (log.isDebugEnabled()) {
-                String fmt = "pubsubEvent() item of type %s with ID %s";
+                String fmt = "pubsubEvent() item of type %s with message ID %s";
 
                 log.debug(String.format(fmt,
                         item.getClass().getSimpleName(),
@@ -99,7 +99,7 @@ public class PrivacyPolicyNegotiationListener extends BasePageController {
 
             // get the policy from the event payload
             UserFeedbackPrivacyNegotiationEvent privEvent = (UserFeedbackPrivacyNegotiationEvent) item;
-            addRequestToQueue(itemId, privEvent);
+            addRequestToQueue(String.valueOf(privEvent.getNegotiationDetails().getNegotiationID()), privEvent);
 
 
             // notify the user
@@ -187,7 +187,7 @@ public class PrivacyPolicyNegotiationListener extends BasePageController {
 
         responsePolicy.setNegotiationStatus(NegotiationStatus.ONGOING);
 
-        pubSubListener.sendResponse(itemId, responsePolicy, negotiationDetails);
+        pubSubListener.sendResponse(responsePolicy, negotiationDetails);
 
         // Remove from queue
         removeRequestFromQueue(itemId);
@@ -206,7 +206,7 @@ public class PrivacyPolicyNegotiationListener extends BasePageController {
 
         responsePolicy.setNegotiationStatus(NegotiationStatus.FAILED);
 
-        pubSubListener.sendResponse(itemId, responsePolicy, negotiationDetails);
+        pubSubListener.sendResponse(responsePolicy, negotiationDetails);
 
         //Remove from queue
         removeRequestFromQueue(itemId);

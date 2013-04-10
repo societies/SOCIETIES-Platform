@@ -213,10 +213,9 @@ public class PrivacyPolicyTestController extends BasePageController {
 
         ResponsePolicy responsePolicy = buildResponsePolicy(guid, requestorBean);
 
-
         NegotiationDetailsBean negotiationDetails = new NegotiationDetailsBean();
         negotiationDetails.setRequestor(requestorBean);
-        negotiationDetails.setNegotiationID(101);
+        negotiationDetails.setNegotiationID(new BigInteger(130, random).intValue());
 
         pubSubListener.sendPpnEvent(guid, responsePolicy, negotiationDetails);
     }
