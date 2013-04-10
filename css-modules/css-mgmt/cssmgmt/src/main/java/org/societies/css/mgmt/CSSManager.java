@@ -1679,7 +1679,8 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 				@Override
 				public void getResult(List<CssAdvertisementRecord> resultList) {
 					if (resultList.size() > 0)
-						addActivityToCSSAF(resultList.get(0).getName() + " accepted your friend request");
+						//addActivityToCSSAF(resultList.get(0).getName() + " accepted your friend request");
+						addActivityToCSSAF("Accepted friend request from " +resultList.get(0).getName());
 					else
 						addActivityToCSSAF("Accepted friend request from " + who);
 				}
@@ -2698,9 +2699,11 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		final CssRequest request = new CssRequest();
 		request.setCssIdentity(identity.toString());
 		request.setRequestStatus(statusType);
-		LOG.info("handleExternalFriendRequest called : ");
-		LOG.info("Request from identity: " +identity);
-		LOG.info("Request  status: " +statusType);
+		LOG.debug("handleExternalFriendRequest called : ");
+		LOG.debug("Request from identity: " +identity);
+		LOG.debug("Request  status: " +statusType);
+		LOG.debug("Request  Origin: " +request.getOrigin());
+		request.setOrigin(CssRequestOrigin.REMOTE);
 
 		try {
 			cssRegistry.updateCssFriendRequestRecord(request);
@@ -2746,6 +2749,7 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		//ACTIVITY FEED
 		List<String> listIDs = new ArrayList<String>();
 		listIDs.add(request.getCssIdentity());
+		LOG.debug("External Handle listIDs is : " +listIDs);
 		final String who = request.getCssIdentity();
 		cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
 			@Override
@@ -2754,6 +2758,7 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 					addActivityToCSSAF("Friend request " + request.getRequestStatus() + " by " + resultList.get(0).getName());
 				else
 					addActivityToCSSAF("Friend request " + request.getRequestStatus() + " by " + who);
+				
 			}
 		});
 	}
@@ -2766,35 +2771,58 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		pendingFR.setOrigin(CssRequestOrigin.LOCAL);
 		acceptCssFriendRequest(pendingFR);
 		
+		LOG.debug("+++++++++++++handleInternalFriendRequest called : ");
+		LOG.debug("+++++++++++++Request from identity: " +identity);
+		LOG.debug("+++++++++++++Request  status: " +statusType);
+		
 		//ACTIVITY FEED
 		List<String> listIDs = new ArrayList<String>();
 		listIDs.add(identity.toString());
+		LOG.debug("listIDs is : " +listIDs);
 		final String who = identity.toString();
 		cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
 			@Override
 			public void getResult(List<CssAdvertisementRecord> resultList) {
 				if (resultList.size() > 0)
-					addActivityToCSSAF(resultList.get(0).getName() + " accepted your friend request");
+					//addActivityToCSSAF(resultList.get(0).getName() + " accepted your friend request");
+					addActivityToCSSAF(" Accepted friend request from " +resultList.get(0).getName());
+			
 				else
 					addActivityToCSSAF("Friend request accepted by " + who);
+				
 			}
 		});
+	}
+	
+	@Override
+	public void handleExternalUpdateRequest(IIdentity identity, CssRequestStatusType statusType) {
+		//identity is who the request has come FROM
+		final CssRequest request = new CssRequest();
+		request.setCssIdentity(identity.toString());
+		request.setRequestStatus(statusType);
+		LOG.debug("handleExternalUpdateRequest called : ");
+		LOG.debug("Request from identity: " +identity);
+		LOG.debug("Request  status: " +statusType);
+		request.setOrigin(CssRequestOrigin.REMOTE);
+
+		try {
+			cssRegistry.updateCssFriendRequestRecord(request);
+			cssRegistry.updateCssRequestRecord(request);
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// If this was initiated locally then inform remote css
+		// We only want to sent messages to remote Css's for this function if we initiated the call locally
+		if (request.getOrigin() == CssRequestOrigin.LOCAL) {
+			// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
+			// otherwise send message to remote css
+			LOG.debug("INSIDE IF STATEMENT -> Request  origin: " +request.getOrigin());
+			//called updateCssFriendRequest on remote
+			request.setOrigin(CssRequestOrigin.REMOTE);
+			cssManagerRemote.updateCssRequest(request);
+		}
 		
-		//addActivityToCSSAF("CSS Friend Request has been " +pendingFR.getRequestStatus() +"by " +identity.toString());
-		//UPDATE LOCAL DATABASE WITH THIS FRIEND REQUEST
-		//CssRequest request = new CssRequest();
-		//request.setCssIdentity(identity.toString());
-		//LOG.info("handleInternalFriendRequest called : ");
-		//LOG.info("Request from identity: " +identity);
-		//LOG.info("Request  status: " +statusType);
-		//try {
-		//	cssRegistry.updateCssFriendRequestRecord(request);
-		//	//cssRegistry.updateCssFriendRequestRecord(request);
-		//	cssRegistry.updateCssRequestRecord(request);
-		//} catch (CssRegistrationException e) {
-		//	// TODO Auto-generated catch block
-		//	e.printStackTrace();
-		//}
 	}
 
 	public void pushtoContext(CssRecord record) {

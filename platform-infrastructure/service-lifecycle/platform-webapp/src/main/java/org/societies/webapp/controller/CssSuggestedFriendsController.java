@@ -16,6 +16,7 @@ import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.css.FriendFilter;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.css.management.ICSSLocalManager;
 import org.societies.api.internal.css.ICSSInternalManager;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
@@ -352,6 +353,12 @@ public class CssSuggestedFriendsController {
 				pendingFR.setRequestStatus(CssRequestStatusType.ACCEPTED);
 				pendingFR.setOrigin(CssRequestOrigin.LOCAL);
 				getCssLocalManager().acceptCssFriendRequest(pendingFR);
+			/*	try {
+					getCssLocalManager().handleInternalFriendRequest(this.commManager.getIdManager().fromJid(pendingFR.getCssIdentity()), pendingFR.getRequestStatus());
+				} catch (InvalidFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}*/
 
 			} else if (sfForm.getMethod().contains("cancel")) {
 				// Cancel the pending friend request
