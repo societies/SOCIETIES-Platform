@@ -37,13 +37,18 @@
                             <p id="option" class="error">Please, select an option</p>
                         </li>
                         <li class="clearfix">
+                        	<img src="http://a1.s6img.com/cdn/0008/p/1623955_9772764_lz.jpg"></img>
+                        </li>
+                        <li class="clearfix">
                             <label for="option">Settings</label>
 
                             <div class="option-group check">
                                 <input type="checkbox" name="" id="check1"/>
                                 <label for="check1">Enable periodic assessment every</label>
+                                <p:outputLabel for="autoAssessmentPeriod">String field</p:outputLabel>
                                 <p:inputText id="autoAssessmentPeriod" value="#{assessmentController.autoAssessmentPeriod}"/>
                                 <label for="autoAssessmentPeriod">seconds</label>
+                                <br/>
 						        <p:commandButton value="Assess now" actionListener="#{assessmentController.assessNow}"/>
                             </div>
                             <div class="clear"></div>
