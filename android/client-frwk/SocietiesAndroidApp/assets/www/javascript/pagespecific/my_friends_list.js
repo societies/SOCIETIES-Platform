@@ -157,16 +157,19 @@ var CSSFriendsServices = {
 		}
 		
 		//CSS Record OBJECT
-		var forename = data.foreName;
-		if (forename=="undefined")
-			forename="";
-		var markup = "<h1>" + data.foreName + " " + data.name + "</h1>" + 
-					 "<p>" + data.homeLocation + "</p>" +
+		var name 	 = data.name, 
+			location = data.homeLocation,
+			email	 = data.emailId;
+		if (name==null) name="";
+		if (location==null) name="";
+		if (email==null) email="";
+		var markup = "<h1>" + name + " </h1>" + 
+					 "<p>" + location + " </p>" +
 					 "<p>" + data.cssIdentity + "</p><br />"; 
 		//INJECT
 		$('div#friend_profile_info').html( markup );
 		//ADDITIONAL INFO
-		var addInfo = "<br/>" + "<p>Email: " + data.emailID + "</p>";
+		var addInfo = "<br/>" + "<p>Email: " + email + " </p>";
 		$('li#friend_additional_info').html( addInfo );
 				
 		try {//REFRESH FORMATTING
