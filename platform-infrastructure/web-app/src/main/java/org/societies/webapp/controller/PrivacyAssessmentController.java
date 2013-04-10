@@ -47,14 +47,11 @@ import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment;
 import org.societies.webapp.models.PrivacyAssessmentForm;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -66,8 +63,6 @@ import org.springframework.web.servlet.ModelAndView;
 public class PrivacyAssessmentController extends BasePageController {
 
 	private static final long serialVersionUID = 1073106046087768688L;
-
-//	private static Logger log = LoggerFactory.getLogger(PrivacyAssessmentController.class);
 	
 	private static final String RESULT = "result";
 
@@ -75,6 +70,8 @@ public class PrivacyAssessmentController extends BasePageController {
 	private static final String contextPath = "work/org.eclipse.virgo.kernel.deployer_3.0.2.RELEASE/staging/" +
 			"global/bundle/societies-webapp/0.4.1/societies-webapp.war/";
 
+	private String autoAssessmentPeriod;
+	
 	/**
 	 * URL parts without prefix and suffix
 	 */
@@ -190,7 +187,7 @@ public class PrivacyAssessmentController extends BasePageController {
 	/**
 	 * OSGI service get auto injected
 	 */
-	@ManagedProperty(value = "#{PrivacyAssessment}")
+	@ManagedProperty(value = "#{privacyAssessment}")
 	private IAssessment assessment;
 	
 	public IAssessment getAssessment() {
@@ -200,6 +197,20 @@ public class PrivacyAssessmentController extends BasePageController {
 	public void setAssessment(IAssessment sdService) {
 		log.debug("setAssessment()");
 		this.assessment = sdService;
+	}
+	/**
+	 * @return the autoAssessmentPeriod
+	 */
+	public String getAutoAssessmentPeriod() {
+		return autoAssessmentPeriod;
+	}
+
+	/**
+	 * @param autoAssessmentPeriod the autoAssessmentPeriod to set
+	 */
+	public void setAutoAssessmentPeriod(String autoAssessmentPeriod) {
+		log.debug("autoAssessmentPeriod set to {}", autoAssessmentPeriod);
+		this.autoAssessmentPeriod = autoAssessmentPeriod;
 	}
 
 	@RequestMapping(value = "/" + PageNames.PRIVACY_ASSESSMENT + ".html", method = RequestMethod.GET)
@@ -384,14 +395,9 @@ public class PrivacyAssessmentController extends BasePageController {
 			
 			PrivacyAssessmentForm form1 = new PrivacyAssessmentForm();
 			form1.setAssessmentSubject(title);
-//			createBarchart(null, xlabel, ylabel, dataLabels, data, chartFileName);
 			createBarchart(null, xlabel, ylabel, plotData, plotDataLabels, chartFileName);
 			form1.setChart(chartFileName);
 			charts.add(form1);
-//			PrivacyAssessmentForm form2 = new PrivacyAssessmentForm();
-//			form2.setAssessmentSubject(title + " 2");
-//			form2.setChart(chartFileName);
-//			charts.add(form2);
 			model.put("assessmentResults", charts);
 
 			log.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST end");
@@ -431,13 +437,6 @@ public class PrivacyAssessmentController extends BasePageController {
 		
 		return new PlotData(data, labels);
 	}
-
-//	private void createBarchart(String title, String categoryLabel, String valueLabel,
-//			PlotData data, String filename) {
-//		
-//		createBarchart(title, categoryLabel, valueLabel, new PlotData[] {data},
-//				new String[] {"data"}, filename);
-//	}
 	
 	private void createBarchart(String title, String categoryLabel, String valueLabel,
 			PlotData[] data, String[] dataLabels, String filename) {
@@ -544,5 +543,10 @@ public class PrivacyAssessmentController extends BasePageController {
 
 		log.debug(PageNames.PRIVACY_ASSESSMENT_SETTINGS + " HTTP POST end");
 		return privacyAssessment();
+	}
+	
+	public void assessNow() {
+		log.debug("assessNow button clicked");
+		assessment.assessAllNow();
 	}
 }
