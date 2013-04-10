@@ -38,7 +38,7 @@ var CSSFriendsServices = {
 	refreshFriendRequests: function() {
 		function showAvatar(VCard) {
 			if (VCard.from != null) {
-				var n=VCard.from.indexOf(".");
+				var n=VCard.from.indexOf("@");
 				var identityStr = VCard.from.substring(0, n);
 				var imageStr = VCard.avatar;
 				if (imageStr != null)
@@ -85,7 +85,7 @@ var CSSFriendsServices = {
 
 		function showAvatar(VCard) {
 			if (VCard.from != null) {
-				var n=VCard.from.indexOf(".");
+				var n=VCard.from.indexOf("@");
 				var identityStr = VCard.from.substring(0, n);
 				var imageStr = VCard.avatar;
 				if (imageStr != null)
@@ -199,7 +199,7 @@ var CSSFriendsServices = {
 	displayFriendEntryRecords: function(data) {
 		function showAvatar(VCard) {
 			if (VCard.from != null) {
-				var n=VCard.from.indexOf(".");
+				var n=VCard.from.indexOf("@");
 				var identityStr = VCard.from.substring(0, n);
 				var imageStr = VCard.avatar;
 				if (imageStr != null)
@@ -248,7 +248,7 @@ var CSSFriendsServices = {
 	displayCSSAdvertRecords: function(data) {
 		function showAvatar(VCard) {
 			if (VCard.from != null) {
-				var n=VCard.from.indexOf(".");
+				var n=VCard.from.indexOf("@");
 				var identityStr = VCard.from.substring(0, n);
 				var imageStr = VCard.avatar;
 				if (imageStr != null)

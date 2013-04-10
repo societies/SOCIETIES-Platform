@@ -265,7 +265,7 @@ var	SocietiesCISListService = {
 	showCISMembers: function (cisId, bAdmin) {		
 		function showAvatar(VCard) {
 			if (VCard.from != null) {
-				var n=VCard.from.indexOf(".");
+				var n=VCard.from.indexOf("@");
 				var identityStr = VCard.from.substring(0, n);
 				var imageStr = VCard.avatar;
 				if (imageStr != null)
