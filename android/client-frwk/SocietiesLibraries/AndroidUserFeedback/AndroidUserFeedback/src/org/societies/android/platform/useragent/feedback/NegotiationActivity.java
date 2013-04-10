@@ -3,6 +3,7 @@ package org.societies.android.platform.useragent.feedback;
 import java.util.List;
 
 import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.comms.xmpp.VCardParcel;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
@@ -18,6 +19,8 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Respons
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -33,6 +36,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TableLayout;
@@ -176,6 +180,16 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
         		finish(); //BASICALLY, IGNORE REQUEST
         	}
         });
+        
+        //ADD IMAGE - IF AVAILABLE
+        VCardParcel vCard = (VCardParcel) getIntent().getParcelableExtra(UserFeedbackActivityIntentExtra.EXTRA_CSS_VCARD);;
+	    byte[] avatarBytes = vCard.getAvatar();
+	    if (avatarBytes != null) {
+	    	Bitmap bMap = BitmapFactory.decodeByteArray(avatarBytes, 0, avatarBytes.length);
+	    
+	    	ImageView image = (ImageView) findViewById(R.id.imageProfile);
+	    	image.setImageBitmap(bMap);
+	    }
     }
 
     @Override

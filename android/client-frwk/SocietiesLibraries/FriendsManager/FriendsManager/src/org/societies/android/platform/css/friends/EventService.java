@@ -125,7 +125,7 @@ public class EventService extends Service {
 			public void returnAction(boolean resultFlag) { 
 				Log.d(LOG_TAG, "return Action.flag: " + resultFlag);
 			}
-		});        
+		});
 		
 		// START BACKGROUND THREAD FOR SERVICE
 		HandlerThread thread = new HandlerThread("FriendServiceStartArguments", android.os.Process.THREAD_PRIORITY_BACKGROUND);
@@ -271,18 +271,6 @@ public class EventService extends Service {
     	}
     }
 
-    private void addNotification(String description, String eventType, CssAdvertisementRecord advert) {
-    	//CREATE ANDROID NOTIFICATION
-    	int notifierflags[] = new int[] {Notification.DEFAULT_SOUND, Notification.DEFAULT_VIBRATE, Notification.FLAG_AUTO_CANCEL};
-		AndroidNotifier notifier = new AndroidNotifier(EventService.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
-		
-		//CREATE INTENT FOR LAUNCHING ACTIVITY
-		Intent intent = new Intent(this.getApplicationContext(), AcceptFriendActivity.class);
-		intent.putExtra(EXTRA_CSS_ADVERT, (Parcelable)advert);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		
-		notifier.notifyMessage(description, eventType, AcceptFriendActivity.class, intent, "SOCIETIES");
-	}
 
     private void addNotificationAccept(String description, String eventType, CssAdvertisementRecord advert) {
     	//CREATE ANDROID NOTIFICATION
