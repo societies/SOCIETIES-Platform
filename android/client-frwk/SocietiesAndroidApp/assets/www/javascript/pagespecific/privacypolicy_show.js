@@ -32,39 +32,49 @@ var SocietiesDataUtil=(function(){
 	/* ************************
 	 * 		Parameters
 	 **************************/
-	var actionList = {"READ": "Read",
-	                  "WRITE" : "Write",
-	                  "CREATE" : "Create",
-	                  "DELETE" : "Delete"};
-	var conditionList = {"SHARE_WITH_3RD_PARTIES": "Share with the world",
-	                     "SHARE_WITH_CIS_MEMBERS_ONLY": "Share with this community",
+	var actionList = {"READ": "access",
+	                  "WRITE" : "update",
+	                  "CREATE" : "create",
+	                  "DELETE" : "delete"};
+	var conditionList = {"SHARE_WITH_3RD_PARTIES": "Shared with the world",
+	                     "SHARE_WITH_CIS_MEMBERS_ONLY": "Shared with community members",
 	                     "SHARE_WITH_CIS_OWNER_ONLY" : "Not shared",
-	                     "MAY_BE_INFERRED" : "Warning, this information may be inferred by people",
-	                     "DATA_RETENTION_IN_SECONDS": "data retention in seconds",
-	                     "DATA_RETENTION_IN_MINUTES": "data retention in minutes",
-	                     "DATA_RETENTION_IN_HOURS": "data retention in hours",
-	                     "RIGHT_TO_OPTOUT": "right to optout",
-	                     "STORE_IN_SECURE_STORAGE": "store in a secure storage",
-	                     "RIGHT_TO_ACCESS_HELD_DATA": "right to access held data",
-	                     "RIGHT_TO_CORRECT_INCORRECT_DATA": "right to correct invalid data"};
-	var resourceTypeList = {"cis:///cis-member-list": "This CIS' member list",
-	                        "context:///favoriteQuotes": "Favorite quotes",
-	                        "context:///interests": "Interests",
-	                        "context:///languages": "Languages",
-	                        "context:///locationCoordinates": "Location coordinates",
-	                        "context:///locationSymbolic": "Location",
-	                        "context:///movies": "Movies",
-	                        "context:///music": "Music"};
+	                     "MAY_BE_INFERRED" : "Warning, this data may be inferred",
+	                     "DATA_RETENTION_IN_SECONDS": "Data retention in seconds",
+	                     "DATA_RETENTION_IN_MINUTES": "Data retention in minutes",
+	                     "DATA_RETENTION_IN_HOURS": "Data retention in hours",
+	                     "RIGHT_TO_OPTOUT": "Right to optout",
+	                     "STORE_IN_SECURE_STORAGE": "Stored in a secure storage",
+	                     "RIGHT_TO_ACCESS_HELD_DATA": "Right to access held data",
+	                     "RIGHT_TO_CORRECT_INCORRECT_DATA": "Right to correct invalid data"};
+	var resourceTypeList = {"CIS:///cis-member-list": "Member list",
+	                        "CONTEXT:///favoriteQuotes": "Favorite quotes",
+	                        "CONTEXT:///email": "Email",
+	                        "CONTEXT:///interests": "Interests",
+	                        "CONTEXT:///occupation": "Occupation",
+	                        "CONTEXT:///workPosition": "Work position",
+	                        "CONTEXT:///languages": "Languages",
+	                        "CONTEXT:///locationCoordinates": "Location coordinates",
+	                        "CONTEXT:///locationSymbolic": "Symbolic location",
+	                        "CONTEXT:///movies": "Movies",
+	                        "CONTEXT:///music": "Music"};
 	var resourceSchemeList = ["context", "device", "cis", "activity", "css"];
 
 	/* ************************
 	 * 		Private Functions
 	 **************************/
+	 
+	function sortConditions(a, b) {
+		return a.conditionConstant > b.conditionConstant;
+	}
 
 	/* ************************
 	 * 		Public Elements
 	 **************************/
 	return{
+		conditionList: conditionList,
+		sortConditions: sortConditions,
+	
 		mapToAction : function(actionId){
 			if (undefined != actionList[actionId]) {
 				return actionList[actionId];
@@ -77,14 +87,85 @@ var SocietiesDataUtil=(function(){
 			}
 			return conditionId;
 		},
-		mapToResourceType : function(resourceType){
+		mapToResourceType : function(resourceType, defaultValue){
 			if (undefined != resourceTypeList[resourceType]) {
 				return resourceTypeList[resourceType];
 			}
-			return resourceType;
+			return defaultValue;
 		},
 	};
 }());
+
+/**
+ * PrivacyPolicy Utility Class
+ * @namespace PrivacyPolicyUtils
+ */
+var PrivacyPolicyUtils=(function(){
+	/* ************************
+	 * 		Parameters
+	 **************************/
+	var TRUE = [1, 'Yes'];
+	var FALSE = [0, 'No'];
+	var globalBehaviourList = {'public':'Public',
+	                           'private':'Private',
+	                           'members-only':'Members only'};
+	var whoCanList = {'public':'Anyone',
+	                           'private':'Nobody',
+	                           'members-only':'Any member'};
+
+	/* ************************
+	 * 		Private Functions
+	 **************************/
+	function in_array(needle, haystack) {
+		var length = haystack.length;
+		for(var i = 0; i < length; i++) {
+			if(haystack[i] == needle)
+				return true;
+		}
+		return false;
+	}
+
+	function getGlobalBehaviour(requestItem){
+		if ("conditions" in requestItem && requestItem.conditions.length > 0) {
+			for (var j=0; j<requestItem.conditions.length; j++){
+				var condition = requestItem.conditions[j];
+				if ("SHARE_WITH_3RD_PARTIES" == condition.conditionConstant
+						&& PrivacyPolicyUtils.in_array(condition.value, TRUE)) {
+					return "public";
+				}
+				if ("SHARE_WITH_CIS_MEMBERS_ONLY" == condition.conditionConstant
+						&& PrivacyPolicyUtils.in_array(condition.value,TRUE)) {
+					return "members-only";
+				}
+			}
+		}
+		return "private";
+	}
+
+	/* ************************
+	 * 		Public Elements
+	 **************************/
+	return{
+		TRUE: TRUE,
+		FALSE: FALSE,
+		
+		in_array: in_array,
+		getGlobalBehaviour: getGlobalBehaviour,
+		mapToGlobalBehaviour : function(key){
+			if (undefined != globalBehaviourList[key]) {
+				return globalBehaviourList[key];
+			}
+			return key;
+		},
+		mapToWhoCanAccess : function(key){
+			if (undefined != whoCanList[key]) {
+				return whoCanList[key];
+			}
+			return key;
+		},
+	};
+}());
+
 
 /**
  * Societies Android app manage privacy policy namespace
@@ -99,45 +180,84 @@ var	SocietiesPrivacyPolicyManagerService=(function(){
 	/* ************************
 	 * 		Private Functions
 	 **************************/
-	function showPrivacyPolicy(privacyPolicy){
-		console.log("getPrivacyPolicy - Succes: ", handler, privacyPolicy);
+	function showPrivacyPolicy(data){
+		console.log("getPrivacyPolicy - Succes");
+		console.log(handler);
+		console.log(data);
+		console.log(JSON.parse(data));
+		var privacyPolicy = JSON.parse(data);
 		//EMPTY TABLE - NEED TO LEAVE THE HEADER
 		while( $(handler).children().length >0 )
 			$(handler+' li:last').remove();
 
 		// Display request items
 		if ("requestItems" in privacyPolicy) {
+			console.log("Display privacy policy");
 			for(var i=0; i<privacyPolicy.requestItems.length; i++) {
 				var requestItem = privacyPolicy.requestItems[i];
+				var dataTypeUri = '';
+				var defaultDataType = '';
+				if ("dataIdUri" in privacyPolicy) {
+					dataTypeUri = requestItem.resource.dataIdUri;
+					defaultDataType = requestItem.resource.dataIdUri;
+				}
+				else {
+					dataTypeUri = requestItem.resource.scheme+":///"+requestItem.resource.dataType;
+					defaultDataType = requestItem.resource.dataType;
+				}
+				console.log("Display: "+dataTypeUri);
 				var li = $('<li>').addClass("requestItem")
 				.attr('id', 'li'+i);
-				$('<h2>').html(SocietiesDataUtil.mapToResourceType(requestItem.resource.dataIdUri))
-				.addClass(("optional" in requestItem && requestItem.optional ? " optional" : ""))
-				.appendTo(li);
+				var h2 = $('<h2>').html(SocietiesDataUtil.mapToResourceType(dataTypeUri, defaultDataType))
+					.addClass(("optional" in requestItem && requestItem.optional ? " <small>(optional)</small>" : ""));
+				var globalBehaviour = PrivacyPolicyUtils.getGlobalBehaviour(requestItem);
+				$('<span>').html(PrivacyPolicyUtils.mapToGlobalBehaviour(globalBehaviour))
+					.addClass('privacy_global-behaviour')
+					.addClass('privacy_'+globalBehaviour)
+					.prependTo(h2);
+				h2.appendTo(li);
 				// Actions
-				var actions = '';
-				for (var j=0; j<requestItem.actions.length; j++){
-					var action = requestItem.actions[j];
-					actions += '<span class="'+action.actionConstant+(("optional" in action) && action.optional ? " optional" : "")+'">'+SocietiesDataUtil.mapToAction(action.actionConstant)+'</span>';
-					if (j != (requestItem.actions.length-1)) {
-						actions += ', ';
+				var whoCanAccess = PrivacyPolicyUtils.mapToWhoCanAccess(globalBehaviour);
+				if ("Nobody" != whoCanAccess) {
+					var actions = whoCanAccess+' can ';
+					requestItem.actions.sort();
+					for (var j=0; j<requestItem.actions.length; j++){
+						var action = requestItem.actions[j];
+						actions += '<span class="'+action.actionConstant+(("optional" in action) && action.optional ? " optional" : "")+'">'+SocietiesDataUtil.mapToAction(action.actionConstant)+'</span>';
+						if (j != (requestItem.actions.length-1)) {
+							if (j == (requestItem.actions.length-2)) {
+								actions += ' and ';
+							}
+							else {
+								actions += ', ';
+							}
+						}
 					}
+					actions += ' it';
+					$('<p>').addClass('actions')
+					.html(actions)
+					.appendTo(li);
 				}
-				$('<p>').addClass('actions')
-				.html(actions)
-				.appendTo(li);
 				// Conditions
-				var conditions = '';
-				for (var j=0; j<requestItem.conditions.length; j++){
-					var condition = requestItem.conditions[j];
-					conditions += '<span class="'+condition.conditionConstant+(("optional" in condition) && condition.optional ? " optional" : "")+'">'+SocietiesDataUtil.mapToCondition(condition.conditionConstant)+': '+condition.value+'</span>';
-					if (j != (requestItem.conditions.length-1)) {
-						conditions += ', ';
+				if ("conditions" in requestItem && requestItem.conditions.length > 0) {
+					var conditions = '';
+					requestItem.conditions.sort(SocietiesDataUtil.sortConditions);
+					for (var j=0; j<requestItem.conditions.length; j++){
+						var condition = requestItem.conditions[j];
+						if (!PrivacyPolicyUtils.in_array(condition.value, PrivacyPolicyUtils.FALSE)
+								&& "SHARE_WITH_3RD_PARTIES" != condition.conditionConstant
+								&& "SHARE_WITH_CIS_MEMBERS_ONLY" != condition.conditionConstant
+								&& "SHARE_WITH_CIS_OWNER_ONLY" != condition.conditionConstant) {
+							conditions += '<span class="'+condition.conditionConstant+(("optional" in condition) && condition.optional ? " optional" : "")+'">'+SocietiesDataUtil.mapToCondition(condition.conditionConstant)+(!PrivacyPolicyUtils.in_array(condition.value, PrivacyPolicyUtils.TRUE) ? ': '+condition.value : '')+'</span>';
+							if (j != (requestItem.conditions.length-1)) {
+								conditions += '<br />';
+							}
+						}
 					}
+					$('<p>').addClass('conditions')
+					.html(conditions)
+					.appendTo(li);
 				}
-				$('<p>').addClass('conditions')
-				.html(conditions)
-				.appendTo(li);
 				li.appendTo(handler);
 			}
 		}
@@ -146,8 +266,8 @@ var	SocietiesPrivacyPolicyManagerService=(function(){
 			.html('<p>Empty</p>')
 			.appendTo(handler);
 		}
-		$(handler).listview('refresh');
-		$(handler).trigger( "collapse" );
+		 $(handler).listview('refresh');
+		 $(handler).trigger( "collapse" );
 	}
 
 	/* ************************
@@ -171,7 +291,7 @@ var	SocietiesPrivacyPolicyManagerService=(function(){
 			}
 
 			// Call
-			window.plugins.PrivacyPolicyManager.getPrivacyPolicy("test", showPrivacyPolicy, failure);
+			window.plugins.PrivacyPolicyManager.getPrivacyPolicy({"requestorId":ownerId, "cisRequestorId": ownerCisId}, showPrivacyPolicy, failure);
 		},
 	};
 }());

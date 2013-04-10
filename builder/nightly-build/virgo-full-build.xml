@@ -63,6 +63,12 @@
 		-->
 		
 		<!-- Integration tests -->
-		<module>../../integration-tests/builder/virgo-integration/virgo-integration-tests.xml</module>		
+		<module>../../integration-tests/builder/virgo-integration/virgo-integration-tests.xml</module>
+		
+		<!-- Performance tests -->
+		<module>../../integration-tests/performance-tests/performance-tester</module>
+		
+				
+		
 	</modules>
 </project>

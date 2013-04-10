@@ -25,8 +25,6 @@
 
 package org.societies.android.platform.useragent.feedback.guis;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,30 +32,18 @@ import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
-import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
-import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.remote.helper.EventsHelper;
-//import org.societies.android.platform.useragent.feedback.AndroidUserFeedback;
 import org.societies.android.platform.useragent.feedback.R;
-import org.societies.android.platform.useragent.feedback.R.layout;
 import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -70,10 +56,12 @@ public class AcknackPopup extends Activity{
 	private boolean isEventsConnected = false;
 	private String resultPayload = "";
 	private UserFeedbackBean eventInfo;
+	private boolean published = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.acknack_activity);
 
 		//RETRIEVE USERFEEDBACK BEAN FROM INTENT
@@ -81,9 +69,9 @@ public class AcknackPopup extends Activity{
 		Bundle bundle = intent.getExtras();
 		eventInfo = bundle.getParcelable(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY);
 		
-		TextView txtView = (TextView) findViewById(R.id.textView1);
+		TextView txtView = (TextView) findViewById(R.id.ackNackProposalText);
 		txtView.setText(eventInfo.getProposalText());
-		LinearLayout layout = (LinearLayout) findViewById(R.id.linearLayout1);
+		LinearLayout layout = (LinearLayout) findViewById(R.id.ackNackInnerLinearLayout);
 
 		for (String option: eventInfo.getOptions()){
 			Button button = new Button(this);
@@ -134,19 +122,30 @@ public class AcknackPopup extends Activity{
 			feedback.add(this.resultPayload);    		
 			bean.setFeedback(feedback);    		
 			bean.setRequestId(eventInfo.getRequestId());
-			eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_RESPONSE_INTENT, bean, new IPlatformEventsCallback() {
-				@Override				
-				public void returnAction(int result) {
-					}				
-				@Override				
-				public void returnAction(boolean resultFlag) {									
-					}
+			//TODO: THE PUBLISH EVENT IS OCCURING MULTIPLE TIMES - DYNAMICLY CREATED FORM?
+			if (!published) {
+				eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_RESPONSE_INTENT, bean, new IPlatformEventsCallback() {
+					@Override				
+					public void returnAction(int result) { }
+					@Override				
+					public void returnAction(boolean resultFlag) { }
+					@Override
+					public void returnException(int exception) { }			
+				});
+			}
+			published = true;
+			//FINISH
+			eventsHelper.tearDownService(new IMethodCallback() {
 				@Override
-				public void returnException(int exception) {
-				}			
+				public void returnException(String result) { }
+				@Override
+				public void returnAction(String result) { }
+				@Override
+				public void returnAction(boolean resultFlag) { }
 			});
+			finish();
 		} catch (PlatformEventsHelperNotConnectedException e) {
-			e.printStackTrace();		
+			e.printStackTrace();
 		}	
 	}
 

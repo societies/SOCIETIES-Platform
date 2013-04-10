@@ -321,27 +321,31 @@ public class InternalTrustBroker implements ITrustBroker {
 							+ "': ITrustRepository service is not available");
 				final ITrustedEntity entity = this.trustRepo.retrieveEntity(trustorId, trusteeId);
 				if (entity != null) {
-					if (TrustValueType.DIRECT == trustValueType)
-						trustRelationship = new TrustRelationship(trustorId,
-								trusteeId, trustValueType, 
-								entity.getDirectTrust().getValue(),
-								entity.getDirectTrust().getLastUpdated());
-					else if (TrustValueType.INDIRECT == trustValueType)
-						trustRelationship = new TrustRelationship(trustorId,
-								trusteeId, trustValueType, 
-								entity.getIndirectTrust().getValue(),
-								entity.getIndirectTrust().getLastUpdated());
-					else if (TrustValueType.USER_PERCEIVED == trustValueType)
-						trustRelationship = new TrustRelationship(trustorId,
-								trusteeId, trustValueType, 
-								entity.getUserPerceivedTrust().getValue(),
-								entity.getUserPerceivedTrust().getLastUpdated());
-					else
+					if (TrustValueType.DIRECT == trustValueType) {
+						if (entity.getDirectTrust().getValue() != null)
+							trustRelationship = new TrustRelationship(trustorId,
+									trusteeId, trustValueType, 
+									entity.getDirectTrust().getValue(),
+									entity.getDirectTrust().getLastUpdated());
+					} else if (TrustValueType.INDIRECT == trustValueType) {
+						if (entity.getIndirectTrust().getValue() != null)
+							trustRelationship = new TrustRelationship(trustorId,
+									trusteeId, trustValueType,
+									entity.getIndirectTrust().getValue(),
+									entity.getIndirectTrust().getLastUpdated());
+					} else if (TrustValueType.USER_PERCEIVED == trustValueType) {
+						if (entity.getUserPerceivedTrust().getValue() != null)
+							trustRelationship = new TrustRelationship(trustorId,
+									trusteeId, trustValueType,
+									entity.getUserPerceivedTrust().getValue(),
+									entity.getUserPerceivedTrust().getLastUpdated());
+					} else {
 						throw new TrustBrokerException(
 								"Could not retrieve trust relationship of type '" + trustValueType 
 								+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
 								+ "' on behalf of requestor '" + requestor + "'" 
 								+ "': Unsupported trust value type '" + trustValueType + "'");
+					}
 				}
 
 			} else { // R E M O T E

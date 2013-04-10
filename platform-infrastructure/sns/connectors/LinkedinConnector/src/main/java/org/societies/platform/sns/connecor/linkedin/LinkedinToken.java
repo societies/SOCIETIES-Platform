@@ -37,8 +37,7 @@ public class LinkedinToken {
 
 	
 	
-	private String defaultApiKey = "cysdprp40gxn";
-	private String defaultApiSecret = "faKKFat0QeJomJjv";
+	
 	
 	
 	private Token accessToken = null;
@@ -46,7 +45,7 @@ public class LinkedinToken {
 
 	public LinkedinToken(String accessToken) {
 		this.service = new ServiceBuilder().provider(TwitterApi.class)
-				.apiKey(defaultApiKey).apiSecret(defaultApiSecret).build();
+				.apiKey(LinkedinConnector.LK_CLIENT_ID).apiSecret(LinkedinConnector.LK_ClIENT_SECRET).build();
 
 		String[] tokenList = null;
 		if (accessToken.contains(",")) {

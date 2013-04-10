@@ -189,6 +189,22 @@
 						  "name": "Tom Cruise",
 						  "uri": "tom.societies.local"
 						 }],
+		"getSuggestedFriends": [
+						 {"key": {
+								"id": "john.societies.local",
+								"name": "John Dough"
+								},
+						 "value" : "3" },
+						 {"key" : {
+						 		"id": "jane.societies.local",
+						  		"name": "Jane Smith"
+						 		},
+						 "value" : "11" },
+						 {"key": { 
+						 		"id": "tom.societies.local",
+						  		"name": "Tom Cruise"
+						  		},
+						  "value": "27" }],
 		"listAdvertisementRecords": [{
 						"name" : "John Dough",
 						"id": "john.societies.local" },

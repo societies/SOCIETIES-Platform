@@ -35,6 +35,7 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.CSSEventConstants;
 import org.societies.api.osgi.event.EMSException;
@@ -48,9 +49,11 @@ import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
 import org.societies.api.privacytrust.trust.model.TrustRelationship;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
+import org.societies.privacytrust.trust.api.ITrustNodeMgr;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.ITrustEvidenceUpdateEventListener;
 import org.societies.privacytrust.trust.api.event.TrustEventMgrException;
+import org.societies.privacytrust.trust.api.event.TrustEventTopic;
 import org.societies.privacytrust.trust.api.event.TrustEvidenceUpdateEvent;
 import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,9 +72,18 @@ public class TrustEventMgr implements ITrustEventMgr {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TrustEventMgr.class);
 	
+	private static final List<String> EVENT_REMOTE_TOPICS = 
+			Collections.unmodifiableList(Arrays.asList(
+					TrustEventTopic.DIRECT_TRUST_UPDATED,
+					TrustEventTopic.INDIRECT_TRUST_UPDATED,
+					TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED));
+	
 	private static final List<String> EVENT_SCHEMA_CLASSES = 
 			Collections.unmodifiableList(Arrays.asList(
 					"org.societies.api.schema.privacytrust.trust.model.TrustUpdateEventBean"));
+	
+	/** The Trust Node Mgr service reference. */
+	private ITrustNodeMgr trustNodeMgr;
 	
 	/** The platform Event Mgr service reference. */
 	@Autowired(required=true)
@@ -91,20 +103,17 @@ public class TrustEventMgr implements ITrustEventMgr {
 			Executors.newSingleThreadExecutor();
 	
 	@Autowired(required=true)
-	TrustEventMgr(PubsubClient pubsubClient) throws Exception {
+	TrustEventMgr(ITrustNodeMgr trustNodeMgr, PubsubClient pubsubClient)
+			throws Exception {
 		
 		if (LOG.isInfoEnabled())
 			LOG.info(this.getClass() + " instantiated");
+		this.trustNodeMgr = trustNodeMgr;
 		this.pubsubClient = pubsubClient;
 		try {
-			if (LOG.isDebugEnabled())
-				LOG.debug("Adding remote remote trust event payload classes '" 
-						+ EVENT_SCHEMA_CLASSES + "'");
-			this.pubsubClient.addSimpleClasses(EVENT_SCHEMA_CLASSES);
-			// TODO create nodes
+			this.createRemoteTopics();
 		} catch (Exception e) {
-			
-			LOG.error(this.getClass() + " could not be instantiated: "
+			LOG.error(this.getClass() + " could not be initialised: "
 					+ e.getLocalizedMessage(), e);
 			throw e;
 		}
@@ -859,6 +868,59 @@ public class TrustEventMgr implements ITrustEventMgr {
 					+ ": type=" + cssEvent.geteventType()
 					+ ", name=" + cssEvent.geteventName()
 					+ ", source=" + cssEvent.geteventSource());
+		}
+	}
+	
+	private void createRemoteTopics() throws TrustEventMgrException {
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Adding remote remote trust event payload classes '" 
+					+ EVENT_SCHEMA_CLASSES + "'");
+		try {
+			this.pubsubClient.addSimpleClasses(EVENT_SCHEMA_CLASSES);
+		} catch (Exception e) {
+			throw new TrustEventMgrException(
+					"Failed to add remote remote trust event payload classes '" 
+					+ EVENT_SCHEMA_CLASSES + "': " + e.getLocalizedMessage(), e);
+		}
+		
+		for (final TrustedEntityId myTeid : this.trustNodeMgr.getMyIds()) {
+			try {
+				final IIdentity ownerId = this.trustNodeMgr.fromId(myTeid);
+				this.doCreateRemoteTopics(ownerId);
+			} catch (Exception e) {
+				throw new TrustEventMgrException("Failed to convert TrustedEntityId '" + myTeid
+						+ "' to IIdentity: " + e.getLocalizedMessage(), e);
+			}
+		}
+	}
+		
+	private void doCreateRemoteTopics(final IIdentity ownerId) 
+			throws TrustEventMgrException {
+
+		final List<String> existingTopics;
+		try {
+			existingTopics = this.pubsubClient.discoItems(ownerId, null);
+		} catch (Exception e) {
+			throw new TrustEventMgrException("Failed to discover topics for IIdentity "
+					+ ownerId + ": " + e.getLocalizedMessage(), e);
+		}
+		
+		for (final String topic : EVENT_REMOTE_TOPICS) {	
+			if (existingTopics == null || !existingTopics.contains(topic)) {
+				if (LOG.isInfoEnabled())
+					LOG.info("Creating pubsub node '" + topic + "' for IIdentity " + ownerId);
+				try {
+					this.pubsubClient.ownerCreate(ownerId, topic);
+				} catch (Exception e) {
+					throw new TrustEventMgrException("Failed to create topic '"
+							+ topic + "' for IIdentity " + ownerId + ": " 
+							+ e.getLocalizedMessage(), e);
+				}
+			} else {
+				if (LOG.isInfoEnabled())
+					LOG.info("Found pubsub node '" + topic + "' for IIdentity " + ownerId);
+			}
 		}
 	}
 }

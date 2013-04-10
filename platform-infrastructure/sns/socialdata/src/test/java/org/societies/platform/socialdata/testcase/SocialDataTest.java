@@ -29,8 +29,6 @@ import org.societies.platform.socialdata.SocialData;
 public class SocialDataTest {
 
 
-	private static String access_token = "";
-	private static ISocialConnector fbConnector=null;
 	private static ISocialData		socialData =null;
 	private static final Logger logger   = Logger.getLogger(SocialDataTest.class.getSimpleName());
 
@@ -200,13 +198,13 @@ public class SocialDataTest {
 	}
 
 
-	@Test
-	public void postMessage(){
-	    	Message msg = new Message();
-	    	msg.setData("This is a JUNIT Test POST!");
-		socialData.postMessage(SocialNetwork.FACEBOOK, msg);
-	}
-	
+//	@Test
+//	public void postMessage(){
+//	    	Message msg = new Message();
+//	    	msg.setData("This is a JUNIT Test POST!");
+//		socialData.postMessage(SocialNetwork.FACEBOOK, msg);
+//	}
+//	
 	
 	
 

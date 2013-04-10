@@ -44,8 +44,8 @@ public class MathUtils {
 
 	public static double[] normalise(final double[] sample) {
 	
-		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("sample=" + Arrays.toString(sample));
+		if (LOG.isDebugEnabled())
+			LOG.debug("sample=" + Arrays.toString(sample));
 		final DescriptiveStatistics stats = new DescriptiveStatistics();
 		
 		// Add the data from the series to stats
@@ -68,15 +68,15 @@ public class MathUtils {
 				normalisedSample[i] = 0.0d;
 		}
 		
-		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("normalisedSample=" + Arrays.toString(normalisedSample));
+		if (LOG.isDebugEnabled())
+			LOG.debug("normalisedSample=" + Arrays.toString(normalisedSample));
 		return normalisedSample;
 	}
 	
 	public static double[] stanine(final double[] input) {
 		
-		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("input=" + Arrays.toString(input));
+		if (LOG.isDebugEnabled())
+			LOG.debug("input=" + Arrays.toString(input));
 		final double[] zscores = normalise(input);
 		final double[] stanines = new double[zscores.length];
 		for (int i = 0; i < zscores.length; ++i) {
@@ -100,8 +100,8 @@ public class MathUtils {
 				stanines[i] = 9;
 		}
 		
-		if (LOG.isInfoEnabled()) // TODO DEBUG
-			LOG.info("stanines=" + Arrays.toString(stanines));
+		if (LOG.isDebugEnabled())
+			LOG.debug("stanines=" + Arrays.toString(stanines));
 		return stanines;
 	}
 	

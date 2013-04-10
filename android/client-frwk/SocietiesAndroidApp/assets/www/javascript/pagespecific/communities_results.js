@@ -80,7 +80,7 @@ var	SocietiesCisDirService = {
 			if ( communityObj ) {
 				//VALID SERVICE OBJECT
 				var markup = "<h1>" + communityObj.communityName + "</h1>" + 
-							 "<p>Type: " + communityObj.communityType + "</p>" + 
+							 "<p>Category: " + communityObj.communityType + "</p>" + 
 							 "<p>" + communityObj.description + "</p>" + 
 							 "<p>Owner: " + communityObj.ownerJid + "</p>";
 				//INJECT
