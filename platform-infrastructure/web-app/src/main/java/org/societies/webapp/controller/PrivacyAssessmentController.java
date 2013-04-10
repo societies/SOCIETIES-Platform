@@ -68,7 +68,10 @@ public class PrivacyAssessmentController extends BasePageController {
 
 	// FIXME: The path should not depend on Virgo version, etc.
 	private static final String contextPath = "work/org.eclipse.virgo.kernel.deployer_3.0.2.RELEASE/staging/" +
-			"global/bundle/societies-webapp/0.4.1/societies-webapp.war/";
+			"global/bundle/societies-webapp/0.6.0/societies-webapp.war/";
+	private static final String chartFileName = "assessment-chart.png";
+
+	private boolean autoAssessment;
 
 	private String autoAssessmentPeriod;
 	
@@ -198,6 +201,22 @@ public class PrivacyAssessmentController extends BasePageController {
 		log.debug("setAssessment()");
 		this.assessment = sdService;
 	}
+
+	/**
+	 * @return the autoAssessment
+	 */
+	public boolean isAutoAssessment() {
+		return autoAssessment;
+	}
+
+	/**
+	 * @param autoAssessment the autoAssessment to set
+	 */
+	public void setAutoAssessment(boolean autoAssessment) {
+		log.debug("autoAssessment set to {}", autoAssessment);
+		this.autoAssessment = autoAssessment;
+	}
+
 	/**
 	 * @return the autoAssessmentPeriod
 	 */
@@ -548,5 +567,10 @@ public class PrivacyAssessmentController extends BasePageController {
 	public void assessNow() {
 		log.debug("assessNow button clicked");
 		assessment.assessAllNow();
+	}
+	
+	public void updateImage() {
+		// TODO: save image 
+		String fileName = contextPath + chartFileName;
 	}
 }

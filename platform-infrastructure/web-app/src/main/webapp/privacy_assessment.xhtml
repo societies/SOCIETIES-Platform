@@ -39,27 +39,29 @@
                                     <option value="5">Data access by class</option>
                                 </select>
                             </div>
+					        <p:commandButton value="Show" actionListener="#{assessmentController.updateImage}"/>
                             <div class="clear"></div>
                             <p id="option" class="error">Please, select an option</p>
                         </li>
                         <li class="clearfix">
                         	<img src="http://a1.s6img.com/cdn/0008/p/1623955_9772764_lz.jpg"></img>
+                        	<img src="assessment-chart.png"></img>
                         </li>
                         <li class="clearfix">
                             <label for="option">Settings</label>
 
                             <div class="option-group check">
-                                <input type="checkbox" name="" id="check1"/>
+                                <p:selectBooleanCheckbox type="checkbox" name="" id="check1" value="#{assessmentController.autoAssessment}" />
                                 <label for="check1">Enable periodic assessment every</label>
-                                <p:outputLabel for="autoAssessmentPeriod">String field</p:outputLabel>
                                 <p:inputText id="autoAssessmentPeriod" value="#{assessmentController.autoAssessmentPeriod}"/>
-                                <label for="autoAssessmentPeriod">seconds</label>
+                                <p:outputLabel for="autoAssessmentPeriod">seconds</p:outputLabel>
                                 <br/>
 						        <p:commandButton value="Assess now" actionListener="#{assessmentController.assessNow}"/>
                             </div>
                             <div class="clear"></div>
                             <p id="option" class="error">Please, select an option</p>
                         </li>
+<!--
                         <li class="clearfix">
                             <p class="success">Thank you! Success Message here.</p>
 
@@ -69,6 +71,7 @@
                                 <input type="submit" id="send_message" class="sendButton" value="Send"/>
                             </div>
                         </li>
+-->
                     </ul>
                 </form>
             </section>
