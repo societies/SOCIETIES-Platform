@@ -154,30 +154,46 @@ var CSSFriendsServices = {
 		while( $('ul#SuggestedFriendsListUL').children().length >1 )
 			$('ul#SuggestedFriendsListUL li:last').remove();
 
+		var rankings = new Array();
 		//DISPLAY SUGGESTIONS
-		for (i  = 0; i < data.length; i++) {
+		for (i = 0; i < data.length; i++) {
+			var rank=0;
 			//GENERATE SNS IMAGES
 			var images="";
-			if (CSSFriendsServices.isFacebookFlagged(data[i].value))
+			if (CSSFriendsServices.isFacebookFlagged(data[i].value)) {
 				images+='<img src="images/icons/facebook-col.png" width="20" height="20" /> &nbsp;';
-			if (CSSFriendsServices.isTwitterFlagged(data[i].value))
+				rank++
+			}
+			if (CSSFriendsServices.isTwitterFlagged(data[i].value)) {
 				images+='<img src="images/icons/twitter-col.png" width="20" height="20" /> &nbsp;';
-			if (CSSFriendsServices.isLinkedinFlagged(data[i].value))
+				rank++
+			}
+			if (CSSFriendsServices.isLinkedinFlagged(data[i].value)) {
 				images+='<img src="images/icons/linkedin-col.png" width="20" height="20" /> &nbsp;';
-			if (CSSFriendsServices.isFoursquareFlagged(data[i].value))
+				rank++
+			}
+			if (CSSFriendsServices.isFoursquareFlagged(data[i].value)) {
 				images+='<img src="images/icons/foursquare-col.png" width="20" height="20" /> &nbsp;';
-			if (CSSFriendsServices.isGooglePlusFlagged(data[i].value))
+				rank++
+			}
+			if (CSSFriendsServices.isGooglePlusFlagged(data[i].value)) {
 				images+='<img src="images/icons/googleplus-col.png" width="20" height="20" /> &nbsp;';
-			
-			//ADD TO LINE ITEM
+				rank++
+			}
+			//ADD TO LINE ITEM data-filtertext="NASDAQ:AAPL Apple Inc."
 			var tableEntry = '<li id="li' + i + '"><a href="#" onclick="CSSFriendsServices.sendFriendRequest(\'' + data[i].key.name + '\', \'' + data[i].key.id + '\', ' + i + ')">' +
 				'<img src="images/profile_pic.png" />' +
 				'<p class="ui-li-aside">' + images + '</p>' + 
 				'<h2>' + data[i].key.name + '</h2>' + 
 				'<p>' + data[i].key.id + '</p>' +
 				'</a></li>';
-			$('ul#SuggestedFriendsListUL').append(tableEntry);
+			rankings[i] = {"rank": rank, "htmlStr": tableEntry};
 		}
+		//SORT BASED ON RANK AND PRINT TABLE
+		rankings.sort(function(a,b) { return parseInt(b.rank) - parseInt(a.rank) } );
+		for (i=0; i <rankings.length; i++)
+			$('ul#SuggestedFriendsListUL').append(rankings[i].htmlStr);
+		
 		$('ul#SuggestedFriendsListUL').listview('refresh');
 	},
 	
