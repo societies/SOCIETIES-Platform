@@ -1,5 +1,6 @@
 package org.societies.android.platform.useragent.feedback.guis;
 
+import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.platform.useragent.feedback.R;
 
 public class SimpleNotificationPopup extends UserFeedbackPopup {
@@ -8,7 +9,8 @@ public class SimpleNotificationPopup extends UserFeedbackPopup {
         super(R.layout.activity_simple_popup,
                 R.id.simpleNotificationProposalText,
                 R.id.simpleNotificationAcceptButton,
-                UserFeedbackPopup.NOT_APPLICABLE);
+                UserFeedbackPopup.NOT_APPLICABLE,
+                IAndroidSocietiesEvents.UF_IMPLICIT_RESPONSE_INTENT);
     }
 
     @Override

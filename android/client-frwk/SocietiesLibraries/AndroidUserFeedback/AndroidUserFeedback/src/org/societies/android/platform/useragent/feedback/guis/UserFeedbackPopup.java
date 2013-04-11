@@ -63,12 +63,14 @@ public abstract class UserFeedbackPopup extends Activity {
     private final int headerID;
     private final int submitButtonID;
     private final int optionsMenuID;
+    private final String responseIntent;
 
-    protected UserFeedbackPopup(int contentViewID, int headerID, int submitButtonID, int optionsMenuID) {
+    protected UserFeedbackPopup(int contentViewID, int headerID, int submitButtonID, int optionsMenuID, String responseIntent) {
         this.contentViewID = contentViewID;
         this.headerID = headerID;
         this.submitButtonID = submitButtonID;
         this.optionsMenuID = optionsMenuID;
+        this.responseIntent = responseIntent;
     }
 
     @Override
@@ -160,7 +162,7 @@ public abstract class UserFeedbackPopup extends Activity {
 
             //TODO: THE PUBLISH EVENT IS OCCURRING MULTIPLE TIMES - DYNAMICALLY CREATED FORM?
             if (!published) {
-                eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_EXPLICIT_RESPONSE_INTENT, bean, new IPlatformEventsCallback() {
+                eventsHelper.publishEvent(responseIntent, bean, new IPlatformEventsCallback() {
                     @Override
                     public void returnAction(int result) {
                     }

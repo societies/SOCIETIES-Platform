@@ -3,6 +3,7 @@ package org.societies.android.platform.useragent.feedback.guis;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.platform.useragent.feedback.R;
 
 public class RadioPopup extends UserFeedbackPopup {
@@ -11,8 +12,8 @@ public class RadioPopup extends UserFeedbackPopup {
         super(R.layout.activity_radio_popup,
                 R.id.radioAckProposalText,
                 R.id.radioAckOkButton,
-                R.menu.activity_radio_popup
-        );
+                R.menu.activity_radio_popup,
+                IAndroidSocietiesEvents.UF_EXPLICIT_RESPONSE_INTENT);
     }
 
     @Override

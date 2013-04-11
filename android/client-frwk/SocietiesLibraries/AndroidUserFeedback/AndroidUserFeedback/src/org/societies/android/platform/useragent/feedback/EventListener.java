@@ -32,6 +32,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.*;
 import android.util.Log;
+import android.widget.Toast;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IPlatformEventsCallback;
@@ -39,10 +40,14 @@ import org.societies.android.api.events.PlatformEventsHelperNotConnectedExceptio
 import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
 import org.societies.android.platform.useragent.feedback.guis.*;
+import org.societies.android.platform.useragent.feedback.model.UserFeedbackTimedAbortBean;
 import org.societies.android.remote.helper.EventsHelper;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 import org.societies.api.schema.useragent.feedback.FeedbackMethodType;
+import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
+
+import java.util.*;
 
 /**
  * Describe your class here...
@@ -50,6 +55,166 @@ import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
  * @author aleckey
  */
 public class EventListener extends Service {
+
+    private class TimedAbortProcessor implements Runnable {
+
+        private boolean abort = false;
+        private final List<UserFeedbackTimedAbortBean> timedAbortsToWatch = new ArrayList<UserFeedbackTimedAbortBean>();
+        private final Map<String, Date> expiryTime = new HashMap<String, Date>();
+        private EventsHelper eventsHelper = null;
+        private boolean isEventHelperConnected = false;
+
+        @Override
+        public void run() {
+            while (!abort) {
+                try {
+                    processTimedAborts();
+                } catch (Exception ex) {
+                    Log.e(LOG_TAG, "Error on timed abort processing thread", ex);
+                }
+
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                    Log.e(LOG_TAG, "Error sleeping on timed abort processing thread", ex);
+                }
+            }
+        }
+
+        public void stop() {
+            abort = true;
+
+            //FINISH
+            if (eventsHelper != null)
+                eventsHelper.tearDownService(new IMethodCallback() {
+                    @Override
+                    public void returnException(String result) {
+                    }
+
+                    @Override
+                    public void returnAction(String result) {
+                    }
+
+                    @Override
+                    public void returnAction(boolean resultFlag) {
+                    }
+                });
+        }
+
+        private void processTimedAborts() {
+            synchronized (timedAbortsToWatch) {
+                for (int i = 0; i < timedAbortsToWatch.size(); i++) {
+                    UserFeedbackTimedAbortBean ufBean = timedAbortsToWatch.get(i);
+
+                    if (ufBean.isResponseSent()) {
+                        submitIgnoreEvent(ufBean.getRequestId());
+                        continue;
+                    }
+
+                    // check if this TA has expired
+                    if (!new Date().after(expiryTime.get(ufBean.getRequestId()))) continue;
+
+                    Log.d(LOG_TAG, "Timeout expired, aborting TA event with ID " + ufBean.getRequestId());
+
+                    // the TA has expired, send the response
+                    submitIgnoreEvent(ufBean.getRequestId());
+
+                    // remove from watch list
+                    removeTimedAbort(ufBean.getRequestId());
+                    i = 0; // this is really dirty, and will result in us potentially processing some items twice
+                    // but it's not a big performance issue, and will prevent us missing any on the off chance that
+                    // removeTimedAbort(...) removes more than 1 item
+                }
+            }
+        }
+
+        public void addTimedAbort(UserFeedbackTimedAbortBean userFeedbackBean) {
+            Date arrivalTime = new Date();
+
+            synchronized (timedAbortsToWatch) {
+                timedAbortsToWatch.add(userFeedbackBean);
+            }
+            synchronized (expiryTime) {
+                Date expiryDate = new Date(arrivalTime.getTime() + (long) userFeedbackBean.getTimeout());
+
+                Log.d(LOG_TAG, "Watching TA event with ID " + userFeedbackBean.getRequestId() + ", expiring " + expiryDate);
+
+                expiryTime.put(userFeedbackBean.getRequestId(), expiryDate);
+            }
+        }
+
+        public void removeTimedAbort(String requestId) {
+            synchronized (timedAbortsToWatch) {
+                for (int i = 0; i < timedAbortsToWatch.size(); i++) {
+                    UserFeedbackBean bean = timedAbortsToWatch.get(i);
+
+                    if (!bean.getRequestId().equals(requestId)) continue;
+
+                    timedAbortsToWatch.remove(i);
+                    i--;
+                }
+            }
+            synchronized (expiryTime) {
+                expiryTime.remove(requestId);
+            }
+        }
+
+        protected void submitIgnoreEvent(final String requestId) {
+            if (isEventHelperConnected) {
+                Log.d(LOG_TAG, "Connected to eventsManager - resultFlag true");
+                publishIgnoreEvent(requestId);
+            } else {
+                eventsHelper = new EventsHelper(EventListener.this);
+                eventsHelper.setUpService(new IMethodCallback() {
+                    @Override
+                    public void returnAction(String result) {
+                        Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");
+                    }
+
+                    @Override
+                    public void returnAction(boolean resultFlag) {
+                        Log.d(LOG_TAG, "eventMgr callback: ReturnAction(boolean) called. Connected");
+                        if (resultFlag) {
+                            isEventHelperConnected = true;
+                            Log.d(LOG_TAG, "Connected to eventsManager - resultFlag true");
+                            publishIgnoreEvent(requestId);
+                        }
+                    }
+
+                    @Override
+                    public void returnException(String result) {
+                    }
+                });
+            }
+        }
+
+        private void publishIgnoreEvent(String requestId) {
+            try {
+                ImpFeedbackResultBean bean = new ImpFeedbackResultBean();
+                bean.setAccepted(true);
+                bean.setRequestId(requestId);
+
+                eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_IMPLICIT_RESPONSE_INTENT, bean, new IPlatformEventsCallback() {
+                    @Override
+                    public void returnAction(int result) {
+                    }
+
+                    @Override
+                    public void returnAction(boolean resultFlag) {
+                    }
+
+                    @Override
+                    public void returnException(int exception) {
+                    }
+                });
+
+
+            } catch (PlatformEventsHelperNotConnectedException e) {
+                Log.e(LOG_TAG, "Error sending response", e);
+                Toast.makeText(EventListener.this, e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }
+    }
 
     private static final String LOG_TAG = EventListener.class.getName();
 
@@ -59,6 +224,18 @@ public class EventListener extends Service {
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
     private EventsHelper eventsHelper;
+
+    private final Thread timedAbortProcessorThread;
+    private final TimedAbortProcessor timedAbortProcessor;
+
+    private final Set<String> processedIncomingEvents = new HashSet<String>();
+
+    public EventListener() {
+        timedAbortProcessor = new TimedAbortProcessor();
+        timedAbortProcessorThread = new Thread(timedAbortProcessor);
+        timedAbortProcessorThread.setName("TimedAbortProcessor");
+        timedAbortProcessorThread.setDaemon(true);
+    }
 
     // Handler that receives messages from the thread
     private final class ServiceHandler extends Handler {
@@ -92,6 +269,8 @@ public class EventListener extends Service {
         // Get the HandlerThread's Looper and use it for our Handler
         mServiceLooper = thread.getLooper();
         mServiceHandler = new ServiceHandler(mServiceLooper);
+
+        timedAbortProcessorThread.start();
     }
 
     @Override
@@ -124,6 +303,9 @@ public class EventListener extends Service {
             public void returnException(String result) {
             }
         });
+
+        timedAbortProcessor.stop();
+
     }
 
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>REGISTER FOR EVENTS>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -156,14 +338,38 @@ public class EventListener extends Service {
             }
             //PRIVACY NEGOTIATION EVENT - payload is UserFeedbackPrivacyNegotiatioEvent
             else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_REQUEST_INTENT)) {
-                Log.d(LOG_TAG, "Privacy Negotiation event received");
                 UserFeedbackPrivacyNegotiationEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+
+                synchronized (processedIncomingEvents) {
+                    String id = String.valueOf(eventPayload.getNegotiationDetails().getNegotiationID());
+
+                    if (processedIncomingEvents.contains(id)) {
+                        Log.w(LOG_TAG, "Ignoring duplicate PPN event received: " + id);
+                        return;
+                    }
+
+                    processedIncomingEvents.add(id);
+                }
+
+                Log.d(LOG_TAG, "Privacy Negotiation event received");
                 launchPrivacyPolicyNegotiation(eventPayload);
             }
             //PERMISSION REQUEST EVENT - payload is UserFeedbackBean
             else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_REQUEST_INTENT)) {
-                Log.d(LOG_TAG, "General Permission request event received");
                 UserFeedbackBean eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+
+                synchronized (processedIncomingEvents) {
+                    String id = eventPayload.getRequestId();
+
+                    if (processedIncomingEvents.contains(id)) {
+                        Log.w(LOG_TAG, "Ignoring duplicate UF event received: " + id);
+                        return;
+                    }
+
+                    processedIncomingEvents.add(id);
+                }
+
+                Log.d(LOG_TAG, "General Permission request event received");
                 String description = "Accept privacy policy?";
                 addUserFeedbackNotification(description, "Privacy Policy", eventPayload);
             }
@@ -259,6 +465,12 @@ public class EventListener extends Service {
             // only one type of implicit feedback
 
             activityClass = TimedAbortPopup.class;
+
+            // wrap the bean
+            UserFeedbackTimedAbortBean newBean = new UserFeedbackTimedAbortBean(ufBean);
+            ufBean = newBean;
+
+            timedAbortProcessor.addTimedAbort(newBean);
 
         } else {
             // only one left is "SHOW_NOTIFICATION"

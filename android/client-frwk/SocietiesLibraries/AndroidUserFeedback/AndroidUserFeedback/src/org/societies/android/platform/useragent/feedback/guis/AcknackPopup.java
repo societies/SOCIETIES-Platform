@@ -28,6 +28,7 @@ package org.societies.android.platform.useragent.feedback.guis;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.platform.useragent.feedback.R;
 
 public class AcknackPopup extends UserFeedbackPopup {
@@ -36,7 +37,8 @@ public class AcknackPopup extends UserFeedbackPopup {
         super(R.layout.acknack_activity,
                 R.id.ackNackProposalText,
                 -1, // not used
-                R.menu.acknack_activity);
+                R.menu.acknack_activity,
+                IAndroidSocietiesEvents.UF_EXPLICIT_RESPONSE_INTENT);
 
     }
 

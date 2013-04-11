@@ -10,6 +10,7 @@ import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.android.platform.useragent.feedback.R;
+import org.societies.android.platform.useragent.feedback.model.UserFeedbackTimedAbortBean;
 import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
 
 public class TimedAbortPopup extends UserFeedbackPopup {
@@ -21,7 +22,8 @@ public class TimedAbortPopup extends UserFeedbackPopup {
         super(R.layout.activity_timedabort_popup,
                 R.id.timedAbortProposalText,
                 UserFeedbackPopup.NOT_APPLICABLE,
-                UserFeedbackPopup.NOT_APPLICABLE);
+                UserFeedbackPopup.NOT_APPLICABLE,
+                IAndroidSocietiesEvents.UF_IMPLICIT_RESPONSE_INTENT);
     }
 
     @Override
@@ -76,6 +78,9 @@ public class TimedAbortPopup extends UserFeedbackPopup {
             ImpFeedbackResultBean bean = new ImpFeedbackResultBean();
             bean.setAccepted(!getResultPayload().contains(ABORT_FLAG));
             bean.setRequestId(getUserFeedbackBean().getRequestId());
+
+            // flag the bean as having response sent, so that the background thread doesn't send an abort response when it times out
+            ((UserFeedbackTimedAbortBean) getUserFeedbackBean()).setResponseSent(true);
 
             //TODO: THE PUBLISH EVENT IS OCCURRING MULTIPLE TIMES - DYNAMICALLY CREATED FORM?
             if (!isPublished()) {

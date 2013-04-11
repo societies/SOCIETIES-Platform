@@ -3,6 +3,7 @@ package org.societies.android.platform.useragent.feedback.guis;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.platform.useragent.feedback.R;
 
 public class CheckboxPopup extends UserFeedbackPopup {
@@ -11,7 +12,8 @@ public class CheckboxPopup extends UserFeedbackPopup {
         super(R.layout.activity_checkbox_popup,
                 R.id.checkAckProposalText,
                 R.id.checkAckOkButton,
-                R.menu.activity_checkbox_popup);
+                R.menu.activity_checkbox_popup,
+                IAndroidSocietiesEvents.UF_EXPLICIT_RESPONSE_INTENT);
 
     }
 
