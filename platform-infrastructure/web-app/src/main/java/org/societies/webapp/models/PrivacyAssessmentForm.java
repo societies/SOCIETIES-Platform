@@ -28,6 +28,8 @@
 package org.societies.webapp.models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -57,8 +59,40 @@ public class PrivacyAssessmentForm implements Serializable {
 	// Showing assessment results
 	private String assessmentSubjectToBeShown;
 	private String assessmentSubjectShown = "";
+	private List<String> assessmentSubjects = new ArrayList<String>();
 	
 	private String chart;
+
+	public class SubjectTypes {
+		// Values
+		public static final String RECEIVER_IDS = "Receiver identities";
+		public static final String SENDER_IDS = "Sender identities";
+		public static final String SENDER_CLASSES = "Sender classes";
+		public static final String DATA_ACCESS_IDS = "Data access by identities";
+		public static final String DATA_ACCESS_CLASSES = "Data access by classes";
+	}
+	
+	public PrivacyAssessmentForm() {
+		assessmentSubjects.add(SubjectTypes.RECEIVER_IDS);
+		assessmentSubjects.add(SubjectTypes.SENDER_IDS);
+		assessmentSubjects.add(SubjectTypes.SENDER_CLASSES);
+		assessmentSubjects.add(SubjectTypes.DATA_ACCESS_IDS);
+		assessmentSubjects.add(SubjectTypes.DATA_ACCESS_CLASSES);
+	}
+
+	/**
+	 * @return the assessmentSubjects
+	 */
+	public List<String> getAssessmentSubjects() {
+		return assessmentSubjects;
+	}
+
+	/**
+	 * @param assessmentSubjects the assessmentSubjects to set
+	 */
+	public void setAssessmentSubjects(List<String> assessmentSubjects) {
+		this.assessmentSubjects = assessmentSubjects;
+	}
 
 	/**
 	 * @return the autoReassessment
