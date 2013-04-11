@@ -51,11 +51,12 @@ public abstract class UserFeedbackPopup extends Activity {
 
     public static final int NOT_APPLICABLE = -999;
 
-    private final String LOG_TAG = this.getClass().getName();
+    protected final String LOG_TAG = this.getClass().getName();
+    private UserFeedbackBean userFeedbackBean;
+    private final List<String> resultPayload = new ArrayList<String>();
+
     private EventsHelper eventsHelper = null;
     private boolean isEventsConnected = false;
-    private final List<String> resultPayload = new ArrayList<String>();
-    private UserFeedbackBean userFeedbackBean;
     private boolean published = false;
 
     private final int contentViewID;
@@ -202,5 +203,17 @@ public abstract class UserFeedbackPopup extends Activity {
 
     protected final List<String> getResultPayload() {
         return resultPayload;
+    }
+
+    protected EventsHelper getEventsHelper() {
+        return eventsHelper;
+    }
+
+    protected boolean isPublished() {
+        return published;
+    }
+
+    protected void setPublished(boolean published) {
+        this.published = published;
     }
 }

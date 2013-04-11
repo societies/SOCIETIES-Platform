@@ -175,7 +175,7 @@ public class EventListener extends Service {
      *
      * @return IntentFilter
      */
-    private IntentFilter createIntentFilter() {
+    private static IntentFilter createIntentFilter() {
         //register broadcast receiver to receive SocietiesEvents return values
         IntentFilter intentFilter = new IntentFilter();
         //EVENT MANAGER INTENTS
@@ -242,39 +242,40 @@ public class EventListener extends Service {
     }
 
     private void addUserFeedbackNotification(String description, String eventType, UserFeedbackBean ufBean) {
-        //CREATE ANDROID NOTIFICATION
-        int notifierflags[] = new int[1];
-        notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
-        AndroidNotifier notifier = new AndroidNotifier(EventListener.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
 
         //DETERMINE WHICH ACTIVITY TO LAUNCH
-        Class activtyClass;
+        Class activityClass;
         if (ufBean.getMethod() == FeedbackMethodType.GET_EXPLICIT_FB) {
 
             // select type of explicit feedback
             if (ufBean.getType() == 0)
-                activtyClass = RadioPopup.class;
+                activityClass = RadioPopup.class;
             else if (ufBean.getType() == 1)
-                activtyClass = CheckboxPopup.class;
+                activityClass = CheckboxPopup.class;
             else
-                activtyClass = AcknackPopup.class;
+                activityClass = AcknackPopup.class;
 
         } else if (ufBean.getMethod() == FeedbackMethodType.GET_IMPLICIT_FB) {
-            // only one type of implict feedback
+            // only one type of implicit feedback
 
-            activtyClass = TimedAbortPopup.class;
+            activityClass = TimedAbortPopup.class;
 
         } else {
             // only one left is "SHOW_NOTIFICATION"
 
-            activtyClass = SimpleNotificationPopup.class;
+            activityClass = SimpleNotificationPopup.class;
         }
 
         //CREATE INTENT FOR LAUNCHING ACTIVITY
-        Intent intent = new Intent(this.getApplicationContext(), activtyClass);
+        Intent intent = new Intent(this.getApplicationContext(), activityClass);
         intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY, (Parcelable) ufBean);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        notifier.notifyMessage(description, eventType, activtyClass, intent, "SOCIETIES");
+
+        //CREATE ANDROID NOTIFICATION
+        int notifierFlags[] = new int[1];
+        notifierFlags[0] = Notification.FLAG_AUTO_CANCEL;
+        AndroidNotifier notifier = new AndroidNotifier(EventListener.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierFlags);
+        notifier.notifyMessage(description, eventType, activityClass, intent, "SOCIETIES");
     }
 
 }
