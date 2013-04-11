@@ -71,10 +71,9 @@ public class PrivacyAssessmentController extends BasePageController {
 			"global/bundle/societies-webapp/0.6.0/societies-webapp.war/";
 	private static final String chartFileName = "assessment-chart.png";
 
-	private boolean autoAssessment;
+	@ManagedProperty(value = "#{privacyAssessmentForm}")
+	private PrivacyAssessmentForm model;
 
-	private String autoAssessmentPeriod;
-	
 	/**
 	 * URL parts without prefix and suffix
 	 */
@@ -201,35 +200,19 @@ public class PrivacyAssessmentController extends BasePageController {
 		log.debug("setAssessment()");
 		this.assessment = sdService;
 	}
-
+	
 	/**
-	 * @return the autoAssessment
+	 * @return the model
 	 */
-	public boolean isAutoAssessment() {
-		return autoAssessment;
+	public PrivacyAssessmentForm getModel() {
+		return model;
 	}
 
 	/**
-	 * @param autoAssessment the autoAssessment to set
+	 * @param model the model to set
 	 */
-	public void setAutoAssessment(boolean autoAssessment) {
-		log.debug("autoAssessment set to {}", autoAssessment);
-		this.autoAssessment = autoAssessment;
-	}
-
-	/**
-	 * @return the autoAssessmentPeriod
-	 */
-	public String getAutoAssessmentPeriod() {
-		return autoAssessmentPeriod;
-	}
-
-	/**
-	 * @param autoAssessmentPeriod the autoAssessmentPeriod to set
-	 */
-	public void setAutoAssessmentPeriod(String autoAssessmentPeriod) {
-		log.debug("autoAssessmentPeriod set to {}", autoAssessmentPeriod);
-		this.autoAssessmentPeriod = autoAssessmentPeriod;
+	public void setModel(PrivacyAssessmentForm model) {
+		this.model = model;
 	}
 
 	@RequestMapping(value = "/" + PageNames.PRIVACY_ASSESSMENT + ".html", method = RequestMethod.GET)
@@ -285,156 +268,139 @@ public class PrivacyAssessmentController extends BasePageController {
 			return new ModelAndView("error", model);
 		}
 
-		String presentationFormat = assForm.getPresentationFormat();
-		String subjectType = assForm.getAssessmentSubjectType();
-		log.debug("presentationFormat = {}, subjectType = {}", presentationFormat, subjectType);
+		String subjectType = assForm.getAssessmentSubjectToBeShown();
+		log.debug("subjectType = {}", subjectType);
 		Collection<PrivacyAssessmentForm> charts = new ArrayList<PrivacyAssessmentForm>();
 		
-		if (presentationFormat.equalsIgnoreCase(Presentation.Format.CHART)) {
+		String chartFileName = "chart-1.png";
+		
+		String title;
+		String xlabel;
+		String ylabel;
+		PlotData[] plotData;
+		String[] plotDataLabels;
+		
+		if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.RECEIVER_IDS_KEY)) {
 			
-			String chartFileName = "chart-1.png";
+			title = Presentation.SubjectTypes.RECEIVER_IDS;
+			xlabel = "Receiver identity";
+			ylabel = "Number of data transmissions";
 			
-			String title;
-			String xlabel;
-			String ylabel;
-			PlotData[] plotData;
-			String[] plotDataLabels;
-			
-			if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.RECEIVER_IDS_KEY)) {
-				
-				title = Presentation.SubjectTypes.RECEIVER_IDS;
-				xlabel = "Receiver identity";
-				ylabel = "Number of data transmissions";
-				
-				Map<IIdentity, Integer> identities;
-				identities = assessment.getNumDataTransmissionEventsForAllReceivers(
-						new Date(0), new Date());
-				log.debug("Number of identities data has been transmitted to: {}", identities.size());
-				plotData = new PlotData[] {mapToArrays(identities)};
-				plotDataLabels = new String[] {"data"};
-			}
-			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_IDS_KEY)) {
-				
-				title = Presentation.SubjectTypes.SENDER_IDS;
-				xlabel = "Sender identity";
-				ylabel = "Correlation of data transmission and data access";
-
-				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
-				assResult = assessment.getAssessmentAllIds();
-
-				int size = assResult.size();
-				IIdentity[] labels = new IIdentity[size];
-				double[][] data = new double[2][size];
-				Iterator<IIdentity> iterator = assResult.keySet().iterator();
-				
-				log.debug("privacyAssessment(): size = {}", size);
-				
-				for (int k = 0; k < size; k++) {
-					labels[k] = iterator.next();
-					data[0][k] = assResult.get(labels[k]).getCorrWithDataAccessBySender();
-					data[1][k] = assResult.get(labels[k]).getCorrWithDataAccessByAll();
-					
-					log.debug("privacyAssessment(): label[{}] = {}", k, labels[k]);
-					log.debug("privacyAssessment(): data[0][{}] = {}", k, data[0][k]);
-					log.debug("privacyAssessment(): data[1][{}] = {}", k, data[1][k]);
-				}
-				
-				plotData = new PlotData[] {
-						new PlotData(data[0], labels),
-						new PlotData(data[1], labels)
-						};
-				plotDataLabels = new String[] {
-						"Correlation with data access by the sender identity",
-						"Correlation with data access by any identity"
-						};
-			}
-			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_CLASSES_KEY)) {
-				
-				title = Presentation.SubjectTypes.SENDER_CLASSES;
-				xlabel = "Sender class";
-				ylabel = "Correlation of data transmission and data access";
-
-				HashMap<String, AssessmentResultClassName> assResult;
-				assResult = assessment.getAssessmentAllClasses();
-
-				int size = assResult.size();
-				String[] labels = new String[size];
-				double[][] data = new double[2][size];
-				Iterator<String> iterator = assResult.keySet().iterator();
-				
-				log.debug("privacyAssessment(): size = {}", size);
-
-				for (int k = 0; k < size; k++) {
-					labels[k] = iterator.next();
-					data[0][k] = assResult.get(labels[k]).getCorrWithDataAccessBySender();
-					data[1][k] = assResult.get(labels[k]).getCorrWithDataAccessByAll();
-					
-					log.debug("privacyAssessment(): label[{}] = {}", k, labels[k]);
-					log.debug("privacyAssessment(): data[0][{}] = {}", k, data[0][k]);
-					log.debug("privacyAssessment(): data[1][{}] = {}", k, data[1][k]);
-				}
-				
-				plotData = new PlotData[] {
-						new PlotData(data[0], labels),
-						new PlotData(data[1], labels)
-						};
-				plotDataLabels = new String[] {
-						"Correlation with data access by the sender class",
-						"Correlation with data access by any class"
-						};
-			}
-			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.DATA_ACCESS_CLASSES_KEY)) {
-				
-				title = Presentation.SubjectTypes.DATA_ACCESS_CLASSES;
-				xlabel = "Class";
-				ylabel = "Number of accesses to local data";
-
-				Map<String, Integer> dataAccessClasses;
-				dataAccessClasses = assessment.getNumDataAccessEventsForAllClasses(new Date(0), new Date());
-				log.debug("Number of data access events (by class): {}", dataAccessClasses.size());
-				plotData = new PlotData[] {mapToArrays(dataAccessClasses)};
-				plotDataLabels = new String[] {"data"};
-			}
-			else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.DATA_ACCESS_IDS_KEY)) {
-				
-				title = Presentation.SubjectTypes.DATA_ACCESS_IDS;
-				xlabel = "Identity";
-				ylabel = "Number of accesses to local data";
-
-				Map<IIdentity, Integer> identities;
-				identities = assessment.getNumDataAccessEventsForAllIdentities(new Date(0), new Date());
-				log.debug("Number of data access events (by identity): {}", identities.size());
-				plotData = new PlotData[] {mapToArrays(identities)};
-				plotDataLabels = new String[] {"data"};
-			}
-			else {
-				log.warn("Unexpected {}: {}", Presentation.SubjectTypes.class.getSimpleName(), subjectType);
-				return privacyAssessment();
-			}
-			
-			PrivacyAssessmentForm form1 = new PrivacyAssessmentForm();
-			form1.setAssessmentSubject(title);
-			createBarchart(null, xlabel, ylabel, plotData, plotDataLabels, chartFileName);
-			form1.setChart(chartFileName);
-			charts.add(form1);
-			model.put("assessmentResults", charts);
-
-			log.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST end");
-			return new ModelAndView(PageNames.PRIVACY_ASSESSMENT_CHART, model);
+			Map<IIdentity, Integer> identities;
+			identities = assessment.getNumDataTransmissionEventsForAllReceivers(
+					new Date(0), new Date());
+			log.debug("Number of identities data has been transmitted to: {}", identities.size());
+			plotData = new PlotData[] {mapToArrays(identities)};
+			plotDataLabels = new String[] {"data"};
 		}
-		else if (presentationFormat.equalsIgnoreCase(Presentation.Format.TABLE)) {
+		else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_IDS_KEY)) {
+			
+			title = Presentation.SubjectTypes.SENDER_IDS;
+			xlabel = "Sender identity";
+			ylabel = "Correlation of data transmission and data access";
+
+			HashMap<IIdentity, AssessmentResultIIdentity> assResult;
+			assResult = assessment.getAssessmentAllIds();
+
+			int size = assResult.size();
+			IIdentity[] labels = new IIdentity[size];
+			double[][] data = new double[2][size];
+			Iterator<IIdentity> iterator = assResult.keySet().iterator();
+			
+			log.debug("privacyAssessment(): size = {}", size);
+			
+			for (int k = 0; k < size; k++) {
+				labels[k] = iterator.next();
+				data[0][k] = assResult.get(labels[k]).getCorrWithDataAccessBySender();
+				data[1][k] = assResult.get(labels[k]).getCorrWithDataAccessByAll();
+				
+				log.debug("privacyAssessment(): label[{}] = {}", k, labels[k]);
+				log.debug("privacyAssessment(): data[0][{}] = {}", k, data[0][k]);
+				log.debug("privacyAssessment(): data[1][{}] = {}", k, data[1][k]);
+			}
+			
+			plotData = new PlotData[] {
+					new PlotData(data[0], labels),
+					new PlotData(data[1], labels)
+					};
+			plotDataLabels = new String[] {
+					"Correlation with data access by the sender identity",
+					"Correlation with data access by any identity"
+					};
+		}
+		else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.SENDER_CLASSES_KEY)) {
+			
+			title = Presentation.SubjectTypes.SENDER_CLASSES;
+			xlabel = "Sender class";
+			ylabel = "Correlation of data transmission and data access";
 
 			HashMap<String, AssessmentResultClassName> assResult;
 			assResult = assessment.getAssessmentAllClasses();
-			model.put("assessmentResults", assResult.values());
 
-			log.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST end");
-			return new ModelAndView(PageNames.PRIVACY_ASSESSMENT_TABLE, model);
+			int size = assResult.size();
+			String[] labels = new String[size];
+			double[][] data = new double[2][size];
+			Iterator<String> iterator = assResult.keySet().iterator();
+			
+			log.debug("privacyAssessment(): size = {}", size);
+
+			for (int k = 0; k < size; k++) {
+				labels[k] = iterator.next();
+				data[0][k] = assResult.get(labels[k]).getCorrWithDataAccessBySender();
+				data[1][k] = assResult.get(labels[k]).getCorrWithDataAccessByAll();
+				
+				log.debug("privacyAssessment(): label[{}] = {}", k, labels[k]);
+				log.debug("privacyAssessment(): data[0][{}] = {}", k, data[0][k]);
+				log.debug("privacyAssessment(): data[1][{}] = {}", k, data[1][k]);
+			}
+			
+			plotData = new PlotData[] {
+					new PlotData(data[0], labels),
+					new PlotData(data[1], labels)
+					};
+			plotDataLabels = new String[] {
+					"Correlation with data access by the sender class",
+					"Correlation with data access by any class"
+					};
+		}
+		else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.DATA_ACCESS_CLASSES_KEY)) {
+			
+			title = Presentation.SubjectTypes.DATA_ACCESS_CLASSES;
+			xlabel = "Class";
+			ylabel = "Number of accesses to local data";
+
+			Map<String, Integer> dataAccessClasses;
+			dataAccessClasses = assessment.getNumDataAccessEventsForAllClasses(new Date(0), new Date());
+			log.debug("Number of data access events (by class): {}", dataAccessClasses.size());
+			plotData = new PlotData[] {mapToArrays(dataAccessClasses)};
+			plotDataLabels = new String[] {"data"};
+		}
+		else if (subjectType.equalsIgnoreCase(Presentation.SubjectTypes.DATA_ACCESS_IDS_KEY)) {
+			
+			title = Presentation.SubjectTypes.DATA_ACCESS_IDS;
+			xlabel = "Identity";
+			ylabel = "Number of accesses to local data";
+
+			Map<IIdentity, Integer> identities;
+			identities = assessment.getNumDataAccessEventsForAllIdentities(new Date(0), new Date());
+			log.debug("Number of data access events (by identity): {}", identities.size());
+			plotData = new PlotData[] {mapToArrays(identities)};
+			plotDataLabels = new String[] {"data"};
 		}
 		else {
-			log.warn("Unexpected {}: {}", Presentation.Format.class.getSimpleName(), presentationFormat);
+			log.warn("Unexpected {}: {}", Presentation.SubjectTypes.class.getSimpleName(), subjectType);
 			return privacyAssessment();
 		}
+		
+		PrivacyAssessmentForm form1 = new PrivacyAssessmentForm();
+		form1.setAssessmentSubjectShown(title);
+		createBarchart(null, xlabel, ylabel, plotData, plotDataLabels, chartFileName);
+		form1.setChart(chartFileName);
+		charts.add(form1);
+		model.put("assessmentResults", charts);
+
+		log.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST end");
+		return new ModelAndView(PageNames.PRIVACY_ASSESSMENT_CHART, model);
 	}
 	
 	/**
@@ -513,10 +479,9 @@ public class PrivacyAssessmentController extends BasePageController {
 		
 		//ADD THE BEAN THAT CONTAINS ALL THE FORM DATA FOR THIS PAGE
 		PrivacyAssessmentForm assForm = new PrivacyAssessmentForm();
-		assForm.setAssessNow(false);
-		int autoReassessmentInSecs = assessment.getAutoPeriod();
-		assForm.setAutoReassessment(autoReassessmentInSecs >= 0);
-		assForm.setAutoReassessmentInSecs(autoReassessmentInSecs);
+		int autoAssessmentInSecs = assessment.getAutoPeriod();
+		assForm.setAutoAssessment(autoAssessmentInSecs >= 0);
+		assForm.setAutoAssessmentInSecs(autoAssessmentInSecs);
 		model.put("assForm", assForm);
 		
 		return new ModelAndView(PageNames.PRIVACY_ASSESSMENT_SETTINGS, model);
@@ -541,16 +506,11 @@ public class PrivacyAssessmentController extends BasePageController {
 			return new ModelAndView("error", model);
 		}
 
-		int autoAssessmentPeriod = assForm.getAutoReassessmentInSecs();
-		boolean assessNow = assForm.isAssessNow();
-		log.debug("autoReassessmentInSecs = {}, assessNow = {}", autoAssessmentPeriod, assessNow);
+		int autoAssessmentPeriod = assForm.getAutoAssessmentInSecs();
+		log.debug("autoReassessmentInSecs = {}", autoAssessmentPeriod);
 		
 		try {
-			if (assessNow) {
-				assessment.assessAllNow();
-			}
-			
-			if (!assForm.isAutoReassessment()) {
+			if (!assForm.isAutoAssessment()) {
 				autoAssessmentPeriod = -1;
 			}
 			assessment.setAutoPeriod(autoAssessmentPeriod);
@@ -565,12 +525,24 @@ public class PrivacyAssessmentController extends BasePageController {
 	}
 	
 	public void assessNow() {
-		log.debug("assessNow button clicked");
+		log.debug("AssessNow button clicked");
 		assessment.assessAllNow();
 	}
 	
 	public void updateImage() {
+
+		log.debug("Show button clicked");
+
 		// TODO: save image 
 		String fileName = contextPath + chartFileName;
+		log.debug(
+				"autoAssessment = " + model.isAutoAssessment() +
+				", autoAssessmentInSecs = " + model.getAutoAssessmentInSecs() +
+				", assessmentSubjectToBeShown = " + model.getAssessmentSubjectToBeShown() +
+				", assessmentSubjectShown = " + model.getAssessmentSubjectShown() +
+				", chart = " + model.getChart()
+				);
+		model.setAutoAssessmentInSecs(123456);
+		log.debug("autoAssessmentInSecs = " + model.getAutoAssessmentInSecs());
 	}
 }

@@ -1,0 +1,55 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="templates/main_template.xhtml">
+
+    <ui:define name="html_head">
+        <title>SOCIEITES</title>
+    </ui:define>
+
+    <ui:define name="body">
+
+        <div class="hr grid_12 clearfix"></div>
+        <!-- Left Column -->
+        <section id="left_col" class="grid_12">
+            <div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a></div>
+            <!-- Form -->
+            <section class="form_style_main">
+                <form action="" method="" id="">
+                    <h4 class="form_title">Privacy Assessment Settings</h4>
+
+                    <div class="hr dotted clearfix"></div>
+                    <ul>
+                        <li class="clearfix">
+                            <label for="option">Settings</label>
+
+                            <div class="option-group check">
+                                <p:selectBooleanCheckbox type="checkbox" name="" id="check1" value="#{privacyAssessmentForm.autoAssessment}" />
+                                <label for="check1">Enable periodic assessment every</label>
+                                <p:inputText id="autoAssessmentPeriod" value="#{privacyAssessmentForm.autoAssessmentInSecs}"/>
+                                <p:outputLabel for="autoAssessmentPeriod">seconds</p:outputLabel>
+                                <br/>
+						        <p:commandButton value="Assess now" actionListener="#{assessmentController.assessNow}"/>
+                            </div>
+                            <div class="clear"></div>
+                            <p id="option" class="error">Please, select an option</p>
+                        </li>
+                        <li class="clearfix">
+                            <p class="success">Thank you! Success Message here.</p>
+
+                            <p class="error">Sorry, an error has occured. Please try again later.</p>
+
+                            <div id="button">
+                                <input type="submit" id="send_message" class="sendButton" value="Send"/>
+                            </div>
+                        </li>
+                    </ul>
+                </form>
+            </section>
+        </section>
+        <div class="hr grid_12 clearfix"></div>
+
+    </ui:define>
+</ui:composition>
+</html>

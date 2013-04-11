@@ -31,7 +31,7 @@
                             <label for="">Show results for</label>
 
                             <div class="select-wrapper">
-                                <select name="select" required="required">
+                                <select name="select" required="required" value="#{privacyAssessmentForm.assessmentSubjectToBeShown}">
                                     <option value="1">Receiver identities</option>
                                     <option value="2">Sender identities</option>
                                     <option value="3">Sender classes</option>
@@ -48,21 +48,6 @@
                         	<img src="assessment-chart.png"></img>
                         </li>
                         <li class="clearfix">
-                            <label for="option">Settings</label>
-
-                            <div class="option-group check">
-                                <p:selectBooleanCheckbox type="checkbox" name="" id="check1" value="#{assessmentController.autoAssessment}" />
-                                <label for="check1">Enable periodic assessment every</label>
-                                <p:inputText id="autoAssessmentPeriod" value="#{assessmentController.autoAssessmentPeriod}"/>
-                                <p:outputLabel for="autoAssessmentPeriod">seconds</p:outputLabel>
-                                <br/>
-						        <p:commandButton value="Assess now" actionListener="#{assessmentController.assessNow}"/>
-                            </div>
-                            <div class="clear"></div>
-                            <p id="option" class="error">Please, select an option</p>
-                        </li>
-<!--
-                        <li class="clearfix">
                             <p class="success">Thank you! Success Message here.</p>
 
                             <p class="error">Sorry, an error has occured. Please try again later.</p>
@@ -71,7 +56,6 @@
                                 <input type="submit" id="send_message" class="sendButton" value="Send"/>
                             </div>
                         </li>
--->
                     </ul>
                 </form>
             </section>
