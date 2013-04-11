@@ -25,54 +25,30 @@
 
 package org.societies.android.platform.useragent.feedback.guis;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-import org.societies.android.api.comms.IMethodCallback;
-import org.societies.android.api.events.IAndroidSocietiesEvents;
-import org.societies.android.api.events.IPlatformEventsCallback;
-import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.android.platform.useragent.feedback.R;
-import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
-import org.societies.android.remote.helper.EventsHelper;
-import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
-import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 
-import java.util.ArrayList;
-import java.util.List;
+public class AcknackPopup extends ExplicitPopup {
 
-public class AcknackPopup extends Activity {
+    public AcknackPopup() {
+        super(R.layout.acknack_activity,
+                R.id.ackNackProposalText,
+                -1, // not used
+                R.menu.acknack_activity);
 
-    private static final String CLIENT_NAME = "org.societies.android.platform.useragent.feedback.guis.AcknackPopup";
-    private static final String LOG_TAG = AcknackPopup.class.getName();
-    EventsHelper eventsHelper = null;
-    private boolean isEventsConnected = false;
-    private String resultPayload = "";
-    private UserFeedbackBean eventInfo;
-    private boolean published = false;
+    }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.acknack_activity);
+    protected void populateSubmitButton() {
+        // do nothing - there's no submit button on the acknack popup
+    }
 
-        //RETRIEVE USERFEEDBACK BEAN FROM INTENT
-        Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
-        eventInfo = bundle.getParcelable(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY);
-
-        TextView txtView = (TextView) findViewById(R.id.ackNackProposalText);
-        txtView.setText(eventInfo.getProposalText());
+    @Override
+    protected void populateOptions() {
         LinearLayout layout = (LinearLayout) findViewById(R.id.ackNackInnerLinearLayout);
-
-        for (String option : eventInfo.getOptions()) {
+        for (String option : getUserFeedbackBean().getOptions()) {
             Button button = new Button(this);
             button.setText(option);
             button.setTag(option);
@@ -82,81 +58,12 @@ public class AcknackPopup extends Activity {
 
                 @Override
                 public void onClick(View v) {
-                    AcknackPopup.this.resultPayload = (String) v.getTag();
-                    Log.d(LOG_TAG, "Connected to eventsManager - resultFlag true");
+                    getResultPayload().clear();
+                    getResultPayload().add((String) v.getTag());
 
-                    if (isEventsConnected) {
-                        publishEvent();
-                    } else {
-                        eventsHelper = new EventsHelper(AcknackPopup.this);
-                        eventsHelper.setUpService(new IMethodCallback() {
-                            @Override
-                            public void returnAction(String result) {
-                                Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");
-                            }
-
-                            @Override
-                            public void returnAction(boolean resultFlag) {
-                                Log.d(LOG_TAG, "eventMgr callback: ReturnAction(boolean) called. Connected");
-                                if (resultFlag) {
-                                    isEventsConnected = true;
-                                    Log.d(LOG_TAG, "Connected to eventsManager - resultFlag true");
-                                    publishEvent();
-                                }
-                            }
-
-                            @Override
-                            public void returnException(String result) {
-                            }
-                        });
-                    }
+                    submit();
                 }
             });
-        }
-        Log.d(LOG_TAG, "onCreate in AcknackPopup");
-    }
-
-    private void publishEvent() {
-        try {
-            ExpFeedbackResultBean bean = new ExpFeedbackResultBean();
-            List<String> feedback = new ArrayList<String>();
-            feedback.add(this.resultPayload);
-            bean.setFeedback(feedback);
-            bean.setRequestId(eventInfo.getRequestId());
-            //TODO: THE PUBLISH EVENT IS OCCURING MULTIPLE TIMES - DYNAMICLY CREATED FORM?
-            if (!published) {
-                eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_RESPONSE_INTENT, bean, new IPlatformEventsCallback() {
-                    @Override
-                    public void returnAction(int result) {
-                    }
-
-                    @Override
-                    public void returnAction(boolean resultFlag) {
-                    }
-
-                    @Override
-                    public void returnException(int exception) {
-                    }
-                });
-            }
-            published = true;
-            //FINISH
-            eventsHelper.tearDownService(new IMethodCallback() {
-                @Override
-                public void returnException(String result) {
-                }
-
-                @Override
-                public void returnAction(String result) {
-                }
-
-                @Override
-                public void returnAction(boolean resultFlag) {
-                }
-            });
-            finish();
-        } catch (PlatformEventsHelperNotConnectedException e) {
-            e.printStackTrace();
         }
     }
 

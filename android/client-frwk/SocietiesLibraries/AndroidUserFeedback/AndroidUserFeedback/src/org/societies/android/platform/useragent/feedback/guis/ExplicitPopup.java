@@ -26,12 +26,173 @@
 package org.societies.android.platform.useragent.feedback.guis;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.api.events.IPlatformEventsCallback;
+import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
+import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
+import org.societies.android.remote.helper.EventsHelper;
+import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
+import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 
-public class ExplicitPopup extends Activity{
+import java.util.ArrayList;
+import java.util.List;
 
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setTheme(android.R.style.Theme_Dialog);
-	}
+public abstract class ExplicitPopup extends Activity {
+
+    private final String LOG_TAG = this.getClass().getName();
+    EventsHelper eventsHelper = null;
+    private boolean isEventsConnected = false;
+    private final List<String> resultPayload = new ArrayList<String>();
+    private UserFeedbackBean userFeedbackBean;
+    private boolean published = false;
+
+    private final int contentViewID;
+    private final int headerID;
+    private final int submitButtonID;
+    private final int optionsMenuID;
+
+    protected ExplicitPopup(int contentViewID, int headerID, int submitButtonID, int optionsMenuID) {
+        this.contentViewID = contentViewID;
+        this.headerID = headerID;
+        this.submitButtonID = submitButtonID;
+        this.optionsMenuID = optionsMenuID;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setTheme(android.R.style.Theme_Dialog);
+
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(contentViewID);
+
+        //RETRIEVE USER FEEDBACK BEAN FROM INTENT
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        userFeedbackBean = bundle.getParcelable(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY);
+
+        populateHeader();
+
+        populateOptions();
+
+        populateSubmitButton();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(optionsMenuID, menu);
+        return true;
+    }
+
+    protected void populateHeader() {
+        TextView txtView = (TextView) findViewById(headerID);
+        txtView.setText(userFeedbackBean.getProposalText());
+    }
+
+    protected abstract void populateOptions();
+
+    protected void populateSubmitButton() {
+        // handle the submit button click
+        Button submitButton = (Button) findViewById(submitButtonID);
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                submit();
+            }
+        });
+    }
+
+    protected void submit() {
+        if (isEventsConnected) {
+            Log.d(LOG_TAG, "Connected to eventsManager - resultFlag true");
+            publishEvent();
+        } else {
+            eventsHelper = new EventsHelper(this);
+            eventsHelper.setUpService(new IMethodCallback() {
+                @Override
+                public void returnAction(String result) {
+                    Log.d(LOG_TAG, "eventMgr callback: ReturnAction(String) called");
+                }
+
+                @Override
+                public void returnAction(boolean resultFlag) {
+                    Log.d(LOG_TAG, "eventMgr callback: ReturnAction(boolean) called. Connected");
+                    if (resultFlag) {
+                        isEventsConnected = true;
+                        Log.d(LOG_TAG, "Connected to eventsManager - resultFlag true");
+                        publishEvent();
+                    }
+                }
+
+                @Override
+                public void returnException(String result) {
+                }
+            });
+        }
+    }
+
+    protected void publishEvent() {
+        try {
+            ExpFeedbackResultBean bean = new ExpFeedbackResultBean();
+            List<String> feedback = new ArrayList<String>();
+            feedback.addAll(this.resultPayload); // copy to the feedback array
+            bean.setFeedback(feedback);
+            bean.setRequestId(userFeedbackBean.getRequestId());
+
+            //TODO: THE PUBLISH EVENT IS OCCURRING MULTIPLE TIMES - DYNAMICALLY CREATED FORM?
+            if (!published) {
+                eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_EXPLICIT_RESPONSE_INTENT, bean, new IPlatformEventsCallback() {
+                    @Override
+                    public void returnAction(int result) {
+                    }
+
+                    @Override
+                    public void returnAction(boolean resultFlag) {
+                    }
+
+                    @Override
+                    public void returnException(int exception) {
+                    }
+                });
+            }
+            published = true;
+
+            //FINISH
+            eventsHelper.tearDownService(new IMethodCallback() {
+                @Override
+                public void returnException(String result) {
+                }
+
+                @Override
+                public void returnAction(String result) {
+                }
+
+                @Override
+                public void returnAction(boolean resultFlag) {
+                }
+            });
+            finish();
+        } catch (PlatformEventsHelperNotConnectedException e) {
+            Log.e(LOG_TAG, "Error sending response", e);
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    protected final UserFeedbackBean getUserFeedbackBean() {
+        return userFeedbackBean;
+    }
+
+    protected final List<String> getResultPayload() {
+        return resultPayload;
+    }
 }
