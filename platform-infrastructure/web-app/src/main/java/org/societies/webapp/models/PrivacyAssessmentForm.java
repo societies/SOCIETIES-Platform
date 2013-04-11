@@ -28,6 +28,8 @@
 package org.societies.webapp.models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -49,26 +51,84 @@ public class PrivacyAssessmentForm implements Serializable {
 
 	private static final long serialVersionUID = 3196618675483151078L;
     private static final Logger log = LoggerFactory.getLogger(PrivacyAssessmentForm.class);
-	
-	// Settings and control
+    
+    /**
+     * Perform periodic assessment in background
+     */
 	private boolean autoAssessment;
+	
+	/**
+	 * Period in seconds for periodic assessment
+	 */
 	private int autoAssessmentInSecs;
-	
-	// Showing assessment results
-	private String assessmentSubjectToBeShown;
-	private String assessmentSubjectShown = "";
-	
-	private String chart;
 
 	/**
-	 * @return the autoReassessment
+	 * Selected assessment subject type
+	 */
+	private String assessmentSubject;
+	
+	/**
+	 * List of all assessment subject types
+	 */
+	private List<String> assessmentSubjects;
+	
+    /**
+	 * Relative path to chart image to show
+	 */
+	private String chart;
+
+	public class SubjectTypes {
+		public static final String RECEIVER_IDS = "Receiver identities";
+		public static final String SENDER_IDS = "Sender identities";
+		public static final String SENDER_CLASSES = "Sender classes";
+		public static final String DATA_ACCESS_IDS = "Data access by identities";
+		public static final String DATA_ACCESS_CLASSES = "Data access by classes";
+	}
+	
+	public class ImageFileNames {
+		public static final String RECEIVER_IDS = SubjectTypes.RECEIVER_IDS + ".png";
+		public static final String SENDER_IDS = SubjectTypes.SENDER_IDS + ".png";
+		public static final String SENDER_CLASSES = SubjectTypes.SENDER_CLASSES + ".png";
+		public static final String DATA_ACCESS_IDS = SubjectTypes.DATA_ACCESS_IDS + ".png";
+		public static final String DATA_ACCESS_CLASSES = SubjectTypes.DATA_ACCESS_CLASSES + ".png";
+	}
+	
+	public PrivacyAssessmentForm() {
+
+		log.info("constructor");
+
+		assessmentSubjects = new ArrayList<String>();
+		assessmentSubjects.add(SubjectTypes.RECEIVER_IDS);
+		assessmentSubjects.add(SubjectTypes.SENDER_IDS);
+		assessmentSubjects.add(SubjectTypes.SENDER_CLASSES);
+		assessmentSubjects.add(SubjectTypes.DATA_ACCESS_IDS);
+		assessmentSubjects.add(SubjectTypes.DATA_ACCESS_CLASSES);
+	}
+
+	/**
+	 * @return List of all assessment subject types
+	 */
+	public List<String> getAssessmentSubjects() {
+		return assessmentSubjects;
+	}
+
+	/**
+	 * @param assessmentSubjects List of all assessment subject types
+	 */
+	public void setAssessmentSubjects(List<String> assessmentSubjects) {
+		log.debug("assessmentSubjects = {}", autoAssessment);
+		this.assessmentSubjects = assessmentSubjects;
+	}
+
+	/**
+	 * @return periodic assessment in background
 	 */
 	public boolean isAutoAssessment() {
 		return autoAssessment;
 	}
 
 	/**
-	 * @param autoReassessment the autoReassessment to set
+	 * @param autoReassessment periodic assessment in background
 	 */
 	public void setAutoAssessment(boolean autoAssessment) {
 		log.debug("autoAssessment = {}", autoAssessment);
@@ -76,14 +136,14 @@ public class PrivacyAssessmentForm implements Serializable {
 	}
 
 	/**
-	 * @return the autoReassessmentInSecs
+	 * @return Period in seconds for periodic assessment
 	 */
 	public int getAutoAssessmentInSecs() {
 		return autoAssessmentInSecs;
 	}
 
 	/**
-	 * @param autoReassessmentInSecs the autoReassessmentInSecs to set
+	 * @param autoReassessmentInSecs Period in seconds for periodic assessment
 	 */
 	public void setAutoAssessmentInSecs(int autoAssessmentInSecs) {
 		log.debug("autoAssessmentInSecs = {}", autoAssessmentInSecs);
@@ -91,44 +151,29 @@ public class PrivacyAssessmentForm implements Serializable {
 	}
 
 	/**
-	 * @return the assessmentSubjectType
+	 * @return Selected assessment subject type
 	 */
-	public String getAssessmentSubjectToBeShown() {
-		return assessmentSubjectToBeShown;
+	public String getAssessmentSubject() {
+		return assessmentSubject;
 	}
 
 	/**
-	 * @param assessmentSubjectType the assessmentSubjectType to set
+	 * @param assessmentSubject Selected assessment subject type
 	 */
-	public void setAssessmentSubjectToBeShown(String assessmentSubjectToBeShown) {
-		log.debug("assessmentSubjectToBeShown = {}", assessmentSubjectToBeShown);
-		this.assessmentSubjectToBeShown = assessmentSubjectToBeShown;
+	public void setAssessmentSubject(String assessmentSubject) {
+		log.debug("assessmentSubject = {}", assessmentSubject);
+		this.assessmentSubject = assessmentSubject;
 	}
 
 	/**
-	 * @return the assessmentSubject
-	 */
-	public String getAssessmentSubjectShown() {
-		return assessmentSubjectShown;
-	}
-
-	/**
-	 * @param assessmentSubject the assessmentSubject to set
-	 */
-	public void setAssessmentSubjectShown(String assessmentSubjectShown) {
-		log.debug("assessmentSubjectShown = {}", assessmentSubjectShown);
-		this.assessmentSubjectShown = assessmentSubjectShown;
-	}
-
-	/**
-	 * @return the chart
+	 * @return Relative path to chart image to show
 	 */
 	public String getChart() {
 		return chart;
 	}
 
 	/**
-	 * @param chart the chart to set
+	 * @param chart Relative path to chart image to show
 	 */
 	public void setChart(String chart) {
 		log.debug("chart = {}", chart);

@@ -1,6 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
                 template="templates/main_template.xhtml">
 
@@ -16,47 +17,52 @@
             <div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a></div>
             <!-- Form -->
             <section class="form_style_main">
-                <form action="" method="" id="">
+                <form action="" method="" id="form1">
                     <h4 class="form_title">Privacy Assessment</h4>
 
                     <div class="hr dotted clearfix"></div>
                     <ul>
                         <li class="clearfix">
                         	<label for="">Description</label>
-                        	<p>To assess possible transmission of your data by installed services, the platform monitors any data access or data transmission by services, and calculates privacy assessment metrics.</p>
-                        	<p>To view these metrics for each identity or software component, select the result type from the drop-down list below and click "Send" at the bottom of page.</p>
-                        	<p>Note that a high value does not necessarily indicate a malicious service, or a service that violates the service level agreement or the privacy policy. Keep in mind the correlation results are only an assessment, and many services may be accessing and/or transmitting your data in scope of their normal operation. It is up to you to decide if data access and data transmission are excessive or not.</p>
+                        	<p>To assess possible transmission of your data by installed services, the platform monitors any data access or data transmission by services, and calculates privacy assessment metrics.
+                        	To switch between various metrics, click left and right arrows below.</p>
+                        	<p><i>Note that a high value does not necessarily indicate malicious behavior, or a violation of any agreement or privacy policy. Keep in mind the correlation results are only an assessment, and many services may be accessing and/or transmitting your data in scope of their normal operation. It is up to you to decide if data access and data transmission are excessive or not.</i></p>
                         </li>
+<!--
                         <li class="clearfix">
                             <label for="">Show results for</label>
+							
+							<p:selectOneMenu value="#{privacyAssessmentForm.assessmentSubject}" var="p">
+								<f:selectItems value="#{privacyAssessmentForm.assessmentSubjects}" var="as" itemLabel="#{as}" itemValue="#{as}"/>
+								<p:column>
+									#{p}
+								</p:column>
+							</p:selectOneMenu>
 
-                            <div class="select-wrapper">
-                                <select name="select" required="required" value="#{privacyAssessmentForm.assessmentSubjectToBeShown}">
-                                    <option value="1">Receiver identities</option>
-                                    <option value="2">Sender identities</option>
-                                    <option value="3">Sender classes</option>
-                                    <option value="4">Data access by identities</option>
-                                    <option value="5">Data access by class</option>
-                                </select>
+                            <div id="button">
+                                <input type="submit" id="send_message" class="sendButton" value="Send"/>
                             </div>
-					        <p:commandButton value="Show" actionListener="#{assessmentController.updateImage}"/>
                             <div class="clear"></div>
                             <p id="option" class="error">Please, select an option</p>
                         </li>
-                        <li class="clearfix">
-<!--
-                        	<img src="http://a1.s6img.com/cdn/0008/p/1623955_9772764_lz.jpg"></img>
 -->
-                        	<img src="assessment-chart.png"></img>
+                        <li class="clearfix">
+                        	<label for="">Results</label>
+							<p:commandButton type="button" onclick="switcher.previous();" icon="ui-icon-circle-triangle-w"/>  
+							<p:commandButton type="button" onclick="switcher.next();" icon="ui-icon-circle-triangle-e"/>  
+							<p:imageSwitch effect="fade" widgetVar="switcher" slideshowAuto="false">  
+								<ui:repeat value="#{privacyAssessmentService.images}" var="image">  
+									<p:graphicImage value="#{image}" />
+								</ui:repeat>  
+							</p:imageSwitch>  
                         </li>
                         <li class="clearfix">
                             <p class="success">Thank you! Success Message here.</p>
 
                             <p class="error">Sorry, an error has occured. Please try again later.</p>
 
-                            <div id="button">
-                                <input type="submit" id="send_message" class="sendButton" value="Send"/>
-                            </div>
+					        <p:commandButton value="Regenerate images" actionListener="#{assessmentController.assessNow}"/>
+							<br/><br/>
                             <a href="privacy_assessment_settings.xhtml">Advanced Settings</a>
                         </li>
                     </ul>
