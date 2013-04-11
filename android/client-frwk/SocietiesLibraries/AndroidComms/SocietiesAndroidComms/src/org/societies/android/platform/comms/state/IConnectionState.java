@@ -37,14 +37,14 @@ public interface IConnectionState {
 
 	enum ConnectionEvent {
 		Start, CheckForConnectivity, AttemptConnection, AttemptConnectionFailure, 
-		AttemptConnectionSuccess, Disconnect, AttemptAutoReconnection, AutoReconnected, NoNetworkFound
+		AttemptConnectionSuccess, Disconnect, AttemptAutoReconnection, AutoReconnected, NoNetworkFound, ConnectionBroken
 	}
 	
 	enum ConnectionState {Disconnected, WaitForNetwork, ValidNetwork, WaitingToConnect, Connected, ReConnecting
 	}
 	
 	enum ConnectionAction {startConnection, updateStatus, startEventProcessor, verifyNetworkConnectivity, cleanupConnection, 
-		initialiseConnection, verifyAuthenticatedConnection
+		initialiseConnection, verifyAuthenticatedConnection, manualReconnection
 	}
 	//Finite State Machine state changed intent and extra information
 	public static final String XMPP_CONNECTION_CHANGED = "org.societies.android.platform.comms.state.XMPP_CONNECTION_CHANGED";

@@ -104,8 +104,9 @@ import org.societies.utilities.DBC.Dbc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
+import org.societies.api.css.ICSSManager;
 
-public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
+public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSManager {
 	private static Logger LOG = LoggerFactory.getLogger(CSSManager.class);
 
 	public static final String TEST_IDENTITY_1 = "node11";

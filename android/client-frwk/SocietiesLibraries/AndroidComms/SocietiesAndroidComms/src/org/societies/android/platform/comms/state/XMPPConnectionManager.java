@@ -61,19 +61,27 @@ import android.util.Log;
 	
 public class XMPPConnectionManager implements IConnectionState {
 	private final static String LOG_TAG = XMPPConnectionManager.class.getName();
-	private final static boolean DEBUG_LOGGING = false;
+	private final static boolean DEBUG_LOGGING = true;
 	private final static String KEY_DIVIDER = ":"; 
 	//(a)Smack does not differentiate between different types of network problems and authentication and all
 	//exceptions are returned as the generic XMPPException
 	private final static String XMPP_AUTHENICATION_EXCEPTION_ID = "SASL authentication";
 	private final static int EVENT_PROCESSOR_SLEEP_INTERVAL = 200;
 	
+	//In the event that the XMPP connection is broken the manager will use the following parameters
+	//to control its manual reconnection attempts
+	//TODO: app preferences
+	private final static int MANUAL_RECONNECTION_DELAY = 2000;
+	private final static int MANUAL_RECONNECTION_ATTEMPTS = 20;
+	private final static int MANUAL_RECONNECTION_INTERVAL = 5000;
+	
 	private Context context;
 	private ConnectionState currentState;
 	private XMPPConnection xmppConnection;
 	private Map <String, StateEventAction> fsmLookupTable;
 	private ConcurrentLinkedQueue <ConnectionEvent> eventQueue;
-	private ScheduledExecutorService queueSchedular;
+	private ScheduledExecutorService queueScheduler;
+	private ScheduledExecutorService connectionScheduler;
 
 	private XMPPConnectionProperties currentXmppConnectProps;
 	private XMPPConnectionProperties newXmppConnectProps;
@@ -84,6 +92,7 @@ public class XMPPConnectionManager implements IConnectionState {
 	private long remoteCallId;
 	private String remoteCallClient;
 	private String remoteUserJid;
+	private int reconnectionAttempts;
 	
 	public XMPPConnectionManager() {
 		this.currentState = IConnectionState.ConnectionState.Disconnected;
@@ -138,6 +147,8 @@ public class XMPPConnectionManager implements IConnectionState {
 		if (null == this.currentXmppConnectProps) {
 			this.currentXmppConnectProps = connectProps;
 		}
+		this.reconnectionAttempts = 0;
+		
 		this.startEventProcessor();
 		this.addEventToQueue(ConnectionEvent.Start);
 
@@ -149,11 +160,10 @@ public class XMPPConnectionManager implements IConnectionState {
 		if (DEBUG_LOGGING) {
 			Log.d(LOG_TAG, "disableConnection");
 		}
-		if (this.isConnected()) {
-			this.remoteCallId = remoteCallId;
-			this.remoteCallClient = client;
-			this.addEventToQueue(ConnectionEvent.Disconnect);
-		}
+		//the connection must be disabled even if the connection has been previously broken
+		this.remoteCallId = remoteCallId;
+		this.remoteCallClient = client;
+		this.addEventToQueue(ConnectionEvent.Disconnect);
 	}
 	@Override
     public XMPPConnection getValidConnection() throws NoXMPPConnectionAvailableException {
@@ -175,15 +185,15 @@ public class XMPPConnectionManager implements IConnectionState {
 			Log.d(LOG_TAG, "startEventProcessor");
 		}
 		
-		this.queueSchedular = Executors.newSingleThreadScheduledExecutor();
+		this.queueScheduler = Executors.newSingleThreadScheduledExecutor();
 		
 		final Runnable processQueue = new Runnable() {
 			
 			@Override
 			public void run() {
-				if (DEBUG_LOGGING) {
-					Log.d(LOG_TAG, "event processor running");
-				}
+//				if (DEBUG_LOGGING) {
+//					Log.d(LOG_TAG, "event processor running");
+//				}
 				
 				while (null != XMPPConnectionManager.this.eventQueue.peek()) {
 					ConnectionEvent pendingEvent = XMPPConnectionManager.this.eventQueue.poll();
@@ -191,18 +201,18 @@ public class XMPPConnectionManager implements IConnectionState {
 				}
 			}
 		};
-		final ScheduledFuture processQueueTimer = queueSchedular.scheduleAtFixedRate(processQueue, 0, EVENT_PROCESSOR_SLEEP_INTERVAL, TimeUnit.MILLISECONDS);
+		final ScheduledFuture processQueueTimer = queueScheduler.scheduleAtFixedRate(processQueue, 0, EVENT_PROCESSOR_SLEEP_INTERVAL, TimeUnit.MILLISECONDS);
 	}
 	
 	/**
 	 * End a connection
 	 */
-	public void endConnection() {
-		if (DEBUG_LOGGING) {
-			Log.d(LOG_TAG, "endConnection");
-		}
-		this.addEventToQueue(ConnectionEvent.Disconnect);
-	}
+//	public void endConnection() {
+//		if (DEBUG_LOGGING) {
+//			Log.d(LOG_TAG, "endConnection");
+//		}
+//		this.addEventToQueue(ConnectionEvent.Disconnect);
+//	}
 	
 	/**
 	 * Update the status of the FSM and send intent to interested receivers
@@ -218,7 +228,7 @@ public class XMPPConnectionManager implements IConnectionState {
 		this.sendStateChangedIntent(formerState, newState);
 	}
 	/**
-	 * Send an intent of the current state
+	 * Send an intent of the current state. Intents are not sent when attempting a re-connection.
 	 * @param formerState
 	 * @param currentState
 	 */
@@ -226,30 +236,35 @@ public class XMPPConnectionManager implements IConnectionState {
 		if (DEBUG_LOGGING) {
 			Log.d(LOG_TAG, "send State Changed intent");
 		}
-		Intent intent = new Intent(IConnectionState.XMPP_CONNECTION_CHANGED);
-		intent.putExtra(IConnectionState.INTENT_FORMER_CONNECTION_STATE, formerState.ordinal());
-		intent.putExtra(IConnectionState.INTENT_CURRENT_CONNECTION_STATE, currentState.ordinal());
-		intent.putExtra(IConnectionState.INTENT_CONNECTED, currentState.equals(ConnectionState.Connected));
-		intent.putExtra(IConnectionState.INTENT_REMOTE_CALL_ID, this.remoteCallId);
-		intent.putExtra(IConnectionState.INTENT_REMOTE_CALL_CLIENT, this.remoteCallClient);
-		intent.putExtra(IConnectionState.INTENT_REMOTE_USER_JID, this.remoteUserJid);
-		this.context.sendBroadcast(intent);
+		if (0 == this.reconnectionAttempts) {
+			Intent intent = new Intent(IConnectionState.XMPP_CONNECTION_CHANGED);
+			intent.putExtra(IConnectionState.INTENT_FORMER_CONNECTION_STATE, formerState.ordinal());
+			intent.putExtra(IConnectionState.INTENT_CURRENT_CONNECTION_STATE, currentState.ordinal());
+			intent.putExtra(IConnectionState.INTENT_CONNECTED, currentState.equals(ConnectionState.Connected));
+			intent.putExtra(IConnectionState.INTENT_REMOTE_CALL_ID, this.remoteCallId);
+			intent.putExtra(IConnectionState.INTENT_REMOTE_CALL_CLIENT, this.remoteCallClient);
+			intent.putExtra(IConnectionState.INTENT_REMOTE_USER_JID, this.remoteUserJid);
+			this.context.sendBroadcast(intent);
+		}
 	}
 	/**
-	 * Send an intent of the current state
+	 * Send an intent of the current state. Intents are not sent when attempting a re-connection.
 	 * @param formerState
 	 * @param currentState
+	 * 
 	 */
 	private void sendLoginFailureIntent(String type, String failureMessage) {
 		if (DEBUG_LOGGING) {
 			Log.d(LOG_TAG, "send login failure intent, reason: " + failureMessage + " type: " + type);
 		}
-		Intent intent = new Intent(type);
-		intent.putExtra(IConnectionState.INTENT_FAILURE_DESCRIPTION, failureMessage);
-		intent.putExtra(IConnectionState.INTENT_REMOTE_CALL_ID, this.remoteCallId);
-		intent.putExtra(IConnectionState.INTENT_REMOTE_CALL_CLIENT, this.remoteCallClient);
-		intent.putExtra(IConnectionState.INTENT_REMOTE_USER_JID, this.remoteUserJid);
-		this.context.sendBroadcast(intent);
+		if (0 == this.reconnectionAttempts) {
+			Intent intent = new Intent(type);
+			intent.putExtra(IConnectionState.INTENT_FAILURE_DESCRIPTION, failureMessage);
+			intent.putExtra(IConnectionState.INTENT_REMOTE_CALL_ID, this.remoteCallId);
+			intent.putExtra(IConnectionState.INTENT_REMOTE_CALL_CLIENT, this.remoteCallClient);
+			intent.putExtra(IConnectionState.INTENT_REMOTE_USER_JID, this.remoteUserJid);
+			this.context.sendBroadcast(intent);
+		}
 	}
 	/**
 	 * Create an {@link XMPPConnection} listener to monitor the connection status 
@@ -291,8 +306,7 @@ public class XMPPConnectionManager implements IConnectionState {
 				if (DEBUG_LOGGING) {
 					Log.d(LOG_TAG, "XMPP connection closed with error: " + e.getMessage());
 				}
-				//TODO: may have to examine error and determine if the ReConnectionmanager will kick in
-				XMPPConnectionManager.this.addEventToQueue(ConnectionEvent.Disconnect);
+				XMPPConnectionManager.this.addEventToQueue(ConnectionEvent.ConnectionBroken);
 			}
 			
 			@Override
@@ -300,7 +314,7 @@ public class XMPPConnectionManager implements IConnectionState {
 				if (DEBUG_LOGGING) {
 					Log.d(LOG_TAG, "XMPP connection closed");
 				}
-				XMPPConnectionManager.this.addEventToQueue(ConnectionEvent.Disconnect);
+//				XMPPConnectionManager.this.addEventToQueue(ConnectionEvent.Disconnect);
 			}
 		};
 		this.xmppConnection.addConnectionListener(connListener);
@@ -341,14 +355,17 @@ public class XMPPConnectionManager implements IConnectionState {
 		this.fsmLookupTable.put(generateKey(ConnectionState.Connected, ConnectionEvent.Disconnect),
 				new StateEventAction(ConnectionAction.cleanupConnection, ConnectionState.Disconnected));
 		
+		this.fsmLookupTable.put(generateKey(ConnectionState.Connected, ConnectionEvent.ConnectionBroken),
+				new StateEventAction(ConnectionAction.manualReconnection, ConnectionState.Disconnected));
+		
 		this.fsmLookupTable.put(generateKey(ConnectionState.Connected, ConnectionEvent.AttemptAutoReconnection),
 				new StateEventAction(ConnectionAction.updateStatus, ConnectionState.ReConnecting));
 		
 		this.fsmLookupTable.put(generateKey(ConnectionState.ReConnecting, ConnectionEvent.AutoReconnected),
 				new StateEventAction(ConnectionAction.updateStatus, ConnectionState.Connected));
 		
-//			this.fsmLookupTable.put(this.generateKey(ConnectionState.???, ConnectionEvent.xxx),
-//					new StateEventAction(ConnectionAction.zzz, ConnectionState.fff));
+//		this.fsmLookupTable.put(this.generateKey(ConnectionState.???, ConnectionEvent.xxx),
+//		new StateEventAction(ConnectionAction.zzz, ConnectionState.fff));
 		
 		//Log the lookup table
 //		StateEventAction eventAction = null;
@@ -450,6 +467,8 @@ public class XMPPConnectionManager implements IConnectionState {
 			this.setupBroadcastReceiver();
 			this.createConnectionListener();
 			this.updateStatus(futureState);
+			this.stopReconnectionTask();
+
 		} else {
 			this.addEventToQueue(ConnectionEvent.AttemptConnectionFailure);
 			this.sendLoginFailureIntent(IConnectionState.XMPP_AUTHENTICATION_FAILURE, AUTHENTICATION_FAILURE_MESSAGE);
@@ -511,13 +530,39 @@ public class XMPPConnectionManager implements IConnectionState {
 	public void cleanupConnection(ConnectionState futureState) {
 		if (DEBUG_LOGGING) {
 			Log.d(LOG_TAG, "cleanupConnection: " + futureState.name());
+			Log.d(LOG_TAG, "Reconnection attempts: " + this.reconnectionAttempts);
 		}
 		this.stopExecutorTask();
 		this.teardownBroadcastReceiver();
 		teardownConnection();
-		this.updateStatus(futureState);
+		
+		if (this.reconnectionAttempts > 0) {
+			if (this.reconnectionAttempts < MANUAL_RECONNECTION_ATTEMPTS) {
+				this.reconnectionAttempts++;
+				this.updateStatus(futureState);
+			} else {
+				this.updateStatus(futureState);
+				this.stopReconnectionTask();
+			}
+		} else {
+			this.updateStatus(futureState);
+		}
 	}
 	
+	public void manualReconnection(ConnectionState futureState) {
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "manualReconnection: " + futureState.name());
+		}
+		//initialise reconnection counter
+		this.reconnectionAttempts = 1;
+		
+		//clean up the connection
+		this.cleanupConnection(futureState);
+
+		//create a reconnection scheduler
+		this.reconnectionScheduler();
+		
+	}
 	/**
 	 * Stop the event queue consumer executor thread
 	 */
@@ -525,7 +570,23 @@ public class XMPPConnectionManager implements IConnectionState {
 		if (DEBUG_LOGGING) {
 			Log.d(LOG_TAG, "stopExecutorTask");
 		}
-		queueSchedular.shutdown();
+		if (this.queueScheduler != null) {
+			queueScheduler.shutdown();
+			this.queueScheduler = null;
+		}
+	}
+	/**
+	 * Stop the reconnection scheduler executor thread
+	 */
+	private void stopReconnectionTask() {
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "stopReconnectionTask");
+		}
+		if (this.connectionScheduler != null) {
+			this.reconnectionAttempts = 0;
+			this.connectionScheduler.shutdown();
+			this.connectionScheduler = null;	
+		}
 	}
 	/**
 	 * Verify that a network exists and is connected. Declared as public to allow reflection.
@@ -569,6 +630,10 @@ public class XMPPConnectionManager implements IConnectionState {
 		ConnectionConfiguration config = new ConnectionConfiguration(connectProps.getValidHost(),
 											 						 connectProps.getServicePort(),
 											 						 connectProps.getServiceName());
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "Reconnection enabled : " + config.isReconnectionAllowed());
+		};
+		
 		connection = new XMPPConnection(config);
 		
 		if(connectProps.isDebug()) {
@@ -680,6 +745,33 @@ public class XMPPConnectionManager implements IConnectionState {
 			       Log.d(LOG_TAG, "Tear down connectivity changes broadcast receiver");
 			};
 	    	this.context.unregisterReceiver(this.bReceiver);
+	    	this.bReceiver = null;
 		}
     }
+    
+	/**
+	 * Manual re-connection manager
+	 * This method creates a scheduler that will wake up periodically and kickstart the FSM
+	 * to attempt a connection.
+	 */
+	private void reconnectionScheduler() {
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "reconnectionScheduler");
+		}
+		this.connectionScheduler = Executors.newSingleThreadScheduledExecutor();
+		
+		final Runnable processQueue = new Runnable() {
+			
+			@Override
+			public void run() {
+				if (DEBUG_LOGGING) {
+					Log.d(LOG_TAG, "re-connection attempt being started, attempt: " + XMPPConnectionManager.this.reconnectionAttempts);
+				}
+				XMPPConnectionManager.this.startEventProcessor();
+				XMPPConnectionManager.this.addEventToQueue(ConnectionEvent.Start);
+			}
+		};
+		final ScheduledFuture processQueueTimer = connectionScheduler.scheduleAtFixedRate(processQueue, MANUAL_RECONNECTION_DELAY, MANUAL_RECONNECTION_INTERVAL, TimeUnit.MILLISECONDS);
+	}
+
 }
