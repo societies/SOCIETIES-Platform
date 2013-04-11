@@ -48,6 +48,11 @@ public class AcknackPopup extends ExplicitPopup {
     @Override
     protected void populateOptions() {
         LinearLayout layout = (LinearLayout) findViewById(R.id.ackNackInnerLinearLayout);
+
+        // clear design time sample components
+        layout.removeAllViews();
+
+
         for (String option : getUserFeedbackBean().getOptions()) {
             Button button = new Button(this);
             button.setText(option);
