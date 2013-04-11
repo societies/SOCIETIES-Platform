@@ -339,13 +339,11 @@ var	SocietiesCISListService = {
 		}
 		
 		//SEND REQUEST
-		if (window.confirm("Send friend request to " + name + "?")) {
-		//jConfirm("Send friend request to " + name + "?", 'Friend Request', function(answer) {
-		     //if (answer){
+		if (myIdentity != css_id) {
+			if (window.confirm("Send friend request to " + name + "?")) {
 		    	 window.plugins.SocietiesLocalCSSManager.sendFriendRequest(css_id, success, failure);
-		     //}
+			}
 		}
-		//);
 	},
 	
 	/**

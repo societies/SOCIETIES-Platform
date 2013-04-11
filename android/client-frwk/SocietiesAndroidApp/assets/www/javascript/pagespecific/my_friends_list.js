@@ -204,12 +204,14 @@ var CSSFriendsServices = {
 
 		//DISPLAY SUGGESTIONS
 		for (i  = 0; i < data.length; i++) {
-			var tableEntry = '<li id="li' + i + '"><a href="#" onclick="CSSFriendsServices.sendFriendRequest(\'' + data[i].name + '\', \'' + data[i].id + '\', ' + i + ')">' +
-				'<img src="images/profile_pic.png" />' +	
-				'<h2>' + data[i].name + '</h2>' + 
-				'<p>' + data[i].id + '</p>' +
-				'</a></li>';
-			$('ul#SuggestedFriendsListUL').append(tableEntry);
+			if (myIdentity != data[i].id) {
+				var tableEntry = '<li id="li' + i + '"><a href="#" onclick="CSSFriendsServices.sendFriendRequest(\'' + data[i].name + '\', \'' + data[i].id + '\', ' + i + ')">' +
+					'<img src="images/profile_pic.png" />' +	
+					'<h2>' + data[i].name + '</h2>' + 
+					'<p>' + data[i].id + '</p>' +
+					'</a></li>';
+				$('ul#SuggestedFriendsListUL').append(tableEntry);
+			}
 		}
 		$('ul#SuggestedFriendsListUL').listview('refresh');
 	},
@@ -224,14 +226,12 @@ var CSSFriendsServices = {
 		}
 		
 		//SEND REQUEST
-		if (window.confirm("Send friend request to " + name + "?")) {
-		//jConfirm("Send friend request to " + name + "?", 'Friend Request', function(answer) {
-			//if (answer) {
-		    	 $('#li' + id).append("Sending Request...");
-		    	 window.plugins.SocietiesLocalCSSManager.sendFriendRequest(css_id, success, failure);
-			//}
+		if (myIdentity != css_id) {
+			if (window.confirm("Send friend request to " + name + "?")) {
+			    	 $('#li' + id).append("Sending Request...");
+			    	 window.plugins.SocietiesLocalCSSManager.sendFriendRequest(css_id, success, failure);
+			}
 		}
-		//);
 	},
 	
 	acceptFriendRequest: function(name, css_id, id) {
