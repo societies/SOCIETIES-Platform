@@ -50,7 +50,7 @@
                         	<label for="">Results</label>
 							<p:commandButton type="button" onclick="switcher.previous();" icon="ui-icon-circle-triangle-w"/>  
 							<p:commandButton type="button" onclick="switcher.next();" icon="ui-icon-circle-triangle-e"/>  
-							<p:imageSwitch effect="turnLeft" widgetVar="switcher" slideshowAuto="false">  
+							<p:imageSwitch effect="fade" widgetVar="switcher" slideshowAuto="false">  
 								<ui:repeat value="#{privacyAssessmentService.images}" var="image">  
 									<p:graphicImage value="#{image}" />
 								</ui:repeat>  
