@@ -40,6 +40,21 @@ var	SocietiesCISListService = {
 	mLastDate: "",
 	
 	/**
+	 * Replaces the image for the profile pic
+	 * @param VCard
+	 * @returns
+	 */
+	showAvatar: function (VCard) {
+		if (VCard.from != null) {
+			var n=VCard.from.indexOf("@");
+			var identityStr = VCard.from.substring(0, n);
+			var imageStr = VCard.avatar;
+			if (imageStr != null)
+				$('img#' + identityStr).attr("src", "data:image/jpg;base64," + VCard.avatar);
+		}
+	},
+	
+	/**
 	 * @methodOf SocietiesCISListService#
 	 * @description update the CIS data on communities_list.html 
 	 * @param {Object} successCallback The callback which will be called when result is successful
@@ -150,6 +165,7 @@ var	SocietiesCISListService = {
 						objectStr = "community";
 					//var tableEntry = "<li id=\"li" + data[i].published + "\"><a href=\"#\" onclick=\"return false;\"><p>" + hours + ":" + minutes + " " + suffix + "</p>" +
 					var tableEntry = "<li id=\"li" + data[i].published + "\"><a href=\"#\" onclick=\"return false;\">" +
+									 "<img src='images/profile_pic.png' id='" + actorStr + "' style='max-width:40px;' />" +
 									 "<h2>"+ actorStr + "</h2>" +
 						 	 		 "<p>" + data[i].verb  + " " + objectStr + "</p>" + //data[i].object
 						 	 		 "<p class=\"ui-li-aside\">" + hours + ":" + minutes + " " + suffix + "</p>" + 
@@ -265,17 +281,7 @@ var	SocietiesCISListService = {
 		window.plugins.SocietiesLocalCISManager.addActivity(mCis_id, activity, success, failure);
 	},
 	
-	showCISMembers: function (cisId, bAdmin) {		
-		function showAvatar(VCard) {
-			if (VCard.from != null) {
-				var n=VCard.from.indexOf("@");
-				var identityStr = VCard.from.substring(0, n);
-				var imageStr = VCard.avatar;
-				if (imageStr != null)
-					$('img#' + identityStr).attr("src", "data:image/jpg;base64," + VCard.avatar);
-			}
-		}
-		
+	showCISMembers: function (cisId, bAdmin) {
 		function showAvatarfailure(data) {
 			console.log("Error retrieving avatar: " + data);
 		}
@@ -311,7 +317,7 @@ var	SocietiesCISListService = {
 								 adminString + 
 								 '<p>' + data[i].jid  + '</p>' + friendRequestATagClose + removeMember + '</li>';
 				$('ul#cis_members').append(tableEntry);
-				window.plugins.SocietiesLocalCSSManager.getVCardUser(data[i].jid, showAvatar, showAvatarfailure);
+				window.plugins.SocietiesLocalCSSManager.getVCardUser(data[i].jid, SocietiesCISListService.showAvatar, showAvatarfailure);
 			}
 			$('ul#cis_members').listview('refresh');
 			$('ul#cis_members').trigger( "collapse" );

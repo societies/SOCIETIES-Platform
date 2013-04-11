@@ -255,13 +255,13 @@ var CSSFriendsServices = {
 				'<h2>' + data[i].key.name + '</h2>' + 
 				'<p>' + data[i].key.id + '</p>' +
 				'</a></li>';
-			rankings[i] = {"rank": rank, "htmlStr": tableEntry};
+			rankings[i] = {"rank": rank, "htmlStr": tableEntry, "id": data[i].key.id};
 		}
 		//SORT BASED ON RANK AND PRINT TABLE
 		rankings.sort(function(a,b) { return parseInt(b.rank) - parseInt(a.rank) } );
 		for (i=0; i <rankings.length; i++) {
 			$('ul#SuggestedFriendsListUL').append(rankings[i].htmlStr);
-			window.plugins.SocietiesLocalCSSManager.getVCardUser(data[i].key.id, showAvatar, failure);
+			window.plugins.SocietiesLocalCSSManager.getVCardUser(rankings[i].id, showAvatar, failure);
 		}
 		
 		$('ul#SuggestedFriendsListUL').listview('refresh');
