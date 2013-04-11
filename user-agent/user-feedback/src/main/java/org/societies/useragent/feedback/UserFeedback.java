@@ -32,6 +32,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
@@ -457,24 +458,26 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 		}
 	}
 
-	@Override
-	public void submitExplicitResponse(String requestId, NegotiationDetailsBean negotiationDetails, ResponsePolicy result) {
-		//create user feedback response bean
-		UserFeedbackPrivacyNegotiationEvent resultBean = new UserFeedbackPrivacyNegotiationEvent();
-		resultBean.setRequestId(requestId);
-		resultBean.setNegotiationDetails(negotiationDetails);
-		resultBean.setResponsePolicy(result);
-
-		//fire response pubsub event to all user agents
-		try {
-			LOG.info("####### Publish "+EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE+": "+ResponseItemUtils.toXmlString(result.getResponseItems()));
-			pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, null, resultBean);
-		} catch (XMPPError e1) {
-			e1.printStackTrace();
-		} catch (CommunicationException e1) {
-			e1.printStackTrace();
-		}
-	}
+//	@Override
+//	public void submitExplicitResponse(String requestId, NegotiationDetailsBean negotiationDetails, ResponsePolicy result) {
+//		//create user feedback response bean
+//		UserFeedbackPrivacyNegotiationEvent resultBean = new UserFeedbackPrivacyNegotiationEvent();
+//		resultBean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+//		resultBean.setType(ExpProposalType.PRIVACY_NEGOTIATION);
+//		resultBean.setRequestId(requestId);
+//		resultBean.setNegotiationDetails(negotiationDetails);
+//		resultBean.setResponsePolicy(result);
+//
+//		//fire response pubsub event to all user agents
+//		try {
+//			LOG.info("####### Publish "+EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE+": "+ResponseItemUtils.toXmlString(result.getResponseItems()));
+//			pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, ""+(new Random().nextInt()), resultBean);
+//		} catch (XMPPError e1) {
+//			e1.printStackTrace();
+//		} catch (CommunicationException e1) {
+//			e1.printStackTrace();
+//		}
+//	}
 
 	@Override
 	public void submitImplicitResponse(String requestID, Boolean result) {

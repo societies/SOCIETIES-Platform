@@ -36,15 +36,16 @@
 	</bean>
 	
     <bean
-        id="TestCase1264"
-        class="org.societies.integration.test.bit.privacynegotiationmanagement.TestCase1264"
-        depends-on="commManager, PrivacyPolicyManager, PrivacyAgreementManager, PrivacyPolicyNegotiationManager, ctxBroker"
+        id="TestCase"
+        class="org.societies.integration.test.bit.privacynegotiationmanagement.TestCase"
+        depends-on="commManager, PrivacyPolicyManager, PrivacyAgreementManager, PrivacyPolicyNegotiationManager, ctxBroker, eventManager"
         init-method="run">
         <property name="commManager" ref="commManager" />
         <property name="privacyPolicyManager" ref="PrivacyPolicyManager" />
         <property name="privacyAgreementManager" ref="PrivacyAgreementManager" />
         <property name="privacyPolicyNegotiationManager" ref="PrivacyPolicyNegotiationManager" />
         <property name="ctxBroker" ref="ctxBroker"></property>
+        <property name="eventManager" ref="eventManager"></property>
     </bean>
 
 </beans>

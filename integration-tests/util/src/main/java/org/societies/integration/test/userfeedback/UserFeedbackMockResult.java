@@ -42,6 +42,16 @@ public class UserFeedbackMockResult {
 
 	/**
 	 * Instantiate a user feedback result that will be used infinitely
+	 * Result must be defined
+	 */
+	public UserFeedbackMockResult() {
+		super();
+		this.nbOfUsage = InfinitelyUsable;
+		this.result = new ArrayList<Object>();
+		this.resultIndexes = new ArrayList<Integer>();
+	}
+	/**
+	 * Instantiate a user feedback result that will be used infinitely
 	 * @param result Result values
 	 */
 	public UserFeedbackMockResult(String... result) {
@@ -63,7 +73,7 @@ public class UserFeedbackMockResult {
 	}
 	/**
 	 * Instantiate a user feedback result that will be used infinitely
-	 * @param result Result values
+	 * @param result ResponsePolicy result value
 	 */
 	public UserFeedbackMockResult(ResponsePolicy result) {
 		this(InfinitelyUsable, result);
@@ -71,7 +81,7 @@ public class UserFeedbackMockResult {
 	/**
 	 * Instantiate a user feedback result that will be used nbOfUsage time
 	 * @param nbOfUsage Nb of time to use theses values as a user feedback result
-	 * @param result Result values
+	 * @param result ResponsePolicy result value
 	 */
 	public UserFeedbackMockResult(int nbOfUsage, ResponsePolicy result) {
 		super();
@@ -79,20 +89,6 @@ public class UserFeedbackMockResult {
 		this.resultIndexes = new ArrayList<Integer>();
 		this.result = new ArrayList<Object>();
 		this.result.add(result);
-	}
-	/**
-	 * Instantiate a user feedback result that will be used nbOfUsage time
-	 * @param nbOfUsage Nb of time to use theses values as a user feedback result
-	 * @param result Result index values
-	 */
-	public UserFeedbackMockResult(Integer... resultIndexes) {
-		super();
-		this.nbOfUsage = InfinitelyUsable;
-		this.result = new ArrayList<Object>();
-		this.resultIndexes = new ArrayList<Integer>();
-		for(Integer resultIndex : resultIndexes) {
-			this.resultIndexes.add(resultIndex);
-		}
 	}
 
 
@@ -136,7 +132,7 @@ public class UserFeedbackMockResult {
 	 * @return privacy agreement value to use as user feedback result
 	 */
 	public ResponsePolicy getPrivacyAgreementResult() {
-		if (null == this.result && result.size() < 1 || !(result.get(0) instanceof ResponsePolicy)) {
+		if (null == this.result || result.size() < 1 || !(result.get(0) instanceof ResponsePolicy)) {
 			return null;
 		}
 		return (ResponsePolicy) result.get(0);
@@ -146,9 +142,7 @@ public class UserFeedbackMockResult {
 	 * @param result list of values to use as user feedback result
 	 */
 	public void setResult(List<Object> result) {
-		if (null == this.result) {
-			this.result = new ArrayList<Object>();
-		}
+		resultIndexes.clear();
 		this.result = result;
 	}
 	/**
@@ -156,20 +150,21 @@ public class UserFeedbackMockResult {
 	 * @param value value to add
 	 */
 	public void addResult(ResponsePolicy value) {
-		if (null == this.result) {
-			this.result = new ArrayList<Object>();
-		}
+		resultIndexes.clear();
 		this.result.add(value);
 	}
 	/**
 	 * Add a value to the list of values to use as user feedback result 
 	 * @param value value to add
 	 */
-	public void addResult(String value) {
-		if (null == this.result) {
-			this.result = new ArrayList<Object>();
+	public void addResult(String... values) {
+		resultIndexes.clear();
+		if (null == values) {
+			return;
 		}
-		this.result.add(value);
+		for(String value : values) {
+			this.result.add(value);
+		}
 	}
 	/**
 	 * Retrieve the list of indexes of the proposed user feedback options. They will be used to retrieved values to use as user feedback result
@@ -183,19 +178,27 @@ public class UserFeedbackMockResult {
 	 * @return list of indexes of the proposed user feedback options
 	 */
 	public void setResultIndexes(List<Integer> resultIndexes) {
-		if (null == this.resultIndexes) {
-			this.resultIndexes = new ArrayList<Integer>();
-		}
+		result.clear();
 		this.resultIndexes = resultIndexes;
 	}
 	/**
 	 * Add a value to the list of indexes of the proposed user feedback options. They will be used to retrieved values to use as user feedback result
 	 * @param value value to add
 	 */
-	public void addResultIndexes(Integer value) {
+	public void addResultIndexes(Integer... values) {
+		result.clear();
 		if (null == this.resultIndexes) {
 			this.resultIndexes = new ArrayList<Integer>();
 		}
-		this.resultIndexes.add(value);
+		if (null == values) {
+			return;
+		}
+		for(Integer value : values) {
+			this.resultIndexes.add(value);
+		}
+	}
+	
+	public boolean isResult() {
+		return null != null && result.size() >= 0;
 	}
 }

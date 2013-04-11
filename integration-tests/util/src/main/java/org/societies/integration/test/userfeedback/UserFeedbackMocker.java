@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,10 +38,14 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
@@ -74,41 +79,40 @@ public class UserFeedbackMocker implements Subscriber {
 
 	public void onCreate() {
 		if (!isDepencyInjectionDone()) {
-			LOG.error("[Dependency Injection] UserFeedbackMocker is not ready. Missing dependencies.");
+			LOG.error("[UserFeedbackMocker][Dependency Injection] Not ready. Missing dependencies.");
 			return;
 		}
-		LOG.info("### init method");
-		// -- Rettrieve cloud node JID
+		// -- Retrieve cloud node JID
 		cloodNodeJid = commManager.getIdManager().getThisNetworkNode();
-		LOG.debug("### Got my cloud ID: "+cloodNodeJid);
 
 		// -- Register for events from created pubsub node
-		LOG.debug("### Registering for user feedback pubsub node");
+		LOG.debug("[UserFeedbackMocker] Registering for userfeedback pubsub node");
 		try {
 			pubsub.subscriberSubscribe(cloodNodeJid, "org/societies/useragent/feedback/event/REQUEST", this);
 			pubsub.subscriberSubscribe(cloodNodeJid, EventTypes.UF_PRIVACY_NEGOTIATION, this);
 			pubsub.subscriberSubscribe(cloodNodeJid, EventTypes.UF_PRIVACY_ACCESS_CONTROL, this);
-			//pubsub.subscriberSubscribe(myCloudID, "org/societies/useragent/feedback/event/EXPLICIT_RESPONSE", this);
-			//pubsub.subscriberSubscribe(myCloudID, "org/societies/useragent/feedback/event/IMPLICIT_RESPONSE", this);
-		} catch (XMPPError e) {
-			LOG.error("Can't subscribe to the userfeedback event due to XMPPError", e);
-		} catch (CommunicationException e) {
-			LOG.error("Can't subscribe to the userfeedback event due to communication exception", e);
 		}
-		LOG.debug("### Pubsub registration complete!");
+		catch (XMPPError e) {
+			LOG.error("[UserFeedbackMocker] Can't subscribe to the userfeedback event due to XMPPError", e);
+		}
+		catch (CommunicationException e) {
+			LOG.error("[UserFeedbackMocker] Can't subscribe to the userfeedback event due to communication exception", e);
+		}
 	}
 
 	public void onDestroy() {
 		// -- Unregister to events
-		LOG.debug("### Unregistering for user feedback pubsub node");
+		LOG.debug("[UserFeedbackMocker] Unregistering for userfeedback pubsub node");
 		try {
 			pubsub.subscriberUnsubscribe(cloodNodeJid, "org/societies/useragent/feedback/event/REQUEST", this);
 			pubsub.subscriberUnsubscribe(cloodNodeJid, EventTypes.UF_PRIVACY_NEGOTIATION, this);
 			pubsub.subscriberUnsubscribe(cloodNodeJid, EventTypes.UF_PRIVACY_ACCESS_CONTROL, this);
-		} catch (XMPPError e) {
-			LOG.error("Can't unsubscribe to the userfeedback event due to XMPPError", e);
-		} catch (CommunicationException e) {
-			LOG.error("Can't unsubscribe to the userfeedback event due to communication exception", e);
+		}
+		catch (XMPPError e) {
+			LOG.error("[UserFeedbackMocker] Can't unsubscribe to the userfeedback event due to XMPPError", e);
+		}
+		catch (CommunicationException e) {
+			LOG.error("[UserFeedbackMocker] Can't unsubscribe to the userfeedback event due to communication exception", e);
 		}
 	}
 
@@ -123,7 +127,7 @@ public class UserFeedbackMocker implements Subscriber {
 		if(!eventTopic.equalsIgnoreCase("org/societies/useragent/feedback/event/REQUEST")
 				&& !eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_NEGOTIATION)
 				&& !eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_ACCESS_CONTROL)) {
-			LOG.error("Hum, bad event receive: "+eventTopic);
+			LOG.error("[UserFeedbackMocker] Hum, bad event receive: "+eventTopic);
 			return;
 		}
 
@@ -153,20 +157,21 @@ public class UserFeedbackMocker implements Subscriber {
 			type = ufAccessControlBean.getType();
 		}
 		UserFeedbackType feedbackType = UserFeedbackType.fromValue(method+":"+type);
-		LOG.debug("Received pubsub event with topic: "+eventTopic+" - "+feedbackType);
+		LOG.debug("[UserFeedbackMocker] Received pubsub event: "+eventTopic+" - "+feedbackType);
 		if (eventTopic.equalsIgnoreCase("org/societies/useragent/feedback/event/REQUEST")) {
 			for (String string : ufBean.getOptions()) {
-				LOG.debug("option: " + string);
+				LOG.debug("[UserFeedbackMocker] option: " + string);
 			}
 		}
 
 		// -- Find in configuration
 		boolean userfeedbackReplied = false;
 		if (mockResults.containsKey(feedbackType)) {
-			LOG.debug("Configuration found for this explicit request: "+ feedbackType);
+			LOG.debug("[UserFeedbackMocker] Configuration found for this explicit request: "+ feedbackType);
 			UserFeedbackMockResult mockResult = mockResults.get(feedbackType);
 			// - Send result
-			if (null != mockResult.getResult() || mockResult.getResult().size() >= 0) {
+			if (mockResult.isResult()) {
+				LOG.debug("[UserfeedbackMocker] Ok, this is a result");
 				userfeedbackReplied = true;
 				// Send as output the specified data list
 				if (eventTopic.equalsIgnoreCase("org/societies/useragent/feedback/event/REQUEST")) {
@@ -174,11 +179,17 @@ public class UserFeedbackMocker implements Subscriber {
 				}
 				// Send as output the specified ResponsePolicy
 				else if (eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_NEGOTIATION)) {
-					userFeedback.submitExplicitResponse(requestId, ufNegotiationBean.getNegotiationDetails(), mockResult.getPrivacyAgreementResult());
+					LOG.info("[UserfeedbackMocker] submitExplicitResponse");
+					submitPN(requestId, ufNegotiationBean.getNegotiationDetails(), mockResult.getPrivacyAgreementResult());
+//										userFeedback.submitExplicitResponse(requestId, ufNegotiationBean.getNegotiationDetails(), mockResult.getPrivacyAgreementResult());
+				}
+				else {
+					userfeedbackReplied = false;
 				}
 			}
 			// - Send result using option indexes
-			else if (null != mockResult.getResult() || mockResult.getResult().size() >= 0) {
+			else {
+				LOG.debug("[UserfeedbackMocker] Ok, this is an index result");
 				userfeedbackReplied = true;
 				// Send as output the input at the specified index
 				if (eventTopic.equalsIgnoreCase("org/societies/useragent/feedback/event/REQUEST")) {
@@ -201,7 +212,12 @@ public class UserFeedbackMocker implements Subscriber {
 						}
 					}
 					responsePolicy.setResponseItems(responseItems);
-					userFeedback.submitExplicitResponse(requestId, ufNegotiationBean.getNegotiationDetails(), responsePolicy);
+					LOG.info("[UserfeedbackMocker] submitExplicitResponse");
+					submitPN(requestId, ufNegotiationBean.getNegotiationDetails(), responsePolicy);
+//										userFeedback.submitExplicitResponse(requestId, ufNegotiationBean.getNegotiationDetails(), responsePolicy);
+				}
+				else {
+					userfeedbackReplied = false;
 				}
 			}
 
@@ -214,27 +230,54 @@ public class UserFeedbackMocker implements Subscriber {
 
 		// -- Default behaviour
 		if (!userfeedbackReplied) {
-			LOG.debug("Use default configuration for this request: "+ feedbackType);
-			if (FeedbackMethodType.GET_EXPLICIT_FB.equals(method)) {
+			LOG.debug("[UserFeedbackMocker] Use default configuration for this request: "+ feedbackType);
+			if (FeedbackMethodType.GET_EXPLICIT_FB.value().equals(method)) {
 				// Send as output the first input string
 				if (eventTopic.equalsIgnoreCase("org/societies/useragent/feedback/event/REQUEST")) {
-					LOG.debug("Send as output the first input string");
 					List<String> result = new ArrayList<String>();
 					result.add(ufBean.getOptions().size() > 0 ? ufBean.getOptions().get(0) : "Ouch!");
 					userFeedback.submitExplicitResponse(ufBean.getRequestId(), result);
 				}
 				// Send as output the input ResponsePolicy
 				else if (eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_NEGOTIATION)) {
-					LOG.debug("Send as output the input ResponsePolicy");
-					userFeedback.submitExplicitResponse(ufNegotiationBean.getRequestId(), ufNegotiationBean.getNegotiationDetails(), ufNegotiationBean.getResponsePolicy());
+					LOG.debug("[UserfeedbackMocker] submitExplicitResponse");
+					submitPN(requestId, ufNegotiationBean.getNegotiationDetails(), ufNegotiationBean.getResponsePolicy());
+//										userFeedback.submitExplicitResponse(ufNegotiationBean.getRequestId(), ufNegotiationBean.getNegotiationDetails(), ufNegotiationBean.getResponsePolicy());
 				}
 			}
-			else if (FeedbackMethodType.GET_IMPLICIT_FB.equals(method)) {
+			else if (FeedbackMethodType.GET_IMPLICIT_FB.value().equals(method)) {
 				userFeedback.submitImplicitResponse(ufBean.getRequestId(), true);
 			}
-			else if (FeedbackMethodType.SHOW_NOTIFICATION.equals(method)) {
+			else if (FeedbackMethodType.SHOW_NOTIFICATION.value().equals(method)) {
 				userFeedback.submitImplicitResponse(ufBean.getRequestId(), true);
 			}
+			else {
+				LOG.error("But... but this is not a valid user feedback request!");
+			}
+		}
+	}
+
+	private void submitPN(String requestId,
+			NegotiationDetailsBean negotiationDetails,
+			ResponsePolicy responsePolicy) {
+		//create user feedback response bean
+		UserFeedbackPrivacyNegotiationEvent resultBean = new UserFeedbackPrivacyNegotiationEvent();
+		resultBean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+		resultBean.setType(ExpProposalType.PRIVACY_NEGOTIATION);
+		resultBean.setRequestId(requestId);
+		resultBean.setNegotiationDetails(negotiationDetails);
+		resultBean.setResponsePolicy(responsePolicy);
+
+		//fire response pubsub event to all user agents
+		try {
+			LOG.info("[UserfeedbackMocker]  Publish "+EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE+": "+ResponseItemUtils.toXmlString(responsePolicy.getResponseItems()));
+			pubsub.publisherPublish(cloodNodeJid, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, ""+(new Random().nextInt()), resultBean);
+		}
+		catch (XMPPError e) {
+			LOG.error("[UserfeedbackMocker] Error due to XMPP", e);
+		}
+		catch (CommunicationException e) {
+			LOG.error("[UserfeedbackMocker] Error due to communication framewrok", e);
 		}
 	}
 

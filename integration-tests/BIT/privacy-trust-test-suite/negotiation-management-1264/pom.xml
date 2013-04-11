@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.integration.test.bit</groupId>
-	<artifactId>privacynegotiationmanagement</artifactId>
-	<name>#1264 Privacy Negotiation Management Test Suite</name>
+	<groupId>org.societies.integration.test</groupId>
+	<artifactId>bit.privacy-negotiation.1872</artifactId>
+	<name>#1872 Privacy Negotiation Test Suite</name>
 	<packaging>bundle</packaging>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>${release.version}</version>
 
 	<developers>
 		<developer>
@@ -70,6 +70,12 @@
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
 			<version>4.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<version>4.1.0</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	

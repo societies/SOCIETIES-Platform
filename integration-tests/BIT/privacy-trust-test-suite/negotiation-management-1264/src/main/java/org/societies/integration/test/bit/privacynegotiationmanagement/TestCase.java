@@ -31,30 +31,33 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.integration.test.IntegrationTestCase;
 
 /**
- * The test case 1264 aims to test the privacy negotiation management
+ * The test case 1872 aims to test the privacy negotiation management
  * real usage, using the context broker and the communication
  * framework.
  * 
+ * @author Eliza (HWU)
  * @author Olivier Maridat (Trialog)
  *
  */
-public class TestCase1264 extends IntegrationTestCase {
-	private static Logger LOG = LoggerFactory.getLogger(TestCase1264.class);
+public class TestCase extends IntegrationTestCase {
+	private static Logger LOG = LoggerFactory.getLogger(TestCase.class);
 
 	public static IPrivacyPolicyManager privacyPolicyManager;
 	public static IPrivacyAgreementManager privacyAgreementManager;
 	public static IPrivacyPolicyNegotiationManager privacyPolicyNegotiationManager;
 	public static ICommManager commManager;
 	public static ICtxBroker ctxBroker;
+	public static IEventMgr eventManager;
 
-	public TestCase1264() {
+	public TestCase() {
 		// Call the super constructor
 		// with test case number
 		// and test case classes to run
-		super(1264, new Class[]{PrivacyNegotiationTest.class});
+		super(1872, new Class[]{PrivacyNegotiationTest.class});
 		PrivacyNegotiationTest.testCaseNumber = this.testCaseNumber;
 	}
 
@@ -76,9 +79,12 @@ public class TestCase1264 extends IntegrationTestCase {
 		this.commManager = commManager;
 		LOG.info("[#"+testCaseNumber+"] [DependencyInjection] ICommManager injected");
 	}
-
+	public void setEventManager(IEventMgr eventManager) {
+		this.eventManager = eventManager;
+		LOG.info("[#"+testCaseNumber+"] [DependencyInjection] IEventMgr injected");
+	}
 	public void setCtxBroker(ICtxBroker ctxBroker) {
-		TestCase1264.ctxBroker = ctxBroker;
+		TestCase.ctxBroker = ctxBroker;
 		LOG.info("[#"+testCaseNumber+"] [DependencyInjection] ICtxBroker injected");
 	}
 
@@ -93,6 +99,10 @@ public class TestCase1264 extends IntegrationTestCase {
 		}
 		if (null == commManager.getIdManager()) {
 			LOG.info("[Dependency Injection] Missing IIdentityManager");
+			return false;
+		}
+		if (null == eventManager) {
+			LOG.info("[Dependency Injection] Missing IEventMgr");
 			return false;
 		}
 		if (null == getUserFeedbackMocker()) {
