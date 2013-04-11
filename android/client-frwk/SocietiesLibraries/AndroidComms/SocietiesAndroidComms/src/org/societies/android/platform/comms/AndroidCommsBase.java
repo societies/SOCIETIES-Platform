@@ -32,8 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -86,9 +84,9 @@ public class AndroidCommsBase implements XMPPAgent {
 	private static final long INVALID_LONG_INTENT_VALUE = -9999999999998L;
 	private static final String PUBSUB_NAMESPACE_KEY = "http://jabber.org/protocol";
 	private static final boolean DEBUG_LOGGING = true;
-	private static final int LATCH_TIMEOUT = 5000;
 	
 	public static final String NOTIFICATION_TITLE = "Societies Communications Problem";
+	public static final String COMMS_RESTORED_CONNECTIVITY = "Re-connected";
 	public static final String COMMS_NO_CONNECTIVITY = "NotConnected";
 	private static final String COMMS_CANNOT_REGISTER = "RegistrationError";
 	private static final String COMMS_CANNOT_UNREGISTER = "UnRegistrationError";
@@ -100,7 +98,6 @@ public class AndroidCommsBase implements XMPPAgent {
 
 //	private String username, password, resource;
 	private String resource;
-	private int usingConnectionCounter = 0;
 	private ProviderElementNamespaceRegistrar providerRegistrar = new ProviderElementNamespaceRegistrar();
 	private RawXmlProvider rawXmlProvider = new RawXmlProvider();
 	private String domainAuthorityNode;
@@ -113,6 +110,7 @@ public class AndroidCommsBase implements XMPPAgent {
 	BroadcastReceiver androidCommsReceiver;
 	BroadcastReceiver xmppConnectionReceiver;
 	IConnectionState xmppConnectMgr;
+	private boolean lostConnection;
 	
 	public AndroidCommsBase(Context serviceContext, boolean restrictBroadcast) {
 		if (DEBUG_LOGGING) {
@@ -125,6 +123,7 @@ public class AndroidCommsBase implements XMPPAgent {
 		this.serviceContext = serviceContext;
 		this.pubsubRegistered = false;
 		this.pubsubListener = null;
+		this.lostConnection = false;
 		
 		//Use the XMPPConnectionManager to access the aSmack XMPP connection
 		this.xmppConnectMgr = new XMPPConnectionManager();
@@ -132,17 +131,20 @@ public class AndroidCommsBase implements XMPPAgent {
 		//Android Profiling
 //		Debug.startMethodTracing(this.getClass().getSimpleName());
 	}
-	
-	public void cleanup() {
+	/**
+	 * Carry out any actions required before shutting down the service
+	 */
+	public void serviceCleanup() {
 		if (null != androidCommsReceiver) {
 			this.teardownBroadcastReceiver(androidCommsReceiver);
+			androidCommsReceiver = null;
 		}
 		if (null != xmppConnectionReceiver) {
 			this.teardownBroadcastReceiver(xmppConnectionReceiver);
+			xmppConnectionReceiver = null;
 		}
-
-		
 	}
+	
 	public boolean register(String client, String[] elementNames, String[] namespaces, long remoteCallId) {
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
 		Dbc.require("Message Beans must be specified", null != elementNames && elementNames.length > 0);
@@ -247,9 +249,6 @@ public class AndroidCommsBase implements XMPPAgent {
 			}
 			intent.setAction(XMPPAgent.UNREGISTER_RESULT);
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, true);
-			
-//			disconnect();
-
 		} catch (NoXMPPConnectionAvailableException e) {
 			Log.e(LOG_TAG, e.getMessage(), e);			
 			intent.setAction(XMPPAgent.UNREGISTER_EXCEPTION);
@@ -331,11 +330,8 @@ public class AndroidCommsBase implements XMPPAgent {
 		};
 		
 		try {
-//			connect();	
-			
 			this.xmppConnectMgr.getValidConnection().sendPacket(formattedMessage);
 		
-//			disconnect();
 			intent.setAction(XMPPAgent.SEND_MESSAGE_RESULT);
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, true);
 			
@@ -345,7 +341,9 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
 
-			createNotification("Error sending message: " + e.getMessage(), COMMS_CANNOT_SEND_MESSAGE, NOTIFICATION_TITLE);
+			createNotification("Error sending message due to lost connectivity", COMMS_NO_CONNECTIVITY, NOTIFICATION_TITLE);
+			this.lostConnection = true;
+			
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
 			intent.setAction(XMPPAgent.SEND_MESSAGE_EXCEPTION);
@@ -391,7 +389,8 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 			
-			createNotification("Error invoking remote method: " + e.getMessage(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
+			createNotification("Error invoking remote method", COMMS_NO_CONNECTIVITY, NOTIFICATION_TITLE);
+			this.lostConnection = true;
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
 			//Send intent
@@ -404,7 +403,7 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 			
-			createNotification("Error invoking remote method: " + e.getMessage(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
+			createNotification("Error invoking remote method due to lost connectivity: " + e.getMessage(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
 		}
 		return false;
 	}
@@ -536,7 +535,6 @@ public class AndroidCommsBase implements XMPPAgent {
 		if (DEBUG_LOGGING) {
 			Log.d(LOG_TAG, "newMainIdentity identity: " + identifier + " domain: " + domain + " password: " + password + " for client: " + client);
 		};
-		this.androidCommsReceiver = this.setupAndroidCommsReceiver();
 
 		String retValue = null;
 		//Send intent
@@ -1249,7 +1247,12 @@ public class AndroidCommsBase implements XMPPAgent {
 					String extraInfo = intent.getStringExtra(ConnectivityManager.EXTRA_EXTRA_INFO);
 					boolean failover = intent.getBooleanExtra(ConnectivityManager.EXTRA_IS_FAILOVER, false);
 
-					createNotification("Device has lost connectivity", COMMS_NO_CONNECTIVITY, NOTIFICATION_TITLE);
+//					createNotification("Device has lost connectivity", COMMS_NO_CONNECTIVITY, NOTIFICATION_TITLE);
+				} else {
+					if (AndroidCommsBase.this.lostConnection) {
+						createNotification("Device has regained connectivity", COMMS_RESTORED_CONNECTIVITY, NOTIFICATION_TITLE);
+						AndroidCommsBase.this.lostConnection = false;
+					}
 				}
 			}
 		}

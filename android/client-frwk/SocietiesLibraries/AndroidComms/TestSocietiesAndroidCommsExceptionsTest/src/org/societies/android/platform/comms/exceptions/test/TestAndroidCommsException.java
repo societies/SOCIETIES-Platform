@@ -106,7 +106,7 @@ public class TestAndroidCommsException extends ServiceTestCase <ServicePlatformC
 	}
 //	@MediumTest
 	/**
-	 * Try to login with an invalid XMPP server. 
+	 * Try to login with an invalid XMPP server. Requires that specified XMPP server is not available
 	 * 
 	 * @throws Exception
 	 */
@@ -130,7 +130,7 @@ public class TestAndroidCommsException extends ServiceTestCase <ServicePlatformC
 	
 //	@MediumTest
 	/**
-	 * Try to register a new identity with an invalid XMPP server. 
+	 * Try to register a new identity with a valid XMPP server. Requires that specified XMPP server is not available
 	 * 
 	 * @throws Exception
 	 */

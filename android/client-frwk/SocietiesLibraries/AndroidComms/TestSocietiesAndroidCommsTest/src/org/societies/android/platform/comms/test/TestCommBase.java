@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 import org.societies.android.api.comms.XMPPAgent;
 import org.societies.android.platform.comms.container.ServicePlatformCommsTest;
 import org.societies.android.platform.comms.container.ServicePlatformCommsTest.TestPlatformCommsBinder;
-import org.societies.android.platform.comms.state.IConnectionState;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -100,7 +99,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 	}
 	
 	
-//	@MediumTest
+	@MediumTest
 	public void testRegistration() throws Exception {
 		this.latch = new CountDownLatch(1);
 		this.testCompleted = false;
@@ -119,7 +118,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 		assertTrue(this.testCompleted);
 	}
 	
-//	@MediumTest
+	@MediumTest
 	public void testSuccessfulLogin() throws Exception {
 		this.latch = new CountDownLatch(1);
 		this.testCompleted = false;
@@ -138,7 +137,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 		assertTrue(this.testCompleted);
 	}
 
-//	@MediumTest
+	@MediumTest
 	public void testBadUserLogin() throws Exception {
 		this.latch = new CountDownLatch(1);
 		this.testCompleted = false;
@@ -157,7 +156,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 		assertTrue(this.testCompleted);
 	}
 
-//	@MediumTest
+	@MediumTest
 	public void testBadPasswordLogin() throws Exception {
 		this.latch = new CountDownLatch(1);
 		this.testCompleted = false;
@@ -176,7 +175,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 		assertTrue(this.testCompleted);
 	}
 
-//	@MediumTest
+	@MediumTest
 	public void testCreateIdentity() throws Exception {
 		this.latch = new CountDownLatch(1);
 		this.testCompleted = false;
@@ -195,7 +194,7 @@ public class TestCommBase extends ServiceTestCase <ServicePlatformCommsTest> {
 		assertTrue(this.testCompleted);
 	}
 
-//	@MediumTest
+	@MediumTest
 	public void testSendMessage() throws Exception {
 		this.latch = new CountDownLatch(1);
 		this.testCompleted = false;

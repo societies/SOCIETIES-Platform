@@ -68,13 +68,13 @@ public class TestXMPPConnectionManager extends AndroidTestCase {
 	protected void tearDown() throws Exception {
 		super.tearDown();
 	}
-//	@MediumTest
+	@MediumTest
 	public void testGetInstance() throws Exception {
 		XMPPConnectionManager xmppConnMgr = new XMPPConnectionManager();
 		assertNotNull(xmppConnMgr);
 	}
 	
-//	@MediumTest
+	@MediumTest
 	public void testEnableConnection() throws Exception {
 		this.testComplete = false;
 		this.testLatch = new CountDownLatch(1);
@@ -91,7 +91,7 @@ public class TestXMPPConnectionManager extends AndroidTestCase {
 		assertTrue(this.testComplete);
 	}
 	
-//	@MediumTest
+	@MediumTest
 	public void testBadCredentials() throws Exception {
 		this.testComplete = false;
 		this.testLatch = new CountDownLatch(1);
@@ -108,7 +108,7 @@ public class TestXMPPConnectionManager extends AndroidTestCase {
 		assertTrue(this.testComplete);
 	}
 	
-	@MediumTest
+//	@MediumTest
 	/**
 	 * Requires that XMPP server is not operational
 	 * @throws Exception
