@@ -51,7 +51,7 @@ public class PrivacyAssessmentForm implements Serializable {
 
 	private static final long serialVersionUID = 3196618675483151078L;
     private static final Logger log = LoggerFactory.getLogger(PrivacyAssessmentForm.class);
-
+    
     /**
      * Perform periodic assessment in background
      */
@@ -70,15 +70,14 @@ public class PrivacyAssessmentForm implements Serializable {
 	/**
 	 * List of all assessment subject types
 	 */
-	private List<String> assessmentSubjects = new ArrayList<String>();
+	private List<String> assessmentSubjects;
 	
-	/**
+    /**
 	 * Relative path to chart image to show
 	 */
 	private String chart;
 
 	public class SubjectTypes {
-		// Values
 		public static final String RECEIVER_IDS = "Receiver identities";
 		public static final String SENDER_IDS = "Sender identities";
 		public static final String SENDER_CLASSES = "Sender classes";
@@ -86,7 +85,19 @@ public class PrivacyAssessmentForm implements Serializable {
 		public static final String DATA_ACCESS_CLASSES = "Data access by classes";
 	}
 	
+	public class ImageFileNames {
+		public static final String RECEIVER_IDS = SubjectTypes.RECEIVER_IDS + ".png";
+		public static final String SENDER_IDS = SubjectTypes.SENDER_IDS + ".png";
+		public static final String SENDER_CLASSES = SubjectTypes.SENDER_CLASSES + ".png";
+		public static final String DATA_ACCESS_IDS = SubjectTypes.DATA_ACCESS_IDS + ".png";
+		public static final String DATA_ACCESS_CLASSES = SubjectTypes.DATA_ACCESS_CLASSES + ".png";
+	}
+	
 	public PrivacyAssessmentForm() {
+
+		log.info("constructor");
+
+		assessmentSubjects = new ArrayList<String>();
 		assessmentSubjects.add(SubjectTypes.RECEIVER_IDS);
 		assessmentSubjects.add(SubjectTypes.SENDER_IDS);
 		assessmentSubjects.add(SubjectTypes.SENDER_CLASSES);
