@@ -47,10 +47,12 @@ import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ExplicitPopup extends Activity {
+public abstract class UserFeedbackPopup extends Activity {
+
+    public static final int NOT_APPLICABLE = -999;
 
     private final String LOG_TAG = this.getClass().getName();
-    EventsHelper eventsHelper = null;
+    private EventsHelper eventsHelper = null;
     private boolean isEventsConnected = false;
     private final List<String> resultPayload = new ArrayList<String>();
     private UserFeedbackBean userFeedbackBean;
@@ -61,7 +63,7 @@ public abstract class ExplicitPopup extends Activity {
     private final int submitButtonID;
     private final int optionsMenuID;
 
-    protected ExplicitPopup(int contentViewID, int headerID, int submitButtonID, int optionsMenuID) {
+    protected UserFeedbackPopup(int contentViewID, int headerID, int submitButtonID, int optionsMenuID) {
         this.contentViewID = contentViewID;
         this.headerID = headerID;
         this.submitButtonID = submitButtonID;
@@ -90,11 +92,15 @@ public abstract class ExplicitPopup extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        if (optionsMenuID == NOT_APPLICABLE) return true;
+
         getMenuInflater().inflate(optionsMenuID, menu);
         return true;
     }
 
     protected void populateHeader() {
+        if (headerID == NOT_APPLICABLE) return;
+
         TextView txtView = (TextView) findViewById(headerID);
         txtView.setText(userFeedbackBean.getProposalText());
     }
@@ -102,6 +108,8 @@ public abstract class ExplicitPopup extends Activity {
     protected abstract void populateOptions();
 
     protected void populateSubmitButton() {
+        if (submitButtonID == NOT_APPLICABLE) return;
+
         // handle the submit button click
         Button submitButton = (Button) findViewById(submitButtonID);
         submitButton.setOnClickListener(new View.OnClickListener() {

@@ -5,7 +5,7 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import org.societies.android.platform.useragent.feedback.R;
 
-public class CheckboxPopup extends ExplicitPopup {
+public class CheckboxPopup extends UserFeedbackPopup {
 
     public CheckboxPopup() {
         super(R.layout.activity_checkbox_popup,

@@ -5,7 +5,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import org.societies.android.platform.useragent.feedback.R;
 
-public class RadioPopup extends ExplicitPopup {
+public class RadioPopup extends UserFeedbackPopup {
 
     public RadioPopup() {
         super(R.layout.activity_radio_popup,

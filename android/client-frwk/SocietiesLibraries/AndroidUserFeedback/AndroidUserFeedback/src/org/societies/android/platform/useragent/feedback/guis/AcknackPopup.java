@@ -30,7 +30,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import org.societies.android.platform.useragent.feedback.R;
 
-public class AcknackPopup extends ExplicitPopup {
+public class AcknackPopup extends UserFeedbackPopup {
 
     public AcknackPopup() {
         super(R.layout.acknack_activity,
