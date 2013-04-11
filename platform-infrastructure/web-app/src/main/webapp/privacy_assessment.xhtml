@@ -22,10 +22,16 @@
                     <div class="hr dotted clearfix"></div>
                     <ul>
                         <li class="clearfix">
+                        	<label for="">Description</label>
+                        	<p>To assess possible transmission of your data by installed services, the platform monitors any data access or data transmission by services, and calculates privacy assessment metrics.</p>
+                        	<p>To view these metrics for each identity or software component, select the result type from the drop-down list below and click "Send" at the bottom of page.</p>
+                        	<p>Note that a high value does not necessarily indicate a malicious service, or a service that violates the service level agreement or the privacy policy. Keep in mind the correlation results are only an assessment, and many services may be accessing and/or transmitting your data in scope of their normal operation. It is up to you to decide if data access and data transmission are excessive or not.</p>
+                        </li>
+                        <li class="clearfix">
                             <label for="">Show results for</label>
 
                             <div class="select-wrapper">
-                                <select name="select" required="required">
+                                <select name="select" required="required" value="#{privacyAssessmentForm.assessmentSubjectToBeShown}">
                                     <option value="1">Receiver identities</option>
                                     <option value="2">Sender identities</option>
                                     <option value="3">Sender classes</option>
@@ -33,21 +39,15 @@
                                     <option value="5">Data access by class</option>
                                 </select>
                             </div>
+					        <p:commandButton value="Show" actionListener="#{assessmentController.updateImage}"/>
                             <div class="clear"></div>
                             <p id="option" class="error">Please, select an option</p>
                         </li>
                         <li class="clearfix">
-                            <label for="option">Settings</label>
-
-                            <div class="option-group check">
-                                <input type="checkbox" name="" id="check1"/>
-                                <label for="check1">Enable periodic assessment every</label>
-                                <p:inputText id="autoAssessmentPeriod" value="#{assessmentController.autoAssessmentPeriod}"/>
-                                <label for="autoAssessmentPeriod">seconds</label>
-						        <p:commandButton value="Assess now" actionListener="#{assessmentController.assessNow}"/>
-                            </div>
-                            <div class="clear"></div>
-                            <p id="option" class="error">Please, select an option</p>
+<!--
+                        	<img src="http://a1.s6img.com/cdn/0008/p/1623955_9772764_lz.jpg"></img>
+-->
+                        	<img src="assessment-chart.png"></img>
                         </li>
                         <li class="clearfix">
                             <p class="success">Thank you! Success Message here.</p>
@@ -57,6 +57,7 @@
                             <div id="button">
                                 <input type="submit" id="send_message" class="sendButton" value="Send"/>
                             </div>
+                            <a href="privacy_assessment_settings.xhtml">Advanced Settings</a>
                         </li>
                     </ul>
                 </form>

@@ -26,122 +26,98 @@
  * 
  */
 package org.societies.webapp.models;
+
+import java.io.Serializable;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
 /**
  * 
  * @author Mitja Vardjan
  */
-public class PrivacyAssessmentForm {
+@Service
+@Scope("Session")
+@SessionScoped
+@ManagedBean
+public class PrivacyAssessmentForm implements Serializable {
 
-	private String method;
+	private static final long serialVersionUID = 3196618675483151078L;
+    private static final Logger log = LoggerFactory.getLogger(PrivacyAssessmentForm.class);
 	
 	// Settings and control
-	private boolean autoReassessment;
-	private int autoReassessmentInSecs;
-	private boolean assessNow;
+	private boolean autoAssessment;
+	private int autoAssessmentInSecs;
 	
 	// Showing assessment results
-	private String assessmentSubjectType;
-	private String presentationFormat;
-	private String assessmentSubject;
+	private String assessmentSubjectToBeShown;
+	private String assessmentSubjectShown = "";
 	
 	private String chart;
 
 	/**
-	 * @return the method
-	 */
-	public String getMethod() {
-		return method;
-	}
-
-	/**
-	 * @param method the method to set
-	 */
-	public void setMethod(String method) {
-		this.method = method;
-	}
-	
-	/**
 	 * @return the autoReassessment
 	 */
-	public boolean isAutoReassessment() {
-		return autoReassessment;
+	public boolean isAutoAssessment() {
+		return autoAssessment;
 	}
 
 	/**
 	 * @param autoReassessment the autoReassessment to set
 	 */
-	public void setAutoReassessment(boolean autoReassessment) {
-		this.autoReassessment = autoReassessment;
+	public void setAutoAssessment(boolean autoAssessment) {
+		log.debug("autoAssessment = {}", autoAssessment);
+		this.autoAssessment = autoAssessment;
 	}
 
 	/**
 	 * @return the autoReassessmentInSecs
 	 */
-	public int getAutoReassessmentInSecs() {
-		return autoReassessmentInSecs;
+	public int getAutoAssessmentInSecs() {
+		return autoAssessmentInSecs;
 	}
 
 	/**
 	 * @param autoReassessmentInSecs the autoReassessmentInSecs to set
 	 */
-	public void setAutoReassessmentInSecs(int autoReassessmentInSecs) {
-		this.autoReassessmentInSecs = autoReassessmentInSecs;
-	}
-
-	/**
-	 * @return the assessNow
-	 */
-	public boolean isAssessNow() {
-		return assessNow;
-	}
-
-	/**
-	 * @param assessNow the assessNow to set
-	 */
-	public void setAssessNow(boolean assessNow) {
-		this.assessNow = assessNow;
+	public void setAutoAssessmentInSecs(int autoAssessmentInSecs) {
+		log.debug("autoAssessmentInSecs = {}", autoAssessmentInSecs);
+		this.autoAssessmentInSecs = autoAssessmentInSecs;
 	}
 
 	/**
 	 * @return the assessmentSubjectType
 	 */
-	public String getAssessmentSubjectType() {
-		return assessmentSubjectType;
+	public String getAssessmentSubjectToBeShown() {
+		return assessmentSubjectToBeShown;
 	}
 
 	/**
 	 * @param assessmentSubjectType the assessmentSubjectType to set
 	 */
-	public void setAssessmentSubjectType(String assessmentSubjectType) {
-		this.assessmentSubjectType = assessmentSubjectType;
-	}
-
-	/**
-	 * @return the presentationFormat
-	 */
-	public String getPresentationFormat() {
-		return presentationFormat;
-	}
-
-	/**
-	 * @param presentationFormat the presentationFormat to set
-	 */
-	public void setPresentationFormat(String presentationFormat) {
-		this.presentationFormat = presentationFormat;
+	public void setAssessmentSubjectToBeShown(String assessmentSubjectToBeShown) {
+		log.debug("assessmentSubjectToBeShown = {}", assessmentSubjectToBeShown);
+		this.assessmentSubjectToBeShown = assessmentSubjectToBeShown;
 	}
 
 	/**
 	 * @return the assessmentSubject
 	 */
-	public String getAssessmentSubject() {
-		return assessmentSubject;
+	public String getAssessmentSubjectShown() {
+		return assessmentSubjectShown;
 	}
 
 	/**
 	 * @param assessmentSubject the assessmentSubject to set
 	 */
-	public void setAssessmentSubject(String assessmentSubject) {
-		this.assessmentSubject = assessmentSubject;
+	public void setAssessmentSubjectShown(String assessmentSubjectShown) {
+		log.debug("assessmentSubjectShown = {}", assessmentSubjectShown);
+		this.assessmentSubjectShown = assessmentSubjectShown;
 	}
 
 	/**
@@ -155,6 +131,7 @@ public class PrivacyAssessmentForm {
 	 * @param chart the chart to set
 	 */
 	public void setChart(String chart) {
+		log.debug("chart = {}", chart);
 		this.chart = chart;
 	}
 }
