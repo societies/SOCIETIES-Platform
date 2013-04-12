@@ -1793,8 +1793,11 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		List<String> foursquareFriends = new ArrayList<String>();
 		List<String> googleplusFriends = new ArrayList<String>();
 		List<String> CISMembersFriends = new ArrayList<String>();
+		List<String> alreadyListed = new ArrayList<String>();
 		Future<List<CssAdvertisementRecordDetailed>> asynchallcss =  this.getCssAdvertisementRecordsFull();
 		List<CssAdvertisementRecordDetailed> allcssDetails = new ArrayList<CssAdvertisementRecordDetailed>();
+		Future<List<CssAdvertisementRecord>> asyncalreadyFriends = this.getCssFriends();
+		List<CssAdvertisementRecord> alreadyFriends = new ArrayList<CssAdvertisementRecord>();
 		
 		HashMap<IIdentity, Integer> commonFriends = new HashMap<IIdentity, Integer>();
 		HashMap<IIdentity, Integer> comparedFriends = new HashMap<IIdentity, Integer>();
@@ -1906,18 +1909,40 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 
 			getCssDirectoryRemote().findAllCssAdvertisementRecords(callback);
 			recordList = callback.getResultList();
+			
+			try {
+				alreadyFriends = asyncalreadyFriends.get();
+				if (alreadyFriends.size() > 0){
+					for (CssAdvertisementRecord arf : alreadyFriends){
+						alreadyListed.add(arf.getName());
+					}
+				}
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (ExecutionException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 
 			for (CssAdvertisementRecord cssAdd : recordList) {
 			
 				if (cssAdd.getId().equalsIgnoreCase(MyId)) {
 				LOG.info("This is my OWN ID not adding it");
 				}else {
-					try {
-						cssFriend.add((this.commManager.getIdManager().fromJid(cssAdd.getId())));
-					} catch (InvalidFormatException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					if (alreadyListed.contains(cssAdd.getName())){
+						LOG.info("Already a friend not adding it");
 					}
+					else {
+						try {
+							cssFriend.add((this.commManager.getIdManager().fromJid(cssAdd.getId())));
+						} catch (InvalidFormatException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+						
+				
 				}
 
 			
@@ -2643,9 +2668,7 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 						}
 					}
              }else {
-            	 LOG.info("done adding to compared friends list now remove any existing friends from list");
-                 LOG.info("alreadyFriends size is : " +alreadyFriends.size());
-                 LOG.info("cssFriends size is : " +cssFriends.size());
+            	 
             	 for(int j = 0; j < cssFriends.size(); j++){
             		 LOG.info("Adding friends to comparedfriends list " +cssFriends.get(j).getName());
             		 comparedFriends.put(cssFriends.get(j), none );
