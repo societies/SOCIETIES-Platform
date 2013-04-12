@@ -53,6 +53,14 @@ public class LocationCoordinates4Obfuscation extends LocationCoordinates {
 		this.accuracy = accuracy;
 	}
 	
+	public LocationCoordinates toLocationCoordinates() {
+		LocationCoordinates res = new LocationCoordinates();
+		res.setLatitude(latitude);
+		res.setLongitude(longitude);
+		res.setAccuracy(accuracy);
+		return res;
+	}
+	
 	
 	/**
 	 * @return the obfuscationLevel

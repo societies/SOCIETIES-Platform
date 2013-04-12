@@ -27,6 +27,9 @@ package org.societies.integration.test.userfeedback;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
+
+
 /**
  * Container for a mock user feedback result
  * @author Olivier Maridat (Trialog)
@@ -34,9 +37,19 @@ import java.util.List;
 public class UserFeedbackMockResult {
 	public static final int InfinitelyUsable = -255;
 	private int nbOfUsage;
-	private List<String> result;
+	private List result;
 	private List<Integer> resultIndexes;
 
+	/**
+	 * Instantiate a user feedback result that will be used infinitely
+	 * Result must be defined
+	 */
+	public UserFeedbackMockResult() {
+		super();
+		this.nbOfUsage = InfinitelyUsable;
+		this.result = new ArrayList<Object>();
+		this.resultIndexes = new ArrayList<Integer>();
+	}
 	/**
 	 * Instantiate a user feedback result that will be used infinitely
 	 * @param result Result values
@@ -53,27 +66,32 @@ public class UserFeedbackMockResult {
 		super();
 		this.nbOfUsage = nbOfUsage;
 		this.resultIndexes = new ArrayList<Integer>();
-		this.result = new ArrayList<String>();
+		this.result = new ArrayList<Object>();
 		for(String resultItem : result) {
 			this.result.add(resultItem);
 		}
 	}
 	/**
+	 * Instantiate a user feedback result that will be used infinitely
+	 * @param result ResponsePolicy result value
+	 */
+	public UserFeedbackMockResult(ResponsePolicy result) {
+		this(InfinitelyUsable, result);
+	}
+	/**
 	 * Instantiate a user feedback result that will be used nbOfUsage time
 	 * @param nbOfUsage Nb of time to use theses values as a user feedback result
-	 * @param result Result index values
+	 * @param result ResponsePolicy result value
 	 */
-	public UserFeedbackMockResult(Integer... resultIndexes) {
+	public UserFeedbackMockResult(int nbOfUsage, ResponsePolicy result) {
 		super();
-		this.nbOfUsage = InfinitelyUsable;
-		this.result = new ArrayList<String>();
+		this.nbOfUsage = nbOfUsage;
 		this.resultIndexes = new ArrayList<Integer>();
-		for(Integer resultIndex : resultIndexes) {
-			this.resultIndexes.add(resultIndex);
-		}
+		this.result = new ArrayList<Object>();
+		this.result.add(result);
 	}
 
-	
+
 	/**
 	 * Retrieve the number of time these values can be used as user feedback result
 	 * @return number of time these values can be used as user feedback result
@@ -106,28 +124,47 @@ public class UserFeedbackMockResult {
 	 * Retrieve the list of values to use as user feedback result 
 	 * @return list of values to use as user feedback result
 	 */
-	public List<String> getResult() {
+	public List getResult() {
 		return result;
+	}
+	/**
+	 * Retrieve the privacy agreement value to use as user feedback result 
+	 * @return privacy agreement value to use as user feedback result
+	 */
+	public ResponsePolicy getPrivacyAgreementResult() {
+		if (null == this.result || result.size() < 1 || !(result.get(0) instanceof ResponsePolicy)) {
+			return null;
+		}
+		return (ResponsePolicy) result.get(0);
 	}
 	/**
 	 * Modify the list of values to use as user feedback result 
 	 * @param result list of values to use as user feedback result
 	 */
-	public void setResult(List<String> result) {
-		if (null == this.result) {
-			this.result = new ArrayList<String>();
-		}
+	public void setResult(List<Object> result) {
+		resultIndexes.clear();
 		this.result = result;
 	}
 	/**
 	 * Add a value to the list of values to use as user feedback result 
 	 * @param value value to add
 	 */
-	public void addResult(String value) {
-		if (null == this.result) {
-			this.result = new ArrayList<String>();
-		}
+	public void addResult(ResponsePolicy value) {
+		resultIndexes.clear();
 		this.result.add(value);
+	}
+	/**
+	 * Add a value to the list of values to use as user feedback result 
+	 * @param value value to add
+	 */
+	public void addResult(String... values) {
+		resultIndexes.clear();
+		if (null == values) {
+			return;
+		}
+		for(String value : values) {
+			this.result.add(value);
+		}
 	}
 	/**
 	 * Retrieve the list of indexes of the proposed user feedback options. They will be used to retrieved values to use as user feedback result
@@ -141,19 +178,27 @@ public class UserFeedbackMockResult {
 	 * @return list of indexes of the proposed user feedback options
 	 */
 	public void setResultIndexes(List<Integer> resultIndexes) {
-		if (null == this.resultIndexes) {
-			this.resultIndexes = new ArrayList<Integer>();
-		}
+		result.clear();
 		this.resultIndexes = resultIndexes;
 	}
 	/**
 	 * Add a value to the list of indexes of the proposed user feedback options. They will be used to retrieved values to use as user feedback result
 	 * @param value value to add
 	 */
-	public void addResultIndexes(Integer value) {
+	public void addResultIndexes(Integer... values) {
+		result.clear();
 		if (null == this.resultIndexes) {
 			this.resultIndexes = new ArrayList<Integer>();
 		}
-		this.resultIndexes.add(value);
+		if (null == values) {
+			return;
+		}
+		for(Integer value : values) {
+			this.resultIndexes.add(value);
+		}
+	}
+	
+	public boolean isResult() {
+		return null != null && result.size() >= 0;
 	}
 }
