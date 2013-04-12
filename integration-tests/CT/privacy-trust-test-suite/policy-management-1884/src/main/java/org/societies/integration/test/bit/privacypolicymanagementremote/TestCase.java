@@ -37,16 +37,16 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyAgreementManagerRemote;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote;
-import org.societies.integration.test.IntegrationTestCase;
+import org.societies.integration.test.CapabilityTestCase;
 
-public class TestCase extends IntegrationTestCase {
+public class TestCase extends CapabilityTestCase {
 	private static Logger LOG = LoggerFactory.getLogger(TestCase.class.getSimpleName());
 
 	public static IPrivacyPolicyManagerRemote privacyPolicyManagerRemote;
 	public static IPrivacyAgreementManagerRemote privacyAgreementManagerRemote;
 	public static ICommManager commManager;
-	
-	
+
+
 	public TestCase() {
 		// Call the super constructor
 		// with test case number
@@ -54,8 +54,8 @@ public class TestCase extends IntegrationTestCase {
 		super(1884, new Class[]{PrivacyPolicyManagerTest.class});
 		PrivacyPolicyManagerTest.testCaseNumber = this.testCaseNumber;
 	}
-	
-	
+
+
 	/* -- Dependency injection --- */
 	public void setPrivacyPolicyManagerRemote(IPrivacyPolicyManagerRemote privacyPolicyManagerRemote) {
 		this.privacyPolicyManagerRemote = privacyPolicyManagerRemote;
