@@ -54,6 +54,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PPNegotiationEvent;
 import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
@@ -271,7 +272,7 @@ public class PrivacyNegotiationTest {
 			//			List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> responseItems = new ArrayList<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem>();
 			//			responsePolicy.setResponseItems(responseItems);
 			UserFeedbackMockResult mockResult = new UserFeedbackMockResult(1);
-			mockResult.addResultIndexes(1);
+//			mockResult.addResultIndexes(1);
 			TestCase.getUserFeedbackMocker().addReply(UserFeedbackType.PRIVACY_NEGOTIATION, mockResult);
 
 			// -- Launch negotiation

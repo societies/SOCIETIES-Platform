@@ -180,8 +180,7 @@ public class UserFeedbackMocker implements Subscriber {
 				// Send as output the specified ResponsePolicy
 				else if (eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_NEGOTIATION)) {
 					LOG.info("[UserfeedbackMocker] submitExplicitResponse");
-					submitPN(requestId, ufNegotiationBean.getNegotiationDetails(), mockResult.getPrivacyAgreementResult());
-//										userFeedback.submitExplicitResponse(requestId, ufNegotiationBean.getNegotiationDetails(), mockResult.getPrivacyAgreementResult());
+					userFeedback.submitExplicitResponse(requestId, ufNegotiationBean.getNegotiationDetails(), mockResult.getPrivacyAgreementResult());
 				}
 				else {
 					userfeedbackReplied = false;
@@ -213,8 +212,7 @@ public class UserFeedbackMocker implements Subscriber {
 					}
 					responsePolicy.setResponseItems(responseItems);
 					LOG.info("[UserfeedbackMocker] submitExplicitResponse");
-					submitPN(requestId, ufNegotiationBean.getNegotiationDetails(), responsePolicy);
-//										userFeedback.submitExplicitResponse(requestId, ufNegotiationBean.getNegotiationDetails(), responsePolicy);
+					userFeedback.submitExplicitResponse(requestId, ufNegotiationBean.getNegotiationDetails(), responsePolicy);
 				}
 				else {
 					userfeedbackReplied = false;
@@ -241,8 +239,7 @@ public class UserFeedbackMocker implements Subscriber {
 				// Send as output the input ResponsePolicy
 				else if (eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_NEGOTIATION)) {
 					LOG.debug("[UserfeedbackMocker] submitExplicitResponse");
-					submitPN(requestId, ufNegotiationBean.getNegotiationDetails(), ufNegotiationBean.getResponsePolicy());
-//										userFeedback.submitExplicitResponse(ufNegotiationBean.getRequestId(), ufNegotiationBean.getNegotiationDetails(), ufNegotiationBean.getResponsePolicy());
+					userFeedback.submitExplicitResponse(ufNegotiationBean.getRequestId(), ufNegotiationBean.getNegotiationDetails(), ufNegotiationBean.getResponsePolicy());
 				}
 			}
 			else if (FeedbackMethodType.GET_IMPLICIT_FB.value().equals(method)) {
@@ -254,30 +251,6 @@ public class UserFeedbackMocker implements Subscriber {
 			else {
 				LOG.error("But... but this is not a valid user feedback request!");
 			}
-		}
-	}
-
-	private void submitPN(String requestId,
-			NegotiationDetailsBean negotiationDetails,
-			ResponsePolicy responsePolicy) {
-		//create user feedback response bean
-		UserFeedbackPrivacyNegotiationEvent resultBean = new UserFeedbackPrivacyNegotiationEvent();
-		resultBean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
-		resultBean.setType(ExpProposalType.PRIVACY_NEGOTIATION);
-		resultBean.setRequestId(requestId);
-		resultBean.setNegotiationDetails(negotiationDetails);
-		resultBean.setResponsePolicy(responsePolicy);
-
-		//fire response pubsub event to all user agents
-		try {
-			LOG.info("[UserfeedbackMocker]  Publish "+EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE+": "+ResponseItemUtils.toXmlString(responsePolicy.getResponseItems()));
-			pubsub.publisherPublish(cloodNodeJid, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, ""+(new Random().nextInt()), resultBean);
-		}
-		catch (XMPPError e) {
-			LOG.error("[UserfeedbackMocker] Error due to XMPP", e);
-		}
-		catch (CommunicationException e) {
-			LOG.error("[UserfeedbackMocker] Error due to communication framewrok", e);
 		}
 	}
 
