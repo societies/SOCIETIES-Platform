@@ -143,7 +143,7 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 		// Data
 		try {
 			currentNode = TestCase.commManager.getIdManager().getThisNetworkNode();
-			targetedNode = TestCase.commManager.getIdManager().getThisNetworkNode();
+			targetedNode = TestCase.commManager.getIdManager().fromJid(TestCase.getReceiverJid());
 			requestorCis = getRequestorCis();
 			requestorService = getRequestorService();
 			cisPolicy = getRequestPolicy(requestorCis);
