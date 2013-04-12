@@ -264,6 +264,7 @@ public class PrivacyAssessmentService implements Serializable {
 	
 	private void generateImageReceiverIds() {
 		
+		String title = "Remote and local identities data has been sent to";
 		String xlabel = "Receiver identity";
 		String ylabel = "Number of data transmissions";
 
@@ -273,11 +274,12 @@ public class PrivacyAssessmentService implements Serializable {
 		log.debug("Number of identities data has been transmitted to: {}", identities.size());
 		PlotData[] plotData = new PlotData[] {mapToArrays(identities)};
 		String[] plotDataLabels = new String[] {"data"};		
-		createBarchart(null, xlabel, ylabel, plotData, plotDataLabels, PrivacyAssessmentForm.ImageFileNames.RECEIVER_IDS);
+		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, PrivacyAssessmentForm.ImageFileNames.RECEIVER_IDS);
 	}
 	
 	private void generateImageSenderIds() {
 
+		String title = "Local identities which sent data and their correlation with data access";
 		String xlabel = "Sender identity";
 		String ylabel = "Correlation of data transmission and data access";
 
@@ -309,11 +311,12 @@ public class PrivacyAssessmentService implements Serializable {
 				"Correlation with data access by the sender identity",
 				"Correlation with data access by any identity"
 				};
-		createBarchart(null, xlabel, ylabel, plotData, plotDataLabels, PrivacyAssessmentForm.ImageFileNames.SENDER_IDS);
+		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, PrivacyAssessmentForm.ImageFileNames.SENDER_IDS);
 	}
 	
 	private void generateImageSenderClass() {
 		
+		String title = "Local Java classes which sent data and their correlation with data access";
 		String xlabel = "Sender class";
 		String ylabel = "Correlation of data transmission and data access";
 
@@ -345,11 +348,12 @@ public class PrivacyAssessmentService implements Serializable {
 				"Correlation with data access by the sender class",
 				"Correlation with data access by any class"
 				};
-		createBarchart(null, xlabel, ylabel, plotData, plotDataLabels, PrivacyAssessmentForm.ImageFileNames.SENDER_CLASSES);
+		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, PrivacyAssessmentForm.ImageFileNames.SENDER_CLASSES);
 	}
 	
 	private void generateImageDataAccessClass() {
 		
+		String title = "Java classes which accessed local data";
 		String xlabel = "Class";
 		String ylabel = "Number of accesses to local data";
 
@@ -358,11 +362,12 @@ public class PrivacyAssessmentService implements Serializable {
 		log.debug("Number of data access events (by class): {}", dataAccessClasses.size());
 		PlotData[] plotData = new PlotData[] {mapToArrays(dataAccessClasses)};
 		String[] plotDataLabels = new String[] {"data"};
-		createBarchart(null, xlabel, ylabel, plotData, plotDataLabels, PrivacyAssessmentForm.ImageFileNames.DATA_ACCESS_CLASSES);
+		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, PrivacyAssessmentForm.ImageFileNames.DATA_ACCESS_CLASSES);
 	}
 	
 	private void generateImageDataAccessIds() {
 		
+		String title = "Identities which accessed local data";
 		String xlabel = "Identity";
 		String ylabel = "Number of accesses to local data";
 
@@ -371,6 +376,6 @@ public class PrivacyAssessmentService implements Serializable {
 		log.debug("Number of data access events (by identity): {}", identities.size());
 		PlotData[] plotData = new PlotData[] {mapToArrays(identities)};
 		String[] plotDataLabels = new String[] {"data"};
-		createBarchart(null, xlabel, ylabel, plotData, plotDataLabels, PrivacyAssessmentForm.ImageFileNames.DATA_ACCESS_IDS);
+		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, PrivacyAssessmentForm.ImageFileNames.DATA_ACCESS_IDS);
 	}
 }
