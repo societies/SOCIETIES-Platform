@@ -1,3 +1,4 @@
+package org.societies.webapp.controller;
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
@@ -22,89 +23,71 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.ctxRetrieve;
 
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.identity.IIdentityManager;
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
-import org.societies.integration.test.IntegrationTestCase;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.RequestScoped;
 
-/**
- * Class that tests Context Triggered Personalisation. 
- *
- * @author Eliza
- *
- */
-public class Test861 extends IntegrationTestCase{
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment;
+import org.societies.webapp.models.PrivacyAssessmentForm;
+import org.societies.webapp.service.PrivacyAssessmentService;
 
-	private static ICtxBroker ctxBroker;
-	private static ICommManager commsMgr;
-	private static IHelloWorld helloWorld;
-	private static IPrivacyDataManager privDataMgr;
+
+@ManagedBean(name = "assessmentController")
+@RequestScoped
+public class PrivacyAssessmentController extends BasePageController {
+
+	private static final long serialVersionUID = 1073106046087768688L;
+	private static Logger log = LoggerFactory.getLogger(PrivacyAssessmentController.class);
 	
-	public Test861(){
-		super(1868, new Class[]{Tester.class});
+	@ManagedProperty(value = "#{privacyAssessmentForm}")
+	private PrivacyAssessmentForm model;
+	
+	public PrivacyAssessmentController() {
+		super();
+		log.info("constructor");
 	}
-
+	
 	/**
-	 * @return the ctxBroker
+	 * OSGI service get auto injected
 	 */
-	public static ICtxBroker getCtxBroker() {
-		return ctxBroker;
+	@ManagedProperty(value = "#{privacyAssessment}")
+	private IAssessment assessment;
+
+	@ManagedProperty(value = "#{privacyAssessmentService}")
+	private PrivacyAssessmentService paService;
+
+	// Getters and setters for services
+	
+	public IAssessment getAssessment() {
+		return assessment;
+	}
+	public void setAssessment(IAssessment sdService) {
+		log.debug("setAssessment()");
+		this.assessment = sdService;
+	}
+	public PrivacyAssessmentService getPaService() {
+		return paService;
+	}
+	public void setPaService(PrivacyAssessmentService paService) {
+		this.paService = paService;
+	}
+	public PrivacyAssessmentForm getModel() {
+		return model;
+	}
+	public void setModel(PrivacyAssessmentForm model) {
+		log.debug("Model set");
+		this.model = model;
 	}
 
-	/**
-	 * @param ctxBroker the ctxBroker to set
-	 */
-	public  void setCtxBroker(ICtxBroker ctxBroker) {
-		this.ctxBroker = ctxBroker;
+	// Methods called from View
+	
+	public void assessNow() {
+		log.debug("AssessNow button clicked");
+		assessment.assessAllNow();
+		paService.generateImages();
 	}
-
-
-	/**
-	 * @return the commsMgr
-	 */
-	public static ICommManager getCommsMgr() {
-		return commsMgr;
-	}
-
-	public static IIdentityManager getIdentityManager(){
-		return commsMgr.getIdManager();
-	}
-	/**
-	 * @param commsMgr the commsMgr to set
-	 */
-	public void setCommsMgr(ICommManager commsMgr) {
-		this.commsMgr = commsMgr;
-	}
-
-	/**
-	 * @return the helloWorld
-	 */
-	public static IHelloWorld getHelloWorld() {
-		return helloWorld;
-	}
-
-	/**
-	 * @param helloWorld the helloWorld to set
-	 */
-	public void setHelloWorld(IHelloWorld helloWorld) {
-		this.helloWorld = helloWorld;
-	}
-
-	/**
-	 * @return the privDataMgr
-	 */
-	public static IPrivacyDataManager getPrivDataMgr() {
-		return privDataMgr;
-	}
-
-	/**
-	 * @param privDataMgr the privDataMgr to set
-	 */
-	public void setPrivDataMgr(IPrivacyDataManager privDataMgr) {
-		Test861.privDataMgr = privDataMgr;
-	}
-
+	
 }

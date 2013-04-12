@@ -45,7 +45,7 @@ public class TestLocationRefiner extends IntegrationTestCase{
 	
 	
 	public TestLocationRefiner(){
-		super(0001, new Class[]{Tester.class});
+		super(1863, new Class[]{Tester.class});
 	}
 
 	/**

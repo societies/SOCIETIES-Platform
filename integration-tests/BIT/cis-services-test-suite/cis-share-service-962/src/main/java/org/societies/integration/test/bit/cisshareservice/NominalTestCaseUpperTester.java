@@ -90,17 +90,17 @@ public class NominalTestCaseUpperTester {
 	@BeforeClass
 	public static void initialization() {
 		
-		LOG.info("[#962] Initialization");
-		LOG.info("[#962] Prerequisite: The CSS is created");
-		LOG.info("[#962] Prerequisite: The user is logged to the CSS");
+		LOG.info("[#1852] Initialization");
+		LOG.info("[#1852] Prerequisite: The CSS is created");
+		LOG.info("[#1852] Prerequisite: The user is logged to the CSS");
 
 		serviceBundleUrl = NominalTestCaseUpperTester.class.getClassLoader().getResource(SERVICE_PATH);
 		
-		assertNotNull("[#962] ServiceBundle is null",serviceBundleUrl);
-		assertNotNull("[#962] getServiceControl is null",TestCase962.getServiceControl());
-		assertNotNull("[#962] getCommManager is null",TestCase962.getCommManager());
-		assertNotNull("[#962] getCisManager is null",TestCase962.getCisManager());
-		assertNotNull("[#962] getServiceRegistry is null",TestCase962.getServiceRegistry());
+		assertNotNull("[#1852] ServiceBundle is null",serviceBundleUrl);
+		assertNotNull("[#1852] getServiceControl is null",TestCase962.getServiceControl());
+		assertNotNull("[#1852] getCommManager is null",TestCase962.getCommManager());
+		assertNotNull("[#1852] getCisManager is null",TestCase962.getCisManager());
+		assertNotNull("[#1852] getServiceRegistry is null",TestCase962.getServiceRegistry());
 	}
 
 	
@@ -109,21 +109,21 @@ public class NominalTestCaseUpperTester {
 	 */
 	@Before
 	public void setUp() {
-		if(LOG.isDebugEnabled()) LOG.debug("[#962] NominalTestCaseUpperTester::setUp");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1852] NominalTestCaseUpperTester::setUp");
 		
 		try{
 			Future<ServiceControlResult> installResultFuture = TestCase962.getServiceControl().installService(serviceBundleUrl);
 			ServiceControlResult installResult = installResultFuture.get();
 			if (!installResult.getMessage().equals(ResultMessage.SUCCESS)) {
-				LOG.error("[#962] Preamble Install Service: Couldn't install");
-				fail("[#962] Preamble Install Service: Couldn't install");
+				LOG.error("[#1852] Preamble Install Service: Couldn't install");
+				fail("[#1852] Preamble Install Service: Couldn't install");
 				return;
 			}
 			
 			testServiceId =installResult.getServiceId();
 			
 			if(LOG.isDebugEnabled()){
-				LOG.debug("[#962] Our CSS Id is " + TestCase962.getCommManager().getIdManager().getThisNetworkNode().getJid());
+				LOG.debug("[#1852] Our CSS Id is " + TestCase962.getCommManager().getIdManager().getThisNetworkNode().getJid());
 			}
 			
 			int mode = 1;
@@ -134,30 +134,30 @@ public class NominalTestCaseUpperTester {
 			Future<ICisOwned> asyncCis = TestCase962.getCisManager().createCis(cisName, cisType, null, cssPassword);
 			myCis = asyncCis.get();
 			
-			assertNotNull("[#962] CIS is null! Failed creating!",myCis);
+			assertNotNull("[#1852] CIS is null! Failed creating!",myCis);
 			
 			if(LOG.isDebugEnabled() && myCis != null) {
-				LOG.debug("[#962] myCis.getCisId(): " + myCis.getCisId());
-				LOG.debug("[#962] myCis.getCisType(): " + myCis.getCisType());
-				LOG.debug("[#962] myCis.getOwnerId(): " + myCis.getOwnerId());
-				LOG.debug("[#962] myCis.getName(): " + myCis.getName());
-				LOG.debug("[#962] myCis.getDescription(): " + myCis.getDescription());
+				LOG.debug("[#1852] myCis.getCisId(): " + myCis.getCisId());
+				LOG.debug("[#1852] myCis.getCisType(): " + myCis.getCisType());
+				LOG.debug("[#1852] myCis.getOwnerId(): " + myCis.getOwnerId());
+				LOG.debug("[#1852] myCis.getName(): " + myCis.getName());
+				LOG.debug("[#1852] myCis.getDescription(): " + myCis.getDescription());
 			
 				IIdentity cisNode = TestCase962.getCommManager().getIdManager().fromJid(myCis.getCisId());
 				
 				switch(cisNode.getType()){
-				case CSS: LOG.debug("[#962] Node is of type: CSS"); break;
-				case CSS_RICH: LOG.debug("[#962] Node is of type: CSS_RICH"); break;
-				case CSS_LIGHT:LOG.debug("[#962] Node is of type: CSS_LIGHT"); break;
-				case CIS: LOG.debug("[#962] Node is of type: CIS"); break;
-				default: LOG.debug("[#962] Node is strange");
+				case CSS: LOG.debug("[#1852] Node is of type: CSS"); break;
+				case CSS_RICH: LOG.debug("[#1852] Node is of type: CSS_RICH"); break;
+				case CSS_LIGHT:LOG.debug("[#1852] Node is of type: CSS_LIGHT"); break;
+				case CIS: LOG.debug("[#1852] Node is of type: CIS"); break;
+				default: LOG.debug("[#1852] Node is strange");
 				}
 			}
 			
 		} catch(Exception ex){
 			ex.printStackTrace();
-			LOG.error("[#962] Preamble Service: Exception occured: " + ex);
-			fail("[#962] Preamble Service: Exception occured: " + ex);
+			LOG.error("[#1852] Preamble Service: Exception occured: " + ex);
+			fail("[#1852] Preamble Service: Exception occured: " + ex);
 			return;
 		}
 	}
@@ -167,27 +167,27 @@ public class NominalTestCaseUpperTester {
 	 */
 	@After
 	public void tearDown() {
-		if(LOG.isDebugEnabled()) LOG.debug("[#962] NominalTestCaseUpperTester:: teardown");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1852] NominalTestCaseUpperTester:: teardown");
 
 		try{
 			Future<ServiceControlResult> uninstallResultFuture =TestCase962.getServiceControl().uninstallService(testServiceId);
 			ServiceControlResult uninstallResult = uninstallResultFuture.get();
 			if (!uninstallResult.getMessage().equals(ResultMessage.SUCCESS)) {
-				LOG.error("[#962] Teardown Uninstall Service: Couldn't uninstall");
-				fail("[#962] Preamble Uninstall Service: Couldn't uninstall");
+				LOG.error("[#1852] Teardown Uninstall Service: Couldn't uninstall");
+				fail("[#1852] Preamble Uninstall Service: Couldn't uninstall");
 				return;
 			}
 			
 			boolean result = TestCase962.getCisManager().deleteCis(myCis.getCisId());
 
 			if(!result){
-				LOG.error("[#962] Teardown delete CIS: Couldn't delete!");
-				fail("[#962] Teardown delete CIS: Couldn't delete!");
+				LOG.error("[#1852] Teardown delete CIS: Couldn't delete!");
+				fail("[#1852] Teardown delete CIS: Couldn't delete!");
 			}
 			
 		} catch(Exception ex){
-			LOG.error("[#962] Preamble Uninstall Service: Exception occured: " + ex);
-			fail("[#962] Preamble Uninstall Service: Exception occured: " + ex);
+			LOG.error("[#1852] Preamble Uninstall Service: Exception occured: " + ex);
+			fail("[#1852] Preamble Uninstall Service: Exception occured: " + ex);
 			return;
 		}
 		
@@ -199,41 +199,41 @@ public class NominalTestCaseUpperTester {
 	@Test
 	public void testShareService(){
 		
-		LOG.info("[#962] Testing Local CIS Share Service!");
+		LOG.info("[#1852] Testing Local CIS Share Service!");
 		
 		//STEP 1: Get the Service
 		Service serviceUnderTest = null;
 			
 		try {
 			if(LOG.isDebugEnabled())
-				LOG.debug("[#962] Selecting service to Share!");
+				LOG.debug("[#1852] Selecting service to Share!");
 				
 			serviceUnderTest = TestCase962.getServiceRegistry().retrieveService(testServiceId);
 		
 		} catch (ServiceRetrieveException e) {
-			LOG.error("[#962] Couldn't retrieve the service: exception: " + e);
-			fail("[#962] Couldn't retrieve the service: exception: " + e);
+			LOG.error("[#1852] Couldn't retrieve the service: exception: " + e);
+			fail("[#1852] Couldn't retrieve the service: exception: " + e);
 			e.printStackTrace();
 		}
 		
 		if(serviceUnderTest == null){
-			if(LOG.isDebugEnabled()) LOG.debug("[#962] Couldn't get the service!");
-			fail("[#962] Couldn't retrieve the service!");
+			if(LOG.isDebugEnabled()) LOG.debug("[#1852] Couldn't get the service!");
+			fail("[#1852] Couldn't retrieve the service!");
 			return;
 		}
 		
 		if(LOG.isDebugEnabled())
-			LOG.debug("[#962] Service selected: " + serviceUnderTest.getServiceEndpoint());
+			LOG.debug("[#1852] Service selected: " + serviceUnderTest.getServiceEndpoint());
 		
 		
 		
 		try {
 			
-			if(LOG.isDebugEnabled()) LOG.debug("[#962] Share service with CIS!");
+			if(LOG.isDebugEnabled()) LOG.debug("[#1852] Share service with CIS!");
 			
 			TestCase962.getServiceRegistry().notifyServiceIsSharedInCIS(testServiceId, myCis.getCisId());
 			
-			if(LOG.isDebugEnabled()) LOG.debug("[#962] Now checking if service is shared on that CIS!");
+			if(LOG.isDebugEnabled()) LOG.debug("[#1852] Now checking if service is shared on that CIS!");
 			
 			List<Service> serviceList = TestCase962.getServiceRegistry().retrieveServicesSharedByCIS(myCis.getCisId());
 			
@@ -243,25 +243,25 @@ public class NominalTestCaseUpperTester {
 			Service myService= serviceList.get(0);
 			
 			if(LOG.isDebugEnabled()) 
-				LOG.debug("[#962] Service shared is: " + myService.getServiceName());
+				LOG.debug("[#1852] Service shared is: " + myService.getServiceName());
 			
 			Assert.assertEquals(myService.getServiceIdentifier().getServiceInstanceIdentifier(),testServiceId.getServiceInstanceIdentifier());
 			Assert.assertEquals(myService.getServiceIdentifier().getIdentifier(),testServiceId.getIdentifier());
 			
 			// Next we remove the service
 			if(LOG.isDebugEnabled()) 
-				LOG.debug("[#962] Attempting to remove the service from sharing!");
+				LOG.debug("[#1852] Attempting to remove the service from sharing!");
 			
 			TestCase962.getServiceRegistry().removeServiceSharingInCIS(testServiceId, myCis.getCisId());
 
-			if(LOG.isDebugEnabled()) LOG.debug("[#962] Now checking if service no longer shared on that CIS!");
+			if(LOG.isDebugEnabled()) LOG.debug("[#1852] Now checking if service no longer shared on that CIS!");
 			
 			serviceList = TestCase962.getServiceRegistry().retrieveServicesSharedByCIS(myCis.getCisId());
 			
 			Assert.assertNotNull(serviceList);
 			Assert.assertTrue(serviceList.isEmpty());
 			
-			if(LOG.isDebugEnabled()) LOG.debug("[#962] CIS now has " + serviceList.size() + " services shared!");
+			if(LOG.isDebugEnabled()) LOG.debug("[#1852] CIS now has " + serviceList.size() + " services shared!");
 
 		
 		} catch(Exception ex){

@@ -53,7 +53,7 @@ public class UAMEventingTest extends EventListener{
 
 	@Test
 	public void test() {
-		LOG.info("Monitor services #747 - Running UAMEventingTest");
+		LOG.info("Monitor services #1875 - Running UAMEventingTest");
 		//create action
 		IIdentity identity = TestCase747.commsMgr.getIdManager().getThisNetworkNode();
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
@@ -65,7 +65,7 @@ public class UAMEventingTest extends EventListener{
 		IAction action1 = new Action(serviceId, "testService", "volume", "high");
 
 		//register for local events
-		LOG.info("Monitor services #747 - Subscribing for local events of type UIM_Event");
+		LOG.info("Monitor services #1875 - Subscribing for local events of type UIM_Event");
 		/*String eventFilter = "(&" + 
 				"(" + CSSEventConstants.EVENT_NAME + "=newaction)" +
 				"(" + CSSEventConstants.EVENT_SOURCE + "=org/societies/useragent/monitoring)" +
@@ -77,13 +77,13 @@ public class UAMEventingTest extends EventListener{
 		}
 
 		//send action
-		LOG.info("Monitor services #747 - sending mock action to trigger UAM event");
+		LOG.info("Monitor services #1875 - sending mock action to trigger UAM event");
 		TestCase747.uam.monitor(identity, action1);
 
 		//10 second timeout
 		int counter = 10;
 		while(event == null && counter > 0){
-			LOG.info("Monitor services #747 - waiting for event: "+counter);
+			LOG.info("Monitor services #1875 - waiting for event: "+counter);
 			try {
 				Thread.sleep(1000);
 				counter --;
@@ -110,12 +110,12 @@ public class UAMEventingTest extends EventListener{
 
 	@Override
 	public void handleInternalEvent(InternalEvent event) {
-		LOG.info("Monitor services #747 - Internal event received!");
-		LOG.info("Monitor services #747 - Event type: "+event.geteventType());
-		LOG.info("Monitor services #747 - Event name: "+event.geteventName());
-		LOG.info("Monitor services #747 - Event source: "+event.geteventSource());
+		LOG.info("Monitor services #1875 - Internal event received!");
+		LOG.info("Monitor services #1875 - Event type: "+event.geteventType());
+		LOG.info("Monitor services #1875 - Event name: "+event.geteventName());
+		LOG.info("Monitor services #1875 - Event source: "+event.geteventSource());
 		UIMEvent payload = (UIMEvent)event.geteventInfo();
-		LOG.info("Monitor services #747 - Event payload -> Identity: "+payload.getUserId()+", Action: "+payload.getAction());
+		LOG.info("Monitor services #1875 - Event payload -> Identity: "+payload.getUserId()+", Action: "+payload.getAction());
 		this.event = event;
 	}
 

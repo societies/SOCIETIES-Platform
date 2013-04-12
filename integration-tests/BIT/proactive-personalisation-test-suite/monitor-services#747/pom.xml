@@ -2,11 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
-	<!-- change the artifactid to your project artifactid -->
-	<groupId>org.societies</groupId>
-	<artifactId>integration.test.bit.monitoring</artifactId>
+	<artifactId>bit.service_monitoring.1875</artifactId>
 	<packaging>bundle</packaging>
-	<version>${version.ua}</version>
+	<version>${release.version}</version>
 
 	<developers>
 		<developer>

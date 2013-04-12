@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.integration.test.bit</groupId>
-	<artifactId>privacydatamanagement</artifactId>
-	<name>#1266 Privacy Data Management Test Suite</name>
+	<groupId>org.societies.integration.test</groupId>
+	<artifactId>bit.privacy_data_management.1871</artifactId>
+	<name>#1871 Privacy Data Management Test Suite</name>
 	<packaging>bundle</packaging>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>${release.version}</version>
 
 	<developers>
 		<developer>

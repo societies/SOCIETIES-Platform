@@ -28,8 +28,8 @@ public class TestCase1055 extends IntegrationTestCase {
 		// with test case number
 		// and test case classes to run
 		//super(713, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
-		super(1055, new Class[] {NominalTestCaseLowerTester.class});
-		NominalTestCaseLowerTester.testCaseNumber = 1055;
+		super(1870, new Class[] {NominalTestCaseLowerTester.class});
+		NominalTestCaseLowerTester.testCaseNumber = 1870;
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class TestCase1055 extends IntegrationTestCase {
 		return privacyLogAppender;
 	}
 	public void setPrivacyLogAppender(IPrivacyLogAppender privacyLogAppender) {
-		LOG.debug("[#1055] setPrivacyLogAppender()");
+		LOG.debug("[#1870] setPrivacyLogAppender()");
 		TestCase1055.privacyLogAppender = privacyLogAppender;
 	}
 	protected static IIdentityManager getIdentityManager() {
@@ -53,28 +53,28 @@ public class TestCase1055 extends IntegrationTestCase {
 		return commManager;
 	}
 	public void setCommManager(ICommManager commManager) {
-		LOG.debug("[#1055] setCommManager()");
+		LOG.debug("[#1870] setCommManager()");
 		TestCase1055.commManager = commManager;
 	}
 	protected static ICtxBroker getCtxBrokerExternal() {
 		return ctxBrokerExternal;
 	}
 	public void setCtxBrokerExternal(ICtxBroker ctxBrokerExternal) {
-		LOG.debug("[#1055] setCtxBrokerExternal()");
+		LOG.debug("[#1870] setCtxBrokerExternal()");
 		TestCase1055.ctxBrokerExternal = ctxBrokerExternal;
 	}
 	protected static org.societies.api.internal.context.broker.ICtxBroker getCtxBrokerInternal() {
 		return ctxBrokerInternal;
 	}
 	public void setCtxBrokerInternal(org.societies.api.internal.context.broker.ICtxBroker ctxBrokerInternal) {
-		LOG.debug("[#1055] setCtxBrokerInternal()");
+		LOG.debug("[#1870] setCtxBrokerInternal()");
 		TestCase1055.ctxBrokerInternal = ctxBrokerInternal;
 	}
 	protected static IAssessment getAssessment() {
 		return assessment;
 	}
 	public void setAssessment(IAssessment assessment) {
-		LOG.debug("[#1055] setAssessment()");
+		LOG.debug("[#1870] setAssessment()");
 		TestCase1055.assessment = assessment;
 	}
 }

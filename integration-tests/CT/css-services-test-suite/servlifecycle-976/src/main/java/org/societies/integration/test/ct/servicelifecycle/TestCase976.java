@@ -61,24 +61,24 @@ public class TestCase976 extends IntegrationTestCase {
 		// with test case number
 		// and test case classes to run
 		//super(713, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
-		super(976, new Class[] {NominalTestCaseUpperTester.class});
-		NominalTestCaseUpperTester.testCaseNumber = 976;
+		super(1883, new Class[] {NominalTestCaseUpperTester.class});
+		NominalTestCaseUpperTester.testCaseNumber = 1883;
 	}
 
 
 	public void setServiceControl(IServiceControl serviceControl) {
-		if(LOG.isDebugEnabled()) LOG.debug("[#976] setServiceControl()");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1883] setServiceControl()");
 		TestCase976.serviceControl = serviceControl;
 	}
 	
 	
 	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
-		if(LOG.isDebugEnabled()) LOG.debug("[#976] setServiceDiscovery()");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1883] setServiceDiscovery()");
 		TestCase976.serviceDiscovery = serviceDiscovery;
 	}
 	
 	public void setCommManager(ICommManager commManager) {
-		if(LOG.isDebugEnabled()) LOG.debug("[#976] setCommManager()");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1883] setCommManager()");
 		TestCase976.commManager = commManager;
 	}
 

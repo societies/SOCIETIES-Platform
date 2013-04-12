@@ -87,9 +87,9 @@ public class NominalTestCaseUpperTester {
 	@BeforeClass
 	public static void initialization() {
 		
-		LOG.info("[#976] Initialization");
-		LOG.info("[#976] Prerequisite: The CSS is created");
-		LOG.info("[#976] Prerequisite: The user is logged to the CSS");
+		LOG.info("[#1883] Initialization");
+		LOG.info("[#1883] Prerequisite: The CSS is created");
+		LOG.info("[#1883] Prerequisite: The user is logged to the CSS");
 
 		serviceBundleUrl = NominalTestCaseUpperTester.class.getClassLoader().getResource(SERVICE_PATH);
 		
@@ -102,7 +102,7 @@ public class NominalTestCaseUpperTester {
 	 */
 	@Before
 	public void setUp() {
-		if(LOG.isDebugEnabled()) LOG.debug("[#976] NominalTestCaseUpperTester::setUp");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1883] NominalTestCaseUpperTester::setUp");
 		
 	}
 	
@@ -111,7 +111,7 @@ public class NominalTestCaseUpperTester {
 	 */
 	@After
 	public void tearDown() {
-		if(LOG.isDebugEnabled()) LOG.debug("[#976] NominalTestCaseUpperTester:: teardown");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1883] NominalTestCaseUpperTester:: teardown");
 		
 	}
 	
@@ -123,7 +123,7 @@ public class NominalTestCaseUpperTester {
 		
 		// Check if we're going to use another JID
 		String ourJid = TestCase976.getCommManager().getIdManager().getThisNetworkNode().getJid();
-		if(LOG.isDebugEnabled()) LOG.debug("[#976] Remote JID is " + REMOTEJID + " and local JID is " + ourJid);
+		if(LOG.isDebugEnabled()) LOG.debug("[#1883] Remote JID is " + REMOTEJID + " and local JID is " + ourJid);
 		
 		if(ourJid.equals(REMOTEJID)){
 			fail("Our JID is the Remote JID!");
@@ -131,7 +131,7 @@ public class NominalTestCaseUpperTester {
 		}
 		
 		// Now we can start!
-		LOG.info("[#976] Testing remote service lifecycle");
+		LOG.info("[#1883] Testing remote service lifecycle");
 		
 		try{
 		
@@ -153,30 +153,30 @@ public class NominalTestCaseUpperTester {
 	 */
 	private void testInstallService(){
 		
-		LOG.info("[#976] Testing installing a service on a remote node!");
+		LOG.info("[#1883] Testing installing a service on a remote node!");
 		
 		try{
 			//STEP 1: Get the Services
-			if(LOG.isDebugEnabled()) LOG.debug("[#976] Getting remote Services from " + REMOTEJID);
+			if(LOG.isDebugEnabled()) LOG.debug("[#1883] Getting remote Services from " + REMOTEJID);
 			
 			Future<List<Service>> asyncResult = TestCase976.getServiceDiscovery().getServices(REMOTEJID);
 			List<Service> resultList = asyncResult.get();
 			int serviceNumber = resultList.size();
 			
 			// STEP 2: Install the service
-			if(LOG.isDebugEnabled()) LOG.debug("[#976] Installing the service!");
+			if(LOG.isDebugEnabled()) LOG.debug("[#1883] Installing the service!");
 			
 			Future<ServiceControlResult> asyncInstallResult = TestCase976.getServiceControl().installService(serviceBundleUrl, REMOTEJID);
 			ServiceControlResult installResult = asyncInstallResult.get();
 			
 			// STEP 3: Is the result success?
-			Assert.assertEquals("[#976] Install not successfull", ResultMessage.SUCCESS, installResult.getMessage());
+			Assert.assertEquals("[#1883] Install not successfull", ResultMessage.SUCCESS, installResult.getMessage());
 			
 			if(installResult.getMessage() != ResultMessage.SUCCESS){
-				if(LOG.isDebugEnabled()) LOG.debug("[#976] Service was not installed successfully");
+				if(LOG.isDebugEnabled()) LOG.debug("[#1883] Service was not installed successfully");
 				return;
 			} else{
-				if(LOG.isDebugEnabled()) LOG.debug("[#976] Service installed successfully: " + installResult.getServiceId().getServiceInstanceIdentifier());
+				if(LOG.isDebugEnabled()) LOG.debug("[#1883] Service installed successfully: " + installResult.getServiceId().getServiceInstanceIdentifier());
 				testServiceId = installResult.getServiceId();
 			}
 			
@@ -184,21 +184,21 @@ public class NominalTestCaseUpperTester {
 			asyncResult = TestCase976.getServiceDiscovery().getServices(REMOTEJID);
 			resultList = asyncResult.get();
 			
-			Assert.assertEquals("[#976] Number of services not increased one! ",serviceNumber+1, resultList.size() );
+			Assert.assertEquals("[#1883] Number of services not increased one! ",serviceNumber+1, resultList.size() );
 			
 			// STEP 6: Check if service was returned and is installed;
 			Service installedService = getServiceFromList(resultList);
 			
 			assertNotNull(installedService);
 			if(installedService != null){
-				Assert.assertEquals("[#976] Service is not installed and started!",installedService.getServiceStatus(),ServiceStatus.STARTED);
-				if(LOG.isDebugEnabled()) LOG.debug("[#976] Service found and in status: " + installedService.getServiceStatus().toString());
+				Assert.assertEquals("[#1883] Service is not installed and started!",installedService.getServiceStatus(),ServiceStatus.STARTED);
+				if(LOG.isDebugEnabled()) LOG.debug("[#1883] Service found and in status: " + installedService.getServiceStatus().toString());
 			}
 			
 		} catch(Exception ex){
-			LOG.error("[#976] Exception occurred: " + ex);
+			LOG.error("[#1883] Exception occurred: " + ex);
 			ex.printStackTrace();
-			fail("[#976] Exception occurred: " + ex);
+			fail("[#1883] Exception occurred: " + ex);
 		}
 		
 	}
@@ -208,7 +208,7 @@ public class NominalTestCaseUpperTester {
 	 */
 	private void testStopService(){
 		
-		LOG.info("[#976] Testing stopping service");
+		LOG.info("[#1883] Testing stopping service");
 		
 		try{
 			
@@ -218,13 +218,13 @@ public class NominalTestCaseUpperTester {
 			ServiceControlResult stopResult = asyncStopResult.get();
 			
 			// STEP 8: Is the result success?
-			Assert.assertEquals("[#976] Stop not successfull", ResultMessage.SUCCESS, stopResult.getMessage());
+			Assert.assertEquals("[#1883] Stop not successfull", ResultMessage.SUCCESS, stopResult.getMessage());
 			
 			if(stopResult.getMessage() != ResultMessage.SUCCESS){
-				if(LOG.isDebugEnabled()) LOG.debug("[#976] Service was not stopped successfully");
+				if(LOG.isDebugEnabled()) LOG.debug("[#1883] Service was not stopped successfully");
 				return;
 			} else{
-				if(LOG.isDebugEnabled()) LOG.debug("[#976] Service was stopped successfully");
+				if(LOG.isDebugEnabled()) LOG.debug("[#1883] Service was stopped successfully");
 			}
 			
 			// Wait for OSGI to update
@@ -239,13 +239,13 @@ public class NominalTestCaseUpperTester {
 			
 			assertNotNull(installedService);
 			if(installedService != null){
-				Assert.assertEquals("[#976] Service is not stopped!",installedService.getServiceStatus(),ServiceStatus.STOPPED);
-				if(LOG.isDebugEnabled()) LOG.debug("[#976] Service found and in status: " + installedService.getServiceStatus().toString());
+				Assert.assertEquals("[#1883] Service is not stopped!",installedService.getServiceStatus(),ServiceStatus.STOPPED);
+				if(LOG.isDebugEnabled()) LOG.debug("[#1883] Service found and in status: " + installedService.getServiceStatus().toString());
 			}
 			
 		} catch(Exception ex){
-			LOG.error("[#976] Exception occurred: " + ex);
-			fail("[#976] Exception occurred: " + ex);
+			LOG.error("[#1883] Exception occurred: " + ex);
+			fail("[#1883] Exception occurred: " + ex);
 		}
 		
 	}
@@ -255,7 +255,7 @@ public class NominalTestCaseUpperTester {
 	 */
 	private void testStartService(){
 		
-		LOG.info("[#976] Testing start service");
+		LOG.info("[#1883] Testing start service");
 		
 		try{
 			
@@ -265,13 +265,13 @@ public class NominalTestCaseUpperTester {
 			ServiceControlResult startResult = asyncStartResult.get();
 			
 			// STEP 12: Is the result success?
-			Assert.assertEquals("[#976] Start not successfull", ResultMessage.SUCCESS, startResult.getMessage());
+			Assert.assertEquals("[#1883] Start not successfull", ResultMessage.SUCCESS, startResult.getMessage());
 			
 			if(startResult.getMessage() != ResultMessage.SUCCESS){
-				if(LOG.isDebugEnabled()) LOG.debug("[#976] Service was not started successfully");
+				if(LOG.isDebugEnabled()) LOG.debug("[#1883] Service was not started successfully");
 				return;
 			} else{
-				if(LOG.isDebugEnabled()) LOG.debug("[#976] Service was started successfully");
+				if(LOG.isDebugEnabled()) LOG.debug("[#1883] Service was started successfully");
 			}
 			
 			// Wait for OSGI to update
@@ -286,13 +286,13 @@ public class NominalTestCaseUpperTester {
 			
 			assertNotNull(installedService);
 			if(installedService != null){
-				Assert.assertEquals("[#976] Service is not started!",installedService.getServiceStatus(),ServiceStatus.STARTED);
-				if(LOG.isDebugEnabled()) LOG.debug("[#976] Service found and in status: " + installedService.getServiceStatus().toString());
+				Assert.assertEquals("[#1883] Service is not started!",installedService.getServiceStatus(),ServiceStatus.STARTED);
+				if(LOG.isDebugEnabled()) LOG.debug("[#1883] Service found and in status: " + installedService.getServiceStatus().toString());
 			}
 			
 		} catch(Exception ex){
-			LOG.error("[#976] Exception occurred: " + ex);
-			fail("[#976] Exception occurred: " + ex);
+			LOG.error("[#1883] Exception occurred: " + ex);
+			fail("[#1883] Exception occurred: " + ex);
 		}
 		
 	}
@@ -302,30 +302,30 @@ public class NominalTestCaseUpperTester {
 	 */
 	private void testUninstallService(){
 		
-		LOG.info("[#976] Testing uninstalling a service on a remote node!");
+		LOG.info("[#1883] Testing uninstalling a service on a remote node!");
 		
 		try{
 			//STEP 15.1: Get the Services
-			if(LOG.isDebugEnabled()) LOG.debug("[#976] Getting remote Services from " + REMOTEJID);
+			if(LOG.isDebugEnabled()) LOG.debug("[#1883] Getting remote Services from " + REMOTEJID);
 			
 			Future<List<Service>> asyncResult = TestCase976.getServiceDiscovery().getServices(REMOTEJID);
 			List<Service> resultList = asyncResult.get();
 			int serviceNumber = resultList.size();
 			
 			// STEP 15: Uninstall the service
-			if(LOG.isDebugEnabled()) LOG.debug("[#976] Uninstalling the service!");
+			if(LOG.isDebugEnabled()) LOG.debug("[#1883] Uninstalling the service!");
 			
 			Future<ServiceControlResult> asyncUninstallResult = TestCase976.getServiceControl().uninstallService(testServiceId);
 			ServiceControlResult uninstallResult = asyncUninstallResult.get();
 			
 			// STEP 16: Is the result success?
-			Assert.assertEquals("[#976] Uninstall not successfull", ResultMessage.SUCCESS, uninstallResult.getMessage());
+			Assert.assertEquals("[#1883] Uninstall not successfull", ResultMessage.SUCCESS, uninstallResult.getMessage());
 			
 			if(uninstallResult.getMessage() != ResultMessage.SUCCESS){
-				if(LOG.isDebugEnabled()) LOG.debug("[#976] Service was not uninstalled successfully");
+				if(LOG.isDebugEnabled()) LOG.debug("[#1883] Service was not uninstalled successfully");
 				return;
 			} else{
-				if(LOG.isDebugEnabled()) LOG.debug("[#976] Service uninstalled successfully: " + uninstallResult.getServiceId().getServiceInstanceIdentifier());
+				if(LOG.isDebugEnabled()) LOG.debug("[#1883] Service uninstalled successfully: " + uninstallResult.getServiceId().getServiceInstanceIdentifier());
 			}
 			
 			// Wait for OSGI to update
@@ -335,21 +335,21 @@ public class NominalTestCaseUpperTester {
 			asyncResult = TestCase976.getServiceDiscovery().getServices(REMOTEJID);
 			resultList = asyncResult.get();
 			
-			Assert.assertEquals("[#976] Number of services not diminished one! ",serviceNumber-1, resultList.size() );
+			Assert.assertEquals("[#1883] Number of services not diminished one! ",serviceNumber-1, resultList.size() );
 			
 			// STEP 19: Check if service was returned and is installed;
 			
-			Assert.assertNull("[#976] Service still there!", getServiceFromList(resultList));
+			Assert.assertNull("[#1883] Service still there!", getServiceFromList(resultList));
 
 		} catch(Exception ex){
-			LOG.error("[#976] Exception occurred: " + ex);
-			fail("[#976] Exception occurred: " + ex);
+			LOG.error("[#1883] Exception occurred: " + ex);
+			fail("[#1883] Exception occurred: " + ex);
 		}
 		
 	}
 	
 	private Service getServiceFromList(List<Service> resultList) {
-		if(LOG.isDebugEnabled()) LOG.debug("[#976] Checking for Service...");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1883] Checking for Service...");
 		Service result = null;
 		
 		for(Service service : resultList){
