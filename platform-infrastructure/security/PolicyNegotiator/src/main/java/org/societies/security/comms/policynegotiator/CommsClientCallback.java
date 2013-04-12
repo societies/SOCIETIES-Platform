@@ -107,7 +107,7 @@ public class CommsClientCallback implements ICommCallback {
 
 	@Override
 	public void receiveError(Stanza stanza, XMPPError error) {
-		LOG.debug("receiveError()");
+		LOG.warn("receiveError(): stanza = {}, error = {}", stanza, error);
 	}
 
 	@Override
