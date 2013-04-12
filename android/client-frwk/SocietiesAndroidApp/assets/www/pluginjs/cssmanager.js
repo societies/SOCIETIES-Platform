@@ -1,6 +1,5 @@
 phonegapdesktop.internal.parseConfigFile('pluginjs/cssmanager.json');
 
-
 window.plugins.SocietiesLocalCSSManager = {
 	connectService: function(successCallback, errorCallback){
 		if (phonegapdesktop.internal.randomException("CssManagerService")) {
@@ -186,10 +185,14 @@ window.plugins.SocietiesLocalCSSManager = {
 		//}
 	},
 	getVCardUser: function(userID, successCallback, errorCallback){
-		//if (phonegapdesktop.internal.randomException("getCssActivities")) {
-		//	errorCallback('A random error was generated');
-		//}
-		//else {
+		
+		for (j=0; j<vcardUsers.length; j++) {
+			if (vcardUsers[j].id == userID) {
+				successCallback(vcardUsers[j].vcard);
+				return;
+			}
+		}
+		//NOT FOUND - GOTO SERVER
 		var jsonMethod = "";
 		if (userID=="john.societies.local")
 			jsonMethod = "VCardJohn";
@@ -201,9 +204,14 @@ window.plugins.SocietiesLocalCSSManager = {
 			jsonMethod = "VCardBob";	
 		else
 			errorCallback("user vcard not found!");
-			
-		successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', jsonMethod));
-		//}
+		
+		var userVCard = phonegapdesktop.internal.getDebugValue('CssManagerService', jsonMethod);
+		successCallback(userVCard);
+		console.log("Caching image...");
+		//CACHE LOCALLY
+		var vcardData = {"id": userID, "vcard": userVCard};
+		//vcardUsers[countVCards] == vcardData;
+		vcardUsers.push(vcardData);
 	}
 }
 

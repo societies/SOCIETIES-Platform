@@ -31,6 +31,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 
 var myIdentity;
+var vcardUsers = [];
 
 var SocietiesLogin = {
 		
