@@ -507,8 +507,6 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 				cssRecord.setForeName(profile.getForeName());
 				cssRecord.setName(profile.getName());
 				cssRecord.setEmailID(profile.getEmailID());
-//				cssRecord.setImID(profile.getImID());
-//				cssRecord.setSocialURI(profile.getSocialURI());
 				cssRecord.setSex(profile.getSex());
 				cssRecord.setHomeLocation(profile.getHomeLocation());
 				cssRecord.setEntity(profile.getEntity());

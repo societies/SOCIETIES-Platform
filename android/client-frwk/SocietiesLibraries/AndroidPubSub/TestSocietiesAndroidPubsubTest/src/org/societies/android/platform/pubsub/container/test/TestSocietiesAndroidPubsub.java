@@ -22,6 +22,7 @@ import android.util.Log;
  * 1. An Openfire XMPP server must be running
  * 2. A suitable AVD must be running
  * 3. The AVD must be configured so that the XMPP_DOMAIN value is valid
+ * 4. The Societies Android Communications app must be installed.
  * 4. The Android Client or Login Tester app must have already logged in successfully
  *
  * Consult http://xmpp.org/extensions/xep-0060.html (Pubsub XMPP XEP) for more details especially 

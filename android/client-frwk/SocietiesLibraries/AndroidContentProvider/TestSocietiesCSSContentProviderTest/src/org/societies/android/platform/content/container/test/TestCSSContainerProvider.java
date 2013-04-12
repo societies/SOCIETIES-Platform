@@ -45,6 +45,25 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
     public static final String TEST_PASSWORD = "P455W0RD";
     public static final String TEST_SOCIAL_URI = "sombody@fb.com";
     public static final String TEST_DOMAIN_SERVER = "societies.bespoke";
+    public static final String TEST_POSITION = "operative";
+    public static final String TEST_WORKPLACE = "the Grindstone";
+    
+	public static final String TEST_UPDATE_IDENTITY = "alan.socities.bespoke";
+	public static final String TEST_UPDATE_INACTIVE_DATE = "20131029";
+    public static final String TEST_UPDATE_REGISTERED_DATE = "20130229";
+    public static final int TEST_UPDATE_UPTIME = 77967;
+    public static final String TEST_UPDATE_EMAIL = "somebody@tssg.net";
+    public static final String TEST_UPDATE_FORENAME = "4NameFore";
+    public static final String TEST_UPDATE_HOME_LOCATION = "The Hearthiest";
+    public static final String TEST_UPDATE_HOSTING_LOCATION = "Dubliner";
+    public static final String TEST_UPDATE_IDENTITY_NAME = "Id Nameest";
+    public static final String TEST_UPDATE_IM_ID = "somebody.tssg.orgy";
+    public static final String TEST_UPDATE_NAME = "The Other CSS";
+    public static final String TEST_UPDATE_PASSWORD = "P455Wweird";
+    public static final String TEST_UPDATE_SOCIAL_URI = "sombody@fb.net";
+    public static final String TEST_UPDATE_DOMAIN_SERVER = "societies.bespookiest";
+    public static final String TEST_UPDATE_POSITION = "operativeUnderling";
+    public static final String TEST_UPDATE_WORKPLACE = "the Slow Grindstone ";
 
     //Preferences
 	private static final String USER_VALUE = "paranoid";
@@ -169,6 +188,58 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
             fail();
         }
 	}
+	
+	@MediumTest
+	public void testCSSRecordDAO() throws Exception {
+		assertTrue(this.cssDAO.cssRecordExists());
+		CssRecord cssRecord = this.cssDAO.readCSSrecord();
+		assertEquals(TEST_IDENTITY, cssRecord.getCssIdentity());
+		assertEquals(TEST_DOMAIN_SERVER, cssRecord.getDomainServer());
+		assertEquals(TEST_EMAIL, cssRecord.getEmailID());
+		assertEquals(TEST_FORENAME, cssRecord.getForeName());
+		assertEquals(CSSManagerEnums.entityType.Person.ordinal(), cssRecord.getEntity());
+		assertEquals(TEST_HOME_LOCATION, cssRecord.getHomeLocation());
+		assertEquals(TEST_NAME, cssRecord.getName());
+		assertEquals(TEST_PASSWORD, cssRecord.getPassword());
+		assertEquals(TEST_POSITION, cssRecord.getPosition());
+		assertEquals(CSSManagerEnums.genderType.Male.ordinal(), cssRecord.getSex());
+		assertEquals(TEST_WORKPLACE, cssRecord.getWorkplace());
+	}
+	
+	@MediumTest
+	public void testUpdateCSSRecordDAO() throws Exception {
+		assertTrue(this.cssDAO.cssRecordExists());
+		CssRecord cssRecord  = new CssRecord();
+		
+		cssRecord.setCssIdentity(TEST_UPDATE_IDENTITY);
+		cssRecord.setDomainServer(TEST_UPDATE_DOMAIN_SERVER);
+		cssRecord.setEmailID(TEST_UPDATE_EMAIL);
+		cssRecord.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
+		cssRecord.setForeName(TEST_UPDATE_FORENAME);
+		cssRecord.setHomeLocation(TEST_UPDATE_HOME_LOCATION);
+		cssRecord.setName(TEST_UPDATE_NAME);
+		cssRecord.setPassword(TEST_UPDATE_PASSWORD);
+		cssRecord.setSex(CSSManagerEnums.genderType.Female.ordinal());
+		cssRecord.setPosition(TEST_UPDATE_POSITION);
+		cssRecord.setWorkplace(TEST_UPDATE_WORKPLACE);
+		this.cssDAO.updateCSSRecord(cssRecord);
+		
+		CssRecord updatedRecord = this.cssDAO.readCSSrecord();
+		
+		assertEquals(TEST_UPDATE_IDENTITY, updatedRecord.getCssIdentity());
+		assertEquals(TEST_UPDATE_DOMAIN_SERVER, updatedRecord.getDomainServer());
+		assertEquals(TEST_UPDATE_EMAIL, updatedRecord.getEmailID());
+		assertEquals(TEST_UPDATE_FORENAME, updatedRecord.getForeName());
+		assertEquals(CSSManagerEnums.entityType.Organisation.ordinal(), updatedRecord.getEntity());
+		assertEquals(TEST_UPDATE_HOME_LOCATION, updatedRecord.getHomeLocation());
+		assertEquals(TEST_UPDATE_NAME, updatedRecord.getName());
+		assertEquals(TEST_UPDATE_PASSWORD, updatedRecord.getPassword());
+		assertEquals(TEST_UPDATE_POSITION, updatedRecord.getPosition());
+		assertEquals(CSSManagerEnums.genderType.Female.ordinal(), updatedRecord.getSex());
+		assertEquals(TEST_UPDATE_WORKPLACE, updatedRecord.getWorkplace());
+
+		
+	}
 	//Cannot be tested as MockContext fails at getPackageName()
 //	@MediumTest
 //	public void testPreferences() throws Exception {
@@ -240,20 +311,16 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
 		cssRecord.setArchiveCSSNodes(archivedNodes);
 		cssRecord.setCssNodes(currentNodes);
 		cssRecord.setCssIdentity(TEST_IDENTITY);
-//		cssRecord.setCssHostingLocation(TEST_HOSTING_LOCATION);
 		cssRecord.setDomainServer(TEST_DOMAIN_SERVER);
 		cssRecord.setEmailID(TEST_EMAIL);
 		cssRecord.setEntity(CSSManagerEnums.entityType.Person.ordinal());
 		cssRecord.setForeName(TEST_FORENAME);
 		cssRecord.setHomeLocation(TEST_HOME_LOCATION);
-//		cssRecord.setIdentityName(TEST_IDENTITY_NAME);
-//		cssRecord.setImID(TEST_IM_ID);
 		cssRecord.setName(TEST_NAME);
 		cssRecord.setPassword(TEST_PASSWORD);
-//		cssRecord.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
 		cssRecord.setSex(CSSManagerEnums.genderType.Male.ordinal());
-//		cssRecord.setSocialURI(TEST_SOCIAL_URI);
-//		cssRecord.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
+		cssRecord.setPosition(TEST_POSITION);
+		cssRecord.setWorkplace(TEST_WORKPLACE);
 		
 		return cssRecord;
 	}

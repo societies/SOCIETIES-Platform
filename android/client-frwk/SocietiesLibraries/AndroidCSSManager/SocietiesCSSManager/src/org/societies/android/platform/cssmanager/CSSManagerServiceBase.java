@@ -1252,6 +1252,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 		 * @param record
 		 */
 		private void updateLocalPersistence(CssRecord record) {
+			Log.d(LOG_TAG, "Update local persistence");
 			if (this.returnIntent.equals(IAndroidCSSManager.LOGIN_CSS) || 
 					this.returnIntent.equals(IAndroidCSSManager.SYNCH_PROFILE) || 
 					this.returnIntent.equals(IAndroidCSSManager.MODIFY_ANDROID_CSS_RECORD)) {

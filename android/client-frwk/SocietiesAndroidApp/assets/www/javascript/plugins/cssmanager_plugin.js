@@ -327,14 +327,14 @@ var	SocietiesLocalCSSManager = {
                 "entity": data.entity,
                 "foreName": data.foreName,
                 "homeLocation": null,
-                "identityName": data.cssIdentity,
-                "imID": data.imID,
                 "name": data.name,
                 "password": null,
                 "presence": 0,
                 "sex": data.sex,
                 "socialURI": null,
-                "status": 0
+                "status": 0,
+                "workplace": data.workplace,
+                "position": data.position
 	            }
 
                 return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful

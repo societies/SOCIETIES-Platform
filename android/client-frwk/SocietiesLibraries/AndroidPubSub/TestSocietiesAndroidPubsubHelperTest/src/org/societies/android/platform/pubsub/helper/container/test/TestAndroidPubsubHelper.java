@@ -90,8 +90,20 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 							assertTrue(result);
 							TestAndroidPubsubHelper.this.testCompleted = true;
 						}
+
+						@Override
+						public void returnException(String arg0) {
+							// TODO Auto-generated method stub
+							
+						}
 					});
 				}
+			}
+
+			@Override
+			public void returnException(String arg0) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 		Thread.sleep(DELAY);
@@ -136,12 +148,25 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 												assertTrue(result);
 												TestAndroidPubsubHelper.this.testCompleted = true;
 											}
+
+											@Override
+											public void returnException(
+													String arg0) {
+												// TODO Auto-generated method stub
+												
+											}
 										});
 									}
 									
 									@Override
 									public void returnAction(boolean arg0) {
 										fail();
+									}
+
+									@Override
+									public void returnException(String arg0) {
+										// TODO Auto-generated method stub
+										
 									}
 								});
 							} catch (XMPPError e) {
@@ -159,6 +184,12 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 						public void returnAction(boolean result) {
 							fail();
 						}
+
+						@Override
+						public void returnException(String arg0) {
+							// TODO Auto-generated method stub
+							
+						}
 					});
 				} catch (XMPPError e) {
 					e.printStackTrace();
@@ -167,6 +198,12 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 					e.printStackTrace();
 					fail();
 				}
+			}
+
+			@Override
+			public void returnException(String arg0) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 
@@ -215,12 +252,25 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 													assertTrue(result);
 													TestAndroidPubsubHelper.this.testCompleted = true;
 												}
+
+												@Override
+												public void returnException(
+														String arg0) {
+													// TODO Auto-generated method stub
+													
+												}
 											});
 										}
 										
 										@Override
 										public void returnAction(boolean result) {
 											fail();
+										}
+
+										@Override
+										public void returnException(String arg0) {
+											// TODO Auto-generated method stub
+											
 										}
 									});
 								} catch (XMPPError e) {
@@ -238,6 +288,12 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 							public void returnAction(boolean result) {
 								fail();
 							}
+
+							@Override
+							public void returnException(String arg0) {
+								// TODO Auto-generated method stub
+								
+							}
 						});
 					} catch (XMPPError e) {
 						// TODO Auto-generated catch block
@@ -249,6 +305,12 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 						fail();
 					}
 				}
+			}
+
+			@Override
+			public void returnException(String arg0) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 		Thread.sleep(DELAY);
@@ -323,11 +385,25 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 																					assertTrue(result);
 																					TestAndroidPubsubHelper.this.testCompleted = true;
 																				}
+
+																				@Override
+																				public void returnException(
+																						String arg0) {
+																					// TODO Auto-generated method stub
+																					
+																				}
 																			});
 																		}
 																		
 																		@Override
 																		public void returnAction(boolean arg0) {
+																		}
+
+																		@Override
+																		public void returnException(
+																				String arg0) {
+																			// TODO Auto-generated method stub
+																			
 																		}
 																	});
 																} catch (XMPPError e) {
@@ -337,6 +413,13 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 																	// TODO Auto-generated catch block
 																	e.printStackTrace();
 																}
+															}
+
+															@Override
+															public void returnException(
+																	String arg0) {
+																// TODO Auto-generated method stub
+																
 															}
 														});
 														
@@ -353,6 +436,13 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 												public void returnAction(boolean arg0) {
 													fail();
 												}
+
+												@Override
+												public void returnException(
+														String arg0) {
+													// TODO Auto-generated method stub
+													
+												}
 											});
 										} catch (XMPPError e) {
 											e.printStackTrace();
@@ -361,6 +451,12 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 											e.printStackTrace();
 											fail();
 										}
+									}
+
+									@Override
+									public void returnException(String arg0) {
+										// TODO Auto-generated method stub
+										
 									}
 								});
 							} catch (XMPPError e) {
@@ -376,6 +472,12 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 						public void returnAction(boolean arg0) {
 							fail();
 						}
+
+						@Override
+						public void returnException(String arg0) {
+							// TODO Auto-generated method stub
+							
+						}
 					});
 				} catch (XMPPError e) {
 					e.printStackTrace();
@@ -384,6 +486,12 @@ public class TestAndroidPubsubHelper extends AndroidTestCase {
 					e.printStackTrace();
 					fail();
 				}
+				
+			}
+
+			@Override
+			public void returnException(String arg0) {
+				// TODO Auto-generated method stub
 				
 			}
 		});
