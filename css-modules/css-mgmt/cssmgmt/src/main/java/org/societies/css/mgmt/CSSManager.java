@@ -2243,6 +2243,7 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 	List<CssAdvertisementRecord> cssFriends = new ArrayList<CssAdvertisementRecord>();
 	List<Person> snFriends = new ArrayList<Person>();
 	List<String> socialFriends = new ArrayList<String>();
+	List<String> alreadyListed = new ArrayList<String>();
 	
 	List<String> facebookFriends = new ArrayList<String>();
 	List<String> twitterFriends = new ArrayList<String>();
@@ -2253,6 +2254,8 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 	List<ICis> cisList = new ArrayList<ICis>();
 	Future<List<CssAdvertisementRecordDetailed>> asynchallcss =  this.getCssAdvertisementRecordsFull();
 	List<CssAdvertisementRecordDetailed> allcssDetails = new ArrayList<CssAdvertisementRecordDetailed>();
+	Future<List<CssAdvertisementRecord>> asyncalreadyFriends = this.getCssFriends();
+	List<CssAdvertisementRecord> alreadyFriends = new ArrayList<CssAdvertisementRecord>();
 	HashMap<CssAdvertisementRecord, Integer> commonFriends = new HashMap<CssAdvertisementRecord, Integer>();
 	HashMap<CssAdvertisementRecord, Integer> comparedFriends = new HashMap<CssAdvertisementRecord, Integer>();
 	
@@ -2364,15 +2367,37 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 
 		getCssDirectoryRemote().findAllCssAdvertisementRecords(callback);
 		recordList = callback.getResultList();
+		
+		try {
+			alreadyFriends = asyncalreadyFriends.get();
+			if (alreadyFriends.size() > 0){
+				for (CssAdvertisementRecord arf : alreadyFriends){
+					alreadyListed.add(arf.getName());
+				}
+			}
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ExecutionException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		for (CssAdvertisementRecord cssAdd : recordList){
-		
 			if (cssAdd.getId().equalsIgnoreCase(MyId)) {
 			LOG.info("@@@@@@@ This is my OWN ID not adding it");
 			}else {
-				cssFriends.add((cssAdd));
+				if (alreadyListed.contains(cssAdd.getName())){
+					LOG.info("Already a friend not adding it");
+				}
+				else {
+					cssFriends.add((cssAdd));
+				}
+					
 			}
 		}
+		LOG.info("###### cssFriends size is now: " +cssFriends.size());
+		
 	}
 
 	// Generate the connector
@@ -2618,11 +2643,17 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 						}
 					}
              }else {
+            	 LOG.info("done adding to compared friends list now remove any existing friends from list");
+                 LOG.info("alreadyFriends size is : " +alreadyFriends.size());
+                 LOG.info("cssFriends size is : " +cssFriends.size());
             	 for(int j = 0; j < cssFriends.size(); j++){
             		 LOG.info("Adding friends to comparedfriends list " +cssFriends.get(j).getName());
             		 comparedFriends.put(cssFriends.get(j), none );
             	 }
              }
+             
+             
+             
     
 	return new AsyncResult<HashMap<CssAdvertisementRecord, Integer>> (comparedFriends);
 	}
