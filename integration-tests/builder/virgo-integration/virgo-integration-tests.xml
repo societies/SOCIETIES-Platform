@@ -42,9 +42,9 @@
 		<module>../../BIT/css-services-test-suite/install-service-713</module>
 		<module>../../BIT/css-services-test-suite/start-stop-714</module>
 		<module>../../BIT/privacy-trust-test-suite/assessment</module>
-		<module>../../BIT/privacy-trust-test-suite/data-management-1266</module>
-		<module>../../BIT/privacy-trust-test-suite/policy-management-1244</module>
-		<module>../../BIT/privacy-trust-test-suite/negotiation-management-1264</module>
+		<module>../../BIT/privacy-trust-test-suite/data-management-1871</module>
+		<module>../../BIT/privacy-trust-test-suite/negotiation-management-1872</module>
+		<module>../../BIT/privacy-trust-test-suite/policy-management-1873</module>
 		<module>../../BIT/privacy-trust-test-suite/local-trust-eventing-1962</module>
 		<module>../../BIT/cis-services-test-suite/cis-share-service-962</module>
 		<!-- <module>../../BIT/cis-services-test-suite/cis-list-services-964</module> -->
