@@ -328,8 +328,6 @@ public class NominalTestCaseLowerTester {
 		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
 		String providerJid = TestCase1001.getProviderJid();
 		
-		//return idMgr.getDomainAuthorityNode();
-		//return idMgr.getThisNetworkNode();
 		LOG.debug("getProvider(): using JID {}", providerJid);
 		return idMgr.fromFullJid(providerJid);
 	}
