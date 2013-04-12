@@ -35,8 +35,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -47,6 +52,8 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.identity.util.RequestorUtils;
+import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
@@ -54,6 +61,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.schema.identity.DataIdentifierScheme;
@@ -67,10 +75,17 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  *
  */
 public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManagerTest.class.getSimpleName());
-
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManagerTest.class);
 	public static Integer testCaseNumber = 0;
 
+	private IPrivacyPolicyManagerListener privacyPolicyListener;
+	private CountDownLatch lock;
+	private boolean succeed;
+	private String resultMsg;
+	private Exception errorException;
+	private RequestPolicy retrievedPrivacyPolicy;
+
+	private IIdentity currentNode;
 	private IIdentity targetedNode;
 	private RequestorCis requestorCis;
 	private RequestorService requestorService;
@@ -78,18 +93,73 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 	private RequestPolicy servicePolicy;
 
 	@Before
-	public void setUp() throws Exception {
-		LOG.info("[#"+testCaseNumber+"] "+getClass().getSimpleName()+"::setUp");
+	public void setUp() {
+		LOG.info("[#"+testCaseNumber+"] setUp");
 		// Dependency injection not ready
 		if (!TestCase.isDepencyInjectionDone()) {
-			throw new PrivacyException("[#"+testCaseNumber+"] [Dependency Injection] PrivacyPolicyManagerTest not ready");
+			LOG.error("[#"+testCaseNumber+"] [Dependency Injection] PrivacyPolicyManagerTest not ready");
+			fail("[Dependency Injection] PrivacyPolicyManagerTest not ready");
 		}
+
+		// Listener
+		lock = new CountDownLatch(1);
+		privacyPolicyListener = new IPrivacyPolicyManagerListener() {
+
+			@Override
+			public void onPrivacyPolicyRetrieved(RequestPolicy privacyPolicy) {
+				succeed = true;
+				retrievedPrivacyPolicy = privacyPolicy;
+				resultMsg = "Privacy policy retrieved or updated!";
+//				LOG.debug("onPrivacyPolicyRetrieved"+resultMsg);
+				lock.countDown();
+			}
+
+			@Override
+			public void onOperationSucceed(String msg) {
+				succeed = true;
+				resultMsg = "Privacy Policy action succeed: "+msg;
+//				LOG.debug("onOperationSucceed"+resultMsg);
+				lock.countDown();
+			}
+
+			@Override
+			public void onOperationCancelled(String msg) {
+				succeed = false;
+				resultMsg = "Privacy Policy action cancelled. "+msg;
+//				LOG.debug("onOperationCancelled"+resultMsg);
+				lock.countDown();
+			}
+
+			@Override
+			public void onOperationAborted(String msg, Exception e) {
+				succeed = false;
+				resultMsg = "Privacy Policy action aborted. "+msg;
+				errorException = e;
+//				LOG.debug("onOperationAborted"+resultMsg);
+				lock.countDown();
+			}
+		};
+
 		// Data
-		targetedNode = TestCase.commManager.getIdManager().getThisNetworkNode();
-		requestorCis = getRequestorCis();
-		requestorService = getRequestorService();
-		cisPolicy = getRequestPolicy(requestorCis);
-		servicePolicy = getRequestPolicy(requestorService);
+		try {
+			currentNode = TestCase.commManager.getIdManager().getThisNetworkNode();
+			targetedNode = TestCase.commManager.getIdManager().getThisNetworkNode();
+			requestorCis = getRequestorCis();
+			requestorService = getRequestorService();
+			cisPolicy = getRequestPolicy(requestorCis);
+			servicePolicy = getRequestPolicy(requestorService);
+		} catch (InvalidFormatException e) {
+			LOG.error("[#"+testCaseNumber+"] Error during setup", e);
+			fail("Error during setup");
+		}
+	}
+
+	@Before
+	public void tearDown() {
+		LOG.info("[#"+testCaseNumber+"] tearDown");
+		succeed = false;
+		resultMsg = "";
+		retrievedPrivacyPolicy = null;
 	}
 
 
@@ -97,22 +167,37 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#getPrivacyPolicy(java.lang.String)}.
 	 */
 	@Test
-	@Ignore
 	public void testGetCisPrivacyPolicyNonExisting() {
-		String testTitle = new String("testGetCisPrivacyPolicyNonExisting: retrieve a non-existing privacy policy");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy expectedPrivacyPolicy = null;
-		RequestPolicy privacyPolicy = null;
+		String testTitle = new String("Get CIS Privacy Policy: retrieve a non-existing privacy policy");
+		LOG.info("[#"+testCaseNumber+"][Test] "+testTitle);
 		try {
-			TestCase.privacyPolicyManagerRemote.getPrivacyPolicy(requestorCis, targetedNode, this);
-		} catch (PrivacyException e) {
+			// -- Try to retrieve
+			LOG.debug("[#"+testCaseNumber+"] Try to retrieve...");
+			TestCase.privacyPolicyManagerRemote.getPrivacyPolicy(RequestorUtils.toRequestor(RequestorUtils.create(currentNode.getJid(), "cis-"+(new Random().nextInt()+".ict-societies.eu")), TestCase.commManager.getIdManager()),
+					targetedNode,
+					privacyPolicyListener);
+			boolean releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				succeed = false;
+				resultMsg = "Privacy policy retrieving aborted due to timeout";
+				errorException = new TimeoutException(resultMsg+": more than "+TestCase.getTimeout()+"ms to do this operation.");
+			}
+			// Verify
+			if (!succeed) {
+				LOG.error("[#"+testCaseNumber+"] Error: "+resultMsg, errorException);
+				fail("Error: "+resultMsg);
+			}
+			assertNull("Retrieved privacy policy should be null", retrievedPrivacyPolicy);
+		}
+		catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
 			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
 			fail("Error: "+e.getMessage());
 		}
-		assertEquals("Expected null privacy policy, but it is not.", privacyPolicy, expectedPrivacyPolicy);
 	}
 
 	/**
@@ -120,267 +205,439 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 	 */
 	@Test
 	public void testGetCisPrivacyPolicy() {
-		String testTitle = new String("testGetCisPrivacyPolicy: add and retrieve the CIS privacy policy ("+requestorCis+") from "+targetedNode);
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
+		String testTitle = new String("Get CIS Privacy Policy: add and retrieve the CIS privacy policy ("+requestorCis+") from "+targetedNode);
+		LOG.info("[#"+testCaseNumber+"][Test] "+testTitle);
 		try {
-			TestCase.privacyPolicyManagerRemote.updatePrivacyPolicy(cisPolicy, targetedNode, this);
-			try {
-				Thread.sleep(5*1000); 
-			} catch (InterruptedException e) { 
-				LOG.error("[#"+testCaseNumber+"] [Test InterruptedException] "+testTitle, e);
-				fail("[#"+testCaseNumber+"] InterruptedException "+testTitle+": "+e.getMessage());
+			// -- Create privacy Policy
+			LOG.debug("[#"+testCaseNumber+"] Creation...");
+			lock = new CountDownLatch(1);
+			TestCase.privacyPolicyManagerRemote.updatePrivacyPolicy(cisPolicy, targetedNode, privacyPolicyListener);
+			boolean releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				succeed = false;
+				resultMsg = "Privacy policy updated aborted due to timeout";
+				errorException = new TimeoutException(resultMsg+": more than "+TestCase.getTimeout()+"ms to do this operation.");
 			}
-			TestCase.privacyPolicyManagerRemote.getPrivacyPolicy(requestorCis, targetedNode, this);
-			try {
-				Thread.sleep(5*1000); 
-			} catch (InterruptedException e) { 
-				LOG.error("[#"+testCaseNumber+"] [Test InterruptedException] "+testTitle, e);
-				fail("[#"+testCaseNumber+"] InterruptedException "+testTitle+": "+e.getMessage());
+			// Verify
+			if (!succeed) {
+				LOG.error("[#"+testCaseNumber+"] Error: "+resultMsg, errorException);
+				fail("Error: "+resultMsg);
 			}
-			TestCase.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorCis, targetedNode, this);
-			try {
-				Thread.sleep(5*1000); 
-			} catch (InterruptedException e) { 
-				LOG.error("[#"+testCaseNumber+"] [Test InterruptedException] "+testTitle, e);
-				fail("[#"+testCaseNumber+"] InterruptedException "+testTitle+": "+e.getMessage());
+			assertNotNull("Retrieved privacy policy should not be null", retrievedPrivacyPolicy);
+			assertEquals("Created and retrieved privacy policy should be equals", cisPolicy, retrievedPrivacyPolicy);
+			assertNotNull("Retrieved privacy policy should not be null", retrievedPrivacyPolicy);
+			assertEquals("Created and retrieved privacy policy strings should be equals", cisPolicy.toString(), retrievedPrivacyPolicy.toString());
+			succeed = false;
+			retrievedPrivacyPolicy = null;
+
+			// -- Retrieve Privacy Policy
+			LOG.debug("[#"+testCaseNumber+"] Try to retrieve...");
+			lock = new CountDownLatch(1);
+			TestCase.privacyPolicyManagerRemote.getPrivacyPolicy(requestorCis, targetedNode, privacyPolicyListener);
+			releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				succeed = false;
+				resultMsg = "Privacy policy retrieving aborted due to timeout";
+				errorException = new TimeoutException(resultMsg+": more than "+TestCase.getTimeout()+"ms to do this operation.");
 			}
-		} catch (PrivacyException e) {
+			// Verify
+			if (!succeed) {
+				LOG.error("[#"+testCaseNumber+"] Error: "+resultMsg, errorException);
+				fail("Error: "+resultMsg);
+			}
+			assertNotNull("Retrieved privacy policy should not be null", retrievedPrivacyPolicy);
+			assertEquals("Created and retrieved privacy policy should be equals", cisPolicy, retrievedPrivacyPolicy);
+			assertEquals("Created and retrieved privacy policy strings should be equals", cisPolicy.toString(), retrievedPrivacyPolicy.toString());
+
+			// -- Delete this privacy policy
+			LOG.debug("[#"+testCaseNumber+"] Delete...");
+			lock = new CountDownLatch(1);
+			TestCase.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorCis, targetedNode, privacyPolicyListener);
+			releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				succeed = false;
+				resultMsg = "Privacy policy deletion aborted due to timeout";
+				errorException = new TimeoutException(resultMsg+": more than "+TestCase.getTimeout()+"ms to do this operation.");
+			}
+			// Verify
+			if (!succeed) {
+				LOG.error("[#"+testCaseNumber+"] Error: "+resultMsg, errorException);
+				fail("Error: "+resultMsg);
+			}
+
+			// -- Try to retrieve
+			LOG.debug("[#"+testCaseNumber+"] Try to retrieve again...");
+			lock = new CountDownLatch(1);
+			TestCase.privacyPolicyManagerRemote.getPrivacyPolicy(requestorCis, targetedNode, privacyPolicyListener);
+			releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				succeed = false;
+				resultMsg = "Privacy policy retrieving aborted due to timeout";
+				errorException = new TimeoutException(resultMsg+": more than "+TestCase.getTimeout()+"ms to do this operation.");
+			}
+			// Verify
+			if (!succeed) {
+				LOG.error("[#"+testCaseNumber+"] Error: "+resultMsg, errorException);
+				fail("Error: "+resultMsg);
+			}
+			assertNull("Retrieved privacy policy should be null", retrievedPrivacyPolicy);
+		} 
+		catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
 			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
 			fail("Error: "+e.getMessage());
 		}
-		assertTrue(true);
 	}
 
 	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#getPrivacyPolicy(java.lang.String)}.
 	 */
 	@Test
-	@Ignore
 	public void testGetServicePrivacyPolicyNonExisting() {
-		String testTitle = new String("testGetServicePrivacyPolicyNonExisting: retrieve a non-existing privacy policy");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy expectedPrivacyPolicy = null;
-		RequestPolicy privacyPolicy = null;
+		String testTitle = new String("Get Service Privacy Policy: retrieve a non-existing privacy policy");
+		LOG.info("[#"+testCaseNumber+"][Test] "+testTitle);
 		try {
-			TestCase.privacyPolicyManagerRemote.getPrivacyPolicy(requestorService, targetedNode, this);
-		} catch (PrivacyException e) {
+			// -- Delete this privacy policy (to be sure it doesn't exist)
+			LOG.debug("[#"+testCaseNumber+"] Delete...");
+			lock = new CountDownLatch(1);
+			TestCase.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorService, targetedNode, privacyPolicyListener);
+			boolean releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				succeed = false;
+				resultMsg = "Privacy policy deletion aborted due to timeout";
+				errorException = new TimeoutException(resultMsg+": more than "+TestCase.getTimeout()+"ms to do this operation.");
+			}
+			// Verify
+			if (!succeed) {
+				LOG.error("[#"+testCaseNumber+"] Error: "+resultMsg, errorException);
+				fail("Error: "+resultMsg);
+			}
+
+			// -- Try to retrieve
+			LOG.debug("[#"+testCaseNumber+"] Try to retrieve...");
+			lock = new CountDownLatch(1);
+			TestCase.privacyPolicyManagerRemote.getPrivacyPolicy(requestorService, targetedNode, privacyPolicyListener);
+			releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				succeed = false;
+				resultMsg = "Privacy policy retrieving aborted due to timeout";
+				errorException = new TimeoutException(resultMsg+": more than "+TestCase.getTimeout()+"ms to do this operation.");
+			}
+			// Verify
+			if (!succeed) {
+				LOG.error("[#"+testCaseNumber+"] Error: "+resultMsg, errorException);
+				fail("Error: "+resultMsg);
+			}
+			assertNull("Retrieved privacy policy should be null", retrievedPrivacyPolicy);
+		}
+		catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
 			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
 			fail("Error: "+e.getMessage());
 		}
-		assertEquals("Expected null privacy policy, but it is not.", privacyPolicy, expectedPrivacyPolicy);
 	}
 
 	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#getPrivacyPolicy(java.lang.String)}.
 	 */
 	@Test
-	@Ignore
 	public void testGetServicePrivacyPolicy() {
-		String testTitle = new String("testGetServicePrivacyPolicy: add and retrieve a privacy policy");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy addedPrivacyPolicy = null;
-		RequestPolicy privacyPolicy = null;
-		boolean deleteResult = false;
+		String testTitle = new String("Get Service Privacy Policy: add and retrieve a privacy policy");
+		LOG.info("[#"+testCaseNumber+"][Test] "+testTitle);
 		try {
-			TestCase.privacyPolicyManagerRemote.updatePrivacyPolicy(servicePolicy, targetedNode, this);
-			TestCase.privacyPolicyManagerRemote.getPrivacyPolicy(requestorService, targetedNode, this);
-			TestCase.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorService, targetedNode, this);
-		} catch (PrivacyException e) {
+			// -- Create privacy Policy
+			LOG.debug("[#"+testCaseNumber+"] Create...");
+			lock = new CountDownLatch(1);
+			TestCase.privacyPolicyManagerRemote.updatePrivacyPolicy(servicePolicy, targetedNode, privacyPolicyListener);
+			boolean releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				succeed = false;
+				resultMsg = "Privacy policy updated aborted due to timeout";
+				errorException = new TimeoutException(resultMsg+": more than "+TestCase.getTimeout()+"ms to do this operation.");
+			}
+			// Verify
+			if (!succeed) {
+				LOG.error("[#"+testCaseNumber+"] Error: "+resultMsg, errorException);
+				fail("Error: "+resultMsg);
+			}
+			assertNotNull("Retrieved privacy policy should not be null", retrievedPrivacyPolicy);
+			assertEquals("Created and retrieved privacy policy should be equals", servicePolicy, retrievedPrivacyPolicy);
+			assertEquals("Created and retrieved privacy policy strings should be equals", servicePolicy.toString(), retrievedPrivacyPolicy.toString());
+			succeed = false;
+			retrievedPrivacyPolicy = null;
+
+			// -- Retrieve Privacy Policy
+			LOG.debug("[#"+testCaseNumber+"] Try to retrieve...");
+			lock = new CountDownLatch(1);
+			TestCase.privacyPolicyManagerRemote.getPrivacyPolicy(requestorService, targetedNode, privacyPolicyListener);
+			releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				succeed = false;
+				resultMsg = "Privacy policy retrieving aborted due to timeout";
+				errorException = new TimeoutException(resultMsg+": more than "+TestCase.getTimeout()+"ms to do this operation.");
+			}
+			// Verify
+			if (!succeed) {
+				LOG.error("[#"+testCaseNumber+"] Error: "+resultMsg, errorException);
+				fail("Error: "+resultMsg);
+			}
+			assertNotNull("Retrieved privacy policy should not be null", retrievedPrivacyPolicy);
+			assertEquals("Created and retrieved privacy policy should be equals", servicePolicy, retrievedPrivacyPolicy);
+			assertEquals("Created and retrieved privacy policy strings should be equals", servicePolicy.toString(), retrievedPrivacyPolicy.toString());
+
+			// -- Delete this privacy policy
+			LOG.debug("[#"+testCaseNumber+"] Delete...");
+			lock = new CountDownLatch(1);
+			TestCase.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorService, targetedNode, privacyPolicyListener);
+			releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				succeed = false;
+				resultMsg = "Privacy policy deletion aborted due to timeout";
+				errorException = new TimeoutException(resultMsg+": more than "+TestCase.getTimeout()+"ms to do this operation.");
+			}
+			// Verify
+			if (!succeed) {
+				LOG.error("[#"+testCaseNumber+"] Error: "+resultMsg, errorException);
+				fail("Error: "+resultMsg);
+			}
+
+			// -- Try to retrieve
+			LOG.debug("[#"+testCaseNumber+"] Try to retrieve again...");
+			lock = new CountDownLatch(1);
+			TestCase.privacyPolicyManagerRemote.getPrivacyPolicy(requestorService, targetedNode, privacyPolicyListener);
+			releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				succeed = false;
+				resultMsg = "Privacy policy retrieving aborted due to timeout";
+				errorException = new TimeoutException(resultMsg+": more than "+TestCase.getTimeout()+"ms to do this operation.");
+			}
+			// Verify
+			if (!succeed) {
+				LOG.error("[#"+testCaseNumber+"] Error: "+resultMsg, errorException);
+				fail("Error: "+resultMsg);
+			}
+			assertNull("Retrieved privacy policy should be null", retrievedPrivacyPolicy);
+		} 
+		catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
 			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
 			fail("Error: "+e.getMessage());
 		}
-		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
-		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicy);
-		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicy, addedPrivacyPolicy);
-		assertTrue("Privacy policy not deleted.", deleteResult);
 	}
 
 	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy)}.
 	 */
 	@Test
-	@Ignore
 	public void testUpdatesCisPrivacyPolicy() {
-		String testTitle = new String("testUpdatePrivacyPolicy: update the same privacy policy");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy privacyPolicy1 = null;
-		RequestPolicy privacyPolicy2 = null;
-		boolean deleteResult = false;
+		String testTitle = new String("Update Privacy Policy: update the same privacy policy several times");
+		LOG.info("[#"+testCaseNumber+"][Test] "+testTitle);
 		try {
-			TestCase.privacyPolicyManagerRemote.updatePrivacyPolicy(cisPolicy, targetedNode, this);
-			TestCase.privacyPolicyManagerRemote.updatePrivacyPolicy(cisPolicy, targetedNode, this);
-			TestCase.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorCis, targetedNode, this);
-		} catch (PrivacyException e) {
+			// -- Create privacy Policy
+			LOG.debug("[#"+testCaseNumber+"] Creation...");
+			lock = new CountDownLatch(1);
+			TestCase.privacyPolicyManagerRemote.updatePrivacyPolicy(cisPolicy, targetedNode, privacyPolicyListener);
+			boolean releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				succeed = false;
+				resultMsg = "Privacy policy creation aborted due to timeout";
+				errorException = new TimeoutException(resultMsg+": more than "+TestCase.getTimeout()+"ms to do this operation.");
+			}
+			// Verify
+			if (!succeed) {
+				LOG.error("[#"+testCaseNumber+"] Error: "+resultMsg, errorException);
+				fail("Error: "+resultMsg);
+			}
+			assertNotNull("Retrieved privacy policy should not be null", retrievedPrivacyPolicy);
+			assertEquals("Created and retrieved privacy policy should be equals", cisPolicy, retrievedPrivacyPolicy);
+			assertEquals("Created and retrieved privacy policy strings should be equals", cisPolicy.toString(), retrievedPrivacyPolicy.toString());
+			RequestPolicy retrievedPrivacyPolicy1 = retrievedPrivacyPolicy;
+			succeed = false;
+			retrievedPrivacyPolicy = null;
+
+			// -- Create privacy Policy
+			LOG.debug("[#"+testCaseNumber+"] Creation again...");
+			lock = new CountDownLatch(1);
+			TestCase.privacyPolicyManagerRemote.updatePrivacyPolicy(cisPolicy, targetedNode, privacyPolicyListener);
+			releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				succeed = false;
+				resultMsg = "Privacy policy creation aborted due to timeout";
+				errorException = new TimeoutException(resultMsg+": more than "+TestCase.getTimeout()+"ms to do this operation.");
+			}
+			// Verify
+			if (!succeed) {
+				LOG.error("[#"+testCaseNumber+"] Error: "+resultMsg, errorException);
+				fail("Error: "+resultMsg);
+			}
+			assertNotNull("Retrieved privacy policy should not be null", retrievedPrivacyPolicy);
+			assertEquals("Created and retrieved privacy policy should be equals", cisPolicy, retrievedPrivacyPolicy);
+			assertEquals("Created and retrieved privacy policy strings should be equals", cisPolicy.toString(), retrievedPrivacyPolicy.toString());
+			assertEquals("Previous and retrieved privacy policy should be equals", retrievedPrivacyPolicy1, retrievedPrivacyPolicy);
+			assertEquals("Previous and retrieved privacy policy strings should be equals", retrievedPrivacyPolicy1.toString(), retrievedPrivacyPolicy.toString());
+
+			// -- Delete this privacy policy
+			LOG.debug("[#"+testCaseNumber+"] Delete...");
+			lock = new CountDownLatch(1);
+			TestCase.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorCis, targetedNode, privacyPolicyListener);
+			releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				succeed = false;
+				resultMsg = "Privacy policy deletion aborted due to timeout";
+				errorException = new TimeoutException(resultMsg+": more than "+TestCase.getTimeout()+"ms to do this operation.");
+			}
+			// Verify
+			if (!succeed) {
+				LOG.error("[#"+testCaseNumber+"] Error: "+resultMsg, errorException);
+				fail("Error: "+resultMsg);
+			}
+		}
+		catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
 			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
 			fail("Error: "+e.getMessage());
 		}
-		assertEquals("Privacy policy not created", cisPolicy, privacyPolicy1);
-		assertEquals("Privacy policy not updated", cisPolicy, privacyPolicy2);
-		assertEquals("Difference between same privacy policies", privacyPolicy1, privacyPolicy2);
-		assertTrue("Privacy policy not deleted.", deleteResult);
 	}
 
 	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy)}.
 	 */
 	@Test
-	@Ignore
-	public void testUpdatesCisPrivacyPolicies() {
-		String testTitle = new String("testUpdatePrivacyPolicy: update the same privacy policy");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy privacyPolicy1 = null;
-		RequestPolicy privacyPolicy2 = null;
+	public void testUpdatesCisPrivacyPolicySeveral() {
+		String testTitle = new String("Update Privacy Policy: update the same privacy policy several times with updates");
+		LOG.info("[#"+testCaseNumber+"][Test] "+testTitle);
 		RequestItem requestItem = new RequestItem(cisPolicy.getRequests().get(0).getResource(), cisPolicy.getRequests().get(0).getActions(), cisPolicy.getRequests().get(0).getConditions());
 		List<RequestItem> requestItems = new ArrayList<RequestItem>();
 		requestItems.add(requestItem);
 		RequestPolicy cisPolicy2 = new RequestPolicy(requestItems);
 		cisPolicy2.setRequestor(requestorCis);
-		boolean deleteResult = false;
 		try {
-			TestCase.privacyPolicyManagerRemote.updatePrivacyPolicy(cisPolicy, targetedNode, this);
-			TestCase.privacyPolicyManagerRemote.updatePrivacyPolicy(cisPolicy2, targetedNode, this);
-			TestCase.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorCis, targetedNode, this);
-		} catch (PrivacyException e) {
+			// -- Create privacy Policy
+			LOG.debug("[#"+testCaseNumber+"] Creation...");
+			lock = new CountDownLatch(1);
+			TestCase.privacyPolicyManagerRemote.updatePrivacyPolicy(cisPolicy, targetedNode, privacyPolicyListener);
+			boolean releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				succeed = false;
+				resultMsg = "Privacy policy creation aborted due to timeout";
+				errorException = new TimeoutException(resultMsg+": more than "+TestCase.getTimeout()+"ms to do this operation.");
+			}
+			// Verify
+			if (!succeed) {
+				LOG.error("[#"+testCaseNumber+"] Error: "+resultMsg, errorException);
+				fail("Error: "+resultMsg);
+			}
+			assertNotNull("Retrieved privacy policy should not be null", retrievedPrivacyPolicy);
+			assertEquals("Created and retrieved privacy policy should be equals", cisPolicy, retrievedPrivacyPolicy);
+			assertEquals("Created and retrieved privacy policy strings should be equals", cisPolicy.toString(), retrievedPrivacyPolicy.toString());
+			RequestPolicy retrievedPrivacyPolicy1 = retrievedPrivacyPolicy;
+			succeed = false;
+			retrievedPrivacyPolicy = null;
+
+			// -- Update this privacy Policy
+			LOG.debug("[#"+testCaseNumber+"] Update...");
+			lock = new CountDownLatch(1);
+			TestCase.privacyPolicyManagerRemote.updatePrivacyPolicy(cisPolicy2, targetedNode, privacyPolicyListener);
+			releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				succeed = false;
+				resultMsg = "Privacy policy creation aborted due to timeout";
+				errorException = new TimeoutException(resultMsg+": more than "+TestCase.getTimeout()+"ms to do this operation.");
+			}
+			// Verify
+			if (!succeed) {
+				LOG.error("[#"+testCaseNumber+"] Error: "+resultMsg, errorException);
+				fail("Error: "+resultMsg);
+			}
+			assertNotNull("Retrieved privacy policy should not be null", retrievedPrivacyPolicy);
+			assertEquals("Created and retrieved privacy policy should be equals", cisPolicy2, retrievedPrivacyPolicy);
+			assertEquals("Created and retrieved privacy policy strings should be equals", cisPolicy2.toString(), retrievedPrivacyPolicy.toString());
+			assertFalse("Previous and retrieved privacy policy should not be equals", retrievedPrivacyPolicy1.equals(retrievedPrivacyPolicy));
+			assertFalse("Previous and retrieved privacy policy strings should be equals", retrievedPrivacyPolicy1.toString().equals(retrievedPrivacyPolicy.toString()));
+			RequestPolicy retrievedPrivacyPolicy2 = retrievedPrivacyPolicy;
+			succeed = false;
+			retrievedPrivacyPolicy = null;
+
+			// -- Retrieve Privacy Policy
+			LOG.debug("[#"+testCaseNumber+"] Try to retrieve...");
+			lock = new CountDownLatch(1);
+			TestCase.privacyPolicyManagerRemote.getPrivacyPolicy(requestorCis, targetedNode, privacyPolicyListener);
+			releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				succeed = false;
+				resultMsg = "Privacy policy retrieving aborted due to timeout";
+				errorException = new TimeoutException(resultMsg+": more than "+TestCase.getTimeout()+"ms to do this operation.");
+			}
+			// Verify
+			if (!succeed) {
+				LOG.error("[#"+testCaseNumber+"] Error: "+resultMsg, errorException);
+				fail("Error: "+resultMsg);
+			}
+			assertNotNull("Retrieved privacy policy should not be null", retrievedPrivacyPolicy);
+			assertEquals("Updated (raw) and retrieved privacy policy should be equals", cisPolicy2, retrievedPrivacyPolicy);
+			assertEquals("Updated (raw) and retrieved privacy policy strings should be equals", cisPolicy2.toString(), retrievedPrivacyPolicy.toString());
+			assertEquals("Updated and retrieved privacy policy should be equals", retrievedPrivacyPolicy2, retrievedPrivacyPolicy);
+			assertEquals("Updated and retrieved privacy policy strings should be equals", retrievedPrivacyPolicy2.toString(), retrievedPrivacyPolicy.toString());
+
+
+			// -- Delete this privacy policy
+			LOG.debug("[#"+testCaseNumber+"] Delete...");
+			lock = new CountDownLatch(1);
+			TestCase.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorCis, targetedNode, privacyPolicyListener);
+			releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				succeed = false;
+				resultMsg = "Privacy policy deletion aborted due to timeout";
+				errorException = new TimeoutException(resultMsg+": more than "+TestCase.getTimeout()+"ms to do this operation.");
+			}
+			// Verify
+			if (!succeed) {
+				LOG.error("[#"+testCaseNumber+"] Error: "+resultMsg, errorException);
+				fail("Error: "+resultMsg);
+			}
+		}
+		catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
 			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
 			fail("Error: "+e.getMessage());
 		}
-		assertEquals("Privacy policy not created", cisPolicy, privacyPolicy1);
-		assertEquals("Privacy policy not updated", cisPolicy2, privacyPolicy2);
-		assertFalse("Same privacy policies but it should not", privacyPolicy1.equals(privacyPolicy2));
-		assertTrue("Privacy policy not deleted.", deleteResult);
 	}
 
 
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#deletePrivacyPolicy(java.lang.String)}.
-	 */
-	@Test
-	@Ignore
-	public void testDeleteServicePrivacyPolicyNotExisting() {
-		String testTitle = new String("testDeleteServicePrivacyPolicyNotExisting: delete a non-existing privacy policy");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy privacyPolicy = null;
-		boolean deleteResult = false;
-		try {
-			TestCase.privacyPolicyManagerRemote.getPrivacyPolicy(requestorService, targetedNode, this);
-			TestCase.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorService, targetedNode, this);
-		} catch (PrivacyException e) {
-			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
-			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error: "+e.getMessage());
-		}
-		assertNull("This privacy policy exists!", privacyPolicy);
-		assertTrue("Privacy policy not deleted.", deleteResult);
-	}
-
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#deletePrivacyPolicy(java.lang.String)}.
-	 */
-	@Test
-	@Ignore
-	public void testDeleteCisPrivacyPolicyNotExisting() {
-		String testTitle = new String("testDeleteCisPrivacyPolicyNotExisting: delete a non-existing privacy policy");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy privacyPolicy = null;
-		boolean deleteResult = false;
-		try {
-			TestCase.privacyPolicyManagerRemote.getPrivacyPolicy(requestorCis, targetedNode, this);
-			TestCase.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorCis, targetedNode, this);
-		} catch (PrivacyException e) {
-			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
-			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error: "+e.getMessage());
-		}
-		assertNull("This privacy policy exists!", privacyPolicy);
-		if (null != privacyPolicy) {
-			LOG.info(privacyPolicy.toXMLString());
-		}
-		assertTrue("Privacy policy not deleted.", deleteResult);
-	}
-
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#deletePrivacyPolicy(java.lang.String)}.
-	 */
-	@Test
-	@Ignore
-	public void testDeleteServicePrivacyPolicy() {
-		String testTitle = new String("testDeletePrivacyPolicy: add and retrieve and delete a privacy policy");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy addedPrivacyPolicy = null;
-		RequestPolicy privacyPolicyBefore = null;
-		RequestPolicy privacyPolicyAfter = null;
-		boolean deleteResult = false;
-		try {
-			TestCase.privacyPolicyManagerRemote.updatePrivacyPolicy(servicePolicy, targetedNode, this);
-			TestCase.privacyPolicyManagerRemote.getPrivacyPolicy(requestorService, targetedNode, this);
-			TestCase.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorService, targetedNode, this);
-			TestCase.privacyPolicyManagerRemote.getPrivacyPolicy(requestorService, targetedNode, this);
-		} catch (PrivacyException e) {
-			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
-			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error: "+e.getMessage());
-		}
-		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
-		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicyBefore);
-		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicyBefore, addedPrivacyPolicy);
-		assertTrue("Privacy policy not deleted.", deleteResult);
-		assertNull("Privacy policy not really deleted.", privacyPolicyAfter);
-	}
-
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#deletePrivacyPolicy(java.lang.String)}.
-	 */
-	@Test
-	@Ignore
-	public void testDeleteCisPrivacyPolicy() {
-		String testTitle = new String("testDeleteCisPrivacyPolicy: add and retrieve and delete a privacy policy");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy addedPrivacyPolicy = null;
-		RequestPolicy privacyPolicyBefore = null;
-		RequestPolicy privacyPolicyAfter = null;
-		boolean deleteResult = false;
-		try {
-			TestCase.privacyPolicyManagerRemote.updatePrivacyPolicy(cisPolicy, targetedNode, this);
-			TestCase.privacyPolicyManagerRemote.getPrivacyPolicy(requestorCis, targetedNode, this);
-			TestCase.privacyPolicyManagerRemote.deletePrivacyPolicy(requestorCis, targetedNode, this);
-			TestCase.privacyPolicyManagerRemote.getPrivacyPolicy(requestorCis, targetedNode, this);
-		} catch (PrivacyException e) {
-			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
-			fail("Privacy error: "+e.getMessage());
-		} catch (Exception e) {
-			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
-			fail("Error: "+e.getMessage());
-		}
-		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
-		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicyBefore);
-		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicyBefore, addedPrivacyPolicy);
-		assertTrue("Privacy policy not deleted.", deleteResult);
-		assertNull("Privacy policy not really deleted.", privacyPolicyAfter);
-	}
 
 
-	
 	/* --- Tools --- */
 	private RequestPolicy getRequestPolicy(Requestor requestor) {
 		List<RequestItem> requestItems = getRequestItems();

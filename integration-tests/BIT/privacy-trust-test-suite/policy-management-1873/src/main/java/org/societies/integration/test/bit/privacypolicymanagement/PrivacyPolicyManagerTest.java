@@ -112,7 +112,7 @@ public class PrivacyPolicyManagerTest {
 	public void testGetCisPrivacyPolicyNonExisting() {
 		String testTitle = new String("testGetCisPrivacyPolicyNonExisting: retrieve a non-existing privacy policy");
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		RequestPolicy expectedPrivacyPolicy = null;
+		boolean deleteResult = false;
 		RequestPolicy privacyPolicy = null;
 		if (null == TestCase.privacyPolicyManager) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle+" : privacyPolicyManager is null");
@@ -123,6 +123,7 @@ public class PrivacyPolicyManagerTest {
 			fail("Error: requestorCis is null");
 		}
 		try {
+			deleteResult = TestCase.privacyPolicyManager.deletePrivacyPolicy(requestorCis);
 			privacyPolicy = TestCase.privacyPolicyManager.getPrivacyPolicy(requestorCis);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
@@ -132,10 +133,7 @@ public class PrivacyPolicyManagerTest {
 			fail("Error: "+e.getMessage());
 		}
 		
-		//Modified by rafik
-		//before:
-		//assertEquals("Expected null privacy policy, but it is not.", privacyPolicy, expectedPrivacyPolicy);
-		//After:
+		assertTrue("Hum, apperently there was an existing privacy policy, and it can't not been deleted.", deleteResult);
 		assertNull("Expected null privacy policy, but it is not.", privacyPolicy);
 	}
 
