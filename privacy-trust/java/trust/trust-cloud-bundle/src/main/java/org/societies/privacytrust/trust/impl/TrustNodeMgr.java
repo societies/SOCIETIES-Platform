@@ -86,14 +86,12 @@ public class TrustNodeMgr implements ITrustNodeMgr {
 	}
 	
 	/*
-	 * @see org.societies.privacytrust.trust.api.ITrustNodeMgr#isMaster()
+	 * @see org.societies.privacytrust.trust.api.ITrustNodeMgr#getLocalIdentity()
 	 */
 	@Override
-	public boolean isMaster() {
-
-		final INetworkNode localNode = this.commMgr.getIdManager().getThisNetworkNode();
-		final INetworkNode cloudNode = this.commMgr.getIdManager().getCloudNode();
-		return localNode.equals(cloudNode);
+	public IIdentity getLocalIdentity() {
+		
+		return this.commMgr.getIdManager().getCloudNode();
 	}
 	
 	/*
@@ -102,7 +100,18 @@ public class TrustNodeMgr implements ITrustNodeMgr {
 	@Override
 	public Requestor getLocalRequestor() {
 		
-		return new Requestor(this.commMgr.getIdManager().getCloudNode());
+		return new Requestor(this.getLocalIdentity());
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.ITrustNodeMgr#isMaster()
+	 */
+	@Override
+	public boolean isMaster() {
+
+		final INetworkNode localNode = this.commMgr.getIdManager().getThisNetworkNode();
+		final INetworkNode cloudNode = this.commMgr.getIdManager().getCloudNode();
+		return localNode.equals(cloudNode);
 	}
 	
 	/*

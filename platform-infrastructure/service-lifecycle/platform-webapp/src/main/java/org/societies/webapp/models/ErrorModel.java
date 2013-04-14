@@ -22,70 +22,37 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-/**
- * 
- */
 package org.societies.webapp.models;
 
-
-
 /**
- * 
- * @author Luca Lamorte
- * This Form will add minimum information to add a connector... 
- *       
+ * Describe your class here...
+ *
+ * @author Mirko
+ *
  */
-public class ContextForm {
+public class ErrorModel {
+	
+	private String errorCode;
+	private String errorMessage;
+	private String errorDescription;
+	
+	public String getErrorCode() {
+		return errorCode;
+	}
+	public void setErrorCode(String errorCode) {
+		this.errorCode = errorCode;
+	}
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
+	public String getErrorDescription() {
+		return errorDescription;
+	}
+	public void setErrorDescription(String errorDescription) {
+		this.errorDescription = errorDescription.replaceAll("\n", "<br/>");
+	}
 
-	private String method;
-	private String type;
-    private String model;
-    private String ctxID;
-    private String value;
-    private String viewType;
-    private int pathIndex;
-    
-    
-	public String getMethod() {
-		return method;
-	}
-	public void setMethod(String method) {
-		this.method = method;
-	}
-	public String getType() {
-		return type;
-	}
-	public void setType(String type) {
-		this.type = type;
-	}
-	public String getModel() {
-		return model;
-	}
-	public void setModel(String model) {
-		this.model = model;
-	}
-	public String getCtxID() {
-		return ctxID;
-	}
-	public void setCtxID(String ctxID) {
-		this.ctxID = ctxID;
-	}
-	public String getValue() {
-		return value;
-	}
-	public void setValue(String value) {
-		this.value = value;
-	}
-	public String getViewType() {
-		return viewType;
-	}
-	public void setViewType(String viewType) {
-		this.viewType = viewType;
-	}
-	public int getPathIndex() {
-		return pathIndex;
-	}
-	public void setPathIndex(int pathIndex) {
-		this.pathIndex = pathIndex;
-	}
 }
