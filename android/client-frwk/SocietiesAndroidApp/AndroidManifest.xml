@@ -58,6 +58,8 @@
         <activity android:name="org.societies.android.platform.useragent.feedback.guis.AcknackPopup" />
         <activity android:name="org.societies.android.platform.useragent.feedback.guis.CheckboxPopup" />
         <activity android:name="org.societies.android.platform.useragent.feedback.guis.RadioPopup" />
+        <activity android:name="org.societies.android.platform.useragent.feedback.guis.SimpleNotificationPopup" />
+        <activity android:name="org.societies.android.platform.useragent.feedback.guis.TimedAbortPopup" />
         <!-- LOCAL SERVICES -->
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceManagementLocal" />
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceUtilitiesRemote" />
