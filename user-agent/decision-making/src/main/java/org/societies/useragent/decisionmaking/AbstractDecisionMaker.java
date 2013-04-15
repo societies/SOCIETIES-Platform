@@ -46,6 +46,8 @@ import org.slf4j.*;
 public abstract class AbstractDecisionMaker implements IDecisionMaker {
 	IConflictResolutionManager manager;
 	IUserFeedback feedbackHandler;
+	public HashSet<IOutcome> hasBeenChecked=new HashSet<IOutcome>();
+	
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 
 	public IConflictResolutionManager getManager() {
@@ -124,11 +126,27 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 		logging.debug("after resolving DM");
 	}
 
-	protected boolean getImplictUserFeedback(String content) {
+	protected boolean getUserFeedback(String content, IAction action) {
 		try {
-			ImpProposalContent ic = new ImpProposalContent(content, 30);
-			return feedbackHandler.getImplicitFB(ImpProposalType.TIMED_ABORT,
-					ic).get();
+			IOutcome iot = (IOutcome) action;
+			if(hasBeenChecked.contains(iot)){
+				hasBeenChecked.remove(iot);
+				return true;
+			}
+			if (iot.getConfidenceLevel() > 50) {
+				ImpProposalContent ic = new ImpProposalContent(content, 10);
+				return feedbackHandler.getImplicitFB(
+						ImpProposalType.TIMED_ABORT, ic).get();
+			} else {
+				ExpProposalContent epc = 
+						new ExpProposalContent(content,new String[]{"Yes","No"});
+				List<String> result= feedbackHandler.getExplicitFB(
+						ExpProposalType.RADIOLIST, epc).get();
+				if(result.get(0).equals("Yes"))
+					return true;
+				else
+					return false;
+			}
 		} catch (Exception e) {
 			System.err.println(e);
 			return false;
@@ -139,5 +157,4 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 			IOutcome prefernce);
 
 	protected abstract void implementIAction(IAction action);
-
 }
