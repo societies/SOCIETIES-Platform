@@ -36,7 +36,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import org.societies.android.api.comms.IMethodCallback;
-import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
@@ -59,11 +58,11 @@ public abstract class UserFeedbackPopup extends Activity {
     private boolean isEventsConnected = false;
     private boolean published = false;
 
-    private final int contentViewID;
-    private final int headerID;
-    private final int submitButtonID;
-    private final int optionsMenuID;
-    private final String responseIntent;
+    protected final int contentViewID;
+    protected final int headerID;
+    protected final int submitButtonID;
+    protected final int optionsMenuID;
+    protected final String responseIntent;
 
     protected UserFeedbackPopup(int contentViewID, int headerID, int submitButtonID, int optionsMenuID, String responseIntent) {
         this.contentViewID = contentViewID;
@@ -84,7 +83,7 @@ public abstract class UserFeedbackPopup extends Activity {
         //RETRIEVE USER FEEDBACK BEAN FROM INTENT
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        userFeedbackBean = bundle.getParcelable(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY);
+        userFeedbackBean = bundle.getParcelable(UserFeedbackActivityIntentExtra.USERFEEDBACK_NODES);
 
         populateHeader();
 
