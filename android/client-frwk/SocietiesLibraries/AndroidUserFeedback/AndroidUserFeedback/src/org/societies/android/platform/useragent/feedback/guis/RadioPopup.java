@@ -28,6 +28,7 @@ public class RadioPopup extends UserFeedbackPopup {
             radio = new RadioButton(this);
             radio.setText(option);
             radio.setTag(option);
+            radio.setTextColor(R.color.Black);
             radioGroup.addView(radio);
 
             // remember the option as it's clicked

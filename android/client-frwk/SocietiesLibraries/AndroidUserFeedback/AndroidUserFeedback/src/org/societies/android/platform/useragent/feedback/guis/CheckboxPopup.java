@@ -28,6 +28,7 @@ public class CheckboxPopup extends UserFeedbackPopup {
             CheckBox checkbox = new CheckBox(this);
             checkbox.setText(option);
             checkbox.setTag(option);
+            checkbox.setTextColor(R.color.Black);
             checkboxGroup.addView(checkbox);
 
             // remember the option as it's clicked
