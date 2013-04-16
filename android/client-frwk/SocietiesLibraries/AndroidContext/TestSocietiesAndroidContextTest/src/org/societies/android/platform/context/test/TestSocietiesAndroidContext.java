@@ -25,14 +25,20 @@
 package org.societies.android.platform.context.test;
 
 import java.net.URISyntaxException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
+import org.societies.api.schema.context.model.CtxAttributeBean;
+import org.societies.api.schema.context.model.CtxEntityBean;
+import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.android.api.context.CtxException;
 import org.societies.android.api.context.ICtxClient;
+import org.societies.android.api.css.manager.IServiceManager;
+import org.societies.android.api.internal.cssmanager.CSSManagerEnums.entityType;
 import org.societies.android.platform.context.container.TestAndroidContextBroker;
 import org.societies.android.platform.context.container.TestAndroidContextBroker.TestContextBrokerBinder;
-import org.societies.android.platform.context.impl.ContextBrokerBase;
-import org.societies.android.platform.context.impl.mocks.MockClientCommunicationMgr;
+import org.societies.android.platform.context.ContextBrokerBase;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 
 import android.content.BroadcastReceiver;
@@ -51,9 +57,24 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 
 	private static final String LOG_TAG = TestSocietiesAndroidContext.class.getName();
 	private static final String CLIENT_ID = "org.societies.android.platform.context.test";
+	private static final int DELAY = 20001;
+
+	private static final String REQUESTOR_ID = "jane.societies.local";
+	
+	private ICtxClient ctxBrokerService;
+	private long testStartTime, testEndTime;
+    private boolean testCompleted;
+	private CountDownLatch serviceStartedSignal;
+	private CountDownLatch testDoneSignal;
+	
+	private BroadcastReceiver receiver;	
+    
 //	private ARequestor requestor;
 	private RequestorBean requestor;
 	private Boolean receivedResult = false;
+
+	private CtxEntityBean entity;
+	private CtxAttributeBean attribute;
 	
 	public TestSocietiesAndroidContext() {
 		super(TestAndroidContextBroker.class);
@@ -63,50 +84,144 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
+
+		this.receiver = this.setupBroadcastReceiver();
+		this.serviceStartedSignal = new CountDownLatch(1);
+		Intent commsIntent = new Intent(getContext(), TestAndroidContextBroker.class);
+        TestContextBrokerBinder binder = (TestContextBrokerBinder) bindService(commsIntent);
+        assertNotNull(binder);
+        this.ctxBrokerService = (ICtxClient) binder.getService();
+        this.ctxBrokerService.startService();
+//		Thread.sleep(DELAY);
+        assertTrue(this.serviceStartedSignal.await(DELAY, TimeUnit.MILLISECONDS));
+	}
+	
+	protected void tearDown() throws Exception {
+		this.unregisterReceiver(this.receiver);
+		Thread.sleep(DELAY);
+        //ensure that service is shutdown to test if service leakage occurs
+        super.shutdownService();
+		super.tearDown();
 	}
 
-	private class CtxBrokerBroadcastReceiver extends BroadcastReceiver{
-		private final String LOG_TAG = CtxBrokerBroadcastReceiver.class.getName();
+    private void unregisterReceiver(BroadcastReceiver receiver) {
+        Log.d(LOG_TAG, "Unregister broadcast receiver");
+        getContext().unregisterReceiver(receiver);
+    }
+    
+	private class MainReceiver extends BroadcastReceiver{
+//		private final String LOG_TAG = MainReceiver.class.getName();
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.d(LOG_TAG, "Received action: " + intent.getAction());
+			Log.d(LOG_TAG, "ContextBrokerTest - Received action: " + intent.getAction());
+			
+			if (intent.getAction().equals(IServiceManager.INTENT_SERVICE_STARTED_STATUS)) {
+				final boolean serviceStarted = intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
+				Log.d(LOG_TAG, "Service started: " + serviceStarted);
+				assertTrue("Service not started", serviceStarted);
+				TestSocietiesAndroidContext.this.serviceStartedSignal.countDown();
+				return;
+			}
+			else if (intent.getAction().equals(ICtxClient.CREATE_ENTITY)) {
+				Log.d(LOG_TAG, "Created Context Entity");
+				entity = intent.getParcelableExtra(ICtxClient.INTENT_RETURN_VALUE_KEY);
+				Log.d(LOG_TAG, "Entity created: " + entity);
+				Log.d(LOG_TAG, "entityId: " + entity.getId());
+				assertNotNull(entity);
+			}
+			else if (intent.getAction().equals(ICtxClient.CREATE_ATTRIBUTE)) {
+				Log.d(LOG_TAG, "Created Context Attribute");
+				attribute = intent.getParcelableExtra(ICtxClient.INTENT_RETURN_VALUE_KEY);
+				Log.d(LOG_TAG, "Attribute created: " + attribute);
+				assertNotNull(attribute);
+			}
 			TestSocietiesAndroidContext.this.receivedResult = true;
 			assertNotNull(intent.getParcelableExtra(ICtxClient.INTENT_RETURN_VALUE_KEY));
 			Log.d(LOG_TAG, "OnReceive finished");
+			
+			//signal that test has completed
+/*			TestSocietiesAndroidContext.this.testCompleted = true;
+			TestSocietiesAndroidContext.this.testEndTime = System.currentTimeMillis();		
+	        Log.d(LOG_TAG, intent.getAction() + " elapse time: " 
+	        		+ (TestSocietiesAndroidContext.this.testEndTime - TestSocietiesAndroidContext.this.testStartTime));
+*/
+			TestSocietiesAndroidContext.this.testEndTime = System.currentTimeMillis();
+			Log.d(LOG_TAG, intent.getAction() + " elapse time: " 
+					+ (TestSocietiesAndroidContext.this.testEndTime - TestSocietiesAndroidContext.this.testStartTime));
+			TestSocietiesAndroidContext.this.testDoneSignal.countDown();
 		}
 
 	}
 	
 	@MediumTest
-	public void testCreateEntity() throws URISyntaxException{
-		BroadcastReceiver receiver = setupBroadcastReceiver();
-		Intent ctxBrokerIntent = new Intent(getContext(), TestAndroidContextBroker.class);
-		
-		TestContextBrokerBinder binder =  (TestContextBrokerBinder) bindService(ctxBrokerIntent);
-		
-		
-		ICtxClient ctxBrokerService = binder.getService();
-		
-		RequestorBean requestor = new RequestorBean();
-		requestor.setRequestorId("service@societies.local");
+	public void testCreateEntity() throws URISyntaxException, Exception{
+//		this.testCompleted = false;
+		this.testDoneSignal = new CountDownLatch(1);
+		this.testStartTime = System.currentTimeMillis();
+		this.testEndTime = this.testStartTime;
+
+		final RequestorBean requestor = new RequestorBean();
+		requestor.setRequestorId(REQUESTOR_ID);
 		
 		Log.d(LOG_TAG, "Requestor is: " + requestor.getRequestorId());
+		Log.d(LOG_TAG, "test createEntity start time: " + this.testStartTime);
 		try {
-			ctxBrokerService.createEntity(CLIENT_ID, requestor, "service@societies.local", "entity");
-		} catch (CtxException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}	
-		while (!this.receivedResult){
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			this.ctxBrokerService.createEntity(CLIENT_ID, requestor, "jane.societies.local", "androidEntity");
+			Log.d(LOG_TAG, "entity created: " + entity);
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to create entity: " + e.getLocalizedMessage());
 		}
+
+//		Thread.sleep(DELAY);
+
+//		Log.d(LOG_TAG, "Received result");
+//        this.unregisterReceiver(receiver);
+
+		//this.testCompleted = true;
+        //assertTrue(this.testCompleted);
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
+	}
+	
+	@MediumTest
+	public void testCreateAttribute() throws URISyntaxException, Exception{
+//		this.testCompleted = false;
+		this.testDoneSignal = new CountDownLatch(1);
+		this.testStartTime = System.currentTimeMillis();
+		this.testEndTime = this.testStartTime;
+
+		final RequestorBean requestor = new RequestorBean();
+		requestor.setRequestorId(this.REQUESTOR_ID);
 		
-		Log.d(LOG_TAG, "Received result");
+		Log.d(LOG_TAG, "Requestor is: " + requestor.getRequestorId());
+		Log.d(LOG_TAG, "test createAttribute start time: " + this.testStartTime);
+		try {
+			Log.d(LOG_TAG, "attribute Test1");
+			this.ctxBrokerService.createEntity(CLIENT_ID, requestor, "jane.societies.local", "androidEntity2");
+			Log.d(LOG_TAG, "attribute Test2");
+
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to create attribute: " + e.getLocalizedMessage());
+		}
+
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
+		this.testDoneSignal = new CountDownLatch(1);
+
+		try {
+			
+//			CtxEntityIdentifierBean entityId = (CtxEntityIdentifierBean) entity.getId();
+			Log.d(LOG_TAG, "attribute Test3");
+			Log.d(LOG_TAG, "entityId used to Create Attribute: " + entity);
+			Log.d(LOG_TAG, "entityId.getString: " + entity.getId().getString());
+			this.ctxBrokerService.createAttribute(CLIENT_ID, requestor, (CtxEntityIdentifierBean) entity.getId(), "androidAttribute");
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to create attribute: " + e.getLocalizedMessage());
+		}
+
+//		Thread.sleep(DELAY);
+
+//		Log.d(LOG_TAG, "Received result");
+//        this.unregisterReceiver(receiver);
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
 	}
     /**
      * Create a broadcast receiver
@@ -115,11 +230,10 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
      */
     private BroadcastReceiver setupBroadcastReceiver() {
     	BroadcastReceiver receiver = null;
-    	
-        Log.d(LOG_TAG, "Set up broadcast receiver");
+    	Log.d(LOG_TAG, "Set up broadcast receiver");
         
-        receiver = new CtxBrokerBroadcastReceiver();
-        getContext().registerReceiver(receiver, createTestIntentFilter());    	
+        receiver = new MainReceiver();
+        getContext().registerReceiver(receiver, this.createTestIntentFilter());    	
         Log.d(LOG_TAG, "Register broadcast receiver");
 
         return receiver;
@@ -134,8 +248,14 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
     	//register broadcast receiver to receive SocietiesEvents return values 
         IntentFilter intentFilter = new IntentFilter();
         
+        Log.d(LOG_TAG, "intentFilter.addAction " + IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+        intentFilter.addAction(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+        Log.d(LOG_TAG, "intentFilter.addAction " + ICtxClient.CREATE_ENTITY);
         intentFilter.addAction(ICtxClient.CREATE_ENTITY);
-        intentFilter.addAction(ICtxClient.INTENT_RETURN_VALUE_KEY);
+        Log.d(LOG_TAG, "intentFilter.addAction " + ICtxClient.CREATE_ATTRIBUTE);
+        intentFilter.addAction(ICtxClient.CREATE_ATTRIBUTE);
+//        intentFilter.addAction(ICtxClient.INTENT_RETURN_VALUE_KEY);
+        Log.d(LOG_TAG, "created test intentFilter " + intentFilter);
         return intentFilter;
     }
 }

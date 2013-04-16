@@ -22,65 +22,64 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.platform.context.impl;
+package org.societies.android.platform.context;
 
-import org.societies.android.api.context.ICtxClient;
-import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
-import org.societies.android.platform.context.impl.ContextBrokerBase;
+import org.societies.android.api.internal.context.IInternalCtxClient;
+import org.societies.android.api.utilities.RemoteServiceHandler;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Binder;
 import android.os.IBinder;
+import android.os.Messenger;
 import android.util.Log;
 
 /**
  * @author pkosmides
  *
- * This wrapper class acts as a local wrapper for the Service Context Android service.
- * It uses the base service implementation {@link ContextBrokerBase} to provide the service functionality
+ * Remote ServiceContext service wrapper for {@link ICtxClient} methods 
  */
-public class ServiceContextBrokerLocal extends Service{
+public class ServiceContextBrokerRemote extends Service{
 
-	private static final String LOG_TAG = ServiceContextBrokerLocal.class.getName();
-	private IBinder binder = null;
-
-    
-    @Override
+	private static final String LOG_TAG = ServiceContextBrokerRemote.class.getName();
+	private Messenger inMessenger;
+	
+/* one way 	*/
+	@Override
 	public void onCreate () {
-		this.binder = new LocalPlatformEventsBinder();
-		Log.d(LOG_TAG, "ServiceContextBrokerLocal service starting");
-	}
-
-	/**Create Binder object for local service invocation */
-	public class LocalPlatformEventsBinder extends Binder {
+//		ClientCommunicationMgr ccm = new ClientCommunicationMgr(this, true);
 		
-		public ICtxClient getService() {
+//		ContextBrokerBase serviceBase = new ContextBrokerBase(this.getApplicationContext(),  ccm, false);
 
-			ClientCommunicationMgr ccm = createClientCommunicationMgr();
-			
-			ICtxClient serviceBase = new ContextBrokerBase(ServiceContextBrokerLocal.this.getApplicationContext(), ccm, false);
-
-			return serviceBase;
-		}
-	}
-	@Override
-	public void onDestroy() {
-		Log.d(LOG_TAG, "ServiceContextBrokerLocal service terminating");
+		ContextBrokerBase serviceBase = new ContextBrokerBase(this.getApplicationContext());
+		
+		this.inMessenger = new Messenger(new RemoteServiceHandler(serviceBase.getClass(), serviceBase, IInternalCtxClient.methodsArray));
+		Log.i(LOG_TAG, "ServiceContextBrokerRemote creation");
 	}
 
+	
+	/* other way 
+	
 	@Override
-	public IBinder onBind(Intent arg0) {
-		return this.binder;
+	public void onCreate () {
+		ContextBrokerBase serviceBase = new ContextBrokerBase(this, createClientCommunicationMgr(), false);
+		
+		this.inMessenger = new Messenger(new RemoteServiceHandler(serviceBase.getClass(), serviceBase, ICtxClient.methodsArray));
+		Log.i(LOG_TAG, "ServicePlatformEventsRemote creation");
 	}
 	
-
-	/**
-	 * Factory method to get instance of {@link ClientCommunicationMgr}
-	 * @return ClientCommunicationMgr
-	 */
 	protected ClientCommunicationMgr createClientCommunicationMgr() {
-		return new ClientCommunicationMgr(this, true);
+		return new ClientCommunicationMgr(this, true); 
+	}*/
+	// END of second way 
+	
+	@Override
+	public IBinder onBind(Intent arg0) {
+		Log.d(LOG_TAG, "ServiceContextBrokerRemote onBind");
+		return inMessenger.getBinder();
 	}
 
+	@Override
+	public void onDestroy() {
+		Log.i(LOG_TAG, "ServiceContextBrokerRemote terminating");
+	}
 }
