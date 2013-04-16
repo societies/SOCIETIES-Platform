@@ -46,7 +46,7 @@ public class TestCase10961 extends IntegrationTestCase {
 	 */
 
 	public TestCase10961() {
-		super(10961, new Class[] {NominalTestCase.class});
+		super(1924, new Class[] {NominalTestCase.class});
 		NominalTestCase.testCaseNumber = testCaseNumber;
 	}
 

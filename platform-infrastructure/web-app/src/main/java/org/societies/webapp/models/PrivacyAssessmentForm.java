@@ -26,135 +26,157 @@
  * 
  */
 package org.societies.webapp.models;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
 /**
  * 
  * @author Mitja Vardjan
  */
-public class PrivacyAssessmentForm {
+@Service
+@Scope("Session")
+@SessionScoped
+@ManagedBean
+public class PrivacyAssessmentForm implements Serializable {
 
-	private String method;
+	private static final long serialVersionUID = 3196618675483151078L;
+    private static final Logger log = LoggerFactory.getLogger(PrivacyAssessmentForm.class);
+    
+    /**
+     * Perform periodic assessment in background
+     */
+	private boolean autoAssessment;
 	
-	// Settings and control
-	private boolean autoReassessment;
-	private int autoReassessmentInSecs;
-	private boolean assessNow;
-	
-	// Showing assessment results
-	private String assessmentSubjectType;
-	private String presentationFormat;
+	/**
+	 * Period in seconds for periodic assessment
+	 */
+	private int autoAssessmentInSecs;
+
+	/**
+	 * Selected assessment subject type
+	 */
 	private String assessmentSubject;
 	
+	/**
+	 * List of all assessment subject types
+	 */
+	private List<String> assessmentSubjects;
+	
+    /**
+	 * Relative path to chart image to show
+	 */
 	private String chart;
 
-	/**
-	 * @return the method
-	 */
-	public String getMethod() {
-		return method;
-	}
-
-	/**
-	 * @param method the method to set
-	 */
-	public void setMethod(String method) {
-		this.method = method;
+	public class SubjectTypes {
+		public static final String RECEIVER_IDS = "Receiver identities";
+		public static final String SENDER_IDS = "Sender identities";
+		public static final String SENDER_CLASSES = "Sender classes";
+		public static final String DATA_ACCESS_IDS = "Data access by identities";
+		public static final String DATA_ACCESS_CLASSES = "Data access by classes";
 	}
 	
-	/**
-	 * @return the autoReassessment
-	 */
-	public boolean isAutoReassessment() {
-		return autoReassessment;
+	public class ImageFileNames {
+		public static final String RECEIVER_IDS = SubjectTypes.RECEIVER_IDS + ".png";
+		public static final String SENDER_IDS = SubjectTypes.SENDER_IDS + ".png";
+		public static final String SENDER_CLASSES = SubjectTypes.SENDER_CLASSES + ".png";
+		public static final String DATA_ACCESS_IDS = SubjectTypes.DATA_ACCESS_IDS + ".png";
+		public static final String DATA_ACCESS_CLASSES = SubjectTypes.DATA_ACCESS_CLASSES + ".png";
+	}
+	
+	public PrivacyAssessmentForm() {
+
+		log.info("constructor");
+
+		assessmentSubjects = new ArrayList<String>();
+		assessmentSubjects.add(SubjectTypes.RECEIVER_IDS);
+		assessmentSubjects.add(SubjectTypes.SENDER_IDS);
+		assessmentSubjects.add(SubjectTypes.SENDER_CLASSES);
+		assessmentSubjects.add(SubjectTypes.DATA_ACCESS_IDS);
+		assessmentSubjects.add(SubjectTypes.DATA_ACCESS_CLASSES);
 	}
 
 	/**
-	 * @param autoReassessment the autoReassessment to set
+	 * @return List of all assessment subject types
 	 */
-	public void setAutoReassessment(boolean autoReassessment) {
-		this.autoReassessment = autoReassessment;
+	public List<String> getAssessmentSubjects() {
+		return assessmentSubjects;
 	}
 
 	/**
-	 * @return the autoReassessmentInSecs
+	 * @param assessmentSubjects List of all assessment subject types
 	 */
-	public int getAutoReassessmentInSecs() {
-		return autoReassessmentInSecs;
+	public void setAssessmentSubjects(List<String> assessmentSubjects) {
+		log.debug("assessmentSubjects = {}", autoAssessment);
+		this.assessmentSubjects = assessmentSubjects;
 	}
 
 	/**
-	 * @param autoReassessmentInSecs the autoReassessmentInSecs to set
+	 * @return periodic assessment in background
 	 */
-	public void setAutoReassessmentInSecs(int autoReassessmentInSecs) {
-		this.autoReassessmentInSecs = autoReassessmentInSecs;
+	public boolean isAutoAssessment() {
+		return autoAssessment;
 	}
 
 	/**
-	 * @return the assessNow
+	 * @param autoReassessment periodic assessment in background
 	 */
-	public boolean isAssessNow() {
-		return assessNow;
+	public void setAutoAssessment(boolean autoAssessment) {
+		log.debug("autoAssessment = {}", autoAssessment);
+		this.autoAssessment = autoAssessment;
 	}
 
 	/**
-	 * @param assessNow the assessNow to set
+	 * @return Period in seconds for periodic assessment
 	 */
-	public void setAssessNow(boolean assessNow) {
-		this.assessNow = assessNow;
+	public int getAutoAssessmentInSecs() {
+		return autoAssessmentInSecs;
 	}
 
 	/**
-	 * @return the assessmentSubjectType
+	 * @param autoReassessmentInSecs Period in seconds for periodic assessment
 	 */
-	public String getAssessmentSubjectType() {
-		return assessmentSubjectType;
+	public void setAutoAssessmentInSecs(int autoAssessmentInSecs) {
+		log.debug("autoAssessmentInSecs = {}", autoAssessmentInSecs);
+		this.autoAssessmentInSecs = autoAssessmentInSecs;
 	}
 
 	/**
-	 * @param assessmentSubjectType the assessmentSubjectType to set
-	 */
-	public void setAssessmentSubjectType(String assessmentSubjectType) {
-		this.assessmentSubjectType = assessmentSubjectType;
-	}
-
-	/**
-	 * @return the presentationFormat
-	 */
-	public String getPresentationFormat() {
-		return presentationFormat;
-	}
-
-	/**
-	 * @param presentationFormat the presentationFormat to set
-	 */
-	public void setPresentationFormat(String presentationFormat) {
-		this.presentationFormat = presentationFormat;
-	}
-
-	/**
-	 * @return the assessmentSubject
+	 * @return Selected assessment subject type
 	 */
 	public String getAssessmentSubject() {
 		return assessmentSubject;
 	}
 
 	/**
-	 * @param assessmentSubject the assessmentSubject to set
+	 * @param assessmentSubject Selected assessment subject type
 	 */
 	public void setAssessmentSubject(String assessmentSubject) {
+		log.debug("assessmentSubject = {}", assessmentSubject);
 		this.assessmentSubject = assessmentSubject;
 	}
 
 	/**
-	 * @return the chart
+	 * @return Relative path to chart image to show
 	 */
 	public String getChart() {
 		return chart;
 	}
 
 	/**
-	 * @param chart the chart to set
+	 * @param chart Relative path to chart image to show
 	 */
 	public void setChart(String chart) {
+		log.debug("chart = {}", chart);
 		this.chart = chart;
 	}
 }

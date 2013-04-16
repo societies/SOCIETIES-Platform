@@ -76,9 +76,9 @@ public class NominalTestCaseLowerTester {
 	@BeforeClass
 	public static void initialization() throws Exception {
 		
-		LOG.info("[#1001] Initialization");
-		LOG.info("[#1001] Prerequisite: The CSS is created");
-		LOG.info("[#1001] Prerequisite: The user is logged to the CSS");
+		LOG.info("[#1879] Initialization");
+		LOG.info("[#1879] Prerequisite: The CSS is created");
+		LOG.info("[#1879] Prerequisite: The user is logged to the CSS");
 
 		negotiator = TestCase1001.getNegotiator();
 		assertNotNull(negotiator);
@@ -90,7 +90,7 @@ public class NominalTestCaseLowerTester {
 	 */
 	@Before
 	public void setUp() {
-		LOG.info("[#1001] NominalTestCaseLowerTester::setUp");
+		LOG.info("[#1879] NominalTestCaseLowerTester::setUp");
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class NominalTestCaseLowerTester {
 	 */
 	@After
 	public void tearDown() {
-		LOG.info("[#1001] tearDown");
+		LOG.info("[#1879] tearDown");
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class NominalTestCaseLowerTester {
 	@Test
 	public void testNegotiationServiceWith0Files() throws Exception {
 		
-		LOG.info("[#1001] testNegotiationServiceWith0Files()");
+		LOG.info("[#1879] testNegotiationServiceWith0Files()");
 
 		IIdentity providerId = getProvider();
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
@@ -133,18 +133,18 @@ public class NominalTestCaseLowerTester {
 			}
 		});
 		
-		LOG.debug("[#1001] testNegotiationServiceWith0Files(): negotiation started");
+		LOG.debug("[#1879] testNegotiationServiceWith0Files(): negotiation started");
 
 		Thread.sleep(TIME_TO_WAIT_IN_MS);
-		LOG.info("[#1001] testNegotiationServiceWith0Files(): checking if successful");
+		LOG.info("[#1879] testNegotiationServiceWith0Files(): checking if successful");
 		assertTrue(callbackInvokedService);
-		LOG.info("[#1001] testNegotiationServiceWith0Files(): SUCCESS");
+		LOG.info("[#1879] testNegotiationServiceWith0Files(): SUCCESS");
 	}
 
 	//@Test // Invoked by other test methods
 	public void testNegotiationServiceWith2Files(String serviceIdStr) throws Exception {
 		
-		LOG.info("[#1001] testNegotiationServiceWith2Files()");
+		LOG.info("[#1879] testNegotiationServiceWith2Files()");
 
 		IIdentity providerId = getProvider();
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
@@ -174,12 +174,12 @@ public class NominalTestCaseLowerTester {
 			}
 		});
 		
-		LOG.debug("[#1001] testNegotiationServiceWith2Files(): negotiation started");
+		LOG.debug("[#1879] testNegotiationServiceWith2Files(): negotiation started");
 
 		Thread.sleep(TIME_TO_WAIT_IN_MS);
-		LOG.info("[#1001] testNegotiationServiceWith2Files(): checking if successful");
+		LOG.info("[#1879] testNegotiationServiceWith2Files(): checking if successful");
 		assertTrue(callbackInvokedService);
-		LOG.info("[#1001] testNegotiationServiceWith2Files(): SUCCESS");
+		LOG.info("[#1879] testNegotiationServiceWith2Files(): SUCCESS");
 	}
 
 	/**
@@ -190,7 +190,7 @@ public class NominalTestCaseLowerTester {
 	@Test
 	public void testNegotiationCis() throws InterruptedException, InvalidFormatException {
 		
-		LOG.info("[#1001] testNegotiationCis()");
+		LOG.info("[#1879] testNegotiationCis()");
 
 		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
 		IIdentity myId = idMgr.getThisNetworkNode();
@@ -212,12 +212,12 @@ public class NominalTestCaseLowerTester {
 			}
 		});
 
-		LOG.debug("[#1001] testNegotiationCis(): negotiation started");
+		LOG.debug("[#1879] testNegotiationCis(): negotiation started");
 		
 		Thread.sleep(TIME_TO_WAIT_IN_MS);
-		LOG.info("[#1001] testNegotiationCis(): checking if successful");
+		LOG.info("[#1879] testNegotiationCis(): checking if successful");
 		assertTrue(callbackInvokedCis);
-		LOG.info("[#1001] testNegotiationCis(): SUCCESS");
+		LOG.info("[#1879] testNegotiationCis(): SUCCESS");
 	}
 
 	/**
@@ -228,7 +228,7 @@ public class NominalTestCaseLowerTester {
 	@Test
 	public void testNegotiationInvalid() throws InterruptedException, InvalidFormatException {
 		
-		LOG.info("[#1001] testNegotiationInvalid()");
+		LOG.info("[#1879] testNegotiationInvalid()");
 
 		IIdentity providerId = getProvider();
 		Requestor provider = new Requestor(providerId);
@@ -245,12 +245,12 @@ public class NominalTestCaseLowerTester {
 			}
 		});
 		
-		LOG.debug("[#1001] testNegotiationInvalid(): negotiation started");
+		LOG.debug("[#1879] testNegotiationInvalid(): negotiation started");
 
 		Thread.sleep(TIME_TO_WAIT_IN_MS);
-		LOG.info("[#1001] testNegotiationInvalid(): checking if successful");
+		LOG.info("[#1879] testNegotiationInvalid(): checking if successful");
 		assertTrue(callbackInvokedInvalid);
-		LOG.info("[#1001] testNegotiationInvalid(): SUCCESS");
+		LOG.info("[#1879] testNegotiationInvalid(): SUCCESS");
 	}
 	
 	@Test
@@ -259,20 +259,20 @@ public class NominalTestCaseLowerTester {
 		String urlStr;
 		int httpCode;
 		
-		LOG.info("[#1001] testFilesDownloadManualFilePlacement()");
-		LOG.info("[#1001] *** Domain Authority Rest server is required for this test! ***");
+		LOG.info("[#1879] testFilesDownloadManualFilePlacement()");
+		LOG.info("[#1879] *** Domain Authority Rest server is required for this test! ***");
 
 		testNegotiationServiceWith2Files(SERVICE_ID_3);
 
 		// URL 1 with valid signature
 		urlStr = serviceFiles.get(0).toString();
-		LOG.info("[#1001] testFilesDownloadManualFilePlacement(): URL with valid signature: {}", urlStr);
+		LOG.info("[#1879] testFilesDownloadManualFilePlacement(): URL with valid signature: {}", urlStr);
 		httpCode = getHttpCode(new URL(urlStr));
 		assertEquals(HttpURLConnection.HTTP_OK, httpCode, 0.0);
 		
 		// URL 2 with valid signature
 		urlStr = serviceFiles.get(1).toString();
-		LOG.info("[#1001] testFilesDownloadManualFilePlacement(): URL with valid signature: {}", urlStr);
+		LOG.info("[#1879] testFilesDownloadManualFilePlacement(): URL with valid signature: {}", urlStr);
 		assertFalse(serviceFiles.get(0).toString().equals(serviceFiles.get(1).toString()));
 		httpCode = getHttpCode(new URL(urlStr));
 		assertEquals(HttpURLConnection.HTTP_OK, httpCode, 0.0);
@@ -282,7 +282,7 @@ public class NominalTestCaseLowerTester {
 		int sigKeywordEnd = serviceFiles.get(0).toString().indexOf(sigKeyword) + sigKeyword.length();
 		urlStr = serviceFiles.get(0).toString().substring(0, sigKeywordEnd) + "123456789012345678901234567890";
 		urlStr += serviceFiles.get(0).toString().substring(sigKeywordEnd + 30);
-		LOG.info("[#1001] testFilesDownloadManualFilePlacement(): URL with invalid signature: {}", urlStr);
+		LOG.info("[#1879] testFilesDownloadManualFilePlacement(): URL with invalid signature: {}", urlStr);
 		assertEquals(serviceFiles.get(0).toString().length(), urlStr.length(), 0.0);
 		httpCode = getHttpCode(new URL(urlStr));
 		assertEquals(HttpURLConnection.HTTP_UNAUTHORIZED, httpCode, 0.0);
@@ -294,20 +294,20 @@ public class NominalTestCaseLowerTester {
 		String urlStr;
 		int httpCode;
 		
-		LOG.info("[#1001] testFilesDownloadAutomaticFilePlacement()");
-		LOG.info("[#1001] *** Domain Authority Rest server is required for this test! ***");
+		LOG.info("[#1879] testFilesDownloadAutomaticFilePlacement()");
+		LOG.info("[#1879] *** Domain Authority Rest server is required for this test! ***");
 
 		testNegotiationServiceWith2Files(SERVICE_ID_4);
 
 		// URL 1 with valid signature
 		urlStr = serviceFiles.get(0).toString();
-		LOG.info("[#1001] testFilesDownloadAutomaticFilePlacement(): URL with valid signature: {}", urlStr);
+		LOG.info("[#1879] testFilesDownloadAutomaticFilePlacement(): URL with valid signature: {}", urlStr);
 		httpCode = getHttpCode(new URL(urlStr));
 		assertEquals(HttpURLConnection.HTTP_OK, httpCode, 0.0);
 		
 		// URL 2 with valid signature
 		urlStr = serviceFiles.get(1).toString();
-		LOG.info("[#1001] testFilesDownloadAutomaticFilePlacement(): URL with valid signature: {}", urlStr);
+		LOG.info("[#1879] testFilesDownloadAutomaticFilePlacement(): URL with valid signature: {}", urlStr);
 		assertFalse(serviceFiles.get(0).toString().equals(serviceFiles.get(1).toString()));
 		httpCode = getHttpCode(new URL(urlStr));
 		assertEquals(HttpURLConnection.HTTP_OK, httpCode, 0.0);
@@ -317,7 +317,7 @@ public class NominalTestCaseLowerTester {
 		int sigKeywordEnd = serviceFiles.get(0).toString().indexOf(sigKeyword) + sigKeyword.length();
 		urlStr = serviceFiles.get(0).toString().substring(0, sigKeywordEnd) + "123456789012345678901234567890";
 		urlStr += serviceFiles.get(0).toString().substring(sigKeywordEnd + 30);
-		LOG.info("[#1001] testFilesDownloadAutomaticFilePlacement(): URL with invalid signature: {}", urlStr);
+		LOG.info("[#1879] testFilesDownloadAutomaticFilePlacement(): URL with invalid signature: {}", urlStr);
 		assertEquals(serviceFiles.get(0).toString().length(), urlStr.length(), 0.0);
 		httpCode = getHttpCode(new URL(urlStr));
 		assertEquals(HttpURLConnection.HTTP_UNAUTHORIZED, httpCode, 0.0);
@@ -328,8 +328,6 @@ public class NominalTestCaseLowerTester {
 		IIdentityManager idMgr = TestCase1001.getGroupMgr().getIdMgr();
 		String providerJid = TestCase1001.getProviderJid();
 		
-		//return idMgr.getDomainAuthorityNode();
-		//return idMgr.getThisNetworkNode();
 		LOG.debug("getProvider(): using JID {}", providerJid);
 		return idMgr.fromFullJid(providerJid);
 	}

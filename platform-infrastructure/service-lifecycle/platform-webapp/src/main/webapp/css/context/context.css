@@ -1,3 +1,29 @@
+.switch{
+    font-family: "Lucida Sans Unicode","Lucida Grande",Sans-Serif;
+    font-size: 0.8em;
+    border: solid 1px;
+    background-color: #ededed;
+    padding: 2px 10px;
+    color: #003399;
+    cursor: pointer;
+    margin-left:5px;
+}
+
+.userBar {
+    /*background-color: #aab4bc;*/
+    margin-top: -4px;
+    font-family: "Lucida Sans Unicode","Lucida Grande",Sans-Serif;
+    font-size: 1.5em;
+    padding: 5px;
+}
+
+.pathBar{
+    /*background-color: #C5C9CD;*/
+    font-family: "Lucida Sans Unicode","Lucida Grande",Sans-Serif;
+    font-size: 0.8em;
+    padding: 5px;
+}
+
 .error {
 	
 	color: #ff0000;
@@ -33,4 +59,12 @@
 .navigator a{
 	margin-left: 10px;
 	
+}
+
+.icon{
+	height: 15px;
+}
+
+.button{
+	cursor: pointer;
 }

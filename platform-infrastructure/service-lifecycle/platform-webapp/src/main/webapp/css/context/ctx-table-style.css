@@ -267,7 +267,7 @@ body
 }
 
 
-#newspaper-a
+.newspaper-a
 {
 	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
@@ -277,7 +277,7 @@ body
 	border-collapse: collapse;
 	border: 1px solid #69c;
 }
-#newspaper-a th
+.newspaper-a th
 {
 	padding: 12px 17px 12px 17px;
 	font-weight: normal;
@@ -285,12 +285,12 @@ body
 	color: #039;
 	border-bottom: 1px dashed #69c;
 }
-#newspaper-a td
+.newspaper-a td
 {
-	padding: 7px 17px 7px 17px;
+	padding: 5px;
 	color: #669;
 }
-#newspaper-a tbody tr:hover td
+.newspaper-a tbody tr:hover td
 {
 	color: #339;
 	background: #d0dafd;
@@ -566,4 +566,14 @@ body
 {
 	color: #339;
 	background: #cdcdee;
+}
+
+<!-- MIRKO -->
+
+#new{
+	border-bottom: 1px dashed #6699CC;
+}
+
+.ctx-actionbar{
+	height: 00px;
 }

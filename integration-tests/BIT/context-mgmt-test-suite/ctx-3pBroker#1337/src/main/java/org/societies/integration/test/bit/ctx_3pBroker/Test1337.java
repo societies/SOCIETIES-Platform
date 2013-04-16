@@ -45,7 +45,7 @@ public class Test1337 extends IntegrationTestCase{
 	
 	
 	public Test1337(){
-		super(1337, new Class[]{Tester.class});
+		super(1858, new Class[]{Tester.class});
 	}
 
 	/**

@@ -97,6 +97,7 @@
 	      
 		<!-- Privacy & Trust: 5 bundles (including 1 test bundle & 1 GUI bundle... move to nightly build pom?) -->
 		<module>../../privacy-trust/java/privacy-protection</module>
+		<module>../../privacy-trust/java/trust/trust-activity-feed</module>
 		<module>../../privacy-trust/java/trust/trust-cloud-bundle</module>
 
 		<!-- PlatForm Test Web App: 1 WAR -->

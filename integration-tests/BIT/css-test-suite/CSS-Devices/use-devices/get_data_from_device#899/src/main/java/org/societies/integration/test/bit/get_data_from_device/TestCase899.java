@@ -23,7 +23,7 @@ public class TestCase899 extends IntegrationTestCase {
 	
 
 	public TestCase899() {
-		super(711, NominalTestCase.class);	
+		super(899, NominalTestCase.class);	
 
 	}
 

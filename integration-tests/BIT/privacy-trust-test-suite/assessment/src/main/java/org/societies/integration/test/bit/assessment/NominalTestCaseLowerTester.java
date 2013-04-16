@@ -65,9 +65,9 @@ public class NominalTestCaseLowerTester {
 	@BeforeClass
 	public static void initialization() {
 		
-		LOG.info("[#1055] Initialization");
-		LOG.info("[#1055] Prerequisite: The CSS is created");
-		LOG.info("[#1055] Prerequisite: The user is logged to the CSS");
+		LOG.info("[#1870] Initialization");
+		LOG.info("[#1870] Prerequisite: The CSS is created");
+		LOG.info("[#1870] Prerequisite: The user is logged to the CSS");
 
 		privacyLogAppender = TestCase1055.getPrivacyLogAppender();
 		assessment = TestCase1055.getAssessment();
@@ -90,7 +90,7 @@ public class NominalTestCaseLowerTester {
 	 */
 	@Before
 	public void setUp() {
-		LOG.info("[#1055] NominalTestCaseLowerTester::setUp");
+		LOG.info("[#1870] NominalTestCaseLowerTester::setUp");
 	}
 
 	/**
@@ -98,13 +98,13 @@ public class NominalTestCaseLowerTester {
 	 */
 	@After
 	public void tearDown() {
-		LOG.info("[#1055] tearDown");
+		LOG.info("[#1870] tearDown");
 	}
 
 	@Test
 	public void testSpeedOfExecution() {
 		
-		LOG.info("[#1055] testSpeedOfExecution()");
+		LOG.info("[#1870] testSpeedOfExecution()");
 
 		IIdentity owner = new MockIdentity("owner.a@a.com");
 		//IIdentity requestorId = new MockIdentity("requestor.a@a.com");
@@ -123,14 +123,14 @@ public class NominalTestCaseLowerTester {
 		privacyLogAppender.logContext(requestor, owner);
 		end = Calendar.getInstance().getTimeInMillis();
 		dt = end - start;
-		LOG.debug("[#1055] testSpeedOfExecution(): invocation took " + dt + " ms");
+		LOG.debug("[#1870] testSpeedOfExecution(): invocation took " + dt + " ms");
 		assertTrue(dt < PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS);
 		
 		start = Calendar.getInstance().getTimeInMillis();
 		privacyLogAppender.logContext(requestor, owner, 6543);
 		end = Calendar.getInstance().getTimeInMillis();
 		dt = end - start;
-		LOG.debug("[#1055] testSpeedOfExecution(): invocation took " + dt + " ms");
+		LOG.debug("[#1870] testSpeedOfExecution(): invocation took " + dt + " ms");
 		assertTrue(dt < PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS);
 		
 		start = Calendar.getInstance().getTimeInMillis();
@@ -138,41 +138,41 @@ public class NominalTestCaseLowerTester {
 		privacyLogAppender.logCommsFw(identityManager.getThisNetworkNode(), identityManager.getThisNetworkNode(), payload);
 		end = Calendar.getInstance().getTimeInMillis();
 		dt = end - start;
-		LOG.debug("[#1055] testSpeedOfExecution(): invocation took " + dt + " ms");
+		LOG.debug("[#1870] testSpeedOfExecution(): invocation took " + dt + " ms");
 		assertTrue(dt < PRIVACY_LOGGER_MAX_EXECUTION_TIME_IN_MS);
 		
-		LOG.info("[#1055] testSpeedOfExecution(): FINISHED");
+		LOG.info("[#1870] testSpeedOfExecution(): FINISHED");
 	}
 	
 	@Test
 	public void testContextBrokerInternalLogging() throws CtxException, InterruptedException, ExecutionException {
 
-		LOG.info("[#1055] testContextBrokerInternalLogging()");
+		LOG.info("[#1870] testContextBrokerInternalLogging()");
 
 		CtxBrokerInternalHelper ctx = new CtxBrokerInternalHelper(ctxBrokerInternal);
 		long num1;
 		long num2;
 		
 		num1 = assessment.getNumDataAccessEvents();
-		LOG.debug("[#1055] testContextBrokerInternalLogging() 1");
+		LOG.debug("[#1870] testContextBrokerInternalLogging() 1");
 		ctx.retrieveCssOperator();
 
 		num2 = assessment.getNumDataAccessEvents();
 		assertEquals("ctx.retrieveCssOperator()", num1 + 1, num2);
 		
-		LOG.debug("[#1055] testContextBrokerInternalLogging() 2");
+		LOG.debug("[#1870] testContextBrokerInternalLogging() 2");
 		ctx.createContext();
-		LOG.debug("[#1055] testContextBrokerInternalLogging() 3");
+		LOG.debug("[#1870] testContextBrokerInternalLogging() 3");
 		
 		num1 = num2;
 		num2 = assessment.getNumDataAccessEvents();
 		assertEquals("Number of data access events not same after ctx.createContext()", num1, num2);
 
 		ctx.retrieveContext();
-		LOG.debug("[#1055] testContextBrokerInternalLogging() 4");
+		LOG.debug("[#1870] testContextBrokerInternalLogging() 4");
 		num1 = num2;
 		num2 = assessment.getNumDataAccessEvents();
-		LOG.debug("[#1055] testContextBrokerInternalLogging(): Number of data access events: before access = " +
+		LOG.debug("[#1870] testContextBrokerInternalLogging(): Number of data access events: before access = " +
 				num1 + ", after access = " + num2);
 		assertEquals("Number of data access events not increased properly after ctx.retrieveContext()", num1 + 2, num2);
 	}
@@ -180,7 +180,7 @@ public class NominalTestCaseLowerTester {
 	@Test
 	public void testContextBrokerExternalLogging() throws CtxException, InterruptedException, ExecutionException {
 
-		LOG.info("[#1055] testContextBrokerExternalLogging()");
+		LOG.info("[#1870] testContextBrokerExternalLogging()");
 
 		IIdentity requestor = identityManager.getThisNetworkNode();
 		CtxBrokerExternalHelper ctx = new CtxBrokerExternalHelper(ctxBrokerExternal, requestor);
@@ -189,18 +189,18 @@ public class NominalTestCaseLowerTester {
 		
 		num1 = assessment.getNumDataAccessEvents();
 		
-		LOG.debug("[#1055] testContextBrokerExternalLogging() 2");
+		LOG.debug("[#1870] testContextBrokerExternalLogging() 2");
 		ctx.createContext();
-		LOG.debug("[#1055] testContextBrokerExternalLogging() 3");
+		LOG.debug("[#1870] testContextBrokerExternalLogging() 3");
 		
 		num2 = assessment.getNumDataAccessEvents();
 		assertEquals("Number of data access events not same after ctx.createContext()", num1, num2);
 
 		ctx.retrieveContext();
-		LOG.debug("[#1055] testContextBrokerExternalLogging() 4");
+		LOG.debug("[#1870] testContextBrokerExternalLogging() 4");
 		num1 = num2;
 		num2 = assessment.getNumDataAccessEvents();
-		LOG.debug("[#1055] testContextBrokerExternalLogging(): Number of data access events: before access = " +
+		LOG.debug("[#1870] testContextBrokerExternalLogging(): Number of data access events: before access = " +
 				num1 + ", after access = " + num2);
 		assertEquals("Number of data access events not increased properly after ctx.retrieveContext()", num1 + 2, num2);
 	}
@@ -208,7 +208,7 @@ public class NominalTestCaseLowerTester {
 	@Test
 	public void testCommsManagerLogging() throws CommunicationException {
 		
-		LOG.info("[#1055] testCommsManagerLogging()");
+		LOG.info("[#1870] testCommsManagerLogging()");
 
 		IIdentity from = identityManager.getThisNetworkNode();
 		IIdentity to = identityManager.getThisNetworkNode();
@@ -223,20 +223,20 @@ public class NominalTestCaseLowerTester {
 		payload.setSignedPolicyOption("<sla/>");
 		payload.setModified(false);
 
-		LOG.debug("[#1055] testCommsManagerLogging(): from identity = " + stanza.getFrom());
-		LOG.debug("[#1055] testCommsManagerLogging(): to identity = " + stanza.getTo());
+		LOG.debug("[#1870] testCommsManagerLogging(): from identity = " + stanza.getFrom());
+		LOG.debug("[#1870] testCommsManagerLogging(): to identity = " + stanza.getTo());
 		
-		LOG.debug("[#1055] testCommsManagerLogging() 1");
+		LOG.debug("[#1870] testCommsManagerLogging() 1");
 		long num1 = assessment.getNumDataTransmissionEvents();
-		LOG.debug("[#1055] testCommsManagerLogging() 2");
+		LOG.debug("[#1870] testCommsManagerLogging() 2");
 		commManager.sendMessage(stanza, payload);
-		LOG.debug("[#1055] testCommsManagerLogging() 3");
+		LOG.debug("[#1870] testCommsManagerLogging() 3");
 		commManager.sendIQGet(stanza, payload, null);
-		LOG.debug("[#1055] testCommsManagerLogging() 4");
+		LOG.debug("[#1870] testCommsManagerLogging() 4");
 		long num2 = assessment.getNumDataTransmissionEvents();
-		LOG.debug("[#1055] testCommsManagerLogging() 5");
+		LOG.debug("[#1870] testCommsManagerLogging() 5");
 		
-		LOG.debug("[#1055] testCommsManagerLogging(): Number of data transmission events: before transmission = " +
+		LOG.debug("[#1870] testCommsManagerLogging(): Number of data transmission events: before transmission = " +
 				num1 + ", after transmission = " + num2);
 		
 		assertEquals(num1 + 2, num2);

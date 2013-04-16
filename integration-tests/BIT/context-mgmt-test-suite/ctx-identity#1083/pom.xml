@@ -2,10 +2,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>integration.test.bit.ctx_identity_1083</artifactId>
+	<artifactId>bit.ctx_identity.1859</artifactId>
 	<name>Context Identity Integration Test</name>
 	<packaging>bundle</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${release.version}</version>
 
 	<developers>
 		<developer>

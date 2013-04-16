@@ -5,6 +5,7 @@
 	xmlns="http://societies.org/api/internal/schema/useragent/feedback"
 	xmlns:ns1="http://societies.org/api/schema/identity" 
 	xmlns:ns2="http://societies.org/api/schema/privacytrust/privacy/model/privacypolicy"
+	xmlns:ns3="http://societies.org/api/schema/useragent/feedback"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<xs:import namespace="http://societies.org/api/schema/identity"
@@ -12,10 +13,17 @@
 		
 	<xs:import namespace="http://societies.org/api/schema/privacytrust/privacy/model/privacypolicy"
 		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.privacytrust.privacy.model.privacypolicy.xsd"/>
+		
+	<xs:import namespace="http://societies.org/api/schema/useragent/feedback"
+		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.useragent.feedback.xsd"/>
 
 	<xs:element name="userFeedbackPrivacyNegotiationEvent">
 		<xs:complexType >
 			<xs:sequence>
+				<xs:element name="method" type="ns3:feedbackMethodType"
+					minOccurs="0" />
+				<xs:element name="requestId" type="xs:string" minOccurs="0" />
+				<xs:element name="type" type="xs:int" />
 				<xs:element name="responsePolicy" type="ns2:responsePolicy" minOccurs="1" maxOccurs="1"/>
 				<xs:element name="negotiationDetails" type="negotiationDetailsBean" minOccurs="1" maxOccurs="1"/>
 			</xs:sequence>
@@ -32,7 +40,11 @@
 	<xs:element name="userFeedbackAccessControlEvent">
 		<xs:complexType >
 			<xs:sequence>
-				<xs:element name="requestID" type="xs:string" minOccurs="1" maxOccurs="1" />
+				<xs:element name="method" type="ns3:feedbackMethodType"
+					minOccurs="0" />
+				<xs:element name="requestId" type="xs:string" minOccurs="0" />
+				<xs:element name="type" type="xs:int" />
+				<!-- <xs:element name="requestID" type="xs:string" minOccurs="1" maxOccurs="1" /> -->
 				<xs:element name="responseItems" type="ns2:responseItem" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="requestor" type="ns1:requestorBean" minOccurs="1" maxOccurs="1"/>	
 			</xs:sequence>
