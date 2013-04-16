@@ -52,12 +52,12 @@ public interface ITrustNodeMgr {
 	public Collection<TrustedEntityId> getMyIds();
 	
 	/**
-	 * Returns <code>true</code> if this node is master; <code>false</code> otherwise.
+	 * Returns the local identity on whose behalf this node operates.
 	 * 
-	 * @return <code>true</code> if this node is master; <code>false</code> otherwise.
-	 * @since 0.5
+	 * @return the local identity on whose behalf this node operates.
+	 * @since 1.0
 	 */
-	public boolean isMaster();
+	public IIdentity getLocalIdentity();
 	
 	/**
 	 * Returns the local requestor on whose behalf this node operates.
@@ -66,6 +66,14 @@ public interface ITrustNodeMgr {
 	 * @since 1.0
 	 */
 	public Requestor getLocalRequestor();
+	
+	/**
+	 * Returns <code>true</code> if this node is master; <code>false</code> otherwise.
+	 * 
+	 * @return <code>true</code> if this node is master; <code>false</code> otherwise.
+	 * @since 0.5
+	 */
+	public boolean isMaster();
 	
 	/**
 	 * Returns the {@link IIdentity} instance of the specified 

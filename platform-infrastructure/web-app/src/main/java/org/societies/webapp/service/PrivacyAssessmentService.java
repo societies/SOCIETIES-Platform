@@ -142,7 +142,7 @@ public class PrivacyAssessmentService implements Serializable {
 		images.add(ImageFileNames.RECEIVER_IDS);
 		images.add(ImageFileNames.SENDER_IDS);
 		images.add(ImageFileNames.SENDER_CLASSES);
-		images.add("http://a1.s6img.com/cdn/0008/p/1623955_9772764_lz.jpg");
+//		images.add("http://a1.s6img.com/cdn/0008/p/1623955_9772764_lz.jpg");
 		images.add(ImageFileNames.DATA_ACCESS_IDS);
 		images.add(ImageFileNames.DATA_ACCESS_CLASSES);
 	}

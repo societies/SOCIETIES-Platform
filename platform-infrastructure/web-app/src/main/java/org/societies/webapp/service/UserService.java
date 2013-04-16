@@ -75,8 +75,7 @@ public class UserService implements Serializable {
     }
 
     public boolean isUserLoggedIn() {
-        //return userLoggedIn;
-    	return true;
+        return userLoggedIn;
     }
 
     public IIdentity getIdentity() {
