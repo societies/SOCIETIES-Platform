@@ -43,10 +43,18 @@ import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.context.contextmanagement.CreateAssociationBean;
+import org.societies.api.schema.context.contextmanagement.CreateAttributeBean;
 import org.societies.api.schema.context.contextmanagement.CreateEntityBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerRequestBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerResponseBean;
 import org.societies.api.schema.context.contextmanagement.BrokerMethodBean;
+import org.societies.api.schema.context.contextmanagement.LookupBean;
+import org.societies.api.schema.context.contextmanagement.RemoveBean;
+import org.societies.api.schema.context.contextmanagement.RetrieveBean;
+import org.societies.api.schema.context.contextmanagement.RetrieveCommunityEntityIdBean;
+import org.societies.api.schema.context.contextmanagement.RetrieveIndividualEntityIdBean;
+import org.societies.api.schema.context.contextmanagement.UpdateBean;
 import org.societies.api.schema.context.model.CtxAssociationBean;
 import org.societies.api.schema.context.model.CtxAttributeBean;
 import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
@@ -216,8 +224,6 @@ public class ContextBrokerBase implements IInternalCtxClient{
 		}
 	}	
 	
-// END of the other way	
-
 	@Override
 	public CtxEntityBean createEntity(String client, RequestorBean requestor,
 			String targetCss, String type) throws CtxException {
@@ -273,7 +279,49 @@ public class ContextBrokerBase implements IInternalCtxClient{
 	public CtxAttributeBean createAttribute(String client,
 			RequestorBean requestor, CtxEntityIdentifierBean scope, String type)
 			throws CtxException {
-		// TODO Auto-generated method stub
+		Log.d(LOG_TAG, "CreateAttribute called by client: " + client);
+		
+		if (this.connectedToComms) {
+			try {
+				IIdentityManager idm = this.commMgr.getIdManager();
+				IIdentity toIdentity;
+	
+				toIdentity = this.commMgr.getIdManager().getCloudNode();
+				
+				Log.d(LOG_TAG, "identity used = " + toIdentity.getJid());
+				CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+				cbPacket.setMethod(BrokerMethodBean.CREATE_ATTRIBUTE);
+
+				CreateAttributeBean ctxBrokerCreateAttributeBean = new CreateAttributeBean();
+				// 1. set requestorBean
+				ctxBrokerCreateAttributeBean.setRequestor(requestor);
+				// 2. set scope
+				CtxEntityIdentifierBean ctxEntIdBean = new CtxEntityIdentifierBean();
+				ctxEntIdBean.setString(scope.toString());
+				ctxBrokerCreateAttributeBean.setScope(ctxEntIdBean);
+				// 3. set type
+				ctxBrokerCreateAttributeBean.setType(type);
+					
+				cbPacket.setCreateAttribute(ctxBrokerCreateAttributeBean);
+	
+				Log.d(LOG_TAG, "before Callback ");
+				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.CREATE_ATTRIBUTE);
+				Log.d(LOG_TAG, "after Callback");
+				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
+				
+				Stanza stanza = new Stanza(toIdentity);
+				this.commMgr.sendIQ(stanza, IQ.Type.GET, cbPacket, ctxBrokerCallBack);
+				Log.d(LOG_TAG, "Sent IQ with stanza=" + stanza);
+			
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        } 						
+		} else {
+			broadcastServiceNotStarted(client, IInternalCtxClient.CREATE_ASSOCIATION);
+		}
 		return null;
 	}
 
@@ -281,7 +329,48 @@ public class ContextBrokerBase implements IInternalCtxClient{
 	public CtxAssociationBean createAssociation(String client,
 			RequestorBean requestor, String targetCss, String type)
 			throws CtxException {
-		// TODO Auto-generated method stub
+		Log.d(LOG_TAG, "CreateAssociation called by client: " + client);
+		
+		if (this.connectedToComms) {
+			try {
+				IIdentityManager idm = this.commMgr.getIdManager();
+				IIdentity toIdentity;
+	
+				toIdentity = idm.fromJid(targetCss);
+//				toIdentity = this.commMgr.getIdManager().getCloudNode();
+				
+				Log.d(LOG_TAG, "identity used = " + toIdentity.getJid());
+				CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+				cbPacket.setMethod(BrokerMethodBean.CREATE_ASSOCIATION);
+
+				CreateAssociationBean ctxBrokerCreateAssociationBean = new CreateAssociationBean();
+				// 1. set requestorBean
+				ctxBrokerCreateAssociationBean.setRequestor(requestor);
+				// 2. set type
+				ctxBrokerCreateAssociationBean.setType(type);
+				// 3. set targetCSS
+				ctxBrokerCreateAssociationBean.setTargetCss(targetCss);
+					
+				cbPacket.setCreateAssociation(ctxBrokerCreateAssociationBean);
+	
+				Log.d(LOG_TAG, "before Callback ");
+				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.CREATE_ASSOCIATION);
+				Log.d(LOG_TAG, "after Callback");
+				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
+				
+				Stanza stanza = new Stanza(toIdentity);
+				this.commMgr.sendIQ(stanza, IQ.Type.GET, cbPacket, ctxBrokerCallBack);
+				Log.d(LOG_TAG, "Sent IQ with stanza=" + stanza);
+			
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        } 						
+		} else {
+			broadcastServiceNotStarted(client, IInternalCtxClient.CREATE_ASSOCIATION);
+		}
 		return null;
 	}
 
@@ -289,7 +378,50 @@ public class ContextBrokerBase implements IInternalCtxClient{
 	public List<CtxIdentifierBean> lookup(String client,
 			RequestorBean requestor, String target, CtxModelTypeBean modelType,
 			String type) throws CtxException {
-		// TODO Auto-generated method stub
+		Log.d(LOG_TAG, "Lookup, giving target id, called by client: " + client);
+		
+		if (this.connectedToComms) {
+			try {
+				IIdentityManager idm = this.commMgr.getIdManager();
+				IIdentity toIdentity;
+	
+				toIdentity = idm.fromJid(target);
+//				toIdentity = this.commMgr.getIdManager().getCloudNode();
+				
+				Log.d(LOG_TAG, "identity used = " + toIdentity.getJid());
+				CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+				cbPacket.setMethod(BrokerMethodBean.LOOKUP);
+
+				LookupBean ctxBrokerLookupBean = new LookupBean();
+				// 1. set requestorBean
+				ctxBrokerLookupBean.setRequestor(requestor);
+				// 2. set target id
+				ctxBrokerLookupBean.setTargetCss(target);
+				// 3. set modelType
+				ctxBrokerLookupBean.setModelType(modelType);
+				// 4. set type
+				ctxBrokerLookupBean.setType(type);
+					
+				cbPacket.setLookup(ctxBrokerLookupBean);
+	
+				Log.d(LOG_TAG, "before Callback ");
+				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.LOOKUP);
+				Log.d(LOG_TAG, "after Callback");
+				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
+				
+				Stanza stanza = new Stanza(toIdentity);
+				this.commMgr.sendIQ(stanza, IQ.Type.GET, cbPacket, ctxBrokerCallBack);
+				Log.d(LOG_TAG, "Sent IQ with stanza=" + stanza);
+			
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        } 						
+		} else {
+			broadcastServiceNotStarted(client, IInternalCtxClient.LOOKUP);
+		}
 		return null;
 	}
 
@@ -297,7 +429,49 @@ public class ContextBrokerBase implements IInternalCtxClient{
 	public List<CtxIdentifierBean> lookup(String client,
 			RequestorBean requestor, CtxEntityIdentifierBean entityId,
 			CtxModelTypeBean modelType, String type) throws CtxException {
-		// TODO Auto-generated method stub
+		Log.d(LOG_TAG, "Lookup called by client: " + client);
+		
+		if (this.connectedToComms) {
+			try {
+				IIdentityManager idm = this.commMgr.getIdManager();
+				IIdentity toIdentity;
+	
+				toIdentity = this.commMgr.getIdManager().getCloudNode();
+				
+				Log.d(LOG_TAG, "identity used = " + toIdentity.getJid());
+				CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+				cbPacket.setMethod(BrokerMethodBean.LOOKUP);
+
+				LookupBean ctxBrokerLookupBean = new LookupBean();
+				// 1. set requestorBean
+				ctxBrokerLookupBean.setRequestor(requestor);
+				// 2. set target id
+				ctxBrokerLookupBean.setTargetCss(toIdentity.getBareJid());
+				// 3. set modelType
+				ctxBrokerLookupBean.setModelType(modelType);
+				// 4. set type
+				ctxBrokerLookupBean.setType(type);
+					
+				cbPacket.setLookup(ctxBrokerLookupBean);
+	
+				Log.d(LOG_TAG, "before Callback ");
+				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.LOOKUP);
+				Log.d(LOG_TAG, "after Callback");
+				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
+				
+				Stanza stanza = new Stanza(toIdentity);
+				this.commMgr.sendIQ(stanza, IQ.Type.GET, cbPacket, ctxBrokerCallBack);
+				Log.d(LOG_TAG, "Sent IQ with stanza=" + stanza);
+			
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        } 						
+		} else {
+			broadcastServiceNotStarted(client, IInternalCtxClient.LOOKUP);
+		}
 		return null;
 	}
 
@@ -313,38 +487,236 @@ public class ContextBrokerBase implements IInternalCtxClient{
 	@Override
 	public CtxModelObjectBean remove(String client, RequestorBean requestor,
 			CtxIdentifierBean identifier) throws CtxException {
-		// TODO Auto-generated method stub
+		Log.d(LOG_TAG, "Remove called by client: " + client);
+		
+		if (this.connectedToComms) {
+			try {
+				IIdentityManager idm = this.commMgr.getIdManager();
+				IIdentity toIdentity;
+	
+//				toIdentity = this.commMgr.getIdManager().getCloudNode();
+				toIdentity = this.commMgr.getIdManager().fromJid(identifier.getString());
+				
+				Log.d(LOG_TAG, "identity used = " + toIdentity.getJid());
+				CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+				cbPacket.setMethod(BrokerMethodBean.REMOVE);
+
+				RemoveBean ctxBrokerRemoveBean = new RemoveBean();
+				// 1. set requestorBean
+				ctxBrokerRemoveBean.setRequestor(requestor);
+				// 2. set identifier
+				ctxBrokerRemoveBean.setId(identifier);
+					
+				cbPacket.setRemove(ctxBrokerRemoveBean);
+	
+				Log.d(LOG_TAG, "before Callback ");
+				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.REMOVE);
+				Log.d(LOG_TAG, "after Callback");
+				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
+				
+				Stanza stanza = new Stanza(toIdentity);
+				this.commMgr.sendIQ(stanza, IQ.Type.GET, cbPacket, ctxBrokerCallBack);
+				Log.d(LOG_TAG, "Sent IQ with stanza=" + stanza);
+			
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        } 						
+		} else {
+			broadcastServiceNotStarted(client, IInternalCtxClient.REMOVE);
+		}
 		return null;
 	}
 
 	@Override
 	public CtxModelObjectBean retrieve(String client, RequestorBean requestor,
 			CtxIdentifierBean identifier) throws CtxException {
-		// TODO Auto-generated method stub
+		Log.d(LOG_TAG, "Retrieve called by client: " + client);
+		
+		if (this.connectedToComms) {
+			try {
+				IIdentityManager idm = this.commMgr.getIdManager();
+				IIdentity toIdentity;
+	
+				toIdentity = this.commMgr.getIdManager().fromJid(identifier.getString());
+				
+				Log.d(LOG_TAG, "identity used = " + toIdentity.getJid());
+				CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+				cbPacket.setMethod(BrokerMethodBean.RETRIEVE);
+
+				RetrieveBean ctxBrokerRetrieveBean = new RetrieveBean();
+				
+				// 1. set identifier
+				ctxBrokerRetrieveBean.setId(identifier);
+				// 2. set requestor
+				ctxBrokerRetrieveBean.setRequestor(requestor);
+
+				cbPacket.setRetrieve(ctxBrokerRetrieveBean);
+	
+				Log.d(LOG_TAG, "before Callback ");
+				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.RETRIEVE);
+				Log.d(LOG_TAG, "after Callback");
+				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
+				
+				Stanza stanza = new Stanza(toIdentity);
+				this.commMgr.sendIQ(stanza, IQ.Type.GET, cbPacket, ctxBrokerCallBack);
+				Log.d(LOG_TAG, "Sent IQ with stanza=" + stanza);
+			
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        } 						
+		} else {
+			broadcastServiceNotStarted(client, IInternalCtxClient.RETRIEVE);
+		}
 		return null;
 	}
 
 	@Override
 	public CtxEntityIdentifierBean retrieveIndividualEntityId(String client,
 			RequestorBean requestor, String cssId) throws CtxException {
-		// TODO Auto-generated method stub
+		Log.d(LOG_TAG, "RetrieveIndividualEntityId called by client: " + client);
+		
+		if (this.connectedToComms) {
+			try {
+				IIdentityManager idm = this.commMgr.getIdManager();
+				IIdentity toIdentity;
+	
+				toIdentity = this.commMgr.getIdManager().fromJid(cssId);
+				
+				Log.d(LOG_TAG, "identity used = " + toIdentity.getJid());
+				CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+				cbPacket.setMethod(BrokerMethodBean.RETRIEVE_INDIVIDUAL_ENTITY_ID);
+
+				RetrieveIndividualEntityIdBean retrieveIndEntBean = new RetrieveIndividualEntityIdBean();
+				
+				// 1. set requestor
+				retrieveIndEntBean.setRequestor(requestor);
+				// 2. set identifier
+				retrieveIndEntBean.setTargetCss(cssId);
+
+				cbPacket.setRetrieveIndividualEntityId(retrieveIndEntBean);
+	
+				Log.d(LOG_TAG, "before Callback ");
+				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.RETRIEVE_INDIVIDUAL_ENTITY_ID);
+				Log.d(LOG_TAG, "after Callback");
+				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
+				
+				Stanza stanza = new Stanza(toIdentity);
+				this.commMgr.sendIQ(stanza, IQ.Type.GET, cbPacket, ctxBrokerCallBack);
+				Log.d(LOG_TAG, "Sent IQ with stanza=" + stanza);
+			
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        } 						
+		} else {
+			broadcastServiceNotStarted(client, IInternalCtxClient.RETRIEVE_INDIVIDUAL_ENTITY_ID);
+		}
 		return null;
+
 	}
 
 	@Override
 	public CtxEntityIdentifierBean retrieveCommunityEntityId(String client,
 			RequestorBean requestor, String cisId) throws CtxException {
-		// TODO Auto-generated method stub
+		Log.d(LOG_TAG, "RetrieveCommunityEntityId called by client: " + client);
+		
+		if (this.connectedToComms) {
+			try {
+				IIdentityManager idm = this.commMgr.getIdManager();
+				IIdentity toIdentity;
+	
+				toIdentity = this.commMgr.getIdManager().fromJid(cisId);
+				
+				Log.d(LOG_TAG, "identity used = " + toIdentity.getJid());
+				CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+				cbPacket.setMethod(BrokerMethodBean.RETRIEVE_COMMUNITY_ENTITY_ID);
+
+				RetrieveCommunityEntityIdBean retrieveCommEntBean = new RetrieveCommunityEntityIdBean();
+				
+				// 1. set requestor
+				retrieveCommEntBean.setRequestor(requestor);
+				// 2. set identifier
+				retrieveCommEntBean.setTarget(cisId);
+
+				cbPacket.setRetrieveCommunityEntityId(retrieveCommEntBean);
+	
+				Log.d(LOG_TAG, "before Callback ");
+				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.RETRIEVE_COMMUNITY_ENTITY_ID);
+				Log.d(LOG_TAG, "after Callback");
+				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
+				
+				Stanza stanza = new Stanza(toIdentity);
+				this.commMgr.sendIQ(stanza, IQ.Type.GET, cbPacket, ctxBrokerCallBack);
+				Log.d(LOG_TAG, "Sent IQ with stanza=" + stanza);
+			
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        } 						
+		} else {
+			broadcastServiceNotStarted(client, IInternalCtxClient.RETRIEVE_COMMUNITY_ENTITY_ID);
+		}
 		return null;
+
 	}
 
 	@Override
 	public CtxModelObjectBean update(String client, RequestorBean requestor,
 			CtxModelObjectBean object) throws CtxException {
-		// TODO Auto-generated method stub
+		Log.d(LOG_TAG, "Update called by client: " + client);
+		
+		if (this.connectedToComms) {
+			try {
+				IIdentityManager idm = this.commMgr.getIdManager();
+				IIdentity toIdentity;
+	
+				toIdentity = this.commMgr.getIdManager().fromJid(object.getId().getString());
+				
+				Log.d(LOG_TAG, "identity used = " + toIdentity.getJid());
+				CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+				cbPacket.setMethod(BrokerMethodBean.UPDATE);
+
+				UpdateBean updateBean = new UpdateBean();
+				
+				// 1. set modelObject
+				updateBean.setCtxModelOject(object);
+				// 2. set requestor
+				updateBean.setRequestor(requestor);
+
+				cbPacket.setUpdate(updateBean);
+	
+				Log.d(LOG_TAG, "before Callback ");
+				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.UPDATE);
+				Log.d(LOG_TAG, "after Callback");
+				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
+				
+				Stanza stanza = new Stanza(toIdentity);
+				this.commMgr.sendIQ(stanza, IQ.Type.GET, cbPacket, ctxBrokerCallBack);
+				Log.d(LOG_TAG, "Sent IQ with stanza=" + stanza);
+			
+			} catch (CommunicationException e) {
+				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+	        } 						
+		} else {
+			broadcastServiceNotStarted(client, IInternalCtxClient.UPDATE);
+		}
 		return null;
 	}
 
+	// LOCAL CONTEXT CLIENT
 	@Override
 	public CtxAssociationBean createAssociation(String client, String type)
 			throws CtxException {
@@ -478,15 +850,122 @@ public class ContextBrokerBase implements IInternalCtxClient{
 								return;
 							}
 							final CtxEntityBean entityBean = payload.getCreateEntityBeanResult();
-//							final ACtxEntity entity = CtxModelBeanTranslator.getInstance().fromCtxEntityBean(entityBean);
-							//NOTIFY calling client
+							Log.d(LOG_TAG, "inside callback, entityBean: " + entityBean);
+							Log.d(LOG_TAG, "entityId: " + entityBean.getId());
+
 							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) entityBean);
+
+							//NOTIFY CALLING CLIENT
 /*							if (restrictBroadcast) {
 								intent.setPackage(client);
 							}
 							ContextBrokerBase.this.applicationContext.sendBroadcast(intent);
 							Log.d(LOG_TAG, "SendBroadcast intent with ctxEntity object");*/
 //							ContextBrokerBase.this.commMgr.unregister(ELEMENT_NAMES, NAMESPACES, ContextBrokerCallback());
+							
+							break;
+
+						case CREATE_ATTRIBUTE:
+							
+							Log.i(LOG_TAG, "inside receiveResult CREATE ATTRIBUTE");
+							if (payload.getCreateAttributeBeanResult() == null) {
+								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getCreateAttributeBeanResult() is null");
+								return;
+							}
+							final CtxAttributeBean attributeBean = payload.getCreateAttributeBeanResult();
+
+							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) attributeBean);
+
+							break;
+
+						case CREATE_ASSOCIATION:
+							
+							Log.i(LOG_TAG, "inside receiveResult CREATE ASSOCIATION");
+							if (payload.getCreateAssociationBeanResult() == null) {
+								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getCreateAssociationBeanResult() is null");
+								return;
+							}
+							final CtxAssociationBean associationBean = payload.getCreateAssociationBeanResult();
+
+							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) associationBean);
+
+							break;
+
+/*						case LOOKUP:
+							
+							Log.i(LOG_TAG, "inside receiveResult LOOKUP");
+							if (payload.getLookupResult() == null) {
+								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getCreateAssociationBeanResult() is null");
+								return;
+							}
+							final CtxAssociationBean associationBean = payload.getCreateAssociationBeanResult();
+
+							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) associationBean);
+					
+							break;*/
+
+						case REMOVE:
+							
+							Log.i(LOG_TAG, "inside receiveResult REMOVE");
+							if (payload.getRemoveBeanResult() == null) {
+								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getRemoveBeanResult() is null");
+								return;
+							}
+							final CtxModelObjectBean removedModelObjectBean = payload.getRemoveBeanResult();
+
+							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) removedModelObjectBean);
+							
+							break;
+
+						case RETRIEVE:
+							
+							Log.i(LOG_TAG, "inside receiveResult RETRIEVE");
+							if (payload.getRetrieveBeanResult() == null) {
+								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getRetrieveBeanResult() is null");
+								return;
+							}
+							final CtxModelObjectBean retrievedObjectBean = payload.getRetrieveBeanResult();
+
+							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) retrievedObjectBean);
+							
+							break;
+
+						case RETRIEVE_INDIVIDUAL_ENTITY_ID:
+							
+							Log.i(LOG_TAG, "inside receiveResult RETRIEVE_INDIVIDUAL_ENTITY_ID");
+							if (payload.getRetrieveIndividualEntityIdBeanResult() == null) {
+								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getRetrieveIndividualEntityIdBeanResult() is null");
+								return;
+							}
+							final CtxEntityIdentifierBean retrievedIndEntIdObjectBean = payload.getRetrieveIndividualEntityIdBeanResult();
+
+							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) retrievedIndEntIdObjectBean);
+							
+							break;
+						
+						case RETRIEVE_COMMUNITY_ENTITY_ID:
+							
+							Log.i(LOG_TAG, "inside receiveResult RETRIEVE_COMMUNITY_ENTITY_ID");
+							if (payload.getRetrieveCommunityEntityIdBeanResult() == null) {
+								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getRetrieveCommunityEntityIdBeanResult() is null");
+								return;
+							}
+							final CtxEntityIdentifierBean retrievedCommEntIdObjectBean = payload.getRetrieveCommunityEntityIdBeanResult();
+
+							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) retrievedCommEntIdObjectBean);
+							
+							break;
+						
+						case UPDATE:
+							
+							Log.i(LOG_TAG, "inside receiveResult UPDATE");
+							if (payload.getUpdateBeanResult() == null) {
+								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getUpdateBeanResult() is null");
+								return;
+							}
+							final CtxModelObjectBean updateBean = payload.getUpdateBeanResult();
+
+							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) updateBean);
 							
 							break;
 							
@@ -505,11 +984,12 @@ public class ContextBrokerBase implements IInternalCtxClient{
 					return;
 				}
 				
-				if (restrictBroadcast) {
-					intent.setPackage(client);
-				}
+//				if (restrictBroadcast) {
+//					intent.setPackage(client);
+//				}
+				intent.addFlags(Intent.FLAG_DEBUG_LOG_RESOLUTION);
 				ContextBrokerBase.this.applicationContext.sendBroadcast(intent);
-				Log.d(LOG_TAG, "SendBroadcast intent with ctxEntity object");
+				Log.d(LOG_TAG, "SendBroadcast intent: " + intent);
 			}
 		}
 
