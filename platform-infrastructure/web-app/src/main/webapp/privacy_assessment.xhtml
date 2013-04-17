@@ -3,6 +3,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
@@ -50,13 +51,21 @@
 -->
                         <li class="clearfix">
                         	<label for="">Results</label>
-							<p:commandButton type="button" onclick="switcher.previous();" icon="ui-icon-circle-triangle-w"/>  
-							<p:commandButton type="button" onclick="switcher.next();" icon="ui-icon-circle-triangle-e"/>  
-							<p:imageSwitch effect="fade" widgetVar="switcher" slideshowAuto="false">  
-								<ui:repeat value="#{privacyAssessmentService.images}" var="image">  
-									<p:graphicImage value="#{image}" />
-								</ui:repeat>  
-							</p:imageSwitch>  
+							<p:commandButton actionListener="#{privacyAssessmentService.previousImage}" update="dynamicImage" icon="ui-icon-circle-triangle-w"/>  
+							<p:commandButton actionListener="#{privacyAssessmentService.nextImage}" update="dynamicImage" icon="ui-icon-circle-triangle-e"/>
+							<br/>
+							<p:graphicImage value="#{privacyAssessmentService.image}" id="dynamicImage"/>
+<!--
+							<br/>
+							<p:commandButton type="button" onClick="switcher.previous();" icon="ui-icon-circle-triangle-w"/>  
+							<p:commandButton type="button" onclick="switcher.next();" icon="ui-icon-circle-triangle-e"/>
+							<br/>
+							<p:imageSwitch effect="fade" widgetVar="switcher" slideshowAuto="false">
+								<ui:repeat value="#{privacyAssessmentService.images}" var="curimage">
+									<p:graphicImage value="#{curimage}" />
+								</ui:repeat>
+							</p:imageSwitch>
+-->
                         </li>
                         <li class="clearfix">
                             <p class="success">Thank you! Success Message here.</p>

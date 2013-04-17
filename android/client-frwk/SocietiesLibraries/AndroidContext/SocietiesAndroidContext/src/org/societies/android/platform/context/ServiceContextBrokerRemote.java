@@ -22,14 +22,64 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.trust.evidence.remote;
+package org.societies.android.platform.context;
+
+import org.societies.android.api.internal.context.IInternalCtxClient;
+import org.societies.android.api.utilities.RemoteServiceHandler;
+
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
+import android.os.Messenger;
+import android.util.Log;
 
 /**
- * Describe your class here...
+ * @author pkosmides
  *
- * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.3
+ * Remote ServiceContext service wrapper for {@link ICtxClient} methods 
  */
-public interface ITrustEvidenceCollectorRemote 
-	extends org.societies.api.privacytrust.trust.evidence.remote.ITrustEvidenceCollectorRemote {
+public class ServiceContextBrokerRemote extends Service{
+
+	private static final String LOG_TAG = ServiceContextBrokerRemote.class.getName();
+	private Messenger inMessenger;
+	
+/* one way 	*/
+	@Override
+	public void onCreate () {
+//		ClientCommunicationMgr ccm = new ClientCommunicationMgr(this, true);
+		
+//		ContextBrokerBase serviceBase = new ContextBrokerBase(this.getApplicationContext(),  ccm, false);
+
+		ContextBrokerBase serviceBase = new ContextBrokerBase(this.getApplicationContext());
+		
+		this.inMessenger = new Messenger(new RemoteServiceHandler(serviceBase.getClass(), serviceBase, IInternalCtxClient.methodsArray));
+		Log.i(LOG_TAG, "ServiceContextBrokerRemote creation");
+	}
+
+	
+	/* other way 
+	
+	@Override
+	public void onCreate () {
+		ContextBrokerBase serviceBase = new ContextBrokerBase(this, createClientCommunicationMgr(), false);
+		
+		this.inMessenger = new Messenger(new RemoteServiceHandler(serviceBase.getClass(), serviceBase, ICtxClient.methodsArray));
+		Log.i(LOG_TAG, "ServicePlatformEventsRemote creation");
+	}
+	
+	protected ClientCommunicationMgr createClientCommunicationMgr() {
+		return new ClientCommunicationMgr(this, true); 
+	}*/
+	// END of second way 
+	
+	@Override
+	public IBinder onBind(Intent arg0) {
+		Log.d(LOG_TAG, "ServiceContextBrokerRemote onBind");
+		return inMessenger.getBinder();
+	}
+
+	@Override
+	public void onDestroy() {
+		Log.i(LOG_TAG, "ServiceContextBrokerRemote terminating");
+	}
 }
