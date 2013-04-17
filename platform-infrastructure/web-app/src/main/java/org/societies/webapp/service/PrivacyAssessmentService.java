@@ -76,7 +76,7 @@ public class PrivacyAssessmentService implements Serializable {
 
 	private boolean imagesGenerated = false;
 	private int imageIndex;
-	private List<byte[]> images;
+	private Map<Integer, byte[]> images;
 
 	public class PlotData {
 
@@ -137,7 +137,7 @@ public class PrivacyAssessmentService implements Serializable {
 
 	public PrivacyAssessmentService() {
 		log.info("constructor");
-		images = new ArrayList<byte[]>();
+		images = new HashMap<Integer, byte[]>();
 	}
 
 	/**
@@ -177,7 +177,7 @@ public class PrivacyAssessmentService implements Serializable {
 			imagesGenerated = true;
 		}
 		List<StreamedContent> result = new ArrayList<StreamedContent>();
-		for (byte[] img : images) {
+		for (byte[] img : images.values()) {
 			//log.debug("getImages(): adding image {}", img);
 			InputStream is = new ByteArrayInputStream(img);
 			//log.debug("getImages(): image input stream: {}", is);
@@ -241,7 +241,7 @@ public class PrivacyAssessmentService implements Serializable {
 	}
 
 	private void createBarchart(String title, String categoryLabel, String valueLabel,
-			PlotData[] data, String[] dataLabels, String filename) {
+			PlotData[] data, String[] dataLabels, int index) {
 
 		DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
 		int maxDataLength = 0;
@@ -281,7 +281,8 @@ public class PrivacyAssessmentService implements Serializable {
 			BufferedImage image = chart.createBufferedImage(width, height);
 			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 			ChartUtilities.writeBufferedImageAsPNG(outStream, image);
-			images.add(outStream.toByteArray());
+			byte[] ba = outStream.toByteArray();
+			images.put(index, ba);
 			log.debug("Generated image {}", title);
 		} catch(IOException e) {
 			log.warn("createBarchart(): ", e);
@@ -311,7 +312,7 @@ public class PrivacyAssessmentService implements Serializable {
 		log.debug("Number of identities data has been transmitted to: {}", identities.size());
 		PlotData[] plotData = new PlotData[] {mapToArrays(identities)};
 		String[] plotDataLabels = new String[] {"data"};		
-		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, PrivacyAssessmentForm.ImageFileNames.RECEIVER_IDS);
+		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, 0);
 	}
 
 	private void generateImageSenderIds() {
@@ -348,7 +349,7 @@ public class PrivacyAssessmentService implements Serializable {
 				"Correlation with data access by the sender identity",
 				"Correlation with data access by any identity"
 		};
-		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, PrivacyAssessmentForm.ImageFileNames.SENDER_IDS);
+		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, 1);
 	}
 
 	private void generateImageSenderClass() {
@@ -385,7 +386,7 @@ public class PrivacyAssessmentService implements Serializable {
 				"Correlation with data access by the sender class",
 				"Correlation with data access by any class"
 		};
-		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, PrivacyAssessmentForm.ImageFileNames.SENDER_CLASSES);
+		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, 2);
 	}
 
 	private void generateImageDataAccessClass() {
@@ -399,7 +400,7 @@ public class PrivacyAssessmentService implements Serializable {
 		log.debug("Number of data access events (by class): {}", dataAccessClasses.size());
 		PlotData[] plotData = new PlotData[] {mapToArrays(dataAccessClasses)};
 		String[] plotDataLabels = new String[] {"data"};
-		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, PrivacyAssessmentForm.ImageFileNames.DATA_ACCESS_CLASSES);
+		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, 3);
 	}
 
 	private void generateImageDataAccessIds() {
@@ -413,6 +414,6 @@ public class PrivacyAssessmentService implements Serializable {
 		log.debug("Number of data access events (by identity): {}", identities.size());
 		PlotData[] plotData = new PlotData[] {mapToArrays(identities)};
 		String[] plotDataLabels = new String[] {"data"};
-		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, PrivacyAssessmentForm.ImageFileNames.DATA_ACCESS_IDS);
+		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, 4);
 	}
 }
