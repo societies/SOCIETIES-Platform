@@ -374,6 +374,7 @@
 						<Export-Package>!*</Export-Package>
 						<Include-Resource>{maven-resources}</Include-Resource>
 						<Import-Package>
+                            javassist.util.proxy;resolution:=optional,
 							org.simpleframework.xml;resolution:=optional,
 							org.simpleframework.xml.convert;resolution:=optional,
 							org.societies.maven.converters;resolution:=optional,
@@ -382,27 +383,27 @@
 							javax.servlet;version="[3.0.0, 4.0.0)",
 							javax.servlet.resources;version="[2.4.0, 4.0.0)",
 							<!-- JSF 2.0 -->
-							com.sun.faces;resolution:=optional,
-							com.sun.faces.config;resolution:=optional,
-							com.sun.faces.application;resolution:=optional,
-							com.sun.faces.context;resolution:=optional,
-							com.sun.faces.lifecycle;resolution:=optional,
-							com.sun.faces.application.view;resolution:=optional,
-							com.sun.faces.renderkit;resolution:=optional,
-							com.sun.faces.component.visit;resolution:=optional,
-							com.sun.faces.facelets.impl;resolution:=optional,
-							com.sun.faces.facelets.tag.jsf;resolution:=optional,
-							com.sun.faces.application.resource;resolution:=optional,
-							com.sun.faces.ext.render;resolution:=optional,
-							com.sun.faces.facelets.component;resolution:=optional,
-							com.sun.faces.renderkit.html_basic;resolution:=optional,
-							com.sun.faces.component;resolution:=optional,
-							com.sun.faces.facelets.tag.ui;resolution:=optional,
-							javax.faces;resolution:=optional,
-							javax.faces.webapp;resolution:=optional,
-							javax.faces.component;resolution:=optional,
-							javax.faces.component.html;resolution:=optional,
-							javax.faces.context;resolution:=optional,
+							com.sun.faces,
+							com.sun.faces.config,
+							com.sun.faces.application,
+							com.sun.faces.context,
+							com.sun.faces.lifecycle,
+							com.sun.faces.application.view,
+							com.sun.faces.renderkit,
+							com.sun.faces.component.visit,
+							com.sun.faces.facelets.impl,
+							com.sun.faces.facelets.tag.jsf,
+							com.sun.faces.application.resource,
+							com.sun.faces.ext.render,
+							com.sun.faces.facelets.component,
+							com.sun.faces.renderkit.html_basic,
+							com.sun.faces.component,
+							com.sun.faces.facelets.tag.ui,
+							javax.faces,
+							javax.faces.webapp,
+							javax.faces.component,
+							javax.faces.component.html,
+							javax.faces.context,
 							<!-- PrimeFaces -->
 							org.primefaces;resolution:=optional,
 							org.primefaces.application;resolution:=optional,
@@ -562,7 +563,7 @@
 							javax.faces.event;resolution:=optional,
 							javax.faces.convert;resolution:=optional,
 							org.springframework.web.jsf.el;resolution:=optional,
-							org.springframework.osgi.config
+                            org.springframework.osgi.config,
 							com.sun.faces.vendor;resolution:=optional,
 							javax.el;resolution:=optional,
 							javax.faces.render;resolution:=optional,
@@ -698,6 +699,32 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>war</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.springframework.osgi</groupId>
+                                    <artifactId>org.springframework.osgi.web</artifactId>
+                                    <version>1.2.1</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>javax.servlet</groupId>
+                                    <artifactId>com.springsource.javax.servlet</artifactId>
+                                    <version>2.5.0</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.glassfish</groupId>
+                                    <artifactId>javax.faces</artifactId>
+                                    <version>2.1.17</version>
+                                    <type>jar</type>
+                                    <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
 									<groupId>com.sun.faces</groupId>
 									<artifactId>jsf-impl</artifactId>
 									<version>2.1.17</version>
