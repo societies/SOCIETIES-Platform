@@ -61,6 +61,15 @@ public class LoginController extends BasePageController {
             logoutAction();
         }
 
+        if (loginDialogUsername == null || loginDialogUsername.isEmpty()
+                || loginDialogPassword == null || loginDialogPassword.isEmpty()) {
+            String summary = "Login failed";
+            String detail = "Username or password were blank";
+            addGlobalMessage(summary, detail, FacesMessage.SEVERITY_WARN);
+
+            return "false";
+        }
+
         String result = openfireLoginService.doLogin(loginDialogUsername, loginDialogPassword);
         if (result == null) {
             String summary = "Login failed";

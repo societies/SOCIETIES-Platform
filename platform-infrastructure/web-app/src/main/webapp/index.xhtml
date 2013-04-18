@@ -3,6 +3,9 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 template="templates/main_template.xhtml">
 
+    <!-- disable redirect to "index.xhtml" if we're not logged in -->
+    <ui:param name="noRedirect" value="true"/>
+
     <ui:define name="html_head">
         <title>SOCIEITES</title>
     </ui:define>
