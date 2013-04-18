@@ -33,8 +33,8 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
 
@@ -44,7 +44,7 @@ import org.societies.api.schema.identity.RequestorBean;
  * @created 09-nov.-2011 16:45:26
  */
 public interface IPrivacyDataManager {
-	
+
 	/**
 	 * Check if a requestor has the permission to perform actions under a personal data
 	 * 
@@ -54,7 +54,12 @@ public interface IPrivacyDataManager {
 	 * @return A ResponseItem containing privacy permission information: PERMIT or DENY. Some optional actions may be avoided and may not be covered by this permission.
 	 * @throws PrivacyException if parameters are not correct, or if the privacy layer is not ready
 	 */
-	public ResponseItem checkPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
+	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
+	/**
+	 * @see checkPermission
+	 */
+	@Deprecated
+	public org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem checkPermission(Requestor requestor, DataIdentifier dataId, List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions) throws PrivacyException;
 	
 	/**
 	 * Check if a requestor has the permission to perform actions under a list of personal data
@@ -67,8 +72,8 @@ public interface IPrivacyDataManager {
 	 * @return A list of ResponseItem containing privacy permission information: PERMIT or DENY. Some optional actions may be avoided and may not be covered by this permission.
 	 * @throws PrivacyException if parameters are not correct, or if the privacy layer is not ready
 	 */
-	public List<ResponseItem> checkPermission(Requestor requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException;
-	
+	public List<org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem> checkPermission(Requestor requestor, List<DataIdentifier> dataIds, List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions) throws PrivacyException;
+
 	/**
 	 * Check if a requestor has the permission to perform action under a personal data
 	 * Duplicate of method @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier, java.util.List)
@@ -80,8 +85,8 @@ public interface IPrivacyDataManager {
 	 * @return A ResponseItem containing permission information
 	 * @throws PrivacyException if parameters are not correct, or if the privacy layer is not ready
 	 */
-	public ResponseItem checkPermission(Requestor requestor, DataIdentifier dataId, Action action) throws PrivacyException;
-	
+	public org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem checkPermission(Requestor requestor, DataIdentifier dataId, org.societies.api.privacytrust.privacy.model.privacypolicy.Action action) throws PrivacyException;
+
 	/**
 	 * Check if a requestor has the permission to perform action under a personal data
 	 * Duplicate of method @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action)
@@ -93,12 +98,12 @@ public interface IPrivacyDataManager {
 	 * @return A list of ResponseItem containing privacy permission information: PERMIT or DENY. Some optional actions may be avoided and may not be covered by this permission.
 	 * @throws PrivacyException if parameters are not correct, or if the privacy layer is not ready
 	 */
-	public  List<ResponseItem> checkPermission(Requestor requestor, List<DataIdentifier> dataIds, Action action) throws PrivacyException;
-	
-	@Deprecated
-	public ResponseItem checkPermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, Action action) throws PrivacyException;
+	public  List<org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem> checkPermission(Requestor requestor, List<DataIdentifier> dataIds, org.societies.api.privacytrust.privacy.model.privacypolicy.Action action) throws PrivacyException;
 
-	
+	@Deprecated
+	public org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem checkPermission(Requestor requestor, IIdentity ownerId, CtxIdentifier dataId, org.societies.api.privacytrust.privacy.model.privacypolicy.Action action) throws PrivacyException;
+
+
 	/**
 	 * Protect a data following the user preferences by obfuscating it to a correct
 	 * obfuscation level. The data information are wrapped into a relevant data

@@ -26,6 +26,7 @@ package org.societies.api.identity.util;
 
 import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.SimpleDataIdentifier;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
@@ -37,6 +38,34 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
  *
  */
 public class DataIdentifierFactory {
+	/**
+	 * Generate a simple DataIdentifier from schema, owner id and type
+	 * 
+	 * @param scheme
+	 * @param ownerId
+	 * @param dataType
+	 * @return
+	 */
+	public static DataIdentifier create(DataIdentifierScheme scheme, String ownerId, String dataType) {
+		DataIdentifier dataId = new SimpleDataIdentifier();
+		dataId.setScheme(scheme);
+		dataId.setOwnerId(ownerId);
+		dataId.setType(dataType);
+		dataId.setUri(DataIdentifierUtils.toUriString(scheme, ownerId, dataType));
+		return dataId;
+	}
+	/**
+	 * Generate a simple DataIdentifier from schema, owner id and type
+	 * 
+	 * @param scheme
+	 * @param ownerId
+	 * @param dataType
+	 * @return
+	 */
+	public static DataIdentifier create(DataIdentifierScheme scheme, IIdentity ownerId, String dataType) {
+		return create(scheme, (null != ownerId ? ownerId.getJid() : ""), dataType);
+	}
+	
 	/**
 	 * Create the relevant DataIdentifier extension using a correct URI
 	 *
@@ -89,10 +118,6 @@ public class DataIdentifierFactory {
 	 * @return
 	 */
 	public static DataIdentifier fromType(DataIdentifierScheme scheme, String dataType) {
-		DataIdentifier dataId = new SimpleDataIdentifier();
-		dataId.setScheme(scheme);
-		dataId.setType(dataType);
-		dataId.setUri(DataIdentifierUtils.toUriString(scheme, dataType));
-		return dataId;
+		return create(scheme, "", dataType);
 	}
 }

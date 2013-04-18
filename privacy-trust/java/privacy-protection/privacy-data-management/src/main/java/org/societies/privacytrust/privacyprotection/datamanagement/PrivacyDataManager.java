@@ -184,6 +184,21 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		}
 		return permission;
 	}
+	@Override
+	public org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions) throws PrivacyException {
+		// Depency injection
+		if (!isDepencyInjectionDone(1)) {
+			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
+		}
+		
+		ResponseItem responseItem = null;
+		try {
+			responseItem = checkPermission(RequestorUtils.toRequestor(requestor, commManager.getIdManager()), dataId, ActionUtils.toActions(actions));
+		} catch (InvalidFormatException e) {
+			throw new PrivacyException("Can't manage the requestor field");
+		}
+		return ResponseItemUtils.toResponseItemBean(responseItem);
+	}
 
 	private ResponseItem checkPermissionCisData(Requestor requestor, DataIdentifier dataId, List<Action> actions, IIdentity cisId) throws PrivacyException {
 		// -- Create useful values for default result
