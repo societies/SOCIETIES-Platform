@@ -26,7 +26,12 @@ package org.societies.privacytrust.trust.impl.engine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
+import org.societies.privacytrust.trust.api.event.ITrustEvidenceUpdateEventListener;
+import org.societies.privacytrust.trust.api.event.TrustEventTopic;
+import org.societies.privacytrust.trust.api.event.TrustEvidenceUpdateEvent;
+import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,9 +46,70 @@ public class IndirectTrustEngine extends TrustEngine {
 	private static final Logger LOG = LoggerFactory.getLogger(IndirectTrustEngine.class);
 	
 	@Autowired
-	IndirectTrustEngine(ITrustEventMgr trustEventMgr) {
+	IndirectTrustEngine(ITrustEventMgr trustEventMgr) throws Exception {
 		
 		super(trustEventMgr);
-		LOG.info(this.getClass() + " instantiated");
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
+		
+		try {
+			LOG.info("Registering for indirect trust evidence updates...");
+			super.trustEventMgr.registerEvidenceUpdateListener(
+					new IndirectTrustEvidenceUpdateListener(), 
+					new String[] { TrustEventTopic.INDIRECT_TRUST_EVIDENCE_UPDATED });
+		} catch (Exception e) {
+			LOG.error(this.getClass() + " could not be initialised: "
+					+ e.getLocalizedMessage(), e);
+			throw e;
+		}
+	}
+	
+	private class IndirectTrustEvidenceHandler implements Runnable {
+
+		private final IIndirectTrustEvidence evidence;
+		
+		private IndirectTrustEvidenceHandler(final IIndirectTrustEvidence evidence) {
+			
+			this.evidence = evidence;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+		
+			if (LOG.isDebugEnabled())
+				LOG.debug("Handling evidence " + this.evidence);
+			
+			//try {
+				for (final TrustedEntityId myId : IndirectTrustEngine.super.trustNodeMgr.getMyIds())
+					;//TODO evaluate(myId, evidence);
+			//} catch (TrustException te) {
+				
+			//	LOG.error("Could not handle evidence "
+			//			+ evidence + ": " + te.getLocalizedMessage(), te);
+			//}
+		} 
+	}
+	
+	private class IndirectTrustEvidenceUpdateListener implements ITrustEvidenceUpdateEventListener {
+
+		/*
+		 * @see org.societies.privacytrust.trust.api.event.ITrustEvidenceUpdateEventListener#onNew(org.societies.privacytrust.trust.api.event.TrustEvidenceUpdateEvent)
+		 */
+		@Override
+		public void onNew(TrustEvidenceUpdateEvent evt) {
+			
+			if (LOG.isDebugEnabled())
+				LOG.debug("Received indirect TrustEvidenceUpdateEvent " + evt);
+			
+			if (!(evt.getSource() instanceof IIndirectTrustEvidence)) {
+				LOG.error("TrustEvidenceUpdateEvent source is not instance of IIndirectTrustEvidence");
+				return;
+			}
+			final IIndirectTrustEvidence evidence = (IIndirectTrustEvidence) evt.getSource();
+			executorService.execute(new IndirectTrustEvidenceHandler(evidence));
+		}
 	}
 }
