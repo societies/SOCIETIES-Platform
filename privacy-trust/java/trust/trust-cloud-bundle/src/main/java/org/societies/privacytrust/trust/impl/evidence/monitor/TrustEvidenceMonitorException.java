@@ -22,52 +22,71 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.privacytrust.trust.evidence;
+package org.societies.privacytrust.trust.impl.evidence.monitor;
+
+import org.societies.api.privacytrust.trust.TrustException;
 
 /**
- * The constants of this enumerated type specify the types of trust evidence.
+ * Thrown to indicate an exception in the Trust Evidence Monitor.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.4
+ * @since 1.0
  */
-public enum TrustEvidenceType {
+public class TrustEvidenceMonitorException extends TrustException {
+
+	private static final long serialVersionUID = 539293515025809659L;
 
 	/**
-	 * The enum constant for direct trust relationships.
-	 * 
-	 * @since 1.0
-	 */
-	DIRECTLY_TRUSTED,
-	
-	/**
-	 * The enum constant for trust ratings.
-	 */
-	RATED,
-	
-	/**
-	 * The enum constant for friending users.
-	 * @since 0.4.1
-	 */
-	FRIENDED_USER,
-	
-	/**
-	 * The enum constant for unfriending users.
-	 * @since 0.4.1
-	 */
-	UNFRIENDED_USER,
-	
-	/**
-	 * The enum constant for joining communities.
-	 */
-	JOINED_COMMUNITY,
-	
-	/**
-	 * The enum constant for leaving communities.
-	 */
-	LEFT_COMMUNITY,
-	
-	/**
-	 * The enum constant for using services.
-	 */
-	USED_SERVICE,
+     * Constructs a <code>TrustEvidenceMonitorException</code> with no detail message.
+     */
+    public TrustEvidenceMonitorException() {
+    	
+        super();
+    }
+
+    /**
+     * Constructs a <code>TrustEvidenceMonitorException</code> with the specified detail
+     * message.
+     * 
+     * @param message
+     *            the detail message.
+     */
+    public TrustEvidenceMonitorException(String message) {
+    	
+        super(message);
+    }
+
+    /**
+     * Creates a <code>TrustEvidenceMonitorException</code> with the specified detail message
+     * and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustEvidenceMonitorException(String message, Throwable cause) {
+    	
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>TrustEvidenceMonitorException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustEvidenceMonitorException(Throwable cause) {
+    	
+        super(cause);
+    }
 }

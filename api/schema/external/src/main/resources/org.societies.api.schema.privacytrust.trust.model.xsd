@@ -30,6 +30,7 @@
   
   <xs:simpleType name="trustEvidenceTypeBean">
     <xs:restriction base="xs:string">
+      <xs:enumeration value="directlyTrusted"/>
       <xs:enumeration value="rated"/>
       <xs:enumeration value="friendedUser"/>
       <xs:enumeration value="unfriendedUser"/>
