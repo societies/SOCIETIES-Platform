@@ -1,0 +1,103 @@
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <ImageView
+            android:id="@+id/radioAckHeaderImage"
+            android:layout_width="fill_parent"
+            android:layout_height="36dp"
+            android:src="@drawable/societies_header"/>
+
+    <LinearLayout
+            android:id="@+id/radioAckOuterLinerLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:background="@color/Blue"
+            android:orientation="vertical">
+
+        <TextView
+                android:id="@+id/radioAckHeaderText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/societies_Notifications"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/Grey"/>
+
+    </LinearLayout>
+
+    <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            >
+        <LinearLayout
+                android:id="@+id/radioAckInnerLinearLayout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/Grey"
+                android:orientation="vertical">
+
+            <TableLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+
+                <TableRow
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                    <ImageView
+                            android:id="@+id/radioAckProfilePic"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/profile_pic"/>
+
+                    <TextView
+                            android:id="@+id/radioAckProposalText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="[PROPOSAL TEXT]"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="@color/Black"/>
+
+                </TableRow>
+            </TableLayout>
+
+            <RadioGroup
+                    android:id="@+id/radioAckRadioGroup"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+
+                <RadioButton android:text="SAMPLE"
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"/>
+                <RadioButton android:text="SAMPLE"
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:checked="true"/>
+                <RadioButton android:text="SAMPLE"
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"/>
+                <RadioButton android:text="SAMPLE"
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"/>
+                <RadioButton android:text="SAMPLE"
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"/>
+                <RadioButton android:text="SAMPLE"
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"/>
+                <RadioButton android:text="SAMPLE"
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"/>
+            </RadioGroup>
+
+            <Button
+                    android:id="@+id/radioAckOkButton"
+                    android:text="@android:string/ok"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+</TableLayout>

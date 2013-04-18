@@ -86,15 +86,18 @@ public class DecisionUtils {
 		return sb.toString();
 	}
 	
+	@Deprecated
 	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision o1, Object o2) {
+		return equal(o1, o2);
+	}
+	public static boolean equal(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision o1, Object o2) {
 		// -- Verify reference equality
-		if (o2 == null) { return false; }
 		if (o1 == o2) { return true; }
+		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
 		if (o1.getClass() != o2.getClass()) { return false; }
 		// -- Verify obj type
-		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision rhs = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision) o2;
-		return new EqualsBuilder()
-		.append(o1.name(), rhs.name())
-		.isEquals();
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision ro2 = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision) o2;
+		return (o1.value().equals(ro2.value()));
 	}
 }

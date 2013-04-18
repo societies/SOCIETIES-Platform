@@ -47,7 +47,7 @@ public class SpecificTestCaseUpperTester {
 	public static ServiceResourceIdentifier calculatorServiceId;
 	
 	public void readyForUpper(){
-		LOG.info("[#759] I'm ready to start upper testing!");
+		LOG.info("[#1866] I'm ready to start upper testing!");
 		NominalTestCaseLowerTester.integrationTestUtils.run(NominalTestCaseLowerTester.testCaseNumber, NominalTestCaseUpperTester.class);
 
 	}
@@ -59,12 +59,12 @@ public class SpecificTestCaseUpperTester {
 	 */
 	@BeforeClass
 	public static void initialization() {
-		LOG.info("[#759] Initialization");
-		LOG.info("[#759] Prerequisite: The CSS is created");
-		LOG.info("[#759] Prerequisite: The user is logged to the CSS");
+		LOG.info("[#1866] Initialization");
+		LOG.info("[#1866] Prerequisite: The CSS is created");
+		LOG.info("[#1866] Prerequisite: The user is logged to the CSS");
 
 		serviceBundleUrl = NominalTestCaseLowerTester.class.getClassLoader().getResource(SERVICE_PATH);//NominalTestCaseLowerTester.class.getClassLoader().getResource("Calculator-0.3.jar");//"file:/Calculator-0.3.jar";
-		LOG.info("[#759] Service location: "+serviceBundleUrl);
+		LOG.info("[#1866] Service location: "+serviceBundleUrl);
 		assertNotNull("Can't find the service JAR location", serviceBundleUrl);
 
 	}
@@ -74,7 +74,7 @@ public class SpecificTestCaseUpperTester {
 	 */
 	@Before
 	public void setUp() {
-		LOG.info("[#759] SpecificTestCaseUpperTester::setUp");
+		LOG.info("[#1866] SpecificTestCaseUpperTester::setUp");
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class SpecificTestCaseUpperTester {
 	 */
 	@After
 	public void tearDown() {
-		LOG.info("[#759] tearDown");
+		LOG.info("[#1866] tearDown");
 	}
 
 
@@ -93,7 +93,7 @@ public class SpecificTestCaseUpperTester {
 	 */
 	@Test(expected=NullPointerException.class)
 	public void bodyUseNotAvailableService() {
-		LOG.info("[#759] bodyUseNotAvailableService");
+		LOG.info("[#1866] bodyUseNotAvailableService");
 
 		/*
 		// --- Preamble: stop/uninstall the Calculator service if necessary
@@ -161,7 +161,7 @@ public class SpecificTestCaseUpperTester {
 	 */
 	@Test(expected=NullPointerException.class)
 	public void bodyUseStillNotAvailableService() {
-		LOG.info("[#759] bodyUseStillNotAvailableService");
+		LOG.info("[#1866] bodyUseStillNotAvailableService");
 /*
 		// --- Preamble: install/stop the Calculator service if necessary
 		try {
@@ -245,7 +245,7 @@ public class SpecificTestCaseUpperTester {
 	}
 
 	public void setAddService(IAddService addService) {
-		LOG.info("[#759] Calculator Service injected");
+		LOG.info("[#1866] Calculator Service injected");
 		this.addService = addService;
 	}
 }

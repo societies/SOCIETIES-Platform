@@ -26,4 +26,6 @@ $(document).on('pageinit', '#landing', function(event) {
 		$.mobile.changePage($("#my_apps"), { transition: "fade"} );
 	});
 	
+	//SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.loadCssActivities);
+	SocietiesLogin.loadCssActivities();
 });

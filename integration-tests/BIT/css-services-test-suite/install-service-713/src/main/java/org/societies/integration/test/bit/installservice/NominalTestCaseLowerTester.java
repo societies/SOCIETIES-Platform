@@ -71,9 +71,9 @@ public class NominalTestCaseLowerTester {
 	@BeforeClass
 	public static void initialization() {
 		
-		LOG.info("[#713] Initialization");
-		LOG.info("[#713] Prerequisite: The CSS is created");
-		LOG.info("[#713] Prerequisite: The user is logged to the CSS");
+		LOG.info("[#1864] Initialization");
+		LOG.info("[#1864] Prerequisite: The CSS is created");
+		LOG.info("[#1864] Prerequisite: The user is logged to the CSS");
 
 		serviceBundleUrl = NominalTestCaseLowerTester.class.getClassLoader().getResource(SERVICE_PATH);
 		serviceControl = TestCase713.getServiceControl();
@@ -88,7 +88,7 @@ public class NominalTestCaseLowerTester {
 	 */
 	@Before
 	public void setUp() {
-		LOG.info("[#713] NominalTestCaseLowerTester::setUp");
+		LOG.info("[#1864] NominalTestCaseLowerTester::setUp");
 	}
 
 	/**
@@ -96,7 +96,7 @@ public class NominalTestCaseLowerTester {
 	 */
 	@After
 	public void tearDown() {
-		LOG.info("[#713] tearDown");
+		LOG.info("[#1864] tearDown");
 	}
 
 
@@ -107,52 +107,52 @@ public class NominalTestCaseLowerTester {
 	@Test
 	public void testInstallService() throws Exception {
 		
-		LOG.info("[#713] testInstallService()");
+		LOG.info("[#1864] testInstallService()");
 
 		List<Service> servicesBefore;
 		List<Service> servicesAfter;
 		List<Service> servicesNew;
 		
 		servicesBefore = getLocalServices();
-		LOG.info("[#713] testInstallService 1");
+		LOG.info("[#1864] testInstallService 1");
 
 		for (Service service : servicesBefore) {
-			LOG.debug("[#713] Before installation: found service " + service.getServiceIdentifier().getServiceInstanceIdentifier());
+			LOG.debug("[#1864] Before installation: found service " + service.getServiceIdentifier().getServiceInstanceIdentifier());
 		}
 		
 		serviceId = installService();
-		LOG.info("[#713] testInstallService 2");
+		LOG.info("[#1864] testInstallService 2");
 		Thread.sleep(2000);
 		assertNotNull("Service ID is null", serviceId.getServiceInstanceIdentifier());
-		LOG.info("[#713] testInstallService 3");
+		LOG.info("[#1864] testInstallService 3");
 		servicesAfter = getLocalServices();
 		for (Service service : servicesAfter) {
-			LOG.debug("[#713] After installation: found service " + service.getServiceIdentifier().getServiceInstanceIdentifier());
+			LOG.debug("[#1864] After installation: found service " + service.getServiceIdentifier().getServiceInstanceIdentifier());
 		}
 		servicesNew = getAdditionalServices(servicesBefore, servicesAfter);
 		int numServices = 0;
 		
-		LOG.info("[#713] testInstallService 4");
+		LOG.info("[#1864] testInstallService 4");
 		assertEquals("Number of all services not increased by exactly 1", 1, servicesAfter.size() - servicesBefore.size());
-		LOG.info("[#713] testInstallService 5");
+		LOG.info("[#1864] testInstallService 5");
 		assertEquals("Number of new services not exactly 1", 1, servicesNew.size());
-		LOG.info("[#713] testInstallService 6");
+		LOG.info("[#1864] testInstallService 6");
 		assertEquals("Incorrect service ID", servicesNew.get(0).getServiceIdentifier().getServiceInstanceIdentifier(),
 				serviceId.getServiceInstanceIdentifier());
-		LOG.info("[#713] testInstallService 7");
+		LOG.info("[#1864] testInstallService 7");
 
 		// -- Find the service
 		for (Service service : servicesAfter) {
 			if (service.getServiceIdentifier().getServiceInstanceIdentifier().equals(serviceId.getServiceInstanceIdentifier())) {
 				// Mark the service as found
-				LOG.info("[#713] service " + serviceId.getServiceInstanceIdentifier() + " found");
+				LOG.info("[#1864] service " + serviceId.getServiceInstanceIdentifier() + " found");
 				++numServices;
 				break;
 			}
 		}
-		LOG.info("[#713] testInstallService 7.1");
+		LOG.info("[#1864] testInstallService 7.1");
 		assertEquals("Number of services with ID " + serviceId.getServiceInstanceIdentifier() + " not exactly 1", 1, numServices);
-		LOG.info("[#713] testInstallService 7.2");
+		LOG.info("[#1864] testInstallService 7.2");
 		
 		uninstallService(serviceId);
 		Thread.sleep(2000);
@@ -160,11 +160,11 @@ public class NominalTestCaseLowerTester {
 		servicesAfter = getLocalServices();
 		servicesNew = getAdditionalServices(servicesBefore, servicesAfter);
 		assertEquals("Number of all services not same as before installation", 0, servicesAfter.size() - servicesBefore.size());
-		LOG.info("[#713] testInstallService 8");
+		LOG.info("[#1864] testInstallService 8");
 		assertEquals("Number of new services not exactly 0", 0, servicesNew.size());
-		LOG.info("[#713] testInstallService 9");
+		LOG.info("[#1864] testInstallService 9");
 		
-		LOG.info("[#713] testInstallService: SUCCESS");
+		LOG.info("[#1864] testInstallService: SUCCESS");
 	}
 	
 	/**
@@ -179,7 +179,7 @@ public class NominalTestCaseLowerTester {
 		ServiceControlResult result = null;
 
 		// -- Install the service
-		LOG.debug("[#713] installService()");
+		LOG.debug("[#1864] installService()");
 		asyncResult = serviceControl.installService(serviceBundleUrl);
 		result = asyncResult.get();
 		ResultMessage message = result.getMessage();
@@ -187,7 +187,7 @@ public class NominalTestCaseLowerTester {
 		if (!message.equals(ResultMessage.SUCCESS)) {
 			throw new Exception("Can't install the service. Returned value: " + message);
 		}
-		LOG.debug("[#713] installService(): " + result.getServiceId().getServiceInstanceIdentifier() + ", " + message);
+		LOG.debug("[#1864] installService(): " + result.getServiceId().getServiceInstanceIdentifier() + ", " + message);
 		
 		return result.getServiceId();
 	}
@@ -204,7 +204,7 @@ public class NominalTestCaseLowerTester {
 		ServiceControlResult result = null;
 
 		// -- Install the service
-		LOG.debug("[#713] Preamble: Uninstall the service");
+		LOG.debug("[#1864] Preamble: Uninstall the service");
 		asyncResult = serviceControl.uninstallService(serviceId);
 		result = asyncResult.get();
 		ResultMessage message = result.getMessage();
@@ -212,7 +212,7 @@ public class NominalTestCaseLowerTester {
 		if (!message.equals(ResultMessage.SUCCESS)) {
 			throw new Exception("Can't uninstall the service. Returned value: " + message);
 		}
-		LOG.debug("[#713] uninstallService(): " + result.getServiceId().getServiceInstanceIdentifier() + ", " + message);
+		LOG.debug("[#1864] uninstallService(): " + result.getServiceId().getServiceInstanceIdentifier() + ", " + message);
 	}
 	
 	private List<Service> getLocalServices() throws ServiceDiscoveryException, InterruptedException, ExecutionException {
@@ -221,15 +221,15 @@ public class NominalTestCaseLowerTester {
 		List<Service> services =  new ArrayList<Service>();
 
 		// -- Search all local services
-		LOG.debug("[#713] getLocalServices() 1");
+		LOG.debug("[#1864] getLocalServices() 1");
 		IServiceDiscovery serviceDiscovery = TestCase713.getServiceDiscovery();
-		LOG.debug("[#713] getLocalServices() 2");
+		LOG.debug("[#1864] getLocalServices() 2");
 		assertNotNull(serviceDiscovery);
-		LOG.debug("[#713] getLocalServices(): " + serviceDiscovery.toString());
+		LOG.debug("[#1864] getLocalServices(): " + serviceDiscovery.toString());
 		asyncServices = serviceDiscovery.getLocalServices();
-		LOG.debug("[#713] getLocalServices() 3");
+		LOG.debug("[#1864] getLocalServices() 3");
 		services = asyncServices.get();
-		LOG.debug("[#713] getLocalServices() 4");
+		LOG.debug("[#1864] getLocalServices() 4");
 
 		return services;
 	}

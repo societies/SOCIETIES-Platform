@@ -60,7 +60,7 @@ public class ContextStorageTest {
 	
 	@Test
 	public void test() {
-		LOG.debug("Monitor services #747 - Running ContextStorageTest....");
+		LOG.debug("Monitor services #1875 - Running ContextStorageTest....");
 		//create actions
 		IIdentity identity = TestCase747.commsMgr.getIdManager().getThisNetworkNode();
 		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
@@ -82,7 +82,7 @@ public class ContextStorageTest {
 		IAction action5 = new Action(serviceId2, "testService", "colour", "green");
 
 		//send actions - 1 second apart
-		LOG.debug("Monitor services #747 - sending mock actions for storage");
+		LOG.debug("Monitor services #1875 - sending mock actions for storage");
 		TestCase747.uam.monitor(identity, action1);
 		try {
 			Thread.sleep(1000);

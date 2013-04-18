@@ -32,7 +32,8 @@ public class PrivacyConditionsConstantValues {
     private static final String[] hours = new String[]{"12", "24", "36", "48", "60", "72", "84", "96"};
     private static final String[] minutes = new String[]{"30", "60", "90", "120", "180", "240", "300", "360", "480", "600"};
     private static final String[] seconds = new String[]{"10", "20", "30", "40", "50", "60", "90", "120", "150", "180", "210", "240"};
-    private static final String[] boolValues = new String[]{"Yes", "No"};
+//    private static final String[] boolValues = new String[]{"Yes", "No"};
+    private static final String[] boolValues = new String[]{"1", "0"};
 
 
     public static String[] getValues(org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants con) {

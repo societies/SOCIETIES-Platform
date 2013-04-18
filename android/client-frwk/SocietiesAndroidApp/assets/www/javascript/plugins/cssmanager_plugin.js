@@ -478,6 +478,23 @@ var	SocietiesLocalCSSManager = {
 		'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
 		'findAllCssAdvertisementRecords', //Telling the plugin, which action we want to perform
 		[client]);   //Passing a list of arguments to the plugin
+	},
+	
+	/**
+	 * @methodOf SocietiesLocalCSSManager#
+	 * @description Retrieves list of friend suggestions
+	 * @param {Object} successCallback The callback which will be called when result is successful
+	 * @param {Object} failureCallback The callback which will be called when result is unsuccessful
+	 */
+	getCssActivities: function(successCallback, failureCallback){
+		var client = "org.societies.android.platform.gui";
+		console.log("Call LocalCSSManagerService - getCssActivities");
+
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+		failureCallback,     //Callback which will be called when plugin action encounters an error
+		'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
+		'getActivities', 	 //Telling the plugin, which action we want to perform
+		[client]);   		 //Passing a list of arguments to the plugin
 	}
 	
 };

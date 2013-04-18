@@ -45,8 +45,8 @@ public class AgreementUtils {
 		if (null == agreementBean) {
 			return null;
 		}
-		NegotiationAgreement agreement = new NegotiationAgreement(ResponseItemUtils.toResponseItems(agreementBean.getRequestedItems()));
-		agreement.setRequestor(RequestorUtils.toRequestor(agreementBean.getRequestor(), identityManager));
+		NegotiationAgreement agreement = new NegotiationAgreement(agreementBean.getRequestedItems());
+		agreement.setRequestor(agreementBean.getRequestor());
 		if (null != agreementBean.getUserIdentity()) {
 			agreement.setUserIdentity(identityManager.fromJid(agreementBean.getUserIdentity()));
 		}
@@ -73,14 +73,14 @@ public class AgreementUtils {
 			return null;
 		}
 		org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Agreement agreementBean = new org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Agreement();
-		agreementBean.setRequestor(RequestorUtils.toRequestorBean(iAgreement.getRequestor()));
+		agreementBean.setRequestor(iAgreement.getRequestor());
 		if (null != iAgreement.getUserIdentity()) {
 			agreementBean.setUserIdentity(iAgreement.getUserIdentity().getJid());
 		}
 		if (null != iAgreement.getUserPublicIdentity()) {
 			agreementBean.setUserPublicIdentity(iAgreement.getUserPublicIdentity().getJid());
 		}
-		agreementBean.setRequestedItems(ResponseItemUtils.toResponseItemBeans(iAgreement.getRequestedItems()));
+		agreementBean.setRequestedItems(iAgreement.getRequestedItems());
 		return agreementBean;
 	}
 	public static List<org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Agreement> toAgreementBeans(List<NegotiationAgreement> agreements)

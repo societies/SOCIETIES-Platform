@@ -38,6 +38,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.Cond
  * @author Elizabeth
  *
  */
+@Deprecated
 public class Condition implements Serializable{
 
 	private ConditionConstants theCondition;

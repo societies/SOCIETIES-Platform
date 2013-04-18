@@ -27,9 +27,12 @@ package org.societies.api.internal.css;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import org.societies.api.activity.IActivity;
+import org.societies.api.activity.IActivityFeedCallback;
 import org.societies.api.css.FriendFilter;
 import org.societies.api.css.ICSSManager;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
@@ -295,6 +298,17 @@ public interface ICSSInternalManager extends ICSSManager {
 	 */
 	public FriendFilter getFriendfilter();
 
+	/**
+	 * This method will parse a timeperiod and return a subset of the actitvies
+     *  in this activityfeed that is within the given timeperiod
+     *
+     * @param {@link String} timeperiod can be: "millisecondssinceepoch millisecondssinceepoch+n"
+     * @return a @List of {@link IActivity}
+     * or a empty list if the parameters are wrong or the  timeperiod did not match any activties
+	 * @param timePeriod
+	 * @return
+	 */
+	public Future<List<MarshaledActivity>> getActivities(String timePeriod, int limitResults);
 	
 	// No implementation of the following methods
 	

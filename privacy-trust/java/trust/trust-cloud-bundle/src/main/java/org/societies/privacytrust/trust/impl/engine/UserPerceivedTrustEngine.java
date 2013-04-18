@@ -62,7 +62,7 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 		LOG.info(this.getClass() + " instantiated");
 		
 		LOG.info("Registering for direct and indirect trust updates...");
-		super.trustEventMgr.registerListener(
+		super.trustEventMgr.registerUpdateListener(
 				new TrustUpdateListener(), 
 				new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED,
 					TrustEventTopic.INDIRECT_TRUST_UPDATED });
@@ -289,8 +289,8 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 			if (LOG.isDebugEnabled())
 				LOG.debug("Received TrustUpdateEvent " + evt);
 			
-			final TrustedEntityId trustorId = evt.getTrustorId();
-			final TrustedEntityId trusteeId = evt.getTrusteeId();
+			final TrustedEntityId trustorId = evt.getTrustRelationship().getTrustorId();
+			final TrustedEntityId trusteeId = evt.getTrustRelationship().getTrusteeId();
 			final TrustedEntityType trusteeType = trusteeId.getEntityType();
 			if (TrustedEntityType.CSS.equals(trusteeType))
 				executorService.execute(new CssUserPerceivedTrustEngine(

@@ -40,17 +40,19 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.RequestorService;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.INegotiationClient;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PPNegotiationEvent;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote;
+import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.AgreementEnvelopeUtils;
+import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.AgreementUtils;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Agreement;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
@@ -58,11 +60,16 @@ import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.identity.DataIdentifierScheme;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.identity.RequestorCisBean;
+import org.societies.api.schema.identity.RequestorServiceBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
@@ -94,8 +101,8 @@ public class NegotiationClient implements INegotiationClient {
 	private ICtxBroker ctxBroker;
 	private IEventMgr eventMgr;
 	private PrivacyPolicyNegotiationManager policyMgr;
-	private Hashtable<Requestor,ResponsePolicy> myPolicies;
-	private Hashtable<Requestor, IAgreement> agreements;
+	private Hashtable<RequestorBean,ResponsePolicy> myPolicies;
+	private Hashtable<RequestorBean, Agreement> agreements;
 	private IPrivacyAgreementManagerInternal policyAgreementMgr;
 	private IPrivacyDataManagerInternal privacyDataManager;
 	private IPrivacyPolicyManager privacyPolicyManager;
@@ -116,8 +123,8 @@ public class NegotiationClient implements INegotiationClient {
 		this.idS = privacyPolicyNegotiationManager.getIdentitySelection();
 		this.privPrefMgr = privacyPolicyNegotiationManager.getPrivacyPreferenceManager();
 		this.idm = privacyPolicyNegotiationManager.getIdm();
-		this.myPolicies = new Hashtable<Requestor, ResponsePolicy>();
-		this.agreements = new Hashtable<Requestor, IAgreement>();
+		this.myPolicies = new Hashtable<RequestorBean, ResponsePolicy>();
+		this.agreements = new Hashtable<RequestorBean, Agreement>();
 		this.userIdentity = idm.getThisNetworkNode();
 		this.userFeedback = privacyPolicyNegotiationManager.getUserFeedback();
 		
@@ -127,12 +134,16 @@ public class NegotiationClient implements INegotiationClient {
 	@Override
 	public void receiveProviderPolicy(RequestPolicy policy) {
 		try {
-			this.privacyPolicyManager.updatePrivacyPolicy(policy);
+			this.privacyPolicyManager.updatePrivacyPolicy(RequestPolicyUtils.toRequestPolicy(policy, this.idm));
 		} catch (PrivacyException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		this.logging.debug("Received Provider RequestPolicy!");
+		this.logging.debug("Request policy contains: "+policy.getRequestItems().size()+" requestItems");
 		//this.logging.debug(policy.toString());
 		this.requestPolicy = policy;
 		List<String> notFoundTypes = this.dataTypesExist(policy);
@@ -154,7 +165,7 @@ public class NegotiationClient implements INegotiationClient {
 			return;
 		}
 		ClientResponsePolicyGenerator policyGen = new ClientResponsePolicyGenerator(this.policyMgr);
-		ResponsePolicy response = policyGen.generatePolicy(policy); 
+		ResponsePolicy response = policyGen.generatePolicy(details, policy); 
 		this.logging.debug("Generated ResponsePolicy. Negotiating with other party");
 		Future<ResponsePolicy> responsePolicy = this.negotiationAgentRemote.negotiate(policy.getRequestor(), response);
 		this.logging.debug("Received reply ResponsePolicy");
@@ -180,10 +191,10 @@ public class NegotiationClient implements INegotiationClient {
 	public void receiveNegotiationResponse(ResponsePolicy policy) {
 		this.logging.debug("Received response policy from Provider!");
 		//this.logging.debug(policy.toString());
-		if (policy.getStatus().equals(NegotiationStatus.FAILED)){
+		if (policy.getNegotiationStatus().equals(NegotiationStatus.FAILED)){
 			this.logging.debug("Negotiation Failed by provider");
 			String requestorStr = "";
-			if (policy.getRequestor() instanceof RequestorCis){
+			if (policy.getRequestor() instanceof RequestorCisBean){
 				requestorStr = "Cis administrator";
 			}else{
 				requestorStr = "Service Provider";
@@ -203,32 +214,39 @@ public class NegotiationClient implements INegotiationClient {
 		else{
 			ResponsePolicy myResponsePolicy = this.findMyResponsePolicy(policy);
 			if (myResponsePolicy == null){
-				new TimedNotificationGUI().showGUI("Ignoring an invalid response policy", "message from: Privacy Policy Negotiation Client");
+				//new TimedNotificationGUI().showGUI("Ignoring an invalid response policy", "message from: Privacy Policy Negotiation Client");
+				this.logging.debug("Ignoring invalid response policy");
 				return;
 			}
 			this.logging.debug("Checking other party's response policy against user's response policy");
 			ClientResponseChecker checker = new ClientResponseChecker();
 			if (checker.checkResponse(myResponsePolicy, policy)){
 				this.logging.debug("ResponsePolicy is OK, creating agreement");
-				IAgreement agreement = new NegotiationAgreement(policy);
-				agreement.setUserPublicIdentity(this.userIdentity);
-				
-				
-				
-				
+				Agreement agreement = new Agreement();
+				agreement.setRequestedItems(policy.getResponseItems());
+				agreement.setUserPublicIdentity(this.userIdentity.getJid());
+				agreement.setRequestor(policy.getRequestor());
 				this.agreements.put(policy.getRequestor(), agreement);
 				//TODO: select an identity and call setFinalIdentity(..);
-				List<IIdentityOption> idOptions  = this.idS.processIdentityContext(agreement);
-				IIdentity selectedIdentity = this.selectIdentity(idOptions, agreement);
-				//this.privacyCallback.setInitialAgreement(agreement);
-				this.logging.debug("Identity selected: "+selectedIdentity.getJid());
-				this.setFinalIdentity(selectedIdentity, policy.getRequestor());
-
+				NegotiationAgreement agreementObj;
+				try {
+					agreementObj = AgreementUtils.toAgreement(agreement, this.idm);
+					List<IIdentityOption> idOptions  = this.idS.processIdentityContext(agreementObj);
+					IIdentity selectedIdentity = this.selectIdentity(idOptions, agreement);
+					//this.privacyCallback.setInitialAgreement(agreement);
+					this.logging.debug("Identity selected: "+selectedIdentity.getJid());
+					this.setFinalIdentity(selectedIdentity, policy.getRequestor());
+				} catch (InvalidFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}else{
+				
 				this.logging.debug("Received ResponsePolicy does not match user's ResponsePolicy, failing negotiation");
-				new TimedNotificationGUI().showGUI("Response policy received from Provider\n"
+				
+/*				new TimedNotificationGUI().showGUI("Response policy received from Provider\n"
 						+"did not match user response policy.\n"
-						+"Aborted negotiation","message from: Privacy Policy Negotiation Client");
+						+"Aborted negotiation","message from: Privacy Policy Negotiation Client");*/
 				InternalEvent evt = this.createFailedNegotiationEvent();
 				try {
 					this.eventMgr.publishInternalEvent(evt);
@@ -241,7 +259,7 @@ public class NegotiationClient implements INegotiationClient {
 		}
 		
 	}
-	private IIdentity selectIdentity(List<IIdentityOption> idOptions, IAgreement agreement) {
+	private IIdentity selectIdentity(List<IIdentityOption> idOptions, Agreement agreement) {
 		/**
 		List<IIdentity> identities = new ArrayList<IIdentity>();
 		List<String> strIds = new ArrayList<String>();
@@ -278,25 +296,30 @@ public class NegotiationClient implements INegotiationClient {
 			
 	}
 
-	private String getMessage(Requestor requestor){
-		if (requestor instanceof RequestorCis){
-			return "Please select one of the following identities to join CIS: "+((RequestorCis) requestor).getCisRequestorId();
-		}else if (requestor instanceof RequestorService){
-			return "Please select one of the following identities to use service: "+((RequestorService) requestor).getRequestorServiceId();
+	private String getMessage(RequestorBean requestor){
+		if (requestor instanceof RequestorCisBean){
+			return "Please select one of the following identities to join CIS: "+((RequestorCisBean) requestor).getCisRequestorId();
+		}else if (requestor instanceof RequestorServiceBean){
+			return "Please select one of the following identities to use service: "+((RequestorServiceBean) requestor).getRequestorServiceId();
 		}else{
 			return "Please select one of the following identities to interact with: "+requestor.getRequestorId();
 		}
 	}
-	public void setFinalIdentity( IIdentity userId, Requestor requestor){
+	public void setFinalIdentity( IIdentity userId, RequestorBean requestor){
 		try {
+			
 			if (this.agreements.containsKey(requestor)){
-				IAgreement agreement = this.agreements.get(requestor);
-				agreement.setUserIdentity(userId);
+				Agreement agreement = this.agreements.get(requestor);
+				agreement.setUserIdentity(userId.getJid());
 				//agreement.setUserPublicDPI(this.IDM.getPublicDigitalPersonalIdentifier());
 				AgreementFinaliser finaliser = new AgreementFinaliser();
 				byte[] signature = finaliser.signAgreement(agreement);
 				Key publicKey = finaliser.getPublicKey();
-				AgreementEnvelope envelope = new AgreementEnvelope(agreement, SerialisationHelper.serialise(publicKey), signature);
+				AgreementEnvelope envelope = new AgreementEnvelope();
+				envelope.setAgreement(agreement);
+				
+				envelope.setPublicKey(SerialisationHelper.serialise(publicKey));
+				envelope.setSignature(signature);
 				this.logging.debug("Sending agreement to other party");
 				Future<Boolean> ack = this.negotiationAgentRemote.acknowledgeAgreement(envelope);
 				this.logging.debug("Received acknowledgement of agreement from other party");
@@ -324,22 +347,20 @@ public class NegotiationClient implements INegotiationClient {
 	}
 	
 	@Override
-	public void acknowledgeAgreement(Requestor requestor, AgreementEnvelope envelope, boolean b) {
+	public void acknowledgeAgreement(RequestorBean requestor, AgreementEnvelope envelope, boolean b) {
 		if (b){
 			this.logging.debug("Acknowledged Agreement - creating access control objects");			
 			try {
 				//TODO: uncomment lines
-				if (requestor instanceof RequestorCis){
+				
 
-					this.policyAgreementMgr.updateAgreement((envelope.getAgreement().getRequestor()), envelope);
+					this.policyAgreementMgr.updateAgreement(RequestorUtils.toRequestor((envelope.getAgreement().getRequestor()), this.idm), AgreementEnvelopeUtils.toAgreementEnvelope(envelope, this.idm));
 
-				}else{
-					this.policyAgreementMgr.updateAgreement(envelope.getAgreement().getRequestor(), envelope);
-				}
+				
 				this.logging.debug("Agreement stored");
 				List<ResponseItem> requests = envelope.getAgreement().getRequestedItems();
 				for (ResponseItem responseItem : requests){
-					privacyDataManager.updatePermission(requestor, responseItem);
+					privacyDataManager.updatePermission(RequestorUtils.toRequestor(requestor, idm), ResponseItemUtils.toResponseItem(responseItem));
 				}
 				this.logging.debug("Permissions updated");
 				InternalEvent event = this.createSuccessfulNegotiationEvent(envelope);
@@ -353,6 +374,9 @@ public class NegotiationClient implements INegotiationClient {
 					this.logging.debug("Unable to post "+event.geteventType()+" event");
 				}
 			} catch (PrivacyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvalidFormatException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -377,10 +401,15 @@ public class NegotiationClient implements INegotiationClient {
 	
 	private void startNegotiation(){
 		
-		Requestor requestor = details.getRequestor();
-		this.logging.debug("Starting negotiation. NegotiationID: "+details.getNegotiationID()+" with: "+requestor.toString());
+		RequestorBean requestor = RequestorUtils.toRequestorBean(details.getRequestor());
+		this.logging.debug("Starting negotiation. NegotiationID: "+details.getNegotiationID()+" with: "+RequestorUtils.toString(requestor));
 		try {
-			this.receiveProviderPolicy(this.negotiationAgentRemote.getPolicy(requestor).get());
+			if (this.negotiationAgentRemote ==null){
+				this.logging.debug("negAgentRemote is NULL");
+			}
+			Future<RequestPolicy> futureRequestorPolicy = this.negotiationAgentRemote.getPolicy(requestor);
+			RequestPolicy requestorPolicy = futureRequestorPolicy.get();
+			this.receiveProviderPolicy(requestorPolicy);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -402,7 +431,7 @@ public class NegotiationClient implements INegotiationClient {
 
 	private List<String> dataTypesExist(RequestPolicy policy){
 		List<String> notFoundContextTypes = new ArrayList<String>();
-		List<RequestItem> items = policy.getRequests();
+		List<RequestItem> items = policy.getRequestItems();
 		for (RequestItem item : items){
 			if (!item.isOptional()){
 				String dataType = item.getResource().getDataType();
@@ -439,8 +468,8 @@ public class NegotiationClient implements INegotiationClient {
 		return iEvent;
 	}
 
-	private InternalEvent createSuccessfulNegotiationEvent(AgreementEnvelope envelope) {
-		PPNegotiationEvent event = new PPNegotiationEvent(envelope.getAgreement(), NegotiationStatus.SUCCESSFUL, details);
+	private InternalEvent createSuccessfulNegotiationEvent(AgreementEnvelope envelope) throws InvalidFormatException {
+		PPNegotiationEvent event = new PPNegotiationEvent(AgreementUtils.toAgreement(envelope.getAgreement(), this.idm), NegotiationStatus.SUCCESSFUL, details);
 		InternalEvent iEvent = new InternalEvent(EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT, "", INegotiationClient.class.getName(), event);
 		this.logging.debug("Successfull negotiation Event: \n"+
 		"EventName: "+iEvent.geteventName()+
@@ -450,29 +479,29 @@ public class NegotiationClient implements INegotiationClient {
 		return iEvent;
 	}
 	private ResponsePolicy findMyResponsePolicy(ResponsePolicy providerPolicy){
-		Requestor requestor = providerPolicy.getRequestor();
+		RequestorBean requestor = providerPolicy.getRequestor();
 		if (this.myPolicies.containsKey(requestor)){
 			return this.myPolicies.get(requestor);
 		}
 
-		Enumeration<Requestor> en = this.myPolicies.keys();
+		Enumeration<RequestorBean> en = this.myPolicies.keys();
 
 		while (en.hasMoreElements()){
-			Requestor provider = en.nextElement();
-			if ((provider instanceof RequestorService) && (requestor instanceof RequestorService)){
+			RequestorBean provider = en.nextElement();
+			if ((provider instanceof RequestorServiceBean) && (requestor instanceof RequestorServiceBean)){
 				if (provider.getRequestorId().equals(requestor.getRequestorId())){
-					ServiceResourceIdentifier serviceID = ((RequestorService) provider).getRequestorServiceId();
+					ServiceResourceIdentifier serviceID = ((RequestorServiceBean) provider).getRequestorServiceId();
 					if (serviceID!=null){
-						if (serviceID.equals(((RequestorService) requestor).getRequestorServiceId())){
+						if (ServiceModelUtils.compare(serviceID,((RequestorServiceBean) requestor).getRequestorServiceId())){
 							return this.myPolicies.get(provider);
 						}
 					}
 				}
-			}else if ((provider instanceof RequestorCis) && (requestor instanceof RequestorCis)){
+			}else if ((provider instanceof RequestorCisBean) && (requestor instanceof RequestorCisBean)){
 				if (provider.getRequestorId().equals(requestor.getRequestorId())){
-					IIdentity cisId = ((RequestorCis) provider).getCisRequestorId();
+					String cisId = ((RequestorCisBean) provider).getCisRequestorId();
 					if (cisId!=null){
-						if (cisId.equals(((RequestorCis) requestor).getCisRequestorId())){
+						if (cisId.equals(((RequestorCisBean) requestor).getCisRequestorId())){
 							return this.myPolicies.get(provider);
 						}
 					}

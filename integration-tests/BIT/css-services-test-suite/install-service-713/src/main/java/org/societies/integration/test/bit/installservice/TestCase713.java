@@ -31,17 +31,17 @@ public class TestCase713 extends IntegrationTestCase {
 		// with test case number
 		// and test case classes to run
 		//super(713, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
-		super(713, new Class[] {NominalTestCaseLowerTester.class});
-		NominalTestCaseLowerTester.testCaseNumber = 713;
+		super(1864, new Class[] {NominalTestCaseLowerTester.class});
+		NominalTestCaseLowerTester.testCaseNumber = 1864;
 	}
 
 
 	public void setServiceControl(IServiceControl serviceControl) {
-		LOG.debug("[#713] setServiceControl()");
+		LOG.debug("[#1864] setServiceControl()");
 		TestCase713.serviceControl = serviceControl;
 	}
 	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
-		LOG.debug("[#713] setServiceDiscovery()");
+		LOG.debug("[#1864] setServiceDiscovery()");
 		TestCase713.serviceDiscovery = serviceDiscovery;
 	}
 	

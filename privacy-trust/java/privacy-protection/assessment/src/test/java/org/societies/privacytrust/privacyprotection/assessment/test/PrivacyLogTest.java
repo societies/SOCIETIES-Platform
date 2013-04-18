@@ -28,6 +28,7 @@ package org.societies.privacytrust.privacyprotection.assessment.test;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -92,7 +93,7 @@ public class PrivacyLogTest {
 		int size1;
 		int size2;
 		
-		DataAccessLogEntry entry = new DataAccessLogEntry(new Date(), null, "", null, 100);
+		DataAccessLogEntry entry = new DataAccessLogEntry(new Date(), null, "", null, null, 100);
 		
 		size1 = privacyLog.getDataAccess().size();
 		privacyLog.append(entry);
@@ -118,12 +119,17 @@ public class PrivacyLogTest {
 		Date date2 = new Date(2000000);
 		Date date3 = new Date(3000000);
 		
+		List<String> stack1 = new ArrayList<String>();
+		List<String> stack2 = new ArrayList<String>();
+		stack1.add("senderClass1");
+		stack2.add("senderClass2");
+
 		DataTransmissionLogEntry entry1 = new DataTransmissionLogEntry(
-				"dataType1", date1, receiver1, sender1, "senderClass1", 861, ChannelType.XMPP);
+				"dataType1", date1, receiver1, sender1, "senderClass1", stack1, 861, ChannelType.XMPP);
 		DataTransmissionLogEntry entry2 = new DataTransmissionLogEntry(
-				"dataType1", date2, receiver2, sender1, "senderClass1", 691, ChannelType.XMPP);
+				"dataType1", date2, receiver2, sender1, "senderClass1", stack1, 691, ChannelType.XMPP);
 		DataTransmissionLogEntry entry3 = new DataTransmissionLogEntry(
-				"dataType2", date3, receiver2, sender2, "senderClass2", 121, ChannelType.FACEBOOK);
+				"dataType2", date3, receiver2, sender2, "senderClass2", stack2, 121, ChannelType.FACEBOOK);
 		
 		privacyLog.append(entry1);
 		privacyLog.append(entry2);

@@ -30,5 +30,7 @@ public class ExpProposalType {
 	public static int RADIOLIST = 0;
 	public static int CHECKBOXLIST = 1;
 	public static int ACKNACK = 2;
+	public static int PRIVACY_NEGOTIATION = 3;
+	public static int PRIVACY_ACCESS_CONTROL = 4;
 
 }

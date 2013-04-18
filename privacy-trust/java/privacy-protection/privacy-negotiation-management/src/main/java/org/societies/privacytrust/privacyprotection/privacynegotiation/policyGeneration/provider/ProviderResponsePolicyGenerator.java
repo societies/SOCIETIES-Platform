@@ -28,17 +28,16 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.JOptionPane;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 
 /**
  * @author Elizabeth
@@ -52,9 +51,13 @@ public class ProviderResponsePolicyGenerator {
 	public ProviderResponsePolicyGenerator(){
 	}
 	public ResponsePolicy generateResponse(ResponsePolicy clientResponse, RequestPolicy myPolicy){
-		if (clientResponse.getStatus().equals(NegotiationStatus.FAILED)){
+		if (clientResponse.getNegotiationStatus().equals(NegotiationStatus.FAILED)){
 			//JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 1");
-			return new ResponsePolicy(myPolicy.getRequestor(),new ArrayList<ResponseItem>(), NegotiationStatus.FAILED);
+			ResponsePolicy toReturn = new ResponsePolicy();
+			toReturn.setNegotiationStatus(NegotiationStatus.FAILED);
+			toReturn.setRequestor(myPolicy.getRequestor());
+			toReturn.setResponseItems(new ArrayList<ResponseItem>());
+			return toReturn;
 		}
 
 		/*
@@ -113,11 +116,15 @@ public class ProviderResponsePolicyGenerator {
 					itemsToRemove.add(responseItem);
 				}else{
 					//JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 2");
-					return new ResponsePolicy(myPolicy.getRequestor(), new ArrayList<ResponseItem>(), NegotiationStatus.FAILED);
+					ResponsePolicy toReturn = new ResponsePolicy();
+					toReturn.setNegotiationStatus(NegotiationStatus.FAILED);
+					toReturn.setRequestor(myPolicy.getRequestor());
+					toReturn.setResponseItems(new ArrayList<ResponseItem>());
+					return toReturn;
 				}
 			}else if (responseItem.getDecision().equals(Decision.INDETERMINATE)){
 				Resource resource = responseItem.getRequestItem().getResource(); 
-				List<RequestItem> myRequests = myPolicy.getRequests();
+				List<RequestItem> myRequests = myPolicy.getRequestItems();
 				RequestItem myRequest = null;
 				//get the Actions I have stated in my service privacy policy for this particular resource 
 				for (RequestItem item : myRequests){
@@ -134,7 +141,11 @@ public class ProviderResponsePolicyGenerator {
 						if (!(containsAction(clientActions,action))){
 							if (!(action.isOptional())){
 								//JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 3");
-								return new ResponsePolicy(myPolicy.getRequestor(),new ArrayList<ResponseItem>(),NegotiationStatus.FAILED);
+								ResponsePolicy toReturn = new ResponsePolicy();
+								toReturn.setNegotiationStatus(NegotiationStatus.FAILED);
+								toReturn.setRequestor(myPolicy.getRequestor());
+								toReturn.setResponseItems(new ArrayList<ResponseItem>());
+								return toReturn;
 							}
 						}
 					}
@@ -153,7 +164,7 @@ public class ProviderResponsePolicyGenerator {
 						Condition con = this.containsIgnoreValue(myConditions, clientCondition);
 						//if condition exists in both policies
 						if (con!=null){
-							if (con.getValueAsString().equalsIgnoreCase(clientCondition.getValueAsString())){
+							if (con.getValue().equalsIgnoreCase(clientCondition.getValue())){
 								//value is the smae 
 							}else{
 								//check IF OPTIONAL
@@ -163,14 +174,18 @@ public class ProviderResponsePolicyGenerator {
 								else{
 									//condition is mandatory so we're going to ask the user
 									Hashtable<String,Object> params = new Hashtable<String,Object>();
-									params.put("localPolicyDetails", con.getConditionName()+": "+con.getValueAsString());
-									params.put("remotePolicyDetails", clientCondition.getConditionName()+": "+clientCondition.getValueAsString());
+									params.put("localPolicyDetails", con.getConditionConstant()+": "+con.getValue());
+									params.put("remotePolicyDetails", clientCondition.getConditionConstant()+": "+clientCondition.getValue());
 									//Boolean response = (Boolean) this.getFeedbackManager().getExplicitFB(FeedbackGUITypes.NEGOTIATION, params);
 									//TODO: use rules - no user
 									Boolean response = true;
 									if (!response.booleanValue()){
 										//JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 4");
-										return new ResponsePolicy(myPolicy.getRequestor(), new ArrayList<ResponseItem>(), NegotiationStatus.FAILED);
+										ResponsePolicy toReturn = new ResponsePolicy();
+										toReturn.setNegotiationStatus(NegotiationStatus.FAILED);
+										toReturn.setRequestor(myPolicy.getRequestor());
+										toReturn.setResponseItems(new ArrayList<ResponseItem>());
+										return toReturn;
 									}
 								}
 							}
@@ -181,13 +196,17 @@ public class ProviderResponsePolicyGenerator {
 								//condition is mandatory so we're going to ask the user
 								Hashtable<String, Object> params = new Hashtable<String, Object>();
 								params.put("localPolicyDetails", "You have not included this condition in your policy");
-								params.put("remotePolicyDetails",clientCondition.getConditionName()+": "+clientCondition.getValueAsString());
+								params.put("remotePolicyDetails",clientCondition.getConditionConstant()+": "+clientCondition.getValue());
 								//TODO: use rules - no user
 								Boolean response = true;
 								//Boolean response = (Boolean) this.getFeedbackManager().getExplicitFB(FeedbackGUITypes.NEGOTIATION, params);
 								if (!response){
 									//JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 5");
-									return new ResponsePolicy(myPolicy.getRequestor(), new ArrayList<ResponseItem>(), NegotiationStatus.FAILED);
+									ResponsePolicy toReturn = new ResponsePolicy();
+									toReturn.setNegotiationStatus(NegotiationStatus.FAILED);
+									toReturn.setRequestor(myPolicy.getRequestor());
+									toReturn.setResponseItems(new ArrayList<ResponseItem>());
+									return toReturn;
 								}
 							}
 						}
@@ -201,14 +220,18 @@ public class ProviderResponsePolicyGenerator {
 							//if it's not optional ask the user
 							if (!myCondition.isOptional()){
 								Hashtable<String, Object> params = new Hashtable<String, Object>();
-								params.put("localPolicyDetails",myCondition.getConditionName()+": "+myCondition.getValueAsString());
+								params.put("localPolicyDetails",myCondition.getConditionConstant()+": "+myCondition.getValue());
 								params.put("remotePolicyDetails", "The client has not included this condition in his policy");
 								//TODO: use rules - no user
 								Boolean response = true;
 								//Boolean response = (Boolean) this.getFeedbackManager().getExplicitFB(FeedbackGUITypes.NEGOTIATION, params);
 								if (!response.booleanValue()){
 									//JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 6");
-									return new ResponsePolicy(myPolicy.getRequestor(),new ArrayList<ResponseItem>(), NegotiationStatus.FAILED);
+									ResponsePolicy toReturn = new ResponsePolicy();
+									toReturn.setNegotiationStatus(NegotiationStatus.FAILED);
+									toReturn.setRequestor(myPolicy.getRequestor());
+									toReturn.setResponseItems(new ArrayList<ResponseItem>());
+									return toReturn;
 								}
 							}
 						}
@@ -224,7 +247,7 @@ public class ProviderResponsePolicyGenerator {
 				clientResponse.getResponseItems().remove(r);
 			}
 		}
-		clientResponse.setStatus(NegotiationStatus.SUCCESSFUL);
+		clientResponse.setNegotiationStatus(NegotiationStatus.SUCCESSFUL);
 
 
 		return clientResponse;
@@ -232,7 +255,7 @@ public class ProviderResponsePolicyGenerator {
 
 	private Condition containsIgnoreValue(List<Condition> list, Condition c){
 		for (Condition con : list){
-			if (c.getConditionName().equals(con.getConditionName())){
+			if (c.getConditionConstant().equals(con.getConditionConstant())){
 				return con;
 			}
 		}
@@ -241,7 +264,7 @@ public class ProviderResponsePolicyGenerator {
 
 	private boolean containsAction(List<Action> actions, Action a){
 		for (Action action : actions){
-			if (action.getActionType().equals(a.getActionType())){
+			if (action.getActionConstant().equals(a.getActionConstant())){
 				return true;
 			}
 		}

@@ -28,10 +28,10 @@ package org.societies.api.internal.privacytrust.privacyprotection.remote;
 import java.util.concurrent.Future;
 
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.Requestor;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 /**
  * @author Eliza
  * @version 1.0
@@ -46,7 +46,7 @@ public interface INegotiationAgentRemote {
 	 * 
 	 * @param contract    the agreement to acknowledge
 	 */
-	public Future<Boolean> acknowledgeAgreement(IAgreementEnvelope contract);
+	public Future<Boolean> acknowledgeAgreement(AgreementEnvelope contract);
 
 	/**
 	 * this method is called by any CSS that wants to read the  RequestPolicy of a service or CIS
@@ -56,7 +56,7 @@ public interface INegotiationAgentRemote {
 	 * @param requestor    the details of the service provider or CIS administrator
 	 *
 	 */
-	public Future<RequestPolicy> getPolicy(Requestor requestor);
+	public Future<RequestPolicy> getPolicy(RequestorBean requestor);
 
 	/**
 	 * This method is called by any CSS to get the Identity of the service provider or CIS administrator.
@@ -77,6 +77,6 @@ public interface INegotiationAgentRemote {
 	 * @param requestor    	the details of the service provider or CIS administrator
 	 * @param policy   		the ResponsePolicy to the provider's privacy policy
 	 */
-	public Future<ResponsePolicy> negotiate(Requestor requestor, ResponsePolicy policy);
+	public Future<ResponsePolicy> negotiate(RequestorBean requestor, ResponsePolicy policy);
 
 }

@@ -25,6 +25,7 @@
 package org.societies.privacytrust.privacyprotection.assessment.log;
 
 import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,13 +84,23 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	
 	private String getInvokerClass() {
 
-		//StackTraceElement[] stack = (new Exception()).getStackTrace();
 		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
 		StackParser stackParser = new StackParser(stack);
 		String invoker = stackParser.getInvokerOfInvoker();
 		//LOG.debug("Context / Comms: {}", stackParser.getInvoker());  // Costly call, use for debugging only!
 		LOG.debug("Invoked by {}", invoker);
+		
 		return invoker;
+	}
+
+	private List<String> getInvokerClasses() {
+
+		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+		StackParser stackParser = new StackParser(stack);
+		List<String> classes = stackParser.getAllClasses();
+		LOG.debug("Invoked by {}", classes);
+		
+		return classes;
 	}
 
 	// Getters and setters for beans
@@ -126,6 +137,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 
 		String dataType;
 		String invokerClass = getInvokerClass();
+		List<String> invokerClasses = getInvokerClasses();
 		
 		if (payload != null) {
 			dataType = payload.getClass().getSimpleName();
@@ -139,6 +151,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 				receiver,
 				sender,
 				invokerClass,
+				invokerClasses,
 				-1,
 				ChannelType.XMPP);
 		
@@ -153,8 +166,9 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		LOG.debug("logContext()");
 		
 		String invokerClass = getInvokerClass();
-
-		logContext(requestor, owner, -1, invokerClass);
+		List<String> invokerClasses = getInvokerClasses();
+		
+		logContext(requestor, owner, -1, invokerClass, invokerClasses);
 	}
 
 	@Override
@@ -163,11 +177,12 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		LOG.debug("logContext({})", dataSize);
 
 		String invokerClass = getInvokerClass();
-
-		logContext(requestor, owner, dataSize, invokerClass);
+		List<String> invokerClasses = getInvokerClasses();
+		
+		logContext(requestor, owner, dataSize, invokerClass, invokerClasses);
 	}
 	
-	private void logContext(Requestor requestor, IIdentity owner, int dataSize, String invokerClass) {
+	private void logContext(Requestor requestor, IIdentity owner, int dataSize, String invokerClass, List<String> invokerClasses) {
 
 		IIdentity requestorId;
 		
@@ -179,7 +194,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		}
 		
 		DataAccessLogEntry logEntry = new DataAccessLogEntry(
-				new Date(), requestorId, invokerClass, owner, dataSize);
+				new Date(), requestorId, invokerClass, invokerClasses, owner, dataSize);
 		privacyLog.getDataAccess().add(logEntry);
 	}
 

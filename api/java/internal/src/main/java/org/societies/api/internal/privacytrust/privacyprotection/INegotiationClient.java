@@ -26,13 +26,11 @@ package org.societies.api.internal.privacytrust.privacyprotection;
 
 //TODO : temporary mock package import to solve missing package in API folder
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.Requestor;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 
 /**
  * This interface defines the methods that should be implemented by the CSS that
@@ -51,7 +49,7 @@ public interface INegotiationClient {
 	 * @param envelope
 	 * @param b
 	 */
-	public void acknowledgeAgreement(Requestor requestor, AgreementEnvelope envelope, boolean b);
+	public void acknowledgeAgreement(RequestorBean requestor, AgreementEnvelope envelope, boolean b);
 
 	/**
 	 * 

@@ -37,6 +37,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  * @version 1.0
  * @created 11-Nov-2011 18:55:01
  */
+@Deprecated
 public interface INegotiationAgent {
 
 	/**
@@ -46,6 +47,7 @@ public interface INegotiationAgent {
 	 * 
 	 * @param contract    the agreement to acknowledge
 	 */
+	@Deprecated
 	public Future<Boolean> acknowledgeAgreement(byte[] agreementEnvelope);
 
 	/**
@@ -56,6 +58,7 @@ public interface INegotiationAgent {
 	 * @param serviceID    the service identifier of the service for which the
 	 * negotiation will be performed
 	 */
+	@Deprecated
 	public Future<byte[]> getPolicy(ServiceResourceIdentifier serviceID);
 
 	/**
@@ -64,6 +67,7 @@ public interface INegotiationAgent {
 	 * where applicable
 	 * 
 	 */
+	@Deprecated
 	public Future<String> getProviderIdentity();
 
 	/**
@@ -78,6 +82,7 @@ public interface INegotiationAgent {
 	 * to be performed
 	 * @param policy    the ResponsePolicy to the provider's privacy policy
 	 */
+	@Deprecated
 	public Future<byte[]> negotiate(ServiceResourceIdentifier serviceID, byte[] responsePolicy);
 
 }

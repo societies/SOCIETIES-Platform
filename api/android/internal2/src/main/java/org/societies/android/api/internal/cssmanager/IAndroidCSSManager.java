@@ -26,7 +26,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 package org.societies.android.api.internal.cssmanager;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
+import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssRecord;
 
@@ -79,6 +81,7 @@ public interface IAndroidCSSManager {
 	public static final String UNREGISTER_XMPP_SERVER = "org.societies.android.platform.cssmanager.UNREGISTER_XMPP_SERVER";
 	public static final String START_APP_SERVICES = "org.societies.android.platform.cssmanager.START_APP_SERVICES";
 	public static final String STOP_APP_SERVICES = "org.societies.android.platform.cssmanager.STOP_APP_SERVICES";
+	public static final String GET_CSS_ACTIVITIES = "org.societies.android.platform.cssmanager.GET_CSS_ACTIVITIES";
 
 	public static final String SUGGESTED_FRIENDS = "org.societies.android.platform.cssmanager.SUGGESTED_FRIENDS";
 	public static final String GET_CSS_FRIENDS = "org.societies.android.platform.cssmanager.GET_CSS_FRIENDS";
@@ -86,30 +89,32 @@ public interface IAndroidCSSManager {
 	public static final String SEND_FRIEND_REQUEST = "org.societies.android.platform.cssmanager.SEND_FRIEND_REQUEST";
 	public static final String GET_FRIEND_REQUESTS = "org.societies.android.platform.cssmanager.GET_FRIEND_REQUESTS";
 	public static final String ACCEPT_FRIEND_REQUEST = "org.societies.android.platform.cssmanager.ACCEPT_FRIEND_REQUEST";
+	
 
 	String methodsArray [] = {"registerXMPPServer(String client, AndroidCSSRecord profile)", //0
-			"unregisterXMPPServer(String client, AndroidCSSRecord profile)",//1
-			"loginXMPPServer(String client, AndroidCSSRecord profile)",		//2
-			"logoutXMPPServer(String client)",								//3
-			"loginCSS(String client, AndroidCSSRecord profile)", 			//4
-			"logoutCSS(String client, AndroidCSSRecord profile)",			//5
-			"registerCSS(String client, AndroidCSSRecord profile)",			//6
-			"unregisterCSS(String client, AndroidCSSRecord profile)",		//7
-			"registerCSSDevice(String client, AndroidCSSRecord profile)",	//8
-			"unregisterCSSDevice(String client, AndroidCSSRecord profile)",	//9
-			"getAndroidCSSRecord(String client)",							//10
-			"modifyAndroidCSSRecord(String client, AndroidCSSRecord profile)",//11
-			"changeCSSNodeStatus(String client, AndroidCSSRecord profile)", //12
-			"synchProfile(String client, AndroidCSSRecord profile)",		//13
-			"setPresenceStatus(String client, AndroidCSSRecord profile)",	//14
-			"getCssFriends(String client)",									//15
-			"getSuggestedFriends(String client)",							//16
-			"readProfileRemote(String client, String cssId)",				//17
-			"sendFriendRequest(String client, String cssId)",				//18
-			"getFriendRequests(String client)",								//19
-			"acceptFriendRequest(String client, String cssId)",				//20
-			"startAppServices(String client)",
-			"stopAppServices(String client)"
+			"unregisterXMPPServer(String client, AndroidCSSRecord profile)",	//1
+			"loginXMPPServer(String client, AndroidCSSRecord profile)",			//2
+			"logoutXMPPServer(String client)",									//3
+			"loginCSS(String client, AndroidCSSRecord profile)", 				//4
+			"logoutCSS(String client, AndroidCSSRecord profile)",				//5
+			"registerCSS(String client, AndroidCSSRecord profile)",				//6
+			"unregisterCSS(String client, AndroidCSSRecord profile)",			//7
+			"registerCSSDevice(String client, AndroidCSSRecord profile)",		//8
+			"unregisterCSSDevice(String client, AndroidCSSRecord profile)",		//9
+			"getAndroidCSSRecord(String client)",								//10
+			"modifyAndroidCSSRecord(String client, AndroidCSSRecord profile)",	//11
+			"changeCSSNodeStatus(String client, AndroidCSSRecord profile)", 	//12
+			"synchProfile(String client, AndroidCSSRecord profile)",			//13
+			"setPresenceStatus(String client, AndroidCSSRecord profile)",		//14
+			"getCssFriends(String client)",										//15
+			"getSuggestedFriends(String client)",								//16
+			"readProfileRemote(String client, String cssId)",					//17
+			"sendFriendRequest(String client, String cssId)",					//18
+			"getFriendRequests(String client)",									//19
+			"acceptFriendRequest(String client, String cssId)",					//20
+			"startAppServices(String client)",									//21
+			"stopAppServices(String client)",									//22
+			"getActivities(String client, String timePeriod, int limitResults)" //23
 	};
 	
 	/**
@@ -299,4 +304,12 @@ public interface IAndroidCSSManager {
 	 * @return
 	 */
 	void acceptFriendRequest(String client, String cssId);
+	
+	/**
+	 * Retrieves activities for the user's CSS
+	 * @param timePeriod Space delimited longs eg, "126423013000 1364230131045"
+	 * @param limitResults number of records to limit to
+	 * @return
+	 */
+	MarshaledActivity[] getActivities(String client, String timePeriod, int limitResults);
 }

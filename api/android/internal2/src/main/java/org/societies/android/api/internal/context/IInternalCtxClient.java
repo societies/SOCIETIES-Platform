@@ -57,17 +57,17 @@ import org.societies.api.schema.context.model.CtxModelTypeBean;
 public interface IInternalCtxClient extends ICtxClient {
  
 	//Intents
-	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.platform.internalctxclient.ReturnValue";
-	public static final String INTENT_RETURN_STATUS_KEY = "org.societies.android.platform.internalctxclient.ReturnStatus";
+	public static final String INTENT_RETURN_VALUE_KEY = ICtxClient.INTENT_RETURN_VALUE_KEY;
+	public static final String INTENT_RETURN_STATUS_KEY = ICtxClient.INTENT_RETURN_STATUS_KEY;
 
-	public static final String CREATE_ASSOCIATION = "org.societies.android.platform.internalctxclient.CREATE_ASSOCIATION";
-	public static final String CREATE_ATTRIBUTE = "org.societies.android.platform.internalctxclient.CREATE_ATTRIBUTE";
-	public static final String CREATE_ENTITY = "org.societies.android.platform.internalctxclient.CREATE_ENTITY";
-	public static final String LOOKUP_ENTITIES = "org.societies.android.platform.internalctxclient.LOOKUP_ENTITIES";
-	public static final String LOOKUP = "org.societies.android.platform.internalctxclient.LOOKUP";
-	public static final String REMOVE = "org.societies.android.platform.internalctxclient.REMOVE";
-	public static final String RETRIEVE = "org.societies.android.platform.internalctxclient.RETRIEVE";
-	public static final String UPDATE = "org.societies.android.platform.internalctxclient.UPDATE";
+	public static final String CREATE_ASSOCIATION = ICtxClient.CREATE_ASSOCIATION;
+	public static final String CREATE_ATTRIBUTE = ICtxClient.CREATE_ATTRIBUTE;
+	public static final String CREATE_ENTITY = ICtxClient.CREATE_ENTITY;
+	public static final String LOOKUP_ENTITIES = ICtxClient.LOOKUP_ENTITIES;
+	public static final String LOOKUP = ICtxClient.LOOKUP;
+	public static final String REMOVE = ICtxClient.REMOVE;
+	public static final String RETRIEVE = ICtxClient.RETRIEVE;
+	public static final String UPDATE = ICtxClient.UPDATE;
 	public static final String UPDATE_ATTRIBUTE = "org.societies.android.platform.internalctxclient.UPDATE_ATTRIBUTE";
 	public static final String UPDATE_ATTRIBUTE_VALUE_METRIC = "org.societies.android.platform.internalctxclient.UPDATE_ATTRIBUTE_VALUE_METRIC";
 

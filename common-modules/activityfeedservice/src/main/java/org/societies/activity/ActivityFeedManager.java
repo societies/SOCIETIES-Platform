@@ -88,7 +88,12 @@ public class ActivityFeedManager implements IActivityFeedManager {
         }
         //not existing, making a new one..
         ActivityFeed ret = new ActivityFeed(feedId,owner);
-        ret.setPubSubcli(this.pubSubClient);
+        if (bPubSub)
+        {
+        	ret.pubSubEnabled = true;
+        	ret.setPubSubcli(this.pubSubClient);
+        }
+        
         ret.startUp(this.sessionFactory);
         if (bPubSub)
         	ret.connectPubSub(identity);

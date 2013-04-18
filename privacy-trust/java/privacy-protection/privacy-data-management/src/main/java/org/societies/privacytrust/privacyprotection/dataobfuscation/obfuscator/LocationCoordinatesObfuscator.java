@@ -202,7 +202,7 @@ public class LocationCoordinatesObfuscator extends DataObfuscator<LocationCoordi
 			break;
 		}
 		obfuscatedLocationCoordinates.setObfuscationLevel(obfuscationLevel);
-		return obfuscatedLocationCoordinates;
+		return obfuscatedLocationCoordinates.toLocationCoordinates();
 	}
 
 	/**

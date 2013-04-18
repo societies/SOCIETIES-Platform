@@ -78,11 +78,11 @@ public class MessageTestCase {
 	
 	@Before
 	public void setUp() {
-		LOG.info("###774... setUp");
+		LOG.info("###1854... setUp");
 
 		//GET CURRENT NODE IDENTITY
 		myIdentity = TestCase774.commManager.getIdManager().getThisNetworkNode();
-		LOG.info("###774... getThisNetworkNode: " + myIdentity.getJid());
+		LOG.info("###1854... getThisNetworkNode: " + myIdentity.getJid());
 
 		//SETUP SERVER TO RECEIVE MESSAGES/IQs
 		sCallback = new ServerCallback();
@@ -99,7 +99,7 @@ public class MessageTestCase {
 
 	@Test
 	public void TestSendIQ() {
-		LOG.info("###774... TestSendIQ");
+		LOG.info("###1854... TestSendIQ");
 
 		//SETUP CALLBACK FOR RETURNED RESULT
 		ClientCallback cCallback = new ClientCallback();
@@ -144,7 +144,7 @@ public class MessageTestCase {
 
 	@Test
 	public void TestSendMessage() {
-		LOG.info("###774... TestSendMessage");
+		LOG.info("###1854... TestSendMessage");
 
 		//CREATE MESSAGE BEAN
 		LOG.info("### Creating a test object");

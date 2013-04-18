@@ -89,6 +89,16 @@ public class ItemConverterHelper {
 			thisNode.setAttribute("xmlns", anyElement.getNamespaceURI().toString());
 			thisNode.setReference(anyElement.getNamespaceURI().toString());
 		}
+		
+		// attributes have to be processed before child elements
+		NamedNodeMap attrs = anyElement.getAttributes();
+		for (int i=0; i<attrs.getLength(); i++) {
+			Node n = attrs.item(i);
+			if (n instanceof Attr) {
+				thisNode.setAttribute(n.getNodeName(), n.getNodeValue());
+			}
+		}
+		
 		NodeList childList = anyElement.getChildNodes();
 		boolean childElements = false;
 		for (int i=0; i<childList.getLength(); i++) {
@@ -102,14 +112,7 @@ public class ItemConverterHelper {
 			}
 		}
 		
-		NamedNodeMap attrs = anyElement.getAttributes();
-		for (int i=0; i<attrs.getLength(); i++) {
-			Node n = attrs.item(i);
-			if (n instanceof Attr) {
-				thisNode.setAttribute(n.getNodeName(), n.getNodeValue());
-			}
-		}
-		
+		// node value
 		if (anyElement.getNodeValue()!=null) {
 			thisNode.setValue(anyElement.getNodeValue());
 		}

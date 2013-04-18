@@ -224,8 +224,13 @@ public class RemoteActivityFeed implements IActivityFeed {
 
 
 	@Override
-	public Future<List<IActivity>> getActivities(String arg0, String arg1,
-			long arg2) {
+	public Future<List<IActivity>> getActivities(String arg0, String arg1, long arg2) {
+		//Not used by remote calls, but since they share the same Interface class ....
+		return null;
+	}
+	
+	@Override
+	public Future<List<IActivity>> getActivities(String arg0, long arg2) {
 		//Not used by remote calls, but since they share the same Interface class ....
 		return null;
 	}

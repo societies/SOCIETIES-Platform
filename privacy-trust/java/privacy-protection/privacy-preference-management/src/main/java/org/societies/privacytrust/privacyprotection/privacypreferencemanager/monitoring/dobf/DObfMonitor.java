@@ -35,10 +35,9 @@ import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfPreferenceDetailsBean;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.DObfPreferenceDetails;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PreferenceConditionExtractor;
 
@@ -51,7 +50,7 @@ import org.societies.privacytrust.privacyprotection.privacypreferencemanager.eva
 public class DObfMonitor implements CtxChangeEventListener {
 
 	private final PrivacyPreferenceManager privPrefMgr;
-	Hashtable<CtxIdentifier, List<DObfPreferenceDetails>> monitoring = new Hashtable<CtxIdentifier, List<DObfPreferenceDetails>>();
+	Hashtable<CtxIdentifier, List<DObfPreferenceDetailsBean>> monitoring = new Hashtable<CtxIdentifier, List<DObfPreferenceDetailsBean>>();
 	private final ICtxBroker ctxBroker;
 	private final IIdentity userIdentity;
 	
@@ -80,9 +79,9 @@ public class DObfMonitor implements CtxChangeEventListener {
 
 
 	private void loadPreferenceDetails(){
-		List<DObfPreferenceDetails> details = privPrefMgr.getDObfPreferences();
+		List<DObfPreferenceDetailsBean> details = privPrefMgr.getDObfPreferenceDetails();
 
-		for (DObfPreferenceDetails detail: details){
+		for (DObfPreferenceDetailsBean detail: details){
 			PreferenceConditionExtractor extractor = new PreferenceConditionExtractor();
 			IPrivacyPreferenceTreeModel model = privPrefMgr.getDObfPreference(detail);
 			if (null!=model){
@@ -91,7 +90,7 @@ public class DObfMonitor implements CtxChangeEventListener {
 					if (monitoring.containsKey(ctxId)){
 						monitoring.get(ctxId).add(detail);
 					}else{
-						ArrayList<DObfPreferenceDetails> list = new ArrayList<DObfPreferenceDetails>();
+						ArrayList<DObfPreferenceDetailsBean> list = new ArrayList<DObfPreferenceDetailsBean>();
 						list.add(detail);
 						monitoring.put(ctxId, list);
 

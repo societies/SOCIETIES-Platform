@@ -58,13 +58,13 @@ public class TestCase728 extends IntegrationTestCase {
 		// with test case number
 		// and test case classes to run
 		//super(713, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
-		super(728, new Class[] {NominalTestCaseUpperTester.class});
-		NominalTestCaseUpperTester.testCaseNumber = 728;
+		super(1882, new Class[] {NominalTestCaseUpperTester.class});
+		NominalTestCaseUpperTester.testCaseNumber = 1882;
 	}
 
 	
 	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
-		if(LOG.isDebugEnabled()) LOG.debug("[#728] setServiceDiscovery()");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1882] setServiceDiscovery()");
 		TestCase728.serviceDiscovery = serviceDiscovery;
 	}
 
@@ -74,7 +74,7 @@ public class TestCase728 extends IntegrationTestCase {
 	}
 	
 	public void setCommManager(ICommManager commManager) {
-		if(LOG.isDebugEnabled()) LOG.debug("[#728] setCommManager()");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1882] setCommManager()");
 		TestCase728.commManager = commManager;
 	}
 

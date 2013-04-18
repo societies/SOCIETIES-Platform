@@ -24,13 +24,13 @@ public class TestCase1001 extends IntegrationTestCase {
 		// Call the super constructor
 		// with test case number
 		// and test case classes to run
-		//super(1001, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
-		super(1001, new Class[] {NominalTestCaseLowerTester.class});
+		//super(1879, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
+		super(1879, new Class[] {NominalTestCaseLowerTester.class});
 		NominalTestCaseLowerTester.testCaseNumber = 1001;
 	}
 
 	public void setNegotiationProviderServiceMgmt(INegotiationProviderServiceMgmt negotiationProviderServiceMgmt) {
-		LOG.debug("[#1001] setNegotiationProviderServiceMgmt()");
+		LOG.debug("[#1879] setNegotiationProviderServiceMgmt()");
 		TestCase1001.negotiationProviderServiceMgmt = negotiationProviderServiceMgmt;
 	}
 	
@@ -49,7 +49,7 @@ public class TestCase1001 extends IntegrationTestCase {
 	 * @param serverUrl the serverUrl to set
 	 */
 	public void setServerUrl(String serverUrl) {
-		LOG.debug("[#1001] setServerUrl({})", serverUrl);
+		LOG.debug("[#1879] setServerUrl({})", serverUrl);
 		TestCase1001.serverUrl = serverUrl;
 	}
 
@@ -64,7 +64,7 @@ public class TestCase1001 extends IntegrationTestCase {
 	 * @param commMgr the commMgr to set
 	 */
 	public void setCommMgr(ICommManager commMgr) {
-		LOG.debug("[#1001] setCommMgr()");
+		LOG.debug("[#1879] setCommMgr()");
 		TestCase1001.commMgr = commMgr;
 	}
 }

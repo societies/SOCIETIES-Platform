@@ -12,9 +12,6 @@
        testing of the bundle outside of an OSGi container -->
 	
 	<osgi:service ref="CSSManagerRemote" interface="org.societies.api.internal.css.management.ICSSRemoteManager" />
-	
 	<osgi:reference id="CommManagerBundle" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
-
 	<osgi:reference id="CSSManagerBundle" interface="org.societies.api.internal.css.ICSSInternalManager"/>
-
 </beans>

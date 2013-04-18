@@ -49,20 +49,21 @@ import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote;
 import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegAgentMethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationACKBeanResult;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationAgentBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationGetPolicyBeanResult;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation.NegotiationMainBeanResult;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.springframework.scheduling.annotation.AsyncResult;
 /**
  * Comms Client that initiates the remote communication
@@ -72,10 +73,14 @@ import org.springframework.scheduling.annotation.AsyncResult;
  */
 public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRemote, ICommCallback{
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-			Arrays.asList("http://societies.org/api/internal/schema/privacytrust/privacyprotection/negotiation", 
+			Arrays.asList("http://societies.org/api/internal/schema/privacytrust/privacyprotection/negotiation",
+					"http://societies.org/api/schema/privacytrust/privacy/model/privacypolicy",
+					"http://societies.org/api/schema/identity",
 					"http://societies.org/api/schema/servicelifecycle/model"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList("org.societies.api.internal.schema.privacytrust.privacyprotection.negotiation",
+					"org.societies.api.schema.privacytrust.privacy.model.privacypolicy",
+					"org.societies.api.schema.identity",
 					"org.societies.api.schema.servicelifecycle.model"));
 
 	//PRIVATE VARIABLES
@@ -192,8 +197,9 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 	 */
 
 	@Override
-	public Future<Boolean> acknowledgeAgreement(IAgreementEnvelope envelope) {
-		IIdentity toIdentity = envelope.getAgreement().getRequestor().getRequestorId();
+	public Future<Boolean> acknowledgeAgreement(AgreementEnvelope envelope) {
+		try {
+		IIdentity toIdentity = idMgr.fromJid(envelope.getAgreement().getRequestor().getRequestorId());
 		/*		try {
 			toIdentity = idMgr.fromJid("XCManager.societies.local");
 		} catch (InvalidFormatException e1) {
@@ -201,19 +207,16 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 		}*/
 		Stanza stanza = new Stanza(toIdentity);
 		NegotiationAgentBean bean = new NegotiationAgentBean();
-		bean.setAgreementEnvelope(Util.toByteArray(envelope));
-		bean.setRequestor(this.createRequestorBean(envelope.getAgreement().getRequestor()));
+		bean.setAgreementEnvelope(envelope);
+		bean.setRequestor(envelope.getAgreement().getRequestor());
 		bean.setMethod(NegAgentMethodType.ACKNOWLEDGE_AGREEMENT);
-		try {
+		
 			this.commManager.sendIQGet(stanza, bean, this);
 			this.logging.debug("Sending "+NegAgentMethodType.ACKNOWLEDGE_AGREEMENT+" IQGET");
-		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 
-		String id = getId(NegAgentMethodType.ACKNOWLEDGE_AGREEMENT, envelope.getAgreement().getRequestor().getRequestorId().getJid());
+
+		String id = getId(NegAgentMethodType.ACKNOWLEDGE_AGREEMENT, envelope.getAgreement().getRequestor().getRequestorId());
 
 		while (!this.ackResults.containsKey(id)){
 			try {
@@ -232,13 +235,19 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 				e.printStackTrace();
 			}
 		}
-		
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return new AsyncResult<Boolean>(false);
 
 	}
 
 	@Override
-	public Future<RequestPolicy> getPolicy(Requestor requestor) {
+	public Future<RequestPolicy> getPolicy(RequestorBean requestor) {
 		/*		IIdentity toIdentity = null;
 		try {
 			toIdentity = idMgr.fromJid("XCManager.societies.local");
@@ -246,20 +255,26 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 			e1.printStackTrace();
 		}
 		Stanza stanza = new Stanza(toIdentity);*/
-		Stanza stanza = new Stanza(requestor.getRequestorId());
-		NegotiationAgentBean bean = new NegotiationAgentBean();
-		bean.setRequestor(createRequestorBean(requestor));
-		bean.setMethod(NegAgentMethodType.GET_POLICY);
+		
+
 
 		try{
+			
+			Stanza stanza = new Stanza(this.idMgr.fromJid(requestor.getRequestorId()));
+			NegotiationAgentBean bean = new NegotiationAgentBean();
+			bean.setRequestor(requestor);
+			bean.setMethod(NegAgentMethodType.GET_POLICY);
 			this.commManager.sendIQGet(stanza, bean, this);
 			this.logging.debug("Sending "+NegAgentMethodType.GET_POLICY+" IQGET");
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
-		String id = getId(NegAgentMethodType.GET_POLICY, requestor.getRequestorId().getJid());
+		String id = getId(NegAgentMethodType.GET_POLICY, requestor.getRequestorId());
 		
 		while(!this.policyResults.containsKey(id)){
 			try {
@@ -270,23 +285,18 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 				this.logging.debug("Returning getPolicy result");
 				NegotiationGetPolicyBeanResult result = policyResults.get(id);
 				
-				RequestPolicy policy = (RequestPolicy) SerialisationHelper.deserialise(result.getRequestPolicy(), this.getClass().getClassLoader());
+				RequestPolicy policy = (RequestPolicy) result.getRequestPolicy();//SerialisationHelper.deserialise(result.getRequestPolicy(), this.getClass().getClassLoader());
 				//RequestPolicy policy = (RequestPolicy) Util.convertToObject(result.getRequestPolicy(), this.getClass());
 				this.policyResults.remove(id);
 				return new AsyncResult<RequestPolicy>(policy);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
 		
-		RequestPolicy policy = new RequestPolicy(new ArrayList<RequestItem>());
+		RequestPolicy policy = new RequestPolicy();
+		policy.setRequestItems(new ArrayList<RequestItem>());
 		policy.setRequestor(requestor);
 		return new AsyncResult<RequestPolicy> (policy);
 	}
@@ -338,7 +348,7 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 	}
 
 	@Override
-	public Future<ResponsePolicy> negotiate(Requestor requestor, ResponsePolicy policy) {
+	public Future<ResponsePolicy> negotiate(RequestorBean requestor, ResponsePolicy policy) {
 		/*		IIdentity toIdentity = null;
 		try {
 
@@ -347,20 +357,24 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 			e1.printStackTrace();
 		}
 		Stanza stanza = new Stanza(toIdentity);*/
-		Stanza stanza = new Stanza(requestor.getRequestorId());
-		NegotiationAgentBean bean = new NegotiationAgentBean();
-		bean.setMethod(NegAgentMethodType.NEGOTIATE);
-		bean.setRequestor(createRequestorBean(requestor));
-		bean.setResponsePolicy(Util.toByteArray(policy));
+
 		try{
+			Stanza stanza = new Stanza(this.idMgr.fromJid(requestor.getRequestorId()));
+			NegotiationAgentBean bean = new NegotiationAgentBean();
+			bean.setMethod(NegAgentMethodType.NEGOTIATE);
+			bean.setRequestor(requestor);
+			bean.setResponsePolicy(policy);
 			this.commManager.sendIQGet(stanza, bean, this);
 			this.logging.debug("Sending "+NegAgentMethodType.NEGOTIATE+" IQGET");
 		} catch (CommunicationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
-		String id = getId(NegAgentMethodType.NEGOTIATE, requestor.getRequestorId().getJid());
+		String id = getId(NegAgentMethodType.NEGOTIATE, requestor.getRequestorId());
 		
 		while(!this.mainResults.containsKey(id)){
 			try {
@@ -370,7 +384,7 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 				this.logging.debug("Returning negotiate result");
 				NegotiationMainBeanResult result = this.mainResults.get(id);
 				
-				ResponsePolicy resp = (ResponsePolicy) SerialisationHelper.deserialise(result.getResponsePolicy(), this.getClass().getClassLoader());
+				ResponsePolicy resp = (ResponsePolicy) result.getResponsePolicy();//SerialisationHelper.deserialise(result.getResponsePolicy(), this.getClass().getClassLoader());
 				
 				//ResponsePolicy resp = (ResponsePolicy) Util.convertToObject(result.getResponsePolicy(), this.getClass());
 				this.mainResults.remove(id);
@@ -378,21 +392,18 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
 		
 		
-		ResponsePolicy emptyPolicy = new ResponsePolicy(requestor, new ArrayList<ResponseItem>(), NegotiationStatus.FAILED);
+		ResponsePolicy emptyPolicy = new ResponsePolicy();
+		emptyPolicy.setRequestor(requestor);
+		emptyPolicy.setResponseItems(new ArrayList<ResponseItem>());
+		emptyPolicy.setNegotiationStatus(NegotiationStatus.FAILED);
 		return new AsyncResult<ResponsePolicy> (emptyPolicy);		
 	}
 
-	private RequestorBean createRequestorBean(Requestor requestor){
+/*	private RequestorBean createRequestorBean(Requestor requestor){
 		if (requestor instanceof RequestorCis){
 			RequestorCisBean cisRequestorBean = new RequestorCisBean();
 			cisRequestorBean.setRequestorId(requestor.getRequestorId().getBareJid());
@@ -408,7 +419,7 @@ public class PrivacyNegotiationManagerCommClient implements INegotiationAgentRem
 			requestorBean.setRequestorId(requestor.getRequestorId().getBareJid());
 			return requestorBean;
 		}
-	}
+	}*/
 
 
 	private static String getId(NegAgentMethodType methodType, String requestorJID){

@@ -77,9 +77,9 @@ public class NominalTestCaseLowerTester {
 	@BeforeClass
 	public static void initialization() throws Exception {
 		
-		LOG.info("[#1001] Initialization");
-		LOG.info("[#1001] Prerequisite: The CSS is created");
-		LOG.info("[#1001] Prerequisite: The user is logged to the CSS");
+		LOG.info("[#1879] Initialization");
+		LOG.info("[#1879] Prerequisite: The CSS is created");
+		LOG.info("[#1879] Prerequisite: The user is logged to the CSS");
 
 		negotiationProviderServiceMgmt = TestCase1001.getNegotiationProviderServiceMgmt();
 		assertNotNull(negotiationProviderServiceMgmt);
@@ -100,7 +100,7 @@ public class NominalTestCaseLowerTester {
 	 */
 	@Before
 	public void setUp() {
-		LOG.info("[#1001] NominalTestCaseLowerTester::setUp");
+		LOG.info("[#1879] NominalTestCaseLowerTester::setUp");
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class NominalTestCaseLowerTester {
 	 */
 	@After
 	public void tearDown() {
-		LOG.info("[#1001] tearDown");
+		LOG.info("[#1879] tearDown");
 	}
 
 	@Test
@@ -201,8 +201,8 @@ public class NominalTestCaseLowerTester {
 
 		String fileName = SERVICE_CLIENT_FILENAME;
 
-		LOG.info("[#1001] testManualFilePlacement()");
-		LOG.info("[#1001] *** Domain Authority Rest server is required in THIS container! ***");
+		LOG.info("[#1879] testManualFilePlacement()");
+		LOG.info("[#1879] *** Domain Authority Rest server is required in THIS container! ***");
 
 		if (fileName.startsWith("/")) {
 			fileName = fileName.replaceFirst("/", "");

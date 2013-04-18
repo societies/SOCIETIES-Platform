@@ -46,7 +46,7 @@ public class CtxSNDataMgmt extends IntegrationTestCase{
 	
 	
 	public CtxSNDataMgmt(){
-		super(0111, new Class[]{Tester.class});
+		super(1898, new Class[]{Tester.class});
 	}
 
 	/**

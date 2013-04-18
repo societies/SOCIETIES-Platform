@@ -62,7 +62,7 @@ public class Tester {
 	
 	@Before
 	public void setUp(){
-		LOG.info("[#1083] Tester::setUp");
+		LOG.info("[#1859] Tester::setUp");
 	}
 	
 	
@@ -80,8 +80,8 @@ public class Tester {
 		try {
 			operator = Test1083.ctxBroker.retrieveCssOperator().get();
 			
-			LOG.info("[#1083] Id from broker is " + operator.getId().getOperatorId());
-			LOG.info("[#1083] Id directly from idMgr is " + privateId);
+			LOG.info("[#1859] Id from broker is " + operator.getId().getOperatorId());
+			LOG.info("[#1859] Id directly from idMgr is " + privateId);
 			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -97,7 +97,7 @@ public class Tester {
 		assertNotNull(operator);
 		assertEquals(operator.getId().getOperatorId(),privateId.getBareJid());
 
-		LOG.info("[#1083] Using equals with getOperatorId() - " + operator.getId().getOperatorId().equals(privateId.getBareJid()));
+		LOG.info("[#1859] Using equals with getOperatorId() - " + operator.getId().getOperatorId().equals(privateId.getBareJid()));
 	}
 		
 }

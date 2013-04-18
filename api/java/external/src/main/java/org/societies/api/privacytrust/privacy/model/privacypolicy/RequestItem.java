@@ -41,6 +41,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.Cond
  * @author Elizabeth
  *
  */
+@Deprecated
 public class RequestItem implements Serializable{
 
 	private Resource resource;

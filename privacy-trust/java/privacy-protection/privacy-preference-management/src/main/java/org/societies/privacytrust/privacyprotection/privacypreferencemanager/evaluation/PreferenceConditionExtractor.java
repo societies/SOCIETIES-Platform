@@ -71,7 +71,7 @@ public class PreferenceConditionExtractor {
 					if (condition instanceof ContextPreferenceCondition){
 						CtxIdentifier id = ((ContextPreferenceCondition) temp.getCondition()).getCtxIdentifier();
 						if (!hasCondition(list,id)){
-							CtxAttributeIdentifier ctxId = ((ContextPreferenceCondition) temp.getCondition()).getCtxIdentifier();
+							CtxIdentifier ctxId = ((ContextPreferenceCondition) temp.getCondition()).getCtxIdentifier();
 							list.add(ctxId);
 						}
 					}

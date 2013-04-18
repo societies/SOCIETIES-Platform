@@ -66,9 +66,9 @@ public class NominalTestCaseUpperTester {
 	@BeforeClass
 	public static void initialization() {
 		
-		LOG.info("[#728] Initialization");
-		LOG.info("[#728] Prerequisite: The CSS is created");
-		LOG.info("[#728] Prerequisite: The user is logged to the CSS");
+		LOG.info("[#1882] Initialization");
+		LOG.info("[#1882] Prerequisite: The CSS is created");
+		LOG.info("[#1882] Prerequisite: The user is logged to the CSS");
 
 	}
 	
@@ -77,7 +77,7 @@ public class NominalTestCaseUpperTester {
 	 */
 	@Before
 	public void setUp() {
-		if(LOG.isDebugEnabled()) LOG.debug("[#728] NominalTestCaseUpperTester::setUp");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1882] NominalTestCaseUpperTester::setUp");
 		
 	}
 	
@@ -86,7 +86,7 @@ public class NominalTestCaseUpperTester {
 	 */
 	@After
 	public void tearDown() {
-		if(LOG.isDebugEnabled()) LOG.debug("[#728] NominalTestCaseUpperTester:: teardown");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1882] NominalTestCaseUpperTester:: teardown");
 		
 	}
 	
@@ -96,33 +96,33 @@ public class NominalTestCaseUpperTester {
 	@Test
 	public void testDiscoverServices(){
 		
-		LOG.info("[#728] Testing Remote Discover Services");
+		LOG.info("[#1882] Testing Remote Discover Services");
 			
 		
 		try{
 			//STEP 1: Get the Services
-			if(LOG.isDebugEnabled()) LOG.debug("[#728] Getting remote Services from " + REMOTEJID);
+			if(LOG.isDebugEnabled()) LOG.debug("[#1882] Getting remote Services from " + REMOTEJID);
 			
 			Future<List<Service>> asyncResult = TestCase728.getServiceDiscovery().getServices(REMOTEJID);
 			List<Service> resultList = asyncResult.get();
 			
 			//STEP 2: Check if we retrieved two services
-			if(LOG.isDebugEnabled()) LOG.debug("[#728] Retrieved " + resultList.size() + " services.");
-			Assert.assertTrue("[#728]  Checking if we retrieved at least two services services!", resultList.size() >= 2);
+			if(LOG.isDebugEnabled()) LOG.debug("[#1882] Retrieved " + resultList.size() + " services.");
+			Assert.assertTrue("[#1882]  Checking if we retrieved at least two services services!", resultList.size() >= 2);
 			
 			
 			//STEP 3 & 4: Check if our current node isn't othercss.societies.local
 			String localJid = TestCase728.getCommManager().getIdManager().getThisNetworkNode().getJid();
-			if(LOG.isDebugEnabled()) LOG.debug("[#728] Current JID is " + localJid);
+			if(LOG.isDebugEnabled()) LOG.debug("[#1882] Current JID is " + localJid);
 			
-			Assert.assertFalse("[#728] Current JID is same as Remote Jid!", localJid.equals(REMOTEJID));
+			Assert.assertFalse("[#1882] Current JID is same as Remote Jid!", localJid.equals(REMOTEJID));
 			int serviceCount = 0;
 			//STEP 5, 6, 7 & 8
 			for(Service service: resultList){
 				String serviceJid = service.getServiceInstance().getFullJid();
-				if(LOG.isDebugEnabled()) LOG.debug("[#728] Service " + service.getServiceName() + " has jid " + serviceJid);
+				if(LOG.isDebugEnabled()) LOG.debug("[#1882] Service " + service.getServiceName() + " has jid " + serviceJid);
 				if(!service.getServiceType().equals(ServiceType.DEVICE)){
-					Assert.assertEquals("[#728] Service JID is not the correct one!", REMOTEJID, serviceJid);
+					Assert.assertEquals("[#1882] Service JID is not the correct one!", REMOTEJID, serviceJid);
 					Assert.assertTrue(service.getServiceName().equals("Calculator Service") || service.getServiceName().equals("FortuneCookie Service") || service.getServiceName().equals("RFiD System"));
 					serviceCount++;
 				}
