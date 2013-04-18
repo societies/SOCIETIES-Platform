@@ -339,7 +339,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 			Stanza stanza = new Stanza(pubsubService);
 			Pubsub payload = new Pubsub();
 			Unsubscribe unsub = new Unsubscribe();
-			unsub.setJid(localIdentity.getJid());
+			unsub.setJid(localIdentity.getBareJid());
 			unsub.setNode(node);
 			payload.setUnsubscribe(unsub);
 	
