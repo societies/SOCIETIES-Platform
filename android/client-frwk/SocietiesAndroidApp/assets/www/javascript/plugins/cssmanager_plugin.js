@@ -495,6 +495,20 @@ var	SocietiesLocalCSSManager = {
 		'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
 		'getActivities', 	 //Telling the plugin, which action we want to perform
 		[client]);   		 //Passing a list of arguments to the plugin
+	},
+	
+	/**
+	 * Retrive the VCard for a given user
+	 */
+	getVCardUser: function(userID, successCallback, failureCallback){
+		var client = "org.societies.android.platform.gui";
+		console.log("Call LocalCSSManagerService - getVCardUser");
+
+		return cordova.exec(successCallback,    //Callback which will be called when plugin action is successful
+		failureCallback,     //Callback which will be called when plugin action encounters an error
+		'PluginCSSManager',  //Telling PhoneGap that we want to run specified plugin
+		'getUserVCard', 	 //Telling the plugin, which action we want to perform
+		[client, userID]);   //Passing a list of arguments to the plugin
 	}
 	
 };

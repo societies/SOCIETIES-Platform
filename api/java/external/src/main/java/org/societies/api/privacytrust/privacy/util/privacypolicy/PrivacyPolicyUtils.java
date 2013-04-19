@@ -43,7 +43,6 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.Requestor;
 import org.societies.api.identity.util.DataIdentifierFactory;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
@@ -88,30 +87,77 @@ public class PrivacyPolicyUtils {
 	 * @param configuration Configuration of the CIS or the 3P service
 	 * @return A slightly completed privacy policy
 	 */
-	@SuppressWarnings("rawtypes")
 	public static RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException {
 		RequestPolicy privacyPolicy = new RequestPolicy();
-		privacyPolicy.setPrivacyPolicyType(privacyPolicyType);
 		List<RequestItem> requestItems = new ArrayList<RequestItem>();
 		
-		// --- Prepare common data
-		PrivacyPolicyBehaviourConstants globalBaheviour = PrivacyPolicyBehaviourConstants.PRIVATE;
-		if (configuration.containsKey("globalBehaviour")) {
-			globalBaheviour = (PrivacyPolicyBehaviourConstants) configuration.get("globalBehaviour");
+		// ---- Add privacy policy type
+		privacyPolicy.setPrivacyPolicyType(privacyPolicyType);
+
+		// ---- Add configured request items
+		if (configuration.containsKey("requestItems")) {
+			requestItems.addAll((List<RequestItem>) configuration.get("requestItems"));
 		}
+
+		// ---- Add common request items
+//		// --- Prepare common data
+//		PrivacyPolicyBehaviourConstants globalBaheviour = PrivacyPolicyBehaviourConstants.PRIVATE;
+//		if (configuration.containsKey("globalBehaviour")) {
+//			globalBaheviour = (PrivacyPolicyBehaviourConstants) configuration.get("globalBehaviour");
+//		}
+//		// -- Actions: read
+//		List<Action> actions = ActionUtils.createList(ActionConstants.READ, ActionConstants.CREATE);
+//		// -- Conditions
+//		List<Condition> conditions = new ArrayList<Condition>();
+//		// - Common
+//		conditions.add(ConditionUtils.create(ConditionConstants.STORE_IN_SECURE_STORAGE, "Yes"));
+//		// - Visibility
+//		// Public
+//		if (PrivacyPolicyBehaviourConstants.PUBLIC.name().equals(globalBaheviour.name())) {
+//			conditions.add(ConditionUtils.createPublic());
+//		}
+//		// Members only
+//		else if (PrivacyPolicyBehaviourConstants.MEMBERS_ONLY.name().equals(globalBaheviour.name())) {
+//			conditions.add(ConditionUtils.createMembersOnly());
+//		}
+//		// Private
+//		else {
+//			conditions.add(ConditionUtils.createPrivate());
+//		}
+
+		privacyPolicy.setRequestItems(requestItems);
+		return privacyPolicy;
+	}
+
+	/**
+	 * Help a developer or a user to create a CIS privacy policy by inferring a default
+	 * one using information about the CIS. The privacy policy in
+	 * result will be slightly completed but still need to be filled.
+	 * E.g. if a CIS membership criteria engine requires access to geolocation data,
+	 * the inference engine will add geolocation data line to the privacy policy.
+	 * @param globalBehaviour Global behavior of the privacy policy: private (default), members only, public or custom
+	 * @param membershipCriteria Membership criteria of the CIS (optional)
+	 * @param configuration Other optional configuration
+	 * @return A slightly completed privacy policy
+	 */
+	public static RequestPolicy inferCisPrivacyPolicy(
+			PrivacyPolicyBehaviourConstants globalBehaviour,
+			MembershipCrit membershipCriteria,
+			Map<String, String> configuration) throws PrivacyException {
+		// --- Prepare common data
 		// -- Actions: read
-		List<Action> actions = ActionUtils.createList(ActionConstants.READ);
+		List<Action> actions = ActionUtils.createList(ActionConstants.READ, ActionConstants.CREATE);
 		// -- Conditions
 		List<Condition> conditions = new ArrayList<Condition>();
 		// - Common
-		conditions.add(ConditionUtils.create(ConditionConstants.STORE_IN_SECURE_STORAGE, "Yes"));
+		conditions.add(ConditionUtils.create(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
 		// - Visibility
 		// Public
-		if (PrivacyPolicyBehaviourConstants.PUBLIC.name().equals(globalBaheviour.name())) {
+		if (PrivacyPolicyBehaviourConstants.PUBLIC.name().equals(globalBehaviour.name())) {
 			conditions.add(ConditionUtils.createPublic());
 		}
 		// Members only
-		else if (PrivacyPolicyBehaviourConstants.MEMBERS_ONLY.name().equals(globalBaheviour.name())) {
+		else if (PrivacyPolicyBehaviourConstants.MEMBERS_ONLY.name().equals(globalBehaviour.name())) {
 			conditions.add(ConditionUtils.createMembersOnly());
 		}
 		// Private
@@ -119,7 +165,8 @@ public class PrivacyPolicyUtils {
 			conditions.add(ConditionUtils.createPrivate());
 		}
 
-		// --- Add data
+		// --- Prepare request item list
+		List<RequestItem> requestItems = new ArrayList<RequestItem>();
 		boolean optional = false;
 		// - CIS Member list
 		{
@@ -164,29 +211,12 @@ public class PrivacyPolicyUtils {
 			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
 			requestItems.add(requestItem);
 		}
-		
-		privacyPolicy.setRequestItems(requestItems);
-		return privacyPolicy;
-	}
 
-	/**
-	 * Help a developer or a user to create a CIS privacy policy by inferring a default
-	 * one using information about the CIS. The privacy policy in
-	 * result will be slightly completed but still need to be filled.
-	 * E.g. if a CIS membership criteria engine requires access to geolocation data,
-	 * the inference engine will add geolocation data line to the privacy policy.
-	 * @param globalBehaviour Global behavior of the privacy policy: private (default), members only, public or custom
-	 * @param membershipCriteria Membership criteria of the CIS (optional)
-	 * @param configuration Other optional configuration
-	 * @return A slightly completed privacy policy
-	 */
-	public static RequestPolicy inferCisPrivacyPolicy(
-			PrivacyPolicyBehaviourConstants globalBehaviour,
-			MembershipCrit membershipCriteria,
-			Map<String, String> configuration) throws PrivacyException {
+		// --- Prepare parameters
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("globalBehaviour", globalBehaviour);
 		parameters.put("membershipCriteria", membershipCriteria);
+		parameters.put("requestItems", requestItems);
 		if (null != configuration) {
 			parameters.putAll(configuration);
 		}

@@ -43,6 +43,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	public final static String CSS_RECORD_TABLE = "CssRecord";
 	public final static String CURRENT_NODE_TABLE = "CssNode";
 	public final static String ARCHIVED_NODE_TABLE = "ArchivedCssNode";
+	public final static String USER_VCARDS_TABLE = "UserVCards";
 	
 	//Create constants for table columns to maintain a single reference fir each column
 	public final static String ROW_ID = BaseColumns._ID;
@@ -69,6 +70,11 @@ public class DBHelper extends SQLiteOpenHelper {
 //	public final static String CSS_RECORD_REGISTRATION = CSSContentProvider.CssRecord.CSS_RECORD_REGISTRATION;
 //	public final static String CSS_RECORD_INACTIVATION = CSSContentProvider.CssRecord.CSS_RECORD_INACTIVATION;
 //	public final static String CSS_RECORD_UPTIME = CSSContentProvider.CssRecord.CSS_RECORD_UPTIME;
+	
+	//AVATAR COLUMNS
+	public final static String USER_IDENTITY = CSSContentProvider.UserVCards.USER_IDENTITY;
+	public final static String USER_AVATAR   = CSSContentProvider.UserVCards.USER_AVATAR;
+	public final static String AVATAR_HASH   = CSSContentProvider.UserVCards.AVATAR_HASH;
 	
 	//Create an "all columns" array. Useful for retrieving all data from a table
 //	public final static String [] ALL_CSSRECORD_COLUMNS = {ROW_ID, CSS_RECORD_DOMAIN_SERVER, CSS_RECORD_CSS_HOSTING_LOCATION,
@@ -124,6 +130,11 @@ public class DBHelper extends SQLiteOpenHelper {
 //				CSS_RECORD_INACTIVATION + " TEXT, " + 
 //				CSS_RECORD_UPTIME + " INTEGER
 				);
+		
+		//AVATAR STORAGE
+		db.execSQL("CREATE TABLE " + USER_VCARDS_TABLE + " (" + ROW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+				USER_IDENTITY + " TEXT, " +
+				AVATAR_HASH   + " TEXT  );");
 	}
 
 	@Override

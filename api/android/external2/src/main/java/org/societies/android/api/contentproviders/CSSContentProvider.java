@@ -96,4 +96,14 @@ public class CSSContentProvider {
 //		public final static String CSS_RECORD_INACTIVATION = "cssInactivation";
 //		public final static String CSS_RECORD_UPTIME = "cssUpTime";
 	}
+	
+	public static final class UserVCards implements BaseColumns {
+
+		public static final String PATH = "UserVCards";
+		public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + PATH);
+		
+		public final static String USER_IDENTITY = "jid";
+		public final static String USER_AVATAR   = "avatar";
+		public final static String AVATAR_HASH   = "avatar_hash";
+	}
 }
