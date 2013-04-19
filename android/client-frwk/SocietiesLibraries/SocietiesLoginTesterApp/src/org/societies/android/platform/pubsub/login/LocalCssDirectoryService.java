@@ -33,6 +33,7 @@ import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.ICommCallback;
 import org.societies.android.api.comms.xmpp.Stanza;
+import org.societies.android.api.comms.xmpp.VCardParcel;
 import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.css.directory.IAndroidCssDirectory;
@@ -244,6 +245,24 @@ public class LocalCssDirectoryService extends Service implements IAndroidCssDire
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.societies.android.api.css.directory.IAndroidCssDirectory#getUserVCard(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public VCardParcel getUserVCard(String client, String userId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.societies.android.api.css.directory.IAndroidCssDirectory#getMyVCard(java.lang.String)
+	 */
+	@Override
+	public VCardParcel getMyVCard(String client) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	/**
 	 * Callback used with Android Comms for CSSDirectory
 	 *
