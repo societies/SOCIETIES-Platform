@@ -87,8 +87,8 @@ public class RequestItemUtils {
 		if (o1.getClass() != o2.getClass()) { return false; }
 		// -- Verify obj type
 		RequestItem rhs = (RequestItem) o2;
-		return (ActionUtils.equals(o1.getActions(), rhs.getActions())
-				&& ConditionUtils.equals(o1.getConditions(), rhs.getConditions())
+		return (ActionUtils.equal(o1.getActions(), rhs.getActions())
+				&& ConditionUtils.equal(o1.getConditions(), rhs.getConditions())
 				&& ResourceUtils.equals(o1.getResource(), rhs.getResource())
 				&& o1.isOptional() == rhs.isOptional()
 				);

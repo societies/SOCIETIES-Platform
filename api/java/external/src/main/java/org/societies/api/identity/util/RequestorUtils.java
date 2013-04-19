@@ -27,7 +27,7 @@ package org.societies.api.identity.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
@@ -106,7 +106,7 @@ public class RequestorUtils {
 	public static String toString(RequestorBean bean){
 		if (bean instanceof RequestorCisBean){
 			StringBuilder builder = new StringBuilder();
-			builder.append("RequestorCisBean [cisRequestorId=");
+			builder.append("RequestorCisBean [getRequestorId=");
 			builder.append(bean.getRequestorId());
 			builder.append(", getCisRequestorId()=");
 			builder.append(((RequestorCisBean) bean).getCisRequestorId());
@@ -114,7 +114,7 @@ public class RequestorUtils {
 			return builder.toString();
 		}else if (bean instanceof RequestorServiceBean){
 			StringBuilder builder = new StringBuilder();
-			builder.append("RequestorServiceBean [requestorId=");
+			builder.append("RequestorServiceBean [getRequestorId=");
 			builder.append(bean.getRequestorId());
 			builder.append(", getRequestorServiceId()=");
 			builder.append(((RequestorServiceBean) bean).getRequestorServiceId());
@@ -136,19 +136,35 @@ public class RequestorUtils {
 		if (o1 == o2) { return true; }
 		if (o2 == null) { return false; }
 		if (o1 == null) { return false; }
-		if (o1.getClass() != o2.getClass()) { return false; }
+		if (!(o2 instanceof RequestorBean)) { return false; }
 		// -- Verify obj type
-		RequestorBean rhs = (RequestorBean) o2;
-		EqualsBuilder equalsBuilder = new EqualsBuilder();
-		equalsBuilder.append(o1.getRequestorId(), rhs.getRequestorId());
+		RequestorBean ro2 = (RequestorBean) o2;
+		if (!StringUtils.equals(o1.getRequestorId(), ro2.getRequestorId())) {
+			return false;
+		}
 		if (o1 instanceof RequestorCisBean) {
-			equalsBuilder.append(((RequestorCisBean)o1).getCisRequestorId(), ((RequestorCisBean)rhs).getCisRequestorId());
+			if (!(o2 instanceof RequestorCisBean)) {
+				return false;
+			}
+			if (!StringUtils.equals(((RequestorCisBean)o1).getCisRequestorId(), ((RequestorCisBean)ro2).getCisRequestorId())) {
+				return false;
+			}
 		}
-		if (o1 instanceof RequestorServiceBean) {
-			equalsBuilder.append(((RequestorServiceBean)o1).getRequestorServiceId().getIdentifier(), ((RequestorServiceBean)rhs).getRequestorServiceId().getIdentifier());
-			equalsBuilder.append(((RequestorServiceBean)o1).getRequestorServiceId().getServiceInstanceIdentifier(), ((RequestorServiceBean)rhs).getRequestorServiceId().getServiceInstanceIdentifier());
+		else if (o1 instanceof RequestorServiceBean) {
+			if (!(o2 instanceof RequestorServiceBean)) {
+				return false;
+			}
+			if (!ServiceUtils.compare(((RequestorServiceBean)o1).getRequestorServiceId(), ((RequestorServiceBean)ro2).getRequestorServiceId())) {
+				return false;
+			}
 		}
-		return equalsBuilder.isEquals();
+		else {
+			if (o2 instanceof RequestorCisBean
+					|| o2 instanceof RequestorServiceBean) {
+				return false;
+			}
+		}
+		return true;
 	}
 	/**
 	 * Use equal instead

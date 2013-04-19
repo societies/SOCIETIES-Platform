@@ -155,7 +155,7 @@ public class ResourceUtils {
 		if (o1 == o2) { return true; }
 		if (o2 == null) { return false; }
 		if (o1 == null) { return false; }
-		if (o1.getClass() != o2.getClass()) { return false; }
+		if (!(o2 instanceof List)) { return false; }
 		// -- Verify obj type
 		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource> ro2 = (List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource>) o2;
 		if (o1.size() != ro2.size()) {

@@ -24,16 +24,22 @@
  */
 package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
+
+import android.text.TextUtils;
 
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
  */
 public class ConditionUtils {
+	public static Map<String, String> map2FriendlyName;
 
 	/**
 	 * Instantiate a mandatory condition
@@ -52,15 +58,15 @@ public class ConditionUtils {
 		condition.setOptional(optional);
 		return condition;
 	}
-	
+
 	public static Condition createPrivate() {
 		return create(ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY, "Yes");
 	}
-	
+
 	public static Condition createMembersOnly() {
 		return create(ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY, "Yes");
 	}
-	
+
 	public static Condition createPublic() {
 		return create(ConditionConstants.SHARE_WITH_3RD_PARTIES, "Yes");
 	}
@@ -89,31 +95,141 @@ public class ConditionUtils {
 		return sb.toString();
 	}
 
-	public static boolean equals(Condition o1, Object o2) {
-		// -- Verify reference equality
-		if (o2 == null) { return false; }
-		if (o1 == o2) { return true; }
-		if (o1.getClass() != o2.getClass()) { return false; }
-		// -- Verify obj type
-		Condition rhs = (Condition) o2;
-		return ((o1.getConditionConstant().name().equals(rhs.getConditionConstant().name())
-				&& o1.getValue().equals(rhs.getValue())
-				&& o1.isOptional() == rhs.isOptional())
-				);
+	public static String toString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition condition){
+		StringBuilder builder = new StringBuilder();
+		builder.append("Condition [getConditionConstant()=");
+		if (null != condition) {
+			builder.append(condition.getConditionConstant());
+			builder.append(", isOptional()=");
+			builder.append(condition.isOptional());
+			builder.append(", getValue()=");
+			builder.append(condition.getValue());
+		}
+		builder.append("]");
+		return builder.toString();
 	}
 
-	public static boolean equals(List<Condition> o1, Object o2) {
+	public static String toString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> conditions){
+		StringBuilder sb = new StringBuilder();
+		if (null != conditions) {
+			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition condition : conditions) {
+				sb.append(toString(condition));
+			}
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * To retrieve the friendly names
+	 * @param haystack List of conditions
+	 * @return List of condition friendly names
+	 */
+	public List<String> getFriendlyName(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> haystack) {
+		List<String> friendlyNameList = new ArrayList<String>();
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition entry : haystack) {
+			friendlyNameList.add(getFriendlyName(entry));
+		}
+		return friendlyNameList;
+	}
+
+	/**
+	 * To retrieve the friendly name
+	 * @param entry condition
+	 * @return condition friendly name
+	 */
+	public static String getFriendlyName(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition entry) {
+		if (null != entry && null != entry.getConditionConstant()) {
+			return "";
+		}
+		if (null == map2FriendlyName || map2FriendlyName.size() <= 0) {
+			map2FriendlyName = new HashMap<String, String>();
+			map2FriendlyName.put(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.SHARE_WITH_3RD_PARTIES.name(), "Shared with the world");
+			map2FriendlyName.put(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.SHARE_WITH_CIS_MEMBERS_ONLY.name(), "Shared with community members");
+			map2FriendlyName.put(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.SHARE_WITH_CIS_OWNER_ONLY.name(), "Not shared");
+			map2FriendlyName.put(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.MAY_BE_INFERRED.name(), "Warning, this data may be inferred");
+			map2FriendlyName.put(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.DATA_RETENTION_IN_SECONDS.name(), "Data retention in seconds");
+			map2FriendlyName.put(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.DATA_RETENTION_IN_MINUTES.name(), "Data retention in minutes");
+			map2FriendlyName.put(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.DATA_RETENTION_IN_HOURS.name(), "Data retention in hours");
+			map2FriendlyName.put(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.RIGHT_TO_OPTOUT.name(), "Right to optout");
+			map2FriendlyName.put(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.STORE_IN_SECURE_STORAGE.name(), "Stored in a secure storage");
+			map2FriendlyName.put(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA.name(), "Right to access held data");
+			map2FriendlyName.put(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.RIGHT_TO_CORRECT_INCORRECT_DATA.name(), "Right to correct invalid data");
+		}
+		if (map2FriendlyName.containsKey(entry.getConditionConstant().name())) {
+			return map2FriendlyName.get(entry.getConditionConstant().name());
+		}
+		return entry.getConditionConstant().name();
+	}
+	public static boolean equal(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition o1, Object o2, boolean dontCheckOptional) {
 		// -- Verify reference equality
-		if (o2 == null) { return false; }
 		if (o1 == o2) { return true; }
+		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
 		if (o1.getClass() != o2.getClass()) { return false; }
 		// -- Verify obj type
-		List<Condition> rhs = (List<Condition>) o2;
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition ro2 = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition) o2;
+		return (ConditionConstantsUtils.equal(o1.getConditionConstant(), ro2.getConditionConstant())
+				&& (TextUtils.equals(o1.getValue(), ro2.getValue()))
+				&& (dontCheckOptional || o1.isOptional() == ro2.isOptional())
+				);
+	}
+	@Deprecated
+	public static boolean equals(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition o1, Object o2) {
+		return equal(o1, o2);
+	}
+	public static boolean equal(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition o1, Object o2) {
+		return equal(o1, o2, false);
+	}
+
+	public static boolean equal(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> o1, Object o2) {
+		// -- Verify reference equality
+		if (o1 == o2) { return true; }
+		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> ro2 = (List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition>) o2;
+		if (o1.size() != ro2.size()) {
+			return false;
+		}
 		boolean result = true;
-		int i = 0;
-		for(Condition o1Element : o1) {
-			result &= equals(o1Element, rhs.get(i++));
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition o1Entry : o1) {
+			result &= contain(o1Entry, ro2);
 		}
 		return result;
+	}
+
+	public static boolean contain(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition conditionToCheck, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> conditions) {
+		if (null == conditions || conditions.size() <= 0 || null == conditionToCheck) {
+			return false;
+		}
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition condition : conditions) {
+			if (equal(conditionToCheck, condition)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * All mandatory requested elements of the haystack are in the needles list
+	 * The needle list may contain other elements
+	 * @param needles
+	 * @param haystack
+	 * @return
+	 */
+	public static boolean containAllMandotory(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> needles, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> haystack) {
+		if (null == haystack || haystack.size() <= 0) {
+			return true;
+		}
+		for (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition entry : haystack){
+			if (entry.isOptional()) {
+				continue;
+			}
+			if (!contain(entry, needles)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

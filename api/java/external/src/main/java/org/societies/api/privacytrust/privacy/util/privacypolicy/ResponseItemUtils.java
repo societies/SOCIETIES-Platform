@@ -109,7 +109,7 @@ public class ResponseItemUtils {
 		if (o1 == o2) { return true; }
 		if (o2 == null) { return false; }
 		if (o1 == null) { return false; }
-		if (o1.getClass() != o2.getClass()) { return false; }
+		if (!(o2 instanceof List)) { return false; }
 		// -- Verify obj type
 		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> ro2 = (List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem>) o2;
 		if (o1.size() != ro2.size()) {
@@ -132,6 +132,18 @@ public class ResponseItemUtils {
 			}
 		}
 		return false;
+	}
+	
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem containSameResource(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem needle, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> haystack) {
+		if (null == haystack || haystack.size() <= 0 || null == needle) {
+			return null;
+		}
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem entry : haystack) {
+			if (ResourceUtils.equal(needle.getRequestItem().getResource(), entry.getRequestItem().getResource())) {
+				return entry;
+			}
+		}
+		return null;
 	}
 
 
