@@ -52,7 +52,7 @@ public abstract class TrustEngine {
 	protected ITrustNodeMgr trustNodeMgr;
 	
 	/** The executor service. */
-	protected ExecutorService executorService = Executors.newSingleThreadExecutor();
+	protected static ExecutorService executorService = Executors.newSingleThreadExecutor();
 	
 	protected TrustEngine(ITrustEventMgr trustEventMgr) {
 		
