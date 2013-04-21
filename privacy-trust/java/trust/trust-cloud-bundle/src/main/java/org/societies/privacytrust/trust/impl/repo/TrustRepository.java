@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Criteria;
-import org.hibernate.LockMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -170,8 +169,7 @@ public class TrustRepository implements ITrustRepository {
 			final Criteria criteria = session.createCriteria(entityClass)
 					.add(Restrictions.and(
 							Restrictions.eq("trustorId", trustorId),
-							Restrictions.eq("trusteeId", trusteeId)
-					)).setLockMode(LockMode.UPGRADE);
+							Restrictions.eq("trusteeId", trusteeId)));
 			
 			//if (TrustedCss.class.equals(entityClass))
 			//	criteria.setFetchMode("communities", FetchMode.SELECT);
