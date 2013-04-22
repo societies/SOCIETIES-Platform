@@ -236,14 +236,13 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 		try{
 			InetAddress localAddress = InetAddress.getLocalHost();
 			
-			LOG.debug("Cloud Node IP address: " + localAddress);
-			
 			if (null != localAddress) {
+				LOG.debug("Cloud Node IP address: " + localAddress);
 				NetworkInterface networkInterface =  NetworkInterface.getByInetAddress(localAddress);
 				
-				LOG.debug("Cloud Node network interface: " + networkInterface.getName());
-				
 				if (null != networkInterface) {
+					LOG.debug("Cloud Node network interface: " + networkInterface.getName());
+					
 					byte[] macAddress = networkInterface.getHardwareAddress();
 					StringBuilder sb = new StringBuilder();
 					for (int i = 0; i < macAddress.length; i++) {
