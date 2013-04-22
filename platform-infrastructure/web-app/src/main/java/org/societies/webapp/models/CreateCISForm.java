@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import org.societies.api.cis.attributes.Rule;
 import org.springframework.util.AutoPopulatingList;
 
+@Deprecated // No longer used after move from JSP to JSF
 public class CreateCISForm {
 
 	@NotNull

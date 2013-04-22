@@ -3,6 +3,7 @@ package org.societies.android.platform.useragent.feedback;
 import java.util.List;
 
 import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.comms.xmpp.VCardParcel;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
@@ -18,8 +19,11 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Respons
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -32,6 +36,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TableLayout;
@@ -49,6 +54,7 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 	private View[][] allResponses;
 	private TableLayout[] tblConditions;
 	private ScrollView svScroll;
+	private boolean published = false;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -134,7 +140,7 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 					checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 						@Override
 						public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-							String conditionValue = (isChecked ? "YES" : "NO");
+							String conditionValue = (isChecked ? "1" : "0");
 							String posValues = (String)buttonView.getContentDescription();
 							String[] positions = posValues.split("_");
 							int responsePos = Integer.parseInt(positions[0]);
@@ -174,6 +180,16 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
         		finish(); //BASICALLY, IGNORE REQUEST
         	}
         });
+        
+        //ADD IMAGE - IF AVAILABLE
+        VCardParcel vCard = (VCardParcel) getIntent().getParcelableExtra(UserFeedbackActivityIntentExtra.EXTRA_CSS_VCARD);;
+	    byte[] avatarBytes = vCard.getAvatar();
+	    if (avatarBytes != null) {
+	    	Bitmap bMap = BitmapFactory.decodeByteArray(avatarBytes, 0, avatarBytes.length);
+	    
+	    	ImageView image = (ImageView) findViewById(R.id.imageProfile);
+	    	image.setImageBitmap(bMap);
+	    }
     }
 
     @Override
@@ -195,31 +211,51 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 		
 	}
 	
-	private void publishEvent() {
-		if (!isEventsConnected) {
-			eventsHelper.setUpService(new IMethodCallback() {
+	@Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "NegotiationActivity terminating");
+		if (isEventsConnected) {
+			eventsHelper.tearDownService(new IMethodCallback() {
 				@Override
 				public void returnException(String result) { }
 				@Override
 				public void returnAction(String result) { }
 				@Override
-				public void returnAction(boolean resultFlag) { 
-					if (resultFlag) {
-						try {
-							eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT, NegotiationActivity.this.eventInfo, new IPlatformEventsCallback() {
-								@Override
-								public void returnException(int exception) { }
-								@Override
-								public void returnAction(int result) { }
-								@Override
-								public void returnAction(boolean resultFlag) { }
-							});
-						} catch (PlatformEventsHelperNotConnectedException e) {
-							e.printStackTrace();
+				public void returnAction(boolean resultFlag) { }
+			});
+		}
+		super.onDestroy();
+	}
+	
+	private void publishEvent() {
+		if (!published) { //EVENT IS BEING PUBLISHED MULTIPLE TIMES
+			if (!isEventsConnected) {
+				eventsHelper.setUpService(new IMethodCallback() {
+					@Override
+					public void returnException(String result) { }
+					@Override
+					public void returnAction(String result) { }
+					@Override
+					public void returnAction(boolean resultFlag) { 
+						if (resultFlag) {
+							try {
+								isEventsConnected = true;
+								published = true;
+								eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT, NegotiationActivity.this.eventInfo, new IPlatformEventsCallback() {
+									@Override
+									public void returnException(int exception) { }
+									@Override
+									public void returnAction(int result) { }
+									@Override
+									public void returnAction(boolean resultFlag) { }
+								});
+							} catch (PlatformEventsHelperNotConnectedException e) {
+								e.printStackTrace();
+							}
 						}
 					}
-				}
-			});
+				});
+			}
 		}
 	}
 	

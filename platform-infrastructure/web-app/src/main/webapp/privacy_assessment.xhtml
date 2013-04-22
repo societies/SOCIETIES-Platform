@@ -1,7 +1,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
@@ -16,47 +18,62 @@
             <div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a></div>
             <!-- Form -->
             <section class="form_style_main">
-                <form action="" method="" id="">
+                <form action="" method="" id="form1">
                     <h4 class="form_title">Privacy Assessment</h4>
 
                     <div class="hr dotted clearfix"></div>
                     <ul>
                         <li class="clearfix">
+                        	<label for="">Description</label>
+                        	<p>To assess possible transmission of your data by installed services, the platform monitors any data access or data transmission by services, and calculates privacy assessment metrics.
+                        	To switch between various metrics, click left and right arrows below.</p>
+                        	<p><i>Note that a high value does not necessarily indicate malicious behavior, or a violation of any agreement or privacy policy. Keep in mind the correlation results are only an assessment, and many services may be accessing and/or transmitting your data in scope of their normal operation. It is up to you to decide if data access and data transmission are excessive or not.</i></p>
+                        	<p>To get latest data, click "Regenerate images".</p>
+                        </li>
+<!--
+                        <li class="clearfix">
                             <label for="">Show results for</label>
+							
+							<p:selectOneMenu value="#{privacyAssessmentForm.assessmentSubject}" var="p">
+								<f:selectItems value="#{privacyAssessmentForm.assessmentSubjects}" var="as" itemLabel="#{as}" itemValue="#{as}"/>
+								<p:column>
+									#{p}
+								</p:column>
+							</p:selectOneMenu>
 
-                            <div class="select-wrapper">
-                                <select name="select" required="required">
-                                    <option value="1">Receiver identities</option>
-                                    <option value="2">Sender identities</option>
-                                    <option value="3">Sender classes</option>
-                                    <option value="4">Data access by identities</option>
-                                    <option value="5">Data access by class</option>
-                                </select>
+                            <div id="button">
+                                <input type="submit" id="send_message" class="sendButton" value="Send"/>
                             </div>
                             <div class="clear"></div>
                             <p id="option" class="error">Please, select an option</p>
                         </li>
+-->
                         <li class="clearfix">
-                            <label for="option">Settings</label>
-
-                            <div class="option-group check">
-                                <input type="checkbox" name="" id="check1"/>
-                                <label for="check1">Enable periodic assessment every</label>
-                                <p:inputText id="autoAssessmentPeriod" value="#{assessmentController.autoAssessmentPeriod}"/>
-                                <label for="autoAssessmentPeriod">seconds</label>
-						        <p:commandButton value="Assess now" actionListener="#{assessmentController.assessNow}"/>
-                            </div>
-                            <div class="clear"></div>
-                            <p id="option" class="error">Please, select an option</p>
+                        	<label for="">Results</label>
+							<p:commandButton actionListener="#{privacyAssessmentService.previousImage}" update="dynamicImage" icon="ui-icon-circle-triangle-w"/>  
+							<p:commandButton actionListener="#{privacyAssessmentService.nextImage}" update="dynamicImage" icon="ui-icon-circle-triangle-e"/>
+							<br/>
+							<p:graphicImage value="#{privacyAssessmentService.image}" id="dynamicImage"/>
+<!--
+							<br/>
+							<p:commandButton type="button" onClick="switcher.previous();" icon="ui-icon-circle-triangle-w"/>  
+							<p:commandButton type="button" onclick="switcher.next();" icon="ui-icon-circle-triangle-e"/>
+							<br/>
+							<p:imageSwitch effect="fade" widgetVar="switcher" slideshowAuto="false">
+								<ui:repeat value="#{privacyAssessmentService.images}" var="curimage">
+									<p:graphicImage value="#{curimage}" />
+								</ui:repeat>
+							</p:imageSwitch>
+-->
                         </li>
                         <li class="clearfix">
                             <p class="success">Thank you! Success Message here.</p>
 
                             <p class="error">Sorry, an error has occured. Please try again later.</p>
 
-                            <div id="button">
-                                <input type="submit" id="send_message" class="sendButton" value="Send"/>
-                            </div>
+					        <p:commandButton value="Regenerate images" actionListener="#{assessmentController.assessNow}" update="dynamicImage"/>
+							<br/><br/>
+                            <a href="privacy_assessment_settings.xhtml">Advanced Settings</a>
                         </li>
                     </ul>
                 </form>

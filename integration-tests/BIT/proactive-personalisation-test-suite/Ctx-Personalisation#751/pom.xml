@@ -2,10 +2,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>integration.test.bit.context_triggered_personalisation_751</artifactId>
+	<artifactId>bit.context_triggered_personalisation.1874</artifactId>
 	<name>Context Triggered Personalisation Integration Test</name>
 	<packaging>bundle</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${release.version}</version>
 
 	<developers>
 		<developer>

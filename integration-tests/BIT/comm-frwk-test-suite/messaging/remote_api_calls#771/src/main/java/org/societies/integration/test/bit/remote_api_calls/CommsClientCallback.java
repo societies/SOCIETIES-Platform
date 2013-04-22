@@ -77,7 +77,7 @@ public class CommsClientCallback implements ICommCallback {
 		//CHECK WHICH END SERVICE IS SENDING US A MESSAGE
 		// --------- CALCULATOR BUNDLE ---------
 		
-		LOG.info("###771... callback receiveResult:");
+		LOG.info("###1855... callback receiveResult:");
 		if (msgBean.getClass().equals(CalcBeanResult.class)) {
 			calcResult = (CalcBeanResult) msgBean;
 			synchronized (this) {

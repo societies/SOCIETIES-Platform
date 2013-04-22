@@ -37,6 +37,11 @@ import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+
 import org.apache.shindig.social.opensocial.model.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,8 +109,9 @@ import org.societies.utilities.DBC.Dbc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
+import org.societies.api.css.ICSSManager;
 
-public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
+public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSManager {
 	private static Logger LOG = LoggerFactory.getLogger(CSSManager.class);
 
 	public static final String TEST_IDENTITY_1 = "node11";
@@ -226,9 +232,35 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 		cssNode.setIdentity(identity);
 		cssNode.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
 		cssNode.setType(CSSManagerEnums.nodeType.Cloud.ordinal());
+		cssNode.setInteractable("false");
+		try{
+			InetAddress localAddress = InetAddress.getLocalHost();
+			
+			LOG.debug("Cloud Node IP address: " + localAddress);
+			
+			if (null != localAddress) {
+				NetworkInterface networkInterface =  NetworkInterface.getByInetAddress(localAddress);
+				
+				LOG.debug("Cloud Node network interface: " + networkInterface.getName());
+				
+				if (null != networkInterface) {
+					byte[] macAddress = networkInterface.getHardwareAddress();
+					StringBuilder sb = new StringBuilder();
+					for (int i = 0; i < macAddress.length; i++) {
+						sb.append(String.format("%02X%s", macAddress[i], (i < macAddress.length - 1) ? ":" : ""));		
+					}
+					cssNode.setCssNodeMAC(sb.toString());
+				}
+			}
+			
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (SocketException e){
+			e.printStackTrace();
+		}
 
 		try {
-			//if CssRecord does not exist create new CssRecord in persistance layer
+			//if CssRecord does not exist create new CssRecord in persistence layer
 
 			if (!this.cssRegistry.cssRecordExists()) {
 
@@ -236,6 +268,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 				CssRecord cssProfile = new CssRecord();
 				cssProfile.getCssNodes().add(cssNode);
 				cssProfile.setCssIdentity(identity);
+				
 //				cssProfile.setCssInactivation("0");
 
 //				cssProfile.setCssRegistration(this.getDate());
@@ -506,24 +539,12 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 				cssRecord.setForeName(profile.getForeName());
 				cssRecord.setName(profile.getName());
 				cssRecord.setEmailID(profile.getEmailID());
-//				cssRecord.setImID(profile.getImID());
-//				cssRecord.setSocialURI(profile.getSocialURI());
 				cssRecord.setSex(profile.getSex());
 				cssRecord.setHomeLocation(profile.getHomeLocation());
 				cssRecord.setEntity(profile.getEntity());
 				cssRecord.setWorkplace(profile.getWorkplace());
 				cssRecord.setPosition(profile.getPosition());
-				cssRecord.setCssNodes(profile.getCssNodes());
 
-				LOG.info("modifyCssRecord cssRecord Entity: " +cssRecord.getEntity());
-				LOG.info("modifyCssRecord cssRecord Name : "  +cssRecord.getName());
-				LOG.info("modifyCssRecord cssRecord EmailID : " +cssRecord.getEmailID());
-				LOG.info("modifyCssRecord cssRecord Sex : " +cssRecord.getSex());
-				LOG.info("modifyCssRecord cssRecord CSSID : " +cssRecord.getCssIdentity());
-				LOG.info("modifyCssRecord cssRecord Workplace : " +cssRecord.getWorkplace());
-				LOG.info("modifyCssRecord cssRecord Position : " +cssRecord.getPosition());
-				
-				LOG.info("modifyCssRecord cssRecord CssNodes : " +cssRecord.getCssNodes());
 
 				// internal eventing
 
@@ -653,8 +674,33 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager {
 	}
 
 	public Future<CssInterfaceResult> synchProfile(CssRecord profile) {
-		// TODO Auto-generated method stub
-		return null;
+		LOG.info("Calling synchProfile");
+		Dbc.require("CssRecord parameter cannot be null", profile != null);
+
+        CssInterfaceResult result = new CssInterfaceResult();
+		result.setProfile(profile);
+		result.setResultStatus(false);
+
+		CssRecord cssRecord = null;
+
+		try {
+			if (this.cssRegistry.cssRecordExists()) {
+				cssRecord = this.cssRegistry.getCssRecord();
+
+				result.setProfile(cssRecord);
+				result.setResultStatus(true);
+
+			} else {
+				LOG.equals("Css record does not exist");
+			}
+
+
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return new AsyncResult<CssInterfaceResult>(result);
 	}
 
 	@Override
@@ -1679,7 +1725,8 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 				@Override
 				public void getResult(List<CssAdvertisementRecord> resultList) {
 					if (resultList.size() > 0)
-						addActivityToCSSAF(resultList.get(0).getName() + " accepted your friend request");
+						//addActivityToCSSAF(resultList.get(0).getName() + " accepted your friend request");
+						addActivityToCSSAF("Accepted friend request from " +resultList.get(0).getName());
 					else
 						addActivityToCSSAF("Accepted friend request from " + who);
 				}
@@ -1791,8 +1838,11 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		List<String> foursquareFriends = new ArrayList<String>();
 		List<String> googleplusFriends = new ArrayList<String>();
 		List<String> CISMembersFriends = new ArrayList<String>();
+		List<String> alreadyListed = new ArrayList<String>();
 		Future<List<CssAdvertisementRecordDetailed>> asynchallcss =  this.getCssAdvertisementRecordsFull();
 		List<CssAdvertisementRecordDetailed> allcssDetails = new ArrayList<CssAdvertisementRecordDetailed>();
+		Future<List<CssAdvertisementRecord>> asyncalreadyFriends = this.getCssFriends();
+		List<CssAdvertisementRecord> alreadyFriends = new ArrayList<CssAdvertisementRecord>();
 		
 		HashMap<IIdentity, Integer> commonFriends = new HashMap<IIdentity, Integer>();
 		HashMap<IIdentity, Integer> comparedFriends = new HashMap<IIdentity, Integer>();
@@ -1904,18 +1954,40 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 
 			getCssDirectoryRemote().findAllCssAdvertisementRecords(callback);
 			recordList = callback.getResultList();
+			
+			try {
+				alreadyFriends = asyncalreadyFriends.get();
+				if (alreadyFriends.size() > 0){
+					for (CssAdvertisementRecord arf : alreadyFriends){
+						alreadyListed.add(arf.getName());
+					}
+				}
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (ExecutionException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 
 			for (CssAdvertisementRecord cssAdd : recordList) {
 			
 				if (cssAdd.getId().equalsIgnoreCase(MyId)) {
 				LOG.info("This is my OWN ID not adding it");
 				}else {
-					try {
-						cssFriend.add((this.commManager.getIdManager().fromJid(cssAdd.getId())));
-					} catch (InvalidFormatException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					if (alreadyListed.contains(cssAdd.getName())){
+						LOG.info("Already a friend not adding it");
 					}
+					else {
+						try {
+							cssFriend.add((this.commManager.getIdManager().fromJid(cssAdd.getId())));
+						} catch (InvalidFormatException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+						
+				
 				}
 
 			
@@ -2241,6 +2313,7 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 	List<CssAdvertisementRecord> cssFriends = new ArrayList<CssAdvertisementRecord>();
 	List<Person> snFriends = new ArrayList<Person>();
 	List<String> socialFriends = new ArrayList<String>();
+	List<String> alreadyListed = new ArrayList<String>();
 	
 	List<String> facebookFriends = new ArrayList<String>();
 	List<String> twitterFriends = new ArrayList<String>();
@@ -2251,6 +2324,8 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 	List<ICis> cisList = new ArrayList<ICis>();
 	Future<List<CssAdvertisementRecordDetailed>> asynchallcss =  this.getCssAdvertisementRecordsFull();
 	List<CssAdvertisementRecordDetailed> allcssDetails = new ArrayList<CssAdvertisementRecordDetailed>();
+	Future<List<CssAdvertisementRecord>> asyncalreadyFriends = this.getCssFriends();
+	List<CssAdvertisementRecord> alreadyFriends = new ArrayList<CssAdvertisementRecord>();
 	HashMap<CssAdvertisementRecord, Integer> commonFriends = new HashMap<CssAdvertisementRecord, Integer>();
 	HashMap<CssAdvertisementRecord, Integer> comparedFriends = new HashMap<CssAdvertisementRecord, Integer>();
 	
@@ -2362,15 +2437,37 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 
 		getCssDirectoryRemote().findAllCssAdvertisementRecords(callback);
 		recordList = callback.getResultList();
+		
+		try {
+			alreadyFriends = asyncalreadyFriends.get();
+			if (alreadyFriends.size() > 0){
+				for (CssAdvertisementRecord arf : alreadyFriends){
+					alreadyListed.add(arf.getName());
+				}
+			}
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ExecutionException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		for (CssAdvertisementRecord cssAdd : recordList){
-		
 			if (cssAdd.getId().equalsIgnoreCase(MyId)) {
 			LOG.info("@@@@@@@ This is my OWN ID not adding it");
 			}else {
-				cssFriends.add((cssAdd));
+				if (alreadyListed.contains(cssAdd.getName())){
+					LOG.info("Already a friend not adding it");
+				}
+				else {
+					cssFriends.add((cssAdd));
+				}
+					
 			}
 		}
+		LOG.info("###### cssFriends size is now: " +cssFriends.size());
+		
 	}
 
 	// Generate the connector
@@ -2616,11 +2713,15 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 						}
 					}
              }else {
+            	 
             	 for(int j = 0; j < cssFriends.size(); j++){
             		 LOG.info("Adding friends to comparedfriends list " +cssFriends.get(j).getName());
             		 comparedFriends.put(cssFriends.get(j), none );
             	 }
              }
+             
+             
+             
     
 	return new AsyncResult<HashMap<CssAdvertisementRecord, Integer>> (comparedFriends);
 	}
@@ -2698,9 +2799,11 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		final CssRequest request = new CssRequest();
 		request.setCssIdentity(identity.toString());
 		request.setRequestStatus(statusType);
-		LOG.info("handleExternalFriendRequest called : ");
-		LOG.info("Request from identity: " +identity);
-		LOG.info("Request  status: " +statusType);
+		LOG.debug("handleExternalFriendRequest called : ");
+		LOG.debug("Request from identity: " +identity);
+		LOG.debug("Request  status: " +statusType);
+		LOG.debug("Request  Origin: " +request.getOrigin());
+		request.setOrigin(CssRequestOrigin.REMOTE);
 
 		try {
 			cssRegistry.updateCssFriendRequestRecord(request);
@@ -2746,6 +2849,7 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		//ACTIVITY FEED
 		List<String> listIDs = new ArrayList<String>();
 		listIDs.add(request.getCssIdentity());
+		LOG.debug("External Handle listIDs is : " +listIDs);
 		final String who = request.getCssIdentity();
 		cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
 			@Override
@@ -2754,6 +2858,7 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 					addActivityToCSSAF("Friend request " + request.getRequestStatus() + " by " + resultList.get(0).getName());
 				else
 					addActivityToCSSAF("Friend request " + request.getRequestStatus() + " by " + who);
+				
 			}
 		});
 	}
@@ -2766,35 +2871,58 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		pendingFR.setOrigin(CssRequestOrigin.LOCAL);
 		acceptCssFriendRequest(pendingFR);
 		
+		LOG.debug("+++++++++++++handleInternalFriendRequest called : ");
+		LOG.debug("+++++++++++++Request from identity: " +identity);
+		LOG.debug("+++++++++++++Request  status: " +statusType);
+		
 		//ACTIVITY FEED
 		List<String> listIDs = new ArrayList<String>();
 		listIDs.add(identity.toString());
+		LOG.debug("listIDs is : " +listIDs);
 		final String who = identity.toString();
 		cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
 			@Override
 			public void getResult(List<CssAdvertisementRecord> resultList) {
 				if (resultList.size() > 0)
-					addActivityToCSSAF(resultList.get(0).getName() + " accepted your friend request");
+					//addActivityToCSSAF(resultList.get(0).getName() + " accepted your friend request");
+					addActivityToCSSAF(" Accepted friend request from " +resultList.get(0).getName());
+			
 				else
 					addActivityToCSSAF("Friend request accepted by " + who);
+				
 			}
 		});
+	}
+	
+	@Override
+	public void handleExternalUpdateRequest(IIdentity identity, CssRequestStatusType statusType) {
+		//identity is who the request has come FROM
+		final CssRequest request = new CssRequest();
+		request.setCssIdentity(identity.toString());
+		request.setRequestStatus(statusType);
+		LOG.debug("handleExternalUpdateRequest called : ");
+		LOG.debug("Request from identity: " +identity);
+		LOG.debug("Request  status: " +statusType);
+		request.setOrigin(CssRequestOrigin.REMOTE);
+
+		try {
+			cssRegistry.updateCssFriendRequestRecord(request);
+			cssRegistry.updateCssRequestRecord(request);
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// If this was initiated locally then inform remote css
+		// We only want to sent messages to remote Css's for this function if we initiated the call locally
+		if (request.getOrigin() == CssRequestOrigin.LOCAL) {
+			// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
+			// otherwise send message to remote css
+			LOG.debug("INSIDE IF STATEMENT -> Request  origin: " +request.getOrigin());
+			//called updateCssFriendRequest on remote
+			request.setOrigin(CssRequestOrigin.REMOTE);
+			cssManagerRemote.updateCssRequest(request);
+		}
 		
-		//addActivityToCSSAF("CSS Friend Request has been " +pendingFR.getRequestStatus() +"by " +identity.toString());
-		//UPDATE LOCAL DATABASE WITH THIS FRIEND REQUEST
-		//CssRequest request = new CssRequest();
-		//request.setCssIdentity(identity.toString());
-		//LOG.info("handleInternalFriendRequest called : ");
-		//LOG.info("Request from identity: " +identity);
-		//LOG.info("Request  status: " +statusType);
-		//try {
-		//	cssRegistry.updateCssFriendRequestRecord(request);
-		//	//cssRegistry.updateCssFriendRequestRecord(request);
-		//	cssRegistry.updateCssRequestRecord(request);
-		//} catch (CssRegistrationException e) {
-		//	// TODO Auto-generated catch block
-		//	e.printStackTrace();
-		//}
 	}
 
 	public void pushtoContext(CssRecord record) {

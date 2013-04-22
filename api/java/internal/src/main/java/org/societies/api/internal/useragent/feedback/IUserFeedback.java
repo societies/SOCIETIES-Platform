@@ -52,6 +52,15 @@ public interface IUserFeedback
 	
 	public void submitExplicitResponse(String id, List<String> result);
 	
+	/**
+	 * Submit an explicit response for privacy negotiation userfeedback request type
+	 * @param requestId Id of the userfeedback request
+	 * @param negotiationDetails
+	 * @param result 
+	 */
+	public void submitExplicitResponse(String requestId,
+			NegotiationDetailsBean negotiationDetails, ResponsePolicy result);
+	
 	public void submitImplicitResponse(String id, Boolean result);
 	
 	public Future<ResponsePolicy> getPrivacyNegotiationFB(ResponsePolicy policy, NegotiationDetailsBean details);

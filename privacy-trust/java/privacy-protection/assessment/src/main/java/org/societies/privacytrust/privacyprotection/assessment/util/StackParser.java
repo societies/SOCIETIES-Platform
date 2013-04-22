@@ -42,6 +42,14 @@ public class StackParser {
 
 	private static final String PROXY_CLASS = "org.springframework.aop.framework.JdkDynamicAopProxy";
 	private static final String PROXY_METHOD = "invoke";
+	private static final String[] SYSTEM_CLASS_PREFIXES = new String[] {
+		 "java.lang.",
+		 "java.util.",
+		 "com.sun.proxy.",
+		 "sun.reflect.",
+		 "org.eclipse.virgo.kernel.",
+		 "org.springframework."
+	};
 	
 	private final StackTraceElement[] stack;
 	private int k = 0;
@@ -57,25 +65,66 @@ public class StackParser {
 	
 	public void log() {
 		
-		for (int k = 0; k < stack.length; k++) {
+		for (int i = 0; i < stack.length; i++) {
 			
 			// Full class name
-			LOG.debug("STACK[{}] class: {}", k, stack[k].getClassName());
+			LOG.debug("STACK[{}] class: {}", i, stack[i].getClassName());
 			
 			// Java file name without path
-			LOG.debug("STACK[{}] file: {}", k, stack[k].getFileName());
+			//LOG.debug("STACK[{}] file: {}", i, stack[i].getFileName());
 			
 			// Method name without class name or parameters
-			LOG.debug("STACK[{}] method: {}", k, stack[k].getMethodName());
+			//LOG.debug("STACK[{}] method: {}", i, stack[i].getMethodName());
 			
 			// Full class name + method + file name + line number
-			LOG.debug("STACK[{}] toString: {}", k, stack[k].toString());
+			//LOG.debug("STACK[{}] toString: {}", i, stack[i].toString());
 			
 			// false for all classes of interest, true only for sun.reflect.NativeMethodAccessorImpl
-			LOG.debug("STACK[{}] isNative: {}", k, stack[k].isNativeMethod());
+			//LOG.debug("STACK[{}] isNative: {}", i, stack[i].isNativeMethod());
 		}
 	}
 	
+	/**
+	 * @return Classes from stack trace, excluding
+	 * java.lang.*,
+	 * java.util.*
+	 * com.sun.proxy.*,
+	 * sun.reflect.*,
+	 * org.eclipse.virgo.kernel.*,
+	 * org.springframework.*,
+	 */
+	public List<String> getAllClasses() {
+
+		List<String> invokers = new ArrayList<String>();
+		String clazz;
+
+		for (int i = 0; i < stack.length; i++) {
+			clazz = stack[i].getClassName();
+			if (!isSystemClass(clazz)) {
+				invokers.add(clazz);
+			}
+		}
+		return invokers;
+	}
+	
+	/**
+	 * @return true for parameters starting with either of these
+	 * java.lang.,
+	 * java.util.
+	 * com.sun.proxy.,
+	 * sun.reflect.,
+	 * org.eclipse.virgo.kernel.,
+	 * org.springframework.,
+	 */
+	public boolean isSystemClass(String clazz) {
+		for (String prefix : SYSTEM_CLASS_PREFIXES) {
+			if (clazz.startsWith(prefix)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public String getInvoker() {
 		k = 0;
 		return getNextInvoker();
@@ -87,6 +136,10 @@ public class StackParser {
 		return getNextInvoker();
 	}
 	
+	/**
+	 * 
+	 * @return Only those classes in stack trace that invoked other Virgo components through proxies
+	 */
 	public List<String> getAllInvokers() {
 
 		List<String> invokers = new ArrayList<String>();

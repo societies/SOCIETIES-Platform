@@ -87,4 +87,12 @@ public interface IServices {
 	 */
 	public boolean compare(ServiceResourceIdentifier serviceId, ServiceResourceIdentifier otherServiceId);
 
+	/**
+	 * This method allows a service to retrieve its category, for example "media" or "calendar"
+	 * 
+	 * @param serviceId
+	 * @return the service category
+	 */
+	public String getMyCategory(ServiceResourceIdentifier serviceId);
+
 }

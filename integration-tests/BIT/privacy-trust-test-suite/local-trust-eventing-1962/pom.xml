@@ -2,11 +2,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>local-trust-eventing</artifactId>
-	<groupId>org.societies.integration.test.bit</groupId>
+	<groupId>org.societies.integration.test</groupId>
+	<artifactId>bit.local_trust_eventing.1962</artifactId>
 	<name>#1962 Local Trust Eventing</name>
 	<packaging>bundle</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${release.version}</version>
 	<dependencies>
 	    <dependency>
 			<groupId>org.societies.api.external</groupId>

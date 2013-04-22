@@ -30,9 +30,16 @@
 	</developers>
 
     <dependencies>
-        <dependency>
-            <groupId>com.google.android</groupId>
-            <artifactId>android</artifactId>
+		<dependency>
+	    	<groupId>com.google.android</groupId>
+	        <artifactId>android</artifactId> 
+	        <exclusions>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.android.api.external</groupId>
@@ -40,12 +47,12 @@
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>
-		<dependency>
+<!-- 		<dependency>
 		    	<groupId>org.societies.android.platform.content</groupId>
 		    	<artifactId>SocietiesCSSContentProvider</artifactId>
    			<version>${release.version}</version>
    			<type>apklib</type>
-		</dependency>
+		</dependency> 
         <dependency>
    			<groupId>org.societies.android.platform.androidutils</groupId>
 		    <artifactId>SocietiesAndroidUtilities</artifactId>
@@ -57,14 +64,18 @@
 		    <artifactId>CommunicationFrameworkCommons</artifactId>
 		    <version>${version.comm}</version>
 		    <type>apklib</type>
-		</dependency>
+		</dependency>-->
 		<dependency>
 		    <groupId>org.societies.android.platform.comms.helper</groupId>
 			<artifactId>societies-android-comms-helper</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>   
-		
+		<dependency>
+			<artifactId>xpp3</artifactId>
+			<groupId>xpp3</groupId>
+			<scope>provided</scope>
+		</dependency>
         
     </dependencies>
 
@@ -78,4 +89,14 @@
             </plugin>
         </plugins>
     </build>
+    
+    	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</reporting>
+	
 </project>

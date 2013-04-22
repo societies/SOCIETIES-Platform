@@ -30,6 +30,7 @@
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="org.societies.android.SocialProvider.WRITE"/>
     <uses-permission android:name="org.societies.android.SocialProvider.READ"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     
     <!-- Traceview permission-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

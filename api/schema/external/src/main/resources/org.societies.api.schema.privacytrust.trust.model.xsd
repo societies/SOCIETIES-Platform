@@ -30,6 +30,7 @@
   
   <xs:simpleType name="trustEvidenceTypeBean">
     <xs:restriction base="xs:string">
+      <xs:enumeration value="directlyTrusted"/>
       <xs:enumeration value="rated"/>
       <xs:enumeration value="friendedUser"/>
       <xs:enumeration value="unfriendedUser"/>
@@ -49,10 +50,20 @@
 	</xs:sequence>
   </xs:complexType>
   
+  <xs:complexType name="trustRelationshipBean2">
+    <xs:sequence>
+      <xs:element name="trustorId" type="tns:trustedEntityIdBean" minOccurs="1" nillable="false"/>
+	  <xs:element name="trusteeId" type="tns:trustedEntityIdBean" minOccurs="1" nillable="false"/>
+	  <xs:element name="trustValueType" type="tns:trustValueTypeBean" minOccurs="1" nillable="false"/>
+	  <xs:element name="trustValue" type="xs:double" minOccurs="1" nillable="false"/>
+	  <!-- <xs:element name="timestamp" type="xs:dateTime" minOccurs="1" nillable="false"/> -->
+	</xs:sequence>
+  </xs:complexType>
+  
   <xs:element name="trustUpdateEventBean">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="trustRelationship" type="tns:trustRelationshipBean" minOccurs="1" nillable="false"/>
+        <xs:element name="trustRelationship" type="tns:trustRelationshipBean2" minOccurs="1" nillable="false"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>

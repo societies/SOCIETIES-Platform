@@ -193,6 +193,7 @@
     <xs:sequence>
       <xs:element name="id" type="xs:string" minOccurs="0"/>
       <xs:element name="diplayId" type="xs:string" minOccurs="0"/>
+      <xs:element name="idNoSpecChar" type="xs:string" minOccurs="0"/>
       <xs:element name="quality"  type="xs:string" minOccurs="0"/>
       <xs:element name="source"   type="xs:string" minOccurs="0"/>
       <xs:element name="model"    type="xs:string" minOccurs="0"/>

@@ -27,6 +27,12 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
 	private final static String CURRENT_NODE_1_IDENTITY = "alan@societies.bespoke/android1";
 	private final static String CURRENT_NODE_2_IDENTITY = "alan@societies.bespoke/rich1";
 	private final static String CURRENT_NODE_3_IDENTITY = "alan.societies.bespoke";
+	private final static String CURRENT_NODE_1_MACADDR = "11:11:11:11:11";
+	private final static String CURRENT_NODE_2_MACADDR = "22:11:11:11:11";
+	private final static String CURRENT_NODE_3_MACADDR = "33:11:11:11:11";
+	private final static String CURRENT_NODE_1_INTERACTABLE = "true";
+	private final static String CURRENT_NODE_2_INTERACTABLE = "true";
+	private final static String CURRENT_NODE_3_INTERACTABLE = "false";
 	
 	private final static String ARCHIVED_NODE_1_IDENTITY = "alan@societies.bespoke/android11";
 	private final static String ARCHIVED_NODE_2_IDENTITY = "alan@societies.bespoke/rich1222";
@@ -45,6 +51,25 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
     public static final String TEST_PASSWORD = "P455W0RD";
     public static final String TEST_SOCIAL_URI = "sombody@fb.com";
     public static final String TEST_DOMAIN_SERVER = "societies.bespoke";
+    public static final String TEST_POSITION = "operative";
+    public static final String TEST_WORKPLACE = "the Grindstone";
+    
+	public static final String TEST_UPDATE_IDENTITY = "alan.socities.bespoke";
+	public static final String TEST_UPDATE_INACTIVE_DATE = "20131029";
+    public static final String TEST_UPDATE_REGISTERED_DATE = "20130229";
+    public static final int TEST_UPDATE_UPTIME = 77967;
+    public static final String TEST_UPDATE_EMAIL = "somebody@tssg.net";
+    public static final String TEST_UPDATE_FORENAME = "4NameFore";
+    public static final String TEST_UPDATE_HOME_LOCATION = "The Hearthiest";
+    public static final String TEST_UPDATE_HOSTING_LOCATION = "Dubliner";
+    public static final String TEST_UPDATE_IDENTITY_NAME = "Id Nameest";
+    public static final String TEST_UPDATE_IM_ID = "somebody.tssg.orgy";
+    public static final String TEST_UPDATE_NAME = "The Other CSS";
+    public static final String TEST_UPDATE_PASSWORD = "P455Wweird";
+    public static final String TEST_UPDATE_SOCIAL_URI = "sombody@fb.net";
+    public static final String TEST_UPDATE_DOMAIN_SERVER = "societies.bespookiest";
+    public static final String TEST_UPDATE_POSITION = "operativeUnderling";
+    public static final String TEST_UPDATE_WORKPLACE = "the Slow Grindstone ";
 
     //Preferences
 	private static final String USER_VALUE = "paranoid";
@@ -125,7 +150,10 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
         assertNotNull(resolver);
         String columns [] = {CSSContentProvider.CssNodes.CSS_NODE_IDENTITY, 
         						CSSContentProvider.CssNodes.CSS_NODE_STATUS,
-        						CSSContentProvider.CssNodes.CSS_NODE_TYPE};
+        						CSSContentProvider.CssNodes.CSS_NODE_TYPE,
+        						CSSContentProvider.CssNodes.CSS_NODE_DEVICE_MAC_ADDRESS,
+        						CSSContentProvider.CssNodes.CSS_NODE_INTERACTABLE
+        						};
 		try {
             Cursor cursor = resolver.query(CSSContentProvider.CssNodes.CONTENT_URI, columns, null, null, null);
             assertNotNull(cursor);
@@ -136,6 +164,8 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
             		Log.d(LOG_TAG, "Node identity: " + cursor.getString(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_IDENTITY)));
             		Log.d(LOG_TAG, "Node status: " + cursor.getInt(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_STATUS)));
             		Log.d(LOG_TAG, "Node type: " + cursor.getInt(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_TYPE)));
+            		Log.d(LOG_TAG, "Node MAC: " + cursor.getInt(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_DEVICE_MAC_ADDRESS)));
+            		Log.d(LOG_TAG, "Node Interactable: " + cursor.getInt(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_INTERACTABLE)));
             	} while (cursor.moveToNext());
             }
             cursor.close();
@@ -150,7 +180,10 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
         assertNotNull(resolver);
         String columns [] = {CSSContentProvider.CssNodes.CSS_NODE_IDENTITY, 
         						CSSContentProvider.CssNodes.CSS_NODE_STATUS,
-        						CSSContentProvider.CssNodes.CSS_NODE_TYPE};
+        						CSSContentProvider.CssNodes.CSS_NODE_TYPE,
+        						CSSContentProvider.CssNodes.CSS_NODE_DEVICE_MAC_ADDRESS,
+        						CSSContentProvider.CssNodes.CSS_NODE_INTERACTABLE
+        						};
 		try {
             Cursor cursor = resolver.query(CSSContentProvider.CssArchivedNodes.CONTENT_URI, columns, null, null, null);
             assertNotNull(cursor);
@@ -161,6 +194,8 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
             		Log.d(LOG_TAG, "Archived Node identity: " + cursor.getString(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_IDENTITY)));
             		Log.d(LOG_TAG, "Archived Node status: " + cursor.getInt(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_STATUS)));
             		Log.d(LOG_TAG, "Archived Node type: " + cursor.getInt(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_TYPE)));
+            		Log.d(LOG_TAG, "Node MAC: " + cursor.getInt(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_DEVICE_MAC_ADDRESS)));
+            		Log.d(LOG_TAG, "Node Interactable: " + cursor.getInt(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_INTERACTABLE)));
             	} while (cursor.moveToNext());
             }
             cursor.close();
@@ -168,6 +203,61 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
         } catch (IllegalArgumentException e) {
             fail();
         }
+	}
+	
+	@MediumTest
+	public void testCSSRecordDAO() throws Exception {
+		assertTrue(this.cssDAO.cssRecordExists());
+		assertEquals(1, this.cssDAO.getCssRowId());
+		
+		CssRecord cssRecord = this.cssDAO.readCSSrecord();
+		assertEquals(TEST_IDENTITY, cssRecord.getCssIdentity());
+		assertEquals(TEST_DOMAIN_SERVER, cssRecord.getDomainServer());
+		assertEquals(TEST_EMAIL, cssRecord.getEmailID());
+		assertEquals(TEST_FORENAME, cssRecord.getForeName());
+		assertEquals(CSSManagerEnums.entityType.Person.ordinal(), cssRecord.getEntity());
+		assertEquals(TEST_HOME_LOCATION, cssRecord.getHomeLocation());
+		assertEquals(TEST_NAME, cssRecord.getName());
+		assertEquals(TEST_PASSWORD, cssRecord.getPassword());
+		assertEquals(TEST_POSITION, cssRecord.getPosition());
+		assertEquals(CSSManagerEnums.genderType.Male.ordinal(), cssRecord.getSex());
+		assertEquals(TEST_WORKPLACE, cssRecord.getWorkplace());
+	}
+	
+	@MediumTest
+	public void testUpdateCSSRecordDAO() throws Exception {
+		assertTrue(this.cssDAO.cssRecordExists());
+		CssRecord cssRecord  = new CssRecord();
+		assertEquals(1, this.cssDAO.getCssRowId());
+		
+		cssRecord.setCssIdentity(TEST_UPDATE_IDENTITY);
+		cssRecord.setDomainServer(TEST_UPDATE_DOMAIN_SERVER);
+		cssRecord.setEmailID(TEST_UPDATE_EMAIL);
+		cssRecord.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
+		cssRecord.setForeName(TEST_UPDATE_FORENAME);
+		cssRecord.setHomeLocation(TEST_UPDATE_HOME_LOCATION);
+		cssRecord.setName(TEST_UPDATE_NAME);
+		cssRecord.setPassword(TEST_UPDATE_PASSWORD);
+		cssRecord.setSex(CSSManagerEnums.genderType.Female.ordinal());
+		cssRecord.setPosition(TEST_UPDATE_POSITION);
+		cssRecord.setWorkplace(TEST_UPDATE_WORKPLACE);
+		this.cssDAO.updateCSSRecord(cssRecord);
+		
+		CssRecord updatedRecord = this.cssDAO.readCSSrecord();
+		
+		assertEquals(TEST_UPDATE_IDENTITY, updatedRecord.getCssIdentity());
+		assertEquals(TEST_UPDATE_DOMAIN_SERVER, updatedRecord.getDomainServer());
+		assertEquals(TEST_UPDATE_EMAIL, updatedRecord.getEmailID());
+		assertEquals(TEST_UPDATE_FORENAME, updatedRecord.getForeName());
+		assertEquals(CSSManagerEnums.entityType.Organisation.ordinal(), updatedRecord.getEntity());
+		assertEquals(TEST_UPDATE_HOME_LOCATION, updatedRecord.getHomeLocation());
+		assertEquals(TEST_UPDATE_NAME, updatedRecord.getName());
+		assertEquals(TEST_UPDATE_PASSWORD, updatedRecord.getPassword());
+		assertEquals(TEST_UPDATE_POSITION, updatedRecord.getPosition());
+		assertEquals(CSSManagerEnums.genderType.Female.ordinal(), updatedRecord.getSex());
+		assertEquals(TEST_UPDATE_WORKPLACE, updatedRecord.getWorkplace());
+
+		
 	}
 	//Cannot be tested as MockContext fails at getPackageName()
 //	@MediumTest
@@ -206,16 +296,22 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
 		currentNode_1.setIdentity(CURRENT_NODE_1_IDENTITY);
 		currentNode_1.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
 		currentNode_1.setType(CSSManagerEnums.nodeType.Android.ordinal());
+		currentNode_1.setCssNodeMAC(CURRENT_NODE_1_MACADDR);
+		currentNode_1.setInteractable(CURRENT_NODE_1_INTERACTABLE);
 		
 		CssNode currentNode_2 = new CssNode(); 
 		currentNode_2.setIdentity(CURRENT_NODE_2_IDENTITY);
 		currentNode_2.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
 		currentNode_2.setType(CSSManagerEnums.nodeType.Rich.ordinal());
+		currentNode_2.setCssNodeMAC(CURRENT_NODE_2_MACADDR);
+		currentNode_2.setInteractable(CURRENT_NODE_2_INTERACTABLE);
 		
 		CssNode currentNode_3 = new CssNode(); 
 		currentNode_3.setIdentity(CURRENT_NODE_3_IDENTITY);
 		currentNode_3.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
 		currentNode_3.setType(CSSManagerEnums.nodeType.Cloud.ordinal());
+		currentNode_3.setCssNodeMAC(CURRENT_NODE_3_MACADDR);
+		currentNode_3.setInteractable(CURRENT_NODE_3_INTERACTABLE);
 		
 		ArrayList<CssNode> currentNodes = new ArrayList<CssNode>();
 		currentNodes.add(currentNode_1);
@@ -226,11 +322,15 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
 		archivedNode_1.setIdentity(ARCHIVED_NODE_1_IDENTITY);
 		archivedNode_1.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
 		archivedNode_1.setType(CSSManagerEnums.nodeType.Android.ordinal());
+		archivedNode_1.setCssNodeMAC(CURRENT_NODE_1_MACADDR);
+		archivedNode_1.setInteractable(CURRENT_NODE_1_INTERACTABLE);
 		
 		CssNode archivedNode_2 = new CssNode(); 
 		archivedNode_2.setIdentity(ARCHIVED_NODE_2_IDENTITY);
 		archivedNode_2.setStatus(CSSManagerEnums.nodeStatus.Unavailable.ordinal());
 		archivedNode_2.setType(CSSManagerEnums.nodeType.Rich.ordinal());
+		archivedNode_2.setCssNodeMAC(CURRENT_NODE_2_MACADDR);
+		archivedNode_2.setInteractable(CURRENT_NODE_2_INTERACTABLE);
 
 		ArrayList<CssNode> archivedNodes = new ArrayList<CssNode>();
 		archivedNodes.add(archivedNode_1);
@@ -240,20 +340,16 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
 		cssRecord.setArchiveCSSNodes(archivedNodes);
 		cssRecord.setCssNodes(currentNodes);
 		cssRecord.setCssIdentity(TEST_IDENTITY);
-//		cssRecord.setCssHostingLocation(TEST_HOSTING_LOCATION);
 		cssRecord.setDomainServer(TEST_DOMAIN_SERVER);
 		cssRecord.setEmailID(TEST_EMAIL);
 		cssRecord.setEntity(CSSManagerEnums.entityType.Person.ordinal());
 		cssRecord.setForeName(TEST_FORENAME);
 		cssRecord.setHomeLocation(TEST_HOME_LOCATION);
-//		cssRecord.setIdentityName(TEST_IDENTITY_NAME);
-//		cssRecord.setImID(TEST_IM_ID);
 		cssRecord.setName(TEST_NAME);
 		cssRecord.setPassword(TEST_PASSWORD);
-//		cssRecord.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
 		cssRecord.setSex(CSSManagerEnums.genderType.Male.ordinal());
-//		cssRecord.setSocialURI(TEST_SOCIAL_URI);
-//		cssRecord.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
+		cssRecord.setPosition(TEST_POSITION);
+		cssRecord.setWorkplace(TEST_WORKPLACE);
 		
 		return cssRecord;
 	}

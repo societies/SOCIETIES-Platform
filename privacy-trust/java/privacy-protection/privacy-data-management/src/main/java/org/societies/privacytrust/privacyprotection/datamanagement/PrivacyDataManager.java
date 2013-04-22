@@ -61,7 +61,9 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ConditionUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestItemUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
@@ -69,6 +71,7 @@ import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.DataObfuscationManager;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 
@@ -76,7 +79,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
  * @author Olivier Maridat (Trialog)
  */
 public class PrivacyDataManager implements IPrivacyDataManager {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManager.class.getName());
+	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManager.class);
 	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage"); // to define a dedicated Logger for Performance Testing
 	private static long performanceObfuscationCount = 0;
 
@@ -87,6 +90,10 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	private ICommManager commManager;
 	private ICisManager cisManager;
 	private IIdentity currentCssId;
+	/**
+	 * Flag to enable/disable access control and obfuscation
+	 */
+	private boolean enabled;
 
 	public PrivacyDataManager()  {
 		dataObfuscationManager = new DataObfuscationManager();
@@ -117,15 +124,20 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		//		if (!(new DataTypeUtil().isLeaf(DataTypeFactory.getType(dataId)))) {
 		//			throw new PrivacyException("[Parameters] Can't manage access control on data type "+DataTypeFactory.getType(dataId)+" (it is not a leaf in the data type hiearchy)");
 		//		}
+		// Create useful values for default result
+		List<Condition> conditions = new ArrayList<Condition>();
+		Resource resource = new Resource(dataId);
+		RequestItem requestItemNull = new RequestItem(resource, actions, conditions);
+		// Access control disabled
+		if (!isEnabled()) {
+			LOG.info("Access control disabled: always PERMIT");
+			return ResponseItemUtils.toResponseItem(ResponseItemUtils.create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision.PERMIT, RequestItemUtils.toRequestItemBean(requestItemNull)));
+		}
+		// Depency injection
 		if (!isDepencyInjectionDone(1)) {
 			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
 		}
 
-
-		// -- Create useful values for default result
-		List<Condition> conditions = new ArrayList<Condition>();
-		Resource resource = new Resource(dataId);
-		RequestItem requestItemNull = new RequestItem(resource, actions, conditions);
 
 		// -- Retrieve a stored permission
 		ResponseItem permission = privacyDataManagerInternal.getPermission(requestor, dataId, actions);
@@ -171,6 +183,21 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			privacyDataManagerInternal.updatePermission(requestor, permission);
 		}
 		return permission;
+	}
+	@Override
+	public org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions) throws PrivacyException {
+		// Depency injection
+		if (!isDepencyInjectionDone(1)) {
+			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
+		}
+		
+		ResponseItem responseItem = null;
+		try {
+			responseItem = checkPermission(RequestorUtils.toRequestor(requestor, commManager.getIdManager()), dataId, ActionUtils.toActions(actions));
+		} catch (InvalidFormatException e) {
+			throw new PrivacyException("Can't manage the requestor field");
+		}
+		return ResponseItemUtils.toResponseItemBean(responseItem);
 	}
 
 	private ResponseItem checkPermissionCisData(Requestor requestor, DataIdentifier dataId, List<Action> actions, IIdentity cisId) throws PrivacyException {
@@ -408,6 +435,11 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		if (!isDepencyInjectionDone(2)) {
 			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
 		}
+		// Obfuscation disabled
+		if (!isEnabled()) {
+			LOG.info("Obfuscation disabled: data untouched");
+			return new AsyncResult<DataWrapper>(dataWrapper);
+		}
 
 		// -- Retrieve the obfuscation level
 		DObfPreferenceDetailsBean dataObfuscationPrefDetails = new DObfPreferenceDetailsBean();
@@ -516,6 +548,20 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			ICisManager cisManager) {
 		this.cisManager = cisManager;
 		LOG.info("[Dependency Injection] ICisManager injected");
+	}
+
+	/**
+	 * @return the enabled
+	 */
+	public boolean isEnabled() {
+		return enabled;
+	}
+	/**
+	 * @param enabled the enabled to set
+	 */
+	@Value("${accesscontrol.privacy.enabled:1}")
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 
 

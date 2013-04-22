@@ -34,6 +34,7 @@ import java.util.Map;
 /*
  * @author Paddy S
  */
+@Deprecated // No longer used after move from JSP to JSF
 public class ProfileSettingsForm {
 
     private String fullName;

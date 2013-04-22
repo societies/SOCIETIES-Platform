@@ -115,6 +115,22 @@ public class AcknackPopup extends Activity{
 		Log.d(LOG_TAG, "onCreate in AcknackPopup");
 	}
 
+	@Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "AcknackPopup activity terminating");
+		if (isEventsConnected) {
+			eventsHelper.tearDownService(new IMethodCallback() {
+				@Override
+				public void returnException(String result) { }
+				@Override
+				public void returnAction(String result) { }
+				@Override
+				public void returnAction(boolean resultFlag) { }
+			});
+		}
+		super.onDestroy();
+	}
+	
 	private void publishEvent() {
 		try {    		
 			ExpFeedbackResultBean bean = new ExpFeedbackResultBean();    		
@@ -135,14 +151,6 @@ public class AcknackPopup extends Activity{
 			}
 			published = true;
 			//FINISH
-			eventsHelper.tearDownService(new IMethodCallback() {
-				@Override
-				public void returnException(String result) { }
-				@Override
-				public void returnAction(String result) { }
-				@Override
-				public void returnAction(boolean resultFlag) { }
-			});
 			finish();
 		} catch (PlatformEventsHelperNotConnectedException e) {
 			e.printStackTrace();

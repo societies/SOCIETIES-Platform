@@ -79,7 +79,7 @@ public class LowerTester implements IFeatureServer {
 		
 		try {
 			getCommManager().register(this); 
-			LOG.info("***771... LowerTester getCommManager().register(this)");
+			LOG.info("***1855... LowerTester getCommManager().register(this)");
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
@@ -105,19 +105,19 @@ public class LowerTester implements IFeatureServer {
 	/* Put your functionality here if there is NO return object, ie, VOID  */
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
-		LOG.info("***771... LowerTester receiveMessage:");
+		LOG.info("***1855... LowerTester receiveMessage:");
 		//CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
 		if (payload instanceof CalcBean)
 		{ 
 			CalcBean messageBean = (CalcBean)payload;
-			LOG.debug("*** Message Recieved by ExampleCommMgr: " + messageBean.getMessage());
+			LOG.debug("***1855 Message Recieved by ExampleCommMgr: " + messageBean.getMessage());
 		}
 	}
 
 	/* Put your functionality here if there IS a return object */
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
-		LOG.info("***771... LowerTester getQuery:");
+		LOG.info("***1855... LowerTester getQuery:");
 		
 		//CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
 		System.out.println("Generic query handler, doing nothing");

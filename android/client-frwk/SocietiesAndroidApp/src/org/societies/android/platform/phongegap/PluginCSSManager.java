@@ -41,6 +41,7 @@ import org.societies.android.platform.cssmanager.ServiceCSSManagerLocal.LocalCSS
 import org.societies.android.platform.cssmanager.LocalCssDirectoryService;
 import org.societies.android.platform.cssmanager.ServiceCSSManagerLocal;
 import org.societies.android.platform.cssmanager.LocalCssDirectoryService.LocalCssDirectoryBinder;
+import org.societies.android.api.comms.xmpp.VCardParcel;
 import org.societies.android.api.css.directory.IAndroidCssDirectory;
 import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
@@ -194,6 +195,8 @@ public class PluginCSSManager extends Plugin {
         
         intentFilter.addAction(IAndroidCssDirectory.FIND_ALL_CSS_ADVERTISEMENT_RECORDS);
         intentFilter.addAction(IAndroidCssDirectory.FIND_FOR_ALL_CSS);
+        intentFilter.addAction(IAndroidCssDirectory.GET_USER_VCARD);
+        intentFilter.addAction(IAndroidCssDirectory.GET_MY_VCARD);
         
         this.ctx.getContext().registerReceiver(new bReceiver(), intentFilter);    	
     }
@@ -429,6 +432,20 @@ public class PluginCSSManager extends Plugin {
 					e.printStackTrace();
 				}
 			} 
+			else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCssDirectory.methodsArray, 2))) {
+				try {
+					this.serviceCssDir.getUserVCard(data.getString(0), data.getString(1));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} 
+			else if (action.equals(ServiceMethodTranslator.getMethodName(IAndroidCssDirectory.methodsArray, 3))) {
+				try {
+					this.serviceCssDir.getMyVCard(data.getString(0));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} 
 			
 			// Don't return any result now, since status results will be sent when events come in from broadcast receiver 
             result = new PluginResult(PluginResult.Status.NO_RESULT);
@@ -519,6 +536,7 @@ public class PluginCSSManager extends Plugin {
 		MarshaledActivity activities[] = null;
 		FriendEntry friendEntries[] = null;
 		PluginResult result = null;
+		VCardParcel vcard = null;
 		boolean resultStatus = false;
 		
 		//ADVERTISEMENT RECORDS	
@@ -548,6 +566,11 @@ public class PluginCSSManager extends Plugin {
 			activities = new MarshaledActivity [parcels.length];
 			System.arraycopy(parcels, 0, activities, 0, parcels.length);
 		}
+		//VCARD RESULTS
+		else if (IAndroidCssDirectory.GET_MY_VCARD==intent.getAction() || IAndroidCssDirectory.GET_USER_VCARD==intent.getAction()) {
+			resultStatus = intent.getBooleanExtra(IAndroidCssDirectory.INTENT_RETURN_STATUS_KEY, false);
+			vcard = intent.getParcelableExtra(IAndroidCssDirectory.INTENT_RETURN_VALUE_KEY);
+		}
 		//CSS RECORDS 
 		else  {
 			resultStatus = intent.getBooleanExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, false);
@@ -571,6 +594,10 @@ public class PluginCSSManager extends Plugin {
 			else if (IAndroidCSSManager.GET_CSS_ACTIVITIES==intent.getAction() ) {
 				result = new PluginResult(PluginResult.Status.OK, convertMarshalledActivity(activities));
 			}
+			//VCARD RESULTS
+			else if (IAndroidCssDirectory.GET_MY_VCARD==intent.getAction() || IAndroidCssDirectory.GET_USER_VCARD==intent.getAction()) {
+				result = new PluginResult(PluginResult.Status.OK, convertVCard(vcard));
+			}
 			//CSS RECORDS
 			else {
 				result = new PluginResult(PluginResult.Status.OK, convertCssRecord(cssRecord));
@@ -589,6 +616,23 @@ public class PluginCSSManager extends Plugin {
 		Log.d(LOG_TAG, "Plugin success method called, target: " + methodCallbackId);
 		return resultStatus;
 	}
+	
+	/**
+	 * Converts a VCardParcel to JSON
+	 * @param card
+	 * @return
+	 */
+	private JSONObject convertVCard(VCardParcel card) {
+        JSONObject jObj = new JSONObject();
+		Gson gson = new Gson();
+		try {
+			jObj =  (JSONObject) new JSONTokener(gson.toJson(card)).nextValue();
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+        return jObj;
+    }
 	
 	/**
      * Creates a JSONObject for a given {@link FriendEntry} array
@@ -709,24 +753,17 @@ public class PluginCSSManager extends Plugin {
 
     	
     	try {
-//			aRecord.setCssHostingLocation(jRecord.getString("cssHostingLocation"));
 			aRecord.setCssIdentity(jRecord.getString("cssIdentity"));
-//	    	aRecord.setCssInactivation(jRecord.getString("cssInactivation"));
-//	    	aRecord.setCssRegistration(jRecord.getString("cssRegistration"));
-//	    	aRecord.setCssUpTime(jRecord.getInt("cssUpTime"));
 	    	aRecord.setDomainServer(jRecord.getString("domainServer"));
 	    	aRecord.setEmailID(jRecord.getString("emailID"));
 	    	aRecord.setEntity(jRecord.getInt("entity"));
 	    	aRecord.setForeName(jRecord.getString("foreName"));
 	    	aRecord.setHomeLocation(jRecord.getString("homeLocation"));
-//	    	aRecord.setIdentityName(jRecord.getString("identityName"));
-//	    	aRecord.setImID(jRecord.getString("imID"));
 	    	aRecord.setName(jRecord.getString("name"));
 	    	aRecord.setPassword(jRecord.getString("password"));
-//	    	aRecord.setPresence(jRecord.getInt("presence"));
 	    	aRecord.setSex(jRecord.getInt("sex"));
-//	    	aRecord.setSocialURI(jRecord.getString("socialURI"));
-//	    	aRecord.setStatus(jRecord.getInt("status"));
+	    	aRecord.setPosition(jRecord.getString("position"));
+	    	aRecord.setWorkplace(jRecord.getString("workplace"));
 	    	
 	    	JSONArray cssNodes = jRecord.getJSONArray("cssNodes");
 	    	List<CssNode> nodeList = new ArrayList<CssNode>();
@@ -894,6 +931,22 @@ public class PluginCSSManager extends Plugin {
 					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
 				}
 			} 
+			else if (intent.getAction().equals(IAndroidCssDirectory.GET_USER_VCARD)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCssDirectory.methodsArray, 2);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			}
+			else if (intent.getAction().equals(IAndroidCssDirectory.GET_MY_VCARD)) {
+				String mapKey = ServiceMethodTranslator.getMethodName(IAndroidCssDirectory.methodsArray, 3);
+				
+				String methodCallbackId = PluginCSSManager.this.methodCallbacks.get(mapKey);
+				if (methodCallbackId != null) {
+					PluginCSSManager.this.sendJavascriptResult(methodCallbackId, intent, mapKey);
+				}
+			}
 		}
 	};
 

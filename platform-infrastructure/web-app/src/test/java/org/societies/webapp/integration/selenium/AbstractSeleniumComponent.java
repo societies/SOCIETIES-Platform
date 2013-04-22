@@ -254,18 +254,22 @@ public abstract class AbstractSeleniumComponent {
         throw new NoSuchElementException("Elements identified by [" + by.toString() + "] not found after " + findTimeoutMillis + "ms", lastEx);
     }
 
-    private void threadSleep() {
-        threadSleep(WAIT_UNTIL_THREAD_SLEEP);
+    protected void waitUntilStale(WebElement element) {
+        // Sleep until the element we want is stale or timeout is over
+        long end = System.currentTimeMillis() + findTimeoutMillis;
+        while (System.currentTimeMillis() < end) {
+            try {
+                element.isDisplayed();
+            } catch (StaleElementReferenceException ex) {
+                return;
+            }
+
+            threadSleep();
+        }
+
+        throw new StaleElementReferenceException("Element [" + element.toString() + "] not stale after " + findTimeoutMillis + "ms");
     }
 
-    private void threadSleep(long timeout) {
-        // This reduces load on the processor by avoiding repeatedly checking faster than events can reasonably happen
-        try {
-            Thread.sleep(timeout);
-        } catch (InterruptedException e) {
-            log.warn("Error sleeping", e);
-        }
-    }
 
     public void openContextMenuOnElement(WebElement element) {
         RemoteWebElement ele = (RemoteWebElement) element;
@@ -290,4 +294,19 @@ public abstract class AbstractSeleniumComponent {
         clickButton(By.xpath(String.format("//*[@id='%s']//*[contains(@class, 'ui-selectonemenu-trigger')]", fieldId)));
         clickButton(By.xpath(String.format("//*[@id='%s_panel']//*[text()='%s']", fieldId, value)));
     }
+
+
+    private void threadSleep() {
+        threadSleep(WAIT_UNTIL_THREAD_SLEEP);
+    }
+
+    private void threadSleep(long timeout) {
+        // This reduces load on the processor by avoiding repeatedly checking faster than events can reasonably happen
+        try {
+            Thread.sleep(timeout);
+        } catch (InterruptedException e) {
+            log.warn("Error sleeping", e);
+        }
+    }
+
 }

@@ -44,7 +44,7 @@ public class Test751 extends IntegrationTestCase{
 	private static IPersonalisationManager personalisationMgrExternal;
 	
 	public Test751(){
-		super(751, new Class[]{Tester.class});
+		super(1874, new Class[]{Tester.class});
 	}
 
 	/**
