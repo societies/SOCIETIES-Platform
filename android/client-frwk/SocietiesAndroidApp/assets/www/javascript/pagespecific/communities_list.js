@@ -145,10 +145,13 @@ var	SocietiesCISListService = {
 					//BODY FORMATTING
 					var n=data[i].actor.indexOf(".");
 					var actorStr = data[i].actor.substring(0, n);
+					var objectStr = data[i].object;
+					if (objectStr.substring(0, 3)=='cis')
+						objectStr = "community";
 					//var tableEntry = "<li id=\"li" + data[i].published + "\"><a href=\"#\" onclick=\"return false;\"><p>" + hours + ":" + minutes + " " + suffix + "</p>" +
 					var tableEntry = "<li id=\"li" + data[i].published + "\"><a href=\"#\" onclick=\"return false;\">" +
 									 "<h2>"+ actorStr + "</h2>" +
-						 	 		 "<p>" + data[i].verb  + " " + data[i].object + "</p>" +
+						 	 		 "<p>" + data[i].verb  + " " + objectStr + "</p>" + //data[i].object
 						 	 		 "<p class=\"ui-li-aside\">" + hours + ":" + minutes + " " + suffix + "</p>" + 
 						 	 		 "</a>" + deleteTag + "</li>";
 					$('ul#cis_activity_feed').append(tableEntry);
@@ -273,8 +276,9 @@ var	SocietiesCISListService = {
 				//var n=data[i].jid.indexOf(".");
 				//var identityStr = data[i].jid.substring(0, n);
 				var identityStr = data[i].name;
-				//SEND FRIEND REQUEST LINK
-				var friendRequestATag = '<a href="#" onclick="SocietiesCISListService.sendFriendRequest(\'' + identityStr + '\', \'' + data[i].jid + '\', ' + i + ')">',
+				//SEND FRIEND REQUEST LINK - temp disabled
+				//var friendRequestATag = '<a href="#" onclick="SocietiesCISListService.sendFriendRequest(\'' + identityStr + '\', \'' + data[i].jid + '\', ' + i + ')">',
+				var friendRequestATag = '<a href="#" >',
 					friendRequestATagClose = "</a>";
 				//GENERATE REMOVE MEMBER LINK - ADMIN MODE ONLY
 				var removeMember = "";
@@ -335,13 +339,11 @@ var	SocietiesCISListService = {
 		}
 		
 		//SEND REQUEST
-		if (window.confirm("Send friend request to " + name + "?")) {
-		//jConfirm("Send friend request to " + name + "?", 'Friend Request', function(answer) {
-		     //if (answer){
+		if (myIdentity != css_id) {
+			if (window.confirm("Send friend request to " + name + "?")) {
 		    	 window.plugins.SocietiesLocalCSSManager.sendFriendRequest(css_id, success, failure);
-		     //}
+			}
 		}
-		//);
 	},
 	
 	/**

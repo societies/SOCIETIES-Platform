@@ -27,6 +27,12 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
 	private final static String CURRENT_NODE_1_IDENTITY = "alan@societies.bespoke/android1";
 	private final static String CURRENT_NODE_2_IDENTITY = "alan@societies.bespoke/rich1";
 	private final static String CURRENT_NODE_3_IDENTITY = "alan.societies.bespoke";
+	private final static String CURRENT_NODE_1_MACADDR = "11:11:11:11:11";
+	private final static String CURRENT_NODE_2_MACADDR = "22:11:11:11:11";
+	private final static String CURRENT_NODE_3_MACADDR = "33:11:11:11:11";
+	private final static String CURRENT_NODE_1_INTERACTABLE = "true";
+	private final static String CURRENT_NODE_2_INTERACTABLE = "true";
+	private final static String CURRENT_NODE_3_INTERACTABLE = "false";
 	
 	private final static String ARCHIVED_NODE_1_IDENTITY = "alan@societies.bespoke/android11";
 	private final static String ARCHIVED_NODE_2_IDENTITY = "alan@societies.bespoke/rich1222";
@@ -144,7 +150,10 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
         assertNotNull(resolver);
         String columns [] = {CSSContentProvider.CssNodes.CSS_NODE_IDENTITY, 
         						CSSContentProvider.CssNodes.CSS_NODE_STATUS,
-        						CSSContentProvider.CssNodes.CSS_NODE_TYPE};
+        						CSSContentProvider.CssNodes.CSS_NODE_TYPE,
+        						CSSContentProvider.CssNodes.CSS_NODE_DEVICE_MAC_ADDRESS,
+        						CSSContentProvider.CssNodes.CSS_NODE_INTERACTABLE
+        						};
 		try {
             Cursor cursor = resolver.query(CSSContentProvider.CssNodes.CONTENT_URI, columns, null, null, null);
             assertNotNull(cursor);
@@ -155,6 +164,8 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
             		Log.d(LOG_TAG, "Node identity: " + cursor.getString(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_IDENTITY)));
             		Log.d(LOG_TAG, "Node status: " + cursor.getInt(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_STATUS)));
             		Log.d(LOG_TAG, "Node type: " + cursor.getInt(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_TYPE)));
+            		Log.d(LOG_TAG, "Node MAC: " + cursor.getInt(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_DEVICE_MAC_ADDRESS)));
+            		Log.d(LOG_TAG, "Node Interactable: " + cursor.getInt(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_INTERACTABLE)));
             	} while (cursor.moveToNext());
             }
             cursor.close();
@@ -169,7 +180,10 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
         assertNotNull(resolver);
         String columns [] = {CSSContentProvider.CssNodes.CSS_NODE_IDENTITY, 
         						CSSContentProvider.CssNodes.CSS_NODE_STATUS,
-        						CSSContentProvider.CssNodes.CSS_NODE_TYPE};
+        						CSSContentProvider.CssNodes.CSS_NODE_TYPE,
+        						CSSContentProvider.CssNodes.CSS_NODE_DEVICE_MAC_ADDRESS,
+        						CSSContentProvider.CssNodes.CSS_NODE_INTERACTABLE
+        						};
 		try {
             Cursor cursor = resolver.query(CSSContentProvider.CssArchivedNodes.CONTENT_URI, columns, null, null, null);
             assertNotNull(cursor);
@@ -180,6 +194,8 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
             		Log.d(LOG_TAG, "Archived Node identity: " + cursor.getString(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_IDENTITY)));
             		Log.d(LOG_TAG, "Archived Node status: " + cursor.getInt(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_STATUS)));
             		Log.d(LOG_TAG, "Archived Node type: " + cursor.getInt(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_TYPE)));
+            		Log.d(LOG_TAG, "Node MAC: " + cursor.getInt(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_DEVICE_MAC_ADDRESS)));
+            		Log.d(LOG_TAG, "Node Interactable: " + cursor.getInt(cursor.getColumnIndex(CSSContentProvider.CssNodes.CSS_NODE_INTERACTABLE)));
             	} while (cursor.moveToNext());
             }
             cursor.close();
@@ -192,6 +208,8 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
 	@MediumTest
 	public void testCSSRecordDAO() throws Exception {
 		assertTrue(this.cssDAO.cssRecordExists());
+		assertEquals(1, this.cssDAO.getCssRowId());
+		
 		CssRecord cssRecord = this.cssDAO.readCSSrecord();
 		assertEquals(TEST_IDENTITY, cssRecord.getCssIdentity());
 		assertEquals(TEST_DOMAIN_SERVER, cssRecord.getDomainServer());
@@ -210,6 +228,7 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
 	public void testUpdateCSSRecordDAO() throws Exception {
 		assertTrue(this.cssDAO.cssRecordExists());
 		CssRecord cssRecord  = new CssRecord();
+		assertEquals(1, this.cssDAO.getCssRowId());
 		
 		cssRecord.setCssIdentity(TEST_UPDATE_IDENTITY);
 		cssRecord.setDomainServer(TEST_UPDATE_DOMAIN_SERVER);
@@ -277,16 +296,22 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
 		currentNode_1.setIdentity(CURRENT_NODE_1_IDENTITY);
 		currentNode_1.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
 		currentNode_1.setType(CSSManagerEnums.nodeType.Android.ordinal());
+		currentNode_1.setCssNodeMAC(CURRENT_NODE_1_MACADDR);
+		currentNode_1.setInteractable(CURRENT_NODE_1_INTERACTABLE);
 		
 		CssNode currentNode_2 = new CssNode(); 
 		currentNode_2.setIdentity(CURRENT_NODE_2_IDENTITY);
 		currentNode_2.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
 		currentNode_2.setType(CSSManagerEnums.nodeType.Rich.ordinal());
+		currentNode_2.setCssNodeMAC(CURRENT_NODE_2_MACADDR);
+		currentNode_2.setInteractable(CURRENT_NODE_2_INTERACTABLE);
 		
 		CssNode currentNode_3 = new CssNode(); 
 		currentNode_3.setIdentity(CURRENT_NODE_3_IDENTITY);
 		currentNode_3.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
 		currentNode_3.setType(CSSManagerEnums.nodeType.Cloud.ordinal());
+		currentNode_3.setCssNodeMAC(CURRENT_NODE_3_MACADDR);
+		currentNode_3.setInteractable(CURRENT_NODE_3_INTERACTABLE);
 		
 		ArrayList<CssNode> currentNodes = new ArrayList<CssNode>();
 		currentNodes.add(currentNode_1);
@@ -297,11 +322,15 @@ public class TestCSSContainerProvider extends ProviderTestCase2<ProviderImplemen
 		archivedNode_1.setIdentity(ARCHIVED_NODE_1_IDENTITY);
 		archivedNode_1.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
 		archivedNode_1.setType(CSSManagerEnums.nodeType.Android.ordinal());
+		archivedNode_1.setCssNodeMAC(CURRENT_NODE_1_MACADDR);
+		archivedNode_1.setInteractable(CURRENT_NODE_1_INTERACTABLE);
 		
 		CssNode archivedNode_2 = new CssNode(); 
 		archivedNode_2.setIdentity(ARCHIVED_NODE_2_IDENTITY);
 		archivedNode_2.setStatus(CSSManagerEnums.nodeStatus.Unavailable.ordinal());
 		archivedNode_2.setType(CSSManagerEnums.nodeType.Rich.ordinal());
+		archivedNode_2.setCssNodeMAC(CURRENT_NODE_2_MACADDR);
+		archivedNode_2.setInteractable(CURRENT_NODE_2_INTERACTABLE);
 
 		ArrayList<CssNode> archivedNodes = new ArrayList<CssNode>();
 		archivedNodes.add(archivedNode_1);

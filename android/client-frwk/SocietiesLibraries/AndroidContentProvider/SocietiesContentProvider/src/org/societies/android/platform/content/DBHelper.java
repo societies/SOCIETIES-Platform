@@ -51,6 +51,9 @@ public class DBHelper extends SQLiteOpenHelper {
 	public final static String CSS_NODE_TYPE = CSSContentProvider.CssNodes.CSS_NODE_TYPE;
 	public final static String CSS_NODE_STATUS = CSSContentProvider.CssNodes.CSS_NODE_STATUS;
 	public final static String CSS_NODE_RECORD = CSSContentProvider.CssNodes.CSS_NODE_RECORD;
+	public final static String CSS_NODE_DEVICE_MAC_ADDRESS = CSSContentProvider.CssNodes.CSS_NODE_DEVICE_MAC_ADDRESS;
+	public final static String CSS_NODE_INTERACTABLE = CSSContentProvider.CssNodes.CSS_NODE_INTERACTABLE;
+	
 
 	public final static String CSS_RECORD_DOMAIN_SERVER = CSSContentProvider.CssRecord.CSS_RECORD_DOMAIN_SERVER;
 	public final static String CSS_RECORD_ENTITY = CSSContentProvider.CssRecord.CSS_RECORD_ENTITY;
@@ -73,7 +76,8 @@ public class DBHelper extends SQLiteOpenHelper {
 														   CSS_RECORD_PASSWORD, CSS_RECORD_EMAILID, CSS_RECORD_SEX, CSS_RECORD_HOME_LOCATION,
 														   CSS_RECORD_CSS_IDENTITY, CSS_RECORD_POSITION, CSS_RECORD_WORKPLACE};
 	
-	public final static String [] ALL_CSSNODE_COLUMNS = {ROW_ID, CSS_NODE_IDENTITY, CSS_NODE_TYPE, CSS_NODE_STATUS, CSS_NODE_RECORD};
+	public final static String [] ALL_CSSNODE_COLUMNS = {ROW_ID, CSS_NODE_IDENTITY, CSS_NODE_TYPE, CSS_NODE_STATUS, CSS_NODE_RECORD, 
+														CSS_NODE_DEVICE_MAC_ADDRESS, CSS_NODE_INTERACTABLE};
 	
 	public DBHelper(Context context, String name, CursorFactory factory, int version) {
 		super(context, name, factory, version);
@@ -90,6 +94,8 @@ public class DBHelper extends SQLiteOpenHelper {
 				CSS_NODE_STATUS + " INTEGER," +
 				CSS_NODE_TYPE + " INTEGER," +
 				CSS_NODE_RECORD + " INTEGER, " +
+				CSS_NODE_DEVICE_MAC_ADDRESS + " TEXT, " +
+				CSS_NODE_INTERACTABLE + " TEXT, " +
 				"FOREIGN KEY (" + CSS_NODE_RECORD + ") REFERENCES CssRecord(" + ROW_ID + "));");		
 		
 		db.execSQL("CREATE TABLE " + ARCHIVED_NODE_TABLE + " (" + ROW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -97,6 +103,8 @@ public class DBHelper extends SQLiteOpenHelper {
 				CSS_NODE_STATUS + " INTEGER," +
 				CSS_NODE_TYPE + " INTEGER," +
 				CSS_NODE_RECORD + " INTEGER, " +
+				CSS_NODE_DEVICE_MAC_ADDRESS + " TEXT, " +
+				CSS_NODE_INTERACTABLE + " TEXT, " +
 				"FOREIGN KEY (" + CSS_NODE_RECORD + ") REFERENCES CssRecord(" + ROW_ID + "));");		
 		
 		db.execSQL("CREATE TABLE " + CSS_RECORD_TABLE + " (" + ROW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +

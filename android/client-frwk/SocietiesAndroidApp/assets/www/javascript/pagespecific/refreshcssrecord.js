@@ -68,6 +68,7 @@ var SocietiesCSSRecord = {
 		$("#cssrecordsextype").val(data.sex);
 		$("#cssrecordposition").val(data.position);
 		$("#cssrecordworkplace").val(data.workplace);
+		$("#cssrecorduserlocation").val(data.homeLocation);
 		
 		//REMOVE ALL ENTRIES
 		while( $('ul#cssNodesList').children().length >0 )

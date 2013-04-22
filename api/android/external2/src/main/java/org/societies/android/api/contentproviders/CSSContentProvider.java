@@ -59,6 +59,8 @@ public class CSSContentProvider {
 		public final static String CSS_NODE_TYPE = "type";
 		public final static String CSS_NODE_STATUS = "status";
 		public final static String CSS_NODE_RECORD = "record";
+		public final static String CSS_NODE_DEVICE_MAC_ADDRESS = "nodeMAC";
+		public final static String CSS_NODE_INTERACTABLE = "interactable";
 
 	}
 	

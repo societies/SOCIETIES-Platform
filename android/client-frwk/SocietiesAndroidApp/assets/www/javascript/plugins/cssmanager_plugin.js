@@ -149,7 +149,9 @@ var	SocietiesLocalCSSManager = {
 		                    "presence": 0,
 		                    "sex": 0,
 		                    "socialURI": null,
-		                    "status": 0
+		                    "status": 0,
+		                    "workplace": null,
+		                    "position": null
 				                  }
 
 
@@ -190,7 +192,9 @@ var	SocietiesLocalCSSManager = {
 		                    "presence": 0,
 		                    "sex": 0,
 		                    "socialURI": null,
-		                    "status": 0
+		                    "status": 0,
+		                    "workplace": null,
+		                    "position": null
 				                  }
 
 
@@ -230,7 +234,9 @@ var	SocietiesLocalCSSManager = {
 		                    "presence": 0,
 		                    "sex": 0,
 		                    "socialURI": null,
-		                    "status": 0
+		                    "status": 0,
+		                    "workplace": null,
+		                    "position": null
 				                  }
 
 
@@ -274,7 +280,9 @@ var	SocietiesLocalCSSManager = {
 		                    "presence": 0,
 		                    "sex": 0,
 		                    "socialURI": null,
-		                    "status": 0
+		                    "status": 0,
+		                    "workplace": null,
+		                    "position": null
 				                  }
 
 

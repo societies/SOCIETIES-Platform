@@ -51,10 +51,11 @@ public class CssRecordDAO {
 	
 	public final static String SOCIETIES_DATABASE_NAME = "SocietiesAndroidClient";
 	public final static int SOCIETIES_DATABASE_VERSION = 1;
+	public final static int CSSRECORD_UNKNOWN_ROWID = 0;
 	
 	private DBHelper dbHelper;
 	private Context context;
-	private long cssRowId = 0;
+	private long cssRowId = CSSRECORD_UNKNOWN_ROWID;
 	/**
 	 * Public constructor
 	 * DBHelper class takes care of creating database if it does not exist
@@ -64,6 +65,18 @@ public class CssRecordDAO {
 	public CssRecordDAO(Context context) {
 		this.context = context;
 		this.dbHelper = new DBHelper(context, SOCIETIES_DATABASE_NAME, null, SOCIETIES_DATABASE_VERSION);
+	}
+
+	/**
+	 * Get the rowId of the CSSRecord
+	 * 
+	 * @return long rowId of CSSrecord
+	 */
+	public long getCssRowId() {
+		if (CSSRECORD_UNKNOWN_ROWID == this.cssRowId) {
+			this.cssRecordExists();
+		}
+		return cssRowId;
 	}
 
 	/**
@@ -115,6 +128,10 @@ public class CssRecordDAO {
 
 		if (recordCount >= 1) {
 			Dbc.invariant("Can only be one CSSRecord row", 1 == recordCount);
+
+			cursor.moveToFirst();
+			this.cssRowId = cursor.getLong(cursor.getColumnIndex(DBHelper.ROW_ID));
+
 			retValue = true;
 		}
 		
@@ -206,6 +223,11 @@ public class CssRecordDAO {
 			node.setIdentity(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_NODE_IDENTITY)));
 			node.setStatus(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_NODE_STATUS)));
 			node.setType(cursor.getInt(cursor.getColumnIndex(DBHelper.CSS_NODE_TYPE)));
+			node.setCssNodeMAC(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_NODE_DEVICE_MAC_ADDRESS)));
+			node.setInteractable(cursor.getString(cursor.getColumnIndex(DBHelper.CSS_NODE_INTERACTABLE)));
+			
+			logCssNode(node); 
+
 			nodeList.add(node);
 			
 			cursor.moveToNext();
@@ -357,11 +379,15 @@ public class CssRecordDAO {
 		if (DEBUG_FLAG) {
 			Log.d(LOG_TAG, "populateCSSNode");
 		}
+		logCssNode(node);
+		
 		ContentValues values = new ContentValues();
 
 		values.put(DBHelper.CSS_NODE_IDENTITY, node.getIdentity());
 		values.put(DBHelper.CSS_NODE_STATUS, node.getStatus());
 		values.put(DBHelper.CSS_NODE_TYPE, node.getType());
+		values.put(DBHelper.CSS_NODE_DEVICE_MAC_ADDRESS, node.getCssNodeMAC());
+		values.put(DBHelper.CSS_NODE_INTERACTABLE, node.getInteractable());
 
 		//only populate foreign key on add record
 		if (-1 !=rowid) {
@@ -375,6 +401,7 @@ public class CssRecordDAO {
 		
 		if (DEBUG_FLAG) {
 			Log.d(LOG_TAG, "logCssRecord");
+			
 			Log.d(LOG_TAG, "CssIdentity: " + record.getCssIdentity());
 			Log.d(LOG_TAG, "DomainServer: " + record.getDomainServer());
 			Log.d(LOG_TAG, "EmailID: " + record.getEmailID());
@@ -386,6 +413,17 @@ public class CssRecordDAO {
 			Log.d(LOG_TAG, "Position: " + record.getPosition());
 			Log.d(LOG_TAG, "Sex: " + record.getSex());
 			Log.d(LOG_TAG, "Workplace: " + record.getWorkplace());
+		}
+	}
+	private void logCssNode(CssNode node) {
+		
+		if (DEBUG_FLAG) {
+			Log.d(LOG_TAG, "logCssNode");
+			Log.d(LOG_TAG, "Identity: " + node.getIdentity());
+			Log.d(LOG_TAG, "Status: " + node.getStatus());
+			Log.d(LOG_TAG, "Type: " + node.getType());
+			Log.d(LOG_TAG, "Node MAC: " + node.getCssNodeMAC());
+			Log.d(LOG_TAG, "Interactable: " + node.getInteractable());
 		}
 	}
 }
