@@ -27,9 +27,13 @@ package org.societies.privacytrust.trust.impl.engine;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.ITrustNodeMgr;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
+import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
+import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
+import org.societies.privacytrust.trust.api.repo.TrustRepositoryException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -44,6 +48,10 @@ public abstract class TrustEngine {
 	@Autowired
 	protected ITrustRepository trustRepo;
 	
+	/** The Trust Evidence Repository service reference. */
+	@Autowired
+	protected ITrustEvidenceRepository trustEvidenceRepo;
+	
 	/** The Trust Event Mgr service reference. */
 	protected ITrustEventMgr trustEventMgr;
 	
@@ -57,5 +65,15 @@ public abstract class TrustEngine {
 	protected TrustEngine(ITrustEventMgr trustEventMgr) {
 		
 		this.trustEventMgr = trustEventMgr;
+	}
+	
+	protected ITrustedEntity createEntityIfAbsent(final TrustedEntityId trustorId,
+			final TrustedEntityId trusteeId) throws TrustRepositoryException {
+
+		ITrustedEntity entity = (ITrustedEntity) this.trustRepo.retrieveEntity(
+				trustorId, trusteeId);
+
+		return (entity == null) ? this.trustRepo.createEntity(
+				trustorId, trusteeId) : entity;
 	}
 }
