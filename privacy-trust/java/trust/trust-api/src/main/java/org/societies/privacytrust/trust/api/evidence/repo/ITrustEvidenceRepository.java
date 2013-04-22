@@ -100,6 +100,9 @@ public interface ITrustEvidenceRepository {
 	 *            (optional) the start time. 
 	 * @param endDate
 	 *            (optional) the end time. 
+	 * @param sourceId
+	 *            (optional) the {@link TrustedEntityId} of the source associated with 
+	 *            the indirect trust evidence to retrieve.
 	 * @return the indirect trust evidence matching the specified search criteria
 	 * @throws TrustEvidenceRepositoryException
 	 *             if there is a problem accessing the Trust Evidence Repository
@@ -108,7 +111,8 @@ public interface ITrustEvidenceRepository {
 	public Set<IIndirectTrustEvidence> retrieveIndirectEvidence(
 			final TrustedEntityId subjectId, final TrustedEntityId objectId,
 			final TrustEvidenceType type, final Date startDate, 
-			final Date endDate) throws TrustEvidenceRepositoryException;
+			final Date endDate, final TrustedEntityId sourceId)
+					throws TrustEvidenceRepositoryException;
 	
 	/**
 	 * Removes the direct trust evidence matching the specified criteria. 
@@ -153,10 +157,14 @@ public interface ITrustEvidenceRepository {
 	 *            (optional) the start time. 
 	 * @param endDate
 	 *            (optional) the end time.
+	 * @param sourceId
+	 *            (optional) the {@link TrustedEntityId} of the source associated with 
+	 *            the indirect trust evidence to remove.
 	 * @since 0.5
 	 */
 	public void removeIndirectEvidence(final TrustedEntityId subjectId,
 			final TrustedEntityId objectId, final TrustEvidenceType type,
-			final Date startDate, final Date endDate) 
+			final Date startDate, final Date endDate, 
+			final TrustedEntityId sourceId)	
 					throws TrustEvidenceRepositoryException;
 }
