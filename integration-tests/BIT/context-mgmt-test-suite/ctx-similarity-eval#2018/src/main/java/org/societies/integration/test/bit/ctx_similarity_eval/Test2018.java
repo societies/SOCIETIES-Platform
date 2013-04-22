@@ -22,67 +22,59 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.similarity.impl;
+package org.societies.integration.test.bit.ctx_similarity_eval;
 
-import java.util.HashMap;
-import java.util.Map;
 
-public class evaluationResult {
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.integration.test.IntegrationTestCase;
 
-	private Boolean result; // overall yes/no from group
-	private HashMap<String, String> attributeSummary;  //  
-	private HashMap attBreakDown;
-	public final String STRONG = "Strongly associated"; //      > 80%
-	public final String MEDIUM = "Medium association";  //   50 - 80%
-	public final String WEAK = "Weakly associated";     //   25 - 50%
-	public final String NONE = "Not associated";		//      < 25%
+/**
+ * 
+ *
+ * @author nikosk
+ *
+ */
+public class Test2018 extends IntegrationTestCase{
+
 	
-	public evaluationResult(){
-		this.result = true;
-		this.attributeSummary = new HashMap<String, String>();
-		this.attBreakDown = new HashMap();
+	public static ICtxBroker ctxBroker;
+	public static ICommManager commManager;
+	
+	
+	
+	public Test2018(){
+		//super(1108, new Class[]{CreateCommunityCtx.class});
+		super(1856, new Class[]{Tester.class});
 	}
-	
-	public void init(){
-		this.result = true;
-		this.attributeSummary = new HashMap<String, String>();
-		this.attBreakDown = new HashMap();
-	}
-	
-	/***
-	 *   result
+
+	/**
+	 * @return the ctxBroker
 	 */
-	public void setResult(Boolean result){
-	
-		this.result = result;
+	public static ICtxBroker getCtxBroker() {
+		return ctxBroker;
 	}
-	//
-	public Boolean getResult(){
-		return this.result;
-	}
-	
-	/***
-	 *   attBreakDown
+
+	/**
+	 * @param ctxBroker the ctxBroker to set
 	 */
-	public void setAttSummary(String att, String value){
-	
-		this.attributeSummary.put(att, value);
+	public  void setCtxBroker(ICtxBroker ctxBroker) {
+		Test2018.ctxBroker = ctxBroker;
+
 	}
-	//
-	public HashMap<String, String> getSummary(){
-		return this.attributeSummary;
+	
+	/**
+	 * @return the commMgr
+	 */
+	public static ICommManager  getCommManager() {
+		return commManager ;
+	}
+
+	/**
+	 * @param commMgr the commMgr to set
+	 */
+	public  void setCommManager(ICommManager commMgr) {
+		Test2018.commManager = commMgr;
 	}	
-	
-	/***
-	 *   attBreakDown
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void setAattBreakDown(HashMap breakdown){
-		attBreakDown.putAll(breakdown);
-	}
-	//
-	public HashMap getAttBreakDown(){
-		return this.attBreakDown;
-	}	
-	
+
 }

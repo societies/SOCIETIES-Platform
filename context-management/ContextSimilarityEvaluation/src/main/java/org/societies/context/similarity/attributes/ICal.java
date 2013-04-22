@@ -33,10 +33,10 @@ import java.util.HashMap;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
-import org.societies.context.similarity.utilities.GetContextData;
+import org.societies.context.similarity.utilities.*;
 //import java.util.Date;
-import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.component.VEvent;
+//import net.fortuna.ical4j.model.Property;
+//import net.fortuna.ical4j.model.component.VEvent;
 
 public class ICal {
 	// look for the common meetings
@@ -81,13 +81,13 @@ public class ICal {
 		return results;
 	}
 	
-	public void extractEvent(VEvent event){
+	//public void extractEvent(VEvent event){
 	    //Date start = (Date) event.getProperty(Property.DTSTART);
 	    //start.getParameters().replace(Value.DATE_TIME);
 	    //end = (DtEnd) event.getProperty(Property.DTEND);
 	    //end.getParameters().replace(Value.DATE);
 	    //suite.addTest(new VEventTest("testValidationException", event));
-	}
+	//}
 
 }
 

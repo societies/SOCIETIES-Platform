@@ -28,24 +28,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.lang.reflect.*;
-import org.societies.api.context.similarity.IContextSimilarity;
+import org.societies.api.context.similarity.*;
 
 /**
  *
  * @author John
  *
  */
-public class ContextSimilarityEvaluator implements IContextSimilarity {
+public class ContextSimilarityEvaluator implements ICtxSimilarityEvaluator {
 	
-	private evaluationResult er;
+	private evaluationResults er;
 
 	public ContextSimilarityEvaluator(){
 		//
-		er = new evaluationResult();
+		er = new evaluationResults();
 		er.init();
 	}
 	
-	public evaluationResult evaluateSimilarity (String[] ids, ArrayList<String> attrib){
+	public org.societies.api.context.similarity.evaluationResults evaluateSimilarity (String[] ids, ArrayList<String> attrib){
 		
 		// 
 		for (String att : attrib){
@@ -61,7 +61,7 @@ public class ContextSimilarityEvaluator implements IContextSimilarity {
 				er.setResult(false);
 			}
 		}
-		return er;
+		return (org.societies.api.context.similarity.evaluationResults) er;
 	}
 	
 

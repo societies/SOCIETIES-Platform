@@ -22,20 +22,51 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.context.similarity;
 
-import java.util.HashMap;
-import java.util.Map;
+
+package org.societies.integration.test.bit.ctx_similarity_eval;
+import static org.junit.Assert.*;
+
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ExecutionException;
+
+import junit.framework.Assert;
+
+import org.junit.Before;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.internal.context.broker.ICtxBroker;
+
 
 /**
- * Describe your class here...
- *
- * @author John
+ *  @author nikosk
  *
  */
-public interface IevaluationResults {
+public class Tester {
+	
+	private ICtxBroker ctxBroker;
+	
+	public Tester(){
 
-	public Boolean getResult();
-	public HashMap<String, String> getSummary();
-	public Map getAttBreakDown();
+	}
+	
+	@Before
+	public void setUp(){
+			
+	}
+	
+	
+	@org.junit.Test
+	public void Test(){
+		ctxBroker = Test2018.getCtxBroker();
+	
+	}
+	
 }

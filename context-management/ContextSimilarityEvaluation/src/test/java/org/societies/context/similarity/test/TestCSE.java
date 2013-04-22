@@ -1,4 +1,4 @@
-package test;
+package org.societies.context.similarity.test;
 
 import java.util.ArrayList;
 
@@ -21,7 +21,7 @@ public class TestCSE {
 		String[] ids = {"jtest1"};//,"jtest2"};
 		ArrayList<String> attrib = new ArrayList<String>();
 		attrib.add("occupation");
-		evaluationResult ie = cse.evaluateSimilarity(ids, attrib);
+		//evaluationResults ie = (evaluationResults) cse.evaluateSimilarity(ids, attrib);
 
 		
 	}
