@@ -42,15 +42,18 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
@@ -71,7 +74,8 @@ public class Tester {
 
 	private ICtxBroker externalCtxBroker;
 	private ICommManager commMgr;
-
+	public ICisManager cisManager;
+	
 	private static Logger LOG = LoggerFactory.getLogger(Tester.class);
 
 	private INetworkNode cssNodeId;
@@ -80,6 +84,9 @@ public class Tester {
 	private RequestorService requestorService = null;
 	private IIdentity userIdentity = null;
 	private IIdentity serviceIdentity = null;
+	
+	private IIdentity cisIdentity = null;
+	
 	private ServiceResourceIdentifier myServiceID;
 
 
@@ -100,7 +107,8 @@ public class Tester {
 
 		this.externalCtxBroker = Test1337.getCtxBroker();
 		this.commMgr = Test1337.getCommManager();
-
+		this.cisManager = Test1337.getCisManager();
+		
 		LOG.info("*** " + this.getClass() + " instantiated");
 
 		try {
@@ -136,9 +144,50 @@ public class Tester {
 		
 		///works
 		this.createOperatorAttributeBirthday();
+		
+		// create a community entity/attributes
+		//this.cisIdentity = this.createCIS();
+		
+		// lookup/retrieve community entity
+		//lookupCommunity();
+		
 	}
 
 
+	private void lookupCommunity(){
+		
+		try {
+			Thread.sleep(4000);
+			CtxEntityIdentifier commEntityId = this.externalCtxBroker.retrieveCommunityEntityId(this.requestorService, this.cisIdentity).get();
+			//CommunityCtxEntity commEntity = (CommunityCtxEntity) this.externalCtxBroker.retrieve(this.requestorService, commEntityId).get();
+			//LOG.info("commEntity : " +commEntity );
+			
+			LOG.info("commEntityId : " +commEntityId );
+			CtxAttribute commAttr =  this.externalCtxBroker.createAttribute(this.requestorService, commEntityId, CtxAttributeTypes.EMAIL).get();
+			commAttr.setStringValue("email");
+			this.externalCtxBroker.update(this.requestorService, commAttr);
+			
+			LOG.info("community this.cisIdentity : " +this.cisIdentity );
+			List<CtxIdentifier> results = this.externalCtxBroker.lookup(this.requestorService, this.cisIdentity, CtxModelType.ENTITY, CtxAttributeTypes.EMAIL).get();
+		
+			Thread.sleep(4000);
+			LOG.info("community lookup results 2  : " +results );
+		
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
+	
 
 	private void updateOperatorAttributeLocation(){
 		LOG.info("*** updateOperatorAttributes : updates an existing  Location attribute");
@@ -321,7 +370,7 @@ public class Tester {
 		LOG.info("*** cisOwned.getCisId() " +cisOwned.getCisId());
 		String cisIDString = cisOwned.getCisId();
 
-		cisID = this.commManager.getIdManager().fromJid(cisIDString);
+		cisID = this.commMgr.getIdManager().fromJid(cisIDString);
 
 		} catch (InterruptedException e) {
 		e.printStackTrace();
