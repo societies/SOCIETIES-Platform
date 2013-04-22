@@ -39,7 +39,7 @@ public class TestCase747 extends IntegrationTestCase{
 	public static IEventMgr eventMgr;
 
 	public TestCase747(){
-		super(747, new Class[]{ContextStorageTest.class, UAMEventingTest.class, UIDUpdateTest.class});
+		super(1875, new Class[]{ContextStorageTest.class, UAMEventingTest.class, UIDUpdateTest.class});
 	}
 
 	public void setCtxBroker(ICtxBroker ctxBroker){

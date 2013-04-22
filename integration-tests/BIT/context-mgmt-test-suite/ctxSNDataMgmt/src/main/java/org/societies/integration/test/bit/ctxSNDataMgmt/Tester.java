@@ -193,11 +193,23 @@ public class Tester {
 				Set<CtxAttribute> attrNameSet = facebookEntity.getAttributes(CtxAttributeTypes.NAME);
 				if(!attrNameSet.isEmpty()) {
 					for(CtxAttribute attrName: attrNameSet){
+						//expected only one
 						LOG.info("facebook attribute name retrieved "+attrName.getStringValue());	
 					}
 
 				}
 
+				
+				Set<CtxAttribute> attrFriendsSet = facebookEntity.getAttributes(CtxAttributeTypes.FRIENDS);
+				if(!attrFriendsSet.isEmpty()) {
+					for(CtxAttribute attrFriend: attrFriendsSet){
+						LOG.info("facebook attribute name retrieved "+attrFriend.getStringValue());	
+					}
+
+				}
+				
+				
+				
 			}				
 
 		} catch (InterruptedException e) {

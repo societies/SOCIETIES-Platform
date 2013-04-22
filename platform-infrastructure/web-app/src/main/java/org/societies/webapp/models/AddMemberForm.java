@@ -2,6 +2,7 @@ package org.societies.webapp.models;
 
 import javax.validation.constraints.Pattern;
 
+@Deprecated // No longer used after move from JSP to JSF
 public class AddMemberForm {
 
 	@Pattern(regexp="cis[A-Za-z0-9._-]+.[A-Za-z0-9._-]",

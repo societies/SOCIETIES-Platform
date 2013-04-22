@@ -26,7 +26,9 @@ package org.societies.privacytrust.privacyprotection.assessment.test;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -74,6 +76,11 @@ public class DataTransferAnalyzerTest {
 	private String class3 = "class3";
 	private String class4 = "class4";
 	
+	private List<String> stack1 = new ArrayList<String>();
+	private List<String> stack2 = new ArrayList<String>();
+	private List<String> stack3 = new ArrayList<String>();
+	private List<String> stack4 = new ArrayList<String>();
+	
 	private String dataType1 = "dataType1";
 	private String dataType2 = "dataType2";
 	private String dataType3 = "dataType3";
@@ -85,29 +92,34 @@ public class DataTransferAnalyzerTest {
 	@Before
 	public void setUp() throws Exception {
 		
+		stack1.add(class1);
+		stack2.add(class2);
+		stack3.add(class3);
+		stack4.add(class4);
+		
 		privacyLog = new PrivacyLog();
 		
-		privacyLog.append(new DataAccessLogEntry(time1, id1, class1, id1, -1));
-		privacyLog.append(new DataAccessLogEntry(time2, id1, class2, id2, -1));
-		privacyLog.append(new DataAccessLogEntry(time3, id1, class3, id1, -1));
-		privacyLog.append(new DataAccessLogEntry(time4, id1, class3, id1, -1));
-		privacyLog.append(new DataAccessLogEntry(time5, id1, class1, id3, -1));
-		privacyLog.append(new DataAccessLogEntry(time6, id2, class1, id4, -1));
-		privacyLog.append(new DataAccessLogEntry(time7, id2, class1, id1, -1));
-		privacyLog.append(new DataAccessLogEntry(time7, null, null, null, -1));
+		privacyLog.append(new DataAccessLogEntry(time1, id1, class1, stack1, id1, -1));
+		privacyLog.append(new DataAccessLogEntry(time2, id1, class2, stack2, id2, -1));
+		privacyLog.append(new DataAccessLogEntry(time3, id1, class3, stack3, id1, -1));
+		privacyLog.append(new DataAccessLogEntry(time4, id1, class3, stack3, id1, -1));
+		privacyLog.append(new DataAccessLogEntry(time5, id1, class1, stack1, id3, -1));
+		privacyLog.append(new DataAccessLogEntry(time6, id2, class1, stack1, id4, -1));
+		privacyLog.append(new DataAccessLogEntry(time7, id2, class1, stack1, id1, -1));
+		privacyLog.append(new DataAccessLogEntry(time7, null, null, null, null, -1));
 
-		privacyLog.append(new DataTransmissionLogEntry(dataType1, time2, id1, id1, class2, -1, ChannelType.XMPP));
-		privacyLog.append(new DataTransmissionLogEntry(dataType2, time3, id2, id1, class4, -1, ChannelType.XMPP));
-		privacyLog.append(new DataTransmissionLogEntry(dataType3, time4, id3, id1, class1, -1, ChannelType.XMPP));
-		privacyLog.append(new DataTransmissionLogEntry(dataType4, time4, id4, id1, class3, -1, ChannelType.XMPP));
-		privacyLog.append(new DataTransmissionLogEntry(dataType1, time5, id1, id1, class3, -1, ChannelType.XMPP));
-		privacyLog.append(new DataTransmissionLogEntry(dataType2, time6, id2, id1, class2, -1, ChannelType.XMPP));
-		privacyLog.append(new DataTransmissionLogEntry(dataType3, time7, id3, id1, class4, -1, ChannelType.XMPP));
-		privacyLog.append(new DataTransmissionLogEntry(dataType4, time8, id4, id1, class1, -1, ChannelType.XMPP));
-		privacyLog.append(new DataTransmissionLogEntry(dataType1, time8, id1, id2, class4, -1, ChannelType.XMPP));
-		privacyLog.append(new DataTransmissionLogEntry(dataType2, time9, id2, id1, class1, -1, ChannelType.XMPP));
-		privacyLog.append(new DataTransmissionLogEntry(dataType3, time9, id3, id1, class3, -1, ChannelType.XMPP));
-		privacyLog.append(new DataTransmissionLogEntry(null, time9, null, null, null, -1, ChannelType.XMPP));
+		privacyLog.append(new DataTransmissionLogEntry(dataType1, time2, id1, id1, class2, stack2, -1, ChannelType.XMPP));
+		privacyLog.append(new DataTransmissionLogEntry(dataType2, time3, id2, id1, class4, stack4, -1, ChannelType.XMPP));
+		privacyLog.append(new DataTransmissionLogEntry(dataType3, time4, id3, id1, class1, stack1, -1, ChannelType.XMPP));
+		privacyLog.append(new DataTransmissionLogEntry(dataType4, time4, id4, id1, class3, stack3, -1, ChannelType.XMPP));
+		privacyLog.append(new DataTransmissionLogEntry(dataType1, time5, id1, id1, class3, stack3, -1, ChannelType.XMPP));
+		privacyLog.append(new DataTransmissionLogEntry(dataType2, time6, id2, id1, class2, stack2, -1, ChannelType.XMPP));
+		privacyLog.append(new DataTransmissionLogEntry(dataType3, time7, id3, id1, class4, stack4, -1, ChannelType.XMPP));
+		privacyLog.append(new DataTransmissionLogEntry(dataType4, time8, id4, id1, class1, stack1, -1, ChannelType.XMPP));
+		privacyLog.append(new DataTransmissionLogEntry(dataType1, time8, id1, id2, class4, stack4, -1, ChannelType.XMPP));
+		privacyLog.append(new DataTransmissionLogEntry(dataType2, time9, id2, id1, class1, stack1, -1, ChannelType.XMPP));
+		privacyLog.append(new DataTransmissionLogEntry(dataType3, time9, id3, id1, class3, stack3, -1, ChannelType.XMPP));
+		privacyLog.append(new DataTransmissionLogEntry(null, time9, null, null, null, null, -1, ChannelType.XMPP));
 		
 		dataTransferAnalyzer = new DataTransferAnalyzer(privacyLog);
 	}

@@ -195,6 +195,7 @@ var userFeedback = (function () {
 			$('<input>').attr('type', 'checkbox')
 			.attr('name', 'data'+i)
 			.attr('id', 'data'+i)
+			.attr('checked', 'checked')
 			.attr('value', formInfo.data[i])
 			.appendTo(li);
 			$('<label>').attr('for', 'data'+i)

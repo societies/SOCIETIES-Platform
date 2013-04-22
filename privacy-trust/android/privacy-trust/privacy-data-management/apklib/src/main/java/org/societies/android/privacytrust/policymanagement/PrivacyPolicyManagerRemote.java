@@ -74,14 +74,16 @@ public class PrivacyPolicyManagerRemote {
 	private Context context;
 	private ClientCommunicationMgr clientCommManager;
 	private PrivacyPolicyIntentSender intentSender;
-	private boolean remoteReady;
+	private static boolean remoteReady;
 
-	
+
 	public PrivacyPolicyManagerRemote(Context context)  {
+		Log.d(TAG, "PrivacyPolicyManagerRemote Constructor");
 		this.context = context;
 		clientCommManager = new ClientCommunicationMgr(context, true);
 		intentSender = new PrivacyPolicyIntentSender(context);
 		remoteReady = false;
+		bindToComms();
 	}
 
 
@@ -107,17 +109,17 @@ public class PrivacyPolicyManagerRemote {
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::"+action);
 		} catch (InvalidFormatException e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(TAG, "Unexepected invalid format error: "+(null != e ? e.getMessage() : ""));
 			intentSender.sendIntentError(clientPackage, action, "Error: don't know who to contact");
 			return false;
 		}
 		catch (CommunicationException e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(TAG, "Unexepected comm error: "+(null != e ? e.getMessage() : ""));
 			intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
 			return false;
 		}
 		catch (Exception e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(TAG, "Unexepected error: "+(null != e ? e.getMessage() : ""));
 			intentSender.sendIntentError(clientPackage, action, "Unknown remote remote");
 			return false;
 		} 
@@ -185,14 +187,14 @@ public class PrivacyPolicyManagerRemote {
 			clientCommManager.sendIQ(stanza, IQ.Type.GET, messageBean, callback);
 			Log.d(TAG, "Send stanza PrivacyPolicyManagerBean::" + action);
 		} catch (Exception e) {
-			Log.e(TAG, e.getMessage());
+			Log.e(TAG, "Unexepected error: "+(null != e ? e.getMessage() : ""));
 			intentSender.sendIntentError(clientPackage, MethodType.DELETE_PRIVACY_POLICY.name(), "Error during the sending of remote request");
 			return false;
 		}
 		return true;
 	}
 
-	
+
 	// -- Comms
 
 	public void bindToComms() {
@@ -213,20 +215,29 @@ public class PrivacyPolicyManagerRemote {
 								//SEND INTENT WITH SERVICE STARTED STATUS
 								Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
 								intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, resultFlag);
+								intent.putExtra("type", "PrivacyPolicyManager");
 								context.sendBroadcast(intent);
 							}
 							@Override
-							public void returnAction(String result) { }
+							public void returnAction(String result) {
+								Log.d(TAG, "Register to comm: " + result);
+							}
 							@Override
 							public void returnException(String result) {
-								// TODO Auto-generated method stub
-					
+								Log.e(TAG, "Error during comm registration: " + result);
+								remoteReady = false;
+								//SEND INTENT WITH SERVICE STARTED STATUS
+								Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
+								intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, remoteReady);
+								intent.putExtra("type", "PrivacyPolicyManager");
+								context.sendBroadcast(intent);
 							}
 
 						});
 					} else {
 						Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
 						intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
+						intent.putExtra("type", "PrivacyPolicyManager");
 						context.sendBroadcast(intent);
 					}
 				}	
@@ -237,7 +248,7 @@ public class PrivacyPolicyManagerRemote {
 				@Override
 				public void returnException(String result) {
 					// TODO Auto-generated method stub
-					
+
 				}
 
 			});
@@ -245,6 +256,7 @@ public class PrivacyPolicyManagerRemote {
 		else {
 			Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STARTED_STATUS);
 			intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+			intent.putExtra("type", "PrivacyPolicyManager");
 			this.context.sendBroadcast(intent);
 		}
 	}
@@ -263,6 +275,7 @@ public class PrivacyPolicyManagerRemote {
 					//SEND INTENT WITH SERVICE STOPPED STATUS
 					Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
 					intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+					intent.putExtra("type", "PrivacyPolicyManager");
 					context.sendBroadcast(intent);
 				}	
 				@Override
@@ -270,7 +283,7 @@ public class PrivacyPolicyManagerRemote {
 				@Override
 				public void returnException(String result) {
 					// TODO Auto-generated method stub
-					
+
 				}
 
 			});
@@ -278,6 +291,7 @@ public class PrivacyPolicyManagerRemote {
 		else {
 			Intent intent = new Intent(IServiceManager.INTENT_SERVICE_STOPPED_STATUS);
 			intent.putExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, true);
+			intent.putExtra("type", "PrivacyPolicyManager");
 			this.context.sendBroadcast(intent);
 		}
 	}

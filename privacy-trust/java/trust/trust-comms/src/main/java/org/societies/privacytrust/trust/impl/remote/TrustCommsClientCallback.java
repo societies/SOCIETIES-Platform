@@ -37,7 +37,6 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
 import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
-import org.societies.privacytrust.trust.impl.broker.remote.InternalTrustBrokerRemoteClientCallback;
 import org.societies.privacytrust.trust.impl.broker.remote.TrustBrokerRemoteClientCallback;
 import org.societies.privacytrust.trust.impl.evidence.remote.InternalTrustEvidenceCollectorRemoteClientCallback;
 import org.societies.privacytrust.trust.impl.evidence.remote.TrustEvidenceCollectorRemoteClientCallback;
@@ -55,25 +54,22 @@ public class TrustCommsClientCallback implements ICommCallback {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			Arrays.asList(
+					"http://societies.org/api/schema/identity",
 					"http://societies.org/api/schema/privacytrust/trust/model",
 					"http://societies.org/api/schema/privacytrust/trust/broker",
 					"http://societies.org/api/schema/privacytrust/trust/evidence/collector",
-					"http://societies.org/api/internal/schema/privacytrust/trust/broker",
 					"http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector"));
 	
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList(
+					"org.societies.api.schema.identity",
 					"org.societies.api.schema.privacytrust.trust.model",
 					"org.societies.api.schema.privacytrust.trust.broker",
 					"org.societies.api.schema.privacytrust.trust.evidence.collector",
-					"org.societies.api.internal.schema.privacytrust.trust.broker",
 					"org.societies.api.internal.schema.privacytrust.trust.evidence.collector"));
 
 	@Autowired(required=true)
 	private TrustBrokerRemoteClientCallback trustBrokerRemoteClientCallback;
-	
-	@Autowired(required=true)
-	private InternalTrustBrokerRemoteClientCallback internalTrustBrokerRemoteClientCallback;
 	
 	@Autowired(required=true)
 	private TrustEvidenceCollectorRemoteClientCallback trustEvidenceCollectorRemoteClientCallback;
@@ -123,16 +119,10 @@ public class TrustCommsClientCallback implements ICommCallback {
 	@Override
 	public void receiveResult(Stanza stanza, Object payload) {
 		
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("receiveResult: stanza.id=" + stanza.getId());
-			LOG.debug("receiveResult: stanza.from=" + stanza.getFrom());
-			LOG.debug("receiveResult: stanza.to=" + stanza.getTo());
-			LOG.debug("receiveResult: payload=" + payload);
-		}
+		if (LOG.isDebugEnabled())
+			LOG.debug("receiveResult: stanza=" + stanza + ", payload=" + payload);
 
-		if (payload instanceof org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerResponseBean) {
-			this.internalTrustBrokerRemoteClientCallback.receiveResult(stanza, (TrustBrokerResponseBean) payload);
-		} else if (payload instanceof TrustBrokerResponseBean) {
+		if (payload instanceof TrustBrokerResponseBean) {
 			this.trustBrokerRemoteClientCallback.receiveResult(stanza, (TrustBrokerResponseBean) payload);
 		} else if (payload instanceof org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean) {
 			this.internalTrustEvidenceCollectorRemoteClientCallback.receiveResult(stanza, (TrustEvidenceCollectorResponseBean) payload);
@@ -150,27 +140,19 @@ public class TrustCommsClientCallback implements ICommCallback {
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
 		
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("receiveMessage: stanza.id=" + stanza.getId());
-			LOG.debug("receiveMessage: stanza.from=" + stanza.getFrom());
-			LOG.debug("receiveMessage: stanza.to=" + stanza.getTo());
-			LOG.debug("receiveMessage: payload=" + payload);
-		}
+		if (LOG.isDebugEnabled())
+			LOG.debug("receiveMessage: stanza=" + stanza + ", payload=" + payload);
 	}
 
 	/*
 	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveItems(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String, java.util.List)
 	 */
 	@Override
-	public void receiveItems(Stanza stanza, String arg1, List<String> arg2) {
+	public void receiveItems(Stanza stanza, String item, List<String> items) {
 		
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("receiveMessage: stanza.id=" + stanza.getId());
-			LOG.debug("receiveMessage: stanza.from=" + stanza.getFrom());
-			LOG.debug("receiveMessage: stanza.to=" + stanza.getTo());
-			LOG.debug("receiveMessage: item=" + arg1);
-			LOG.debug("receiveMessage: items=" + arg2);
-		}
+		if (LOG.isDebugEnabled())
+			LOG.debug("receiveMessage: stanza=" + stanza + ", item=" + item
+					+ ", items=" + items);
 	}
 
 	/*
@@ -179,13 +161,9 @@ public class TrustCommsClientCallback implements ICommCallback {
 	@Override
 	public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
 		
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("receiveInfo: stanza.id=" + stanza.getId());
-			LOG.debug("receiveInfo: stanza.from=" + stanza.getFrom());
-			LOG.debug("receiveInfo: stanza.to=" + stanza.getTo());
-			LOG.debug("receiveInfo: node=" + node);
-			LOG.debug("receiveInfo: info=" + info);
-		}
+		if (LOG.isDebugEnabled())
+			LOG.debug("receiveInfo: stanza=" + stanza + ", node=" + node
+					+ ", info=" + info);
 	}
 
 	/*
@@ -194,9 +172,6 @@ public class TrustCommsClientCallback implements ICommCallback {
 	@Override
 	public void receiveError(Stanza stanza, XMPPError info) {
 		
-		LOG.error("receiveError: stanza.id=" + stanza.getId());
-		LOG.error("receiveError: stanza.from=" + stanza.getFrom());
-		LOG.error("receiveError: stanza.to=" + stanza.getTo());
-		LOG.error("receiveError: info=" + info);
+		LOG.error("receiveError: stanza=" + stanza + ", info=" + info);
 	}
 }

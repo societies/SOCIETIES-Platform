@@ -9,7 +9,12 @@ package org.societies.integration.test.userfeedback;
  *
  */
 public enum UserFeedbackType {
-	RADIOLIST("getExplicitFB:0"), CHECKBOXLIST("getExplicitFB:1"), ACKNACK("getExplicitFB:2"), ABORT("getImplicitFB:0");
+	RADIOLIST("getExplicitFB:0"),
+	CHECKBOXLIST("getExplicitFB:1"),
+	ACKNACK("getExplicitFB:2"),
+	ABORT("getImplicitFB:0"),
+	PRIVACY_NEGOTIATION("getExplicitFB:3"),
+	PRIVACY_ACCESS_CONTROL("getExplicitFB:4");
 
 	private final String value;
 

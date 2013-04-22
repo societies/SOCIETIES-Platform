@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <string name="app_name">TestFeedback</string>
@@ -9,5 +10,7 @@
     <string name="title_section2">Section 2</string>
     <string name="title_section1">Section 1</string>
     <string name="title_activity_test">TestActivity</string>
+    <string name="title_activity_negotiation_form">NegotiationForm</string>
+    <string name="action_settings">Settings</string>
 
 </resources>

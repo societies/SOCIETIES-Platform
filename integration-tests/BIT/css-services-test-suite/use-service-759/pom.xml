@@ -9,11 +9,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.integration.test.bit</groupId>
-	<artifactId>useservice</artifactId>
-	<name>#759 Use a 3P service</name>
+	<groupId>org.societies.integration.test</groupId>
+	<artifactId>bit.use_service.1866</artifactId>
+	<name>#1866 Use a 3P service</name>
 	<packaging>bundle</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${release.version}</version>
 
 	<developers>
 		<developer>

@@ -67,9 +67,9 @@ public class NominalTestCaseLowerTester {
 	 */
 	@BeforeClass
 	public static void initialization() {
-		LOG.info("[#755] Initialization");
-		LOG.info("[#755] Prerequisite: The PLAN file is executed");
-		LOG.info("[#755] Prerequisite: The CSS has an identity");
+		LOG.info("[#1867] Initialization");
+		LOG.info("[#1867] Prerequisite: The PLAN file is executed");
+		LOG.info("[#1867] Prerequisite: The CSS has an identity");
 	}
 
 	/**
@@ -78,21 +78,21 @@ public class NominalTestCaseLowerTester {
 	 */
 	@Before
 	public void setUp() {
-		LOG.info("[#755] NominalTestCaseLowerTester::setUp");
+		LOG.info("[#1867] NominalTestCaseLowerTester::setUp");
 
 		Future<CssInterfaceResult> interfaceResult = null;
 		//CssRecord profile = null;
 		
 		profile = createCSSRecord();
-		LOG.info("[#755] CSS Record: profile:" +profile);
+		LOG.info("[#1867] CSS Record: profile:" +profile);
 
 			// -- Create the CSS Record
-			LOG.info("[#755] Preamble: Create the CSS Record");
+			LOG.info("[#1867] Preamble: Create the CSS Record");
 	}
 			private CssRecord createCSSRecord() {
 				
 				
-				LOG.info("[#755] createCSSRecord: Create the CSS Record/////////////////////");
+				LOG.info("[#1867] createCSSRecord: Create the CSS Record/////////////////////");
 		    	CssNode cssNode_1;
 
 				cssNode_1 = new CssNode();
@@ -142,7 +142,7 @@ public class NominalTestCaseLowerTester {
 	 */
 	@After
 	public void tearDown() {
-		LOG.info("[#755] tearDown");
+		LOG.info("[#1867] tearDown");
 	}
 
 
@@ -152,12 +152,12 @@ public class NominalTestCaseLowerTester {
 	 */
 	@Test
 	public void bodyCreateNode() {
-		LOG.info("[#755] create CSS Cloud Node");
+		LOG.info("[#1867] create CSS Cloud Node");
 		String Name = null;
 		Name ="Liam";
 		String compareName;
-		LOG.info("[#755] ######################## .................:" +Name);
-		LOG.info("[#755] ##########@@@@@@@@@@@@@@ .................:" +profile.getForeName());
+		LOG.info("[#1867] ######################## .................:" +Name);
+		LOG.info("[#1867] ##########@@@@@@@@@@@@@@ .................:" +profile.getForeName());
 		
 		assertTrue(Name.equals(profile.getForeName()));
 		
@@ -167,9 +167,9 @@ public class NominalTestCaseLowerTester {
 		
 		try {
 			cssDetails = TestCase755.cssRegistry.getCssRecord();
-			LOG.info("[#755] &&&&&&&&&&&&&& Name of CSS is .................:" +cssDetails.getName());
+			LOG.info("[#1867] &&&&&&&&&&&&&& Name of CSS is .................:" +cssDetails.getName());
 		} catch (CssRegistrationException e) {
-			LOG.info("[#755] CssRegistrationException - Could not get the CSS Record from the CSS Registry");
+			LOG.info("[#1867] CssRegistrationException - Could not get the CSS Record from the CSS Registry");
 			e.printStackTrace();
 		}
 		
@@ -179,22 +179,22 @@ public class NominalTestCaseLowerTester {
 		
 		try {
 			Name = TestCase755.cssRegistry.getCssRecord().getName();
-			LOG.info("[#755] &&&&&&&&&&&&&& Name of CSS is .................:" +Name);
+			LOG.info("[#1867] &&&&&&&&&&&&&& Name of CSS is .................:" +Name);
 		} catch (CssRegistrationException e) {
-			LOG.info("[#755] CssRegistrationException - Could not get the CSS Record Name from the CSS Registry");
+			LOG.info("[#1867] CssRegistrationException - Could not get the CSS Record Name from the CSS Registry");
 			e.printStackTrace();
 		}
 		compareName = profile.getName();
-		LOG.info("[#755] ==================== .................:" +compareName);
+		LOG.info("[#1867] ==================== .................:" +compareName);
 		//assertTrue(Name.equals(cssDetails.getForeName())); 
 		assertTrue(compareName.equalsIgnoreCase(profile.getName()));
 		assertTrue(compareName.equalsIgnoreCase(Name));
-		LOG.info("[#755] create CSS Cloud Node END............finally....."); 
+		LOG.info("[#1867] create CSS Cloud Node END............finally....."); 
 	}
 	
 	@Test
 	public void bodyDeleteNode() {
-		LOG.info("[#755] Delete CSS Cloud Node");
+		LOG.info("[#1867] Delete CSS Cloud Node");
 		String Name = null;
 		Name ="liam";
 		String compareName;
@@ -206,7 +206,7 @@ public class NominalTestCaseLowerTester {
 		try {
 			cssDetails = TestCase755.cssRegistry.getCssRecord();
 		} catch (CssRegistrationException e) {
-			LOG.info("[#755] CssRegistrationException - Could not add node to the CSS Registry");
+			LOG.info("[#1867] CssRegistrationException - Could not add node to the CSS Registry");
 			e.printStackTrace();
 		}
 		
@@ -216,9 +216,9 @@ public class NominalTestCaseLowerTester {
 		try {
 			Name = TestCase755.cssRegistry.getCssRecord().getName();
 			interfaceResult = TestCase755.cssLocalManager.getCssRecord();
-			LOG.info("[#755] deleteNode Name of CSS is .................:" +Name);
+			LOG.info("[#1867] deleteNode Name of CSS is .................:" +Name);
 		} catch (CssRegistrationException e) {
-			LOG.info("[#755] CssRegistrationException - Could not get the CSS Record Name from the CSS Registry");
+			LOG.info("[#1867] CssRegistrationException - Could not get the CSS Record Name from the CSS Registry");
 			e.printStackTrace();
 		}
 		compareName = profile.getName();
@@ -230,12 +230,12 @@ public class NominalTestCaseLowerTester {
 			cssDetails = TestCase755.cssRegistry.getCssRecord();
 			
 		} catch (CssRegistrationException e) {
-			LOG.info("[#755] CssRegistrationException - Could not delete node from the CSS Registry");
+			LOG.info("[#1867] CssRegistrationException - Could not delete node from the CSS Registry");
 			e.printStackTrace();
 		}
 		//assertNull(cssDetails);
-		LOG.info("[#755] CSS Details:" +cssDetails.getName());
-		LOG.info("[#755] Delete CSS Cloud Node END.................");
+		LOG.info("[#1867] CSS Details:" +cssDetails.getName());
+		LOG.info("[#1867] Delete CSS Cloud Node END.................");
 		
 	}
 

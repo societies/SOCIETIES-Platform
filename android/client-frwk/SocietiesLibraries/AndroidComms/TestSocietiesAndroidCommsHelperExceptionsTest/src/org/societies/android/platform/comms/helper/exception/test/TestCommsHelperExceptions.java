@@ -85,7 +85,7 @@ public class TestCommsHelperExceptions extends AndroidTestCase {
 		assertTrue(this.testCompleted);
 	}
 	
-	@MediumTest
+//	@MediumTest
 	/**
 	 * Test if XMPP server is not available.Requires that the SocietiesAndroidCommsApp
 	 * is installed in the target AVD

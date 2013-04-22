@@ -24,10 +24,11 @@
  */
 package org.societies.privacytrust.trust.api.event;
 
-import org.societies.api.privacytrust.trust.event.ITrustEventListener;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.event.TrustEvent;
+import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 
 /**
  * The Trust Event Manager is responsible for the subscription and publishing
@@ -53,51 +54,123 @@ public interface ITrustEventMgr {
     public void postEvent(final TrustEvent event, final String[] topics);
     
     /**
-     * Registers the specified {@link ITrustEventListener} for events of the
-     * supplied topics. Once registered, the <code>ITrustEventListener</code>
-     * will receive {@link TrustEvent TrustEvents}.
+     * Registers the specified {@link ITrustUpdateEventListener} for all local
+     * events of the supplied topics. Once registered, the 
+     * <code>ITrustUpdateEventListener</code> will handle 
+     * {@link TrustUpdateEvent TrustUpdateEvents} associated with any locally
+     * updated trust value.
      * <p>
-     * To unregister the specified <code>ITrustEventListener</code>, use the
-     * {@link #unregisterListener(ITrustEventListener, String[])} method.
+     * To unregister the specified <code>ITrustUpdateEventListener</code>, use
+     * the {@link #unregisterUpdateListener(ITrustUpdateEventListener, String[])}
+     * method.
      * 
      * @param listener
-     *            the <code>ITrustEventListener</code> to register.
+     *            the <code>ITrustUpdateEventListener</code> to register.
      * @param topics
      *            the event topics to register for.
      * @throws TrustEventMgrException
      *             if the registration process of the specified
-     *             <code>ITrustEventListener</code> fails.
+     *             <code>ITrustUpdateEventListener</code> fails.
      * @throws NullPointerException
-     *             if any of the specified parameters is <code>null</code>.
-     * @see #unregisterListener(ITrustEventListener, String[])
-     * @since 0.5
+     *             if any of the specified parameters is 
+     *             <code>null</code>.
+     * @see #unregisterUpdateListener(ITrustUpdateEventListener, String[])
+     * @since 1.0
      */
-    public void registerListener(final ITrustEventListener listener, 
+    public void registerUpdateListener(final ITrustUpdateEventListener listener, 
 			final String[] topics) throws TrustEventMgrException;
     
     /**
-     * Unregisters the specified {@link ITrustEventListener} from events of the
-     * supplied topics. Once unregistered, the <code>ITrustEventListener</code>
-     * will no longer receive {@link TrustEvent TrustEvents}.
+     * Unregisters the specified {@link ITrustUpdateEventListener} from all 
+     * local events of the supplied topics. Once unregistered, 
+     * the <code>ITrustUpdateEventListener</code> will no longer receive 
+     * {@link TrustUpdateEvent TrustUpdateEvents} associated with any locally
+     * updated trust value.
      * <p>
-     * The method has no effect if the specified 
-     * <code>ITrustEventListener</code> has not been previously registered using
-     * the {@link #registerListener(ITrustEventListener, String[])} method.
+     * The method has no effect if the specified
+     * <code>ITrustUpdateEventListener</code> has not been previously
+     * registered using the 
+     * {@link #registerUpdateListener(ITrustUpdateEventListener, String[])}
+     * method.
      * 
      * @param listener
-     *            the <code>ITrustEventListener</code> to unregister.
+     *            the <code>ITrustUpdateEventListener</code> to unregister.
      * @param topics
      *            the event topics to unregister from.
      * @throws TrustEventMgrException
      *             if the unregistration process of the specified
-     *             <code>ITrustEventListener</code> fails.
+     *             <code>ITrustUpdateEventListener</code> fails.
      * @throws NullPointerException
-     *             if any of the specified parameters is <code>null</code>.
-     * @see #registerListener(ITrustEventListener, String[])
+     *             if any of the specified parameters is 
+     *             <code>null</code>.
+     * @see #registerUpdateListener(ITrustUpdateEventListener, String[])
      * @since 1.0
      */
-    public void unregisterListener(final ITrustEventListener listener, 
+    public void unregisterUpdateListener(final ITrustUpdateEventListener listener, 
 			final String[] topics) throws TrustEventMgrException;
+    
+    /**
+     * Registers the specified {@link ITrustUpdateEventListener} for events of the
+     * supplied topics. Once registered, the <code>ITrustUpdateEventListener</code>
+     * will handle {@link TrustUpdateEvent TrustUpdateEvents} associated with the 
+     * values assigned by the given trustor.
+     * <p>
+     * To unregister the specified <code>ITrustUpdateEventListener</code>, use
+     * the {@link #unregisterUpdateListener(ITrustUpdateEventListener, String[], TrustedEntityId)}
+     * method.
+     * 
+     * @param listener
+     *            the <code>ITrustUpdateEventListener</code> to register.
+     * @param topics
+     *            the event topics to register for.
+     * @param trustorId
+	 *            the identifier of the entity which places trust in
+	 *            the specified trustee.
+     * @throws TrustEventMgrException
+     *             if the registration process of the specified
+     *             <code>ITrustUpdateEventListener</code> fails.
+     * @throws NullPointerException
+     *             if any of the specified listener or topics is 
+     *             <code>null</code>.
+     * @see #unregisterUpdateListener(ITrustUpdateEventListener, String[], TrustedEntityId)
+     * @since 1.0
+     */
+    public void registerUpdateListener(final ITrustUpdateEventListener listener, 
+			final String[] topics, final TrustedEntityId trustorId) 
+					throws TrustEventMgrException;
+    
+    /**
+     * Unregisters the specified {@link ITrustUpdateEventListener} from events
+     * of the supplied topics. Once unregistered, 
+     * the <code>ITrustUpdateEventListener</code> will no longer receive 
+     * {@link TrustUpdateEvent TrustUpdateEvents} associated with the values
+     * assigned by the given trustor.
+     * <p>
+     * The method has no effect if the specified
+     * <code>ITrustUpdateEventListener</code> has not been previously
+     * registered using the 
+     * {@link #registerUpdateListener(ITrustUpdateEventListener, String[], TrustedEntityId)}
+     * method.
+     * 
+     * @param listener
+     *            the <code>ITrustUpdateEventListener</code> to unregister.
+     * @param topics
+     *            the event topics to unregister from.
+     * @param trustorId
+	 *            the identifier of the entity which places trust in
+	 *            the specified trustees.
+     * @throws TrustEventMgrException
+     *             if the unregistration process of the specified
+     *             <code>ITrustUpdateEventListener</code> fails.
+     * @throws NullPointerException
+     *             if any of the specified parameters is 
+     *             <code>null</code>.
+     * @see #registerUpdateListener(ITrustUpdateEventListener, String[], TrustedEntityId)
+     * @since 1.0
+     */
+    public void unregisterUpdateListener(final ITrustUpdateEventListener listener, 
+			final String[] topics, final TrustedEntityId trustorId)
+					throws TrustEventMgrException;
     
     /**
      * Registers the specified {@link ITrustUpdateEventListener} for events of the
@@ -123,7 +196,7 @@ public interface ITrustEventMgr {
      *             if the registration process of the specified
      *             <code>ITrustUpdateEventListener</code> fails.
      * @throws NullPointerException
-     *             if any of the specified listener or topics is 
+     *             if any of the specified parameters is 
      *             <code>null</code>.
      * @see #unregisterUpdateListener(ITrustUpdateEventListener, String[], TrustedEntityId, TrustedEntityId)
      * @since 0.5
@@ -159,7 +232,7 @@ public interface ITrustEventMgr {
      *             if the unregistration process of the specified
      *             <code>ITrustUpdateEventListener</code> fails.
      * @throws NullPointerException
-     *             if any of the specified listener or topics is 
+     *             if any of the specified parameters is 
      *             <code>null</code>.
      * @see #registerUpdateListener(ITrustUpdateEventListener, String[], TrustedEntityId, TrustedEntityId)
      * @since 1.0
@@ -167,6 +240,131 @@ public interface ITrustEventMgr {
     public void unregisterUpdateListener(final ITrustUpdateEventListener listener, 
 			final String[] topics, final TrustedEntityId trustorId,
 			final TrustedEntityId trusteeId) throws TrustEventMgrException;
+    
+    /**
+     * Registers the specified {@link ITrustUpdateEventListener} for events of the
+     * supplied topics. Once registered, the <code>ITrustUpdateEventListener</code>
+     * will handle {@link TrustUpdateEvent TrustUpdateEvents} associated with the 
+     * values assigned to entities of the specified type by the given trustor.
+     * <p>
+     * To unregister the specified <code>ITrustUpdateEventListener</code>, use
+     * the {@link #unregisterUpdateListener(ITrustUpdateEventListener, String[], TrustedEntityId, TrustedEntityType)}
+     * method.
+     * 
+     * @param listener
+     *            the <code>ITrustUpdateEventListener</code> to register.
+     * @param topics
+     *            the event topics to register for.
+     * @param trustorId
+	 *            the identifier of the entity which places trust in
+	 *            the specified trustee.
+	 * @param trusteeType
+	 *            the type of the entities whose trust update events to
+	 *            register for.
+     * @throws TrustEventMgrException
+     *             if the registration process of the specified
+     *             <code>ITrustUpdateEventListener</code> fails.
+     * @throws NullPointerException
+     *             if any of the specified listener or topics is 
+     *             <code>null</code>.
+     * @see #unregisterUpdateListener(ITrustUpdateEventListener, String[], TrustedEntityId, TrustedEntityType)
+     * @since 1.0
+     */
+    public void registerUpdateListener(final ITrustUpdateEventListener listener, 
+			final String[] topics, final TrustedEntityId trustorId,
+			final TrustedEntityType trusteeType) throws TrustEventMgrException;
+    
+    /**
+     * Unregisters the specified {@link ITrustUpdateEventListener} from events
+     * of the supplied topics. Once unregistered, 
+     * the <code>ITrustUpdateEventListener</code> will no longer receive 
+     * {@link TrustUpdateEvent TrustUpdateEvents} associated with the values
+     * assigned to entities of the specified type by the given trustor.
+     * <p>
+     * The method has no effect if the specified
+     * <code>ITrustUpdateEventListener</code> has not been previously
+     * registered using the 
+     * {@link #registerUpdateListener(ITrustUpdateEventListener, String[], TrustedEntityId, TrustedEntityType)}
+     * method.
+     * 
+     * @param listener
+     *            the <code>ITrustUpdateEventListener</code> to unregister.
+     * @param topics
+     *            the event topics to unregister from.
+     * @param trustorId
+	 *            the identifier of the entity which places trust in
+	 *            the specified trustees.
+	 * @param trusteeType
+	 *            the type of the entities whose trust update events to
+	 *            unregister from.
+     * @throws TrustEventMgrException
+     *             if the unregistration process of the specified
+     *             <code>ITrustUpdateEventListener</code> fails.
+     * @throws NullPointerException
+     *             if any of the specified parameters is 
+     *             <code>null</code>.
+     * @see #registerUpdateListener(ITrustUpdateEventListener, String[], TrustedEntityId, TrustedEntityType)
+     * @since 1.0
+     */
+    public void unregisterUpdateListener(final ITrustUpdateEventListener listener, 
+			final String[] topics, final TrustedEntityId trustorId,
+			final TrustedEntityType trusteeType) throws TrustEventMgrException;
+    
+    /**
+     * Registers the specified {@link ITrustEvidenceUpdateEventListener} for
+     * all local events of the supplied topics. Once registered, the <code>
+     * ITrustEvidenceUpdateEventListener</code> will handle {@link 
+     * TrustEvidenceUpdateEvent TrustEvidenceUpdateEvents} associated with the
+     * identified subject and object.
+     * <p>
+     * To unregister the specified 
+     * <code>ITrustEvidenceUpdateEventListener</code>, use the 
+     * {@link #unregisterEvidenceUpdateListener(ITrustEvidenceUpdateEventListener, String[])} 
+     * method.
+     * 
+     * @param listener
+     *            the <code>ITrustEvidenceUpdateEventListener</code> to register.
+     * @param topics
+     *            the event topics to register for.
+     * @throws TrustEventMgrException
+     *             if the registration process of the specified
+     *             <code>ITrustEvidenceUpdateEventListener</code> fails.
+     * @throws NullPointerException
+     *             if any of the specified parameters is <code>null</code>.
+     * @see #unregisterEvidenceUpdateListener(ITrustEvidenceUpdateEventListener, String[])
+     * @since 0.5
+     */
+    public void registerEvidenceUpdateListener(
+    		final ITrustEvidenceUpdateEventListener listener, 
+			final String[] topics) throws TrustEventMgrException;
+    
+    /**
+     * Unregisters the specified {@link ITrustEvidenceUpdateEventListener} from
+     * all local events of the supplied topics. Once unregistered, the <code>
+     * ITrustEvidenceUpdateEventListener</code> will no longer receive {@link 
+     * TrustEvidenceUpdateEvent TrustEvidenceUpdateEvents}.
+     * <p>
+     * The method has no effect if the specified 
+     * <code>ITrustEvidenceUpdateEventListener</code> has not been previously
+     * registered using the 
+     * {@link #registerEvidenceUpdateListener(ITrustEvidenceUpdateEventListener, String[])}
+     * method.
+     * 
+     * @param listener
+     *            the <code>ITrustEvidenceUpdateEventListener</code> to unregister.
+     * @param topics
+     *            the event topics to unregister from.
+     * @throws TrustEventMgrException
+     *             if the unregistration process of the specified
+     *             <code>ITrustEvidenceUpdateEventListener</code> fails.
+     * @throws NullPointerException
+     *             if any of the specified parameters is <code>null</code>.
+     * @see #registerEvidenceUpdateListener(ITrustEvidenceUpdateEventListener, String[])
+     * @since 1.0
+     */
+    public void unregisterEvidenceUpdateListener(
+    		final ITrustEvidenceUpdateEventListener listener, 
+			final String[] topics) throws TrustEventMgrException;
     
     /**
      * Registers the specified {@link ITrustEvidenceUpdateEventListener} for

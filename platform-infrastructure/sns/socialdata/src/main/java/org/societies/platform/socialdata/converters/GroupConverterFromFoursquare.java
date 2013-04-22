@@ -49,6 +49,7 @@ public class GroupConverterFromFoursquare implements GroupConverter {
 		}catch(JSONException ex){
 		    
 		}
+		catch(Exception e){}
 		
 		return groups;
 	}

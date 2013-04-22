@@ -42,6 +42,8 @@ public class ContextForm {
     private String model;
     private String ctxID;
     private String value;
+    private String viewType;
+    private int pathIndex;
     
     
 	public String getMethod() {
@@ -74,10 +76,16 @@ public class ContextForm {
 	public void setValue(String value) {
 		this.value = value;
 	}
-    
-
-
-		
-	
-
+	public String getViewType() {
+		return viewType;
+	}
+	public void setViewType(String viewType) {
+		this.viewType = viewType;
+	}
+	public int getPathIndex() {
+		return pathIndex;
+	}
+	public void setPathIndex(int pathIndex) {
+		this.pathIndex = pathIndex;
+	}
 }

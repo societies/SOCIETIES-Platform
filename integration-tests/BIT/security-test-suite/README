@@ -20,10 +20,16 @@ Set these properties:
 # This should be the host and port of the domain authority REST server, as seen
 # from service consumer side. Obviously, localhost is fine only if you will run
 # the consumer part of test on the domain authority node.
+#
+# Default: http://localhost:8080
+#
 test.security.daRestUrl=http://localhost:8080
 
 # Tell the consumer part of the test which identity is the provider.
 # On that node the provider part of the test should be run.
+#
+# Default: dynamically set to local node.
+# 
 test.security.providerJid=admin.societies.local
 
 Run the provider part. Wait for the test end.

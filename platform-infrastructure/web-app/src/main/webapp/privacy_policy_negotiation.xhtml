@@ -22,7 +22,7 @@
                               multiple="true"
                               value="#{ppNegotiation.responsePolicy.responseItems}"
                               var="responseItem">
-                <p:tab title="#{responseItem.requestItem.resource.dataIdUri}">
+                <p:tab title="#{responseItem.requestItem.resource.dataType}" >
                     <p:tabView id="tabView">
 
                         <p:tab title="General">
@@ -105,11 +105,11 @@
                 <p:messages id="validationMessages"/>
 
                 <p:commandButton value="Complete Negotiation"
-                                 actionListener="#{ppNegotiation.completeNegotiation}"
+                                 action="#{ppNegotiation.completeNegotiationAction}"
                                  update="@form"/>
 
                 <p:commandButton value="Cancel Negotiation"
-                                 actionListener="#{ppNegotiation.cancelNegotiation}"
+                                 action="#{ppNegotiation.cancelNegotiationAction}"
                                  process="@this"
                                  update="@form"/>
             </f:facet>

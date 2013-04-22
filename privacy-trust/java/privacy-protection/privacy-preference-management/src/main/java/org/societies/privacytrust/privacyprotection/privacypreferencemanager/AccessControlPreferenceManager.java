@@ -39,12 +39,17 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.util.DataIdentifierFactory;
+import org.societies.api.identity.util.DataIdentifierUtils;
+import org.societies.api.identity.util.DataTypeDescriptionUtils;
+import org.societies.api.identity.util.DataTypeUtils;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager;
@@ -60,6 +65,7 @@ import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
+import org.societies.api.schema.identity.DataTypeDescription;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
@@ -250,9 +256,9 @@ public class AccessControlPreferenceManager {
 		reqItem.setResource(resource);
 		item.setRequestItem(reqItem);
 
-
-		String proposalText = requestor.getRequestorId().toString()+" is requesting access to perform the following actions to resource: \n"
-				+ "type: "+dataId.getType()+"\n(resource Id: "+dataId.getUri()+")\nSelect the actions you want to allow to be performed.";
+		DataTypeDescription dataTypeDescription =  (new DataTypeUtils()).getFriendlyDescription(dataId.getType());
+		String proposalText = requestor.getRequestorId().toString()+" is requesting access to your \"<span title=\""+dataTypeDescription.getFriendlyDescription()+"\">"+dataTypeDescription.getFriendlyName()+"</span>\" in order to perform the following actions.\n"
+				+ "Pick the allowed actions:";
 		String[] actionsStr = new String[notExistsPreference.size()];
 		int i = 0;
 		for (Action a: notExistsPreference){
@@ -347,33 +353,45 @@ public class AccessControlPreferenceManager {
 		PrivacyPreference withAllConditionsPreference = this.createPreferenceWithPrivacyConditions(conditions, action, outcome);
 		if (resource.getScheme().equals(DataIdentifierScheme.CONTEXT)){
 			try {
-				CtxAttributeIdentifier ctxIdentifier = (CtxAttributeIdentifier) ResourceUtils.getDataIdentifier(resource);
-				CtxAttribute ctxAttribute = (CtxAttribute) this.ctxBroker.retrieve(ctxIdentifier).get();
-				if (ctxAttribute!=null){
-					if (null!=ctxAttribute.getQuality().getOriginType()){
-						if (ctxAttribute.getQuality().getOriginType().equals(CtxOriginType.INFERRED) || ctxAttribute.getQuality().getOriginType().equals(CtxOriginType.SENSED)){
-							ContextPreferenceCondition condition;
-							PrivacyPreference conditionPreference;
-							switch (ctxAttribute.getValueType()){
-							case DOUBLE:
-								condition = new ContextPreferenceCondition(ctxIdentifier, OperatorConstants.EQUALS, ctxAttribute.getDoubleValue().toString());
-								conditionPreference = new PrivacyPreference(condition);
-								conditionPreference.add(withAllConditionsPreference);
-								return conditionPreference;
+				// 2013-04-16: updated by Olivier to replace CtxAttributeIdentifier to CtxIdentifier. Add logic to handle also CtxEntity and not just CtxAttribute
+				CtxIdentifier ctxIdentifier = (CtxIdentifier) ResourceUtils.getDataIdentifier(resource);
+				CtxModelObject ctxModelObject = this.ctxBroker.retrieve(ctxIdentifier).get();
+				ContextPreferenceCondition condition;
+				PrivacyPreference conditionPreference;
+				// -- CtxAttribute
+				if (ctxModelObject!=null && ctxModelObject instanceof CtxAttribute){
+					CtxAttribute ctxAttribute = (CtxAttribute) ctxModelObject;
+					// CtxAttribute is inferred or sensed: add a privacy preference condition
+					if (null!=ctxAttribute.getQuality()
+							&& null!=ctxAttribute.getQuality().getOriginType()
+							&& (ctxAttribute.getQuality().getOriginType().equals(CtxOriginType.INFERRED) || ctxAttribute.getQuality().getOriginType().equals(CtxOriginType.SENSED))){
+						switch (ctxAttribute.getValueType()){
+						case DOUBLE:
+							condition = new ContextPreferenceCondition(ctxIdentifier, OperatorConstants.EQUALS, ctxAttribute.getDoubleValue().toString());
+							conditionPreference = new PrivacyPreference(condition);
+							conditionPreference.add(withAllConditionsPreference);
+							return conditionPreference;
 
-							case INTEGER:
-								condition = new ContextPreferenceCondition(ctxIdentifier, OperatorConstants.EQUALS, ctxAttribute.getIntegerValue().toString());
-								conditionPreference = new PrivacyPreference(condition);
-								conditionPreference.add(withAllConditionsPreference);
-								return conditionPreference;
-							case STRING: 
-								condition = new ContextPreferenceCondition(ctxIdentifier, OperatorConstants.EQUALS, ctxAttribute.getStringValue());
-								conditionPreference = new PrivacyPreference(condition);
-								conditionPreference.add(withAllConditionsPreference);
-								return conditionPreference;
-							}
-
+						case INTEGER:
+							condition = new ContextPreferenceCondition(ctxIdentifier, OperatorConstants.EQUALS, ctxAttribute.getIntegerValue().toString());
+							conditionPreference = new PrivacyPreference(condition);
+							conditionPreference.add(withAllConditionsPreference);
+							return conditionPreference;
+						case STRING: 
+							condition = new ContextPreferenceCondition(ctxIdentifier, OperatorConstants.EQUALS, ctxAttribute.getStringValue());
+							conditionPreference = new PrivacyPreference(condition);
+							conditionPreference.add(withAllConditionsPreference);
+							return conditionPreference;
 						}
+					}
+					// -- CtxEntity
+					else if (ctxModelObject!=null && ctxModelObject instanceof CtxEntity){
+						CtxEntity ctxEntity = (CtxEntity) ctxModelObject;
+						// TODO for Eliza: check if it is relevant to add a ContextPreferenceCondition or not
+						//						condition = new ContextPreferenceCondition(ctxIdentifier, OperatorConstants.EQUALS, ctxEntity.getOwnerId());
+						//						conditionPreference = new PrivacyPreference(condition);
+						//						conditionPreference.add(withAllConditionsPreference);
+						//						return conditionPreference;
 					}
 				}else{
 					throw new PrivacyException("Could not create access control preference as there was no ctxAttribute found in DB with the provided dataIdentifier");

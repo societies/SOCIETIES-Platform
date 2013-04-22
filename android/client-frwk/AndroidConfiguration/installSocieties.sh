@@ -30,10 +30,10 @@ installSocietiesAPK() {
 	echo "--------------------------"
  	adb -s $1 install -r ../SocietiesAndroidApp/target/SocietiesAndroidApp.apk
 
-        echo ""
-        echo "Install SocietiesLoginTester on $1"
-        echo "--------------------------"
-        adb -s $1 install -r ../SocietiesLibraries/SocietiesLoginTesterApp/target/SocietiesLoginTesterApp.apk
+        #echo ""
+        #echo "Install SocietiesLoginTester on $1"
+        #echo "--------------------------"
+        #adb -s $1 install -r ../SocietiesLibraries/SocietiesLoginTesterApp/target/SocietiesLoginTesterApp.apk
 
 }
 

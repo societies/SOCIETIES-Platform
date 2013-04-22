@@ -59,10 +59,12 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 	public UserPerceivedTrustEngine(ITrustEventMgr trustEventMgr) throws TrustEventMgrException {
 		
 		super(trustEventMgr);
-		LOG.info(this.getClass() + " instantiated");
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
 		
-		LOG.info("Registering for direct and indirect trust updates...");
-		super.trustEventMgr.registerListener(
+		if (LOG.isInfoEnabled())
+			LOG.info("Registering for direct and indirect trust updates...");
+		super.trustEventMgr.registerUpdateListener(
 				new TrustUpdateListener(), 
 				new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED,
 					TrustEventTopic.INDIRECT_TRUST_UPDATED });
@@ -74,6 +76,9 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 	@Override
 	public void evaluateCssTrustValues(final List<ITrustedCss> cssList)
 			throws TrustEngineException {
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Evaluating user-perceived trust for users: " + cssList);
 		
 		for (final ITrustedCss css : cssList) {
 			final double directTrustValue = (css.getDirectTrust().getValue() != null) 
@@ -88,7 +93,7 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 		}
 		
 		if (LOG.isDebugEnabled())
-			LOG.debug("Evaluated user-perceived trust for entities: " + cssList);
+			LOG.debug("Evaluated user-perceived trust for users: " + cssList);
 	}
 
 	/*
@@ -97,6 +102,9 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 	@Override
 	public void evaluateCisTrustValues(final List<ITrustedCis> cisList)
 			throws TrustEngineException {
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Evaluating user-perceived trust for communities: " + cisList);
 		
 		for (final ITrustedCis cis : cisList) {
 			final double directTrustValue = (cis.getDirectTrust().getValue() != null)
@@ -111,7 +119,7 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 		}
 		
 		if (LOG.isDebugEnabled())
-			LOG.debug("Evaluated user-perceived trust for entities: " + cisList);
+			LOG.debug("Evaluated user-perceived trust for communities: " + cisList);
 	}
 
 	/*
@@ -120,6 +128,9 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 	@Override
 	public void evaluateServiceTrustValues(final List<ITrustedService> serviceList)
 			throws TrustEngineException {
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Evaluating user-perceived trust for services: " + serviceList);
 		
 		for (final ITrustedService service : serviceList) {
 			final double directTrustValue = (service.getDirectTrust().getValue() != null)
@@ -134,7 +145,7 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 		}
 		
 		if (LOG.isDebugEnabled())
-			LOG.debug("Evaluated user-perceived trust for entities: " + serviceList);
+			LOG.debug("Evaluated user-perceived trust for services: " + serviceList);
 	}
 	
 	private class CssUserPerceivedTrustEngine implements Runnable {
@@ -173,8 +184,11 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 				cssList.add(css);
 				evaluateCssTrustValues(cssList);
 				
-				for (final ITrustedCss evaluatedCss : cssList)
+				for (final ITrustedCss evaluatedCss : cssList) {
+					if (LOG.isDebugEnabled())
+						LOG.debug("Persisting " + evaluatedCss);
 					trustRepo.updateEntity(evaluatedCss);
+				}
 			} catch (TrustException te) {
 				
 				LOG.error("Could not (re)evaluate user-perceived trust for entity '" 
@@ -203,7 +217,7 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 		public void run() {
 			
 			if (LOG.isDebugEnabled())
-				LOG.debug("Running CisDirectTrustEngine for entity '" 
+				LOG.debug("Running CisUserPerceivedTrustEngine for entity '" 
 						+ this.trusteeId + "' on behalf of '" + this.trustorId + "'");
 			
 			try {
@@ -220,8 +234,11 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 				cisList.add(cis);
 				evaluateCisTrustValues(cisList);
 				
-				for (final ITrustedCis evaluatedCis : cisList)
+				for (final ITrustedCis evaluatedCis : cisList) {
+					if (LOG.isDebugEnabled())
+						LOG.debug("Persisting " + evaluatedCis);
 					trustRepo.updateEntity(evaluatedCis);
+				}
 			} catch (TrustException te) {
 				
 				LOG.error("Could not (re)evaluate user-perceived trust for entity '" 
@@ -250,7 +267,7 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 		public void run() {
 			
 			if (LOG.isDebugEnabled())
-				LOG.debug("Running ServiceDirectTrustEngine for entity '" 
+				LOG.debug("Running ServiceUserPerceivedTrustEngine for entity '" 
 						+ this.trusteeId + "' on behalf of '" + this.trustorId + "'");
 			
 			try {
@@ -267,8 +284,11 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 				serviceList.add(service);
 				evaluateServiceTrustValues(serviceList);
 				
-				for (final ITrustedService evaluatedService : serviceList)
+				for (final ITrustedService evaluatedService : serviceList) {
+					if (LOG.isDebugEnabled())
+						LOG.debug("Persisting " + evaluatedService);
 					trustRepo.updateEntity(evaluatedService);
+				}
 			} catch (TrustException te) {
 				
 				LOG.error("Could not (re)evaluate user-perceived trust for entity '" 
@@ -289,8 +309,8 @@ public class UserPerceivedTrustEngine extends TrustEngine implements IUserPercei
 			if (LOG.isDebugEnabled())
 				LOG.debug("Received TrustUpdateEvent " + evt);
 			
-			final TrustedEntityId trustorId = evt.getTrustorId();
-			final TrustedEntityId trusteeId = evt.getTrusteeId();
+			final TrustedEntityId trustorId = evt.getTrustRelationship().getTrustorId();
+			final TrustedEntityId trusteeId = evt.getTrustRelationship().getTrusteeId();
 			final TrustedEntityType trusteeType = trusteeId.getEntityType();
 			if (TrustedEntityType.CSS.equals(trusteeType))
 				executorService.execute(new CssUserPerceivedTrustEngine(

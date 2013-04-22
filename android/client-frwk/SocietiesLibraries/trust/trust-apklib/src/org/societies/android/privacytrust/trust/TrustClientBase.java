@@ -42,18 +42,27 @@ import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean;
+import org.societies.api.schema.privacytrust.trust.model.TrustRelationshipBean;
+import org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
-import org.societies.api.internal.schema.privacytrust.trust.broker.RetrieveTrustBrokerRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.broker.RetrieveTrustBrokerResponseBean;
-import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
+import org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipResponseBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipsRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipsResponseBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustValueRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustValueResponseBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
 import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcelable;
 import android.util.Log;
 
 /**
@@ -71,13 +80,15 @@ public class TrustClientBase implements IInternalTrustClient {
 			"trustEvidenceCollectorRequestBean", "trustEvidenceCollectorResponseBean");
 	
 	private static final List<String> NAMESPACES = Arrays.asList(
+			"http://societies.org/api/schema/identity",
             "http://societies.org/api/schema/privacytrust/trust/model",
-			"http://societies.org/api/internal/schema/privacytrust/trust/broker",
+			"http://societies.org/api/schema/privacytrust/trust/broker",
 			"http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector");
 	
 	private static final List<String> PACKAGES = Arrays.asList(
-			"org.societies.api.internal.schema.privacytrust.trust.model",
-			"org.societies.api.internal.schema.privacytrust.trust.broker",
+			"org.societies.api.schema.identity",
+			"org.societies.api.schema.privacytrust.trust.model",
+			"org.societies.api.schema.privacytrust.trust.broker",
 			"org.societies.api.internal.schema.privacytrust.trust.evidence.collector");
 	
 	/** The Client Comm Mgr service reference. */
@@ -104,20 +115,140 @@ public class TrustClientBase implements IInternalTrustClient {
 			Log.e(TAG, e.getMessage(), e);
         }
     }
-
+    
+    /*
+     * @see org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient#retrieveTrustRelationships(java.lang.String, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean)
+     */
+	@Override
+	public void retrieveTrustRelationships(final String client,
+			final TrustedEntityIdBean trustorId) {
+		
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		
+		this.doRetrieveTrustRelationships(client, null, trustorId);
+	}
+	
 	/*
-	 * @see org.societies.android.api.privacytrust.trust.ITrustClient#retrieveTrust(java.lang.String, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean)
+	 * @see org.societies.android.api.privacytrust.trust.ITrustClient#retrieveTrustRelationships(java.lang.String, org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean)
 	 */
 	@Override
-	public void retrieveTrust(final String client, 
-			final TrustedEntityIdBean trustorId, final TrustedEntityIdBean trusteeId) {
+	public void retrieveTrustRelationships(final String client,
+			final RequestorBean requestor,
+			final TrustedEntityIdBean trustorId) {
 		
-		// TODO null checks?
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		
+		this.doRetrieveTrustRelationships(client, requestor, trustorId);
+	}
+	
+	private void doRetrieveTrustRelationships(final String client, 
+			RequestorBean requestor, final TrustedEntityIdBean trustorId) {
 		
 		final StringBuilder sb = new StringBuilder();
-		sb.append("Retrieving trust:");
+		sb.append("Retrieving trust relationships:");
 		sb.append(" client=");
 		sb.append(client);
+		sb.append(", requestor=");
+		sb.append(requestor);
+		sb.append(", trustorId=");
+		sb.append(trustorId.getEntityId());
+		Log.d(TAG, sb.toString());
+		
+		if (this.connectedToComms) {
+			
+			try {
+				if (requestor == null) {
+					requestor = new RequestorBean();
+					requestor.setRequestorId(
+							this.clientCommMgr.getIdManager().getThisNetworkNode().getJid());
+					Log.d(TAG, "requestor=" + requestor.getRequestorId());
+				}
+				
+				final TrustRelationshipsRequestBean retrieveBean = new TrustRelationshipsRequestBean();
+				retrieveBean.setRequestor(requestor);
+				retrieveBean.setTrustorId(trustorId);
+
+				final TrustBrokerRequestBean requestBean = new TrustBrokerRequestBean();
+				requestBean.setMethodName(
+						org.societies.api.schema.privacytrust.trust.broker.MethodName.RETRIEVE_TRUST_RELATIONSHIPS);
+				requestBean.setRetrieveTrustRelationships(retrieveBean);
+
+				final ICommCallback retrieveTrustCallback = 
+						new TrustClientCommCallback(client, IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIPS); 
+				final IIdentity toId = this.clientCommMgr.getIdManager().getCloudNode();
+				Log.d(TAG, "cloudNode=" + toId.getJid());
+				final Stanza stanza = new Stanza(toId);
+	        	this.clientCommMgr.sendIQ(stanza, IQ.Type.GET, requestBean, 
+	        			retrieveTrustCallback);
+	        	Log.d(TAG, "Sent IQ with stanza=" + stanza);
+			} catch (Exception e) {
+				Log.e(TAG, "Failed to send RETRIEVE_TRUST_RELATIONSHIPS request: " + e.getMessage(), e);
+				// TODO handle error ??
+	        }
+			
+		} else {
+			// NOT CONNECTED TO COMMS SERVICE
+        	this.broadcastServiceNotStarted(client, IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIPS);
+		}
+	}
+    
+    /*
+     * @see org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient#retrieveTrustRelationships(java.lang.String, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean)
+     */
+	@Override
+	public void retrieveTrustRelationships(final String client,
+			final TrustedEntityIdBean trustorId, 
+			final TrustedEntityIdBean trusteeId) {
+		
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		
+		this.doRetrieveTrustRelationships(client, null, trustorId, trusteeId);
+	}
+	
+	/*
+	 * @see org.societies.android.api.privacytrust.trust.ITrustClient#retrieveTrustRelationships(java.lang.String, org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean)
+	 */
+	@Override
+	public void retrieveTrustRelationships(final String client,
+			final RequestorBean requestor,
+			final TrustedEntityIdBean trustorId, 
+			final TrustedEntityIdBean trusteeId) {
+		
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		
+		this.doRetrieveTrustRelationships(client, requestor, trustorId, trusteeId);
+	}
+	
+	private void doRetrieveTrustRelationships(final String client, 
+			RequestorBean requestor, final TrustedEntityIdBean trustorId,
+			final TrustedEntityIdBean trusteeId) {
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append("Retrieving trust relationships:");
+		sb.append(" client=");
+		sb.append(client);
+		sb.append(", requestor=");
+		sb.append(requestor);
 		sb.append(", trustorId=");
 		sb.append(trustorId.getEntityId());
 		sb.append(", trusteeId=");
@@ -127,14 +258,230 @@ public class TrustClientBase implements IInternalTrustClient {
 		if (this.connectedToComms) {
 			
 			try {
-				final RetrieveTrustBrokerRequestBean retrieveBean = new RetrieveTrustBrokerRequestBean();
+				if (requestor == null) {
+					requestor = new RequestorBean();
+					requestor.setRequestorId(
+							this.clientCommMgr.getIdManager().getThisNetworkNode().getJid());
+					Log.d(TAG, "requestor=" + requestor.getRequestorId());
+				}
+				
+				final TrustRelationshipsRequestBean retrieveBean = new TrustRelationshipsRequestBean();
+				retrieveBean.setRequestor(requestor);
 				retrieveBean.setTrustorId(trustorId);
 				retrieveBean.setTrusteeId(trusteeId);
 
 				final TrustBrokerRequestBean requestBean = new TrustBrokerRequestBean();
 				requestBean.setMethodName(
-						org.societies.api.internal.schema.privacytrust.trust.broker.MethodName.RETRIEVE);
-				requestBean.setRetrieve(retrieveBean);
+						org.societies.api.schema.privacytrust.trust.broker.MethodName.RETRIEVE_TRUST_RELATIONSHIPS);
+				requestBean.setRetrieveTrustRelationships(retrieveBean);
+
+				final ICommCallback retrieveTrustCallback = 
+						new TrustClientCommCallback(client, IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIPS); 
+				final IIdentity toId = this.clientCommMgr.getIdManager().getCloudNode();
+				Log.d(TAG, "cloudNode=" + toId.getJid());
+				final Stanza stanza = new Stanza(toId);
+	        	this.clientCommMgr.sendIQ(stanza, IQ.Type.GET, requestBean, 
+	        			retrieveTrustCallback);
+	        	Log.d(TAG, "Sent IQ with stanza=" + stanza);
+			} catch (Exception e) {
+				Log.e(TAG, "Failed to send RETRIEVE_TRUST_RELATIONSHIPS request: " + e.getMessage(), e);
+				// TODO handle error ??
+	        }
+			
+		} else {
+			// NOT CONNECTED TO COMMS SERVICE
+        	this.broadcastServiceNotStarted(client, IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIPS);
+		}
+	}
+	
+	/*
+	 * @see org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient#retrieveTrustRelationship(java.lang.String, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean)
+	 */
+	@Override
+	public void retrieveTrustRelationship(final String client,
+			final TrustedEntityIdBean trustorId, 
+			final TrustedEntityIdBean trusteeId,
+			final TrustValueTypeBean trustValueType) {
+		
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		this.doRetrieveTrustRelationship(client, null, trustorId, trusteeId, trustValueType);
+	}
+	
+	/*
+	 * @see org.societies.android.api.privacytrust.trust.ITrustClient#retrieveTrustRelationship(java.lang.String, org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean)
+	 */
+	@Override
+	public void retrieveTrustRelationship(final String client,
+			final RequestorBean requestor,
+			final TrustedEntityIdBean trustorId, 
+			final TrustedEntityIdBean trusteeId,
+			final TrustValueTypeBean trustValueType) {
+		
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		this.doRetrieveTrustRelationship(client, requestor, trustorId, trusteeId, trustValueType);
+	}
+	
+	private void doRetrieveTrustRelationship(final String client, 
+			RequestorBean requestor, final TrustedEntityIdBean trustorId,
+			final TrustedEntityIdBean trusteeId,
+			final TrustValueTypeBean trustValueType) {
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append("Retrieving trust relationship:");
+		sb.append(" client=");
+		sb.append(client);
+		sb.append(", requestor=");
+		sb.append(requestor);
+		sb.append(", trustorId=");
+		sb.append(trustorId.getEntityId());
+		sb.append(", trusteeId=");
+		sb.append(trusteeId.getEntityId());
+		sb.append(", trustValueType=");
+		sb.append(trustValueType);
+		Log.d(TAG, sb.toString());
+		
+		if (this.connectedToComms) {
+			
+			try {
+				if (requestor == null) {
+					requestor = new RequestorBean();
+					requestor.setRequestorId(
+							this.clientCommMgr.getIdManager().getThisNetworkNode().getJid());
+					Log.d(TAG, "requestor=" + requestor.getRequestorId());
+				}
+				
+				final TrustRelationshipRequestBean retrieveBean = new TrustRelationshipRequestBean();
+				retrieveBean.setRequestor(requestor);
+				retrieveBean.setTrustorId(trustorId);
+				retrieveBean.setTrusteeId(trusteeId);
+				retrieveBean.setTrustValueType(trustValueType);
+
+				final TrustBrokerRequestBean requestBean = new TrustBrokerRequestBean();
+				requestBean.setMethodName(
+						org.societies.api.schema.privacytrust.trust.broker.MethodName.RETRIEVE_TRUST_RELATIONSHIP);
+				requestBean.setRetrieveTrustRelationship(retrieveBean);
+
+				final ICommCallback retrieveTrustCallback = 
+						new TrustClientCommCallback(client, IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIP); 
+				final IIdentity toId = this.clientCommMgr.getIdManager().getCloudNode();
+				Log.d(TAG, "cloudNode=" + toId.getJid());
+				final Stanza stanza = new Stanza(toId);
+	        	this.clientCommMgr.sendIQ(stanza, IQ.Type.GET, requestBean, 
+	        			retrieveTrustCallback);
+	        	Log.d(TAG, "Sent IQ with stanza=" + stanza);
+			} catch (Exception e) {
+				Log.e(TAG, "Failed to send RETRIEVE_TRUST_RELATIONSHIP request: " + e.getMessage(), e);
+				// TODO handle error ??
+	        }
+			
+		} else {
+			// NOT CONNECTED TO COMMS SERVICE
+        	this.broadcastServiceNotStarted(client, IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIP);
+		}
+	}
+
+    /*
+	 * @see org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient#retrieveTrustValue(java.lang.String, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean)
+	 */
+	@Override
+	public void retrieveTrustValue(final String client,
+			final TrustedEntityIdBean trustorId, 
+			final TrustedEntityIdBean trusteeId,
+			final TrustValueTypeBean trustValueType) {
+		
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		this.doRetrieveTrustValue(client, null, trustorId, trusteeId, trustValueType);
+	}
+    
+    /*
+     * @see org.societies.android.api.privacytrust.trust.ITrustClient#retrieveTrustValue(java.lang.String, org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean)
+     */
+	@Override
+	public void retrieveTrustValue(final String client,
+			final RequestorBean requestor,
+			final TrustedEntityIdBean trustorId, 
+			final TrustedEntityIdBean trusteeId,
+			final TrustValueTypeBean trustValueType) {
+		
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		this.doRetrieveTrustValue(client, requestor, trustorId, trusteeId, trustValueType);
+	}
+	
+	private void doRetrieveTrustValue(final String client, 
+			RequestorBean requestor, final TrustedEntityIdBean trustorId,
+			final TrustedEntityIdBean trusteeId,
+			final TrustValueTypeBean trustValueType) {
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append("Retrieving trust value:");
+		sb.append(" client=");
+		sb.append(client);
+		sb.append(", requestor=");
+		sb.append(requestor);
+		sb.append(", trustorId=");
+		sb.append(trustorId.getEntityId());
+		sb.append(", trusteeId=");
+		sb.append(trusteeId.getEntityId());
+		sb.append(", trustValueType=");
+		sb.append(trustValueType);
+		Log.d(TAG, sb.toString());
+		
+		if (this.connectedToComms) {
+			
+			try {
+				if (requestor == null) {
+					requestor = new RequestorBean();
+					requestor.setRequestorId(
+							this.clientCommMgr.getIdManager().getThisNetworkNode().getJid());
+					Log.d(TAG, "requestor=" + requestor.getRequestorId());
+				}
+				
+				final TrustValueRequestBean retrieveBean = new TrustValueRequestBean();
+				retrieveBean.setRequestor(requestor);
+				retrieveBean.setTrustorId(trustorId);
+				retrieveBean.setTrusteeId(trusteeId);
+				retrieveBean.setTrustValueType(trustValueType);
+
+				final TrustBrokerRequestBean requestBean = new TrustBrokerRequestBean();
+				requestBean.setMethodName(
+						org.societies.api.schema.privacytrust.trust.broker.MethodName.RETRIEVE_TRUST_VALUE);
+				requestBean.setRetrieveTrustValue(retrieveBean);
 
 				final ICommCallback retrieveTrustCallback = 
 						new TrustClientCommCallback(client, IInternalTrustClient.RETRIEVE_TRUST_VALUE); 
@@ -156,14 +503,307 @@ public class TrustClientBase implements IInternalTrustClient {
 	}
 	
 	/*
-	 * @see org.societies.android.api.privacytrust.trust.ITrustClient#addDirectTrustEvidence(java.lang.String, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean, org.societies.android.api.common.ADate, java.io.Serializable)
+	 * @see org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient#retrieveTrustRelationships(java.lang.String, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean)
+	 */
+	@Override
+	public void retrieveTrustRelationships(final String client,
+			final TrustedEntityIdBean trustorId, 
+			final TrustedEntityTypeBean trusteeType) {
+		
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		
+		this.doRetrieveTrustRelationships(client, null, trustorId, trusteeType);
+	}
+	
+	/*
+	 * @see org.societies.android.api.privacytrust.trust.ITrustClient#retrieveTrustRelationships(java.lang.String, org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean)
+	 */
+	@Override
+	public void retrieveTrustRelationships(final String client,
+			final RequestorBean requestor,
+			final TrustedEntityIdBean trustorId, 
+			final TrustedEntityTypeBean trusteeType) {
+		
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		
+		this.doRetrieveTrustRelationships(client, requestor, trustorId, trusteeType);
+	}
+	
+	private void doRetrieveTrustRelationships(final String client, 
+			RequestorBean requestor, final TrustedEntityIdBean trustorId,
+			final TrustedEntityTypeBean trusteeType) {
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append("Retrieving trust relationships:");
+		sb.append(" client=");
+		sb.append(client);
+		sb.append(", requestor=");
+		sb.append(requestor);
+		sb.append(", trustorId=");
+		sb.append(trustorId.getEntityId());
+		sb.append(", trusteeType=");
+		sb.append(trusteeType);
+		Log.d(TAG, sb.toString());
+		
+		if (this.connectedToComms) {
+			
+			try {
+				if (requestor == null) {
+					requestor = new RequestorBean();
+					requestor.setRequestorId(
+							this.clientCommMgr.getIdManager().getThisNetworkNode().getJid());
+					Log.d(TAG, "requestor=" + requestor.getRequestorId());
+				}
+				
+				final TrustRelationshipsRequestBean retrieveBean = new TrustRelationshipsRequestBean();
+				retrieveBean.setRequestor(requestor);
+				retrieveBean.setTrustorId(trustorId);
+				retrieveBean.setTrusteeType(trusteeType);
+
+				final TrustBrokerRequestBean requestBean = new TrustBrokerRequestBean();
+				requestBean.setMethodName(
+						org.societies.api.schema.privacytrust.trust.broker.MethodName.RETRIEVE_TRUST_RELATIONSHIPS);
+				requestBean.setRetrieveTrustRelationships(retrieveBean);
+
+				final ICommCallback retrieveTrustCallback = 
+						new TrustClientCommCallback(client, IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIPS); 
+				final IIdentity toId = this.clientCommMgr.getIdManager().getCloudNode();
+				Log.d(TAG, "cloudNode=" + toId.getJid());
+				final Stanza stanza = new Stanza(toId);
+	        	this.clientCommMgr.sendIQ(stanza, IQ.Type.GET, requestBean, 
+	        			retrieveTrustCallback);
+	        	Log.d(TAG, "Sent IQ with stanza=" + stanza);
+			} catch (Exception e) {
+				Log.e(TAG, "Failed to send RETRIEVE_TRUST_RELATIONSHIPS request: " + e.getMessage(), e);
+				// TODO handle error ??
+	        }
+			
+		} else {
+			// NOT CONNECTED TO COMMS SERVICE
+        	this.broadcastServiceNotStarted(client, IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIPS);
+		}
+	}
+	
+	/*
+	 * @see org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient#retrieveTrustRelationships(java.lang.String, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean)
+	 */
+	@Override
+	public void retrieveTrustRelationships(final String client,
+			final TrustedEntityIdBean trustorId, 
+			final TrustValueTypeBean trustValueType) {
+		
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		this.doRetrieveTrustRelationships(client, null, trustorId, trustValueType);
+	}
+	
+	/*
+	 * @see org.societies.android.api.privacytrust.trust.ITrustClient#retrieveTrustRelationships(java.lang.String, org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean)
+	 */
+	@Override
+	public void retrieveTrustRelationships(final String client,
+			final RequestorBean requestor,
+			final TrustedEntityIdBean trustorId, 
+			final TrustValueTypeBean trustValueType) {
+		
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		
+		this.doRetrieveTrustRelationships(client, requestor, trustorId, trustValueType);
+	}
+	
+	private void doRetrieveTrustRelationships(final String client, 
+			RequestorBean requestor, final TrustedEntityIdBean trustorId,
+			final TrustValueTypeBean trustValueType) {
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append("Retrieving trust relationships:");
+		sb.append(" client=");
+		sb.append(client);
+		sb.append(", requestor=");
+		sb.append(requestor);
+		sb.append(", trustorId=");
+		sb.append(trustorId.getEntityId());
+		sb.append(", trustValueType=");
+		sb.append(trustValueType);
+		Log.d(TAG, sb.toString());
+		
+		if (this.connectedToComms) {
+			
+			try {
+				if (requestor == null) {
+					requestor = new RequestorBean();
+					requestor.setRequestorId(
+							this.clientCommMgr.getIdManager().getThisNetworkNode().getJid());
+					Log.d(TAG, "requestor=" + requestor.getRequestorId());
+				}
+				
+				final TrustRelationshipsRequestBean retrieveBean = new TrustRelationshipsRequestBean();
+				retrieveBean.setRequestor(requestor);
+				retrieveBean.setTrustorId(trustorId);
+				retrieveBean.setTrustValueType(trustValueType);
+
+				final TrustBrokerRequestBean requestBean = new TrustBrokerRequestBean();
+				requestBean.setMethodName(
+						org.societies.api.schema.privacytrust.trust.broker.MethodName.RETRIEVE_TRUST_RELATIONSHIPS);
+				requestBean.setRetrieveTrustRelationships(retrieveBean);
+
+				final ICommCallback retrieveTrustCallback = 
+						new TrustClientCommCallback(client, IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIPS); 
+				final IIdentity toId = this.clientCommMgr.getIdManager().getCloudNode();
+				Log.d(TAG, "cloudNode=" + toId.getJid());
+				final Stanza stanza = new Stanza(toId);
+	        	this.clientCommMgr.sendIQ(stanza, IQ.Type.GET, requestBean, 
+	        			retrieveTrustCallback);
+	        	Log.d(TAG, "Sent IQ with stanza=" + stanza);
+			} catch (Exception e) {
+				Log.e(TAG, "Failed to send RETRIEVE_TRUST_RELATIONSHIPS request: " + e.getMessage(), e);
+				// TODO handle error ??
+	        }
+			
+		} else {
+			// NOT CONNECTED TO COMMS SERVICE
+        	this.broadcastServiceNotStarted(client, IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIPS);
+		}
+	}
+	
+	/*
+	 * @see org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient#retrieveTrustRelationships(java.lang.String, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean)
+	 */
+	@Override
+	public void retrieveTrustRelationships(final String client,
+			final TrustedEntityIdBean trustorId,
+			final TrustedEntityTypeBean trusteeType,
+			final TrustValueTypeBean trustValueType) {
+		
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		this.doRetrieveTrustRelationships(client, null, trustorId, trusteeType, trustValueType);
+	}
+	
+	/*
+	 * @see org.societies.android.api.privacytrust.trust.ITrustClient#retrieveTrustRelationships(java.lang.String, org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean)
+	 */
+	@Override
+	public void retrieveTrustRelationships(final String client,
+			final RequestorBean requestor,
+			final TrustedEntityIdBean trustorId,
+			final TrustedEntityTypeBean trusteeType,
+			final TrustValueTypeBean trustValueType) {
+		
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		
+		this.doRetrieveTrustRelationships(client, requestor, trustorId, trusteeType, trustValueType);
+	}
+	
+	private void doRetrieveTrustRelationships(final String client, 
+			RequestorBean requestor, final TrustedEntityIdBean trustorId,
+			final TrustedEntityTypeBean trusteeType,
+			final TrustValueTypeBean trustValueType) {
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append("Retrieving trust relationships:");
+		sb.append(" client=");
+		sb.append(client);
+		sb.append(", requestor=");
+		sb.append(requestor);
+		sb.append(", trustorId=");
+		sb.append(trustorId.getEntityId());
+		sb.append(", trusteeType=");
+		sb.append(trusteeType);
+		sb.append(", trustValueType=");
+		sb.append(trustValueType);
+		Log.d(TAG, sb.toString());
+		
+		if (this.connectedToComms) {
+			
+			try {
+				if (requestor == null) {
+					requestor = new RequestorBean();
+					requestor.setRequestorId(
+							this.clientCommMgr.getIdManager().getThisNetworkNode().getJid());
+					Log.d(TAG, "requestor=" + requestor.getRequestorId());
+				}
+				
+				final TrustRelationshipsRequestBean retrieveBean = new TrustRelationshipsRequestBean();
+				retrieveBean.setRequestor(requestor);
+				retrieveBean.setTrustorId(trustorId);
+				retrieveBean.setTrusteeType(trusteeType);
+				retrieveBean.setTrustValueType(trustValueType);
+
+				final TrustBrokerRequestBean requestBean = new TrustBrokerRequestBean();
+				requestBean.setMethodName(
+						org.societies.api.schema.privacytrust.trust.broker.MethodName.RETRIEVE_TRUST_RELATIONSHIPS);
+				requestBean.setRetrieveTrustRelationships(retrieveBean);
+
+				final ICommCallback retrieveTrustCallback = 
+						new TrustClientCommCallback(client, IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIPS); 
+				final IIdentity toId = this.clientCommMgr.getIdManager().getCloudNode();
+				Log.d(TAG, "cloudNode=" + toId.getJid());
+				final Stanza stanza = new Stanza(toId);
+	        	this.clientCommMgr.sendIQ(stanza, IQ.Type.GET, requestBean, 
+	        			retrieveTrustCallback);
+	        	Log.d(TAG, "Sent IQ with stanza=" + stanza);
+			} catch (Exception e) {
+				Log.e(TAG, "Failed to send RETRIEVE_TRUST_RELATIONSHIPS request: " + e.getMessage(), e);
+				// TODO handle error ??
+	        }
+			
+		} else {
+			// NOT CONNECTED TO COMMS SERVICE
+        	this.broadcastServiceNotStarted(client, IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIPS);
+		}
+	}
+	
+	/*
+	 * @see org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient#addDirectTrustEvidence(java.lang.String, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean, org.societies.android.api.common.ADate, java.io.Serializable)
 	 */
 	@Override
 	public void addDirectTrustEvidence(final String client, 
-			final TrustedEntityIdBean subjectId, final TrustedEntityIdBean objectId,
+			final TrustedEntityIdBean subjectId, 
+			final TrustedEntityIdBean objectId,
 			final TrustEvidenceTypeBean type, final ADate timestamp, 
 			final Serializable info) {
-		/* TODO null checks
+		
 		if (client == null)
 			throw new NullPointerException("client can't be null");
 		if (subjectId == null)
@@ -173,12 +813,48 @@ public class TrustClientBase implements IInternalTrustClient {
 		if (type == null)
 			throw new NullPointerException("type can't be null");
 		if (timestamp == null)
-			throw new NullPointerException("timestamp can't be null");*/
+			throw new NullPointerException("timestamp can't be null");
+		
+		this.doAddDirectTrustEvidence(client, null, subjectId, objectId, type, timestamp, info);
+	}
+	
+	/*
+	 * @see org.societies.android.api.privacytrust.trust.ITrustClient#addDirectTrustEvidence(java.lang.String, org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean, org.societies.android.api.common.ADate, java.io.Serializable)
+	 */
+	@Override
+	public void addDirectTrustEvidence(final String client, 
+			final RequestorBean requestor, final TrustedEntityIdBean subjectId,
+			final TrustedEntityIdBean objectId,
+			final TrustEvidenceTypeBean type, final ADate timestamp, 
+			final Serializable info) {
+		
+		if (client == null)
+			throw new NullPointerException("client can't be null");
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (subjectId == null)
+			throw new NullPointerException("subjectId can't be null");
+		if (objectId == null)
+			throw new NullPointerException("objectId can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+		if (timestamp == null)
+			throw new NullPointerException("timestamp can't be null");
+		
+		this.doAddDirectTrustEvidence(client, requestor, subjectId, objectId, type, timestamp, info);
+	}
+	
+	private void doAddDirectTrustEvidence(final String client,
+			RequestorBean requestor, final TrustedEntityIdBean subjectId,
+			final TrustedEntityIdBean objectId,	final TrustEvidenceTypeBean type,
+			final ADate timestamp, final Serializable info) {
 		
 		final StringBuilder sb = new StringBuilder();
 		sb.append("Adding direct trust evidence:");
 		sb.append(" client=");
 		sb.append(client);
+		sb.append(", requestor=");
+		sb.append(requestor);
 		sb.append(", subjectId=");
 		sb.append(subjectId.getEntityId());
 		sb.append(", objectId=");
@@ -194,8 +870,16 @@ public class TrustClientBase implements IInternalTrustClient {
 		if (this.connectedToComms) {
 			
 			try {
+				if (requestor == null) {
+					requestor = new RequestorBean();
+					requestor.setRequestorId(
+							this.clientCommMgr.getIdManager().getThisNetworkNode().getJid());
+					Log.d(TAG, "requestor=" + requestor.getRequestorId());
+				}
+				
 				final AddDirectEvidenceRequestBean addEvidenceBean = 
 						new AddDirectEvidenceRequestBean();
+				// 0. TODO requestor
 				// 1. subjectId
 				addEvidenceBean.setSubjectId(subjectId);
 				// 2. objectId
@@ -438,16 +1122,51 @@ public class TrustClientBase implements IInternalTrustClient {
 								+ responseBean.getMethodName());
 				switch (responseBean.getMethodName()) {
 				
-				case RETRIEVE:
+				case RETRIEVE_TRUST_RELATIONSHIPS:
 					
-					final RetrieveTrustBrokerResponseBean retrieveBean =
-						responseBean.getRetrieve();
-					if (retrieveBean == null) {
-						Log.e(TAG, "Trust Broker retrieve trust bean is null");
+					final TrustRelationshipsResponseBean retrieveRelationshipsBean =
+						responseBean.getRetrieveTrustRelationships();
+					if (retrieveRelationshipsBean == null) {
+						Log.e(TAG, "Trust Broker retrieve trust relationships bean is null");
 						// TODO error handling
 						return;
 					}
-					final Double trustValue = retrieveBean.getResult();
+					final List<TrustRelationshipBean> trustRelationships = 
+							retrieveRelationshipsBean.getResult();
+					if (trustRelationships != null)
+						intent.putExtra(IInternalTrustClient.INTENT_RETURN_VALUE_KEY, 
+								trustRelationships.toArray(
+										new TrustRelationshipBean[trustRelationships.size()]));
+					else // return empty array
+						intent.putExtra(IInternalTrustClient.INTENT_RETURN_VALUE_KEY, 
+								new TrustRelationshipBean[0]);
+					break;
+				
+				case RETRIEVE_TRUST_RELATIONSHIP:
+					
+					final TrustRelationshipResponseBean retrieveRelationshipBean =
+						responseBean.getRetrieveTrustRelationship();
+					if (retrieveRelationshipBean == null) {
+						Log.e(TAG, "Trust Broker retrieve trust relationship bean is null");
+						// TODO error handling
+						return;
+					}
+					final TrustRelationshipBean trustRelationship = retrieveRelationshipBean.getResult();
+					if (trustRelationship != null)
+						intent.putExtra(IInternalTrustClient.INTENT_RETURN_VALUE_KEY, 
+								(Parcelable) trustRelationship);
+					break;
+				
+				case RETRIEVE_TRUST_VALUE:
+					
+					final TrustValueResponseBean retrieveValueBean =
+						responseBean.getRetrieveTrustValue();
+					if (retrieveValueBean == null) {
+						Log.e(TAG, "Trust Broker retrieve trust value bean is null");
+						// TODO error handling
+						return;
+					}
+					final Double trustValue = retrieveValueBean.getResult();
 					if (trustValue != null)
 						intent.putExtra(IInternalTrustClient.INTENT_RETURN_VALUE_KEY, trustValue);
 					break;
@@ -475,7 +1194,7 @@ public class TrustClientBase implements IInternalTrustClient {
 					break;
 				default:
 
-					Log.e(TAG, "Unsupported method in Trust Broker response bean: "
+					Log.e(TAG, "Unsupported method in Trust Evidence Collector response bean: "
 							+ responseBean.getMethodName());
 					// TODO error handling
 					return;
@@ -488,8 +1207,10 @@ public class TrustClientBase implements IInternalTrustClient {
 				return;
 			}
 			
-			if(TrustClientBase.this.restrictBroadcast)
+			if (TrustClientBase.this.restrictBroadcast)
 				intent.setPackage(this.client);
+			intent.addFlags(Intent.FLAG_DEBUG_LOG_RESOLUTION);
+			Log.d(TrustClientBase.TAG, "receiveResult: broadcasting intent " + intent); 
 			TrustClientBase.this.androidContext.sendBroadcast(intent);
 		}
 

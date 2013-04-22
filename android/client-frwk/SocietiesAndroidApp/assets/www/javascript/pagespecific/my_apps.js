@@ -24,18 +24,23 @@ var Societies3PServices = {
 				$('ul#SocietiesServicesDiv li:last').remove();
 
 			//DISPLAY SERVICES
-			for (i  = 0; i < data.length; i++) {
-				var tableEntry = '<li><a href="#" onclick="Societies3PServices.showDetails(' + i + ')"><img src="images/printer_icon.png" class="profile_list" alt="logo" >' +
-					'<h2>' + data[i].serviceName + '</h2>' + 
-					'<p>' + data[i].serviceDescription + '</p>' + 
-					'</a></li>';
-				/*
-				$('ul#SocietiesServicesDiv').append(
-						$('<li>').append(
-								$('<a>').attr('href','#appdetails').append(
-										$('<img>').attr('src', '../images/printer_icon.png').append(data.serviceName) )));     
-				*/
-				jQuery('ul#SocietiesServicesDiv').append(tableEntry);
+			if (data.length==0) {
+				var tableEntry = '<li><a href="#"><h2>No services installed</h2></a></li>';
+				$('ul#SocietiesServicesDiv').append(tableEntry);
+			} else {
+				for (i  = 0; i < data.length; i++) {
+					var tableEntry = '<li><a href="#" onclick="Societies3PServices.showDetails(' + i + ')"><img src="images/printer_icon.png" class="profile_list" alt="logo" >' +
+						'<h2>' + data[i].serviceName + '</h2>' + 
+						'<p>' + data[i].serviceDescription + '</p>' + 
+						'</a></li>';
+					/*
+					$('ul#SocietiesServicesDiv').append(
+							$('<li>').append(
+									$('<a>').attr('href','#appdetails').append(
+											$('<img>').attr('src', '../images/printer_icon.png').append(data.serviceName) )));     
+					*/
+					jQuery('ul#SocietiesServicesDiv').append(tableEntry);
+				}
 			}
 			$('#SocietiesServicesDiv').listview('refresh');
 		}
@@ -61,14 +66,19 @@ var Societies3PServices = {
 				$('ul#LocalServicesDiv li:last').remove();
 
 			//DISPLAY SERVICES
-			for (i  = 0; i < data.length; i++) {
-				var tableEntry = '<li><a href="#" data-rel="dialog" onclick="Societies3PServices.startActivity(\'' + data[i].applicationName + '\', \'' + data[i].packageName + '\')">' +
-									'<img src="' + data[i].icon + '" class="profile_list" alt="logo" >' + 
-									'<h2>' + data[i].applicationName + '</h2>' + 
-									'<p>' + data[i].packageName + '</p></a>' +  
-									//'<a href="#" data-rel="dialog" data-transition="fade" onclick="Societies3PServices.startActivity(\'' + data[i].applicationName + '\', \'' + data[i].packageName + '\')">Launch</a>' +
-									'</li>';
-				jQuery('ul#LocalServicesDiv').append(tableEntry);
+			if (data.length==0) {
+				var tableEntry = '<li><a href="#"><h2>No apps installed</h2></a></li>';
+				$('ul#LocalServicesDiv').append(tableEntry);
+			} else {
+				for (i  = 0; i < data.length; i++) {
+					var tableEntry = '<li><a href="#" data-rel="dialog" onclick="Societies3PServices.startActivity(\'' + data[i].applicationName + '\', \'' + data[i].packageName + '\')">' +
+										'<img src="' + data[i].icon + '" class="profile_list" alt="logo" >' + 
+										'<h2>' + data[i].applicationName + '</h2>' + 
+										'<p>' + data[i].packageName + '</p></a>' +  
+										//'<a href="#" data-rel="dialog" data-transition="fade" onclick="Societies3PServices.startActivity(\'' + data[i].applicationName + '\', \'' + data[i].packageName + '\')">Launch</a>' +
+										'</li>';
+					jQuery('ul#LocalServicesDiv').append(tableEntry);
+				}
 			}
 			$('#LocalServicesDiv').listview('refresh');
 		}

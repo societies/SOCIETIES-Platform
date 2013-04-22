@@ -24,9 +24,18 @@
  */
 package org.societies.android.platform.css.friends;
 
+import java.util.List;
+
+import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.comms.xmpp.ICommCallback;
+import org.societies.android.api.comms.xmpp.Stanza;
+import org.societies.android.api.comms.xmpp.VCardParcel;
+import org.societies.android.api.comms.xmpp.XMPPError;
+import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.androidutils.AndroidNotifier;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.css.directory.CssFriendEvent;
 
@@ -38,7 +47,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -63,6 +71,7 @@ public class EventService extends Service {
 	private static final String SERVICE_ACTION   = "org.societies.android.platform.events.ServicePlatformEventsRemote";
 	private static final String CLIENT_NAME      = "org.societies.android.platform.css.friends.EventService";
 	private static final String EXTRA_CSS_ADVERT = "org.societies.api.schema.css.directory.CssAdvertisementRecord";
+	private static final String EXTRA_CSS_VCARD  = "org.societies.android.api.comms.xmpp.VCardParcel";
 	private static final String ALL_CSS_FRIEND_INTENTS = "org.societies.android.css.friends";
 	
 	//TRACKING CONNECTION TO EVENTS MANAGER
@@ -71,6 +80,7 @@ public class EventService extends Service {
 	private BroadcastReceiver receiver;
 	private Looper mServiceLooper;
 	private ServiceHandler mServiceHandler;
+	private ClientCommunicationMgr ccm;
 
 	// Handler that receives messages from the thread
 	private final class ServiceHandler extends Handler {
@@ -101,6 +111,22 @@ public class EventService extends Service {
 	@Override
 	public void onCreate() {
 		Log.d(this.getClass().getName(), "Friends Service creating...");
+		this.ccm = new ClientCommunicationMgr(this, true);
+        this.ccm.bindCommsService(new IMethodCallback() {
+			@Override
+			public void returnException(String result) { 
+				Log.d(LOG_TAG, "Exception binding to service: " + result);
+			}
+			@Override
+			public void returnAction(String result) { 
+				Log.d(LOG_TAG, "return Action.flag: " + result);
+			}
+			@Override
+			public void returnAction(boolean resultFlag) { 
+				Log.d(LOG_TAG, "return Action.flag: " + resultFlag);
+			}
+		});
+		
 		// START BACKGROUND THREAD FOR SERVICE
 		HandlerThread thread = new HandlerThread("FriendServiceStartArguments", android.os.Process.THREAD_PRIORITY_BACKGROUND);
 		thread.start();
@@ -183,8 +209,9 @@ public class EventService extends Service {
 			else if (intent.getAction().equals(IAndroidSocietiesEvents.CSS_FRIEND_REQUEST_RECEIVED_INTENT)) {
 				Log.d(LOG_TAG, "Frient Request received event");
 				CssFriendEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
-				String description = eventPayload.getCssAdvert().getName() + " sent a friend request";
-				addNotification(description, "Friend Request", eventPayload.getCssAdvert());
+				//GET VCARD FOR THIS REQUEST
+				ICommCallback callback = new VCardCallback(eventPayload);
+		    	ccm.getVCard(eventPayload.getCssAdvert().getId(), callback);
 			}
 			else if (intent.getAction().equals(IAndroidSocietiesEvents.CSS_FRIEND_REQUEST_ACCEPTED_INTENT)) {
 				Log.d(LOG_TAG, "Frient Request accepted event");
@@ -244,24 +271,10 @@ public class EventService extends Service {
     	}
     }
 
-    private void addNotification(String description, String eventType, CssAdvertisementRecord advert) {
-    	//CREATE ANDROID NOTIFICATION
-		int notifierflags [] = new int [1];
-		notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
-		AndroidNotifier notifier = new AndroidNotifier(EventService.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
-		
-		//CREATE INTENT FOR LAUNCHING ACTIVITY
-		Intent intent = new Intent(this.getApplicationContext(), AcceptFriendActivity.class);
-		intent.putExtra(EXTRA_CSS_ADVERT, (Parcelable)advert);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		
-		notifier.notifyMessage(description, eventType, AcceptFriendActivity.class, intent, "SOCIETIES");
-	}
 
     private void addNotificationAccept(String description, String eventType, CssAdvertisementRecord advert) {
     	//CREATE ANDROID NOTIFICATION
-		int notifierflags [] = new int [1];
-		notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
+		int notifierflags[] = new int[] {Notification.DEFAULT_SOUND, Notification.DEFAULT_VIBRATE, Notification.FLAG_AUTO_CANCEL};
 		AndroidNotifier notifier = new AndroidNotifier(EventService.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
 		
 		//CREATE INTENT FOR LAUNCHING ACTIVITY
@@ -274,4 +287,42 @@ public class EventService extends Service {
 		
 		notifier.notifyMessage(description, eventType, AcceptFriendActivity.class);
     }
+    
+    /**
+	 * Callback used with Android Comms for CSSDirectory
+	 *
+	 */
+	private class VCardCallback implements ICommCallback {
+		private CssFriendEvent eventPayload;
+		
+		public VCardCallback(CssFriendEvent eventPayload) {
+			this.eventPayload = eventPayload;
+		}
+		
+		public List<String> getXMLNamespaces() { return null;}
+		public List<String> getJavaPackages() {  return null;}
+		public void receiveError(Stanza arg0, XMPPError arg1) { }
+		public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) { }
+		public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {	}
+		public void receiveMessage(Stanza arg0, Object arg1) { }
+
+		public void receiveResult(Stanza arg0, Object retValue) {
+			Log.d(VCardCallback.class.getName(), "VCardCallback Callback receiveResult");
+			VCardParcel vCard = (VCardParcel)retValue;
+			
+			//CREATE ANDROID NOTIFICATION
+			int notifierflags [] = new int [1];
+			notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
+			AndroidNotifier notifier = new AndroidNotifier(EventService.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
+			
+			//CREATE INTENT FOR LAUNCHING ACTIVITY
+			Intent intent = new Intent(EventService.this.getApplicationContext(), AcceptFriendActivity.class);
+			intent.putExtra(EXTRA_CSS_ADVERT, (Parcelable)eventPayload.getCssAdvert());
+			intent.putExtra(EXTRA_CSS_VCARD, (Parcelable)vCard);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			
+			String description = eventPayload.getCssAdvert().getName() + " sent a friend request";
+			notifier.notifyMessage(description, "Friend Request", AcceptFriendActivity.class, intent, "SOCIETIES");
+		}
+	}
 }

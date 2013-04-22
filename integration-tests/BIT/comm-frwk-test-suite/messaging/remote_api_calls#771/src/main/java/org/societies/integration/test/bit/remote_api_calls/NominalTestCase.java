@@ -52,12 +52,12 @@ public class NominalTestCase {
 
 	@Before
 	public void setUp() {
-		LOG.info("###771... setUp");
+		LOG.info("###1855... setUp");
 
 		//GET CURRENT NODE IDENTITY
 		IIdentity toIdentity = TestCase771.idMgr.getThisNetworkNode();
 		
-		LOG.info("###771... getThisNetworkNode: " + toIdentity.getJid());
+		LOG.info("###1855... getThisNetworkNode: " + toIdentity.getJid());
 		
 		stanza = new Stanza(toIdentity);
 
@@ -67,7 +67,7 @@ public class NominalTestCase {
 
 	@Test
 	public void body1() {
-		LOG.info("###771... body1");
+		LOG.info("###1855... body1");
 
 		//CREATE MESSAGE BEAN
 		CalcBean calc = new CalcBean();
@@ -77,7 +77,7 @@ public class NominalTestCase {
 		calc.setMessage("Testing body1 - Adding");
 		try {
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
-			LOG.info("***771... sendIQGet: ADD(1,2)");
+			LOG.info("***1855... sendIQGet: ADD(1,2)");
 			TestCase771.commManager.sendIQGet(stanza, calc, callback);
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
@@ -108,7 +108,7 @@ public class NominalTestCase {
 
 	@Test
 	public void body2() {
-		LOG.info("###771... body2");
+		LOG.info("###1855... body2");
 
 		//CREATE MESSAGE BEAN
 		CalcBean calc = new CalcBean();
@@ -118,7 +118,7 @@ public class NominalTestCase {
 		calc.setMessage("Testing body2 - subtract");
 		try {
 			//SEND INFORMATION QUERY - RESPONSE WILL BE IN "callback.RecieveMessage()"
-			LOG.info("***771... sendIQGet: SUBTRACT(2,1)");
+			LOG.info("***1855... sendIQGet: SUBTRACT(2,1)");
 			TestCase771.commManager.sendIQGet(stanza, calc, callback);
 		} catch (CommunicationException e) {
 			LOG.warn(e.getMessage());
@@ -152,6 +152,6 @@ public class NominalTestCase {
 
 	@After
 	public void tearDown() {
-		LOG.info("###771... tearDown");
+		LOG.info("###1855... tearDown");
  	}
 }

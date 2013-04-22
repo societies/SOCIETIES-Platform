@@ -57,7 +57,7 @@ public class IntegrationTestUtils {
 	 */
 	public Result run(int testCaseNumber, Class... testCaseClasses) {
 		// -- Display test case title
-		StringBuffer title = new StringBuffer("[#"+testCaseNumber+"] Start the integration test case for classes: ");
+		StringBuffer title = new StringBuffer("[#"+testCaseNumber+"][Test Suite] Start the integration test case for classes: ");
 		for (int j=0; j<testCaseClasses.length; j++) {
 			title.append(testCaseClasses[j].getSimpleName()+(j == (testCaseClasses.length-1) ? "" : ", "));
 		}

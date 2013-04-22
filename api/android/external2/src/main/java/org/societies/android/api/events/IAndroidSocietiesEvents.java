@@ -57,6 +57,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	final static String CSS_MANAGER_DEPART_CSS_NODE_INTENT = "org.societies.android.css.manager.departCSSNode";
 	final static String CSS_FRIEND_REQUEST_RECEIVED_INTENT = "org.societies.android.css.friends.RequestReceived";
 	final static String CSS_FRIEND_REQUEST_ACCEPTED_INTENT = "org.societies.android.css.friends.RequestAccepted";
+	final static String CSS_MANAGER_FILTER = "org.societies.android.css.manager";
+	final static String CSS_FRIEND_FILTER = "org.societies.android.css.friends";
 
 	//Device Manager intents
 	final static String DEVICE_MANAGER_DEVICE_REGISTERED_INTENT   = "org.societies.android.device.manager.DEVICE_CONNECTED";
