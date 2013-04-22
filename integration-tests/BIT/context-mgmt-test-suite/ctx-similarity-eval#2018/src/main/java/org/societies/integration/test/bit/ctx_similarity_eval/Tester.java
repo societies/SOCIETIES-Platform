@@ -28,20 +28,34 @@ package org.societies.integration.test.bit.ctx_similarity_eval;
 import static org.junit.Assert.*;
 
 import java.awt.Point;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
-import junit.framework.Assert;
 
+import junit.framework.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+
+
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.internal.context.broker.ICtxBroker;
 
 
@@ -53,6 +67,17 @@ public class Tester {
 	
 	private ICtxBroker ctxBroker;
 	
+	private static Logger LOG = LoggerFactory.getLogger(Tester.class);
+	CtxEntity serviceA = null;
+	CtxAttribute userInterestsA = null;
+	CtxAttribute moviesA = null;
+	
+	CtxEntity serviceB = null;
+	CtxAttribute userInterestsB = null;
+	CtxAttribute moviesB = null;
+	
+	
+	
 	public Tester(){
 
 	}
@@ -62,11 +87,81 @@ public class Tester {
 			
 	}
 	
-	
-	@org.junit.Test
-	public void Test(){
-		ctxBroker = Test2018.getCtxBroker();
-	
+	@After
+	public void tearDown(){
+
+		try {
+			LOG.info("*** tear down **** " );
+			if(serviceA != null ) this.ctxBroker.remove(serviceA.getId());
+			if(serviceB != null ) this.ctxBroker.remove(serviceB.getId());
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
+
+	@Test
+	public void Test(){
+		
+		this.ctxBroker = Test2018.getCtxBroker();
+		
+		CtxEntity serviceA = null;
+		CtxAttribute userInterestsA = null;
+		CtxAttribute moviesA = null;
+		
+		CtxEntity serviceB = null;
+		CtxAttribute userInterestsB = null;
+		CtxAttribute moviesB = null;
+		
+		try {
+			serviceA = this.ctxBroker.createEntity(CtxEntityTypes.SERVICE).get();
+			userInterestsA = this.ctxBroker.createAttribute(serviceA.getId(), CtxAttributeTypes.INTERESTS).get();
+			userInterestsA.setStringValue("Movies,Books,Sports");
+			userInterestsA = (CtxAttribute) this.ctxBroker.update(userInterestsA).get();
+			LOG.info("service A  " +serviceA.getId());
+			
+			serviceB = ctxBroker.createEntity(CtxEntityTypes.SERVICE).get();
+			userInterestsB = this.ctxBroker.createAttribute(serviceB.getId(), CtxAttributeTypes.INTERESTS).get();
+			userInterestsB.setStringValue("Movies,Sports");
+			userInterestsB = (CtxAttribute) this.ctxBroker.update(userInterestsB).get();
+			LOG.info("service  B " +serviceB.getId());
+			
+			LOG.info("service A interests " +userInterestsA.getStringValue() );
+			
+			LOG.info("service B interests " +userInterestsB.getStringValue() );
+			List<Serializable> objects = new ArrayList<Serializable>();
+			
+			objects.add(userInterestsB.getStringValue());
+			
+			// this should be changed
+			this.ctxBroker.evaluateSimilarity(userInterestsA.getStringValue(),objects );
+			
+		
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
+		
+		
+		
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
 	
 }

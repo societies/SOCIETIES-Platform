@@ -29,6 +29,7 @@ package org.societies.integration.test.bit.ctx_3pBroker;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -40,6 +41,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
@@ -303,4 +306,33 @@ public class Tester {
 	}
 	 */
 	
+	
+	
+	protected IIdentity createCIS() {
+
+		IIdentity cisID = null;
+		try {
+		Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> ();
+		LOG.info("*** trying to create cis:");
+		ICisOwned cisOwned = this.cisManager.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
+		LOG.info("*** cis created: "+cisOwned.getCisId());
+
+		LOG.info("*** cisOwned " +cisOwned);
+		LOG.info("*** cisOwned.getCisId() " +cisOwned.getCisId());
+		String cisIDString = cisOwned.getCisId();
+
+		cisID = this.commManager.getIdManager().fromJid(cisIDString);
+
+		} catch (InterruptedException e) {
+		e.printStackTrace();
+		} catch (ExecutionException e) {
+		e.printStackTrace();
+		} catch (InvalidFormatException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		}
+
+		return cisID;
+		}
+
 }
