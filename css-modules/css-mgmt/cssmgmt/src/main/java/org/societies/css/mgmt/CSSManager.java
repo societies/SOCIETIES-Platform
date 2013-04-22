@@ -37,6 +37,11 @@ import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+
 import org.apache.shindig.social.opensocial.model.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -227,9 +232,35 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 		cssNode.setIdentity(identity);
 		cssNode.setStatus(CSSManagerEnums.nodeStatus.Available.ordinal());
 		cssNode.setType(CSSManagerEnums.nodeType.Cloud.ordinal());
+		cssNode.setInteractable("false");
+		try{
+			InetAddress localAddress = InetAddress.getLocalHost();
+			
+			LOG.debug("Cloud Node IP address: " + localAddress);
+			
+			if (null != localAddress) {
+				NetworkInterface networkInterface =  NetworkInterface.getByInetAddress(localAddress);
+				
+				LOG.debug("Cloud Node network interface: " + networkInterface.getName());
+				
+				if (null != networkInterface) {
+					byte[] macAddress = networkInterface.getHardwareAddress();
+					StringBuilder sb = new StringBuilder();
+					for (int i = 0; i < macAddress.length; i++) {
+						sb.append(String.format("%02X%s", macAddress[i], (i < macAddress.length - 1) ? ":" : ""));		
+					}
+					cssNode.setCssNodeMAC(sb.toString());
+				}
+			}
+			
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (SocketException e){
+			e.printStackTrace();
+		}
 
 		try {
-			//if CssRecord does not exist create new CssRecord in persistance layer
+			//if CssRecord does not exist create new CssRecord in persistence layer
 
 			if (!this.cssRegistry.cssRecordExists()) {
 
@@ -237,6 +268,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 				CssRecord cssProfile = new CssRecord();
 				cssProfile.getCssNodes().add(cssNode);
 				cssProfile.setCssIdentity(identity);
+				
 //				cssProfile.setCssInactivation("0");
 
 //				cssProfile.setCssRegistration(this.getDate());
@@ -507,24 +539,12 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 				cssRecord.setForeName(profile.getForeName());
 				cssRecord.setName(profile.getName());
 				cssRecord.setEmailID(profile.getEmailID());
-//				cssRecord.setImID(profile.getImID());
-//				cssRecord.setSocialURI(profile.getSocialURI());
 				cssRecord.setSex(profile.getSex());
 				cssRecord.setHomeLocation(profile.getHomeLocation());
 				cssRecord.setEntity(profile.getEntity());
 				cssRecord.setWorkplace(profile.getWorkplace());
 				cssRecord.setPosition(profile.getPosition());
-				cssRecord.setCssNodes(profile.getCssNodes());
 
-				LOG.info("modifyCssRecord cssRecord Entity: " +cssRecord.getEntity());
-				LOG.info("modifyCssRecord cssRecord Name : "  +cssRecord.getName());
-				LOG.info("modifyCssRecord cssRecord EmailID : " +cssRecord.getEmailID());
-				LOG.info("modifyCssRecord cssRecord Sex : " +cssRecord.getSex());
-				LOG.info("modifyCssRecord cssRecord CSSID : " +cssRecord.getCssIdentity());
-				LOG.info("modifyCssRecord cssRecord Workplace : " +cssRecord.getWorkplace());
-				LOG.info("modifyCssRecord cssRecord Position : " +cssRecord.getPosition());
-				
-				LOG.info("modifyCssRecord cssRecord CssNodes : " +cssRecord.getCssNodes());
 
 				// internal eventing
 
@@ -654,8 +674,33 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 	}
 
 	public Future<CssInterfaceResult> synchProfile(CssRecord profile) {
-		// TODO Auto-generated method stub
-		return null;
+		LOG.info("Calling synchProfile");
+		Dbc.require("CssRecord parameter cannot be null", profile != null);
+
+        CssInterfaceResult result = new CssInterfaceResult();
+		result.setProfile(profile);
+		result.setResultStatus(false);
+
+		CssRecord cssRecord = null;
+
+		try {
+			if (this.cssRegistry.cssRecordExists()) {
+				cssRecord = this.cssRegistry.getCssRecord();
+
+				result.setProfile(cssRecord);
+				result.setResultStatus(true);
+
+			} else {
+				LOG.equals("Css record does not exist");
+			}
+
+
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return new AsyncResult<CssInterfaceResult>(result);
 	}
 
 	@Override

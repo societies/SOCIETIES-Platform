@@ -753,24 +753,17 @@ public class PluginCSSManager extends Plugin {
 
     	
     	try {
-//			aRecord.setCssHostingLocation(jRecord.getString("cssHostingLocation"));
 			aRecord.setCssIdentity(jRecord.getString("cssIdentity"));
-//	    	aRecord.setCssInactivation(jRecord.getString("cssInactivation"));
-//	    	aRecord.setCssRegistration(jRecord.getString("cssRegistration"));
-//	    	aRecord.setCssUpTime(jRecord.getInt("cssUpTime"));
 	    	aRecord.setDomainServer(jRecord.getString("domainServer"));
 	    	aRecord.setEmailID(jRecord.getString("emailID"));
 	    	aRecord.setEntity(jRecord.getInt("entity"));
 	    	aRecord.setForeName(jRecord.getString("foreName"));
 	    	aRecord.setHomeLocation(jRecord.getString("homeLocation"));
-//	    	aRecord.setIdentityName(jRecord.getString("identityName"));
-//	    	aRecord.setImID(jRecord.getString("imID"));
 	    	aRecord.setName(jRecord.getString("name"));
 	    	aRecord.setPassword(jRecord.getString("password"));
-//	    	aRecord.setPresence(jRecord.getInt("presence"));
 	    	aRecord.setSex(jRecord.getInt("sex"));
-//	    	aRecord.setSocialURI(jRecord.getString("socialURI"));
-//	    	aRecord.setStatus(jRecord.getInt("status"));
+	    	aRecord.setPosition(jRecord.getString("position"));
+	    	aRecord.setWorkplace(jRecord.getString("workplace"));
 	    	
 	    	JSONArray cssNodes = jRecord.getJSONArray("cssNodes");
 	    	List<CssNode> nodeList = new ArrayList<CssNode>();
