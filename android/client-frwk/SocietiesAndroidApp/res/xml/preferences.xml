@@ -26,17 +26,17 @@
 		   	<EditTextPreference 
    		    	android:title="Domain Authority Node" 
    		    	android:key="daNode" 
-   		    	android:defaultValue="danode" 
+   		    	android:defaultValue="john.societies.local" 
    		    	android:summary="Domain Authority Node"/>
     		<EditTextPreference 
    		    	android:title="CSS Identity" 
    		    	android:key="cssIdentity" 
-   		    	android:defaultValue="" 
+   		    	android:defaultValue="john" 
    		    	android:summary="CSS XMPP identity"/>
            	<EditTextPreference 
    		    	android:title="Identity Password" 
    		    	android:key="cssPassword" 
-   		    	android:defaultValue="" 
+   		    	android:defaultValue="1234" 
    		    	android:summary="CSS XMPP password"/>
            	<EditTextPreference 
    		    	android:title="Android CSS Node JID Resource" 

@@ -30,8 +30,11 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  * @namespace SocietiesLogin
  */
 
+var myIdentity;
+var vcardUsers = [];
 
 var SocietiesLogin = {
+		
 		/**
 		 * @methodOf SocietiesLogin#
 		 * @description Refresh the Login page based on current app preferences
@@ -282,17 +285,7 @@ var SocietiesLogin = {
 			//FOREACH ACTIVITY
 			if(data.length > 0) {
 				console.log("data size: " + data.length);
-				/*
-				for(var obj in data) {
-				    if(data.hasOwnProperty(obj)){
-					    for(var prop in data[obj]){
-					        if(data[obj].hasOwnProperty(prop)){
-					        	console.log(prop + ':' + data[obj][prop]);
-					        }
-					    }
-					}
-				}
-				*/
+				myIdentity = data[0].actor;
 				var mLastDate = "";
 				for (i=data.length-1; i >= 0 ; i--) {
 					//HEADER

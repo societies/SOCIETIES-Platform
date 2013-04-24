@@ -40,7 +40,8 @@ public class InstalledAppInfo implements Parcelable {
 	private String applicationDescription="";
 	private String versionName="";
 	private int versionCode = 0;
-	private String iconAsB64string="";
+	private String icon="";
+	//private byte[] icon = new byte[0];
 
 	public InstalledAppInfo() {
 		super();
@@ -96,14 +97,14 @@ public class InstalledAppInfo implements Parcelable {
 		this.versionCode = versionCode;
 	}
 	
-	/**@return the iconAsB64string */
-	public String getIconAsB64string() {
-		return iconAsB64string;
+	/**@return the iconImage */
+	public String getIcon() {
+		return icon;
 	}
 
-	/**@param iconAsB64string the iconAsB64string to set*/
-	public void setIconAsB64string(String iconAsB64string) {
-		this.iconAsB64string = iconAsB64string;
+	/**@param iconImage the iconImage to set */
+	public void setIcon(String iconImage) {
+		this.icon = iconImage;
 	}
 
 	@Override
@@ -123,7 +124,7 @@ public class InstalledAppInfo implements Parcelable {
 		dest.writeString(this.getPackageName());
 		dest.writeString(this.getVersionName());
 		dest.writeInt(this.getVersionCode());
-		dest.writeString(this.getIconAsB64string());
+		dest.writeString(this.getIcon());
 	}
 	
 	private InstalledAppInfo(Parcel in) {
@@ -133,9 +134,9 @@ public class InstalledAppInfo implements Parcelable {
 		this.setPackageName(in.readString());
 		this.setVersionName(in.readString());
 		this.setVersionCode(in.readInt());
-		this.setIconAsB64string(in.readString());
+		this.setIcon(in.readString());
 	}
-	
+
 	public static final Parcelable.Creator<InstalledAppInfo> CREATOR = new Parcelable.Creator<InstalledAppInfo>() {
 		public InstalledAppInfo createFromParcel(Parcel in) {
 			return new InstalledAppInfo(in);

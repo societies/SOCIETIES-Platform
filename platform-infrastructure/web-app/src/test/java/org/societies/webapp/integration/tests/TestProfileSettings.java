@@ -29,6 +29,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openqa.selenium.WebElement;
 import org.societies.webapp.integration.selenium.SeleniumTest;
 import org.societies.webapp.integration.selenium.components.*;
 import org.societies.webapp.integration.selenium.pages.IndexPage;
@@ -427,20 +428,20 @@ public class TestProfileSettings extends SeleniumTest {
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
 
 
-//        profileSettingsPage.openContextMenuOnConditionNode(new int[]{0, 0}, "timeOfDay EQUALS afternoon")
-//                .clickAddBefore()
-//                .setName("locationSymbolic")
-//                .setOperator("equals")
-//                .setConditionValue("pub")
-//                .clickSave();
-//
-//
-//        beerStrengthNode.subNodes.remove(afternoonConditionNode);
-//        locationHomeConditionNode = new ProfileSettingsPage.TreeNode("locationSymbolic EQUALS home",
-//                ProfileSettingsPage.TreeNodeType.CONDITION,
-//                beerStrengthNode);
-//        locationHomeConditionNode.subNodes.add(afternoonConditionNode);
-//        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+        profileSettingsPage.openContextMenuOnConditionNode(new int[]{0, 0}, "timeOfDay EQUALS afternoon")
+                .clickAddBefore()
+                .setName("locationSymbolic")
+                .setOperator("equals")
+                .setConditionValue("pub")
+                .clickSave();
+
+
+        beerStrengthNode.subNodes.remove(afternoonConditionNode);
+        locationHomeConditionNode = new ProfileSettingsPage.TreeNode("locationSymbolic EQUALS home",
+                ProfileSettingsPage.TreeNodeType.CONDITION,
+                beerStrengthNode);
+        locationHomeConditionNode.subNodes.add(afternoonConditionNode);
+        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
 
 
     }

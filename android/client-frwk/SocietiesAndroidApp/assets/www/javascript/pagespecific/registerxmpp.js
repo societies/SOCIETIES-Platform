@@ -63,7 +63,6 @@ var SocietiesXMPPRegistration = {
 
 	validateRegistrationCredentials: function(name, password, repeatPassword, termsAck) {
 		var retValue = true;
-		alert ("checkbox value: " + termsAck);
 		
 		if (name.length > 0 && password.length > 0) {
 			if (repeatPassword.length === 0) {

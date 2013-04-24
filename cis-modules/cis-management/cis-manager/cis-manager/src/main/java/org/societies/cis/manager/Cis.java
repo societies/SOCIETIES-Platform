@@ -1202,7 +1202,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 			listMemberIDs.add(element.getMembersJid());
 	    }
 		//GET PARTICIPANT NAMES FROM CSS DIR
-		cssDirectoryRemote.searchByID(listMemberIDs, new ICssDirectoryCallback() {
+		getCssDirectoryRemote().searchByID(listMemberIDs, new ICssDirectoryCallback() {
 			@Override
 			public void getResult(List<CssAdvertisementRecord> results) {
 				for (CssAdvertisementRecord record: results) {

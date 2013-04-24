@@ -7,6 +7,7 @@ package org.societies.webapp.models;
  * @author mmanniox
  *
  */
+@Deprecated // No longer used after move from JSP to JSF
 public class LoginForm {
 
 	String username;

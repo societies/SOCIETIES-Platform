@@ -39,4 +39,5 @@ public class UserFeedbackActivityIntentExtra {
 	
 	public static final String EXTRA_PRIVACY_POLICY = "org.societies.userfeedback.eventInfo";
 	public static final String USERFEEDBACK_NODES 	= "org.societies.useragent.feedback";
+	public static final String EXTRA_CSS_VCARD  	= "org.societies.android.api.comms.xmpp.VCardParcel";
 }

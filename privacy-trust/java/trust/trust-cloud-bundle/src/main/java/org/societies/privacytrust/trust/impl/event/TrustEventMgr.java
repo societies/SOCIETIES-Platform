@@ -467,8 +467,13 @@ public class TrustEventMgr implements ITrustEventMgr {
 								+ ": trustorIdFilter=" + trustorIdFilter
 								+ ", trusteeIdFilter=" + trusteeIdFilter
 								+ ", trustValueType=" + trustValueType);
-					this.pubsubClient.subscriberSubscribe(pubsubId, topics[i], 
-							remoteHandler);
+					try {
+						this.pubsubClient.subscriberSubscribe(pubsubId, 
+								topics[i], remoteHandler);
+					} catch (Exception e) {
+						this.remoteHandlers.remove(remoteHandler);
+						throw e;
+					}
 				} else {
 					LOG.warn("TrustUpdateEvent listener " + listener + " already registered to topic "
 							+ topics[i]);
@@ -517,8 +522,13 @@ public class TrustEventMgr implements ITrustEventMgr {
 								+ ": trustorIdFilter=" + trustorIdFilter
 								+ ", trusteeIdFilter=" + trusteeIdFilter
 								+ ", trustValueType=" + trustValueType);
-					this.pubsubClient.subscriberUnsubscribe(pubsubId, topics[i], 
-							remoteHandler);
+					try {
+						this.pubsubClient.subscriberUnsubscribe(pubsubId, 
+								topics[i], remoteHandler);
+					} catch (Exception e) {
+						this.remoteHandlers.add(remoteHandler);
+						throw e;
+					}
 				} else {
 					LOG.warn("Nothing to do - TrustUpdateEvent listener " + listener 
 							+ " was not registered to topic " + topics[i]);
