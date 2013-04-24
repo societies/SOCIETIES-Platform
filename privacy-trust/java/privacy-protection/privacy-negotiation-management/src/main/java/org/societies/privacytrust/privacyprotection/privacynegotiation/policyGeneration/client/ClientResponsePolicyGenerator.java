@@ -37,6 +37,7 @@ import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.NegotiationStatusUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestItemUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponsePolicyUtils;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
@@ -47,6 +48,7 @@ import org.societies.privacytrust.privacyprotection.privacynegotiation.PrivacyPo
 
 /**
  * @author Eliza
+ * @author Olivier Maridat (Trialog)
  *
  */
 public class ClientResponsePolicyGenerator {
@@ -60,9 +62,8 @@ public class ClientResponsePolicyGenerator {
 		privacyPreferenceManager = policyMgr.getPrivacyPreferenceManager();
 	}
 
-
 	public ResponsePolicy generatePolicy(NegotiationDetails details, RequestPolicy providerPolicy){
-		// Generate an empty failed response policy ( may be needed)
+		// Generate an empty failed response policy (may be useful)
 		ResponsePolicy responsePolicyEmpty = new ResponsePolicy();
 		responsePolicyEmpty.setRequestor(providerPolicy.getRequestor());
 		responsePolicyEmpty.setNegotiationStatus(NegotiationStatus.FAILED);
@@ -85,10 +86,11 @@ public class ClientResponsePolicyGenerator {
 					found = true;
 				}
 			}
-			// This item is not in the privacy preferences: create an empty response item for it
+			// This item is not in the privacy preferences: create an empty response item for it, PERMIT by default to simplify the user's life
 			if (!found){
 				ResponseItem item = new ResponseItem();
 				item.setRequestItem(requestItem);
+				item.setDecision(Decision.PERMIT);
 				responseItems.add(item);
 			}
 		}
@@ -96,7 +98,7 @@ public class ClientResponsePolicyGenerator {
 		responsePolicyGenerated.setRequestor(providerPolicy.getRequestor());
 		responsePolicyGenerated.setNegotiationStatus(NegotiationStatus.ONGOING);
 		LOG.debug("Generated response policy to be displayed to the user");
-		LOG.debug("{{{{{ "+ResponsePolicyUtils.toString(responsePolicyGenerated));
+		LOG.debug(ResponsePolicyUtils.toString(responsePolicyGenerated));
 		return responsePolicyGenerated;
 	}
 
@@ -127,7 +129,7 @@ public class ClientResponsePolicyGenerator {
 				responsePolicyUserApprouved.setNegotiationStatus(NegotiationStatus.ONGOING);
 			}
 			LOG.debug("Generated user response policy. ResponsePolicy contains: "+responsePolicyUserApprouved.getResponseItems().size()+" responseItems");
-			LOG.debug("{{{{{ "+ResponsePolicyUtils.toString(responsePolicyUserApprouved));
+			LOG.debug(ResponsePolicyUtils.toString(responsePolicyUserApprouved));
 			return responsePolicyUserApprouved;
 		} catch (InterruptedException e) {
 			LOG.error("Negotiation failed due to interrupted exception", e);

@@ -51,7 +51,12 @@ public class ProviderResponsePolicyGenerator {
 	public ProviderResponsePolicyGenerator(){
 	}
 	
-	
+	/**
+	 * TODO urgent: fix this method that didn't accept to deny optional RequestItem, Action or Condition!!!
+	 * @param clientResponse
+	 * @param myPolicy
+	 * @return
+	 */
 	public ResponsePolicy generateResponse(ResponsePolicy clientResponse, RequestPolicy myPolicy){
 		if (clientResponse.getNegotiationStatus().equals(NegotiationStatus.FAILED)){
 			//JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 1");
