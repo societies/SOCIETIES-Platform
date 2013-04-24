@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.lang.reflect.*;
-import org.societies.api.context.similarity.*;
+import org.societies.context.api.similarity.*;
 
 /**
  *
@@ -45,7 +45,7 @@ public class ContextSimilarityEvaluator implements ICtxSimilarityEvaluator {
 		er.init();
 	}
 	
-	public org.societies.api.context.similarity.evaluationResults evaluateSimilarity (String[] ids, ArrayList<String> attrib){
+	public org.societies.context.api.similarity.evaluationResults evaluateSimilarity (String[] ids, ArrayList<String> attrib){
 		
 		// 
 		for (String att : attrib){
@@ -61,7 +61,7 @@ public class ContextSimilarityEvaluator implements ICtxSimilarityEvaluator {
 				er.setResult(false);
 			}
 		}
-		return (org.societies.api.context.similarity.evaluationResults) er;
+		return (org.societies.context.api.similarity.evaluationResults) er;
 	}
 	
 

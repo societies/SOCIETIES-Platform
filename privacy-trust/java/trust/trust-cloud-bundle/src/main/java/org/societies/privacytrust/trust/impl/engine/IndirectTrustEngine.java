@@ -99,7 +99,7 @@ public class IndirectTrustEngine extends TrustEngine {
 			// referenced in the specified TrustEvidence
 			final Set<IIndirectTrustEvidence> evidenceSet = super.trustEvidenceRepo
 					.retrieveIndirectEvidence(null, evidence.getObjectId(),
-							evidence.getType(), null, null); // TODO unique evidence - max date!!
+							evidence.getType(), null, null, null); // TODO unique evidence - max date!!
 			if (LOG.isDebugEnabled())
 				LOG.debug("evidenceSet=" + evidenceSet);
 			
