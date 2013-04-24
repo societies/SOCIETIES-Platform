@@ -1,20 +1,17 @@
-SOCIETIES Platform Release 0.6
+SOCIETIES Platform Release 1.0
 
-Change log since R0.5:
-- Multi-container distribution: 
-	- configured for 2 users containers 
-    - user1 run 'fullcontainer' plan, user2 runs 'usercontainer' plan
-- Openfire domain changed from ‘societies.local’ to ‘ict-societies.eu’
-    - requires Openfire properties to be updated
-- removed 'xc.properties' and merged properties into 'org.societies.platform.properties'
-- Web context of Test Webapp changed to http://localhost:8080/societies-platform/
-- Linux startup configuration included
+Change log since R0.6:
+- Bug fixes and feature refinement based on deployment and acceptance testing
+- Multi-container configuration for both Windows and Unix/Linux
+- Android Platform services and application included
 
-Features:
+Platform Features in Release 1.0:
 
 Virgo Platform Services
 
-- org.societies.activityfeed: ?
+- org.societies.activityfeed
+-- Provides an generic activity feed service that can be integrated with platform or 3 party services allowing for relevant activity 
+posts. In this release the activity is integrated with the CIS manager to associate activity feeds with created communities.
 - org.societies.security 
 -- low level security services, providing digital signatures to 3rd party services and policy negotiation process
 -- service policy negotiation, providing service client with access to service resources
@@ -23,18 +20,16 @@ Virgo Platform Services
 -- The Trust Management & Evaluation framework provides the necessary infrastructure for 
 the maintenance and management of dynamically changing trustworthiness of stakeholders with respect to different domains of 
 collaboration. In this context, is assists an individual to assess the trustworthiness of the entities with whom they interact, 
-such as, other users, communities and services. Trust assessment is currently based on the experiences of the end-user, but in 
-next releases is will also utilise the experiences of fellow community members by exploiting available feedback and 
-using learning mechanisms, thus providing the necessary facilities for trust-based discovery of individuals, communities and services.
+such as, other users, communities and services. Trust assessment is currently based on the experiences of the end-user.
 -- The Privacy Protection provides the necessary infrastructure to protect user's personal data. On the first hand, before 
 each third party service installation, or CIS joining, the user is prompted to accept the corresponding privacy policy and 
 modify his privacy preferences in consequences to protect his data exactly as he wanted. On the other hand, every time one 
 of the user's personal data is requested, the Privacy Preferences Engine checks the user's will, or ask the user for feedback, 
-before to release access to it. Next releases will aim to enhance the usability.
+before to release access to it.
 - org.societies.css.devicemgmt
 -- This component is the focal point for interaction with external devices. When a new device is detected via a specific device 
 driver, the latter driver informs this component which assigns it a Device ID. It then creates and maintains the device binding 
-table adding the device to both the Device Registry and the Service Registry. If the device is tagged as a “context source”, it 
+table adding the device to both the Device Registry and the Service Registry. If the device is tagged as a â€œcontext sourceâ€�, it 
 can raise an internal event to inform the context component of the status of the device (connected, disconnected, updated data).
 - org.societies.context.management
 -- It provides the functionality regarding the representation, collection, management, and sharing of context information and 
@@ -91,25 +86,22 @@ Party services can use it to communicate with remote components.
 
 Android Platform Services:
 
-- CIS_MANAGER_SERVICE
-- CIS_SUBSCRIBED_SERVICE
-- SLM_SERVICE_CONTROL_SERVICE
-- PRIVACY_POLICY_SERVICE
-- SNS_SOCIAL_DATA_SERVICE
-this server uses the communication framework to excenge information between the android app and social data bundle.In particular, 
-is it possible to connect/disconnect a social network from the mobile app and send the result of such operation to the container 
-bundle to maintain everything updated.
-- SLM_SERVICE_DISCO_SERVICE
-- FRIENDS_MANAGER_SERVICE
-- USER_FEEDBACK_SERVICE
-This service is the equivalent service of UserFeedback on the backend and allows other services to request information or feedback 
-from the user in the form of explicit or implicit notification popups. This component serves only platform services and is 
-not available to 3rd party services. 
+- Community Manager: Administrate/manage communities that you own. Membership, shared services, moderate activity feed
+- Community Subscriptions Manager: interact with communities that you are a member of
+- Service Management: Display/control services installed on your cloud node. List/launch SOCIETIES 3rd Party services installed locally
+- Privacy Policy Utilities: Component to create privacy policies from pre-defined templates and to convert policy XML into a readable 
+UI format
+- Social Networking: Add and authorise connectors to your social network sites (currently Facebook, Twitter, Foursquare, Linked-in)
+- Friends Management: Eventing system to notify you of friend requests/acceptances and general friends management features
+- User Feedback: generic component supporting retrieval of user feedback for policy negotiation, access control requests
+- CSS/CIS directory services: allows for the querying of users and communities in the centralised directory
+- CSS Manager: responsible for managing all the platform services for the user, logging in/out, starting/stopping platform services, 
+profile updates
 
 Android Platform Application:
 
--Comms & Eventing
--- Android has an implementation of Communication Framework which integrates with the Intent mechanism. The received packets are 
-unmarshalled into objects that implement Parcelable so that it can efficiently be sent over an Intent.
-- HTML5 User Inteface
-- CSS/CIS directory services
+- Comms & Eventing: Android has an implementation of Communication Framework which integrates with the Intent mechanism. The received 
+packets are unmarshalled into objects that implement Parcelable so that it can efficiently be sent over an Intent.
+- HTML5 User Interface is the main GUI. 
+- Phonegap plugins are used as the interop layer between the native platform services and the javascript of the user interface.
+
