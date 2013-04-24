@@ -104,30 +104,30 @@ public class RequestorUtils {
 	}	
 
 	public static String toString(RequestorBean bean){
-		if (bean instanceof RequestorCisBean){
-			StringBuilder builder = new StringBuilder();
-			builder.append("RequestorCisBean [getRequestorId=");
-			builder.append(bean.getRequestorId());
-			builder.append(", getCisRequestorId()=");
-			builder.append(((RequestorCisBean) bean).getCisRequestorId());
-			builder.append("]");
-			return builder.toString();
-		}else if (bean instanceof RequestorServiceBean){
-			StringBuilder builder = new StringBuilder();
-			builder.append("RequestorServiceBean [getRequestorId=");
-			builder.append(bean.getRequestorId());
-			builder.append(", getRequestorServiceId()=");
-			builder.append(((RequestorServiceBean) bean).getRequestorServiceId());
-			builder.append("]");
-			return builder.toString();
-		}else{
-			StringBuilder builder = new StringBuilder();
-			builder.append("RequestorBean [getRequestorId()=");
-			builder.append(bean.getRequestorId());
-			builder.append("]");
-			return builder.toString();
-
+		StringBuilder builder = new StringBuilder();
+		if (null != bean) {
+			if (bean instanceof RequestorCisBean){
+				builder.append("RequestorCisBean [");
+				builder.append("getRequestorId()=");
+				builder.append(bean.getRequestorId());
+				builder.append(", getCisRequestorId()=");
+				builder.append(((RequestorCisBean) bean).getCisRequestorId());
+			}
+			else if (bean instanceof RequestorServiceBean){
+				builder.append("RequestorServiceBean [");
+				builder.append("getRequestorId()=");
+				builder.append(bean.getRequestorId());
+				builder.append(", getRequestorServiceId()=");
+				builder.append(((RequestorServiceBean) bean).getRequestorServiceId());
+			}
+			else{
+				builder.append("RequestorBean [");
+				builder.append("getRequestorId()=");
+				builder.append(bean.getRequestorId());
+			}
 		}
+		builder.append("]");
+		return builder.toString();
 	}
 
 

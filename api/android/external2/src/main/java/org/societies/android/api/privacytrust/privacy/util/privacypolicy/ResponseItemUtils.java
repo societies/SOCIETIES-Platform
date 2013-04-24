@@ -26,10 +26,6 @@ package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
 import java.util.List;
 
-import org.societies.api.privacytrust.privacy.util.privacypolicy.ConditionUtils;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
@@ -47,6 +43,7 @@ public class ResponseItemUtils {
 		return responseItem;
 	}
 
+	
 	public static String toXmlString(ResponseItem responseItem){
 		StringBuilder sb = new StringBuilder();
 		if (null != responseItem) {
@@ -68,58 +65,91 @@ public class ResponseItemUtils {
 		return sb.toString();
 	}
 
-	public static String toString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem item){
+	public static String toString(ResponseItem value){
 		StringBuilder builder = new StringBuilder();
-		builder.append("RequestItem [getActions()=");
-		for (Action action : item.getActions()) {	
-			builder.append(action);
+		builder.append("ResponseItem [");
+		if (null != value) {
+			builder.append("getDecision()=");
+			builder.append(value.getDecision());
+			builder.append(", getRequestItem()=");
+			builder.append(RequestItemUtils.toString(value.getRequestItem()));
 		}
-		builder.append(", getConditions()=");
-		for (Condition condition: item.getConditions()) {
-			builder.append(ConditionUtils.toString(condition));
-		}
-		builder.append(", isOptional()=");
-		builder.append(item.isOptional());
-		builder.append(", getResource()=");
-		builder.append(ResourceUtils.toString(item.getResource()));
 		builder.append("]");
 		return builder.toString();
 	}
-	
-	public static String toString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem> requestItems){
+
+	public static String toString(List<ResponseItem> values){
 		StringBuilder sb = new StringBuilder();
-		if (null != requestItems) {
-			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem requestItem : requestItems) {
-				sb.append(toString(requestItem));
+		if (null != values) {
+			for(ResponseItem entry : values) {
+				sb.append(toString(entry));
 			}
 		}
 		return sb.toString();
 	}
 
-	public static boolean equals(ResponseItem o1, Object o2) {
+	
+	public static boolean equal(ResponseItem o1, Object o2) {
 		// -- Verify reference equality
-		if (o2 == null) { return false; }
 		if (o1 == o2) { return true; }
+		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
 		if (o1.getClass() != o2.getClass()) { return false; }
 		// -- Verify obj type
-		ResponseItem rhs = (ResponseItem) o2;
-		return (DecisionUtils.equals(o1.getDecision(), rhs.getDecision())
-				&& RequestItemUtils.equals(o1.getRequestItem(), rhs.getRequestItem())
+		ResponseItem ro2 = (ResponseItem) o2;
+		return (DecisionUtils.equal(o1.getDecision(), ro2.getDecision())
+				&& RequestItemUtils.equal(o1.getRequestItem(), ro2.getRequestItem())
 				);
 	}
+	@Deprecated
+	public static boolean equals(ResponseItem o1, Object o2) {
+		return equal(o1, o2);
+	}
 
-	public static boolean equals(List<ResponseItem> o1, Object o2) {
+	public static boolean equal(List<ResponseItem> o1, Object o2) {
 		// -- Verify reference equality
-		if (o2 == null) { return false; }
 		if (o1 == o2) { return true; }
-		if (o1.getClass() != o2.getClass()) { return false; }
+		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
+		if (!(o2 instanceof List)) { return false; }
 		// -- Verify obj type
-		List<ResponseItem> rhs = (List<ResponseItem>) o2;
+		List<ResponseItem> ro2 = (List<ResponseItem>) o2;
+		if (o1.size() != ro2.size()) {
+			return false;
+		}
 		boolean result = true;
-		int i = 0;
-		for(ResponseItem o1Element : o1) {
-			result &= equals(o1Element, rhs.get(i++));
+		for(ResponseItem o1Entry : o1) {
+			result &= contain(o1Entry, ro2);
 		}
 		return result;
+	}
+	@Deprecated
+	public static boolean equals(List<ResponseItem> o1, Object o2) {
+		return equal(o1, o2);
+	}
+
+	public static boolean contain(ResponseItem needle, List<ResponseItem> haystack) {
+		if (null == haystack || haystack.size() <= 0 || null == needle) {
+			return false;
+		}
+		for(ResponseItem entry : haystack) {
+			if (equal(needle, entry)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	
+	public static ResponseItem containSameResource(ResponseItem needle, List<ResponseItem> haystack) {
+		if (null == haystack || haystack.size() <= 0 || null == needle) {
+			return null;
+		}
+		for(ResponseItem entry : haystack) {
+			if (ResourceUtils.equal(needle.getRequestItem().getResource(), entry.getRequestItem().getResource())) {
+				return entry;
+			}
+		}
+		return null;
 	}
 }

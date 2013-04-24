@@ -26,7 +26,7 @@ package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
 import java.util.List;
 
-import org.societies.api.identity.util.RequestorUtils;
+import org.societies.android.api.identity.util.RequestorUtils;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
@@ -49,12 +49,15 @@ public class ResponsePolicyUtils {
 
 	public static String toString(ResponsePolicy item){
 		StringBuilder builder = new StringBuilder();
-		builder.append("ResponsePolicy [getNegotiationStatus()=");
-		builder.append(item.getNegotiationStatus());
-		builder.append(", getRequestItem()=");
-		builder.append(RequestorUtils.toString(item.getRequestor()));
-		builder.append(", getRequestItem()=");
-		builder.append(ResponseItemUtils.toString(item.getResponseItems()));
+		builder.append("ResponsePolicy [");
+		if (null != item) {
+			builder.append("getNegotiationStatus()=");
+			builder.append(item.getNegotiationStatus());
+			builder.append(", getRequestItem()=");
+			builder.append(RequestorUtils.toString(item.getRequestor()));
+			builder.append(", getRequestItem()=");
+			builder.append(ResponseItemUtils.toString(item.getResponseItems()));
+		}
 		builder.append("]");
 		return builder.toString();
 	}
@@ -89,7 +92,7 @@ public class ResponsePolicyUtils {
 		if (o1 == o2) { return true; }
 		if (o2 == null) { return false; }
 		if (o1 == null) { return false; }
-		if (o1.getClass() != o2.getClass()) { return false; }
+		if (!(o2 instanceof List)) { return false; }
 		// -- Verify obj type
 		List<ResponsePolicy> ro2 = (List<ResponsePolicy>) o2;
 		if (o1.size() != ro2.size()) {
@@ -113,7 +116,7 @@ public class ResponsePolicyUtils {
 		}
 		return false;
 	}
-	
+
 
 	public static boolean hasOptionalResponseItemsOnly(ResponsePolicy responsePolicy) {
 		if (null == responsePolicy || null == responsePolicy.getResponseItems() || responsePolicy.getResponseItems().size() <= 0) {
@@ -121,7 +124,7 @@ public class ResponsePolicyUtils {
 		}
 		for(ResponseItem responseItem : responsePolicy.getResponseItems()) {
 			// At least one requested item is mandatory
-			if (!responseItem.getRequestItem().isOptional()) {
+			if (null != responseItem.getRequestItem() && !responseItem.getRequestItem().isOptional()) {
 				return false;
 			}
 		}

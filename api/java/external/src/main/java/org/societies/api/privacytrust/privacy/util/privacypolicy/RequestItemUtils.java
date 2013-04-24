@@ -78,28 +78,28 @@ public class RequestItemUtils {
 		return sb.toString();
 	}
 
-	public static String toString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem item){
+	public static String toString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem value){
 		StringBuilder builder = new StringBuilder();
 		builder.append("RequestItem [");
-		if (null != item) {
-			builder.append(", getActions()=");
-			builder.append(ActionUtils.toString(item.getActions()));
+		if (null != value) {
+			builder.append("getActions()=");
+			builder.append(ActionUtils.toString(value.getActions()));
 			builder.append(", getConditions()=");
-			builder.append(ConditionUtils.toString(item.getConditions()));
+			builder.append(ConditionUtils.toString(value.getConditions()));
 			builder.append(", isOptional()=");
-			builder.append(item.isOptional());
+			builder.append(value.isOptional());
 			builder.append(", getResource()=");
-			builder.append(ResourceUtils.toString(item.getResource()));
+			builder.append(ResourceUtils.toString(value.getResource()));
 		}
 		builder.append("]");
 		return builder.toString();
 	}
 
-	public static String toString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem> requestItems){
+	public static String toString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem> values){
 		StringBuilder sb = new StringBuilder();
-		if (null != requestItems) {
-			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem requestItem : requestItems) {
-				sb.append(toString(requestItem));
+		if (null != values) {
+			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem value : values) {
+				sb.append(toString(value));
 			}
 		}
 		return sb.toString();
