@@ -22,20 +22,24 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.context.similarity;
+package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
+
 
 /**
- * Describe your class here...
- *
- * @author John
- *
+ * Tool class to manage conversion between Java type and Bean XMLschema generated type
+ * @author Olivier Maridat (Trialog)
  */
-public interface evaluationResults {
-
-	public Boolean getResult();
-	public HashMap<String, String> getSummary();
-	public Map getAttBreakDown();
+public class ConditionConstantsUtils {
+	public static boolean equal(ConditionConstants o1, Object o2) {
+		// -- Verify reference equality
+		if (o1 == o2) { return true; }
+		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		ConditionConstants ro2 = (ConditionConstants) o2;
+		return (o1.value().equals(ro2.value()));
+	}
 }

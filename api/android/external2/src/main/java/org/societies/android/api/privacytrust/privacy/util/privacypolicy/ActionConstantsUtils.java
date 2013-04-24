@@ -22,16 +22,24 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.context.similarity;
+package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
-import java.util.ArrayList;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
+
 
 /**
- * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * Tool class to manage conversion between Java type and Bean XMLschema generated type
+ * @author Olivier Maridat (Trialog)
  */
-public interface ICtxSimilarityEvaluator {
-
-	public evaluationResults evaluateSimilarity(String[] ids, ArrayList<String> attrib);
-	
-
+public class ActionConstantsUtils {
+	public static boolean equal(ActionConstants o1, Object o2) {
+		// -- Verify reference equality
+		if (o1 == o2) { return true; }
+		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		ActionConstants ro2 = (ActionConstants) o2;
+		return (o1.value().equals(ro2.value()));
+	}
 }

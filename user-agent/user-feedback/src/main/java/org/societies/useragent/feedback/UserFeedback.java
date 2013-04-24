@@ -32,6 +32,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -48,6 +49,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.NegotiationDetailsUtils;
 import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
@@ -60,6 +62,7 @@ import org.societies.api.internal.useragent.model.ImpProposalType;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestItemUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponsePolicyUtils;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
@@ -741,30 +744,40 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 		event.setRequestId(requestId);
 		event.setNegotiationDetails(details);
 		event.setResponsePolicy(policy);
+		ResponsePolicy responsePolicyUserApproved = null;
 		try {
 			this.pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION, null, event);
 			while (!this.containsKey(details)){
 				synchronized (this.negotiationResults) {
 					try {
 						this.negotiationResults.wait();
+						LOG.debug("getPrivacyNegotiationFB notified: response available");
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						this.LOG.error("Waiting for negotiation results interrupted", e);
+						return new AsyncResult<ResponsePolicy>(null);
 					}
 				}
 			}
-			this.pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP, null, negotiationResults.get(details));
-		} catch (XMPPError e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (CommunicationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			// Retrieve the user approved response policy
+			for(Entry<NegotiationDetailsBean, ResponsePolicy> negotiationResult : negotiationResults.entrySet()) {
+				if (NegotiationDetailsUtils.equal(negotiationResult.getKey(), details)) {
+					responsePolicyUserApproved = negotiationResult.getValue();
+					break;
+				}
+			}
+			LOG.debug("Userfeedback negotiation pop up can now be removed: "+ResponsePolicyUtils.toString(responsePolicyUserApproved));
+			this.pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP, null, responsePolicyUserApproved);
+		} catch (XMPPError e) {
+			this.LOG.error("XMPP error during userfeedback privacy negotiation", e);
+			return new AsyncResult<ResponsePolicy>(null);
+		} catch (CommunicationException e) {
+			this.LOG.error("Communication error during userfeedback privacy negotiation", e);
+			return new AsyncResult<ResponsePolicy>(null);
 		}
 
 
 
-		return new AsyncResult<ResponsePolicy>(negotiationResults.get(details));
+		return new AsyncResult<ResponsePolicy>(responsePolicyUserApproved);
 	}
 
 	private boolean containsKey(NegotiationDetailsBean details){
