@@ -48,6 +48,7 @@ import org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType;
 import org.societies.privacytrust.trust.impl.common.hibernate.TrustedEntityIdUserType;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.IndirectTrustEvidence;
+import org.societies.privacytrust.trust.impl.evidence.repo.model.TableName;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.TrustEvidence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -69,7 +70,8 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 	
 	TrustEvidenceRepository() {
 		
-		LOG.info(this.getClass() + " instantiated");
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
 	}
 	
 	/*
@@ -140,12 +142,52 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 		if (LOG.isDebugEnabled())
 			LOG.debug("Retrieving indirect trust evidence between dates '"
 					+ startDate + "' and '" + endDate + "' of type " + type
-					+ " with subjectId '"
-					+ subjectId + "', objectId '" + objectId 
-					+ "' and sourceId '" + sourceId 
+					+ " with subjectId '" + subjectId + "', objectId '" 
+					+ objectId + "' and sourceId '" + sourceId 
 					+ "' from the Trust Evidence Repository...");
 		result.addAll(this.retrieve(subjectId, objectId, 
 				IndirectTrustEvidence.class, type, startDate, endDate, sourceId));
+		
+		return result;
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveLatestDirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType)
+	 */
+	@Override
+	public Set<IDirectTrustEvidence> retrieveLatestDirectEvidence(
+			final TrustedEntityId subjectId, final TrustedEntityId objectId,
+			final TrustEvidenceType type) 
+					throws TrustEvidenceRepositoryException {
+		
+		final Set<IDirectTrustEvidence> result = new HashSet<IDirectTrustEvidence>();
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving latest direct trust evidence of type " + type 
+					+ " with subjectId '" + subjectId + "' and objectId '" 
+					+ objectId + "' from the Trust Evidence Repository...");
+		result.addAll(this.retrieveLatest(subjectId, objectId, 
+				DirectTrustEvidence.class, type, null));
+		
+		return result;
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveLatestIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	public Set<IIndirectTrustEvidence> retrieveLatestIndirectEvidence(
+			final TrustedEntityId subjectId, final TrustedEntityId objectId,
+			final TrustEvidenceType type, final TrustedEntityId sourceId)
+					throws TrustEvidenceRepositoryException {
+		
+		final Set<IIndirectTrustEvidence> result = new HashSet<IIndirectTrustEvidence>();
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving latest indirect trust evidence of type "
+					+ type + " with subjectId '" + subjectId + "', objectId '" 
+					+ objectId + "' and sourceId '" + sourceId 
+					+ "' from the Trust Evidence Repository...");
+		result.addAll(this.retrieveLatest(subjectId, objectId, 
+				IndirectTrustEvidence.class, type, sourceId));
 		
 		return result;
 	}
@@ -232,6 +274,73 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 				session.close();
 		}
 			
+		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <T extends TrustEvidence> Set<T> retrieveLatest(
+			final TrustedEntityId subjectId, final TrustedEntityId objectId,
+			final Class<T> evidenceClass, final TrustEvidenceType type,
+			final TrustedEntityId sourceId)	
+					throws TrustEvidenceRepositoryException {
+		
+		final Set<T> result = new HashSet<T>();
+		final String table = (IndirectTrustEvidence.class == evidenceClass) 
+				? TableName.INDIRECT_TRUST_EVIDENCE
+						: TableName.DIRECT_TRUST_EVIDENCE;
+		String sqlRetrieve = "select * from " + table + " ec" 
+				+ " left outer join " + table + " ec2"
+				+ " on (ec.subject_id = ec2.subject_id"
+				+ " and ec.object_id = ec2.object_id"
+				+ " and ec.type = ec2.type"
+				+ ((IndirectTrustEvidence.class == evidenceClass) ?
+						" and ec.source_id = ec2.source_id" : "")
+				+ " and ec.timestamp < ec2.timestamp)"
+				+ " where ec2.id is null";
+		
+		if (subjectId != null)
+			sqlRetrieve += " and ec.subject_id = :subjectId";
+		
+		if (objectId != null)
+			sqlRetrieve += " and ec.object_id = :objectId";
+		
+		if (type != null)
+			sqlRetrieve += " and ec.type = :type";
+		
+		if (IndirectTrustEvidence.class == evidenceClass && sourceId != null)
+			sqlRetrieve += " and ec.source_id = :sourceId";
+		
+		final Session session = sessionFactory.openSession();
+		try {
+			final Query latestQuery = session.createSQLQuery(sqlRetrieve).addEntity(evidenceClass);
+			
+			if (subjectId != null)
+				latestQuery.setParameter("subjectId", subjectId, 
+						Hibernate.custom(TrustedEntityIdUserType.class));
+
+			if (objectId != null)
+				latestQuery.setParameter("objectId", objectId, 
+						Hibernate.custom(TrustedEntityIdUserType.class));
+
+			if (type != null)
+				latestQuery.setParameter("type", type.ordinal());
+
+			if (IndirectTrustEvidence.class == evidenceClass && sourceId != null)
+				latestQuery.setParameter("sourceId", sourceId, 
+						Hibernate.custom(TrustedEntityIdUserType.class));
+
+			result.addAll(latestQuery.list());
+		} catch (Exception e) {
+			throw new TrustEvidenceRepositoryException(
+					"Could not retrieve latest evidence with subjectId '"
+					+ subjectId	+ "', objectId '" + objectId 
+					+ "' and sourceId '" + sourceId + "' of type '" + type 
+					+ "': "	+ e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+
 		return result;
 	}
 	
