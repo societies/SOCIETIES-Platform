@@ -25,6 +25,7 @@
 package org.societies.integration.test.bit.ctx_3pBroker;
 
 
+import org.societies.api.cis.management.ICisManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.broker.ICtxBroker;
 import org.societies.integration.test.IntegrationTestCase;
@@ -41,7 +42,7 @@ public class Test1337 extends IntegrationTestCase{
 	
 	public static ICtxBroker ctxBroker;
 	public static ICommManager commManager;
-
+	public static ICisManager cisManager;
 	
 	
 	public Test1337(){
@@ -76,5 +77,14 @@ public class Test1337 extends IntegrationTestCase{
 	public  void setCommManager(ICommManager commMgr) {
 		Test1337.commManager = commMgr;
 	}		
+
+	public static ICisManager getCisManager() {
+		return cisManager;
+	}
+
+	public void setCisManager(ICisManager cisManager) {
+		
+		Test1337.cisManager = cisManager;
+	}
 
 }

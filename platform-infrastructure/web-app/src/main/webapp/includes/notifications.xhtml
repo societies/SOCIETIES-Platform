@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+
+    <h:outputText value="This is a really dirty hack to ensure that the ppNegotation bean is initialized"
+                  rendered="#{privacyPolicyNegotiationListener.queuedNegotiationCount eq -1}"/>
+
+    <p:dialog id="notificationDialog" resizable="true" header="Notifications"
+              draggable="true" modal="false">
+
+
+        <p>Bugs/incomplete:</p>
+        <ul>
+            <li>Wrong item disappearing on submit</li>
+            <li>Remove Timed Abort from GUI when it expires</li>
+            <li>Input validation</li>
+        </ul>
+
+        <p:dataGrid var="notification" value="#{notifications.negotiationQueue}"
+                    columns="1" emptyMessage="No notifications :(" id="notificationGrid">
+
+            <h:outputText value="ID: #{notification.itemId}"/>
+
+            <p:panel header="#{notification.title}" rendered="#{notification.type eq 'PPN'}"
+                     id="ppnPopupPanel">
+                <!-- PRIVACY POLICY NEGOTIATION -->
+
+                <h:panelGrid columns="1">
+                    <h:outputText value="#{notification.title}"/>
+
+                    <h:outputText value="#{notification.arrivalDate}"/>
+
+                    <h:outputLink value="#{notification.infoLink}">More info</h:outputLink>
+
+                </h:panelGrid>
+            </p:panel>
+
+            <p:panel header="#{notification.title}" rendered="#{notification.type eq 'ACK_NACK'}"
+                     id="ackNackPopupPanel">
+                <!-- ACK/NACK -->
+
+                <h:panelGrid columns="1">
+                    <h:outputText value="Please select:"/>
+                    <p:selectOneButton value="#{notification.result}">
+                        <f:selectItems value="#{notification.options}"/>
+                        <p:ajax event="change"
+                                process="ackNackPopupPanel"
+                                update="notificationGrid"
+                                listener="#{notifications.submitItem(notification.itemId)}"/>
+                    </p:selectOneButton>
+                </h:panelGrid>
+            </p:panel>
+
+            <p:panel header="#{notification.title}" rendered="#{notification.type eq 'SELECT_ONE'}"
+                     id="selectOnePopupPanel">
+                <!-- SELECT ONE / RADIO BUTTONS -->
+                <h:panelGrid columns="1">
+                    <h:outputText value="Please select:"/>
+                    <p:selectOneRadio value="#{notification.result}">
+                        <f:selectItems value="#{notification.options}"/>
+                    </p:selectOneRadio>
+
+                    <p:commandButton value="Submit" process="selectOnePopupPanel"
+                                     update="notificationGrid"
+                                     actionListener="#{notifications.submitItem(notification.itemId)}"/>
+                </h:panelGrid>
+            </p:panel>
+
+            <p:panel header="#{notification.title}" rendered="#{notification.type eq 'SELECT_MANY'}"
+                     id="selectManyPopupPanel">
+                <!-- SELECT MANY / CHECKBOXES -->
+                <h:panelGrid columns="1">
+                    <h:outputText value="Please select:"/>
+                    <p:selectManyCheckbox value="#{notification.results}">
+                        <f:selectItems value="#{notification.options}"/>
+                    </p:selectManyCheckbox>
+
+                    <p:commandButton value="Submit" process="selectManyPopupPanel"
+                                     update="notificationGrid"
+                                     actionListener="#{notifications.submitItem(notification.itemId)}"/>
+                </h:panelGrid>
+            </p:panel>
+
+            <p:panel header="#{notification.title}" rendered="#{notification.type eq 'NOTIFICATION'}"
+                     id="notificationPopupPanel">
+                <!-- SIMPLE NOTIFICATION -->
+
+                <h:panelGrid columns="1">
+                    <h:outputText value="#{notification.title}"/>
+
+                    <p:commandButton value="Ok" process="notificationPopupPanel"
+                                     update="notificationGrid"
+                                     actionListener="#{notifications.submitItem(notification.itemId)}"/>
+                </h:panelGrid>
+
+            </p:panel>
+
+            <p:panel header="#{notification.title}" rendered="#{notification.type eq 'TIMED_ABORT'}"
+                     id="timedAbortPopupPanel">
+                <!-- TMIED ABORT -->
+
+
+                <h:panelGrid columns="1">
+                    <h:outputText value="Time left: #{notification.friendlyTimeLeft}" id="timedAbortTimeLeft"/>
+                    <p:poll interval="1" update="timedAbortTimeLeft"/>
+
+                    <p>Click this button to cancel</p>
+
+                    <f:metadata>
+                        <f:viewParam name="result" value="#{notification.result}"/>
+                    </f:metadata>
+                    <p:commandButton value="Abort" process="timedAbortPopupPanel"
+                                     update="notificationGrid"
+                                     actionListener="#{notifications.submitItem(notification.itemId)}">
+                        <f:param name="result" value="abort"/>
+                    </p:commandButton>
+
+                </h:panelGrid>
+            </p:panel>
+
+
+        </p:dataGrid>
+
+    </p:dialog>
+
+
+</ui:composition>
+</html>

@@ -49,6 +49,7 @@
       <xs:enumeration value="cis"/>
       <xs:enumeration value="activity"/>
       <xs:enumeration value="css"/>
+      <xs:enumeration value="socialprovider"/>
     </xs:restriction>
   </xs:simpleType>
   

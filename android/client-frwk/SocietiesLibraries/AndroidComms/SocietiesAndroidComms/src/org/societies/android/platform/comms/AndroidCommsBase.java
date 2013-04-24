@@ -51,9 +51,16 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.packet.DiscoverItems;
+import org.jivesoftware.smackx.packet.VCard;
 import org.societies.android.api.comms.XMPPAgent;
+import org.societies.android.api.comms.xmpp.VCardParcel;
 import org.societies.android.api.comms.xmpp.XMPPNode;
 import org.societies.android.platform.androidutils.AndroidNotifier;
+import org.societies.android.platform.comms.state.IConnectionState;
+import org.societies.android.platform.comms.state.NoXMPPConnectionAvailableException;
+import org.societies.android.platform.comms.state.XMPPConnectionManager;
+import org.societies.android.platform.comms.state.XMPPConnectionProperties;
+import org.societies.android.platform.comms.state.IConnectionState.ConnectionState;
 import org.societies.utilities.DBC.Dbc;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -68,16 +75,19 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Parcelable;
 import android.util.Log;
 
 public class AndroidCommsBase implements XMPPAgent {
 	private static final String LOG_TAG = AndroidCommsBase.class.getName();
-	private static final long PUBSUB_EVENT_CALBACK_ID = -9999999999999L;
+	private static final long PUBSUB_EVENT_CALLBACK_ID = -9999999999999L;
+	private static final long INVALID_LONG_INTENT_VALUE = -9999999999998L;
 	private static final String PUBSUB_NAMESPACE_KEY = "http://jabber.org/protocol";
-	private static final boolean DEBUG_LOGGING = false;
+	private static final boolean DEBUG_LOGGING = true;
 	
-	private static final String NOTIFICATION_TITLE = "Societies Communications Problem";
-	private static final String COMMS_NO_CONNECTIVITY = "NotConnected";
+	public static final String NOTIFICATION_TITLE = "Societies Communications Problem";
+	public static final String COMMS_RESTORED_CONNECTIVITY = "Re-connected";
+	public static final String COMMS_NO_CONNECTIVITY = "NotConnected";
 	private static final String COMMS_CANNOT_REGISTER = "RegistrationError";
 	private static final String COMMS_CANNOT_UNREGISTER = "UnRegistrationError";
 	private static final String COMMS_CANNOT_SEND_MESSAGE = "SendMessageError";
@@ -86,9 +96,8 @@ public class AndroidCommsBase implements XMPPAgent {
 	private static final String COMMS_CANNOT_LOGIN = "LoginError";
 	private static final String COMMS_CANNOT_LOGOUT = "LogoutError";
 
-	private XMPPConnection connection;
-	private String username, password, resource;
-	private int usingConnectionCounter = 0;
+//	private String username, password, resource;
+	private String resource;
 	private ProviderElementNamespaceRegistrar providerRegistrar = new ProviderElementNamespaceRegistrar();
 	private RawXmlProvider rawXmlProvider = new RawXmlProvider();
 	private String domainAuthorityNode;
@@ -98,8 +107,10 @@ public class AndroidCommsBase implements XMPPAgent {
 	boolean pubsubRegistered;
 	PacketListener pubsubListener;
 	Context serviceContext;
-	BroadcastReceiver receiver;
-
+	BroadcastReceiver androidCommsReceiver;
+	BroadcastReceiver xmppConnectionReceiver;
+	IConnectionState xmppConnectMgr;
+	private boolean lostConnection;
 	
 	public AndroidCommsBase(Context serviceContext, boolean restrictBroadcast) {
 		if (DEBUG_LOGGING) {
@@ -112,9 +123,26 @@ public class AndroidCommsBase implements XMPPAgent {
 		this.serviceContext = serviceContext;
 		this.pubsubRegistered = false;
 		this.pubsubListener = null;
+		this.lostConnection = false;
+		
+		//Use the XMPPConnectionManager to access the aSmack XMPP connection
+		this.xmppConnectMgr = new XMPPConnectionManager();
 
 		//Android Profiling
 //		Debug.startMethodTracing(this.getClass().getSimpleName());
+	}
+	/**
+	 * Carry out any actions required before shutting down the service
+	 */
+	public void serviceCleanup() {
+		if (null != androidCommsReceiver) {
+			this.teardownBroadcastReceiver(androidCommsReceiver);
+			androidCommsReceiver = null;
+		}
+		if (null != xmppConnectionReceiver) {
+			this.teardownBroadcastReceiver(xmppConnectionReceiver);
+			xmppConnectionReceiver = null;
+		}
 	}
 	
 	public boolean register(String client, String[] elementNames, String[] namespaces, long remoteCallId) {
@@ -151,11 +179,11 @@ public class AndroidCommsBase implements XMPPAgent {
 			//only need to register Pubsub listener once, otherwise multiple events instances 
 			//are generated for a single event
 			if (!this.pubsubRegistered && isNameSpacePubsub(namespaces)) {
-				connect();
+//				connect();
 				
 				this.pubsubListener = new RegisterPacketListener(client, remoteCallId);
 				
-				connection.addPacketListener(this.pubsubListener, new AndFilter(new PacketTypeFilter(Message.class), new NamespaceFilter(namespaces)));
+				this.xmppConnectMgr.getValidConnection().addPacketListener(this.pubsubListener, new AndFilter(new PacketTypeFilter(Message.class), new NamespaceFilter(namespaces)));
 				this.pubsubRegistered = true;
 				if (DEBUG_LOGGING) {
 					Log.d(LOG_TAG, "Pubsub event listener registered");
@@ -163,7 +191,7 @@ public class AndroidCommsBase implements XMPPAgent {
 			}
 			intent.setAction(XMPPAgent.REGISTER_RESULT);
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, true);
-		} catch (XMPPException e) {
+		} catch (NoXMPPConnectionAvailableException e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
 			intent.setAction(XMPPAgent.REGISTER_EXCEPTION);
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
@@ -192,22 +220,24 @@ public class AndroidCommsBase implements XMPPAgent {
 //			}
 		};
 		
-		//remove Pubsub listener
-		if (this.pubsubRegistered && isNameSpacePubsub(namespaces)) {
-			connection.removePacketListener(this.pubsubListener);
-			if (DEBUG_LOGGING) {
-				Log.d(LOG_TAG, "Pubsub event listener unregistered");
-			};
-			this.pubsubRegistered = false;
-		}
-
 		//Send intent
 		Intent intent = new Intent();
 		if (AndroidCommsBase.this.restrictBroadcast) {
 			intent.setPackage(client);
 		}
 		intent.putExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+
 		try {
+		//remove Pubsub listener
+			if (this.pubsubRegistered && isNameSpacePubsub(namespaces)) {
+				this.xmppConnectMgr.getValidConnection().removePacketListener(this.pubsubListener);
+				if (DEBUG_LOGGING) {
+					Log.d(LOG_TAG, "Pubsub event listener unregistered");
+				};
+				this.pubsubRegistered = false;
+			}
+	
+			
 			for(int i=0; i<elementNames.length; i++) {
 				for(int j=0; j<namespaces.length; j++) {
 					ProviderElementNamespaceRegistrar.ElementNamespaceTuple tuple = new ProviderElementNamespaceRegistrar.ElementNamespaceTuple(elementNames[i], namespaces[j]);		
@@ -219,9 +249,13 @@ public class AndroidCommsBase implements XMPPAgent {
 			}
 			intent.setAction(XMPPAgent.UNREGISTER_RESULT);
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, true);
+		} catch (NoXMPPConnectionAvailableException e) {
+			Log.e(LOG_TAG, e.getMessage(), e);			
+			intent.setAction(XMPPAgent.UNREGISTER_EXCEPTION);
+			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
+			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
 			
-			disconnect();
-
+			createNotification("Error un-registering namespaces: " + e.getMessage(), COMMS_CANNOT_UNREGISTER, NOTIFICATION_TITLE);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage(), e);			
 			intent.setAction(XMPPAgent.UNREGISTER_EXCEPTION);
@@ -296,13 +330,20 @@ public class AndroidCommsBase implements XMPPAgent {
 		};
 		
 		try {
-			connect();	
-			
-			connection.sendPacket(formattedMessage);
+			this.xmppConnectMgr.getValidConnection().sendPacket(formattedMessage);
 		
-			disconnect();
 			intent.setAction(XMPPAgent.SEND_MESSAGE_RESULT);
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, true);
+			
+		} catch (NoXMPPConnectionAvailableException e) {
+			Log.e(LOG_TAG, e.getMessage(), e);
+			intent.setAction(XMPPAgent.SEND_MESSAGE_EXCEPTION);
+			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
+			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+
+			createNotification("Error sending message due to lost connectivity", COMMS_NO_CONNECTIVITY, NOTIFICATION_TITLE);
+			this.lostConnection = true;
+			
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
 			intent.setAction(XMPPAgent.SEND_MESSAGE_EXCEPTION);
@@ -324,7 +365,7 @@ public class AndroidCommsBase implements XMPPAgent {
 		};
 
 		try {
-			connect(); 
+//			connect(); 
 			
 			String id = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(xml))).getDocumentElement().getAttribute("id");
 									
@@ -332,10 +373,24 @@ public class AndroidCommsBase implements XMPPAgent {
 				throw new NullPointerException("IQ XML has no ID attribute!");
 			}
 			
-			connection.addPacketListener(new SendIQPacketListener(client, remoteCallId), new AndFilter(new PacketTypeFilter(IQ.class),new PacketIDFilter(id))); 
+			this.xmppConnectMgr.getValidConnection().addPacketListener(new SendIQPacketListener(client, remoteCallId), new AndFilter(new PacketTypeFilter(IQ.class),new PacketIDFilter(id))); 
 			
-			connection.sendPacket(createPacketFromXml(xml));		
+			this.xmppConnectMgr.getValidConnection().sendPacket(createPacketFromXml(xml));		
 			
+		} catch (NoXMPPConnectionAvailableException e) {
+			Log.e(LOG_TAG, e.getMessage(), e);
+			//Send intent
+			Intent intent = new Intent(SEND_IQ_EXCEPTION);
+			if (AndroidCommsBase.this.restrictBroadcast) {
+				intent.setPackage(client);
+			}
+			intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
+			intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+			
+			createNotification("Error invoking remote method", COMMS_NO_CONNECTIVITY, NOTIFICATION_TITLE);
+			this.lostConnection = true;
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
 			//Send intent
@@ -348,7 +403,7 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 			
-			createNotification("Error invoking remote method: " + e.getMessage(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
+			createNotification("Error invoking remote method due to lost connectivity: " + e.getMessage(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
 		}
 		return false;
 	}
@@ -368,14 +423,14 @@ public class AndroidCommsBase implements XMPPAgent {
 		}
 
 		try {
-			connect();			
-			retValue = connection.getUser();			
-			disconnect();			
+//			connect();			
+			retValue = this.xmppConnectMgr.getValidConnection().getUser();			
+//			disconnect();			
 			if (DEBUG_LOGGING) {
 				Log.d(LOG_TAG, "getIdentity identity: " + retValue);
 			};
 			
-		} catch (XMPPException e) {
+		} catch (NoXMPPConnectionAvailableException e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
 		} finally {
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
@@ -415,21 +470,21 @@ public class AndroidCommsBase implements XMPPAgent {
 		String retValue = null;
 		
 		try {
-			connect();
+//			connect();
 			
 			DiscoverItems discoItems = new DiscoverItems();
 			discoItems.setTo(entity);
 			discoItems.setNode(node);		
 
 			
-			connection.addPacketListener(new GetItemsPacketListener(client, remoteCallId), 
+			this.xmppConnectMgr.getValidConnection().addPacketListener(new GetItemsPacketListener(client, remoteCallId), 
 					new AndFilter(new PacketTypeFilter(IQ.class),new PacketIDFilter(discoItems.getPacketID()))); 
 			
-			connection.sendPacket(discoItems);
+			this.xmppConnectMgr.getValidConnection().sendPacket(discoItems);
 			
 			retValue = discoItems.getPacketID();
 
-		} catch (XMPPException e) {
+		} catch (NoXMPPConnectionAvailableException e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
 			//Send intent
 			Intent intent = new Intent(GET_ITEMS_EXCEPTION);
@@ -441,7 +496,7 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
 			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
-		} 	
+		}  	
 		return null;
 	}
 	
@@ -459,17 +514,19 @@ public class AndroidCommsBase implements XMPPAgent {
 		}
 
 		
-		if (null != connection) {
-			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, isConnectedInternal());
-		} else {
-			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
+		if (this.xmppConnectMgr.isConnected()) {
+			retValue = true;
 		}
+		intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
 		
 		intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
 		this.serviceContext.sendBroadcast(intent);
 		return retValue;
 	}
-	
+	/**
+	 * Create a new XMPP identity. Does not use the {@link XMPPConnectionManager} to establish an XMPP but creates its own connection
+	 * and closes it 
+	 */
 	public String newMainIdentity(String client, String identifier, String domain, String password, long remoteCallId, String host) { 
 		Dbc.require("Client must be specified", null != client && client.length() > 0);
 		Dbc.require("Identfier must be specified", null != identifier && identifier.length() > 0);
@@ -478,7 +535,6 @@ public class AndroidCommsBase implements XMPPAgent {
 		if (DEBUG_LOGGING) {
 			Log.d(LOG_TAG, "newMainIdentity identity: " + identifier + " domain: " + domain + " password: " + password + " for client: " + client);
 		};
-		this.setupBroadcastReceiver();
 
 		String retValue = null;
 		//Send intent
@@ -493,33 +549,22 @@ public class AndroidCommsBase implements XMPPAgent {
 			serverHost = host;
 		}
 		String serviceName = domain;
-		
+
+		Connection newIdConnection = null;
 		try {
-			if(null != connection && 
-					connection.isConnected() && 
-					connection.getHost().equals(serverHost) && 
-					connection.getPort()==port && 
-					connection.getServiceName().equals(serviceName)) {
-				
-				createAccount(connection, identifier, password);
-				retValue = username(identifier, domain) + "/" + resource;
-				if (DEBUG_LOGGING) {
-					Log.d(LOG_TAG, "Created user JID: " + retValue);
-				};
-			}
-			else {
-				ConnectionConfiguration config = new ConnectionConfiguration(serverHost, port, serviceName);
-				Connection newIdConnection = new XMPPConnection(config);			
-				newIdConnection.connect();
-				
-				createAccount(newIdConnection, identifier, password);
-				
-				newIdConnection.disconnect();
-				retValue = username(identifier, serviceName) + "/" + resource;
-				if (DEBUG_LOGGING) {
-					Log.d(LOG_TAG, "Created user JID: " + retValue);
-				};
-			}
+			ConnectionConfiguration config = new ConnectionConfiguration(serverHost, port, serviceName);
+			newIdConnection = new XMPPConnection(config);			
+			newIdConnection.connect();
+			
+			createAccount(newIdConnection, identifier, password);
+			
+			retValue = createFullUserJID(identifier, domain, this.resource);
+			
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "Created user JID: " + retValue);
+			};
+			
+			
 			//Send intent
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
 			
@@ -540,7 +585,9 @@ public class AndroidCommsBase implements XMPPAgent {
 				Log.d(LOG_TAG, "Create intent sent for: " + retValue);
 			}
 			this.serviceContext.sendBroadcast(intent);
-			this.teardownBroadcastReceiver();
+			
+			//ensure that XMPP connection is disconnected
+			newIdConnection.disconnect();
 		}
 		
 		return null;
@@ -556,8 +603,7 @@ public class AndroidCommsBase implements XMPPAgent {
 		if (DEBUG_LOGGING) {
 			Log.d(LOG_TAG, "login identifier: " + identifier + " domain: " + domain + " password: " + password + " host: " + host  + " for client: " + client);
 		};
-		this.setupBroadcastReceiver();
-
+		
 		String retValue = null;
 		Intent intent = new Intent(LOGIN);
 		if (this.restrictBroadcast) {
@@ -566,34 +612,17 @@ public class AndroidCommsBase implements XMPPAgent {
 		intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
 
 		
-		if(isConnectedInternal()) {
-			logoutInternal();
-		}
-		String username = username(identifier, domain);
-		loadConfig(domain, username, password, host);
-		try {
-			connect();
-			retValue = username + "/" + resource;
-			//Send intent
-			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
-
-		} catch (XMPPException e) {
-			Log.e(LOG_TAG, e.getMessage(), e);
-			//Send intent
-			intent = new Intent(LOGIN_EXCEPTION);
-			if (AndroidCommsBase.this.restrictBroadcast) {
-				intent.setPackage(client);
-			}
-			intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
-			intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
-			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
-			
-			createNotification("Error logging in: " + e.getMessage(), COMMS_CANNOT_LOGIN , NOTIFICATION_TITLE);
-		} finally {
-			//Send intent
-			this.serviceContext.sendBroadcast(intent);
-			Log.d(LOG_TAG, "Login intent sent");
-		}
+		XMPPConnectionProperties xmppConnectProps = new XMPPConnectionProperties();
+		xmppConnectProps.setDebug(this.debug);
+		xmppConnectProps.setHostIP(host);
+		xmppConnectProps.setNodeResource(this.resource);
+		xmppConnectProps.setPassword(password);
+		xmppConnectProps.setServiceName(domain);
+		xmppConnectProps.setServicePort(this.port);
+		xmppConnectProps.setUserName(identifier);
+		
+		this.xmppConnectMgr.enableConnection(xmppConnectProps, this.serviceContext, createFullUserJID(identifier, domain, this.resource), client, remoteCallId);
+		
 		return null;
 	}
 
@@ -618,18 +647,10 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.setPackage(client);
 		}
 		intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+		intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
 
+		this.xmppConnectMgr.disableConnection(client, remoteCallId);
 		
-		try {
-			retValue = logoutInternal();
-		} catch (Exception e) {
-			Log.e(LOG_TAG, e.getMessage(), e);
-		} finally {
-			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, retValue);
-			this.serviceContext.sendBroadcast(intent);
-			this.teardownBroadcastReceiver();
-		}
-
 		return false;
 	}
 	
@@ -671,6 +692,16 @@ public class AndroidCommsBase implements XMPPAgent {
 			Log.d(LOG_TAG, "configureAgent for client: " + client);
 		};
 		
+		if (null != this.androidCommsReceiver) {
+			this.teardownBroadcastReceiver(this.androidCommsReceiver);
+		} 
+		if (null != this.xmppConnectionReceiver) {
+			this.teardownBroadcastReceiver(this.xmppConnectionReceiver);
+		} 
+		
+		this.androidCommsReceiver = this.setupAndroidCommsReceiver();
+		this.xmppConnectionReceiver = this.setupXMPPConnectionReceiver();
+
 		this.setDomainAuthorityNode(client, xmppDomainAuthorityNode);
 		this.setPortNumber(client, xmppPort);
 		this.setResource(client, xmppResource);
@@ -729,26 +760,26 @@ public class AndroidCommsBase implements XMPPAgent {
 		ProviderManager.getInstance().removeExtensionProvider(tuple.elementName, tuple.namespace);
 	}
 	
-	private void connect() throws XMPPException {		
-		if (DEBUG_LOGGING) {
-			Log.d(LOG_TAG, "connect");
-		};
-		
-		if(!connection.isConnected()) {
-			connection.connect();
-			connection.login(username, password, resource);
-		}
-		usingConnectionCounter++;
-	}
+//	private void connect() throws XMPPException {		
+//		if (DEBUG_LOGGING) {
+//			Log.d(LOG_TAG, "connect");
+//		};
+//		
+//		if(!connection.isConnected()) {
+//			connection.connect();
+//			connection.login(username, password, resource);
+//		}
+//		usingConnectionCounter++;
+//	}
 	
-	private void disconnect() {
-		if (DEBUG_LOGGING) {
-			Log.d(LOG_TAG, "disconnect");
-		};
-		usingConnectionCounter--;
-		if(usingConnectionCounter == 0)
-			connection.disconnect();		
-	}
+//	private void disconnect() {
+//		if (DEBUG_LOGGING) {
+//			Log.d(LOG_TAG, "disconnect");
+//		};
+//		usingConnectionCounter--;
+//		if(usingConnectionCounter == 0)
+//			connection.disconnect();		
+//	}
 	
 	private Packet createPacketFromXml(final String xml) {
 		if (DEBUG_LOGGING) {
@@ -821,76 +852,76 @@ public class AndroidCommsBase implements XMPPAgent {
 		accountMgr.createAccount(username, password, attributes);
 	}
 	
-	private String username(String identifier, String domain) {
+	private static String createFullUserJID(String identifier, String domain, String jidResource) {
 		if (DEBUG_LOGGING) {
-			Log.d(LOG_TAG, "username identifier: " + identifier + " domain: " + domain);
+			Log.d(LOG_TAG, "username identifier: " + identifier + " domain: " + domain + " resource: " + jidResource);
 		};
-		return identifier + "@" + domain;
+		return identifier + "@" + domain + "/" + jidResource;
 	}
 	
-	/**
-	 * Create XMPP Configuration object
-	 * 
-	 * @param server DNS name of XMPP server
-	 * @param username 
-	 * @param password
-	 * @param host IP address of XMPP server (optional). If used, the DNS lookup to resolve the server is overridden.
-	 */
-	private void loadConfig(String server, String username, String password, String host) {
-		if (DEBUG_LOGGING) {
-			Log.d(LOG_TAG, "loadConfig server: " + server + " username: " + username + " password: " + password + " host: " + host);
-		};
-		
-		this.username = username;
-		this.password = password;
-		String xmppHost = server;
-		if (null != host) {
-			xmppHost = host;
-		}
-		ConnectionConfiguration config = new ConnectionConfiguration(xmppHost, port, server);
+//	/**
+//	 * Create XMPP Configuration object
+//	 * 
+//	 * @param server DNS name of XMPP server
+//	 * @param username 
+//	 * @param password
+//	 * @param host IP address of XMPP server (optional). If used, the DNS lookup to resolve the server is overridden.
+//	 */
+//	private void loadConfig(String server, String username, String password, String host) {
+//		if (DEBUG_LOGGING) {
+//			Log.d(LOG_TAG, "loadConfig server: " + server + " username: " + username + " password: " + password + " host: " + host);
+//		};
+//		
+//		this.username = username;
+//		this.password = password;
+//		String xmppHost = server;
+//		if (null != host) {
+//			xmppHost = host;
+//		}
+//		ConnectionConfiguration config = new ConnectionConfiguration(xmppHost, port, server);
+//
+//		connection = new XMPPConnection(config);
+//		
+//		if(debug) {
+//			connection.addPacketListener(new PacketListener() {
+//	
+//				public void processPacket(Packet packet) {
+//					if (DEBUG_LOGGING) {
+//						Log.d(LOG_TAG, "Packet received: " + packet.toXML());
+//					};
+//				}
+//				
+//			}, new PacketFilter() {
+//	
+//				public boolean accept(Packet packet) {
+//					return true;
+//				}
+//			});
+//			connection.addPacketSendingListener(new PacketListener() {
+//	
+//				public void processPacket(Packet packet) {
+//					if (DEBUG_LOGGING) {
+//						Log.d(LOG_TAG, "Packet sent: " + packet.toXML());
+//					};
+//				}
+//				
+//			}, new PacketFilter() {
+//	
+//				public boolean accept(Packet packet) {
+//					return true;
+//				}
+//			});
+//		}
+//	}
 
-		connection = new XMPPConnection(config);
-		
-		if(debug) {
-			connection.addPacketListener(new PacketListener() {
-	
-				public void processPacket(Packet packet) {
-					if (DEBUG_LOGGING) {
-						Log.d(LOG_TAG, "Packet received: " + packet.toXML());
-					};
-				}
-				
-			}, new PacketFilter() {
-	
-				public boolean accept(Packet packet) {
-					return true;
-				}
-			});
-			connection.addPacketSendingListener(new PacketListener() {
-	
-				public void processPacket(Packet packet) {
-					if (DEBUG_LOGGING) {
-						Log.d(LOG_TAG, "Packet sent: " + packet.toXML());
-					};
-				}
-				
-			}, new PacketFilter() {
-	
-				public boolean accept(Packet packet) {
-					return true;
-				}
-			});
-		}
-	}
-
-	private boolean isConnectedInternal() {
-		boolean retValue = false;
-		
-		if (null != connection) {
-			retValue = connection.isConnected();
-		}
-		return retValue;
-	}
+//	private boolean isConnectedInternal() {
+//		boolean retValue = false;
+//		
+//		if (null != connection) {
+//			retValue = connection.isConnected();
+//		}
+//		return retValue;
+//	}
 	
 	private boolean UnRegisterCommManagerInternal() {
 		Set<ProviderElementNamespaceRegistrar.ElementNamespaceTuple> tuples = providerRegistrar.getRegists();
@@ -902,13 +933,13 @@ public class AndroidCommsBase implements XMPPAgent {
 		return true;
 	}
 	
-	private boolean logoutInternal() {
-		UnRegisterCommManagerInternal();		
-		connection.disconnect();
-		usingConnectionCounter = 0;
-		
-		return true;
-	}
+//	private boolean logoutInternal() {
+//		UnRegisterCommManagerInternal();		
+//		connection.disconnect();
+//		usingConnectionCounter = 0;
+//		
+//		return true;
+//	}
 	
 	/**
 	 * Societies enabled aSmack Packet Listener 
@@ -931,7 +962,7 @@ public class AndroidCommsBase implements XMPPAgent {
 //				intent.setPackage(this.client);
 //			}
 			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, packet.toXML());
-			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, PUBSUB_EVENT_CALBACK_ID);
+			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, PUBSUB_EVENT_CALLBACK_ID);
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 			if (DEBUG_LOGGING) {
 				Log.d(LOG_TAG, "Pubsub node intent sent: " + packet.toXML());
@@ -950,30 +981,45 @@ public class AndroidCommsBase implements XMPPAgent {
 
 		public void processPacket(Packet packet) {
 			IQ iq = (IQ)packet;
-			connection.removePacketListener(this);
-			disconnect();
-			
-			if(iq.getType() == IQ.Type.RESULT) {
-				//Send intent
-				Intent intent = new Intent(SEND_IQ_RESULT);
-				if (AndroidCommsBase.this.restrictBroadcast) {
-					intent.setPackage(this.client);
-				}
-				intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, packet.toXML());
-				intent.putExtra(INTENT_RETURN_CALL_ID_KEY, this.remoteCallId);
-				AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+			try {
+				AndroidCommsBase.this.xmppConnectMgr.getValidConnection().removePacketListener(this);
+//				disconnect();
 				
-			} else if(iq.getType() == IQ.Type.ERROR) {
+				if(iq.getType() == IQ.Type.RESULT) {
+					//Send intent
+					Intent intent = new Intent(SEND_IQ_RESULT);
+					if (AndroidCommsBase.this.restrictBroadcast) {
+						intent.setPackage(this.client);
+					}
+					intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, packet.toXML());
+					intent.putExtra(INTENT_RETURN_CALL_ID_KEY, this.remoteCallId);
+					AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+					
+				} else if(iq.getType() == IQ.Type.ERROR) {
+					//Send intent
+					Intent intent = new Intent(SEND_IQ_ERROR);
+					if (AndroidCommsBase.this.restrictBroadcast) {
+						intent.setPackage(this.client);
+					}
+					intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, packet.toXML());
+					intent.putExtra(INTENT_RETURN_CALL_ID_KEY, this.remoteCallId);
+					AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+					
+					createNotification("Error invoking remote method: " + packet.toXML(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
+				}
+			} catch (NoXMPPConnectionAvailableException e) {
+				Log.e(LOG_TAG, e.getMessage(), e);
+				
 				//Send intent
 				Intent intent = new Intent(SEND_IQ_ERROR);
 				if (AndroidCommsBase.this.restrictBroadcast) {
-					intent.setPackage(this.client);
+					intent.setPackage(client);
 				}
-				intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, packet.toXML());
-				intent.putExtra(INTENT_RETURN_CALL_ID_KEY, this.remoteCallId);
+				intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, "");
+				intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
+				intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+				intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
 				AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
-				
-				createNotification("Error invoking remote method: " + packet.toXML(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
 			}
 		}	
 	}
@@ -989,9 +1035,9 @@ public class AndroidCommsBase implements XMPPAgent {
 		
 		public void processPacket(Packet packet) {
 			IQ iq = (IQ)packet;
-			connection.removePacketListener(this);
-			disconnect();
 			try {
+				AndroidCommsBase.this.xmppConnectMgr.getValidConnection().removePacketListener(this);
+	//			disconnect();
 				if(iq.getType() == IQ.Type.RESULT) {
 					if(isDiscoItem(iq)) {
 						//Send intent
@@ -1014,6 +1060,19 @@ public class AndroidCommsBase implements XMPPAgent {
 					intent.putExtra(INTENT_RETURN_CALL_ID_KEY, this.remoteCallId);
 					AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 				}
+			} catch (NoXMPPConnectionAvailableException e) {
+				Log.e(LOG_TAG, e.getMessage(), e);
+				
+				//Send intent
+				Intent intent = new Intent(GET_ITEMS_EXCEPTION);
+				if (AndroidCommsBase.this.restrictBroadcast) {
+					intent.setPackage(client);
+				}
+				intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, "");
+				intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
+				intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+				intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+				AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 			} catch (Exception e) {
 				Log.e(LOG_TAG, e.getMessage(), e);
 				
@@ -1083,19 +1142,38 @@ public class AndroidCommsBase implements XMPPAgent {
 	}
 	
     /**
-     * Create a broadcast receiver
+     * Create a broadcast receiver for monitoring Android Connectivity
      * 
      * @return the created broadcast receiver
      */
-    private BroadcastReceiver setupBroadcastReceiver() {
+    private BroadcastReceiver setupAndroidCommsReceiver() {
 		if (DEBUG_LOGGING) {
 	        Log.d(LOG_TAG, "Set up connectivity changes broadcast receiver");
 		};
         
-        this.receiver = new AndroidCommsReceiver();
-        this.serviceContext.registerReceiver(this.receiver, createIntentFilter());    
+        BroadcastReceiver receiver = new AndroidCommsReceiver();
+        this.serviceContext.registerReceiver(receiver, createAndroidCommsIntentFilter());    
 		if (DEBUG_LOGGING) {
-	        Log.d(LOG_TAG, "Register broadcast receiver");
+	        Log.d(LOG_TAG, "Register connectivity changes broadcast receiver");
+		};
+
+        return receiver;
+    }
+    
+    /**
+     * Create a broadcast receiver for monitoring XMPPConnection states
+     * 
+     * @return the created broadcast receiver
+     */
+    private BroadcastReceiver setupXMPPConnectionReceiver() {
+		if (DEBUG_LOGGING) {
+	        Log.d(LOG_TAG, "Set up XMPP connection states broadcast receiver");
+		};
+        
+        BroadcastReceiver receiver = new XMPPConnectionReceiver();
+        this.serviceContext.registerReceiver(receiver, createXMPPConnectionIntentFilter());    
+		if (DEBUG_LOGGING) {
+	        Log.d(LOG_TAG, "Register XMPP connection states broadcast receiver");
 		};
 
         return receiver;
@@ -1103,23 +1181,37 @@ public class AndroidCommsBase implements XMPPAgent {
     /**
      * Unregister the broadcast receiver
      */
-    private void teardownBroadcastReceiver() {
+    private void teardownBroadcastReceiver(BroadcastReceiver receiver) {
 		if (DEBUG_LOGGING) {
 		       Log.d(LOG_TAG, "Tear down broadcast receiver");
 		};
-    	this.serviceContext.unregisterReceiver(this.receiver);
+    	this.serviceContext.unregisterReceiver(receiver);
     }
 
 	
     /**
-     * Create a suitable intent filter
+     * Create a suitable intent filter for monitoring Android connectivity
      * @return IntentFilter
      */
-    private IntentFilter createIntentFilter() {
+    private IntentFilter createAndroidCommsIntentFilter() {
     	//register broadcast receiver to receive SocietiesEvents return values 
         IntentFilter intentFilter = new IntentFilter();
         
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        return intentFilter;
+    }
+    /**
+     * Create a suitable intent filter for monitoring the XMPPConnection states
+     * @return IntentFilter
+     */
+    private IntentFilter createXMPPConnectionIntentFilter() {
+    	//register broadcast receiver to receive SocietiesEvents return values 
+        IntentFilter intentFilter = new IntentFilter();
+        
+        intentFilter.addAction(IConnectionState.XMPP_CONNECTION_CHANGED);
+        intentFilter.addAction(IConnectionState.XMPP_AUTHENTICATION_FAILURE);
+        intentFilter.addAction(IConnectionState.XMPP_NO_NETWORK_FOUND_FAILURE);
+        intentFilter.addAction(IConnectionState.XMPP_CONNECTIVITY_FAILURE);
         return intentFilter;
     }
 
@@ -1133,6 +1225,9 @@ public class AndroidCommsBase implements XMPPAgent {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "AndroidCommsReceiver received action: " + intent.getAction());
+			}
 			if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
 
 				boolean unConnected = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
@@ -1152,10 +1247,214 @@ public class AndroidCommsBase implements XMPPAgent {
 					String extraInfo = intent.getStringExtra(ConnectivityManager.EXTRA_EXTRA_INFO);
 					boolean failover = intent.getBooleanExtra(ConnectivityManager.EXTRA_IS_FAILOVER, false);
 
-					createNotification("Device has lost connectivity", COMMS_NO_CONNECTIVITY, NOTIFICATION_TITLE);
+//					createNotification("Device has lost connectivity", COMMS_NO_CONNECTIVITY, NOTIFICATION_TITLE);
+				} else {
+					if (AndroidCommsBase.this.lostConnection) {
+						createNotification("Device has regained connectivity", COMMS_RESTORED_CONNECTIVITY, NOTIFICATION_TITLE);
+						AndroidCommsBase.this.lostConnection = false;
+					}
 				}
 			}
 		}
     }
+    /**
+     * Broadcast receiver to receive intent return values from {@link XMPPConnectionManager}
+     * 
+     */
+    private class XMPPConnectionReceiver extends BroadcastReceiver {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "XMPPConnectionReceiver received action: " + intent.getAction());
+			}
+			if (intent.getAction().equals(IConnectionState.XMPP_CONNECTION_CHANGED)) {
+				
+				if (intent.getIntExtra(IConnectionState.INTENT_CURRENT_CONNECTION_STATE, 
+						IConnectionState.INVALID_INTENT_INTEGER_EXTRA_VALUE) == ConnectionState.Connected.ordinal()) {
+					
+					//Send intent
+					Intent sendIntent  = new Intent(XMPPAgent.LOGIN);
+					if (AndroidCommsBase.this.restrictBroadcast) {
+						sendIntent.setPackage(intent.getStringExtra(IConnectionState.INTENT_REMOTE_CALL_CLIENT));
+					}
+					sendIntent.putExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, intent.getLongExtra(IConnectionState.INTENT_REMOTE_CALL_ID, INVALID_LONG_INTENT_VALUE));
+					sendIntent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, intent.getStringExtra(IConnectionState.INTENT_REMOTE_USER_JID));
+					AndroidCommsBase.this.serviceContext.sendBroadcast(sendIntent);
+					
+				} else if (intent.getIntExtra(IConnectionState.INTENT_CURRENT_CONNECTION_STATE,
+						IConnectionState.INVALID_INTENT_INTEGER_EXTRA_VALUE) == ConnectionState.Disconnected.ordinal()) {
+					//Send intent
+					Intent sendIntent  = new Intent(XMPPAgent.LOGOUT);
+					if (AndroidCommsBase.this.restrictBroadcast) {
+						sendIntent.setPackage(intent.getStringExtra(IConnectionState.INTENT_REMOTE_CALL_CLIENT));
+					}
+					sendIntent.putExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, intent.getLongExtra(IConnectionState.INTENT_REMOTE_CALL_ID, INVALID_LONG_INTENT_VALUE));
+					sendIntent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, true);
+					AndroidCommsBase.this.serviceContext.sendBroadcast(sendIntent);
+				}
+			} else if (intent.getAction().equals(IConnectionState.XMPP_AUTHENTICATION_FAILURE) || 
+						intent.getAction().equals(IConnectionState.XMPP_CONNECTIVITY_FAILURE) ||
+						intent.getAction().equals(IConnectionState.XMPP_NO_NETWORK_FOUND_FAILURE)) {
+				//Send intent
+				Intent sendIntent  = new Intent(XMPPAgent.LOGIN_EXCEPTION);
+				if (AndroidCommsBase.this.restrictBroadcast) {
+					sendIntent.setPackage(intent.getStringExtra(IConnectionState.INTENT_REMOTE_CALL_CLIENT));
+				}
+				sendIntent.putExtra(XMPPAgent.INTENT_RETURN_CALL_ID_KEY, intent.getLongExtra(IConnectionState.INTENT_REMOTE_CALL_ID, INVALID_LONG_INTENT_VALUE));
+				sendIntent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, intent.getStringExtra(IConnectionState.INTENT_FAILURE_DESCRIPTION));
+				AndroidCommsBase.this.serviceContext.sendBroadcast(sendIntent);
+			
+			}
+		}
+    }
+
+    private class queryVCardPacketListener implements PacketListener {
+		String client;
+		long remoteCallId;
+		
+		public queryVCardPacketListener(String client, long remoteCallId) {
+			this.client = client;
+			this.remoteCallId = remoteCallId;
+		}
+
+		public void processPacket(Packet packet) {
+			IQ iq = (IQ)packet;
+			try {
+				AndroidCommsBase.this.xmppConnectMgr.getValidConnection().removePacketListener(this);
+				if(iq.getType() == IQ.Type.RESULT) {
+					//Send intent
+					Intent intent = new Intent(GET_USER_VCARD);
+					if (AndroidCommsBase.this.restrictBroadcast)
+						intent.setPackage(this.client);
+					//intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, packet.toXML());
+					VCard returnedCard = (VCard)packet;
+					VCardParcel parcelVCard = VCardUtilities.convertToParcelVCard(returnedCard);
+					intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, (Parcelable)parcelVCard);
+					intent.putExtra(INTENT_RETURN_CALL_ID_KEY, this.remoteCallId);
+					AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+					
+				} else if(iq.getType() == IQ.Type.ERROR) {
+					//Send intent
+					Intent intent = new Intent(GET_USER_VCARD);
+					if (AndroidCommsBase.this.restrictBroadcast)
+						intent.setPackage(this.client);
+					intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, packet.toXML());
+					intent.putExtra(INTENT_RETURN_CALL_ID_KEY, this.remoteCallId);
+					AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+					createNotification("Error invoking remote method: " + packet.toXML(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
+				}
+			} catch (NoXMPPConnectionAvailableException e) {
+				Log.e(LOG_TAG, e.getMessage(), e);
+				
+				//Send intent
+				Intent intent = new Intent(SEND_IQ_ERROR);
+				if (AndroidCommsBase.this.restrictBroadcast) {
+					intent.setPackage(client);
+				}
+				intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, "");
+				intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
+				intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+				intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+				AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+			}
+		}	
+	}
+    
+    public void setVCard(String client, VCardParcel vCard) {
+		//REQUIRED DUE TO ISSUE: https://code.google.com/p/asmack/issues/detail?id=14#c8
+		ProviderManager.getInstance().addIQProvider("vCard", "vcard-temp", new org.jivesoftware.smackx.provider.VCardProvider());
+		
+		VCard xmppCard = VCardUtilities.convertToXMPPVCard(vCard);
+		try {
+			xmppCard.save(xmppConnectMgr.getValidConnection());
+		} catch (XMPPException e1) {
+			e1.printStackTrace();
+		} catch (NoXMPPConnectionAvailableException e) {
+			e.printStackTrace();
+		}
+    }
+    
+    public VCardParcel getVCard(String client, long remoteCallId, String userId) {
+    	Dbc.require("Client must be specified", null != client && client.length() > 0);
+		Dbc.require("userId must be specified", null != userId && userId.length() > 0);
+		if (DEBUG_LOGGING) Log.d(LOG_TAG, "getVCard userId: " + userId + " for client: " + client);
+		
+    	//REQUIRED DUE TO ISSUE: https://code.google.com/p/asmack/issues/detail?id=14#c8
+    	ProviderManager.getInstance().addIQProvider("vCard", "vcard-temp", new org.jivesoftware.smackx.provider.VCardProvider());
+    	
+    	String id = "123";
+    	String xml = "<iq id='123' to='" + userId + "' type='get'><vCard xmlns='vcard-temp'/></iq>"; 
+		try {
+			this.xmppConnectMgr.getValidConnection().addPacketListener(new queryVCardPacketListener(client, remoteCallId), new AndFilter(new PacketTypeFilter(IQ.class),new PacketIDFilter(id)));
+			this.xmppConnectMgr.getValidConnection().sendPacket(createPacketFromXml(xml));
+		} catch (NoXMPPConnectionAvailableException e) {
+			Log.e(LOG_TAG, e.getMessage(), e);
+			//Send intent
+			Intent intent = new Intent(SEND_IQ_EXCEPTION);
+			if (AndroidCommsBase.this.restrictBroadcast) {
+				intent.setPackage(client);
+			}
+			intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
+			intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+			
+			createNotification("Error invoking remote method: " + e.getMessage(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
+		} catch (Exception e) {
+			Log.e(LOG_TAG, e.getMessage(), e);
+			//Send intent
+			Intent intent = new Intent(SEND_IQ_EXCEPTION);
+			if (AndroidCommsBase.this.restrictBroadcast) {
+				intent.setPackage(client);
+			}
+			intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
+			intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+			
+			createNotification("Error invoking remote method: " + e.getMessage(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
+		}
+		
+		return null;
+    }
+    
+    public VCardParcel getVCard(String client, long remoteCallId) {
+    	//REQUIRED DUE TO ISSUE: https://code.google.com/p/asmack/issues/detail?id=14#c8
+    	ProviderManager.getInstance().addIQProvider("vCard", "vcard-temp", new org.jivesoftware.smackx.provider.VCardProvider());
+    	VCardParcel parcelVCard = null;
+
+		try {
+			VCard returnedCard = new VCard();
+			xmppConnectMgr.getValidConnection().connect();			//AUTHENTICATED CONNECTION
+			returnedCard.load(xmppConnectMgr.getValidConnection());
+			parcelVCard = VCardUtilities.convertToParcelVCard(returnedCard);
+			
+			//RETURN INTENT
+	    	Intent intent = new Intent(XMPPAgent.GET_VCARD);
+			if (AndroidCommsBase.this.restrictBroadcast)
+				intent.setPackage(client);
+			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, (Parcelable)parcelVCard);
+			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+			this.serviceContext.sendBroadcast(intent);
+			
+		} catch (XMPPException e) {
+			e.printStackTrace();
+			
+		} catch (NoXMPPConnectionAvailableException e) {
+			Log.e(LOG_TAG, e.getMessage(), e);
+			//Send intent
+			Intent intent = new Intent(GET_VCARD);
+			if (AndroidCommsBase.this.restrictBroadcast) {
+				intent.setPackage(client);
+			}
+			intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, (Parcelable)parcelVCard);
+			intent.putExtra(INTENT_RETURN_EXCEPTION_KEY, "NoXMPPConnectionAvailableException");
+			intent.putExtra(INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
+			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
+			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
+		}
+		return null;
+    }
+    
 
 }

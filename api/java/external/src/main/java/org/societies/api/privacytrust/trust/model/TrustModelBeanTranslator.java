@@ -181,6 +181,8 @@ public final class TrustModelBeanTranslator {
 			return TrustEvidenceTypeBean.LEFT_COMMUNITY;
 		case RATED:
 			return TrustEvidenceTypeBean.RATED;
+		case DIRECTLY_TRUSTED:
+			return TrustEvidenceTypeBean.DIRECTLY_TRUSTED;
 		default:
 			throw new IllegalArgumentException("'" + trustEvidenceType 
 					+ "': Unsupported trust evidence type");
@@ -205,6 +207,8 @@ public final class TrustModelBeanTranslator {
 			return TrustEvidenceType.LEFT_COMMUNITY;
 		case RATED:
 			return TrustEvidenceType.RATED;
+		case DIRECTLY_TRUSTED:
+			return TrustEvidenceType.DIRECTLY_TRUSTED;
 		default:
 			throw new IllegalArgumentException("'" + trustEvidenceTypeBean 
 					+ "': Unsupported trust evidence type bean");

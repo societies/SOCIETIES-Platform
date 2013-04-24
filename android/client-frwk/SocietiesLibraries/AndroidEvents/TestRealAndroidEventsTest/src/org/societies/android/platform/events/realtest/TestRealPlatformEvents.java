@@ -86,7 +86,7 @@ public class TestRealPlatformEvents extends ServiceTestCase <RealPlatformEventsT
     	assertTrue(this.testCompleted);
     	
 	}
-    @MediumTest
+//    @MediumTest
 	public void testSubscribeToAllEvents() throws Exception {
 		this.endCondition = new CountDownLatch(1);
 

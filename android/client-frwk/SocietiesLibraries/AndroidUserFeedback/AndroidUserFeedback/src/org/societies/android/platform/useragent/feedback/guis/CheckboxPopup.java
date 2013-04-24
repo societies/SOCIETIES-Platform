@@ -43,7 +43,7 @@ public class CheckboxPopup extends Activity {
         eventInfo = bundle.getParcelable(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY);
 
         //HEADER
-        TextView txtView = (TextView) findViewById(R.id.textView1);
+        TextView txtView = (TextView) findViewById(R.id.checkAckProposalText);
         txtView.setText(eventInfo.getProposalText());
         LinearLayout checkboxGroup = (LinearLayout) findViewById(R.id.radioAckRadioGroup);
         Button submitButton = (Button) findViewById(R.id.radioAckOkButton);
@@ -113,6 +113,22 @@ public class CheckboxPopup extends Activity {
         return true;
     }
 
+    @Override
+	public void onDestroy() {
+		Log.d(LOG_TAG, "CheckboxPopup terminating");
+		if (isEventsConnected) {
+			eventsHelper.tearDownService(new IMethodCallback() {
+				@Override
+				public void returnException(String result) { }
+				@Override
+				public void returnAction(String result) { }
+				@Override
+				public void returnAction(boolean resultFlag) { }
+			});
+		}
+		super.onDestroy();
+	}
+    
     private void publishEvent() {
         try {
             ExpFeedbackResultBean bean = new ExpFeedbackResultBean();
@@ -138,21 +154,7 @@ public class CheckboxPopup extends Activity {
                 });
             }
             published = true;
-
             //FINISH
-            eventsHelper.tearDownService(new IMethodCallback() {
-                @Override
-                public void returnException(String result) {
-                }
-
-                @Override
-                public void returnAction(String result) {
-                }
-
-                @Override
-                public void returnAction(boolean resultFlag) {
-                }
-            });
             finish();
         } catch (PlatformEventsHelperNotConnectedException e) {
             Log.e("CheckboxPopup.publishEvent()", "Error sending response", e);

@@ -62,8 +62,7 @@ TODO
 
 <h2>Installation</h2>
 
-<p>Rename societies-RELEASE.jar to societies.jar and copy it into the plugins directory of your Openfire server. The
-plugin will then be automatically deployed.</p>
+<p>Copy societies.jar into the plugins directory of your Openfire server. The plugin will then be automatically deployed. You can also upload the jar via the Openfire admin web interface.</p>
 
 <h2>Configuration</h2>
 
@@ -78,15 +77,35 @@ Access http://localhost:9090/plugins/societies/public/signup.html to test if the
 </p>
 
 <p>
-There is a programmatic HTTP interface available for doing batch provisioning and ad-hoc integration. The interface responds with an XML message describing success or some error. It can be accessed @ http://localhost:9090/plugins/societies/societies
+There is a programmatic HTTP interface available for doing batch provisioning and ad-hoc integration. The interface responds with an XML message describing success or some error. It can be accessed @ http://localhost:9090/plugins/societies/societies via GET or POST method.
 </p>
 
 <p>
-For example to create a user call http://localhost:9090/plugins/societies/societies?username=jmgonc&password=jmgonc&type=add&secret=defaultSecret&name=joao
+For example to create a user call using GET method: http://localhost:9090/plugins/societies/societies?username=jmgonc&password=jmgonc&type=add&secret=defaultSecret&name=joao
 </p>
 
 <p>
-The allowed parameters for the programmatic interface are 'username', 'password', 'type', 'name', 'email', 'secret' and 'groups'. The valid values for 'type' are 'add', 'delete', 'update', 'enable', 'disable' and 'login'.
+The allowed parameters for the programmatic interface are 'username', 'password', 'type', 'name', 'email', 'secret' and 'groups'. The valid values for 'type' are 'add', 'delete', 'update', 'enable', 'disable', 'login' and 'vcard'. The 'type' describes the functionality:
+<ul>
+  <li>add - adds user</li>
+  <li>delete - deletes user</li>
+  <li>update - updates user info</li>
+  <li>enable - enables user</li>
+  <li>disable - disables user</li>
+  <li>login - verifies user credentials</li>
+  <li>vcard - gets user's vCard</li>
+</ul>
+Changing a user's vCard is the only exception and is only accessible by POST. Set the 'username' parameter with the user's username, the 'vcard' parameter with the updated <a href="http://tools.ietf.org/html/rfc6351">vCard in XML</a> and the 'secret' parameter. You can test the call with the form below:
+<form method="post" action="/plugins/societies/societies">
+Secret: <input name="secret" id="secret" value="defaultSecret" /><br/>
+Username: <input name="username" id="username" value="jane" /><br/>
+vCard: <br/><textarea name="vcard" id="vcard" cols="50" rows="10" />
+<vCard xmlns="vcard-temp">
+<fn><text>Jane Doe</text></fn>
+</vCard>
+</textarea>
+<br/><input type="submit" />
+</form>
 </p>
 
 </body>

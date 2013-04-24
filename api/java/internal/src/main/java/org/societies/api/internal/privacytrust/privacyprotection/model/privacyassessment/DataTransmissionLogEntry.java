@@ -25,6 +25,7 @@
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
 import java.util.Date;
+import java.util.List;
 
 import org.societies.api.identity.IIdentity;
 
@@ -44,6 +45,7 @@ public class DataTransmissionLogEntry {
 	private final IIdentity receiver;	
 	private final IIdentity sender;
 	private final String senderClass;
+	private final List<String> senderStack;
 	private final long payloadSize;
 	private final ChannelType channelId;
 	
@@ -52,7 +54,7 @@ public class DataTransmissionLogEntry {
 	private double correlationWithDataAccessBySenderClass = -1;
 
 	public DataTransmissionLogEntry(String dataType, Date time, IIdentity receiver,
-			IIdentity sender, String senderClass, long payloadSize, ChannelType channelId) {
+			IIdentity sender, String senderClass, List<String> senderStack, long payloadSize, ChannelType channelId) {
 		
 		this.dataType = dataType;
 		this.time = time;
@@ -97,10 +99,18 @@ public class DataTransmissionLogEntry {
 		this.receiver = receiver;
 		this.sender = sender;
 		this.senderClass = senderClass;
+		this.senderStack = senderStack;
 		this.payloadSize = payloadSize;
 		this.channelId = channelId;
 	}
 	
+	/**
+	 * @return List of all non-system classes in stack
+	 */
+	public List<String> getSenderStack() {
+		return senderStack;
+	}
+
 	public String getDataType() {
 		return dataType;
 	}

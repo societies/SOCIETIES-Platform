@@ -1,5 +1,9 @@
 package org.societies.da.openfire.plugin;
 
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.auth.AuthFactory;
 import org.jivesoftware.openfire.auth.ConnectionException;
@@ -15,6 +19,7 @@ import org.jivesoftware.openfire.user.User;
 import org.jivesoftware.openfire.user.UserAlreadyExistsException;
 import org.jivesoftware.openfire.user.UserManager;
 import org.jivesoftware.openfire.user.UserNotFoundException;
+import org.jivesoftware.openfire.vcard.VCardManager;
 import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.StringUtils;
 import org.jivesoftware.util.PropertyEventListener;
@@ -22,10 +27,14 @@ import org.jivesoftware.util.PropertyEventDispatcher;
 import org.xmpp.packet.JID;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.Writer;
 import java.util.*;
 
 public class SocietiesPlugin implements Plugin, PropertyEventListener {
     private UserManager userManager;
+    private VCardManager vcardManager;
     private XMPPServer server;
 
     private String secret;
@@ -34,6 +43,7 @@ public class SocietiesPlugin implements Plugin, PropertyEventListener {
     public void initializePlugin(PluginManager manager, File pluginDirectory) {
         server = XMPPServer.getInstance();
         userManager = server.getUserManager();
+        vcardManager = server.getVCardManager();
 
         secret = JiveGlobals.getProperty("plugin.societies.secret", "");
         secret = ""; // TODO remove this that is forcing the secret to be "defaultSecret"
@@ -223,5 +233,20 @@ public class SocietiesPlugin implements Plugin, PropertyEventListener {
 	public boolean loginUser(String username, String password) throws UnauthorizedException, ConnectionException, InternalUnauthenticatedException {
 		AuthFactory.getAuthProvider().authenticate(username, password);
 		return true;
+	}
+	
+	// VCard Methods
+	public void getVcard(String username, Writer out) throws IOException {
+		Element vcard = vcardManager.getVCard(username);
+		if (vcard!=null) {
+			XMLWriter xmlw = new XMLWriter(out);
+			xmlw.write(vcard);
+		}
+	}
+	
+	public void setVcard(String username, String vcard) throws Exception {
+		SAXReader reader = new SAXReader();
+		Document vcardDocument = reader.read(new StringReader(vcard));
+		vcardManager.setVCard(username, vcardDocument.getRootElement());
 	}
 }

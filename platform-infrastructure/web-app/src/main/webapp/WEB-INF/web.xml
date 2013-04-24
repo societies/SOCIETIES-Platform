@@ -13,6 +13,12 @@
 
     <description>Societies Platform webapplication</description>
 
+    <!-- primefaces theme -->
+    <context-param>
+        <param-name>primefaces.THEME</param-name>
+        <param-value>societies-theme</param-value>
+    </context-param>
+
     <!-- OSGI aware web application context declaration -->
     <context-param>
         <param-name>contextClass</param-name>

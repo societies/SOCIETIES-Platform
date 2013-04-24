@@ -57,7 +57,18 @@ var SocietiesDataUtil=(function(){
 	                        "CONTEXT:///locationCoordinates": "Location coordinates",
 	                        "CONTEXT:///locationSymbolic": "Symbolic location",
 	                        "CONTEXT:///movies": "Movies",
-	                        "CONTEXT:///music": "Music"};
+	                        "CONTEXT:///music": "Music",
+	                        "cis:///cis-member-list": "Member list",
+	                        "context:///favoriteQuotes": "Favorite quotes",
+	                        "context:///email": "Email",
+	                        "context:///interests": "Interests",
+	                        "context:///occupation": "Occupation",
+	                        "context:///workPosition": "Work position",
+	                        "context:///languages": "Languages",
+	                        "context:///locationCoordinates": "Location coordinates",
+	                        "context:///locationSymbolic": "Symbolic location",
+	                        "context:///movies": "Movies",
+	                        "context:///music": "Music"};
 	var resourceSchemeList = ["context", "device", "cis", "activity", "css"];
 
 	/* ************************
@@ -208,8 +219,8 @@ var	SocietiesPrivacyPolicyManagerService=(function(){
 				console.log("Display: "+dataTypeUri);
 				var li = $('<li>').addClass("requestItem")
 				.attr('id', 'li'+i);
-				var h2 = $('<h2>').html(SocietiesDataUtil.mapToResourceType(dataTypeUri, defaultDataType))
-					.addClass(("optional" in requestItem && requestItem.optional ? " <small>(optional)</small>" : ""));
+				var h2 = $('<h2>').html(SocietiesDataUtil.mapToResourceType(dataTypeUri, defaultDataType)+("optional" in requestItem && requestItem.optional ? " <small>(optional)</small>" : ""))
+					.addClass(("optional" in requestItem && requestItem.optional ? "optional" : ""));
 				var globalBehaviour = PrivacyPolicyUtils.getGlobalBehaviour(requestItem);
 				$('<span>').html(PrivacyPolicyUtils.mapToGlobalBehaviour(globalBehaviour))
 					.addClass('privacy_global-behaviour')

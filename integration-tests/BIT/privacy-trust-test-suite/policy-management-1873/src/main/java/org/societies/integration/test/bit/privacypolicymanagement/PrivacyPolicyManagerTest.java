@@ -112,7 +112,7 @@ public class PrivacyPolicyManagerTest {
 	public void testGetCisPrivacyPolicyNonExisting() {
 		String testTitle = new String("testGetCisPrivacyPolicyNonExisting: retrieve a non-existing privacy policy");
 		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-		boolean deleteResult = false;
+		RequestPolicy expectedPrivacyPolicy = null;
 		RequestPolicy privacyPolicy = null;
 		if (null == TestCase.privacyPolicyManager) {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle+" : privacyPolicyManager is null");
@@ -123,7 +123,6 @@ public class PrivacyPolicyManagerTest {
 			fail("Error: requestorCis is null");
 		}
 		try {
-			deleteResult = TestCase.privacyPolicyManager.deletePrivacyPolicy(requestorCis);
 			privacyPolicy = TestCase.privacyPolicyManager.getPrivacyPolicy(requestorCis);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
@@ -133,7 +132,10 @@ public class PrivacyPolicyManagerTest {
 			fail("Error: "+e.getMessage());
 		}
 		
-		assertTrue("Hum, apperently there was an existing privacy policy, and it can't not been deleted.", deleteResult);
+		//Modified by rafik
+		//before:
+		//assertEquals("Expected null privacy policy, but it is not.", privacyPolicy, expectedPrivacyPolicy);
+		//After:
 		assertNull("Expected null privacy policy, but it is not.", privacyPolicy);
 	}
 
@@ -180,6 +182,7 @@ public class PrivacyPolicyManagerTest {
 		RequestPolicy expectedPrivacyPolicy = null;
 		RequestPolicy privacyPolicy = null;
 		try {
+			TestCase.privacyPolicyManager.deletePrivacyPolicy(requestorService);
 			privacyPolicy = TestCase.privacyPolicyManager.getPrivacyPolicy(requestorService);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Test PrivacyException] "+testTitle, e);
@@ -214,6 +217,7 @@ public class PrivacyPolicyManagerTest {
 			LOG.error("[#"+testCaseNumber+"] [Test Exception] "+testTitle, e);
 			fail("Error: "+e.getMessage());
 		}
+		LOG.info("[#"+testCaseNumber+"] "+testTitle+": Retrieved privacy policy: "+privacyPolicy.toString());
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
 		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicy);
 		
@@ -557,7 +561,7 @@ public class PrivacyPolicyManagerTest {
 		extendedActions.add(new Action(ActionConstants.CREATE));
 		extendedActions.add(new Action(ActionConstants.WRITE));
 		extendedActions.add(new Action(ActionConstants.DELETE));
-		RequestItem someItem = new RequestItem(someResource, extendedActions, extendedConditions, false);
+		RequestItem someItem = new RequestItem(someResource, extendedActions, extendedConditions, true);
 		items.add(someItem);
 		return items;
 	}

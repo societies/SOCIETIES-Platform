@@ -63,12 +63,12 @@ var SocietiesCSSRecord = {
 		$("#cssrecordforename").val(data.foreName);
 		$("#cssrecordname").val(data.name);
 		$("#cssrecordemaildetails").val(data.emailID);
-		$("#cssrecordimdetails").val(data.imID);
-		$("#cssrecorduserlocation").val(data.homeLocation);
-		$("#cssrecordsnsdetails").val(data.socialURI);
-		$("#cssrecordidentity").val(data.cssIdentity); //identityName
+		$("#cssrecordidentity").val(data.cssIdentity); 
 		$("#cssrecordorgtype").val(data.entity);
 		$("#cssrecordsextype").val(data.sex);
+		$("#cssrecordposition").val(data.position);
+		$("#cssrecordworkplace").val(data.workplace);
+		$("#cssrecorduserlocation").val(data.homeLocation);
 		
 		//REMOVE ALL ENTRIES
 		while( $('ul#cssNodesList').children().length >0 )
@@ -100,10 +100,11 @@ var SocietiesCSSRecord = {
 				"entity": jQuery("#cssrecordidentity").val(),
 				"foreName": jQuery("#cssrecordforename").val(),
 				"cssIdentity": jQuery("#cssrecordidentity").val(),
-				"imID": jQuery("#cssrecordimdetails").val(),
 				"name": jQuery("#cssrecordname").val(),
 				"sex": jQuery("#cssrecordsextype").val(),
 				"entity": jQuery("#cssrecordorgtype").val(),
+				"position": jQuery("#cssrecordposition").val(),
+				"workplace": jQuery("#cssrecordworkplace").val(),
 				"homeLocation": jQuery("#cssrecorduserlocation").val()
 		};
 		
@@ -135,19 +136,13 @@ $(document).on('pageinit', '#my-profile', function(event) {
 		$.mobile.changePage($("#landing"), {transition: "fade"});
 	});
 	
-	$('a#btnProfileSave').off('click').on('click', function(e){
+	$('#btnProfileSave').off('click').on('click', function(e){
 		SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesCSSRecord.modifyCSSProfile);
 		$.mobile.changePage($("#landing"), {transition: "fade"});
 	});
 	
 	$('#updateProfile').off('click').on('click', function(){
-		$('#updateProfile').val("updating...");
-		$('#updateProfile').button('disable');
-		$('#updateProfile').button('refresh');
-		SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesCSSRecord.modifyCSSProfile);
-		$('#updateProfile').val("Update Profile");
-		$('#updateProfile').button('enable');
-		$('#updateProfile').button('refresh');
+		SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesCSSRecord.refreshCssProfile);
 	});
 
 });
