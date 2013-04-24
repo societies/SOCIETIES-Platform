@@ -84,6 +84,15 @@ public interface ICSSInternalManager extends ICSSManager {
 	 */
 	public Future<CssInterfaceResult> logoutCSS(CssRecord profile);
 
+        /**
+         * Synch the CSS profile
+         * 
+         * @param profile
+         * @return Future<CssInterfaceResult>
+         */
+        public Future<CssInterfaceResult> synchProfile(CssRecord profile);
+
+
 	/**
 	 * Register a CSS
 	 * 

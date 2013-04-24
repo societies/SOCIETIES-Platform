@@ -154,9 +154,9 @@ public class CommsServer implements IFeatureServer {
 //			case LOGOUT_XMPP_SERVER:
 //				asyncResult = this.cssManager.logoutXMPPServer((CssRecord) bean.getProfile());
 //				break;
-//			case SYNCH_PROFILE:
-//				asyncResult = this.cssManager.synchProfile((CssRecord) bean.getProfile());
-//				break;
+			case SYNCH_PROFILE:
+				asyncResult = this.cssManager.synchProfile((CssRecord) bean.getProfile());
+				break;
 			case UNREGISTER_CSS:
 				asyncResult = this.cssManager.unregisterCSS((CssRecord) bean.getProfile());
 				break;

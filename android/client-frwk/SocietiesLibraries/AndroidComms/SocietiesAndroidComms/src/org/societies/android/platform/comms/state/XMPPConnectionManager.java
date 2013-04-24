@@ -78,6 +78,8 @@ public class XMPPConnectionManager implements IConnectionState {
 	private Context context;
 	private ConnectionState currentState;
 	private XMPPConnection xmppConnection;
+	private ConnectionListener connectionListener;
+	
 	private Map <String, StateEventAction> fsmLookupTable;
 	private ConcurrentLinkedQueue <ConnectionEvent> eventQueue;
 	private ScheduledExecutorService queueScheduler;
@@ -99,6 +101,7 @@ public class XMPPConnectionManager implements IConnectionState {
 		
 		this.eventQueue = new ConcurrentLinkedQueue<ConnectionEvent>();
 		this.xmppConnection = null;
+		this.connectionListener = null;
 		this.currentXmppConnectProps = null;
 		this.newXmppConnectProps = null;
 		
@@ -318,6 +321,7 @@ public class XMPPConnectionManager implements IConnectionState {
 			}
 		};
 		this.xmppConnection.addConnectionListener(connListener);
+		this.connectionListener = connListener;
 	}
 	
 	private static String generateKey(ConnectionState currentState, ConnectionEvent event) {
@@ -452,6 +456,19 @@ public class XMPPConnectionManager implements IConnectionState {
 										  this.newXmppConnectProps.getNodeResource());
 		}
 	}
+	/**
+	 * Restore connection
+	 * @return true if connection restored
+	 * @throws XMPPException
+	 */
+	private void restoreConnection() throws XMPPException {
+		Dbc.invariant("XMPP connection cannot be null", null != this.xmppConnection);
+		if (DEBUG_LOGGING) {
+			Log.d(LOG_TAG, "restoreConnection");
+		}
+
+		this.xmppConnection.connect();
+	}
 	
 	/**
 	 * Verify that the established authenticated connection is in a connected state
@@ -489,38 +506,56 @@ public class XMPPConnectionManager implements IConnectionState {
 		if (!this.currentXmppConnectProps.equals(this.newXmppConnectProps) ||
 				null == this.xmppConnection) {
 			this.xmppConnection = createNewXMPPConnection(this.newXmppConnectProps);
-			try {
+		}
+		
+		try {
+			if (this.reconnectionAttempts > 0) {
+				this.restoreConnection();
+			} else {
 				this.authenticateConnection();
-				this.addEventToQueue(ConnectionEvent.AttemptConnectionSuccess);
-			} catch (XMPPException x) {
-				if (DEBUG_LOGGING){
-					Log.d(LOG_TAG, "Unable to establish XMPP connection");
-				}
-				
-				if (x.getMessage().contains(XMPP_AUTHENICATION_EXCEPTION_ID)) {
-					this.sendLoginFailureIntent(IConnectionState.XMPP_AUTHENTICATION_FAILURE, IConnectionState.AUTHENTICATION_FAILURE_MESSAGE);
-				} else {
-					this.sendLoginFailureIntent(IConnectionState.XMPP_CONNECTIVITY_FAILURE, CONNECTIVITY_FAILURE_MESSAGE);
-				}
-				this.addEventToQueue(ConnectionEvent.AttemptConnectionFailure);
-			} catch (Exception e) {
-				if (DEBUG_LOGGING){
-					Log.d(LOG_TAG, "Unable to establish XMPP connection");
-				}
-				this.sendLoginFailureIntent(IConnectionState.XMPP_CONNECTIVITY_FAILURE, CONNECTIVITY_FAILURE_MESSAGE);
-				this.addEventToQueue(ConnectionEvent.AttemptConnectionFailure);
 			}
+			this.addEventToQueue(ConnectionEvent.AttemptConnectionSuccess);
+		} catch (XMPPException x) {
+			if (DEBUG_LOGGING){
+				Log.d(LOG_TAG, "Unable to establish XMPP connection");
+			}
+			
+			if (x.getMessage().contains(XMPP_AUTHENICATION_EXCEPTION_ID)) {
+				this.sendLoginFailureIntent(IConnectionState.XMPP_AUTHENTICATION_FAILURE, IConnectionState.AUTHENTICATION_FAILURE_MESSAGE);
+			} else {
+				this.sendLoginFailureIntent(IConnectionState.XMPP_CONNECTIVITY_FAILURE, CONNECTIVITY_FAILURE_MESSAGE);
+			}
+			this.addEventToQueue(ConnectionEvent.AttemptConnectionFailure);
+		} catch (Exception e) {
+			if (DEBUG_LOGGING){
+				Log.d(LOG_TAG, "Unable to establish XMPP connection");
+			}
+			this.sendLoginFailureIntent(IConnectionState.XMPP_CONNECTIVITY_FAILURE, CONNECTIVITY_FAILURE_MESSAGE);
+			this.addEventToQueue(ConnectionEvent.AttemptConnectionFailure);
 		}
 	}
-	
-	private void teardownConnection() {
+	/**
+	 * Disconnect and destroy connection
+	 * @param destroyConnection true if new connection required, false for reconnects
+	 */
+	private void teardownConnection(boolean destroyConnection) {
 		if (DEBUG_LOGGING) {
 			Log.d(LOG_TAG, "teardownConnection");
 		}
 		if (null != this.xmppConnection && this.xmppConnection.isConnected()) {
 			this.xmppConnection.disconnect();
+			if (null != this.connectionListener) {
+				this.xmppConnection.removeConnectionListener(this.connectionListener);
+			}
 		} 
-		this.xmppConnection = null;
+
+		if (destroyConnection) {
+			if (DEBUG_LOGGING) {
+				Log.d(LOG_TAG, "teardownConnection - destroy connection");
+			}
+			
+			this.xmppConnection = null;
+		}
 	}
 	/**
 	 * Carry out clean up tasks required. Declared as public to allow reflection.
@@ -534,9 +569,10 @@ public class XMPPConnectionManager implements IConnectionState {
 		}
 		this.stopExecutorTask();
 		this.teardownBroadcastReceiver();
-		teardownConnection();
 		
 		if (this.reconnectionAttempts > 0) {
+			teardownConnection(false);
+
 			if (this.reconnectionAttempts < MANUAL_RECONNECTION_ATTEMPTS) {
 				this.reconnectionAttempts++;
 				this.updateStatus(futureState);
@@ -545,6 +581,7 @@ public class XMPPConnectionManager implements IConnectionState {
 				this.stopReconnectionTask();
 			}
 		} else {
+			teardownConnection(true);
 			this.updateStatus(futureState);
 		}
 	}
