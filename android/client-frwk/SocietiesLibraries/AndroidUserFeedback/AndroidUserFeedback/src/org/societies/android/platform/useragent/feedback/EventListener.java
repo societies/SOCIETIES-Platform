@@ -24,17 +24,28 @@
  */
 package org.societies.android.platform.useragent.feedback;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.comms.xmpp.ICommCallback;
+import org.societies.android.api.comms.xmpp.Stanza;
+import org.societies.android.api.comms.xmpp.VCardParcel;
+import org.societies.android.api.comms.xmpp.XMPPError;
+import org.societies.android.api.comms.xmpp.XMPPInfo;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.android.platform.androidutils.AndroidNotifier;
+import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
 import org.societies.android.platform.useragent.feedback.guis.AcknackPopup;
 import org.societies.android.platform.useragent.feedback.guis.CheckboxPopup;
 import org.societies.android.platform.useragent.feedback.guis.RadioPopup;
 import org.societies.android.remote.helper.EventsHelper;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
+import org.societies.api.schema.css.directory.CssFriendEvent;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 
 import android.app.Notification;
@@ -67,7 +78,10 @@ public class EventListener extends Service {
 	private Looper mServiceLooper;
 	private ServiceHandler mServiceHandler;
 	private EventsHelper eventsHelper;
-
+	private Set<Integer> eventIds;
+	private Set<String> eventGuids;
+	private ClientCommunicationMgr ccm;
+	
 	// Handler that receives messages from the thread
 	private final class ServiceHandler extends Handler {
 		public ServiceHandler(Looper looper) {
@@ -77,6 +91,8 @@ public class EventListener extends Service {
 		@Override
 		public void handleMessage(Message msg) {
 			Log.d(this.getClass().getName(), "Message received in Userfeedback event thread");
+			eventIds = new HashSet<Integer>();
+			eventGuids = new HashSet<String>();
 			if (!boundToEventMgrService) {
 				setupBroadcastReceiver();
 				subscribeToEvents();
@@ -92,6 +108,22 @@ public class EventListener extends Service {
 	@Override
 	public void onCreate() {
 		Log.d(this.getClass().getName(), "UserFeedback Service creating...");
+		this.ccm = new ClientCommunicationMgr(this, true);
+        this.ccm.bindCommsService(new IMethodCallback() {
+			@Override
+			public void returnException(String result) { 
+				Log.d(LOG_TAG, "Exception binding to service: " + result);
+			}
+			@Override
+			public void returnAction(String result) { 
+				Log.d(LOG_TAG, "return Action.flag: " + result);
+			}
+			@Override
+			public void returnAction(boolean resultFlag) { 
+				Log.d(LOG_TAG, "return Action.flag: " + resultFlag);
+			}
+		});
+        
 		// START BACKGROUND THREAD FOR SERVICE
 		HandlerThread thread = new HandlerThread("UserFeedbackStartArguments", android.os.Process.THREAD_PRIORITY_BACKGROUND);
 		thread.start();
@@ -155,14 +187,25 @@ public class EventListener extends Service {
 			else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_REQUEST_INTENT)) {
 				Log.d(LOG_TAG, "Privacy Negotiation event received");
 				UserFeedbackPrivacyNegotiationEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
-				launchNegotiation(eventPayload);
+				//CHECK IF WE HAVE RECEIVED THIS ALREADY
+				int thisId = eventPayload.getNegotiationDetails().getNegotiationID();
+				if (!eventIds.contains(thisId)) {
+					eventIds.add(thisId);
+					ICommCallback callback = new VCardCallback(eventPayload, NegotiationActivity.class);
+					ccm.getVCard(eventPayload.getNegotiationDetails().getRequestor().getRequestorId(), callback);
+				}
 			}
 			//PERMISSION REQUEST EVENT - payload is UserFeedbackBean 
 			else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_REQUEST_INTENT)) {
 				Log.d(LOG_TAG, "General Permission request event received");
 				UserFeedbackBean eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
-				String description = "Accept privacy policy?";
-				addNotification(description, "Privacy Policy", eventPayload);
+				String eventGuid = eventPayload.getRequestId();
+				//CHECK IF WE HAVE RECEIVED THIS ALREADY
+				if (!eventGuids.contains(eventGuid)) {
+					eventGuids.add(eventGuid);
+					String description = eventPayload.getProposalText();
+					addNotification(description, "Privacy Policy", eventPayload);
+				}
 			}
 		}
     }
@@ -223,14 +266,6 @@ public class EventListener extends Service {
 			}
 		});
 	}
-
-    private void launchNegotiation(UserFeedbackPrivacyNegotiationEvent policy) {
-    	//CREATE INTENT FOR LAUNCHING ACTIVITY
-		Intent intent = new Intent(this.getApplicationContext(), NegotiationActivity.class);
-		intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY, (Parcelable)policy);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivity(intent);
-	}
     
     private void addNotification(String description, String eventType, UserFeedbackBean policy) {
     	//CREATE ANDROID NOTIFICATION
@@ -239,19 +274,69 @@ public class EventListener extends Service {
 		AndroidNotifier notifier = new AndroidNotifier(EventListener.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
 		
 		//DETERMINE WHICH ACTIVITY TO LAUNCH
-		Class activtyClass;
+		Class activityClass;
 		if (policy.getType()==0)
-			activtyClass = RadioPopup.class;
+			activityClass = RadioPopup.class;
 		else if (policy.getType()==1)
-			activtyClass = CheckboxPopup.class;
+			activityClass = CheckboxPopup.class;
 		else
-			activtyClass = AcknackPopup.class;
+			activityClass = AcknackPopup.class;
 		
 		//CREATE INTENT FOR LAUNCHING ACTIVITY
-		Intent intent = new Intent(this.getApplicationContext(), activtyClass);
+		Intent intent = new Intent(this.getApplicationContext(), activityClass);
 		intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY, (Parcelable)policy);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		notifier.notifyMessage(description, eventType, activtyClass, intent, "SOCIETIES");
+		notifier.notifyMessage(description, eventType, activityClass, intent, "SOCIETIES");
+	}
+
+    /**
+	 * Callback used with Android Comms for CSSDirectory
+	 *
+	 */
+	private class VCardCallback implements ICommCallback {
+		private Parcelable policy;
+		private Class<?> activityClass;
+		private String description;
+		boolean notify = false;
+		
+		public VCardCallback(Parcelable policy, Class activtyClass, boolean notify, String description) {
+			this.policy = policy;
+			this.activityClass = activtyClass;
+			this.description = description;
+		}
+		
+		public VCardCallback(Parcelable policy, Class activtyClass) {
+			this.policy = policy;
+			this.activityClass = activtyClass;
+		}
+		
+		public List<String> getXMLNamespaces() { return null;}
+		public List<String> getJavaPackages() {  return null;}
+		public void receiveError(Stanza arg0, XMPPError arg1) { }
+		public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) { }
+		public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {	}
+		public void receiveMessage(Stanza arg0, Object arg1) { }
+
+		public void receiveResult(Stanza arg0, Object retValue) {
+			Log.d(VCardCallback.class.getName(), "VCardCallback Callback receiveResult");
+			VCardParcel vCard = (VCardParcel)retValue;
+			
+			//CREATE ANDROID NOTIFICATION
+			int notifierflags [] = new int [1];
+			notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
+			AndroidNotifier notifier = new AndroidNotifier(EventListener.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
+			
+			//CREATE INTENT FOR LAUNCHING ACTIVITY
+			Intent intent = new Intent(EventListener.this.getApplicationContext(), activityClass);
+			intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY, policy);
+			intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_CSS_VCARD, (Parcelable)vCard);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+			if (notify)
+				notifier.notifyMessage(description, "Friend Request", activityClass, intent, "SOCIETIES");
+			else
+				startActivity(intent);
+		}
 	}
 
 }

@@ -43,7 +43,6 @@ import org.societies.privacytrust.trust.api.engine.IDirectTrustEngine;
 import org.societies.privacytrust.trust.api.engine.TrustEngineException;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.ITrustEvidenceUpdateEventListener;
-import org.societies.privacytrust.trust.api.event.TrustEventMgrException;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
 import org.societies.privacytrust.trust.api.event.TrustEvidenceUpdateEvent;
 import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
@@ -85,15 +84,23 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 	private ITrustEvidenceRepository trustEvidenceRepo;
 	
 	@Autowired
-	public DirectTrustEngine(ITrustEventMgr trustEventMgr) throws TrustEventMgrException {
+	public DirectTrustEngine(ITrustEventMgr trustEventMgr) throws Exception {
 		
 		super(trustEventMgr);
-		LOG.info(this.getClass() + " instantiated");
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
 		
-		LOG.info("Registering for direct trust evidence updates...");
-		super.trustEventMgr.registerEvidenceUpdateListener(
-				new DirectTrustEvidenceUpdateListener(), 
-				new String[] { TrustEventTopic.DIRECT_TRUST_EVIDENCE_UPDATED });
+		try {
+			if (LOG.isInfoEnabled())
+				LOG.info("Registering for direct trust evidence updates...");
+			super.trustEventMgr.registerEvidenceUpdateListener(
+					new DirectTrustEvidenceUpdateListener(), 
+					new String[] { TrustEventTopic.DIRECT_TRUST_EVIDENCE_UPDATED });
+		} catch (Exception e) {
+			LOG.error(this.getClass() + " could not be initialised: "
+					+ e.getLocalizedMessage(), e);
+			throw e;
+		}
 	}
 	
 	/*

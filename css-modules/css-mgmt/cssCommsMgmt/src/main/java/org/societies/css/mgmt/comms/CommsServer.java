@@ -347,9 +347,7 @@ public class CommsServer implements IFeatureServer {
 				//request.setCssIdentity(stanza.getFrom().getJid());
 				request.setRequestStatus(bean.getRequestStatus());
 				request.setOrigin(CssRequestOrigin.REMOTE);
-			//	request.setRequestStatus(bean.ge);
-				//this.cssManager.updateCssFriendRequest(request);
-				this.cssManager.handleExternalFriendRequest(receivedID, bean.getRequestStatus());
+				this.cssManager.handleExternalUpdateRequest(receivedID, bean.getRequestStatus());
 				
 			break;
 			case UPDATE_CSS_REQUEST:
@@ -397,8 +395,6 @@ public class CommsServer implements IFeatureServer {
 				//request.setCssIdentity(stanza.getFrom().getJid());
 				request.setRequestStatus(bean.getRequestStatus());
 				request.setOrigin(CssRequestOrigin.REMOTE);
-			//	request.setRequestStatus(bean.ge);
-				//this.cssManager.acceptCssFriendRequest(request);
 				this.cssManager.handleExternalFriendRequest(receivedID, bean.getRequestStatus());
 			break;
 			case DECLINE_CSS_FRIEND_REQUEST:

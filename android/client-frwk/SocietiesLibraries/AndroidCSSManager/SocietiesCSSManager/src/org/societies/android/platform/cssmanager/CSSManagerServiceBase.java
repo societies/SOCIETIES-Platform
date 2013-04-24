@@ -1213,7 +1213,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 						intent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, advertArray);
 					}
 					//FriendEntry array
-					if (IAndroidCSSManager.SUGGESTED_FRIENDS == this.returnIntent) {
+					else if (IAndroidCSSManager.SUGGESTED_FRIENDS == this.returnIntent) {
 						FriendEntry advertArray[] = new FriendEntry[resultBean.getResultSuggestedFriends().size()]; 
 						advertArray = resultBean.getResultSuggestedFriends().toArray(advertArray);
 						
@@ -1223,7 +1223,6 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 					//cssRecords
 					else { 
 						intent.putExtra(IAndroidCSSManager.INTENT_RETURN_STATUS_KEY, resultBean.getResult().isResultStatus());
-						//AndroidCSSRecord aRecord = AndroidCSSRecord.convertCssRecord(resultBean.getResult().getProfile());
 						CssRecord aRecord = resultBean.getResult().getProfile();
 						intent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, (Parcelable) aRecord);
 						this.updateLocalPersistence(aRecord);
@@ -1610,6 +1609,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 												Log.d(LOG_TAG, "DomainLogin exception result sent");
 												exceptionIntent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, result);
 												CSSManagerServiceBase.this.context.sendBroadcast(exceptionIntent);
+												CSSManagerServiceBase.this.ccm.unbindCommsService();
 											}
 										});								
 									}
@@ -1622,6 +1622,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 										Log.d(LOG_TAG, "DomainLogin exception result sent");
 										exceptionIntent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, result);
 										CSSManagerServiceBase.this.context.sendBroadcast(exceptionIntent);
+										CSSManagerServiceBase.this.ccm.unbindCommsService();
 									}
 								});
 							} else {
@@ -1629,6 +1630,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 								Log.d(LOG_TAG, "DomainLogin exception result sent");
 								exceptionIntent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, "Failed to configure to Android Comms");
 								CSSManagerServiceBase.this.context.sendBroadcast(exceptionIntent);
+								CSSManagerServiceBase.this.ccm.unbindCommsService();
 							}
 						}
 
@@ -1637,6 +1639,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 							Log.d(LOG_TAG, "DomainLogin exception result sent");
 							exceptionIntent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, result);
 							CSSManagerServiceBase.this.context.sendBroadcast(exceptionIntent);
+							CSSManagerServiceBase.this.ccm.unbindCommsService();
 						}
 					});
 				} else {
@@ -1644,6 +1647,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 					Log.d(LOG_TAG, "DomainLogin exception result sent");
 					exceptionIntent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, "Failed to bind to Android Comms");
 					CSSManagerServiceBase.this.context.sendBroadcast(exceptionIntent);
+					CSSManagerServiceBase.this.ccm.unbindCommsService();
 				}
 			}
 
@@ -1652,6 +1656,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 				Log.d(LOG_TAG, "DomainLogin exception result sent");
 				exceptionIntent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, result);
 				CSSManagerServiceBase.this.context.sendBroadcast(exceptionIntent);
+				CSSManagerServiceBase.this.ccm.unbindCommsService();
 			}
 		});
     }
@@ -1745,6 +1750,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 												Log.d(LOG_TAG, "Domain Registration exception result sent");
 												exceptionIntent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, "Unable to register identity with XMPP server");
 												CSSManagerServiceBase.this.context.sendBroadcast(exceptionIntent);
+												CSSManagerServiceBase.this.ccm.unbindCommsService();
 											}
 										}
 										
@@ -1756,6 +1762,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 											Log.d(LOG_TAG, "Domain Registration exception result sent");
 											exceptionIntent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, result);
 											CSSManagerServiceBase.this.context.sendBroadcast(exceptionIntent);
+											CSSManagerServiceBase.this.ccm.unbindCommsService();
 										}
 									}, host);
 									
@@ -1767,6 +1774,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 								Log.d(LOG_TAG, "Domain Registration exception result sent");
 								exceptionIntent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, "Unable to configure Android Comms");
 								CSSManagerServiceBase.this.context.sendBroadcast(exceptionIntent);
+								CSSManagerServiceBase.this.ccm.unbindCommsService();
 							}
 						}
 
@@ -1775,6 +1783,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 							Log.d(LOG_TAG, "Domain Registration exception result sent");
 							exceptionIntent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, result);
 							CSSManagerServiceBase.this.context.sendBroadcast(exceptionIntent);
+							CSSManagerServiceBase.this.ccm.unbindCommsService();
 						}
 					});
 				} else {
@@ -1782,6 +1791,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 					Log.d(LOG_TAG, "Domain Registration exception result sent");
 					exceptionIntent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, "Unable to bind to Android Comms");
 					CSSManagerServiceBase.this.context.sendBroadcast(exceptionIntent);
+					CSSManagerServiceBase.this.ccm.unbindCommsService();
 				}
 			}
 
@@ -1790,6 +1800,7 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 				Log.d(LOG_TAG, "Domain Registration exception result sent");
 				exceptionIntent.putExtra(IAndroidCSSManager.INTENT_RETURN_VALUE_KEY, result);
 				CSSManagerServiceBase.this.context.sendBroadcast(exceptionIntent);
+				CSSManagerServiceBase.this.ccm.unbindCommsService();
 			}
 		});
 	}

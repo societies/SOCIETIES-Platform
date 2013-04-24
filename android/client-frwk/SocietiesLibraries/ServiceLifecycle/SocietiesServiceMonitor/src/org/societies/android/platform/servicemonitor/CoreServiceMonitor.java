@@ -274,13 +274,22 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 		Log.d(LOG_TAG, "Calling getInstalledApplications from client: " + client);
 		
 		List<InstalledAppInfo> apps = getInstalledApps(false, "org.societies.thirdpartyservice"); /* false = no system packages */
-		Parcelable returnArray[] = new Parcelable[apps.size()];
+		List<InstalledAppInfo> appsIbm = getInstalledApps(false, "com.ibm.hrl.ms.pz"); //HARDCODING FOR Context Aware Wall AS PACKAGE NAME DOES NOT MATCH
+		
+		int countIBM = 0;
+		if (appsIbm.size() > 0)
+			countIBM = 1;
+		//DECLARE RETURNING ARRAY
+		Parcelable returnArray[] = new Parcelable[apps.size() + countIBM];
 		for (int i=0; i<apps.size(); i++) {
 			InstalledAppInfo tmpApp = apps.get(i); 
 			returnArray[i] = tmpApp;
-			Log.d(LOG_TAG, tmpApp.toString());
 		}
-
+		//ADD Context Aware Wall IF FOUND - ASSUME FIRST POSITION
+		if (appsIbm.size() > 0) {
+			InstalledAppInfo tmpApp = appsIbm.get(0);
+			returnArray[returnArray.length-1] = tmpApp;
+		}
 		//SETUP RETURN INTENT STUFF
 		if (client != null) {
 			Intent intent = new Intent(INSTALLED_APPLICATIONS);
@@ -316,7 +325,7 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 			Bitmap bitmap = ((BitmapDrawable)icon).getBitmap(); 
 			ByteArrayOutputStream stream = new ByteArrayOutputStream(); 
 			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream); 
-			byte[] bitmapdata = stream.toByteArray(); 
+			byte[] bitmapdata = stream.toByteArray();
 			String base64String = "data:image/png;base64," + Base64.encodeToString(bitmapdata, 0); 
 
 			//ADD PACKAGE INFO TO RETURNED ARRAY
@@ -332,7 +341,7 @@ public class CoreServiceMonitor extends Service implements ICoreServiceMonitor {
 			newInfo.setApplicationDescription(desc);
 			newInfo.setVersionName(p.versionName);
 			newInfo.setVersionCode(p.versionCode);
-			newInfo.setIconAsB64string(base64String);
+			newInfo.setIcon(base64String);
 			res.add(newInfo);
 		}
 		return res;
