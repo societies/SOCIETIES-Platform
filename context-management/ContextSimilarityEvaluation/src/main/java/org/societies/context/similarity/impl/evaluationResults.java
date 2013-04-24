@@ -22,69 +22,67 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.ctx_3pBroker;
+package org.societies.context.similarity.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 
-import org.societies.api.cis.management.ICisManager;
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.broker.ICtxBroker;
-import org.societies.integration.test.IntegrationTestCase;
-import org.societies.integration.test.bit.ctx_3pBroker.Tester;
+public class evaluationResults {
 
-/**
- * 
- *
- * @author nikosk
- *
- */
-public class Test1337 extends IntegrationTestCase{
-
+	private Boolean result; // overall yes/no from group
+	private HashMap<String, String> attributeSummary;  //  
+	private HashMap attBreakDown;
+	public final String STRONG = "Strongly associated"; //      > 80%
+	public final String MEDIUM = "Medium association";  //   50 - 80%
+	public final String WEAK = "Weakly associated";     //   25 - 50%
+	public final String NONE = "Not associated";		//      < 25%
 	
-	public static ICtxBroker ctxBroker;
-	public static ICommManager commManager;
-	public static ICisManager cisManager;
-	
-	
-	public Test1337(){
-		super(1858, new Class[]{Tester.class});
-	}
-
-	/**
-	 * @return the ctxBroker
-	 */
-	public static ICtxBroker getCtxBroker() {
-		return ctxBroker;
-	}
-
-	/**
-	 * @param ctxBroker the ctxBroker to set
-	 */
-	public  void setCtxBroker(ICtxBroker ctxBroker) {
-		Test1337.ctxBroker = ctxBroker;
-
+	public evaluationResults(){
+		this.result = true;
+		this.attributeSummary = new HashMap<String, String>();
+		this.attBreakDown = new HashMap();
 	}
 	
-	/**
-	 * @return the commMgr
+	public void init(){
+		this.result = true;
+		this.attributeSummary = new HashMap<String, String>();
+		this.attBreakDown = new HashMap();
+	}
+	
+	/***
+	 *   result
 	 */
-	public static ICommManager  getCommManager() {
-		return commManager ;
+	public void setResult(Boolean result){
+	
+		this.result = result;
 	}
-
-	/**
-	 * @param commMgr the commMgr to set
+	//
+	public Boolean getResult(){
+		return this.result;
+	}
+	
+	/***
+	 *   attBreakDown
 	 */
-	public  void setCommManager(ICommManager commMgr) {
-		Test1337.commManager = commMgr;
-	}		
-
-	public static ICisManager getCisManager() {
-		return cisManager;
+	public void setAttSummary(String att, String value){
+	
+		this.attributeSummary.put(att, value);
 	}
-
-	public void setCisManager(ICisManager cisManager) {
-		
-		Test1337.cisManager = cisManager;
+	//
+	public HashMap<String, String> getSummary(){
+		return this.attributeSummary;
+	}	
+	
+	/***
+	 *   attBreakDown
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void setAattBreakDown(HashMap breakdown){
+		attBreakDown.putAll(breakdown);
 	}
-
+	//
+	public HashMap getAttBreakDown(){
+		return this.attBreakDown;
+	}	
+	
 }

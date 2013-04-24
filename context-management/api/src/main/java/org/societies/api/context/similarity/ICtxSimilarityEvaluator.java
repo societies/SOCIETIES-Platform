@@ -25,19 +25,13 @@
 package org.societies.api.context.similarity;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.societies.context.similarity.impl.evaluationResult;
 
 /**
- * Describe your class here...
- *
- * @author John
- *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  */
-public interface IContextSimilarity {
+public interface ICtxSimilarityEvaluator {
 
-	public evaluationResult evaluateSimilarity(String[] ids, ArrayList<String> attrib);
+	public evaluationResults evaluateSimilarity(String[] ids, ArrayList<String> attrib);
+	
 
 }

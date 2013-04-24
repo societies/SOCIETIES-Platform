@@ -33,7 +33,7 @@ import java.util.Map;
  * @author John
  *
  */
-public interface IevaluationResults {
+public interface evaluationResults {
 
 	public Boolean getResult();
 	public HashMap<String, String> getSummary();

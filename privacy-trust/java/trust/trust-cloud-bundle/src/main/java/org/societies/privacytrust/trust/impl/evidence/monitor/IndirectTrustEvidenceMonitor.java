@@ -241,6 +241,22 @@ public class IndirectTrustEvidenceMonitor implements ITrustUpdateEventListener {
 				type, ts, trustValue, sourceId);
 	}
 	
+	private void retrieveOpinions(final TrustedEntityId connectionId)
+			throws TrustException {
+		
+		try {
+			final Set<TrustRelationship> trustRelationships =
+					this.trustBroker.retrieveTrustRelationships(connectionId,
+							TrustValueType.DIRECT).get();
+			//this.trustEvidenceRepository.retrieveIndirectEvidence(
+			//		connectionId, null, arg2, arg3, arg4)
+		} catch (Exception e) {
+			throw new TrustEvidenceMonitorException(
+					"Interrupted while retrieving DIRECT trust relationships of trustor '"
+							+ connectionId + "'");
+		}
+	}
+	
 	private void initConnections(final TrustedEntityId myTeid) 
 			throws TrustException {
 		

@@ -46,7 +46,6 @@ import org.societies.privacytrust.trust.api.event.ITrustEvidenceUpdateEventListe
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
 import org.societies.privacytrust.trust.api.event.TrustEvidenceUpdateEvent;
 import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
-import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.api.model.IDirectTrust;
 import org.societies.privacytrust.trust.api.model.ITrust;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
@@ -78,10 +77,6 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
         aMap.put(TrustEvidenceType.USED_SERVICE, +1.0d);
         EVIDENCE_SCORE_MAP = Collections.unmodifiableMap(aMap);
     }
-	
-	/** The Trust Evidence Repository service reference. */
-	@Autowired
-	private ITrustEvidenceRepository trustEvidenceRepo;
 	
 	@Autowired
 	public DirectTrustEngine(ITrustEventMgr trustEventMgr) throws Exception {
@@ -126,7 +121,7 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 
 		try {
 			// Create the trusted entity the evidence object refers to if not already available
-			this.createEntityIfAbsent(trustorId, evidence.getObjectId());
+			super.createEntityIfAbsent(trustorId, evidence.getObjectId());
 			
 			final Class<? extends ITrustedEntity> entityClass;
 			switch (evidence.getObjectId().getEntityType()) {
@@ -193,7 +188,7 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 				if (super.trustNodeMgr.getMyIds().contains(evidence.getSubjectId()))
 					user = this.createMyCssIfAbsent(evidence.getSubjectId());
 				else
-					user = (ITrustedCss) this.createEntityIfAbsent(trustorId, evidence.getSubjectId());
+					user = (ITrustedCss) super.createEntityIfAbsent(trustorId, evidence.getSubjectId());
 				final ITrustedCis community = (ITrustedCis) trustee; // TODO class cast exception?
 				if (TrustEvidenceType.JOINED_COMMUNITY.equals(evidence.getType()))
 					user.addCommunity(community);
@@ -393,16 +388,6 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 						+ svcArray[i].getTrusteeId() + ") direct trust after normalisation: "
 						+ svcArray[i].getDirectTrust());
 		}
-	}
-
-	private ITrustedEntity createEntityIfAbsent(final TrustedEntityId trustorId,
-			final TrustedEntityId trusteeId) throws TrustRepositoryException {
-
-		ITrustedEntity entity = (ITrustedEntity) this.trustRepo.retrieveEntity(
-				trustorId, trusteeId);
-
-		return (entity == null) ? this.trustRepo.createEntity(
-				trustorId, trusteeId) : entity;
 	}
 	
 	private ITrustedCss createMyCssIfAbsent(final TrustedEntityId myTrustorId) 
