@@ -297,7 +297,8 @@ public class ContextBrokerBase implements IInternalCtxClient{
 				ctxBrokerCreateAttributeBean.setRequestor(requestor);
 				// 2. set scope
 				CtxEntityIdentifierBean ctxEntIdBean = new CtxEntityIdentifierBean();
-				ctxEntIdBean.setString(scope.toString());
+				Log.d(LOG_TAG, "scope used: " + scope.getString());
+				ctxEntIdBean.setString(scope.getString());
 				ctxBrokerCreateAttributeBean.setScope(ctxEntIdBean);
 				// 3. set type
 				ctxBrokerCreateAttributeBean.setType(type);
@@ -540,7 +541,12 @@ public class ContextBrokerBase implements IInternalCtxClient{
 				IIdentityManager idm = this.commMgr.getIdManager();
 				IIdentity toIdentity;
 	
-				toIdentity = this.commMgr.getIdManager().fromJid(identifier.getString());
+/*				CtxEntityIdentifierBean entityId = new CtxEntityIdentifierBean();
+				entityId.setString(identifier.getString());
+				Log.d(LOG_TAG, "entityId used to retrieve model object: " + entityId.getString());
+				toIdentity = this.commMgr.getIdManager().fromJid(entityId.getString());*/
+				
+				toIdentity = this.commMgr.getIdManager().getCloudNode();
 				
 				Log.d(LOG_TAG, "identity used = " + toIdentity.getJid());
 				CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
@@ -872,7 +878,13 @@ public class ContextBrokerBase implements IInternalCtxClient{
 								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getCreateAttributeBeanResult() is null");
 								return;
 							}
+							Log.i(LOG_TAG, "payload received: " + payload);
 							final CtxAttributeBean attributeBean = payload.getCreateAttributeBeanResult();
+							Log.i(LOG_TAG, "attributeBean received: " + attributeBean);
+							Log.d(LOG_TAG, "attribute.getSourceId(): " + attributeBean.getSourceId());
+							Log.d(LOG_TAG, "attribute.getStringValue() " + attributeBean.getStringValue());
+							Log.d(LOG_TAG, "attribute.getId() " + attributeBean.getId().getString());
+
 
 							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) attributeBean);
 
@@ -886,7 +898,8 @@ public class ContextBrokerBase implements IInternalCtxClient{
 								return;
 							}
 							final CtxAssociationBean associationBean = payload.getCreateAssociationBeanResult();
-
+							Log.d(LOG_TAG, "association.getId(): " + associationBean.getId().getString());
+							
 							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) associationBean);
 
 							break;
@@ -925,7 +938,8 @@ public class ContextBrokerBase implements IInternalCtxClient{
 								return;
 							}
 							final CtxModelObjectBean retrievedObjectBean = payload.getRetrieveBeanResult();
-
+							Log.d(LOG_TAG, "retrievedObjectBean.getId(): " + retrievedObjectBean.getId().getString());
+							
 							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) retrievedObjectBean);
 							
 							break;
