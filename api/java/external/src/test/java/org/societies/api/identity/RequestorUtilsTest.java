@@ -24,15 +24,14 @@
  */
 package org.societies.api.identity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,6 +123,28 @@ public class RequestorUtilsTest {
 		requestorCis2.setCisRequestorId("cis-test.ict-societies.local");
 		assertTrue("Same requestorBeans should be equal", RequestorUtils.equal(requestorCis1, requestorCis2));
 		assertTrue("Same requestorBeans should be equal (inverse)", RequestorUtils.equal(requestorCis2, requestorCis1));
+	}
+	
+	@Test
+	public void testContainable() {
+		String testTitle = "requestor is containable?";
+		LOG.info("[Test] "+testTitle);
+		
+		Map<RequestorBean, String> map = new Hashtable<RequestorBean, String>();
+		RequestorBean requestor1 = RequestorUtils.create("university.ict-societies.local");
+		RequestorBean requestor2 = RequestorUtils.create("emma.ict-societies.local");
+		RequestorBean requestor3 = RequestorUtils.create("mario.ict-societies.local");
+		map.put(requestor1, "requestor1");
+		map.put(requestor2, "requestor2");
+		
+		assertTrue("Requestor1 should be contained in the map (1/2)", map.containsKey(requestor1));
+		assertEquals("Requestor1 should be contained in the map (2/2)", map.get(requestor1), "requestor1");
+		
+		assertTrue("requestor2 should be contained in the map (1/2)", map.containsKey(requestor2));
+		assertEquals("requestor2 should be contained in the map (2/2)", map.get(requestor2), "requestor2");
 
+		assertFalse("requestor3 should not be contained in the map (1/2)", map.containsKey(requestor3));
+		assertNull("requestor3 should not be contained in the map (2/2)", map.get(requestor3));
+		
 	}
 }
