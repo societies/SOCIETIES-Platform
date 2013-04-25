@@ -334,7 +334,7 @@ var	SocietiesLocalCSSManager = {
                 "emailID": data.emailID,
                 "entity": data.entity,
                 "foreName": data.foreName,
-                "homeLocation": null,
+                "homeLocation": data.homeLocation,
                 "name": data.name,
                 "password": null,
                 "presence": 0,
