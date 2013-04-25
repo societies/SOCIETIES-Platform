@@ -29,13 +29,14 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.ITrustNodeMgr;
-import org.societies.privacytrust.trust.api.evidence.remote.IInternalTrustEvidenceCollectorRemoteClient;
-import org.societies.privacytrust.trust.api.evidence.remote.IInternalTrustEvidenceCollectorRemoteClientCallback;
+import org.societies.privacytrust.trust.api.evidence.remote.ITrustEvidenceCollectorRemoteClient;
+import org.societies.privacytrust.trust.api.evidence.remote.ITrustEvidenceCollectorRemoteClientCallback;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.IndirectTrustEvidence;
@@ -65,7 +66,7 @@ public class InternalTrustEvidenceCollector implements ITrustEvidenceCollector {
 	
 	/** The internal Trust Evidence Collector Client service reference. */
 	@Autowired(required=false)
-	private IInternalTrustEvidenceCollectorRemoteClient internalTrustEvidenceCollectorRemoteClient;
+	private ITrustEvidenceCollectorRemoteClient trustEvidenceCollectorRemoteClient;
 	
 	InternalTrustEvidenceCollector() {
 		
@@ -74,12 +75,37 @@ public class InternalTrustEvidenceCollector implements ITrustEvidenceCollector {
 	}
 	
 	/*
-	 * @see org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector#addDirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
+	 * @see org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector#addDirectEvidence(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
+	 */
+	@Override
+	public void addDirectEvidence(final Requestor requestor, 
+			final TrustedEntityId subjectId, final TrustedEntityId objectId, 
+			final TrustEvidenceType type, final Date timestamp, 
+			final Serializable info) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (subjectId == null)
+			throw new NullPointerException("subjectId can't be null");
+		if (objectId == null)
+			throw new NullPointerException("objectId can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+		if (timestamp == null)
+			throw new NullPointerException("timestamp can't be null");
+		
+		this.doAddDirectEvidence(requestor, subjectId, objectId, type, 
+				timestamp, info);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addDirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
 	 */
 	@Override
 	public void addDirectEvidence(final TrustedEntityId subjectId, 
 			final TrustedEntityId objectId, final TrustEvidenceType type,
-			final Date timestamp, final Serializable info) throws TrustException {
+			final Date timestamp, final Serializable info) 
+					throws TrustException {
 		
 		if (subjectId == null)
 			throw new NullPointerException("subjectId can't be null");
@@ -89,6 +115,28 @@ public class InternalTrustEvidenceCollector implements ITrustEvidenceCollector {
 			throw new NullPointerException("type can't be null");
 		if (timestamp == null)
 			throw new NullPointerException("timestamp can't be null");
+		
+		this.doAddDirectEvidence(null, subjectId, objectId, type, timestamp,
+				info);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector#addDirectEvidence(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
+	 * @see org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector#addDirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
+	 */
+	private void doAddDirectEvidence(Requestor requestor,
+			final TrustedEntityId subjectId, final TrustedEntityId objectId,
+			final TrustEvidenceType type, final Date timestamp, 
+			final Serializable info) throws TrustException {
+		
+		if (requestor == null)
+			requestor = this.trustNodeMgr.getLocalRequestor();
+		
+		if (LOG.isDebugEnabled()) 
+			LOG.debug("Adding direct trust evidence with subjectId '"
+					+ subjectId	+ "', objectId '" + objectId + "', type '" 
+					+ type + "', timestamp '" + timestamp + "' and info '" 
+					+ info + "' on behalf of requestor '" + requestor + "'");
 		
 		try {
 			final boolean doLocal = this.trustNodeMgr.isMaster();
@@ -100,8 +148,11 @@ public class InternalTrustEvidenceCollector implements ITrustEvidenceCollector {
 						subjectId, objectId, type, timestamp, info);
 				if (this.trustEvidenceRepository == null)
 					throw new TrustEvidenceCollectorException(
-							"Could not add direct evidence with " + subjectId + "'" 
-									+ "' and objectId '" + objectId 
+							"Could not add direct evidence with subjectId '"
+									+ subjectId	+ "', objectId '" + objectId 
+									+ "', type '" + type + "', timestamp '" 
+									+ timestamp + "' and info '" + info 
+									+ "' on behalf of requestor '" + requestor
 									+ "': ITrustEvidenceRepository service is not available");
 				this.trustEvidenceRepository.addEvidence(evidence);
 				
@@ -109,41 +160,57 @@ public class InternalTrustEvidenceCollector implements ITrustEvidenceCollector {
 
 				final TrustEvidenceCollectorRemoteCallback callback = 
 						new TrustEvidenceCollectorRemoteCallback();
-				if (this.internalTrustEvidenceCollectorRemoteClient == null)
+				if (this.trustEvidenceCollectorRemoteClient == null)
 					throw new TrustEvidenceCollectorException(
-							"Could not add direct evidence with " + subjectId + "'" 
-									+ "' and objectId '" + objectId 
+							"Could not add direct evidence with subjectId '"
+									+ subjectId	+ "', objectId '" + objectId 
+									+ "', type '" + type + "', timestamp '" 
+									+ timestamp + "' and info '" + info 
+									+ "' on behalf of requestor '" + requestor 
 									+ "': ITrustEvidenceCollectorRemote service is not available");
-				this.internalTrustEvidenceCollectorRemoteClient.addDirectEvidence(
-						subjectId, objectId, type, timestamp, info, callback);
+				this.trustEvidenceCollectorRemoteClient.addDirectEvidence(
+						requestor, subjectId, objectId, type, timestamp, info,
+						callback);
 				synchronized (callback) {
 					try {
 						callback.wait();
+						if (callback.getException() != null)
+							throw callback.getException();
+						
 					} catch (InterruptedException ie) {
 					throw new TrustEvidenceCollectorException(
-							"Interrupted while adding direct trust evidence with " + subjectId + "'" 
-									+ "' and objectId '" + objectId	+ "'");
+							"Interrupted while adding direct trust evidence with subjectId '"
+									+ subjectId	+ "', objectId '" + objectId 
+									+ "', type '" + type + "', timestamp '" 
+									+ timestamp + "' and info '" + info 
+									+ "' on behalf of requestor '" + requestor + "'");
 					}
 				}
 			}
 			
 		} catch (ServiceUnavailableException sue) {
 			throw new TrustEvidenceCollectorException(
-					"Could not add direct evidence with " + subjectId + "'" 
-							+ "' and objectId '" + objectId 
-							+ "': " + sue.getLocalizedMessage(), sue);
+					"Could not add direct evidence with subjectId '"
+					+ subjectId	+ "', objectId '" + objectId 
+					+ "', type '" + type + "', timestamp '" 
+					+ timestamp + "' and info '" + info 
+					+ "' on behalf of requestor '" + requestor 
+					+ "': " + sue.getLocalizedMessage(), sue);
 		}
 	}
-
+	
 	/*
-	 * @see org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector#addIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector#addIndirectEvidence(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void addIndirectEvidence(final TrustedEntityId subjectId,
-			final TrustedEntityId objectId,	final TrustEvidenceType type,
-			final Date timestamp, final Serializable info,
-			final TrustedEntityId sourceId) throws TrustException {
+	public void addIndirectEvidence(final Requestor requestor, 
+			final TrustedEntityId subjectId, final TrustedEntityId objectId, 
+			final TrustEvidenceType type, final Date timestamp, 
+			final Serializable info, final TrustedEntityId sourceId)
+					throws TrustException {
 		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
 		if (subjectId == null)
 			throw new NullPointerException("subjectId can't be null");
 		if (objectId == null)
@@ -155,15 +222,121 @@ public class InternalTrustEvidenceCollector implements ITrustEvidenceCollector {
 		if (sourceId == null)
 			throw new NullPointerException("sourceId can't be null");
 		
-		final IndirectTrustEvidence evidence = new IndirectTrustEvidence(
-				subjectId, objectId, type, timestamp, info, sourceId);
-		this.trustEvidenceRepository.addEvidence(evidence);
+		this.doAddIndirectEvidence(requestor, subjectId, objectId, type, 
+				timestamp, info, sourceId);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector#addIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	public void addIndirectEvidence(final TrustedEntityId subjectId, 
+			final TrustedEntityId objectId, final TrustEvidenceType type,
+			final Date timestamp, final Serializable info,
+			final TrustedEntityId sourceId)	throws TrustException {
 		
-		// TODO remote
+		if (subjectId == null)
+			throw new NullPointerException("subjectId can't be null");
+		if (objectId == null)
+			throw new NullPointerException("objectId can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+		if (timestamp == null)
+			throw new NullPointerException("timestamp can't be null");
+		
+		this.doAddIndirectEvidence(null, subjectId, objectId, type, timestamp,
+				info, sourceId);
+	}
+
+	/*
+	 * @see org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector#addIndirectEvidence(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector#addIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 */
+	private void doAddIndirectEvidence(Requestor requestor,
+			final TrustedEntityId subjectId, final TrustedEntityId objectId,
+			final TrustEvidenceType type, final Date timestamp, 
+			final Serializable info, final TrustedEntityId sourceId)
+					throws TrustException {
+		
+		if (requestor == null)
+			requestor = this.trustNodeMgr.getLocalRequestor();
+		
+		if (LOG.isDebugEnabled()) 
+			LOG.debug("Adding indirect trust evidence with subjectId '"
+					+ subjectId	+ "', objectId '" + objectId + "', type '" 
+					+ type + "', timestamp '" + timestamp + "', info '" + info
+					+ "' and sourceId '" + sourceId 
+					+ "' on behalf of requestor '" + requestor + "'");
+		
+		try {
+			final boolean doLocal = this.trustNodeMgr.isMaster();
+			if (LOG.isDebugEnabled())
+				LOG.debug("doLocal is " + doLocal);
+			if (doLocal) {
+
+				final IndirectTrustEvidence evidence = new IndirectTrustEvidence(
+						subjectId, objectId, type, timestamp, info, sourceId);
+				if (this.trustEvidenceRepository == null)
+					throw new TrustEvidenceCollectorException(
+							"Could not add indirect evidence with subjectId '"
+									+ subjectId	+ "', objectId '" + objectId 
+									+ "', type '" + type + "', timestamp '" 
+									+ timestamp + "', info '" + info
+									+ "' and sourceId '" + sourceId 
+									+ "' on behalf of requestor '" + requestor
+									+ "': ITrustEvidenceRepository service is not available");
+				this.trustEvidenceRepository.addEvidence(evidence);
+				
+			} else {
+
+				final TrustEvidenceCollectorRemoteCallback callback = 
+						new TrustEvidenceCollectorRemoteCallback();
+				if (this.trustEvidenceCollectorRemoteClient == null)
+					throw new TrustEvidenceCollectorException(
+							"Could not add indirect evidence with subjectId '"
+									+ subjectId	+ "', objectId '" + objectId 
+									+ "', type '" + type + "', timestamp '" 
+									+ timestamp + "', info '" + info
+									+ "' and sourceId '" + sourceId 
+									+ "' on behalf of requestor '" + requestor 
+									+ "': ITrustEvidenceCollectorRemote service is not available");
+				this.trustEvidenceCollectorRemoteClient.addIndirectEvidence(
+						requestor, subjectId, objectId, type, timestamp, info,
+						sourceId, callback);
+				synchronized (callback) {
+					try {
+						callback.wait();
+						if (callback.getException() != null)
+							throw callback.getException();
+						
+					} catch (InterruptedException ie) {
+					throw new TrustEvidenceCollectorException(
+							"Interrupted while adding indirect trust evidence with subjectId '"
+									+ subjectId	+ "', objectId '" + objectId 
+									+ "', type '" + type + "', timestamp '" 
+									+ timestamp + "', info '" + info
+									+ "' and sourceId '" + sourceId 
+									+ "' on behalf of requestor '" + requestor + "'");
+					}
+				}
+			}
+			
+		} catch (ServiceUnavailableException sue) {
+			throw new TrustEvidenceCollectorException(
+					"Could not add indirect evidence with subjectId '"
+					+ subjectId	+ "', objectId '" + objectId 
+					+ "', type '" + type + "', timestamp '" 
+					+ timestamp + "', info '" + info
+					+ "' and sourceId '" + sourceId 
+					+ "' on behalf of requestor '" + requestor 
+					+ "': " + sue.getLocalizedMessage(), sue);
+		}
 	}
 	
 	private class TrustEvidenceCollectorRemoteCallback 
-		implements IInternalTrustEvidenceCollectorRemoteClientCallback {
+		implements ITrustEvidenceCollectorRemoteClientCallback {
+		
+		private TrustException trustException;
 
 		/*
 		 * @see org.societies.privacytrust.trust.api.evidence.remote.ITrustEvidenceCollectorRemoteClientCallback#onAddedDirectEvidence()
@@ -185,6 +358,23 @@ public class InternalTrustEvidenceCollector implements ITrustEvidenceCollector {
 			synchronized (this) {
 	            notifyAll();
 	        }
+		}
+
+		/*
+		 * @see org.societies.privacytrust.trust.api.evidence.remote.ITrustEvidenceCollectorRemoteClientCallback#onException(org.societies.api.privacytrust.trust.TrustException)
+		 */
+		@Override
+		public void onException(TrustException trustException) {
+			
+			this.trustException = trustException;
+			synchronized (this) {
+	            notifyAll();
+	        }
+		}
+		
+		private TrustException getException() {
+			
+			return this.trustException;
 		}
 	}
 }
