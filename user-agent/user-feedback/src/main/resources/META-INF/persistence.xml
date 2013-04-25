@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="2.0">
+
+    <persistence-unit name="HibernatePersistenceUnit">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <properties>
+            <property name="hibernate.connection.url" value="#{jdbc.url}"/>
+            <property name="hibernate.connection.driver_class" value="${jdbc.driverClassName}"/>
+            <property name="hibernate.connection.username" value="${jdbc.username}"/>
+            <property name="hibernate.connection.password" value="${jdbc.password}"/>
+            <property name="hibernate.archive.autodetection" value="class"/>
+            <property name="hibernate.show_sql" value="${show_sql}"/>
+            <property name="hibernate.format_sql" value="${format_sql}"/>
+            <property name="hbm2ddl.auto" value="${hbm2ddl.auto}"/>
+
+        </properties>
+
+        <class>org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent</class>
+        <class>org.societies.api.schema.useragent.feedback.UserFeedbackBean</class>
+
+    </persistence-unit>
+
+</persistence>
+-->

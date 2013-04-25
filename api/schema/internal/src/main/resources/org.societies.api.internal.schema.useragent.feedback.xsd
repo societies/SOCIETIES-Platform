@@ -1,54 +1,66 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema version="1.0" elementFormDefault="qualified"
-	targetNamespace="http://societies.org/api/internal/schema/useragent/feedback"
-	xmlns:tns="http://societies.org/api/internal/schema/useragent/feedback"
-	xmlns="http://societies.org/api/internal/schema/useragent/feedback"
-	xmlns:ns1="http://societies.org/api/schema/identity" 
-	xmlns:ns2="http://societies.org/api/schema/privacytrust/privacy/model/privacypolicy"
-	xmlns:ns3="http://societies.org/api/schema/useragent/feedback"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+           targetNamespace="http://societies.org/api/internal/schema/useragent/feedback"
+           xmlns="http://societies.org/api/internal/schema/useragent/feedback"
+           xmlns:ns1="http://societies.org/api/schema/identity"
+           xmlns:ns2="http://societies.org/api/schema/privacytrust/privacy/model/privacypolicy"
+           xmlns:ns3="http://societies.org/api/schema/useragent/feedback"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-	<xs:import namespace="http://societies.org/api/schema/identity"
-		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.identity.xsd" />
-		
-	<xs:import namespace="http://societies.org/api/schema/privacytrust/privacy/model/privacypolicy"
-		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.privacytrust.privacy.model.privacypolicy.xsd"/>
-		
-	<xs:import namespace="http://societies.org/api/schema/useragent/feedback"
-		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.useragent.feedback.xsd"/>
+    <xs:import namespace="http://societies.org/api/schema/identity"
+               schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.identity.xsd"/>
 
-	<xs:element name="userFeedbackPrivacyNegotiationEvent">
-		<xs:complexType >
-			<xs:sequence>
-				<xs:element name="method" type="ns3:feedbackMethodType"
-					minOccurs="0" />
-				<xs:element name="requestId" type="xs:string" minOccurs="0" />
-				<xs:element name="type" type="xs:int" />
-				<xs:element name="responsePolicy" type="ns2:responsePolicy" minOccurs="1" maxOccurs="1"/>
-				<xs:element name="negotiationDetails" type="negotiationDetailsBean" minOccurs="1" maxOccurs="1"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
+    <xs:import namespace="http://societies.org/api/schema/privacytrust/privacy/model/privacypolicy"
+               schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.privacytrust.privacy.model.privacypolicy.xsd"/>
 
-	<xs:complexType name="negotiationDetailsBean">
-		<xs:sequence>
-			<xs:element name="negotiationID" type="xs:int" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="requestor" type="ns1:requestorBean" minOccurs="1" maxOccurs="1"/>		
-		</xs:sequence>
-	</xs:complexType>
-	
-	<xs:element name="userFeedbackAccessControlEvent">
-		<xs:complexType >
-			<xs:sequence>
-				<xs:element name="method" type="ns3:feedbackMethodType"
-					minOccurs="0" />
-				<xs:element name="requestId" type="xs:string" minOccurs="0" />
-				<xs:element name="type" type="xs:int" />
-				<!-- <xs:element name="requestID" type="xs:string" minOccurs="1" maxOccurs="1" /> -->
-				<xs:element name="responseItems" type="ns2:responseItem" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element name="requestor" type="ns1:requestorBean" minOccurs="1" maxOccurs="1"/>	
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	
+    <xs:import namespace="http://societies.org/api/schema/useragent/feedback"
+               schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.useragent.feedback.xsd"/>
+
+    <xs:element name="userFeedbackPrivacyNegotiationEvent">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="method" type="ns3:feedbackMethodType"
+                            minOccurs="0"/>
+                <xs:element name="stage" type="feedbackStage"
+                            minOccurs="0"/>
+                <xs:element name="requestId" type="xs:string" minOccurs="0"/>
+                <xs:element name="requestDate" type="xs:dateTime" minOccurs="0"/>
+                <xs:element name="type" type="xs:int"/>
+                <xs:element name="responsePolicy" type="ns2:responsePolicy" minOccurs="1" maxOccurs="1"/>
+                <xs:element name="negotiationDetails" type="negotiationDetailsBean" minOccurs="1" maxOccurs="1"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="negotiationDetailsBean">
+        <xs:sequence>
+            <xs:element name="negotiationID" type="xs:int" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="requestor" type="ns1:requestorBean" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="userFeedbackAccessControlEvent">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="method" type="ns3:feedbackMethodType"
+                            minOccurs="0"/>
+                <xs:element name="requestId" type="xs:string" minOccurs="0"/>
+                <xs:element name="type" type="xs:int"/>
+                <!-- <xs:element name="requestID" type="xs:string" minOccurs="1" maxOccurs="1" /> -->
+                <xs:element name="responseItems" type="ns2:responseItem" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="requestor" type="ns1:requestorBean" minOccurs="1" maxOccurs="1"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+
+    <xs:simpleType name="feedbackStage">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="notStarted"/>
+            <xs:enumeration value="pendingUserResponse"/>
+            <xs:enumeration value="completed"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+
 </xs:schema>

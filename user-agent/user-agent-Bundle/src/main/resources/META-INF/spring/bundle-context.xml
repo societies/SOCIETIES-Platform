@@ -1,63 +1,112 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd"
-	xmlns:context="http://www.springframework.org/schema/context">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:spring="http://gate.ac.uk/ns/spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://gate.ac.uk/ns/spring http://gate.ac.uk/ns/spring.xsd"
+        >
 
-	<!-- regular spring configuration file defining the beans for this bundle. 
-		We've kept the osgi definitions in a separate configuration file so that 
-		this file can easily be used for integration testing outside of an OSGi environment -->
+    <!-- regular spring configuration file defining the beans for this bundle.
+        We've kept the osgi definitions in a separate configuration file so that
+        this file can easily be used for integration testing outside of an OSGi environment -->
 
-	<bean id="uam" 
-	    class="org.societies.useragent.monitoring.UserActionMonitor"
-		name="uam" 
-		depends-on="ctxBroker, eventMgr, commsMgr, cssMgr" 
-		init-method="initialiseUserActionMonitor">
-		<property name="ctxBroker" ref="ctxBroker"/>
-		<property name="eventMgr" ref="eventMgr"/>
-		<property name="commsMgr" ref="commsMgr"/>
-		<property name="cssMgr" ref="cssMgr"/>
-	</bean>	
+    <bean id="uam"
+          class="org.societies.useragent.monitoring.UserActionMonitor"
+          name="uam"
+          depends-on="ctxBroker, eventMgr, commsMgr, cssMgr"
+          init-method="initialiseUserActionMonitor">
+        <property name="ctxBroker" ref="ctxBroker"/>
+        <property name="eventMgr" ref="eventMgr"/>
+        <property name="commsMgr" ref="commsMgr"/>
+        <property name="cssMgr" ref="cssMgr"/>
+    </bean>
 
-	<bean id="feedback" 
-	    class="org.societies.useragent.feedback.UserFeedback"
-		name="feedback" 
-		depends-on="ctxBroker, commsMgr, uaRemote" 
-		init-method="initialiseUserFeedback">
-		<property name="ctxBroker" ref="ctxBroker"/>
-		<property name="commsMgr" ref="commsMgr"/>
-		<property name="pubsub" ref="pubsub"/>
-		<property name="uaRemote" ref="uaRemote"/>
-	</bean>
-	
-	<bean id="dm" 
-	    class="org.societies.useragent.decisionmaking.DecisionMaker"
-		name="dm" 
-		depends-on="conflict,feedback">
-		<property name="manager" ref="conflict"/>
-		<property name="feedbackHandler" ref="feedback"/>
-	</bean>
-	
-	<bean id="conflict" 
-	    class="org.societies.useragent.conflict.ConflictResolutionManager"
-	    name="conflict">
-	</bean>
-	
-	<bean id="uaRemote" 
-	    class="org.societies.useragent.comms.UACommsClient" 
-	    depends-on="commsMgr"
-	    init-method="initService">
-  		<property name="commsMgr" ref="commsMgr"/>
-	</bean>
-	
-	<bean id="UACommsServer" 
-	    class="org.societies.useragent.comms.UACommsServer" 
-	    depends-on="commsMgr, uam, feedback"
-	    init-method="initService">
-	    <property name="commsMgr" ref="commsMgr"/>
-	    <property name="uam" ref="uam"/>
-	    <property name="feedback" ref="feedback"/>
-	</bean>
-	
+    <bean id="feedback"
+          class="org.societies.useragent.feedback.UserFeedback"
+          name="feedback"
+          depends-on="ctxBroker, commsMgr, uaRemote"
+          init-method="initialiseUserFeedback">
+        <property name="ctxBroker" ref="ctxBroker"/>
+        <property name="commsMgr" ref="commsMgr"/>
+        <property name="pubsub" ref="pubsub"/>
+        <property name="uaRemote" ref="uaRemote"/>
+    </bean>
+
+    <bean id="dm"
+          class="org.societies.useragent.decisionmaking.DecisionMaker"
+          name="dm"
+          depends-on="conflict,feedback">
+        <property name="manager" ref="conflict"/>
+        <property name="feedbackHandler" ref="feedback"/>
+    </bean>
+
+    <bean id="conflict"
+          class="org.societies.useragent.conflict.ConflictResolutionManager"
+          name="conflict">
+    </bean>
+
+    <bean id="uaRemote"
+          class="org.societies.useragent.comms.UACommsClient"
+          depends-on="commsMgr"
+          init-method="initService">
+        <property name="commsMgr" ref="commsMgr"/>
+    </bean>
+
+    <bean id="UACommsServer"
+          class="org.societies.useragent.comms.UACommsServer"
+          depends-on="commsMgr, uam, feedback"
+          init-method="initService">
+        <property name="commsMgr" ref="commsMgr"/>
+        <property name="uam" ref="uam"/>
+        <property name="feedback" ref="feedback"/>
+    </bean>
+
+    <bean id="sessionFactory"
+          class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+
+        <property name="annotatedClasses">
+            <list>
+                <value>org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent</value>
+                <value>org.societies.api.schema.useragent.feedback.UserFeedbackBean</value>
+            </list>
+        </property>
+
+        <!--<property name="annotatedPackages">
+            <list>
+                <value>org.societies.cis.directory.model</value>
+            </list>
+        </property>-->
+
+        <property name="hibernateProperties">
+            <props>
+                <!-- <prop key="hibernate.dialect">${hibernate.dialect}</prop>
+                <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
+                <prop key="hibernate.jdbc.batch_size">0</prop> -->
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.cache.use_second_level_cache">false</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="hibernate.format_sql">true</prop>
+            </props>
+        </property>
+
+        <property name="mappingDirectoryLocations" value="classpath:META-INF/hibernate"/>
+
+        <!--<property name="mappingResources">
+            <list>
+                <value>META-INF/hibernate/UserFeedbackBean.hbm.xml</value>
+            </list>
+        </property>-->
+
+    </bean>
+
+    <bean id="userFeedbackHistoryRepositoryBean"
+          class="org.societies.useragent.feedback.UserFeedbackHistoryRepository">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <bean id="privacyPolicyNegotiationHistoryRepositoryBean"
+          class="org.societies.useragent.feedback.PrivacyPolicyNegotiationHistoryRepository">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+
 </beans>
