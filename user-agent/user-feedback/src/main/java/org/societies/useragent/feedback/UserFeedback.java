@@ -720,7 +720,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         event.setResponsePolicy(policy);
         try {
             this.pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION, null, event);
-            while (!this.containsKey(details)) {
+            while (!containsKey(negotiationResults, details)) {
                 synchronized (this.negotiationResults) {
                     try {
                         this.negotiationResults.wait();
@@ -743,8 +743,8 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         return new AsyncResult<ResponsePolicy>(negotiationResults.get(details));
     }
 
-    private boolean containsKey(NegotiationDetailsBean details) {
-        for (NegotiationDetailsBean next : this.negotiationResults.keySet()) {
+    private static boolean containsKey(Map<NegotiationDetailsBean, ResponsePolicy> negotiationResults, NegotiationDetailsBean details) {
+        for (NegotiationDetailsBean next : negotiationResults.keySet()) {
             if (RequestorUtils.equals(next.getRequestor(), details.getRequestor())) {
                 if (next.getNegotiationID() == details.getNegotiationID()) {
                     return true;
