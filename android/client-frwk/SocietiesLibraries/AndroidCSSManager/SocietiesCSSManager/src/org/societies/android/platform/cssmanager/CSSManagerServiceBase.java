@@ -1850,10 +1850,11 @@ public class CSSManagerServiceBase implements IAndroidCSSManager {
 			if (DEBUG_LOGGING) {
 				Log.d(LOG_TAG, "CSSManagerEventsReceiver received action: " + intent.getAction());
 			}
-//			if (intent.getAction().equals(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT) ||
-//					intent.getAction().equals(IAndroidSocietiesEvents.CSS_MANAGER_DEPART_CSS_NODE_EVENT)) {
-//				CSSManagerServiceBase.this.synchProfile(CSSManagerServiceBase.this.context.getApplicationContext().getPackageName(), new CssRecord());
-//			}
+			if (intent.getAction().equals(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT) ||
+					intent.getAction().equals(IAndroidSocietiesEvents.CSS_MANAGER_DEPART_CSS_NODE_EVENT)) {
+				
+				CSSManagerServiceBase.this.synchProfile(CSSManagerServiceBase.this.context.getApplicationContext().getPackageName(), new CssRecord());
+			}
 		}
     }
 

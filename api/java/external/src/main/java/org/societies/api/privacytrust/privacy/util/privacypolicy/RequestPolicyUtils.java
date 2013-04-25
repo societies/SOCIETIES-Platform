@@ -116,7 +116,7 @@ public class RequestPolicyUtils {
 		if (o1 == o2) { return true; }
 		if (o2 == null) { return false; }
 		if (o1 == null) { return false; }
-		if (o1.getClass() != o2.getClass()) { return false; }
+		if (!(o2 instanceof List)) { return false; }
 		// -- Verify obj type
 		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy> ro2 = (List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy>) o2;
 		if (o1.size() != ro2.size()) {

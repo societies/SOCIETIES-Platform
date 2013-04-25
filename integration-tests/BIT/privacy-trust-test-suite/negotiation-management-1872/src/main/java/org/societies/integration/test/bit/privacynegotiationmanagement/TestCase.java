@@ -31,8 +31,10 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
+import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.integration.test.IntegrationTestCase;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The test case 1872 aims to test the privacy negotiation management
@@ -47,6 +49,8 @@ public class TestCase extends IntegrationTestCase {
 	private static Logger LOG = LoggerFactory.getLogger(TestCase.class);
 
 	public static IPrivacyPolicyManager privacyPolicyManager;
+	@Autowired
+	public static IPrivacyPolicyManagerRemote privacyPolicyManagerRemote;
 	public static IPrivacyAgreementManager privacyAgreementManager;
 	public static IPrivacyPolicyNegotiationManager privacyPolicyNegotiationManager;
 	public static ICommManager commManager;
