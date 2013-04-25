@@ -37,7 +37,7 @@ import org.societies.integration.test.bit.ctx_3pBroker.Tester;
  * @author nikosk
  *
  */
-public class Test1337 extends IntegrationTestCase{
+public class Test1858 extends IntegrationTestCase {
 
 	
 	public static ICtxBroker ctxBroker;
@@ -45,9 +45,11 @@ public class Test1337 extends IntegrationTestCase{
 	public static ICisManager cisManager;
 	
 	
-	public Test1337(){
-		super(1858, new Class[]{Tester.class});
+	public Test1858(){
+		super(1337, new Class[]{Tester.class});
+		
 	}
+	
 
 	/**
 	 * @return the ctxBroker
@@ -60,7 +62,7 @@ public class Test1337 extends IntegrationTestCase{
 	 * @param ctxBroker the ctxBroker to set
 	 */
 	public  void setCtxBroker(ICtxBroker ctxBroker) {
-		Test1337.ctxBroker = ctxBroker;
+		Test1858.ctxBroker = ctxBroker;
 
 	}
 	
@@ -75,7 +77,7 @@ public class Test1337 extends IntegrationTestCase{
 	 * @param commMgr the commMgr to set
 	 */
 	public  void setCommManager(ICommManager commMgr) {
-		Test1337.commManager = commMgr;
+		Test1858.commManager = commMgr;
 	}		
 
 	public static ICisManager getCisManager() {
@@ -84,7 +86,7 @@ public class Test1337 extends IntegrationTestCase{
 
 	public void setCisManager(ICisManager cisManager) {
 		
-		Test1337.cisManager = cisManager;
+		Test1858.cisManager = cisManager;
 	}
 
 }
