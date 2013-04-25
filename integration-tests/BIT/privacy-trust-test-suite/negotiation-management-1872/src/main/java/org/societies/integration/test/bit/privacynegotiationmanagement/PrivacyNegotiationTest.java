@@ -91,13 +91,13 @@ public class PrivacyNegotiationTest {
 	/**
 	 * Asynchronous helper
 	 */
-	private static CountDownLatch lock = new CountDownLatch(1);
+	private CountDownLatch lock;
 	/**
 	 * Received data from the asynchronous call
 	 */
-	private static boolean negotiationResult;
-	private static EventListener eventListener;
-	private static String[] eventListened;
+	private boolean negotiationResult;
+	private EventListener eventListener;
+	private String[] eventListened;
 
 	private RequestorService requestorService;
 	private RequestorCis requestorCis;
@@ -113,47 +113,22 @@ public class PrivacyNegotiationTest {
 	private CtxAttributeIdentifier ctxStatusAttributeId;
 	private CtxAttribute statusAttribute;
 
-
-	@BeforeClass
-	public static void setUpClass() {
-		String testTitle = new String("setUpClass");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-
-		// -- Subscribe to Negotiation Events
-		eventListener = new EventListener() {
-			@Override
-			public void handleInternalEvent(InternalEvent event) {
-				String type = event.geteventType();
-				LOG.info("[#"+testCaseNumber+"][Event] Internal event received: "+type);
-				negotiationResult = false;
-				// Negotiation Finished
-				if (type.equals(EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT)) {
-					PPNegotiationEvent evenInfo = (PPNegotiationEvent) event.geteventInfo();
-					// Success
-					if (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.NegotiationStatus.SUCCESSFUL.name().equals(evenInfo.getNegotiationStatus().name())) {
-						negotiationResult = true;
-					}
-				}
-				lock.countDown();
-			}
-			@Override
-			public void handleExternalEvent(CSSEvent event) { }
-		};
-		eventListened = new String[] {
-				EventTypes.FAILED_NEGOTIATION_EVENT,
-				EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT
-		};
-		TestCase.eventManager.subscribeInternalEvent(eventListener, eventListened, null);
-	}
-
-	@AfterClass
-	public static void tearDownClass() {
-		String testTitle = new String("tearDownClass");
-		LOG.info("[#"+testCaseNumber+"] "+testTitle);
-
-		// -- Unlisten events
-		TestCase.eventManager.unSubscribeInternalEvent(eventListener, eventListened, null);
-	}
+	//
+	//	@BeforeClass
+	//	public static void setUpClass() {
+	//		String testTitle = new String("setUpClass");
+	//		LOG.info("[#"+testCaseNumber+"] "+testTitle);
+	//
+	//
+	//	}
+	//
+	//	@AfterClass
+	//	public static void tearDownClass() {
+	//		String testTitle = new String("tearDownClass");
+	//		LOG.info("[#"+testCaseNumber+"] "+testTitle);
+	//
+	//		
+	//	}
 
 	@Before
 	public void setUp() {
@@ -167,7 +142,35 @@ public class PrivacyNegotiationTest {
 		}
 
 		// -- Events
+		lock = new CountDownLatch(1);
 		negotiationResult = false;
+		// -- Subscribe to Negotiation Events
+		eventListener = new EventListener() {
+			@Override
+			public void handleInternalEvent(InternalEvent event) {
+				String type = event.geteventType();
+				LOG.info("[#"+testCaseNumber+"][Event] Internal event received: "+type);
+				negotiationResult = false;
+				// Negotiation Finished
+				if (type.equals(EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT)) {
+					PPNegotiationEvent evenInfo = (PPNegotiationEvent) event.geteventInfo();
+					LOG.info("[#"+testCaseNumber+"][Event] "+evenInfo.getNegotiationStatus());
+					// Success
+					if (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.NegotiationStatus.SUCCESSFUL.name().equals(evenInfo.getNegotiationStatus().name())) {
+						negotiationResult = true;
+					}
+				}
+				LOG.info("[#"+testCaseNumber+"][Event] "+negotiationResult);
+				lock.countDown();
+			}
+			@Override
+			public void handleExternalEvent(CSSEvent event) { }
+		};
+		eventListened = new String[] {
+				EventTypes.FAILED_NEGOTIATION_EVENT,
+				EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT
+		};
+		TestCase.eventManager.subscribeInternalEvent(eventListener, eventListened, null);
 
 		// -- Add privacy policies
 		try {
@@ -179,6 +182,14 @@ public class PrivacyNegotiationTest {
 			requestorCis = getRequestorCis();
 			cisPrivacyPolicy = getCisPolicy();
 			TestCase.privacyPolicyManager.updatePrivacyPolicy(cisPrivacyPolicy);
+			RequestPolicy updatedPrivacyPolicy = TestCase.privacyPolicyManager.getPrivacyPolicy(requestorCis);
+			assertNotNull("Retrieved privacy policy should not be null", updatedPrivacyPolicy);
+			assertNotNull("Retrieved privacy policy items should not be null", updatedPrivacyPolicy.getRequests());
+			assertTrue("Retrieved privacy policy items should not be empty", updatedPrivacyPolicy.getRequests().size() > 0);
+//			RequestPolicy updatedPrivacyPolicy = TestCase.privacyPolicyManagerRemote.getPrivacyPolicy(requestorCis);
+//			assertNotNull("Retrieved privacy policy should not be null", updatedPrivacyPolicy);
+//			assertNotNull("Retrieved privacy policy items should not be null", updatedPrivacyPolicy.getRequests());
+//			assertTrue("Retrieved privacy policy items should not be empty", updatedPrivacyPolicy.getRequests().size() > 0);
 		} catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Error PrivacyException] "+testTitle, e);
 			fail("Error PrivacyException: "+e.getLocalizedMessage()+" - "+testTitle);
@@ -212,6 +223,9 @@ public class PrivacyNegotiationTest {
 			LOG.error("[#"+testCaseNumber+"] [Error PrivacyException] "+testTitle, e);
 			fail("Error PrivacyException: "+e.getMessage()+" - "+testTitle);
 		}
+
+		// -- Unlisten events
+		TestCase.eventManager.unSubscribeInternalEvent(eventListener, eventListened, null);
 	}
 
 
@@ -259,20 +273,19 @@ public class PrivacyNegotiationTest {
 	}
 
 	@Test
-	public void testStartNegotiationCisFaillure() {
+	public void testStartNegotiationCisRefused() {
 		String testTitle = new String("Start Negotiation CIS: refused");
 		LOG.info("[#"+testCaseNumber+"][Test] "+testTitle);
 
 		AgreementEnvelope retrievedPrivacyAgreement = null;
 		try {
 			// -- Mock Userfeedback
-			//			org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy responsePolicy = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy();
-			//			responsePolicy.setRequestor(RequestorUtils.toRequestorBean(requestorCis));
-			//			responsePolicy.setNegotiationStatus(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.NegotiationStatus.SUCCESSFUL);
-			//			List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> responseItems = new ArrayList<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem>();
-			//			responsePolicy.setResponseItems(responseItems);
-			UserFeedbackMockResult mockResult = new UserFeedbackMockResult(1);
-//			mockResult.addResultIndexes(1);
+			org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy responsePolicy = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy();
+			responsePolicy.setRequestor(RequestorUtils.toRequestorBean(requestorCis));
+			responsePolicy.setNegotiationStatus(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.NegotiationStatus.FAILED);
+			List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> responseItems = new ArrayList<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem>();
+			responsePolicy.setResponseItems(responseItems);
+			UserFeedbackMockResult mockResult = new UserFeedbackMockResult(1, responsePolicy);
 			TestCase.getUserFeedbackMocker().addReply(UserFeedbackType.PRIVACY_NEGOTIATION, mockResult);
 
 			// -- Launch negotiation
@@ -291,11 +304,52 @@ public class PrivacyNegotiationTest {
 
 			// Check Agreement
 			retrievedPrivacyAgreement = TestCase.privacyAgreementManager.getAgreement(requestorCis);
-			assertNotNull("Privacy agreement should not be null", retrievedPrivacyAgreement);
-			assertNotNull("Privacy agreement (agreement) should not be null", retrievedPrivacyAgreement.getAgreement());
-			assertNotNull("Privacy agreement response items should not be null", retrievedPrivacyAgreement.getAgreement().getRequestedItems());
-			LOG.debug("[#"+testCaseNumber+"] Resultant agreement: "+ResponseItemUtils.toXmlString(retrievedPrivacyAgreement.getAgreement().getRequestedItems()));
-			//			assertTrue("Privacy agreement response items should be empty", retrievedPrivacyAgreement.getAgreement().getRequestedItems().size() == 0);
+			assertNull("Privacy agreement should be null", retrievedPrivacyAgreement);
+		}
+		catch (PrivacyException e) {
+			LOG.error("[#"+testCaseNumber+"] [Error PrivacyException] "+testTitle, e);
+			fail("Error PrivacyException: "+e.getMessage()+" - "+testTitle);
+		}
+		catch (Exception e) {
+			LOG.error("[#"+testCaseNumber+"] [Error Exception] "+testTitle, e);
+			fail("Error Exception: "+e.getMessage()+" - "+testTitle);
+		}
+	}
+
+	@Test
+	public void testStartNegotiationCisFaillure() {
+		String testTitle = new String("Start Negotiation CIS: faillure");
+		LOG.info("[#"+testCaseNumber+"][Test] "+testTitle);
+
+		AgreementEnvelope retrievedPrivacyAgreement = null;
+		try {
+			// -- Mock Userfeedback
+			//			org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy responsePolicy = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy();
+			//			responsePolicy.setRequestor(RequestorUtils.toRequestorBean(requestorCis));
+			//			responsePolicy.setNegotiationStatus(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.NegotiationStatus.SUCCESSFUL);
+			//			List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> responseItems = new ArrayList<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem>();
+			//			responsePolicy.setResponseItems(responseItems);
+			UserFeedbackMockResult mockResult = new UserFeedbackMockResult(1);
+			mockResult.addResultIndexes(1);
+			TestCase.getUserFeedbackMocker().addReply(UserFeedbackType.PRIVACY_NEGOTIATION, mockResult);
+
+			// -- Launch negotiation
+			int negotiationId = new Random().nextInt();
+			TestCase.privacyPolicyNegotiationManager.negotiateCISPolicy(new NegotiationDetails(requestorCis, negotiationId));
+
+			// -- Test
+			// Negotiation Result
+			boolean releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			// Check timeout
+			if (!releaseBeforeTimeout) {
+				// Do stuff
+				fail("Timeout");
+			}
+			assertFalse("Negotiation should have failled", negotiationResult);
+
+			// Check Agreement
+			retrievedPrivacyAgreement = TestCase.privacyAgreementManager.getAgreement(requestorCis);
+			assertNull("Privacy agreement should be null", retrievedPrivacyAgreement);
 		}
 		catch (PrivacyException e) {
 			LOG.error("[#"+testCaseNumber+"] [Error PrivacyException] "+testTitle, e);
@@ -365,7 +419,8 @@ public class PrivacyNegotiationTest {
 
 	private RequestorCis getRequestorCis() throws InvalidFormatException {
 		IIdentity requestorId = TestCase.commManager.getIdManager().getThisNetworkNode();
-		IIdentity cisId =TestCase.commManager.getIdManager().fromJid("lions.societies.local");
+		int randomInt = new Random().nextInt();
+		IIdentity cisId =TestCase.commManager.getIdManager().fromJid("cis-"+randomInt+".societies.local");
 		return new RequestorCis(requestorId, cisId);
 	}
 
@@ -378,9 +433,9 @@ public class PrivacyNegotiationTest {
 		actions.add(new Action(ActionConstants.READ));
 		List<Condition> conditions = new ArrayList<Condition>();
 		conditions.add(new Condition(ConditionConstants.DATA_RETENTION_IN_HOURS, "48"));
-		conditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "YES"));
-		conditions.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "YES"));
-		conditions.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "YES"));
+		conditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1"));
+		conditions.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
+		conditions.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "1"));
 		RequestItem itemLocation = new RequestItem(rLocation, actions, conditions);
 
 
@@ -393,10 +448,10 @@ public class PrivacyNegotiationTest {
 		actions1.add(new Action(ActionConstants.READ));
 		List<Condition> conditions1 = new ArrayList<Condition>();
 		conditions1.add(new Condition(ConditionConstants.DATA_RETENTION_IN_HOURS, "48"));
-		conditions1.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "YES"));
-		conditions1.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "YES"));
-		conditions1.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "YES"));
-		RequestItem itemStatus = new RequestItem(rStatus, actions1, conditions1);
+		conditions1.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1"));
+		conditions1.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
+		conditions1.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "1"));
+		RequestItem itemStatus = new RequestItem(rStatus, actions1, conditions1, true);
 
 		/* ----------------------------------------------------*/
 
@@ -441,9 +496,9 @@ public class PrivacyNegotiationTest {
 		actions.add(new Action(ActionConstants.READ));
 		List<Condition> conditions = new ArrayList<Condition>();
 		conditions.add(new Condition(ConditionConstants.DATA_RETENTION_IN_HOURS, "48"));
-		conditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "YES"));
-		conditions.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "YES"));
-		conditions.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "YES"));
+		conditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1"));
+		conditions.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
+		conditions.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "1"));
 		RequestItem itemLocation = new RequestItem(rLocation, actions, conditions, true);
 
 
@@ -455,9 +510,9 @@ public class PrivacyNegotiationTest {
 		actions1.add(new Action(ActionConstants.READ));
 		List<Condition> conditions1 = new ArrayList<Condition>();
 		conditions1.add(new Condition(ConditionConstants.DATA_RETENTION_IN_HOURS, "48"));
-		conditions1.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "YES"));
-		conditions1.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "YES"));
-		conditions1.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "YES"));
+		conditions1.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1"));
+		conditions1.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "1"));
+		conditions1.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "1"));
 		RequestItem itemStatus = new RequestItem(rStatus, actions1, conditions1, true);
 
 		/*
@@ -469,9 +524,9 @@ public class PrivacyNegotiationTest {
 		actions2.add(new Action(ActionConstants.CREATE));
 		List<Condition> conditions2 = new ArrayList<Condition>();
 		conditions2.add(new Condition(ConditionConstants.DATA_RETENTION_IN_HOURS, "48"));
-		conditions2.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "YES"));
-		conditions2.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "NO"));
-		conditions2.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "YES"));
+		conditions2.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES, "1"));
+		conditions2.add(new Condition(ConditionConstants.STORE_IN_SECURE_STORAGE, "0"));
+		conditions2.add(new Condition(ConditionConstants.RIGHT_TO_OPTOUT, "1"));
 		RequestItem itemBirthday = new RequestItem(rBirthday, actions2, conditions2, true);
 
 		/* ----------------------------------------------------*/

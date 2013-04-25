@@ -237,8 +237,16 @@ public class IndirectTrustEvidenceMonitor implements ITrustUpdateEventListener {
 					+ subjectId + ", objectId="	+ objectId 
 					+ ", type=" + type + ", ts=" + ts + ", trustValue=" 
 					+ trustValue + ", sourceId=" + sourceId);
-		this.trustEvidenceCollector.addIndirectEvidence(subjectId, objectId,
-				type, ts, trustValue, sourceId);
+		// Ignore evidence where subjectId == objectId
+		if (!subjectId.equals(objectId))
+			this.trustEvidenceCollector.addIndirectEvidence(subjectId, 
+					objectId, type, ts, trustValue, sourceId);
+		else
+			if (LOG.isDebugEnabled())
+				LOG.debug("Ignoring indirect trust evidence: subjectId="
+						+ subjectId + ", objectId="	+ objectId 
+						+ ", type=" + type + ", ts=" + ts + ", trustValue=" 
+						+ trustValue + ", sourceId=" + sourceId);
 	}
 	
 	private void retrieveOpinions(final TrustedEntityId connectionId)

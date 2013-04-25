@@ -31,6 +31,7 @@
 	<bean id="TestCase1337" class="org.societies.integration.test.bit.ctx_3pBroker.Test1337" init-method="run">
 		<property name="ctxBroker" ref ="ctxBroker" />
 		<property name="commManager" ref="commManager" />
+		<property name="cisManager" ref="cisManager" />
 		 
   	</bean>
   	
