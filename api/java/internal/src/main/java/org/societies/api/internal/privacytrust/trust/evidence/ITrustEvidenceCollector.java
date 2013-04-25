@@ -24,12 +24,92 @@
  */
 package org.societies.api.internal.privacytrust.trust.evidence;
 
+import java.io.Serializable;
+import java.util.Date;
+
+import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+
 /**
- * Describe your class here...
+ * This interface extends the external 
+ * {@link org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector
+ * ITrustEvidenceCollector} interface.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.2
  */
 public interface ITrustEvidenceCollector extends 
 	org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector {
+	
+	/**
+	 * Adds the specified piece of direct trust evidence. The
+	 * {@link TrustedEntityId TrustedEntityIds} of the subject and the object
+	 * this piece of evidence refers to, its type, as well as, the time the
+	 * evidence was recorded must be supplied. Finally, depending on the
+	 * evidence type, the method allows specifying supplementary information.
+	 *  
+	 * @param subjectId
+	 *            (required) the {@link TrustedEntityId} of the subject this 
+	 *            piece of direct trust evidence refers to.
+	 * @param objectId
+	 *            (required) the {@link TrustedEntityId} of the object this
+	 *            piece of direct trust evidence refers to.
+	 * @param type
+	 *            (required) the type of the piece of direct trust evidence to
+	 *            be added.
+	 * @param timestamp
+	 *            (required) the time this piece of direct trust evidence was
+	 *            recorded.
+	 * @param info
+	 *            (optional) supplementary information if applicable; 
+	 *            <code>null</code> otherwise.
+	 * @throws TrustException
+	 *            if the specified piece of direct trust evidence cannot be
+	 *            added.
+	 * @throws NullPointerException
+	 *            if any of the required parameters is <code>null</code>.
+	 * @since 1.1
+	 */
+	public void addDirectEvidence(final TrustedEntityId subjectId,
+			final TrustedEntityId objectId, final TrustEvidenceType type,
+			final Date timestamp, final Serializable info) 
+					throws TrustException;
+	
+	/**
+	 * Adds the specified piece of indirect trust evidence which originates
+	 * from the given source. The {@link TrustedEntityId TrustedEntityIds} of
+	 * the subject and the object this piece of evidence refers to, its type,
+	 * as well as, the time the evidence was recorded are also supplied. 
+	 * Finally, depending on the evidence type, the method allows specifying
+	 * supplementary information.
+	 *  
+	 * @param subjectId
+	 *            (required) the {@link TrustedEntityId} of the subject this 
+	 *            piece of indirect trust evidence refers to.
+	 * @param objectId
+	 *            (required) the {@link TrustedEntityId} of the object this
+	 *            piece of indirect trust evidence refers to.
+	 * @param type
+	 *            (required) the type of the piece of indirect trust evidence
+	 *            to be added.
+	 * @param timestamp
+	 *            (required) the time this piece of indirect trust evidence was
+	 *            recorded.
+	 * @param info
+	 *            (optional) supplementary information if applicable; 
+	 *            <code>null</code> otherwise.
+	 * @param sourceId
+	 *            (required) the {@link TrustedEntityId} of the source this
+	 *            piece of indirect trust evidence originates from.
+	 * @throws TrustException
+	 *            if the specified piece of trust evidence cannot be added.
+	 * @throws NullPointerException
+	 *            if any of the required parameters is <code>null</code>.
+	 * @since 1.1
+	 */
+	public void addIndirectEvidence(final TrustedEntityId subjectId,
+			final TrustedEntityId objectId, final TrustEvidenceType type,
+			final Date timestamp, final Serializable info, 
+			final TrustedEntityId sourceId)	throws TrustException;
 }
