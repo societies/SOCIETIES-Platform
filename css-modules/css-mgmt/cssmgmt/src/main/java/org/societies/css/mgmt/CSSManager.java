@@ -34,8 +34,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.shindig.social.opensocial.model.Person;
 import org.slf4j.Logger;
@@ -46,6 +48,8 @@ import org.societies.api.activity.IActivityFeedManager;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
+import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -66,6 +70,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
@@ -3163,5 +3168,140 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		}
 		return listSchemaActivities;
 	}
+	
+	@Override
+	@Async
+	public Future<HashMap<String, Integer>> getUserSNSDetails(FriendFilter filter) 
+	{
+
+		HashMap<String, Integer> resultList = new HashMap<String, Integer>();
+		List<String> suggestionsIDs = new ArrayList<String>();
+	
+		
+		//Check if the CIS_MEMBERS_BIT is set if it is use this as the base group
+		if ((filter.getFilterFlag() & BitCompareUtil.CIS_MEMBERS_BIT) == BitCompareUtil.CIS_MEMBERS_BIT)
+		{
+			// Checking Cis Member list
+			ICis iCis = this.getCisManager().getCis(filter.getCis_Jids()[0].getBareJid());
+		
+			if (iCis != null)
+			{	
+				//TODO : add as member variable
+				Requestor platformRequestor = new Requestor(getCommManager().getIdManager().getThisNetworkNode());
+			
+				CssManagerCisCallback cisCallback = new CssManagerCisCallback();
+				iCis.getListOfMembers(platformRequestor, cisCallback.iCisManagerCallback);
+			
+				try {
+					cisCallback.cisManagerCallbackSignal.await(); 
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			
+				if (cisCallback.bResponseReceived && cisCallback.memberList != null)
+				{
+					for (int i = 0; i < cisCallback.memberList.size(); i++) {
+						suggestionsIDs.add(cisCallback.memberList.get(i).getJid());
+					}
+				}	
+				cisCallback = null;
+				
+			}
+			if (suggestionsIDs.size() == 0)
+				return new AsyncResult<HashMap<String, Integer>>(resultList);  // don't bother continuing, list is empty
+	
+		}
+	
+	
+		CssDirectoryRemoteClient cssDirCallback = new CssDirectoryRemoteClient();
+
+		if (suggestionsIDs.size() > 0)
+			getCssDirectoryRemote().searchByID(suggestionsIDs, cssDirCallback);
+		else
+			getCssDirectoryRemote().findAllCssAdvertisementRecords(cssDirCallback);
+	
+		List<CssAdvertisementRecord> advertList = cssDirCallback.getResultList();
+	
+		
+		String currentUserID = getCommManager().getIdManager().getThisNetworkNode().getBareJid();
+		for (int i = 0; i < advertList.size(); i++)
+		{
+			if (!currentUserID.equalsIgnoreCase(advertList.get(i).getId()))
+				resultList.put(advertList.get(i).getId(), 0);
+		}
+
+		List<Person> snsFriends = (List<Person>) getSocialData().getSocialPeople();
+		
+		if ((snsFriends == null) || (snsFriends.size() == 0))
+			return new AsyncResult<HashMap<String, Integer>>(resultList); 
+		
+		boolean ignore = true; // assume we are going to ignore them
+		int flagInc = 0;
+		int checkPos = 0;
+		String tmpName = null;
+		String snsID = null;
+		
+		for ( int index = 0; index < snsFriends.size(); index++)
+		{
+			if ((snsFriends.get(index).getId() != null) && (snsFriends.get(index).getId().length() > 0)) {
+				// check if it's a social connecter we are interested in
+				checkPos = snsFriends.get(index).getId().indexOf(':');
+			
+				if (checkPos > 0)
+					snsID = snsFriends.get(index).getId().substring(0, checkPos);
+				else
+					snsID = snsFriends.get(index).getId();
+			
+			
+				ignore = true; // assume we are going to ignore them
+				flagInc = 0;
+			
+				if(snsID.equalsIgnoreCase("facebook") && (filter.getFilterFlag() & BitCompareUtil.FACEBOOK_BIT) == BitCompareUtil.FACEBOOK_BIT) {
+					ignore = false;
+					// Assuming that each entry cossepsonds to one sns connection
+					flagInc = BitCompareUtil.FACEBOOK_BIT;
+				}else if(snsID.equalsIgnoreCase("twitter") && (filter.getFilterFlag() & BitCompareUtil.TWITTER_BIT) == BitCompareUtil.TWITTER_BIT) {
+					ignore = false;
+					flagInc = BitCompareUtil.TWITTER_BIT;
+				}else if(snsID.equalsIgnoreCase("linkedin") && (filter.getFilterFlag() & BitCompareUtil.LINKEDIN_BIT) == BitCompareUtil.LINKEDIN_BIT) {
+					ignore = false;
+					flagInc = BitCompareUtil.LINKEDIN_BIT;
+				}else if(snsID.equalsIgnoreCase("foursquare") && (filter.getFilterFlag() & BitCompareUtil.FOURSQUARE_BIT) == BitCompareUtil.FOURSQUARE_BIT) {
+					ignore = false;
+					flagInc = BitCompareUtil.FOURSQUARE_BIT;
+				}else if(snsID.equalsIgnoreCase("googleplus") && (filter.getFilterFlag() & BitCompareUtil.GOOGLEPLUS_BIT) == BitCompareUtil.GOOGLEPLUS_BIT) {
+					ignore = false;	
+					flagInc = BitCompareUtil.GOOGLEPLUS_BIT;
+				}
+			
+				if ((!ignore) && (snsFriends.get(index).getName() != null))
+				{	
+					tmpName = snsFriends.get(index).getName().getFormatted();
+					// search css
+					if (tmpName != null && !tmpName.isEmpty())
+					{
+						for (int i = 0; i < advertList.size(); i++)
+						{
+							if (tmpName.equalsIgnoreCase(advertList.get(i).getName()))
+							{
+								//got match
+								int value = resultList.get(advertList.get(i).getId());
+								if ((value & flagInc) != flagInc) // just in case SN friends are repeated for a SC
+								{
+									value += flagInc;
+									resultList.put(advertList.get(i).getId(), value);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	
+
+    	return new AsyncResult<HashMap<String, Integer>> (resultList);
+	}
+	
+	
 	
 }

@@ -56,4 +56,7 @@ public interface ICSSManager {
 	 */
 	public void sendCSSFriendRequest(IIdentity friendId, RequestorService service);
 	
+	public Future<HashMap<String, Integer>> getUserSNSDetails(FriendFilter filter);
+	
+	
 }
