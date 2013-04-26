@@ -27,29 +27,26 @@ package org.societies.api.privacytrust.trust.evidence;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.societies.api.identity.Requestor;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 
 /**
- * This interface is used to add trust evidence with regards to CSSs, CISs or
- * services. Trust evidence data are the basis for evaluating direct and
- * indirect trust in these entities. 
+ * This interface is used to add direct and indirect trust evidence with 
+ * regards to CSSs, CISs or services. Trust evidence data are the basis for
+ * evaluating the {@link TrustValueType#DIRECT direct} and
+ * {@link TrustValueType#INDIRECT indirect} trust in these entities. 
  * <p>
- * More specifically, each piece of trust evidence is associated with a TODO 
- * {@link TrustedEntityId} which identifies the trusted entity that particular
- * piece of evidence refers to. Therefore, multiple trust evidence can be
- * assigned to a single trusted entity. Moreover, the {@link TrustEvidenceType}
- * is used to characterise the type of evidence. Joining or leaving a
- * community, using a service, interacting with another individual are some
- * examples of trust evidence types. In addition, we distinguish between direct
- * and indirect trust in an entity. Likewise, trust evidence is classified as 
- * <em>direct</em> or <em>indirect</em> trust evidence. The former are related to
- * data which are locally collected by the trustor regarding their direct
- * interactions with individuals, communities, or services, while the latter
- * include information originating from other trusted entities. Thus, every
- * piece of indirect trust evidence is coupled with a <code>TrustedEntityId</code>
- * which references the <em>source</em> of this information.
+ * More specifically, each piece of trust evidence is associated with a 
+ * <i>subject</i> and an <i>object</i>, as well as, the 
+ * {@link TrustEvidenceType type} characterising that particular piece of
+ * evidence. A user (subject) joining/leaving a community (object), using a
+ * service (object), interacting with another individual (object) are some
+ * examples of trust evidence. Direct trust evidence are collected locally
+ * with respect to the CSS owner, while indirect trust originate from other
+ * sources. Thus, indirect trust evidence are also accompanied with the
+ * <i>source</i> from which they originate.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.5
@@ -60,33 +57,38 @@ public interface ITrustEvidenceCollector {
 	 * Adds the specified piece of direct trust evidence. The
 	 * {@link TrustedEntityId TrustedEntityIds} of the subject and the object
 	 * this piece of evidence refers to, its type, as well as, the time the
-	 * evidence was recorded are also supplied. Finally, depending on the
+	 * evidence was recorded must be supplied. Finally, depending on the
 	 * evidence type, the method allows specifying supplementary information.
 	 *  
+	 * @param requestor
+	 *            (required) the {@link Requestor} on whose behalf to add this 
+	 *            piece of direct trust evidence.
 	 * @param subjectId
-	 *            the {@link TrustedEntityId} of the subject the piece of
-	 *            evidence refers to.
+	 *            (required) the {@link TrustedEntityId} of the subject this 
+	 *            piece of direct trust evidence refers to.
 	 * @param objectId
-	 *            the {@link TrustedEntityId} of the object the piece of
-	 *            evidence refers to.
+	 *            (required) the {@link TrustedEntityId} of the object this
+	 *            piece of direct trust evidence refers to.
 	 * @param type
-	 *            the type of the evidence to be added.
+	 *            (required) the type of the piece of direct trust evidence to
+	 *            be added.
 	 * @param timestamp
-	 *            the time the evidence was recorded.
+	 *            (required) the time this piece of direct trust evidence was
+	 *            recorded.
 	 * @param info
-	 *            supplementary information if applicable; <code>null</code>
-	 *            otherwise.
+	 *            (optional) supplementary information if applicable; 
+	 *            <code>null</code> otherwise.
 	 * @throws TrustException
-	 *            if the specified piece of direct trust evidence cannot be 
+	 *            if the specified piece of direct trust evidence cannot be
 	 *            added.
 	 * @throws NullPointerException
-	 *            if any of the specified subjectId, objectId, type or 
-	 *            timestamp parameter is <code>null</code>.
-	 * @since 0.5
+	 *            if any of the required parameters is <code>null</code>.
+	 * @since 1.1
 	 */
-	public void addDirectEvidence(final TrustedEntityId subjectId, 
-			final TrustedEntityId objectId, final TrustEvidenceType type,
-			final Date timestamp, final Serializable info) throws TrustException;
+	public void addDirectEvidence(final Requestor requestor,
+			final TrustedEntityId subjectId, final TrustedEntityId objectId,
+			final TrustEvidenceType type, final Date timestamp,
+			final Serializable info) throws TrustException;
 	
 	/**
 	 * Adds the specified piece of indirect trust evidence which originates
@@ -96,28 +98,53 @@ public interface ITrustEvidenceCollector {
 	 * Finally, depending on the evidence type, the method allows specifying
 	 * supplementary information.
 	 *  
+	 * @param requestor
+	 *            (required) the {@link Requestor} on whose behalf to add this 
+	 *            piece of indirect trust evidence.
 	 * @param subjectId
-	 *            the {@link TrustedEntityId} of the subject the piece of
-	 *            evidence refers to.
+	 *            (required) the {@link TrustedEntityId} of the subject this 
+	 *            piece of indirect trust evidence refers to.
 	 * @param objectId
-	 *            the {@link TrustedEntityId} of the object the piece of
-	 *            evidence refers to.
+	 *            (required) the {@link TrustedEntityId} of the object this
+	 *            piece of indirect trust evidence refers to.
 	 * @param type
-	 *            the type of the evidence to be added.
+	 *            (required) the type of the piece of indirect trust evidence
+	 *            to be added.
 	 * @param timestamp
-	 *            the time the evidence was recorded.
+	 *            (required) the time this piece of indirect trust evidence was
+	 *            recorded.
 	 * @param info
-	 *            supplementary information if applicable; <code>null</code>
-	 *            otherwise.
+	 *            (optional) supplementary information if applicable; 
+	 *            <code>null</code> otherwise.
 	 * @param sourceId
-	 *            the source this evidence originates from.
+	 *            (required) the {@link TrustedEntityId} of the source this
+	 *            piece of indirect trust evidence originates from.
 	 * @throws TrustException
-	 *            if the specified piece of indirect trust evidence cannot be 
-	 *            added
+	 *            if the specified piece of trust evidence cannot be added.
 	 * @throws NullPointerException
-	 *            if any of the subjectId, objectId, type, timestamp or 
-	 *            sourceId parameter is <code>null</code>.
+	 *            if any of the required parameters is <code>null</code>.
+	 * @since 1.1
+	 */
+	public void addIndirectEvidence(final Requestor requestor,
+			final TrustedEntityId subjectId, final TrustedEntityId objectId,
+			final TrustEvidenceType type, final Date timestamp,
+			final Serializable info, final TrustedEntityId sourceId)
+					throws TrustException;
+	
+	/**
 	 * @since 0.5
+	 * @deprecated As of 1.1, use 
+	 * {@link #addDirectEvidence(Requestor, TrustedEntityId, TrustedEntityId, TrustEvidenceType, Date, Serializable)}.
+	 */
+	@Deprecated
+	public void addDirectEvidence(final TrustedEntityId subjectId, 
+			final TrustedEntityId objectId, final TrustEvidenceType type,
+			final Date timestamp, final Serializable info) throws TrustException;
+	
+	/**
+	 * @since 0.5
+	 * @deprecated As of 1.1, use 
+	 * {@link #addIndirectEvidence(TrustedEntityId, TrustedEntityId, TrustEvidenceType, Date, Serializable, TrustedEntityId)}.
 	 */
 	public void addIndirectEvidence(final TrustedEntityId subjectId, 
 			final TrustedEntityId objectId, final TrustEvidenceType type, 

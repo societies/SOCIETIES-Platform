@@ -91,7 +91,8 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 	
 	TrustBrokerRemoteServer() {
 		
-		LOG.info(this.getClass() + " instantiated");
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
 	}
 	
 	/*
@@ -116,15 +117,23 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 	 * @see org.societies.api.comm.xmpp.interfaces.IFeatureServer#getQuery(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
 	 */
 	@Override
-	public Object getQuery(Stanza stanza, Object bean) throws XMPPError {
+	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
+		
+		if (stanza == null)
+			throw new NullPointerException("stanza can't be null");
+		if (payload == null)
+			throw new NullPointerException("payload can't be null");
 		
 		if (LOG.isDebugEnabled())
-			LOG.debug("getQuery: stanza=" + stanza + ", bean=" + bean);
-		if (!(bean instanceof TrustBrokerRequestBean))
-			throw new XMPPError(StanzaError.bad_request, "bean is not instance of TrustBrokerRequestBean");
+			LOG.debug("getQuery: stanza=" + stanza + ", payload=" + payload);
 		
-		final TrustBrokerRequestBean requestBean = (TrustBrokerRequestBean) bean;
+		if (!(payload instanceof TrustBrokerRequestBean))
+			throw new XMPPError(StanzaError.bad_request, "Unknown request bean class: "
+					+ payload.getClass());
+		
+		final TrustBrokerRequestBean requestBean = (TrustBrokerRequestBean) payload;
 		final TrustBrokerResponseBean responseBean = new TrustBrokerResponseBean();
+		responseBean.setMethodName(requestBean.getMethodName());
 		
 		if (LOG.isDebugEnabled())
 			LOG.debug("getQuery: requestBean.getMethodName()=" + requestBean.getMethodName());
@@ -132,18 +141,27 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 			
 			final TrustRelationshipsRequestBean trustRelationshipsRequestBean =
 					requestBean.getRetrieveTrustRelationships();
-			if (trustRelationshipsRequestBean == null)
+			if (trustRelationshipsRequestBean == null) {
+				LOG.error("Invalid TrustBroker remote retrieve trust relationships request: "
+						+ "TrustRelationshipsRequestBean can't be null");
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust relationships request: "
 						+ "TrustRelationshipsRequestBean can't be null");
-			if (trustRelationshipsRequestBean.getRequestor() == null)
+			}
+			if (trustRelationshipsRequestBean.getRequestor() == null) {
+				LOG.error("Invalid TrustBroker remote retrieve trust relationships request: "
+						+ "requestor can't be null");
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust relationships request: "
 						+ "requestor can't be null");
-			if (trustRelationshipsRequestBean.getTrustorId() == null)
+			}
+			if (trustRelationshipsRequestBean.getTrustorId() == null) {
+				LOG.error("Invalid TrustBroker remote retrieve trust relationships request: "
+						+ "trustorId can't be null");
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust relationships request: "
 						+ "trustorId can't be null");
+			}
 			
 			try {
 				final Requestor requestor = RequestorUtils.toRequestor(
@@ -198,7 +216,8 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 					result = this.trustBroker.retrieveTrustRelationships(
 							requestor, trustorId, trustValueType).get();
 				} else {
-					
+					LOG.error("Invalid TrustBroker remote retrieve trust relationships request: "
+							+ "Missing parameters");
 					throw new XMPPError(StanzaError.bad_request, 
 							"Invalid TrustBroker remote retrieve trust relationships request: "
 							+ "Missing parameters");
@@ -211,7 +230,6 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 					resultBean.add(TrustModelBeanTranslator.getInstance().
 							fromTrustRelationship(trustRelationship));
 				trustRelationshipsResponseBean.setResult(resultBean);
-				responseBean.setMethodName(MethodName.RETRIEVE_TRUST_RELATIONSHIPS);
 				responseBean.setRetrieveTrustRelationships(trustRelationshipsResponseBean);
 				
 			} catch (MalformedTrustedEntityIdException mteide) {
@@ -220,7 +238,7 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 						+ mteide.getLocalizedMessage(), mteide);
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust relationships request: "
-						+ mteide.getLocalizedMessage(), mteide);
+						+ mteide.getLocalizedMessage());
 			} catch (XMPPError xmppe) {
 				
 				throw xmppe;
@@ -230,33 +248,48 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 						+ e.getLocalizedMessage(), e);
 				throw new XMPPError(StanzaError.internal_server_error, 
 						"Could not retrieve trust relationships: "
-						+ e.getLocalizedMessage(), e);
+						+ e.getLocalizedMessage());
 			} 
 		
 		} else if (MethodName.RETRIEVE_TRUST_RELATIONSHIP.equals(requestBean.getMethodName())) {
 			
 			final TrustRelationshipRequestBean trustRelationshipRequestBean =
 					requestBean.getRetrieveTrustRelationship();
-			if (trustRelationshipRequestBean == null)
+			if (trustRelationshipRequestBean == null) {
+				LOG.error("Invalid TrustBroker remote retrieve trust relationship request: "
+						+ "TrustRelationshipRequestBean can't be null");
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust relationship request: "
 						+ "TrustRelationshipRequestBean can't be null");
-			if (trustRelationshipRequestBean.getRequestor() == null)
+			}
+			if (trustRelationshipRequestBean.getRequestor() == null) {
+				LOG.error("Invalid TrustBroker remote retrieve trust relationship request: "
+						+ "requestor can't be null");
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust relationship request: "
 						+ "requestor can't be null");
-			if (trustRelationshipRequestBean.getTrustorId() == null)
+			}
+			if (trustRelationshipRequestBean.getTrustorId() == null) {
+				LOG.error("Invalid TrustBroker remote retrieve trust relationship request: "
+						+ "trustorId can't be null");
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust relationship request: "
 						+ "trustorId can't be null");
-			if (trustRelationshipRequestBean.getTrusteeId() == null)
+			}
+			if (trustRelationshipRequestBean.getTrusteeId() == null) {
+				LOG.error("Invalid TrustBroker remote retrieve trust relationship request: "
+						+ "trusteeId can't be null");
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust relationship request: "
 						+ "trusteeId can't be null");
-			if (trustRelationshipRequestBean.getTrustValueType() == null)
+			}
+			if (trustRelationshipRequestBean.getTrustValueType() == null) {
+				LOG.error("Invalid TrustBroker remote retrieve trust relationship request: "
+						+ "trustValueType can't be null");
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust relationship request: "
 						+ "trustValueType can't be null");
+			}
 			
 			try {
 				final Requestor requestor = RequestorUtils.toRequestor(
@@ -277,7 +310,6 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 				if (result != null)
 					trustRelationshipResponseBean.setResult(
 							TrustModelBeanTranslator.getInstance().fromTrustRelationship(result));
-				responseBean.setMethodName(MethodName.RETRIEVE_TRUST_RELATIONSHIP);
 				responseBean.setRetrieveTrustRelationship(trustRelationshipResponseBean);
 				
 			} catch (MalformedTrustedEntityIdException mteide) {
@@ -286,40 +318,55 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 						+ mteide.getLocalizedMessage(), mteide);
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust relationship request: "
-						+ mteide.getLocalizedMessage(), mteide);
+						+ mteide.getLocalizedMessage());
 			} catch (Exception e) {
 				
 				LOG.error("Could not retrieve trust relationship: "
 						+ e.getLocalizedMessage(), e);
 				throw new XMPPError(StanzaError.internal_server_error, 
 						"Could not retrieve trust relationship: "
-						+ e.getLocalizedMessage(), e);
+						+ e.getLocalizedMessage());
 			} 
 		
 		} else if (MethodName.RETRIEVE_TRUST_VALUE.equals(requestBean.getMethodName())) {
 			
 			final TrustValueRequestBean trustValueRequestBean =
 					requestBean.getRetrieveTrustValue();
-			if (trustValueRequestBean == null)
+			if (trustValueRequestBean == null) {
+				LOG.error("Invalid TrustBroker remote retrieve trust value request: "
+						+ "TrustValueRequestBean can't be null");
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust value request: "
 						+ "TrustValueRequestBean can't be null");
-			if (trustValueRequestBean.getRequestor() == null)
+			}
+			if (trustValueRequestBean.getRequestor() == null) {
+				LOG.error("Invalid TrustBroker remote retrieve trust value request: "
+						+ "requestor can't be null");
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust value request: "
 						+ "requestor can't be null");
-			if (trustValueRequestBean.getTrustorId() == null)
+			}
+			if (trustValueRequestBean.getTrustorId() == null) {
+				LOG.error("Invalid TrustBroker remote retrieve trust value request: "
+						+ "trustorId can't be null");
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust value request: "
 						+ "trustorId can't be null");
-			if (trustValueRequestBean.getTrusteeId() == null)
+			}
+			if (trustValueRequestBean.getTrusteeId() == null) {
+				LOG.error("Invalid TrustBroker remote retrieve trust value request: "
+						+ "trusteeId can't be null");
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust value request: "
 						+ "trusteeId can't be null");
-			if (trustValueRequestBean.getTrustValueType() == null)
+			}
+			if (trustValueRequestBean.getTrustValueType() == null) {
+				LOG.error("Invalid TrustBroker remote retrieve trust value request: "
+						+ "trustValueType can't be null");
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust value request: "
 						+ "trustValueType can't be null");
+			}
 			
 			try {
 				final Requestor requestor = RequestorUtils.toRequestor(
@@ -337,7 +384,6 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 						new TrustValueResponseBean(); 
 				if (result != null)
 					trustValueResponseBean.setResult(result);
-				responseBean.setMethodName(MethodName.RETRIEVE_TRUST_VALUE);
 				responseBean.setRetrieveTrustValue(trustValueResponseBean);
 				
 			} catch (MalformedTrustedEntityIdException mteide) {
@@ -346,20 +392,22 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 						+ mteide.getLocalizedMessage(), mteide);
 				throw new XMPPError(StanzaError.bad_request, 
 						"Invalid TrustBroker remote retrieve trust value request: "
-						+ mteide.getLocalizedMessage(), mteide);
+						+ mteide.getLocalizedMessage());
 			} catch (Exception e) {
 				
 				LOG.error("Could not retrieve trust value: "
 						+ e.getLocalizedMessage(), e);
 				throw new XMPPError(StanzaError.internal_server_error, 
 						"Could not retrieve trust value: "
-						+ e.getLocalizedMessage(), e);
+						+ e.getLocalizedMessage());
 			} 
 			
 		} else {
-			
+			LOG.error("Unsupported TrustBroker remote request method: "
+					+ requestBean.getMethodName());
 			throw new XMPPError(StanzaError.unexpected_request, 
-					"Unsupported TrustBroker remote request method: " + requestBean.getMethodName());
+					"Unsupported TrustBroker remote request method: "
+					+ requestBean.getMethodName());
 		}
 		
 		return responseBean;
@@ -369,7 +417,7 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 	 * @see org.societies.api.comm.xmpp.interfaces.IFeatureServer#receiveMessage(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
 	 */
 	@Override
-	public void receiveMessage(Stanza arg0, Object arg1) {
+	public void receiveMessage(Stanza stanza, Object payload) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -378,7 +426,7 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 	 * @see org.societies.api.comm.xmpp.interfaces.IFeatureServer#setQuery(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
 	 */
 	@Override
-	public Object setQuery(Stanza arg0, Object arg1) throws XMPPError {
+	public Object setQuery(Stanza stanza, Object payload) throws XMPPError {
 		// TODO Auto-generated method stub
 		return null;
 	}
