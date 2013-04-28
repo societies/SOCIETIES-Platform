@@ -83,4 +83,42 @@ public class IndirectTrustEvidence extends TrustEvidence implements
 		
 		return this.sourceId;
 	}
+
+	/*
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		
+		final int prime = 31;
+		
+		int result = super.hashCode();
+		result = prime * result
+				+ ((this.sourceId == null) ? 0 : this.sourceId.hashCode());
+		
+		return result;
+	}
+
+	/*
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object that) {
+		
+		if (this == that)
+			return true;
+		if (!super.equals(that))
+			return false;
+		if (this.getClass() != that.getClass())
+			return false;
+		
+		IndirectTrustEvidence other = (IndirectTrustEvidence) that;
+		if (this.sourceId == null) {
+			if (other.sourceId != null)
+				return false;
+		} else if (!this.sourceId.equals(other.sourceId))
+			return false;
+		
+		return true;
+	}
 }

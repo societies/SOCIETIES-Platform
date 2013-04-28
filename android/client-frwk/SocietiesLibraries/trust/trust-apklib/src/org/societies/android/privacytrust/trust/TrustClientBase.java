@@ -83,13 +83,13 @@ public class TrustClientBase implements IInternalTrustClient {
 			"http://societies.org/api/schema/identity",
             "http://societies.org/api/schema/privacytrust/trust/model",
 			"http://societies.org/api/schema/privacytrust/trust/broker",
-			"http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector");
+			"http://societies.org/api/schema/privacytrust/trust/evidence/collector");
 	
 	private static final List<String> PACKAGES = Arrays.asList(
 			"org.societies.api.schema.identity",
 			"org.societies.api.schema.privacytrust.trust.model",
 			"org.societies.api.schema.privacytrust.trust.broker",
-			"org.societies.api.internal.schema.privacytrust.trust.evidence.collector");
+			"org.societies.api.schema.privacytrust.trust.evidence.collector");
 	
 	/** The Client Comm Mgr service reference. */
 	private ClientCommunicationMgr clientCommMgr;
