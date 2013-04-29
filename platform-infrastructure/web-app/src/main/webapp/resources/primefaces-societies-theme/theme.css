@@ -863,6 +863,10 @@ ul.ui-selectlistbox-list .ui-state-highlight {
     background: #ffffff;
 }
 
+li.ui-selectonemenu-item{
+	list-style: none;
+}
+
 .ui--items {
     background: #202020 url("#{resource['primefaces-societies-theme:images/ui-bg_flat_75_202020_40x100.png']}") 50% 50% repeat-x;
     list-style: none;
