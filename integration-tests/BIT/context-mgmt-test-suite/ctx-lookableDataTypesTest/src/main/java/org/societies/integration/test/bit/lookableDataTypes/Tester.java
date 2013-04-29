@@ -75,6 +75,8 @@ import org.societies.api.internal.sns.ISocialConnector;
 import org.societies.api.internal.sns.ISocialData;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.context.broker.ICtxBroker;
+import org.societies.integration.test.userfeedback.UserFeedbackMockResult;
+import org.societies.integration.test.userfeedback.UserFeedbackType;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 
@@ -115,6 +117,12 @@ public class Tester {
 
 	@Before
 	public void setUp(){
+
+		LOG.info("*** initiallizing " );
+		LOG.info("*** " +LookableDataTypesTest.getUserFeedbackMocker());
+
+		LookableDataTypesTest.getUserFeedbackMocker().setEnabled(true);
+		LookableDataTypesTest.getUserFeedbackMocker().addReply(UserFeedbackType.ACKNACK, new UserFeedbackMockResult("Allow"));
 
 	}
 	
