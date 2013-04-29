@@ -5,7 +5,7 @@
 	<artifactId>bit.ctxSNDataMgmt.1898</artifactId>
 	<name>Ctx Mgm SNS Integration Test</name>
 	<packaging>bundle</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${release.version}</version>
 
 	<developers>
    		<developer>
