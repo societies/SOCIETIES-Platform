@@ -45,17 +45,17 @@ import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
-import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
-import org.societies.api.schema.useragent.feedback.FeedbackMethodType;
-import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
-import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
+import org.societies.api.schema.useragent.feedback.*;
 import org.societies.useragent.api.feedback.IInternalUserFeedback;
+import org.societies.useragent.api.feedback.IPrivacyPolicyNegotiationHistoryRepository;
+import org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository;
 import org.societies.useragent.api.model.UserFeedbackEventTopics;
 import org.societies.useragent.api.remote.IUserAgentRemoteMgr;
 import org.societies.useragent.feedback.guis.AckNackGUI;
 import org.societies.useragent.feedback.guis.CheckBoxGUI;
 import org.societies.useragent.feedback.guis.RadioGUI;
 import org.societies.useragent.feedback.guis.TimedGUI;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 import java.util.*;
@@ -84,16 +84,31 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     private static final String PRIVACY_ACCESS_CONTROL = "privacy-access-control";
     private static final String UNDEFINED = "undefined";
 
-    ICtxBroker ctxBroker;
-    ICommManager commsMgr;
-    PubsubClient pubsub;
-    IUserAgentRemoteMgr uaRemote;
-    RequestManager requestMgr;
-    IIdentity myCloudID;
+    @Autowired
+    private ICtxBroker ctxBroker;
+
+    @Autowired
+    private ICommManager commsMgr;
+
+    @Autowired
+    private PubsubClient pubsub;
+
+    @Autowired
+    private IUserAgentRemoteMgr uaRemote;
+
+    @Autowired
+    private IUserFeedbackHistoryRepository userFeedbackHistoryRepository;
+
+    @Autowired
+    private IPrivacyPolicyNegotiationHistoryRepository privacyPolicyNegotiationHistoryRepository;
+
     private final HashMap<String, List<String>> expResults = new HashMap<String, List<String>>();
     private final HashMap<String, Boolean> impResults = new HashMap<String, Boolean>();
     private final HashMap<NegotiationDetailsBean, ResponsePolicy> negotiationResults = new HashMap<NegotiationDetailsBean, ResponsePolicy>();
     private final HashMap<String, List<ResponseItem>> accessCtrlResults = new HashMap<String, List<ResponseItem>>();
+
+    private RequestManager requestMgr;
+    private IIdentity myCloudID;
 
 
     public void initialiseUserFeedback() {
@@ -154,11 +169,12 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         LOG.debug("Content: " + content.getProposalText());
 
         //generate unique ID for this pubsub event and feedback request
-        String requestID = UUID.randomUUID().toString();
+        String requestId = UUID.randomUUID().toString();
 
         //create user feedback bean to fire in pubsub event
         UserFeedbackBean ufBean = new UserFeedbackBean();
-        ufBean.setRequestId(requestID);
+        ufBean.setStage(FeedbackStage.PENDING_USER_RESPONSE);
+        ufBean.setRequestId(requestId);
         ufBean.setType(type);
         ufBean.setProposalText(content.getProposalText());
         List<String> optionsList = new ArrayList<String>();
@@ -167,32 +183,65 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         ufBean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
 
         //add new request to result hashmap
-        expResults.put(requestID, null);
+        expResults.put(requestId, null);
+
+        // store in database before sending pubsub event
+        try {
+            if (userFeedbackHistoryRepository == null) {
+                LOG.warn("userFeedbackHistoryRepository is null - cannot store user feedback request bean in database");
+            } else {
+                if (LOG.isDebugEnabled())
+                    LOG.debug("Storing user feedback bean in database");
+                userFeedbackHistoryRepository.insert(ufBean);
+            }
+        } catch (Exception ex) {
+            LOG.error("Error storing user feedback request bean to database", ex);
+        }
 
         //send pubsub event to all user agents
         try {
-            LOG.debug("Sending user feedback request event via pubsub");
-            pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.REQUEST, null, ufBean);
-        } catch (XMPPError e) {
-            e.printStackTrace();
-        } catch (CommunicationException e) {
-            e.printStackTrace();
+            if (LOG.isDebugEnabled())
+                LOG.debug("Sending user feedback request event via pubsub");
+            pubsub.publisherPublish(myCloudID,
+                    UserFeedbackEventTopics.REQUEST,
+                    requestId,
+                    ufBean);
+        } catch (Exception ex) {
+            LOG.error("Error transmitting user feedback request bean via pubsub", ex);
         }
 
         //wait for result
-        while (this.expResults.get(requestID) == null) {
+        while (this.expResults.get(requestId) == null) {
             try {
                 synchronized (expResults) {
                     this.expResults.wait();
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                // do nothing?
             }
         }
 
+        // update result
+        try {
+            if (userFeedbackHistoryRepository != null) {
+                userFeedbackHistoryRepository.updateStage(requestId, FeedbackStage.COMPLETED);
+            }
+        } catch (Exception ex) {
+            LOG.error("Error updating user feedback stage in database", ex);
+        }
+        // inform clients that UF is complete
+        try {
+            pubsub.publisherPublish(myCloudID,
+                    UserFeedbackEventTopics.COMPLETE,
+                    requestId,
+                    null);
+        } catch (Exception ex) {
+            LOG.error("Error transmitting user feedback complete via pubsub", ex);
+        }
+
         //set result and remove id from hashmap
-        List<String> result = this.expResults.get(requestID);
-        this.expResults.remove(requestID);
+        List<String> result = this.expResults.get(requestId);
+        this.expResults.remove(requestId);
 
         return new AsyncResult<List<String>>(result);
     }
@@ -203,46 +252,230 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         LOG.debug("Content: " + content.getProposalText());
 
         //generate unique ID for this pubsub event and feedback request
-        String requestID = UUID.randomUUID().toString();
+        String requestId = UUID.randomUUID().toString();
 
         //create user feedback bean to fire in pubsub event
         UserFeedbackBean ufBean = new UserFeedbackBean();
-        ufBean.setRequestId(requestID);
+        ufBean.setStage(FeedbackStage.PENDING_USER_RESPONSE);
+        ufBean.setRequestId(requestId);
         ufBean.setType(type);
         ufBean.setProposalText(content.getProposalText());
         ufBean.setTimeout(content.getTimeout());
         ufBean.setMethod(FeedbackMethodType.GET_IMPLICIT_FB);
 
         //add new request to result hashmap
-        impResults.put(requestID, null);
+        impResults.put(requestId, null);
+
+        // store in database before sending pubsub event
+        try {
+            if (userFeedbackHistoryRepository == null) {
+                LOG.warn("userFeedbackHistoryRepository is null - cannot store user feedback request bean in database");
+            } else {
+                if (LOG.isDebugEnabled())
+                    LOG.debug("Storing user feedback bean in database");
+                userFeedbackHistoryRepository.insert(ufBean);
+            }
+        } catch (Exception ex) {
+            LOG.error("Error storing user feedback request bean to database", ex);
+        }
 
         //send pubsub event to all user agents
         try {
-            LOG.debug("Sending user feedback request event via pubsub");
-            pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.REQUEST, null, ufBean);
-        } catch (XMPPError e) {
-            e.printStackTrace();
-        } catch (CommunicationException e) {
-            e.printStackTrace();
+            if (LOG.isDebugEnabled())
+                LOG.debug("Sending user feedback request event via pubsub");
+            pubsub.publisherPublish(myCloudID,
+                    UserFeedbackEventTopics.REQUEST,
+                    requestId,
+                    ufBean);
+        } catch (Exception ex) {
+            LOG.error("Error transmitting user feedback request bean via pubsub", ex);
+        }
+        // update result
+        try {
+            if (userFeedbackHistoryRepository != null) {
+                userFeedbackHistoryRepository.updateStage(requestId, FeedbackStage.COMPLETED);
+            }
+        } catch (Exception ex) {
+            LOG.error("Error updating user feedback stage in database", ex);
         }
 
         //wait until result is available
-        while (this.impResults.get(requestID) == null) {
+        while (this.impResults.get(requestId) == null) {
             try {
                 synchronized (impResults) {
                     this.impResults.wait();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                // do nothing?
             }
         }
 
+        // update result
+        try {
+            if (userFeedbackHistoryRepository != null) {
+                userFeedbackHistoryRepository.updateStage(requestId, FeedbackStage.COMPLETED);
+            }
+        } catch (Exception ex) {
+            LOG.error("Error updating user feedback stage in database", ex);
+        }
+        // inform clients that UF is complete
+        try {
+            pubsub.publisherPublish(myCloudID,
+                    UserFeedbackEventTopics.COMPLETE,
+                    requestId,
+                    null);
+        } catch (Exception ex) {
+            LOG.error("Error transmitting user feedback complete via pubsub", ex);
+        }
+
         //set result and remove id from hashmap
-        Boolean result = this.impResults.get(requestID);
-        this.impResults.remove(requestID);
+        Boolean result = this.impResults.get(requestId);
+        this.impResults.remove(requestId);
 
         return new AsyncResult<Boolean>(result);
     }
+
+
+    @Override
+    public Future<ResponsePolicy> getPrivacyNegotiationFB(ResponsePolicy policy, NegotiationDetailsBean details) {
+
+        LOG.debug("processing negotiationFeedback request");
+        if (policy == null) {
+            LOG.debug("Policy parameter is null");
+        } else {
+            LOG.debug("Policy contains: " + policy.getResponseItems().size() + " responseItems");
+        }
+        UserFeedbackPrivacyNegotiationEvent event = new UserFeedbackPrivacyNegotiationEvent();
+        event.setStage(FeedbackStage.PENDING_USER_RESPONSE);
+        event.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+        event.setType(ExpProposalType.PRIVACY_NEGOTIATION);
+        String requestId = UUID.randomUUID().toString();
+        event.setRequestId(requestId);
+        event.setNegotiationDetails(details);
+        event.setResponsePolicy(policy);
+
+        // store in database before sending pubsub event
+        try {
+            if (privacyPolicyNegotiationHistoryRepository == null) {
+                LOG.warn("privacyPolicyNegotiationHistoryRepository is null - cannot store PPN request bean in database");
+            } else {
+                if (LOG.isDebugEnabled())
+                    LOG.debug("Storing PPN bean in database");
+                privacyPolicyNegotiationHistoryRepository.insert(event);
+            }
+        } catch (Exception ex) {
+            LOG.error("Error storing PPN request bean to database", ex);
+        }
+
+        try {
+            if (LOG.isDebugEnabled())
+                LOG.debug("Sending PPN request event via pubsub");
+            pubsub.publisherPublish(myCloudID,
+                    EventTypes.UF_PRIVACY_NEGOTIATION,
+                    requestId,
+                    event);
+        } catch (Exception ex) {
+            LOG.error("Error transmitting PPN request bean via pubsub", ex);
+        }
+
+        while (!containsKey(negotiationResults, details)) {
+            synchronized (this.negotiationResults) {
+                try {
+                    this.negotiationResults.wait();
+                } catch (InterruptedException e) {
+                    // do nothing?
+                }
+            }
+        }
+
+        // update result
+        try {
+            if (privacyPolicyNegotiationHistoryRepository != null) {
+                privacyPolicyNegotiationHistoryRepository.updateStage(requestId, FeedbackStage.COMPLETED);
+            }
+        } catch (Exception ex) {
+            LOG.error("Error updating PPN stage in database", ex);
+        }
+        // inform clients that negotiation is complete
+        try {
+            pubsub.publisherPublish(myCloudID,
+                    EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP,
+                    requestId,
+                    negotiationResults.get(details));
+        } catch (Exception ex) {
+            LOG.error("Error transmitting PPN complete via pubsub", ex);
+        }
+
+
+        return new AsyncResult<ResponsePolicy>(negotiationResults.get(details));
+    }
+
+    @Override
+    public Future<List<ResponseItem>> getAccessControlFB(Requestor requestor, List<ResponseItem> items) {
+        UserFeedbackAccessControlEvent event = new UserFeedbackAccessControlEvent();
+        event.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+        event.setType(ExpProposalType.PRIVACY_ACCESS_CONTROL);
+        String requestId = UUID.randomUUID().toString();
+        event.setRequestId(requestId);
+        event.setRequestor(RequestorUtils.toRequestorBean(requestor));
+        event.setResponseItems(items);
+
+        // TODO: store in database before sending pubsub event
+//        try {
+//            if (userFeedbackHistoryRepository == null) {
+//                LOG.warn("userFeedbackHistoryRepository is null - cannot store user feedback request bean in database");
+//            } else {
+//                if (LOG.isDebugEnabled())
+//                    LOG.debug("Storing user feedback bean in database");
+//                userFeedbackHistoryRepository.insert(event);
+//            }
+//        } catch (Exception ex) {
+//            LOG.error("Error storing user feedback request bean to database", ex);
+//        }
+
+
+        try {
+            if (LOG.isDebugEnabled())
+                LOG.debug("Sending access control request event via pubsub");
+            this.pubsub.publisherPublish(myCloudID,
+                    EventTypes.UF_PRIVACY_ACCESS_CONTROL,
+                    requestId,
+                    event);
+        } catch (Exception ex) {
+            LOG.error("Error transmitting access control request bean via pubsub", ex);
+        }
+
+        while (!this.accessCtrlResults.containsKey(requestId)) {
+            synchronized (this.accessCtrlResults) {
+                try {
+                    this.accessCtrlResults.wait();
+                } catch (InterruptedException e) {
+                    // do nothing?
+                }
+            }
+        }
+
+//        // update result
+//        try {
+//            if (userFeedbackHistoryRepository != null) {
+//                userFeedbackHistoryRepository.updateStage(requestId, FeedbackStage.COMPLETED);
+//            }
+//        } catch (Exception ex) {
+//            LOG.error("Error updating user feedback stage in database", ex);
+//        }
+        // inform clients that negotiation is complete
+        try {
+            this.pubsub.publisherPublish(myCloudID,
+                    EventTypes.UF_PRIVACY_ACCESS_CONTROL_REMOVE_POPUP,
+                    requestId,
+                    accessCtrlResults.get(requestId));
+        } catch (Exception ex) {
+            LOG.error("Error transmitting access control complete via pubsub", ex);
+        }
+
+        return new AsyncResult<List<ResponseItem>>(this.accessCtrlResults.get(requestId));
+    }
+
 
     @Override
     public void showNotification(String notificationTxt) {
@@ -250,41 +483,41 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         LOG.debug("Content: " + notificationTxt);
 
         //generate unique ID for this pubsub event and feedback request
-        String requestID = UUID.randomUUID().toString();
+        String requestId = UUID.randomUUID().toString();
 
         //create user feedback bean to fire in pubsub event
         UserFeedbackBean ufBean = new UserFeedbackBean();
-        ufBean.setRequestId(requestID);
+        ufBean.setStage(FeedbackStage.COMPLETED);
+        ufBean.setRequestId(requestId);
         ufBean.setProposalText(notificationTxt);
         ufBean.setMethod(FeedbackMethodType.SHOW_NOTIFICATION);
 
-        //add request ID and result type to results hashmap
-        impResults.put(requestID, null);
+        // store in database before sending pubsub event
+        try {
+            if (userFeedbackHistoryRepository == null) {
+                LOG.warn("userFeedbackHistoryRepository is null - cannot store user feedback request bean in database");
+            } else {
+                if (LOG.isDebugEnabled())
+                    LOG.debug("Storing user feedback bean in database");
+                userFeedbackHistoryRepository.insert(ufBean);
+            }
+        } catch (Exception ex) {
+            LOG.error("Error storing user feedback request bean to database", ex);
+        }
 
         //send pubsub event to all user agents
         try {
             LOG.debug("Sending user feedback request event via pubsub");
-            pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.REQUEST, null, ufBean);
-        } catch (XMPPError e) {
-            e.printStackTrace();
-        } catch (CommunicationException e) {
-            e.printStackTrace();
+            pubsub.publisherPublish(myCloudID,
+                    UserFeedbackEventTopics.REQUEST,
+                    requestId,
+                    ufBean);
+        } catch (Exception ex) {
+            LOG.error("Error transmitting user feedback request bean via pubsub", ex);
         }
 
-        //wait until result is available
-        while (this.impResults.get(requestID) == null) {
-            try {
-                synchronized (impResults) {
-                    this.impResults.wait();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-
-            }
-        }
-
-        //remove id from hashmap
-        this.impResults.remove(requestID);
+        // NB: No wait for a simple notification
+        // NB: No response/completed event for a simple notification
     }
 
 
@@ -349,9 +582,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     /*
      * Handle explicit feedback request and response events
      */
-    private void processExpFeedbackRequestEvent(String requestID, int type, String proposalText, List<String> optionsList) {
+    private void processExpFeedbackRequestEvent(String requestId, int type, String proposalText, List<String> optionsList) {
         //create feedback form
-        FeedbackForm fbForm = generateExpFeedbackForm(requestID, type, proposalText, optionsList);
+        FeedbackForm fbForm = generateExpFeedbackForm(requestId, type, proposalText, optionsList);
         //add new request to queue
         requestMgr.addRequest(fbForm);
     }
@@ -374,9 +607,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     /*
      * Handle implicit feedback request and response events
      */
-    private void processImpFeedbackRequestEvent(String requestID, int type, String proposalText, int timeout) {
+    private void processImpFeedbackRequestEvent(String requestId, int type, String proposalText, int timeout) {
         //create feedback form
-        FeedbackForm fbForm = generateImpFeedbackForm(requestID, type, proposalText, timeout);
+        FeedbackForm fbForm = generateImpFeedbackForm(requestId, type, proposalText, timeout);
         //add new request to queue
         requestMgr.addRequest(fbForm);
     }
@@ -399,9 +632,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     /*
      * Handle notification request events
      */
-    private void processNotificationRequestEvent(String requestID, String proposalText) {
+    private void processNotificationRequestEvent(String requestId, String proposalText) {
         //create feedback form
-        FeedbackForm fbForm = generateNotificationForm(requestID, proposalText);
+        FeedbackForm fbForm = generateNotificationForm(requestId, proposalText);
         //add new request to queue
         requestMgr.addRequest(fbForm);
     }
@@ -419,15 +652,15 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     }
 
     @Override
-    public void submitExplicitResponse(String requestID, List<String> result) {
+    public void submitExplicitResponse(String requestId, List<String> result) {
         //create user feedback response bean
         ExpFeedbackResultBean resultBean = new ExpFeedbackResultBean();
-        resultBean.setRequestId(requestID);
+        resultBean.setRequestId(requestId);
         resultBean.setFeedback(result);
 
         //fire response pubsub event to all user agents
         try {
-            pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.EXPLICIT_RESPONSE, null, resultBean);
+            pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.EXPLICIT_RESPONSE, requestId, resultBean);
         } catch (XMPPError e1) {
             e1.printStackTrace();
         } catch (CommunicationException e1) {
@@ -448,7 +681,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         //fire response pubsub event to all user agents
         try {
             LOG.info("####### Publish " + EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE + ": " + ResponseItemUtils.toXmlString(result.getResponseItems()));
-            pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, null, resultBean);
+            pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, requestId, resultBean);
         } catch (XMPPError e1) {
             e1.printStackTrace();
         } catch (CommunicationException e1) {
@@ -457,10 +690,10 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     }
 
     @Override
-    public void submitImplicitResponse(String requestID, Boolean result) {
+    public void submitImplicitResponse(String requestId, Boolean result) {
         //create user feedback response bean
         ImpFeedbackResultBean resultBean = new ImpFeedbackResultBean();
-        resultBean.setRequestId(requestID);
+        resultBean.setRequestId(requestId);
         resultBean.setAccepted(result);
 
         //fire response pubsub event to all user agents
@@ -477,10 +710,10 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     /*
      * Helper methods to generate feedback forms - explicit, implicit and notification
      */
-    private static FeedbackForm generateExpFeedbackForm(String requestID, int type, String proposalText, List<String> optionsList) {
+    private static FeedbackForm generateExpFeedbackForm(String requestId, int type, String proposalText, List<String> optionsList) {
         FeedbackForm newFbForm = new FeedbackForm();
         //add unique id
-        newFbForm.setID(requestID);
+        newFbForm.setID(requestId);
         //add text to show to user
         newFbForm.setText(proposalText);
         //add data
@@ -502,10 +735,10 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         return newFbForm;
     }
 
-    private static FeedbackForm generateImpFeedbackForm(String requestID, int type, String proposalText, int timeout) {
+    private static FeedbackForm generateImpFeedbackForm(String requestId, int type, String proposalText, int timeout) {
         FeedbackForm newFbForm = new FeedbackForm();
         //add unique id
-        newFbForm.setID(requestID);
+        newFbForm.setID(requestId);
         //add text to show user
         newFbForm.setText(proposalText);
         //add data
@@ -520,10 +753,10 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         return newFbForm;
     }
 
-    private static FeedbackForm generateNotificationForm(String requestID, String notificationTxt) {
+    private static FeedbackForm generateNotificationForm(String requestId, String notificationTxt) {
         FeedbackForm newFbForm = new FeedbackForm();
         //add unique id
-        newFbForm.setID(requestID);
+        newFbForm.setID(requestId);
         //add text to show user
         newFbForm.setText(notificationTxt);
         //add data
@@ -533,80 +766,6 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         newFbForm.setType(NOTIFICATION);
         return newFbForm;
     }
-
-	/*@Override
-    public Future<List<String>> getExplicitFB(int type, ExpProposalContent content) {
-		List<String> result = null;
-
-		//check current UID
-		String uid = getCurrentUID();
-		if(uid.equals(UNDEFINED)){//don't know what current UID is
-			LOG.error("UID is not defined - sending request to all interactable devices in CSS");
-
-		}else if(uid.equals(myDeviceID)){  //local device is current UID
-			//show GUIs on local device
-			LOG.debug("Returning explicit feedback");
-			String proposalText = content.getProposalText();
-			String[] options = content.getOptions();
-			if(type == ExpProposalType.RADIOLIST){
-				LOG.debug("Radio list GUI");
-				RadioGUI gui = new RadioGUI();
-				result = gui.displayGUI(proposalText, options);
-			}else if(type == ExpProposalType.CHECKBOXLIST){
-				LOG.debug("Check box list GUI");
-				CheckBoxGUI gui = new CheckBoxGUI();
-				result = gui.displayGUI(proposalText, options);
-			}else{ //ACK-NACK
-				LOG.debug("ACK/NACK GUI");
-				result = AckNackGUI.displayGUI(proposalText, options);
-			}
-
-		}else{  //remote device is current UID
-			//show GUIs on remote UID
-			try {
-				result = uaRemote.getExplicitFB(type, content).get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-			}
-		}
-
-		return new AsyncResult<List<String>>(result);
-	}*/
-
-	/*@Override
-    public Future<Boolean> getImplicitFB(int type, ImpProposalContent content) {
-		Boolean result = null;
-
-		//check for current UID
-		String uid = getCurrentUID();
-		if(uid.equals(UNDEFINED)){  //don't know what current UID is
-
-		}else if(uid.equals(myDeviceID)){  //local device is current UID
-			//show GUIs on local device
-			LOG.debug("Returning implicit feedback");
-
-			String proposalText = content.getProposalText();
-			int timeout = content.getTimeout();
-			if(type == ImpProposalType.TIMED_ABORT){
-				LOG.debug("Timed Abort GUI");
-				TimedGUI gui = new TimedGUI();
-				result = gui.displayGUI(proposalText, timeout);
-			}
-		}else{  //remote device is current UID
-			//show GUIs on remote UID
-			try {
-				result = uaRemote.getImplicitFB(type, content).get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-			}
-		}
-
-		return new AsyncResult<Boolean>(result);
-	}	*/
 
     /*
      *Called by UACommsServer to request explicit feedback for remote User Agent
@@ -702,46 +861,14 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         this.uaRemote = uaRemote;
     }
 
-    @Override
-    public Future<ResponsePolicy> getPrivacyNegotiationFB(ResponsePolicy policy,
-                                                          NegotiationDetailsBean details) {
-        LOG.debug("processing negotiationFeedback request");
-        if (policy == null) {
-            LOG.debug("Policy parameter is null");
-        } else {
-            LOG.debug("Policy contains: " + policy.getResponseItems().size() + " responseItems");
-        }
-        UserFeedbackPrivacyNegotiationEvent event = new UserFeedbackPrivacyNegotiationEvent();
-        event.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
-        event.setType(ExpProposalType.PRIVACY_NEGOTIATION);
-        String requestId = UUID.randomUUID().toString();
-        event.setRequestId(requestId);
-        event.setNegotiationDetails(details);
-        event.setResponsePolicy(policy);
-        try {
-            this.pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION, null, event);
-            while (!containsKey(negotiationResults, details)) {
-                synchronized (this.negotiationResults) {
-                    try {
-                        this.negotiationResults.wait();
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-            }
-            this.pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP, null, negotiationResults.get(details));
-        } catch (XMPPError e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        } catch (CommunicationException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-
-
-        return new AsyncResult<ResponsePolicy>(negotiationResults.get(details));
+    public void setUserFeedbackHistoryRepository(IUserFeedbackHistoryRepository userFeedbackHistoryRepository) {
+        this.userFeedbackHistoryRepository = userFeedbackHistoryRepository;
     }
+
+    public void setPrivacyPolicyNegotiationHistoryRepository(IPrivacyPolicyNegotiationHistoryRepository privacyPolicyNegotiationHistoryRepository) {
+        this.privacyPolicyNegotiationHistoryRepository = privacyPolicyNegotiationHistoryRepository;
+    }
+
 
     private static boolean containsKey(Map<NegotiationDetailsBean, ResponsePolicy> negotiationResults, NegotiationDetailsBean details) {
         for (NegotiationDetailsBean next : negotiationResults.keySet()) {
@@ -755,40 +882,4 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
     }
 
-    @Override
-    public Future<List<ResponseItem>> getAccessControlFB(Requestor requestor,
-                                                         List<ResponseItem> items) {
-        // TODO Auto-generated method stub
-        UserFeedbackAccessControlEvent event = new UserFeedbackAccessControlEvent();
-        event.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
-        event.setType(ExpProposalType.PRIVACY_ACCESS_CONTROL);
-        String requestId = UUID.randomUUID().toString();
-        event.setRequestId(requestId);
-        event.setRequestor(RequestorUtils.toRequestorBean(requestor));
-        event.setResponseItems(items);
-        try {
-            this.pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_ACCESS_CONTROL, null, event);
-
-
-            while (!this.accessCtrlResults.containsKey(requestId)) {
-                synchronized (this.accessCtrlResults) {
-                    try {
-                        this.accessCtrlResults.wait();
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            this.pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP, null, accessCtrlResults.get(requestId));
-        } catch (XMPPError e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (CommunicationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return new AsyncResult<List<ResponseItem>>(this.accessCtrlResults.get(requestId));
-    }
 }

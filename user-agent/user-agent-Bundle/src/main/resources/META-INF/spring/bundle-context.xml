@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:spring="http://gate.ac.uk/ns/spring"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://gate.ac.uk/ns/spring http://gate.ac.uk/ns/spring.xsd"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
         >
 
     <!-- regular spring configuration file defining the beans for this bundle.
@@ -28,6 +28,8 @@
         <property name="commsMgr" ref="commsMgr"/>
         <property name="pubsub" ref="pubsub"/>
         <property name="uaRemote" ref="uaRemote"/>
+        <property name="privacyPolicyNegotiationHistoryRepository" ref="privacyPolicyNegotiationHistoryRepositoryBean"/>
+        <property name="userFeedbackHistoryRepository" ref="userFeedbackHistoryRepositoryBean"/>
     </bean>
 
     <bean id="dm"
