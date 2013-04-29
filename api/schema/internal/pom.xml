@@ -89,7 +89,15 @@
 						<configuration>
 							<args>
 								<arg>-Xcollection-setter-injector</arg>
+								<arg>-Xdefault-value</arg>
 							</args>
+							<plugins>
+				                <plugin>
+				                    <groupId>org.jvnet.jaxb2_commons</groupId>
+				                    <artifactId>jaxb2-default-value</artifactId>
+				                    <version>1.1</version>
+				                </plugin>
+				            </plugins>
 						</configuration>
 					</execution>
 				</executions>
