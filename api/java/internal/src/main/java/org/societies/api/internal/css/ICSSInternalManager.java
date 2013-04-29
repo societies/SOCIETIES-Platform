@@ -310,6 +310,8 @@ public interface ICSSInternalManager extends ICSSManager {
 	 */
 	public Future<List<MarshaledActivity>> getActivities(String timePeriod, int limitResults);
 	
+	public void pushtoContext(CssRecord cssrecord);
+	
 	// No implementation of the following methods
 	
 //	/**
