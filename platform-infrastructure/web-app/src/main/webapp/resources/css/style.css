@@ -553,30 +553,34 @@ ul#navigation ul ul ul {
 /* Notification bubble
 -------------------------------------------------------------- */
 #navigation div.notification-bubble {
-    width: 48px;
-    height: 48px;
-    margin: 0;
+    width: 24px;
+    height: 24px;
+    margin-top: 34px;
     padding: 0;
-    background-image: url('../images/world_web_48x48.png');
+    background-image: url('../images/world_web_24x24.png');
     display: block;
 }
 
 #navigation div.notification-bubble a {
-    width: 48px;
-    height: 48px;
+    width: 24px;
+    height: 24px;
     text-align: right;
     vertical-align: middle;
     padding: 0;
 }
 
 #navigation div.notification-bubble span#mainForm\:notification-count {
+	position: absolute;
     text-align: center;
     vertical-align: middle;
-    margin: 10px 0 0 0;
-    padding: 2px 2px 2px 2px;
-    background-color: #c00;
-    color: #fff;
-    border: 1px solid #900;
+    margin: -10px 0 0 -10px;
+    padding: 0 5px 0 5px;
+    background-color:#F26A36;
+	color:#ffffff;
+	font-weight:bold;
+	font-size:0.80em;	
+	border-radius:2px;
+	box-shadow:1px 1px 1px gray;
 }
 
 div#mainForm\:notificationDialog #mainForm\:notificationGrid_content {
@@ -1516,6 +1520,8 @@ ul.social-network li {
     position: relative;
     display: inline;
 }
+
+
 
 /* THE END */
 
