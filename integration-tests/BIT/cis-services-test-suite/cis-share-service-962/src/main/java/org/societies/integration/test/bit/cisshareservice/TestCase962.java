@@ -34,7 +34,7 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegis
 import org.societies.integration.test.IntegrationTestCase;
 
 /**
- * Test case 962 aims to test attaching a service to a CIS
+ * Test case 1852 aims to test attaching a service to a CIS
  * 
  * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
@@ -68,28 +68,28 @@ public class TestCase962 extends IntegrationTestCase {
 		// with test case number
 		// and test case classes to run
 		//super(713, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
-		super(962, new Class[] {NominalTestCaseUpperTester.class});
-		NominalTestCaseUpperTester.testCaseNumber = 962;
+		super(1852, new Class[] {NominalTestCaseUpperTester.class});
+		NominalTestCaseUpperTester.testCaseNumber = 1852;
 	}
 
 
 	public void setCisManager(ICisManager cisManager) {
-		if(LOG.isDebugEnabled()) LOG.debug("[#962] setCisManager()");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1852] setCisManager()");
 		TestCase962.cisManager = cisManager;
 	}
 	
 	public void setServiceControl(IServiceControl serviceControl) {
-		if(LOG.isDebugEnabled()) LOG.debug("[#962] setServiceControl()");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1852] setServiceControl()");
 		TestCase962.serviceControl = serviceControl;
 	}
 	
 	public void setServiceRegistry(IServiceRegistry serviceRegistry) {
-		if(LOG.isDebugEnabled()) LOG.debug("[#962] setServiceRegistry()");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1852] setServiceRegistry()");
 		TestCase962.serviceRegistry = serviceRegistry;
 	}
 
 	public void setCommManager(ICommManager commManager) {
-		if(LOG.isDebugEnabled()) LOG.debug("[#962] setCommManager()");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1852] setCommManager()");
 		TestCase962.commManager = commManager;
 	}
 	

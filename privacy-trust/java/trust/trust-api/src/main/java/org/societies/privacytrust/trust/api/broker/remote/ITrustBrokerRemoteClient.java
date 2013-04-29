@@ -24,8 +24,14 @@
  */
 package org.societies.privacytrust.trust.api.broker.remote;
 
+import java.util.Set;
+
+import org.societies.api.identity.Requestor;
 import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.model.TrustRelationship;
+import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 
 /**
  * This interface provides access to the trust values associated with individuals,
@@ -35,27 +41,223 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityId;
  * @since 0.5
  */
 public interface ITrustBrokerRemoteClient {
-
+	
 	/**
-	 * Retrieves the trust value which the specified trustor has assigned to the
-	 * supplied trustee. The method returns <code>null</code> if no trust value
-	 * has been assigned to the specified trustee by the given trustor.
-	 * 
+	 * Retrieves all trust relationships of the specified trustor. The method
+	 * returns an <i>empty</i> set if the identified trustor has not 
+	 * established any trust relationships. The result is returned through the 
+	 * {@link ITrustBrokerRemoteClientCallback#onRetrievedTrustRelationships(Set)}
+	 * method.
+	 *
+	 * @param requestor 
+	 *            (required)
 	 * @param trustorId
-	 *            the identifier of the entity which has assigned the trust
-	 *            value to retrieve.
-	 * @param trusteeId
-	 *            the identifier of the entity whose trust value to retrieve.
+	 *            (required) the identifier of the entity whose trust
+	 *            relationships to retrieve.
 	 * @param callback
-	 *            the callback to receive the trust value.
-	 * @throws TrustException 
-	 *             if the trust value of the specified entity cannot be
-	 *             retrieved
-	 * @throws NullPointerException 
-	 *             if any of the specified parameters is <code>null</code>
-	 * @since 0.5
+	 *            (required) the callback to receive the result.
+	 * @throws TrustException if the trust relationships cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @since 1.0
 	 */
-	public void retrieveTrust(final TrustedEntityId trustorId,
-			final TrustedEntityId trusteeId, 
+	public void retrieveTrustRelationships(final Requestor requestor,
+			final TrustedEntityId trustorId,
+			final ITrustBrokerRemoteClientCallback callback)
+					throws TrustException;
+	
+	/**
+	 * Retrieves the trust relationships of the specified trustor with the
+	 * supplied trustee. The method returns an <i>empty</i> set if no trust
+	 * relationships exist between the identified trustor and trustee. The
+	 * result is returned through the 
+	 * {@link ITrustBrokerRemoteClientCallback#onRetrievedTrustRelationships(Set)}
+	 * method.
+	 *
+	 * @param requestor 
+	 *            (required)
+	 * @param trustorId
+	 *            (required) the identifier of the entity whose trust 
+	 *            relationships to retrieve.
+	 * @param trusteeId
+	 *            (required) the identifier of the entity trusted by the 
+	 *            specified trustor.
+	 * @param callback
+	 *            (required) the callback to receive the result.
+	 * @throws TrustException if the trust relationships cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @since 1.0
+	 */
+	public void retrieveTrustRelationships(final Requestor requestor,
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId, 
+			final ITrustBrokerRemoteClientCallback callback) throws TrustException;
+	
+	/**
+	 * Retrieves the trust relationship of the specified type which the given
+	 * trustor has established with the supplied trustee. The method returns 
+	 * <code>null</code> if no trust relationship of the specified type has
+	 * been established with the supplied trustee by the given trustor. The
+	 * result is returned through the 
+	 * {@link ITrustBrokerRemoteClientCallback#onRetrievedTrustRelationship(TrustRelationship)}
+	 * method.
+	 * 
+	 * @param requestor
+	 *            (required)
+	 * @param trustorId
+	 *            (required) the identifier of the entity which has assigned
+	 *            the trust value to retrieve.
+	 * @param trusteeId
+	 *            (required) the identifier of the entity whose trust value to
+	 *            retrieve.
+	 * @param trustValueType
+	 *            (required) the type of the trust value, i.e. one of 
+	 *            {@link TrustValueType#DIRECT DIRECT},
+	 *            {@link TrustValueType#INDIRECT INDIRECT}, or
+	 *            {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}.
+	 * @param callback
+	 *            (required) the callback to receive the result.
+	 * @throws TrustException if the trust relationship cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is
+	 *         <code>null</code>.
+	 * @since 1.0
+	 */
+	public void retrieveTrustRelationship(final Requestor requestor, 
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final TrustValueType trustValueType,
+			final ITrustBrokerRemoteClientCallback callback) throws TrustException;
+	
+	/**
+	 * Retrieves the trust value of the specified type which the given trustor
+	 * has assigned to the supplied trustee. The method returns 
+	 * <code>null</code> if no trust value of the specified type has been
+	 * assigned to the supplied trustee by the given trustor. The
+	 * result is returned through the 
+	 * {@link ITrustBrokerRemoteClientCallback#onRetrievedTrustValue(Double)}
+	 * method.
+	 * 
+	 * @param requestor
+	 *            (required)
+	 * @param trustorId
+	 *            (required) the identifier of the entity which has assigned
+	 *            the trust value to retrieve.
+	 * @param trusteeId
+	 *            (required) the identifier of the entity whose trust value to
+	 *            retrieve.
+	 * @param trustValueType
+	 *            (required) the type of the trust value, i.e. one of 
+	 *            {@link TrustValueType#DIRECT DIRECT},
+	 *            {@link TrustValueType#INDIRECT INDIRECT}, or
+	 *            {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}.
+	 * @param callback
+	 *            (required) the callback to receive the result.
+	 * @throws TrustException if the trust value cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is
+	 *         <code>null</code>.
+	 * @since 1.0
+	 */
+	public void retrieveTrustValue(final Requestor requestor, 
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final TrustValueType trustValueType,
+			final ITrustBrokerRemoteClientCallback callback) throws TrustException;
+	
+	/**
+	 * Retrieves the trust relationships of the specified trustor matching the
+	 * supplied criteria. More specifically, the {@link TrustedEntityType type}
+	 * of the entities trusted by the trustor is also specified. The method
+	 * returns an <i>empty</i> set if no trust relationships match
+	 * the supplied criteria. The result is returned through the 
+	 * {@link ITrustBrokerRemoteClientCallback#onRetrievedTrustRelationships(Set)}
+	 * method.
+	 *
+	 * @param requestor 
+	 *            (required)
+	 * @param trustorId
+	 *            (required) the identifier of the entity which has established
+	 *            the trust relationships to retrieve.
+	 * @param trusteeType
+	 *            (required) the {@link TrustedEntityType type} of the trusted
+	 *            entities to match, e.g. {@link TrustedEntityType#CSS CSS}.
+	 * @param callback
+	 *            (required) the callback to receive the result.
+	 * @throws TrustException if the trust relationships cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @since 1.0
+	 */
+	public void retrieveTrustRelationships(final Requestor requestor, 
+			final TrustedEntityId trustorId, 
+			final TrustedEntityType trusteeType,
+			final ITrustBrokerRemoteClientCallback callback) throws TrustException;
+	
+	/**
+	 * Retrieves the trust relationships of the specified trustor matching the
+	 * supplied criteria. More specifically, the trust value type, i.e. one of
+	 * {@link TrustValueType#DIRECT DIRECT}, 
+	 * {@link TrustValueType#INDIRECT INDIRECT}, or
+	 * {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}, is also specified.
+	 * The method returns an <i>empty</i> set if no trust relationships match
+	 * the supplied criteria. The result is returned through the 
+	 * {@link ITrustBrokerRemoteClientCallback#onRetrievedTrustRelationships(Set)}
+	 * method.
+	 *
+	 * @param requestor 
+	 *            (required)
+	 * @param trustorId
+	 *            (required) the identifier of the entity which has established
+	 *            the trust relationships to retrieve.
+	 * @param trustValueType
+	 *            (required) the type of the trust value, i.e. one of 
+	 *            {@link TrustValueType#DIRECT DIRECT},
+	 *            {@link TrustValueType#INDIRECT INDIRECT}, or
+	 *            {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}.
+	 * @param callback
+	 *            (required) the callback to receive the result.
+	 * @throws TrustException if the trust relationships cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @since 1.0
+	 */
+	public void retrieveTrustRelationships(final Requestor requestor,
+			final TrustedEntityId trustorId,
+			final TrustValueType trustValueType,
+			final ITrustBrokerRemoteClientCallback callback) throws TrustException;
+	
+	/**
+	 * Retrieves the trust relationships of the specified trustor matching the
+	 * supplied criteria. More specifically, the {@link TrustedEntityType type}
+	 * of the entities trusted by the trustor and/or the trust value type, i.e. one of 
+	 * {@link TrustValueType#DIRECT DIRECT}, 
+	 * {@link TrustValueType#INDIRECT INDIRECT}, or
+	 * {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}, are also specified.
+	 * The method returns an <i>empty</i> set if no trust relationships match
+	 * the supplied criteria. The result is returned through the 
+	 * {@link ITrustBrokerRemoteClientCallback#onRetrievedTrustRelationships(Set)}
+	 * method.
+	 *
+	 * @param requestor 
+	 *            (required)
+	 * @param trustorId
+	 *            (required) the identifier of the entity which has established
+	 *            the trust relationships to retrieve.
+	 * @param trusteeType
+	 *            (required) the {@link TrustedEntityType type} of the trusted
+	 *            entities to match, e.g. {@link TrustedEntityType#CSS CSS}.
+	 * @param trustValueType
+	 *            (required) the type of the trust value, i.e. one of 
+	 *            {@link TrustValueType#DIRECT DIRECT},
+	 *            {@link TrustValueType#INDIRECT INDIRECT}, or
+	 *            {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}.
+	 * @param callback
+	 *            (required) the callback to receive the result.
+	 * @throws TrustException if the trust relationships cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @since 1.0
+	 */
+	public void retrieveTrustRelationships(
+			final Requestor requestor, final TrustedEntityId trustorId,
+			final TrustedEntityType trusteeType, 
+			final TrustValueType trustValueType,
 			final ITrustBrokerRemoteClientCallback callback) throws TrustException;
 }

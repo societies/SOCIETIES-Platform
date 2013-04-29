@@ -79,7 +79,7 @@ public class Tester {
 
 	@Test
 	public void TestMonitorActionsContext() {
-		System.out.println("Test 1109 started : ContextStorageTest");
+		System.out.println("Test 1876 started : ContextStorageTest");
 
 
 		CtxAttributeIdentifier uiModelAttributeId = null;
@@ -159,7 +159,7 @@ public class Tester {
 			//setContext(CtxAttributeTypes.STATUS, "free");
 
 			//send actions - 2 second delay
-			LOG.info("Monitor services #1109 - sending mock actions for storage");
+			LOG.info("Monitor services #1876 - sending mock actions for storage");
 
 			actionsTask1(action1,action2,action3);
 			randomAction(actionRandom1);
@@ -311,7 +311,7 @@ public class Tester {
 	@Test
 	public void TestPerformContinuousPrediction(){
 
-		LOG.info("Test 1109 : TestPerformContinuousPrediction");
+		LOG.info("Test 1876 : TestPerformContinuousPrediction");
 
 
 		try {
@@ -344,7 +344,7 @@ public class Tester {
 	@Test
 	public void TestGetCurrentIntentAction(){
 
-		LOG.info("Test 1109 : TestGetCurrentIntentAction");
+		LOG.info("Test 1876 : TestGetCurrentIntentAction");
 
 		ServiceResourceIdentifier serviceId3 = new ServiceResourceIdentifier();
 		try {
@@ -393,7 +393,7 @@ public class Tester {
 	@Test
 	public void TestGetPredictionByAttrUpdate(){
 
-		LOG.info("Test 1109 : TestGetPredictionByAttrUpdate");
+		LOG.info("Test 1876 : TestGetPredictionByAttrUpdate");
 		IIdentity cssOwnerId = getOwnerId();
 
 		CtxAttribute updatedlocAttr =  setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "Gas_station");

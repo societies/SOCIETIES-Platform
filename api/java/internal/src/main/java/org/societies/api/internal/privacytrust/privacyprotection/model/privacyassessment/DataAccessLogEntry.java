@@ -25,6 +25,7 @@
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
 import java.util.Date;
+import java.util.List;
 
 import org.societies.api.identity.IIdentity;
 
@@ -39,32 +40,42 @@ public class DataAccessLogEntry {
 	private final Date time;
 	private final long timeInMs;
 	private final IIdentity requestor;	
-	private final String requestorClass;	
+	private final String requestorClass;
+	private final List<String> requestorStack;
 	private final IIdentity owner;
 	private final long dataSize;
 	
 	public DataAccessLogEntry(Date time, IIdentity requestor, String requestorClass,
-			IIdentity owner) {
+			List<String> requestorStack, IIdentity owner) {
 		
 		this.time = time;
 		this.timeInMs = time.getTime();
 		this.requestor = requestor;
 		this.requestorClass = requestorClass;
+		this.requestorStack = requestorStack;
 		this.owner = owner;
 		this.dataSize = -1;
 	}
 	
 	public DataAccessLogEntry(Date time, IIdentity requestor, String requestorClass,
-			IIdentity owner, long payloadSize) {
+			List<String> requestorStack, IIdentity owner, long payloadSize) {
 		
 		this.time = time;
 		this.timeInMs = time.getTime();
 		this.requestor = requestor;
 		this.requestorClass = requestorClass;
+		this.requestorStack = requestorStack;
 		this.owner = owner;
 		this.dataSize = payloadSize;
 	}
 	
+	/**
+	 * @return List of all non-system classes in stack
+	 */
+	public List<String> getRequestorStack() {
+		return requestorStack;
+	}
+
 	public Date getTime() {
 		return time;
 	}

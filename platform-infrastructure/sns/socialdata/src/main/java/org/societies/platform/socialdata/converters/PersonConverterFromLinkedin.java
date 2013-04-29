@@ -62,10 +62,22 @@ public class PersonConverterFromLinkedin implements PersonConverter {
 	private String     rawData;
 	private JSONObject db;
 	private Person 	   person;
+	private List<Account> accounts;
+	
+	
+	public PersonConverterFromLinkedin() {
+	    	Account linkedinAccounts = new AccountImpl();
+	    	linkedinAccounts.setDomain("linkedin.com");
+		accounts = new ArrayList<Account>();
+		accounts.add(linkedinAccounts);
+	}
 
 	public Person load(String data){
 
 		person = new PersonImpl();
+		person.setAccounts(accounts);
+		
+		
 		this.rawData = data;
 
 		try{

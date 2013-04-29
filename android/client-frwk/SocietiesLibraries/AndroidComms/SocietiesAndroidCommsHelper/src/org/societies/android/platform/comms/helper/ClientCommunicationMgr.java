@@ -14,6 +14,7 @@ import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.androidutils.PacketMarshaller;
 import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.comms.xmpp.CommunicationException;
+import org.societies.android.api.comms.xmpp.VCardParcel;
 import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.android.api.comms.xmpp.ICommCallback;
 import org.societies.api.identity.IIdentity;
@@ -549,6 +550,70 @@ public class ClientCommunicationMgr {
 		invoke.execute();
 	}
 	
+	public void setVCard(VCardParcel vCard) {
+		int targetMethodInt = 15;
+		String targetMethodSignature = XMPPAgent.methodsArray[targetMethodInt];
+		
+		android.os.Message outMessage = android.os.Message.obtain(null, targetMethodInt, 0, 0);
+		Bundle outBundle = new Bundle();
+
+		//CLIENT PARAM
+		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethodSignature, 0), this.clientPackageName);
+		if (DEBUG_LOGGING) Log.d(LOG_TAG, "Client Package Name: " + this.clientPackageName);
+		//VCARD PARAM
+		outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(targetMethodSignature, 1), vCard);
+		if (DEBUG_LOGGING) Log.d(LOG_TAG, "VCard added: " + vCard.getJabberId());
+
+		outMessage.setData(outBundle);
+		if (DEBUG_LOGGING) Log.d(LOG_TAG, "Call Societies Android Comms Service: " + targetMethodSignature);
+		try {
+			targetService.send(outMessage);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+    
+	public VCardParcel getVCard(ICommCallback callback) {
+		try {
+			//MANAGE CALLBACK
+			long callbackID = this.randomGenerator.nextLong();
+			synchronized(this.xmppCallbackMap) {
+				//store callback in order to activate required methods
+				this.xmppCallbackMap.put(callbackID, callback);
+			}
+			InvokeVCard invoke = new InvokeVCard(this.clientPackageName, callbackID);
+			String[] params = new String[] {XMPPAgent.GET_VCARD};
+			invoke.execute(params);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public VCardParcel getVCard(String userId, ICommCallback callback) {
+		Dbc.require("userID Param must be specified", null != userId);
+		try {
+			//CONVERT TO USER ACCOUNT IF PARAM WAS EXTERNAL COMPONENT
+			IIdentity userIdentity = this.getIdManager().fromJid(userId);
+			userId = userIdentity.getIdentifier() + "@" + userIdentity.getDomain();
+			
+			//MANAGE CALLBACK
+			long callbackID = this.randomGenerator.nextLong();
+			synchronized(this.xmppCallbackMap) {
+				//store callback in order to activate required methods
+				this.xmppCallbackMap.put(callbackID, callback);
+			}			
+			
+			InvokeVCard invoke = new InvokeVCard(this.clientPackageName, callbackID);
+			String[] params = new String[] {XMPPAgent.GET_USER_VCARD, userId};
+			invoke.execute(params);
+			
+		} catch (InvalidFormatException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
 	private static IIdentityManager createIdentityManager(String thisNode, String daNode) throws InvalidFormatException {
 		IIdentityManager idManager;
@@ -817,8 +882,40 @@ public class ClientCommunicationMgr {
 						callback.returnException(intent.getStringExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY));
 					}
 				}
+			} //////////////////////////// RETURN VCARD /////////////////////////// 
+			else if (intent.getAction().equals(XMPPAgent.GET_VCARD)) {
+				synchronized(ClientCommunicationMgr.this.xmppCallbackMap) {
+					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
+					if (null != callback) {
+						ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
+						if (DEBUG_LOGGING) Log.d(LOG_TAG, "Received my VCard result");
+						try {
+							VCardParcel vcard = intent.getParcelableExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY);
+							callback.receiveResult(new Stanza(ClientCommunicationMgr.this.getIdManager().getThisNetworkNode()), vcard);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			} //////////////////////////RETURN VCARD /////////////////////////// 
+			else if (intent.getAction().equals(XMPPAgent.GET_USER_VCARD)) {
+				synchronized(ClientCommunicationMgr.this.xmppCallbackMap) {
+					ICommCallback callback = ClientCommunicationMgr.this.xmppCallbackMap.get(callbackId);
+					if (null != callback) {
+						ClientCommunicationMgr.this.xmppCallbackMap.remove(callbackId);
+						if (DEBUG_LOGGING)
+							Log.d(LOG_TAG, "Received user's Vcard result");
+						try {
+							VCardParcel vcard = intent.getParcelableExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY);
+							callback.receiveResult(new Stanza(ClientCommunicationMgr.this.getIdManager().getThisNetworkNode()), vcard);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
 			}
 		}
+		
     }
 
     /**
@@ -853,6 +950,8 @@ public class ClientCommunicationMgr {
         intentFilter.addAction(XMPPAgent.UNREGISTER_EXCEPTION);
         intentFilter.addAction(XMPPAgent.NEW_MAIN_IDENTITY);
         intentFilter.addAction(XMPPAgent.NEW_MAIN_IDENTITY_EXCEPTION);
+        intentFilter.addAction(XMPPAgent.GET_VCARD);
+        intentFilter.addAction(XMPPAgent.GET_USER_VCARD);
         return intentFilter;
     }
     
@@ -1878,6 +1977,62 @@ public class ClientCommunicationMgr {
     		return null;
     	}
     }
+    
+	/**Async task to invoke VCard functions
+     */
+    private class InvokeVCard extends AsyncTask<String, Void, Void> {
+
+    	private final String LOCAL_LOG_TAG = InvokeVCard.class.getName();
+    	private String client;
+    	private long remoteCallId;
+
+    	/**
+    	 * Default Constructor
+    	 * 
+    	 * @param packageName
+    	 * @param client
+    	 */
+    	public InvokeVCard(String client, long remoteCallId) {
+    		this.client = client;
+    		this.remoteCallId = remoteCallId;
+    	}
+
+    	protected Void doInBackground(String... params) {
+
+    		String targetIntent = params[0];
+    		int targetMethodInt;
+    		if (targetIntent.equals(XMPPAgent.GET_VCARD))
+    			targetMethodInt = 16;
+    		else 
+    			targetMethodInt = 17; //XMPPAgent.GET_USER_VCARD
+
+    		String targetMethodSignature = XMPPAgent.methodsArray[targetMethodInt];
+    		android.os.Message outMessage = android.os.Message.obtain(null, targetMethodInt, 0, 0);
+    		Bundle outBundle = new Bundle();
+
+    		//CLIENT PARAM
+    		outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethodSignature, 0), this.client);
+    		if (DEBUG_LOGGING) Log.d(LOCAL_LOG_TAG, "Client Package Name: " + this.client);
+    		
+    		outBundle.putLong(ServiceMethodTranslator.getMethodParameterName(targetMethodSignature, 1), this.remoteCallId);
+    		if (DEBUG_LOGGING) Log.d(LOCAL_LOG_TAG, "Remote call ID: " + this.remoteCallId);
+
+    		if (targetMethodInt == 17) { //ONLY REQUIRED WHEN GETTING ANOTHER USER'S VCARD
+    			String userID = params[1];
+    			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethodSignature, 2), userID);
+        		if (DEBUG_LOGGING) Log.d(LOCAL_LOG_TAG, "Target user ID: " + userID);
+    		}
+    		outMessage.setData(outBundle);
+			if (DEBUG_LOGGING) Log.d(LOCAL_LOG_TAG, "Call Societies Android Comms Service: " + targetMethodSignature);
+    		try {
+				targetService.send(outMessage);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+    		return null;
+    	}
+    }
+    
     /**
      * Create a stanza from a received packet
      * @param packet

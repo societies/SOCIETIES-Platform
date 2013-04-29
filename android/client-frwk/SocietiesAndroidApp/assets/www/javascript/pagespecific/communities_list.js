@@ -40,6 +40,21 @@ var	SocietiesCISListService = {
 	mLastDate: "",
 	
 	/**
+	 * Replaces the image for the profile pic
+	 * @param VCard
+	 * @returns
+	 */
+	showAvatar: function (VCard) {
+		if (VCard.from != null) {
+			var n=VCard.from.indexOf("@");
+			var identityStr = VCard.from.substring(0, n);
+			var imageStr = VCard.avatar;
+			if (imageStr != null)
+				$('img#' + identityStr).attr("src", "data:image/jpg;base64," + VCard.avatar);
+		}
+	},
+	
+	/**
 	 * @methodOf SocietiesCISListService#
 	 * @description update the CIS data on communities_list.html 
 	 * @param {Object} successCallback The callback which will be called when result is successful
@@ -58,6 +73,7 @@ var	SocietiesCISListService = {
 		for (i  = 0; i < data.length; i++) {
 			var tableEntry = '<li><a href="#" onclick="SocietiesCISListService.showCISDetails(' + i + ', ' + bAdmin + ')"><img src="images/community_profile_icon.png" class="profile_list" alt="logo" >' +
 							 '<h2>' + data[i].communityName + '</h2>' + 
+							 '<p><b>Category:</b> ' + data[i].communityType + '</p>' +
 							 '<p>' + data[i].description + '</p>' + 
 							 '</a></li>';
 			$('ul#CommunitiesListDiv').append(tableEntry);
@@ -73,7 +89,7 @@ var	SocietiesCISListService = {
 			mCis_id = communityObj.communityJid;
 			$('input#cis_id').val(mCis_id);
 			var markup = "<h1>" + communityObj.communityName + "</h1>" + 
-						 "<p>Type: " + communityObj.communityType + "</p>" + 
+						 "<p>Category: " + communityObj.communityType + "</p>" + 
 						 "<p>" + communityObj.description + "</p>" + 
 						 "<p>Admin: " + communityObj.ownerJid + "</p>";
 			//INJECT
@@ -144,11 +160,15 @@ var	SocietiesCISListService = {
 					//BODY FORMATTING
 					var n=data[i].actor.indexOf(".");
 					var actorStr = data[i].actor.substring(0, n);
+					var objectStr = data[i].object;
+					if (objectStr.substring(0, 3)=='cis')
+						objectStr = "community";
 					//var tableEntry = "<li id=\"li" + data[i].published + "\"><a href=\"#\" onclick=\"return false;\"><p>" + hours + ":" + minutes + " " + suffix + "</p>" +
 					var tableEntry = "<li id=\"li" + data[i].published + "\"><a href=\"#\" onclick=\"return false;\">" +
+									 "<img src='images/profile_pic.png' id='" + actorStr + "' style='max-width:40px;' />" +
 									 "<h2>"+ actorStr + "</h2>" +
-						 	 		 "<p>" + data[i].verb  + " " + data[i].object + "</p>" +
-						 	 		"<p class=\"ui-li-aside\">" + hours + ":" + minutes + " " + suffix + "</p>" + 
+						 	 		 "<p>" + data[i].verb  + " " + objectStr + "</p>" + //data[i].object
+						 	 		 "<p class=\"ui-li-aside\">" + hours + ":" + minutes + " " + suffix + "</p>" + 
 						 	 		 "</a>" + deleteTag + "</li>";
 					$('ul#cis_activity_feed').append(tableEntry);
 				}
@@ -261,33 +281,43 @@ var	SocietiesCISListService = {
 		window.plugins.SocietiesLocalCISManager.addActivity(mCis_id, activity, success, failure);
 	},
 	
-	showCISMembers: function (cisId, bAdmin) {		
+	showCISMembers: function (cisId, bAdmin) {
+		function showAvatarfailure(data) {
+			console.log("Error retrieving avatar: " + data);
+		}
+		
 		function success(data) {
 			//EMPTY TABLE - NEED TO LEAVE THE HEADER
 			while( $('ul#cis_members').children().length >0 )
 				$('ul#cis_members li:last').remove();
 			
 			for (i  = 0; i < data.length; i++) {
-				//TODO: NEED TO GET NAME ADDED TO PARTICIPANT OBJECT. ONLY HAVE JID!
 				var n=data[i].jid.indexOf(".");
 				var identityStr = data[i].jid.substring(0, n);
 				//SEND FRIEND REQUEST LINK
-				var friendRequestATag = '<a href="#" onclick="SocietiesCISListService.sendFriendRequest(\'' + identityStr + '\', \'' + data[i].jid + '\', ' + i + ')">',
+				//var friendRequestATag = '<a href="#" onclick="SocietiesCISListService.sendFriendRequest(\'' + data[i].name + '\', \'' + data[i].jid + '\', ' + i + ')">',
+				var friendRequestATag = '<a href="#" >',
 					friendRequestATagClose = "</a>";
 				//GENERATE REMOVE MEMBER LINK - ADMIN MODE ONLY
 				var removeMember = "";
 				if (bAdmin) {
-					removeMember = '<a href="#" onclick="SocietiesCISListService.removeMember(\'' + identityStr + '\', \'' + data[i].jid + '\', ' + i + ')">Remove Member</a>';
+					removeMember = '<a href="#" onclick="SocietiesCISListService.removeMember(\'' + data[i].name + '\', \'' + data[i].jid + '\', ' + i + ')">Remove Member</a>';
 					if (data[i].role == "owner") {
 						//PREVENT FRIEND REQUESTS TO SELF
 						friendRequestATag = "", friendRequestATagClose = "", removeMember="";
 					}
 				}
 				//TABLE ENTRY
-				var tableEntry = '<li id="li' + i + '">' + friendRequestATag + 
-								 '<h2>'+ data[i].jid + '</h2>' + 
-								 '<p>' + data[i].role  + '</p>' + friendRequestATagClose + removeMember + '</li>';
+				var adminString = "";
+				if (data[i].role == "OWNER")
+					adminString = '<p class="ui-li-aside">owner</p>';
+				var tableEntry = '<li id="li' + i + '">' + friendRequestATag +
+								 '<img src="images/profile_pic.png" id="' + identityStr + '" style="max-width:100px;" />' +
+								 '<h2>'+ data[i].name + '</h2>' +
+								 adminString + 
+								 '<p>' + data[i].jid  + '</p>' + friendRequestATagClose + removeMember + '</li>';
 				$('ul#cis_members').append(tableEntry);
+				window.plugins.SocietiesLocalCSSManager.getVCardUser(data[i].jid, SocietiesCISListService.showAvatar, showAvatarfailure);
 			}
 			$('ul#cis_members').listview('refresh');
 			$('ul#cis_members').trigger( "collapse" );
@@ -331,13 +361,11 @@ var	SocietiesCISListService = {
 		}
 		
 		//SEND REQUEST
-		if (window.confirm("Send friend request to " + name + "?")) {
-		//jConfirm("Send friend request to " + name + "?", 'Friend Request', function(answer) {
-		     //if (answer){
+		if (myIdentity != css_id) {
+			if (window.confirm("Send friend request to " + name + "?")) {
 		    	 window.plugins.SocietiesLocalCSSManager.sendFriendRequest(css_id, success, failure);
-		     //}
+			}
 		}
-		//);
 	},
 	
 	/**

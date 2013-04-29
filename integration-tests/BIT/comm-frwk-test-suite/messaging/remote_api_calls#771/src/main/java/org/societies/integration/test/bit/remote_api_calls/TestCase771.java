@@ -58,7 +58,7 @@ public class TestCase771 extends IntegrationTestCase implements ICommCallback{
 	private LowerTester lowerTester;
 
 	public TestCase771() {
-		super(711, NominalTestCase.class);
+		super(1855, NominalTestCase.class);
 		
 		this.lowerTester = new  LowerTester();
 	}

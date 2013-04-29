@@ -53,7 +53,7 @@ public class TestCase109612 extends IntegrationTestCase {
         // Call the super constructor
         // with test case number
         // and test case classes to run
-        super(109612, new Class[]{ActivityFeedManagerRemoteTest.class});
+        super(1925, new Class[]{ActivityFeedManagerRemoteTest.class});
         ActivityFeedManagerRemoteTest.testCaseNumber = this.testCaseNumber;
     }
 

@@ -25,20 +25,29 @@
 package org.societies.privacytrust.trust.impl;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
+import org.societies.api.privacytrust.trust.model.TrustRelationship;
+import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.ITrustNodeMgr;
-import org.societies.privacytrust.trust.api.broker.remote.IInternalTrustBrokerRemoteClient;
-import org.societies.privacytrust.trust.api.broker.remote.IInternalTrustBrokerRemoteClientCallback;
+import org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClient;
+import org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClientCallback;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
+import org.societies.privacytrust.trust.api.model.ITrustedCis;
+import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
+import org.societies.privacytrust.trust.api.model.ITrustedService;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -71,9 +80,9 @@ public class InternalTrustBroker implements ITrustBroker {
 	@Autowired(required=false)
 	private ITrustRepository trustRepo;
 	
-	/** The internal Trust Broker Remote Client service reference. */
+	/** The Trust Broker Remote Client service reference. */
 	@Autowired(required=false)
-	private IInternalTrustBrokerRemoteClient internalTrustBrokerRemoteClient;
+	private ITrustBrokerRemoteClient trustBrokerRemoteClient;
 			
 	InternalTrustBroker() {
 		
@@ -82,70 +91,9 @@ public class InternalTrustBroker implements ITrustBroker {
 	}
 	
 	/*
-	 * @see org.societies.api.privacytrust.trust.ITrustBroker#retrieveTrust(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 * TODO Remove once no longer referenced.
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrust(org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
-	@Async
-	@Override
-	public Future<Double> retrieveTrust(final TrustedEntityId trustorId,
-			final TrustedEntityId trusteeId) throws TrustException {
-		
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
-			throw new NullPointerException("trusteeId can't be null");
-		
-		Double trustValue = null;
-		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving trust value assigned to entity '"	+ trusteeId
-					+ "' by '" + trustorId + "'");
-		
-		try {
-			final boolean doLocal = 
-					(this.trustNodeMgr.getMyIds().contains(trustorId) && this.trustNodeMgr.isMaster())
-					? true : false;
-			if (LOG.isDebugEnabled())
-				LOG.debug("doLocal for trustor '" + trustorId + "' is " + doLocal);
-			if (doLocal) {
-
-				if (this.trustRepo == null)
-					throw new TrustBrokerException("Could not retrieve trust value assigned to entity '" 
-							+ trusteeId + "' by '" + trustorId 
-							+ "': ITrustRepository service is not available");
-				final ITrustedEntity entity = this.trustRepo.retrieveEntity(trustorId, trusteeId);
-				if (entity != null)
-					trustValue = entity.getUserPerceivedTrust().getValue();
-
-			} else {
-
-				if (this.internalTrustBrokerRemoteClient == null)
-					throw new TrustBrokerException("Could not retrieve trust value assigned to entity '" 
-							+ trusteeId + "' by '" + trustorId 
-							+ "': IInternalTrustBrokerRemoteClient service is not available");
-
-				final RemoteRetrieveCallback callback = new RemoteRetrieveCallback();
-				this.internalTrustBrokerRemoteClient.retrieveTrust(trustorId, trusteeId, callback);
-				synchronized (callback) {
-					try {
-						callback.wait();
-						trustValue = callback.getResult();
-					} catch (InterruptedException ie) {
-
-						throw new TrustBrokerException("Interrupted while receiveing trust value assigned to entity '" 
-								+ trusteeId + "' by '" + trustorId + "'");
-					}
-				}
-			}
-			
-		} catch (ServiceUnavailableException sue) {
-			throw new TrustBrokerException("Could not retrieve trust value assigned to entity '" 
-					+ trusteeId + "' by '" + trustorId 
-					+ "': " + sue.getLocalizedMessage(), sue);
-		}
-			
-		return new AsyncResult<Double>(trustValue);
-	}
-
 	@Deprecated
 	public Future<Double> retrieveTrust(
 			final TrustedEntityId trusteeId) throws TrustException {
@@ -154,10 +102,788 @@ public class InternalTrustBroker implements ITrustBroker {
 	}
 	
 	/*
-	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateEventListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void registerTrustUpdateEventListener(
+	@Async
+	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final Requestor requestor, final TrustedEntityId trustorId)
+					throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		
+		return this.doRetrieveTrustRelationshipsByType(requestor, trustorId, null, null);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	@Async
+	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final TrustedEntityId trustorId) throws TrustException {
+		
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		
+		return this.doRetrieveTrustRelationshipsByType(null, trustorId, null, null);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	@Async
+	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final Requestor requestor, final TrustedEntityId trustorId,
+			final TrustedEntityId trusteeId) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		
+		return this.doRetrieveTrustRelationships(requestor, trustorId, trusteeId);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	@Async
+	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
+					throws TrustException {
+		
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		
+		return this.doRetrieveTrustRelationships(null, trustorId, trusteeId);
+	}
+	
+	@Async
+	private Future<Set<TrustRelationship>> doRetrieveTrustRelationships(
+			Requestor requestor, final TrustedEntityId trustorId, 
+			final TrustedEntityId trusteeId) throws TrustException {
+		
+		if (requestor == null)
+			requestor = this.trustNodeMgr.getLocalRequestor();
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving all trust relationships between trustor '" 
+					+ trustorId	+ "' and trustee '" + trusteeId 
+					+ "' on behalf of requestor '" + requestor + "'");
+		
+		final Set<TrustRelationship> trustRelationships =
+				new HashSet<TrustRelationship>();
+		try {
+			final boolean doLocal = (this.trustNodeMgr.getMyIds().contains(trustorId) 
+					&& this.trustNodeMgr.isMaster());
+			if (LOG.isDebugEnabled())
+				LOG.debug("doLocal for trustor '" + trustorId + "' is " + doLocal);
+			if (doLocal) { // L O C A L
+
+				if (this.trustRepo == null)
+					throw new TrustBrokerException(
+							"Could not retrieve all trust relationships between trustor '" 
+							+ trustorId	+ "' and trustee '" + trusteeId 
+							+ "' on behalf of requestor '" + requestor + "'" 
+							+ "': ITrustRepository service is not available");
+				final ITrustedEntity entity = this.trustRepo.retrieveEntity(trustorId, trusteeId);
+				if (entity != null) {
+					
+					if (entity.getDirectTrust().getValue() != null)
+						trustRelationships.add(new TrustRelationship(trustorId, trusteeId, 
+								TrustValueType.DIRECT, entity.getDirectTrust().getValue(), 
+								entity.getDirectTrust().getLastUpdated()));
+					if (entity.getIndirectTrust().getValue() != null)
+						trustRelationships.add(new TrustRelationship(trustorId, trusteeId, 
+								TrustValueType.INDIRECT, entity.getIndirectTrust().getValue(), 
+								entity.getIndirectTrust().getLastUpdated()));
+					if (entity.getUserPerceivedTrust().getValue() != null)
+						trustRelationships.add(new TrustRelationship(trustorId, trusteeId, 
+								TrustValueType.USER_PERCEIVED, entity.getUserPerceivedTrust().getValue(), 
+								entity.getUserPerceivedTrust().getLastUpdated()));
+				}
+
+			} else { // R E M O T E
+
+				if (this.trustBrokerRemoteClient == null)
+					throw new TrustBrokerException(
+							"Could not retrieve all trust relationships between trustor '" 
+							+ trustorId	+ "' and trustee '" + trusteeId 
+							+ "' on behalf of requestor '" + requestor + "'"
+							+ "': ITrustBrokerRemoteClient service is not available");
+
+				final RemoteClientCallback callback = new RemoteClientCallback();
+				this.trustBrokerRemoteClient.retrieveTrustRelationships(
+						requestor, trustorId, trusteeId, callback);
+				synchronized (callback) {
+					try {
+						callback.wait();
+						if (callback.getException() == null)
+							trustRelationships.addAll(callback.getTrustRelationships());
+						else
+							throw callback.getException();
+						
+					} catch (InterruptedException ie) {
+
+						throw new TrustBrokerException(
+								"Interrupted while receiveing all trust relationships between trustor '" 
+								+ trustorId	+ "' and trustee '" + trusteeId 
+								+ "' on behalf of requestor '" + requestor + "'");
+					}
+				}
+			}
+			
+		} catch (ServiceUnavailableException sue) {
+			throw new TrustBrokerException(
+					"Could not retrieve all trust relationships between trustor '" 
+					+ trustorId	+ "' and trustee '" + trusteeId 
+					+ "' on behalf of requestor '" + requestor + "'" 
+					+ "': " + sue.getLocalizedMessage(), sue);
+		}
+			
+		return new AsyncResult<Set<TrustRelationship>>(trustRelationships);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#retrieveTrustRelationship(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	@Async
+	public Future<TrustRelationship> retrieveTrustRelationship(
+			final Requestor requestor,
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");	
+		
+		return this.doRetrieveTrustRelationship(requestor, trustorId, trusteeId, trustValueType);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationship(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	@Async
+	public Future<TrustRelationship> retrieveTrustRelationship(
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId, 
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");	
+		
+		return this.doRetrieveTrustRelationship(null, trustorId, trusteeId, trustValueType);
+	}
+	
+	@Async
+	private Future<TrustRelationship> doRetrieveTrustRelationship(
+			Requestor requestor,
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (requestor == null)
+			requestor = this.trustNodeMgr.getLocalRequestor();
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving trust relationship of type '" + trustValueType 
+					+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
+					+ "' on behalf of requestor '" + requestor + "'");
+		
+		TrustRelationship trustRelationship = null;
+		try {
+			final boolean doLocal = (this.trustNodeMgr.getMyIds().contains(trustorId) 
+					&& this.trustNodeMgr.isMaster());
+			if (LOG.isDebugEnabled())
+				LOG.debug("doLocal for trustor '" + trustorId + "' is " + doLocal);
+			if (doLocal) { // L O C A L
+
+				if (this.trustRepo == null)
+					throw new TrustBrokerException(
+							"Could not retrieve trust relationship of type '" + trustValueType 
+								+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
+								+ "' on behalf of requestor '" + requestor + "'" 
+							+ "': ITrustRepository service is not available");
+				final ITrustedEntity entity = this.trustRepo.retrieveEntity(trustorId, trusteeId);
+				if (entity != null) {
+					if (TrustValueType.DIRECT == trustValueType) {
+						if (entity.getDirectTrust().getValue() != null)
+							trustRelationship = new TrustRelationship(trustorId,
+									trusteeId, trustValueType, 
+									entity.getDirectTrust().getValue(),
+									entity.getDirectTrust().getLastUpdated());
+					} else if (TrustValueType.INDIRECT == trustValueType) {
+						if (entity.getIndirectTrust().getValue() != null)
+							trustRelationship = new TrustRelationship(trustorId,
+									trusteeId, trustValueType,
+									entity.getIndirectTrust().getValue(),
+									entity.getIndirectTrust().getLastUpdated());
+					} else if (TrustValueType.USER_PERCEIVED == trustValueType) {
+						if (entity.getUserPerceivedTrust().getValue() != null)
+							trustRelationship = new TrustRelationship(trustorId,
+									trusteeId, trustValueType,
+									entity.getUserPerceivedTrust().getValue(),
+									entity.getUserPerceivedTrust().getLastUpdated());
+					} else {
+						throw new TrustBrokerException(
+								"Could not retrieve trust relationship of type '" + trustValueType 
+								+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
+								+ "' on behalf of requestor '" + requestor + "'" 
+								+ "': Unsupported trust value type '" + trustValueType + "'");
+					}
+				}
+
+			} else { // R E M O T E
+
+				if (this.trustBrokerRemoteClient == null)
+					throw new TrustBrokerException(
+							"Could not retrieve trust relationship of type '" + trustValueType
+							+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
+							+ "' on behalf of requestor '" + requestor + "'"
+							+ "': ITrustBrokerRemoteClient service is not available");
+
+				final RemoteClientCallback callback = new RemoteClientCallback();
+				this.trustBrokerRemoteClient.retrieveTrustRelationship(
+						requestor, trustorId, trusteeId, trustValueType, callback);
+				synchronized (callback) {
+					try {
+						callback.wait();
+						if (callback.getException() == null)
+							trustRelationship = callback.getTrustRelationship();
+						else
+							throw callback.getException();
+						
+					} catch (InterruptedException ie) {
+
+						throw new TrustBrokerException(
+								"Interrupted while receiveing trust relationship of type '" + trustValueType 
+								+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
+								+ "' on behalf of requestor '" + requestor + "'");
+					}
+				}
+			}
+			
+		} catch (ServiceUnavailableException sue) {
+			throw new TrustBrokerException(
+					"Could not retrieve trust relationship of type '" + trustValueType 
+					+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
+					+ "' on behalf of requestor '" + requestor + "'" 
+					+ "': " + sue.getLocalizedMessage(), sue);
+		}
+			
+		return new AsyncResult<TrustRelationship>(trustRelationship);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#retrieveTrustValue(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	@Async
+	public Future<Double> retrieveTrustValue(final Requestor requestor,
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");	
+		
+		return this.doRetrieveTrustValue(requestor, trustorId, trusteeId, trustValueType);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustValue(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	@Async
+	public Future<Double> retrieveTrustValue(final TrustedEntityId trustorId,
+			final TrustedEntityId trusteeId, final TrustValueType trustValueType) throws TrustException {
+		
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");	
+		
+		return this.doRetrieveTrustValue(null, trustorId, trusteeId, trustValueType);
+	}
+	
+	@Async
+	private Future<Double> doRetrieveTrustValue(Requestor requestor,
+			final TrustedEntityId trustorId,
+			final TrustedEntityId trusteeId, final TrustValueType trustValueType) throws TrustException {
+		
+		if (requestor == null)
+			requestor = this.trustNodeMgr.getLocalRequestor();
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving trust value of type '" + trustValueType 
+					+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
+					+ "' on behalf of requestor '" + requestor + "'");
+		
+		Double trustValue = null;
+		try {
+			final boolean doLocal = (this.trustNodeMgr.getMyIds().contains(trustorId) 
+					&& this.trustNodeMgr.isMaster());
+			if (LOG.isDebugEnabled())
+				LOG.debug("doLocal for trustor '" + trustorId + "' is " + doLocal);
+			if (doLocal) { // L O C A L
+
+				if (this.trustRepo == null)
+					throw new TrustBrokerException(
+							"Could not retrieve trust value of type '" + trustValueType 
+								+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
+								+ "' on behalf of requestor '" + requestor + "'" 
+							+ "': ITrustRepository service is not available");
+				final ITrustedEntity entity = this.trustRepo.retrieveEntity(trustorId, trusteeId);
+				if (entity != null) {
+					if (TrustValueType.DIRECT == trustValueType)
+						trustValue = entity.getDirectTrust().getValue();
+					else if (TrustValueType.INDIRECT == trustValueType)
+						trustValue = entity.getIndirectTrust().getValue();
+					else if (TrustValueType.USER_PERCEIVED == trustValueType)
+						trustValue = entity.getUserPerceivedTrust().getValue();
+					else
+						throw new TrustBrokerException(
+								"Could not retrieve trust value of type '" + trustValueType 
+								+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
+								+ "' on behalf of requestor '" + requestor + "'" 
+								+ "': Unsupported trust value type '" + trustValueType + "'");
+				}
+
+			} else { // R E M O T E
+
+				if (this.trustBrokerRemoteClient == null)
+					throw new TrustBrokerException(
+							"Could not retrieve trust value of type '" + trustValueType
+							+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
+							+ "' on behalf of requestor '" + requestor + "'"
+							+ "': ITrustBrokerRemoteClient service is not available");
+
+				final RemoteClientCallback callback = new RemoteClientCallback();
+				this.trustBrokerRemoteClient.retrieveTrustValue(
+						requestor, trustorId, trusteeId, trustValueType, callback);
+				synchronized (callback) {
+					try {
+						callback.wait();
+						if (callback.getException() == null)
+							trustValue = callback.getTrustValue();
+						else 
+							throw callback.getException();
+						
+					} catch (InterruptedException ie) {
+
+						throw new TrustBrokerException(
+								"Interrupted while receiveing trust value of type '" + trustValueType 
+								+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
+								+ "' on behalf of requestor '" + requestor + "'");
+					}
+				}
+			}
+			
+		} catch (ServiceUnavailableException sue) {
+			throw new TrustBrokerException(
+					"Could not retrieve trust value of type '" + trustValueType 
+					+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
+					+ "' on behalf of requestor '" + requestor + "'" 
+					+ "': " + sue.getLocalizedMessage(), sue);
+		}
+			
+		return new AsyncResult<Double>(trustValue);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType)
+	 */
+	@Override
+	@Async
+	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final Requestor requestor, final TrustedEntityId trustorId, 
+			final TrustedEntityType trusteeType) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		
+		return this.doRetrieveTrustRelationshipsByType(requestor, trustorId, 
+				trusteeType, null);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType)
+	 */
+	@Override
+	@Async
+	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final TrustedEntityId trustorId, 
+			final TrustedEntityType trusteeType) throws TrustException {
+		
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		
+		return this.doRetrieveTrustRelationshipsByType(null, trustorId, 
+				trusteeType, null);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	@Async
+	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final Requestor requestor, final TrustedEntityId trustorId,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		return this.doRetrieveTrustRelationshipsByType(requestor, trustorId, 
+				null, trustValueType);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	@Async
+	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final TrustedEntityId trustorId,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		return this.doRetrieveTrustRelationshipsByType(null, trustorId, 
+				null, trustValueType);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	@Async
+	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final Requestor requestor, final TrustedEntityId trustorId, 
+			final TrustedEntityType trusteeType,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		return this.doRetrieveTrustRelationshipsByType(requestor, trustorId, 
+				trusteeType, trustValueType);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	@Async
+	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final TrustedEntityId trustorId, 
+			final TrustedEntityType trusteeType,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		return this.doRetrieveTrustRelationshipsByType(null, trustorId, 
+				trusteeType, trustValueType);
+	}
+	
+	@Async
+	private Future<Set<TrustRelationship>> doRetrieveTrustRelationshipsByType(
+			Requestor requestor, final TrustedEntityId trustorId, 
+			final TrustedEntityType trusteeType,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (requestor == null)
+			requestor = this.trustNodeMgr.getLocalRequestor();
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving trust relationships of trustor '" 
+					+ trustorId	+ "' with entities of type '" + trusteeType 
+					+ "' and trust values of type '" + trustValueType
+					+ "' on behalf of requestor '" + requestor + "'");
+		
+		final Set<TrustRelationship> trustRelationships =
+				new HashSet<TrustRelationship>();
+		try {
+			final boolean doLocal = (this.trustNodeMgr.getMyIds().contains(trustorId) 
+					&& this.trustNodeMgr.isMaster());
+			if (LOG.isDebugEnabled())
+				LOG.debug("doLocal for trustor '" + trustorId + "' is " + doLocal);
+			if (doLocal) { // L O C A L
+
+				if (this.trustRepo == null)
+					throw new TrustBrokerException(
+							"Could not retrieve trust relationships of trustor '" 
+							+ trustorId	+ "' with entities of type '" + trusteeType 
+							+ "' and trust values of type '" + trustValueType
+							+ "' on behalf of requestor '" + requestor + "'" 
+							+ "': ITrustRepository service is not available");
+				
+				final Set<ITrustedEntity> entities = new HashSet<ITrustedEntity>();
+				if (null == trusteeType) {
+					entities.addAll(this.trustRepo.retrieveEntities(trustorId, ITrustedCss.class));
+					entities.addAll(this.trustRepo.retrieveEntities(trustorId, ITrustedCis.class));
+					entities.addAll(this.trustRepo.retrieveEntities(trustorId, ITrustedService.class));
+				} else if (TrustedEntityType.CSS == trusteeType) {
+					entities.addAll(this.trustRepo.retrieveEntities(trustorId, ITrustedCss.class));
+				} else if (TrustedEntityType.CIS == trusteeType) {
+					entities.addAll(this.trustRepo.retrieveEntities(trustorId, ITrustedCis.class));
+				} else if (TrustedEntityType.SVC == trusteeType) {
+					entities.addAll(this.trustRepo.retrieveEntities(trustorId, ITrustedService.class));
+				} else {
+					throw new TrustBrokerException(
+							"Could not retrieve trust relationships of trustor '" 
+							+ trustorId	+ "' with entities of type '" + trusteeType 
+							+ "' and trust values of type '" + trustValueType
+							+ "' on behalf of requestor '" + requestor + "'" 
+							+ "': Unsupported trustee type '" + trusteeType + "'");
+				}
+				
+				for (final ITrustedEntity entity : entities) {
+					
+					if (entity.getDirectTrust().getValue() != null
+							&& (null == trustValueType || TrustValueType.DIRECT == trustValueType))
+						trustRelationships.add(new TrustRelationship(trustorId, 
+								entity.getTrusteeId(), TrustValueType.DIRECT, 
+								entity.getDirectTrust().getValue(), 
+								entity.getDirectTrust().getLastUpdated()));
+					if (entity.getIndirectTrust().getValue() != null
+							&& (null == trustValueType || TrustValueType.INDIRECT == trustValueType))
+						trustRelationships.add(new TrustRelationship(trustorId,
+								entity.getTrusteeId(), 
+								TrustValueType.INDIRECT, 
+								entity.getIndirectTrust().getValue(), 
+								entity.getIndirectTrust().getLastUpdated()));
+					if (entity.getUserPerceivedTrust().getValue() != null
+							&& (null == trustValueType || TrustValueType.USER_PERCEIVED == trustValueType))
+						trustRelationships.add(new TrustRelationship(trustorId, 
+								entity.getTrusteeId(), 
+								TrustValueType.USER_PERCEIVED, 
+								entity.getUserPerceivedTrust().getValue(), 
+								entity.getUserPerceivedTrust().getLastUpdated()));
+				}
+
+			} else { // R E M O T E
+
+				if (this.trustBrokerRemoteClient == null)
+					throw new TrustBrokerException(
+							"Could not retrieve trust relationships of trustor '" 
+							+ trustorId	+ "' with entities of type '" + trusteeType 
+							+ "' and trust values of type '" + trustValueType
+							+ "' on behalf of requestor '" + requestor + "'"
+							+ "': ITrustBrokerRemoteClient service is not available");
+
+				final RemoteClientCallback callback = new RemoteClientCallback();
+				if (trusteeType != null && trustValueType == null)
+					this.trustBrokerRemoteClient.retrieveTrustRelationships(
+							requestor, trustorId, trusteeType, callback);
+				else if (trusteeType == null && trustValueType != null)
+					this.trustBrokerRemoteClient.retrieveTrustRelationships(
+							requestor, trustorId, trustValueType, callback);
+				else
+					this.trustBrokerRemoteClient.retrieveTrustRelationships(
+							requestor, trustorId, trusteeType, trustValueType, callback);
+				synchronized (callback) {
+					try {
+						callback.wait();
+						if (callback.getException() == null)
+							trustRelationships.addAll(callback.getTrustRelationships());
+						else
+							throw callback.getException();
+						
+					} catch (InterruptedException ie) {
+
+						throw new TrustBrokerException(
+								"Interrupted while receiveing trust relationships of trustor '" 
+								+ trustorId	+ "' with entities of type '" + trusteeType 
+								+ "' and trust values of type '" + trustValueType
+								+ "' on behalf of requestor '" + requestor + "'");
+					}
+				}
+			}
+			
+		} catch (ServiceUnavailableException sue) {
+			throw new TrustBrokerException(
+					"Could not retrieve trust relationships of trustor '" 
+					+ trustorId	+ "' with entities of type '" + trusteeType 
+					+ "' and trust values of type '" + trustValueType
+					+ "' on behalf of requestor '" + requestor + "'" 
+					+ "': " + sue.getLocalizedMessage(), sue);
+		}
+			
+		return new AsyncResult<Set<TrustRelationship>>(trustRelationships);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	public void registerTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		
+		this.doRegisterTrustUpdateListener(
+				requestor, listener, trustorId, null, null);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	public void unregisterTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		
+		this.doUnregisterTrustUpdateListener(
+				requestor, listener, trustorId, null, null);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	public void registerTrustUpdateListener(
+			final ITrustUpdateEventListener listener,
+			final TrustedEntityId trustorId) throws TrustException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		
+		this.doRegisterTrustUpdateListener(
+				null, listener, trustorId, null, null);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	public void unregisterTrustUpdateListener(
+			final ITrustUpdateEventListener listener,
+			final TrustedEntityId trustorId) throws TrustException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		
+		this.doUnregisterTrustUpdateListener(
+				null, listener, trustorId, null, null);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	public void registerTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
+					throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		
+		this.doRegisterTrustUpdateListener(
+				requestor, listener, trustorId, trusteeId, null);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	public void unregisterTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
+					throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		
+		this.doUnregisterTrustUpdateListener(
+				requestor, listener, trustorId, trusteeId, null);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	public void registerTrustUpdateListener(
 			final ITrustUpdateEventListener listener,
 			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
 					throws TrustException {
@@ -169,24 +895,17 @@ public class InternalTrustBroker implements ITrustBroker {
 		if (trusteeId == null)
 			throw new NullPointerException("trusteeId can't be null");
 		
-		if (this.trustEventMgr == null)
-			throw new TrustBrokerException("Could not register trust update listener for entity (" 
-					+ trustorId	+ ", " + trusteeId + "): ITrustEventMgr service is not available");
-		
-		final String[] topics = new String[] { TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
-		if (LOG.isDebugEnabled())
-			LOG.debug("Registering event listener for entity (" + trustorId 
-					+ ", " + trusteeId + ") to topics '" + Arrays.toString(topics) + "'");
-		this.trustEventMgr.registerUpdateListener(listener, topics, trustorId, trusteeId);
+		this.doRegisterTrustUpdateListener(
+				null, listener, trustorId, trusteeId, null);
 	}
 	
 	/*
-	 * @see org.societies.api.privacytrust.trust.ITrustBroker#unregisterTrustUpdateEventListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void unregisterTrustUpdateEventListener(
+	public void unregisterTrustUpdateListener(
 			final ITrustUpdateEventListener listener,
-			final TrustedEntityId trustorId, final TrustedEntityId trusteeId) 
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
 					throws TrustException {
 		
 		if (listener == null)
@@ -196,35 +915,620 @@ public class InternalTrustBroker implements ITrustBroker {
 		if (trusteeId == null)
 			throw new NullPointerException("trusteeId can't be null");
 		
-		if (this.trustEventMgr == null)
-			throw new TrustBrokerException("Could not unregister trust update listener for entity (" 
-					+ trustorId	+ ", " + trusteeId + "): ITrustEventMgr service is not available");
-		final String[] topics = new String[] { TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
-		if (LOG.isDebugEnabled())
-			LOG.debug("Unregistering event listener for entity (" + trustorId 
-					+ ", " + trusteeId + ") from topics '" + Arrays.toString(topics) + "'");
-		this.trustEventMgr.unregisterUpdateListener(listener, topics, trustorId, trusteeId);
+		this.doUnregisterTrustUpdateListener(
+				null, listener, trustorId, trusteeId, null);
 	}
 	
-	private class RemoteRetrieveCallback implements IInternalTrustBrokerRemoteClientCallback {
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	public void registerTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		this.doRegisterTrustUpdateListener(
+				requestor, listener, trustorId, trusteeId, trustValueType);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	public void unregisterTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		
+		this.doUnregisterTrustUpdateListener(
+				requestor, listener, trustorId, trusteeId, trustValueType);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	public void registerTrustUpdateListener(
+			final ITrustUpdateEventListener listener,
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		this.doRegisterTrustUpdateListener(
+				null, listener, trustorId, trusteeId, trustValueType);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	public void unregisterTrustUpdateListener(
+			final ITrustUpdateEventListener listener,
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final TrustValueType trustValueType) 
+					throws TrustException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		
+		this.doUnregisterTrustUpdateListener(
+				null, listener, trustorId, trusteeId, trustValueType);
+	}
+	
+	private void doRegisterTrustUpdateListener(Requestor requestor,
+			final ITrustUpdateEventListener listener,
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (requestor == null)
+			requestor = this.trustNodeMgr.getLocalRequestor();
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Registering for trust value updates of type '" + trustValueType 
+					+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
+					+ "' on behalf of requestor '" + requestor + "'");
+		
+		if (this.trustEventMgr == null)
+			throw new TrustBrokerException(
+					"Could not register for trust value updates of type '" 
+					+ trustValueType + "' assigned to entity '"	+ trusteeId	
+					+ "' by '" + trustorId 
+					+ "' on behalf of requestor '" + requestor + "'" 
+					+ ": ITrustEventMgr service is not available");
+		
+		final String[] topics;
+		if (null == trustValueType)
+			topics = new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED,
+				TrustEventTopic.INDIRECT_TRUST_UPDATED,
+				TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
+		else if (TrustValueType.DIRECT == trustValueType)
+			topics = new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED };
+		else if (TrustValueType.INDIRECT == trustValueType)
+			topics = new String[] { TrustEventTopic.INDIRECT_TRUST_UPDATED };
+		else if (TrustValueType.USER_PERCEIVED == trustValueType)
+			topics = new String[] { TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
+		else
+			throw new TrustBrokerException(
+					"Could not register for trust value updates of type '" 
+					+ trustValueType + "' assigned to entity '"	+ trusteeId	
+					+ "' by '" + trustorId 
+					+ "' on behalf of requestor '" + requestor + "'"
+					+ ": Unsupported trust value type '" + trustValueType + "'");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Registering event listener for trustor '" + trustorId 
+					+ "' and trustee '" + trusteeId + "' to topics '" + Arrays.toString(topics) + "'");
+		if (trusteeId == null)
+			this.trustEventMgr.registerUpdateListener(listener, topics, trustorId);
+		else
+			this.trustEventMgr.registerUpdateListener(listener, topics, trustorId, trusteeId);
+	}
+	
+	private void doUnregisterTrustUpdateListener(Requestor requestor,
+			final ITrustUpdateEventListener listener,
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (requestor == null)
+			requestor = this.trustNodeMgr.getLocalRequestor();
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Unregistering from trust value updates of type '" + trustValueType 
+					+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
+					+ "' on behalf of requestor '" + requestor + "'");
+		
+		if (this.trustEventMgr == null)
+			throw new TrustBrokerException(
+					"Could not unregister from trust value updates of type '" 
+					+ trustValueType + "' assigned to entity '"	+ trusteeId	
+					+ "' by '" + trustorId + "' on behalf of requestor '" + requestor + "'" 
+					+ ": ITrustEventMgr service is not available");
+		
+		final String[] topics;
+		if (null == trustValueType)
+			topics = new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED,
+				TrustEventTopic.INDIRECT_TRUST_UPDATED,
+				TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
+		else if (TrustValueType.DIRECT == trustValueType)
+			topics = new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED };
+		else if (TrustValueType.INDIRECT == trustValueType)
+			topics = new String[] { TrustEventTopic.INDIRECT_TRUST_UPDATED };
+		else if (TrustValueType.USER_PERCEIVED == trustValueType)
+			topics = new String[] { TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
+		else
+			throw new TrustBrokerException(
+					"Could not unregister from trust value updates of type '" 
+					+ trustValueType + "' assigned to entity '"	+ trusteeId	
+					+ "' by '" + trustorId 
+					+ "' on behalf of requestor '" + requestor + "'"
+					+ ": Unsupported trust value type '" + trustValueType + "'");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Unregistering event listener for trustor '" + trustorId 
+					+ "' and trustee '" + trusteeId + "' from topics '" + Arrays.toString(topics) + "'");
+		if (trusteeId == null)
+			this.trustEventMgr.unregisterUpdateListener(listener, topics, trustorId);
+		else
+			this.trustEventMgr.unregisterUpdateListener(listener, topics, trustorId, trusteeId);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType)
+	 */
+	@Override
+	public void registerTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, final TrustedEntityType trusteeType)
+					throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		
+		this.doRegisterTrustUpdateListenerByType(
+				requestor, listener, trustorId, trusteeType, null);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType)
+	 */
+	@Override
+	public void unregisterTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, final TrustedEntityType trusteeType)
+					throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		
+		this.doUnregisterTrustUpdateListenerByType(
+				requestor, listener, trustorId, trusteeType, null);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType)
+	 */
+	@Override
+	public void registerTrustUpdateListener(
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, final TrustedEntityType trusteeType)
+					throws TrustException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		
+		this.doRegisterTrustUpdateListenerByType(
+				null, listener, trustorId, trusteeType, null);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType)
+	 */
+	@Override
+	public void unregisterTrustUpdateListener(
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, final TrustedEntityType trusteeType)
+					throws TrustException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		
+		this.doUnregisterTrustUpdateListenerByType(
+				null, listener, trustorId, trusteeType, null);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	public void registerTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		this.doRegisterTrustUpdateListener(
+				requestor, listener, trustorId, null, trustValueType);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	public void unregisterTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		this.doUnregisterTrustUpdateListener(
+				requestor, listener, trustorId, null, trustValueType);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	public void registerTrustUpdateListener(
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		this.doRegisterTrustUpdateListener(
+				null, listener, trustorId, null, trustValueType);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	public void unregisterTrustUpdateListener(
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		this.doUnregisterTrustUpdateListener(
+				null, listener, trustorId, null, trustValueType);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	public void registerTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, final TrustedEntityType trusteeType,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		this.doRegisterTrustUpdateListenerByType(
+				requestor, listener, trustorId, trusteeType, trustValueType);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	public void unregisterTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, final TrustedEntityType trusteeType,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		this.doUnregisterTrustUpdateListenerByType(
+				requestor, listener, trustorId, trusteeType, trustValueType);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	public void registerTrustUpdateListener(
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, final TrustedEntityType trusteeType,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		this.doRegisterTrustUpdateListenerByType(
+				null, listener, trustorId, trusteeType, trustValueType);
+	}
 
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	public void unregisterTrustUpdateListener(
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, final TrustedEntityType trusteeType,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		
+		this.doUnregisterTrustUpdateListenerByType(
+				null, listener, trustorId, trusteeType, trustValueType);
+	}
+	
+	private void doRegisterTrustUpdateListenerByType(Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, final TrustedEntityType trusteeType,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (requestor == null)
+			requestor = this.trustNodeMgr.getLocalRequestor();
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("Registering for trust value updates of type '" + trustValueType 
+					+ "' assigned to entities of type '" + trusteeType + "' by '" + trustorId 
+					+ "' on behalf of requestor '" + requestor + "'");
+
+		if (this.trustEventMgr == null)
+			throw new TrustBrokerException(
+					"Could not register for trust value updates of type '" 
+					+ trustValueType + "' assigned to entities of type '" 
+					+ trusteeType + "' by '" + trustorId 
+					+ "' on behalf of requestor '" + requestor + "'" 
+					+ ": ITrustEventMgr service is not available");
+
+		final String[] topics;
+		if (null == trustValueType)
+			topics = new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED,
+				TrustEventTopic.INDIRECT_TRUST_UPDATED,
+				TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
+		else if (TrustValueType.DIRECT == trustValueType)
+			topics = new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED };
+		else if (TrustValueType.INDIRECT == trustValueType)
+			topics = new String[] { TrustEventTopic.INDIRECT_TRUST_UPDATED };
+		else if (TrustValueType.USER_PERCEIVED == trustValueType)
+			topics = new String[] { TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
+		else
+			throw new TrustBrokerException(
+					"Could not register for trust value updates of type '" 
+					+ trustValueType + "' assigned to entities of type '" 
+					+ trusteeType + "' by '" + trustorId 
+					+ "' on behalf of requestor '" + requestor + "'"
+					+ ": Unsupported trust value type '" + trustValueType + "'");
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("Registering event listener for trustor '" + trustorId 
+					+ "' and trustee type '" + trusteeType + "' to topics '" + Arrays.toString(topics) + "'");
+		this.trustEventMgr.registerUpdateListener(listener, topics, trustorId, trusteeType);
+	}
+	
+	private void doUnregisterTrustUpdateListenerByType(Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustedEntityId trustorId, final TrustedEntityType trusteeType,
+			final TrustValueType trustValueType) throws TrustException {
+		
+		if (requestor == null)
+			requestor = this.trustNodeMgr.getLocalRequestor();
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("Unregistering from trust value updates of type '" + trustValueType 
+					+ "' assigned to entities of type '" + trusteeType + "' by '" + trustorId 
+					+ "' on behalf of requestor '" + requestor + "'");
+
+		if (this.trustEventMgr == null)
+			throw new TrustBrokerException(
+					"Could not unregister from trust value updates of type '" 
+					+ trustValueType + "' assigned to entities of type '" 
+					+ trusteeType + "' by '" + trustorId 
+					+ "' on behalf of requestor '" + requestor + "'" 
+					+ ": ITrustEventMgr service is not available");
+
+		final String[] topics;
+		if (null == trustValueType)
+			topics = new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED,
+				TrustEventTopic.INDIRECT_TRUST_UPDATED,
+				TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
+		else if (TrustValueType.DIRECT == trustValueType)
+			topics = new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED };
+		else if (TrustValueType.INDIRECT == trustValueType)
+			topics = new String[] { TrustEventTopic.INDIRECT_TRUST_UPDATED };
+		else if (TrustValueType.USER_PERCEIVED == trustValueType)
+			topics = new String[] { TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
+		else
+			throw new TrustBrokerException(
+					"Could not unregister from trust value updates of type '" 
+					+ trustValueType + "' assigned to entities of type '" 
+					+ trusteeType + "' by '" + trustorId 
+					+ "' on behalf of requestor '" + requestor + "'"
+					+ ": Unsupported trust value type '" + trustValueType + "'");
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("Unregistering event listener for trustor '" + trustorId 
+					+ "' and trustee type '" + trusteeType + "' from topics '" + Arrays.toString(topics) + "'");
+		this.trustEventMgr.unregisterUpdateListener(listener, topics, trustorId, trusteeType);
+	}
+	
+	private class RemoteClientCallback implements ITrustBrokerRemoteClientCallback {
+
+		private Set<TrustRelationship> trustRelationships;
+		
+		private TrustRelationship trustRelationship;
+		
 		private Double trustValue;
 		
+		private TrustException trustException;
+		
 		/*
-		 * @see org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClientCallback#onRetrievedTrust(java.lang.Double)
+		 * @see org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClientCallback#onRetrievedTrustRelationships(java.util.Set)
 		 */
 		@Override
-		public void onRetrievedTrust(Double value) {
+		public void onRetrievedTrustRelationships(Set<TrustRelationship> trustRelationships) {
 			
-			this.trustValue = value;
+			this.trustRelationships = trustRelationships;
 			synchronized (this) {
 	            notifyAll();
 	        }
 		}
 		
-		private Double getResult() {
+		private Set<TrustRelationship> getTrustRelationships() {
+			
+			return this.trustRelationships;
+		}
+		
+		/*
+		 * @see org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClientCallback#onRetrievedTrustRelationship(org.societies.api.privacytrust.trust.model.TrustRelationship)
+		 */
+		@Override
+		public void onRetrievedTrustRelationship(TrustRelationship trustRelationship) {
+			
+			this.trustRelationship = trustRelationship;
+			synchronized (this) {
+	            notifyAll();
+	        }
+		}
+		
+		private TrustRelationship getTrustRelationship() {
+			
+			return this.trustRelationship;
+		}
+		
+		/*
+		 * @see org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClientCallback#onRetrievedTrustValue(java.lang.Double)
+		 */
+		@Override
+		public void onRetrievedTrustValue(Double trustValue) {
+			
+			this.trustValue = trustValue;
+			synchronized (this) {
+	            notifyAll();
+	        }
+		}
+		
+		private Double getTrustValue() {
 			
 			return this.trustValue;
+		}
+		
+		/*
+		 * @see org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClientCallback#onException(org.societies.api.privacytrust.trust.TrustException)
+		 */
+		@Override
+		public void onException(TrustException trustException) {
+			
+			this.trustException = trustException;
+			synchronized (this) {
+	            notifyAll();
+	        }
+		}
+		
+		private TrustException getException() {
+			
+			return this.trustException;
 		}
 	}
 }

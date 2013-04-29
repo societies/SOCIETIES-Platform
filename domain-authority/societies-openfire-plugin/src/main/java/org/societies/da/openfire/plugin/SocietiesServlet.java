@@ -102,6 +102,12 @@ public class SocietiesServlet extends HttpServlet {
             	if (plugin.loginUser(username,password))
             		replyMessage("ok", request, response,out);
             }
+            else if ("vcard".equals(type)) {
+            	response.setContentType("text/xml");
+        		response.setStatus(200);
+            	plugin.getVcard(username,out);
+            	out.flush();
+            }
             else {
                 Log.warn("The societies servlet received an invalid request of type: " + type);
                 // TODO Do something
@@ -130,7 +136,7 @@ public class SocietiesServlet extends HttpServlet {
         }
     }
 
-    private void replyMessage(String message, HttpServletRequest request, HttpServletResponse response, PrintWriter out) throws IOException{
+	private void replyMessage(String message, HttpServletRequest request, HttpServletResponse response, PrintWriter out) throws IOException{
     	String referer = request.getHeader("Referer");
     	Log.debug("referer: " + referer);
     	if (referer!=null && referer.endsWith("public/signup.html"))
@@ -158,7 +164,32 @@ public class SocietiesServlet extends HttpServlet {
     @Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response);
+    	String vcard = request.getParameter("vcard");
+    	
+    	// standard request case
+    	if (vcard==null || vcard.equals("")) {
+    		doGet(request, response);
+    		return;
+    	}
+    	
+    	// Check this request is authorized
+    	PrintWriter out = response.getWriter();
+    	String secret = request.getParameter("secret");
+        if ((plugin.getSecret() != null || !plugin.getSecret().equals("")) && (secret == null || !secret.equals(plugin.getSecret()))) {
+            String query = request.getQueryString();
+        	Log.warn("An unauthorised user service request was received: " + ((query != null) ? query : ""));
+            replyError("RequestNotAuthorised: Provided secret '"+secret+"' did not match", request, response, out);
+            return;
+         }
+    	
+    	// set vcard use case
+    	String username = request.getParameter("username");
+    	try {
+			plugin.setVcard(username, vcard);
+			replyMessage("ok", request, response,out);
+		} catch (Exception e) {
+			replyError("Exception: "+e.getMessage(), request, response, out);
+		}
     }
 
     @Override

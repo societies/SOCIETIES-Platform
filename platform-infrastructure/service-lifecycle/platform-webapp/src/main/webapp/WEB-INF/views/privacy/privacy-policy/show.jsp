@@ -9,7 +9,7 @@
 <div class="resources">
 	<c:forEach var="request" items="${PrivacyPolicy.requests}" varStatus="status">
 		<div class="resource" id="resource${status.index}">
-			<h5>${request.resource.scheme} > ${request.resource.dataType}</h5>
+			<h5>${request.resource.scheme} > ${request.resource.dataType}<c:if test="${request.optional} == 1"> <span>optional</span></c:if></h5>
 			<ul class="short-description">
 				<c:forEach var="action" items="${request.actions}"><li class="${action.actionType}<c:if test="${action.optional} == 1"> optional</c:if>">${action.actionType}</li></c:forEach>
 				<li class="status ${request.status}">${request.status}</li>
@@ -28,7 +28,7 @@
 					Following these conditions:
 					<ul class="conditions">
 						<c:forEach var="condition" items="${request.conditions}" varStatus="statusCondition">
-							<li><c:out value="${condition.conditionName}" />: <c:out value="${condition.value}" /></li>
+							<li<c:if test="${condition.optional} == 1"> class="optional"</c:if>><c:out value="${condition.conditionName}" />: <c:out value="${condition.value}" /></li>
 						</c:forEach>
 					</ul>
 				</c:if>

@@ -190,7 +190,7 @@ public class CisCreationForm extends CisManagerForm {
 					conditions.add(new Condition(conditionForm.getConditionName(), conditionForm.getValue(), conditionForm.isOptional()));
 				}
 			}
-			requestItems.add(new RequestItem(resource, actions, conditions));
+			requestItems.add(new RequestItem(resource, actions, conditions, resourceForm.isOptional()));
 		}
 		RequestPolicy privacyPolicy = new RequestPolicy(requestItems);
 		privacyPolicy.setRequestor(requestor);

@@ -30,8 +30,22 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  * @namespace SocietiesLogin
  */
 
+//Browser globals
+/*global clearInterval: false, clearTimeout: false, document: false, event: false, frames: false, history: false, Image: false, location: false, name: false, navigator: false, Option: false, parent: false, screen: false, setInterval: false, setTimeout: false, window: false, XMLHttpRequest: false */
+//Miscellaneous globals
+/*global alert: false, confirm: false, console: false, Debug: false, opera: false, prompt: false, WSH: false, $: false, jQuery: false */
+//JQuery globals
+/*global $: false, jQuery: false */
+//Mocha testing globals
+/*global exports: false */
+//Specific globals
+/*global SocietiesAppConfig: false */
+
+var myIdentity;
+var vcardUsers = [];
 
 var SocietiesLogin = {
+		
 		/**
 		 * @methodOf SocietiesLogin#
 		 * @description Refresh the Login page based on current app preferences
@@ -58,7 +72,6 @@ var SocietiesLogin = {
 		
 		if (name.length === 0 || password.length === 0 || domain.length === 0) {
 			retValue  = false;
-			alert("validateLoginCredentials: " + "User credentials and Identity Domain must be entered");
 		} 
 		return retValue;
 	},
@@ -192,7 +205,7 @@ var SocietiesLogin = {
 		function success(data) {
 			console.log("updateLoginCredentialPreferences - successful: " + data.value);
 		}
-		
+
 		function failure(data) {
 			alert("updateLoginCredentialPreferences - failure: " + data);
 		}
@@ -282,17 +295,7 @@ var SocietiesLogin = {
 			//FOREACH ACTIVITY
 			if(data.length > 0) {
 				console.log("data size: " + data.length);
-				/*
-				for(var obj in data) {
-				    if(data.hasOwnProperty(obj)){
-					    for(var prop in data[obj]){
-					        if(data[obj].hasOwnProperty(prop)){
-					        	console.log(prop + ':' + data[obj][prop]);
-					        }
-					    }
-					}
-				}
-				*/
+				myIdentity = data[0].actor;
 				var mLastDate = "";
 				for (i=data.length-1; i >= 0 ; i--) {
 					//HEADER
@@ -342,7 +345,12 @@ var SocietiesLogin = {
 		}
 		
 		window.plugins.SocietiesLocalCSSManager.getCssActivities(success, failure);
-	}
+	}	
+}
+
+//Only used by Mocha
+if(typeof exports !== 'undefined') {
+    exports.validateLoginCredentials = SocietiesLogin.validateLoginCredentials;
 }
 
 

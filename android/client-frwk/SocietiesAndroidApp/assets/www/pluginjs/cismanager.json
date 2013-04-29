@@ -26,15 +26,22 @@
 	                    "description": "soh barca",
 	                    "communityJid" : "barca.soc.com"
 	     			},
-	     "getMembers" : [{"jid": "alec@societies.local", 
-	     				  "role": "owner"
+	     "getMembers" : [{"jid": "tom.societies.local", 
+	     				  "role": "OWNER",
+	     				  "name": "Tom Cruise"
 	     				 },
-	     				 {"jid": "thomas@societies.local", 
-	     				  "role": "participant" 
+	     				 {"jid": "john.societies.local", 
+	     				  "role": "PARTICIPANT",
+	     				  "name": "John Smith"
 	     				 },
-	     				 {"jid": "alan@societies.local", 
-	     				  "role": "participant"
-	     			}],
+	     				 {"jid": "jane.societies.local", 
+	     				  "role": "PARTICIPANT",
+	     				  "name": "Jane Smith"
+	     				},
+	     				{"jid": "bob.societies.local", 
+	     				  "role": "PARTICIPANT",
+	     				  "name": "Robert DeNiro"
+	     				}],
 	     "listOfCISs": [{
 	     				"communityName": "flamengo",
 	                    "communityType": "soccer",

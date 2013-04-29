@@ -24,8 +24,8 @@
  */
 package org.societies.privacytrust.trust.impl.repo.model;
 
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -107,7 +107,7 @@ public abstract class TrustedEntity implements ITrustedEntity {
 
 	/** The {@link TrustUpdateEvent trust update events} associated with this entity. */
 	@Transient
-	final private Set<TrustUpdateEvent> updateEvents = new CopyOnWriteArraySet<TrustUpdateEvent>();
+	final private Queue<TrustUpdateEvent> updateEventQueue = new ConcurrentLinkedQueue<TrustUpdateEvent>();
 	
 	/**
 	 * Constructs a <code>TrustedEntity</code> with the specified trustor and 
@@ -173,13 +173,15 @@ public abstract class TrustedEntity implements ITrustedEntity {
 		return this.userPerceivedTrust;
 	}
 	
-	/*
-	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getTrustUpdateEvents()
+	/**
+	 * Returns the {@link TrustUpdateEvent trust update events} associated with
+	 * this entity.
+	 * 
+	 * @since 1.0
 	 */
-	@Override
-	public Set<TrustUpdateEvent> getTrustUpdateEvents() {
+	public Queue<TrustUpdateEvent> getUpdateEventQueue() {
 		
-		return this.updateEvents;
+		return this.updateEventQueue;
 	}
 	
 	/*

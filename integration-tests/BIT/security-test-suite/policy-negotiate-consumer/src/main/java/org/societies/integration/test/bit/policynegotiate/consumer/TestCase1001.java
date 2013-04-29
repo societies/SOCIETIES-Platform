@@ -6,6 +6,7 @@ package org.societies.integration.test.bit.policynegotiate.consumer;
 /**
  * The test case 1001 aims to test 3P service installation.
  */
+import org.junit.runner.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
@@ -31,13 +32,13 @@ public class TestCase1001 extends IntegrationTestCase {
 		// Call the super constructor
 		// with test case number
 		// and test case classes to run
-		//super(1001, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
-		super(1001, new Class[] {NominalTestCaseLowerTester.class});
+		//super(1879, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
+		super(1879, new Class[] {NominalTestCaseLowerTester.class});
 		NominalTestCaseLowerTester.testCaseNumber = 1001;
 	}
 
 	public void setNegotiator(INegotiation negotiator) {
-		LOG.debug("[#1001] setNegotiator()");
+		LOG.debug("[#1879] setNegotiator()");
 		TestCase1001.negotiator = negotiator;
 	}
 	
@@ -46,7 +47,7 @@ public class TestCase1001 extends IntegrationTestCase {
 	}
 
 	public void setGroupMgr(INegotiationProviderRemote groupMgr) {
-		LOG.debug("[#1001] setGroupMgr()");
+		LOG.debug("[#1879] setGroupMgr()");
 		TestCase1001.groupMgr = groupMgr;
 	}
 	
@@ -55,11 +56,22 @@ public class TestCase1001 extends IntegrationTestCase {
 	}
 
 	public void setProviderJid(String providerJid) {
-		LOG.debug("[#1001] setProviderJid()");
+		LOG.debug("[#1879] setProviderJid({})", providerJid);
 		TestCase1001.providerJid = providerJid;
 	}
 	
 	protected static String getProviderJid() {
 		return providerJid;
+	}
+	
+	@Override
+	public Result run() {
+		if (providerJid == null || providerJid.isEmpty()) {
+			providerJid = groupMgr.getIdMgr().getThisNetworkNode().getJid();
+			LOG.warn("Property test.security.providerJid not set, defaulting to local node: {}. " +
+					"If you have not run the provider part of the test on this node, then this test will fail!",
+					providerJid);
+		}
+		return super.run();
 	}
 }

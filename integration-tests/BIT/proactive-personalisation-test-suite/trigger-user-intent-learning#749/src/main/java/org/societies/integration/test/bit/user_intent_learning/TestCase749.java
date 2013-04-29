@@ -34,8 +34,8 @@ public class TestCase749 extends IntegrationTestCase{
 	public static ICommManager commsMgr;
 	
 	public TestCase749() {
-		super(749, new Class[]{Tester.class});
-		System.out.println("Test 749 started : TestCase749() ");
+		super(1877, new Class[]{Tester.class});
+		System.out.println("Test 1877 started : TestCase749() ");
 	}
 
 

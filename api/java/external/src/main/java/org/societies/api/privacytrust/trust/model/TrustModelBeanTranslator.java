@@ -26,6 +26,8 @@ package org.societies.api.privacytrust.trust.model;
 
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean;
+import org.societies.api.schema.privacytrust.trust.model.TrustRelationshipBean;
+import org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean;
 
@@ -113,11 +115,59 @@ public final class TrustModelBeanTranslator {
 		}	
 	}
 	
-	public TrustEvidenceTypeBean fromTrustEvidenceType(TrustEvidenceType trustEvidenceType) {
+	/**
+	 * 
+	 * @param trustValueType
+	 * @return
+	 * @since 1.0
+	 */
+	public TrustValueTypeBean fromTrustValueType(TrustValueType trustValueType) {
 		
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		
+		switch (trustValueType) {
+		case DIRECT:
+			return TrustValueTypeBean.DIRECT;
+		case INDIRECT:
+			return TrustValueTypeBean.INDIRECT;
+		case USER_PERCEIVED:
+			return TrustValueTypeBean.USER_PERCEIVED;
+		default:
+			throw new IllegalArgumentException("'" + trustValueType 
+					+ "': Unsupported trust value type");
+		}
+	}
+	
+	/**
+	 * 
+	 * @param trustValueTypeBean
+	 * @return
+	 * @since 1.0
+	 */
+	public TrustValueType fromTrustValueTypeBean(TrustValueTypeBean trustValueTypeBean) {
+		
+		if (trustValueTypeBean == null)
+			throw new NullPointerException("trustValueTypeBean can't be null");
+		
+		switch (trustValueTypeBean) {
+		case DIRECT:
+			return TrustValueType.DIRECT;
+		case INDIRECT:
+			return TrustValueType.INDIRECT;
+		case USER_PERCEIVED:
+			return TrustValueType.USER_PERCEIVED;
+		default:
+			throw new IllegalArgumentException("'" + trustValueTypeBean 
+					+ "': Unsupported trust value type bean");
+		}	
+	}
+	
+	public TrustEvidenceTypeBean fromTrustEvidenceType(TrustEvidenceType trustEvidenceType) {
+
 		if (trustEvidenceType == null)
 			throw new NullPointerException("trustEvidenceType can't be null");
-		
+
 		switch (trustEvidenceType) {
 		case USED_SERVICE:
 			return TrustEvidenceTypeBean.USED_SERVICE;
@@ -131,17 +181,19 @@ public final class TrustModelBeanTranslator {
 			return TrustEvidenceTypeBean.LEFT_COMMUNITY;
 		case RATED:
 			return TrustEvidenceTypeBean.RATED;
+		case DIRECTLY_TRUSTED:
+			return TrustEvidenceTypeBean.DIRECTLY_TRUSTED;
 		default:
 			throw new IllegalArgumentException("'" + trustEvidenceType 
 					+ "': Unsupported trust evidence type");
 		}
 	}
-	
+
 	public TrustEvidenceType fromTrustEvidenceTypeBean(TrustEvidenceTypeBean trustEvidenceTypeBean) {
-		
+
 		if (trustEvidenceTypeBean == null)
 			throw new NullPointerException("trustEvidenceTypeBean can't be null");
-		
+
 		switch (trustEvidenceTypeBean) {
 		case USED_SERVICE:
 			return TrustEvidenceType.USED_SERVICE;
@@ -155,10 +207,59 @@ public final class TrustModelBeanTranslator {
 			return TrustEvidenceType.LEFT_COMMUNITY;
 		case RATED:
 			return TrustEvidenceType.RATED;
+		case DIRECTLY_TRUSTED:
+			return TrustEvidenceType.DIRECTLY_TRUSTED;
 		default:
 			throw new IllegalArgumentException("'" + trustEvidenceTypeBean 
 					+ "': Unsupported trust evidence type bean");
 		}	
+	}
+	
+	/**
+	 * 
+	 * @param trustRelationship
+	 * @return
+	 * @since 1.0
+	 */
+	public TrustRelationshipBean fromTrustRelationship(TrustRelationship trustRelationship) {
+		
+		if (trustRelationship == null)
+			throw new NullPointerException("trustRelationship can't be null");
+		
+		final TrustRelationshipBean trustRelationshipBean = new TrustRelationshipBean();
+		trustRelationshipBean.setTrustorId(fromTrustedEntityId(
+				trustRelationship.getTrustorId()));
+		trustRelationshipBean.setTrusteeId(fromTrustedEntityId(
+				trustRelationship.getTrusteeId()));
+		trustRelationshipBean.setTrustValueType(fromTrustValueType(
+				trustRelationship.getTrustValueType()));
+		trustRelationshipBean.setTrustValue(
+				trustRelationship.getTrustValue());
+		trustRelationshipBean.setTimestamp(
+				trustRelationship.getTimestamp());
+		
+		return trustRelationshipBean;
+	}
+	
+	/**
+	 * 
+	 * @param trustRelationshipBean
+	 * @return
+	 * @throws MalformedTrustedEntityIdException
+	 * @since 1.0
+	 */
+	public TrustRelationship fromTrustRelationshipBean(TrustRelationshipBean trustRelationshipBean) 
+			throws MalformedTrustedEntityIdException {
+		
+		if (trustRelationshipBean == null)
+			throw new NullPointerException("trustRelationshipBean can't be null");
+		
+		return new TrustRelationship(
+				fromTrustedEntityIdBean(trustRelationshipBean.getTrustorId()),
+				fromTrustedEntityIdBean(trustRelationshipBean.getTrusteeId()),
+				fromTrustValueTypeBean(trustRelationshipBean.getTrustValueType()),
+				trustRelationshipBean.getTrustValue(),
+				trustRelationshipBean.getTimestamp());
 	}
 	
 	/*

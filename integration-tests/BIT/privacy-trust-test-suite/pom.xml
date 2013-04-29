@@ -28,9 +28,9 @@
 
 	<modules>
 	    <module>assessment</module>
-	    <module>data-management-1266</module>
-	    <module>policy-management-1244</module>
-	    <module>negotiation-management-1264</module>
+	    <module>data-management-1871</module>
+	    <module>negotiation-management-1872</module>
+	    <module>policy-management-1873</module>
 	    <module>trust-based-pref-eval-1678</module>
 	    <module>local-trust-eventing-1962</module>
 	</modules>

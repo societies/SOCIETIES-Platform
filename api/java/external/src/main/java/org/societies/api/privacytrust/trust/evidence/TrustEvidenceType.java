@@ -33,6 +33,13 @@ package org.societies.api.privacytrust.trust.evidence;
 public enum TrustEvidenceType {
 
 	/**
+	 * The enum constant for direct trust relationships.
+	 * 
+	 * @since 1.0
+	 */
+	DIRECTLY_TRUSTED,
+	
+	/**
 	 * The enum constant for trust ratings.
 	 */
 	RATED,

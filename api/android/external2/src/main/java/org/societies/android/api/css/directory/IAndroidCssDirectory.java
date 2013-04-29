@@ -24,6 +24,7 @@
  */
 package org.societies.android.api.css.directory;
 
+import org.societies.android.api.comms.xmpp.VCardParcel;
 import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 
@@ -45,9 +46,13 @@ public interface IAndroidCssDirectory extends IServiceManager {
 	public static final String INTENT_RETURN_STATUS_KEY = "org.societies.android.platform.cssdirectory.ReturnStatus";
 	public static final String FIND_ALL_CSS_ADVERTISEMENT_RECORDS = "org.societies.android.platform.cssdirectory.FIND_ALL_CSS_ADVERTISEMENT_RECORDS";
 	public static final String FIND_FOR_ALL_CSS = "org.societies.android.platform.cssdirectory.FIND_FOR_ALL_CSS";
+	public static final String GET_USER_VCARD   = "org.societies.android.platform.cssdirectory.GET_USER_VCARD";
+	public static final String GET_MY_VCARD   = "org.societies.android.platform.cssdirectory.GET_MY_VCARD";
 	
-	String methodsArray [] = {"findForAllCss(String client, String searchTerm)",
-							  "findAllCssAdvertisementRecords(String client)"
+	String methodsArray [] = {"findForAllCss(String client, String searchTerm)",	//0
+							  "findAllCssAdvertisementRecords(String client)",		//1
+							  "getUserVCard(String client, String userId)",			//2
+							  "getMyVCard(String client)"							//3
 							};
 	
 	/**
@@ -65,4 +70,18 @@ public interface IAndroidCssDirectory extends IServiceManager {
 	 */
 	public CssAdvertisementRecord[] findAllCssAdvertisementRecords(String client);
 	
+	/**
+	 * Get the VCard for a specified user
+	 * @param client
+	 * @param userId
+	 * @return
+	 */
+	public VCardParcel getUserVCard(String client, String userId);
+	
+	/**
+	 * Retrieves my VCard
+	 * @param client
+	 * @return
+	 */
+	public VCardParcel getMyVCard(String client);
 }

@@ -42,7 +42,12 @@ public class TestCase1962 extends IntegrationTestCase {
 	
 	public TestCase1962() {
 
-		super(1962, new Class[] { TestLocalTrustEventing.class });
+		super(1962, new Class[] { TestByTrustor.class,
+				TestByTrustorTrusteeType.class,
+				TestByTrustorTrustee.class,
+				TestByTrustorValueType.class,
+				TestByTrustorTrusteeTypeValueType.class,
+				TestByTrustorTrusteeValueType.class });
 	}
 
 	/**

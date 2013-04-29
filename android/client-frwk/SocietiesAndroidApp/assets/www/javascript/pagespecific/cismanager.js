@@ -30,6 +30,16 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  * @namespace SocietiesCISManagerService
  */
 
+//Browser globals
+/*global clearInterval: false, clearTimeout: false, document: false, event: false, frames: false, history: false, Image: false, location: false, name: false, navigator: false, Option: false, parent: false, screen: false, setInterval: false, setTimeout: false, window: false, XMLHttpRequest: false */
+//Miscellaneous globals
+/*global alert: false, confirm: false, console: false, Debug: false, opera: false, prompt: false, WSH: false, $: false, jQuery: false */
+//JQuery globals
+/*global $: false, jQuery: false */
+//Specific globals
+/*global SocietiesCISListService: false, ServiceManagementServiceHelper: false, SocietiesCISManagerService: false, SocietiesPrivacyPolicyManagerService: false */
+/*global SocietiesCISManagerHelper: false, SocietiesCisDirService: false */
+
 var	SocietiesCISManagerService = {
 			
 	/**
@@ -76,7 +86,7 @@ var	SocietiesCISManagerService = {
 		if ( data ) {
 			//VALID COMMUNITY OBJECT
 			var markup = "<h1>" + data.communityName + "</h1>" + 
-						 "<p>Type: " + data.communityType + "</p>" + 
+						 "<p>Category: " + data.communityType + "</p>" + 
 						 "<p>" + data.description + "</p>" + 
 						 "<p>Owner: " + data.ownerJid + "</p>";
 			$('input#cis_id').val(data.communityJid);
@@ -131,6 +141,14 @@ var	SocietiesCISManagerService = {
 			catch(err) {}
 			//POPULATE THE MyServices SELECT BOX
 			ServiceManagementServiceHelper.connectToServiceManagement(SocietiesCISListService.createSelectServices);
+			
+			// -- Populate CIS Privacy Policy
+			var privacyPolicyHandler = '#getPrivacyPolicy';
+			// Clean
+			while($(privacyPolicyHandler).children().length >0)
+				$(privacyPolicyHandler+' li:last').remove();
+			// Call
+			SocietiesPrivacyPolicyManagerService.getPrivacyPolicy(privacyPolicyHandler, data.ownerJid, data.communityJid, true);
 			
 			$.mobile.changePage($("#community-details-page"), {transition: "fade"});
 		}

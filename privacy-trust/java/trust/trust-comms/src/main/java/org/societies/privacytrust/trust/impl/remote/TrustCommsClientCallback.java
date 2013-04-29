@@ -35,11 +35,7 @@ import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
-import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
-import org.societies.privacytrust.trust.impl.broker.remote.InternalTrustBrokerRemoteClientCallback;
 import org.societies.privacytrust.trust.impl.broker.remote.TrustBrokerRemoteClientCallback;
-import org.societies.privacytrust.trust.impl.evidence.remote.InternalTrustEvidenceCollectorRemoteClientCallback;
 import org.societies.privacytrust.trust.impl.evidence.remote.TrustEvidenceCollectorRemoteClientCallback;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,31 +51,23 @@ public class TrustCommsClientCallback implements ICommCallback {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			Arrays.asList(
+					"http://societies.org/api/schema/identity",
 					"http://societies.org/api/schema/privacytrust/trust/model",
 					"http://societies.org/api/schema/privacytrust/trust/broker",
-					"http://societies.org/api/schema/privacytrust/trust/evidence/collector",
-					"http://societies.org/api/internal/schema/privacytrust/trust/broker",
-					"http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector"));
+					"http://societies.org/api/schema/privacytrust/trust/evidence/collector"));
 	
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList(
+					"org.societies.api.schema.identity",
 					"org.societies.api.schema.privacytrust.trust.model",
 					"org.societies.api.schema.privacytrust.trust.broker",
-					"org.societies.api.schema.privacytrust.trust.evidence.collector",
-					"org.societies.api.internal.schema.privacytrust.trust.broker",
-					"org.societies.api.internal.schema.privacytrust.trust.evidence.collector"));
+					"org.societies.api.schema.privacytrust.trust.evidence.collector"));
 
 	@Autowired(required=true)
 	private TrustBrokerRemoteClientCallback trustBrokerRemoteClientCallback;
 	
 	@Autowired(required=true)
-	private InternalTrustBrokerRemoteClientCallback internalTrustBrokerRemoteClientCallback;
-	
-	@Autowired(required=true)
 	private TrustEvidenceCollectorRemoteClientCallback trustEvidenceCollectorRemoteClientCallback;
-	
-	@Autowired(required=true)
-	private InternalTrustEvidenceCollectorRemoteClientCallback internalTrustEvidenceCollectorRemoteClientCallback;
 
 	@Autowired(required=true)
 	public TrustCommsClientCallback(ICommManager commsMgr) throws Exception {
@@ -123,25 +111,23 @@ public class TrustCommsClientCallback implements ICommCallback {
 	@Override
 	public void receiveResult(Stanza stanza, Object payload) {
 		
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("receiveResult: stanza.id=" + stanza.getId());
-			LOG.debug("receiveResult: stanza.from=" + stanza.getFrom());
-			LOG.debug("receiveResult: stanza.to=" + stanza.getTo());
-			LOG.debug("receiveResult: payload=" + payload);
+		if (stanza == null)
+			throw new NullPointerException("stanza can't be null");
+		if (payload == null)
+			throw new NullPointerException("payload can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("receiveResult: stanza=" + stanza + ", payload=" + payload);
+		if (stanza.getId() == null) {
+			LOG.error("Received result with null stanza id");
+			return;
 		}
-
-		if (payload instanceof org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerResponseBean) {
-			this.internalTrustBrokerRemoteClientCallback.receiveResult(stanza, (TrustBrokerResponseBean) payload);
-		} else if (payload instanceof TrustBrokerResponseBean) {
-			this.trustBrokerRemoteClientCallback.receiveResult(stanza, (TrustBrokerResponseBean) payload);
-		} else if (payload instanceof org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean) {
-			this.internalTrustEvidenceCollectorRemoteClientCallback.receiveResult(stanza, (TrustEvidenceCollectorResponseBean) payload);
-		} else if (payload instanceof TrustEvidenceCollectorResponseBean) {
-			this.trustEvidenceCollectorRemoteClientCallback.receiveResult(stanza, (TrustEvidenceCollectorResponseBean) payload);
-		} else {
-			LOG.error("Unexpected result payload: "
-					+ ((payload != null) ? payload.getClass() : "null"));
-		}
+		if (this.trustBrokerRemoteClientCallback.containsClient(stanza.getId()))
+			this.trustBrokerRemoteClientCallback.receiveResult(stanza, payload);
+		else if (this.trustEvidenceCollectorRemoteClientCallback.containsClient(stanza.getId()))
+			this.trustEvidenceCollectorRemoteClientCallback.receiveResult(stanza, payload);
+		else
+			LOG.error("Received result with unexpected stanza id: " + stanza.getId());
 	}		
 
 	/*
@@ -150,27 +136,19 @@ public class TrustCommsClientCallback implements ICommCallback {
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
 		
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("receiveMessage: stanza.id=" + stanza.getId());
-			LOG.debug("receiveMessage: stanza.from=" + stanza.getFrom());
-			LOG.debug("receiveMessage: stanza.to=" + stanza.getTo());
-			LOG.debug("receiveMessage: payload=" + payload);
-		}
+		if (LOG.isDebugEnabled())
+			LOG.debug("receiveMessage: stanza=" + stanza + ", payload=" + payload);
 	}
 
 	/*
 	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveItems(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String, java.util.List)
 	 */
 	@Override
-	public void receiveItems(Stanza stanza, String arg1, List<String> arg2) {
+	public void receiveItems(Stanza stanza, String item, List<String> items) {
 		
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("receiveMessage: stanza.id=" + stanza.getId());
-			LOG.debug("receiveMessage: stanza.from=" + stanza.getFrom());
-			LOG.debug("receiveMessage: stanza.to=" + stanza.getTo());
-			LOG.debug("receiveMessage: item=" + arg1);
-			LOG.debug("receiveMessage: items=" + arg2);
-		}
+		if (LOG.isDebugEnabled())
+			LOG.debug("receiveMessage: stanza=" + stanza + ", item=" + item
+					+ ", items=" + items);
 	}
 
 	/*
@@ -179,24 +157,33 @@ public class TrustCommsClientCallback implements ICommCallback {
 	@Override
 	public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
 		
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("receiveInfo: stanza.id=" + stanza.getId());
-			LOG.debug("receiveInfo: stanza.from=" + stanza.getFrom());
-			LOG.debug("receiveInfo: stanza.to=" + stanza.getTo());
-			LOG.debug("receiveInfo: node=" + node);
-			LOG.debug("receiveInfo: info=" + info);
-		}
+		if (LOG.isDebugEnabled())
+			LOG.debug("receiveInfo: stanza=" + stanza + ", node=" + node
+					+ ", info=" + info);
 	}
 
 	/*
 	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveError(org.societies.comm.xmpp.datatypes.Stanza, org.societies.comm.xmpp.datatypes.XMPPError)
 	 */
 	@Override
-	public void receiveError(Stanza stanza, XMPPError info) {
+	public void receiveError(Stanza stanza, XMPPError error) {
 		
-		LOG.error("receiveError: stanza.id=" + stanza.getId());
-		LOG.error("receiveError: stanza.from=" + stanza.getFrom());
-		LOG.error("receiveError: stanza.to=" + stanza.getTo());
-		LOG.error("receiveError: info=" + info);
+		if (stanza == null)
+			throw new NullPointerException("stanza can't be null");
+		if (error == null)
+			throw new NullPointerException("error can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("receiveError: stanza=" + stanza + ", error=" + error);
+		if (stanza.getId() == null) {
+			LOG.error("Received error with null stanza id");
+			return;
+		}
+		if (this.trustBrokerRemoteClientCallback.containsClient(stanza.getId()))
+			this.trustBrokerRemoteClientCallback.receiveError(stanza, error);
+		else if (this.trustEvidenceCollectorRemoteClientCallback.containsClient(stanza.getId()))
+			this.trustEvidenceCollectorRemoteClientCallback.receiveError(stanza, error);
+		else
+			LOG.error("Received error with unexpected stanza id: " + stanza.getId());
 	}
 }

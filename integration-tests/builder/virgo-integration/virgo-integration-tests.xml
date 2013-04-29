@@ -42,12 +42,12 @@
 		<module>../../BIT/css-services-test-suite/install-service-713</module>
 		<module>../../BIT/css-services-test-suite/start-stop-714</module>
 		<module>../../BIT/privacy-trust-test-suite/assessment</module>
-		<module>../../BIT/privacy-trust-test-suite/data-management-1266</module>
-		<module>../../BIT/privacy-trust-test-suite/policy-management-1244</module>
-		<module>../../BIT/privacy-trust-test-suite/negotiation-management-1264</module>
+		<module>../../BIT/privacy-trust-test-suite/data-management-1871</module>
+		<module>../../BIT/privacy-trust-test-suite/negotiation-management-1872</module>
+		<module>../../BIT/privacy-trust-test-suite/policy-management-1873</module>
 		<module>../../BIT/privacy-trust-test-suite/local-trust-eventing-1962</module>
 		<module>../../BIT/cis-services-test-suite/cis-share-service-962</module>
-		<module>../../BIT/cis-services-test-suite/cis-list-services-964</module>
+		<!-- <module>../../BIT/cis-services-test-suite/cis-list-services-964</module> -->
 		<module>../../BIT/cis-test-suite/cis-management/create_cis#958</module>
 		<module>../../BIT/comm-frwk-test-suite/eventing/pubsub-#772</module>
 		<module>../../BIT/comm-frwk-test-suite/messaging/AsyncMessaging-774</module>
@@ -69,14 +69,18 @@
 <!--		<module>../../BIT/ico-test-suite/CSSDataCollector#1093</module> -->
 		<module>../../BIT/proactive-personalisation-test-suite/Ctx-Personalisation#751</module>
 		<module>../../BIT/proactive-personalisation-test-suite/monitor-services#747</module>
+		<module>../../BIT/proactive-personalisation-test-suite/static-preference</module>
 		<module>../../BIT/proactive-personalisation-test-suite/trigger-caui-prediction#1109</module>
 		<module>../../BIT/proactive-personalisation-test-suite/trigger-user-intent-learning#749</module>
 		<module>../../BIT/proactive-personalisation-test-suite/trigger-user-preference-learning#748</module>
 
+		<!-- user agent -->
+		<module>../../BIT/useragent-test-suite/feedback-privacy-test</module>
+		
 		<!-- CT Tests -->
 		<module>../../CT/privacy-trust-test-suite</module>
 		<module>../../CT/cis-test-suite/activityfeedCT</module>
-		<module>../../CT/cis-services-test-suite/cis-share-service-739</module>
+		<!-- <module>../../CT/cis-services-test-suite/cis-share-service-739</module> -->
 		<module>../../CT/css-services-test-suite/discover-services-728</module>
 		<module>../../CT/css-services-test-suite/servlifecycle-976</module>
 	</modules>

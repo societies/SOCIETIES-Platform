@@ -31,7 +31,7 @@ public class NominalTestCaseUpperTester {
 	private static IAddService addService;
 
 	public void readyForUpper(){
-		LOG.info("[#759] I'm ready to start upper testing!");
+		LOG.info("[#1866] I'm ready to start upper testing!");
 		//NominalTestCaseLowerTester.integrationTestUtils.run(NominalTestCaseLowerTester.testCaseNumber, NominalTestCaseUpperTester.class);
 
 	}
@@ -40,7 +40,7 @@ public class NominalTestCaseUpperTester {
 	 */
 	@Before
 	public void setUp() {
-		LOG.info("[#759] NominalTestCaseUpperTester::setUp");
+		LOG.info("[#1866] NominalTestCaseUpperTester::setUp");
 	}
 
 	/**
@@ -49,7 +49,7 @@ public class NominalTestCaseUpperTester {
 	 */
 	@After
 	public void tearDown() {
-		LOG.info("[#759] tearDown");
+		LOG.info("[#1866] tearDown");
 
 		// TODO: uninstall and stop the Calculator service
 		// At the moment Calculator service can't stop without crashing the system, so this must wait.
@@ -57,14 +57,14 @@ public class NominalTestCaseUpperTester {
 		Future<ServiceControlResult> asynchResult = null;
 		ServiceControlResult scresult = null;
 		try {
-			LOG.info("[#759] Stop the service: "+calculatorServiceId.getIdentifier());
+			LOG.info("[#1866] Stop the service: "+calculatorServiceId.getIdentifier());
 			asynchResult = TestCase759.serviceControl.stopService(calculatorServiceId);
 			scresult = asynchResult.get();
 			if (!scresult.getMessage().equals(ResultMessage.SUCCESS)) {
 				throw new Exception("Can't stop the service. Returned value: "+scresult.getMessage());
 			}
 
-			LOG.info("[#759] Uninstall the service: "+calculatorServiceId.getIdentifier());
+			LOG.info("[#1866] Uninstall the service: "+calculatorServiceId.getIdentifier());
 			asynchResult = TestCase759.serviceControl.uninstallService(calculatorServiceId);
 			scresult = asynchResult.get();
 			if (!scresult.getMessage().equals(ResultMessage.SUCCESS)) {
@@ -73,8 +73,8 @@ public class NominalTestCaseUpperTester {
 		}
 		catch (Exception e)
 		{
-			LOG.info("[#759] Unknown Exception", e);
-			fail("[#759] Unknown Exception: "+e.getMessage());
+			LOG.info("[#1866] Unknown Exception", e);
+			fail("[#1866] Unknown Exception: "+e.getMessage());
 			return;
 		}
 	}
@@ -85,28 +85,28 @@ public class NominalTestCaseUpperTester {
 	 */
 	@Test
 	public void bodyUseService() {
-		LOG.info("[#759] bodyUseService part 2");
+		LOG.info("[#1866] bodyUseService part 2");
 
 		// -- Consume the service
 		int expected = 3;
 		int actual = 0;
 		try {
 			actual = addService.addNumbers(1, 2).get();
-			LOG.info("[#759] Consume Calculator Service 1+2="+actual);
-			assertEquals("[#759] Consume Calculator Service", expected, actual);
+			LOG.info("[#1866] Consume Calculator Service 1+2="+actual);
+			assertEquals("[#1866] Consume Calculator Service", expected, actual);
 		} catch (InterruptedException e) {
-			LOG.info("[#759] InterruptedException", e);
-			fail("[#759] InterruptedException: "+e.getMessage());
+			LOG.info("[#1866] InterruptedException", e);
+			fail("[#1866] InterruptedException: "+e.getMessage());
 		} catch (ExecutionException e) {
-			LOG.info("[#759] ExecutionException", e);
-			fail("[#759] ExecutionException: "+e.getMessage());
+			LOG.info("[#1866] ExecutionException", e);
+			fail("[#1866] ExecutionException: "+e.getMessage());
 		} catch(Exception ex){
 			ex.printStackTrace();
 		}
 	}
 	
 	public void setAddService(IAddService addService) {
-		LOG.info("[#759] Calculator Service injected");
+		LOG.info("[#1866] Calculator Service injected");
 		this.addService = addService;
 
 	}

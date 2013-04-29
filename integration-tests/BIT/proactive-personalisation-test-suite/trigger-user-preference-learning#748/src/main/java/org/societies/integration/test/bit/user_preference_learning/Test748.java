@@ -15,7 +15,7 @@ public class Test748 extends IntegrationTestCase{
 	private static ICommManager commManager;
 	
 	public Test748(){
-		super(748, new Class[]{Tester.class});
+		super(1878, new Class[]{Tester.class});
 	}
 	
 	public static IPersonalisationManager getPersonMan() {

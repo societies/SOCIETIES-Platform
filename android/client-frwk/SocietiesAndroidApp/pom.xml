@@ -175,9 +175,27 @@
 					<!-- The generated documentation will be put on this directory -->
 					<directory>${project.build.directory}/doc</directory>
 					<!-- JS file(s) of this directory will be used to generate the documentation -->
-					<srcDir>${basedir}/assets/www/reference.js</srcDir>
+					<srcDir>${basedir}/assets/www/javascript</srcDir>
+					<recurse>5</recurse>
 				</configuration>
 			</plugin>
+			<!--plugin>
+      				<groupId>org.codehaus.mojo</groupId>
+      				<artifactId>jslint-maven-plugin</artifactId>
+      				<version>1.0.1</version>
+      				<executions>
+        				<execution>
+          					<goals>
+            						<goal>jslint</goal>
+            						<goal>test-jslint</goal>
+          					</goals>
+        				</execution>
+      				</executions>
+    				<configuration>
+					<sourceJsFolder>${basedir}/assets/www/javascript/pagespecific</sourceJsFolder>
+				</configuration>
+			</plugin-->
+			
 		</plugins>
 	</build>
 	<reporting>

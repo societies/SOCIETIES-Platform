@@ -84,6 +84,15 @@ public interface ICSSInternalManager extends ICSSManager {
 	 */
 	public Future<CssInterfaceResult> logoutCSS(CssRecord profile);
 
+        /**
+         * Synch the CSS profile
+         * 
+         * @param profile
+         * @return Future<CssInterfaceResult>
+         */
+        public Future<CssInterfaceResult> synchProfile(CssRecord profile);
+
+
 	/**
 	 * Register a CSS
 	 * 
@@ -210,6 +219,10 @@ public interface ICSSInternalManager extends ICSSManager {
 	 */
 	public void handleExternalFriendRequest(IIdentity externalCSS, CssRequestStatusType status);
 
+	/**
+	 * To be called from clients external to this CSS
+	 */
+	public void handleExternalUpdateRequest(IIdentity externalCSS, CssRequestStatusType status);
 	
 	// to be replaced by above
 	

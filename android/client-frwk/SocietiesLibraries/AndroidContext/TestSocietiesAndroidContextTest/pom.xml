@@ -16,6 +16,7 @@
 	<packaging>apk</packaging>
 	<properties>
 		<tested.project.dir>${project.basedir}/../ContainerSocietiesAndroidContext</tested.project.dir>
+		<tested.project.android.coverage>${tested.project.dir}/target/org.societies.android.platform.context.container/files/coverage.ec</tested.project.android.coverage>
 	</properties>
 
 	<developers>
@@ -72,13 +73,11 @@
         <dependency>
 			<artifactId>xpp3</artifactId>
 			<groupId>xpp3</groupId>
-			<version>1.1.4c</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>emma</groupId>
 			<artifactId>emma</artifactId>
-			<version>2.1.5320</version>
 			<scope>compile</scope>
 		</dependency>
 
@@ -95,12 +94,13 @@
 					<testCoverage>true</testCoverage>
 					<testCreateReport>true</testCreateReport>
 					<testTestSize>medium</testTestSize>
-					<testCoverageFile>/data/data/org.societies.android.platform.personalisation.container/files/coverage.ec</testCoverageFile>
+					<testCoverageFile>${tested.project.android.coverage}</testCoverageFile>
+<!-- 				<testCoverageFile>/data/data/org.societies.android.platform.context.container/files/coverage.ec</testCoverageFile>	-->
 					<!--test> <coverage>true</coverage> <createReport>true</createReport> 
 						<testSize>medium</testSize> </test -->
 				</configuration>
 				<extensions>true</extensions>
-				<!-- -->
+				<!-- Change the following to true to enable coverage report 
 				<executions>
 					<execution>
 						<id>pull-coverage</id>
@@ -109,27 +109,27 @@
 							<goal>pull</goal>
 						</goals>
 						<configuration>
-							<pullSource>/data/data/org.societies.android.platform.personalisation.container/files/coverage.ec</pullSource>
+							<pullSource>/data/data/org.societies.android.platform.context.container/files/coverage.ec</pullSource>
 							<pullDestination>${tested.project.dir}/target/emma/coverage.ec</pullDestination>
 						</configuration>
 					</execution>
-				</executions>
+				</executions>	-->
 			</plugin>
 		</plugins>
 	</build>
-	<reporting>
-		<plugins>
+<!-- <reporting>
+		<plugins>	-->
 			<!--plugin> <groupId>org.sonatype.maven.plugin</groupId> <artifactId>emma4it-maven-plugin</artifactId> 
 				<version>1.3</version> <configuration> <metadatas>${tested.project.dir}/target/emma/coverage.em,${tested.project.dir}/src/ 
 				</metadatas> <instrumentations>${tested.project.dir}/target/emma/coverage.ec</instrumentations> 
 				<reportDirectory>${tested.project.dir}/target/emma/</reportDirectory> <baseDirectory>{tested.project.dir}/target/</baseDirectory> 
 				<formats>xml,html</formats> </configuration> </plugin -->
-
+<!-- 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
 				<version>2.12.4</version>
 			</plugin>
 		</plugins>
-	</reporting>
+	</reporting>	-->
 </project>

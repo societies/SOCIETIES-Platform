@@ -21,9 +21,9 @@
 	<!-- /header -->
 	 
 	<div data-role="header" data-theme="b" >
-		<a href="#" data-icon="delete" id="btnProfileCancel" data-role="button">Cancel</a>
+		<!-- <a href="#" data-icon="delete" id="btnProfileCancel" data-role="button">Cancel</a> -->
 		<h1>My Profile</h1>
-		<a href="#" data-icon="check" id="btnProfileSave" data-role="button">Save</a>
+		<a href="#"  id="updateProfile" data-role="button">Refresh</a>
 	</div>
 	<div data-role="content">
 		<form id="form1">
@@ -53,61 +53,52 @@
 		    	<label for="cssrecordname">Surname: </label>
 		    	<input type="text" name="cssRecordName" id="cssrecordname" value=""/>
 			</div>
-
-			<!-- <div data-role="collapsible-set">  -->
-			
-				<div data-role="collapsible" data-theme="b" data-content-theme="d">
-					<h3>Contact Details</h3>					
-					<!-- CSS e-mail Details-->
-					<div data-role="fieldcontain" >
-				    	<label for="cssrecordemaildetails">e-Mail: </label>
-				    	<input type="text" name="cssRecordEmailDetails" id="cssrecordemaildetails" value=""/>
-					</div>
-					<!-- CSS IM Details-->
-					<div data-role="fieldcontain" >
-				    	<label for="cssrecordimdetails">Phone: </label>
-				    	<input type="text" name="cssRecordImDetails" id="cssrecordimdetails" value=""/>
-					</div>
-					<!-- CSS SNS Details-->
-					<!-- 
-					<div data-role="fieldcontain" >
-				    	<label for="cssrecordsnsdetails">Social: </label>
-				    	<input type="text" name="cssRecordSNSDetails" id="cssrecordsnsdetails" value=""/>
-					</div>
-					 -->
+				
+			<div data-role="collapsible" data-theme="b" data-content-theme="d">
+				<h3>Personal Details</h3>
+				
+				<div data-role="fieldcontain" >
+					<!-- Sex -->
+					<label for="cssrecordsextype">Sex:</label>
+					<select name="cssRecordSexType" id="cssrecordsextype" data-role="slider">
+						<option value="0">Male</option>
+						<option value="1">Female</option>
+					</select>
 				</div>
 				
-				<div data-role="collapsible" data-theme="b" data-content-theme="d">
-					<h3>Personal Details</h3>
-					
-					<div data-role="fieldcontain" >
-						<!-- Sex -->
-						<label for="cssrecordsextype">Sex:</label>
-						<select name="cssRecordSexType" id="cssrecordsextype" data-role="slider">
-							<option value="0">Male</option>
-							<option value="1">Female</option>
-						</select>
-					</div>
-					
-					<!-- CSS Location -->
-					<div data-role="fieldcontain" >
-				    	<label for="cssrecorduserlocation">Home Location: </label>
-				    	<input type="text" name="cssRecordUserLocation" id="cssrecorduserlocation" value=""/>
-					</div>
-					
+				<!-- CSS Location -->
+				<div data-role="fieldcontain" >
+			    	<label for="cssrecorduserlocation">Home Location: </label>
+			    	<input type="text" name="cssRecordUserLocation" id="cssrecorduserlocation" value=""/>
 				</div>
-				<div data-role="collapsible" data-theme="b" data-content-theme="d">
-					<h3>My Devices</h3>
-					<ul data-role="listview" data-theme="d" data-divider-theme="b" id="cssNodesList">
-					<!-- PLACE NODE RECORDS HERE -->
-					
-					</ul>
+				
+				<!-- CSS e-mail Details-->
+				<div data-role="fieldcontain" >
+			    	<label for="cssrecordemaildetails">e-Mail: </label>
+			    	<input type="text" name="cssRecordEmailDetails" id="cssrecordemaildetails" value=""/>
 				</div>
-			<!-- 
-			<div class="sign_up">
-				<input id="updateProfile" type="button" value="Update Profile" data-inline="true" data-theme="h"/> 
+				<!-- CSS Position -->
+				<div data-role="fieldcontain" >
+			    	<label for="cssrecordposition">Position: </label>
+			    	<input type="text" name="cssRecordPosition" id="cssrecordposition" value=""/>
+				</div>
+				<!-- CSS Workplace -->
+				<div data-role="fieldcontain" >
+			    	<label for="cssrecordworkplace">Workplace: </label>
+			    	<input type="text" name="cssRecordWorkplace" id="cssrecordworkplace" value=""/>
+				</div>
 			</div>
-			-->
+			<div data-role="collapsible" data-theme="b" data-content-theme="d">
+				<h3>My Devices</h3>
+				<ul data-role="listview" data-theme="d" data-divider-theme="b" id="cssNodesList">
+				<!-- PLACE NODE RECORDS HERE -->
+				
+				</ul>
+			</div>
+			<div class="sign_up">
+				<!--input id="updateProfile" type="button" value="Update Profile" data-inline="true" data-theme="h"/--> 
+				<input id="btnProfileSave" type="button" value="Save" data-inline="true" data-theme="h"/> 
+			</div>
 		</form>
 		<br/>
 		<div class="terms">

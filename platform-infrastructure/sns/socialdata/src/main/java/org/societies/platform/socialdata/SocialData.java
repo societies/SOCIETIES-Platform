@@ -275,7 +275,7 @@ public class SocialData implements ISocialData{
 	}
 
 
-
+	
 	@Override
 	public void removeSocialConnector(String connectorId) throws Exception{
 
@@ -368,8 +368,8 @@ public class SocialData implements ISocialData{
 		return new ArrayList(socialProfiles.values());
 	}
 
-
-	@Override
+	
+	@Override 
 	public void updateSocialData() {
 		
 	    

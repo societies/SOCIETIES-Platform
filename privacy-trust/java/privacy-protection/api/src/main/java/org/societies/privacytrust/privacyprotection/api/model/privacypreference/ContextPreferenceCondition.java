@@ -27,6 +27,7 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 import java.io.Serializable;
 
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.OperatorConstants;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyConditionConstants;
 
@@ -40,19 +41,19 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
  */
 public class ContextPreferenceCondition implements IPrivacyPreferenceCondition, Serializable{
 
-	private CtxAttributeIdentifier ctxID;
+	private CtxIdentifier ctxID;
 	private String value;
 	private PrivacyConditionConstants myConditionType;
 
 	private OperatorConstants operator;
-	public ContextPreferenceCondition(CtxAttributeIdentifier ctxIdentifier, OperatorConstants op, String val){
+	public ContextPreferenceCondition(CtxIdentifier ctxIdentifier, OperatorConstants op, String val){
 		this.ctxID = ctxIdentifier;
 		this.operator = op;
 		this.value = val;
 		this.myConditionType = PrivacyConditionConstants.CONTEXT;
 	}
 	
-	public CtxAttributeIdentifier getCtxIdentifier(){
+	public CtxIdentifier getCtxIdentifier(){
 		return this.ctxID;
 	}
 	
