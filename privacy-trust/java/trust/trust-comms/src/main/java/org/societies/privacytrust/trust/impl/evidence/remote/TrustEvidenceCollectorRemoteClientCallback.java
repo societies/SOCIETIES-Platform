@@ -36,8 +36,8 @@ import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.MethodName;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.MethodName;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
 import org.societies.privacytrust.trust.api.evidence.remote.ITrustEvidenceCollectorRemoteClientCallback;
 import org.springframework.stereotype.Service;
 
@@ -55,11 +55,13 @@ public class TrustEvidenceCollectorRemoteClientCallback implements ICommCallback
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			Arrays.asList(
+					"http://societies.org/api/schema/identity",
 					"http://societies.org/api/schema/privacytrust/trust/model",
 					"http://societies.org/api/schema/privacytrust/trust/evidence/collector"));
 	
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList(
+					"org.societies.api.schema.identity",
 					"org.societies.api.internal.schema.privacytrust.trust.model",
 					"org.societies.api.internal.schema.privacytrust.trust.evidence.collector"));
 	
@@ -94,9 +96,29 @@ public class TrustEvidenceCollectorRemoteClientCallback implements ICommCallback
 	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveError(org.societies.api.comm.xmpp.datatypes.Stanza, org.societies.api.comm.xmpp.exceptions.XMPPError)
 	 */
 	@Override
-	public void receiveError(Stanza arg0, XMPPError arg1) {
-		// TODO Auto-generated method stub
-	
+	public void receiveError(Stanza stanza, XMPPError error) {
+		
+		if (stanza == null)
+			throw new NullPointerException("stanza can't be null");
+		if (error == null)
+			throw new NullPointerException("error can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Received error: stanza=" + stanza + ", error=" + error);
+		if (stanza.getId() == null) {
+			LOG.error("Received error with null stanza id");
+			return;
+		}
+		final ITrustEvidenceCollectorRemoteClientCallback callbackClient = 
+				this.removeClient(stanza.getId());
+		if (callbackClient == null) {
+			LOG.error("Received error with stanza id '" + stanza.getId()
+					+ "' but no matching callback was found");
+			return;
+		}
+		final TrustEvidenceCollectorCommsException exception = 
+				new TrustEvidenceCollectorCommsException(error.getGenericText());
+		callbackClient.onException(exception);
 	}
 
 	/*
@@ -130,32 +152,66 @@ public class TrustEvidenceCollectorRemoteClientCallback implements ICommCallback
 	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveResult(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
 	 */
 	@Override
-	public void receiveResult(final Stanza stanza, final Object bean) {
+	public void receiveResult(final Stanza stanza, final Object payload) {
 		
-		if (!(bean instanceof TrustEvidenceCollectorResponseBean))
-			throw new IllegalArgumentException("bean is not instance of TrustEvidenceCollectorResponseBean");
+		if (stanza == null)
+			throw new NullPointerException("stanza can't be null");
+		if (payload == null)
+			throw new NullPointerException("payload can't be null");
 		
-		final TrustEvidenceCollectorResponseBean responseBean = (TrustEvidenceCollectorResponseBean) bean;
-		
-		ITrustEvidenceCollectorRemoteClientCallback callback = this.clients.remove(stanza.getId());
+		if (LOG.isDebugEnabled())
+			LOG.debug("receiveResult: stanza=" + stanza + ", payload=" + payload);
+		if (stanza.getId() == null) {
+			LOG.error("Received result with null stanza id");
+			return;
+		}
+		final ITrustEvidenceCollectorRemoteClientCallback callback = 
+				this.removeClient(stanza.getId());
 		if (callback == null) {
-			LOG.error("Could not find client callback for TrustEvidenceCollector remote addDirectEvidence response: "
+			LOG.error("Could not handle result bean: No callback client found for stanza with id: " 
 					+ stanza.getId());
 			return;
 		}
 		
+		if (!(payload instanceof TrustEvidenceCollectorResponseBean)) {
+			callback.onException(new TrustEvidenceCollectorCommsException(
+					"Could not handle result bean: Unexpected type: "
+							+ payload.getClass()));
+			return;
+		}
+		
+		final TrustEvidenceCollectorResponseBean responseBean = (TrustEvidenceCollectorResponseBean) payload;
+		if (LOG.isDebugEnabled())
+			LOG.debug("receiveResult: responseBean.getMethodName()="
+					+ responseBean.getMethodName());	
 		if (MethodName.ADD_DIRECT_EVIDENCE.equals(responseBean.getMethodName())) {	
 			
 			callback.onAddedDirectEvidence();
+			
 		} else if (MethodName.ADD_INDIRECT_EVIDENCE.equals(responseBean.getMethodName())) {	
 				
-			callback.onAddedIndirectEvidence();	
+			callback.onAddedIndirectEvidence();
+			
 		} else {
 			
-			LOG.error("Unsupported TrustEvidenceCollector remote response method: " + responseBean.getMethodName());
+			LOG.error("Unsupported TrustEvidenceCollector remote response method: "
+					+ responseBean.getMethodName());
+			callback.onException(new TrustEvidenceCollectorCommsException(
+					"Unsupported TrustEvidenceCollector remote response method: "
+					+ responseBean.getMethodName()));
 		}
 	}
 
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public boolean containsClient(String id) {
+		
+		return this.clients.containsKey(id);
+	}
+	
 	/**
 	 * 
 	 * @param id
@@ -169,9 +225,10 @@ public class TrustEvidenceCollectorRemoteClientCallback implements ICommCallback
 	/**
 	 * 
 	 * @param id
+	 * @return 
 	 */
-	void removeClient(String id) {
+	ITrustEvidenceCollectorRemoteClientCallback removeClient(String id) {
 		
-		this.clients.remove(id);
+		return this.clients.remove(id);
 	}
 }

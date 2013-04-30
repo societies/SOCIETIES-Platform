@@ -45,7 +45,7 @@ public class RequestItemUtils {
 	 * @return
 	 */
 	public static RequestItem create(Resource resource, List<Action> actions, List<Condition> conditions) {
-		return create(resource, actions, conditions, true);
+		return create(resource, actions, conditions, false);
 	}
 
 	public static RequestItem create(Resource resource, List<Action> actions, List<Condition> conditions, boolean optional) {
@@ -80,32 +80,89 @@ public class RequestItemUtils {
 		return sb.toString();
 	}
 
+	public static String toString(RequestItem value){
+		StringBuilder builder = new StringBuilder();
+		builder.append("RequestItem [");
+		if (null != value) {
+			builder.append("getActions()=");
+			builder.append(ActionUtils.toString(value.getActions()));
+			builder.append(", getConditions()=");
+			builder.append(ConditionUtils.toString(value.getConditions()));
+			builder.append(", isOptional()=");
+			builder.append(value.isOptional());
+			builder.append(", getResource()=");
+			builder.append(ResourceUtils.toString(value.getResource()));
+		}
+		builder.append("]");
+		return builder.toString();
+	}
+
+	public static String toString(List<RequestItem> values){
+		StringBuilder sb = new StringBuilder();
+		if (null != values) {
+			for(RequestItem value : values) {
+				sb.append(toString(value));
+			}
+		}
+		return sb.toString();
+	}
+
+
+	@Deprecated
 	public static boolean equals(RequestItem o1, Object o2) {
+		return equal(o1, o2);
+	}
+	public static boolean equal(RequestItem o1, Object o2) {
+		return equal(o1, o2, false);
+	}
+	public static boolean equal(RequestItem o1, Object o2, boolean dontCheckOptional) {
 		// -- Verify reference equality
-		if (o2 == null) { return false; }
 		if (o1 == o2) { return true; }
+		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
 		if (o1.getClass() != o2.getClass()) { return false; }
 		// -- Verify obj type
-		RequestItem rhs = (RequestItem) o2;
-		return (ActionUtils.equals(o1.getActions(), rhs.getActions())
-				&& ConditionUtils.equals(o1.getConditions(), rhs.getConditions())
-				&& ResourceUtils.equals(o1.getResource(), rhs.getResource())
-				&& o1.isOptional() == rhs.isOptional()
+		RequestItem ro2 = (RequestItem) o2;
+		return (ActionUtils.equal(o1.getActions(), ro2.getActions())
+				&& ConditionUtils.equal(o1.getConditions(), ro2.getConditions())
+				&& ResourceUtils.equal(o1.getResource(), ro2.getResource())
+				&& (dontCheckOptional || o1.isOptional() == ro2.isOptional())
 				);
 	}
 
+	@Deprecated
 	public static boolean equals(List<RequestItem> o1, Object o2) {
+		return equal(o1, o2);
+	}
+	public static boolean equal(List<RequestItem> o1, Object o2) {
 		// -- Verify reference equality
-		if (o2 == null) { return false; }
 		if (o1 == o2) { return true; }
-		if (o1.getClass() != o2.getClass()) { return false; }
+		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
+		if (!(o2 instanceof List)) { 
+			return false;
+		}
 		// -- Verify obj type
-		List<RequestItem> rhs = (List<RequestItem>) o2;
+		List<RequestItem> ro2 = (List<RequestItem>) o2;
+		if (o1.size() != ro2.size()) {
+			return false;
+		}
 		boolean result = true;
-		int i = 0;
-		for(RequestItem o1Element : o1) {
-			result &= equals(o1Element, rhs.get(i++));
+		for(RequestItem o1Entry : o1) {
+			result &= contain(o1Entry, ro2);
 		}
 		return result;
+	}
+
+	public static boolean contain(RequestItem needle, List<RequestItem> haystack) {
+		if (null == haystack || haystack.size() <= 0 || null == needle) {
+			return false;
+		}
+		for(RequestItem entry : haystack) {
+			if (equal(needle, entry)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

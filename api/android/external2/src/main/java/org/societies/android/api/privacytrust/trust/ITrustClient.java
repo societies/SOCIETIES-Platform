@@ -35,7 +35,19 @@ import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean;
 
 /**
- * Describe your class here...
+ * This interface provides access to the trust values associated with 
+ * individuals, communities and services. These values define trust 
+ * relationships between a given <i>trustor</i> and a <i>trustee</i>. More
+ * specifically, a trustor is an entity which assigns a trust value to another
+ * entity, i.e. the trustee, in order to express the trustworthiness of that 
+ * entity. Such a trust value ranges from <i>0</i> to <i>1</i>, where zero 
+ * expresses full distrust, while one denotes full trust. There are three 
+ * different types of values that can be assigned:
+ * {@link TrustValueTypeBean#DIRECT DIRECT}, 
+ * {@link TrustValueTypeBean#INDIRECT INDIRECT}, or 
+ * {@link TrustValueTypeBean#USER_PERCEIVED USER_PERCEIVED}. A 
+ * <code>TrustRelationshipBean</code> also contains the date and time
+ * (timestamp) when the trust value was last evaluated.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.5

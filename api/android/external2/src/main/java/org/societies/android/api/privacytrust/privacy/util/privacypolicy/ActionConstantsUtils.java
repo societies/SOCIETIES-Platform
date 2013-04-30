@@ -22,69 +22,24 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.ctx_3pBroker;
+package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 
-import org.societies.api.cis.management.ICisManager;
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.broker.ICtxBroker;
-import org.societies.integration.test.IntegrationTestCase;
-import org.societies.integration.test.bit.ctx_3pBroker.Tester;
 
 /**
- * 
- *
- * @author nikosk
- *
+ * Tool class to manage conversion between Java type and Bean XMLschema generated type
+ * @author Olivier Maridat (Trialog)
  */
-public class Test1337 extends IntegrationTestCase{
-
-	
-	public static ICtxBroker ctxBroker;
-	public static ICommManager commManager;
-	public static ICisManager cisManager;
-	
-	
-	public Test1337(){
-		super(1858, new Class[]{Tester.class});
+public class ActionConstantsUtils {
+	public static boolean equal(ActionConstants o1, Object o2) {
+		// -- Verify reference equality
+		if (o1 == o2) { return true; }
+		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
+		if (o1.getClass() != o2.getClass()) { return false; }
+		// -- Verify obj type
+		ActionConstants ro2 = (ActionConstants) o2;
+		return (o1.value().equals(ro2.value()));
 	}
-
-	/**
-	 * @return the ctxBroker
-	 */
-	public static ICtxBroker getCtxBroker() {
-		return ctxBroker;
-	}
-
-	/**
-	 * @param ctxBroker the ctxBroker to set
-	 */
-	public  void setCtxBroker(ICtxBroker ctxBroker) {
-		Test1337.ctxBroker = ctxBroker;
-
-	}
-	
-	/**
-	 * @return the commMgr
-	 */
-	public static ICommManager  getCommManager() {
-		return commManager ;
-	}
-
-	/**
-	 * @param commMgr the commMgr to set
-	 */
-	public  void setCommManager(ICommManager commMgr) {
-		Test1337.commManager = commMgr;
-	}		
-
-	public static ICisManager getCisManager() {
-		return cisManager;
-	}
-
-	public void setCisManager(ICisManager cisManager) {
-		
-		Test1337.cisManager = cisManager;
-	}
-
 }

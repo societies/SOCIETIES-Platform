@@ -2,19 +2,29 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>bit.community_context_estimation.1856</artifactId>
-	<name>Community Context Estimation Integration Test</name>
+	<artifactId>bit.context_similarity_eval.2018</artifactId>
+	<name>Context Similarity eval Integration Test</name>
 	<packaging>bundle</packaging>
 	<version>${release.version}</version>
 
 	<developers>
    		<developer>
-			<name>Giorgos Bouloudis</name>
-			<email>ybouloudis@amitec.gr</email>
-			<organization>Amitec</organization>
-			<organizationUrl>http://www.amitec.gr/</organizationUrl>
+			<name>Emmet Boylan</name>
+			<email>eboylan@tssg.org</email>
+			<organization>TSSG</organization>
+			<organizationUrl>http://www.tssg.org/</organizationUrl>
 			<roles>
 				<role>owner</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+0</timezone>
+		</developer>
+   		<developer>
+			<name>Nikos Kalatzis</name>
+			<email>nikosk@cn.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
 				<role>developer</role>
 			</roles>
 			<timezone>+2</timezone>

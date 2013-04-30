@@ -24,10 +24,16 @@
  */
 package org.societies.api.privacytrust.privacy.util.privacypolicy;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
@@ -37,8 +43,12 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Request
  *
  */
 public class ActionUtilsTest {
+	private static Logger LOG = LoggerFactory.getLogger(ActionUtilsTest.class.getName());
+	
 	@Test
 	public void testEqual() {
+		String testTitle = "Equal";
+		LOG.info("[Test] "+testTitle);
 		Action action1 = null;
 		Action action2 = null;
 		RequestPolicy notAction = null;
@@ -69,5 +79,73 @@ public class ActionUtilsTest {
 		assertTrue("Equal actions should be equal", ActionUtils.equal(action1, action2));
 		assertTrue("Equal actions should be equal (inverse)", ActionUtils.equal(action2, action1));
 		assertFalse("action and object should not be equal", ActionUtils.equal(action1, notAction));
+	}
+	
+	@Test
+	public void testContainAllMandotory() {
+		String testTitle = "Contain all mandatory actions";
+		LOG.info("[Test] "+testTitle);
+		// NULL
+		List<Action> requestedActions = null;
+		List<Action> providedActions = null;
+		assertTrue("Null requested actions means nothing is mandatory", ActionUtils.containAllMandotory(providedActions, requestedActions));
+		
+		// Empty
+		requestedActions = new ArrayList<Action>();
+		assertTrue("Empty requested actions means nothing is mandatory (1/2)", ActionUtils.containAllMandotory(providedActions, requestedActions));
+		providedActions = new ArrayList<Action>();
+		assertTrue("Empty requested actions means nothing is mandatory (2/2)", ActionUtils.containAllMandotory(providedActions, requestedActions));
+		
+		// Only mandatory
+		requestedActions = ActionUtils.createList(ActionConstants.READ);
+		assertFalse("Only Mandatory requested actions (1/2)", ActionUtils.containAllMandotory(providedActions, requestedActions));
+		providedActions = ActionUtils.createList(ActionConstants.READ);
+		assertTrue("Empty requested actions means nothing is mandatory (2/4)", ActionUtils.containAllMandotory(providedActions, requestedActions));
+		requestedActions = ActionUtils.createList(ActionConstants.READ, ActionConstants.WRITE);
+		assertFalse("Only Mandatory requested actions (3/4)", ActionUtils.containAllMandotory(providedActions, requestedActions));
+		providedActions = ActionUtils.createList(ActionConstants.READ, ActionConstants.WRITE);
+		assertTrue("Empty requested actions means nothing is mandatory (4/4)", ActionUtils.containAllMandotory(providedActions, requestedActions));
+
+		// With optional fields
+		requestedActions.add(ActionUtils.create(ActionConstants.DELETE, true));
+		assertTrue("With option field, it should still match (1/3)", ActionUtils.containAllMandotory(providedActions, requestedActions));
+		providedActions.add(ActionUtils.create(ActionConstants.DELETE, true));
+		assertTrue("With option field, it should still match (2/3)", ActionUtils.containAllMandotory(providedActions, requestedActions));
+		providedActions = ActionUtils.createList(ActionConstants.READ, ActionConstants.WRITE, ActionConstants.DELETE);
+		assertTrue("Empty requested actions means nothing is mandatory (3/3)", ActionUtils.containAllMandotory(providedActions, requestedActions));
+		
+		// Only optional fields
+		requestedActions = new ArrayList<Action>();
+		requestedActions.add(ActionUtils.create(ActionConstants.DELETE, true));
+		providedActions = null;
+		assertTrue("Only optional field, it should still match (1/4)", ActionUtils.containAllMandotory(providedActions, requestedActions));
+		providedActions = new ArrayList<Action>();
+		assertTrue("Only optional field, it should still match (2/4)", ActionUtils.containAllMandotory(providedActions, requestedActions));
+		providedActions.add(ActionUtils.create(ActionConstants.DELETE, true));
+		assertTrue("Only optional field, it should still match (3/4)", ActionUtils.containAllMandotory(providedActions, requestedActions));
+		providedActions = ActionUtils.createList(ActionConstants.READ, ActionConstants.WRITE, ActionConstants.DELETE);
+		assertTrue("Only optional field, it should still match (4/4)", ActionUtils.containAllMandotory(providedActions, requestedActions));
+		
+	}
+	
+	@Test
+	public void testGetFriendlyName() {
+		String testTitle = "Get friendly name";
+		LOG.info("[Test] "+testTitle);
+		String expectedFriendlyName = "access";
+		String actualFriendlyName = ActionUtils.getFriendlyName(ActionUtils.create(ActionConstants.READ));
+		assertEquals("Friendly names should be equal", expectedFriendlyName, actualFriendlyName);
+		
+		String expectedFriendlyDescription1 = "access";
+		String actualFriendlyDescription1 = ActionUtils.getFriendlyDescription(ActionUtils.createList(ActionConstants.READ));
+		assertEquals("Friendly descriptions 1 should be equal", expectedFriendlyDescription1, actualFriendlyDescription1);
+		
+		String expectedFriendlyDescription2 = "access and update";
+		String actualFriendlyDescription2 = ActionUtils.getFriendlyDescription(ActionUtils.createList(ActionConstants.READ, ActionConstants.WRITE));
+		assertEquals("Friendly descriptions 2 should be equal", expectedFriendlyDescription2, actualFriendlyDescription2);
+		
+		String expectedFriendlyDescription3 = "access, update and delete";
+		String actualFriendlyDescription3 = ActionUtils.getFriendlyDescription(ActionUtils.createList(ActionConstants.READ, ActionConstants.WRITE, ActionConstants.DELETE));
+		assertEquals("Friendly descriptions 3 should be equal", expectedFriendlyDescription3, actualFriendlyDescription3);
 	}
 }

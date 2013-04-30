@@ -98,8 +98,8 @@ public class IndirectTrustEngine extends TrustEngine {
 			// Retrieve all Indirect Trust Evidence related to the object
 			// referenced in the specified TrustEvidence
 			final Set<IIndirectTrustEvidence> evidenceSet = super.trustEvidenceRepo
-					.retrieveIndirectEvidence(null, evidence.getObjectId(),
-							evidence.getType(), null, null); // TODO unique evidence - max date!!
+					.retrieveLatestIndirectEvidence(null, evidence.getObjectId(),
+							evidence.getType(), null);
 			if (LOG.isDebugEnabled())
 				LOG.debug("evidenceSet=" + evidenceSet);
 			
@@ -118,6 +118,8 @@ public class IndirectTrustEngine extends TrustEngine {
 					totalValue += (Double) relatedEvidence.getInfo();
 					N++;
 				}
+				if (LOG.isDebugEnabled())
+					LOG.debug("totalValue=" + totalValue + ", N=" + N);
 				if (N != 0) {
 					final double value = totalValue / N;
 					final double confidence = 0.5; // TODO constant or what?

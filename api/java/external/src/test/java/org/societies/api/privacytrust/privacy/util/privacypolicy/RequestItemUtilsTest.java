@@ -31,14 +31,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.util.log.Log;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.schema.identity.DataIdentifierScheme;
-import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
@@ -204,5 +201,48 @@ public class RequestItemUtilsTest {
 		assertFalse("Equal privacy policies should not be equal (inverse)", RequestItemUtils.equal(requestItem2, requestItem1));
 		assertTrue("Similar privacy policies should be Similar", RequestItemUtils.equal(requestItem1, requestItem2, true));
 		assertTrue("Similar privacy policies should be Similar (inverse)", RequestItemUtils.equal(requestItem2, requestItem1, true));
+	}
+
+	@Test
+	public void testEqualList() {
+		String testTitle = "Equal: list";
+		LOG.info("[Test] "+testTitle);
+
+		List<RequestItem> requestItems1 = null;
+		List<RequestItem> requestItems2 = null;
+		Action notPrivacyPolicy = null;
+		// -- Null
+		assertTrue("Same null item should be equal", RequestItemUtils.equal(requestItems1, requestItems1));
+		assertTrue("Null items should be equal", RequestItemUtils.equal(requestItems1, requestItems2));
+		assertTrue("Null item and null object should be equal", RequestItemUtils.equal(requestItems1, notPrivacyPolicy));
+
+		// -- Empty
+		requestItems1 = new ArrayList<RequestItem>();
+		requestItems2 = new ArrayList<RequestItem>();
+		notPrivacyPolicy = new Action();
+		assertTrue("Same empty item should be equal", RequestItemUtils.equal(requestItems1, requestItems1));
+		assertTrue("Empty items should be equal", RequestItemUtils.equal(requestItems1, requestItems2));
+		assertTrue("Empty items should be equal (inverse)", RequestItemUtils.equal(requestItems2, requestItems1));
+		assertFalse("Empty item and empty object should not be equal", RequestItemUtils.equal(requestItems1, notPrivacyPolicy));
+
+		// Filled
+		List<Condition> conditions1 = new ArrayList<Condition>();
+		conditions1.add(ConditionUtils.create(ConditionConstants.SHARE_WITH_3RD_PARTIES, "Yes"));
+		List<Condition> conditions2 = new ArrayList<Condition>();
+		conditions2.add(ConditionUtils.create(ConditionConstants.SHARE_WITH_3RD_PARTIES, "Yes"));
+		conditions2.add(ConditionUtils.create(ConditionConstants.MAY_BE_INFERRED, "Yes"));
+		requestItems1.add(RequestItemUtils.create(
+				ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.ACTION),
+				ActionUtils.createList(ActionConstants.READ), 
+				conditions1));
+		assertTrue("Same item should be equal", RequestItemUtils.equal(requestItems1, requestItems1));
+		assertFalse("Different items should not be equal", RequestItemUtils.equal(requestItems1, requestItems2));
+		assertFalse("Different items should not be equal (inverse)", RequestItemUtils.equal(requestItems2, requestItems1));
+		requestItems2.add(RequestItemUtils.create(
+				ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.ACTION),
+				ActionUtils.createList(ActionConstants.READ), 
+				conditions1));
+		assertTrue("Same item should be equal", RequestItemUtils.equal(requestItems1, requestItems2));
+		assertTrue("Same item should be equal (inverse)", RequestItemUtils.equal(requestItems2, requestItems1));
 	}
 }
