@@ -109,7 +109,7 @@ public class Tester {
 		for (int i=0; i<2; i++){
 			try {
 				//send actions - 1 second apart
-				LOG.info("Monitor services #749 - sending mock actions for storage");
+				LOG.info("Monitor services #1877 - sending mock actions for storage");
 				TestCase749.uam.monitor(identity, action1);
 
 				Thread.sleep(1000);

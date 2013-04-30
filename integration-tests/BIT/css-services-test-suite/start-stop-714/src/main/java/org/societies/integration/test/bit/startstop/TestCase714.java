@@ -33,7 +33,7 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegis
 import org.societies.integration.test.IntegrationTestCase;
 
 /**
- * Test case 714 aims to test the start and stop operations of Service Control.
+ * Test case 1865 aims to test the start and stop operations of Service Control.
  * 
  * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
@@ -61,23 +61,23 @@ public class TestCase714 extends IntegrationTestCase {
 		// with test case number
 		// and test case classes to run
 		//super(713, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
-		super(714, new Class[] {NominalTestCaseUpperTester.class});
-		NominalTestCaseUpperTester.testCaseNumber = 714;
+		super(1865, new Class[] {NominalTestCaseUpperTester.class});
+		NominalTestCaseUpperTester.testCaseNumber = 1865;
 	}
 
 
 	public void setServiceControl(IServiceControl serviceControl) {
-		if(LOG.isDebugEnabled()) LOG.debug("[#714] setServiceControl()");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1865] setServiceControl()");
 		TestCase714.serviceControl = serviceControl;
 	}
 	
 	public void setServiceRegistry(IServiceRegistry serviceRegistry) {
-		if(LOG.isDebugEnabled()) LOG.debug("[#714] setServiceRegistry()");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1865] setServiceRegistry()");
 		TestCase714.serviceRegistry = serviceRegistry;
 	}
 	
 	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
-		if(LOG.isDebugEnabled()) LOG.debug("[#714] setServiceDiscovery()");
+		if(LOG.isDebugEnabled()) LOG.debug("[#1865] setServiceDiscovery()");
 		TestCase714.serviceDiscovery = serviceDiscovery;
 	}
 	

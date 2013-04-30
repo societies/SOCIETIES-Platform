@@ -92,7 +92,7 @@ public class ResourceUtils {
 		// URI available
 		return DataIdentifierFactory.fromUri(resource.getDataIdUri());
 	}
-	
+
 
 	public static String toXmlString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource){
 		StringBuilder sb = new StringBuilder();
@@ -114,21 +114,34 @@ public class ResourceUtils {
 		}
 		return sb.toString();
 	}
-	
+
 	public static String toString(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource){
 		StringBuilder builder = new StringBuilder();
-		builder.append("Resource [getDataIdUri()=");
-		if (null==resource.getDataIdUri()){
-			builder.append("null");
-		}else{
-			builder.append(resource.getDataIdUri());
+		builder.append("Resource [");
+		if (null != resource) {
+			builder.append("getDataIdUri()=");
+			if (null==resource.getDataIdUri()){
+				builder.append("null");
+			}else{
+				builder.append(resource.getDataIdUri());
+			}
+			builder.append(", getDataType()=");
+			builder.append(resource.getDataType());
+			builder.append(", getScheme()=");
+			builder.append(resource.getScheme());
 		}
-		builder.append(", getDataType()=");
-		builder.append(resource.getDataType());
-		builder.append(", getScheme()=");
-		builder.append(resource.getScheme());
 		builder.append("]");
 		return builder.toString();
+	}
+
+	public static String toString(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource> values){
+		StringBuilder sb = new StringBuilder();
+		if (null != values) {
+			for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource entry : values) {
+				sb.append(toString(entry));
+			}
+		}
+		return sb.toString();
 	}
 
 
@@ -155,7 +168,7 @@ public class ResourceUtils {
 		if (o1 == o2) { return true; }
 		if (o2 == null) { return false; }
 		if (o1 == null) { return false; }
-		if (o1.getClass() != o2.getClass()) { return false; }
+		if (!(o2 instanceof List)) { return false; }
 		// -- Verify obj type
 		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource> ro2 = (List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource>) o2;
 		if (o1.size() != ro2.size()) {
@@ -167,7 +180,7 @@ public class ResourceUtils {
 		}
 		return result;
 	}
-	
+
 	public static boolean contain(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource needle, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource> haystack) {
 		if (null == haystack || haystack.size() <= 0 || null == needle) {
 			return false;
@@ -179,8 +192,8 @@ public class ResourceUtils {
 		}
 		return false;
 	}
-	
-	
+
+
 	public static Resource toResource(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resourceBean)
 	{
 		if (null == resourceBean) {

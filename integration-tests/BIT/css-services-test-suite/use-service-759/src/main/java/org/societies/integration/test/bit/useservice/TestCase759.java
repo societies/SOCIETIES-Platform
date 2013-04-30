@@ -36,8 +36,8 @@ public class TestCase759 extends IntegrationTestCase {
 		// with test case number
 		// and test case classes to run
 		//super(759, new Class[]{NominalTestCaseLowerTester.class, SpecificTestCaseUpperTester.class});
-		super(759, new Class[]{NominalTestCaseLowerTester.class});
-		NominalTestCaseLowerTester.testCaseNumber = 759;
+		super(1866, new Class[]{NominalTestCaseLowerTester.class});
+		NominalTestCaseLowerTester.testCaseNumber = 1866;
 	}
 
 

@@ -59,6 +59,8 @@ public class CSSContentProvider {
 		public final static String CSS_NODE_TYPE = "type";
 		public final static String CSS_NODE_STATUS = "status";
 		public final static String CSS_NODE_RECORD = "record";
+		public final static String CSS_NODE_DEVICE_MAC_ADDRESS = "nodeMAC";
+		public final static String CSS_NODE_INTERACTABLE = "interactable";
 
 	}
 	
@@ -71,7 +73,6 @@ public class CSSContentProvider {
 		public final static String CSS_NODE_TYPE = "type";
 		public final static String CSS_NODE_STATUS = "status";
 		public final static String CSS_NODE_RECORD = "record";
-
 	}
 
 	public static final class CssRecord implements BaseColumns {
@@ -80,20 +81,24 @@ public class CSSContentProvider {
 		public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + PATH);
 		
 		public final static String CSS_RECORD_DOMAIN_SERVER = "domainServer";
-//		public final static String CSS_RECORD_CSS_HOSTING_LOCATION = "cssHostingLocation";
 		public final static String CSS_RECORD_ENTITY = "entity";
 		public final static String CSS_RECORD_FORENAME = "foreName";
 		public final static String CSS_RECORD_NAME = "name";
-//		public final static String CSS_RECORD_IDENTITY_NAME = "identityName";
 		public final static String CSS_RECORD_EMAILID = "emailID";
-//		public final static String CSS_RECORD_IMID = "imID";
-//		public final static String CSS_RECORD_SOCIALURI = "socialURI";
 		public final static String CSS_RECORD_SEX = "sex";
 		public final static String CSS_RECORD_HOME_LOCATION = "homeLocation";
 		public final static String CSS_RECORD_CSS_IDENTITY = "cssIdentity";
-//		public final static String CSS_RECORD_STATUS = "status";
-//		public final static String CSS_RECORD_REGISTRATION = "cssRegistration";
-//		public final static String CSS_RECORD_INACTIVATION = "cssInactivation";
-//		public final static String CSS_RECORD_UPTIME = "cssUpTime";
+		public final static String CSS_RECORD_POSITION = "position";
+		public final static String CSS_RECORD_WORKPLACE = "workplace";
+	}
+	
+	public static final class UserVCards implements BaseColumns {
+
+		public static final String PATH = "UserVCards";
+		public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + PATH);
+		
+		public final static String USER_IDENTITY = "jid";
+		public final static String USER_AVATAR   = "avatar";
+		public final static String AVATAR_HASH   = "avatar_hash";
 	}
 }

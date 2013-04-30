@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.ITrustNodeMgr;
@@ -84,6 +86,24 @@ public class TrustNodeMgr implements ITrustNodeMgr {
 	}
 	
 	/*
+	 * @see org.societies.privacytrust.trust.api.ITrustNodeMgr#getLocalIdentity()
+	 */
+	@Override
+	public IIdentity getLocalIdentity() {
+		
+		return this.commMgr.getIdManager().getCloudNode();
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.ITrustNodeMgr#getLocalRequestor()
+	 */
+	@Override
+	public Requestor getLocalRequestor() {
+		
+		return new Requestor(this.getLocalIdentity());
+	}
+	
+	/*
 	 * @see org.societies.privacytrust.trust.api.ITrustNodeMgr#isMaster()
 	 */
 	@Override
@@ -92,5 +112,22 @@ public class TrustNodeMgr implements ITrustNodeMgr {
 		final INetworkNode localNode = this.commMgr.getIdManager().getThisNetworkNode();
 		final INetworkNode cloudNode = this.commMgr.getIdManager().getCloudNode();
 		return localNode.equals(cloudNode);
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.ITrustNodeMgr#fromId(org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	public IIdentity fromId(final TrustedEntityId teid) {
+		
+		if (teid == null)
+			throw new NullPointerException("teid can't be null");
+		
+		try {
+			return this.commMgr.getIdManager().fromJid(teid.getEntityId());
+		} catch (InvalidFormatException ife) {
+			throw new IllegalArgumentException("Invalid TrustedEntityId '" 
+					+ teid + "': " + ife.getLocalizedMessage(), ife);
+		}
 	}
 }

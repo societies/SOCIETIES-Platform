@@ -2,6 +2,7 @@ package org.societies.webapp.models;
 
 import org.societies.api.cis.attributes.Rule.OperationType;
 
+@Deprecated // No longer used after move from JSP to JSF
 public class MembershipCriteriaForm {
 	
 	String attribute;

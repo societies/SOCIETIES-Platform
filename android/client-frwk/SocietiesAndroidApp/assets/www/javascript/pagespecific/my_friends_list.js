@@ -5,12 +5,47 @@
  */
 var CSSFriendsServices = {
 	
+	isFacebookFlagged: function(flag) {
+		var FACEBOOK_BIT=0x0000000001;
+		return (flag & FACEBOOK_BIT) === FACEBOOK_BIT; 
+	},
+			
+	isTwitterFlagged: function(flag) {
+		var TWITTER_BIT=0x0000000010;
+		return (flag & TWITTER_BIT) === TWITTER_BIT; 
+	},
+	
+	isLinkedinFlagged: function(flag) {
+		var LINKEDIN_BIT=0x0000000100;
+		return (flag & LINKEDIN_BIT) === LINKEDIN_BIT; 
+	},
+	
+	isFoursquareFlagged: function(flag) {
+		var FOURSQUARE_BIT=0x0000001000;
+		return (flag & FOURSQUARE_BIT) === FOURSQUARE_BIT; 
+	},
+	
+	isGooglePlusFlagged: function(flag) {
+		var GOOGLEPLUS_BIT=0x0000010000;
+		return (flag & GOOGLEPLUS_BIT) === GOOGLEPLUS_BIT; 
+	},
+	
 	/**
 	 * @methodOf Societies3PServices#
 	 * @description Refresh your friend requests
 	 * @returns null
 	 */
 	refreshFriendRequests: function() {
+		function showAvatar(VCard) {
+			if (VCard.from != null) {
+				var n=VCard.from.indexOf("@");
+				var identityStr = VCard.from.substring(0, n);
+				var imageStr = VCard.avatar;
+				if (imageStr != null)
+					$('img#' + identityStr).attr("src", "data:image/jpg;base64," + VCard.avatar);
+			}
+		}
+		
 		function success(data) {
 			//UPDATE COUNT
 			$("span#myFriendRequests").html(data.length);
@@ -18,20 +53,23 @@ var CSSFriendsServices = {
 			//EMPTY TABLE - NEED TO LEAVE THE HEADER
 			while( $('ul#FriendRequestsListUL').children().length >1 )
 				$('ul#FriendRequestsListUL li:last').remove();
-			//DISPLAY SERVICES
+			//DISPLAY REQUESTS
 			for (i  = 0; i < data.length; i++) {
+				var n=data[i].id.indexOf(".");
+				var identityStr = data[i].id.substring(0, n);
 				var tableEntry = '<li id="li' + i + '"><a href="#" onclick="CSSFriendsServices.acceptFriendRequest(\'' + data[i].name + '\', \'' + data[i].id + '\', ' + i + ')">' +
-					'<img src="images/profile_pic.png" />' +
+					'<img src="images/profile_pic.png" id="' + identityStr + '" style="max-width:100px;" />' +
 					'<h2>' + data[i].name + '</h2>' + 
 					'<p>' + data[i].id + '</p>' +
 					'</a></li>';
-				jQuery('ul#FriendRequestsListUL').append(tableEntry);
+				$('ul#FriendRequestsListUL').append(tableEntry);
+				window.plugins.SocietiesLocalCSSManager.getVCardUser(data[i].id, showAvatar, failure);
 			}
 			$('ul#FriendRequestsListUL').listview('refresh');
 		}
 		
 		function failure(data) {
-			alert("refreshFriendRequests - failure: " + data);
+			console.log("refreshFriendRequests failure: " + data);
 		}
 		
 		window.plugins.SocietiesLocalCSSManager.getFriendRequests(success, failure);
@@ -45,6 +83,16 @@ var CSSFriendsServices = {
 	refreshFriendList: function() {
 		console.log("refreshFriendList");
 
+		function showAvatar(VCard) {
+			if (VCard.from != null) {
+				var n=VCard.from.indexOf("@");
+				var identityStr = VCard.from.substring(0, n);
+				var imageStr = VCard.avatar;
+				if (imageStr != null)
+					$('img#' + identityStr).attr("src", "data:image/jpg;base64," + VCard.avatar);
+			}
+		}
+		
 		function success(data) {
 			//UPDATE COUNT
 			$("span#myFriendsCount").html(data.length);
@@ -53,20 +101,23 @@ var CSSFriendsServices = {
 			while( $('ul#FriendsListDiv').children().length >1 )
 				$('ul#FriendsListDiv li:last').remove();
 
-			//DISPLAY SERVICES
+			//DISPLAY FRIENDS
 			for (i  = 0; i < data.length; i++) {
+				var n=data[i].id.indexOf(".");
+				var identityStr = data[i].id.substring(0, n);
 				var tableEntry = '<li><a href="#" onclick="CSSFriendsServices.showFriendDetails(\'' + data[i].id + '\')">' +
-					'<img src="images/profile_pic.png" />' +	
+					'<img src="images/profile_pic.png" id="' + identityStr + '" style="max-width:100px;" />' +
 					'<h2>' + data[i].name + '</h2>' + 
 					'<p>' + data[i].id + '</p>' +
 					'</a></li>';
 				$('ul#FriendsListDiv').append(tableEntry);
+				window.plugins.SocietiesLocalCSSManager.getVCardUser(data[i].id, showAvatar, failure);
 			}
 			$('ul#FriendsListDiv').listview('refresh');
 		}
 		
 		function failure(data) {
-			alert("refresh3PServices - failure: " + data);
+			console.log("refreshFriendList failure: " + data);
 		}
 		
 		window.plugins.SocietiesLocalCSSManager.getMyFriendsList(success, failure);
@@ -86,17 +137,39 @@ var CSSFriendsServices = {
 	},
 	
 	showFriendDetailPage: function(data) {
+		function success(data) {
+			//DISPLAY PROFILE IMAGE IF AVAILABLE
+			
+			//$("img").attr({
+			//	  src: "/resources/hat.gif",
+			//	  title: "jQuery",
+			//	  alt: "jQuery Logo"
+			//	});
+			
+			if (data.avatar==null)
+				$("img#friendProfilePic").attr("src", "images/profile_pic_sample.jpg");
+			else
+				$("img#friendProfilePic").attr("src", "data:image/jpg;base64," + data.avatar);
+		}
+		
+		function failure(data) {
+			console.log("Error retrieving avatar: " + data);
+		}
+		
 		//CSS Record OBJECT
-		var forename = data.foreName;
-		if (forename=="undefined")
-			forename="";
-		var markup = "<h1>" + data.foreName + " " + data.name + "</h1>" + 
-					 "<p>" + data.homeLocation + "</p>" +
+		var name 	 = data.name, 
+			location = data.homeLocation,
+			email	 = data.emailId;
+		if (name==null) name="";
+		if (location==null) name="";
+		if (email==null) email="";
+		var markup = "<h1>" + name + " </h1>" + 
+					 "<p>" + location + " </p>" +
 					 "<p>" + data.cssIdentity + "</p><br />"; 
 		//INJECT
 		$('div#friend_profile_info').html( markup );
 		//ADDITIONAL INFO
-		var addInfo = "<br/>" + "<p>Email: " + data.emailID + "</p>";
+		var addInfo = "<br/>" + "<p>Email: " + email + " </p>";
 		$('li#friend_additional_info').html( addInfo );
 				
 		try {//REFRESH FORMATTING
@@ -104,6 +177,8 @@ var CSSFriendsServices = {
 			$('ul#friendInfoUL').listview('refresh');
 		}
 		catch(err) {}
+		//RETRIEVE PHOTO
+		window.plugins.SocietiesLocalCSSManager.getVCardUser(data.cssIdentity, success, failure);
 	},
 	
 	refreshSuggestedFriendsList: function() {
@@ -114,29 +189,116 @@ var CSSFriendsServices = {
 			$("span#suggestedFriendsCount").html(data.length);
 			$("span#suggestedFriendsCount").css({ visibility: "visible"});			
 			//DISPLAY RECORDS
-			CSSFriendsServices.displayCSSAdvertRecords(data);
+			CSSFriendsServices.displayFriendEntryRecords(data);
 		}
 		
 		function failure(data) {
-			alert("refresh3PServices - failure: " + data);
+			alert("Error occured retrieving suggested friends: " + data);
 		}
 		
 		window.plugins.SocietiesLocalCSSManager.getSuggestedFriends(success, failure);
 	},
 	
+	displayFriendEntryRecords: function(data) {
+		function showAvatar(VCard) {
+			if (VCard.from != null) {
+				var n=VCard.from.indexOf("@");
+				var identityStr = VCard.from.substring(0, n);
+				var imageStr = VCard.avatar;
+				if (imageStr != null)
+					$('img#' + identityStr).attr("src", "data:image/jpg;base64," + VCard.avatar);
+			}
+		}
+		
+		function failure(data) {
+			console.log("Error retrieving avatar: " + data);
+		}
+		
+		//EMPTY TABLE - NEED TO LEAVE THE HEADER
+		while( $('ul#SuggestedFriendsListUL').children().length >1 )
+			$('ul#SuggestedFriendsListUL li:last').remove();
+
+		var rankings = new Array();
+		//DISPLAY SUGGESTIONS
+		for (i = 0; i < data.length; i++) {
+			var rank=0;
+			//GENERATE SNS IMAGES
+			var images="";
+			if (CSSFriendsServices.isFacebookFlagged(data[i].value)) {
+				images+='<img src="images/icons/facebook-col.png" width="20" height="20" /> &nbsp;';
+				rank++
+			}
+			if (CSSFriendsServices.isTwitterFlagged(data[i].value)) {
+				images+='<img src="images/icons/twitter-col.png" width="20" height="20" /> &nbsp;';
+				rank++
+			}
+			if (CSSFriendsServices.isLinkedinFlagged(data[i].value)) {
+				images+='<img src="images/icons/linkedin-col.png" width="20" height="20" /> &nbsp;';
+				rank++
+			}
+			if (CSSFriendsServices.isFoursquareFlagged(data[i].value)) {
+				images+='<img src="images/icons/foursquare-col.png" width="20" height="20" /> &nbsp;';
+				rank++
+			}
+			if (CSSFriendsServices.isGooglePlusFlagged(data[i].value)) {
+				images+='<img src="images/icons/googleplus-col.png" width="20" height="20" /> &nbsp;';
+				rank++
+			}
+			
+			//ADD TO LINE ITEM
+			var n=data[i].key.id.indexOf(".");
+			var identityStr = data[i].key.id.substring(0, n);
+			//ADD TO LINE ITEM data-filtertext="NASDAQ:AAPL Apple Inc."
+			var tableEntry = '<li id="li' + i + '"><a href="#" onclick="CSSFriendsServices.sendFriendRequest(\'' + data[i].key.name + '\', \'' + data[i].key.id + '\', ' + i + ')">' +
+				'<img src="images/profile_pic.png" id="' + identityStr + '" style="max-width:100px;" />' +
+				'<p class="ui-li-aside">' + images + '</p>' + 
+				'<h2>' + data[i].key.name + '</h2>' + 
+				'<p>' + data[i].key.id + '</p>' +
+				'</a></li>';
+			rankings[i] = {"rank": rank, "htmlStr": tableEntry, "id": data[i].key.id};
+		}
+		//SORT BASED ON RANK AND PRINT TABLE
+		rankings.sort(function(a,b) { return parseInt(b.rank) - parseInt(a.rank) } );
+		for (i=0; i <rankings.length; i++) {
+			$('ul#SuggestedFriendsListUL').append(rankings[i].htmlStr);
+			window.plugins.SocietiesLocalCSSManager.getVCardUser(rankings[i].id, showAvatar, failure);
+		}
+		
+		$('ul#SuggestedFriendsListUL').listview('refresh');
+	},
+	
 	displayCSSAdvertRecords: function(data) {
+		function showAvatar(VCard) {
+			if (VCard.from != null) {
+				var n=VCard.from.indexOf("@");
+				var identityStr = VCard.from.substring(0, n);
+				var imageStr = VCard.avatar;
+				if (imageStr != null)
+					$('img#' + identityStr).attr("src", "data:image/jpg;base64," + VCard.avatar);
+			}
+		}
+		
+		function failure(data) {
+			console.log("Error retrieving avatar: " + data);
+		}
+		
 		//EMPTY TABLE - NEED TO LEAVE THE HEADER
 		while( $('ul#SuggestedFriendsListUL').children().length >1 )
 			$('ul#SuggestedFriendsListUL li:last').remove();
 
 		//DISPLAY SUGGESTIONS
 		for (i  = 0; i < data.length; i++) {
-			var tableEntry = '<li id="li' + i + '"><a href="#" onclick="CSSFriendsServices.sendFriendRequest(\'' + data[i].name + '\', \'' + data[i].id + '\', ' + i + ')">' +
-				'<img src="images/profile_pic.png" />' +	
-				'<h2>' + data[i].name + '</h2>' + 
-				'<p>' + data[i].id + '</p>' +
-				'</a></li>';
-			$('ul#SuggestedFriendsListUL').append(tableEntry);
+			if (myIdentity != data[i].id) {
+				var n=data[i].id.indexOf(".");
+				var identityStr = data[i].id.substring(0, n);
+				var tableEntry = '<li id="li' + i + '"><a href="#" onclick="CSSFriendsServices.sendFriendRequest(\'' + data[i].name + '\', \'' + data[i].id + '\', ' + i + ')">' +
+					'<img src="images/profile_pic.png" id="' + identityStr + '" style="max-width:100px;" />' +
+					'<h2>' + data[i].name + '</h2>' + 
+					'<p>' + data[i].id + '</p>' +
+					'</a></li>';
+				$('ul#SuggestedFriendsListUL').append(tableEntry);
+				window.plugins.SocietiesLocalCSSManager.getVCardUser(data[i].id, showAvatar, failure);
+			}
 		}
 		$('ul#SuggestedFriendsListUL').listview('refresh');
 	},
@@ -151,14 +313,12 @@ var CSSFriendsServices = {
 		}
 		
 		//SEND REQUEST
-		if (window.confirm("Send friend request to " + name + "?")) {
-		//jConfirm("Send friend request to " + name + "?", 'Friend Request', function(answer) {
-			//if (answer) {
-		    	 $('#li' + id).append("Sending Request...");
-		    	 window.plugins.SocietiesLocalCSSManager.sendFriendRequest(css_id, success, failure);
-			//}
+		if (myIdentity != css_id) {
+			if (window.confirm("Send friend request to " + name + "?")) {
+			    	 $('#li' + id).append("Sending Request...");
+			    	 window.plugins.SocietiesLocalCSSManager.sendFriendRequest(css_id, success, failure);
+			}
 		}
-		//);
 	},
 	
 	acceptFriendRequest: function(name, css_id, id) {

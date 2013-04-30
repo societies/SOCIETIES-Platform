@@ -104,7 +104,7 @@ public class Correlation {
 				if (ac.getRequestorClass() == null || tr.getSenderClass() == null) {
 					//LOG.warn("Requestor or sender class is null");
 				}
-				else if (ac.getRequestorClass().equals(tr.getSenderClass())) {
+				else if (tr.getSenderStack().contains(ac.getRequestorClass())) {
 					corrBySenderClass += corr;
 				}
 			}

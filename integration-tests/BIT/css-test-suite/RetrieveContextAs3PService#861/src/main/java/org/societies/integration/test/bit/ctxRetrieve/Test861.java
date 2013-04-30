@@ -44,7 +44,7 @@ public class Test861 extends IntegrationTestCase{
 	private static IPrivacyDataManager privDataMgr;
 	
 	public Test861(){
-		super(751, new Class[]{Tester.class});
+		super(1868, new Class[]{Tester.class});
 	}
 
 	/**

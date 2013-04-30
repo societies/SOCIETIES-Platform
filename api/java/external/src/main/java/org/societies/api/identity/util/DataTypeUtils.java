@@ -271,6 +271,7 @@ public class DataTypeUtils {
 		addDataTypeDescription(CtxAttributeTypes.ACTION, "Action done by this entity");
 		addDataTypeDescription(CtxAttributeTypes.AGE, "Age of this entity");
 		addDataTypeDescription(CtxAttributeTypes.BOOKS, "Favorite books", "Favorite books of this entity");
+		addDataTypeDescription(CtxAttributeTypes.LOCATION_SYMBOLIC, "Symbolic location", "Symbolic location");
 		return true;
 	}
 

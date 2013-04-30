@@ -3,10 +3,14 @@
 	targetNamespace="http://societies.org/api/schema/privacytrust/trust/evidence/collector"   
 	xmlns:tns="http://societies.org/api/schema/privacytrust/trust/evidence/collector" 
 	xmlns:tnsm="http://societies.org/api/schema/privacytrust/trust/model"
+	xmlns:tnsid="http://societies.org/api/schema/identity"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<xs:import namespace="http://societies.org/api/schema/privacytrust/trust/model"
 		schemaLocation="org.societies.api.schema.privacytrust.trust.model.xsd" />
+		
+	<xs:import namespace="http://societies.org/api/schema/identity"
+		schemaLocation="org.societies.api.schema.identity.xsd" />
 		
 	<xs:element name="trustEvidenceCollectorRequestBean">
 		<xs:complexType>
@@ -35,6 +39,7 @@
 	
 	<xs:complexType name="addDirectEvidenceRequestBean">
 		<xs:sequence>
+			<xs:element name="requestor" type="tnsid:requestorBean" nillable="false" minOccurs="1"/>
 			<xs:element name="subjectId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
 			<xs:element name="objectId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
 			<xs:element name="type" type="tnsm:trustEvidenceTypeBean" nillable="false" minOccurs="1"/>
@@ -45,6 +50,7 @@
 	
 	<xs:complexType name="addIndirectEvidenceRequestBean">
 		<xs:sequence>
+			<xs:element name="requestor" type="tnsid:requestorBean" nillable="false" minOccurs="1"/>
 			<xs:element name="subjectId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
 			<xs:element name="objectId" type="tnsm:trustedEntityIdBean" nillable="false" minOccurs="1"/>
 			<xs:element name="type" type="tnsm:trustEvidenceTypeBean" nillable="false" minOccurs="1"/>

@@ -50,6 +50,13 @@ public class ProviderResponsePolicyGenerator {
 
 	public ProviderResponsePolicyGenerator(){
 	}
+	
+	/**
+	 * TODO urgent: fix this method that didn't accept to deny optional RequestItem, Action or Condition!!!
+	 * @param clientResponse
+	 * @param myPolicy
+	 * @return
+	 */
 	public ResponsePolicy generateResponse(ResponsePolicy clientResponse, RequestPolicy myPolicy){
 		if (clientResponse.getNegotiationStatus().equals(NegotiationStatus.FAILED)){
 			//JOptionPane.showMessageDialog(null, "Provider: Negotiation Failed 1");
@@ -110,7 +117,7 @@ public class ProviderResponsePolicyGenerator {
 		List<ResponseItem> clientResponseItems = clientResponse.getResponseItems();
 		List<ResponseItem> itemsToRemove = new ArrayList<ResponseItem>();
 		for (ResponseItem responseItem : clientResponseItems){
-			if ((responseItem.getDecision().equals(Decision.DENY))  || (responseItem.getDecision().equals(Decision.NOT_APPLICABLE))){
+			if (null == responseItem.getDecision() || responseItem.getDecision().equals(Decision.DENY)  || responseItem.getDecision().equals(Decision.NOT_APPLICABLE)){
 				if (responseItem.getRequestItem().isOptional()){
 					//clientResponseItems.remove(responseItem);
 					itemsToRemove.add(responseItem);

@@ -172,12 +172,34 @@ public class ServiceMgmt implements IServices {
 		
 		} catch(Exception ex){
 			ex.printStackTrace();
-			logger.error("Exceptioon occured: " + ex.getMessage());
+			logger.error("Exception occured: " + ex.getMessage());
 			return null;
 		}
 		
 	}
 
+	@Override
+	public String getMyCategory(ServiceResourceIdentifier serviceId) {
+		
+		try{
+			
+			// First we get the calling Bundle
+			Future<Service> serviceAsync = getServiceDiscovery().getService(serviceId);
+			Service myService = serviceAsync.get();
+			
+			if(logger.isDebugEnabled())
+				logger.debug("myService category is" + myService.getServiceCategory());
+		
+			return myService.getServiceCategory();
+		
+		} catch(Exception ex){
+			ex.printStackTrace();
+			logger.error("Exception occured: " + ex.getMessage());
+			return null;
+		}
+		
+	}
+	
 	@Override
 	public ServiceResourceIdentifier getServerServiceIdentifier(
 			ServiceResourceIdentifier serviceId) {

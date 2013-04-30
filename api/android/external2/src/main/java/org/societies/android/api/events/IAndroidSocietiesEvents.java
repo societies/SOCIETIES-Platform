@@ -57,6 +57,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	final static String CSS_MANAGER_DEPART_CSS_NODE_INTENT = "org.societies.android.css.manager.departCSSNode";
 	final static String CSS_FRIEND_REQUEST_RECEIVED_INTENT = "org.societies.android.css.friends.RequestReceived";
 	final static String CSS_FRIEND_REQUEST_ACCEPTED_INTENT = "org.societies.android.css.friends.RequestAccepted";
+	final static String CSS_MANAGER_FILTER = "org.societies.android.css.manager";
+	final static String CSS_FRIEND_FILTER = "org.societies.android.css.friends";
 
 	//Device Manager intents
 	final static String DEVICE_MANAGER_DEVICE_REGISTERED_INTENT   = "org.societies.android.device.manager.DEVICE_CONNECTED";
@@ -157,9 +159,10 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	static final String CONTEXT_CLASS 		= "org.societies.api.schema.context.model.CtxIdentifierBean";
 	static final String FRIEND_EVENT_CLASS 	= "org.societies.api.schema.css.directory.CssFriendEvent";
 	static final String UF_PRIVACY_CLASS 	= "org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent";
-	static final String UF_RES_EVENT_CLASS  = "org.societies.api.schema.useragent.feedback.UserFeedbackBean";
+	static final String UF_REQUEST_CLASS	= "org.societies.api.schema.useragent.feedback.UserFeedbackBean";
+	static final String UF_RESPONSE_CLASS	= "org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean";
 	//N.B. Add any new event payload classes to this array - order is unimportant
-	final static String pubsubPayloadClasses [] = {CSS_MANAGER_CLASS, CONTEXT_CLASS, FRIEND_EVENT_CLASS, UF_PRIVACY_CLASS, UF_RES_EVENT_CLASS};
+	final static String pubsubPayloadClasses [] = {CSS_MANAGER_CLASS, CONTEXT_CLASS, FRIEND_EVENT_CLASS, UF_PRIVACY_CLASS, UF_REQUEST_CLASS, UF_RESPONSE_CLASS};
 	
 	final static String GENERIC_INTENT_PAYLOAD_KEY = "Pubsub_Payload_Key";
 	

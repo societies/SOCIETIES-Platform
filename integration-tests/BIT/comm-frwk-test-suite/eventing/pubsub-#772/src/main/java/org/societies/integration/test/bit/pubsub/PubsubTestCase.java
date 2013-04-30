@@ -74,11 +74,11 @@ public class PubsubTestCase {
 	
 	@Before
 	public void setUp() {
-		LOG.info("###772... setUp");
+		LOG.info("###1853... setUp");
 
 		//GET CURRENT NODE IDENTITY
 		myIdentity = TestCase772.commManager.getIdManager().getThisNetworkNode();
-		LOG.info("###771... getThisNetworkNode: " + myIdentity.getJid());
+		LOG.info("###1853... getThisNetworkNode: " + myIdentity.getJid());
 
 		//SETUP PUBSUB RETURN STUFF
 		callback = new PubsubCallback();
@@ -113,7 +113,7 @@ public class PubsubTestCase {
 
 	@Test
 	public void TestAdd() {
-		LOG.info("###771... TestAdd");
+		LOG.info("###1853... TestAdd");
 
 		//GET A LIST OF PUBSUB TOPICS
 		LOG.info("### Querying list of Nodes");
@@ -200,6 +200,6 @@ public class PubsubTestCase {
 		} catch (CommunicationException ce) {
 			fail("CommException Deleting pubsub node: " + ce.getMessage());
 		}
-		LOG.info("###772... tearDown complete");
+		LOG.info("###1853... tearDown complete");
 	}
 }

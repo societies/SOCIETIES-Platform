@@ -52,14 +52,20 @@ public class PrivacyPolicyManagerLocalService extends Service {
 		if (!((PrivacyPolicyManager)((LocalBinder)binder).getService()).startService()) {
 			Log.e(TAG, "Ouch, can't start this service (i.e. can't bind it to the SocietiesCommsApp)");
 		}
+		else {
+			Log.d(TAG, "Starting service requested");
+		}
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if (!((PrivacyPolicyManager)((LocalBinder)binder).getService()).stopService()) {
-			Log.e(TAG, "Ouch, can't stop this service (i.e. can't unbind it to the SocietiesCommsApp)");
-		}
+//		if (!((PrivacyPolicyManager)((LocalBinder)binder).getService()).stopService()) {
+//			Log.e(TAG, "Ouch, can't stop this service (i.e. can't unbind it to the SocietiesCommsApp)");
+//		}
+//		else {
+//			Log.d(TAG, "Stopping service requested");
+//		}
 	}
 
 

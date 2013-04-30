@@ -46,7 +46,7 @@
 				<artifactId>android-maven-plugin</artifactId>
 				<configuration>
 					<emulator>
-						  <avd>Test22Device</avd>
+						  <avd>Test403Device</avd>
 						  <wait>60000</wait>
 						  <options>-no-skin</options>
 					</emulator>

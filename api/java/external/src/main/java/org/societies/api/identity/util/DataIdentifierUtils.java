@@ -50,6 +50,22 @@ public class DataIdentifierUtils {
 	}
 	
 	/**
+	 * Generate a URI: sheme://ownerid/type
+	 * @param scheme
+	 * @param ownerId
+	 * @param dataType
+	 * @return
+	 */
+	public static String toUriString(DataIdentifierScheme scheme, String ownerId, String dataType)
+	{
+		StringBuilder str = new StringBuilder("");
+		str.append((scheme != null ? scheme.value()+"://" : "/"));
+		str.append((ownerId != null ? ownerId+"/" : "/"));
+		str.append((dataType != null ? dataType+"/" : "/"));
+		return str.toString();
+	}
+	
+	/**
 	 * Generate a URI: sheme:///type
 	 * @param scheme
 	 * @param dataType

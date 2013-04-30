@@ -60,7 +60,7 @@ public abstract class Trust implements ITrust {
 	@Override
 	public Double getValue() {
 		
-		return this.value;
+		return (this.value != null) ? new Double(this.value) : null;
 	}
 
 	/*

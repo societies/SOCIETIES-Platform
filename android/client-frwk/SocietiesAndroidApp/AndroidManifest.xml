@@ -30,6 +30,7 @@
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="org.societies.android.SocialProvider.WRITE"/>
     <uses-permission android:name="org.societies.android.SocialProvider.READ"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     
     <!-- Traceview permission-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -54,8 +55,10 @@
         <activity android:name="org.societies.android.platform.socialdata.BridgeActivity" />
         <activity android:name="org.societies.platfrom.sns.android.socialapp.WebActivity" />
         <activity android:name="org.societies.android.platform.css.friends.AcceptFriendActivity" />
-        <activity android:name="org.societies.android.platform.useragent.feedback.NegotiationActivity">
-        </activity>
+        <activity android:name="org.societies.android.platform.useragent.feedback.NegotiationActivity" />
+        <activity android:name="org.societies.android.platform.useragent.feedback.guis.AcknackPopup" />
+        <activity android:name="org.societies.android.platform.useragent.feedback.guis.CheckboxPopup" />
+        <activity android:name="org.societies.android.platform.useragent.feedback.guis.RadioPopup" />
         <!-- LOCAL SERVICES -->
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceManagementLocal" />
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceUtilitiesRemote" />
@@ -68,6 +71,9 @@
         <service android:name="org.societies.android.platform.css.friends.FriendsManagerLocal" />
         <service android:name="org.societies.android.platform.css.friends.EventService" />
         <service android:name="org.societies.android.platform.useragent.feedback.EventListener" />
+        <service android:name="org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService" />
+        <service android:name="org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService" />
+        <service android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidLocal" />
         <!-- REMOTE SERVICES -->
         <service android:name="org.societies.android.platform.cis.CisDirectoryRemote" android:label="Cis Directory Remote" >
            <intent-filter>
@@ -86,8 +92,6 @@
                 <action android:name="org.societies.android.platform.cis.CisSubscribedRemote" />
    			</intent-filter>
    		</service>
-        <service android:name="org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService" />
-        <service android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidLocal" />
         <service
         	android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidRemote"
         	android:label="SocietiesPersonalisation">

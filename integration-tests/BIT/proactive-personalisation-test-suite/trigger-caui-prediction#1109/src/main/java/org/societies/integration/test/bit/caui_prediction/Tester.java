@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxAttributeTypes;
+
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
@@ -57,6 +57,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -66,8 +67,6 @@ import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 public class Tester {
 
 	private static Logger LOG = LoggerFactory.getLogger(TestCase1109.class);
-
-	//IIdentity identity = new MockIdentity(IdentityType.CSS, "user", "societies.org");
 
 	//private IIdentity cssOwnerId;
 
@@ -79,7 +78,7 @@ public class Tester {
 
 	@Test
 	public void TestMonitorActionsContext() {
-		System.out.println("Test 1109 started : ContextStorageTest");
+		System.out.println("Test 1876 started : ContextStorageTest");
 
 
 		CtxAttributeIdentifier uiModelAttributeId = null;
@@ -159,7 +158,7 @@ public class Tester {
 			//setContext(CtxAttributeTypes.STATUS, "free");
 
 			//send actions - 2 second delay
-			LOG.info("Monitor services #1109 - sending mock actions for storage");
+			LOG.info("Monitor services #1876 - sending mock actions for storage");
 
 			actionsTask1(action1,action2,action3);
 			randomAction(actionRandom1);
@@ -311,7 +310,7 @@ public class Tester {
 	@Test
 	public void TestPerformContinuousPrediction(){
 
-		LOG.info("Test 1109 : TestPerformContinuousPrediction");
+		LOG.info("Test 1876 : TestPerformContinuousPrediction");
 
 
 		try {
@@ -344,7 +343,7 @@ public class Tester {
 	@Test
 	public void TestGetCurrentIntentAction(){
 
-		LOG.info("Test 1109 : TestGetCurrentIntentAction");
+		LOG.info("Test 1876 : TestGetCurrentIntentAction");
 
 		ServiceResourceIdentifier serviceId3 = new ServiceResourceIdentifier();
 		try {
@@ -393,7 +392,7 @@ public class Tester {
 	@Test
 	public void TestGetPredictionByAttrUpdate(){
 
-		LOG.info("Test 1109 : TestGetPredictionByAttrUpdate");
+		LOG.info("Test 1876 : TestGetPredictionByAttrUpdate");
 		IIdentity cssOwnerId = getOwnerId();
 
 		CtxAttribute updatedlocAttr =  setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "Gas_station");
@@ -695,8 +694,7 @@ public class Tester {
 
 		return cssOwnerId;
 	}
-
-
+	
 	/*
 	 * Actions create the following model
 	 * caui model created - actions map: 

@@ -24,45 +24,36 @@
  */
 package org.societies.android.api.privacytrust.privacy.util.privacypolicy;
 
+import java.util.List;
+
 import org.societies.android.api.identity.util.DataIdentifierFactory;
+import org.societies.android.api.identity.util.DataIdentifierSchemeUtils;
 import org.societies.android.api.identity.util.DataTypeFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 
+import android.text.TextUtils;
+
 /**
  * Tool class to manage conversion between Java type and Bean XMLschema generated type
  * @author Olivier Maridat (Trialog)
  */
 public class ResourceUtils {
-	
-
-	public static String getDataIdUri(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource) {
-		return ((null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) ? resource.getScheme()+":///"+resource.getDataType() : resource.getDataIdUri());
-	}
-
-	public static String getDataType(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource) {
-		// No URI: scheme+type available
-		if (null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) {
-			return resource.getDataType();
-		}
-		// URI available
-		return DataTypeFactory.fromUri(resource.getDataIdUri()).getType();
-	}
-	
-	public static DataIdentifier getDataIdentifier(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource) throws MalformedCtxIdentifierException {
-		// No URI: scheme+type available
-		if (null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) {
-			return DataIdentifierFactory.fromType(resource.getScheme(), resource.getDataType());
-		}
-		// URI available
-		return DataIdentifierFactory.fromUri(resource.getDataIdUri());
-	}
 
 	public static Resource create(String dataIdUri) {
 		Resource resource = new Resource();
 		resource.setDataIdUri(dataIdUri);
+		DataIdentifier dataId;
+		try {
+			dataId = DataIdentifierFactory.fromUri(dataIdUri);
+			resource.setDataIdUri(dataId.getUri());
+			resource.setDataType(dataId.getType());
+			resource.setScheme(dataId.getScheme());
+		} catch (MalformedCtxIdentifierException e) {
+			resource.setDataIdUri(dataIdUri);
+		}
 		return resource;
 	}
 
@@ -72,6 +63,30 @@ public class ResourceUtils {
 		resource.setDataType(dataType);
 		return resource;
 	}
+
+
+	public static String getDataIdUri(Resource resource) {
+		return ((null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) ? resource.getScheme()+":///"+resource.getDataType() : resource.getDataIdUri());
+	}
+
+	public static String getDataType(Resource resource) {
+		// No URI: scheme+type available
+		if (null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) {
+			return resource.getDataType();
+		}
+		// URI available
+		return DataTypeFactory.fromUri(resource.getDataIdUri()).getType();
+	}
+
+	public static DataIdentifier getDataIdentifier(Resource resource) throws MalformedCtxIdentifierException {
+		// No URI: scheme+type available
+		if (null == resource.getDataIdUri() || "".equals(resource.getDataIdUri())) {
+			return DataIdentifierFactory.fromType(resource.getScheme(), resource.getDataType());
+		}
+		// URI available
+		return DataIdentifierFactory.fromUri(resource.getDataIdUri());
+	}
+
 
 	public static String toXmlString(Resource resource){
 		StringBuilder sb = new StringBuilder();
@@ -94,16 +109,81 @@ public class ResourceUtils {
 		return sb.toString();
 	}
 
-	public static boolean equals(Resource o1, Object o2) {
+
+	public static String toString(Resource resource){
+		StringBuilder builder = new StringBuilder();
+		builder.append("Resource [");
+		if (null != resource) {
+			builder.append("getDataIdUri()=");
+			if (null==resource.getDataIdUri()){
+				builder.append("null");
+			}else{
+				builder.append(resource.getDataIdUri());
+			}
+			builder.append(", getDataType()=");
+			builder.append(resource.getDataType());
+			builder.append(", getScheme()=");
+			builder.append(resource.getScheme());
+		}
+		builder.append("]");
+		return builder.toString();
+	}
+
+	public static String toString(List<Resource> values){
+		StringBuilder sb = new StringBuilder();
+		if (null != values) {
+			for(Resource entry : values) {
+				sb.append(toString(entry));
+			}
+		}
+		return sb.toString();
+	}
+
+	public static boolean equal(Resource o1, Object o2) {
 		// -- Verify reference equality
-		if (o2 == null) { return false; }
 		if (o1 == o2) { return true; }
+		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
 		if (o1.getClass() != o2.getClass()) { return false; }
 		// -- Verify obj type
-		Resource rhs = (Resource) o2;
-		return (o1.getDataIdUri().equals(rhs.getDataIdUri())
-				&& o1.getDataType().equals(rhs.getDataType())
-				&& o1.getScheme().equals(rhs.getScheme())
+		Resource ro2 = (Resource) o2;
+		return (TextUtils.equals(o1.getDataIdUri(), ro2.getDataIdUri())
+				&& TextUtils.equals(o1.getDataType(), ro2.getDataType())
+				&& DataIdentifierSchemeUtils.equal(o1.getScheme(), ro2.getScheme())
 				);
+	}
+	@Deprecated
+	public static boolean equals(Resource o1, Object o2) {
+		return equal(o1, o2);
+	}
+
+	public static boolean equal(List<Resource> o1, Object o2) {
+		// -- Verify reference equality
+		if (o1 == o2) { return true; }
+		if (o2 == null) { return false; }
+		if (o1 == null) { return false; }
+		if (!(o2 instanceof List)) { return false; }
+		// -- Verify obj type
+		List<Resource> ro2 = (List<Resource>) o2;
+		if (o1.size() != ro2.size()) {
+			return false;
+		}
+		boolean result = true;
+		for(Resource o1Entry : o1) {
+			result &= contain(o1Entry, ro2);
+		}
+		return result;
+	}
+
+	public static boolean contain(Resource needle, List<Resource> haystack) {
+		if (null == haystack || haystack.size() <= 0 || null == needle) {
+			return false;
+		}
+		for(Resource entry : haystack) {
+			if (equal(needle, entry)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

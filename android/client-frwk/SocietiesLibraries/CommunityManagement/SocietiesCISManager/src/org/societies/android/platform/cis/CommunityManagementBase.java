@@ -216,8 +216,8 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 	/* @see org.societies.android.api.cis.management.ICisManager#createCis(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Hashtable, java.lang.String)*/
 	public Community createCis(final String client, final String cisName, final String cisType, final String description, final MembershipCrit rules, final String privacyPolicy) {
 		Log.d(LOG_TAG, "createCis called by client: " + client);
+		/*
 		String privacyPolicyXml = "<RequestPolicy />";
-		
 		PrivacyPolicyBehaviourConstants policyType = PrivacyPolicyBehaviourConstants.MEMBERS_ONLY; //DEFAULT
 		try {
 			policyType = PrivacyPolicyBehaviourConstants.fromValue(privacyPolicy);
@@ -230,7 +230,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 		} catch (PrivacyException pEx) {
 			pEx.printStackTrace();
 		}
-		
+		*/
 		if (connectedToComms) {
 	        //COMMUNITY INFO
 			Community cisinfo = new Community();
@@ -241,7 +241,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 			//ADD TO BEAN
 			Create create = new Create();
 			create.setCommunity(cisinfo);
-			create.setPrivacyPolicy(privacyPolicyXml);
+			create.setPrivacyPolicy(privacyPolicy); //privacyPolicyXml);
 			//CREATE MESSAGE BEAN
 			CommunityManager messageBean = new CommunityManager();
 			messageBean.setCreate(create);
@@ -714,16 +714,16 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 					Log.d(LOG_TAG, "CommunityManager Result!");
 					CommunityMethods communityMessage = (CommunityMethods) msgBean;
 					
-					// --------- JOIN RESPONSE ---------
-					if (communityMessage.getJoinResponse() != null) {
-						boolean bJoined = communityMessage.getJoinResponse().isResult();
-						if (bJoined) {
-							Parcelable joined = communityMessage.getJoinResponse();
-							//NOTIFY CALLING CLIENT
-							intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, joined);
-						}
-						intent.putExtra(ICisSubscribed.INTENT_RETURN_BOOLEAN, bJoined);
-					}
+					// --------- JOIN RESPONSE --------- moved to IQ
+					//if (communityMessage.getJoinResponse() != null) {
+					//	boolean bJoined = communityMessage.getJoinResponse().isResult();
+					//	if (bJoined) {
+					//		Parcelable joined = communityMessage.getJoinResponse();
+					//		//NOTIFY CALLING CLIENT
+					//		intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, joined);
+					//	}
+					//	intent.putExtra(ICisSubscribed.INTENT_RETURN_BOOLEAN, bJoined);
+					//}
 				}
 				intent.setPackage(client);
 				CommunityManagementBase.this.androidContext.sendBroadcast(intent);
@@ -788,6 +788,16 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 						boolean bSuccess = communityResponse.getDeleteMemberResponse().isResult();
 						//NOTIFY CALLING CLIENT
 						intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, bSuccess);
+					}
+					//JOIN RESPONSE 
+					if (communityResponse.getJoinResponse() != null) {
+						boolean bJoined = communityResponse.getJoinResponse().isResult();
+						if (bJoined) {
+							Parcelable joined = communityResponse.getJoinResponse();
+							//NOTIFY CALLING CLIENT
+							intent.putExtra(ICisSubscribed.INTENT_RETURN_VALUE, joined);
+						}
+						intent.putExtra(ICisSubscribed.INTENT_RETURN_BOOLEAN, bJoined);
 					}
 				}
 				

@@ -17,10 +17,9 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 
+	<context:annotation-config />
 
-   <context:annotation-config />
-
-    <tx:annotation-driven />
+	<tx:annotation-driven />
 	<bean id="ServiceRegPropConfig"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="ignoreResourceNotFound" value="true"></property>
@@ -34,11 +33,7 @@
 		</property>	
 	</bean>
 
-
-    <bean
-        id="sessionFactory"
-        class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean" >
-
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean" >
         <property name="dataSource" ref="dataSource" />
         <property name="annotatedClasses" >
             <list>
@@ -48,14 +43,11 @@
                 <value>org.societies.cis.manager.CisSubscribedImp</value>
             </list>
         </property>
-
         <property name="annotatedPackages" >
-
             <list>
                 <value>org.societies.cis.manager</value>
             </list>
         </property>
-
         <property name="hibernateProperties" >
             <props>
                 <prop key="hibernate.show_sql" >${show_sql}</prop>
@@ -67,16 +59,17 @@
             </props>
         </property>
     </bean>
+    
     <!-- enable the configuration of transactional behavior based on annotations -->
-
     <tx:annotation-driven transaction-manager="transactionManager" />
 
     <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" >
-        <property name="sessionFactory" ref="sessionFactory" />
+		<property name="sessionFactory" ref="sessionFactory" />
     </bean>
+    
     <bean id="CisManagementBundle" class="org.societies.cis.manager.CisManager" init-method="init"
-        depends-on="NegotiationRequester"
-    destroy-method="UnRegisterCisManager">
+          depends-on="NegotiationRequester"
+		  destroy-method="UnRegisterCisManager">
         <property name="sessionFactory" ref="sessionFactory" />
         <property name="ccmFactory" ref="cisCommMgrFactory"/>
         <property name="iCommMgr" ref="xcCommunication"/>
@@ -89,13 +82,6 @@
         <property name="iUsrFeedback" ref="userFeedback"/>
         <property name="iActivityFeedManager" ref="activityFeedManager" />
         <property name="privacyPolicyNegotiationIncluded" value="${policynegotiation.privacy}" />
-        
-        
-    </bean>
-    
-   <!-- <bean id="CisClientService" 
-    	class="org.societies.cis.manager.CisManagerClient">
-    	<constructor-arg ref="CisManagementBundle"/>
-    </bean>-->
-    
+        <property name="cssDirectoryRemote" ref="cssDirectoryRemote"/>
+    </bean>    
 </beans>

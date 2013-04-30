@@ -31,12 +31,18 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.schema.privacytrust.trust.broker.MethodName;
-import org.societies.api.schema.privacytrust.trust.broker.RetrieveTrustBrokerRequestBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipsRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustValueRequestBean;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator;
+import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClient;
 import org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClientCallback;
 import org.societies.privacytrust.trust.impl.remote.TrustCommsClientCallback;
@@ -72,23 +78,24 @@ public class TrustBrokerRemoteClient implements ITrustBrokerRemoteClient {
 	}
 
 	/*
-	 * @see org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClient#retrieveTrust(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClientCallback)
+	 * @see org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClient#retrieveTrustRelationships(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClientCallback)
 	 */
 	@Override
-	public void retrieveTrust(final TrustedEntityId trustorId,
-			final TrustedEntityId trusteeId,
-			final ITrustBrokerRemoteClientCallback callback) throws TrustException {
+	public void retrieveTrustRelationships(final Requestor requestor, 
+			final TrustedEntityId trustorId,
+			final ITrustBrokerRemoteClientCallback callback) 
+					throws TrustException {
 		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
 		if (trustorId == null)
 			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
-			throw new NullPointerException("trusteeId can't be null");
 		if (callback == null)
 			throw new NullPointerException("callback can't be null");
 		
 		if (LOG.isDebugEnabled()) 
-			LOG.debug("Retrieving trust value assigned to entity '" + trusteeId	
-					+ "' by '" + trustorId + "'");
+			LOG.debug("Retrieving trust relationships of trustor '"	+ trustorId 
+					+ "' on behalf of requestor '" + requestor + "'");
 		
 		try {
 			final IIdentity toIdentity = 
@@ -97,28 +104,407 @@ public class TrustBrokerRemoteClient implements ITrustBrokerRemoteClient {
 			
 			this.trustBrokerRemoteClientCallback.addClient(stanza.getId(), callback);
 			
-			final RetrieveTrustBrokerRequestBean retrieveBean = new RetrieveTrustBrokerRequestBean();
+			final TrustRelationshipsRequestBean retrieveBean = new TrustRelationshipsRequestBean();
+			retrieveBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
+			retrieveBean.setTrustorId(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(trustorId));
+			
+			final TrustBrokerRequestBean requestBean = new TrustBrokerRequestBean();
+			requestBean.setMethodName(MethodName.RETRIEVE_TRUST_RELATIONSHIPS);
+			requestBean.setRetrieveTrustRelationships(retrieveBean);
+			
+			this.commManager.sendIQGet(stanza, requestBean, this.trustCommsClientCallback);
+			
+		} catch (InvalidFormatException ife) {
+			
+			throw new TrustBrokerCommsException(
+					"Could not retrieve trust relationships of trustor '"
+					+ trustorId + "': Invalid trustorId IIdentity: " 
+					+ ife.getLocalizedMessage(), ife);
+		} catch (CommunicationException ce) {
+			
+			throw new TrustBrokerCommsException(
+					"Could not retrieve trust relationships of trustor '"
+					+ trustorId	+ "': " + ce.getLocalizedMessage(), ce);
+		}
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClient#retrieveTrustRelationships(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClientCallback)
+	 */
+	@Override
+	public void retrieveTrustRelationships(final Requestor requestor, 
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final ITrustBrokerRemoteClientCallback callback) 
+					throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		if (callback == null)
+			throw new NullPointerException("callback can't be null");
+		
+		if (LOG.isDebugEnabled()) 
+			LOG.debug("Retrieving trust relationships between trustor '" 
+					+ trustorId + "' and trustee '" + trusteeId 
+					+ "' on behalf of requestor '" + requestor + "'");
+		
+		try {
+			final IIdentity toIdentity = 
+					this.commManager.getIdManager().fromJid(trustorId.getEntityId()); 
+			final Stanza stanza = new Stanza(toIdentity);
+			
+			this.trustBrokerRemoteClientCallback.addClient(stanza.getId(), callback);
+			
+			final TrustRelationshipsRequestBean retrieveBean = new TrustRelationshipsRequestBean();
+			retrieveBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
 			retrieveBean.setTrustorId(
 					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(trustorId));
 			retrieveBean.setTrusteeId(
 					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(trusteeId));
 			
 			final TrustBrokerRequestBean requestBean = new TrustBrokerRequestBean();
-			requestBean.setMethodName(MethodName.RETRIEVE);
-			requestBean.setRetrieve(retrieveBean);
+			requestBean.setMethodName(MethodName.RETRIEVE_TRUST_RELATIONSHIPS);
+			requestBean.setRetrieveTrustRelationships(retrieveBean);
 			
 			this.commManager.sendIQGet(stanza, requestBean, this.trustCommsClientCallback);
 			
 		} catch (InvalidFormatException ife) {
 			
-			throw new TrustBrokerCommsException("Could not retrieve trust value assigned to entity '" 
+			throw new TrustBrokerCommsException(
+					"Could not retrieve trust relationships between trustor '"
+					+ trustorId + "' and trustee '" + trusteeId 
+					+ "': Invalid IIdentity: " 
+					+ ife.getLocalizedMessage(), ife);
+		} catch (CommunicationException ce) {
+			
+			throw new TrustBrokerCommsException(
+					"Could not retrieve trust relationships between trustor '"
+					+ trustorId + "' and trustee '" + trusteeId 
+					+ "': " + ce.getLocalizedMessage(), ce);
+		}
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClient#retrieveTrustRelationship(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType, org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClientCallback)
+	 */
+	@Override
+	public void retrieveTrustRelationship(final Requestor requestor, 
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final TrustValueType trustValueType,
+			final ITrustBrokerRemoteClientCallback callback) 
+					throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		if (callback == null)
+			throw new NullPointerException("callback can't be null");
+		
+		if (LOG.isDebugEnabled()) 
+			LOG.debug("Retrieving trust relationship of type '" + trustValueType
+					+ "' assigned to entity '" + trusteeId	
+					+ "' by '" + trustorId + "' on behalf of requestor '"
+					+ requestor + "'");
+		
+		try {
+			final IIdentity toIdentity = 
+					this.commManager.getIdManager().fromJid(trustorId.getEntityId()); 
+			final Stanza stanza = new Stanza(toIdentity);
+			
+			this.trustBrokerRemoteClientCallback.addClient(stanza.getId(), callback);
+			
+			final TrustRelationshipRequestBean retrieveBean = new TrustRelationshipRequestBean();
+			retrieveBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
+			retrieveBean.setTrustorId(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(trustorId));
+			retrieveBean.setTrusteeId(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(trusteeId));
+			retrieveBean.setTrustValueType(
+					TrustModelBeanTranslator.getInstance().fromTrustValueType(trustValueType));
+			
+			final TrustBrokerRequestBean requestBean = new TrustBrokerRequestBean();
+			requestBean.setMethodName(MethodName.RETRIEVE_TRUST_RELATIONSHIP);
+			requestBean.setRetrieveTrustRelationship(retrieveBean);
+			
+			this.commManager.sendIQGet(stanza, requestBean, this.trustCommsClientCallback);
+			
+		} catch (InvalidFormatException ife) {
+			
+			throw new TrustBrokerCommsException(
+					"Could not retrieve trust relationship of type '"
+					+ trustValueType + "' assigned to entity '" 
 					+ trusteeId	+ "' by '" + trustorId 
 					+ "': Invalid trustorId IIdentity: " 
 					+ ife.getLocalizedMessage(), ife);
 		} catch (CommunicationException ce) {
 			
-			throw new TrustBrokerCommsException("Could not retrieve trust value assigned to entity '" 
+			throw new TrustBrokerCommsException(
+					"Could not retrieve trust relationship of type '"
+					+ trustValueType + "' assigned to entity '" 
 					+ trusteeId	+ "' by '" + trustorId 
+					+ "': " + ce.getLocalizedMessage(), ce);
+		}
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClient#retrieveTrustValue(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType, org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClientCallback)
+	 */
+	@Override
+	public void retrieveTrustValue(final Requestor requestor, 
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final TrustValueType trustValueType,
+			final ITrustBrokerRemoteClientCallback callback) 
+					throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeId == null)
+			throw new NullPointerException("trusteeId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		if (callback == null)
+			throw new NullPointerException("callback can't be null");
+		
+		if (LOG.isDebugEnabled()) 
+			LOG.debug("Retrieving trust value of type '" + trustValueType
+					+ "' assigned to entity '" + trusteeId	
+					+ "' by '" + trustorId + "' on behalf of requestor '"
+					+ requestor + "'");
+		
+		try {
+			final IIdentity toIdentity = 
+					this.commManager.getIdManager().fromJid(trustorId.getEntityId()); 
+			final Stanza stanza = new Stanza(toIdentity);
+			
+			this.trustBrokerRemoteClientCallback.addClient(stanza.getId(), callback);
+			
+			final TrustValueRequestBean retrieveBean = new TrustValueRequestBean();
+			retrieveBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
+			retrieveBean.setTrustorId(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(trustorId));
+			retrieveBean.setTrusteeId(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(trusteeId));
+			retrieveBean.setTrustValueType(
+					TrustModelBeanTranslator.getInstance().fromTrustValueType(trustValueType));
+			
+			final TrustBrokerRequestBean requestBean = new TrustBrokerRequestBean();
+			requestBean.setMethodName(MethodName.RETRIEVE_TRUST_VALUE);
+			requestBean.setRetrieveTrustValue(retrieveBean);
+			
+			this.commManager.sendIQGet(stanza, requestBean, this.trustCommsClientCallback);
+			
+		} catch (InvalidFormatException ife) {
+			
+			throw new TrustBrokerCommsException(
+					"Could not retrieve trust value of type '"
+					+ trustValueType + "' assigned to entity '" 
+					+ trusteeId	+ "' by '" + trustorId 
+					+ "': Invalid trustorId IIdentity: " 
+					+ ife.getLocalizedMessage(), ife);
+		} catch (CommunicationException ce) {
+			
+			throw new TrustBrokerCommsException(
+					"Could not retrieve trust value of type '"
+					+ trustValueType + "' assigned to entity '" 
+					+ trusteeId	+ "' by '" + trustorId 
+					+ "': " + ce.getLocalizedMessage(), ce);
+		}
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClient#retrieveTrustRelationships(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType, org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClientCallback)
+	 */
+	@Override
+	public void retrieveTrustRelationships(final Requestor requestor, 
+			final TrustedEntityId trustorId, 
+			final TrustedEntityType trusteeType,
+			final ITrustBrokerRemoteClientCallback callback) 
+					throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		if (callback == null)
+			throw new NullPointerException("callback can't be null");
+		
+		if (LOG.isDebugEnabled()) 
+			LOG.debug("Retrieving trust relationships of trustor '" 
+					+ trustorId + "' with entities of type '" + trusteeType 
+					+ "' on behalf of requestor '" + requestor + "'");
+		
+		try {
+			final IIdentity toIdentity = 
+					this.commManager.getIdManager().fromJid(trustorId.getEntityId()); 
+			final Stanza stanza = new Stanza(toIdentity);
+			
+			this.trustBrokerRemoteClientCallback.addClient(stanza.getId(), callback);
+			
+			final TrustRelationshipsRequestBean retrieveBean = new TrustRelationshipsRequestBean();
+			retrieveBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
+			retrieveBean.setTrustorId(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(trustorId));
+			retrieveBean.setTrusteeType(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityType(trusteeType));
+			
+			final TrustBrokerRequestBean requestBean = new TrustBrokerRequestBean();
+			requestBean.setMethodName(MethodName.RETRIEVE_TRUST_RELATIONSHIPS);
+			requestBean.setRetrieveTrustRelationships(retrieveBean);
+			
+			this.commManager.sendIQGet(stanza, requestBean, this.trustCommsClientCallback);
+			
+		} catch (InvalidFormatException ife) {
+			
+			throw new TrustBrokerCommsException(
+					"Could not retrieve trust relationships of trustor '"
+					+ trustorId + "' with entities of type '" + trusteeType 
+					+ "': Invalid trustor IIdentity: " 
+					+ ife.getLocalizedMessage(), ife);
+		} catch (CommunicationException ce) {
+			
+			throw new TrustBrokerCommsException(
+					"Could not retrieve trust relationships of trustor '"
+					+ trustorId + "' with entities of type '" + trusteeType 
+					+ "': " + ce.getLocalizedMessage(), ce);
+		}
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClient#retrieveTrustRelationships(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType, org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClientCallback)
+	 */
+	@Override
+	public void retrieveTrustRelationships(final Requestor requestor, 
+			final TrustedEntityId trustorId, 
+			final TrustValueType trustValueType,
+			final ITrustBrokerRemoteClientCallback callback) 
+					throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		if (callback == null)
+			throw new NullPointerException("callback can't be null");
+		
+		if (LOG.isDebugEnabled()) 
+			LOG.debug("Retrieving trust relationships of trustor '" 
+					+ trustorId + "' with values of type '" + trustValueType 
+					+ "' on behalf of requestor '" + requestor + "'");
+		
+		try {
+			final IIdentity toIdentity = 
+					this.commManager.getIdManager().fromJid(trustorId.getEntityId()); 
+			final Stanza stanza = new Stanza(toIdentity);
+			
+			this.trustBrokerRemoteClientCallback.addClient(stanza.getId(), callback);
+			
+			final TrustRelationshipsRequestBean retrieveBean = new TrustRelationshipsRequestBean();
+			retrieveBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
+			retrieveBean.setTrustorId(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(trustorId));
+			retrieveBean.setTrustValueType(
+					TrustModelBeanTranslator.getInstance().fromTrustValueType(trustValueType));
+			
+			final TrustBrokerRequestBean requestBean = new TrustBrokerRequestBean();
+			requestBean.setMethodName(MethodName.RETRIEVE_TRUST_RELATIONSHIPS);
+			requestBean.setRetrieveTrustRelationships(retrieveBean);
+			
+			this.commManager.sendIQGet(stanza, requestBean, this.trustCommsClientCallback);
+			
+		} catch (InvalidFormatException ife) {
+			
+			throw new TrustBrokerCommsException(
+					"Could not retrieve trust relationships of trustor '"
+					+ trustorId + "' with values of type '" + trustValueType 
+					+ "': Invalid trustor IIdentity: " 
+					+ ife.getLocalizedMessage(), ife);
+		} catch (CommunicationException ce) {
+			
+			throw new TrustBrokerCommsException(
+					"Could not retrieve trust relationships of trustor '"
+					+ trustorId + "' with values of type '" + trustValueType
+					+ "': " + ce.getLocalizedMessage(), ce);
+		}
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClient#retrieveTrustRelationships(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType, org.societies.api.privacytrust.trust.model.TrustValueType, org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClientCallback)
+	 */
+	@Override
+	public void retrieveTrustRelationships(
+			final Requestor requestor, final TrustedEntityId trustorId,
+			final TrustedEntityType trusteeType, 
+			final TrustValueType trustValueType,
+			final ITrustBrokerRemoteClientCallback callback) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (trusteeType == null)
+			throw new NullPointerException("trusteeType can't be null");
+		if (trustValueType == null)
+			throw new NullPointerException("trustValueType can't be null");
+		if (callback == null)
+			throw new NullPointerException("callback can't be null");
+		
+		if (LOG.isDebugEnabled()) 
+			LOG.debug("Retrieving trust relationships of trustor '" 
+					+ trustorId + "' with entities of type '" + trusteeType
+					+ "' and values of type '" + trustValueType
+					+ "' on behalf of requestor '" + requestor + "'");
+		
+		try {
+			final IIdentity toIdentity = 
+					this.commManager.getIdManager().fromJid(trustorId.getEntityId()); 
+			final Stanza stanza = new Stanza(toIdentity);
+			
+			this.trustBrokerRemoteClientCallback.addClient(stanza.getId(), callback);
+			
+			final TrustRelationshipsRequestBean retrieveBean = new TrustRelationshipsRequestBean();
+			retrieveBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
+			retrieveBean.setTrustorId(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(trustorId));
+			retrieveBean.setTrusteeType(
+					TrustModelBeanTranslator.getInstance().fromTrustedEntityType(trusteeType));
+			retrieveBean.setTrustValueType(
+					TrustModelBeanTranslator.getInstance().fromTrustValueType(trustValueType));
+			
+			final TrustBrokerRequestBean requestBean = new TrustBrokerRequestBean();
+			requestBean.setMethodName(MethodName.RETRIEVE_TRUST_RELATIONSHIPS);
+			requestBean.setRetrieveTrustRelationships(retrieveBean);
+			
+			this.commManager.sendIQGet(stanza, requestBean, this.trustCommsClientCallback);
+			
+		} catch (InvalidFormatException ife) {
+			
+			throw new TrustBrokerCommsException(
+					"Could not retrieve trust relationships of trustor '"
+					+ trustorId + "' with entities of type '" + trusteeType
+					+ "' and values of type '" + trustValueType
+					+ "': Invalid trustor IIdentity: " 
+					+ ife.getLocalizedMessage(), ife);
+		} catch (CommunicationException ce) {
+			
+			throw new TrustBrokerCommsException(
+					"Could not retrieve trust relationships of trustor '"
+					+ trustorId + "' with entities of type '" + trusteeType
+					+ "' and values of type '" + trustValueType
 					+ "': " + ce.getLocalizedMessage(), ce);
 		}
 	}

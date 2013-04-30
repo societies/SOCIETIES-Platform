@@ -277,7 +277,9 @@ public class ProfileSettingsPage extends BaseSocietiesPage {
     }
 
     public void clickSaveTreeButton() {
+        WebElement button = waitUntilVisible(By.xpath(SAVE_TREE_BUTTON_XPATH));
         clickButton(By.xpath(SAVE_TREE_BUTTON_XPATH));
+        waitUntilStale(button);
     }
 
 }

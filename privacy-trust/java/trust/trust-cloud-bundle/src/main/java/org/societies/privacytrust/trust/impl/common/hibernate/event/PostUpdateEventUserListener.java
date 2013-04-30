@@ -25,6 +25,7 @@
 package org.societies.privacytrust.trust.impl.common.hibernate.event;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +34,7 @@ import org.hibernate.event.PostUpdateEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
+import org.societies.api.privacytrust.trust.model.TrustRelationship;
 import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.impl.repo.model.Trust;
@@ -86,38 +88,63 @@ public class PostUpdateEventUserListener implements PostUpdateEventListener {
 	            if (!TRUST_PROPERTY_MAP.containsKey(propName))
 	            	continue;
 	            
-	            final Object oldValue = event.getOldState()[i];
-	            final Object newValue = event.getState()[i];
+	            final Trust oldValue = (Trust) event.getOldState()[i];
+	            final Trust newValue = (Trust) event.getState()[i];
 	            if (areDifferent(oldValue, newValue)) {
-	            	final TrustedEntityId trustorId = ((TrustedEntity) event.getEntity()).getTrustorId();
-	            	final TrustedEntityId trusteeId = ((TrustedEntity) event.getEntity()).getTrusteeId();
-	            	final Double oldTrustValue = (oldValue != null) 
-	            			? ((Trust) oldValue).getValue() : null; 
-	            	final Double newTrustValue = (newValue != null) 
-	            			? ((Trust) newValue).getValue() : null;
-	            	final TrustUpdateEvent trustUpdateEvent = new TrustUpdateEvent(
-	            			trustorId, trusteeId, TRUST_PROPERTY_MAP.get(propName), 
-	            			oldTrustValue, newTrustValue);
 	            	if (LOG.isDebugEnabled())
-	            		LOG.debug("Adding TrustUpdateEvent " + trustUpdateEvent);
+	            		LOG.debug("Old trust: " + oldValue + ", New trust: " + newValue);
 	            	final TrustedEntity entity = (TrustedEntity) event.getEntity();
-	            	if (entity.getTrustUpdateEvents().contains(trustUpdateEvent))
-	            		entity.getTrustUpdateEvents().remove(trustUpdateEvent);
-	            	entity.getTrustUpdateEvents().add(trustUpdateEvent);
+	            	final TrustedEntityId trustorId = entity.getTrustorId();
+	            	final TrustedEntityId trusteeId = entity.getTrusteeId();
+	            	final TrustValueType trustValueType = TRUST_PROPERTY_MAP.get(propName);
+	            	final Double newTrustValue = (newValue != null) 
+	            			? (newValue).getValue() : null;
+	            	final Date timestamp;
+	            	if (TrustValueType.DIRECT == trustValueType)
+	            		timestamp = entity.getDirectTrust().getLastUpdated();
+	            	else if (TrustValueType.INDIRECT == trustValueType)
+	            		timestamp = entity.getIndirectTrust().getLastUpdated();
+	            	else // if (TrustValueType.USER_PERCEIVED == trustValueType)
+	            		timestamp = entity.getUserPerceivedTrust().getLastUpdated();		
+	            			
+	            	final TrustUpdateEvent trustUpdateEvent = new TrustUpdateEvent(
+	            			new TrustRelationship(trustorId, trusteeId, 
+	            					trustValueType, newTrustValue, timestamp));
+	            	
+	            	if (LOG.isDebugEnabled())
+	            		LOG.debug("Queueing TrustUpdateEvent " + trustUpdateEvent);
+	            	entity.getUpdateEventQueue().add(trustUpdateEvent);
 	            }
 	        }
 		}
-			
 	}
 	
-	private static boolean areDifferent(final Object x, final Object y) {
+	private static boolean areDifferent(final Trust x, final Trust y) {
 		
 		if (x == y)
 			return false;
 		
 		if (x == null || y == null)
 			return true;
+
+		/*if (x.getLastModified() == null) {
+			if (y.getLastModified() != null)
+				return true;
+		} else if (!new Date(1000 * (x.getLastModified().getTime()/1000)).equals(
+				new Date(1000 * (y.getLastModified().getTime()/1000))))
+			return true;
+		if (x.getLastUpdated() == null) {
+			if (y.getLastUpdated() != null)
+				return true;
+		} else if (!new Date(1000 * (x.getLastUpdated().getTime()/1000)).equals(
+				new Date(1000 * (y.getLastUpdated().getTime()/1000))))
+			return true;*/
+		if (x.getValue() == null) {
+			if (y.getValue() != null)
+				return true;
+		} else if (!x.getValue().equals(y.getValue()))
+			return true;
 		
-		return (x.equals(y)) ? false : true;
+		return false;
 	}
 }

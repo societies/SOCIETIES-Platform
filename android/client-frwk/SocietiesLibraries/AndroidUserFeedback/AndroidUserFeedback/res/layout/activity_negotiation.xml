@@ -8,8 +8,6 @@
         android:id="@+id/imageView1"
         android:layout_width="fill_parent"
         android:layout_height="36dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
         android:src="@drawable/societies_header" />
 
     <LinearLayout
@@ -36,11 +34,31 @@
         android:background="@color/Grey"
         android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/txtHeader"
+        <TableLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="asdf" />
+            android:layout_height="wrap_content" >
+
+            <TableRow
+                android:id="@+id/tableRow1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+                <ImageView
+                    android:id="@+id/imageProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/profile_pic" />
+
+                <TextView
+                    android:id="@+id/txtHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="asdf"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/Black" />
+
+            </TableRow>
+        </TableLayout>
 
         <Spinner
             android:id="@+id/spinResource"
@@ -53,8 +71,6 @@
         android:id="@+id/tblConditions"
         android:layout_width="226dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
         android:background="@color/Grey" >
 
         <TableRow

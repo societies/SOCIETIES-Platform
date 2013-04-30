@@ -1,0 +1,6 @@
+To launch this test case:
+* compile this test case
+* put the Virgo <....test.plan> on a Virgo "pickup" directory (e.g. university container)
+* start Openfire
+* start this container
+* follow the tag [#1873] on the log

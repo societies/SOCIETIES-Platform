@@ -410,14 +410,10 @@ public class PluginCoreServiceMonitor extends Plugin {
 				
 				String methodCallbackId = PluginCoreServiceMonitor.this.methodCallbacks.get(mapKey);
 				if (methodCallbackId != null) {
-					
-					//unmarshall intent extra
-					Parcelable parcels[] =  intent.getParcelableArrayExtra(CoreServiceMonitor.INTENT_RETURN_KEY);
 					//CONVERT PARCELS BACK INTO InstalledAppInfo ARRAY 
+					Parcelable parcels[] =  intent.getParcelableArrayExtra(CoreServiceMonitor.INTENT_RETURN_KEY);
 					InstalledAppInfo apps[] = new InstalledAppInfo[parcels.length];
-					for (int i = 0; i < parcels.length; i++) {
-						apps[i] = (InstalledAppInfo) parcels[i];
-					}
+					System.arraycopy(parcels, 0, apps, 0, parcels.length);
 					//CONVERT TO JSON AND RETURN
 					PluginResult result = new PluginResult(PluginResult.Status.OK, convertInstalledAppInfoToJSONArray(apps));
 					result.setKeepCallback(false);

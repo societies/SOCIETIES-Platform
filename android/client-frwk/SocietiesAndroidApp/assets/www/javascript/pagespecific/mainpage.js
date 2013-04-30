@@ -169,6 +169,8 @@ $(document).on('pageinit', '#index', function(event) {
 		//LOGIN
 		if (SocietiesLogin.validateLoginCredentials(jQuery("#loginUsername").val(), jQuery("#loginPassword").val(), jQuery("#identitydomain").val())) {
 			SocietiesLocalCSSManagerHelper.connectToLocalCSSManager(SocietiesLogin.successfulXMPPDomainLogin);
+		} else {
+			alert("validateLoginCredentials: " + "User credentials and Identity Domain must be entered");
 		}
 		//RE-ENABLE LOGIN BUTTON
 		$('#connectXMPP').val("LOGIN");

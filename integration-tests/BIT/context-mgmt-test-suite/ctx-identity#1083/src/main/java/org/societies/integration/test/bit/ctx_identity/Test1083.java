@@ -43,7 +43,7 @@ public class Test1083 extends IntegrationTestCase{
 
 	
 	public Test1083(){
-		super(1083, new Class[]{Tester.class});
+		super(1859, new Class[]{Tester.class});
 	}
 
 	/**

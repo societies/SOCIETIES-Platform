@@ -22,11 +22,13 @@ public class DecisionMakingCallback{
 
 	public void handleExpFeedback(List<String> feedback) {
 		// TODO Auto-generated method stub
-		if(feedback.get(0).equals(intent.toString()))
+		if(feedback.get(0).equals(intent.toString())){
+			maker.hasBeenChecked.add(intent);
 			maker.implementIAction(intent);
-		else {
+		}else {
 			for(IOutcome iou:preference){
 				if(iou.toString().equals(feedback.get(0)))
+					maker.hasBeenChecked.add(iou);
 					maker.implementIAction(iou);
 			}
 		}

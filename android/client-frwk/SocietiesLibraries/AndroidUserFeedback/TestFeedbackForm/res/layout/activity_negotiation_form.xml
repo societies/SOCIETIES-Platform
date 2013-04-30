@@ -1,0 +1,165 @@
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:background="@color/Black" >
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="fill_parent"
+        android:layout_height="36dp"
+        android:src="@drawable/societies_header" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="226dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:background="@color/Blue"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/title_activity_negotiation"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/Grey" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/Grey"
+        android:orientation="vertical" >
+
+        <TableLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TableRow
+                android:id="@+id/tableRow1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+                <ImageView
+                    android:id="@+id/imageProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/profile_pic" />
+
+                <TextView
+                    android:id="@+id/txtHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="asdf"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/Black" />
+
+            </TableRow>
+        </TableLayout>
+    </LinearLayout>
+
+    <TableLayout
+        android:id="@+id/tblConditions"
+        android:layout_width="226dp"
+        android:layout_height="wrap_content"
+        android:background="@color/Grey" >
+
+        <TableRow
+            android:id="@+id/trHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/Blue" >
+
+            <TextView
+                android:id="@+id/trConditionHdr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:text="Requested information"
+                android:textColor="@color/Grey" />
+
+            <TextView
+                android:id="@+id/trConditionValueHdr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:gravity="center_horizontal"
+                android:text="Optional"
+                android:textColor="@color/Grey" />
+
+        </TableRow>
+    </TableLayout>
+    
+    <TableLayout
+        android:id="@+id/tblResources"
+        android:layout_width="226dp"
+        android:layout_height="wrap_content"
+        android:background="@color/Grey" >
+
+        <TableRow
+            android:id="@+id/trHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/Blue"
+            android:gravity="center_vertical|center_horizontal" >
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/iconplus" />
+
+            <TextView
+                android:id="@+id/trConditionHdr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:text="Location"
+                android:textColor="@color/Grey" 
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <CheckBox
+                android:id="@+id/checkBox1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:text="            " />
+
+        </TableRow>
+    </TableLayout>
+    
+	
+	
+	<ScrollView
+        android:id="@+id/svConditions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+	</ScrollView>
+	
+	<!--  BUTTONS -->
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/btnAccept"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="59dp"
+            android:text="Accept" />
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="60dp"
+            android:layout_toLeftOf="@+id/btnAccept"
+            android:text="Cancel" />
+   	</RelativeLayout>
+</TableLayout>

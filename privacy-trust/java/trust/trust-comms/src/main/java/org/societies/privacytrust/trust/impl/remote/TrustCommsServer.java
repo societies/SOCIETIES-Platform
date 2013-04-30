@@ -44,9 +44,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
 import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
-import org.societies.privacytrust.trust.impl.broker.remote.InternalTrustBrokerRemoteServer;
 import org.societies.privacytrust.trust.impl.broker.remote.TrustBrokerRemoteServer;
-import org.societies.privacytrust.trust.impl.evidence.remote.InternalTrustEvidenceCollectorRemoteServer;
 import org.societies.privacytrust.trust.impl.evidence.remote.TrustEvidenceCollectorRemoteServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -64,30 +62,22 @@ public class TrustCommsServer implements IFeatureServer {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			Arrays.asList(
+					"http://societies.org/api/schema/identity",
 			  		"http://societies.org/api/schema/privacytrust/trust/model",
 			  		"http://societies.org/api/schema/privacytrust/trust/broker",
-			  		"http://societies.org/api/schema/privacytrust/trust/evidence/collector",
-			  		"http://societies.org/api/internal/schema/privacytrust/trust/broker",
-			  		"http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector"));
+			  		"http://societies.org/api/schema/privacytrust/trust/evidence/collector"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList(
+					"org.societies.api.schema.identity",
 			  		"org.societies.api.schema.privacytrust.trust.model",
 			  		"org.societies.api.schema.privacytrust.trust.broker",
-			  		"org.societies.api.schema.privacytrust.trust.evidence.collector",
-			  		"org.societies.api.internal.schema.privacytrust.trust.broker",
-			  		"org.societies.api.internal.schema.privacytrust.trust.evidence.collector"));
+			  		"org.societies.api.schema.privacytrust.trust.evidence.collector"));
 	
 	@Autowired(required=true)
 	private TrustBrokerRemoteServer trustBrokerRemoteServer;
 	
 	@Autowired(required=true)
-	private InternalTrustBrokerRemoteServer internalTrustBrokerRemoteServer;
-	
-	@Autowired(required=true)
 	private TrustEvidenceCollectorRemoteServer trustEvidenceCollectorRemoteServer;
-	
-	@Autowired(required=true)
-	private InternalTrustEvidenceCollectorRemoteServer internalTrustEvidenceCollectorRemoteServer;
 
 	@Autowired(required=true)
 	public TrustCommsServer(ICommManager commsMgr) throws Exception {
@@ -131,19 +121,11 @@ public class TrustCommsServer implements IFeatureServer {
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
 		
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("getQuery: stanza.id=" + stanza.getId());
-			LOG.debug("getQuery: stanza.from=" + stanza.getFrom());
-			LOG.debug("getQuery: stanza.to=" + stanza.getTo());
-			LOG.debug("getQuery: payload=" + payload);
-		}
+		if (LOG.isDebugEnabled())
+			LOG.debug("getQuery: stanza=" + stanza + ", payload=" + payload);
 
-		if (payload instanceof org.societies.api.internal.schema.privacytrust.trust.broker.TrustBrokerRequestBean) {
-			return this.internalTrustBrokerRemoteServer.getQuery(stanza, payload);
-		} else if (payload instanceof TrustBrokerRequestBean) {
+		if (payload instanceof TrustBrokerRequestBean) {
 			return this.trustBrokerRemoteServer.getQuery(stanza, payload);
-		} else if (payload instanceof org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean) {
-				return this.internalTrustEvidenceCollectorRemoteServer.getQuery(stanza, payload);
 		} else if (payload instanceof TrustEvidenceCollectorRequestBean) {
 			return this.trustEvidenceCollectorRemoteServer.getQuery(stanza, payload);
 		} else {
@@ -161,14 +143,8 @@ public class TrustCommsServer implements IFeatureServer {
 	@Override
 	public Object setQuery(Stanza stanza, Object payload) throws XMPPError {
 		
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("setQuery: stanza.id=" + stanza.getId());
-			LOG.debug("setQuery: stanza.from=" + stanza.getFrom());
-			LOG.debug("setQuery: stanza.to=" + stanza.getTo());
-			LOG.debug("setQuery: payload=" + payload);
-		}
-
-		// TODO error?
+		if (LOG.isDebugEnabled())
+			LOG.debug("setQuery: stanza=" + stanza + ", payload=" + payload);
 		
 		return null;
 	}
@@ -179,11 +155,7 @@ public class TrustCommsServer implements IFeatureServer {
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
 		
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("receiveMessage: stanza.id=" + stanza.getId());
-			LOG.debug("receiveMessage: stanza.from=" + stanza.getFrom());
-			LOG.debug("receiveMessage: stanza.to=" + stanza.getTo());
-			LOG.debug("receiveMessage: payload=" + payload);
-		}		
+		if (LOG.isDebugEnabled())
+			LOG.debug("receiveMessage: stanza=" + stanza + ", payload=" + payload);
 	}
 }

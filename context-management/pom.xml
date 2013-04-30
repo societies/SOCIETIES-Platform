@@ -58,6 +58,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>ContextSimilarityEvaluation</module>
 		<module>CommunityContextEstimation</module>
 		<module>context-performance-tests</module>
+		<module>context-activity-feed</module>
 		<!-- <module>context-data-init</module>  -->
 	</modules>
 </project>
