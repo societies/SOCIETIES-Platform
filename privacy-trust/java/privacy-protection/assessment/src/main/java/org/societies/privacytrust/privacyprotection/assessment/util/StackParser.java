@@ -46,9 +46,16 @@ public class StackParser {
 		 "java.lang.",
 		 "java.util.",
 		 "com.sun.proxy.",
+		 "sun.proxy.$Proxy",
 		 "sun.reflect.",
 		 "org.eclipse.virgo.kernel.",
-		 "org.springframework."
+		 "org.springframework.",
+		 
+		 // Prevent false positive correlation for integration tests
+		 "org.junit.internal.runners.",
+		 "org.junit.runner.JUnitCore",
+		 "org.societies.integration.test.IntegrationTestCase",
+		 "org.societies.integration.test.IntegrationTestUtils",
 	};
 	
 	private final StackTraceElement[] stack;
@@ -98,7 +105,10 @@ public class StackParser {
 		List<String> invokers = new ArrayList<String>();
 		String clazz;
 
-		for (int i = 0; i < stack.length; i++) {
+		k = 0;
+		getInvokerOfInvoker();
+		
+		for (int i = k-1; i < stack.length; i++) {
 			clazz = stack[i].getClassName();
 			if (!isSystemClass(clazz)) {
 				invokers.add(clazz);

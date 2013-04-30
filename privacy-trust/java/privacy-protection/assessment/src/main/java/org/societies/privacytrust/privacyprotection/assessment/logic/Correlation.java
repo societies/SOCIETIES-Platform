@@ -104,7 +104,8 @@ public class Correlation {
 				if (ac.getRequestorClass() == null || tr.getSenderClass() == null) {
 					//LOG.warn("Requestor or sender class is null");
 				}
-				else if (tr.getSenderStack().contains(ac.getRequestorClass())) {
+//				else if (tr.getSenderStack().contains(ac.getRequestorClass())) {
+				else if (isAnyMemberEqual(tr.getSenderStack(), ac.getRequestorStack())) {
 					corrBySenderClass += corr;
 				}
 			}
@@ -113,6 +114,18 @@ public class Correlation {
 			tr.setCorrelationWithDataAccessBySenderClass(corrBySenderClass);
 		}
 		lastRun = new Date();
+	}
+	
+	public boolean isAnyMemberEqual(List<String> list1, List<String> list2) {
+		LOG.debug("isAnyMemberEqual({}, {})", list1, list2);
+		for (String needle : list1) {
+			if (list2.contains(needle)) {
+				LOG.debug("isAnyMemberEqual(): true");
+				return true;
+			}
+		}
+		LOG.debug("isAnyMemberEqual(): false");
+		return false;
 	}
 	
 	/**

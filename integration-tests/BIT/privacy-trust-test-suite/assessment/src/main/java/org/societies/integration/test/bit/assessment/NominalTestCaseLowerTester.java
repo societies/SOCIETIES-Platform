@@ -246,17 +246,20 @@ public class NominalTestCaseLowerTester {
 	}
 	
 	@Test
-	public void testCorrlationByClass() throws Exception {
+	public void testCorrelationBySenderClass() throws Exception {
 		
-		LOG.info("[#1870] testCorrlationByClass()");
+		LOG.info("[#1870] testCorrelationByClass()");
 
-		List<AssessmentResultClassName> result = new ArrayList<AssessmentResultClassName>();
-		List<HashMap<String, AssessmentResultClassName>> resultAllClasses =
-				new ArrayList<HashMap<String,AssessmentResultClassName>>();
+		List<HashMap<String, Double>> corrs = new ArrayList<HashMap<String, Double>>();
+		HashMap<String, AssessmentResultClassName> result;
 		
 		assessment.assessAllNow();
-		result.add(assessment.getAssessment(getClass().getName()));
-		resultAllClasses.add(assessment.getAssessmentAllClasses());
+		result = assessment.getAssessmentAllClasses();
+		HashMap<String, Double> corrs0 = new HashMap<String, Double>();
+		for (String key : result.keySet()) {
+			corrs0.put(key, result.get(key).getCorrWithDataAccessBySender());
+		}
+		corrs.add(corrs0);
 
 		accessContext();
 		Thread.sleep(100);
@@ -264,34 +267,37 @@ public class NominalTestCaseLowerTester {
 		Thread.sleep(100);
 
 		assessment.assessAllNow();
-		result.add(assessment.getAssessment(getClass().getName()));
-		resultAllClasses.add(assessment.getAssessmentAllClasses());
-		
+		result = assessment.getAssessmentAllClasses();
+		HashMap<String, Double> corrs1 = new HashMap<String, Double>();
+		for (String key : result.keySet()) {
+			corrs1.put(key, result.get(key).getCorrWithDataAccessBySender());
+		}
+		corrs.add(corrs1);
+
 		transmitData(true);
 		Thread.sleep(100);
+		
 		assessment.assessAllNow();
-		result.add(assessment.getAssessment(getClass().getName()));
-		resultAllClasses.add(assessment.getAssessmentAllClasses());
+		result = assessment.getAssessmentAllClasses();
+		HashMap<String, Double> corrs2 = new HashMap<String, Double>();
+		for (String key : result.keySet()) {
+			corrs2.put(key, result.get(key).getCorrWithDataAccessBySender());
+		}
+		corrs.add(corrs2);
 		
-		assertTrue(result.get(0).getCorrWithDataAccessBySender() < result.get(1).getCorrWithDataAccessBySender());
-		assertTrue(result.get(1).getCorrWithDataAccessBySender() < result.get(2).getCorrWithDataAccessBySender());
-		
-		for (String key : resultAllClasses.get(0).keySet()) {
+		for (String key : corrs0.keySet()) {
 			LOG.debug("Verifying correlation by class for {}", key);
-			double[] corr = new double[] {
-					resultAllClasses.get(0).get(key).getCorrWithDataAccessBySender(),
-					resultAllClasses.get(1).get(key).getCorrWithDataAccessBySender(),
-					resultAllClasses.get(2).get(key).getCorrWithDataAccessBySender(),
-			};
 			if (key.equals(getClass().getName())) {
 				LOG.debug("Correlations for this class ({}) should have increased", key);
-				assertTrue(corr[0] < corr[1]);
-				assertTrue(corr[1] < corr[2]);
+				LOG.debug("Correlations for this class: {}, {}, " + corrs2.get(key), corrs0.get(key), corrs1.get(key));
+				assertTrue(corrs0.get(key) < corrs1.get(key));
+				assertTrue(corrs1.get(key) < corrs2.get(key));
 			}
 			else {
 				LOG.debug("Correlations for other class ({}) should have remained the same", key);
-				assertEquals(corr[0], corr[1], 0.0);
-				assertEquals(corr[1], corr[2], 0.0);
+				LOG.debug("Correlations for other class: {}, {}, " + corrs2.get(key), corrs0.get(key), corrs1.get(key));
+				assertEquals(corrs0.get(key), corrs1.get(key), 0.0);
+				assertEquals(corrs1.get(key), corrs2.get(key), 0.0);
 			}
 		}
 	}
@@ -305,6 +311,11 @@ public class NominalTestCaseLowerTester {
 		ctx.retrieveContext();
 	}
 	
+	/**
+	 * 
+	 * @param returnValue true to send asynchronous message with callback, false to send one-way message
+	 * @throws CommunicationException
+	 */
 	private void transmitData(boolean returnValue) throws CommunicationException {
 		
 		IIdentity to = identityManager.getThisNetworkNode();
