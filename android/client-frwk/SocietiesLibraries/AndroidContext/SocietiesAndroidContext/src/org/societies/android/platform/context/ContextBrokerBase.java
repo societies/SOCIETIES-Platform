@@ -686,7 +686,9 @@ public class ContextBrokerBase implements IInternalCtxClient{
 				IIdentityManager idm = this.commMgr.getIdManager();
 				IIdentity toIdentity;
 	
-				toIdentity = this.commMgr.getIdManager().fromJid(object.getId().getString());
+/*				Log.d(LOG_TAG, "before parsing to jid: " + object.getId().getString());
+				toIdentity = this.commMgr.getIdManager().fromJid(object.getId().getString());*/
+				toIdentity = this.commMgr.getIdManager().getCloudNode();
 				
 				Log.d(LOG_TAG, "identity used = " + toIdentity.getJid());
 				CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
