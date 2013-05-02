@@ -8,19 +8,17 @@
         <!--<meta attribute="class-description">
             This class contains the employee detail.
         </meta>-->
-        <id name="requestId" type="string" column="requestId">
-            <generator class="uuid"/>
-        </id>
+        <id name="requestId" type="string" column="requestId"/>
 
         <property name="method" column="method" type="org.societies.api.schema.useragent.feedback.FeedbackMethodType"/>
         <property name="stage" column="stage" type="org.societies.api.schema.useragent.feedback.FeedbackStage"/>
         <property name="requestDate" column="requestDate" type="java.util.Date"/>
         <property name="type" column="type" type="int"/>
-        <array name="options" table="UserFeedbackBean_options">
+        <list name="options" table="UserFeedbackBean_options" lazy="false">
             <key column="option_id"/>
             <index column="option_index"/>
             <element column="value" type="string"/>
-        </array>
+        </list>
         <property name="proposalText" column="proposalText" type="string"/>
         <property name="timeout" column="timeout" type="int"/>
 

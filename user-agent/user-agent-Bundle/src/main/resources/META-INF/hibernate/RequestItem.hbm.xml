@@ -19,11 +19,11 @@
             <element column="action" type="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action"/>
         </array>
 
-        <array name="conditions">
+        <list name="conditions" lazy="false">
             <key column="condition_id"/>
             <index column="condition_index"/>
             <one-to-many class="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition"/>
-        </array>
+        </list>
 
         <property name="optional" column="optional" type="boolean"/>
 

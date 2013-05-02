@@ -17,6 +17,7 @@ public class UserFeedbackHistoryRepository implements IUserFeedbackHistoryReposi
     private static final Logger log = LoggerFactory.getLogger(UserFeedbackHistoryRepository.class);
 
     private SessionFactory sessionFactory;
+    private Session session;
 
     public SessionFactory getSessionFactory() {
         return sessionFactory;
@@ -26,11 +27,17 @@ public class UserFeedbackHistoryRepository implements IUserFeedbackHistoryReposi
         this.sessionFactory = sessionFactory;
     }
 
+    public void init() {
+        session = sessionFactory.openSession();
+    }
+
+    public void destroy() {
+        session.flush();
+        session.close();
+    }
+
     @Override
     public List<UserFeedbackBean> listPrevious(int howMany) {
-
-        Session session = sessionFactory.openSession();
-
         Query query = session.createQuery("FROM UserFeedbackBean uf ORDER BY uf.requestDate");
         query.setMaxResults(howMany);
 
@@ -39,8 +46,6 @@ public class UserFeedbackHistoryRepository implements IUserFeedbackHistoryReposi
 
     @Override
     public List<UserFeedbackBean> listSince(Date sinceWhen) {
-        Session session = sessionFactory.openSession();
-
         Query query = session.createQuery("FROM UserFeedbackBean uf WHERE uf.requestDate > :date ORDER BY uf.requestDate");
 
         return query.list();
@@ -49,18 +54,15 @@ public class UserFeedbackHistoryRepository implements IUserFeedbackHistoryReposi
 
     @Override
     public UserFeedbackBean getByRequestId(String requestId) {
-        Session session = sessionFactory.openSession();
-        return getByRequestId(session, requestId);
-    }
-
-    private UserFeedbackBean getByRequestId(Session session, String requestId) {
         Query query = session.createQuery("FROM UserFeedbackBean uf WHERE uf.requestId = :id");
         query.setString("id", requestId);
 
         List results = query.list();
 
-        if (results.size() == 0)
+        if (results.size() == 0) {
+            log.warn("Found no UserFeedbackBean with requestId=" + requestId);
             return null;
+        }
 
         return (UserFeedbackBean) results.get(0);
     }
@@ -68,17 +70,16 @@ public class UserFeedbackHistoryRepository implements IUserFeedbackHistoryReposi
 
     @Override
     public void insert(UserFeedbackBean ufBean) {
-        Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
 
-        session.persist(ufBean);
+        session.save(ufBean);
 
         transaction.commit();
+        session.flush();
     }
 
     @Override
     public void updateStage(String requestId, FeedbackStage newStage) {
-        Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
 
         UserFeedbackBean item = getByRequestId(requestId);
@@ -86,5 +87,6 @@ public class UserFeedbackHistoryRepository implements IUserFeedbackHistoryReposi
         session.update(item);
 
         transaction.commit();
+        session.flush();
     }
 }

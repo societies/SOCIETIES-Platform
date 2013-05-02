@@ -9,19 +9,15 @@
         <!--<meta attribute="class-description">
             This class contains the employee detail.
         </meta>-->
-        <id name="requestId" type="string" column="requestId">
-            <generator class="uuid"/>
-        </id>
+        <id name="requestId" type="string" column="requestId"/>
 
         <property name="method" column="method" type="org.societies.api.schema.useragent.feedback.FeedbackMethodType"/>
         <property name="stage" column="stage" type="org.societies.api.schema.useragent.feedback.FeedbackStage"/>
         <property name="requestDate" column="requestDate" type="java.util.Date"/>
         <property name="type" column="type" type="int"/>
 
-        <set name="responsePolicy">
-            <key column="ResponsePolicy_id"/>
-            <one-to-many class="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy"/>
-        </set>
+        <property name="responsePolicy" column="responsePolicy"
+                  type="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy"/>
 
         <property name="negotiationDetails"
                   column="negotiationDetails"

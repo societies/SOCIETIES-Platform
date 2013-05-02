@@ -43,10 +43,22 @@ import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBe
 public interface IUserFeedback
 {
 	public Future<List<String>> getExplicitFB(int type, ExpProposalContent content);
-	
+
+	public Future<List<String>> getExplicitFB(int type, ExpProposalContent content, IUserFeedbackResponseEventListener<List<String>> callback);
+
 	public Future<Boolean> getImplicitFB(int type, ImpProposalContent content);
-	
-	public void showNotification(String notificationText);
+
+	public Future<Boolean> getImplicitFB(int type, ImpProposalContent content, IUserFeedbackResponseEventListener<Boolean> callback);
+
+    public Future<ResponsePolicy> getPrivacyNegotiationFB(ResponsePolicy policy, NegotiationDetailsBean details);
+
+    public Future<ResponsePolicy> getPrivacyNegotiationFB(ResponsePolicy policy, NegotiationDetailsBean details, IUserFeedbackResponseEventListener<ResponsePolicy> callback);
+
+    public Future<List<ResponseItem>> getAccessControlFB(Requestor requestor, List<ResponseItem> items);
+
+    public Future<List<ResponseItem>> getAccessControlFB(Requestor requestor, List<ResponseItem> items, IUserFeedbackResponseEventListener<List<ResponseItem>> callback);
+
+    public void showNotification(String notificationText);
 	
 	public FeedbackForm getNextRequest();
 	
@@ -62,8 +74,6 @@ public interface IUserFeedback
 			NegotiationDetailsBean negotiationDetails, ResponsePolicy result);
 	
 	public void submitImplicitResponse(String id, Boolean result);
-	
-	public Future<ResponsePolicy> getPrivacyNegotiationFB(ResponsePolicy policy, NegotiationDetailsBean details);
-	
-	public Future<List<ResponseItem>> getAccessControlFB(Requestor requestor, List<ResponseItem> items);
+
+    void clear();
 }

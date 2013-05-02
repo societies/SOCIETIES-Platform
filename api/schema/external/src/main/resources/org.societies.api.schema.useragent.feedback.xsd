@@ -14,7 +14,7 @@
                 <xs:element name="requestId" type="xs:string" minOccurs="0"/>
                 <xs:element name="requestDate" type="xs:dateTime" minOccurs="0"/>
                 <xs:element name="type" type="xs:int"/>
-                <xs:element name="options" type="xs:string" nillable="true"
+                <xs:element name="options" type="xs:string"
                             minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element name="proposalText" type="xs:string"
                             minOccurs="0"/>

@@ -22,12 +22,10 @@
     <bean id="feedback"
           class="org.societies.useragent.feedback.UserFeedback"
           name="feedback"
-          depends-on="ctxBroker, commsMgr, uaRemote"
+          depends-on="commsMgr"
           init-method="initialiseUserFeedback">
-        <property name="ctxBroker" ref="ctxBroker"/>
         <property name="commsMgr" ref="commsMgr"/>
         <property name="pubsub" ref="pubsub"/>
-        <property name="uaRemote" ref="uaRemote"/>
         <property name="privacyPolicyNegotiationHistoryRepository" ref="privacyPolicyNegotiationHistoryRepositoryBean"/>
         <property name="userFeedbackHistoryRepository" ref="userFeedbackHistoryRepositoryBean"/>
     </bean>
@@ -101,12 +99,16 @@
     </bean>
 
     <bean id="userFeedbackHistoryRepositoryBean"
-          class="org.societies.useragent.feedback.UserFeedbackHistoryRepository">
-        <property name="sessionFactory" ref="sessionFactory"/>
+          class="org.societies.useragent.feedback.UserFeedbackHistoryRepository"
+          init-method="init"
+          destroy-method="destroy">
+    <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
     <bean id="privacyPolicyNegotiationHistoryRepositoryBean"
-          class="org.societies.useragent.feedback.PrivacyPolicyNegotiationHistoryRepository">
+          class="org.societies.useragent.feedback.PrivacyPolicyNegotiationHistoryRepository"
+            init-method="init"
+            destroy-method="destroy">
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 

@@ -6,9 +6,7 @@
 <hibernate-mapping>
     <class name="org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean"
            table="NegotiationDetailsBean">
-        <!--<meta attribute="class-description">
-            This class contains the employee detail.
-        </meta>-->
+
         <id name="negotiationID" type="string" column="negotiationID">
             <generator class="uuid"/>
         </id>

@@ -11,10 +11,11 @@
             <generator class="uuid"/>
         </id>
 
-        <set name="responseItems">
+        <list name="responseItems" lazy="false">
             <key column="ResponseItem_id"/>
+            <index column="responseItem_index"/>
             <one-to-many class="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem"/>
-        </set>
+        </list>
 
         <property name="negotiationStatus" column="negotiationStatus"
                   type="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.NegotiationStatus"/>
