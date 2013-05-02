@@ -159,7 +159,7 @@ var CSSFriendsServices = {
 		//CSS Record OBJECT
 		var name 	 = data.name, 
 			location = data.homeLocation,
-			email	 = data.emailId;
+			email	 = data.emailID;
 		if (name==null) name="";
 		if (location==null) name="";
 		if (email==null) email="";
