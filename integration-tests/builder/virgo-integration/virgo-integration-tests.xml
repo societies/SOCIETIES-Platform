@@ -62,6 +62,10 @@
 		<module>../../BIT/context-mgmt-test-suite/ctx-src-registration#1028</module>
 		<module>../../BIT/context-mgmt-test-suite/ctx-UserLocationRefinerTest</module>
 		<module>../../BIT/css-test-suite/CreateCSSCloduNode-#755</module>
+		<module>../../BIT/css-test-suite/CSSCRecordtocontext-#1992</module>
+		<module>../../BIT/css-test-suite/CSSGetAdvertisements-#1993</module>
+		<module>../../BIT/css-test-suite/CSSGetFriends-#1994</module>
+		<module>../../BIT/css-test-suite/CSSGetSuggestedFriends-#1995</module>
 		<module>../../BIT/css-test-suite/CSS-Devices/use-devices/get_data_from_device#899</module>
 		<module>../../BIT/css-test-suite/RetrieveContextAs3PService#861</module>
 		<module>../../BIT/ico-test-suite/CPA#1096</module>
