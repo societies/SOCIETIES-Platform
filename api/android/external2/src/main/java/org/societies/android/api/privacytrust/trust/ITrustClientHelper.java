@@ -27,7 +27,7 @@ package org.societies.android.api.privacytrust.trust;
 import java.io.Serializable;
 
 import org.societies.android.api.common.ADate;
-import org.societies.android.api.css.manager.IServiceManager;
+import org.societies.android.api.services.ICoreSocietiesServices;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean;
@@ -35,78 +35,38 @@ import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean;
 
 /**
- * This interface provides access to the trust values associated with 
- * individuals, communities and services. These values define trust 
- * relationships between a given <i>trustor</i> and a <i>trustee</i>. More
- * specifically, a trustor is an entity which assigns a trust value to another
- * entity, i.e. the trustee, in order to express the trustworthiness of that 
- * entity. Such a trust value ranges from <i>0</i> to <i>1</i>, where zero 
- * expresses full distrust, while one denotes full trust. There are three 
- * different types of values that can be assigned:
- * {@link TrustValueTypeBean#DIRECT DIRECT}, 
- * {@link TrustValueTypeBean#INDIRECT INDIRECT}, or 
- * {@link TrustValueTypeBean#USER_PERCEIVED USER_PERCEIVED}. A 
- * <code>TrustRelationshipBean</code> also contains the date and time
- * (timestamp) when the trust value was last evaluated.
+ * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.5
+ * @since 1.1
  */
-public interface ITrustClient extends IServiceManager {
+public interface ITrustClientHelper extends ICoreSocietiesServices {
 	
-	public static final String INTENT_RETURN_VALUE_KEY = 
-			"org.societies.android.privacytrust.trust.ReturnValue";
-    public static final String INTENT_RETURN_STATUS_KEY = 
-    		"org.societies.android.privacytrust.trust.ReturnStatus";
-    
-    public static final String RETRIEVE_TRUST_RELATIONSHIPS = 
-    		"org.societies.android.api.privacytrust.trust.RETRIEVE_TRUST_RELATIONSHIPS";
-    public static final String RETRIEVE_TRUST_RELATIONSHIP = 
-    		"org.societies.android.api.privacytrust.trust.RETRIEVE_TRUST_RELATIONSHIP";
-    public static final String RETRIEVE_TRUST_VALUE = 
-    		"org.societies.android.api.privacytrust.trust.RETRIEVE_TRUST_VALUE";
-    public static final String ADD_DIRECT_TRUST_EVIDENCE = 
-    		"org.societies.android.api.privacytrust.trust.ADD_DIRECT_TRUST_EVIDENCE";
-
-    String methodsArray [] = {
-    		"retrieveTrustRelationships(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId)",
-    		"retrieveTrustRelationships(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId)",
-    		"retrieveTrustRelationship(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
-    		"retrieveTrustValue(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
-    		"retrieveTrustRelationships(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean trusteeType)",
-    		"retrieveTrustRelationships(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
-    		"retrieveTrustRelationships(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean trusteeType, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
-    		"addDirectTrustEvidence(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean subjectId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean objectId, org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean type, org.societies.android.api.common.ADate timestamp, Serializable info",
-			"startService()",
-			"stopService()" };
-
     /**
 	 * Retrieves all trust relationships of the specified trustor. The method
 	 * returns an <i>empty</i> array if the identified trustor has not 
 	 * established any trust relationships. 
 	 *
-	 * @param client
-	 *            (required) TODO
 	 * @param requestor 
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust relationships.
 	 * @param trustorId
 	 *            (required) the identifier of the entity whose trust
 	 *            relationships to retrieve.
+	 * @param callback
+	 *            (required) the callback to receive the result.
 	 * @throws NullPointerException if any of the specified parameters is 
 	 *         <code>null</code>.
-	 * @since 1.0
 	 */
-    public void retrieveTrustRelationships(final String client,
-			final RequestorBean requestor, final TrustedEntityIdBean trustorId);
+    public void retrieveTrustRelationships(final RequestorBean requestor,
+    		final TrustedEntityIdBean trustorId, 
+    		final ITrustClientCallback callback);
     
     /**
 	 * Retrieves the trust relationships of the specified trustor with the
 	 * supplied trustee. The method returns an <i>empty</i> array if no trust
 	 * relationships exist between the identified trustor and trustee.
 	 *
-	 * @param client
-	 *            (required) TODO
 	 * @param requestor 
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust relationships.
@@ -116,13 +76,15 @@ public interface ITrustClient extends IServiceManager {
 	 * @param trusteeId
 	 *            (required) the identifier of the entity trusted by the 
 	 *            specified trustor.
+	 * @param callback
+	 *            (required) the callback to receive the result.
 	 * @throws NullPointerException if any of the specified parameters is 
 	 *         <code>null</code>.
-	 * @since 1.0
 	 */
-    public void retrieveTrustRelationships(final String client,
-			final RequestorBean requestor, final TrustedEntityIdBean trustorId,
-			final TrustedEntityIdBean trusteeId);
+    public void retrieveTrustRelationships(final RequestorBean requestor,
+    		final TrustedEntityIdBean trustorId, 
+    		final TrustedEntityIdBean trusteeId,
+    		final ITrustClientCallback callback);
     
     /**
 	 * Retrieves the trust relationship of the specified type which the given
@@ -130,8 +92,6 @@ public interface ITrustClient extends IServiceManager {
 	 * <code>null</code> if no trust relationship of the specified type has
 	 * been established with the supplied trustee by the given trustor.
 	 * 
-	 * @param client
-	 *            (required) TODO
 	 * @param requestor
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust relationship.
@@ -146,15 +106,16 @@ public interface ITrustClient extends IServiceManager {
 	 *            i.e. one of {@link TrustValueTypeBean#DIRECT}, 
 	 *            {@link TrustValueTypeBean#INDIRECT}, or
 	 *            {@link TrustValueTypeBean#USER_PERCEIVED}.
+	 * @param callback
+	 *            (required) the callback to receive the result.
 	 * @throws NullPointerException if any of the specified parameters is
 	 *         <code>null</code>.
-	 * @since 1.0
 	 */
-	public void retrieveTrustRelationship(final String client, 
-			final RequestorBean requestor, 
+	public void retrieveTrustRelationship(final RequestorBean requestor, 
 			final TrustedEntityIdBean trustorId, 
 			final TrustedEntityIdBean trusteeId, 
-			final TrustValueTypeBean trustValueType);
+			final TrustValueTypeBean trustValueType,
+			final ITrustClientCallback callback);
     
     /**
 	 * Retrieves the trust value of the given type which the specified trustor
@@ -162,8 +123,6 @@ public interface ITrustClient extends IServiceManager {
 	 * if no trust value has been assigned to the specified trustee by the given
 	 * trustor.
 	 * 
-	 * @param client
-	 *            (required) TODO
 	 * @param requestor
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust value.
@@ -177,15 +136,16 @@ public interface ITrustClient extends IServiceManager {
 	 *            {@link TrustValueTypeBean#DIRECT}, 
 	 *            {@link TrustValueTypeBean#INDIRECT}, or
 	 *            {@link TrustValueTypeBean#USER_PERCEIVED}.
+	 * @param callback
+	 *            (required) the callback to receive the result.
 	 * @throws NullPointerException if any of the specified parameters is
 	 *         <code>null</code>.
-	 * @since 1.0
 	 */
-	public void retrieveTrustValue(final String client, 
-			final RequestorBean requestor, 
+	public void retrieveTrustValue(final RequestorBean requestor, 
 			final TrustedEntityIdBean trustorId, 
 			final TrustedEntityIdBean trusteeId, 
-			final TrustValueTypeBean trustValueType);
+			final TrustValueTypeBean trustValueType,
+			final ITrustClientCallback callback);
 	
 	/**
 	 * Retrieves the trust relationships of the specified trustor matching the
@@ -194,8 +154,6 @@ public interface ITrustClient extends IServiceManager {
 	 * method returns an <i>empty</i> array if no trust relationships match the
 	 * supplied criteria.
 	 *
-	 * @param client
-	 *            (required) TODO
 	 * @param requestor
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust relationships.
@@ -206,14 +164,15 @@ public interface ITrustClient extends IServiceManager {
 	 *            (required) the {@link TrustedEntityTypeBean type} of the
 	 *            trusted entities to match, e.g. 
 	 *            {@link TrustedEntityTypeBean#CSS CSS}.
+	 * @param callback
+	 *            (required) the callback to receive the result.
 	 * @throws NullPointerException if any of the specified parameters is 
 	 *         <code>null</code>.
-	 * @since 1.0
 	 */
-	public void retrieveTrustRelationships(final String client, 
-			final RequestorBean requestor, 
+	public void retrieveTrustRelationships(final RequestorBean requestor, 
 			final TrustedEntityIdBean trustorId, 
-			final TrustedEntityTypeBean trusteeType);
+			final TrustedEntityTypeBean trusteeType,
+			final ITrustClientCallback callback);
 	
 	/**
 	 * Retrieves the trust relationships of the specified trustor matching the
@@ -224,8 +183,6 @@ public interface ITrustClient extends IServiceManager {
 	 * The method returns an <i>empty</i> array if no trust relationships match
 	 * the supplied criteria.
 	 *
-	 * @param client
-	 *            (required) TODO
 	 * @param requestor
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust relationships.
@@ -237,14 +194,15 @@ public interface ITrustClient extends IServiceManager {
 	 *            {@link TrustValueTypeBean#DIRECT DIRECT},
 	 *            {@link TrustValueTypeBean#INDIRECT INDIRECT}, or
 	 *            {@link TrustValueTypeBean#USER_PERCEIVED USER_PERCEIVED}.
+	 * @param callback
+	 *            (required) the callback to receive the result.
 	 * @throws NullPointerException if any of the specified parameters is 
 	 *         <code>null</code>.
-	 * @since 1.0
 	 */
-	public void retrieveTrustRelationships(final String client, 
-			final RequestorBean requestor, 
+	public void retrieveTrustRelationships(final RequestorBean requestor, 
 			final TrustedEntityIdBean trustorId, 
-			final TrustValueTypeBean trustValueType);
+			final TrustValueTypeBean trustValueType,
+			final ITrustClientCallback callback);
 	
 	/**
 	 * Retrieves the trust relationships of the specified trustor matching the
@@ -256,8 +214,6 @@ public interface ITrustClient extends IServiceManager {
 	 * specified. The method returns an <i>empty</i> array if no trust 
 	 * relationships match the supplied criteria.
 	 *
-	 * @param client
-	 *            (required) TODO
 	 * @param requestor
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust relationships.
@@ -273,15 +229,16 @@ public interface ITrustClient extends IServiceManager {
 	 *            {@link TrustValueTypeBean#DIRECT DIRECT},
 	 *            {@link TrustValueTypeBean#INDIRECT INDIRECT}, or
 	 *            {@link TrustValueTypeBean#USER_PERCEIVED USER_PERCEIVED}.
+	 * @param callback
+	 *            (required) the callback to receive the result.
 	 * @throws NullPointerException if any of the specified parameters is 
 	 *         <code>null</code>.
-	 * @since 1.0
 	 */
-	public void retrieveTrustRelationships(final String client, 
-			final RequestorBean requestor, 
+	public void retrieveTrustRelationships(final RequestorBean requestor, 
 			final TrustedEntityIdBean trustorId,
 			final TrustedEntityTypeBean trusteeType,
-			final TrustValueTypeBean trustValueType);
+			final TrustValueTypeBean trustValueType,
+			final ITrustClientCallback callback);
 	
 	/**
 	 * Adds the specified piece of direct trust evidence. The
@@ -290,8 +247,6 @@ public interface ITrustClient extends IServiceManager {
 	 * evidence was recorded are also supplied. Finally, depending on the
 	 * evidence type, the method allows specifying supplementary information.
 	 * 
-	 * @param client
-	 *            (required) TODO
 	 * @param requestor
 	 *            (required) the requestor on whose behalf to add the direct 
 	 *            trust evidence.
@@ -308,13 +263,15 @@ public interface ITrustClient extends IServiceManager {
 	 * @param info
 	 *            (optional) supplementary information if applicable; 
 	 *            <code>null</code> otherwise.
+	 * @param callback
+	 *            (required) the callback to receive the result.
 	 * @throws NullPointerException
 	 *            if any of the required parameters is <code>null</code>.
-	 * @since 1.0
 	 */
-	public void addDirectTrustEvidence(final String client, 
-			final RequestorBean requestor, final TrustedEntityIdBean subjectId,
+	public void addDirectTrustEvidence(final RequestorBean requestor, 
+			final TrustedEntityIdBean subjectId,
 			final TrustedEntityIdBean objectId,	
 			final TrustEvidenceTypeBean type, final ADate timestamp, 
-			final Serializable info);
+			final Serializable info,
+			final ITrustClientCallback callback);
 }

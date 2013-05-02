@@ -104,16 +104,36 @@ public class TrustBrokerRemoteClientCallback implements ICommCallback {
 	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveError(org.societies.api.comm.xmpp.datatypes.Stanza, org.societies.api.comm.xmpp.exceptions.XMPPError)
 	 */
 	@Override
-	public void receiveError(Stanza arg0, XMPPError arg1) {
-		// TODO Auto-generated method stub
-
+	public void receiveError(Stanza stanza, XMPPError error) {
+		
+		if (stanza == null)
+			throw new NullPointerException("stanza can't be null");
+		if (error == null)
+			throw new NullPointerException("error can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Received error: stanza=" + stanza + ", error=" + error);
+		if (stanza.getId() == null) {
+			LOG.error("Received error with null stanza id");
+			return;
+		}
+		final ITrustBrokerRemoteClientCallback callbackClient = 
+				this.removeClient(stanza.getId());
+		if (callbackClient == null) {
+			LOG.error("Received error with stanza id '" + stanza.getId()
+					+ "' but no matching callback was found");
+			return;
+		}
+		final TrustBrokerCommsException exception = 
+				new TrustBrokerCommsException(error.getGenericText());
+		callbackClient.onException(exception);
 	}
 
 	/*
 	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveInfo(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String, org.societies.api.comm.xmpp.datatypes.XMPPInfo)
 	 */
 	@Override
-	public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) {
+	public void receiveInfo(Stanza stanza, String arg1, XMPPInfo arg2) {
 		// TODO Auto-generated method stub
 
 	}
@@ -122,7 +142,7 @@ public class TrustBrokerRemoteClientCallback implements ICommCallback {
 	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveItems(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String, java.util.List)
 	 */
 	@Override
-	public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {
+	public void receiveItems(Stanza stanza, String arg1, List<String> arg2) {
 		// TODO Auto-generated method stub
 
 	}
@@ -131,7 +151,7 @@ public class TrustBrokerRemoteClientCallback implements ICommCallback {
 	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveMessage(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
 	 */
 	@Override
-	public void receiveMessage(Stanza arg0, Object arg1) {
+	public void receiveMessage(Stanza stanza, Object payload) {
 		// TODO Auto-generated method stub
 
 	}
@@ -140,21 +160,38 @@ public class TrustBrokerRemoteClientCallback implements ICommCallback {
 	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveResult(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.Object)
 	 */
 	@Override
-	public void receiveResult(final Stanza stanza, final Object bean) {
+	public void receiveResult(final Stanza stanza, final Object payload) {
 		
-		if (!(bean instanceof TrustBrokerResponseBean))
-			throw new IllegalArgumentException("bean is not instance of TrustBrokerResponseBean");
+		if (stanza == null)
+			throw new NullPointerException("stanza can't be null");
+		if (payload == null)
+			throw new NullPointerException("payload can't be null");
 		
-		final TrustBrokerResponseBean responseBean = (TrustBrokerResponseBean) bean;
-		
-		final ITrustBrokerRemoteClientCallback callback = this.clients.remove(stanza.getId());
+		if (LOG.isDebugEnabled())
+			LOG.debug("receiveResult: stanza=" + stanza + ", payload=" + payload);
+		if (stanza.getId() == null) {
+			LOG.error("Received result with null stanza id");
+			return;
+		}
+		final ITrustBrokerRemoteClientCallback callback =
+				this.removeClient(stanza.getId());
 		if (callback == null) {
-			LOG.error("Could not find client callback for TrustBroker remote '" 
-					+ responseBean.getMethodName() + "' response with stanza: "
-					+ stanza);
+			LOG.error("Could not handle result bean: No callback client found for stanza with id: " 
+					+ stanza.getId());
 			return;
 		}
 		
+		if (!(payload instanceof TrustBrokerResponseBean)) {
+			callback.onException(new TrustBrokerCommsException(
+					"Could not handle result bean: Unexpected type: "
+					+ payload.getClass()));
+			return;
+		}
+		
+		final TrustBrokerResponseBean responseBean = (TrustBrokerResponseBean) payload;
+		if (LOG.isDebugEnabled())
+			LOG.debug("receiveResult: responseBean.getMethodName()="
+					+ responseBean.getMethodName());
 		if (MethodName.RETRIEVE_TRUST_RELATIONSHIPS.equals(responseBean.getMethodName())) {
 			
 			final TrustRelationshipsResponseBean trustRelationshipsResponseBean =
@@ -236,6 +273,16 @@ public class TrustBrokerRemoteClientCallback implements ICommCallback {
 	/**
 	 * 
 	 * @param id
+	 * @return
+	 */
+	public boolean containsClient(String id) {
+		
+		return this.clients.containsKey(id);
+	}
+	
+	/**
+	 * 
+	 * @param id
 	 * @param callback
 	 */
 	void addClient(String id, ITrustBrokerRemoteClientCallback callback) {
@@ -246,9 +293,10 @@ public class TrustBrokerRemoteClientCallback implements ICommCallback {
 	/**
 	 * 
 	 * @param id
+	 * @return 
 	 */
-	void removeClient(String id) {
+	ITrustBrokerRemoteClientCallback removeClient(String id) {
 		
-		this.clients.remove(id);
+		return this.clients.remove(id);
 	}
 }

@@ -22,34 +22,71 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.evidence.remote;
+package org.societies.android.remote.helper;
 
-import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.android.api.privacytrust.trust.TrustException;
 
 /**
- * Describe your class here...
- *
+ * Thrown to indicate that a Trust Client service method could not be invoked.
+ * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.5
+ * @since 1.1
  */
-public interface ITrustEvidenceCollectorRemoteClientCallback {
-	
+public class TrustClientInvocationException extends TrustException {
+
+	private static final long serialVersionUID = -1836848582254383795L;
+
 	/**
-	 * Called when the direct trust evidence has been added.
-	 */
-	public void onAddedDirectEvidence();
-	
-	/**
-	 * Called when the indirect trust evidence has been added.
-	 */
-	public void onAddedIndirectEvidence();
-	
-	/**
-	 * Associates an exception with this callback.
-	 * 
-	 * @param exception 
-	 *            the exception to associate with this callback.
-	 * @since 1.1
-	 */
-	public void onException(TrustException exception);
+     * Constructs a <code>TrustClientNotConnectedException</code> with no detail message.
+     */
+    public TrustClientInvocationException() {
+    	
+        super();
+    }
+
+    /**
+     * Constructs a <code>TrustClientNotConnectedException</code> with the specified detail
+     * message.
+     * 
+     * @param message
+     *            the detail message.
+     */
+    public TrustClientInvocationException(String message) {
+    	
+        super(message);
+    }
+
+    /**
+     * Creates a <code>TrustClientNotConnectedException</code> with the specified detail message
+     * and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustClientInvocationException(String message, Throwable cause) {
+    	
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>TrustClientNotConnectedException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustClientInvocationException(Throwable cause) {
+    	
+        super(cause);
+    }
 }

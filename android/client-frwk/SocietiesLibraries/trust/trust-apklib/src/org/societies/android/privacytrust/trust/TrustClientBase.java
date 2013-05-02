@@ -56,9 +56,9 @@ import org.societies.api.schema.privacytrust.trust.broker.TrustValueRequestBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustValueResponseBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
-import org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.AddDirectEvidenceRequestBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorRequestBean;
+import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
 
 import android.content.Context;
 import android.content.Intent;
@@ -83,13 +83,13 @@ public class TrustClientBase implements IInternalTrustClient {
 			"http://societies.org/api/schema/identity",
             "http://societies.org/api/schema/privacytrust/trust/model",
 			"http://societies.org/api/schema/privacytrust/trust/broker",
-			"http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector");
+			"http://societies.org/api/schema/privacytrust/trust/evidence/collector");
 	
 	private static final List<String> PACKAGES = Arrays.asList(
 			"org.societies.api.schema.identity",
 			"org.societies.api.schema.privacytrust.trust.model",
 			"org.societies.api.schema.privacytrust.trust.broker",
-			"org.societies.api.internal.schema.privacytrust.trust.evidence.collector");
+			"org.societies.api.schema.privacytrust.trust.evidence.collector");
 	
 	/** The Client Comm Mgr service reference. */
 	private ClientCommunicationMgr clientCommMgr;
@@ -879,23 +879,24 @@ public class TrustClientBase implements IInternalTrustClient {
 				
 				final AddDirectEvidenceRequestBean addEvidenceBean = 
 						new AddDirectEvidenceRequestBean();
-				// 0. TODO requestor
-				// 1. subjectId
+				// 1. requestor
+				addEvidenceBean.setRequestor(requestor);
+				// 2. subjectId
 				addEvidenceBean.setSubjectId(subjectId);
-				// 2. objectId
+				// 3. objectId
 				addEvidenceBean.setObjectId(objectId);
-				// 3. type
+				// 4. type
 				addEvidenceBean.setType(type);
-				// 4. timestamp
+				// 5. timestamp
 				addEvidenceBean.setTimestamp(timestamp.getDate());
-				// 5. info
+				// 6. info
 				if (info != null)
 					addEvidenceBean.setInfo(serialise(info));
 
 				final TrustEvidenceCollectorRequestBean requestBean = 
 						new TrustEvidenceCollectorRequestBean();
 				requestBean.setMethodName(
-						org.societies.api.internal.schema.privacytrust.trust.evidence.collector.MethodName.ADD_DIRECT_EVIDENCE);
+						org.societies.api.schema.privacytrust.trust.evidence.collector.MethodName.ADD_DIRECT_EVIDENCE);
 				requestBean.setAddDirectEvidence(addEvidenceBean);
 
 				final ICommCallback addDirectTrustEvidenceCallback = 

@@ -22,14 +22,48 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.evidence.remote;
+package org.societies.android.api.privacytrust.trust;
+
+import java.util.Set;
+
+import org.societies.api.schema.privacytrust.trust.model.TrustRelationshipBean;
 
 /**
  * Describe your class here...
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.3
+ * @since 1.1
  */
-public interface IInternalTrustEvidenceCollectorRemoteClient 
-	extends ITrustEvidenceCollectorRemoteClient {
+public interface ITrustClientCallback {
+	
+	/**
+	 * 
+	 * @param trustRelationships
+	 */
+	public void onRetrievedTrustRelationships(Set<TrustRelationshipBean> trustRelationships);
+	
+	/**
+	 * 
+	 * @param trustRelationship
+	 */
+	public void onRetrievedTrustRelationship(TrustRelationshipBean trustRelationship);
+	
+	/**
+	 * 
+	 * @param trustValue
+	 */
+	public void onRetrievedTrustValue(Double trustValue);
+	
+	/**
+	 * Called upon successful addition of direct trust evidence using the
+	 * TODO
+	 */
+	public void onAddedDirectTrustEvidence();
+	
+	/**
+	 * Associates an exception with this callback.
+	 * 
+	 * @param exception the exception to associate with this callback.
+	 */
+	public void onException(TrustException exception);
 }
