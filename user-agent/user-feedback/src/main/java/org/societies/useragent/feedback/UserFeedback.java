@@ -540,7 +540,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         requestMgr.removeRequest(responseID);
         //set result value in hashmap
         synchronized (expResults) {
-            if (expResults.containsKey(responseID)) {
+            if (!expResults.containsKey(responseID)) {
                 if (log.isDebugEnabled())
                     log.debug("This isn't the node where the exp feedback request originated");
 
