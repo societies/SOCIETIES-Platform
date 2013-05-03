@@ -1,0 +1,177 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                template="templates/main_template.xhtml">
+
+    <ui:define name="html_head">
+        <title>Notification History :: SOCIEITES</title>
+    </ui:define>
+
+    <ui:define name="body">
+
+        <p:dataGrid var="notification" value="#{notifications.allNotificationsQueue}"
+                    columns="1" emptyMessage="No notifications :(" id="notificationHistoryGrid">
+
+            <h:outputText value="ID: #{notification.itemId}"/>
+
+            <p:panel id="ppnPopupPanel_unread" styleClass="unread-notification"
+                     header="#{notification.title}"
+                     rendered="#{notification.type eq 'PPN' and notification.complete eq false}">
+                <!-- PRIVACY POLICY NEGOTIATION -->
+
+                <h:panelGrid columns="1">
+                    <h:outputText value="#{notification.title}"/>
+
+                    <h:outputText value="#{notification.arrivalDate}"/>
+
+                    <h:outputLink value="#{notification.infoLink}">More info</h:outputLink>
+
+                </h:panelGrid>
+            </p:panel>
+
+            <p:panel id="ppnPopupPanel"
+                     header="#{notification.title}"
+                     rendered="#{notification.type eq 'PPN' and notification.complete eq true}">
+                <!-- PRIVACY POLICY NEGOTIATION -->
+
+                <h:panelGrid columns="1">
+                    <h:outputText value="#{notification.title}"/>
+
+                    <h:outputText value="#{notification.arrivalDate}"/>
+
+                    <h:outputLink value="#{notification.infoLink}">More info</h:outputLink>
+
+                </h:panelGrid>
+            </p:panel>
+
+            <p:panel id="ackNackPopupPanel_unread" styleClass="unread-notification"
+                     header="#{notification.title}"
+                     rendered="#{notification.type eq 'ACK_NACK' and notification.complete eq false}">
+                <!-- ACK/NACK -->
+
+                <h:panelGrid columns="1">
+                    <h:outputText value="Please select:"/>
+                    <p:selectOneButton value="#{notification.result}">
+                        <f:selectItems value="#{notification.options}"/>
+                        <p:ajax event="change"
+                                process="ackNackPopupPanel"
+                                update="notificationHistoryGrid"
+                                listener="#{notifications.submitItem(notification.itemId)}"/>
+                    </p:selectOneButton>
+                </h:panelGrid>
+
+            </p:panel>
+
+            <p:panel id="ackNackPopupPanel"
+                     header="#{notification.title}"
+                     rendered="#{notification.type eq 'ACK_NACK' and notification.complete eq true}">
+                <!-- ACK/NACK -->
+
+            </p:panel>
+
+            <p:panel id="selectOnePopupPanel_unread" styleClass="unread-notification"
+                     header="#{notification.title}"
+                     rendered="#{notification.type eq 'SELECT_ONE' and notification.complete eq false}">
+                <!-- SELECT ONE / RADIO BUTTONS -->
+
+                <h:panelGrid columns="1">
+                    <h:outputText value="Please select:"/>
+                    <p:selectOneRadio value="#{notification.result}">
+                        <f:selectItems value="#{notification.options}"/>
+                    </p:selectOneRadio>
+
+                    <p:commandButton value="Submit" process="selectOnePopupPanel"
+                                     update="notificationHistoryGrid"
+                                     actionListener="#{notifications.submitItem(notification.itemId)}"/>
+                </h:panelGrid>
+            </p:panel>
+
+            <p:panel id="selectOnePopupPanel"
+                     header="#{notification.title}"
+                     rendered="#{notification.type eq 'SELECT_ONE' and notification.complete eq true}">
+                <!-- SELECT ONE / RADIO BUTTONS -->
+
+            </p:panel>
+
+            <p:panel id="selectManyPopupPanel_unread" styleClass="unread-notification"
+                     header="#{notification.title}"
+                     rendered="#{notification.type eq 'SELECT_MANY' and notification.complete eq false}">
+                <!-- SELECT MANY / CHECKBOXES -->
+                <h:panelGrid columns="1">
+                    <h:outputText value="Please select:"/>
+                    <p:selectManyCheckbox value="#{notification.results}">
+                        <f:selectItems value="#{notification.options}"/>
+                    </p:selectManyCheckbox>
+
+                    <p:commandButton value="Submit" process="selectManyPopupPanel"
+                                     update="notificationHistoryGrid"
+                                     actionListener="#{notifications.submitItem(notification.itemId)}"/>
+                </h:panelGrid>
+            </p:panel>
+
+            <p:panel id="selectManyPopupPanel"
+                     header="#{notification.title}"
+                     rendered="#{notification.type eq 'SELECT_MANY' and notification.complete eq true}">
+                <!-- SELECT MANY / CHECKBOXES -->
+
+            </p:panel>
+
+            <p:panel id="notificationPopupPanel_unread" styleClass="unread-notification"
+                     header="#{notification.title}"
+                     rendered="#{notification.type eq 'NOTIFICATION' and notification.complete eq false}">
+                <!-- SIMPLE NOTIFICATION -->
+
+                <h:panelGrid columns="1">
+                    <h:outputText value="#{notification.title}"/>
+
+                    <p:commandButton value="Ok" process="notificationPopupPanel"
+                                     update="notificationHistoryGrid"
+                                     actionListener="#{notifications.submitItem(notification.itemId)}"/>
+                </h:panelGrid>
+
+            </p:panel>
+
+            <p:panel id="notificationPopupPanel"
+                     header="#{notification.title}"
+                     rendered="#{notification.type eq 'NOTIFICATION' and notification.complete eq true}">
+                <!-- SIMPLE NOTIFICATION -->
+
+            </p:panel>
+
+            <p:panel id="timedAbortPopupPanel_unread" styleClass="unread-notification"
+                     header="#{notification.title}"
+                     rendered="#{notification.type eq 'TIMED_ABORT' and notification.complete eq false}">
+                <!-- TMIED ABORT -->
+
+                <h:panelGrid columns="1">
+                    <h:outputText value="Time left: #{notification.friendlyTimeLeft}" id="timedAbortTimeLeft"/>
+                    <p:poll interval="1" update="timedAbortTimeLeft"/>
+
+                    <p>Click this button to cancel</p>
+
+                    <f:metadata>
+                        <f:viewParam name="result" value="#{notification.result}"/>
+                    </f:metadata>
+                    <p:commandButton value="Abort" process="timedAbortPopupPanel"
+                                     update="notificationHistoryGrid"
+                                     actionListener="#{notifications.submitItem(notification.itemId)}">
+                        <f:param name="result" value="abort"/>
+                    </p:commandButton>
+
+                </h:panelGrid>
+            </p:panel>
+
+            <p:panel id="timedAbortPopupPanel"
+                     header="#{notification.title}"
+                     rendered="#{notification.type eq 'TIMED_ABORT' and notification.complete eq true}">
+                <!-- TMIED ABORT -->
+
+            </p:panel>
+
+        </p:dataGrid>
+    </ui:define>
+</ui:composition>
+</html>

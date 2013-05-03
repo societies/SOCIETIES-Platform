@@ -4,15 +4,15 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
-import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.feedback.IUserFeedbackResponseEventListener;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
+import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalType;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.*;
-import org.societies.api.schema.useragent.feedback.FeedbackMethodType;
-import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
-import org.societies.useragent.api.model.UserFeedbackEventTopics;
 import org.societies.webapp.ILoginListener;
 import org.societies.webapp.controller.BasePageController;
 import org.societies.webapp.service.UserService;
@@ -24,9 +24,9 @@ import javax.faces.bean.SessionScoped;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 @ManagedBean(name = "ppNegotiationTest")
 @SessionScoped
@@ -56,85 +56,6 @@ public class PrivacyPolicyTestController extends BasePageController {
                 log.error("Error subscribing to pubsub notifications (id="
                         + getUserService().getIdentity()
                         + " event=" + EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, e);
-            }
-        }
-
-        public void sendPpnEvent(String itemId, ResponsePolicy responsePolicy, NegotiationDetailsBean negotiationDetails) {
-            UserFeedbackPrivacyNegotiationEvent payload = new UserFeedbackPrivacyNegotiationEvent();
-            payload.setResponsePolicy(responsePolicy);
-            payload.setNegotiationDetails(negotiationDetails);
-
-            try {
-                getPubsubClient().publisherPublish(getUserService().getIdentity(),
-                        EventTypes.UF_PRIVACY_NEGOTIATION,
-                        itemId,
-                        payload);
-
-            } catch (Exception e) {
-                addGlobalMessage("Error publishing notification of new negotiation",
-                        e.getMessage(),
-                        FacesMessage.SEVERITY_ERROR);
-                log.error("Error publishing notification of new negotiation", e);
-            }
-        }
-
-        public void sendSimpleEvent(String requestID, String proposalText) {
-            //create user feedback bean to fire in pubsub event
-            UserFeedbackBean ufBean = new UserFeedbackBean();
-            ufBean.setRequestId(requestID);
-            ufBean.setProposalText(proposalText);
-            ufBean.setMethod(FeedbackMethodType.SHOW_NOTIFICATION);
-
-            //send pubsub event to all user agents
-            try {
-                getPubsubClient().publisherPublish(getUserService().getIdentity(), UserFeedbackEventTopics.REQUEST, requestID, ufBean);
-            } catch (Exception e) {
-                addGlobalMessage("Error publishing user feedback event",
-                        e.getMessage(),
-                        FacesMessage.SEVERITY_ERROR);
-                log.error("Error publishing user feedback event", e);
-            }
-        }
-
-        public void sendExpFBEvent(String requestID, int type, String proposalText, String[] options) {
-            //create user feedback bean to fire in pubsub event
-            UserFeedbackBean ufBean = new UserFeedbackBean();
-            ufBean.setRequestId(requestID);
-            ufBean.setType(type);
-            ufBean.setProposalText(proposalText);
-            List<String> optionsList = new ArrayList<String>();
-            Collections.addAll(optionsList, options);
-            ufBean.setOptions(optionsList);
-            ufBean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
-
-            //send pubsub event to all user agents
-            try {
-                getPubsubClient().publisherPublish(getUserService().getIdentity(), UserFeedbackEventTopics.REQUEST, requestID, ufBean);
-            } catch (Exception e) {
-                addGlobalMessage("Error publishing user feedback event",
-                        e.getMessage(),
-                        FacesMessage.SEVERITY_ERROR);
-                log.error("Error publishing user feedback event", e);
-            }
-        }
-
-        public void sendImpFBEvent(String requestID, int type, String proposalText, int timeout) {
-            //create user feedback bean to fire in pubsub event
-            UserFeedbackBean ufBean = new UserFeedbackBean();
-            ufBean.setRequestId(requestID);
-            ufBean.setType(type);
-            ufBean.setProposalText(proposalText);
-            ufBean.setTimeout(timeout);
-            ufBean.setMethod(FeedbackMethodType.GET_IMPLICIT_FB);
-
-            //send pubsub event to all user agents
-            try {
-                getPubsubClient().publisherPublish(getUserService().getIdentity(), UserFeedbackEventTopics.REQUEST, requestID, ufBean);
-            } catch (Exception e) {
-                addGlobalMessage("Error publishing user feedback event",
-                        e.getMessage(),
-                        FacesMessage.SEVERITY_ERROR);
-                log.error("Error publishing user feedback event", e);
             }
         }
 
@@ -170,6 +91,10 @@ public class PrivacyPolicyTestController extends BasePageController {
     @ManagedProperty(value = "#{userService}")
     private UserService userService;
 
+    @ManagedProperty(value = "#{userFeedback}")
+    private IUserFeedback userFeedback;
+
+
     private final PubSubListener pubSubListener = new PubSubListener();
     private final LoginListener loginListener = new LoginListener();
     private static int req_counter = 0;
@@ -178,6 +103,7 @@ public class PrivacyPolicyTestController extends BasePageController {
         log.trace("PrivacyPolicyTestController ctor()");
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public PubsubClient getPubsubClient() {
         return pubsubClient;
     }
@@ -187,6 +113,7 @@ public class PrivacyPolicyTestController extends BasePageController {
         this.pubsubClient = pubsubClient;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public UserService getUserService() {
         return userService;
     }
@@ -204,7 +131,17 @@ public class PrivacyPolicyTestController extends BasePageController {
         this.userService.addLoginListener(loginListener);
     }
 
-    public void sendPpnEvent() {
+    @SuppressWarnings("UnusedDeclaration")
+    public IUserFeedback getUserFeedback() {
+        return userFeedback;
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void setUserFeedback(IUserFeedback userFeedback) {
+        this.userFeedback = userFeedback;
+    }
+
+    public void sendPpnEvent() throws ExecutionException, InterruptedException {
         RequestorBean requestorBean = new RequestorBean();
         requestorBean.setRequestorId("req" + ++req_counter);
 
@@ -217,50 +154,95 @@ public class PrivacyPolicyTestController extends BasePageController {
         negotiationDetails.setRequestor(requestorBean);
         negotiationDetails.setNegotiationID(new BigInteger(130, random).intValue());
 
-        pubSubListener.sendPpnEvent(guid, responsePolicy, negotiationDetails);
+        log.info("PPN: Sending event");
+        userFeedback.getPrivacyNegotiationFB(responsePolicy, negotiationDetails, new IUserFeedbackResponseEventListener<ResponsePolicy>() {
+            @Override
+            public void responseReceived(ResponsePolicy result) {
+                addGlobalMessage("PPN Response received",
+                        result.getResponsePolicyId() + " = " + result.getNegotiationStatus(),
+                        FacesMessage.SEVERITY_INFO);
+            }
+        });
+
     }
 
-    public void sendSimpleNotifiationEvent() {
-        String requestID = UUID.randomUUID().toString();
-
+    public void sendSimpleNotificationEvent() {
         String proposalText = "This is just a simple alert";
 
-        pubSubListener.sendSimpleEvent(requestID, proposalText);
+        log.info("Simple: Sending event");
+        userFeedback.showNotification(proposalText);
+        log.info("Simple: Done");
     }
 
-    public void sendAckNackEvent() {
-        String requestID = UUID.randomUUID().toString();
-
+    public void sendAckNackEvent() throws ExecutionException, InterruptedException {
         String proposalText = "Pick a button";
         String[] options = new String[]{"btn1", "btn2"}; // this actually has no effect for acknack
 
-        pubSubListener.sendExpFBEvent(requestID, ExpProposalType.ACKNACK, proposalText, options);
+        log.info("Acknack: Sending event");
+        ExpProposalContent content = new ExpProposalContent(proposalText, options);
+        userFeedback.getExplicitFB(ExpProposalType.ACKNACK, content, new IUserFeedbackResponseEventListener<List<String>>() {
+            @Override
+            public void responseReceived(List<String> result) {
+                log.info("Acknack: Response received");
+                addGlobalMessage("AckNack Response received",
+                        result.get(0),
+                        FacesMessage.SEVERITY_INFO);
+            }
+        });
+        log.info("Acknack: Sent");
     }
 
-    public void sendSelectOneEvent() {
-        String requestID = UUID.randomUUID().toString();
-
+    public void sendSelectOneEvent() throws ExecutionException, InterruptedException {
         String proposalText = "Pick ONE option";
         String[] options = new String[]{"Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"};
 
-        pubSubListener.sendExpFBEvent(requestID, ExpProposalType.RADIOLIST, proposalText, options);
+        log.info("SelectOne: Sending event");
+        ExpProposalContent content = new ExpProposalContent(proposalText, options);
+        userFeedback.getExplicitFB(ExpProposalType.RADIOLIST, content, new IUserFeedbackResponseEventListener<List<String>>() {
+            @Override
+            public void responseReceived(List<String> result) {
+                log.info("SelectOne: Response received");
+                addGlobalMessage("SelectOne Response received",
+                        result.get(0),
+                        FacesMessage.SEVERITY_INFO);
+            }
+        });
+        log.info("SelectOne: Sent");
     }
 
-    public void sendSelectManyEvent() {
-        String requestID = UUID.randomUUID().toString();
-
+    public void sendSelectManyEvent() throws ExecutionException, InterruptedException {
         String proposalText = "Pick MANY options";
         String[] options = new String[]{"red", "orange", "yellow", "green", "blue", "indigo", "violet"};
 
-        pubSubListener.sendExpFBEvent(requestID, ExpProposalType.CHECKBOXLIST, proposalText, options);
+        log.info("SelectMany: Sending event");
+        ExpProposalContent content = new ExpProposalContent(proposalText, options);
+        userFeedback.getExplicitFB(ExpProposalType.CHECKBOXLIST, content, new IUserFeedbackResponseEventListener<List<String>>() {
+            @Override
+            public void responseReceived(List<String> result) {
+                log.info("SelectMany: Response received");
+                addGlobalMessage("SelectMany Response received",
+                        Arrays.toString(result.toArray()),
+                        FacesMessage.SEVERITY_INFO);
+            }
+        });
+        log.info("SelectMany: Sent");
     }
 
-    public void sendTimedAbortEvent(long sec) {
-        String requestID = UUID.randomUUID().toString();
-
+    public void sendTimedAbortEvent(long sec) throws ExecutionException, InterruptedException {
         String proposalText = "This is a timed abort";
 
-        pubSubListener.sendImpFBEvent(requestID, ImpProposalType.TIMED_ABORT, proposalText, (int) sec * 1000);
+        log.info("TimedAbort: Sending event");
+        ImpProposalContent content = new ImpProposalContent(proposalText, (int) sec);
+        userFeedback.getImplicitFB(ImpProposalType.TIMED_ABORT, content, new IUserFeedbackResponseEventListener<Boolean>() {
+            @Override
+            public void responseReceived(Boolean result) {
+                log.info("TimedAbort: Response received");
+                addGlobalMessage("TimedAbort Response received",
+                        result.toString(),
+                        FacesMessage.SEVERITY_INFO);
+            }
+        });
+        log.info("TimedAbort: Sent");
     }
 
     private static ResponsePolicy buildResponsePolicy(String guid, RequestorBean requestorBean) {
