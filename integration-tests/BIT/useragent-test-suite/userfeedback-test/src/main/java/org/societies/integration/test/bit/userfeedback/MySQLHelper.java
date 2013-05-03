@@ -57,18 +57,16 @@ public class MySQLHelper {
 
         resultSet = statement.executeQuery();
 
-        List<String> options = new ArrayList<String>();
-        Collections.addAll(options, content.getOptions());
+        List<String> expectedOptions = new ArrayList<String>();
+        List<String> actualOptions = new ArrayList<String>();
+        Collections.addAll(expectedOptions, content.getOptions());
+
 
         while (resultSet.next()) {
-            if (!options.contains(resultSet.getString(1)))
-                Assert.fail("Option [" + resultSet.getString(1) + "] was found in result set, but not expected");
-
-            options.remove(options.indexOf(resultSet.getString(1)));
+            actualOptions.add(resultSet.getString(1));
         }
 
-        if (options.size() > 0)
-            Assert.fail("Option [" + options.get(0) + "] was not found in result set");
+        Tester.compareLists(expectedOptions, actualOptions);
 
         return id;
     }

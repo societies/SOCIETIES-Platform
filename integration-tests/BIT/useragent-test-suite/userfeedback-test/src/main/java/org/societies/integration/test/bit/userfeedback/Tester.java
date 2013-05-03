@@ -23,6 +23,7 @@ import org.societies.useragent.api.model.UserFeedbackEventTopics;
 
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class Tester {
@@ -30,7 +31,7 @@ public class Tester {
     private static final Logger log = LoggerFactory.getLogger(Tester.class);
 
     private class PubSubListener implements Subscriber {
-        private static final long XMPP_TIMEOUT = 1000;
+        private static final long XMPP_TIMEOUT = 2000;
         public final Queue<PubSubEvent> eventQueue = new LinkedList<PubSubEvent>();
 
         //pubsubClient event schemas
@@ -210,25 +211,15 @@ public class Tester {
 
             PubSubEvent event = waitForPubSubEvent(requestId, UserFeedbackEventTopics.REQUEST);
 
-            if (event == null)
-                Assert.fail("Event ID [" + requestId + "] not found after " + XMPP_TIMEOUT + "ms");
+            Assert.assertNotNull("Event ID [" + requestId + "] with type [" + UserFeedbackEventTopics.REQUEST + "] not found after " + XMPP_TIMEOUT + "ms",
+                    event);
 
             UserFeedbackBean bean = (UserFeedbackBean) event.getItem();
 
-
             Assert.assertEquals("Bean ID [" + requestId + "] had wrong type", type, bean.getType());
 
-            for (String option : bean.getOptions()) {
-                if (!expectedOptions.contains(option))
-                    Assert.fail("Option [" + option + "] was found in event data, but not expected");
-
-                expectedOptions.remove(option);
-            }
-
-            if (expectedOptions.size() > 0)
-                Assert.fail("Option [" + expectedOptions.get(0) + "] was not found in event data");
+            Tester.compareLists(expectedOptions, bean.getOptions());
         }
-
 
         public void assertExpResponseReceived(String requestId, int type, List<String> expectedResults) throws InterruptedException {
             PubSubEvent event = waitForPubSubEvent(requestId, UserFeedbackEventTopics.EXPLICIT_RESPONSE);
@@ -238,16 +229,7 @@ public class Tester {
 
             ExpFeedbackResultBean bean = (ExpFeedbackResultBean) event.getItem();
 
-            for (String option : bean.getFeedback()) {
-                if (!expectedResults.contains(option))
-                    Assert.fail("Option [" + option + "] was found in event data, but not expected");
-
-                expectedResults.remove(option);
-            }
-
-            if (expectedResults.size() > 0)
-                Assert.fail("Option [" + expectedResults.get(0) + "] was not found in event data");
-
+            Tester.compareLists(expectedResults, bean.getFeedback());
         }
 
         public void assertCompletedReceived(String requestId) throws InterruptedException {
@@ -314,7 +296,7 @@ public class Tester {
     }
 
     @Test
-    public void fullTestScript() throws SQLException, InterruptedException {
+    public void fullTestScript() throws SQLException, InterruptedException, ExecutionException {
 
         // NB: The following manual script was written to test full integration of UF, Android and the Webapp - only the
         // UF component will be tested in this automated test class
@@ -380,7 +362,6 @@ public class Tester {
         //      2. EXPLICIT_REQUEST PubSub event sent from server
         pubSubListener.assertNotificationReceived(acknackRequestId, ExpProposalType.ACKNACK, acknackContent);
 
-
         final ExpProposalContent selectOneContent = new ExpProposalContent("SelectOne test",
                 new String[]{"Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"});
         final Future<List<String>> selectOneFB = userFeedback.getExplicitFB(ExpProposalType.CHECKBOXLIST, selectOneContent);
@@ -407,37 +388,76 @@ public class Tester {
 
 
         //3. Accept AckNack notification via T65
-        List<String> acknackResults = new ArrayList<String>();
-        acknackResults.add("Yes");
-        pubSubListener.sendExplicitResponse(acknackRequestId, acknackResults);
+        List<String> expectedAcknackResults = new ArrayList<String>();
+        expectedAcknackResults.add("Yes");
+        pubSubListener.sendExplicitResponse(acknackRequestId, expectedAcknackResults);
 
         //      1. EXPLICIT_RESPONSE PubSub event sent from client
-        pubSubListener.assertExpResponseReceived(acknackRequestId, ExpProposalType.ACKNACK, acknackResults);
+        pubSubListener.assertExpResponseReceived(acknackRequestId, ExpProposalType.ACKNACK, expectedAcknackResults);
         //      2. Database is updated - negotiation status and results
         final UserFeedbackBean acknackFeedbackBean = userFeedbackHistoryRepository.getByRequestId(acknackRequestId);
         Assert.assertEquals(FeedbackStage.COMPLETED, acknackFeedbackBean.getStage());
-        Assert.assertEquals(1, acknackFeedbackBean.getOptions().size());
-        Assert.assertEquals("Yes", acknackFeedbackBean.getOptions().get(0));
-
-        //      3. COMPLETED PubSub event is sent from server
+//        compareLists(acknackResults, acknackFeedbackBean.getOptions());
+        //      3. Future is updated
+        final List<String> acknackResult = acknackFB.get();
+        Tester.compareLists(expectedAcknackResults, acknackResult);
+        //      4. COMPLETED PubSub event is sent from server
         pubSubListener.assertCompletedReceived(acknackRequestId);
 
         //4. Accept SelectOne notification via Android
-        final List<String> selectOneResults = new ArrayList<String>();
-        selectOneResults.add("Phylum");
-        pubSubListener.sendExplicitResponse(selectOneRequestId, selectOneResults);
+        final List<String> expectedSelectOneResults = new ArrayList<String>();
+        expectedSelectOneResults.add("Phylum");
+        pubSubListener.sendExplicitResponse(selectOneRequestId, expectedSelectOneResults);
 
         //      1. EXPLICIT_RESPONSE PubSub event sent from client
-        pubSubListener.assertExpResponseReceived(selectOneRequestId, ExpProposalType.RADIOLIST, selectOneResults);
+        pubSubListener.assertExpResponseReceived(selectOneRequestId, ExpProposalType.RADIOLIST, expectedSelectOneResults);
         //      2. Database is updated - negotiation status and results
         final UserFeedbackBean selectOneFeedbackBean = userFeedbackHistoryRepository.getByRequestId(selectOneRequestId);
         Assert.assertEquals(FeedbackStage.COMPLETED, selectOneFeedbackBean.getStage());
-        Assert.assertEquals(1, selectOneFeedbackBean.getOptions().size());
-        Assert.assertEquals("Phylum", selectOneFeedbackBean.getOptions().get(0));
-
-        //      3. COMPLETED PubSub event is sent from server
+//        compareLists(selectOneResults, selectOneFeedbackBean.getOptions());
+        //      3. Future is updated
+        final List<String> selectOneResult = selectOneFB.get();
+        Tester.compareLists(expectedSelectOneResults, selectOneResult);
+        //      4. COMPLETED PubSub event is sent from server
         pubSubListener.assertCompletedReceived(selectOneRequestId);
 
+    }
+
+    private static <T> void compareLists(T[] expected, T[] actual) {
+        List<T> leftList = new ArrayList<T>();
+        Collections.addAll(leftList, expected);
+        List<T> rightList = new ArrayList<T>();
+        Collections.addAll(rightList, actual);
+
+        compareLists(leftList, rightList);
+    }
+
+    private static <T> void compareLists(List<T> expected, T[] actual) {
+        List<T> rightList = new ArrayList<T>();
+        Collections.addAll(rightList, actual);
+
+        compareLists(expected, rightList);
+    }
+
+    private static <T> void compareLists(T[] expected, List<T> actual) {
+        List<T> leftList = new ArrayList<T>();
+        Collections.addAll(leftList, expected);
+
+        compareLists(leftList, actual);
+    }
+
+    public static <T> void compareLists(List<T> expected, List<T> actual) {
+        List<T> expectedClone = new ArrayList<T>(expected);
+
+        for (T actualItem : actual) {
+            if (!expected.contains(actualItem))
+                Assert.fail("Item [" + actualItem + "] found in actual list, but not expected");
+
+            expectedClone.remove(actualItem);
+        }
+
+        if (expectedClone.size() > 0)
+            Assert.fail("Item [" + expectedClone.get(0) + "] was expected, but not in actual list");
     }
 
 }
