@@ -383,6 +383,9 @@ public class ServiceMethodTranslator {
 					
 				} else if (arrayContains(JAVA_LANG_CLASSES, paramTypes[i])) {
 					paramClasses[i] = Class.forName(JAVA_LANG_PREFIX + paramTypes[i]);
+
+				} else if (Serializable.class.getName().equalsIgnoreCase(paramTypes[i]) || Serializable.class.getSimpleName().equalsIgnoreCase(paramTypes[i])) {
+					paramClasses[i] = Serializable.class;
 					
 				} else {
 					paramClasses[i] = Class.forName(paramTypes[i]);
