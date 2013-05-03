@@ -94,7 +94,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 	private List<IUserIntentAction> lastPredictedActions = new ArrayList<IUserIntentAction>();
 
 	int predictionRequestsCounter = 0;
-	int discoveryThreshold = 19;
+	int discoveryThreshold = 8;
 	boolean modelExist = false;
 
 	private IIdentity cssOwnerId;
@@ -239,7 +239,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 					for(IUserIntentAction nextAction : nextActionsMap.keySet()){
 						Double doubleConf = nextActionsMap.get(nextAction);
 						//doubleConf = doubleConf*100;
-						doubleConf = 50.0;
+						doubleConf = 70.0;
 						nextAction.setConfidenceLevel(doubleConf.intValue());
 						//LOG.info("6. nextActionsMap " +nextAction);
 						results.add(nextAction);
