@@ -54,7 +54,11 @@ public class TestEventsHelper extends AndroidTestCase {
 		
 		final EventsHelper helper = new EventsHelper(getContext());
 		helper.setUpService(new IMethodCallback() {
-			
+				
+			@Override
+			public void returnException(String exception) {
+			}
+
 			@Override
 			public void returnAction(String result) {
 				fail();
@@ -64,6 +68,10 @@ public class TestEventsHelper extends AndroidTestCase {
 			public void returnAction(boolean resultFlag) {
 				assertTrue(resultFlag);
 				helper.tearDownService(new IMethodCallback() {
+
+					@Override
+					public void returnException(String exception) {
+					}
 					
 					@Override
 					public void returnAction(String result) {
@@ -93,6 +101,10 @@ public class TestEventsHelper extends AndroidTestCase {
 		helper.setUpService(new IMethodCallback() {
 			
 			@Override
+			public void returnException(String exception) {
+			}
+
+			@Override
 			public void returnAction(String result) {
 				fail();
 			}
@@ -103,6 +115,10 @@ public class TestEventsHelper extends AndroidTestCase {
 				try {
 					helper.subscribeToEvent(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, new IPlatformEventsCallback() {
 						
+						@Override
+						public void returnException(int exception) {
+						}
+
 						@Override
 						public void returnAction(int result) {
 							fail();
@@ -115,10 +131,18 @@ public class TestEventsHelper extends AndroidTestCase {
 								helper.getNumSubscribedNodes(new IPlatformEventsCallback() {
 									
 									@Override
+									public void returnException(int exception) {
+									}
+									
+									@Override
 									public void returnAction(int result) {
 										assertEquals(1, result);
 										try {
 											helper.publishEvent(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, getCssEvent(), new IPlatformEventsCallback() {
+
+												@Override
+												public void returnException(int exception) {
+												}
 												
 												@Override
 												public void returnAction(int arg0) {
@@ -131,6 +155,10 @@ public class TestEventsHelper extends AndroidTestCase {
 														helper.unSubscribeFromEvent(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, new IPlatformEventsCallback() {
 															
 															@Override
+															public void returnException(int exception) {
+															}
+															
+															@Override
 															public void returnAction(int result) {
 																fail();
 															}
@@ -139,6 +167,10 @@ public class TestEventsHelper extends AndroidTestCase {
 															public void returnAction(boolean resultFlag) {
 																assertTrue(resultFlag);
 																helper.tearDownService(new IMethodCallback() {
+																	
+																	@Override
+																	public void returnException(String exception) {
+																	}
 																	
 																	@Override
 																	public void returnAction(String result) {
@@ -197,6 +229,10 @@ public class TestEventsHelper extends AndroidTestCase {
 		helper.setUpService(new IMethodCallback() {
 			
 			@Override
+			public void returnException(String exception) {
+			}
+
+			@Override
 			public void returnAction(String result) {
 				fail();
 			}
@@ -207,6 +243,10 @@ public class TestEventsHelper extends AndroidTestCase {
 				try {
 					helper.subscribeToEvent(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, new IPlatformEventsCallback() {
 						
+						@Override
+						public void returnException(int exception) {
+						}
+
 						@Override
 						public void returnAction(int result) {
 							fail();
@@ -219,10 +259,18 @@ public class TestEventsHelper extends AndroidTestCase {
 								helper.getNumSubscribedNodes(new IPlatformEventsCallback() {
 									
 									@Override
+									public void returnException(int exception) {
+									}
+
+									@Override
 									public void returnAction(int result) {
 										assertEquals(1, result);
 										try {
 											helper.publishEvent(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, getExpFeedbackResultBean(), new IPlatformEventsCallback() {
+												
+												@Override
+												public void returnException(int exception) {
+												}
 												
 												@Override
 												public void returnAction(int arg0) {
@@ -235,6 +283,10 @@ public class TestEventsHelper extends AndroidTestCase {
 														helper.unSubscribeFromEvent(IAndroidSocietiesEvents.CSS_MANAGER_ADD_CSS_NODE_INTENT, new IPlatformEventsCallback() {
 															
 															@Override
+															public void returnException(int exception) {
+															}
+															
+															@Override
 															public void returnAction(int result) {
 																fail();
 															}
@@ -243,6 +295,10 @@ public class TestEventsHelper extends AndroidTestCase {
 															public void returnAction(boolean resultFlag) {
 																assertTrue(resultFlag);
 																helper.tearDownService(new IMethodCallback() {
+																	
+																	@Override
+																	public void returnException(String exception) {
+																	}
 																	
 																	@Override
 																	public void returnAction(String result) {
@@ -301,6 +357,10 @@ public class TestEventsHelper extends AndroidTestCase {
 		helper.setUpService(new IMethodCallback() {
 			
 			@Override
+			public void returnException(String exception) {
+			}
+			
+			@Override
 			public void returnAction(String result) {
 				fail();
 			}
@@ -310,6 +370,10 @@ public class TestEventsHelper extends AndroidTestCase {
 				assertTrue(resultFlag);
 				try {
 					helper.subscribeToEvents(INTENTS_FILTER, new IPlatformEventsCallback() {
+
+						@Override
+						public void returnException(int exception) {
+						}
 						
 						@Override
 						public void returnAction(int result) {
@@ -321,12 +385,20 @@ public class TestEventsHelper extends AndroidTestCase {
 							assertTrue(resultFlag);
 							try {
 								helper.getNumSubscribedNodes(new IPlatformEventsCallback() {
+
+									@Override
+									public void returnException(int exception) {
+									}
 									
 									@Override
 									public void returnAction(int result) {
 										assertEquals(NUM_FILTER_EVENTS, result);
 										try {
 											helper.unSubscribeFromEvents(INTENTS_FILTER, new IPlatformEventsCallback() {
+												
+												@Override
+												public void returnException(int exception) {
+												}
 												
 												@Override
 												public void returnAction(int result) {
@@ -337,6 +409,10 @@ public class TestEventsHelper extends AndroidTestCase {
 												public void returnAction(boolean resultFlag) {
 													assertTrue(resultFlag);
 													helper.tearDownService(new IMethodCallback() {
+														
+														@Override
+														public void returnException(String exception) {
+														}
 														
 														@Override
 														public void returnAction(String result) {
@@ -393,7 +469,11 @@ public class TestEventsHelper extends AndroidTestCase {
 		
 		try {
 			helper.subscribeToAllEvents(new IPlatformEventsCallback() {
-				
+
+				@Override
+				public void returnException(int exception) {
+				}
+
 				@Override
 				public void returnAction(int result) {
 				}

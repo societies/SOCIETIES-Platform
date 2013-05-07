@@ -26,8 +26,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 package org.societies.android.remote.helper;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.societies.android.api.common.ADate;
@@ -53,6 +53,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Messenger;
+import android.os.Parcelable;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -225,7 +226,7 @@ public class TrustClientHelper implements ITrustClientHelper {
 					.add(callback);
 
 			// Select target method and create message to convey remote invocation
-	   		String targetMethod = ITrustClient.methodsArray[0];
+	   		String targetMethod = ITrustClient.methodsArray[2];
 			android.os.Message outMessage = 
 					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(
 							ITrustClient.methodsArray, targetMethod), 0, 0);
@@ -240,7 +241,7 @@ public class TrustClientHelper implements ITrustClientHelper {
 			Log.d(TAG, "requestor: " + requestor.getRequestorId());
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 3), trustorId);
+					targetMethod, 2), trustorId);
 			Log.d(TAG, "trustorId: " + trustorId.getEntityId());
 			
 	   		outMessage.setData(outBundle);
@@ -294,7 +295,7 @@ public class TrustClientHelper implements ITrustClientHelper {
 					.add(callback);
 
 			// Select target method and create message to convey remote invocation
-	   		String targetMethod = ITrustClient.methodsArray[1];
+	   		String targetMethod = ITrustClient.methodsArray[3];
 			android.os.Message outMessage = 
 					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(
 							ITrustClient.methodsArray, targetMethod), 0, 0);
@@ -309,11 +310,11 @@ public class TrustClientHelper implements ITrustClientHelper {
 			Log.d(TAG, "requestor: " + requestor.getRequestorId());
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 3), trustorId);
+					targetMethod, 2), trustorId);
 			Log.d(TAG, "trustorId: " + trustorId.getEntityId());
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 4), trusteeId);
+					targetMethod, 3), trusteeId);
 			Log.d(TAG, "trusteeId: " + trusteeId.getEntityId());
 			
 	   		outMessage.setData(outBundle);
@@ -371,7 +372,7 @@ public class TrustClientHelper implements ITrustClientHelper {
 					.add(callback);
 
 			// Select target method and create message to convey remote invocation
-	   		String targetMethod = ITrustClient.methodsArray[2];
+	   		String targetMethod = ITrustClient.methodsArray[4];
 			android.os.Message outMessage = 
 					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(
 							ITrustClient.methodsArray, targetMethod), 0, 0);
@@ -386,15 +387,15 @@ public class TrustClientHelper implements ITrustClientHelper {
 			Log.d(TAG, "requestor: " + requestor.getRequestorId());
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 3), trustorId);
+					targetMethod, 2), trustorId);
 			Log.d(TAG, "trustorId: " + trustorId.getEntityId());
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 4), trusteeId);
+					targetMethod, 3), trusteeId);
 			Log.d(TAG, "trusteeId: " + trusteeId.getEntityId());
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 5), trustValueType);
+					targetMethod, 4), trustValueType);
 			Log.d(TAG, "trustValueType: " + trustValueType);
 			
 	   		outMessage.setData(outBundle);
@@ -452,7 +453,7 @@ public class TrustClientHelper implements ITrustClientHelper {
 					.add(callback);
 
 			// Select target method and create message to convey remote invocation
-	   		String targetMethod = ITrustClient.methodsArray[3];
+	   		String targetMethod = ITrustClient.methodsArray[5];
 			android.os.Message outMessage = 
 					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(
 							ITrustClient.methodsArray, targetMethod), 0, 0);
@@ -467,15 +468,15 @@ public class TrustClientHelper implements ITrustClientHelper {
 			Log.d(TAG, "requestor: " + requestor.getRequestorId());
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 3), trustorId);
+					targetMethod, 2), trustorId);
 			Log.d(TAG, "trustorId: " + trustorId.getEntityId());
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 4), trusteeId);
+					targetMethod, 3), trusteeId);
 			Log.d(TAG, "trusteeId: " + trusteeId.getEntityId());
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 5), trustValueType);
+					targetMethod, 4), trustValueType);
 			Log.d(TAG, "trustValueType: " + trustValueType);
 			
 	   		outMessage.setData(outBundle);
@@ -529,7 +530,7 @@ public class TrustClientHelper implements ITrustClientHelper {
 					.add(callback);
 
 			// Select target method and create message to convey remote invocation
-	   		String targetMethod = ITrustClient.methodsArray[4];
+	   		String targetMethod = ITrustClient.methodsArray[6];
 			android.os.Message outMessage = 
 					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(
 							ITrustClient.methodsArray, targetMethod), 0, 0);
@@ -544,11 +545,11 @@ public class TrustClientHelper implements ITrustClientHelper {
 			Log.d(TAG, "requestor: " + requestor.getRequestorId());
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 3), trustorId);
+					targetMethod, 2), trustorId);
 			Log.d(TAG, "trustorId: " + trustorId.getEntityId());
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 4), trusteeType);
+					targetMethod, 3), trusteeType);
 			Log.d(TAG, "trusteeType: " + trusteeType);
 			
 	   		outMessage.setData(outBundle);
@@ -602,7 +603,7 @@ public class TrustClientHelper implements ITrustClientHelper {
 					.add(callback);
 
 			// Select target method and create message to convey remote invocation
-	   		String targetMethod = ITrustClient.methodsArray[5];
+	   		String targetMethod = ITrustClient.methodsArray[7];
 			android.os.Message outMessage = 
 					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(
 							ITrustClient.methodsArray, targetMethod), 0, 0);
@@ -617,11 +618,11 @@ public class TrustClientHelper implements ITrustClientHelper {
 			Log.d(TAG, "requestor: " + requestor.getRequestorId());
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 3), trustorId);
+					targetMethod, 2), trustorId);
 			Log.d(TAG, "trustorId: " + trustorId.getEntityId());
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 4), trustValueType);
+					targetMethod, 3), trustValueType);
 			Log.d(TAG, "trustValueType: " + trustValueType);
 			
 	   		outMessage.setData(outBundle);
@@ -679,7 +680,7 @@ public class TrustClientHelper implements ITrustClientHelper {
 					.add(callback);
 
 			// Select target method and create message to convey remote invocation
-	   		String targetMethod = ITrustClient.methodsArray[6];
+	   		String targetMethod = ITrustClient.methodsArray[8];
 			android.os.Message outMessage = 
 					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(
 							ITrustClient.methodsArray, targetMethod), 0, 0);
@@ -694,15 +695,15 @@ public class TrustClientHelper implements ITrustClientHelper {
 			Log.d(TAG, "requestor: " + requestor.getRequestorId());
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 3), trustorId);
+					targetMethod, 2), trustorId);
 			Log.d(TAG, "trustorId: " + trustorId.getEntityId());
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 4), trusteeType);
+					targetMethod, 3), trusteeType);
 			Log.d(TAG, "trusteeType: " + trusteeType);
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 5), trustValueType);
+					targetMethod, 4), trustValueType);
 			Log.d(TAG, "trustValueType: " + trustValueType);
 			
 	   		outMessage.setData(outBundle);
@@ -751,7 +752,7 @@ public class TrustClientHelper implements ITrustClientHelper {
 		if (callback == null)
 			throw new NullPointerException("callback can't be null");
 		
-		Log.d(TAG, "retrieveTrustRelationships: requestor="
+		Log.d(TAG, "addDirectTrustEvidence: requestor="
 				+ requestor.getRequestorId() + ", subjectId=" 
 				+ subjectId.getEntityId() + ", objectId=" 
 				+ objectId.getEntityId() + ", type=" + type + ", timestmap="
@@ -764,7 +765,7 @@ public class TrustClientHelper implements ITrustClientHelper {
 					.add(callback);
 
 			// Select target method and create message to convey remote invocation
-	   		String targetMethod = ITrustClient.methodsArray[7];
+	   		String targetMethod = ITrustClient.methodsArray[9];
 			android.os.Message outMessage = 
 					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(
 							ITrustClient.methodsArray, targetMethod), 0, 0);
@@ -779,23 +780,23 @@ public class TrustClientHelper implements ITrustClientHelper {
 			Log.d(TAG, "requestor: " + requestor.getRequestorId());
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 3), subjectId);
-			Log.d(TAG, "trustorId: " + subjectId.getEntityId());
+					targetMethod, 2), subjectId);
+			Log.d(TAG, "subjectId: " + subjectId.getEntityId());
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 4), objectId);
+					targetMethod, 3), objectId);
 			Log.d(TAG, "objectId: " + objectId.getEntityId());
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 5), type);
+					targetMethod, 4), type);
 			Log.d(TAG, "type: " + type);
 			
 			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 6), timestamp);
+					targetMethod, 5), timestamp);
 			Log.d(TAG, "timestamp: " + timestamp);
 			
 			outBundle.putSerializable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 7), info);
+					targetMethod, 6), info);
 			Log.d(TAG, "info: " + info);
 			
 	   		outMessage.setData(outBundle);
@@ -839,10 +840,22 @@ public class TrustClientHelper implements ITrustClientHelper {
 							TrustClientHelper.this.methodQueues[classMethods.retrieveTrustRelationships.ordinal()].poll();
 					if (null != retrievedCallback) {
 						// TODO Handle exceptions
-						final TrustRelationshipBean[] trustRelationships = (TrustRelationshipBean[]) 
+						final Set<TrustRelationshipBean> trustRelationships = 
+								new HashSet<TrustRelationshipBean>();
+						final Parcelable[] pTrustRelationships = (Parcelable[]) 
 								intent.getParcelableArrayExtra(ITrustClient.INTENT_RETURN_VALUE_KEY);
+						for (final Parcelable pTrustRelationship : pTrustRelationships) {
+							if (pTrustRelationship instanceof TrustRelationshipBean) {
+								trustRelationships.add((TrustRelationshipBean) pTrustRelationship);
+							} else {
+								retrievedCallback.onException(new TrustClientInvocationException(
+										"Unexpected return value type: " + ((pTrustRelationship != null) 
+												? pTrustRelationship.getClass() : "null")));
+								return;
+							}
+						}
 						retrievedCallback.onRetrievedTrustRelationships(
-								new HashSet<TrustRelationshipBean>(Arrays.asList(trustRelationships)));
+								trustRelationships);
 					} else {
 						Log.e(TAG, "Could not find callback for received action " + intent.getAction());
 					}
@@ -857,9 +870,21 @@ public class TrustClientHelper implements ITrustClientHelper {
 							TrustClientHelper.this.methodQueues[classMethods.retrieveTrustRelationship.ordinal()].poll();
 					if (null != retrievedCallback) {
 						// TODO Handle exceptions
-						final TrustRelationshipBean trustRelationship = (TrustRelationshipBean) 
+						final Parcelable pTrustRelationship = 
 								intent.getParcelableExtra(ITrustClient.INTENT_RETURN_VALUE_KEY);
-						retrievedCallback.onRetrievedTrustRelationship(trustRelationship);
+						if (pTrustRelationship == null) {
+							retrievedCallback.onRetrievedTrustRelationship(
+									null);
+						} else if (pTrustRelationship instanceof TrustRelationshipBean) {
+							retrievedCallback.onRetrievedTrustRelationship(
+									(TrustRelationshipBean) pTrustRelationship);
+						} else {
+							retrievedCallback.onException(new TrustClientInvocationException(
+									"Unexpected return value type: " + ((pTrustRelationship != null) 
+											? pTrustRelationship.getClass() : "null")));
+							return;
+						}
+						
 					} else {
 						Log.e(TAG, "Could not find callback for received action " + intent.getAction());
 					}
