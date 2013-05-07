@@ -54,7 +54,9 @@ import org.societies.api.personalisation.model.IAction;
 //import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
+import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
+
 // remove after testing
 //import org.societies.personalisation.CAUITaskManager.impl.CAUITaskManager;
 
@@ -69,7 +71,6 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	private ICtxBroker ctxBroker;
 	private ICommManager commsMgr;
 
-
 	IPerformanceMessage m;
 
 	//LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = null;
@@ -83,10 +84,9 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	public CAUIDiscovery(){
 		//actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
 		//remove after testing
-		//cauiTaskManager = new CAUITaskManager();
-
+	//	cauiTaskManager = new CAUITaskManager();
 	}
-
+	
 	public ICAUITaskManager getCauiTaskManager() {
 		//System.out.println(this.getClass().getName()+": Return cauiTaskManager");
 		return cauiTaskManager;
@@ -129,6 +129,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 		LOG.debug("start model generation");
 
+		//this should change according to sequence in CAUIDiscoveryLearningTest  
 		if (retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION) != null ){
 
 			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData = retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION);
@@ -137,35 +138,38 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			List<MockHistoryData> mockData = convertHistoryData(mapHocData);
 
 			//LOG.info("3. Generate Transition Dictionary");
-			LinkedHashMap<List<String>,ActionDictObject> currentActCtxDictionary = generateTransitionsDictionary(mockData);
+		//	LinkedHashMap<List<String>,ActionDictObject> currentActCtxDictionary = generateTransitionsDictionary(mockData);
+			HashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> dictionary = generateTransitionsDictionaryAll(mockData);
+			
+			//LOG.info("4. Assign context to actions");
+			HashMap<String,List<String>> ctxActionsMap =  assignContextToAction(dictionary.get(1));
+			
+			//LOG.info("5. Generate Transition Propability Dictionary (step2)");
+			try {
+				TransProbCalculator transProb = new TransProbCalculator();
+				LinkedHashMap<List<String>, HashMap<String, Double>> trans2ProbDictionary = transProb.calcTrans2Prob(dictionary.get(2));
+				LinkedHashMap<List<String>,HashMap<String,Double>> trans3ProbDictionary = transProb.calcTrans3Prob(dictionary.get(3));
+				
+				//LOG.info("6. Generate UserIntentModelData");
+				ConstructUIModel cmodel = new ConstructUIModel(cauiTaskManager,ctxBroker); 
+				UserIntentModelData modelData = null;
+				modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap);
 
-			//LOG.info("4. Generate Transition Propability Dictionary (step2)");
-			TransitionProbabilitiesCalc transProb  = new TransitionProbabilitiesCalc();
-			LinkedHashMap<String,HashMap<String,Double>> trans2ProbDictionary = transProb.calcTrans2Prob(currentActCtxDictionary);	
-			//printTransProbDictionary(trans2ProbDictionary);
-			//LOG.info("5. Assign context to actions");
-
-			HashMap<String,List<String>> ctxActionsMap =  assignContextToAction(currentActCtxDictionary);
-			//LOG.info("5. Generate UserIntentModelData");
-
-			ConstructUIModel cmodel = new ConstructUIModel(cauiTaskManager,ctxBroker); 
-			//LOG.info("5a trans2ProbDictionary "+ trans2ProbDictionary);
-			//LOG.info("5a ctxActionsMap "+ ctxActionsMap);
-			UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap);
-
-			//LOG.info("6. result "+modelData.getActionModel());
-
-			//LOG.info("7. Store UserIntentModelData to ctx DB");
-
-			CtxAttribute ctxAttr = storeModelCtxDB(modelData);
-			LOG.debug("model stored under attribute id: "+ctxAttr.getId());
-			LOG.debug("modelData "+ modelData.getActionModel());
-
-			// performance log code
-			byte entBytes [] = toByteArray(modelData);
-			long modelSize = entBytes.length;
-			this.predictionModelSizePerformanceLog(modelSize);
-			// end of performance log code
+				CtxAttribute ctxAttr = storeModelCtxDB(modelData);
+				LOG.debug("model stored under attribute id: "+ctxAttr.getId());
+				LOG.debug("modelData "+ modelData.getActionModel());
+						
+				System.out.println("*********** model created *******"+ modelData.getActionModel());
+			
+				// performance log code
+				byte entBytes [] = toByteArray(modelData);
+				long modelSize = entBytes.length;
+				this.predictionModelSizePerformanceLog(modelSize);
+				// end of performance log code
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
 			
 		}else LOG.info("not enough history data");
 	}
@@ -185,6 +189,32 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			e.printStackTrace();
 		}
 		return results;
+	}
+
+	/*
+	 * Total dictionary format
+	 * map { key: 1 , value: [dictionary for one char]
+	 *	 	     key: 2 , value: [dictionary for two chars]
+	 *	     key: 3 , value: [dictionary for three chars]}
+	 * 
+	 */
+
+	public  LinkedHashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> generateDictionaries(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history){
+
+		LOG.info("2. Convert History Data");
+		List<MockHistoryData> convertedHistory = convertHistoryData(history);
+
+		LOG.info("3. Generate Transition Dictionary");
+
+		LinkedHashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> actCtxDictionaryAll = new LinkedHashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>>();
+		LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = null;
+
+		for(int i=1; i<=3; i++){
+			actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
+			actCtxDictionary = populateActionCtxDictionary(convertedHistory, i);
+			actCtxDictionaryAll.put(i, actCtxDictionary);
+		}		
+		return actCtxDictionaryAll;				
 	}
 
 	/*
@@ -225,6 +255,22 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		return actCtxDictionaryAll;
 	}
 
+
+	//
+
+	public HashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> generateTransitionsDictionaryAll(List<MockHistoryData> data) {
+
+		HashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> actCtxDictionaryAll = new HashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>>();
+		LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = null;
+
+		for(int i=1; i<=3; i++){
+			actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
+			actCtxDictionary = populateActionCtxDictionary(data, i);
+			actCtxDictionaryAll.put(i, actCtxDictionary);
+		}
+
+		return actCtxDictionaryAll;
+	}
 	/*
 	public LinkedHashMap<List<String>,ActionDictObject> getDictionary(){
 		return this.actCtxDictionary;
@@ -379,14 +425,18 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	}
 
 
-
-
+	/*
+	 * generates a map with key the string representation of the action and object the prevailing context values
+	 * e.g. http://testService1#volume#mute=[status=away]
+	 * 		http://testService1#volume#mute=[status=away]
+	 * 		http://testService2#volume#low= [locationSymbolic=office, status=busy]
+	 */
 	public HashMap<String,List<String>> assignContextToAction(LinkedHashMap<List<String>,ActionDictObject> dictionaryFull){
 
 		//key:ActionName value:[home,free,10]
 		HashMap<String,List<String>> results = new HashMap<String,List<String>>();
 
-		TransitionProbabilitiesCalc transProb  = new TransitionProbabilitiesCalc();
+		TransProbCalculator transProb  = new TransProbCalculator();
 		LinkedHashMap<List<String>,ActionDictObject> dic = transProb.getStepDict(dictionaryFull, 1);
 		//System.out.println("dic "+dic);
 		String action = "";
@@ -651,6 +701,130 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		}
 		return bytes;
 	}
+
+
+	public LinkedHashMap<List<String>,ActionDictObject>  populateActionCtxDictionary(List<MockHistoryData> historyData, Integer step){
+
+		//HashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> dictionaryRepo = new HashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>>();
+		LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
+
+		int historySize = historyData.size();
+		LOG.debug("historySize "+historySize);
+
+		List<String> currentActPhrase = null;
+		List<String> currentCtxPhraseLocation = null;
+		List<String> currentCtxPhraseStatus = null;
+		List<String> currentCtxPhraseTemperature = null;
+
+		// j is the step and the longest phrase has 3 actions
+		//for (int j=step; j<=step; j++) {
+		int j=step;
+		for (int i = 0; i < historySize ; i++) {
+			MockHistoryData currentHocData =  historyData.get(i);
+			List<String> actionNameObjTemp = new ArrayList<String>();
+			String actionName = currentHocData.getServiceId()+"#"+currentHocData.getParameterName()+"#"+currentHocData.getActionValue();
+			//LOG.info("action name "+actionName);
+			actionNameObjTemp.add(actionName);
+
+			//context
+			LinkedList<String> ctxObjTempLocation = new LinkedList<String>();
+			LinkedList<String> ctxObjTempStatus = new LinkedList<String>();
+			LinkedList<String> ctxObjTempTemperature = new LinkedList<String>();
+
+			ctxObjTempLocation.add(currentHocData.getContextValue(CtxAttributeTypes.LOCATION_SYMBOLIC));
+			ctxObjTempStatus.add(currentHocData.getContextValue(CtxAttributeTypes.STATUS));
+			ctxObjTempTemperature.add(currentHocData.getContextValue(CtxAttributeTypes.TEMPERATURE));
+
+			MockHistoryData tempHocData = null;
+			//get next action
+			for (int k=1; k<j; k++){
+				//avoid null pointer at end of file
+				if( i+k < historySize ){
+					tempHocData = historyData.get(i+k);
+					//String tempNextActName = tempHocData.getActionValue();
+					String tempNextActName = tempHocData.getServiceId()+"#"+tempHocData.getParameterName()+"#"+tempHocData.getActionValue();
+
+					actionNameObjTemp.add(tempNextActName);
+
+					//context
+					String tempNextCtxLoc = tempHocData.getContextValue(CtxAttributeTypes.LOCATION_SYMBOLIC);
+					String tempNextCtxStatus = tempHocData.getContextValue(CtxAttributeTypes.STATUS);
+					String tempNextCtxTemperature = tempHocData.getContextValue(CtxAttributeTypes.TEMPERATURE);
+
+					ctxObjTempLocation.add(tempNextCtxLoc);
+					ctxObjTempStatus.add(tempNextCtxStatus);
+					ctxObjTempTemperature.add(tempNextCtxTemperature);
+				}
+			}
+
+			currentActPhrase = actionNameObjTemp;
+			//context
+			currentCtxPhraseLocation = ctxObjTempLocation;
+			currentCtxPhraseStatus = ctxObjTempStatus;
+			currentCtxPhraseTemperature = ctxObjTempTemperature;
+
+			List<List<String>> currentCtxPhraseList = new ArrayList<List<String>>();
+			currentCtxPhraseList.add(0,currentCtxPhraseLocation );
+			currentCtxPhraseList.add(1,currentCtxPhraseStatus );
+			currentCtxPhraseList.add(2,currentCtxPhraseTemperature );
+
+			if (actionNameObjTemp.size() == j){
+				//System.out.println("j="+j+" i="+i+" actionName "+actionName+ " phrase "+currentActPhrase +" context"+currentHocData.getContext()+" ");
+
+				if(actCtxDictionary.containsKey(currentActPhrase)){
+
+					//get current dictObj
+					ActionDictObject dicObj = actCtxDictionary.get(currentActPhrase);
+					//update total action score
+					Integer previousScore = dicObj.getTotalOccurences();
+					dicObj.setTotalOccurences(previousScore+1);
+
+					//update context map
+					HashMap<List<String>,Integer> currentCtxMapLocation = new HashMap<List<String>,Integer>();
+					currentCtxMapLocation = dicObj.getLocationContextMap();
+					HashMap<List<String>,Integer> updatedMapLoc = mergeCtxMaps(currentCtxPhraseLocation, currentCtxMapLocation);
+					dicObj.setLocationContextMap(updatedMapLoc);
+
+					HashMap<List<String>,Integer> currentCtxMapStatus = new HashMap<List<String>,Integer>();
+					currentCtxMapStatus = dicObj.getStatusContextMap();
+					HashMap<List<String>,Integer> updatedMapStatus = mergeCtxMaps(currentCtxPhraseStatus, currentCtxMapStatus);
+					dicObj.setStatusContextMap(updatedMapStatus);
+
+					HashMap<List<String>,Integer> currentCtxMapTemperature = new HashMap<List<String>,Integer>();
+					currentCtxMapTemperature = dicObj.getTemperatureContextMap();
+					HashMap<List<String>,Integer> updatedMapTemperature = mergeCtxMaps(currentCtxPhraseTemperature, currentCtxMapTemperature);
+					dicObj.setTemperatureContextMap(updatedMapTemperature);
+
+					//add updated data to dictionary
+					actCtxDictionary.put(currentActPhrase,dicObj);
+
+				} else {
+					ActionDictObject newDictObj = new ActionDictObject();
+					newDictObj.setTotalOccurences(1);
+
+					//create context map
+					HashMap<List<String>,Integer> newCtxMapLocation =  new HashMap<List<String>,Integer>();
+					newCtxMapLocation.put(currentCtxPhraseLocation, 1);
+					newDictObj.setLocationContextMap(newCtxMapLocation);
+
+					HashMap<List<String>,Integer> newCtxMapStatus =  new HashMap<List<String>,Integer>();
+					newCtxMapStatus.put(currentCtxPhraseStatus, 1);
+					newDictObj.setStatusContextMap(newCtxMapStatus);
+
+					HashMap<List<String>,Integer> newCtxMapTemperature =  new HashMap<List<String>,Integer>();
+					newCtxMapTemperature.put(currentCtxPhraseTemperature, 1);
+					newDictObj.setTemperatureContextMap(newCtxMapTemperature);
+
+					actCtxDictionary.put(currentActPhrase,newDictObj);
+				}
+
+			}
+
+		}
+		//}
+		return actCtxDictionary;
+	}
+
 
 	//*************** Model storage to hard drive *****************
 	/*
