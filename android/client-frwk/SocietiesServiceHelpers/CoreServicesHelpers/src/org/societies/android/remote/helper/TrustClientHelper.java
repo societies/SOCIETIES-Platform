@@ -26,8 +26,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 package org.societies.android.remote.helper;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.societies.android.api.common.ADate;
@@ -53,6 +53,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Messenger;
+import android.os.Parcelable;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -839,10 +840,22 @@ public class TrustClientHelper implements ITrustClientHelper {
 							TrustClientHelper.this.methodQueues[classMethods.retrieveTrustRelationships.ordinal()].poll();
 					if (null != retrievedCallback) {
 						// TODO Handle exceptions
-						final TrustRelationshipBean[] trustRelationships = (TrustRelationshipBean[]) 
+						final Set<TrustRelationshipBean> trustRelationships = 
+								new HashSet<TrustRelationshipBean>();
+						final Parcelable[] pTrustRelationships = (Parcelable[]) 
 								intent.getParcelableArrayExtra(ITrustClient.INTENT_RETURN_VALUE_KEY);
+						for (final Parcelable pTrustRelationship : pTrustRelationships) {
+							if (pTrustRelationship instanceof TrustRelationshipBean) {
+								trustRelationships.add((TrustRelationshipBean) pTrustRelationship);
+							} else {
+								retrievedCallback.onException(new TrustClientInvocationException(
+										"Unexpected return value type: " + ((pTrustRelationship != null) 
+												? pTrustRelationship.getClass() : "null")));
+								return;
+							}
+						}
 						retrievedCallback.onRetrievedTrustRelationships(
-								new HashSet<TrustRelationshipBean>(Arrays.asList(trustRelationships)));
+								trustRelationships);
 					} else {
 						Log.e(TAG, "Could not find callback for received action " + intent.getAction());
 					}
@@ -857,9 +870,21 @@ public class TrustClientHelper implements ITrustClientHelper {
 							TrustClientHelper.this.methodQueues[classMethods.retrieveTrustRelationship.ordinal()].poll();
 					if (null != retrievedCallback) {
 						// TODO Handle exceptions
-						final TrustRelationshipBean trustRelationship = (TrustRelationshipBean) 
+						final Parcelable pTrustRelationship = 
 								intent.getParcelableExtra(ITrustClient.INTENT_RETURN_VALUE_KEY);
-						retrievedCallback.onRetrievedTrustRelationship(trustRelationship);
+						if (pTrustRelationship == null) {
+							retrievedCallback.onRetrievedTrustRelationship(
+									null);
+						} else if (pTrustRelationship instanceof TrustRelationshipBean) {
+							retrievedCallback.onRetrievedTrustRelationship(
+									(TrustRelationshipBean) pTrustRelationship);
+						} else {
+							retrievedCallback.onException(new TrustClientInvocationException(
+									"Unexpected return value type: " + ((pTrustRelationship != null) 
+											? pTrustRelationship.getClass() : "null")));
+							return;
+						}
+						
 					} else {
 						Log.e(TAG, "Could not find callback for received action " + intent.getAction());
 					}
