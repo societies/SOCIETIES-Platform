@@ -41,10 +41,13 @@ import org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean;
  */
 public interface IInternalTrustClient extends ITrustClient {
 	
+	/** The extra Intent field containing the result. */
 	public static final String INTENT_RETURN_VALUE_KEY = 
 			ITrustClient.INTENT_RETURN_VALUE_KEY;
-    public static final String INTENT_RETURN_STATUS_KEY = 
-    		ITrustClient.INTENT_RETURN_STATUS_KEY;
+	
+	/** The extra Intent String field containing the exception message. */
+	public static final String INTENT_EXCEPTION_KEY = 
+			ITrustClient.INTENT_EXCEPTION_KEY;
     
     public static final String RETRIEVE_TRUST_RELATIONSHIPS =
     		ITrustClient.RETRIEVE_TRUST_RELATIONSHIPS;
@@ -55,25 +58,28 @@ public interface IInternalTrustClient extends ITrustClient {
     public static final String ADD_DIRECT_TRUST_EVIDENCE = 
     		ITrustClient.ADD_DIRECT_TRUST_EVIDENCE;
 
+    /* N.B. Methods inherited from the {@link ITrustClient} interface must be
+     * declared first and in the same order! */
     String methodsArray [] = {
+    		"startService()",
+    		"stopService()",
     		"retrieveTrustRelationships(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId)",
-    		"retrieveTrustRelationships(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId)",
     		"retrieveTrustRelationships(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId)",
-    		"retrieveTrustRelationships(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId)",
     		"retrieveTrustRelationship(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
-    		"retrieveTrustRelationship(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
     		"retrieveTrustValue(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
-    		"retrieveTrustValue(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
     		"retrieveTrustRelationships(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean trusteeType)",
-    		"retrieveTrustRelationships(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean trusteeType)",
     		"retrieveTrustRelationships(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
-    		"retrieveTrustRelationships(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
     		"retrieveTrustRelationships(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean trusteeType, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
+    		"addDirectTrustEvidence(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean subjectId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean objectId, org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean type, org.societies.android.api.common.ADate timestamp, Serializable info)",
+    		"retrieveTrustRelationships(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId)",
+    		"retrieveTrustRelationships(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId)",
+    		"retrieveTrustRelationship(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
+    		"retrieveTrustValue(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
+    		"retrieveTrustRelationships(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean trusteeType)",
+    		"retrieveTrustRelationships(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
     		"retrieveTrustRelationships(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean trusteeType, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
-            "addDirectTrustEvidence(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean subjectId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean objectId, org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean type, org.societies.android.api.common.ADate timestamp, Serializable info",
-            "addDirectTrustEvidence(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean subjectId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean objectId, org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean type, org.societies.android.api.common.ADate timestamp, Serializable info",
-			"startService()",
-			"stopService()" };
+            "addDirectTrustEvidence(String client, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean subjectId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean objectId, org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean type, org.societies.android.api.common.ADate timestamp, Serializable info)"
+            };
 
     /**
 	 * Retrieves all trust relationships of the specified trustor. The method
@@ -81,7 +87,7 @@ public interface IInternalTrustClient extends ITrustClient {
 	 * established any trust relationships. 
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param trustorId
 	 *            (required) the identifier of the entity whose trust
 	 *            relationships to retrieve.
@@ -98,7 +104,7 @@ public interface IInternalTrustClient extends ITrustClient {
 	 * relationships exist between the identified trustor and trustee.
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param trustorId
 	 *            (required) the identifier of the entity whose trust 
 	 *            relationships to retrieve.
@@ -120,7 +126,7 @@ public interface IInternalTrustClient extends ITrustClient {
 	 * been established with the supplied trustee by the given trustor.
 	 * 
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param trustorId
 	 *            (required) the identifier of the entity whose trust 
 	 *            relationship to retrieve.
@@ -148,7 +154,7 @@ public interface IInternalTrustClient extends ITrustClient {
 	 * trustor.
 	 * 
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param trustorId
 	 *            (required) the identifier of the entity which has assigned 
 	 *            the trust value to retrieve.
@@ -176,7 +182,7 @@ public interface IInternalTrustClient extends ITrustClient {
 	 * supplied criteria.
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param trustorId
 	 *            (required) the identifier of the entity which has established
 	 *            the trust relationships to retrieve.
@@ -202,7 +208,7 @@ public interface IInternalTrustClient extends ITrustClient {
 	 * the supplied criteria.
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param trustorId
 	 *            (required) the identifier of the entity which has established
 	 *            the trust relationships to retrieve.
@@ -230,7 +236,7 @@ public interface IInternalTrustClient extends ITrustClient {
 	 * relationships match the supplied criteria.
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param trustorId
 	 *            (required) the identifier of the entity which has established
 	 *            the trust relationships to retrieve.
@@ -260,7 +266,7 @@ public interface IInternalTrustClient extends ITrustClient {
 	 * evidence type, the method allows specifying supplementary information.
 	 * 
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param subjectId
 	 *            (required) the {@link ATrustedEntityId} of the subject the
 	 *            piece of evidence refers to.

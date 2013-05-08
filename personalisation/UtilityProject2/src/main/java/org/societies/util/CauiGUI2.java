@@ -1,0 +1,385 @@
+package org.societies.util;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxHistoryAttribute;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.util.SerialisationHelper;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.personalisation.model.Action;
+import org.societies.api.personalisation.model.IAction;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.useragent.monitoring.IUserActionMonitor;
+import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
+import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
+
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+// org.societies.personalisation.CAUI.api.model.UserIntentModelData;
+import org.societies.personalisation.CAUI.api.model.*;
+
+public class CauiGUI2  extends JFrame  implements ActionListener {
+
+	private ICtxBroker ctxBroker;
+	private ICommManager commManager;
+	private IIdentityManager idMgr;
+	private IIdentity userIdentity;
+	public static ICAUIPrediction cauiPrediction;
+	private ICAUIDiscovery cauiDiscovery;
+
+	public static IUserActionMonitor uam;
+
+
+	private final static String newline = "\n";
+
+	private IndividualCtxEntity entityPerson;
+
+	String history = "";
+
+	JTextArea textAreaHistory;
+	JTextArea textAreaUIModel;
+
+	public CauiGUI2() {
+		//JFrame f = new JFrame();
+
+		getContentPane().setLayout(null);
+
+		//history
+		JPanel panelHistory = new JPanel();
+		panelHistory.setBounds(10, 11, 560, 152);
+
+		panelHistory.setLayout(null);
+
+		textAreaHistory = new JTextArea();
+		textAreaHistory.setEditable(false); 
+
+		JScrollPane scrolltextAreaHistory = new JScrollPane(textAreaHistory);
+		scrolltextAreaHistory.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrolltextAreaHistory.setBounds(10, 11, 446, 141);
+		panelHistory.add(scrolltextAreaHistory);
+
+		//button
+		JButton btnRetrieveHistory = new JButton("history");
+		btnRetrieveHistory.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("retrieve history pressed");
+				Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> results = retrieveHistoryTupleData();
+				String data = printHistory(results);
+				textAreaHistory.setText("");
+				textAreaHistory.append(data+newline);
+
+			}
+		});
+		btnRetrieveHistory.setBounds(485, 33, 65, 23);
+		panelHistory.add(btnRetrieveHistory);
+		getContentPane().add(panelHistory);
+
+
+
+		// ui model		
+		JPanel panelModel = new JPanel();
+		panelModel.setBounds(10, 164, 560, 167);
+		getContentPane().add(panelModel);
+		panelModel.setLayout(null);
+
+		textAreaUIModel = new JTextArea();
+		//textAreaUIModel.setBounds(10, 11, 434, 145);
+		//panelModel.add(textAreaUIModel);
+
+		JScrollPane scrolltextAreaUIModel = new JScrollPane(textAreaUIModel);
+		scrolltextAreaUIModel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrolltextAreaUIModel.setBounds(10, 11, 434, 145);
+		panelModel.add(scrolltextAreaUIModel);
+
+
+
+
+		JButton btnNewButton = new JButton("Display model");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Prediction model button clicked");
+
+				List<CtxIdentifier> ls;
+
+				try {
+					ls = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CAUI_MODEL).get();
+					if(ls.size()>0){
+						CtxAttribute uiModelAttr = (CtxAttribute) ctxBroker.retrieve(ls.get(0)).get();
+						UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
+						textAreaUIModel.setText("");
+						textAreaUIModel.append(printModel(newUIModelData.getActionModel()));
+					}
+
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ExecutionException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (CtxException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				} catch (ClassNotFoundException e3) {
+					// TODO Auto-generated catch block
+					e3.printStackTrace();
+				}
+
+			}
+		});
+		btnNewButton.setBounds(454, 34, 96, 23);
+		panelModel.add(btnNewButton);
+
+		JButton btnLearnModel = new JButton("Learn model");
+		btnLearnModel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+				cauiDiscovery.generateNewUserModel();
+			
+			}
+		});
+		btnLearnModel.setBounds(454, 68, 89, 23);
+		panelModel.add(btnLearnModel);
+
+
+		// monitor action
+		JPanel panel_2 = new JPanel();
+		panel_2.setBounds(10, 342, 414, 32);
+		getContentPane().add(panel_2);
+		panel_2.setLayout(null);
+
+		textField = new JTextField();
+		textField.setBounds(0, 11, 86, 20);
+		panel_2.add(textField);
+		textField.setColumns(10);
+
+		textField_1 = new JTextField();
+		textField_1.setBounds(114, 11, 86, 20);
+		panel_2.add(textField_1);
+		textField_1.setColumns(10);
+
+		JButton btnPerformAction = new JButton("monitor action");
+		btnPerformAction.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("monitor action button clicked");
+				ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
+				try {
+					serviceId1.setIdentifier(new URI("css://nikosk@societies.org/mockedService"));
+					IAction action1 = new Action(serviceId1, "serviceType", textField.getText(), textField_1.getText());
+					IIdentity cssOwnerId = getOwnerId();
+					uam.monitor(cssOwnerId, action1);
+
+				} catch (URISyntaxException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnPerformAction.setBounds(231, 10, 120, 23);
+		panel_2.add(btnPerformAction);
+
+		setDefaultCloseOperation( JFrame.DO_NOTHING_ON_CLOSE );
+
+		//setContentPane( panel );
+		//pack();
+		setVisible( true );
+	}
+
+	static CauiGUI2 cauiGUI2;
+	private JTextField textField;
+	private JTextField textField_1;
+
+
+
+
+	public void setHistoryData(){
+
+	}
+
+
+	public static void main( String args[] ) 
+	{
+		try 
+		{
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		}
+		catch ( ClassNotFoundException e ) 
+		{
+		}
+		catch ( InstantiationException e ) 
+		{
+		}
+		catch ( IllegalAccessException e ) 
+		{
+		}
+		catch ( UnsupportedLookAndFeelException e ) 
+		{
+		}
+		cauiGUI2 = new CauiGUI2();
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+
+	} 
+
+
+	/**
+	 * @return the ctxBroker
+	 */
+	public ICtxBroker getCtxBroker() {
+		return ctxBroker;
+	}
+
+	/**
+	 * @param ctxBroker the ctxBroker to set
+	 */
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		this.ctxBroker = ctxBroker;
+	}
+
+	/**
+	 * @return the commManager
+	 */
+	public ICommManager getCommManager() {
+		return commManager;
+	}
+
+	/**
+	 * @param commManager the commManager to set
+	 */
+	public void setCommManager(ICommManager commManager) {
+		this.commManager = commManager;
+		this.idMgr = this.commManager.getIdManager();
+		this.userIdentity = this.idMgr.getThisNetworkNode();
+	} 
+
+	public void setCauiPrediction(ICAUIPrediction cauiPrediction){
+		this.cauiPrediction = cauiPrediction;
+	}
+
+
+	public void setUam(IUserActionMonitor uam){
+		this.uam = uam;
+	}
+
+	public ICAUIDiscovery getCauiDiscovery() {
+
+		return cauiDiscovery;
+	}
+
+
+	public void setCauiDiscovery(ICAUIDiscovery cauiDiscovery) {
+
+		this.cauiDiscovery = cauiDiscovery;
+	}
+
+	public Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> retrieveHistoryTupleData(){
+
+		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> results = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
+		List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
+		try {
+			results = ctxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, listOfEscortingAttributeIds, null, null).get();
+
+		}catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return results;
+	}
+
+
+	public String printModel(HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> model){
+
+		String data ="";
+		for(IUserIntentAction action: model.keySet()){
+			String line =  action.getparameterName()+" "+ action.getvalue()+ "->"+ model.get(action).toString()+newline;
+			data = data + line;
+		}
+
+
+		return data;
+	}
+
+	public String printHistory(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData){
+
+		String data =""; 
+		int i = 0;
+		for(CtxHistoryAttribute ctxHocAttr :mapHocData.keySet()){
+
+			try {
+				Date time = ctxHocAttr.getLastUpdated();
+				IAction action = (IAction)SerialisationHelper.deserialise(ctxHocAttr.getBinaryValue(), this.getClass().getClassLoader());
+				List<CtxHistoryAttribute> escortingAttrList = mapHocData.get(ctxHocAttr);
+				//		System.out.println(i+" primary Attr: {"+action.getparameterName() +" "+action.getvalue()+"} escorting: {" +escortingAttrList.get(0).getStringValue()+" "+escortingAttrList.get(1).getStringValue()+" "+escortingAttrList.get(2).getStringValue()+"}");
+				System.out.println(i+" primary Attr: {"+action.getparameterName() +" "+action.getvalue()+"} escorting: { ctx1, ctx2, ctx3 }");
+				i++;
+				data = data + time+" "+action.getparameterName()+" "+action.getvalue()+" ctx1,ctx2 "+newline;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return data;
+	}
+
+	private IIdentity getOwnerId(){
+
+		IIdentity cssOwnerId = null;
+		try {
+			final INetworkNode cssNodeId = commManager.getIdManager().getThisNetworkNode();
+			//LOG.info("*** cssNodeId = " + cssNodeId);
+			final String cssOwnerStr = cssNodeId.getBareJid();
+			cssOwnerId = commManager.getIdManager().fromJid(cssOwnerStr);
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return cssOwnerId;
+	}
+}

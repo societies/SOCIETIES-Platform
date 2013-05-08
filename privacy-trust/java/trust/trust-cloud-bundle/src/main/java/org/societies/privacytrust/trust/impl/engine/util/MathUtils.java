@@ -25,7 +25,6 @@
 package org.societies.privacytrust.trust.impl.engine.util;
 
 import org.apache.commons.math.stat.StatUtils;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,27 +45,11 @@ public class MathUtils {
 	
 		if (LOG.isDebugEnabled())
 			LOG.debug("sample=" + Arrays.toString(sample));
-		final DescriptiveStatistics stats = new DescriptiveStatistics();
 		
-		// Add the data from the series to stats
-		for (int i = 0; i < sample.length; i++) {
-			stats.addValue(sample[i]);
-		}
-		
-		// Compute mean and standard deviation
-		final double mean = stats.getMean();
-		final double standardDeviation = stats.getStandardDeviation();
-		
-		// initialize the standardizedSample, which has the same length as the sample
-		double[] normalisedSample = new double[sample.length];
-		
-		for (int i = 0; i < sample.length; i++) {
-			// z = (x- mean)/standardDeviation
-			if (standardDeviation != 0.0d)
-				normalisedSample[i] = (sample[i] - mean) / standardDeviation;
-			else
+		final double[] normalisedSample = StatUtils.normalize(sample);
+		for (int i = 0; i < normalisedSample.length; ++i)
+			if (Double.isNaN(normalisedSample[i]))
 				normalisedSample[i] = 0.0d;
-		}
 		
 		if (LOG.isDebugEnabled())
 			LOG.debug("normalisedSample=" + Arrays.toString(normalisedSample));

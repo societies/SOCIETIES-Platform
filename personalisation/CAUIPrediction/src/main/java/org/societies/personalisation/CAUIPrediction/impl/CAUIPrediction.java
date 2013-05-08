@@ -77,9 +77,9 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	private static final Logger LOG = LoggerFactory.getLogger(CAUIPrediction.class);
 	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage"); 
-    // to define a dedicated Logger
-    IPerformanceMessage m; 
-    IPerformanceMessage m2;
+	// to define a dedicated Logger
+	IPerformanceMessage m; 
+	IPerformanceMessage m2;
 
 	private ICtxBroker ctxBroker;
 	private IInternalPersonalisationManager persoMgr;
@@ -94,7 +94,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 	private List<IUserIntentAction> lastPredictedActions = new ArrayList<IUserIntentAction>();
 
 	int predictionRequestsCounter = 0;
-	int discoveryThreshold = 19;
+	int discoveryThreshold = 8;
 	boolean modelExist = false;
 
 	private IIdentity cssOwnerId;
@@ -188,11 +188,11 @@ public class CAUIPrediction implements ICAUIPrediction{
 			IAction action) {
 
 		long startTime = System.currentTimeMillis();
-		
+
 		predictionRequestsCounter = predictionRequestsCounter +1;
 		this.recordMonitoredAction(action);
 
-		
+
 		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
 		if(cauiDiscovery != null){
 			LOG.info("  Model Discovery Counter:" +predictionRequestsCounter);
@@ -206,8 +206,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 		}
 
 		if(modelExist == true && enablePrediction == true){
-			
-			
+
+
 			//LOG.info("1. model exists " +modelExist);
 			//LOG.info("START PREDICTION caui modelExist "+modelExist);
 			//UIModelBroker setModel = new UIModelBroker(ctxBroker,cauiTaskManager);	
@@ -217,7 +217,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 			//LOG.info("2. action perf par:"+ par+" action val:"+val);
 			//add code here for retrieving current context;
 
-			
+
 
 			// identify performed action in model
 			List<IUserIntentAction> actionsList = cauiTaskManager.retrieveActionsByTypeValue(par, val);
@@ -239,7 +239,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 					for(IUserIntentAction nextAction : nextActionsMap.keySet()){
 						Double doubleConf = nextActionsMap.get(nextAction);
 						//doubleConf = doubleConf*100;
-						doubleConf = 50.0;
+						doubleConf = 70.0;
 						nextAction.setConfidenceLevel(doubleConf.intValue());
 						//LOG.info("6. nextActionsMap " +nextAction);
 						results.add(nextAction);
@@ -257,10 +257,10 @@ public class CAUIPrediction implements ICAUIPrediction{
 			for(IUserIntentAction predAction : results){
 				this.recordPrediction(predAction);		
 			}
-		
+
 			long endTime = System.currentTimeMillis();
 			this.predictionPerformanceLog(endTime-startTime);
-			
+
 		}
 
 		LOG.info("getPrediction based on action: "+ action+" identity requestor:"+requestor+" results:"+results);
@@ -270,13 +270,13 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	@Override
 	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor, CtxAttribute contextAttribute) {
-		
+
 		LOG.debug("getPrediction based on attr update  contextAttribute"+ contextAttribute.getId().toString()+" identity requestor"+requestor);
 		LOG.debug("attr string value "+contextAttribute.getStringValue() );
 		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
 
 		long startTime = System.currentTimeMillis();
-		
+
 		CtxAttribute currentLocation = null;
 		CtxAttribute currentStatus = null; 
 		retrieveOperatorsCtx(CtxAttributeTypes.STATUS);
@@ -310,7 +310,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		if(cauiTaskManager.retrieveActionsByContext(situationContext) != null ) {
 			results = cauiTaskManager.retrieveActionsByContext(situationContext);
-			
+
 			// prediction performance log
 			long endTime = System.currentTimeMillis();
 			this.predictionPerformanceLog(endTime-startTime);
@@ -318,7 +318,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 				int confLevel = action.getConfidenceLevel();
 				this.predictionConfLevelPerformanceLog(confLevel);	
 			}
-			
+
 		}
 
 		LOG.info("action prediction based on ctx update :"+ results);		
@@ -391,7 +391,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		//	LOG.info("getCurrentIntentAction based on identity and serviceID:"+ serviceID.getServiceInstanceIdentifier() +" identity requestor:"+ownerID+" userActionType:"+userActionType);
 		long startTime = System.currentTimeMillis();
-		
+
 		IUserIntentAction predictedAction = null;
 		if(modelExist == true && enablePrediction == true){
 			//LOG.info("serviceID.getIdentifier().toString() "+serviceID.getIdentifier().toString() );
@@ -400,7 +400,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 			// compare current context and choose proper action
 			if(actionList.size()>0) {
 				predictedAction = findBestMatchingAction(actionList);
-			
+
 			}
 
 		} else {
@@ -409,11 +409,11 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		if(predictedAction != null)	{
 			long endTime = System.currentTimeMillis();
-			
+
 			this.predictionPerformanceLog(endTime - startTime);
 			this.predictionConfLevelPerformanceLog(predictedAction.getConfidenceLevel());
 			this.recordPrediction(predictedAction);		
-		
+
 		}
 		//LOG.info("getCurrentIntentAction based on serviceID and actionType : "+predictedAction );
 		return new AsyncResult<IUserIntentAction>(predictedAction);
@@ -451,6 +451,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 	 * Identify best matching action according to operator's current context and predicted actions context
 	 *	 
 	 */	
+
+
 	private IUserIntentAction findBestMatchingAction(List<IUserIntentAction> actionList){
 		IUserIntentAction bestAction = null;
 
@@ -463,36 +465,45 @@ public class CAUIPrediction implements ICAUIPrediction{
 		for(IUserIntentAction action : actionList ){
 
 			HashMap<String,Serializable> actionCtx = action.getActionContext();
+			int actionMatchScore = 0;
 
-			int actionMatchScore = 0;			
+			if( actionCtx != null ){
 
-			for(String ctxType : actionCtx.keySet()){
-				Serializable ctxValue = actionCtx.get(ctxType);
-				if( ctxValue != null){
-					if(ctxType.equals(CtxAttributeTypes.LOCATION_SYMBOLIC)&& ctxValue instanceof String){
-						String actionLocation = (String) ctxValue;
-						//	LOG.info("String context location value :"+ actionLocation);
-						if(currentLocation != null){
-							if(currentLocation.getStringValue() != null && currentLocation.getStringValue().equals(actionLocation)) actionMatchScore = actionMatchScore +1;	
-						}					
+				actionMatchScore = 0;			
 
-					}
-					/*else if(ctxType.equals(CtxAttributeTypes.TEMPERATURE) && ctxValue instanceof Integer ){
+				for(String ctxType : actionCtx.keySet()){
+					Serializable ctxValue = actionCtx.get(ctxType);
+					if( ctxValue != null){
+						if(ctxType.equals(CtxAttributeTypes.LOCATION_SYMBOLIC)&& ctxValue instanceof String){
+							String actionLocation = (String) ctxValue;
+							//	LOG.info("String context location value :"+ actionLocation);
+							if(currentLocation != null){
+								if(currentLocation.getStringValue() != null){
+
+									if(currentLocation.getStringValue().equals(actionLocation)) actionMatchScore = actionMatchScore +1;	
+								}
+							}					
+
+						}
+						/*else if(ctxType.equals(CtxAttributeTypes.TEMPERATURE) && ctxValue instanceof Integer ){
 					Integer actionTemperature= (Integer) ctxValue;
 					LOG.info("Integer context temperature value :"+ actionTemperature);
 					if(currentTemp.getIntegerValue().equals(actionTemperature)) actionMatchScore = actionMatchScore +1;
 					}*/
-					else if(ctxType.equals(CtxAttributeTypes.STATUS) && ctxValue instanceof String ){
-						String actionStatus = (String) ctxValue;
-						//LOG.info("String context status value :"+ actionStatus);
-						if(currentStatus != null ){
-							if(currentStatus.getStringValue() != null && currentStatus.getStringValue().equals(actionStatus)) actionMatchScore = actionMatchScore +1;	
+						else if(ctxType.equals(CtxAttributeTypes.STATUS) && ctxValue instanceof String ){
+							String actionStatus = (String) ctxValue;
+							//LOG.info("String context status value :"+ actionStatus);
+							if(currentStatus != null ){
+								if(currentStatus.getStringValue() != null){
+									if( currentStatus.getStringValue().equals(actionStatus)) actionMatchScore = actionMatchScore +1;	
+								}
+							}
+						} else {
+							LOG.debug("findBestMatchingAction: context type:"+ctxType +" does not match");
 						}
+					} 
+				}
 
-					} else {
-						LOG.debug("findBestMatchingAction: context type:"+ctxType +" does not match");
-					}
-				}	
 				actionsScoreMap.put(action, actionMatchScore);
 				//System.out.println("actionsScoreMap  " +actionsScoreMap);
 			}
@@ -500,14 +511,14 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		int maxValueInMap=(Collections.max(actionsScoreMap.values()));  // This will return max value in the Hashmap
 		for(IUserIntentAction action  : actionsScoreMap.keySet()){
+
 			if(actionsScoreMap.get(action).equals(maxValueInMap)) bestAction = action;
 		}
 
-		LOG.debug("best action "+bestAction);
+		//LOG.info("best action "+bestAction);
 
 		return bestAction;
 	}
-
 
 
 	@Override
@@ -730,26 +741,26 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	void predictionPerformanceLog(long delay){
 		m = new PerformanceMessage();
-	    m.setSourceComponent(this.getClass()+"");
-	    m.setD82TestTableName("S67");
-	    m.setTestContext("Personalisation.CAUIUserIntent.IntentPrediction.Delay");
-	    m.setOperationType("IntentPredictionFromIntentModel");//?
-	    m.setPerformanceType(IPerformanceMessage.Delay);
-        
+		m.setSourceComponent(this.getClass()+"");
+		m.setD82TestTableName("S67");
+		m.setTestContext("Personalisation.CAUIUserIntent.IntentPrediction.Delay");
+		m.setOperationType("IntentPredictionFromIntentModel");//?
+		m.setPerformanceType(IPerformanceMessage.Delay);
+
 		m.setPerformanceNameValue("Delay=" + delay); 
-        PERF_LOG.trace(m.toString());
+		PERF_LOG.trace(m.toString());
 	}
-	
+
 	void predictionConfLevelPerformanceLog(int confLevel){
 		m2 = new PerformanceMessage();
-	    m2.setSourceComponent(this.getClass()+"");
-	    m2.setD82TestTableName("S24");
-	    m2.setTestContext("Personalisation.CAUIUserIntent.IntentPrediction.ConfidenceLevel");
-	    m2.setOperationType("IntentPredictionFromIntentModel");//?
-	    m2.setPerformanceType(IPerformanceMessage.Accuracy);
-        
+		m2.setSourceComponent(this.getClass()+"");
+		m2.setD82TestTableName("S24");
+		m2.setTestContext("Personalisation.CAUIUserIntent.IntentPrediction.ConfidenceLevel");
+		m2.setOperationType("IntentPredictionFromIntentModel");//?
+		m2.setPerformanceType(IPerformanceMessage.Accuracy);
+
 		m2.setPerformanceNameValue("Confidence Level=" + confLevel); 
-        PERF_LOG.trace(m2.toString());
+		PERF_LOG.trace(m2.toString());
 	}
-	
+
 }

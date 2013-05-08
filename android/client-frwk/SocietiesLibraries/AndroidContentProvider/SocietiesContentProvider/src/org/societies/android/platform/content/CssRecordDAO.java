@@ -47,7 +47,7 @@ import android.util.Log;
  */
 public class CssRecordDAO {
 	private static final String LOG_TAG = CssRecordDAO.class.getName();
-	private static boolean DEBUG_FLAG = true;
+	private static boolean DEBUG_FLAG = false;
 	
 	public final static String SOCIETIES_DATABASE_NAME = "SocietiesAndroidClient";
 	public final static int SOCIETIES_DATABASE_VERSION = 1;
