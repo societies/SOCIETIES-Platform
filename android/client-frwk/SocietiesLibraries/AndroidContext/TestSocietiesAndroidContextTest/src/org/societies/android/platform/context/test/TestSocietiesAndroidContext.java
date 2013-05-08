@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.societies.api.schema.context.model.CtxAssociationBean;
 import org.societies.api.schema.context.model.CtxAttributeBean;
+import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
 import org.societies.api.schema.context.model.CtxEntityBean;
 import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
 import org.societies.api.schema.context.model.CtxModelObjectBean;
@@ -137,7 +138,7 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 			else if (intent.getAction().equals(ICtxClient.CREATE_ATTRIBUTE)) {
 				Log.d(LOG_TAG, "Created Context Attribute");
 				attribute = intent.getParcelableExtra(ICtxClient.INTENT_RETURN_VALUE_KEY);
-				Log.d(LOG_TAG, "Attribute created: " + attribute);
+				Log.d(LOG_TAG, "Attribute created: " + attribute + " with binVal: " + attribute.getBinaryValue().toString() + " intVal: " + attribute.getIntegerValue().toString() + " and doubleVal: " + attribute.getDoubleValue().toString());
 				assertNotNull(attribute);
 			}
 			else if (intent.getAction().equals(ICtxClient.CREATE_ASSOCIATION)) {
@@ -150,6 +151,8 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 				Log.d(LOG_TAG, "Retrieved ");
 				retrievedModelObject = intent.getParcelableExtra(ICtxClient.INTENT_RETURN_VALUE_KEY);
 				Log.d(LOG_TAG, "Retrieved Model Object: " + retrievedModelObject.getId().getString());
+				attribute = (CtxAttributeBean) retrievedModelObject;
+				Log.d(LOG_TAG, "binaryValue: " + attribute.getBinaryValue() + " intValue: " + attribute.getIntegerValue() + " and doubleValue: " + attribute.getDoubleValue());
 				assertNotNull(retrievedModelObject);
 			}
 			else if (intent.getAction().equals(ICtxClient.RETRIEVE_INDIVIDUAL_ENTITY_ID)) {
@@ -303,13 +306,33 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 
 		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
 		this.testDoneSignal = new CountDownLatch(1);
+
+		try {
+			
+//			CtxEntityIdentifierBean entityId = (CtxEntityIdentifierBean) entity.getId();
+			Log.d(LOG_TAG, "entityId used to Create Attribute: " + entity);
+			Log.d(LOG_TAG, "entityId.getString: " + entity.getId().getString());
+			CtxEntityIdentifierBean entityId = new CtxEntityIdentifierBean();
+			entityId.setString(entity.getId().getString());
+			this.ctxBrokerService.createAttribute(CLIENT_ID, requestor, entityId, "androidAttribute3");
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to create attribute: " + e.getLocalizedMessage());
+		}
+		
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
+		this.testDoneSignal = new CountDownLatch(1);
 		try {
 			Log.d(LOG_TAG, "entity used to retrieve: " + entity);
 			Log.d(LOG_TAG, "entity.getString: " + entity.getId().getString());
-			CtxEntityIdentifierBean entityId = new CtxEntityIdentifierBean();
-			entityId.setString(entity.getId().getString());
+//			CtxEntityIdentifierBean entityId = new CtxEntityIdentifierBean();
+//			entityId.setString(entity.getId().getString());
 
-			this.ctxBrokerService.retrieve(CLIENT_ID, requestor, entityId);
+//			this.ctxBrokerService.retrieve(CLIENT_ID, requestor, entityId);
+
+			CtxAttributeIdentifierBean attrId = new CtxAttributeIdentifierBean();
+			attrId.setString(attribute.getId().getString());
+			
+			this.ctxBrokerService.retrieve(CLIENT_ID, requestor, attrId);
 		} 		catch (Exception e) {
 			Log.e(LOG_TAG, "Failed to retrieve: " + e.getLocalizedMessage());
 		}

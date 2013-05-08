@@ -51,6 +51,8 @@ import org.societies.api.schema.context.model.IndividualCtxEntityBean;
 
 public final class CtxModelBeanTranslator {
 
+	protected byte[] binaryValue;
+	
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CtxModelBeanTranslator.class);
 
@@ -335,7 +337,11 @@ public final class CtxModelBeanTranslator {
 	public CtxAttributeBean fromCtxAttribute(CtxAttribute attr) {
 
 		CtxAttributeBean bean = new CtxAttributeBean();
-		bean.setBinaryValue(attr.getBinaryValue());
+		byte[] minBinaryValue = new byte[] {Byte.MIN_VALUE};
+		if (attr.getBinaryValue() == null)
+			bean.setBinaryValue(minBinaryValue);
+		else
+			bean.setBinaryValue(attr.getBinaryValue());
 		bean.setDoubleValue(attr.getDoubleValue());
 		bean.setHistoryRecorded(attr.isHistoryRecorded());
 		bean.setId(fromCtxIdentifier(attr.getId()));
@@ -361,11 +367,22 @@ public final class CtxModelBeanTranslator {
 		if (bean.getStringValue() != null)
 			object.setValue(bean.getStringValue());
 		else if (bean.getIntegerValue() != null)
-			object.setValue(bean.getIntegerValue());
+			if (bean.getIntegerValue() == -1)
+				object.setValue(null);
+			else
+				object.setValue(bean.getIntegerValue());
 		else if (bean.getDoubleValue() != null)
-			object.setValue(bean.getDoubleValue());
-		else if (bean.getBinaryValue() != null)
-			object.setValue(bean.getBinaryValue());
+			if (bean.getDoubleValue() == -1.0)
+				object.setValue(null);
+			else
+				object.setValue(bean.getDoubleValue());
+		else if (bean.getBinaryValue() != null) {
+			byte[] minBinaryValue = new byte[] {Byte.MIN_VALUE};
+			if (bean.getBinaryValue() == minBinaryValue)
+				object.setValue(binaryValue);
+			else
+				object.setValue(bean.getBinaryValue());
+		}
 		// Handle value meta-data
 		object.setValueType(fromCtxAttributeValueTypeBean(bean.getValueType()));
 		object.setValueMetric(bean.getValueMetric());
