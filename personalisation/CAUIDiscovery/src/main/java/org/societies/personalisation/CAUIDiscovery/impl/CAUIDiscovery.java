@@ -58,7 +58,7 @@ import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 
 // remove after testing
-//import org.societies.personalisation.CAUITaskManager.impl.CAUITaskManager;
+import org.societies.personalisation.CAUITaskManager.impl.CAUITaskManager;
 
 
 
@@ -84,7 +84,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	public CAUIDiscovery(){
 		//actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
 		//remove after testing
-	//	cauiTaskManager = new CAUITaskManager();
+		cauiTaskManager = new CAUITaskManager();
 	}
 	
 	public ICAUITaskManager getCauiTaskManager() {

@@ -34,6 +34,7 @@ import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
+import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 import org.societies.personalisation.CAUIDiscovery.impl.CAUIDiscovery;
@@ -51,16 +52,18 @@ public class CAUIDiscoveryLearningTest {
 	private CtxEntity operator = null;
 	CAUIDiscovery discover = null;
 	PredictorTest predictor = null;
+	UserIntentModelData modelData = null;
+	
 	
 	Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 
 	IAction action1 = null;
-	
+
 	CAUIDiscoveryLearningTest(){
 		discover = new  CAUIDiscovery();
 		operator = createOperator();
 		predictor =  new PredictorTest();
-		predictor.setTaskModelManager();
+
 	}
 
 	private void  startTesting(){
@@ -102,39 +105,63 @@ public class CAUIDiscoveryLearningTest {
 
 			System.out.println("6. Generate UserIntentModelData");
 			ConstructUIModel cmodel = new ConstructUIModel(discover.getCauiTaskManager(),null); 
-			UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap);
+			modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap);
+
+
 
 			System.out.println("*********** model created *******"+ modelData.getActionModel());
 			for( IUserIntentAction userAction  : modelData.getActionModel().keySet()){
-					System.out.println(userAction);
-					//System.out.println(userAction.getActionContext());
+				System.out.println(userAction);
+				//System.out.println(userAction.getActionContext());
 			}
-		
-		
-			
+
+
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
 
-		
-		
 		// model discovered
-	
-	
 		// start predictions
-		startPredictions();
-	
-	}
-	
-	private void startPredictions(){
-		
-			//List<IUserIntentAction> predictedAction  = predictor.getPrediction(null, action1).get();
-			
-			//System.out.println("predictedAction "+predictedAction);
+		startPredictions(modelData);
+
 	}
 
-	
+
+
+	private void startPredictions(UserIntentModelData model){
+
+
+		ICAUITaskManager taskManager = discover.getCauiTaskManager();
+		taskManager.updateModel(model);
+		predictor.setTaskModelManager(taskManager);
+				
+		System.out.println(" start predictions for action1 "+action1 );
+
+		try {
+			predictor.setOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC, "home");
+			List<IUserIntentAction> predictedAction  = predictor.getPrediction(null, action1).get();
+			System.out.println(" predictedAction1 "+predictedAction );
+
+
+			predictor.setOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC, "park");
+			List<IUserIntentAction> predictedAction2  = predictor.getPrediction(null, action1).get();
+			System.out.println(" predictedAction2 "+predictedAction2 );
+
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		//System.out.println("predictedAction "+predictedAction);
+	}
+
+
 	private CtxAttributeValueType findAttributeValueType(Serializable value) {
 		if (value == null)
 			return CtxAttributeValueType.EMPTY;
@@ -186,27 +213,36 @@ public class CAUIDiscoveryLearningTest {
 		//System.out.println ("action service ID "+actionY.getServiceID().getServiceInstanceIdentifier());
 		for (int i=0; i<4; i++){
 
+			//monitorAction(action1,"home","free",10);
 			monitorAction(action1,"home","free",10);
-			monitorAction(action1,"country","free",10);
-			monitorAction(action2,"office","busy",15);
-			monitorAction(action3,"park","away",25);
+			monitorAction(action2,"home","busy",15);
+			monitorAction(action3,"home","away",25);
+			
 			monitorAction(actionX,"park","away",25);
 			monitorAction(actionY,"park","away",25);
 			monitorAction(action4,"park","away",25);
 			monitorAction(action5,"park","away",25);
 			monitorAction(actionY,"park","away",25);
 			monitorAction(actionX,"park","away",25);
-			monitorAction(action1,"home","free",10);
-			monitorAction(action2,"office","busy",15);
-			monitorAction(action3,"zoo","away",25);
+			
+			monitorAction(action1,"office","free",10);
+			monitorAction(action3,"office","busy",15);
+			monitorAction(action2,"office","away",25);
+			
 			monitorAction(actionY,"park","away",25);
 			monitorAction(actionY,"park","away",25);
 			monitorAction(action1,"home","free",10);
-			monitorAction(action2,"office","busy",15);
-			monitorAction(action3,"park","away",25);
+			monitorAction(action2,"home","busy",15);
+			monitorAction(action3,"home","away",25);
+			
 			monitorAction(actionX,"park","away",25);
 			monitorAction(action4,"park","away",25);
 			monitorAction(action5,"park","away",25);
+			
+			monitorAction(action1,"office","free",10);
+			monitorAction(action3,"office","busy",15);
+			monitorAction(action2,"office","away",25);
+			
 		}
 	}
 
@@ -310,52 +346,6 @@ public class CAUIDiscoveryLearningTest {
 			System.out.println("Action:"+actions+ "# "+occurences+" | context: "+dicObj.toString());
 		}
 	}
-
-	// dead code
-
-	/*
-	public List<MockHistoryData> createMockHistorySet(){
-		List<MockHistoryData>  data = new ArrayList<MockHistoryData>();
-		//MockHistoryData(String action, String parameterName, Map<String,String> context){
-		Map<String,String> context = new HashMap<String,String>();
-		context.put("temperature","hot");
-		context.put("SymLoc","free");
-		Date date = new Date();
-		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
-		try {
-			serviceId1.setIdentifier(new URI("http://testService1"));
-
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-
-		data.add(new MockHistoryData("volume","mute",context,date,serviceId1.getServiceInstanceIdentifier()));
-		data.add(new MockHistoryData("paramA","valueA",context,date,serviceId1.getServiceInstanceIdentifier()));
-		data.add(new MockHistoryData("paramB","valueB",context,date,serviceId1.getServiceInstanceIdentifier()));
-		data.add(new MockHistoryData("paramC","valueC",context,date,serviceId1.getServiceInstanceIdentifier()));
-		data.add(new MockHistoryData("paramX","valueX",context,date,serviceId1.getServiceInstanceIdentifier()));
-		data.add(new MockHistoryData("paramY","valueY",context,date,serviceId1.getServiceInstanceIdentifier()));
-		data.add(new MockHistoryData("paramA","valueA",context,date,serviceId1.getServiceInstanceIdentifier()));
-		data.add(new MockHistoryData("paramB","valueB",context,date,serviceId1.getServiceInstanceIdentifier()));
-		data.add(new MockHistoryData("paramC","valueC",context,date,serviceId1.getServiceInstanceIdentifier()));
-		data.add(new MockHistoryData("paramO","valueO",context,date,serviceId1.getServiceInstanceIdentifier()));
-		data.add(new MockHistoryData("paramP","valueP",context,date,serviceId1.getServiceInstanceIdentifier()));
-		data.add(new MockHistoryData("paramA","valueA",context,date,serviceId1.getServiceInstanceIdentifier()));
-		data.add(new MockHistoryData("paramB","valueB",context,date,serviceId1.getServiceInstanceIdentifier()));
-		data.add(new MockHistoryData("paramC","valueC",context,date,serviceId1.getServiceInstanceIdentifier()));
-		data.add(new MockHistoryData("paramL","valueL",context,date,serviceId1.getServiceInstanceIdentifier()));
-		data.add(new MockHistoryData("paramA","valueA",context,date,serviceId1.getServiceInstanceIdentifier()));
-		data.add(new MockHistoryData("paramB","valueB",context,date,serviceId1.getServiceInstanceIdentifier()));
-		data.add(new MockHistoryData("paramC","valueC",context,date,serviceId1.getServiceInstanceIdentifier()));
-
-		List<MockHistoryData> newSet = new ArrayList<MockHistoryData>();
-
-		for(int i=0; i<1; i++){
-			newSet.addAll(data);
-		}
-		return newSet;
-	}
-	 */
 
 
 
