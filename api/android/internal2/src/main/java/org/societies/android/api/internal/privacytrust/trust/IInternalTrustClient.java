@@ -41,10 +41,13 @@ import org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean;
  */
 public interface IInternalTrustClient extends ITrustClient {
 	
+	/** The extra Intent field containing the result. */
 	public static final String INTENT_RETURN_VALUE_KEY = 
 			ITrustClient.INTENT_RETURN_VALUE_KEY;
-    public static final String INTENT_RETURN_STATUS_KEY = 
-    		ITrustClient.INTENT_RETURN_STATUS_KEY;
+	
+	/** The extra Intent String field containing the exception message. */
+	public static final String INTENT_EXCEPTION_KEY = 
+			ITrustClient.INTENT_EXCEPTION_KEY;
     
     public static final String RETRIEVE_TRUST_RELATIONSHIPS =
     		ITrustClient.RETRIEVE_TRUST_RELATIONSHIPS;
@@ -84,7 +87,7 @@ public interface IInternalTrustClient extends ITrustClient {
 	 * established any trust relationships. 
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param trustorId
 	 *            (required) the identifier of the entity whose trust
 	 *            relationships to retrieve.
@@ -101,7 +104,7 @@ public interface IInternalTrustClient extends ITrustClient {
 	 * relationships exist between the identified trustor and trustee.
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param trustorId
 	 *            (required) the identifier of the entity whose trust 
 	 *            relationships to retrieve.
@@ -123,7 +126,7 @@ public interface IInternalTrustClient extends ITrustClient {
 	 * been established with the supplied trustee by the given trustor.
 	 * 
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param trustorId
 	 *            (required) the identifier of the entity whose trust 
 	 *            relationship to retrieve.
@@ -151,7 +154,7 @@ public interface IInternalTrustClient extends ITrustClient {
 	 * trustor.
 	 * 
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param trustorId
 	 *            (required) the identifier of the entity which has assigned 
 	 *            the trust value to retrieve.
@@ -179,7 +182,7 @@ public interface IInternalTrustClient extends ITrustClient {
 	 * supplied criteria.
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param trustorId
 	 *            (required) the identifier of the entity which has established
 	 *            the trust relationships to retrieve.
@@ -205,7 +208,7 @@ public interface IInternalTrustClient extends ITrustClient {
 	 * the supplied criteria.
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param trustorId
 	 *            (required) the identifier of the entity which has established
 	 *            the trust relationships to retrieve.
@@ -233,7 +236,7 @@ public interface IInternalTrustClient extends ITrustClient {
 	 * relationships match the supplied criteria.
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param trustorId
 	 *            (required) the identifier of the entity which has established
 	 *            the trust relationships to retrieve.
@@ -263,7 +266,7 @@ public interface IInternalTrustClient extends ITrustClient {
 	 * evidence type, the method allows specifying supplementary information.
 	 * 
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param subjectId
 	 *            (required) the {@link ATrustedEntityId} of the subject the
 	 *            piece of evidence refers to.

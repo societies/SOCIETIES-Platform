@@ -1720,4 +1720,138 @@ public class TestTrustClientHelper extends AndroidTestCase {
 		latch.await(LATCH_TIME_OUT, TimeUnit.MILLISECONDS);
 		assertTrue(this.testCompleted);
 	}
+	
+	@MediumTest
+	public void testExceptionOnRetrieveTrustRelationshipsByTrustor() throws Exception {
+		
+		this.testCompleted = false;
+		final CountDownLatch latch = new CountDownLatch(1);
+		// Setup test data
+		final RequestorBean requestor = new RequestorBean();
+		requestor.setRequestorId(TEST_TRUSTOR_ID);
+
+		final TrustedEntityIdBean trustorId =
+				new TrustedEntityIdBean();
+		trustorId.setEntityId(TEST_TRUSTEE_ID2);
+		trustorId.setEntityType(TrustedEntityTypeBean.CSS);
+		
+		final TrustClientHelper helper = new TrustClientHelper(getContext());
+		helper.setUpService(new IMethodCallback() {
+			
+			/*
+			 * @see org.societies.android.api.comms.IMethodCallback#returnException(java.lang.String)
+			 */
+			@Override
+			public void returnException(String exception) {
+				
+				fail("setUpService returned exception: " + exception);
+			}
+
+			/*
+			 * @see org.societies.android.api.comms.IMethodCallback#returnAction(java.lang.String)
+			 */
+			@Override
+			public void returnAction(String result) {
+				
+				fail("setUpService returned action: " + result);
+			}
+			
+			@Override
+			public void returnAction(boolean resultFlag) {
+				
+				assertTrue(resultFlag);
+				helper.retrieveTrustRelationships(requestor, trustorId, 
+						new ITrustClientCallback() {
+
+					/*
+					 * @see org.societies.android.api.privacytrust.trust.ITrustClientCallback#onAddedDirectTrustEvidence()
+					 */
+					@Override
+					public void onAddedDirectTrustEvidence() {
+						
+						// should not be called!
+						fail("retrieveTrustRelationships callback onAddedDirectTrustEvidence");
+					}
+
+					/*
+					 * @see org.societies.android.api.privacytrust.trust.ITrustClientCallback#onException(org.societies.android.api.privacytrust.trust.TrustException)
+					 */
+					@Override
+					public void onException(TrustException exception) {
+
+						// success!
+						Log.d(TAG, "retrieveTrustRelationships callback onException: " + exception);
+						assertNotNull(exception);
+						assertNotNull(exception.getMessage());
+						helper.tearDownService(new IMethodCallback() {
+
+							/*
+							 * @see org.societies.android.api.comms.IMethodCallback#returnException(java.lang.String)
+							 */
+							@Override
+							public void returnException(String exception) {
+
+								fail("tearDownService returned exception: " + exception);
+							}
+
+							/*
+							 * @see org.societies.android.api.comms.IMethodCallback#returnAction(java.lang.String)
+							 */
+							@Override
+							public void returnAction(String result) {
+
+								fail("tearDownService returned action: " + result);
+							}
+
+							/*
+							 * @see org.societies.android.api.comms.IMethodCallback#returnAction(boolean)
+							 */
+							@Override
+							public void returnAction(boolean resultFlag) {
+
+								assertTrue(resultFlag);
+								TestTrustClientHelper.this.testCompleted = true;
+								latch.countDown();
+							}
+						});
+					}
+
+					/*
+					 * @see org.societies.android.api.privacytrust.trust.ITrustClientCallback#onRetrievedTrustRelationship(org.societies.api.schema.privacytrust.trust.model.TrustRelationshipBean)
+					 */
+					@Override
+					public void onRetrievedTrustRelationship(
+							TrustRelationshipBean trustRelationship) {
+
+						// should not be called!
+						fail("retrieveTrustRelationships callback onRetrievedTrustRelationship: "
+								+ trustRelationship);
+					}
+
+					/*
+					 * @see org.societies.android.api.privacytrust.trust.ITrustClientCallback#onRetrievedTrustRelationships(java.util.Set)
+					 */
+					@Override
+					public void onRetrievedTrustRelationships(
+							Set<TrustRelationshipBean> trustRelationships) {
+
+						// should not be called!
+						fail("retrieveTrustRelationships callback onRetrievedTrustRelationships: "
+								+ trustRelationships);
+					}
+
+					@Override
+					public void onRetrievedTrustValue(Double trustValue) {
+
+						// should not be called!
+						fail("retrieveTrustRelationships callback onRetrievedTrustValue: "
+								+ trustValue);
+					}
+				});
+			}
+		});
+		
+		latch.await(LATCH_TIME_OUT, TimeUnit.MILLISECONDS);
+		assertTrue(this.testCompleted);
+	}
 }

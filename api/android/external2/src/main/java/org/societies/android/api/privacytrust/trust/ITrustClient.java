@@ -54,10 +54,13 @@ import org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean;
  */
 public interface ITrustClient extends IServiceManager {
 	
+	/** The extra Intent field containing the result. */
 	public static final String INTENT_RETURN_VALUE_KEY = 
-			"org.societies.android.privacytrust.trust.ReturnValue";
-    public static final String INTENT_RETURN_STATUS_KEY = 
-    		"org.societies.android.privacytrust.trust.ReturnStatus";
+			"org.societies.android.api.privacytrust.trust.ReturnValue";
+	
+	/** The extra Intent String field containing the exception message. */
+	public static final String INTENT_EXCEPTION_KEY = 
+			"org.societies.android.api.privacytrust.trust.Exception";
     
     public static final String RETRIEVE_TRUST_RELATIONSHIPS = 
     		"org.societies.android.api.privacytrust.trust.RETRIEVE_TRUST_RELATIONSHIPS";
@@ -87,7 +90,7 @@ public interface ITrustClient extends IServiceManager {
 	 * established any trust relationships. 
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param requestor 
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust relationships.
@@ -107,7 +110,7 @@ public interface ITrustClient extends IServiceManager {
 	 * relationships exist between the identified trustor and trustee.
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param requestor 
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust relationships.
@@ -132,7 +135,7 @@ public interface ITrustClient extends IServiceManager {
 	 * been established with the supplied trustee by the given trustor.
 	 * 
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param requestor
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust relationship.
@@ -164,7 +167,7 @@ public interface ITrustClient extends IServiceManager {
 	 * trustor.
 	 * 
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param requestor
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust value.
@@ -196,7 +199,7 @@ public interface ITrustClient extends IServiceManager {
 	 * supplied criteria.
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param requestor
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust relationships.
@@ -226,7 +229,7 @@ public interface ITrustClient extends IServiceManager {
 	 * the supplied criteria.
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param requestor
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust relationships.
@@ -258,7 +261,7 @@ public interface ITrustClient extends IServiceManager {
 	 * relationships match the supplied criteria.
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param requestor
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust relationships.
@@ -292,7 +295,7 @@ public interface ITrustClient extends IServiceManager {
 	 * evidence type, the method allows specifying supplementary information.
 	 * 
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param requestor
 	 *            (required) the requestor on whose behalf to add the direct 
 	 *            trust evidence.
