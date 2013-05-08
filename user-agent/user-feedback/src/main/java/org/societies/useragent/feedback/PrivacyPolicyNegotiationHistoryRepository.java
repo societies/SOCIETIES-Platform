@@ -36,7 +36,6 @@ public class PrivacyPolicyNegotiationHistoryRepository implements IPrivacyPolicy
         session.close();
     }
 
-
     @Override
     public List<UserFeedbackPrivacyNegotiationEvent> listPrevious(int howMany) {
         Query query = session.createQuery("FROM UserFeedbackPrivacyNegotiationEvent uf ORDER BY uf.requestDate");
@@ -54,14 +53,24 @@ public class PrivacyPolicyNegotiationHistoryRepository implements IPrivacyPolicy
     }
 
     @Override
+    public List<UserFeedbackPrivacyNegotiationEvent> listIncomplete() {
+        Query query = session.createQuery("FROM UserFeedbackPrivacyNegotiationEvent uf WHERE uf.stage != :stage ORDER BY uf.requestDate");
+        query.setParameter("stage", FeedbackStage.COMPLETED);
+
+        return query.list();
+    }
+
+    @Override
     public UserFeedbackPrivacyNegotiationEvent getByRequestId(String requestId) {
         Query query = session.createQuery("FROM UserFeedbackPrivacyNegotiationEvent uf WHERE uf.requestId = :id");
         query.setString("id", requestId);
 
         List results = query.list();
 
-        if (results.size() == 0)
+        if (results.size() == 0) {
+            log.warn("Found no UserFeedbackPrivacyNegotiationEvent with requestId=" + requestId);
             return null;
+        }
 
         return (UserFeedbackPrivacyNegotiationEvent) results.get(0);
     }
@@ -73,6 +82,7 @@ public class PrivacyPolicyNegotiationHistoryRepository implements IPrivacyPolicy
         session.save(event);
 
         transaction.commit();
+        session.flush();
     }
 
     @Override
@@ -84,6 +94,7 @@ public class PrivacyPolicyNegotiationHistoryRepository implements IPrivacyPolicy
         session.update(item);
 
         transaction.commit();
+        session.flush();
     }
 
 }

@@ -12,6 +12,8 @@ public interface IUserFeedbackHistoryRepository {
 
     List<UserFeedbackBean> listSince(Date sinceWhen);
 
+    List<UserFeedbackBean> listIncomplete();
+
     UserFeedbackBean getByRequestId(String requestId);
 
     void insert(UserFeedbackBean ufBean);

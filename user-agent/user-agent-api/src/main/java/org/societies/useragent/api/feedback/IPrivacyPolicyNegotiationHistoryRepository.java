@@ -12,6 +12,8 @@ public interface IPrivacyPolicyNegotiationHistoryRepository {
 
     List<UserFeedbackPrivacyNegotiationEvent> listSince(Date sinceWhen);
 
+    List<UserFeedbackPrivacyNegotiationEvent> listIncomplete();
+
     UserFeedbackPrivacyNegotiationEvent getByRequestId(String requestId);
 
     void insert(UserFeedbackPrivacyNegotiationEvent event);
