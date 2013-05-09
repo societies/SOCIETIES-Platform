@@ -51,7 +51,6 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     private final String type;
     private final String[] options;
     private final Date timeoutTime;
-    private String result;
     private String[] results;
     private boolean complete;
 
@@ -125,14 +124,17 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     }
 
     public String getResult() {
-        return result;
+        if (results == null || results.length == 0)
+            return "";
+
+        return results[0];
     }
 
     public void setResult(String result) {
         if (log.isTraceEnabled())
             log.trace("setResult() for " + getTitle() + "=" + result);
 
-        this.result = result;
+        this.results = new String[]{result};
     }
 
     public String[] getResults() {
@@ -183,6 +185,12 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
 
     @Override
     public int compareTo(NotificationQueueItem that) {
+
+        if (this.isComplete() && !that.isComplete())
+            return 1;
+        if (!this.isComplete() && that.isComplete())
+            return -1;
+
         return this.arrivalDate.compareTo(that.arrivalDate);
     }
 
