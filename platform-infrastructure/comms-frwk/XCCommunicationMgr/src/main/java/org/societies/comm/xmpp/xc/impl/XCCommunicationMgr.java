@@ -169,7 +169,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
             String msg = "IQ GET received: id=%s node=%s";
             log.debug(String.format(msg,
                     iq.getID(),
-                    iq.getChildElement().getName()
+                    iq.getChildElement() != null ? iq.getChildElement().getName() : "null"
             ));
         }
 
@@ -193,7 +193,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
             String msg = "IQ Result received: id=%s node=%s";
             log.debug(String.format(msg,
                     iq.getID(),
-                    iq.getChildElement().getName()
+                    iq.getChildElement() != null ? iq.getChildElement().getName() : "null"
             ));
         }
         helper.dispatchIQResult(iq);
@@ -201,15 +201,8 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 
     @Override
     protected void handleIQError(IQ iq) {
-        if (log.isTraceEnabled())
-            log.trace("IQ Error received: " + iq.toXML());
-        else if (log.isDebugEnabled()) {
-            String msg = "IQ Error received: id=%s node=%s";
-            log.debug(String.format(msg,
-                    iq.getID(),
-                    iq.getChildElement().getName()
-            ));
-        }
+        if (log.isDebugEnabled())
+            log.debug("IQ Error: " + iq.toXML());
         helper.dispatchIQError(iq);
     }
 
@@ -312,7 +305,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
             String msg = "Sending IQ: id=%s node=%s";
             log.debug(String.format(msg,
                     iq.getID(),
-                    iq.getChildElement().getName()
+                    iq.getChildElement() != null ? iq.getChildElement().getName() : "null"
             ));
         }
         privacyLog(stanza, payload);
@@ -332,7 +325,7 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
             String msg = "Sending IQ: id=%s node=%s";
             log.debug(String.format(msg,
                     iq.getID(),
-                    iq.getChildElement().getName()
+                    iq.getChildElement() != null ? iq.getChildElement().getName() : "null"
             ));
         }
 
