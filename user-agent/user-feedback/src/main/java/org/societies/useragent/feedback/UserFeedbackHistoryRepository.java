@@ -10,6 +10,7 @@ import org.societies.api.schema.useragent.feedback.FeedbackStage;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 import org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -91,6 +92,34 @@ public class UserFeedbackHistoryRepository implements IUserFeedbackHistoryReposi
 
         UserFeedbackBean item = getByRequestId(requestId);
         item.setStage(newStage);
+        session.update(item);
+
+        transaction.commit();
+        session.flush();
+    }
+
+    @Override
+    public void completeExpFeedback(String requestId, List<String> values) {
+        Transaction transaction = session.beginTransaction();
+
+        UserFeedbackBean item = getByRequestId(requestId);
+        item.setStage(FeedbackStage.COMPLETED);
+        item.setOptions(values);
+        session.update(item);
+
+        transaction.commit();
+        session.flush();
+    }
+
+    @Override
+    public void completeImpFeedback(String requestId, boolean accepted) {
+        Transaction transaction = session.beginTransaction();
+
+        UserFeedbackBean item = getByRequestId(requestId);
+        item.setStage(FeedbackStage.COMPLETED);
+        List<String> options = new ArrayList<String>();
+        options.add(accepted ? "true" : "false");
+        item.setOptions(options);
         session.update(item);
 
         transaction.commit();

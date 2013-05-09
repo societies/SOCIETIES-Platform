@@ -19,4 +19,8 @@ public interface IUserFeedbackHistoryRepository {
     void insert(UserFeedbackBean ufBean);
 
     void updateStage(String requestId, FeedbackStage newStage);
+
+    void completeExpFeedback(String requestId, List<String> values);
+
+    void completeImpFeedback(String requestId, boolean result);
 }
