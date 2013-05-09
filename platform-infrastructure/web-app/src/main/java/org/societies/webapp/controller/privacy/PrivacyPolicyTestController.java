@@ -17,6 +17,7 @@ import org.societies.webapp.ILoginListener;
 import org.societies.webapp.controller.BasePageController;
 import org.societies.webapp.service.UserService;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -103,6 +104,18 @@ public class PrivacyPolicyTestController extends BasePageController {
         log.trace("PrivacyPolicyTestController ctor()");
     }
 
+    @PostConstruct
+    public void postConstruct() {
+        // NB: Generally you DON'T want to use this method to set up your class - you want to use the LoginListener
+        // - This method is called whenever the bean is created at the start of the session, while the login listener
+        // - is called when the user actually logs in and an identity is available
+
+        // call this in case we're set up after the user has logged in
+        if (userService.isUserLoggedIn()) {
+            loginListener.userLoggedIn();
+        }
+    }
+
     @SuppressWarnings("UnusedDeclaration")
     public PubsubClient getPubsubClient() {
         return pubsubClient;
@@ -185,7 +198,7 @@ public class PrivacyPolicyTestController extends BasePageController {
             public void responseReceived(List<String> result) {
                 log.info("Acknack: Response received");
                 addGlobalMessage("AckNack Response received",
-                        result.get(0),
+                        (result != null && result.size() > 0) ? result.get(0) : "null",
                         FacesMessage.SEVERITY_INFO);
             }
         });
@@ -203,7 +216,7 @@ public class PrivacyPolicyTestController extends BasePageController {
             public void responseReceived(List<String> result) {
                 log.info("SelectOne: Response received");
                 addGlobalMessage("SelectOne Response received",
-                        result.get(0),
+                        (result != null && result.size() > 0) ? result.get(0) : "null",
                         FacesMessage.SEVERITY_INFO);
             }
         });
@@ -221,7 +234,7 @@ public class PrivacyPolicyTestController extends BasePageController {
             public void responseReceived(List<String> result) {
                 log.info("SelectMany: Response received");
                 addGlobalMessage("SelectMany Response received",
-                        Arrays.toString(result.toArray()),
+                        (result != null) ? Arrays.toString(result.toArray()) : "null",
                         FacesMessage.SEVERITY_INFO);
             }
         });
@@ -238,7 +251,7 @@ public class PrivacyPolicyTestController extends BasePageController {
             public void responseReceived(Boolean result) {
                 log.info("TimedAbort: Response received");
                 addGlobalMessage("TimedAbort Response received",
-                        result.toString(),
+                        (result != null) ? result.toString() : "null",
                         FacesMessage.SEVERITY_INFO);
             }
         });

@@ -48,8 +48,10 @@
             <li><a href="index.xhtml" class="current"><br/>Home</a></li>
             <li>
                 <div class="notification-bubble">
+
                     <p:commandLink update="notificationDialog"
-                                   oncomplete="#{p:widgetVar('notificationDialog')}.show();">
+                                   oncomplete="#{p:widgetVar('notificationDialog')}.show();"
+                                   rendered="#{loginController.loggedIn and noNotificationPopup ne 'true'}">
 
                         <p:outputPanel id="notification-count-wrapper">
                             <h:outputText
@@ -58,6 +60,7 @@
                                     value="#{notifications.numUnansweredNotifications}"/>
                         </p:outputPanel>
                     </p:commandLink>
+
                 </div>
             </li>
         </ul>

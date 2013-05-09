@@ -51,7 +51,8 @@ public class NotificationsController extends BasePageController {
                         EventTypes.UF_PRIVACY_ACCESS_CONTROL_REMOVE_POPUP,
                         UserFeedbackEventTopics.EXPLICIT_RESPONSE,
                         UserFeedbackEventTopics.IMPLICIT_RESPONSE,
-                        UserFeedbackEventTopics.REQUEST));
+                        UserFeedbackEventTopics.REQUEST,
+                        UserFeedbackEventTopics.COMPLETE));
 
         public void registerForEvents() {
 
@@ -144,24 +145,55 @@ public class NotificationsController extends BasePageController {
                     || EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE.equals(node)
                     || EventTypes.UF_PRIVACY_ACCESS_CONTROL_REMOVE_POPUP.equals(node)
                     || UserFeedbackEventTopics.EXPLICIT_RESPONSE.equals(node)
-                    || UserFeedbackEventTopics.IMPLICIT_RESPONSE.equals(node)) {
-
+                    || UserFeedbackEventTopics.IMPLICIT_RESPONSE.equals(node)
+                    || UserFeedbackEventTopics.COMPLETE.equals(node)) {
 
                 if (item instanceof UserFeedbackBean) {
                     String id = ((UserFeedbackBean) item).getRequestId();
-                    markQueueItemComplete(id);
+                    String[] options = ((UserFeedbackBean) item).getOptions().toArray(new String[((UserFeedbackBean) item).getOptions().size()]);
+
+                    if (log.isTraceEnabled())
+                        log.trace(String.format("Received %s event for [%s] with options {%s}",
+                                node,
+                                id,
+                                Arrays.toString(options)));
+
+                    markQueueItemComplete(id, options);
                 } else if (item instanceof ExpFeedbackResultBean) {
                     String id = ((ExpFeedbackResultBean) item).getRequestId();
-                    markQueueItemComplete(id);
+                    String[] options = ((ExpFeedbackResultBean) item).getFeedback().toArray(new String[((ExpFeedbackResultBean) item).getFeedback().size()]);
+
+                    if (log.isTraceEnabled())
+                        log.trace(String.format("Received %s event for [%s] with options {%s}",
+                                node,
+                                id,
+                                Arrays.toString(options)));
+
+                    markQueueItemComplete(id, options);
                 } else if (item instanceof ImpFeedbackResultBean) {
                     String id = ((ImpFeedbackResultBean) item).getRequestId();
-                    markQueueItemComplete(id);
+                    String[] options = new String[]{((ImpFeedbackResultBean) item).isAccepted() ? "true" : "false"};
+                    markQueueItemComplete(id, options);
                 } else if (item instanceof UserFeedbackPrivacyNegotiationEvent) {
                     String id = String.valueOf(((UserFeedbackPrivacyNegotiationEvent) item).getNegotiationDetails().getNegotiationID());
-                    markQueueItemComplete(id);
+
+                    if (log.isTraceEnabled())
+                        log.trace(String.format("Received %s event for [%s] with options {%s}",
+                                node,
+                                id,
+                                "null"));
+
+                    markQueueItemComplete(id, null);
                 } else {
                     log.warn(String.format("Unknown response payload type %s, attempting to remove by message ID", item.getClass().getSimpleName()));
-                    markQueueItemComplete(itemId);
+
+                    if (log.isTraceEnabled())
+                        log.trace(String.format("Received %s event for [%s] with options {%s}",
+                                node,
+                                itemId,
+                                "null"));
+
+                    markQueueItemComplete(itemId, new String[]{});
                 }
 
             } else {
@@ -285,7 +317,7 @@ public class NotificationsController extends BasePageController {
                     submitItem(ta.getItemId());
 
                     // remove from watch list
-                    markQueueItemComplete(ta.getItemId());
+                    markQueueItemComplete(ta.getItemId(), new String[]{"false"});
                     i--;
                 }
             }
@@ -315,9 +347,9 @@ public class NotificationsController extends BasePageController {
 
     private final List<NotificationQueueItem> timedAbortsToWatch = new ArrayList<NotificationQueueItem>();
     // NB: to avoid deadlocks, always synchronise on negotiationQueue, not on queueIDs
-    private final Queue<NotificationQueueItem> unansweredNotifications = new LinkedList<NotificationQueueItem>();
+    private final List<NotificationQueueItem> unansweredNotifications = new LinkedList<NotificationQueueItem>();
     private final Set<String> unansweredNotificationIDs = new HashSet<String>();
-    private final Queue<NotificationQueueItem> allNotifications = new LinkedList<NotificationQueueItem>();
+    private final List<NotificationQueueItem> allNotifications = new LinkedList<NotificationQueueItem>();
     private final Set<String> allNotificationIDs = new HashSet<String>();
 
     public NotificationsController() {
@@ -326,6 +358,11 @@ public class NotificationsController extends BasePageController {
         timedAbortProcessorThread = new Thread(new TimedAbortProcessor(timedAbortsToWatch));
         timedAbortProcessorThread.setName("TimedAbortProcessor");
         timedAbortProcessorThread.setDaemon(true);
+    }
+
+    @SuppressWarnings("MethodMayBeStatic")
+    public boolean isDebugMode() {
+        return true;
     }
 
     @SuppressWarnings("UnusedDeclaration")
@@ -389,17 +426,22 @@ public class NotificationsController extends BasePageController {
         // NB: Generally you DON'T want to use this method to set up your class - you want to use the LoginListener
         // - This method is called whenever the bean is created at the start of the session, while the login listener
         // - is called when the user actually logs in and an identity is available
+
+        // call this in case we're set up after the user has logged in
+        if (userService.isUserLoggedIn()) {
+            loginListener.userLoggedIn();
+        }
     }
 
     public int getNumUnansweredNotifications() {
         return unansweredNotifications.size();
     }
 
-    public Queue<NotificationQueueItem> getUnansweredNegotiationQueue() {
+    public List<NotificationQueueItem> getUnansweredNegotiationQueue() {
         return unansweredNotifications;
     }
 
-    public Queue<NotificationQueueItem> getAllNotificationsQueue() {
+    public List<NotificationQueueItem> getAllNotificationsQueue() {
         return allNotifications;
     }
 
@@ -428,6 +470,7 @@ public class NotificationsController extends BasePageController {
             return;
         }
 
+        selectedItem.setComplete(true);
 
         if (selectedItem.getType().equals(NotificationQueueItem.TYPE_ACK_NACK)
                 || selectedItem.getType().equals(NotificationQueueItem.TYPE_SELECT_ONE)
@@ -458,7 +501,7 @@ public class NotificationsController extends BasePageController {
         } else if (selectedItem.getType().equals(NotificationQueueItem.TYPE_NOTIFICATION)) {
             // no response is required
             // but we must manually remove item from queue
-            markQueueItemComplete(selectedItem.getItemId());
+            markQueueItemComplete(selectedItem.getItemId(), new String[]{});
         }
 
     }
@@ -549,8 +592,10 @@ public class NotificationsController extends BasePageController {
             return null;
         }
 
-        if (bean.getStage() == FeedbackStage.COMPLETED)
+        if (bean.getStage() == FeedbackStage.COMPLETED) {
             newItem.setComplete(true);
+            newItem.setResults(options);
+        }
 
         return newItem;
     }
@@ -567,6 +612,7 @@ public class NotificationsController extends BasePageController {
 
             allNotificationIDs.add(item.getItemId());
             allNotifications.add(item);
+            Collections.sort(allNotifications);
 
             if (!item.isComplete()) {
                 if (log.isDebugEnabled())
@@ -575,14 +621,15 @@ public class NotificationsController extends BasePageController {
                 synchronized (unansweredNotifications) {
                     unansweredNotificationIDs.add(item.getItemId());
                     unansweredNotifications.add(item);
+                    Collections.sort(unansweredNotifications);
                 }
             }
         }
     }
 
-    private void markQueueItemComplete(String itemId) {
+    private void markQueueItemComplete(String itemId, String[] results) {
         if (log.isDebugEnabled()) {
-            String fmt = "Removing notification item ID %s";
+            String fmt = "Completing notification item ID %s";
             log.debug(String.format(fmt, itemId));
         }
 
@@ -596,9 +643,12 @@ public class NotificationsController extends BasePageController {
                     log.debug(String.format(fmt, nqi.getType(), itemId));
                 }
 
-                nqi.setComplete(true);
-                unansweredNotifications.remove(nqi);
-                unansweredNotificationIDs.remove(itemId);
+                synchronized (nqi) {
+                    nqi.setResults(results);
+                    nqi.setComplete(true);
+                    unansweredNotifications.remove(nqi);
+                    unansweredNotificationIDs.remove(itemId);
+                }
 
                 break;
             }
