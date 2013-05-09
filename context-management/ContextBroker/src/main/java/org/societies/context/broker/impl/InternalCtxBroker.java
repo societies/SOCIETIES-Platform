@@ -316,7 +316,8 @@ public class InternalCtxBroker implements ICtxBroker {
 			if (result != null) {
 				LOG.info("Found CSS node context entity " + result);
 			} else {
-				final IIdentity cssId = this.commMgr.getIdManager().fromJid(cssNodeId.getBareJid());
+				final IIdentity cssId = this.commMgr.getIdManager().fromJid(
+						cssNodeId.getBareJid().replace('@', '.')); // Android JIDs contain '@' instead of '.'
 				final IndividualCtxEntity cssEnt = this.retrieveIndividualEntity(cssId).get();
 				if (cssEnt == null)
 					throw new CtxBrokerException("The IndividualCtxEntity for CSS '" 

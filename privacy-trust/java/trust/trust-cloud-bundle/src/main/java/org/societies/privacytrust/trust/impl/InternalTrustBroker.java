@@ -228,7 +228,11 @@ public class InternalTrustBroker implements ITrustBroker {
 				synchronized (callback) {
 					try {
 						callback.wait();
-						trustRelationships.addAll(callback.getTrustRelationships());
+						if (callback.getException() == null)
+							trustRelationships.addAll(callback.getTrustRelationships());
+						else
+							throw callback.getException();
+						
 					} catch (InterruptedException ie) {
 
 						throw new TrustBrokerException(
@@ -363,7 +367,11 @@ public class InternalTrustBroker implements ITrustBroker {
 				synchronized (callback) {
 					try {
 						callback.wait();
-						trustRelationship = callback.getTrustRelationship();
+						if (callback.getException() == null)
+							trustRelationship = callback.getTrustRelationship();
+						else
+							throw callback.getException();
+						
 					} catch (InterruptedException ie) {
 
 						throw new TrustBrokerException(
@@ -482,7 +490,11 @@ public class InternalTrustBroker implements ITrustBroker {
 				synchronized (callback) {
 					try {
 						callback.wait();
-						trustValue = callback.getTrustValue();
+						if (callback.getException() == null)
+							trustValue = callback.getTrustValue();
+						else 
+							throw callback.getException();
+						
 					} catch (InterruptedException ie) {
 
 						throw new TrustBrokerException(
@@ -723,7 +735,11 @@ public class InternalTrustBroker implements ITrustBroker {
 				synchronized (callback) {
 					try {
 						callback.wait();
-						trustRelationships.addAll(callback.getTrustRelationships());
+						if (callback.getException() == null)
+							trustRelationships.addAll(callback.getTrustRelationships());
+						else
+							throw callback.getException();
+						
 					} catch (InterruptedException ie) {
 
 						throw new TrustBrokerException(
@@ -1510,7 +1526,6 @@ public class InternalTrustBroker implements ITrustBroker {
 	        }
 		}
 		
-		@SuppressWarnings("unused")
 		private TrustException getException() {
 			
 			return this.trustException;

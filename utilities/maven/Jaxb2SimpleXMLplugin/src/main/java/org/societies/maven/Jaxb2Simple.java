@@ -474,6 +474,11 @@ public class Jaxb2Simple extends AbstractMojo
 		textToReplace = "\n";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
 
+		//COMPLETELY REMOVE @Element(defaultValue = "", required=false)
+		textToFind = "@Element\\(defaultValue = \".*\", required=false\\)";
+		textToReplace = "";
+		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		
 		// /@XmlSchemaType.*/d 
 		// /@XmlAnyAttribute.*/d 
 

@@ -24,9 +24,11 @@
  */
 package org.societies.api.privacytrust.privacy.util.privacypolicy;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -109,12 +111,24 @@ public class PrivacyPolicyUtilsTest {
 			fail("Error "+e.getMessage()+": "+testTitle);
 		}
 		assertNotNull("Privacy policy generated should not be null", retrievedPrivacyPolicy);
-		LOG.debug("**** Original XML privacy policy ****");
-		LOG.info(RequestPolicyUtils.toXmlString(privacyPolicy));
-		LOG.debug("**** Generated RequestPolicy ****");
-		LOG.debug(RequestPolicyUtils.toXmlString(retrievedPrivacyPolicy));
+		assertNotNull("Privacy policy original should not be null", privacyPolicy);
+		//		LOG.debug("**** Original XML privacy policy ****");
+		//		LOG.debug(RequestPolicyUtils.toXmlString(privacyPolicy));
+		//		LOG.debug("**** Generated RequestPolicy ****");
+		//		LOG.debug(RequestPolicyUtils.toXmlString(retrievedPrivacyPolicy));
 		assertEquals("Privacy policy generated (xml) not equal to the original policy", RequestPolicyUtils.toXmlString(privacyPolicy), RequestPolicyUtils.toXmlString(retrievedPrivacyPolicy));
-		//		assertTrue("Privacy policy generated not equal to the original policy", RequestPolicyUtils.equal(privacyPolicy, retrievedPrivacyPolicy));
+		// Class
+		assertEquals("Privacy policy generated not same class as the original policy", privacyPolicy.getClass(), retrievedPrivacyPolicy.getClass());
+		// Requestor
+		assertTrue("Privacy policy generated and the original policy: not the same requestor", RequestorUtils.equal(privacyPolicy.getRequestor(), retrievedPrivacyPolicy.getRequestor()));
+		// Request Items
+		assertEquals("Privacy policy generated and the original policy: not the same request items size", privacyPolicy.getRequestItems().size(), retrievedPrivacyPolicy.getRequestItems().size());
+		for(int i=0; i<retrievedPrivacyPolicy.getRequestItems().size(); i++) {
+			assertTrue("Privacy policy generated and the original policy: not the same request item "+i, RequestItemUtils.equal(privacyPolicy.getRequestItems().get(i), retrievedPrivacyPolicy.getRequestItems().get(i)));
+		}
+		assertTrue("Privacy policy generated and the original policy: not the same request items", RequestItemUtils.equal(privacyPolicy.getRequestItems(), retrievedPrivacyPolicy.getRequestItems()));
+		// All
+		assertTrue("Privacy policy generated not equal to the original policy", RequestPolicyUtils.equal(privacyPolicy, retrievedPrivacyPolicy));
 	}
 
 	@Test
@@ -157,8 +171,8 @@ public class PrivacyPolicyUtilsTest {
 		assertNotNull("Private privacy policy should not be null", privacyPolicyPrivate);
 		assertNotNull("Members only privacy policy should not be null", privacyPolicyMembersOnly);
 		assertNotNull("Public privacy policy should not be null", privacyPolicyPublic);
-		Log.debug("Private privacy policy: "+PrivacyPolicyUtils.toXacmlString(privacyPolicyPrivate)+"\n*******");
-		Log.debug("Members only privacy policy: "+PrivacyPolicyUtils.toXacmlString(privacyPolicyMembersOnly)+"\n*******");
-		Log.debug("Public privacy policy: "+PrivacyPolicyUtils.toXacmlString(privacyPolicyPublic)+"\n*******");
+		//		Log.debug("Private privacy policy: "+PrivacyPolicyUtils.toXacmlString(privacyPolicyPrivate)+"\n*******");
+		//		Log.debug("Members only privacy policy: "+PrivacyPolicyUtils.toXacmlString(privacyPolicyMembersOnly)+"\n*******");
+		//		Log.debug("Public privacy policy: "+PrivacyPolicyUtils.toXacmlString(privacyPolicyPublic)+"\n*******");
 	}
 }

@@ -121,9 +121,9 @@ public class PrivacyAssessmentService implements Serializable {
 		}
 
 		public double[] getData() {
-			for (double d : data) {
-				log.debug("getData(): {}", d);
-			}
+//			for (double d : data) {
+//				log.debug("getData(): {}", d);
+//			}
 			return data;
 		}
 

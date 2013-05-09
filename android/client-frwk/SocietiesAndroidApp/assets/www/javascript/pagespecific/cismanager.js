@@ -30,6 +30,16 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  * @namespace SocietiesCISManagerService
  */
 
+//Browser globals
+/*global clearInterval: false, clearTimeout: false, document: false, event: false, frames: false, history: false, Image: false, location: false, name: false, navigator: false, Option: false, parent: false, screen: false, setInterval: false, setTimeout: false, window: false, XMLHttpRequest: false */
+//Miscellaneous globals
+/*global alert: false, confirm: false, console: false, Debug: false, opera: false, prompt: false, WSH: false, $: false, jQuery: false */
+//JQuery globals
+/*global $: false, jQuery: false */
+//Specific globals
+/*global SocietiesCISListService: false, ServiceManagementServiceHelper: false, SocietiesCISManagerService: false, SocietiesPrivacyPolicyManagerService: false */
+/*global SocietiesCISManagerHelper: false, SocietiesCisDirService: false */
+
 var	SocietiesCISManagerService = {
 			
 	/**

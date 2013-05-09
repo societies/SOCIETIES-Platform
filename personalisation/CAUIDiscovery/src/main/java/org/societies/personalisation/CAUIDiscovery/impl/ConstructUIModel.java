@@ -49,12 +49,14 @@ public class ConstructUIModel {
 	}
 
 
-	public UserIntentModelData constructNewModel(LinkedHashMap<String,HashMap<String,Double>> transDictionaryAll, HashMap<String,List<String>> ctxActionsMap){
+	public UserIntentModelData constructNewModel(LinkedHashMap<List<String>,HashMap<String,Double>> transDictionaryAll, HashMap<String,List<String>> ctxActionsMap){
 
 		UserIntentModelData modelData = cauiTaskManager.createModel();
 		
 		//create all actions and assign context
-		for (String actionTemp : transDictionaryAll.keySet()){
+		for (List<String> actionTempList : transDictionaryAll.keySet()){
+			String actionTemp  = actionTempList.get(0);
+			
 			String [] action = actionTemp.split("\\#");
 			// add here the serviceID /
 			//LOG.info("action details > serviceID: "+action[0]+" paramName: "+action[1]+" paramValue:"+action[2]);
@@ -91,15 +93,27 @@ public class ConstructUIModel {
 
 		// set links among actions
 		//	LOG.info("4 set links among actions");
-		for (String sourceActionConc : transDictionaryAll.keySet()){
-
+		for (List<String> sourceActionConcList : transDictionaryAll.keySet()){
+			//System.out.println("sourceActionConcList "+sourceActionConcList);
+			
+			String sourceActionConc = sourceActionConcList.get(0);
+			//System.out.println("sourceActionConc "+sourceActionConc);
+			
 			String [] sourceAction = sourceActionConc.split("\\#");
 			
+			
 			List<IUserIntentAction> sourceActionList = cauiTaskManager.retrieveActionsByTypeValue(sourceAction[1],sourceAction[2]);
+			System.out.println("sourceActionList "+sourceActionList);
 			//	LOG.info("5 sourceActionList "+ sourceActionList);
 			IUserIntentAction sourceActionObj = sourceActionList.get(0);
-
-			HashMap<String,Double> targetActionsMap = transDictionaryAll.get(sourceActionConc);
+			
+		//	System.out.println("sourceActionObj "+sourceActionObj);
+			
+			HashMap<String,Double> targetActionsMap = transDictionaryAll.get(sourceActionConcList);
+			
+			
+			//System.out.println("transDictionaryAll "+transDictionaryAll);
+			//System.out.println("targetActionsMap "+targetActionsMap);
 			//	LOG.info("6 targetActionsMap "+ targetActionsMap);
 			for(String targetActionString : targetActionsMap.keySet()){
 				String [] actionStringTarg = targetActionString.split("\\#");

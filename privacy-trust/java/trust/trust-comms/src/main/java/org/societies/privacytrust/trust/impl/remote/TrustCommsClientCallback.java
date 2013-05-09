@@ -35,10 +35,7 @@ import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
-import org.societies.api.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean;
 import org.societies.privacytrust.trust.impl.broker.remote.TrustBrokerRemoteClientCallback;
-import org.societies.privacytrust.trust.impl.evidence.remote.InternalTrustEvidenceCollectorRemoteClientCallback;
 import org.societies.privacytrust.trust.impl.evidence.remote.TrustEvidenceCollectorRemoteClientCallback;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,25 +54,20 @@ public class TrustCommsClientCallback implements ICommCallback {
 					"http://societies.org/api/schema/identity",
 					"http://societies.org/api/schema/privacytrust/trust/model",
 					"http://societies.org/api/schema/privacytrust/trust/broker",
-					"http://societies.org/api/schema/privacytrust/trust/evidence/collector",
-					"http://societies.org/api/internal/schema/privacytrust/trust/evidence/collector"));
+					"http://societies.org/api/schema/privacytrust/trust/evidence/collector"));
 	
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
 			Arrays.asList(
 					"org.societies.api.schema.identity",
 					"org.societies.api.schema.privacytrust.trust.model",
 					"org.societies.api.schema.privacytrust.trust.broker",
-					"org.societies.api.schema.privacytrust.trust.evidence.collector",
-					"org.societies.api.internal.schema.privacytrust.trust.evidence.collector"));
+					"org.societies.api.schema.privacytrust.trust.evidence.collector"));
 
 	@Autowired(required=true)
 	private TrustBrokerRemoteClientCallback trustBrokerRemoteClientCallback;
 	
 	@Autowired(required=true)
 	private TrustEvidenceCollectorRemoteClientCallback trustEvidenceCollectorRemoteClientCallback;
-	
-	@Autowired(required=true)
-	private InternalTrustEvidenceCollectorRemoteClientCallback internalTrustEvidenceCollectorRemoteClientCallback;
 
 	@Autowired(required=true)
 	public TrustCommsClientCallback(ICommManager commsMgr) throws Exception {
@@ -119,19 +111,23 @@ public class TrustCommsClientCallback implements ICommCallback {
 	@Override
 	public void receiveResult(Stanza stanza, Object payload) {
 		
+		if (stanza == null)
+			throw new NullPointerException("stanza can't be null");
+		if (payload == null)
+			throw new NullPointerException("payload can't be null");
+		
 		if (LOG.isDebugEnabled())
 			LOG.debug("receiveResult: stanza=" + stanza + ", payload=" + payload);
-
-		if (payload instanceof TrustBrokerResponseBean) {
-			this.trustBrokerRemoteClientCallback.receiveResult(stanza, (TrustBrokerResponseBean) payload);
-		} else if (payload instanceof org.societies.api.internal.schema.privacytrust.trust.evidence.collector.TrustEvidenceCollectorResponseBean) {
-			this.internalTrustEvidenceCollectorRemoteClientCallback.receiveResult(stanza, (TrustEvidenceCollectorResponseBean) payload);
-		} else if (payload instanceof TrustEvidenceCollectorResponseBean) {
-			this.trustEvidenceCollectorRemoteClientCallback.receiveResult(stanza, (TrustEvidenceCollectorResponseBean) payload);
-		} else {
-			LOG.error("Unexpected result payload: "
-					+ ((payload != null) ? payload.getClass() : "null"));
+		if (stanza.getId() == null) {
+			LOG.error("Received result with null stanza id");
+			return;
 		}
+		if (this.trustBrokerRemoteClientCallback.containsClient(stanza.getId()))
+			this.trustBrokerRemoteClientCallback.receiveResult(stanza, payload);
+		else if (this.trustEvidenceCollectorRemoteClientCallback.containsClient(stanza.getId()))
+			this.trustEvidenceCollectorRemoteClientCallback.receiveResult(stanza, payload);
+		else
+			LOG.error("Received result with unexpected stanza id: " + stanza.getId());
 	}		
 
 	/*
@@ -170,8 +166,24 @@ public class TrustCommsClientCallback implements ICommCallback {
 	 * @see org.societies.comm.xmpp.interfaces.CommCallback#receiveError(org.societies.comm.xmpp.datatypes.Stanza, org.societies.comm.xmpp.datatypes.XMPPError)
 	 */
 	@Override
-	public void receiveError(Stanza stanza, XMPPError info) {
+	public void receiveError(Stanza stanza, XMPPError error) {
 		
-		LOG.error("receiveError: stanza=" + stanza + ", info=" + info);
+		if (stanza == null)
+			throw new NullPointerException("stanza can't be null");
+		if (error == null)
+			throw new NullPointerException("error can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("receiveError: stanza=" + stanza + ", error=" + error);
+		if (stanza.getId() == null) {
+			LOG.error("Received error with null stanza id");
+			return;
+		}
+		if (this.trustBrokerRemoteClientCallback.containsClient(stanza.getId()))
+			this.trustBrokerRemoteClientCallback.receiveError(stanza, error);
+		else if (this.trustEvidenceCollectorRemoteClientCallback.containsClient(stanza.getId()))
+			this.trustEvidenceCollectorRemoteClientCallback.receiveError(stanza, error);
+		else
+			LOG.error("Received error with unexpected stanza id: " + stanza.getId());
 	}
 }
