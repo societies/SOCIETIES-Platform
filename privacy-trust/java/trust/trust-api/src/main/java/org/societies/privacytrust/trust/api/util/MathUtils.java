@@ -24,6 +24,8 @@
  */
 package org.societies.privacytrust.trust.api.util;
 
+import org.apache.commons.math.linear.ArrayRealVector;
+import org.apache.commons.math.linear.RealVector;
 import org.apache.commons.math.stat.StatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,5 +98,23 @@ public class MathUtils {
 	public static double max(double[] input) {
 		
 		return StatUtils.max(input);
+	}
+	
+	public static double mean(double[] input) {
+		
+		return StatUtils.mean(input);
+	}
+	
+	public static double cos(double[] x, double[] y) {
+		
+		final RealVector x_vec = new ArrayRealVector(x);
+		final RealVector y_vec = new ArrayRealVector(y);
+		if (x_vec.getDimension() != y_vec.getDimension())
+			throw new IllegalArgumentException(Arrays.toString(x) 
+					+ ", " + Arrays.toString(y) + ": Vector length mismatch"
+					+ ": Expected " + x_vec.getDimension() + " but was " 
+					+ y_vec.getDimension());
+		
+		return x_vec.dotProduct(y_vec) / (x_vec.getNorm() * y_vec.getNorm());
 	}
 }
