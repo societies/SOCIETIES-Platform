@@ -60,6 +60,8 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import java.util.*;
 import java.util.concurrent.Future;
 
+import static org.societies.api.schema.useragent.feedback.FeedbackMethodType.GET_EXPLICIT_FB;
+
 public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subscriber {
 
     private static final Logger log = LoggerFactory.getLogger(UserFeedback.class);
@@ -116,6 +118,10 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         impResults.clear();
         negotiationResults.clear();
         accessCtrlResults.clear();
+        expCallbacks.clear();
+        impCallbacks.clear();
+        negotiationCallbacks.clear();
+        accessCtrlCallbacks.clear();
 
         //get cloud ID
         myCloudID = commsMgr.getIdManager().getThisNetworkNode();
@@ -128,6 +134,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             pubsub.ownerCreate(myCloudID, UserFeedbackEventTopics.REQUEST);
             pubsub.ownerCreate(myCloudID, UserFeedbackEventTopics.EXPLICIT_RESPONSE);
             pubsub.ownerCreate(myCloudID, UserFeedbackEventTopics.IMPLICIT_RESPONSE);
+            pubsub.ownerCreate(myCloudID, UserFeedbackEventTopics.COMPLETE);
             pubsub.ownerCreate(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION);
             pubsub.ownerCreate(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE);
             pubsub.ownerCreate(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP);
@@ -135,12 +142,8 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             pubsub.ownerCreate(myCloudID, EventTypes.UF_PRIVACY_ACCESS_CONTROL_REMOVE_POPUP);
             pubsub.ownerCreate(myCloudID, EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE);
             log.debug("Pubsub node created!");
-        } catch (XMPPError e) {
-            e.printStackTrace();
-        } catch (CommunicationException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.error("Error creating user feedback pubsub nodes", e);
         }
 
         //register for events from created pubsub node
@@ -152,12 +155,74 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             pubsub.subscriberSubscribe(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, this);
             pubsub.subscriberSubscribe(myCloudID, EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE, this);
             log.debug("Pubsub registration complete!");
-        } catch (XMPPError e) {
-            e.printStackTrace();
-        } catch (CommunicationException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.error("Error registering for user feedback pubsub nodes", e);
         }
-        log.debug("User Feedback Initialised!!!");
+
+        try {
+            log.debug("Recalling stored UF requests");
+
+            List<UserFeedbackBean> userFeedbackBeans = userFeedbackHistoryRepository.listIncomplete();
+
+            for (UserFeedbackBean userFeedbackBean : userFeedbackBeans) {
+                String requestId = userFeedbackBean.getRequestId();
+                switch (userFeedbackBean.getMethod()) {
+                    case GET_EXPLICIT_FB:
+                        UserFeedbackResult<List<String>> expResult = new UserFeedbackResult<List<String>>(requestId);
+                        expResults.put(requestId, expResult);
+                        break;
+                    case GET_IMPLICIT_FB:
+                        UserFeedbackResult<Boolean> impResult = new UserFeedbackResult<Boolean>(requestId);
+                        impResults.put(requestId, impResult);
+                        break;
+                }
+
+                // TODO: there's no way to store the callback for the UF request
+                // If the platform has been restarted, there's a good bet the requesting service will have been restarted
+                // too, so a callback would be pointless anyway. It's going to have to resume its operations based on the database records
+//                if (callback != null) {
+//                    expCallbacks.put(requestId, callback);
+//                }
+            }
+
+            log.debug("Finished recalling stored UF requests");
+        } catch (Exception ex) {
+            log.error("Error recalling stored UF requests", ex);
+        }
+
+        try {
+            log.debug("Recalling stored PPN requests");
+
+            List<UserFeedbackPrivacyNegotiationEvent> userFeedbackPrivacyNegotiationEvents = privacyPolicyNegotiationHistoryRepository.listIncomplete();
+            for (UserFeedbackPrivacyNegotiationEvent userFeedbackPrivacyNegotiationEvent : userFeedbackPrivacyNegotiationEvents) {
+                String requestId = userFeedbackPrivacyNegotiationEvent.getRequestId();
+
+                UserFeedbackResult<ResponsePolicy> result = new UserFeedbackResult<ResponsePolicy>(requestId);
+                negotiationResults.put(requestId, result);
+
+                // TODO: there's no way to store the callback for the PPN request
+                // If the platform has been restarted, there's a good bet the requesting service will have been restarted
+                // too, so a callback would be pointless anyway. It's going to have to resume its operations based on the database records
+//                if (callback != null) {
+//                    expCallbacks.put(requestId, callback);
+//                }
+            }
+
+            log.debug("Finished recalling stored PPN requests");
+        } catch (Exception ex) {
+            log.error("Error recalling stored PPN requests", ex);
+        }
+
+        String msg = "User Feedback Initialised\n" +
+                " Exp UF requests: %s\n" +
+                " Imp UF requests: %s\n" +
+                " PPN requests: %s\n" +
+                " AC requests: %s";
+        log.debug(String.format(msg,
+                expResults.size(),
+                impResults.size(),
+                negotiationResults.size(),
+                accessCtrlResults.size()));
     }
 
     @Override
@@ -184,7 +249,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         List<String> optionsList = new ArrayList<String>();
         Collections.addAll(optionsList, content.getOptions());
         ufBean.setOptions(optionsList);
-        ufBean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+        ufBean.setMethod(GET_EXPLICIT_FB);
 
         //add new request to result hashmap
         UserFeedbackResult<List<String>> result = new UserFeedbackResult<List<String>>(requestId);
@@ -202,9 +267,6 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                     log.debug("Storing user feedback bean in database");
 
                 userFeedbackHistoryRepository.insert(ufBean);
-//                ufBean = userFeedbackHistoryRepository.getByRequestId(requestId);
-
-                log.info("Horrible lazy loading hack - options.size()=" + ufBean.getOptions().size());
             }
         } catch (Exception ex) {
             log.error("Error storing user feedback request bean to database", ex);
@@ -313,7 +375,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
         UserFeedbackPrivacyNegotiationEvent event = new UserFeedbackPrivacyNegotiationEvent();
         event.setStage(FeedbackStage.PENDING_USER_RESPONSE);
-        event.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+        event.setMethod(GET_EXPLICIT_FB);
         event.setType(ExpProposalType.PRIVACY_NEGOTIATION);
         String requestId = UUID.randomUUID().toString();
         event.setRequestId(requestId);
@@ -364,7 +426,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     @Override
     public Future<List<ResponseItem>> getAccessControlFB(Requestor requestor, List<ResponseItem> items, IUserFeedbackResponseEventListener<List<ResponseItem>> callback) {
         UserFeedbackAccessControlEvent event = new UserFeedbackAccessControlEvent();
-        event.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+        event.setMethod(GET_EXPLICIT_FB);
         event.setType(ExpProposalType.PRIVACY_ACCESS_CONTROL);
         String requestId = UUID.randomUUID().toString();
         event.setRequestId(requestId);
@@ -564,7 +626,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             // update result
             try {
                 if (userFeedbackHistoryRepository != null) {
-                    userFeedbackHistoryRepository.updateStage(responseID, FeedbackStage.COMPLETED);
+                    userFeedbackHistoryRepository.completeExpFeedback(responseID, expFeedbackBean.getFeedback());
                 }
             } catch (Exception ex) {
                 log.error("Error updating user feedback stage in database", ex);
@@ -618,7 +680,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             // update result
             try {
                 if (userFeedbackHistoryRepository != null) {
-                    userFeedbackHistoryRepository.updateStage(responseID, FeedbackStage.COMPLETED);
+                    userFeedbackHistoryRepository.completeImpFeedback(responseID, result);
                 }
             } catch (Exception ex) {
                 log.error("Error updating user feedback stage in database", ex);
@@ -785,7 +847,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     public void submitExplicitResponse(String requestId, NegotiationDetailsBean negotiationDetails, ResponsePolicy result) {
         //create user feedback response bean
         UserFeedbackPrivacyNegotiationEvent resultBean = new UserFeedbackPrivacyNegotiationEvent();
-        resultBean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+        resultBean.setMethod(GET_EXPLICIT_FB);
         resultBean.setType(ExpProposalType.PRIVACY_NEGOTIATION);
         resultBean.setRequestId(requestId);
         resultBean.setNegotiationDetails(negotiationDetails);
