@@ -394,8 +394,14 @@ public final class CtxModelBeanTranslator {
 		if(bean.getQuality().getOriginType() != null ){
 			object.getQuality().setOriginType(fromCtxOriginTypeBean(bean.getQuality().getOriginType()));
 		}
-		object.getQuality().setPrecision(bean.getQuality().getPrecision());
-		object.getQuality().setUpdateFrequency(bean.getQuality().getUpdateFrequency());
+		if (bean.getQuality().getPrecision() == -1)
+			object.getQuality().setPrecision(null);
+		else
+			object.getQuality().setPrecision(bean.getQuality().getPrecision());
+		if (bean.getQuality().getPrecision() == -1)
+			object.getQuality().setPrecision(null);
+		else
+			object.getQuality().setUpdateFrequency(bean.getQuality().getUpdateFrequency());
 
 		return object;
 	}
