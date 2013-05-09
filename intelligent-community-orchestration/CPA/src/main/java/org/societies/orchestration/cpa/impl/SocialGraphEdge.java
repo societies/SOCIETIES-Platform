@@ -24,8 +24,8 @@
  */
 package org.societies.orchestration.cpa.impl;
 
-import org.societies.api.internal.orchestration.ISocialGraphEdge;
-import org.societies.api.internal.orchestration.ISocialGraphVertex;
+import org.societies.api.cis.orchestration.model.ISocialGraphEdge;
+import org.societies.api.cis.orchestration.model.ISocialGraphVertex;
 
 public class SocialGraphEdge implements ISocialGraphEdge {
 	private double weight;

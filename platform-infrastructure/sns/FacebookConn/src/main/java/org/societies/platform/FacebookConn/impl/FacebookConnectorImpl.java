@@ -59,7 +59,7 @@ public class FacebookConnectorImpl implements FacebookConnector {
 		
 		this.identity		= identity;
 		this.access_token	= access_token;
-		this.name 			= ISocialConnector.FACEBOOK_CONN;
+		this.name 			= ISocialConnector.;
 		this.id				= this.name + "_" + UUID.randomUUID();
 		facebookClient		= new DefaultFacebookClient(access_token);
 		

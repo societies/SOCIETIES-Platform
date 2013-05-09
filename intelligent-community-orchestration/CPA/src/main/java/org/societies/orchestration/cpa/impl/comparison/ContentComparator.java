@@ -63,8 +63,10 @@ public class ContentComparator implements ActorComparator {
         }
     }
     public void initAnnie() throws GateException {
-        Out.prln("Initialising ANNIE...");
-        Gate.setPluginsHome(new File("."));
+        Out.prln("Initialising ANNIE... ");
+        if(Gate.getPluginsHome()==null)
+            Gate.setPluginsHome(new File("."));
+
         Gate.init();
         File gateHome = Gate.getGateHome();
         pluginURL =  ContentComparator.class.getClassLoader().getResource("plugins/ANNIE/");

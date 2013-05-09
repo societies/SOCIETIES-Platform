@@ -66,6 +66,8 @@ public class CPACreationPatterns
 		if(analyserprop.contains(JUNGBETWEENNESS)){
 			analyser = new JungBetweennessAnalyser(5);
 		}
+        compSet.addComparator(new SimpleCounter());
+        compSet.addComparator(new ContentComparator());
 	}
 	//private ActorComparator actComp = null;
     private MultiComparator compSet = new MultiComparator();
@@ -76,8 +78,7 @@ public class CPACreationPatterns
 		String nowStr = Long.toString(System.currentTimeMillis());
 
 
-        compSet.addComparator(new SimpleCounter());
-        compSet.addComparator(new ContentComparator());
+
 		//1. make a graph of interactions, the weight on the links indicates level of interaction, 0 is none. 
 		graph.populateFromNewData(actDiff, lastTime, compSet);
 		//2. segment the graph nodes according to weights. suggest
