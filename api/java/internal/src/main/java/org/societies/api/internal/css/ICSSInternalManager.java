@@ -84,6 +84,15 @@ public interface ICSSInternalManager extends ICSSManager {
 	 */
 	public Future<CssInterfaceResult> logoutCSS(CssRecord profile);
 
+        /**
+         * Synch the CSS profile
+         * 
+         * @param profile
+         * @return Future<CssInterfaceResult>
+         */
+        public Future<CssInterfaceResult> synchProfile(CssRecord profile);
+
+
 	/**
 	 * Register a CSS
 	 * 
@@ -313,6 +322,8 @@ public interface ICSSInternalManager extends ICSSManager {
 	 * @return
 	 */
 	public Future<List<MarshaledActivity>> getActivities(String timePeriod, int limitResults);
+	
+	public void pushtoContext(CssRecord cssrecord);
 	
 	// No implementation of the following methods
 	

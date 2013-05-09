@@ -24,6 +24,8 @@
  */
 package org.societies.privacytrust.trust.api.evidence.remote;
 
+import org.societies.api.privacytrust.trust.TrustException;
+
 /**
  * Describe your class here...
  *
@@ -41,4 +43,13 @@ public interface ITrustEvidenceCollectorRemoteClientCallback {
 	 * Called when the indirect trust evidence has been added.
 	 */
 	public void onAddedIndirectEvidence();
+	
+	/**
+	 * Associates an exception with this callback.
+	 * 
+	 * @param exception 
+	 *            the exception to associate with this callback.
+	 * @since 1.1
+	 */
+	public void onException(TrustException exception);
 }

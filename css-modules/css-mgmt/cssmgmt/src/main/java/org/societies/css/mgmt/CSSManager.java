@@ -236,14 +236,13 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 		try{
 			InetAddress localAddress = InetAddress.getLocalHost();
 			
-			LOG.debug("Cloud Node IP address: " + localAddress);
-			
 			if (null != localAddress) {
+				LOG.debug("Cloud Node IP address: " + localAddress);
 				NetworkInterface networkInterface =  NetworkInterface.getByInetAddress(localAddress);
 				
-				LOG.debug("Cloud Node network interface: " + networkInterface.getName());
-				
 				if (null != networkInterface) {
+					LOG.debug("Cloud Node network interface: " + networkInterface.getName());
+					
 					byte[] macAddress = networkInterface.getHardwareAddress();
 					StringBuilder sb = new StringBuilder();
 					for (int i = 0; i < macAddress.length; i++) {
@@ -437,6 +436,8 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		this.pushtoContext(cssRecord);
 
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
@@ -507,8 +508,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 		}
 
 
-
-
+		this.pushtoContext(cssRecord);
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
 
@@ -3038,7 +3038,10 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			
 			List<CssNode> cssNodes = new ArrayList<CssNode>();
 			cssNodes = record.getCssNodes();
-			LOG.info("pushtoContext CSSNODES value: " +cssNodes);
+			for(int i = 0; i < cssNodes.size(); i++){
+				LOG.info("pushtoContext CSSNODES value: " +cssNodes.get(i).getIdentity());
+			}
+			
 			for (final CssNode cssNode : cssNodes) {
 
 			  // create INetworkNode instance from JID String representation

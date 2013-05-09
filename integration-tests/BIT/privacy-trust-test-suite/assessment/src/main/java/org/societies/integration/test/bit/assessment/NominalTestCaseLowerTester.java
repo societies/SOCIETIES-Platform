@@ -2,7 +2,10 @@ package org.societies.integration.test.bit.assessment;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.After;
@@ -19,6 +22,7 @@ import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
@@ -210,7 +214,6 @@ public class NominalTestCaseLowerTester {
 		
 		LOG.info("[#1870] testCommsManagerLogging()");
 
-		IIdentity from = identityManager.getThisNetworkNode();
 		IIdentity to = identityManager.getThisNetworkNode();
 		Stanza stanza = new Stanza(to);
 		
@@ -240,5 +243,96 @@ public class NominalTestCaseLowerTester {
 				num1 + ", after transmission = " + num2);
 		
 		assertEquals(num1 + 2, num2);
+	}
+	
+	@Test
+	public void testCorrelationBySenderClass() throws Exception {
+		
+		LOG.info("[#1870] testCorrelationByClass()");
+
+		List<HashMap<String, Double>> corrs = new ArrayList<HashMap<String, Double>>();
+		HashMap<String, AssessmentResultClassName> result;
+		
+		assessment.assessAllNow();
+		result = assessment.getAssessmentAllClasses();
+		HashMap<String, Double> corrs0 = new HashMap<String, Double>();
+		for (String key : result.keySet()) {
+			corrs0.put(key, result.get(key).getCorrWithDataAccessBySender());
+		}
+		corrs.add(corrs0);
+
+		accessContext();
+		Thread.sleep(100);
+		transmitData(false);
+		Thread.sleep(100);
+
+		assessment.assessAllNow();
+		result = assessment.getAssessmentAllClasses();
+		HashMap<String, Double> corrs1 = new HashMap<String, Double>();
+		for (String key : result.keySet()) {
+			corrs1.put(key, result.get(key).getCorrWithDataAccessBySender());
+		}
+		corrs.add(corrs1);
+
+		transmitData(true);
+		Thread.sleep(100);
+		
+		assessment.assessAllNow();
+		result = assessment.getAssessmentAllClasses();
+		HashMap<String, Double> corrs2 = new HashMap<String, Double>();
+		for (String key : result.keySet()) {
+			corrs2.put(key, result.get(key).getCorrWithDataAccessBySender());
+		}
+		corrs.add(corrs2);
+		
+		for (String key : corrs0.keySet()) {
+			LOG.debug("Verifying correlation by class for {}", key);
+			if (key.equals(getClass().getName())) {
+				LOG.debug("Correlations for this class ({}) should have increased", key);
+				LOG.debug("Correlations for this class: {}, {}, " + corrs2.get(key), corrs0.get(key), corrs1.get(key));
+				assertTrue(corrs0.get(key) < corrs1.get(key));
+				assertTrue(corrs1.get(key) < corrs2.get(key));
+			}
+			else {
+				LOG.debug("Correlations for other class ({}) should have remained the same", key);
+				LOG.debug("Correlations for other class: {}, {}, " + corrs2.get(key), corrs0.get(key), corrs1.get(key));
+				assertEquals(corrs0.get(key), corrs1.get(key), 0.0);
+				assertEquals(corrs1.get(key), corrs2.get(key), 0.0);
+			}
+		}
+	}
+	
+	private void accessContext() throws Exception {
+		
+		IIdentity requestor = identityManager.getThisNetworkNode();
+		CtxBrokerExternalHelper ctx = new CtxBrokerExternalHelper(ctxBrokerExternal, requestor);
+		
+		ctx.createContext();
+		ctx.retrieveContext();
+	}
+	
+	/**
+	 * 
+	 * @param returnValue true to send asynchronous message with callback, false to send one-way message
+	 * @throws CommunicationException
+	 */
+	private void transmitData(boolean returnValue) throws CommunicationException {
+		
+		IIdentity to = identityManager.getThisNetworkNode();
+		Stanza stanza = new Stanza(to);
+		
+		ProviderBean payload = new ProviderBean();
+		payload.setMethod(MethodType.ACCEPT_POLICY_AND_GET_SLA);
+		payload.setServiceId("service-1");
+		payload.setSessionId(1);
+		payload.setSignedPolicyOption("<sla/>");
+		payload.setModified(false);
+
+		if (returnValue) {
+			commManager.sendMessage(stanza, payload);
+		}
+		else {
+			commManager.sendIQGet(stanza, payload, null);
+		}
 	}
 }

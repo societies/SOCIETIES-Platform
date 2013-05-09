@@ -121,7 +121,6 @@ public class NegotiationAgent implements INegotiationAgent{
 			}
 			ProviderResponsePolicyGenerator respPolGen = new ProviderResponsePolicyGenerator();
 			ResponsePolicy myResponse = respPolGen.generateResponse(policy, myPolicy);
-			
 			return new AsyncResult<ResponsePolicy>(myResponse);
 		} catch (PrivacyException e) {
 			// TODO Auto-generated catch block

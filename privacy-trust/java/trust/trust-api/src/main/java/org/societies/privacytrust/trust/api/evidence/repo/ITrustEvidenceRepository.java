@@ -46,13 +46,14 @@ public interface ITrustEvidenceRepository {
 	 * repository.
 	 * 
 	 * @param evidence
-	 *            the evidence to be added to the repository
+	 *            the evidence to be added to the repository.
 	 * @throws TrustEvidenceRepositoryException
-	 *             if the specified evidence cannot be added to the repository
+	 *             if the specified evidence cannot be added to the repository.
 	 * @throws NullPointerException
-	 *             if the specified evidence is <code>null</code>
+	 *             if the specified evidence is <code>null</code>.
 	 */
-	public void addEvidence(final ITrustEvidence evidence) throws TrustEvidenceRepositoryException;
+	public void addEvidence(final ITrustEvidence evidence) 
+			throws TrustEvidenceRepositoryException;
 	
 	/**
 	 * Retrieves the direct trust evidence matching the specified criteria. 
@@ -61,20 +62,21 @@ public interface ITrustEvidenceRepository {
 	 * range in which the evidence was collected.
 	 * 
 	 * @param subjectId
-	 *            (optional) the {@link TrustedEntityId} of the subject associated with 
-	 *            the direct trust evidence to retrieve.
+	 *            (optional) the {@link TrustedEntityId} of the subject 
+	 *            associated with the direct trust evidence to retrieve.
 	 * @param objectId
-	 *            (optional) the {@link TrustedEntityId} of the object associated with 
-	 *            the direct trust evidence to retrieve.
+	 *            (optional) the {@link TrustedEntityId} of the object 
+	 *            associated with the direct trust evidence to retrieve.
 	 * @param type
 	 *            (optional) the type of the direct trust evidence to retrieve. 
 	 * @param startDate
 	 *            (optional) the start time. 
 	 * @param endDate
 	 *            (optional) the end time.
-	 * @return the direct trust evidence matching the specified search criteria
+	 * @return the direct trust evidence matching the specified search criteria.
 	 * @throws TrustEvidenceRepositoryException
-	 *             if there is a problem accessing the Trust Evidence Repository
+	 *             if there is a problem accessing the Trust Evidence 
+	 *             Repository.
 	 * @since 0.5
 	 */
 	public Set<IDirectTrustEvidence> retrieveDirectEvidence(
@@ -89,26 +91,88 @@ public interface ITrustEvidenceRepository {
 	 * range in which the evidence was collected.
 	 * 
 	 * @param subjectId
-	 *            (optional) the {@link TrustedEntityId} of the subject associated with 
-	 *            the indirect trust evidence to retrieve.
+	 *            (optional) the {@link TrustedEntityId} of the subject 
+	 *            associated with the indirect trust evidence to retrieve.
 	 * @param objectId
-	 *            (optional) the {@link TrustedEntityId} of the object associated with 
-	 *            the indirect trust evidence to retrieve.
+	 *            (optional) the {@link TrustedEntityId} of the object 
+	 *            associated with the indirect trust evidence to retrieve.
 	 * @param type
-	 *            (optional) the type of the indirect trust evidence to retrieve. 
+	 *            (optional) the type of the indirect trust evidence to 
+	 *            retrieve. 
 	 * @param startDate
 	 *            (optional) the start time. 
 	 * @param endDate
 	 *            (optional) the end time. 
-	 * @return the indirect trust evidence matching the specified search criteria
+	 * @param sourceId
+	 *            (optional) the {@link TrustedEntityId} of the source 
+	 *            associated with the indirect trust evidence to retrieve.
+	 * @return the indirect trust evidence matching the specified search 
+	 *             criteria.
 	 * @throws TrustEvidenceRepositoryException
-	 *             if there is a problem accessing the Trust Evidence Repository
-	 * @since 0.5
+	 *             if there is a problem accessing the Trust Evidence 
+	 *             Repository.
+	 * @since 1.0
 	 */
 	public Set<IIndirectTrustEvidence> retrieveIndirectEvidence(
 			final TrustedEntityId subjectId, final TrustedEntityId objectId,
 			final TrustEvidenceType type, final Date startDate, 
-			final Date endDate) throws TrustEvidenceRepositoryException;
+			final Date endDate, final TrustedEntityId sourceId)
+					throws TrustEvidenceRepositoryException;
+	
+	/**
+	 * Retrieves the latest direct trust evidence matching the specified
+	 * optional criteria. The method allows matching against the subject,
+	 * object, as well as, the {@link TrustEvidenceType type} of the evidence.
+	 * 
+	 * @param subjectId
+	 *            (optional) the {@link TrustedEntityId} of the subject 
+	 *            associated with the direct trust evidence to retrieve.
+	 * @param objectId
+	 *            (optional) the {@link TrustedEntityId} of the object
+	 *            associated with the direct trust evidence to retrieve.
+	 * @param type
+	 *            (optional) the type of the direct trust evidence to retrieve.
+	 * @return the latest direct trust evidence matching the specified search
+	 *             criteria.
+	 * @throws TrustEvidenceRepositoryException
+	 *             if there is a problem accessing the Trust Evidence 
+	 *             Repository.
+	 * @since 1.0
+	 */
+	public Set<IDirectTrustEvidence> retrieveLatestDirectEvidence(
+			final TrustedEntityId subjectId, final TrustedEntityId objectId,
+			final TrustEvidenceType type) 
+					throws TrustEvidenceRepositoryException;
+	
+	/**
+	 * Retrieves the latest indirect trust evidence matching the specified
+	 * optional criteria. The method allows matching against the subject,
+	 * object, source, as well as, the {@link TrustEvidenceType type} of the
+	 * evidence.
+	 * 
+	 * @param subjectId
+	 *            (optional) the {@link TrustedEntityId} of the subject 
+	 *            associated with the indirect trust evidence to retrieve.
+	 * @param objectId
+	 *            (optional) the {@link TrustedEntityId} of the object 
+	 *            associated with the indirect trust evidence to retrieve.
+	 * @param type
+	 *            (optional) the type of the indirect trust evidence to 
+	 *            retrieve.
+	 * @param sourceId
+	 *            (optional) the {@link TrustedEntityId} of the source
+	 *            associated with the indirect trust evidence to retrieve.
+	 * @return the latest indirect trust evidence matching the specified search
+	 *             criteria.
+	 * @throws TrustEvidenceRepositoryException
+	 *             if there is a problem accessing the Trust Evidence 
+	 *             Repository.
+	 * @since 1.0
+	 */
+	public Set<IIndirectTrustEvidence> retrieveLatestIndirectEvidence(
+			final TrustedEntityId subjectId, final TrustedEntityId objectId,
+			final TrustEvidenceType type, final TrustedEntityId sourceId)
+					throws TrustEvidenceRepositoryException;
 	
 	/**
 	 * Removes the direct trust evidence matching the specified criteria. 
@@ -117,17 +181,20 @@ public interface ITrustEvidenceRepository {
 	 * range in which the evidence was collected.
 	 * 
 	 * @param subjectId
-	 *            (optional) the {@link TrustedEntityId} of the subject associated with 
-	 *            the direct trust evidence to remove.
+	 *            (optional) the {@link TrustedEntityId} of the subject 
+	 *            associated with the direct trust evidence to remove.
 	 * @param objectId
-	 *            (optional) the {@link TrustedEntityId} of the object associated with 
-	 *            the direct trust evidence to remove.
+	 *            (optional) the {@link TrustedEntityId} of the object 
+	 *            associated with the direct trust evidence to remove.
 	 * @param type
 	 *            (optional) the type of the direct trust evidence to remove. 
 	 * @param startDate
 	 *            (optional) the start time. 
 	 * @param endDate
 	 *            (optional) the end time.
+	 * @throws TrustEvidenceRepositoryException
+	 *             if there is a problem accessing the Trust Evidence 
+	 *             Repository.
 	 * @since 0.5
 	 */
 	public void removeDirectEvidence(final TrustedEntityId subjectId,
@@ -142,21 +209,28 @@ public interface ITrustEvidenceRepository {
 	 * range in which the evidence was collected.
 	 * 
 	 * @param subjectId
-	 *            (optional) the {@link TrustedEntityId} of the subject associated with 
-	 *            the direct trust evidence to remove.
+	 *            (optional) the {@link TrustedEntityId} of the subject 
+	 *            associated with the direct trust evidence to remove.
 	 * @param objectId
-	 *            (optional) the {@link TrustedEntityId} of the object associated with 
-	 *            the direct trust evidence to remove.
+	 *            (optional) the {@link TrustedEntityId} of the object 
+	 *            associated with the direct trust evidence to remove.
 	 * @param type
 	 *            (optional) the type of the direct trust evidence to remove. 
 	 * @param startDate
 	 *            (optional) the start time. 
 	 * @param endDate
 	 *            (optional) the end time.
-	 * @since 0.5
+	 * @param sourceId
+	 *            (optional) the {@link TrustedEntityId} of the source 
+	 *            associated with the indirect trust evidence to remove.
+	 * @throws TrustEvidenceRepositoryException
+	 *             if there is a problem accessing the Trust Evidence 
+	 *             Repository.
+	 * @since 1.0
 	 */
 	public void removeIndirectEvidence(final TrustedEntityId subjectId,
 			final TrustedEntityId objectId, final TrustEvidenceType type,
-			final Date startDate, final Date endDate) 
+			final Date startDate, final Date endDate, 
+			final TrustedEntityId sourceId)	
 					throws TrustEvidenceRepositoryException;
 }

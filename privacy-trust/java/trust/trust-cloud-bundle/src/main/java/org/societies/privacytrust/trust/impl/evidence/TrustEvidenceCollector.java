@@ -29,6 +29,7 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
@@ -55,9 +56,78 @@ public class TrustEvidenceCollector implements
 	
 	TrustEvidenceCollector() {
 		
-		LOG.info(this.getClass() + " instantiated");
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
 	}
 
+	/*
+	 * @see org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector#addDirectEvidence(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
+	 */
+	@Override
+	public void addDirectEvidence(final Requestor requestor, 
+			final TrustedEntityId subjectId, final TrustedEntityId objectId,
+			final TrustEvidenceType type, final Date timestamp, 
+			final Serializable info) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (subjectId == null)
+			throw new NullPointerException("subjectId can't be null");
+		if (objectId == null)
+			throw new NullPointerException("objectId can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+		if (timestamp == null)
+			throw new NullPointerException("timestamp can't be null");
+		
+		if (LOG.isDebugEnabled()) 
+			LOG.debug("Adding direct trust evidence with subjectId '"
+					+ subjectId	+ "', objectId '" + objectId + "', type '" 
+					+ type + "', timestamp '" + timestamp + "' and info '"
+					+ info + "' on behalf of requestor '" + requestor + "'");
+		
+		// TODO access control
+		
+		this.internalTrustEvidenceCollector.addDirectEvidence(requestor,
+				subjectId, objectId, type, timestamp, info);
+	}
+
+	/*
+	 * @see org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector#addIndirectEvidence(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 */
+	@Override
+	public void addIndirectEvidence(final Requestor requestor, 
+			final TrustedEntityId subjectId, final TrustedEntityId objectId,
+			final TrustEvidenceType type, final Date timestamp,
+			final Serializable info, final TrustedEntityId sourceId) 
+					throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (subjectId == null)
+			throw new NullPointerException("subjectId can't be null");
+		if (objectId == null)
+			throw new NullPointerException("objectId can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+		if (timestamp == null)
+			throw new NullPointerException("timestamp can't be null");
+		if (sourceId == null)
+			throw new NullPointerException("sourceId can't be null");
+		
+		if (LOG.isDebugEnabled()) 
+			LOG.debug("Adding indirect trust evidence with subjectId '"
+					+ subjectId	+ "', objectId '" + objectId + "', type '" 
+					+ type + "', timestamp '" + timestamp + "', info '" + info
+					+ "' and sourceId '" + sourceId 
+					+ "' on behalf of requestor '" + requestor + "'");
+		
+		// TODO access control
+		
+		this.internalTrustEvidenceCollector.addIndirectEvidence(requestor,
+				subjectId, objectId, type, timestamp, info, sourceId);
+	}
+	
 	/*
 	 * @see org.societies.api.privacytrust.trust.evidence.ITrustEvidenceCollector#addDirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable)
 	 */
@@ -66,6 +136,20 @@ public class TrustEvidenceCollector implements
 			final TrustedEntityId objectId, final TrustEvidenceType type,
 			Date timestamp, Serializable info) throws TrustException {
 		
+		if (subjectId == null)
+			throw new NullPointerException("subjectId can't be null");
+		if (objectId == null)
+			throw new NullPointerException("objectId can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+		if (timestamp == null)
+			throw new NullPointerException("timestamp can't be null");
+		
+		if (LOG.isDebugEnabled()) 
+			LOG.debug("Adding direct trust evidence with  subjectId '"
+					+ subjectId	+ "', objectId '" + objectId + "', type '" 
+					+ type + "', timestamp '" + timestamp + "' and info '"
+					+ info + "'");
 		this.internalTrustEvidenceCollector.addDirectEvidence(subjectId,
 				objectId, type, timestamp, info);
 	}
@@ -78,6 +162,11 @@ public class TrustEvidenceCollector implements
 			final TrustedEntityId objectId, TrustEvidenceType type, Date timestamp,
 			Serializable info, final TrustedEntityId sourceId) throws TrustException {
 		
+		if (LOG.isDebugEnabled()) 
+			LOG.debug("Adding indirect trust evidence with  subjectId '"
+					+ subjectId	+ "', objectId '" + objectId + "', type '" 
+					+ type + "', timestamp '" + timestamp + "', info '" + info
+					+ "' and sourceId '" + sourceId + "'");
 		this.internalTrustEvidenceCollector.addIndirectEvidence(subjectId,
 				objectId, type, timestamp, info, sourceId);
 	}

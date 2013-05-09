@@ -630,7 +630,7 @@ button.ui-button::-moz-focus-inner {
     top: 50%;
     width: 32px;
     height: 32px;
-    margin: -10px 0 0 0;
+    margin: 0 0 0 0;
     padding: 1px;
     font-weight: normal;
     text-decoration: none;
@@ -706,13 +706,142 @@ button.ui-button::-moz-focus-inner {
     outline: none;
 }
 
-.ui-selectcheckboxmenu-panel {
-    background: #202020 url("#{resource['primefaces-societies-theme:images/ui-bg_flat_75_202020_40x100.png']}") 50% 50% repeat-x;
+.ui-selectcheckboxmenu-panel, 
+ul.ui--items,
+div.ui-selectonelistbox,
+ul.ui-selectlistbox-list,
+.ui--panel,
+div.ui-tabs-panels,
+ul.ui-selectonemenu-items {
+    /*background: #202020 url("#{resource['primefaces-societies-theme:images/ui-bg_flat_75_202020_40x100.png']}") 50% 50% repeat-x;*/
     list-style: none;
     padding: 2px;
     margin: 0;
     display: block;
     outline: none;
+    background-color: #fff;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#efefef));
+    background-image: -webkit-linear-gradient(top, #ffffff, #efefef);
+    background-image: -moz-linear-gradient(top, #ffffff, #efefef);
+    background-image: -ms-linear-gradient(top, #ffffff, #efefef);
+    background-image: -o-linear-gradient(top, #ffffff, #efefef);
+    background-image: linear-gradient(top, #ffffff, #efefef);
+    -pie-background: linear-gradient(top, #ffffff, #efefef);
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+    -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+ul.ui-selectcheckboxmenu-items li.ui-selectcheckboxmenu-item
+{
+    display: list-item;
+    position: relative;
+    list-style: disc;
+}
+
+li.ui-selectcheckboxmenu-item label
+{
+ 	float: none;
+ 	color: #000000;
+}
+
+ul.ui-menu-list .ui-state-hover,
+div.ui-selectcheckboxmenu .ui-selectcheckboxmenu-trigger,
+div.ui-selectcheckboxmenu .ui-state-hover,
+div.ui-widget-header .ui-state-hover,
+div.ui-chkbox .ui-state-hover,
+div.ui-radiobutton .ui-state-hover,
+ul.ui--items .ui-state-hover,
+ul.ui-selectlistbox-list .ui-state-hover,
+ul.ui-tabs-nav,
+ul.ui-tabs-nav .ui-state-hover,
+ul.ui-selectonemenu-items .ui-state-hover,
+div.ui-accordion .ui-state-hover, 
+div.ui-rating-cancel div.ui-rating-cancel-hover,
+div.ui-selectonemenu .ui-state-hover,
+div.ui-selectonemenu .ui-selectonemenu-trigger{
+	background: #efefef;
+	color: #000000;
+}
+
+ul.ui-tabs-nav .ui-state-hover a,
+div.ui-accordion .ui-state-hover a,
+div.ui-selectonemenu label{
+	color: #000000;
+}
+
+div.ui-selectcheckboxmenu-panel div.ui-widget-header,
+a.ui-selectcheckboxmenu-label-container label,
+a.ui-selectcheckboxmenu-label-container .ui-state-hover{
+	background: #ffffff; 
+}
+
+div.ui-chkbox{
+	background-color: #fff;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#efefef));
+    background-image: -webkit-linear-gradient(top, #ffffff, #efefef);
+    background-image: -moz-linear-gradient(top, #ffffff, #efefef);
+    background-image: -ms-linear-gradient(top, #ffffff, #efefef);
+    background-image: -o-linear-gradient(top, #ffffff, #efefef);
+    background-image: linear-gradient(top, #ffffff, #efefef);
+    -pie-background: linear-gradient(top, #ffffff, #efefef);
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    -moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+div.ui-chkbox:checked{
+   background-color: #f5f5f5;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#efefef), to(#ffffff));
+    background-image: -webkit-linear-gradient(top, #efefef, #ffffff);
+    background-image: -moz-linear-gradient(top, #efefef, #ffffff);
+    background-image: -ms-linear-gradient(top, #efefef, #ffffff);
+    background-image: -o-linear-gradient(top, #efefef, #ffffff);
+    background-image: linear-gradient(top, #efefef, #ffffff);
+    -pie-background: linear-gradient(top, #efefef, #ffffff);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.5);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+div.ui-radiobutton{
+	background-color: #fff;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#efefef));
+    background-image: -webkit-linear-gradient(top, #ffffff, #efefef);
+    background-image: -moz-linear-gradient(top, #ffffff, #efefef);
+    background-image: -ms-linear-gradient(top, #ffffff, #efefef);
+    background-image: -o-linear-gradient(top, #ffffff, #efefef);
+    background-image: linear-gradient(top, #ffffff, #efefef);
+    -pie-background: linear-gradient(top, #ffffff, #efefef);
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    -moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+}
+
+div.ui-radiobutton:checked{
+    background-color: #f5f5f5;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#efefef), to(#ffffff));
+    background-image: -webkit-linear-gradient(top, #efefef, #ffffff);
+    background-image: -moz-linear-gradient(top, #efefef, #ffffff);
+    background-image: -ms-linear-gradient(top, #efefef, #ffffff);
+    background-image: -o-linear-gradient(top, #efefef, #ffffff);
+    background-image: linear-gradient(top, #efefef, #ffffff);
+    -pie-background: linear-gradient(top, #efefef, #ffffff);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.5);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.5);
 }
 
 .ui-selectonelistbox {
@@ -729,7 +858,16 @@ ul.ui-selectlistbox-list li {
     list-style-image: none;
 }
 
-.ui-selectonemenu-items {
+ul.ui-selectonemenu-items .ui-state-highlight,
+ul.ui-selectlistbox-list .ui-state-highlight {
+    background: #ffffff;
+}
+
+li.ui-selectonemenu-item{
+	list-style: none;
+}
+
+.ui--items {
     background: #202020 url("#{resource['primefaces-societies-theme:images/ui-bg_flat_75_202020_40x100.png']}") 50% 50% repeat-x;
     list-style: none;
     padding: 2px;
@@ -739,12 +877,12 @@ ul.ui-selectlistbox-list li {
 }
 
 ul.ui-menu-list li,
-ul.ui-selectonemenu-items li {
+ul.ui--items li {
     list-style: none;
     list-style-image: none;
 }
 
-.ui-selectonemenu-items-wrapper.ui-selectonemenu-items {
+.ui--items-wrapper.ui--items {
     background-color: rgb(51, 51, 51);
     background-image: none;
     border-radius: 3px;
@@ -867,6 +1005,7 @@ table.ui-panelgrid td {
     width: 1.2em;
     height: 1.2em;
     cursor: default;
+    background: #cccccc;
 }
 
 .ui-slider .ui-slider-range {
@@ -930,6 +1069,11 @@ table.ui-panelgrid td {
     top: 0;
 }
 
+div.ui-slider .ui-state-hover,
+div.ui-slider .ui-state-focus{
+	background: #efefef;
+}
+
 .ui-spinner {
     position: relative;
     display: inline-block;
@@ -991,6 +1135,13 @@ table.ui-panelgrid td {
     /* need to fix icons sprite */
     background-position: -65px -16px;
 }
+
+span.ui-spinner .ui-state-hover,
+span.ui-spinner .ui-state-focus{
+	background: #efefef;
+}
+
+
 
 .ui-tabs {
     position: relative; /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
@@ -1955,6 +2106,31 @@ body .ui-tooltip {
     border: 1px solid #777c82;
 }
 
+input.ui-inputfield:hover {
+	background:#ffffff;
+	color:#000000;
+    border: 1px solid #777c82;
+}
+
+input.ui-inputfield:focus {
+	background:#ffffff;
+	color:#000000;
+    border: 1px solid #777c82;
+}
+
+textarea.ui-inputfield:hover {
+	background:#ffffff;
+	color:#000000;
+    border: 1px solid #777c82;
+}
+
+textarea.ui-inputfield:focus {
+	background:#ffffff;
+	color:#000000;
+    border: 1px solid #777c82;
+}
+
+
 /* Misc visuals
 ----------------------------------*/
 
@@ -2001,4 +2177,28 @@ body .ui-tooltip {
     opacity: .3;
     filter: Alpha(Opacity = 30);
     border-radius: 8px;
+}
+
+ul.side a{
+	list-style: none;
+    padding: 0;
+}
+
+ul.side li{
+	margin: 0;
+    padding: 0 20px;
+    list-style: none
+}
+ul.side a{
+	width: 150px;
+    display: inline-block;
+    padding: 10px 0 10px 25px;
+    text-decoration: none;
+    color: #313639;
+    font-weight: bold;
+    background: transparent url(../images/societies_GUI_v1.png) -600px -120px no-repeat;
+}
+
+ul.side a:hover{
+	background: #fafafa url(../images/societies_GUI_v1.png) -600px -180px no-repeat;
 }

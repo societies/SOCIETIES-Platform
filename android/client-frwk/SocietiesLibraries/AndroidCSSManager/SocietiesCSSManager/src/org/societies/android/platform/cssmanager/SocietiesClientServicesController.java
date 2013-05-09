@@ -37,6 +37,7 @@ import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.internal.cssmanager.IFriendsManager;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
+import org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient;
 import org.societies.android.api.internal.servicelifecycle.IServiceControl;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.android.api.internal.sns.ISocialData;
@@ -515,6 +516,14 @@ public class SocietiesClientServicesController {
         		Log.e(LOCAL_LOG_TAG, "CIS Subscribed Service does not exist");
         	}
 
+        	if (retValue) {
+	        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Trust Service");
+	        	serviceIntent = new Intent(ICoreSocietiesServices.TRUST_CLIENT_SERVICE_INTENT);
+	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, trustConnection, Context.BIND_AUTO_CREATE);
+           	} else {
+        		Log.e(LOCAL_LOG_TAG, "Trust Service does not exist");
+        	}
+
         	//LOCAL PLATFORM SERVICES
         	if (retValue) {
 	        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Android CSS Directory Service");
@@ -563,6 +572,7 @@ public class SocietiesClientServicesController {
            	} else {
         		Log.e(LOCAL_LOG_TAG, "Privacy Policy Service does not exist");
         	}
+        	
         	
         	try {
         		//To prevent hanging this latch uses a timeout
@@ -833,7 +843,10 @@ public class SocietiesClientServicesController {
 		case CIS_SUBSCRIBED_SERVICE:
 			retValue = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisSubscribed.methodsArray, targetMethod), 0, 0);
 			break;
-//		case ???_SERVICE:
+			case TRUST_SERVICE:
+			retValue = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IInternalTrustClient.methodsArray, targetMethod), 0, 0);
+			break;
+//			case ???_SERVICE:
 //			retValue = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(???.methodsArray, targetMethod), 0, 0);
 //			break;
 		default:
