@@ -22,71 +22,33 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
-
-import java.util.Set;
+package org.societies.privacytrust.trust.api.similarity;
 
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 
 /**
- * This interface represents trusted CSSs. An <code>ITrustedCss</code> object is
- * referenced by its {@link TrustedEntityId}, while the associated 
- * {@link Trust} value objects express the trustworthiness of this CSS, i.e.
- * direct, indirect and user-perceived. Each trusted CSS is assigned a set of
- * {@link TrustedCis} objects representing the communities this CSS is member
- * of. In addition, the services provided by a TrustedCss are modelled as
- * {@link TrustedService} objects.
- * 
+ * This interface provides methods to evaluate the similarity of users 
+ * based on their direct trust relationships.
+ *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.7
+ * @since 1.1
  */
-public interface ITrustedCss extends ITrustedEntity {
-
-	/**
-	 * Returns a set containing the communities this CSS is member of.
-	 * 
-	 * @return a set containing the communities this CSS is member of.
-	 */
-	public Set<ITrustedCis> getCommunities();
-
-	/**
-	 * 
-	 * @param community
-	 */
-	public void addCommunity(final ITrustedCis community);
-
-	/**
-	 * 
-	 * @param community
-	 */
-	public void removeCommunity(final ITrustedCis community);
-
-	/**
-	 * Returns a set containing the services provided by this CSS.
-	 * 
-	 * @return a set containing the services provided by this CSS.
-	 */
-	public Set<ITrustedService> getServices();
+public interface ITrustSimilarityEvaluator {
 	
-	/*
-	 * TODO 
-	 * @param serviceType
-	 *
-	public Set<TrustedService> getServices(String serviceType) {
-		return null;
-	}*/
-	
-	/** 
-	 * Returns the similarity between the trustor and the trustee.
-	 *  
-	 * @since 1.1 
+	/**
+	 * TODO
+	 * 
+	 * @param trustorId
+	 *            the entity to compare against the given trustee.
+	 * @param trusteeId 
+	 *            the entity to compare against the given trustor.
+	 * @return
+	 * @throws TrustSimilarityEvalException
+	 * @throws IllegalArgumentException 
+	 *             if the specified identifiers are not of type CSS.
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>.
 	 */
-	public Double getSimilarity();
-	
-	/** 
-	 * Sets the similarity between the trustor and the trustee.
-	 *  
-	 * @since 1.1 
-	 */
-	public void setSimilarity(Double similarity);
+	public Double evaluateCosineSimilarity(final TrustedEntityId trustorId,
+			final TrustedEntityId trusteeId) throws TrustSimilarityEvalException;
 }

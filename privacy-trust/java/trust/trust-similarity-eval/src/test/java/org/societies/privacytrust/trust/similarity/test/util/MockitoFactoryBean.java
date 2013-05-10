@@ -22,71 +22,45 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
+package org.societies.privacytrust.trust.similarity.test.util;
 
-import java.util.Set;
-
-import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.FactoryBean;
 
 /**
- * This interface represents trusted CSSs. An <code>ITrustedCss</code> object is
- * referenced by its {@link TrustedEntityId}, while the associated 
- * {@link Trust} value objects express the trustworthiness of this CSS, i.e.
- * direct, indirect and user-perceived. Each trusted CSS is assigned a set of
- * {@link TrustedCis} objects representing the communities this CSS is member
- * of. In addition, the services provided by a TrustedCss are modelled as
- * {@link TrustedService} objects.
- * 
- * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.7
+ * A {@link FactoryBean} for creating mock beans based on Mockito so that they
+ * can be {@link @Autowired} into Spring test configurations.
+ *
+ * @author Mattias Severson, Jayway
+ *
+ * @see FactoryBean
+ * @see org.mockito.Mockito 
  */
-public interface ITrustedCss extends ITrustedEntity {
+public class MockitoFactoryBean<T> implements FactoryBean<T> {
 
-	/**
-	 * Returns a set containing the communities this CSS is member of.
-	 * 
-	 * @return a set containing the communities this CSS is member of.
-	 */
-	public Set<ITrustedCis> getCommunities();
+    private Class<T> classToBeMocked;
 
-	/**
-	 * 
-	 * @param community
-	 */
-	public void addCommunity(final ITrustedCis community);
+    /**
+     * Creates a Mockito mock instance of the provided class.
+     * @param classToBeMocked The class to be mocked.
+     */
+    public MockitoFactoryBean(Class<T> classToBeMocked) {
+        this.classToBeMocked = classToBeMocked;
+    }
 
-	/**
-	 * 
-	 * @param community
-	 */
-	public void removeCommunity(final ITrustedCis community);
+    @Override
+    public T getObject() throws Exception {
+    	
+        return Mockito.mock(classToBeMocked);
+    }
 
-	/**
-	 * Returns a set containing the services provided by this CSS.
-	 * 
-	 * @return a set containing the services provided by this CSS.
-	 */
-	public Set<ITrustedService> getServices();
-	
-	/*
-	 * TODO 
-	 * @param serviceType
-	 *
-	public Set<TrustedService> getServices(String serviceType) {
-		return null;
-	}*/
-	
-	/** 
-	 * Returns the similarity between the trustor and the trustee.
-	 *  
-	 * @since 1.1 
-	 */
-	public Double getSimilarity();
-	
-	/** 
-	 * Sets the similarity between the trustor and the trustee.
-	 *  
-	 * @since 1.1 
-	 */
-	public void setSimilarity(Double similarity);
+    @Override
+    public Class<?> getObjectType() {
+        return classToBeMocked;
+    }
+
+    @Override
+    public boolean isSingleton() {
+        return true;
+    }
 }
