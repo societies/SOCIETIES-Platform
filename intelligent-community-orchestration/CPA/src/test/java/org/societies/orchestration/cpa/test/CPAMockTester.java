@@ -165,7 +165,7 @@ public class CPAMockTester {
 
     }
 
-    //@Test
+    @Test
     public void simpleTrendTest(){
 
         ArrayList list = new ArrayList();
