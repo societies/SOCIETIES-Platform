@@ -22,71 +22,71 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.model;
+package org.societies.privacytrust.trust.api.similarity;
 
-import java.util.Set;
-
-import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.TrustException;
 
 /**
- * This interface represents trusted CSSs. An <code>ITrustedCss</code> object is
- * referenced by its {@link TrustedEntityId}, while the associated 
- * {@link Trust} value objects express the trustworthiness of this CSS, i.e.
- * direct, indirect and user-perceived. Each trusted CSS is assigned a set of
- * {@link TrustedCis} objects representing the communities this CSS is member
- * of. In addition, the services provided by a TrustedCss are modelled as
- * {@link TrustedService} objects.
- * 
+ * Thrown to indicate Trust Similarity Evaluation exceptions.
+ *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.7
+ * @since 1.1
  */
-public interface ITrustedCss extends ITrustedEntity {
+public class TrustSimilarityEvalException extends TrustException {
+
+	private static final long serialVersionUID = -7742861343228860712L;
 
 	/**
-	 * Returns a set containing the communities this CSS is member of.
-	 * 
-	 * @return a set containing the communities this CSS is member of.
-	 */
-	public Set<ITrustedCis> getCommunities();
+     * Constructs a <code>TrustSimilarityEvalException</code> with no detail message.
+     */
+    public TrustSimilarityEvalException() {
+    	
+        super();
+    }
 
-	/**
-	 * 
-	 * @param community
-	 */
-	public void addCommunity(final ITrustedCis community);
+    /**
+     * Constructs a <code>TrustSimilarityEvalException</code> with the specified detail
+     * message.
+     * 
+     * @param message
+     *            the detail message.
+     */
+    public TrustSimilarityEvalException(String message) {
+    	
+        super(message);
+    }
 
-	/**
-	 * 
-	 * @param community
-	 */
-	public void removeCommunity(final ITrustedCis community);
+    /**
+     * Creates a <code>TrustSimilarityEvalException</code> with the specified detail message
+     * and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustSimilarityEvalException(String message, Throwable cause) {
+    	
+        super(message, cause);
+    }
 
-	/**
-	 * Returns a set containing the services provided by this CSS.
-	 * 
-	 * @return a set containing the services provided by this CSS.
-	 */
-	public Set<ITrustedService> getServices();
-	
-	/*
-	 * TODO 
-	 * @param serviceType
-	 *
-	public Set<TrustedService> getServices(String serviceType) {
-		return null;
-	}*/
-	
-	/** 
-	 * Returns the similarity between the trustor and the trustee.
-	 *  
-	 * @since 1.1 
-	 */
-	public Double getSimilarity();
-	
-	/** 
-	 * Sets the similarity between the trustor and the trustee.
-	 *  
-	 * @since 1.1 
-	 */
-	public void setSimilarity(Double similarity);
+    /**
+     * Creates a <code>TrustSimilarityEvalException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustSimilarityEvalException(Throwable cause) {
+    	
+        super(cause);
+    }
 }
