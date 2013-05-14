@@ -33,13 +33,15 @@ import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
+import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 import org.societies.personalisation.CAUIDiscovery.impl.CAUIDiscovery;
 import org.societies.personalisation.CAUIDiscovery.impl.ActionDictObject;
 import org.societies.personalisation.CAUIDiscovery.impl.ConstructUIModel;
 import org.societies.personalisation.CAUIDiscovery.impl.MockHistoryData;
-import org.societies.personalisation.CAUIDiscovery.impl.TransitionProbabilitiesCalc;
+import org.societies.personalisation.CAUIDiscovery.impl.TransProbCalculator;
+
 
 public class CAUIDiscoveryLearningTest {
 
@@ -48,12 +50,17 @@ public class CAUIDiscoveryLearningTest {
 
 	private CtxEntity operator = null;
 	CAUIDiscovery discover = null;
-
+	PredictorTest predictor = null;
+	
 	Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 
+	IAction action1 = null;
+	
 	CAUIDiscoveryLearningTest(){
 		discover = new  CAUIDiscovery();
 		operator = createOperator();
+		predictor =  new PredictorTest();
+		predictor.setTaskModelManager();
 	}
 
 	private void  startTesting(){
@@ -61,7 +68,7 @@ public class CAUIDiscoveryLearningTest {
 		System.out.println("1. create history");
 		createContextHistoryAttributesSet();
 		printHistory(this.mapHocData);
-		
+
 
 		System.out.println("2. Convert History Data");
 		List<MockHistoryData> mockData = discover.convertHistoryData(this.mapHocData);
@@ -69,36 +76,65 @@ public class CAUIDiscoveryLearningTest {
 		System.out.println("Converted Data: "+mockData);
 
 		System.out.println("3. Perform learning");
-		LinkedHashMap<List<String>,ActionDictObject> currentActCtxDictionary = discover.generateTransitionsDictionary(mockData);
+		HashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> dictionary = discover.generateTransitionsDictionaryAll(mockData);
 
-		System.out.println("Print dictionary ");
-		printDictionary(currentActCtxDictionary);
+		for(int i=1; i<= dictionary.size(); i++) {
+			System.out.println("Print dictionary, step: "+i+" size:"+dictionary.get(i).size());
+			printDictionary(dictionary.get(i));
+		}
 
-		HashMap<String,List<String>> ctxActionsMap =  discover.assignContextToAction(currentActCtxDictionary);
+		HashMap<String,List<String>> ctxActionsMap =  discover.assignContextToAction(dictionary.get(1));
 		System.out.println("4. assignContextToAction");
 		System.out.println(ctxActionsMap);
 
+
 		System.out.println("5. Calculate trans probabilites");
 		// add context calculation in calcTrans2Prob
-		TransitionProbabilitiesCalc transProb  = new TransitionProbabilitiesCalc(currentActCtxDictionary);
-		LinkedHashMap<String,HashMap<String,Double>> trans2ProbDictionary = transProb.calcTrans2Prob(currentActCtxDictionary);	
-		printTransProbDictionary(trans2ProbDictionary);
+		System.out.println("5. step 2 ");
 
-		//LinkedHashMap<String,HashMap<String,Double>> trans3ProbDictionary = transProb.calcTrans3Prob(currentActCtxDictionary);
-		//printTransProbDictionary(trans3ProbDictionary);
+		try {
+			TransProbCalculator transProb = new TransProbCalculator();
+			LinkedHashMap<List<String>, HashMap<String, Double>> trans2ProbDictionary = transProb.calcTrans2Prob(dictionary.get(2));
+			printTransProbDictionary(trans2ProbDictionary);
+			System.out.println("5. step 3 ");
+			LinkedHashMap<List<String>,HashMap<String,Double>> trans3ProbDictionary = transProb.calcTrans3Prob(dictionary.get(3));
+			printTransProbDictionary(trans3ProbDictionary);
 
-		System.out.println("6. Generate UserIntentModelData");
-		ConstructUIModel cmodel = new ConstructUIModel(discover.getCauiTaskManager(),null); 
-		UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap);
+			System.out.println("6. Generate UserIntentModelData");
+			ConstructUIModel cmodel = new ConstructUIModel(discover.getCauiTaskManager(),null); 
+			UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap);
 
-		System.out.println("*********** model created *******"+ modelData.getActionModel());
-		for( IUserIntentAction userAction  : modelData.getActionModel().keySet()){
-			//	System.out.println(userAction);
-			//	System.out.println(userAction.getActionContext());
-		}
+			System.out.println("*********** model created *******"+ modelData.getActionModel());
+			for( IUserIntentAction userAction  : modelData.getActionModel().keySet()){
+					System.out.println(userAction);
+					//System.out.println(userAction.getActionContext());
+			}
+		
+		
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+
+		
+		
+		// model discovered
+	
+	
+		// start predictions
+		startPredictions();
+	
+	}
+	
+	private void startPredictions(){
+		
+			//List<IUserIntentAction> predictedAction  = predictor.getPrediction(null, action1).get();
+			
+			//System.out.println("predictedAction "+predictedAction);
 	}
 
-
+	
 	private CtxAttributeValueType findAttributeValueType(Serializable value) {
 		if (value == null)
 			return CtxAttributeValueType.EMPTY;
@@ -115,10 +151,10 @@ public class CAUIDiscoveryLearningTest {
 	}
 
 
-	public void printTransProbDictionary (LinkedHashMap<String,HashMap<String,Double>> transProbDictionary){
-		System.out.println("printing transition probabilites for step 2");
+	public void printTransProbDictionary (LinkedHashMap<List<String>,HashMap<String,Double>> transProbDictionary){
+		System.out.println("printing transition probabilites ");
 		//System.out.println ("**** total number of entries:" + transProbDictionary.size());
-		for(String action : transProbDictionary.keySet()){
+		for(List<String> action : transProbDictionary.keySet()){
 			HashMap<String,Double> transTargets = transProbDictionary.get(action);
 			System.out.println("Action:"+action+ "| target: "+transTargets);
 		}
@@ -140,7 +176,7 @@ public class CAUIDiscoveryLearningTest {
 		}
 
 		//create actions
-		IAction action1 = new Action(serviceId1, "testService", "volume", "high");
+		action1 = new Action(serviceId1, "testService", "volume", "high");
 		IAction action2 = new Action(serviceId2, "testService", "volume", "low");
 		IAction action3 = new Action(serviceId1, "testService", "volume", "mute");
 		IAction actionX = new Action(serviceId1, "testService", "XXXX", "XXXX");

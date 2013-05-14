@@ -839,7 +839,13 @@ public class TrustClientHelper implements ITrustClientHelper {
 					final ITrustClientCallback retrievedCallback = 
 							TrustClientHelper.this.methodQueues[classMethods.retrieveTrustRelationships.ordinal()].poll();
 					if (null != retrievedCallback) {
-						// TODO Handle exceptions
+						final String exceptionMessage = intent.getStringExtra(
+								ITrustClient.INTENT_EXCEPTION_KEY);
+						if (exceptionMessage != null) {
+							retrievedCallback.onException(new TrustClientInvocationException(
+									exceptionMessage));
+							return;
+						}
 						final Set<TrustRelationshipBean> trustRelationships = 
 								new HashSet<TrustRelationshipBean>();
 						final Parcelable[] pTrustRelationships = (Parcelable[]) 
@@ -869,7 +875,13 @@ public class TrustClientHelper implements ITrustClientHelper {
 					final ITrustClientCallback retrievedCallback = 
 							TrustClientHelper.this.methodQueues[classMethods.retrieveTrustRelationship.ordinal()].poll();
 					if (null != retrievedCallback) {
-						// TODO Handle exceptions
+						final String exceptionMessage = intent.getStringExtra(
+								ITrustClient.INTENT_EXCEPTION_KEY);
+						if (exceptionMessage != null) {
+							retrievedCallback.onException(new TrustClientInvocationException(
+									exceptionMessage));
+							return;
+						}
 						final Parcelable pTrustRelationship = 
 								intent.getParcelableExtra(ITrustClient.INTENT_RETURN_VALUE_KEY);
 						if (pTrustRelationship == null) {
@@ -898,7 +910,13 @@ public class TrustClientHelper implements ITrustClientHelper {
 					final ITrustClientCallback retrievedCallback = 
 							TrustClientHelper.this.methodQueues[classMethods.retrieveTrustValue.ordinal()].poll();
 					if (null != retrievedCallback) {
-						// TODO Handle exceptions
+						final String exceptionMessage = intent.getStringExtra(
+								ITrustClient.INTENT_EXCEPTION_KEY);
+						if (exceptionMessage != null) {
+							retrievedCallback.onException(new TrustClientInvocationException(
+									exceptionMessage));
+							return;
+						}
 						final Double defaultTrustValue = -1.0d;
 						final Double trustValue = intent.getDoubleExtra(ITrustClient.INTENT_RETURN_VALUE_KEY, defaultTrustValue);
 						if (defaultTrustValue.equals(trustValue))
@@ -918,7 +936,13 @@ public class TrustClientHelper implements ITrustClientHelper {
 					final ITrustClientCallback retrievedCallback = 
 							TrustClientHelper.this.methodQueues[classMethods.addDirectTrustEvidence.ordinal()].poll();
 					if (null != retrievedCallback) {
-						// TODO Handle exceptions
+						final String exceptionMessage = intent.getStringExtra(
+								ITrustClient.INTENT_EXCEPTION_KEY);
+						if (exceptionMessage != null) {
+							retrievedCallback.onException(new TrustClientInvocationException(
+									exceptionMessage));
+							return;
+						}
 						retrievedCallback.onAddedDirectTrustEvidence();
 					} else {
 						Log.e(TAG, "Could not find callback for received action " + intent.getAction());

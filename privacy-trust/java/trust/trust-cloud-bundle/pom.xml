@@ -30,6 +30,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.societies.privacytrust.trust</groupId>
+			<artifactId>trust-similarity-eval</artifactId>
+			<version>${version.pt}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.privacytrust.trust</groupId>
 			<artifactId>trust-activity-feed</artifactId>
 			<version>${version.pt}</version>
 		</dependency>

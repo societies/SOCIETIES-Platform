@@ -22,79 +22,71 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.impl.engine.util;
+package org.societies.privacytrust.trust.api.similarity;
 
-import org.apache.commons.math.stat.StatUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import cern.colt.Arrays;
+import org.societies.api.privacytrust.trust.TrustException;
 
 /**
- * Describe your class here...
+ * Thrown to indicate Trust Similarity Evaluation exceptions.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.3
+ * @since 1.1
  */
-public class MathUtils {
-	
-	/** The logging facility. */
-	private static final Logger LOG = LoggerFactory.getLogger(MathUtils.class);
+public class TrustSimilarityEvalException extends TrustException {
 
-	public static double[] normalise(final double[] sample) {
-	
-		if (LOG.isDebugEnabled())
-			LOG.debug("sample=" + Arrays.toString(sample));
-		
-		final double[] normalisedSample = StatUtils.normalize(sample);
-		for (int i = 0; i < normalisedSample.length; ++i)
-			if (Double.isNaN(normalisedSample[i]))
-				normalisedSample[i] = 0.0d;
-		
-		if (LOG.isDebugEnabled())
-			LOG.debug("normalisedSample=" + Arrays.toString(normalisedSample));
-		return normalisedSample;
-	}
-	
-	public static double[] stanine(final double[] input) {
-		
-		if (LOG.isDebugEnabled())
-			LOG.debug("input=" + Arrays.toString(input));
-		final double[] zscores = normalise(input);
-		final double[] stanines = new double[zscores.length];
-		for (int i = 0; i < zscores.length; ++i) {
-			if (zscores[i] < -1.75d)
-				stanines[i] = 1;
-			else if (zscores[i] >= -1.75d && zscores[i] < -1.25d)
-				stanines[i] = 2;
-			else if (zscores[i] >= -1.25d && zscores[i] < -0.75d)
-				stanines[i] = 3;
-			else if (zscores[i] >= -0.75d && zscores[i] < -0.25d)
-				stanines[i] = 4;
-			else if (zscores[i] >= -0.25d && zscores[i] < +0.25d)
-				stanines[i] = 5;
-			else if (zscores[i] >= +0.25d && zscores[i] < +0.75d)
-				stanines[i] = 6;
-			else if (zscores[i] >= +0.75d && zscores[i] < +1.25d)
-				stanines[i] = 7;
-			else if (zscores[i] >= +1.25d && zscores[i] < +1.75d)
-				stanines[i] = 8;
-			else // if (zscores[i] >= +1.75d)
-				stanines[i] = 9;
-		}
-		
-		if (LOG.isDebugEnabled())
-			LOG.debug("stanines=" + Arrays.toString(stanines));
-		return stanines;
-	}
-	
-	public static double min(double[] input) {
-		
-		return StatUtils.min(input);
-	}
-	
-	public static double max(double[] input) {
-		
-		return StatUtils.max(input);
-	}
+	private static final long serialVersionUID = -7742861343228860712L;
+
+	/**
+     * Constructs a <code>TrustSimilarityEvalException</code> with no detail message.
+     */
+    public TrustSimilarityEvalException() {
+    	
+        super();
+    }
+
+    /**
+     * Constructs a <code>TrustSimilarityEvalException</code> with the specified detail
+     * message.
+     * 
+     * @param message
+     *            the detail message.
+     */
+    public TrustSimilarityEvalException(String message) {
+    	
+        super(message);
+    }
+
+    /**
+     * Creates a <code>TrustSimilarityEvalException</code> with the specified detail message
+     * and cause.
+     * 
+     * @param message
+     *            the detail message (which is saved for later retrieval by the
+     *            {@link #getMessage()} method).
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustSimilarityEvalException(String message, Throwable cause) {
+    	
+        super(message, cause);
+    }
+
+    /**
+     * Creates a <code>TrustSimilarityEvalException</code> with the specified cause and a
+     * detail message of <tt>(cause==null ? null : cause.toString())</tt> (which
+     * typically contains the class and detail message of <tt>cause</tt>).
+     * 
+     * @param cause
+     *            the cause (which is saved for later retrieval by the
+     *            {@link #getCause()} method). (A <tt>null</tt> value is
+     *            permitted, and indicates that the cause is nonexistent or
+     *            unknown.)
+     */
+    public TrustSimilarityEvalException(Throwable cause) {
+    	
+        super(cause);
+    }
 }

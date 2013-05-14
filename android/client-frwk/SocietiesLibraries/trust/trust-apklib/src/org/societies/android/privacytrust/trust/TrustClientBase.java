@@ -190,8 +190,12 @@ public class TrustClientBase implements IInternalTrustClient {
 	        			retrieveTrustCallback);
 	        	Log.d(TAG, "Sent IQ with stanza=" + stanza);
 			} catch (Exception e) {
-				Log.e(TAG, "Failed to send RETRIEVE_TRUST_RELATIONSHIPS request: " + e.getMessage(), e);
-				// TODO handle error ??
+				final String exceptionMessage = 
+						"Failed to send RETRIEVE_TRUST_RELATIONSHIPS request: "
+						+ e.getMessage(); 
+				Log.e(TAG, exceptionMessage, e);
+				this.broadcastException(client, 
+						IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIPS, exceptionMessage);
 	        }
 			
 		} else {
@@ -284,8 +288,12 @@ public class TrustClientBase implements IInternalTrustClient {
 	        			retrieveTrustCallback);
 	        	Log.d(TAG, "Sent IQ with stanza=" + stanza);
 			} catch (Exception e) {
-				Log.e(TAG, "Failed to send RETRIEVE_TRUST_RELATIONSHIPS request: " + e.getMessage(), e);
-				// TODO handle error ??
+				final String exceptionMessage = 
+						"Failed to send RETRIEVE_TRUST_RELATIONSHIPS request: "
+						+ e.getMessage(); 
+				Log.e(TAG, exceptionMessage, e);
+				this.broadcastException(client, 
+						IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIPS, exceptionMessage);
 	        }
 			
 		} else {
@@ -388,8 +396,12 @@ public class TrustClientBase implements IInternalTrustClient {
 	        			retrieveTrustCallback);
 	        	Log.d(TAG, "Sent IQ with stanza=" + stanza);
 			} catch (Exception e) {
-				Log.e(TAG, "Failed to send RETRIEVE_TRUST_RELATIONSHIP request: " + e.getMessage(), e);
-				// TODO handle error ??
+				final String exceptionMessage = 
+						"Failed to send RETRIEVE_TRUST_RELATIONSHIP request: "
+						+ e.getMessage(); 
+				Log.e(TAG, exceptionMessage, e);
+				this.broadcastException(client, 
+						IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIP, exceptionMessage);
 	        }
 			
 		} else {
@@ -492,8 +504,12 @@ public class TrustClientBase implements IInternalTrustClient {
 	        			retrieveTrustCallback);
 	        	Log.d(TAG, "Sent IQ with stanza=" + stanza);
 			} catch (Exception e) {
-				Log.e(TAG, "Failed to send RETRIEVE_TRUST_VALUE request: " + e.getMessage(), e);
-				// TODO handle error ??
+				final String exceptionMessage = 
+						"Failed to send RETRIEVE_TRUST_VALUE request: "
+						+ e.getMessage(); 
+				Log.e(TAG, exceptionMessage, e);
+				this.broadcastException(client, 
+						IInternalTrustClient.RETRIEVE_TRUST_VALUE, exceptionMessage);
 	        }
 			
 		} else {
@@ -586,8 +602,12 @@ public class TrustClientBase implements IInternalTrustClient {
 	        			retrieveTrustCallback);
 	        	Log.d(TAG, "Sent IQ with stanza=" + stanza);
 			} catch (Exception e) {
-				Log.e(TAG, "Failed to send RETRIEVE_TRUST_RELATIONSHIPS request: " + e.getMessage(), e);
-				// TODO handle error ??
+				final String exceptionMessage = 
+						"Failed to send RETRIEVE_TRUST_RELATIONSHIPS request: "
+						+ e.getMessage(); 
+				Log.e(TAG, exceptionMessage, e);
+				this.broadcastException(client, 
+						IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIPS, exceptionMessage);
 	        }
 			
 		} else {
@@ -680,8 +700,12 @@ public class TrustClientBase implements IInternalTrustClient {
 	        			retrieveTrustCallback);
 	        	Log.d(TAG, "Sent IQ with stanza=" + stanza);
 			} catch (Exception e) {
-				Log.e(TAG, "Failed to send RETRIEVE_TRUST_RELATIONSHIPS request: " + e.getMessage(), e);
-				// TODO handle error ??
+				final String exceptionMessage = 
+						"Failed to send RETRIEVE_TRUST_RELATIONSHIPS request: "
+						+ e.getMessage(); 
+				Log.e(TAG, exceptionMessage, e);
+				this.broadcastException(client, 
+						IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIPS, exceptionMessage);
 	        }
 			
 		} else {
@@ -784,8 +808,12 @@ public class TrustClientBase implements IInternalTrustClient {
 	        			retrieveTrustCallback);
 	        	Log.d(TAG, "Sent IQ with stanza=" + stanza);
 			} catch (Exception e) {
-				Log.e(TAG, "Failed to send RETRIEVE_TRUST_RELATIONSHIPS request: " + e.getMessage(), e);
-				// TODO handle error ??
+				final String exceptionMessage = 
+						"Failed to send RETRIEVE_TRUST_RELATIONSHIPS request: "
+						+ e.getMessage(); 
+				Log.e(TAG, exceptionMessage, e);
+				this.broadcastException(client, 
+						IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIPS, exceptionMessage);
 	        }
 			
 		} else {
@@ -908,8 +936,12 @@ public class TrustClientBase implements IInternalTrustClient {
 						addDirectTrustEvidenceCallback);
 				Log.d(TAG, "Sent IQ with stanza=" + stanza);
 			} catch (Exception e) {
-				Log.e(TAG, "Failed to send ADD_DIRECT_TRUST_EVIDENCE request: " + e.getMessage(), e);
-				// TODO handle error ??
+				final String exceptionMessage = 
+						"Failed to send ADD_DIRECT_TRUST_EVIDENCE request: "
+						+ e.getMessage(); 
+				Log.e(TAG, exceptionMessage, e);
+				this.broadcastException(client, 
+						IInternalTrustClient.ADD_DIRECT_TRUST_EVIDENCE, exceptionMessage);
 			}
 			
 		} else {
@@ -1049,6 +1081,15 @@ public class TrustClientBase implements IInternalTrustClient {
 		}
 	}
 	
+	private void broadcastException(String client, String method, String message) {
+
+		final Intent intent = new Intent(method);
+		intent.putExtra(IInternalTrustClient.INTENT_EXCEPTION_KEY, message);
+		if (this.restrictBroadcast)
+			intent.setPackage(client); 
+		this.androidContext.sendBroadcast(intent);
+	}
+	
 	/**
 	 * Serialises the specified object into a byte array
 	 * 
@@ -1128,8 +1169,10 @@ public class TrustClientBase implements IInternalTrustClient {
 					final TrustRelationshipsResponseBean retrieveRelationshipsBean =
 						responseBean.getRetrieveTrustRelationships();
 					if (retrieveRelationshipsBean == null) {
-						Log.e(TAG, "Trust Broker retrieve trust relationships bean is null");
-						// TODO error handling
+						Log.e(TAG, "Trust Broker retrieve trust relationships response bean is null");
+						TrustClientBase.this.broadcastException(this.client,
+								this.returnIntent, 
+								"Trust Broker retrieve trust relationships response bean is null");
 						return;
 					}
 					final List<TrustRelationshipBean> trustRelationships = 
@@ -1148,8 +1191,10 @@ public class TrustClientBase implements IInternalTrustClient {
 					final TrustRelationshipResponseBean retrieveRelationshipBean =
 						responseBean.getRetrieveTrustRelationship();
 					if (retrieveRelationshipBean == null) {
-						Log.e(TAG, "Trust Broker retrieve trust relationship bean is null");
-						// TODO error handling
+						Log.e(TAG, "Trust Broker retrieve trust relationship response bean is null");
+						TrustClientBase.this.broadcastException(this.client,
+								this.returnIntent, 
+								"Trust Broker retrieve trust relationship response bean is null");
 						return;
 					}
 					final TrustRelationshipBean trustRelationship = retrieveRelationshipBean.getResult();
@@ -1163,8 +1208,10 @@ public class TrustClientBase implements IInternalTrustClient {
 					final TrustValueResponseBean retrieveValueBean =
 						responseBean.getRetrieveTrustValue();
 					if (retrieveValueBean == null) {
-						Log.e(TAG, "Trust Broker retrieve trust value bean is null");
-						// TODO error handling
+						Log.e(TAG, "Trust Broker retrieve trust value response bean is null");
+						TrustClientBase.this.broadcastException(this.client,
+								this.returnIntent, 
+								"Trust Broker retrieve trust value response bean is null");
 						return;
 					}
 					final Double trustValue = retrieveValueBean.getResult();
@@ -1174,9 +1221,12 @@ public class TrustClientBase implements IInternalTrustClient {
 					
 				default:
 					
-					Log.e(TAG, "Unsupported method in Trust Broker response bean: "
+					Log.e(TAG, "Unexpected method in Trust Broker response bean: "
 							+ responseBean.getMethodName());
-					// TODO error handling
+					TrustClientBase.this.broadcastException(this.client,
+							this.returnIntent, 
+							"Unexpected method in Trust Broker response bean: "
+							+ responseBean.getMethodName());
 					return;
 				}
 				
@@ -1191,19 +1241,26 @@ public class TrustClientBase implements IInternalTrustClient {
 
 				case ADD_DIRECT_EVIDENCE:
 					
-					// TODO return ACK ?
+					// Nothing to do
 					break;
 				default:
 
-					Log.e(TAG, "Unsupported method in Trust Evidence Collector response bean: "
+					Log.e(TAG, "Unexpected method in Trust Evidence Collector response bean: "
 							+ responseBean.getMethodName());
-					// TODO error handling
+					TrustClientBase.this.broadcastException(this.client,
+							this.returnIntent, 
+							"Unexpected method in Trust Evidence Collector response bean: "
+							+ responseBean.getMethodName());
 					return;
 				}
 				
 			} else {
 				
 				Log.e(TrustClientBase.TAG, "Received unexpected response bean in result: "
+						+ ((payload != null) ? payload.getClass() : "null"));
+				TrustClientBase.this.broadcastException(this.client,
+						this.returnIntent, 
+						"Received unexpected response bean in result: "
 						+ ((payload != null) ? payload.getClass() : "null"));
 				return;
 			}
@@ -1221,15 +1278,15 @@ public class TrustClientBase implements IInternalTrustClient {
 		@Override
 		public void receiveError(Stanza stanza, XMPPError error) {
 			
-			Log.d(TrustClientBase.TAG, "receiveError: stanza=" + stanza
+			Log.e(TrustClientBase.TAG, "receiveError: stanza=" + stanza
 					+ ", error=" + error);
-			/* TODO
+			final String exceptionMessage;
 			if (error != null)
-				TrustClientBase.this.callbackException = error;
+				exceptionMessage = error.getStanzaErrorString(); // TODO getGenericText???
 			else
-				TrustClientBase.this.callbackException = 
-					new TrustClientException("Unspecified XMPPError");
-			TrustClientBase.this.cdLatch.countDown();*/
+				exceptionMessage = "Unspecified XMPPError";
+			TrustClientBase.this.broadcastException(this.client,
+					this.returnIntent, exceptionMessage);
 		}
 
 		/*

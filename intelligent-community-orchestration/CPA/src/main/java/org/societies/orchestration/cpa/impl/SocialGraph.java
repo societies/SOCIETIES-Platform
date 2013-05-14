@@ -28,9 +28,9 @@ import edu.uci.ics.jung.graph.UndirectedSparseGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.activity.IActivity;
-import org.societies.api.internal.orchestration.ISocialGraph;
-import org.societies.api.internal.orchestration.ISocialGraphEdge;
-import org.societies.api.internal.orchestration.ISocialGraphVertex;
+import org.societies.api.cis.orchestration.model.ISocialGraph;
+import org.societies.api.cis.orchestration.model.ISocialGraphEdge;
+import org.societies.api.cis.orchestration.model.ISocialGraphVertex;
 import org.societies.orchestration.cpa.impl.comparison.ActorComparator;
 
 import java.util.*;
@@ -126,6 +126,7 @@ public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph 
 		return vertices.toArray(a);
 	}
     public synchronized void handleTrends (String text){
+        LOG.info("handletrends text: \""+text+"\"");
         if(getTrends().containsKey(text)){
             getTrends().get(text).increment();
         } else {

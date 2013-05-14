@@ -53,7 +53,7 @@ import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
 import org.societies.privacytrust.trust.api.repo.TrustRepositoryException;
-import org.societies.privacytrust.trust.impl.engine.util.MathUtils;
+import org.societies.privacytrust.trust.api.util.MathUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
