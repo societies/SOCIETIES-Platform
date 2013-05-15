@@ -322,7 +322,7 @@ public class PrivacyAssessmentService implements Serializable {
 		String ylabel = "Correlation of data transmission and data access";
 
 		HashMap<IIdentity, AssessmentResultIIdentity> assResult;
-		assResult = assessment.getAssessmentAllIds();
+		assResult = assessment.getAssessmentAllIds(model.getStartDate(), model.getEndDate());
 
 		int size = assResult.size();
 		IIdentity[] labels = new IIdentity[size];
@@ -359,7 +359,7 @@ public class PrivacyAssessmentService implements Serializable {
 		String ylabel = "Correlation of data transmission and data access";
 
 		HashMap<String, AssessmentResultClassName> assResult;
-		assResult = assessment.getAssessmentAllClasses();
+		assResult = assessment.getAssessmentAllClasses(model.getStartDate(), model.getEndDate());
 
 		int size = assResult.size();
 		String[] labels = new String[size];

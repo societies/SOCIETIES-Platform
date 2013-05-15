@@ -157,11 +157,11 @@ public class NominalTestCaseLowerTester {
 		long num1;
 		long num2;
 		
-		num1 = assessment.getNumDataAccessEvents();
+		num1 = assessment.getNumDataAccessEvents(null, null);
 		LOG.debug("[#1870] testContextBrokerInternalLogging() 1");
 		ctx.retrieveCssOperator();
 
-		num2 = assessment.getNumDataAccessEvents();
+		num2 = assessment.getNumDataAccessEvents(null, null);
 		assertEquals("ctx.retrieveCssOperator()", num1 + 1, num2);
 		
 		LOG.debug("[#1870] testContextBrokerInternalLogging() 2");
@@ -169,13 +169,13 @@ public class NominalTestCaseLowerTester {
 		LOG.debug("[#1870] testContextBrokerInternalLogging() 3");
 		
 		num1 = num2;
-		num2 = assessment.getNumDataAccessEvents();
+		num2 = assessment.getNumDataAccessEvents(null, null);
 		assertEquals("Number of data access events not same after ctx.createContext()", num1, num2);
 
 		ctx.retrieveContext();
 		LOG.debug("[#1870] testContextBrokerInternalLogging() 4");
 		num1 = num2;
-		num2 = assessment.getNumDataAccessEvents();
+		num2 = assessment.getNumDataAccessEvents(null, null);
 		LOG.debug("[#1870] testContextBrokerInternalLogging(): Number of data access events: before access = " +
 				num1 + ", after access = " + num2);
 		assertEquals("Number of data access events not increased properly after ctx.retrieveContext()", num1 + 2, num2);
@@ -191,19 +191,19 @@ public class NominalTestCaseLowerTester {
 		long num1;
 		long num2;
 		
-		num1 = assessment.getNumDataAccessEvents();
+		num1 = assessment.getNumDataAccessEvents(null, null);
 		
 		LOG.debug("[#1870] testContextBrokerExternalLogging() 2");
 		ctx.createContext();
 		LOG.debug("[#1870] testContextBrokerExternalLogging() 3");
 		
-		num2 = assessment.getNumDataAccessEvents();
+		num2 = assessment.getNumDataAccessEvents(null, null);
 		assertEquals("Number of data access events not same after ctx.createContext()", num1, num2);
 
 		ctx.retrieveContext();
 		LOG.debug("[#1870] testContextBrokerExternalLogging() 4");
 		num1 = num2;
-		num2 = assessment.getNumDataAccessEvents();
+		num2 = assessment.getNumDataAccessEvents(null, null);
 		LOG.debug("[#1870] testContextBrokerExternalLogging(): Number of data access events: before access = " +
 				num1 + ", after access = " + num2);
 		assertEquals("Number of data access events not increased properly after ctx.retrieveContext()", num1 + 2, num2);
@@ -230,13 +230,13 @@ public class NominalTestCaseLowerTester {
 		LOG.debug("[#1870] testCommsManagerLogging(): to identity = " + stanza.getTo());
 		
 		LOG.debug("[#1870] testCommsManagerLogging() 1");
-		long num1 = assessment.getNumDataTransmissionEvents();
+		long num1 = assessment.getNumDataTransmissionEvents(null, null);
 		LOG.debug("[#1870] testCommsManagerLogging() 2");
 		commManager.sendMessage(stanza, payload);
 		LOG.debug("[#1870] testCommsManagerLogging() 3");
 		commManager.sendIQGet(stanza, payload, null);
 		LOG.debug("[#1870] testCommsManagerLogging() 4");
-		long num2 = assessment.getNumDataTransmissionEvents();
+		long num2 = assessment.getNumDataTransmissionEvents(null, null);
 		LOG.debug("[#1870] testCommsManagerLogging() 5");
 		
 		LOG.debug("[#1870] testCommsManagerLogging(): Number of data transmission events: before transmission = " +
@@ -253,8 +253,8 @@ public class NominalTestCaseLowerTester {
 		List<HashMap<String, Double>> corrs = new ArrayList<HashMap<String, Double>>();
 		HashMap<String, AssessmentResultClassName> result;
 		
-		assessment.assessAllNow();
-		result = assessment.getAssessmentAllClasses();
+		assessment.assessAllNow(null, null);
+		result = assessment.getAssessmentAllClasses(null, null);
 		HashMap<String, Double> corrs0 = new HashMap<String, Double>();
 		for (String key : result.keySet()) {
 			corrs0.put(key, result.get(key).getCorrWithDataAccessBySender());
@@ -266,8 +266,8 @@ public class NominalTestCaseLowerTester {
 		transmitData(false);
 		Thread.sleep(100);
 
-		assessment.assessAllNow();
-		result = assessment.getAssessmentAllClasses();
+		assessment.assessAllNow(null, null);
+		result = assessment.getAssessmentAllClasses(null, null);
 		HashMap<String, Double> corrs1 = new HashMap<String, Double>();
 		for (String key : result.keySet()) {
 			corrs1.put(key, result.get(key).getCorrWithDataAccessBySender());
@@ -277,8 +277,8 @@ public class NominalTestCaseLowerTester {
 		transmitData(true);
 		Thread.sleep(100);
 		
-		assessment.assessAllNow();
-		result = assessment.getAssessmentAllClasses();
+		assessment.assessAllNow(null, null);
+		result = assessment.getAssessmentAllClasses(null, null);
 		HashMap<String, Double> corrs2 = new HashMap<String, Double>();
 		for (String key : result.keySet()) {
 			corrs2.put(key, result.get(key).getCorrWithDataAccessBySender());

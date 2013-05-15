@@ -66,14 +66,21 @@
 							</p:imageSwitch>
 -->
                         </li>
+                        <li>Show results from
+                        	<p:calendar value="#{privacyAssessmentForm.startDate}" pattern="yyyy-MM-ddHH:mm" />
+                        	to
+                        	<p:calendar value="#{privacyAssessmentForm.endDate}" pattern="yyyy-MM-ddHH:mm" />
+                        </li>
                         <li class="clearfix">
                             <p class="success">Thank you! Success Message here.</p>
 
                             <p class="error">Sorry, an error has occured. Please try again later.</p>
 
 					        <p:commandButton value="Regenerate images" actionListener="#{assessmentController.assessNow}" update="dynamicImage"/>
+<!--
 							<br/><br/>
                             <a href="privacy_assessment_settings.xhtml">Advanced Settings</a>
+-->
                         </li>
                     </ul>
                 </form>
