@@ -44,10 +44,7 @@ import org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClie
 import org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClientCallback;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
-import org.societies.privacytrust.trust.api.model.ITrustedCis;
-import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
-import org.societies.privacytrust.trust.api.model.ITrustedService;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -236,7 +233,7 @@ public class InternalTrustBroker implements ITrustBroker {
 					} catch (InterruptedException ie) {
 
 						throw new TrustBrokerException(
-								"Interrupted while receiveing all trust relationships between trustor '" 
+								"Interrupted while receiving all trust relationships between trustor '" 
 								+ trustorId	+ "' and trustee '" + trusteeId 
 								+ "' on behalf of requestor '" + requestor + "'");
 					}
@@ -375,7 +372,7 @@ public class InternalTrustBroker implements ITrustBroker {
 					} catch (InterruptedException ie) {
 
 						throw new TrustBrokerException(
-								"Interrupted while receiveing trust relationship of type '" + trustValueType 
+								"Interrupted while receiving trust relationship of type '" + trustValueType 
 								+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
 								+ "' on behalf of requestor '" + requestor + "'");
 					}
@@ -498,7 +495,7 @@ public class InternalTrustBroker implements ITrustBroker {
 					} catch (InterruptedException ie) {
 
 						throw new TrustBrokerException(
-								"Interrupted while receiveing trust value of type '" + trustValueType 
+								"Interrupted while receiving trust value of type '" + trustValueType 
 								+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
 								+ "' on behalf of requestor '" + requestor + "'");
 					}
@@ -668,26 +665,8 @@ public class InternalTrustBroker implements ITrustBroker {
 							+ "' on behalf of requestor '" + requestor + "'" 
 							+ "': ITrustRepository service is not available");
 				
-				final Set<ITrustedEntity> entities = new HashSet<ITrustedEntity>();
-				if (null == trusteeType) {
-					entities.addAll(this.trustRepo.retrieveEntities(trustorId, ITrustedCss.class));
-					entities.addAll(this.trustRepo.retrieveEntities(trustorId, ITrustedCis.class));
-					entities.addAll(this.trustRepo.retrieveEntities(trustorId, ITrustedService.class));
-				} else if (TrustedEntityType.CSS == trusteeType) {
-					entities.addAll(this.trustRepo.retrieveEntities(trustorId, ITrustedCss.class));
-				} else if (TrustedEntityType.CIS == trusteeType) {
-					entities.addAll(this.trustRepo.retrieveEntities(trustorId, ITrustedCis.class));
-				} else if (TrustedEntityType.SVC == trusteeType) {
-					entities.addAll(this.trustRepo.retrieveEntities(trustorId, ITrustedService.class));
-				} else {
-					throw new TrustBrokerException(
-							"Could not retrieve trust relationships of trustor '" 
-							+ trustorId	+ "' with entities of type '" + trusteeType 
-							+ "' and trust values of type '" + trustValueType
-							+ "' on behalf of requestor '" + requestor + "'" 
-							+ "': Unsupported trustee type '" + trusteeType + "'");
-				}
-				
+				final Set<ITrustedEntity> entities = 
+						this.trustRepo.retrieveEntities(trustorId, trusteeType, trustValueType);		
 				for (final ITrustedEntity entity : entities) {
 					
 					if (entity.getDirectTrust().getValue() != null
@@ -743,7 +722,7 @@ public class InternalTrustBroker implements ITrustBroker {
 					} catch (InterruptedException ie) {
 
 						throw new TrustBrokerException(
-								"Interrupted while receiveing trust relationships of trustor '" 
+								"Interrupted while receiving trust relationships of trustor '" 
 								+ trustorId	+ "' with entities of type '" + trusteeType 
 								+ "' and trust values of type '" + trustValueType
 								+ "' on behalf of requestor '" + requestor + "'");

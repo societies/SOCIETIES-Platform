@@ -24,8 +24,8 @@
  */
 package org.societies.privacytrust.trust.impl.repo;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -41,10 +41,7 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
-import org.societies.privacytrust.trust.api.model.ITrustedCis;
-import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
-import org.societies.privacytrust.trust.api.model.ITrustedService;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.societies.privacytrust.trust.api.repo.TrustRepositoryException;
 import org.societies.privacytrust.trust.impl.repo.model.TrustedCis;
@@ -278,36 +275,58 @@ public class TrustRepository implements ITrustRepository {
 	}
 	
 	/*
-	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#retrieveEntities(org.societies.api.privacytrust.trust.model.TrustedEntityId, java.lang.Class)
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#retrieveEntities(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType, org.societies.api.privacytrust.trust.model.TrustValueType)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends ITrustedEntity> List<T> retrieveEntities(
-			final TrustedEntityId trustorId, final Class<T> entityClass)
+	public Set<ITrustedEntity> retrieveEntities(final TrustedEntityId trustorId,
+			final TrustedEntityType entityType, final TrustValueType valueType)
 					throws TrustRepositoryException {
 		
 		if (trustorId == null)
 			throw new NullPointerException("trustorId can't be null");
-		if (entityClass == null)
-			throw new NullPointerException("entityClass can't be null");
 		
 		final Class<? extends TrustedEntity> daClass;
-		if (ITrustedCss.class.equals(entityClass))
+		if (null == entityType)
+			daClass = null;
+		else if (TrustedEntityType.CSS == entityType)
 			daClass = TrustedCss.class;
-		else if (ITrustedCis.class.equals(entityClass))
+		else if (TrustedEntityType.CIS == entityType)
 			daClass = TrustedCis.class;
-		else if (ITrustedService.class.equals(entityClass))
+		else if (TrustedEntityType.SVC == entityType)
 			daClass = TrustedService.class;
 		else
-			throw new TrustRepositoryException("Unsupported entityClass: "
-					+ entityClass);
+			throw new TrustRepositoryException("Unsupported entityType: "
+					+ entityType);
 			
-		final List<T> result = new ArrayList<T>();
+		final Set<ITrustedEntity> result = new HashSet<ITrustedEntity>();
+		if (null != daClass) {
+			result.addAll(this.doRetrieveEntities(trustorId, daClass, valueType));
+		} else {
+			result.addAll(this.doRetrieveEntities(trustorId, TrustedCss.class, valueType));
+			result.addAll(this.doRetrieveEntities(trustorId, TrustedCis.class, valueType));
+			result.addAll(this.doRetrieveEntities(trustorId, TrustedService.class, valueType));
+		}
+		
+		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <T extends TrustedEntity> Set<T> doRetrieveEntities(
+			final TrustedEntityId trustorId, final Class<T> entityClass,
+			final TrustValueType valueType)	throws TrustRepositoryException {
+		
+		final Set<T> result = new HashSet<T>();
 		Session session = null;
 		try {
 			session = sessionFactory.openSession();
-			final Criteria criteria = session.createCriteria(daClass)
+			final Criteria criteria = session.createCriteria(entityClass)
 					.add(Restrictions.eq("trustorId", trustorId));
+			if (TrustValueType.DIRECT == valueType)
+				criteria.add(Restrictions.isNotNull("directTrust.value"));
+			else if (TrustValueType.INDIRECT == valueType)
+				criteria.add(Restrictions.isNotNull("indirectTrust.value"));
+			else if (TrustValueType.USER_PERCEIVED == valueType)
+				criteria.add(Restrictions.isNotNull("userPerceivedTrust.value"));
 			result.addAll(criteria.list());
 		} catch (Exception e) {
 			throw new TrustRepositoryException("Could not retrieve entities trusted by '"
