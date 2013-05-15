@@ -244,11 +244,13 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 					LOG.debug("Cloud Node network interface: " + networkInterface.getName());
 					
 					byte[] macAddress = networkInterface.getHardwareAddress();
-					StringBuilder sb = new StringBuilder();
-					for (int i = 0; i < macAddress.length; i++) {
-						sb.append(String.format("%02X%s", macAddress[i], (i < macAddress.length - 1) ? ":" : ""));		
+					if (null != macAddress) {
+						StringBuilder sb = new StringBuilder();
+						for (int i = 0; i < macAddress.length; i++) {
+							sb.append(String.format("%02X%s", macAddress[i], (i < macAddress.length - 1) ? ":" : ""));		
+						}
+						cssNode.setCssNodeMAC(sb.toString());
 					}
-					cssNode.setCssNodeMAC(sb.toString());
 				}
 			}
 			
