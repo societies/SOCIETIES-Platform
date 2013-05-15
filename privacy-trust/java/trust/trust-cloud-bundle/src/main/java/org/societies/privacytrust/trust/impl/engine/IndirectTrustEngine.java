@@ -38,6 +38,7 @@ import org.societies.privacytrust.trust.api.event.TrustEventTopic;
 import org.societies.privacytrust.trust.api.event.TrustEvidenceUpdateEvent;
 import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
+import org.societies.privacytrust.trust.api.similarity.ITrustSimilarityEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +52,10 @@ public class IndirectTrustEngine extends TrustEngine {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(IndirectTrustEngine.class);
 	
-	@Autowired
+	@Autowired(required=true)
+	private ITrustSimilarityEvaluator trustSimilarityEvaluator;
+	
+	@Autowired(required=true)
 	IndirectTrustEngine(ITrustEventMgr trustEventMgr) throws Exception {
 		
 		super(trustEventMgr);
@@ -107,6 +111,7 @@ public class IndirectTrustEngine extends TrustEngine {
 
 			// Update rating
 			case DIRECTLY_TRUSTED:
+				// TODO eval similarity
 				int N = 0;
 				double totalValue = 0d;
 				for (final IIndirectTrustEvidence relatedEvidence : evidenceSet) {

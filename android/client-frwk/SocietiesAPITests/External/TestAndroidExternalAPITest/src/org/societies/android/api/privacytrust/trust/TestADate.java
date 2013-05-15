@@ -26,6 +26,8 @@ package org.societies.android.api.privacytrust.trust;
 
 import java.util.Date;
 
+import org.societies.android.api.common.ADate;
+
 import android.os.Parcel;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;

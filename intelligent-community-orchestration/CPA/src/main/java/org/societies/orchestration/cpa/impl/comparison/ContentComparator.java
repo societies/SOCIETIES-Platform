@@ -38,6 +38,7 @@ import org.societies.orchestration.cpa.impl.SocialGraphVertex;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -63,8 +64,15 @@ public class ContentComparator implements ActorComparator {
         }
     }
     public void initAnnie() throws GateException {
-        Out.prln("Initialising ANNIE...");
-        Gate.setPluginsHome(new File("."));
+        Out.prln("Initialising ANNIE... ");
+        if(Gate.getPluginsHome()==null)
+            Gate.setPluginsHome(new File("."));
+
+        try {
+            Gate.setSiteConfigFile(new File(ContentComparator.class.getClassLoader().getResource("gate.xml").toURI()));
+        } catch (URISyntaxException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
         Gate.init();
         File gateHome = Gate.getGateHome();
         pluginURL =  ContentComparator.class.getClassLoader().getResource("plugins/ANNIE/");

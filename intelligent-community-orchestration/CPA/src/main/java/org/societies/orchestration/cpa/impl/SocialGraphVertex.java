@@ -24,8 +24,8 @@
  */
 package org.societies.orchestration.cpa.impl;
 
-import org.societies.api.internal.orchestration.ISocialGraphEdge;
-import org.societies.api.internal.orchestration.ISocialGraphVertex;
+import org.societies.api.cis.orchestration.model.ISocialGraphEdge;
+import org.societies.api.cis.orchestration.model.ISocialGraphVertex;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
