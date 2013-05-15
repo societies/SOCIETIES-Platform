@@ -51,6 +51,7 @@ import org.societies.android.platform.cssmanager.LocalCssDirectoryService.LocalC
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal;
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal.LocalSLMBinder;
 import org.societies.android.platform.socialdata.SocialData;
+import org.societies.android.platform.useragent.feedback.EventHistory;
 import org.societies.android.platform.useragent.feedback.EventListener;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService;
 
@@ -74,7 +75,7 @@ import android.util.Log;
  *
  */
 public class SocietiesClientServicesController {
-	private final static String LOG_TAG = SocietiesClientServicesController.class.getName();
+	private final static String LOG_TAG = SocietiesClientServicesController.class.getCanonicalName();
 	//timeout for bind, start and stop all services
 	private final static long TASK_TIMEOUT = 10000;
 	
@@ -476,7 +477,7 @@ public class SocietiesClientServicesController {
      */
     private class InvokeBindAllServices extends AsyncTask<Void, Void, Void> {
 
-    	private final String LOCAL_LOG_TAG = InvokeBindAllServices.class.getName();
+    	private final String LOCAL_LOG_TAG = InvokeBindAllServices.class.getCanonicalName();
     	private IMethodCallback callback;
    	 /**
    	 * Default Constructor
@@ -594,7 +595,7 @@ public class SocietiesClientServicesController {
      */
     private class InvokeStartAllServices extends AsyncTask<Void, Void, Void> {
 
-    	private final String LOCAL_LOG_TAG = InvokeStartAllServices.class.getName();
+    	private final String LOCAL_LOG_TAG = InvokeStartAllServices.class.getCanonicalName();
     	private IMethodCallback callback;
 
    	 /**
@@ -643,8 +644,10 @@ public class SocietiesClientServicesController {
             //USERFEEDBACK EVENT LISTENER
             Intent intentUserFeedback = new Intent(SocietiesClientServicesController.this.context, EventListener.class);
             SocietiesClientServicesController.this.context.startService(intentUserFeedback);
-            
-    		try {
+            Intent intentUserFeedbackHistory = new Intent(SocietiesClientServicesController.this.context, EventHistory.class);
+            SocietiesClientServicesController.this.context.startService(intentUserFeedbackHistory);
+
+            try {
 				SocietiesClientServicesController.this.servicesStarted.await(TASK_TIMEOUT, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
 				retValue = false;
@@ -665,7 +668,7 @@ public class SocietiesClientServicesController {
      */
     private class InvokeStopAllServices extends AsyncTask<Void, Void, Void> {
 
-    	private final String LOCAL_LOG_TAG = InvokeStopAllServices.class.getName();
+    	private final String LOCAL_LOG_TAG = InvokeStopAllServices.class.getCanonicalName();
     	private IMethodCallback callback;
 
    	 /**
@@ -716,7 +719,9 @@ public class SocietiesClientServicesController {
             //USERFEEDBACK EVENT LISTENER
             Intent intentUserFeedback = new Intent(SocietiesClientServicesController.this.context, EventListener.class);
             SocietiesClientServicesController.this.context.stopService(intentUserFeedback);
-            
+            Intent intentUserFeedbackHistory = new Intent(SocietiesClientServicesController.this.context, EventHistory.class);
+            SocietiesClientServicesController.this.context.stopService(intentUserFeedbackHistory);
+
     		try {
 				SocietiesClientServicesController.this.servicesStopped.await(TASK_TIMEOUT, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {

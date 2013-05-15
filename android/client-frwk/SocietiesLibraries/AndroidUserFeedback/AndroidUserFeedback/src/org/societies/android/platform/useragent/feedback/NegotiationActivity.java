@@ -1,7 +1,20 @@
 package org.societies.android.platform.useragent.feedback;
 
-import java.util.List;
-
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.widget.*;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.VCardParcel;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
@@ -16,36 +29,11 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Conditi
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 
-import android.os.Bundle;
-import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.Menu;
-import android.view.View;
-import android.view.Window;
-import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ScrollView;
-import android.widget.Spinner;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
+import java.util.List;
 
 public class NegotiationActivity extends Activity implements OnItemSelectedListener {
 
-	private static final String LOG_TAG = NegotiationActivity.class.getName();
+	private static final String LOG_TAG = NegotiationActivity.class.getCanonicalName();
 	
 	private EventsHelper eventsHelper;
 	UserFeedbackPrivacyNegotiationEvent eventInfo = null;

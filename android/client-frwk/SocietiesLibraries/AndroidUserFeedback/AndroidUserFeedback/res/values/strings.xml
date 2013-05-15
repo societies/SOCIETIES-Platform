@@ -4,6 +4,7 @@
     <string name="hello">Hello World!</string>
     <string name="app_name">Societies Notifications</string>
     <string name="societies_Notifications">Permissions Request</string>
+    <string name="societies_Notifications_hist">Permissions Requests</string>
     <string name="notifications_description">Description</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
@@ -14,5 +15,7 @@
     <string name="timed_abort_positive_string">Ignore</string>
     <string name="timed_abort_negative_string">Abort</string>
     <string name="simple_notification_accept_string">OK</string>
+    <string name="request_history">Request History</string>
+    <string name="close_string">Close</string>
 
 </resources>

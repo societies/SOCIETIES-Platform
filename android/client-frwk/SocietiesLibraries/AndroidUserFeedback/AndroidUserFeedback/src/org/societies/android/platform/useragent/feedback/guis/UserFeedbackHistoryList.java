@@ -22,54 +22,70 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.societies.android.platform.useragent.feedback.guis;
 
-import android.app.Notification;
-import android.app.Notification.Builder;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
+import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
-import org.societies.android.platform.useragent.feedback.R;
+import android.content.ServiceConnection;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.view.Menu;
+import org.societies.android.api.internal.R;
+import org.societies.android.platform.useragent.feedback.EventHistory;
 
-/**
- * @author Eliza
- *
- */
-@Deprecated
-public class UserFeedbackNotification {
+public class UserFeedbackHistoryList extends Activity {
 
-	private static final String LOG_CAT = UserFeedbackNotification.class.getCanonicalName();
-	private Context context;
+    protected final String LOG_TAG = this.getClass().getName();
 
-	public UserFeedbackNotification(Context context) {
-		this.context = context;
-	}
-	
-	public void getExplicitFB(String notificationTag){
-		Log.d(LOG_CAT, "Request for ExplicitFB Notification window");
-		Builder mBuilder =
-		        new Builder(context)
-		        .setSmallIcon(R.drawable.home_logo)
-		        .setContentTitle("My notification")
-		        .setContentText("Hello World!");
-		
-		// Creates an explicit intent for an Activity in your app
-		Intent resultIntent = new Intent(this.context, AcknackPopup.class);
-		
-		// The stack builder object will contain an artificial back stack for the
-		// started Activity.
-		// This ensures that navigating backward from the Activity leads out of
-		// your application to the Home screen.
-		//TaskStackBuilder stackBuilder = TaskStackBuilder.create(this.context);
-		
-		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, resultIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
-		mBuilder.setContentIntent(pendingIntent);
-		Notification notification = mBuilder.getNotification();
-		NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager.notify(notificationTag, 0, notification);
-		Log.d(LOG_CAT, "ExplicitFB Notification created");
-		
-	}
+    private EventHistory eventHistoryService;
+
+    private ServiceConnection eventHistoryServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            EventHistory.LocalBinder binder = (EventHistory.LocalBinder) service;
+            eventHistoryService = binder.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            eventHistoryService = null;
+        }
+    };
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setTheme(android.R.style.Theme_Dialog);
+        setContentView(R.layout.activity_notification_history);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return true;
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Bind to LocalService
+        Intent intent = new Intent(this, EventHistory.class);
+        bindService(intent, eventHistoryServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (eventHistoryService != null) {
+            unbindService(eventHistoryServiceConnection);
+        }
+    }
+
+
 }
