@@ -45,8 +45,8 @@ public class CtxAttributeComplexValue implements Serializable{
 	/** The median value of the current context attribute */
 	private Double median;
 
-	/** The range value of the current context attribute */
-	private Double range;
+	/** The min and max range value of the current context attribute */
+	private Number rangeMin, rangeMax;
 
 	/** The location of the current context attribute */
 	private String locationgps;
@@ -104,24 +104,45 @@ public class CtxAttributeComplexValue implements Serializable{
 	}
 
 	/** 
-	 * Gets the range of the current context attribute value.
+	 * Gets the min range of the current context attribute value.
 	 * 
-	 * @return the range of the current context attribute value.
+	 * @return the min range of the current context attribute value.
 	 */
-	public Double getRange() {
+	public Number getRangeMin() {
 		
-		return this.range;
+		return this.rangeMin;
 	}
-	
+
 	/**
-	 * Sets the range of the current context attribute value.
+	 * Sets the min range of the current context attribute value.
 	 * 
 	 * @param range
-	 * 			the range of the current context attribute value.
+	 * 			the min range of the current context attribute value.
 	 */
-	public void setRange(Double range) {
+	public void setRangeMin (Number rangeMin) {
 		
-		this.range = range;
+		this.rangeMin = rangeMin;
+	}
+
+	/** 
+	 * Gets the max range of the current context attribute value.
+	 * 
+	 * @return the max range of the current context attribute value.
+	 */
+	public Number getRangeMax() {
+		
+		return this.rangeMax;
+	}	
+
+	/**
+	 * Sets the max range of the current context attribute value.
+	 * 
+	 * @param range
+	 * 			the max range of the current context attribute value.
+	 */
+	public void setRangeMax (Number rangeMax) {
+		
+		this.rangeMax = rangeMax;
 	}
 	
 	/**
