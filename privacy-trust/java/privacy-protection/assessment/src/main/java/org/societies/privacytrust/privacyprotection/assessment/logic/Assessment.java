@@ -35,7 +35,9 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.PrivacyLogFilter;
 import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
 
 /**
@@ -61,6 +63,9 @@ public class Assessment implements IAssessment {
 	private HashMap<IIdentity, AssessmentResultIIdentity> assessmentById = new HashMap<IIdentity, AssessmentResultIIdentity>();
 	private HashMap<String, AssessmentResultClassName> assessmentByClass = new HashMap<String, AssessmentResultClassName>();
 	
+	private Date resultsStart;
+	private Date resultsEnd;
+	
 	private int autoPeriod = -1;
 	
 	public Assessment() {
@@ -81,7 +86,7 @@ public class Assessment implements IAssessment {
 		LOG.debug("init()");
 		dataTransferAnalyzer = new DataTransferAnalyzer(privacyLog);
 		dataAccessAnalyzer = new DataAccessAnalyzer(privacyLog.getDataAccess());
-		assessAllNow();
+		assessAllNow(null, null);
 	}
 	
 	@Override
@@ -96,14 +101,20 @@ public class Assessment implements IAssessment {
 	}
 	
 	@Override
-	public void assessAllNow() {
+	public void assessAllNow(Date start, Date end) {
 		
-		LOG.info("assessAllNow()");
+		LOG.info("assessAllNow({}, {})", start, end);
+		
+		resultsStart = start;
+		resultsEnd = end;
+		
+		start = nonNullStart(start);
+		end = nonNullEnd(end);
 		
 		// For each sender identity: calculate result and update value in assessmentById
 		for (IIdentity sender : privacyLog.getSenderIds()) {
 			try {
-				AssessmentResultIIdentity ass = dataTransferAnalyzer.estimatePrivacyBreach(sender);
+				AssessmentResultIIdentity ass = dataTransferAnalyzer.estimatePrivacyBreach(sender, start, end);
 				LOG.debug("assessAllNow(): updating for identity {}", sender);
 				assessmentById.put(sender, ass);
 			} catch (AssessmentException e) {
@@ -113,7 +124,7 @@ public class Assessment implements IAssessment {
 		// For each sender class: calculate result and update value in assessmentByClass
 		for (String sender : privacyLog.getSenderClassNames()) {
 			try {
-				AssessmentResultClassName ass = dataTransferAnalyzer.estimatePrivacyBreach(sender);
+				AssessmentResultClassName ass = dataTransferAnalyzer.estimatePrivacyBreach(sender, start, end);
 				LOG.debug("assessAllNow(): updating for class {}", sender);
 				assessmentByClass.put(sender, ass);
 			} catch (AssessmentException e) {
@@ -123,23 +134,25 @@ public class Assessment implements IAssessment {
 	}
 	
 	@Override
-	public HashMap<IIdentity, AssessmentResultIIdentity> getAssessmentAllIds() {
+	public HashMap<IIdentity, AssessmentResultIIdentity> getAssessmentAllIds(Date start, Date end) {
 		
-		LOG.info("getAssessmentAllIds()");
-
+		LOG.info("getAssessmentAllIds({}, {})", start, end);
+		
+		updateResultsIfNeeded(start, end);
 		return assessmentById;
 	}
 	
 	@Override
-	public HashMap<String, AssessmentResultClassName> getAssessmentAllClasses() {
+	public HashMap<String, AssessmentResultClassName> getAssessmentAllClasses(Date start, Date end) {
 
-		LOG.info("getAssessmentAllClasses()");
+		LOG.info("getAssessmentAllClasses({}, {})", start, end);
 		
+		updateResultsIfNeeded(start, end);
 		return assessmentByClass;
 	}
 
 	@Override
-	public AssessmentResultIIdentity getAssessment(IIdentity sender) {
+	public AssessmentResultIIdentity getAssessment(IIdentity sender, Date start, Date end) {
 		
 		LOG.info("getAssessment({})", sender);
 		
@@ -147,11 +160,12 @@ public class Assessment implements IAssessment {
 			LOG.warn("getAssessment({}): invalid argument", sender);
 			return null;
 		}
+		updateResultsIfNeeded(start, end);
 		return assessmentById.get(sender);
 	}
 
 	@Override
-	public AssessmentResultClassName getAssessment(String sender) {
+	public AssessmentResultClassName getAssessment(String sender, Date start, Date end) {
 
 		LOG.info("getAssessment({})", sender);
 
@@ -159,23 +173,37 @@ public class Assessment implements IAssessment {
 			LOG.warn("getAssessment({}): invalid argument", sender);
 			return null;
 		}
+		updateResultsIfNeeded(start, end);
 		return assessmentByClass.get(sender);
 	}
 	
 	@Override
-	public long getNumDataTransmissionEvents() {
+	public long getNumDataTransmissionEvents(Date start, Date end) {
 
 		LOG.info("getNumDataTransmissionEvents()");
 
-		return privacyLog.getDataTransmission().size();
+		PrivacyLogFilter filter = new PrivacyLogFilter();
+		filter.setStart(start);
+		filter.setEnd(end);
+		return privacyLog.search(filter).size();
 	}
 	
 	@Override
-	public long getNumDataAccessEvents() {
+	public long getNumDataAccessEvents(Date start, Date end) {
 
 		LOG.info("getNumDataAccessEvents()");
 		
-		return privacyLog.getDataAccess().size();
+		start = nonNullStart(start);
+		end = nonNullEnd(end);
+		
+		List<DataAccessLogEntry> allDataAccessEvents = privacyLog.getDataAccess();
+		int count = 0;
+		for (DataAccessLogEntry da : allDataAccessEvents) {
+			if (da.getTime().after(start) && da.getTime().before(end)) {
+				++count;
+			}
+		}
+		return count;
 	}
 	
 	@Override
@@ -190,21 +218,29 @@ public class Assessment implements IAssessment {
 
 	@Override
 	public int getNumDataAccessEvents(IIdentity requestor, Date start, Date end) {
+		start = nonNullStart(start);
+		end = nonNullEnd(end);
 		return dataAccessAnalyzer.getNumDataAccessEvents(requestor, start, end);
 	}
 
 	@Override
 	public int getNumDataAccessEvents(String requestorClass, Date start, Date end) {
+		start = nonNullStart(start);
+		end = nonNullEnd(end);
 		return dataAccessAnalyzer.getNumDataAccessEvents(requestorClass, start, end);
 	}
 	
 	@Override
 	public Map<IIdentity, Integer> getNumDataAccessEventsForAllIdentities(Date start, Date end) {
+		start = nonNullStart(start);
+		end = nonNullEnd(end);
 		return dataAccessAnalyzer.getNumDataAccessEventsForAllIdentities(start, end);
 	}
 	
 	@Override
 	public Map<String, Integer> getNumDataAccessEventsForAllClasses(Date start, Date end) {
+		start = nonNullStart(start);
+		end = nonNullEnd(end);
 		return dataAccessAnalyzer.getNumDataAccessEventsForAllClasses(start, end);
 	}
 	
@@ -215,11 +251,50 @@ public class Assessment implements IAssessment {
 	
 	@Override
 	public int getNumDataTransmissionEvents(IIdentity receiver, Date start, Date end) {
+		start = nonNullStart(start);
+		end = nonNullEnd(end);
 		return dataTransferAnalyzer.getNumDataTransmissionEvents(receiver, start, end);
 	}
 
 	@Override
 	public Map<IIdentity, Integer> getNumDataTransmissionEventsForAllReceivers(Date start, Date end) {
+		start = nonNullStart(start);
+		end = nonNullEnd(end);
 		return dataTransferAnalyzer.getNumDataTransmissionEventsForAllReceivers(start, end);
+	}
+	
+	private Date nonNullStart(Date d) {
+		if (d == null) {
+			return new Date(0);
+		}
+		else {
+			return d;
+		}
+	}
+	
+	private Date nonNullEnd(Date d) {
+		if (d == null) {
+			return new Date();
+		}
+		else {
+			return d;
+		}
+	}
+	
+	private boolean areDatesEqual(Date a, Date b) {
+		if (a == null) {
+			return b == null;
+		}
+		else {
+			return a.equals(b);
+		}
+	}
+	
+	private void updateResultsIfNeeded(Date start, Date end) {
+		if (!areDatesEqual(start, resultsStart) || !areDatesEqual(end, resultsEnd)) {
+			LOG.debug("Previous results are for different time interval: from {} to {}. Updating...",
+					resultsStart, resultsEnd);
+			assessAllNow(start, end);
+		}
 	}
 }

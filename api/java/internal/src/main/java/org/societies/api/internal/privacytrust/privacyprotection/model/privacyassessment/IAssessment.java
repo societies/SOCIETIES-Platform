@@ -45,6 +45,7 @@ public interface IAssessment {
 	 * 
 	 * @return seconds period in seconds, negative value for no auto update
 	 */
+	@Deprecated
 	public int getAutoPeriod();
 
 	/**
@@ -53,22 +54,23 @@ public interface IAssessment {
 	 * 
 	 * @param seconds period in seconds, negative value for no auto update
 	 */
+	@Deprecated
 	public void setAutoPeriod(int seconds);
 	
 	/**
 	 * Perform all assessments and update assessment values. May take a long time.
 	 */
-	public void assessAllNow();
+	public void assessAllNow(Date start, Date end);
 	
 	/**
 	 * Get a-posteriori assessment for all sender {@link IIdentity} values.
 	 */
-	public HashMap<IIdentity, AssessmentResultIIdentity> getAssessmentAllIds();
+	public HashMap<IIdentity, AssessmentResultIIdentity> getAssessmentAllIds(Date start, Date end);
 	
 	/**
 	 * Get a-posteriori assessment for all sender classes.
 	 */
-	public HashMap<String, AssessmentResultClassName> getAssessmentAllClasses();
+	public HashMap<String, AssessmentResultClassName> getAssessmentAllClasses(Date start, Date end);
 
 	/**
 	 * Get a-posteriori assessment for a particular sender {@link IIdentity}.
@@ -77,7 +79,7 @@ public interface IAssessment {
 	 * 
 	 * @return privacy assessment for given sender
 	 */
-	public AssessmentResultIIdentity getAssessment(IIdentity sender);
+	public AssessmentResultIIdentity getAssessment(IIdentity sender, Date start, Date end);
 
 	/**
 	 * Get a-posteriori assessment for a particular sender class name.
@@ -86,7 +88,7 @@ public interface IAssessment {
 	 * 
 	 * @return privacy assessment for given sender
 	 */
-	public AssessmentResultClassName getAssessment(String senderClassName);
+	public AssessmentResultClassName getAssessment(String senderClassName, Date start, Date end);
 	
 	/**
 	 * Development only.
@@ -94,7 +96,7 @@ public interface IAssessment {
 	 * 
 	 * @return number of all recorded data transmission events
 	 */
-	public long getNumDataTransmissionEvents();
+	public long getNumDataTransmissionEvents(Date start, Date end);
 	
 	/**
 	 * @return All identities that have requested access to local data
@@ -109,7 +111,7 @@ public interface IAssessment {
 	/**
 	 * @return number of all recorded data access events
 	 */
-	public long getNumDataAccessEvents();
+	public long getNumDataAccessEvents(Date start, Date end);
 
 	/**
 	 * Get number of events in certain time period where given requestor accessed local data.

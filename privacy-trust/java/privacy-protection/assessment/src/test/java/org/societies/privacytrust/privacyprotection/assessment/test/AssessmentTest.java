@@ -150,7 +150,7 @@ public class AssessmentTest {
 		
 //		result1 = assessment.getAssessmentAllIds();
 //		assessment.assessAllNow();
-		result2 = assessment.getAssessmentAllIds();
+		result2 = assessment.getAssessmentAllIds(null, null);
 		
 //		assertEquals(0, result1.size());
 		assertEquals(2, result2.size());
@@ -167,7 +167,7 @@ public class AssessmentTest {
 		
 //		result1 = assessment.getAssessmentAllClasses();
 //		assessment.assessAllNow();
-		result2 = assessment.getAssessmentAllClasses();
+		result2 = assessment.getAssessmentAllClasses(null, null);
 		
 //		assertEquals(0, result1.size());
 		assertEquals(4, result2.size());
@@ -178,7 +178,7 @@ public class AssessmentTest {
 	 */
 	@Test
 	public void testGetAssessmentIIdentity() {
-		assessment.assessAllNow();
+		assessment.assessAllNow(null, null);
 	}
 
 	/**
@@ -186,7 +186,7 @@ public class AssessmentTest {
 	 */
 	@Test
 	public void testGetAssessmentString() {
-		assessment.assessAllNow();
+		assessment.assessAllNow(null, null);
 	}
 
 	/**
@@ -199,13 +199,13 @@ public class AssessmentTest {
 		int additional = Math.abs(new Random().nextInt()) % 8;
 		long transmissionEvents = 11;
 		
-		assertEquals(initial, assessment.getNumDataAccessEvents());
-		assertEquals(transmissionEvents, assessment.getNumDataTransmissionEvents());
+		assertEquals(initial, assessment.getNumDataAccessEvents(null, null));
+		assertEquals(transmissionEvents, assessment.getNumDataTransmissionEvents(null, null));
 		
 		appendDataAccessEvents(additional);
 		
-		assertEquals(initial + additional, assessment.getNumDataAccessEvents());
-		assertEquals(transmissionEvents, assessment.getNumDataTransmissionEvents());
+		assertEquals(initial + additional, assessment.getNumDataAccessEvents(null, null));
+		assertEquals(transmissionEvents, assessment.getNumDataTransmissionEvents(null, null));
 	}
 
 	/**
@@ -218,13 +218,13 @@ public class AssessmentTest {
 		int additional = Math.abs(new Random().nextInt()) % 8;
 		long accessEvents = 7;
 		
-		assertEquals(initial, assessment.getNumDataTransmissionEvents());
-		assertEquals(accessEvents, assessment.getNumDataAccessEvents());
+		assertEquals(initial, assessment.getNumDataTransmissionEvents(null, null));
+		assertEquals(accessEvents, assessment.getNumDataAccessEvents(null, null));
 		
 		appendDataTransmissionEvents(additional);
 		
-		assertEquals(initial + additional, assessment.getNumDataTransmissionEvents());
-		assertEquals(accessEvents, assessment.getNumDataAccessEvents());
+		assertEquals(initial + additional, assessment.getNumDataTransmissionEvents(null, null));
+		assertEquals(accessEvents, assessment.getNumDataAccessEvents(null, null));
 	}
 	
 	private void appendDataAccessEvents(int num) {
