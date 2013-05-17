@@ -71,6 +71,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
+import org.societies.api.context.model.CtxEvaluationResults;
 import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
@@ -97,7 +98,7 @@ import org.societies.context.broker.impl.comm.callbacks.UpdateCtxCallback;
 import org.societies.context.broker.impl.util.CtxBrokerUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Async; 
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.societies.api.identity.util.DataTypeUtils;
@@ -2802,4 +2803,13 @@ public class InternalCtxBroker implements ICtxBroker {
 		return this.retrieve(req, ctxIdList);
 	}
 
+	/**
+	 * added by eboylna for CSE integration test
+	 */
+	@Override
+    public CtxEvaluationResults evaluateSimilarity(String[] ids, ArrayList<String> attrib) throws CtxException {
+        LOG.info("EBOYLANLOGFOOTPRINT internalCtxBroker.evaluateSimilarity called");
+        CtxEvaluationResults evalResult = this.evaluateSimilarity(ids, attrib);
+    return evalResult;
+    }
 }
