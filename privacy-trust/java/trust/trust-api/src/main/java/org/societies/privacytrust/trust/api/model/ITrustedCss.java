@@ -75,4 +75,18 @@ public interface ITrustedCss extends ITrustedEntity {
 	public Set<TrustedService> getServices(String serviceType) {
 		return null;
 	}*/
+	
+	/** 
+	 * Returns the similarity between the trustor and the trustee.
+	 *  
+	 * @since 1.1 
+	 */
+	public Double getSimilarity();
+	
+	/** 
+	 * Sets the similarity between the trustor and the trustee.
+	 *  
+	 * @since 1.1 
+	 */
+	public void setSimilarity(Double similarity);
 }

@@ -106,6 +106,19 @@
                 <action android:name="org.societies.android.platform.events.ServicePlatformEventsRemote"></action>
    			</intent-filter>
         </service>
+        <service android:name="org.societies.android.privacytrust.trust.TrustClientRemote" 
+            android:label="Trust Client Remote" >
+            <intent-filter>
+                <action android:name="org.societies.android.privacytrust.trust.TrustClientRemote" />
+            </intent-filter>
+        </service>
+        <service android:name="org.societies.android.platform.context.ServiceContextBrokerRemote" 
+            android:label="SocietiesContext" >
+            <intent-filter>
+                <action android:name="org.societies.android.platform.context.ServiceContextBrokerRemote" />
+            </intent-filter>
+        </service>
+        
         <provider 
             android:authorities="org.societies.android.platform.content.androidcssmanager"
             android:name="org.societies.android.platform.content.ProviderImplementation"

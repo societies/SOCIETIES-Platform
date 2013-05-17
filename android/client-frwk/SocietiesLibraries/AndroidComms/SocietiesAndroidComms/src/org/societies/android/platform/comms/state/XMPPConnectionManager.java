@@ -61,7 +61,7 @@ import android.util.Log;
 	
 public class XMPPConnectionManager implements IConnectionState {
 	private final static String LOG_TAG = XMPPConnectionManager.class.getName();
-	private final static boolean DEBUG_LOGGING = true;
+	private final static boolean DEBUG_LOGGING = false;
 	private final static String KEY_DIVIDER = ":"; 
 	//(a)Smack does not differentiate between different types of network problems and authentication and all
 	//exceptions are returned as the generic XMPPException

@@ -35,17 +35,32 @@ import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean;
 
 /**
- * Describe your class here...
+ * This interface provides access to the trust values associated with 
+ * individuals, communities and services. These values define trust 
+ * relationships between a given <i>trustor</i> and a <i>trustee</i>. More
+ * specifically, a trustor is an entity which assigns a trust value to another
+ * entity, i.e. the trustee, in order to express the trustworthiness of that 
+ * entity. Such a trust value ranges from <i>0</i> to <i>1</i>, where zero 
+ * expresses full distrust, while one denotes full trust. There are three 
+ * different types of values that can be assigned:
+ * {@link TrustValueTypeBean#DIRECT DIRECT}, 
+ * {@link TrustValueTypeBean#INDIRECT INDIRECT}, or 
+ * {@link TrustValueTypeBean#USER_PERCEIVED USER_PERCEIVED}. A 
+ * <code>TrustRelationshipBean</code> also contains the date and time
+ * (timestamp) when the trust value was last evaluated.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.5
  */
 public interface ITrustClient extends IServiceManager {
 	
+	/** The extra Intent field containing the result. */
 	public static final String INTENT_RETURN_VALUE_KEY = 
-			"org.societies.android.privacytrust.trust.ReturnValue";
-    public static final String INTENT_RETURN_STATUS_KEY = 
-    		"org.societies.android.privacytrust.trust.ReturnStatus";
+			"org.societies.android.api.privacytrust.trust.ReturnValue";
+	
+	/** The extra Intent String field containing the exception message. */
+	public static final String INTENT_EXCEPTION_KEY = 
+			"org.societies.android.api.privacytrust.trust.Exception";
     
     public static final String RETRIEVE_TRUST_RELATIONSHIPS = 
     		"org.societies.android.api.privacytrust.trust.RETRIEVE_TRUST_RELATIONSHIPS";
@@ -57,6 +72,8 @@ public interface ITrustClient extends IServiceManager {
     		"org.societies.android.api.privacytrust.trust.ADD_DIRECT_TRUST_EVIDENCE";
 
     String methodsArray [] = {
+    		"startService()",
+    		"stopService()",
     		"retrieveTrustRelationships(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId)",
     		"retrieveTrustRelationships(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId)",
     		"retrieveTrustRelationship(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trusteeId, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
@@ -64,9 +81,8 @@ public interface ITrustClient extends IServiceManager {
     		"retrieveTrustRelationships(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean trusteeType)",
     		"retrieveTrustRelationships(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
     		"retrieveTrustRelationships(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean trustorId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityTypeBean trusteeType, org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean trustValueType)",
-    		"addDirectTrustEvidence(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean subjectId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean objectId, org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean type, org.societies.android.api.common.ADate timestamp, Serializable info",
-			"startService()",
-			"stopService()" };
+    		"addDirectTrustEvidence(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean subjectId, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean objectId, org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean type, org.societies.android.api.common.ADate timestamp, Serializable info)"
+    		};
 
     /**
 	 * Retrieves all trust relationships of the specified trustor. The method
@@ -74,7 +90,7 @@ public interface ITrustClient extends IServiceManager {
 	 * established any trust relationships. 
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param requestor 
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust relationships.
@@ -94,7 +110,7 @@ public interface ITrustClient extends IServiceManager {
 	 * relationships exist between the identified trustor and trustee.
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param requestor 
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust relationships.
@@ -119,7 +135,7 @@ public interface ITrustClient extends IServiceManager {
 	 * been established with the supplied trustee by the given trustor.
 	 * 
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param requestor
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust relationship.
@@ -151,7 +167,7 @@ public interface ITrustClient extends IServiceManager {
 	 * trustor.
 	 * 
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param requestor
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust value.
@@ -183,7 +199,7 @@ public interface ITrustClient extends IServiceManager {
 	 * supplied criteria.
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param requestor
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust relationships.
@@ -213,7 +229,7 @@ public interface ITrustClient extends IServiceManager {
 	 * the supplied criteria.
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param requestor
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust relationships.
@@ -245,7 +261,7 @@ public interface ITrustClient extends IServiceManager {
 	 * relationships match the supplied criteria.
 	 *
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param requestor
 	 *            (required) the requestor on whose behalf to retrieve the 
 	 *            trust relationships.
@@ -279,7 +295,7 @@ public interface ITrustClient extends IServiceManager {
 	 * evidence type, the method allows specifying supplementary information.
 	 * 
 	 * @param client
-	 *            (required) TODO
+	 *            (required) the package name of the client application.
 	 * @param requestor
 	 *            (required) the requestor on whose behalf to add the direct 
 	 *            trust evidence.

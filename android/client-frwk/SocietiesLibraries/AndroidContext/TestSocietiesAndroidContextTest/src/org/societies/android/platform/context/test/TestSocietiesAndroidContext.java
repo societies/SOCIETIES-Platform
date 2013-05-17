@@ -28,9 +28,12 @@ import java.net.URISyntaxException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.societies.api.schema.context.model.CtxAssociationBean;
 import org.societies.api.schema.context.model.CtxAttributeBean;
+import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
 import org.societies.api.schema.context.model.CtxEntityBean;
 import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
+import org.societies.api.schema.context.model.CtxModelObjectBean;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.android.api.context.CtxException;
 import org.societies.android.api.context.ICtxClient;
@@ -74,7 +77,10 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 	private Boolean receivedResult = false;
 
 	private CtxEntityBean entity;
-	private CtxAttributeBean attribute;
+	private CtxAttributeBean attribute, updatedAttribute;
+	private CtxAssociationBean association;
+	private CtxModelObjectBean retrievedModelObject;
+	private CtxEntityIdentifierBean retrievedIndEntityId, retrievedCommunityEntityId;
 	
 	public TestSocietiesAndroidContext() {
 		super(TestAndroidContextBroker.class);
@@ -132,9 +138,42 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 			else if (intent.getAction().equals(ICtxClient.CREATE_ATTRIBUTE)) {
 				Log.d(LOG_TAG, "Created Context Attribute");
 				attribute = intent.getParcelableExtra(ICtxClient.INTENT_RETURN_VALUE_KEY);
-				Log.d(LOG_TAG, "Attribute created: " + attribute);
+				Log.d(LOG_TAG, "Attribute created: " + attribute + " with binVal: " + attribute.getBinaryValue().toString() + " intVal: " + attribute.getIntegerValue().toString() + " and doubleVal: " + attribute.getDoubleValue().toString());
 				assertNotNull(attribute);
 			}
+			else if (intent.getAction().equals(ICtxClient.CREATE_ASSOCIATION)) {
+				Log.d(LOG_TAG, "Created Context Association");
+				association = intent.getParcelableExtra(ICtxClient.INTENT_RETURN_VALUE_KEY);
+				Log.d(LOG_TAG, "Association created: " + association);
+				assertNotNull(association);
+			}
+			else if (intent.getAction().equals(ICtxClient.RETRIEVE)) {
+				Log.d(LOG_TAG, "Retrieved ");
+				retrievedModelObject = intent.getParcelableExtra(ICtxClient.INTENT_RETURN_VALUE_KEY);
+				Log.d(LOG_TAG, "Retrieved Model Object: " + retrievedModelObject.getId().getString());
+				attribute = (CtxAttributeBean) retrievedModelObject;
+				Log.d(LOG_TAG, "binaryValue: " + attribute.getBinaryValue() + " intValue: " + attribute.getIntegerValue() + " and doubleValue: " + attribute.getDoubleValue());
+				assertNotNull(retrievedModelObject);
+			}
+			else if (intent.getAction().equals(ICtxClient.RETRIEVE_INDIVIDUAL_ENTITY_ID)) {
+				Log.d(LOG_TAG, "RetrievedIndividualEntityId ");
+				retrievedIndEntityId = intent.getParcelableExtra(ICtxClient.INTENT_RETURN_VALUE_KEY);
+				Log.d(LOG_TAG, "Retrieved Individual Entity Id: " + retrievedIndEntityId.getString());
+				assertNotNull(retrievedIndEntityId);
+			}
+			else if (intent.getAction().equals(ICtxClient.RETRIEVE_COMMUNITY_ENTITY_ID)) {
+				Log.d(LOG_TAG, "RetrievedCommunityEntityId ");
+				retrievedCommunityEntityId = intent.getParcelableExtra(ICtxClient.INTENT_RETURN_VALUE_KEY);
+				Log.d(LOG_TAG, "Retrieved Community Entity Id: " + retrievedCommunityEntityId.getString());
+				assertNotNull(retrievedCommunityEntityId);
+			}
+			else if (intent.getAction().equals(ICtxClient.UPDATE)) {
+				Log.d(LOG_TAG, "Update Attribute ");
+				updatedAttribute = intent.getParcelableExtra(ICtxClient.INTENT_RETURN_VALUE_KEY);
+				Log.d(LOG_TAG, "Updated Attribute: " + updatedAttribute.getId().getString());
+				assertNotNull(updatedAttribute);
+			}
+			
 			TestSocietiesAndroidContext.this.receivedResult = true;
 			assertNotNull(intent.getParcelableExtra(ICtxClient.INTENT_RETURN_VALUE_KEY));
 			Log.d(LOG_TAG, "OnReceive finished");
@@ -212,7 +251,9 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 			Log.d(LOG_TAG, "attribute Test3");
 			Log.d(LOG_TAG, "entityId used to Create Attribute: " + entity);
 			Log.d(LOG_TAG, "entityId.getString: " + entity.getId().getString());
-			this.ctxBrokerService.createAttribute(CLIENT_ID, requestor, (CtxEntityIdentifierBean) entity.getId(), "androidAttribute");
+			CtxEntityIdentifierBean entityId = new CtxEntityIdentifierBean();
+			entityId.setString(entity.getId().getString());
+			this.ctxBrokerService.createAttribute(CLIENT_ID, requestor, entityId, "androidAttribute");
 		} 		catch (Exception e) {
 			Log.e(LOG_TAG, "Failed to create attribute: " + e.getLocalizedMessage());
 		}
@@ -223,6 +264,170 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 //        this.unregisterReceiver(receiver);
 		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
 	}
+	
+	@MediumTest
+	public void testCreateAssociation() throws URISyntaxException, Exception{
+//		this.testCompleted = false;
+		this.testDoneSignal = new CountDownLatch(1);
+		this.testStartTime = System.currentTimeMillis();
+		this.testEndTime = this.testStartTime;
+
+		final RequestorBean requestor = new RequestorBean();
+		requestor.setRequestorId(this.REQUESTOR_ID);
+		
+		Log.d(LOG_TAG, "Requestor is: " + requestor.getRequestorId());
+		Log.d(LOG_TAG, "test createAssociation start time: " + this.testStartTime);
+		try {
+			this.ctxBrokerService.createAssociation(CLIENT_ID, requestor, "jane.societies.local", "associationAndroid");
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to create association: " + e.getLocalizedMessage());
+		}
+
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
+	}
+	
+	@MediumTest
+	public void testRetrieve() throws URISyntaxException, Exception{
+//		this.testCompleted = false;
+		this.testDoneSignal = new CountDownLatch(1);
+		this.testStartTime = System.currentTimeMillis();
+		this.testEndTime = this.testStartTime;
+
+		final RequestorBean requestor = new RequestorBean();
+		requestor.setRequestorId(this.REQUESTOR_ID);
+		
+		Log.d(LOG_TAG, "Requestor is: " + requestor.getRequestorId());
+		Log.d(LOG_TAG, "test retrieve start time: " + this.testStartTime);
+		try {
+			this.ctxBrokerService.createEntity(CLIENT_ID, requestor, "jane.societies.local", "androidEntity3");
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to create entity: " + e.getLocalizedMessage());
+		}
+
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
+		this.testDoneSignal = new CountDownLatch(1);
+
+		try {
+			
+//			CtxEntityIdentifierBean entityId = (CtxEntityIdentifierBean) entity.getId();
+			Log.d(LOG_TAG, "entityId used to Create Attribute: " + entity);
+			Log.d(LOG_TAG, "entityId.getString: " + entity.getId().getString());
+			CtxEntityIdentifierBean entityId = new CtxEntityIdentifierBean();
+			entityId.setString(entity.getId().getString());
+			this.ctxBrokerService.createAttribute(CLIENT_ID, requestor, entityId, "androidAttribute3");
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to create attribute: " + e.getLocalizedMessage());
+		}
+		
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
+		this.testDoneSignal = new CountDownLatch(1);
+		try {
+			Log.d(LOG_TAG, "entity used to retrieve: " + entity);
+			Log.d(LOG_TAG, "entity.getString: " + entity.getId().getString());
+//			CtxEntityIdentifierBean entityId = new CtxEntityIdentifierBean();
+//			entityId.setString(entity.getId().getString());
+
+//			this.ctxBrokerService.retrieve(CLIENT_ID, requestor, entityId);
+
+			CtxAttributeIdentifierBean attrId = new CtxAttributeIdentifierBean();
+			attrId.setString(attribute.getId().getString());
+			
+			this.ctxBrokerService.retrieve(CLIENT_ID, requestor, attrId);
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to retrieve: " + e.getLocalizedMessage());
+		}
+
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
+	}
+	
+	@MediumTest
+	public void testRetrieveIndividualEntityId() throws URISyntaxException, Exception{
+//		this.testCompleted = false;
+		this.testDoneSignal = new CountDownLatch(1);
+		this.testStartTime = System.currentTimeMillis();
+		this.testEndTime = this.testStartTime;
+
+		final RequestorBean requestor = new RequestorBean();
+		requestor.setRequestorId(this.REQUESTOR_ID);
+		
+		Log.d(LOG_TAG, "Requestor is: " + requestor.getRequestorId());
+		Log.d(LOG_TAG, "test retrieveIndividualEntityId start time: " + this.testStartTime);
+		try {
+			this.ctxBrokerService.retrieveIndividualEntityId(CLIENT_ID, requestor, REQUESTOR_ID);
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to retrieveIndividualEntityId: " + e.getLocalizedMessage());
+		}
+
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
+	}
+	
+/*	@MediumTest
+	public void testRetrieveCommunityEntityId() throws URISyntaxException, Exception{
+		this.testDoneSignal = new CountDownLatch(1);
+		this.testStartTime = System.currentTimeMillis();
+		this.testEndTime = this.testStartTime;
+
+		final RequestorBean requestor = new RequestorBean();
+		requestor.setRequestorId(this.REQUESTOR_ID);
+		
+		Log.d(LOG_TAG, "Requestor is: " + requestor.getRequestorId());
+		Log.d(LOG_TAG, "test retrieveCommunityEntityId start time: " + this.testStartTime);
+		try {
+			this.ctxBrokerService.retrieveCommunityEntityId(CLIENT_ID, requestor, REQUESTOR_ID);
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to retrieveCommunityEntityId: " + e.getLocalizedMessage());
+		}
+
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
+	}*/
+	
+	@MediumTest
+	public void testUpdateAttribute() throws URISyntaxException, Exception{
+//		this.testCompleted = false;
+		this.testDoneSignal = new CountDownLatch(1);
+		this.testStartTime = System.currentTimeMillis();
+		this.testEndTime = this.testStartTime;
+
+		final RequestorBean requestor = new RequestorBean();
+		requestor.setRequestorId(this.REQUESTOR_ID);
+		
+		Log.d(LOG_TAG, "Requestor is: " + requestor.getRequestorId());
+		Log.d(LOG_TAG, "test retrieve start time: " + this.testStartTime);
+		try {
+			this.ctxBrokerService.createEntity(CLIENT_ID, requestor, "jane.societies.local", "androidEntity4");
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to create entity: " + e.getLocalizedMessage());
+		}
+
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
+		
+		this.testDoneSignal = new CountDownLatch(1);
+		try {
+			
+			Log.d(LOG_TAG, "entityId used to Create Attribute: " + entity);
+			Log.d(LOG_TAG, "entityId.getString: " + entity.getId().getString());
+			CtxEntityIdentifierBean entityId = new CtxEntityIdentifierBean();
+			entityId.setString(entity.getId().getString());
+			this.ctxBrokerService.createAttribute(CLIENT_ID, requestor, entityId, "androidAttribute2");
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to create attribute: " + e.getLocalizedMessage());
+		}
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
+		this.testDoneSignal = new CountDownLatch(1);
+		try {
+			Log.d(LOG_TAG, "attribute used to update: " + attribute);
+			Log.d(LOG_TAG, "attribute.getString: " + attribute.getId().getString());
+			attribute.setIntegerValue(123);
+			attribute.setDoubleValue(123.123);
+			this.ctxBrokerService.update(CLIENT_ID, requestor, attribute);
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to retrieve: " + e.getLocalizedMessage());
+		}
+
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
+	}	
+	
+	
     /**
      * Create a broadcast receiver
      * 
@@ -254,6 +459,17 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
         intentFilter.addAction(ICtxClient.CREATE_ENTITY);
         Log.d(LOG_TAG, "intentFilter.addAction " + ICtxClient.CREATE_ATTRIBUTE);
         intentFilter.addAction(ICtxClient.CREATE_ATTRIBUTE);
+        Log.d(LOG_TAG, "intentFilter.addAction " + ICtxClient.CREATE_ASSOCIATION);
+        intentFilter.addAction(ICtxClient.CREATE_ASSOCIATION);
+        Log.d(LOG_TAG, "intentFilter.addAction " + ICtxClient.RETRIEVE);
+        intentFilter.addAction(ICtxClient.RETRIEVE);
+        Log.d(LOG_TAG, "intentFilter.addAction " + ICtxClient.RETRIEVE_INDIVIDUAL_ENTITY_ID);
+        intentFilter.addAction(ICtxClient.RETRIEVE_INDIVIDUAL_ENTITY_ID);
+        Log.d(LOG_TAG, "intentFilter.addAction " + ICtxClient.RETRIEVE_COMMUNITY_ENTITY_ID);
+        intentFilter.addAction(ICtxClient.RETRIEVE_COMMUNITY_ENTITY_ID);
+        Log.d(LOG_TAG, "intentFilter.addAction " + ICtxClient.UPDATE);
+        intentFilter.addAction(ICtxClient.UPDATE);
+
 //        intentFilter.addAction(ICtxClient.INTENT_RETURN_VALUE_KEY);
         Log.d(LOG_TAG, "created test intentFilter " + intentFilter);
         return intentFilter;

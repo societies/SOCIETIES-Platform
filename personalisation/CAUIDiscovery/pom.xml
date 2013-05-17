@@ -86,6 +86,12 @@
 			<version>${version.pm}</version>
 			<scope>test</scope>
 		</dependency>
+				<dependency>
+			<groupId>org.societies.personalisation</groupId>
+			<artifactId>CAUIPrediction</artifactId>
+			<version>${version.pm}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 

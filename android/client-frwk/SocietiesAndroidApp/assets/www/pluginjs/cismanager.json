@@ -26,26 +26,26 @@
 	                    "description": "soh barca",
 	                    "communityJid" : "barca.soc.com"
 	     			},
-	     "getMembers" : [{"jid": "tom.societies.local", 
+	     "getMembers" : [{"jid": "brian.societies.local", 
 	     				  "role": "OWNER",
-	     				  "name": "Tom Cruise"
+	     				  "name": "Brian Nevelle"
 	     				 },
 	     				 {"jid": "john.societies.local", 
 	     				  "role": "PARTICIPANT",
-	     				  "name": "John Smith"
+	     				  "name": "John Breen"
 	     				 },
-	     				 {"jid": "jane.societies.local", 
+	     				 {"jid": "helen.societies.local", 
 	     				  "role": "PARTICIPANT",
-	     				  "name": "Jane Smith"
+	     				  "name": "Helen O'Connell"
 	     				},
-	     				{"jid": "bob.societies.local", 
+	     				{"jid": "harry.societies.local", 
 	     				  "role": "PARTICIPANT",
-	     				  "name": "Robert DeNiro"
+	     				  "name": "Harry McDonal"
 	     				}],
 	     "listOfCISs": [{
-	     				"communityName": "flamengo",
-	                    "communityType": "soccer",
-	                    "ownerJid": "zico.soc.com",
+	     				"communityName": "Green IT",
+	                    "communityType": "Enterprise",
+	                    "ownerJid": "brian.societies.local",
 	                    "membershipCrit": {
 		                    "criteria": [
 		                    	{
@@ -62,13 +62,13 @@
 		                        "rank": "2"}
 		                        ]
 		                	},
-	                    "description": "cis do flamengo",
-	                    "communityJid" : "fla.soc.com"
+	                    "description": "Research into practices supporting Greener IT",
+	                    "communityJid" : "greenit.societies.local"
 					     },
 	     				{
-						"communityName": "vasco",
-	                    "communityType": "soccer",
-	                    "ownerJid": "dinamite@soc.com",
+						"communityName": "Cloud Computing",
+	                    "communityType": "Enterprise",
+	                    "ownerJid": "brian.societies.local",
 	                    "membershipCrit": {
 		                    "criteria": [
 		                    	{
@@ -85,13 +85,13 @@
 		                        "rank": "2"}
 		                        ]
 		                	},
-	                    "description": "cis do Vasco",
-	                    "communityJid" : "vasco.soc.com"
+	                    "description": "Cloud research into SLA and differentiation",
+	                    "communityJid" : "cloud.societies.local"
 					     },
 					     {
-						"communityName": "fluminense fc",
-	                    "communityType": "soccer",
-	                    "ownerJid": "fred@soc.com",
+						"communityName": "FIA event",
+	                    "communityType": "Enterprise",
+	                    "ownerJid": "helen.societies.local",
 	                    "membershipCrit": {
 		                    "criteria": [
 		                    	{
@@ -108,8 +108,8 @@
 		                        "rank": "2"}
 		                        ]
 		                	},
-	                    "description": "cis do flu",
-	                    "communityJid" : "flu.soc.com"
+	                    "description": "FIA information regarding events",
+	                    "communityJid" : "fia.societies.local"
 	     				}
 	     		],
 		"CISDirResults": [
@@ -187,14 +187,14 @@
 					},
 					
 		"ActivityFeed": [{
-     				"actor": "john.societies.local",
+     				"actor": "brian.societies.local",
      				"verb": "created",
 	                "object": "cis-1234",
 	                "target" : "n/a",
 	                "published": "1332403882588"
 					},
 					{
-     				"actor": "jane.societies.local",
+     				"actor": "helen.societies.local",
      				"verb": "joined",
 	                "object": "cis-1234",
 	                "target" : "n/a",

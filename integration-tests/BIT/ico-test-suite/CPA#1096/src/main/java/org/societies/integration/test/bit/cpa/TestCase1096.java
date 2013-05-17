@@ -10,8 +10,8 @@ package org.societies.integration.test.bit.cpa;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.orchestration.ICPA;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.internal.orchestration.ICPA;
 import org.societies.api.internal.orchestration.ICisDataCollector;
 import org.societies.integration.test.IntegrationTestCase;
 

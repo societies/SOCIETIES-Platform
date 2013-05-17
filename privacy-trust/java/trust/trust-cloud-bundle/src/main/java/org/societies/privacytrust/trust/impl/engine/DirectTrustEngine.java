@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.engine.IDirectTrustEngine;
 import org.societies.privacytrust.trust.api.engine.TrustEngineException;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
@@ -53,7 +54,7 @@ import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
 import org.societies.privacytrust.trust.api.repo.TrustRepositoryException;
-import org.societies.privacytrust.trust.impl.engine.util.MathUtils;
+import org.societies.privacytrust.trust.api.util.MathUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -123,39 +124,17 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 			// Create the trusted entity the evidence object refers to if not already available
 			super.createEntityIfAbsent(trustorId, evidence.getObjectId());
 			
-			final Class<? extends ITrustedEntity> entityClass;
-			switch (evidence.getObjectId().getEntityType()) {
-			
-			case CSS:
-				entityClass = ITrustedCss.class;
-				break;
-				
-			case CIS:
-				entityClass = ITrustedCis.class;
-				break;
-				
-			case SVC:
-				entityClass = ITrustedService.class;
-				break;
-				
-			// TODO case LGC:
-				
-			default:
-				throw new TrustEngineException("Unsupported evidence object type: " 
-						+ evidence.getObjectId().getEntityType());
-			}
-			
 			// Retrieve all TrustedEntities trusted by the trustor
 			// having the same type as the object referenced in the specified TrustEvidence
-			final List<? extends ITrustedEntity> entityList = this.trustRepo.retrieveEntities(
-					trustorId, entityClass);
+			final Set<ITrustedEntity> entitySet = this.trustRepo.retrieveEntities(
+					trustorId, evidence.getObjectId().getEntityType(), null);
 			if (LOG.isDebugEnabled())
-				LOG.debug("entityList=" + entityList);
-			resultSet.addAll(entityList);
+				LOG.debug("entitySet=" + entitySet);
+			resultSet.addAll(entitySet);
 			
 			final Map<TrustedEntityId,ITrustedEntity> entityMap = 
-					new HashMap<TrustedEntityId, ITrustedEntity>(entityList.size());
-			for (final ITrustedEntity entity : entityList)
+					new HashMap<TrustedEntityId, ITrustedEntity>(entitySet.size());
+			for (final ITrustedEntity entity : entitySet)
 				entityMap.put(entity.getTrusteeId(), entity);
 			
 			final ITrustedEntity trustee = entityMap.get(evidence.getObjectId());
@@ -207,11 +186,11 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 						+ evidence.getType());
 			}
 			
-			final Set<ITrustedCss> userSet = new HashSet<ITrustedCss>(entityList.size());
-			final Set<ITrustedCis> communitySet = new HashSet<ITrustedCis>(entityList.size());
-			final Set<ITrustedService> serviceSet = new HashSet<ITrustedService>(entityList.size());
+			final Set<ITrustedCss> userSet = new HashSet<ITrustedCss>(entitySet.size());
+			final Set<ITrustedCis> communitySet = new HashSet<ITrustedCis>(entitySet.size());
+			final Set<ITrustedService> serviceSet = new HashSet<ITrustedService>(entitySet.size());
 			
-			for (final ITrustedEntity entity : entityList) {
+			for (final ITrustedEntity entity : entitySet) {
 				if (entity instanceof ITrustedCss)
 					userSet.add((ITrustedCss) entity);
 				else if (entity instanceof ITrustedCis)
@@ -222,11 +201,16 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 			
 			if (!userSet.isEmpty()) {
 				this.evaluateUsers(userSet);
-				final List<ITrustedCis> communityList = this.trustRepo.retrieveEntities(
-						trustorId, ITrustedCis.class);
-				if (!communityList.isEmpty()) {
-					this.evaluateCommunities(new HashSet<ITrustedCis>(communityList));
-					resultSet.addAll(communityList);
+				final Set<ITrustedEntity> allCommunitySet = this.trustRepo.retrieveEntities(
+						trustorId, TrustedEntityType.CIS, null);
+				if (!allCommunitySet.isEmpty()) {
+					final Set<ITrustedCis> theAllCommunitySet = 
+							new HashSet<ITrustedCis>(allCommunitySet.size());
+					for (final ITrustedEntity entity : allCommunitySet)
+						if (entity instanceof ITrustedCis)
+							theAllCommunitySet.add((ITrustedCis) entity);
+					this.evaluateCommunities(theAllCommunitySet);
+					resultSet.addAll(theAllCommunitySet);
 				}
 			} else if (!communitySet.isEmpty()) {
 				this.evaluateCommunities(communitySet);

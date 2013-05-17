@@ -122,8 +122,8 @@
 			<type>apklib</type>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.android</groupId>
-			<artifactId>privacytrust</artifactId>
+	        <groupId>org.societies.android.privacytrust.trust</groupId>
+	        <artifactId>trust-client</artifactId>
 			<version>${version.pt}</version>
 			<type>apklib</type>
 		</dependency>
@@ -136,6 +136,12 @@
 		<dependency>
 			<groupId>org.societies.android.platform.css.friends</groupId>
    			<artifactId>FriendsManager</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
+		</dependency>
+		<dependency>
+		   	<groupId>org.societies.android.platform.context</groupId>
+   			<artifactId>SocietiesAndroidContext</artifactId>
 			<version>${release.version}</version>
 			<type>apklib</type>
 		</dependency>

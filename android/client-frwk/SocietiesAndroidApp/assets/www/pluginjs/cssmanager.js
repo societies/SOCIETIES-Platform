@@ -125,7 +125,7 @@ window.plugins.SocietiesLocalCSSManager = {
 			errorCallback('A random error was generated');
 		}
 		else {
-			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'readProfile'));
+			successCallback(phonegapdesktop.internal.getDebugValue('CssManagerService', 'readProfileRemote'));
 		}
 	},
 	getSuggestedFriends: function(successCallback, errorCallback){
@@ -196,12 +196,26 @@ window.plugins.SocietiesLocalCSSManager = {
 		var jsonMethod = "";
 		if (userID=="john.societies.local")
 			jsonMethod = "VCardJohn";
-		else if (userID=="jane.societies.local")
-			jsonMethod = "VCardJane";
-		else if (userID=="tom.societies.local")
-			jsonMethod = "VCardTom";
-		else if (userID=="bob.societies.local")
-			jsonMethod = "VCardBob";	
+		else if (userID=="brian.societies.local")
+			jsonMethod = "VCardBrian";
+		else if (userID=="dan.societies.local")
+			jsonMethod = "VCardDan";
+		else if (userID=="eduard.societies.local")
+			jsonMethod = "VCardEduard";	
+		else if (userID=="george.societies.local")
+			jsonMethod = "VCardGeorge";
+		else if (userID=="harry.societies.local")
+			jsonMethod = "VCardHarry";
+		else if (userID=="helen.societies.local")
+			jsonMethod = "VCardHelen";
+		else if (userID=="michael.societies.local")
+			jsonMethod = "VCardMichael";
+		else if (userID=="paul.societies.local")
+			jsonMethod = "VCardPaul";
+		else if (userID=="stephen.societies.local")
+			jsonMethod = "VCardStephen";
+		else if (userID=="tim.societies.local")
+			jsonMethod = "VCardTim";
 		else
 			errorCallback("user vcard not found!");
 		
