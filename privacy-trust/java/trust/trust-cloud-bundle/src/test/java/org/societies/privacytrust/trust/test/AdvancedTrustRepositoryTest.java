@@ -27,6 +27,7 @@ package org.societies.privacytrust.trust.test;
 import static org.junit.Assert.*;
 
 import java.util.Set;
+import java.util.SortedSet;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -64,6 +65,8 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 	
 	private static final String TRUSTEE_CSS_ID = BASE_ID + "CssIIdentity";
 	private static final String TRUSTEE_CSS_ID2 = BASE_ID + "CssIIdentity2";
+	private static final String TRUSTEE_CSS_ID3 = BASE_ID + "CssIIdentity3";
+	private static final String TRUSTEE_CSS_ID4 = BASE_ID + "CssIIdentity4";
 	
 	private static final String TRUSTEE_CIS_ID = BASE_ID + "CisIIdentity";
 	private static final String TRUSTEE_CIS_ID2 = BASE_ID + "CisIIdentity2";
@@ -78,6 +81,8 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 	
 	private static TrustedEntityId trusteeCssTeid;
 	private static TrustedEntityId trusteeCssTeid2;
+	private static TrustedEntityId trusteeCssTeid3;
+	private static TrustedEntityId trusteeCssTeid4;
 	
 	private static TrustedEntityId trusteeCisTeid;
 	private static TrustedEntityId trusteeCisTeid2;
@@ -98,6 +103,8 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 		
 		trusteeCssTeid = new TrustedEntityId(TrustedEntityType.CSS, TRUSTEE_CSS_ID);
 		trusteeCssTeid2 = new TrustedEntityId(TrustedEntityType.CSS, TRUSTEE_CSS_ID2);
+		trusteeCssTeid3 = new TrustedEntityId(TrustedEntityType.CSS, TRUSTEE_CSS_ID3);
+		trusteeCssTeid4 = new TrustedEntityId(TrustedEntityType.CSS, TRUSTEE_CSS_ID4);
 		
 		trusteeCisTeid = new TrustedEntityId(TrustedEntityType.CIS, TRUSTEE_CIS_ID);
 		trusteeCisTeid2 = new TrustedEntityId(TrustedEntityType.CIS, TRUSTEE_CIS_ID2);
@@ -115,6 +122,8 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 		trustorCssTeid = null;
 		trusteeCssTeid = null;
 		trusteeCssTeid2 = null;
+		trusteeCssTeid3 = null;
+		trusteeCssTeid4 = null;
 		trusteeCisTeid = null;
 		trusteeCisTeid2 = null;
 		trusteeServiceTeid = null;
@@ -545,5 +554,144 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 		assertTrue(entities.contains(css));
 		assertTrue(entities.contains(svc));
 		assertEquals(2, entities.size());
+		
+		this.trustRepo.removeEntity(css.getTrustorId(), css.getTrusteeId());
+		this.trustRepo.removeEntity(css2.getTrustorId(), css2.getTrusteeId());
+		this.trustRepo.removeEntity(cis.getTrustorId(), cis.getTrusteeId());
+		this.trustRepo.removeEntity(cis2.getTrustorId(), cis2.getTrusteeId());
+		this.trustRepo.removeEntity(svc.getTrustorId(), svc.getTrusteeId());
+		this.trustRepo.removeEntity(svc2.getTrustorId(), svc2.getTrusteeId());
+	}
+	
+	/**
+	 * Test method for {@link org.societies.privacytrust.trust.api.repo.ITrustRepository#retrieveCssBySimilarity(org.societies.api.privacytrust.trust.model.TrustedEntityId, java.lang.Integer, java.lang.Double)}.
+	 * @throws TrustRepositoryException 
+	 */
+	@Test
+	public void testRetrieveCssBySimilarity() throws TrustRepositoryException {
+	
+		// retrieve CSSs
+		SortedSet<ITrustedCss> cssSet = 
+				this.trustRepo.retrieveCssBySimilarity(trustorCssTeid, null, null);
+		assertNotNull(cssSet);
+		assertTrue(cssSet.isEmpty());
+		
+		cssSet = this.trustRepo.retrieveCssBySimilarity(trustorCssTeid, 0.5d, null);
+		assertNotNull(cssSet);
+		assertTrue(cssSet.isEmpty());
+		
+		cssSet = this.trustRepo.retrieveCssBySimilarity(trustorCssTeid, null, 5);
+		assertNotNull(cssSet);
+		assertTrue(cssSet.isEmpty());
+		
+		cssSet = this.trustRepo.retrieveCssBySimilarity(trustorCssTeid, 0.55, 5);
+		assertNotNull(cssSet);
+		assertTrue(cssSet.isEmpty());
+	
+		// add CSS to DB
+		ITrustedCss css = (ITrustedCss) 
+				this.trustRepo.createEntity(trustorCssTeid, trusteeCssTeid);
+		// verify
+		cssSet = this.trustRepo.retrieveCssBySimilarity(trustorCssTeid, null, null);
+		assertNotNull(cssSet);
+		assertFalse(cssSet.isEmpty());
+		assertTrue(cssSet.contains(css));
+		assertEquals(1, cssSet.size());
+		cssSet = this.trustRepo.retrieveCssBySimilarity(trustorCssTeid, 0.5d, null);
+		assertNotNull(cssSet);
+		assertTrue(cssSet.isEmpty());
+		// assign similarity to CSS
+		css.setSimilarity(0.5d);
+		css = (ITrustedCss) this.trustRepo.updateEntity(css);
+		cssSet = this.trustRepo.retrieveCssBySimilarity(trustorCssTeid, 0.5d, null);
+		assertNotNull(cssSet);
+		assertFalse(cssSet.isEmpty());
+		assertTrue(cssSet.contains(css));
+		assertEquals(1, cssSet.size());
+		
+		// add CSS2 to DB
+		ITrustedCss css2 = (ITrustedCss)
+				this.trustRepo.createEntity(trustorCssTeid, trusteeCssTeid2);
+		// verify
+		cssSet = this.trustRepo.retrieveCssBySimilarity(trustorCssTeid, null, null);
+		assertNotNull(cssSet);
+		assertFalse(cssSet.isEmpty());
+		assertTrue(cssSet.contains(css));
+		assertTrue(cssSet.contains(css2));
+		assertEquals(2, cssSet.size());
+		cssSet = this.trustRepo.retrieveCssBySimilarity(trustorCssTeid, 0.5d, null);
+		assertNotNull(cssSet);
+		assertFalse(cssSet.isEmpty());
+		assertTrue(cssSet.contains(css));
+		assertEquals(1, cssSet.size());
+		// assign similarity to CSS2
+		css2.setSimilarity(0.9d);
+		css2 = (ITrustedCss) this.trustRepo.updateEntity(css2);
+		cssSet = this.trustRepo.retrieveCssBySimilarity(trustorCssTeid, 0.8d, null);
+		assertNotNull(cssSet);
+		assertFalse(cssSet.isEmpty());
+		assertTrue(cssSet.contains(css2));
+		assertEquals(1, cssSet.size());
+		cssSet = this.trustRepo.retrieveCssBySimilarity(trustorCssTeid, null, null);
+		assertNotNull(cssSet);
+		assertFalse(cssSet.isEmpty());
+		assertTrue(cssSet.contains(css));
+		assertTrue(cssSet.contains(css2));
+		assertEquals(2, cssSet.size());
+		assertTrue(cssSet.first().equals(css));
+		assertTrue(cssSet.last().equals(css2));
+		
+		// add CSS3 to DB
+		ITrustedCss css3 = (ITrustedCss)
+				this.trustRepo.createEntity(trustorCssTeid, trusteeCssTeid3);
+		// verify
+		cssSet = this.trustRepo.retrieveCssBySimilarity(trustorCssTeid, null, null);
+		assertNotNull(cssSet);
+		assertFalse(cssSet.isEmpty());
+		assertTrue(cssSet.contains(css));
+		assertTrue(cssSet.contains(css2));
+		assertTrue(cssSet.contains(css3));
+		assertEquals(3, cssSet.size());
+		assertTrue(cssSet.first().equals(css3));
+		assertTrue(cssSet.last().equals(css2));
+		
+		// add CSS4 to DB
+		ITrustedCss css4 = (ITrustedCss)
+				this.trustRepo.createEntity(trustorCssTeid, trusteeCssTeid4);
+		// assign similarity to CSS2
+		css4.setSimilarity(0.1d);
+		css4 = (ITrustedCss) this.trustRepo.updateEntity(css4);
+		// verify
+		cssSet = this.trustRepo.retrieveCssBySimilarity(trustorCssTeid, null, null);
+		assertNotNull(cssSet);
+		assertFalse(cssSet.isEmpty());
+		assertTrue(cssSet.contains(css));
+		assertTrue(cssSet.contains(css2));
+		assertTrue(cssSet.contains(css3));
+		assertTrue(cssSet.contains(css4));
+		assertEquals(4, cssSet.size());
+		assertTrue(cssSet.first().equals(css3));
+		assertTrue(cssSet.last().equals(css2));
+		cssSet = this.trustRepo.retrieveCssBySimilarity(trustorCssTeid, null, 2);
+		assertNotNull(cssSet);
+		assertFalse(cssSet.isEmpty());
+		assertTrue(cssSet.contains(css));
+		assertTrue(cssSet.contains(css2));
+		assertEquals(2, cssSet.size());
+		assertTrue(cssSet.first().equals(css));
+		assertTrue(cssSet.last().equals(css2));
+		cssSet = this.trustRepo.retrieveCssBySimilarity(trustorCssTeid, 0.5d, null);
+		assertNotNull(cssSet);
+		assertFalse(cssSet.isEmpty());
+		assertTrue(cssSet.contains(css));
+		assertTrue(cssSet.contains(css2));
+		assertEquals(2, cssSet.size());
+		assertTrue(cssSet.first().equals(css));
+		assertTrue(cssSet.last().equals(css2));
+		
+		this.trustRepo.removeEntity(css.getTrustorId(), css.getTrusteeId());
+		this.trustRepo.removeEntity(css2.getTrustorId(), css2.getTrusteeId());
+		this.trustRepo.removeEntity(css3.getTrustorId(), css3.getTrusteeId());
+		this.trustRepo.removeEntity(css4.getTrustorId(), css4.getTrusteeId());
 	}
 }
