@@ -39,6 +39,7 @@ public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph 
 	private ArrayList<ISocialGraphEdge> edges;
 	private ArrayList<ISocialGraphVertex> vertices;
     private HashMap<String,TrendStats> trends;
+    private boolean wordTrends = true;
     protected static Logger LOG = LoggerFactory.getLogger(SocialGraph.class);
 
 	public SocialGraph(){
@@ -125,19 +126,33 @@ public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph 
 	public <T> T[] toArray(T[] a) {
 		return vertices.toArray(a);
 	}
-    public synchronized void handleTrends (String text){
-        LOG.info("handletrends text: \""+text+"\"");
-        if(getTrends().containsKey(text)){
-            getTrends().get(text).increment();
-        } else {
-            TrendStats ts = new TrendStats();
-            ts.setTrendText(text);
-            getTrends().put(text,ts);
+    public synchronized void handleTrends (String inp){
+        LOG.info("handletrends text: \""+inp+"\"");
+        String[] finalText = {inp};
+        if(wordTrends){
+            String[] words = inp.split("\\s+");
+/*            for (int i = 0; i < words.length; i++) {
+                // You may want to check for a non-word character before blindly
+                // performing a replacement
+                // It may also be necessary to adjust the character class
+                //words[i] = words[i].replaceAll("[^\w]", "");
+            }*/
+            finalText = words;
+
         }
-        //cleanup
-        for(Iterator<String> it = getTrends().keySet().iterator() ; it.hasNext();)
-            if(getTrends().get(it.next()).tooOld())
-                it.remove();
+        for(String text : finalText){
+            if(getTrends().containsKey(text)){
+                getTrends().get(text).increment();
+            } else {
+                TrendStats ts = new TrendStats();
+                ts.setTrendText(text);
+                getTrends().put(text,ts);
+            }
+            //cleanup
+            for(Iterator<String> it = getTrends().keySet().iterator() ; it.hasNext();)
+                if(getTrends().get(it.next()).tooOld())
+                    it.remove();
+        }
 /*        for(String trend : getTrends().keySet())
             if(getTrends().get(trend).tooOld())
                 getTrends().remove(trend);*/
