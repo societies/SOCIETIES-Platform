@@ -122,6 +122,30 @@ public interface ITrustRepository {
 					throws TrustRepositoryException;
 	
 	/**
+	 * Returns the mean trust value of the specified type assigned by the
+	 * supplied trustor. The type of the entities whose trust values to 
+	 * estimate the mean of may optionally be provided.
+	 * 
+	 * @param trustorId
+	 *            (required) the identifier of the trustor.
+	 * @param valueType
+	 *            (required) the type of trust values whose mean is to be
+	 *            calculated.
+	 * @param entityType
+	 *            (optional) the trusted entity type to match; otherwise
+	 *            <code>null</code> to match all entity types.
+	 * @return all entities matching the specified criteria.
+	 * @throws TrustRepositoryException
+	 *             if there is a problem accessing the Trust Repository.
+	 * @throws NullPointerException
+	 *             if any of the required parameters is <code>null</null>.
+	 * @since 1.1
+	 */
+	public double retrieveMeanTrustValue(final TrustedEntityId trustorId,
+			final TrustValueType valueType, final TrustedEntityType entityType)
+					throws TrustRepositoryException;
+	
+	/**
 	 * Returns a set of CSSs from the Trust Repository whose elements are
 	 * ordered based on their similarity to the specified trustor. More 
 	 * specifically, the first element in the returned set is the CSS with the

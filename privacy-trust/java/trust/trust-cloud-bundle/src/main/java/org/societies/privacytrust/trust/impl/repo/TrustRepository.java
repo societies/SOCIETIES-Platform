@@ -26,6 +26,7 @@ package org.societies.privacytrust.trust.impl.repo;
 
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -35,6 +36,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -349,6 +352,43 @@ public class TrustRepository implements ITrustRepository {
 	}
 	
 	/*
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#retrieveMeanTrustValue(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType, org.societies.api.privacytrust.trust.model.TrustedEntityType)
+	 */
+	@Override
+	public double retrieveMeanTrustValue(final TrustedEntityId trustorId,
+			final TrustValueType valueType, final TrustedEntityType entityType)
+					throws TrustRepositoryException {
+		
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (valueType == null)
+			throw new NullPointerException("valueType can't be null");
+		
+		final String valueProperty;
+		if (TrustValueType.DIRECT == valueType)
+			valueProperty = "directTrust.value";
+		else if (TrustValueType.INDIRECT == valueType)
+			valueProperty = "indirectTrust.value";
+		else // if (TrustValueType.USER_PERCEIVED == valueType)
+			valueProperty = "userPerceivedTrust.value";
+		
+		final Class<? extends TrustedEntity> entityClass;
+		if (null == entityType)
+			entityClass = TrustedEntity.class;
+		else if (TrustedEntityType.CSS == entityType)
+			entityClass = TrustedCss.class;
+		else if (TrustedEntityType.CIS == entityType)
+			entityClass = TrustedCis.class;
+		else if (TrustedEntityType.SVC == entityType)
+			entityClass = TrustedService.class;
+		else
+			throw new TrustRepositoryException("Unsupported entityType: "
+					+ entityType);
+		
+		return this.doRetrieveMeanTrustValue(trustorId, valueProperty, entityClass);
+	}
+	
+	/*
 	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#retrieveCssBySimilarity(org.societies.api.privacytrust.trust.model.TrustedEntityId, java.lang.Double, java.lang.Integer)
 	 */
 	@SuppressWarnings("unchecked")
@@ -413,5 +453,40 @@ public class TrustRepository implements ITrustRepository {
 		}
 		
 		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private double doRetrieveMeanTrustValue(
+			final TrustedEntityId trustorId, final String valueProperty,	
+			final Class<? extends TrustedEntity> entityClass) 
+					throws TrustRepositoryException {
+		
+		Session session = null;
+		try {
+			session = sessionFactory.openSession();
+			final Criteria criteria = session.createCriteria(entityClass)
+					.add(Restrictions.eq("trustorId", trustorId));
+			final ProjectionList projList = Projections.projectionList();
+			projList.add(Projections.sum(valueProperty));
+			projList.add(Projections.count(valueProperty));
+			criteria.setProjection(projList);
+			final List<Object[]> results = criteria.list();
+			double totalSum = 0.0d;
+			int totalCount = 0;
+			for (Object[] resultsEntry : results) {
+				if (resultsEntry[0] != null) {
+					totalSum += (Double) resultsEntry[0];
+					totalCount += (Integer) resultsEntry[1];
+				}
+			}
+			return (totalCount > 0) ? (totalSum / totalCount) : 0.0d;
+		
+		} catch (Exception e) {
+			throw new TrustRepositoryException("Could not estimate mean trust value assigned by '"
+					+ trustorId + "': " + e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
 	}
 }
