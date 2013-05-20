@@ -10,27 +10,27 @@
         is to facilitate integration testing of the bundle outside of an OSGi container -->
 
 
-    <osgi:service ref="uam">
+    <osgi:service ref="userActionMonitor">
         <osgi:interfaces>
             <value>org.societies.api.useragent.monitoring.IUserActionMonitor</value>
             <value>org.societies.useragent.api.monitoring.IInternalUserActionMonitor</value>
         </osgi:interfaces>
     </osgi:service>
 
-    <osgi:service ref="dm">
+    <osgi:service ref="decisionMaker">
         <osgi:interfaces>
             <value>org.societies.api.internal.useragent.decisionmaking.IDecisionMaker</value>
         </osgi:interfaces>
     </osgi:service>
 
-    <osgi:service ref="feedback">
+    <osgi:service ref="userFeedback">
         <osgi:interfaces>
             <value>org.societies.api.internal.useragent.feedback.IUserFeedback</value>
             <value>org.societies.useragent.api.feedback.IInternalUserFeedback</value>
         </osgi:interfaces>
     </osgi:service>
 
-    <osgi:service ref="uaRemote">
+    <osgi:service ref="uaCommsClient">
         <osgi:interfaces>
             <value>org.societies.useragent.api.remote.IUserAgentRemoteMgr</value>
         </osgi:interfaces>
@@ -45,16 +45,16 @@
 
     <!-- Import External services -->
 
-    <!-- context Broker is needed by uam (at least) -->
+    <!-- context Broker is needed by internalUserActionMonitor (at least) -->
     <osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker">
     </osgi:reference>
 
-    <!-- event manager (local eventing) is needed by the uam -->
-    <osgi:reference id="eventMgr" interface="org.societies.api.osgi.event.IEventMgr">
+    <!-- event manager (local eventing) is needed by the internalUserActionMonitor -->
+    <osgi:reference id="eventManager" interface="org.societies.api.osgi.event.IEventMgr">
     </osgi:reference>
 
-    <!-- comms manager is needed by the uam -->
-    <osgi:reference id="commsMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager">
+    <!-- comms manager is needed by the internalUserActionMonitor -->
+    <osgi:reference id="commsManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager">
     </osgi:reference>
 
     <!-- pubsub is needed by the user feedback -->
@@ -63,10 +63,10 @@
 
     <!-- IServiceDiscovery is needed by dm (at least) <osgi:reference id="servicedis" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery">
     </osgi:reference>-->
-    <!-- CSS Manager is needed by uam -->
-    <osgi:reference id="cssMgr" interface="org.societies.api.internal.css.ICSSInternalManager">
+    <!-- CSS Manager is needed by internalUserActionMonitor -->
+    <osgi:reference id="cssManager" interface="org.societies.api.internal.css.ICSSInternalManager">
     </osgi:reference>
 
-    <osgi:reference id="dataSource" interface="javax.sql.DataSource" />
+    <osgi:reference id="dataSource" interface="javax.sql.DataSource"/>
 
 </beans>

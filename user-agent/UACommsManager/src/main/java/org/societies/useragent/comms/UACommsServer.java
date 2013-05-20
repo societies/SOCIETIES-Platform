@@ -25,11 +25,6 @@
 
 package org.societies.useragent.comms;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
@@ -45,191 +40,231 @@ import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
-import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean;
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
 import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
+import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
+import org.societies.api.schema.useragent.feedback.UserFeedbackHistoryRequest;
+import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean;
 import org.societies.useragent.api.feedback.IInternalUserFeedback;
 import org.societies.useragent.api.monitoring.IInternalUserActionMonitor;
 
-public class UACommsServer implements IFeatureServer{
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
-	public static final List<String> NAMESPACES = Collections.unmodifiableList(
-			Arrays.asList("http://societies.org/api/schema/useragent/monitoring",
-					"http://societies.org/api/schema/useragent/feedback"));
-	public static final List<String> PACKAGES = Collections.unmodifiableList(
-			Arrays.asList("org.societies.api.schema.useragent.monitoring",
-					"org.societies.api.schema.useragent.feedback"));
+public class UACommsServer implements IFeatureServer {
+    private static final Logger log = LoggerFactory.getLogger(UACommsServer.class);
 
-	//PRIVATE VARIABLES
-	private ICommManager commsMgr;
-	private IInternalUserActionMonitor uam;
-	private IInternalUserFeedback feedback;
-	private IIdentityManager idManager;
-	private Logger LOG = LoggerFactory.getLogger(UACommsServer.class);
+    public static final List<String> NAMESPACES = Collections.unmodifiableList(
+            Arrays.asList("http://societies.org/api/schema/useragent/monitoring",
+                    "http://societies.org/api/schema/useragent/feedback"));
+    public static final List<String> PACKAGES = Collections.unmodifiableList(
+            Arrays.asList("org.societies.api.schema.useragent.monitoring",
+                    "org.societies.api.schema.useragent.feedback"));
 
-	//PROPERTIES
-	public ICommManager getCommsMgr() {
-		return commsMgr;
-	}
+    //PRIVATE VARIABLES
+    private ICommManager commsMgr;
+    private IInternalUserActionMonitor internalUserActionMonitor;
+    private IInternalUserFeedback feedback;
+    private IIdentityManager idManager;
 
-	public void setCommsMgr(ICommManager commsMgr) {
-		this.commsMgr = commsMgr;
-	}
+    //PROPERTIES
+    public ICommManager getCommsMgr() {
+        return commsMgr;
+    }
 
-	public void setUam(IInternalUserActionMonitor uam) {
-		this.uam = uam;
-	}
-	
-	public void setFeedback(IInternalUserFeedback feedback){
-		this.feedback = feedback;
-	}
+    public void setCommsMgr(ICommManager commsMgr) {
+        this.commsMgr = commsMgr;
+    }
 
-	//METHODS
-	public UACommsServer(){
-	}
+    public void setInternalUserActionMonitor(IInternalUserActionMonitor internalUserActionMonitor) {
+        this.internalUserActionMonitor = internalUserActionMonitor;
+    }
 
-	public void initService() {
-		//REGISTER OUR CommsManager WITH THE XMPP Communication Manager
-		try {
-			getCommsMgr().register(this); 
-		} catch (CommunicationException e) {
-			e.printStackTrace();
-		}
-		idManager = commsMgr.getIdManager();
-	}
+    public void setFeedback(IInternalUserFeedback feedback) {
+        this.feedback = feedback;
+    }
 
-	public List<String> getJavaPackages() {
-		return PACKAGES;
-	}
+    //METHODS
+    public UACommsServer() {
+    }
 
-	public List<String> getXMLNamespaces() {
-		return NAMESPACES;
-	}
+    public void initService() {
+        //REGISTER OUR CommsManager WITH THE XMPP Communication Manager
+        try {
+            getCommsMgr().register(this);
+        } catch (CommunicationException e) {
+            e.printStackTrace();
+        }
+        idManager = commsMgr.getIdManager();
+    }
 
-	
-	/*
-	 * USER ACTION MONITOR METHODS
-	 */
-	public void receiveMessage(Stanza stanza, Object payload) {
-		LOG.info("UACommsServer received message with no return type!!!");
-		//CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
-		if (payload instanceof UserActionMonitorBean){ 
-			this.receiveMessage(stanza, (UserActionMonitorBean)payload);
-		}
-	}
+    @Override
+    public List<String> getJavaPackages() {
+        return PACKAGES;
+    }
 
-	private void receiveMessage(Stanza stanza, UserActionMonitorBean monitorBean){
-		//---- UAM Bundle ---
-		LOG.info("Message received for UAM - processing");
-
-		switch(monitorBean.getMethod()){
-		case MONITOR:
-			try {
-				String senderDeviceId = monitorBean.getSenderDeviceId();
-				IIdentity owner = idManager.fromJid(monitorBean.getIdentity());
-				ServiceResourceIdentifier serviceId = monitorBean.getServiceResourceIdentifier();
-				String serviceType = monitorBean.getServiceType();
-				String parameterName = monitorBean.getParameterName();
-				String value = monitorBean.getValue();
-				IAction action = new Action(serviceId, serviceType, parameterName, value);
-				LOG.info("Sending remote message to local UAM");
-				uam.monitorFromRemoteNode(senderDeviceId, owner, action);
-				break;
-			} catch (InvalidFormatException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	
-	/*
-	 * USER FEEDBACK METHODS
-	 */
-	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
-		LOG.info("UACommsServer received message with a return type!!!");
-		Object result = null;
-		if (payload instanceof UserActionMonitorBean){ 
-			this.receiveMessage(stanza, (UserActionMonitorBean)payload);
-			result = true;
-		}
-		if (payload instanceof UserFeedbackBean){
-			result = this.getQuery(stanza, (UserFeedbackBean)payload);
-		}
-		return result;
-	}
-
-	private Object getQuery(Stanza stanza, UserFeedbackBean feedbackBean){
-		//---- User Feedback Bundle ----
-		LOG.info("Message received for User Feedback - processing");
-
-		Object resultBean = null;
-
-		switch(feedbackBean.getMethod()){
-		case GET_EXPLICIT_FB:
-			try {
-				String requestId = feedbackBean.getRequestId();
-				int expType = feedbackBean.getType();
-				String expProposalText = feedbackBean.getProposalText();
-				List<String> tmp = feedbackBean.getOptions();
-				String[] options = new String[tmp.size()];
-				//create array of options
-				int i = 0;
-				for(String nextOption: tmp){
-					options[i] = nextOption;
-					i++;
-				}
-				LOG.debug("Sending remote message to local User Feedback - explicit");
-				ExpProposalContent expContent = new ExpProposalContent(expProposalText, options);
-				List<String> result = feedback.getExplicitFBforRemote(expType, expContent).get();
-				
-				//create response bean
-				ExpFeedbackResultBean expResultBean = new ExpFeedbackResultBean();
-				expResultBean.setRequestId(requestId);
-				expResultBean.setFeedback(result);
-				resultBean = expResultBean;
-
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-			}
-			break;
-			
-		case GET_IMPLICIT_FB:
-			try {
-				String requestId = feedbackBean.getRequestId();
-				int impType = feedbackBean.getType();
-				String impProposalText = feedbackBean.getProposalText();
-				int timeout = feedbackBean.getTimeout();
-				LOG.debug("Sending remote message to local User Feedback - implicit");
-				ImpProposalContent impContent = new ImpProposalContent(impProposalText, timeout);
-				Boolean result = feedback.getImplicitFBforRemote(impType, impContent).get();
-				
-				//create response bean
-				ImpFeedbackResultBean impResultBean = new ImpFeedbackResultBean();
-				impResultBean.setRequestId(requestId);
-				impResultBean.setAccepted(result.booleanValue());
-				resultBean = impResultBean;
-				
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				e.printStackTrace();
-			}
-			break;
-		}
-
-		return resultBean;
-	}
+    @Override
+    public List<String> getXMLNamespaces() {
+        return NAMESPACES;
+    }
 
 
-	public Object setQuery(Stanza arg0, Object arg1) throws XMPPError {
-		return null;
-	}
+    /*
+     * USER ACTION MONITOR METHODS
+     */
+    @Override
+    public void receiveMessage(Stanza stanza, Object payload) {
+        log.info(String.format("receiveMessage() \nStanza=%s\nPayload=%s",
+                stanza != null ? stanza.toString() : "null",
+                payload != null ? payload.toString() : "null"));
+
+//        log.info("UACommsServer received message with no return type!!!");
+        //CHECK WHICH END BUNDLE TO BE CALLED THAT I MANAGE
+        if (payload instanceof UserActionMonitorBean) {
+            this.receiveMessage(stanza, (UserActionMonitorBean) payload);
+        }
+    }
+
+    private void receiveMessage(Stanza stanza, UserActionMonitorBean monitorBean) {
+        //---- UAM Bundle ---
+        log.info("Message received for UAM - processing");
+
+        switch (monitorBean.getMethod()) {
+            case MONITOR:
+                try {
+                    String senderDeviceId = monitorBean.getSenderDeviceId();
+                    IIdentity owner = idManager.fromJid(monitorBean.getIdentity());
+                    ServiceResourceIdentifier serviceId = monitorBean.getServiceResourceIdentifier();
+                    String serviceType = monitorBean.getServiceType();
+                    String parameterName = monitorBean.getParameterName();
+                    String value = monitorBean.getValue();
+                    IAction action = new Action(serviceId, serviceType, parameterName, value);
+                    log.info("Sending remote message to local UAM");
+                    internalUserActionMonitor.monitorFromRemoteNode(senderDeviceId, owner, action);
+                    break;
+                } catch (InvalidFormatException e) {
+                    e.printStackTrace();
+                }
+        }
+    }
 
 
+    /*
+     * USER FEEDBACK METHODS
+     */
+    @Override
+    public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
+        log.info(String.format("getQuery() \nStanza=%s\nPayload=%s",
+                stanza != null ? stanza.toString() : "null",
+                payload != null ? payload.toString() : "null"));
 
+        log.info("UACommsServer received message with a return type!!!");
+        Object result = null;
+        if (payload instanceof UserActionMonitorBean) {
+            this.receiveMessage(stanza, (UserActionMonitorBean) payload);
+            result = true;
+        } else if (payload instanceof UserFeedbackBean) {
+            result = this.getQuery(stanza, (UserFeedbackBean) payload);
+        } else if (payload instanceof UserFeedbackHistoryRequest) {
+            result = this.getQuery(stanza, (UserFeedbackHistoryRequest) payload);
+        }
+        return result;
+    }
+
+    private Object getQuery(Stanza stanza, UserFeedbackHistoryRequest requestBean) {
+
+        List<UserFeedbackBean> result;
+
+        switch (requestBean.getRequestType()) {
+            case BY_COUNT:
+                result = feedback.listStoredFeedbackBeans(requestBean.getHowMany());
+                break;
+            case BY_DATE:
+                result = feedback.listStoredFeedbackBeans(requestBean.getSinceWhen());
+                break;
+            default:
+                log.warn("Invalid requestBean.requestType: " + requestBean.getRequestType().name());
+                return null;
+        }
+
+        return result.toArray(new UserFeedbackBean[result.size()]);
+    }
+
+    private Object getQuery(Stanza stanza, UserFeedbackBean feedbackBean) {
+        //---- User Feedback Bundle ----
+        log.info("Message received for User Feedback - processing");
+
+        Object resultBean = null;
+
+        switch (feedbackBean.getMethod()) {
+            case GET_EXPLICIT_FB:
+                try {
+                    String requestId = feedbackBean.getRequestId();
+                    int expType = feedbackBean.getType();
+                    String expProposalText = feedbackBean.getProposalText();
+                    List<String> tmp = feedbackBean.getOptions();
+                    String[] options = new String[tmp.size()];
+                    //create array of options
+                    int i = 0;
+                    for (String nextOption : tmp) {
+                        options[i] = nextOption;
+                        i++;
+                    }
+                    log.debug("Sending remote message to local User Feedback - explicit");
+                    ExpProposalContent expContent = new ExpProposalContent(expProposalText, options);
+                    List<String> result = feedback.getExplicitFBforRemote(expType, expContent).get();
+
+                    //create response bean
+                    ExpFeedbackResultBean expResultBean = new ExpFeedbackResultBean();
+                    expResultBean.setRequestId(requestId);
+                    expResultBean.setFeedback(result);
+                    resultBean = expResultBean;
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+                break;
+
+            case GET_IMPLICIT_FB:
+                try {
+                    String requestId = feedbackBean.getRequestId();
+                    int impType = feedbackBean.getType();
+                    String impProposalText = feedbackBean.getProposalText();
+                    int timeout = feedbackBean.getTimeout();
+                    log.debug("Sending remote message to local User Feedback - implicit");
+                    ImpProposalContent impContent = new ImpProposalContent(impProposalText, timeout);
+                    Boolean result = feedback.getImplicitFBforRemote(impType, impContent).get();
+
+                    //create response bean
+                    ImpFeedbackResultBean impResultBean = new ImpFeedbackResultBean();
+                    impResultBean.setRequestId(requestId);
+                    impResultBean.setAccepted(result);
+                    resultBean = impResultBean;
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
+
+        return resultBean;
+    }
+
+
+    @Override
+    public Object setQuery(Stanza stanza, Object payload) throws XMPPError {
+        log.info(String.format("setQuery() \nStanza=%s\nPayload=%s",
+                stanza != null ? stanza.toString() : "null",
+                payload != null ? payload.toString() : "null"));
+
+        return null;
+    }
 
 
 }

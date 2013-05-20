@@ -8,55 +8,55 @@
         We've kept the osgi definitions in a separate configuration file so that
         this file can easily be used for integration testing outside of an OSGi environment -->
 
-    <bean id="uam"
+    <bean id="userActionMonitor"
           class="org.societies.useragent.monitoring.UserActionMonitor"
-          name="uam"
-          depends-on="ctxBroker, eventMgr, commsMgr, cssMgr"
+          name="userActionMonitor"
+          depends-on="ctxBroker, eventManager, commsManager, cssManager"
           init-method="initialiseUserActionMonitor">
         <property name="ctxBroker" ref="ctxBroker"/>
-        <property name="eventMgr" ref="eventMgr"/>
-        <property name="commsMgr" ref="commsMgr"/>
-        <property name="cssMgr" ref="cssMgr"/>
+        <property name="eventMgr" ref="eventManager"/>
+        <property name="commsMgr" ref="commsManager"/>
+        <property name="cssMgr" ref="cssManager"/>
     </bean>
 
-    <bean id="feedback"
+    <bean id="userFeedback"
           class="org.societies.useragent.feedback.UserFeedback"
           name="feedback"
-          depends-on="commsMgr"
+          depends-on="commsManager"
           init-method="initialiseUserFeedback">
-        <property name="commsMgr" ref="commsMgr"/>
+        <property name="commsMgr" ref="commsManager"/>
         <property name="pubsub" ref="pubsub"/>
         <property name="privacyPolicyNegotiationHistoryRepository" ref="privacyPolicyNegotiationHistoryRepositoryBean"/>
         <property name="userFeedbackHistoryRepository" ref="userFeedbackHistoryRepositoryBean"/>
     </bean>
 
-    <bean id="dm"
+    <bean id="decisionMaker"
           class="org.societies.useragent.decisionmaking.DecisionMaker"
           name="dm"
-          depends-on="conflict,feedback">
-        <property name="manager" ref="conflict"/>
-        <property name="feedbackHandler" ref="feedback"/>
+          depends-on="conflictResolutionManager,userFeedback">
+        <property name="manager" ref="conflictResolutionManager"/>
+        <property name="feedbackHandler" ref="userFeedback"/>
     </bean>
 
-    <bean id="conflict"
+    <bean id="conflictResolutionManager"
           class="org.societies.useragent.conflict.ConflictResolutionManager"
           name="conflict">
     </bean>
 
-    <bean id="uaRemote"
+    <bean id="uaCommsClient"
           class="org.societies.useragent.comms.UACommsClient"
-          depends-on="commsMgr"
+          depends-on="commsManager"
           init-method="initService">
-        <property name="commsMgr" ref="commsMgr"/>
+        <property name="commsMgr" ref="commsManager"/>
     </bean>
 
-    <bean id="UACommsServer"
+    <bean id="uaCommsServer"
           class="org.societies.useragent.comms.UACommsServer"
-          depends-on="commsMgr, uam, feedback"
+          depends-on="commsManager, userActionMonitor, userFeedback"
           init-method="initService">
-        <property name="commsMgr" ref="commsMgr"/>
-        <property name="uam" ref="uam"/>
-        <property name="feedback" ref="feedback"/>
+        <property name="commsMgr" ref="commsManager"/>
+        <property name="internalUserActionMonitor" ref="userActionMonitor"/>
+        <property name="feedback" ref="userFeedback"/>
     </bean>
 
     <bean id="sessionFactory"
@@ -102,13 +102,13 @@
           class="org.societies.useragent.feedback.UserFeedbackHistoryRepository"
           init-method="init"
           destroy-method="destroy">
-    <property name="sessionFactory" ref="sessionFactory"/>
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
     <bean id="privacyPolicyNegotiationHistoryRepositoryBean"
           class="org.societies.useragent.feedback.PrivacyPolicyNegotiationHistoryRepository"
-            init-method="init"
-            destroy-method="destroy">
+          init-method="init"
+          destroy-method="destroy">
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 

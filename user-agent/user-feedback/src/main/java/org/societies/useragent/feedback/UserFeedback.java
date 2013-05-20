@@ -70,6 +70,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     private static final List<String> EVENT_SCHEMA_CLASSES =
             Collections.unmodifiableList(Arrays.asList(
                     "org.societies.api.schema.useragent.feedback.UserFeedbackBean",
+                    "org.societies.api.schema.useragent.feedback.UserFeedbackHistoryRequest",
                     "org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean",
                     "org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean",
                     "org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent",
@@ -995,6 +996,21 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         }
 
         return new AsyncResult<Boolean>(result);
+    }
+
+    @Override
+    public List<UserFeedbackBean> listStoredFeedbackBeans(int howMany) {
+        return userFeedbackHistoryRepository.listPrevious(howMany);
+    }
+
+    @Override
+    public List<UserFeedbackBean> listStoredFeedbackBeans(Date sinceWhen) {
+        return userFeedbackHistoryRepository.listSince(sinceWhen);
+    }
+
+    @Override
+    public List<UserFeedbackBean> listIncompleteFeedbackBeans() {
+        return userFeedbackHistoryRepository.listIncomplete();
     }
 
     public void setCommsMgr(ICommManager commsMgr) {
