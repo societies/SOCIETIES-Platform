@@ -224,6 +224,15 @@ public class ContextBrokerBase implements IInternalCtxClient{
 		}
 	}	
 	
+	private void broadcastException(String client, String method, String message) {
+
+		final Intent intent = new Intent(method);
+		intent.putExtra(IInternalCtxClient.INTENT_EXCEPTION_VALUE_KEY, message);
+		if (this.restrictBroadcast)
+			intent.setPackage(client); 
+		this.applicationContext.sendBroadcast(intent);
+	}
+	
 	@Override
 	public CtxEntityBean createEntity(String client, RequestorBean requestor,
 			String targetCss, String type) throws CtxException {
@@ -265,8 +274,11 @@ public class ContextBrokerBase implements IInternalCtxClient{
 			} catch (CommunicationException e) {
 				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
 			} catch (Exception e) {
-				e.printStackTrace();
-				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+				final String exceptionMessage = 
+						"Failed to send CREATE_ENTITY request: "
+						+ e.getMessage(); 
+				Log.e(LOG_TAG, exceptionMessage, e);
+				this.broadcastException(client, IInternalCtxClient.CREATE_ENTITY, exceptionMessage);
 	        } 						
 		} else {
 			broadcastServiceNotStarted(client, IInternalCtxClient.CREATE_ENTITY);
@@ -317,11 +329,14 @@ public class ContextBrokerBase implements IInternalCtxClient{
 			} catch (CommunicationException e) {
 				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
 			} catch (Exception e) {
-				e.printStackTrace();
-				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+				final String exceptionMessage = 
+						"Failed to send CREATE_ATTRIBUTE request: "
+						+ e.getMessage(); 
+				Log.e(LOG_TAG, exceptionMessage, e);
+				this.broadcastException(client, IInternalCtxClient.CREATE_ATTRIBUTE, exceptionMessage);
 	        } 						
 		} else {
-			broadcastServiceNotStarted(client, IInternalCtxClient.CREATE_ASSOCIATION);
+			broadcastServiceNotStarted(client, IInternalCtxClient.CREATE_ATTRIBUTE);
 		}
 		return null;
 	}
@@ -366,8 +381,11 @@ public class ContextBrokerBase implements IInternalCtxClient{
 			} catch (CommunicationException e) {
 				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
 			} catch (Exception e) {
-				e.printStackTrace();
-				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+				final String exceptionMessage = 
+						"Failed to send CREATE_ASSOCIATION request: "
+						+ e.getMessage(); 
+				Log.e(LOG_TAG, exceptionMessage, e);
+				this.broadcastException(client, IInternalCtxClient.CREATE_ASSOCIATION, exceptionMessage);
 	        } 						
 		} else {
 			broadcastServiceNotStarted(client, IInternalCtxClient.CREATE_ASSOCIATION);
@@ -417,8 +435,11 @@ public class ContextBrokerBase implements IInternalCtxClient{
 			} catch (CommunicationException e) {
 				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
 			} catch (Exception e) {
-				e.printStackTrace();
-				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+				final String exceptionMessage = 
+						"Failed to send LOOKUP request: "
+						+ e.getMessage(); 
+				Log.e(LOG_TAG, exceptionMessage, e);
+				this.broadcastException(client, IInternalCtxClient.LOOKUP, exceptionMessage);
 	        } 						
 		} else {
 			broadcastServiceNotStarted(client, IInternalCtxClient.LOOKUP);
@@ -467,8 +488,11 @@ public class ContextBrokerBase implements IInternalCtxClient{
 			} catch (CommunicationException e) {
 				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
 			} catch (Exception e) {
-				e.printStackTrace();
-				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+				final String exceptionMessage = 
+						"Failed to send LOOKUP request: "
+						+ e.getMessage(); 
+				Log.e(LOG_TAG, exceptionMessage, e);
+				this.broadcastException(client, IInternalCtxClient.LOOKUP, exceptionMessage);
 	        } 						
 		} else {
 			broadcastServiceNotStarted(client, IInternalCtxClient.LOOKUP);
@@ -522,8 +546,11 @@ public class ContextBrokerBase implements IInternalCtxClient{
 			} catch (CommunicationException e) {
 				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
 			} catch (Exception e) {
-				e.printStackTrace();
-				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+				final String exceptionMessage = 
+						"Failed to send REMOVE request: "
+						+ e.getMessage(); 
+				Log.e(LOG_TAG, exceptionMessage, e);
+				this.broadcastException(client, IInternalCtxClient.REMOVE, exceptionMessage);
 	        } 						
 		} else {
 			broadcastServiceNotStarted(client, IInternalCtxClient.REMOVE);
@@ -573,8 +600,11 @@ public class ContextBrokerBase implements IInternalCtxClient{
 			} catch (CommunicationException e) {
 				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
 			} catch (Exception e) {
-				e.printStackTrace();
-				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+				final String exceptionMessage = 
+						"Failed to send RETRIEVE request: "
+						+ e.getMessage(); 
+				Log.e(LOG_TAG, exceptionMessage, e);
+				this.broadcastException(client, IInternalCtxClient.RETRIEVE, exceptionMessage);
 	        } 						
 		} else {
 			broadcastServiceNotStarted(client, IInternalCtxClient.RETRIEVE);
@@ -619,8 +649,11 @@ public class ContextBrokerBase implements IInternalCtxClient{
 			} catch (CommunicationException e) {
 				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
 			} catch (Exception e) {
-				e.printStackTrace();
-				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+				final String exceptionMessage = 
+						"Failed to send RETRIEVE_INDIVIDUAL_ENTITY_ID request: "
+						+ e.getMessage(); 
+				Log.e(LOG_TAG, exceptionMessage, e);
+				this.broadcastException(client, IInternalCtxClient.RETRIEVE_INDIVIDUAL_ENTITY_ID, exceptionMessage);
 	        } 						
 		} else {
 			broadcastServiceNotStarted(client, IInternalCtxClient.RETRIEVE_INDIVIDUAL_ENTITY_ID);
@@ -666,8 +699,11 @@ public class ContextBrokerBase implements IInternalCtxClient{
 			} catch (CommunicationException e) {
 				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
 			} catch (Exception e) {
-				e.printStackTrace();
-				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+				final String exceptionMessage = 
+						"Failed to send RETRIEVE_COMMUNITY_ENTITY_ID request: "
+						+ e.getMessage(); 
+				Log.e(LOG_TAG, exceptionMessage, e);
+				this.broadcastException(client, IInternalCtxClient.RETRIEVE_COMMUNITY_ENTITY_ID, exceptionMessage);
 	        } 						
 		} else {
 			broadcastServiceNotStarted(client, IInternalCtxClient.RETRIEVE_COMMUNITY_ENTITY_ID);
@@ -715,8 +751,11 @@ public class ContextBrokerBase implements IInternalCtxClient{
 			} catch (CommunicationException e) {
 				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
 			} catch (Exception e) {
-				e.printStackTrace();
-				Log.e(LOG_TAG, "Exception sending comms: " + e.getMessage());
+				final String exceptionMessage = 
+						"Failed to send UPDATE request: "
+						+ e.getMessage(); 
+				Log.e(LOG_TAG, exceptionMessage, e);
+				this.broadcastException(client, IInternalCtxClient.UPDATE, exceptionMessage);
 	        } 						
 		} else {
 			broadcastServiceNotStarted(client, IInternalCtxClient.UPDATE);
@@ -855,6 +894,8 @@ public class ContextBrokerBase implements IInternalCtxClient{
 							Log.i(LOG_TAG, "inside receiveResult CREATE ENTITY");
 							if (payload.getCreateEntityBeanResult() == null) {
 								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getCreateEntityBeanResult() is null");
+								ContextBrokerBase.this.broadcastException(client, this.returnIntent, 
+										"Could not handle result bean: CtxBrokerResponseBean.getCreateEntityBeanResult() is null");
 								return;
 							}
 							final CtxEntityBean entityBean = payload.getCreateEntityBeanResult();
@@ -878,6 +919,8 @@ public class ContextBrokerBase implements IInternalCtxClient{
 							Log.i(LOG_TAG, "inside receiveResult CREATE ATTRIBUTE");
 							if (payload.getCreateAttributeBeanResult() == null) {
 								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getCreateAttributeBeanResult() is null");
+								ContextBrokerBase.this.broadcastException(client, this.returnIntent, 
+										"Could not handle result bean: CtxBrokerResponseBean.getCreateAttributeBeanResult() is null");
 								return;
 							}
 							Log.i(LOG_TAG, "payload received: " + payload);
@@ -897,6 +940,8 @@ public class ContextBrokerBase implements IInternalCtxClient{
 							Log.i(LOG_TAG, "inside receiveResult CREATE ASSOCIATION");
 							if (payload.getCreateAssociationBeanResult() == null) {
 								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getCreateAssociationBeanResult() is null");
+								ContextBrokerBase.this.broadcastException(client, this.returnIntent, 
+										"Could not handle result bean: CtxBrokerResponseBean.getCreateAssociationBeanResult() is null");
 								return;
 							}
 							final CtxAssociationBean associationBean = payload.getCreateAssociationBeanResult();
@@ -924,6 +969,8 @@ public class ContextBrokerBase implements IInternalCtxClient{
 							Log.i(LOG_TAG, "inside receiveResult REMOVE");
 							if (payload.getRemoveBeanResult() == null) {
 								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getRemoveBeanResult() is null");
+								ContextBrokerBase.this.broadcastException(client, this.returnIntent, 
+										"Could not handle result bean: CtxBrokerResponseBean.getRemoveBeanResult() is null");
 								return;
 							}
 							final CtxModelObjectBean removedModelObjectBean = payload.getRemoveBeanResult();
@@ -937,6 +984,8 @@ public class ContextBrokerBase implements IInternalCtxClient{
 							Log.i(LOG_TAG, "inside receiveResult RETRIEVE");
 							if (payload.getRetrieveBeanResult() == null) {
 								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getRetrieveBeanResult() is null");
+								ContextBrokerBase.this.broadcastException(client, this.returnIntent, 
+										"Could not handle result bean: CtxBrokerResponseBean.getRetrieveBeanResult() is null");
 								return;
 							}
 							final CtxModelObjectBean retrievedObjectBean = payload.getRetrieveBeanResult();
@@ -951,6 +1000,8 @@ public class ContextBrokerBase implements IInternalCtxClient{
 							Log.i(LOG_TAG, "inside receiveResult RETRIEVE_INDIVIDUAL_ENTITY_ID");
 							if (payload.getRetrieveIndividualEntityIdBeanResult() == null) {
 								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getRetrieveIndividualEntityIdBeanResult() is null");
+								ContextBrokerBase.this.broadcastException(client, this.returnIntent, 
+										"Could not handle result bean: CtxBrokerResponseBean.getRetrieveIndividualEntityIdBeanResult() is null");
 								return;
 							}
 							final CtxEntityIdentifierBean retrievedIndEntIdObjectBean = payload.getRetrieveIndividualEntityIdBeanResult();
@@ -964,6 +1015,8 @@ public class ContextBrokerBase implements IInternalCtxClient{
 							Log.i(LOG_TAG, "inside receiveResult RETRIEVE_COMMUNITY_ENTITY_ID");
 							if (payload.getRetrieveCommunityEntityIdBeanResult() == null) {
 								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getRetrieveCommunityEntityIdBeanResult() is null");
+								ContextBrokerBase.this.broadcastException(client, this.returnIntent, 
+										"Could not handle result bean: CtxBrokerResponseBean.getRetrieveCommunityEntityIdBeanResult() is null");
 								return;
 							}
 							final CtxEntityIdentifierBean retrievedCommEntIdObjectBean = payload.getRetrieveCommunityEntityIdBeanResult();
@@ -977,6 +1030,8 @@ public class ContextBrokerBase implements IInternalCtxClient{
 							Log.i(LOG_TAG, "inside receiveResult UPDATE");
 							if (payload.getUpdateBeanResult() == null) {
 								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getUpdateBeanResult() is null");
+								ContextBrokerBase.this.broadcastException(client, this.returnIntent, 
+										"Could not handle result bean: CtxBrokerResponseBean.getUpdateBeanResult() is null");
 								return;
 							}
 							final CtxModelObjectBean updateBean = payload.getUpdateBeanResult();

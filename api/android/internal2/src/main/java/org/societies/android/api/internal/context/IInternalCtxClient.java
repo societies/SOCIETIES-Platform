@@ -60,6 +60,7 @@ public interface IInternalCtxClient extends ICtxClient, IServiceManager {
 	//Intents
 	public static final String INTENT_RETURN_VALUE_KEY = ICtxClient.INTENT_RETURN_VALUE_KEY;
 	public static final String INTENT_RETURN_STATUS_KEY = ICtxClient.INTENT_RETURN_STATUS_KEY;
+	public static final String INTENT_EXCEPTION_VALUE_KEY = ICtxClient.INTENT_EXCEPTION_VALUE_KEY;	
 
 	public static final String CREATE_ASSOCIATION = ICtxClient.CREATE_ASSOCIATION;
 	public static final String CREATE_ATTRIBUTE = ICtxClient.CREATE_ATTRIBUTE;

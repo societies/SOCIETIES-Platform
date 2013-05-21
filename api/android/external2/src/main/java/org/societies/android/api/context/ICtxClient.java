@@ -47,7 +47,8 @@ public interface ICtxClient extends IServiceManager {
 	//Intents
 	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.platform.ctxclient.ReturnValue";
 	public static final String INTENT_RETURN_STATUS_KEY = "org.societies.android.platform.ctxclient.ReturnStatus";
-
+	public static final String INTENT_EXCEPTION_VALUE_KEY = "org.societies.android.platform.ctxclient.ExceptionValue";
+	
 	public static final String CREATE_ENTITY = "org.societies.android.platform.ctxclient.CREATE_ENTITY";
 	public static final String CREATE_ATTRIBUTE = "org.societies.android.platform.ctxclient.CREATE_ATTRIBUTE";
 	public static final String CREATE_ASSOCIATION = "org.societies.android.platform.ctxclient.CREATE_ASSOCIATION";
