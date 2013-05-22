@@ -25,7 +25,6 @@
 package org.societies.api.internal.context.broker;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -51,7 +50,6 @@ import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
-import org.societies.api.context.model.CtxEvaluationResults;
 
 /**
  * This interface provides access to current, past and future context data. The
@@ -850,10 +848,4 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	 * @throws CtxException 
 	 */
 	public void disableCtxRecording() throws CtxException;
-	
-	/**
-	 * added by Eboylan for CSE integration test
-	 */
-	public CtxEvaluationResults evaluateSimilarity(String[] ids,
-            ArrayList<String> attrib) throws CtxException;
 }
