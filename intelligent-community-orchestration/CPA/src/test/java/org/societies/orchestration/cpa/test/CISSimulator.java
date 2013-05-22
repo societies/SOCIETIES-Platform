@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -134,7 +135,12 @@ public class CISSimulator implements IActivityFeedCallback {
         }
         init(users); //using the same code even though the rates set will be ignored in generating traffic
         long msgCounter = 0;
-        SentenceExtractor extractor = new SentenceExtractor("./src/test/resources/reuters21578content.txt");
+        SentenceExtractor extractor = null;
+        try {
+            extractor = new SentenceExtractor(CISSimulator.class.getClassLoader().getResource("reuters21578content.txt").toURI());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
         //String sentence = extractor.getSentences(20,1)[0];
         String tmpSentence = "";
         for(String[] line : data){

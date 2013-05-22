@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -308,7 +307,7 @@ public class PrivacyAssessmentService implements Serializable {
 
 		Map<IIdentity, Integer> identities;
 		identities = assessment.getNumDataTransmissionEventsForAllReceivers(
-				new Date(0), new Date());
+				model.getStartDate(), model.getEndDate());
 		log.debug("Number of identities data has been transmitted to: {}", identities.size());
 		PlotData[] plotData = new PlotData[] {mapToArrays(identities)};
 		String[] plotDataLabels = new String[] {"data"};		
@@ -322,7 +321,7 @@ public class PrivacyAssessmentService implements Serializable {
 		String ylabel = "Correlation of data transmission and data access";
 
 		HashMap<IIdentity, AssessmentResultIIdentity> assResult;
-		assResult = assessment.getAssessmentAllIds();
+		assResult = assessment.getAssessmentAllIds(model.getStartDate(), model.getEndDate());
 
 		int size = assResult.size();
 		IIdentity[] labels = new IIdentity[size];
@@ -359,7 +358,7 @@ public class PrivacyAssessmentService implements Serializable {
 		String ylabel = "Correlation of data transmission and data access";
 
 		HashMap<String, AssessmentResultClassName> assResult;
-		assResult = assessment.getAssessmentAllClasses();
+		assResult = assessment.getAssessmentAllClasses(model.getStartDate(), model.getEndDate());
 
 		int size = assResult.size();
 		String[] labels = new String[size];
@@ -396,7 +395,7 @@ public class PrivacyAssessmentService implements Serializable {
 		String ylabel = "Number of accesses to local data";
 
 		Map<String, Integer> dataAccessClasses;
-		dataAccessClasses = assessment.getNumDataAccessEventsForAllClasses(new Date(0), new Date());
+		dataAccessClasses = assessment.getNumDataAccessEventsForAllClasses(model.getStartDate(), model.getEndDate());
 		log.debug("Number of data access events (by class): {}", dataAccessClasses.size());
 		PlotData[] plotData = new PlotData[] {mapToArrays(dataAccessClasses)};
 		String[] plotDataLabels = new String[] {"data"};
@@ -410,7 +409,7 @@ public class PrivacyAssessmentService implements Serializable {
 		String ylabel = "Number of accesses to local data";
 
 		Map<IIdentity, Integer> identities;
-		identities = assessment.getNumDataAccessEventsForAllIdentities(new Date(0), new Date());
+		identities = assessment.getNumDataAccessEventsForAllIdentities(model.getStartDate(), model.getEndDate());
 		log.debug("Number of data access events (by identity): {}", identities.size());
 		PlotData[] plotData = new PlotData[] {mapToArrays(identities)};
 		String[] plotDataLabels = new String[] {"data"};

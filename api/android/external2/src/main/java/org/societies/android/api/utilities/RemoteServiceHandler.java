@@ -123,8 +123,6 @@ public class RemoteServiceHandler extends Handler {
 								Log.d(LOG_TAG, "Class: " + parameterClasses[i] + " is an instance of Parcelable");
 							};
 							bundleMethod = Bundle.class.getMethod(BUNDLE_GET_PARCELABLE_METHOD, bundleParam);
-						} else if (java.io.Serializable.class.equals(parameterClasses[i])) {
-							bundleMethod = Bundle.class.getMethod("getSerializable", bundleParam);
 						} else if (parameterClasses[i].isArray()) {
 							if (DEBUG_LOGGING){
 								Log.d(LOG_TAG, "Class: " + parameterClasses[i] + " is an array");

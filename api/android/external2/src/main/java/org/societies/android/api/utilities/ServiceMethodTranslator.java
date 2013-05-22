@@ -52,6 +52,7 @@ public class ServiceMethodTranslator {
 	private static final String ParameterDelimiter = ",";
 	private static final String ParameterSeparator = " ";
 	public static final String JAVA_LANG_PREFIX = "java.lang.";
+	public static final String JAVA_IO_PREFIX = "java.io.";
 	public static final String JAVA_LANG_PREFIX_ARRAY = "[Ljava.lang.";
 	public static final String JAVA_LANG_SUFFIX_ARRAY = ";";
 	public static final String JAVA_ARRAY = "[]";
@@ -65,6 +66,7 @@ public class ServiceMethodTranslator {
 	public static final String ANDROID_PRIMITIVES_ARRAYS_CLASS_TYPE [] = {"[I", "[J", "[D", "[F", "[B", "[C", "[Z", "[S"};
 	public static final String JAVA_PRIMITIVE_ARRAYS [] = {"int[]", "long[]", "double[]", "float[]", "byte[]", "char[]", "boolean[]", "short[]"};
 	public static final String JAVA_LANG_CLASSES [] = {"String", "Object"};
+	public static final String JAVA_IO_CLASSES [] = {"Serializable"};
 	public static final String JAVA_LANG_CLASSES_ARRAYS [] = {"String[]", "Object[]"};
 	
 	private static final String LOG_TAG = ServiceMethodTranslator.class.getName();
@@ -293,6 +295,8 @@ public class ServiceMethodTranslator {
 			result.append(capitaliseString(getPrimitiveClass(paramType).getSimpleName()));
 		} else if (arrayContains(JAVA_LANG_CLASSES, paramType)) {
 			result.append(capitaliseString(paramType));
+		} else if (arrayContains(JAVA_IO_CLASSES, paramType)) {
+			result.append(capitaliseString(paramType));
 		} else {
 			Class<?> paramClassType = null;
 			try {
@@ -302,10 +306,7 @@ public class ServiceMethodTranslator {
 					if (implementedInterfaces[i].equals(Parcelable.class)) {
 						result.append("Parcelable");
 						break;
-					} else if (implementedInterfaces[i].equals(Serializable.class)) {
-						result.append("Serializable");
-						break;
-					}
+					} 
 				}
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
@@ -384,8 +385,8 @@ public class ServiceMethodTranslator {
 				} else if (arrayContains(JAVA_LANG_CLASSES, paramTypes[i])) {
 					paramClasses[i] = Class.forName(JAVA_LANG_PREFIX + paramTypes[i]);
 
-				} else if (Serializable.class.getName().equalsIgnoreCase(paramTypes[i]) || Serializable.class.getSimpleName().equalsIgnoreCase(paramTypes[i])) {
-					paramClasses[i] = Serializable.class;
+				} else if (arrayContains(JAVA_IO_CLASSES, paramTypes[i])) {
+					paramClasses[i] = Class.forName(JAVA_IO_PREFIX + paramTypes[i]);
 					
 				} else {
 					paramClasses[i] = Class.forName(paramTypes[i]);

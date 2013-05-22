@@ -22,58 +22,14 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.orchestration;
-
-import java.util.List;
-
-import org.societies.api.cis.orchestration.model.IFilter;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+package org.societies.api.cis.orchestration.model;
 
 /**
- *
- * Interface for Community Recommendation Manager
+ * FilterOperators for Filter class
  *
  * @author Chris Lima
  *
  */
-public interface ICommunityRecommendationManager {
-
-	/**
-	 * 
-	 * Default is 10 results
-	 * 
-	 * @param limit Maximum results to return
-	 */
-	public abstract void setLimit(int limit);
-
-	/**
-	 * @return the limit
-	 */
-	public abstract int getLimit();
-
-	/**
-	 * 
-	 * Return a list of CIS advertisements sorted by relevance. CisAdvertisementRecord enables to retrieve CIS information.
-	 * 
-	 * @param limit Maximum results to return. Default value if null is 10.
-	 * @param primaryfilter An array of filters. The primary filter is applied for exact results. All the filters must match.
-	 * @param secondaryfilter An array of filters. The secondary filter is applied for extended results. 
-	 * @return list of CIS advertisements sorted by relevance
-	 */
-	public abstract List<CisAdvertisementRecord> getCISAdvResults(int limit,
-			IFilter[] primaryfilter, IFilter[] secondaryfilter);
-
-	/**
-	 * 
-	 * Return a list of CIS identities sorted by relevance
-	 * 
-	 * @param limit Maximum results to return. Default value if null is 10.
-	 * @param primaryfilter An array of filters. The primary filter is applied when you want an exact result
-	 * @param secondaryfilter An array of filters. The secondary filter is when not all parameters provide a match
-	 * @return list of CIS advertisements sorted by relevance
-	 */
-	public abstract List<IIdentity> getResults(int limit,
-			IFilter[] primaryfilter, IFilter[] secondaryfilter);
-
+public enum FilterOperators {
+	EQUAL, NOT_EQUAL, GREATER, GREATER_OR_EQUAL, LESS, LESS_OR_EQUAL, SIMILAR
 }

@@ -69,4 +69,9 @@ public enum CtxAttributeValueType {
 	 * Denotes that the {@link CtxAttribute} value is of type <code>byte[]</code>
 	 */
 	BINARY,
+	
+	/**
+	 * Denotes that the {@link CtxAttribute} value is of type <code>CtxAttributeComplexValue</code>
+	 */
+	COMPLEX,
 }

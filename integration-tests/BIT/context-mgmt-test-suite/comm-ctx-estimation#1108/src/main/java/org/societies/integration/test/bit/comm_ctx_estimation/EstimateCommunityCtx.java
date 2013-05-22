@@ -55,6 +55,8 @@ public class EstimateCommunityCtx {
 
 	}
 
+	
+	
 	@Test
 	public void TestEstimateCommunityCtx() {
 
@@ -68,36 +70,51 @@ public class EstimateCommunityCtx {
 		//LOG.info("cisManager service"+ Test1108.getCisManager());
 
 
+		
 		try {
 			this.cssIDUniversity =  this.commManager.getIdManager().fromJid(targetUniversity);
 			this.cssIDEmma =  this.commManager.getIdManager().fromJid(targetEmma);
 
-			// university's interests 
+			// setting uni attributes 
+
+			// university interests 
 			LOG.info("university's identity : " + this.cssIDUniversity.toString());
 			//CtxEntityIdentifier universityEntityID = this.ctxBroker.retrieveIndividualEntityId(null, this.cssIDUniversity).get();
 
-			CtxAttribute interestsUniversitys = updateIndividualAttribute(this.cssIDUniversity, CtxAttributeTypes.INTERESTS,"reading,socialnetworking,cinema,sports" );
+			CtxAttribute interestsUniversitys = updateStringAttr(this.cssIDUniversity, CtxAttributeTypes.INTERESTS,"reading,socialnetworking,cinema,sports" );
 			assertEquals(interestsUniversitys.getType(), CtxAttributeTypes.INTERESTS);
 			LOG.info("university's interests created : " + interestsUniversitys.getId());
 
-			CtxAttribute locationUniversity = updateIndividualAttribute(this.cssIDUniversity, CtxAttributeTypes.LOCATION_SYMBOLIC,"zoneA" );
+			CtxAttribute locationUniversity = updateStringAttr(this.cssIDUniversity, CtxAttributeTypes.LOCATION_SYMBOLIC,"zoneA" );
 			assertEquals(locationUniversity.getType(), CtxAttributeTypes.LOCATION_SYMBOLIC);
 			LOG.info("university's location created : " + locationUniversity.getId());
 
+			CtxAttribute temperatureUniversity = updateIntegerAttr(this.cssIDUniversity, CtxAttributeTypes.TEMPERATURE, 20 );
+			assertEquals(temperatureUniversity.getType(), CtxAttributeTypes.TEMPERATURE);
+			LOG.info("university's temperature created : " + temperatureUniversity.getId());
+
+			
+			
+			
 			// emma's interest (remote comm will be initiated)
 			LOG.info("emma's identity : " + this.cssIDEmma.toString());
 
-			CtxAttribute interestsEmma =  updateIndividualAttribute(this.cssIDEmma,CtxAttributeTypes.INTERESTS,"cooking,horseRiding,restaurants,cinema" );
+			CtxAttribute interestsEmma =  updateStringAttr(this.cssIDEmma,CtxAttributeTypes.INTERESTS,"cooking,horseRiding,restaurants,cinema" );
 			assertEquals(interestsEmma.getType(), CtxAttributeTypes.INTERESTS);
 			LOG.info("emmas's interest created : " + interestsEmma.getId());
 
-			CtxAttribute locationEmma  = updateIndividualAttribute(this.cssIDEmma,CtxAttributeTypes.LOCATION_SYMBOLIC,"zoneA" );
+			CtxAttribute locationEmma  = updateStringAttr(this.cssIDEmma,CtxAttributeTypes.LOCATION_SYMBOLIC,"zoneA" );
 			assertEquals(locationEmma.getType(), CtxAttributeTypes.LOCATION_SYMBOLIC);
 			LOG.info("emmas's location created : " + locationEmma.getId());
+
+			CtxAttribute temperatureEmma = updateIntegerAttr(this.cssIDEmma, CtxAttributeTypes.TEMPERATURE, 10 );
+			assertEquals(temperatureEmma.getType(), CtxAttributeTypes.TEMPERATURE);
+			LOG.info("emma's temperature created : " + temperatureEmma.getId());
 
 
 			// create CIS
 			IIdentity cisID = this.createCIS();
+			
 			// at this point a community Entity should be created in universitys container
 			// at this point an association should be created in universitys container
 			LOG.info("wait until community entity and attributes are created for cisID"+ cisID  );
@@ -108,6 +125,13 @@ public class EstimateCommunityCtx {
 			CommunityCtxEntity communityEntity = (CommunityCtxEntity) this.ctxBroker.retrieve(ctxCommunityEntityIdentifier).get();
 			LOG.info("ctxCommunityEntity : " + communityEntity);
 
+			this.ctxBroker.createAttribute(communityEntity.getId(), CtxAttributeTypes.INTERESTS);
+			this.ctxBroker.createAttribute(communityEntity.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC);
+			this.ctxBroker.createAttribute(communityEntity.getId(), CtxAttributeTypes.TEMPERATURE);
+			
+			
+			
+			
 			LOG.info("ctxCommunityEntity members : " + communityEntity.getMembers());
 			LOG.info("ctxCommunityEntity members size : " + communityEntity.getMembers().size());
 
@@ -129,6 +153,9 @@ public class EstimateCommunityCtx {
 
 					CtxEntityIdentifier emmaEntityID = this.ctxBroker.retrieveIndividualEntityId(null,this.cssIDEmma).get();
 					hasMembersAssoc.addChildEntity(emmaEntityID);
+					
+					CtxEntityIdentifier uniEntityID = this.ctxBroker.retrieveIndividualEntityId(null,this.cssIDUniversity).get();
+					hasMembersAssoc.addChildEntity(uniEntityID);
 					hasMembersAssoc = (CtxAssociation) this.ctxBroker.update(hasMembersAssoc).get();
 				}
 			}
@@ -136,16 +163,17 @@ public class EstimateCommunityCtx {
 			CommunityCtxEntity communityEntityUpdated = (CommunityCtxEntity) this.ctxBroker.retrieve(ctxCommunityEntityIdentifier).get();
 			LOG.info("Updated ctxCommunityEntity : " + communityEntityUpdated.getMembers());
 			LOG.info("Updated ctxCommunityEntity members : " + communityEntityUpdated.getMembers());
-
 			// the upper lines will be removed with code adding a css member to the cis
 			// a community now exists with two members university (local) and emma (remote)
-			String interestValue = fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.INTERESTS);
-			assertEquals("cinema", interestValue);	
 
-			// String locationSymbolicValue = fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC);
+			
+			//test estimations 
+			
+			fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.INTERESTS);
+			fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC);
+			fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.TEMPERATURE);
+			
 			// assertEquals("zoneA", locationSymbolicValue);
-
-
 
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
@@ -160,12 +188,11 @@ public class EstimateCommunityCtx {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	
 	}
 	
 
-	private CtxAttribute updateIndividualAttribute(IIdentity identity, String attributeType, String value){
+	private CtxAttribute updateStringAttr(IIdentity identity, String attributeType, String value){
 	
 		CtxAttribute attributeUpdated = null;
 		List<CtxIdentifier> attributeList;
@@ -205,29 +232,75 @@ public class EstimateCommunityCtx {
 		return attributeUpdated;
 	}
 	
-	
-	
 
-
-	public String fetchCommunityValue(CtxEntityIdentifier communityEntityId, String ctxAttributeType){
-
-		String estimatedValue = null;
-
-		LOG.info("**** lookup communityInterests: "); 
-		List<CtxIdentifier> communityInterestsList;
+	private CtxAttribute updateIntegerAttr(IIdentity identity, String attributeType, Integer value){
+		
+		CtxAttribute attributeUpdated = null;
+		List<CtxIdentifier> attributeList;
+		//List<CtxIdentifier> emmaInterestList = this.ctxBroker.lookup(null, this.cssIDEmma,CtxModelType.ATTRIBUTE,CtxAttributeTypes.INTERESTS).get();
 		try {
-			communityInterestsList = this.ctxBroker.lookup(communityEntityId, CtxModelType.ATTRIBUTE, ctxAttributeType).get();
+			attributeList = this.ctxBroker.lookup(identity, CtxModelType.ATTRIBUTE,attributeType).get();
+		
+			CtxAttribute attribute = null;
 
-			LOG.info("**** lookup community attribute results : " +communityInterestsList);
+			if( attributeList.size() == 0){
+				
+				CtxEntityIdentifier entityID = this.ctxBroker.retrieveIndividualEntityId(null, identity).get();
+				attribute = this.ctxBroker.createAttribute(entityID, attributeType).get();
+			
+			} else {
+				attribute = (CtxAttribute) this.ctxBroker.retrieve(attributeList.get(0)).get();
+			}
+			attribute.setIntegerValue(value);
+			
+			attributeUpdated = (CtxAttribute) this.ctxBroker.update(attribute).get();
+		
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		return attributeUpdated;
+	}
 
-			if(communityInterestsList.size() > 0 ) {
-				CtxAttributeIdentifier communityAttrId = (CtxAttributeIdentifier) communityInterestsList.get(0);	
+	
 
-				CtxAttribute communityInterestsAttribute = (CtxAttribute) this.ctxBroker.retrieve(communityAttrId).get();
 
-				LOG.info("**** communityInterests id : " + communityInterestsAttribute.getId());
-				LOG.info("**** communityInterests value : " + communityInterestsAttribute.getStringValue());
-				estimatedValue = communityInterestsAttribute.getStringValue();
+	public void fetchCommunityValue(CtxEntityIdentifier communityEntityId, String ctxAttributeType){
+
+		//String estimatedValue = null;
+
+		LOG.info("**** lookup "+ ctxAttributeType); 
+		List<CtxIdentifier> communityAttrList;
+		try {
+			communityAttrList = this.ctxBroker.lookup(communityEntityId, CtxModelType.ATTRIBUTE, ctxAttributeType).get();
+
+			LOG.info("**** lookup community attribute results : " +communityAttrList);
+
+			if(communityAttrList.size() > 0 ) {
+				CtxAttributeIdentifier communityAttrId = (CtxAttributeIdentifier) communityAttrList.get(0);	
+				
+				
+				LOG.info("**** INITIATE ESTIMATION ");
+				CtxAttribute communityAttribute = (CtxAttribute) this.ctxBroker.retrieve(communityAttrId).get();
+
+				LOG.info("**** communityInterests id : " + communityAttribute.getId());
+				LOG.info("  ******************** string outcome pairs...........  " + communityAttribute.getComplexValue().getPairs());
+				
+				LOG.info("  ******************** numeric outcome average...........  " + communityAttribute.getComplexValue().getAverage());
+				LOG.info("  ******************** numeric outcome median...........  " + communityAttribute.getComplexValue().getMedian());
+				LOG.info("  ******************** numeric outcome mode...........  " + communityAttribute.getComplexValue().getMode());
+				LOG.info("  ******************** numeric outcome max...........  " + communityAttribute.getComplexValue().getRangeMax());
+				LOG.info("  ******************** numeric outcome min...........  " + communityAttribute.getComplexValue().getRangeMin());
+				
+				//LOG.info("**** communityInterests value : " + communityInterestsAttribute.getStringValue());
+				//estimatedValue = communityInterestsAttribute.getStringValue();
 			}
 	
 		} catch (InterruptedException e) {
@@ -241,7 +314,7 @@ public class EstimateCommunityCtx {
 			e.printStackTrace();
 		}
 		
-		return estimatedValue;
+		
 	}
 
 
@@ -252,7 +325,7 @@ IIdentity cisID = null;
 try {
 Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> ();
 LOG.info("*** trying to create cis:");
-ICisOwned cisOwned = this.cisManager.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
+ICisOwned cisOwned = this.cisManager.createCis("testCIS5", "cisType", cisCriteria, "nice CIS").get();
 LOG.info("*** cis created: "+cisOwned.getCisId());
 
 LOG.info("*** cisOwned " +cisOwned);

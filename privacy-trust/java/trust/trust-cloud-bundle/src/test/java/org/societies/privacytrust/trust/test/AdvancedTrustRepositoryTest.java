@@ -26,7 +26,7 @@ package org.societies.privacytrust.trust.test;
 
 import static org.junit.Assert.*;
 
-import java.util.List;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -34,10 +34,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
+import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.societies.privacytrust.trust.api.repo.TrustRepositoryException;
@@ -393,52 +395,155 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 	 * @throws TrustRepositoryException 
 	 */
 	@Test
-	public void testRetrieveTrustedCsss() throws TrustRepositoryException {
+	public void testRetrieveTrustedEntities() throws TrustRepositoryException {
 	
-		List<ITrustedCss> entities = this.trustRepo.retrieveEntities(
-				trustorCssTeid, ITrustedCss.class);
+		// retrieve CSSs
+		Set<ITrustedEntity> entities = this.trustRepo.retrieveEntities(
+				trustorCssTeid, TrustedEntityType.CSS, null);
 		assertNotNull(entities);
 		assertTrue(entities.isEmpty());
 		
 		// add CSS to DB
-		this.trustRepo.createEntity(trustorCssTeid, trusteeCssTeid);
-		entities = this.trustRepo.retrieveEntities(trustorCssTeid, ITrustedCss.class);
+		ITrustedEntity css = 
+				this.trustRepo.createEntity(trustorCssTeid, trusteeCssTeid);
+		entities = this.trustRepo.retrieveEntities(trustorCssTeid, TrustedEntityType.CSS, null);
 		assertNotNull(entities);
 		assertFalse(entities.isEmpty());
+		assertTrue(entities.contains(css));
 		assertEquals(1, entities.size());
 		
 		// add CSS2 to DB
-		this.trustRepo.createEntity(trustorCssTeid, trusteeCssTeid2);
-		entities = this.trustRepo.retrieveEntities(trustorCssTeid, ITrustedCss.class);
+		ITrustedEntity css2 =
+				this.trustRepo.createEntity(trustorCssTeid, trusteeCssTeid2);
+		entities = this.trustRepo.retrieveEntities(trustorCssTeid, TrustedEntityType.CSS, null);
 		assertNotNull(entities);
 		assertFalse(entities.isEmpty());
+		assertTrue(entities.contains(css));
+		assertTrue(entities.contains(css2));
 		assertEquals(2, entities.size());
-	}
+		
+		// add direct trust value to CSS
+		css.getDirectTrust().setValue(0.5d);
+		css = this.trustRepo.updateEntity(css);
+		entities = this.trustRepo.retrieveEntities(trustorCssTeid, TrustedEntityType.CSS, TrustValueType.DIRECT);
+		assertNotNull(entities);
+		assertFalse(entities.isEmpty());
+		assertTrue(entities.contains(css));
+		assertEquals(1, entities.size());
+		entities = this.trustRepo.retrieveEntities(trustorCssTeid, TrustedEntityType.CSS, TrustValueType.INDIRECT);
+		assertNotNull(entities);
+		assertTrue(entities.isEmpty());
+		entities = this.trustRepo.retrieveEntities(trustorCssTeid, TrustedEntityType.CSS, TrustValueType.USER_PERCEIVED);
+		assertNotNull(entities);
+		assertTrue(entities.isEmpty());
 	
-	/**
-	 * Test method for {@link org.societies.privacytrust.trust.impl.repo.TrustRepository#retrieveEntities(String, Class))}.
-	 * @throws TrustRepositoryException 
-	 */
-	@Test
-	public void testRetrieveTrustedCiss() throws TrustRepositoryException {
-	
-		List<ITrustedCis> entities = this.trustRepo.retrieveEntities(
-				trustorCssTeid, ITrustedCis.class);
+		// retrieve CISs
+		entities = this.trustRepo.retrieveEntities(
+				trustorCssTeid, TrustedEntityType.CIS, null);
 		assertNotNull(entities);
 		assertTrue(entities.isEmpty());
 		
 		// add CIS to DB
-		this.trustRepo.createEntity(trustorCssTeid, trusteeCisTeid);
-		entities = this.trustRepo.retrieveEntities(trustorCssTeid, ITrustedCis.class);
+		ITrustedEntity cis =
+				this.trustRepo.createEntity(trustorCssTeid, trusteeCisTeid);
+		entities = this.trustRepo.retrieveEntities(trustorCssTeid, TrustedEntityType.CIS, null);
 		assertNotNull(entities);
 		assertFalse(entities.isEmpty());
+		assertTrue(entities.contains(cis));
 		assertEquals(1, entities.size());
 		
 		// add CIS2 to DB
-		this.trustRepo.createEntity(trustorCssTeid, trusteeCisTeid2);
-		entities = this.trustRepo.retrieveEntities(trustorCssTeid, ITrustedCis.class);
+		ITrustedEntity cis2 =
+				this.trustRepo.createEntity(trustorCssTeid, trusteeCisTeid2);
+		entities = this.trustRepo.retrieveEntities(trustorCssTeid, TrustedEntityType.CIS, null);
 		assertNotNull(entities);
 		assertFalse(entities.isEmpty());
+		assertTrue(entities.contains(cis));
+		assertTrue(entities.contains(cis2));
+		assertEquals(2, entities.size());
+		
+		// retrieve all entities with direct trust values
+		entities = this.trustRepo.retrieveEntities(trustorCssTeid, null, TrustValueType.DIRECT);
+		assertNotNull(entities);
+		assertFalse(entities.isEmpty());
+		assertTrue(entities.contains(css));
+		assertEquals(1, entities.size());
+		// retrieve all entities with indirect trust values
+		entities = this.trustRepo.retrieveEntities(trustorCssTeid, null, TrustValueType.INDIRECT);
+		assertNotNull(entities);
+		assertTrue(entities.isEmpty());
+		// retrieve all entities with user-perceived trust values
+		entities = this.trustRepo.retrieveEntities(trustorCssTeid, null, TrustValueType.USER_PERCEIVED);
+		assertNotNull(entities);
+		assertTrue(entities.isEmpty());
+		
+		// retrieve all entities
+		entities = this.trustRepo.retrieveEntities(trustorCssTeid, null, null);
+		assertNotNull(entities);
+		assertFalse(entities.isEmpty());
+		assertTrue(entities.contains(css));
+		assertTrue(entities.contains(css2));
+		assertTrue(entities.contains(cis));
+		assertTrue(entities.contains(cis2));
+		assertEquals(4, entities.size());
+		
+		// retrieve Services
+		entities = this.trustRepo.retrieveEntities(
+				trustorCssTeid, TrustedEntityType.SVC, null);
+		assertNotNull(entities);
+		assertTrue(entities.isEmpty());
+
+		// add Service to DB
+		ITrustedEntity svc = 
+				this.trustRepo.createEntity(trustorCssTeid, trusteeServiceTeid);
+		entities = this.trustRepo.retrieveEntities(trustorCssTeid, TrustedEntityType.SVC, null);
+		assertNotNull(entities);
+		assertFalse(entities.isEmpty());
+		assertTrue(entities.contains(svc));
+		assertEquals(1, entities.size());
+
+		// add Service2 to DB
+		ITrustedEntity svc2 =
+				this.trustRepo.createEntity(trustorCssTeid, trusteeServiceTeid2);
+		entities = this.trustRepo.retrieveEntities(trustorCssTeid, TrustedEntityType.SVC, null);
+		assertNotNull(entities);
+		assertFalse(entities.isEmpty());
+		assertTrue(entities.contains(svc));
+		assertTrue(entities.contains(svc2));
+		assertEquals(2, entities.size());
+
+		// add indirect trust value to Service
+		svc.getIndirectTrust().setValue(0.5d);
+		svc = this.trustRepo.updateEntity(svc);
+		entities = this.trustRepo.retrieveEntities(trustorCssTeid, TrustedEntityType.SVC, TrustValueType.DIRECT);
+		assertNotNull(entities);
+		assertNotNull(entities);
+		assertTrue(entities.isEmpty());
+		entities = this.trustRepo.retrieveEntities(trustorCssTeid, TrustedEntityType.SVC, TrustValueType.INDIRECT);
+		assertFalse(entities.isEmpty());
+		assertTrue(entities.contains(svc));
+		assertEquals(1, entities.size());
+		entities = this.trustRepo.retrieveEntities(trustorCssTeid, TrustedEntityType.SVC, TrustValueType.USER_PERCEIVED);
+		assertNotNull(entities);
+		assertTrue(entities.isEmpty());
+		
+		// add user-perceived trust value to Service
+		svc.getUserPerceivedTrust().setValue(0.25d);
+		svc = this.trustRepo.updateEntity(svc);
+		// retrieve all entities with user-perceived trust values
+		entities = this.trustRepo.retrieveEntities(trustorCssTeid, null, TrustValueType.USER_PERCEIVED);
+		assertFalse(entities.isEmpty());
+		assertTrue(entities.contains(svc));
+		assertEquals(1, entities.size());
+		
+		// add user-perceived trust value to CSS
+		css.getUserPerceivedTrust().setValue(0.25d);
+		css = this.trustRepo.updateEntity(css);
+		// retrieve all entities with user-perceived trust values
+		entities = this.trustRepo.retrieveEntities(trustorCssTeid, null, TrustValueType.USER_PERCEIVED);
+		assertFalse(entities.isEmpty());
+		assertTrue(entities.contains(css));
+		assertTrue(entities.contains(svc));
 		assertEquals(2, entities.size());
 	}
 }

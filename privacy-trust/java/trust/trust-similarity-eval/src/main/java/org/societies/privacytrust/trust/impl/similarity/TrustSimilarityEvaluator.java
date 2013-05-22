@@ -25,7 +25,6 @@
 package org.societies.privacytrust.trust.impl.similarity;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,14 +32,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
+import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
-import org.societies.privacytrust.trust.api.model.ITrustedCis;
-import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
-import org.societies.privacytrust.trust.api.model.ITrustedService;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.societies.privacytrust.trust.api.similarity.ITrustSimilarityEvaluator;
 import org.societies.privacytrust.trust.api.similarity.TrustSimilarityEvalException;
@@ -135,21 +132,14 @@ public class TrustSimilarityEvaluator implements ITrustSimilarityEvaluator {
 		final Map<TrustedEntityId, Double> result =
 				new HashMap<TrustedEntityId, Double>();
 		
-		final Set<ITrustedEntity> trustedEntities = new HashSet<ITrustedEntity>();
-		// Fetch CSSs trusted by trustor
-		trustedEntities.addAll(this.trustRepository.retrieveEntities(trustorId, ITrustedCss.class));
-		// Fetch CISs trusted by trustor
-		trustedEntities.addAll(this.trustRepository.retrieveEntities(trustorId, ITrustedCis.class));
-		// Fetch Services trusted by trustor
-		trustedEntities.addAll(this.trustRepository.retrieveEntities(trustorId, ITrustedService.class));
-		
+		// Fetch entities trusted by trustor
+		final Set<ITrustedEntity> trustedEntities = 
+				this.trustRepository.retrieveEntities(trustorId, null, TrustValueType.DIRECT);
 		for (final ITrustedEntity entity : trustedEntities) {
 			
 			// Ignore entity if
-			// 1. directTrustValue == null
-			// 2. trustorId == trusteeId
-			if (entity.getDirectTrust().getValue() != null
-					&& (!entity.getTrustorId().equals(entity.getTrusteeId())))
+			// 1. trustorId == trusteeId
+			if (!entity.getTrustorId().equals(entity.getTrusteeId()))
 				result.put(entity.getTrusteeId(),
 						entity.getDirectTrust().getValue());
 		}

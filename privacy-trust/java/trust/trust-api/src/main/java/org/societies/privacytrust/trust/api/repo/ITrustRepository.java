@@ -24,9 +24,11 @@
  */
 package org.societies.privacytrust.trust.api.repo;
 
-import java.util.List;
+import java.util.Set;
 
+import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 
 public interface ITrustRepository {
@@ -94,14 +96,26 @@ public interface ITrustRepository {
 			final TrustedEntityId trusteeId) throws TrustRepositoryException;
 	
 	/**
+	 * Retrieves all entities from the Trust Repository matching the specified 
+	 * criteria.
 	 * 
 	 * @param trustorId
-	 * @param type
-	 * @return
+	 *            (required) the identifier of the trustor.
+	 * @param entityType
+	 *            (optional) the trusted entity type to match; otherwise
+	 *            <code>null</code> to match all entity types.
+	 * @param valueType
+	 *            (optional) the trust value type to match, i.e. filter out
+	 *            entities having a <code>null</code> value of the specified 
+	 *            type.
+	 * @return all entities matching the specified criteria.
 	 * @throws TrustRepositoryException
-	 * @since 0.5
+	 *             if there is a problem accessing the Trust Repository.
+	 * @throws NullPointerException
+	 *             if any of the required parameters is <code>null</null>.
+	 * @since 1.1
 	 */
-	public <T extends ITrustedEntity> List<T> retrieveEntities(
-			final TrustedEntityId trustorId, final Class<T> entityClass)
+	public Set<ITrustedEntity> retrieveEntities(final TrustedEntityId trustorId,
+			final TrustedEntityType entityType,	final TrustValueType valueType)
 					throws TrustRepositoryException;
 }
