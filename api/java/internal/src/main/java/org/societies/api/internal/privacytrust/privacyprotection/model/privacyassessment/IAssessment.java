@@ -40,35 +40,26 @@ import org.societies.api.identity.IIdentity;
 public interface IAssessment {
 
 	/**
-	 * Get time interval after which the Privacy Assessment automatically
-	 * evaluates past events and performs assessment.
+	 * Perform all assessments and update assessment values. May take some time.
 	 * 
-	 * @return seconds period in seconds, negative value for no auto update
-	 */
-	@Deprecated
-	public int getAutoPeriod();
-
-	/**
-	 * Set time interval after which the Privacy Assessment will automatically
-	 * evaluate past events and perform assessment.
-	 * 
-	 * @param seconds period in seconds, negative value for no auto update
-	 */
-	@Deprecated
-	public void setAutoPeriod(int seconds);
-	
-	/**
-	 * Perform all assessments and update assessment values. May take a long time.
+	 * @param start Calculate results from events after this time. Pass null for no limit.
+	 * @param end Calculate results from events before this time. Pass null for no limit.
 	 */
 	public void assessAllNow(Date start, Date end);
 	
 	/**
 	 * Get a-posteriori assessment for all sender {@link IIdentity} values.
+	 * 
+	 * @param start Calculate results from events after this time. Pass null for no limit.
+	 * @param end Calculate results from events before this time. Pass null for no limit.
 	 */
 	public HashMap<IIdentity, AssessmentResultIIdentity> getAssessmentAllIds(Date start, Date end);
 	
 	/**
 	 * Get a-posteriori assessment for all sender classes.
+	 * 
+	 * @param start Calculate results from events after this time. Pass null for no limit.
+	 * @param end Calculate results from events before this time. Pass null for no limit.
 	 */
 	public HashMap<String, AssessmentResultClassName> getAssessmentAllClasses(Date start, Date end);
 
@@ -76,6 +67,8 @@ public interface IAssessment {
 	 * Get a-posteriori assessment for a particular sender {@link IIdentity}.
 	 * 
 	 * @param sender sender identity that was self-reported by the sender
+	 * @param start Calculate results from events after this time. Pass null for no limit.
+	 * @param end Calculate results from events before this time. Pass null for no limit.
 	 * 
 	 * @return privacy assessment for given sender
 	 */
@@ -84,16 +77,19 @@ public interface IAssessment {
 	/**
 	 * Get a-posteriori assessment for a particular sender class name.
 	 * 
-	 * @param sender class name of the sender as determined by the Privacy Assessment
+	 * @param senderClassName class name of the sender as determined by the Privacy Assessment
+	 * @param start Calculate results from events after this time. Pass null for no limit.
+	 * @param end Calculate results from events before this time. Pass null for no limit.
 	 * 
 	 * @return privacy assessment for given sender
 	 */
 	public AssessmentResultClassName getAssessment(String senderClassName, Date start, Date end);
 	
 	/**
-	 * Development only.
-	 * TODO: remove from API and implementation
+	 * Get number of events in given time period where data has been sent to any receiver.
 	 * 
+	 * @param start Match only events after this time. Pass null for no limit.
+	 * @param end Match only events before this time. Pass null for no limit.
 	 * @return number of all recorded data transmission events
 	 */
 	public long getNumDataTransmissionEvents(Date start, Date end);
@@ -109,44 +105,46 @@ public interface IAssessment {
 	public List<String> getDataAccessRequestorClasses();
 
 	/**
+	 * @param start Match only events after this time. Pass null for no limit.
+	 * @param end Match only events before this time. Pass null for no limit.
 	 * @return number of all recorded data access events
 	 */
 	public long getNumDataAccessEvents(Date start, Date end);
 
 	/**
-	 * Get number of events in certain time period where given requestor accessed local data.
+	 * Get number of events in given time period where given requestor accessed local data.
 	 * 
 	 * @param requestor Identity of the requestor (the one who requested data access)
-	 * @param start Match only events after this time
-	 * @param end Match only events before this time
+	 * @param start Match only events after this time. Pass null for no limit.
+	 * @param end Match only events before this time. Pass null for no limit.
 	 * @return All events where requestor matches
 	 */
 	public int getNumDataAccessEvents(IIdentity requestor, Date start, Date end);
 
 	/**
-	 * Get number of events in certain time period where given requestor accessed local data.
+	 * Get number of events in given time period where given requestor accessed local data.
 	 * 
 	 * @param requestorClass Class name of the requestor (the one who requested data access)
-	 * @param start Match only events after this time
-	 * @param end Match only events before this time
+	 * @param start Match only events after this time. Pass null for no limit.
+	 * @param end Match only events before this time. Pass null for no limit.
 	 * @return All events where requestor matches
 	 */
 	public int getNumDataAccessEvents(String requestorClass, Date start, Date end);
 
 	/**
-	 * Get number of local data access events in certain time period, grouped by requestor identity.
+	 * Get number of local data access events in given time period, grouped by requestor identity.
 	 * 
-	 * @param start Match only events after this time
-	 * @param end Match only events before this time
+	 * @param start Match only events after this time. Pass null for no limit.
+	 * @param end Match only events before this time. Pass null for no limit.
 	 * @return Number of data access events for each requestor class name
 	 */
 	public Map<IIdentity, Integer> getNumDataAccessEventsForAllIdentities(Date start, Date end);
 
 	/**
-	 * Get number of local data access events in certain time period, grouped by requestor class name.
+	 * Get number of local data access events in given time period, grouped by requestor class name.
 	 * 
-	 * @param start Match only events after this time
-	 * @param end Match only events before this time
+	 * @param start Match only events after this time. Pass null for no limit.
+	 * @param end Match only events before this time. Pass null for no limit.
 	 * @return Number of data access events for each requestor identity
 	 */
 	public Map<String, Integer> getNumDataAccessEventsForAllClasses(Date start, Date end);
@@ -157,21 +155,21 @@ public interface IAssessment {
 	public List<IIdentity> getDataTransmissionReceivers();
 
 	/**
-	 * Get number of events in certain time period where data has been sent to given receiver.
+	 * Get number of events in given time period where data has been sent to given receiver.
 	 * 
 	 * @param receiver Identity of the receiver (the one data has been sent to)
-	 * @param start Match only events after this time
-	 * @param end Match only events before this time
+	 * @param start Match only events after this time. Pass null for no limit.
+	 * @param end Match only events before this time. Pass null for no limit.
 	 * @return All events where receiver matches
 	 */
 	public int getNumDataTransmissionEvents(IIdentity receiver, Date start, Date end);
 	
 	/**
-	 * Get number of events in certain time period where data has been sent to any receiver.
+	 * Get number of events in given time period where data has been sent to any receiver.
 	 * Events are grouped by receiver identity.
 	 * 
-	 * @param start Match only events after this time
-	 * @param end Match only events before this time
+	 * @param start Match only events after this time. Pass null for no limit.
+	 * @param end Match only events before this time. Pass null for no limit.
 	 * @return Number of data transmission events for each receiver
 	 */
 	public Map<IIdentity, Integer> getNumDataTransmissionEventsForAllReceivers(Date start, Date end);
