@@ -57,7 +57,7 @@
         <dependency>
             <groupId>org.societies</groupId>
             <artifactId>hibernate_classes</artifactId>
-            <scope>test</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.transaction</groupId>
@@ -162,12 +162,6 @@
             <artifactId>societies-api-internal</artifactId>
             <scope>provided</scope>
         </dependency>
-<!--        <dependency>
-            <groupId>org.societies.orchestration.api</groupId>
-            <artifactId>intelligent-community-orchestration-api</artifactId>
-            <scope>provided</scope>
-            <version>${version.ico}</version>
-        </dependency>-->
 
         <dependency>
             <groupId>org.societies.api.external</groupId>
@@ -177,13 +171,6 @@
 
         <!--  graph stuff -->
 
-
-        <!-- 	<dependency> -->
-        <!-- 		<groupId>net.sf.jung</groupId> -->
-        <!-- 		<artifactId>jung-io</artifactId> -->
-        <!-- 		<version>${project.version}</version> -->
-        <!-- 		<scope>compile</scope> -->
-        <!-- 	</dependency> -->
 
         <dependency>
             <groupId>net.sf.jung</groupId>
