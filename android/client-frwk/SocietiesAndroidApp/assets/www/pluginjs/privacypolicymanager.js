@@ -2,13 +2,13 @@ phonegapdesktop.internal.parseConfigFile('pluginjs/privacypolicymanager.json');
 
 
 window.plugins.PrivacyPolicyManager = {
-		getPrivacyPolicy: function(owner, successCallback, errorCallback){
-			console.log("getPrivacyPolicy called", owner);
-			if (phonegapdesktop.internal.randomException("PrivacyPolicyManagerService")) {
+		getPrivacyPolicy: function(owner, successCallback, failureCallback){
+			console.log("Call PrivacyPolicyManager (desktop) - getPrivacyPolicy");
+			if (phonegapdesktop.internal.randomException("PrivacyPolicyDesktopManagerService")) {
 				errorCallback('A random error was generated');
 			}
 			else {
-				successCallback(phonegapdesktop.internal.getDebugValue('PrivacyPolicyManagerService', 'getPrivacyPolicy'));
+				successCallback(phonegapdesktop.internal.getDebugValue('PrivacyPolicyDesktopManagerService', 'getPrivacyPolicy'));
 			}
 		}
 }
