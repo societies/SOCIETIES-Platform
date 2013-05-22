@@ -12,13 +12,9 @@ import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 import org.societies.api.schema.useragent.feedback.UserFeedbackHistoryRequest;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class NotificationHistoryRepository implements INotificationHistoryRepository {
-    private static class RequestCallback implements ICommCallback, Future<List<NotificationHistoryItem>> {
+    private static class RequestCallback implements ICommCallback {
         private static final String LOG_TAG = RequestCallback.class.getCanonicalName();
 
         private List<NotificationHistoryItem> result;
@@ -52,7 +48,7 @@ public class NotificationHistoryRepository implements INotificationHistoryReposi
             // wrap the beans in NotificationHistoryItem objects
             for (UserFeedbackBean bean : request.getResponse()) {
                 NotificationHistoryItem item = new NotificationHistoryItem(bean.getRequestId(),
-                        new Date(), // TODO: store this in the bean
+                        bean.getRequestDate(),
                         bean);
                 historyItems.add(item);
             }
@@ -61,7 +57,6 @@ public class NotificationHistoryRepository implements INotificationHistoryReposi
 
             result = historyItems;
             complete = true;
-            this.notifyAll();
         }
 
         @Override
@@ -99,33 +94,17 @@ public class NotificationHistoryRepository implements INotificationHistoryReposi
 
         }
 
-        @Override
-        public boolean cancel(boolean b) {
-            return false;
-        }
-
-        @Override
-        public boolean isCancelled() {
-            return false;
-        }
-
-        @Override
         public boolean isDone() {
             return complete;
         }
 
-        @Override
-        public List<NotificationHistoryItem> get() throws InterruptedException, ExecutionException {
-            return result;
-        }
-
-        @Override
-        public List<NotificationHistoryItem> get(long l, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
+        public List<NotificationHistoryItem> get() {
             return result;
         }
     }
 
     private static final String LOG_TAG = NotificationHistoryRepository.class.getCanonicalName();
+    public static final int REQUEST_TIMEOUT = 10000;
 
     public static final List<String> ELEMENT_NAMES = Collections.unmodifiableList(
             Arrays.asList("userFeedbackHistoryRequest", "requestCallback"));
@@ -145,7 +124,7 @@ public class NotificationHistoryRepository implements INotificationHistoryReposi
 
 
     @Override
-    public Future<List<NotificationHistoryItem>> listPrevious(int howMany) {
+    public List<NotificationHistoryItem> listPrevious(int howMany) {
         try {
             if (commsManager == null) {
                 Log.e(LOG_TAG, "commsManager was null when trying to list previous");
@@ -168,12 +147,31 @@ public class NotificationHistoryRepository implements INotificationHistoryReposi
             bean.setHowMany(howMany);
 
             Stanza stanza = new Stanza(cloudNode);
+            String id = UUID.randomUUID().toString();
+            stanza.setId(id);
+
 
             Log.d(LOG_TAG, "Sending IQ...");
             commsManager.sendIQ(stanza, IQ.Type.GET, bean, requestCallback);
             Log.d(LOG_TAG, "IQ sent");
 
-            return requestCallback;
+            Date timeout = new Date(new Date().getTime() + REQUEST_TIMEOUT);
+
+            while (new Date().before(timeout)) {
+                if (requestCallback.isDone()) {
+                    break;
+                }
+
+                Thread.sleep(10);
+            }
+
+            if (!requestCallback.isDone()) {
+                Log.w(LOG_TAG, "No response received for listPrevious(int) after " + REQUEST_TIMEOUT + "ms");
+                return null;
+            }
+
+            Log.d(LOG_TAG, "Response has arrived");
+            return requestCallback.get();
 
         } catch (InvalidFormatException e) {
             Log.e(LOG_TAG, "Error listing previous notification history items", e);
@@ -187,7 +185,7 @@ public class NotificationHistoryRepository implements INotificationHistoryReposi
     }
 
     @Override
-    public Future<List<NotificationHistoryItem>> listSince(Date sinceWhen) {
+    public List<NotificationHistoryItem> listSince(Date sinceWhen) {
         return null;
     }
 }

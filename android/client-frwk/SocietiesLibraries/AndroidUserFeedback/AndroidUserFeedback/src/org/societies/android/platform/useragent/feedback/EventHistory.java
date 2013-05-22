@@ -12,7 +12,6 @@ import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyN
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 
 import java.util.*;
-import java.util.concurrent.Future;
 
 public class EventHistory extends Service {
 
@@ -123,33 +122,16 @@ public class EventHistory extends Service {
     public void reloadFromRepository(int howMany) {
         Log.i(LOG_TAG, "reloadFromRepository(int)");
 
-        Future<List<NotificationHistoryItem>> storedItems = historyRepository.listPrevious(howMany);
+        List<NotificationHistoryItem> storedItems = historyRepository.listPrevious(howMany);
 
         if (storedItems == null) {
-            Log.e(LOG_TAG, "historyRepository.listPrevious returned null when trying to reload from repository");
+            Log.e(LOG_TAG, "historyRepository.listPrevious() returned null when trying to reload from repository");
             return;
         }
 
-        Log.d(LOG_TAG, "Waiting for response to arrive");
-
-
         try {
-            synchronized (storedItems) {
-                storedItems.wait(REQUEST_TIMEOUT);
-            }
-        } catch (InterruptedException e) {
-            Log.e(LOG_TAG, "Error sleeping while waiting for historyRepository.listPrevious(int) response", e);
-        }
-
-        if (!storedItems.isDone()) {
-            Log.w(LOG_TAG, "No response received for historyRepository.listPrevious(int) after " + REQUEST_TIMEOUT + "ms");
-            return;
-        }
-
-        Log.d(LOG_TAG, "Response has arrived");
-        try {
-            Log.d(LOG_TAG, "Received " + storedItems.get().size() + " items");
-            replaceCacheWithList(storedItems.get());
+            Log.d(LOG_TAG, "Received " + storedItems.size() + " items");
+            replaceCacheWithList(storedItems);
         } catch (Exception e) {
             Log.e(LOG_TAG, "Error getting reloadFromRepository response", e);
         }
@@ -158,18 +140,15 @@ public class EventHistory extends Service {
     public void reloadFromRepository(Date sinceWhen) {
         Log.i(LOG_TAG, "reloadFromRepository(Date)");
 
-        Future<List<NotificationHistoryItem>> storedItems = historyRepository.listSince(sinceWhen);
+        List<NotificationHistoryItem> storedItems = historyRepository.listSince(sinceWhen);
 
-        while (!storedItems.isDone()) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                Log.e(LOG_TAG, "Error sleeping while waiting for reloadFromRepository response", e);
-            }
+        if (storedItems == null) {
+            Log.e(LOG_TAG, "historyRepository.listSince() returned null when trying to reload from repository");
+            return;
         }
 
         try {
-            replaceCacheWithList(storedItems.get());
+            replaceCacheWithList(storedItems);
         } catch (Exception e) {
             Log.e(LOG_TAG, "Error getting reloadFromRepository response", e);
         }
