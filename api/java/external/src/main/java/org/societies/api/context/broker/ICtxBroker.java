@@ -25,6 +25,7 @@
 package org.societies.api.context.broker;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -573,5 +574,12 @@ public interface ICtxBroker {
 	 */
 	public Future<List<CtxEntityIdentifier>> retrieveParentCommunities(final Requestor requestor,
 			final CtxEntityIdentifier community) throws CtxException;
+	
+	/**
+	 * added by eboylan for CSE integration test
+	 */
+	public org.societies.api.context.model.CtxEvaluationResults evaluateSimilarity(String[] ids,
+            ArrayList<String> attrib) throws CtxException;
+
 
 }
