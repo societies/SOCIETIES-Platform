@@ -26,6 +26,8 @@
 package org.societies.orchestration.cpa.test.util;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
@@ -43,7 +45,7 @@ public class SentenceExtractor {
     private File f = null;
 
     private ArrayList<String> allsentences = null;
-    public SentenceExtractor(String file){
+    public SentenceExtractor(URI file){
         allsentences = new ArrayList<String>();
         String data = SentenceExtractor.readFile(file);
         //System.out.println("data start: "+data.substring(0,3000));
@@ -59,7 +61,7 @@ public class SentenceExtractor {
         data=null;
 
     }
-    private static String readFile(String path) {
+    private static String readFile(URI path) {
         FileInputStream stream = null;
 
         try {
@@ -91,7 +93,12 @@ public class SentenceExtractor {
     }
     public int size(){return allsentences.size();}
     public static void main(String args[]){
-        SentenceExtractor extractor = new SentenceExtractor("./src/test/resources/reuters21578content.txt");
+        SentenceExtractor extractor = null;
+        try {
+            extractor = new SentenceExtractor(SentenceExtractor.class.getClassLoader().getResource("reuters21578content.txt").toURI());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
         String sentence = extractor.getSentences(20,1)[0];
         System.out.println("sentence 1 : \""+sentence+"\"");
 

@@ -21,15 +21,8 @@
                 <form action="" method="" id="form1">
                     <h4 class="form_title">Privacy Assessment</h4>
 
-                    <div class="hr dotted clearfix"></div>
+                    <!--div class="hr dotted clearfix"></div-->
                     <ul>
-                        <li class="clearfix">
-                        	<label for="">Description</label>
-                        	<p>To assess possible transmission of your data by installed services, the platform monitors any data access or data transmission by services, and calculates privacy assessment metrics.
-                        	To switch between various metrics, click left and right arrows below.</p>
-                        	<p><i>Note that a high value does not necessarily indicate malicious behavior, or a violation of any agreement or privacy policy. Keep in mind the correlation results are only an assessment, and many services may be accessing and/or transmitting your data in scope of their normal operation. It is up to you to decide if data access and data transmission are excessive or not.</i></p>
-                        	<p>To get latest data, click "Regenerate images".</p>
-                        </li>
 <!--
                         <li class="clearfix">
                             <label for="">Show results for</label>
@@ -49,9 +42,12 @@
                         </li>
 -->
                         <li class="clearfix">
-                        	<label for="">Results</label>
+
 							<p:commandButton actionListener="#{privacyAssessmentService.previousImage}" update="dynamicImage" icon="ui-icon-circle-triangle-w"/>  
 							<p:commandButton actionListener="#{privacyAssessmentService.nextImage}" update="dynamicImage" icon="ui-icon-circle-triangle-e"/>
+							<p:spacer width="472" height="1" />
+                        	<p:commandButton icon="ui-icon ui-icon-help" oncomplete="help.show()" />
+
 							<br/>
 							<p:graphicImage value="#{privacyAssessmentService.image}" id="dynamicImage"/>
 <!--
@@ -70,19 +66,52 @@
                         	<p:calendar value="#{privacyAssessmentForm.startDate}" pattern="yyyy-MM-ddHH:mm" />
                         	to
                         	<p:calendar value="#{privacyAssessmentForm.endDate}" pattern="yyyy-MM-ddHH:mm" />
+                        	or leave blank for no limit.
                         </li>
                         <li class="clearfix">
                             <p class="success">Thank you! Success Message here.</p>
 
                             <p class="error">Sorry, an error has occured. Please try again later.</p>
 
-					        <p:commandButton value="Regenerate images" actionListener="#{assessmentController.assessNow}" update="dynamicImage"/>
+					        <p:commandButton value="Update" icon="ui-icon ui-icon-arrowrefresh-1-w" actionListener="#{assessmentController.assessNow}" update="dynamicImage"/>
 <!--
 							<br/><br/>
                             <a href="privacy_assessment_settings.xhtml">Advanced Settings</a>
 -->
                         </li>
                     </ul>
+                    
+					<p:dialog header="Help" widgetVar="help" showEffect="fade" hideEffect="fade" closeOnEscape="true" width="500">
+						<h:panelGrid id="display" columns="2" cellpadding="15">
+							
+							<f:facet name="header">
+								<p:graphicImage value="/images/information_web_48x48.png" />
+							</f:facet>
+
+							<h:outputText value="Background" />
+							<h:outputText value="To assess possible transmission of your data by installed services, the platform monitors any data access or data transmission by services, and calculates privacy assessment metrics." />
+				
+							<p:spacer width="1" height="15" />
+							<p:spacer width="1" height="15" />
+
+							<h:outputText value="Browse results" />
+							<h:outputText value="Switch between various metrics by clicking left and right arrows above the chart." />
+				
+							<p:spacer width="1" height="15" />
+							<p:spacer width="1" height="15" />
+						
+							<h:outputText value="Change time interval" />
+							<h:outputText value="Below the chart, you can select start time and end time for the time interval to show results for. Leave start or end time blank to disable start or end time limit. Then click Update to update the results." />
+				
+							<p:spacer width="1" height="15" />
+							<p:spacer width="1" height="15" />
+
+							<h:outputText value="Interpreting results" />
+							<h:outputText value="A high value does not necessarily indicate malicious behavior, or a violation of any agreement or privacy policy. Keep in mind the correlation results are only an assessment, and many services may be accessing and/or transmitting your data in scope of their normal operation. It is up to you to decide if data access and data transmission are excessive or not." />
+							
+						</h:panelGrid>
+					</p:dialog>
+					  
                 </form>
             </section>
         </section>

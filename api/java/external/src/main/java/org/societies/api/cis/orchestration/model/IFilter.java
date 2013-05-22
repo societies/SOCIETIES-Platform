@@ -22,58 +22,29 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.orchestration;
+package org.societies.api.cis.orchestration.model;
 
-import java.util.List;
-
-import org.societies.api.cis.orchestration.model.IFilter;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 
 /**
- *
- * Interface for Community Recommendation Manager
- *
- * @author Chris Lima
- *
- */
-public interface ICommunityRecommendationManager {
+*
+* @author Chris Lima
+*
+*/
+public interface IFilter {
 
 	/**
-	 * 
-	 * Default is 10 results
-	 * 
-	 * @param limit Maximum results to return
+	 * @return A string value of a CtxAttributeTypes
 	 */
-	public abstract void setLimit(int limit);
+	public abstract String getCtxAttribute();
 
 	/**
-	 * @return the limit
+	 * @return the value
 	 */
-	public abstract int getLimit();
+	public abstract String getValue();
 
 	/**
-	 * 
-	 * Return a list of CIS advertisements sorted by relevance. CisAdvertisementRecord enables to retrieve CIS information.
-	 * 
-	 * @param limit Maximum results to return. Default value if null is 10.
-	 * @param primaryfilter An array of filters. The primary filter is applied for exact results. All the filters must match.
-	 * @param secondaryfilter An array of filters. The secondary filter is applied for extended results. 
-	 * @return list of CIS advertisements sorted by relevance
+	 * @return the operator
 	 */
-	public abstract List<CisAdvertisementRecord> getCISAdvResults(int limit,
-			IFilter[] primaryfilter, IFilter[] secondaryfilter);
-
-	/**
-	 * 
-	 * Return a list of CIS identities sorted by relevance
-	 * 
-	 * @param limit Maximum results to return. Default value if null is 10.
-	 * @param primaryfilter An array of filters. The primary filter is applied when you want an exact result
-	 * @param secondaryfilter An array of filters. The secondary filter is when not all parameters provide a match
-	 * @return list of CIS advertisements sorted by relevance
-	 */
-	public abstract List<IIdentity> getResults(int limit,
-			IFilter[] primaryfilter, IFilter[] secondaryfilter);
+	public abstract FilterOperators getOperator();
 
 }
