@@ -1,15 +1,11 @@
 package org.societies.android.platform.useragent.feedback;
 
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 import org.societies.android.api.comms.IMethodCallback;
-import org.societies.android.api.comms.XMPPAgent;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.android.platform.useragent.feedback.model.NotificationHistoryItem;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
@@ -26,9 +22,6 @@ public class EventHistory extends Service {
         return singleton;
     }
 
-    // Binder given to clients
-    private final IBinder serviceBinder = new LocalBinder();
-
     public class LocalBinder extends Binder {
         public EventHistory getService() {
             // Return this instance of EventHistory so clients can call public methods
@@ -36,12 +29,66 @@ public class EventHistory extends Service {
         }
     }
 
+    private class BindMethodCallback implements IMethodCallback {
+        private final String LOG_TAG = BindMethodCallback.class.getCanonicalName();
+
+        @Override
+        public void returnAction(boolean resultFlag) {
+            Log.i(LOG_TAG + ".methodCallback", "returnAction(boolean)");
+
+            // NB: If we need to register more names for use in other components, we should either union the two lists or register twice
+            clientCommunicationMgr.register(
+                    NotificationHistoryRepository.ELEMENT_NAMES,
+                    NotificationHistoryRepository.NAMESPACES,
+                    NotificationHistoryRepository.PACKAGES,
+                    registerMethodCallback);
+        }
+
+        @Override
+        public void returnAction(String result) {
+            Log.i(LOG_TAG + ".methodCallback", "returnAction(String)");
+        }
+
+        @Override
+        public void returnException(String result) {
+            Log.i(LOG_TAG + ".methodCallback", "returnException(String)");
+        }
+    }
+
+    private class RegisterMethodCallback implements IMethodCallback {
+        private final String LOG_TAG = RegisterMethodCallback.class.getCanonicalName();
+
+        @Override
+        public void returnAction(boolean resultFlag) {
+            Log.i(LOG_TAG + ".methodCallback", "returnAction(boolean)");
+
+            reloadFromRepository(DEFAULT_FETCH_COUNT);
+        }
+
+        @Override
+        public void returnAction(String result) {
+            Log.i(LOG_TAG + ".methodCallback", "returnAction(String)");
+        }
+
+        @Override
+        public void returnException(String result) {
+            Log.i(LOG_TAG + ".methodCallback", "returnException(String)");
+        }
+    }
+
+    public static final int REQUEST_TIMEOUT = 10000;
+
+    // Binder given to clients
+    private final IBinder serviceBinder = new LocalBinder();
+
+    private final BindMethodCallback bindMethodCallback = new BindMethodCallback();
+    private final RegisterMethodCallback registerMethodCallback = new RegisterMethodCallback();
+
     private static final String LOG_TAG = EventHistory.class.getCanonicalName();
     public static final int DEFAULT_FETCH_COUNT = 50;
 
     private INotificationHistoryRepository historyRepository;
     private ClientCommunicationMgr clientCommunicationMgr;
-
 
     // NB: to avoid deadlocks, always synchronise on historyItems, not on itemIDs
     private final List<NotificationHistoryItem> historyItems = new ArrayList<NotificationHistoryItem>();
@@ -58,42 +105,19 @@ public class EventHistory extends Service {
         super.onCreate();
         EventHistory.singleton = this;
 
-        this.registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.i(LOG_TAG +".BroadcastReceiver", "onReceive() = " + intent.getAction());
-                reloadFromRepository(DEFAULT_FETCH_COUNT);
-            }
-        }, createIntentFilter());
 
-        clientCommunicationMgr = new ClientCommunicationMgr(getApplicationContext(), false);
-        clientCommunicationMgr.bindCommsService(new IMethodCallback() {
-            @Override
-            public void returnAction(boolean resultFlag) {
-                Log.i(LOG_TAG + ".methodCallback", "returnAction(boolean)");
-            }
-
-            @Override
-            public void returnAction(String result) {
-                Log.i(LOG_TAG + ".methodCallback", "returnAction(String)");
-            }
-
-            @Override
-            public void returnException(String result) {
-                Log.i(LOG_TAG + ".methodCallback", "returnException(String)");
-            }
-        });
-
+        clientCommunicationMgr = new ClientCommunicationMgr(getApplicationContext(), true);
+        clientCommunicationMgr.bindCommsService(bindMethodCallback);
         historyRepository = new NotificationHistoryRepository(clientCommunicationMgr);
-
     }
 
-    private IntentFilter createIntentFilter() {
-        //register broadcast receiver to receive SocietiesEvents return values
-        IntentFilter intentFilter = new IntentFilter();
-
-        intentFilter.addAction(XMPPAgent.GET_DOMAIN_AUTHORITY_NODE);
-        return intentFilter;
+    @Override
+    public void onDestroy() {
+        Log.i(LOG_TAG, "onDestroy()");
+        super.onDestroy();
+        // NB: If we need to register more names for use in other components, we should either union the two lists or register twice
+        clientCommunicationMgr.unregister(NotificationHistoryRepository.ELEMENT_NAMES, NotificationHistoryRepository.NAMESPACES, registerMethodCallback);
+        clientCommunicationMgr.unbindCommsService();
     }
 
     public void reloadFromRepository(int howMany) {
@@ -106,15 +130,25 @@ public class EventHistory extends Service {
             return;
         }
 
-        while (!storedItems.isDone()) {
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                Log.e(LOG_TAG, "Error sleeping while waiting for reloadFromRepository response", e);
-            }
-        }
+        Log.d(LOG_TAG, "Waiting for response to arrive");
+
 
         try {
+            synchronized (storedItems) {
+                storedItems.wait(REQUEST_TIMEOUT);
+            }
+        } catch (InterruptedException e) {
+            Log.e(LOG_TAG, "Error sleeping while waiting for historyRepository.listPrevious(int) response", e);
+        }
+
+        if (!storedItems.isDone()) {
+            Log.w(LOG_TAG, "No response received for historyRepository.listPrevious(int) after " + REQUEST_TIMEOUT + "ms");
+            return;
+        }
+
+        Log.d(LOG_TAG, "Response has arrived");
+        try {
+            Log.d(LOG_TAG, "Received " + storedItems.get().size() + " items");
             replaceCacheWithList(storedItems.get());
         } catch (Exception e) {
             Log.e(LOG_TAG, "Error getting reloadFromRepository response", e);
