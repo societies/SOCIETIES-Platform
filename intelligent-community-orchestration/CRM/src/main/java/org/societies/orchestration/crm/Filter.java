@@ -22,58 +22,56 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.orchestration;
+package org.societies.orchestration.crm;
 
-import java.util.List;
-
+import org.societies.api.cis.orchestration.model.FilterOperators;
 import org.societies.api.cis.orchestration.model.IFilter;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+
 
 /**
- *
- * Interface for Community Recommendation Manager
+ * Filter model for Community Recommendation Manager
  *
  * @author Chris Lima
  *
  */
-public interface ICommunityRecommendationManager {
+public class Filter implements IFilter {
+
+	private String ctxAttribute;
+	private String value;
+	private FilterOperators operator;
 
 	/**
-	 * 
-	 * Default is 10 results
-	 * 
-	 * @param limit Maximum results to return
+	 * @param ctxAttribute Context attributes available from org.societies.api.context.model.CtxAttributeTypes. E.g. ABOUT, INTERESTS, LOCATION_SYMBOLIC
+	 * @param value String or numeric value to be compared
+	 * @param operator Operators available from PrimaryFilterOperators enum. E.g. EQUAL
 	 */
-	public abstract void setLimit(int limit);
+	public Filter(String ctxAttribute, String value, FilterOperators operator) {
+		this.ctxAttribute = ctxAttribute;
+		this.value = value;
+		this.operator = operator;
+	}
 
-	/**
-	 * @return the limit
+	/* (non-Javadoc)
+	 * @see org.societies.orchestration.crm.IFilter#getCtxAttribute()
 	 */
-	public abstract int getLimit();
+	@Override
+	public String getCtxAttribute() {
+		return ctxAttribute;
+	}
 
-	/**
-	 * 
-	 * Return a list of CIS advertisements sorted by relevance. CisAdvertisementRecord enables to retrieve CIS information.
-	 * 
-	 * @param limit Maximum results to return. Default value if null is 10.
-	 * @param primaryfilter An array of filters. The primary filter is applied for exact results. All the filters must match.
-	 * @param secondaryfilter An array of filters. The secondary filter is applied for extended results. 
-	 * @return list of CIS advertisements sorted by relevance
+	/* (non-Javadoc)
+	 * @see org.societies.orchestration.crm.IFilter#getValue()
 	 */
-	public abstract List<CisAdvertisementRecord> getCISAdvResults(int limit,
-			IFilter[] primaryfilter, IFilter[] secondaryfilter);
+	@Override
+	public String getValue() {
+		return value;
+	}
 
-	/**
-	 * 
-	 * Return a list of CIS identities sorted by relevance. The IIdentiy list can be used to retrieve more info from the Context Broker
-	 * 
-	 * @param limit Maximum results to return. Default value if null is 10.
-	 * @param primaryfilter An array of filters. The primary filter is applied when you want an exact result
-	 * @param secondaryfilter An array of filters. The secondary filter is when not all parameters provide a match
-	 * @return list of CIS advertisements sorted by relevance
+	/* (non-Javadoc)
+	 * @see org.societies.orchestration.crm.IFilter#getOperator()
 	 */
-	public abstract List<IIdentity> getResults(int limit,
-			IFilter[] primaryfilter, IFilter[] secondaryfilter);
-
+	@Override
+	public FilterOperators getOperator() {
+		return operator;
+	}
 }
