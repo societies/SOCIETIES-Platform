@@ -22,38 +22,44 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.api.similarity;
+package org.societies.privacytrust.trust.api.engine;
+
+import java.util.Set;
 
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
+import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 
 /**
- * This interface provides methods to evaluate the similarity of users 
- * based on their direct trust relationships.
+ * This interface provides methods to evaluate the trustworthiness of 
+ * {@link ITrustedEntity} objects based on {@link IIndirectTrustEvidence}
+ * information.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 1.1
  */
-public interface ITrustSimilarityEvaluator {
+public interface IIndirectTrustEngine {
 	
 	/**
-	 * Evaluates the cosine similarity between the given trustor and trustee.
-	 * More specifically, the resulting similarity ranges from −1 meaning
-	 * exactly opposite, to 1 meaning exactly the same, with 0 usually
-	 * indicating independence, and in-between values indicating intermediate
-	 * similarity or dissimilarity.
+	 * TODO
 	 * 
 	 * @param trustorId
-	 *            the entity to compare against the given trustee.
-	 * @param trusteeId 
-	 *            the entity to compare against the given trustor.
-	 * @return the cosine similarity between the given trustor and trustee.
-	 * @throws TrustSimilarityEvalException
-	 *             if there is a problem evaluating the cosine similarity.
-	 * @throws IllegalArgumentException 
-	 *             if the specified identifiers are not of type CSS.
-	 * @throws NullPointerException
-	 *             if any of the specified parameters is <code>null</code>.
+	 * @param evidence
+	 * @return
+	 * @throws TrustEngineException
 	 */
-	public Double evaluateCosineSimilarity(final TrustedEntityId trustorId,
-			final TrustedEntityId trusteeId) throws TrustSimilarityEvalException;
+	public Set<ITrustedEntity> evaluate(final TrustedEntityId trustorId,
+			final IIndirectTrustEvidence evidence) throws TrustEngineException;
+	
+	/**
+	 * TODO
+	 * 
+	 * @param trustorId
+	 * @param evidenceSet
+	 * @return
+	 * @throws TrustEngineException
+	 */
+	public Set<ITrustedEntity> evaluate(final TrustedEntityId trustorId,
+			final Set<IIndirectTrustEvidence> evidenceSet) 
+					throws TrustEngineException;
 }
