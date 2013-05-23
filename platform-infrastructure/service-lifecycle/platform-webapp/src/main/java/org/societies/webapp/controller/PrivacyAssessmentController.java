@@ -491,7 +491,9 @@ public class PrivacyAssessmentController {
 		//ADD THE BEAN THAT CONTAINS ALL THE FORM DATA FOR THIS PAGE
 		PrivacyAssessmentForm assForm = new PrivacyAssessmentForm();
 		assForm.setAssessNow(false);
-		int autoReassessmentInSecs = assessment.getAutoPeriod();
+		//int autoReassessmentInSecs = assessment.getAutoPeriod();
+		int autoReassessmentInSecs = 0;  // FIXME: remove this obsolete functionality
+		LOG.warn("Automatic periodical assessment is no longer implemented.");
 		assForm.setAutoReassessment(autoReassessmentInSecs >= 0);
 		assForm.setAutoReassessmentInSecs(autoReassessmentInSecs);
 		model.put("assForm", assForm);
@@ -530,7 +532,9 @@ public class PrivacyAssessmentController {
 			if (!assForm.isAutoReassessment()) {
 				autoAssessmentPeriod = -1;
 			}
-			assessment.setAutoPeriod(autoAssessmentPeriod);
+			// FIXME: remove this obsolete functionality
+			//assessment.setAutoPeriod(autoAssessmentPeriod);
+			LOG.warn("Automatic periodical assessment is no longer implemented.");
 		}
 		catch (Exception ex)
 		{

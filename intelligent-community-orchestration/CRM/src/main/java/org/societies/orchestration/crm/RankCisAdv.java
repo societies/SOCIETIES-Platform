@@ -22,58 +22,61 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.cis.orchestration;
+package org.societies.orchestration.crm;
 
-import java.util.List;
+import java.util.Comparator;
 
-import org.societies.api.cis.orchestration.model.IFilter;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 
+
+
 /**
- *
- * Interface for Community Recommendation Manager
+ * Class to rank CisAdvertisementRecord by relevance
  *
  * @author Chris Lima
  *
  */
-public interface ICommunityRecommendationManager {
+final class RankCisAdv implements Comparator<RankCisAdv> {
+
+	private int rank = 0;
+	private CisAdvertisementRecord cisAdv;
 
 	/**
-	 * 
-	 * Default is 10 results
-	 * 
-	 * @param limit Maximum results to return
+	 * @return the rank
 	 */
-	public abstract void setLimit(int limit);
+	public int getRank() {
+		return rank;
+	}
 
 	/**
-	 * @return the limit
+	 * Increment rank value
 	 */
-	public abstract int getLimit();
+	public void incrementRank() {
+		this.rank++;		
+	}
 
 	/**
-	 * 
-	 * Return a list of CIS advertisements sorted by relevance. CisAdvertisementRecord enables to retrieve CIS information.
-	 * 
-	 * @param limit Maximum results to return. Default value if null is 10.
-	 * @param primaryfilter An array of filters. The primary filter is applied for exact results. All the filters must match.
-	 * @param secondaryfilter An array of filters. The secondary filter is applied for extended results. 
-	 * @return list of CIS advertisements sorted by relevance
+	 * @return the cisAdv
 	 */
-	public abstract List<CisAdvertisementRecord> getCISAdvResults(int limit,
-			IFilter[] primaryfilter, IFilter[] secondaryfilter);
+	public CisAdvertisementRecord getCisAdv() {
+		return cisAdv;
+	}
 
 	/**
-	 * 
-	 * Return a list of CIS identities sorted by relevance. The IIdentiy list can be used to retrieve more info from the Context Broker
-	 * 
-	 * @param limit Maximum results to return. Default value if null is 10.
-	 * @param primaryfilter An array of filters. The primary filter is applied when you want an exact result
-	 * @param secondaryfilter An array of filters. The secondary filter is when not all parameters provide a match
-	 * @return list of CIS advertisements sorted by relevance
+	 * @param cisAdv the cisAdv to set
 	 */
-	public abstract List<IIdentity> getResults(int limit,
-			IFilter[] primaryfilter, IFilter[] secondaryfilter);
+	public void setCisAdv(CisAdvertisementRecord cisAdv) {
+		this.cisAdv = cisAdv;
+	}
 
+	/* (non-Javadoc)
+	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+	 */
+	@Override
+	public int compare(RankCisAdv a, RankCisAdv b) {
+		final int scoreCmp = -Double.compare(a.getRank(), b.getRank());
+		if (scoreCmp != 0)
+			return scoreCmp;
+		return scoreCmp;
+	}
 }
