@@ -26,13 +26,14 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 package org.societies.android.remote.helper;
 
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.societies.android.api.common.ADate;
 import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.context.ContextClientInvocationException;
+import org.societies.android.api.context.ContextClientNotConnectedException;
 import org.societies.android.api.context.CtxException;
 import org.societies.android.api.context.ICtxClient;
 import org.societies.android.api.context.ICtxClientCallback;
@@ -48,7 +49,6 @@ import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
 import org.societies.api.schema.context.model.CtxIdentifierBean;
 import org.societies.api.schema.context.model.CtxModelObjectBean;
 import org.societies.api.schema.context.model.CtxModelTypeBean;
-import org.societies.utilities.DBC.Dbc;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -63,10 +63,16 @@ import android.os.Parcelable;
 import android.os.RemoteException;
 import android.util.Log;
 
+/**
+ * This class provides a simple callback interface to the Societies Android Context service
+ * It assumes that the service has already been bound to the Android Comms and Pubsub services.
+ * 
+ * @author <a href="mailto:pkosmidis@cn.ntua.gr">Pavlos Kosmides</a> (ICCS)
+ * @since 1.1
+ */
 public class ContextClientHelper implements ICtxClientHelper {
 
 	private final static String LOG_TAG = ContextClientHelper.class.getName();
-	private final static int ILLEGAL_VALUE = -999999;
 	
     private enum classMethods {
     	createEntity,
@@ -110,15 +116,17 @@ public class ContextClientHelper implements ICtxClientHelper {
 	
 	@Override
 	public boolean setUpService(IMethodCallback callback) {
-		Dbc.require("Callback object must be specified", null != callback);
+		if (callback == null)
+			throw new NullPointerException("callback can't be null");
+		
 		Log.d(LOG_TAG, "setUpService");
 		
 		if (!this.connectedToContextClient) {
 			this.setupBroadcastReceiver();
 
 			this.startupCallback = callback;
-        	Intent serviceIntent = new Intent(ICoreSocietiesServices.EVENTS_SERVICE_INTENT);
-        	this.context.bindService(serviceIntent, eventsConnection, Context.BIND_AUTO_CREATE);
+        	Intent serviceIntent = new Intent(ICoreSocietiesServices.CONTEXT_SERVICE_INTENT);
+        	this.context.bindService(serviceIntent, this.contextClientConnection, Context.BIND_AUTO_CREATE);
 		}
 		return false;
 		
@@ -126,7 +134,16 @@ public class ContextClientHelper implements ICtxClientHelper {
 
 	@Override
 	public boolean tearDownService(IMethodCallback callback) {
-		// TODO Auto-generated method stub
+		if (callback == null)
+			throw new NullPointerException("callback can't be null");
+		
+		Log.d(LOG_TAG, "tearDownService");
+		if (this.connectedToContextClient) {
+			this.teardownBroadcastReceiver();
+	       	this.context.unbindService(this.contextClientConnection);
+			Log.d(LOG_TAG, "tearDownService completed");
+	       	callback.returnAction(true);
+		}
 		return false;
 	}
 
@@ -134,7 +151,61 @@ public class ContextClientHelper implements ICtxClientHelper {
 	public CtxEntityBean createEntity(RequestorBean requestor,
 			String targetCss, String type, ICtxClientCallback callback)
 			throws CtxException {
-		// TODO Auto-generated method stub
+
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (targetCss == null) 
+			throw new NullPointerException("targetCSS can't be null");
+		if (callback == null)
+			throw new NullPointerException("callback can't be null");
+		
+		Log.d(LOG_TAG, "createEntity with requestor=" + requestor.getRequestorId()
+				+ ", targetCss=" + targetCss + ", type=" + type + ", callback=" + callback);
+		
+		if (this.connectedToContextClient) {
+			//Add callback class to method queue tail
+			this.initialiseQueue(classMethods.createEntity.ordinal());
+			this.methodQueues[classMethods.createEntity.ordinal()].add(callback);
+			
+			//Select target method and create message to convey remote invocation
+			String targetMethod = ICtxClient.methodsArray[0];
+			android.os.Message outMessage = 
+					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(
+					ICtxClient.methodsArray, targetMethod), 0, 0);
+			
+			Bundle outBundle = new Bundle();
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(
+					targetMethod, 0), this.clientPackageName);
+			Log.d(LOG_TAG, "client: " + this.clientPackageName);
+			
+			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
+					targetMethod, 1), requestor);
+			Log.d(LOG_TAG, "requestor: " + requestor.getRequestorId());
+			
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), targetCss);
+			Log.d(LOG_TAG, "targetCss: " + targetCss);
+			
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), type);
+			Log.d(LOG_TAG, "type: " + type);
+			
+			outMessage.setData(outBundle);
+			Log.d(LOG_TAG, "Call service method: " + targetMethod);
+			
+			try {
+				this.targetService.send(outMessage);
+			} catch (RemoteException e) {
+				Log.e(LOG_TAG, "Could not send remote method invocation", e);
+				//Retrieve callback and signal failure
+				final ICtxClientCallback retrievedCallback = 
+						this.methodQueues[classMethods.createEntity.ordinal()].poll();
+				if (null != retrievedCallback) {
+					retrievedCallback.onException(new ContextClientInvocationException());
+				}
+			}
+		} else {
+			Log.e(LOG_TAG, "Note connected to Context Client service");
+			callback.onException(new ContextClientNotConnectedException());
+		}
 		return null;
 	}
 
@@ -142,7 +213,60 @@ public class ContextClientHelper implements ICtxClientHelper {
 	public CtxAttributeBean createAttribute(RequestorBean requestor,
 			CtxEntityIdentifierBean scope, String type,
 			ICtxClientCallback callback) throws CtxException {
-		// TODO Auto-generated method stub
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (scope == null) 
+			throw new NullPointerException("scope can't be null");
+		if (callback == null)
+			throw new NullPointerException("callback can't be null");
+		
+		Log.d(LOG_TAG, "createAttribute with requestor=" + requestor.getRequestorId()
+				+ ", scope=" + scope.toString() + ", type=" + type + ", callback=" + callback);
+		
+		if (this.connectedToContextClient) {
+			//Add callback class to method queue tail
+			this.initialiseQueue(classMethods.createAttribute.ordinal());
+			this.methodQueues[classMethods.createAttribute.ordinal()].add(callback);
+			
+			//Select target method and create message to convey remote invocation
+			String targetMethod = ICtxClient.methodsArray[1];
+			android.os.Message outMessage = 
+					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(
+					ICtxClient.methodsArray, targetMethod), 0, 0);
+			
+			Bundle outBundle = new Bundle();
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(
+					targetMethod, 0), this.clientPackageName);
+			Log.d(LOG_TAG, "client: " + this.clientPackageName);
+			
+			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
+					targetMethod, 1), requestor);
+			Log.d(LOG_TAG, "requestor: " + requestor.getRequestorId());
+			
+			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), scope);
+			Log.d(LOG_TAG, "scope: " + scope.toString());
+			
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), type);
+			Log.d(LOG_TAG, "type: " + type);
+			
+			outMessage.setData(outBundle);
+			Log.d(LOG_TAG, "Call service method: " + targetMethod);
+			
+			try {
+				this.targetService.send(outMessage);
+			} catch (RemoteException e) {
+				Log.e(LOG_TAG, "Could not send remote method invocation", e);
+				//Retrieve callback and signal failure
+				final ICtxClientCallback retrievedCallback = 
+						this.methodQueues[classMethods.createAttribute.ordinal()].poll();
+				if (null != retrievedCallback) {
+					retrievedCallback.onException(new ContextClientInvocationException());
+				}
+			}
+		} else {
+			Log.e(LOG_TAG, "Note connected to Context Client service");
+			callback.onException(new ContextClientNotConnectedException());
+		}
 		return null;
 	}
 
@@ -150,7 +274,60 @@ public class ContextClientHelper implements ICtxClientHelper {
 	public CtxAssociationBean createAssociation(RequestorBean requestor,
 			String targetCss, String type, ICtxClientCallback callback)
 			throws CtxException {
-		// TODO Auto-generated method stub
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (targetCss == null) 
+			throw new NullPointerException("targetCSS can't be null");
+		if (callback == null)
+			throw new NullPointerException("callback can't be null");
+		
+		Log.d(LOG_TAG, "createAssociation with requestor=" + requestor.getRequestorId()
+				+ ", targetCss=" + targetCss + ", type=" + type + ", callback=" + callback);
+		
+		if (this.connectedToContextClient) {
+			//Add callback class to method queue tail
+			this.initialiseQueue(classMethods.createAssociation.ordinal());
+			this.methodQueues[classMethods.createAssociation.ordinal()].add(callback);
+			
+			//Select target method and create message to convey remote invocation
+			String targetMethod = ICtxClient.methodsArray[2];
+			android.os.Message outMessage = 
+					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(
+					ICtxClient.methodsArray, targetMethod), 0, 0);
+			
+			Bundle outBundle = new Bundle();
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(
+					targetMethod, 0), this.clientPackageName);
+			Log.d(LOG_TAG, "client: " + this.clientPackageName);
+			
+			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
+					targetMethod, 1), requestor);
+			Log.d(LOG_TAG, "requestor: " + requestor.getRequestorId());
+			
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), targetCss);
+			Log.d(LOG_TAG, "targetCss: " + targetCss);
+			
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 3), type);
+			Log.d(LOG_TAG, "type: " + type);
+			
+			outMessage.setData(outBundle);
+			Log.d(LOG_TAG, "Call service method: " + targetMethod);
+			
+			try {
+				this.targetService.send(outMessage);
+			} catch (RemoteException e) {
+				Log.e(LOG_TAG, "Could not send remote method invocation", e);
+				//Retrieve callback and signal failure
+				final ICtxClientCallback retrievedCallback = 
+						this.methodQueues[classMethods.createAssociation.ordinal()].poll();
+				if (null != retrievedCallback) {
+					retrievedCallback.onException(new ContextClientInvocationException());
+				}
+			}
+		} else {
+			Log.e(LOG_TAG, "Note connected to Context Client service");
+			callback.onException(new ContextClientNotConnectedException());
+		}
 		return null;
 	}
 
@@ -158,7 +335,66 @@ public class ContextClientHelper implements ICtxClientHelper {
 	public List<CtxIdentifierBean> lookup(RequestorBean requestor,
 			String target, CtxModelTypeBean modelType, String type,
 			ICtxClientCallback callback) throws CtxException {
-		// TODO Auto-generated method stub
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (target == null) 
+			throw new NullPointerException("targetCSS can't be null");
+		if (modelType == null)
+			throw new NullPointerException("modelType can't be null");
+		if (callback == null)
+			throw new NullPointerException("callback can't be null");
+		
+		Log.d(LOG_TAG, "lookup with requestor=" + requestor.getRequestorId()
+				+ ", target=" + target + ", modelType=" + modelType.toString() +", type=" + type + ", callback=" + callback);
+		
+		if (this.connectedToContextClient) {
+			//Add callback class to method queue tail
+			this.initialiseQueue(classMethods.lookup.ordinal());
+			this.methodQueues[classMethods.lookup.ordinal()].add(callback);
+			
+			//Select target method and create message to convey remote invocation
+			String targetMethod = ICtxClient.methodsArray[3];
+			android.os.Message outMessage = 
+					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(
+					ICtxClient.methodsArray, targetMethod), 0, 0);
+			
+			Bundle outBundle = new Bundle();
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(
+					targetMethod, 0), this.clientPackageName);
+			Log.d(LOG_TAG, "client: " + this.clientPackageName);
+			
+			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
+					targetMethod, 1), requestor);
+			Log.d(LOG_TAG, "requestor: " + requestor.getRequestorId());
+			
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 2), target);
+			Log.d(LOG_TAG, "target: " + target);
+			
+			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
+					targetMethod, 3), modelType);
+			Log.d(LOG_TAG, "modelType: " + modelType.toString());
+			
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(targetMethod, 4), type);
+			Log.d(LOG_TAG, "type: " + type);
+			
+			outMessage.setData(outBundle);
+			Log.d(LOG_TAG, "Call service method: " + targetMethod);
+			
+			try {
+				this.targetService.send(outMessage);
+			} catch (RemoteException e) {
+				Log.e(LOG_TAG, "Could not send remote method invocation", e);
+				//Retrieve callback and signal failure
+				final ICtxClientCallback retrievedCallback = 
+						this.methodQueues[classMethods.lookup.ordinal()].poll();
+				if (null != retrievedCallback) {
+					retrievedCallback.onException(new ContextClientInvocationException());
+				}
+			}
+		} else {
+			Log.e(LOG_TAG, "Note connected to Context Client service");
+			callback.onException(new ContextClientNotConnectedException());
+		}
 		return null;
 	}
 
@@ -192,7 +428,58 @@ public class ContextClientHelper implements ICtxClientHelper {
 	public CtxModelObjectBean retrieve(RequestorBean requestor,
 			CtxIdentifierBean identifier, ICtxClientCallback callback)
 			throws CtxException {
-		// TODO Auto-generated method stub
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (identifier == null) 
+			throw new NullPointerException("identifier can't be null");
+		if (callback == null)
+			throw new NullPointerException("callback can't be null");
+		
+		Log.d(LOG_TAG, "retrieve with requestor=" + requestor.getRequestorId()
+				+ ", identifier=" + identifier.toString() + ", callback=" + callback);
+		
+		if (this.connectedToContextClient) {
+			//Add callback class to method queue tail
+			this.initialiseQueue(classMethods.retrieve.ordinal());
+			this.methodQueues[classMethods.retrieve.ordinal()].add(callback);
+			
+			//Select target method and create message to convey remote invocation
+			String targetMethod = ICtxClient.methodsArray[7];
+			android.os.Message outMessage = 
+					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(
+					ICtxClient.methodsArray, targetMethod), 0, 0);
+			
+			Bundle outBundle = new Bundle();
+			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(
+					targetMethod, 0), this.clientPackageName);
+			Log.d(LOG_TAG, "client: " + this.clientPackageName);
+			
+			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
+					targetMethod, 1), requestor);
+			Log.d(LOG_TAG, "requestor: " + requestor.getRequestorId());
+			
+			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
+					targetMethod, 2), identifier);
+			Log.d(LOG_TAG, "identifier: " + identifier.toString());
+			
+			outMessage.setData(outBundle);
+			Log.d(LOG_TAG, "Call service method: " + targetMethod);
+			
+			try {
+				this.targetService.send(outMessage);
+			} catch (RemoteException e) {
+				Log.e(LOG_TAG, "Could not send remote method invocation", e);
+				//Retrieve callback and signal failure
+				final ICtxClientCallback retrievedCallback = 
+						this.methodQueues[classMethods.retrieve.ordinal()].poll();
+				if (null != retrievedCallback) {
+					retrievedCallback.onException(new ContextClientInvocationException());
+				}
+			}
+		} else {
+			Log.e(LOG_TAG, "Note connected to Context Client service");
+			callback.onException(new ContextClientNotConnectedException());
+		}
 		return null;
 	}
 
@@ -264,23 +551,138 @@ public class ContextClientHelper implements ICtxClientHelper {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			Log.d(LOG_TAG, "Received action: " + intent.getAction());
-/*
+
 			if (intent.getAction().equals(ICtxClient.CREATE_ASSOCIATION)) {
 				if (null != ContextClientHelper.this.methodQueues[classMethods.createAssociation.ordinal()]) {
 					ICtxClientCallback retrievedCallback = ContextClientHelper.this.methodQueues[classMethods.createAssociation.ordinal()].poll();
 					if (null != retrievedCallback) {
 						final String exceptionMessage = intent.getStringExtra(ICtxClient.INTENT_EXCEPTION_VALUE_KEY);
 						if (exceptionMessage != null) {
-							retrievedCallback.onException(new )
+							retrievedCallback.onException(new ContextClientInvocationException(exceptionMessage));
 						}
-						if (intent.getIntExtra(ICtxClient.INTENT_RETURN_VALUE_KEY, ILLEGAL_VALUE) >= 0) {
-							retrievedCallback.onException(exception)returnException(intent.getIntExtra(ICtxClient.INTENT_EXCEPTION_VALUE_KEY, ILLEGAL_VALUE));
+						final CtxAssociationBean ctxAssociation;
+						final Parcelable pCtxAssociation = (Parcelable) intent.getParcelableExtra(ICtxClient.INTENT_RETURN_VALUE_KEY);
+						if (pCtxAssociation instanceof CtxAssociationBean) {
+							ctxAssociation = (CtxAssociationBean) pCtxAssociation;
 						} else {
-							retrievedCallback.returnAction(intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+							retrievedCallback.onException(new ContextClientInvocationException ("Unexpected return value type: " 
+						+ ((pCtxAssociation != null) ? pCtxAssociation.getClass() : "null")));
+							return;
 						}
+						
+						retrievedCallback.onCreatedAssociation(ctxAssociation);
+					} else {
+						Log.e(LOG_TAG, "Could not find callback for received action " + intent.getAction());
 					}
+				} else {
+					Log.e(LOG_TAG, "Could not find callback method queue for received action " + intent.getAction());
 				}
-			}*/
+			} else if (intent.getAction().equals(ICtxClient.CREATE_ATTRIBUTE)) {
+				if (null != ContextClientHelper.this.methodQueues[classMethods.createAttribute.ordinal()]) {
+					ICtxClientCallback retrievedCallback = ContextClientHelper.this.methodQueues[classMethods.createAttribute.ordinal()].poll();
+					if (null != retrievedCallback) {
+						final String exceptionMessage = intent.getStringExtra(ICtxClient.INTENT_EXCEPTION_VALUE_KEY);
+						if (exceptionMessage != null) {
+							retrievedCallback.onException(new ContextClientInvocationException(exceptionMessage));
+						}
+						final CtxAttributeBean ctxAttribute;
+						final Parcelable pCtxAttribute = (Parcelable) intent.getParcelableExtra(ICtxClient.INTENT_RETURN_VALUE_KEY);
+						if (pCtxAttribute instanceof CtxAttributeBean) {
+							ctxAttribute = (CtxAttributeBean) pCtxAttribute;
+						} else {
+							retrievedCallback.onException(new ContextClientInvocationException ("Unexpected return value type: " 
+						+ ((pCtxAttribute != null) ? pCtxAttribute.getClass() : "null")));
+							return;
+						}
+						
+						retrievedCallback.onCreatedAttribute(ctxAttribute);
+					} else {
+						Log.e(LOG_TAG, "Could not find callback for received action " + intent.getAction());
+					}
+				} else {
+					Log.e(LOG_TAG, "Could not find callback method queue for received action " + intent.getAction());
+				}
+			} else if (intent.getAction().equals(ICtxClient.CREATE_ENTITY)) {
+				if (null != ContextClientHelper.this.methodQueues[classMethods.createEntity.ordinal()]) {
+					ICtxClientCallback retrievedCallback = ContextClientHelper.this.methodQueues[classMethods.createEntity.ordinal()].poll();
+					if (null != retrievedCallback) {
+						final String exceptionMessage = intent.getStringExtra(ICtxClient.INTENT_EXCEPTION_VALUE_KEY);
+						if (exceptionMessage != null) {
+							retrievedCallback.onException(new ContextClientInvocationException(exceptionMessage));
+						}
+						final CtxEntityBean ctxEntity;
+						final Parcelable pCtxEntity = (Parcelable) intent.getParcelableExtra(ICtxClient.INTENT_RETURN_VALUE_KEY);
+						if (pCtxEntity instanceof CtxEntityBean) {
+							ctxEntity = (CtxEntityBean) pCtxEntity;
+						} else {
+							retrievedCallback.onException(new ContextClientInvocationException ("Unexpected return value type: " 
+						+ ((pCtxEntity != null) ? pCtxEntity.getClass() : "null")));
+							return;
+						}
+						
+						retrievedCallback.onCreatedEntity(ctxEntity);
+					} else {
+						Log.e(LOG_TAG, "Could not find callback for received action " + intent.getAction());
+					}
+				} else {
+					Log.e(LOG_TAG, "Could not find callback method queue for received action " + intent.getAction());
+				}
+			} else if (intent.getAction().equals(ICtxClient.LOOKUP)) {
+				if (null != ContextClientHelper.this.methodQueues[classMethods.lookup.ordinal()]) {
+					ICtxClientCallback retrievedCallback = ContextClientHelper.this.methodQueues[classMethods.lookup.ordinal()].poll();
+					if (null != retrievedCallback) {
+						final String exceptionMessage = intent.getStringExtra(ICtxClient.INTENT_EXCEPTION_VALUE_KEY);
+						if (exceptionMessage != null) {
+							retrievedCallback.onException(new ContextClientInvocationException(exceptionMessage));
+						}
+						final List<CtxIdentifierBean> ctxIdsList = null;
+						ArrayList<Parcelable> pCtxIdsList = new ArrayList<Parcelable>();
+						pCtxIdsList = intent.getParcelableArrayListExtra(ICtxClient.INTENT_RETURN_VALUE_KEY);
+						for (final Parcelable pCtxIdList : pCtxIdsList) {
+							if (pCtxIdList instanceof CtxIdentifierBean) {
+								ctxIdsList.add((CtxIdentifierBean) pCtxIdList);
+							} else { 
+								retrievedCallback.onException(new ContextClientInvocationException ("Unexpected return value type: " 
+							+ ((pCtxIdList != null) ? pCtxIdList.getClass() : "null")));
+								return;
+							}
+						}
+						
+						retrievedCallback.onLookupCallback(ctxIdsList);
+					} else {
+						Log.e(LOG_TAG, "Could not find callback for received action " + intent.getAction());
+					}
+				} else {
+					Log.e(LOG_TAG, "Could not find callback method queue for received action " + intent.getAction());
+				}				
+			} else if (intent.getAction().equals(ICtxClient.RETRIEVE)) {
+				if (null != ContextClientHelper.this.methodQueues[classMethods.retrieve.ordinal()]) {
+					ICtxClientCallback retrievedCallback = ContextClientHelper.this.methodQueues[classMethods.retrieve.ordinal()].poll();
+					if (null != retrievedCallback) {
+						final String exceptionMessage = intent.getStringExtra(ICtxClient.INTENT_EXCEPTION_VALUE_KEY);
+						if (exceptionMessage != null) {
+							retrievedCallback.onException(new ContextClientInvocationException(exceptionMessage));
+						}
+						final CtxModelObjectBean modelObject;
+						final Parcelable pModelObject = (Parcelable) intent.getParcelableExtra(ICtxClient.RETRIEVE);	
+						if (pModelObject instanceof CtxModelObjectBean) {
+								modelObject = (CtxModelObjectBean) pModelObject;
+						} else { 
+							retrievedCallback.onException(new ContextClientInvocationException ("Unexpected return value type: " 
+							+ ((pModelObject != null) ? pModelObject.getClass() : "null")));
+							return;
+						}
+						
+						retrievedCallback.onRetrieveCtx(modelObject);
+					
+					} else {
+						Log.e(LOG_TAG, "Could not find callback for received action " + intent.getAction());
+					}
+				} else {
+					Log.e(LOG_TAG, "Could not find callback method queue for received action " + intent.getAction());
+				}				
+			}
+		}
     }
 
     /**
@@ -291,7 +693,7 @@ public class ContextClientHelper implements ICtxClientHelper {
     private BroadcastReceiver setupBroadcastReceiver() {
         Log.d(LOG_TAG, "Set up broadcast receiver");
         
-        this.receiver = new EventsHelperReceiver();
+        this.receiver = new ContextClientHelperReceiver();
         this.context.registerReceiver(this.receiver, createIntentFilter());    
         Log.d(LOG_TAG, "Register broadcast receiver");
 
@@ -313,6 +715,17 @@ public class ContextClientHelper implements ICtxClientHelper {
     	//register broadcast receiver to receive SocietiesEvents return values 
         IntentFilter intentFilter = new IntentFilter();
         
+        Log.d(LOG_TAG, "intentFilter.addAction " + ICtxClient.CREATE_ASSOCIATION); 
+        intentFilter.addAction(ICtxClient.CREATE_ASSOCIATION);
+        Log.d(LOG_TAG, "intentFilter.addAction " + ICtxClient.CREATE_ATTRIBUTE); 
+        intentFilter.addAction(ICtxClient.CREATE_ATTRIBUTE);
+        Log.d(LOG_TAG, "intentFilter.addAction " + ICtxClient.CREATE_ENTITY); 
+        intentFilter.addAction(ICtxClient.CREATE_ENTITY);
+        Log.d(LOG_TAG, "intentFilter.addAction " + ICtxClient.LOOKUP);
+        intentFilter.addAction(ICtxClient.LOOKUP);
+        Log.d(LOG_TAG, "intentFilter.addAction " + ICtxClient.RETRIEVE);
+        intentFilter.addAction(ICtxClient.RETRIEVE);
+        
         return intentFilter;
     }
     /**
@@ -323,7 +736,7 @@ public class ContextClientHelper implements ICtxClientHelper {
     private void initialiseQueue(int index) {
     	if (null == this.methodQueues[index]) {
     		Log.d(LOG_TAG, "Create queue for index: " + index);
-    		this.methodQueues[index] = new ConcurrentLinkedQueue<IPlatformEventsCallback>();
+    		this.methodQueues[index] = new ConcurrentLinkedQueue<ICtxClientCallback>();
     	}
     }
 }

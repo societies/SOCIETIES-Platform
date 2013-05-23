@@ -22,10 +22,16 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.remote.helper;
+package org.societies.android.api.context;
 
 import org.societies.android.api.context.CtxException;
 
+/**
+ * Thrown to indicate that a Context Client service method could not be invoked.
+ * 
+ * @author <a href="mailto:pkosmidis@cn.ntua.gr">Pavlos Kosmides</a> (ICCS)
+ * @since 1.1
+ */
 public class ContextClientInvocationException extends CtxException {
 
 	private static final long serialVersionUID = 502019026651566882L;
