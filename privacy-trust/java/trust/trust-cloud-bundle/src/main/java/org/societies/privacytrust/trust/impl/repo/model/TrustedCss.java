@@ -38,6 +38,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Index;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
@@ -92,8 +93,9 @@ public class TrustedCss extends TrustedEntity implements ITrustedCss {
 	private final Set<ITrustedService> services = new HashSet<ITrustedService>();
 	
 	/** The similarity between the trustor and the trustee. */
+	@Index(name = "similarity_idx")
 	@Column(name = "similarity")
-	private Double similarity;
+	private Double similarity = 0.0d;
 
 	/* Empty constructor required by Hibernate */
 	private TrustedCss() {
@@ -184,5 +186,30 @@ public class TrustedCss extends TrustedEntity implements ITrustedCss {
 	public void setSimilarity(Double similarity) {
 		
 		this.similarity = similarity;
+	}
+	
+	/*
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		
+		final StringBuilder sb = new StringBuilder();
+		
+		sb.append("(");
+		sb.append("trustorId=" + super.getTrustorId());
+		sb.append(",");
+		sb.append("trusteeId=" + super.getTrusteeId());
+		sb.append(",");
+		sb.append("directTrust=" + super.getDirectTrust());
+		sb.append(",");
+		sb.append("indirectTrust=" + super.getIndirectTrust());
+		sb.append(",");
+		sb.append("userPerceivedTrust=" + super.getUserPerceivedTrust());
+		sb.append(",");
+		sb.append("similarity=" + this.similarity);
+		sb.append(")");
+		
+		return sb.toString();
 	}
 }
