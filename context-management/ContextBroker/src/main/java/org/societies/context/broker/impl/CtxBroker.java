@@ -585,8 +585,9 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 	@Override
     @Async
     public CtxEvaluationResults evaluateSimilarity(String[] ids,ArrayList<String> attrib) throws CtxException {
-        LOG.info("EBOYLANLOGFOOTPRINT CtxBroker.evaluateSimilarity() called");
+        
         CtxEvaluationResults result = internalCtxBroker.evaluateSimilarity(ids, attrib);
+        LOG.info("EBOYLANLOGFOOTPRINT CtxBroker.evaluateSimilarity() called");
         return result;
     }
 

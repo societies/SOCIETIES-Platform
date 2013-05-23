@@ -27,8 +27,9 @@ package org.societies.api.context.model;
 import java.util.HashMap;
 import java.util.Map;
 
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+//import org.societies.integration.test.bit.ctx_similarity_eval.Tester;
 
 
 public class CtxEvaluationResults {
@@ -41,6 +42,7 @@ public class CtxEvaluationResults {
 	public final String MEDIUM = "Medium association";  //   50 - 80%
 	public final String WEAK = "Weakly associated";     //   25 - 50%
 	public final String NONE = "Not associated";		//      < 25%
+	private static Logger LOG = LoggerFactory.getLogger(CtxEvaluationResults.class);
 	
 	public CtxEvaluationResults(){
 		this.result = true;
@@ -62,7 +64,7 @@ public class CtxEvaluationResults {
 	}
 	//
 	public Boolean getResult(){
-		//LOG.info("EBOYLANLOGFOOTPRINT ctxEvaluationResult.getResult called");
+		LOG.info("EBOYLANLOGFOOTPRINT ctxEvaluationResult.getResult called");
 		return this.result;
 	}
 	

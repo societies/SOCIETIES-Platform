@@ -48,12 +48,14 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.context.model.CtxEvaluationResults;
+import org.springframework.stereotype.Service;
 //import org.societies.context.similarity.api.similarity.CtxEvaluationResults;
 
 /**
  * @author eboylan
  *
  */
+@Service
 public class Tester {
 
 	private ICtxBroker ctxBroker;
@@ -130,6 +132,9 @@ public class Tester {
 
 			attrib.add("occupation");
 			LOG.info("EBOYLANLOGFOOTPRINT attrib tested = " + attrib.get(0).toString());
+			//LOG.info("EBOYLANLOGFOOTPRINT ID's: " + janeID.toString() + jackID.toString());
+			LOG.info("EBOYLANLOGFOOTPRINT ID's: " + janeID + jackID);
+			LOG.info("EBOYLANLOGFOOTPRINT broker: " + ctxBroker);
 			
 			//Future<List<Object>> areSimilar = (Future<List<Object>>) this.ctxBroker.evaluateSimilarity(ids, attrib);
 			LOG.info("EBOYLANLOGFOOTPRINT : Start estimating similarity ...");
@@ -137,11 +142,11 @@ public class Tester {
 			//assertEquals(areSimilar.toString(), "False");
 			//LOG.info("EBOYLANLOGFOOTPRINT aresimilar: " + areSimilar.toString());
 			
-			LOG.info("EBOYLANLOGFOOTPRINT : Start estimating similarity....");
+			//LOG.info("EBOYLANLOGFOOTPRINT : Start estimating similarity....");
 			//Boolean sim = (Boolean) this.ctxBroker.evaluateSimilarity(ctxAttrOccupationJack.getStringValue(), ctxAttrOccupationJane.getStringValue()).get();
 			//LOG.info("EBOYLANLOGFOOTPRINT" + sim.toString());
 			
-			//org.societies.api.internal.context.model.CtxEvaluationResults ie = (this.ctxBroker.evaluateSimilarity(ids, attrib));
+			CtxEvaluationResults ie = (this.ctxBroker.evaluateSimilarity(ids, attrib));
 			LOG.info("EBOYLANLOGFOOTPRINT : " + ie.getResult().toString());
 			assertFalse(ie.getResult());
 
@@ -158,7 +163,7 @@ public class Tester {
 			LOG.info("EBOYLANLOGFOOTPRINT Context Exception");
 			e.printStackTrace();
 		} catch (Exception e) {
-			LOG.info("EBOYLANLOGFOOTPRINT " + e.toString());
+			LOG.info("EBOYLANLOGFOOTPRINT Tester: " + e.toString());
 			e.printStackTrace();
 		}
 
@@ -186,7 +191,7 @@ public class Tester {
 
 			attrib.add("movies");
 			LOG.info("EBOYLANLOGFOOTPRINT jacks movie: " + ctxAttrMoviesJack.toString());
-			//CtxEvaluationResults ie = (CtxEvaluationResults) ( this.ctxBroker.evaluateSimilarity(ids, attrib));
+			CtxEvaluationResults ie = (CtxEvaluationResults) ( this.ctxBroker.evaluateSimilarity(ids, attrib));
 			LOG.info("EBOYLANLOGFOOTPRINT " + ie.getResult());
 			assertFalse(ie.getResult());
 			
