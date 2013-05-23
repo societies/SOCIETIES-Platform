@@ -59,6 +59,8 @@ public class TrustSimilarityEvaluator implements ITrustSimilarityEvaluator {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(TrustSimilarityEvaluator.class);
 	
+	private static final double COS_SIM_VALUE_SHIFT = -0.5d;
+	
 	@Autowired(required=true)
 	private ITrustRepository trustRepository;
 	
@@ -87,6 +89,10 @@ public class TrustSimilarityEvaluator implements ITrustSimilarityEvaluator {
 		if (!TrustedEntityType.CSS.equals(trusteeId.getEntityType()))
 			throw new IllegalArgumentException("trusteeId is not of type CSS");
 		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Evaluating cosine similarity between trustor '"
+					+ trustorId + "' and trustee '" + trusteeId + "'");
+		
 		// Self-comparison
 		if (trustorId.equals(trusteeId))
 			return 1.0d;
@@ -95,17 +101,17 @@ public class TrustSimilarityEvaluator implements ITrustSimilarityEvaluator {
 			// The trust relationships of the trustor
 			final Map<TrustedEntityId, Double> trustorRelationships =
 					this.retrieveTrustorRelationships(trustorId);
-			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("trustorRelationships: " + trustorRelationships);
+			if (LOG.isDebugEnabled())
+				LOG.debug("trustorRelationships: " + trustorRelationships);
 			if (trustorRelationships.isEmpty())
-				return null; // TODO or 0.0d ?
+				return 0.0d;
 			
 			// The trust relationships of the trustee in common with the trustor
 			final Map<TrustedEntityId, Double> commonRelationships =
 					this.retrieveCommonRelationships(trusteeId, 
 							trustorRelationships.keySet());
-			if (LOG.isInfoEnabled()) // TODO DEBUG
-				LOG.info("commonRelationships: " + commonRelationships);
+			if (LOG.isDebugEnabled())
+				LOG.debug("commonRelationships: " + commonRelationships);
 			if (commonRelationships.isEmpty())
 				return 0.0d;
 			
@@ -113,8 +119,8 @@ public class TrustSimilarityEvaluator implements ITrustSimilarityEvaluator {
 			final double[] trusteeValueVector = new double[commonRelationships.size()];
 			int i = 0;
 			for (final TrustedEntityId teid : commonRelationships.keySet()) {
-				trustorValueVector[i] = trustorRelationships.get(teid);
-				trusteeValueVector[i] = commonRelationships.get(teid);
+				trustorValueVector[i] = trustorRelationships.get(teid) + COS_SIM_VALUE_SHIFT;
+				trusteeValueVector[i] = commonRelationships.get(teid) + COS_SIM_VALUE_SHIFT;
 				i++;
 			}
 			return MathUtils.cos(trustorValueVector, trusteeValueVector);
