@@ -20,6 +20,10 @@ public class NotificationHistoryRepository implements INotificationHistoryReposi
         private List<NotificationHistoryItem> result;
         private boolean complete = false;
 
+        public RequestCallback() {
+            Log.i(LOG_TAG, "ctor()");
+        }
+
         @Override
         public List<String> getXMLNamespaces() {
             return NAMESPACES;
@@ -107,13 +111,11 @@ public class NotificationHistoryRepository implements INotificationHistoryReposi
     public static final int REQUEST_TIMEOUT = 10000;
 
     public static final List<String> ELEMENT_NAMES = Collections.unmodifiableList(
-            Arrays.asList("userFeedbackHistoryRequest", "requestCallback"));
+            Arrays.asList("userFeedbackHistoryRequest"));
     public static final List<String> NAMESPACES = Collections.unmodifiableList(
-            Arrays.asList("http://societies.org/api/schema/useragent/monitoring",
-                    "http://societies.org/api/schema/useragent/feedback"));
+            Arrays.asList("http://societies.org/api/schema/useragent/feedback"));
     public static final List<String> PACKAGES = Collections.unmodifiableList(
-            Arrays.asList("org.societies.api.schema.useragent.monitoring",
-                    "org.societies.api.schema.useragent.feedback"));
+            Arrays.asList("org.societies.api.schema.useragent.feedback"));
 
 
     private final ClientCommunicationMgr commsManager;
