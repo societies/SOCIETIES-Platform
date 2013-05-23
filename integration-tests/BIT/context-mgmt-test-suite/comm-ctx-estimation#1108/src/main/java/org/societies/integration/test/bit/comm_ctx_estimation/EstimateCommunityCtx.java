@@ -93,8 +93,13 @@ public class EstimateCommunityCtx {
 			assertEquals(temperatureUniversity.getType(), CtxAttributeTypes.TEMPERATURE);
 			LOG.info("university's temperature created : " + temperatureUniversity.getId());
 
-			
-			
+			CtxAttribute languagesEmma = updateStringAttr(this.cssIDEmma, CtxAttributeTypes.LANGUAGES, "English,German,Greek" );
+			assertEquals(languagesEmma.getType(), CtxAttributeTypes.LANGUAGES);
+			LOG.info("Emma's Languages created : " + languagesEmma.getId());
+
+			CtxAttribute languagesUniversity = updateStringAttr(this.cssIDUniversity, CtxAttributeTypes.LANGUAGES, "English,Spanish,French" );
+			assertEquals(languagesUniversity.getType(), CtxAttributeTypes.LANGUAGES);
+			LOG.info("university's Languages created : " + languagesUniversity.getId());
 			
 			// emma's interest (remote comm will be initiated)
 			LOG.info("emma's identity : " + this.cssIDEmma.toString());
@@ -128,7 +133,7 @@ public class EstimateCommunityCtx {
 			this.ctxBroker.createAttribute(communityEntity.getId(), CtxAttributeTypes.INTERESTS);
 			this.ctxBroker.createAttribute(communityEntity.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC);
 			this.ctxBroker.createAttribute(communityEntity.getId(), CtxAttributeTypes.TEMPERATURE);
-			
+			this.ctxBroker.createAttribute(communityEntity.getId(), CtxAttributeTypes.LANGUAGES);
 			
 			
 			
@@ -172,7 +177,7 @@ public class EstimateCommunityCtx {
 			fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.INTERESTS);
 			fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC);
 			fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.TEMPERATURE);
-			
+			fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.LANGUAGES);
 			// assertEquals("zoneA", locationSymbolicValue);
 
 		} catch (InvalidFormatException e) {

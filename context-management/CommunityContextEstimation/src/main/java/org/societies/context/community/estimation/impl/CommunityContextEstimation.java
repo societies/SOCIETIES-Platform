@@ -146,24 +146,46 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 		Map<String,List<CtxAttributeValueType>> possibleValueTypes = new HashMap<String,List<CtxAttributeValueType>>();
 
-		List<CtxAttributeValueType> valueTypes = new ArrayList<CtxAttributeValueType>();
-		valueTypes.add(CtxAttributeValueType.STRING);
-		valueTypes.add(CtxAttributeValueType.INTEGER);
-		valueTypes.add(CtxAttributeValueType.DOUBLE);
-		possibleValueTypes.put(CtxAttributeTypes.TEMPERATURE, valueTypes);
+		List<CtxAttributeValueType> valueTypesStringIntegerDouble = new ArrayList<CtxAttributeValueType>();
+		List<CtxAttributeValueType> valueTypesString = new ArrayList<CtxAttributeValueType>();
+		List<CtxAttributeValueType> valueTypesIntegerString = new ArrayList<CtxAttributeValueType>();
+		
+		valueTypesStringIntegerDouble.add(CtxAttributeValueType.STRING);
+		valueTypesStringIntegerDouble.add(CtxAttributeValueType.INTEGER);
+		valueTypesStringIntegerDouble.add(CtxAttributeValueType.DOUBLE);
+		
+		valueTypesString.add(CtxAttributeValueType.STRING);
+		
+		valueTypesIntegerString.add(CtxAttributeValueType.INTEGER);
+		valueTypesIntegerString.add(CtxAttributeValueType.STRING);
+		
+		
+		possibleValueTypes.put(CtxAttributeTypes.TEMPERATURE, valueTypesStringIntegerDouble);
+		possibleValueTypes.put(CtxAttributeTypes.INTERESTS, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.AGE, valueTypesStringIntegerDouble);
+		possibleValueTypes.put(CtxAttributeTypes.LANGUAGES, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.LOCATION_COORDINATES, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.OCCUPATION, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.LOCATION_SYMBOLIC, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.BOOKS, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.FAVOURITE_QUOTES, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.MOVIES, valueTypesString);
 
 		// TODO add all data types and values
 		// resolve issue with different value types for the same attribute type e.g. hot vs 32C
 
 		Set<String> attributeTypesSet = new HashSet<String>();
+		
 		attributeTypesSet.add(CtxAttributeTypes.TEMPERATURE);
-
+		attributeTypesSet.add(CtxAttributeTypes.INTERESTS);
+		attributeTypesSet.add(CtxAttributeTypes.AGE);
+		attributeTypesSet.add(CtxAttributeTypes.LANGUAGES);
+		attributeTypesSet.add(CtxAttributeTypes.LOCATION_COORDINATES);
+		attributeTypesSet.add(CtxAttributeTypes.OCCUPATION);
+		attributeTypesSet.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
 		attributeTypesSet.add(CtxAttributeTypes.BOOKS);
 		attributeTypesSet.add(CtxAttributeTypes.FAVOURITE_QUOTES);
-		attributeTypesSet.add(CtxAttributeTypes.INTERESTS);
 		attributeTypesSet.add(CtxAttributeTypes.MOVIES);
-		attributeTypesSet.add(CtxAttributeTypes.LANGUAGES);
-		attributeTypesSet.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
 		
 		CtxAttributeComplexValue complexValue = new CtxAttributeComplexValue();
 
@@ -205,19 +227,35 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 				// Integer values
 				// average, median, 
 				if( !integerAttrValues.isEmpty()){
-					LOG.info("estimateCommunityCtx 4 integer" );
+					LOG.info("estimateCommunityCtx 4for integer" );
 					//average
 					meanIntegerValue = cceNumMean(integerAttrValues);	
 					complexValue.setAverage(meanIntegerValue);
+					LOG.info("Mean Integer Value is :"+meanIntegerValue);
 					// pairs
+					LOG.info("Calculating Pairs2");
 					HashMap<String,Integer> pairs = new HashMap<String,Integer>();
 					pairs = cceStringPairs(stringAttrValues);
+					LOG.info("PAIRS are :"+pairs.get(0));
 					complexValue.setPairs(pairs);
 					//range 
+					LOG.info("Calculating Range ");
 					Integer [] range = cceNumRange(integerAttrValues);
-					complexValue.setRangeMax(range[0]);
-					complexValue.setRangeMin(range[1]);
+					complexValue.setRangeMax(range[1]);
+					complexValue.setRangeMin(range[0]);
 					LOG.info("estimateCommunityCtx 4 integer finished ");
+					//mode
+									
+					//median
+					LOG.info("Calculating Mesian");
+					Double medianNumber = cceNumMedian(integerAttrValues);
+					LOG.info("The meeeeeeeeeedian is "+medianNumber);
+					complexValue.setMedian(medianNumber);
+					LOG.info("estimateCommunityCtx 4 integer finished ");
+					//TODO add mode
+					LOG.info("Calculating Mode");
+					//ArrayList<Integer> modeNumber = cceNumMode(integerAttrValues);
+					//complexValue.s
 					//mode
 					//TODO add mode
 					
