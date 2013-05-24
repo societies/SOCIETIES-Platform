@@ -52,6 +52,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSPreferenceDetailsBean;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
@@ -88,6 +89,7 @@ public class TestIDSPreferences {
 	private IPrivacyDataManagerInternal privacyDataManagerInternal = Mockito.mock(IPrivacyDataManagerInternal.class);
 	private ITrustBroker trustBroker = Mockito.mock(ITrustBroker.class);
 	private IUserFeedback userFeedback = Mockito.mock(IUserFeedback.class);
+	private IEventMgr eventMgr = Mockito.mock(IEventMgr.class);
 	private ArrayList<Action> actions;
 	private ArrayList<Condition> conditions;
 	private IDSPrivacyPreferenceTreeModel idsModel;
@@ -111,7 +113,7 @@ public class TestIDSPreferences {
 		this.privPrefMgr.setprivacyDataManagerInternal(privacyDataManagerInternal);
 		this.privPrefMgr.setTrustBroker(trustBroker);
 		this.privPrefMgr.setUserFeedback(userFeedback);
-		
+		this.privPrefMgr.setEventMgr(eventMgr);
 		
 		
 		this.setupRequestor();

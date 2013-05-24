@@ -179,7 +179,7 @@ public class NegotiationClient implements INegotiationClient {
 		ClientResponsePolicyGenerator policyGen = new ClientResponsePolicyGenerator(
 				this.policyMgr);
 		ResponsePolicy responsePolicyGenerated = policyGen.generatePolicy(details, policy);
-		ResponsePolicy responsePolicyUserAproved = policyGen.generatePolicyUserAproved(details, responsePolicyGenerated);
+		ResponsePolicy responsePolicyUserAproved = policyGen.generatePolicyUserApproved(details, responsePolicyGenerated);
 		this.logging.debug("############## Provided ResponsePolicy" + ResponsePolicyUtils.toString(responsePolicyUserAproved));
 		this.myPolicies.put(responsePolicyUserAproved.getRequestor(), responsePolicyGenerated);
 		this.logging
