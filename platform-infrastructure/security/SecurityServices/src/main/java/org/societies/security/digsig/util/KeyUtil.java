@@ -105,6 +105,12 @@ public class KeyUtil {
 //		return keyStr;
 //	}
 	
+	/**
+	 * Serialize X.509 certificate to String
+	 *
+	 * @param cert The certificate to convert to String
+	 * @return Serialized certificate
+	 */
 	public static String cert2str(X509Certificate cert) throws DigsigException {
 		
 		byte[] certBytes;

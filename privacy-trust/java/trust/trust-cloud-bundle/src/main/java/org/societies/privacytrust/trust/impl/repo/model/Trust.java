@@ -44,15 +44,15 @@ public abstract class Trust implements ITrust {
 	private static final long serialVersionUID = 3965922195661451444L;
 	
 	@Column(name = "value")
-	private Double value;
+	protected Double value;
 	
 	@Column(name = "last_modified")
 	@Type(type = "org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType")
-	private Date lastModified;
+	protected Date lastModified;
 	
 	@Column(name = "last_updated")
 	@Type(type = "org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType")
-	private Date lastUpdated;
+	protected Date lastUpdated;
 
 	/*
 	 * @see org.societies.privacytrust.trust.api.model.ITrust#getValue()
@@ -150,13 +150,13 @@ public abstract class Trust implements ITrust {
 	public String toString() {
 		
 		final StringBuilder sb = new StringBuilder();
-		sb.append("[");
+		sb.append("<");
 		sb.append("value=" + this.value);
 		sb.append(",");
 		sb.append("lastModified=" + this.lastModified);
 		sb.append(",");
 		sb.append("lastUpdated=" + this.lastUpdated);
-		sb.append("]");
+		sb.append(">");
 		
 		return sb.toString();
 	}

@@ -26,31 +26,54 @@ package org.societies.api.cis.orchestration;
 
 import java.util.List;
 
-import org.societies.api.cis.orchestration.model.DataParameters;
+import org.societies.api.cis.orchestration.model.IFilter;
 import org.societies.api.identity.IIdentity;
-import org.societies.utilities.annotations.SocietiesExternalInterface;
-import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 
 /**
- * 
  *
- * @author Eliza
+ * Interface for Community Recommendation Manager
+ *
+ * @author Chris Lima
  *
  */
-@SocietiesExternalInterface(type = SocietiesInterfaceType.PROVIDED)
 public interface ICommunityRecommendationManager {
 
 	/**
-	 * This method provides functionality that allows a 3p or platform service to retrieve
-	 *   a list of CSSs that have a number of parameters in common. These parameters are 
-	 *   context information such as location, occupation, DoB, homeTown, age, interests, 
-	 *   hobbies etc. See org.societies.api.context.model.CtxAttributeTypes for a list of 
-	 *   known parameter types.   
-	 * @param parameters	the parameters and scope for searching for relevant CSSs
-	 * @return				the list of relevant CSSs in IIdentity format.
+	 * 
+	 * Default is 10 results
+	 * 
+	 * @param limit Maximum results to return
 	 */
-	public List<IIdentity> getRelevantCSSs(DataParameters parameters);
-	
-	
-	
+	public abstract void setLimit(int limit);
+
+	/**
+	 * @return the limit
+	 */
+	public abstract int getLimit();
+
+	/**
+	 * 
+	 * Return a list of CIS advertisements sorted by relevance. CisAdvertisementRecord enables to retrieve CIS information.
+	 * 
+	 * @param limit Maximum results to return. Default value if null is 10.
+	 * @param primaryfilter An array of filters. The primary filter is applied for exact results. All the filters must match.
+	 * @param secondaryfilter An array of filters. The secondary filter is applied for extended results. 
+	 * @return list of CIS advertisements sorted by relevance
+	 */
+	public abstract List<CisAdvertisementRecord> getCISAdvResults(int limit,
+			IFilter[] primaryfilter, IFilter[] secondaryfilter);
+
+	/**
+	 * 
+	 * Return a list of CIS identities sorted by relevance. The IIdentiy list can be used to retrieve more info from the Context Broker
+	 * 
+	 * @param limit Maximum results to return. Default value if null is 10.
+	 * @param primaryfilter An array of filters. The primary filter is applied when you want an exact result
+	 * @param secondaryfilter An array of filters. The secondary filter is when not all parameters provide a match
+	 * @return list of CIS advertisements sorted by relevance
+	 */
+	public abstract List<IIdentity> getResults(int limit,
+			IFilter[] primaryfilter, IFilter[] secondaryfilter);
+
 }

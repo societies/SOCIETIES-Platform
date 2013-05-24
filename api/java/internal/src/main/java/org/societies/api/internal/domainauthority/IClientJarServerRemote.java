@@ -85,8 +85,9 @@ public interface IClientJarServerRemote {
 	 * @param toIdentity The identity of the server
 	 * @param serviceId The ID of the service
 	 * @param provider The service provider
-	 * @param providerPublicKey Base64 encoded public key associated with the provider identity,
-	 * as returned by {@link ISignatureMgr#key2str(java.security.Key)}
+	 * @param providerCertificate Base64 encoded X.509 certificate associated with the provider identity,
+	 * as returned by {@link ISignatureMgr#cert2str(java.security.cert.X509Certificate)}.
+	 * Only the public key is needed in the certificate, no need to include the private key.
 	 * @param signature Digital signature of <b>serviceId</b> and <b>files</b> parameters,
 	 * created with provider's private key
 	 * @param files List of files to be shared. All the files are associated to the given
@@ -94,6 +95,6 @@ public interface IClientJarServerRemote {
 	 * @param callback the callback to receive the result of this asynchronous method
 	 */
 	public void shareFiles(IIdentity toIdentity, URI serviceId, IIdentity provider,
-			String providerPublicKey, String signature,
+			String providerCertificate, String signature,
 			List<String> files,	IClientJarServerCallback callback);
 }

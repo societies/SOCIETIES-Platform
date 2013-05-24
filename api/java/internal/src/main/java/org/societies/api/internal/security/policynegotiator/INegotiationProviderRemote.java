@@ -40,7 +40,7 @@ import org.societies.api.internal.schema.security.policynegotiator.NegotiationTy
 public interface INegotiationProviderRemote {
 
 	/**
-	 * See {@link INegotiationProvider#getPolicyOptions(String)}
+	 * See {@link INegotiationProvider#getPolicyOptions(String, NegotiationType)}
 	 */
 	public void getPolicyOptions(String serviceId, NegotiationType type, Requestor provider, INegotiationProviderCallback callback);
 

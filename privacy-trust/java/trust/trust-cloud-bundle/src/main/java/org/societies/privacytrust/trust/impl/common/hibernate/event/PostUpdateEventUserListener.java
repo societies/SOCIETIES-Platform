@@ -68,7 +68,8 @@ public class PostUpdateEventUserListener implements PostUpdateEventListener {
 
 	PostUpdateEventUserListener() {
 		
-		LOG.info(this.getClass() + " instantiated");
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
 	}
 	
 	/*
@@ -82,31 +83,37 @@ public class PostUpdateEventUserListener implements PostUpdateEventListener {
 			final String[] propNames = event.getPersister().getPropertyNames();
 			
 			// iterate over property names, extract corresponding property values
-	        for (int i = 0; i < propNames.length; i++) {
+	        for (int i = 0; i < propNames.length; ++i) {
 	 
 	            final String propName = propNames[i];
 	            if (!TRUST_PROPERTY_MAP.containsKey(propName))
 	            	continue;
 	            
-	            final Trust oldValue = (Trust) event.getOldState()[i];
-	            final Trust newValue = (Trust) event.getState()[i];
-	            if (areDifferent(oldValue, newValue)) {
+	            final Trust oldTrust = (Trust) event.getOldState()[i];
+	            final Trust newTrust = (Trust) event.getState()[i];
+	            if (areDifferent(oldTrust, newTrust)) {
 	            	if (LOG.isDebugEnabled())
-	            		LOG.debug("Old trust: " + oldValue + ", New trust: " + newValue);
+	            		LOG.debug(propName + ": Old trust=" + oldTrust + ", New trust=" + newTrust);
 	            	final TrustedEntity entity = (TrustedEntity) event.getEntity();
 	            	final TrustedEntityId trustorId = entity.getTrustorId();
 	            	final TrustedEntityId trusteeId = entity.getTrusteeId();
 	            	final TrustValueType trustValueType = TRUST_PROPERTY_MAP.get(propName);
-	            	final Double newTrustValue = (newValue != null) 
-	            			? (newValue).getValue() : null;
+	            	final Double newTrustValue = (newTrust != null) 
+	            			? (newTrust).getValue() : null;
+	            	if (newTrustValue == null)  {
+	            		if (LOG.isDebugEnabled())
+	            			LOG.debug("Skipping TrustUpdateEvent: New "
+	            					+ propName + " value is null");
+	            		continue;
+	            	}
 	            	final Date timestamp;
 	            	if (TrustValueType.DIRECT == trustValueType)
 	            		timestamp = entity.getDirectTrust().getLastUpdated();
 	            	else if (TrustValueType.INDIRECT == trustValueType)
 	            		timestamp = entity.getIndirectTrust().getLastUpdated();
 	            	else // if (TrustValueType.USER_PERCEIVED == trustValueType)
-	            		timestamp = entity.getUserPerceivedTrust().getLastUpdated();		
-	            			
+	            		timestamp = entity.getUserPerceivedTrust().getLastUpdated();
+	            	
 	            	final TrustUpdateEvent trustUpdateEvent = new TrustUpdateEvent(
 	            			new TrustRelationship(trustorId, trusteeId, 
 	            					trustValueType, newTrustValue, timestamp));
@@ -127,18 +134,6 @@ public class PostUpdateEventUserListener implements PostUpdateEventListener {
 		if (x == null || y == null)
 			return true;
 
-		/*if (x.getLastModified() == null) {
-			if (y.getLastModified() != null)
-				return true;
-		} else if (!new Date(1000 * (x.getLastModified().getTime()/1000)).equals(
-				new Date(1000 * (y.getLastModified().getTime()/1000))))
-			return true;
-		if (x.getLastUpdated() == null) {
-			if (y.getLastUpdated() != null)
-				return true;
-		} else if (!new Date(1000 * (x.getLastUpdated().getTime()/1000)).equals(
-				new Date(1000 * (y.getLastUpdated().getTime()/1000))))
-			return true;*/
 		if (x.getValue() == null) {
 			if (y.getValue() != null)
 				return true;
