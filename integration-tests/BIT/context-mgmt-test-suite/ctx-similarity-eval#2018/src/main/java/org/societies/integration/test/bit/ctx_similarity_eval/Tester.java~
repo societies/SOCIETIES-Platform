@@ -138,7 +138,13 @@ public class Tester {
 			
 			//Future<List<Object>> areSimilar = (Future<List<Object>>) this.ctxBroker.evaluateSimilarity(ids, attrib);
 			LOG.info("EBOYLANLOGFOOTPRINT : Start estimating similarity ...");
+			//LOG.info("EBOYLANLOGFOOTPRINT occupation jack:"+  ctxAttrOccupationJack.getStringValue() +"occupation jane:"+ ctxAttrOccupationJane.getStringValue()+" are similar:"+ areSimilar);
+			//assertEquals(areSimilar.toString(), "False");
+			//LOG.info("EBOYLANLOGFOOTPRINT aresimilar: " + areSimilar.toString());
 			
+			//LOG.info("EBOYLANLOGFOOTPRINT : Start estimating similarity....");
+			//Boolean sim = (Boolean) this.ctxBroker.evaluateSimilarity(ctxAttrOccupationJack.getStringValue(), ctxAttrOccupationJane.getStringValue()).get();
+			//LOG.info("EBOYLANLOGFOOTPRINT" + sim.toString());
 			
 			CtxEvaluationResults ie = (this.ctxBroker.evaluateSimilarity(ids, attrib));
 			LOG.info("EBOYLANLOGFOOTPRINT : " + ie.getResult().toString());
