@@ -148,7 +148,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			try {
 				TransProbCalculator transProb = new TransProbCalculator();
 				LinkedHashMap<List<String>, HashMap<String, Double>> trans2ProbDictionary = transProb.calcTrans2Prob(dictionary.get(2));
-				LinkedHashMap<List<String>,HashMap<String,Double>> trans3ProbDictionary = transProb.calcTrans3Prob(dictionary.get(3));
+				//LinkedHashMap<List<String>,HashMap<String,Double>> trans3ProbDictionary = transProb.calcTrans3Prob(dictionary.get(3));
 				
 				//LOG.info("6. Generate UserIntentModelData");
 				ConstructUIModel cmodel = new ConstructUIModel(cauiTaskManager,ctxBroker); 
