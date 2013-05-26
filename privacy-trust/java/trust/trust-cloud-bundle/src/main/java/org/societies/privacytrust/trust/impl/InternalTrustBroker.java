@@ -710,7 +710,7 @@ public class InternalTrustBroker implements ITrustBroker {
 							requestor, trustorId, trustValueType, callback);
 				else
 					this.trustBrokerRemoteClient.retrieveTrustRelationships(
-							requestor, trustorId, trusteeType, trustValueType, callback);
+							requestor, trustorId, callback);
 				synchronized (callback) {
 					try {
 						callback.wait();
