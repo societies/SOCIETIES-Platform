@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.swing.JOptionPane;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifier;
@@ -91,7 +93,7 @@ public class PreferenceEvaluator {
 			
 			
 			temp.put(p.getOutcome(), ctxIds);
-			//JOptionPane.showMessageDiathis.logging.debug(null, "Evaluation: returning outcome: "+p.getOutcome().toString());
+			////JOptionPane.showMessageDiathis.logging.debug(null, "Evaluation: returning outcome: "+p.getOutcome().toString());
 			return temp;
 		}else{
 			return new Hashtable<IPrivacyOutcome,List<CtxIdentifier>>();
@@ -104,11 +106,13 @@ public class PreferenceEvaluator {
 		//a non-context aware preference
 		if (ptn.isLeaf()){
 			this.logging.debug("preference is not context-dependent. returning IAction object"+ptn.getOutcome().toString());
+			//JOptionPane.showMessageDialog(null, "preference is not context-dependent. returning IAction object"+ptn.getOutcome().toString());
 			return ptn;
 		}
 		//if the root object is null then the tree is split so we have to evaluate more than one tree
 		if (ptn.getUserObject()==null){
 			this.logging.debug("preference tree is split. we might have a conflict");
+			//JOptionPane.showMessageDialog(null, "preference tree is split. we might have a conflict");
 			Enumeration<IPrivacyPreference> e = ptn.children();
 			ArrayList<IPrivacyPreference> prefList = new ArrayList<IPrivacyPreference>(); 
 			while (e.hasMoreElements()){
@@ -122,17 +126,21 @@ public class PreferenceEvaluator {
 			//if only one IOutcome is applicable with the current context return that
 			if (prefList.size()==1){
 				this.logging.debug("PrefEvaluator> Returning: "+ prefList.get(0).toString());
+				//JOptionPane.showMessageDialog(null, "split: PrefEvaluator> Returning: "+ prefList.get(0).toString());
 				return prefList.get(0);
 			}
 			//if no IOutcome is applicable, return a null object
 			else if (prefList.size()==0){
+				
 				this.logging.debug("PrefEvaluator> No preference applicable");
+				//JOptionPane.showMessageDialog(null, "split: PrefEvaluator> No preference applicable");
 				return null;
 			}
 			//if more than one IOutcome objs is applicable, use conflict resolution and return the most applicable
 			else{
 				ConflictResolver cr = new ConflictResolver();
 				IPrivacyPreference io = cr.resolveConflicts(prefList);
+				//JOptionPane.showMessageDialog(null, "split PrefEvaluator> Returning: "+io.toString());
 				this.logging.debug("PrefEvaluator> Returning: "+io.toString());
 				return io;
 			}
@@ -140,14 +148,16 @@ public class PreferenceEvaluator {
 		//if the root node is not empty
 		else{
 			this.logging.debug("preference tree is not split. no conflicts here");
+			//JOptionPane.showMessageDialog(null, "preference tree is not split. no conflicts here");
 			//and it's a condition
 			if (ptn.isBranch()){
 				//evaluate the condition
 				IPrivacyPreferenceCondition con = ptn.getCondition();
 				try {
 					if (evaluatesToTrue(con)){
-						//JOptionPane.showMessageDiathis.logging.debug(null, con.toString()+" evaluated to true");
+						////JOptionPane.showMessageDiathis.logging.debug(null, con.toString()+" evaluated to true");
 						this.logging.debug(con.toString()+" is true - descending tree levels");
+						//JOptionPane.showMessageDialog(null, con.toString()+" is true - descending tree levels");
 						//traverse the tree in preorder traversal to evaluate all the conditions under this branch and find an Action 
 						Enumeration<IPrivacyPreference> e = ptn.children();
 						while (e.hasMoreElements()){
@@ -158,8 +168,9 @@ public class PreferenceEvaluator {
 							}
 						}		
 					}else{
-						//JOptionPane.showMessageDiathis.logging.debug(null, con.toString()+" evaluated to false");
+						////JOptionPane.showMessageDiathis.logging.debug(null, con.toString()+" evaluated to false");
 						this.logging.debug(con.toString()+" is false - returning");
+						//JOptionPane.showMessageDialog(null, con.toString()+" is false - returning");
 					}
 				} catch (PrivacyException e) {
 					// TODO Auto-generated catch block
@@ -167,6 +178,7 @@ public class PreferenceEvaluator {
 				}
 			}//and it's not a condition but an Outcome (i.e. not a branch but a leaf)
 			else{
+				//JOptionPane.showMessageDialog(null, "PrefEvaluator> Returning: "+ptn.getOutcome());
 				this.logging.debug("PrefEvaluator> Returning: "+ptn.getOutcome());
 				return ptn;
 			}

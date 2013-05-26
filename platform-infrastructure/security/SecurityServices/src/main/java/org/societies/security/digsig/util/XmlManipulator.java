@@ -174,7 +174,7 @@ public class XmlManipulator {
 	 * Gets the String content of the element at the specified XPath
 	 * 
 	 * @param strXPath
-	 * @return
+	 * @return content of the specified XML element
 	 */
 	public String getElementContent(Node start, String strXPath) {
 		XPathExpression exp = getExpression(strXPath);

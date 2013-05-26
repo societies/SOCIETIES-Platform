@@ -170,7 +170,7 @@ public class DataTransmissionLogEntry {
 	/**
 	 * Set correlation with all data access events
 	 * 
-	 * @param correlationWithDataAccess Correlation with all data access events
+	 * @param correlation Correlation with all data access events
 	 */
 	public void setCorrelationWithDataAccess(double correlation) {
 		
@@ -194,7 +194,7 @@ public class DataTransmissionLogEntry {
 	/**
 	 * Set correlation with those data access events where the sender ID has accessed the data.
 	 * 
-	 * @param correlationWithDataAccess Correlation with all data access events
+	 * @param correlation Correlation with all data access events
 	 */
 	public void setCorrelationWithDataAccessBySender(double correlation) {
 		
@@ -218,7 +218,7 @@ public class DataTransmissionLogEntry {
 	/**
 	 * Set correlation with those data access events where the sender class has accessed the data
 	 * 
-	 * @param correlationWithDataAccess Correlation with all data access events
+	 * @param correlation Correlation with all data access events
 	 */
 	public void setCorrelationWithDataAccessBySenderClass(double correlation) {
 		

@@ -66,8 +66,6 @@ public class Assessment implements IAssessment {
 	private Date resultsStart;
 	private Date resultsEnd;
 	
-	private int autoPeriod = -1;
-	
 	public Assessment() {
 		LOG.info("Constructor");
 	}
@@ -87,17 +85,6 @@ public class Assessment implements IAssessment {
 		dataTransferAnalyzer = new DataTransferAnalyzer(privacyLog);
 		dataAccessAnalyzer = new DataAccessAnalyzer(privacyLog.getDataAccess());
 		assessAllNow(null, null);
-	}
-	
-	@Override
-	public int getAutoPeriod() {
-		return autoPeriod;
-	}
-	
-	@Override
-	public void setAutoPeriod(int seconds) {
-		LOG.info("setAutoPeriod({})", seconds);
-		this.autoPeriod = seconds;
 	}
 	
 	@Override

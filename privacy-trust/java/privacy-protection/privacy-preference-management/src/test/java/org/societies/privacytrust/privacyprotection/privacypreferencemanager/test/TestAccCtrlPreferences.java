@@ -73,6 +73,7 @@ import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
@@ -123,6 +124,7 @@ public class TestAccCtrlPreferences {
 	private ITrustBroker trustBroker = Mockito.mock(ITrustBroker.class);
 	private IUserFeedback userFeedback = Mockito.mock(IUserFeedback.class);
 	private IPrivacyAgreementManager agreementMgr = Mockito.mock(IPrivacyAgreementManager.class);
+	private IEventMgr eventManager = Mockito.mock(IEventMgr.class);
 	private PrivacyPreferenceManager privPrefMgr;
 	private Resource resourceWithID;
 	private List<Action> actions;
@@ -157,7 +159,7 @@ public class TestAccCtrlPreferences {
 		this.privPrefMgr.setTrustBroker(trustBroker);
 		this.privPrefMgr.setUserFeedback(userFeedback);
 		this.privPrefMgr.setAgreementMgr(agreementMgr);
-		
+		this.privPrefMgr.setEventMgr(eventManager);
 		this.setupRequestor();
 		this.setupContext();
 		this.setupPolicyDetails();

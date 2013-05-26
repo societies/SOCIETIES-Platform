@@ -27,6 +27,7 @@ package org.societies.orchestration.cpa.test;
 
 import org.hibernate.SessionFactory;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,10 +46,12 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.orchestration.ICisDataCollector;
 import org.societies.orchestration.cpa.impl.CPA;
+import org.societies.orchestration.cpa.test.util.SentenceExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -75,6 +78,7 @@ public class CPAMockTester {
     private ActivityFeedManager activityFeedManagerUnderTest;
     private IActivityFeedManager iActivityFeedManagerUnderTest;
     private static CPA cpa  = null;
+    private Thread thread = null;
 
     @Autowired
     private SessionFactory sessionFactory;
@@ -87,6 +91,22 @@ public class CPAMockTester {
         cpa = new CPA(mockCollector,CIS_ID);
         when(mockCollector.subscribe(CIS_ID,cpa)).thenReturn(new ArrayList());
 
+
+
+    }
+
+    public void startThread(){
+        thread = new Thread(cpa);
+        thread.start();
+    }
+    public void stopThread(){
+        thread = null;
+    }
+
+
+    @Before
+    public void beforeTest(){
+        cpa.init();
     }
 
     @AfterClass
@@ -170,8 +190,6 @@ public class CPAMockTester {
 
         ArrayList list = new ArrayList();
 
-        Thread t = new Thread(cpa);
-        t.start();
         makeActs();
         list.addAll(Arrays.asList(a1, a2, a3, a4, pa1, pa2, pa3, pa4)) ;
         cpa.receiveNewData(list);
@@ -184,5 +202,47 @@ public class CPAMockTester {
         List<String> trends = cpa.getTrends(2);
         for(String trend : trends)
             LOG.info("trend: "+trend);
+    }
+
+    @Test
+    public void reutersTest(){
+        SentenceExtractor extractor = null;
+        ArrayList list = new ArrayList();
+        try {
+            extractor = new SentenceExtractor(CISSimulator.class.getClassLoader().getResource("reuters21578content.txt").toURI());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        //String sentence = extractor.getSentences(20,1)[0];
+        String tmpSentence = "";
+        int maxMsgs = 100;
+        int msgCounter = 0;
+        while(msgCounter++<maxMsgs){
+            tmpSentence = extractor.getSentences(msgCounter,1)[0];
+            if(tmpSentence.length()>254)
+                tmpSentence = tmpSentence.substring(0,253);
+            LOG.info("inserting setence: \""+tmpSentence+"\"");
+            list.add(makeMessage("from","two",tmpSentence,"0"));
+
+        }
+        cpa.receiveNewData(list);
+        this.startThread();
+        LOG.info("inserted acts ("+list.size()+") into cpa object, sleeping " + sleepTime + " ms while cpa thinks..");
+        try {
+            Thread.sleep(sleepTime);
+        } catch (InterruptedException e) {
+        }
+        List<String> trends = cpa.getTrends(2);
+        for(String trend : trends)
+            LOG.info("trend: "+trend);
+    }
+
+    public static Activity makeMessage(String user1, String user2, String message, String published){
+        Activity ret = new Activity();
+        ret.setActor(user1);
+        ret.setObject(message);
+        ret.setTarget(user2);
+        ret.setPublished(published);
+        return ret;
     }
 }

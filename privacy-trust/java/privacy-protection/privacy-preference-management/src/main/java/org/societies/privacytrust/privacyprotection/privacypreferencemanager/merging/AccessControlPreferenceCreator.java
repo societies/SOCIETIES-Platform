@@ -30,6 +30,8 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.JOptionPane;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxIdentifier;
@@ -85,7 +87,9 @@ public class AccessControlPreferenceCreator extends EventListener{
 	private IIdentityManager idMgr;
 	private final AccessControlPreferenceManager accCtrlPrefMgr;
 	private PrivacyPreferenceManager ppMgr;
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
 
+	
 	public AccessControlPreferenceCreator(PrivacyPreferenceManager ppMgr){
 		this.ppMgr = ppMgr;
 		this.eventMgr = ppMgr.getEventMgr();
@@ -121,7 +125,7 @@ public class AccessControlPreferenceCreator extends EventListener{
 				if (item.getRequestItem().getResource().getScheme().equals(DataIdentifierScheme.CONTEXT)){
 					try {
 						if (ctxBroker==null){
-							JOptionPane.showMessageDialog(null, "broker null");
+							this.logging.debug("broker null");
 						}
 						List<CtxIdentifier> ctxIDList = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, dataType).get();
 						if (ctxIDList.size()==0){
