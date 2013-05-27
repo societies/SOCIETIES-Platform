@@ -60,4 +60,24 @@ public class IndirectTrust extends Trust implements IIndirectTrust {
 	
 		this.confidence = confidence;
 	}
+	
+	/*
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append("<");
+		sb.append("value=" + super.value);
+		sb.append(",");
+		sb.append("lastModified=" + super.lastModified);
+		sb.append(",");
+		sb.append("lastUpdated=" + super.lastUpdated);
+		sb.append(",");
+		sb.append("confidence=" + this.confidence);
+		sb.append(">");
+		
+		return sb.toString();
+	}
 }

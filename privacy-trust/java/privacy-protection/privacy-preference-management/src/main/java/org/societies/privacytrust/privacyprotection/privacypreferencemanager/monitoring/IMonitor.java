@@ -22,63 +22,17 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.security.digsig;
+package org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring;
+
+import org.societies.api.context.event.CtxChangeEvent;
 
 /**
- * Exception that may get thrown from methods that use digital signatures.
- *
- * @author Mitja Vardjan
+ * @author Eliza
  *
  */
-public class DigsigException extends Exception {
+public interface IMonitor {
 
-	/**
-	 *  The Constant serialVersionUID
-	 */
-	private static final long serialVersionUID = -2334307465917723771L;
-
-	/**
-	 * Instantiates a new exception.
-	 */
-	public DigsigException() {
-		super();
-	}
-
-	/**
-	 * Instantiates a new exception.
-	 * 
-	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
-	 */
-	public DigsigException(String msg) {
-		super(msg);
-	}
+	public void onModification(CtxChangeEvent event);
 	
-	/**
-	 * Instantiates a new exception.
-	 * 
-	 * @param e The cause to be stored for later retrieval by {@link Throwable#getCause()}
-	 */
-	public DigsigException(Throwable e) {
-		super(e);
-	}
-	
-	/**
-	 * Instantiates a new exception.
-	 * 
-	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
-	 * @param e The cause to be stored for later retrieval by {@link Throwable#getCause()}
-	 */
-	public DigsigException(String msg, Throwable e) {
-		super(msg, e);
-	}
-	
-	/**
-	 * Instantiates a new exception.
-	 * 
-	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
-	 * @param e The cause to be stored for later retrieval by {@link Throwable#getCause()}
-	 */
-	public DigsigException(Throwable e, String msg) {
-		super(msg, e);
-	}
+	public String getMonitorID();
 }

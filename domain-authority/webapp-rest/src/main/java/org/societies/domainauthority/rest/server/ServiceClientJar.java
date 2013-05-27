@@ -78,9 +78,8 @@ public class ServiceClientJar extends HttpServlet {
 
 	/**
 	 * Method processing HTTP GET requests, producing "application/java-archive" MIME media type.
-	 * 
-	 * @return Service client in form of jar file.
-	 * Error 401 if file or key not valid.
+	 * HTTP response: the requested file, e.g., service client in form of jar file.
+	 * Error 401 if file name or signature not valid.
 	 * Error 500 on server error.
 	 */
 //	@Path("{name}")

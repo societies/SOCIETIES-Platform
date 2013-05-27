@@ -169,7 +169,7 @@ public interface ISignatureMgr {
 	 * 
 	 * @param data The data that given signature is supposed to correspond to.
 	 * @param signature The digital signature to verify
-	 * @param publicKey The identity to use for verification
+	 * @param identity The identity to use for verification
 	 * @return True if signature is valid. False if signature, public key or
 	 * identity is invalid, or (unlikely) other error occurred.
 	 */

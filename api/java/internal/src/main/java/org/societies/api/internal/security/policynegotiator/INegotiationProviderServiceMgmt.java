@@ -41,7 +41,7 @@ public interface INegotiationProviderServiceMgmt {
 
 	/**
 	 * Please use
-	 * {@link #addService(ServiceResourceIdentifier, String, URI, URL[], INegotiationProviderSLMCallback)
+	 * {@link #addService(ServiceResourceIdentifier, String, URI, URL[], INegotiationProviderSLMCallback)}
 	 * instead.
 	 */
 	@Deprecated
@@ -51,7 +51,7 @@ public interface INegotiationProviderServiceMgmt {
 
 	/**
 	 * Please use
-	 * {@link #addService(ServiceResourceIdentifier, String, URI, URL[], INegotiationProviderSLMCallback)
+	 * {@link #addService(ServiceResourceIdentifier, String, URI, URL[], INegotiationProviderSLMCallback)}
 	 * instead.
 	 * 
 	 * Tells Policy Negotiator that a new service is available for sharing to others.
@@ -65,7 +65,7 @@ public interface INegotiationProviderServiceMgmt {
 	 * If the service does not provide a client and no other files are to be made available for
 	 * service consumers to download, this parameter should be null.
 	 * 
-	 * @param file Relative paths of any files to be associated with the service and shared on the
+	 * @param files Relative paths of any files to be associated with the service and shared on the
 	 * domain authority server.
 	 * The paths are relative on the server.
 	 * Example: "3p-service/Calculator.jar" if file path on the server is $VIRGO_HOME/3p-service/Calculator.jar

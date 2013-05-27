@@ -56,7 +56,7 @@ public class StorageException extends Exception {
 	/**
 	 * Instantiates a new exception.
 	 * 
-	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
+	 * @param e The cause to be stored for later retrieval by {@link Throwable#getCause()}
 	 */
 	public StorageException(Throwable e) {
 		super(e);
@@ -66,7 +66,7 @@ public class StorageException extends Exception {
 	 * Instantiates a new exception.
 	 * 
 	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
-	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
+	 * @param e The cause to be stored for later retrieval by {@link Throwable#getCause()}
 	 */
 	public StorageException(String msg, Throwable e) {
 		super(msg, e);
@@ -76,7 +76,7 @@ public class StorageException extends Exception {
 	 * Instantiates a new exception.
 	 * 
 	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
-	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
+	 * @param e The cause to be stored for later retrieval by {@link Throwable#getCause()}
 	 */
 	public StorageException(Throwable e, String msg) {
 		super(msg, e);

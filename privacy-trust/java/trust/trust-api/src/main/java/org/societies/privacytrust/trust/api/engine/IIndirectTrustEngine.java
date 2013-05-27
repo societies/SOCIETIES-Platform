@@ -22,63 +22,44 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.security.digsig;
+package org.societies.privacytrust.trust.api.engine;
+
+import java.util.Set;
+
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
+import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 
 /**
- * Exception that may get thrown from methods that use digital signatures.
+ * This interface provides methods to evaluate the trustworthiness of 
+ * {@link ITrustedEntity} objects based on {@link IIndirectTrustEvidence}
+ * information.
  *
- * @author Mitja Vardjan
- *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 1.1
  */
-public class DigsigException extends Exception {
-
-	/**
-	 *  The Constant serialVersionUID
-	 */
-	private static final long serialVersionUID = -2334307465917723771L;
-
-	/**
-	 * Instantiates a new exception.
-	 */
-	public DigsigException() {
-		super();
-	}
-
-	/**
-	 * Instantiates a new exception.
-	 * 
-	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
-	 */
-	public DigsigException(String msg) {
-		super(msg);
-	}
+public interface IIndirectTrustEngine {
 	
 	/**
-	 * Instantiates a new exception.
+	 * TODO
 	 * 
-	 * @param e The cause to be stored for later retrieval by {@link Throwable#getCause()}
+	 * @param trustorId
+	 * @param evidence
+	 * @return
+	 * @throws TrustEngineException
 	 */
-	public DigsigException(Throwable e) {
-		super(e);
-	}
+	public Set<ITrustedEntity> evaluate(final TrustedEntityId trustorId,
+			final IIndirectTrustEvidence evidence) throws TrustEngineException;
 	
 	/**
-	 * Instantiates a new exception.
+	 * TODO
 	 * 
-	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
-	 * @param e The cause to be stored for later retrieval by {@link Throwable#getCause()}
+	 * @param trustorId
+	 * @param evidenceSet
+	 * @return
+	 * @throws TrustEngineException
 	 */
-	public DigsigException(String msg, Throwable e) {
-		super(msg, e);
-	}
-	
-	/**
-	 * Instantiates a new exception.
-	 * 
-	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
-	 * @param e The cause to be stored for later retrieval by {@link Throwable#getCause()}
-	 */
-	public DigsigException(Throwable e, String msg) {
-		super(msg, e);
-	}
+	public Set<ITrustedEntity> evaluate(final TrustedEntityId trustorId,
+			final Set<IIndirectTrustEvidence> evidenceSet) 
+					throws TrustEngineException;
 }

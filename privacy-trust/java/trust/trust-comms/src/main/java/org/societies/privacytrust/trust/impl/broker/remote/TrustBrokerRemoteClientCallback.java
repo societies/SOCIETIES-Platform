@@ -124,8 +124,10 @@ public class TrustBrokerRemoteClientCallback implements ICommCallback {
 					+ "' but no matching callback was found");
 			return;
 		}
+		final String errorMessage = (error.getGenericText() != null)
+				? error.getGenericText() : error.getStanzaErrorString();
 		final TrustBrokerCommsException exception = 
-				new TrustBrokerCommsException(error.getGenericText());
+				new TrustBrokerCommsException(errorMessage);
 		callbackClient.onException(exception);
 	}
 

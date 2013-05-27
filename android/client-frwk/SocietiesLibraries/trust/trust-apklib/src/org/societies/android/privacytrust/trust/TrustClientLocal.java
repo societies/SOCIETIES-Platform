@@ -22,63 +22,61 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.security.digsig;
+package org.societies.android.privacytrust.trust;
+
+import org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient;
+
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.util.Log;
 
 /**
- * Exception that may get thrown from methods that use digital signatures.
- *
- * @author Mitja Vardjan
- *
+ * This wrapper class acts as a local wrapper for the Trust Client. It uses the
+ * base service implementation {@link TrustClientBase}.
  */
-public class DigsigException extends Exception {
-
-	/**
-	 *  The Constant serialVersionUID
-	 */
-	private static final long serialVersionUID = -2334307465917723771L;
-
-	/**
-	 * Instantiates a new exception.
-	 */
-	public DigsigException() {
-		super();
+public class TrustClientLocal extends Service {
+	
+    private static final String TAG = TrustClientLocal.class.getName();
+    
+    private IBinder binder = null;
+    
+    /*
+     * @see android.app.Service#onCreate()
+     */
+    @Override
+	public void onCreate () {
+    	
+    	Log.d(TAG, "onCreate");
+		this.binder = new TrustClientLocalBinder();
 	}
 
-	/**
-	 * Instantiates a new exception.
-	 * 
-	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
-	 */
-	public DigsigException(String msg) {
-		super(msg);
+    /*
+     * @see android.app.Service#onDestroy()
+     */
+	@Override
+	public void onDestroy() {
+		
+		Log.d(TAG, "onDestroy");
 	}
 	
-	/**
-	 * Instantiates a new exception.
-	 * 
-	 * @param e The cause to be stored for later retrieval by {@link Throwable#getCause()}
+	/*
+	 * @see android.app.Service#onBind(android.content.Intent)
 	 */
-	public DigsigException(Throwable e) {
-		super(e);
+	@Override
+	public IBinder onBind(Intent intent) {
+		
+		Log.d(TAG, "onBind");
+		return this.binder;
 	}
-	
-	/**
-	 * Instantiates a new exception.
-	 * 
-	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
-	 * @param e The cause to be stored for later retrieval by {@link Throwable#getCause()}
-	 */
-	public DigsigException(String msg, Throwable e) {
-		super(msg, e);
-	}
-	
-	/**
-	 * Instantiates a new exception.
-	 * 
-	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
-	 * @param e The cause to be stored for later retrieval by {@link Throwable#getCause()}
-	 */
-	public DigsigException(Throwable e, String msg) {
-		super(msg, e);
+
+	/** The Binder object for local service invocation. */
+	public class TrustClientLocalBinder extends Binder {
+		
+		public IInternalTrustClient getService() {
+
+			return new TrustClientBase(TrustClientLocal.this, true);
+		}
 	}
 }

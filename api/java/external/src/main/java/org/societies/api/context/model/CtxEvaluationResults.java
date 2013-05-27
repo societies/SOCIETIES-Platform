@@ -22,58 +22,74 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.similarity.attributes;
+package org.societies.api.context.model;
 
 import java.util.HashMap;
+import java.util.Map;
 
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.identity.IIdentity;
-import org.societies.context.similarity.utilities.GetContextData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+//import org.societies.integration.test.bit.ctx_similarity_eval.Tester;
 
-/**
- * Describe your class here...
- *
- * @author John
- *
- */
-public class interests {
+
+public class CtxEvaluationResults {
+
 	
-	private GetContextData gcd;
-	private CtxAttributeTypes cat;
-
-	public interests(){
-		gcd = new GetContextData();
+	private Boolean result; // overall yes/no from group
+	private HashMap<String, String> attributeSummary;  //  
+	private HashMap attBreakDown;
+	public final String STRONG = "Strongly associated"; //      > 80%
+	public final String MEDIUM = "Medium association";  //   50 - 80%
+	public final String WEAK = "Weakly associated";     //   25 - 50%
+	public final String NONE = "Not associated";		//      < 25%
+	private static Logger LOG = LoggerFactory.getLogger(CtxEvaluationResults.class);
+	
+	public CtxEvaluationResults(){
+		this.result = true;
+		this.attributeSummary = new HashMap<String, String>();
+		this.attBreakDown = new HashMap();
 	}
 	
-	public HashMap<String, Double> evaluate(String[] allOwners){
-		HashMap<String, Double> results = new HashMap<String, Double>();
-		HashMap<String, Integer> resultcount = new HashMap<String, Integer>();
-		Integer totalCount = allOwners.length;
- 
-		for (String css : allOwners){
-			// get context value
-			//CtxAttribute contextResult = gcd.getContext(css, cat.INTERESTS);
-			//String contextValue = contextResult.getStringValue();			
-			String[] splitString = css.split(",");
-			//
-			for (String i : splitString){
-				if (resultcount.containsKey(i)){
-					resultcount.put(i, resultcount.get(i) + 1);
-				} else {
-					resultcount.put(i, 1);
-				}
-			}
-			//
-		}
-		
-		//analyse results
-		for (String k : resultcount.keySet()){
-			float percent=(float)resultcount.get(k)/totalCount*100;
-			results.put(k, (double)percent);
-		}
-		
-		return results;
-		//
+	public void init(){
+		this.result = true;
+		this.attributeSummary = new HashMap<String, String>();
+		this.attBreakDown = new HashMap();
 	}
+	
+	/***
+	 *   result
+	 */
+	public void setResult(Boolean result){
+		this.result = result;
+	}
+	//
+	public Boolean getResult(){
+		LOG.info("EBOYLANLOGFOOTPRINT ctxEvaluationResult.getResult called");
+		return this.result;
+	}
+	
+	/***
+	 *   attBreakDown
+	 */
+	public void setAttSummary(String att, String value){
+	
+		this.attributeSummary.put(att, value);
+	}
+	//
+	public HashMap<String, String> getSummary(){
+		return this.attributeSummary;
+	}	
+	
+	/***
+	 *   attBreakDown
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void setAattBreakDown(HashMap breakdown){
+		attBreakDown.putAll(breakdown);
+	}
+	//
+	public HashMap getAttBreakDown(){
+		return this.attBreakDown;
+	}	
+	
 }
