@@ -1,6 +1,7 @@
 package org.societies.webapp.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -19,10 +20,13 @@ import org.societies.api.css.FriendFilter;
 import org.societies.api.internal.css.ICSSInternalManager;
 import org.societies.webapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Controller;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
+import org.societies.api.schema.cssmanagement.CssManagerResultActivities;
 import org.societies.api.schema.cssmanagement.CssRequest;
 import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
@@ -270,11 +274,11 @@ public HashMap<CssAdvertisementRecord, Integer> getSuggestedfriends() {
 	
 	}
 	
-	public void sendfriendrequest(){
+	public void sendfriendrequest(String friendid){
 		
 		log.info("@@@@@@@@@@@ sendfriendrequest method called @@@@@@@@@@@@@@ ");
 	
-		this.cssLocalManager.sendCssFriendRequest("liam.societies.local");
+		this.cssLocalManager.sendCssFriendRequest(friendid);
 		
 	}
 	
@@ -290,7 +294,7 @@ public void handlerequestaccept(String friendid){
 	
 	}
 
-	public void handlerequestdecline(){
+	public void handlerequestdecline(String friendid){
 		
 		log.info("@@@@@@@@@@@ DECLINE method called @@@@@@@@@@@@@@ ");
 		log.info("@@@@@@@@@@@ DECLINE method called friendid " +friendid);
@@ -303,7 +307,7 @@ public void handlerequestaccept(String friendid){
 		
 	}
 
-	public void handlerequestcancelled(){
+	public void handlerequestcancelled(String friendid){
 		
 		log.info("@@@@@@@@@@@ CANCELLED method called @@@@@@@@@@@@@@ ");
 		log.info("@@@@@@@@@@@ CANCELLED method called friendid " +friendid);
@@ -321,6 +325,38 @@ public void handlerequestaccept(String friendid){
 
 	public void setFriendid(String friendid) {
 		this.friendid = friendid;
+	}
+	
+	public List<MarshaledActivity> getActivities(){
+		log.info("getActivities called");
+		Date date = new Date();
+		long longDate=date.getTime();
+		String timespan = "1262304000000 " + longDate;
+		List<MarshaledActivity> listSchemaActivities = new ArrayList<MarshaledActivity>();  
+		List<MarshaledActivity> Result = new ArrayList<MarshaledActivity>();
+						
+		Future<List<MarshaledActivity>> asyncActivitiesResult = this.cssLocalManager.getActivities(timespan, 20);
+		CssManagerResultActivities results = new CssManagerResultActivities();
+		try {
+			results.setMarshaledActivity(asyncActivitiesResult.get());
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		} catch (ExecutionException e1) {
+			e1.printStackTrace();
+		}
+		
+		log.info("Activities : " +results);
+		log.info("Activities Size: " +results.getMarshaledActivity().size());
+		
+		for(MarshaledActivity result : results.getMarshaledActivity()){
+			log.info("MarshaledActivity Published " +result.getPublished());
+			log.info("MarshaledActivity Verb " +result.getVerb());
+			log.info("MarshaledActivity Actor" +result.getActor());
+			Result.add(result);
+			
+		}
+		
+		return Result;
 	}
 
 	

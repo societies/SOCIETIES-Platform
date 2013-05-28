@@ -22,9 +22,7 @@
             <div class="websearchbar">
                 <div class="websearchtitle">
                     <h4 class="form_title">Suggested Friends</h4>
-                    <p:commandButton value="Refresh" id="input" action="#{suggestedfriends.getsnsFriendes}">
-                    	<p:ajax execute="input" render="out" />
-                    </p:commandButton>
+                    <p:commandButton value="Refresh" action="#{suggestedfriends.getsnsFriendes}"></p:commandButton>
        	 			<br/> <br/>
                 </div>
                 <div class="groupsearch">
@@ -40,7 +38,7 @@
                 <header>
                 </header>
                 <ol class="keyinfolist">
-                    <c:forEach id="out" items="#{suggestedfriends.snsFriendes}" var="snsFriend">
+                    <c:forEach items="#{suggestedfriends.snsFriendes}" var="snsFriend">
     				    <li class="keyinfo bypostauthor">
                         <figure class="gravatar">
                             <a class="friend_profile.xhtml"><img alt="" src="images/profile_pic.png"
@@ -48,11 +46,8 @@
                         </figure>
                         <div class="keyinfo_content">
                             <div class="clearfix">
-                                <time datetime="2012-09-30T00:01Z"
-                                      class="keyinfo-meta keyinfometadata">Location, Sep 30, 2012 at 0:01 am
-                                </time>
                                 <br/>
-                                <H6>Name:     #{snsFriend.getResultCssAdvertisementRecord().getName()}</H6>								
+                                <H6>Name:     #{snsFriend.getResultCssAdvertisementRecord().getName()}</H6> 								
                                 <H6>Identity: #{snsFriend.getResultCssAdvertisementRecord().getId()}</H6>
                             </div>
                             <div class="keyinfo_text">
@@ -60,19 +55,19 @@
                         </div>
                         <c:if test="${snsFriend.status=='NEEDSRESP'}">
                         	<p:commandButton value="Accept Friend Request" action="#{suggestedfriends.handlerequestaccept(snsFriend.getResultCssAdvertisementRecord().getId())}"/>
-		 					<p:commandButton value="Decline Friend Request" action="#{suggestedfriends.handlerequestdecline()}"/>
+		 					<p:commandButton value="Decline Friend Request" action="#{suggestedfriends.handlerequestdecline(snsFriend.getResultCssAdvertisementRecord().getId())}"/>
 		        		</c:if>
 		        		<c:if test="${snsFriend.status=='PENDING'}">
-		        			<p:commandButton value="Cancel Pending Friend Request" action="#{suggestedfriends.handlerequestpending()}"/> 
+		        			<p:commandButton value="Cancel Pending Friend Request" action="#{suggestedfriends.handlerequestcancelled(snsFriend.getResultCssAdvertisementRecord().getId())}"/> 
 		        		</c:if>
 		        		<c:if test="${snsFriend.status=='NOTREQUESTED'}">
-		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequest()}"/>        	       
+		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequest(snsFriend.getResultCssAdvertisementRecord().getId())}"/>        	       
 		        		</c:if>
-		        		<c:if test="${otherFriend.status=='DENIED'}">
-		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequestdenied()}"/> 	       	       
+		        		<c:if test="${snsFriend.status=='DENIED'}">
+		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequestdenied(snsFriend.getResultCssAdvertisementRecord().getId())}"/> 	       	       
 	        			</c:if>
-	        			<c:if test="${otherFriend.status=='DENIEDCANCELLED'}">
-		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequestdenied()}"/> 	       	       
+	        			<c:if test="${snsFriend.status=='CANCELLED'}">
+		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequest(snsFriend.getResultCssAdvertisementRecord().getId())}"/> 	       	       
 	        			</c:if>
                         </li>
                       </c:forEach>
@@ -90,29 +85,23 @@
                 </header>
                 <p:commandButton value="Refresh" action="#{suggestedfriends.getfriends()}"/>
        	 		<br/> <br/>
-                <ul class="sidebar">
-                	<c:forEach items="#{suggestedfriends.friends}" var="friend">
-                		<li><H6>- #{friend.name}</H6></li>
-                	</c:forEach>
+                <ul>
+                	<ui:repeat value="#{suggestedfriends.friends}" var="friend">
+                		<li> #{friend.name}</li>
+                	</ui:repeat>
                 </ul>
             </section>
             <section>
                 <header>
-                    <h3>Other Activity</h3>
+                    <h3>CSS Activity</h3>
                 </header>
                 <div class="hr dotted clearfix"></div>
-                <ul class="contact_data">
-                    <li>
-                        <figure class="gravatar">
-                            <img alt="" src="images/webprofile_pic_sample4.jpg" height="48" width="48"/>
-                        </figure>
-                        <strong>Mary Bloggs</strong> dolor sit amet, consectetur adipiscing elit. Ipsum dolor sit amet, elit.
-                    </li>
-                </ul>
-                <ul class="contact_data">
-                    <li>Other Link - <a href="#">Link 1</a></li>
-                    <li>Other Link - <a href="#">Link 2</a></li>
-                    <li>Other Link - <a href="#">Link 3</a></li>
+                <p:commandButton value="Get Activities" action="#{suggestedfriends.getActivities()}"/>
+       	 		<br/> <br/>
+       	 		<ul>
+                	<c:forEach items="#{suggestedfriends.getActivities()}" var="MarshaledActivity">
+                		<li> #{MarshaledActivity.getVerb()}</li>
+                	</c:forEach>
                 </ul>
             </section>
             <div class="hr dotted clearfix"></div>
