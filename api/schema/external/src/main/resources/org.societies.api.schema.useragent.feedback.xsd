@@ -11,8 +11,11 @@
                             minOccurs="0"/>
                 <xs:element name="stage" type="feedbackStage"
                             minOccurs="0"/>
-                <xs:element name="requestId" type="xs:string" minOccurs="0"/>
-                <xs:element name="requestDate" type="xs:dateTime" minOccurs="0"/>
+                <!--<xs:element name="requestId" type="xs:string" minOccurs="0"/>-->
+                <xs:element name="requestId" type="xs:string" minOccurs="1"/>
+                <!--<xs:element name="requestDate" type="xs:dateTime" minOccurs="0"/>-->
+                <!--<xs:element name="requestDate" type="xs:dateTime" minOccurs="1"/>-->
+                <xs:element name="requestDate" type="xs:dateTime" minOccurs="1" nillable="false"/>
                 <xs:element name="type" type="xs:int"/>
                 <xs:element name="options" type="xs:string"
                             minOccurs="0" maxOccurs="unbounded"/>
@@ -64,9 +67,10 @@
     <xs:element name="userFeedbackHistoryRequest">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="requestType" type="historyRequestType" minOccurs="0"/>
-                <xs:element name="howMany" type="xs:int" minOccurs="0"/>
-                <xs:element name="sinceWhen" type="xs:dateTime" minOccurs="0"/>
+                <xs:element name="requestType" type="historyRequestType" minOccurs="1"/>
+                <xs:element name="howMany" type="xs:int" minOccurs="1"/>
+                <xs:element name="sinceWhen" type="xs:dateTime" minOccurs="1" nillable="false"/>
+                <xs:element ref="userFeedbackBean" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
