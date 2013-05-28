@@ -24,7 +24,6 @@
  */
 package org.societies.api.privacytrust.privacy.util.privacypolicy;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -34,7 +33,6 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jetty.util.log.Log;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;

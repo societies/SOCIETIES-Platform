@@ -56,12 +56,14 @@
 	</parent>
 
 	<dependencies>
+		<!-- 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>javax.persistence</groupId>
 			<artifactId>com.springsource.javax.persistence</artifactId>
@@ -92,18 +94,38 @@
 			<artifactId>com.springsource.org.hibernate</artifactId>
 			<version>3.3.2.GA</version>
 			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>com.springsource.slf4j.api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>com.springsource.org.hibernate.annotations</artifactId>
 			<version>3.4.0.GA-A</version>
 			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>com.springsource.slf4j.api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>com.springsource.org.hibernate.annotations.common</artifactId>
 			<version>3.3.0.ga</version>
 			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>
+						com.springsource.org.apache.commons.logging
+					</artifactId>
+					<groupId>org.apache.commons</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.dom4j</groupId>
