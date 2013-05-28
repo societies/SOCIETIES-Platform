@@ -47,6 +47,14 @@
 			<groupId>org.springframework.osgi</groupId>
 			<artifactId>org.springframework.osgi.core</artifactId>
 			<version>1.2.1</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>
+						com.springsource.org.apache.commons.logging
+					</artifactId>
+					<groupId>org.apache.commons</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -111,6 +119,10 @@
 				<exclusion>
 					<artifactId>el-api</artifactId>
 					<groupId>org.apache.tomcat</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -276,6 +288,10 @@
 				<exclusion>
 					<artifactId>xmlunit</artifactId>
 					<groupId>xmlunit</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
 				</exclusion>
 			</exclusions>
 		</dependency>
