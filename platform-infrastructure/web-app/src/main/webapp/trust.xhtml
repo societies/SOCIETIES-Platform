@@ -1,0 +1,71 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                template="templates/main_template.xhtml">
+
+    <ui:define name="html_head">
+        <title>SOCIETIES :: View My Trust Relationships</title>
+    </ui:define>
+
+    <ui:define name="body">
+
+        <p:panel>
+            <f:facet name="header">
+                My Trust Relationships
+            </f:facet>
+
+            <p:tabView id="tabView" dynamic="true" activeIndex="0"
+                       effect="slide" effectDuration="normal">
+  
+                <p:tab title="Users">
+                    <p:dataTable id="userTable" var="user"
+                                 value="#{trustController.users}" 
+                                 emptyMessage="No trusted user found"
+                                 paginator="true" rows="20"
+                                 paginatorAlwaysVisible="false"
+                                 filteredValue="#{trustController.filteredUsers}"
+                                 filterDelay="500">
+                        <p:column headerText="ID"
+                                  filterBy="#{user.trusteeId.entityId}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{user.trusteeId.entityId}" />
+                        </p:column>
+                        <p:column headerText="Trust Value">
+                            <h:outputText value="#{user.userPerceivedTrust.value}" />
+                        </p:column>
+                        <p:column headerText="Last Updated">
+                            <h:outputText value="#{user.userPerceivedTrust.lastUpdated}" />
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Services">
+                    <p:dataTable id="serviceTable" var="service"
+                                 value="#{trustController.services}" 
+                                 emptyMessage="No trusted service found"
+                                 paginator="true" rows="20"
+                                 paginatorAlwaysVisible="false"
+                                 filteredValue="#{trustController.filteredServices}"
+                                 filterDelay="500">
+                        <p:column headerText="ID"
+                                  filterBy="#{service.trusteeId.entityId}"
+                                  filterMatchMode="contains">
+                            <h:outputText value="#{service.trusteeId.entityId}" />
+                        </p:column>
+                        <p:column headerText="Trust Value">
+                            <h:outputText value="#{service.userPerceivedTrust.value}" />
+                        </p:column>
+                        <p:column headerText="Last Updated">
+                            <h:outputText value="#{service.userPerceivedTrust.lastUpdated}" />
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+
+            </p:tabView>
+            
+        </p:panel>
+
+    </ui:define>
+</ui:composition>
+</html>
