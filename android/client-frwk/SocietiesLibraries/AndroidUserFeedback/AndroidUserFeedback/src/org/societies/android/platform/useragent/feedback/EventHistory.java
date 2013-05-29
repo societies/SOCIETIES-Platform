@@ -75,8 +75,6 @@ public class EventHistory extends Service {
         }
     }
 
-    public static final int REQUEST_TIMEOUT = 10000;
-
     // Binder given to clients
     private final IBinder serviceBinder = new LocalBinder();
 
