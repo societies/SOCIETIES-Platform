@@ -855,10 +855,10 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         //fire response pubsub event to all user agents
         try {
             pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.EXPLICIT_RESPONSE, requestId, resultBean);
-        } catch (XMPPError e1) {
-            e1.printStackTrace();
-        } catch (CommunicationException e1) {
-            e1.printStackTrace();
+        } catch (XMPPError e) {
+            log.error("Error submitting explicit response", e);
+        } catch (CommunicationException e) {
+            log.error("Error submitting explicit response", e);
         }
     }
 
@@ -876,10 +876,10 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         try {
             log.info("####### Publish " + EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE + ": " + ResponseItemUtils.toXmlString(result.getResponseItems()));
             pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, requestId, resultBean);
-        } catch (XMPPError e1) {
-            e1.printStackTrace();
-        } catch (CommunicationException e1) {
-            e1.printStackTrace();
+        } catch (XMPPError e) {
+            log.error("Error submitting negotiation response", e);
+        } catch (CommunicationException e) {
+            log.error("Error submitting negotiation response", e);
         }
     }
 
@@ -894,9 +894,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         try {
             pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.IMPLICIT_RESPONSE, null, resultBean);
         } catch (XMPPError e) {
-            e.printStackTrace();
+            log.error("Error submitting implicit response", e);
         } catch (CommunicationException e) {
-            e.printStackTrace();
+            log.error("Error submitting implicit response", e);
         }
     }
 
