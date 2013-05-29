@@ -124,6 +124,15 @@ public class NotificationsController extends BasePageController {
 
             } else if (UserFeedbackEventTopics.REQUEST.equals(node)) {
 
+                if (!(item instanceof UserFeedbackBean)) {
+                    log.warn(String.format("Received pubsub event with topic '%s', ID '%s' and class '%s' - Required UserFeedbackBean ",
+                            node,
+                            itemId,
+                            item.getClass().getCanonicalName()
+                    ));
+                    return;
+                }
+
                 UserFeedbackBean bean = (UserFeedbackBean) item;
                 NotificationQueueItem newItem = createNotificationQueueItemFromUserFeedbackBean(bean);
 
