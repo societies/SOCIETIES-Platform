@@ -656,15 +656,22 @@ public class ContextClientHelper implements ICtxClientHelper {
 					Log.e(LOG_TAG, "Could not find callback method queue for received action " + intent.getAction());
 				}				
 			} else if (intent.getAction().equals(ICtxClient.RETRIEVE)) {
+				Log.d(LOG_TAG, "inside ICtxClient.RETRIEVE");
 				if (null != ContextClientHelper.this.methodQueues[classMethods.retrieve.ordinal()]) {
+					Log.d(LOG_TAG, "retrieve.ordinal check OK!");
 					ICtxClientCallback retrievedCallback = ContextClientHelper.this.methodQueues[classMethods.retrieve.ordinal()].poll();
 					if (null != retrievedCallback) {
+						Log.d(LOG_TAG, "retrievedCallback check OK!");
 						final String exceptionMessage = intent.getStringExtra(ICtxClient.INTENT_EXCEPTION_VALUE_KEY);
 						if (exceptionMessage != null) {
+							Log.d(LOG_TAG, "calling onException when retrieving.");
 							retrievedCallback.onException(new ContextClientInvocationException(exceptionMessage));
 						}
+						Log.d(LOG_TAG, "after exception test. ");
 						final CtxModelObjectBean modelObject;
-						final Parcelable pModelObject = (Parcelable) intent.getParcelableExtra(ICtxClient.RETRIEVE);	
+						Log.d(LOG_TAG, "before parceling. ");
+						final Parcelable pModelObject = (Parcelable) intent.getParcelableExtra(ICtxClient.INTENT_RETURN_VALUE_KEY);	
+						Log.d(LOG_TAG, "pModelObject is : " + pModelObject.getClass());
 						if (pModelObject instanceof CtxModelObjectBean) {
 								modelObject = (CtxModelObjectBean) pModelObject;
 						} else { 
