@@ -10,6 +10,8 @@ import org.simpleframework.xml.Namespace;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.convert.Registry;
+import org.simpleframework.xml.convert.RegistryStrategy;
 import org.simpleframework.xml.core.Persister;
 import org.simpleframework.xml.strategy.Strategy;
 import org.slf4j.Logger;
@@ -76,7 +78,8 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
         subscribers = new HashMap<Subscription, List<Subscriber>>();
         elementToClass = new HashMap<String, Class<?>>();
 
-        Strategy strategy = new AnnotationStrategy();
+        Registry registry = new Registry();
+		Strategy strategy = new RegistryStrategy(registry);
         serializer = new Persister(strategy);
 
         this.endpoint = endpoint;
