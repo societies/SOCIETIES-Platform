@@ -68,8 +68,8 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="requestType" type="historyRequestType" minOccurs="1"/>
-                <xs:element name="howMany" type="xs:int" minOccurs="1"/>
-                <xs:element name="sinceWhen" type="xs:dateTime" minOccurs="1" nillable="false"/>
+                <xs:element name="howMany" type="xs:int"/>
+                <xs:element name="sinceWhen" type="xs:dateTime"/>
                 <xs:element ref="userFeedbackBean" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
