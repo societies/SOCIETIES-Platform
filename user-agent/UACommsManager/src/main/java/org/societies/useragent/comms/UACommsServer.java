@@ -48,6 +48,7 @@ import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean;
 import org.societies.useragent.api.feedback.IInternalUserFeedback;
 import org.societies.useragent.api.monitoring.IInternalUserActionMonitor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -95,7 +96,7 @@ public class UACommsServer implements IFeatureServer {
         try {
             getCommsMgr().register(this);
         } catch (CommunicationException e) {
-            e.printStackTrace();
+            log.error("Error registering with comms manager", e);
         }
         idManager = commsMgr.getIdManager();
     }
@@ -116,7 +117,7 @@ public class UACommsServer implements IFeatureServer {
      */
     @Override
     public void receiveMessage(Stanza stanza, Object payload) {
-        log.info(String.format("receiveMessage() \nStanza=%s\nPayload=%s",
+        log.info(String.format("receiveMessage() \n    Stanza=%s\n    Payload=%s",
                 stanza != null ? stanza.toString() : "null",
                 payload != null ? payload.toString() : "null"));
 
@@ -145,7 +146,7 @@ public class UACommsServer implements IFeatureServer {
                     internalUserActionMonitor.monitorFromRemoteNode(senderDeviceId, owner, action);
                     break;
                 } catch (InvalidFormatException e) {
-                    e.printStackTrace();
+                    log.error("Error receiving message", e);
                 }
         }
     }
@@ -156,7 +157,7 @@ public class UACommsServer implements IFeatureServer {
      */
     @Override
     public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
-        log.info(String.format("getQuery() \nStanza=%s\nPayload=%s",
+        log.info(String.format("getQuery() \n    Stanza=%s\n    Payload=%s",
                 stanza != null ? stanza.toString() : "null",
                 payload != null ? payload.toString() : "null"));
 
@@ -173,7 +174,7 @@ public class UACommsServer implements IFeatureServer {
         return result;
     }
 
-    private Object getQuery(Stanza stanza, UserFeedbackHistoryRequest requestBean) {
+    private UserFeedbackHistoryRequest getQuery(Stanza stanza, UserFeedbackHistoryRequest requestBean) {
 
         List<UserFeedbackBean> result;
 
@@ -189,7 +190,19 @@ public class UACommsServer implements IFeatureServer {
                 return null;
         }
 
-        return result.toArray(new UserFeedbackBean[result.size()]);
+        if (log.isDebugEnabled())
+            log.debug("About to transmit " + result.size() + " UserFeedbackBeans");
+
+        // NB: Hibernate will return a persistent list, which is no good to us
+        requestBean.setUserFeedbackBean(new ArrayList<UserFeedbackBean>(result));
+
+        // NB: Now get rid of all the persistent lists inside the beans
+        for (UserFeedbackBean bean : requestBean.getUserFeedbackBean()) {
+            bean.setOptions(new ArrayList<String>(bean.getOptions()));
+        }
+
+//        return result.toArray(new UserFeedbackBean[result.size()]);
+        return requestBean;
     }
 
     private Object getQuery(Stanza stanza, UserFeedbackBean feedbackBean) {
@@ -223,9 +236,9 @@ public class UACommsServer implements IFeatureServer {
                     resultBean = expResultBean;
 
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.error("Error creating response bean", e);
                 } catch (ExecutionException e) {
-                    e.printStackTrace();
+                    log.error("Error creating response bean", e);
                 }
                 break;
 
@@ -246,9 +259,9 @@ public class UACommsServer implements IFeatureServer {
                     resultBean = impResultBean;
 
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.error("Error creating response bean", e);
                 } catch (ExecutionException e) {
-                    e.printStackTrace();
+                    log.error("Error creating response bean", e);
                 }
                 break;
         }
@@ -259,12 +272,11 @@ public class UACommsServer implements IFeatureServer {
 
     @Override
     public Object setQuery(Stanza stanza, Object payload) throws XMPPError {
-        log.info(String.format("setQuery() \nStanza=%s\nPayload=%s",
+        log.info(String.format("setQuery() \n    Stanza=%s\n    Payload=%s",
                 stanza != null ? stanza.toString() : "null",
                 payload != null ? payload.toString() : "null"));
 
         return null;
     }
-
 
 }
