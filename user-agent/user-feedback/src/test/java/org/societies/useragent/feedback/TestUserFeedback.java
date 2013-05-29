@@ -25,88 +25,79 @@
 
 package org.societies.useragent.feedback;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
-import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelObject;
-import org.societies.api.context.model.CtxModelType;
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.context.model.CtxAttributeTypes;
-import org.societies.api.internal.useragent.model.ExpProposalContent;
-import org.societies.api.internal.useragent.model.ExpProposalType;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalType;
-import org.springframework.scheduling.annotation.AsyncResult;
-
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import static org.mockito.Mockito.*;
+import org.societies.api.context.model.*;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.springframework.scheduling.annotation.AsyncResult;
 
-public class TestUserFeedback extends TestCase{
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Future;
 
-	UserFeedback userFeedback;
-	ICtxBroker mockCtxBroker;
-	
-	String mockDeviceID;
-	String mockIdentity;
-	
-	//context
-	CtxEntityIdentifier mockPersonId;
-	CtxEntityIdentifier mockEntityId;
-	CtxAttributeIdentifier mockUIDId;
-	CtxAttribute mockUID;
-	Future<CtxModelObject> mockUIDFuture;
-	List<CtxIdentifier> mockUIDIdList;
-	Future<List<CtxIdentifier>> mockUIDIdListFuture;
+import static org.mockito.Mockito.mock;
 
-	public void setUp() throws Exception{
-		mockCtxBroker = mock(ICtxBroker.class);
-		
-		mockDeviceID = "sarah.societies.local/android";
-		mockIdentity = "sarah.societies.local";
-		
-		userFeedback = new UserFeedback();
-		userFeedback.setCtxBroker(mockCtxBroker);
-		//userFeedback.myCloudID = mockDeviceID;
-		
-		mockPersonId = new CtxEntityIdentifier(mockIdentity, "PERSON", new Long(12345));
-		mockEntityId = new CtxEntityIdentifier(mockIdentity, "testEntity", new Long(12345));
-		mockUIDId = new CtxAttributeIdentifier(mockEntityId, CtxAttributeTypes.UID, new Long(12345));
-		mockUID = new CtxAttribute((CtxAttributeIdentifier)mockUIDId);
-		mockUID.setStringValue(mockDeviceID);
-		mockUIDFuture = new AsyncResult<CtxModelObject>(mockUID);
-		mockUIDIdList = new ArrayList<CtxIdentifier>();
-		mockUIDIdList.add(mockUIDId);
-		mockUIDIdListFuture = new AsyncResult<List<CtxIdentifier>>(mockUIDIdList);
-	}
+public class TestUserFeedback extends TestCase {
 
-	public void tearDown() throws Exception{
-		userFeedback = null;
-		mockCtxBroker = null;
-		mockDeviceID = null;
-		mockIdentity = null;
-		mockPersonId = null;
-		mockEntityId = null;
-		mockUIDId = null;
-		mockUID = null;
-		mockUIDIdList = null;
-		mockUIDFuture = null;
-	}
-	
-	public void testTmp(){
-		Assert.assertTrue(true);
-	}
+    UserFeedback userFeedback;
+    ICtxBroker mockCtxBroker;
+
+    String mockDeviceID;
+    String mockIdentity;
+
+    //context
+    CtxEntityIdentifier mockPersonId;
+    CtxEntityIdentifier mockEntityId;
+    CtxAttributeIdentifier mockUIDId;
+    CtxAttribute mockUID;
+    Future<CtxModelObject> mockUIDFuture;
+    List<CtxIdentifier> mockUIDIdList;
+    Future<List<CtxIdentifier>> mockUIDIdListFuture;
+
+    @Override
+    public void setUp() throws Exception {
+        mockCtxBroker = mock(ICtxBroker.class);
+
+        mockDeviceID = "sarah.societies.local/android";
+        mockIdentity = "sarah.societies.local";
+
+        userFeedback = new UserFeedback();
+//		userFeedback.setCtxBroker(mockCtxBroker);
+        //userFeedback.myCloudID = mockDeviceID;
+
+        mockPersonId = new CtxEntityIdentifier(mockIdentity, "PERSON", (long) 12345);
+        mockEntityId = new CtxEntityIdentifier(mockIdentity, "testEntity", (long) 12345);
+        mockUIDId = new CtxAttributeIdentifier(mockEntityId, CtxAttributeTypes.UID, (long) 12345);
+        mockUID = new CtxAttribute(mockUIDId);
+        mockUID.setStringValue(mockDeviceID);
+        mockUIDFuture = new AsyncResult<CtxModelObject>(mockUID);
+        mockUIDIdList = new ArrayList<CtxIdentifier>();
+        mockUIDIdList.add(mockUIDId);
+        mockUIDIdListFuture = new AsyncResult<List<CtxIdentifier>>(mockUIDIdList);
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        userFeedback = null;
+        mockCtxBroker = null;
+        mockDeviceID = null;
+        mockIdentity = null;
+        mockPersonId = null;
+        mockEntityId = null;
+        mockUIDId = null;
+        mockUID = null;
+        mockUIDIdList = null;
+        mockUIDFuture = null;
+    }
+
+    public void testTmp() {
+        Assert.assertTrue(true);
+    }
 
 
 	/*public void testAckNackGUI() {
-		try {
+        try {
 			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID)).thenReturn(mockUIDIdListFuture);
 			when(mockCtxBroker.retrieve(mockUIDId)).thenReturn(mockUIDFuture);
 			
