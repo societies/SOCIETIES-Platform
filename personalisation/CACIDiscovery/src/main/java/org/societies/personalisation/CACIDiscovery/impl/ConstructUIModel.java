@@ -1,9 +1,10 @@
-package org.societies.personalisation.CAUIDiscovery.impl;
+package org.societies.personalisation.CACIDiscovery.impl;
 
 
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,7 +16,6 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
-//import org.societies.personalisation.CAUI.api.model.IUserIntentTask;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 
 public class ConstructUIModel {
@@ -54,7 +54,6 @@ public class ConstructUIModel {
 
 	public UserIntentModelData constructNewModel(LinkedHashMap<List<String>,HashMap<String,Double>> transDictionaryAll, HashMap<String,List<String>> ctxActionsMap){
 
-		//System.out.println("cauiTaskManager "+cauiTaskManager);
 		UserIntentModelData modelData = cauiTaskManager.createModel();
 		
 		//create all actions and assign context
@@ -107,7 +106,7 @@ public class ConstructUIModel {
 			
 			
 			List<IUserIntentAction> sourceActionList = cauiTaskManager.retrieveActionsByTypeValue(sourceAction[1],sourceAction[2]);
-		//	System.out.println("sourceActionList "+sourceActionList);
+			System.out.println("sourceActionList "+sourceActionList);
 			//	LOG.info("5 sourceActionList "+ sourceActionList);
 			IUserIntentAction sourceActionObj = sourceActionList.get(0);
 			
