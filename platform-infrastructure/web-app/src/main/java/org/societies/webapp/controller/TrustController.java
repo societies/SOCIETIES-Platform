@@ -25,19 +25,28 @@
 package org.societies.webapp.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
+import javax.faces.event.AjaxBehaviorEvent;
 
+import org.primefaces.event.RateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
+import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
+import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
+import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
+import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustRelationship;
 import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
@@ -52,20 +61,26 @@ public class TrustController extends BasePageController {
 	private static final long serialVersionUID = -1250855340010366453L;
 
 	private static Logger LOG = LoggerFactory.getLogger(TrustController.class);
+	
+	/* N.B. This should match the f:attribute name of the rating component! */
+	private static final String RATING_F_ATTR_NAME = "ratedEntityId";
 
 	@ManagedProperty(value = "#{trustBroker}")
 	private ITrustBroker trustBroker;
+	
+	@ManagedProperty(value = "#{trustEvidenceCollector}")
+	private ITrustEvidenceCollector trustEvidenceCollector;
 
 	@ManagedProperty(value = "#{userService}")
 	private UserService userService;
 	
-	private final List<TrustedEntity> users = new ArrayList<TrustedEntity>();
+	private List<TrustedEntity> users = new ArrayList<TrustedEntity>();
 	private List<TrustedEntity> filteredUsers = new ArrayList<TrustedEntity>();
 	
-	private final List<TrustedEntity> communities = new ArrayList<TrustedEntity>();
+	private List<TrustedEntity> communities = new ArrayList<TrustedEntity>();
 	private List<TrustedEntity> filteredCommunities = new ArrayList<TrustedEntity>();
 	
-	private final List<TrustedEntity> services = new ArrayList<TrustedEntity>();
+	private List<TrustedEntity> services = new ArrayList<TrustedEntity>();
 	private List<TrustedEntity> filteredServices = new ArrayList<TrustedEntity>();
 	
 	public TrustController() {
@@ -98,6 +113,16 @@ public class TrustController extends BasePageController {
 	public void setTrustBroker(ITrustBroker trustBroker) {
 
 		this.trustBroker = trustBroker;
+	}
+	
+	public ITrustEvidenceCollector getTrustEvidenceCollector() {
+
+		return trustEvidenceCollector;
+	}
+
+	public void setTrustEvidenceCollector(ITrustEvidenceCollector trustEvidenceCollector) {
+
+		this.trustEvidenceCollector = trustEvidenceCollector;
 	}
 
 	public UserService getUserService() {
@@ -160,8 +185,46 @@ public class TrustController extends BasePageController {
     	
         this.filteredServices = filteredServices;  
     }
+    
+    public void onRating(RateEvent rateEvent) {  
+        
+    	if (LOG.isDebugEnabled())
+    		LOG.debug("onRating event " + rateEvent);
+    	
+    	try {
+    		final TrustedEntityId ratedTeid = (TrustedEntityId) 
+    				rateEvent.getComponent().getAttributes().get(RATING_F_ATTR_NAME);
+    		final Double rating = 0.2d * new Double((String) rateEvent.getRating());
+    		this.updateTrustRating(ratedTeid, rating);
+    		
+    	} catch (Exception e) {
+
+    		super.addGlobalMessage("A surprising new problem has occurred!", 
+    				e.getLocalizedMessage(), FacesMessage.SEVERITY_ERROR);
+    		return;
+    	}
+    }  
+      
+    public void onCancelledRating(AjaxBehaviorEvent rateEvent) {  
+        
+    	if (LOG.isDebugEnabled())
+    		LOG.debug("onCancelledRating event " + rateEvent);
+    	
+    	try {
+    		final TrustedEntityId ratedTeid = (TrustedEntityId) 
+    				rateEvent.getComponent().getAttributes().get(RATING_F_ATTR_NAME);
+    		final Double rating = new Double(0);
+    		this.updateTrustRating(ratedTeid, rating);
+    		
+    	} catch (Exception e) {
+
+    		super.addGlobalMessage("A surprising new problem has occurred!", 
+					e.getLocalizedMessage(), FacesMessage.SEVERITY_ERROR);
+    	}
+    }
 	
-	private List<TrustedEntity> retrieveTrustedEntities(TrustedEntityType entityType) {
+	private List<TrustedEntity> retrieveTrustedEntities(
+			final TrustedEntityType entityType) {
 		
 		final List<TrustedEntity> result = new ArrayList<TrustedEntity>();
 		
@@ -192,11 +255,70 @@ public class TrustController extends BasePageController {
 				result.addAll(trustedEntities.values());
 			} catch (Exception e) {
 
-				super.addGlobalMessage("A surprising new error has occurred!", 
+				super.addGlobalMessage("A surprising new problem has occurred!", 
 						e.getLocalizedMessage(), FacesMessage.SEVERITY_ERROR);
 			}
 		} // end if userIsLoggedIn
 		
 		return result;
+	}
+	
+	private void updateTrustRating(final TrustedEntityId ratedTeid,
+			final Double rating) {
+		
+		if (this.userService.isUserLoggedIn()) {
+    		try {
+    			final TrustedEntityId myTeid = new TrustedEntityId(
+						TrustedEntityType.CSS, this.userService.getUserID());
+    			final CountDownLatch cdLatch = new CountDownLatch(1);
+    			final TrustUpdateListener listener = new TrustUpdateListener(cdLatch);
+    			this.trustBroker.registerTrustUpdateListener(listener, myTeid,
+    					ratedTeid, TrustValueType.USER_PERCEIVED);
+    			if (LOG.isDebugEnabled())
+    				LOG.debug("Adding trust evidence: '" + myTeid + "' rated '" + ratedTeid + "' with " + rating);
+    			this.trustEvidenceCollector.addDirectEvidence(myTeid, ratedTeid,
+    					TrustEvidenceType.RATED, new Date(), rating);
+    			cdLatch.await(2, TimeUnit.SECONDS);
+    			this.trustBroker.unregisterTrustUpdateListener(listener, myTeid,
+    					ratedTeid, TrustValueType.USER_PERCEIVED);
+    			if (TrustedEntityType.CSS == ratedTeid.getEntityType())
+    				this.users = this.retrieveTrustedEntities(TrustedEntityType.CSS);
+    			else if (TrustedEntityType.CIS == ratedTeid.getEntityType())
+    				this.communities = this.retrieveTrustedEntities(TrustedEntityType.CIS);
+    			else if (TrustedEntityType.SVC == ratedTeid.getEntityType())
+    				this.services = this.retrieveTrustedEntities(TrustedEntityType.SVC);
+    			
+    		} catch (Exception e) {
+
+    			super.addGlobalMessage("A surprising new problem has occurred!", 
+    					e.getLocalizedMessage(), FacesMessage.SEVERITY_ERROR);
+    			return;
+    		}
+    		super.addGlobalMessage("Thanks for your feedback", 
+					"We love you!", FacesMessage.SEVERITY_INFO);
+    	} // end if userIsLoggedIn
+	}
+	
+	private class TrustUpdateListener implements ITrustUpdateEventListener {
+		
+		private final CountDownLatch cdLatch;
+		
+		private TrustUpdateListener(CountDownLatch cdLatch) {
+			
+			this.cdLatch = cdLatch;
+		}
+		
+		/*
+		 * @see org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener#onUpdate(org.societies.api.privacytrust.trust.event.TrustUpdateEvent)
+		 */
+		@Override
+		public void onUpdate(TrustUpdateEvent trustUpdateEvent) {
+			
+			if (LOG.isDebugEnabled())
+				LOG.debug(trustUpdateEvent.getTrustRelationship().getTrustValueType() 
+						+ " trust in '" + trustUpdateEvent.getTrustRelationship().getTrusteeId() 
+						+ "' updated");
+			this.cdLatch.countDown();
+		} 
 	}
 }
