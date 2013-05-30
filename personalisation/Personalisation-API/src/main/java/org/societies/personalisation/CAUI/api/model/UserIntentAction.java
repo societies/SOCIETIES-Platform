@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske dru�be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVA��O, SA (PTIN), IBM Corp., 
+ * informacijske druï¿½be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAï¿½ï¿½O, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -31,6 +31,7 @@ import org.societies.api.personalisation.model.Action;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
+
 /**
  * This class represents an action performed by a user and modeled in user intent model.
  * 
@@ -45,8 +46,10 @@ public class UserIntentAction extends Action implements IUserIntentAction, Seria
 	HashMap<String,Serializable> actionContext = new HashMap<String,Serializable>(); 
 	private int confidenceLevel;
 
+	// is set to true if this action refers to a community of users
+	public Boolean isCommunity = false;
+	
 	//private double transProb;
-
 	private long duration;
 
 	public UserIntentAction(ServiceResourceIdentifier serviceID, String serviceType, String par, String val,Long id){
@@ -111,4 +114,13 @@ public class UserIntentAction extends Action implements IUserIntentAction, Seria
 	public String getTaskID() {
 		return this.taskID ;
 	}
+	
+	public Boolean isCommunity() {
+		return isCommunity;
+	}
+
+	public void setCommunity(Boolean community) {
+		this.isCommunity = community;
+	}
+
 }

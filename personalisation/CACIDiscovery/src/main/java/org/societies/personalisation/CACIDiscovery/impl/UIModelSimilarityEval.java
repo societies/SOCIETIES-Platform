@@ -17,33 +17,30 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.CACI.api.CACIDiscovery;
+package org.societies.personalisation.CACIDiscovery.impl;
 
-import java.util.List;
-
+import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 
+public class UIModelSimilarityEval {
 
-/**
- * @since 0.0.1
- * @author nikosk(ICCS)
- * @version 1.0
- * @created 15-Nov-2011 1:42:10 PM
- */
-
-
-public interface ICACIDiscovery {
-
-	/**
-	 * This methods initiates the generation of a new Context Aware Community Intent model
-	 */
-	public void generateNewCommunityModel();
-
+	public UIModelSimilarityEval(){
+		
+	}
 	
-	/**
-	 * This methods initiates the generation of a new Context Aware Community Intent model
-	 */
-	public void generateNewCommunityModel(List<UserIntentModelData> userModelList);
+	
+	public Double evaluateSimilarity(UserIntentModelData modelA, UserIntentModelData modelB){
+		Double result = 0.0;
+		
+		
+		
+		if( modelA.getActionModel().keySet().equals(modelB.getActionModel().keySet())){
+			result = 1.0;
+		}
+		
+		//TODO extend similarity eval with target actions
+		
+		return result;
+	}
 	
 }
-

@@ -8,12 +8,13 @@
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>RELEASE</version>
 	</parent>
-	<!-- groupId is set in parent pom -->
+
+		<!-- groupId is set in parent pom -->
 	<groupId>org.societies.personalisation</groupId>
 	<artifactId>CACIDiscovery</artifactId>
 	<version>${version.pm}</version>
 	<name>Ctx Aware Community Intent Discovery</name>
-	<packaging>bundle</packaging>
+
 
 	<developers>
 		<developer>
@@ -63,6 +64,39 @@
 			<scope>provided</scope>
 		</dependency>
 
+				<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.personalisation</groupId>
+			<artifactId>CAUITaskManager</artifactId>
+			<version>${version.pm}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.personalisation</groupId>
+			<artifactId>CAUIPrediction</artifactId>
+			<version>${version.pm}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.personalisation</groupId>
+			<artifactId>CAUIDiscovery</artifactId>
+			<version>${version.pm}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		
+		
 	</dependencies>
 
 
