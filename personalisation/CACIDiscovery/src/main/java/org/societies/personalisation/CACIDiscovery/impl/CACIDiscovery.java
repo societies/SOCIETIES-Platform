@@ -19,17 +19,30 @@
  */
 package org.societies.personalisation.CACIDiscovery.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.util.SerialisationHelper;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.personalisation.CACI.api.CACIDiscovery.ICACIDiscovery;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
@@ -161,7 +174,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 		this.printCACIModel(communityActionsMap);
 		UserIntentModelData communityModel = new UserIntentModelData();
 		communityModel.setActionModel(communityActionsMap);
-		storeModel(communityModel);
+		storeModelCtxDB(communityModel);
 		
 	
 	}
@@ -171,10 +184,91 @@ public class CACIDiscovery implements ICACIDiscovery{
 	 * store model to ctx DB as a community ctx Attribute of community Entity defined by cis
 	 */
 	
-	private void storeModel(UserIntentModelData communityModel){
-	//TODO store model 	
+	private CtxAttribute storeModelCtxDB(UserIntentModelData modelData){
+
+		CtxAttribute ctxAttrCAUIModel = null;
+		try {
+			byte[] binaryModel = SerialisationHelper.serialise(modelData);
+
+			//CtxEntity operator = ctxBroker.retrieveCssOperator().get();
+
+			final INetworkNode cssNodeId = commsMgr.getIdManager().getThisNetworkNode();
+
+			final String cssOwnerStr = cssNodeId.getBareJid();
+			IIdentity cssOwnerId = commsMgr.getIdManager().fromJid(cssOwnerStr);
+
+			//LOG.info("cssOwnerId "+cssOwnerId);
+			IndividualCtxEntity operator = ctxBroker.retrieveIndividualEntity(cssOwnerId).get();
+			//LOG.info("discovery operator retrieved "+operator);
+			
+			CtxAttributeIdentifier uiModelAttributeId = null;
+		//	ctxAttrCAUIModel = lookupAttrHelp(CtxAttributeTypes.CAUI_MODEL);
+			List<CtxIdentifier> ls = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
+			if (ls.size()>0) {
+				uiModelAttributeId = (CtxAttributeIdentifier) ls.get(0);
+			} else {
+				CtxAttribute attr = this.ctxBroker.createAttribute(operator.getId(), CtxAttributeTypes.CACI_MODEL).get();
+				uiModelAttributeId = attr.getId();
+			}			
+			
+			if(uiModelAttributeId != null){
+
+				ctxAttrCAUIModel = ctxBroker.updateAttribute(uiModelAttributeId, binaryModel).get();
+			} else {
+				//store under community entity
+				ctxAttrCAUIModel = ctxBroker.updateAttribute(uiModelAttributeId, binaryModel).get();
+			}
+
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ctxAttrCAUIModel;
+	}
+	
+		
+	protected CtxAttribute lookupAttrHelp(String type){
+		CtxAttribute ctxAttr = null;
+		try {
+			// !! use ctxBroker method that searches entities and attributes	
+			List<CtxIdentifier> tupleAttrList = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE,type).get();
+			if(tupleAttrList.size()>0){
+				CtxIdentifier ctxId = tupleAttrList.get(0);
+				ctxAttr =  (CtxAttribute) this.ctxBroker.retrieve(ctxId).get();	
+			}		
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ctxAttr;
 	}
 
+
+	
+	
+	
+	
+	
+	
+	
 	/*
 	 * merges the target action transition probs
 	 */
