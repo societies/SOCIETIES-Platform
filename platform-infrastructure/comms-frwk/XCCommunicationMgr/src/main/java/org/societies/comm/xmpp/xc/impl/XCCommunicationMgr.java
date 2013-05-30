@@ -368,8 +368,10 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 	}
 
 	public void setPrivacyLog(IPrivacyLogAppender privacyLog) {
-		this.privacyLog = privacyLog;
-		privacyLogEnabled = true;
+		if (privacyLog!=null) {
+			this.privacyLog = privacyLog;
+			privacyLogEnabled = true;
+		}
 	}
 	
 	private void privacyLog(Stanza stanza, Object payload) {
