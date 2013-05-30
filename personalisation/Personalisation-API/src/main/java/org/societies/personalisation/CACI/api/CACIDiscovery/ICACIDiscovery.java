@@ -21,6 +21,7 @@ package org.societies.personalisation.CACI.api.CACIDiscovery;
 
 import java.util.List;
 
+import org.societies.api.identity.IIdentity;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 
 
@@ -39,6 +40,10 @@ public interface ICACIDiscovery {
 	 */
 	public void generateNewCommunityModel();
 
+	/**
+	 * This methods initiates the generation of a new Context Aware Community Intent model
+	 */
+	public void generateNewCommunityModel(IIdentity cisId);
 	
 	/**
 	 * This methods initiates the generation of a new Context Aware Community Intent model

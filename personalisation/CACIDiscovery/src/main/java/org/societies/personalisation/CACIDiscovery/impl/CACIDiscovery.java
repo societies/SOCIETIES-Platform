@@ -32,8 +32,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
@@ -579,6 +581,57 @@ public class CACIDiscovery implements ICACIDiscovery{
 	@Override
 	public void generateNewCommunityModel() {
 
+	}
+
+
+	@Override
+	public void generateNewCommunityModel(IIdentity cisId) {
+		
+		List<UserIntentModelData> userModelList = new ArrayList<UserIntentModelData>();
+		
+		try {
+			 CtxEntityIdentifier commEntID = this.ctxBroker.retrieveCommunityEntityId(cisId).get();
+			
+			CommunityCtxEntity commEnt = (CommunityCtxEntity) this.ctxBroker.retrieve(commEntID).get();
+			Set<CtxEntityIdentifier> membersIDSet = commEnt.getMembers();
+		
+			for(CtxEntityIdentifier entityId  : membersIDSet){
+				
+				List<CtxIdentifier> modelAttrIDList = this.ctxBroker.lookup(entityId, CtxModelType.ATTRIBUTE,CtxAttributeTypes.CAUI_MODEL).get();
+				
+				for(CtxIdentifier attrID : modelAttrIDList){
+					
+					CtxAttribute uiModelAttr = this.ctxBroker.retrieveAttribute((CtxAttributeIdentifier) attrID, false).get();	
+					if(uiModelAttr.getBinaryValue() != null){
+						UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
+						userModelList.add(newUIModelData);
+					}
+				}
+			}
+
+			if(userModelList.size()>0){
+				generateNewCommunityModel(userModelList);	
+			}
+					
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 
+		 
+		
 	}
 
 }
