@@ -4,22 +4,25 @@
            xmlns="http://societies.org/api/schema/useragent/feedback"
            xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xs:complexType name="userFeedbackBean">
-        <xs:sequence>
-            <xs:element name="method" type="feedbackMethodType"
-                        minOccurs="0"/>
-            <xs:element name="stage" type="feedbackStage"
-                        minOccurs="0"/>
-            <xs:element name="requestId" type="xs:string" minOccurs="0"/>
-            <xs:element name="requestDate" type="xs:dateTime" minOccurs="0"/>
-            <xs:element name="type" type="xs:int"/>
-            <xs:element name="options" type="xs:string"
-                        minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="proposalText" type="xs:string"
-                        minOccurs="0"/>
-            <xs:element name="timeout" type="xs:int"/>
-        </xs:sequence>
-    </xs:complexType>
+    <xs:element name="userFeedbackBean">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="method" type="feedbackMethodType"
+                            minOccurs="0"/>
+                <xs:element name="stage" type="feedbackStage"
+                            minOccurs="0"/>
+                <xs:element name="requestId" type="xs:string" minOccurs="1"/>
+                <xs:element name="requestDate" type="xs:dateTime" minOccurs="1" nillable="false"/>
+                <xs:element name="type" type="xs:int"/>
+                <xs:element name="options" type="xs:string"
+                            minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="proposalText" type="xs:string"
+                            minOccurs="0"/>
+                <xs:element name="timeout" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
 
     <xs:element name="expFeedbackResultBean">
         <xs:complexType>
@@ -61,16 +64,17 @@
     <xs:element name="userFeedbackHistoryRequest">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="requestType" type="historyRequestType" minOccurs="0"/>
-                <xs:element name="howMany" type="xs:int" minOccurs="0"/>
-                <xs:element name="sinceWhen" type="xs:dateTime" minOccurs="0"/>
-                <xs:element name="response" type="userFeedbackBean" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="requestType" type="historyRequestType" minOccurs="1"/>
+                <xs:element name="howMany" type="xs:int" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="sinceWhen" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="userFeedbackBean" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
 
     <xs:simpleType name="historyRequestType">
         <xs:restriction base="xs:string">
+            <xs:enumeration value="outstanding"/>
             <xs:enumeration value="byCount"/>
             <xs:enumeration value="byDate"/>
         </xs:restriction>
