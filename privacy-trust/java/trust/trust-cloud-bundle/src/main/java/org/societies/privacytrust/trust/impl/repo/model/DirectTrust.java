@@ -89,17 +89,17 @@ public class DirectTrust extends Trust implements IDirectTrust {
 	public String toString() {
 		
 		final StringBuilder sb = new StringBuilder();
-		sb.append("[");
-		sb.append("value=" + super.getValue());
+		sb.append("<");
+		sb.append("value=" + super.value);
 		sb.append(",");
-		sb.append("lastModified=" + super.getLastModified());
+		sb.append("lastModified=" + super.lastModified);
 		sb.append(",");
-		sb.append("lastUpdated=" + super.getLastUpdated());
+		sb.append("lastUpdated=" + super.lastUpdated);
 		sb.append(",");
 		sb.append("rating=" + this.rating);
 		sb.append(",");
 		sb.append("score=" + this.score);
-		sb.append("]");
+		sb.append(">");
 		
 		return sb.toString();
 	}

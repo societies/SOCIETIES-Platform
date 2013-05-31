@@ -25,6 +25,7 @@
 package org.societies.api.context.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -52,7 +53,7 @@ public class CtxAttributeComplexValue implements Serializable{
 	private String locationgps;
 
 	/** The mode value of the current context attribute */
-	private Double mode;
+	private ArrayList<Integer> mode;
 
 	/** The pairs depict a pair of a string with an integer value */
 	HashMap<String, Integer> pairs = new HashMap<String, Integer>();
@@ -171,7 +172,7 @@ public class CtxAttributeComplexValue implements Serializable{
 	 * 
 	 * @return the mode of the current context attribute value.
 	 */
-	public Double getMode() {
+	public ArrayList<Integer> getMode() {
 		
 		return this.mode;
 	}
@@ -182,7 +183,7 @@ public class CtxAttributeComplexValue implements Serializable{
 	 * @param mode
 	 * 			the mode of the current context attribute value.
 	 */
-	public void setMode(Double mode) {
+	public void setMode(ArrayList<Integer> mode) {
 		
 		this.mode = mode;
 	}

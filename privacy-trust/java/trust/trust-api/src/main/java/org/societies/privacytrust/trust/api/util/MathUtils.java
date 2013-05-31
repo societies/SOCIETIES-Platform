@@ -24,6 +24,8 @@
  */
 package org.societies.privacytrust.trust.api.util;
 
+import static org.apache.commons.math.util.MathUtils.EPSILON; 
+
 import org.apache.commons.math.linear.ArrayRealVector;
 import org.apache.commons.math.linear.RealVector;
 import org.apache.commons.math.stat.StatUtils;
@@ -107,14 +109,18 @@ public class MathUtils {
 	
 	public static double cos(double[] x, double[] y) {
 		
-		final RealVector x_vec = new ArrayRealVector(x);
-		final RealVector y_vec = new ArrayRealVector(y);
+		RealVector x_vec = new ArrayRealVector(x);
+		RealVector y_vec = new ArrayRealVector(y);
 		if (x_vec.getDimension() != y_vec.getDimension())
 			throw new IllegalArgumentException(Arrays.toString(x) 
 					+ ", " + Arrays.toString(y) + ": Vector length mismatch"
 					+ ": Expected " + x_vec.getDimension() + " but was " 
 					+ y_vec.getDimension());
-		
+		if (org.apache.commons.math.util.MathUtils.equals(0.0d, x_vec.getNorm()))
+			x_vec = new ArrayRealVector(x_vec.getDimension(), EPSILON);
+		if (org.apache.commons.math.util.MathUtils.equals(0.0d, y_vec.getNorm()))
+			y_vec = new ArrayRealVector(y_vec.getDimension(), EPSILON);
+				
 		return x_vec.dotProduct(y_vec) / (x_vec.getNorm() * y_vec.getNorm());
 	}
 }

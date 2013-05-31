@@ -70,6 +70,7 @@ import org.societies.privacytrust.privacyprotection.privacypreferencemanager.eva
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.management.PrivatePreferenceCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging.AccessControlPreferenceCreator;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.PrivacyPreferenceConditionMonitor;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.accessCtrl.AccCtrlMonitor;
 
 /**
  * @author Elizabeth
@@ -105,6 +106,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	private IDSPreferenceManager idsMgr;
 	private IEventMgr eventMgr;
 	private AccessControlPreferenceCreator accCtrlPreferenceCreator;
+	private AccCtrlMonitor accCtrlMonitor;
 
 	public PrivacyPreferenceManager(){
 
@@ -146,6 +148,8 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		if (this.myMessageBox==null){
 			myMessageBox = new MessageBox();
 		}
+		
+		accCtrlMonitor = new AccCtrlMonitor(this);
 	}
 
 
@@ -175,6 +179,11 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		}
 		return idsMgr;
 	}
+
+	public AccCtrlMonitor getAccCtrlMonitor() {
+		return accCtrlMonitor;
+	}
+
 
 	@Override
 	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId,
@@ -522,6 +531,8 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	public AccessControlPreferenceCreator getAccCtrlPreferenceCreator() {
 		return accCtrlPreferenceCreator;
 	}
+
+
 
 }
 

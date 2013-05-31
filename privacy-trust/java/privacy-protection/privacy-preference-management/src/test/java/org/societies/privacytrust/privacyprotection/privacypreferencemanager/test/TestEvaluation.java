@@ -57,6 +57,7 @@ import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
@@ -86,6 +87,7 @@ public class TestEvaluation {
 	IPrivacyDataManagerInternal  privacyDataManager = Mockito.mock(IPrivacyDataManagerInternal.class);
 	ICommManager commsManager = Mockito.mock(ICommManager.class);
 	IIdentityManager identityManager = Mockito.mock(IIdentityManager.class);
+	IEventMgr eventMgr = Mockito.mock(IEventMgr.class);
 	PrivacyPreferenceManager privPrefMgr = new PrivacyPreferenceManager();
 	IIdentity userId;
 	IUserFeedback userFeedback = Mockito.mock(IUserFeedback.class);
@@ -113,7 +115,7 @@ public class TestEvaluation {
 		privPrefMgr.setprivacyDataManagerInternal(privacyDataManager);
 		privPrefMgr.setTrustBroker(trustBroker);
 		privPrefMgr.setUserFeedback(userFeedback);
-		
+		privPrefMgr.setEventMgr(eventMgr);
 		try {
 			Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxTypes.PRIVACY_PREFERENCE_REGISTRY)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
 			Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, CtxTypes.PRIVACY_PREFERENCE)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));

@@ -92,28 +92,23 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 			break;
 
 		case median:
-
 			break;
 
 		case mode:
-
 			break;
 
 		case range:
-
 			break;
 
 		case minBB:
-
 			break;
 
 		case stringMode:
-
 			break;
 
 		case convexHull:
-
 			break;
+
 		default:
 			break;
 		}
@@ -128,7 +123,6 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 	@Override
 	public CtxAttribute estimateCommunityCtx(CtxEntityIdentifier communityCtxId, CtxAttributeIdentifier ctxAttributeIdentifier) {
 
-
 		LOG.info("estimateCommunityCtx 1");
 		CtxAttribute communityAttr = null;
 
@@ -139,43 +133,58 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 		ArrayList<String> stringAttrValues = new ArrayList<String>();
 		ArrayList<Double> doubleAttrValues = new ArrayList<Double>();
 
-
 		ArrayList<String> finalArrayStringList = new ArrayList<String>();
 		ArrayList<String> modeStringValue = new ArrayList<String>();
 
-
+		List<CtxAttributeValueType> valueTypesStringIntegerDouble = new ArrayList<CtxAttributeValueType>();
+		valueTypesStringIntegerDouble.add(CtxAttributeValueType.STRING);
+		valueTypesStringIntegerDouble.add(CtxAttributeValueType.INTEGER);
+		valueTypesStringIntegerDouble.add(CtxAttributeValueType.DOUBLE);		
+		
+		List<CtxAttributeValueType> valueTypesString = new ArrayList<CtxAttributeValueType>();
+		valueTypesString.add(CtxAttributeValueType.STRING);
+		
+		List<CtxAttributeValueType> valueTypesIntegerString = new ArrayList<CtxAttributeValueType>();
+		valueTypesIntegerString.add(CtxAttributeValueType.INTEGER);
+		valueTypesIntegerString.add(CtxAttributeValueType.STRING);
+		
 		Map<String,List<CtxAttributeValueType>> possibleValueTypes = new HashMap<String,List<CtxAttributeValueType>>();
-
-		List<CtxAttributeValueType> valueTypes = new ArrayList<CtxAttributeValueType>();
-		valueTypes.add(CtxAttributeValueType.STRING);
-		valueTypes.add(CtxAttributeValueType.INTEGER);
-		valueTypes.add(CtxAttributeValueType.DOUBLE);
-		possibleValueTypes.put(CtxAttributeTypes.TEMPERATURE, valueTypes);
+		possibleValueTypes.put(CtxAttributeTypes.TEMPERATURE, valueTypesStringIntegerDouble);
+		possibleValueTypes.put(CtxAttributeTypes.AGE, valueTypesStringIntegerDouble);	
+		possibleValueTypes.put(CtxAttributeTypes.INTERESTS, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.LANGUAGES, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.LOCATION_COORDINATES, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.OCCUPATION, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.LOCATION_SYMBOLIC, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.BOOKS, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.FAVOURITE_QUOTES, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.MOVIES, valueTypesString);
 
 		// TODO add all data types and values
 		// resolve issue with different value types for the same attribute type e.g. hot vs 32C
 
-		Set<String> attributeTypesSet = new HashSet<String>();
-		attributeTypesSet.add(CtxAttributeTypes.TEMPERATURE);
-
-		attributeTypesSet.add(CtxAttributeTypes.BOOKS);
-		attributeTypesSet.add(CtxAttributeTypes.FAVOURITE_QUOTES);
-		attributeTypesSet.add(CtxAttributeTypes.INTERESTS);
-		attributeTypesSet.add(CtxAttributeTypes.MOVIES);
-		attributeTypesSet.add(CtxAttributeTypes.LANGUAGES);
-		attributeTypesSet.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		Set<String> attributeTypesSetToBeChecked = new HashSet<String>();
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.TEMPERATURE);
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.INTERESTS);
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.AGE);
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.LANGUAGES);
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.LOCATION_COORDINATES);
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.OCCUPATION);
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.BOOKS);
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.FAVOURITE_QUOTES);
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.MOVIES);
 		
 		CtxAttributeComplexValue complexValue = new CtxAttributeComplexValue();
 
 		try {
 			LOG.info("estimateCommunityCtx 2");
-			//TODO check if CtxAttribute is nul
+			//TODO check if CtxAttribute is null
 			communityAttr = (CtxAttribute) internalCtxBroker.retrieveAttribute(ctxAttributeIdentifier, false).get();
-
 			String attributeType = ctxAttributeIdentifier.getType().toString();
 
 			// checks if attribute type is included in the list of types that can be estimated
-			if(attributeTypesSet.contains(attributeType)){
+			if(attributeTypesSetToBeChecked.contains(attributeType)){
 
 				CommunityCtxEntity retrievedCommunity = (CommunityCtxEntity) internalCtxBroker.retrieve(communityCtxId).get();
 				Set<CtxEntityIdentifier> communityMembers = retrievedCommunity.getMembers();
@@ -198,29 +207,63 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 						if(ca.getDoubleValue()!= null){
 							doubleAttrValues.add(ca.getDoubleValue());
 						}
-
 					}
 				}
 
 				// Integer values
 				// average, median, 
 				if( !integerAttrValues.isEmpty()){
-					LOG.info("estimateCommunityCtx 4 integer" );
+					LOG.info("estimateCommunityCtx 4for integer" );
 					//average
 					meanIntegerValue = cceNumMean(integerAttrValues);	
 					complexValue.setAverage(meanIntegerValue);
+					LOG.info("Mean Integer Value is :"+meanIntegerValue);
+					
 					// pairs
+					LOG.info("Calculating Pairs");
 					HashMap<String,Integer> pairs = new HashMap<String,Integer>();
 					pairs = cceStringPairs(stringAttrValues);
+					LOG.info("PAIRS are :"+pairs.get(0));
 					complexValue.setPairs(pairs);
-					//range 
-					Integer [] range = cceNumRange(integerAttrValues);
-					complexValue.setRangeMax(range[0]);
-					complexValue.setRangeMin(range[1]);
-					LOG.info("estimateCommunityCtx 4 integer finished ");
-					//mode
-					//TODO add mode
 					
+					//range 
+					LOG.info("Calculating Range ");
+					Integer [] range = cceNumRange(integerAttrValues);
+					complexValue.setRangeMax(range[1]);
+					complexValue.setRangeMin(range[0]);
+					LOG.info("estimateCommunityCtx 4 integer finished ");							
+					
+					//median
+					LOG.info("Calculating Median");
+					Double medianNumber = cceNumMedian(integerAttrValues);
+					LOG.info("The median is "+medianNumber);
+					complexValue.setMedian(medianNumber);
+					LOG.info("estimateCommunityCtx 4 integer finished ");
+					
+					//mode
+					LOG.info("Calculating Mode");
+					//ArrayList<Integer> modeNumber = cceNumMode(integerAttrValues);
+					//complexValue.setMode(integerAttrValues);
+					ArrayList<Integer> modeNumber = cceNumMode(integerAttrValues);
+					complexValue.setMode(modeNumber);
+
+					LOG.info("Calculating ConvexHull");
+					//Converting the integers to Points2D
+					ArrayList<String> finalStringArrayList = new ArrayList<String>();
+					ArrayList<Point2D> cH = new ArrayList<Point2D>();
+					
+					for (String strPoint:stringAttrValues){
+						String[] helperString = strPoint.split(",");
+						for (String s1:helperString){
+							finalStringArrayList.add(s1);
+						}
+					}
+					cH = cceGeomConvexHull(CommunityContextEstimation.splitString(finalArrayStringList.toString()));
+					ArrayList<String> stringPoints = new ArrayList<String>();
+					for (Point2D point:cH){
+						stringPoints.add(point.toString());
+					}
+					complexValue.setLocationGPS(stringPoints.toString());
 					//TODO add any other applicable
 					
 				}
@@ -241,6 +284,17 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 				}
 				communityAttr.setComplexValue(complexValue);
 				LOG.info("estimateCommunityCtx 6 communityAttr "+ communityAttr.getId());
+			}
+			
+			// calculate double
+			if(!doubleAttrValues.isEmpty()){
+				//average
+				// TODO add a method cceNumMean that will take array of doubles
+				//range
+				
+				//median
+				
+				//mode
 			}
 
 		} catch (InterruptedException e1) {
@@ -912,19 +966,17 @@ public class CommunityContextEstimation implements ICommunityCtxEstimationMgr{
 
 		Assert.notEmpty(inputValuesList,"Cannot use estimation without attributes");
 		int total = 0; 
-		//double res = 0.0;
+
 
 		for (int i=0; i<inputValuesList.size(); i++) {
 			total = total + inputValuesList.get(i);
 		}		
 
-		double res = (double)total/(double)inputValuesList.size();
-		//		double res =roundTwoDecimals(total/inputValuesList.size());
-		//		DecimalFormat twoDForm = new DecimalFormat("#.##");
-		//		double resF = Double.valueOf(twoDForm.format(res)).doubleValue();				
+		double res = (double)total/(double)inputValuesList.size();		
 
 		return res;
 	}
+	
 
 	/*
 	 * Returns the median of an integers' ArrayList

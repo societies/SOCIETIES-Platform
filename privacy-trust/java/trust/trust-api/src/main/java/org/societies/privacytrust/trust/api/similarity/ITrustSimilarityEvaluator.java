@@ -36,14 +36,19 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 public interface ITrustSimilarityEvaluator {
 	
 	/**
-	 * TODO
+	 * Evaluates the cosine similarity between the given trustor and trustee.
+	 * More specifically, the resulting similarity ranges from −1 meaning
+	 * exactly opposite, to 1 meaning exactly the same, with 0 usually
+	 * indicating independence, and in-between values indicating intermediate
+	 * similarity or dissimilarity.
 	 * 
 	 * @param trustorId
 	 *            the entity to compare against the given trustee.
 	 * @param trusteeId 
 	 *            the entity to compare against the given trustor.
-	 * @return
+	 * @return the cosine similarity between the given trustor and trustee.
 	 * @throws TrustSimilarityEvalException
+	 *             if there is a problem evaluating the cosine similarity.
 	 * @throws IllegalArgumentException 
 	 *             if the specified identifiers are not of type CSS.
 	 * @throws NullPointerException

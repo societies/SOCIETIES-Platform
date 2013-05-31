@@ -99,8 +99,7 @@ public class DOMHelper {
 	/**
 	 * Transform XML from {@link Document} to byte[]
 	 * 
-	 * @param xml
-	 *            The XML in form of {@link Document}
+	 * @param doc The XML in form of {@link Document}
 	 * @return XML byte array or null on error
 	 */
 	public static byte[] doc2byteArray(Document doc) {

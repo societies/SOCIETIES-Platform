@@ -15,12 +15,12 @@
 
     <!--TODO : Should not be using cardinality 0..1, this needs to be updated but since privacy api changed and IPrivacyPolicyManagerRemote
     no longer available, not just cardinality that needs to be changed, code does too. So leaving this for now, as that bundle deploys -->
-    <!--     <osgi:reference id="privacyPolicyManager"
-                        interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager"
-                        cardinality="0..1"/>
-        <osgi:reference id="privacyPolicyManagerRemote"
-                        interface="org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote"
-                        cardinality="0..1"/> -->
+<!--     <osgi:reference id="privacyPolicyManager"
+                    interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager"
+                    cardinality="0..1"/>
+    <osgi:reference id="privacyPolicyManagerRemote"
+                    interface="org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote"
+                    cardinality="0..1"/> -->
 
     <!--Required for service discovery-->
     <osgi:reference id="serviceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"
@@ -37,5 +37,9 @@
                     interface="org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository"/>
     <osgi:reference id="privacyPolicyNegotiationHistoryRepository"
                     interface="org.societies.useragent.api.feedback.IPrivacyPolicyNegotiationHistoryRepository"/>
+	
+    <osgi:reference id="trustBroker" interface="org.societies.api.internal.privacytrust.trust.ITrustBroker"/>
+
+    <osgi:reference id="trustEvidenceCollector" interface="org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector"/>
 
 </beans>

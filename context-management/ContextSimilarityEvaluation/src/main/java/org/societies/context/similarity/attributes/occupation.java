@@ -45,19 +45,19 @@ public class occupation {
 		
 	}
 	
-	public HashMap<String, Double> evaluate(IIdentity[] allOwners){
+	public HashMap<String, Double> evaluate(String[] allOwners){
 		HashMap<String, Double> results = new HashMap<String, Double>();
 		HashMap<String, Integer> resultcount = new HashMap<String, Integer>();
 		Integer totalCount = allOwners.length;
  
-		for (IIdentity css : allOwners){
+		for (String css : allOwners){
 
 			// get context value
 			// TODO  sort this out later
-			CtxAttribute contextResult = gcd.getContext(css, cat.OCCUPATION);
-			String contextValue = contextResult.getStringValue();
+			//CtxAttribute contextResult = gcd.getContext(css, cat.OCCUPATION);
+			//String contextValue = contextResult.getStringValue();
 			// 
-			String[] indivresult = occRef.find(contextValue);
+			String[] indivresult = occRef.find(css);//(contextValue);
 			for (String i : indivresult){
 				if (resultcount.containsKey(i)){
 					resultcount.put(i, resultcount.get(i) + 1);
