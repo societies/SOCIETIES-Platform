@@ -37,6 +37,7 @@ public interface ICoreSocietiesServices {
 	final static String CIS_SUBSCRIBED_SERVICE_INTENT = "org.societies.android.platform.cis.CisSubscribedRemote";
 	final static String COMMS_SERVICE_INTENT = "org.societies.android.platform.comms.app.ServicePlatformCommsRemote";
 	final static String TRUST_CLIENT_SERVICE_INTENT = "org.societies.android.privacytrust.trust.TrustClientRemote";
+	final static String CONTEXT_SERVICE_INTENT = "org.societies.android.platform.context.ServiceContextBrokerRemote";
 	
 	/**
 	 * 
@@ -50,5 +51,4 @@ public interface ICoreSocietiesServices {
 	 * @return true if service terminated
 	 */
 	boolean tearDownService(IMethodCallback callback);
-
 }

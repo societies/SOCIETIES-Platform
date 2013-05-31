@@ -48,7 +48,7 @@ public class SopSuitability {
 	 * Suitability of the SOP option is calculated based on weighted average.
 	 * 
 	 * @param preferenceNames Names of the preferences to be fetched from
-	 * {@link IInternalPersonalisationManager}
+	 * {@link IPersonalisationManager}
 	 * @param valuesInSop Numerical values in given SOP option
 	 * @param weights Importance estimations of parameters.
 	 * 

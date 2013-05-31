@@ -57,7 +57,7 @@
         <dependency>
             <groupId>org.societies</groupId>
             <artifactId>hibernate_classes</artifactId>
-            <scope>test</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.transaction</groupId>
@@ -162,12 +162,6 @@
             <artifactId>societies-api-internal</artifactId>
             <scope>provided</scope>
         </dependency>
-<!--        <dependency>
-            <groupId>org.societies.orchestration.api</groupId>
-            <artifactId>intelligent-community-orchestration-api</artifactId>
-            <scope>provided</scope>
-            <version>${version.ico}</version>
-        </dependency>-->
 
         <dependency>
             <groupId>org.societies.api.external</groupId>
@@ -177,13 +171,6 @@
 
         <!--  graph stuff -->
 
-
-        <!-- 	<dependency> -->
-        <!-- 		<groupId>net.sf.jung</groupId> -->
-        <!-- 		<artifactId>jung-io</artifactId> -->
-        <!-- 		<version>${project.version}</version> -->
-        <!-- 		<scope>compile</scope> -->
-        <!-- 	</dependency> -->
 
         <dependency>
             <groupId>net.sf.jung</groupId>
@@ -204,9 +191,30 @@
             <version>7.0</version>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.9.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.societies.platform</groupId>
+            <artifactId>facebook_connector</artifactId>
+            <scope>test</scope>
+            <version>${release.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.pmerienne</groupId>
+            <artifactId>trident-ml</artifactId>
+            <version>0.0.2</version>
+        </dependency>
     </dependencies>
-
+    <repositories>
+        <repository>
+            <id>clojars.org</id>
+            <url>http://clojars.org/repo</url>
+        </repository>
+    </repositories>
     <build>
         <plugins>
             <plugin>
@@ -215,6 +223,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+                        <Import-Package>*;resolution:=optional</Import-Package>
                         <Embed-Dependency>;scope=compile|runtime</Embed-Dependency>
                         <Embed-Transitive>false</Embed-Transitive>
                     </instructions>

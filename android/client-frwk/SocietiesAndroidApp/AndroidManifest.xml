@@ -78,6 +78,7 @@
         <service android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidLocal" />
         <service android:name="org.societies.android.platform.useragent.feedback.EventListener" />
         <service android:name="org.societies.android.platform.useragent.feedback.EventHistory" />
+        <service android:name="org.societies.android.privacytrust.trust.TrustClientLocal" />
         <!-- REMOTE SERVICES -->
         <service android:name="org.societies.android.platform.cis.CisDirectoryRemote" android:label="Cis Directory Remote" >
            <intent-filter>
@@ -116,6 +117,13 @@
                 <action android:name="org.societies.android.privacytrust.trust.TrustClientRemote" />
             </intent-filter>
         </service>
+        <service android:name="org.societies.android.platform.context.ServiceContextBrokerRemote" 
+            android:label="SocietiesContext" >
+            <intent-filter>
+                <action android:name="org.societies.android.platform.context.ServiceContextBrokerRemote" />
+            </intent-filter>
+        </service>
+        
         <provider 
             android:authorities="org.societies.android.platform.content.androidcssmanager"
             android:name="org.societies.android.platform.content.ProviderImplementation"

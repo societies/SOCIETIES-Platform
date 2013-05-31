@@ -129,7 +129,7 @@ public class DataTransferAnalyzer {
 		return matches;
 	}
 
-	public AssessmentResultIIdentity estimatePrivacyBreach(IIdentity sender) throws AssessmentException {
+	public AssessmentResultIIdentity estimatePrivacyBreach(IIdentity sender, Date start, Date end) throws AssessmentException {
 		
 		if (sender == null || sender.getJid() == null) {
 			LOG.warn("estimatePrivacyBreach({}): sender or sender JID is null", sender);
@@ -141,6 +141,8 @@ public class DataTransferAnalyzer {
 		AssessmentResultIIdentity result = new AssessmentResultIIdentity(sender);
 		PrivacyLogFilter filter = new PrivacyLogFilter();
 		filter.setSender(sender);
+		filter.setStart(start);
+		filter.setEnd(end);
 		
 		double corrByAll = 0;
 		double corrBySender = 0;
@@ -154,7 +156,7 @@ public class DataTransferAnalyzer {
 		return result;
 	}
 	
-	public AssessmentResultClassName estimatePrivacyBreach(String sender) throws AssessmentException {
+	public AssessmentResultClassName estimatePrivacyBreach(String sender, Date start, Date end) throws AssessmentException {
 		
 		if (sender == null) {
 			LOG.warn("estimatePrivacyBreach({}): sender is null", sender);
@@ -166,6 +168,8 @@ public class DataTransferAnalyzer {
 		AssessmentResultClassName result = new AssessmentResultClassName(sender);
 		PrivacyLogFilter filter = new PrivacyLogFilter();
 		filter.setSenderClass(sender);
+		filter.setStart(start);
+		filter.setEnd(end);
 		
 		double corrByAll = 0;
 		double corrBySender = 0;

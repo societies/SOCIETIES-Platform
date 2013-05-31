@@ -149,6 +149,9 @@ public class CPA implements IDataCollectorSubscriber, Runnable
     }
     public void init(){
         this.newActivities = new ArrayList<IActivity>();
+        this.lastTemporaryCheck = new Date(0);
+        this.cpaCreationPatterns = new CPACreationPatterns();
+        this.cpaCreationPatterns.init();
     }
     public List<String> getTrends(int n){
         //ArrayList<String> ret = new ArrayList<String>();

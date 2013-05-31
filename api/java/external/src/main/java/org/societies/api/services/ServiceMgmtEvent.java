@@ -26,6 +26,7 @@ package org.societies.api.services;
 
 import java.io.Serializable;
 
+import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceType;
 
@@ -46,6 +47,7 @@ public class ServiceMgmtEvent implements Serializable{
 	private long bundleId;
 	private String bundleSymbolName;
 	private ServiceType serviceType;
+	private IIdentity sharedNode;
 	private ServiceMgmtEventType eventType;
 	
 	
@@ -54,6 +56,18 @@ public class ServiceMgmtEvent implements Serializable{
 	 */
 	public ServiceMgmtEventType getEventType() {
 		return eventType;
+	}
+	/**
+	 * @return the sharedNode
+	 */
+	public IIdentity getSharedNode() {
+		return sharedNode;
+	}
+	/**
+	 * @param sharedNode the sharedNode to set
+	 */
+	public void setSharedNode(IIdentity sharedNode) {
+		this.sharedNode = sharedNode;
 	}
 	/**
 	 * @param eventType the eventType to set

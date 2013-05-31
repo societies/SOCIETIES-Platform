@@ -71,6 +71,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
+import org.societies.api.context.model.CtxEvaluationResults;
 import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
@@ -78,6 +79,7 @@ import org.societies.context.api.community.db.ICommunityCtxDBMgr;
 import org.societies.context.api.community.inference.ICommunityCtxInferenceMgr;
 import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.ICtxEventMgr;
+import org.societies.context.api.similarity.ICtxSimilarityEvaluator;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 import org.societies.context.api.user.inference.IUserCtxInferenceMgr;
@@ -95,9 +97,10 @@ import org.societies.context.broker.impl.comm.callbacks.RetrieveCtxCallback;
 import org.societies.context.broker.impl.comm.callbacks.RetrieveIndividualEntCallback;
 import org.societies.context.broker.impl.comm.callbacks.UpdateCtxCallback;
 import org.societies.context.broker.impl.util.CtxBrokerUtils;
+//import org.societies.context.similarity.impl.ContextSimilarityEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Async; 
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.societies.api.identity.util.DataTypeUtils;
@@ -231,6 +234,14 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		return this.createEntity(null, null, type);
 	}
+	
+	/**
+	 * The Context Similarity Evaluator service reference.
+	 *
+	 * @see {@link #setCtxSimilarityEvaluator(ICtxSimilarityEvaluator)}
+	 */
+	@Autowired(required=true)
+	private ICtxSimilarityEvaluator ctxSimilarityEval;
 
 	@Override
 	@Async
@@ -1442,6 +1453,16 @@ public class InternalCtxBroker implements ICtxBroker {
 	public void setUserCtxInferenceMgr(IUserCtxInferenceMgr userCtxInferenceMgr) {
 
 		this.userCtxInferenceMgr = userCtxInferenceMgr;
+	}
+	
+	/**
+	 * Sets the UserCtxInferenceMgr service reference.
+	 * 
+	 * @param ICtxSimilarityEvaluator
+	 *            the ctxSimilarityEval service reference to set.
+	 */
+	public void setCtxSimilarityEvaluator(ICtxSimilarityEvaluator ICSE) {
+		this.ctxSimilarityEval = ICSE;
 	}
 
 
@@ -2802,4 +2823,14 @@ public class InternalCtxBroker implements ICtxBroker {
 		return this.retrieve(req, ctxIdList);
 	}
 
+	/**
+	 * added by eboylan for CSE integration test
+	 */
+	@Override
+    public CtxEvaluationResults evaluateSimilarity(String[] ids, ArrayList<String> attrib) throws CtxException {
+		LOG.info("EBOYLANLOGFOOTPRINT: ctxSimilarity broker = " + ctxSimilarityEval);
+        LOG.info("EBOYLANLOGFOOTPRINT internalCtxBroker.evaluateSimilarity called");
+        CtxEvaluationResults evalResult = (CtxEvaluationResults) this.ctxSimilarityEval.evaluateSimilarity(ids, attrib); //this.
+    return evalResult;
+    }
 }

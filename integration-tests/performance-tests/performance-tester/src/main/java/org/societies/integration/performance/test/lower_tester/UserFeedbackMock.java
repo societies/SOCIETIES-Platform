@@ -43,6 +43,8 @@ import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
  * @author Rafik
  *
  */
+
+@Deprecated
 public class UserFeedbackMock implements Subscriber{
 	
 	private IUserFeedback userFeedback;
