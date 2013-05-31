@@ -26,12 +26,14 @@ package org.societies.context.api.similarity;
 
 import java.util.ArrayList;
 
+import org.societies.api.context.model.CtxEvaluationResults;
+
 /**
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  */
 public interface ICtxSimilarityEvaluator {
 
-	public evaluationResults evaluateSimilarity(String[] ids, ArrayList<String> attrib);
+	public CtxEvaluationResults evaluateSimilarity(String[] ids, ArrayList<String> attrib);
 	
 
 }

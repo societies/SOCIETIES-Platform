@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -37,6 +38,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Index;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
@@ -50,6 +52,8 @@ import org.societies.privacytrust.trust.api.model.ITrustedService;
  * {@link TrustedCis} objects representing the communities this CSS is member
  * of. In addition, the services provided by a TrustedCss are modelled as
  * {@link TrustedService} objects.
+ * <p>
+ * Note: this class has a natural ordering that is inconsistent with equals.
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.1
@@ -87,6 +91,11 @@ public class TrustedCss extends TrustedEntity implements ITrustedCss {
 			fetch = FetchType.EAGER
 	)
 	private final Set<ITrustedService> services = new HashSet<ITrustedService>();
+	
+	/** The similarity between the trustor and the trustee. */
+	@Index(name = "similarity_idx")
+	@Column(name = "similarity")
+	private Double similarity = 0.0d;
 
 	/* Empty constructor required by Hibernate */
 	private TrustedCss() {
@@ -160,4 +169,47 @@ public class TrustedCss extends TrustedEntity implements ITrustedCss {
 	public Set<TrustedService> getServices(String serviceType) {
 		return null;
 	}*/
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedCss#getSimilarity()
+	 */
+	@Override
+	public Double getSimilarity() {
+		
+		return (this.similarity != null) ? new Double(this.similarity) : null;
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedCss#setSimilarity(java.lang.Double)
+	 */
+	@Override
+	public void setSimilarity(Double similarity) {
+		
+		this.similarity = similarity;
+	}
+	
+	/*
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		
+		final StringBuilder sb = new StringBuilder();
+		
+		sb.append("(");
+		sb.append("trustorId=" + super.getTrustorId());
+		sb.append(",");
+		sb.append("trusteeId=" + super.getTrusteeId());
+		sb.append(",");
+		sb.append("directTrust=" + super.getDirectTrust());
+		sb.append(",");
+		sb.append("indirectTrust=" + super.getIndirectTrust());
+		sb.append(",");
+		sb.append("userPerceivedTrust=" + super.getUserPerceivedTrust());
+		sb.append(",");
+		sb.append("similarity=" + this.similarity);
+		sb.append(")");
+		
+		return sb.toString();
+	}
 }

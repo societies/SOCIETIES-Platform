@@ -285,7 +285,7 @@ public class PrivacyAssessmentController {
 				ylabel = "Correlation of data transmission and data access";
 
 				HashMap<IIdentity, AssessmentResultIIdentity> assResult;
-				assResult = assessment.getAssessmentAllIds();
+				assResult = assessment.getAssessmentAllIds(null, null);
 
 				int size = assResult.size();
 				IIdentity[] labels = new IIdentity[size];
@@ -320,7 +320,7 @@ public class PrivacyAssessmentController {
 				ylabel = "Correlation of data transmission and data access";
 
 				HashMap<String, AssessmentResultClassName> assResult;
-				assResult = assessment.getAssessmentAllClasses();
+				assResult = assessment.getAssessmentAllClasses(null, null);
 
 				int size = assResult.size();
 				String[] labels = new String[size];
@@ -395,7 +395,7 @@ public class PrivacyAssessmentController {
 		else if (presentationFormat.equalsIgnoreCase(Presentation.Format.TABLE)) {
 
 			HashMap<String, AssessmentResultClassName> assResult;
-			assResult = assessment.getAssessmentAllClasses();
+			assResult = assessment.getAssessmentAllClasses(null, null);
 			model.put("assessmentResults", assResult.values());
 
 			LOG.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST end");
@@ -491,7 +491,9 @@ public class PrivacyAssessmentController {
 		//ADD THE BEAN THAT CONTAINS ALL THE FORM DATA FOR THIS PAGE
 		PrivacyAssessmentForm assForm = new PrivacyAssessmentForm();
 		assForm.setAssessNow(false);
-		int autoReassessmentInSecs = assessment.getAutoPeriod();
+		//int autoReassessmentInSecs = assessment.getAutoPeriod();
+		int autoReassessmentInSecs = 0;  // FIXME: remove this obsolete functionality
+		LOG.warn("Automatic periodical assessment is no longer implemented.");
 		assForm.setAutoReassessment(autoReassessmentInSecs >= 0);
 		assForm.setAutoReassessmentInSecs(autoReassessmentInSecs);
 		model.put("assForm", assForm);
@@ -524,13 +526,15 @@ public class PrivacyAssessmentController {
 		
 		try {
 			if (assessNow) {
-				assessment.assessAllNow();
+				assessment.assessAllNow(null, null);
 			}
 			
 			if (!assForm.isAutoReassessment()) {
 				autoAssessmentPeriod = -1;
 			}
-			assessment.setAutoPeriod(autoAssessmentPeriod);
+			// FIXME: remove this obsolete functionality
+			//assessment.setAutoPeriod(autoAssessmentPeriod);
+			LOG.warn("Automatic periodical assessment is no longer implemented.");
 		}
 		catch (Exception ex)
 		{

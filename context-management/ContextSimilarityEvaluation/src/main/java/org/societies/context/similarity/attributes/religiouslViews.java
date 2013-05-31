@@ -46,17 +46,17 @@ public class religiouslViews {
 		gcd = new GetContextData();
 	}
 	
-	public HashMap<String, Double> evaluate(IIdentity[] allOwners){
+	public HashMap<String, Double> evaluate(String[] allOwners){
 		HashMap<String, Double> results = new HashMap<String, Double>();
 		HashMap<String, Integer> resultcount = new HashMap<String, Integer>();
 		Integer totalCount = allOwners.length;
  
-		for (IIdentity css : allOwners){
+		for (String css : allOwners){
 			// get context value
 			// TODO  sort this out later
-			CtxAttribute contextResult = gcd.getContext(css, cat.RELIGIOUS_VIEWS);
-			String contextValue = contextResult.getStringValue();			
-			String[] splitString = contextValue.split(",");
+			//CtxAttribute contextResult = gcd.getContext(css, cat.RELIGIOUS_VIEWS);
+			//String contextValue = contextResult.getStringValue();			
+			String[] splitString = css.split(",");
 			
 			for (String i : splitString){
 				if (resultcount.containsKey(i)){

@@ -29,6 +29,7 @@ package org.societies.webapp.models;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.faces.bean.ManagedBean;
@@ -76,6 +77,10 @@ public class PrivacyAssessmentForm implements Serializable {
 	 * Relative path to chart image to show
 	 */
 	private String chart;
+	
+	private Date startDate;
+
+	private Date endDate;
 
 	public class SubjectTypes {
 		public static final String RECEIVER_IDS = "Receiver identities";
@@ -83,14 +88,6 @@ public class PrivacyAssessmentForm implements Serializable {
 		public static final String SENDER_CLASSES = "Sender classes";
 		public static final String DATA_ACCESS_IDS = "Data access by identities";
 		public static final String DATA_ACCESS_CLASSES = "Data access by classes";
-	}
-	
-	public class ImageFileNames {
-		public static final String RECEIVER_IDS = SubjectTypes.RECEIVER_IDS + ".png";
-		public static final String SENDER_IDS = SubjectTypes.SENDER_IDS + ".png";
-		public static final String SENDER_CLASSES = SubjectTypes.SENDER_CLASSES + ".png";
-		public static final String DATA_ACCESS_IDS = SubjectTypes.DATA_ACCESS_IDS + ".png";
-		public static final String DATA_ACCESS_CLASSES = SubjectTypes.DATA_ACCESS_CLASSES + ".png";
 	}
 	
 	public PrivacyAssessmentForm() {
@@ -178,5 +175,37 @@ public class PrivacyAssessmentForm implements Serializable {
 	public void setChart(String chart) {
 		log.debug("chart = {}", chart);
 		this.chart = chart;
+	}
+
+	/**
+	 * @return the startDate
+	 */
+	public Date getStartDate() {
+		log.debug("getStartDate(): {}", startDate);
+		return startDate;
+	}
+
+	/**
+	 * @param startDate the startDate to set
+	 */
+	public void setStartDate(Date startDate) {
+		log.debug("setStartDate({})", startDate);
+		this.startDate = startDate;
+	}
+
+	/**
+	 * @return the endDate
+	 */
+	public Date getEndDate() {
+		log.debug("getEndDate(): {}", endDate);
+		return endDate;
+	}
+
+	/**
+	 * @param endDate the endDate to set
+	 */
+	public void setEndDate(Date endDate) {
+		log.debug("setEndDate({})", endDate);
+		this.endDate = endDate;
 	}
 }

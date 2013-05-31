@@ -25,6 +25,7 @@
 package org.societies.context.broker.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -50,6 +51,7 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.context.model.CtxEvaluationResults;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.context.broker.api.CtxBrokerException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -576,7 +578,18 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			// do nothing
 		}
 	}
+ 
+	/**
+	 * added by eboylan for CSE integration tests
+	 */
+	@Override
+    @Async
+    public CtxEvaluationResults evaluateSimilarity(String[] ids,ArrayList<String> attrib) throws CtxException {
+        
+        CtxEvaluationResults result = internalCtxBroker.evaluateSimilarity(ids, attrib);
+        LOG.info("EBOYLANLOGFOOTPRINT CtxBroker.evaluateSimilarity() called");
+        return result;
+    }
 
-	
 
 }

@@ -27,6 +27,7 @@ package org.societies.api.internal.security.policynegotiator;
 import java.net.URI;
 import java.util.List;
 
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.security.storage.ISecureStorage;
 
 /**
@@ -39,8 +40,7 @@ public interface INegotiationCallback {
 	
 	/**
 	 * Async return for
-	 * {@link INegotiation#startNegotiation(org.societies.api.identity.IIdentity,
-	 * String, INegotiationCallback)}
+	 * {@link INegotiation#startNegotiation(Requestor, INegotiationCallback)}
 	 * 
 	 * @param agreementKey The key to get Service Level Agreement (SLA) from
 	 * {@link ISecureStorage}. If negotiation has not been successful, this
@@ -62,8 +62,7 @@ public interface INegotiationCallback {
 
 	/**
 	 * Async return for
-	 * {@link INegotiation#startNegotiation(org.societies.api.identity.IIdentity,
-	 * String, INegotiationCallback)}
+	 * {@link INegotiation#startNegotiation(Requestor, INegotiationCallback)}
 	 * in case of error.
 	 * 
 	 * @param msg Error message

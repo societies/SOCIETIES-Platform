@@ -102,42 +102,42 @@ public class ClientResponsePolicyGenerator {
 		return responsePolicyGenerated;
 	}
 
-	public ResponsePolicy generatePolicyUserAproved(NegotiationDetails details, ResponsePolicy requestedResponsePolicy){
+	public ResponsePolicy generatePolicyUserApproved(NegotiationDetails details, ResponsePolicy requestedResponsePolicy){
 		// Generate an empty failed response policy ( may be needed)
 		ResponsePolicy responsePolicyEmpty = new ResponsePolicy();
 		responsePolicyEmpty.setRequestor(requestedResponsePolicy.getRequestor());
 		responsePolicyEmpty.setNegotiationStatus(NegotiationStatus.FAILED);
 
 		// -- Let the user change the selected response policy
-		ResponsePolicy responsePolicyUserApprouved = new ResponsePolicy();
+		ResponsePolicy responsePolicyUserApproved = new ResponsePolicy();
 		NegotiationDetailsBean negDetailsBean = new NegotiationDetailsBean();
 		negDetailsBean.setNegotiationID(details.getNegotiationID());
 		negDetailsBean.setRequestor(requestedResponsePolicy.getRequestor());
 		try {
-			responsePolicyUserApprouved = userFeedback.getPrivacyNegotiationFB(requestedResponsePolicy, negDetailsBean).get();
-			if (null == responsePolicyUserApprouved){
+			responsePolicyUserApproved = userFeedback.getPrivacyNegotiationFB(requestedResponsePolicy, negDetailsBean).get();
+			if (null == responsePolicyUserApproved){
 				LOG.error("Result of userfeedback negotiation request is null");
-				responsePolicyUserApprouved = responsePolicyEmpty;
+				responsePolicyUserApproved = responsePolicyEmpty;
 			}
-			else if (NegotiationStatusUtils.equal(NegotiationStatus.FAILED, responsePolicyUserApprouved.getNegotiationStatus())){
+			else if (NegotiationStatusUtils.equal(NegotiationStatus.FAILED, responsePolicyUserApproved.getNegotiationStatus())){
 				LOG.error("Result of userfeedback negotiation request has a 'failed' status");
-				responsePolicyUserApprouved = responsePolicyEmpty;
-				responsePolicyUserApprouved.setResponseItems(new ArrayList<ResponseItem>());
+				responsePolicyUserApproved = responsePolicyEmpty;
+				responsePolicyUserApproved.setResponseItems(new ArrayList<ResponseItem>());
 			}
 			else {
 				LOG.debug("Result of userfeedback negotiation request is valid, let's check it with the requested policy");
-				responsePolicyUserApprouved.setNegotiationStatus(NegotiationStatus.ONGOING);
+				responsePolicyUserApproved.setNegotiationStatus(NegotiationStatus.ONGOING);
 			}
-			LOG.debug("Generated user response policy. ResponsePolicy contains: "+responsePolicyUserApprouved.getResponseItems().size()+" responseItems");
-			LOG.debug(ResponsePolicyUtils.toString(responsePolicyUserApprouved));
-			return responsePolicyUserApprouved;
+			LOG.debug("Generated user response policy. ResponsePolicy contains: "+responsePolicyUserApproved.getResponseItems().size()+" responseItems");
+			LOG.debug(ResponsePolicyUtils.toString(responsePolicyUserApproved));
+			return responsePolicyUserApproved;
 		} catch (InterruptedException e) {
 			LOG.error("Negotiation failed due to interrupted exception", e);
-			responsePolicyUserApprouved = responsePolicyEmpty;
+			responsePolicyUserApproved = responsePolicyEmpty;
 		} catch (ExecutionException e) {
 			LOG.error("Negotiation failed due to execution exception", e);
-			responsePolicyUserApprouved = responsePolicyEmpty;
+			responsePolicyUserApproved = responsePolicyEmpty;
 		}
-		return responsePolicyUserApprouved;
+		return responsePolicyUserApproved;
 	}
 }

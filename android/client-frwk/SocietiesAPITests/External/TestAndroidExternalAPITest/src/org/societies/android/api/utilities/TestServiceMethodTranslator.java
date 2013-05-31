@@ -15,7 +15,8 @@ public class TestServiceMethodTranslator extends AndroidTestCase {
 												"getAnotherGreeting(String appendToMessage, int index)",
 												"getParcelable(String value, int number, org.societies.android.TestParcel parcel)",
 												"getArrays(String[ ] value, String othervalue[], int  [] number, long longer  [], org.societies.android.TestParcel parcel[])",
-												"getComplexParcelable(org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean bean, Object object)"
+												"getComplexParcelable(org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean bean, Object object)",
+												"getSeriazable(Serializable serBean, Object object)"
 	};
 	
 	private static String METHOD_1 = "getGreeting";
@@ -23,6 +24,7 @@ public class TestServiceMethodTranslator extends AndroidTestCase {
 	private static String METHOD_3 = "getParcelable";
 	private static String METHOD_4 = "getArrays";
 	private static String METHOD_5 = "getComplexParcelable";
+	private static String METHOD_6 = "getSeriazable";
 	private static String METHOD_NON_EXIST = "doesNotExist()";
 	private static String PARAM_1_NAME = "appendToMessage";
 	private static String PARAM_2_NAME = "index";
@@ -33,6 +35,7 @@ public class TestServiceMethodTranslator extends AndroidTestCase {
 	private static String PARAM_7_NAME = "longer";
 	private static String PARAM_8_NAME = "bean";
 	private static String PARAM_9_NAME = "object";
+	private static String PARAM_10_NAME = "serBean";
 	
 	private static String PARAM_1_TYPE = "String";
 	private static String PARAM_2_TYPE = "int";
@@ -46,6 +49,7 @@ public class TestServiceMethodTranslator extends AndroidTestCase {
 	private static String PARAM_10_TYPE = "org.societies.android.TestParcel";
 	private static String PARAM_11_TYPE = "org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean";
 	private static String PARAM_12_TYPE = "Object";
+	private static String PARAM_13_TYPE = "Serializable";
 	
 	private static String PARAM_1_ARRAY_TYPE = "String[]";
 	private static String PARAM_2_ARRAY_TYPE = "int[]";
@@ -64,6 +68,7 @@ public class TestServiceMethodTranslator extends AndroidTestCase {
 	private static String PARAM_4_TYPE_CAP = "Double";
 	private static String PARAM_5_TYPE_CAP = "org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean";
 	private static String PARAM_6_TYPE_CAP = "Object";
+	private static String PARAM_7_TYPE_CAP = "Serializable";
 
 	private static String PARAM_1_ARRAY_TYPE_CAP = "String[]";
 	private static String PARAM_2_ARRAY_TYPE_CAP = "Int[]";
@@ -121,6 +126,7 @@ public class TestServiceMethodTranslator extends AndroidTestCase {
 		assertEquals(3, ServiceMethodTranslator.getMethodIndex(methodsArray, methodsArray[3]));
 		assertEquals(4, ServiceMethodTranslator.getMethodIndex(methodsArray, methodsArray[4]));
 		assertEquals(5, ServiceMethodTranslator.getMethodIndex(methodsArray, methodsArray[5]));
+		assertEquals(6, ServiceMethodTranslator.getMethodIndex(methodsArray, methodsArray[6]));
 		assertEquals(-1, ServiceMethodTranslator.getMethodIndex(methodsArray, METHOD_NON_EXIST));
 	}
 
@@ -132,12 +138,13 @@ public class TestServiceMethodTranslator extends AndroidTestCase {
 		assertEquals(METHOD_3, ServiceMethodTranslator.getMethodName(methodsArray, 3));
 		assertEquals(METHOD_4, ServiceMethodTranslator.getMethodName(methodsArray, 4));
 		assertEquals(METHOD_5, ServiceMethodTranslator.getMethodName(methodsArray, 5));
+		assertEquals(METHOD_6, ServiceMethodTranslator.getMethodName(methodsArray, 6));
 	}
 	
 	@MediumTest
 	public void testGetInvalidMethodString() throws Exception {
 		try {
-			assertEquals(METHOD_3, ServiceMethodTranslator.getMethodName(methodsArray, 6));
+			assertEquals(METHOD_3, ServiceMethodTranslator.getMethodName(methodsArray, 7));
 			fail("DBC PreconditionException not thrown");
 		} catch (PreconditionException e){
 		} 
@@ -151,6 +158,7 @@ public class TestServiceMethodTranslator extends AndroidTestCase {
 		assertEquals(3, ServiceMethodTranslator.getParameterNumber(methodsArray[3]));
 		assertEquals(5, ServiceMethodTranslator.getParameterNumber(methodsArray[4]));
 		assertEquals(2, ServiceMethodTranslator.getParameterNumber(methodsArray[5]));
+		assertEquals(2, ServiceMethodTranslator.getParameterNumber(methodsArray[6]));
 	}
 
 	
@@ -174,6 +182,8 @@ public class TestServiceMethodTranslator extends AndroidTestCase {
 		assertEquals(PARAM_5_NAME, ServiceMethodTranslator.getMethodParameterName(methodsArray[4], 4));
 		assertEquals(PARAM_8_NAME, ServiceMethodTranslator.getMethodParameterName(methodsArray[5], 0));
 		assertEquals(PARAM_9_NAME, ServiceMethodTranslator.getMethodParameterName(methodsArray[5], 1));
+		assertEquals(PARAM_10_NAME, ServiceMethodTranslator.getMethodParameterName(methodsArray[6], 0));
+		assertEquals(PARAM_9_NAME, ServiceMethodTranslator.getMethodParameterName(methodsArray[6], 1));
 
 	}
 
@@ -186,6 +196,7 @@ public class TestServiceMethodTranslator extends AndroidTestCase {
 		assertEquals(3, ServiceMethodTranslator.getMethodParameterNames(methodsArray[3]).length);
 		assertEquals(5, ServiceMethodTranslator.getMethodParameterNames(methodsArray[4]).length);
 		assertEquals(2, ServiceMethodTranslator.getMethodParameterNames(methodsArray[5]).length);
+		assertEquals(2, ServiceMethodTranslator.getMethodParameterNames(methodsArray[6]).length);
 	}
 
 	@MediumTest
@@ -210,7 +221,9 @@ public class TestServiceMethodTranslator extends AndroidTestCase {
 		assertEquals(2, ServiceMethodTranslator.getParameterClasses(methodsArray[5]).length);
 		assertEquals(Class.forName(PARAM_11_TYPE), ServiceMethodTranslator.getParameterClasses(methodsArray[5])[0]);
 		assertEquals(Class.forName(ServiceMethodTranslator.JAVA_LANG_PREFIX + PARAM_12_TYPE), ServiceMethodTranslator.getParameterClasses(methodsArray[5])[1]);
-//		Class clazzes [] = ServiceMethodTranslator.getParameterClasses(methodsArray[2]);
+		assertEquals(Class.forName(ServiceMethodTranslator.JAVA_IO_PREFIX + PARAM_13_TYPE), ServiceMethodTranslator.getParameterClasses(methodsArray[6])[0]);
+		assertEquals(Class.forName(ServiceMethodTranslator.JAVA_LANG_PREFIX + PARAM_12_TYPE), ServiceMethodTranslator.getParameterClasses(methodsArray[6])[1]);
+		//		Class clazzes [] = ServiceMethodTranslator.getParameterClasses(methodsArray[2]);
 //		for (int i = 0; i < clazzes.length; i++) {
 //			System.out.println("Class: " + clazzes[i].getCanonicalName());
 //		}
@@ -231,6 +244,7 @@ public class TestServiceMethodTranslator extends AndroidTestCase {
 		assertEquals(PARAM_10_ARRAY_TYPE, ServiceMethodTranslator.capitaliseString(PARAM_10_ARRAY_TYPE));
 		assertEquals(PARAM_5_TYPE_CAP, ServiceMethodTranslator.capitaliseString(PARAM_11_TYPE));
 		assertEquals(PARAM_6_TYPE_CAP, ServiceMethodTranslator.capitaliseString(PARAM_12_TYPE));
+		assertEquals(PARAM_7_TYPE_CAP, ServiceMethodTranslator.capitaliseString(PARAM_13_TYPE));
 	}
 	
 	@MediumTest
@@ -248,6 +262,8 @@ public class TestServiceMethodTranslator extends AndroidTestCase {
 		assertEquals(PARAM_10_ARRAY_TYPE, ServiceMethodTranslator.getMethodParameterType(methodsArray[4], 4));
 		assertEquals(PARAM_11_TYPE, ServiceMethodTranslator.getMethodParameterType(methodsArray[5], 0));
 		assertEquals(PARAM_12_TYPE, ServiceMethodTranslator.getMethodParameterType(methodsArray[5], 1));
+		assertEquals(PARAM_13_TYPE, ServiceMethodTranslator.getMethodParameterType(methodsArray[6], 0));
+		assertEquals(PARAM_12_TYPE, ServiceMethodTranslator.getMethodParameterType(methodsArray[6], 1));
 
 		assertEquals(null, ServiceMethodTranslator.getMethodParameterType(methodsArray[0], 0));
 	}
@@ -266,6 +282,8 @@ public class TestServiceMethodTranslator extends AndroidTestCase {
 		assertEquals(PARAM_10_ARRAY_TYPE, ServiceMethodTranslator.getMethodParameterTypeCapitalised(methodsArray[4], 4));
 		assertEquals(PARAM_5_TYPE_CAP, ServiceMethodTranslator.getMethodParameterTypeCapitalised(methodsArray[5], 0));
 		assertEquals(PARAM_6_TYPE_CAP, ServiceMethodTranslator.getMethodParameterTypeCapitalised(methodsArray[5], 1));
+		assertEquals(PARAM_7_TYPE_CAP, ServiceMethodTranslator.getMethodParameterTypeCapitalised(methodsArray[6], 0));
+		assertEquals(PARAM_6_TYPE_CAP, ServiceMethodTranslator.getMethodParameterTypeCapitalised(methodsArray[6], 1));
 
 	}
 	@MediumTest
@@ -276,6 +294,7 @@ public class TestServiceMethodTranslator extends AndroidTestCase {
 		assertEquals(3, ServiceMethodTranslator.getMethodParameterTypes(methodsArray[3]).length);
 		assertEquals(5, ServiceMethodTranslator.getMethodParameterTypes(methodsArray[4]).length);
 		assertEquals(2, ServiceMethodTranslator.getMethodParameterTypes(methodsArray[5]).length);
+		assertEquals(2, ServiceMethodTranslator.getMethodParameterTypes(methodsArray[6]).length);
 //		String types [] = ServiceMethodTranslator.getMethodParameterTypes(methodsArray[2]);
 //		for (int i = 0; i < types.length; i++) {
 //			System.out.println("Types: " + types[i]);

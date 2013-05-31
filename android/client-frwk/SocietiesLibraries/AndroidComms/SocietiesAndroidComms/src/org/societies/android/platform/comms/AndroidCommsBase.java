@@ -83,7 +83,7 @@ public class AndroidCommsBase implements XMPPAgent {
 	private static final long PUBSUB_EVENT_CALLBACK_ID = -9999999999999L;
 	private static final long INVALID_LONG_INTENT_VALUE = -9999999999998L;
 	private static final String PUBSUB_NAMESPACE_KEY = "http://jabber.org/protocol";
-	private static final boolean DEBUG_LOGGING = true;
+	private static final boolean DEBUG_LOGGING = false;
 	
 	public static final String NOTIFICATION_TITLE = "Societies Communications Problem";
 	public static final String COMMS_RESTORED_CONNECTIVITY = "Re-connected";

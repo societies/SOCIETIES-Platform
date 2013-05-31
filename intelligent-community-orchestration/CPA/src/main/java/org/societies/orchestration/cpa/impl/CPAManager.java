@@ -25,13 +25,12 @@
 
 package org.societies.orchestration.cpa.impl;
 
-import org.societies.api.internal.orchestration.ICPA;
+import org.societies.api.cis.orchestration.ICPA;
 import org.societies.api.internal.orchestration.ICisDataCollector;
-import org.societies.api.internal.orchestration.ISocialGraph;
+import org.societies.api.cis.orchestration.model.ISocialGraph;
 import org.societies.api.osgi.event.*;
 import org.societies.api.schema.cis.community.Community;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 

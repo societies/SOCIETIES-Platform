@@ -35,6 +35,7 @@ import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.css.directory.IAndroidCssDirectory;
 import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.api.internal.context.IInternalCtxClient;
 import org.societies.android.api.internal.cssmanager.IFriendsManager;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient;
@@ -53,6 +54,8 @@ import org.societies.android.platform.servicemonitor.ServiceManagementLocal.Loca
 import org.societies.android.platform.socialdata.SocialData;
 import org.societies.android.platform.useragent.feedback.EventListener;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService;
+import org.societies.android.privacytrust.trust.TrustClientLocal;
+import org.societies.android.privacytrust.trust.TrustClientLocal.TrustClientLocalBinder;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -78,7 +81,7 @@ public class SocietiesClientServicesController {
 	//timeout for bind, start and stop all services
 	private final static long TASK_TIMEOUT = 10000;
 	
-	private final static int NUM_SERVICES = 12;
+	private final static int NUM_SERVICES = 14;
 	
 	private final static int CIS_DIRECTORY_SERVICE 		= 0;
 	private final static int CIS_MANAGER_SERVICE 		= 1;
@@ -92,6 +95,8 @@ public class SocietiesClientServicesController {
 	private final static int PERSONALISATION_SERVICE 	= 9;
 	private final static int SLM_SERVICE_DISCO_SERVICE 	= 10;
 	private final static int FRIENDS_MANAGER_SERVICE 	= 11;
+	private final static int CONTEXT_SERVICE 			= 12;
+	private final static int INTERNAL_TRUST_SERVICE 	= 13;
 	
 	private Context context;
 	private CountDownLatch servicesBinded;
@@ -111,6 +116,7 @@ public class SocietiesClientServicesController {
 	private ISocialData snsConnectorService;
 	private IFriendsManager friendMgrService;
 	private IPrivacyPolicyManager privacyPolicyService;
+	private IInternalTrustClient internalTrustService;
 	
 	private long startTime;
 	
@@ -329,6 +335,29 @@ public class SocietiesClientServicesController {
         	Log.d(LOG_TAG, "Time to bind to " + SERVICE_NAME + " service: " + Long.toString(System.currentTimeMillis() - SocietiesClientServicesController.this.startTime));
         }
     };
+    
+    private ServiceConnection internalTrustConnection = new ServiceConnection() {
+
+    	final static String SERVICE_NAME = "Platform Internal Trust";
+        public void onServiceDisconnected(ComponentName name) {
+           	Log.d(LOG_TAG, "Disconnecting from " + SERVICE_NAME + " service");
+        	SocietiesClientServicesController.this.connectedToServices[INTERNAL_TRUST_SERVICE] = false;
+        }
+
+        public void onServiceConnected(ComponentName name, IBinder service) {
+        	Log.d(LOG_TAG, "Connecting to " + SERVICE_NAME + " service");
+    		
+        	SocietiesClientServicesController.this.connectedToServices[INTERNAL_TRUST_SERVICE] = true;
+		
+			//Get a local binder
+        	TrustClientLocalBinder binder = (TrustClientLocalBinder) service;
+        	//Retrieve the local service API
+        	SocietiesClientServicesController.this.internalTrustService = (IInternalTrustClient) binder.getService();
+        	SocietiesClientServicesController.this.platformServiceConnections[INTERNAL_TRUST_SERVICE] = this;
+        	SocietiesClientServicesController.this.servicesBinded.countDown();
+        	Log.d(LOG_TAG, "Time to bind to " + SERVICE_NAME + " service: " + Long.toString(System.currentTimeMillis() - SocietiesClientServicesController.this.startTime));
+        }
+    };
 
     //Potential platform services
     private ServiceConnection trustConnection = new ServiceConnection() {
@@ -445,6 +474,27 @@ public class SocietiesClientServicesController {
 		}
 	};
 	
+    private ServiceConnection contextConnection = new ServiceConnection() {
+
+    	final static String SERVICE_NAME = "Platform Context";
+        public void onServiceDisconnected(ComponentName name) {
+           	Log.d(LOG_TAG, "Disconnecting from " + SERVICE_NAME + " service");
+        	SocietiesClientServicesController.this.connectedToServices[CONTEXT_SERVICE] = false;
+        }
+
+        public void onServiceConnected(ComponentName name, IBinder service) {
+        	Log.d(LOG_TAG, "Connecting to " + SERVICE_NAME + " service");
+
+        	SocietiesClientServicesController.this.connectedToServices[CONTEXT_SERVICE] = true;
+        	//get a remote binder
+        	SocietiesClientServicesController.this.allMessengers[CONTEXT_SERVICE] = new Messenger(service);
+        	
+        	SocietiesClientServicesController.this.platformServiceConnections[CONTEXT_SERVICE] = this;
+        	SocietiesClientServicesController.this.servicesBinded.countDown();
+        	Log.d(LOG_TAG, "Time to bind to " + SERVICE_NAME + " service: " + Long.toString(System.currentTimeMillis() - SocietiesClientServicesController.this.startTime));
+        }
+    };
+
 //  private ServiceConnection ???Connection = new ServiceConnection() {
 //
 //      public void onServiceDisconnected(ComponentName name) {
@@ -505,7 +555,7 @@ public class SocietiesClientServicesController {
             	serviceIntent = new Intent(ICoreSocietiesServices.CIS_MANAGER_SERVICE_INTENT);
             	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, cisManagerConnection, Context.BIND_AUTO_CREATE);
         	} else {
-        		Log.e(LOCAL_LOG_TAG, "CIS Manager Service does not exist");
+        		Log.e(LOCAL_LOG_TAG, "CIS Directory Service does not exist");
         	}
 
         	if (retValue) {
@@ -513,13 +563,21 @@ public class SocietiesClientServicesController {
 	        	serviceIntent = new Intent(ICoreSocietiesServices.CIS_SUBSCRIBED_SERVICE_INTENT);
 	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, cisSubscribedConnection, Context.BIND_AUTO_CREATE);
            	} else {
-        		Log.e(LOCAL_LOG_TAG, "CIS Subscribed Service does not exist");
+        		Log.e(LOCAL_LOG_TAG, "CIS Manager Service does not exist");
         	}
 
         	if (retValue) {
 	        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Trust Service");
 	        	serviceIntent = new Intent(ICoreSocietiesServices.TRUST_CLIENT_SERVICE_INTENT);
 	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, trustConnection, Context.BIND_AUTO_CREATE);
+           	} else {
+        		Log.e(LOCAL_LOG_TAG, "CIS Subscribed Service does not exist");
+        	}
+
+        	if (retValue) {
+	        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Context Service");
+	        	serviceIntent = new Intent(ICoreSocietiesServices.CONTEXT_SERVICE_INTENT);
+	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, contextConnection, Context.BIND_AUTO_CREATE);
            	} else {
         		Log.e(LOCAL_LOG_TAG, "Trust Service does not exist");
         	}
@@ -530,7 +588,7 @@ public class SocietiesClientServicesController {
 	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, LocalCssDirectoryService.class);
 	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, cssDirectoryConnection, Context.BIND_AUTO_CREATE);
            	} else {
-        		Log.e(LOCAL_LOG_TAG, "CSS Directory Service does not exist");
+        		Log.e(LOCAL_LOG_TAG, "Context Service does not exist");
         	}
 
         	if (retValue) {
@@ -538,7 +596,7 @@ public class SocietiesClientServicesController {
 	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, ServiceManagementLocal.class);
 	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, slmDiscoConnection, Context.BIND_AUTO_CREATE);
            	} else {
-        		Log.e(LOCAL_LOG_TAG, "SLM Service Discovery Service does not exist");
+        		Log.e(LOCAL_LOG_TAG, "CSS Directory Service does not exist");
         	}
         	
         	if (retValue) {
@@ -546,7 +604,7 @@ public class SocietiesClientServicesController {
 	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, ServiceManagementLocal.class);
 	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, slmControlConnection, Context.BIND_AUTO_CREATE);
            	} else {
-        		Log.e(LOCAL_LOG_TAG, "SLM Service Control Service does not exist");
+        		Log.e(LOCAL_LOG_TAG, "SLM Service Discovery Service does not exist");
         	}
 
         	if (retValue) {
@@ -554,7 +612,7 @@ public class SocietiesClientServicesController {
 	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, SocialData.class);
 	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, snsSocialDataConnection, Context.BIND_AUTO_CREATE);
            	} else {
-        		Log.e(LOCAL_LOG_TAG, "SNS Connectors Service does not exist");
+        		Log.e(LOCAL_LOG_TAG, "SLM Service Control Service does not exist");
         	}
         	
         	if (retValue) {
@@ -562,7 +620,7 @@ public class SocietiesClientServicesController {
 	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, FriendsManagerLocal.class);
 	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, friendsMgrConnection, Context.BIND_AUTO_CREATE);
            	} else {
-        		Log.e(LOCAL_LOG_TAG, "Friends Manager Service does not exist");
+        		Log.e(LOCAL_LOG_TAG, "SNS Connectors Service does not exist");
         	}
         	
         	if (retValue) {
@@ -570,9 +628,20 @@ public class SocietiesClientServicesController {
 	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, PrivacyPolicyManagerLocalService.class);
 	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, privacyPolicyConnection, Context.BIND_AUTO_CREATE);
            	} else {
+        		Log.e(LOCAL_LOG_TAG, "Friends Manager Service does not exist");
+        	}
+        	
+        	if (retValue) {
+	        	Log.d(LOCAL_LOG_TAG, "Bind to Societies Internal Trust Service");
+	        	serviceIntent = new Intent(SocietiesClientServicesController.this.context, TrustClientLocal.class);
+	        	retValue = SocietiesClientServicesController.this.context.bindService(serviceIntent, internalTrustConnection, Context.BIND_AUTO_CREATE);
+           	} else {
         		Log.e(LOCAL_LOG_TAG, "Privacy Policy Service does not exist");
         	}
         	
+        	if (!retValue) {
+        		Log.e(LOCAL_LOG_TAG, "Internal Trust Service does not exist");
+        	}
         	
         	try {
         		//To prevent hanging this latch uses a timeout
@@ -613,6 +682,7 @@ public class SocietiesClientServicesController {
     		boolean retValue = true;
     		//Start remote platform services
     		for (int i  = 0; i < SocietiesClientServicesController.this.allMessengers.length; i++) {
+    			Log.d(LOCAL_LOG_TAG, "Starting service: " + i);
     			
     			if (null != SocietiesClientServicesController.this.allMessengers[i]) {
             		String targetMethod = IServiceManager.methodsArray[0];
@@ -635,6 +705,7 @@ public class SocietiesClientServicesController {
     		SocietiesClientServicesController.this.snsConnectorService.startService();
     		SocietiesClientServicesController.this.friendMgrService.startService();
     		SocietiesClientServicesController.this.privacyPolicyService.startService();
+    		SocietiesClientServicesController.this.internalTrustService.startService();
     		
     		//START "STARTED SERVICES"
         	//FRIENDS SERVICE
@@ -708,6 +779,7 @@ public class SocietiesClientServicesController {
     		SocietiesClientServicesController.this.snsConnectorService.stopService();
     		SocietiesClientServicesController.this.friendMgrService.stopService();
     		SocietiesClientServicesController.this.privacyPolicyService.stopService();
+    		SocietiesClientServicesController.this.internalTrustService.stopService();
 
     		//STOP "STARTED SERVICES"
         	//FRIENDS SERVICE
@@ -843,8 +915,11 @@ public class SocietiesClientServicesController {
 		case CIS_SUBSCRIBED_SERVICE:
 			retValue = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(ICisSubscribed.methodsArray, targetMethod), 0, 0);
 			break;
-			case TRUST_SERVICE:
+		case TRUST_SERVICE:
 			retValue = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IInternalTrustClient.methodsArray, targetMethod), 0, 0);
+			break;
+		case CONTEXT_SERVICE:
+			retValue = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(IInternalCtxClient.methodsArray, targetMethod), 0, 0);
 			break;
 //			case ???_SERVICE:
 //			retValue = android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(???.methodsArray, targetMethod), 0, 0);

@@ -138,7 +138,8 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 				try {
 					ls = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CAUI_MODEL).get();
 					if(ls.size()>0){
-						CtxAttribute uiModelAttr = (CtxAttribute) ctxBroker.retrieve(ls.get(0)).get();
+						CtxAttributeIdentifier attrID = (CtxAttributeIdentifier) ls.get(0);
+						CtxAttribute uiModelAttr =  ctxBroker.retrieveAttribute(attrID,false).get();
 						UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
 						textAreaUIModel.setText("");
 						textAreaUIModel.append(printModel(newUIModelData.getActionModel()));

@@ -177,7 +177,7 @@ public class DataTransferAnalyzerTest {
 		AssessmentResultIIdentity result;
 		double expected;
 
-		result = dataTransferAnalyzer.estimatePrivacyBreach(sender);
+		result = dataTransferAnalyzer.estimatePrivacyBreach(sender, null, null);
 		
 		// Check number and frequency of transmissions
 		assertEquals(numPacketsTransmitted, result.getNumAllPackets());
@@ -241,7 +241,7 @@ public class DataTransferAnalyzerTest {
 		AssessmentResultClassName result;
 		double expected;
 
-		result = dataTransferAnalyzer.estimatePrivacyBreach(sender);
+		result = dataTransferAnalyzer.estimatePrivacyBreach(sender, null, null);
 
 		// Check number and frequency of transmissions
 		assertEquals(numPacketsTransmitted, result.getNumAllPackets());

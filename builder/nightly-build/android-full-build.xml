@@ -71,6 +71,8 @@
 		<module>../../android/client-frwk/SocietiesLibraries/AndroidEvents/SocietiesAndroidEvents</module>
 		<module>../../android/client-frwk/SocietiesLibraries/FriendsManager/FriendsManager</module>
 		<module>../../android/client-frwk/SocietiesLibraries/trust/trust-apklib</module>
+                <module>../../android/client-frwk/SocietiesLibraries/AndroidContext/SocietiesAndroidContext</module>
+
 		<!-- Not building
 		<module>../../platform-infrastructure/client-frwk/SocietiesLibraries/AndroidPersonalisation/SocietiesAndroidPersonalisation</module>  -->
 		<!-- Client Framework Service Helpers -->

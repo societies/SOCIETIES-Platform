@@ -73,8 +73,8 @@ public class SignatureCheck {
 	/**
 	 * Checks that the provider signature is valid
 	 * 
-	 * @return
-	 * @throws DigsigException
+	 * @return All valid signatures. Key = ID of the valid signature. Value = certificate.
+	 * @throws DigsigException On any error, or if any signature is invalid.
 	 */
 	public HashMap<String, X509Certificate> verifyAllSignatures() throws DigsigException {
 		
@@ -129,7 +129,7 @@ public class SignatureCheck {
 	 * Verifies consumer identity, validates the signature and returns the
 	 * selected SOP element
 	 * 
-	 * @return
+	 * @return The referenced SOP element
 	 * @throws DigsigException
 	 */
 	public Element getReferencedSOP() throws DigsigException {

@@ -27,6 +27,8 @@ package org.societies.api.context.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.societies.api.context.model.util.SerialisationHelper;
+
 /**
  * This class is used to represent context attributes which describe the
  * properties of a {@link CtxEntity}. Multiple <code>CtxAttribute</code>
@@ -96,6 +98,9 @@ public class CtxAttribute extends CtxModelObject {
 	/** The QoC meta-data. */
 	private final CtxQuality quality = new CtxQuality(this);
 	
+	/** The complex value of this context attribute. */
+	private CtxAttributeComplexValue complexValue = new CtxAttributeComplexValue();
+	
 	/** The identifier of the context source for the current attribute value. */
 	private String sourceId;
 	
@@ -143,6 +148,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @see #getIntegerValue()
 	 * @see #getDoubleValue()
 	 * @see #getBinaryValue()
+	 * @see #getComplexValue()
 	 */
 	public String getStringValue() {
 		
@@ -157,6 +163,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @see #setIntegerValue(Integer)
 	 * @see #setDoubleValue(Double)
 	 * @see #setBinaryValue(byte[])
+	 * @see #setComplexValue(CtxAttributeComplexValue)
 	 */
 	public void setStringValue(String value) {
 		
@@ -178,6 +185,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @see #getStringValue()
 	 * @see #getDoubleValue()
 	 * @see #getBinaryValue()
+	 * @see #getComplexValue()
 	 */
 	public Integer getIntegerValue() {
 		
@@ -192,9 +200,9 @@ public class CtxAttribute extends CtxModelObject {
 	 * @see #setStringValue(String)
 	 * @see #setDoubleValue(Double)
 	 * @see #setBinaryValue(byte[])
+	 * @see #setComplexValue(CtxAttributeComplexValue)
 	 */
 	public void setIntegerValue(Integer value) {
-		
 		this.stringValue = null;
 		this.integerValue = value;
 		this.doubleValue = null;
@@ -213,6 +221,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @see #getStringValue()
 	 * @see #getIntegerValue()
 	 * @see #getBinaryValue()
+	 * @see #getComplexValue()
 	 */
 	public Double getDoubleValue() {
 		
@@ -227,6 +236,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @see #setStringValue(String)
 	 * @see #setIntegerValue(Integer)
 	 * @see #setBinaryValue(byte[])
+	 * @see #setComplexValue(CtxAttributeComplexValue)
 	 */
 	public void setDoubleValue(Double value) {
 		
@@ -248,6 +258,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @see #getStringValue()
 	 * @see #getIntegerValue()
 	 * @see #getDoubleValue()
+	 * @see #getComplexValue()
 	 */
 	public byte[] getBinaryValue() {
 		
@@ -262,6 +273,7 @@ public class CtxAttribute extends CtxModelObject {
 	 * @see #setStringValue(String)
 	 * @see #setIntegerValue(Integer)
 	 * @see #setDoubleValue(Double)
+	 * @see #setComplexValue(CtxAttributeComplexValue)
 	 */
 	public void setBinaryValue(byte[] value) {
 		
@@ -272,6 +284,51 @@ public class CtxAttribute extends CtxModelObject {
 		// Update the last update time
 		this.quality.setLastUpdated(new Date());
 		this.setValueType(CtxAttributeValueType.BINARY);
+	}
+
+	/**
+	 * Returns the value of this context attribute or <code>null</code>
+	 * if the value is not a String.
+	 * 
+	 * @return the value of this context attribute or <code>null</code>
+	 *         if the value is not a String.
+	 * @see #getIntegerValue()
+	 * @see #getDoubleValue()
+	 * @see #getBinaryValue()
+	 * @see #getComplexValue()
+	 */
+	public CtxAttributeComplexValue getComplexValue() {
+		this.binaryValue = this.getBinaryValue();
+		if (binaryValue != null)
+			try {
+				this.complexValue = (CtxAttributeComplexValue) SerialisationHelper.deserialise(binaryValue, complexValue.getClass().getClassLoader());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		return this.complexValue;
+	}
+	
+	/**
+	 * Sets the value of this context attribute to the specified String.
+	 * 
+	 * @param value
+	 *            the String value to set
+	 * @see #setIntegerValue(Integer)
+	 * @see #setDoubleValue(Double)
+	 * @see #setBinaryValue(byte[])
+	 * @see #setComplexValue(CtxAttributeComplexValue)
+	 */
+	public void setComplexValue(CtxAttributeComplexValue value) {
+
+		try {
+			this.binaryValue = SerialisationHelper.serialise(value);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.setBinaryValue(binaryValue);
+		this.setValueType(CtxAttributeValueType.COMPLEX);
 	}
 	
 	Serializable getValue() {
@@ -377,7 +434,7 @@ public class CtxAttribute extends CtxModelObject {
 		
 		return this.quality;
 	}
-	
+		
 	/**
 	 * Returns the identifier of the context source for the current attribute value.
 	 * 

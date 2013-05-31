@@ -297,9 +297,14 @@ public class CAUITaskManager implements ICAUITaskManager{
 
 		Map<IUserIntentAction, Double> results = new HashMap<IUserIntentAction, Double>();
 		UserIntentModelData model = retrieveModel();
+		LOG.debug("model "+ model);
+		
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
+		LOG.debug("actionsMap "+ actionsMap);
+		LOG.debug("currentAction "+ currentAction);
 		if(actionsMap.keySet().contains(currentAction)){
 			results = actionsMap.get(currentAction);
+			
 		}		 
 		return results;
 	}
@@ -387,24 +392,24 @@ public class CAUITaskManager implements ICAUITaskManager{
 
 		List<IUserIntentAction> bestActionList = new ArrayList<IUserIntentAction>();
 		HashMap<IUserIntentAction, Integer> actionsScoreMap = new HashMap<IUserIntentAction, Integer>();
-		
+
 		String currentLocationValue = "null";
 		String currentStatusValue = "null";
-		
+
 		if( situationConext.get(CtxAttributeTypes.LOCATION_SYMBOLIC) != null){
 			currentLocationValue = (String) situationConext.get(CtxAttributeTypes.LOCATION_SYMBOLIC);	
 		}
-		
+
 		if( situationConext.get(CtxAttributeTypes.STATUS) != null){
 			currentStatusValue = (String) situationConext.get(CtxAttributeTypes.STATUS);	
 		}  
-		
+
 		//Integer currentTempValue = (Integer) situationConext.get(CtxAttributeTypes.TEMPERATURE);
 
 		for(IUserIntentAction action : actionList ){
 
 			HashMap<String,Serializable> actionCtx = action.getActionContext();
-					
+
 			//System.out.println("String action :"+ action+" actionCtx:"+actionCtx);
 
 			for(String ctxType : actionCtx.keySet()){
@@ -437,7 +442,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 					LOG.debug("findBestMatchingAction: context type:"+ctxType +" does not match");
 				}
 				//System.out.println("String type :"+ ctxType+" ctxValue:"+ctxValue);
-	
+
 				if(actionsScoreMap.get(action) == null){
 					actionsScoreMap.put(action, actionMatchScore);
 				} else {
@@ -447,12 +452,21 @@ public class CAUITaskManager implements ICAUITaskManager{
 			}	
 		}
 		//System.out.println("actionsScoreMap  " +actionsScoreMap);
-		int maxValueInMap=(Collections.max(actionsScoreMap.values()));  // This will return max value in the Hashmap
-		for(IUserIntentAction action  : actionsScoreMap.keySet()){
-			if(actionsScoreMap.get(action).equals(maxValueInMap)) {
-				bestActionList.add(action);
+		if(!actionsScoreMap.values().isEmpty()){
+
+			int maxValueInMap=(Collections.max(actionsScoreMap.values()));  // This will return max value in the Hashmap
+			for(IUserIntentAction action  : actionsScoreMap.keySet()){
+				if(actionsScoreMap.get(action).equals(maxValueInMap)) {
+					bestActionList.add(action);
+				}
+			}
+		} else {
+			for(IUserIntentAction action  : actionsScoreMap.keySet()){
+				bestActionList.add(action);	
 			}
 		}
+
+
 		LOG.debug("best action "+bestActionList);
 		return bestActionList;
 	}

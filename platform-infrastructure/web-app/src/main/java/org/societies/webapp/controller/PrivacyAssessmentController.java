@@ -86,7 +86,7 @@ public class PrivacyAssessmentController extends BasePageController {
 	
 	public void assessNow() {
 		log.debug("AssessNow button clicked");
-		assessment.assessAllNow();
+		assessment.assessAllNow(model.getStartDate(), model.getEndDate());
 		paService.generateImages();
 	}
 	

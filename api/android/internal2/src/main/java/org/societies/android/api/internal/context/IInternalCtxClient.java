@@ -39,6 +39,7 @@ import org.societies.api.schema.context.model.CtxModelObjectBean;
 import org.societies.api.schema.context.model.IndividualCtxEntityBean;
 import org.societies.android.api.context.CtxException;
 import org.societies.api.schema.context.model.CtxModelTypeBean;
+import org.societies.android.api.css.manager.IServiceManager;
 
 
 
@@ -54,7 +55,7 @@ import org.societies.api.schema.context.model.CtxModelTypeBean;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.0.2
  */
-public interface IInternalCtxClient extends ICtxClient {
+public interface IInternalCtxClient extends ICtxClient, IServiceManager {
  
 	//Intents
 	public static final String INTENT_RETURN_VALUE_KEY = ICtxClient.INTENT_RETURN_VALUE_KEY;
@@ -82,7 +83,9 @@ public interface IInternalCtxClient extends ICtxClient {
 			"retrieve(String client, ACtxIdentifier identifier)", 
 			"update(String client, ACtxModelObject identifier)", 
 			"updateAttribute(String client, ACtxAttributeIdentifier attributeId, Serializable value)", 
-			"updateAttribute(String client, ACtxAttributeIdentifier attributeId, Serializable value, String valueMetric)"
+			"updateAttribute(String client, ACtxAttributeIdentifier attributeId, Serializable value, String valueMetric)",
+                	"startService()",
+                	"stopService()"
 	};
 
 

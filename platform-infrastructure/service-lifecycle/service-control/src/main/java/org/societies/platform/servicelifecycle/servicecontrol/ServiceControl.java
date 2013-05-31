@@ -580,8 +580,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				logger.info("Installed web-type third-party service.");
 				returnResult.setMessage(ResultMessage.SUCCESS);
 				sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' installed!");
-				sendEvent(ServiceMgmtEventType.NEW_SERVICE,serviceToInstall);
-				sendEvent(ServiceMgmtEventType.SERVICE_STARTED,serviceToInstall);
+				sendEvent(ServiceMgmtEventType.NEW_SERVICE,serviceToInstall,null);
+				sendEvent(ServiceMgmtEventType.SERVICE_STARTED,serviceToInstall,null);
 				
 			} else{
 									
@@ -652,8 +652,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					returnResult.setMessage(result.getMessage());
 					sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' installed!");
 					
-					sendEvent(ServiceMgmtEventType.NEW_SERVICE,newService);
-					sendEvent(ServiceMgmtEventType.SERVICE_STARTED,newService);
+					sendEvent(ServiceMgmtEventType.NEW_SERVICE,newService,null);
+					sendEvent(ServiceMgmtEventType.SERVICE_STARTED,newService,null);
 					
 				} else{
 					if(logger.isDebugEnabled())
@@ -998,9 +998,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				returnResult.setMessage(ResultMessage.SUCCESS);
 				
 				if(service.getServiceStatus().equals(ServiceStatus.STARTED))
-					sendEvent(ServiceMgmtEventType.SERVICE_STOPPED,service);
+					sendEvent(ServiceMgmtEventType.SERVICE_STOPPED,service,null);
 				
-				sendEvent(ServiceMgmtEventType.SERVICE_REMOVED,service);
+				sendEvent(ServiceMgmtEventType.SERVICE_REMOVED,service,null);
 				
 				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
@@ -1207,7 +1207,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						logger.debug("Updating ActivityFeed for " + myCIS.getCisId());
 					
 					updateActivityFeed(node,"Shared",service);
-					
+					sendEvent(ServiceMgmtEventType.SERVICE_SHARED,service,node);
 					sendUserNotification("Shared service '"+ service.getServiceName()+"' with CIS: " + myCIS.getName());
 					
 				} else {
@@ -1246,7 +1246,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 							
 							updateActivityFeed(node,"Shared",service);
 							sendUserNotification("Shared service '"+ service.getServiceName()+"' with CIS: " + remoteCis.getName());
-
+							sendEvent(ServiceMgmtEventType.SERVICE_SHARED,service,node);
 						}	
 					}				
 				}					
@@ -1362,6 +1362,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						}
 					} else{
 						updateActivityFeed(node,"Unshared",service);
+						sendEvent(ServiceMgmtEventType.SERVICE_UNSHARED,service,node);
 						sendUserNotification("No longer sharing "+ service.getServiceName() + " with " + myCIS.getName());
 					}
 		
@@ -1403,6 +1404,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 							} else{
 								getServiceReg().removeServiceSharingInCIS(ourService.getServiceIdentifier(), node.getJid());
 								updateActivityFeed(node,"Unshared",service);
+								sendEvent(ServiceMgmtEventType.SERVICE_UNSHARED,service,node);
 								sendUserNotification("No longer sharing "+ service.getServiceName() + " with " + getCisManager().getCis(node.getJid()).getName());
 							}
 						}
@@ -1425,34 +1427,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		return new AsyncResult<ServiceControlResult>(returnResult);
 	}
 	
-	private void sendEvent(ServiceMgmtEventType eventType, Service service){
-		
-		if(logger.isDebugEnabled())
-			logger.debug("Sending event of type: " + eventType + " for service " + ServiceModelUtils.serviceResourceIdentifierToString(service.getServiceIdentifier()));
-		
-		ServiceMgmtInternalEvent serviceEvent = new ServiceMgmtInternalEvent();
-		serviceEvent.setEventType(eventType);
-		serviceEvent.setServiceType(service.getServiceType());
-		serviceEvent.setServiceId(service.getServiceIdentifier());
-
-		if(!service.getServiceType().equals(ServiceType.DEVICE)){
-			Bundle bundle = ServiceModelUtils.getBundleFromService(service, bundleContext);
-			serviceEvent.setBundleId(bundle.getBundleId());
-			serviceEvent.setBundleSymbolName(bundle.getSymbolicName());
-		} else{
-			serviceEvent.setBundleId(-1);
-			serviceEvent.setBundleSymbolName(null);
-		}
-
-		InternalEvent internalEvent = new InternalEvent(EventTypes.SERVICE_LIFECYCLE_EVENT, eventType.toString(), "org/societies/servicelifecycle", serviceEvent);
-		
-		try {
-			getEventMgr().publishInternalEvent(internalEvent);
-		} catch (EMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			logger.error("Error sending event!");
-		}
+	private void sendEvent(ServiceMgmtEventType eventType, Service service,IIdentity node){	
+		ServiceControlAsync servAsync = new ServiceControlAsync(eventType,service,node);
+		executor.execute(servAsync);
 	}
 	
 	private void sendUserNotification(String message){
@@ -1535,8 +1512,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 								getServiceReg().updateRegisteredService(newService);
 							}
 							
-							sendEvent(ServiceMgmtEventType.NEW_SERVICE,newService);
-							sendEvent(ServiceMgmtEventType.SERVICE_STARTED,newService);
+							sendEvent(ServiceMgmtEventType.NEW_SERVICE,newService,null);
+							sendEvent(ServiceMgmtEventType.SERVICE_STARTED,newService,null);
 							
 							if(logger.isDebugEnabled())
 								logger.debug("Installed service " + newService.getServiceName());
@@ -1601,11 +1578,14 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		IIdentity target;
 		String verb;
 		Service service;
+		ServiceMgmtEventType eventType;
 		boolean activityUpdate;
+		boolean internalEvent;
 		
 		public ServiceControlAsync(String message){
 			this.message = message;
 			activityUpdate = false;
+			internalEvent = false;
 		}
 		
 		public ServiceControlAsync(IIdentity target, String verb, Service service){
@@ -1613,6 +1593,15 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			this.verb = verb;
 			this.service = service;
 			activityUpdate = true;
+			internalEvent = false;
+
+		}
+		
+		public ServiceControlAsync(ServiceMgmtEventType eventType, Service service,IIdentity node){
+			internalEvent = true;
+			this.service = service;
+			this.target = node;
+			this.eventType = eventType;
 		}
 		
 		/* (non-Javadoc)
@@ -1620,17 +1609,51 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		 */
 		@Override
 		public void run() {
-			if(activityUpdate)
-				this.updateActivityFeed(target,verb,service);
-			else
-				this.sendUserNotification(message);
-			
+			if(internalEvent){
+				this.sendEvent(eventType,service,target);
+			} else{
+				if(activityUpdate)
+					this.updateActivityFeed(target,verb,service);
+				else
+					this.sendUserNotification(message);
+			}
 		}
 		
 		private void sendUserNotification(String message){
 			if(logger.isDebugEnabled())
 				logger.debug("Sending notification: " + message);
 			getUserFeedback().showNotification(message);
+		}
+		
+		private void sendEvent(ServiceMgmtEventType eventType, Service service,IIdentity node){
+			
+			if(logger.isDebugEnabled())
+				logger.debug("Sending event of type: " + eventType + " for service " + ServiceModelUtils.serviceResourceIdentifierToString(service.getServiceIdentifier()));
+			
+			ServiceMgmtInternalEvent serviceEvent = new ServiceMgmtInternalEvent();
+			serviceEvent.setEventType(eventType);
+			serviceEvent.setServiceType(service.getServiceType());
+			serviceEvent.setServiceId(service.getServiceIdentifier());
+			serviceEvent.setSharedNode(node);
+			
+			if(!service.getServiceType().equals(ServiceType.DEVICE)){
+				Bundle bundle = ServiceModelUtils.getBundleFromService(service, bundleContext);
+				serviceEvent.setBundleId(bundle.getBundleId());
+				serviceEvent.setBundleSymbolName(bundle.getSymbolicName());
+			} else{
+				serviceEvent.setBundleId(-1);
+				serviceEvent.setBundleSymbolName(null);
+			}
+
+			InternalEvent internalEvent = new InternalEvent(EventTypes.SERVICE_LIFECYCLE_EVENT, eventType.toString(), "org/societies/servicelifecycle", serviceEvent);
+			
+			try {
+				getEventMgr().publishInternalEvent(internalEvent);
+			} catch (EMSException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				logger.error("Error sending event!");
+			}
 		}
 		
 		private void updateActivityFeed(IIdentity target, String verb, Service service){
