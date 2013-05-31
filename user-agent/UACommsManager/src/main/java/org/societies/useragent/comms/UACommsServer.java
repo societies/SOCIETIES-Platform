@@ -48,10 +48,7 @@ import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean;
 import org.societies.useragent.api.feedback.IInternalUserFeedback;
 import org.societies.useragent.api.monitoring.IInternalUserActionMonitor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 public class UACommsServer implements IFeatureServer {
@@ -184,6 +181,9 @@ public class UACommsServer implements IFeatureServer {
                 break;
             case BY_DATE:
                 result = feedback.listStoredFeedbackBeans(requestBean.getSinceWhen());
+//                break;
+            case OUTSTANDING:
+                result = feedback.listIncompleteFeedbackBeans();
                 break;
             default:
                 log.warn("Invalid requestBean.requestType: " + requestBean.getRequestType().name());
@@ -196,9 +196,10 @@ public class UACommsServer implements IFeatureServer {
         // NB: Hibernate will return a persistent list, which is no good to us
         requestBean.setUserFeedbackBean(new ArrayList<UserFeedbackBean>(result));
 
-        // NB: Now get rid of all the persistent lists inside the beans
+        // NB: Now get rid of all the hibernate mess inside the beans
         for (UserFeedbackBean bean : requestBean.getUserFeedbackBean()) {
-            bean.setOptions(new ArrayList<String>(bean.getOptions()));
+            bean.setOptions(new ArrayList<String>(bean.getOptions())); // persistent list
+            bean.setRequestDate(new Date(bean.getRequestDate().getTime())); // java.sql.Timestamp
         }
 
 //        return result.toArray(new UserFeedbackBean[result.size()]);
