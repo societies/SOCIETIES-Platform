@@ -74,6 +74,7 @@
         <service android:name="org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService" />
         <service android:name="org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService" />
         <service android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidLocal" />
+        <service android:name="org.societies.android.privacytrust.trust.TrustClientLocal" />
         <!-- REMOTE SERVICES -->
         <service android:name="org.societies.android.platform.cis.CisDirectoryRemote" android:label="Cis Directory Remote" >
            <intent-filter>
