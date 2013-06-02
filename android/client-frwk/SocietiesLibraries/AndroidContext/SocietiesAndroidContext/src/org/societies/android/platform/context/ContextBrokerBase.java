@@ -951,18 +951,21 @@ public class ContextBrokerBase implements IInternalCtxClient{
 
 							break;
 
-/*						case LOOKUP:
+						case LOOKUP:
 							
 							Log.i(LOG_TAG, "inside receiveResult LOOKUP");
-							if (payload.getLookupResult() == null) {
-								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getCreateAssociationBeanResult() is null");
+							if (payload.getCtxBrokerLookupBeanResult() == null) {
+								Log.e(LOG_TAG, "Could not handle result bean: CtxBrokerResponseBean.getCtxBrokerLookupBeanResult() is null");
 								return;
 							}
-							final CtxAssociationBean associationBean = payload.getCreateAssociationBeanResult();
+							final List<CtxIdentifierBean> ctxIdsBeanList = payload.getCtxBrokerLookupBeanResult();
 
-							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) associationBean);
-					
-							break;*/
+							if (ctxIdsBeanList != null) 
+								intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, ctxIdsBeanList.toArray(new CtxIdentifierBean[ctxIdsBeanList.size()]));
+							else
+								intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, new CtxIdentifierBean[0]);
+						
+							break;
 
 						case REMOVE:
 							
