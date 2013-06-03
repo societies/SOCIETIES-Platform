@@ -26,12 +26,66 @@
 package org.societies.android.platform.useragent.feedback.guis;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.view.Menu;
+import org.societies.android.api.internal.R;
+import org.societies.android.platform.useragent.feedback.EventHistory;
 
-public class ExplicitPopup extends Activity{
+public class UserFeedbackHistoryList extends Activity {
 
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setTheme(android.R.style.Theme_Dialog);
-	}
+    protected final String LOG_TAG = this.getClass().getName();
+
+    private EventHistory eventHistoryService;
+
+    private ServiceConnection eventHistoryServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            EventHistory.LocalBinder binder = (EventHistory.LocalBinder) service;
+            eventHistoryService = binder.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            eventHistoryService = null;
+        }
+    };
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setTheme(android.R.style.Theme_Dialog);
+        setContentView(R.layout.activity_notification_history);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return true;
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Bind to LocalService
+        Intent intent = new Intent(this, EventHistory.class);
+        bindService(intent, eventHistoryServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Unbind from the service
+        if (eventHistoryService != null) {
+            unbindService(eventHistoryServiceConnection);
+        }
+    }
+
+
 }

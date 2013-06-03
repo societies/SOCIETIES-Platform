@@ -3,13 +3,13 @@
              android:layout_height="match_parent">
 
     <ImageView
-            android:id="@+id/ackNackHeaderImage"
+            android:id="@+id/simpleNotificationHeaderImage"
             android:layout_width="fill_parent"
             android:layout_height="36dp"
             android:src="@drawable/societies_header"/>
 
     <LinearLayout
-            android:id="@+id/ackNackOuterLinerLayout"
+            android:id="@+id/simpleNotificationOuterLinerLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
@@ -17,7 +17,7 @@
             android:orientation="vertical">
 
         <TextView
-                android:id="@+id/ackNackHeaderText"
+                android:id="@+id/simpleNotificationHeaderText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/societies_Notifications"
@@ -42,13 +42,13 @@
                     android:layout_height="wrap_content">
 
                 <ImageView
-                        android:id="@+id/ackNackProfilePic"
+                        android:id="@+id/simpleNotificationProfilePic"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/profile_pic"/>
 
                 <TextView
-                        android:id="@+id/ackNackProposalText"
+                        android:id="@+id/simpleNotificationProposalText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="[PROPOSAL TEXT]"
@@ -59,22 +59,10 @@
         </TableLayout>
 
 
-        <LinearLayout
-                android:id="@+id/ackNackInnerLinearLayout"
-                android:layout_width="wrap_content"
+        <Button android:text="@string/simple_notification_accept_string"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/Grey"
-                android:orientation="horizontal">
-
-            <Button android:text="SAMPLE"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-            <Button android:text="SAMPLE"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:checked="true"/>
-
-        </LinearLayout>
+                android:id="@+id/simpleNotificationAcceptButton"/>
 
     </LinearLayout>
 

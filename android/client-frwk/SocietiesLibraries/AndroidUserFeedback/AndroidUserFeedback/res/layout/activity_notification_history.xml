@@ -1,0 +1,83 @@
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <ImageView
+            android:id="@+id/notificationHistoryHeaderImage"
+            android:layout_width="fill_parent"
+            android:layout_height="36dp"
+            android:src="@drawable/societies_header"/>
+
+    <LinearLayout
+            android:id="@+id/notificationHistoryOuterLinerLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:background="@color/Grey"
+            android:orientation="vertical">
+
+        <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/request_history"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:background="@color/Blue"
+                android:textColor="@color/Grey"/>
+
+        <ListView android:id="@android:id/list"
+                  android:layout_width="match_parent"
+                  android:layout_height="fill_parent"
+                  android:background="@color/Grey"
+                  android:layout_weight="1"
+                  android:drawSelectorOnTop="false"
+                  android:isScrollContainer="true"/>
+
+        <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:isScrollContainer="true">
+
+            <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true">
+
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/profile_pic"
+                        />
+
+                <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_gravity="center_vertical">
+
+                    <TextView
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:text="[PROPOSAL TEXT]"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="@color/Black"/>
+                    <TextView
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:text="[RECEIVED DATE]"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="@color/Lt_Grey"/>
+                </LinearLayout>
+            </TableRow>
+
+
+        </TableLayout>
+
+
+        <Button android:text="@string/close_string"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/notificationHistoryCloseButton"/>
+
+    </LinearLayout>
+
+</TableLayout>

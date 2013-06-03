@@ -3,13 +3,13 @@
              android:layout_height="match_parent">
 
     <ImageView
-            android:id="@+id/ackNackHeaderImage"
+            android:id="@+id/timedAbortHeaderImage"
             android:layout_width="fill_parent"
             android:layout_height="36dp"
             android:src="@drawable/societies_header"/>
 
     <LinearLayout
-            android:id="@+id/ackNackOuterLinerLayout"
+            android:id="@+id/timedAbortOuterLinerLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
@@ -17,7 +17,7 @@
             android:orientation="vertical">
 
         <TextView
-                android:id="@+id/ackNackHeaderText"
+                android:id="@+id/timedAbortHeaderText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/societies_Notifications"
@@ -42,13 +42,13 @@
                     android:layout_height="wrap_content">
 
                 <ImageView
-                        android:id="@+id/ackNackProfilePic"
+                        android:id="@+id/timedAbortProfilePic"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/profile_pic"/>
 
                 <TextView
-                        android:id="@+id/ackNackProposalText"
+                        android:id="@+id/timedAbortProposalText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="[PROPOSAL TEXT]"
@@ -60,7 +60,7 @@
 
 
         <LinearLayout
-                android:id="@+id/ackNackInnerLinearLayout"
+                android:id="@+id/timedAbortInnerLinearLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/Grey"
