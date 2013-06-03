@@ -235,7 +235,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         // wait until complete, or timeout has expired
         while (!result.isDone()) {
             try {
-                result.wait(100);
+                synchronized (result) {
+                    result.wait(100);
+                }
             } catch (InterruptedException e) {
                 log.warn("Error waiting for result", e);
             }
@@ -326,7 +328,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         // wait until complete, or timeout has expired
         while (!result.isDone()) {
             try {
-                result.wait(100);
+                synchronized (result) {
+                    result.wait(100);
+                }
             } catch (InterruptedException e) {
                 log.warn("Error waiting for result", e);
             }
@@ -416,7 +420,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         // wait until complete, or timeout has expired
         while (!result.isDone()) {
             try {
-                result.wait(100);
+                synchronized (result) {
+                    result.wait(100);
+                }
             } catch (InterruptedException e) {
                 log.warn("Error waiting for result", e);
             }
@@ -511,7 +517,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         // wait until complete, or timeout has expired
         while (!result.isDone()) {
             try {
-                result.wait(100);
+                synchronized (result) {
+                    result.wait(100);
+                }
             } catch (InterruptedException e) {
                 log.warn("Error waiting for result", e);
             }
