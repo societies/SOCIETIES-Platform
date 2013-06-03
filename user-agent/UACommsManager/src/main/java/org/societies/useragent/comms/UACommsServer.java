@@ -179,8 +179,8 @@ public class UACommsServer implements IFeatureServer {
             case BY_COUNT:
                 result = feedback.listStoredFeedbackBeans(requestBean.getHowMany());
                 break;
-            case BY_DATE:
-                result = feedback.listStoredFeedbackBeans(requestBean.getSinceWhen());
+//            case BY_DATE:
+//                result = feedback.listStoredFeedbackBeans(requestBean.getSinceWhen());
 //                break;
             case OUTSTANDING:
                 result = feedback.listIncompleteFeedbackBeans();
@@ -199,7 +199,7 @@ public class UACommsServer implements IFeatureServer {
         // NB: Now get rid of all the hibernate mess inside the beans
         for (UserFeedbackBean bean : requestBean.getUserFeedbackBean()) {
             bean.setOptions(new ArrayList<String>(bean.getOptions())); // persistent list
-            bean.setRequestDate(new Date(bean.getRequestDate().getTime())); // java.sql.Timestamp
+//            bean.setRequestDate(new Date(bean.getRequestDate().getTime())); // java.sql.Timestamp
         }
 
 //        return result.toArray(new UserFeedbackBean[result.size()]);

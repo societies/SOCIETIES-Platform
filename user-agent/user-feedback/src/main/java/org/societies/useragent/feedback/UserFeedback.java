@@ -243,7 +243,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
         //create user feedback bean to fire in pubsub event
         UserFeedbackBean ufBean = new UserFeedbackBean();
-        ufBean.setRequestDate(new Date());
+//        ufBean.setRequestDate(new Date());
         ufBean.setStage(FeedbackStage.PENDING_USER_RESPONSE);
         ufBean.setRequestId(requestId);
         ufBean.setType(type);
@@ -312,7 +312,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
         //create user feedback bean to fire in pubsub event
         UserFeedbackBean ufBean = new UserFeedbackBean();
-        ufBean.setRequestDate(new Date());
+//        ufBean.setRequestDate(new Date());
         ufBean.setStage(FeedbackStage.PENDING_USER_RESPONSE);
         ufBean.setRequestId(requestId);
         ufBean.setType(type);
@@ -481,7 +481,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
         //create user feedback bean to fire in pubsub event
         UserFeedbackBean ufBean = new UserFeedbackBean();
-        ufBean.setRequestDate(new Date());
+//        ufBean.setRequestDate(new Date());
         ufBean.setStage(FeedbackStage.COMPLETED);
         ufBean.setRequestId(requestId);
         ufBean.setProposalText(notificationTxt);

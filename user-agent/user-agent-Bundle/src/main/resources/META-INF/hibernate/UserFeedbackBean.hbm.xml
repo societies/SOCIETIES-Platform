@@ -12,7 +12,7 @@
 
         <property name="method" column="method" type="org.societies.api.schema.useragent.feedback.FeedbackMethodType"/>
         <property name="stage" column="stage" type="org.societies.api.schema.useragent.feedback.FeedbackStage"/>
-        <property name="requestDate" column="requestDate" type="java.util.Date"/>
+        <!--<property name="requestDate" column="requestDate" type="java.util.Date"/>-->
         <property name="type" column="type" type="int"/>
         <list name="options" table="UserFeedbackBean_options" lazy="false">
             <key column="option_id"/>

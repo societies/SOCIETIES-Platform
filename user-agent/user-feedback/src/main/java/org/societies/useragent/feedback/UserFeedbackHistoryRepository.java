@@ -39,7 +39,8 @@ public class UserFeedbackHistoryRepository implements IUserFeedbackHistoryReposi
 
     @Override
     public List<UserFeedbackBean> listPrevious(int howMany) {
-        Query query = session.createQuery("FROM UserFeedbackBean uf ORDER BY uf.requestDate");
+        Query query = session.createQuery("FROM UserFeedbackBean uf");
+//        Query query = session.createQuery("FROM UserFeedbackBean uf ORDER BY uf.requestDate");
         query.setMaxResults(howMany);
 
         return query.list();
@@ -47,15 +48,17 @@ public class UserFeedbackHistoryRepository implements IUserFeedbackHistoryReposi
 
     @Override
     public List<UserFeedbackBean> listSince(Date sinceWhen) {
-        Query query = session.createQuery("FROM UserFeedbackBean uf WHERE uf.requestDate > :date ORDER BY uf.requestDate");
-        query.setDate("date", sinceWhen);
+        Query query = session.createQuery("FROM UserFeedbackBean uf");
+//        Query query = session.createQuery("FROM UserFeedbackBean uf WHERE uf.requestDate > :date ORDER BY uf.requestDate");
+//        query.setDate("date", sinceWhen);
 
         return query.list();
     }
 
     @Override
     public List<UserFeedbackBean> listIncomplete() {
-        Query query = session.createQuery("FROM UserFeedbackBean uf WHERE uf.stage != :stage ORDER BY uf.requestDate");
+        Query query = session.createQuery("FROM UserFeedbackBean uf WHERE uf.stage != :stage");
+//        Query query = session.createQuery("FROM UserFeedbackBean uf WHERE uf.stage != :stage ORDER BY uf.requestDate");
         query.setParameter("stage", FeedbackStage.COMPLETED);
 
         return query.list();
