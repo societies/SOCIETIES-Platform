@@ -26,7 +26,6 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -170,7 +169,7 @@ public class PrivacyPolicyTestController extends BasePageController {
         negotiationDetails.setNegotiationID(new BigInteger(130, random).intValue());
 
         log.info("PPN: Sending event");
-        userFeedback.getPrivacyNegotiationFB(responsePolicy, negotiationDetails, new IUserFeedbackResponseEventListener<ResponsePolicy>() {
+        userFeedback.getPrivacyNegotiationFBAsync(responsePolicy, negotiationDetails, new IUserFeedbackResponseEventListener<ResponsePolicy>() {
             @Override
             public void responseReceived(ResponsePolicy result) {
                 addGlobalMessage("PPN Response received",
@@ -195,7 +194,7 @@ public class PrivacyPolicyTestController extends BasePageController {
 
         log.info("Acknack: Sending event");
         ExpProposalContent content = new ExpProposalContent(proposalText, options);
-        userFeedback.getExplicitFB(ExpProposalType.ACKNACK, content, new IUserFeedbackResponseEventListener<List<String>>() {
+        userFeedback.getExplicitFBAsync(ExpProposalType.ACKNACK, content, new IUserFeedbackResponseEventListener<List<String>>() {
             @Override
             public void responseReceived(List<String> result) {
                 log.info("Acknack: Response received");
@@ -214,23 +213,8 @@ public class PrivacyPolicyTestController extends BasePageController {
         ExpProposalContent content = new ExpProposalContent(proposalText, options);
         Future<List<String>> explicitFB = userFeedback.getExplicitFB(ExpProposalType.RADIOLIST, content);
 
-        long TIMEOUT = 10000; // 10 seconds
-
-        Date timeout = new Date(new Date().getTime() + TIMEOUT);
-
-        // wait until complete, or timeout has expired
-        while (!explicitFB.isDone() && timeout.after(new Date())) {
-            explicitFB.wait(10);
-        }
-
-        if (!explicitFB.isDone()) {
-            // HANDLE THIS TIMEOUT SOMEHOW
-            return;
-        }
-
-        // OTHERWISE USE YOUR RESULT HERE
-        List<String> result = explicitFB.get();
-        /// if (result.size() == ....
+        // USE YOUR RESULT HERE
+        /// if (explicitFB.get().size() == ....
     }
 
     public void sendSelectOneEvent() {
@@ -239,7 +223,7 @@ public class PrivacyPolicyTestController extends BasePageController {
 
         log.info("SelectOne: Sending event");
         ExpProposalContent content = new ExpProposalContent(proposalText, options);
-        userFeedback.getExplicitFB(ExpProposalType.RADIOLIST, content, new IUserFeedbackResponseEventListener<List<String>>() {
+        userFeedback.getExplicitFBAsync(ExpProposalType.RADIOLIST, content, new IUserFeedbackResponseEventListener<List<String>>() {
             @Override
             public void responseReceived(List<String> result) {
                 log.info("SelectOne: Response received");
@@ -257,7 +241,7 @@ public class PrivacyPolicyTestController extends BasePageController {
 
         log.info("SelectMany: Sending event");
         ExpProposalContent content = new ExpProposalContent(proposalText, options);
-        userFeedback.getExplicitFB(ExpProposalType.CHECKBOXLIST, content, new IUserFeedbackResponseEventListener<List<String>>() {
+        userFeedback.getExplicitFBAsync(ExpProposalType.CHECKBOXLIST, content, new IUserFeedbackResponseEventListener<List<String>>() {
             @Override
             public void responseReceived(List<String> result) {
                 log.info("SelectMany: Response received");
@@ -274,7 +258,7 @@ public class PrivacyPolicyTestController extends BasePageController {
 
         log.info("TimedAbort: Sending event");
         ImpProposalContent content = new ImpProposalContent(proposalText, (int) sec);
-        userFeedback.getImplicitFB(ImpProposalType.TIMED_ABORT, content, new IUserFeedbackResponseEventListener<Boolean>() {
+        userFeedback.getImplicitFBAsync(ImpProposalType.TIMED_ABORT, content, new IUserFeedbackResponseEventListener<Boolean>() {
             @Override
             public void responseReceived(Boolean result) {
                 log.info("TimedAbort: Response received");

@@ -230,11 +230,33 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
     @Override
     public Future<List<String>> getExplicitFB(int type, ExpProposalContent content) {
-        return getExplicitFB(type, content, null);
+        Future<List<String>> result = getExplicitFBAsync(type, content);
+
+        // wait until complete, or timeout has expired
+        while (!result.isDone()) {
+            try {
+                result.wait(100);
+            } catch (InterruptedException e) {
+                log.warn("Error waiting for result", e);
+            }
+        }
+
+        try {
+//            return result.get();
+            return result;
+        } catch (Exception e) {
+            log.warn("Error parsing result from Future", e);
+            return null;
+        }
     }
 
     @Override
-    public Future<List<String>> getExplicitFB(int type, ExpProposalContent content, IUserFeedbackResponseEventListener<List<String>> callback) {
+    public Future<List<String>> getExplicitFBAsync(int type, ExpProposalContent content) {
+        return getExplicitFBAsync(type, content, null);
+    }
+
+    @Override
+    public Future<List<String>> getExplicitFBAsync(int type, ExpProposalContent content, IUserFeedbackResponseEventListener<List<String>> callback) {
         if (log.isDebugEnabled()) {
             log.debug("Received request for explicit feedback");
             log.debug("Content: " + content.getProposalText());
@@ -299,11 +321,33 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
     @Override
     public Future<Boolean> getImplicitFB(int type, ImpProposalContent content) {
-        return getImplicitFB(type, content, null);
+        Future<Boolean> result = getImplicitFBAsync(type, content);
+
+        // wait until complete, or timeout has expired
+        while (!result.isDone()) {
+            try {
+                result.wait(100);
+            } catch (InterruptedException e) {
+                log.warn("Error waiting for result", e);
+            }
+        }
+
+        try {
+//            return result.get();
+            return result;
+        } catch (Exception e) {
+            log.warn("Error parsing result from Future", e);
+            return null;
+        }
     }
 
     @Override
-    public Future<Boolean> getImplicitFB(int type, ImpProposalContent content, IUserFeedbackResponseEventListener<Boolean> callback) {
+    public Future<Boolean> getImplicitFBAsync(int type, ImpProposalContent content) {
+        return getImplicitFBAsync(type, content, null);
+    }
+
+    @Override
+    public Future<Boolean> getImplicitFBAsync(int type, ImpProposalContent content, IUserFeedbackResponseEventListener<Boolean> callback) {
         if (log.isDebugEnabled()) {
             log.debug("Received request for implicit feedback");
             log.debug("Content: " + content.getProposalText());
@@ -365,14 +409,36 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         return result;
     }
 
-
     @Override
     public Future<ResponsePolicy> getPrivacyNegotiationFB(ResponsePolicy policy, NegotiationDetailsBean details) {
-        return getPrivacyNegotiationFB(policy, details, null);
+        Future<ResponsePolicy> result = getPrivacyNegotiationFBAsync(policy, details);
+
+        // wait until complete, or timeout has expired
+        while (!result.isDone()) {
+            try {
+                result.wait(100);
+            } catch (InterruptedException e) {
+                log.warn("Error waiting for result", e);
+            }
+        }
+
+        try {
+//            return result.get();
+            return result;
+        } catch (Exception e) {
+            log.warn("Error parsing result from Future", e);
+            return null;
+        }
+    }
+
+
+    @Override
+    public Future<ResponsePolicy> getPrivacyNegotiationFBAsync(ResponsePolicy policy, NegotiationDetailsBean details) {
+        return getPrivacyNegotiationFBAsync(policy, details, null);
     }
 
     @Override
-    public Future<ResponsePolicy> getPrivacyNegotiationFB(ResponsePolicy policy, NegotiationDetailsBean details, IUserFeedbackResponseEventListener<ResponsePolicy> callback) {
+    public Future<ResponsePolicy> getPrivacyNegotiationFBAsync(ResponsePolicy policy, NegotiationDetailsBean details, IUserFeedbackResponseEventListener<ResponsePolicy> callback) {
 
         if (log.isDebugEnabled()) {
             log.debug("processing negotiationFeedback request");
@@ -440,11 +506,33 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
     @Override
     public Future<List<ResponseItem>> getAccessControlFB(Requestor requestor, List<ResponseItem> items) {
-        return getAccessControlFB(requestor, items, null);
+        Future<List<ResponseItem>> result = getAccessControlFBAsync(requestor, items);
+
+        // wait until complete, or timeout has expired
+        while (!result.isDone()) {
+            try {
+                result.wait(100);
+            } catch (InterruptedException e) {
+                log.warn("Error waiting for result", e);
+            }
+        }
+
+        try {
+//            return result.get();
+            return result;
+        } catch (Exception e) {
+            log.warn("Error parsing result from Future", e);
+            return null;
+        }
     }
 
     @Override
-    public Future<List<ResponseItem>> getAccessControlFB(Requestor requestor, List<ResponseItem> items, IUserFeedbackResponseEventListener<List<ResponseItem>> callback) {
+    public Future<List<ResponseItem>> getAccessControlFBAsync(Requestor requestor, List<ResponseItem> items) {
+        return getAccessControlFBAsync(requestor, items, null);
+    }
+
+    @Override
+    public Future<List<ResponseItem>> getAccessControlFBAsync(Requestor requestor, List<ResponseItem> items, IUserFeedbackResponseEventListener<List<ResponseItem>> callback) {
         UserFeedbackAccessControlEvent event = new UserFeedbackAccessControlEvent();
         event.setMethod(GET_EXPLICIT_FB);
         event.setType(ExpProposalType.PRIVACY_ACCESS_CONTROL);
