@@ -494,7 +494,7 @@ public class ProfileSettingsController extends BasePageController {
         );
         IPreference preferenceNode = new PreferenceTreeNode();
         preferenceNode.setUserObject(preferenceDetails);
-        PreferenceTreeModel model = new PreferenceTreeModel(preferenceNode);
+        PreferenceTreeModel model = new PreferenceTreeModel(preferenceDetails, preferenceNode);
 
 
         PreferenceOutcome outcome = new PreferenceOutcome(

@@ -22,55 +22,17 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.preference.api.model;
-
-import java.io.Serializable;
-import java.util.Date;
-
-import javax.swing.tree.TreeModel;
-
-import org.societies.api.internal.personalisation.model.PreferenceDetails;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-
-
+package org.societies.personalisation.CommunityPreferenceManagement.impl.management;
 
 /**
- * @author Elizabeth
- * @version 1.0
- * @created 08-Nov-2011 14:02:56
+ * Describe your class here...
+ *
+ * @author Eliza
+ *
  */
-public interface IPreferenceTreeModel extends TreeModel, Serializable {
+public class CtxModelTypes {
 
-	/**
-	 * Method to retrieve the date this preference was last modified either due to
-	 * learning or by the user using the GUI
-	 * @return	the Date object
-	 */
-	public Date getLastModifiedDate();
-
-
-	/**
-	 * Method to return the preference object included in this model (Returns the root
-	 * node of the preference tree)
-	 * @return	the preference object
-	 */
-	public IPreference getRootPreference();
-
-
-	/**
-	 * Method to record the last time this preference changed either due to learning
-	 * or by the user using the GUI
-	 * 
-	 * @param d    d
-	 */
-	public void setLastModifiedDate(Date d);
-	
-	
-	/**
-	 * Method to get the details that this preference refers to 
-	 * 
-	 * @return the details (serviceid, service type, preference name)
-	 */
-	public PreferenceDetails getPreferenceDetails();
-
+	public static final String PREFERENCE_REGISTRY = "PREFERENCE_REGISTRY";
+	public static final String HAS_PREFERENCES = "HAS_PREFERENCES";
+	public static final String PREFERENCE = "PREFERENCE";
 }

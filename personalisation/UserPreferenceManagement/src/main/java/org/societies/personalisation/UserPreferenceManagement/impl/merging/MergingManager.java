@@ -108,7 +108,7 @@ public class MergingManager implements IC45Consumer{
 				logging.debug("Trees in C45output: "+treeList.size());
 				for (IPreferenceTreeModel tree : treeList){
 					logging.debug(tree.toString());
-					String prefName = tree.getPreferenceName();
+					String prefName = tree.getPreferenceDetails().getPreferenceName();
 					if (prefName==null){
 						prefName = this.getPreferenceName(tree);
 					}
