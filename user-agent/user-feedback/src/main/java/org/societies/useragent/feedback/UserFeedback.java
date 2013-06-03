@@ -43,6 +43,8 @@ import org.societies.api.internal.useragent.feedback.IUserFeedbackResponseEventL
 import org.societies.api.internal.useragent.model.*;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.societies.api.schema.useragent.feedback.*;
@@ -347,6 +349,11 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             if (log.isDebugEnabled())
                 log.debug("Sending user feedback request event via pubsub");
 
+            // HACK: When hibernate persists the ufBean object, it changes the options list to a org.hibernate.collection.PersistentList
+            // When this is deserialised at the other side, hibernate gets upset. Really the serialiser should be converting any
+            // PersistentList back to an ArrayList
+            ufBean.setOptions(new ArrayList<String>()); // list is empty anyway for implicit feedback
+
             pubsub.publisherPublish(myCloudID,
                     UserFeedbackEventTopics.REQUEST,
                     requestId,
@@ -410,6 +417,16 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             if (log.isDebugEnabled())
                 log.debug("Sending PPN request event via pubsub");
 
+
+            // HACK: When hibernate persists the ufBean object, it changes the options list to a org.hibernate.collection.PersistentList
+            // When this is deserialised at the other side, hibernate gets upset. Really the serialiser should be converting any
+            // PersistentList back to an ArrayList
+            event.getResponsePolicy().setResponseItems(new ArrayList<ResponseItem>(event.getResponsePolicy().getResponseItems()));
+            for (ResponseItem responseItem : event.getResponsePolicy().getResponseItems()) {
+                responseItem.getRequestItem().setActions(new ArrayList<Action>(responseItem.getRequestItem().getActions()));
+                responseItem.getRequestItem().setConditions(new ArrayList<Condition>(responseItem.getRequestItem().getConditions()));
+            }
+
             pubsub.publisherPublish(myCloudID,
                     EventTypes.UF_PRIVACY_NEGOTIATION,
                     requestId,
@@ -459,6 +476,16 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         try {
             if (log.isDebugEnabled())
                 log.debug("Sending access control request event via pubsub");
+
+            // HACK: When hibernate persists the ufBean object, it changes the options list to a org.hibernate.collection.PersistentList
+            // When this is deserialised at the other side, hibernate gets upset. Really the serialiser should be converting any
+            // PersistentList back to an ArrayList
+            event.setResponseItems(new ArrayList<ResponseItem>(event.getResponseItems()));
+            for (ResponseItem responseItem : event.getResponseItems()) {
+                responseItem.getRequestItem().setActions(new ArrayList<Action>(responseItem.getRequestItem().getActions()));
+                responseItem.getRequestItem().setConditions(new ArrayList<Condition>(responseItem.getRequestItem().getConditions()));
+            }
+
             this.pubsub.publisherPublish(myCloudID,
                     EventTypes.UF_PRIVACY_ACCESS_CONTROL,
                     requestId,
