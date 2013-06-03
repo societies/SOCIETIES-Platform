@@ -32,6 +32,19 @@
                                  process="@this"/>
             </p:row>
             <p:row>
+                <p:commandButton value="Send UF Ack/Nack (blocking)"
+                                 actionListener="#{ppNegotiationTest.sendAckNackEvent}"
+                                 process="@this"
+                                 disabled="true"/>
+                <p:commandButton value="Send UF Select One (blocking)"
+                                 actionListener="#{ppNegotiationTest.sendSelectOneEvent_blocking}"
+                                 process="@this"/>
+                <p:commandButton value="Send UF Select Many (blocking)"
+                                 actionListener="#{ppNegotiationTest.sendSelectManyEvent}"
+                                 process="@this"
+                                 disabled="true"/>
+            </p:row>
+            <p:row>
                 <p:commandButton value="Send UF Timed Abort (30s)"
                                  actionListener="#{ppNegotiationTest.sendTimedAbortEvent(30)}"
                                  process="@this"/>

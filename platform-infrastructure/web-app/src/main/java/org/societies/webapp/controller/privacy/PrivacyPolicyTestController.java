@@ -211,10 +211,12 @@ public class PrivacyPolicyTestController extends BasePageController {
         String[] options = new String[]{"Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"};
 
         ExpProposalContent content = new ExpProposalContent(proposalText, options);
-        Future<List<String>> explicitFB = userFeedback.getExplicitFB(ExpProposalType.RADIOLIST, content);
+        Future<List<String>> result = userFeedback.getExplicitFB(ExpProposalType.RADIOLIST, content);
 
         // USE YOUR RESULT HERE
-        /// if (explicitFB.get().size() == ....
+        addGlobalMessage("SelectOne Response received",
+                (result.get() != null && result.get().size() > 0) ? result.get().get(0) : "null",
+                FacesMessage.SEVERITY_INFO);
     }
 
     public void sendSelectOneEvent() {
