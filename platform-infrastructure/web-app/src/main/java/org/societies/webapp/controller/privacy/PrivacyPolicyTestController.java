@@ -26,8 +26,10 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 @ManagedBean(name = "ppNegotiationTest")
 @SessionScoped
@@ -187,7 +189,7 @@ public class PrivacyPolicyTestController extends BasePageController {
         log.info("Simple: Done");
     }
 
-    public void sendAckNackEvent() throws ExecutionException, InterruptedException {
+    public void sendAckNackEvent() {
         String proposalText = "Pick a button";
         String[] options = new String[]{"btn1", "btn2"}; // this actually has no effect for acknack
 
@@ -205,7 +207,33 @@ public class PrivacyPolicyTestController extends BasePageController {
         log.info("Acknack: Sent");
     }
 
-    public void sendSelectOneEvent() throws ExecutionException, InterruptedException {
+    public void sendSelectOneEvent_blocking() throws InterruptedException, ExecutionException {
+        String proposalText = "Pick ONE option";
+        String[] options = new String[]{"Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"};
+
+        ExpProposalContent content = new ExpProposalContent(proposalText, options);
+        Future<List<String>> explicitFB = userFeedback.getExplicitFB(ExpProposalType.RADIOLIST, content);
+
+        long TIMEOUT = 10000; // 10 seconds
+
+        Date timeout = new Date(new Date().getTime() + TIMEOUT);
+
+        // wait until complete, or timeout has expired
+        while (!explicitFB.isDone() && timeout.after(new Date())) {
+            explicitFB.wait(10);
+        }
+
+        if (!explicitFB.isDone()) {
+            // HANDLE THIS TIMEOUT SOMEHOW
+            return;
+        }
+
+        // OTHERWISE USE YOUR RESULT HERE
+        List<String> result = explicitFB.get();
+        /// if (result.size() == ....
+    }
+
+    public void sendSelectOneEvent() {
         String proposalText = "Pick ONE option";
         String[] options = new String[]{"Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"};
 
@@ -223,7 +251,7 @@ public class PrivacyPolicyTestController extends BasePageController {
         log.info("SelectOne: Sent");
     }
 
-    public void sendSelectManyEvent() throws ExecutionException, InterruptedException {
+    public void sendSelectManyEvent() {
         String proposalText = "Pick MANY options";
         String[] options = new String[]{"red", "orange", "yellow", "green", "blue", "indigo", "violet"};
 
@@ -241,7 +269,7 @@ public class PrivacyPolicyTestController extends BasePageController {
         log.info("SelectMany: Sent");
     }
 
-    public void sendTimedAbortEvent(long sec) throws ExecutionException, InterruptedException {
+    public void sendTimedAbortEvent(long sec) {
         String proposalText = "This is a timed abort";
 
         log.info("TimedAbort: Sending event");
