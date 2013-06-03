@@ -33,9 +33,10 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Menu;
-import org.societies.android.api.internal.R;
 import org.societies.android.platform.useragent.feedback.EventHistory;
+import org.societies.android.platform.useragent.feedback.R;
 
+@Deprecated
 public class UserFeedbackHistoryList extends Activity {
 
     protected final String LOG_TAG = this.getClass().getName();

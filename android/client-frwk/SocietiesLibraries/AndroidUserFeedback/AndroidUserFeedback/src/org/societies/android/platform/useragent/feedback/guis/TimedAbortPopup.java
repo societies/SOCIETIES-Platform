@@ -11,6 +11,7 @@ import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.android.platform.useragent.feedback.R;
 import org.societies.android.platform.useragent.feedback.TimedAbortProcessor;
+import org.societies.api.schema.useragent.feedback.FeedbackStage;
 import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
 
 public class TimedAbortPopup extends UserFeedbackPopup {
@@ -78,6 +79,7 @@ public class TimedAbortPopup extends UserFeedbackPopup {
             ImpFeedbackResultBean bean = new ImpFeedbackResultBean();
             bean.setAccepted(!getResultPayload().contains(ABORT_FLAG));
             bean.setRequestId(getUserFeedbackBean().getRequestId());
+            getUserFeedbackBean().setStage(FeedbackStage.COMPLETED);
 
             // flag the bean as having response sent, so that the background thread doesn't send an abort response when it times out
             TimedAbortProcessor.getInstance().removeTimedAbort(getUserFeedbackBean().getRequestId());

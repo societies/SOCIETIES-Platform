@@ -41,6 +41,7 @@ import org.societies.android.api.events.PlatformEventsHelperNotConnectedExceptio
 import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
 import org.societies.android.remote.helper.EventsHelper;
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
+import org.societies.api.schema.useragent.feedback.FeedbackStage;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 
 import java.util.ArrayList;
@@ -158,6 +159,7 @@ public abstract class UserFeedbackPopup extends Activity {
             feedback.addAll(this.resultPayload); // copy to the feedback array
             bean.setFeedback(feedback);
             bean.setRequestId(userFeedbackBean.getRequestId());
+            userFeedbackBean.setStage(FeedbackStage.COMPLETED);
 
             //TODO: THE PUBLISH EVENT IS OCCURRING MULTIPLE TIMES - DYNAMICALLY CREATED FORM?
             if (!published) {

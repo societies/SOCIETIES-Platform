@@ -62,6 +62,7 @@
         <activity android:name="org.societies.android.platform.useragent.feedback.guis.SimpleNotificationPopup" />
         <activity android:name="org.societies.android.platform.useragent.feedback.guis.TimedAbortPopup" />
         <activity android:name="org.societies.android.platform.useragent.feedback.guis.UserFeedbackHistoryList" />
+        <activity android:name="org.societies.android.platform.useragent.feedback.guis.NotificationHistoryPopup" />
         <!-- LOCAL SERVICES -->
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceManagementLocal" />
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceUtilitiesRemote" />

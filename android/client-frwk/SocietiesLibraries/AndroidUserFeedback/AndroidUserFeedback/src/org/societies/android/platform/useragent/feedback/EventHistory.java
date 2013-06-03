@@ -1,5 +1,6 @@
 package org.societies.android.platform.useragent.feedback;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -8,7 +9,9 @@ import android.util.Log;
 import org.jivesoftware.smack.packet.IQ;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.*;
+import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
+import org.societies.android.platform.useragent.feedback.guis.NotificationHistoryPopup;
 import org.societies.android.platform.useragent.feedback.model.NotificationHistoryItem;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
@@ -103,9 +106,9 @@ public class EventHistory extends Service {
 
 
                 UserFeedbackHistoryRequest bean = new UserFeedbackHistoryRequest();
-                bean.setRequestType(HistoryRequestType.BY_COUNT);
+                bean.setRequestType(HistoryRequestType.OUTSTANDING);
                 bean.setHowMany(howMany);
-                bean.setSinceWhen(new Date()); // will be ignored, but must not be null
+//                bean.setSinceWhen(new Date()); // will be ignored, but must not be null
 
                 Stanza stanza = new Stanza(cloudNode);
                 String id = UUID.randomUUID().toString();
@@ -162,7 +165,8 @@ public class EventHistory extends Service {
             // wrap the beans in NotificationHistoryItem objects
             for (UserFeedbackBean bean : request.getUserFeedbackBean()) {
                 NotificationHistoryItem item = new NotificationHistoryItem(bean.getRequestId(),
-                        bean.getRequestDate(),
+//                        bean.getRequestDate(),
+                        new Date(),
                         bean);
                 historyItems.add(item);
             }
@@ -170,6 +174,26 @@ public class EventHistory extends Service {
             Log.i(LOG_TAG, "Received a response containing " + historyItems.size() + " NHIs");
 
             replaceCacheWithList(historyItems);
+
+            if (!historyItems.isEmpty()) {
+                // pop up a notification
+
+                //CREATE INTENT FOR LAUNCHING ACTIVITY
+                Intent intent = new Intent(EventHistory.this.getApplicationContext(), NotificationHistoryPopup.class);
+//                intent.putExtra(UserFeedbackActivityIntentExtra.USERFEEDBACK_NODES, (Parcelable) ufBean);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                //CREATE ANDROID NOTIFICATION
+                int notifierFlags[] = new int[1];
+                notifierFlags[0] = Notification.FLAG_AUTO_CANCEL;
+                AndroidNotifier notifier = new AndroidNotifier(EventHistory.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierFlags);
+                notifier.notifyMessage(
+                        "Click to answer outstanding requests",
+                        "Outstanding requests",
+                        NotificationHistoryPopup.class,
+                        intent,
+                        historyItems.size() + " outstanding requests");
+            }
         }
 
         @Override
