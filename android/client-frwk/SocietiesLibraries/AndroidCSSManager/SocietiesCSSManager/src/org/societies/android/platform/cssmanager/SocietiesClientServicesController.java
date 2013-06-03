@@ -25,16 +25,15 @@
  */
 package org.societies.android.platform.cssmanager;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
+import android.content.*;
+import android.os.*;
+import android.util.Log;
 import org.societies.android.api.cis.directory.ICisDirectory;
 import org.societies.android.api.cis.management.ICisManager;
 import org.societies.android.api.cis.management.ICisSubscribed;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.css.directory.IAndroidCssDirectory;
 import org.societies.android.api.css.manager.IServiceManager;
-import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.internal.context.IInternalCtxClient;
 import org.societies.android.api.internal.cssmanager.IFriendsManager;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
@@ -42,7 +41,6 @@ import org.societies.android.api.internal.privacytrust.trust.IInternalTrustClien
 import org.societies.android.api.internal.servicelifecycle.IServiceControl;
 import org.societies.android.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.android.api.internal.sns.ISocialData;
-import org.societies.android.api.internal.useragent.IAndroidUserFeedback;
 import org.societies.android.api.services.ICoreSocietiesServices;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.android.platform.css.friends.EventService;
@@ -52,29 +50,19 @@ import org.societies.android.platform.cssmanager.LocalCssDirectoryService.LocalC
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal;
 import org.societies.android.platform.servicemonitor.ServiceManagementLocal.LocalSLMBinder;
 import org.societies.android.platform.socialdata.SocialData;
+import org.societies.android.platform.useragent.feedback.EventHistory;
 import org.societies.android.platform.useragent.feedback.EventListener;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService;
 import org.societies.android.privacytrust.trust.TrustClientLocal;
 import org.societies.android.privacytrust.trust.TrustClientLocal.TrustClientLocalBinder;
 
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.IBinder;
-import android.os.Messenger;
-import android.os.RemoteException;
-import android.util.Log;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class used to bind to, unbind from, invoke Societies defined methods in {@link IServiceManager}. Any service
  * that needs access to Android Comms and/or Android Comms Pubsub need to included in this class. See {@link SocietiesEssentialServicesController}
  * for services that are considered essential and are dependencies of some or all services started in this class.
- *
  */
 public class SocietiesClientServicesController {
     private final static String LOG_TAG = SocietiesClientServicesController.class.getName();
@@ -95,8 +83,8 @@ public class SocietiesClientServicesController {
     private final static int PERSONALISATION_SERVICE 	= 9;
     private final static int SLM_SERVICE_DISCO_SERVICE 	= 10;
     private final static int FRIENDS_MANAGER_SERVICE 	= 11;
-    private final static int CONTEXT_SERVICE 			= 12;
-    private final static int INTERNAL_TRUST_SERVICE 	= 13;
+    private final static int CONTEXT_SERVICE            = 12;
+    private final static int INTERNAL_TRUST_SERVICE     = 13;
 
     private Context context;
     private CountDownLatch servicesBinded;
@@ -107,8 +95,8 @@ public class SocietiesClientServicesController {
     private BroadcastReceiver shutdownReceiver;
 
     private boolean connectedToServices[];
-    private ServiceConnection platformServiceConnections [];
-    private Messenger allMessengers [];
+    private ServiceConnection platformServiceConnections[];
+    private Messenger allMessengers[];
 
     private IAndroidCssDirectory cssDirectoryService;
     private IServiceDiscovery slmServiceDisco;
@@ -132,8 +120,6 @@ public class SocietiesClientServicesController {
 
     /**
      * Bind to the app services. Assumes that login has already taken place
-     *
-     * @param IMethodCallback callback
      */
     public void bindToServices(IMethodCallback callback) {
         //set up broadcast receiver for start/bind actions
@@ -142,9 +128,9 @@ public class SocietiesClientServicesController {
         InvokeBindAllServices invoker = new InvokeBindAllServices(callback);
         invoker.execute();
     }
+
     /**
      * Unbind from app services
-     *
      */
     public void unbindFromServices() {
         Log.d(LOG_TAG, "Unbind from Societies Platform Services");
@@ -157,17 +143,17 @@ public class SocietiesClientServicesController {
         //tear down broadcast receiver after stop/unbind actions
         this.teardownBroadcastReceiver(this.shutdownReceiver);
     }
+
     /**
      * Start all Societies Client app services
-     * @param callback
      */
     public void startAllServices(IMethodCallback callback) {
         InvokeStartAllServices invoker = new InvokeStartAllServices(callback);
         invoker.execute();
     }
+
     /**
      * Stop all Societies Client app services
-     * @param callback
      */
     public void stopAllServices(IMethodCallback callback) {
         //set up broadcast receiver for stop/unbind actions
@@ -185,11 +171,14 @@ public class SocietiesClientServicesController {
     private ServiceConnection cisDirectoryConnection = new ServiceConnection() {
 
         final static String SERVICE_NAME = "CIS Directory";
+
+        @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(LOG_TAG, "Disconnecting from " + SERVICE_NAME + " service");
             SocietiesClientServicesController.this.connectedToServices[CIS_DIRECTORY_SERVICE] = false;
         }
 
+        @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(LOG_TAG, "Connecting to " + SERVICE_NAME + " service");
 
@@ -206,11 +195,14 @@ public class SocietiesClientServicesController {
     private ServiceConnection cisManagerConnection = new ServiceConnection() {
 
         final static String SERVICE_NAME = "Platform CIS Manager";
+
+        @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(LOG_TAG, "Disconnecting from " + SERVICE_NAME + " service");
             SocietiesClientServicesController.this.connectedToServices[CIS_MANAGER_SERVICE] = false;
         }
 
+        @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(LOG_TAG, "Connecting to " + SERVICE_NAME + " service");
 
@@ -227,11 +219,14 @@ public class SocietiesClientServicesController {
     private ServiceConnection cisSubscribedConnection = new ServiceConnection() {
 
         final static String SERVICE_NAME = "Platform CIS Subscribed";
+
+        @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(LOG_TAG, "Disconnecting from " + SERVICE_NAME + " service");
             SocietiesClientServicesController.this.connectedToServices[CIS_SUBSCRIBED_SERVICE] = false;
         }
 
+        @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(LOG_TAG, "Connecting to " + SERVICE_NAME + " service");
 
@@ -248,11 +243,14 @@ public class SocietiesClientServicesController {
     private ServiceConnection cssDirectoryConnection = new ServiceConnection() {
 
         final static String SERVICE_NAME = "Platform CSS Directory";
+
+        @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(LOG_TAG, "Disconnecting from " + SERVICE_NAME + " service");
             SocietiesClientServicesController.this.connectedToServices[CSS_DIRECTORY_SERVICE] = false;
         }
 
+        @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(LOG_TAG, "Connecting to " + SERVICE_NAME + " service");
 
@@ -260,7 +258,7 @@ public class SocietiesClientServicesController {
             //Get a local binder
             LocalCssDirectoryBinder binder = (LocalCssDirectoryBinder) service;
             //Retrieve the local service API
-            SocietiesClientServicesController.this.cssDirectoryService = (IAndroidCssDirectory) binder.getService();
+            SocietiesClientServicesController.this.cssDirectoryService = binder.getService();
             SocietiesClientServicesController.this.platformServiceConnections[CSS_DIRECTORY_SERVICE] = this;
             SocietiesClientServicesController.this.servicesBinded.countDown();
             Log.d(LOG_TAG, "Time to bind to " + SERVICE_NAME + " service: " + Long.toString(System.currentTimeMillis() - SocietiesClientServicesController.this.startTime));
@@ -270,11 +268,14 @@ public class SocietiesClientServicesController {
     private ServiceConnection slmDiscoConnection = new ServiceConnection() {
 
         final static String SERVICE_NAME = "Platform SLM Service Discovery";
+
+        @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(LOG_TAG, "Disconnecting from " + SERVICE_NAME + " service");
             SocietiesClientServicesController.this.connectedToServices[SLM_SERVICE_DISCO_SERVICE] = false;
         }
 
+        @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(LOG_TAG, "Connecting to " + SERVICE_NAME + " service");
 
@@ -283,7 +284,7 @@ public class SocietiesClientServicesController {
             //Get a local binder
             LocalSLMBinder binder = (LocalSLMBinder) service;
             //Retrieve the local service API
-            SocietiesClientServicesController.this.slmServiceDisco = (IServiceDiscovery) binder.getService();
+            SocietiesClientServicesController.this.slmServiceDisco = binder.getService();
             SocietiesClientServicesController.this.platformServiceConnections[SLM_SERVICE_DISCO_SERVICE] = this;
             SocietiesClientServicesController.this.servicesBinded.countDown();
             Log.d(LOG_TAG, "Time to bind to " + SERVICE_NAME + " service: " + Long.toString(System.currentTimeMillis() - SocietiesClientServicesController.this.startTime));
@@ -293,11 +294,14 @@ public class SocietiesClientServicesController {
     private ServiceConnection slmControlConnection = new ServiceConnection() {
 
         final static String SERVICE_NAME = "Platform SLM Service Control";
+
+        @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(LOG_TAG, "Disconnecting from " + SERVICE_NAME + " service");
             SocietiesClientServicesController.this.connectedToServices[SLM_SERVICE_CONTROL_SERVICE] = false;
         }
 
+        @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(LOG_TAG, "Connecting to " + SERVICE_NAME + " service");
 
@@ -306,7 +310,7 @@ public class SocietiesClientServicesController {
             //Get a local binder
             LocalSLMBinder binder = (LocalSLMBinder) service;
             //Retrieve the local service API
-            SocietiesClientServicesController.this.slmServiceControl = (IServiceControl) binder.getService();
+            SocietiesClientServicesController.this.slmServiceControl = binder.getService();
             SocietiesClientServicesController.this.platformServiceConnections[SLM_SERVICE_CONTROL_SERVICE] = this;
             SocietiesClientServicesController.this.servicesBinded.countDown();
             Log.d(LOG_TAG, "Time to bind to " + SERVICE_NAME + " service: " + Long.toString(System.currentTimeMillis() - SocietiesClientServicesController.this.startTime));
@@ -316,11 +320,14 @@ public class SocietiesClientServicesController {
     private ServiceConnection snsSocialDataConnection = new ServiceConnection() {
 
         final static String SERVICE_NAME = "Platform SNS Social Data";
+
+        @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(LOG_TAG, "Disconnecting from " + SERVICE_NAME + " service");
             SocietiesClientServicesController.this.connectedToServices[SNS_SOCIAL_DATA_SERVICE] = false;
         }
 
+        @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(LOG_TAG, "Connecting to " + SERVICE_NAME + " service");
 
@@ -329,7 +336,7 @@ public class SocietiesClientServicesController {
             //Get a local binder
             SocialData.LocalBinder binder = (SocialData.LocalBinder) service;
             //Retrieve the local service API
-            SocietiesClientServicesController.this.snsConnectorService = (ISocialData) binder.getService();
+            SocietiesClientServicesController.this.snsConnectorService = binder.getService();
             SocietiesClientServicesController.this.platformServiceConnections[SNS_SOCIAL_DATA_SERVICE] = this;
             SocietiesClientServicesController.this.servicesBinded.countDown();
             Log.d(LOG_TAG, "Time to bind to " + SERVICE_NAME + " service: " + Long.toString(System.currentTimeMillis() - SocietiesClientServicesController.this.startTime));
@@ -339,11 +346,14 @@ public class SocietiesClientServicesController {
     private ServiceConnection internalTrustConnection = new ServiceConnection() {
 
         final static String SERVICE_NAME = "Platform Internal Trust";
+
+        @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(LOG_TAG, "Disconnecting from " + SERVICE_NAME + " service");
             SocietiesClientServicesController.this.connectedToServices[INTERNAL_TRUST_SERVICE] = false;
         }
 
+        @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(LOG_TAG, "Connecting to " + SERVICE_NAME + " service");
 
@@ -352,7 +362,7 @@ public class SocietiesClientServicesController {
             //Get a local binder
             TrustClientLocalBinder binder = (TrustClientLocalBinder) service;
             //Retrieve the local service API
-            SocietiesClientServicesController.this.internalTrustService = (IInternalTrustClient) binder.getService();
+            SocietiesClientServicesController.this.internalTrustService = binder.getService();
             SocietiesClientServicesController.this.platformServiceConnections[INTERNAL_TRUST_SERVICE] = this;
             SocietiesClientServicesController.this.servicesBinded.countDown();
             Log.d(LOG_TAG, "Time to bind to " + SERVICE_NAME + " service: " + Long.toString(System.currentTimeMillis() - SocietiesClientServicesController.this.startTime));
@@ -363,11 +373,14 @@ public class SocietiesClientServicesController {
     private ServiceConnection trustConnection = new ServiceConnection() {
 
         final static String SERVICE_NAME = "Platform Trust";
+
+        @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(LOG_TAG, "Disconnecting from " + SERVICE_NAME + " service");
             SocietiesClientServicesController.this.connectedToServices[TRUST_SERVICE] = false;
         }
 
+        @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(LOG_TAG, "Connecting to " + SERVICE_NAME + " service");
 
@@ -385,11 +398,14 @@ public class SocietiesClientServicesController {
     private ServiceConnection privacyDataConnection = new ServiceConnection() {
 
         final static String SERVICE_NAME = "Platform Privacy Data";
+
+        @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(LOG_TAG, "Disconnecting from " + SERVICE_NAME + " service");
             SocietiesClientServicesController.this.connectedToServices[PRIVACY_DATA_SERVICE] = false;
         }
 
+        @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(LOG_TAG, "Connecting to " + SERVICE_NAME + " service");
 
@@ -406,11 +422,14 @@ public class SocietiesClientServicesController {
     private ServiceConnection privacyPolicyConnection = new ServiceConnection() {
 
         final static String SERVICE_NAME = "Platform Privacy Policy";
+
+        @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(LOG_TAG, "Disconnecting from " + SERVICE_NAME + " service");
             SocietiesClientServicesController.this.connectedToServices[PRIVACY_POLICY_SERVICE] = false;
         }
 
+        @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(LOG_TAG, "Connecting to " + SERVICE_NAME + " service");
             SocietiesClientServicesController.this.connectedToServices[PRIVACY_POLICY_SERVICE] = true;
@@ -418,7 +437,7 @@ public class SocietiesClientServicesController {
             //Get a local binder
             PrivacyPolicyManagerLocalService.LocalBinder binder = (PrivacyPolicyManagerLocalService.LocalBinder) service;
             //Retrieve the local service API
-            SocietiesClientServicesController.this.privacyPolicyService = (IPrivacyPolicyManager) binder.getService();
+            SocietiesClientServicesController.this.privacyPolicyService = binder.getService();
             SocietiesClientServicesController.this.platformServiceConnections[PRIVACY_POLICY_SERVICE] = this;
             SocietiesClientServicesController.this.servicesBinded.countDown();
 
@@ -435,11 +454,14 @@ public class SocietiesClientServicesController {
     private ServiceConnection personalisationMgrConnection = new ServiceConnection() {
 
         final static String SERVICE_NAME = "Platform Personalisation Manager";
+
+        @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(LOG_TAG, "Disconnecting from " + SERVICE_NAME + " service");
             SocietiesClientServicesController.this.connectedToServices[PERSONALISATION_SERVICE] = false;
         }
 
+        @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(LOG_TAG, "Connecting to " + SERVICE_NAME + " service");
 
@@ -455,11 +477,13 @@ public class SocietiesClientServicesController {
 
     private ServiceConnection friendsMgrConnection = new ServiceConnection() {
 
+        @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(LOG_TAG, "Disconnecting from Platform Friends Manager service");
             SocietiesClientServicesController.this.connectedToServices[FRIENDS_MANAGER_SERVICE] = false;
         }
 
+        @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(LOG_TAG, "Connecting to Platform Friends Manager service");
 
@@ -468,7 +492,7 @@ public class SocietiesClientServicesController {
             //Get a local binder
             LocalFriendsManagerBinder binder = (LocalFriendsManagerBinder) service;
             //Retrieve the local service API
-            SocietiesClientServicesController.this.friendMgrService = (IFriendsManager) binder.getService();
+            SocietiesClientServicesController.this.friendMgrService = binder.getService();
             SocietiesClientServicesController.this.platformServiceConnections[FRIENDS_MANAGER_SERVICE] = this;
             SocietiesClientServicesController.this.servicesBinded.countDown();
         }
@@ -477,11 +501,14 @@ public class SocietiesClientServicesController {
     private ServiceConnection contextConnection = new ServiceConnection() {
 
         final static String SERVICE_NAME = "Platform Context";
+
+        @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(LOG_TAG, "Disconnecting from " + SERVICE_NAME + " service");
             SocietiesClientServicesController.this.connectedToServices[CONTEXT_SERVICE] = false;
         }
 
+        @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(LOG_TAG, "Connecting to " + SERVICE_NAME + " service");
 
@@ -520,30 +547,29 @@ public class SocietiesClientServicesController {
      */
 
     /**
-     *
      * Async task to bind to all relevant Societies Client app services
-     *
      */
     private class InvokeBindAllServices extends AsyncTask<Void, Void, Void> {
 
-        private final String LOCAL_LOG_TAG = InvokeBindAllServices.class.getName();
+        private final String LOCAL_LOG_TAG = InvokeBindAllServices.class.getCanonicalName();
         private IMethodCallback callback;
+
         /**
          * Default Constructor
-         * @param IMethodCallback callback
          */
         public InvokeBindAllServices(IMethodCallback callback) {
             this.callback = callback;
         }
 
+        @Override
         protected Void doInBackground(Void... args) {
 
             SocietiesClientServicesController.this.servicesBinded = new CountDownLatch(NUM_SERVICES);
 
             SocietiesClientServicesController.this.startTime = System.currentTimeMillis();
 
-            boolean retValue = false;
-            Intent serviceIntent = null;
+            boolean retValue;
+            Intent serviceIntent;
 
             //Remote Platform services
             Log.d(LOCAL_LOG_TAG, "Bind to Societies Android CIS Directory Service");
@@ -657,23 +683,21 @@ public class SocietiesClientServicesController {
     }
 
     /**
-     *
      * Async task to start all relevant Societies Client app services
-     *
      */
     private class InvokeStartAllServices extends AsyncTask<Void, Void, Void> {
 
-        private final String LOCAL_LOG_TAG = InvokeStartAllServices.class.getName();
+        private final String LOCAL_LOG_TAG = InvokeStartAllServices.class.getCanonicalName();
         private IMethodCallback callback;
 
         /**
          * Default Constructor
-         * @param serviceMessenger
          */
         public InvokeStartAllServices(IMethodCallback callback) {
             this.callback = callback;
         }
 
+        @Override
         protected Void doInBackground(Void... args) {
             SocietiesClientServicesController.this.servicesStarted = new CountDownLatch(NUM_SERVICES);
 
@@ -681,7 +705,7 @@ public class SocietiesClientServicesController {
 
             boolean retValue = true;
             //Start remote platform services
-            for (int i  = 0; i < SocietiesClientServicesController.this.allMessengers.length; i++) {
+            for (int i = 0; i < SocietiesClientServicesController.this.allMessengers.length; i++) {
                 Log.d(LOCAL_LOG_TAG, "Starting service: " + i);
 
                 if (null != SocietiesClientServicesController.this.allMessengers[i]) {
@@ -714,6 +738,8 @@ public class SocietiesClientServicesController {
             //USERFEEDBACK EVENT LISTENER
             Intent intentUserFeedback = new Intent(SocietiesClientServicesController.this.context, EventListener.class);
             SocietiesClientServicesController.this.context.startService(intentUserFeedback);
+            Intent intentUserFeedbackHistory = new Intent(SocietiesClientServicesController.this.context, EventHistory.class);
+            SocietiesClientServicesController.this.context.startService(intentUserFeedbackHistory);
 
             try {
                 SocietiesClientServicesController.this.servicesStarted.await(TASK_TIMEOUT, TimeUnit.MILLISECONDS);
@@ -729,24 +755,23 @@ public class SocietiesClientServicesController {
             return null;
         }
     }
+
     /**
-     *
      * Async task to stop all relevant Societies Client app services
-     *
      */
     private class InvokeStopAllServices extends AsyncTask<Void, Void, Void> {
 
-        private final String LOCAL_LOG_TAG = InvokeStopAllServices.class.getName();
+        private final String LOCAL_LOG_TAG = InvokeStopAllServices.class.getCanonicalName();
         private IMethodCallback callback;
 
         /**
          * Default Constructor
-         * @param serviceMessenger
          */
         public InvokeStopAllServices(IMethodCallback callback) {
             this.callback = callback;
         }
 
+        @Override
         protected Void doInBackground(Void... args) {
             SocietiesClientServicesController.this.servicesStopped = new CountDownLatch(NUM_SERVICES);
 
@@ -755,7 +780,7 @@ public class SocietiesClientServicesController {
             boolean retValue = true;
 
             //STOP REMOTE SERVICES
-            for (int i  = 0; i < SocietiesClientServicesController.this.allMessengers.length; i++) {
+            for (int i = 0; i < SocietiesClientServicesController.this.allMessengers.length; i++) {
                 if (null != SocietiesClientServicesController.this.allMessengers[i]) {
                     String targetMethod = IServiceManager.methodsArray[1];
                     android.os.Message outMessage = getRemoteMessage(targetMethod, i);
@@ -788,6 +813,8 @@ public class SocietiesClientServicesController {
             //USERFEEDBACK EVENT LISTENER
             Intent intentUserFeedback = new Intent(SocietiesClientServicesController.this.context, EventListener.class);
             SocietiesClientServicesController.this.context.stopService(intentUserFeedback);
+            Intent intentUserFeedbackHistory = new Intent(SocietiesClientServicesController.this.context, EventHistory.class);
+            SocietiesClientServicesController.this.context.stopService(intentUserFeedbackHistory);
 
             try {
                 SocietiesClientServicesController.this.servicesStopped.await(TASK_TIMEOUT, TimeUnit.MILLISECONDS);
@@ -804,8 +831,8 @@ public class SocietiesClientServicesController {
 
     /**
      * Broadcast receiver to receive intent return values from service method calls
-     * Essentially this receiver invokes callbacks for relevant intents received from Android Communications. 
-     * Since more than one instance of this class can exist for an app, i.e. more than one component could be communicating, 
+     * Essentially this receiver invokes callbacks for relevant intents received from Android Communications.
+     * Since more than one instance of this class can exist for an app, i.e. more than one component could be communicating,
      * callback IDs cannot be assumed to exist for a particular Broadcast receiver.
      */
     private class PlatformServicesStartupReceiver extends BroadcastReceiver {
@@ -827,10 +854,11 @@ public class SocietiesClientServicesController {
             }
         }
     }
+
     /**
      * Broadcast receiver to receive intent return values from service method calls
-     * Essentially this receiver invokes callbacks for relevant intents received from Android Communications. 
-     * Since more than one instance of this class can exist for an app, i.e. more than one component could be communicating, 
+     * Essentially this receiver invokes callbacks for relevant intents received from Android Communications.
+     * Since more than one instance of this class can exist for an app, i.e. more than one component could be communicating,
      * callback IDs cannot be assumed to exist for a particular Broadcast receiver.
      */
     private class PlatformServicesShutdownReceiver extends BroadcastReceiver {
@@ -863,6 +891,7 @@ public class SocietiesClientServicesController {
         this.context.registerReceiver(this.startupReceiver, createIntentFilter());
         Log.d(LOG_TAG, "Register broadcast receiver");
     }
+
     /**
      * Create a services shutdown broadcast receiver
      */
@@ -873,6 +902,7 @@ public class SocietiesClientServicesController {
         this.context.registerReceiver(this.shutdownReceiver, createIntentFilter());
         Log.d(LOG_TAG, "Register broadcast receiver");
     }
+
     /**
      * Unregister the broadcast receiver
      */
@@ -884,6 +914,7 @@ public class SocietiesClientServicesController {
 
     /**
      * Create a suitable intent filter
+     *
      * @return IntentFilter
      */
     private IntentFilter createIntentFilter() {
@@ -895,12 +926,9 @@ public class SocietiesClientServicesController {
         intentFilter.addAction(IServiceManager.INTENT_SERVICE_EXCEPTION_INFO);
         return intentFilter;
     }
+
     /**
      * Create the correct message for remote method invocation
-     *
-     * @param targetMethod
-     * @param index
-     * @return android.os.Message
      */
     private android.os.Message getRemoteMessage(String targetMethod, int index) {
         android.os.Message retValue = null;
