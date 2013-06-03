@@ -17,5 +17,7 @@
     <string name="simple_notification_accept_string">OK</string>
     <string name="request_history">Request History</string>
     <string name="close_string">Close</string>
+    <string name="nh_no_items">No notifications</string>
+    <string name="icon">icon</string>
 
 </resources>
