@@ -73,7 +73,7 @@ public class C45ConflictConsumer implements IC45Consumer{
 			if (c45.getOwner().equals(this.userId) && c45.getServiceId().equals(serviceID)){
 				List<IPreferenceTreeModel> tList = c45.getTreeList();
 				for (IPreferenceTreeModel t :tList){
-					if (t.getPreferenceName().equalsIgnoreCase(this.parameterName)){
+					if (t.getPreferenceDetails().getPreferenceName().equalsIgnoreCase(this.parameterName)){
 						tree = t;
 					}
 				}

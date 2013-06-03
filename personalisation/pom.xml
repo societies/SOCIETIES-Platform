@@ -66,5 +66,6 @@
 		<module>CRISTUserIntentPrediction</module>
 		<module>CRISTUserIntentTaskManager</module>
 		<module>Personalisation-Bundle</module>
+		<module>CommunityPreferenceManagement</module>
 	</modules>
 </project>

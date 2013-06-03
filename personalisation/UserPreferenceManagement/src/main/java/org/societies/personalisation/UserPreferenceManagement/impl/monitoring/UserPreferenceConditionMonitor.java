@@ -30,6 +30,7 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
@@ -38,6 +39,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.CSSEventConstants;
@@ -52,6 +54,7 @@ import org.societies.personalisation.UserPreferenceManagement.impl.UserPreferenc
 import org.societies.personalisation.UserPreferenceManagement.impl.merging.MergingManager;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
+import org.societies.personalisation.preference.api.CommunityPreferenceManagement.ICommunityPreferenceManager;
 import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
 import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Learning;
 import org.societies.personalisation.preference.api.model.IPreferenceConditionIOutcomeName;
@@ -77,6 +80,11 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 	private MergingManager merging;
 	private IC45Learning userPrefLearning;
 	private IEventMgr eventMgr;
+	
+	private ICommManager commManager;
+	private IUserFeedback userFeedbackMgr;
+	private ICommunityPreferenceManager communityPreferenceMgr;
+	private CisEventListener eventListener;
 
 	public UserPreferenceConditionMonitor(){
 	}
@@ -141,6 +149,7 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 		merging = new MergingManager(getUserPrefLearning(), prefMgr, this);
 		this.subscribeForStaticUIMEvents();
 		logging.debug(this.getClass().toString()+": INITIALISED");
+		eventListener = new CisEventListener(this);
 	}
 	
 
@@ -335,6 +344,36 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 		
 		this.prefMgr.storePreference(uimEvent.getUserId(), details, preference);
 		
+	}
+
+
+	public ICommManager getCommManager() {
+		return commManager;
+	}
+
+
+	public void setCommManager(ICommManager commManager) {
+		this.commManager = commManager;
+	}
+
+
+	public IUserFeedback getUserFeedbackMgr() {
+		return userFeedbackMgr;
+	}
+
+
+	public void setUserFeedbackMgr(IUserFeedback userFeedbackMgr) {
+		this.userFeedbackMgr = userFeedbackMgr;
+	}
+
+
+	public ICommunityPreferenceManager getCommunityPreferenceMgr() {
+		return communityPreferenceMgr;
+	}
+
+
+	public void setCommunityPreferenceMgr(ICommunityPreferenceManager communityPreferenceMgr) {
+		this.communityPreferenceMgr = communityPreferenceMgr;
 	}
 
 	

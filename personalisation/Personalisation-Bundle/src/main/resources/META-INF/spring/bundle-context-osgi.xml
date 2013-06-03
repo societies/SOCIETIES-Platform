@@ -74,10 +74,21 @@
         <osgi:interfaces>
         	<value>org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager</value>
         </osgi:interfaces>
+        </osgi:service>
         
+        <osgi:service ref="communityPreferenceManager">
+            <osgi:interfaces>
+                <value>org.societies.personalisation.preference.api.CommunityPreferenceManagement.ICommunityPreferenceManager</value>
+            </osgi:interfaces>
         </osgi:service>
         
         
+        <osgi:service ref="CommunityPreferenceManagementClient">
+            <osgi:interfaces>
+                <value>org.societies.personalisation.preference.api.CommunityPreferenceManagement.ICommunityPreferenceManager</value>
+                <value>org.societies.api.comm.xmpp.interfaces.ICommCallback</value>
+            </osgi:interfaces>
+        </osgi:service>
         
         
 <!--         PersonalisationManager is needed by pcm, dianne, cristPrediction, cauiPrediction
@@ -145,6 +156,11 @@ start importing internal services. cardinality is set to 0..1 because we have a 
 		
 		<osgi:reference id="commsMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"> 
 		</osgi:reference>
+		
+		<osgi:reference id="userFeedback" interface="org.societies.api.internal.useragent.feedback.IUserFeedback">
+		</osgi:reference>
+		
+		<osgi:reference id="cisManager" interface="org.societies.api.cis.management.ICisManager"></osgi:reference>
 		
 		<!--  <osgi:reference id="upcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/> -->
 		

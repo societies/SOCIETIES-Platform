@@ -128,6 +128,12 @@
 			<artifactId>CRISTUserIntentDiscovery</artifactId>
 			<version>${version.pm}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.societies.personalisation</groupId>
+			<artifactId>CommunityPreferenceManagement</artifactId>
+			<version>${version.pm}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -152,7 +158,8 @@
 							CAUIPrediction;scope=compile|runtime,
 							CRISTUserIntentTaskManager;scope=compile|runtime,
 							CRISTUserIntentPrediction;scope=compile|runtime,
-							CRISTUserIntentDiscovery;scope=compile|runtime
+							CRISTUserIntentDiscovery;scope=compile|runtime,
+							CommunityPreferenceManagement;scope=compile|runtime
 						</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
 

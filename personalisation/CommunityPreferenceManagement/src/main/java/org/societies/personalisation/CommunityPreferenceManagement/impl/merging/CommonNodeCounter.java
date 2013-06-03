@@ -22,55 +22,64 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.preference.api.model;
+package org.societies.personalisation.CommunityPreferenceManagement.impl.merging;
 
-import java.io.Serializable;
-import java.util.Date;
+import java.util.ArrayList;
 
-import javax.swing.tree.TreeModel;
-
-import org.societies.api.internal.personalisation.model.PreferenceDetails;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.personalisation.preference.api.model.IPreference;
 
 /**
  * @author Elizabeth
- * @version 1.0
- * @created 08-Nov-2011 14:02:56
+ *
  */
-public interface IPreferenceTreeModel extends TreeModel, Serializable {
+public class CommonNodeCounter {
 
-	/**
-	 * Method to retrieve the date this preference was last modified either due to
-	 * learning or by the user using the GUI
-	 * @return	the Date object
-	 */
-	public Date getLastModifiedDate();
-
-
-	/**
-	 * Method to return the preference object included in this model (Returns the root
-	 * node of the preference tree)
-	 * @return	the preference object
-	 */
-	public IPreference getRootPreference();
-
-
-	/**
-	 * Method to record the last time this preference changed either due to learning
-	 * or by the user using the GUI
-	 * 
-	 * @param d    d
-	 */
-	public void setLastModifiedDate(Date d);
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
+	private class NodeCounter{
+		IPreference node;
+		int counter;
+		
+		NodeCounter(IPreference ptn, int c){
+			this.node = ptn;
+			this.counter = c;
+			
+		}
+		
+		public int getCounter(){
+			return this.counter;
+		}
+		
+		public IPreference getNode(){
+			return this.node;
+		}
+	}
 	
+	ArrayList<NodeCounter> nc;
+	public CommonNodeCounter(){
+		nc = new ArrayList<NodeCounter>();
+	}
 	
-	/**
-	 * Method to get the details that this preference refers to 
-	 * 
-	 * @return the details (serviceid, service type, preference name)
-	 */
-	public PreferenceDetails getPreferenceDetails();
+	public void add(IPreference ptn, int counter){
+		this.nc.add(new NodeCounter(ptn,counter));
+	}
+	
+	public IPreference getMostCommonNode(){
+		int counter = 0;
+		IPreference ptn = null;
+		logging.debug("nc size:"+this.nc.size());
+		for (int i = 0; i< this.nc.size(); i++){
+			int c = this.nc.get(i).getCounter();
+			if (counter < c){
+				counter = c;
+				ptn = this.nc.get(i).getNode();
+			}
+		}
+		
+		return ptn;
+	}
+	
 
 }
+
