@@ -218,6 +218,9 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 				this.evaluateServices(serviceSet);
 			}
 			
+			// Add related evidence
+			trustee.addDirectEvidence(evidence);
+			
 			// persist updated TrustedEntities in the Trust Repository
 			for (final ITrustedEntity entity : resultSet)
 				trustRepo.updateEntity(entity);

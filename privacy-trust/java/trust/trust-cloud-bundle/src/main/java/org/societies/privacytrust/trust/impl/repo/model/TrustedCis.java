@@ -27,15 +27,20 @@ package org.societies.privacytrust.trust.impl.repo.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
+import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
 
 /**
  * This class represents trusted CISs. A <code>TrustedCis</code> object is
@@ -58,6 +63,20 @@ import org.societies.privacytrust.trust.api.model.ITrustedCss;
 public class TrustedCis extends TrustedEntity implements ITrustedCis {
 
 	private static final long serialVersionUID = -438368876927927076L;
+	
+	/** The direct trust evidence associated with the evaluated trust value of this CIS. */
+	@ManyToMany(
+			cascade = CascadeType.MERGE,
+			targetEntity = DirectTrustEvidence.class,
+			fetch = FetchType.EAGER
+	)
+    @JoinTable(
+    		name = TableName.TRUSTED_CIS + "_direct_evidence",
+    		joinColumns = { @JoinColumn(name = TableName.TRUSTED_CIS + "_id") },
+    		inverseJoinColumns = { @JoinColumn(name = 
+    		org.societies.privacytrust.trust.impl.evidence.repo.model.TableName.DIRECT_TRUST_EVIDENCE + "_id") }
+    )
+	private Set<IDirectTrustEvidence> directEvidence = new HashSet<IDirectTrustEvidence>();
 	
 	/** The members of this trusted CIS. */
 	@ManyToMany(
@@ -89,6 +108,35 @@ public class TrustedCis extends TrustedEntity implements ITrustedCis {
 	public TrustedCis(final TrustedEntityId trustorId, final TrustedEntityId trusteeId) {
 		
 		super(trustorId, trusteeId);
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getDirectEvidence()
+	 */
+	@Override
+	public Set<IDirectTrustEvidence> getDirectEvidence() {
+		
+		return this.directEvidence;
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#addDirectEvidence(org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence)
+	 */
+	@Override
+	public void addDirectEvidence(final IDirectTrustEvidence evidence) {
+		
+		if (!this.directEvidence.contains(evidence))
+			this.directEvidence.add(evidence);
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#removeDirectEvidence(org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence)
+	 */
+	@Override
+	public void removeDirectEvidence(final IDirectTrustEvidence evidence) {
+		
+		if (this.directEvidence.contains(evidence))
+			this.directEvidence.remove(evidence);
 	}
 
 	/*

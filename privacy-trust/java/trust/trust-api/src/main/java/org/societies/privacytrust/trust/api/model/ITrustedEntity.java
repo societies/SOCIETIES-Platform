@@ -25,8 +25,10 @@
 package org.societies.privacytrust.trust.api.model;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
 
 /**
  * This interface is used to represent an entity trusted by the trustor,
@@ -62,6 +64,34 @@ public interface ITrustedEntity extends Serializable {
 	 * @return the direct trust in this entity.
 	 */
 	public IDirectTrust getDirectTrust();
+	
+	/**
+	 * Returns the set of direct trust evidence associated with the evaluated
+	 * direct trust value.
+	 * 
+	 * @return the set of direct trust evidence associated with the evaluated
+	 * direct trust value.
+	 * @since 1.1
+	 */
+	public Set<IDirectTrustEvidence> getDirectEvidence();
+	
+	/**
+	 * Adds the specified piece of direct trust evidence.
+	 * 
+	 * @param evidence
+	 *            the piece of direct trust evidence to add.
+	 * @since 1.1
+	 */
+	public void addDirectEvidence(final IDirectTrustEvidence evidence);
+
+	/**
+	 * Removes the specified piece of direct trust evidence.
+	 * 
+	 * @param evidence
+	 *            the piece of direct trust evidence to remove.
+	 * @since 1.1
+	 */
+	public void removeDirectEvidence(final IDirectTrustEvidence evidence);
 
 	/**
 	 * Returns the indirect trust in this entity.

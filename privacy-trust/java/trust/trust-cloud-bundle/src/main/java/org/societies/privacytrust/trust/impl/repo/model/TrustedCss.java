@@ -40,9 +40,11 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Index;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
+import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
 
 /**
  * This class represents trusted CSSs. A <code>TrustedCss</code> object is
@@ -69,6 +71,20 @@ import org.societies.privacytrust.trust.api.model.ITrustedService;
 public class TrustedCss extends TrustedEntity implements ITrustedCss {
 	
 	private static final long serialVersionUID = 6564159563124215460L;
+	
+	/** The direct trust evidence associated with the evaluated trust value of this CSS. */
+	@ManyToMany(
+			cascade = CascadeType.MERGE,
+			targetEntity = DirectTrustEvidence.class,
+			fetch = FetchType.EAGER
+	)
+    @JoinTable(
+    		name = TableName.TRUSTED_CSS + "_direct_evidence",
+    		joinColumns = { @JoinColumn(name = TableName.TRUSTED_CSS + "_id") },
+    		inverseJoinColumns = { @JoinColumn(name = 
+    		org.societies.privacytrust.trust.impl.evidence.repo.model.TableName.DIRECT_TRUST_EVIDENCE + "_id") }
+    )
+	private Set<IDirectTrustEvidence> directEvidence = new HashSet<IDirectTrustEvidence>();
 	
 	/** The communities this CSS is member of. */
 	@ManyToMany(
@@ -116,6 +132,35 @@ public class TrustedCss extends TrustedEntity implements ITrustedCss {
 	public TrustedCss(final TrustedEntityId trustorId, final TrustedEntityId trusteeId) {
 		
 		super(trustorId, trusteeId);
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getDirectEvidence()
+	 */
+	@Override
+	public Set<IDirectTrustEvidence> getDirectEvidence() {
+		
+		return this.directEvidence;
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#addDirectEvidence(org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence)
+	 */
+	@Override
+	public void addDirectEvidence(final IDirectTrustEvidence evidence) {
+		
+		if (!this.directEvidence.contains(evidence))
+			this.directEvidence.add(evidence);
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#removeDirectEvidence(org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence)
+	 */
+	@Override
+	public void removeDirectEvidence(final IDirectTrustEvidence evidence) {
+		
+		if (this.directEvidence.contains(evidence))
+			this.directEvidence.remove(evidence);
 	}
 
 	/*
