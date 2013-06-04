@@ -12,8 +12,9 @@ import org.societies.integration.test.IntegrationTestCase;
 import org.junit.runner.JUnitCore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.management.ICisManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 
@@ -30,12 +31,22 @@ public class TestCase2058 extends IntegrationTestCase{
 	public static IUserActionMonitor uam;
 	public static ICAUIPrediction cauiPrediction;
 	public static ICommManager commMgr;
+	public static ICisManager cisManager;
 	
 	public TestCase2058() {
 		super(2058, new Class[]{Tester.class});
 		System.out.println("Test 2058 started : TestCase2058() ");
 		//startTest(); 
 	}
+	
+	
+	
+
+	public void setCisManager(ICisManager cisManager) {
+		TestCase2058.cisManager = cisManager;
+	}
+
+	
 	
 	//setters
 	public void setCauiPrediction(ICAUIPrediction cauiPrediction){
@@ -73,6 +84,9 @@ public class TestCase2058 extends IntegrationTestCase{
 		return TestCase2058.commMgr;
 	}
 	
+	public static ICisManager getCisManager() {
+		return cisManager;
+	}
 	
 	/*	
 	private void startTest() {
