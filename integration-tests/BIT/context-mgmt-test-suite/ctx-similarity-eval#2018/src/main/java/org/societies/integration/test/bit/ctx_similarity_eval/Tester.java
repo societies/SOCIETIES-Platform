@@ -118,7 +118,7 @@ public class Tester {
 		assertNotNull(ctxBroker);
 		
 		try {
-			LOG.info("EBOYLANLOGFOOTPRINT starting user creation");
+			LOG.info("EBOYLANLOGFOOTPRINT starting test0");
 			//to create occupation attribute for Jack
 			CtxAttribute ctxAttrOccupationJack = this.ctxBroker.createAttribute(jackID,CtxAttributeTypes.OCCUPATION).get();
 			//set occupation attribute
@@ -151,8 +151,9 @@ public class Tester {
 			
 			
 			CtxEvaluationResults ie = (this.ctxBroker.evaluateSimilarity(ids, attrib));
-			LOG.info("EBOYLANLOGFOOTPRINT : " + ie.getResult().toString());
-			assertTrue(ie.getResult());
+			//LOG.info("EBOYLANLOGFOOTPRINT : " + ie.getResult());
+			//LOG.info("EBOYLANLOGFOOTPRINT : " + ie.getSummary());
+			assertEquals(true, ie.getResult());
 
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -182,7 +183,7 @@ public class Tester {
 		//pass if contextSimilarity returns true
 		String[] ids = {jackID.toString(),janeID.toString()};
 		ArrayList<String> attrib = new ArrayList<String>();
-		LOG.info("EBOYLANLOGFOOTPRINT starting test 2");
+		LOG.info("EBOYLANLOGFOOTPRINT starting test1");
 
 		//to create movies attribute for Jack
 		CtxAttribute ctxAttrMoviesJack;
@@ -202,8 +203,9 @@ public class Tester {
 			attrib.add("movies");
 			LOG.info("EBOYLANLOGFOOTPRINT jacks movie: " + ctxAttrMoviesJack.toString());
 			CtxEvaluationResults ie = (CtxEvaluationResults) ( this.ctxBroker.evaluateSimilarity(ids, attrib));
-			LOG.info("EBOYLANLOGFOOTPRINT " + ie.getResult());
-			assertFalse(ie.getResult());
+			//LOG.info("EBOYLANLOGFOOTPRINT " + ie.getResult());
+			//LOG.info("EBOYLANLOGFOOTPRINT : " + ie.getSummary());
+			assertEquals(false, ie.getResult());
 			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
