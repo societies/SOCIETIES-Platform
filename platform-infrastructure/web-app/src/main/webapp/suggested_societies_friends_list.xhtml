@@ -25,17 +25,25 @@
                     <p:commandButton value="Refresh" action="#{suggestedfriends.getsnsFriendes}"></p:commandButton>
        	 			<br/> <br/>
                 </div>
-                <div class="groupsearch">
-                    <form action="" class="websearch-form frame nobtn rsmall">
-                        <input type="text" name="search" class="websearch-input" placeholder="Search for Friends..."/>
-                    </form>
+                
+                <div class="select-wrapper">
+                    <h6>Select a Filter option</h6>
+                	<select name="select" required="required">
+                                    <option value="0x0000000000">None</option>
+                                    <option value="0x0000000001">Facebook</option>
+                                    <option value="0x0000000010">Twitter</option>
+                                    <option value="0x0000000100">LinkedIn</option>
+                                    <option value="0x0000001000">FourSquare</option>
+                                    <option value="0x0000010000">Google+</option>
+                                    <option value="0x0000100000">CIS_MEMBERS_BIT</option>
+                                </select>
                 </div>
             </div>
         </section>
         <!-- Left Column -->
         <article id="left_col" class="grid_8">
             <section class="itemlist">
-                <header>
+                <header>Social Network Suggested Friends
                 </header>
                 <ol class="keyinfolist">
                     <c:forEach items="#{suggestedfriends.snsFriendes}" var="snsFriend">
@@ -64,7 +72,7 @@
 		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequest(snsFriend.getResultCssAdvertisementRecord().getId())}"/>        	       
 		        		</c:if>
 		        		<c:if test="${snsFriend.status=='DENIED'}">
-		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequestdenied(snsFriend.getResultCssAdvertisementRecord().getId())}"/> 	       	       
+		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequest(snsFriend.getResultCssAdvertisementRecord().getId())}"/> 	       	       
 	        			</c:if>
 	        			<c:if test="${snsFriend.status=='CANCELLED'}">
 		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequest(snsFriend.getResultCssAdvertisementRecord().getId())}"/> 	       	       
@@ -74,7 +82,47 @@
                 </ol>
                 <div class="hr clearfix"></div>
             </section>
+            <section class="itemlist">
+                <header>SOCIETIES Suggested Friends</header>
+                <ol class="keyinfolist">
+                    <c:forEach items="#{suggestedfriends.otherFriendes}" var="otherFriend">
+    				    <li class="keyinfo bypostauthor">
+                        <figure class="gravatar">
+                            <a class="friend_profile.xhtml"><img alt="" src="images/launcher_societies.png"
+                                                                height="58" width="58"/></a>
+                        </figure>
+                        <div class="keyinfo_content">
+                            <div class="clearfix">
+                                <br/>
+                                <H6>Name:     #{otherFriend.getResultCssAdvertisementRecord().getName()}</H6> 								
+                                <H6>Identity: #{otherFriend.getResultCssAdvertisementRecord().getId()}</H6>
+                            </div>
+                            <div class="keyinfo_text">
+                            </div>
+                        </div>
+                        <c:if test="${otherFriend.status=='NEEDSRESP'}">
+                        	<p:commandButton value="Accept Friend Request" action="#{suggestedfriends.handlerequestaccept(otherFriend.getResultCssAdvertisementRecord().getId())}"/>
+		 					<p:commandButton value="Decline Friend Request" action="#{suggestedfriends.handlerequestdecline(otherFriend.getResultCssAdvertisementRecord().getId())}"/>
+		        		</c:if>
+		        		<c:if test="${otherFriend.status=='PENDING'}">
+		        			<p:commandButton value="Cancel Pending Friend Request" action="#{suggestedfriends.handlerequestcancelled(otherFriend.getResultCssAdvertisementRecord().getId())}"/> 
+		        		</c:if>
+		        		<c:if test="${otherFriend.status=='NOTREQUESTED'}">
+		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequest(otherFriend.getResultCssAdvertisementRecord().getId())}"/>        	       
+		        		</c:if>
+		        		<c:if test="${otherFriend.status=='DENIED'}">
+		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequest(otherFriend.getResultCssAdvertisementRecord().getId())}"/> 	       	       
+	        			</c:if>
+	        			<c:if test="${otherFriend.status=='CANCELLED'}">
+		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequest(otherFriend.getResultCssAdvertisementRecord().getId())}"/> 	       	       
+	        			</c:if>
+                        </li>
+                      </c:forEach>
+                </ol>
+                <div class="hr clearfix"></div>
+            </section>
         </article>
+        
         <!-- Right Column / Sidebar -->
         <aside id="sidebar_right" class="grid_4">
             <div class="sidebar_top_BG"></div>
@@ -83,7 +131,6 @@
                 <header>
                     <h3>Your friends...</h3>
                 </header>
-                <p:commandButton value="Refresh" action="#{suggestedfriends.getfriends()}"/>
        	 		<br/> <br/>
                 <ul>
                 	<ui:repeat value="#{suggestedfriends.friends}" var="friend">
@@ -96,10 +143,9 @@
                     <h3>CSS Activity</h3>
                 </header>
                 <div class="hr dotted clearfix"></div>
-                <p:commandButton value="Get Activities" action="#{suggestedfriends.getActivities()}"/>
        	 		<br/> <br/>
        	 		<ul>
-                	<c:forEach items="#{suggestedfriends.getActivities()}" var="MarshaledActivity">
+                	<c:forEach items="#{suggestedfriends.activities}" var="MarshaledActivity">
                 		<li> #{MarshaledActivity.getVerb()}</li>
                 	</c:forEach>
                 </ul>

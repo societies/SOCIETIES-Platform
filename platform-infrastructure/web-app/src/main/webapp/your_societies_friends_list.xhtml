@@ -30,13 +30,14 @@
         <!-- Left Column -->
         <article id="left_col" class="grid_8">
             <section class="itemlist">
+            	<form action="" method="" id="form1">
                 <header>
                 </header>
                 <ol class="keyinfolist">
                 	<ui:repeat value="#{suggestedfriends.friends}" var="friend">
     				    <li class="keyinfo bypostauthor">
                         <figure class="gravatar">
-                            <a class="friend_profile.xhtml"><img alt="" src="images/profile_pic.png"
+                            <a class="friend_profile.xhtml"><img alt="" src="images/launcher_societies.png"
                                                                 height="58" width="58"/></a>
                         </figure>
                         <div class="keyinfo_content">
@@ -55,6 +56,7 @@
                       </ui:repeat>
                 </ol>
                 <div class="hr clearfix"></div>
+                </form>
             </section>
         </article>
         <!-- Right Column / Sidebar -->
@@ -66,10 +68,9 @@
                     <h3>CSS Activity</h3>
                 </header>
                 <div class="hr dotted clearfix"></div>
-                <p:commandButton value="Get Activities" action="#{suggestedfriends.getActivities()}"/>
        	 		<br/> <br/>
        	 		<ul>
-                	<c:forEach items="#{suggestedfriends.getActivities()}" var="MarshaledActivity">
+                	<c:forEach items="#{suggestedfriends.getactivities()}" var="MarshaledActivity">
                 		<li> #{MarshaledActivity.getVerb()}</li>
                 	</c:forEach>
                 </ul>
