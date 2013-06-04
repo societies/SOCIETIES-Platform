@@ -42,4 +42,6 @@
 
     <osgi:reference id="trustEvidenceCollector" interface="org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector"/>
 
+	<osgi:reference id="cssLocalManager" interface="org.societies.api.internal.css.ICSSInternalManager"/>
+
 </beans>
