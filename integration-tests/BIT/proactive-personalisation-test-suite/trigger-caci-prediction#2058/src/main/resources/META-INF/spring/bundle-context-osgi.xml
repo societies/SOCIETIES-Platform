@@ -28,6 +28,9 @@
 	<osgi:reference id="cauiPrediction" interface="org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction">
 	</osgi:reference>
 	
+	<osgi:reference id="caciDiscovery" interface="org.societies.personalisation.CACI.api.CACIDiscovery.ICACIDiscovery">
+	</osgi:reference>
+	
 	<osgi:reference id="commMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager">
 	</osgi:reference>
 	

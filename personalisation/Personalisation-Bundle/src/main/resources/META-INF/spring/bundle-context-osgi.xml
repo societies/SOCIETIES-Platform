@@ -57,6 +57,12 @@
         	<value>org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery</value>
         </osgi:interfaces>
         </osgi:service>
+           
+           <osgi:service ref="caciDiscovery">
+        <osgi:interfaces>
+        	<value>org.societies.personalisation.CACI.api.CACIDiscovery.ICACIDiscovery</value>
+        </osgi:interfaces>
+        </osgi:service>
         
         <osgi:service ref="cristPrediction">
         <osgi:interfaces>
