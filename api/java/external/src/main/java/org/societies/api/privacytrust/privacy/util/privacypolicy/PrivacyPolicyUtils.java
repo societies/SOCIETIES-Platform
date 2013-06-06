@@ -95,7 +95,7 @@ public class PrivacyPolicyUtils {
 		privacyPolicy.setPrivacyPolicyType(privacyPolicyType);
 
 		// ---- Add configured request items
-		if (configuration.containsKey("requestItems")) {
+		if (null != configuration && configuration.containsKey("requestItems")) {
 			requestItems.addAll((List<RequestItem>) configuration.get("requestItems"));
 		}
 
@@ -686,9 +686,12 @@ public class PrivacyPolicyUtils {
 				if (optionalNodeList.getLength()>0){
 					Element valueOptional = (Element) optionalNodeList.item(0);
 					String value = valueOptional.getFirstChild().getNodeValue();
-					if (value.equalsIgnoreCase("false")){
-						c.setOptional(false);
+					if (value.equalsIgnoreCase("true")){
+						c.setOptional(true);
 					}
+//					if (value.equalsIgnoreCase("false")){
+//						c.setOptional(false);
+//					}
 				}
 			}
 		}

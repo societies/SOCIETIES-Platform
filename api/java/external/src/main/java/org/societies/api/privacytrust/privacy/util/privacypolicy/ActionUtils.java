@@ -201,6 +201,23 @@ public class ActionUtils {
 		}
 		return sb.toString();
 	}
+	
+	/**
+	 * Simple method to check if a list of actions has, at least, one action
+	 * which is not optional
+	 * @param actions List of action
+	 * @return True if the list is ok
+	 */
+	public static boolean atLeast1MandatoryAction(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions) {
+		boolean oneMandatory = false;
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action action : actions) {
+			if (!action.isOptional()) {
+				oneMandatory = true;
+				break;
+			}
+		}
+		return oneMandatory;
+	}
 
 	/**
 	 * 
@@ -304,7 +321,6 @@ public class ActionUtils {
 		}
 		return false;
 	}
-	@Deprecated
 	public static boolean contains(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action needle, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> haystack){
 		return contain(needle, haystack);
 	}
@@ -332,7 +348,7 @@ public class ActionUtils {
 	}
 
 
-	public static boolean contains(List<Action> actionsToCheck, List<Action> actions) {
+	public static boolean contains(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actionsToCheck, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions) {
 		return contains(actionsToCheck, actions, null);
 	}
 	/**
@@ -342,13 +358,12 @@ public class ActionUtils {
 	 * @param intersection Will be filled with the intersection of the two list. It will works only if actions contains actionsToCheck
 	 * @return
 	 */
-	public static boolean contains(List<Action> actionsToCheck, List<Action> actions, List<Action> intersection) {
+	public static boolean contains(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actionsToCheck, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> intersection) {
 		if (null == actions || actions.size() <= 0 || null == actionsToCheck || actionsToCheck.size() <= 0 || actions.size() < actionsToCheck.size()) {
 			return false;
 		}
-		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actionBeans = toActionBeans(actions);
-		for(Action actionToCheck : actionsToCheck) {
-			if (!contains(toActionBean(actionToCheck), actionBeans)) {
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action actionToCheck : actionsToCheck) {
+			if (!contains(actionToCheck, actions)) {
 				return false;
 			}
 			if (null != intersection) {

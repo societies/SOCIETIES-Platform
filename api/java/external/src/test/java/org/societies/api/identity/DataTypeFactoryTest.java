@@ -24,94 +24,63 @@
  */
 package org.societies.api.identity;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.model.CisAttributeTypes;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.util.DataIdentifierFactory;
-import org.societies.api.identity.util.DataIdentifierUtils;
+import org.societies.api.identity.util.DataTypeFactory;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 
 /**
- * Simple data identifier implementations that helps managing data identifiers
- *
  * @author Olivier Maridat (Trialog)
  *
  */
-public class SimpleDataIdentifier extends DataIdentifier {
-	private static final long serialVersionUID = 4137288721938940079L;
-	private static final Logger LOG = LoggerFactory.getLogger(SimpleDataIdentifier.class.getName());
+public class DataTypeFactoryTest {
+	private static final Logger LOG = LoggerFactory.getLogger(DataTypeFactoryTest.class.getName());
 
-	@Override
-	public String getUri() {
-		if (null != uri) {
-			return uri;
+	@Test
+	public void testGetScheme() {
+		String testTitle = "Get scheme";
+		LOG.info("[Test] "+testTitle);
+		DataIdentifier id1 = DataIdentifierFactory.fromType(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.ADDRESS_HOME_CITY);
+		DataIdentifier id2 = null;
+		try {
+			id2 = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://me.ict-societies.eu/"+CisAttributeTypes.MEMBER_LIST);
+		} catch (MalformedCtxIdentifierException e) {
+			LOG.error("Faillure during data id creation from URI", e);
+			fail("Faillure during data id creation from URI: "+e.getMessage());
 		}
-		uri = DataIdentifierUtils.toUriString(this);
-		return uri;
-	}
+		DataIdentifier id3 = DataIdentifierFactory.create(DataIdentifierScheme.CIS, "me.ict-societies.eu", CisAttributeTypes.MEMBER_LIST);
 
-	@Override
-	public String getType() {
-		if (null == type && null != uri) {
-			try {
-				DataIdentifier dataId = DataIdentifierFactory.fromUri(uri);
-				scheme = dataId.getScheme();
-				type = dataId.getType();
-				ownerId = dataId.getOwnerId();
-			} catch (MalformedCtxIdentifierException e) {
-				LOG.error("Can't retrieve the data id from its URI");
-			}
+		assertEquals("Scheme should be equals", DataIdentifierScheme.CONTEXT, DataTypeFactory.getScheme(id1));
+		assertEquals("Scheme should be equals", DataIdentifierScheme.CIS, DataTypeFactory.getScheme(id2));
+		assertEquals("Scheme should be equals", DataIdentifierScheme.CIS, DataTypeFactory.getScheme(id3));
+	}
+	
+	@Test
+	public void testGetType() {
+		String testTitle = "Get type";
+		LOG.info("[Test] "+testTitle);
+		DataIdentifier id1 = DataIdentifierFactory.fromType(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.ADDRESS_HOME_CITY);
+		DataIdentifier id2 = null;
+		try {
+			id2 = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://me.ict-societies.eu/"+CisAttributeTypes.MEMBER_LIST);
+		} catch (MalformedCtxIdentifierException e) {
+			LOG.error("Faillure during data id creation from URI", e);
+			fail("Faillure during data id creation from URI: "+e.getMessage());
 		}
-		return type;
-	}
+		DataIdentifier id3 = DataIdentifierFactory.create(DataIdentifierScheme.CIS, "me.ict-societies.eu", CisAttributeTypes.MEMBER_LIST);
 
-	@Override
-	public DataIdentifierScheme getScheme() {
-		if (null == scheme && null != uri) {
-			try {
-				DataIdentifier dataId = DataIdentifierFactory.fromUri(uri);
-				scheme = dataId.getScheme();
-				type = dataId.getType();
-				ownerId = dataId.getOwnerId();
-			} catch (MalformedCtxIdentifierException e) {
-				LOG.error("Can't retrieve the data id from its URI");
-			}
-		}
-		return scheme;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "SimpleDataIdentifier ["
-				+ (scheme != null ? "scheme=" + scheme + ", " : "")
-				+ (ownerId != null ? "ownerId=" + ownerId + ", " : "")
-				+ (type != null ? "type=" + type + ", " : "")
-				+ (uri != null ? "uri=" + uri : "") + "]";
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		// -- Verify reference equality
-		if (obj == null) { return false; }
-		if (obj == this) { return true; }
-		if (obj.getClass() != getClass()) {
-			return false;
-		}
-		// -- Verify obj type
-		SimpleDataIdentifier rhs = (SimpleDataIdentifier) obj;
-		return new EqualsBuilder()
-		.append(this.getScheme(), rhs.getScheme())
-		.append(this.getOwnerId(), rhs.getOwnerId())
-		.append(this.getType(), rhs.getType())
-		.isEquals();
+		assertEquals("Type should be equals", CtxAttributeTypes.ADDRESS_HOME_CITY, DataTypeFactory.getType(id1));
+		assertEquals("Type should be equals", CisAttributeTypes.MEMBER_LIST, DataTypeFactory.getType(id2));
+		assertEquals("Type should be equals", CisAttributeTypes.MEMBER_LIST, DataTypeFactory.getType(id3));
+		
 	}
 }

@@ -186,7 +186,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 
 
 	@Override
-	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId,
+	public List<ResponseItem> checkPermission(RequestorBean requestor, DataIdentifier dataId,
 			List<Action> actions) throws PrivacyException {
 		// TODO Auto-generated method stub
 		AccessControlPreferenceManager  accCtrlMgr = getAccessControlPreferenceManager();
@@ -195,7 +195,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 
 	@Override
 	@Deprecated
-	public org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem checkPermission(Requestor requestor, DataIdentifier dataId,
+	public List<org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem> checkPermission(Requestor requestor, DataIdentifier dataId,
 			List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions) throws PrivacyException {
 		// TODO Auto-generated method stub
 		AccessControlPreferenceManager  accCtrlMgr = getAccessControlPreferenceManager();
@@ -204,7 +204,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 			actionBeanList.add(ActionUtils.toActionBean(action));
 		}
 
-		return ResponseItemUtils.toResponseItem(accCtrlMgr.checkPermission(RequestorUtils.toRequestorBean(requestor), dataId, actionBeanList));
+		return ResponseItemUtils.toResponseItems(accCtrlMgr.checkPermission(RequestorUtils.toRequestorBean(requestor), dataId, actionBeanList));
 	}
 	@Override
 	public boolean deleteAccCtrlPreference(

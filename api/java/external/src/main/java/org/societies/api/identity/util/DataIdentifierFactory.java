@@ -24,6 +24,8 @@
  */
 package org.societies.api.identity.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
@@ -38,6 +40,8 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
  *
  */
 public class DataIdentifierFactory {
+	private static final Logger LOG = LoggerFactory.getLogger(DataIdentifierFactory.class.getName());
+
 	/**
 	 * Generate a simple DataIdentifier from schema, owner id and type
 	 * 
@@ -65,7 +69,7 @@ public class DataIdentifierFactory {
 	public static DataIdentifier create(DataIdentifierScheme scheme, IIdentity ownerId, String dataType) {
 		return create(scheme, (null != ownerId ? ownerId.getJid() : ""), dataType);
 	}
-	
+
 	/**
 	 * Create the relevant DataIdentifier extension using a correct URI
 	 *
@@ -76,7 +80,14 @@ public class DataIdentifierFactory {
 	public static DataIdentifier fromUri(String dataIdUri) throws MalformedCtxIdentifierException
 	{
 		String[] uri = dataIdUri.split("://");
-		DataIdentifierScheme scheme = DataIdentifierScheme.fromValue(uri[0]);
+		DataIdentifierScheme scheme = null;
+		try {
+			scheme = DataIdentifierScheme.fromValue(uri[0]);
+		}
+		catch(IllegalArgumentException e) {
+			LOG.error("Hum, can't understand this scheme in the URI \""+uri[0]+"\". Use CONTEXT by default.");
+			scheme = DataIdentifierScheme.CONTEXT;
+		}
 
 		// Context
 		if (DataIdentifierScheme.CONTEXT.equals(scheme)) {

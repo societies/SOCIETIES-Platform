@@ -28,8 +28,10 @@ import java.util.Map;
 
 import org.societies.api.identity.Requestor;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyTypeConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 
 /**
  * Interface exposed to Societies components in order to do actions relative
@@ -50,7 +52,13 @@ public interface IPrivacyPolicyManager {
 	 * @return the privacy policy
 	 * @throws PrivacyException
 	 */
-	public RequestPolicy getPrivacyPolicy(Requestor requestor) throws PrivacyException;
+	public RequestPolicy getPrivacyPolicy(RequestorBean requestor) throws PrivacyException;
+	/**
+	 * Will be removed in 1.2
+	 * @see getPrivacyPolicy
+	 */
+	@Deprecated
+	public org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy getPrivacyPolicy(Requestor requestor) throws PrivacyException;
 	
 	/**
 	 * Retrieve a privacy policy file from a JAR
@@ -82,6 +90,12 @@ public interface IPrivacyPolicyManager {
 	 * @return The stored privacy policy
 	 */
 	public RequestPolicy updatePrivacyPolicy(RequestPolicy privacyPolicy) throws PrivacyException;
+	/**
+	 * Will be removed in 1.2
+	 * @see getPrivacyPolicy
+	 */
+	@Deprecated
+	public org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy updatePrivacyPolicy(org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy privacyPolicy) throws PrivacyException;
 	
 	/**
 	 * Store or update a (CIS or 3P Service) privacy policy from an XML version of it.
@@ -91,7 +105,13 @@ public interface IPrivacyPolicyManager {
 	 * @return The privacy policy now stored by the PrivacyPolicyManager
 	 * @throws PrivacyException
 	 */
-	public RequestPolicy updatePrivacyPolicy(String privacyPolicy, Requestor requestor) throws PrivacyException;
+	public RequestPolicy updatePrivacyPolicy(String privacyPolicy, RequestorBean requestor) throws PrivacyException;
+	/**
+	 * Will be removed in 1.2
+	 * @see getPrivacyPolicy
+	 */
+	@Deprecated
+	public org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy updatePrivacyPolicy(String privacyPolicy, Requestor requestor) throws PrivacyException;
 	
 	/**
 	 * Delete a CIS or 3P service privacy policy by the ID of the CIS or the 3P Service
@@ -99,6 +119,12 @@ public interface IPrivacyPolicyManager {
 	 * @param requestor Id of the CIS or the 3P service
 	 * @return True if the privacy policy is successfully deleted
 	 */
+	public boolean deletePrivacyPolicy(RequestorBean requestor) throws PrivacyException;
+	/**
+	 * Will be removed in 1.2
+	 * @see getPrivacyPolicy
+	 */
+	@Deprecated
 	public boolean deletePrivacyPolicy(Requestor requestor) throws PrivacyException;
 
 	/**
@@ -115,19 +141,24 @@ public interface IPrivacyPolicyManager {
 	 * @return A not complete privacy policy
 	 */
 	public RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException;
+	/**
+	 * Will be removed in 1.2
+	 * @see getPrivacyPolicy
+	 */
+	@Deprecated
+	public org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy inferPrivacyPolicy(org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException;
 	
 	/**
-	 * Create a Privacy Policy in an XML format from a Java format Privacy Policy
-	 * @param privacyPolicy Privacy policy
-	 * @return A string containing the XML version the privacy policy
+	 * Will be removed in 1.2
+	 * @see PrivacyPolicyUtils#toXacmlString(RequestPolicy)
 	 */
-	public String toXMLString(RequestPolicy privacyPolicy);
+	@Deprecated
+	public String toXMLString(org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy privacyPolicy);
 	
 	/**
-	 * Create a Privacy Policy in a Java format from a XML format Privacy Policy
-	 * @param privacyPolicy Privacy policy
-	 * @return A Java object containing the privacy policy
-	 * @throws PrivacyException 
+	 * Will be removed in 1.2
+	 * @see PrivacyPolicyUtils#fromXacmlString(String)
 	 */
-	public RequestPolicy fromXMLString(String privacyPolicy) throws PrivacyException;
+	@Deprecated
+	public org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy fromXMLString(String privacyPolicy) throws PrivacyException;
 }

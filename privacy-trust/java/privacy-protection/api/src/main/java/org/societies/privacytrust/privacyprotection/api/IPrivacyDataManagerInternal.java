@@ -26,8 +26,6 @@ package org.societies.privacytrust.privacyprotection.api;
 
 import java.util.List;
 
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
@@ -49,7 +47,7 @@ public interface IPrivacyDataManagerInternal {
 	 * @throws PrivacyException
 	 */
 	public List<ResponseItem> getPermissions(Requestor requestor, DataIdentifier dataId) throws PrivacyException;
-	
+
 	/**
 	 * Find the relevant permission
 	 * 
@@ -59,8 +57,8 @@ public interface IPrivacyDataManagerInternal {
 	 * @return The ResponseItem of this permission
 	 * @throws PrivacyException
 	 */
-	public ResponseItem getPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
-	
+	public List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> getPermissions(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
+
 	/**
 	 * Update access control permissions over a data
 	 * 
@@ -73,7 +71,7 @@ public interface IPrivacyDataManagerInternal {
 	 * @throws PrivacyException
 	 */
 	public boolean updatePermission(Requestor requestor, DataIdentifier dataId, List<Action> actions, Decision permission) throws PrivacyException;
-	
+
 	/**
 	 * Update access control permissions over a data
 	 * 
@@ -83,7 +81,17 @@ public interface IPrivacyDataManagerInternal {
 	 * @throws PrivacyException
 	 */
 	public boolean updatePermission(Requestor requestor, ResponseItem permission) throws PrivacyException;
-	
+
+	/**
+	 * Update access control permissions over a data
+	 * 
+	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
+	 * @param permissions List of permissions
+	 * @return Success of the operation
+	 * @throws PrivacyException
+	 */
+	public boolean updatePermissions(Requestor requestor, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> permissions) throws PrivacyException;
+
 	/**
 	 * Delete relevant permissions
 	 * 
@@ -104,5 +112,4 @@ public interface IPrivacyDataManagerInternal {
 	 * @throws PrivacyException
 	 */
 	public boolean deletePermission(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
-
 }

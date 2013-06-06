@@ -66,11 +66,11 @@ import org.societies.privacytrust.privacyprotection.privacypolicy.registry.Priva
  *
  */
 public class PrivacyPolicyRegistryManager {
+	private static final Logger LOG = LoggerFactory.getLogger(PrivacyPolicyRegistryManager.class.getName());
 
 	private PrivacyPolicyRegistry policyRegistry;
 	private ICtxBroker ctxBroker;
 
-	private Logger LOG = LoggerFactory.getLogger(this.getClass().getName());
 	private IIdentity myPublicDPI;
 	private IIdentityManager idm;
 

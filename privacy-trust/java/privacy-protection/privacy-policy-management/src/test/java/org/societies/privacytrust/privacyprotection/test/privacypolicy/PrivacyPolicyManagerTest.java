@@ -66,6 +66,7 @@ import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
@@ -77,6 +78,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.Cond
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.services.ServiceUtils;
 import org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager;
 import org.societies.util.commonmock.MockIdentity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,11 +161,11 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		ICommManager commManager = Mockito.mock(ICommManager.class);
 		IIdentityManager idManager = Mockito.mock(IIdentityManager.class);
 		IIdentity otherCssId = new MockIdentity(IdentityType.CSS, "othercss","societies.local");
-		IIdentity cisId = new MockIdentity(IdentityType.CIS, "onecis", "societies.local");
+		IIdentity cisId = new MockIdentity(IdentityType.CIS, "cis-one", "societies.local");
 		Mockito.when(idManager.fromJid(otherCssId.getJid())).thenReturn(otherCssId);
 		Mockito.when(idManager.fromJid(cisId.getJid())).thenReturn(cisId);
-		Mockito.when(idManager.fromJid("onecis.societies.local")).thenReturn(new MockIdentity("onecis.societies.local"));
-		Mockito.when(idManager.fromJid("onecis@societies.local")).thenReturn(new MockIdentity("onecis@societies.local"));
+		Mockito.when(idManager.fromJid("cis-one.societies.local")).thenReturn(new MockIdentity("cis-one.societies.local"));
+		Mockito.when(idManager.fromJid("cis-one@societies.local")).thenReturn(new MockIdentity("cis-one@societies.local"));
 		Mockito.when(idManager.fromJid("othercss@societies.local")).thenReturn(new MockIdentity("othercss@societies.local"));
 		Mockito.when(idManager.fromJid("red@societies.local")).thenReturn(new MockIdentity("red@societies.local"));
 		Mockito.when(idManager.fromJid("eliza@societies.local")).thenReturn(new MockIdentity("eliza@societies.local"));
@@ -460,11 +462,11 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 			fail("Error "+e.getMessage()+": "+testTitle);
 		}
 		assertNotNull("Privacy policy generated should not be null", privacyPolicy);
-		LOG.error("**** Original XML privacy policy ****");
-		LOG.error(cisPolicy.toXMLString());
-		LOG.error("**** Generated RequestPolicy ****");
-		LOG.error(privacyPolicy.toXMLString());
-		assertEquals("Privacy policy generated (xml) not equal to the original policy", cisPolicy.toXMLString(), privacyPolicy.toXMLString());
+		LOG.debug("**** Original XML privacy policy ****");
+		LOG.debug(cisPolicy.toXMLString().replaceAll("[\n\t]", ""));
+		LOG.debug("**** Generated RequestPolicy ****");
+		LOG.debug(privacyPolicy.toXMLString().replaceAll("[\n\t]", ""));
+		assertEquals("Privacy policy generated (xml) not equal to the original policy", cisPolicy.toXMLString().replaceAll("[\n\t]", ""), privacyPolicy.toXMLString().replaceAll("[\n\t]", ""));
 		assertEquals("Privacy policy generated not equal to the original policy", cisPolicy, privacyPolicy);
 	}
 	
@@ -498,10 +500,10 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 			fail("[Error testFromXml] error");
 		}
 		LOG.info("***** Original Privacy Policy *****");
-		LOG.info("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+cisPolicy.toXMLString());
+		LOG.info("<?xmlversion=\"1.0\"encoding=\"UTF-8\"?>"+cisPolicy.toXMLString().replaceAll("[ \n\t]", ""));
 		LOG.info("***** Generated Privacy Policy *****");
-		LOG.info(privacyPolicy);
-		assertEquals("Privacy policy generated not equal to the original policy", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+cisPolicy.toXMLString(), privacyPolicy);
+		LOG.info(privacyPolicy.replaceAll("[ \n\t]", ""));
+		assertEquals("Privacy policy generated not equal to the original policy", "<?xmlversion=\"1.0\"encoding=\"UTF-8\"?>"+cisPolicy.toXMLString().replaceAll("[ \n\t]", ""), privacyPolicy.replaceAll("[ \n\t]", ""));
 	}
 
 
@@ -518,6 +520,9 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		} catch (PrivacyException e) {
 			LOG.error("[Error testInferPrivacyPolicy] Privacy error", e);
 			fail("[Error testInferPrivacyPolicy] Privacy error");
+		} catch (Exception e) {
+			LOG.info("[Test Exception] testInferPrivacyPolicy", e);
+			fail("[Error testInferPrivacyPolicy] error");
 		}
 		assertEquals(expected, actual);
 	}
@@ -651,7 +656,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 				"<AttributeValue>othercss@societies.local</AttributeValue>" +
 				"</Attribute>" +
 				"<Attribute AttributeId=\"CisId\" DataType=\"org.societies.api.identity.IIdentity\">" +
-				"<AttributeValue>onecis.societies.local</AttributeValue>" +
+				"<AttributeValue>cis-one.societies.local</AttributeValue>" +
 				"</Attribute>" +
 				"</Subject>"+
 				"<Target>" +
@@ -746,19 +751,20 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 
 	private RequestorService getRequestorService(){
 		IIdentity requestorId = new MockIdentity(IdentityType.CSS, "eliza","societies.local");
-		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
-		serviceId.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
-		try {
-			serviceId.setIdentifier(new URI("css://eliza@societies.org/HelloEarth"));
-		} catch (URISyntaxException e) {
-			LOG.error("Can't create the service ID", e);
-		}
+		ServiceResourceIdentifier serviceId = ServiceUtils.generateServiceResourceIdentifierFromString("myGreatService eliza@societies.org");
+//		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
+//		serviceId.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
+//		try {
+//			serviceId.setIdentifier(new URI("css://eliza@societies.org/HelloEarth"));
+//		} catch (URISyntaxException e) {
+//			LOG.error("Can't create the service ID", e);
+//		}
 		return new RequestorService(requestorId, serviceId);
 	}
 
 	private RequestorCis getRequestorCis(){
 		IIdentity otherCssId = new MockIdentity(IdentityType.CSS, "othercss","societies.local");
-		IIdentity cisId = new MockIdentity(IdentityType.CIS, "onecis", "societies.local");
+		IIdentity cisId = new MockIdentity(IdentityType.CIS, "cis-one", "societies.local");
 		return new RequestorCis(otherCssId, cisId);
 	}
 

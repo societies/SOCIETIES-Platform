@@ -639,7 +639,7 @@ public class TestAccCtrlMonitor {
 		}
 
 		@Override
-		public org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem getPermission(
+		public List<ResponseItem> getPermissions(
 				Requestor requestor,
 				DataIdentifier dataId,
 				List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions)
@@ -705,6 +705,12 @@ public class TestAccCtrlMonitor {
 			//JOptionPane.showMessageDialog(null, "Deleted permission - req/dataId/actions" );
 			this.receivedResponse.clear();
 			receivedResponse.put(4, true);
+			return false;
+		}
+		@Override
+		public boolean updatePermissions(Requestor requestor,
+				List<ResponseItem> permissions) throws PrivacyException {
+			// TODO Auto-generated method stub
 			return false;
 		}
 		
