@@ -32,8 +32,6 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Id;
 
-import org.societies.api.schema.cssmanagement.CssRequestStatusType;
-
 
 /**
  * This is the Class accepted by the CssRegistry when a css registers wth a friend.

@@ -31,7 +31,6 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +48,7 @@ import org.societies.css.cssRegistry.model.CssRegistryEntry;
 import org.societies.css.cssRegistry.model.CssRequestEntry;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
 
+@SuppressWarnings("deprecation")
 public class CssRegistry implements ICssRegistry {
 	private SessionFactory sessionFactory;
 	private static Logger log = LoggerFactory.getLogger(CssRegistry.class);

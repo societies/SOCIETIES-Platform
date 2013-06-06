@@ -22,17 +22,35 @@
 	<dependencies>
 
 		<!-- spring -->
-		<dependency>
+	<!-- 	<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
 			<version>${spring.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
+	-->	
+<!--
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>smackx</artifactId>
+					<groupId>org.igniterealtime.smack</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>smack</artifactId>
+					<groupId>org.igniterealtime.smack</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+-->
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-platform-libs</artifactId>
+			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -41,8 +59,7 @@
 			<groupId>org.societies</groupId>
 			<artifactId>hibernate_classes</artifactId>
 			<scope>provided</scope>
-		</dependency>
-
+		</dependency> 
 
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
@@ -55,6 +72,7 @@
 			<artifactId>societies-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		
 
 		<dependency>
 			<groupId>junit</groupId>
@@ -62,12 +80,19 @@
 			<version>4.10</version>
 			<scope>test</scope>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.test</artifactId>
-			<version>3.0.5.RELEASE</version>
+			<version>${spring.version}</version>
 			<scope>test</scope>
 		</dependency>
+		
+	
+		
+	
+	
+		
 
 	</dependencies>
 
@@ -83,9 +108,12 @@
 					<instructions>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
-						<Import-Package>
-						org.hibernate.proxy;resolution:=optional,
-						*;resolution:=optional</Import-Package>
+						
+								<Import-Package>com.mysql.jdbc,
+						org.hibernate.cfg,
+						org.springframework.context,
+							*;resolution:=optional</Import-Package>
+						<Export-Package>!*</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>
