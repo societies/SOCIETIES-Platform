@@ -57,6 +57,14 @@
 			<scope>provided</scope>
 		</dependency>
 
+
+<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-platform-libs</artifactId>
+			<scope>provided</scope>
+			<version>${release.version}</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
@@ -81,6 +89,7 @@
 			<artifactId>context-event-mgmt</artifactId>
 			<version>${version.cm}</version>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>user-context-db-mgmt</artifactId>
@@ -96,6 +105,7 @@
 			<artifactId>user-context-history-mgmt</artifactId>
 			<version>${version.cm}</version>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>context-broker</artifactId>

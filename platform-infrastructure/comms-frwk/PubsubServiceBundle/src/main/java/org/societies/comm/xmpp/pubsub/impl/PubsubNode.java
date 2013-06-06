@@ -10,17 +10,17 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.UUID;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+//import org.hibernate.HibernateException;/
+//import org.hibernate.Session;
+//import org.hibernate.SessionFactory;
+//import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.HostedNode;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.comm.xmpp.pubsub.model.PubsubNodeDAO;
+//import org.societies.comm.xmpp.pubsub.model.PubsubNodeDAO;
 
 // TODO collection node support
 public class PubsubNode extends HostedNode {
@@ -38,9 +38,9 @@ public class PubsubNode extends HostedNode {
 	private Map<String, String> publisherByItemId;
 	// itempublishoptions??? these suck!
 	
-	private SessionFactory sf;
+	//private SessionFactory sf;
 	private IIdentityManager idm;
-	private PubsubNodeDAO dao;
+	//private PubsubNodeDAO dao;
 	
 	public PubsubNode(IIdentity owner, String nodeId) {
 		super(nodeId, null); // TODO collection nodes
@@ -51,7 +51,7 @@ public class PubsubNode extends HostedNode {
 		itemsById = new HashMap<String, Object>();
 		publisherByItemId = new HashMap<String, String>();
 	}
-	
+	/*
 	public PubsubNode(PubsubNodeDAO dao, SessionFactory sf, IIdentityManager idm) {
 		super(dao.getNodeId(), null);
 		this.sf = sf;
@@ -66,7 +66,8 @@ public class PubsubNode extends HostedNode {
 		
 		loadFromDAO();
 	}
-	
+	*/
+	/*
 	public PubsubNodeDAO enablePersistence(SessionFactory sf, IIdentityManager idm) {
 		if (dao==null) {
 			this.sf = sf;
@@ -82,7 +83,8 @@ public class PubsubNode extends HostedNode {
 		}
 		return dao;
 	}
-	
+	*/
+	/*
 	private void loadFromDAO() {
 		subscriptionsById = new HashMap<String, IIdentity>();
 		subscriptionsByUser = new HashMap<IIdentity, List<String>>();
@@ -138,7 +140,7 @@ public class PubsubNode extends HostedNode {
 	public PubsubNodeDAO getDAO() {
 		return dao;
 	}
-
+*/
 	public String newSubscription(IIdentity subscriber) {
 		// Generate subId
 		String subId = UUID.randomUUID().toString();
@@ -154,7 +156,7 @@ public class PubsubNode extends HostedNode {
 		}
 		subIdList.add(subId);
 		
-		writeToDAO(subId);
+	//	writeToDAO(subId);
 		return subId;
 	}
 	
@@ -171,7 +173,7 @@ public class PubsubNode extends HostedNode {
 		IIdentity subscriber = subscriptionsById.get(string);
 		subscriptionsById.remove(string);
 		subscriptionsByUser.remove(subscriber); // removes all subscriptions... TODO handle subIds separately
-		writeToDAO(string);
+		//writeToDAO(string);
 	}
 
 	public String publishItem(String itemId, Object itemObject, String publisher) {

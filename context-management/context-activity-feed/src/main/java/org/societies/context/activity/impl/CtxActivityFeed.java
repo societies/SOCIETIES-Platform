@@ -42,7 +42,6 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
@@ -53,7 +52,6 @@ import org.springframework.stereotype.Service;
  * @since 1.0
  */
 @Service
-@Lazy(false)
 public class CtxActivityFeed {
 
 	/** The logging facility. */

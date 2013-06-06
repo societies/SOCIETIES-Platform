@@ -27,7 +27,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:osgi="http://www.springframework.org/schema/osgi"
+       xmlns:osgi-compendium="http://www.springframework.org/schema/osgi-compendium"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+        http://www.springframework.org/schema/osgi-compendium 
+                      http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium-1.2.xsd
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
     <!-- definitions using elements of the osgi namespace can be included
@@ -37,6 +40,13 @@ keeping these definitions separate is to facilitate integration
 testing of the bundle outside of an OSGi container -->
 
 
+
+<!-- Load user.properties with default values -->
+	 
+	<osgi-compendium:cm-properties id="userConfig" persistent-id="org.societies.platform">
+    	<prop key="userDir">config</prop>
+    </osgi-compendium:cm-properties>
+    
     <!--         <osgi:service ref="CPA"> -->
     <!--         <osgi:interfaces> -->
     <osgi:service ref="activityFeedManager">
@@ -44,6 +54,9 @@ testing of the bundle outside of an OSGi container -->
             <value>org.societies.api.activity.IActivityFeedManager</value>
         </osgi:interfaces>
     </osgi:service>
+    
+    <osgi:reference id="dataSource" 
+	    interface="javax.sql.DataSource" />
 
     <osgi:reference id="pubSubClient"
                     interface="org.societies.api.comm.xmpp.pubsub.PubsubClient" />

@@ -42,35 +42,28 @@
 		<!-- Service Management: 2 bundles (to be merged) -->
 		<module>../../platform-infrastructure/service-lifecycle/service-discovery/</module>
 		<module>../../platform-infrastructure/service-lifecycle/service-control/</module>
-
 		<!-- Security and Dependability Mgmt: 2 bundles -->	
 		<module>../../platform-infrastructure/security/SecurityServices</module>
 		<module>../../platform-infrastructure/security/PolicyNegotiator</module>
-
 		<!-- Activity Feed: 1 bundle -->
 		<module>../../common-modules/activityfeed</module>
 		<module>../../common-modules/activityfeedservice</module>
 
-
 		<!-- Directory Clients: 2 bundles (to be merged) -->
 		<module>../../css-modules/css-directory-client</module>
 		<module>../../cis-modules/cis-directory-client/</module>
-
 		<!-- CSS Mgmt: 3 bundles (to be merged) -->
 		<module>../../css-modules/css-registry</module>
 		<module>../../css-modules/css-mgmt/cssCommsMgmt</module>
 		<module>../../css-modules/css-mgmt/cssmgmt</module>
-
 		<!-- CIS Mgmt: 1 bundle (path to be corrected) -->
 		<module>../../cis-modules/cis-management/cis-manager-client</module>
 		<module>../../cis-modules/cis-management/cis-manager/cis-manager</module>
-
 		<!-- Device Mgmt: 3 bundles (to be merged) -->
 		<module>../../css-modules/device-mgmt/devicemanager/</module>
 		<module>../../css-modules/device-mgmt/DeviceRegistry/</module>
 		<module>../../css-modules/device-mgmt/DeviceCommsMgr/</module>
 		<module>../../css-modules/device-mgmt/RFIDDriver/</module>
-
 		<!-- SNS: 1 bundle -->
 		<module>../../platform-infrastructure/sns/connectors/GooglePlusConnector</module>
 		<module>../../platform-infrastructure/sns/connectors/FacebookConnector</module>
@@ -84,26 +77,27 @@
 		<module>../../context-management</module>
 		<module>../../context-management/context-cloud-bundle/</module>
 		<module>../../context-management/LocationManagement/</module>
-
 		<!-- User Agent: 3 bundles (can these be merged?)-->
 		<module>../../user-agent</module>
-
 		<!-- Intelligent Community Orchestration: 2 bundles (can these be merged?)-->
+		<!--
 		<module>../../intelligent-community-orchestration</module>
-
+		-->
 		<!-- Personalisation: 2 bundles (merge?) -->
 		<module>../../personalisation</module>
 		<module>../../personalisation/Personalisation-GroupManager</module>
-	      
 		<!-- Privacy & Trust: 5 bundles (including 1 test bundle & 1 GUI bundle... move to nightly build pom?) -->
 		<module>../../privacy-trust/java/privacy-protection</module>
-		<module>../../privacy-trust/java/trust/trust-similarity-eval</module>
+		<!--<module>../../privacy-trust/java/trust/trust-similarity-eval</module>
 		<module>../../privacy-trust/java/trust/trust-activity-feed</module>
-		<module>../../privacy-trust/java/trust/trust-cloud-bundle</module>
-
+		<module>../../privacy-trust/java/trust/trust-cloud-bundle</module> -->
 		<!-- PlatForm Test Web App: 1 WAR -->
+		<!--
 		<module>../../platform-infrastructure/service-lifecycle/platform-webapp/</module>
+		-->
 		<!-- PlatForm Web App: 1 WAR -->
+		<!--
 		<module>../../platform-infrastructure/web-app/</module>
+		-->
 	</modules>
 </project>

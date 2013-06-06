@@ -70,7 +70,6 @@ import org.springframework.stereotype.Service;
  * @since 0.4
  */
 @Service
-@Lazy(false)
 public class CtxPerformanceTester{
 
 	/** The logging facility. */

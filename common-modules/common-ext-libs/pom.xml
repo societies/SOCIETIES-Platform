@@ -18,12 +18,58 @@
 	</properties>
 	<dependencies>
 	
+	
+	<dependency>
+	<groupId>org.eclipse.tycho</groupId>
+	<artifactId>org.eclipse.osgi</artifactId>
+	<version>3.8.1.v20120830-144521</version>
+	<scope>provided</scope>
+</dependency>
+
 	<dependency>
 		<groupId>commons-lang</groupId>
 		<artifactId>commons-lang</artifactId>
 		<version>2.6</version>
 	</dependency>
 
+	<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.1</version>
+			
+		</dependency>
+
+<!-- 
+	<dependency>
+		<groupId>org.springframework.osgi</groupId>
+		<artifactId>spring-osgi-core</artifactId>
+		<version>1.2.1</version>
+		<exclusions>
+			<exclusion>
+				<artifactId>spring-osgi-io</artifactId>
+				<groupId>org.springframework.osgi</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>org.springframework.aop</artifactId>
+				<groupId>org.springframework</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>org.springframework.beans</artifactId>
+				<groupId>org.springframework</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>org.springframework.context</artifactId>
+				<groupId>org.springframework</groupId>
+			</exclusion>
+			<exclusion>
+				<artifactId>org.springframework.core</artifactId>
+				<groupId>org.springframework</groupId>
+			</exclusion>
+		</exclusions>
+	</dependency>
+     -->      
+	        
+            
 	<!-- 
 		<dependency>
 			<groupId>org.igniterealtime</groupId>
@@ -40,6 +86,20 @@
 			</exclusions>
 		</dependency>
 	-->
+	<dependency>
+		<groupId>org.igniterealtime.smack</groupId>
+		<artifactId>smack</artifactId>
+		<version>3.2.1</version>
+	</dependency>
+
+	<dependency>
+		<groupId>org.igniterealtime.smack</groupId>
+		<artifactId>smackx</artifactId>
+		<version>3.2.1</version>
+	</dependency>
+            
+	
+	
 	<!-- 	
 		<dependency>
 			<groupId>org.igniterealtime.smack</groupId>
@@ -73,35 +133,33 @@
 		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
-			<version>4.1.0</version>
+			<version>5.0.0</version>
 		</dependency>
--->
-		<dependency>
-			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.compendium</artifactId>
-			<version>4.1.0</version>
-		</dependency>
+            
+		-->
 		
 		<!-- databases -->
-		<dependency>
+	<!--	<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>com.springsource.org.hsqldb</artifactId>
 			<version>1.8.0.10</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- apache commons -->
-	<!-- 
+	
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>com.springsource.org.apache.commons.pool</artifactId>
 			<version>1.5.3</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>com.springsource.org.apache.commons.collections</artifactId>
 			<version>3.2.1</version>
 		</dependency>
-
+		
+		<!--
 		<dependency>
 			<groupId>net.sf.jung</groupId>
 			<artifactId>jung-graph-impl</artifactId>
@@ -112,14 +170,14 @@
 			<artifactId>jung-algorithms</artifactId>
 			<version>2.0.1</version>
 		</dependency>
-
+		-->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math</artifactId>
 			<version>2.2</version>
 		</dependency>
 
-
+		 
 		<dependency>
 			<groupId>org.apache.shindig</groupId>
 			<artifactId>shindig-social-api</artifactId>
@@ -137,15 +195,66 @@
 					<artifactId>commons-logging</artifactId>
 					<groupId>commons-logging</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>commons-codec</artifactId>
+					<groupId>commons-codec</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-lang3</artifactId>
+					<groupId>org.apache.commons</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>ehcache-core</artifactId>
+					<groupId>net.sf.ehcache</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>aopalliance</artifactId>
+					<groupId>aopalliance</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-fileupload</artifactId>
+					<groupId>commons-fileupload</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>httpclient</artifactId>
+					<groupId>org.apache.httpcomponents</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jasper-el</artifactId>
+					<groupId>org.apache.tomcat</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-io</artifactId>
+					<groupId>commons-io</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>xml-apis</artifactId>
+					<groupId>xml-apis</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jsr305</artifactId>
+					<groupId>com.google.code.findbugs</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
+		
+			<dependency>
+	<groupId>colt</groupId>
+	<artifactId>colt</artifactId>
+	<version>1.2.0</version>
+</dependency>
 
+<!--  
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15on</artifactId>
 			<version>1.47</version>
 		</dependency>
-
+-->
 		<dependency>
 			<groupId>nz.ac.waikato.cms.weka</groupId>
 			<artifactId>weka-stable</artifactId>
@@ -156,36 +265,44 @@
 			<groupId>org.scribe</groupId>
 			<artifactId>scribe</artifactId>
 			<version>1.3.0</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-codec</artifactId>
+					<groupId>commons-codec</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>com.restfb</groupId>
 			<artifactId>restfb</artifactId>
 			<version>1.6.9</version>
 		</dependency>
-
+		<!--  
 
 		<dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-all</artifactId>
 			<version>1.3</version>
 		</dependency>
-
+-->
+<!-- 
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 			<version>1.5</version>
 		</dependency>
+-->
 
-
-
+	
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20070829</version>
 		</dependency>
 		
-		-->
+		
+		
 		<!-- 
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -237,11 +354,6 @@
 		</dependency>
 		-->
 		
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.1</version>
-		</dependency>
 		
 		<!-- 
 		<dependency>
@@ -316,6 +428,10 @@
 			</exclusions>
 		</dependency>
 		-->
+		
+	
+     
+		
 	</dependencies>
 	<build>
 		<plugins>

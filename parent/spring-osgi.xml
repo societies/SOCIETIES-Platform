@@ -24,7 +24,7 @@
 			is deployed - virgo.deploy - Deployment folder to deploy artifacts to - -->
 		<!-- Spring dependency version -->
 		<spring.version>3.1.0.RELEASE</spring.version>
-		<slf4j.version>1.6.1</slf4j.version>
+		<slf4j.version>1.7.2</slf4j.version>
 	</properties>
 	<!-- - This section controls the versions of toolkits and frameworks used -->
 	<dependencyManagement>
@@ -60,7 +60,7 @@
 			<dependency>
 				<groupId>org.igniterealtime</groupId>
 				<artifactId>tinder</artifactId>
-				<version>1.2.2</version>
+				<version>1.2.3</version>
 				<type>jar</type>
 				<scope>compile</scope>
 			</dependency>
@@ -203,34 +203,7 @@
 				<artifactId>org.springframework.transaction</artifactId>
 				<version>${spring.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
-				<version>${slf4j.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>com.springsource.slf4j.api</artifactId>
-				<version>${slf4j.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>com.springsource.slf4j.log4j</artifactId>
-				<version>${slf4j.version}</version>
-				<scope>provided</scope>
-				<exclusions>
-					<exclusion>
-						<groupId>log4j</groupId>
-						<artifactId>log4j</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.apache.log4j</groupId>
-						<artifactId>com.springsource.org.apache.log4j</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
+		
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>

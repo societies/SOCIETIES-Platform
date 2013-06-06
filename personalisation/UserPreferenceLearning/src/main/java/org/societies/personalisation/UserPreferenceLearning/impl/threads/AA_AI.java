@@ -31,7 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.jetty.util.log.Log;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxHistoryAttribute;
@@ -169,7 +169,7 @@ public class AA_AI extends Thread{
 			outputString = executeAlgorithm(instances);
 		} catch (Exception e) {
 			e.printStackTrace();
-			Log.debug("No rules could be learned from the current history set: \nException: "+e.toString());
+			LOG.debug("No rules could be learned from the current history set: \nException: "+e.toString());
 			return null;
 		}
 

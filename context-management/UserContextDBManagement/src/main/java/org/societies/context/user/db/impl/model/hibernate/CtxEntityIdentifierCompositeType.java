@@ -31,7 +31,7 @@ import java.sql.SQLException;
 
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.Type;
 import org.hibernate.usertype.CompositeUserType;
 import org.societies.api.context.model.CtxEntityIdentifier;

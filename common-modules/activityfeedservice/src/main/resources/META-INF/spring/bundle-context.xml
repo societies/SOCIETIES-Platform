@@ -36,29 +36,10 @@
        xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
        xmlns:tx="http://www.springframework.org/schema/tx">
 
-    <bean id="CPAPropConfig"
-          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="ignoreResourceNotFound" value="false"></property>
-        <property name="locations">
-            <list>
-                <!--			 	<value>classpath:/derby_database.properties</value>-->
-                <value>file:${CONFIG_DIR}/org.societies.platform.properties</value>
-            </list>
-        </property>
-    </bean>
+    <context:property-placeholder properties-ref="userConfig"/>
 
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
-          init-method="createDataSource" destroy-method="close">
-        <property name="driverClassName" value="${jdbc.driverClassName}" />
-        <property name="url" value="${jdbc.url}" />
-        <property name="username" value="${jdbc.username}" />
-        <property name="password" value="${jdbc.password}" />
-        <property name="initialSize" value="2" />
-        <property name="maxActive" value="5" />
-    </bean>
-
-    <bean id="sessionFactory"
-          class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+       <bean id="sessionFactory"
+          class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource" />
 
         <property name="annotatedClasses">
@@ -80,16 +61,16 @@
                 <prop key="hibernate.jdbc.batch_size">0</prop>
                 -->
                 <prop key="hibernate.show_sql">${show_sql}</prop>
-                <prop key="hibernate.cache.use_second_level_cache">${cache.use_second_level_cache}</prop>
+             <!--   <prop key="hibernate.cache.use_second_level_cache">${cache.use_second_level_cache}</prop>
                 <prop key="hibernate.hbm2ddl.auto">${hbm2ddl.auto}</prop>
-                <prop key="hibernate.format_sql">${format_sql}</prop>
+                <prop key="hibernate.format_sql">${format_sql}</prop>-->
             </props>
         </property>
     </bean>
     <tx:annotation-driven transaction-manager="transactionManager" />
 
     <bean id="transactionManager"
-          class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+          class="org.springframework.orm.hibernate4.HibernateTransactionManager">
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
 

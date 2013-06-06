@@ -26,13 +26,6 @@
 			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>org.scribe</groupId>
-			<artifactId>scribe</artifactId>
-			<version>1.3.0</version>
-		</dependency>
-		
 		
 		<dependency>
 			<groupId>org.societies</groupId>
@@ -40,6 +33,15 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-platform-libs</artifactId>
+			<scope>provided</scope>
+			<version>${release.version}</version>
+		</dependency>
+		
+
+		
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
@@ -54,11 +56,7 @@
 
 	
 
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>1.5</version>
-		</dependency>
+		
 
 		<dependency>
 			<groupId>com.googlecode.json-simple</groupId>
@@ -66,12 +64,7 @@
 			<version>1.1</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20070829</version>
-		</dependency>
-
+		
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

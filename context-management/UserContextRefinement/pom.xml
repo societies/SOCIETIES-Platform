@@ -38,6 +38,14 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-platform-libs</artifactId>
+			<scope>provided</scope>
+			<version>${release.version}</version>
+		</dependency>
+
+
+		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
 			<scope>provided</scope>
@@ -64,12 +72,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>colt</groupId>
-			<artifactId>colt</artifactId>
-			<version>1.2.0</version>
-			<scope>provided</scope>
-		</dependency>
+		
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

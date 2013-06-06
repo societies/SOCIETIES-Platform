@@ -24,14 +24,10 @@
  */
 package org.societies.api.cis.attributes;
 
+import org.societies.api.cis.management.ICis;
+import org.societies.api.cis.management.ICisManager;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
-
-import java.util.HashMap;
-
-import org.societies.api.activity.IActivityFeed;
-import org.societies.api.cis.attributes.MembershipCriteria;
-import org.societies.api.context.model.CtxAttribute;
 
 
 

@@ -24,8 +24,8 @@
  */
 package org.societies.context.user.db.impl.event.hibernate;
 
-import org.hibernate.event.PostDeleteEvent;
-import org.hibernate.event.PostDeleteEventListener;
+import org.hibernate.event.spi.PostDeleteEvent;
+import org.hibernate.event.spi.PostDeleteEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.context.api.event.CtxChangeEventTopic;

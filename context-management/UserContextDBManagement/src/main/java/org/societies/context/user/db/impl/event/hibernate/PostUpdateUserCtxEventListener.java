@@ -24,8 +24,8 @@
  */
 package org.societies.context.user.db.impl.event.hibernate;
 
-import org.hibernate.event.PostUpdateEvent;
-import org.hibernate.event.PostUpdateEventListener;
+import org.hibernate.event.spi.PostUpdateEvent;
+import org.hibernate.event.spi.PostUpdateEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.context.api.event.CtxChangeEventTopic;

@@ -55,6 +55,14 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-platform-libs</artifactId>
+			<scope>provided</scope>
+			<version>${release.version}</version>
+		</dependency>
+		
+		
+		<dependency>
 		  <groupId>org.societies.cis</groupId>
 		  <artifactId>cis-management-client</artifactId>
 		  <version>${version.cis}</version>

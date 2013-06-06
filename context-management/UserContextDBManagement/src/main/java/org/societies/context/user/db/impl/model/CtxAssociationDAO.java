@@ -36,8 +36,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.persistence.ElementCollection;
 
-import org.hibernate.annotations.CollectionOfElements;
 import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.Type;
 import org.societies.api.context.model.CtxAssociationIdentifier;
@@ -98,7 +98,7 @@ public class CtxAssociationDAO extends CtxModelObjectDAO {
 	@Type(type="org.societies.context.user.db.impl.model.hibernate.CtxEntityIdentifierType")
 	private CtxEntityIdentifier parentEntity;
 	
-	@CollectionOfElements(fetch = FetchType.EAGER, targetElement = CtxEntityIdentifierType.class)
+	@ElementCollection
 	@JoinTable(name="org_societies_context_assoc_entities", joinColumns = @JoinColumn(name="association_id"))
 	@Column(name="ctx_ent_id")
 	private Set<CtxEntityIdentifier> childEntities = new HashSet<CtxEntityIdentifier>();

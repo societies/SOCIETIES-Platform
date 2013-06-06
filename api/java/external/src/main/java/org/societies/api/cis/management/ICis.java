@@ -24,17 +24,10 @@
  */
 package org.societies.api.cis.management;
 
-import java.util.Hashtable;
-import java.util.List;
-import java.util.concurrent.Future;
-
-import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
-import org.societies.api.cis.attributes.MembershipCriteria;
-import org.societies.api.identity.Requestor;
 
 /**
  * @author Babak.Farshchian@sintef.no

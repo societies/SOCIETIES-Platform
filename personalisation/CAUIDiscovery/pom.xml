@@ -48,6 +48,13 @@
 			<scope>provided</scope>
 		</dependency>
 
+	<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-platform-libs</artifactId>
+			<scope>provided</scope>
+			<version>${release.version}</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>

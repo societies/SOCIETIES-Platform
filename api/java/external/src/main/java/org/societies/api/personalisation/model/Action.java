@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.services.IServices;
 import org.societies.api.services.ServiceUtils;
 
 

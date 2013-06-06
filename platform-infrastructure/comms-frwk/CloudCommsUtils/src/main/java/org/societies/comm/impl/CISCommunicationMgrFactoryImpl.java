@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.hibernate.SessionFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -30,12 +30,12 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 	private ICommManager originalEndpoint;
 	private IIdentityManager idm;
 	private String domainName;
-	private SessionFactory sf;
+	//private SessionFactory sf;
 	
-	public CISCommunicationMgrFactoryImpl(ICommManager endpoint, String genericPassword, SessionFactory sf) {
+	public CISCommunicationMgrFactoryImpl(ICommManager endpoint, String genericPassword, Object sf) {
 		this.genericPassword = genericPassword;
 		originalEndpoint = endpoint;
-		this.sf = sf;
+	//	this.sf = sf;
 		
 		initCISCommunicationMgrFactoryImpl();
 	}
@@ -77,10 +77,10 @@ public class CISCommunicationMgrFactoryImpl implements ICISCommunicationMgrFacto
 		
 		// CIS Pubsub
 		PubsubServiceRouter psr = null;
-		if (sf==null)
+	//	if (sf==null)
 			psr = new PubsubServiceRouter(commMgr);
-		else
-			psr = new PubsubServiceRouter(commMgr,sf);
+	//	else
+	//		psr = new PubsubServiceRouter(commMgr,sf);
 		
 		// restore threadContextClassloader
 		Thread.currentThread().setContextClassLoader(threadContextClassLoader);

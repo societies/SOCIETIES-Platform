@@ -61,7 +61,6 @@ import org.societies.context.api.event.CtxEventScope;
 import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.event.api.CtxEventMgrException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
@@ -71,7 +70,6 @@ import org.springframework.stereotype.Service;
  * @since 0.0.4
  */
 @Service("ctxEventMgr")
-@Lazy(false)
 public class CtxEventMgr implements ICtxEventMgr {
 
 	/** The logging facility. */

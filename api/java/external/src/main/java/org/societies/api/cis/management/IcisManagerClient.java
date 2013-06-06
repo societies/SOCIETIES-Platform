@@ -37,6 +37,7 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
  * Please ignore this one!!! It is deprecated and it is going to be deleted soon
 */
 
+@SuppressWarnings("unused")
 @Deprecated
 public interface IcisManagerClient {
 	

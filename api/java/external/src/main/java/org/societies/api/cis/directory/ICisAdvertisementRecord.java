@@ -24,12 +24,11 @@
  */
 package org.societies.api.cis.directory;
 
+import java.util.HashMap;
+
+import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
-
-import java.util.HashMap;
-import org.societies.api.cis.attributes.MembershipCriteria;
-import org.societies.api.context.model.CtxAttribute;
 
 /**
  * This interface allows access to the CISAdvertisement record

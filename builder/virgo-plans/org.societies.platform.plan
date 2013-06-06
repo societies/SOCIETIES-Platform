@@ -10,10 +10,11 @@
 
 	<artifact type="plan" name="org.societies.common.modules" />
 
+	<!--
 	<artifact type="plan" name="org.societies.activityfeed" />
-
+	-->
 	<artifact type="plan" name="org.societies.security" />
-
+	<!--
 	<artifact type="plan" name="org.societies.privacy.and.trust" />
 
 	<artifact type="plan" name="org.societies.css.devicemgmt" />
@@ -23,9 +24,9 @@
 	<artifact type="plan" name="org.societies.css.management" />
 
 	<artifact type="plan" name="org.societies.cis.management" />
-
+	-->
 	<artifact type="plan" name="org.societies.service-lifecycle" />
-
+	<!--
 	<artifact type="plan" name="org.societies.sns" />
 
 	<artifact type="plan" name="org.societies.useragent" />
@@ -33,4 +34,5 @@
 	<artifact type="plan" name="org.societies.personalisation" />
 
 	<artifact type="plan" name="org.societies.webapp" />
+	-->
 </plan>

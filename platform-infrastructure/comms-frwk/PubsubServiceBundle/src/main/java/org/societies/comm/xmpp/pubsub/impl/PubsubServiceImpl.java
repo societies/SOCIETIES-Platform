@@ -39,11 +39,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
+//import org.hibernate.HibernateException;
+//import org.hibernate.Session;
+//import org.hibernate.SessionFactory;
+//import org.hibernate.Transaction;
+//import org.hibernate.criterion.Restrictions;
 import org.jabber.protocol.pubsub.Create;
 import org.jabber.protocol.pubsub.Item;
 import org.jabber.protocol.pubsub.Items;
@@ -60,8 +60,8 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.comm.xmpp.pubsub.PubsubService;
-import org.societies.comm.xmpp.pubsub.model.PubsubNodeDAO;
-import org.societies.comm.xmpp.pubsub.model.PubsubServiceDAO;
+//import org.societies.comm.xmpp.pubsub.model.PubsubNodeDAO;
+//import org.societies.comm.xmpp.pubsub.model.PubsubServiceDAO;
 
 // TODO
 public class PubsubServiceImpl implements PubsubService {
@@ -104,9 +104,9 @@ public class PubsubServiceImpl implements PubsubService {
 	private List<IIdentity> admins; // TODO use!
 	private ICommManager endpoint;
 	private IIdentityManager idm;
-	private SessionFactory sf;
+//	private SessionFactory sf;
 //	private Session s;
-	private PubsubServiceDAO dao;
+	//private PubsubServiceDAO dao;
 	
 	public PubsubServiceImpl(ICommManager endpoint) {
 		init(endpoint);
@@ -120,7 +120,7 @@ public class PubsubServiceImpl implements PubsubService {
 		admins = new ArrayList<IIdentity>();
 		idm = endpoint.getIdManager();
 	}
-
+/*
 	public PubsubServiceImpl(ICommManager endpoint, SessionFactory sf) {
 		init(endpoint);
 		this.sf = sf;
@@ -152,7 +152,8 @@ public class PubsubServiceImpl implements PubsubService {
 			s.close();
 		}
 	}
-
+*/
+	/*
 	private void loadFromDAO() {
 		for (PubsubNodeDAO pnDao : dao.getNodes()) {
 			PubsubNode psn = new PubsubNode(pnDao, sf, idm);
@@ -191,7 +192,7 @@ public class PubsubServiceImpl implements PubsubService {
 			}
 		}
 	}
-
+*/
 	@Override
 	public Pubsub subscriberSubscribe(Stanza stanza, Pubsub payload) throws XMPPError {
 		IIdentity sender = stanza.getFrom();
@@ -488,7 +489,7 @@ public class PubsubServiceImpl implements PubsubService {
 		PubsubNode newNode = new PubsubNode(owner, nodeId);
 		nodes.put(nodeId, newNode);
 		endpoint.addRootNode(newNode);
-		writeToDAO(newNode);
+	//	writeToDAO(newNode);
 		
 		// Build success response
 		Pubsub response = new Pubsub();
@@ -552,7 +553,7 @@ public class PubsubServiceImpl implements PubsubService {
 		// Remove Node
 		nodes.remove(nodeId);
 		endpoint.removeRootNode(node);
-		writeToDAO(node);
+	//	writeToDAO(node);
 		
 		// Example 156. Owner deletes a node with redirection
 		String redirectUri = null;

@@ -25,10 +25,7 @@
 
 package org.societies.api.css.devicemgmt.display;
 
-import java.io.File;
 import java.net.URL;
-
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 public interface IDisplayDriver {
 

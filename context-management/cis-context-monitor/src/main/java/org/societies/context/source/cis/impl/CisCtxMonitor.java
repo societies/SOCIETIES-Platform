@@ -56,7 +56,6 @@ import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.cis.community.Community;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
@@ -66,7 +65,6 @@ import org.springframework.stereotype.Service;
  * @since 0.5
  */
 @Service
-@Lazy(false)
 public class CisCtxMonitor extends EventListener implements Subscriber {
 
 	/** The logging facility. */

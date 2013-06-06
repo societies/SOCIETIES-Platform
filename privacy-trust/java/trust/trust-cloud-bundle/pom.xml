@@ -44,6 +44,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-platform-libs</artifactId>
+			<scope>provided</scope>
+			<version>${release.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
 			<type>libd</type>
@@ -82,12 +88,8 @@
 			<artifactId>org.springframework.core</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>javax.transaction</groupId>
-			<artifactId>com.springsource.javax.transaction</artifactId>
-			<version>1.1.0</version>
-			<scope>test</scope>
-		</dependency>
+		
+		
 	</dependencies>
 	<parent>
 		<groupId>org.societies</groupId>
@@ -108,6 +110,7 @@
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
 						<Import-Package>org.hibernate.proxy;resolution:=optional,
+						org.hibernate.cache;resolution:=optional,
 						    *;resolution:=optional</Import-Package>
 					</instructions>
 				</configuration>

@@ -37,6 +37,13 @@
 			<artifactId>common-ext-libs</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-platform-libs</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
 		<!-- Simple framework -->
 		<dependency>
 			<groupId>org.simpleframework</groupId>
@@ -61,12 +68,6 @@
 			</exclusions>
 		</dependency>
 		
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.2</version>
-			<scope>provided</scope>
-		</dependency>
 		
 		<!-- SOCIETIES -->
 		<dependency>
@@ -116,7 +117,7 @@
 			<scope>test</scope>
 		</dependency>
 		
-		
+	
 
 	</dependencies>
 	<build>

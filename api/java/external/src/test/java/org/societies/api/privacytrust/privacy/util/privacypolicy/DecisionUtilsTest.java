@@ -48,7 +48,7 @@ public class DecisionUtilsTest {
 		// -- Empty Privacy Policy
 		decision1 = Decision.DENY;
 		decision2 = Decision.INDETERMINATE;
-		notDecision = new RequestPolicy();
+	
 		assertTrue("Same empty decision should be equal", DecisionUtils.equal(decision1, decision1));
 		// -- Privacy Policy
 		assertTrue("Same decision should be equal", DecisionUtils.equal(decision1, decision1));

@@ -39,7 +39,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
+//import org.hibernate.SessionFactory;
 import org.jabber.protocol.pubsub.Options;
 import org.jabber.protocol.pubsub.Pubsub;
 import org.jabber.protocol.pubsub.owner.Configure;
@@ -82,15 +82,16 @@ public class PubsubServiceRouter implements IFeatureServer {
 	private PubsubService impl;
 
 	public PubsubServiceRouter(ICommManager endpoint) {
-		init(endpoint, null);
+		init(endpoint);
 	}
 	
-	private void init(ICommManager endpoint, SessionFactory sf) {
+	
+	private void init(ICommManager endpoint) {
 		this.endpoint = endpoint;
-		if (sf==null)
+		//if (sf==null)
 			impl = new PubsubServiceImpl(endpoint);
-		else
-			impl = new PubsubServiceImpl(endpoint,sf);
+		//else
+		//	impl = new PubsubServiceImpl(endpoint,sf);
 		try {
 			endpoint.register(this); // TODO unregister??
 		} catch (CommunicationException e) {
@@ -98,10 +99,11 @@ public class PubsubServiceRouter implements IFeatureServer {
 		}
 	}
 
+	/*
 	public PubsubServiceRouter(ICommManager endpoint, SessionFactory sf) {
 		init(endpoint, sf);
 	}
-
+*/
 	@Override
 	public List<String> getXMLNamespaces() {
 		return NAMESPACES;

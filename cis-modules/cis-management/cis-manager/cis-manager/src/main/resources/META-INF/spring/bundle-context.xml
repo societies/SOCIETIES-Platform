@@ -20,20 +20,9 @@
 	<context:annotation-config />
 
 	<tx:annotation-driven />
-	<bean id="ServiceRegPropConfig"
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="ignoreResourceNotFound" value="true"></property>
-		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
-		<property name="locations">
-			<list>
-			<!-- 	<value>classpath:META-INF/spring/derby_database.properties</value> -->
-			    <value>classpath:META-INF/spring/org.societies.local.properties</value>
-				<value>file:${CONFIG_DIR}/org.societies.platform.properties</value>
-			</list>
-		</property>	
-	</bean>
+ <context:property-placeholder properties-ref="userConfig"/>
 
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean" >
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean" >
         <property name="dataSource" ref="dataSource" />
         <property name="annotatedClasses" >
             <list>
@@ -51,11 +40,6 @@
         <property name="hibernateProperties" >
             <props>
                 <prop key="hibernate.show_sql" >${show_sql}</prop>
-                <prop key="hibernate.cache.use_second_level_cache">false</prop>
-                <prop key="hibernate.hbm2ddl.auto">${hbm2ddl.auto}</prop>
-                <prop key="hibernate.format_sql">${format_sql}</prop>
-                <prop key="hibernate.query.factory_class">org.hibernate.hql.classic.ClassicQueryTranslatorFactory</prop>
-
             </props>
         </property>
     </bean>
@@ -63,7 +47,7 @@
     <!-- enable the configuration of transactional behavior based on annotations -->
     <tx:annotation-driven transaction-manager="transactionManager" />
 
-    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" >
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager" >
 		<property name="sessionFactory" ref="sessionFactory" />
     </bean>
     

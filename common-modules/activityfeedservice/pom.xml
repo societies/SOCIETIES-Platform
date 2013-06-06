@@ -62,9 +62,16 @@
             <scope>provided</scope>
         </dependency>
 
+       <dependency> 
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
-            <groupId>org.societies</groupId>
-            <artifactId>hibernate_classes</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${spring.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -74,6 +81,13 @@
             <scope>provided</scope>
         </dependency>
 
+ 		<dependency>
+            <groupId>org.societies</groupId>
+            <artifactId>common-ext-platform-libs</artifactId>
+            <scope>provided</scope>
+            <version>${release.version}</version>
+        </dependency>
+        
         <dependency>
             <groupId>org.societies.api.internal</groupId>
             <artifactId>societies-api-internal</artifactId>
@@ -87,12 +101,8 @@
         </dependency>
 
 
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20090211</version>
-        </dependency>
-
+ 	
+        
         <dependency>
             <groupId>org.societies.platform</groupId>
             <artifactId>socialdata</artifactId>
@@ -109,7 +119,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>org.springframework.test</artifactId>
-            <version>3.0.5.RELEASE</version>
+            <version>${spring.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -167,7 +177,9 @@
                             org.societies.activity.model,
                             org.societies.activity.model.*
                         </Export-Package>
-                        <Import-Package>org.hibernate.proxy;resolution:=optional,*;resolution:=optional</Import-Package>
+                        <Import-Package>org.hibernate.proxy;resolution:=optional,
+                        org.hibernate.cache;resolution:=optional,
+                        *;resolution:=optional</Import-Package>
                     </instructions>
                 </configuration>
             </plugin>

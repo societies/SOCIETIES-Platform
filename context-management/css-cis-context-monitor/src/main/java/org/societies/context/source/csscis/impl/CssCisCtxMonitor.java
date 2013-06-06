@@ -70,7 +70,6 @@ import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.css.directory.CssFriendEvent;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
@@ -81,7 +80,6 @@ import org.springframework.stereotype.Service;
  * @since 1.0
  */
 @Service
-@Lazy(false)
 public class CssCisCtxMonitor extends EventListener implements Subscriber {
 
 	/** The logging facility. */

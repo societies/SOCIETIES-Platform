@@ -78,11 +78,11 @@
 			<scope>provided</scope>
 		</dependency>
 
-				
+			
 		<dependency>
-			<groupId>org.springframework.osgi</groupId>
-			<artifactId>org.springframework.osgi.core</artifactId>
-			<version>1.2.1</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.2</version>
 			<scope>provided</scope>
 		</dependency>
 		
@@ -94,9 +94,24 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.test</artifactId>
-			<version>3.0.5.RELEASE</version>
+			<version>${spring.version}</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.enterprise</artifactId>
+			<version>4.2.0</version>
+			<scope>provided</scope>
+		</dependency>
+            
+            <dependency>
+	<groupId>org.eclipse.osgi</groupId>
+	<artifactId>org.eclipse.osgi.services</artifactId>
+	<version>3.2.100.v20100503</version>
+	<scope>provided</scope>
+</dependency>
+            
 	</dependencies>
 	<build>
 		<plugins>
@@ -108,7 +123,7 @@
 					<instructions>
 						<Bundle-Activator></Bundle-Activator>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<Embed-Transitive>true</Embed-Transitive>
+						<Embed-Transitive>false</Embed-Transitive>
 						<Import-Package>*;resolution:=optional</Import-Package>
 					</instructions>
 				</configuration>

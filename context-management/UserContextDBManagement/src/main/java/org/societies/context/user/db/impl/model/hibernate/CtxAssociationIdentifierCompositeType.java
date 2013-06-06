@@ -31,10 +31,12 @@ import java.sql.SQLException;
 
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.type.Type;
 import org.hibernate.usertype.CompositeUserType;
 import org.societies.api.context.model.CtxAssociationIdentifier;
+import org.hibernate.type.StandardBasicTypes;
+
 
 /**
  * Describe your class here...
@@ -48,7 +50,7 @@ private static final Class<CtxAssociationIdentifier> CTX_ASSOCIATION_ID_CLASS = 
 	
 	private static final String[] PROPERTY_NAMES = { "owner_id", "type", "object_number" };
 	
-	private static final Type[] PROPERTY_TYPES = { Hibernate.STRING, Hibernate.STRING, Hibernate.LONG };
+	private static final Type[] PROPERTY_TYPES = { StandardBasicTypes.STRING, StandardBasicTypes.STRING, StandardBasicTypes.LONG };
 
 	/*
 	 * @see org.hibernate.usertype.CompositeUserType#assemble(java.io.Serializable, org.hibernate.engine.SessionImplementor, java.lang.Object)
@@ -167,9 +169,9 @@ private static final Class<CtxAssociationIdentifier> CTX_ASSOCIATION_ID_CLASS = 
 	public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor session, Object owner)
 			throws HibernateException, SQLException {
 		
-		final String ownerId = (String) Hibernate.STRING.nullSafeGet(rs, names[0]);
-		final String type = (String) Hibernate.STRING.nullSafeGet(rs, names[1]);
-		final Long objectNumber = (Long) Hibernate.LONG.nullSafeGet(rs, names[2]);
+		final String ownerId = (String) StandardBasicTypes.STRING.nullSafeGet(rs, names[0]);
+		final String type = (String) StandardBasicTypes.STRING.nullSafeGet(rs, names[1]);
+		final Long objectNumber = (Long) StandardBasicTypes.LONG.nullSafeGet(rs, names[2]);
 		
 		if (ownerId == null || type == null || objectNumber == null)
 			return null;
@@ -186,9 +188,9 @@ private static final Class<CtxAssociationIdentifier> CTX_ASSOCIATION_ID_CLASS = 
 		
 		final CtxAssociationIdentifier id = (CtxAssociationIdentifier) value;
 		
-		Hibernate.STRING.nullSafeSet(st, id.getOwnerId(), index);
-		Hibernate.STRING.nullSafeSet(st, id.getType(), index + 1);
-		Hibernate.LONG.nullSafeSet(st, id.getObjectNumber(), index + 2);
+		StandardBasicTypes.STRING.nullSafeSet(st, id.getOwnerId(), index);
+		StandardBasicTypes.STRING.nullSafeSet(st, id.getType(), index + 1);
+		StandardBasicTypes.LONG.nullSafeSet(st, id.getObjectNumber(), index + 2);
 	}
 
 	/* (non-Javadoc)

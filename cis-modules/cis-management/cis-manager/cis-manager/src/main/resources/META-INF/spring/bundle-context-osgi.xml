@@ -7,6 +7,13 @@
                       http://www.springframework.org/schema/osgi-compendium 
                       http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium-1.2.xsd">
 
+
+	<!-- Load user.properties with default values -->
+	 
+	<osgi-compendium:cm-properties id="userConfig" persistent-id="org.societies.platform">
+    	<prop key="userDir">config</prop>
+    </osgi-compendium:cm-properties>
+    
 	<!-- definitions using elements of the osgi namespace can be included in 
 		this file. There is no requirement to keep these definitions in a separate 
 		file if you do not want to. The rationale for keeping these definitions separate 

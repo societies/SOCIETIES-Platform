@@ -26,7 +26,6 @@ package org.societies.api.context.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
 /**

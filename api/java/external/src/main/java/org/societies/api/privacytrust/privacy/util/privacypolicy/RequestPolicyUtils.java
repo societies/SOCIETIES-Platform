@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.util.RequestorUtils;
@@ -36,8 +35,6 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyTypeConstants;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 
 /**
  * Utility class to manage RequestPolicy bean

@@ -51,11 +51,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.ElementCollection;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.annotations.CollectionOfElements;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.client.ActivityFeedClient;
@@ -234,7 +235,7 @@ public class Cis implements IFeatureServer, ICisOwned {
 	//@Transient
 	//Set<MembershipCriteriaImp> cisCriteria = null;
 	
-	@CollectionOfElements(targetElement = java.lang.String.class,fetch=FetchType.EAGER)
+	@ElementCollection
 	@CollectionTable(name="org_societies_cis_manager_Cis_criteria",joinColumns = @JoinColumn(name = "cis_id"))
 	@Column(name="criteria",length=500)
 	public Set<String> membershipCritOnDb;// we will store it in the db as "context,rank,operator,value1,value2"
