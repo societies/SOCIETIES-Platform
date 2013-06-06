@@ -113,6 +113,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.societies.personalisation</groupId>
+			<artifactId>CACIDiscovery</artifactId>
+			<version>${version.pm}</version>
+		</dependency>
+		
+			<dependency>
+			<groupId>org.societies.personalisation</groupId>
 			<artifactId>CRISTUserIntentTaskManager</artifactId>
 			<version>${version.pm}</version>
 		</dependency>

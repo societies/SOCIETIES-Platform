@@ -28,45 +28,36 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.societies.personalisation</groupId>
+	<groupId>org.societies.orchestration</groupId>
 	<artifactId>builder</artifactId>
-	<name>Personalisation Builder</name>
+	<name>ICO Builder</name>
 	<packaging>pom</packaging>
 	<version>${version.pt}</version>
 	<developers>
 	    <developer>
-	      <name>Elizabeth Papadopoulou</name>
-	      <email>E.Papadopoulou@hw.ac.uk</email>
-	      <organization>HWU</organization>
-	      <organizationUrl>http://www.hw.ac.uk/</organizationUrl>
+	      <name>Bjørn Magnus Mathisen</name>
+	      <email>bjornmagnus.mathisen@sintef.no</email>
+	      <organization>SINTEF</organization>
+	      <organizationUrl>http://www.sintef.no/</organizationUrl>
 	      <roles>
-	        <role>Senior Developer</role>
+	        <role>developer</role>
+	        <role>owner</role>
 	      </roles>
-	      <timezone>+0</timezone>
+	      <timezone>+1</timezone>
 	    </developer>
 	</developers>
 
 	<!-- All builder projects should inherit from version-parent -->
 	<parent>
 		<groupId>org.societies</groupId>
-		<artifactId>spring-osgi-parent</artifactId>
+		<artifactId>version-parent</artifactId>
 		<version>RELEASE</version>
 	</parent>
 	
 	<modules>
-		<module>Personalisation-API</module>
-		<module>PersonalisationManager</module>
-		<module>CAUITaskManager</module>
-		<module>CAUIDiscovery</module>
-		<module>CAUIPrediction</module>
-		<module>CACIDiscovery</module>
-		<module>UserPreferenceManagement</module>
-		<module>UserPreferenceLearning</module>
-		<module>DIANNE</module>
-		<module>CRISTUserIntentDiscovery</module>
-		<module>CRISTUserIntentPrediction</module>
-		<module>CRISTUserIntentTaskManager</module>
-		<module>Personalisation-Bundle</module>
-		<module>CommunityPreferenceManagement</module>
+		<module>API</module>
+		<module>CISDataCollector</module>
+		<!-- <module>CSSDataCollector</module> does not seem to work yet -->
+		<module>CPA</module>
 	</modules>
 </project>

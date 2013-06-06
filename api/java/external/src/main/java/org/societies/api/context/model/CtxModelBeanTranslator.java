@@ -366,16 +366,10 @@ public final class CtxModelBeanTranslator {
 		// Handle value
 		if (bean.getStringValue() != null)
 			object.setValue(bean.getStringValue());
-		else if (bean.getIntegerValue() != null)
-			if (bean.getIntegerValue() == -1)
-				object.setValue(null);
-			else
-				object.setValue(bean.getIntegerValue());
-		else if (bean.getDoubleValue() != null)
-			if (bean.getDoubleValue() == -1.0)
-				object.setValue(null);
-			else
-				object.setValue(bean.getDoubleValue());
+		else if (bean.getIntegerValue() != null || bean.getIntegerValue() != -1)
+			object.setValue(bean.getIntegerValue());
+		else if (bean.getDoubleValue() != null || bean.getDoubleValue() == -1.0)
+			object.setValue(bean.getDoubleValue());
 		else if (bean.getBinaryValue() != null) {
 			byte[] minBinaryValue = new byte[] {Byte.MIN_VALUE};
 			if (bean.getBinaryValue() == minBinaryValue)
