@@ -3,8 +3,10 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>bit.userfeedback</artifactId>
-    <name>User Feedback Integration Test</name>
+
+    <groupId>org.societies.integration.test</groupId>
+    <artifactId>bit.userfeedback.2074</artifactId>
+    <name>#2074 User Feedback Integration Test</name>
     <packaging>bundle</packaging>
     <version>${release.version}</version>
 
