@@ -32,7 +32,7 @@ public class CACICommunityMembershipChangeMonitor implements CtxChangeEventListe
 	private ICommManager commMgr;
 	private final Set<String> communities = new CopyOnWriteArraySet<String>();
 
-	
+
 	@Autowired (required=true)
 	public CACICommunityMembershipChangeMonitor(ICtxBroker ctxBrok, ICommManager commMngr) throws Exception{
 		this.commMgr = commMngr;
@@ -45,22 +45,24 @@ public class CACICommunityMembershipChangeMonitor implements CtxChangeEventListe
 		//fetch my CSS Entity
 		IndividualCtxEntity ownerEnt = ctxBrok.retrieveIndividualEntity(this.ownerId).get();
 
-		//fetch OWNS communities
-		Set<CtxAssociationIdentifier> ownsCISsSet = ownerEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF);
-		// TODO The "IS_MEMBER_OF will change in "OWNS_COMMUNITIES"
+		//fetch is_Member_of association
+		Set<CtxAssociationIdentifier> isMemberOfCISsSet = ownerEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF);
 
-		if (ownsCISsSet.isEmpty()){
-			LOG.error("Could not initialise: ownsCISs association is null");
-			throw new IllegalStateException("Could not initialise: ownsCISs association is null");
+
+		if (isMemberOfCISsSet.isEmpty()){
+			LOG.error("Could not initialise: is_member_of_CISs association is null");
+			throw new IllegalStateException("Could not initialise: is_member_of_CISs association is null");
 		}
 
-		CtxAssociationIdentifier ownsCISsID = ownsCISsSet.iterator().next();
+		CtxAssociationIdentifier isMemberCISsID = isMemberOfCISsSet.iterator().next();
 		if (LOG.isInfoEnabled())
-			LOG.info("Registering for context changes related to CSS OWNS_COMMUNITIES association '"
+			LOG.info("Registering for context changes related to CSS is_member_of association '"
 					+ ownerId + "'");
-		ctxBroker.registerForChanges(this, ownsCISsID);
+		ctxBroker.registerForChanges(this, isMemberCISsID);
 
-		CtxAssociation ownsCISsAssoc = (CtxAssociation) ctxBrok.retrieve(ownsCISsID).get();
+
+		/*
+		CtxAssociation ownsCISsAssoc = (CtxAssociation) ctxBrok.retrieve(isMemberCISsID).get();
 		Set<CtxEntityIdentifier> communitiesEntitiesId = ownsCISsAssoc.getChildEntities();
 
 		for (CtxEntityIdentifier comEntityId:communitiesEntitiesId){
@@ -71,10 +73,67 @@ public class CACICommunityMembershipChangeMonitor implements CtxChangeEventListe
 		}
 		if (LOG.isDebugEnabled())
 			LOG.debug("communities=" + communities);	 
+*/
 	}
 
-	//end of constructor
+	
+	
+	
+	@Override
+	public void onCreation(CtxChangeEvent event) {
+		// TODO Auto-generated method stub	
+	}
 
+	@Override
+	public void onUpdate(CtxChangeEvent event) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onModification(CtxChangeEvent event) {
+		if (CtxAssociationTypes.IS_MEMBER_OF.equals(event.getId().getType())) // TODO change OWNS_COMMUNITIES
+			LOG.info("joined cis event received : event.getId(): "+ event.getId() + " --- event.getSource():"+ event.getSource());
+			this.executorService.execute(new CssJoinedCommunityHandler(event.getId()));
+
+	}
+
+	@Override
+	public void onRemoval(CtxChangeEvent event) {
+		// TODO Auto-generated method stub
+
+	}
+	
+
+
+	
+	
+	private class CssJoinedCommunityHandler implements Runnable {
+
+		private final CtxIdentifier ctxId;
+		private CssJoinedCommunityHandler(CtxIdentifier ctxId) {
+
+			this.ctxId = ctxId;
+		}
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+		}
+	}
+
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	//end of constructor
+	/*
 	private void registerMembershipChanges(IIdentity cisId) {
 
 		CtxEntityIdentifier communityEntId;
@@ -103,6 +162,8 @@ public class CACICommunityMembershipChangeMonitor implements CtxChangeEventListe
 		}
 
 	}
+
+
 	private class CommunityHasMembersListener implements CtxChangeEventListener {
 		private final CtxEntityIdentifier communityId;
 
@@ -110,6 +171,7 @@ public class CACICommunityMembershipChangeMonitor implements CtxChangeEventListe
 
 			this.communityId = communityId;
 		}
+
 
 		@Override
 		public void onCreation(CtxChangeEvent event) {
@@ -143,44 +205,14 @@ public class CACICommunityMembershipChangeMonitor implements CtxChangeEventListe
 		}
 
 	}
-	@Override
-	public void onCreation(CtxChangeEvent event) {
-		// TODO Auto-generated method stub	
-	}
 
-	@Override
-	public void onUpdate(CtxChangeEvent event) {
-		// TODO Auto-generated method stub
 
-	}
 
-	@Override
-	public void onModification(CtxChangeEvent event) {
-		if (CtxAssociationTypes.IS_MEMBER_OF.equals(event.getId().getType())) // TODO change OWNS_COMMUNITIES
-			this.executorService.execute(new UserOwnsCommunitiesHandler(event.getId()));
+*/
+	
 
-	}
-
-	@Override
-	public void onRemoval(CtxChangeEvent event) {
-		// TODO Auto-generated method stub
-
-	}
-
-	private class UserOwnsCommunitiesHandler implements Runnable {
-
-		private final CtxIdentifier ctxId;
-		private UserOwnsCommunitiesHandler(CtxIdentifier ctxId) {
-
-			this.ctxId = ctxId;
-		}
-
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-		}
-	}
-
+		
+	
 	private class CommunityHasMembersHandler implements Runnable {
 		private final CtxEntityIdentifier communityEntId;
 
@@ -212,6 +244,8 @@ public class CACICommunityMembershipChangeMonitor implements CtxChangeEventListe
 	}
 
 
+
+	
 
 
 }

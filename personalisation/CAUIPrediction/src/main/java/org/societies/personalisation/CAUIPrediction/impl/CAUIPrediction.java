@@ -163,7 +163,17 @@ public class CAUIPrediction implements ICAUIPrediction{
 	// constructor
 	public void initialiseCAUIPrediction(){
 		LOG.info("CAUIPrediction initialised");
+		LOG.info("registerForNewUiModelEvent");
 		registerForNewUiModelEvent();
+	
+		try {
+			LOG.info("joinMon");
+			CommunityJoinMonitor joinMon = new CommunityJoinMonitor(this.ctxBroker ,this.commsMgr);
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public CAUIPrediction(){

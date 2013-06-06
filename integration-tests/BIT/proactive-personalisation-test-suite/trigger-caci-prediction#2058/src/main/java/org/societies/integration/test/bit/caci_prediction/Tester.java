@@ -32,6 +32,7 @@ import java.util.ArrayList;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,7 +45,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
@@ -98,6 +101,8 @@ public class Tester {
 	private RequestorService requestorService = null;
 	private IIdentity serviceIdentity = null;
 	
+	public IIdentity cisID = null;
+	
 	@Before
 	public void setUp(){
 		
@@ -125,7 +130,7 @@ public class Tester {
 		LOG.info("Start testing ........... " + localid+" "+localid.getJid());
 
 
-		if(localid.getJid().equals(emmaStringID)) createCAUIEmma();
+		//if(localid.getJid().equals(emmaStringID)) createCAUIEmma();
 		if(localid.getJid().equals(uniStringID)) createCAUIUni();
 	
 	}
@@ -133,6 +138,7 @@ public class Tester {
 
 	// runs only on uni node
 	// caci discovery 
+	
 	@Test
 	public void retrieveCAUIModels(){
 
@@ -151,7 +157,7 @@ public class Tester {
 					UserIntentModelData model = retrieveCAUIAttribute(uniStringID);
 					Thread.sleep(5000);
 					if (model != null){
-						LOG.info(" Model UNI retrieved "+ model.getActionModel() );
+						LOG.info(" Model CAUI UNI retrieved "+ model.getActionModel() );
 						modelCreated = true;
 					} else LOG.info(" Model not retrieved/created yet " + i);
 
@@ -162,24 +168,58 @@ public class Tester {
 			}
 
 			LOG.info(" retrieving emma model" );
-			UserIntentModelData modelEmma = retrieveCAUIAttribute(emmaStringID);
-			LOG.info(" model EMMA retrieved : " +modelEmma.getActionModel() );
+		//	UserIntentModelData modelEmma = retrieveCAUIAttribute(emmaStringID);
+		//	LOG.info(" model EMMA retrieved : " +modelEmma.getActionModel() );
 		}
 	}
 
 
-	
-	@Test
-	public void createCACIModel(){
-		
-		LOG.info(" caci Discovery Service : " +this.caciDiscovery);
-		this.caciDiscovery.generateNewCommunityModel();
-		
-	}
 
 	
 	
+	@Test
+	public void TestCreateCIS(){
+		
+		LOG.info(" createCIS : " );
+		
+		
+		try {
+			Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> ();
+			LOG.info("*** trying to create cis:");
+			ICisOwned cisOwned = this.cisManager.createCis("testCIS11", "cisType", cisCriteria, "nice CIS").get();
+			LOG.info("*** cis created: "+cisOwned.getCisId());
+
+			LOG.info("*** cisOwned " +cisOwned);
+			LOG.info("*** cisOwned.getCisId() " +cisOwned.getCisId());
+			String cisIDString = cisOwned.getCisId();
+
+			cisID = this.commManager.getIdManager().fromJid(cisIDString);
+		
+			LOG.info("*** cisID " +cisID);
+			
+			LOG.info("*** waiting *****" );
+			Thread.sleep(10000);
+		
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	
+		
+		LOG.info(" caci Discovery Service : " +this.caciDiscovery);
+		LOG.info("create caci" +this.cisID);
+		this.caciDiscovery.generateNewCommunityModel(this.cisID);
+	
+	
+	
+	
+	}	
+	
+
 	
 	
 	public UserIntentModelData retrieveCAUIAttribute(String targetID){
