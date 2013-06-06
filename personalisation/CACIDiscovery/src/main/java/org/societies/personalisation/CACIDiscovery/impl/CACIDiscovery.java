@@ -62,10 +62,17 @@ public class CACIDiscovery implements ICACIDiscovery{
 	private ICtxBroker ctxBroker;
 	private ICommManager commsMgr;
 
+	private IIdentity cisIdentifier ;
+	
+	
 	public CACIDiscovery(){
 		//cauiTaskManager = new CAUITaskManager();	
 	}
 
+	
+	public void initialiseCACIDiscovery(){
+		
+	}
 
 	public ICAUITaskManager getCauiTaskManager() {
 		//System.out.println(this.getClass().getName()+": Return cauiTaskManager");
@@ -97,6 +104,21 @@ public class CACIDiscovery implements ICACIDiscovery{
 		return commsMgr;
 	}
 
+	
+	@Override
+	public void generateNewCommunityModel(IIdentity cisId) {
+				
+		this.cisIdentifier = cisId;
+		
+		LOG.info("Discovering new CACI model for "+ this.cisIdentifier);
+		
+		List<UserIntentModelData> userModelList = new ArrayList<UserIntentModelData>();
+		userModelList = retrieveUIModels(cisId);
+		
+		if(userModelList.size()>0){
+			generateNewCommunityModel(userModelList);	
+		}
+	}
 
 
 
@@ -134,7 +156,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 		this.printCACIModel(communityActionsMap);		
 		//		printModels(userModelList);
 
-		
+
 		int i =0;
 		for(UserIntentModelData userModel : userModelList){
 			i++;
@@ -144,7 +166,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 
 			for (IUserIntentAction sourceUserAct  :uiModelActions.keySet()){
 				System.out.println("sourceUserAct " +sourceUserAct);
-				
+
 				//iterate through commActions and find a commAction similar with user action
 				for(IUserIntentAction sourceComAct : communityActionsMap.keySet()){
 
@@ -154,73 +176,66 @@ public class CACIDiscovery implements ICACIDiscovery{
 						// translate targets to commAct ?
 						HashMap<IUserIntentAction,Double> targetComActionNew =  translateUsertoComActionMap(translationMap, targetUserActions);
 						System.out.println("targetComActionNew " +targetComActionNew);
-						
+
 						// if null or map is empty
 						if(communityActionsMap.get(sourceComAct) == null || communityActionsMap.get(sourceComAct).size() == 0){
 							communityActionsMap.put(sourceComAct, targetComActionNew);
 
 						} if(communityActionsMap.get(sourceComAct).size() >0 ){
 							HashMap<IUserIntentAction,Double> targetComActionExisting = communityActionsMap.get(sourceComAct);
-						
+
 							HashMap<IUserIntentAction,Double> updatedTargetComMap = mergeTargetMaps(targetComActionNew,targetComActionExisting);
 							communityActionsMap.put(sourceComAct, updatedTargetComMap);
 						}
-
 					}
-
 				}
 			}
 			this.printCACIModel(communityActionsMap);
 		}
-	
+
 		this.printCACIModel(communityActionsMap);
 		UserIntentModelData communityModel = new UserIntentModelData();
 		communityModel.setActionModel(communityActionsMap);
-		storeModelCtxDB(communityModel);
 		
-	
+		storeModelCtxDB(communityModel);
 	}
 
-	
+
 	/*
 	 * store model to ctx DB as a community ctx Attribute of community Entity defined by cis
 	 */
-	
-	private CtxAttribute storeModelCtxDB(UserIntentModelData modelData){
 
-		CtxAttribute ctxAttrCAUIModel = null;
+	private CtxAttribute storeModelCtxDB(UserIntentModelData modelData){
+		
+		if(modelData.getActionModel().isEmpty()) {
+			LOG.info("No community actions in CACI model , couldn't store model to Ctx DB");
+			return null;
+		}
+		
+		if( this.cisIdentifier == null) {
+			LOG.info("CIS identifiers is not defined");
+			return null;
+		} 		
+		
+		CtxAttribute ctxAttrCACIModel = null;
 		try {
 			byte[] binaryModel = SerialisationHelper.serialise(modelData);
 
-			//CtxEntity operator = ctxBroker.retrieveCssOperator().get();
-
-			final INetworkNode cssNodeId = commsMgr.getIdManager().getThisNetworkNode();
-
-			final String cssOwnerStr = cssNodeId.getBareJid();
-			IIdentity cssOwnerId = commsMgr.getIdManager().fromJid(cssOwnerStr);
-
-			//LOG.info("cssOwnerId "+cssOwnerId);
-			IndividualCtxEntity operator = ctxBroker.retrieveIndividualEntity(cssOwnerId).get();
-			//LOG.info("discovery operator retrieved "+operator);
+			CtxEntityIdentifier communityEntID = this.ctxBroker.retrieveCommunityEntityId(this.cisIdentifier).get();
 			
 			CtxAttributeIdentifier uiModelAttributeId = null;
-		//	ctxAttrCAUIModel = lookupAttrHelp(CtxAttributeTypes.CAUI_MODEL);
-			List<CtxIdentifier> ls = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
+			List<CtxIdentifier> ls = this.ctxBroker.lookup(communityEntID, CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
+			
 			if (ls.size()>0) {
 				uiModelAttributeId = (CtxAttributeIdentifier) ls.get(0);
+				ctxAttrCACIModel = ctxBroker.updateAttribute(uiModelAttributeId, binaryModel).get();
 			} else {
-				CtxAttribute attr = this.ctxBroker.createAttribute(operator.getId(), CtxAttributeTypes.CACI_MODEL).get();
+				CtxAttribute attr = this.ctxBroker.createAttribute(communityEntID, CtxAttributeTypes.CACI_MODEL).get();
 				uiModelAttributeId = attr.getId();
+				ctxAttrCACIModel = ctxBroker.updateAttribute(uiModelAttributeId, binaryModel).get();
 			}			
+			LOG.info("CACI Model stored in community ctx DB" + ctxAttrCACIModel.getId());
 			
-			if(uiModelAttributeId != null){
-
-				ctxAttrCAUIModel = ctxBroker.updateAttribute(uiModelAttributeId, binaryModel).get();
-			} else {
-				//store under community entity
-				ctxAttrCAUIModel = ctxBroker.updateAttribute(uiModelAttributeId, binaryModel).get();
-			}
-
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -230,17 +245,14 @@ public class CACIDiscovery implements ICACIDiscovery{
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
+		}  catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return ctxAttrCAUIModel;
+		return ctxAttrCACIModel;
 	}
-	
-		
+
+
 	protected CtxAttribute lookupAttrHelp(String type){
 		CtxAttribute ctxAttr = null;
 		try {
@@ -264,13 +276,13 @@ public class CACIDiscovery implements ICACIDiscovery{
 	}
 
 
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
 	/*
 	 * merges the target action transition probs
 	 */
@@ -285,7 +297,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 		}
 
 		for(IUserIntentAction newMapAction : targetComActionNew.keySet()){
-			
+
 			System.out.println("current Action " +newMapAction);
 			if(targetComActionExisting.get(newMapAction) != null){
 				System.out.println("result" +result);
@@ -293,16 +305,16 @@ public class CACIDiscovery implements ICACIDiscovery{
 				Double newTransProb = targetComActionNew.get(newMapAction);
 				Double updatedTrandProb = (existingTransProb+newTransProb);
 				result.put(newMapAction, updatedTrandProb);
-				
-				
+
+
 			} else  {
 				System.out.println("result" +result);
 				Double newTransProb = targetComActionNew.get(newMapAction);
 				result.put(newMapAction, newTransProb);
-				
+
 			}
-		//TODO fix probabilities 
-		// should sum to 1
+			//TODO fix probabilities 
+			// should sum to 1
 			for(IUserIntentAction actionTemp :result.keySet()){
 				Double currentProb = result.get(actionTemp);
 				result.put(actionTemp, currentProb/2);
@@ -559,14 +571,14 @@ public class CACIDiscovery implements ICACIDiscovery{
 		System.out.println("tranlationMap ends --- ");
 	}
 
-/*
+	/*
 	private void printModels(List<UserIntentModelData> modelList){
 
 		for(UserIntentModelData uimodel : modelList){
 			System.out.println(uimodel.getActionModel());
 		}
 	}
-*/
+	 */
 
 	private void printCACIModel(Map<IUserIntentAction, HashMap<IUserIntentAction,Double>> map){
 
@@ -581,26 +593,27 @@ public class CACIDiscovery implements ICACIDiscovery{
 	@Override
 	public void generateNewCommunityModel() {
 
+		
+		System.out.println("SERVICE CALLED ********* " );
+		
 	}
 
 
-	@Override
-	public void generateNewCommunityModel(IIdentity cisId) {
-		
+	private List<UserIntentModelData> retrieveUIModels (IIdentity cisId) {
+
 		List<UserIntentModelData> userModelList = new ArrayList<UserIntentModelData>();
-		
+
+		CtxEntityIdentifier commEntID;
 		try {
-			 CtxEntityIdentifier commEntID = this.ctxBroker.retrieveCommunityEntityId(cisId).get();
-			
+			commEntID = this.ctxBroker.retrieveCommunityEntityId(cisId).get();
 			CommunityCtxEntity commEnt = (CommunityCtxEntity) this.ctxBroker.retrieve(commEntID).get();
 			Set<CtxEntityIdentifier> membersIDSet = commEnt.getMembers();
-		
+
 			for(CtxEntityIdentifier entityId  : membersIDSet){
-				
+
 				List<CtxIdentifier> modelAttrIDList = this.ctxBroker.lookup(entityId, CtxModelType.ATTRIBUTE,CtxAttributeTypes.CAUI_MODEL).get();
-				
 				for(CtxIdentifier attrID : modelAttrIDList){
-					
+
 					CtxAttribute uiModelAttr = this.ctxBroker.retrieveAttribute((CtxAttributeIdentifier) attrID, false).get();	
 					if(uiModelAttr.getBinaryValue() != null){
 						UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
@@ -609,10 +622,6 @@ public class CACIDiscovery implements ICACIDiscovery{
 				}
 			}
 
-			if(userModelList.size()>0){
-				generateNewCommunityModel(userModelList);	
-			}
-					
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -629,9 +638,10 @@ public class CACIDiscovery implements ICACIDiscovery{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		 
-		 
-		
+
+
+		return userModelList;
 	}
+
 
 }

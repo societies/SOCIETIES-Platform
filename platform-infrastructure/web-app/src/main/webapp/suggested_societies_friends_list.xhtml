@@ -1,6 +1,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
@@ -18,97 +22,107 @@
             <div class="websearchbar">
                 <div class="websearchtitle">
                     <h4 class="form_title">Suggested Friends</h4>
+                    <p:commandButton value="Refresh" action="#{suggestedfriends.getsnsFriendes}"></p:commandButton>
+       	 			<br/> <br/>
                 </div>
-                <div class="groupsearch">
-                    <form action="" class="websearch-form frame nobtn rsmall">
-                        <input type="text" name="search" class="websearch-input" placeholder="Search for Friends..."/>
-                    </form>
+                
+                <div class="select-wrapper">
+                    <h6>Select a Filter option</h6>
+                	<select name="select" required="required">
+                                    <option value="0x0000000000">None</option>
+                                    <option value="0x0000000001">Facebook</option>
+                                    <option value="0x0000000010">Twitter</option>
+                                    <option value="0x0000000100">LinkedIn</option>
+                                    <option value="0x0000001000">FourSquare</option>
+                                    <option value="0x0000010000">Google+</option>
+                                    <option value="0x0000100000">CIS_MEMBERS_BIT</option>
+                                </select>
                 </div>
             </div>
         </section>
         <!-- Left Column -->
         <article id="left_col" class="grid_8">
             <section class="itemlist">
-                <header>
+                <header>Social Network Suggested Friends
                 </header>
                 <ol class="keyinfolist">
-                    <li class="keyinfo bypostauthor">
+                    <c:forEach items="#{suggestedfriends.snsFriendes}" var="snsFriend">
+    				    <li class="keyinfo bypostauthor">
                         <figure class="gravatar">
-                            <a class="friend_profile.xhtml"><img alt="" src="images/webprofile_pic_sample1.jpg"
-                                                                height="48" width="48"/></a>
-                            <a class="keyinfo-reply-link" href="friend_profile.xhtml">INFO</a>
+                            <a class="friend_profile.xhtml"><img alt="" src="images/profile_pic.png"
+                                                                height="58" width="58"/></a>
                         </figure>
                         <div class="keyinfo_content">
                             <div class="clearfix">
-                                <time datetime="2012-09-30T00:01Z"
-                                      class="keyinfo-meta keyinfometadata">Location, Sep 30, 2012 at 0:01 am
-                                </time>
                                 <br/>
-                                <cite class="author_name"><a href="profile.xhtml">Sara Weber</a></cite>
+                                <H6>Name:     #{snsFriend.getResultCssAdvertisementRecord().getName()}</H6> 								
+                                <H6>Identity: #{snsFriend.getResultCssAdvertisementRecord().getId()}</H6>
                             </div>
                             <div class="keyinfo_text">
-                                <p>Latest details... Aliquam risus elit, luctus vel, interdum vitae, malesuada eget, elit. Nulla vitae ipsum. Donec ligula ante, bibendum sit amet, elementum quis, viverra eu, ante. Fusce tincidunt. Mauris pellentesque, arcu eget feugiat accumsan, ipsum mi molestie orci, ut pulvinar sapien lorem nec dui.</p>
                             </div>
                         </div>
-                    </li>
-                    <li class="keyinfo">
+                        <c:if test="${snsFriend.status=='NEEDSRESP'}">
+                        	<p:commandButton value="Accept Friend Request" action="#{suggestedfriends.handlerequestaccept(snsFriend.getResultCssAdvertisementRecord().getId())}"/>
+		 					<p:commandButton value="Decline Friend Request" action="#{suggestedfriends.handlerequestdecline(snsFriend.getResultCssAdvertisementRecord().getId())}"/>
+		        		</c:if>
+		        		<c:if test="${snsFriend.status=='PENDING'}">
+		        			<p:commandButton value="Cancel Pending Friend Request" action="#{suggestedfriends.handlerequestcancelled(snsFriend.getResultCssAdvertisementRecord().getId())}"/> 
+		        		</c:if>
+		        		<c:if test="${snsFriend.status=='NOTREQUESTED'}">
+		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequest(snsFriend.getResultCssAdvertisementRecord().getId())}"/>        	       
+		        		</c:if>
+		        		<c:if test="${snsFriend.status=='DENIED'}">
+		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequest(snsFriend.getResultCssAdvertisementRecord().getId())}"/> 	       	       
+	        			</c:if>
+	        			<c:if test="${snsFriend.status=='CANCELLED'}">
+		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequest(snsFriend.getResultCssAdvertisementRecord().getId())}"/> 	       	       
+	        			</c:if>
+                        </li>
+                      </c:forEach>
+                </ol>
+                <div class="hr clearfix"></div>
+            </section>
+            <section class="itemlist">
+                <header>SOCIETIES Suggested Friends</header>
+                <ol class="keyinfolist">
+                    <c:forEach items="#{suggestedfriends.otherFriendes}" var="otherFriend">
+    				    <li class="keyinfo bypostauthor">
                         <figure class="gravatar">
-                            <img alt="" src="images/webprofile_pic_sample2.jpg" height="48" width="48"/>
-                            <a class="keyinfo-reply-link" href="">INFO</a>
+                            <a class="friend_profile.xhtml"><img alt="" src="images/launcher_societies.png"
+                                                                height="58" width="58"/></a>
                         </figure>
                         <div class="keyinfo_content">
                             <div class="clearfix">
-                                <time datetime="2012-09-30T00:01Z"
-                                      class="keyinfo-meta keyinfometadata">Location, Sep 30, 2012 at 0:01 am
-                                </time>
                                 <br/>
-                                <cite class="author_name"><a href="">Joe Bloggs</a></cite>
+                                <H6>Name:     #{otherFriend.getResultCssAdvertisementRecord().getName()}</H6> 								
+                                <H6>Identity: #{otherFriend.getResultCssAdvertisementRecord().getId()}</H6>
                             </div>
                             <div class="keyinfo_text">
-                                <p>Latest details... Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque orci velit, malesuada et varius ac, egestas eget nunc. Donec non porttitor massa.</p>
                             </div>
                         </div>
-                    </li>
-                    <li class="keyinfo bypostauthor">
-                        <figure class="gravatar">
-                            <img alt="" src="images/webprofile_pic_sample3.jpg" height="48" width="48"/>
-                            <a class="keyinfo-reply-link" href="">INFO</a>
-                        </figure>
-                        <div class="keyinfo_content">
-                            <div class="clearfix">
-                                <time datetime="2012-09-30T00:01Z"
-                                      class="keyinfo-meta keyinfometadata">Location, Sep 30, 2012 at 0:01 am
-                                </time>
-                                <br/>
-                                <cite class="author_name"><a href="">Jim Bloggs</a></cite>
-                            </div>
-                            <div class="keyinfo_text">
-                                <p>Latest details... Donec leo. Aliquam risus elit, luctus vel, interdum vitae, malesuada eget, elit. Nulla vitae ipsum. Donec ligula ante, bibendum sit amet, elementum quis, viverra eu, ante. Fusce tincidunt. Mauris pellentesque, arcu eget feugiat accumsan, ipsum mi molestie orci, ut pulvinar sapien lorem nec dui.</p>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="keyinfo bypostauthor">
-                        <figure class="gravatar">
-                            <img alt="" src="images/webprofile_pic_sample4.jpg" height="48" width="48"/>
-                            <a class="keyinfo-reply-link" href="">INFO</a>
-                        </figure>
-                        <div class="keyinfo_content">
-                            <div class="clearfix">
-                                <time datetime="2012-09-30T00:01Z"
-                                      class="keyinfo-meta keyinfometadata">Location, Sep 30, 2012 at 0:01 am
-                                </time>
-                                <br/>
-                                <cite class="author_name"><a href="">Mary Bloggs</a></cite>
-                            </div>
-                            <div class="keyinfo_text">
-                                <p>Latest details... Donec leo. Aliquam risus elit, luctus vel, interdum vitae, malesuada eget, elit. Nulla vitae ipsum. Donec ligula ante, bibendum sit amet, elementum quis, viverra eu, ante. Fusce tincidunt. Mauris pellentesque, arcu eget feugiat accumsan, ipsum mi molestie orci, ut pulvinar sapien lorem nec dui.</p>
-                            </div>
-                        </div>
-                    </li>
+                        <c:if test="${otherFriend.status=='NEEDSRESP'}">
+                        	<p:commandButton value="Accept Friend Request" action="#{suggestedfriends.handlerequestaccept(otherFriend.getResultCssAdvertisementRecord().getId())}"/>
+		 					<p:commandButton value="Decline Friend Request" action="#{suggestedfriends.handlerequestdecline(otherFriend.getResultCssAdvertisementRecord().getId())}"/>
+		        		</c:if>
+		        		<c:if test="${otherFriend.status=='PENDING'}">
+		        			<p:commandButton value="Cancel Pending Friend Request" action="#{suggestedfriends.handlerequestcancelled(otherFriend.getResultCssAdvertisementRecord().getId())}"/> 
+		        		</c:if>
+		        		<c:if test="${otherFriend.status=='NOTREQUESTED'}">
+		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequest(otherFriend.getResultCssAdvertisementRecord().getId())}"/>        	       
+		        		</c:if>
+		        		<c:if test="${otherFriend.status=='DENIED'}">
+		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequest(otherFriend.getResultCssAdvertisementRecord().getId())}"/> 	       	       
+	        			</c:if>
+	        			<c:if test="${otherFriend.status=='CANCELLED'}">
+		        			<p:commandButton value="Send Friend Request" action="#{suggestedfriends.sendfriendrequest(otherFriend.getResultCssAdvertisementRecord().getId())}"/> 	       	       
+	        			</c:if>
+                        </li>
+                      </c:forEach>
                 </ol>
                 <div class="hr clearfix"></div>
             </section>
         </article>
+        
         <!-- Right Column / Sidebar -->
         <aside id="sidebar_right" class="grid_4">
             <div class="sidebar_top_BG"></div>
@@ -117,31 +131,23 @@
                 <header>
                     <h3>Your friends...</h3>
                 </header>
-                <ul class="sidebar">
-                    <li><a href="">Tim Bloggs</a></li>
-                    <li><a href="">John Doe</a></li>
-                    <li><a href="">Jack Bloggs</a></li>
-                    <li><a href="">Sara Doe</a></li>
-                    <li><a href="">Ann Doe</a></li>
+       	 		<br/> <br/>
+                <ul>
+                	<ui:repeat value="#{suggestedfriends.friends}" var="friend">
+                		<li> #{friend.name}</li>
+                	</ui:repeat>
                 </ul>
             </section>
             <section>
                 <header>
-                    <h3>Other Activity</h3>
+                    <h3>CSS Activity</h3>
                 </header>
                 <div class="hr dotted clearfix"></div>
-                <ul class="contact_data">
-                    <li>
-                        <figure class="gravatar">
-                            <img alt="" src="images/webprofile_pic_sample4.jpg" height="48" width="48"/>
-                        </figure>
-                        <strong>Mary Bloggs</strong> dolor sit amet, consectetur adipiscing elit. Ipsum dolor sit amet, elit.
-                    </li>
-                </ul>
-                <ul class="contact_data">
-                    <li>Other Link - <a href="#">Link 1</a></li>
-                    <li>Other Link - <a href="#">Link 2</a></li>
-                    <li>Other Link - <a href="#">Link 3</a></li>
+       	 		<br/> <br/>
+       	 		<ul>
+                	<c:forEach items="#{suggestedfriends.activities}" var="MarshaledActivity">
+                		<li> #{MarshaledActivity.getVerb()}</li>
+                	</c:forEach>
                 </ul>
             </section>
             <div class="hr dotted clearfix"></div>

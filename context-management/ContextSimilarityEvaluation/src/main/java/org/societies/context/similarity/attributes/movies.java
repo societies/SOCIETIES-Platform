@@ -26,6 +26,8 @@ package org.societies.context.similarity.attributes;
 
 import java.util.HashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
@@ -41,6 +43,7 @@ public class movies {
 
 	private CtxAttributeTypes cat;
 	private GetContextData gcd;
+	private static final Logger LOG = LoggerFactory.getLogger(occupation.class);
 
 	public movies(){
 		gcd = new GetContextData();
@@ -59,20 +62,25 @@ public class movies {
 			String[] splitString = css.split(",");
 			//
 			for (String i : splitString){
+				LOG.info("EBOYLANTESTSTRINGMOV: " + i);
 				if (resultcount.containsKey(i)){
 					resultcount.put(i, resultcount.get(i) + 1);
 				} else {
 					resultcount.put(i, 1);
 				}
+				
 			}
 			//
 		}
-		
+		LOG.info("EBOYLANLOGFOOTPrint: " + resultcount.toString());
 		//analyse results
 		for (String k : resultcount.keySet()){
+			
 			float percent=(float)resultcount.get(k)/totalCount*100;
 			results.put(k, (double)percent);
+			LOG.info("EBOYLANMOVIEPERCENT: " + percent);
 		}
+		LOG.info("EBOYLANMOVIERESULT: " + results);
 		
 		return results;
 		//
