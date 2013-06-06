@@ -382,7 +382,7 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 	}*/
 	
 	@MediumTest
-	public void testUpdateAttribute() throws URISyntaxException, Exception{
+	public void testUpdateAttributeIntegerValue() throws URISyntaxException, Exception{
 //		this.testCompleted = false;
 		this.testDoneSignal = new CountDownLatch(1);
 		this.testStartTime = System.currentTimeMillis();
@@ -408,7 +408,7 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 			Log.d(LOG_TAG, "entityId.getString: " + entity.getId().getString());
 			CtxEntityIdentifierBean entityId = new CtxEntityIdentifierBean();
 			entityId.setString(entity.getId().getString());
-			this.ctxBrokerService.createAttribute(CLIENT_ID, requestor, entityId, "androidAttribute2");
+			this.ctxBrokerService.createAttribute(CLIENT_ID, requestor, entityId, "androidAttribute4");
 		} 		catch (Exception e) {
 			Log.e(LOG_TAG, "Failed to create attribute: " + e.getLocalizedMessage());
 		}
@@ -417,16 +417,103 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 		try {
 			Log.d(LOG_TAG, "attribute used to update: " + attribute);
 			Log.d(LOG_TAG, "attribute.getString: " + attribute.getId().getString());
-			attribute.setIntegerValue(123);
-			attribute.setDoubleValue(123.123);
+			attribute.setIntegerValue(321);
+			this.ctxBrokerService.update(CLIENT_ID, requestor, attribute);
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to update: " + e.getLocalizedMessage());
+		}
+
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
+	}	
+
+	@MediumTest	
+	public void testUpdateAttributeDouble() throws URISyntaxException, Exception{
+		this.testDoneSignal = new CountDownLatch(1);
+		this.testStartTime = System.currentTimeMillis();
+		this.testEndTime = this.testStartTime;
+
+		final RequestorBean requestor = new RequestorBean();
+		requestor.setRequestorId(this.REQUESTOR_ID);
+		
+		Log.d(LOG_TAG, "Requestor is: " + requestor.getRequestorId());
+		Log.d(LOG_TAG, "test retrieve start time: " + this.testStartTime);
+		try {
+			this.ctxBrokerService.createEntity(CLIENT_ID, requestor, "jane.societies.local", "androidEntity5");
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to create entity: " + e.getLocalizedMessage());
+		}
+
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
+		
+		this.testDoneSignal = new CountDownLatch(1);
+		try {
+			
+			Log.d(LOG_TAG, "entityId used to Create Attribute: " + entity);
+			Log.d(LOG_TAG, "entityId.getString: " + entity.getId().getString());
+			CtxEntityIdentifierBean entityId = new CtxEntityIdentifierBean();
+			entityId.setString(entity.getId().getString());
+			this.ctxBrokerService.createAttribute(CLIENT_ID, requestor, entityId, "androidAttribute5");
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to create attribute: " + e.getLocalizedMessage());
+		}
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
+		this.testDoneSignal = new CountDownLatch(1);
+		try {
+			Log.d(LOG_TAG, "attribute used to update: " + attribute);
+			Log.d(LOG_TAG, "attribute.getString: " + attribute.getId().getString());
+			attribute.setDoubleValue(12.123);
+			this.ctxBrokerService.update(CLIENT_ID, requestor, attribute);
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to update: " + e.getLocalizedMessage());
+		}
+
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
+	}
+
+	@MediumTest	
+	public void testUpdateAttributeOnlyBinary() throws URISyntaxException, Exception{
+		this.testDoneSignal = new CountDownLatch(1);
+		this.testStartTime = System.currentTimeMillis();
+		this.testEndTime = this.testStartTime;
+
+		final RequestorBean requestor = new RequestorBean();
+		requestor.setRequestorId(this.REQUESTOR_ID);
+		
+		Log.d(LOG_TAG, "Requestor is: " + requestor.getRequestorId());
+		Log.d(LOG_TAG, "test retrieve start time: " + this.testStartTime);
+		try {
+			this.ctxBrokerService.createEntity(CLIENT_ID, requestor, "jane.societies.local", "androidEntity6");
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to create entity: " + e.getLocalizedMessage());
+		}
+
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
+		this.testDoneSignal = new CountDownLatch(1);
+		try {
+			
+			Log.d(LOG_TAG, "entityId used to Create Attribute: " + entity);
+			Log.d(LOG_TAG, "entityId.getString: " + entity.getId().getString());
+			CtxEntityIdentifierBean entityId = new CtxEntityIdentifierBean();
+			entityId.setString(entity.getId().getString());
+			this.ctxBrokerService.createAttribute(CLIENT_ID, requestor, entityId, "androidAttribute6");
+		} 		catch (Exception e) {
+			Log.e(LOG_TAG, "Failed to create attribute: " + e.getLocalizedMessage());
+		}
+		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
+		this.testDoneSignal = new CountDownLatch(1);
+
+		try {
+			Log.d(LOG_TAG, "attribute used to update: " + attribute);
+			Log.d(LOG_TAG, "attribute.getString: " + attribute.getId().getString());
+			byte[] b1 = new byte[] {97, 98, 99};
+			attribute.setBinaryValue(b1);
 			this.ctxBrokerService.update(CLIENT_ID, requestor, attribute);
 		} 		catch (Exception e) {
 			Log.e(LOG_TAG, "Failed to retrieve: " + e.getLocalizedMessage());
 		}
 
 		assertTrue(this.testDoneSignal.await(DELAY, TimeUnit.MILLISECONDS));
-	}	
-	
+	}
 	
     /**
      * Create a broadcast receiver
