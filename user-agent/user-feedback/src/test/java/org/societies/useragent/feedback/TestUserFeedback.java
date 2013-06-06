@@ -129,7 +129,7 @@ public class TestUserFeedback extends TestCase {
         userFeedback.initialiseUserFeedback();
     }
 
-    public void getExplicitFB_sync_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+    public void testGetExplicitFB_sync_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
         ExpProposalContent content = new ExpProposalContent(
                 "Test proposal",
@@ -176,7 +176,7 @@ public class TestUserFeedback extends TestCase {
         Assert.assertEquals("Expected result bean to contain correct result", expectedResult, result.get().get(0));
     }
 
-    public void getExplicitFB_async_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+    public void testGetExplicitFB_async_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
         ExpProposalContent content = new ExpProposalContent(
                 "Test proposal",
@@ -211,7 +211,7 @@ public class TestUserFeedback extends TestCase {
         Assert.assertEquals("Expected result bean to contain correct result", expectedResult, result.get().get(0));
     }
 
-    public void getExplicitFB_callback_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+    public void testGetExplicitFB_callback_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
         ExpProposalContent content = new ExpProposalContent(
                 "Test proposal",
@@ -250,7 +250,7 @@ public class TestUserFeedback extends TestCase {
         Assert.assertEquals("Expected result bean to contain correct result", expectedResult, callback.getResult().get(0));
     }
 
-    public void getExplicitFB_callback_ignoresWrongResponses() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+    public void testGetExplicitFB_callback_ignoresWrongResponses() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
         ExpProposalContent content = new ExpProposalContent(
                 "Test proposal",
@@ -310,7 +310,7 @@ public class TestUserFeedback extends TestCase {
     }
 
 
-    public void getImplicitFB_sync_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+    public void testGetImplicitFB_sync_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
         ImpProposalContent content = new ImpProposalContent(
                 "Test proposal",
@@ -353,7 +353,7 @@ public class TestUserFeedback extends TestCase {
         Assert.assertEquals("Expected result bean to contain correct result", Boolean.TRUE, result.get());
     }
 
-    public void getImplicitFB_async_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+    public void testGetImplicitFB_async_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
         ImpProposalContent content = new ImpProposalContent(
                 "Test proposal",
@@ -384,7 +384,7 @@ public class TestUserFeedback extends TestCase {
         Assert.assertEquals("Expected result bean to contain correct result", Boolean.TRUE, result.get());
     }
 
-    public void getImplicitFB_callback_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+    public void testGetImplicitFB_callback_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
         ImpProposalContent content = new ImpProposalContent(
                 "Test proposal",
@@ -418,7 +418,7 @@ public class TestUserFeedback extends TestCase {
         Assert.assertEquals("Expected result bean to contain correct result", Boolean.TRUE, callback.getResult());
     }
 
-    public void getImplicitFB_callback_ignoresWrongResponses() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+    public void testGetImplicitFB_callback_ignoresWrongResponses() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
         ImpProposalContent content = new ImpProposalContent(
                 "Test proposal",
@@ -474,7 +474,7 @@ public class TestUserFeedback extends TestCase {
     }
 
 
-    public void getPrivacyNegotiationFB_sync_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+    public void testGetPrivacyNegotiationFB_sync_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
         SecureRandom random = new SecureRandom();
 
@@ -527,7 +527,7 @@ public class TestUserFeedback extends TestCase {
 //        Assert.assertEquals("Expected result bean to contain correct result", expectedResult, result.get().get(0));
     }
 
-    public void getPrivacyNegotiationFB_async_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+    public void testGetPrivacyNegotiationFB_async_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
         SecureRandom random = new SecureRandom();
 
@@ -568,7 +568,7 @@ public class TestUserFeedback extends TestCase {
 //        Assert.assertEquals("Expected result bean to contain correct result", expectedResult, result.get().get(0));
     }
 
-    public void getPrivacyNegotiationFB_callback_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+    public void testGetPrivacyNegotiationFB_callback_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
         SecureRandom random = new SecureRandom();
 
@@ -612,7 +612,7 @@ public class TestUserFeedback extends TestCase {
 //        Assert.assertEquals("Expected result bean to contain correct result", expectedResult, result.get().get(0));
     }
 
-    public void getPrivacyNegotiationFB_callback_ignoresWrongResponses() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+    public void testGetPrivacyNegotiationFB_callback_ignoresWrongResponses() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
         SecureRandom random = new SecureRandom();
 
@@ -677,7 +677,7 @@ public class TestUserFeedback extends TestCase {
     }
 
 
-    public void getAccessControlFB_sync_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+    public void testGetAccessControlFB_sync_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
         final String requestId = UUID.randomUUID().toString();
 
@@ -726,7 +726,7 @@ public class TestUserFeedback extends TestCase {
 //        Assert.assertEquals("Expected result bean to contain correct result", expectedResult, result.get().get(0));
     }
 
-    public void getAccessControlFB_async_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+    public void testGetAccessControlFB_async_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
         final String requestId = UUID.randomUUID().toString();
 
@@ -763,7 +763,7 @@ public class TestUserFeedback extends TestCase {
 //        Assert.assertEquals("Expected result bean to contain correct result", expectedResult, result.get().get(0));
     }
 
-    public void getAccessControlFB_callback_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+    public void testGetAccessControlFB_callback_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
         final String requestId = UUID.randomUUID().toString();
 
@@ -803,7 +803,7 @@ public class TestUserFeedback extends TestCase {
 //        Assert.assertEquals("Expected result bean to contain correct result", expectedResult, result.get().get(0));
     }
 
-    public void getAccessControlFB_callback_ignoresWrongResponses() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+    public void testGetAccessControlFB_callback_ignoresWrongResponses() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
         final String requestId = UUID.randomUUID().toString();
         final String wrongID = UUID.randomUUID().toString();
