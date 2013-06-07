@@ -187,7 +187,7 @@ public abstract class AbstractSeleniumComponent {
             threadSleep();
         }
 
-        throw new NoSuchElementException("Element identified by [" + by.toString() + "] still visible after " + findTimeoutMillis + "ms");
+        throw new TimeoutException("Element identified by [" + by.toString() + "] still visible after " + findTimeoutMillis + "ms");
     }
 
     protected WebElement waitUntilFound(By by) {
@@ -229,7 +229,7 @@ public abstract class AbstractSeleniumComponent {
             threadSleep();
         }
 
-        throw new NoSuchElementException("Element identified by [" + by.toString() + "] still found after " + findTimeoutMillis + "ms");
+        throw new TimeoutException("Element identified by [" + by.toString() + "] still found after " + findTimeoutMillis + "ms");
     }
 
     protected List<WebElement> waitUntilElementsFound(By by) {
