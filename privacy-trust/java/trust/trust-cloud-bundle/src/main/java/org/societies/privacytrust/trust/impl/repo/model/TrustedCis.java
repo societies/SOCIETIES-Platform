@@ -26,16 +26,25 @@ package org.societies.privacytrust.trust.impl.repo.model;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Sort;
+import org.hibernate.annotations.SortType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
+import org.societies.privacytrust.trust.impl.evidence.repo.model.TrustEvidence;
 
 /**
  * This class represents trusted CISs. A <code>TrustedCis</code> object is
@@ -49,6 +58,7 @@ import org.societies.privacytrust.trust.api.model.ITrustedCss;
  */
 @Entity
 @org.hibernate.annotations.Entity(
+		dynamicInsert=true,
 		dynamicUpdate=true
 )
 @Table(
@@ -58,6 +68,21 @@ import org.societies.privacytrust.trust.api.model.ITrustedCss;
 public class TrustedCis extends TrustedEntity implements ITrustedCis {
 
 	private static final long serialVersionUID = -438368876927927076L;
+	
+	/** The trust evidence associated with the evaluated trust values of this CIS. */
+	@ManyToMany(
+			cascade = CascadeType.MERGE,
+			targetEntity = TrustEvidence.class,
+			fetch = FetchType.EAGER
+	)
+    @JoinTable(
+    		name = TableName.TRUSTED_CIS + "_evidence",
+    		joinColumns = { @JoinColumn(name = TableName.TRUSTED_CIS + "_id") },
+    		inverseJoinColumns = { @JoinColumn(name = 
+    		org.societies.privacytrust.trust.impl.evidence.repo.model.TableName.TRUST_EVIDENCE + "_id") }
+    )
+	@Sort(type=SortType.NATURAL)
+	private final SortedSet<ITrustEvidence> evidence = new TreeSet<ITrustEvidence>();
 	
 	/** The members of this trusted CIS. */
 	@ManyToMany(
@@ -89,6 +114,35 @@ public class TrustedCis extends TrustedEntity implements ITrustedCis {
 	public TrustedCis(final TrustedEntityId trustorId, final TrustedEntityId trusteeId) {
 		
 		super(trustorId, trusteeId);
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getEvidence()
+	 */
+	@Override
+	public SortedSet<ITrustEvidence> getEvidence() {
+		
+		return this.evidence;
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#addEvidence(org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence)
+	 */
+	@Override
+	public void addEvidence(final ITrustEvidence evidence) {
+		
+		if (!this.evidence.contains(evidence))
+			this.evidence.add(evidence);
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#removeEvidence(org.societies.api.privacytrust.trust.model.TrustEvidence)
+	 */
+	@Override
+	public void removeEvidence(final ITrustEvidence evidence) {
+		
+		if (this.evidence.contains(evidence))
+			this.evidence.remove(evidence);
 	}
 
 	/*

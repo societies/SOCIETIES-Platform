@@ -24,18 +24,27 @@
  */
 package org.societies.privacytrust.trust.impl.repo.model;
 
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import javax.persistence.CascadeType;
 //import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Sort;
+import org.hibernate.annotations.SortType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
+import org.societies.privacytrust.trust.impl.evidence.repo.model.TrustEvidence;
 
 /**
  * This class represents trusted services. A TrustedService object is referenced
@@ -49,6 +58,7 @@ import org.societies.privacytrust.trust.api.model.ITrustedService;
  */
 @Entity
 @org.hibernate.annotations.Entity(
+		dynamicInsert=true,
 		dynamicUpdate=true
 )
 @Table(
@@ -58,6 +68,21 @@ import org.societies.privacytrust.trust.api.model.ITrustedService;
 public class TrustedService extends TrustedEntity implements ITrustedService {
 
 	private static final long serialVersionUID = 8253551733059925542L;
+	
+	/** The trust evidence associated with the evaluated trust values of this service. */
+	@ManyToMany(
+			cascade = CascadeType.MERGE,
+			targetEntity = TrustEvidence.class,
+			fetch = FetchType.EAGER
+	)
+    @JoinTable(
+    		name = TableName.TRUSTED_SERVICE + "_evidence",
+    		joinColumns = { @JoinColumn(name = TableName.TRUSTED_SERVICE + "_id") },
+    		inverseJoinColumns = { @JoinColumn(name = 
+    		org.societies.privacytrust.trust.impl.evidence.repo.model.TableName.TRUST_EVIDENCE + "_id") }
+    )
+	@Sort(type=SortType.NATURAL)
+	private final SortedSet<ITrustEvidence> evidence = new TreeSet<ITrustEvidence>();
 	
 	/** The type of this service. */
 	//@Column(name = "type", nullable = false, updatable = false, length = 256)
@@ -103,6 +128,35 @@ public class TrustedService extends TrustedEntity implements ITrustedService {
 	public TrustedService(final TrustedEntityId trustorId, final TrustedEntityId trusteeId) {
 		
 		super(trustorId, trusteeId);
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getEvidence()
+	 */
+	@Override
+	public SortedSet<ITrustEvidence> getEvidence() {
+		
+		return this.evidence;
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#addEvidence(org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence)
+	 */
+	@Override
+	public void addEvidence(final ITrustEvidence evidence) {
+		
+		if (!this.evidence.contains(evidence))
+			this.evidence.add(evidence);
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#removeEvidence(org.societies.api.privacytrust.trust.model.TrustEvidence)
+	 */
+	@Override
+	public void removeEvidence(final ITrustEvidence evidence) {
+		
+		if (this.evidence.contains(evidence))
+			this.evidence.remove(evidence);
 	}
 
 	/*

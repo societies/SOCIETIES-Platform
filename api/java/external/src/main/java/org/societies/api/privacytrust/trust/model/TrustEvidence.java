@@ -22,77 +22,63 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.impl.evidence.repo.model;
+package org.societies.api.privacytrust.trust.model;
 
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.Index;
-import org.hibernate.annotations.Type;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
-import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 
 /**
- * Describe your class here...
+ * This class is used to represent direct and indirect trust evidence with 
+ * regards to CSSs, CISs or services. Trust evidence data are the basis for
+ * evaluating the {@link TrustValueType#DIRECT direct} and
+ * {@link TrustValueType#INDIRECT indirect} trust in these entities. 
+ * <p>
+ * More specifically, each piece of trust evidence is associated with a 
+ * <i>subject</i> and an <i>object</i>, as well as, the 
+ * {@link TrustEvidenceType type} characterising that particular piece of
+ * evidence. Depending on the type, supplementary <i>information</i> can also 
+ * be specified. Some examples of trust evidence follow: 
+ * <table>
+ * <tr><th>subject</th> <th>object</th> <th>type</th> <th>info</th></tr>
+ * <tr><td>CSS</td> <td>CSS/CIS/Service</td> <td>{@link TrustEvidenceType#RATED RATED}</td><td><code>Double</code> [0,1]</td></tr>
+ * <tr><td>CSS</td> <td>CSS</td> <td>{@link TrustEvidenceType#FRIENDED_USER FRIENDED_USER}</td> <td><code>null</code></td></tr>
+ * <tr><td>CSS</td> <td>CSS</td> <td>{@link TrustEvidenceType#UNFRIENDED_USER UNFRIENDED_USER}</td> <td><code>null</code></td></tr> 
+ * <tr><td>CSS</td> <td>CIS</td> <td>{@link TrustEvidenceType#JOINED_COMMUNITY JOINED_COMMUNITY}</td> <td><code>null</code></td></tr>
+ * <tr><td>CSS</td> <td>CIS</td> <td>{@link TrustEvidenceType#LEFT_COMMUNITY LEFT_COMMUNITY}</td> <td><code>null</code></td></tr> 
+ * <tr><td>CSS</td> <td>Service</td> <td>{@link TrustEvidenceType#USED_SERVICE USED_SERVICE}</td> <td><code>Double</code> [0,1] (optional)</td></tr>
+ * </table>
+ * <p>
+ * Direct trust evidence are collected locally with respect to the CSS owner,
+ * while indirect trust evidence originate from other sources. Thus, indirect 
+ * trust evidence are also accompanied with the <i>source</i> from which they 
+ * originate.   
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 0.0.8
+ * @since 1.1
  */
-@Entity
-@org.hibernate.annotations.Entity(
-		dynamicInsert=true
-)
-@Table(
-		name = TableName.TRUST_EVIDENCE
-)
-@Immutable
-public class TrustEvidence implements ITrustEvidence {
+public class TrustEvidence implements Serializable, Comparable<TrustEvidence> {
 
-	private static final long serialVersionUID = 3874421819907517767L;
+	private static final long serialVersionUID = 3081731373916156074L;
 
-	/* The surrogate key used by Hibernate. */
-	@Id
-	@GeneratedValue
-	@Column(name = "id")
-	private long id;
+	/** The subject this piece of trust evidence refers to. */
+	private final TrustedEntityId subjectId;
 	
-	@Index(name = "subject_idx")
-	@Column(name = "subject_id", nullable = false, updatable = false, length = 255)
-	@Type(type = "org.societies.privacytrust.trust.impl.common.hibernate.TrustedEntityIdUserType")
-	private TrustedEntityId subjectId;
+	/** The object this piece of trust evidence refers to. */
+	private final TrustedEntityId objectId;
 	
-	@Index(name = "object_idx")
-	@Column(name = "object_id", nullable = false, updatable = false, length = 255)
-	@Type(type = "org.societies.privacytrust.trust.impl.common.hibernate.TrustedEntityIdUserType")
-	private TrustedEntityId objectId;
+	/** The type of this piece of trust evidence. */
+	private final TrustEvidenceType type;
 	
-	@Index(name = "type_idx")
-	@Column(name = "type", nullable = false, updatable = false)
-	private TrustEvidenceType type;
+	/** The date and time when this piece of trust evidence was collected. */
+	private final Date timestamp;
 	
-	@Column(name = "timestamp", nullable = false, updatable = false)
-	@Type(type = "org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType")
-	private Date timestamp;
+	/** Supplementary information if applicable */
+	private final Serializable info;
 	
-	@Column(name = "info", length = 1023, nullable = true, updatable = false)
-	private Serializable info;
-	
-	@Index(name = "source_idx")
-	@Column(name = "source_id", nullable = true, updatable = false, length = 255)
-	@Type(type = "org.societies.privacytrust.trust.impl.common.hibernate.TrustedEntityIdUserType")
-	private TrustedEntityId sourceId;
-	
-	/* Empty constructor required by Hibernate */
-	@SuppressWarnings("unused")
-	private TrustEvidence() {}
+	/** The source of this piece of (indirect) trust evidence. */
+	private final TrustedEntityId sourceId;
 	
 	/**
 	 * Constructs a <code>TrustEvidence</code> object with the specified 
@@ -145,56 +131,72 @@ public class TrustEvidence implements ITrustEvidence {
 		this.info = info;
 		this.sourceId = sourceId;
 	}
-	
-	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence#getSubjectId()
+
+	/**
+	 * Returns the {@link TrustedEntityId} of the subject this piece of
+	 * trust evidence refers to.
+	 * 
+	 * @return the {@link TrustedEntityId} of the subject this piece of
+	 *         trust evidence refers to.
 	 */
-	@Override
 	public TrustedEntityId getSubjectId() {
 		
 		return this.subjectId;
 	}
 
-	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence#getObjectId()
+	/**
+	 * Returns the {@link TrustedEntityId} of the object this piece of
+	 * trust evidence refers to.
+	 * 
+	 * @return the {@link TrustedEntityId} of the object this piece of
+	 *         trust evidence refers to.
 	 */
-	@Override
 	public TrustedEntityId getObjectId() {
 		
 		return this.objectId;
 	}
 
-	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence#getType()
+	/**
+	 * Returns the {@link TrustEvidenceType type} of this piece of trust
+	 * evidence.
+	 *  
+	 * @return the {@link TrustEvidenceType type} of this piece of trust
+	 *         evidence.
 	 */
-	@Override
 	public TrustEvidenceType getType() {
 		
 		return this.type;
 	}
-	
-	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence#getTimestamp()
+
+	/**
+	 * Returns the date and time when the trust value was last evaluated.
+	 * 
+	 * @return the date and time when the trust value was last evaluated.
 	 */
-	@Override
 	public Date getTimestamp() {
 		
 		return this.timestamp;
 	}
 	
-	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence#getInfo()
+	/**
+	 * Returns the trust value expressing the trustworthiness of the identified
+	 * trustee.
+	 *  
+	 * @return the trust value expressing the trustworthiness of the identified
+	 *         trustee.
 	 */
-	@Override
 	public Serializable getInfo() {
 		
 		return this.info;
 	}
 	
-	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence#getSourceId()
+	/**
+	 * Returns the {@link TrustedEntityId} of the source this piece of
+	 * trust evidence originates from.
+	 * 
+	 * @return the {@link TrustedEntityId} of the source this piece of
+	 *         trust evidence originates from.
 	 */
-	@Override
 	public TrustedEntityId getSourceId() {
 		
 		return this.sourceId;
@@ -204,7 +206,7 @@ public class TrustEvidence implements ITrustEvidence {
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
-	public int compareTo(ITrustEvidence that) {
+	public int compareTo(TrustEvidence that) {
 		
 		if (that == null)
 			throw new NullPointerException("can't compare with null");
@@ -212,45 +214,45 @@ public class TrustEvidence implements ITrustEvidence {
 		if (this == that)
 			return 0;
 		
-		int comparison = this.timestamp.compareTo(that.getTimestamp());
+		int comparison = this.timestamp.compareTo(that.timestamp);
 		if (comparison != 0)
 			return comparison;
 		
-		comparison = this.subjectId.getEntityId().compareTo(that.getSubjectId().getEntityId());
+		comparison = this.subjectId.getEntityId().compareTo(that.subjectId.getEntityId());
 		if (comparison != 0)
 			return comparison;
 		
-		comparison = this.objectId.getEntityId().compareTo(that.getObjectId().getEntityId());
+		comparison = this.objectId.getEntityId().compareTo(that.objectId.getEntityId());
 		if (comparison != 0)
 			return comparison;
 		
-		comparison = this.type.compareTo(that.getType());
+		comparison = this.type.compareTo(that.type);
 		if (comparison != 0)
 			return comparison;
 		
 		if (this.info != null) {
-			if (that.getInfo() == null) { // this.info != null && that.info == null
+			if (that.info == null) { // this.info != null && that.info == null
 				return +1; // empty before evidence with info
 			} else { // this.info != null && that.info != null
-				if (this.info.hashCode() < that.getInfo().hashCode())
+				if (this.info.hashCode() < that.info.hashCode())
 					return -1;
-				else if (this.info.hashCode() > that.getInfo().hashCode())
+				else if (this.info.hashCode() > that.info.hashCode())
 					return +1;
 			}
 		} else { // this.info == null
-			if (that.getInfo() == null) // this.info == null && that.info == null
+			if (that.info == null) // this.info == null && that.info == null
 				return 0;
 			else // this.info == null && that.info != null
 				return -1; // empty before evidence with info
 		}
 		
 		if (this.sourceId != null) {
-			if (that.getSourceId() == null) // this.sourceId != null && that.sourceId == null
+			if (that.sourceId == null) // this.sourceId != null && that.sourceId == null
 				return +1; // direct before indirect evidence
 			else // this.sourceId != null && that.sourceId != null
-				return this.sourceId.getEntityId().compareTo(that.getSourceId().getEntityId());
+				return this.sourceId.getEntityId().compareTo(that.sourceId.getEntityId());
 		} else { // sourceId == null
-			if (that.getSourceId() == null) // this.sourceId == null && that.sourceId == null
+			if (that.sourceId == null) // this.sourceId == null && that.sourceId == null
 				return 0;
 			else // this.sourceId == null && that.sourceId != null
 				return -1; // direct before indirect evidence
