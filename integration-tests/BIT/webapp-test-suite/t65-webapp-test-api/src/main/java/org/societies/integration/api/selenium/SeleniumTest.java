@@ -36,8 +36,8 @@ import java.util.Random;
 
 public abstract class SeleniumTest {
     public static final String BASE_URL = "http://localhost:8080/societies/";
-    public static final boolean CLOSE_BROWSER_ON_FAILURE = false;
-    //    public static final boolean CLOSE_BROWSER_ON_FAILURE = true;
+//    public static final boolean CLOSE_BROWSER_ON_FAILURE = false;
+        public static final boolean CLOSE_BROWSER_ON_FAILURE = true;
     public static final char[] RANDOM_STRING_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345789".toCharArray();
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass()); //NB NOT static!
