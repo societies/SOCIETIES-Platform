@@ -57,8 +57,5 @@ public class TestExamplePage extends SeleniumTest {
         // click our button
         examplePage.clickMessageButton();
         // clicking the button doesn't actually do much, but at least we've verified that it's there
-
-        // verify that the textbox still contains the text
-        examplePage.verifyStringFieldValue("i am some text");
     }
 }

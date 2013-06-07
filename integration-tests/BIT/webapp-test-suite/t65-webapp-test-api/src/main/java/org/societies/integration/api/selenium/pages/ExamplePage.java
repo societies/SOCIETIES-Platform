@@ -1,9 +1,7 @@
 package org.societies.integration.api.selenium.pages;
 
-import junit.framework.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 public class ExamplePage extends BaseSocietiesPage {
 
@@ -22,10 +20,4 @@ public class ExamplePage extends BaseSocietiesPage {
         setFieldValue(text, By.xpath(STRING_FIELD_XPATH));
     }
 
-    public void verifyStringFieldValue(String text) {
-        WebElement field = waitUntilVisible(By.xpath(STRING_FIELD_XPATH));
-
-        Assert.assertEquals("Expected field value to match",
-                text, field.getText());
-    }
 }

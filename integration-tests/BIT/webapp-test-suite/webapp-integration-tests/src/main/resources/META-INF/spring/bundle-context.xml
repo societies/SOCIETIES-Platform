@@ -4,11 +4,11 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="testCaseXX" class="org.societies.integration.tests.bit.webapp.TestInit" init-method="run">
-        <property name="pubsub" ref="pubsub"/>
-        <property name="commsMgr" ref="commsMgr"/>
+        <!--<property name="pubsub" ref="pubsub"/>-->
+        <!--<property name="commsMgr" ref="commsMgr"/>-->
         <!--<property name="mySQLHelper" ref="mysqlHelper"/>-->
-        <property name="userFeedback" ref="userFeedback"/>
-        <property name="userFeedbackHistoryRepository" ref="userFeedbackHistoryRepository"/>
+        <!--<property name="userFeedback" ref="userFeedback"/>-->
+        <!--<property name="userFeedbackHistoryRepository" ref="userFeedbackHistoryRepository"/>-->
     </bean>
 
     <!--<bean id="mysqlHelper" class="org.societies.integration.test.bit.userfeedback.MySQLHelper">

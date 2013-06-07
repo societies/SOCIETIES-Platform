@@ -7,8 +7,8 @@ public class ProfileSettingsAddPreferenceDialog extends BasePageComponent {
     private static final String DIALOG_XPATH = "//*[@id='mainForm:addPreferenceDialog']";
     private static final String SAVE_BTN_XPATH = "//*[@id='mainForm:addPreferenceDialog']//*[contains(@class, 'ui-button-text') and text()='Save']";
     private static final String CANCEL_BTN_XPATH = "//*[@id='mainForm:addPreferenceDialog']//*[contains(@class, 'ui-button-text') and text()='Cancel']";
-    private static final String NAME_FIELD_XPATH = "//*[@id='mainForm:addPreferenceName']";
-    private static final String SERVICE_DROPDOWN_ID = "mainForm:addPreferecneService";
+    private static final String NAME_INPUT_FIELD_XPATH = "//input[@name='mainForm:addPreferenceName_editableInput']";
+    private static final String SERVICE_DROPDOWN_ID = "mainForm:addPreferenceService";
 
     public ProfileSettingsAddPreferenceDialog(WebDriver driver) {
         super(driver);
@@ -28,7 +28,7 @@ public class ProfileSettingsAddPreferenceDialog extends BasePageComponent {
     }
 
     public ProfileSettingsAddPreferenceDialog setName(String value) {
-        setFieldValue(value, By.xpath(NAME_FIELD_XPATH));
+        setFieldValue(value, By.xpath(NAME_INPUT_FIELD_XPATH));
         return this;
     }
 

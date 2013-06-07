@@ -51,6 +51,8 @@ public class TestProfileSettings extends SeleniumTest {
     private ProfileSettingsPage.TreeNode volumeHomeOutcomeNode;
     private ProfileSettingsPage.TreeNode volumeWorkOutcomeNode;
 
+    private boolean dontVerifyTreeStateAfterTest;
+
     @Before
     public void setupTest() {
         log.debug("Setting up test");
@@ -61,11 +63,16 @@ public class TestProfileSettings extends SeleniumTest {
 
         buildDefaultPreferenceTree();
 
+        dontVerifyTreeStateAfterTest = false;
+
         log.debug("Finished setting up test");
     }
 
     @After
     public void verifyPersistBetweenSessions() {
+        if (dontVerifyTreeStateAfterTest)
+            return;
+
         profileSettingsPage.clickSaveTreeButton();
 
         getDriver().manage().deleteAllCookies();
@@ -98,6 +105,8 @@ public class TestProfileSettings extends SeleniumTest {
         profileSettingsPage.verifyUsernameInTitle(USERNAME);
         profileSettingsPage.verifyUserDetails("paddy", "societies.local.macs.hw.ac.uk", "CSS_RICH",
                 "paddy.societies.local.macs.hw.ac.uk", "paddy.societies.local.macs.hw.ac.uk");
+
+        dontVerifyTreeStateAfterTest = true;
     }
 
     @Test
@@ -409,7 +418,7 @@ public class TestProfileSettings extends SeleniumTest {
         profileSettingsPage.openContextMenuOnOutcomeNode(new int[]{0, 0}, strong)
                 .clickAddBefore()
                 .setName("locationSymbolic")
-                .setOperator("equals")
+                .setOperator("EQUALS")
                 .setConditionValue("home")
                 .clickSave();
 
@@ -426,7 +435,7 @@ public class TestProfileSettings extends SeleniumTest {
         profileSettingsPage.openContextMenuOnConditionNode(new int[]{0, 0}, "timeOfDay EQUALS afternoon")
                 .clickAddBefore()
                 .setName("locationSymbolic")
-                .setOperator("equals")
+                .setOperator("EQUALS")
                 .setConditionValue("pub")
                 .clickSave();
 
