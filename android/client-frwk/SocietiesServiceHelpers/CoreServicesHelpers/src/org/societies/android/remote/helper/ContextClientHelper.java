@@ -38,6 +38,7 @@ import org.societies.android.api.context.CtxException;
 import org.societies.android.api.context.ICtxClient;
 import org.societies.android.api.context.ICtxClientCallback;
 import org.societies.android.api.context.ICtxClientHelper;
+import org.societies.android.api.privacytrust.trust.ITrustClient;
 import org.societies.android.api.services.ICoreSocietiesServices;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
 import org.societies.api.schema.identity.RequestorBean;
@@ -635,9 +636,11 @@ public class ContextClientHelper implements ICtxClientHelper {
 						if (exceptionMessage != null) {
 							retrievedCallback.onException(new ContextClientInvocationException(exceptionMessage));
 						}
-						final List<CtxIdentifierBean> ctxIdsList = null;
-						ArrayList<Parcelable> pCtxIdsList = new ArrayList<Parcelable>();
-						pCtxIdsList = intent.getParcelableArrayListExtra(ICtxClient.INTENT_RETURN_VALUE_KEY);
+						final List<CtxIdentifierBean> ctxIdsList = new ArrayList<CtxIdentifierBean>();
+//						List<Parcelable> pCtxIdsList = new ArrayList<Parcelable>();
+						final Parcelable[] pCtxIdsList = (Parcelable[]) 
+								intent.getParcelableArrayExtra(ICtxClient.INTENT_RETURN_VALUE_KEY);
+						Log.d(LOG_TAG, "lookup result inside callback, length: " + pCtxIdsList.length + ", and has: " + pCtxIdsList.toString());
 						for (final Parcelable pCtxIdList : pCtxIdsList) {
 							if (pCtxIdList instanceof CtxIdentifierBean) {
 								ctxIdsList.add((CtxIdentifierBean) pCtxIdList);

@@ -959,12 +959,14 @@ public class ContextBrokerBase implements IInternalCtxClient{
 								return;
 							}
 							final List<CtxIdentifierBean> ctxIdsBeanList = payload.getCtxBrokerLookupBeanResult();
+							Log.d(LOG_TAG, "getCtxBrokerLookupBeanResult(): " + payload.getCtxBrokerLookupBeanResult().size());
+							Log.d(LOG_TAG, "ctxIdsBeanList.size(): " + ctxIdsBeanList.size() + ", toString: " + ctxIdsBeanList.toString());
 
 							if (ctxIdsBeanList != null) 
 								intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, ctxIdsBeanList.toArray(new CtxIdentifierBean[ctxIdsBeanList.size()]));
 							else
 								intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, new CtxIdentifierBean[0]);
-						
+							
 							break;
 
 						case REMOVE:
