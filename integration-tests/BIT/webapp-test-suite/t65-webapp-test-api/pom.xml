@@ -87,9 +87,10 @@
             <version>2.25.0</version>
         </dependency>
         <dependency>
-            <groupId>org.junit</groupId>
-            <artifactId>com.springsource.junit</artifactId>
-            <version>3.8.2</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -102,9 +103,9 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${pom.groupId}.${pom.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${pom.artifactId}</Bundle-Name>
-                        <Bundle-Version>${pom.version}</Bundle-Version>
+                        <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Bundle-Version>${project.version}</Bundle-Version>
                         <Include-Resource>{maven-resources}</Include-Resource>
                         <Import-Package>
                             !org.jboss.resource.adapter.jdbc.vendor,
@@ -114,14 +115,6 @@
                         </Import-Package>
 
                     </instructions>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor></descriptor>
-                    </descriptors>
                 </configuration>
             </plugin>
             <plugin>
