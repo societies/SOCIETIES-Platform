@@ -20,7 +20,7 @@ public class TestUserFeedback extends IntegrationTestCase {
     private static IUserFeedbackHistoryRepository userFeedbackHistoryRepository;
 
     public TestUserFeedback() {
-        super(99999, Tester.class);
+        super(2074, Tester.class);
         log.debug("Starting TestUserFeedback");
 
     }

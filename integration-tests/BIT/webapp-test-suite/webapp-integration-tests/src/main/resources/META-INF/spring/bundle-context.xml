@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="testCaseXX" class="org.societies.integration.tests.bit.webapp.TestInit" init-method="run">
+        <!--<property name="pubsub" ref="pubsub"/>-->
+        <!--<property name="commsMgr" ref="commsMgr"/>-->
+        <!--<property name="mySQLHelper" ref="mysqlHelper"/>-->
+        <!--<property name="userFeedback" ref="userFeedback"/>-->
+        <!--<property name="userFeedbackHistoryRepository" ref="userFeedbackHistoryRepository"/>-->
+    </bean>
+
+    <!--<bean id="mysqlHelper" class="org.societies.integration.test.bit.userfeedback.MySQLHelper">
+        <constructor-arg index="0" value="jdbc:mysql://localhost:3306/societiesdb"/>
+        <constructor-arg index="1" value="root"/>
+        <constructor-arg index="2" value="root"/>
+    </bean>-->
+
+</beans>

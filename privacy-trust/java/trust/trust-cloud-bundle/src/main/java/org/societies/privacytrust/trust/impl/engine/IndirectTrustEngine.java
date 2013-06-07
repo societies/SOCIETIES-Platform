@@ -44,7 +44,7 @@ import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.ITrustEvidenceUpdateEventListener;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
 import org.societies.privacytrust.trust.api.event.TrustEvidenceUpdateEvent;
-import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 import org.societies.privacytrust.trust.api.similarity.ITrustSimilarityEvaluator;
@@ -76,7 +76,7 @@ public class IndirectTrustEngine extends TrustEngine implements IIndirectTrustEn
 				LOG.info("Registering for indirect trust evidence updates...");
 			super.trustEventMgr.registerEvidenceUpdateListener(
 					new IndirectTrustEvidenceUpdateListener(), 
-					new String[] { TrustEventTopic.INDIRECT_TRUST_EVIDENCE_UPDATED });
+					new String[] { TrustEventTopic.TRUST_EVIDENCE_UPDATED });
 		} catch (Exception e) {
 			LOG.error(this.getClass() + " could not be initialised: "
 					+ e.getLocalizedMessage(), e);
@@ -85,14 +85,14 @@ public class IndirectTrustEngine extends TrustEngine implements IIndirectTrustEn
 	}
 	
 	/*
-	 * @see org.societies.privacytrust.trust.api.engine.IIndirectTrustEngine#evaluate(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence)
+	 * @see org.societies.privacytrust.trust.api.engine.IIndirectTrustEngine#evaluate(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence)
 	 */
 	@Override
 	public Set<ITrustedEntity> evaluate(final TrustedEntityId trustorId, 
-			final IIndirectTrustEvidence evidence) throws TrustEngineException {
+			final ITrustEvidence evidence) throws TrustEngineException {
 		
 		if (LOG.isDebugEnabled())
-			LOG.debug("Evaluating indirect trust evidence " + evidence
+			LOG.debug("Evaluating trust evidence " + evidence
 					+ " on behalf of '" + trustorId + "'");
 		
 		if (trustorId == null)
@@ -147,12 +147,12 @@ public class IndirectTrustEngine extends TrustEngine implements IIndirectTrustEn
 				double weightSum = 0d;
 				// Retrieve all Indirect Trust Evidence related to the object
 				// referenced in the specified TrustEvidence
-				final Set<IIndirectTrustEvidence> evidenceSet = super.trustEvidenceRepo
-						.retrieveLatestIndirectEvidence(null, evidence.getObjectId(),
+				final Set<ITrustEvidence> evidenceSet = super.trustEvidenceRepo
+						.retrieveLatestEvidence(null, evidence.getObjectId(),
 								evidence.getType(), null);
 				if (LOG.isDebugEnabled())
 					LOG.debug("evidenceSet=" + evidenceSet);
-				for (final IIndirectTrustEvidence relatedEvidence : evidenceSet) {
+				for (final ITrustEvidence relatedEvidence : evidenceSet) {
 					if (!(relatedEvidence.getInfo() instanceof Double)) {
 						LOG.warn("Related evidence " + relatedEvidence 
 								+ " has no trust value!");
@@ -230,7 +230,7 @@ public class IndirectTrustEngine extends TrustEngine implements IIndirectTrustEn
 	 */
 	@Override
 	public Set<ITrustedEntity> evaluate(final TrustedEntityId trustorId,
-			final Set<IIndirectTrustEvidence> evidenceSet) 
+			final Set<ITrustEvidence> evidenceSet) 
 					throws TrustEngineException {
 		
 		if (LOG.isDebugEnabled())
@@ -244,11 +244,11 @@ public class IndirectTrustEngine extends TrustEngine implements IIndirectTrustEn
 		
 		final Set<ITrustedEntity> resultSet = new HashSet<ITrustedEntity>();
 		// create sorted evidence set based on the evidence timestamps
-		final SortedSet<IIndirectTrustEvidence> sortedEvidenceSet =
-				new TreeSet<IIndirectTrustEvidence>(evidenceSet);
+		final SortedSet<ITrustEvidence> sortedEvidenceSet =
+				new TreeSet<ITrustEvidence>(evidenceSet);
 		if (LOG.isDebugEnabled())
 			LOG.debug("Sorted indirect trust evidence set " + sortedEvidenceSet);
-		for (final IIndirectTrustEvidence evidence : sortedEvidenceSet) {
+		for (final ITrustEvidence evidence : sortedEvidenceSet) {
 			final Set<ITrustedEntity> newResultSet = this.evaluate(trustorId, evidence);  
 			resultSet.removeAll(newResultSet);
 			resultSet.addAll(newResultSet);
@@ -258,7 +258,7 @@ public class IndirectTrustEngine extends TrustEngine implements IIndirectTrustEn
 	}
 	
 	private boolean areRelevant(final TrustedEntityId trustorId,
-			final IIndirectTrustEvidence evidence) throws TrustEngineException {
+			final ITrustEvidence evidence) throws TrustEngineException {
 		
 		boolean result = false;
 		
@@ -270,8 +270,9 @@ public class IndirectTrustEngine extends TrustEngine implements IIndirectTrustEn
 			break;
 			
 		default:
-			throw new TrustEngineException("Unsupported type: " 
-					+ evidence.getType());
+			if (LOG.isDebugEnabled())
+				LOG.debug("Trust evidence " + evidence 
+						+ " is not relevant for trustor '" + trustorId + "'");
 		}
 		
 		return result;
@@ -299,12 +300,12 @@ public class IndirectTrustEngine extends TrustEngine implements IIndirectTrustEn
 	private double retrieveMeanTrustOpinion(
 			final TrustedEntityId trusteeId) throws TrustException {
 
-		final Set<IIndirectTrustEvidence> evidenceSet = 
-				super.trustEvidenceRepo.retrieveLatestIndirectEvidence(
+		final Set<ITrustEvidence> evidenceSet = 
+				super.trustEvidenceRepo.retrieveLatestEvidence(
 						trusteeId, null, TrustEvidenceType.DIRECTLY_TRUSTED, null);
 		double sum = 0.0d;
 		int count = 0;
-		for (final IIndirectTrustEvidence evidence : evidenceSet) {
+		for (final ITrustEvidence evidence : evidenceSet) {
 			if (evidence.getInfo() instanceof Double) {
 				sum += (Double) evidence.getInfo(); 
 				count++;
@@ -325,9 +326,9 @@ public class IndirectTrustEngine extends TrustEngine implements IIndirectTrustEn
 	
 	private class IndirectTrustEvidenceHandler implements Runnable {
 
-		private final IIndirectTrustEvidence evidence;
+		private final ITrustEvidence evidence;
 		
-		private IndirectTrustEvidenceHandler(final IIndirectTrustEvidence evidence) {
+		private IndirectTrustEvidenceHandler(final ITrustEvidence evidence) {
 			
 			this.evidence = evidence;
 		}
@@ -361,13 +362,13 @@ public class IndirectTrustEngine extends TrustEngine implements IIndirectTrustEn
 		public void onNew(TrustEvidenceUpdateEvent evt) {
 			
 			if (LOG.isDebugEnabled())
-				LOG.debug("Received indirect TrustEvidenceUpdateEvent " + evt);
+				LOG.debug("Received TrustEvidenceUpdateEvent " + evt);
 			
-			if (!(evt.getSource() instanceof IIndirectTrustEvidence)) {
-				LOG.error("TrustEvidenceUpdateEvent source is not instance of IIndirectTrustEvidence");
+			if (!(evt.getSource() instanceof ITrustEvidence)) {
+				LOG.error("TrustEvidenceUpdateEvent source is not instance of ITrustEvidence");
 				return;
 			}
-			final IIndirectTrustEvidence evidence = (IIndirectTrustEvidence) evt.getSource();
+			final ITrustEvidence evidence = (ITrustEvidence) evt.getSource();
 			executorService.execute(new IndirectTrustEvidenceHandler(evidence));
 		}
 	}

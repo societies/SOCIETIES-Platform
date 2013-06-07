@@ -16,19 +16,24 @@ public abstract class BasePageController implements Serializable {
     }
 
     protected void addFacesMessage(String component, String summary, String detail, FacesMessage.Severity severity) {
-        FacesMessage message = new FacesMessage(severity, summary, detail);
-        FacesContext.getCurrentInstance().addMessage(component, message);
+        try {
+            FacesMessage message = new FacesMessage(severity, summary, detail);
+            FacesContext.getCurrentInstance().addMessage(component, message);
 
-        String logMsg = "MESSAGE:" + severity.toString()
-                + (component != null ? ":" + component : ":GLOBAL")
-                + " [" + summary + "] " + detail;
+            String logMsg = "MESSAGE:" + severity.toString()
+                    + (component != null ? ":" + component : ":GLOBAL")
+                    + " [" + summary + "] " + detail;
 
-        if (severity == FacesMessage.SEVERITY_ERROR)
-            log.error(logMsg);
-        else if (severity == FacesMessage.SEVERITY_WARN)
-            log.warn(logMsg);
-        else
-            log.trace(logMsg);
-
+            if (severity == FacesMessage.SEVERITY_ERROR)
+                log.error(logMsg);
+            else if (severity == FacesMessage.SEVERITY_WARN)
+                log.warn(logMsg);
+            else
+                log.trace(logMsg);
+        } catch (Exception ex) {
+            // This method gets called from so many places, that it's worth catching any possible exception
+            // Generally speaking, missing a message to a user is not a problem as the messages are usually non critical
+            log.error("Error sending faces message to component " + component, ex);
+        }
     }
 }

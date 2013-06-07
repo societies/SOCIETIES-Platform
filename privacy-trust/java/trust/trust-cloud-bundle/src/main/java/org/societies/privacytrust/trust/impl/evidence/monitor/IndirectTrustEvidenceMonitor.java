@@ -46,10 +46,9 @@ import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.ITrustNodeMgr;
-import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.api.evidence.repo.TrustEvidenceRepositoryException;
-import org.societies.privacytrust.trust.impl.evidence.repo.model.IndirectTrustEvidence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -256,17 +255,17 @@ public class IndirectTrustEvidenceMonitor implements ITrustUpdateEventListener {
 			throws TrustException {
 		
 		final Set<TrustRelationship> retrievedRelationships;
-		final Set<IIndirectTrustEvidence> existingEvidenceSet;
+		final Set<ITrustEvidence> existingEvidenceSet;
 		try {
 			retrievedRelationships = this.trustBroker.retrieveTrustRelationships(
 					connectionId, TrustValueType.DIRECT).get();
 			// If connection has no opinions do nothing
 			if (retrievedRelationships.isEmpty())
 				return;
-			existingEvidenceSet = this.trustEvidenceRepository.retrieveLatestIndirectEvidence(
+			existingEvidenceSet = this.trustEvidenceRepository.retrieveLatestEvidence(
 					null, null, TrustEvidenceType.DIRECTLY_TRUSTED, connectionId);
 			for (final TrustRelationship retrievedRelationship : retrievedRelationships) {
-				for (final IIndirectTrustEvidence existingEvidence : existingEvidenceSet) {
+				for (final ITrustEvidence existingEvidence : existingEvidenceSet) {
 					if (retrievedRelationship.getTrustorId().equals(existingEvidence.getSubjectId())
 							&& retrievedRelationship.getTrusteeId().equals(existingEvidence.getObjectId())
 							&& retrievedRelationship.getTimestamp().getTime() > existingEvidence.getTimestamp().getTime()) {
