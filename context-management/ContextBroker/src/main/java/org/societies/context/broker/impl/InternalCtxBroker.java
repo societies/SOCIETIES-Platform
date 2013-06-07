@@ -1835,8 +1835,11 @@ public class InternalCtxBroker implements ICtxBroker {
 			// community context
 		}else if (IdentityType.CIS.equals(target.getType())){
 
-			localCtxIdListResult = this.communityCtxDBMgr.lookupCommunityCtxEntity(type);
-
+			//localCtxIdListResult = this.communityCtxDBMgr.lookupCommunityCtxEntity(type);
+			LOG.info(" retrieving community attributes:: " + modelType +" .. "+type);
+			
+			localCtxIdListResult = this.communityCtxDBMgr.lookup(modelType, type);
+			LOG.info(" retrieving community attributes results :: "+ localCtxIdListResult);
 		} else throw new CtxBrokerException("objects identifier does not correspond to a CSS or a CIS");
 
 		return new AsyncResult<List<CtxIdentifier>>(localCtxIdListResult);

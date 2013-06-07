@@ -25,6 +25,8 @@
 
 package org.societies.integration.test.bit.communication_ctx_frwk;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 
@@ -42,7 +44,10 @@ import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxEntityTypes;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
@@ -56,55 +61,103 @@ import org.societies.api.identity.Requestor;
  *
  */
 public class Tester {
-	
+
 	private static Logger LOG = LoggerFactory.getLogger(Test1064.class);
 	Requestor requestor = null;
-	
+
+
+	// run test in university's container
+	private String targetEmma= "emma.ict-societies.eu";
+
+
 	public Tester(){
 		LOG.info("*** " + this.getClass() + " starting");
 	}
-	
+
 	@Before
 	public void setUp(){
-			
+
 	}
-	
-	
+
+
 	@Test
 	public void Test(){
-		
+
 		LOG.info("*** REMOTE CM TEST STARTING ***");
 		LOG.info("*** " + this.getClass() + " instantiated");
 		LOG.info("*** ctxBroker service :"+Test1064.getCtxBroker());
-		
+
 		try {								
 			INetworkNode cssNodeId = Test1064.getCommManager().getIdManager().getThisNetworkNode();
 			final String cssOwnerStr = cssNodeId.getBareJid();
 			IIdentity cssOwnerId = Test1064.getCommManager().getIdManager().fromJid(cssOwnerStr);
 			this.requestor = new Requestor(cssOwnerId);
 			LOG.info("*** requestor = " + this.requestor);
-						
-			// this should be set with the use of identManager
-			// in current test a null targetCss creates the entity in local cm 
-			IIdentity targetCss = null;
+
+			IIdentity cssIDEmma =  Test1064.getCommManager().getIdManager().fromJid(targetEmma);
+			CtxEntity entityEmmaDevice = Test1064.getCtxBroker().createEntity(requestor, cssIDEmma, CtxEntityTypes.DEVICE).get();
+
+			LOG.info("entity DEVICE created based on 3p broker "+entityEmmaDevice.getId());
+			assertNotNull(entityEmmaDevice.getId());	
+			assertEquals("device", entityEmmaDevice.getType().toLowerCase());
 			
-			CtxEntity entity = Test1064.getCtxBroker().createEntity(requestor, targetCss, CtxEntityTypes.PERSON).get();
-			LOG.info("entity person created based on 3p broker "+entity);
-			LOG.info("entity person created based on 3p broker entity id :"+entity.getId());	
-	    	
-	    	
-		
-	    	CtxEntityIdentifier entityID = entity.getId();
-	       	
-	    	LOG.info(" scope entityID "+entityID.toString());
-	    	// this null is set in order to trigger remote call
-	    	entityID.setOwnerId("null");
-	    	LOG.info(" scope entityID "+entityID.toString());
-	    
-	    	LOG.info("create attribute BIRTHDAY ");
-	    	CtxAttribute attribute = Test1064.getCtxBroker().createAttribute(requestor, entityID, CtxAttributeTypes.BIRTHDAY).get();
-	    	LOG.info("attribute BIRTHDAY created based on 3p broker "+attribute.getId());
-		    	
+			CtxAttribute attrEmmaTemperature = Test1064.getCtxBroker().createAttribute(requestor, entityEmmaDevice.getId(), CtxAttributeTypes.TEMPERATURE).get();
+			LOG.info("Attribute TEMPERATURE created in remote container "+attrEmmaTemperature.getId());
+			assertNotNull(attrEmmaTemperature.getId());	
+
+			
+		//test binary
+			MockBlobClass blob = new MockBlobClass(999);
+			byte[] blobBytes;
+
+				try {
+					blobBytes = SerialisationHelper.serialise(blob);
+					CtxAttribute ctxAttrBinary = Test1064.getCtxBroker().createAttribute(requestor, entityEmmaDevice.getId(), CtxAttributeTypes.ACTIVITIES).get();
+					ctxAttrBinary.setBinaryValue(blobBytes);
+
+					Test1064.getCtxBroker().update(requestor, ctxAttrBinary);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
+
+			// entity and attribute created
+
+			// perform remote look up and retrieve
+			// ENTITY
+			List<CtxIdentifier> entityList = Test1064.getCtxBroker().lookup(requestor, cssIDEmma,  CtxModelType.ENTITY, CtxEntityTypes.DEVICE).get();
+			LOG.info("remote entity list ids:" +entityList);
+			assertNotNull(entityList);
+			
+			CtxEntity entityDevRetrieved = (CtxEntity) Test1064.getCtxBroker().retrieve(requestor, entityList.get(0)).get();
+			LOG.info("remote entity id:" +entityDevRetrieved.getId());
+			assertNotNull(entityDevRetrieved.getId());
+
+			// ATTRIBUTE
+			//List<CtxIdentifier> attrList = Test1064.getCtxBroker().lookup(requestor, entityDevRetrieved.getId(), CtxModelType.ATTRIBUTE ,CtxAttributeTypes.TEMPERATURE).get();
+			List<CtxIdentifier> attrList = Test1064.getCtxBroker().lookup(requestor, cssIDEmma, CtxModelType.ATTRIBUTE ,CtxAttributeTypes.TEMPERATURE).get();
+			LOG.info("remote attribute list ids:" +attrList);
+			//assertEquals(1,attrList.size());
+
+			CtxAttribute remoteAttrTemp = (CtxAttribute) Test1064.getCtxBroker().retrieve(requestor,attrList.get(0)).get();
+			LOG.info("remote CtxAttribute id:" +remoteAttrTemp.getId());
+			assertNotNull(remoteAttrTemp.getId());
+			assertEquals("temperature", remoteAttrTemp.getType().toLowerCase());
+			
+			
+			//List<CtxIdentifier> attrListAction = Test1064.getCtxBroker().lookup(requestor, entityDevRetrieved.getId(), CtxModelType.ATTRIBUTE ,CtxAttributeTypes.ACTION).get();
+			List<CtxIdentifier> attrListAction = Test1064.getCtxBroker().lookup(requestor, cssIDEmma, CtxModelType.ATTRIBUTE ,CtxAttributeTypes.ACTIVITIES).get();
+			CtxAttribute remoteAttrAction = (CtxAttribute) Test1064.getCtxBroker().retrieve(requestor,attrListAction.get(0)).get();
+			LOG.info("remote CtxAttribute id:" +remoteAttrAction.getId());
+			assertNotNull(remoteAttrAction.getId());
+			assertEquals("activities", remoteAttrAction.getType().toLowerCase());
+			LOG.info("remote CtxAttribute binary value:" +remoteAttrAction.getBinaryValue() +"  -- "+this.getClass().getClassLoader() );
+			
+			MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(remoteAttrAction.getBinaryValue(), this.getClass().getClassLoader());
+			assertNotNull(retrievedBlob);
+			
+
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -117,11 +170,13 @@ public class Tester {
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
-	
-	
-	//private createRemoteEntity(){	}
-	
-	
+
 }

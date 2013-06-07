@@ -102,59 +102,59 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	//Services registration
 	public ICAUIDiscovery getCauiDiscovery() {
-		LOG.info(this.getClass().getName()+": Return cauiDiscovery");
+		LOG.debug(this.getClass().getName()+": Return cauiDiscovery");
 		return cauiDiscovery;
 	}
 
 
 	public void setCauiDiscovery(ICAUIDiscovery cauiDiscovery) {
-		LOG.info(this.getClass().getName()+": Got cauiDiscovery");
+		LOG.debug(this.getClass().getName()+": Got cauiDiscovery");
 		this.cauiDiscovery = cauiDiscovery;
 	}
 
 
 	public ICtxBroker getCtxBroker() {
-		LOG.info(this.getClass().getName()+": Return ctxBroker");
+		LOG.debug(this.getClass().getName()+": Return ctxBroker");
 		return ctxBroker;
 	}
 
 
 	public void setCtxBroker(ICtxBroker ctxBroker) {
-		LOG.info(this.getClass().getName()+": Got ctxBroker");
+		LOG.debug(this.getClass().getName()+": Got ctxBroker");
 		this.ctxBroker = ctxBroker;
 	}
 
 
 	public IInternalPersonalisationManager getPersoMgr() {
-		LOG.info(this.getClass().getName()+": Return persoMgr");
+		LOG.debug(this.getClass().getName()+": Return persoMgr");
 		return persoMgr;
 	}
 
 
 	public void setPersoMgr(IInternalPersonalisationManager persoMgr) {
-		LOG.info(this.getClass().getName()+": Got persoMgr");
+		LOG.debug(this.getClass().getName()+": Got persoMgr");
 		this.persoMgr = persoMgr;
 	}
 
 
 	public ICAUITaskManager getCauiTaskManager() {
-		LOG.info(this.getClass().getName()+": Return cauiTaskManager");
+		LOG.debug(this.getClass().getName()+": Return cauiTaskManager");
 		return cauiTaskManager;
 	}
 
 
 	public void setCauiTaskManager(ICAUITaskManager cauiTaskManager) {
-		LOG.info(this.getClass().getName()+": Got cauiTaskManager");
+		LOG.debug(this.getClass().getName()+": Got cauiTaskManager");
 		this.cauiTaskManager = cauiTaskManager;
 	}
 
 	public void setCommsMgr(ICommManager commsMgr) {
-		LOG.info(this.getClass().getName()+": Got commsMgr");
+		LOG.debug(this.getClass().getName()+": Got commsMgr");
 		this.commsMgr = commsMgr;
 	}
 
 	public ICommManager getCommsMgr() {
-		LOG.info(this.getClass().getName()+": Return CommsMgr");
+		LOG.debug(this.getClass().getName()+": Return CommsMgr");
 		return commsMgr;
 	}
 
@@ -162,13 +162,13 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	// constructor
 	public void initialiseCAUIPrediction(){
-		LOG.info("CAUIPrediction initialised");
-		LOG.info("registerForNewUiModelEvent");
+		LOG.debug("CAUIPrediction initialised");
+		LOG.debug("registerForNewUiModelEvent");
 		registerForNewUiModelEvent();
 	
 		try {
-			LOG.info("joinMon");
-			CommunityJoinMonitor joinMon = new CommunityJoinMonitor(this.ctxBroker ,this.commsMgr);
+			LOG.debug("register for cis join and new community model creation");
+			new CommunityJoinMonitor(this.ctxBroker ,this.commsMgr);
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -634,7 +634,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		@Override
 		public void onUpdate(CtxChangeEvent event) {
-			LOG.info(event.getId() + ": *** Update event *** new User Intentn model stored in ctxDB");
+			LOG.debug(event.getId() + ": *** Update event *** new User Intentn model stored in ctxDB");
 
 			CtxIdentifier uiModelAttrID = event.getId();
 
@@ -651,12 +651,12 @@ public class CAUIPrediction implements ICAUIPrediction{
 					if(retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC) != null){
 						CtxAttribute ctxAttrLocation = retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC);
 						persoMgr.registerForContextUpdate(getOwnerId(), PersonalisationTypes.CAUIIntent, ctxAttrLocation.getId());	
-						LOG.info("register with pers manager for ctxAttr LOCATION_SYMBOLIC update");
+						LOG.debug("register with pers manager for ctxAttr LOCATION_SYMBOLIC update");
 					}
 					if(retrieveOperatorsCtx(CtxAttributeTypes.STATUS) != null){
 						CtxAttribute ctxAttrStatus = retrieveOperatorsCtx(CtxAttributeTypes.STATUS);
 						persoMgr.registerForContextUpdate(getOwnerId(), PersonalisationTypes.CAUIIntent, ctxAttrStatus.getId());	
-						LOG.info("register with pers manager for ctxAttr STATUS update");
+						LOG.debug("register with pers manager for ctxAttr STATUS update");
 					}
 
 					/*	
