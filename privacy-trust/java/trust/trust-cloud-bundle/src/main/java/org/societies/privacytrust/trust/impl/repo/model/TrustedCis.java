@@ -26,6 +26,8 @@ package org.societies.privacytrust.trust.impl.repo.model;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -36,11 +38,13 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Sort;
+import org.hibernate.annotations.SortType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
-import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
+import org.societies.privacytrust.trust.impl.evidence.repo.model.TrustEvidence;
 
 /**
  * This class represents trusted CISs. A <code>TrustedCis</code> object is
@@ -54,6 +58,7 @@ import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvid
  */
 @Entity
 @org.hibernate.annotations.Entity(
+		dynamicInsert=true,
 		dynamicUpdate=true
 )
 @Table(
@@ -64,19 +69,20 @@ public class TrustedCis extends TrustedEntity implements ITrustedCis {
 
 	private static final long serialVersionUID = -438368876927927076L;
 	
-	/** The direct trust evidence associated with the evaluated trust value of this CIS. */
+	/** The trust evidence associated with the evaluated trust values of this CIS. */
 	@ManyToMany(
 			cascade = CascadeType.MERGE,
-			targetEntity = DirectTrustEvidence.class,
+			targetEntity = TrustEvidence.class,
 			fetch = FetchType.EAGER
 	)
     @JoinTable(
-    		name = TableName.TRUSTED_CIS + "_direct_evidence",
+    		name = TableName.TRUSTED_CIS + "_evidence",
     		joinColumns = { @JoinColumn(name = TableName.TRUSTED_CIS + "_id") },
     		inverseJoinColumns = { @JoinColumn(name = 
-    		org.societies.privacytrust.trust.impl.evidence.repo.model.TableName.DIRECT_TRUST_EVIDENCE + "_id") }
+    		org.societies.privacytrust.trust.impl.evidence.repo.model.TableName.TRUST_EVIDENCE + "_id") }
     )
-	private Set<IDirectTrustEvidence> directEvidence = new HashSet<IDirectTrustEvidence>();
+	@Sort(type=SortType.NATURAL)
+	private final SortedSet<ITrustEvidence> evidence = new TreeSet<ITrustEvidence>();
 	
 	/** The members of this trusted CIS. */
 	@ManyToMany(
@@ -111,32 +117,32 @@ public class TrustedCis extends TrustedEntity implements ITrustedCis {
 	}
 	
 	/*
-	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getDirectEvidence()
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getEvidence()
 	 */
 	@Override
-	public Set<IDirectTrustEvidence> getDirectEvidence() {
+	public SortedSet<ITrustEvidence> getEvidence() {
 		
-		return this.directEvidence;
+		return this.evidence;
 	}
 	
 	/*
-	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#addDirectEvidence(org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence)
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#addEvidence(org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence)
 	 */
 	@Override
-	public void addDirectEvidence(final IDirectTrustEvidence evidence) {
+	public void addEvidence(final ITrustEvidence evidence) {
 		
-		if (!this.directEvidence.contains(evidence))
-			this.directEvidence.add(evidence);
+		if (!this.evidence.contains(evidence))
+			this.evidence.add(evidence);
 	}
 	
 	/*
-	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#removeDirectEvidence(org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence)
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#removeEvidence(org.societies.api.privacytrust.trust.model.TrustEvidence)
 	 */
 	@Override
-	public void removeDirectEvidence(final IDirectTrustEvidence evidence) {
+	public void removeEvidence(final ITrustEvidence evidence) {
 		
-		if (this.directEvidence.contains(evidence))
-			this.directEvidence.remove(evidence);
+		if (this.evidence.contains(evidence))
+			this.evidence.remove(evidence);
 	}
 
 	/*

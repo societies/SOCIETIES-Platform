@@ -27,12 +27,12 @@ package org.societies.privacytrust.trust.api.engine;
 import java.util.Set;
 
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 
 /**
  * This interface provides methods to evaluate the trustworthiness of 
- * {@link ITrustedEntity} objects based on {@link IDirectTrustEvidence}
+ * {@link ITrustedEntity} objects based on direct {@link TrustEvidence}
  * information.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
@@ -47,10 +47,10 @@ public interface IDirectTrustEngine {
 	 * @param evidence
 	 * @return
 	 * @throws TrustEngineException
-	 * @since 0.5
+	 * @since 1.1
 	 */
 	public Set<ITrustedEntity> evaluate(final TrustedEntityId trustorId,
-			final IDirectTrustEvidence evidence) throws TrustEngineException;
+			final ITrustEvidence evidence) throws TrustEngineException;
 	
 	/**
 	 * TODO
@@ -59,9 +59,9 @@ public interface IDirectTrustEngine {
 	 * @param evidenceSet
 	 * @return
 	 * @throws TrustEngineException
-	 * @since 0.5
+	 * @since 1.1
 	 */
 	public Set<ITrustedEntity> evaluate(final TrustedEntityId trustorId,
-			final Set<IDirectTrustEvidence> evidenceSet) 
+			final Set<ITrustEvidence> evidenceSet) 
 					throws TrustEngineException;
 }

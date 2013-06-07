@@ -25,10 +25,10 @@
 package org.societies.privacytrust.trust.api.model;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.SortedSet;
 
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 
 /**
  * This interface is used to represent an entity trusted by the trustor,
@@ -66,32 +66,33 @@ public interface ITrustedEntity extends Serializable {
 	public IDirectTrust getDirectTrust();
 	
 	/**
-	 * Returns the set of direct trust evidence associated with the evaluated
-	 * direct trust value.
+	 * Returns an ordered set of the trust evidence associated with the
+	 * evaluated trust values. More specifically, the returned evidence are
+	 * sorted based on their timestamps (ascending order).
 	 * 
-	 * @return the set of direct trust evidence associated with the evaluated
-	 * direct trust value.
+	 * @return an ordered set of the trust evidence associated with the
+	 *         evaluated trust values.
 	 * @since 1.1
 	 */
-	public Set<IDirectTrustEvidence> getDirectEvidence();
+	public SortedSet<ITrustEvidence> getEvidence();
 	
 	/**
-	 * Adds the specified piece of direct trust evidence.
+	 * Adds the specified piece of trust evidence.
 	 * 
 	 * @param evidence
-	 *            the piece of direct trust evidence to add.
+	 *            the piece of trust evidence to add.
 	 * @since 1.1
 	 */
-	public void addDirectEvidence(final IDirectTrustEvidence evidence);
+	public void addEvidence(final ITrustEvidence evidence);
 
 	/**
-	 * Removes the specified piece of direct trust evidence.
+	 * Removes the specified piece of trust evidence.
 	 * 
 	 * @param evidence
-	 *            the piece of direct trust evidence to remove.
+	 *            the piece of trust evidence to remove.
 	 * @since 1.1
 	 */
-	public void removeDirectEvidence(final IDirectTrustEvidence evidence);
+	public void removeEvidence(final ITrustEvidence evidence);
 
 	/**
 	 * Returns the indirect trust in this entity.

@@ -24,9 +24,12 @@
  */
 package org.societies.privacytrust.trust.impl.evidence.repo;
 
+import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
@@ -34,20 +37,17 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
-import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.api.evidence.repo.TrustEvidenceRepositoryException;
 import org.societies.privacytrust.trust.impl.common.hibernate.DateTimeUserType;
 import org.societies.privacytrust.trust.impl.common.hibernate.TrustedEntityIdUserType;
-import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
-import org.societies.privacytrust.trust.impl.evidence.repo.model.IndirectTrustEvidence;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.TableName;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.TrustEvidence;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,14 +75,17 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 	}
 	
 	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#addEvidence(org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence)
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#addEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.io.Serializable, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void addEvidence(final ITrustEvidence evidence)
+	public ITrustEvidence addEvidence(final TrustedEntityId subjectId, 
+			final TrustedEntityId objectId, 
+			final TrustEvidenceType type, final Date timestamp,
+			final Serializable info, final TrustedEntityId sourceId) 
 			throws TrustEvidenceRepositoryException {
 		
-		if (evidence == null)
-			throw new NullPointerException("evidence can't be null");
+		ITrustEvidence evidence = new TrustEvidence(
+				subjectId, objectId, type, timestamp, info, sourceId);
 		
 		if (LOG.isDebugEnabled())
 			LOG.debug("Adding trust evidence " + evidence + " to the Trust Evidence Repository...");
@@ -91,9 +94,10 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 		Transaction tx = null;
 		try {
 			tx = session.beginTransaction();
-			session.save(evidence);
+			final Serializable evidenceId = session.save(evidence);
 			session.flush();
 			tx.commit();
+			return (ITrustEvidence) session.get(TrustEvidence.class, evidenceId);
 	
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for trust evidence " + evidence);
@@ -108,140 +112,78 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 	}
 
 	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveDirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.util.Date)
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.util.Date, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public Set<IDirectTrustEvidence> retrieveDirectEvidence(
-			final TrustedEntityId subjectId, final TrustedEntityId objectId,
-			final TrustEvidenceType type, final Date startDate, 
-			final Date endDate)	throws TrustEvidenceRepositoryException {
-		
-		final Set<IDirectTrustEvidence> result = new HashSet<IDirectTrustEvidence>();
-		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving direct trust evidence between dates '"
-					+ startDate + "' and '" + endDate + "' of type " + type 
-					+ " with subjectId '" + subjectId + "' and objectId '" + objectId 
-					+ "' from the Trust Evidence Repository...");
-		result.addAll(this.retrieve(subjectId, objectId, 
-				DirectTrustEvidence.class, type, startDate, endDate, null));
-		
-		return result;
-	}
-
-	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.util.Date, org.societies.api.privacytrust.trust.model.TrustedEntityId)
-	 */
-	@Override
-	public Set<IIndirectTrustEvidence> retrieveIndirectEvidence(
+	public SortedSet<ITrustEvidence> retrieveEvidence(
 			final TrustedEntityId subjectId, final TrustedEntityId objectId,
 			final TrustEvidenceType type, final Date startDate, 
 			final Date endDate, final TrustedEntityId sourceId)
 					throws TrustEvidenceRepositoryException {
 		
-		final Set<IIndirectTrustEvidence> result = new HashSet<IIndirectTrustEvidence>();
+		final SortedSet<ITrustEvidence> result = new TreeSet<ITrustEvidence>();
 		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving indirect trust evidence between dates '"
+			LOG.debug("Retrieving trust evidence between dates '"
 					+ startDate + "' and '" + endDate + "' of type " + type
 					+ " with subjectId '" + subjectId + "', objectId '" 
 					+ objectId + "' and sourceId '" + sourceId 
 					+ "' from the Trust Evidence Repository...");
-		result.addAll(this.retrieve(subjectId, objectId, 
-				IndirectTrustEvidence.class, type, startDate, endDate, sourceId));
+		result.addAll(this.retrieve(subjectId, objectId, type, startDate,
+				endDate, sourceId));
 		
 		return result;
 	}
 	
 	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveLatestDirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType)
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveLatestEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public Set<IDirectTrustEvidence> retrieveLatestDirectEvidence(
-			final TrustedEntityId subjectId, final TrustedEntityId objectId,
-			final TrustEvidenceType type) 
-					throws TrustEvidenceRepositoryException {
-		
-		final Set<IDirectTrustEvidence> result = new HashSet<IDirectTrustEvidence>();
-		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving latest direct trust evidence of type " + type 
-					+ " with subjectId '" + subjectId + "' and objectId '" 
-					+ objectId + "' from the Trust Evidence Repository...");
-		result.addAll(this.retrieveLatest(subjectId, objectId, 
-				DirectTrustEvidence.class, type, null));
-		
-		return result;
-	}
-	
-	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#retrieveLatestIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, org.societies.api.privacytrust.trust.model.TrustedEntityId)
-	 */
-	@Override
-	public Set<IIndirectTrustEvidence> retrieveLatestIndirectEvidence(
+	public SortedSet<ITrustEvidence> retrieveLatestEvidence(
 			final TrustedEntityId subjectId, final TrustedEntityId objectId,
 			final TrustEvidenceType type, final TrustedEntityId sourceId)
 					throws TrustEvidenceRepositoryException {
 		
-		final Set<IIndirectTrustEvidence> result = new HashSet<IIndirectTrustEvidence>();
+		final SortedSet<ITrustEvidence> result = new TreeSet<ITrustEvidence>();
 		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving latest indirect trust evidence of type "
-					+ type + " with subjectId '" + subjectId + "', objectId '" 
+			LOG.debug("Retrieving latest trust evidence of type " + type 
+					+ " with subjectId '" + subjectId + "', objectId '" 
 					+ objectId + "' and sourceId '" + sourceId 
 					+ "' from the Trust Evidence Repository...");
-		result.addAll(this.retrieveLatest(subjectId, objectId, 
-				IndirectTrustEvidence.class, type, sourceId));
+		result.addAll(this.retrieveLatest(subjectId, objectId, type, sourceId));
 		
 		return result;
 	}
 
 	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#removeDirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.util.Date)
+	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#removeEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.util.Date, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void removeDirectEvidence(final TrustedEntityId subjectId, 
-			final TrustedEntityId objectId,	final TrustEvidenceType type,
-			final Date startDate, final Date endDate)
-					throws TrustEvidenceRepositoryException {
-		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Removing direct trust evidence between dates '"
-					+ startDate + "' and '" + endDate + "' of type " + type
-					+ " with subjectId '" + subjectId + "' and objectId '" 
-					+ objectId + "' from the Trust Evidence Repository...");
-		this.remove(subjectId, objectId, DirectTrustEvidence.class, type,
-				startDate, endDate, null);
-	}
-
-	/*
-	 * @see org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository#removeIndirectEvidence(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.evidence.TrustEvidenceType, java.util.Date, java.util.Date, org.societies.api.privacytrust.trust.model.TrustedEntityId)
-	 */
-	@Override
-	public void removeIndirectEvidence(final TrustedEntityId subjectId,
+	public void removeEvidence(final TrustedEntityId subjectId,
 			final TrustedEntityId objectId,	final TrustEvidenceType type,
 			final Date startDate, final Date endDate,
 			final TrustedEntityId sourceId)
 					throws TrustEvidenceRepositoryException {
 		
 		if (LOG.isDebugEnabled())
-			LOG.debug("Removing indirect trust evidence between dates '"
+			LOG.debug("Removing trust evidence between dates '"
 					+ startDate + "' and '" + endDate + "' of type " + type
 					+ " with subjectId '" + subjectId + "' and objectId '" 
 					+ objectId + "' from the Trust Evidence Repository...");
-		this.remove(subjectId, objectId, IndirectTrustEvidence.class, type,
-				startDate, endDate, sourceId);
+		this.remove(subjectId, objectId, type, startDate, endDate, sourceId);
 	}
 	
 	@SuppressWarnings("unchecked")
-	private <T extends TrustEvidence> Set<T> retrieve(
-			final TrustedEntityId subjectId, final TrustedEntityId objectId,
-			final Class<T> evidenceClass, final TrustEvidenceType type,
+	private Set<ITrustEvidence> retrieve(final TrustedEntityId subjectId,
+			final TrustedEntityId objectId,	final TrustEvidenceType type,
 			final Date startDate, final Date endDate, 
 			final TrustedEntityId sourceId)
 					throws TrustEvidenceRepositoryException {
 		
-		final Set<T> result = new HashSet<T>();
+		final Set<ITrustEvidence> result = new LinkedHashSet<ITrustEvidence>();
 		Session session = null;
 		try {
 			session = this.sessionFactory.openSession();
-			final Criteria criteria = session.createCriteria(evidenceClass);
+			final Criteria criteria = session.createCriteria(TrustEvidence.class);
 		
 			if (subjectId != null)
 				criteria.add(Restrictions.eq("subjectId", subjectId));
@@ -258,8 +200,10 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 			if (endDate != null)
 				criteria.add(Restrictions.le("timestamp", endDate));
 			
-			if (IndirectTrustEvidence.class == evidenceClass && sourceId != null)
+			if (sourceId != null)
 				criteria.add(Restrictions.eq("sourceId", sourceId));
+			
+			criteria.addOrder(Order.asc("timestamp"));
 	
 			result.addAll(criteria.list());
 		} catch (Exception e) {
@@ -278,23 +222,18 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private <T extends TrustEvidence> Set<T> retrieveLatest(
+	private Set<ITrustEvidence> retrieveLatest(
 			final TrustedEntityId subjectId, final TrustedEntityId objectId,
-			final Class<T> evidenceClass, final TrustEvidenceType type,
-			final TrustedEntityId sourceId)	
+			final TrustEvidenceType type, final TrustedEntityId sourceId)	
 					throws TrustEvidenceRepositoryException {
 		
-		final Set<T> result = new HashSet<T>();
-		final String table = (IndirectTrustEvidence.class == evidenceClass) 
-				? TableName.INDIRECT_TRUST_EVIDENCE
-						: TableName.DIRECT_TRUST_EVIDENCE;
-		String sqlRetrieve = "select * from " + table + " ec" 
-				+ " left outer join " + table + " ec2"
+		final Set<ITrustEvidence> result = new LinkedHashSet<ITrustEvidence>();
+		String sqlRetrieve = "select * from " + TableName.TRUST_EVIDENCE + " ec" 
+				+ " left outer join " + TableName.TRUST_EVIDENCE + " ec2"
 				+ " on (ec.subject_id = ec2.subject_id"
 				+ " and ec.object_id = ec2.object_id"
 				+ " and ec.type = ec2.type"
-				+ ((IndirectTrustEvidence.class == evidenceClass) ?
-						" and ec.source_id = ec2.source_id" : "")
+				+ " and ec.source_id = ec2.source_id"
 				+ " and ec.timestamp < ec2.timestamp)"
 				+ " where ec2.id is null";
 		
@@ -307,12 +246,14 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 		if (type != null)
 			sqlRetrieve += " and ec.type = :type";
 		
-		if (IndirectTrustEvidence.class == evidenceClass && sourceId != null)
+		if (sourceId != null)
 			sqlRetrieve += " and ec.source_id = :sourceId";
+		
+		sqlRetrieve += " order by ec.timestamp asc";
 		
 		final Session session = sessionFactory.openSession();
 		try {
-			final Query latestQuery = session.createSQLQuery(sqlRetrieve).addEntity(evidenceClass);
+			final Query latestQuery = session.createSQLQuery(sqlRetrieve).addEntity(TrustEvidence.class);
 			
 			if (subjectId != null)
 				latestQuery.setParameter("subjectId", subjectId, 
@@ -325,10 +266,10 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 			if (type != null)
 				latestQuery.setParameter("type", type.ordinal());
 
-			if (IndirectTrustEvidence.class == evidenceClass && sourceId != null)
+			if (sourceId != null)
 				latestQuery.setParameter("sourceId", sourceId, 
 						Hibernate.custom(TrustedEntityIdUserType.class));
-
+			
 			result.addAll(latestQuery.list());
 		} catch (Exception e) {
 			throw new TrustEvidenceRepositoryException(
@@ -345,15 +286,14 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 	}
 	
 	private void remove(final TrustedEntityId subjectId, 
-			final TrustedEntityId objectId,	
-			final Class<? extends TrustEvidence> evidenceClass,
-			final TrustEvidenceType type, final Date startDate,
-			final Date endDate, final TrustedEntityId sourceId)
+			final TrustedEntityId objectId,	final TrustEvidenceType type,
+			final Date startDate, final Date endDate, 
+			final TrustedEntityId sourceId)
 					throws TrustEvidenceRepositoryException {
 		
 		boolean hasWhere = false;
 		boolean isFirstParam = true;
-		String hqlDelete = "delete " + evidenceClass.getName() + " ec";
+		String hqlDelete = "delete " + TrustEvidence.class.getName() + " ec";
 		
 		if (subjectId != null) {
 			if (!hasWhere) {
@@ -415,7 +355,7 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 			hqlDelete += " ec.timestamp <= :endDate";
 		}
 		
-		if (IndirectTrustEvidence.class == evidenceClass && sourceId != null) {
+		if (sourceId != null) {
 			if (!hasWhere) {
 				hqlDelete += " where";
 				hasWhere = true;
@@ -448,13 +388,13 @@ public class TrustEvidenceRepository implements ITrustEvidenceRepository {
 			if (endDate != null)
 				deleteQuery.setParameter("endDate", endDate, Hibernate.custom(DateTimeUserType.class));
 			
-			if (IndirectTrustEvidence.class == evidenceClass && sourceId != null)
+			if (sourceId != null)
 				deleteQuery.setParameter("sourceId", sourceId, Hibernate.custom(TrustedEntityIdUserType.class));
 		        
 			int deletedEntities = deleteQuery.executeUpdate();
 			if (LOG.isDebugEnabled())
-				LOG.debug("Removed " + deletedEntities + " " + evidenceClass.getSimpleName()
-						+ "s from the Trust Evidence Repository");
+				LOG.debug("Removed " + deletedEntities 
+						+ " pieces of trust evidence from the Trust Evidence Repository");
 			tx.commit();
 			
 		} catch (Exception e) {

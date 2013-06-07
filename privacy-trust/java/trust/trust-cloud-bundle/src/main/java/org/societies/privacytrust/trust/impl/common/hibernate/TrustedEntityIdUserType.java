@@ -137,9 +137,10 @@ public class TrustedEntityIdUserType implements UserType {
     public void nullSafeSet(PreparedStatement st, Object value, int index)
             throws HibernateException, SQLException {
 
-    	final TrustedEntityId teid = (TrustedEntityId) value;
-    	
-		Hibernate.STRING.nullSafeSet(st, teid.toString(), index);
+    	if (value != null)
+    		Hibernate.STRING.nullSafeSet(st, value.toString(), index);
+    	else
+    		Hibernate.STRING.nullSafeSet(st, null, index);
     }
 
     /*

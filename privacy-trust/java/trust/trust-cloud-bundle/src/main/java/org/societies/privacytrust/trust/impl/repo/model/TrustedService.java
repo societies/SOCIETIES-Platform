@@ -24,8 +24,8 @@
  */
 package org.societies.privacytrust.trust.impl.repo.model;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 //import javax.persistence.Column;
@@ -38,11 +38,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Sort;
+import org.hibernate.annotations.SortType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
-import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
+import org.societies.privacytrust.trust.impl.evidence.repo.model.TrustEvidence;
 
 /**
  * This class represents trusted services. A TrustedService object is referenced
@@ -56,6 +58,7 @@ import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvid
  */
 @Entity
 @org.hibernate.annotations.Entity(
+		dynamicInsert=true,
 		dynamicUpdate=true
 )
 @Table(
@@ -66,19 +69,20 @@ public class TrustedService extends TrustedEntity implements ITrustedService {
 
 	private static final long serialVersionUID = 8253551733059925542L;
 	
-	/** The direct trust evidence associated with the evaluated trust value of this CSS. */
+	/** The trust evidence associated with the evaluated trust values of this service. */
 	@ManyToMany(
 			cascade = CascadeType.MERGE,
-			targetEntity = DirectTrustEvidence.class,
+			targetEntity = TrustEvidence.class,
 			fetch = FetchType.EAGER
 	)
     @JoinTable(
-    		name = TableName.TRUSTED_SERVICE + "_direct_evidence",
+    		name = TableName.TRUSTED_SERVICE + "_evidence",
     		joinColumns = { @JoinColumn(name = TableName.TRUSTED_SERVICE + "_id") },
     		inverseJoinColumns = { @JoinColumn(name = 
-    		org.societies.privacytrust.trust.impl.evidence.repo.model.TableName.DIRECT_TRUST_EVIDENCE + "_id") }
+    		org.societies.privacytrust.trust.impl.evidence.repo.model.TableName.TRUST_EVIDENCE + "_id") }
     )
-	private Set<IDirectTrustEvidence> directEvidence = new HashSet<IDirectTrustEvidence>();
+	@Sort(type=SortType.NATURAL)
+	private final SortedSet<ITrustEvidence> evidence = new TreeSet<ITrustEvidence>();
 	
 	/** The type of this service. */
 	//@Column(name = "type", nullable = false, updatable = false, length = 256)
@@ -127,32 +131,32 @@ public class TrustedService extends TrustedEntity implements ITrustedService {
 	}
 	
 	/*
-	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getDirectEvidence()
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#getEvidence()
 	 */
 	@Override
-	public Set<IDirectTrustEvidence> getDirectEvidence() {
+	public SortedSet<ITrustEvidence> getEvidence() {
 		
-		return this.directEvidence;
+		return this.evidence;
 	}
 	
 	/*
-	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#addDirectEvidence(org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence)
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#addEvidence(org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence)
 	 */
 	@Override
-	public void addDirectEvidence(final IDirectTrustEvidence evidence) {
+	public void addEvidence(final ITrustEvidence evidence) {
 		
-		if (!this.directEvidence.contains(evidence))
-			this.directEvidence.add(evidence);
+		if (!this.evidence.contains(evidence))
+			this.evidence.add(evidence);
 	}
 	
 	/*
-	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#removeDirectEvidence(org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence)
+	 * @see org.societies.privacytrust.trust.api.model.ITrustedEntity#removeEvidence(org.societies.api.privacytrust.trust.model.TrustEvidence)
 	 */
 	@Override
-	public void removeDirectEvidence(final IDirectTrustEvidence evidence) {
+	public void removeEvidence(final ITrustEvidence evidence) {
 		
-		if (this.directEvidence.contains(evidence))
-			this.directEvidence.remove(evidence);
+		if (this.evidence.contains(evidence))
+			this.evidence.remove(evidence);
 	}
 
 	/*
