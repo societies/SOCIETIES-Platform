@@ -59,6 +59,7 @@
 		<module>CAUITaskManager</module>
 		<module>CAUIDiscovery</module>
 		<module>CAUIPrediction</module>
+		<module>CACIDiscovery</module>
 		<module>UserPreferenceManagement</module>
 		<module>UserPreferenceLearning</module>
 		<module>DIANNE</module>
@@ -66,5 +67,6 @@
 		<module>CRISTUserIntentPrediction</module>
 		<module>CRISTUserIntentTaskManager</module>
 		<module>Personalisation-Bundle</module>
+		<module>CommunityPreferenceManagement</module>
 	</modules>
 </project>

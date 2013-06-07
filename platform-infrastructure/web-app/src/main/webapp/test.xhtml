@@ -5,7 +5,7 @@
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
-        <title>SOCIEITES :: View Response Policy</title>
+        <title>Test UF Notifications :: SOCIEITES</title>
     </ui:define>
 
     <ui:define name="body">
@@ -17,7 +17,7 @@
                                  actionListener="#{ppNegotiationTest.sendPpnEvent}"
                                  process="@this"/>
                 <p:commandButton value="Send Simple Msg"
-                                 actionListener="#{ppNegotiationTest.sendSimpleNotifiationEvent}"
+                                 actionListener="#{ppNegotiationTest.sendSimpleNotificationEvent}"
                                  process="@this"/>
             </p:row>
             <p:row>
@@ -30,6 +30,19 @@
                 <p:commandButton value="Send UF Select Many"
                                  actionListener="#{ppNegotiationTest.sendSelectManyEvent}"
                                  process="@this"/>
+            </p:row>
+            <p:row>
+                <p:commandButton value="Send UF Ack/Nack (blocking)"
+                                 actionListener="#{ppNegotiationTest.sendAckNackEvent}"
+                                 process="@this"
+                                 disabled="true"/>
+                <p:commandButton value="Send UF Select One (blocking)"
+                                 actionListener="#{ppNegotiationTest.sendSelectOneEvent_blocking}"
+                                 process="@this"/>
+                <p:commandButton value="Send UF Select Many (blocking)"
+                                 actionListener="#{ppNegotiationTest.sendSelectManyEvent}"
+                                 process="@this"
+                                 disabled="true"/>
             </p:row>
             <p:row>
                 <p:commandButton value="Send UF Timed Abort (30s)"

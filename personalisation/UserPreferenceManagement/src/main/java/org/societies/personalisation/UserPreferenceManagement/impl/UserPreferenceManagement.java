@@ -240,12 +240,7 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
 
         logging.debug("request to store preference: for " + details.toString() + "\nPreference:\n" + preference.toTreeString());
 
-        IPreferenceTreeModel model = new PreferenceTreeModel(preference);
-        model.setPreferenceName(details.getPreferenceName());
-        if (details.getServiceID() != null) {
-            model.setServiceID(details.getServiceID());
-        }
-        model.setServiceType(details.getServiceType());
+        IPreferenceTreeModel model = new PreferenceTreeModel(details, preference);
         return this.preferenceCache.storePreference(ownerID, details, model);
         //this.calculateSizeOfObject(preference);
 
@@ -297,8 +292,8 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
                 IPreferenceOutcome o = null;
                 while (e.hasMoreElements()) {
                     o = e.nextElement();
-                    o.setServiceID(model.getServiceID());
-                    o.setServiceType(model.getServiceType());
+                    o.setServiceID(model.getPreferenceDetails().getServiceID());
+                    o.setServiceType(model.getPreferenceDetails().getServiceType());
                     this.outcomeConditionListTable.put(o, evaluationResult.get(o));
                 }
 

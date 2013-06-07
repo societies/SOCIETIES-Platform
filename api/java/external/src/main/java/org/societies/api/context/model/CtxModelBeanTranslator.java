@@ -52,6 +52,7 @@ import org.societies.api.schema.context.model.IndividualCtxEntityBean;
 public final class CtxModelBeanTranslator {
 
 	protected byte[] binaryValue;
+	byte[] minBinaryValue = new byte[] {Byte.MIN_VALUE};
 	
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CtxModelBeanTranslator.class);
@@ -337,15 +338,22 @@ public final class CtxModelBeanTranslator {
 	public CtxAttributeBean fromCtxAttribute(CtxAttribute attr) {
 
 		CtxAttributeBean bean = new CtxAttributeBean();
-		byte[] minBinaryValue = new byte[] {Byte.MIN_VALUE};
 		if (attr.getBinaryValue() == null)
 			bean.setBinaryValue(minBinaryValue);
 		else
 			bean.setBinaryValue(attr.getBinaryValue());
-		bean.setDoubleValue(attr.getDoubleValue());
+		Double minDoubleValue = Double.MIN_VALUE;
+		if (attr.getDoubleValue() == null)
+			bean.setDoubleValue(minDoubleValue);
+		else
+			bean.setDoubleValue(attr.getDoubleValue());
 		bean.setHistoryRecorded(attr.isHistoryRecorded());
 		bean.setId(fromCtxIdentifier(attr.getId()));
-		bean.setIntegerValue(attr.getIntegerValue());
+		Integer minIntegerValue = Integer.MIN_VALUE;
+		if (attr.getIntegerValue() == null)
+			bean.setIntegerValue(minIntegerValue);
+		else
+			bean.setIntegerValue(attr.getIntegerValue());
 		bean.setLastModified(attr.getLastModified());
 		bean.setSourceId(attr.getSourceId());
 		bean.setStringValue(attr.getStringValue());
@@ -366,23 +374,13 @@ public final class CtxModelBeanTranslator {
 		// Handle value
 		if (bean.getStringValue() != null)
 			object.setValue(bean.getStringValue());
-		else if (bean.getIntegerValue() != null)
-			if (bean.getIntegerValue() == -1)
-				object.setValue(null);
-			else
-				object.setValue(bean.getIntegerValue());
-		else if (bean.getDoubleValue() != null)
-			if (bean.getDoubleValue() == -1.0)
-				object.setValue(null);
-			else
-				object.setValue(bean.getDoubleValue());
-		else if (bean.getBinaryValue() != null) {
-			byte[] minBinaryValue = new byte[] {Byte.MIN_VALUE};
-			if (bean.getBinaryValue() == minBinaryValue)
-				object.setValue(binaryValue);
-			else
-				object.setValue(bean.getBinaryValue());
-		}
+		else if (bean.getIntegerValue() != Integer.MIN_VALUE)
+			object.setValue(bean.getIntegerValue());
+		else if (bean.getDoubleValue() != Double.MIN_VALUE)
+			object.setValue(bean.getDoubleValue());
+		else if (bean.getBinaryValue() != minBinaryValue)
+			object.setValue(bean.getBinaryValue());
+
 		// Handle value meta-data
 		object.setValueType(fromCtxAttributeValueTypeBean(bean.getValueType()));
 		object.setValueMetric(bean.getValueMetric());
@@ -394,12 +392,14 @@ public final class CtxModelBeanTranslator {
 		if(bean.getQuality().getOriginType() != null ){
 			object.getQuality().setOriginType(fromCtxOriginTypeBean(bean.getQuality().getOriginType()));
 		}
-		if (bean.getQuality().getPrecision() == -1)
+//		if (bean.getQuality().getPrecision() == -1)
+		if (bean.getQuality().getPrecision() == Double.MIN_VALUE)
 			object.getQuality().setPrecision(null);
 		else
 			object.getQuality().setPrecision(bean.getQuality().getPrecision());
-		if (bean.getQuality().getPrecision() == -1)
-			object.getQuality().setPrecision(null);
+//		if (bean.getQuality().getPrecision() == -1)
+		if (bean.getQuality().getPrecision() == Double.MIN_VALUE)
+			object.getQuality().setUpdateFrequency(null);
 		else
 			object.getQuality().setUpdateFrequency(bean.getQuality().getUpdateFrequency());
 
@@ -510,8 +510,14 @@ public final class CtxModelBeanTranslator {
 	public CtxQualityBean fromCtxQuality(CtxQuality quality) {
 
 		final CtxQualityBean bean = new CtxQualityBean();
-		bean.setPrecision(quality.getPrecision());
-		bean.setUpdateFrequency(quality.getUpdateFrequency());
+		if (quality.getPrecision() == null)
+			bean.setPrecision(Double.MIN_VALUE);
+		else
+			bean.setPrecision(quality.getPrecision());
+		if (quality.getUpdateFrequency() == null)
+			bean.setUpdateFrequency(Double.MIN_VALUE);
+		else
+			bean.setUpdateFrequency(quality.getUpdateFrequency());
 		bean.setOriginType(fromCtxOriginType(quality.getOriginType()));
 		bean.setLastUpdated(quality.getLastUpdated());
 

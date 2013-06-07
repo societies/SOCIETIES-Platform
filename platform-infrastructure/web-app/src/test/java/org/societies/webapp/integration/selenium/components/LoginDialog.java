@@ -28,11 +28,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
 public class LoginDialog extends BasePageComponent {
-    private static final String LOGIN_REGISTER_LINK = "//a[@href='#login-box']";
+    private static final String LOGIN_REGISTER_LINK = "//div[@class='login-form']/a[text()='LOGIN / REGISTER']";
     private static final String USERNAME_FIELD = "//input[@id='mainForm:username' and @type='text']";
     private static final String PASSWORD_FIELD = "//input[@id='mainForm:password' and @type='password']";
-    private static final String SUBMIT_BUTTON = "//input[@type='submit']";
-    private static final String LOGIN_CONFIRM_MSG = "//div[@class='login-form']/span/strong[text()='%s']";
+    private static final String SUBMIT_BUTTON = "//button[@type='submit']";
+    private static final String LOGIN_CONFIRM_MSG = "//div[@class='login-form']//strong[text()='%s']";
 
     public LoginDialog(WebDriver driver) {
         super(driver);

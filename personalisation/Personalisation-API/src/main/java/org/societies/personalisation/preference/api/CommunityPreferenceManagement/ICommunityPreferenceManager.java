@@ -24,6 +24,9 @@
  */
 package org.societies.personalisation.preference.api.CommunityPreferenceManagement;
 
+import java.util.List;
+
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.IPreference;
@@ -39,47 +42,30 @@ import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 public interface ICommunityPreferenceManager {
 
 	/**
-	 * 
-	 * @param details
+	 * This method is used to retrieve community preferences from the CIS.
+	 * @param cisID	the id of the CIS
+	 * @return a list of preferences
 	 */
-	public void deletePreference(PreferenceDetails details);
-
+	public List<IPreferenceTreeModel> getAllCommunityPreferences(IIdentity cisID);
+	
 	/**
-	 * 
-	 * @param serviceType
-	 * @param serviceID
-	 * @param preferenceName
+	 * This method is used to upload user preferences to the CIS.
+	 * @param model
 	 */
-	public void deletePreference(String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
-
+	public void uploadUserPreferences(IIdentity cisId, List<IPreferenceTreeModel> model);
+	
+	
 	/**
-	 * 
-	 * @param serviceType
-	 * @param serviceID
-	 * @param preferenceName
+	 * This method is used to retrieve the details of the preferences held by this CIS
+	 * @return
 	 */
-	public IPreferenceTreeModel getModel(String serviceType, ServiceResourceIdentifier serviceID, String preferenceName);
-
+	public List<PreferenceDetails> getCommunityPreferenceDetails(IIdentity cisId);
+	
 	/**
-	 * 
-	 * @param details
-	 */
-	public IPreferenceTreeModel getModel(PreferenceDetails details);
-
-	/**
-	 * 
-	 * @param serviceType
-	 * @param serviceID
-	 * @param preferenceName
-	 * @param preference
-	 */
-	public void updatePreference(String serviceType, ServiceResourceIdentifier serviceID, String preferenceName, IPreference preference);
-
-	/**
-	 * 
-	 * @param details
-	 * @param preference
-	 */
-	public void updatePreference(PreferenceDetails details, IPreference preference);
+	 * This method is used to retrieve a specific preference held by this CIS
+	 * @param detail
+	 * @return
+	 */	
+	public List<IPreferenceTreeModel> getCommunityPreferences(IIdentity cisID, List<PreferenceDetails> details);
 
 }

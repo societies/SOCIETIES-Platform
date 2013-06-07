@@ -1,0 +1,48 @@
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <ImageView
+            android:id="@+id/notificationHistoryHeaderImage"
+            android:layout_width="fill_parent"
+            android:layout_height="36dp"
+            android:src="@drawable/societies_header"
+            android:contentDescription="@string/icon"/>
+
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:background="@color/Grey"
+            android:orientation="vertical">
+
+        <TextView
+                android:id="@android:id/title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/request_history"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:background="@color/Blue"
+                android:textColor="@color/Grey"/>
+
+        <ListView android:id="@android:id/list"
+                  android:layout_width="match_parent"
+                  android:layout_height="fill_parent"
+                  android:background="@color/Grey"
+                  android:layout_weight="1"
+                  android:drawSelectorOnTop="false"
+                  android:isScrollContainer="true"/>
+
+        <TextView android:id="@android:id/empty"
+                  android:layout_width="fill_parent"
+                  android:layout_height="fill_parent"
+                  android:text="@string/nh_no_items"/>
+
+        <Button android:id="@android:id/closeButton"
+                android:text="@string/close_string"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+</TableLayout>

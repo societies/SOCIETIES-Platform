@@ -46,7 +46,7 @@ public class PreferenceConditionExtractor {
 	public List<IPreferenceConditionIOutcomeName> extractConditions(IPreferenceTreeModel pModel){
 		IPreference p = pModel.getRootPreference();
 		ArrayList<IPreferenceConditionIOutcomeName> list = new ArrayList<IPreferenceConditionIOutcomeName>();
-		String preferenceName = pModel.getPreferenceName();
+		String preferenceName = pModel.getPreferenceDetails().getPreferenceName();
 		
 		Enumeration<IPreference> newNodeEnum = p.depthFirstEnumeration();
 		if (p.getUserObject()!=null){

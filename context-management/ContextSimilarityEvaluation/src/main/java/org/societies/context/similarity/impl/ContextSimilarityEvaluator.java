@@ -55,7 +55,7 @@ public class ContextSimilarityEvaluator implements ICtxSimilarityEvaluator {
 	public CtxEvaluationResults evaluateSimilarity (String[] ids, ArrayList<String> attrib){
 		
 		//
-		LOG.info("EBOYLANLOGFOOTPRINT cse.evaluateSimilarity called");
+		LOG.info("EBOYLANLOGevaluateSim cse.evaluateSimilarity called");
 		for (String att : attrib){
 			evaluateAttribute( att,ids);
 		}
@@ -75,7 +75,7 @@ public class ContextSimilarityEvaluator implements ICtxSimilarityEvaluator {
 
 	private void evaluateAttribute(String att, String[] ids){
 		String path = "org.societies.context.similarity.attributes." + att;
-		LOG.info("EBOYLANLOGFOOTPRINT cse.evaluateAttribute called");
+		LOG.info("EBOYLANLOGevaluateattrib cse.evaluateAttribute called");
 		try {
 			Class<?> c = Class.forName(path);
 			String[] argu = ids;
@@ -93,7 +93,7 @@ public class ContextSimilarityEvaluator implements ICtxSimilarityEvaluator {
 	
 	private void evaluateAttributeSummary(String att, HashMap<String, Double> attributeResults){
 		Double max = 0.0;
-		LOG.info("EBOYLANLOGFOOTPRINT cse.evaluateAttributeSummary called");
+		LOG.info("EBOYLANLOGevaluateattrib cse.evaluateAttributeSummary called");
 		for (Double resultV : attributeResults.values()  ){
 			if (resultV > max){
 				max = resultV;

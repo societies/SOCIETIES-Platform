@@ -27,11 +27,11 @@
     </LinearLayout>
 
     <LinearLayout
-            android:id="@+id/ackNackInnerLinearLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/Grey"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
 
         <TableLayout
                 android:layout_width="match_parent"
@@ -57,6 +57,24 @@
 
             </TableRow>
         </TableLayout>
+
+
+        <LinearLayout
+                android:id="@+id/ackNackInnerLinearLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/Grey"
+                android:orientation="horizontal">
+
+            <Button android:text="SAMPLE"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            <Button android:text="SAMPLE"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="true"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 

@@ -372,20 +372,39 @@ public class TrustRepository implements ITrustRepository {
 		else // if (TrustValueType.USER_PERCEIVED == valueType)
 			valueProperty = "userPerceivedTrust.value";
 		
-		final Class<? extends TrustedEntity> entityClass;
-		if (null == entityType)
-			entityClass = TrustedEntity.class;
-		else if (TrustedEntityType.CSS == entityType)
-			entityClass = TrustedCss.class;
-		else if (TrustedEntityType.CIS == entityType)
-			entityClass = TrustedCis.class;
-		else if (TrustedEntityType.SVC == entityType)
-			entityClass = TrustedService.class;
-		else
+		double sumValue = 0.0d;
+		int countValue = 0;
+		if (null == entityType) {
+			final SumN cssSumN = this.retrieveSumNTrustValue(
+					trustorId, valueProperty, TrustedCss.class);
+			final SumN cisSumN = this.retrieveSumNTrustValue(
+					trustorId, valueProperty, TrustedCis.class);
+			final SumN svcSumN = this.retrieveSumNTrustValue(
+					trustorId, valueProperty, TrustedService.class);
+			sumValue += cssSumN.sum + cisSumN.sum + svcSumN.sum;
+			countValue += cssSumN.n + cisSumN.n + svcSumN.n;
+			
+		} else if (TrustedEntityType.CSS == entityType) {
+			final SumN sumN = this.retrieveSumNTrustValue(
+					trustorId, valueProperty, TrustedCss.class);
+			sumValue += sumN.sum;
+			countValue += sumN.n;
+		} else if (TrustedEntityType.CIS == entityType) {
+			final SumN sumN = this.retrieveSumNTrustValue(
+					trustorId, valueProperty, TrustedCis.class);
+			sumValue += sumN.sum;
+			countValue += sumN.n;
+		} else if (TrustedEntityType.SVC == entityType) {
+			final SumN sumN = this.retrieveSumNTrustValue(
+					trustorId, valueProperty, TrustedService.class);
+			sumValue += sumN.sum;
+			countValue += sumN.n;
+		} else {
 			throw new TrustRepositoryException("Unsupported entityType: "
 					+ entityType);
+		}
 		
-		return this.doRetrieveMeanTrustValue(trustorId, valueProperty, entityClass);
+		return (countValue > 0) ? sumValue / countValue : 0.0d; 
 	}
 	
 	/*
@@ -456,7 +475,7 @@ public class TrustRepository implements ITrustRepository {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private double doRetrieveMeanTrustValue(
+	private SumN retrieveSumNTrustValue(
 			final TrustedEntityId trustorId, final String valueProperty,	
 			final Class<? extends TrustedEntity> entityClass) 
 					throws TrustRepositoryException {
@@ -479,7 +498,7 @@ public class TrustRepository implements ITrustRepository {
 					totalCount += (Integer) resultsEntry[1];
 				}
 			}
-			return (totalCount > 0) ? (totalSum / totalCount) : 0.0d;
+			return new SumN(totalSum, totalCount);
 		
 		} catch (Exception e) {
 			throw new TrustRepositoryException("Could not estimate mean trust value assigned by '"
@@ -487,6 +506,25 @@ public class TrustRepository implements ITrustRepository {
 		} finally {
 			if (session != null)
 				session.close();
+		}
+	}
+	
+	/**
+	 * Utility class to calculate the mean.
+	 * 
+	 * mean = sum / n;
+	 *
+	 * @since 1.1
+	 */
+	private class SumN {
+		
+		private final double sum;
+		private final int n;
+		
+		private SumN(final double sum, final int n) {
+			
+			this.sum = sum;
+			this.n = n;
 		}
 	}
 }

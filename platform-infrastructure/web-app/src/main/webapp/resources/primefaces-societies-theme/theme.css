@@ -1237,6 +1237,11 @@ body .ui-tooltip {
     font-weight: bold;
 }
 
+.unread-notification .ui-widget-header {
+    border: 1px solid #f26a36;
+    color: #f26a36;
+}
+
 /* Interaction states
 ----------------------------------*/
 .ui-state-default,

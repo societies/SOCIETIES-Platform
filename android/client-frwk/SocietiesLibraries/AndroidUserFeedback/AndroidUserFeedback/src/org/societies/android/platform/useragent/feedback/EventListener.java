@@ -24,197 +24,193 @@
  */
 package org.societies.android.platform.useragent.feedback;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.societies.android.api.comms.IMethodCallback;
-import org.societies.android.api.comms.xmpp.ICommCallback;
-import org.societies.android.api.comms.xmpp.Stanza;
-import org.societies.android.api.comms.xmpp.VCardParcel;
-import org.societies.android.api.comms.xmpp.XMPPError;
-import org.societies.android.api.comms.xmpp.XMPPInfo;
-import org.societies.android.api.events.IAndroidSocietiesEvents;
-import org.societies.android.api.events.IPlatformEventsCallback;
-import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
-import org.societies.android.platform.androidutils.AndroidNotifier;
-import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
-import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
-import org.societies.android.platform.useragent.feedback.guis.AcknackPopup;
-import org.societies.android.platform.useragent.feedback.guis.CheckboxPopup;
-import org.societies.android.platform.useragent.feedback.guis.RadioPopup;
-import org.societies.android.remote.helper.EventsHelper;
-import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
-import org.societies.api.schema.css.directory.CssFriendEvent;
-import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
-
 import android.app.Notification;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
-import android.os.Parcelable;
+import android.os.*;
 import android.util.Log;
+import org.societies.android.api.comms.IMethodCallback;
+import org.societies.android.api.events.IAndroidSocietiesEvents;
+import org.societies.android.api.events.IPlatformEventsCallback;
+import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
+import org.societies.android.platform.androidutils.AndroidNotifier;
+import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
+import org.societies.android.platform.useragent.feedback.guis.*;
+import org.societies.android.remote.helper.EventsHelper;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
+import org.societies.api.schema.useragent.feedback.FeedbackMethodType;
+import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Describe your class here...
  *
  * @author aleckey
- *
  */
 public class EventListener extends Service {
 
-	private static final String LOG_TAG = EventListener.class.getName();
-	
-	//TRACKING CONNECTION TO EVENTS MANAGER
-	private boolean boundToEventMgrService = false;
-	private BroadcastReceiver receiver;
-	private Looper mServiceLooper;
-	private ServiceHandler mServiceHandler;
-	private EventsHelper eventsHelper;
-	private Set<Integer> eventIds;
-	private Set<String> eventGuids;
-	private ClientCommunicationMgr ccm;
-	
-	// Handler that receives messages from the thread
-	private final class ServiceHandler extends Handler {
-		public ServiceHandler(Looper looper) {
-			super(looper);
-		}
-		      
-		@Override
-		public void handleMessage(Message msg) {
-			Log.d(this.getClass().getName(), "Message received in Userfeedback event thread");
-			eventIds = new HashSet<Integer>();
-			eventGuids = new HashSet<String>();
-			if (!boundToEventMgrService) {
-				setupBroadcastReceiver();
-				subscribeToEvents();
-			}
-		}
-	}
-	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>UserFeedback SERVICE LIFECYCLE METHODS>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	@Override
-	public IBinder onBind(Intent intent) {
-		return null;	//NO-ONE ALLOWED TO BIND TO THIS SERVICE
-	}
+    private static final String LOG_TAG = EventListener.class.getName();
 
-	@Override
-	public void onCreate() {
-		Log.d(this.getClass().getName(), "UserFeedback Service creating...");
-		this.ccm = new ClientCommunicationMgr(this, true);
-        this.ccm.bindCommsService(new IMethodCallback() {
-			@Override
-			public void returnException(String result) { 
-				Log.d(LOG_TAG, "Exception binding to service: " + result);
-			}
-			@Override
-			public void returnAction(String result) { 
-				Log.d(LOG_TAG, "return Action.flag: " + result);
-			}
-			@Override
-			public void returnAction(boolean resultFlag) { 
-				Log.d(LOG_TAG, "return Action.flag: " + resultFlag);
-			}
-		});
-        
-		// START BACKGROUND THREAD FOR SERVICE
-		HandlerThread thread = new HandlerThread("UserFeedbackStartArguments", android.os.Process.THREAD_PRIORITY_BACKGROUND);
-		thread.start();
-		
-		// Get the HandlerThread's Looper and use it for our Handler 
-		mServiceLooper = thread.getLooper();
-		mServiceHandler = new ServiceHandler(mServiceLooper);
-	}
-	
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		// For each start request, send a message to start a job and deliver the
-		//start ID so we know which request we're stopping when we finish the job
-		Message msg = mServiceHandler.obtainMessage();
-		msg.arg1 = startId;
-	  	mServiceHandler.sendMessage(msg);
-	  
-	  	//If we get killed, after returning from here, restart
-		return START_STICKY;
-	}
-	
-	@Override
-	public void onDestroy() {
-		Log.d(LOG_TAG, "UserFeedback service terminating");
-		boundToEventMgrService = false;
-		this.unregisterReceiver(receiver);
-		this.eventsHelper.tearDownService(new IMethodCallback() {
-			@Override
-			public void returnAction(String result) { }
-			@Override
-			public void returnAction(boolean resultFlag) { }
-			@Override
-			public void returnException(String result) { }
-		});
-	}
-	
-	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>REGISTER FOR EVENTS>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	/**Create a broadcast receiver */
+    //TRACKING CONNECTION TO EVENTS MANAGER
+    private boolean boundToEventMgrService = false;
+    private BroadcastReceiver receiver;
+    private Looper mServiceLooper;
+    private ServiceHandler mServiceHandler;
+    private EventsHelper eventsHelper;
+
+    private final Set<String> processedIncomingEvents = new HashSet<String>();
+
+    // Handler that receives messages from the thread
+    private final class ServiceHandler extends Handler {
+        public ServiceHandler(Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            Log.d(this.getClass().getName(), "Message received in Userfeedback event thread");
+            if (!boundToEventMgrService) {
+                setupBroadcastReceiver();
+                subscribeToEvents();
+            }
+        }
+    }
+
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>UserFeedback SERVICE LIFECYCLE METHODS>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;    //NO-ONE ALLOWED TO BIND TO THIS SERVICE
+    }
+
+    @Override
+    public void onCreate() {
+        Log.d(this.getClass().getName(), "UserFeedback Service creating...");
+        // START BACKGROUND THREAD FOR SERVICE
+        HandlerThread thread = new HandlerThread("UserFeedbackStartArguments", android.os.Process.THREAD_PRIORITY_BACKGROUND);
+        thread.start();
+
+        // Get the HandlerThread's Looper and use it for our Handler
+        mServiceLooper = thread.getLooper();
+        mServiceHandler = new ServiceHandler(mServiceLooper);
+
+        // Timed abort processor needs a context to run in
+        TimedAbortProcessor.getInstance().setContext(this);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        // For each start request, send a message to start a job and deliver the
+        //start ID so we know which request we're stopping when we finish the job
+        Message msg = mServiceHandler.obtainMessage();
+        msg.arg1 = startId;
+        mServiceHandler.sendMessage(msg);
+
+        //If we get killed, after returning from here, restart
+        return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(LOG_TAG, "UserFeedback service terminating");
+        boundToEventMgrService = false;
+        this.unregisterReceiver(receiver);
+        this.eventsHelper.tearDownService(new IMethodCallback() {
+            @Override
+            public void returnAction(String result) {
+            }
+
+            @Override
+            public void returnAction(boolean resultFlag) {
+            }
+
+            @Override
+            public void returnException(String result) {
+            }
+        });
+
+        TimedAbortProcessor.getInstance().stop();
+    }
+
+    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>REGISTER FOR EVENTS>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    /**
+     * Create a broadcast receiver
+     */
     private void setupBroadcastReceiver() {
-    	Log.d(LOG_TAG, "Setting up broadcast receiver...");
-    	receiver = new MainReceiver();
+        Log.d(LOG_TAG, "Setting up broadcast receiver...");
+        receiver = new MainReceiver();
         this.registerReceiver(receiver, createIntentFilter());
     }
-    
-    /**Broadcast receiver to receive intent return values from EventManager service*/
+
+    /**
+     * Broadcast receiver to receive intent return values from EventManager service
+     */
     private class MainReceiver extends BroadcastReceiver {
-		
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Log.d(LOG_TAG, "Received action: " + intent.getAction());
-			
-			//EVENT MANAGER INTENTS
-			if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT)) {
-				Log.d(LOG_TAG, "Subscribed to event: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
-			} else if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENTS)) {
-				Log.d(LOG_TAG, "Subscribed to multiple events: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
-			} else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS)) {
-				Log.d(LOG_TAG, "Un-subscribed to events: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
-			}
-			//PRIVACY NEGOTIATION EVENT - payload is UserFeedbackPrivacyNegotiatioEvent 
-			else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_REQUEST_INTENT)) {
-				Log.d(LOG_TAG, "Privacy Negotiation event received");
-				UserFeedbackPrivacyNegotiationEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
-				//CHECK IF WE HAVE RECEIVED THIS ALREADY
-				int thisId = eventPayload.getNegotiationDetails().getNegotiationID();
-				if (!eventIds.contains(thisId)) {
-					eventIds.add(thisId);
-					ICommCallback callback = new VCardCallback(eventPayload, NegotiationActivity.class);
-					ccm.getVCard(eventPayload.getNegotiationDetails().getRequestor().getRequestorId(), callback);
-				}
-			}
-			//PERMISSION REQUEST EVENT - payload is UserFeedbackBean 
-			else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_REQUEST_INTENT)) {
-				Log.d(LOG_TAG, "General Permission request event received");
-				UserFeedbackBean eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
-				String eventGuid = eventPayload.getRequestId();
-				//CHECK IF WE HAVE RECEIVED THIS ALREADY
-				if (!eventGuids.contains(eventGuid)) {
-					eventGuids.add(eventGuid);
-					String description = eventPayload.getProposalText();
-					addNotification(description, "Privacy Policy", eventPayload);
-				}
-			}
-		}
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(LOG_TAG, "Received action: " + intent.getAction());
+
+            //EVENT MANAGER INTENTS
+            if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT)) {
+                Log.d(LOG_TAG, "Subscribed to event: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+            } else if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENTS)) {
+                Log.d(LOG_TAG, "Subscribed to multiple events: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+            } else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS)) {
+                Log.d(LOG_TAG, "Un-subscribed to events: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+            }
+            //PRIVACY NEGOTIATION EVENT - payload is UserFeedbackPrivacyNegotiatioEvent
+            else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_REQUEST_INTENT)) {
+                UserFeedbackPrivacyNegotiationEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+
+                synchronized (processedIncomingEvents) {
+                    String id = String.valueOf(eventPayload.getNegotiationDetails().getNegotiationID());
+
+                    if (processedIncomingEvents.contains(id)) {
+                        Log.w(LOG_TAG, "Ignoring duplicate PPN event received: " + id);
+                        return;
+                    }
+
+                    processedIncomingEvents.add(id);
+                }
+
+                Log.d(LOG_TAG, "Privacy Negotiation event received");
+                launchPrivacyPolicyNegotiation(eventPayload);
+            }
+            //PERMISSION REQUEST EVENT - payload is UserFeedbackBean
+            else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_REQUEST_INTENT)) {
+                UserFeedbackBean eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+
+                synchronized (processedIncomingEvents) {
+                    String id = eventPayload.getRequestId();
+
+                    if (processedIncomingEvents.contains(id)) {
+                        Log.w(LOG_TAG, "Ignoring duplicate UF event received: " + id);
+                        return;
+                    }
+
+                    processedIncomingEvents.add(id);
+                }
+
+                Log.d(LOG_TAG, "General Permission request event received");
+                String description = "Accept privacy policy?";
+                addUserFeedbackNotification(description, "Privacy Policy", eventPayload);
+            }
+        }
     }
-    
-    /**Create a suitable intent filter
+
+    /**
+     * Create a suitable intent filter
+     *
      * @return IntentFilter
      */
-    private IntentFilter createIntentFilter() {
-    	//register broadcast receiver to receive SocietiesEvents return values 
+    private static IntentFilter createIntentFilter() {
+        //register broadcast receiver to receive SocietiesEvents return values
         IntentFilter intentFilter = new IntentFilter();
         //EVENT MANAGER INTENTS
         intentFilter.addAction(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT);
@@ -225,118 +221,99 @@ public class EventListener extends Service {
         intentFilter.addAction(IAndroidSocietiesEvents.UF_REQUEST_INTENT);
         return intentFilter;
     }
-    
+
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>SUBSCRIBE TO PUBSUB EVENTS>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     private void subscribeToEvents() {
-		eventsHelper = new EventsHelper(EventListener.this.getApplicationContext());
-		Log.d(LOG_TAG, "new EventService");
-		eventsHelper.setUpService(new IMethodCallback() {
-			@Override
-			public void returnAction(String result) { }
-			
-			@Override
-			public void returnAction(boolean resultFlag) {
-				Log.d(LOG_TAG, "eventMgr callback: resultFlag: " + resultFlag);
-				if (resultFlag){
-					try {
-						//subscribing to all user feedback events. 
-						EventListener.this.eventsHelper.subscribeToEvents(UserFeedbackActivityIntentExtra.USERFEEDBACK_NODES, new IPlatformEventsCallback() {
-							@Override
-							public void returnAction(int result) {
-								Log.d(LOG_TAG, "eventMgr callback: ReturnAction(int) called. ??");
-							}
-							@Override
-							public void returnAction(boolean resultFlag) {
-								Log.d(LOG_TAG, "eventMgr.subscribeToEvents resultFlag: " + resultFlag);
-								if (resultFlag)
-									boundToEventMgrService = true;
-							}
-							@Override
-							public void returnException(int exception) {
-								Log.d(LOG_TAG, "eventMgr.returnException code: " + exception);
-							}
-						});
-					} catch (PlatformEventsHelperNotConnectedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-			@Override
-			public void returnException(String result) {
-			}
-		});
-	}
-    
-    private void addNotification(String description, String eventType, UserFeedbackBean policy) {
-    	//CREATE ANDROID NOTIFICATION
-		int notifierflags [] = new int [1];
-		notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
-		AndroidNotifier notifier = new AndroidNotifier(EventListener.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
-		
-		//DETERMINE WHICH ACTIVITY TO LAUNCH
-		Class activityClass;
-		if (policy.getType()==0)
-			activityClass = RadioPopup.class;
-		else if (policy.getType()==1)
-			activityClass = CheckboxPopup.class;
-		else
-			activityClass = AcknackPopup.class;
-		
-		//CREATE INTENT FOR LAUNCHING ACTIVITY
-		Intent intent = new Intent(this.getApplicationContext(), activityClass);
-		intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY, (Parcelable)policy);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		notifier.notifyMessage(description, eventType, activityClass, intent, "SOCIETIES");
-	}
+        eventsHelper = new EventsHelper(EventListener.this.getApplicationContext());
+        Log.d(LOG_TAG, "new EventService");
+        eventsHelper.setUpService(new IMethodCallback() {
+            @Override
+            public void returnAction(String result) {
+            }
 
-    /**
-	 * Callback used with Android Comms for CSSDirectory
-	 *
-	 */
-	private class VCardCallback implements ICommCallback {
-		private Parcelable policy;
-		private Class<?> activityClass;
-		private String description;
-		boolean notify = false;
-		
-		public VCardCallback(Parcelable policy, Class activtyClass, boolean notify, String description) {
-			this.policy = policy;
-			this.activityClass = activtyClass;
-			this.description = description;
-		}
-		
-		public VCardCallback(Parcelable policy, Class activtyClass) {
-			this.policy = policy;
-			this.activityClass = activtyClass;
-		}
-		
-		public List<String> getXMLNamespaces() { return null;}
-		public List<String> getJavaPackages() {  return null;}
-		public void receiveError(Stanza arg0, XMPPError arg1) { }
-		public void receiveInfo(Stanza arg0, String arg1, XMPPInfo arg2) { }
-		public void receiveItems(Stanza arg0, String arg1, List<String> arg2) {	}
-		public void receiveMessage(Stanza arg0, Object arg1) { }
+            @Override
+            public void returnAction(boolean resultFlag) {
+                Log.d(LOG_TAG, "eventMgr callback: resultFlag: " + resultFlag);
+                if (resultFlag) {
+                    try {
+                        //subscribing to all user feedback events.
+                        EventListener.this.eventsHelper.subscribeToEvents(UserFeedbackActivityIntentExtra.USERFEEDBACK_NODES, new IPlatformEventsCallback() {
+                            @Override
+                            public void returnAction(int result) {
+                                Log.d(LOG_TAG, "eventMgr callback: ReturnAction(int) called. ??");
+                            }
 
-		public void receiveResult(Stanza arg0, Object retValue) {
-			Log.d(VCardCallback.class.getName(), "VCardCallback Callback receiveResult");
-			VCardParcel vCard = (VCardParcel)retValue;
-			
-			//CREATE ANDROID NOTIFICATION
-			int notifierflags [] = new int [1];
-			notifierflags[0] = Notification.FLAG_AUTO_CANCEL;
-			AndroidNotifier notifier = new AndroidNotifier(EventListener.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierflags);
-			
-			//CREATE INTENT FOR LAUNCHING ACTIVITY
-			Intent intent = new Intent(EventListener.this.getApplicationContext(), activityClass);
-			intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY, policy);
-			intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_CSS_VCARD, (Parcelable)vCard);
-			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            @Override
+                            public void returnAction(boolean resultFlag) {
+                                Log.d(LOG_TAG, "eventMgr.subscribeToEvents resultFlag: " + resultFlag);
+                                if (resultFlag)
+                                    boundToEventMgrService = true;
+                            }
 
-			if (notify)
-				notifier.notifyMessage(description, "Friend Request", activityClass, intent, "SOCIETIES");
-			else
-				startActivity(intent);
-		}
-	}
+                            @Override
+                            public void returnException(int exception) {
+                                Log.d(LOG_TAG, "eventMgr.returnException code: " + exception);
+                            }
+                        });
+                    } catch (PlatformEventsHelperNotConnectedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void returnException(String result) {
+            }
+        });
+    }
+
+    private void launchPrivacyPolicyNegotiation(UserFeedbackPrivacyNegotiationEvent policy) {
+        //CREATE INTENT FOR LAUNCHING ACTIVITY
+        Intent intent = new Intent(this.getApplicationContext(), NegotiationActivity.class);
+        intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY, (Parcelable) policy);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    private void addUserFeedbackNotification(String description, String eventType, UserFeedbackBean ufBean) {
+
+        //DETERMINE WHICH ACTIVITY TO LAUNCH
+        Class activityClass;
+        if (ufBean.getMethod() == FeedbackMethodType.GET_EXPLICIT_FB) {
+
+            // select type of explicit feedback
+            if (ufBean.getType() == 0)
+                activityClass = RadioPopup.class;
+            else if (ufBean.getType() == 1)
+                activityClass = CheckboxPopup.class;
+            else
+                activityClass = AcknackPopup.class;
+
+        } else if (ufBean.getMethod() == FeedbackMethodType.GET_IMPLICIT_FB) {
+            // only one type of implicit feedback
+
+            activityClass = TimedAbortPopup.class;
+
+            // Add to the background watcher
+            TimedAbortProcessor.getInstance().addTimedAbort(ufBean);
+
+        } else {
+            // only one left is "SHOW_NOTIFICATION"
+
+            activityClass = SimpleNotificationPopup.class;
+        }
+
+        //CREATE INTENT FOR LAUNCHING ACTIVITY
+        Intent intent = new Intent(this.getApplicationContext(), activityClass);
+        intent.putExtra(UserFeedbackActivityIntentExtra.USERFEEDBACK_NODES, (Parcelable) ufBean);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        //CREATE ANDROID NOTIFICATION
+        int notifierFlags[] = new int[1];
+        notifierFlags[0] = Notification.FLAG_AUTO_CANCEL;
+        AndroidNotifier notifier = new AndroidNotifier(EventListener.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierFlags);
+        notifier.notifyMessage(description, eventType, activityClass, intent, "SOCIETIES");
+
+    }
 
 }

@@ -44,15 +44,15 @@ public abstract class SeleniumTest {
     protected final Logger log = LoggerFactory.getLogger(this.getClass()); //NB NOT static!
     private WebDriver driver;
 
-    @Rule
-    public SqlScriptRule sqlScriptRule;
+//    @Rule
+//    public SqlScriptRule sqlScriptRule;
 
     @Rule
     public BrowserControlRule browserControlRule;
 
     protected SeleniumTest() {
         this.driver = new ChromeDriver();
-        this.sqlScriptRule = new SqlScriptRule(this.getClass());
+//        this.sqlScriptRule = new SqlScriptRule(this.getClass());
         this.browserControlRule = new BrowserControlRule(driver, BASE_URL, CLOSE_BROWSER_ON_FAILURE);
     }
 
@@ -65,6 +65,7 @@ public abstract class SeleniumTest {
         getDriver().get(BASE_URL + "index.xhtml");
         IndexPage indexPage = new IndexPage(getDriver());
         indexPage.doLogin(username, password);
+        getDriver().get(BASE_URL + "index.xhtml");
 
         return indexPage;
     }
