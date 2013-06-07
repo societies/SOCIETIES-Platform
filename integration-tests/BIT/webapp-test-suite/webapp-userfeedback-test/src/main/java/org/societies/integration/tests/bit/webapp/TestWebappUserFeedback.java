@@ -12,13 +12,19 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
+import org.societies.api.internal.useragent.model.ImpProposalContent;
+import org.societies.api.internal.useragent.model.ImpProposalType;
 import org.societies.integration.api.selenium.SeleniumTest;
 import org.societies.integration.api.selenium.components.UFNotificationPopup;
 import org.societies.integration.api.selenium.pages.IndexPage;
 import org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository;
 
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+
+import static junit.framework.Assert.fail;
 
 public class TestWebappUserFeedback extends SeleniumTest {
 
@@ -59,7 +65,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
 //        pubSubListener.unregisterForEvents();
     }
 
-//    @Test
+    //    @Test
     public void eventsAppearAtLogin_andCanBeAccepted() {
         ExpProposalContent content = new ExpProposalContent("Pick a button", new String[]{"Yes", "No"});
 
@@ -93,13 +99,18 @@ public class TestWebappUserFeedback extends SeleniumTest {
     }
 
     @Test
-    public void sendAckNack_completeEvent_ensureDataUpdated() {
+    public void sendAckNack_completeEventViaPopup_ensureDataUpdated() throws ExecutionException, InterruptedException {
         indexPage.doLogin(USERNAME, PASSWORD);
-        UFNotificationPopup popup = indexPage.clickNotificationBubble();
+        UFNotificationPopup popup;
 
         // clear any existing data
-        popup.answerAllOutstandingRequestsWithAnyOption();
-        popup.close();
+        try {
+            indexPage.verifyNumberInNotificationsBubble(0);
+        } catch (Exception ex) {
+            popup = indexPage.clickNotificationBubble();
+            popup.answerAllOutstandingRequestsWithAnyOption();
+            popup.close();
+        }
 
         // ensure we're starting from a clean slate
         indexPage.verifyNumberInNotificationsBubble(0);
@@ -120,10 +131,252 @@ public class TestWebappUserFeedback extends SeleniumTest {
         popup.close();
 
         // ensure data has been updated
-        Assert.assertTrue(result1.isDone());
-        indexPage.verifyNumberInNotificationsBubble(0);
+        Date timeout = new Date(new Date().getTime() + 10000);
+        while (timeout.after(new Date())) {
+            if (result1.isDone())
+                break;
 
+            Thread.sleep(100);
+        }
+
+        Assert.assertTrue("Future object not updated after 10000ms", result1.isDone());
+        Assert.assertEquals("Value not updated in Future object", 1, result1.get().size());
+        Assert.assertEquals("Wrong value in Future object", "No", result1.get().get(0));
+        indexPage.verifyNumberInNotificationsBubble(0);
     }
 
+    @Test
+    public void sendSelectOne_completeEventViaPopup_ensureDataUpdated() throws ExecutionException, InterruptedException {
+        indexPage.doLogin(USERNAME, PASSWORD);
+        UFNotificationPopup popup;
+
+        // clear any existing data
+        try {
+            indexPage.verifyNumberInNotificationsBubble(0);
+        } catch (Exception ex) {
+            popup = indexPage.clickNotificationBubble();
+            popup.answerAllOutstandingRequestsWithAnyOption();
+            popup.close();
+        }
+
+        // ensure we're starting from a clean slate
+        indexPage.verifyNumberInNotificationsBubble(0);
+
+        // send a request
+        ExpProposalContent content = new ExpProposalContent("Pick one", new String[]{"Yes", "No", "Maybe", "Sometimes", "Dont know", "Dont care"});
+        Future<List<String>> result1 = userFeedback.getExplicitFBAsync(ExpProposalType.RADIOLIST, content);
+
+        // ensure request has been sent
+        indexPage.verifyNumberInNotificationsBubble(1);
+        popup = indexPage.clickNotificationBubble();
+
+        // ensure request hasn't been completed
+        Assert.assertFalse(result1.isDone());
+
+        // respond to request
+        popup.answerSelectOneRequest("Maybe");
+        popup.close();
+
+        // ensure data has been updated
+        Date timeout = new Date(new Date().getTime() + 10000);
+        while (timeout.after(new Date())) {
+            if (result1.isDone())
+                break;
+
+            Thread.sleep(100);
+        }
+
+        Assert.assertTrue("Future object not updated after 10000ms", result1.isDone());
+        Assert.assertEquals("Value not updated in Future object", 1, result1.get().size());
+        Assert.assertEquals("Wrong value in Future object", "Maybe", result1.get().get(0));
+        indexPage.verifyNumberInNotificationsBubble(0);
+    }
+
+    @Test
+    public void sendSelectMany_completeEventViaPopup_ensureDataUpdated() throws ExecutionException, InterruptedException {
+        indexPage.doLogin(USERNAME, PASSWORD);
+        UFNotificationPopup popup;
+
+        // clear any existing data
+        try {
+            indexPage.verifyNumberInNotificationsBubble(0);
+        } catch (Exception ex) {
+            popup = indexPage.clickNotificationBubble();
+            popup.answerAllOutstandingRequestsWithAnyOption();
+            popup.close();
+        }
+
+        // ensure we're starting from a clean slate
+        indexPage.verifyNumberInNotificationsBubble(0);
+
+        // send a request
+        ExpProposalContent content = new ExpProposalContent("Pick two", new String[]{"Yes", "No", "Maybe", "Sometimes", "Dont know", "Dont care"});
+        Future<List<String>> result1 = userFeedback.getExplicitFBAsync(ExpProposalType.CHECKBOXLIST, content);
+
+        // ensure request has been sent
+        indexPage.verifyNumberInNotificationsBubble(1);
+        popup = indexPage.clickNotificationBubble();
+
+        // ensure request hasn't been completed
+        Assert.assertFalse(result1.isDone());
+
+        // respond to request
+        popup.answerSelectManyRequest(new String[]{"Maybe", "Dont know", "Dont care"});
+        popup.close();
+
+        // ensure data has been updated
+        Date timeout = new Date(new Date().getTime() + 10000);
+        while (timeout.after(new Date())) {
+            if (result1.isDone())
+                break;
+
+            Thread.sleep(100);
+        }
+
+        Assert.assertTrue("Future object not updated after 10000ms", result1.isDone());
+        Assert.assertEquals("Value not updated in Future object", 3, result1.get().size());
+        Assert.assertTrue("Wrong values in Future object", result1.get().contains("Maybe"));
+        Assert.assertTrue("Wrong values in Future object", result1.get().contains("Dont know"));
+        Assert.assertTrue("Wrong values in Future object", result1.get().contains("Dont care"));
+        indexPage.verifyNumberInNotificationsBubble(0);
+    }
+
+//    @Test - not quite ready yet
+    public void sendTimedAbort_acceptEventViaPopup_ensureDataUpdated() throws ExecutionException, InterruptedException {
+        indexPage.doLogin(USERNAME, PASSWORD);
+        UFNotificationPopup popup;
+
+        // clear any existing data
+        try {
+            indexPage.verifyNumberInNotificationsBubble(0);
+        } catch (Exception ex) {
+            popup = indexPage.clickNotificationBubble();
+            popup.answerAllOutstandingRequestsWithAnyOption();
+            popup.close();
+        }
+
+        // ensure we're starting from a clean slate
+        indexPage.verifyNumberInNotificationsBubble(0);
+
+        // send a request
+        ImpProposalContent content = new ImpProposalContent("Accept me", 30000);
+        Future<Boolean> result1 = userFeedback.getImplicitFB(ImpProposalType.TIMED_ABORT, content);
+
+        // ensure request has been sent
+        indexPage.verifyNumberInNotificationsBubble(1);
+        popup = indexPage.clickNotificationBubble();
+
+        // ensure request hasn't been completed
+        Assert.assertFalse(result1.isDone());
+
+        // respond to request
+        fail("need to accept the request");
+        popup.answerSelectManyRequest(new String[]{"Maybe", "Dont know", "Dont care"});
+        popup.close();
+
+        // ensure data has been updated
+        Date timeout = new Date(new Date().getTime() + 10000);
+        while (timeout.after(new Date())) {
+            if (result1.isDone())
+                break;
+
+            Thread.sleep(100);
+        }
+
+        Assert.assertTrue("Future object not updated after 10000ms", result1.isDone());
+        Assert.assertEquals("Value not updated in Future object", Boolean.TRUE, result1.get());
+        indexPage.verifyNumberInNotificationsBubble(0);
+    }
+
+    //    @Test - not quite ready yet
+    public void sendTimedAbort_abortEventViaPopup_ensureDataUpdated() throws ExecutionException, InterruptedException {
+        indexPage.doLogin(USERNAME, PASSWORD);
+        UFNotificationPopup popup;
+
+        // clear any existing data
+        try {
+            indexPage.verifyNumberInNotificationsBubble(0);
+        } catch (Exception ex) {
+            popup = indexPage.clickNotificationBubble();
+            popup.answerAllOutstandingRequestsWithAnyOption();
+            popup.close();
+        }
+
+        // ensure we're starting from a clean slate
+        indexPage.verifyNumberInNotificationsBubble(0);
+
+        // send a request
+        ImpProposalContent content = new ImpProposalContent("Abort me", 30000);
+        Future<Boolean> result1 = userFeedback.getImplicitFB(ImpProposalType.TIMED_ABORT, content);
+
+        // ensure request has been sent
+        indexPage.verifyNumberInNotificationsBubble(1);
+        popup = indexPage.clickNotificationBubble();
+
+        // ensure request hasn't been completed
+        Assert.assertFalse(result1.isDone());
+
+        // respond to request
+        fail("need to abort the request");
+        popup.answerSelectManyRequest(new String[]{"Maybe", "Dont know", "Dont care"});
+        popup.close();
+
+        // ensure data has been updated
+        Date timeout = new Date(new Date().getTime() + 10000);
+        while (timeout.after(new Date())) {
+            if (result1.isDone())
+                break;
+
+            Thread.sleep(100);
+        }
+
+        Assert.assertTrue("Future object not updated after 10000ms", result1.isDone());
+        Assert.assertEquals("Value not updated in Future object", Boolean.FALSE, result1.get());
+        indexPage.verifyNumberInNotificationsBubble(0);
+    }
+
+    @Test
+    public void sendTimedAbort_ignoreEvent_ensureDataUpdated() throws ExecutionException, InterruptedException {
+        indexPage.doLogin(USERNAME, PASSWORD);
+        UFNotificationPopup popup;
+
+        // clear any existing data
+        try {
+            indexPage.verifyNumberInNotificationsBubble(0);
+        } catch (Exception ex) {
+            popup = indexPage.clickNotificationBubble();
+            popup.answerAllOutstandingRequestsWithAnyOption();
+            popup.close();
+        }
+
+        // ensure we're starting from a clean slate
+        indexPage.verifyNumberInNotificationsBubble(0);
+
+        // send a request
+        ImpProposalContent content = new ImpProposalContent("Accept me", 5000);
+        Future<Boolean> result1 = userFeedback.getImplicitFB(ImpProposalType.TIMED_ABORT, content);
+
+        // ensure request has been sent
+        indexPage.verifyNumberInNotificationsBubble(1);
+
+        // ensure request hasn't been completed
+        Assert.assertFalse(result1.isDone());
+
+        // respond to request (by ignoring it)
+        Thread.sleep(5000);
+
+        // ensure data has been updated
+        Date timeout = new Date(new Date().getTime() + 10000);
+        while (timeout.after(new Date())) {
+            if (result1.isDone())
+                break;
+
+            Thread.sleep(100);
+        }
+
+        Assert.assertTrue("Future object not updated after 10000ms", result1.isDone());
+        Assert.assertEquals("Value not updated in Future object", Boolean.TRUE, result1.get());
+        indexPage.verifyNumberInNotificationsBubble(0);
+    }
 
 }
