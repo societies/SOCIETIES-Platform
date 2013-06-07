@@ -24,8 +24,8 @@
  */
 package org.societies.integration.api.selenium.components;
 
-import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -76,7 +76,7 @@ public class UFNotificationPopup extends BasePageComponent {
             try {
                 answerAckNackRequestWithAnyOption();
                 i--;
-            } catch (ElementNotFoundException ex) {
+            } catch (NoSuchElementException ex) {
                 break;
             }
 
@@ -88,7 +88,7 @@ public class UFNotificationPopup extends BasePageComponent {
             try {
                 answerSelectOneRequestWithAnyOption();
                 i--;
-            } catch (ElementNotFoundException ex) {
+            } catch (NoSuchElementException ex) {
                 break;
             }
 
@@ -100,7 +100,7 @@ public class UFNotificationPopup extends BasePageComponent {
             try {
                 answerSelectManyRequestWithAnyOption();
                 i--;
-            } catch (ElementNotFoundException ex) {
+            } catch (NoSuchElementException ex) {
                 break;
             }
 
