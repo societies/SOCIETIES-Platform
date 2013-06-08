@@ -1698,7 +1698,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			CtxEntityIdentifier entityId, CtxModelType modelType, String type)
 					throws CtxException {
 
-		//TODO access control aplies?
+		
 		if(requestor == null) requestor = getLocalRequestor();
 
 		if (entityId == null)
@@ -1716,9 +1716,13 @@ public class InternalCtxBroker implements ICtxBroker {
 					+ "' under entity " + entityId);
 
 		final List<CtxIdentifier> result = new ArrayList<CtxIdentifier>();
-		final CtxEntity entity;
+		//final CtxEntity entity;
 		try {
 			final IIdentity targetId = this.commMgr.getIdManager().fromJid(entityId.getOwnerId());
+			
+			List<CtxIdentifier> listResults = this.lookup(requestor, targetId, modelType, type).get();
+		    result.addAll(listResults);
+			/*
 			if (IdentityType.CIS.equals(targetId.getType()))
 				entity = (CtxEntity) this.communityCtxDBMgr.retrieve(entityId);
 			else
@@ -1738,6 +1742,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				for (final CtxAssociationIdentifier assocId : assocIds)
 					result.add(assocId);
 			}
+			*/
 		} catch (Exception e) {
 
 			throw new CtxBrokerException("Could not look up context " + modelType

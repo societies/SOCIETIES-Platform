@@ -135,12 +135,14 @@ public class Tester {
 			assertNotNull(entityDevRetrieved.getId());
 
 			// ATTRIBUTE
-			//List<CtxIdentifier> attrList = Test1064.getCtxBroker().lookup(requestor, entityDevRetrieved.getId(), CtxModelType.ATTRIBUTE ,CtxAttributeTypes.TEMPERATURE).get();
-			List<CtxIdentifier> attrList = Test1064.getCtxBroker().lookup(requestor, cssIDEmma, CtxModelType.ATTRIBUTE ,CtxAttributeTypes.TEMPERATURE).get();
-			LOG.info("remote attribute list ids:" +attrList);
-			//assertEquals(1,attrList.size());
+			List<CtxIdentifier> attrList1 = Test1064.getCtxBroker().lookup(requestor, entityDevRetrieved.getId(), CtxModelType.ATTRIBUTE ,CtxAttributeTypes.TEMPERATURE).get();
+			List<CtxIdentifier> attrList2 = Test1064.getCtxBroker().lookup(requestor, cssIDEmma, CtxModelType.ATTRIBUTE ,CtxAttributeTypes.TEMPERATURE).get();
+			LOG.info("remote attribute list ids:" +attrList1);
+			LOG.info("remote attribute list ids:" +attrList2);
+			// verify that two methods return the same results
+			assertEquals(attrList1,attrList2);
 
-			CtxAttribute remoteAttrTemp = (CtxAttribute) Test1064.getCtxBroker().retrieve(requestor,attrList.get(0)).get();
+			CtxAttribute remoteAttrTemp = (CtxAttribute) Test1064.getCtxBroker().retrieve(requestor,attrList1.get(0)).get();
 			LOG.info("remote CtxAttribute id:" +remoteAttrTemp.getId());
 			assertNotNull(remoteAttrTemp.getId());
 			assertEquals("temperature", remoteAttrTemp.getType().toLowerCase());
