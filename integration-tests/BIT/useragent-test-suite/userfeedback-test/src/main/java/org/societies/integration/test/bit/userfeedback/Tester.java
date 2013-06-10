@@ -355,7 +355,7 @@ public class Tester {
         //2. Send 4x UF Explicit notification - AckNack, SelectOne, 2x SelectMany
         final ExpProposalContent acknackContent = new ExpProposalContent("AckNack test",
                 new String[]{"Yes", "No"});
-        final Future<List<String>> acknackFB = userFeedback.getExplicitFB(ExpProposalType.ACKNACK, acknackContent);
+        final Future<List<String>> acknackFB = userFeedback.getExplicitFBAsync(ExpProposalType.ACKNACK, acknackContent);
         //      1. Notification stored in DB
 
         final String acknackRequestId = mySQLHelper.assertNotificationStored(ExpProposalType.ACKNACK, acknackContent);
@@ -364,7 +364,7 @@ public class Tester {
 
         final ExpProposalContent selectOneContent = new ExpProposalContent("SelectOne test",
                 new String[]{"Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"});
-        final Future<List<String>> selectOneFB = userFeedback.getExplicitFB(ExpProposalType.CHECKBOXLIST, selectOneContent);
+        final Future<List<String>> selectOneFB = userFeedback.getExplicitFBAsync(ExpProposalType.CHECKBOXLIST, selectOneContent);
         //      1. Notification stored in DB
         final String selectOneRequestId = mySQLHelper.assertNotificationStored(ExpProposalType.CHECKBOXLIST, selectOneContent);
         //      2. EXPLICIT_REQUEST PubSub event sent from server
@@ -372,7 +372,7 @@ public class Tester {
 
         final ExpProposalContent selectManyContent1 = new ExpProposalContent("SelectMany test 1",
                 new String[]{"red", "orange", "yellow", "green", "blue", "indigo", "violet"});
-        final Future<List<String>> selectManyFB1 = userFeedback.getExplicitFB(ExpProposalType.RADIOLIST, selectManyContent1);
+        final Future<List<String>> selectManyFB1 = userFeedback.getExplicitFBAsync(ExpProposalType.RADIOLIST, selectManyContent1);
         //      1. Notification stored in DB
         final String selectManyRequestId1 = mySQLHelper.assertNotificationStored(ExpProposalType.RADIOLIST, selectManyContent1);
         //      2. EXPLICIT_REQUEST PubSub event sent from server
@@ -380,14 +380,16 @@ public class Tester {
 
         final ExpProposalContent selectManyContent2 = new ExpProposalContent("SelectMany test 2",
                 new String[]{"red2", "orange2", "yellow2", "green2", "blue2", "indigo2", "violet2"});
-        final Future<List<String>> selectManyFB2 = userFeedback.getExplicitFB(ExpProposalType.RADIOLIST, selectManyContent2);
+        final Future<List<String>> selectManyFB2 = userFeedback.getExplicitFBAsync(ExpProposalType.RADIOLIST, selectManyContent2);
         //      1. Notification stored in DB
         final String selectManyRequestId2 = mySQLHelper.assertNotificationStored(ExpProposalType.RADIOLIST, selectManyContent2);
         //      2. EXPLICIT_REQUEST PubSub event sent from server
         pubSubListener.assertNotificationReceived(selectManyRequestId2, ExpProposalType.RADIOLIST, selectManyContent2);
 
 
-        //3. Accept AckNack notification via T65
+        //3. Accept AckNack notification
+        Assert.assertFalse(acknackFB.isDone());
+
         List<String> expectedAcknackResults = new ArrayList<String>();
         expectedAcknackResults.add("Yes");
         pubSubListener.sendExplicitResponse(acknackRequestId, expectedAcknackResults);
@@ -398,13 +400,16 @@ public class Tester {
         final UserFeedbackBean acknackFeedbackBean = userFeedbackHistoryRepository.getByRequestId(acknackRequestId);
         Assert.assertEquals(FeedbackStage.COMPLETED, acknackFeedbackBean.getStage());
 //        compareLists(acknackResults, acknackFeedbackBean.getOptions());
+
         //      3. Future is updated
+        Assert.assertTrue(acknackFB.isDone());
         final List<String> acknackResult = acknackFB.get();
         Tester.compareLists(expectedAcknackResults, acknackResult);
         //      4. COMPLETED PubSub event is sent from server
         pubSubListener.assertCompletedReceived(acknackRequestId);
 
-        //4. Accept SelectOne notification via Android
+        //4. Accept SelectOne notification
+        Assert.assertFalse(selectOneFB.isDone());
         final List<String> expectedSelectOneResults = new ArrayList<String>();
         expectedSelectOneResults.add("Phylum");
         pubSubListener.sendExplicitResponse(selectOneRequestId, expectedSelectOneResults);
@@ -415,7 +420,9 @@ public class Tester {
         final UserFeedbackBean selectOneFeedbackBean = userFeedbackHistoryRepository.getByRequestId(selectOneRequestId);
         Assert.assertEquals(FeedbackStage.COMPLETED, selectOneFeedbackBean.getStage());
 //        compareLists(selectOneResults, selectOneFeedbackBean.getOptions());
+
         //      3. Future is updated
+        Assert.assertTrue(selectOneFB.isDone());
         final List<String> selectOneResult = selectOneFB.get();
         Tester.compareLists(expectedSelectOneResults, selectOneResult);
         //      4. COMPLETED PubSub event is sent from server

@@ -32,6 +32,7 @@ import java.util.ArrayList;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,7 +45,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
@@ -92,47 +95,52 @@ public class Tester {
 	public ICommManager commManager;
 	public ICisManager cisManager;
 	public ICACIDiscovery caciDiscovery;
-	
+
 	boolean modelExist = false;
 
 	private RequestorService requestorService = null;
 	private IIdentity serviceIdentity = null;
-	
+
+	public IIdentity cisID = null;
+
 	@Before
 	public void setUp(){
-		
+
 		this.ctxBroker = TestCase2058.getCtxBroker();
 		this.commManager = TestCase2058.getCommMgr();
 		this.cisManager = TestCase2058.getCisManager();
 		this.caciDiscovery = TestCase2058.getCaciDiscovery();
-		
+
 		LOG.info("setUp: this.ctxBroker " +this.ctxBroker );
 		LOG.info("setUp: this.commManager " +this.commManager );
-	
 	}
 
-	
-	@Test
+	@Ignore
+	@Test	
 	public void createCAUIModels(){
 
 		CtxAttribute uniCauiModelAttr = null;
 		CtxAttribute emmaCauiModelAttr =  null;
 
-	
-
 		IIdentity localid = getOwnerId();
 
 		LOG.info("Start testing ........... " + localid+" "+localid.getJid());
-
-
 		if(localid.getJid().equals(emmaStringID)) createCAUIEmma();
 		if(localid.getJid().equals(uniStringID)) createCAUIUni();
-	
 	}
-
 
 	// runs only on uni node
 	// caci discovery 
+	@Ignore
+	@Test
+	public void onlyForUniNode(){
+		
+		IIdentity localid = getOwnerId();
+		if(localid.getJid().equals(uniStringID)){
+			TestCreateCIS();
+		}
+	}
+	
 	@Test
 	public void retrieveCAUIModels(){
 
@@ -151,7 +159,7 @@ public class Tester {
 					UserIntentModelData model = retrieveCAUIAttribute(uniStringID);
 					Thread.sleep(5000);
 					if (model != null){
-						LOG.info(" Model UNI retrieved "+ model.getActionModel() );
+						LOG.info(" Model CAUI UNI retrieved "+ model.getActionModel() );
 						modelCreated = true;
 					} else LOG.info(" Model not retrieved/created yet " + i);
 
@@ -161,51 +169,148 @@ public class Tester {
 				}
 			}
 
-			LOG.info(" retrieving emma model" );
+			LOG.info(" retrieving emma model " +emmaStringID);
 			UserIntentModelData modelEmma = retrieveCAUIAttribute(emmaStringID);
 			LOG.info(" model EMMA retrieved : " +modelEmma.getActionModel() );
 		}
 	}
 
+	
+	public void TestCreateCIS(){
 
-	
-	@Test
-	public void createCACIModel(){
-		
-		LOG.info(" caci Discovery Service : " +this.caciDiscovery);
-		this.caciDiscovery.generateNewCommunityModel();
-		
-	}
+		LOG.info(" createCIS : " );
 
-	
-	
-	
-	
-	
-	public UserIntentModelData retrieveCAUIAttribute(String targetID){
-		
-		LOG.info("retrieveCAUIAttribute" );
+		try {
+			Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> ();
+			LOG.info("*** trying to create cis:");
+			ICisOwned cisOwned = this.cisManager.createCis("testCIS13", "cisType", cisCriteria, "nice CIS").get();
+			LOG.info("*** cis created: "+cisOwned.getCisId());
 
-		LOG.info("Services: this.ctxBroker " +this.ctxBroker );
-		LOG.info("Services: this.commManager " +this.commManager );
-		
-		
+			LOG.info("*** cisOwned " +cisOwned);
+			LOG.info("*** cisOwned.getCisId() " +cisOwned.getCisId());
+			String cisIDString = cisOwned.getCisId();
+
+			cisID = this.commManager.getIdManager().fromJid(cisIDString);
+
+			LOG.info("*** cisID " +cisID);
+
+			LOG.info("*** waiting *****" );
+			Thread.sleep(10000);
+
+			LOG.info(" caci Discovery Service : " +this.caciDiscovery);
+			LOG.info("create caci" +this.cisID);
+			this.caciDiscovery.generateNewCommunityModel(this.cisID);
+			Thread.sleep(10000);
+			
+			//LOG.info("retrieving caci attr1 ");
+			CtxAttribute caciAttr = retrieveCACIAttribute(this.cisID);
+			
+			//LOG.info("retrieving caci attr 2 : " +caciAttr);
+			
+			UserIntentModelData caciModel = null;
+			
+			if(caciAttr.getBinaryValue() != null) {
+				LOG.info(caciAttr.getBinaryValue() + " " + this.getClass().getClassLoader());
+
+				LOG.info("retrieve Model 5 cauiAtt.getBinaryValue() != null .. retrieve Model 5 " );
+				caciModel = (UserIntentModelData) SerialisationHelper.deserialise(caciAttr.getBinaryValue(), this.getClass().getClassLoader());
+				LOG.info("retrieve Model 7 ... "+ caciModel.getActionModel() );
+			} else if (caciAttr.getBinaryValue() == null ) LOG.info("caui attr binary = null");
+
+			Assert.assertNotNull(caciModel);
+			
+			
+			
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}	
+	
+
+
+	public CtxAttribute retrieveCACIAttribute(IIdentity cisID){
+
+		LOG.info("retrieving caci model 1");
+		CtxAttribute caciAtt = null;
+
 		try {
 			ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
 			serviceId1.setIdentifier(new URI("css://nikosk@societies.org/radioService"));
 			serviceId1.setServiceInstanceIdentifier("css://nikosk@societies.org/radioService");
 			this.requestorService = new RequestorService(serviceIdentity, serviceId1);
 			IIdentity localid = getOwnerId();		
-			
+
 			this.requestorService = new RequestorService(localid, serviceId1);
 			
-			LOG.info("retrieveModels ... "+ this.requestorService );
+			LOG.info("retrieving caci model 2 " +this.requestorService);
+		
+			List<CtxIdentifier> ls = this.ctxBroker.lookup(this.requestorService, cisID, CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
 			
+			LOG.info("retrieving caci model 3 " +ls);
+			
+			if (ls.size() > 0) {
+				
+				CtxAttributeIdentifier uiModelAttributeId = (CtxAttributeIdentifier) ls.get(0);
+				LOG.info("retrieving caci model 4 ");
+				caciAtt = (CtxAttribute) this.ctxBroker.retrieve(this.requestorService, uiModelAttributeId).get();
+				LOG.info("retrieving caci model 5 " +caciAtt);
+			}
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
+
+		return caciAtt;
+	}
+
+
+
+	public UserIntentModelData retrieveCAUIAttribute(String targetID){
+
+		LOG.info("retrieveCAUIAttribute" );
+
+		LOG.info("Services: this.ctxBroker " +this.ctxBroker );
+		LOG.info("Services: this.commManager " +this.commManager );
+
+
+		try {
+			ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
+			serviceId1.setIdentifier(new URI("css://nikosk@societies.org/radioService"));
+			serviceId1.setServiceInstanceIdentifier("css://nikosk@societies.org/radioService");
+			this.requestorService = new RequestorService(serviceIdentity, serviceId1);
+			IIdentity localid = getOwnerId();		
+
+			this.requestorService = new RequestorService(localid, serviceId1);
+
+			LOG.info("retrieveModels ... "+ this.requestorService );
+
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 
 
 		UserIntentModelData cauiModel = null;
@@ -215,8 +320,8 @@ public class Tester {
 		try {
 
 			if(targetID.equals(uniStringID)) {
-			//	LOG.info("retrieveModels ... "+ this.requestorService );
-			//	LOG.info("retrieveModels ... identity "+ getCCSId(targetID) );
+				//	LOG.info("retrieveModels ... "+ this.requestorService );
+				//	LOG.info("retrieveModels ... identity "+ getCCSId(targetID) );
 				ls = this.ctxBroker.lookup(this.requestorService, getCCSId(targetID), CtxModelType.ATTRIBUTE, CtxAttributeTypes.CAUI_MODEL).get();
 				LOG.info("retrieve Model UNI 2" );
 
@@ -225,6 +330,9 @@ public class Tester {
 				LOG.info("retrieve Model EMMA 2" );
 
 			} else LOG.info(" ERROR no model for "+targetID  );
+
+
+
 
 
 			if (ls.size() > 0) {
@@ -236,8 +344,8 @@ public class Tester {
 					LOG.info("cauiAtt != null :: retrieve Model 4 " );
 					if(cauiAtt.getBinaryValue() != null) {
 						LOG.info(cauiAtt.getBinaryValue() + " " + this.getClass().getClassLoader());
-						
-					    LOG.info("retrieve Model 5 cauiAtt.getBinaryValue() != null .. retrieve Model 5 " );
+
+						LOG.info("retrieve Model 5 cauiAtt.getBinaryValue() != null .. retrieve Model 5 " );
 						cauiModel = (UserIntentModelData) SerialisationHelper.deserialise(cauiAtt.getBinaryValue(), this.getClass().getClassLoader());
 						LOG.info("retrieve Model 6 cauiModel: "+cauiModel );
 						LOG.info("retrieve Model 7 ... "+ cauiModel.getActionModel() );
@@ -264,6 +372,8 @@ public class Tester {
 
 		return cauiModel;
 	}
+
+
 
 
 

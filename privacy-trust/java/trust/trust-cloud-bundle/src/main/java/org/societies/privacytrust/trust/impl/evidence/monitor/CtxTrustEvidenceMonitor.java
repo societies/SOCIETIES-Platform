@@ -659,10 +659,10 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 					final String memberId = memberEntId.getOwnerId();
 					if (LOG.isDebugEnabled())
 						LOG.debug("Checking existing evidence about '" + memberId + "' being member of community '" + communityId + "'");
-					if (trustEvidenceRepository.retrieveDirectEvidence(
+					if (trustEvidenceRepository.retrieveEvidence(
 							new TrustedEntityId(TrustedEntityType.CSS, memberId), 
 							new TrustedEntityId(TrustedEntityType.CIS, communityId),
-							TrustEvidenceType.JOINED_COMMUNITY, null, null).isEmpty())
+							TrustEvidenceType.JOINED_COMMUNITY, null, null, null).isEmpty())
 						addMembershipEvidence(memberId, communityId, TrustEvidenceType.JOINED_COMMUNITY, new Date());
 					members.add(memberId);
 				}
