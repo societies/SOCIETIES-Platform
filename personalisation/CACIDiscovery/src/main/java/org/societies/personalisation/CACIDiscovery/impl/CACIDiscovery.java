@@ -63,15 +63,15 @@ public class CACIDiscovery implements ICACIDiscovery{
 	private ICommManager commsMgr;
 
 	private IIdentity cisIdentifier ;
-	
-	
+
+
 	public CACIDiscovery(){
 		//cauiTaskManager = new CAUITaskManager();	
 	}
 
-	
+
 	public void initialiseCACIDiscovery(){
-		 
+
 	}
 
 	public ICAUITaskManager getCauiTaskManager() {
@@ -104,17 +104,17 @@ public class CACIDiscovery implements ICACIDiscovery{
 		return commsMgr;
 	}
 
-	
+
 	@Override
 	public void generateNewCommunityModel(IIdentity cisId) {
-				
+
 		this.cisIdentifier = cisId;
-		
+
 		LOG.info("Discovering new CACI model for "+ this.cisIdentifier);
-		
+
 		List<UserIntentModelData> userModelList = new ArrayList<UserIntentModelData>();
 		userModelList = retrieveUIModels(cisId);
-		
+
 		if(userModelList.size()>0){
 			generateNewCommunityModel(userModelList);	
 		}
@@ -196,7 +196,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 		this.printCACIModel(communityActionsMap);
 		UserIntentModelData communityModel = new UserIntentModelData();
 		communityModel.setActionModel(communityActionsMap);
-		
+
 		storeModelCtxDB(communityModel);
 	}
 
@@ -206,26 +206,26 @@ public class CACIDiscovery implements ICACIDiscovery{
 	 */
 
 	private CtxAttribute storeModelCtxDB(UserIntentModelData modelData){
-		
+
 		if(modelData.getActionModel().isEmpty()) {
 			LOG.info("No community actions in CACI model , couldn't store model to Ctx DB");
 			return null;
 		}
-		
+
 		if( this.cisIdentifier == null) {
 			LOG.info("CIS identifiers is not defined");
 			return null;
 		} 		
-		
+
 		CtxAttribute ctxAttrCACIModel = null;
 		try {
 			byte[] binaryModel = SerialisationHelper.serialise(modelData);
 
 			CtxEntityIdentifier communityEntID = this.ctxBroker.retrieveCommunityEntityId(this.cisIdentifier).get();
-			
+
 			CtxAttributeIdentifier uiModelAttributeId = null;
 			List<CtxIdentifier> ls = this.ctxBroker.lookup(communityEntID, CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
-			
+
 			if (ls.size()>0) {
 				uiModelAttributeId = (CtxAttributeIdentifier) ls.get(0);
 				ctxAttrCACIModel = ctxBroker.updateAttribute(uiModelAttributeId, binaryModel).get();
@@ -235,7 +235,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 				ctxAttrCACIModel = ctxBroker.updateAttribute(uiModelAttributeId, binaryModel).get();
 			}			
 			LOG.info("CACI Model stored in community ctx DB" + ctxAttrCACIModel.getId());
-			
+
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -593,16 +593,16 @@ public class CACIDiscovery implements ICACIDiscovery{
 	@Override
 	public void generateNewCommunityModel() {
 
-		
+
 		System.out.println("SERVICE CALLED ********* " );
-		
+
 	}
 
 
 	private List<UserIntentModelData> retrieveUIModels (IIdentity cisId) {
 
 		List<UserIntentModelData> userModelList = new ArrayList<UserIntentModelData>();
-
+		LOG.info(" retrieving cauis for cisID "+ cisId);
 		CtxEntityIdentifier commEntID;
 		try {
 			commEntID = this.ctxBroker.retrieveCommunityEntityId(cisId).get();
@@ -610,18 +610,28 @@ public class CACIDiscovery implements ICACIDiscovery{
 			Set<CtxEntityIdentifier> membersIDSet = commEnt.getMembers();
 
 			for(CtxEntityIdentifier entityId  : membersIDSet){
+				LOG.info(" retrieving entityIds for cisID "+ entityId);
 
 				List<CtxIdentifier> modelAttrIDList = this.ctxBroker.lookup(entityId, CtxModelType.ATTRIBUTE,CtxAttributeTypes.CAUI_MODEL).get();
-				for(CtxIdentifier attrID : modelAttrIDList){
+				
+				LOG.info(" retrieving modelAttrIDList for cisID "+ modelAttrIDList);
+				
+				if(modelAttrIDList.size()>0){
+					for(CtxIdentifier attrID : modelAttrIDList){
 
-					CtxAttribute uiModelAttr = this.ctxBroker.retrieveAttribute((CtxAttributeIdentifier) attrID, false).get();	
-					if(uiModelAttr.getBinaryValue() != null){
-						UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
-						userModelList.add(newUIModelData);
+						LOG.info(" retrieving attrID  "+ attrID);
+						CtxAttribute uiModelAttr = (CtxAttribute) this.ctxBroker.retrieve(attrID).get();	
+						LOG.info(" retrieving uiModelAttr  "+ uiModelAttr);
+						
+						if(uiModelAttr.getBinaryValue() != null){
+							UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
+							
+							userModelList.add(newUIModelData);
+						}
 					}
+
 				}
 			}
-
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

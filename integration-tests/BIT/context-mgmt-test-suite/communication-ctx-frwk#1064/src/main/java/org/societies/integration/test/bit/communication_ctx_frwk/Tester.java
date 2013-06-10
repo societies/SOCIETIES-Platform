@@ -27,23 +27,28 @@ package org.societies.integration.test.bit.communication_ctx_frwk;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 
 import junit.framework.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.internal.context.model.CtxEntityTypes;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
@@ -52,6 +57,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
+import org.societies.api.context.broker.ICtxBroker;
 
 
 /**
@@ -65,6 +71,8 @@ public class Tester {
 	private static Logger LOG = LoggerFactory.getLogger(Test1064.class);
 	Requestor requestor = null;
 
+	public ICtxBroker ctxBroker;
+	public org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker;
 
 	// run test in university's container
 	private String targetEmma= "emma.ict-societies.eu";
@@ -77,11 +85,13 @@ public class Tester {
 	@Before
 	public void setUp(){
 
+		this.ctxBroker =  Test1064.getCtxBroker();
+		this.internalCtxBroker = Test1064.getInternalCtxBroker();
 	}
 
-
+	@Ignore
 	@Test
-	public void Test(){
+	public void testRemoteRetrievals(){
 
 		LOG.info("*** REMOTE CM TEST STARTING ***");
 		LOG.info("*** " + this.getClass() + " instantiated");
@@ -100,27 +110,27 @@ public class Tester {
 			LOG.info("entity DEVICE created based on 3p broker "+entityEmmaDevice.getId());
 			assertNotNull(entityEmmaDevice.getId());	
 			assertEquals("device", entityEmmaDevice.getType().toLowerCase());
-			
+
 			CtxAttribute attrEmmaTemperature = Test1064.getCtxBroker().createAttribute(requestor, entityEmmaDevice.getId(), CtxAttributeTypes.TEMPERATURE).get();
 			LOG.info("Attribute TEMPERATURE created in remote container "+attrEmmaTemperature.getId());
 			assertNotNull(attrEmmaTemperature.getId());	
 
-			
-		//test binary
+
+			//test binary
 			MockBlobClass blob = new MockBlobClass(999);
 			byte[] blobBytes;
 
-				try {
-					blobBytes = SerialisationHelper.serialise(blob);
-					CtxAttribute ctxAttrBinary = Test1064.getCtxBroker().createAttribute(requestor, entityEmmaDevice.getId(), CtxAttributeTypes.ACTIVITIES).get();
-					ctxAttrBinary.setBinaryValue(blobBytes);
+			try {
+				blobBytes = SerialisationHelper.serialise(blob);
+				CtxAttribute ctxAttrBinary = Test1064.getCtxBroker().createAttribute(requestor, entityEmmaDevice.getId(), CtxAttributeTypes.ACTIVITIES).get();
+				ctxAttrBinary.setBinaryValue(blobBytes);
 
-					Test1064.getCtxBroker().update(requestor, ctxAttrBinary);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			
+				Test1064.getCtxBroker().update(requestor, ctxAttrBinary);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 
 			// entity and attribute created
 
@@ -129,7 +139,7 @@ public class Tester {
 			List<CtxIdentifier> entityList = Test1064.getCtxBroker().lookup(requestor, cssIDEmma,  CtxModelType.ENTITY, CtxEntityTypes.DEVICE).get();
 			LOG.info("remote entity list ids:" +entityList);
 			assertNotNull(entityList);
-			
+
 			CtxEntity entityDevRetrieved = (CtxEntity) Test1064.getCtxBroker().retrieve(requestor, entityList.get(0)).get();
 			LOG.info("remote entity id:" +entityDevRetrieved.getId());
 			assertNotNull(entityDevRetrieved.getId());
@@ -146,8 +156,8 @@ public class Tester {
 			LOG.info("remote CtxAttribute id:" +remoteAttrTemp.getId());
 			assertNotNull(remoteAttrTemp.getId());
 			assertEquals("temperature", remoteAttrTemp.getType().toLowerCase());
-			
-			
+
+
 			//List<CtxIdentifier> attrListAction = Test1064.getCtxBroker().lookup(requestor, entityDevRetrieved.getId(), CtxModelType.ATTRIBUTE ,CtxAttributeTypes.ACTION).get();
 			List<CtxIdentifier> attrListAction = Test1064.getCtxBroker().lookup(requestor, cssIDEmma, CtxModelType.ATTRIBUTE ,CtxAttributeTypes.ACTIVITIES).get();
 			CtxAttribute remoteAttrAction = (CtxAttribute) Test1064.getCtxBroker().retrieve(requestor,attrListAction.get(0)).get();
@@ -155,10 +165,10 @@ public class Tester {
 			assertNotNull(remoteAttrAction.getId());
 			assertEquals("activities", remoteAttrAction.getType().toLowerCase());
 			LOG.info("remote CtxAttribute binary value:" +remoteAttrAction.getBinaryValue() +"  -- "+this.getClass().getClassLoader() );
-			
+
 			MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(remoteAttrAction.getBinaryValue(), this.getClass().getClassLoader());
 			assertNotNull(retrievedBlob);
-			
+
 
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -179,6 +189,124 @@ public class Tester {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+
+	@Test
+	public void testPrivacyPolicyStructure(){
+
+
+		try {
+			INetworkNode cssNodeId = Test1064.getCommManager().getIdManager().getThisNetworkNode();
+			final String cssOwnerStr = cssNodeId.getBareJid();
+			IIdentity cssOwnerId = Test1064.getCommManager().getIdManager().fromJid(cssOwnerStr);
+			requestor = new Requestor(cssOwnerId);
+
+
+			LOG.info("*** internalCtxBroker = " + internalCtxBroker);
+
+			IndividualCtxEntity indiEnt =  this.internalCtxBroker.retrieveIndividualEntity(cssOwnerId).get();
+
+			LOG.info("*** create privacy policy structure");
+			
+			List<CtxIdentifier> assocList = this.internalCtxBroker.lookup(CtxModelType.ASSOCIATION, CtxAssociationTypes.HAS_SERVICE_PRIVACY_POLICIES).get();
+			
+			CtxAssociation hasPrivacyPol = null;
+			
+			if(assocList.size() == 0 ){
+				hasPrivacyPol = this.internalCtxBroker.createAssociation(cssOwnerId,  CtxAssociationTypes.HAS_SERVICE_PRIVACY_POLICIES).get();
+			} else {
+				hasPrivacyPol = (CtxAssociation) this.internalCtxBroker.retrieve(assocList.get(0)).get();
+			}
+			
+		
+			hasPrivacyPol.setParentEntity(indiEnt.getId());
+
+			CtxEntity servPrivacyPolicyEnt1 = createServicePrivacyPol(cssOwnerId, "serviceID123");
+			CtxEntity servPrivacyPolicyEnt2 = createServicePrivacyPol(cssOwnerId, "serviceID456");
+			CtxEntity servPrivacyPolicyEnt3 = createServicePrivacyPol(cssOwnerId, "serviceID789");
+
+			hasPrivacyPol.addChildEntity(servPrivacyPolicyEnt1.getId());
+			hasPrivacyPol.addChildEntity(servPrivacyPolicyEnt2.getId());
+			hasPrivacyPol.addChildEntity(servPrivacyPolicyEnt3.getId());
+
+			this.internalCtxBroker.update(hasPrivacyPol);
+
+			LOG.info("*** privacy policy structure created");
+
+
+			LOG.info("*** retrieve privacy policy ");
+
+			List<CtxEntityIdentifier> entIdList =	this.internalCtxBroker.lookupEntities(CtxEntityTypes.SERVICE_PRIVACY_POLICY, CtxAttributeTypes.ID, "serviceID123", "serviceID123").get();
+
+			if( !entIdList.isEmpty()){
+				LOG.info("size of results: "+entIdList.size());
+				CtxEntityIdentifier entPolID = entIdList.get(0);
+				CtxEntity servPrivPolEnt =	(CtxEntity) this.internalCtxBroker.retrieve( entPolID).get();
+				Set<CtxAttribute> priPolAttrSet = servPrivPolEnt.getAttributes(CtxAttributeTypes.PRIVACY_POLICY);
+
+				for(CtxAttribute priPolAttr : priPolAttrSet){
+					
+					MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(priPolAttr.getBinaryValue(), this.getClass().getClassLoader());
+					LOG.info("*** retrievedBlob " +retrievedBlob.getSeed());				
+					assertEquals(999,retrievedBlob.getSeed());
+				}
+			}
+
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+
+	}
+
+	
+	public CtxEntity createServicePrivacyPol(IIdentity cssOwnerId, String serviceID){
+
+		CtxEntity servPrivacyPolicyEnt = null;
+		try {
+			servPrivacyPolicyEnt = this.internalCtxBroker.createEntity( cssOwnerId, CtxEntityTypes.SERVICE_PRIVACY_POLICY).get();
+			CtxAttribute  serviceIDAttr = this.internalCtxBroker.createAttribute(servPrivacyPolicyEnt.getId(), CtxAttributeTypes.ID).get();
+			serviceIDAttr.setStringValue(serviceID);
+			this.internalCtxBroker.update(serviceIDAttr).get();
+
+			CtxAttribute  privPolAttr = this.internalCtxBroker.createAttribute( servPrivacyPolicyEnt.getId(), CtxAttributeTypes.PRIVACY_POLICY).get();
+			MockBlobClass blob = new MockBlobClass(999);
+			byte[] blobBytes = SerialisationHelper.serialise(blob);
+			privPolAttr.setBinaryValue(blobBytes);
+			this.internalCtxBroker.update(privPolAttr);
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return servPrivacyPolicyEnt;
+
 	}
 
 }

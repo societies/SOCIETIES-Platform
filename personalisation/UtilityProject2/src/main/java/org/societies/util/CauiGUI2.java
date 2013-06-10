@@ -164,7 +164,7 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 
 			}
 		});
-		btnNewButton.setBounds(454, 34, 96, 23);
+		btnNewButton.setBounds(454, 34, 106, 23);
 		panelModel.add(btnNewButton);
 
 		JButton btnLearnModel = new JButton("Learn model");
@@ -175,7 +175,7 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 			
 			}
 		});
-		btnLearnModel.setBounds(454, 68, 89, 23);
+		btnLearnModel.setBounds(454, 68, 106, 23);
 		panelModel.add(btnLearnModel);
 
 

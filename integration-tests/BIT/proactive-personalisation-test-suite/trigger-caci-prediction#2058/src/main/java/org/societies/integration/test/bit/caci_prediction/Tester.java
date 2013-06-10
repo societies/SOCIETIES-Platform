@@ -53,6 +53,10 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 
+import org.societies.api.context.model.CommunityCtxEntity;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationIdentifier;
+import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
@@ -101,7 +105,7 @@ public class Tester {
 	private RequestorService requestorService = null;
 	private IIdentity serviceIdentity = null;
 
-	public IIdentity cisID = null;
+	//public IIdentity cisID = null;
 
 	@Before
 	public void setUp(){
@@ -115,7 +119,16 @@ public class Tester {
 		LOG.info("setUp: this.commManager " +this.commManager );
 	}
 
-	@Ignore
+
+	/*
+	 * scenario test
+	 * 1) createCAUIModels
+	 * 2) createCIS()
+	 * 3) createCACIModel
+	 * 4) retrieveCACIModels from members
+	 */
+
+	
 	@Test	
 	public void createCAUIModels(){
 
@@ -124,26 +137,101 @@ public class Tester {
 
 		IIdentity localid = getOwnerId();
 
-		LOG.info("Start testing ........... " + localid+" "+localid.getJid());
+		LOG.info("Start testing ...........createCAUIModels " + localid+" "+localid.getJid());
 		if(localid.getJid().equals(emmaStringID)) createCAUIEmma();
 		if(localid.getJid().equals(uniStringID)) createCAUIUni();
+		retrieveCAUIModels();
 	}
 
 	// runs only on uni node
-	// caci discovery 
-	@Ignore
-	@Test
-	public void onlyForUniNode(){
-		
-		IIdentity localid = getOwnerId();
-		if(localid.getJid().equals(uniStringID)){
-			TestCreateCIS();
-		}
-	}
+	// create cis and adds emma as member 
+
 	
 	@Test
+	public void createCIS(){
+
+		LOG.info("Start testing ...........createCIS ");
+
+		IIdentity localid = getOwnerId();
+		if(localid.getJid().equals(uniStringID)){
+			IIdentity cisid = TestCreateCIS();
+			LOG.info("CIS created.... ");
+			addMember(cisid, getCSSId(emmaStringID) );
+			LOG.info("member added.... ");
+			createCACIModel(cisid);
+		}
+	}
+
+
+
+	public void createCACIModel(IIdentity cisid){
+
+		LOG.info(" caci Discovery Service : " +this.caciDiscovery);
+		LOG.info("create caci" +cisid);
+
+		try{
+			LOG.info(".............generateNewCommunityModel.................");
+			this.caciDiscovery.generateNewCommunityModel(cisid);
+			LOG.info(".............generateNewCommunityModel.................finished");
+			Thread.sleep(10000);
+
+			LOG.info("retrieving caci attr ");
+			CtxAttribute caciAttr = retrieveCACIAttribute(cisid);
+			LOG.info("retrieving caci attr "+caciAttr.getId());
+			
+			
+			//LOG.info("retrieving caci attr 2 : " +caciAttr);
+			UserIntentModelData caciModel = null;
+
+			if(caciAttr.getBinaryValue() != null) {
+				LOG.info(caciAttr.getBinaryValue() + " " + this.getClass().getClassLoader());
+
+				LOG.info("retrieve Model 5 cauiAtt.getBinaryValue() != null .. retrieve Model 5 " );
+				caciModel = (UserIntentModelData) SerialisationHelper.deserialise(caciAttr.getBinaryValue(), this.getClass().getClassLoader());
+				LOG.info("retrieve Model 7 ... "+ caciModel.getActionModel() );
+			} else if (caciAttr.getBinaryValue() == null ) LOG.info("caui attr binary = null");
+
+
+			//Assert.assertNotNull(caciModel);
+			Thread.sleep(5000);
+
+		} catch(InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Ignore
+	@Test
+	public void retrieveCACIModels(){
+
+		LOG.info(" retrieveCACIModels .... " );
+
+		UserIntentModelData modelCACIUni = retrieveCAUIAttribute(uniStringID, CtxAttributeTypes.CACI_MODEL);
+		LOG.info(" modelCACIUni .... "+modelCACIUni.getActionModel());
+		//	UserIntentModelData modelCACIEmma = retrieveCAUIAttribute(emmaStringID, CtxAttributeTypes.CACI_MODEL);
+		//	LOG.info(" modelCACIEmma .... "+modelCACIEmma.getActionModel());
+		//	Assert.assertEquals(modelCACIUni, modelCACIEmma);
+	}
+
+	
+	@Ignore
+	@Test
+	public void retrieveEmmaCAUIModels(){
+		LOG.info(" retrieving emma model " +emmaStringID);
+		UserIntentModelData modelEmma = retrieveCAUIAttribute(emmaStringID,CtxAttributeTypes.CAUI_MODEL);
+		LOG.info(" model EMMA retrieved : " +modelEmma.getActionModel() );
+	}
+
 	public void retrieveCAUIModels(){
 
+		//LOG.info("Start testing ...........retrieveCAUIModels ");
 		IIdentity localid = getOwnerId();
 		if(localid.getJid().equals(uniStringID)) {
 
@@ -156,11 +244,13 @@ public class Tester {
 
 				try {	
 					LOG.info(" retrieving uni model 2 " );
-					UserIntentModelData model = retrieveCAUIAttribute(uniStringID);
+					UserIntentModelData modelUni = retrieveCAUIAttribute(uniStringID, CtxAttributeTypes.CAUI_MODEL);
 					Thread.sleep(5000);
-					if (model != null){
-						LOG.info(" Model CAUI UNI retrieved "+ model.getActionModel() );
+					if (modelUni != null){
+						LOG.info(" Model CAUI UNI retrieved "+ modelUni.getActionModel() );
 						modelCreated = true;
+						Assert.assertNotNull(modelUni);
+
 					} else LOG.info(" Model not retrieved/created yet " + i);
 
 				} catch (InterruptedException e) {
@@ -170,16 +260,18 @@ public class Tester {
 			}
 
 			LOG.info(" retrieving emma model " +emmaStringID);
-			UserIntentModelData modelEmma = retrieveCAUIAttribute(emmaStringID);
+			UserIntentModelData modelEmma = retrieveCAUIAttribute(emmaStringID,CtxAttributeTypes.CAUI_MODEL);
 			LOG.info(" model EMMA retrieved : " +modelEmma.getActionModel() );
+			Assert.assertNotNull(modelEmma);
 		}
 	}
 
-	
-	public void TestCreateCIS(){
+
+	public IIdentity TestCreateCIS(){
 
 		LOG.info(" createCIS : " );
-
+		IIdentity cisID = null;
+		
 		try {
 			Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> ();
 			LOG.info("*** trying to create cis:");
@@ -197,30 +289,6 @@ public class Tester {
 			LOG.info("*** waiting *****" );
 			Thread.sleep(10000);
 
-			LOG.info(" caci Discovery Service : " +this.caciDiscovery);
-			LOG.info("create caci" +this.cisID);
-			this.caciDiscovery.generateNewCommunityModel(this.cisID);
-			Thread.sleep(10000);
-			
-			//LOG.info("retrieving caci attr1 ");
-			CtxAttribute caciAttr = retrieveCACIAttribute(this.cisID);
-			
-			//LOG.info("retrieving caci attr 2 : " +caciAttr);
-			
-			UserIntentModelData caciModel = null;
-			
-			if(caciAttr.getBinaryValue() != null) {
-				LOG.info(caciAttr.getBinaryValue() + " " + this.getClass().getClassLoader());
-
-				LOG.info("retrieve Model 5 cauiAtt.getBinaryValue() != null .. retrieve Model 5 " );
-				caciModel = (UserIntentModelData) SerialisationHelper.deserialise(caciAttr.getBinaryValue(), this.getClass().getClassLoader());
-				LOG.info("retrieve Model 7 ... "+ caciModel.getActionModel() );
-			} else if (caciAttr.getBinaryValue() == null ) LOG.info("caui attr binary = null");
-
-			Assert.assertNotNull(caciModel);
-			
-			
-			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (ExecutionException e) {
@@ -228,15 +296,10 @@ public class Tester {
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
+
+		return cisID;
 	}	
-	
 
 
 	public CtxAttribute retrieveCACIAttribute(IIdentity cisID){
@@ -252,15 +315,15 @@ public class Tester {
 			IIdentity localid = getOwnerId();		
 
 			this.requestorService = new RequestorService(localid, serviceId1);
-			
+
 			LOG.info("retrieving caci model 2 " +this.requestorService);
-		
+
 			List<CtxIdentifier> ls = this.ctxBroker.lookup(this.requestorService, cisID, CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
-			
+
 			LOG.info("retrieving caci model 3 " +ls);
-			
+
 			if (ls.size() > 0) {
-				
+
 				CtxAttributeIdentifier uiModelAttributeId = (CtxAttributeIdentifier) ls.get(0);
 				LOG.info("retrieving caci model 4 ");
 				caciAtt = (CtxAttribute) this.ctxBroker.retrieve(this.requestorService, uiModelAttributeId).get();
@@ -281,13 +344,14 @@ public class Tester {
 			e.printStackTrace();
 		}
 
-
 		return caciAtt;
 	}
 
+	/*
+	 * model type will be either caui or caci 
+	 */
 
-
-	public UserIntentModelData retrieveCAUIAttribute(String targetID){
+	public UserIntentModelData retrieveCAUIAttribute(String targetID, String modelType){
 
 		LOG.info("retrieveCAUIAttribute" );
 
@@ -311,8 +375,6 @@ public class Tester {
 			e.printStackTrace();
 		}
 
-
-
 		UserIntentModelData cauiModel = null;
 		LOG.info("retrieve Model 1" );
 		List<CtxIdentifier> ls = null;
@@ -322,18 +384,14 @@ public class Tester {
 			if(targetID.equals(uniStringID)) {
 				//	LOG.info("retrieveModels ... "+ this.requestorService );
 				//	LOG.info("retrieveModels ... identity "+ getCCSId(targetID) );
-				ls = this.ctxBroker.lookup(this.requestorService, getCCSId(targetID), CtxModelType.ATTRIBUTE, CtxAttributeTypes.CAUI_MODEL).get();
+				ls = this.ctxBroker.lookup(this.requestorService, getCSSId(targetID), CtxModelType.ATTRIBUTE, modelType.toLowerCase()).get();
 				LOG.info("retrieve Model UNI 2" );
 
 			} else if (targetID.equals(emmaStringID)) {
-				ls = this.ctxBroker.lookup(this.requestorService, getCCSId(targetID), CtxModelType.ATTRIBUTE, CtxAttributeTypes.CAUI_MODEL).get();
+				ls = this.ctxBroker.lookup(this.requestorService, getCSSId(targetID), CtxModelType.ATTRIBUTE, modelType.toLowerCase()).get();
 				LOG.info("retrieve Model EMMA 2" );
 
 			} else LOG.info(" ERROR no model for "+targetID  );
-
-
-
-
 
 			if (ls.size() > 0) {
 				CtxAttributeIdentifier uiModelAttributeId = (CtxAttributeIdentifier) ls.get(0);
@@ -372,10 +430,6 @@ public class Tester {
 
 		return cauiModel;
 	}
-
-
-
-
 
 
 	void createCAUIEmma(){
@@ -444,177 +498,62 @@ public class Tester {
 	}
 
 
+	public void addMember(IIdentity cisID, 	IIdentity cssMemberID){
+
+		try{
+			CtxEntityIdentifier memberEntityID = this.ctxBroker.retrieveIndividualEntityId(this.requestorService, cssMemberID).get();
+
+			CtxEntityIdentifier ctxCommunityEntityIdentifier = this.ctxBroker.retrieveCommunityEntityId(this.requestorService, cisID).get();
+			LOG.info("ctxCommunityEntity id : " + ctxCommunityEntityIdentifier.toString());
+
+			CommunityCtxEntity communityEntity = (CommunityCtxEntity) this.ctxBroker.retrieve(this.requestorService,ctxCommunityEntityIdentifier).get();
+			LOG.info("ctxCommunityEntity : " + communityEntity);
 
 
+			LOG.info("ctxCommunityEntity members : " + communityEntity.getMembers());
+			LOG.info("ctxCommunityEntity members size : " + communityEntity.getMembers().size());
 
 
-	/*
-	@Test
-	public void TestMonitorActionsContext() {
-		System.out.println("Test 2058 started : ContextStorageTest");
+			// the following lines will be removed with code adding a css member to the cis
+			// adding emma to community
+			Set<CtxAssociationIdentifier> comAssocIdSet = communityEntity.getAssociations(CtxAssociationTypes.HAS_MEMBERS);
+			LOG.info("ctxCommunityEntity members comAssocIdSet : " + comAssocIdSet);
+			LOG.info("ctxCommunityEntity members comAssocIdSet size : " + comAssocIdSet.size());
 
+			CtxAssociation hasMembersAssoc = null;	
 
+			if(comAssocIdSet != null ){
+				for(CtxAssociationIdentifier assocID : comAssocIdSet){
+					hasMembersAssoc = (CtxAssociation) this.ctxBroker.retrieve(this.requestorService,assocID).get();	
+					LOG.info("hasMembersAssoc getChildEntities: " + hasMembersAssoc.getChildEntities());
+					LOG.info("hasMembersAssoc size: " + hasMembersAssoc.getChildEntities().size());
+					LOG.info("hasMembersAssoc getParentEntity: " + hasMembersAssoc.getParentEntity());
 
-		CtxAttributeIdentifier uiModelAttributeId = null;
-		List<CtxIdentifier> ls;
+					//CtxEntityIdentifier emmaEntityID = this.ctxBroker.retrieveIndividualEntityId(null,this.cssIDEmma).get();
+					hasMembersAssoc.addChildEntity(memberEntityID);
 
-		try {
-			ls = TestCase2058.ctxBroker.lookup(this.requestorService, CtxModelType.ATTRIBUTE, CtxAttributeTypes.CAUI_MODEL).get();
-
-			if (ls.size()>0) {
-				uiModelAttributeId = (CtxAttributeIdentifier) ls.get(0);
-				CtxAttribute uiModelAttr = (CtxAttribute) TestCase2058.ctxBroker.retrieve(this.requestorService, uiModelAttributeId).get();
-
-				if(uiModelAttr != null) {
-
-					if(uiModelAttr.getBinaryValue() != null) {
-						modelExist = true;						
-					}
+					//TODO is this necessary?
+					//CtxEntityIdentifier uniEntityID = this.ctxBroker.retrieveIndividualEntityId(null, this.cssIDUniversity).get();
+					//hasMembersAssoc.addChildEntity(uniEntityID);
+					hasMembersAssoc = (CtxAssociation) this.ctxBroker.update(this.requestorService, hasMembersAssoc).get();
 				}
-			} 
-
-		} catch (InterruptedException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		} catch (ExecutionException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		} catch (CtxException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-
-
-		if(modelExist == false)	{	
-
-			ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
-			ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
-			ServiceResourceIdentifier serviceIdRandom = new ServiceResourceIdentifier();
-			try {
-				//	IIdentity cssOwnerId = getOwnerId();
-
-				serviceId1.setIdentifier(new URI("css://nikosk@societies.org/radioService"));
-				serviceId1.setServiceInstanceIdentifier("css://nikosk@societies.org/radioService");
-
-				serviceId2.setIdentifier(new URI("css://nikosk@societies.org/navigatorService"));
-				serviceId2.setServiceInstanceIdentifier("css://nikosk@societies.org/navigatorService");
-
-
-				serviceIdRandom.setIdentifier(new URI("css://nikosk@societies.org/randomService"));
-				serviceIdRandom.setServiceInstanceIdentifier("css://nikosk@societies.org/randomService");
-
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			} 
-
-			//create actions
-			//task1
-			IAction action1 = new Action(serviceId1, "serviceType1", "setRadio", "on");
-			IAction action2 = new Action(serviceId1, "serviceType1", "setVolume", "medium");
-			IAction action3 = new Action(serviceId1, "serviceType1", "setTuner", "favoriteChannel1");
-			//task2
-			IAction action4 = new Action(serviceId2, "serviceType2", "setDestination", "gasStation");
-			IAction action5 = new Action(serviceId2, "serviceType2", "setDestination", "office");
-			IAction action6 = new Action(serviceId2, "serviceType2", "getInfo", "traffic");
-			//task3
-			IAction action7 = new Action(serviceId1, "serviceType1", "setRadio", "off");
-			IAction action8 = new Action(serviceId2, "serviceType2", "setDestinator", "off");
-
-			// random action 1
-			IAction actionRandom1 = new Action(serviceIdRandom, "serviceIdRandom", "random", "xxx");
-			IAction actionRandom2 = new Action(serviceIdRandom, "serviceIdRandom", "random", "yyy");
-			IAction actionRandom3 = new Action(serviceIdRandom, "serviceIdRandom", "random", "zzz");
-			IAction actionRandom4 = new Action(serviceIdRandom, "serviceIdRandom", "random", "ooo");
-
-			//set context data
-			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "home");
-			//setContext(CtxAttributeTypes.TEMPERATURE, 25);
-			//setContext(CtxAttributeTypes.STATUS, "free");
-
-			//send actions - 2 second delay
-			LOG.info("Monitor services #1876 - sending mock actions for storage");
-
-			actionsTask1(action1,action2,action3);
-			randomAction(actionRandom1);
-			actionsTask2(action4,action5,action6);
-			randomAction(actionRandom2);
-			actionsTask3(action7,action8);
-
-			actionsTask1(action1,action2,action3);
-			randomAction(actionRandom2);
-			randomAction(actionRandom1);
-			actionsTask2(action4,action5,action6);
-			randomAction(actionRandom2);
-
-
-			randomAction(actionRandom1);
-
-			//actionsTask3(action7,action8);
-
-
-			actionsTask1(action1,action2,action3);
-			randomAction(actionRandom3);
-			randomAction(actionRandom1);
-			actionsTask2(action4,action5,action6);
-			randomAction(actionRandom3);
-			randomAction(actionRandom2);
-			randomAction(actionRandom2);
-			actionsTask3(action7,action8);
-
-			actionsTask1(action1,action2,action3);
-			randomAction(actionRandom2);
-
-			actionsTask2(action4,action5,action6);
-			randomAction(actionRandom1);
-			randomAction(actionRandom3);
-			actionsTask3(action7,action8);
-
-			randomAction(actionRandom4);
-			randomAction(actionRandom2);
-			randomAction(actionRandom4);
-
-			LOG.info("*********** ACTIONS SEND WAITING FOR MODEL CREATION ************");
-			try {
-				Thread.sleep(10000);
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
 			}
+			CommunityCtxEntity communityEntityUpdated = (CommunityCtxEntity) this.ctxBroker.retrieve(this.requestorService, ctxCommunityEntityIdentifier).get();
+			LOG.info("Updated ctxCommunityEntity : " + communityEntityUpdated.getMembers());
+			LOG.info("Updated ctxCommunityEntity members size : " + communityEntityUpdated.getMembers().size());
 
-
-		}
-	}
-
-	 */
-
-	/*
-	@Test
-	public void TestHistoryDataRetrieval() {
-
-		LOG.info("TestHistoryDataRetrieval ");
-
-		List<CtxAttributeIdentifier> ls = new ArrayList<CtxAttributeIdentifier>();
-		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults;
-		try {
-			tupleResults = TestCase2058.ctxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, ls, null, null).get();
-			boolean success = false;
-			if(tupleResults.size() >=0 )success= true;
-			Assert.assertTrue(success);
-
-
-			printHocTuplesDB(tupleResults);
-			LOG.info("number of actions in history "+ tupleResults.size());
-
+			//Assert.assertEquals(2,communityEntityUpdated.getMembers().size());
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
-
-	 */
-
 	/*
 
 	@Test
@@ -938,14 +877,16 @@ public class Tester {
 		return cssOwnerId;
 	}
 
-	private IIdentity getCCSId(String targetStringID ){
+	private IIdentity getCSSId(String targetStringID ){
 
 		IIdentity cssOwnerId = null;
 		try {
 			//final INetworkNode cssNodeId = TestCase2058.commMgr.getIdManager().getThisNetworkNode();
-			//LOG.info("*** cssNodeId = " + cssNodeId);
+			LOG.info("*** targetStringID = " + targetStringID);
 			//final String cssOwnerStr = cssNodeId.getBareJid();
 			cssOwnerId = TestCase2058.commMgr.getIdManager().fromJid(targetStringID);
+
+			LOG.info("*** IIdentity = " + cssOwnerId);
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
