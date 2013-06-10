@@ -74,7 +74,7 @@ public class TestContextClientHelper extends AndroidTestCase {
 	private long startTime;
 
 	private CtxEntityBean entityCreated, entityCreated2, entityCreated3;
-	private CtxAttributeBean attributeCreated;
+	private CtxAttributeBean attributeCreated, attributeCreated2;
 	
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -1024,7 +1024,7 @@ public class TestContextClientHelper extends AndroidTestCase {
 	}
 	
 	@MediumTest
-	public void testLookupByEntityType() throws Exception {
+	public void testLookupByAttributeType() throws Exception {
 		this.testCompleted = false;
 		this.latch = new CountDownLatch(1);
 		// Setup test data
@@ -1158,6 +1158,126 @@ public class TestContextClientHelper extends AndroidTestCase {
 
 		this.latch = new CountDownLatch(1);
 		
+		this.helper = new ContextClientHelper(getContext());
+		helper.setUpService(new IMethodCallback() {
+			
+			/*
+			 * @see org.societies.android.api.comms.IMethodCallback#returnException(java.lang.String)
+			 */
+			@Override
+			public void returnException(String exception) {
+				
+				fail("setUpService returned exception: " + exception);
+			}
+
+			/*
+			 * @see org.societies.android.api.comms.IMethodCallback#returnAction(java.lang.String)
+			 */
+			@Override
+			public void returnAction(String result) {
+				
+				fail("setUpService returned action: " + result);
+			}
+			
+			@Override
+			public void returnAction(boolean resultFlag) {
+				
+				assertTrue(resultFlag);
+				try {
+					helper.createAttribute(requestor, (CtxEntityIdentifierBean) entityCreated2.getId(), "androidAttributeHelper3", new ICtxClientCallback() {
+
+						@Override
+						public CtxException getException() {
+							// TODO Auto-generated method stub
+							return null;
+						}
+
+						@Override
+						public void onCreatedAssociation(CtxAssociationBean association) {
+							fail("retrieveAttribute callback onCreatedAssociation: "
+									+ association);
+						}
+
+						@Override
+						public void onCreatedAttribute(CtxAttributeBean attribute) {
+
+							Log.d(LOG_TAG, "on CreatedAttribute, attributeId is: " + attribute.getId().toString());
+							assertNotNull(attribute);
+							attributeCreated2 = attribute; 
+							
+							helper.tearDownService(new IMethodCallback() {
+
+								@Override
+								public void returnAction(boolean resultFlag) {
+									assertTrue(resultFlag);
+//									TestContextClientHelper.this.testCompleted = true;
+									latch.countDown();
+								}
+
+								@Override
+								public void returnAction(String result) {
+									fail("tearDownService returned action: " + result);
+								}
+
+								@Override
+								public void returnException(String exception) {
+									fail("tearDownService returned exception: " + exception);
+								} 
+								
+							});
+						}
+
+						@Override
+						public void onCreatedEntity(CtxEntityBean entity) {
+							fail("retrieveAttribute callback onCreatedEntity: "
+									+ entity);														
+						}
+
+						@Override
+						public void onException(CtxException exception) {
+							fail("retrieveAttribute callback onException: "
+									+ exception);
+						}
+
+						@Override
+						public void onLookupCallback(List<CtxIdentifierBean> lookupList) {
+							fail("retrieveAttribute callback onLookupCallback: "
+									+ lookupList);
+						}
+
+						@Override
+						public void onRemovedModelObject(CtxModelObjectBean modelObject) {
+							fail("retrieveAttribute callback onRemovedModelObject: "
+									+ modelObject);							
+						}
+
+						@Override
+						public void onRetrieveCtx(CtxModelObjectBean modelObject) {
+							fail("retrieveAttribute callback onRetrievedCtx: "
+									+ modelObject);							
+						}
+
+						@Override
+						public void onRetrievedEntityId(CtxEntityIdentifierBean entityId) {
+							fail("retrieveAttribute callback onRetrievedEntityId: "
+									+ entityId);							
+						}
+
+						@Override
+						public void onUpdateCtx(CtxModelObjectBean modelObject) {
+							fail("retrieveAttribute callback onUpdateCtx: "
+									+ modelObject);							
+						}
+					});
+				} catch (CtxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+		assertTrue(this.latch.await(LATCH_TIME_OUT, TimeUnit.MILLISECONDS));
+		this.latch = new CountDownLatch(1);
+		
 		//Lookup entities
 		this.helper = new ContextClientHelper(getContext());
 		helper.setUpService(new IMethodCallback() {
@@ -1185,7 +1305,7 @@ public class TestContextClientHelper extends AndroidTestCase {
 				
 				assertTrue(resultFlag);
 				try {
-					helper.lookup(requestor, "jane.societies.local", CtxModelTypeBean.ENTITY, "androidEntityHelper4", new ICtxClientCallback() {
+					helper.lookup(requestor, "jane.societies.local", CtxModelTypeBean.ATTRIBUTE, "androidAttributeHelper3", new ICtxClientCallback() {
 
 						@Override
 						public CtxException getException() {
@@ -1219,9 +1339,16 @@ public class TestContextClientHelper extends AndroidTestCase {
 
 						@Override
 						public void onLookupCallback(List<CtxIdentifierBean> lookupList) {
-							Log.d(LOG_TAG, "on CreatedAttribute, lookupList is: " + lookupList.size());
 							assertNotNull(lookupList);
-							assertTrue(lookupList.contains(entityCreated2.getId()));
+							assertFalse(lookupList.isEmpty());
+							boolean containsId = false;
+							for (final CtxIdentifierBean lookupId : lookupList) {
+								if (attributeCreated2.getId().getString().equals(lookupId.getString())) {
+									containsId = true;
+									Log.d(LOG_TAG, "lookup contains the id and value is: " + containsId);
+								}
+							}
+							assertTrue(containsId);
 							
 							helper.tearDownService(new IMethodCallback() {
 

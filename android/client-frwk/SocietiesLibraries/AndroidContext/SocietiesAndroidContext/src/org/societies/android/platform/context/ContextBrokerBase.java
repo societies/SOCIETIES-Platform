@@ -261,9 +261,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 	
 	//			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
 	
-				Log.d(LOG_TAG, "before Callback ");
 				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.CREATE_ENTITY);
-				Log.d(LOG_TAG, "after Callback");
 				toIdentity = this.commMgr.getIdManager().getCloudNode();
 				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
 				
@@ -317,9 +315,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 					
 				cbPacket.setCreateAttribute(ctxBrokerCreateAttributeBean);
 	
-				Log.d(LOG_TAG, "before Callback ");
 				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.CREATE_ATTRIBUTE);
-				Log.d(LOG_TAG, "after Callback");
 				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
 				
 				Stanza stanza = new Stanza(toIdentity);
@@ -369,9 +365,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 					
 				cbPacket.setCreateAssociation(ctxBrokerCreateAssociationBean);
 	
-				Log.d(LOG_TAG, "before Callback ");
 				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.CREATE_ASSOCIATION);
-				Log.d(LOG_TAG, "after Callback");
 				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
 				
 				Stanza stanza = new Stanza(toIdentity);
@@ -423,9 +417,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 					
 				cbPacket.setLookup(ctxBrokerLookupBean);
 	
-				Log.d(LOG_TAG, "before Callback ");
 				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.LOOKUP);
-				Log.d(LOG_TAG, "after Callback");
 				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
 				
 				Stanza stanza = new Stanza(toIdentity);
@@ -476,9 +468,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 					
 				cbPacket.setLookup(ctxBrokerLookupBean);
 	
-				Log.d(LOG_TAG, "before Callback ");
 				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.LOOKUP);
-				Log.d(LOG_TAG, "after Callback");
 				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
 				
 				Stanza stanza = new Stanza(toIdentity);
@@ -534,9 +524,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 					
 				cbPacket.setRemove(ctxBrokerRemoveBean);
 	
-				Log.d(LOG_TAG, "before Callback ");
 				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.REMOVE);
-				Log.d(LOG_TAG, "after Callback");
 				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
 				
 				Stanza stanza = new Stanza(toIdentity);
@@ -588,9 +576,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 
 				cbPacket.setRetrieve(ctxBrokerRetrieveBean);
 	
-				Log.d(LOG_TAG, "before Callback ");
 				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.RETRIEVE);
-				Log.d(LOG_TAG, "after Callback");
 				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
 				
 				Stanza stanza = new Stanza(toIdentity);
@@ -637,9 +623,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 
 				cbPacket.setRetrieveIndividualEntityId(retrieveIndEntBean);
 	
-				Log.d(LOG_TAG, "before Callback ");
 				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.RETRIEVE_INDIVIDUAL_ENTITY_ID);
-				Log.d(LOG_TAG, "after Callback");
 				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
 				
 				Stanza stanza = new Stanza(toIdentity);
@@ -687,9 +671,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 
 				cbPacket.setRetrieveCommunityEntityId(retrieveCommEntBean);
 	
-				Log.d(LOG_TAG, "before Callback ");
 				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.RETRIEVE_COMMUNITY_ENTITY_ID);
-				Log.d(LOG_TAG, "after Callback");
 				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
 				
 				Stanza stanza = new Stanza(toIdentity);
@@ -739,9 +721,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 
 				cbPacket.setUpdate(updateBean);
 	
-				Log.d(LOG_TAG, "before Callback ");
 				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.UPDATE);
-				Log.d(LOG_TAG, "after Callback");
 				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
 				
 				Stanza stanza = new Stanza(toIdentity);
@@ -899,19 +879,9 @@ public class ContextBrokerBase implements IInternalCtxClient{
 								return;
 							}
 							final CtxEntityBean entityBean = payload.getCreateEntityBeanResult();
-							Log.d(LOG_TAG, "inside callback, entityBean: " + entityBean);
-							Log.d(LOG_TAG, "entityId: " + entityBean.getId());
 
 							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) entityBean);
 
-							//NOTIFY CALLING CLIENT
-/*							if (restrictBroadcast) {
-								intent.setPackage(client);
-							}
-							ContextBrokerBase.this.applicationContext.sendBroadcast(intent);
-							Log.d(LOG_TAG, "SendBroadcast intent with ctxEntity object");*/
-//							ContextBrokerBase.this.commMgr.unregister(ELEMENT_NAMES, NAMESPACES, ContextBrokerCallback());
-							
 							break;
 
 						case CREATE_ATTRIBUTE:
@@ -923,13 +893,8 @@ public class ContextBrokerBase implements IInternalCtxClient{
 										"Could not handle result bean: CtxBrokerResponseBean.getCreateAttributeBeanResult() is null");
 								return;
 							}
-							Log.i(LOG_TAG, "payload received: " + payload);
-							final CtxAttributeBean attributeBean = payload.getCreateAttributeBeanResult();
-							Log.i(LOG_TAG, "attributeBean received: " + attributeBean);
-							Log.d(LOG_TAG, "attribute.getSourceId(): " + attributeBean.getSourceId());
-							Log.d(LOG_TAG, "attribute.getStringValue() " + attributeBean.getStringValue());
-							Log.d(LOG_TAG, "attribute.getId() " + attributeBean.getId().getString());
 
+							final CtxAttributeBean attributeBean = payload.getCreateAttributeBeanResult();
 
 							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) attributeBean);
 
@@ -959,8 +924,6 @@ public class ContextBrokerBase implements IInternalCtxClient{
 								return;
 							}
 							final List<CtxIdentifierBean> ctxIdsBeanList = payload.getCtxBrokerLookupBeanResult();
-							Log.d(LOG_TAG, "getCtxBrokerLookupBeanResult(): " + payload.getCtxBrokerLookupBeanResult().size());
-							Log.d(LOG_TAG, "ctxIdsBeanList.size(): " + ctxIdsBeanList.size() + ", toString: " + ctxIdsBeanList.toString());
 
 							if (ctxIdsBeanList != null) 
 								intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, ctxIdsBeanList.toArray(new CtxIdentifierBean[ctxIdsBeanList.size()]));
@@ -994,7 +957,6 @@ public class ContextBrokerBase implements IInternalCtxClient{
 								return;
 							}
 							final CtxModelObjectBean retrievedObjectBean = payload.getRetrieveBeanResult();
-							Log.d(LOG_TAG, "retrievedObjectBean.getId(): " + retrievedObjectBean.getId().getString());
 							
 							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) retrievedObjectBean);
 							
