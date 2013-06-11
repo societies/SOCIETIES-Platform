@@ -59,5 +59,6 @@
 		<module>CISDataCollector</module>
 		<module>CSSDataCollector</module> <!--  does not seem to work yet -->
 		<module>CPA</module>
+		<module>CRM</module>
 	</modules>
 </project>
