@@ -194,7 +194,7 @@ public class TrustController extends BasePageController {
     	try {
     		final TrustedEntityId ratedTeid = (TrustedEntityId) 
     				rateEvent.getComponent().getAttributes().get(RATING_F_ATTR_NAME);
-    		final Double rating = 0.2d * new Double((String) rateEvent.getRating());
+    		final Double rating = 0.2d * new Double((Integer) rateEvent.getRating());
     		this.updateTrustRating(ratedTeid, rating);
     		
     	} catch (Exception e) {
