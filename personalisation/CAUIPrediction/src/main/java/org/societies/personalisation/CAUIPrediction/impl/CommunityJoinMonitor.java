@@ -13,6 +13,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
+import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
@@ -108,7 +109,7 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 		private CssJoinedCommunityHandler(CtxIdentifier ctxId) {
 
 			this.ctxId = ctxId;
-			//LOG.debug("CssJoinedCommunityHandler  1 "+ this.ctxId );
+			LOG.debug("CssJoinedCommunityHandler  1 "+ this.ctxId );
 			//CssJoinedCommunityHandler  1 context://university.ict-societies.eu/ASSOCIATION/isMemberOf/2 
 
 		}
@@ -118,33 +119,40 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 			//LOG.info("CssJoinedCommunityHandler  2 "+ this.ctxId );
 			try {
 				CtxAssociation isMemberOfAssoc = (CtxAssociation) ctxBroker.retrieve(this.ctxId).get();
-				//LOG.info("CssJoinedCommunityHandler  3 "+ isMemberOfAssoc.getId() );
+				LOG.info("CssJoinedCommunityHandler  3 "+ isMemberOfAssoc.getId() );
 				CtxEntityIdentifier cssEntId = isMemberOfAssoc.getParentEntity();
 
 				Set<CtxEntityIdentifier> cisEntIdSet = isMemberOfAssoc.getChildEntities();
 				//	CommunityCtxEntity cisEnt =  (CommunityCtxEntity) ctxBroker.retrieve(cisEntId).get();
 
-				for(CtxEntityIdentifier cisEntityID : cisEntIdSet){
+				if(!cisEntIdSet.isEmpty() ){
+					
+					for(CtxEntityIdentifier cisEntityID : cisEntIdSet){
 
-					//LOG.info("CssJoinedCommunityHandler  4 "+ cisEntityID );
-					List<CtxIdentifier> caciIdList = ctxBroker.lookup(cisEntityID, CtxModelType.ATTRIBUTE,  CtxAttributeTypes.CACI_MODEL).get();
+						LOG.info("CssJoinedCommunityHandler  4 "+ cisEntityID );
 
-					//LOG.info("CssJoinedCommunityHandler  5 caciIdList "+ caciIdList );
-					// register for new caci model update events
-					if( ! caciIdList.isEmpty())	{
-						//LOG.info("CssJoinedCommunityHandler  6 "+ caciIdList );
+						//remote lookup in cis is not working
+						//	List<CtxIdentifier> caciIdList = ctxBroker.lookup(cisEntityID, CtxModelType.ATTRIBUTE,  CtxAttributeTypes.CACI_MODEL).get();
+						
+						// use this instead
+						CommunityCtxEntity comEntity = (CommunityCtxEntity) ctxBroker.retrieve(cisEntityID).get();
+						Set<CtxAttribute> caciAttrSet =  comEntity.getAttributes(CtxAttributeTypes.CACI_MODEL);
 
-						CtxIdentifier attrCaciID = caciIdList.get(0);
-						//LOG.info("CssJoinedCommunityHandler  7 attrCaciID "+ attrCaciID );
+						LOG.info("CssJoinedCommunityHandler  5 caciIdList "+ caciAttrSet );
+						// register for new caci model update events
+						if( ! caciAttrSet.isEmpty())	{
+							
+							for(CtxAttribute caciAttr : caciAttrSet) {
+															
+								if (LOG.isInfoEnabled())
+									LOG.info("Registering for context changes related to CIS CACI_Model ctx attribute '"
+											+ caciAttr.getId() + "'");
 
-						if (LOG.isInfoEnabled())
-							LOG.info("Registering for context changes related to CIS CACI_Model ctx attribute '"
-									+ cisEntityID + "'");
-
-						ctxBroker.registerForChanges(new CACIModelEventHandler(), attrCaciID);
+								ctxBroker.registerForChanges(new CACIModelEventHandler(), caciAttr.getId());
+							}							
+						}
 					}
 				}
-
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -164,24 +172,24 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 
 
 		CACIModelEventHandler(){
-//			LOG.info("inside CACIModelEventHandler ------------------");
+					LOG.info("inside CACIModelEventHandler ------------------");
 		}
 
 		@Override
 		public void onCreation(CtxChangeEvent event) {
-	//		LOG.info("inside CACIModelEventHandler ------------------ onCreation "+event.getId());
+			//		LOG.info("inside CACIModelEventHandler ------------------ onCreation "+event.getId());
 
 		}
 
 		@Override
 		public void onUpdate(CtxChangeEvent event) {
-	//		LOG.info("inside CACIModelEventHandler ------------------ onUpdate "+event.getId());
-//
+			//		LOG.info("inside CACIModelEventHandler ------------------ onUpdate "+event.getId());
+			//
 		}
 
 		@Override
 		public void onModification(CtxChangeEvent event) {
-		//	LOG.info("inside CACIModelEventHandler ------------------ onModification ");
+			//	LOG.info("inside CACIModelEventHandler ------------------ onModification ");
 
 			if (CtxAttributeTypes.CACI_MODEL.equals(event.getId().getType())) 
 				LOG.debug("update of caci model received  : event.getId(): "+ event.getId() + " --- event.getSource():"+ event.getSource());
@@ -191,24 +199,27 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 
 				try {
 					// retrieve caciModelAttr from CIS ctx DB
-					CtxAttribute caciModelAttrRemote = ctxBroker.retrieveAttribute((CtxAttributeIdentifier) attributeCaciID, false).get();
-				//	LOG.info("***onModification 1 caciModelAttrRemote= " + caciModelAttrRemote.getId());
+					CtxAttribute caciModelAttrRemote = (CtxAttribute) ctxBroker.retrieve((CtxAttributeIdentifier) attributeCaciID).get();
+					
+					LOG.info("*** remote caci attribute retrieved " + caciModelAttrRemote);
+					LOG.info("***onModification 1 caciModelAttrRemote= " + caciModelAttrRemote.getId());
+
+					
 					//store caciModel to local CSS ctx DB
 					CtxAttribute caciModelAttrLocal = null;
-
 					List<CtxIdentifier> caciModelAttrLocalList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
-				//	LOG.info("***onModification 2 caciModelAttrLocalList= " + caciModelAttrLocalList.size());
+						LOG.info("***onModification 2 caciModelAttrLocalList= " + caciModelAttrLocalList.size());
 					IIdentity localcssID = getOwnerId();
 					CtxEntityIdentifier entityID = ctxBroker.retrieveIndividualEntityId(null, localcssID).get();
 
-				//	LOG.info("***onModification 3 entityID= " + entityID.toString());
+					//	LOG.info("***onModification 3 entityID= " + entityID.toString());
 					if( caciModelAttrLocalList.size() == 0){
 						caciModelAttrLocal = ctxBroker.createAttribute(entityID, CtxAttributeTypes.CACI_MODEL).get();
-				//		LOG.info("***onModification 4 ctxBroker.createAttribute= " + caciModelAttrLocal.getId());
+								LOG.info("***onModification 4 ctxBroker.createAttribute= " + caciModelAttrLocal.getId());
 					} else {
 						CtxAttributeIdentifier attrID = (CtxAttributeIdentifier) caciModelAttrLocalList.get(0);
 						caciModelAttrLocal = (CtxAttribute) ctxBroker.retrieveAttribute(attrID, false).get();
-				//		LOG.info("***onModification 5 ctxBroker.createAttribute= " + caciModelAttrLocal.getId());
+								LOG.info("***onModification 5 ctxBroker.createAttribute= " + caciModelAttrLocal.getId());
 					}
 					caciModelAttrLocal.setBinaryValue(caciModelAttrRemote.getBinaryValue());
 					ctxBroker.update(caciModelAttrLocal);

@@ -28,6 +28,7 @@ public class TestCase2058 extends IntegrationTestCase{
 	public static ICACIDiscovery caciDiscovery;
 	public static ICommManager commMgr;
 	public static ICisManager cisManager;
+	public static org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker;
 	
 	public TestCase2058() {
 		super(2058, new Class[]{Tester.class});
@@ -84,6 +85,18 @@ public class TestCase2058 extends IntegrationTestCase{
 	
 	public static ICACIDiscovery getCaciDiscovery(){
 		return caciDiscovery;
+	}
+	
+	
+	public static org.societies.api.internal.context.broker.ICtxBroker getInternalCtxBroker() {
+		return internalCtxBroker;
+	}
+	
+	/**
+	 * @param ctxBroker the ctxBroker to set
+	 */
+	public void setInternalCtxBroker(org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker) {
+		TestCase2058.internalCtxBroker = internalCtxBroker;
 	}
 	
 }

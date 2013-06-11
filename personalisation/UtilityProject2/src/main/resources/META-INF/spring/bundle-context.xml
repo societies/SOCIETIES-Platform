@@ -19,6 +19,7 @@
 		<property name="cauiPrediction" ref="cauiPrediction" />
  		<property name="commManager" ref="commManager"/>
  		<property name="cauiDiscovery" ref="cauiDiscovery" />
+ 		<property name="caciDiscovery" ref="caciDiscovery" />
 		
 	</bean>
 

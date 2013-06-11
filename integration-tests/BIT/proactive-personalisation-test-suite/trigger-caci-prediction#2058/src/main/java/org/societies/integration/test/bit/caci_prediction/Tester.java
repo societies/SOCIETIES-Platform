@@ -99,6 +99,8 @@ public class Tester {
 	public ICommManager commManager;
 	public ICisManager cisManager;
 	public ICACIDiscovery caciDiscovery;
+	public org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker;
+
 
 	boolean modelExist = false;
 
@@ -114,6 +116,7 @@ public class Tester {
 		this.commManager = TestCase2058.getCommMgr();
 		this.cisManager = TestCase2058.getCisManager();
 		this.caciDiscovery = TestCase2058.getCaciDiscovery();
+		this.internalCtxBroker = TestCase2058.getInternalCtxBroker();
 
 		LOG.info("setUp: this.ctxBroker " +this.ctxBroker );
 		LOG.info("setUp: this.commManager " +this.commManager );
@@ -140,13 +143,13 @@ public class Tester {
 		LOG.info("Start testing ...........createCAUIModels " + localid+" "+localid.getJid());
 		if(localid.getJid().equals(emmaStringID)) createCAUIEmma();
 		if(localid.getJid().equals(uniStringID)) createCAUIUni();
-		retrieveCAUIModels();
+		//retrieveCAUIModels();
 	}
 
 	// runs only on uni node
 	// create cis and adds emma as member 
 
-	
+	@Ignore
 	@Test
 	public void createCIS(){
 
@@ -158,44 +161,58 @@ public class Tester {
 			LOG.info("CIS created.... ");
 			addMember(cisid, getCSSId(emmaStringID) );
 			LOG.info("member added.... ");
-			createCACIModel(cisid);
+			//createCACIModel(cisid);
 		}
 	}
 
+	@Ignore
+	@Test
+	public void createCACIModel(){
 
+		IIdentity cisId = null;
+		List<CtxIdentifier> listISMemberOf;
+		LOG.info(".............createCACIModel................." );
+		
+		try {
+			listISMemberOf = this.internalCtxBroker.lookup(CtxModelType.ASSOCIATION, CtxAssociationTypes.IS_MEMBER_OF).get();
+			LOG.info(".............listISMemberOf................." +listISMemberOf);
+			if(!listISMemberOf.isEmpty() ){
+				CtxAssociation assoc = (CtxAssociation) this.internalCtxBroker.retrieve(listISMemberOf.get(0)).get();
+				Set<CtxEntityIdentifier> entIDSet = assoc.getChildEntities();
 
-	public void createCACIModel(IIdentity cisid){
+				for(CtxEntityIdentifier entId : entIDSet){
+					cisId = commManager.getIdManager().fromJid(entId.getOwnerId());
+					System.out.println("cis id : "+cisId );
+				}
+				if( cisId!= null){
+					LOG.info(".............generateNewCommunityModel.................");
+					this.caciDiscovery.generateNewCommunityModel(cisId);
+					LOG.info(".............generateNewCommunityModel.................finished");
+				}
 
-		LOG.info(" caci Discovery Service : " +this.caciDiscovery);
-		LOG.info("create caci" +cisid);
+				Thread.sleep(5000);
+				LOG.info("retrieving caci attr ");
+				CtxAttribute caciAttr = retrieveCACIAttribute(cisId);
+				LOG.info("retrieving caci attr "+caciAttr.getId());
 
-		try{
-			LOG.info(".............generateNewCommunityModel.................");
-			this.caciDiscovery.generateNewCommunityModel(cisid);
-			LOG.info(".............generateNewCommunityModel.................finished");
-			Thread.sleep(10000);
+				//LOG.info("retrieving caci attr 2 : " +caciAttr);
+				UserIntentModelData caciModel = null;
 
-			LOG.info("retrieving caci attr ");
-			CtxAttribute caciAttr = retrieveCACIAttribute(cisid);
-			LOG.info("retrieving caci attr "+caciAttr.getId());
-			
-			
-			//LOG.info("retrieving caci attr 2 : " +caciAttr);
-			UserIntentModelData caciModel = null;
+				if(caciAttr.getBinaryValue() != null) {
+					LOG.info(caciAttr.getBinaryValue() + " " + this.getClass().getClassLoader());
+					LOG.info("retrieve Model 5 cauiAtt.getBinaryValue() != null .. retrieve Model 5 " );
+					caciModel = (UserIntentModelData) SerialisationHelper.deserialise(caciAttr.getBinaryValue(), this.getClass().getClassLoader());
+					LOG.info("retrieve Model 7 ... "+ caciModel.getActionModel() );
+				} 
+			}
 
-			if(caciAttr.getBinaryValue() != null) {
-				LOG.info(caciAttr.getBinaryValue() + " " + this.getClass().getClassLoader());
-
-				LOG.info("retrieve Model 5 cauiAtt.getBinaryValue() != null .. retrieve Model 5 " );
-				caciModel = (UserIntentModelData) SerialisationHelper.deserialise(caciAttr.getBinaryValue(), this.getClass().getClassLoader());
-				LOG.info("retrieve Model 7 ... "+ caciModel.getActionModel() );
-			} else if (caciAttr.getBinaryValue() == null ) LOG.info("caui attr binary = null");
-
-
-			//Assert.assertNotNull(caciModel);
-			Thread.sleep(5000);
-
-		} catch(InterruptedException e) {
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -204,11 +221,14 @@ public class Tester {
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
-	@Ignore
-	@Test
+	
+	
 	public void retrieveCACIModels(){
 
 		LOG.info(" retrieveCACIModels .... " );
@@ -220,9 +240,8 @@ public class Tester {
 		//	Assert.assertEquals(modelCACIUni, modelCACIEmma);
 	}
 
-	
-	@Ignore
-	@Test
+
+
 	public void retrieveEmmaCAUIModels(){
 		LOG.info(" retrieving emma model " +emmaStringID);
 		UserIntentModelData modelEmma = retrieveCAUIAttribute(emmaStringID,CtxAttributeTypes.CAUI_MODEL);
@@ -271,7 +290,7 @@ public class Tester {
 
 		LOG.info(" createCIS : " );
 		IIdentity cisID = null;
-		
+
 		try {
 			Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> ();
 			LOG.info("*** trying to create cis:");
