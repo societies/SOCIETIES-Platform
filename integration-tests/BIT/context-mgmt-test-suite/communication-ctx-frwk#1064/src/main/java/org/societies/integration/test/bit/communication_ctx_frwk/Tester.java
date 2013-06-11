@@ -26,6 +26,7 @@
 package org.societies.integration.test.bit.communication_ctx_frwk;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -41,12 +42,14 @@ import org.junit.Test;
 import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
+import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
@@ -73,6 +76,9 @@ public class Tester {
 
 	public ICtxBroker ctxBroker;
 	public org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker;
+	public ICommManager commMgr;
+
+	public IIdentity currentCISId;
 
 	// run test in university's container
 	private String targetEmma= "emma.ict-societies.eu";
@@ -87,6 +93,7 @@ public class Tester {
 
 		this.ctxBroker =  Test1064.getCtxBroker();
 		this.internalCtxBroker = Test1064.getInternalCtxBroker();
+		this.commMgr = Test1064.getCommManager();
 	}
 
 	@Ignore
@@ -191,7 +198,7 @@ public class Tester {
 		}
 	}
 
-
+	@Ignore
 	@Test
 	public void testPrivacyPolicyStructure(){
 
@@ -208,18 +215,18 @@ public class Tester {
 			IndividualCtxEntity indiEnt =  this.internalCtxBroker.retrieveIndividualEntity(cssOwnerId).get();
 
 			LOG.info("*** create privacy policy structure");
-			
+
 			List<CtxIdentifier> assocList = this.internalCtxBroker.lookup(CtxModelType.ASSOCIATION, CtxAssociationTypes.HAS_SERVICE_PRIVACY_POLICIES).get();
-			
+
 			CtxAssociation hasPrivacyPol = null;
-			
+
 			if(assocList.size() == 0 ){
 				hasPrivacyPol = this.internalCtxBroker.createAssociation(cssOwnerId,  CtxAssociationTypes.HAS_SERVICE_PRIVACY_POLICIES).get();
 			} else {
 				hasPrivacyPol = (CtxAssociation) this.internalCtxBroker.retrieve(assocList.get(0)).get();
 			}
-			
-		
+
+
 			hasPrivacyPol.setParentEntity(indiEnt.getId());
 
 			CtxEntity servPrivacyPolicyEnt1 = createServicePrivacyPol(cssOwnerId, "serviceID123");
@@ -246,7 +253,7 @@ public class Tester {
 				Set<CtxAttribute> priPolAttrSet = servPrivPolEnt.getAttributes(CtxAttributeTypes.PRIVACY_POLICY);
 
 				for(CtxAttribute priPolAttr : priPolAttrSet){
-					
+
 					MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(priPolAttr.getBinaryValue(), this.getClass().getClassLoader());
 					LOG.info("*** retrievedBlob " +retrievedBlob.getSeed());				
 					assertEquals(999,retrievedBlob.getSeed());
@@ -275,7 +282,7 @@ public class Tester {
 
 	}
 
-	
+
 	public CtxEntity createServicePrivacyPol(IIdentity cssOwnerId, String serviceID){
 
 		CtxEntity servPrivacyPolicyEnt = null;
@@ -308,5 +315,109 @@ public class Tester {
 		return servPrivacyPolicyEnt;
 
 	}
+
+
+	/*
+	 * scenario...
+	 * a cis is created in uni css node 
+	 * 
+	 * emma performs lookup to this node 
+	 */
+	@Ignore
+	@Test
+	public void testRemoteRetrievalsCIS(){
+
+		try {
+			INetworkNode cssNodeId = Test1064.getCommManager().getIdManager().getThisNetworkNode();
+			final String cssOwnerStr = cssNodeId.getBareJid();
+			IIdentity cssOwnerId = Test1064.getCommManager().getIdManager().fromJid(cssOwnerStr);
+			this.requestor = new Requestor(cssOwnerId);
+			LOG.info("*** requestor = " + this.requestor);
+
+
+			List<CtxEntityIdentifier> cisList = retrieveBelongingCIS();
+
+			LOG.info("*** retrieveBelongingCIS = " + cisList);
+
+			List<CtxIdentifier> listCommAttributesName1 = this.internalCtxBroker.lookup(requestor, cisList.get(0), CtxModelType.ATTRIBUTE, CtxAttributeTypes.NAME).get();	
+			LOG.info("*** remote comm lookups based on commEntID = " + listCommAttributesName1);
+
+			if(currentCISId != null){
+				List<CtxIdentifier> listCommAttributesName2 = this.internalCtxBroker.lookup(requestor, currentCISId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.NAME).get();
+				LOG.info("*** remote comm lookups based on cisID = " + listCommAttributesName2);
+				
+							
+				CtxAttribute commAttr =  (CtxAttribute) this.internalCtxBroker.retrieve(listCommAttributesName2.get(0)).get();
+				LOG.info("*** remote comm Attr value = " + commAttr.getStringValue());
+			
+				List<CtxIdentifier> listCommAssocs = this.internalCtxBroker.lookup(requestor, currentCISId, CtxModelType.ASSOCIATION, CtxAssociationTypes.IS_MEMBER_OF).get();
+				LOG.info("*** remote comm Assoc value = " + listCommAssocs.get(0));
+			
+			
+				List<CtxIdentifier> listCommAttributesName3 = this.internalCtxBroker.lookup(currentCISId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.NAME).get();
+				LOG.info("*** remote comm Attr list = " + listCommAttributesName3);
+			
+			}
+			
+
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+
+
+
+
+
+	public List<CtxEntityIdentifier> retrieveBelongingCIS(){
+
+		List<CtxEntityIdentifier> commEntIDList = new ArrayList<CtxEntityIdentifier>();
+
+		List<CtxIdentifier> listISMemberOf = new ArrayList<CtxIdentifier>();
+		try {
+			listISMemberOf = this.internalCtxBroker.lookup(CtxModelType.ASSOCIATION, CtxAssociationTypes.IS_MEMBER_OF).get();
+			LOG.debug(".............listISMemberOf................." +listISMemberOf);
+
+			if(!listISMemberOf.isEmpty() ){
+				CtxAssociation assoc = (CtxAssociation) this.internalCtxBroker.retrieve(listISMemberOf.get(0)).get();
+				Set<CtxEntityIdentifier> entIDSet = assoc.getChildEntities();
+
+				for(CtxEntityIdentifier entId : entIDSet){
+					IIdentity cisId = this.commMgr.getIdManager().fromJid(entId.getOwnerId());
+					LOG.debug("cis id : "+cisId );
+					currentCISId = cisId;
+					CtxEntityIdentifier commId = this.internalCtxBroker.retrieveCommunityEntityId(cisId).get();
+					commEntIDList.add(commId);
+				}
+			}
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return commEntIDList;
+	}
+
 
 }
