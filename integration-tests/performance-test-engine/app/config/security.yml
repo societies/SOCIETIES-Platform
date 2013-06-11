@@ -14,26 +14,49 @@ security:
         in_memory:
             memory:
                 users:
-                    user:  { password: userpass, roles: [ 'ROLE_USER' ] }
-                    admin: { password: adminpass, roles: [ 'ROLE_ADMIN' ] }
+                    socperf:  { password: here4socperf, roles: [ 'ROLE_USER' ] }
+                    admin: { password: here4adminsocperf, roles: [ 'ROLE_ADMIN' ] }
 
     firewalls:
         dev:
             pattern:  ^/(_(profiler|wdt)|css|images|js)/
             security: false
-
-        login:
-            pattern:  ^/demo/secured/login$
-            security: false
-
-        secured_area:
-            pattern:    ^/demo/secured/
+        
+        start_test:
+            pattern:   ^/start-test$
+            anonymous: true
+        
+        end_test:
+            pattern:   ^/end-test$
+            anonymous: true
+        
+        main_login:
+            pattern:   ^/login$
+            anonymous: true
+        
+        main:
+            pattern:   ^/
+            anonymous: false
+            provider:  in_memory
             form_login:
-                check_path: /demo/secured/login_check
-                login_path: /demo/secured/login
+                login_path: login
+                check_path: login_check
             logout:
-                path:   /demo/secured/logout
-                target: /demo/
+                path:   logout
+                target: /index
+
+#        login:
+#            pattern:  ^/demo/secured/login$
+#            security: false
+
+#        secured_area:
+#            pattern:    ^/demo/secured/
+#            form_login:
+#                check_path: /demo/secured/login_check
+#                login_path: /demo/secured/login
+#            logout:
+#                path:   /demo/secured/logout
+#                target: /demo/
             #anonymous: ~
             #http_basic:
             #    realm: "Secured Demo Area"
