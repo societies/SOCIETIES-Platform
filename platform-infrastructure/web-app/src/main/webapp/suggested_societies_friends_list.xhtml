@@ -28,16 +28,18 @@
                 
                 <div class="select-wrapper">
                     <h6>Select a Filter option</h6>
-                	<select name="select" required="required">
-                                    <option value="0x0000000000">None</option>
-                                    <option value="0x0000000001">Facebook</option>
-                                    <option value="0x0000000010">Twitter</option>
-                                    <option value="0x0000000100">LinkedIn</option>
-                                    <option value="0x0000001000">FourSquare</option>
-                                    <option value="0x0000010000">Google+</option>
-                                    <option value="0x0000100000">CIS_MEMBERS_BIT</option>
-                                </select>
+                	<h:selectOneMenu value="#{suggestedfriends.filterstring}">
+                                    <f:selectItem itemValue= "None" itemLabel="None"/>
+                                    <f:selectItem itemValue= "facebook" itemLabel="Facebook"/>
+                                    <f:selectItem itemValue= "twitter" itemLabel="Twitter"/>
+                                    <f:selectItem itemValue= "linkedin" itemLabel="LinkedIn"/>
+                                    <f:selectItem itemValue= "foursquare" itemLabel="FourSquare"/>
+                                    <f:selectItem itemValue= "googleplus" itemLabel="Google+"/>
+                                    <f:selectItem itemValue= "cis_members_bit" itemLabel="CIS_MEMBERS_BIT"/>
+                    </h:selectOneMenu>
                 </div>
+                <br/> <br/>
+                
             </div>
         </section>
         <!-- Left Column -->
