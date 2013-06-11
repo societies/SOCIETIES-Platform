@@ -43,7 +43,7 @@ import java.util.Date;
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 1.0
  */
-public final class TrustRelationship implements Serializable {
+public class TrustRelationship implements Serializable {
 
 	private static final long serialVersionUID = -1925436871890516849L;
 
@@ -62,10 +62,10 @@ public final class TrustRelationship implements Serializable {
 	 * attributes.
 	 * 
 	 * @param trustorId
-	 *            (required) the {@link TrustedEntityIdentifier} of the entity
+	 *            (required) the {@link TrustedEntityId} of the entity
 	 *            (trustor) that assigned the trust value.
 	 * @param trusteeId
-	 *            (required) the {@link TrustedEntityIdentifier} of the entity
+	 *            (required) the {@link TrustedEntityId} of the entity
 	 *            (trustee) that the trust value was assigned to.
 	 * @param trustValueType
 	 *            (required) the {@link TrustValueType type} of the trust 
@@ -107,10 +107,10 @@ public final class TrustRelationship implements Serializable {
 	}
 
 	/**
-	 * Returns the {@link TrustedEntityIdentifier} of the entity (trustor) that
+	 * Returns the {@link TrustedEntityId} of the entity (trustor) that
 	 * assigned the trust value.
 	 * 
-	 * @return the {@link TrustedEntityIdentifier} of the entity (trustor) that
+	 * @return the {@link TrustedEntityId} of the entity (trustor) that
 	 *         assigned the trust value.
 	 */
 	public TrustedEntityId getTrustorId() {
@@ -119,10 +119,10 @@ public final class TrustRelationship implements Serializable {
 	}
 
 	/**
-	 * Returns the {@link TrustedEntityIdentifier} of the entity (trustee) that
+	 * Returns the {@link TrustedEntityId} of the entity (trustee) that
 	 * the trust value was assigned to.
 	 * 
-	 * @return the {@link TrustedEntityIdentifier} of the entity (trustee) that
+	 * @return the {@link TrustedEntityId} of the entity (trustee) that
 	 *         the trust value was assigned to.
 	 */
 	public TrustedEntityId getTrusteeId() {

@@ -91,7 +91,7 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		EventTypes.CSS_FRIENDED_EVENT, EventTypes.CIS_SUBS,
 		EventTypes.CIS_UNSUBS, EventTypes.CIS_CREATION,	
 		EventTypes.CIS_DELETION, EventTypes.CIS_RESTORE };
-	
+
 	private static final String[] EXTERNAL_EVENT_TYPES = { 
 		CSSManagerEnums.CSS_FRIEND_REQUEST_ACCEPTED_EVENT };
 
@@ -150,7 +150,7 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 			LOG.debug("Received internal event: " + eventToString(event));
 
 		if (EventTypes.CSS_FRIENDED_EVENT.equals(event.geteventType())) {
-			
+
 			if (event.geteventSource() == null 
 					|| event.geteventSource().length() == 0) {
 
@@ -159,7 +159,7 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 						+ " but was " + event.geteventSource());
 				return;
 			}
-			
+
 			if (!(event.geteventInfo() instanceof String)
 					|| ((String) event.geteventInfo()).length() == 0) {
 
@@ -168,11 +168,11 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 						+ " but was " + event.geteventInfo());
 				return;
 			}
-			
+
 			final String myCssIdStr = event.geteventSource();
 			final String newFriendIdStr = (String) event.geteventInfo();
 			this.executorService.execute(new CssFriendedHandler(myCssIdStr, newFriendIdStr));
-			
+
 		} else if (EventTypes.CIS_SUBS.equals(event.geteventType())
 				|| EventTypes.CIS_UNSUBS.equals(event.geteventType())) {
 
@@ -248,7 +248,7 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 			LOG.debug("Received pubsub event: " + item);
 
 		if (item instanceof CssFriendEvent) {
-			
+
 			final String myCssIdStr = pubsubService.getBareJid();
 			final String newFriendIdStr = ((CssFriendEvent) item).getCssAdvert().getId();
 			if (newFriendIdStr == null || newFriendIdStr.length() == 0) {
@@ -257,10 +257,10 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 						+ newFriendIdStr);
 				return;
 			}
-			
+
 			this.executorService.execute(new CssFriendedHandler(myCssIdStr,
 					newFriendIdStr));
-			
+
 		} else if (item instanceof MarshaledActivity) {
 
 			final String cssIdStr = ((MarshaledActivity) item).getActor();
@@ -648,19 +648,25 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 				final String cisOwnerCssIdStr = cis.getOwnerJid();
 				final IIdentity cisOwnerId = commMgr.getIdManager().fromJid(cisOwnerCssIdStr);
 
-				List<String> attrTypesList = getPrivPolicyAttributeTypes(cisOwnerId, cisId);
-
-				LOG.debug("attrTypes ********* "+attrTypesList);
-
 				// NAME
 				createCtxAttribute(cisEntity.getId(), CtxAttributeTypes.NAME, this.cis.getCommunityName());
 				// ABOUT
 				createCtxAttribute(cisEntity.getId(), CtxAttributeTypes.ABOUT, this.cis.getDescription());
+				//CACI
+				createCtxAttribute(cisEntity.getId(), CtxAttributeTypes.CACI_MODEL, "noModel");
+				
+				// add ctx attributes based on privacy policy
+				List<String> attrTypesList = getPrivPolicyAttributeTypes(cisOwnerId, cisId);
+				LOG.debug("attrTypes ********* "+attrTypesList);
+				
+				if(attrTypesList!= null ){
+					for(String attrType :attrTypesList ){
 
-				for(String attrType :attrTypesList ){
+						createCtxAttribute(cisEntity.getId(), attrType, null);
+					}
 
-					createCtxAttribute(cisEntity.getId(), attrType, null);
 				}
+				
 				// (3) Update community ctx entity HAS_MEMBERS association
 
 				final IndividualCtxEntity cisOwnerEntity = ctxBroker.retrieveIndividualEntity(cisOwnerId).get();
@@ -855,7 +861,7 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 
 		return sb.toString();
 	}
-	
+
 	private class PubsubEventSubscriber implements Runnable {
 
 		/*
@@ -863,13 +869,13 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		 */
 		@Override
 		public void run() {
-			
+
 			try {
 				final IIdentity pubsubId = commMgr.getIdManager().getThisNetworkNode();
 				final Set<String> topicsToRegister = 
 						new HashSet<String>(Arrays.asList(EXTERNAL_EVENT_TYPES));
 				while (!topicsToRegister.isEmpty()) {
-					
+
 					if (LOG.isDebugEnabled())
 						LOG.debug("Pubsub events to register for '" + topicsToRegister + "'");
 					final List<String> existingTopics = pubsubClient.discoItems(pubsubId, null);

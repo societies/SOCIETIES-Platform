@@ -41,7 +41,7 @@ public class Test1064 extends IntegrationTestCase{
 	
 	public static ICtxBroker ctxBroker;
 	public static ICommManager commManager;
-	
+	public static org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker;
 	
 	public Test1064(){
 		super(1857, new Class[]{Tester.class});
@@ -54,11 +54,19 @@ public class Test1064 extends IntegrationTestCase{
 		return ctxBroker;
 	}
 
+	public static org.societies.api.internal.context.broker.ICtxBroker getInternalCtxBroker() {
+		return internalCtxBroker;
+	}
+	
 	/**
 	 * @param ctxBroker the ctxBroker to set
 	 */
+	public void setInternalCtxBroker(org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker) {
+		Test1064.internalCtxBroker = internalCtxBroker;
+	}
+	
 	public  void setCtxBroker(ICtxBroker ctxBroker) {
-		this.ctxBroker = ctxBroker;
+		Test1064.ctxBroker = ctxBroker;
 	}
 	/**
 	 * @return the commMgr

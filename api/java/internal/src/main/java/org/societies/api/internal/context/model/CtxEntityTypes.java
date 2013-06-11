@@ -55,4 +55,9 @@ public class CtxEntityTypes extends
      * @since 1.0
      */
     public static final String PREFERENCE = "preference";
+    
+    /**
+     * @since 0.0.8 
+     */
+    public static final String SERVICE_PRIVACY_POLICY = "servicePrivacyPolicy"; 
 }

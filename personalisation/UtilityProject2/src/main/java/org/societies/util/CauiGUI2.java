@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JFrame;
@@ -29,7 +30,10 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
@@ -44,6 +48,7 @@ import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
+import org.societies.personalisation.CACI.api.CACIDiscovery.ICACIDiscovery;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
 
@@ -57,8 +62,9 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 	private ICommManager commManager;
 	private IIdentityManager idMgr;
 	private IIdentity userIdentity;
-	public static ICAUIPrediction cauiPrediction;
+	public  ICAUIPrediction cauiPrediction;
 	private ICAUIDiscovery cauiDiscovery;
+	private ICACIDiscovery caciDiscovery;
 
 	public static IUserActionMonitor uam;
 
@@ -75,6 +81,15 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 	public CauiGUI2() {
 		//JFrame f = new JFrame();
 
+		ctxBroker = this.getCtxBroker();
+		cauiPrediction = this.getCauiPrediction();
+		caciDiscovery = this.getCaciDiscovery();
+		
+		System.out.println("services:cauiPrediction: " + cauiPrediction);
+		System.out.println("services:caciDiscovery: " + caciDiscovery);
+		System.out.println("services:cauiDiscovery: " + cauiDiscovery);
+		System.out.println("services:ctxBroker: " + ctxBroker);
+			
 		getContentPane().setLayout(null);
 
 		//history
@@ -164,19 +179,60 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 
 			}
 		});
-		btnNewButton.setBounds(454, 34, 96, 23);
+		btnNewButton.setBounds(454, 34, 106, 23);
 		panelModel.add(btnNewButton);
 
 		JButton btnLearnModel = new JButton("Learn model");
 		btnLearnModel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			
+
 				cauiDiscovery.generateNewUserModel();
-			
+
 			}
 		});
-		btnLearnModel.setBounds(454, 68, 89, 23);
+		btnLearnModel.setBounds(454, 68, 106, 23);
 		panelModel.add(btnLearnModel);
+
+		JButton btnLearnCaci = new JButton("Learn CACI");
+		btnLearnCaci.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				List<CtxIdentifier> listISMemberOf;
+				try {
+					listISMemberOf = ctxBroker.lookup(CtxModelType.ASSOCIATION, CtxAssociationTypes.IS_MEMBER_OF).get();
+
+					IIdentity cisId = null;
+					if(!listISMemberOf.isEmpty() ){
+						CtxAssociation assoc = (CtxAssociation) ctxBroker.retrieve(listISMemberOf.get(0)).get();
+						Set<CtxEntityIdentifier> entIDSet = assoc.getChildEntities();
+
+						for(CtxEntityIdentifier entId : entIDSet){
+							cisId = commManager.getIdManager().fromJid(entId.getOwnerId());
+							System.out.println("cis id : "+cisId );
+						}
+						if( cisId!= null){
+							System.out.println("generate new community model for cisID:" + cisId );
+							caciDiscovery.generateNewCommunityModel(cisId);
+						}
+
+					}
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ExecutionException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (CtxException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (InvalidFormatException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}	
+			}
+		});
+		btnLearnCaci.setBounds(454, 98, 89, 23);
+		panelModel.add(btnLearnCaci);
 
 
 		// monitor action
@@ -221,6 +277,8 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 		//setContentPane( panel );
 		//pack();
 		setVisible( true );
+	
+		
 	}
 
 	static CauiGUI2 cauiGUI2;
@@ -297,6 +355,11 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 		this.cauiPrediction = cauiPrediction;
 	}
 
+	
+	public ICAUIPrediction getCauiPrediction() {
+		return cauiPrediction;
+	}
+
 
 	public void setUam(IUserActionMonitor uam){
 		this.uam = uam;
@@ -306,7 +369,15 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 
 		return cauiDiscovery;
 	}
+	public ICACIDiscovery getCaciDiscovery() {
 
+		return caciDiscovery;
+	}
+
+	public void setCaciDiscovery(ICACIDiscovery caciDiscovery) {
+
+		this.caciDiscovery = caciDiscovery;
+	}
 
 	public void setCauiDiscovery(ICAUIDiscovery cauiDiscovery) {
 

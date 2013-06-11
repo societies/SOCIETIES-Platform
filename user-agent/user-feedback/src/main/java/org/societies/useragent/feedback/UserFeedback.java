@@ -228,9 +228,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                 accessCtrlResults.size()));
     }
 
-    @Override
-    public Future<List<String>> getExplicitFB(int type, ExpProposalContent content) {
-        Future<List<String>> result = getExplicitFBAsync(type, content);
+
+    public Future<List<String>> getExplicitFB(String requestId, int type, ExpProposalContent content) {
+        Future<List<String>> result = getExplicitFBAsync(requestId, type, content, null);
 
         // wait until complete, or timeout has expired
         while (!result.isDone()) {
@@ -253,19 +253,31 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     }
 
     @Override
+    public Future<List<String>> getExplicitFB(int type, ExpProposalContent content) {
+        //generate unique ID for this pubsub event and feedback request
+        String requestId = UUID.randomUUID().toString();
+
+        return getExplicitFB(requestId, type, content);
+    }
+
+    @Override
     public Future<List<String>> getExplicitFBAsync(int type, ExpProposalContent content) {
         return getExplicitFBAsync(type, content, null);
     }
 
     @Override
     public Future<List<String>> getExplicitFBAsync(int type, ExpProposalContent content, IUserFeedbackResponseEventListener<List<String>> callback) {
-        if (log.isDebugEnabled()) {
-            log.debug("Received request for explicit feedback");
-            log.debug("Content: " + content.getProposalText());
-        }
-
         //generate unique ID for this pubsub event and feedback request
         String requestId = UUID.randomUUID().toString();
+
+        return getExplicitFBAsync(requestId, type, content, callback);
+    }
+
+    public Future<List<String>> getExplicitFBAsync(String requestId, int type, ExpProposalContent content, IUserFeedbackResponseEventListener<List<String>> callback) {
+        if (log.isDebugEnabled()) {
+            log.debug("Received request for explicit feedback\n" +
+                    "    Content: " + content.getProposalText());
+        }
 
         //create user feedback bean to fire in pubsub event
         UserFeedbackBean ufBean = new UserFeedbackBean();
@@ -277,13 +289,19 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         List<String> optionsList = new ArrayList<String>();
         Collections.addAll(optionsList, content.getOptions());
         ufBean.setOptions(optionsList);
-        ufBean.setMethod(GET_EXPLICIT_FB);
+        ufBean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
 
         //add new request to result hashmap
         UserFeedbackResult<List<String>> result = new UserFeedbackResult<List<String>>(requestId);
-        expResults.put(requestId, result);
+
+        synchronized (expResults) {
+            expResults.put(requestId, result);
+        }
+
         if (callback != null) {
-            expCallbacks.put(requestId, callback);
+            synchronized (expCallbacks) {
+                expCallbacks.put(requestId, callback);
+            }
         }
 
         // store in database before sending pubsub event
@@ -303,7 +321,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         //send pubsub event to all user agents
         try {
             if (log.isDebugEnabled())
-                log.debug("Sending user feedback request event via pubsub");
+                log.debug("Sending user feedback request event via pubsub with ID " + requestId);
 
             // HACK: When hibernate persists the ufBean object, it changes the options list to a org.hibernate.collection.PersistentList
             // When this is deserialised at the other side, hibernate gets upset. Really the serialiser should be converting any
@@ -321,9 +339,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         return result;
     }
 
-    @Override
-    public Future<Boolean> getImplicitFB(int type, ImpProposalContent content) {
-        Future<Boolean> result = getImplicitFBAsync(type, content);
+
+    public Future<Boolean> getImplicitFB(String requestId, int type, ImpProposalContent content) {
+        Future<Boolean> result = getImplicitFBAsync(requestId, type, content, null);
 
         // wait until complete, or timeout has expired
         while (!result.isDone()) {
@@ -346,19 +364,31 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     }
 
     @Override
+    public Future<Boolean> getImplicitFB(int type, ImpProposalContent content) {
+        //generate unique ID for this pubsub event and feedback request
+        String requestId = UUID.randomUUID().toString();
+
+        return getImplicitFB(requestId, type, content);
+    }
+
+    @Override
     public Future<Boolean> getImplicitFBAsync(int type, ImpProposalContent content) {
         return getImplicitFBAsync(type, content, null);
     }
 
     @Override
     public Future<Boolean> getImplicitFBAsync(int type, ImpProposalContent content, IUserFeedbackResponseEventListener<Boolean> callback) {
-        if (log.isDebugEnabled()) {
-            log.debug("Received request for implicit feedback");
-            log.debug("Content: " + content.getProposalText());
-        }
-
         //generate unique ID for this pubsub event and feedback request
         String requestId = UUID.randomUUID().toString();
+
+        return getImplicitFBAsync(requestId, type, content, callback);
+    }
+
+    public Future<Boolean> getImplicitFBAsync(String requestId, int type, ImpProposalContent content, IUserFeedbackResponseEventListener<Boolean> callback) {
+        if (log.isDebugEnabled()) {
+            log.debug("Received request for implicit feedback\n" +
+                    "    Content: " + content.getProposalText());
+        }
 
         //create user feedback bean to fire in pubsub event
         UserFeedbackBean ufBean = new UserFeedbackBean();
@@ -372,9 +402,15 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
         //add new request to result hashmap
         UserFeedbackResult<Boolean> result = new UserFeedbackResult<Boolean>(requestId);
-        impResults.put(requestId, result);
+
+        synchronized (impResults) {
+            impResults.put(requestId, result);
+        }
+
         if (callback != null) {
-            impCallbacks.put(requestId, callback);
+            synchronized (impCallbacks) {
+                impCallbacks.put(requestId, callback);
+            }
         }
 
         // store in database before sending pubsub event
@@ -386,7 +422,6 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                     log.debug("Storing user feedback bean in database");
 
                 userFeedbackHistoryRepository.insert(ufBean);
-                ufBean = userFeedbackHistoryRepository.getByRequestId(requestId);
             }
         } catch (Exception ex) {
             log.error("Error storing user feedback request bean to database", ex);
@@ -395,7 +430,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         //send pubsub event to all user agents
         try {
             if (log.isDebugEnabled())
-                log.debug("Sending user feedback request event via pubsub");
+                log.debug("Sending user feedback request event via pubsub with ID " + requestId);
 
             // HACK: When hibernate persists the ufBean object, it changes the options list to a org.hibernate.collection.PersistentList
             // When this is deserialised at the other side, hibernate gets upset. Really the serialiser should be converting any
@@ -413,9 +448,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         return result;
     }
 
-    @Override
-    public Future<ResponsePolicy> getPrivacyNegotiationFB(ResponsePolicy policy, NegotiationDetailsBean details) {
-        Future<ResponsePolicy> result = getPrivacyNegotiationFBAsync(policy, details);
+
+    public Future<ResponsePolicy> getPrivacyNegotiationFB(String requestId, ResponsePolicy policy, NegotiationDetailsBean details) {
+        Future<ResponsePolicy> result = getPrivacyNegotiationFBAsync(requestId, policy, details, null);
 
         // wait until complete, or timeout has expired
         while (!result.isDone()) {
@@ -437,6 +472,13 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         }
     }
 
+    @Override
+    public Future<ResponsePolicy> getPrivacyNegotiationFB(ResponsePolicy policy, NegotiationDetailsBean details) {
+        //generate unique ID for this pubsub event and feedback request
+        String requestId = UUID.randomUUID().toString();
+
+        return getPrivacyNegotiationFB(requestId, policy, details);
+    }
 
     @Override
     public Future<ResponsePolicy> getPrivacyNegotiationFBAsync(ResponsePolicy policy, NegotiationDetailsBean details) {
@@ -445,6 +487,13 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
     @Override
     public Future<ResponsePolicy> getPrivacyNegotiationFBAsync(ResponsePolicy policy, NegotiationDetailsBean details, IUserFeedbackResponseEventListener<ResponsePolicy> callback) {
+        //generate unique ID for this pubsub event and feedback request
+        String requestId = UUID.randomUUID().toString();
+
+        return getPrivacyNegotiationFBAsync(requestId, policy, details, callback);
+    }
+
+    public Future<ResponsePolicy> getPrivacyNegotiationFBAsync(String requestId, ResponsePolicy policy, NegotiationDetailsBean details, IUserFeedbackResponseEventListener<ResponsePolicy> callback) {
 
         if (log.isDebugEnabled()) {
             log.debug("processing negotiationFeedback request");
@@ -459,16 +508,19 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         event.setStage(FeedbackStage.PENDING_USER_RESPONSE);
         event.setMethod(GET_EXPLICIT_FB);
         event.setType(ExpProposalType.PRIVACY_NEGOTIATION);
-        String requestId = UUID.randomUUID().toString();
         event.setRequestId(requestId);
         event.setNegotiationDetails(details);
         event.setResponsePolicy(policy);
 
 
         UserFeedbackResult<ResponsePolicy> result = new UserFeedbackResult<ResponsePolicy>(requestId);
-        negotiationResults.put(requestId, result);
+        synchronized (negotiationResults) {
+            negotiationResults.put(requestId, result);
+        }
         if (callback != null) {
-            negotiationCallbacks.put(requestId, callback);
+            synchronized (negotiationCallbacks) {
+                negotiationCallbacks.put(requestId, callback);
+            }
         }
 
         // store in database before sending pubsub event
@@ -510,9 +562,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         return result;
     }
 
-    @Override
-    public Future<List<ResponseItem>> getAccessControlFB(Requestor requestor, List<ResponseItem> items) {
-        Future<List<ResponseItem>> result = getAccessControlFBAsync(requestor, items);
+
+    public Future<List<ResponseItem>> getAccessControlFB(String requestId, Requestor requestor, List<ResponseItem> items) {
+        Future<List<ResponseItem>> result = getAccessControlFBAsync(requestId, requestor, items, null);
 
         // wait until complete, or timeout has expired
         while (!result.isDone()) {
@@ -535,24 +587,42 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     }
 
     @Override
+    public Future<List<ResponseItem>> getAccessControlFB(Requestor requestor, List<ResponseItem> items) {
+        //generate unique ID for this pubsub event and feedback request
+        String requestId = UUID.randomUUID().toString();
+
+        return getAccessControlFB(requestId, requestor, items);
+    }
+
+    @Override
     public Future<List<ResponseItem>> getAccessControlFBAsync(Requestor requestor, List<ResponseItem> items) {
         return getAccessControlFBAsync(requestor, items, null);
     }
 
     @Override
     public Future<List<ResponseItem>> getAccessControlFBAsync(Requestor requestor, List<ResponseItem> items, IUserFeedbackResponseEventListener<List<ResponseItem>> callback) {
+        //generate unique ID for this pubsub event and feedback request
+        String requestId = UUID.randomUUID().toString();
+
+        return getAccessControlFBAsync(requestId, requestor, items, callback);
+    }
+
+    public Future<List<ResponseItem>> getAccessControlFBAsync(String requestId, Requestor requestor, List<ResponseItem> items, IUserFeedbackResponseEventListener<List<ResponseItem>> callback) {
         UserFeedbackAccessControlEvent event = new UserFeedbackAccessControlEvent();
         event.setMethod(GET_EXPLICIT_FB);
         event.setType(ExpProposalType.PRIVACY_ACCESS_CONTROL);
-        String requestId = UUID.randomUUID().toString();
         event.setRequestId(requestId);
         event.setRequestor(RequestorUtils.toRequestorBean(requestor));
         event.setResponseItems(items);
 
         UserFeedbackResult<List<ResponseItem>> result = new UserFeedbackResult<List<ResponseItem>>(requestId);
-        accessCtrlResults.put(requestId, result);
+        synchronized (accessCtrlResults) {
+            accessCtrlResults.put(requestId, result);
+        }
         if (callback != null) {
-            accessCtrlCallbacks.put(requestId, callback);
+            synchronized (accessCtrlCallbacks) {
+                accessCtrlCallbacks.put(requestId, callback);
+            }
         }
 
         // TODO: store in database before sending pubsub event
@@ -708,19 +778,15 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         } else if (eventTopic.equalsIgnoreCase(UserFeedbackEventTopics.IMPLICIT_RESPONSE)) {
             //read from implicit response bean
             ImpFeedbackResultBean impFeedbackBean = (ImpFeedbackResultBean) item;
-            String responseId = impFeedbackBean.getRequestId();
-            boolean impResult = impFeedbackBean.isAccepted();
-            this.processImpResponseEvent(responseId, impResult);
+            this.processImpResponseEvent(impFeedbackBean);
 
         } else if (eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE)) {
             UserFeedbackPrivacyNegotiationEvent event = (UserFeedbackPrivacyNegotiationEvent) item;
-            String responseId = event.getRequestId();
-            this.processPrivacyPolicyNegotiationResponseEvent(responseId, event);
+            this.processPrivacyPolicyNegotiationResponseEvent(event);
 
         } else if (eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE)) {
             UserFeedbackAccessControlEvent event = (UserFeedbackAccessControlEvent) item;
-            String responseId = event.getRequestId();
-            this.processAccessControlResponseEvent(responseId, event);
+            this.processAccessControlResponseEvent(event);
 
         }
     }
@@ -741,16 +807,20 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         String responseID = expFeedbackBean.getRequestId();
 
         //remove from request manager list if exists
-        requestMgr.removeRequest(responseID);
+        synchronized (requestMgr) {
+            requestMgr.removeRequest(responseID);
+        }
+
         //set result value in hashmap
         synchronized (expResults) {
             if (!expResults.containsKey(responseID)) {
-                if (log.isDebugEnabled())
-                    log.debug("This isn't the node where the exp feedback request originated");
+                if (log.isTraceEnabled())
+                    log.trace(String.format("This isn't the node where the exp feedback request ID [%s] originated",
+                            responseID));
 
                 if (log.isTraceEnabled()) {
                     StringBuilder bld = new StringBuilder();
-                    bld.append("exp feedback requests outstanding:-\n");
+                    bld.append("Exp feedback requests outstanding:-\n");
                     for (String s : expResults.keySet()) {
                         bld.append(" - ");
                         bld.append(s);
@@ -805,14 +875,33 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         requestMgr.addRequest(fbForm);
     }
 
-    private void processImpResponseEvent(String responseID, Boolean result) {
+    private void processImpResponseEvent(ImpFeedbackResultBean impFeedbackBean) {
+
+        String responseID = impFeedbackBean.getRequestId();
+
         //remove from request manager list if exists
-        requestMgr.removeRequest(responseID);
+        synchronized (requestMgr) {
+            requestMgr.removeRequest(responseID);
+        }
+
         //set result value in hashmap
         synchronized (impResults) {
-            if (impResults.containsKey(responseID)) {
+            if (!impResults.containsKey(responseID)) {
                 if (log.isTraceEnabled())
-                    log.trace("This isn't the node where the imp feedback request originated");
+                    log.trace(String.format("This isn't the node where the imp feedback request ID [%s] originated",
+                            responseID));
+
+                if (log.isTraceEnabled()) {
+                    StringBuilder bld = new StringBuilder();
+                    bld.append("Imp feedback requests outstanding:-\n");
+                    for (String s : impResults.keySet()) {
+                        bld.append(" - ");
+                        bld.append(s);
+                        bld.append('\n');
+                    }
+                    log.trace(bld.toString());
+                }
+
                 return;
             }
 
@@ -822,7 +911,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             // update result
             try {
                 if (userFeedbackHistoryRepository != null) {
-                    userFeedbackHistoryRepository.completeImpFeedback(responseID, result);
+                    userFeedbackHistoryRepository.completeImpFeedback(responseID, impFeedbackBean.isAccepted());
                 }
             } catch (Exception ex) {
                 log.error("Error updating user feedback stage in database", ex);
@@ -832,20 +921,20 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                 pubsub.publisherPublish(myCloudID,
                         UserFeedbackEventTopics.COMPLETE,
                         responseID,
-                        null);
+                        impFeedbackBean);
             } catch (Exception ex) {
                 log.error("Error transmitting user feedback complete via pubsub", ex);
             }
 
             final UserFeedbackResult<Boolean> userFeedbackResult = impResults.get(responseID);
             synchronized (userFeedbackResult) {
-                userFeedbackResult.complete(result);
+                userFeedbackResult.complete(impFeedbackBean.isAccepted());
                 userFeedbackResult.notifyAll();
             }
 
             if (impCallbacks.containsKey(responseID)) {
                 IUserFeedbackResponseEventListener<Boolean> callback = impCallbacks.remove(responseID);
-                callback.responseReceived(result);
+                callback.responseReceived(impFeedbackBean.isAccepted());
             }
 
             this.impResults.notifyAll();
@@ -862,14 +951,33 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         requestMgr.addRequest(fbForm);
     }
 
-    private void processPrivacyPolicyNegotiationResponseEvent(String responseID, UserFeedbackPrivacyNegotiationEvent result) {
+    private void processPrivacyPolicyNegotiationResponseEvent(UserFeedbackPrivacyNegotiationEvent result) {
+
+        String responseID = result.getRequestId();
+
         //remove from request manager list if exists
-        requestMgr.removeRequest(responseID);
+        synchronized (requestMgr) {
+            requestMgr.removeRequest(responseID);
+        }
+
         //set result value in hashmap
         synchronized (negotiationResults) {
-            if (negotiationResults.containsKey(responseID)) {
+            if (!negotiationResults.containsKey(responseID)) {
                 if (log.isTraceEnabled())
-                    log.trace("This isn't the node where the PPN request originated");
+                    log.trace(String.format("This isn't the node where the PPN request ID [%s] originated",
+                            responseID));
+
+                if (log.isTraceEnabled()) {
+                    StringBuilder bld = new StringBuilder();
+                    bld.append("PPN requests outstanding:-\n");
+                    for (String s : negotiationResults.keySet()) {
+                        bld.append(" - ");
+                        bld.append(s);
+                        bld.append('\n');
+                    }
+                    log.trace(bld.toString());
+                }
+
                 return;
             }
 
@@ -912,32 +1020,50 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     }
 
 
-    private void processAccessControlResponseEvent(String responseID, UserFeedbackAccessControlEvent result) {
+    private void processAccessControlResponseEvent(UserFeedbackAccessControlEvent result) {
+
+        String responseID = result.getRequestId();
+
         //remove from request manager list if exists
-        requestMgr.removeRequest(responseID);
+        synchronized (requestMgr) {
+            requestMgr.removeRequest(responseID);
+        }
+
         //set result value in hashmap
-        synchronized (impResults) {
-            if (accessCtrlResults.containsKey(responseID)) {
+        synchronized (accessCtrlResults) {
+            if (!accessCtrlResults.containsKey(responseID)) {
                 if (log.isTraceEnabled())
-                    log.trace("This isn't the node where the AC feedback request originated...don't need to add result to hashmap");
+                    log.trace(String.format("This isn't the node where the AC request ID [%s] originated",
+                            responseID));
+
+                if (log.isTraceEnabled()) {
+                    StringBuilder bld = new StringBuilder();
+                    bld.append("AC requests outstanding:-\n");
+                    for (String s : accessCtrlResults.keySet()) {
+                        bld.append(" - ");
+                        bld.append(s);
+                        bld.append('\n');
+                    }
+                    log.trace(bld.toString());
+                }
+
                 return;
             }
 
             if (log.isDebugEnabled())
-                log.debug("this is the node where the AC feedback request originated....adding result to hashmap");
+                log.debug("This is the node where the AC feedback request originated");
 
             // update result
-//                try {
-//                    if (userFeedbackHistoryRepository != null) {
-//                        userFeedbackHistoryRepository.updateStage(responseID, FeedbackStage.COMPLETED);
-//                    }
-//                } catch (Exception ex) {
-//                    log.error("Error updating user feedback stage in database", ex);
+//            try {
+//                if (userFeedbackHistoryRepository != null) {
+//                    userFeedbackHistoryRepository.updateStage(responseID, FeedbackStage.COMPLETED);
 //                }
-
+//            } catch (Exception ex) {
+//                log.error("Error updating access control request stage in database", ex);
+//            }
             // inform clients that negotiation is complete
             try {
-                this.pubsub.publisherPublish(myCloudID,
+                pubsub.publisherPublish(myCloudID,
                         EventTypes.UF_PRIVACY_ACCESS_CONTROL_REMOVE_POPUP,
                         responseID,
                         accessCtrlResults.get(responseID));
@@ -951,9 +1077,13 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                 userFeedbackResult.notifyAll();
             }
 
+            if (accessCtrlCallbacks.containsKey(responseID)) {
+                IUserFeedbackResponseEventListener<List<ResponseItem>> callback = accessCtrlCallbacks.remove(responseID);
+                callback.responseReceived(result.getResponseItems());
+            }
+
             this.accessCtrlResults.notifyAll();
         }
-
     }
 
 
