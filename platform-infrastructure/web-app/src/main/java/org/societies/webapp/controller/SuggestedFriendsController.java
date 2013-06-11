@@ -63,8 +63,8 @@ public class SuggestedFriendsController extends BasePageController{
 	private List<MarshaledActivity> activities;
 	private List<CssAdvertisementRecord> friends;
 	private String friendid;
-	
-	private int selectedValue;
+		
+	private static String filterstring = "None";
 
 
 
@@ -79,18 +79,6 @@ public class SuggestedFriendsController extends BasePageController{
 	private String name;
 	private String Id;
 	
-	private FriendFilter friendfilter;
-	
-	
-	public FriendFilter getfriendfilter(){
-		return friendfilter ;
-	}
-	
-	public void setfriendfilter(FriendFilter filter){
-		log.info("set filter called with filter as : " +filter.getFilterFlag());
-		
-		this.friendfilter=friendfilter;
-	}
 	
 	public ICSSInternalManager getCssLocalManager() {
 		return cssLocalManager;
@@ -130,27 +118,25 @@ public class SuggestedFriendsController extends BasePageController{
 	
 	public SuggestedFriendsController() {
 	    log.info("SuggestedFriendsController constructor called");
-	    log.info("SuggestedFriendsController constructor about to call getSuggestedFriends");
-	   // this.getSuggestedfriends();
 	}
 
 	public List<CssAdvertisementRecordDetailed> getsnsFriendes(){
-		log.info("getsnsFriends method called [][]][][][][][][] ");
+		log.debug("getsnsFriends method called");
 		snsSuggestedFriends = this.getSuggestedfriends();
-		log.info("[][]][][][][][][] And we're BACK :-) ");
+		log.debug("And we're BACK :-) ");
 		List<CssAdvertisementRecord> snsFriends = new ArrayList<CssAdvertisementRecord>();
 		List<CssAdvertisementRecord> otherFriends = new ArrayList<CssAdvertisementRecord>();
 		snsFriendes = new ArrayList<CssAdvertisementRecordDetailed>();
 		for(Entry<CssAdvertisementRecord, Integer> entry : snsSuggestedFriends.entrySet()){
-			log.info("snsFriends ID " +entry.getKey().getId());
-			log.info("snsFriends Name " +entry.getKey().getName());
-			log.info("snsFriends Hashmap value " +entry.getValue());
-			if(entry.getValue().equals(0)){
+			log.debug("snsFriends ID " +entry.getKey().getId());
+			log.debug("snsFriends Name " +entry.getKey().getName());
+			log.debug("snsFriends Hashmap value " +entry.getValue());
+			if(entry.getValue() == 0){
 				otherFriends.add(entry.getKey());
-				log.info("otherFriends SIZE is " +snsFriends.size());
+				log.debug("otherFriends SIZE is " +snsFriends.size());
 			}else {
 				snsFriends.add(entry.getKey());
-				log.info("snsFriends SIZE is " +snsFriends.size());
+				log.debug("snsFriends SIZE is " +snsFriends.size());
 			}
 			
 			
@@ -159,7 +145,7 @@ public class SuggestedFriendsController extends BasePageController{
 		asyncssdetails = this.cssLocalManager.getCssAdvertisementRecordsFull();
 		try {
 			allcssdetails = asyncssdetails.get();
-			log.info("allcssdetails SIZE is " +allcssdetails.size());
+			log.debug("allcssdetails SIZE is " +allcssdetails.size());
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -179,8 +165,6 @@ public class SuggestedFriendsController extends BasePageController{
 					{
 						if (allcssdetails.get(index).getResultCssAdvertisementRecord().getId().contains(friendReq.get(indexFR).getCssIdentity()) && (allcssdetails.get(index).getStatus() != CssRequestStatusType.DENIED))
 						{
-							// We have a pending FR from this people, change status. This should be done in the CssManager 
-							// but not for the pilot
 							allcssdetails.get(index).setStatus(CssRequestStatusType.NEEDSRESP);
 							indexFR = friendReq.size();
 		
@@ -197,12 +181,10 @@ public class SuggestedFriendsController extends BasePageController{
 		}
 		for(int i = 0; i < allcssdetails.size(); i++){
 			for(CssAdvertisementRecord entry : snsFriends){
-				log.info("entry id is " +entry.getId());
-				log.info("allcssdetails ID is " +allcssdetails.get(i).getResultCssAdvertisementRecord().getId());
+				log.debug("entry id is " +entry.getId());
+				log.debug("allcssdetails ID is " +allcssdetails.get(i).getResultCssAdvertisementRecord().getId());
 				if(entry.getId().contains(allcssdetails.get(i).getResultCssAdvertisementRecord().getId())){
-					
-					log.info("ADDING record to list " +allcssdetails.get(i));
-					log.info("snsFriendes size is " +snsFriendes.size());
+					log.debug("ADDING record to list " +allcssdetails.get(i));
 					snsFriendes.add(allcssdetails.get(i));
 				}
 			}
@@ -225,34 +207,80 @@ public class SuggestedFriendsController extends BasePageController{
 		 
 	public HashMap<CssAdvertisementRecord, Integer> getSuggestedfriends() {
 		 
-		log.info("getSuggestedFriends method called {}{}{}{}{}{}{}{}{} == ");
-		 
-		FriendFilter filter = this.getfriendfilter();
+		log.debug("getSuggestedFriends method called");
 		HashMap<CssAdvertisementRecord,Integer> snsSuggestedFriends = null;
-		 
-		try {
-	
-			Integer filterFlag = 0x00000001111;
-			filter = cssLocalManager.getFriendfilter();
-			if(filter==null){
-				filter = new FriendFilter();
-				filterFlag=0x00000011111;
-				filter.setFilterFlag(filterFlag);
-			}else{
-				filterFlag = filter.getFilterFlag();
-				filter.setFilterFlag(filterFlag );
-			}
+		
+		filterstring = this.getFilterstring();
+		log.debug("getSuggestedFriends filterstring has the value set to : " +filterstring);
+		
+		int facebook =		0x0000000001;
+		int twitter = 		0x0000000010;
+		int linkedin =		0x0000000100;
+		int foursquare = 	0x0000001000;
+		int googleplus = 	0x0000010000;
+		int all = 			0x0000011111;
+		int CISMemeber = 	0x0000100000;
+		
+		int filterType = 0;
+		
+		FriendFilter filter = new FriendFilter();
+		
+		if (filterstring.equalsIgnoreCase("facebook")) {
+			filterType = facebook;
+			filter.setFilterFlag(facebook);
+			log.debug("getSuggestedFriends setting friend filter with filterflag as : " +filter.getFilterFlag());
 			
-			log.info("About to call the suggestedFriendDetails with filterflag: " +filter);
+		} 
+		
+		if (filterstring.equalsIgnoreCase("twitter")) {
+			filterType = twitter;
+			filter.setFilterFlag(twitter);
+			log.debug("getSuggestedFriends setting friend filter with filterflag as : " +filter.getFilterFlag());
+		} 
+		
+		if (filterstring.equalsIgnoreCase("linkedin")) {
+			filterType = linkedin;
+			filter.setFilterFlag(linkedin);
+			log.debug("getSuggestedFriends setting friend filter with filterflag as : " +filter.getFilterFlag());
+		} 
+		
+		if (filterstring.equalsIgnoreCase("foursquare")) {
+			filterType = foursquare;
+			filter.setFilterFlag(foursquare);
+			log.debug("getSuggestedFriends setting friend filter with filterflag as : " +filter.getFilterFlag());
+		} 
+		
+		if (filterstring.equalsIgnoreCase("googleplus")) {
+			filterType = googleplus;
+			filter.setFilterFlag(googleplus);
+			log.debug("getSuggestedFriends setting friend filter with filterflag as : " +filter.getFilterFlag());
+		} 
+		
+		if (filterstring.equalsIgnoreCase("none")) {
+			filterType = all;
+			filter.setFilterFlag(all);
+			log.debug("getSuggestedFriends setting friend filter with filterflag as : " +filter.getFilterFlag());
+		} 
+		if (filterstring.equalsIgnoreCase("CISMember")) {
+			filterType = CISMemeber;
+			filter.setFilterFlag(CISMemeber);
+			log.debug("getSuggestedFriends setting friend filter with filterflag as : " +filter.getFilterFlag());
+			
+		}
+		
+		try {
+			log.debug("getSuggestedFriends this call has returned " +filter + "with flag set to: " +filter.getFilterFlag());
+			
+			log.debug("About to call the suggestedFriendDetails with filterflag: " +filter.getFilterFlag());
 			Future<HashMap<CssAdvertisementRecord, Integer>> asynchSnsSuggestedFriends = getCssLocalManager().getSuggestedFriendsDetails(filter); //suggestedFriends();
 			snsSuggestedFriends = asynchSnsSuggestedFriends.get();
 	
-			log.info("Back from call the suggestedFriendDetails with result: " +snsSuggestedFriends);
-			log.info("snsSuggestedFriends contains" +snsSuggestedFriends);
+			log.debug("Back from call the suggestedFriendDetails with result: " +snsSuggestedFriends);
+			log.debug("snsSuggestedFriends contains" +snsSuggestedFriends);
 			for(Entry<CssAdvertisementRecord, Integer> entry : snsSuggestedFriends.entrySet()){
-				log.info("snsSuggestedFriends ID " +entry.getKey().getId());
-				log.info("snsSuggestedFriends Name " +entry.getKey().getName());
-				log.info("snsSuggestedFriends Hashmap value " +entry.getValue());
+				log.debug("snsSuggestedFriends ID " +entry.getKey().getId());
+				log.debug("snsSuggestedFriends Name " +entry.getKey().getName());
+				log.debug("snsSuggestedFriends Hashmap value " +entry.getValue());
 				
 			}
 			
@@ -266,7 +294,7 @@ public class SuggestedFriendsController extends BasePageController{
 	
 	public List<CssAdvertisementRecord> getfriends(){
 			
-		log.info("@@@@@@@@@@@ getfriendslist method called @@@@@@@@@@@@@@ ");
+		log.debug("getfriendslist method called");
 		
 		Future<List<CssAdvertisementRecord>> asynchFriends = getCssLocalManager().getCssFriends();
 		List<CssAdvertisementRecord> friends = new ArrayList<CssAdvertisementRecord>();
@@ -281,7 +309,7 @@ public class SuggestedFriendsController extends BasePageController{
 			e.printStackTrace();
 		}
 			
-		log.info("Friends SIZE is now " +friends.size());
+		log.debug("Friends SIZE is now " +friends.size());
 			
 		return friends;
 		
@@ -290,7 +318,7 @@ public class SuggestedFriendsController extends BasePageController{
 		
 	public void sendfriendrequest(String friendid){
 			
-		log.info("@@@@@@@@@@@ sendfriendrequest method called @@@@@@@@@@@@@@ ");
+		log.debug("sendfriendrequest method called");
 		
 		this.cssLocalManager.sendCssFriendRequest(friendid);
 			
@@ -298,8 +326,8 @@ public class SuggestedFriendsController extends BasePageController{
 	
 	public void handlerequestaccept(String friendid){
 		
-		log.info("@@@@@@@@@@@ ACCEPT method called @@@@@@@@@@@@@@ ");
-		log.info("@@@@@@@@@@@ ACCEPT method called friendid " +friendid);
+		log.debug("ACCEPT method called");
+		log.debug("ACCEPT method called friendid " +friendid);
 		CssRequest pendingFR = new CssRequest();
 		pendingFR.setCssIdentity(friendid); 
 		pendingFR.setRequestStatus(CssRequestStatusType.ACCEPTED);
@@ -310,21 +338,20 @@ public class SuggestedFriendsController extends BasePageController{
 
 	public void handlerequestdecline(String friendid){
 		
-		log.info("@@@@@@@@@@@ DECLINE method called @@@@@@@@@@@@@@ ");
-		log.info("@@@@@@@@@@@ DECLINE method called friendid " +friendid);
+		log.debug("DECLINE method called");
+		log.debug("DECLINE method called friendid " +friendid);
 		CssRequest pendingFR = new CssRequest();
 		pendingFR.setCssIdentity(friendid);
 		pendingFR.setRequestStatus(CssRequestStatusType.DENIED);
 		pendingFR.setOrigin(CssRequestOrigin.LOCAL);
-		//getCssLocalManager().updateCssRequest(pendingFR);
 		getCssLocalManager().declineCssFriendRequest(pendingFR);
 		
 	}
 
 	public void handlerequestcancelled(String friendid){
 		
-		log.info("@@@@@@@@@@@ CANCELLED method called @@@@@@@@@@@@@@ ");
-		log.info("@@@@@@@@@@@ CANCELLED method called friendid " +friendid);
+		log.debug("CANCELLED method called");
+		log.debug("CANCELLED method called friendid " +friendid);
 		CssRequest pendingFR = new CssRequest();
 		pendingFR.setCssIdentity(friendid); 
 		pendingFR.setRequestStatus(CssRequestStatusType.CANCELLED);
@@ -342,7 +369,7 @@ public class SuggestedFriendsController extends BasePageController{
 	}
 	
 	public List<MarshaledActivity> getactivities(){
-		log.info("getActivities called");
+		log.debug("getActivities called");
 		Date date = new Date();
 		long longDate=date.getTime();
 		String timespan = "1262304000000 " + longDate;
@@ -359,13 +386,13 @@ public class SuggestedFriendsController extends BasePageController{
 			e1.printStackTrace();
 		}
 		
-		log.info("Activities : " +results);
-		log.info("Activities Size: " +results.getMarshaledActivity().size());
+		log.debug("Activities : " +results);
+		log.debug("Activities Size: " +results.getMarshaledActivity().size());
 		
 		for(MarshaledActivity result : results.getMarshaledActivity()){
-			log.info("MarshaledActivity Published " +result.getPublished());
-			log.info("MarshaledActivity Verb " +result.getVerb());
-			log.info("MarshaledActivity Actor" +result.getActor());
+			log.debug("MarshaledActivity Published " +result.getPublished());
+			log.debug("MarshaledActivity Verb " +result.getVerb());
+			log.debug("MarshaledActivity Actor" +result.getActor());
 			Result.add(result);
 			
 		}
@@ -378,10 +405,10 @@ public class SuggestedFriendsController extends BasePageController{
 		List<CssAdvertisementRecord> otherFriends = new ArrayList<CssAdvertisementRecord>();
 		List<CssAdvertisementRecordDetailed> otherFriendes = new ArrayList<CssAdvertisementRecordDetailed>();
 		
-		log.info("getOtherFriends is called");
-		log.info("allcssdetails SIZE is " +allcssdetails.size());
+		log.debug("getOtherFriends is called");
+		log.debug("allcssdetails SIZE is " +allcssdetails.size());
 		otherFriends = this.getOtherFlist();
-		log.info("otherFriends SIZE is " +otherFriends.size());
+		log.debug("otherFriends SIZE is " +otherFriends.size());
 		
 		asynchFR = getCssLocalManager().findAllCssRequests();
 		try {
@@ -394,8 +421,6 @@ public class SuggestedFriendsController extends BasePageController{
 					{
 						if (allcssdetails.get(index).getResultCssAdvertisementRecord().getId().contains(friendReq.get(indexFR).getCssIdentity()) && (allcssdetails.get(index).getStatus() != CssRequestStatusType.DENIED))
 						{
-							// We have a pending FR from this people, change status. This should be done in the CssManager 
-							// but not for the pilot
 							allcssdetails.get(index).setStatus(CssRequestStatusType.NEEDSRESP);
 							indexFR = friendReq.size();
 		
@@ -412,12 +437,10 @@ public class SuggestedFriendsController extends BasePageController{
 		}
 		for(int i = 0; i < allcssdetails.size(); i++){
 			for(CssAdvertisementRecord entry : otherFriends){
-				log.info("entry id is " +entry.getId());
-				log.info("allcssdetails ID is " +allcssdetails.get(i).getResultCssAdvertisementRecord().getId());
+				log.debug("entry id is " +entry.getId());
+				log.debug("allcssdetails ID is " +allcssdetails.get(i).getResultCssAdvertisementRecord().getId());
 				if(entry.getId().contains(allcssdetails.get(i).getResultCssAdvertisementRecord().getId())){
-					
-					log.info("ADDING record to list " +allcssdetails.get(i));
-					log.info("snsFriendes size is " +snsFriendes.size());
+					log.debug("ADDING record to list " +allcssdetails.get(i));
 					otherFriendes.add(allcssdetails.get(i));
 				}
 			}
@@ -427,22 +450,29 @@ public class SuggestedFriendsController extends BasePageController{
 	}
 	
 	public List<CssAdvertisementRecord> getOtherFlist(){
-		log.info("Called getOtherFlist to get-> OtherFriends list ");
+		log.debug("Called getOtherFlist to get-> OtherFriends list ");
 		return otherFriends;
 		
 	}
 
 	public void setOtherFriends(List<CssAdvertisementRecord> otherFriends) {
-		log.info("Setting OtherFriends list ");
+		log.debug("Setting OtherFriends list ");
+		
 		this.otherFriends = otherFriends;
+		
+		log.debug("List size is " +otherFriends.size());
 	}
 
-	public int getSelectedValue() {
-		return selectedValue;
+	public String getFilterstring() {
+		return filterstring;
 	}
 
-	public void setSelectedValue(int selectedValue) {
-		this.selectedValue = selectedValue;
+	public void setFilterstring(String filters) {
+		log.debug("setfilterstring called with string: " +filters);
+		
+		SuggestedFriendsController.filterstring = filters;
+		
+		
 	}
 
 	
