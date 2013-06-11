@@ -212,12 +212,6 @@ public class PrivacyDataManagerTest extends IntegrationTest {
 					errorException = e;
 					lock.countDown();
 				}
-				@Override
-				public void onObfuscatedVersionRetrieved(CtxIdentifier dataId, boolean retrieved) {
-					succeed = false;
-					errorMsg = "onObfuscatedVersionRetrieved should no be called";
-					lock.countDown();
-				}
 			});
 
 			boolean releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
@@ -277,12 +271,6 @@ public class PrivacyDataManagerTest extends IntegrationTest {
 					succeed = false;
 					errorMsg = msg;
 					errorException = e;
-					lock.countDown();
-				}
-				@Override
-				public void onObfuscatedVersionRetrieved(CtxIdentifier dataId, boolean retrieved) {
-					succeed = false;
-					errorMsg = "onObfuscatedVersionRetrieved should no be called";
 					lock.countDown();
 				}
 			});

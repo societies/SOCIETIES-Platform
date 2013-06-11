@@ -24,7 +24,8 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.listener;
 
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+
 
 
 /**
@@ -34,6 +35,12 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
  */
 public interface IPrivacyPolicyManagerListener {
 	public void onPrivacyPolicyRetrieved(RequestPolicy privacyPolicy);
+	/**
+	 * Will be removed in 1.2
+	 * @see onPrivacyPolicyRetrieved
+	 */
+	@Deprecated
+	public void onPrivacyPolicyRetrieved(org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy privacyPolicy);
 	public void onOperationSucceed(String msg);
 	public void onOperationCancelled(String msg);
 	public void onOperationAborted(String msg, Exception e);

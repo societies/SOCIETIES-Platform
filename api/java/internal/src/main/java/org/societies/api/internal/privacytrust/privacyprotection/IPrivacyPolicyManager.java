@@ -128,22 +128,14 @@ public interface IPrivacyPolicyManager {
 	public boolean deletePrivacyPolicy(Requestor requestor) throws PrivacyException;
 
 	/**
-	 * Help a developer or a user to create a privacy policy by inferring a default
-	 * one using information about the CIS or the service. The privacy policy in
-	 * result will be slighty completed but still need to be filled. E.g. if a CIS
-	 * configuration contains information about geolocation data, the inference engine
-	 * will add geolocation data line to the privacy policy.
-	 * Example of use:
-	 * - CIS Management, or 3rd Service Creation, to create a policy
-	 * 
-	 * @param privacyPolicyType 1 means CIS privacy policy, 0 means 3P Service privacy policy
-	 * @param configuration Configuration of the CIS or the 3P service
-	 * @return A not complete privacy policy
+	 * Will be removed in 1.2
+	 * @see PrivacyPolicyUtils#inferPrivacyPolicy(PrivacyPolicyTypeConstants, Map)
 	 */
+	@Deprecated
 	public RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException;
 	/**
 	 * Will be removed in 1.2
-	 * @see getPrivacyPolicy
+	 * @see PrivacyPolicyUtils#inferPrivacyPolicy(PrivacyPolicyTypeConstants, Map)
 	 */
 	@Deprecated
 	public org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy inferPrivacyPolicy(org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException;

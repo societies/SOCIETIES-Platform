@@ -39,135 +39,130 @@ import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacy
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBean;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.privacytrust.remote.PrivacyCommClientCallback;
 /**
  * Comms Client that initiates the remote communication
  *
  * @author Olivier Maridat (Trialog)
- *
  */
 public class PrivacyPolicyManagerCommClient implements IPrivacyPolicyManagerRemote {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManagerCommClient.class);
-	
+	private static final Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManagerCommClient.class);
+
 	private ICommManager commManager;
 	private PrivacyPolicyManagerCommClientCallback listeners;
 	private PrivacyCommClientCallback privacyCommClientCallback;
 
-	
-	public PrivacyPolicyManagerCommClient() {	
-	}
 
-
-	
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote#getPrivacyPolicy(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener)
-	 */
 	@Override
-	public void getPrivacyPolicy(Requestor requestor, IIdentity targetedNode,
-			IPrivacyPolicyManagerListener listener) throws PrivacyException {
-		LOG.info("#### getPrivacyPolicy remote called");
+	public void getPrivacyPolicy(RequestorBean requestor, IIdentity targetedNode, IPrivacyPolicyManagerListener listener) throws PrivacyException {
 		Stanza stanza = new Stanza(targetedNode);
-		
 		listeners.privacyPolicyManagerlisteners.put(stanza.getId(), listener);
-		
+
 		PrivacyPolicyManagerBean bean = new PrivacyPolicyManagerBean();
 		bean.setMethod(MethodType.GET_PRIVACY_POLICY);
-		bean.setRequestor(RequestorUtils.toRequestorBean(requestor));
+		bean.setRequestor(requestor);
 		try {
-			this.commManager.sendIQGet(stanza, bean, privacyCommClientCallback);
-		} catch (CommunicationException e) {
+			commManager.sendIQGet(stanza, bean, privacyCommClientCallback);
+		}
+		catch (CommunicationException e) {
 			LOG.error("CommunicationException: "+MethodType.GET_PRIVACY_POLICY, e);
 			throw new PrivacyException("CommunicationException: "+MethodType.GET_PRIVACY_POLICY, e);
 		}
-		LOG.info("#### getPrivacyPolicy remote sent");
+		catch (Exception e) {
+			LOG.error("Exception: "+MethodType.GET_PRIVACY_POLICY, e);
+			throw new PrivacyException("Exception: "+MethodType.GET_PRIVACY_POLICY, e);
+		}
+	}
+	@Deprecated
+	public void getPrivacyPolicy(Requestor requestor, IIdentity targetedNode, IPrivacyPolicyManagerListener listener) throws PrivacyException {
+		getPrivacyPolicy(RequestorUtils.toRequestorBean(requestor), targetedNode, listener);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote#updatePrivacyPolicy(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy, org.societies.api.identity.IIdentity, org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener)
-	 */
 	@Override
-	public void updatePrivacyPolicy(RequestPolicy privacyPolicy,
-			IIdentity targetedNode, IPrivacyPolicyManagerListener listener) throws PrivacyException {
-		LOG.info("#### updatePrivacyPolicy remote called");
+	public void updatePrivacyPolicy(RequestPolicy privacyPolicy, IIdentity targetedNode, IPrivacyPolicyManagerListener listener) throws PrivacyException {
 		Stanza stanza = new Stanza(targetedNode);
-		
 		listeners.privacyPolicyManagerlisteners.put(stanza.getId(), listener);
-		
+
 		PrivacyPolicyManagerBean bean = new PrivacyPolicyManagerBean();
 		bean.setMethod(MethodType.UPDATE_PRIVACY_POLICY);
-		bean.setPrivacyPolicy(RequestPolicyUtils.toRequestPolicyBean(privacyPolicy));
+		bean.setPrivacyPolicy(privacyPolicy);
 		try {
-			this.commManager.sendIQGet(stanza, bean, privacyCommClientCallback);
-		} catch (CommunicationException e) {
+			commManager.sendIQGet(stanza, bean, privacyCommClientCallback);
+		}
+		catch (CommunicationException e) {
 			LOG.error("CommunicationException: "+MethodType.UPDATE_PRIVACY_POLICY, e);
 			throw new PrivacyException("CommunicationException: "+MethodType.UPDATE_PRIVACY_POLICY, e);
 		}
-		LOG.info("#### updatePrivacyPolicy remote sent");
+		catch (Exception e) {
+			LOG.error("Exception: "+MethodType.UPDATE_PRIVACY_POLICY, e);
+			throw new PrivacyException("Exception: "+MethodType.UPDATE_PRIVACY_POLICY, e);
+		}
+	}
+	@Deprecated
+	public void updatePrivacyPolicy(org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy privacyPolicy, IIdentity targetedNode, IPrivacyPolicyManagerListener listener) throws PrivacyException {
+		updatePrivacyPolicy(RequestPolicyUtils.toRequestPolicyBean(privacyPolicy), targetedNode, listener);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote#deletePrivacyPolicy(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener)
-	 */
 	@Override
-	public void deletePrivacyPolicy(Requestor requestor,
-			IIdentity targetedNode, IPrivacyPolicyManagerListener listener) throws PrivacyException {
-		LOG.info("#### deletePrivacyPolicy remote called");
+	public void deletePrivacyPolicy(RequestorBean requestor, IIdentity targetedNode, IPrivacyPolicyManagerListener listener) throws PrivacyException {
 		Stanza stanza = new Stanza(targetedNode);
-		
 		listeners.privacyPolicyManagerlisteners.put(stanza.getId(), listener);
-		
+
 		PrivacyPolicyManagerBean bean = new PrivacyPolicyManagerBean();
 		bean.setMethod(MethodType.DELETE_PRIVACY_POLICY);
-		bean.setRequestor(RequestorUtils.toRequestorBean(requestor));
+		bean.setRequestor(requestor);
 		try {
-			this.commManager.sendIQGet(stanza, bean, privacyCommClientCallback);
-		} catch (CommunicationException e) {
+			commManager.sendIQGet(stanza, bean, privacyCommClientCallback);
+		}
+		catch (CommunicationException e) {
 			LOG.error("CommunicationException: "+MethodType.DELETE_PRIVACY_POLICY, e);
 			throw new PrivacyException("CommunicationException: "+MethodType.DELETE_PRIVACY_POLICY, e);
 		}
-		LOG.info("#### deletePrivacyPolicy remote sent");
+		catch (Exception e) {
+			LOG.error("Exception: "+MethodType.DELETE_PRIVACY_POLICY, e);
+			throw new PrivacyException("Exception: "+MethodType.DELETE_PRIVACY_POLICY, e);
+		}
+	}
+	@Deprecated
+	public void deletePrivacyPolicy(Requestor requestor, IIdentity targetedNode, IPrivacyPolicyManagerListener listener) throws PrivacyException {
+		deletePrivacyPolicy(RequestorUtils.toRequestorBean(requestor), targetedNode, listener);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote#inferPrivacyPolicy(int, java.util.Map, org.societies.api.identity.IIdentity, org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener)
-	 */
-	@Override
-	public void inferPrivacyPolicy(int privacyPolicyType, Map configuration,
-			IIdentity targetedNode, IPrivacyPolicyManagerListener listener) throws PrivacyException {
-		LOG.info("#### inferPrivacyPolicy remote called");
+	@SuppressWarnings("rawtypes")
+	@Deprecated
+	public void inferPrivacyPolicy(int privacyPolicyType, Map configuration, IIdentity targetedNode, IPrivacyPolicyManagerListener listener) throws PrivacyException {
 		Stanza stanza = new Stanza(targetedNode);
-		
 		listeners.privacyPolicyManagerlisteners.put(stanza.getId(), listener);
-		
+
 		PrivacyPolicyManagerBean bean = new PrivacyPolicyManagerBean();
 		bean.setMethod(MethodType.INFER_PRIVACY_POLICY);
 		bean.setPrivacyPolicyType(privacyPolicyType);
 		try {
-			this.commManager.sendIQGet(stanza, bean, privacyCommClientCallback);
-		} catch (CommunicationException e) {
+			commManager.sendIQGet(stanza, bean, privacyCommClientCallback);
+		}
+		catch (CommunicationException e) {
 			LOG.error("CommunicationException: "+MethodType.INFER_PRIVACY_POLICY, e);
 			throw new PrivacyException("CommunicationException: "+MethodType.INFER_PRIVACY_POLICY, e);
 		}
-		LOG.info("#### inferPrivacyPolicy remote sent");
+		catch (Exception e) {
+			LOG.error("Exception: "+MethodType.INFER_PRIVACY_POLICY, e);
+			throw new PrivacyException("Exception: "+MethodType.INFER_PRIVACY_POLICY, e);
+		}
 	}
-	
-	
-	
+
+
+
 	// -- Dependency Injection
-	
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
-		LOG.info("[DependencyInjection] CommManager injected");
 	}
 	public void setListeners(PrivacyPolicyManagerCommClientCallback listeners) {
 		this.listeners = listeners;
-		LOG.info("[DependencyInjection] PrivacyDataManagerCommClientCallback injected");
 	}
-	public void setPrivacyCommClientCallback(
-			PrivacyCommClientCallback privacyCommClientCallback) {
+	public void setPrivacyCommClientCallback(PrivacyCommClientCallback privacyCommClientCallback) {
 		this.privacyCommClientCallback = privacyCommClientCallback;
-		LOG.info("[DependencyInjection] PrivacyCommClientCallback injected");
 	}
 }

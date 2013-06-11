@@ -31,9 +31,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -58,28 +61,24 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
+import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.RequestorService;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.ConditionUtils;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestItemUtils;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
 import org.societies.api.schema.identity.DataIdentifierScheme;
-import org.societies.api.schema.identity.RequestorBean;
-import org.societies.api.schema.identity.RequestorCisBean;
-import org.societies.api.schema.identity.RequestorServiceBean;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.services.ServiceUtils;
 import org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager;
@@ -93,7 +92,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
 /**
- * Test list:
+ * Test deprecated methods of {@link IPrivacyPolicyManager}
  * - get a not existing cis privacy policy
  * - add, get and delete a cis privacy policy
  * - get a not existing service privacy policy
@@ -104,22 +103,26 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * - delete a not existing service privacy policy
  * - delete a cis privacy policy
  * - delete a service privacy policy
+ * - generate a privacy policy from XML string
+ * - generate a privacy policy from empty XML string
+ * - transform a privacy policy to a XML string
+ * - transform an empty privacy policy to a XML string
  * - equality between two RequestPolicy
  * 
  * @author Olivier Maridat (Trialog)
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration//(locations = { "PrivacyPolicyManagerTest-context.xml" })
-public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
-	private static final Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManagerTest.class.getName());
+@ContextConfiguration(locations = { "PrivacyPolicyManagerTest-context.xml" })
+public class PrivacyPolicyManagerDeprecatedTest extends AbstractJUnit4SpringContextTests {
+	private static final Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManagerDeprecatedTest.class.getName());
 
 	@Autowired
 	private IPrivacyPolicyManager privacyPolicyManager;
-
+	
 	private ICtxBroker ctxBroker;
-	private RequestorCisBean requestorCis;
-	private RequestorServiceBean requestorService;
+	private RequestorCis requestorCis;
+	private RequestorService requestorService;
 	private RequestPolicy cisPolicy;
 	private RequestPolicy servicePolicy;
 	private CtxEntity personEntity;
@@ -143,31 +146,31 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		ICommManager commManager = Mockito.mock(ICommManager.class);
 		IIdentityManager idManager = Mockito.mock(IIdentityManager.class);
 		INetworkNode myCssId = new MockNetworkNode(IdentityType.CSS, "me","ict-societies.eu", "RICH");
-		IIdentity otherCssId = new MockIdentity(IdentityType.CSS, "othercss","ict-societies.eu");
-		IIdentity cisId = new MockIdentity(IdentityType.CIS, "cis-one", "ict-societies.eu");
+		IIdentity otherCssId = new MockIdentity(IdentityType.CSS, "othercss","societies.local");
+		IIdentity cisId = new MockIdentity(IdentityType.CIS, "cis-one", "societies.local");
 		Mockito.when(idManager.getThisNetworkNode()).thenReturn(myCssId);
 		Mockito.when(idManager.fromJid(otherCssId.getJid())).thenReturn(otherCssId);
 		Mockito.when(idManager.fromJid(cisId.getJid())).thenReturn(cisId);
-		Mockito.when(idManager.fromJid("cis-one.ict-societies.eu")).thenReturn(new MockIdentity("cis-one.ict-societies.eu"));
-		Mockito.when(idManager.fromJid("cis-one.ict-societies.eu")).thenReturn(new MockIdentity("cis-one.ict-societies.eu"));
-		Mockito.when(idManager.fromJid("othercss.ict-societies.eu")).thenReturn(new MockIdentity("othercss.ict-societies.eu"));
-		Mockito.when(idManager.fromJid("red.ict-societies.eu")).thenReturn(new MockIdentity("red.ict-societies.eu"));
-		Mockito.when(idManager.fromJid("eliza.ict-societies.eu")).thenReturn(new MockIdentity("eliza.ict-societies.eu"));
+		Mockito.when(idManager.fromJid("cis-one.societies.local")).thenReturn(new MockIdentity("cis-one.societies.local"));
+		Mockito.when(idManager.fromJid("cis-one@societies.local")).thenReturn(new MockIdentity("cis-one@societies.local"));
+		Mockito.when(idManager.fromJid("othercss@societies.local")).thenReturn(new MockIdentity("othercss@societies.local"));
+		Mockito.when(idManager.fromJid("red@societies.local")).thenReturn(new MockIdentity("red@societies.local"));
+		Mockito.when(idManager.fromJid("eliza@societies.local")).thenReturn(new MockIdentity("eliza@societies.local"));
 		Mockito.when(commManager.getIdManager()).thenReturn(idManager);
 
 		// CtxBorker
 		ICtxBroker ctxBroker = Mockito.mock(ICtxBroker.class);
-		Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, org.societies.api.internal.context.model.CtxAttributeTypes.PRIVACY_POLICY_REGISTRY)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
-		Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, "policyOf"+RequestorUtils.toUriString(requestorCis))).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
-		Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, "policyOf"+RequestorUtils.toUriString(requestorService))).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
+		Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.PRIVACY_POLICY_REGISTRY)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
+		Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, "policyOf"+getCtxType(requestorCis))).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
+		Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, "policyOf"+getCtxType(requestorService))).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
 		Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PRIVACY_POLICY)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
 		IndividualCtxEntity weirdPerson = new IndividualCtxEntity(personEntity.getId());
 		Mockito.when(ctxBroker.retrieveIndividualEntity(myCssId)).thenReturn(new AsyncResult<IndividualCtxEntity>(weirdPerson));
 		Mockito.when(ctxBroker.createAssociation(CtxAssociationTypes.HAS_PRIVACY_POLICIES)).thenReturn(new AsyncResult<CtxAssociation>(hasPrivacyPolicies));
 		Mockito.when(ctxBroker.createEntity(CtxEntityTypes.PRIVACY_POLICY)).thenReturn(new AsyncResult<CtxEntity>(policyEntity));
-		Mockito.when(ctxBroker.createAttribute((CtxEntityIdentifier) policyEntity.getId(), "policyOf"+RequestorUtils.toUriString(requestorCis))).thenReturn(new AsyncResult<CtxAttribute>(cisPolicyAttribute));
-		Mockito.when(ctxBroker.createAttribute((CtxEntityIdentifier) policyEntity.getId(), "policyOf"+RequestorUtils.toUriString(requestorService))).thenReturn(new AsyncResult<CtxAttribute>(servicePolicyAttribute));
-		Mockito.when(ctxBroker.createAttribute(personEntity.getId(), org.societies.api.internal.context.model.CtxAttributeTypes.PRIVACY_POLICY_REGISTRY)).thenReturn(new AsyncResult<CtxAttribute>(registryAttribute));
+		Mockito.when(ctxBroker.createAttribute((CtxEntityIdentifier) policyEntity.getId(), "policyOf"+getCtxType(requestorCis))).thenReturn(new AsyncResult<CtxAttribute>(cisPolicyAttribute));
+		Mockito.when(ctxBroker.createAttribute((CtxEntityIdentifier) policyEntity.getId(), "policyOf"+getCtxType(requestorService))).thenReturn(new AsyncResult<CtxAttribute>(servicePolicyAttribute));
+		Mockito.when(ctxBroker.createAttribute(personEntity.getId(), CtxAttributeTypes.PRIVACY_POLICY_REGISTRY)).thenReturn(new AsyncResult<CtxAttribute>(registryAttribute));
 		Mockito.when(ctxBroker.retrieve(cisPolicyAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(cisPolicyAttribute));
 		Mockito.when(ctxBroker.retrieve(servicePolicyAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(servicePolicyAttribute));
 		Mockito.when(ctxBroker.remove(cisPolicyAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(cisPolicyAttribute));
@@ -196,7 +199,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		} catch (Exception e) {
 			fail("[Error testGetCisPrivacyPolicyNonExisting] error");
 		}
-		assertTrue("Expected null privacy policy, but it is not.", RequestPolicyUtils.equal(privacyPolicy, expectedPrivacyPolicy));
+		assertEquals("Expected null privacy policy, but it is not.", privacyPolicy, expectedPrivacyPolicy);
 	}
 
 	/**
@@ -224,7 +227,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		assertNotNull("Privacy policy retrieved is null, but it should not.", retrievedPrivacyPolicy);
 		LOG.info("Added privacy policy: "+addedPrivacyPolicy.toString());
 		LOG.info("Retrieved privacy policy: "+retrievedPrivacyPolicy.toString());
-		assertTrue("Expected a privacy policy, but it was not the good one.", RequestPolicyUtils.equal(retrievedPrivacyPolicy, addedPrivacyPolicy));
+		assertEquals("Expected a privacy policy, but it was not the good one.", retrievedPrivacyPolicy, addedPrivacyPolicy);
 		assertTrue("Privacy policy not deleted.", deleteResult);
 	}
 
@@ -244,7 +247,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		} catch (Exception e) {
 			fail("[Error testDeletePrivacyPolicy] error");
 		}
-		assertTrue("Expected null privacy policy, but it is not.", RequestPolicyUtils.equal(privacyPolicy, expectedPrivacyPolicy));
+		assertEquals("Expected null privacy policy, but it is not.", privacyPolicy, expectedPrivacyPolicy);
 	}
 
 	/**
@@ -269,10 +272,10 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		}
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
 		assertNotNull("Privacy policy retrieved is null, but it should not.", retrievedPrivacyPolicy);
-		assertTrue("Expected a privacy policy, but it what not the good one.", RequestPolicyUtils.equal(retrievedPrivacyPolicy, addedPrivacyPolicy));
+		assertEquals("Expected a privacy policy, but it what not the good one.", retrievedPrivacyPolicy, addedPrivacyPolicy);
 		assertTrue("Privacy policy not deleted.", deleteResult);
 	}
-
+	
 	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy)}.
 	 */
@@ -289,9 +292,9 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		} catch (Exception e) {
 			fail("[Error testDeletePrivacyPolicy] error");
 		}
-		assertTrue("Privacy policy not created", RequestPolicyUtils.equal(cisPolicy, privacyPolicy1));
-		assertTrue("Privacy policy not updated", RequestPolicyUtils.equal(cisPolicy, privacyPolicy2));
-		assertTrue("Difference between same privacy policies", RequestPolicyUtils.equal(privacyPolicy1, privacyPolicy2));
+		assertEquals("Privacy policy not created", cisPolicy, privacyPolicy1);
+		assertEquals("Privacy policy not updated", cisPolicy, privacyPolicy2);
+		assertEquals("Difference between same privacy policies", privacyPolicy1, privacyPolicy2);
 	}
 
 	/**
@@ -302,7 +305,8 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		LOG.info("[[TEST]] testUpdatesCisPrivacyPolicies: update the same privacy policy");
 		RequestPolicy privacyPolicy1 = null;
 		RequestPolicy privacyPolicy2 = null;
-		RequestPolicy servicePolicy2 = RequestPolicyUtils.create(requestorService, cisPolicy.getRequestItems());
+		RequestPolicy servicePolicy2 = new RequestPolicy(cisPolicy.getRequests());
+		servicePolicy2.setRequestor(requestorService);
 		try {
 			privacyPolicy1 = privacyPolicyManager.updatePrivacyPolicy(cisPolicy);
 			privacyPolicy2 = privacyPolicyManager.updatePrivacyPolicy(servicePolicy2);
@@ -311,8 +315,8 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		} catch (Exception e) {
 			fail("[Error testDeletePrivacyPolicy] error");
 		}
-		assertTrue("Privacy policy not created", RequestPolicyUtils.equal(cisPolicy, privacyPolicy1));
-		assertTrue("Privacy policy not updated", RequestPolicyUtils.equal(servicePolicy2, privacyPolicy2));
+		assertEquals("Privacy policy not created", cisPolicy, privacyPolicy1);
+		assertEquals("Privacy policy not updated", servicePolicy2, privacyPolicy2);
 		assertFalse("Same privacy policies but it should not", privacyPolicy1.equals(privacyPolicy2));
 	}
 
@@ -337,7 +341,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		assertNull("This privacy policy exists!", privacyPolicy);
 		assertTrue("Privacy policy not deleted.", deleteResult);
 	}
-
+	
 	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#deletePrivacyPolicy(java.lang.String)}.
 	 */
@@ -382,11 +386,11 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		}
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
 		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicyBefore);
-		assertTrue("Expected a privacy policy, but it what not the good one.", RequestPolicyUtils.equal(privacyPolicyBefore, addedPrivacyPolicy));
+		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicyBefore, addedPrivacyPolicy);
 		assertTrue("Privacy policy not deleted.", deleteResult);
 		assertNull("Privacy policy not really deleted.", privacyPolicyAfter);
 	}
-
+	
 	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#deletePrivacyPolicy(java.lang.String)}.
 	 */
@@ -410,41 +414,150 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		}
 		assertNotNull("Privacy policy not added.", addedPrivacyPolicy);
 		assertNotNull("Privacy policy retrieved is null, but it should not.", privacyPolicyBefore);
-		assertTrue("Expected a privacy policy, but it what not the good one.", RequestPolicyUtils.equal(privacyPolicyBefore, addedPrivacyPolicy));
+		assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicyBefore, addedPrivacyPolicy);
 		assertTrue("Privacy policy not deleted.", deleteResult);
 		assertNull("Privacy policy not really deleted.", privacyPolicyAfter);
 	}
-
+	
 	@Test
 	public void testDataIdentifierSchemeEquals() {
 		LOG.info("[[TEST]] testDataIdentifierSchemeEquals");
 		assertEquals("Expected equals", DataIdentifierScheme.CONTEXT, DataIdentifierScheme.CONTEXT);
 		assertTrue("Expected equals", DataIdentifierScheme.CONTEXT.equals(DataIdentifierScheme.CONTEXT));
 	}
+	
+	/**
+	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#fromXMLString(org.lang.String privacyPolicy)}.
+	 */
+	@Test
+	public void testFromXmlNull() {
+		LOG.info("[[TEST]] testFromXmlNull");
+		RequestPolicy privacyPolicy1 = null;
+		RequestPolicy privacyPolicy2 = null;
+		try {
+			privacyPolicy1 = privacyPolicyManager.fromXMLString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+			privacyPolicy2 = privacyPolicyManager.fromXMLString("");
+		} catch (PrivacyException e) {
+			LOG.info("[Test PrivacyException] testFromXmlNull", e);
+			fail("[Error testFromXmlNull] Privacy error");
+		} catch (Exception e) {
+			LOG.info("[Test Exception] testFromXmlNull: "+e.getMessage(), e);
+			fail("[Error testFromXmlNull] error: "+e.getMessage());
+		}
+		assertNull("Privacy policy should be null", privacyPolicy1);
+		assertNull("Privacy policy should be null", privacyPolicy2);
+	}
+	
+	
+	/**
+	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#fromXMLString(org.lang.String privacyPolicy)}.
+	 */
+	@Test
+	public void testFromXml() {
+		String testTitle = "testFromXml: generated a RequestPolicy from a XML privacy policy";
+		LOG.info("[[TEST]] "+testTitle);
+		RequestPolicy privacyPolicy = null;
+		try {
+			privacyPolicy = privacyPolicyManager.fromXMLString(cisPolicy.toXMLString());
+		} catch (PrivacyException e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("Privacy error "+e.getMessage()+": "+testTitle);
+		} catch (Exception e) {
+			LOG.error("[Test Exception] "+testTitle, e);
+			fail("Error "+e.getMessage()+": "+testTitle);
+		}
+		assertNotNull("Privacy policy generated should not be null", privacyPolicy);
+		LOG.debug("**** Original XML privacy policy ****");
+		LOG.debug(cisPolicy.toXMLString().replaceAll("[\n\t]", ""));
+		LOG.debug("**** Generated RequestPolicy ****");
+		LOG.debug(privacyPolicy.toXMLString().replaceAll("[\n\t]", ""));
+		assertEquals("Privacy policy generated (xml) not equal to the original policy", cisPolicy.toXMLString().replaceAll("[\n\t]", ""), privacyPolicy.toXMLString().replaceAll("[\n\t]", ""));
+		assertEquals("Privacy policy generated not equal to the original policy", cisPolicy, privacyPolicy);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#fromXMLString(org.lang.String privacyPolicy)}.
+	 */
+	@Test
+	public void testToXmlNull() {
+		LOG.info("[[TEST]] testToXmlNull");
+		String privacyPolicy = null;
+		try {
+			privacyPolicy = privacyPolicyManager.toXMLString(null);
+		} catch (Exception e) {
+			LOG.info("[Test Exception] testToXmlNull", e);
+			fail("[Error testToXmlNull] error");
+		}
+		assertEquals("Privacy policy generated not equal to the original policy", "<?xml version=\"1.0\" encoding=\"UTF-8\"?><RequestPolicy></RequestPolicy>", privacyPolicy);
+	}
+	
+	/**
+	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#fromXMLString(org.lang.String privacyPolicy)}.
+	 */
+	@Test
+	public void testToXml() {
+		LOG.info("[[TEST]] testToXml");
+		String privacyPolicy = null;
+		try {
+			privacyPolicy = privacyPolicyManager.toXMLString(cisPolicy);
+		} catch (Exception e) {
+			LOG.info("[Test Exception] testToXml", e);
+			fail("[Error testFromXml] error");
+		}
+		LOG.info("***** Original Privacy Policy *****");
+		LOG.info("<?xmlversion=\"1.0\"encoding=\"UTF-8\"?>"+cisPolicy.toXMLString().replaceAll("[ \n\t]", ""));
+		LOG.info("***** Generated Privacy Policy *****");
+		LOG.info(privacyPolicy.replaceAll("[ \n\t]", ""));
+		assertEquals("Privacy policy generated not equal to the original policy", "<?xmlversion=\"1.0\"encoding=\"UTF-8\"?>"+cisPolicy.toXMLString().replaceAll("[ \n\t]", ""), privacyPolicy.replaceAll("[ \n\t]", ""));
+	}
+
+
+	/**
+	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#inferPrivacyPolicy()}.
+	 */
+	@Test
+	public void testInferPrivacyPolicy() {
+		LOG.info("[[TEST]] testInferPrivacyPolicy");
+		RequestPolicy expected = new RequestPolicy(new ArrayList<RequestItem>());
+		RequestPolicy actual = null;
+		try {
+			actual = privacyPolicyManager.inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, null);
+		} catch (PrivacyException e) {
+			LOG.error("[Error testInferPrivacyPolicy] Privacy error", e);
+			fail("[Error testInferPrivacyPolicy] Privacy error");
+		} catch (Exception e) {
+			LOG.info("[Test Exception] testInferPrivacyPolicy", e);
+			fail("[Error testInferPrivacyPolicy] error");
+		}
+		assertEquals(expected, actual);
+	}
+
 
 	@Test
 	public void testRequestPolicyEquals() {
 		LOG.info("[[TEST]] testRequestPolicyEquals");
 		List<RequestItem> requestItems2 = new ArrayList<RequestItem>();
-		Resource resource2 = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
+		Resource resource2 = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
 		List<Action> actions2 = new ArrayList<Action>();
-		actions2.add(ActionUtils.create(ActionConstants.READ));
-		RequestItem requestItem2 = RequestItemUtils.create(resource2, actions2, new ArrayList<Condition>());
+		actions2.add(new Action(ActionConstants.READ));
+		RequestItem requestItem2 = new RequestItem(resource2, actions2, new ArrayList<Condition>());
 		requestItems2.add(requestItem2);
-		RequestPolicy actual = RequestPolicyUtils.create(requestorCis, requestItems2);
+		RequestPolicy actual = new RequestPolicy(requestItems2);
+		actual.setRequestor(requestorCis);
 
 		List<RequestItem> requestItems = new ArrayList<RequestItem>();
-		Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
+		Resource resource = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
 		List<Action> actions = new ArrayList<Action>();
-		actions.add(ActionUtils.create(ActionConstants.READ));
-		RequestItem requestItem = RequestItemUtils.create(resource, actions, new ArrayList<Condition>());
+		actions.add(new Action(ActionConstants.READ));
+		RequestItem requestItem = new RequestItem(resource, actions, new ArrayList<Condition>());
 		requestItems.add(requestItem);
-		RequestPolicy expected = RequestPolicyUtils.create(requestorCis, requestItems);
+		RequestPolicy expected = new RequestPolicy(requestItems);
+		expected.setRequestor(requestorCis);
 
-		assertEquals("Expected equals XML string", RequestPolicyUtils.toXmlString(expected), RequestPolicyUtils.toXmlString(actual));
-		assertTrue("Expected equals", RequestPolicyUtils.equal(expected, actual));
+		assertEquals("Expected equals", expected.toXMLString(), actual.toXMLString());
+		assertEquals("Expected equals", expected, actual);
 	}
-
+	
 	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#getPrivacyPolicy(java.lang.String)}.
 	 */
@@ -499,10 +612,10 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		LOG.info(" *** Original Privacy Policy: \n"+privacyPolicy);
 		LOG.info(" *** Added Privacy Policy: \n"+addedPrivacyPolicy.toString());
 		LOG.info(" *** Retrieved Privacy Policy: \n"+readPrivacyPolicy.toString());
-		assertTrue("Expected a privacy policy, but it what not the good one.", RequestPolicyUtils.equal(readPrivacyPolicy, addedPrivacyPolicy));
+		assertEquals("Expected a privacy policy, but it what not the good one.", readPrivacyPolicy, addedPrivacyPolicy);
 		assertTrue("Privacy policy not deleted.", deleteResult);
 	}
-
+	
 	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#getPrivacyPolicy(java.lang.String)}.
 	 */
@@ -530,10 +643,10 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		LOG.info(" *** Original Privacy Policy: \n"+privacyPolicy);
 		LOG.info(" *** Added Privacy Policy: \n"+addedPrivacyPolicy.toString());
 		LOG.info(" *** Retrieved Privacy Policy: \n"+readPrivacyPolicy.toString());
-		assertTrue("Expected a privacy policy, but it what not the good one.", RequestPolicyUtils.equal(readPrivacyPolicy, addedPrivacyPolicy));
+		assertEquals("Expected a privacy policy, but it what not the good one.", readPrivacyPolicy, addedPrivacyPolicy);
 		assertTrue("Privacy policy not deleted.", deleteResult);
 	}
-
+	
 	/**
 	 * Test method for {@link org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager#getPrivacyPolicy(java.lang.String)}.
 	 */
@@ -548,7 +661,7 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 				"<AttributeValue>othercss@societies.local</AttributeValue>" +
 				"</Attribute>" +
 				"<Attribute AttributeId=\"CisId\" DataType=\"org.societies.api.identity.IIdentity\">" +
-				"<AttributeValue>onecis.societies.local</AttributeValue>" +
+				"<AttributeValue>cis-one.societies.local</AttributeValue>" +
 				"</Attribute>" +
 				"</Subject>"+
 				"<Target>" +
@@ -581,8 +694,8 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		String retrievedPrivacyPolicy = null;
 		String jarLocation = "testjar-1.0.jar";
 		try {
-			retrievedPrivacyPolicy = privacyPolicyManager.getPrivacyPolicyFromLocation(jarLocation);
-			assertTrue("Expected equals privacy policies", RequestPolicyUtils.equal(PrivacyPolicyUtils.fromXacmlString(expectedPrivacyPolicy), PrivacyPolicyUtils.fromXacmlString(retrievedPrivacyPolicy)));
+//			retrievedPrivacyPolicy = privacyPolicyManager.getPrivacyPolicyFrom3PServiceJar(jarLocation);
+			assertEquals("Expected a privacy policy, but it what not the good one.", privacyPolicyManager.fromXMLString(expectedPrivacyPolicy), privacyPolicyManager.fromXMLString(retrievedPrivacyPolicy));
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("Privacy error "+e.getLocalizedMessage()+": "+testTitle);
@@ -597,64 +710,71 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 
 	/* --- Tools --- */
 	private void createPersonEntity() {
-		mockId = new MockIdentity(IdentityType.CSS, "me", "ict-societies.eu");
+		mockId = new MockIdentity(IdentityType.CSS, "me", "societies.local");
 		CtxEntityIdentifier ctxPersonId = new CtxEntityIdentifier(mockId.getJid(), "Person", new Long(1));
 		personEntity = new CtxEntity(ctxPersonId);
 		hasPrivacyPolicies = new CtxAssociation(new CtxAssociationIdentifier(mockId.getJid(), CtxAssociationTypes.HAS_PRIVACY_POLICIES, new Long(3)));
 		CtxEntityIdentifier policyEntityId = new CtxEntityIdentifier(mockId.getJid(), CtxEntityTypes.PRIVACY_POLICY, new Long(1));
 		policyEntity = new CtxEntity(policyEntityId);
-		CtxAttributeIdentifier cisPolicyAttributeId = new CtxAttributeIdentifier(policyEntityId, "policyOf"+RequestorUtils.toUriString(requestorCis), new Long(2));
+		CtxAttributeIdentifier cisPolicyAttributeId = new CtxAttributeIdentifier(policyEntityId, "policyOf"+getCtxType(requestorCis), new Long(2));
 		cisPolicyAttribute = new CtxAttribute(cisPolicyAttributeId);
-		CtxAttributeIdentifier servicePolicyAttributeId = new CtxAttributeIdentifier(policyEntityId, "policyOf"+RequestorUtils.toUriString(requestorService), new Long(2));
+		CtxAttributeIdentifier servicePolicyAttributeId = new CtxAttributeIdentifier(policyEntityId, "policyOf"+getCtxType(requestorService), new Long(2));
 		servicePolicyAttribute = new CtxAttribute(servicePolicyAttributeId);
 		CtxAttributeIdentifier registryAttrId = new CtxAttributeIdentifier(ctxPersonId, org.societies.api.internal.context.model.CtxAttributeTypes.PRIVACY_POLICY_REGISTRY, new Long(2));
 		registryAttribute = new CtxAttribute(registryAttrId);
 	}
 
-	private RequestPolicy getRequestPolicy(RequestorBean requestor) {
-		List<RequestItem> requestItems = this.getRequestItems();
-		RequestPolicy requestPolicy = RequestPolicyUtils.create(requestor, requestItems);
+	private RequestPolicy getRequestPolicy(Requestor requestor) {
+		RequestPolicy requestPolicy;
+		List<RequestItem> requestItems = getRequestItems();
+		requestPolicy = new RequestPolicy(requestor, requestItems);
 		return requestPolicy;
 	}
 
 	private List<RequestItem> getRequestItems() {
 		List<RequestItem> items = new ArrayList<RequestItem>();
-
-		Resource locationResource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
+		Resource locationResource = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
 		List<Condition> conditions = new ArrayList<Condition>();
-		conditions.add(ConditionUtils.create(ConditionConstants.SHARE_WITH_3RD_PARTIES, "0"));
+		conditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"NO"));
 		List<Action> actions = new ArrayList<Action>();
-		actions.add(ActionUtils.create(ActionConstants.READ));
-		RequestItem rItem = RequestItemUtils.create(locationResource, actions, conditions, false);
-
+		actions.add(new Action(ActionConstants.READ));
+		RequestItem rItem = new RequestItem(locationResource, actions, conditions, false);
 		items.add(rItem);
-
-
-		Resource someResource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, "someResource");
+		Resource someResource = new Resource(DataIdentifierScheme.CONTEXT, "someResource");
 		List<Condition> extendedConditions = new ArrayList<Condition>();
-		extendedConditions.add(ConditionUtils.create(ConditionConstants.SHARE_WITH_3RD_PARTIES,"0"));
-		extendedConditions.add(ConditionUtils.create(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA, "1"));
+		extendedConditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"NO"));
+		extendedConditions.add(new Condition(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA, "YES"));
 		List<Action> extendedActions = new ArrayList<Action>();
-		extendedActions.add(ActionUtils.create(ActionConstants.READ));
-		extendedActions.add(ActionUtils.create(ActionConstants.CREATE));
-		extendedActions.add(ActionUtils.create(ActionConstants.WRITE));
-		extendedActions.add(ActionUtils.create(ActionConstants.DELETE));
-		RequestItem someItem = RequestItemUtils.create(someResource, extendedActions, extendedConditions, false);
-
+		extendedActions.add(new Action(ActionConstants.READ));
+		extendedActions.add(new Action(ActionConstants.CREATE));
+		extendedActions.add(new Action(ActionConstants.WRITE));
+		extendedActions.add(new Action(ActionConstants.DELETE));
+		RequestItem someItem = new RequestItem(someResource, extendedActions, extendedConditions, false);
 		items.add(someItem);
 		return items;
 	}
 
-	private RequestorServiceBean getRequestorService(){
-		IIdentity requestorId = new MockIdentity(IdentityType.CSS, "eliza","ict-societies.eu");
-		ServiceResourceIdentifier serviceId = ServiceUtils.generateServiceResourceIdentifierFromString("myGreatService eliza.societies.org");
-		return RequestorUtils.create(requestorId.getJid(), serviceId);
+	private RequestorService getRequestorService(){
+		IIdentity requestorId = new MockIdentity(IdentityType.CSS, "eliza","societies.local");
+		ServiceResourceIdentifier serviceId = ServiceUtils.generateServiceResourceIdentifierFromString("myGreatService eliza@societies.org");
+//		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
+//		serviceId.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
+//		try {
+//			serviceId.setIdentifier(new URI("css://eliza@societies.org/HelloEarth"));
+//		} catch (URISyntaxException e) {
+//			LOG.error("Can't create the service ID", e);
+//		}
+		return new RequestorService(requestorId, serviceId);
 	}
 
-	private RequestorCisBean getRequestorCis(){
-		IIdentity requestorId = new MockIdentity(IdentityType.CSS, "me","ict-societies.eu");
-		IIdentity cisId = new MockIdentity(IdentityType.CIS, "cis-holidays", "ict-societies.eu");
-		return (RequestorCisBean) RequestorUtils.create(requestorId.getJid(), cisId.getJid());
+	private RequestorCis getRequestorCis(){
+		IIdentity otherCssId = new MockIdentity(IdentityType.CSS, "othercss","societies.local");
+		IIdentity cisId = new MockIdentity(IdentityType.CIS, "cis-one", "societies.local");
+		return new RequestorCis(otherCssId, cisId);
+	}
+
+	private String getCtxType(Requestor requestor){
+		return RequestorUtils.toUriString(RequestorUtils.toRequestorBean(requestor));
 	}
 
 

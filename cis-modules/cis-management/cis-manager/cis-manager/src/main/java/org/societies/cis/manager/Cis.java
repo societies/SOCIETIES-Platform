@@ -67,6 +67,7 @@ import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisParticipant;
+import org.societies.api.cis.model.CisAttributeTypes;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
@@ -1227,18 +1228,18 @@ public class Cis implements IFeatureServer, ICisOwned {
 		w.setResult(false);
 		// -- Access control
 		if(null != this.privacyDataManager && null != requestor){
-			ResponseItem resp = null;
+			List<ResponseItem> permission = null;
 			DataIdentifier dataId = null;
 			try {
-				dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS.value() + "://" + this.getCisId() + "/cis-member-list");
-				resp = this.privacyDataManager.checkPermission(requestor, dataId, new Action(ActionConstants.READ));
+				dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS.value() + "://" + this.getCisId() + "/"+CisAttributeTypes.MEMBER_LIST);
+				permission = this.privacyDataManager.checkPermission(requestor, dataId, new Action(ActionConstants.READ));
 			} catch (MalformedCtxIdentifierException e) {
 				LOG.error("The identifier of the requested data is malformed", e);
 			} catch (PrivacyException e) {
 				LOG.error("Error during access control of this data", e);
 			}
 			// No permission
-			if(null == resp || !Decision.PERMIT.equals(resp.getDecision())){
+			if(null == permission || permission.size() <=0 || !Decision.PERMIT.equals(permission.get(0).getDecision())){
 				LOG.debug("This requestor: "+requestor);
 				LOG.debug("doesn't have the permission to retrieve this data: "+dataId);
 				callback.receiveResult(c);

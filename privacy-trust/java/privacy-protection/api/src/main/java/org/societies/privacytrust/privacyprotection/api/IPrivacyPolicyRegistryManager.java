@@ -31,29 +31,30 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Request
 /**
  * @author Olivier Maridat (Trialog)
  */
-interface IPrivacyPolicyRegistryManager {
+public interface IPrivacyPolicyRegistryManager {
 	/**
-	 * method to retrieve the policy of a given service
-	 * @param requestor	the serviceid of the service for which the policy is for
-	 * @return	the policy document for that service 
+	 * Retrieve the privacy policy of a given entity in the registry
+	 * @param owner	CIS or 3P service id of the privacy policy owner
+	 * @return	the privacy policy
 	 * @throws PrivacyException 
 	 */
-	public RequestPolicy getPrivacyPolicy(RequestorBean requestor) throws PrivacyException;
+	public RequestPolicy getPrivacyPolicy(RequestorBean owner) throws PrivacyException;
 
 	/**
-	 * method to add a policy to the registry
-	 * @param requestor	the service id of the service for which the policy is for
-	 * @param policy	the policy document
+	 * Update a privacy policy to the registry
+	 * @param owner	CIS or 3P service id of the privacy policy owner
+	 * @param privacyPolicy The privacy policy to store
+	 * @return success of the operation 
 	 * @throws PrivacyException 
 	 */
-	public boolean updatePrivacyPolicy(RequestorBean requestor, RequestPolicy policy) throws PrivacyException;
+	public boolean updatePrivacyPolicy(RequestorBean owner, RequestPolicy privacyPolicy) throws PrivacyException;
 
 	/**
-	 * method to delete the policy of a given service
-	 * @param requestor	the serviceid of the service for which the policy is for
-	 * @return	success of the operation 
+	 * Delete a privacy policy in the registry
+	 * @param owner	CIS or 3P service id of the privacy policy owner
+	 * @return success of the operation 
 	 * @throws PrivacyException 
 	 */
-	public boolean deletePolicy(RequestorBean requestor) throws PrivacyException;
+	public boolean deletePrivacyPolicy(RequestorBean owner) throws PrivacyException;
 }
 

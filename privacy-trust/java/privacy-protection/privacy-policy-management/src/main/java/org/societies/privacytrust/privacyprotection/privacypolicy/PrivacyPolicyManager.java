@@ -72,7 +72,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 
 
 	public void init() {
-		policyRegistryManager = new PrivacyPolicyRegistryManager(ctxBroker, commManager.getIdManager());
+		policyRegistryManager = new PrivacyPolicyRegistryManager(ctxBroker, commManager);
 	}
 
 
@@ -88,12 +88,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		}
 
 		// -- Search
-		RequestPolicy privacyPolicy;
-		try {
-			privacyPolicy = RequestPolicyUtils.toRequestPolicyBean(policyRegistryManager.getPolicy(RequestorUtils.toRequestor(requestor, commManager.getIdManager())));
-		} catch (InvalidFormatException e) {
-			privacyPolicy = null;
-		}
+		RequestPolicy privacyPolicy = policyRegistryManager.getPrivacyPolicy(requestor);
 		return privacyPolicy;
 	}
 	@Deprecated
@@ -153,11 +148,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		}
 
 		// -- Add
-		try {
-			policyRegistryManager.addPolicy(RequestorUtils.toRequestor(privacyPolicy.getRequestor(), commManager.getIdManager()), RequestPolicyUtils.toRequestPolicy(privacyPolicy, commManager.getIdManager()));
-		} catch (InvalidFormatException e) {
-			throw new PrivacyException("Can't add the privacy policy", e);
-		}
+		policyRegistryManager.updatePrivacyPolicy(privacyPolicy.getRequestor(), privacyPolicy);
 		return privacyPolicy;
 	}
 	@Deprecated
@@ -205,22 +196,7 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		}
 
 		// -- Delete
-		try {
-			policyRegistryManager.deletePolicy(RequestorUtils.toRequestor(requestor, commManager.getIdManager()));
-		} catch (InterruptedException e) {
-			LOG.error("[Error deletePrivacyPolicy] Can't delete privacy policy.", e);
-			return false;
-		} catch (ExecutionException e) {
-			LOG.error("[Error deletePrivacyPolicy] Can't delete privacy policy.", e);
-			return false;
-		} catch (CtxException e) {
-			LOG.error("[Error deletePrivacyPolicy] Can't delete privacy policy. Error in the context.", e);
-			return false;
-		} catch (InvalidFormatException e) {
-			LOG.error("[Error deletePrivacyPolicy] Can't delete privacy policy. Error in retrieve requestor.", e);
-			return false;
-		}
-		return true;
+		return policyRegistryManager.deletePrivacyPolicy(requestor);
 	}
 	@Deprecated
 	@Override

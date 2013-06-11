@@ -39,8 +39,6 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.util.DataIdentifierFactory;
 import org.societies.api.identity.util.DataIdentifierUtils;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.logging.IPerformanceMessage;
@@ -57,7 +55,6 @@ import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUt
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.identity.DataIdentifier;
-import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
@@ -71,7 +68,6 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Respons
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.DataObfuscationManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -163,14 +159,15 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		return permissions;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier, java.util.List)
-	 */
 	@Deprecated
 	@Override
 	public List<org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem> checkPermission(Requestor requestor, DataIdentifier dataId, List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions) throws PrivacyException {
 		return ResponseItemUtils.toResponseItems(checkPermission(RequestorUtils.toRequestorBean(requestor), dataId, ActionUtils.toActionBeans(actions)));
+	}
+	@Deprecated
+	@Override
+	public List<org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem> checkPermission(Requestor requestor, DataIdentifier dataId, org.societies.api.privacytrust.privacy.model.privacypolicy.Action action) throws PrivacyException {
+		return ResponseItemUtils.toResponseItems(checkPermission(RequestorUtils.toRequestorBean(requestor), dataId, ActionUtils.toActionBean(action)));
 	}
 
 	/*
@@ -501,9 +498,6 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	}
 
 
-	private boolean isDependencyInjectionDone() {
-		return isDependencyInjectionDone(0);
-	}
 	/**
 	 * Level 0: all
 	 * Level 1: privacyPref, commManager
