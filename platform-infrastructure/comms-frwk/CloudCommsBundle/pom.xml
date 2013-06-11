@@ -55,6 +55,20 @@
 			<artifactId>PubsubClient</artifactId>
 			<version>${version.comm}</version>
 			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>simple-xml</artifactId>
+					<groupId>org.simpleframework</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>slf4j-simple</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.societies.comm.xmpp</groupId>
@@ -73,6 +87,51 @@
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>simple-xml</artifactId>
+					<groupId>org.simpleframework</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>dom4j</groupId>
+			<artifactId>dom4j</artifactId>
+			<version>1.6.1</version>
+			<scope>compile</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.igniterealtime</groupId>
+			<artifactId>whack</artifactId>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smack</artifactId>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smackx</artifactId>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		
+		<!-- 	<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>compile</scope>
+		</dependency> -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		
     </dependencies>
@@ -86,28 +145,23 @@
 				<configuration>
     				<instructions>
     					<Import-Package>
-    						org.osgi.framework,
+    						<!--org.osgi.framework,
     						!org.jvnet.staxex,
     						!org.jvnet.fastinfoset,
     						!com.sun.xml.fastinfoset.*,
-    						org.slf4j*;version="1.5.8",
-    						org.simpleframework.xml.stream,
+    						!org.slf4j*;version="1.5.8", -->
+    						<!-- org.simpleframework.xml.stream, -->
     						org.hibernate.proxy;resolution:=optional,
-    						org.jabber.protocol.pubsub,
+    					<!-- 	org.jabber.protocol.pubsub, -->
     						*;resolution:=optional
     					</Import-Package>
-    					<Export-Package>
-    						org.societies.identity,
-    						org.societies.comm.xmpp,
-    						org.societies.comm.xmpp.pubsub,
-    						org.societies.comm.xmpp.pubsub.impl
-		           		</Export-Package>
+    					<Export-Package>!*</Export-Package>
 		           		<!-- Is impl export needed for anything but tests? 
 		           		why do i need to import explicitly org.simpleframework.xml.stream?
 		           		!com.sun.org.apache.xerces.internal.jaxp.datatype,
 		           		org.xmpp.component;version="0.1.0",
 		           		-->
-		           		<DynamicImport-Package>*</DynamicImport-Package>
+		           		<DynamicImport-Package>org.societies.*</DynamicImport-Package>
 		           		<Embed-Dependency>
 			           		*;scope=compile|runtime
 		           		</Embed-Dependency>
