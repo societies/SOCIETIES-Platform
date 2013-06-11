@@ -46,7 +46,7 @@
         </osgi:interfaces>
         </osgi:service>
         
-        <osgi:service ref="cauiPrediction">
+       <osgi:service ref="cauiPrediction">
         <osgi:interfaces>
         	<value>org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction</value>
         </osgi:interfaces>

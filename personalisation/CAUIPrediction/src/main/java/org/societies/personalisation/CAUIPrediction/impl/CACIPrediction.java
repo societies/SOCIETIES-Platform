@@ -58,7 +58,7 @@ public class CACIPrediction {
 	private static final Logger LOG = LoggerFactory.getLogger(CACIPrediction.class);
 
 	private ICtxBroker ctxBroker;
-	private ICAUITaskManager cauiTaskManager;
+	private ICAUITaskManager caciTaskManager;
 	private ICommManager commsMgr ;
 
 	static boolean caciPredictionEnabled = true;
@@ -68,10 +68,10 @@ public class CACIPrediction {
 	protected CtxAttribute currentCaciModelAttr;
 
 
-	public CACIPrediction(ICtxBroker ctxBroker, ICAUITaskManager cauiTaskManager,ICommManager commsMgr){
+	public CACIPrediction(ICtxBroker ctxBroker, ICAUITaskManager caciTaskManager, ICommManager commsMgr){
 
 		this.ctxBroker = ctxBroker;
-		this.cauiTaskManager = cauiTaskManager;
+		this.caciTaskManager = caciTaskManager;
 		this.commsMgr = commsMgr;
 	}
 
@@ -196,36 +196,16 @@ public class CACIPrediction {
 		return commEntIDList;
 	}
 
-
-	//************ caci model code
-
-
-
+	
 	public void setCACIActiveModel (UserIntentModelData newCACIModelData){
 
 		if (newCACIModelData != null){
 			// get a new instance of cauiTaskManager
-			//cauiTaskManager.updateModel(newUIModelData);
+			caciTaskManager.updateModel(newCACIModelData);
 			cacimodelExist = true;		 
 			LOG.info("caci model set - actions map: "+newCACIModelData.getActionModel());
 		}
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

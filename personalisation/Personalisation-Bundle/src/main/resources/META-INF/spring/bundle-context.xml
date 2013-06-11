@@ -29,6 +29,13 @@
 		<property name="ctxBroker" ref="ctxBroker"></property>
 	</bean>
 
+	<bean id="caciTaskManager"
+		class="org.societies.personalisation.CAUITaskManager.impl.CAUITaskManager"
+		name="caciTaskManager" init-method="initialiseCAUITaskManager">
+		<property name="ctxBroker" ref="ctxBroker"></property>
+	</bean>
+	
+	
 	<bean id="cauiPrediction"
 		class="org.societies.personalisation.CAUIPrediction.impl.CAUIPrediction"
 		name="cauiPrediction" init-method="initialiseCAUIPrediction">
@@ -36,6 +43,7 @@
 		<property name="ctxBroker" ref="ctxBroker"></property>
 		<property name="cauiDiscovery" ref="cauiDiscovery"></property>
 		<property name="cauiTaskManager" ref="cauiTaskManager"></property>
+		<property name="caciTaskManager" ref="caciTaskManager"></property>
 		<property name="commsMgr" ref="commsMgr"></property>
 	</bean>
 
