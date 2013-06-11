@@ -99,7 +99,6 @@ import org.societies.context.broker.impl.comm.callbacks.UpdateCtxCallback;
 import org.societies.context.broker.impl.util.CtxBrokerUtils;
 //import org.societies.context.similarity.impl.ContextSimilarityEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.scheduling.annotation.Async; 
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
@@ -492,7 +491,7 @@ public class InternalCtxBroker implements ICtxBroker {
 							if (refinedAttribute != null)
 								attribute = refinedAttribute;
 						}
-					} catch (ServiceUnavailableException sue) {
+					} catch (Exception sue) {
 
 						LOG.warn("Could not check if attribute requires inference: "
 								+ "User Context Inference Mgr is not available");
@@ -1512,7 +1511,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		try {
 			if (this.privacyLogAppender != null)
 				this.privacyLogAppender.logContext(requestor, target);
-		} catch (ServiceUnavailableException sue) {
+		} catch (Exception sue) {
 			// do nothing
 		}
 	}
@@ -1955,7 +1954,7 @@ public class InternalCtxBroker implements ICtxBroker {
 								if (attributeResult != null)
 									objectResult = attributeResult;
 							}
-						} catch (ServiceUnavailableException sue) {
+						} catch (Exception sue) {
 
 							LOG.warn("Could not check if attribute requires inference: "
 									+ "User Context Inference Mgr is not available");
@@ -2146,7 +2145,7 @@ public class InternalCtxBroker implements ICtxBroker {
 					this.userCtxInferenceMgr.refineContinuously(
 							(CtxAttributeIdentifier) ctxId, new Double(0)); // TODO handle updateFreq
 				}
-			} catch (ServiceUnavailableException sue) {
+			} catch (Exception sue) {
 
 				LOG.warn("Could not check if attribute requires inference: "
 						+ "User Context Inference Mgr is not available");
@@ -2194,7 +2193,7 @@ public class InternalCtxBroker implements ICtxBroker {
 					this.userCtxInferenceMgr.refineContinuously(
 							(CtxAttributeIdentifier) ctxId, new Double(0)); // TODO handle updateFreq
 				}
-			} catch (ServiceUnavailableException sue) {
+			} catch (Exception sue) {
 
 				LOG.warn("Could not check if attribute requires inference: "
 						+ "User Context Inference Mgr is not available");

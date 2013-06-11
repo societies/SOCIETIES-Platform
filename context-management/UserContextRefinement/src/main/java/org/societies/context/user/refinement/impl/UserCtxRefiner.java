@@ -37,7 +37,6 @@ import org.societies.context.api.user.refinement.IUserCtxRefiner;
 //import org.societies.context.user.refinement.impl.bayesianLibrary.inference.structures.impl.DAG;
 import org.societies.context.user.refinement.impl.location.UserLocationRefiner;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -79,7 +78,7 @@ public class UserCtxRefiner implements IUserCtxRefiner {
 		if (CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()))
 			try {
 				return this.userLocationRefiner.refineOnDemand(attrId);
-			} catch (ServiceUnavailableException sue) {
+			} catch (Exception sue) {
 				throw new UserCtxInferenceException("Could not refine attribute '"
 						+ attrId + "': Service UserLocationRefiner is not available");
 			}
@@ -106,7 +105,7 @@ public class UserCtxRefiner implements IUserCtxRefiner {
 		if (CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()))
 			try {
 				this.userLocationRefiner.refineContinuously(attrId, updateFreq);
-			} catch (ServiceUnavailableException sue) {
+			} catch (Exception sue) {
 				throw new UserCtxInferenceException("Could not refine attribute '"
 						+ attrId + "' continuously: Service UserLocationRefiner is not available");
 			}

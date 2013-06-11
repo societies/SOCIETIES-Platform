@@ -134,7 +134,7 @@ public class CommsServer extends EventListener implements IFeatureServer {
 			"(|(" + CSSEventConstants.EVENT_SOURCE + "="+eventSource+")(" + CSSEventConstants.EVENT_SOURCE + "=org/societies/servicelifecycle))" +  
 			")";
 			String[] eventTypes = new String[] {EventTypes.CIS_CREATION, EventTypes.SERVICE_LIFECYCLE_EVENT};
-			getEventMgr().subscribeInternalEvent(this, eventTypes, eventFilter);
+		//	getEventMgr().subscribeInternalEvent(this, eventTypes, eventFilter);
 			
 		} catch (CommunicationException e) {
 			e.printStackTrace();

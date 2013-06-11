@@ -41,7 +41,6 @@ import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceReposito
 import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.IndirectTrustEvidence;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -188,7 +187,7 @@ public class InternalTrustEvidenceCollector implements ITrustEvidenceCollector {
 				}
 			}
 			
-		} catch (ServiceUnavailableException sue) {
+		} catch (Exception sue) {
 			throw new TrustEvidenceCollectorException(
 					"Could not add direct evidence with subjectId '"
 					+ subjectId	+ "', objectId '" + objectId 
@@ -321,7 +320,7 @@ public class InternalTrustEvidenceCollector implements ITrustEvidenceCollector {
 				}
 			}
 			
-		} catch (ServiceUnavailableException sue) {
+		} catch (Exception sue) {
 			throw new TrustEvidenceCollectorException(
 					"Could not add indirect evidence with subjectId '"
 					+ subjectId	+ "', objectId '" + objectId 

@@ -43,15 +43,15 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
-import org.apache.shindig.social.opensocial.model.ActivityEntry;
-import org.apache.shindig.social.opensocial.model.ActivityObject;
+//import org.apache.shindig.social.opensocial.model.ActivityEntry;
+//import org.apache.shindig.social.opensocial.model.ActivityObject;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+//import org.json.JSONArray;
+//import org.json.JSONException;
+//import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.activity.model.Activity;
@@ -353,49 +353,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     @Override
     synchronized public long importActivityEntries(List<?> activityEntries) {
         long ret = 0;
-        if(activityEntries.size() == 0){
-            LOG.error("list is empty, exiting");
-            return ret;
-        }
-        if(!ActivityEntry.class.isInstance(activityEntries.get(0))){ //just checking the first entry.
-            LOG.error("first instance in the given list is not of type ActivityEntry, exiting");
-            return ret;
-        }
-        List<ActivityEntry> castedList = (List<ActivityEntry>) activityEntries;
-        Activity newAct = null;
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-        ParsePosition pp = new ParsePosition(0);
-        Session session = null;
-        Transaction t = null;
-        try{
-
-            session = getSessionFactory().openSession();
-            t = session.beginTransaction();
-
-            for(ActivityEntry act : castedList){
-                pp.setIndex(0);
-                newAct = new Activity();
-                newAct.setActor(getContentIfNotNull(act.getActor()));
-                newAct.setOwnerId(this.getId());
-                newAct.setObject(getContentIfNotNull(act.getObject()));
-                newAct.setPublished(Long.toString(df.parse(act.getPublished(),pp).getTime()));
-                newAct.setTarget(getContentIfNotNull(act.getTarget()));
-                newAct.setVerb(act.getVerb());
-                ret++;
-                session.save(newAct);
-            }
-            t.commit();
-        }catch(Exception e){
-            if (t != null)
-                t.rollback();
-            LOG.warn("Importing of activities from social data failed..");
-            e.printStackTrace();
-
-        }finally{
-            if(session!=null)
-                session.close();
-        }
-
+       
         return ret;
     }
 
@@ -456,6 +414,8 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     }
 
     public List<IActivity> getActivitiesFromDB(String query, String timePeriod) {
+    	ArrayList<IActivity> ret = new ArrayList<IActivity>();
+    	/*
         ArrayList<IActivity> ret = new ArrayList<IActivity>();
         List<IActivity> tmp = this.getActivitiesFromDB(timePeriod);
         if(tmp.size()==0) {
@@ -519,6 +479,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
             LOG.error("Invocation target exception for the filterOp");
             e.printStackTrace();
         }
+        */
         return ret;
     }
 
@@ -688,15 +649,16 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
         }
     }
 
-    public String getContentIfNotNull(ActivityObject a){
-        if(a == null) return null;
-        if(a.getObjectType().contains("person"))
-            return a.getDisplayName();
-        if(a.getObjectType().contains("note"))
-            return "note";
-        if(a.getObjectType().contains("bookmark"))
-            return a.getUrl();
-        return a.getContent();
+    public String getContentIfNotNull(Object a){
+        //if(a == null) 
+        	return null;
+        //if(a.getObjectType().contains("person"))
+            ///return a.getDisplayName();
+        //if(a.getObjectType().contains("note"))
+            //return "note";
+        //if(a.getObjectType().contains("bookmark"))
+          //  return a.getUrl();
+        //return a.getContent();
     }
 
     public org.societies.api.schema.activity.MarshaledActivity iactivToMarshActiv(IActivity iActivity){

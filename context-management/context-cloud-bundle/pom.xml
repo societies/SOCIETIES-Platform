@@ -43,6 +43,7 @@
 
 	<!-- List dependencies here -->
 	<dependencies>
+	<!-- 
 		<dependency>
      		<groupId>org.springframework</groupId>
      		<artifactId>org.springframework.spring-library</artifactId>
@@ -50,7 +51,24 @@
      		<version>${spring.version}</version>
      		<scope>provided</scope>
 		</dependency>
+-->
 
+<!-- 
+<dependency>
+	<groupId>org.springframework.osgi</groupId>
+	<artifactId>spring-osgi-core</artifactId>
+	<version>1.2.1</version>
+</dependency>
+            
+           
+<dependency>
+	<groupId>org.springframework</groupId>
+	<artifactId>spring-beans</artifactId>
+	<version>3.1.0.RELEASE</version>
+	<scope>provided</scope>
+</dependency>
+     -->      
+            
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>common-ext-libs</artifactId>
@@ -64,6 +82,12 @@
 			<scope>provided</scope>
 			<version>${release.version}</version>
 		</dependency>
+		
+			<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>hibernate_classes</artifactId>
+			<scope>provided</scope>
+		</dependency> 
 		
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
@@ -153,6 +177,13 @@
 			<version>${version.cm}</version>
 		</dependency>
 
+<dependency>
+	<groupId>org.springframework.osgi</groupId>
+	<artifactId>spring-osgi-core</artifactId>
+	<version>1.2.1</version>
+	<scope>provided</scope>
+</dependency>
+
 	</dependencies>
 
 	<build>
@@ -170,7 +201,21 @@
 						<Embed-Dependency>*;scope=compile|runtime,</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
 
-						<Import-Package>org.hibernate.proxy;resolution:=optional,
+						<Import-Package>
+						org.springframework.beans.factory.xml;resolution:=optional,
+						javax.xml.parsers;resolution:=optional,
+						org.springframework.beans;resolution:=optional,
+						org.springframework.beans.factory;resolution:=optional,
+						org.springframework.beans.factory.config;resolution:=optional,
+						org.springframework.beans.factory.parsing;resolution:=optional,
+						org.springframework.beans.factory.support;resolution:=optional,
+						org.springframework.core.env;resolution:=optional,
+						org.springframework.core.io;resolution:=optional,
+						org.springframework.core.io.support;resolution:=optional,
+						org.w3c.dom;resolution:=optional,
+						org.xml.sax;resolution:=optional,
+						org.hibernate.proxy;resolution:=optional,
+						org.springframework.osgi.service;resolution:=optional,
 						    *;resolution:=optional</Import-Package>
 						
 						<Export-Package />

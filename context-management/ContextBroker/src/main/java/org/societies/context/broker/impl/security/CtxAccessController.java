@@ -40,7 +40,6 @@ import org.societies.context.broker.api.security.CtxAccessControllerException;
 import org.societies.context.broker.api.security.CtxPermission;
 import org.societies.context.broker.api.security.ICtxAccessController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -113,7 +112,7 @@ public class CtxAccessController implements ICtxAccessController {
 			throw new CtxAccessControllerException("Failed to perform access control: "
 					+ "PrivacyDataManager checkPermission failed: "
 					+ pe.getLocalizedMessage(), pe);
-		} catch (ServiceUnavailableException sue) {
+		} catch (Exception sue) {
 			throw new CtxAccessControllerException("Failed to perform access control: "
 					+ "PrivacyDataManager service is not available");
 		}

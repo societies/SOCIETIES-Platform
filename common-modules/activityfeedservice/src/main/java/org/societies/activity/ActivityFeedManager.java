@@ -139,18 +139,18 @@ public class ActivityFeedManager implements IActivityFeedManager {
         return true;
     }
     public void init(){
-        Session session = getSessionFactory().openSession();
-        List<IActivityFeed> tmpFeeds = null;
-        try{
-        	tmpFeeds = session.createCriteria(ActivityFeed.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
-        	feeds.addAll(tmpFeeds);
-        }catch(Exception e){
-            LOG.error("CISManager startup queries failed..");
-            e.printStackTrace();
-        }finally{
-            if(session!=null)
-                session.close();
-        }
+      //  Session session = getSessionFactory().openSession();
+     //   List<IActivityFeed> tmpFeeds = null;
+     //   try{
+     //   	tmpFeeds = session.createCriteria(ActivityFeed.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
+     //   	feeds.addAll(tmpFeeds);
+     //   }catch(Exception e){
+     //       LOG.error("CISManager startup queries failed..");
+     //       e.printStackTrace();
+     //   }finally{
+     //       if(session!=null)
+     //           session.close();
+     //   }
     }
 
     public SessionFactory getSessionFactory() {

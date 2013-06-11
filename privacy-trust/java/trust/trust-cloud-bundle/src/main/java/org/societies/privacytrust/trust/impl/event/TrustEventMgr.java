@@ -1241,7 +1241,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 	}
 	
 	private void createRemoteTopics() throws TrustEventMgrException {
-		
+	/*	
 		if (LOG.isDebugEnabled())
 			LOG.debug("Adding remote trust event payload classes '" 
 					+ EVENT_SCHEMA_CLASSES + "'");
@@ -1262,6 +1262,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 						+ "' to IIdentity: " + e.getLocalizedMessage(), e);
 			}
 		}
+		*/
 	}
 		
 	private void doCreateRemoteTopics(final IIdentity ownerId) 

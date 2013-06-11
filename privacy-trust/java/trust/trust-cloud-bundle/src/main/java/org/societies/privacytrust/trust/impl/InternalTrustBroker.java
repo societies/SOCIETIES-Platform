@@ -48,7 +48,6 @@ import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
@@ -240,7 +239,7 @@ public class InternalTrustBroker implements ITrustBroker {
 				}
 			}
 			
-		} catch (ServiceUnavailableException sue) {
+		} catch (Exception sue) {
 			throw new TrustBrokerException(
 					"Could not retrieve all trust relationships between trustor '" 
 					+ trustorId	+ "' and trustee '" + trusteeId 
@@ -379,7 +378,7 @@ public class InternalTrustBroker implements ITrustBroker {
 				}
 			}
 			
-		} catch (ServiceUnavailableException sue) {
+		} catch (Exception sue) {
 			throw new TrustBrokerException(
 					"Could not retrieve trust relationship of type '" + trustValueType 
 					+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
@@ -502,7 +501,7 @@ public class InternalTrustBroker implements ITrustBroker {
 				}
 			}
 			
-		} catch (ServiceUnavailableException sue) {
+		} catch (Exception sue) {
 			throw new TrustBrokerException(
 					"Could not retrieve trust value of type '" + trustValueType 
 					+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
@@ -730,7 +729,7 @@ public class InternalTrustBroker implements ITrustBroker {
 				}
 			}
 			
-		} catch (ServiceUnavailableException sue) {
+		} catch (Exception sue) {
 			throw new TrustBrokerException(
 					"Could not retrieve trust relationships of trustor '" 
 					+ trustorId	+ "' with entities of type '" + trusteeType 

@@ -55,7 +55,6 @@ import org.societies.api.context.model.CtxEvaluationResults;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.context.broker.api.CtxBrokerException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -574,7 +573,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 		try {
 			if (this.privacyLogAppender != null)
 				this.privacyLogAppender.logContext(requestor, target);
-		} catch (ServiceUnavailableException sue) {
+		} catch (Exception sue) {
 			// do nothing
 		}
 	}
