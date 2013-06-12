@@ -30,6 +30,7 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.management.ICisManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -38,6 +39,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
@@ -84,8 +86,11 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 	private ICommManager commManager;
 	private IUserFeedback userFeedbackMgr;
 	private ICommunityPreferenceManager communityPreferenceMgr;
-	private CisEventListener eventListener;
-
+	private CisEventListener cisEventListener;
+	private IServiceDiscovery serviceDiscovery;
+	private ICisManager cisManager;
+	private CommunitiesHandler communitiesHandler;
+	
 	public UserPreferenceConditionMonitor(){
 	}
 	
@@ -149,7 +154,11 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 		merging = new MergingManager(getUserPrefLearning(), prefMgr, this);
 		this.subscribeForStaticUIMEvents();
 		logging.debug(this.getClass().toString()+": INITIALISED");
-		eventListener = new CisEventListener(this);
+		
+		this.cisEventListener  = new CisEventListener(this);
+		communitiesHandler = new CommunitiesHandler(this);
+		communitiesHandler.scheduleTasks();
+		
 	}
 	
 
@@ -374,6 +383,36 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 
 	public void setCommunityPreferenceMgr(ICommunityPreferenceManager communityPreferenceMgr) {
 		this.communityPreferenceMgr = communityPreferenceMgr;
+	}
+
+
+	public CisEventListener getCisEventListener() {
+		return cisEventListener;
+	}
+
+
+	public void setCisEventListener(CisEventListener cisEventListener) {
+		this.cisEventListener = cisEventListener;
+	}
+
+
+	public IServiceDiscovery getServiceDiscovery() {
+		return serviceDiscovery;
+	}
+
+
+	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
+		this.serviceDiscovery = serviceDiscovery;
+	}
+
+
+	public ICisManager getCisManager() {
+		return cisManager;
+	}
+
+
+	public void setCisManager(ICisManager cisManager) {
+		this.cisManager = cisManager;
 	}
 
 	

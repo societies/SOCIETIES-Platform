@@ -1,5 +1,7 @@
 package org.societies.personalisation.preference.api.model.util;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -7,15 +9,18 @@ import java.util.List;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxModelBeanTranslator;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.internal.schema.personalisation.model.ContextPreferenceConditionBean;
 import org.societies.api.internal.schema.personalisation.model.OperatorConstantsBean;
 import org.societies.api.internal.schema.personalisation.model.PreferenceDetailsBean;
 import org.societies.api.internal.schema.personalisation.model.PreferenceTreeModelBean;
 import org.societies.api.internal.schema.personalisation.model.PreferenceTreeNodeBean;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.personalisation.model.ActionBean;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.ContextPreferenceCondition;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceCondition;
@@ -181,5 +186,20 @@ public class PreferenceUtils {
 		case LESS_THAN: return OperatorConstants.LESS_THAN;
 		default: return OperatorConstants.EQUALS;
 		}
+	}
+	
+	
+	public static PreferenceDetails getCommunityPreferenceManagerDetails(IIdentityManager idm, ServiceResourceIdentifier serviceIDOf3pService, String downloadOrUpload) throws URISyntaxException{
+		PreferenceDetails details = new PreferenceDetails();
+		ServiceResourceIdentifier serviceID = new ServiceResourceIdentifier();
+		serviceID.setIdentifier(new URI(idm.getThisNetworkNode().getBareJid()));
+		serviceID.setServiceInstanceIdentifier("CommunityPreferenceManager");
+		details.setServiceID(serviceID);
+		details.setServiceType(downloadOrUpload);
+		details.setPreferenceName(ServiceModelUtils.serviceResourceIdentifierToString(serviceIDOf3pService));
+		
+		return details;
+		
+		
 	}
 }

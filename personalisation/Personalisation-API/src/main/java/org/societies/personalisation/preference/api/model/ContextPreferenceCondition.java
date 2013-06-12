@@ -52,6 +52,7 @@ public class ContextPreferenceCondition implements IPreferenceCondition, Seriali
 		this.value = val;
 		this.type = "context";
 		this.name = name;
+		
 
 	}
 	
@@ -97,7 +98,12 @@ public class ContextPreferenceCondition implements IPreferenceCondition, Seriali
 	
 	public String toString(){
 		
-		return this.CtxIdentifier.getType()+this.operator+this.value;
+		if (this.CtxIdentifier==null){
+			return this.type+this.operator+this.value;	
+		}else{
+			return this.CtxIdentifier.getType()+this.operator+this.value;
+		}
+		
 	}
 	
 	public boolean equals(IPreferenceCondition pc){
