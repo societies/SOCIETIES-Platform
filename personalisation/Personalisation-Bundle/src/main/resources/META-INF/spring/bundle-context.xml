@@ -20,6 +20,8 @@
 		<property name="commManager" ref="commsMgr"></property>
 		<property name="userFeedbackMgr" ref="userFeedback"></property>
 		<property name="communityPreferenceMgr" ref="communityPreferenceManager"></property>
+		<property name="serviceDiscovery" ref="serviceDiscovery"></property>
+		<property name="cisManager" ref="cisManager"></property>
 	</bean>
 
 	

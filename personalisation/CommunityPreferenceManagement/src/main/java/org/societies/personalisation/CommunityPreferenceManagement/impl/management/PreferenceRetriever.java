@@ -25,7 +25,6 @@
 package org.societies.personalisation.CommunityPreferenceManagement.impl.management;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -38,7 +37,6 @@ import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
@@ -54,7 +52,6 @@ import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
  */
 public class PreferenceRetriever {
 	
-	private static final String PREFERENCE_REGISTRY = "COMMUNITY_PREFERENCE_REGISTRY";
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private ICtxBroker broker;
 	private ICisManager cisManager;
@@ -85,7 +82,7 @@ public class PreferenceRetriever {
 	
 	public Registry retrieveRegistry(IIdentity CISId){
 		try {
-			Future<List<CtxIdentifier>> futureAttrList = broker.lookup(CtxModelType.ATTRIBUTE, PREFERENCE_REGISTRY);
+			Future<List<CtxIdentifier>> futureAttrList = broker.lookup(CtxModelType.ATTRIBUTE, CtxModelTypes.PREFERENCE_REGISTRY);
 			if (futureAttrList==null){
 				return new Registry(CISId);
 			}

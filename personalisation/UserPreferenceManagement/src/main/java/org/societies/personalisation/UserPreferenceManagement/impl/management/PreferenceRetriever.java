@@ -48,15 +48,15 @@ import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 public class PreferenceRetriever {
 	
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
-	private ICtxBroker broker; 
+	private ICtxBroker ctxBroker; 
 
 	public PreferenceRetriever(ICtxBroker broker){
-		this.broker = broker;
+		this.ctxBroker = broker;
 	}
 	
 	public Registry retrieveRegistry(){
 		try {
-			Future<List<CtxIdentifier>> futureAttrList = broker.lookup(CtxModelType.ATTRIBUTE, "PREFERENCE_REGISTRY");
+			Future<List<CtxIdentifier>> futureAttrList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, "PREFERENCE_REGISTRY");
 			if (futureAttrList==null){
 				return new Registry();
 			}
@@ -64,7 +64,7 @@ public class PreferenceRetriever {
 			if (null!=attrList){
 				if (attrList.size()>0){
 					CtxIdentifier identifier = attrList.get(0);
-					CtxAttribute attr = (CtxAttribute) broker.retrieve(identifier).get();
+					CtxAttribute attr = (CtxAttribute) ctxBroker.retrieve(identifier).get();
 					
 					Registry registry = (Registry) SerialisationHelper.deserialise(attr.getBinaryValue(), this.getClass().getClassLoader());
 					if (null==registry){
@@ -139,7 +139,7 @@ public class PreferenceRetriever {
 	public IPreferenceTreeModel retrievePreference(CtxIdentifier id){
 		try{
 			//retrieve directly the attribute in context that holds the preference as a blob value
-			CtxAttribute attrPref = (CtxAttribute) broker.retrieve(id).get();
+			CtxAttribute attrPref = (CtxAttribute) ctxBroker.retrieve(id).get();
 			IPreferenceTreeModel iptm = (IPreferenceTreeModel) SerialisationHelper.deserialise(attrPref.getBinaryValue(), this.getClass().getClassLoader());
 			return iptm;
 		}

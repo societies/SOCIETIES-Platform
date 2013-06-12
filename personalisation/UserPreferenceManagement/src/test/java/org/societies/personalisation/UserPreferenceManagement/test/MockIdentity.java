@@ -22,7 +22,12 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.CommunityPreferenceManagement.impl.management;
+package org.societies.personalisation.UserPreferenceManagement.test;
+
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.IdentityType;
+
 
 /**
  * Describe your class here...
@@ -30,9 +35,53 @@ package org.societies.personalisation.CommunityPreferenceManagement.impl.managem
  * @author Eliza
  *
  */
-public class CtxModelTypes {
+public class MockIdentity implements INetworkNode {
 
-	public static final String PREFERENCE_REGISTRY = "COMMUNITY_PREFERENCE_REGISTRY";
-	public static final String HAS_PREFERENCES = "HAS_COMMUNITIY_PREFERENCES";
-	public static final String PREFERENCE = "HAS_COMMUNITY_PREFERENCE";
+	
+	private final IdentityType type;
+	private final String identifier;
+	private final String domainIdentifier;
+
+	public MockIdentity(IdentityType type, String identifier,
+			String domainIdentifier) {
+				this.type = type;
+				this.identifier = identifier;
+				this.domainIdentifier = domainIdentifier;
+		
+		
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public String getJid() {
+		return type+"://"+identifier+"@"+domainIdentifier;
+	}
+
+	@Override
+	public String getBareJid() {
+		// TODO Auto-generated method stub
+		return getJid();
+	}
+
+	@Override
+	public String getDomain() {
+		return domainIdentifier;
+	}
+
+	@Override
+	public String getIdentifier() {
+		return identifier;
+	}
+
+	@Override
+	public IdentityType getType() {
+		return type;
+	}
+
+	@Override
+	public String getNodeIdentifier() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

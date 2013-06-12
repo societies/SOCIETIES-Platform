@@ -24,7 +24,9 @@
  */
 package org.societies.personalisation.UserPreferenceManagement.impl.monitoring;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -33,7 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
@@ -44,6 +48,7 @@ import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.personalisation.model.Action;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.services.ServiceMgmtEvent;
@@ -53,6 +58,9 @@ import org.societies.personalisation.UserPreferenceManagement.impl.merging.Prefe
 import org.societies.personalisation.preference.api.CommunityPreferenceManagement.ICommunityPreferenceManager;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
+import org.societies.personalisation.preference.api.model.PreferenceOutcome;
+import org.societies.personalisation.preference.api.model.PreferenceTreeNode;
+import org.societies.personalisation.preference.api.model.util.PreferenceUtils;
 
 /**
  * @author Eliza
@@ -62,7 +70,6 @@ public class CisEventListener extends EventListener{
 
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 
-	private final IEventMgr evMgr;
 	private final ICommManager commManager;
 	private final IUserFeedback userFeedbackMgr;
 	private final ICommunityPreferenceManager communityPreferenceMgr;
@@ -73,14 +80,13 @@ public class CisEventListener extends EventListener{
 	private final UserPreferenceConditionMonitor pcm;
 	
 	public CisEventListener(UserPreferenceConditionMonitor pcm){
-		this.evMgr = pcm.getEventMgr();
 		this.commManager = pcm.getCommManager();
 		userFeedbackMgr = pcm.getUserFeedbackMgr();
 		communityPreferenceMgr = pcm.getCommunityPreferenceMgr();
 		this.userPrefMgr = pcm.getPreferenceManager();
 		this.pcm = pcm;
 		this.tempTable = new Hashtable<String, PreferenceDetails>();
-		this.evMgr.subscribeInternalEvent(this, new String[]{EventTypes.CIS_SUBS, EventTypes.SERVICE_LIFECYCLE_EVENT, EventTypes.CIS_UNSUBS}, null);
+		pcm.getEventMgr().subscribeInternalEvent(this, new String[]{EventTypes.CIS_SUBS, EventTypes.SERVICE_LIFECYCLE_EVENT, EventTypes.CIS_UNSUBS}, null);
 		
 	}
 
@@ -104,27 +110,45 @@ public class CisEventListener extends EventListener{
 						List<String> list = this.userFeedbackMgr.getExplicitFB(ExpProposalType.CHECKBOXLIST, new ExpProposalContent("Please select which community preferences you want to download", options)).get();
 						
 						
+						
 						List<PreferenceDetails> detailsToDownload = new ArrayList<PreferenceDetails>();
 						for (String str: list){
 							if (this.tempTable.containsKey(str)){
 								this.logging.debug("Downloading community preference: "+str+" from: "+cisId);
-								detailsToDownload.add(this.tempTable.get(str));
+								PreferenceDetails preferenceDetails = this.tempTable.get(str);
+								detailsToDownload.add(preferenceDetails);
+								
+								PreferenceDetails communityPreferenceManagerDetails = PreferenceUtils.getCommunityPreferenceManagerDetails(this.commManager.getIdManager(), preferenceDetails.getServiceID(), PersonalisationConstants.DOWNLOAD);
+								IOutcome preferenceOutcome = new PreferenceOutcome(communityPreferenceManagerDetails.getServiceID(), communityPreferenceManagerDetails.getServiceType(), communityPreferenceManagerDetails.getPreferenceName(), PersonalisationConstants.YES, false, false, false);
+								PreferenceTreeNode preference = new PreferenceTreeNode(preferenceOutcome);
+								this.userPrefMgr.storePreference(this.commManager.getIdManager().getThisNetworkNode(), communityPreferenceManagerDetails, preference);
+								this.tempTable.remove(str);
 							}
 						}
 						
+						
+						Collection<PreferenceDetails> values = this.tempTable.values();
+						for (PreferenceDetails detail : values){
+							PreferenceDetails communityPreferenceManagerDetails = PreferenceUtils.getCommunityPreferenceManagerDetails(this.commManager.getIdManager(), detail.getServiceID(), PersonalisationConstants.DOWNLOAD);
+							IOutcome preferenceOutcome = new PreferenceOutcome(communityPreferenceManagerDetails.getServiceID(), communityPreferenceManagerDetails.getServiceType(), communityPreferenceManagerDetails.getPreferenceName(), PersonalisationConstants.NO, false, false, false);
+							PreferenceTreeNode preference = new PreferenceTreeNode(preferenceOutcome);
+							this.userPrefMgr.storePreference(this.commManager.getIdManager().getThisNetworkNode(), communityPreferenceManagerDetails, preference);
+						}
 						List<IPreferenceTreeModel> communityPreferences = this.communityPreferenceMgr.getCommunityPreferences(cisId, detailsToDownload);
 						
 						
 						for (IPreferenceTreeModel communityModel : communityPreferences){
 							IPreferenceTreeModel model = this.userPrefMgr.getModel(null, communityModel.getPreferenceDetails());
+							
+							IIdentity userId = this.commManager.getIdManager().getThisNetworkNode();
 							if (model==null){
-								this.userPrefMgr.storePreference(null, communityModel.getPreferenceDetails(), model.getRootPreference());
+								this.userPrefMgr.storePreference(userId, communityModel.getPreferenceDetails(), communityModel.getRootPreference());
 							}else{
 								PreferenceMerger merger = new PreferenceMerger();
 								IPreference mergeTrees = merger.mergeTrees(model.getRootPreference(), communityModel.getRootPreference(), "");
-								this.userPrefMgr.storePreference(null, communityModel.getPreferenceDetails(), mergeTrees);
+								this.userPrefMgr.storePreference(userId, communityModel.getPreferenceDetails(), mergeTrees);
 							}
-							this.pcm.processPreferenceChanged(null, communityModel.getPreferenceDetails().getServiceID(), communityModel.getPreferenceDetails().getServiceType(), communityModel.getPreferenceDetails().getPreferenceName());
+							this.pcm.processPreferenceChanged(userId, communityModel.getPreferenceDetails().getServiceID(), communityModel.getPreferenceDetails().getServiceType(), communityModel.getPreferenceDetails().getPreferenceName());
 						}
 					}
 					
@@ -138,6 +162,9 @@ public class CisEventListener extends EventListener{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (URISyntaxException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -179,7 +206,8 @@ public class CisEventListener extends EventListener{
 			this.tempTable.put(key, d);
 		}
 		
-		return (String[]) options.toArray();
+		
+		return options.toArray(new String[options.size()]);
 	}
 	
 	private List<PreferenceDetails> getRelevantPreferenceDetails(List<PreferenceDetails> allDetails, ServiceResourceIdentifier serviceID){

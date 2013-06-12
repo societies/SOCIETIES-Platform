@@ -22,17 +22,20 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.CommunityPreferenceManagement.impl.management;
+package org.societies.personalisation.UserPreferenceManagement.impl.monitoring;
 
 /**
- * Describe your class here...
- *
  * @author Eliza
  *
  */
-public class CtxModelTypes {
+public class PersonalisationConstants {
 
-	public static final String PREFERENCE_REGISTRY = "COMMUNITY_PREFERENCE_REGISTRY";
-	public static final String HAS_PREFERENCES = "HAS_COMMUNITIY_PREFERENCES";
-	public static final String PREFERENCE = "HAS_COMMUNITY_PREFERENCE";
+	
+	
+	public static final String DOWNLOAD = "DOWNLOAD";
+	public static final String UPLOAD = "UPLOAD";
+	
+	
+	public static final String YES = "YES";
+	public static final String NO = "NO";
 }
