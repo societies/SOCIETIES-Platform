@@ -24,6 +24,7 @@
  */
 package org.societies.android.privacytrust.datamanagement;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,6 +40,7 @@ import org.societies.android.privacytrust.datamanagement.callback.PrivacyDataInt
 import org.societies.android.privacytrust.datamanagement.callback.RemotePrivacyDataCallback;
 import org.societies.android.privacytrust.policymanagement.callback.PrivacyPolicyIntentSender;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.util.DataIdentifierUtils;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
@@ -88,7 +90,7 @@ public class PrivacyDataManagerRemote {
 
 	// -- Access control
 
-	public void checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
+	public void checkPermission(String clientPackage, RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException {
 		String action = MethodType.CHECK_PERMISSION.name();
 		try {
 			// -- Verify status
@@ -104,7 +106,11 @@ public class PrivacyDataManagerRemote {
 			PrivacyDataManagerBean messageBean = new PrivacyDataManagerBean();
 			messageBean.setMethod(MethodType.CHECK_PERMISSION);
 			messageBean.setRequestor(requestor);
-			messageBean.setDataIdUri(dataId.getUri());
+			List<String> dataUris = new ArrayList<String>();
+			for(DataIdentifier dataId : dataIds) {
+				dataUris.add(DataIdentifierUtils.toUriString(dataId));
+			}
+			messageBean.setDataIdUris(dataUris);
 			messageBean.setActions(actions);
 
 			// -- Send

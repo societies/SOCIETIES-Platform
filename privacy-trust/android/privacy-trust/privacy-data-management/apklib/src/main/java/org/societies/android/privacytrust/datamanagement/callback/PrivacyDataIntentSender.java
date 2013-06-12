@@ -53,7 +53,7 @@ public class PrivacyDataIntentSender extends PrivacyIntentSender {
 
 	public boolean sendIntentCheckPermission(String clientPackage, PrivacyDataManagerBeanResult bean) {
 		Intent intent = prepareIntent(clientPackage, MethodType.CHECK_PERMISSION.name(), bean.isAck(), bean.getAckMessage());
-		intent.putExtra(returnValueKey, (Serializable) bean.getPermission());
+		intent.putExtra(returnValueKey, (Serializable) bean.getPermissions());
 		context.sendBroadcast(intent);
 		return true;
 	}

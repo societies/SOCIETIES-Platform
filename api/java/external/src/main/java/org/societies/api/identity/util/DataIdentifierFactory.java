@@ -24,6 +24,9 @@
  */
 package org.societies.api.identity.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifierFactory;
@@ -120,6 +123,18 @@ public class DataIdentifierFactory {
 		dataId.setType(path.substring(end+1, endType));
 		return dataId;
 	}
+	
+	public static List<DataIdentifier> fromUris(List<String> dataUris) throws MalformedCtxIdentifierException {
+		List<DataIdentifier> dataIds = new ArrayList<DataIdentifier>();
+		if (null == dataUris || dataUris.size() <= 0) {
+			return dataIds;
+		}
+		for (String dataUri : dataUris) {
+			dataIds.add(fromUri(dataUri));
+		}
+		return dataIds;
+	}
+	
 
 	/**
 	 * Generate a simple DataIdentifier from schema and type

@@ -39,11 +39,13 @@ public interface IDataObfuscationListener {
 	 * @param obfuscatedData Obfuscated data wrapped in a DataWrapper (of the same type that the one used to launch the obfuscation)
 	 */
 	public void onObfuscationDone(DataWrapper obfuscatedData);
+	
 	/**
 	 * The operation has been cancelled (by the user or the system)
 	 * @param msg Explanation about the cancel (if any)
 	 */
 	public void onObfuscationCancelled(String msg);
+	
 	/**
 	 * The operation has been aborted (by the system)
 	 * @param msg Explanation about the abort (if any)

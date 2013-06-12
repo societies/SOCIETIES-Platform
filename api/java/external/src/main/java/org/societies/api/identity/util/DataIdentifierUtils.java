@@ -26,6 +26,8 @@ package org.societies.api.identity.util;
 
 import java.util.Set;
 
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.SimpleDataIdentifier;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
@@ -44,6 +46,9 @@ public class DataIdentifierUtils {
 	 */
 	public static String toUriString(DataIdentifier dataId)
 	{
+		if (dataId instanceof CtxIdentifier) {
+			return ((CtxIdentifier) dataId).toUriString();
+		}
 		return toUriString(dataId.getScheme(), dataId.getOwnerId(), dataId.getType());
 	}
 	
@@ -108,24 +113,12 @@ public class DataIdentifierUtils {
 	}
 
 	/**
+	 * @throws MalformedCtxIdentifierException 
 	 * @see DataIdentifierFactory#fromUri(String)
 	 */
 	@Deprecated
-	public static DataIdentifier fromUri(String dataIdUri)
+	public static DataIdentifier fromUri(String dataIdUri) throws MalformedCtxIdentifierException
 	{
-		String[] uri = dataIdUri.split("://");
-		DataIdentifier dataId = new SimpleDataIdentifier();
-		dataId.setScheme(DataIdentifierScheme.fromValue(uri[0]));
-		String path = uri[1];
-		int pos = 0, end = 0, endType = 0;
-		if ((end = path.indexOf('/', pos)) >= 0) {
-			dataId.setOwnerId(path.substring(pos, end));
-		}
-		endType = path.length();
-		if (path.endsWith("/") && endType > 1) {
-			endType--;
-		}
-		dataId.setType(path.substring(end+1, endType));
-		return dataId;
+		return DataIdentifierFactory.fromUri(dataIdUri);
 	}
 }

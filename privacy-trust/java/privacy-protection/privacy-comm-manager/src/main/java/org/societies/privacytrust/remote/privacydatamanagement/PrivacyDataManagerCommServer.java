@@ -88,11 +88,10 @@ public class PrivacyDataManagerCommServer {
 
 	private boolean checkPermission(PrivacyDataManagerBean bean, PrivacyDataManagerBeanResult beanResult) {
 		try {
-			DataIdentifier dataId = DataIdentifierFactory.fromUri(bean.getDataIdUri());
-			List<ResponseItem> permission = privacyDataManager.checkPermission(bean.getRequestor(), dataId, bean.getActions());
-			if (null != permission && permission.size() > 0) {
-				// TODO manage a list of permission as a result
-				beanResult.setPermission(permission.get(0));
+			List<DataIdentifier> dataIds = DataIdentifierFactory.fromUris(bean.getDataIdUris());
+			List<ResponseItem> permissions = privacyDataManager.checkPermission(bean.getRequestor(), dataIds, bean.getActions());
+			if (null != permissions && permissions.size() > 0) {
+				beanResult.setPermissions(permissions);
 			}
 			else {
 				beanResult.setAck(false);
