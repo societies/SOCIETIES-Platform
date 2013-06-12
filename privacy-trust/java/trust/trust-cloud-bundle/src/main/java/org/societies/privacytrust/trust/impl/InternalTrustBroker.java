@@ -25,7 +25,6 @@
 package org.societies.privacytrust.trust.impl;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -37,6 +36,7 @@ import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.model.ExtTrustRelationship;
 import org.societies.api.privacytrust.trust.TrustAccessControlException;
 import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.TrustQuery;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.model.TrustEvidence;
 import org.societies.api.privacytrust.trust.model.TrustRelationship;
@@ -121,31 +121,63 @@ public class InternalTrustBroker implements ITrustBroker {
 	}
 	
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.TrustQuery)
 	 */
 	@Override
 	@Async
 	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
-			final TrustedEntityId trustorId) throws TrustException {
+			final Requestor requestor, final TrustQuery query) throws TrustException {
 		
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
+		if (query == null)
+			throw new NullPointerException("query can't be null");
 		
-		return this.doRetrieveTrustRelationshipsByType(null, trustorId, null, null);
+		if (query.getTrusteeId() != null)
+			return this.doRetrieveTrustRelationships(requestor, 
+					query.getTrustorId(), query.getTrusteeId());
+		else
+			return this.doRetrieveTrustRelationshipsByType(requestor, 
+					query.getTrustorId(), query.getTrusteeType(),
+					query.getTrustValueType());
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.privacytrust.trust.TrustQuery)
+	 */
+	@Override
+	@Async
+	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final TrustQuery query) throws TrustException {
+		
+		if (query == null)
+			throw new NullPointerException("query can't be null");
+		
+		if (query.getTrusteeId() != null)
+			return this.doRetrieveTrustRelationships(null, 
+					query.getTrustorId(), query.getTrusteeId());
+		else
+			return this.doRetrieveTrustRelationshipsByType(null, 
+					query.getTrustorId(), query.getTrusteeType(),
+					query.getTrustValueType());
 	}
 
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveExtTrustRelationships(org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveExtTrustRelationships(org.societies.api.privacytrust.trust.TrustQuery)
 	 */
 	@Override
 	@Async
 	public Future<Set<ExtTrustRelationship>> retrieveExtTrustRelationships(
-			final TrustedEntityId trustorId) throws TrustException {
+			final TrustQuery query) throws TrustException {
 		
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
+		if (query == null)
+			throw new NullPointerException("query can't be null");
 		
-		return this.doRetrieveExtTrustRelationshipsByType(trustorId, null, null);
+		if (query.getTrusteeId() != null)
+			return this.doRetrieveExtTrustRelationships( 
+					query.getTrustorId(), query.getTrusteeId());
+		else
+			return this.doRetrieveExtTrustRelationshipsByType( 
+					query.getTrustorId(), query.getTrusteeType(),
+					query.getTrustValueType());
 	}
 	
 	/*
@@ -167,40 +199,6 @@ public class InternalTrustBroker implements ITrustBroker {
 		return this.doRetrieveTrustRelationships(requestor, trustorId, trusteeId);
 	}
 	
-	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
-	 */
-	@Override
-	@Async
-	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
-			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
-					throws TrustException {
-		
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
-			throw new NullPointerException("trusteeId can't be null");
-		
-		return this.doRetrieveTrustRelationships(null, trustorId, trusteeId);
-	}
-	
-	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveExtTrustRelationships(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
-	 */
-	@Override
-	@Async
-	public Future<Set<ExtTrustRelationship>> retrieveExtTrustRelationships(
-			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
-					throws TrustException {
-		
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
-			throw new NullPointerException("trusteeId can't be null");
-		
-		return this.doRetrieveExtTrustRelationships(trustorId, trusteeId);
-	}
-	
 	@Async
 	private Future<Set<TrustRelationship>> doRetrieveTrustRelationships(
 			Requestor requestor, final TrustedEntityId trustorId, 
@@ -215,7 +213,7 @@ public class InternalTrustBroker implements ITrustBroker {
 					+ "' on behalf of requestor '" + requestor + "'");
 		
 		final Set<TrustRelationship> trustRelationships =
-				new HashSet<TrustRelationship>();
+				new LinkedHashSet<TrustRelationship>();
 		try {
 			final boolean doLocal = (this.trustNodeMgr.getMyIds().contains(trustorId) 
 					&& this.trustNodeMgr.isMaster());
@@ -396,22 +394,37 @@ public class InternalTrustBroker implements ITrustBroker {
 	}
 	
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationship(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#retrieveTrustRelationship(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.TrustQuery)
 	 */
 	@Override
 	@Async
 	public Future<TrustRelationship> retrieveTrustRelationship(
-			final TrustedEntityId trustorId, final TrustedEntityId trusteeId, 
-			final TrustValueType trustValueType) throws TrustException {
+			final Requestor requestor, final TrustQuery query) throws TrustException {
 		
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
-			throw new NullPointerException("trusteeId can't be null");
-		if (trustValueType == null)
-			throw new NullPointerException("trustValueType can't be null");	
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (query == null)
+			throw new NullPointerException("query can't be null");
 		
-		return this.doRetrieveTrustRelationship(null, trustorId, trusteeId, trustValueType);
+		// TODO
+		return this.doRetrieveTrustRelationship(requestor, query.getTrustorId(),
+				query.getTrusteeId(), query.getTrustValueType());
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationship(org.societies.api.privacytrust.trust.TrustQuery)
+	 */
+	@Override
+	@Async
+	public Future<TrustRelationship> retrieveTrustRelationship(
+			final TrustQuery query) throws TrustException {
+		
+		if (query == null)
+			throw new NullPointerException("query can't be null");
+		
+		// TODO
+		return this.doRetrieveTrustRelationship(null, query.getTrustorId(),
+				query.getTrusteeId(), query.getTrustValueType());
 	}
 	
 	/*
@@ -420,17 +433,14 @@ public class InternalTrustBroker implements ITrustBroker {
 	@Override
 	@Async
 	public Future<ExtTrustRelationship> retrieveExtTrustRelationship(
-			final TrustedEntityId trustorId, final TrustedEntityId trusteeId, 
-			final TrustValueType trustValueType) throws TrustException {
+			final TrustQuery query) throws TrustException {
 		
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
-			throw new NullPointerException("trusteeId can't be null");
-		if (trustValueType == null)
-			throw new NullPointerException("trustValueType can't be null");	
+		if (query == null)
+			throw new NullPointerException("query can't be null");
 		
-		return this.doRetrieveExtTrustRelationship(trustorId, trusteeId, trustValueType);
+		// TODO
+		return this.doRetrieveExtTrustRelationship(query.getTrustorId(),
+				query.getTrusteeId(), query.getTrustValueType());
 	}
 	
 	@Async
@@ -651,21 +661,35 @@ public class InternalTrustBroker implements ITrustBroker {
 	}
 	
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustValue(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#retrieveTrustValue(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.TrustQuery)
 	 */
 	@Override
 	@Async
-	public Future<Double> retrieveTrustValue(final TrustedEntityId trustorId,
-			final TrustedEntityId trusteeId, final TrustValueType trustValueType) throws TrustException {
+	public Future<Double> retrieveTrustValue(final Requestor requestor, 
+			final TrustQuery query)	throws TrustException {
 		
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
-			throw new NullPointerException("trusteeId can't be null");
-		if (trustValueType == null)
-			throw new NullPointerException("trustValueType can't be null");	
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (query == null)
+			throw new NullPointerException("query can't be null");	
 		
-		return this.doRetrieveTrustValue(null, trustorId, trusteeId, trustValueType);
+		return this.doRetrieveTrustValue(requestor, query.getTrustorId(),
+				query.getTrusteeId(), query.getTrustValueType());
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustValue(org.societies.api.privacytrust.trust.TrustQuery)
+	 */
+	@Override
+	@Async
+	public Future<Double> retrieveTrustValue(final TrustQuery query)
+			throws TrustException {
+		
+		if (query == null)
+			throw new NullPointerException("query can't be null");	
+		
+		return this.doRetrieveTrustValue(null, query.getTrustorId(),
+				query.getTrusteeId(), query.getTrustValueType());
 	}
 	
 	@Async
@@ -773,42 +797,6 @@ public class InternalTrustBroker implements ITrustBroker {
 	}
 	
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType)
-	 */
-	@Override
-	@Async
-	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
-			final TrustedEntityId trustorId, 
-			final TrustedEntityType trusteeType) throws TrustException {
-		
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeType == null)
-			throw new NullPointerException("trusteeType can't be null");
-		
-		return this.doRetrieveTrustRelationshipsByType(null, trustorId, 
-				trusteeType, null);
-	}
-	
-	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveExtTrustRelationships(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType)
-	 */
-	@Override
-	@Async
-	public Future<Set<ExtTrustRelationship>> retrieveExtTrustRelationships(
-			final TrustedEntityId trustorId, 
-			final TrustedEntityType trusteeType) throws TrustException {
-		
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeType == null)
-			throw new NullPointerException("trusteeType can't be null");
-		
-		return this.doRetrieveExtTrustRelationshipsByType(trustorId, 
-				trusteeType, null);
-	}
-	
-	/*
 	 * @see org.societies.api.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
 	 */
 	@Override
@@ -825,42 +813,6 @@ public class InternalTrustBroker implements ITrustBroker {
 			throw new NullPointerException("trustValueType can't be null");
 		
 		return this.doRetrieveTrustRelationshipsByType(requestor, trustorId, 
-				null, trustValueType);
-	}
-	
-	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
-	 */
-	@Override
-	@Async
-	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
-			final TrustedEntityId trustorId,
-			final TrustValueType trustValueType) throws TrustException {
-		
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trustValueType == null)
-			throw new NullPointerException("trustValueType can't be null");
-		
-		return this.doRetrieveTrustRelationshipsByType(null, trustorId, 
-				null, trustValueType);
-	}
-	
-	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveExtTrustRelationships(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
-	 */
-	@Override
-	@Async
-	public Future<Set<ExtTrustRelationship>> retrieveExtTrustRelationships(
-			final TrustedEntityId trustorId,
-			final TrustValueType trustValueType) throws TrustException {
-		
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trustValueType == null)
-			throw new NullPointerException("trustValueType can't be null");
-		
-		return this.doRetrieveExtTrustRelationshipsByType(trustorId, 
 				null, trustValueType);
 	}
 	
@@ -887,48 +839,6 @@ public class InternalTrustBroker implements ITrustBroker {
 				trusteeType, trustValueType);
 	}
 	
-	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType, org.societies.api.privacytrust.trust.model.TrustValueType)
-	 */
-	@Override
-	@Async
-	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
-			final TrustedEntityId trustorId, 
-			final TrustedEntityType trusteeType,
-			final TrustValueType trustValueType) throws TrustException {
-		
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeType == null)
-			throw new NullPointerException("trusteeType can't be null");
-		if (trustValueType == null)
-			throw new NullPointerException("trustValueType can't be null");
-		
-		return this.doRetrieveTrustRelationshipsByType(null, trustorId, 
-				trusteeType, trustValueType);
-	}
-	
-	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveExtTrustRelationships(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType, org.societies.api.privacytrust.trust.model.TrustValueType)
-	 */
-	@Override
-	@Async
-	public Future<Set<ExtTrustRelationship>> retrieveExtTrustRelationships(
-			final TrustedEntityId trustorId, 
-			final TrustedEntityType trusteeType,
-			final TrustValueType trustValueType) throws TrustException {
-		
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeType == null)
-			throw new NullPointerException("trusteeType can't be null");
-		if (trustValueType == null)
-			throw new NullPointerException("trustValueType can't be null");
-		
-		return this.doRetrieveExtTrustRelationshipsByType(trustorId, 
-				trusteeType, trustValueType);
-	}
-	
 	@Async
 	private Future<Set<TrustRelationship>> doRetrieveTrustRelationshipsByType(
 			Requestor requestor, final TrustedEntityId trustorId, 
@@ -945,7 +855,7 @@ public class InternalTrustBroker implements ITrustBroker {
 					+ "' on behalf of requestor '" + requestor + "'");
 		
 		final Set<TrustRelationship> trustRelationships =
-				new HashSet<TrustRelationship>();
+				new LinkedHashSet<TrustRelationship>();
 		try {
 			final boolean doLocal = (this.trustNodeMgr.getMyIds().contains(trustorId) 
 					&& this.trustNodeMgr.isMaster());
@@ -1189,37 +1099,91 @@ public class InternalTrustBroker implements ITrustBroker {
 	}
 	
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.TrustQuery)
+	 */
+	@Override
+	public void registerTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener,
+			final TrustQuery query) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (query == null)
+			throw new NullPointerException("query can't be null");
+		
+		if (query.getTrusteeType() != null)
+			this.doRegisterTrustUpdateListenerByType(requestor, listener,
+					query.getTrustorId(), query.getTrusteeType(),
+					query.getTrustValueType());
+		else
+			this.doRegisterTrustUpdateListener(requestor, listener, 
+					query.getTrustorId(), query.getTrusteeId(), 
+					query.getTrustValueType());
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.TrustQuery)
+	 */
+	@Override
+	public void unregisterTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener,
+			final TrustQuery query) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (query == null)
+			throw new NullPointerException("query can't be null");
+		
+		if (query.getTrusteeType() != null)
+			this.doUnregisterTrustUpdateListenerByType(requestor, listener,
+					query.getTrustorId(), query.getTrusteeType(), 
+					query.getTrustValueType());
+		else
+			this.doUnregisterTrustUpdateListener(requestor, listener, 
+					query.getTrustorId(), query.getTrusteeId(), 
+					query.getTrustValueType());
+	}
+	
+	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.TrustQuery)
 	 */
 	@Override
 	public void registerTrustUpdateListener(
 			final ITrustUpdateEventListener listener,
-			final TrustedEntityId trustorId) throws TrustException {
+			final TrustQuery query) throws TrustException {
 		
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
+		if (query == null)
+			throw new NullPointerException("query can't be null");
 		
-		this.doRegisterTrustUpdateListener(
-				null, listener, trustorId, null, null);
+		if (query.getTrusteeType() != null)
+			this.doRegisterTrustUpdateListenerByType(null, listener,
+					query.getTrustorId(), query.getTrusteeType(),
+					query.getTrustValueType());
+		else
+			this.doRegisterTrustUpdateListener(null, listener, 
+					query.getTrustorId(), query.getTrusteeId(), 
+					query.getTrustValueType());
 	}
 	
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId)
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.TrustQuery)
 	 */
 	@Override
 	public void unregisterTrustUpdateListener(
 			final ITrustUpdateEventListener listener,
-			final TrustedEntityId trustorId) throws TrustException {
+			final TrustQuery query) throws TrustException {
 		
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
+		if (query == null)
+			throw new NullPointerException("query can't be null");
 		
-		this.doUnregisterTrustUpdateListener(
-				null, listener, trustorId, null, null);
+		if (query.getTrusteeType() != null)
+			this.doUnregisterTrustUpdateListenerByType(null, listener,
+					query.getTrustorId(), query.getTrusteeType(),
+					query.getTrustValueType());
+		else
+			this.doUnregisterTrustUpdateListener(null, listener, 
+					query.getTrustorId(), query.getTrusteeId(), 
+					query.getTrustValueType());
 	}
 	
 	/*
@@ -1267,46 +1231,6 @@ public class InternalTrustBroker implements ITrustBroker {
 	}
 	
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
-	 */
-	@Override
-	public void registerTrustUpdateListener(
-			final ITrustUpdateEventListener listener,
-			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
-					throws TrustException {
-		
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
-			throw new NullPointerException("trusteeId can't be null");
-		
-		this.doRegisterTrustUpdateListener(
-				null, listener, trustorId, trusteeId, null);
-	}
-	
-	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
-	 */
-	@Override
-	public void unregisterTrustUpdateListener(
-			final ITrustUpdateEventListener listener,
-			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
-					throws TrustException {
-		
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
-			throw new NullPointerException("trusteeId can't be null");
-		
-		this.doUnregisterTrustUpdateListener(
-				null, listener, trustorId, trusteeId, null);
-	}
-	
-	/*
 	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
 	 */
 	@Override
@@ -1350,49 +1274,6 @@ public class InternalTrustBroker implements ITrustBroker {
 		
 		this.doUnregisterTrustUpdateListener(
 				requestor, listener, trustorId, trusteeId, trustValueType);
-	}
-	
-	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
-	 */
-	@Override
-	public void registerTrustUpdateListener(
-			final ITrustUpdateEventListener listener,
-			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
-			final TrustValueType trustValueType) throws TrustException {
-		
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
-			throw new NullPointerException("trusteeId can't be null");
-		if (trustValueType == null)
-			throw new NullPointerException("trustValueType can't be null");
-		
-		this.doRegisterTrustUpdateListener(
-				null, listener, trustorId, trusteeId, trustValueType);
-	}
-	
-	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
-	 */
-	@Override
-	public void unregisterTrustUpdateListener(
-			final ITrustUpdateEventListener listener,
-			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
-			final TrustValueType trustValueType) 
-					throws TrustException {
-		
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
-			throw new NullPointerException("trusteeId can't be null");
-		
-		this.doUnregisterTrustUpdateListener(
-				null, listener, trustorId, trusteeId, trustValueType);
 	}
 	
 	private void doRegisterTrustUpdateListener(Requestor requestor,
@@ -1537,46 +1418,6 @@ public class InternalTrustBroker implements ITrustBroker {
 	}
 	
 	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType)
-	 */
-	@Override
-	public void registerTrustUpdateListener(
-			final ITrustUpdateEventListener listener, 
-			final TrustedEntityId trustorId, final TrustedEntityType trusteeType)
-					throws TrustException {
-		
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeType == null)
-			throw new NullPointerException("trusteeType can't be null");
-		
-		this.doRegisterTrustUpdateListenerByType(
-				null, listener, trustorId, trusteeType, null);
-	}
-	
-	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType)
-	 */
-	@Override
-	public void unregisterTrustUpdateListener(
-			final ITrustUpdateEventListener listener, 
-			final TrustedEntityId trustorId, final TrustedEntityType trusteeType)
-					throws TrustException {
-		
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeType == null)
-			throw new NullPointerException("trusteeType can't be null");
-		
-		this.doUnregisterTrustUpdateListenerByType(
-				null, listener, trustorId, trusteeType, null);
-	}
-	
-	/*
 	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
 	 */
 	@Override
@@ -1618,46 +1459,6 @@ public class InternalTrustBroker implements ITrustBroker {
 		
 		this.doUnregisterTrustUpdateListener(
 				requestor, listener, trustorId, null, trustValueType);
-	}
-	
-	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
-	 */
-	@Override
-	public void registerTrustUpdateListener(
-			final ITrustUpdateEventListener listener, 
-			final TrustedEntityId trustorId,
-			final TrustValueType trustValueType) throws TrustException {
-		
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trustValueType == null)
-			throw new NullPointerException("trustValueType can't be null");
-		
-		this.doRegisterTrustUpdateListener(
-				null, listener, trustorId, null, trustValueType);
-	}
-	
-	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
-	 */
-	@Override
-	public void unregisterTrustUpdateListener(
-			final ITrustUpdateEventListener listener, 
-			final TrustedEntityId trustorId,
-			final TrustValueType trustValueType) throws TrustException {
-		
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trustValueType == null)
-			throw new NullPointerException("trustValueType can't be null");
-		
-		this.doUnregisterTrustUpdateListener(
-				null, listener, trustorId, null, trustValueType);
 	}
 	
 	/*
@@ -1706,46 +1507,6 @@ public class InternalTrustBroker implements ITrustBroker {
 		
 		this.doUnregisterTrustUpdateListenerByType(
 				requestor, listener, trustorId, trusteeType, trustValueType);
-	}
-	
-	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType, org.societies.api.privacytrust.trust.model.TrustValueType)
-	 */
-	@Override
-	public void registerTrustUpdateListener(
-			final ITrustUpdateEventListener listener, 
-			final TrustedEntityId trustorId, final TrustedEntityType trusteeType,
-			final TrustValueType trustValueType) throws TrustException {
-		
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeType == null)
-			throw new NullPointerException("trusteeType can't be null");
-		if (trustValueType == null)
-			throw new NullPointerException("trustValueType can't be null");
-		
-		this.doRegisterTrustUpdateListenerByType(
-				null, listener, trustorId, trusteeType, trustValueType);
-	}
-
-	/*
-	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType, org.societies.api.privacytrust.trust.model.TrustValueType)
-	 */
-	@Override
-	public void unregisterTrustUpdateListener(
-			final ITrustUpdateEventListener listener, 
-			final TrustedEntityId trustorId, final TrustedEntityType trusteeType,
-			final TrustValueType trustValueType) throws TrustException {
-		
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		
-		this.doUnregisterTrustUpdateListenerByType(
-				null, listener, trustorId, trusteeType, trustValueType);
 	}
 	
 	private void doRegisterTrustUpdateListenerByType(Requestor requestor,

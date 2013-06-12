@@ -20,7 +20,7 @@
  		<property name="commManager" ref="commManager"/>
  		<property name="cauiDiscovery" ref="cauiDiscovery" />
  		<property name="caciDiscovery" ref="caciDiscovery" />
-		
+	
 	</bean>
 
 	<!-- <context:component-scan base-package="org.societies.personalisation.management.impl"></context:component-scan> -->

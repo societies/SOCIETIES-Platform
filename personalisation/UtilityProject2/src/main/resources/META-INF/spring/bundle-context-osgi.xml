@@ -20,5 +20,4 @@
 		<osgi:reference id="caciDiscovery" interface="org.societies.personalisation.CACI.api.CACIDiscovery.ICACIDiscovery">
 	</osgi:reference>
 		
-		
 </beans>

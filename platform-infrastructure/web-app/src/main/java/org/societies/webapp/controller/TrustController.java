@@ -44,10 +44,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
+import org.societies.api.internal.privacytrust.trust.model.ExtTrustRelationship;
+import org.societies.api.privacytrust.trust.TrustQuery;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
-import org.societies.api.privacytrust.trust.model.TrustRelationship;
+import org.societies.api.privacytrust.trust.model.TrustEvidence;
 import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
@@ -232,11 +234,12 @@ public class TrustController extends BasePageController {
 			try {
 				final TrustedEntityId myTeid = new TrustedEntityId(
 						TrustedEntityType.CSS, this.userService.getUserID());
-				final List<TrustRelationship> dbResult = new ArrayList<TrustRelationship>();
-				dbResult.addAll(this.trustBroker.retrieveTrustRelationships(myTeid, entityType).get());
+				final List<ExtTrustRelationship> dbResult = new ArrayList<ExtTrustRelationship>();
+				dbResult.addAll(this.trustBroker.retrieveExtTrustRelationships(
+						new TrustQuery(myTeid).setTrusteeType(entityType)).get());
 				final Map<TrustedEntityId, TrustedEntity> trustedEntities = 
 						new HashMap<TrustedEntityId, TrustedEntity>();
-				for (final TrustRelationship tr : dbResult) {
+				for (final ExtTrustRelationship tr : dbResult) {
 					TrustedEntity trustedEntity = trustedEntities.get(tr.getTrusteeId()); 
 					if (trustedEntity == null)
 						trustedEntity = new TrustedEntity(myTeid, tr.getTrusteeId());
@@ -249,6 +252,18 @@ public class TrustController extends BasePageController {
 					} else if (TrustValueType.USER_PERCEIVED == tr.getTrustValueType()) {
 						trustedEntity.getUserPerceivedTrust().setValue(tr.getTrustValue());
 						trustedEntity.getUserPerceivedTrust().setLastUpdated(tr.getTimestamp());
+					}
+					if (LOG.isDebugEnabled())
+						LOG.debug("Found evidence for '" + tr.getTrusteeId() + "': " + tr.getTrustEvidence());
+					for (final TrustEvidence evidence : tr.getTrustEvidence()) {
+						// Handle RATED evidence
+						if (TrustEvidenceType.RATED == evidence.getType() && evidence.getInfo() instanceof Double) {
+							final Double dblRating = (Double) evidence.getInfo() * 5.0d;
+							final Integer intRating = dblRating.intValue();
+							if (LOG.isDebugEnabled())
+								LOG.debug("Initialising rating for '" + tr.getTrusteeId() + "' to " + intRating);
+							trustedEntity.setRating(intRating);
+						}
 					}
 					trustedEntities.put(tr.getTrusteeId(), trustedEntity);
 				}
@@ -272,15 +287,15 @@ public class TrustController extends BasePageController {
 						TrustedEntityType.CSS, this.userService.getUserID());
     			final CountDownLatch cdLatch = new CountDownLatch(1);
     			final TrustUpdateListener listener = new TrustUpdateListener(cdLatch);
-    			this.trustBroker.registerTrustUpdateListener(listener, myTeid,
-    					ratedTeid, TrustValueType.USER_PERCEIVED);
+    			this.trustBroker.registerTrustUpdateListener(listener, new TrustQuery(myTeid)
+    					.setTrusteeId(ratedTeid).setTrustValueType(TrustValueType.USER_PERCEIVED));
     			if (LOG.isDebugEnabled())
     				LOG.debug("Adding trust evidence: '" + myTeid + "' rated '" + ratedTeid + "' with " + rating);
     			this.trustEvidenceCollector.addDirectEvidence(myTeid, ratedTeid,
     					TrustEvidenceType.RATED, new Date(), rating);
     			cdLatch.await(2, TimeUnit.SECONDS);
-    			this.trustBroker.unregisterTrustUpdateListener(listener, myTeid,
-    					ratedTeid, TrustValueType.USER_PERCEIVED);
+    			this.trustBroker.unregisterTrustUpdateListener(listener, new TrustQuery(myTeid)
+				.setTrusteeId(ratedTeid).setTrustValueType(TrustValueType.USER_PERCEIVED));
     			if (TrustedEntityType.CSS == ratedTeid.getEntityType())
     				this.users = this.retrieveTrustedEntities(TrustedEntityType.CSS);
     			else if (TrustedEntityType.CIS == ratedTeid.getEntityType())

@@ -27,7 +27,6 @@ package org.societies.personalisation.CommunityPreferenceManagement.impl.managem
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

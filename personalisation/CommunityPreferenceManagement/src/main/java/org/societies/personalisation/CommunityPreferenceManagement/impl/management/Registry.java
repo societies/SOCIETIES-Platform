@@ -38,6 +38,10 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 
 public class Registry implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1523266247660963721L;
 	private Hashtable<PreferenceDetails, CtxIdentifier> mappings; 
 	private int index ;
 	private final IIdentity CISId;
@@ -50,7 +54,7 @@ public class Registry implements Serializable{
 	
 	public String getNameForNewPreference(){
 		this.index += 1;
-		return "preference_"+this.index;
+		return "community_preference_"+this.index;
 	}
 	
 	public void addPreference(PreferenceDetails detail, CtxIdentifier id){

@@ -64,8 +64,9 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 	private IIdentity userIdentity;
 	public  ICAUIPrediction cauiPrediction;
 	private ICAUIDiscovery cauiDiscovery;
-	private ICACIDiscovery caciDiscovery;
 
+	public ICACIDiscovery caciDiscovery;
+	
 	public static IUserActionMonitor uam;
 
 
@@ -320,7 +321,11 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 
 	} 
 
+	
+	public void setCaciDiscovery(ICACIDiscovery caciDiscovery) {
 
+		this.caciDiscovery = caciDiscovery;
+	}
 	/**
 	 * @return the ctxBroker
 	 */
@@ -374,10 +379,7 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 		return caciDiscovery;
 	}
 
-	public void setCaciDiscovery(ICACIDiscovery caciDiscovery) {
-
-		this.caciDiscovery = caciDiscovery;
-	}
+	
 
 	public void setCauiDiscovery(ICAUIDiscovery cauiDiscovery) {
 

@@ -22,17 +22,36 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.CommunityPreferenceManagement.impl.management;
+package org.societies.api.privacytrust.trust;
 
 /**
- * Describe your class here...
- *
- * @author Eliza
- *
+ * This exception is thrown to indicate that a requested access to trust
+ * information is denied.
+ * 
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 1.1
  */
-public class CtxModelTypes {
+public class NonUniqueTrustQueryResultException extends RuntimeException {
 
-	public static final String PREFERENCE_REGISTRY = "COMMUNITY_PREFERENCE_REGISTRY";
-	public static final String HAS_PREFERENCES = "HAS_COMMUNITIY_PREFERENCES";
-	public static final String PREFERENCE = "HAS_COMMUNITY_PREFERENCE";
+	private static final long serialVersionUID = -8885656747495961493L;
+
+	/**
+     * Constructs a <code>TrustAccessControlException</code> with no detail message.
+     */
+    public NonUniqueTrustQueryResultException() {
+    	
+        super();
+    }
+
+    /**
+     * Constructs a <code>TrustAccessControlException</code> with the specified detail
+     * message.
+     * 
+     * @param message
+     *            the detail message.
+     */
+    public NonUniqueTrustQueryResultException(String message) {
+    	
+        super(message);
+    }
 }

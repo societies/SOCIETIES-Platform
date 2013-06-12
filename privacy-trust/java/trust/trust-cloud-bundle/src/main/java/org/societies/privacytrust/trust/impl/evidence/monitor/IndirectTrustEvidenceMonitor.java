@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
 import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.TrustQuery;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
@@ -107,7 +108,8 @@ public class IndirectTrustEvidenceMonitor implements ITrustUpdateEventListener {
 		try {
 			for (final TrustedEntityId myTeid : trustNodeMgr.getMyIds()) {
 				this.initConnections(myTeid);
-				trustBroker.registerTrustUpdateListener(this, myTeid, TrustValueType.DIRECT);
+				trustBroker.registerTrustUpdateListener(this, 
+						new TrustQuery(myTeid).setTrustValueType(TrustValueType.DIRECT));
 			}
 			this.scheduler.scheduleWithFixedDelay(new MaintenanceDaemon(),
 					WAIT, WAIT, TimeUnit.SECONDS);
@@ -214,7 +216,8 @@ public class IndirectTrustEvidenceMonitor implements ITrustUpdateEventListener {
 				try {
 					IndirectTrustEvidenceMonitor.this.retrieveOpinions(connectionId);
 					trustBroker.registerTrustUpdateListener(
-							IndirectTrustEvidenceMonitor.this, connectionId, TrustValueType.DIRECT);
+							IndirectTrustEvidenceMonitor.this, 
+							new TrustQuery(connectionId).setTrustValueType(TrustValueType.DIRECT));
 					IndirectTrustEvidenceMonitor.this.unmonitoredConnections.remove(connectionId);
 					IndirectTrustEvidenceMonitor.this.monitoredConnections.add(connectionId);
 				} catch (Exception e) {
@@ -258,7 +261,7 @@ public class IndirectTrustEvidenceMonitor implements ITrustUpdateEventListener {
 		final Set<ITrustEvidence> existingEvidenceSet;
 		try {
 			retrievedRelationships = this.trustBroker.retrieveTrustRelationships(
-					connectionId, TrustValueType.DIRECT).get();
+					new TrustQuery(connectionId).setTrustValueType(TrustValueType.DIRECT)).get();
 			// If connection has no opinions do nothing
 			if (retrievedRelationships.isEmpty())
 				return;
@@ -290,8 +293,9 @@ public class IndirectTrustEvidenceMonitor implements ITrustUpdateEventListener {
 		
 		try {
 			final Set<TrustRelationship> trustRelationships = 
-					this.trustBroker.retrieveTrustRelationships(myTeid,
-							TrustedEntityType.CSS, TrustValueType.DIRECT).get();
+					this.trustBroker.retrieveTrustRelationships(
+							new TrustQuery(myTeid).setTrusteeType(TrustedEntityType.CSS)
+							.setTrustValueType(TrustValueType.DIRECT)).get();
 			for (final TrustRelationship trustRelationship : trustRelationships)
 				this.unmonitoredConnections.add(trustRelationship.getTrusteeId());
 		} catch (Exception e) {
