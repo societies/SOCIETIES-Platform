@@ -230,14 +230,10 @@ public class CAUIPrediction implements ICAUIPrediction{
 					}
 				}			
 			}
-		} else if(enableCACIPrediction) {
+		} else if(enableCACIPrediction == true && caciModelExist == true) {
 			LOG.info("no CAUI model exist ... utilize community model ");
 			
-			if(!caciModelExist && this.caciPredictor.retrieveBelongingCIS() != null){
-					
-			}results = this.caciPredictor.getPrediction(requestor, action);
-			
-			
+			results = this.caciPredictor.getPrediction(requestor, action);
 						
 		} else LOG.info("neither caci, nor caui are able to perform prediction");
 		//LOG.info(" getPrediction(IIdentity requestor, IAction action) "+ results);
@@ -569,7 +565,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 			}		
 			
 			///register for caci model
-			List<CtxIdentifier> lsCaci = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
+			List<CtxIdentifier> lsCaci = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, "CAUI_CACI_MODEL").get();
 			
 			CtxAttributeIdentifier caciModelAttributeId = null;
 			
@@ -577,7 +573,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 			if (lsCaci.size()>0) {
 				caciModelAttributeId = (CtxAttributeIdentifier) lsCaci.get(0);
 			} else {
-				CtxAttribute attr = this.ctxBroker.createAttribute(operator.getId(), CtxAttributeTypes.CAUI_MODEL).get();
+				CtxAttribute attr = this.ctxBroker.createAttribute(operator.getId(), "CAUI_CACI_MODEL").get();
 				caciModelAttributeId = attr.getId();
 			}
 
@@ -745,6 +741,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 					//TODO register with pers manager for location updates.
 					//LOG.info("register with pers manager for ctxAttr  update");
+					/*
 					if(retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC) != null){
 						CtxAttribute ctxAttrLocation = retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC);
 						persoMgr.registerForContextUpdate(getOwnerId(), PersonalisationTypes.CAUIIntent, ctxAttrLocation.getId());	
@@ -756,7 +753,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 						LOG.debug("register with pers manager for ctxAttr STATUS update");
 					}
 
-					/*	
+						
 					if(retrieveOperatorsCtx(CtxAttributeTypes.TEMPERATURE) != null){
 						CtxAttribute ctxAttrTemp = retrieveOperatorsCtx(CtxAttributeTypes.TEMPERATURE);
 						persoMgr.registerForContextUpdate(getOwnerId(), PersonalisationTypes.CAUIIntent, ctxAttrTemp.getId());	

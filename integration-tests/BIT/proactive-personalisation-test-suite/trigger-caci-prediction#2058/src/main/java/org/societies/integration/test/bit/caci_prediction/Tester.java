@@ -165,7 +165,7 @@ public class Tester {
 		}
 	}
 
-	@Ignore
+	
 	@Test
 	public void createCACIModel(){
 
@@ -174,6 +174,7 @@ public class Tester {
 		LOG.info(".............createCACIModel................." );
 		
 		try {
+			Thread.sleep(5000);
 			listISMemberOf = this.internalCtxBroker.lookup(CtxModelType.ASSOCIATION, CtxAssociationTypes.IS_MEMBER_OF).get();
 			LOG.info(".............listISMemberOf................." +listISMemberOf);
 			if(!listISMemberOf.isEmpty() ){

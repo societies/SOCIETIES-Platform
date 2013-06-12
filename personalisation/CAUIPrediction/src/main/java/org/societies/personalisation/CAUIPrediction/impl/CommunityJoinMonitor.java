@@ -1,5 +1,6 @@
 package org.societies.personalisation.CAUIPrediction.impl;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -22,12 +23,14 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -119,7 +122,7 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 			//LOG.info("CssJoinedCommunityHandler  2 "+ this.ctxId );
 			try {
 				CtxAssociation isMemberOfAssoc = (CtxAssociation) ctxBroker.retrieve(this.ctxId).get();
-				LOG.info("CssJoinedCommunityHandler  3 "+ isMemberOfAssoc.getId() );
+				LOG.debug("CssJoinedCommunityHandler  3 "+ isMemberOfAssoc.getId() );
 				CtxEntityIdentifier cssEntId = isMemberOfAssoc.getParentEntity();
 
 				Set<CtxEntityIdentifier> cisEntIdSet = isMemberOfAssoc.getChildEntities();
@@ -129,7 +132,7 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 					
 					for(CtxEntityIdentifier cisEntityID : cisEntIdSet){
 
-						LOG.info("CssJoinedCommunityHandler  4 "+ cisEntityID );
+						LOG.debug("CssJoinedCommunityHandler  4 "+ cisEntityID );
 
 						//remote lookup in cis is not working
 						//	List<CtxIdentifier> caciIdList = ctxBroker.lookup(cisEntityID, CtxModelType.ATTRIBUTE,  CtxAttributeTypes.CACI_MODEL).get();
@@ -138,7 +141,7 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 						CommunityCtxEntity comEntity = (CommunityCtxEntity) ctxBroker.retrieve(cisEntityID).get();
 						Set<CtxAttribute> caciAttrSet =  comEntity.getAttributes(CtxAttributeTypes.CACI_MODEL);
 
-						LOG.info("CssJoinedCommunityHandler  5 caciIdList "+ caciAttrSet );
+						LOG.debug("CssJoinedCommunityHandler  5 caciIdList "+ caciAttrSet );
 						// register for new caci model update events
 						if( ! caciAttrSet.isEmpty())	{
 							
@@ -172,7 +175,7 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 
 
 		CACIModelEventHandler(){
-					LOG.info("inside CACIModelEventHandler ------------------");
+					LOG.debug("inside CACIModelEventHandler ------------------");
 		}
 
 		@Override
@@ -201,29 +204,37 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 					// retrieve caciModelAttr from CIS ctx DB
 					CtxAttribute caciModelAttrRemote = (CtxAttribute) ctxBroker.retrieve((CtxAttributeIdentifier) attributeCaciID).get();
 					
-					LOG.info("*** remote caci attribute retrieved " + caciModelAttrRemote);
-					LOG.info("***onModification 1 caciModelAttrRemote= " + caciModelAttrRemote.getId());
+					LOG.debug("*** remote caci attribute retrieved " + caciModelAttrRemote);
+					LOG.debug("***onModification 1 caciModelAttrRemote= " + caciModelAttrRemote.getId());
 
 					
 					//store caciModel to local CSS ctx DB
 					CtxAttribute caciModelAttrLocal = null;
-					List<CtxIdentifier> caciModelAttrLocalList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
-						LOG.info("***onModification 2 caciModelAttrLocalList= " + caciModelAttrLocalList.size());
+					List<CtxIdentifier> caciModelAttrLocalList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, "CAUI_CACI_MODEL").get();
+						LOG.debug("***onModification 2 caciModelAttrLocalList= " + caciModelAttrLocalList.size());
 					IIdentity localcssID = getOwnerId();
 					CtxEntityIdentifier entityID = ctxBroker.retrieveIndividualEntityId(null, localcssID).get();
 
 					//	LOG.info("***onModification 3 entityID= " + entityID.toString());
 					if( caciModelAttrLocalList.size() == 0){
-						caciModelAttrLocal = ctxBroker.createAttribute(entityID, CtxAttributeTypes.CACI_MODEL).get();
-								LOG.info("***onModification 4 ctxBroker.createAttribute= " + caciModelAttrLocal.getId());
+						caciModelAttrLocal = ctxBroker.createAttribute(entityID, "CAUI_CACI_MODEL").get();
+								LOG.debug("***onModification 4 ctxBroker.createAttribute= " + caciModelAttrLocal.getId());
 					} else {
 						CtxAttributeIdentifier attrID = (CtxAttributeIdentifier) caciModelAttrLocalList.get(0);
 						caciModelAttrLocal = (CtxAttribute) ctxBroker.retrieveAttribute(attrID, false).get();
-								LOG.info("***onModification 5 ctxBroker.createAttribute= " + caciModelAttrLocal.getId());
+								LOG.debug("***onModification 5 ctxBroker.retrieveAttribute= " + caciModelAttrLocal.getId());
 					}
-					caciModelAttrLocal.setBinaryValue(caciModelAttrRemote.getBinaryValue());
-					ctxBroker.update(caciModelAttrLocal);
-					LOG.debug("*** model  stored in = " + caciModelAttrLocal.getId());
+					caciModelAttrRemote.getBinaryValue();
+					if(caciModelAttrRemote.getBinaryValue() != null){
+						UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(caciModelAttrRemote.getBinaryValue(), this.getClass().getClassLoader());
+						
+						byte[] binaryModel = SerialisationHelper.serialise(newUIModelData); 
+						caciModelAttrLocal.setBinaryValue(binaryModel);
+						ctxBroker.update(caciModelAttrLocal);
+						LOG.debug("*** model  stored in = " + caciModelAttrLocal.getId());
+					}
+					
+					
 
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -232,6 +243,12 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (CtxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}	
