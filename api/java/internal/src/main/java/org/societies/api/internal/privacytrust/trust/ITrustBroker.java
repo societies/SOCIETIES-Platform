@@ -27,6 +27,7 @@ package org.societies.api.internal.privacytrust.trust;
 import java.util.Set;
 import java.util.concurrent.Future;
 
+import org.societies.api.internal.privacytrust.trust.model.ExtTrustRelationship;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.model.TrustRelationship;
@@ -45,20 +46,47 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 public interface ITrustBroker extends org.societies.api.privacytrust.trust.ITrustBroker {
 	
 	/**
-	 * Retrieves all trust relationships of the specified trustor. The method
-	 * returns an <i>empty</i> set if the identified trustor has not 
-	 * established any trust relationships. 
+	 * Retrieves all trust relationships of the specified trustor. 
+	 * More specifically, the method returns all {@link TrustValueType#DIRECT
+	 * direct}, {@link TrustValueType#INDIRECT indirect}, as well as,
+	 * {@link TrustValueType#USER_PERCEIVED user-perceived} trust relationships
+	 * established by the identified <i>local</i> or <i>remote</i> CSS 
+	 * (trustor). The method returns an <i>empty</i> set if the identified 
+	 * trustor has not established any trust relationships.
 	 *
 	 * @param trustorId
 	 *            (required) the identifier of the entity whose trust
 	 *            relationships to retrieve.
 	 * @return all trust relationships of the specified trustor.
 	 * @throws TrustException if the trust relationships cannot be retrieved.
-	 * @throws NullPointerException if any of the specified parameters is 
+	 * @throws NullPointerException if any of the required parameters is 
 	 *         <code>null</code>.
 	 * @since 1.0
 	 */
 	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final TrustedEntityId trustorId) throws TrustException;
+	
+	/**
+	 * Retrieves all trust relationships of the specified trustor. Compared to
+	 * {@link #retrieveTrustRelationships(TrustedEntityId)}, the
+	 * relationships returned by this method also include the related trust 
+	 * evidence. However, the supplied trustor <i>must</i> identity the local
+	 * CSS, otherwise an exception will be thrown. The method returns an 
+	 * <i>empty</i> set if the identified trustor has not established any trust
+	 * relationships. 
+	 *
+	 * @param trustorId
+	 *            (required) the identifier of the entity whose trust
+	 *            relationships to retrieve.
+	 * @return all trust relationships of the specified trustor.
+	 * @throws TrustAccessControlException if the specified trustor identifies 
+	 *         a <i>non-local</i> CSS.
+	 * @throws TrustException if the trust relationships cannot be retrieved.
+	 * @throws NullPointerException if any of the required parameters is 
+	 *         <code>null</code>.
+	 * @since 1.1
+	 */
+	public Future<Set<ExtTrustRelationship>> retrieveExtTrustRelationships(
 			final TrustedEntityId trustorId) throws TrustException;
 	
 	/**
@@ -80,6 +108,30 @@ public interface ITrustBroker extends org.societies.api.privacytrust.trust.ITrus
 	 * @since 1.0
 	 */
 	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
+					throws TrustException;
+	
+	/**
+	 * Retrieves the trust relationships of the specified trustor with the
+	 * supplied trustee. The method returns an <i>empty</i> set if no trust
+	 * relationships exist between the identified trustor and trustee.
+	 *
+	 * @param trustorId
+	 *            (required) the identifier of the entity whose trust 
+	 *            relationships to retrieve.
+	 * @param trusteeId
+	 *            (required) the identifier of the entity trusted by the 
+	 *            specified trustor.
+	 * @return the trust relationships of the specified trustor with the 
+	 *         supplied trustee.
+	 * @throws TrustAccessControlException if the specified trustor identifies 
+	 *         a <i>non-local</i> CSS.
+	 * @throws TrustException if the trust relationships cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @since 1.1
+	 */
+	public Future<Set<ExtTrustRelationship>> retrieveExtTrustRelationships(
 			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
 					throws TrustException;
 	
@@ -108,6 +160,36 @@ public interface ITrustBroker extends org.societies.api.privacytrust.trust.ITrus
 	 * @since 1.0
 	 */
 	public Future<TrustRelationship> retrieveTrustRelationship( 
+			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final TrustValueType trustValueType) throws TrustException;
+	
+	/**
+	 * Retrieves the trust relationship of the specified type which the given
+	 * trustor has established with the supplied trustee. The method returns 
+	 * <code>null</code> if no trust relationship of the specified type has
+	 * been established with the supplied trustee by the given trustor.
+	 * 
+	 * @param trustorId
+	 *            (required) the identifier of the entity which has assigned
+	 *            the trust value to retrieve.
+	 * @param trusteeId
+	 *            (required) the identifier of the entity whose trust value to
+	 *            retrieve.
+	 * @param trustValueType
+	 *            (required) the type of the trust value, i.e. one of 
+	 *            {@link TrustValueType#DIRECT DIRECT},
+	 *            {@link TrustValueType#INDIRECT INDIRECT}, or
+	 *            {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}.
+	 * @return the trust relationship of the specified type which the given
+	 *         trustor has established with the supplied trustee.
+	 * @throws TrustAccessControlException if the specified trustor identifies 
+	 *         a <i>non-local</i> CSS.
+	 * @throws TrustException if the trust relationship cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is
+	 *         <code>null</code>.
+	 * @since 1.1
+	 */
+	public Future<ExtTrustRelationship> retrieveExtTrustRelationship( 
 			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
 			final TrustValueType trustValueType) throws TrustException;
 	
@@ -165,6 +247,32 @@ public interface ITrustBroker extends org.societies.api.privacytrust.trust.ITrus
 	
 	/**
 	 * Retrieves the trust relationships of the specified trustor matching the
+	 * supplied criteria. More specifically, the {@link TrustedEntityType type}
+	 * of the entities trusted by the trustor is also specified. The method
+	 * returns an <i>empty</i> set if no trust relationships match
+	 * the supplied criteria.
+	 *
+	 * @param trustorId
+	 *            (required) the identifier of the entity which has established
+	 *            the trust relationships to retrieve.
+	 * @param trusteeType
+	 *            (required) the {@link TrustedEntityType type} of the trusted
+	 *            entities to match, e.g. {@link TrustedEntityType#CSS CSS}.
+	 * @return the trust relationships of the specified trustor that match the
+	 *         specified criteria.
+	 * @throws TrustAccessControlException if the specified trustor identifies 
+	 *         a <i>non-local</i> CSS.
+	 * @throws TrustException if the trust relationships cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @since 1.1
+	 */
+	public Future<Set<ExtTrustRelationship>> retrieveExtTrustRelationships(
+			final TrustedEntityId trustorId, 
+			final TrustedEntityType trusteeType) throws TrustException;
+	
+	/**
+	 * Retrieves the trust relationships of the specified trustor matching the
 	 * supplied criteria. More specifically, the trust value type, i.e. one of
 	 * {@link TrustValueType#DIRECT DIRECT}, 
 	 * {@link TrustValueType#INDIRECT INDIRECT}, or
@@ -188,6 +296,36 @@ public interface ITrustBroker extends org.societies.api.privacytrust.trust.ITrus
 	 * @since 1.0
 	 */
 	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final TrustedEntityId trustorId, 
+			final TrustValueType trustValueType) throws TrustException;
+	
+	/**
+	 * Retrieves the trust relationships of the specified trustor matching the
+	 * supplied criteria. More specifically, the trust value type, i.e. one of
+	 * {@link TrustValueType#DIRECT DIRECT}, 
+	 * {@link TrustValueType#INDIRECT INDIRECT}, or
+	 * {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}, is also specified.
+	 * The method returns an <i>empty</i> set if no trust relationships match
+	 * the supplied criteria.
+	 *
+	 * @param trustorId
+	 *            (required) the identifier of the entity which has established
+	 *            the trust relationships to retrieve.
+	 * @param trustValueType
+	 *            (required) the type of the trust value, i.e. one of 
+	 *            {@link TrustValueType#DIRECT DIRECT},
+	 *            {@link TrustValueType#INDIRECT INDIRECT}, or
+	 *            {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}.
+	 * @return the trust relationships of the specified trustor that match the
+	 *         specified criteria.
+	 * @throws TrustAccessControlException if the specified trustor identifies 
+	 *         a <i>non-local</i> CSS.
+	 * @throws TrustException if the trust relationships cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @since 1.1
+	 */
+	public Future<Set<ExtTrustRelationship>> retrieveExtTrustRelationships(
 			final TrustedEntityId trustorId, 
 			final TrustValueType trustValueType) throws TrustException;
 	
@@ -220,6 +358,41 @@ public interface ITrustBroker extends org.societies.api.privacytrust.trust.ITrus
 	 * @since 1.0
 	 */
 	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final TrustedEntityId trustorId,
+			final TrustedEntityType trusteeType, 
+			final TrustValueType trustValueType) throws TrustException;
+	
+	/**
+	 * Retrieves the trust relationships of the specified trustor matching the
+	 * supplied criteria. More specifically, the {@link TrustedEntityType type}
+	 * of the entities trusted by the trustor and the trust value type, i.e. 
+	 * one of {@link TrustValueType#DIRECT DIRECT}, 
+	 * {@link TrustValueType#INDIRECT INDIRECT}, or
+	 * {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}, are also specified.
+	 * The method returns an <i>empty</i> set if no trust relationships match
+	 * the supplied criteria.
+	 *
+	 * @param trustorId
+	 *            (required) the identifier of the entity which has established
+	 *            the trust relationships to retrieve.
+	 * @param trusteeType
+	 *            (required) the {@link TrustedEntityType type} of the trusted
+	 *            entities to match, e.g. {@link TrustedEntityType#CSS CSS}.
+	 * @param trustValueType
+	 *            (required) the type of the trust value, i.e. one of 
+	 *            {@link TrustValueType#DIRECT DIRECT},
+	 *            {@link TrustValueType#INDIRECT INDIRECT}, or
+	 *            {@link TrustValueType#USER_PERCEIVED USER_PERCEIVED}.
+	 * @return the trust relationships of the specified trustor that match the
+	 *         specified criteria.
+	 * @throws TrustAccessControlException if the specified trustor identifies 
+	 *         a <i>non-local</i> CSS.
+	 * @throws TrustException if the trust relationships cannot be retrieved.
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @since 1.1
+	 */
+	public Future<Set<ExtTrustRelationship>> retrieveExtTrustRelationships(
 			final TrustedEntityId trustorId,
 			final TrustedEntityType trusteeType, 
 			final TrustValueType trustValueType) throws TrustException;

@@ -35,6 +35,7 @@ import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.identity.IdentityType;
+import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
@@ -48,9 +49,9 @@ public class Util {
 
 	public static void printPreference(IPreferenceTreeModel model){
 		System.out.println("*** Preference Details ***");
-		System.out.println("Service: "+model.getServiceID().getIdentifier());
-		System.out.println("Service Type: "+model.getServiceType());
-		System.out.println("Preference: "+model.getPreferenceName());
+		System.out.println("Service: "+model.getPreferenceDetails().getServiceID().getIdentifier());
+		System.out.println("Service Type: "+model.getPreferenceDetails().getServiceType());
+		System.out.println("Preference: "+model.getPreferenceDetails().getPreferenceName());
 		IPreference node = model.getRootPreference();
 		Enumeration<IPreference> eDepth = node.preorderEnumeration();
 		
@@ -62,9 +63,6 @@ public class Util {
 		
 
 	}
-
-
-
 	
 	private static void printNode(IPreference node, int depth){
 		
@@ -219,10 +217,11 @@ public class Util {
 		preferenceAttribute = new CtxAttribute(preferenceAttributeId);
 		
 		System.out.println(preference.toString());
-		IPreferenceTreeModel model = new PreferenceTreeModel(preference);
-		model.setPreferenceName(VOLUME);
-		model.setServiceID(serviceId);
-		model.setServiceType(Service_Type);
+		PreferenceDetails details = new PreferenceDetails();
+		details.setPreferenceName(VOLUME);
+		details.setServiceID(serviceId);
+		details.setServiceType(Service_Type);
+		IPreferenceTreeModel model = new PreferenceTreeModel(details, preference);
 		return model;
 	}
 	

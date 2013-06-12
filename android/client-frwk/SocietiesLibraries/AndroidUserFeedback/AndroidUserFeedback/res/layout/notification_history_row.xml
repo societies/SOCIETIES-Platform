@@ -1,0 +1,35 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:background="@color/Grey"
+              android:isScrollContainer="true">
+
+    <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/profile_pic"
+            android:contentDescription="@string/icon"/>
+
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical">
+
+        <TextView
+                android:id="@+id/nhPropText"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="[PROPOSAL TEXT]"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/Black"/>
+        <TextView
+                android:id="@+id/nhPropDate"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="[RECEIVED DATE]"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/Lt_Grey"/>
+    </LinearLayout>
+
+</LinearLayout>

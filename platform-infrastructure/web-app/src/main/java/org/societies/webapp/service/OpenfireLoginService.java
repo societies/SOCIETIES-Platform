@@ -35,7 +35,7 @@ public class OpenfireLoginService implements Serializable {
         ENABLE,
         DISABLE,
         UPDATE,
-        LOGIN;
+        LOGIN
     }
 
     private static final String OPENFIRE_PLUGIN = "http://%s:9090/plugins/societies/societies";
@@ -56,6 +56,7 @@ public class OpenfireLoginService implements Serializable {
         return commManager;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public void setCommManager(ICommManager commManager) {
         log.trace("setCommManager() has been called with " + commManager);
         this.commManager = commManager;
@@ -124,22 +125,14 @@ public class OpenfireLoginService implements Serializable {
         log.info("Logged on succesffuly");
 
 
-        // 		GET SERVER/PORT NUMBER FROM REGISTRY
-        //String redirectUrl = new String();
-        //redirectUrl = String.format("http://%s:%s/societies/%s/loginviada.html", userRecord.getHost(), userRecord.getPort(), userRecord.getId());
-        //model.put("webappurl", redirectUrl);
-        //model.put("name", userName);
-        //return new ModelAndView("loginsuccess", model);
-        log.info("Got user lloged on");
         return "logged";
-
     }
 
     private static String postData(MethodType method, String openfireUrl, Map<String, String> params) {
         try {
-            StringBuffer data = new StringBuffer();
+            StringBuilder data = new StringBuilder();
             for (String s : params.keySet()) {
-                String tmp = URLEncoder.encode(s, "UTF-8") + "=" + URLEncoder.encode((String) params.get(s), "UTF-8") + "&";
+                String tmp = URLEncoder.encode(s, "UTF-8") + "=" + URLEncoder.encode(params.get(s), "UTF-8") + "&";
                 data.append(tmp);
             }
             //ADD METHOD
@@ -156,7 +149,7 @@ public class OpenfireLoginService implements Serializable {
 
             // Get the response
             BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             String line;
             while ((line = rd.readLine()) != null) {
                 sb.append(line);
@@ -175,7 +168,7 @@ public class OpenfireLoginService implements Serializable {
         return "";
     }
 
-    private Document loadXMLFromString(String xml) throws Exception {
+    private static Document loadXMLFromString(String xml) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         InputSource is = new InputSource(new StringReader(xml));

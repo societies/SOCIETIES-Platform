@@ -24,16 +24,14 @@
  */
 package org.societies.android.platform.useragent.feedback.guis;
 
-import org.societies.android.platform.useragent.feedback.R;
-
 import android.app.Notification;
 import android.app.Notification.Builder;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import org.societies.android.platform.useragent.feedback.R;
 
 /**
  * @author Eliza
@@ -42,7 +40,7 @@ import android.util.Log;
 @Deprecated
 public class UserFeedbackNotification {
 
-	private static final String LOG_CAT = UserFeedbackNotification.class.getName();
+	private static final String LOG_CAT = UserFeedbackNotification.class.getCanonicalName();
 	private Context context;
 
 	public UserFeedbackNotification(Context context) {

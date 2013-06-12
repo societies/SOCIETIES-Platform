@@ -74,6 +74,13 @@ public class CtxAssociationTypes extends
 	public static final String HAS_PROXIMITY_HISTORY = "hasProximityHistory";
 	
 	/**
+	 * Directed context association
+	 *  
+	 * @since 0.0.8
+	 */
+	public static final String HAS_SERVICE_PRIVACY_POLICIES = "hasServicePrivacyPolicies";
+	
+	/**
 	 * Directed context association between a {@link CtxEntityTypes#CONTEXT_SOURCE
 	 * CONTEXT_SOURCE} entity and the context entity it provides updates for.
 	 *  

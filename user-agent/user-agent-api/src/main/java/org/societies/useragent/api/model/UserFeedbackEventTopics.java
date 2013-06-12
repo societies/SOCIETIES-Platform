@@ -37,4 +37,7 @@ public final class UserFeedbackEventTopics {
 	
 	/** UserFeedback implicit response event */
 	public static final String IMPLICIT_RESPONSE = BASE_TOPIC + "IMPLICIT_RESPONSE";
+
+    /** UserFeedback implicit response event */
+	public static final String COMPLETE = BASE_TOPIC + "COMPLETE";
 }

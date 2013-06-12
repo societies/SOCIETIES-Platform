@@ -29,11 +29,11 @@ import java.io.Serializable;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 
 /**
- * This abstract class is used to represent an entity trusted by the trustor,
- * i.e. the owner of a CSS. Each trusted entity is referenced by its
- * {@link TrustedEntityId}, while the associated {@link Trust} objects express
- * the trustworthiness of that entity, i.e. direct, indirect and user-perceived
- * trust.
+ * This class is used to represent an entity trusted by the trustor,
+ * i.e. the owner of a CSS. Each trusted entity is associated with the
+ * {@link TrustedEntityId} of the referenced trustor and trustee, while the
+ * {@link Trust} objects express the trustworthiness of that particular
+ * trustee, i.e. direct, indirect and user-perceived trust.
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 1.1 
@@ -56,6 +56,8 @@ public class TrustedEntity implements Serializable {
 	
 	/** The user-perceived trust in this entity. */
 	private final Trust userPerceivedTrust = new Trust();
+	
+	private Integer rating = 0;
 	
 	/**
 	 * Constructs a <code>TrustedEntity</code> with the specified trustor and 
@@ -93,6 +95,16 @@ public class TrustedEntity implements Serializable {
 	public Trust getUserPerceivedTrust() {
 		
 		return this.userPerceivedTrust;
+	}
+	
+	public Integer getRating() {
+		
+		return this.rating;
+	}
+	
+	public void setRating(Integer rating) {
+		
+		this.rating = rating;
 	}
 
 	/*

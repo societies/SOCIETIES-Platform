@@ -1698,7 +1698,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			CtxEntityIdentifier entityId, CtxModelType modelType, String type)
 					throws CtxException {
 
-		//TODO access control aplies?
+		
 		if(requestor == null) requestor = getLocalRequestor();
 
 		if (entityId == null)
@@ -1716,16 +1716,17 @@ public class InternalCtxBroker implements ICtxBroker {
 					+ "' under entity " + entityId);
 
 		final List<CtxIdentifier> result = new ArrayList<CtxIdentifier>();
-		final CtxEntity entity;
+		//final CtxEntity entity;
 		try {
 			final IIdentity targetId = this.commMgr.getIdManager().fromJid(entityId.getOwnerId());
+			
+			List<CtxIdentifier> listResults = this.lookup(requestor, targetId, modelType, type).get();
+		    result.addAll(listResults);
+			/*
 			if (IdentityType.CIS.equals(targetId.getType()))
 				entity = (CtxEntity) this.communityCtxDBMgr.retrieve(entityId);
 			else
 				entity = (CtxEntity) this.userCtxDBMgr.retrieve(entityId);
-
-			// TODO check local or remote
-			// TODO if local then CtxDBMgr should provide the method - temp hack follows
 
 			if (CtxModelType.ATTRIBUTE.equals(modelType)) {
 				final Set<CtxAttribute> attrs = entity.getAttributes(type);
@@ -1738,6 +1739,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				for (final CtxAssociationIdentifier assocId : assocIds)
 					result.add(assocId);
 			}
+			*/
 		} catch (Exception e) {
 
 			throw new CtxBrokerException("Could not look up context " + modelType
@@ -1835,8 +1837,41 @@ public class InternalCtxBroker implements ICtxBroker {
 			// community context
 		}else if (IdentityType.CIS.equals(target.getType())){
 
-			localCtxIdListResult = this.communityCtxDBMgr.lookupCommunityCtxEntity(type);
+			if (this.isLocalCisId(target)){
+				//localCtxIdListResult = this.communityCtxDBMgr.lookupCommunityCtxEntity(type);	
+				localCtxIdListResult = this.communityCtxDBMgr.lookup(modelType, type);
+				
+				return new AsyncResult<List<CtxIdentifier>>(localCtxIdListResult);
+				
+			} else {
+			
+				final LookupCallback callbackCIS = new LookupCallback();
+				
+				ctxBrokerClient.lookup(requestor, target, modelType, type, callbackCIS);
+				
+				synchronized (callbackCIS) {
 
+					try {
+						callbackCIS.wait();
+						remoteCtxIdListResult = callbackCIS.getResult();
+
+					} catch (InterruptedException e) {
+
+						throw new CtxBrokerException("Interrupted while waiting for remote createEntity");
+					}
+				}
+				
+				return new AsyncResult<List<CtxIdentifier>>(remoteCtxIdListResult);
+			}
+			
+			
+			
+			/*
+			LOG.debug(" retrieving community attributes:: " + modelType +" .. "+type);
+			
+			localCtxIdListResult = this.communityCtxDBMgr.lookup(modelType, type);
+			LOG.debug(" retrieving community attributes results :: "+ localCtxIdListResult);
+*/
 		} else throw new CtxBrokerException("objects identifier does not correspond to a CSS or a CIS");
 
 		return new AsyncResult<List<CtxIdentifier>>(localCtxIdListResult);
@@ -2768,8 +2803,33 @@ public class InternalCtxBroker implements ICtxBroker {
 			// community context
 		}else if (IdentityType.CIS.equals(targetCSS.getType())){
 
+			if (this.isLocalCisId(targetCSS)){
+				
+				localCtxIdListResult = this.communityCtxDBMgr.lookupCommunityCtxEntity(type);	
+				
+				return new AsyncResult<List<CtxIdentifier>>(localCtxIdListResult);
+				
+			} else {
+				final LookupCallback callbackCIS = new LookupCallback();
+				
+				CtxModelType modelType = null;
+				ctxBrokerClient.lookup(requestor, targetCSS, modelType, type, callbackCIS);
+				
+				
+				synchronized (callbackCIS) {
 
-			localCtxIdListResult = this.communityCtxDBMgr.lookupCommunityCtxEntity(type);
+					try {
+						callbackCIS.wait();
+						remoteCtxIdListResult = callbackCIS.getResult();
+
+					} catch (InterruptedException e) {
+
+						throw new CtxBrokerException("Interrupted while waiting for remote createEntity");
+					}
+				}
+				
+				return new AsyncResult<List<CtxIdentifier>>(remoteCtxIdListResult);
+			}			
 
 			//LOG.info("skata 3 this.communityCtxDBMgr.lookup(modelType, type);: "+this.communityCtxDBMgr.lookup(modelType, type));
 

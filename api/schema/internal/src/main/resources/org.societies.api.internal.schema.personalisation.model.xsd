@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0"
+targetNamespace="http://societies.org/api/internal/schema/personalisation/model" 
+xmlns="http://societies.org/api/internal/schema/personalisation/model"
+	xmlns:tns="http://societies.org/api/schema/servicelifecycle/model"
+	xmlns:tns1="http://societies.org/api/schema/context/model"
+	xmlns:tns2="http://societies.org/api/schema/personalisation/model"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:import namespace="http://societies.org/api/schema/servicelifecycle/model"
+		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.servicelifecycle.model.xsd" />
+	
+	<xs:import namespace="http://societies.org/api/schema/personalisation/model"
+		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.personalisation.model.xsd" />
+	
+	<xs:import namespace="http://societies.org/api/schema/context/model"
+		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.context.model.xsd" />
+
+	<xs:complexType name="ContextPreferenceConditionBean">
+		<xs:sequence>
+			<xs:element name="ctxIdentifier" type="tns1:ctxIdentifierBean" minOccurs="1" maxOccurs="1" nillable="false" />
+			<xs:element name="operator" type="OperatorConstantsBean" minOccurs="1" maxOccurs="1" nillable="false"/>
+			<xs:element name="value" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false" />
+			<xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false" />
+			<xs:element name="type" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="PreferenceTreeNodeBean">
+		<xs:sequence>
+			<xs:element name="condition" type="ContextPreferenceConditionBean" minOccurs="0" maxOccurs="1" />
+			<xs:element name="outcome" type="tns2:ActionBean" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="children" type="PreferenceTreeNodeBean" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="PreferenceTreeModelBean">
+		<xs:sequence>
+			<xs:element name="preference" type="PreferenceTreeNodeBean"/>
+			<xs:element name="preferenceDetails" type="PreferenceDetailsBean" /> 
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:simpleType name="OperatorConstantsBean">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="equals" />
+			<xs:enumeration value="greater_than" />
+			<xs:enumeration value="greater_or_equal_than" />
+			<xs:enumeration value="less_than" />
+			<xs:enumeration value="less_or_equal_than" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:complexType name="PreferenceDetailsBean">
+		<xs:sequence>
+			<xs:element name="preferenceName" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1" />
+			<xs:element name="serviceID" type="tns:serviceResourceIdentifier"></xs:element>
+			<xs:element name="serviceType" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

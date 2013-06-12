@@ -29,6 +29,18 @@
 	<!-- List dependencies  -->
 	<dependencies>
 		<dependency>
+	    	<groupId>com.google.android</groupId>
+	        <artifactId>android</artifactId> 
+	        <version>4.1.1.4</version>
+	        <scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.schema</groupId>
+			<artifactId>societies-api-schema</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<scope>provided</scope>

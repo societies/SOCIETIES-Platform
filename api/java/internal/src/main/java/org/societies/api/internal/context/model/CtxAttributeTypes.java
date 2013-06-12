@@ -97,6 +97,7 @@ org.societies.api.context.model.CtxAttributeTypes {
 	 */
 	public static final String D_NET = "dNet";
 
+	
 	/**
 	 * 
 	 */
@@ -106,7 +107,12 @@ org.societies.api.context.model.CtxAttributeTypes {
 	 *
 	 */
 	public static final String PRIVACY_POLICY_REGISTRY = "privacyPolicyRegistry";
-
+	
+	/**
+	 *
+	 */
+	public static final String PRIVACY_POLICY = "privacyPolicy";
+	
 	/**
 	 * @since 0.0.8
 	 */
@@ -122,6 +128,9 @@ org.societies.api.context.model.CtxAttributeTypes {
 	 */
 	public static final String UID = "uid";
 	
+	
+	
+	 
 	/**
 	 * @since 0.0.8
 	 */

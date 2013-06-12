@@ -84,7 +84,9 @@
 
         </div>
 
-        <ui:include src="/includes/notifications.xhtml"/>
+        <ui:fragment rendered="#{loginController.loggedIn and noNotificationPopup ne 'true'}">
+            <ui:include src="/includes/notifications.xhtml"/>
+        </ui:fragment>
 
         <ui:insert name="dialogs">
         </ui:insert>

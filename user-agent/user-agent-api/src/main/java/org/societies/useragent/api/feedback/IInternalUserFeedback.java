@@ -25,16 +25,24 @@
 
 package org.societies.useragent.api.feedback;
 
-import java.util.List;
-import java.util.concurrent.Future;
-
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
+import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
+
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Future;
 
 public interface IInternalUserFeedback {
 	
 	public Future<List<String>> getExplicitFBforRemote(int type, ExpProposalContent content);
 	
 	public Future<Boolean> getImplicitFBforRemote(int type, ImpProposalContent content);
+
+    List<UserFeedbackBean> listStoredFeedbackBeans(int howMany);
+
+    List<UserFeedbackBean> listStoredFeedbackBeans(Date sinceWhen);
+
+    List<UserFeedbackBean> listIncompleteFeedbackBeans();
 
 }

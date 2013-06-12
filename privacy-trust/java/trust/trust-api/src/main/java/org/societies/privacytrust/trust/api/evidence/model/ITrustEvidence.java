@@ -44,31 +44,41 @@ public interface ITrustEvidence extends Serializable, Comparable<ITrustEvidence>
 	 * @since 0.5
 	 */
 	public TrustedEntityId getSubjectId();
-	
+
 	/**
 	 * 
 	 * @return
 	 * @since 0.5
 	 */
 	public TrustedEntityId getObjectId();
-	
+
 	/**
 	 * 
 	 * @return
 	 * @since 0.3
 	 */
 	public TrustEvidenceType getType();
-	
+
 	/**
 	 * 
 	 * @return
 	 */
 	public Date getTimestamp();
-	
+
 	/**
 	 * 
 	 * @return
 	 * @since 0.3
 	 */
 	public Serializable getInfo();
+	
+	/**
+	 * Returns the {@link TrustedEntityId} of the source this piece of
+	 * trust evidence originates from.
+	 * 
+	 * @return the {@link TrustedEntityId} of the source this piece of
+	 *         trust evidence originates from.
+	 * @since 1.1
+	 */
+	public TrustedEntityId getSourceId();
 }

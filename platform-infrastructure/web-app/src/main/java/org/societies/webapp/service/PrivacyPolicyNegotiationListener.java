@@ -11,6 +11,7 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Respons
 import org.societies.webapp.ILoginListener;
 import org.societies.webapp.controller.BasePageController;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -138,6 +139,18 @@ public class PrivacyPolicyNegotiationListener extends BasePageController {
 
     public PrivacyPolicyNegotiationListener() {
         log.debug("PrivacyPolicyNegotiationListener ctor()");
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        // NB: Generally you DON'T want to use this method to set up your class - you want to use the LoginListener
+        // - This method is called whenever the bean is created at the start of the session, while the login listener
+        // - is called when the user actually logs in and an identity is available
+
+        // call this in case we're set up after the user has logged in
+        if (userService.isUserLoggedIn()) {
+            loginListener.userLoggedIn();
+        }
     }
 
     public PubsubClient getPubsubClient() {

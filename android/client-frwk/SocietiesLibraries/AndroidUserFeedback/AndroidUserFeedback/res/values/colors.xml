@@ -2,5 +2,6 @@
 <resources>
  <color name="Blue">#0c517e</color>
  <color name="Grey">#fff</color>
+ <color name="Lt_Grey">#aaa</color>
  <color name="Black">#000000</color>
 </resources>

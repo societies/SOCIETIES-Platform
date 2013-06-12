@@ -20,7 +20,11 @@
 	<osgi:reference id="ctxBroker"
 		interface="org.societies.api.context.broker.ICtxBroker">
 	</osgi:reference>
-
+	
+	<osgi:reference id="internalCtxBroker"
+		interface="org.societies.api.internal.context.broker.ICtxBroker">
+	</osgi:reference>
+	
 	<osgi:reference id="commManager"
 		interface="org.societies.api.comm.xmpp.interfaces.ICommManager">
 	</osgi:reference>

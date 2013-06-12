@@ -1,58 +1,85 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.societies.android.platform.useragent.feedback"
-    android:versionCode="1"
-    android:versionName="1.0" >
+          package="org.societies.android.platform.useragent.feedback"
+          android:versionCode="1"
+          android:versionName="1.0">
 
     <uses-sdk
-        android:minSdkVersion="11"
-        android:targetSdkVersion="11" />
+            android:minSdkVersion="11"
+            android:targetSdkVersion="11"/>
 
     <application
-        android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name" >
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/app_name">
+
         <activity
-            android:name="org.societies.android.platform.useragent.feedback.guis.AcknackPopup"
-            android:label="@string/societies_Notifications" >
+                android:name="org.societies.android.platform.useragent.feedback.guis.AcknackPopup"
+                android:label="@string/societies_Notifications">
             <intent-filter>
-                <action android:name="org.societies.android.platform.useragent.feedback.guis.AcknackPopup" />
+                <action android:name="org.societies.android.platform.useragent.feedback.guis.AcknackPopup"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
 
-        <service android:name=".UserFeedbackLocal" >
+        <activity
+                android:name="org.societies.android.platform.useragent.feedback.guis.RadioPopup"
+                android:label="@string/societies_Notifications">
+            <intent-filter>
+                <action android:name="org.societies.android.platform.useragent.feedback.guis.RadioPopup"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+                android:name="org.societies.android.platform.useragent.feedback.guis.CheckboxPopup"
+                android:label="@string/societies_Notifications">
+            <intent-filter>
+                <action android:name="org.societies.android.platform.useragent.feedback.guis.CheckboxPopup"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+                android:name="org.societies.android.platform.useragent.feedback.guis.SimpleNotificationPopup"
+                android:label="@string/societies_Notifications">
+            <intent-filter>
+                <action android:name="org.societies.android.platform.useragent.feedback.guis.SimpleNotificationPopup"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+                android:name="org.societies.android.platform.useragent.feedback.guis.TimedAbortPopup"
+                android:label="@string/societies_Notifications">
+            <intent-filter>
+                <action android:name="org.societies.android.platform.useragent.feedback.guis.TimedAbortPopup"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+
+        <service android:name=".UserFeedbackLocal">
         </service>
 
-        <activity
-            android:name=".NegotiationActivity"
-            android:label="@string/title_activity_negotiation" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".guis.RadioPopup"
-            android:label="@string/title_activity_radio_popup" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".guis.CheckboxPopup"
-            android:label="@string/title_activity_checkbox_popup" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>
