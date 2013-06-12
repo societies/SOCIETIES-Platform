@@ -44,6 +44,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
 import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.TrustQuery;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
@@ -109,7 +110,7 @@ public class TestByTrustor {
 		this.listener = new MyTrustUpdateEventListener();
 		try {
 			this.internalTrustBroker.registerTrustUpdateListener(
-					this.listener, this.myTeid);
+					this.listener, new TrustQuery(this.myTeid));
 		} catch (TrustException te) {
 			fail("Failed to register TrustUpdateEvent listener: "
 					+ te.getLocalizedMessage());
@@ -121,7 +122,7 @@ public class TestByTrustor {
 		
 		try {
 			this.internalTrustBroker.unregisterTrustUpdateListener(
-					this.listener, this.myTeid);
+					this.listener, new TrustQuery(this.myTeid));
 		} catch (TrustException te) {
 			fail("Failed to unregister TrustUpdateEvent listener: "
 					+ te.getLocalizedMessage());
@@ -178,7 +179,8 @@ public class TestByTrustor {
 							&& TrustValueType.DIRECT == event.getTrustRelationship().getTrustValueType()) {
 				
 						trustValue = this.internalTrustBroker.retrieveTrustValue(
-								this.myTeid, this.teid1, TrustValueType.DIRECT).get();
+								new TrustQuery(this.myTeid).setTrusteeId(this.teid1)
+								.setTrustValueType(TrustValueType.DIRECT)).get();
 						assertEquals("Received new trust value was incorrect", trustValue, 
 								event.getTrustRelationship().getTrustValue());
 						assertNotNull("Received timestamp was null", 
@@ -190,7 +192,8 @@ public class TestByTrustor {
 							&& TrustValueType.USER_PERCEIVED == event.getTrustRelationship().getTrustValueType()) {
 				
 						trustValue = this.internalTrustBroker.retrieveTrustValue(
-								this.myTeid, this.teid1, TrustValueType.USER_PERCEIVED).get();
+								new TrustQuery(this.myTeid).setTrusteeId(this.teid1)
+								.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 						assertEquals("Received new trust value was incorrect", trustValue, 
 								event.getTrustRelationship().getTrustValue());
 						assertNotNull("Received timestamp was null", 
@@ -202,7 +205,8 @@ public class TestByTrustor {
 							&& TrustValueType.DIRECT == event.getTrustRelationship().getTrustValueType()) {
 				
 						trustValue = this.internalTrustBroker.retrieveTrustValue(
-								this.myTeid, this.teid2, TrustValueType.DIRECT).get();
+								new TrustQuery(this.myTeid).setTrusteeId(this.teid2)
+								.setTrustValueType(TrustValueType.DIRECT)).get();
 						assertEquals("Received new trust value was incorrect", trustValue, 
 								event.getTrustRelationship().getTrustValue());
 						assertNotNull("Received timestamp was null", 
@@ -214,7 +218,8 @@ public class TestByTrustor {
 							&& TrustValueType.USER_PERCEIVED == event.getTrustRelationship().getTrustValueType()) {
 				
 						trustValue = this.internalTrustBroker.retrieveTrustValue(
-								this.myTeid, this.teid2, TrustValueType.USER_PERCEIVED).get();
+								new TrustQuery(this.myTeid).setTrusteeId(this.teid2)
+								.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 						assertEquals("Received new trust value was incorrect", trustValue, 
 								event.getTrustRelationship().getTrustValue());
 						assertNotNull("Received timestamp was null", 

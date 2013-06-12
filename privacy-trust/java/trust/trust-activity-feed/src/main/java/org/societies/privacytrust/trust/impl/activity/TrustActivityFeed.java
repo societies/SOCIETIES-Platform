@@ -32,6 +32,7 @@ import org.societies.api.activity.IActivityFeedManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
+import org.societies.api.privacytrust.trust.TrustQuery;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
 import org.societies.api.privacytrust.trust.model.TrustValueType;
@@ -78,8 +79,8 @@ public class TrustActivityFeed implements ITrustUpdateEventListener {
 			final TrustedEntityId cssTeid = TrustedEntityIdFactory.fromIIdentity(cssOwnerId);
 			if (LOG.isInfoEnabled())
 				LOG.info("Registering for updates of user-preceived trust");
-			trustBroker.registerTrustUpdateListener(this, cssTeid,
-					TrustValueType.USER_PERCEIVED);
+			trustBroker.registerTrustUpdateListener(this, new TrustQuery(cssTeid)
+					.setTrustValueType(TrustValueType.USER_PERCEIVED));
 			
 		} catch (Exception e) {
 
