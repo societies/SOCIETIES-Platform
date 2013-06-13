@@ -70,9 +70,13 @@
 	
 	<!-- Rafik's Declarations end -->
 	
+	<!-- Trust declarations start -->
 	
-	
-	
+	<bean name="trustPerformanceTest" class="org.societies.integration.performance.test.upper_tester.trust.TrustPerformanceTest">
+  		<property name="commManager" ref="commManager"/>
+  	</bean>
+  	
+	<!-- Trust declarations end -->
 	
 	
 	
