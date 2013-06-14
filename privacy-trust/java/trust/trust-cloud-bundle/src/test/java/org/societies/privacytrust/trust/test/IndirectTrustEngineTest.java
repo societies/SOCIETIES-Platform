@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -52,6 +53,7 @@ import org.societies.privacytrust.trust.api.engine.IIndirectTrustEngine;
 import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
+import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -350,5 +352,69 @@ public class IndirectTrustEngineTest {
 		// verify similarity with CSS2 is lower than that with CSS
 		similarityCss2 = ((ITrustedCss) this.trustRepo.retrieveEntity(myCssTeid, trusteeCssTeid2)).getSimilarity();
 		assertTrue(similarityCss.compareTo(similarityCss2) > 0);*/
+		
+		// clean trust repo
+		// this.trustRepo.remove
+		this.trustEvidenceRepo.removeEvidence(null, null, null, null, null, null);
+	}
+	
+	@Test
+	public void testRelevantEvidence() throws Exception {
+		
+		// add trust opinion CSS -> CSS2
+		final TrustedEntityId trusteeCssTeid = trusteeCssTeidList.get(0);
+		final TrustedEntityId trusteeCssTeid2 = trusteeCssTeidList.get(1);
+		ITrustEvidence evidence = this.trustEvidenceRepo.addEvidence(
+				trusteeCssTeid, trusteeCssTeid2, TrustEvidenceType.DIRECTLY_TRUSTED,
+				new Date(), new Double(0.75), trusteeCssTeid);
+		Set<ITrustedEntity> entities = this.engine.evaluate(myCssTeid, evidence);
+		// verify evidence is relevant
+		assertNotNull(entities);
+		assertFalse(entities.isEmpty());
+		assertEquals(1, entities.size());
+		assertNotNull(entities.iterator().next().getIndirectTrust().getValue());
+		ITrustedCss trusteeCss = (ITrustedCss) 
+				this.trustRepo.retrieveEntity(myCssTeid, trusteeCssTeid2);
+		assertNotNull(trusteeCss);
+		
+		// add trust opinion CSS -> CSS
+		evidence = this.trustEvidenceRepo.addEvidence(
+				trusteeCssTeid, trusteeCssTeid, TrustEvidenceType.DIRECTLY_TRUSTED,
+				new Date(), new Double(0.75), trusteeCssTeid);
+		entities = this.engine.evaluate(myCssTeid, evidence);
+		// verify evidence is ignored
+		assertNotNull(entities);
+		assertTrue(entities.isEmpty());
+		
+		// add trust opinion myCSS -> myCSS
+		evidence = this.trustEvidenceRepo.addEvidence(
+				myCssTeid, myCssTeid, TrustEvidenceType.DIRECTLY_TRUSTED,
+				new Date(), new Double(0.75), trusteeCssTeid);
+		entities = this.engine.evaluate(myCssTeid, evidence);
+		// verify evidence is ignored
+		assertNotNull(entities);
+		assertTrue(entities.isEmpty());
+		
+		// add trust opinion myCSS -> CSS
+		evidence = this.trustEvidenceRepo.addEvidence(
+				myCssTeid, trusteeCssTeid, TrustEvidenceType.DIRECTLY_TRUSTED,
+				new Date(), new Double(0.75), myCssTeid);
+		entities = this.engine.evaluate(myCssTeid, evidence);
+		// verify evidence is ignored
+		assertNotNull(entities);
+		assertTrue(entities.isEmpty());
+		
+		// add trust opinion CSS -> myCSS
+		evidence = this.trustEvidenceRepo.addEvidence(
+				trusteeCssTeid, myCssTeid, TrustEvidenceType.DIRECTLY_TRUSTED,
+				new Date(), new Double(0.75), trusteeCssTeid);
+		entities = this.engine.evaluate(myCssTeid, evidence);
+		// verify evidence is ignored
+		assertNotNull(entities);
+		assertTrue(entities.isEmpty());
+		
+		// clean trust repo
+		this.trustRepo.removeEntity(myCssTeid, trusteeCssTeid2);
+		this.trustEvidenceRepo.removeEvidence(null, null, null, null, null, null);
 	}
 }
