@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.UserPreferenceManagement.impl.monitoring;
+package org.societies.personalisation.UserPreferenceManagement.impl.cis;
 
 
 import java.net.URISyntaxException;
@@ -52,8 +52,10 @@ import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.UserPreferenceManagement;
+import org.societies.personalisation.UserPreferenceManagement.impl.cis.DownloadFeedbackListenerCallBack.FeedbackType;
 import org.societies.personalisation.UserPreferenceManagement.impl.merging.PreferenceMerger;
-import org.societies.personalisation.UserPreferenceManagement.impl.monitoring.DownloadFeedbackListenerCallBack.FeedbackType;
+import org.societies.personalisation.UserPreferenceManagement.impl.monitoring.PersonalisationConstants;
+import org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor;
 import org.societies.personalisation.preference.api.CommunityPreferenceManagement.ICommunityPreferenceManager;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
@@ -90,7 +92,7 @@ public class CommunitiesHandler {
 		this.userPrefMgr = pcm.getPreferenceManager();
 		this.userFeedback = pcm.getUserFeedbackMgr();
 
-		idManager = commsMgr.getIdManager();
+		setIdManager(commsMgr.getIdManager());
 
 		this.downloadTempTable = new Hashtable<String, PreferenceDetails>();
 		this.uploadTempTable = new Hashtable<String, PreferenceDetails>();
@@ -98,6 +100,23 @@ public class CommunitiesHandler {
 
 	}
 
+	public DownloaderTask scheduleDownload(Date date){
+		Timer downloadTimer = new Timer();
+		DownloaderTask downloadTimerTask = new DownloaderTask();
+		downloadTimerTask.setDone(false);
+		downloadTimer.schedule(downloadTimerTask, date);
+		return downloadTimerTask;
+		
+
+	}
+	
+	public UploaderTask scheduleUpload(Date date){
+		Timer uploadTimer = new Timer();
+		UploaderTask uploadTimerTask = new UploaderTask();
+		uploadTimerTask.setDone(false);
+		uploadTimer.schedule(uploadTimerTask, date);
+		return uploadTimerTask;
+	}
 	public void scheduleTasks(){
 		Timer downloadTimer = new Timer();
 		Calendar downloaderCalendar = Calendar.getInstance();
@@ -108,12 +127,14 @@ public class CommunitiesHandler {
 
 		//System.out.println(calendar.getTime().toString());
 
-		TimerTask downloadTimerTask = new DownloaderTask();
+		DownloaderTask downloadTimerTask = new DownloaderTask();
+		downloadTimerTask.setDone(false);
 		downloadTimer.schedule(downloadTimerTask, downloaderCalendar.getTime());
 
 
 		Timer uploadTimer = new Timer();
 
+		
 		Calendar uploadCalendar = Calendar.getInstance();
 
 		uploadCalendar.set(Calendar.HOUR, 23);
@@ -121,19 +142,25 @@ public class CommunitiesHandler {
 		uploadCalendar.set(Calendar.SECOND, 59);
 
 
-		TimerTask uploadTimerTask = new UploaderTask();
+		UploaderTask uploadTimerTask = new UploaderTask();
+		uploadTimerTask.setDone(false);
 		uploadTimer.schedule(uploadTimerTask, uploadCalendar.getTime());
 	}
-	private class UploaderTask extends TimerTask{
+	
+	
+	public class UploaderTask extends TimerTask{
+
+		private boolean done = false;
 
 		@Override
 		public void run() {
-			IIdentity userId = idManager.getThisNetworkNode();
+			
+			IIdentity userId = getIdManager().getThisNetworkNode();
 			List<ICis> cisList = cisManager.getCisList();
 			for (ICis cis: cisList){
 				try {
 
-					IIdentity cisId = idManager.fromJid(cis.getCisId());
+					IIdentity cisId = getIdManager().fromJid(cis.getCisId());
 					List<Service> services = serviceDiscovery.getServices(cisId).get();
 
 					List<PreferenceDetails> matchingDetails = findRelevantPreferences(services, userPrefMgr.getPreferenceDetailsForAllPreferences());
@@ -141,7 +168,7 @@ public class CommunitiesHandler {
 					List<PreferenceDetails> toBeChecked = new ArrayList<PreferenceDetails>();
 					for (PreferenceDetails prefDetail : matchingDetails){
 
-						PreferenceDetails communityPreferenceManagerDetails = PreferenceUtils.getCommunityPreferenceManagerDetails(idManager, prefDetail.getServiceID(), PersonalisationConstants.UPLOAD);
+						PreferenceDetails communityPreferenceManagerDetails = PreferenceUtils.getCommunityPreferenceManagerDetails(getIdManager(), prefDetail.getServiceID(), PersonalisationConstants.UPLOAD);
 
 
 						IPreferenceOutcome preference = pcm.getPreferenceManager().getPreference(userId, communityPreferenceManagerDetails.getServiceType(), communityPreferenceManagerDetails.getServiceID(), communityPreferenceManagerDetails.getPreferenceName());
@@ -168,8 +195,10 @@ public class CommunitiesHandler {
 
 					String[] userFriendlyListofDetails = getUserFriendlyListofDetails(toBeChecked, FeedbackType.UPLOAD);
 
+					
 					userFeedback.getExplicitFBAsync(ExpProposalType.CHECKBOXLIST, new ExpProposalContent("Please select which of these preferences you want to upload to the CIS anonymously", userFriendlyListofDetails), new DownloadFeedbackListenerCallBack(uploadTempTable, pcm, FeedbackType.UPLOAD)).get();
 
+					
 				} catch (InvalidFormatException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -187,20 +216,33 @@ public class CommunitiesHandler {
 					e.printStackTrace();
 				}
 			}
+			
+			this.setDone(true);
+		}
 
+		public boolean isDone() {
+			return done;
+		}
+
+		public void setDone(boolean done) {
+			this.done = done;
 		}
 
 	}
 
-	private class DownloaderTask extends TimerTask{
+	public class DownloaderTask extends TimerTask{
 
+
+		private boolean done = false;
+		
+		
 		@Override
 		public void run() {
 			List<ICis> cisList = cisManager.getCisList();
 			for (ICis cis: cisList){
 				try {
-					IIdentity cisId = idManager.fromJid(cis.getCisId());
-					IIdentity userId = idManager.getThisNetworkNode();
+					IIdentity cisId = getIdManager().fromJid(cis.getCisId());
+					IIdentity userId = getIdManager().getThisNetworkNode();
 					List<PreferenceDetails> communityPreferenceDetails = communityPrefMgr.getCommunityPreferenceDetails(cisId);
 					List<PreferenceDetails> listofPreferencesToDownload = new ArrayList<PreferenceDetails>();
 
@@ -209,8 +251,8 @@ public class CommunitiesHandler {
 
 					for (PreferenceDetails details : communityPreferenceDetails){
 
-						PreferenceDetails managerDetails = PreferenceUtils.getCommunityPreferenceManagerDetails(idManager, details.getServiceID(), PersonalisationConstants.DOWNLOAD);
-						IPreferenceOutcome preference = CommunitiesHandler.this.userPrefMgr.getPreference(idManager.getThisNetworkNode(), managerDetails.getServiceType(), managerDetails.getServiceID(), managerDetails.getPreferenceName());
+						PreferenceDetails managerDetails = PreferenceUtils.getCommunityPreferenceManagerDetails(getIdManager(), details.getServiceID(), PersonalisationConstants.DOWNLOAD);
+						IPreferenceOutcome preference = CommunitiesHandler.this.userPrefMgr.getPreference(getIdManager().getThisNetworkNode(), managerDetails.getServiceType(), managerDetails.getServiceID(), managerDetails.getPreferenceName());
 						if (preference!=null){
 							if (preference.getvalue().matches(PersonalisationConstants.YES)){
 								listofPreferencesToDownload.add(details);
@@ -231,20 +273,26 @@ public class CommunitiesHandler {
 
 						if (model==null){
 							userPrefMgr.storePreference(userId, communityModel.getPreferenceDetails(), communityModel.getRootPreference());
+							pcm.processPreferenceChanged(userId, communityModel.getPreferenceDetails().getServiceID(), communityModel.getPreferenceDetails().getServiceType(), communityModel.getPreferenceDetails().getPreferenceName());
 						}else{
-							PreferenceMerger merger = new PreferenceMerger();
-							IPreference mergeTrees = merger.mergeTrees(model.getRootPreference(), communityModel.getRootPreference(), "");
-							userPrefMgr.storePreference(userId, communityModel.getPreferenceDetails(), mergeTrees);
+							PreferenceMerger merger = new PreferenceMerger(pcm.getUserFeedbackMgr());
+							PreMerger preMerger = new PreMerger(pcm.getCtxBroker(), userId);
+							IPreference replaceCtxIdentifiers = preMerger.replaceCtxIdentifiers(communityModel.getRootPreference());
+							if (replaceCtxIdentifiers!=null){
+								IPreference mergeTrees = merger.mergeTrees(model.getRootPreference(), replaceCtxIdentifiers, "");
+								userPrefMgr.storePreference(userId, communityModel.getPreferenceDetails(), mergeTrees);
+								pcm.processPreferenceChanged(userId, communityModel.getPreferenceDetails().getServiceID(), communityModel.getPreferenceDetails().getServiceType(), communityModel.getPreferenceDetails().getPreferenceName());
+							}
 						}
-						pcm.processPreferenceChanged(userId, communityModel.getPreferenceDetails().getServiceID(), communityModel.getPreferenceDetails().getServiceType(), communityModel.getPreferenceDetails().getPreferenceName());
+						
 					}
 
 
 					String[] options = getUserFriendlyListofDetails(listtoBeChecked, FeedbackType.DOWNLOAD);
 
-					IUserFeedbackResponseEventListener<List<String>> feedbackListener = new DownloadFeedbackListenerCallBack(downloadTempTable, pcm, FeedbackType.DOWNLOAD);
+					DownloadFeedbackListenerCallBack feedbackListener = new DownloadFeedbackListenerCallBack(downloadTempTable, pcm, FeedbackType.DOWNLOAD);
 					userFeedback.getExplicitFBAsync(ExpProposalType.CHECKBOXLIST, new ExpProposalContent("Please select which community preferences you want to download", options), feedbackListener).get();
-
+					this.setDone(true);
 				} catch (InvalidFormatException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -260,6 +308,16 @@ public class CommunitiesHandler {
 				} 
 			}
 
+		}
+
+
+
+		public boolean isDone() {
+			return done;
+		}
+
+		public void setDone(boolean done) {
+			this.done = done;
 		}
 
 	}
@@ -288,7 +346,7 @@ public class CommunitiesHandler {
 
 	private List<PreferenceDetails> findRelevantPreferences(List<Service> services, List<PreferenceDetails> details){
 
-		IIdentity userId = this.idManager.getThisNetworkNode();
+		IIdentity userId = this.getIdManager().getThisNetworkNode();
 		List<PreferenceDetails> preferences = new ArrayList<PreferenceDetails>();
 		for (Service service: services){
 			ServiceResourceIdentifier serviceIdentifier = service.getServiceIdentifier();
@@ -304,7 +362,7 @@ public class CommunitiesHandler {
 
 	private List<PreferenceDetails> findRelevantPreferenceDetails(List<Service> services, List<PreferenceDetails> details){
 		ArrayList<PreferenceDetails> preferences = new ArrayList<PreferenceDetails>(); 
-		IIdentity userId = this.idManager.getThisNetworkNode();
+		IIdentity userId = this.getIdManager().getThisNetworkNode();
 		for (Service service: services){
 			ServiceResourceIdentifier serviceIdentifier = service.getServiceIdentifier();
 			for (PreferenceDetails detail : details){
@@ -315,5 +373,13 @@ public class CommunitiesHandler {
 		}
 
 		return preferences;
+	}
+
+	public IIdentityManager getIdManager() {
+		return idManager;
+	}
+
+	public void setIdManager(IIdentityManager idManager) {
+		this.idManager = idManager;
 	}
 }

@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.UserPreferenceManagement.impl.monitoring;
+package org.societies.personalisation.UserPreferenceManagement.impl.cis;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -55,6 +55,8 @@ import org.societies.api.services.ServiceMgmtEvent;
 import org.societies.api.services.ServiceMgmtEventType;
 import org.societies.personalisation.UserPreferenceManagement.impl.UserPreferenceManagement;
 import org.societies.personalisation.UserPreferenceManagement.impl.merging.PreferenceMerger;
+import org.societies.personalisation.UserPreferenceManagement.impl.monitoring.PersonalisationConstants;
+import org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor;
 import org.societies.personalisation.preference.api.CommunityPreferenceManagement.ICommunityPreferenceManager;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
@@ -143,17 +145,20 @@ public class CisEventListener extends EventListener{
 							IIdentity userId = this.commManager.getIdManager().getThisNetworkNode();
 							if (model==null){
 								this.userPrefMgr.storePreference(userId, communityModel.getPreferenceDetails(), communityModel.getRootPreference());
+								this.pcm.processPreferenceChanged(userId, communityModel.getPreferenceDetails().getServiceID(), communityModel.getPreferenceDetails().getServiceType(), communityModel.getPreferenceDetails().getPreferenceName());
 							}else{
-								PreferenceMerger merger = new PreferenceMerger();
-								IPreference mergeTrees = merger.mergeTrees(model.getRootPreference(), communityModel.getRootPreference(), "");
+								PreferenceMerger merger = new PreferenceMerger(pcm.getUserFeedbackMgr());
+								PreMerger preMerger = new PreMerger(this.pcm.getCtxBroker(), userId);
+								IPreference replaceCtxIdentifiers = preMerger.replaceCtxIdentifiers(communityModel.getRootPreference());
+								if (replaceCtxIdentifiers!=null){
+								IPreference mergeTrees = merger.mergeTrees(model.getRootPreference(), replaceCtxIdentifiers, "");
 								this.userPrefMgr.storePreference(userId, communityModel.getPreferenceDetails(), mergeTrees);
+								this.pcm.processPreferenceChanged(userId, communityModel.getPreferenceDetails().getServiceID(), communityModel.getPreferenceDetails().getServiceType(), communityModel.getPreferenceDetails().getPreferenceName());
+								}
 							}
-							this.pcm.processPreferenceChanged(userId, communityModel.getPreferenceDetails().getServiceID(), communityModel.getPreferenceDetails().getServiceType(), communityModel.getPreferenceDetails().getPreferenceName());
+							
 						}
 					}
-					
-					
-					//TODO: add this CISId into list of CISs that I'm uploading preferences
 					
 				} catch (InvalidFormatException e) {
 					// TODO Auto-generated catch block
@@ -170,8 +175,6 @@ public class CisEventListener extends EventListener{
 				}
 				
 			}
-		}else if (iEvent.geteventType().equalsIgnoreCase(EventTypes.CIS_UNSUBS)){
-			
 		}else if (iEvent.geteventType().equalsIgnoreCase(ServiceMgmtEventType.SERVICE_SHARED.toString())){
 			if (iEvent.geteventInfo()!=null){
 				if (iEvent.geteventInfo() instanceof ServiceMgmtEvent){
@@ -190,10 +193,7 @@ public class CisEventListener extends EventListener{
 					
 				}
 			}
-		}else if (iEvent.geteventType().equalsIgnoreCase(ServiceMgmtEventType.SERVICE_UNSHARED.toString())){
-			
 		}
-		
 	}
 
 	private String[] getUserFriendlyListofDetails(

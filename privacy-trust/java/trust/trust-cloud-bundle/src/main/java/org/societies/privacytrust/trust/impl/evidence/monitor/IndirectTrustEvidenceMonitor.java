@@ -26,6 +26,7 @@ package org.societies.privacytrust.trust.impl.evidence.monitor;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
@@ -260,21 +261,20 @@ public class IndirectTrustEvidenceMonitor implements ITrustUpdateEventListener {
 		final Set<TrustRelationship> retrievedRelationships;
 		final Set<ITrustEvidence> existingEvidenceSet;
 		try {
-			retrievedRelationships = this.trustBroker.retrieveTrustRelationships(
-					new TrustQuery(connectionId).setTrustValueType(TrustValueType.DIRECT)).get();
-			// If connection has no opinions do nothing
-			if (retrievedRelationships.isEmpty())
-				return;
 			existingEvidenceSet = this.trustEvidenceRepository.retrieveLatestEvidence(
-					null, null, TrustEvidenceType.DIRECTLY_TRUSTED, connectionId);
+					connectionId, null, TrustEvidenceType.DIRECTLY_TRUSTED, connectionId);
+			// Get the last evidence timestamp
+			Date lastEvidenceTimestamp = null;
+			final Iterator<ITrustEvidence> evidenceIter = existingEvidenceSet.iterator();
+			while (evidenceIter.hasNext())
+				lastEvidenceTimestamp = evidenceIter.next().getTimestamp();
+			// Fetch trust relationships after lastEvidenceTimestamp 
+			// TODO Add fromDate param to TrustQuery 
+			retrievedRelationships = this.trustBroker.retrieveTrustRelationships(
+					new TrustQuery(connectionId).setTrustValueType(TrustValueType.DIRECT)).get();			
 			for (final TrustRelationship retrievedRelationship : retrievedRelationships) {
-				for (final ITrustEvidence existingEvidence : existingEvidenceSet) {
-					if (retrievedRelationship.getTrustorId().equals(existingEvidence.getSubjectId())
-							&& retrievedRelationship.getTrusteeId().equals(existingEvidence.getObjectId())
-							&& retrievedRelationship.getTimestamp().getTime() > existingEvidence.getTimestamp().getTime()) {
+				if (lastEvidenceTimestamp == null || retrievedRelationship.getTimestamp().compareTo(lastEvidenceTimestamp) > 0) {
 						this.addIndirectEvidence(retrievedRelationship, connectionId);
-						break;
-					}
 				}
 			}
 		} catch (TrustEvidenceRepositoryException tere) {
