@@ -99,33 +99,74 @@ public class ContextPreferenceCondition implements IPreferenceCondition, Seriali
 	public String toString(){
 		
 		if (this.CtxIdentifier==null){
-			return this.type+this.operator+this.value;	
+			return this.name+this.operator+this.value;	
 		}else{
 			return this.CtxIdentifier.getType()+this.operator+this.value;
 		}
 		
 	}
 	
-	public boolean equals(IPreferenceCondition pc){
 
-		if (!(pc.getname().equals(this.name))){
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((CtxIdentifier == null) ? 0 : CtxIdentifier.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result
+				+ ((operator == null) ? 0 : operator.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
 			return false;
 		}
-		if (!(pc.getoperator().equals(this.operator))){
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		if (!(pc.getCtxIdentifier().equals(this.CtxIdentifier))){
+		ContextPreferenceCondition other = (ContextPreferenceCondition) obj;
+		if (CtxIdentifier == null) {
+			if (other.CtxIdentifier != null) {
+				return false;
+			}
+		} else if (!CtxIdentifier.equals(other.CtxIdentifier)) {
 			return false;
 		}
-		if (!(pc.getType().equals(this.type))){
+		if (name == null) {
+			if (other.name != null) {
+				return false;
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
 		}
-		if (!(pc.getvalue().equals(this.value))){
+		if (operator != other.operator) {
 			return false;
 		}
-		
+		if (type == null) {
+			if (other.type != null) {
+				return false;
+			}
+		} else if (!type.equals(other.type)) {
+			return false;
+		}
+		if (value == null) {
+			if (other.value != null) {
+				return false;
+			}
+		} else if (!value.equals(other.value)) {
+			return false;
+		}
 		return true;
 	}
+
 	public boolean equalsIgnoreValue(IPreferenceCondition pc){
 		if (!(pc.getCtxIdentifier().equals(this.CtxIdentifier))){
 			return false;

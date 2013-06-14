@@ -26,13 +26,20 @@ package org.societies.personalisation.UserPreferenceManagement.impl.merging;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
+import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.personalisation.preference.api.UserPreferenceMerging.IUserPreferenceMerging;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceCondition;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
+import org.societies.personalisation.preference.api.model.PreferenceOutcome;
 import org.societies.personalisation.preference.api.model.PreferenceTreeNode;
 
 
@@ -41,8 +48,10 @@ public class PreferenceMerger implements IUserPreferenceMerging{
 	
 	private String situation;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
+	private final IUserFeedback userFeedback;
 	
-	public PreferenceMerger(){
+	public PreferenceMerger(IUserFeedback userFeedback){
+		this.userFeedback = userFeedback;
 		//RequestUserConfirmation ruc = new RequestUserConfirmation();
 		situation = "";
 	}
@@ -305,11 +314,30 @@ public class PreferenceMerger implements IUserPreferenceMerging{
 			IPreferenceOutcome oldOutcome = oldTree.getOutcome();
 			IPreferenceOutcome newOutcome = newNode.getOutcome();
 			//if they match, we only need to increase its confidence level
-			if (oldOutcome.equals(newOutcome)){
-				//increase *****confidencelevel***
-				//dpt = new DisplayPreferenceTree(new PreferenceTreeModel(oldTree),"Merged Tree");
-			}else{
-				//check confidence level of existing preference, and if can't determine what to do, ASK USER (RequestUserConfirmation
+			if (!oldOutcome.equals(newOutcome)){
+				
+				String serviceId = ServiceModelUtils.serviceResourceIdentifierToString(oldOutcome.getServiceID());
+				String preferenceName = oldOutcome.getparameterName();
+				String[] options = new String []{oldOutcome.getvalue(), newOutcome.getvalue()};
+				try {
+					List<String> list = this.userFeedback.getExplicitFB(ExpProposalType.RADIOLIST, new ExpProposalContent("Preference Merging information needed\n. Please select your default preference "+preferenceName+" of service: "+serviceId, options)).get();
+					if (list.size()>0){
+						String userResponse = list.get(0);
+						if (userResponse.equalsIgnoreCase(oldOutcome.getvalue())){
+							return oldTree;
+						}else{
+							return newNode;
+						}
+					}
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				
 			}
 			//dpt = new DisplayPreferenceTree(new PreferenceTreeModel(oldTree), "Merged Tree");
 			return oldTree;
