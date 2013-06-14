@@ -6,7 +6,8 @@
 	<groupId>org.societies.orchestration</groupId>
 	<artifactId>csm</artifactId>
 	<packaging>jar</packaging>
-	<version>${version.pm}</version>
+	<name>CSM</name>
+	<version>${version.cm}</version>
 	<developers>
 		<developer>
 			<name>JMG</name>
@@ -52,25 +53,18 @@
 			<artifactId>societies-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
-        	
+         
 		<dependency>
-            		<groupId>org.societies.orchestration.api</groupId>
-            		<artifactId>intelligent-community-orchestration-api</artifactId>
-            	<version>${version.ico}</version>
-        	</dependency>
-
-        	<dependency>
-        	    <groupId>junit</groupId>
-        	    <artifactId>junit</artifactId>
-        	    <version>4.10</version>
-        	    <scope>test</scope>
-        	</dependency>
-
-        	<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>provided</scope>
+			<groupId>org.societies.orchestration.api</groupId>
+			<artifactId>intelligent-community-orchestration-api</artifactId>
+			<version>${version.ico}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
@@ -128,12 +122,6 @@
             <artifactId>com.springsource.org.apache.derby</artifactId>
             <version>10.5.1000001.764942</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -205,22 +193,7 @@
             <version>1.0.0.BUILD-20080106</version>
         </dependency>
 
-
-        <dependency>
-            <groupId>org.societies.api.internal</groupId>
-            <artifactId>societies-api-internal</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.societies.api.external</groupId>
-            <artifactId>societies-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
         <!--  graph stuff -->
-
-
         <dependency>
             <groupId>net.sf.jung</groupId>
             <artifactId>jung-visualization</artifactId>
@@ -234,7 +207,7 @@
             <version>4.1.0</version>
             <scope>provided</scope>
         </dependency>
-        
+   
         <dependency>
             <groupId>uk.ac.gate</groupId>
             <artifactId>gate-core</artifactId>
@@ -261,69 +234,43 @@
             <artifactId>trident-ml</artifactId>
             <version>0.0.2</version>
         </dependency>
-
+	
 	</dependencies>
 	
-	<repositories>
-        <repository>
-            <id>clojars.org</id>
-            <url>http://clojars.org/repo</url>
-        </repository>
-    </repositories>
-	
 	<build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Import-Package>*;resolution:=optional</Import-Package>
-                        <Embed-Dependency>;scope=compile|runtime</Embed-Dependency>
-                        <Embed-Transitive>false</Embed-Transitive>
-                    </instructions>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <artifactId>maven-clean-plugin</artifactId>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <!-- created after mvn test using the Derby DBMS -->
-                            <directory>cpatest</directory>
-                        </fileset>
-                        <fileset>
-                            <directory>.</directory>
-                            <includes>
-                                <!-- created after mvn test using the Derby DBMS -->
-                                <include>derby.log</include>
-                            </includes>
-                        </fileset>
-                    </filesets>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <configuration>
-                    <artifactItems>
-                        <artifactItem>
-                            <groupId>${project.groupId}</groupId>
-                            <artifactId>${project.artifactId}</artifactId>
-                            <version>${version.ico}</version>
-                            <type>bundle</type>
-                            <overWrite>true</overWrite>
-                            <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
-                        </artifactItem>
-                    </artifactItems>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+		<plugins>
+			 <plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+						<_nouses>true</_nouses>
+					</instructions>
+				</configuration>
+			</plugin>
+			
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
+							<version>${version.cm}</version>
+							<type>jar</type>
+							<overWrite>true</overWrite>
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
 
 </project>

@@ -151,8 +151,9 @@ public class Tester {
 			
 			
 			CtxEvaluationResults ie = (this.ctxBroker.evaluateSimilarity(ids, attrib));
-			//LOG.info("EBOYLANLOGFOOTPRINT : " + ie.getResult());
-			//LOG.info("EBOYLANLOGFOOTPRINT : " + ie.getSummary());
+			LOG.info("EBOYLANGETRESULT " + ie.getResult());
+			LOG.info("EBOYLANGETSUMMARY : " + ie.getSummary());
+			LOG.info("EBOYLANGETATTBREAKDOWN : " + ie.getAttBreakDown());
 			assertEquals(true, ie.getResult());
 
 		} catch (InterruptedException e) {
@@ -203,8 +204,9 @@ public class Tester {
 			attrib.add("movies");
 			LOG.info("EBOYLANLOGFOOTPRINT jacks movie: " + ctxAttrMoviesJack.toString());
 			CtxEvaluationResults ie = (CtxEvaluationResults) ( this.ctxBroker.evaluateSimilarity(ids, attrib));
-			//LOG.info("EBOYLANLOGFOOTPRINT " + ie.getResult());
-			//LOG.info("EBOYLANLOGFOOTPRINT : " + ie.getSummary());
+			LOG.info("EBOYLANGETRESULT " + ie.getResult());
+			LOG.info("EBOYLANGETSUMMARY : " + ie.getSummary());
+			LOG.info("EBOYLANGETATTBREAKDOWN : " + ie.getAttBreakDown());
 			assertEquals(false, ie.getResult());
 			
 		} catch (InterruptedException e) {
