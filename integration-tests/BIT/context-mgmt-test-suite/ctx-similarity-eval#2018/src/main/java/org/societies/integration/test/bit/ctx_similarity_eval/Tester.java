@@ -70,8 +70,12 @@ public class Tester {
 
 	CtxEntity jack = null;
 	CtxEntity jane = null;
+	CtxEntity ken = null;
+	CtxEntity kelly = null;
 	CtxEntityIdentifier jackID = null;
 	CtxEntityIdentifier janeID = null;
+	CtxEntityIdentifier kenID = null;
+	CtxEntityIdentifier kellyID = null;
 	CtxEvaluationResults ie = null;
 	
 	public Tester(){
@@ -86,6 +90,8 @@ public class Tester {
 		try {
 			jack = this.ctxBroker.createEntity(CtxEntityTypes.PERSON).get();
 			jane = this.ctxBroker.createEntity(CtxEntityTypes.PERSON).get();
+			ken = this.ctxBroker.createEntity(CtxEntityTypes.PERSON).get();
+			kelly = this.ctxBroker.createEntity(CtxEntityTypes.PERSON).get();
 		} catch (InterruptedException e) {
 			e.printStackTrace(); 
 		} catch (ExecutionException e) {
@@ -94,7 +100,9 @@ public class Tester {
 			e.printStackTrace();
 		}
 		jackID = jack.getId();
-		janeID = jane.getId();	
+		janeID = jane.getId();
+		kenID = ken.getId();
+		kellyID = kelly.getId();
 	}
 
 	@After
@@ -106,6 +114,8 @@ public class Tester {
 			//if(serviceB != null ) this.ctxBroker.remove(serviceB.getId());
 			if(jack != null ) this.ctxBroker.remove(jackID);
 			if(jane != null ) this.ctxBroker.remove(janeID);
+			if(ken != null ) this.ctxBroker.remove(kenID);
+			if(kelly != null ) this.ctxBroker.remove(kellyID);
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -122,7 +132,7 @@ public class Tester {
 			//to create occupation attribute for Jack
 			CtxAttribute ctxAttrOccupationJack = this.ctxBroker.createAttribute(jackID,CtxAttributeTypes.OCCUPATION).get();
 			//set occupation attribute
-			ctxAttrOccupationJack.setStringValue("Doctor");
+			ctxAttrOccupationJack.setStringValue("Construction Managers");
 			ctxAttrOccupationJack.setValueType(CtxAttributeValueType.STRING);
 			ctxAttrOccupationJack = (CtxAttribute) this.ctxBroker.update(ctxAttrOccupationJack).get();
 			LOG.info("EBOYLANLOGFOOTPRINT Jack: "+ ctxAttrOccupationJack.getStringValue());
@@ -131,7 +141,7 @@ public class Tester {
 			//to create occupation attribute for Jane
 			CtxAttribute ctxAttrOccupationJane = this.ctxBroker.createAttribute(janeID, CtxAttributeTypes.OCCUPATION).get();
 			//set occupation attribute
-			ctxAttrOccupationJane.setStringValue("Pilot");
+			ctxAttrOccupationJane.setStringValue("Commercial Pilots");
 			ctxAttrOccupationJane.setValueType(CtxAttributeValueType.STRING);
 			ctxAttrOccupationJane = (CtxAttribute) this.ctxBroker.update(ctxAttrOccupationJane).get();
 			LOG.info("EBOYLANLOGFOOTPRINT Jane: "+ctxAttrOccupationJane.getStringValue());
@@ -187,9 +197,8 @@ public class Tester {
 		LOG.info("EBOYLANLOGFOOTPRINT starting test1");
 
 		//to create movies attribute for Jack
-		CtxAttribute ctxAttrMoviesJack;
 		try {
-			ctxAttrMoviesJack = this.ctxBroker.createAttribute(jackID,CtxAttributeTypes.MOVIES).get();
+			CtxAttribute ctxAttrMoviesJack = this.ctxBroker.createAttribute(jackID,CtxAttributeTypes.MOVIES).get();
 			//set movie attribute
 			ctxAttrMoviesJack.setStringValue("Dracula");
 			ctxAttrMoviesJack.setValueType(CtxAttributeValueType.STRING);
@@ -203,6 +212,52 @@ public class Tester {
 
 			attrib.add("movies");
 			LOG.info("EBOYLANLOGFOOTPRINT jacks movie: " + ctxAttrMoviesJack.toString());
+			CtxEvaluationResults ie = (CtxEvaluationResults) ( this.ctxBroker.evaluateSimilarity(ids, attrib));
+			LOG.info("EBOYLANGETRESULT " + ie.getResult());
+			LOG.info("EBOYLANGETSUMMARY : " + ie.getSummary());
+			LOG.info("EBOYLANGETATTBREAKDOWN : " + ie.getAttBreakDown());
+			assertEquals(false, ie.getResult());
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			LOG.info("EBOYLANLOGFOOTPRINT Interrupted Exception");
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			LOG.info("EBOYLANLOGFOOTPRINT Execution Exception");
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			LOG.info("EBOYLANLOGFOOTPRINT Context Exception");
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void test2() {
+		
+		
+		//pass if contextSimilarity returns true
+		String[] ids = {jackID.toString(),janeID.toString(),kenID.toString(),kellyID.toString()};
+		ArrayList<String> attrib = new ArrayList<String>();
+		LOG.info("EBOYLANLOGFOOTPRINT starting test1");
+		
+		try {
+			//to create movies attribute for Jack
+			CtxAttribute ctxAttrMoviesKen = this.ctxBroker.createAttribute(kenID,CtxAttributeTypes.MOVIES).get();
+			//set movie attribute
+			ctxAttrMoviesKen.setStringValue("Dracula, Jaws");
+			ctxAttrMoviesKen.setValueType(CtxAttributeValueType.STRING);
+			ctxAttrMoviesKen = (CtxAttribute) this.ctxBroker.update(ctxAttrMoviesKen).get();
+
+			CtxAttribute ctxAttrMoviesKelly = this.ctxBroker.createAttribute(kellyID,CtxAttributeTypes.MOVIES).get();
+			//set movie attribute
+			ctxAttrMoviesKelly.setStringValue("Jaws, Batman");
+			ctxAttrMoviesKelly.setValueType(CtxAttributeValueType.STRING);
+			ctxAttrMoviesKelly = (CtxAttribute) this.ctxBroker.update(ctxAttrMoviesKelly).get();
+
+			attrib.add("movies");
+			attrib.add("occupation");
 			CtxEvaluationResults ie = (CtxEvaluationResults) ( this.ctxBroker.evaluateSimilarity(ids, attrib));
 			LOG.info("EBOYLANGETRESULT " + ie.getResult());
 			LOG.info("EBOYLANGETSUMMARY : " + ie.getSummary());
