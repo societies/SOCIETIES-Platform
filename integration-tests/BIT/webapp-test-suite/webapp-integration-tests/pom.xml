@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.societies.integration.test</groupId>
-    <artifactId>bit.webapp_integration_tests.xxx</artifactId>
-    <name>#XXX T65 Web App Integration Tests</name>
+    <artifactId>bit.webapp_integration_tests.2078</artifactId>
+    <name>#2078 T65 Web App Integration Tests</name>
     <packaging>bundle</packaging>
     <version>${release.version}</version>
 
