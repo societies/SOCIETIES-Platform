@@ -24,9 +24,15 @@
  */
 package org.societies.privacytrust.privacyprotection.assessment.util;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.wiring.BundleWiring;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.springframework.osgi.context.BundleContextAware;
@@ -40,25 +46,64 @@ import org.springframework.osgi.context.BundleContextAware;
 public class ServiceResolver implements BundleContextAware {
 
 	private BundleContext bundleContext;
+	private static Logger LOG = LoggerFactory.getLogger(ServiceResolver.class);
 
 	@Override
 	public void setBundleContext(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
 	}
-	
-	public String[] getClassNames(Service service) {
-		
-		String [] cn;
-		Bundle bundle = getBundle(service);
-		BundleWiring bw;
-		
-		bundle.getEntryPaths(path)
-		bw.findEntries("/", "*.class", BundleWiring.FINDENTRIES_RECURSE);
-		bw.listResources("/", "*.class", BundleWiring.LISTRESOURCES_RECURSE);
 
-		return cn;
+	public void init() {
+		getBundleSymbolicName("org.societies.api.internal.css.management.ICSSManagerCallback");
 	}
+	
+	public List<String> getBundleSymbolicName(String className) {
+		
+		LOG.debug("getBundleSymbolicName({})", className);
 
+		Bundle[] bundles = bundleContext.getBundles();
+		
+		//LOG.debug("Number of all bundles: {}", bundles.length);
+		Enumeration<URL> entries;
+		URL entry;
+		String cn;
+		int index;
+		List<String> result = new ArrayList<String>();
+		
+		for (Bundle bundle : bundles) {
+
+			//LOG.debug("Getting entries for bundle ID {}: {}", bundle.getBundleId(), bundle.getSymbolicName());
+
+			entries = bundle.findEntries("/", "*.class", true);
+			while (entries != null && entries.hasMoreElements()) {
+				entry = entries.nextElement();
+				//LOG.debug("Found entry: {}", entry);
+				cn = entry.toString().replaceFirst("bundleentry://", "");
+				index = cn.indexOf("/");
+				if (index > 0) {
+					if (cn.length() > (index + 1)) {
+						++index;
+					}
+					cn = cn.substring(index);
+					cn = cn.replaceAll("/", ".");
+					index = cn.lastIndexOf(".class");
+					if (index > 0) {
+						cn = cn.substring(0, index);
+					}
+				}
+				//LOG.debug("Entry class name: {}", cn);
+				if (className.equals(cn)) {
+					LOG.debug("Found matching class name in {}", bundle.getSymbolicName());
+					result.add(bundle.getSymbolicName());
+				}
+			}
+		}
+		if (result.size() > 1) {
+			LOG.warn("Class {} is present in multiple ({}) bundles", className, result.size());
+		}
+		return result;
+	}
+	
 	private Bundle getBundle(Service service) {
 		return ServiceModelUtils.getBundleFromService(service, bundleContext);
 	}

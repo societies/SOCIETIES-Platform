@@ -69,4 +69,9 @@
 		<property name="privacyLog" ref="privacyLog" />
 	</bean>
 
+	<bean id="serviceResolver"
+		class="org.societies.privacytrust.privacyprotection.assessment.util.ServiceResolver"
+		init-method="init" >
+	</bean>
+
 </beans>
