@@ -142,7 +142,6 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 				// -- Permission not available: remote call
 				Log.d(TAG, "No Local Permission retrieved: remote call");
-				List<DataIdentifier>
 				privacyDataManagerRemote.checkPermission(clientPackage, requestor, dataIds, actions);
 				// Publish progress
 				if (!checkAndPublishProgress((progress = progress+30), "Remote access control required: request sent")) {

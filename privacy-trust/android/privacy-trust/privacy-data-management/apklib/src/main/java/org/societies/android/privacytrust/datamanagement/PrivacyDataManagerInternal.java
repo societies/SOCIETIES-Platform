@@ -102,10 +102,10 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		action.setActionConstant(ActionConstants.READ);
 		actions.add(action);
 		// Retrieve privacy permission
-		PrivacyPermission privacyPermission = getPermission(requestor, dataId, actions);
+		List<PrivacyPermission> privacyPermissions = getPermissions(requestor, dataId, actions);
 		// Retrieve obfuscation level
-		if (null != privacyPermission) {
-			return privacyPermission.getObfuscationLevel();
+		if (null != privacyPermissions && privacyPermissions.size() > 0) {
+			return privacyPermissions.get(0).getObfuscationLevel();
 		}
 		// No obfuscation level: default value
 		return -1;

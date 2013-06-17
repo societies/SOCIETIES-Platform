@@ -34,13 +34,13 @@ import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.css.manager.IServiceManager;
+import org.societies.android.api.identity.util.DataIdentifierUtils;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.android.privacytrust.datamanagement.callback.PrivacyDataIntentSender;
 import org.societies.android.privacytrust.datamanagement.callback.RemotePrivacyDataCallback;
 import org.societies.android.privacytrust.policymanagement.callback.PrivacyPolicyIntentSender;
 import org.societies.api.identity.INetworkNode;
-import org.societies.api.identity.util.DataIdentifierUtils;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
@@ -151,11 +151,6 @@ public class PrivacyDataManagerRemote {
 			Log.e(TAG, "Unexepected error: "+(null != e ? e.getMessage() : ""));
 			intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
 		}
-	}
-
-	public DataWrapper hasObfuscatedVersion(RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
-		Log.i(TAG, "Remote obfuscation not available yet.");
-		return dataWrapper;
 	}
 
 	// -- Comms
