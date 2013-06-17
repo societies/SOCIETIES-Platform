@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.springframework.osgi.context.BundleContextAware;
 
 /**
@@ -45,30 +46,34 @@ import org.springframework.osgi.context.BundleContextAware;
  */
 public class ServiceResolver implements BundleContextAware {
 
-	private BundleContext bundleContext;
+	private static BundleContext bundleContext;
 	private static Logger LOG = LoggerFactory.getLogger(ServiceResolver.class);
 
 	@Override
 	public void setBundleContext(BundleContext bundleContext) {
-		this.bundleContext = bundleContext;
+		ServiceResolver.bundleContext = bundleContext;
 	}
 
 	public void init() {
-		getBundleSymbolicName("org.societies.api.internal.css.management.ICSSManagerCallback");
+		LOG.debug("init()");
 	}
 	
 	public List<String> getBundleSymbolicName(String className) {
 		
 		LOG.debug("getBundleSymbolicName({})", className);
 
-		Bundle[] bundles = bundleContext.getBundles();
-		
-		//LOG.debug("Number of all bundles: {}", bundles.length);
 		Enumeration<URL> entries;
 		URL entry;
 		String cn;
 		int index;
 		List<String> result = new ArrayList<String>();
+
+		if (bundleContext == null) {
+			LOG.warn("bundleContext is null. This is OK only if it happened during JUnit test");
+			return result;
+		}
+		Bundle[] bundles = bundleContext.getBundles();
+		//LOG.debug("Number of all bundles: {}", bundles.length);
 		
 		for (Bundle bundle : bundles) {
 
@@ -104,7 +109,10 @@ public class ServiceResolver implements BundleContextAware {
 		return result;
 	}
 	
-	private Bundle getBundle(Service service) {
-		return ServiceModelUtils.getBundleFromService(service, bundleContext);
-	}
+//	private ServiceResourceIdentifier getServiceId(Bundle bundle) {
+//		
+//		Service service = ServiceModelUtils.getServiceFromBundle(bundle, serviceDiscovery);
+//		
+//		return service.getServiceIdentifier();
+//	}
 }

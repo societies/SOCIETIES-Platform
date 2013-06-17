@@ -95,6 +95,24 @@ public class DataAccessAnalyzer {
 		return matchedEntries;
 	}
 	
+	public List<DataAccessLogEntry> getDataAccessForBundle(String requestor, Date start, Date end) {
+		
+		List<DataAccessLogEntry> matchedEntries = new ArrayList<DataAccessLogEntry>();
+
+		if (requestor == null) {
+			LOG.warn("getDataAccessForBundle({}): requestor is null", requestor);
+			return matchedEntries;
+		}
+		
+		for (DataAccessLogEntry da : dataAccess) {
+			if (da.getRequestorBundles().contains(requestor) &&
+					da.getTime().after(start) && da.getTime().before(end)) {
+				matchedEntries.add(da);
+			}
+		}
+		return matchedEntries;
+	}
+	
 	/**
 	 * Get number of events in certain time period where given requestor accessed local data.
 	 * 
@@ -121,6 +139,21 @@ public class DataAccessAnalyzer {
 	public int getNumDataAccessEvents(String requestorClass, Date start, Date end) {
 		
 		List<DataAccessLogEntry> matchedEntries = getDataAccess(requestorClass, start, end);
+		
+		return matchedEntries.size();
+	}
+	
+	/**
+	 * Get number of events in certain time period where given requestor accessed local data.
+	 * 
+	 * @param requestorBundle Symbolic name of the requestor bundle (the one who requested data access)
+	 * @param start Match only events after this time
+	 * @param end Match only events before this time
+	 * @return All events where requestor matches
+	 */
+	public int getNumDataAccessEventsForBundle(String requestorBundle, Date start, Date end) {
+		
+		List<DataAccessLogEntry> matchedEntries = getDataAccessForBundle(requestorBundle, start, end);
 		
 		return matchedEntries.size();
 	}
@@ -155,6 +188,23 @@ public class DataAccessAnalyzer {
 		return matches;
 	}
 	
+	public List<String> getDataAccessRequestorBundles() {
+		
+		List<String> matches = new ArrayList<String>();
+		List<String> requestors;
+		
+		for (DataAccessLogEntry da : dataAccess) {
+			requestors = da.getRequestorBundles();
+			for (String requestor : requestors) {
+				if (!matches.contains(requestor) && requestor != null) {
+					LOG.debug("getDataAccessRequestorBundles(): Adding bundle {}", requestor);
+					matches.add(requestor);
+				}
+			}
+		}
+		return matches;
+	}
+	
 	public Map<IIdentity, Integer> getNumDataAccessEventsForAllIdentities(Date start, Date end) {
 		
 		Map<IIdentity, Integer> result = new HashMap<IIdentity, Integer>();
@@ -174,6 +224,18 @@ public class DataAccessAnalyzer {
 		
 		for (String requestor : requestors) {
 			result.put(requestor, getNumDataAccessEvents(requestor, start, end));
+		}
+		
+		return result;
+	}
+	
+	public Map<String, Integer> getNumDataAccessEventsForAllBundles(Date start, Date end) {
+
+		Map<String, Integer> result = new HashMap<String, Integer>();
+		List<String> requestors = getDataAccessRequestorBundles();
+		
+		for (String requestor : requestors) {
+			result.put(requestor, getNumDataAccessEventsForBundle(requestor, start, end));
 		}
 		
 		return result;

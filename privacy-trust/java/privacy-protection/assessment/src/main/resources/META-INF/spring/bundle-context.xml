@@ -57,21 +57,22 @@
 		class="org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog">
 	</bean>
 
+	<bean id="serviceResolver"
+		class="org.societies.privacytrust.privacyprotection.assessment.util.ServiceResolver"
+		init-method="init" >
+	</bean>
+
 	<bean id="privacyLogAppender"
 		class="org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLogAppender"
-		init-method="init">
+		init-method="init" depends-on="serviceResolver">
 		<property name="privacyLog" ref="privacyLog" />
+		<property name="serviceResolver" ref="serviceResolver" />
 	</bean>
 
 	<bean id="assessment"
 		class="org.societies.privacytrust.privacyprotection.assessment.logic.Assessment"
 		init-method="init" depends-on="privacyLog">
 		<property name="privacyLog" ref="privacyLog" />
-	</bean>
-
-	<bean id="serviceResolver"
-		class="org.societies.privacytrust.privacyprotection.assessment.util.ServiceResolver"
-		init-method="init" >
 	</bean>
 
 </beans>

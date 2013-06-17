@@ -37,6 +37,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacyas
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.privacytrust.privacyprotection.assessment.logger.CommsFwTestBean;
+import org.societies.privacytrust.privacyprotection.assessment.util.ServiceResolver;
 import org.societies.privacytrust.privacyprotection.assessment.util.StackParser;
 
 /**
@@ -51,6 +52,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 
 	private CommsFwTestBean testBean;
 	private PrivacyLog privacyLog;
+	private ServiceResolver serviceResolver;
 
 	public PrivacyLogAppender() {
 		LOG.info("Constructor");
@@ -82,6 +84,20 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 //		logStack();
 	}
 	
+	/**
+	 * @return the serviceResolver
+	 */
+	public ServiceResolver getServiceResolver() {
+		return serviceResolver;
+	}
+
+	/**
+	 * @param serviceResolver the serviceResolver to set
+	 */
+	public void setServiceResolver(ServiceResolver serviceResolver) {
+		this.serviceResolver = serviceResolver;
+	}
+
 	private String getInvokerClass() {
 
 		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
@@ -138,6 +154,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		String dataType;
 		String invokerClass = getInvokerClass();
 		List<String> invokerClasses = getInvokerClasses();
+		List<String> invokerBundles = serviceResolver.getBundleSymbolicName(invokerClass);
 		
 		if (payload != null) {
 			dataType = payload.getClass().getSimpleName();
@@ -152,6 +169,7 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 				sender,
 				invokerClass,
 				invokerClasses,
+				invokerBundles,
 				-1,
 				ChannelType.XMPP);
 		

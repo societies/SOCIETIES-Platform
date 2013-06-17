@@ -24,91 +24,26 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
-import java.util.Date;
-import java.util.List;
-
-import org.societies.api.identity.IIdentity;
-
 /**
- * 
+ * Privacy Assessment result for a particular sender in form of a particular bundle symbolic name
+ * or service ID that is mapped to the bundle.
+ * Based on all data packets that were sent by this sender.
+ * This assessment is more reliable because the sender identity is determined by the assessment.
  *
  * @author Mitja Vardjan
  *
  */
-public class DataAccessLogEntry {
-	
-	private final Date time;
-	private final long timeInMs;
-	private final IIdentity requestor;	
-	private final String requestorClass;
-	private final List<String> requestorStack;
-	private List<String> requestorBundles;
-	private final IIdentity owner;
-	private final long dataSize;
-	
-	public DataAccessLogEntry(Date time, IIdentity requestor, String requestorClass,
-			List<String> requestorStack, IIdentity owner) {
-		
-		this.time = time;
-		this.timeInMs = time.getTime();
-		this.requestor = requestor;
-		this.requestorClass = requestorClass;
-		this.requestorStack = requestorStack;
-		this.owner = owner;
-		this.dataSize = -1;
+public class AssessmentResultBundle extends AssessmentResult {
+
+	public AssessmentResultBundle(String sender) {
+		super(sender);
 	}
-	
-	public DataAccessLogEntry(Date time, IIdentity requestor, String requestorClass,
-			List<String> requestorStack, IIdentity owner, long payloadSize) {
-		
-		this.time = time;
-		this.timeInMs = time.getTime();
-		this.requestor = requestor;
-		this.requestorClass = requestorClass;
-		this.requestorStack = requestorStack;
-		this.owner = owner;
-		this.dataSize = payloadSize;
-	}
-	
+
 	/**
-	 * @return List of all non-system classes in stack
+	 * @return the sender
 	 */
-	public List<String> getRequestorStack() {
-		return requestorStack;
-	}
-
-	public Date getTime() {
-		return time;
-	}
-	
-	public long getTimeInMs() {
-		return timeInMs;
-	}
-	
-	public IIdentity getRequestor() {
-		return requestor;
-	}
-	
-	public String getRequestorClass() {
-		return requestorClass;
-	}
-	
-	/**
-	 * @return the requestorBundles
-	 */
-	public List<String> getRequestorBundles() {
-		return requestorBundles;
-	}
-
-	public void setRequestorBundles(List<String> requestorBundles) {
-		this.requestorBundles = requestorBundles;
-	}
-
-	public IIdentity getOwner() {
-		return owner;
-	}
-	
-	public long getPayloadSize() {
-		return dataSize;
+	@Override
+	public String getSender() {
+		return (String) sender;
 	}
 }

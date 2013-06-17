@@ -62,6 +62,14 @@ public interface IAssessment {
 	 * @param end Calculate results from events before this time. Pass null for no limit.
 	 */
 	public HashMap<String, AssessmentResultClassName> getAssessmentAllClasses(Date start, Date end);
+	
+	/**
+	 * Get a-posteriori assessment for all sender bundles.
+	 * 
+	 * @param start Calculate results from events after this time. Pass null for no limit.
+	 * @param end Calculate results from events before this time. Pass null for no limit.
+	 */
+	public HashMap<String, AssessmentResultBundle> getAssessmentAllBundles(Date start, Date end);
 
 	/**
 	 * Get a-posteriori assessment for a particular sender {@link IIdentity}.
@@ -84,6 +92,17 @@ public interface IAssessment {
 	 * @return privacy assessment for given sender
 	 */
 	public AssessmentResultClassName getAssessment(String senderClassName, Date start, Date end);
+
+	/**
+	 * Get a-posteriori assessment for a particular sender bundle.
+	 * 
+	 * @param senderBundle symbolic name of the sender bundle as determined by the Privacy Assessment
+	 * @param start Calculate results from events after this time. Pass null for no limit.
+	 * @param end Calculate results from events before this time. Pass null for no limit.
+	 * 
+	 * @return privacy assessment for given sender
+	 */
+	public AssessmentResultBundle getAssessmentForBundle(String senderBundle, Date start, Date end);
 	
 	/**
 	 * Get number of events in given time period where data has been sent to any receiver.
@@ -103,6 +122,11 @@ public interface IAssessment {
 	 * @return Names of all classes that have requested access to local data
 	 */
 	public List<String> getDataAccessRequestorClasses();
+	
+	/**
+	 * @return Symbolic names of all bundles that have requested access to local data
+	 */
+	public List<String> getDataAccessRequestorBundles();
 
 	/**
 	 * @param start Match only events after this time. Pass null for no limit.
@@ -132,6 +156,16 @@ public interface IAssessment {
 	public int getNumDataAccessEvents(String requestorClass, Date start, Date end);
 
 	/**
+	 * Get number of events in given time period where given requestor accessed local data.
+	 * 
+	 * @param requestorBundle Symbolic name of the requestor bundle (the one who requested data access)
+	 * @param start Match only events after this time. Pass null for no limit.
+	 * @param end Match only events before this time. Pass null for no limit.
+	 * @return All events where requestor matches
+	 */
+	public int getNumDataAccessEventsForBundle(String requestorBundle, Date start, Date end);
+
+	/**
 	 * Get number of local data access events in given time period, grouped by requestor identity.
 	 * 
 	 * @param start Match only events after this time. Pass null for no limit.
@@ -148,6 +182,16 @@ public interface IAssessment {
 	 * @return Number of data access events for each requestor identity
 	 */
 	public Map<String, Integer> getNumDataAccessEventsForAllClasses(Date start, Date end);
+
+	/**
+	 * Get number of local data access events in given time period, grouped by symbolic name of
+	 * requestor bundle.
+	 * 
+	 * @param start Match only events after this time. Pass null for no limit.
+	 * @param end Match only events before this time. Pass null for no limit.
+	 * @return Number of data access events for each requestor identity
+	 */
+	public Map<String, Integer> getNumDataAccessEventsForAllBundles(Date start, Date end);
 	
 	/**
 	 * @return All identities the messages have been sent to.
