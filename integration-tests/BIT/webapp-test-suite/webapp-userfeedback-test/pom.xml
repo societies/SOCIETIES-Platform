@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.societies.integration.test</groupId>
-    <artifactId>bit.webapp_userfeedback_test.xxx</artifactId>
-    <name>#XXX T65 Web App User Feedback Integration Test</name>
+    <artifactId>bit.webapp_userfeedback_test.2077</artifactId>
+    <name>#2077 T65 Web App User Feedback Integration Test</name>
     <packaging>bundle</packaging>
     <version>${release.version}</version>
 

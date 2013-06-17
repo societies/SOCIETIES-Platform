@@ -17,11 +17,14 @@ public abstract class BasePageController implements Serializable {
 
     protected void addFacesMessage(String component, String summary, String detail, FacesMessage.Severity severity) {
         try {
+            if (component == null)
+                component = "";
+
             FacesMessage message = new FacesMessage(severity, summary, detail);
             FacesContext.getCurrentInstance().addMessage(component, message);
 
             String logMsg = "MESSAGE:" + severity.toString()
-                    + (component != null ? ":" + component : ":GLOBAL")
+                    + (component.length() > 0 ? ":" + component : ":GLOBAL")
                     + " [" + summary + "] " + detail;
 
             if (severity == FacesMessage.SEVERITY_ERROR)
