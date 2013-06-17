@@ -115,14 +115,14 @@ public class DataTransferAnalyzerTest {
 		
 		privacyLog = new PrivacyLog();
 		
-		privacyLog.append(new DataAccessLogEntry(time1, id1, class1, stack1, id1, -1));
-		privacyLog.append(new DataAccessLogEntry(time2, id1, class2, stack2, id2, -1));
-		privacyLog.append(new DataAccessLogEntry(time3, id1, class3, stack3, id1, -1));
-		privacyLog.append(new DataAccessLogEntry(time4, id1, class3, stack3, id1, -1));
-		privacyLog.append(new DataAccessLogEntry(time5, id1, class1, stack1, id3, -1));
-		privacyLog.append(new DataAccessLogEntry(time6, id2, class1, stack1, id4, -1));
-		privacyLog.append(new DataAccessLogEntry(time7, id2, class1, stack1, id1, -1));
-		privacyLog.append(new DataAccessLogEntry(time7, null, null, null, null, -1));
+		privacyLog.append(new DataAccessLogEntry(time1, id1, class1, stack1, bundles1, id1, -1));
+		privacyLog.append(new DataAccessLogEntry(time2, id1, class2, stack2, bundles1, id2, -1));
+		privacyLog.append(new DataAccessLogEntry(time3, id1, class3, stack3, bundles1, id1, -1));
+		privacyLog.append(new DataAccessLogEntry(time4, id1, class3, stack3, bundles1, id1, -1));
+		privacyLog.append(new DataAccessLogEntry(time5, id1, class1, stack1, bundles1, id3, -1));
+		privacyLog.append(new DataAccessLogEntry(time6, id2, class1, stack1, bundles1, id4, -1));
+		privacyLog.append(new DataAccessLogEntry(time7, id2, class1, stack1, bundles1, id1, -1));
+		privacyLog.append(new DataAccessLogEntry(time7, null, null, null, null, null, -1));
 
 		privacyLog.append(new DataTransmissionLogEntry(dataType1, time2, id1, id1, class2, stack2, bundles1, -1, ChannelType.XMPP));
 		privacyLog.append(new DataTransmissionLogEntry(dataType2, time3, id2, id1, class4, stack4, bundles2, -1, ChannelType.XMPP));

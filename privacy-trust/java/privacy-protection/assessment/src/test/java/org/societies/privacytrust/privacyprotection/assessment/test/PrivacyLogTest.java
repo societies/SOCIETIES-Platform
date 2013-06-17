@@ -93,7 +93,7 @@ public class PrivacyLogTest {
 		int size1;
 		int size2;
 		
-		DataAccessLogEntry entry = new DataAccessLogEntry(new Date(), null, "", null, null, 100);
+		DataAccessLogEntry entry = new DataAccessLogEntry(new Date(), null, "", null, null, null, 100);
 		
 		size1 = privacyLog.getDataAccess().size();
 		privacyLog.append(entry);

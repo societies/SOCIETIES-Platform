@@ -210,9 +210,10 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		else {
 			requestorId = requestor.getRequestorId();
 		}
+		List<String> invokerBundle = serviceResolver.getBundleSymbolicName(invokerClass);
 		
 		DataAccessLogEntry logEntry = new DataAccessLogEntry(
-				new Date(), requestorId, invokerClass, invokerClasses, owner, dataSize);
+				new Date(), requestorId, invokerClass, invokerClasses, invokerBundle, owner, dataSize);
 		privacyLog.getDataAccess().add(logEntry);
 	}
 

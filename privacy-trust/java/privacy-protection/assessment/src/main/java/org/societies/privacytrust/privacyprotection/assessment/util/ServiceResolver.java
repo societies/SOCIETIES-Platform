@@ -72,6 +72,9 @@ public class ServiceResolver implements BundleContextAware {
 			LOG.warn("bundleContext is null. This is OK only if it happened during JUnit test");
 			return result;
 		}
+		if (className == null) {
+			return result;
+		}
 		Bundle[] bundles = bundleContext.getBundles();
 		//LOG.debug("Number of all bundles: {}", bundles.length);
 		
