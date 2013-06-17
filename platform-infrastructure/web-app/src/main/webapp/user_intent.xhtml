@@ -1,0 +1,69 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="templates/main_template.xhtml">
+
+	<ui:define name="html_head">
+		<title>SOCIETIES :: View User/Community intent models</title>
+	</ui:define>
+
+	<ui:define name="body">
+
+		<p:panel>
+			<f:facet name="header">
+                Context Aware User Intent Model
+            </f:facet>
+			<h:form>
+				<p:tabView id="tabView" dynamic="true" activeIndex="0">
+
+					<p:tab title="User Model">
+
+						<p:dataTable var="CAUIAction"
+							value="#{cauiController.userActionsList}">
+							<p:column headerText="Source User Action">
+								<h:outputText value="#{CAUIAction.sourceAction}" />
+							</p:column>
+							<p:column
+								headerText="Target User Action : transition probability">
+								<h:outputText value="#{CAUIAction.targetAction}" />
+							</p:column>
+
+						</p:dataTable>
+
+
+						<p:commandButton value="Learn new user model"
+							actionListener="#{cauiController.learnUserModel}" />
+						<p:commandButton value="Refresh user model"
+							actionListener="#{cauiController.refreshUserModel}" />
+					</p:tab>
+
+					<p:tab title="Community Model">
+
+						<p:dataTable var="CAUIAction"
+							value="#{cauiController.userActionsList}">
+							<p:column headerText="Source User Action">
+								<h:outputText value="#{CAUIAction.sourceAction}" />
+							</p:column>
+							<p:column
+								headerText="Target User Action : transition probability">
+								<h:outputText value="#{CAUIAction.targetAction}" />
+							</p:column>
+						</p:dataTable>
+
+
+						<p:commandButton value="Learn new community model"
+							actionListener="#{cauiController.showMeAMessage}" />
+						<p:commandButton value="Refresh community model"
+							actionListener="#{cauiController.showMeAMessage}" />
+					</p:tab>
+
+				</p:tabView>
+			</h:form>
+		</p:panel>
+
+	</ui:define>
+</ui:composition>
+</html>

@@ -25,6 +25,7 @@
 package org.societies.personalisation.CAUI.api.CAUIPrediction;
 
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -84,5 +85,7 @@ public interface ICAUIPrediction {
 	 * 
 	 */
 	public void receivePredictionFeedback(IAction action);
+	
+	
 	
 }
