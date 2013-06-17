@@ -275,7 +275,6 @@ public class IndirectTrustEngine extends TrustEngine implements IIndirectTrustEn
 	 * @param evidence
 	 * @return <code>true</code> if the specified piece of evidence is relevant
 	 *         for the supplied trustor; <code>false</code> otherwise.
-	 * @throws TrustEngineException
 	 */
 	private boolean areRelevant(final TrustedEntityId trustorId,
 			final ITrustEvidence evidence) {
