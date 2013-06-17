@@ -161,7 +161,7 @@ public class PreferenceEvaluator {
 	
 	
 	
-	public boolean evaluatesToTrue(IPreferenceCondition cond)throws Exception{
+	public boolean evaluatesToTrue(IPreferenceCondition cond){
 		if (cond instanceof ContextPreferenceCondition){
 			String currentContextValue = this.getValueFromContext(cond.getCtxIdentifier());
 			OperatorConstants operator = cond.getoperator();
@@ -174,7 +174,8 @@ public class PreferenceEvaluator {
 			else
 				return this.evaluateInt(parseString(cond.getvalue()), parseString(currentContextValue), operator);
 		}else{
-			throw new Exception("PM: Condition is not a Context condition");
+			this.logging.error("Catastrophic failure. Request to evaluate a node that is not a conditional node");
+			return false;
 		}
 		
 	}

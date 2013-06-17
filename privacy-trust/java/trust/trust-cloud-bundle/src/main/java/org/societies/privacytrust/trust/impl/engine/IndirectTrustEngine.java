@@ -257,24 +257,40 @@ public class IndirectTrustEngine extends TrustEngine implements IIndirectTrustEn
 		return resultSet;
 	}
 	
+	/**
+	 * Checks if the specified piece of evidence is relevant for the supplied
+	 * trustor. More specifically, a piece of evidence is relevant for indirect
+	 * trust evaluation if:
+	 * <ol>
+	 *   <li>type == {@link TrustEvidenceType#DIRECTLY_TRUSTED DIRECTLY_TRUSTED}</li>
+	 *   <li>trustorId != evidence.subjectId, i.e. ignore trust opinions 
+	 *       originating <i>from</i> the trustor</li>
+	 *   <li>trustorId != evidence.objectId, i.e. ignore trust opinions 
+	 *       <i>about</i> the trustor</li>
+	 *   <li>evidence.subjectId != evidence.objectId, i.e. ignore 
+	 *       self-referencing trust opinions</li>
+	 * </ol>
+	 * 
+	 * @param trustorId
+	 * @param evidence
+	 * @return <code>true</code> if the specified piece of evidence is relevant
+	 *         for the supplied trustor; <code>false</code> otherwise.
+	 * @throws TrustEngineException
+	 */
 	private boolean areRelevant(final TrustedEntityId trustorId,
-			final ITrustEvidence evidence) throws TrustEngineException {
+			final ITrustEvidence evidence) {
 		
 		boolean result = false;
-		
-		switch (evidence.getType()) {
 
-		case DIRECTLY_TRUSTED:
-			if (!trustorId.equals(evidence.getSubjectId()))
-				result = true;
-			break;
-			
-		default:
-			if (LOG.isDebugEnabled())
-				LOG.debug("Trust evidence " + evidence 
-						+ " is not relevant for trustor '" + trustorId + "'");
-		}
-		
+		if (TrustEvidenceType.DIRECTLY_TRUSTED == evidence.getType()
+				&& !trustorId.equals(evidence.getSubjectId())
+				&& !trustorId.equals(evidence.getObjectId())
+				&& !evidence.getSubjectId().equals(evidence.getObjectId()))
+			result = true;
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("Trust evidence '" + evidence + "' is relevant for trustor '"
+					+ trustorId + "': " + result);
 		return result;
 	}
 	
