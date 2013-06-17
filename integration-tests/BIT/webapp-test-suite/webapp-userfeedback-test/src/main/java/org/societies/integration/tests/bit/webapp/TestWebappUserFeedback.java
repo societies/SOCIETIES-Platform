@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import static junit.framework.Assert.fail;
-
 public class TestWebappUserFeedback extends SeleniumTest {
 
     private static final Logger log = LoggerFactory.getLogger(TestWebappUserFeedback.class);
@@ -65,7 +63,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
 //        pubSubListener.unregisterForEvents();
     }
 
-    //    @Test
+    @Test
     public void eventsAppearAtLogin_andCanBeAccepted() {
         ExpProposalContent content = new ExpProposalContent("Pick a button", new String[]{"Yes", "No"});
 
@@ -241,7 +239,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
         indexPage.verifyNumberInNotificationsBubble(0);
     }
 
-//    @Test - not quite ready yet
+    @Test
     public void sendTimedAbort_acceptEventViaPopup_ensureDataUpdated() throws ExecutionException, InterruptedException {
         indexPage.doLogin(USERNAME, PASSWORD);
         UFNotificationPopup popup;
@@ -260,7 +258,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
 
         // send a request
         ImpProposalContent content = new ImpProposalContent("Accept me", 30000);
-        Future<Boolean> result1 = userFeedback.getImplicitFB(ImpProposalType.TIMED_ABORT, content);
+        Future<Boolean> result1 = userFeedback.getImplicitFBAsync(ImpProposalType.TIMED_ABORT, content);
 
         // ensure request has been sent
         indexPage.verifyNumberInNotificationsBubble(1);
@@ -270,8 +268,8 @@ public class TestWebappUserFeedback extends SeleniumTest {
         Assert.assertFalse(result1.isDone());
 
         // respond to request
-        fail("need to accept the request");
-        popup.answerSelectManyRequest(new String[]{"Maybe", "Dont know", "Dont care"});
+//        fail("need to accept the request");
+        popup.acceptTimedAbortRequest();
         popup.close();
 
         // ensure data has been updated
@@ -288,7 +286,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
         indexPage.verifyNumberInNotificationsBubble(0);
     }
 
-    //    @Test - not quite ready yet
+    @Test
     public void sendTimedAbort_abortEventViaPopup_ensureDataUpdated() throws ExecutionException, InterruptedException {
         indexPage.doLogin(USERNAME, PASSWORD);
         UFNotificationPopup popup;
@@ -307,7 +305,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
 
         // send a request
         ImpProposalContent content = new ImpProposalContent("Abort me", 30000);
-        Future<Boolean> result1 = userFeedback.getImplicitFB(ImpProposalType.TIMED_ABORT, content);
+        Future<Boolean> result1 = userFeedback.getImplicitFBAsync(ImpProposalType.TIMED_ABORT, content);
 
         // ensure request has been sent
         indexPage.verifyNumberInNotificationsBubble(1);
@@ -317,8 +315,8 @@ public class TestWebappUserFeedback extends SeleniumTest {
         Assert.assertFalse(result1.isDone());
 
         // respond to request
-        fail("need to abort the request");
-        popup.answerSelectManyRequest(new String[]{"Maybe", "Dont know", "Dont care"});
+//        fail("need to abort the request");
+        popup.abortTimedAbortRequest();
         popup.close();
 
         // ensure data has been updated
@@ -354,7 +352,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
 
         // send a request
         ImpProposalContent content = new ImpProposalContent("Accept me", 5000);
-        Future<Boolean> result1 = userFeedback.getImplicitFB(ImpProposalType.TIMED_ABORT, content);
+        Future<Boolean> result1 = userFeedback.getImplicitFBAsync(ImpProposalType.TIMED_ABORT, content);
 
         // ensure request has been sent
         indexPage.verifyNumberInNotificationsBubble(1);
@@ -375,7 +373,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
         }
 
         Assert.assertTrue("Future object not updated after 10000ms", result1.isDone());
-        Assert.assertEquals("Value not updated in Future object", Boolean.TRUE, result1.get());
+        Assert.assertEquals("Incorrect value updated in Future object", Boolean.FALSE, result1.get());
         indexPage.verifyNumberInNotificationsBubble(0);
     }
 
