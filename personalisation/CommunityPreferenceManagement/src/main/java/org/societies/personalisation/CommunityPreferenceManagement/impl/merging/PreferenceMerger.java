@@ -301,18 +301,7 @@ public class PreferenceMerger implements IUserPreferenceMerging{
 	public IPreference mergeNewNodeAsLeaf(IPreference newNode, IPreference oldTree){
 		//DisplayPreferenceTree dpt;
 		if (newNode.isLeaf() && oldTree.isLeaf()){
-			//check if they are the same actions
-			IPreferenceOutcome oldOutcome = oldTree.getOutcome();
-			IPreferenceOutcome newOutcome = newNode.getOutcome();
-			//if they match, we only need to increase its confidence level
-			if (oldOutcome.equals(newOutcome)){
-				//increase *****confidencelevel***
-				//dpt = new DisplayPreferenceTree(new PreferenceTreeModel(oldTree),"Merged Tree");
-			}else{
-				//check confidence level of existing preference, and if can't determine what to do, ASK USER (RequestUserConfirmation
-			}
-			//dpt = new DisplayPreferenceTree(new PreferenceTreeModel(oldTree), "Merged Tree");
-			return oldTree;
+			return newNode;
 		}
 		
 		IPreference root = (IPreference) oldTree.getRoot();

@@ -27,15 +27,20 @@ package org.societies.personalisation.UserPreferenceManagement.test;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
+import java.util.Hashtable;
 import java.util.List;
-import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
-import org.hsqldb.lib.HashSet;
+import javax.swing.JOptionPane;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.societies.api.cis.management.ICis;
+import org.societies.api.cis.management.ICisManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
@@ -54,19 +59,25 @@ import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxEntityTypes;
-import org.societies.api.internal.personalisation.IPersonalisationManager;
+import org.societies.api.internal.personalisation.model.FeedbackTypes;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
+import org.societies.api.internal.useragent.feedback.IUserFeedbackResponseEventListener;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
-import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
-import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.personalisation.UserPreferenceManagement.impl.cis.CommunitiesHandler;
+import org.societies.personalisation.UserPreferenceManagement.impl.cis.CommunitiesHandler.DownloaderTask;
+import org.societies.personalisation.UserPreferenceManagement.impl.cis.CommunitiesHandler.UploaderTask;
+import org.societies.personalisation.UserPreferenceManagement.impl.cis.DownloadFeedbackListenerCallBack.FeedbackType;
+import org.societies.personalisation.UserPreferenceManagement.impl.cis.DownloadFeedbackListenerCallBack;
 import org.societies.personalisation.UserPreferenceManagement.impl.management.CtxModelTypes;
-import org.societies.personalisation.UserPreferenceManagement.impl.monitoring.CisEventListener;
 import org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.preference.api.CommunityPreferenceManagement.ICommunityPreferenceManager;
@@ -84,7 +95,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
  * @author Eliza
  *
  */
-public class TestCommunityDownload {
+public class TestCommunitiesHandler {
 
 
 	private Community community;
@@ -111,6 +122,14 @@ public class TestCommunityDownload {
 	private CtxAttribute ctxPreferenceAttribute2;
 	private final static String preferenceKey1 = "preference_1";
 	private final static String preferenceKey2 = "preference_2";
+	private IIdentityManager idManager;
+	private ICisManager cisManager;
+	private IServiceDiscovery serviceDiscovery;
+	private DownloadFeedbackListenerCallBack feedbackListenerCallBack;
+	private String[] options;
+	private ArgumentCaptor<DownloadFeedbackListenerCallBack> callBackArgument;
+	private ArgumentCaptor<ExpProposalContent> optionsArgument;
+	
 	@Before
 	public void setup(){
 		cisID = new MockIdentity(IdentityType.CSS, "cisAdmin", "ict-societies.eu");
@@ -122,9 +141,13 @@ public class TestCommunityDownload {
 		community.setOwnerJid(userId.getJid());
 		upcm = new UserPreferenceConditionMonitor();
 
+		cisManager = Mockito.mock(ICisManager.class);
+		upcm.setCisManager(cisManager);
 
+		serviceDiscovery = Mockito.mock(IServiceDiscovery.class);
+		upcm.setServiceDiscovery(serviceDiscovery);
 		commManager = Mockito.mock(ICommManager.class);
-		IIdentityManager idm = Mockito.mock(IIdentityManager.class);
+		idManager = Mockito.mock(IIdentityManager.class);
 		upcm.setCommManager(commManager);
 		communityPreferenceMgr = Mockito.mock(ICommunityPreferenceManager.class);
 		upcm.setCommunityPreferenceMgr(communityPreferenceMgr);
@@ -138,15 +161,24 @@ public class TestCommunityDownload {
 		upcm.setUserFeedbackMgr(userFeedbackMgr);
 		userPrefLearning = Mockito.mock(IC45Learning.class);
 		upcm.setUserPrefLearning(userPrefLearning);
-		upcm.initialisePreferenceManagement();
-		uploadPreferenceToCommunity();
-
+		setupContextAndPreferences();
+		Service service = new Service();
+		service.setServiceIdentifier(this.serviceID);
 
 		try {
+			List<ICis> cisList = new ArrayList<ICis>();
+			ICis cis = new MockCis(this.cisID.getJid());
+			cisList.add(cis);
+			
+			List<Service> serviceList = new ArrayList<Service>();
+			serviceList.add(service);
+			Mockito.when(serviceDiscovery.getServices(cisID)).thenReturn(new AsyncResult<List<Service>>(serviceList));
+			Mockito.when(cisManager.getCisList()).thenReturn(cisList);
 			Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, "PREFERENCE_REGISTRY")).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
-			Mockito.when(this.commManager.getIdManager()).thenReturn(idm);
+			Mockito.when(this.commManager.getIdManager()).thenReturn(idManager);
 			Mockito.when(this.commManager.getIdManager().fromJid(community.getCommunityJid())).thenReturn(cisID);
 			Mockito.when(this.commManager.getIdManager().getThisNetworkNode()).thenReturn(userId);
+			Mockito.when(this.idManager.getThisNetworkNode()).thenReturn(userId);
 			Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PREFERENCE)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
 
 			Mockito.when(ctxBroker.retrieveIndividualEntity(userId)).thenReturn(new AsyncResult<IndividualCtxEntity>(personCtxEntity));
@@ -172,29 +204,88 @@ public class TestCommunityDownload {
 			Mockito.when(ctxBroker.update(ctxPreferenceRegistryAttribute)).thenReturn(new AsyncResult<CtxModelObject>(ctxPreferenceRegistryAttribute));
 			Mockito.when(ctxBroker.retrieve(ctxPreferenceAttribute1.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.ctxPreferenceAttribute1));
 			Mockito.when(ctxBroker.retrieve(ctxPreferenceAttribute2.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.ctxPreferenceAttribute2));
-			this.storeUserPreference();
+			List<CtxIdentifier> attrList = new ArrayList<CtxIdentifier>();
+			attrList.add(this.locationAttribute.getId());
+			Mockito.when(ctxBroker.lookup(this.personCtxEntity.getId(), CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC)).thenReturn(new AsyncResult<List<CtxIdentifier>>(attrList));
+			Hashtable<String, PreferenceDetails> detailsTable = new Hashtable<String, PreferenceDetails>();
+			
+			
+			optionsArgument = ArgumentCaptor.forClass(ExpProposalContent.class);
+			
+			callBackArgument = ArgumentCaptor.forClass(DownloadFeedbackListenerCallBack.class);
+			
+			Mockito.when(userFeedbackMgr.getExplicitFBAsync(Mockito.eq(ExpProposalType.CHECKBOXLIST), optionsArgument.capture(), callBackArgument.capture())).thenReturn(new AsyncResult<List<String>>(new ArrayList<String>()));
+
+			
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (ServiceDiscoveryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		upcm.initialisePreferenceManagement();
+		
+		this.storeUserPreference();
 	}
 
 	@Test
-	public void test(){
-		//with empty preference DB:
-		CisEventListener cisEventListener = upcm.getCisEventListener();
-		InternalEvent iEvent = new InternalEvent(EventTypes.CIS_SUBS, "subscription of CIS", this.cisID.getBareJid(), community);
-		cisEventListener.handleInternalEvent(iEvent);
-
-		//adding a preference
-
-		//cisEventListener.handleInternalEvent(iEvent);
+	public void testUpload(){
+		CommunitiesHandler communitiesHandler = upcm.getCommunitiesHandler();
+		
+		UploaderTask scheduleUpload = communitiesHandler.scheduleUpload(new Date());
+		
+/*		ArgumentCaptor<ExpProposalContent> downloadOptionsArgument = ArgumentCaptor.forClass(ExpProposalContent.class);
+		
+		ArgumentCaptor<DownloadFeedbackListenerCallBack> argument = ArgumentCaptor.forClass(DownloadFeedbackListenerCallBack.class);
+		Mockito.verify(userFeedbackMgr).getExplicitFBAsync(Mockito.eq(ExpProposalType.CHECKBOXLIST), downloadOptionsArgument.capture(), argument.capture());
+		*/
+		
+		while (!scheduleUpload.isDone()){
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		feedbackListenerCallBack = callBackArgument.getValue();
+		ExpProposalContent value = optionsArgument.getValue();
+		options = value.getOptions();
+		List<String> uploadOptionsList = new ArrayList<String>();
+		uploadOptionsList.add(options[0]);
+		
+		feedbackListenerCallBack.responseReceived(uploadOptionsList);
+		
+	}
+	
+	@Test
+	public void testDownload(){
+		CommunitiesHandler communitiesHandler = upcm.getCommunitiesHandler();
+		DownloaderTask scheduleDownload = communitiesHandler.scheduleDownload(new Date());
+		
+		while (!scheduleDownload.isDone()){
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		feedbackListenerCallBack = callBackArgument.getValue();
+		ExpProposalContent value = optionsArgument.getValue();
+		options = value.getOptions();
+		List<String> optionsList = new ArrayList<String>();
+		optionsList.add(options[0]);
+		
+		feedbackListenerCallBack.responseReceived(optionsList);
+		
 	}
 
-	private void uploadPreferenceToCommunity(){
+	private void setupContextAndPreferences(){
 
 		try {
 			this.serviceID = new ServiceResourceIdentifier();
