@@ -154,7 +154,10 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			privacyDataManagerInternal.updatePermissions(RequestorUtils.toRequestor(requestor, commManager.getIdManager()), permissions);
 		}
 		catch (InvalidFormatException e) {
-			throw new PrivacyException("Error with the requestor", e);
+			LOG.error("[Error] with the requestor, return DENY", e);
+			permissions = new ArrayList<ResponseItem>();
+			ResponseItem permission = ResponseItemUtils.create(Decision.DENY, requestItemNull);
+			permissions.add(permission);
 		}
 		return permissions;
 	}

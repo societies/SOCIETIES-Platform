@@ -395,23 +395,28 @@ public class PrivacyDataManagerTest {
 		String dataId3 = "context:///locationSymbolic/";
 		String dataId4 = "context:///locationSymbolic";
 		String dataId5 = "context:///";
+		try {
+			assertNotNull("Data id from "+dataId1+" should not be null", DataIdentifierUtils.fromUri(dataId1));
+			assertEquals("Owner id from "+dataId1+" not retrieved", ownerId, DataIdentifierUtils.fromUri(dataId1).getOwnerId());
 
-		assertNotNull("Data id from "+dataId1+" should not be null", DataIdentifierUtils.fromUri(dataId1));
-		assertEquals("Owner id from "+dataId1+" not retrieved", ownerId, DataIdentifierUtils.fromUri(dataId1).getOwnerId());
+			assertNotNull("Data id from "+dataId2+" should not be null", DataIdentifierUtils.fromUri(dataId2));
+			assertEquals("Owner id from "+dataId2+" not retrieved", ownerId, DataIdentifierUtils.fromUri(dataId2).getOwnerId());
 
-		assertNotNull("Data id from "+dataId2+" should not be null", DataIdentifierUtils.fromUri(dataId2));
-		assertEquals("Owner id from "+dataId2+" not retrieved", ownerId, DataIdentifierUtils.fromUri(dataId2).getOwnerId());
+			assertNotNull("Data id from "+dataId3+" should not be null", DataIdentifierUtils.fromUri(dataId3));
+			assertEquals("Owner id from "+dataId3+" not retrieved", "", DataIdentifierUtils.fromUri(dataId3).getOwnerId());
 
-		assertNotNull("Data id from "+dataId3+" should not be null", DataIdentifierUtils.fromUri(dataId3));
-		assertEquals("Owner id from "+dataId3+" not retrieved", "", DataIdentifierUtils.fromUri(dataId3).getOwnerId());
+			assertNotNull("Data id from "+dataId4+" should not be null", DataIdentifierUtils.fromUri(dataId4));
+			assertEquals("Owner id from "+dataId4+" not retrieved", "", DataIdentifierUtils.fromUri(dataId4).getOwnerId());
+			assertEquals("Data type from "+dataId4+" not retrieved", "locationSymbolic", DataIdentifierUtils.fromUri(dataId4).getType());
 
-		assertNotNull("Data id from "+dataId4+" should not be null", DataIdentifierUtils.fromUri(dataId4));
-		assertEquals("Owner id from "+dataId4+" not retrieved", "", DataIdentifierUtils.fromUri(dataId4).getOwnerId());
-		assertEquals("Data type from "+dataId4+" not retrieved", "locationSymbolic", DataIdentifierUtils.fromUri(dataId4).getType());
-
-		assertNotNull("Data id from "+dataId5+" should not be null", DataIdentifierUtils.fromUri(dataId5));
-		assertEquals("Owner id from "+dataId5+" not retrieved", "", DataIdentifierUtils.fromUri(dataId5).getOwnerId());
-		assertEquals("Data type from "+dataId5+" not retrieved", "", DataIdentifierUtils.fromUri(dataId5).getType());
+			assertNotNull("Data id from "+dataId5+" should not be null", DataIdentifierUtils.fromUri(dataId5));
+			assertEquals("Owner id from "+dataId5+" not retrieved", "", DataIdentifierUtils.fromUri(dataId5).getOwnerId());
+			assertEquals("Data type from "+dataId5+" not retrieved", "", DataIdentifierUtils.fromUri(dataId5).getType());
+		}
+		catch(MalformedCtxIdentifierException e) {
+			LOG.error("[Error MalformedCtxIdentifierException] "+testTitle, e);
+			fail("[Error MalformedCtxIdentifierException] "+testTitle+":"+e.getMessage());
+		}
 	}
 
 	@Test
