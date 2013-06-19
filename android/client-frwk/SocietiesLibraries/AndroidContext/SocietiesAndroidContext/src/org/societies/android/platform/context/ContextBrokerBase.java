@@ -56,7 +56,6 @@ import org.societies.api.schema.context.contextmanagement.RetrieveCommunityEntit
 import org.societies.api.schema.context.contextmanagement.RetrieveIndividualEntityIdBean;
 import org.societies.api.schema.context.contextmanagement.UpdateBean;
 import org.societies.api.schema.context.model.CtxAssociationBean;
-import org.societies.api.schema.context.model.CtxAssociationIdentifierBean;
 import org.societies.api.schema.context.model.CtxAttributeBean;
 import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
 import org.societies.api.schema.context.model.CtxEntityBean;
@@ -89,7 +88,8 @@ public class ContextBrokerBase implements IInternalCtxClient{
 					"org.societies.api.schema.identity",
 					"org.societies.api.schema.servicelifecycle.model"));
 
-    private static ExpiringCache<CtxIdentifierBean, CtxModelObjectBean> cache = new ExpiringCache();
+	//expiring cache with key value the identifier in string
+    private static ExpiringCache<String, CtxModelObjectBean> cache = new ExpiringCache();
 
 	//Logging tag
 	private static final String LOG_TAG = ContextBrokerBase.class.getName();
@@ -452,11 +452,11 @@ public class ContextBrokerBase implements IInternalCtxClient{
 				IIdentity toIdentity;
 	
 				toIdentity = this.commMgr.getIdManager().getCloudNode();
-				
+					
 				Log.d(LOG_TAG, "identity used = " + toIdentity.getJid());
 				CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
 				cbPacket.setMethod(BrokerMethodBean.LOOKUP);
-
+	
 				LookupBean ctxBrokerLookupBean = new LookupBean();
 				// 1. set requestorBean
 				ctxBrokerLookupBean.setRequestor(requestor);
@@ -466,16 +466,16 @@ public class ContextBrokerBase implements IInternalCtxClient{
 				ctxBrokerLookupBean.setModelType(modelType);
 				// 4. set type
 				ctxBrokerLookupBean.setType(type);
-					
+						
 				cbPacket.setLookup(ctxBrokerLookupBean);
 	
 				ICommCallback ctxBrokerCallBack = new ContextBrokerCallback(client, IInternalCtxClient.LOOKUP);
 				Log.d(LOG_TAG, "cloudNode= " + toIdentity.getJid());
-				
+					
 				Stanza stanza = new Stanza(toIdentity);
 				this.commMgr.sendIQ(stanza, IQ.Type.GET, cbPacket, ctxBrokerCallBack);
 				Log.d(LOG_TAG, "Sent IQ with stanza=" + stanza);
-			
+				
 			} catch (CommunicationException e) {
 				Log.e(LOG_TAG, "Error sending XMPP IQ", e);
 			} catch (Exception e) {
@@ -552,11 +552,15 @@ public class ContextBrokerBase implements IInternalCtxClient{
 			CtxIdentifierBean identifier) throws CtxException {
 		Log.d(LOG_TAG, "Retrieve called by client: " + client);
 		
-		CtxModelObjectBean retrObj = cache.get(identifier);
+		CtxModelObjectBean retrObj = cache.get(identifier.getString());
+
+		Log.d(LOG_TAG, "Retrieved object from cache: " + retrObj);
+		Log.d(LOG_TAG, "identifier used: " + identifier.getString() + " and getting: " + cache.get(identifier.getString()));
+		Log.d(LOG_TAG, "cached objects: " + cache);
 		
 		//Checking first the cache to retrieve the object
 		if (retrObj != null) {
-			Log.d(LOG_TAG, "Retrieved object from cache: " + retrObj);
+
 			
 			if (client != null) {
 				final Intent intent = new Intent(IInternalCtxClient.RETRIEVE);
@@ -564,7 +568,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 				
 				intent.addFlags(Intent.FLAG_DEBUG_LOG_RESOLUTION);
 				ContextBrokerBase.this.applicationContext.sendBroadcast(intent);
-				Log.d(LOG_TAG, "SendBroadcast intent: " + intent);
+				Log.d(LOG_TAG, "SendBroadcast intent (from cache): " + intent);
 			}			
 		}
 		else {
@@ -937,7 +941,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 							final CtxEntityBean entityBean = payload.getCreateEntityBeanResult();
 
 							//Caching created entity
-							cache.put(entityBean.getId(), entityBean);
+							cache.put(entityBean.getId().getString(), entityBean);
 							Log.d(LOG_TAG, "Entity cached - " + entityBean);
 							
 							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) entityBean);
@@ -957,7 +961,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 							final CtxAttributeBean attributeBean = payload.getCreateAttributeBeanResult();
 
 							//Caching created attribute
-							cache.put(attributeBean.getId(), attributeBean);
+							cache.put(attributeBean.getId().getString(), attributeBean);
 							Log.d(LOG_TAG, "Attribute cached - " + attributeBean);
 							
 							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) attributeBean);
@@ -977,7 +981,7 @@ public class ContextBrokerBase implements IInternalCtxClient{
 							Log.d(LOG_TAG, "association.getId(): " + associationBean.getId().getString());
 
 							//Caching created attribute
-							cache.put(associationBean.getId(), associationBean);
+							cache.put(associationBean.getId().getString(), associationBean);
 							Log.d(LOG_TAG, "Association cached - " + associationBean);
 
 							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) associationBean);
@@ -1010,6 +1014,11 @@ public class ContextBrokerBase implements IInternalCtxClient{
 								return;
 							}
 							final CtxModelObjectBean removedModelObjectBean = payload.getRemoveBeanResult();
+
+							//remove from cache
+							if (cache.keySet().contains(removedModelObjectBean.getId().getString())) {
+								cache.remove(removedModelObjectBean.getId().getString());
+							}
 
 							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) removedModelObjectBean);
 							
@@ -1070,6 +1079,11 @@ public class ContextBrokerBase implements IInternalCtxClient{
 								return;
 							}
 							final CtxModelObjectBean updateBean = payload.getUpdateBeanResult();
+
+							//caching updated object
+							if (cache.keySet().contains(updateBean.getId().getString())) {
+								cache.put(updateBean.getId().getString(), updateBean);
+							}
 
 							intent.putExtra(IInternalCtxClient.INTENT_RETURN_VALUE_KEY, (Parcelable) updateBean);
 							

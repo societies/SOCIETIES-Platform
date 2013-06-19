@@ -3,7 +3,7 @@ package org.societies.android.platform.context;
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.LinkedHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Set;
 
 class ExpiringCache<K, V> {
@@ -38,7 +38,8 @@ class ExpiringCache<K, V> {
     @SuppressWarnings("serial")
 	ExpiringCache(long millisUntilExpiration) {
         this.millisUntilExpiration = millisUntilExpiration;
-        map = new LinkedHashMap<K, Entry<K,V>>() {
+        //use ConcurrentHashMap instead of LinkedHashMap
+        map = new ConcurrentHashMap<K, Entry<K,V>>() {
             @SuppressWarnings("rawtypes")
 			protected boolean removeEldestEntry(Map.Entry eldest) {
                 return size() > MAX_ENTRIES;
@@ -69,6 +70,10 @@ class ExpiringCache<K, V> {
             entry = map.put(key, new Entry<K, V>(System.currentTimeMillis(), val));
         }
         return entry == null ? null : entry.get();
+    }
+    
+    synchronized void remove(K key) {
+    	map.remove(key);    	
     }
     
     synchronized void clear() {
