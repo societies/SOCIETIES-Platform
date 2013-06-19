@@ -72,19 +72,17 @@ public class CACIPrediction {
 	static boolean cacimodelExist = false;
 
 	protected CtxAttribute currentCaciModelAttr;
-	//private IIdentity cssOwnerId;
 
 	public CACIPrediction(ICtxBroker ctxBroker, ICAUITaskManager caciTaskManager, ICommManager commsMgr){
 
 		this.ctxBroker = ctxBroker;
 		this.caciTaskManager = caciTaskManager;
 		this.commsMgr = commsMgr;
-		
 	}
 
+	
 	protected IIdentity getOperatorID (){
-		
-		
+	
 		final INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
 		final String cssOwnerStr = cssNodeId.getBareJid();
 		IIdentity cssOwnerId = null;
@@ -97,15 +95,12 @@ public class CACIPrediction {
 		}		
 		return cssOwnerId;
 	}
-	
-	
-	public CACIPrediction(ICtxBroker ctxBroker, ICommManager commsMgr){
+		
 
+	public CACIPrediction(ICtxBroker ctxBroker, ICommManager commsMgr){
+	
 		this.ctxBroker = ctxBroker;
 		this.commsMgr = commsMgr;
-	
-		
-	
 	}
 
 	public List<IUserIntentAction> getPrediction(IIdentity requestor,
@@ -148,13 +143,9 @@ public class CACIPrediction {
 			}			
 		}
 
-
 		return predictedActionsList;
 	}
 
-
-	
-	
 	
 	private IUserIntentAction findBestMatchingAction(List<IUserIntentAction> actionList){
 		IUserIntentAction bestAction = null;

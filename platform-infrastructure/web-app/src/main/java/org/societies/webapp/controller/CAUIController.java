@@ -3,7 +3,6 @@ package org.societies.webapp.controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,16 +12,13 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
 import org.societies.personalisation.CACI.api.CACIDiscovery.ICACIDiscovery;
+import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.webapp.models.CAUIAction;
 import org.societies.webapp.service.UserService;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
-import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelType;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -34,9 +30,7 @@ import javax.faces.bean.RequestScoped;
 @RequestScoped
 public class CAUIController extends BasePageController {
 
-
 	private static Logger LOG = LoggerFactory.getLogger(CAUIController.class);
-
 
 	private static final long serialVersionUID = 1L;
 
@@ -44,9 +38,11 @@ public class CAUIController extends BasePageController {
 	private UserService userService; 
 	private String stringProperty;
 	private boolean boolProperty;
+	static int i = 0;
 
 	private List<CAUIAction> userActionsList = new ArrayList<CAUIAction>();
-
+	private List<CAUIAction> communityActionsList = new ArrayList<CAUIAction>();
+	
 	public CAUIController() {
 
 		LOG.info(this.getClass().getName() + " instantiated");
@@ -56,25 +52,14 @@ public class CAUIController extends BasePageController {
 	public void init() {
 
 		LOG.info(this.getClass().getName() + " initialising");
-
-		//userActionsList = this.getCAUIActiveModel();
-		
-		HashMap<String,Double> target1 = new HashMap<String,Double>();
-		target1.put("targetAct1", 0.8);
-		target1.put("targetAct2", 0.2);
-		CAUIAction action1 = new CAUIAction("action1",target1);
-
-		HashMap<String,Double> target2 = new HashMap<String,Double>();
-		target2.put("targetAct2", 1.0);
-		CAUIAction action2 = new CAUIAction("action2",target2);
-
-		System.out.println("action records 1 ");
-		this.userActionsList.add(action1);
-		this.userActionsList.add(action2);
-		System.out.println("action records 2 aaaa "+this.userActionsList);
-		
+		this.userActionsList = this.getActiveModel(CtxAttributeTypes.CAUI_MODEL);
+		this.communityActionsList = this.getActiveModel(CtxAttributeTypes.CACI_MODEL);
+		  
+		LOG.info("action records ::"+this.userActionsList);
+		LOG.info("community records ::"+this.communityActionsList);
 	}
 
+	/*
 	@ManagedProperty(value = "#{cauiTaskManager}")
 	private ICAUITaskManager cauiTaskManager;
 
@@ -83,9 +68,12 @@ public class CAUIController extends BasePageController {
 
 	@ManagedProperty(value = "#{caciDiscovery}")
 	private ICACIDiscovery caciDiscovery;
-
+*/
 	@ManagedProperty(value = "#{internalCtxBroker}")
 	private ICtxBroker internalCtxBroker;
+	
+	@ManagedProperty(value = "#{cauiPrediction}")
+	private ICAUIPrediction cauiPrediction;
 
 	private ICommManager commMngrRef;
 
@@ -96,8 +84,112 @@ public class CAUIController extends BasePageController {
 		return this.userActionsList;
 	}
 
+	public List<CAUIAction> getCommunityActionsList(){
+
+		return this.communityActionsList;
+	}
+
+	
 
 
+	public List<CAUIAction> getActiveModel(String type){
+
+		List<CAUIAction> result = new ArrayList<CAUIAction>();
+		HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> model = new 	HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>>();
+
+		if (type.equals(CtxAttributeTypes.CAUI_MODEL)){
+			if(this.cauiPrediction.getCAUIActiveModel() != null){
+				model = this.cauiPrediction.getCAUIActiveModel();
+				LOG.info("getCAUIActiveModel  : "+ model);
+				result = convertModel(model);
+				return result;
+			}
+		} else if(type.equals(CtxAttributeTypes.CACI_MODEL) ){
+			if(this.cauiPrediction.getCACIActiveModel() != null){
+				model = this.cauiPrediction.getCACIActiveModel();
+				LOG.info("getCACIActiveModel  : "+ model);
+				result = convertModel(model);
+				return result;
+			}
+		} 
+		return result;
+	}
+
+
+	private List<CAUIAction> convertModel(HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> originalModel ){
+
+		List<CAUIAction> result = new ArrayList<CAUIAction>();
+
+		if(!originalModel.isEmpty()){
+
+			for(IUserIntentAction sourceAct : originalModel.keySet()){
+
+				String sourcActionString = sourceAct.toString();
+
+				HashMap<String, Double> targetMap = new HashMap<String, Double>();
+				HashMap<IUserIntentAction, Double> targetMapOriginal = originalModel.get(sourceAct);
+
+				for(IUserIntentAction targetActOrig : targetMapOriginal.keySet()){
+					targetMap.put(targetActOrig.toString(), targetMapOriginal.get(targetActOrig));
+				}
+
+				CAUIAction cauiAct = new CAUIAction(sourcActionString, targetMap);
+				LOG.info("convertModel  : "+ cauiAct);
+				result.add(cauiAct);
+			}		
+		}
+
+		return result;
+	}
+
+	
+	public void learnUserModel(){
+		LOG.info("discovery started...aaaaaaaaa " );
+		int i = 0;
+		addGlobalMessage("learn User Model", "for id "+i, FacesMessage.SEVERITY_INFO);
+		LOG.info("service ref for cauiDisc "+ this.cauiPrediction);
+		LOG.info("service ref for broker  "+ this.internalCtxBroker);
+		this.cauiPrediction.generateNewUserModel();
+		LOG.info("discovery started..." );
+	}
+
+
+	public void refreshUserModel(){
+		addGlobalMessage("MODEL REFRESHED", "Now here's your message!", FacesMessage.SEVERITY_INFO);
+	}
+
+	
+	public void learnCommunityModel(){
+		int i = 0;
+		addGlobalMessage("learn community Model", "for id "+i, FacesMessage.SEVERITY_INFO);
+		IIdentity cisId = null;
+		this.cauiPrediction.generateNewCommunityModel(cisId);
+		LOG.info("discovery started..." );
+	}
+
+	
+	private IIdentity getOwnerId(){
+
+		IIdentity cssOwnerId = null;
+		try {
+			final INetworkNode cssNodeId = this.commMngrRef.getIdManager().getThisNetworkNode();
+
+			final String cssOwnerStr = cssNodeId.getBareJid();
+			cssOwnerId = this.commMngrRef.getIdManager().fromJid(cssOwnerStr);
+			LOG.info("*** css identity = " + cssOwnerId);
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return cssOwnerId;
+	}
+
+
+	
+	//*************************************
+    // service registration 
+	//*************************************
+	/*
 	public ICAUITaskManager getCauiTaskManager() {
 
 		LOG.info("get task manager "+cauiTaskManager);
@@ -125,7 +217,18 @@ public class CAUIController extends BasePageController {
 		LOG.info("get cauiDiscovery manager "+cauiDiscovery);    
 		return caciDiscovery;
 	}
+	
+	public void setCauiDiscovery(ICAUIDiscovery cauiDiscovery) {
+		LOG.info("set cauiDiscovery manager " +cauiDiscovery);
+		this.cauiDiscovery = cauiDiscovery;
+	}
 
+	public void setCaciDiscovery(ICACIDiscovery caciDiscovery) {
+		LOG.info("set caciDiscovery manager " +caciDiscovery);
+		this.caciDiscovery = caciDiscovery;
+	}
+
+*/
 	public ICtxBroker getInternalCtxBroker() {
 		LOG.info("get internalCtxBroker manager " +internalCtxBroker);
 		return internalCtxBroker;
@@ -142,16 +245,7 @@ public class CAUIController extends BasePageController {
 	}
 
 
-	public void setCauiDiscovery(ICAUIDiscovery cauiDiscovery) {
-		LOG.info("set cauiDiscovery manager " +cauiDiscovery);
-		this.cauiDiscovery = cauiDiscovery;
-	}
-
-	public void setCaciDiscovery(ICACIDiscovery caciDiscovery) {
-		LOG.info("set caciDiscovery manager " +caciDiscovery);
-		this.caciDiscovery = caciDiscovery;
-	}
-
+	
 	public ICommManager getCommMngrRef() {
 		return this.commMngrRef;
 	}
@@ -161,6 +255,15 @@ public class CAUIController extends BasePageController {
 		this.commMngrRef = commMngrRef;
 	}
 
+
+	public ICAUIPrediction getCauiPrediction() {
+		LOG.info("get getCauiPrediction "+this.cauiPrediction);
+		return this.cauiPrediction;
+	}
+
+	public void setCauiPrediction(ICAUIPrediction cauiPrediction) {
+		this.cauiPrediction = cauiPrediction;
+	}
 
 
 	public UserService getUserService() {
@@ -193,75 +296,4 @@ public class CAUIController extends BasePageController {
 		addGlobalMessage("THIS IS CAUI MESSAGE", "Now here's your message!", FacesMessage.SEVERITY_INFO);
 	}
 
-
-
-	public List<CAUIAction> getCAUIActiveModel(){
-
-		List<CAUIAction> result = new ArrayList<CAUIAction>();
-		HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> model = new 	HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>>();
-		if(this.cauiTaskManager.getCAUIActiveModel() != null){
-			model = this.cauiTaskManager.getCAUIActiveModel();	
-
-			for(IUserIntentAction sourceAct : model.keySet()){
-
-				String sourcActionString = sourceAct.toString();
-
-				HashMap<String, Double> targetMap = new HashMap<String, Double>();
-				HashMap<IUserIntentAction, Double> targetMapOriginal = model.get(sourceAct);
-
-				for(IUserIntentAction targetActOrig : targetMapOriginal.keySet()){
-					targetMap.put(targetActOrig.toString(), targetMapOriginal.get(targetActOrig));
-				}
-
-				CAUIAction cauiAct = new CAUIAction(sourcActionString, targetMap);
-				result.add(cauiAct);
-			}		
-		}
-
-		return result;		 
-	}
-
-
-	public void learnUserModel(){
-		int i = 0;
-		addGlobalMessage("learn User Model", "for id "+i, FacesMessage.SEVERITY_INFO);
-		LOG.info("service ref for cauiDisc "+ this.cauiDiscovery);
-		LOG.info("service ref for broker  "+ this.internalCtxBroker);
-		this.cauiDiscovery.generateNewUserModel();
-		LOG.info("discovery started..." );
-
-	}
-
-	
-	public void refreshUserModel(){
-		List<CAUIAction> ls = getCAUIActiveModel();
-		
-		LOG.info("refreshUserModel: "+ ls);
-		
-		addGlobalMessage("MODEL REFRESHED", "Now here's your message!", FacesMessage.SEVERITY_INFO);
-	}
-
-	public void learnCommunityModel(){
-		int i = 0;
-		addGlobalMessage("learn community Model", "for id "+i, FacesMessage.SEVERITY_INFO);
-		this.caciDiscovery.generateNewCommunityModel();
-		LOG.info("discovery started..." );
-	}
-
-	private IIdentity getOwnerId(){
-
-		IIdentity cssOwnerId = null;
-		try {
-			final INetworkNode cssNodeId = this.commMngrRef.getIdManager().getThisNetworkNode();
-
-			final String cssOwnerStr = cssNodeId.getBareJid();
-			cssOwnerId = this.commMngrRef.getIdManager().fromJid(cssOwnerStr);
-			LOG.info("*** css identity = " + cssOwnerId);
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return cssOwnerId;
-	}
 }

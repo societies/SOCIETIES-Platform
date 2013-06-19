@@ -44,12 +44,19 @@ import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 public interface ICAUIPrediction {
 
 	/**
-	 * This method allows the system to provide predictions 
+	 * This method allows the system to provide predictions based on user model
 	 * 
 	 * @param bool
 	 */
-	public void enablePrediction(Boolean bool);
+	public void enableUserPrediction(Boolean bool);
 
+	/**
+	 * This method allows the system to provide predictions based on community model 
+	 * 
+	 * @param bool
+	 */
+	public void enableCommPrediction(Boolean bool);
+	
 	/**
 	 * Allows any service to request a context-based user intent prediction.
 	 *  
@@ -86,6 +93,31 @@ public interface ICAUIPrediction {
 	 */
 	public void receivePredictionFeedback(IAction action);
 	
+	/**
+	 * This method return a map describing the transitions among performed user actions and possible future actions
+	 * based on a learned user model.
+	 * 
+	 * @return user model
+	 */
+	public HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> getCAUIActiveModel();
 	
+	/**
+	 * This method return a map describing the transitions among performed user actions and possible future actions 
+	 * based on a learned community model 
+	 * 
+	 * @return community model
+	 */
+	 
+	public HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> getCACIActiveModel();
+
+	/**
+	 * This method initiates the generation of a new user model.
+	 */
+	public void generateNewUserModel();
 	
+	/**
+	 * This methods initiates the generation of a new Context Aware Community Intent model
+	 */
+	public void generateNewCommunityModel(IIdentity cisId);
+		
 }

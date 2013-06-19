@@ -57,6 +57,7 @@ import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
+import org.societies.personalisation.CACI.api.CACIDiscovery.ICACIDiscovery;
 import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
@@ -91,6 +92,9 @@ public class CAUIPrediction implements ICAUIPrediction{
 	private ICAUITaskManager caciTaskManager; 
 
 	private ICAUIDiscovery cauiDiscovery;
+	private ICACIDiscovery caciDiscovery;
+	
+	
 	private ICommManager commsMgr;
 
 	private Boolean enableCauiPrediction = true;  
@@ -123,14 +127,15 @@ public class CAUIPrediction implements ICAUIPrediction{
 		LOG.debug("CAUIPrediction initialised");
 		LOG.debug("registerForNewUiModelEvent");
 
-		retrieveModelDB();
-		registerForNewUiModelEvent();
-
-		LOG.debug( "caci manager: "+ this.caciTaskManager );
-
-		// TODO get new instance of task manager service
+		//set caui Active model if exists
+		retrieveCAUIModelDB();
+		
+		// set caci Active model if exists
 		this.caciPredictor = new CACIPrediction(this.ctxBroker, this.caciTaskManager, this.commsMgr);
-
+		retrieveCACIModelDB();
+		
+		registerForNewUiModelEvent();
+	
 
 		try {
 			LOG.debug("register for cis join and new community model creation");
@@ -148,12 +153,12 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 
 	@Override
-	public void enablePrediction(Boolean bool) {
+	public void enableUserPrediction(Boolean bool) {
 		this.enableCauiPrediction = bool;
 	}
 
-	//TODO add to interface
-	public void enableCACIPrediction(Boolean bool) {
+	@Override
+	public void enableCommPrediction(Boolean bool) {
 		enableCACIPrediction = bool;
 	}
 
@@ -800,7 +805,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 	//*** helper context class 
 	//***********************************
 
-	private void retrieveModelDB(){
+	private void retrieveCAUIModelDB(){
 
 		try {
 			List<CtxIdentifier>	listModels = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CAUI_MODEL).get();
@@ -831,7 +836,41 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	}
 
+	private void retrieveCACIModelDB(){
 
+		try {
+			List<CtxIdentifier>	listModels = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, "CAUI_CACI_MODEL").get();
+			if(!listModels.isEmpty()){
+				CtxAttribute modelAttr = (CtxAttribute) this.ctxBroker.retrieve(listModels.get(0)).get();
+				if(modelAttr.getBinaryValue() != null){
+					UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(modelAttr.getBinaryValue(), this.getClass().getClassLoader());
+					setCACIActiveModel(newUIModelData);	
+				}				
+			}
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+
+	}
+
+	
+	
 	private CtxAttribute retrieveOperatorsCtx(String type){
 		CtxAttribute ctxAttr = null;
 		try {
@@ -899,6 +938,44 @@ public class CAUIPrediction implements ICAUIPrediction{
 	}
 
 
+	
+	// ******
+	@Override
+	public HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> getCAUIActiveModel() {
+		
+		HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> activeCAUIModel = new HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>>(); 
+		if(this.cauiTaskManager.getCAUIActiveModel() != null ){
+			activeCAUIModel = this.cauiTaskManager.getCAUIActiveModel();	
+		}
+		return activeCAUIModel;
+	}
+
+	@Override
+	public HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> getCACIActiveModel() {
+		
+		HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> activeCACIModel = new HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>>(); 
+		if(this.caciTaskManager.getCAUIActiveModel() != null ){
+			activeCACIModel = this.caciTaskManager.getCAUIActiveModel();	
+		}			
+		return activeCACIModel;
+	}
+
+	@Override
+	public void generateNewUserModel() {
+		
+		this.cauiDiscovery.generateNewUserModel();
+		
+	}
+
+	@Override
+	public void generateNewCommunityModel(IIdentity cisId) {
+		
+		this.caciDiscovery.generateNewCommunityModel(cisId);
+		
+	}
+
+	
+	
 
 
 	//Services registration
@@ -952,7 +1029,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	public ICAUITaskManager getCauiTaskManager() {
 		LOG.debug(this.getClass().getName()+": Return cauiTaskManager");
-		return cauiTaskManager;
+		return this.cauiTaskManager;
 	}
 
 
@@ -970,7 +1047,19 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	public ICommManager getCommsMgr() {
 		LOG.debug(this.getClass().getName()+": Return CommsMgr");
-		return commsMgr;
+		return this.commsMgr;
 	}
 
+	public ICACIDiscovery getCaciDiscovery() {
+		LOG.debug(this.getClass().getName()+": Got caciDiscovery");
+		return this.caciDiscovery;
+	}
+
+	public void setCaciDiscovery(ICACIDiscovery caciDiscovery) {
+		this.caciDiscovery = caciDiscovery;
+	}
+
+	//Services registration
+	
+	
 }

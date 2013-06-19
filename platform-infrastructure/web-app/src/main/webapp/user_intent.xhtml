@@ -11,7 +11,7 @@
 	</ui:define>
 
 	<ui:define name="body">
-
+	<h:head/>
 		<p:panel>
 			<f:facet name="header">
                 Context Aware User Intent Model
@@ -21,7 +21,7 @@
 
 					<p:tab title="User Model">
 
-						<p:dataTable var="CAUIAction"
+						<p:dataTable id="userTable" var="CAUIAction"
 							value="#{cauiController.userActionsList}">
 							<p:column headerText="Source User Action">
 								<h:outputText value="#{CAUIAction.sourceAction}" />
@@ -35,15 +35,16 @@
 
 
 						<p:commandButton value="Learn new user model"
-							actionListener="#{cauiController.learnUserModel}" />
+							action="#{cauiController.learnUserModel}" update="userTable" />
 						<p:commandButton value="Refresh user model"
-							actionListener="#{cauiController.refreshUserModel}" />
+							action="#{cauiController.refreshUserModel}" update="userTable" />
 					</p:tab>
 
 					<p:tab title="Community Model">
 
-						<p:dataTable var="CAUIAction"
-							value="#{cauiController.userActionsList}">
+						<p:dataTable id="communityTable" var="CAUIAction"
+							value="#{cauiController.communityActionsList}">
+							
 							<p:column headerText="Source User Action">
 								<h:outputText value="#{CAUIAction.sourceAction}" />
 							</p:column>
