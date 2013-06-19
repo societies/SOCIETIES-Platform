@@ -83,7 +83,15 @@ public class UserCtxRefiner implements IUserCtxRefiner {
 				throw new UserCtxInferenceException("Could not refine attribute '"
 						+ attrId + "': Service UserLocationRefiner is not available");
 			}
-		else
+		else if( CtxAttributeTypes.LOCATION_COORDINATES.equals(attrId.getType())){
+			try {
+				return this.userLocationRefiner.refineOnDemandGPSCoords(attrId);
+			} catch (ServiceUnavailableException sue) {
+				throw new UserCtxInferenceException("Could not refine attribute '"
+						+ attrId + "': Service UserLocationRefiner is not available");
+			}
+		}
+		else 
 			throw new UserCtxInferenceException("Could not refine attribute '"
 					+ attrId + "': Unsupported attribute type: " + attrId.getType());
 		// TODO bayesian
