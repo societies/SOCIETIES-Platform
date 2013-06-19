@@ -12,6 +12,7 @@ import org.societies.api.identity.*;
 import org.societies.api.internal.comm.ICommManagerController;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
 import org.societies.identity.IdentityManagerImpl;
+import org.springframework.osgi.service.ServiceUnavailableException;
 import org.xmpp.component.AbstractComponent;
 import org.xmpp.component.ComponentException;
 import org.xmpp.packet.IQ;
@@ -235,7 +236,6 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 	/*
      * Implementation of CommunicationManager methods
 	 */
-
     @Override
     public void register(IFeatureServer fs) throws CommunicationException {
         helper.register(fs);
@@ -394,20 +394,25 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
             return false;
     }
 
-    public IPrivacyLogAppender getPrivacyLog() {
-        return privacyLog;
-    }
+	public IPrivacyLogAppender getPrivacyLog() {
+		return privacyLog;
+	}
 
-    public void setPrivacyLog(IPrivacyLogAppender privacyLog) {
-        if (privacyLog!=null) {
-            this.privacyLog = privacyLog;
-            privacyLogEnabled = true;
-        }
-    }
-
-    private void privacyLog(Stanza stanza, Object payload) {
-        if (privacyLogEnabled) {
-            privacyLog.logCommsFw(stanza.getFrom(), stanza.getTo(), payload);
-        }
-    }
+	public void setPrivacyLog(IPrivacyLogAppender privacyLog) {
+		if (privacyLog!=null) {
+			this.privacyLog = privacyLog;
+			privacyLogEnabled = true;
+		}
+	}
+	
+	private void privacyLog(Stanza stanza, Object payload) {
+		if (privacyLogEnabled) {
+			try {
+				privacyLog.logCommsFw(stanza.getFrom(), stanza.getTo(), payload);
+			} catch (ServiceUnavailableException e) {
+				log.warn("Privacy Logger unavailable. Resuming without Privacy Logger...", e);
+				privacyLogEnabled = false;
+			}
+		}
+	}
 }
