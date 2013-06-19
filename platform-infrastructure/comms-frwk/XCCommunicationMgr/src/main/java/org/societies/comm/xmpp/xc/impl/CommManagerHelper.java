@@ -127,7 +127,7 @@ public class CommManagerHelper {
 
     public synchronized IQ handleDiscoItems(IQ iq) {
         String node = null;
-        Attribute nodeAttr = iq.getElement().attribute("node");
+        Attribute nodeAttr = ((Element)(iq.getElement().elements().get(0))).attribute("node");
         if (nodeAttr != null)
             node = nodeAttr.getText();
 
