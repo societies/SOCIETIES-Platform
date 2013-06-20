@@ -31,6 +31,9 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
+
+import org.societies.context.api.community.prediction.ICommunityCtxPredictionMgr;
 import org.springframework.util.Assert;
 
 public class CommunityContextPrediction implements ICommunityCtxPredictionMgr{

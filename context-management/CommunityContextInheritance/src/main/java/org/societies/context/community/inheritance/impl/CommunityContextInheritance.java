@@ -35,10 +35,9 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+//import org.societies.api.context.CtxException;
 import org.societies.api.context.CtxException;
-//import org.societies.api.context.broker.*;
-
-import org.societies.api.internal.context.broker.ICtxBroker;
+//import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAssociationTypes;
@@ -52,6 +51,7 @@ import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.community.inheritance.ICommunityCtxInheritanceMgr;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -67,7 +67,19 @@ public class CommunityContextInheritance implements ICommunityCtxInheritanceMgr 
 	private final String ccsIdString;*/
 
 	@Autowired (required=true)
-	public CommunityContextInheritance(ICtxBroker ctxBroker, ICommManager commMngr) throws Exception {	
+	public CommunityContextInheritance(ICtxBroker ctxBroker, ICommManager commMngr)throws Exception{
+		if (LOG.isDebugEnabled()){
+			LOG.info(this.getClass() + "instantiated ");
+		}
+		this.ctxBroker = ctxBroker;
+		this.commMngr = commMngr;
+		//fetch this CSS Entity
+		//final String ownerIdStr = commMngr.getIdManager().getThisNetworkNode().getBareJid();
+		//this.ownerId = commMngr.getIdManager().fromJid(ownerIdStr);
+		//return a (static) list with the inheritable attributes
+	}
+	
+/*	public CommunityContextInheritance(ICtxBroker ctxBroker, ICommManager commMngr) throws Exception {	
 		if (LOG.isDebugEnabled()){
 			LOG.info(this.getClass() + "instantiated ");
 		}
@@ -78,7 +90,7 @@ public class CommunityContextInheritance implements ICommunityCtxInheritanceMgr 
 		//this.ownerId = commMngr.getIdManager().fromJid(ownerIdStr);
 		//return a (static) list with the inheritable attributes
 
-	}
+	}*/
 
 	public CtxAttributeIdentifier inferTypes(ArrayList<String> inferrableTypes) {
 		//TODO 
@@ -95,6 +107,7 @@ public class CommunityContextInheritance implements ICommunityCtxInheritanceMgr 
 		//Given the css entity, fetch a set of association ids, type "isMemberOf"
 		String cssIdString = commMngr.getIdManager().getThisNetworkNode().getBareJid();
 		IIdentity ownerId = commMngr.getIdManager().fromJid(cssIdString);
+		IndividualCtxEntity cssEntity2 = ctxBroker.retrieveIndividualEntity(ownerId).get();
 		IndividualCtxEntity cssEntity = ctxBroker.retrieveIndividualEntity(ownerId).get();
 					
 		//Use the broker to get the association ids of type is_Member_Of and then the objects
@@ -131,13 +144,13 @@ public class CommunityContextInheritance implements ICommunityCtxInheritanceMgr 
 			listWithCtxAttributeObjs.add(attrEntity);	
 		}
 		//if the attributes are more than one, then run the compareQoC method
-		if (listWithCtxAttributeObjs.size() >= 2) {
-			CtxAttribute currAtt = listWithCtxAttributeObjs.get(0);
-			for (int i=1; i<listWithCtxAttributeObjs.size(); i++){
+		/*if (listWithCtxAttributeObjs.sizWithCtxAttributeObjs.get(0);
+			for (int i=1; i<listWithCtxe() >= 2) {
+			CtxAttribute currAtt = listAttributeObjs.size(); i++){
 				CtxAttribute currentAtt = (CtxAttribute)compareQoC(currAtt, listWithCtxAttributeObjs.get(i));
 				currAtt=currentAtt;
 			}
-		}
+		}*/
 	
 	}
 	/**
@@ -166,8 +179,8 @@ public class CommunityContextInheritance implements ICommunityCtxInheritanceMgr 
 		Double precisionOfSecondtAttribute = ctxAtt2.getQuality().getPrecision();
 		
 
-		if (lastUpdatedFirstAttribute.after(lastUpdatedSecondAttribute) && dt.get lastUpdatedFirstAttribute.getMinutes())
-			
+/*		if (lastUpdatedFirstAttribute.after(lastUpdatedSecondAttribute) && dt.get lastUpdatedFirstAttribute.getMinutes())
+*/			
 			return null;
 		
 	}
