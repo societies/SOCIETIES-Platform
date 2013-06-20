@@ -25,9 +25,10 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
+import javax.faces.bean.ViewScoped;
 
 @ManagedBean(name = "cauiController")
-@RequestScoped
+@ViewScoped
 public class CAUIController extends BasePageController {
 
 	private static Logger LOG = LoggerFactory.getLogger(CAUIController.class);
@@ -133,7 +134,7 @@ public class CAUIController extends BasePageController {
 
 		return result;
 	}
-
+	
 	
 	public void learnUserModel(){
 		log.info("discovery started...aaaaaaaaa log log" );
