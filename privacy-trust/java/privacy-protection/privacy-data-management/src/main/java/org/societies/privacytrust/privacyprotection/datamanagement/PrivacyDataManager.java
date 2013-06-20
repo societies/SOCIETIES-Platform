@@ -69,6 +69,7 @@ import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 
@@ -224,11 +225,21 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		ResponseItem permissionPermit = ResponseItemUtils.create(Decision.PERMIT, requestItem);
 		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
 		// -- Internal call (requestor == current node)
-		IIdentity currentCssId = commManager.getIdManager().getThisNetworkNode();
-		if (null != currentCssId && requestor.getRequestorId().equals(currentCssId.getJid())) {
-			LOG.debug("[CIS access control] Internal call: always PERMIT");
-			permissions.add(permissionPermit);
-			return permissions;
+		IIdentity currentCssId = null;
+		try {
+			currentCssId = commManager.getIdManager().getThisNetworkNode();
+		}
+		finally {
+			// Error case
+			if (null == currentCssId) {
+				permissions.add(permissionDeny);
+				return permissions;
+			}
+			if (null != currentCssId && requestor.getRequestorId().equals(currentCssId.getJid())) {
+				LOG.debug("[CIS access control] Internal call: always PERMIT");
+				permissions.add(permissionPermit);
+				return permissions;
+			}
 		}
 
 
@@ -323,7 +334,8 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		catch(Exception e) {
 			LOG.error("Exception during CIS Data Access control", e);
 		}
-		LOG.debug("[CIS access control] No requested items are matching, or anyway, they are private: always DENY");
+		LOG.debug("[CIS access control] No requested items are matching, or an error appears, or anyway they are privates: always DENY");
+		permissions.clear();
 		permissions.add(permissionDeny);
 		return permissions;
 	}
@@ -359,10 +371,6 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		return false;
 	}
 
-	/**
-	 * @return
-	 * @throws PrivacyException 
-	 */
 	public List<ICisParticipant> retrieveCisMemberList(String cisId) {
 		ICisOwned cis = cisManager.getOwnedCis(cisId);
 		if (null == cis) {
@@ -389,7 +397,6 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			} catch (InvalidFormatException e) {
 				LOG.error("[From JID Error] IIdentity can not be understand.", e);
 			}
-
 		}
 		return true;
 	}
@@ -425,7 +432,14 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		DObfPreferenceDetailsBean dataObfuscationPrefDetails = new DObfPreferenceDetailsBean();
 		dataObfuscationPrefDetails.setResource(ResourceUtils.create(dataWrapper.getScheme(), dataWrapper.getDataType()));
 		dataObfuscationPrefDetails.setRequestor(requestor);
-		double obfuscationLevel = privacyPreferenceManager.evaluateDObfPreference(dataObfuscationPrefDetails);
+		double obfuscationLevel = 1.0;
+		try {
+			obfuscationLevel = privacyPreferenceManager.evaluateDObfPreference(dataObfuscationPrefDetails);
+		}
+		catch(ServiceUnavailableException e) {
+			LOG.error("[Obfuscation] Can't retrieve obfuscation level from privacy preferences manager");
+			return new AsyncResult<DataWrapper>(dataWrapper);
+		}
 		// - Performance loggings
 		doPerformanceLogging(obfuscationLevel);
 		// - If no obfuscation is required: return directly the wrapped data
@@ -465,7 +479,6 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 * ******************************* */
 	public void setPrivacyPreferenceManager(IPrivacyPreferenceManager privacyPreferenceManager) {
 		this.privacyPreferenceManager = privacyPreferenceManager;
-		LOG.debug("[Dependency Injection] privacyPreferenceManager injected");
 	}
 	public void setPrivacyDataManagerInternal(IPrivacyDataManagerInternal privacyDataManagerInternal) {
 		this.privacyDataManagerInternal = privacyDataManagerInternal;
@@ -475,15 +488,12 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	}
 	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
 		this.privacyPolicyManager = privacyPolicyManager;
-		LOG.debug("[Dependency Injection] PrivacyPolicyManager injected");
 	}
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
-		LOG.debug("[Dependency Injection] CommManager injected");
 	}
 	public void setCisManager(ICisManager cisManager) {
 		this.cisManager = cisManager;
-		LOG.debug("[Dependency Injection] ICisManager injected");
 	}
 
 	/**

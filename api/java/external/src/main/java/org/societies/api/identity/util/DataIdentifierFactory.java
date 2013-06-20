@@ -88,8 +88,14 @@ public class DataIdentifierFactory {
 			scheme = DataIdentifierScheme.fromValue(uri[0]);
 		}
 		catch(IllegalArgumentException e) {
-			LOG.error("Hum, can't understand this scheme in the URI \""+uri[0]+"\". Use CONTEXT by default.");
-			scheme = DataIdentifierScheme.CONTEXT;
+			try {
+				scheme = DataIdentifierScheme.valueOf(uri[0]);
+				dataIdUri = scheme+"://"+uri[1];
+			}
+			catch(Exception e2) {
+				LOG.error("Hum, can't understand this scheme in the URI \""+uri[0]+"\". Use CONTEXT by default.", e, e2);
+				scheme = DataIdentifierScheme.CONTEXT;
+			}
 		}
 
 		// Context
@@ -123,7 +129,7 @@ public class DataIdentifierFactory {
 		dataId.setType(path.substring(end+1, endType));
 		return dataId;
 	}
-	
+
 	public static List<DataIdentifier> fromUris(List<String> dataUris) throws MalformedCtxIdentifierException {
 		List<DataIdentifier> dataIds = new ArrayList<DataIdentifier>();
 		if (null == dataUris || dataUris.size() <= 0) {
@@ -134,7 +140,7 @@ public class DataIdentifierFactory {
 		}
 		return dataIds;
 	}
-	
+
 
 	/**
 	 * Generate a simple DataIdentifier from schema and type

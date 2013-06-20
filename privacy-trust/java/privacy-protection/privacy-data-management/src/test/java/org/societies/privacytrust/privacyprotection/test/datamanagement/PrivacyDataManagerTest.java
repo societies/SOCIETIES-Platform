@@ -389,32 +389,47 @@ public class PrivacyDataManagerTest {
 		String testTitle = new String("testFromUriString: multiple test of DataId parsing");
 		LOG.info("[TEST] "+testTitle);
 
-		String ownerId = "owner@domain.com";
-		String dataId1 = "context://"+ownerId+"/locationSymbolic/";
-		String dataId2 = "context://owner@domain.com/locationSymbolic";
-		String dataId3 = "context:///locationSymbolic/";
-		String dataId4 = "context:///locationSymbolic";
-		String dataId5 = "context:///";
+		String ownerId = "owner.domain.com";
+		String dataId1 = DataIdentifierScheme.CIS+"://"+ownerId+"/locationSymbolic/";
+		String dataId1b = "CIS://"+ownerId+"/locationSymbolic/";
+		String dataId2 = DataIdentifierScheme.CIS+"://"+ownerId+"/locationSymbolic";
+		String dataId3 = DataIdentifierScheme.CIS+":///locationSymbolic/";
+		String dataId4 = DataIdentifierScheme.CIS+":///locationSymbolic";
+		String dataId5 = DataIdentifierScheme.CIS+":///";
+		String dataId6 = DataIdentifierScheme.CONTEXT+"://"+ownerId+"/ENTITY/person/1/ATTRIBUTE/name/13";
+		String dataId6b = "CONTEXT://"+ownerId+"/ENTITY/person/1/ATTRIBUTE/name/13";
 		try {
-			assertNotNull("Data id from "+dataId1+" should not be null", DataIdentifierUtils.fromUri(dataId1));
-			assertEquals("Owner id from "+dataId1+" not retrieved", ownerId, DataIdentifierUtils.fromUri(dataId1).getOwnerId());
+			// CIS
+			assertNotNull("Data id from "+dataId1+" should not be null", DataIdentifierFactory.fromUri(dataId1));
+			assertEquals("Owner id from "+dataId1+" not retrieved", ownerId, DataIdentifierFactory.fromUri(dataId1).getOwnerId());
+			assertNotNull("Data id from "+dataId1b+" should not be null", DataIdentifierFactory.fromUri(dataId1b));
+			assertEquals("Owner id from "+dataId1b+" not retrieved", ownerId, DataIdentifierFactory.fromUri(dataId1b).getOwnerId());
 
-			assertNotNull("Data id from "+dataId2+" should not be null", DataIdentifierUtils.fromUri(dataId2));
-			assertEquals("Owner id from "+dataId2+" not retrieved", ownerId, DataIdentifierUtils.fromUri(dataId2).getOwnerId());
+			assertNotNull("Data id from "+dataId2+" should not be null", DataIdentifierFactory.fromUri(dataId2));
+			assertEquals("Owner id from "+dataId2+" not retrieved", ownerId, DataIdentifierFactory.fromUri(dataId2).getOwnerId());
 
-			assertNotNull("Data id from "+dataId3+" should not be null", DataIdentifierUtils.fromUri(dataId3));
-			assertEquals("Owner id from "+dataId3+" not retrieved", "", DataIdentifierUtils.fromUri(dataId3).getOwnerId());
+			assertNotNull("Data id from "+dataId3+" should not be null", DataIdentifierFactory.fromUri(dataId3));
+			assertEquals("Owner id from "+dataId3+" not retrieved", "", DataIdentifierFactory.fromUri(dataId3).getOwnerId());
 
-			assertNotNull("Data id from "+dataId4+" should not be null", DataIdentifierUtils.fromUri(dataId4));
-			assertEquals("Owner id from "+dataId4+" not retrieved", "", DataIdentifierUtils.fromUri(dataId4).getOwnerId());
-			assertEquals("Data type from "+dataId4+" not retrieved", "locationSymbolic", DataIdentifierUtils.fromUri(dataId4).getType());
+			assertNotNull("Data id from "+dataId4+" should not be null", DataIdentifierFactory.fromUri(dataId4));
+			assertEquals("Owner id from "+dataId4+" not retrieved", "", DataIdentifierFactory.fromUri(dataId4).getOwnerId());
+			assertEquals("Data type from "+dataId4+" not retrieved", "locationSymbolic", DataIdentifierFactory.fromUri(dataId4).getType());
 
-			assertNotNull("Data id from "+dataId5+" should not be null", DataIdentifierUtils.fromUri(dataId5));
-			assertEquals("Owner id from "+dataId5+" not retrieved", "", DataIdentifierUtils.fromUri(dataId5).getOwnerId());
-			assertEquals("Data type from "+dataId5+" not retrieved", "", DataIdentifierUtils.fromUri(dataId5).getType());
+			assertNotNull("Data id from "+dataId5+" should not be null", DataIdentifierFactory.fromUri(dataId5));
+			assertEquals("Owner id from "+dataId5+" not retrieved", "", DataIdentifierFactory.fromUri(dataId5).getOwnerId());
+			assertEquals("Data type from "+dataId5+" not retrieved", "", DataIdentifierFactory.fromUri(dataId5).getType());
+
+			// Context
+			assertNotNull("Data id from "+dataId6+" should not be null", DataIdentifierFactory.fromUri(dataId6));
+			assertEquals("Owner id from "+dataId6+" not retrieved", ownerId, DataIdentifierFactory.fromUri(dataId6).getOwnerId());
+			assertEquals("Data type from "+dataId6+" not retrieved", "name", DataIdentifierFactory.fromUri(dataId6).getType());
+
+			assertNotNull("Data id from "+dataId6b+" should not be null", DataIdentifierFactory.fromUri(dataId6b));
+			assertEquals("Owner id from "+dataId6b+" not retrieved", ownerId, DataIdentifierFactory.fromUri(dataId6b).getOwnerId());
+			assertEquals("Data type from "+dataId6b+" not retrieved", "name", DataIdentifierFactory.fromUri(dataId6b).getType());
 		}
 		catch(MalformedCtxIdentifierException e) {
-			LOG.error("[Error MalformedCtxIdentifierException] "+testTitle, e);
+			LOG.info("[Error MalformedCtxIdentifierException] "+testTitle, e);
 			fail("[Error MalformedCtxIdentifierException] "+testTitle+":"+e.getMessage());
 		}
 	}
@@ -424,12 +439,6 @@ public class PrivacyDataManagerTest {
 		String testTitle = new String("testSchemes: multiple test on DataIdentifierScheme");
 		LOG.info("[TEST] "+testTitle);
 
-		String ownerId = "owner@domain.com";
-		String dataId1 = DataIdentifierScheme.CONTEXT+"://"+ownerId+"/locationSymbolic/";
-		String dataId2 = DataIdentifierScheme.CONTEXT+"://owner@domain.com/locationSymbolic";
-		String dataId3 = DataIdentifierScheme.CONTEXT+":///locationSymbolic/";
-		String dataId4 = DataIdentifierScheme.CONTEXT+":///locationSymbolic";
-		String dataId5 = DataIdentifierScheme.CONTEXT+":///";
 		DataIdentifierScheme schemeCtx1 = DataIdentifierScheme.CONTEXT;
 		DataIdentifierScheme schemeCtx2 = DataIdentifierScheme.CONTEXT;
 		DataIdentifierScheme schemeCis = DataIdentifierScheme.CIS;

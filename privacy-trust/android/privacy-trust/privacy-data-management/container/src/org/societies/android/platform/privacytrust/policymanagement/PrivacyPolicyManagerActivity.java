@@ -29,6 +29,7 @@ import java.util.List;
 import org.societies.android.api.internal.privacytrust.IPrivacyPolicyManager;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.android.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
+import org.societies.android.api.privacytrust.privacy.util.privacypolicy.RequestItemUtils;
 import org.societies.android.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
 import org.societies.android.platform.privacytrust.R;
 import org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService;
@@ -109,19 +110,10 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 					owner.setCisRequestorId("cis-a1fcced7-fae7-4253-a44f-27a281811ca1.societies.local");
 					privacyPolicyManagerService.getPrivacyPolicy(this.getPackageName(), owner);
 				}
-				else if (R.id.btnLaunchTest2 == view.getId() || R.id.btnLaunchTest3 == view.getId()) {
-					if (null == retrievedPrivacyPolicy) {
-						txtLocation.setText("Hum, for testing purpose, we will use a default privacy policy");
-						retrievedPrivacyPolicy = defaultPrivacyPolicy;
-					}
-					if (null == retrievedPrivacyPolicy) {
-						txtLocation.setText("Hum, but there is no default privacy policy");
-					}
-					else {
-						RequestPolicy newPrivacyPolicy = PrivacyPolicyUtils.inferCisPrivacyPolicy(PrivacyPolicyBehaviourConstants.MEMBERS_ONLY, null);
-						newPrivacyPolicy.setRequestor(owner);
-						privacyPolicyManagerService.updatePrivacyPolicy(this.getPackageName(), retrievedPrivacyPolicy);
-					}
+				else if (R.id.btnLaunchTest2 == view.getId()) {
+					RequestPolicy newPrivacyPolicy = PrivacyPolicyUtils.inferCisPrivacyPolicy(PrivacyPolicyBehaviourConstants.MEMBERS_ONLY, null);
+					newPrivacyPolicy.setRequestor(owner);
+					privacyPolicyManagerService.updatePrivacyPolicy(this.getPackageName(), newPrivacyPolicy);
 				}
 				else if (R.id.btnLaunchTest4 == view.getId()) {
 					privacyPolicyManagerService.deletePrivacyPolicy(this.getPackageName(), owner);
@@ -168,12 +160,8 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 	 * ************** */
 
 	public void onClick(View v) {
-		if (R.id.btnLaunchTest1 == v.getId() || R.id.btnLaunchTest1bis == v.getId() || R.id.btnLaunchTest2 == v.getId() || R.id.btnLaunchTest3 == v.getId() || R.id.btnLaunchTest4 == v.getId()) {
+		if (R.id.btnLaunchTest1 == v.getId() || R.id.btnLaunchTest1bis == v.getId() || R.id.btnLaunchTest2 == v.getId() || R.id.btnLaunchTest4 == v.getId()) {
 			onLaunchTest(v);
-		}
-		else if (R.id.btnConnect == v.getId()) {
-			Log.d(TAG, "Not implemented yet.");
-			//			clientCommManager.login();
 		}
 		else if (R.id.btnReset == v.getId()) {
 			onButtonResetClick(v);
@@ -203,11 +191,9 @@ public class PrivacyPolicyManagerActivity extends Activity implements OnClickLis
 		// -- Create a link with editable area
 		txtLocation = (TextView) findViewById(R.id.txtLocation);
 		// -- Create a link with buttons
-		((Button) findViewById(R.id.btnConnect)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnLaunchTest1)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnLaunchTest1bis)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnLaunchTest2)).setOnClickListener(this);
-		((Button) findViewById(R.id.btnLaunchTest3)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnLaunchTest4)).setOnClickListener(this);
 		((Button) findViewById(R.id.btnReset)).setOnClickListener(this);
 
