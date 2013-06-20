@@ -107,7 +107,7 @@ public class CommunityContextInheritance implements ICommunityCtxInheritanceMgr 
 		//Given the css entity, fetch a set of association ids, type "isMemberOf"
 		String cssIdString = commMngr.getIdManager().getThisNetworkNode().getBareJid();
 		IIdentity ownerId = commMngr.getIdManager().fromJid(cssIdString);
-		IndividualCtxEntity cssEntity2 = ctxBroker.retrieveIndividualEntity(ownerId).get();
+		//IndividualCtxEntity cssEntity2 = ctxBroker.retrieveIndividualEntity(ownerId).get();
 		IndividualCtxEntity cssEntity = ctxBroker.retrieveIndividualEntity(ownerId).get();
 					
 		//Use the broker to get the association ids of type is_Member_Of and then the objects
@@ -144,13 +144,13 @@ public class CommunityContextInheritance implements ICommunityCtxInheritanceMgr 
 			listWithCtxAttributeObjs.add(attrEntity);	
 		}
 		//if the attributes are more than one, then run the compareQoC method
-		/*if (listWithCtxAttributeObjs.sizWithCtxAttributeObjs.get(0);
-			for (int i=1; i<listWithCtxe() >= 2) {
-			CtxAttribute currAtt = listAttributeObjs.size(); i++){
+		if (listWithCtxAttributeObjs.size()>= 2) {
+			CtxAttribute currAtt = listWithCtxAttributeObjs.get(0);
+			for (int i=1; i<listWithCtxAttributeObjs.size(); i++){
 				CtxAttribute currentAtt = (CtxAttribute)compareQoC(currAtt, listWithCtxAttributeObjs.get(i));
 				currAtt=currentAtt;
 			}
-		}*/
+		}
 	
 	}
 	/**
