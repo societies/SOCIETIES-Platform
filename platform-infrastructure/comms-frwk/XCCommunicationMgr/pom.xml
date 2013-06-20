@@ -21,13 +21,11 @@
     	<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
     	<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
-			<version>${release.version}</version>
 			<scope>provided</scope>
 		</dependency>
     	<!-- Commons -->
@@ -45,21 +43,8 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.igniterealtime.smack</groupId>
-			<artifactId>smack</artifactId>
-			<type>jar</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.igniterealtime.smack</groupId>
-			<artifactId>smackx</artifactId>
-			<type>jar</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 		    <groupId>org.simpleframework</groupId>
 		    <artifactId>simple-xml</artifactId>
-		    <version>2.6.4</version>
 		    <scope>provided</scope>
 		   <exclusions>
 			    <!-- StAX is not available on Android -->
