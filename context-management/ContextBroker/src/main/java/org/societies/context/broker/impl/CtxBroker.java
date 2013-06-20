@@ -48,6 +48,7 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -287,6 +288,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			Date startDate, Date endDate) throws CtxException {
 
 		Future<List<CtxHistoryAttribute>> hocObj = null;
+		/*
 		IIdentity targetCss;
 		try {
 			targetCss = this.idMgr.fromJid(attrId.getOwnerId());
@@ -304,7 +306,9 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 			LOG.info("remote call is not supported for ctx history data");
 		}
-
+*/
+		hocObj = internalCtxBroker.retrieveHistory(requestor, attrId, startDate, endDate);
+		
 		return hocObj;
 	}
 
@@ -592,4 +596,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
     }
 
 
+
+
+	
 }
