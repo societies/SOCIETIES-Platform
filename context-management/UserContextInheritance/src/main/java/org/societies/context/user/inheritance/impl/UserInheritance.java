@@ -60,18 +60,16 @@ import org.springframework.stereotype.Service;
  * @author yboul
  */
 
+//TODO dead class to be removed
 
-public class UserInheritance implements IUserCtxInheritanceMgr{
-	
+public class UserInheritance {
+}
+	/*
 	private static final Logger LOG = LoggerFactory.getLogger(CommunityContextInheritance.class);
 	private ICtxBroker ctxBroker;
 	private ICommManager commMngr;
 	
-	/*@Autowired
-	private final IIdentity ownerId;
-	@Autowired
-	private final String ccsIdString;*/
-
+	
 	@Autowired (required=true)
 	public CommunityContextInheritance(ICtxBroker ctxBroker, ICommManager commMngr) throws Exception {	
 		if (LOG.isDebugEnabled()){
@@ -157,7 +155,7 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 	 *             if the unregistration process fails
 	 * 
 	 * @since 0.0.3
-	 */
+	 
 	public CtxAttribute compareQoC(CtxAttribute ctxAtt1, CtxAttribute ctxAtt2) {
 		DateTime dt = new DateTime();
 		Calendar cale = GregorianCalendar.getInstance();
@@ -174,7 +172,7 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 		
 		/*qoc1 = 50*(lastUpdatedFirstAttribute/DateTime.now()) + 50*precisionOfFirstAttribute;
 		qoc2 = 50*(lastUpdatedSecondAttribute/DateTime.now()) + 50*precisionOfSecondAttribute;*/
-		
+	/*	
 
 		//if (lastUpdatedFirstAttribute.after(lastUpdatedSecondAttribute) && dt.get lastUpdatedFirstAttribute.getMinutes())
 			
@@ -184,7 +182,7 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 	
 	
 	
-	
+	/*
 
 	@Override
 	public void getCIS(IIdentity arg0) {
@@ -215,6 +213,7 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 	
 	
 }
+*/
 /*@Service
 public class UserInheritance implements IUserCtxInheritanceMgr{
 	
