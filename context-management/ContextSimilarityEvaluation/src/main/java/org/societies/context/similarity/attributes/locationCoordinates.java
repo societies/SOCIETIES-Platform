@@ -98,8 +98,8 @@ public class locationCoordinates {
 	private void calculateDistance(String lat, String lng){
 		for (int i = 0; i < userList.length - 1; i++){
 
-			double lat1 = Double.parseDouble(lat); 
-			double lng1 = Double.parseDouble(lng);
+			double lat1 = Double.valueOf(lat); 
+			double lng1 = Double.valueOf(lng);
 			
 			for (int x = i + 1; x < userList.length;x++){
 				// TODO convert from string to lat long
