@@ -235,6 +235,9 @@ public class TrustController extends BasePageController {
 				final Map<TrustedEntityId, TrustedEntity> trustedEntities = 
 						new HashMap<TrustedEntityId, TrustedEntity>();
 				for (final ExtTrustRelationship tr : dbResult) {
+					// Omit *my* CSS from the list of trusted entities!
+					if (myTeid.equals(tr.getTrusteeId()))
+						continue;
 					TrustedEntity trustedEntity = trustedEntities.get(tr.getTrusteeId()); 
 					if (trustedEntity == null)
 						trustedEntity = new TrustedEntity(myTeid, tr.getTrusteeId());
