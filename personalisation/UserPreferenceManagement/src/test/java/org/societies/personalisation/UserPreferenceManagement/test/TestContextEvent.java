@@ -32,6 +32,7 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -41,6 +42,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.IPersonalisationManager;
@@ -68,7 +70,7 @@ public class TestContextEvent  {
 	UserPreferenceConditionMonitor pcm ;
 	IInternalPersonalisationManager persoMgr = Mockito.mock(IInternalPersonalisationManager.class);
 	ICtxBroker broker = Mockito.mock(ICtxBroker.class);
-	
+	private ICommManager commManager = Mockito.mock(ICommManager.class);
 	private IIdentity mockId;
 	private CtxEntityIdentifier ctxEntityId;
 	private CtxEntity ctxEntity;
@@ -89,9 +91,9 @@ public class TestContextEvent  {
 		pcm.setEventMgr(Mockito.mock(IEventMgr.class));
 		pcm.setPersoMgr(persoMgr);
 		pcm.setUserPrefLearning(Mockito.mock(IC45Learning.class));
-		pcm.initialisePreferenceManagement();
+		pcm.setCommManager(commManager);
 
-		mockId = new MyIdentity(IdentityType.CSS, "myId", "domain");
+		mockId = new MockIdentity(IdentityType.CSS, "myId", "domain");
 		ctxEntityId = new CtxEntityIdentifier(mockId.getJid(), "Person", new Long(1));
 		ctxEntity = new CtxEntity(ctxEntityId);	
 		serviceID = new ServiceResourceIdentifier();
@@ -108,7 +110,9 @@ public class TestContextEvent  {
 		details.setServiceType("media");
 		this.setupContextAttributes();
 		this.setupPreference(details, "100", "10");
+
 		this.setupRegistry(details, preference);
+		pcm.initialisePreferenceManagement();
 	}
 
 	
@@ -125,7 +129,7 @@ public class TestContextEvent  {
 		try{
 
 		
-		
+		Mockito.when(commManager.getIdManager()).thenReturn(Mockito.mock(IIdentityManager.class));
 		Mockito.when(broker.retrieve(ctxEntityId)).thenReturn(new AsyncResult(ctxEntity));
 		Mockito.when(broker.retrieve(ctxLocationAttributeId)).thenReturn(new AsyncResult(locationAttribute));
 		List<CtxIdentifier> tempEntityList = new ArrayList<CtxIdentifier>();

@@ -27,214 +27,911 @@ package org.societies.useragent.feedback;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import org.societies.api.context.model.*;
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.context.model.CtxAttributeTypes;
-import org.springframework.scheduling.annotation.AsyncResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.Requestor;
+import org.societies.api.identity.util.RequestorUtils;
+import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
+import org.societies.api.internal.useragent.feedback.IUserFeedbackResponseEventListener;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
+import org.societies.api.internal.useragent.model.ExpProposalType;
+import org.societies.api.internal.useragent.model.ImpProposalContent;
+import org.societies.api.internal.useragent.model.ImpProposalType;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.*;
+import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
+import org.societies.api.schema.useragent.feedback.FeedbackMethodType;
+import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
+import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
+import org.societies.useragent.api.feedback.IPrivacyPolicyNegotiationHistoryRepository;
+import org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository;
+import org.societies.useragent.api.model.UserFeedbackEventTopics;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import static org.mockito.Mockito.mock;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 public class TestUserFeedback extends TestCase {
 
-    UserFeedback userFeedback;
-    ICtxBroker mockCtxBroker;
+    private static final Logger log = LoggerFactory.getLogger(TestUserFeedback.class);
+    public static final int SYNC_RESPONSE_DELAY = 1000;
 
-    String mockDeviceID;
-    String mockIdentity;
+    private class EventCallback<T> implements IUserFeedbackResponseEventListener<T> {
+        private boolean responseRx = false;
+        private T result = null;
 
-    //context
-    CtxEntityIdentifier mockPersonId;
-    CtxEntityIdentifier mockEntityId;
-    CtxAttributeIdentifier mockUIDId;
-    CtxAttribute mockUID;
-    Future<CtxModelObject> mockUIDFuture;
-    List<CtxIdentifier> mockUIDIdList;
-    Future<List<CtxIdentifier>> mockUIDIdListFuture;
+        @Override
+        public void responseReceived(T result) {
+            log.debug("Callback called");
+            this.result = result;
+            responseRx = true;
+        }
+
+        public boolean isResponseRx() {
+            return responseRx;
+        }
+
+        public T getResult() {
+            return result;
+        }
+    }
+
+    private UserFeedback userFeedback;
+
+    // autowired vars
+    private ICommManager mockCommManager;
+    private PubsubClient mockPubSubClient;
+    private IUserFeedbackHistoryRepository mockUserFeedbackHistoryRepository;
+    private IPrivacyPolicyNegotiationHistoryRepository mockPrivacyPolicyNegotiationHistoryRepository;
+
+    // private vars
+    private IIdentityManager mockIdentityManager;
 
     @Override
     public void setUp() throws Exception {
-        mockCtxBroker = mock(ICtxBroker.class);
+        log.debug("setUp()");
 
-        mockDeviceID = "sarah.societies.local/android";
-        mockIdentity = "sarah.societies.local";
+        mockCommManager = mock(ICommManager.class);
+        mockPubSubClient = mock(PubsubClient.class);
+        mockUserFeedbackHistoryRepository = mock(UserFeedbackHistoryRepository.class);
+        mockPrivacyPolicyNegotiationHistoryRepository = mock(PrivacyPolicyNegotiationHistoryRepository.class);
+
+        mockIdentityManager = mock(IIdentityManager.class);
 
         userFeedback = new UserFeedback();
-//		userFeedback.setCtxBroker(mockCtxBroker);
-        //userFeedback.myCloudID = mockDeviceID;
+        userFeedback.setCommsMgr(mockCommManager);
+        userFeedback.setPubsub(mockPubSubClient);
+        userFeedback.setUserFeedbackHistoryRepository(mockUserFeedbackHistoryRepository);
+        userFeedback.setPrivacyPolicyNegotiationHistoryRepository(mockPrivacyPolicyNegotiationHistoryRepository);
 
-        mockPersonId = new CtxEntityIdentifier(mockIdentity, "PERSON", (long) 12345);
-        mockEntityId = new CtxEntityIdentifier(mockIdentity, "testEntity", (long) 12345);
-        mockUIDId = new CtxAttributeIdentifier(mockEntityId, CtxAttributeTypes.UID, (long) 12345);
-        mockUID = new CtxAttribute(mockUIDId);
-        mockUID.setStringValue(mockDeviceID);
-        mockUIDFuture = new AsyncResult<CtxModelObject>(mockUID);
-        mockUIDIdList = new ArrayList<CtxIdentifier>();
-        mockUIDIdList.add(mockUIDId);
-        mockUIDIdListFuture = new AsyncResult<List<CtxIdentifier>>(mockUIDIdList);
+        when(mockCommManager.getIdManager()).thenReturn(mockIdentityManager);
+
+        when(mockUserFeedbackHistoryRepository.listIncomplete()).thenReturn(new ArrayList<UserFeedbackBean>());// just an empty list
+        when(mockPrivacyPolicyNegotiationHistoryRepository.listIncomplete()).thenReturn(new ArrayList<UserFeedbackPrivacyNegotiationEvent>());// just an empty list
+
+        userFeedback.initialiseUserFeedback();
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        userFeedback = null;
-        mockCtxBroker = null;
-        mockDeviceID = null;
-        mockIdentity = null;
-        mockPersonId = null;
-        mockEntityId = null;
-        mockUIDId = null;
-        mockUID = null;
-        mockUIDIdList = null;
-        mockUIDFuture = null;
+    public void testGetExplicitFB_sync_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+
+        ExpProposalContent content = new ExpProposalContent(
+                "Test proposal",
+                new String[]{"Yes", "No"}
+        );
+
+        String expectedResult = "Yes";
+
+        final String requestId = UUID.randomUUID().toString();
+
+        final ExpFeedbackResultBean resultBean = new ExpFeedbackResultBean();
+        resultBean.setFeedback(new ArrayList<String>());
+        resultBean.getFeedback().add(expectedResult);
+        resultBean.setRequestId(requestId);
+
+        log.debug("Preparing response thread");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                log.debug("Waiting " + SYNC_RESPONSE_DELAY + "ms to send mock pub sub response");
+
+                try {
+                    Thread.sleep(SYNC_RESPONSE_DELAY);
+                } catch (InterruptedException e) {
+                    log.error("Error delaying mock pubsub event", e);
+                }
+
+                log.debug("Sending mock pubsub response");
+                userFeedback.pubsubEvent(null, UserFeedbackEventTopics.EXPLICIT_RESPONSE, requestId, resultBean);
+                log.debug("Mock pubsub response sent");
+            }
+        }).start();
+
+        log.debug("Requesting EXP (AckNack) user feedback");
+        Future<List<String>> result = userFeedback.getExplicitFB(requestId, ExpProposalType.ACKNACK, content);
+        log.debug("Method returned");
+
+        // VERIFICATION
+        verify(mockUserFeedbackHistoryRepository).insert(any(UserFeedbackBean.class));
+        verify(mockPubSubClient).publisherPublish(any(IIdentity.class), eq(UserFeedbackEventTopics.REQUEST), eq(requestId), any(UserFeedbackBean.class));
+
+        Assert.assertNotNull("Expected Future to contain result", result.get());
+        Assert.assertEquals("Expected result bean to contain 1 item", 1, result.get().size());
+        Assert.assertEquals("Expected result bean to contain correct result", expectedResult, result.get().get(0));
     }
 
-    public void testTmp() {
-        Assert.assertTrue(true);
+    public void testGetExplicitFB_async_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+
+        ExpProposalContent content = new ExpProposalContent(
+                "Test proposal",
+                new String[]{"Yes", "No"}
+        );
+
+        String expectedResult = "Yes";
+
+        final String requestId = UUID.randomUUID().toString();
+
+        final ExpFeedbackResultBean resultBean = new ExpFeedbackResultBean();
+        resultBean.setFeedback(new ArrayList<String>());
+        resultBean.getFeedback().add(expectedResult);
+        resultBean.setRequestId(requestId);
+
+        log.debug("Requesting EXP (AckNack) user feedback");
+        Future<List<String>> result = userFeedback.getExplicitFBAsync(requestId, ExpProposalType.ACKNACK, content, null);
+        log.debug("Method returned");
+
+        // VERIFICATION
+        verify(mockUserFeedbackHistoryRepository).insert(any(UserFeedbackBean.class));
+        verify(mockPubSubClient).publisherPublish(any(IIdentity.class), eq(UserFeedbackEventTopics.REQUEST), eq(requestId), any(UserFeedbackBean.class));
+
+        Assert.assertNull("Expected Future to be empty", result.get());
+
+        log.debug("Sending mock pubsub response");
+        userFeedback.pubsubEvent(null, UserFeedbackEventTopics.EXPLICIT_RESPONSE, requestId, resultBean);
+        log.debug("Mock pubsub response sent");
+
+        Assert.assertNotNull("Expected Future to contain result", result.get());
+        Assert.assertEquals("Expected result bean to contain 1 item", 1, result.get().size());
+        Assert.assertEquals("Expected result bean to contain correct result", expectedResult, result.get().get(0));
     }
 
+    public void testGetExplicitFB_callback_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
-	/*public void testAckNackGUI() {
+        ExpProposalContent content = new ExpProposalContent(
+                "Test proposal",
+                new String[]{"Yes", "No"}
+        );
+
+        String expectedResult = "Yes";
+
+        final String requestId = UUID.randomUUID().toString();
+
+        final ExpFeedbackResultBean resultBean = new ExpFeedbackResultBean();
+        resultBean.setFeedback(new ArrayList<String>());
+        resultBean.getFeedback().add(expectedResult);
+        resultBean.setRequestId(requestId);
+
+        EventCallback<List<String>> callback = new EventCallback<List<String>>();
+
+        log.debug("Requesting EXP (AckNack) user feedback");
+        userFeedback.getExplicitFBAsync(requestId, ExpProposalType.ACKNACK, content, callback);
+        log.debug("Method returned");
+
+        // VERIFICATION
+        verify(mockUserFeedbackHistoryRepository).insert(any(UserFeedbackBean.class));
+        verify(mockPubSubClient).publisherPublish(any(IIdentity.class), eq(UserFeedbackEventTopics.REQUEST), eq(requestId), any(UserFeedbackBean.class));
+
+        Assert.assertFalse(callback.isResponseRx());
+
+        log.debug("Sending mock pubsub response");
+        userFeedback.pubsubEvent(null, UserFeedbackEventTopics.EXPLICIT_RESPONSE, requestId, resultBean);
+        log.debug("Mock pubsub response sent");
+
+        Assert.assertTrue(callback.isResponseRx());
+
+        Assert.assertNotNull("Expected callback to contain result", callback.getResult());
+        Assert.assertEquals("Expected result bean to contain 1 item", 1, callback.getResult().size());
+        Assert.assertEquals("Expected result bean to contain correct result", expectedResult, callback.getResult().get(0));
+    }
+
+    public void testGetExplicitFB_callback_ignoresWrongResponses() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+
+        ExpProposalContent content = new ExpProposalContent(
+                "Test proposal",
+                new String[]{"Yes", "No"}
+        );
+
+        String expectedResult = "Yes";
+
+        final String requestId = UUID.randomUUID().toString();
+        final String wrongID = UUID.randomUUID().toString();
+
+        final ExpFeedbackResultBean resultBean = new ExpFeedbackResultBean();
+        resultBean.setFeedback(new ArrayList<String>());
+        resultBean.getFeedback().add(expectedResult);
+        resultBean.setRequestId(requestId);
+
+        EventCallback<List<String>> callback = new EventCallback<List<String>>();
+
+        log.debug("Requesting EXP (AckNack) user feedback");
+        userFeedback.getExplicitFBAsync(requestId, ExpProposalType.ACKNACK, content, callback);
+        log.debug("Method returned");
+
+
+        log.debug("Sending wrong pubsub responses");
+
+        resultBean.setRequestId(wrongID);
+        userFeedback.pubsubEvent(null, UserFeedbackEventTopics.EXPLICIT_RESPONSE, wrongID, resultBean);
+        Assert.assertFalse(callback.isResponseRx());
+
+        resultBean.setRequestId(requestId);
+
         try {
-			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID)).thenReturn(mockUIDIdListFuture);
-			when(mockCtxBroker.retrieve(mockUIDId)).thenReturn(mockUIDFuture);
-			
-			String proposalText = "Press: YES";
-			String[] options = {"YES", "NO"};
-			List<String> feedback = userFeedback.getExplicitFB(ExpProposalType.ACKNACK, new ExpProposalContent(proposalText, options)).get();
-			
-			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID);
-			verify(mockCtxBroker).retrieve(mockUIDId);
-						
-			//analyse results
-			Assert.assertNotNull(feedback);
-			Assert.assertTrue(feedback.size() == 1);
-			String results = feedback.get(0);
-			Assert.assertEquals("YES", results);
-			
-		} catch (CtxException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
-	}
+            userFeedback.pubsubEvent(null, UserFeedbackEventTopics.IMPLICIT_RESPONSE, requestId, resultBean);
+        } catch (Exception ex) {
+            // do nothing - this is acceptable behaviour
+        }
+        Assert.assertFalse(callback.isResponseRx());
+
+        try {
+            userFeedback.pubsubEvent(null, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, requestId, resultBean);
+        } catch (Exception ex) {
+            // do nothing - this is acceptable behaviour
+        }
+        Assert.assertFalse(callback.isResponseRx());
+
+        try {
+            userFeedback.pubsubEvent(null, EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE, requestId, resultBean);
+        } catch (Exception ex) {
+            // do nothing - this is acceptable behaviour
+        }
+        Assert.assertFalse(callback.isResponseRx());
+
+        log.debug("Sending correct mock pubsub response");
+        userFeedback.pubsubEvent(null, UserFeedbackEventTopics.EXPLICIT_RESPONSE, requestId, resultBean);
+
+        Assert.assertTrue(callback.isResponseRx());
+    }
 
 
+    public void testGetImplicitFB_sync_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
-	public void testCheckBoxGUI(){
-		try {
-			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID)).thenReturn(mockUIDIdListFuture);
-			when(mockCtxBroker.retrieve(mockUIDId)).thenReturn(mockUIDFuture);
-			
-			String proposalText = "Select: RED, GREEN and BLUE";
-			String[] options = {"RED", "WHITE", "GREEN", "BLUE", "BLACK", "YELLOW"};
-			List<String> feedback = userFeedback.getExplicitFB(ExpProposalType.CHECKBOXLIST, new ExpProposalContent(proposalText, options)).get();
-			
-			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID);
-			verify(mockCtxBroker).retrieve(mockUIDId);
-			
-			//analyse results
-			Assert.assertNotNull(feedback);
-			Assert.assertTrue(feedback.size() == 3);
-			Assert.assertTrue(feedback.contains("RED"));
-			Assert.assertTrue(feedback.contains("GREEN"));
-			Assert.assertTrue(feedback.contains("BLUE"));
-			Assert.assertTrue(!feedback.contains("WHITE"));
-			Assert.assertTrue(!feedback.contains("BLACK"));
-			Assert.assertTrue(!feedback.contains("YELLOW"));
-			
-		} catch (CtxException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
-	}
+        ImpProposalContent content = new ImpProposalContent(
+                "Test proposal",
+                30000
+        );
+
+        final String requestId = UUID.randomUUID().toString();
+
+        final ImpFeedbackResultBean resultBean = new ImpFeedbackResultBean();
+        resultBean.setAccepted(true);
+        resultBean.setRequestId(requestId);
+
+        log.debug("Preparing response thread");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                log.debug("Waiting " + SYNC_RESPONSE_DELAY + "ms to send mock pub sub response");
+
+                try {
+                    Thread.sleep(SYNC_RESPONSE_DELAY);
+                } catch (InterruptedException e) {
+                    log.error("Error delaying mock pubsub event", e);
+                }
+
+                log.debug("Sending mock pubsub response");
+                userFeedback.pubsubEvent(null, UserFeedbackEventTopics.IMPLICIT_RESPONSE, requestId, resultBean);
+                log.debug("Mock pubsub response sent");
+            }
+        }).start();
+
+        log.debug("Requesting IMP (Timed Abort) user feedback");
+        Future<Boolean> result = userFeedback.getImplicitFB(requestId, ImpProposalType.TIMED_ABORT, content);
+        log.debug("Method returned");
+
+        // VERIFICATION
+        verify(mockUserFeedbackHistoryRepository).insert(any(UserFeedbackBean.class));
+        verify(mockPubSubClient).publisherPublish(any(IIdentity.class), eq(UserFeedbackEventTopics.REQUEST), eq(requestId), any(UserFeedbackBean.class));
+
+        Assert.assertNotNull("Expected Future to contain result", result.get());
+        Assert.assertEquals("Expected result bean to contain correct result", Boolean.TRUE, result.get());
+    }
+
+    public void testGetImplicitFB_async_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+
+        ImpProposalContent content = new ImpProposalContent(
+                "Test proposal",
+                30000
+        );
+
+        final String requestId = UUID.randomUUID().toString();
+
+        final ImpFeedbackResultBean resultBean = new ImpFeedbackResultBean();
+        resultBean.setAccepted(true);
+        resultBean.setRequestId(requestId);
+
+        log.debug("Requesting IMP (Timed Abort) user feedback");
+        Future<Boolean> result = userFeedback.getImplicitFBAsync(requestId, ImpProposalType.TIMED_ABORT, content, null);
+        log.debug("Method returned");
+
+        // VERIFICATION
+        verify(mockUserFeedbackHistoryRepository).insert(any(UserFeedbackBean.class));
+        verify(mockPubSubClient).publisherPublish(any(IIdentity.class), eq(UserFeedbackEventTopics.REQUEST), eq(requestId), any(UserFeedbackBean.class));
+
+        Assert.assertNull("Expected Future to be empty", result.get());
+
+        log.debug("Sending mock pubsub response");
+        userFeedback.pubsubEvent(null, UserFeedbackEventTopics.IMPLICIT_RESPONSE, requestId, resultBean);
+        log.debug("Mock pubsub response sent");
+
+        Assert.assertNotNull("Expected Future to contain result", result.get());
+        Assert.assertEquals("Expected result bean to contain correct result", Boolean.TRUE, result.get());
+    }
+
+    public void testGetImplicitFB_callback_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+
+        ImpProposalContent content = new ImpProposalContent(
+                "Test proposal",
+                30000
+        );
+
+        final String requestId = UUID.randomUUID().toString();
+
+        final ImpFeedbackResultBean resultBean = new ImpFeedbackResultBean();
+        resultBean.setAccepted(true);
+        resultBean.setRequestId(requestId);
+
+        EventCallback<Boolean> callback = new EventCallback<Boolean>();
+
+        log.debug("Requesting IMP (Timed Abort) user feedback");
+        userFeedback.getImplicitFBAsync(requestId, ImpProposalType.TIMED_ABORT, content, callback);
+        log.debug("Method returned");
+
+        // VERIFICATION
+        verify(mockUserFeedbackHistoryRepository).insert(any(UserFeedbackBean.class));
+        verify(mockPubSubClient).publisherPublish(any(IIdentity.class), eq(UserFeedbackEventTopics.REQUEST), eq(requestId), any(UserFeedbackBean.class));
+
+        Assert.assertFalse(callback.isResponseRx());
+
+        log.debug("Sending mock pubsub response");
+        userFeedback.pubsubEvent(null, UserFeedbackEventTopics.IMPLICIT_RESPONSE, requestId, resultBean);
+        log.debug("Mock pubsub response sent");
+
+        Assert.assertTrue(callback.isResponseRx());
+        Assert.assertNotNull("Expected callback to contain result", callback.getResult());
+        Assert.assertEquals("Expected result bean to contain correct result", Boolean.TRUE, callback.getResult());
+    }
+
+    public void testGetImplicitFB_callback_ignoresWrongResponses() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+
+        ImpProposalContent content = new ImpProposalContent(
+                "Test proposal",
+                30000
+        );
+
+        final String requestId = UUID.randomUUID().toString();
+        final String wrongID = UUID.randomUUID().toString();
+
+        final ImpFeedbackResultBean resultBean = new ImpFeedbackResultBean();
+        resultBean.setAccepted(true);
+        resultBean.setRequestId(requestId);
+
+        EventCallback<Boolean> callback = new EventCallback<Boolean>();
+
+        log.debug("Requesting IMP (Timed Abort) user feedback");
+        userFeedback.getImplicitFBAsync(requestId, ImpProposalType.TIMED_ABORT, content, callback);
+        log.debug("Method returned");
+
+        log.debug("Sending wrong pubsub responses");
+
+        resultBean.setRequestId(wrongID);
+        userFeedback.pubsubEvent(null, UserFeedbackEventTopics.IMPLICIT_RESPONSE, wrongID, resultBean);
+        Assert.assertFalse(callback.isResponseRx());
+
+        resultBean.setRequestId(requestId);
+
+        try {
+            userFeedback.pubsubEvent(null, UserFeedbackEventTopics.EXPLICIT_RESPONSE, requestId, resultBean);
+        } catch (Exception ex) {
+            // do nothing - this is acceptable behaviour
+        }
+        Assert.assertFalse(callback.isResponseRx());
+
+        try {
+            userFeedback.pubsubEvent(null, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, requestId, resultBean);
+        } catch (Exception ex) {
+            // do nothing - this is acceptable behaviour
+        }
+        Assert.assertFalse(callback.isResponseRx());
+
+        try {
+            userFeedback.pubsubEvent(null, EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE, requestId, resultBean);
+        } catch (Exception ex) {
+            // do nothing - this is acceptable behaviour
+        }
+        Assert.assertFalse(callback.isResponseRx());
+
+        log.debug("Sending correct mock pubsub response");
+        userFeedback.pubsubEvent(null, UserFeedbackEventTopics.IMPLICIT_RESPONSE, requestId, resultBean);
+
+        Assert.assertTrue(callback.isResponseRx());
+    }
 
 
+    public void testGetPrivacyNegotiationFB_sync_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
 
-	public void testRadioGUI(){
-		try {
-			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID)).thenReturn(mockUIDIdListFuture);
-			when(mockCtxBroker.retrieve(mockUIDId)).thenReturn(mockUIDFuture);
-			
-			String proposalText = "Select: WHITE";
-			String[] options = {"RED", "WHITE", "GREEN", "BLUE", "BLACK", "YELLOW"};
-			List<String> feedback = userFeedback.getExplicitFB(ExpProposalType.RADIOLIST, new ExpProposalContent(proposalText, options)).get();
-			
-			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID);
-			verify(mockCtxBroker).retrieve(mockUIDId);
-			
-			//analyse results
-			Assert.assertNotNull(feedback);
-			Assert.assertTrue(feedback.size() == 1);
-			String results = feedback.get(0);
-			Assert.assertEquals("WHITE", results);
-			
-		} catch (CtxException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
-	}
+        SecureRandom random = new SecureRandom();
 
-	
-	
-	public void testTimedGUI_abort(){
-		try {
-			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID)).thenReturn(mockUIDIdListFuture);
-			when(mockCtxBroker.retrieve(mockUIDId)).thenReturn(mockUIDFuture);
-			
-			String proposalText = "Press: ABORT";
-			Boolean feedback = userFeedback.getImplicitFB(ImpProposalType.TIMED_ABORT, new ImpProposalContent(proposalText, 10000)).get();
-			
-			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID);
-			verify(mockCtxBroker).retrieve(mockUIDId);
-			
-			//analyse results
-			Assert.assertNotNull(feedback);
-			Assert.assertEquals(false, feedback.booleanValue());
-			
-		} catch (CtxException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
-	}
+        final String requestId = UUID.randomUUID().toString();
+        final int negotiationId = new BigInteger(130, random).intValue();
 
-	
-	
-	public void testTimedGUI_timeout(){
-		try {
-			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID)).thenReturn(mockUIDIdListFuture);
-			when(mockCtxBroker.retrieve(mockUIDId)).thenReturn(mockUIDFuture);
-			
-			String proposalText = "DO NOT press any button";
-			Boolean feedback = userFeedback.getImplicitFB(ImpProposalType.TIMED_ABORT, new ImpProposalContent(proposalText, 5000)).get();
-			
-			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID);
-			verify(mockCtxBroker).retrieve(mockUIDId);
-			
-			//analyse results
-			Assert.assertNotNull(feedback);
-			Assert.assertEquals(true, feedback.booleanValue());
-			
-		} catch (CtxException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
-	}*/
+        RequestorBean requestorBean = new RequestorBean();
+        requestorBean.setRequestorId(requestId);
+
+        NegotiationDetailsBean negotiationDetails = new NegotiationDetailsBean();
+        negotiationDetails.setRequestor(requestorBean);
+        negotiationDetails.setNegotiationID(negotiationId);
+
+        ResponsePolicy responsePolicy = buildResponsePolicy(requestId, requestorBean);
+
+        final UserFeedbackPrivacyNegotiationEvent resultBean = new UserFeedbackPrivacyNegotiationEvent();
+        resultBean.setRequestId(requestId);
+        resultBean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+        resultBean.setNegotiationDetails(negotiationDetails);
+        resultBean.setResponsePolicy(responsePolicy);
+
+        log.debug("Preparing response thread");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                log.debug("Waiting " + SYNC_RESPONSE_DELAY + "ms to send mock pub sub response");
+
+                try {
+                    Thread.sleep(SYNC_RESPONSE_DELAY);
+                } catch (InterruptedException e) {
+                    log.error("Error delaying mock pubsub event", e);
+                }
+
+                log.debug("Sending mock pubsub response");
+                userFeedback.pubsubEvent(null, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, requestId, resultBean);
+                log.debug("Mock pubsub response sent");
+            }
+        }).start();
+
+        log.debug("Requesting PPN feedback");
+        Future<ResponsePolicy> result = userFeedback.getPrivacyNegotiationFB(requestId, responsePolicy, negotiationDetails);
+        log.debug("Method returned");
+
+        // VERIFICATION
+        verify(mockPrivacyPolicyNegotiationHistoryRepository).insert(any(UserFeedbackPrivacyNegotiationEvent.class));
+        verify(mockPubSubClient).publisherPublish(any(IIdentity.class), eq(EventTypes.UF_PRIVACY_NEGOTIATION), eq(requestId), any(UserFeedbackPrivacyNegotiationEvent.class));
+
+        Assert.assertNotNull("Expected Future to contain result", result.get());
+//        Assert.assertEquals("Expected result bean to contain 1 item", 1, result.get().size());
+//        Assert.assertEquals("Expected result bean to contain correct result", expectedResult, result.get().get(0));
+    }
+
+    public void testGetPrivacyNegotiationFB_async_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+
+        SecureRandom random = new SecureRandom();
+
+        final String requestId = UUID.randomUUID().toString();
+        final int negotiationId = new BigInteger(130, random).intValue();
+
+        RequestorBean requestorBean = new RequestorBean();
+        requestorBean.setRequestorId(requestId);
+
+        NegotiationDetailsBean negotiationDetails = new NegotiationDetailsBean();
+        negotiationDetails.setRequestor(requestorBean);
+        negotiationDetails.setNegotiationID(negotiationId);
+
+        ResponsePolicy responsePolicy = buildResponsePolicy(requestId, requestorBean);
+
+        final UserFeedbackPrivacyNegotiationEvent resultBean = new UserFeedbackPrivacyNegotiationEvent();
+        resultBean.setRequestId(requestId);
+        resultBean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+        resultBean.setNegotiationDetails(negotiationDetails);
+        resultBean.setResponsePolicy(responsePolicy);
+
+        log.debug("Requesting PPN feedback");
+        Future<ResponsePolicy> result = userFeedback.getPrivacyNegotiationFBAsync(requestId, responsePolicy, negotiationDetails, null);
+        log.debug("Method returned");
+
+        // VERIFICATION
+        verify(mockPrivacyPolicyNegotiationHistoryRepository).insert(any(UserFeedbackPrivacyNegotiationEvent.class));
+        verify(mockPubSubClient).publisherPublish(any(IIdentity.class), eq(EventTypes.UF_PRIVACY_NEGOTIATION), eq(requestId), any(UserFeedbackPrivacyNegotiationEvent.class));
+
+        Assert.assertNull("Expected Future to be empty", result.get());
+
+        log.debug("Sending mock pubsub response");
+        userFeedback.pubsubEvent(null, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, requestId, resultBean);
+        log.debug("Mock pubsub response sent");
+
+        Assert.assertNotNull("Expected Future to contain result", result.get());
+//        Assert.assertEquals("Expected result bean to contain 1 item", 1, result.get().size());
+//        Assert.assertEquals("Expected result bean to contain correct result", expectedResult, result.get().get(0));
+    }
+
+    public void testGetPrivacyNegotiationFB_callback_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+
+        SecureRandom random = new SecureRandom();
+
+        final String requestId = UUID.randomUUID().toString();
+        final int negotiationId = new BigInteger(130, random).intValue();
+
+        RequestorBean requestorBean = new RequestorBean();
+        requestorBean.setRequestorId(requestId);
+
+        NegotiationDetailsBean negotiationDetails = new NegotiationDetailsBean();
+        negotiationDetails.setRequestor(requestorBean);
+        negotiationDetails.setNegotiationID(negotiationId);
+
+        ResponsePolicy responsePolicy = buildResponsePolicy(requestId, requestorBean);
+
+        final UserFeedbackPrivacyNegotiationEvent resultBean = new UserFeedbackPrivacyNegotiationEvent();
+        resultBean.setRequestId(requestId);
+        resultBean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+        resultBean.setNegotiationDetails(negotiationDetails);
+        resultBean.setResponsePolicy(responsePolicy);
+
+        EventCallback<ResponsePolicy> callback = new EventCallback<ResponsePolicy>();
+
+        log.debug("Requesting PPN feedback");
+        userFeedback.getPrivacyNegotiationFBAsync(requestId, responsePolicy, negotiationDetails, callback);
+        log.debug("Method returned");
+
+        // VERIFICATION
+        verify(mockPrivacyPolicyNegotiationHistoryRepository).insert(any(UserFeedbackPrivacyNegotiationEvent.class));
+        verify(mockPubSubClient).publisherPublish(any(IIdentity.class), eq(EventTypes.UF_PRIVACY_NEGOTIATION), eq(requestId), any(UserFeedbackPrivacyNegotiationEvent.class));
+
+        Assert.assertFalse(callback.isResponseRx());
+
+        log.debug("Sending mock pubsub response");
+        userFeedback.pubsubEvent(null, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, requestId, resultBean);
+        log.debug("Mock pubsub response sent");
+
+        Assert.assertTrue(callback.isResponseRx());
+        Assert.assertNotNull("Expected Future to contain result", callback.getResult());
+//        Assert.assertEquals("Expected result bean to contain 1 item", 1, result.get().size());
+//        Assert.assertEquals("Expected result bean to contain correct result", expectedResult, result.get().get(0));
+    }
+
+    public void testGetPrivacyNegotiationFB_callback_ignoresWrongResponses() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+
+        SecureRandom random = new SecureRandom();
+
+        final String requestId = UUID.randomUUID().toString();
+        final int negotiationId = new BigInteger(130, random).intValue();
+        final String wrongID = UUID.randomUUID().toString();
+
+        RequestorBean requestorBean = new RequestorBean();
+        requestorBean.setRequestorId(requestId);
+
+        NegotiationDetailsBean negotiationDetails = new NegotiationDetailsBean();
+        negotiationDetails.setRequestor(requestorBean);
+        negotiationDetails.setNegotiationID(negotiationId);
+
+        ResponsePolicy responsePolicy = buildResponsePolicy(requestId, requestorBean);
+
+        final UserFeedbackPrivacyNegotiationEvent resultBean = new UserFeedbackPrivacyNegotiationEvent();
+        resultBean.setRequestId(requestId);
+        resultBean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+        resultBean.setNegotiationDetails(negotiationDetails);
+        resultBean.setResponsePolicy(responsePolicy);
+
+        EventCallback<ResponsePolicy> callback = new EventCallback<ResponsePolicy>();
+
+        log.debug("Requesting PPN feedback");
+        userFeedback.getPrivacyNegotiationFBAsync(requestId, responsePolicy, negotiationDetails, callback);
+        log.debug("Method returned");
+
+        log.debug("Sending wrong pubsub responses");
+
+        resultBean.setRequestId(wrongID);
+        userFeedback.pubsubEvent(null, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, wrongID, resultBean);
+        Assert.assertFalse(callback.isResponseRx());
+
+        resultBean.setRequestId(requestId);
+
+        try {
+            userFeedback.pubsubEvent(null, UserFeedbackEventTopics.IMPLICIT_RESPONSE, requestId, resultBean);
+        } catch (Exception ex) {
+            // do nothing - this is acceptable behaviour
+        }
+        Assert.assertFalse(callback.isResponseRx());
+
+        try {
+            userFeedback.pubsubEvent(null, UserFeedbackEventTopics.EXPLICIT_RESPONSE, requestId, resultBean);
+        } catch (Exception ex) {
+            // do nothing - this is acceptable behaviour
+        }
+        Assert.assertFalse(callback.isResponseRx());
+
+        try {
+            userFeedback.pubsubEvent(null, EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE, requestId, resultBean);
+        } catch (Exception ex) {
+            // do nothing - this is acceptable behaviour
+        }
+        Assert.assertFalse(callback.isResponseRx());
+
+        log.debug("Sending correct mock pubsub response");
+        userFeedback.pubsubEvent(null, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, requestId, resultBean);
+
+        Assert.assertTrue(callback.isResponseRx());
+    }
+
+
+    public void testGetAccessControlFB_sync_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+
+        final String requestId = UUID.randomUUID().toString();
+
+        IIdentity identity = mock(IIdentity.class);
+
+        Requestor requestor = new Requestor(identity);
+
+        List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
+        responseItems.add(buildResponseItem("ab.cd.ef1", "type1"));
+        responseItems.add(buildResponseItem("ab.cd.ef2", "type2"));
+        responseItems.add(buildResponseItem("ab.cd.ef3", "type3"));
+
+        final UserFeedbackAccessControlEvent resultBean = new UserFeedbackAccessControlEvent();
+        resultBean.setRequestId(requestId);
+        resultBean.setResponseItems(responseItems);
+        resultBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
+
+        log.debug("Preparing response thread");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                log.debug("Waiting " + SYNC_RESPONSE_DELAY + "ms to send mock pub sub response");
+
+                try {
+                    Thread.sleep(SYNC_RESPONSE_DELAY);
+                } catch (InterruptedException e) {
+                    log.error("Error delaying mock pubsub event", e);
+                }
+
+                log.debug("Sending mock pubsub response");
+                userFeedback.pubsubEvent(null, EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE, requestId, resultBean);
+                log.debug("Mock pubsub response sent");
+            }
+        }).start();
+
+        log.debug("Requesting Access Control user feedback");
+        Future<List<ResponseItem>> result = userFeedback.getAccessControlFB(requestId, requestor, responseItems);
+        log.debug("Method returned");
+
+        // VERIFICATION
+//        verify(mockUserFeedbackHistoryRepository).insert(any(UserFeedbackAccessControlEvent.class));
+        verify(mockPubSubClient).publisherPublish(any(IIdentity.class), eq(EventTypes.UF_PRIVACY_ACCESS_CONTROL), eq(requestId), any(UserFeedbackAccessControlEvent.class));
+
+        Assert.assertNotNull("Expected Future to contain result", result.get());
+//        Assert.assertEquals("Expected result bean to contain 1 item", 1, result.get().size());
+//        Assert.assertEquals("Expected result bean to contain correct result", expectedResult, result.get().get(0));
+    }
+
+    public void testGetAccessControlFB_async_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+
+        final String requestId = UUID.randomUUID().toString();
+
+        IIdentity identity = mock(IIdentity.class);
+
+        Requestor requestor = new Requestor(identity);
+
+        List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
+        responseItems.add(buildResponseItem("ab.cd.ef1", "type1"));
+        responseItems.add(buildResponseItem("ab.cd.ef2", "type2"));
+        responseItems.add(buildResponseItem("ab.cd.ef3", "type3"));
+
+        final UserFeedbackAccessControlEvent resultBean = new UserFeedbackAccessControlEvent();
+        resultBean.setRequestId(requestId);
+        resultBean.setResponseItems(responseItems);
+        resultBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
+
+        log.debug("Requesting Access Control user feedback");
+        Future<List<ResponseItem>> result = userFeedback.getAccessControlFBAsync(requestId, requestor, responseItems, null);
+        log.debug("Method returned");
+
+        // VERIFICATION
+//        verify(mockUserFeedbackHistoryRepository).insert(any(UserFeedbackAccessControlEvent.class));
+        verify(mockPubSubClient).publisherPublish(any(IIdentity.class), eq(EventTypes.UF_PRIVACY_ACCESS_CONTROL), eq(requestId), any(UserFeedbackAccessControlEvent.class));
+
+        Assert.assertNull("Expected Future to be empty", result.get());
+
+        log.debug("Sending mock pubsub response");
+        userFeedback.pubsubEvent(null, EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE, requestId, resultBean);
+        log.debug("Mock pubsub response sent");
+
+        Assert.assertNotNull("Expected Future to contain result", result.get());
+//        Assert.assertEquals("Expected result bean to contain 1 item", 1, result.get().size());
+//        Assert.assertEquals("Expected result bean to contain correct result", expectedResult, result.get().get(0));
+    }
+
+    public void testGetAccessControlFB_callback_fullSequence() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+
+        final String requestId = UUID.randomUUID().toString();
+
+        IIdentity identity = mock(IIdentity.class);
+
+        Requestor requestor = new Requestor(identity);
+
+        List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
+        responseItems.add(buildResponseItem("ab.cd.ef1", "type1"));
+        responseItems.add(buildResponseItem("ab.cd.ef2", "type2"));
+        responseItems.add(buildResponseItem("ab.cd.ef3", "type3"));
+
+        final UserFeedbackAccessControlEvent resultBean = new UserFeedbackAccessControlEvent();
+        resultBean.setRequestId(requestId);
+        resultBean.setResponseItems(responseItems);
+        resultBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
+
+        EventCallback<List<ResponseItem>> callback = new EventCallback<List<ResponseItem>>();
+
+        log.debug("Requesting Access Control user feedback");
+        userFeedback.getAccessControlFBAsync(requestId, requestor, responseItems, callback);
+        log.debug("Method returned");
+
+        // VERIFICATION
+//        verify(mockUserFeedbackHistoryRepository).insert(any(UserFeedbackAccessControlEvent.class));
+        verify(mockPubSubClient).publisherPublish(any(IIdentity.class), eq(EventTypes.UF_PRIVACY_ACCESS_CONTROL), eq(requestId), any(UserFeedbackAccessControlEvent.class));
+
+        Assert.assertFalse(callback.isResponseRx());
+
+        log.debug("Sending mock pubsub response");
+        userFeedback.pubsubEvent(null, EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE, requestId, resultBean);
+        log.debug("Mock pubsub response sent");
+
+        Assert.assertTrue(callback.isResponseRx());
+        Assert.assertNotNull("Expected Future to contain result", callback.getResult());
+//        Assert.assertEquals("Expected result bean to contain 1 item", 1, result.get().size());
+//        Assert.assertEquals("Expected result bean to contain correct result", expectedResult, result.get().get(0));
+    }
+
+    public void testGetAccessControlFB_callback_ignoresWrongResponses() throws ExecutionException, InterruptedException, CommunicationException, XMPPError {
+
+        final String requestId = UUID.randomUUID().toString();
+        final String wrongID = UUID.randomUUID().toString();
+
+        IIdentity identity = mock(IIdentity.class);
+
+        Requestor requestor = new Requestor(identity);
+
+        List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
+        responseItems.add(buildResponseItem("ab.cd.ef1", "type1"));
+        responseItems.add(buildResponseItem("ab.cd.ef2", "type2"));
+        responseItems.add(buildResponseItem("ab.cd.ef3", "type3"));
+
+        final UserFeedbackAccessControlEvent resultBean = new UserFeedbackAccessControlEvent();
+        resultBean.setRequestId(requestId);
+        resultBean.setResponseItems(responseItems);
+        resultBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
+
+        EventCallback<List<ResponseItem>> callback = new EventCallback<List<ResponseItem>>();
+
+        log.debug("Requesting Access Control user feedback");
+        userFeedback.getAccessControlFBAsync(requestId, requestor, responseItems, callback);
+        log.debug("Method returned");
+
+        log.debug("Sending wrong pubsub responses");
+
+        resultBean.setRequestId(wrongID);
+        userFeedback.pubsubEvent(null, EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE, wrongID, resultBean);
+        Assert.assertFalse(callback.isResponseRx());
+
+        resultBean.setRequestId(requestId);
+
+        try {
+            userFeedback.pubsubEvent(null, UserFeedbackEventTopics.IMPLICIT_RESPONSE, requestId, resultBean);
+        } catch (Exception ex) {
+            // do nothing - this is acceptable behaviour
+        }
+        Assert.assertFalse(callback.isResponseRx());
+
+        try {
+            userFeedback.pubsubEvent(null, UserFeedbackEventTopics.EXPLICIT_RESPONSE, requestId, resultBean);
+        } catch (Exception ex) {
+            // do nothing - this is acceptable behaviour
+        }
+        Assert.assertFalse(callback.isResponseRx());
+
+        try {
+            userFeedback.pubsubEvent(null, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, requestId, resultBean);
+        } catch (Exception ex) {
+            // do nothing - this is acceptable behaviour
+        }
+        Assert.assertFalse(callback.isResponseRx());
+
+        log.debug("Sending correct mock pubsub response");
+        userFeedback.pubsubEvent(null, EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE, requestId, resultBean);
+
+        Assert.assertTrue(callback.isResponseRx());
+
+    }
+
+
+    private static ResponsePolicy buildResponsePolicy(String guid, RequestorBean requestorBean) {
+        List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
+        responseItems.add(buildResponseItem("http://this.is.a.win/", "winning - " + guid));
+        responseItems.add(buildResponseItem("http://paddy.rules/", "paddy"));
+        responseItems.add(buildResponseItem("http://something.something.something/", "dark side"));
+
+        ResponsePolicy responsePolicy = new ResponsePolicy();
+        responsePolicy.setRequestor(requestorBean);
+        responsePolicy.setNegotiationStatus(NegotiationStatus.ONGOING);
+        responsePolicy.setResponseItems(responseItems);
+        return responsePolicy;
+    }
+
+    private static ResponseItem buildResponseItem(String uri, String dataType) {
+        Action action1 = new Action();
+        action1.setActionConstant(ActionConstants.CREATE);
+        action1.setOptional(true);
+        Action action2 = new Action();
+        action2.setActionConstant(ActionConstants.DELETE);
+        action2.setOptional(false);
+        Action action3 = new Action();
+        action3.setActionConstant(ActionConstants.READ);
+        action3.setOptional(false);
+        Action action4 = new Action();
+        action4.setActionConstant(ActionConstants.WRITE);
+        action4.setOptional(true);
+
+        Condition condition1 = new Condition();
+        condition1.setConditionConstant(ConditionConstants.DATA_RETENTION_IN_HOURS);
+        condition1.setValue("1");
+        condition1.setOptional(false);
+        Condition condition2 = new Condition();
+        condition2.setConditionConstant(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA);
+        condition2.setValue("2");
+        condition2.setOptional(true);
+        Condition condition3 = new Condition();
+        condition3.setConditionConstant(ConditionConstants.RIGHT_TO_OPTOUT);
+        condition3.setValue("3");
+        condition3.setOptional(false);
+        Condition condition4 = new Condition();
+        condition4.setConditionConstant(ConditionConstants.STORE_IN_SECURE_STORAGE);
+        condition4.setValue("4");
+        condition4.setOptional(true);
+
+        Resource resource = new Resource();
+        resource.setDataIdUri(uri);
+        resource.setDataType(dataType);
+
+        RequestItem requestItem = new RequestItem();
+        requestItem.getActions().add(action1);
+        requestItem.getActions().add(action2);
+        requestItem.getActions().add(action3);
+        requestItem.getActions().add(action4);
+
+        requestItem.getConditions().add(condition1);
+        requestItem.getConditions().add(condition2);
+        requestItem.getConditions().add(condition3);
+        requestItem.getConditions().add(condition4);
+
+        requestItem.setOptional(false);
+        requestItem.setResource(resource);
+
+        ResponseItem responseItem = new ResponseItem();
+        responseItem.setDecision(Decision.INDETERMINATE);
+        responseItem.setRequestItem(requestItem);
+        return responseItem;
+    }
+
 
 }

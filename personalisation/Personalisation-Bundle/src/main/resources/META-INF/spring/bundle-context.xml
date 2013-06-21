@@ -20,6 +20,8 @@
 		<property name="commManager" ref="commsMgr"></property>
 		<property name="userFeedbackMgr" ref="userFeedback"></property>
 		<property name="communityPreferenceMgr" ref="communityPreferenceManager"></property>
+		<property name="serviceDiscovery" ref="serviceDiscovery"></property>
+		<property name="cisManager" ref="cisManager"></property>
 	</bean>
 
 	
@@ -29,6 +31,13 @@
 		<property name="ctxBroker" ref="ctxBroker"></property>
 	</bean>
 
+	<bean id="caciTaskManager"
+		class="org.societies.personalisation.CAUITaskManager.impl.CAUITaskManager"
+		name="caciTaskManager" init-method="initialiseCAUITaskManager">
+		<property name="ctxBroker" ref="ctxBroker"></property>
+	</bean>
+	
+	
 	<bean id="cauiPrediction"
 		class="org.societies.personalisation.CAUIPrediction.impl.CAUIPrediction"
 		name="cauiPrediction" init-method="initialiseCAUIPrediction">
@@ -36,6 +45,7 @@
 		<property name="ctxBroker" ref="ctxBroker"></property>
 		<property name="cauiDiscovery" ref="cauiDiscovery"></property>
 		<property name="cauiTaskManager" ref="cauiTaskManager"></property>
+		<property name="caciTaskManager" ref="caciTaskManager"></property>
 		<property name="commsMgr" ref="commsMgr"></property>
 	</bean>
 
@@ -47,6 +57,14 @@
 		<property name="commsMgr" ref="commsMgr"></property>
 	</bean>
 
+	<bean id="caciDiscovery"
+		class="org.societies.personalisation.CACIDiscovery.impl.CACIDiscovery"
+		name="caciDiscovery" init-method="initialiseCACIDiscovery">
+		<property name="cauiTaskManager" ref="cauiTaskManager"></property>
+		<property name="ctxBroker" ref="ctxBroker"></property>
+		<property name="commsMgr" ref="commsMgr"></property>
+	</bean>
+	
 	<bean id="cristPrediction"
 		class="org.societies.personalisation.CRISTUserIntentPrediction.impl.CRISTUserIntentPrediction"
 		name="cristPrediction" init-method="initialiseCRISTPrediction">

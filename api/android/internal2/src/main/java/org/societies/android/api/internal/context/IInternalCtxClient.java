@@ -60,6 +60,7 @@ public interface IInternalCtxClient extends ICtxClient, IServiceManager {
 	//Intents
 	public static final String INTENT_RETURN_VALUE_KEY = ICtxClient.INTENT_RETURN_VALUE_KEY;
 	public static final String INTENT_RETURN_STATUS_KEY = ICtxClient.INTENT_RETURN_STATUS_KEY;
+	public static final String INTENT_EXCEPTION_VALUE_KEY = ICtxClient.INTENT_EXCEPTION_VALUE_KEY;	
 
 	public static final String CREATE_ASSOCIATION = ICtxClient.CREATE_ASSOCIATION;
 	public static final String CREATE_ATTRIBUTE = ICtxClient.CREATE_ATTRIBUTE;
@@ -74,18 +75,30 @@ public interface IInternalCtxClient extends ICtxClient, IServiceManager {
 
 
 	//Array of interface method signatures
-	String methodsArray [] = {"createAssociation(String client, String type)", 
-			"createAttribute(String client, ACtxEntityIdentifier scope, String type)", 
-			"createEntity(String client, String type)",
-			"lookupEntities(String client, String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue)", 
-			"lookup(String client, CtxModelType modelType, String type)", 
-			"remove(String client, ACtxIdentifier identifier)", 
-			"retrieve(String client, ACtxIdentifier identifier)", 
-			"update(String client, ACtxModelObject identifier)", 
-			"updateAttribute(String client, ACtxAttributeIdentifier attributeId, Serializable value)", 
-			"updateAttribute(String client, ACtxAttributeIdentifier attributeId, Serializable value, String valueMetric)",
-                	"startService()",
-                	"stopService()"
+	String methodsArray [] = {"createEntity(String client, org.societies.api.schema.identity.RequestorBean requestor, String targetCss, String type)",
+			"createAttribute(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.context.model.CtxEntityIdentifierBean scope, String type)",
+			"createAssociation(String client, org.societies.api.schema.identity.RequestorBean requestor, String targetCss, String type)",
+			"lookup(String client, org.societies.api.schema.identity.RequestorBean requestor, String target, org.societies.api.schema.context.model.CtxModelTypeBean modelType, String type)",
+			"lookup(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.context.model.CtxEntityIdentifierBean entityId, org.societies.api.schema.context.model.CtxModelTypeBean modelType, String type)",
+			"lookupEntities(String client, org.societies.api.schema.identity.RequestorBean requestor, String targetCss, String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue)",
+			"remove(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.context.model.CtxIdentifierBean identifier)",
+			"retrieve(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.context.model.CtxIdentifierBean identifier)",
+			"retrieveIndividualEntityId(String client, org.societies.api.schema.identity.RequestorBean requestor, String cssId)",
+			"retrieveCommunityEntityId(String client, org.societies.api.schema.identity.RequestorBean requestor, String cisId)",
+			"update(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.context.model.CtxModelObjectBean object)",
+			"startService()",
+			"stopService()",
+			"createEntity(String client, String targetCss, String type)",
+			"createAttribute(String client, org.societies.api.schema.context.model.CtxEntityIdentifierBean scope, String type)",
+			"createAssociation(String client, String targetCss, String type)",
+			"lookup(String client, String target, org.societies.api.schema.context.model.CtxModelTypeBean modelType, String type)",
+			"lookup(String client, org.societies.api.schema.context.model.CtxEntityIdentifierBean entityId, org.societies.api.schema.context.model.CtxModelTypeBean modelType, String type)",
+			"lookupEntities(String client, String targetCss, String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue)",
+			"remove(String client, org.societies.api.schema.context.model.CtxIdentifierBean identifier)",
+			"retrieve(String client, org.societies.api.schema.context.model.CtxIdentifierBean identifier)",
+			"retrieveIndividualEntityId(String client, String cssId)",
+			"retrieveCommunityEntityId(String client, String cisId)",
+			"update(String client, org.societies.api.schema.context.model.CtxModelObjectBean object)"
 	};
 
 

@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
 import org.societies.privacytrust.trust.api.event.TrustEvidenceUpdateEvent;
-import org.societies.privacytrust.trust.impl.evidence.repo.model.DirectTrustEvidence;
 import org.societies.privacytrust.trust.impl.evidence.repo.model.TrustEvidence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,7 +55,8 @@ public class PostInsertEventUserListener implements PostInsertEventListener {
 
 	PostInsertEventUserListener() {
 		
-		LOG.info(this.getClass() + " instantiated");
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
 	}
 
 	/*
@@ -67,11 +67,7 @@ public class PostInsertEventUserListener implements PostInsertEventListener {
 		
 		if (event.getEntity() instanceof TrustEvidence) {
 			
-			final String topic;
-			if (event.getEntity() instanceof DirectTrustEvidence)
-				topic = TrustEventTopic.DIRECT_TRUST_EVIDENCE_UPDATED;
-			else // if (event.getEntity() instanceof IndirectTrustEvidence)
-				topic = TrustEventTopic.INDIRECT_TRUST_EVIDENCE_UPDATED;
+			final String topic = TrustEventTopic.TRUST_EVIDENCE_UPDATED;
 			final TrustEvidenceUpdateEvent trustEvidenceUpdateEvent = 
 					new TrustEvidenceUpdateEvent((TrustEvidence) event.getEntity());
 			if (LOG.isDebugEnabled())

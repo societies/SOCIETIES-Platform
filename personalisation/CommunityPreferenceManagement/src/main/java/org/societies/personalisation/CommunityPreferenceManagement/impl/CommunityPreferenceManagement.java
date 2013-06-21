@@ -22,6 +22,8 @@ package org.societies.personalisation.CommunityPreferenceManagement.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.cis.management.ICisManager;
@@ -90,13 +92,16 @@ public class CommunityPreferenceManagement implements ICommunityPreferenceManage
 		boolean ownCIS = false;
 
 		List<ICisOwned> listOfOwnedCis = cisManager.getListOfOwnedCis();
+		//JOptionPane.showMessageDialog(null, listOfOwnedCis.size());
 		for (ICisOwned ownedCis : listOfOwnedCis){
 			if (ownedCis.getCisId().equalsIgnoreCase(cisId.getBareJid())){
 				ownCIS = true;
+				
 			}
 		}
 
 		if (ownCIS){
+			//JOptionPane.showMessageDialog(null, "I own this CIS");
 			this.logging.debug("Uploading new community preferences.");
 			for (IPreferenceTreeModel newModel : models){
 				PreferenceDetails newDetail = newModel.getPreferenceDetails();
@@ -114,6 +119,7 @@ public class CommunityPreferenceManagement implements ICommunityPreferenceManage
 			}
 
 		}else{
+			//JOptionPane.showMessageDialog(null, "I do not own this CIS");
 			this.communityPreferenceManagementClient.uploadUserPreferences(cisId, models);
 		}
 	}

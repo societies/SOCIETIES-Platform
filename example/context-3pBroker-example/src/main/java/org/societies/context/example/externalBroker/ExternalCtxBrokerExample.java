@@ -83,17 +83,6 @@ public class ExternalCtxBrokerExample 	{
 	private IIdentity cssOwnerId;
 	private INetworkNode cssNodeId;
 	private ICisOwned cisOwned  = null;
-	private IIdentity cisID;
-
-
-	//	private IIdentity cisID;
-	private IIdentity cssID1; 
-	private IIdentity cssID2;
-	private IIdentity cssID3;
-
-	private IndividualCtxEntity indiEnt1;
-	private IndividualCtxEntity indiEnt2;
-	private IndividualCtxEntity indiEnt3;
 
 	private static IndividualCtxEntity owner = null;
 	private static CtxEntity deviceCtxEntity;
@@ -131,109 +120,15 @@ public class ExternalCtxBrokerExample 	{
 		this.requestor = new Requestor(this.cssOwnerId);
 		LOG.info("*** requestor = " + this.requestor);
 
-		Hashtable<String,MembershipCriteria> cisCriteria = new Hashtable<String,MembershipCriteria>();
-		
-		
-		try {
-			cisOwned = cisManager.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		LOG.info("*** cisOwned " +cisOwned);
-		LOG.info("*** cisOwned.getCisId() " +cisOwned.getCisId());
-		String cisIDString  = cisOwned.getCisId();
-
-		this.cisID = commMgr.getIdManager().fromJid(cisIDString);
-
 		LOG.info("*** Starting individual context examples...");
 
-		ca3pService.retrieveIndividualEntityId();
-		ca3pService.createCtxEntityWithCtxAttributes();
+		//ca3pService.retrieveIndividualEntityId();
+		//ca3pService.createCtxEntityWithCtxAttributes();
+		//ca3pService.retrieveCtxAttributeBasedOnEntity();
+		//ca3pService.lookupAndRetrieveCtxAttributes();
+		//ca3pService.createCtxEntityWithCtxAttributes();
 		
-		ca3pService.retrieveCtxAttributeBasedOnEntity();
-
-		ca3pService.lookupAndRetrieveCtxAttributes();
-
-
-		//LOG.info("*** Starting community context examples...");
-		// creation of communities is only allowed by platform services
-		//this.createCommunityCtxEnt();
-		
-//		ca3pService.retrievceLookupCommunityEntAttributes(this.cisID);
-	}
-
-
-	/*
-	private void createCommunityCtxEnt(){
-
-		CommunityCtxEntity communityEntity;
-		try {
-			
-			communityEntity = internalCtxBroker.createCommunityEntity(this.cisID).get();
-			this.cssID1 =  this.commMgrService.getIdManager().fromJid("Aris@societies.local");
-			this.indiEnt1 = this.internalCtxBroker.createIndividualEntity(this.cssID1, CtxEntityTypes.PERSON).get();
-			CtxAttribute individualAttr1 = this.internalCtxBroker.createAttribute(this.indiEnt1.getId() , CtxAttributeTypes.INTERESTS).get();
-			individualAttr1.setStringValue("reading,socialnetworking,cinema,sports");
-			this.internalCtxBroker.update(individualAttr1);
-
-			this.cssID2 =  this.commMgrService.getIdManager().fromJid("Babis@societies.local ");
-			this.indiEnt2 = this.internalCtxBroker.createIndividualEntity(this.cssID2, CtxEntityTypes.PERSON).get();
-			CtxAttribute individualAttr2 = this.internalCtxBroker.createAttribute(this.indiEnt2.getId() , CtxAttributeTypes.INTERESTS).get();
-			individualAttr2.setStringValue("cooking,horseRiding,restaurants,cinema");
-
-			this.cssID3 =  this.commMgrService.getIdManager().fromJid("Chrisa@societies.local ");
-			this.indiEnt3 = this.internalCtxBroker.createIndividualEntity(this.cssID3, CtxEntityTypes.PERSON).get();
-			CtxAttribute individualAttr3 = this.internalCtxBroker.createAttribute(this.indiEnt3.getId() , CtxAttributeTypes.INTERESTS).get();
-			individualAttr3.setStringValue("cooking,horseRiding,socialnetworking,restaurants,cinema");
-
-			communityEntity.addMember(this.indiEnt1.getId());
-			communityEntity.addMember(this.indiEnt2.getId());
-			communityEntity.addMember(this.indiEnt3.getId());
-
-			CtxAttributeBond attributeLocationBond = new CtxAttributeBond(CtxAttributeTypes.LOCATION_SYMBOLIC, CtxBondOriginType.MANUALLY_SET);
-			attributeLocationBond.setMinValue("home");
-			attributeLocationBond.setMaxValue("home");
-			attributeLocationBond.setValueType(CtxAttributeValueType.STRING);
-			LOG.info("locationBond created : " + attributeLocationBond.toString());
-			CtxAttributeBond attributeAgeBond = new CtxAttributeBond(CtxAttributeTypes.WEIGHT, CtxBondOriginType.MANUALLY_SET);
-
-			attributeLocationBond.setValueType(CtxAttributeValueType.INTEGER);
-			attributeAgeBond.setMinValue(new Integer(18));
-			attributeAgeBond.setMinValue(new Integer(20));
-
-			communityEntity.addBond(attributeLocationBond);
-			communityEntity.addBond(attributeAgeBond);
-
-
-			this.internalCtxBroker.update(communityEntity);
-
-			CtxAttribute ctxAttr = this.internalCtxBroker.createAttribute(communityEntity.getId(),CtxAttributeTypes.INTERESTS).get();
-			ctxAttr.setStringValue("reading,socialnetworking,sports,cooking,horseRiding,cinema,restaurants");
-			ctxAttr.setValueType(CtxAttributeValueType.STRING);
-			ctxAttr.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
-
-			this.internalCtxBroker.update(ctxAttr).get();
-
-
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		ca3pService.registerForLocUpdates();
 		}
-
-	}
-*/
 	
 }

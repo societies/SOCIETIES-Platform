@@ -32,7 +32,7 @@ package org.societies.personalisation.CommunityPreferenceManagement.impl.managem
  */
 public class CtxModelTypes {
 
-	public static final String PREFERENCE_REGISTRY = "PREFERENCE_REGISTRY";
-	public static final String HAS_PREFERENCES = "HAS_PREFERENCES";
-	public static final String PREFERENCE = "PREFERENCE";
+	public static final String PREFERENCE_REGISTRY = "COMMUNITY_PREFERENCE_REGISTRY";
+	public static final String HAS_PREFERENCES = "HAS_COMMUNITIY_PREFERENCES";
+	public static final String PREFERENCE = "HAS_COMMUNITY_PREFERENCE";
 }

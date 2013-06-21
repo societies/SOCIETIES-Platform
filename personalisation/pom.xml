@@ -59,6 +59,7 @@
 		<module>CAUITaskManager</module>
 		<module>CAUIDiscovery</module>
 		<module>CAUIPrediction</module>
+		<module>CACIDiscovery</module>
 		<module>UserPreferenceManagement</module>
 		<module>UserPreferenceLearning</module>
 		<module>DIANNE</module>

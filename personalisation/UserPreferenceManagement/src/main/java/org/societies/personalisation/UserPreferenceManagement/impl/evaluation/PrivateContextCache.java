@@ -172,39 +172,6 @@ public class PrivateContextCache {
 		this.logging.debug("updated Context Cache for context type: "+type+" with id: "+id.toUriString()+" with value: "+this.cache.get(id));
 		this.printCache();
 	}
-	
-
-	private class Pair{
-		private String type;
-		private ServiceResourceIdentifier id;
-		Pair(String serviceType, ServiceResourceIdentifier serviceID){
-			this.setServiceType(serviceType);
-			this.setServiceId(serviceID);
-		}
-		public void setServiceType(String type) {
-			this.type = type;
-		}
-		public String getServiceType() {
-			return type;
-		}
-		public void setServiceId(ServiceResourceIdentifier id) {
-			this.id = id;
-		}
-		public ServiceResourceIdentifier getServiceId() {
-			return this.id;
-		}
-		
-		public boolean equals(Pair p){
-			if (!(this.type.equalsIgnoreCase(p.getServiceType()))){
-				return false;
-			}
-			if (!(this.id.toString().equalsIgnoreCase(p.getServiceId().toString()))){
-				return false;
-			}
-			
-			return true;
-		}
-	}
 
 	
 }

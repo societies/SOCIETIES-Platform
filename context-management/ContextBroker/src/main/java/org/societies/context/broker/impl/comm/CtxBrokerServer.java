@@ -395,15 +395,23 @@ public class CtxBrokerServer implements IFeatureServer{
 				List<CtxIdentifier> lookupResultsList = ctxbroker.lookup(requestor, targetCss, modelType, type).get();
 				if (lookupResultsList.size() > 0) {
 					List<CtxIdentifierBean> identBeanList = new ArrayList<CtxIdentifierBean>(); 
+
+					if (LOG.isDebugEnabled())
+					    LOG.debug("lookupResultsList=" + lookupResultsList);
+					
 					for (CtxIdentifier identifier : lookupResultsList) {
-						if (identifier.getModelType().equals(CtxModelType.ATTRIBUTE)){
+						CtxIdentifierBean ctxIdBean = 
+									 CtxModelBeanTranslator.getInstance().fromCtxIdentifier(identifier);
+							identBeanList.add(ctxIdBean);
+					
+						
+					/*	if (identifier.getModelType().equals(CtxModelType.ATTRIBUTE)){
 							CtxAttributeIdentifier attrId = (CtxAttributeIdentifier) identifier;
 							CtxAttributeIdentifierBean attrIdBean = 
 									(CtxAttributeIdentifierBean) CtxModelBeanTranslator.getInstance().fromCtxIdentifier(attrId);
 							identBeanList.add(attrIdBean);
-						}						
-						//CtxIdentifierBean identityBean = ctxBeanTranslator.fromCtxIdentifier(identifier);
-						// TODO why only attr ids???
+						}
+						*/						
 					}
 					beanResponse.setCtxBrokerLookupBeanResult(identBeanList);
 				}

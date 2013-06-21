@@ -241,6 +241,8 @@ public class CisMgmtPerformanceTestImpl implements ICisMgmtPerformanceTest{
 						{
 							String cisId =  createdCis.getCisId();
 							
+							String cisOwnedId =  createdCis.getOwnerId();
+							
 							if (null != cisId) 
 							{
 								
@@ -288,7 +290,7 @@ public class CisMgmtPerformanceTestImpl implements ICisMgmtPerformanceTest{
 										{
 											if (expectedPrivacyPolicy.toXMLString().equals(retrievedPrivacyPolicy.toXMLString()) ) 
 											{ 
-												performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "CIS creation has successfully done", PerformanceTestResult.SUCCESS_STATUS);
+												performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "CIS creation has been successfully done: " + "cis id = " + cisId + " Owned id = "+ cisOwnedId, PerformanceTestResult.SUCCESS_STATUS);
 												performanceLowerTester.testFinish(performanceTestResult);
 											}
 											else

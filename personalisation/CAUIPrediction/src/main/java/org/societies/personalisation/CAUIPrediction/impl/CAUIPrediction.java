@@ -46,6 +46,9 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
+import org.societies.api.context.model.CommunityCtxEntity;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
@@ -84,10 +87,13 @@ public class CAUIPrediction implements ICAUIPrediction{
 	private ICtxBroker ctxBroker;
 	private IInternalPersonalisationManager persoMgr;
 	private ICAUITaskManager cauiTaskManager;
+	
+	private ICAUITaskManager caciTaskManager; 
+	
 	private ICAUIDiscovery cauiDiscovery;
 	private ICommManager commsMgr;
 
-	private Boolean enablePrediction = true;  
+	private Boolean enableCauiPrediction = true;  
 
 	// maintains the last 100 actions
 	private List<IAction> lastMonitoredActions = new ArrayList<IAction>();
@@ -95,75 +101,43 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	int predictionRequestsCounter = 0;
 	int discoveryThreshold = 6;
-	boolean modelExist = false;
-
+	public boolean cauiModelExist = false;
+	
+	
+	// caci variables
+	public static boolean enableCACIPrediction = true;
+	public static boolean  caciModelExist = false;
+	//boolean caciFreshness = true;
+	
+	protected CtxAttribute currentCaciModelAttr;
+	CACIPrediction caciPredictor = null;
+	
 	private IIdentity cssOwnerId;
 	private CtxEntityIdentifier operatorEntId;
 
-	//Services registration
-	public ICAUIDiscovery getCauiDiscovery() {
-		LOG.info(this.getClass().getName()+": Return cauiDiscovery");
-		return cauiDiscovery;
-	}
-
-
-	public void setCauiDiscovery(ICAUIDiscovery cauiDiscovery) {
-		LOG.info(this.getClass().getName()+": Got cauiDiscovery");
-		this.cauiDiscovery = cauiDiscovery;
-	}
-
-
-	public ICtxBroker getCtxBroker() {
-		LOG.info(this.getClass().getName()+": Return ctxBroker");
-		return ctxBroker;
-	}
-
-
-	public void setCtxBroker(ICtxBroker ctxBroker) {
-		LOG.info(this.getClass().getName()+": Got ctxBroker");
-		this.ctxBroker = ctxBroker;
-	}
-
-
-	public IInternalPersonalisationManager getPersoMgr() {
-		LOG.info(this.getClass().getName()+": Return persoMgr");
-		return persoMgr;
-	}
-
-
-	public void setPersoMgr(IInternalPersonalisationManager persoMgr) {
-		LOG.info(this.getClass().getName()+": Got persoMgr");
-		this.persoMgr = persoMgr;
-	}
-
-
-	public ICAUITaskManager getCauiTaskManager() {
-		LOG.info(this.getClass().getName()+": Return cauiTaskManager");
-		return cauiTaskManager;
-	}
-
-
-	public void setCauiTaskManager(ICAUITaskManager cauiTaskManager) {
-		LOG.info(this.getClass().getName()+": Got cauiTaskManager");
-		this.cauiTaskManager = cauiTaskManager;
-	}
-
-	public void setCommsMgr(ICommManager commsMgr) {
-		LOG.info(this.getClass().getName()+": Got commsMgr");
-		this.commsMgr = commsMgr;
-	}
-
-	public ICommManager getCommsMgr() {
-		LOG.info(this.getClass().getName()+": Return CommsMgr");
-		return commsMgr;
-	}
 
 
 
 	// constructor
 	public void initialiseCAUIPrediction(){
-		LOG.info("CAUIPrediction initialised");
+		LOG.debug("CAUIPrediction initialised");
+		LOG.debug("registerForNewUiModelEvent");
 		registerForNewUiModelEvent();
+		
+		LOG.debug( "caci manager: "+ this.caciTaskManager );
+		
+		// TODO get new instance of task manager service
+		this.caciPredictor = new CACIPrediction(this.ctxBroker, this.caciTaskManager, this.commsMgr);
+		
+		
+		try {
+			LOG.debug("register for cis join and new community model creation");
+			new CommunityJoinMonitor(this.ctxBroker ,this.commsMgr);
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public CAUIPrediction(){
@@ -173,10 +147,19 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	@Override
 	public void enablePrediction(Boolean bool) {
-		this.enablePrediction = bool;
+		this.enableCauiPrediction = bool;
 	}
 
-
+	//TODO add to interface
+	public void enableCACIPrediction(Boolean bool) {
+		enableCACIPrediction = bool;
+	}
+	
+	public void setCaciModelExist(Boolean bool) {
+		caciModelExist = bool;
+	}
+	
+	
 	@Override
 	public List<List<String>> getPredictionHistory() {
 		// 
@@ -205,8 +188,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 			}
 		}
 
-		if(modelExist == true && enablePrediction == true){
-
+		if(cauiModelExist == true && enableCauiPrediction == true){
 
 			//LOG.info("1. model exists " +modelExist);
 			//LOG.info("START PREDICTION caui modelExist "+modelExist);
@@ -248,11 +230,15 @@ public class CAUIPrediction implements ICAUIPrediction{
 					}
 				}			
 			}
-		} else {
-			LOG.info("no CAUI model exist yet ");
-		}
+		} else if(enableCACIPrediction == true && caciModelExist == true) {
+			LOG.info("no CAUI model exist ... utilize community model ");
+			
+			results = this.caciPredictor.getPrediction(requestor, action);
+						
+		} else LOG.info("neither caci, nor caui are able to perform prediction");
 		//LOG.info(" getPrediction(IIdentity requestor, IAction action) "+ results);
 
+		
 		if(results.size()>0){
 			for(IUserIntentAction predAction : results){
 				this.recordPrediction(predAction);		
@@ -268,6 +254,9 @@ public class CAUIPrediction implements ICAUIPrediction{
 	}
 
 
+	
+	
+	
 	@Override
 	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor, CtxAttribute contextAttribute) {
 
@@ -393,7 +382,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 		long startTime = System.currentTimeMillis();
 
 		IUserIntentAction predictedAction = null;
-		if(modelExist == true && enablePrediction == true){
+		if(cauiModelExist == true && enableCauiPrediction == true){
 			//LOG.info("serviceID.getIdentifier().toString() "+serviceID.getIdentifier().toString() );
 			List<IUserIntentAction> actionList = cauiTaskManager.retrieveActionsByServiceType(serviceID.getIdentifier().toString(), userActionType);
 			//LOG.info("action LIST "+actionList );
@@ -547,6 +536,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 			//LOG.info("operator retrieved "+operator);
 			operatorEntId = operator.getId();
 
+			
+			///register for caui model
 			List<CtxIdentifier> ls = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CAUI_MODEL).get();
 
 			if (ls.size()>0) {
@@ -562,16 +553,46 @@ public class CAUIPrediction implements ICAUIPrediction{
 					CtxAttribute uiModelAttr;
 
 					uiModelAttr = (CtxAttribute) ctxBroker.retrieve(uiModelAttributeId).get();
-
+					
+					// this is used in case of reboot and model already exist in db
 					if(uiModelAttr.getBinaryValue() != null){
 						UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
-						setActiveModel(newUIModelData);	
+						setCAUIActiveModel(newUIModelData);	
 					}
 				}
 				this.ctxBroker.registerForChanges(new MyCtxUIModelChangeEventListener(),uiModelAttributeId);	
 
 			}		
+			
+			///register for caci model
+			List<CtxIdentifier> lsCaci = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, "CAUI_CACI_MODEL").get();
+			
+			CtxAttributeIdentifier caciModelAttributeId = null;
+			
+			
+			if (lsCaci.size()>0) {
+				caciModelAttributeId = (CtxAttributeIdentifier) lsCaci.get(0);
+			} else {
+				CtxAttribute attr = this.ctxBroker.createAttribute(operator.getId(), "CAUI_CACI_MODEL").get();
+				caciModelAttributeId = attr.getId();
+			}
 
+			if (caciModelAttributeId != null){
+
+				if(caciModelAttributeId instanceof CtxAttributeIdentifier){
+					CtxAttribute caciModelAttr;
+
+					caciModelAttr = (CtxAttribute) ctxBroker.retrieve(caciModelAttributeId).get();
+					// this is used in case of reboot and model already exist in db
+					if(caciModelAttr.getBinaryValue() != null){
+						UserIntentModelData newCaciModelData = (UserIntentModelData) SerialisationHelper.deserialise(caciModelAttr.getBinaryValue(), this.getClass().getClassLoader());
+						setCACIActiveModel(newCaciModelData);	
+					}
+				}
+				this.ctxBroker.registerForChanges(new MyCtxCACIIModelChangeEventListener(),caciModelAttributeId);	
+
+			}		
+			
 			//LOG.info("registration for context attribute updates of type CAUI: "+uiModelAttributeId);
 		} catch (InterruptedException e) {
 			// 
@@ -594,20 +615,22 @@ public class CAUIPrediction implements ICAUIPrediction{
 		}			
 	}
 
-	public void setActiveModel(UserIntentModelData newUIModelData){
+	public void setCAUIActiveModel(UserIntentModelData newUIModelData){
 
 		if (newUIModelData != null){
 			cauiTaskManager.updateModel(newUIModelData);
-			modelExist = true;		 
-			HashMap<IUserIntentAction,HashMap <IUserIntentAction,Double>> model = newUIModelData.getActionModel();
+			cauiModelExist = true;		 
+			LOG.info("caui model set - actions map: "+newUIModelData.getActionModel());
+		}
+	}
 
-			LOG.info("caui model set - actions map: "+model);
+	
+	
+	public void setCACIActiveModel (UserIntentModelData newUIModelData){
 
-			List<IUserIntentAction> actionsList = new ArrayList<IUserIntentAction>(model.keySet());
-			//for(IUserIntentAction action: actionsList){
-			//		LOG.info("action : "+action +" context:"+ action.getActionContext());
-			//	}
-
+		if (newUIModelData != null){
+			this.caciPredictor.setCACIActiveModel(newUIModelData);
+			LOG.info("caci model set - actions map: "+newUIModelData.getActionModel());
 		}
 	}
 
@@ -624,7 +647,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		@Override
 		public void onUpdate(CtxChangeEvent event) {
-			LOG.info(event.getId() + ": *** Update event *** new User Intentn model stored in ctxDB");
+			LOG.debug(event.getId() + ": *** Update event *** new User Intentn model stored in ctxDB");
 
 			CtxIdentifier uiModelAttrID = event.getId();
 
@@ -634,19 +657,19 @@ public class CAUIPrediction implements ICAUIPrediction{
 					uiModelAttr = (CtxAttribute) ctxBroker.retrieve(uiModelAttrID).get();
 					UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
 
-					setActiveModel(newUIModelData);
+					setCAUIActiveModel(newUIModelData);
 
 					//TODO register with pers manager for location updates.
 					//LOG.info("register with pers manager for ctxAttr  update");
 					if(retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC) != null){
 						CtxAttribute ctxAttrLocation = retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC);
 						persoMgr.registerForContextUpdate(getOwnerId(), PersonalisationTypes.CAUIIntent, ctxAttrLocation.getId());	
-						LOG.info("register with pers manager for ctxAttr LOCATION_SYMBOLIC update");
+						LOG.debug("register with pers manager for ctxAttr LOCATION_SYMBOLIC update");
 					}
 					if(retrieveOperatorsCtx(CtxAttributeTypes.STATUS) != null){
 						CtxAttribute ctxAttrStatus = retrieveOperatorsCtx(CtxAttributeTypes.STATUS);
 						persoMgr.registerForContextUpdate(getOwnerId(), PersonalisationTypes.CAUIIntent, ctxAttrStatus.getId());	
-						LOG.info("register with pers manager for ctxAttr STATUS update");
+						LOG.debug("register with pers manager for ctxAttr STATUS update");
 					}
 
 					/*	
@@ -688,6 +711,86 @@ public class CAUIPrediction implements ICAUIPrediction{
 	// end of event listener implementation
 
 
+	
+	
+	
+	private class MyCtxCACIIModelChangeEventListener implements CtxChangeEventListener {
+
+
+		MyCtxCACIIModelChangeEventListener(){
+		}
+
+		@Override
+		public void onCreation(CtxChangeEvent event) {
+
+		}
+
+		@Override
+		public void onUpdate(CtxChangeEvent event) {
+			LOG.debug(event.getId() + ": *** Update event *** new Community Intent model stored in ctxDB");
+
+			CtxIdentifier caciModelAttrID = event.getId();
+
+			if(caciModelAttrID instanceof CtxAttributeIdentifier){
+				CtxAttribute uiModelAttr;
+				try {
+					uiModelAttr = (CtxAttribute) ctxBroker.retrieve(caciModelAttrID).get();
+					UserIntentModelData newCACIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
+
+					setCACIActiveModel(newCACIModelData);
+
+					//TODO register with pers manager for location updates.
+					//LOG.info("register with pers manager for ctxAttr  update");
+					/*
+					if(retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC) != null){
+						CtxAttribute ctxAttrLocation = retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC);
+						persoMgr.registerForContextUpdate(getOwnerId(), PersonalisationTypes.CAUIIntent, ctxAttrLocation.getId());	
+						LOG.debug("register with pers manager for ctxAttr LOCATION_SYMBOLIC update");
+					}
+					if(retrieveOperatorsCtx(CtxAttributeTypes.STATUS) != null){
+						CtxAttribute ctxAttrStatus = retrieveOperatorsCtx(CtxAttributeTypes.STATUS);
+						persoMgr.registerForContextUpdate(getOwnerId(), PersonalisationTypes.CAUIIntent, ctxAttrStatus.getId());	
+						LOG.debug("register with pers manager for ctxAttr STATUS update");
+					}
+
+						
+					if(retrieveOperatorsCtx(CtxAttributeTypes.TEMPERATURE) != null){
+						CtxAttribute ctxAttrTemp = retrieveOperatorsCtx(CtxAttributeTypes.TEMPERATURE);
+						persoMgr.registerForContextUpdate(getOwnerId(), PersonalisationTypes.CAUIIntent, ctxAttrTemp.getId());	
+						//LOG.info("register with pers manager for ctxAttr TEMPERATURE update");
+					}
+					 */
+				} catch (InterruptedException e) {
+
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+
+					e.printStackTrace();
+				} catch (CtxException e) {
+
+					e.printStackTrace();
+				} catch (IOException e) {
+
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+
+					e.printStackTrace();
+				}	
+			}
+		}
+
+		@Override
+		public void onModification(CtxChangeEvent event) {
+
+		}
+
+		@Override
+		public void onRemoval(CtxChangeEvent event) {
+
+		}
+	}
+	
+	
 
 	//**********************************
 	//*** helper context class 
@@ -761,6 +864,81 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		m2.setPerformanceNameValue("Confidence Level=" + confLevel); 
 		PERF_LOG.trace(m2.toString());
+	}
+
+	
+	
+	
+	//Services registration
+	public ICAUIDiscovery getCauiDiscovery() {
+		LOG.debug(this.getClass().getName()+": Return cauiDiscovery");
+		return cauiDiscovery;
+	}
+
+
+	public void setCauiDiscovery(ICAUIDiscovery cauiDiscovery) {
+		LOG.debug(this.getClass().getName()+": Got cauiDiscovery");
+		this.cauiDiscovery = cauiDiscovery;
+	}
+
+
+	public ICtxBroker getCtxBroker() {
+		LOG.debug(this.getClass().getName()+": Return ctxBroker");
+		return ctxBroker;
+	}
+
+
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		LOG.debug(this.getClass().getName()+": Got ctxBroker");
+		this.ctxBroker = ctxBroker;
+	}
+
+
+	public IInternalPersonalisationManager getPersoMgr() {
+		LOG.debug(this.getClass().getName()+": Return persoMgr");
+		return persoMgr;
+	}
+
+
+	public void setPersoMgr(IInternalPersonalisationManager persoMgr) {
+		LOG.debug(this.getClass().getName()+": Got persoMgr");
+		this.persoMgr = persoMgr;
+	}
+
+
+	public ICAUITaskManager getCaciTaskManager() {
+		LOG.debug(this.getClass().getName()+": Return caciTaskManager");
+		return caciTaskManager;
+	}
+
+
+	public void setCaciTaskManager(ICAUITaskManager caciTaskManager) {
+		LOG.debug(this.getClass().getName()+": Got caciTaskManager");
+		this.caciTaskManager = caciTaskManager;
+	}
+
+	
+	public ICAUITaskManager getCauiTaskManager() {
+		LOG.debug(this.getClass().getName()+": Return cauiTaskManager");
+		return cauiTaskManager;
+	}
+
+
+	public void setCauiTaskManager(ICAUITaskManager cauiTaskManager) {
+		LOG.debug(this.getClass().getName()+": Got cauiTaskManager");
+		this.cauiTaskManager = cauiTaskManager;
+	}
+
+	
+	
+	public void setCommsMgr(ICommManager commsMgr) {
+		LOG.debug(this.getClass().getName()+": Got commsMgr");
+		this.commsMgr = commsMgr;
+	}
+
+	public ICommManager getCommsMgr() {
+		LOG.debug(this.getClass().getName()+": Return CommsMgr");
+		return commsMgr;
 	}
 
 }

@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.TrustQuery;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.model.TrustRelationship;
 import org.societies.api.privacytrust.trust.model.TrustValueType;
@@ -68,6 +69,126 @@ public class TrustBroker implements org.societies.api.privacytrust.trust.ITrustB
 		
 		if (LOG.isInfoEnabled())
 			LOG.info(this.getClass() + " instantiated");
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.TrustQuery)
+	 */
+	@Async
+	@Override
+	public Future<Set<TrustRelationship>> retrieveTrustRelationships(
+			final Requestor requestor, final TrustQuery query)
+					throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (query == null)
+			throw new NullPointerException("query can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving trust relationships matching query '"	
+					+ query + "' on behalf of requestor '" + requestor + "'");
+		
+		// TODO access control
+		
+		return this.internalTrustBroker.retrieveTrustRelationships(
+				requestor, query);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#retrieveTrustRelationship(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.TrustQuery)
+	 */
+	@Async
+	@Override
+	public Future<TrustRelationship> retrieveTrustRelationship(
+			final Requestor requestor, final TrustQuery query) 
+					throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (query == null)
+			throw new NullPointerException("query can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving trust relationship matching query '"	
+					+ query + "' on behalf of requestor '" + requestor + "'");
+		
+		// TODO access control
+		
+		return this.internalTrustBroker.retrieveTrustRelationship(
+				requestor, query);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#retrieveTrustValue(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.TrustQuery)
+	 */
+	@Async
+	@Override
+	public Future<Double> retrieveTrustValue(final Requestor requestor,
+			final TrustQuery query) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (query == null)
+			throw new NullPointerException("query can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Retrieving trust value matching query '"	
+					+ query + "' on behalf of requestor '" + requestor + "'");
+		
+		// TODO access control
+		
+		return this.internalTrustBroker.retrieveTrustValue(requestor, query);
+	}
+	
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.TrustQuery)
+	 */
+	@Override
+	public void registerTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, 
+			final TrustQuery query) throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (query == null)
+			throw new NullPointerException("query can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Registering for trust update events matching query '" 
+					+ query + "' on behalf of requestor '" + requestor + "'");
+		
+		// TODO access control
+		
+		this.internalTrustBroker.registerTrustUpdateListener(
+				requestor, listener, query);
+	}
+
+	/*
+	 * @see org.societies.api.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.TrustQuery)
+	 */
+	@Override
+	public void unregisterTrustUpdateListener(final Requestor requestor,
+			final ITrustUpdateEventListener listener, final TrustQuery query)
+					throws TrustException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (listener == null)
+			throw new NullPointerException("listener can't be null");
+		if (query == null)
+			throw new NullPointerException("query can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Unregistering from trust update events matching query '" 
+					+ query + "' on behalf of requestor '" + requestor + "'");
+		
+		// TODO access control
+		
+		this.internalTrustBroker.unregisterTrustUpdateListener(
+				requestor, listener, query);
 	}
 	
 	/*

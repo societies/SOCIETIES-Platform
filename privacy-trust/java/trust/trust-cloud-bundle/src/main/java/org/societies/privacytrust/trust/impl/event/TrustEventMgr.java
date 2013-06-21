@@ -1004,10 +1004,9 @@ public class TrustEventMgr implements ITrustEventMgr {
 						+ ": Unexpected eventInfo: " + internalEvent.geteventInfo());
 				return;
 			}
-			final ITrustEvidence evidence = 
-					(ITrustEvidence) internalEvent.geteventInfo(); 
 			final TrustEvidenceUpdateEvent event = 
-					new TrustEvidenceUpdateEvent(evidence);
+					new TrustEvidenceUpdateEvent((ITrustEvidence) 
+							internalEvent.geteventInfo());
 			if (LOG.isDebugEnabled())
 				LOG.debug("Forwarding local TrustEvidenceUpdateEvent " + event + " to listener");
 			((ITrustEvidenceUpdateEventListener) super.listener).onNew(event);

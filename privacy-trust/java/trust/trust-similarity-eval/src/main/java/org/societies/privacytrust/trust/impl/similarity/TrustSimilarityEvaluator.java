@@ -35,7 +35,7 @@ import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
-import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
@@ -162,15 +162,15 @@ public class TrustSimilarityEvaluator implements ITrustSimilarityEvaluator {
 				new HashMap<TrustedEntityId, Double>();
 		
 		// Fetch evidence regarding entities trusted by trustee
-		final Set<IIndirectTrustEvidence> trusteeEvidenceSet =
-				this.trustEvidenceRepository.retrieveLatestIndirectEvidence(
+		final Set<ITrustEvidence> trusteeEvidenceSet =
+				this.trustEvidenceRepository.retrieveLatestEvidence(
 						trusteeId, null, TrustEvidenceType.DIRECTLY_TRUSTED, null);
-		for (final IIndirectTrustEvidence evidence : trusteeEvidenceSet) {
+		for (final ITrustEvidence evidence : trusteeEvidenceSet) {
 			
 			// Ignore evidence if
 			// 1. objectId not contained in trustorRelationships
-			// 1. info (directTrustValue) == null
-			// 2. subjectId == objectId
+			// 2. info (directTrustValue) == null
+			// 3. subjectId == objectId
 			if (trustorRelationships.contains(evidence.getObjectId()) &&
 					evidence.getInfo() instanceof Double &&
 					(!evidence.getSubjectId().equals(evidence.getObjectId())))

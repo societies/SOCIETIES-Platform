@@ -46,7 +46,7 @@
         </osgi:interfaces>
         </osgi:service>
         
-        <osgi:service ref="cauiPrediction">
+       <osgi:service ref="cauiPrediction">
         <osgi:interfaces>
         	<value>org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction</value>
         </osgi:interfaces>
@@ -55,6 +55,12 @@
         <osgi:service ref="cauiDiscovery">
         <osgi:interfaces>
         	<value>org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery</value>
+        </osgi:interfaces>
+        </osgi:service>
+           
+           <osgi:service ref="caciDiscovery">
+        <osgi:interfaces>
+        	<value>org.societies.personalisation.CACI.api.CACIDiscovery.ICACIDiscovery</value>
         </osgi:interfaces>
         </osgi:service>
         
@@ -161,6 +167,8 @@ start importing internal services. cardinality is set to 0..1 because we have a 
 		</osgi:reference>
 		
 		<osgi:reference id="cisManager" interface="org.societies.api.cis.management.ICisManager"></osgi:reference>
+		
+		<osgi:reference id="serviceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"></osgi:reference>
 		
 		<!--  <osgi:reference id="upcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/> -->
 		

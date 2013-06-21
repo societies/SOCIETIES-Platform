@@ -30,6 +30,8 @@ import static org.mockito.Mockito.*;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -44,7 +46,7 @@ import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
-import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.api.model.IDirectTrust;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
@@ -201,29 +203,29 @@ public class TrustSimilarityEvaluatorTest {
 		when(this.mockTrustRepository.retrieveEntities(trustorId, null, TrustValueType.DIRECT))
 				.thenReturn(trustedEntities);
 		
-		final Set<IIndirectTrustEvidence> trusteeEvidence = new HashSet<IIndirectTrustEvidence>();
+		final SortedSet<ITrustEvidence> trusteeEvidence = new TreeSet<ITrustEvidence>();
 		for (final TrustedEntityId teid : trusteeCssRelationships.keySet()) {
-			final IIndirectTrustEvidence mockEvidence = mock(IIndirectTrustEvidence.class);
+			final ITrustEvidence mockEvidence = mock(ITrustEvidence.class);
 			when(mockEvidence.getSubjectId()).thenReturn(trusteeId);
 			when(mockEvidence.getObjectId()).thenReturn(teid);
 			when(mockEvidence.getInfo()).thenReturn(trusteeCssRelationships.get(teid));
 			trusteeEvidence.add(mockEvidence);
 		}
 		for (final TrustedEntityId teid : trusteeCisRelationships.keySet()) {
-			final IIndirectTrustEvidence mockEvidence = mock(IIndirectTrustEvidence.class);
+			final ITrustEvidence mockEvidence = mock(ITrustEvidence.class);
 			when(mockEvidence.getSubjectId()).thenReturn(trusteeId);
 			when(mockEvidence.getObjectId()).thenReturn(teid);
 			when(mockEvidence.getInfo()).thenReturn(trusteeCisRelationships.get(teid));
 			trusteeEvidence.add(mockEvidence);
 		}
 		for (final TrustedEntityId teid : trusteeSvcRelationships.keySet()) {
-			final IIndirectTrustEvidence mockEvidence = mock(IIndirectTrustEvidence.class);
+			final ITrustEvidence mockEvidence = mock(ITrustEvidence.class);
 			when(mockEvidence.getSubjectId()).thenReturn(trusteeId);
 			when(mockEvidence.getObjectId()).thenReturn(teid);
 			when(mockEvidence.getInfo()).thenReturn(trusteeSvcRelationships.get(teid));
 			trusteeEvidence.add(mockEvidence);
 		}
-		when(this.mockTrustEvidenceRepository.retrieveLatestIndirectEvidence(
+		when(this.mockTrustEvidenceRepository.retrieveLatestEvidence(
 				trusteeId, null, TrustEvidenceType.DIRECTLY_TRUSTED, null)).thenReturn(trusteeEvidence);
 		
 		final Double similarity = this.trustSimilarityEvaluator
@@ -313,29 +315,29 @@ public class TrustSimilarityEvaluatorTest {
 		when(this.mockTrustRepository.retrieveEntities(trustorId, null, TrustValueType.DIRECT))
 				.thenReturn(trustedEntities);
 		
-		final Set<IIndirectTrustEvidence> trusteeEvidence = new HashSet<IIndirectTrustEvidence>();
+		final SortedSet<ITrustEvidence> trusteeEvidence = new TreeSet<ITrustEvidence>();
 		for (final TrustedEntityId teid : trusteeCssRelationships.keySet()) {
-			final IIndirectTrustEvidence mockEvidence = mock(IIndirectTrustEvidence.class);
+			final ITrustEvidence mockEvidence = mock(ITrustEvidence.class);
 			when(mockEvidence.getSubjectId()).thenReturn(trusteeId);
 			when(mockEvidence.getObjectId()).thenReturn(teid);
 			when(mockEvidence.getInfo()).thenReturn(trusteeCssRelationships.get(teid));
 			trusteeEvidence.add(mockEvidence);
 		}
 		for (final TrustedEntityId teid : trusteeCisRelationships.keySet()) {
-			final IIndirectTrustEvidence mockEvidence = mock(IIndirectTrustEvidence.class);
+			final ITrustEvidence mockEvidence = mock(ITrustEvidence.class);
 			when(mockEvidence.getSubjectId()).thenReturn(trusteeId);
 			when(mockEvidence.getObjectId()).thenReturn(teid);
 			when(mockEvidence.getInfo()).thenReturn(trusteeCisRelationships.get(teid));
 			trusteeEvidence.add(mockEvidence);
 		}
 		for (final TrustedEntityId teid : trusteeSvcRelationships.keySet()) {
-			final IIndirectTrustEvidence mockEvidence = mock(IIndirectTrustEvidence.class);
+			final ITrustEvidence mockEvidence = mock(ITrustEvidence.class);
 			when(mockEvidence.getSubjectId()).thenReturn(trusteeId);
 			when(mockEvidence.getObjectId()).thenReturn(teid);
 			when(mockEvidence.getInfo()).thenReturn(trusteeSvcRelationships.get(teid));
 			trusteeEvidence.add(mockEvidence);
 		}
-		when(this.mockTrustEvidenceRepository.retrieveLatestIndirectEvidence(
+		when(this.mockTrustEvidenceRepository.retrieveLatestEvidence(
 				trusteeId, null, TrustEvidenceType.DIRECTLY_TRUSTED, null)).thenReturn(trusteeEvidence);
 		
 		final Double similarity = this.trustSimilarityEvaluator
@@ -425,29 +427,29 @@ public class TrustSimilarityEvaluatorTest {
 		when(this.mockTrustRepository.retrieveEntities(trustorId, null, TrustValueType.DIRECT))
 				.thenReturn(trustedEntities);
 		
-		final Set<IIndirectTrustEvidence> trusteeEvidence = new HashSet<IIndirectTrustEvidence>();
+		final SortedSet<ITrustEvidence> trusteeEvidence = new TreeSet<ITrustEvidence>();
 		for (final TrustedEntityId teid : trusteeCssRelationships.keySet()) {
-			final IIndirectTrustEvidence mockEvidence = mock(IIndirectTrustEvidence.class);
+			final ITrustEvidence mockEvidence = mock(ITrustEvidence.class);
 			when(mockEvidence.getSubjectId()).thenReturn(trusteeId);
 			when(mockEvidence.getObjectId()).thenReturn(teid);
 			when(mockEvidence.getInfo()).thenReturn(trusteeCssRelationships.get(teid));
 			trusteeEvidence.add(mockEvidence);
 		}
 		for (final TrustedEntityId teid : trusteeCisRelationships.keySet()) {
-			final IIndirectTrustEvidence mockEvidence = mock(IIndirectTrustEvidence.class);
+			final ITrustEvidence mockEvidence = mock(ITrustEvidence.class);
 			when(mockEvidence.getSubjectId()).thenReturn(trusteeId);
 			when(mockEvidence.getObjectId()).thenReturn(teid);
 			when(mockEvidence.getInfo()).thenReturn(trusteeCisRelationships.get(teid));
 			trusteeEvidence.add(mockEvidence);
 		}
 		for (final TrustedEntityId teid : trusteeSvcRelationships.keySet()) {
-			final IIndirectTrustEvidence mockEvidence = mock(IIndirectTrustEvidence.class);
+			final ITrustEvidence mockEvidence = mock(ITrustEvidence.class);
 			when(mockEvidence.getSubjectId()).thenReturn(trusteeId);
 			when(mockEvidence.getObjectId()).thenReturn(teid);
 			when(mockEvidence.getInfo()).thenReturn(trusteeSvcRelationships.get(teid));
 			trusteeEvidence.add(mockEvidence);
 		}
-		when(this.mockTrustEvidenceRepository.retrieveLatestIndirectEvidence(
+		when(this.mockTrustEvidenceRepository.retrieveLatestEvidence(
 				trusteeId, null, TrustEvidenceType.DIRECTLY_TRUSTED, null)).thenReturn(trusteeEvidence);
 		
 		final Double similarity = this.trustSimilarityEvaluator
@@ -537,29 +539,29 @@ public class TrustSimilarityEvaluatorTest {
 		when(this.mockTrustRepository.retrieveEntities(trustorId, null, TrustValueType.DIRECT))
 				.thenReturn(trustedEntities);
 		
-		final Set<IIndirectTrustEvidence> trusteeEvidence = new HashSet<IIndirectTrustEvidence>();
+		final SortedSet<ITrustEvidence> trusteeEvidence = new TreeSet<ITrustEvidence>();
 		for (final TrustedEntityId teid : trusteeCssRelationships.keySet()) {
-			final IIndirectTrustEvidence mockEvidence = mock(IIndirectTrustEvidence.class);
+			final ITrustEvidence mockEvidence = mock(ITrustEvidence.class);
 			when(mockEvidence.getSubjectId()).thenReturn(trusteeId);
 			when(mockEvidence.getObjectId()).thenReturn(teid);
 			when(mockEvidence.getInfo()).thenReturn(trusteeCssRelationships.get(teid));
 			trusteeEvidence.add(mockEvidence);
 		}
 		for (final TrustedEntityId teid : trusteeCisRelationships.keySet()) {
-			final IIndirectTrustEvidence mockEvidence = mock(IIndirectTrustEvidence.class);
+			final ITrustEvidence mockEvidence = mock(ITrustEvidence.class);
 			when(mockEvidence.getSubjectId()).thenReturn(trusteeId);
 			when(mockEvidence.getObjectId()).thenReturn(teid);
 			when(mockEvidence.getInfo()).thenReturn(trusteeCisRelationships.get(teid));
 			trusteeEvidence.add(mockEvidence);
 		}
 		for (final TrustedEntityId teid : trusteeSvcRelationships.keySet()) {
-			final IIndirectTrustEvidence mockEvidence = mock(IIndirectTrustEvidence.class);
+			final ITrustEvidence mockEvidence = mock(ITrustEvidence.class);
 			when(mockEvidence.getSubjectId()).thenReturn(trusteeId);
 			when(mockEvidence.getObjectId()).thenReturn(teid);
 			when(mockEvidence.getInfo()).thenReturn(trusteeSvcRelationships.get(teid));
 			trusteeEvidence.add(mockEvidence);
 		}
-		when(this.mockTrustEvidenceRepository.retrieveLatestIndirectEvidence(
+		when(this.mockTrustEvidenceRepository.retrieveLatestEvidence(
 				trusteeId, null, TrustEvidenceType.DIRECTLY_TRUSTED, null)).thenReturn(trusteeEvidence);
 		
 		final Double similarity = this.trustSimilarityEvaluator
@@ -649,34 +651,35 @@ public class TrustSimilarityEvaluatorTest {
 		when(this.mockTrustRepository.retrieveEntities(trustorId, null, TrustValueType.DIRECT))
 				.thenReturn(trustedEntities);
 		
-		final Set<IIndirectTrustEvidence> trusteeEvidence = new HashSet<IIndirectTrustEvidence>();
+		final SortedSet<ITrustEvidence> trusteeEvidence = new TreeSet<ITrustEvidence>();
 		for (final TrustedEntityId teid : trusteeCssRelationships.keySet()) {
-			final IIndirectTrustEvidence mockEvidence = mock(IIndirectTrustEvidence.class);
+			final ITrustEvidence mockEvidence = mock(ITrustEvidence.class);
 			when(mockEvidence.getSubjectId()).thenReturn(trusteeId);
 			when(mockEvidence.getObjectId()).thenReturn(teid);
 			when(mockEvidence.getInfo()).thenReturn(trusteeCssRelationships.get(teid));
 			trusteeEvidence.add(mockEvidence);
 		}
 		for (final TrustedEntityId teid : trusteeCisRelationships.keySet()) {
-			final IIndirectTrustEvidence mockEvidence = mock(IIndirectTrustEvidence.class);
+			final ITrustEvidence mockEvidence = mock(ITrustEvidence.class);
 			when(mockEvidence.getSubjectId()).thenReturn(trusteeId);
 			when(mockEvidence.getObjectId()).thenReturn(teid);
 			when(mockEvidence.getInfo()).thenReturn(trusteeCisRelationships.get(teid));
 			trusteeEvidence.add(mockEvidence);
 		}
 		for (final TrustedEntityId teid : trusteeSvcRelationships.keySet()) {
-			final IIndirectTrustEvidence mockEvidence = mock(IIndirectTrustEvidence.class);
+			final ITrustEvidence mockEvidence = mock(ITrustEvidence.class);
 			when(mockEvidence.getSubjectId()).thenReturn(trusteeId);
 			when(mockEvidence.getObjectId()).thenReturn(teid);
 			when(mockEvidence.getInfo()).thenReturn(trusteeSvcRelationships.get(teid));
 			trusteeEvidence.add(mockEvidence);
 		}
-		when(this.mockTrustEvidenceRepository.retrieveLatestIndirectEvidence(
+		when(this.mockTrustEvidenceRepository.retrieveLatestEvidence(
 				trusteeId, null, TrustEvidenceType.DIRECTLY_TRUSTED, null)).thenReturn(trusteeEvidence);
 		
+		@SuppressWarnings("unused")
 		final Double similarity = this.trustSimilarityEvaluator
 				.evaluateCosineSimilarity(trustorId, trusteeId);
-		System.out.println(similarity);
+		//System.out.println(similarity); TODO
 		//assertTrue(similarity > 0.9d);
 	}
 	
@@ -762,9 +765,9 @@ public class TrustSimilarityEvaluatorTest {
 		when(this.mockTrustRepository.retrieveEntities(trustorId, null, TrustValueType.DIRECT))
 				.thenReturn(trustedEntities);
 		
-		when(this.mockTrustEvidenceRepository.retrieveLatestIndirectEvidence(
+		when(this.mockTrustEvidenceRepository.retrieveLatestEvidence(
 				trusteeId, null, TrustEvidenceType.DIRECTLY_TRUSTED, null))
-				.thenReturn(new HashSet<IIndirectTrustEvidence>());
+				.thenReturn(new TreeSet<ITrustEvidence>());
 		
 		final Double similarity = this.trustSimilarityEvaluator
 				.evaluateCosineSimilarity(trustorId, trusteeId);
@@ -827,29 +830,29 @@ public class TrustSimilarityEvaluatorTest {
 		when(this.mockTrustRepository.retrieveEntities(trustorId, null, TrustValueType.DIRECT))
 				.thenReturn(trustedEntities);
 		
-		final Set<IIndirectTrustEvidence> trusteeEvidence = new HashSet<IIndirectTrustEvidence>();
+		final SortedSet<ITrustEvidence> trusteeEvidence = new TreeSet<ITrustEvidence>();
 		for (final TrustedEntityId teid : trusteeCssRelationships.keySet()) {
-			final IIndirectTrustEvidence mockEvidence = mock(IIndirectTrustEvidence.class);
+			final ITrustEvidence mockEvidence = mock(ITrustEvidence.class);
 			when(mockEvidence.getSubjectId()).thenReturn(trusteeId);
 			when(mockEvidence.getObjectId()).thenReturn(teid);
 			when(mockEvidence.getInfo()).thenReturn(trusteeCssRelationships.get(teid));
 			trusteeEvidence.add(mockEvidence);
 		}
 		for (final TrustedEntityId teid : trusteeCisRelationships.keySet()) {
-			final IIndirectTrustEvidence mockEvidence = mock(IIndirectTrustEvidence.class);
+			final ITrustEvidence mockEvidence = mock(ITrustEvidence.class);
 			when(mockEvidence.getSubjectId()).thenReturn(trusteeId);
 			when(mockEvidence.getObjectId()).thenReturn(teid);
 			when(mockEvidence.getInfo()).thenReturn(trusteeCisRelationships.get(teid));
 			trusteeEvidence.add(mockEvidence);
 		}
 		for (final TrustedEntityId teid : trusteeSvcRelationships.keySet()) {
-			final IIndirectTrustEvidence mockEvidence = mock(IIndirectTrustEvidence.class);
+			final ITrustEvidence mockEvidence = mock(ITrustEvidence.class);
 			when(mockEvidence.getSubjectId()).thenReturn(trusteeId);
 			when(mockEvidence.getObjectId()).thenReturn(teid);
 			when(mockEvidence.getInfo()).thenReturn(trusteeSvcRelationships.get(teid));
 			trusteeEvidence.add(mockEvidence);
 		}
-		when(this.mockTrustEvidenceRepository.retrieveLatestIndirectEvidence(
+		when(this.mockTrustEvidenceRepository.retrieveLatestEvidence(
 				trusteeId, null, TrustEvidenceType.DIRECTLY_TRUSTED, null)).thenReturn(trusteeEvidence);
 		
 		final Double similarity = this.trustSimilarityEvaluator
