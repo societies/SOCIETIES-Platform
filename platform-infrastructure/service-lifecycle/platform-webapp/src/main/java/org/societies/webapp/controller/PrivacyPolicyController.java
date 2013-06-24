@@ -59,6 +59,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -453,6 +454,18 @@ public class PrivacyPolicyController {
 		public boolean ack;
 		public String ackMessage;
 
+		@Override
+		public void onPrivacyPolicyRetrieved(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy privacyPolicy) {
+			LOG.error("onPrivacyPolicyRetrieved");
+			ack = true;
+			try {
+				this.privacyPolicy = RequestPolicyUtils.toRequestPolicy(privacyPolicy, commMngrRef.getIdManager());
+			} catch (InvalidFormatException e) {
+				onOperationAborted("Privacy policy retrieved, but it is ununderstandable", e);
+			}
+			notifyAll();
+		}
+		
 		@Override
 		public void onPrivacyPolicyRetrieved(RequestPolicy privacyPolicy) {
 			LOG.error("onPrivacyPolicyRetrieved");

@@ -86,7 +86,7 @@ public class MockDataManagerInternal implements IPrivacyDataManagerInternal {
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier, java.util.List)
 	 */
 	@Override
-	public ResponseItem getPermission(Requestor requestor,
+	public List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> getPermissions(Requestor requestor,
 			DataIdentifier dataId, List<Action> actions)
 			throws PrivacyException {
 		// TODO Auto-generated method stub
@@ -116,6 +116,15 @@ public class MockDataManagerInternal implements IPrivacyDataManagerInternal {
 	@Override
 	public boolean deletePermission(Requestor requestor, DataIdentifier dataId,
 			List<Action> actions) throws PrivacyException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean updatePermissions(
+			Requestor requestor,
+			List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> permissions)
+			throws PrivacyException {
 		// TODO Auto-generated method stub
 		return false;
 	}

@@ -34,6 +34,7 @@
 	<bean name="privacyDataManager"
 		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager">
 		<property name="privacyDataManagerInternal" ref="privacyDataManagerInternal" />
+		<property name="dataObfuscationManager" ref="dataObfuscationManager" />
 		<property name="privacyPreferenceManager" ref="privacyPreferenceManager" />
 		<property name="privacyPolicyManager" ref="privacyPolicyManager" />
 		<property name="cisManager" ref="cisManager" />
@@ -43,6 +44,10 @@
 	<bean name="privacyDataManagerInternal"
 		class="org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManagerInternal">
 		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<bean name="dataObfuscationManager"
+		class="org.societies.privacytrust.privacyprotection.dataobfuscation.DataObfuscationManager">
 	</bean>
 
 	<!-- Communication -->

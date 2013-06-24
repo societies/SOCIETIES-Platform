@@ -18,6 +18,7 @@
 
 	<xs:complexType name="dataWrapper">
 		<xs:sequence>
+			<xs:element name="scheme" type="ns1:dataIdentifierScheme" minOccurs="0"/>
 			<xs:element name="dataType" type="xs:string" minOccurs="1" />
 			<xs:element name="data" type="tns:iObfuscable" />
 		</xs:sequence>

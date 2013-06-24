@@ -24,6 +24,7 @@
  */
 package org.societies.android.privacytrust.datamanagement;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,6 +34,7 @@ import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.CommunicationException;
 import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.css.manager.IServiceManager;
+import org.societies.android.api.identity.util.DataIdentifierUtils;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.android.platform.comms.helper.ClientCommunicationMgr;
 import org.societies.android.privacytrust.datamanagement.callback.PrivacyDataIntentSender;
@@ -88,7 +90,7 @@ public class PrivacyDataManagerRemote {
 
 	// -- Access control
 
-	public void checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
+	public void checkPermission(String clientPackage, RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException {
 		String action = MethodType.CHECK_PERMISSION.name();
 		try {
 			// -- Verify status
@@ -104,7 +106,11 @@ public class PrivacyDataManagerRemote {
 			PrivacyDataManagerBean messageBean = new PrivacyDataManagerBean();
 			messageBean.setMethod(MethodType.CHECK_PERMISSION);
 			messageBean.setRequestor(requestor);
-			messageBean.setDataIdUri(dataId.getUri());
+			List<String> dataUris = new ArrayList<String>();
+			for(DataIdentifier dataId : dataIds) {
+				dataUris.add(DataIdentifierUtils.toUriString(dataId));
+			}
+			messageBean.setDataIdUris(dataUris);
 			messageBean.setActions(actions);
 
 			// -- Send
@@ -145,11 +151,6 @@ public class PrivacyDataManagerRemote {
 			Log.e(TAG, "Unexepected error: "+(null != e ? e.getMessage() : ""));
 			intentSender.sendIntentError(clientPackage, action, "Error during the sending of remote request");
 		}
-	}
-
-	public DataWrapper hasObfuscatedVersion(RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
-		Log.i(TAG, "Remote obfuscation not available yet.");
-		return dataWrapper;
 	}
 
 	// -- Comms

@@ -37,63 +37,56 @@ import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacy
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyAgreementManagerBean;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.privacytrust.remote.PrivacyCommClientCallback;
+
 /**
  * Comms Client that initiates the remote communication
  *
  * @author Olivier Maridat (Trialog)
- *
  */
 public class PrivacyAgreementManagerCommClient implements IPrivacyAgreementManagerRemote {
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyAgreementManagerCommClient.class);
-	
+
 	private ICommManager commManager;
 	private PrivacyAgreementManagerCommClientCallback listeners;
 	private PrivacyCommClientCallback privacyCommClientCallback;
 
-	
-	public PrivacyAgreementManagerCommClient() {	
-	}
 
-
-	
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyAgreementManagerRemote#getPrivacyAgreement(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyAgreementManagerListener)
-	 */
 	@Override
-	public void getPrivacyAgreement(Requestor requestor, IIdentity targetedNode,
-			IPrivacyAgreementManagerListener listener) throws PrivacyException {
-		LOG.info("#### getPrivacyAgreement remote called");
+	public void getPrivacyAgreement(RequestorBean requestor, IIdentity targetedNode, IPrivacyAgreementManagerListener listener) throws PrivacyException {
 		Stanza stanza = new Stanza(targetedNode);
-		
 		listeners.privacyAgreementManagerlisteners.put(stanza.getId(), listener);
-		
+
 		PrivacyAgreementManagerBean bean = new PrivacyAgreementManagerBean();
 		bean.setMethod(MethodType.GET_PRIVACY_AGREEMENT);
-		bean.setRequestor(RequestorUtils.toRequestorBean(requestor));
+		bean.setRequestor(requestor);
 		try {
 			this.commManager.sendIQGet(stanza, bean, privacyCommClientCallback);
-		} catch (CommunicationException e) {
+		}
+		catch (CommunicationException e) {
 			LOG.error("CommunicationException: "+MethodType.GET_PRIVACY_AGREEMENT, e);
 			throw new PrivacyException("CommunicationException: "+MethodType.GET_PRIVACY_AGREEMENT, e);
 		}
-		LOG.info("#### getPrivacyAgreement remote sent");
+		catch (Exception e) {
+			LOG.error("Exception: "+MethodType.GET_PRIVACY_AGREEMENT, e);
+			throw new PrivacyException("Exception: "+MethodType.GET_PRIVACY_AGREEMENT, e);
+		}
 	}
-	
-	
+	@Deprecated
+	public void getPrivacyAgreement(Requestor requestor, IIdentity targetedNode, IPrivacyAgreementManagerListener listener) throws PrivacyException {
+		getPrivacyAgreement(RequestorUtils.toRequestorBean(requestor), targetedNode, listener);
+	}
+
+
 	// -- Dependency Injection
-	
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
-		LOG.info("[DependencyInjection] CommManager injected");
 	}
 	public void setListeners(PrivacyAgreementManagerCommClientCallback listeners) {
 		this.listeners = listeners;
-		LOG.info("[DependencyInjection] PrivacyDataManagerCommClientCallback injected");
 	}
-	public void setPrivacyCommClientCallback(
-			PrivacyCommClientCallback privacyCommClientCallback) {
+	public void setPrivacyCommClientCallback(PrivacyCommClientCallback privacyCommClientCallback) {
 		this.privacyCommClientCallback = privacyCommClientCallback;
-		LOG.info("[DependencyInjection] PrivacyCommClientCallback injected");
 	}
 }

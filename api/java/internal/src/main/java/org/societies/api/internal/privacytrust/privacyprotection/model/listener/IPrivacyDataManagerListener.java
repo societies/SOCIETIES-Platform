@@ -24,16 +24,41 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.listener;
 
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import java.util.List;
+
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
+
 
 
 /**
  * This interface defines a listener for an access control operation over a personal data.
  * @author Olivier Maridat (Trialog)
- * @date 27 apr. 2012
+ * @created 27 apr. 2012
+ * @updated 12 jun. 2013
  */
 public interface IPrivacyDataManagerListener {
-	public void onAccessControlChecked(ResponseItem permission);
+	/**
+	 * Send back the access control result
+	 * @param permissions List of permissions for all requested data
+	 */
+	public void onAccessControlChecked(List<ResponseItem> permissions);
+	/**
+	 * Will be removed in 1.2
+	 * @see onAccessControlChecked
+	 */
+	@Deprecated
+	public void onAccessControlChecked(org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem permission);
+	
+	/**
+	 * The operation has been cancelled (by the user or the system)
+	 * @param msg Explanation about the cancel (if any)
+	 */
 	public void onAccessControlCancelled(String msg);
+	
+	/**
+	 * The operation has been aborted (by the system)
+	 * @param msg Explanation about the abort (if any)
+	 * @param e Error explanation
+	 */
 	public void onAccessControlAborted(String msg, Exception e);
 }

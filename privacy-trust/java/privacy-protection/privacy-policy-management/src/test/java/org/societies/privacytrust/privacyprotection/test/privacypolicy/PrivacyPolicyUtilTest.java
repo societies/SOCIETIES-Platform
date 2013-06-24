@@ -149,7 +149,7 @@ public class PrivacyPolicyUtilTest extends AbstractJUnit4SpringContextTests {
 
 	private RequestorCis getRequestorCis(){
 		IIdentity otherCssId = new MockIdentity(IdentityType.CSS, "othercss","societies.local");
-		IIdentity cisId = new MockIdentity(IdentityType.CIS, "onecis", "societies.local");
+		IIdentity cisId = new MockIdentity(IdentityType.CIS, "cis-one", "societies.local");
 		return new RequestorCis(otherCssId, cisId);
 	}
 }

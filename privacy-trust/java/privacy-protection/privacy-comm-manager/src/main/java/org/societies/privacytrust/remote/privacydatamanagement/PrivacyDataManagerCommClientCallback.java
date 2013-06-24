@@ -57,11 +57,13 @@ public class PrivacyDataManagerCommClientCallback {
 	public void receiveResult(Stanza stanza, PrivacyDataManagerBeanResult bean) {
 		// -- Check Permission
 		if (bean.getMethod().equals(MethodType.CHECK_PERMISSION)) {
-			LOG.info("$$$$ checkPermission response received");
 			IPrivacyDataManagerListener listener = privacyDataManagerlisteners.get(stanza.getId());
 			privacyDataManagerlisteners.remove(stanza.getId());
 			if (bean.isAck()) {
-				listener.onAccessControlChecked(ResponseItemUtils.toResponseItem(bean.getPermission()));
+				listener.onAccessControlChecked(bean.getPermissions());
+				if (null != bean.getPermissions() && bean.getPermissions().size() > 0) {
+					listener.onAccessControlChecked(ResponseItemUtils.toResponseItem(bean.getPermissions().get(0)));
+				}
 			}
 			else {
 				listener.onAccessControlCancelled(bean.getAckMessage());
@@ -71,7 +73,6 @@ public class PrivacyDataManagerCommClientCallback {
 
 		// -- Obfuscate Data
 		else if (bean.getMethod().equals(MethodType.OBFUSCATE_DATA)) {
-			LOG.info("$$$$ obfuscateData response received");
 			IDataObfuscationListener listener = dataObfuscationlisteners.get(stanza.getId());
 			dataObfuscationlisteners.remove(stanza.getId());
 			if (bean.isAck()) {

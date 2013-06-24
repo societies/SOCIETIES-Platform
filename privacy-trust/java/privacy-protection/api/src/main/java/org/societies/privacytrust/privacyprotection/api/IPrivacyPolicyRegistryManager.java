@@ -22,34 +22,39 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.privacytrust.privacyprotection.model.listener;
+package org.societies.privacytrust.privacyprotection.api;
 
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
-
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 
 /**
- * This interface defines a listener for an obfuscation operation.
  * @author Olivier Maridat (Trialog)
- * @created 14-oct.-2011
- * @updated 05-jun.-2013
  */
-public interface IDataObfuscationListener {
+public interface IPrivacyPolicyRegistryManager {
 	/**
-	 * Send back the obfuscated data
-	 * @param obfuscatedData Obfuscated data wrapped in a DataWrapper (of the same type that the one used to launch the obfuscation)
+	 * Retrieve the privacy policy of a given entity in the registry
+	 * @param owner	CIS or 3P service id of the privacy policy owner
+	 * @return	the privacy policy
+	 * @throws PrivacyException 
 	 */
-	public void onObfuscationDone(DataWrapper obfuscatedData);
-	
+	public RequestPolicy getPrivacyPolicy(RequestorBean owner) throws PrivacyException;
+
 	/**
-	 * The operation has been cancelled (by the user or the system)
-	 * @param msg Explanation about the cancel (if any)
+	 * Update a privacy policy to the registry
+	 * @param owner	CIS or 3P service id of the privacy policy owner
+	 * @param privacyPolicy The privacy policy to store
+	 * @return success of the operation 
+	 * @throws PrivacyException 
 	 */
-	public void onObfuscationCancelled(String msg);
-	
+	public boolean updatePrivacyPolicy(RequestorBean owner, RequestPolicy privacyPolicy) throws PrivacyException;
+
 	/**
-	 * The operation has been aborted (by the system)
-	 * @param msg Explanation about the abort (if any)
-	 * @param e Error explanation
+	 * Delete a privacy policy in the registry
+	 * @param owner	CIS or 3P service id of the privacy policy owner
+	 * @return success of the operation 
+	 * @throws PrivacyException 
 	 */
-	public void onObfuscationAborted(String msg, Exception e);
+	public boolean deletePrivacyPolicy(RequestorBean owner) throws PrivacyException;
 }
+
