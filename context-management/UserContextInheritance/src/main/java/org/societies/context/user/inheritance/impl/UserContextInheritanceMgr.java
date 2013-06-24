@@ -28,8 +28,10 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -43,6 +45,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
@@ -80,6 +83,14 @@ public class UserContextInheritanceMgr implements IUserCtxInheritanceMgr {
 
 	}
 
+	
+	public UserContextInheritanceMgr() throws Exception {	
+		if (LOG.isDebugEnabled()){
+			LOG.info(this.getClass() + "instantiated ");
+		}
+	
+
+	}
 	public CtxAttributeIdentifier inferTypes(ArrayList<String> inferrableTypes) {
 		//TODO 
 		//CtxAttributeIdentifier attributeTypes = (CtxAttributeIdentifier) ctxBroker.retrieve(this, ctxAttId);
@@ -88,9 +99,10 @@ public class UserContextInheritanceMgr implements IUserCtxInheritanceMgr {
 
 	}
 	
-	public void communityInheritance(CtxAttributeIdentifier ctxAttrId) throws InvalidFormatException, InterruptedException, ExecutionException, CtxException {
+	public CtxAttribute communityInheritance(CtxAttributeIdentifier ctxAttrId) throws InvalidFormatException, InterruptedException, ExecutionException, CtxException {
 
 		CtxAttribute ctxAttributeObjToInherit = (CtxAttribute) ctxBroker.retrieve(ctxAttrId).get();
+		CtxAttribute retAttribute = null;
 		
 		//Given the css entity, fetch a set of association ids, type "isMemberOf"
 		String cssIdString = commMngr.getIdManager().getThisNetworkNode().getBareJid();
@@ -108,7 +120,7 @@ public class UserContextInheritanceMgr implements IUserCtxInheritanceMgr {
 						
 		//from the association objects, get the CIS ids (getParent method) (for each .getChildEntities get the entities where the getOwnerId = jid of the CIS (by using the comm manager))
 		ArrayList<IndividualCtxEntity> setOfParentCISsEntities = new ArrayList<IndividualCtxEntity>();
-		ArrayList<CtxIdentifier> setOfCISsIds = new ArrayList<CtxIdentifier>();
+		ArrayList<CtxEntityIdentifier> setOfCISsIds = new ArrayList<CtxEntityIdentifier>();
 		for (CtxAssociation assocObj:setOfCtxAssociationsObj){
 			CtxEntityIdentifier assocParentId = assocObj.getParentEntity();
 			setOfCISsIds.add(assocParentId);
@@ -118,12 +130,19 @@ public class UserContextInheritanceMgr implements IUserCtxInheritanceMgr {
 		//use the  lookup (requestor, targerid, attribute, attId.getType()) to retrieve a set of att ids
 		ArrayList<CtxAttributeIdentifier> setOfCISCtxAttributeIds = new ArrayList<CtxAttributeIdentifier>();
 
-		for (CtxIdentifier cisEntityId:setOfCISsIds){
+		/*for (CtxIdentifier cisEntityId:setOfCISsIds){
+
 			String cisString = commMngr.getIdManager().getThisNetworkNode().getBareJid();
 			IIdentity cisIdentity = commMngr.getIdManager().fromJid(cisString);
 			 CtxAttributeIdentifier cisCtxAttributeId = (CtxAttributeIdentifier) ctxBroker.lookup(cisIdentity, CtxModelType.ATTRIBUTE, ctxAttrId.getType()).get();
 			 setOfCISCtxAttributeIds.add(cisCtxAttributeId);
+		}*/
+		
+		for (CtxEntityIdentifier cisIdentifier:setOfCISsIds){
+			CtxAttributeIdentifier cisCtxAttributeId =(CtxAttributeIdentifier) ctxBroker.lookup(cisIdentifier, CtxModelType.ATTRIBUTE, ctxAttrId.getType()).get();
+			setOfCISCtxAttributeIds.add(cisCtxAttributeId);
 		}
+		
  		// through the broker, retrieve the attribute objects
 		ArrayList<CtxAttribute> listWithCtxAttributeObjs = new ArrayList<CtxAttribute>();
 		for (CtxAttributeIdentifier attId:setOfCISCtxAttributeIds){
@@ -134,10 +153,12 @@ public class UserContextInheritanceMgr implements IUserCtxInheritanceMgr {
 		if (listWithCtxAttributeObjs.size() >= 2) {
 			CtxAttribute currAtt = listWithCtxAttributeObjs.get(0);
 			for (int i=1; i<listWithCtxAttributeObjs.size(); i++){
-				CtxAttribute currentAtt = (CtxAttribute)compareQoC(currAtt, listWithCtxAttributeObjs.get(i));
-				currAtt=currentAtt;
+				//CtxAttribute currentAtt = (CtxAttribute)compareQoC(currAtt, listWithCtxAttributeObjs.get(i));
+				retAttribute = (CtxAttribute)compareQoC(currAtt, listWithCtxAttributeObjs.get(i));
+				currAtt=retAttribute;
 			}
 		}
+		return retAttribute;
 	
 	}
 	/**
@@ -165,19 +186,23 @@ public class UserContextInheritanceMgr implements IUserCtxInheritanceMgr {
 		Double precisionOfFirstAttribute = ctxAtt1.getQuality().getPrecision();
 		Double precisionOfSecondtAttribute = ctxAtt2.getQuality().getPrecision();
 		
+		double base=0.0;
+		if (freshnessOfFirstAttribute < freshnessOfSecondAttribute) {
+			base=freshnessOfFirstAttribute;
+		}else{
+			base=freshnessOfSecondAttribute;
+		}
 		
-		/*qoc1 = 50*(lastUpdatedFirstAttribute/DateTime.now()) + 50*precisionOfFirstAttribute;
-		qoc2 = 50*(lastUpdatedSecondAttribute/DateTime.now()) + 50*precisionOfSecondAttribute;*/
+		double qoc1 = 50*(freshnessOfFirstAttribute/base)+ 50*precisionOfFirstAttribute;
+		double qoc2 = 50*(freshnessOfSecondAttribute/base) + 50*freshnessOfSecondAttribute;
 		
-
-		//if (lastUpdatedFirstAttribute.after(lastUpdatedSecondAttribute) && dt.get lastUpdatedFirstAttribute.getMinutes())
-			
-			return null;
+		if (qoc1>qoc2){
+			return ctxAtt1;
+		}else{
+			return ctxAtt2;
+		}				
 		
 	}
-	
-	
-	
 	
 
 	@Override

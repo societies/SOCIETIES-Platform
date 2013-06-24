@@ -26,14 +26,15 @@ package org.societies.context.user.inheritance.test;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
-
 import java.util.Date;
+import java.util.concurrent.Future;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
@@ -42,6 +43,12 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxModelObjectFactory;
+import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.context.user.inheritance.impl.UserContextInheritanceMgr;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class UserContextInheritanceMgrTest {
 	
@@ -71,6 +78,10 @@ public class UserContextInheritanceMgrTest {
 	
 	static CtxAssociation assoc;
 	static CtxAssociationIdentifier assocID;
+	
+	private static ICtxBroker mockctxBroker = mock(ICtxBroker.class);
+	private static ICommManager mockcomMngr = mock(ICommManager.class);
+	
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -104,13 +115,20 @@ public class UserContextInheritanceMgrTest {
 		attrTemperatureCISCID = new CtxAttributeIdentifier("context://cis-1eebff13-9750-404a-8e3b-1a91b79cd5e9.ict-societies.eu/ENTITY/community/32769/ATTRIBUTE/temperature/30");
 		attrTemperatureCISC = CtxModelObjectFactory.getInstance().createAttribute(attrTemperatureCISCID, new Date(), new Date(), "ooo");
 		
-		
+		String cssIdString = "context://john.societies.local/ENTITY/person/31";
+				
 		assocID = new CtxAssociationIdentifier("context://university.ict-societies.eu/ASSOCIATION/isMemberOf/2");
 		assoc = new CtxAssociation(assocID);
 		assoc.setParentEntity(entityCSSID);
 		assoc.addChildEntity(entityCISIDA);
 		assoc.addChildEntity(entityCISIDB);
 		assoc.addChildEntity(entityCISIDC);
+		
+		System.out.println("before mocking");
+		when(mockcomMngr.getIdManager().getThisNetworkNode().getBareJid()).thenReturn(cssIdString);
+		System.out.println("after mocking");
+		/*when(mockcomMngr.getIdManager().fromJid("context://john.societies.local/ENTITY/person/31")).thenReturn((IIdentity) entityCSSID);
+		when(mockctxBroker.retrieveIndividualEntity((IIdentity) entityCSSID)).thenReturn((Future<IndividualCtxEntity>) entityCSS).getMock();*/
 		
 	}
 	
@@ -137,12 +155,21 @@ public class UserContextInheritanceMgrTest {
 	}
 	
 	@Test
-	public void testUserInheritanceMethod1() {
+	public void testUserInheritanceMethod1() throws Exception {
 	
 		// entities and attributes created.... start testing...
+		System.out.println("attributeCSSA "+ attrTemperatureCISA.getStringValue());
 		System.out.println("entityCSS "+ entityCSS.getId());
 		assertEquals("context://john.societies.local/ENTITY/person/31",entityCSS.getId().toString());
 		///	...	
+	UserContextInheritanceMgr uI = new UserContextInheritanceMgr();
+		try {
+			CtxAttribute a = (CtxAttribute) uI.communityInheritance(attrTemperatureCSSID);
+			// System.out.println("attribut" + a);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
