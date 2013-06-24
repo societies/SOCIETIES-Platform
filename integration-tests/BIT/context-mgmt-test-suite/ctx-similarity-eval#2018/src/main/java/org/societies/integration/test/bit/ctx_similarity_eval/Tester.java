@@ -46,6 +46,7 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxEntityTypes;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.Requestor;
@@ -173,8 +174,8 @@ public class Tester {
 			
 			this.ctxBroker.registerForChanges(listener, this.janeID);
 			this.ctxBroker.updateAttribute(ctxAttrOccupationJane.getId(),ctxAttrOccupationJane.getStringValue());
-			LOG.info("EBOYLANLOGFOOTPRINT Jane: "+ctxAttrOccupationJane.getStringValue());
-			LOG.info("EBOYLANLOGFOOTPRINT Jack: "+ this.ctxBroker.lookup(ctxAttrOccupationJack.getStringValue()).get());
+			//LOG.info("EBOYLANLOGFOOTPRINT Jane: "+ctxAttrOccupationJane.getStringValue());
+			//LOG.info("EBOYLANLOGFOOTPRINT Jack: "+ this.ctxBroker.lookup(ctxAttrOccupationJack.getStringValue()).get());
 			
 			String[] ids = {jackID.toString(),janeID.toString()};
 			ArrayList<String> attrib = new ArrayList<String>();
@@ -188,12 +189,19 @@ public class Tester {
 			//Future<List<Object>> areSimilar = (Future<List<Object>>) this.ctxBroker.evaluateSimilarity(ids, attrib);
 			LOG.info("EBOYLANLOGFOOTPRINT : Start estimating similarity ...");
 			
+			List<CtxIdentifier> occupationAttrList = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.OCCUPATION).get();
+			LOG.info("occupationAttrList : " + occupationAttrList);
+			if(!occupationAttrList.isEmpty() ){
+				for(CtxIdentifier attOccID : occupationAttrList){
+					CtxAttribute movieAttr = (CtxAttribute) this.ctxBroker.retrieve(attOccID).get();
+					CtxEvaluationResults ie = (this.ctxBroker.evaluateSimilarity(ids, attrib));
+					LOG.info("EBOYLANGETRESULT t0: " + ie.getResult());
+					LOG.info("EBOYLANGETSUMMARY t0: " + ie.getSummary());
+					LOG.info("EBOYLANGETATTBREAKDOWN t0: " + ie.getAttBreakDown());
+					assertEquals(true, ie.getResult());
+				}
+			}
 			
-			CtxEvaluationResults ie = (this.ctxBroker.evaluateSimilarity(ids, attrib));
-			LOG.info("EBOYLANGETRESULT t0: " + ie.getResult());
-			LOG.info("EBOYLANGETSUMMARY t0: " + ie.getSummary());
-			LOG.info("EBOYLANGETATTBREAKDOWN t0: " + ie.getAttBreakDown());
-			assertEquals(false, ie.getResult());
 			this.ctxBroker.unregisterFromChanges(listener, this.jackID);
 			this.ctxBroker.unregisterFromChanges(listener, this.janeID);
 
@@ -248,12 +256,21 @@ public class Tester {
 			this.ctxBroker.updateAttribute(ctxAttrMoviesJane.getId(),ctxAttrMoviesJane.getStringValue());
 			
 			attrib.add("movies");
-			LOG.info("EBOYLANLOGFOOTPRINT jacks movie: " + this.ctxBroker.lookup(ctxAttrMoviesJack.getStringValue()).get());
-			CtxEvaluationResults ie = (CtxEvaluationResults) ( this.ctxBroker.evaluateSimilarity(ids, attrib));
-			LOG.info("EBOYLANGETRESULT t1: " + ie.getResult());
-			LOG.info("EBOYLANGETSUMMARY t1: " + ie.getSummary());
-			LOG.info("EBOYLANGETATTBREAKDOWN t1: " + ie.getAttBreakDown());
-			assertEquals(false, ie.getResult());
+			
+			//CtxEvaluationResults ie = (CtxEvaluationResults) ( this.ctxBroker.evaluateSimilarity(ids, attrib));
+			List<CtxIdentifier> moviesAttrList = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.MOVIES).get();
+			LOG.info("moviesAttrList : " + moviesAttrList);
+			if(!moviesAttrList.isEmpty() ){
+				for(CtxIdentifier attMovID : moviesAttrList){
+					CtxAttribute movieAttr = (CtxAttribute) this.ctxBroker.retrieve(attMovID).get();
+					//LOG.info("EBOYLANLOGFOOTPRINT jacks movie: " + this.ctxBroker.lookup(ctxAttrMoviesJack.getStringValue()).get());
+					CtxEvaluationResults ie = (this.ctxBroker.evaluateSimilarity(ids, attrib));
+					LOG.info("EBOYLANGETRESULT t1: " + ie.getResult());
+					LOG.info("EBOYLANGETSUMMARY t1: " + ie.getSummary());
+					LOG.info("EBOYLANGETATTBREAKDOWN t1: " + ie.getAttBreakDown());
+					assertEquals(false, ie.getResult());
+				}
+			}
 			
 			this.ctxBroker.unregisterFromChanges(listener, this.jackID);
 			this.ctxBroker.unregisterFromChanges(listener, this.janeID);
@@ -302,11 +319,21 @@ public class Tester {
 
 			attrib.add("movies");
 			attrib.add("occupation");
-			CtxEvaluationResults ie = (CtxEvaluationResults) ( this.ctxBroker.evaluateSimilarity(ids, attrib));
-			LOG.info("EBOYLANGETRESULT t2: " + ie.getResult());
-			LOG.info("EBOYLANGETSUMMARY t2: " + ie.getSummary());
-			LOG.info("EBOYLANGETATTBREAKDOWN t2: " + ie.getAttBreakDown());
-			assertEquals(false, ie.getResult());
+			
+			List<CtxIdentifier> multAttrList = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.OCCUPATION).get();
+			multAttrList.addAll(this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.MOVIES).get());
+			LOG.info("multAttrList : " + multAttrList);
+			if(!multAttrList.isEmpty() ){
+				for(CtxIdentifier attMultID : multAttrList){
+					CtxAttribute movieAttr = (CtxAttribute) this.ctxBroker.retrieve(attMultID).get();
+					CtxEvaluationResults ie = (this.ctxBroker.evaluateSimilarity(ids, attrib));
+					LOG.info("EBOYLANGETRESULT t2: " + ie.getResult());
+					LOG.info("EBOYLANGETSUMMARY t2: " + ie.getSummary());
+					LOG.info("EBOYLANGETATTBREAKDOWN t2: " + ie.getAttBreakDown());
+					assertEquals(false, ie.getResult());
+				}
+			}
+			
 			this.ctxBroker.unregisterFromChanges(listener, this.kenID);
 			this.ctxBroker.unregisterFromChanges(listener, this.kellyID);
 			
