@@ -2551,7 +2551,10 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		this.logRequest(requestor, identity);
 
-		if(IdentityType.CSS.equals(identity.getType())) {
+
+		if (IdentityType.CSS.equals(identity.getType()) 
+				|| IdentityType.CSS_RICH.equals(identity.getType())
+				|| IdentityType.CSS_LIGHT.equals(identity.getType())) {
 
 			if (this.commMgr.getIdManager().isMine(identity) ) {
 				//hocObj = internalCtxBroker.retrieveHistory(attrId, startDate, endDate);
