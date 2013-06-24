@@ -130,7 +130,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		LOG.debug("start model generation");
 
 		//this should change according to sequence in CAUIDiscoveryLearningTest  
-		if (retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION) != null ){
+		if ( !retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION).isEmpty() ){
 
 			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData = retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION);
 
@@ -171,17 +171,19 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				e.printStackTrace();
 			}	
 			
-		}else LOG.info("not enough history data");
+		}else LOG.info("No history data for User Intent Model learning");
 	}
 
 	private Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> retrieveHistoryTupleData(String attributeType){
 
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> results = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 		List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
+		
 		try {
 			results = ctxBroker.retrieveHistoryTuples(attributeType, listOfEscortingAttributeIds, null, null).get();
-
-		}catch (InterruptedException e) {
+			LOG.debug(" history: "+ attributeType  +" retrieveHistoryTupleData: " +results);
+		
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {

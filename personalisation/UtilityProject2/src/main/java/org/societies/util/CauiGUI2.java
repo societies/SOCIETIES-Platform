@@ -259,9 +259,14 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 				System.out.println("monitor action button clicked");
 				ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
 				try {
-					serviceId1.setIdentifier(new URI("css://nikosk@societies.org/mockedService"));
+					serviceId1.setIdentifier(new URI("css://nikosk@societies.org/radioService"));
+					serviceId1.setServiceInstanceIdentifier("css://nikosk@societies.org/radioService");
+					
 					IAction action1 = new Action(serviceId1, "serviceType", textField.getText(), textField_1.getText());
 					IIdentity cssOwnerId = getOwnerId();
+					
+					System.out.println(" action: "+ action1 );
+					System.out.println( "cssOwnerId "+ cssOwnerId);
 					uam.monitor(cssOwnerId, action1);
 
 				} catch (URISyntaxException e1) {
@@ -392,7 +397,8 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 		List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
 		try {
 			results = ctxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, listOfEscortingAttributeIds, null, null).get();
-
+			System.out.println(" retrieveHistoryTupleData: " +results);
+			
 		}catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

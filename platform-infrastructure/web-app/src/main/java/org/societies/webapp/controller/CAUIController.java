@@ -50,7 +50,6 @@ public class CAUIController extends BasePageController {
 	@PostConstruct
 	public void init() {
 		//log.info(msg)
-		log.info(this.getClass().getName() + " initialising");
 		LOG.info(this.getClass().getName() + " initialising");
 		this.userActionsList = this.getActiveModel(CtxAttributeTypes.CAUI_MODEL);
 		this.communityActionsList = this.getActiveModel(CtxAttributeTypes.CACI_MODEL);
@@ -137,11 +136,10 @@ public class CAUIController extends BasePageController {
 	
 	
 	public void learnUserModel(){
-		log.info("discovery started...aaaaaaaaa log log" );
-		LOG.info("discovery started...aaaaaaaaa " );
+		
 		System.out.println("learnUserModel");
 		int i = 0;
-		addGlobalMessage("learn User Model", "for id "+i, FacesMessage.SEVERITY_INFO);
+		addGlobalMessage("Learn User Model", "for id "+i, FacesMessage.SEVERITY_INFO);
 		LOG.info("service ref for cauiDisc "+ this.cauiPrediction);
 		LOG.info("service ref for broker  "+ this.internalCtxBroker);
 		this.cauiPrediction.generateNewUserModel();
