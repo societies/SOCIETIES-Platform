@@ -24,9 +24,7 @@ package org.societies.orchestration.CSM.test;
 * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-
-
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 import local.test.dummy.classes.CisAdvertisementRecord;
 import local.test.dummy.classes.CisDirectory;
@@ -36,28 +34,31 @@ import local.test.dummy.interfaces.ICisDirectory;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.orchestration.CSM.main.java.csm.CSM;
+import org.societies.orchestration.csm.CSM;
 
 
 public class CSMTest {
 	
 	private CSM csm;
 	
-	
-	
-	
 	@Test
 	public void testSetup(){
-		//csm = new CSM();
-		//csm.setUP();
+		Logger LOG = LoggerFactory.getLogger(CSMTest.class);
+		LOG.info("CSMTest begin");
+		csm = new CSM();
+		assertNotNull(csm);
+		csm.setUP();
+		assertTrue(true);
 	}
 	//
 	//
 	@Test
 	public void testNewUser(){
 		//csm.groupUpdate();
-		
+		assertTrue(true);
 	}	
 
 }
