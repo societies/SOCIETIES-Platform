@@ -84,6 +84,26 @@ public class UserContextInheritanceMgr implements IUserCtxInheritanceMgr {
 	}
 
 	
+	public ICtxBroker getCtxBroker() {
+		return ctxBroker;
+	}
+
+
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		this.ctxBroker = ctxBroker;
+	}
+
+
+	public ICommManager getCommMngr() {
+		return commMngr;
+	}
+
+
+	public void setCommMngr(ICommManager commMngr) {
+		this.commMngr = commMngr;
+	}
+
+
 	public UserContextInheritanceMgr() throws Exception {	
 		if (LOG.isDebugEnabled()){
 			LOG.info(this.getClass() + "instantiated ");
