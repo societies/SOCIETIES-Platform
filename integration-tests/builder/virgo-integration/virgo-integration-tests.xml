@@ -80,7 +80,12 @@
 
 		<!-- user agent -->
 		<module>../../BIT/useragent-test-suite/feedback-privacy-test</module>
-		
+		<module>../../BIT/useragent-test-suite/userfeedback-test-2074</module>
+
+        <!-- T65 web app -->
+        <module>../../BIT/webapp-test-suite/webapp-integration-tests-2078</module>
+        <module>../../BIT/webapp-test-suite/webapp-userfeedback-test-2077</module>
+
 		<!-- CT Tests -->
 		<module>../../CT/privacy-trust-test-suite</module>
 		<module>../../CT/cis-test-suite/activityfeedCT</module>
