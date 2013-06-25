@@ -22,35 +22,39 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.api.similarity;
+
+package org.societies.orchestration.Models;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.societies.api.context.model.CtxEvaluationResults;
-/**
- * @author <a href="mailto:eboylan@tssg.org">Emmet Boylan</a> (TSSG)
- * @since 1.0
- * 
- */
-public interface ICtxSimilarityEvaluator {
+public class Models {
+
+	private ArrayList<Model> modelList;
 	
-	/**
-	 * Check 2 or more entities for similarity in 1 or more attributes.
-	 * @param ids
-	 * 		String array of user IDs of entities to be compared
-	 * @param attrib
-	 * 		ArrayList<String> of attributes to test for similarity eg. books and movies
-	 * @return CtxEvaluationResults
-	 * 		The returned CtxEvaluationResults can be accessed by the following methods
-	 * 			*Boolean getResult() returns a Boolean value. True for results of 50%+ similarity, false 
-	 * 				for lower.
-	 * 			*HashMap<String, String> getSummary() returns a hashmap containing attributes
-	 * 				compared as the key and the result for that attribute as the value.
-	 * 			*HashMap getAttBreakDown() returns a hashmap containing the similarity evaluation results
-	 * 				down according to the taxonomy of the attribute compared.
-	 */
-
-	public CtxEvaluationResults evaluateSimilarity(String[] ids, ArrayList<String> attrib);
+	public Models(){
+		modelList = new ArrayList<Model>();
+	}
 	
+	public ArrayList<Model> getModels(){
+		//
 
+		return modelList;
+		
+	}
+	
+	public void addModel(Model newModel){
+		modelList.add(newModel);
+	}
+	
+	public HashMap<String, String> getModelNames(){
+		HashMap<String, String> tmp = new HashMap<String, String>();
+		for (Model m : modelList){
+			tmp.put(m.getName(), m.getName());
+		}
+		return tmp; 
+	}
 }
+

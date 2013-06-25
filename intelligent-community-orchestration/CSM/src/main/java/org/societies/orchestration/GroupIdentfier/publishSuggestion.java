@@ -22,35 +22,35 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.api.similarity;
 
-import java.util.ArrayList;
+package org.societies.orchestration.GroupIdentfier;
 
-import org.societies.api.context.model.CtxEvaluationResults;
+import org.societies.api.osgi.event.EMSException;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
+import org.societies.orchestration.csm.CommunitySuggestion;
+
 /**
- * @author <a href="mailto:eboylan@tssg.org">Emmet Boylan</a> (TSSG)
- * @since 1.0
- * 
+ * Describe your class here...
+ *
+ * @author John
+ *
  */
-public interface ICtxSimilarityEvaluator {
-	
-	/**
-	 * Check 2 or more entities for similarity in 1 or more attributes.
-	 * @param ids
-	 * 		String array of user IDs of entities to be compared
-	 * @param attrib
-	 * 		ArrayList<String> of attributes to test for similarity eg. books and movies
-	 * @return CtxEvaluationResults
-	 * 		The returned CtxEvaluationResults can be accessed by the following methods
-	 * 			*Boolean getResult() returns a Boolean value. True for results of 50%+ similarity, false 
-	 * 				for lower.
-	 * 			*HashMap<String, String> getSummary() returns a hashmap containing attributes
-	 * 				compared as the key and the result for that attribute as the value.
-	 * 			*HashMap getAttBreakDown() returns a hashmap containing the similarity evaluation results
-	 * 				down according to the taxonomy of the attribute compared.
-	 */
 
-	public CtxEvaluationResults evaluateSimilarity(String[] ids, ArrayList<String> attrib);
+public class publishSuggestion {
 	
+	private IEventMgr eventMgr;
 
+	public void sendSuggestion(CommunitySuggestion ire){
+		//send local event
+		InternalEvent event = new InternalEvent(EventTypes.ICO_RECOMMENDTION_EVENT, "newaction", "org/societies/orchestration/ICO", ire);
+		try {
+			eventMgr.publishInternalEvent(event);
+		} catch (EMSException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
 }

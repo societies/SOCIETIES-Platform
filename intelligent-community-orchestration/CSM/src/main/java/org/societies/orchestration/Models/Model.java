@@ -22,35 +22,54 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.api.similarity;
 
-import java.util.ArrayList;
+package org.societies.orchestration.Models;
 
-import org.societies.api.context.model.CtxEvaluationResults;
-/**
- * @author <a href="mailto:eboylan@tssg.org">Emmet Boylan</a> (TSSG)
- * @since 1.0
- * 
- */
-public interface ICtxSimilarityEvaluator {
+import java.util.HashMap;
+
+public class Model {
+	private String name;
+	private String jId;
+	private HashMap<String, Object> AttributeValues;
+	private HashMap<String, Integer> AttributeRank;
 	
-	/**
-	 * Check 2 or more entities for similarity in 1 or more attributes.
-	 * @param ids
-	 * 		String array of user IDs of entities to be compared
-	 * @param attrib
-	 * 		ArrayList<String> of attributes to test for similarity eg. books and movies
-	 * @return CtxEvaluationResults
-	 * 		The returned CtxEvaluationResults can be accessed by the following methods
-	 * 			*Boolean getResult() returns a Boolean value. True for results of 50%+ similarity, false 
-	 * 				for lower.
-	 * 			*HashMap<String, String> getSummary() returns a hashmap containing attributes
-	 * 				compared as the key and the result for that attribute as the value.
-	 * 			*HashMap getAttBreakDown() returns a hashmap containing the similarity evaluation results
-	 * 				down according to the taxonomy of the attribute compared.
-	 */
-
-	public CtxEvaluationResults evaluateSimilarity(String[] ids, ArrayList<String> attrib);
+	public Model(String pName){
+		this.name = pName; 
+		AttributeValues = new HashMap<String, Object>();
+		AttributeRank = new HashMap<String, Integer>();
+	}
 	
-
+	public void setName(String name){
+		this.name = name;
+	}
+	
+	public String getName(){
+		return this.name;
+	}
+	
+	public void setJid(String Jid){
+		this.jId = Jid;
+	}
+	
+	public String getJid(){
+		return this.jId;
+	}
+	
+	public void setAttValues(String att, Object value){
+		this.AttributeValues.put(att, value);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public HashMap getAttValues(){
+		return this.AttributeValues;
+	}
+	
+	public void setAttRank(String att, Object value){
+		this.AttributeRank.put(att, (Integer) value);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public HashMap getAttRank(){
+		return this.AttributeRank;
+	}	
 }
