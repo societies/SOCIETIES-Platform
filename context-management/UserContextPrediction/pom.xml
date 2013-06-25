@@ -9,6 +9,14 @@
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>RELEASE</version>
 	</parent>
+	
+	
+	<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
+			<scope>provided</scope>
+		</dependency>
 
 	<!-- groupId is set in parent pom -->
 	<artifactId>user-context-prediction</artifactId>

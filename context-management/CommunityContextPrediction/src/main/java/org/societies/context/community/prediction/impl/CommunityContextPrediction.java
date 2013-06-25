@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druΕΎbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAΓ‡ΓƒO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -24,19 +24,240 @@
  */
 package org.societies.context.community.prediction.impl;
 
+import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
-
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CommunityCtxEntity;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeComplexValue;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.context.api.community.prediction.ICommunityCtxPredictionMgr;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
-public class CommunityContextPrediction implements ICommunityCtxPredictionMgr{
+
+public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
+	
+	/** The logging facility. */
+	private static final Logger LOG = (Logger) LoggerFactory.getLogger(CommunityContextPrediction.class);
+
+	@Autowired(required=false)
+	private ICtxBroker internalCtxBroker;
+
+	public CommunityContextPrediction() {
+		LOG.info(this.getClass() + "CommunityContextPrediction instantiated ");
+	}
+	
+	//@Override
+	public CtxAttribute predictCommunityCtx(CtxEntityIdentifier communityCtxId, CtxAttributeIdentifier ctxAttributeIdentifier) {
+
+		LOG.info("estimateCommunityCtx 1");
+		CtxAttribute communityAttr = null;
+
+		// this values will be set in complexAttrType
+		double meanIntegerValue = 0.0;
+
+		ArrayList<Integer> integerAttrValues = new ArrayList<Integer>();
+		ArrayList<String> stringAttrValues = new ArrayList<String>();
+		ArrayList<Double> doubleAttrValues = new ArrayList<Double>();
+
+		ArrayList<String> finalArrayStringList = new ArrayList<String>();
+		ArrayList<String> modeStringValue = new ArrayList<String>();
+
+		List<CtxAttributeValueType> valueTypesStringIntegerDouble = new ArrayList<CtxAttributeValueType>();
+		valueTypesStringIntegerDouble.add(CtxAttributeValueType.STRING);
+		valueTypesStringIntegerDouble.add(CtxAttributeValueType.INTEGER);
+		valueTypesStringIntegerDouble.add(CtxAttributeValueType.DOUBLE);		
+		
+		List<CtxAttributeValueType> valueTypesString = new ArrayList<CtxAttributeValueType>();
+		valueTypesString.add(CtxAttributeValueType.STRING);
+		
+		List<CtxAttributeValueType> valueTypesIntegerString = new ArrayList<CtxAttributeValueType>();
+		valueTypesIntegerString.add(CtxAttributeValueType.INTEGER);
+		valueTypesIntegerString.add(CtxAttributeValueType.STRING);
+		
+		Map<String,List<CtxAttributeValueType>> possibleValueTypes = new HashMap<String,List<CtxAttributeValueType>>();
+		possibleValueTypes.put(CtxAttributeTypes.TEMPERATURE, valueTypesStringIntegerDouble);
+		possibleValueTypes.put(CtxAttributeTypes.AGE, valueTypesStringIntegerDouble);	
+		possibleValueTypes.put(CtxAttributeTypes.INTERESTS, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.LANGUAGES, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.LOCATION_COORDINATES, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.OCCUPATION, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.LOCATION_SYMBOLIC, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.BOOKS, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.FAVOURITE_QUOTES, valueTypesString);
+		possibleValueTypes.put(CtxAttributeTypes.MOVIES, valueTypesString);
+
+		// TODO add all data types and values
+		// resolve issue with different value types for the same attribute type e.g. hot vs 32C
+
+		Set<String> attributeTypesSetToBeChecked = new HashSet<String>();
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.TEMPERATURE);
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.INTERESTS);
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.AGE);
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.LANGUAGES);
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.LOCATION_COORDINATES);
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.OCCUPATION);
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.BOOKS);
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.FAVOURITE_QUOTES);
+		attributeTypesSetToBeChecked.add(CtxAttributeTypes.MOVIES);
+		
+		CtxAttributeComplexValue complexValue = new CtxAttributeComplexValue();
+
+		try {
+			LOG.info("estimateCommunityCtx 2");
+			//TODO check if CtxAttribute is null
+			communityAttr = (CtxAttribute) internalCtxBroker.retrieveAttribute(ctxAttributeIdentifier, false).get();
+			String attributeType = ctxAttributeIdentifier.getType().toString();
+
+			// checks if attribute type is included in the list of types that can be estimated
+			if(attributeTypesSetToBeChecked.contains(attributeType)){
+
+				CommunityCtxEntity retrievedCommunity = (CommunityCtxEntity) internalCtxBroker.retrieve(communityCtxId).get();
+				Set<CtxEntityIdentifier> communityMembers = retrievedCommunity.getMembers();
+
+				for(CtxEntityIdentifier comMemb:communityMembers){
+					IndividualCtxEntity individualMember = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
+
+					LOG.info("estimateCommunityCtx 3 "+ individualMember.getId());
+
+					Set<CtxAttribute> list = individualMember.getAttributes(attributeType);	
+
+					for (CtxAttribute ca:list){
+						if(ca.getIntegerValue()!= null){
+							integerAttrValues.add(ca.getIntegerValue());
+						}
+
+						if(ca.getStringValue()!= null){
+							stringAttrValues.add(ca.getStringValue());
+						}
+						if(ca.getDoubleValue()!= null){
+							doubleAttrValues.add(ca.getDoubleValue());
+						}
+					}
+				}
+
+				// Integer values
+				// average, median, 
+				if( !integerAttrValues.isEmpty()){
+					LOG.info("estimateCommunityCtx 4for integer" );
+					//average
+					meanIntegerValue = ccpNumMean(integerAttrValues);	
+					complexValue.setAverage(meanIntegerValue);
+					LOG.info("Mean Integer Value is :"+meanIntegerValue);
+					
+					// pairs
+					LOG.info("Calculating Pairs");
+					HashMap<String,Integer> pairs = new HashMap<String,Integer>();
+					pairs = ccpStringPairs(stringAttrValues);
+					LOG.info("PAIRS are :"+pairs.get(0));
+					complexValue.setPairs(pairs);
+					
+					//range 
+					LOG.info("Calculating Range ");
+					Integer [] range = ccpNumRange(integerAttrValues);
+					complexValue.setRangeMax(range[1]);
+					complexValue.setRangeMin(range[0]);
+					LOG.info("estimateCommunityCtx 4 integer finished ");							
+					
+					//median
+					LOG.info("Calculating Median");
+					Double medianNumber = ccpNumMedian(integerAttrValues);
+					LOG.info("The median is "+medianNumber);
+					complexValue.setMedian(medianNumber);
+					LOG.info("estimateCommunityCtx 4 integer finished ");
+					
+					//mode
+					LOG.info("Calculating Mode");
+					//ArrayList<Integer> modeNumber = cceNumMode(integerAttrValues);
+					//complexValue.setMode(integerAttrValues);
+					ArrayList<Integer> modeNumber = ccpNumMode(integerAttrValues);
+					complexValue.setMode(modeNumber);
+
+					LOG.info("Calculating ConvexHull");
+					//Converting the integers to Points2D
+					ArrayList<String> finalStringArrayList = new ArrayList<String>();
+					ArrayList<Point2D> cH = new ArrayList<Point2D>();
+					
+					for (String strPoint:stringAttrValues){
+						String[] helperString = strPoint.split(",");
+						for (String s1:helperString){
+							finalStringArrayList.add(s1);
+						}
+					}
+					cH = ccpGeomConvexHull(CommunityContextPrediction.splitString(finalArrayStringList.toString()));
+					ArrayList<String> stringPoints = new ArrayList<String>();
+					for (Point2D point:cH){
+						stringPoints.add(point.toString());
+					}
+					complexValue.setLocationGPS(stringPoints.toString());
+					//TODO add any other applicable
+					
+				}
+
+				// calculate strings 
+				if( !stringAttrValues.isEmpty()){
+
+					for (String s: stringAttrValues){
+						String[] helper = s.split(",");
+						for (String s1:helper){
+							finalArrayStringList.add(s1);
+						}
+					}	
+					HashMap<String,Integer> occurences = new HashMap<String,Integer>();
+					occurences = ccpStringPairs(finalArrayStringList);
+					LOG.info("estimateCommunityCtx 5 string "+ modeStringValue);
+					complexValue.setPairs(occurences);
+				}
+				communityAttr.setComplexValue(complexValue);
+				LOG.info("estimateCommunityCtx 6 communityAttr "+ communityAttr.getId());
+			}
+			
+			// calculate double
+			if(!doubleAttrValues.isEmpty()){
+				//average
+				// TODO add a method cceNumMean that will take array of doubles
+				//range
+				
+				//median
+				
+				//mode
+			}
+
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ExecutionException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (CtxException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} 
+
+		return communityAttr;
+	}
 	
 	/*
 	 * Returns the mean value of an integers' ArrayList 
@@ -74,6 +295,7 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr{
 	 */
 	//@Override
 	public double ccpNumMedian(ArrayList<Integer> inputValuesList) {
+		
 		Assert.notEmpty(inputValuesList,"Cannot use estimation without attributes");
 		Integer med,med1,med2=0;
 		Collections.sort(inputValuesList);
@@ -101,7 +323,7 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr{
 	 */
 	public ArrayList<Integer> ccpNumMode(ArrayList<Integer> inputValuesList) {
 
-		Assert.notEmpty(inputValuesList,"Cannot use estimation without attributes");
+		//Assert.notEmpty(inputValuesList,"Cannot use estimation without attributes");
 		Hashtable <Integer, Integer> frequencyMap = new Hashtable<Integer, Integer>();
 		ArrayList<Integer> finalList = new ArrayList<Integer>();
 
@@ -221,6 +443,73 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr{
 		return convexHullSet;
 	}
 	
+	
+	private void singleSideHullSet(ArrayList<Point2D> pointsSet, Point2D minPoint,
+			Point2D maxPoint, ArrayList<Point2D> convexHullSet) {
+
+
+		Point2D fP = new Point();
+		Point2D rP = new Point();
+
+		double distance_max = Integer.MIN_VALUE;
+		double relativeDistance = 0;
+		int farthestPointIndex = -1;
+		int insertPosition = convexHullSet.indexOf(maxPoint);
+
+		ArrayList<Point2D> set1 = new ArrayList<Point2D>();
+		ArrayList<Point2D> set2 = new ArrayList<Point2D>();	
+
+		if (pointsSet.size()==0){
+			return ;
+		}
+		if (pointsSet.size()==1){
+			Point2D p = pointsSet.get(0);
+			pointsSet.remove(p);
+			convexHullSet.add(insertPosition, p);
+			return;
+		}
+
+		for (int i=0; i<pointsSet.size(); i++){	
+			Point2D m =pointsSet.get(i);	
+			relativeDistance=(maxPoint.getX()-minPoint.getX())*(minPoint.getY()-m.getY())-(maxPoint.getY()-minPoint.getY())*(minPoint.getX()-m.getX());
+			if (relativeDistance < 0){
+				relativeDistance= -relativeDistance;
+			}
+
+			if (relativeDistance > distance_max){	
+				distance_max =relativeDistance;
+				farthestPointIndex=i;	
+			}	
+		}
+
+		fP=pointsSet.get(farthestPointIndex);
+		convexHullSet.add(insertPosition,fP);
+		pointsSet.remove(farthestPointIndex);
+
+		for (int i=0; i<pointsSet.size(); ++i){
+			rP = pointsSet.get(i);
+			double crossProduct = (fP.getX()-minPoint.getX())*(rP.getY()-minPoint.getY()) - (fP.getY()-minPoint.getY())*(rP.getX()-minPoint.getX());
+			if (crossProduct >= 0){
+				set1.add(rP);
+			}
+		}
+
+		for (int i=0; i<pointsSet.size(); ++i){
+			rP = pointsSet.get(i);
+			double crossProduct = (maxPoint.getX()-fP.getX())*(rP.getY()-fP.getY()) - (maxPoint.getY()-fP.getY())*(rP.getX()-fP.getX());
+			if (crossProduct >= 0){
+				set2.add(rP);	
+			}
+		}
+		if (set1.size()!=0){
+			singleSideHullSet(set1, minPoint, fP, convexHullSet);
+		}
+		if (set2.size()!=0){
+			singleSideHullSet(set2,fP,maxPoint,convexHullSet);
+		}
+
+	}
+	
 	/*
 	 * Returns the minimum bounding box that contains all the given points
 	 * @param an array list of integers
@@ -306,6 +595,30 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr{
 		}
 
 		return mode;
+	}
+
+	//method for splitting the LOCATION string. Location should be in String representation of a pair of double values
+	public static ArrayList<Point2D> splitString (String s){
+
+		Point2D.Double p = new Point2D.Double();
+		double x=0.0;
+		double y=0.0;
+		int l = 0;
+		ArrayList<Point2D> points = new ArrayList<Point2D>();
+		String[] splited_string = s.split(",");
+
+		System.out.println("The size of splitted string is "+splited_string.length);
+
+		for (int k = 0; k< splited_string.length -1; k++){
+			x = Double.parseDouble(splited_string[l]);
+			y = Double.parseDouble(splited_string[l+1]);
+			l=l+2;
+			p.setLocation(x, y);
+			points.add(p);
+			//returns the point with the coordinates
+		}
+		return points;	
+
 	}
 	
 	/* Edo den eixe sxolia ... giati???
@@ -416,5 +729,11 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr{
 	public CtxIdentifier predictContext(CtxAttributeIdentifier arg0, Date arg1) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void getCommunity(IIdentity arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }
