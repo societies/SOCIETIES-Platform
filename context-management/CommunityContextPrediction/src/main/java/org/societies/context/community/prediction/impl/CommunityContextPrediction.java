@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.logging.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -52,10 +51,8 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -705,7 +702,7 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 				frequencyMap.put(inputListOfStrings.get(i), 1);
 			}	
 			int total=0;
-			Enumeration<String> e = frequencyMap.keys();
+			//Enumeration<String> e = frequencyMap.keys();
 			Iterator<Integer> it = frequencyMap.values().iterator();
 
 			while (it.hasNext()){
@@ -789,32 +786,13 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 		return returnAttribute;
 	}
 
-	private LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>> shortByTime(HashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>> data){
-		
-		
-		LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>> result = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 
-		TreeMap<Date,CtxHistoryAttribute> tempHocDataTreeMap = new TreeMap<Date,CtxHistoryAttribute>();
 
-		for(CtxHistoryAttribute hocAttr: data.keySet()){
-
-			tempHocDataTreeMap.put(hocAttr.getLastUpdated(),hocAttr);
-		}
-
-		for(Date date :tempHocDataTreeMap.keySet()){
-
-			CtxHistoryAttribute keyHocAttr = tempHocDataTreeMap.get(date);
-			result.put(keyHocAttr, data.get(keyHocAttr));
-		}
-
-		return result;
-	}
-
-	@Override
+	/*@Override
 	public void getCommunity(EntityIdentifier cisID) {
 		// TODO Auto-generated method stub
 
-	}
+	}*/
 
 	/* (non-Javadoc)
 	 * @see org.societies.context.api.community.prediction.ICommunityCtxPredictionMgr#predictContext(org.societies.api.context.model.CtxAttributeIdentifier, java.util.Date)
@@ -825,9 +803,16 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 		return null;
 	}
 
-	@Override
+	/*@Override
 	public void getCommunity(EntityIdentifier arg0) {
 		// TODO Auto-generated method stub
 
+	}*/
+
+
+	@Override
+	public void getCommunity(IIdentity arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }
