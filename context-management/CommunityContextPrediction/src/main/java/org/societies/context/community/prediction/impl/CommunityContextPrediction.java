@@ -63,6 +63,7 @@ import org.springframework.util.Assert;
 
 
 public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
+	//It needs refinement!!
 
 	/** The logging facility. */
 	private static final Logger LOG = (Logger) LoggerFactory.getLogger(CommunityContextPrediction.class);
@@ -77,7 +78,9 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 		LOG.info(this.getClass() + "CommunityContextPrediction instantiated ");
 	}
 
-
+	/* It uses the appropriate ctxBroker method to retrieve the input from User Context Prediction
+	 * 
+	 */
 	//@Override
 	public CtxAttribute predictCommunityCtx(CtxEntityIdentifier communityCtxId, CtxAttributeIdentifier ctxAttributeIdentifier) throws InvalidFormatException {
 
@@ -278,11 +281,8 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 	 * Returns the mean value of an integers' ArrayList 
 	 * @param an array list of integers
 	 * @return a double as the mean value of the input integers
-	 * 
-	 * Differences from Community Context Estimation:
-	 * 1) "ccp..." instead of "cce..." (stands for community context prediction)
-	 * 2) inputValuesList must come from User Context Prediction!
-	 * 3) use the appropriate broker method
+	 *
+	 * inputValuesList must come from User Context Prediction!
 	 * 
 	 */
 	public double ccpNumMean(ArrayList<Integer> inputValuesList) {
@@ -304,9 +304,7 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 	 * @param an array list of integers
 	 * @return a double as the median value of the input integers
 	 * 
-	 * Differences from Community Context Estimation:
-	 * 1) "ccp..." instead of "cce..." (stands for community context prediction)
-	 * 2) inputValuesList must come from User Context Prediction!
+	  inputValuesList must come from User Context Prediction!
 	 * 
 	 */
 	//@Override
@@ -332,9 +330,7 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 	 * @param an array list of integers
 	 * @return an ArrayList of integers representing the mode value of the input integers
 	 * 
-	 * Differences from Community Context Estimation:
-	 * 1) "ccp..." instead of "cce..." (stands for community context prediction)
-	 * 2) inputValuesList must come from User Context Prediction!
+	 * inputValuesList must come from User Context Prediction!
 	 * 
 	 */
 	public ArrayList<Integer> ccpNumMode(ArrayList<Integer> inputValuesList) {
@@ -376,10 +372,8 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 	 * Returns the range of an integers' ArrayList
 	 * @param an array list of integers
 	 * @return the range of the input integers as Integer[]
-	 * 
-	 * Differences from Community Context Estimation:
-	 * 1) "ccp..." instead of "cce..." (stands for community context prediction)
-	 * 2) inputValuesList must come from User Context Prediction!
+	 *
+	 * inputValuesList must come from User Context Prediction!
 	 * 
 	 */
 	public Integer[] ccpNumRange(ArrayList<Integer> inputValuesList) {
@@ -406,10 +400,7 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 	 * Returns the convex hull of a points' ArrayList. It recursively uses the singleSideHulSet method
 	 * @param an array list of points.
 	 * @return an ArrayList of points, representing the convex hull set of the input points
-	 * 
-	 * Differences from Community Context Estimation:
-	 * 1) "ccp..." instead of "cce..." (stands for community context prediction)
-	 * 2) points must come from User Context Prediction!
+	 * points must come from User Context Prediction!
 	 * 
 	 */
 	public ArrayList<Point2D> ccpGeomConvexHull(ArrayList<Point2D> points) {
@@ -531,9 +522,7 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 	 * @param an array list of integers
 	 * @return an array of points representing the minimum bounding box of the input points
 	 * 
-	 * Differences from Community Context Estimation:
-	 * 1) "ccp..." instead of "cce..." (stands for community context prediction)
-	 * 2) points must come from User Context Prediction!
+	 *points must come from User Context Prediction!
 	 * 
 	 */
 	public Point2D[] ccpGeomMinBB(ArrayList<Point2D> points) {
@@ -573,9 +562,7 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 	 * @param an array list of strings
 	 * @return an ArrayList of strings showing the mode of the input strings
 	 * 
-	 * Differences from Community Context Estimation:
-	 * 1) "ccp..." instead of "cce..." (stands for community context prediction)
-	 * 2) inputValuesList must come from User Context Prediction!
+	 * inputValuesList must come from User Context Prediction!
 	 * 
 	 */
 	public ArrayList<String> ccpStringMode(ArrayList<String> inputValuesList) {
@@ -637,12 +624,9 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 
 	}
 
-	/* Edo den eixe sxolia ... giati???
-	 * Einai test code? An nai, prepei na ginoun diorthoseis kai edo kai sto cce ...
-	 * 
-	 * Differences from Community Context Estimation:
-	 * 1) "ccp..." instead of "cce..." (stands for community context prediction)
-	 * 2) inputListOfStrings must come from User Context Prediction!
+	/* 
+	 * @param ArrayList<String> 
+	 * @return a frequency map 
 	 * 
 	 */
 	public HashMap<String,Integer> ccpStringPairs(ArrayList<String> inputListOfStrings) {
@@ -676,9 +660,6 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 	 * @param an array list of strings
 	 * @return an array list of strings of type [abd, 57%, abc, 14%, cde, 28%]
 	 * 
-	 * Differences from Community Context Estimation:
-	 * 1) "ccp..." instead of "cce..." (stands for community context prediction)
-	 * 2) inputListOfStrings must come from User Context Prediction!
 	 * 
 	 */
 	public ArrayList<String> ccpStringPercentage(ArrayList<String> inputListOfStrings) {
@@ -728,7 +709,11 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 		return arrayListWithStringPercent;
 
 	}
-
+	/*
+	 * predicts the next community coordinates location, based on the previous and current location
+	 * @param communityAttrId
+	 * @return CtxAttribute the predicted context attribute
+	 */
 	public CtxAttribute predictCommunityNextLocationCoordinates(CtxAttributeIdentifier communityAttrId) throws InvalidFormatException, InterruptedException, ExecutionException, CtxException {
 		//retrieve previous location from historyofContext db
 
@@ -745,11 +730,11 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 		Requestor requestor = new Requestor(ownerIdentiy);
 
 		List<CtxHistoryAttribute> communityHistoryAttribute = internalCtxBroker.retrieveHistory(requestor, communityAttrId, null, null).get();
-		
+
 		if (communityHistoryAttribute.size()!=0){
 			Date fresher = communityHistoryAttribute.get(0).getLastUpdated();
 			for (CtxHistoryAttribute ctxHA:communityHistoryAttribute){
-				
+
 				if (fresher.before(ctxHA.getLastUpdated()))
 				{
 					fresher = ctxHA.getLastUpdated();
@@ -759,11 +744,11 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 			//retrieve latest position
 			String coordinatesString = freshAttribute.getStringValue();
 			List<String> listCoordinates = Arrays.asList(coordinatesString);
-			
-			 xp = (Double.parseDouble(listCoordinates.get(0)));
-			 yp = (Double.parseDouble(listCoordinates.get(1)));
+
+			xp = (Double.parseDouble(listCoordinates.get(0)));
+			yp = (Double.parseDouble(listCoordinates.get(1)));
 		}
-		
+
 		//retrieve current coordinates of the Community
 		CommunityCtxEntity currentCommunity = (CommunityCtxEntity) internalCtxBroker.retrieve(communityAttrId).get();
 		Set<CtxAttribute> currentGPSLocation = currentCommunity.getAttributes(CtxAttributeTypes.LOCATION_COORDINATES);
@@ -778,9 +763,9 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 		//calculate the next position using vectors
 		Double	xf = (xc + (xc-xp));
 		Double	yf = (yc + (yc-yp));
-		
+
 		String stringToUpdate = xf.toString()+yf.toString();
-		
+
 		//update the future attribute
 		returnAttribute.setStringValue(stringToUpdate);					
 		return returnAttribute;
@@ -788,31 +773,17 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 
 
 
-	/*@Override
-	public void getCommunity(EntityIdentifier cisID) {
-		// TODO Auto-generated method stub
-
-	}*/
-
-	/* (non-Javadoc)
-	 * @see org.societies.context.api.community.prediction.ICommunityCtxPredictionMgr#predictContext(org.societies.api.context.model.CtxAttributeIdentifier, java.util.Date)
-	 */
 	@Override
 	public CtxIdentifier predictContext(CtxAttributeIdentifier arg0, Date arg1) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/*@Override
-	public void getCommunity(EntityIdentifier arg0) {
-		// TODO Auto-generated method stub
-
-	}*/
 
 
 	@Override
 	public void getCommunity(IIdentity arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
