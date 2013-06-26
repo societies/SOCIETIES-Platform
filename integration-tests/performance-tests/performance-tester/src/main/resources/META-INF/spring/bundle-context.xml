@@ -79,7 +79,14 @@
 	<!-- Trust declarations end -->
 	
 	
+	<!-- Olivier's Declarations start -->
 	
+	<bean name="ServiceControlPerformanceTest" class="org.societies.integration.performance.test.upper_tester.slm.ServiceControlPerformanceTest">
+  		<property name="commManager" ref="commManager"/>
+  		<property name="serviceControl" ref="serviceControl"/>
+  	</bean>
+  	
+  	<!-- Olivier's Declarations end -->
 	
 	
 	<!--...............................................................and this.............................................................. -->

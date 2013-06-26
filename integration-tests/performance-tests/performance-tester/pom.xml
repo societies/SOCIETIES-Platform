@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.societies.integration.performance.test</groupId>
-  <artifactId>societies-performance-tester</artifactId>
-  <packaging>bundle</packaging>
-  <name>Societies Performance Tester Bundle</name>
-  <version>0.0.1-SNAPSHOT</version>
-  
-  <developers>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.societies.integration.performance.test</groupId>
+	<artifactId>societies-performance-tester</artifactId>
+	<packaging>bundle</packaging>
+	<name>Societies Performance Tester Bundle</name>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<developers>
 		<developer>
 			<name>Rafik Said Mansour</name>
 			<email>rafik.said.mansour@gmail.com</email>
@@ -20,13 +20,13 @@
 			</roles>
 		</developer>
 	</developers>
-	
+
 	<parent>
 		<groupId>org.societies</groupId>
 		<artifactId>spring-osgi-parent</artifactId>
 		<version>RELEASE</version>
 	</parent>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -34,37 +34,45 @@
 			<type>libd</type>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>common-ext-libs</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.societies.api.internal</groupId>
 			<artifactId>societies-api-internal</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.0</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
 			<version>1.9.0</version>
 			<scope>test</scope>
+		</dependency>
+
+		<!-- For 3P service Test Cases -->
+		<dependency>
+			<groupId>org.societies.integration.example.service</groupId>
+			<artifactId>IntegrationTestService</artifactId>
+			<version>0.1</version>
+			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 
@@ -79,7 +87,8 @@
 						<Bundle-SymbolicName>${pom.groupId}.${pom.artifactId}</Bundle-SymbolicName>
 						<Bundle-Name>${pom.artifactId}</Bundle-Name>
 						<Bundle-Version>${pom.version}</Bundle-Version>
-						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Dependency>*;scope=compile|runtime,
+							IntegrationTestService;scope=runtime</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
 						<Import-Package>*;resolution:=optional</Import-Package>
 					</instructions>
@@ -123,5 +132,5 @@
 			</plugin>
 		</plugins>
 	</build>
-  
+
 </project>

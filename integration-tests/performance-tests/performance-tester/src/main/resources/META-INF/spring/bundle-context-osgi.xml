@@ -23,6 +23,8 @@
       
       <osgi:reference id="privacyPolicyManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager"/>
       
+      <osgi:reference id="serviceControl" interface="org.societies.api.internal.servicelifecycle.IServiceControl" />
+      
 
 
 
@@ -52,6 +54,17 @@
 				<entry key="service.exported.interfaces" value="*"/>
 				<entry key="service.exported.configs" value="org.apache.cxf.ws"/>	
 				<entry key="org.apache.cxf.ws.address" value="${ws.host.name}${ws.rafik.cssmgmt}"/>
+			</osgi:service-properties>
+       </osgi:service>
+       
+       <osgi:service ref="ServiceControlPerformanceTest">	
+			<osgi:interfaces>
+				<value>org.societies.integration.performance.test.upper_tester.slm.IServiceControlPerformanceTest</value>
+			</osgi:interfaces>
+			<osgi:service-properties>
+				<entry key="service.exported.interfaces" value="*"/>
+				<entry key="service.exported.configs" value="org.apache.cxf.ws"/>	
+				<entry key="org.apache.cxf.ws.address" value="${ws.host.name}${ws.servicecontrol}"/>
 			</osgi:service-properties>
        </osgi:service>
        
