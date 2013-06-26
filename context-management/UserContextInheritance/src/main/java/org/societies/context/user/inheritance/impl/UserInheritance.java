@@ -56,10 +56,41 @@ import org.springframework.stereotype.Service;
  * @author yboul
  */
 
-@Service
+
+//TODO dead class to be removed
+
+//@Service
 public class UserInheritance implements IUserCtxInheritanceMgr{
+
+	@Override
+	public void getCIS(IIdentity arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getContextAttribute(CtxAttributeIdentifier arg0,
+			CtxAttributeValueType arg1, IIdentity arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void inheritContextAttribute(CtxAttributeIdentifier arg0,
+			CtxAttributeValueType arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void resolveConflicts(ConflictResolutionAlgorithm arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+}
 	
-	/** The logging facility. */
+	/** The logging facility. *//*
 	private static final Logger LOG = LoggerFactory.getLogger(UserInheritance.class);
 	
 	@Autowired(required=false)
@@ -218,3 +249,4 @@ public class UserInheritance implements IUserCtxInheritanceMgr{
 	}
 
 }
+*/
