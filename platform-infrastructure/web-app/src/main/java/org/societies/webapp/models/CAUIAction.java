@@ -28,7 +28,7 @@ public class CAUIAction implements Serializable{
 		
 		for( String tAct :targetActionMap.keySet()){
 			Double transProb = targetActionMap.get(tAct);
-			this.targetAction = targetAction +tAct+":"+transProb+",";
+			this.targetAction = targetAction +tAct+":"+transProb+"\n";
 			
 		}
 	}

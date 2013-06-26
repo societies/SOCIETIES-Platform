@@ -18,6 +18,9 @@
             </f:facet>
 			<!-- 	<h:form> -->
 
+        
+        
+        
 
 			<p:tabView id="tabView" dynamic="true" activeIndex="0">
 
@@ -31,23 +34,29 @@
 						<p:column headerText="Target User Action : transition probability">
 							<h:outputText value="#{CAUIAction.targetAction}" />
 						</p:column>
-
 					</p:dataTable>
-
-
 					<p:commandButton value="Learn new user model"
-						actionListener="#{cauiController.learnUserModel()}" />
-
+						actionListener="#{cauiController.learnUserModel()}"
+						update="userTable" />
 					<p:commandButton value="Refresh user model"
 						actionListener="#{cauiController.refreshUserModel()}"
 						update="userTable" />
+				
+				<!-- <h:outputText value="Enable prediction: " />
+        		<p:selectBooleanCheckbox value="#{CAUIController.enableUserPrediction}">  
+             
+           			 <p:ajax update="msg" listener="#{CAUIController.setEnableUserPrediction}"/>  
+        		</p:selectBooleanCheckbox> 
+				 -->  
 				</p:tab>
+
+
+
 
 				<p:tab title="Community Model">
 
 					<p:dataTable id="communityTable" var="CAUIAction"
 						value="#{cauiController.communityActionsList}">
-
 						<p:column headerText="Source User Action">
 							<h:outputText value="#{CAUIAction.sourceAction}" />
 						</p:column>
@@ -63,7 +72,26 @@
 						actionListener="#{cauiController.showMeAMessage}" />
 				</p:tab>
 
+
+				<p:tab title="Prediction Log">
+					<p:dataTable id="predictionLogTable" var="CAUIActionLog"
+						value="#{cauiController.predictionLogList}">
+
+						<p:column headerText="Performed User Action">
+							<h:outputText value="#{CAUIActionLog.performedAction}" />
+						</p:column>
+						<p:column headerText="Predicted User Action ">
+							<h:outputText value="#{CAUIActionLog.predictedAction}" />
+						</p:column>
+					</p:dataTable>
+					<p:commandButton value="Refresh Prediction Log"
+						actionListener="#{cauiController.showMeAMessage}" update="predictionLogTable" />
+				</p:tab>
+
+
 			</p:tabView>
+			
+			
 			<!-- 	</h:form> -->
 		</p:panel>
 

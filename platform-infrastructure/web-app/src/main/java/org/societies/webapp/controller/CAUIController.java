@@ -1,8 +1,10 @@
 package org.societies.webapp.controller;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,7 @@ import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.webapp.models.CAUIAction;
+import org.societies.webapp.models.CAUIActionLog;
 import org.societies.webapp.service.UserService;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
@@ -32,31 +35,42 @@ import javax.faces.bean.ViewScoped;
 public class CAUIController extends BasePageController {
 
 	private static Logger LOG = LoggerFactory.getLogger(CAUIController.class);
-	
+
 	private static final long serialVersionUID = 1L;
 
 	private String stringProperty;
 	private boolean boolProperty;
+
+	private boolean enableUserPrediction = true;
 	static int i = 0;
 
 	private List<CAUIAction> userActionsList = new ArrayList<CAUIAction>();
 	private List<CAUIAction> communityActionsList = new ArrayList<CAUIAction>();
-	
+	private List<CAUIActionLog> predictionLogList = new ArrayList<CAUIActionLog>();
+
+
 	public CAUIController() {
 
-		log.info(this.getClass().getName() + "constructor instantiated");
+		LOG.info(this.getClass().getName() + "constructor instantiated");
 	}
+
 
 	@PostConstruct
 	public void init() {
-		//log.info(msg)
+
 		LOG.info(this.getClass().getName() + " initialising");
+
 		this.userActionsList = this.getActiveModel(CtxAttributeTypes.CAUI_MODEL);
 		this.communityActionsList = this.getActiveModel(CtxAttributeTypes.CACI_MODEL);
-		  
+		this.predictionLogList = this.getPredictionLog();
+
+		LOG.info("isUserPredictionEnabled ::"+this.cauiPrediction.isUserPredictionEnabled());
+		this.enableUserPrediction = this.cauiPrediction.isUserPredictionEnabled();
+
 		LOG.info("action records ::"+this.userActionsList);
 		LOG.info("community records ::"+this.communityActionsList);
-		LOG.info("aaaaaaaaaaaaaaaaa");
+		LOG.info("predictionLogList ::"+this.predictionLogList);
+
 		//learnUserModel();
 		//learnUserModel();
 	}
@@ -64,15 +78,25 @@ public class CAUIController extends BasePageController {
 
 	@ManagedProperty(value = "#{userService}")
 	private UserService userService; 
-	
+
 	@ManagedProperty(value = "#{internalCtxBroker}")
 	private ICtxBroker internalCtxBroker;
-	
+
 	@ManagedProperty(value = "#{cauiPrediction}")
 	private ICAUIPrediction cauiPrediction;
 
 	private ICommManager commMngrRef;
 
+
+	public void setEnableUserPrediction(boolean bool){
+		this.enableUserPrediction = bool;
+		LOG.info("setEnableUserPrediction  : "+ bool);
+	}
+
+	public Boolean isEnableUserPrediction(){
+		LOG.info("getEnableUserPrediction  : "+ this.enableUserPrediction);
+		return this.enableUserPrediction ;
+	}
 
 
 	public List<CAUIAction> getUserActionsList(){
@@ -83,6 +107,11 @@ public class CAUIController extends BasePageController {
 	public List<CAUIAction> getCommunityActionsList(){
 
 		return this.communityActionsList;
+	}
+
+	public List<CAUIActionLog> getPredictionLogList(){
+
+		return this.predictionLogList;
 	}
 
 	public List<CAUIAction> getActiveModel(String type){
@@ -108,62 +137,86 @@ public class CAUIController extends BasePageController {
 		return result;
 	}
 
+
+	public List<CAUIActionLog>  getPredictionLog(){
+
+		List<CAUIActionLog> result = new ArrayList<CAUIActionLog>(); 
+		List<Entry<String, String>> tempResultList = this.cauiPrediction.getPredictionPairLog();
+
+		if( !tempResultList.isEmpty()){
+			for(Entry<String,String> entry : tempResultList){
+				String performed = entry.getKey();
+				String predicted = entry.getValue();
+				CAUIActionLog cauiLog = new CAUIActionLog(performed,predicted);
+				LOG.info("getPredictionLog  cauiLog : "+ cauiLog);
+				result.add(cauiLog);
+			}
+		}
+		LOG.info("getPredictionLog result : "+ result);
+		return result;
+	}
+
+
 	private List<CAUIAction> convertModel(HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> originalModel ){
 
 		List<CAUIAction> result = new ArrayList<CAUIAction>();
 
 		if(!originalModel.isEmpty()){
-
 			for(IUserIntentAction sourceAct : originalModel.keySet()){
 
-				String sourcActionString = sourceAct.toString();
+				//String sourcActionString = sourceAct.toString();
+				
+				String sourcActionString = sourceAct.getparameterName() +"="+ sourceAct.getvalue();
 
 				HashMap<String, Double> targetMap = new HashMap<String, Double>();
 				HashMap<IUserIntentAction, Double> targetMapOriginal = originalModel.get(sourceAct);
 
 				for(IUserIntentAction targetActOrig : targetMapOriginal.keySet()){
-					targetMap.put(targetActOrig.toString(), targetMapOriginal.get(targetActOrig));
-				}
+					String trimedTargetStr = targetActOrig.getparameterName()+"="+targetActOrig.getvalue();
+					Double transProb = targetMapOriginal.get(targetActOrig);
+					DecimalFormat df = new DecimalFormat("#.##");
+					Double transProbTrimmed = Double.parseDouble(df.format(transProb));
+					targetMap.put(trimedTargetStr, transProbTrimmed);
 
+				}
 				CAUIAction cauiAct = new CAUIAction(sourcActionString, targetMap);
 				LOG.info("convertModel  : "+ cauiAct);
 				result.add(cauiAct);
 			}		
 		}
-
 		return result;
 	}
-	
-	
+
+
 	public void learnUserModel(){
-		
+
 		System.out.println("learnUserModel");
-		int i = 0;
-		addGlobalMessage("Learn User Model", "for id "+i, FacesMessage.SEVERITY_INFO);
+
+		IIdentity cssID = null ; 
+		//if( getOwnerId() != null) {	cssID = getOwnerId();		}
 		LOG.info("service ref for cauiDisc "+ this.cauiPrediction);
 		LOG.info("service ref for broker  "+ this.internalCtxBroker);
 		this.cauiPrediction.generateNewUserModel();
 		LOG.info("discovery started..." );
-		addGlobalMessage("MODEL LEARNING TRIGGERED", "Now here's your message!", FacesMessage.SEVERITY_INFO);
+		addGlobalMessage("MODEL LEARNING TRIGGERED for cssID", "click on refresh model button", FacesMessage.SEVERITY_INFO);
 	}
 
 
 	public void refreshUserModel(){
-		addGlobalMessage("MODEL REFRESHED", "Now here's your message!", FacesMessage.SEVERITY_INFO);
+		addGlobalMessage("MODEL REFRESHED", "Retrieving model from DB", FacesMessage.SEVERITY_INFO);
 	}
 
-	
+
 	public void learnCommunityModel(){
-		int i = 0;
+
 		addGlobalMessage("learn community Model", "for id "+i, FacesMessage.SEVERITY_INFO);
 		IIdentity cisId = null;
-		
-		
+
 		this.cauiPrediction.generateNewCommunityModel(cisId);
 		LOG.info("discovery started..." );
 	}
 
-	
+
 	private IIdentity getOwnerId(){
 
 		IIdentity cssOwnerId = null;
@@ -181,50 +234,6 @@ public class CAUIController extends BasePageController {
 	}
 
 
-	
-	//*************************************
-    // service registration 
-	//*************************************
-	/*
-	public ICAUITaskManager getCauiTaskManager() {
-
-		LOG.info("get task manager "+cauiTaskManager);
-		return this.cauiTaskManager;
-	}
-
-
-	public void setCauiTaskManager(ICAUITaskManager cauiTaskManager) {
-
-		if (cauiTaskManager == null)
-			log.info("taskManager() = null");
-		else
-			LOG.info("set taskManager manager " +cauiTaskManager.toString());
-		this.cauiTaskManager = cauiTaskManager;
-	}
-
-	public ICAUIDiscovery getCauiDiscovery() {
-
-		LOG.info("get cauiDiscovery manager "+cauiDiscovery);    
-		return cauiDiscovery;
-	}
-
-	public ICACIDiscovery getCaciDiscovery() {
-
-		LOG.info("get cauiDiscovery manager "+cauiDiscovery);    
-		return caciDiscovery;
-	}
-	
-	public void setCauiDiscovery(ICAUIDiscovery cauiDiscovery) {
-		LOG.info("set cauiDiscovery manager " +cauiDiscovery);
-		this.cauiDiscovery = cauiDiscovery;
-	}
-
-	public void setCaciDiscovery(ICACIDiscovery caciDiscovery) {
-		LOG.info("set caciDiscovery manager " +caciDiscovery);
-		this.caciDiscovery = caciDiscovery;
-	}
-
-*/
 	public ICtxBroker getInternalCtxBroker() {
 		LOG.info("get internalCtxBroker manager " +internalCtxBroker);
 		return internalCtxBroker;
@@ -241,7 +250,7 @@ public class CAUIController extends BasePageController {
 	}
 
 
-	
+
 	public ICommManager getCommMngrRef() {
 		return this.commMngrRef;
 	}

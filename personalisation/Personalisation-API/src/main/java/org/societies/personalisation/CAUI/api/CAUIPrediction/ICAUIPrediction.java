@@ -27,6 +27,7 @@ package org.societies.personalisation.CAUI.api.CAUIPrediction;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.Future;
 
 import org.societies.api.context.model.CtxAttribute;
@@ -119,5 +120,18 @@ public interface ICAUIPrediction {
 	 * This methods initiates the generation of a new Context Aware Community Intent model
 	 */
 	public void generateNewCommunityModel(IIdentity cisId);
+	
+	/**
+	 * Returns a list of the last 100 string representations of performed action/predicted action pairs 
+	 * @return
+	 */	
+	public List<Entry<String, String>> getPredictionPairLog();
+	
+	
+	public Boolean isUserPredictionEnabled();
+	
+	public Boolean isCommunityPredictionEnabled();
+	
+	
 		
 }

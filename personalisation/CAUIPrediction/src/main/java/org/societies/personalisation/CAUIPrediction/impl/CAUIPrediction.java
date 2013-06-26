@@ -102,6 +102,14 @@ public class CAUIPrediction implements ICAUIPrediction{
 	// maintains the last 100 actions
 	private List<IAction> lastMonitoredActions = new ArrayList<IAction>();
 	private List<IUserIntentAction> lastPredictedActions = new ArrayList<IUserIntentAction>();
+	
+	// Coupled of String representation of performed action and respective predicted action   
+	public static java.util.List<java.util.Map.Entry<String,String>> predictionPairList= new java.util.ArrayList<java.util.Map.Entry<String,String>>();
+	
+	@Override
+	public java.util.List<java.util.Map.Entry<String, String>> getPredictionPairLog() {
+		return predictionPairList;
+	}
 
 	int predictionRequestsCounter = 0;
 	int discoveryThreshold = 6;
@@ -109,7 +117,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 
 	// caci variables
-	public static boolean enableCACIPrediction = true;
+	public boolean enableCACIPrediction = true;
 	public static boolean  caciModelExist = false;
 	//boolean caciFreshness = true;
 
@@ -158,6 +166,17 @@ public class CAUIPrediction implements ICAUIPrediction{
 	}
 
 	@Override
+	public Boolean isUserPredictionEnabled() {
+		return  this.enableCauiPrediction ;
+	}
+
+	
+	@Override
+	public Boolean isCommunityPredictionEnabled() {
+		return  this.enableCACIPrediction ;
+	}
+
+	@Override
 	public void enableCommPrediction(Boolean bool) {
 		enableCACIPrediction = bool;
 	}
@@ -181,8 +200,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		predictionRequestsCounter = predictionRequestsCounter +1;
 		this.recordMonitoredAction(action);
-
-
+		
+		
 		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
 		if(cauiDiscovery != null){
 			LOG.info("  Model Discovery Counter:" +predictionRequestsCounter);
@@ -211,7 +230,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 			// identify performed action in model
 			List<IUserIntentAction> actionsList = cauiTaskManager.retrieveActionsByTypeValue(par, val);
 			LOG.debug("3. cauiTaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
-
+			
+			
 			if(actionsList.size()>0){
 
 				// improve this to also use context for action identification
@@ -247,21 +267,23 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 
 		if(results.size()>0){
+			String predictedActString = "";
+			
 			for(IUserIntentAction predAction : results){
 				this.recordPrediction(predAction);		
+				predictedActString = predAction.toString() +"," +predictedActString; 
 			}
-
+		
+			java.util.Map.Entry<String,String> predictionPair = new java.util.AbstractMap.SimpleEntry<String,String>(action.toString(),predictedActString);
+			predictionPairList.add(predictionPair);
+			
 			long endTime = System.currentTimeMillis();
 			this.predictionPerformanceLog(endTime-startTime);
-
 		}
 
 		LOG.info("getPrediction based on action: "+ action+" identity requestor:"+requestor+" results:"+results);
 		return new AsyncResult<List<IUserIntentAction>>(results);
 	}
-
-
-
 
 
 	@Override
@@ -433,7 +455,9 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	//the list should also consider the perso feedback  
 	private void recordMonitoredAction(IAction action){
-
+		
+		
+		
 		if(this.lastMonitoredActions.size()>100){
 			this.lastMonitoredActions.remove(0);
 		}
