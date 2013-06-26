@@ -73,7 +73,6 @@
 		           		org.xmpp.component;version="0.1.0",
 		           		org.simpleframework.xml.stream,
 		           		-->
-		           		<DynamicImport-Package>*</DynamicImport-Package>
 		           		<Embed-Dependency>
 			           		*;scope=compile|runtime
 		           		</Embed-Dependency>

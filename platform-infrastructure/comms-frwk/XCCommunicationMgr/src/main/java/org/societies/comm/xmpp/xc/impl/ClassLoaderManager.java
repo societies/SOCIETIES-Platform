@@ -17,8 +17,8 @@ public class ClassLoaderManager {
 	private static Logger LOG = LoggerFactory
 			.getLogger(ClassLoaderManager.class);
 	
-	private Map<IFeatureServer,ClassLoader> fsRegistry;
-	private Map<ICommCallback,ClassLoader> callbackRegistry;
+	private Map<Class<?>,ClassLoader> fsRegistry;
+	private Map<Class<?>,ClassLoader> callbackRegistry;
 	private Map<String,ClassLoader> callbackTemporary;
 	private Bundle thisBundle;
 	private ClassLoader thisBundlesClassLoader;
@@ -27,14 +27,14 @@ public class ClassLoaderManager {
 		thisBundle = FrameworkUtil.getBundle(this.getClass());
 		//thisBundlesClassLoader = getBundleClassloader(thisBundle);
 		thisBundlesClassLoader = this.getClass().getClassLoader();
-		fsRegistry = new HashMap<IFeatureServer, ClassLoader>();
-		callbackRegistry = new HashMap<ICommCallback, ClassLoader>();
+		fsRegistry = new HashMap<Class<?>, ClassLoader>();
+		callbackRegistry = new HashMap<Class<?>, ClassLoader>();
 		callbackTemporary = new Hashtable<String, ClassLoader>(); // Hashtable because it is synchronized
 	}
 
 	public ClassLoader classLoaderMagic(ICommCallback callback) {
 		LOG.debug("getting classloader for ICommCallback "+callback.toString());
-		ClassLoader newClassloader = callbackRegistry.get(callback);
+		ClassLoader newClassloader = callbackRegistry.get(callback.getClass());
 		ClassLoader oldClassloader = Thread.currentThread().getContextClassLoader();
 		
 		if (newClassloader!=null) {
@@ -51,7 +51,7 @@ public class ClassLoaderManager {
 
 	public ClassLoader classLoaderMagic(IFeatureServer fs) {
 		LOG.debug("getting classloader for IFeatureServer "+fs.toString());
-		ClassLoader newClassloader = fsRegistry.get(fs);
+		ClassLoader newClassloader = fsRegistry.get(fs.getClass());
 		ClassLoader oldClassloader = Thread.currentThread().getContextClassLoader();
 		
 		if (newClassloader!=null) {
@@ -108,17 +108,17 @@ public class ClassLoaderManager {
 
 	public void classloaderRegistry(IFeatureServer fs) {
 		Bundle b = FrameworkUtil.getBundle(fs.getClass());
-		LOG.debug("Class "+fs.getClass().toString()+" is associated with bundle "+b.toString());
+		LOG.info("Class "+fs.getClass().toString()+" is associated with bundle "+b.toString());
 		if (b.getBundleId()!=thisBundle.getBundleId())
-			fsRegistry.put(fs, getBundleClassloader(b));
+			fsRegistry.put(fs.getClass(), getBundleClassloader(b));
 	}
 
 	
 	public void classloaderRegistry(ICommCallback messageCallback) {
 		Bundle b = FrameworkUtil.getBundle(messageCallback.getClass());
-		LOG.debug("Class "+messageCallback.getClass().toString()+" is associated with bundle "+b.toString());
+		LOG.info("Class "+messageCallback.getClass().toString()+" is associated with bundle "+b.toString());
 		if (b.getBundleId()!=thisBundle.getBundleId())
-			callbackRegistry.put(messageCallback, getBundleClassloader(b));
+			callbackRegistry.put(messageCallback.getClass(), getBundleClassloader(b));
 	}
 	
 	private ClassLoader getBundleClassloader(Bundle b) {
