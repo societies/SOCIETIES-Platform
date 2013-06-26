@@ -84,6 +84,7 @@
 	<bean name="ServiceControlPerformanceTest" class="org.societies.integration.performance.test.upper_tester.slm.ServiceControlPerformanceTest">
   		<property name="commManager" ref="commManager"/>
   		<property name="serviceControl" ref="serviceControl"/>
+  		<property name="serviceDiscovery" ref="serviceDiscovery"/>
   	</bean>
   	
   	<!-- Olivier's Declarations end -->

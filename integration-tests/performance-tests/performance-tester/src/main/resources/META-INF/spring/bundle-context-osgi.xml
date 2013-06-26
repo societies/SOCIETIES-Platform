@@ -25,6 +25,8 @@
       
       <osgi:reference id="serviceControl" interface="org.societies.api.internal.servicelifecycle.IServiceControl" />
       
+      <osgi:reference id="serviceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery" />
+      
 
 
 

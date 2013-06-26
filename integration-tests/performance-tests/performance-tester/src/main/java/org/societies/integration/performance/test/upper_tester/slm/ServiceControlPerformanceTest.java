@@ -30,6 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ResultMessage;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 import org.societies.api.services.ServiceUtils;
@@ -39,6 +42,7 @@ import org.societies.integration.performance.test.lower_tester.PerformanceTestRe
 import org.societies.integration.performance.test.upper_tester.slm.model.Install3pServiceParameters;
 import org.societies.integration.performance.test.upper_tester.slm.model.InstallShared3pServiceParameters;
 import org.societies.integration.performance.test.upper_tester.slm.model.Share3pServiceParameters;
+import org.societies.integration.performance.test.upper_tester.slm.model.Uninstall3pServiceParameters;
 
 /**
  * @author Olivier Maridat (Trialog)
@@ -48,13 +52,13 @@ public class ServiceControlPerformanceTest implements IServiceControlPerformance
 
 	private ICommManager commManager;
 	private IServiceControl serviceControl;
+	private IServiceDiscovery serviceDiscovery;
 
 
 	@Override
 	public void testInstall3pService(PerformanceTestMgmtInfo performanceTestMgmtInfo, Install3pServiceParameters parameters) {
 		// -- Init
-		PerformanceLowerTester performanceLowerTester = new PerformanceLowerTester(performanceTestMgmtInfo);
-		performanceLowerTester.testStart(this.getClass().getName(), commManager);
+		PerformanceLowerTester performanceLowerTester = initResult(performanceTestMgmtInfo);
 		PerformanceTestResult performanceTestResult = null;
 
 		// -- Verify
@@ -66,19 +70,18 @@ public class ServiceControlPerformanceTest implements IServiceControlPerformance
 		}
 
 		// -- Parameters
+		if (null == parameters.getServicePath() || "".equals(parameters.getCssOwnerId())) {
+			parameters.setCssOwnerId(commManager.getIdManager().getThisNetworkNode().getJid());	
+		}
 		URL serviceBundleUrl = this.getClass().getClassLoader().getResource(parameters.getServicePath());
 
 		// -- Launch the test
 		try {
 			ServiceControlResult result = serviceControl.installService(serviceBundleUrl, parameters.getCssOwnerId()).get();
-			boolean success = (null != result && ResultMessage.SUCCESS.equals(result.getMessage()));
-			String resultMsg = "Result: "+(success ? ServiceUtils.serviceResourceIdentifierToString(result.getServiceId())+" is installed" : "service can't be installed+")+"! ("+(null != result ? result.getMessage() : "result is empty")+")";
-			LOG.info(resultMsg);
-			performanceTestResult = new PerformanceTestResult(this.getClass().getName(), resultMsg, success ? PerformanceTestResult.SUCCESS_STATUS : PerformanceTestResult.FAILED_STATUS);
+			performanceTestResult = generateResult(result, "", "installed");
 		}
 		catch (Exception e) {
-			LOG.error("["+e.getMessage()+"] Ouch, can't install this 3p service.", e);
-			performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "Ouch, can't install this 3p service \""+serviceBundleUrl.toString()+"\"", PerformanceTestResult.ERROR_STATUS);
+			performanceTestResult = generateErrorResult(e, serviceBundleUrl.toString(), "install");
 		}
 
 		// -- Send result
@@ -87,20 +90,172 @@ public class ServiceControlPerformanceTest implements IServiceControlPerformance
 
 	@Override
 	public void testShare3pService(PerformanceTestMgmtInfo performanceTestMgmtInfo, Share3pServiceParameters parameters) {
+		// -- Init
+		PerformanceLowerTester performanceLowerTester = initResult(performanceTestMgmtInfo);
+		PerformanceTestResult performanceTestResult = null;
 
+		// -- Verify
+		if (null == parameters) {
+			performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "Share3pServiceParameters are null!", PerformanceTestResult.ERROR_STATUS);
+		}
+		if (null == parameters.getServiceId() || "".equals(parameters.getServiceId())) {
+			performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "Share3pServiceParameters::serviceId is empty!", PerformanceTestResult.ERROR_STATUS);
+		}
+
+		// -- Parameters
+		ServiceResourceIdentifier serviceResourceId = ServiceUtils.generateServiceResourceIdentifierFromString(parameters.getServiceId());
+		if (null == serviceResourceId) {
+			performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "Can't retrieve a ServiceResourceIdentifier from this 3p service id: \""+parameters.getServiceId()+"\"", PerformanceTestResult.ERROR_STATUS);
+		}
+		
+		// -- Launch the test
+		try {
+			Service service = serviceDiscovery.getService(serviceResourceId).get();
+			if (null == service) {
+				performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "Can't find this 3p service: \""+parameters.getServiceId()+"\"", PerformanceTestResult.ERROR_STATUS);
+			}
+			ServiceControlResult result = serviceControl.shareService(service, parameters.getCisId()).get();
+			performanceTestResult = generateResult(result, "", "shared");
+		}
+		catch (Exception e) {
+			performanceTestResult = generateErrorResult(e, parameters.getServiceId(), "share");
+		}
+
+		// -- Send result
+		performanceLowerTester.testFinish(performanceTestResult);
+	}
+
+	@Override
+	public void testUnshare3pService(PerformanceTestMgmtInfo performanceTestMgmtInfo, Share3pServiceParameters parameters) {
+		// -- Init
+		PerformanceLowerTester performanceLowerTester = initResult(performanceTestMgmtInfo);
+		PerformanceTestResult performanceTestResult = null;
+
+		// -- Verify
+		if (null == parameters) {
+			performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "Share3pServiceParameters are null!", PerformanceTestResult.ERROR_STATUS);
+		}
+		if (null == parameters.getServiceId() || "".equals(parameters.getServiceId())) {
+			performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "Share3pServiceParameters::serviceId is empty!", PerformanceTestResult.ERROR_STATUS);
+		}
+
+		// -- Parameters
+		ServiceResourceIdentifier serviceResourceId = ServiceUtils.generateServiceResourceIdentifierFromString(parameters.getServiceId());
+
+		// -- Launch the test
+		try {
+			Service service = serviceDiscovery.getService(serviceResourceId).get();
+			ServiceControlResult result = serviceControl.unshareService(service, parameters.getCisId()).get();
+			performanceTestResult = generateResult(result, "", "unshared");
+		}
+		catch (Exception e) {
+			performanceTestResult = generateErrorResult(e, parameters.getServiceId(), "unshare");
+		}
+
+		// -- Send result
+		performanceLowerTester.testFinish(performanceTestResult);
 	}
 
 	@Override
 	public void testInstallShared3pService(PerformanceTestMgmtInfo performanceTestMgmtInfo, InstallShared3pServiceParameters parameters) {
+		// -- Init
+		PerformanceLowerTester performanceLowerTester = initResult(performanceTestMgmtInfo);
+		PerformanceTestResult performanceTestResult = null;
 
+		// -- Verify
+		if (null == parameters) {
+			performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "Share3pServiceParameters are null!", PerformanceTestResult.ERROR_STATUS);
+		}
+		if (null == parameters.getServiceId() || "".equals(parameters.getServiceId())) {
+			performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "Share3pServiceParameters::serviceId is empty!", PerformanceTestResult.ERROR_STATUS);
+		}
+
+		// -- Parameters
+		ServiceResourceIdentifier serviceResourceId = ServiceUtils.generateServiceResourceIdentifierFromString(parameters.getServiceId());
+		if (null == serviceResourceId) {
+			performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "Can't retrieve a ServiceResourceIdentifier from this 3p service id: \""+parameters.getServiceId()+"\"", PerformanceTestResult.ERROR_STATUS);
+		}
+
+		// -- Launch the test
+		try {
+			Service service = serviceDiscovery.getService(serviceResourceId).get();
+			if (null == service) {
+				performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "Can't find this 3p service: \""+parameters.getServiceId()+"\"", PerformanceTestResult.ERROR_STATUS);
+			}
+			ServiceControlResult result = serviceControl.installService(service, commManager.getIdManager().getThisNetworkNode().getJid()).get();
+			performanceTestResult = generateResult(result, "", "installed (shared)");
+		}
+		catch (Exception e) {
+			performanceTestResult = generateErrorResult(e, parameters.getServiceId(), "install (shared)");
+		}
+
+		// -- Send result
+		performanceLowerTester.testFinish(performanceTestResult);
 	}
-	
-	
+
+	@Override
+	public void testUninstall3pService(PerformanceTestMgmtInfo performanceTestMgmtInfo, Uninstall3pServiceParameters parameters) {
+		// -- Init
+		PerformanceLowerTester performanceLowerTester = initResult(performanceTestMgmtInfo);
+		PerformanceTestResult performanceTestResult = null;
+
+		// -- Verify
+		if (null == parameters) {
+			performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "Uninstall3pServiceParameters are null!", PerformanceTestResult.ERROR_STATUS);
+		}
+		if (null == parameters.getServiceId() || "".equals(parameters.getServiceId())) {
+			performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "Uninstall3pServiceParameters::serviceId is empty!", PerformanceTestResult.ERROR_STATUS);
+		}
+
+		// -- Parameters
+		ServiceResourceIdentifier serviceResourceId = ServiceUtils.generateServiceResourceIdentifierFromString(parameters.getServiceId());
+
+		// -- Launch the test
+		try {
+			ServiceControlResult result = serviceControl.uninstallService(serviceResourceId).get();
+			performanceTestResult = generateResult(result, "", "uninstalled");
+		}
+		catch (Exception e) {
+			performanceTestResult = generateErrorResult(e, parameters.getServiceId(), "uninstall");
+		}
+
+		// -- Send result
+		performanceLowerTester.testFinish(performanceTestResult);
+	}
+
+	// --- Private Methods
+	private PerformanceLowerTester initResult(PerformanceTestMgmtInfo performanceTestMgmtInfo) {
+		PerformanceLowerTester performanceLowerTester = new PerformanceLowerTester(performanceTestMgmtInfo);
+		performanceLowerTester.testStart(this.getClass().getName(), commManager);
+		return performanceLowerTester;
+	}
+
+	private PerformanceTestResult generateResult(ServiceControlResult result, String data, String action) {
+		boolean success = (null != result && ResultMessage.SUCCESS.equals(result.getMessage()));
+		if (null != result && null != result.getServiceId() && !"".equals(result.getServiceId())) {
+			data = ServiceUtils.serviceResourceIdentifierToString(result.getServiceId())+" "+data;
+		}
+		String resultMsg = "Result: "+(success ? data+" is "+action : "service can't be "+action)+"! ("+(null != result ? result.getMessage() : "result is empty")+")";
+		LOG.info(resultMsg);
+		return new PerformanceTestResult(this.getClass().getName(), resultMsg, success ? PerformanceTestResult.SUCCESS_STATUS : PerformanceTestResult.FAILED_STATUS);
+	}
+
+	private PerformanceTestResult generateErrorResult(Exception e, String data, String action) {
+		String resultMsg = "["+e+"] Ouch, can't "+action+" this 3p service  \""+data+"\".";
+		LOG.error(resultMsg, e);
+		return new PerformanceTestResult(this.getClass().getName(), resultMsg, PerformanceTestResult.ERROR_STATUS);
+	}
+
+
+	// --- Dependency Injection
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
 	}
 	public void setServiceControl(IServiceControl serviceControl) {
 		this.serviceControl = serviceControl;
+	}
+	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
+		this.serviceDiscovery = serviceDiscovery;
 	}
 }
 

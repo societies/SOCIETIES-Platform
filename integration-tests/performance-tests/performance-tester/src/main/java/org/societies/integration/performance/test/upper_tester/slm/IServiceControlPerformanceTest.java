@@ -28,6 +28,7 @@ import org.societies.integration.performance.test.lower_tester.PerformanceTestMg
 import org.societies.integration.performance.test.upper_tester.slm.model.Install3pServiceParameters;
 import org.societies.integration.performance.test.upper_tester.slm.model.InstallShared3pServiceParameters;
 import org.societies.integration.performance.test.upper_tester.slm.model.Share3pServiceParameters;
+import org.societies.integration.performance.test.upper_tester.slm.model.Uninstall3pServiceParameters;
 
 /**
  * @author Olivier Maridat (Trialog
@@ -41,7 +42,7 @@ public interface IServiceControlPerformanceTest {
 	 * @param parameters an object containing parameters needed for this test  
 	 */
 	public void testInstall3pService(PerformanceTestMgmtInfo performanceTestMgmtInfo, Install3pServiceParameters parameters);
-
+	
 	/**
 	 * To test the sharing of a third party service through a CIS
 	 * @pre a CIS should has been created
@@ -52,6 +53,15 @@ public interface IServiceControlPerformanceTest {
 	public void testShare3pService(PerformanceTestMgmtInfo performanceTestMgmtInfo, Share3pServiceParameters parameters);
 
 	/**
+	 * To test the unsharing of a third party service through a CIS
+	 * @pre a CIS should has been created
+	 * @pre the CSS has to be a member of this CIS
+	 * @param performanceTestInfo MUST be in all performance test, this object groups some information sent by the Engine
+	 * @param parameters an object containing parameters needed for this test  
+	 */
+	public void testUnshare3pService(PerformanceTestMgmtInfo performanceTestMgmtInfo, Share3pServiceParameters parameters);
+
+	/**
 	 * To test the installation of third party service shared through a CIS
 	 * @pre a CIS should has been created
 	 * @pre The service to install has to be shared through this CIS
@@ -60,5 +70,13 @@ public interface IServiceControlPerformanceTest {
 	 * @param parameters an object containing parameters needed for this test  
 	 */
 	public void testInstallShared3pService(PerformanceTestMgmtInfo performanceTestMgmtInfo, InstallShared3pServiceParameters parameters);
+	
+	/**
+	 * To test the uninstallation of a third party service in a CSS
+	 * @pre a 3P service archive (jar, war or apk) has to be installed in the given CSS container.
+	 * @param performanceTestInfo MUST be in all performance test, this object groups some information sent by the Engine
+	 * @param parameters an object containing parameters needed for this test  
+	 */
+	public void testUninstall3pService(PerformanceTestMgmtInfo performanceTestMgmtInfo, Uninstall3pServiceParameters parameters);
 }
 

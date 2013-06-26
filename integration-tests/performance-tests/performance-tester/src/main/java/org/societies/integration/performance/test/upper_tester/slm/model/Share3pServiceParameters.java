@@ -29,5 +29,30 @@ package org.societies.integration.performance.test.upper_tester.slm.model;
  *
  */
 public class Share3pServiceParameters {
+	private String cisId;
+	private String serviceId;
+	
+	
+	public Share3pServiceParameters() {
+	}
+	public Share3pServiceParameters(String cisId, String serviceId) {
+		super();
+		this.cisId = cisId;
+		this.serviceId = serviceId;
+	}
 
+
+	public String getCisId() {
+		return cisId;
+	}
+	public void setCisId(String cisId) {
+		this.cisId = cisId;
+	}
+	
+	public String getServiceId() {
+		return serviceId;
+	}
+	public void setServiceId(String serviceId) {
+		this.serviceId = serviceId;
+	}
 }

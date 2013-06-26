@@ -26,32 +26,24 @@ package org.societies.integration.performance.test.upper_tester.slm.model;
 
 /**
  * @author Olivier Maridat (Trialog)
+ *
  */
-public class Install3pServiceParameters {
-	private String cssOwnerId;
-	private String servicePath;
+public class Uninstall3pServiceParameters {
+	private String serviceId;
 	
 	
-	public Install3pServiceParameters() {
+	public Uninstall3pServiceParameters() {
 	}
-	public Install3pServiceParameters(String cssOwnerId, String servicePath) {
+	public Uninstall3pServiceParameters(String servicePath) {
 		super();
-		this.cssOwnerId = cssOwnerId;
-		this.servicePath = servicePath;
+		this.serviceId = servicePath;
 	}
+
 	
-	
-	public String getCssOwnerId() {
-		return cssOwnerId;
+	public String getServiceId() {
+		return serviceId;
 	}
-	public void setCssOwnerId(String cssOwnerId) {
-		this.cssOwnerId = cssOwnerId;
-	}
-	
-	public String getServicePath() {
-		return servicePath;
-	}
-	public void setServicePath(String servicePath) {
-		this.servicePath = servicePath;
+	public void setServiceId(String serviceId) {
+		this.serviceId = serviceId;
 	}
 }

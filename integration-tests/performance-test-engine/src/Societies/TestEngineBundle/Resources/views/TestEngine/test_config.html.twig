@@ -26,6 +26,7 @@ Test Parameters
 </h4>
 
 	<form method="post" action="send-test">	
+		<input value="next" type="submit" class="btn btn-primary" />
 		{% for item in performanceTestParameters %}	 	
 	 		
 	 		<label class="required" for="{{ item.id }}" >{{ item.parameterName }}</label>

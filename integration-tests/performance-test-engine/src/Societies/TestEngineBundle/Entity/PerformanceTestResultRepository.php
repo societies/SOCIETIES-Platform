@@ -18,7 +18,8 @@ class PerformanceTestResultRepository extends EntityRepository
 		$qb = $this->createQueryBuilder('result');
 		
 		$qb->setFirstResult($index)
-			->setMaxResults($limit);
+			->setMaxResults($limit)
+			->orderBy('result.id', 'DESC');
 		
 		return $qb->getQuery()
 					->getResult();
