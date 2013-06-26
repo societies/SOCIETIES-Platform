@@ -411,13 +411,6 @@ public class CommManagerHelper {
         String packageStr = getPackage(namespace);
         String beanName = name.substring(0, 1).toUpperCase() + name.substring(1);
 
-        // TODO issue rasing
-        try {
-            clm.currentNewClassloader.loadClass(packageStr + "." + beanName);
-        } catch (ClassNotFoundException e) {
-            LOG.warn("### ClassLoader '" + clm.currentNewClassloader.toString() + "' could not load Class '" + packageStr + "." + beanName + "' ###", e);
-        }
-
         return Thread.currentThread().getContextClassLoader().loadClass(packageStr + "." + beanName);
     }
 
