@@ -732,14 +732,14 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 
 	}
 
-	public CtxAttribute predictCommunityNextGPSLocation(CtxAttributeIdentifier communityAttrId) throws InvalidFormatException, InterruptedException, ExecutionException, CtxException {
+	public CtxAttribute predictCommunityNextLocationCoordinates(CtxAttributeIdentifier communityAttrId) throws InvalidFormatException, InterruptedException, ExecutionException, CtxException {
 		//retrieve previous location from historyofContext db
 
 		CtxHistoryAttribute freshAttribute =null;
 		CtxAttribute returnAttribute = null;
 
-		Double x1 = null;
-		Double y1 = null;
+		Double xp = null;
+		Double yp = null;
 		Double xc = null;
 		Double yc = null;
 
@@ -759,15 +759,15 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 					freshAttribute = ctxHA;
 				}	
 			}			
-			//retrieve the position of more fresh position
+			//retrieve latest position
 			String coordinatesString = freshAttribute.getStringValue();
 			List<String> listCoordinates = Arrays.asList(coordinatesString);
 			
-			 x1 = (Double.parseDouble(listCoordinates.get(0)));
-			 y1 = (Double.parseDouble(listCoordinates.get(1)));
+			 xp = (Double.parseDouble(listCoordinates.get(0)));
+			 yp = (Double.parseDouble(listCoordinates.get(1)));
 		}
 		
-		//retrieve current GPS location of the Community
+		//retrieve current coordinates of the Community
 		CommunityCtxEntity currentCommunity = (CommunityCtxEntity) internalCtxBroker.retrieve(communityAttrId).get();
 		Set<CtxAttribute> currentGPSLocation = currentCommunity.getAttributes(CtxAttributeTypes.LOCATION_COORDINATES);
 
@@ -775,12 +775,12 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 			for (CtxAttribute ctxAtt: currentGPSLocation){
 				List<String> listCurrentPointsCoordinates = Arrays.asList(ctxAtt.getStringValue());
 				xc = (Double.parseDouble(listCurrentPointsCoordinates.get(0)));
-				yc = (Double.parseDouble(listCurrentPointsCoordinates.get(0)));	
+				yc = (Double.parseDouble(listCurrentPointsCoordinates.get(1)));	
 			} 
 		}
 		//calculate the next position using vectors
-		Double	xf = (xc + (xc-x1));
-		Double	yf = (yc + (yc-y1));
+		Double	xf = (xc + (xc-xp));
+		Double	yf = (yc + (yc-yp));
 		
 		String stringToUpdate = xf.toString()+yf.toString();
 		
