@@ -48,6 +48,7 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -285,27 +286,8 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 	public Future<List<CtxHistoryAttribute>> retrieveHistory(
 			final Requestor requestor, CtxAttributeIdentifier attrId,
 			Date startDate, Date endDate) throws CtxException {
-
-		Future<List<CtxHistoryAttribute>> hocObj = null;
-		IIdentity targetCss;
-		try {
-			targetCss = this.idMgr.fromJid(attrId.getOwnerId());
-		} catch (InvalidFormatException ife) {
-			throw new CtxBrokerException("Could not create IIdentity from JID '"
-					+ attrId.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
-		}
-
-		this.logRequest(requestor, targetCss);
-
-		if (idMgr.isMine(targetCss)) {
-
-			hocObj = internalCtxBroker.retrieveHistory(attrId, startDate, endDate);
-		} else {
-
-			LOG.info("remote call is not supported for ctx history data");
-		}
-
-		return hocObj;
+		
+		return internalCtxBroker.retrieveHistory(requestor, attrId, startDate, endDate);
 	}
 
 
@@ -587,9 +569,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
     public CtxEvaluationResults evaluateSimilarity(String[] ids,ArrayList<String> attrib) throws CtxException {
         
         CtxEvaluationResults result = internalCtxBroker.evaluateSimilarity(ids, attrib);
-        LOG.info("EBOYLANLOGFOOTPRINT CtxBroker.evaluateSimilarity() called");
+        LOG.debug("EBOYLANLOGFOOTPRINT CtxBroker.evaluateSimilarity() called");
         return result;
-    }
-
-
+    }	
 }

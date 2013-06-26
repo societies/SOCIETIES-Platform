@@ -11,23 +11,85 @@
 
     <ui:define name="body">
 
+        <p:dialog id="trustDialog" header="Trust Level Detail" widgetVar="trustDialogWidget" resizable="false">
+            <p:panelGrid id="trustDetail">
+                <f:facet name="header">
+                    <p:row>
+                        <p:column colspan="2">
+                            <h:outputText value="#{trustController.selectedEntity.trusteeId.entityId}" />
+                        </p:column>
+                    </p:row>
+                </f:facet>
+                <p:row>  
+                    <p:column colspan="2">  
+                        <p:spacer height="0"/>  
+                    </p:column>  
+                </p:row>
+                <p:row>
+                    <p:column style="font-weight: bold;">
+                        <h:outputText value="Overall Trust Level:" /> 
+                    </p:column>
+                    <p:column style="font-weight: bold;">
+                        <h:outputText value="#{trustController.selectedEntity.userPerceivedTrust.value != null ? trustController.selectedEntity.userPerceivedTrust.value : '-'}" />
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <h:outputText value="Direct Trust Level:" />  
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{trustController.selectedEntity.directTrust.value != null ? trustController.selectedEntity.directTrust.value : '-'}" />
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <h:outputText value="Indirect Trust Level:" />  
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{trustController.selectedEntity.indirectTrust.value != null ? trustController.selectedEntity.indirectTrust.value : '-'}" />
+                    </p:column>
+                </p:row>
+                <p:row>  
+                    <p:column colspan="2">  
+                        <p:spacer height="0"/>  
+                    </p:column>  
+                </p:row>
+                <p:row>
+                    <p:column style="font-weight: bold;">
+                        <h:outputText value="Your rating:" />  
+                    </p:column>
+                    <p:column>
+                        <p:rating value="#{trustController.selectedEntity.rating}" cancel="false">
+                            <p:ajax event="rate" listener="#{trustController.onRating}" update=":mainForm:tabView"/>
+                            <f:attribute name="ratedEntityId" value="#{trustController.selectedEntity.trusteeId}" />
+                        </p:rating>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
+        </p:dialog>
+
         <p:panel>
             <f:facet name="header">
                 My Trust Relationships
             </f:facet>
-            <h:form id="form">
-            <p:tabView id="tabView" dynamic="true" activeIndex="0">
+
+                <p:tabView id="tabView" dynamic="true" activeIndex="0">
   
-                <p:tab title="Users">
-                    <p:dataTable id="userTable" var="user"
+                    <p:tab title="Users">
+                        <p:dataTable id="userTable" var="user"
                                  value="#{trustController.users}" 
                                  emptyMessage="No trusted users found"
+                                 rowKey="#{user.trusteeId.entityId}"  
+                                 selection="#{trustController.selectedEntity}" 
+                                 selectionMode="single"
                                  paginator="true" rows="15"
                                  paginatorAlwaysVisible="false"
                                  filteredValue="#{trustController.filteredUsers}"
                                  filterDelay="500"
                                  sortBy="#{user.userPerceivedTrust.value}"
                                  sortOrder="descending">
+
+                        <p:ajax event="rowSelect" update=":mainForm:trustDetail" oncomplete="trustDialogWidget.show()" />
 
                         <p:column headerText="ID" sortBy="#{user.trusteeId.entityId}"
                                   filterBy="#{user.trusteeId.entityId}"
@@ -36,18 +98,7 @@
                         </p:column>
 
                         <p:column headerText="Trust Level" sortBy="#{user.userPerceivedTrust.value}">
-                            <h:outputLabel id="userValue" value="#{user.userPerceivedTrust.value}" />
-                            <p:overlayPanel id="userTrustDetails" for="userValue" showEvent="mouseover" hideEvent="mouseout" at="right">
-                                <p:panelGrid columns="2">  
-                                     <f:facet name="header">Trust Level Details</f:facet>  
-
-                                     <h:outputLabel value="Direct Trust Level" />  
-                                     <h:outputLabel value="#{user.directTrust.value}" />
-
-                                     <h:outputLabel value="Indirect Trust Level" />  
-                                     <h:outputLabel value="#{user.indirectTrust.value}" />
-                                 </p:panelGrid>  
-                             </p:overlayPanel>
+                            <h:outputText value="#{user.userPerceivedTrust.value}" />
                         </p:column>
 
                         <p:column headerText="Last Updated" sortBy="#{user.userPerceivedTrust.lastUpdated}">
@@ -55,11 +106,7 @@
                         </p:column>
 
                         <p:column headerText="Your Rating" sortBy="#{user.rating}">
-                            <p:rating value="#{user.rating}" >
-                                <p:ajax event="rate" listener="#{trustController.onRating}" update="userTable" />
-                                <p:ajax event="cancel" listener="#{trustController.onCancelledRating}" update="userTable" />
-                                <f:attribute name="ratedEntityId" value="#{user.trusteeId}" />
-                            </p:rating>
+                            <p:rating value="#{user.rating}" readonly="true" />
                         </p:column>
 
                     </p:dataTable>
@@ -69,12 +116,17 @@
                     <p:dataTable id="communityTable" var="community"
                                  value="#{trustController.communities}" 
                                  emptyMessage="No trusted communities found"
+                                 rowKey="#{community.trusteeId.entityId}"  
+                                 selection="#{trustController.selectedEntity}" 
+                                 selectionMode="single"
                                  paginator="true" rows="15"
                                  paginatorAlwaysVisible="false"
                                  filteredValue="#{trustController.filteredCommunities}"
                                  filterDelay="500"
                                  sortBy="#{community.userPerceivedTrust.value}"
                                  sortOrder="descending">
+
+                        <p:ajax event="rowSelect" update=":mainForm:trustDetail" oncomplete="trustDialogWidget.show()" />
 
                         <p:column headerText="ID" sortBy="#{community.trusteeId.entityId}"
                                   filterBy="#{community.trusteeId.entityId}"
@@ -83,18 +135,7 @@
                         </p:column>
 
                         <p:column headerText="Trust Level" sortBy="#{community.userPerceivedTrust.value}">
-                            <h:outputLabel id="communityValue" value="#{community.userPerceivedTrust.value}" />
-                            <p:overlayPanel id="communityTrustDetails" for="communityValue" showEvent="mouseover" hideEvent="mouseout" at="right">
-                                <p:panelGrid columns="2">  
-                                     <f:facet name="header">Trust Level Details</f:facet>  
-
-                                     <h:outputLabel value="Direct Trust Level" />
-                                     <h:outputLabel value="#{community.directTrust.value}" />
-
-                                     <h:outputLabel value="Indirect Trust Level" />
-                                     <h:outputLabel value="#{community.indirectTrust.value}" />
-                                 </p:panelGrid>  
-                             </p:overlayPanel>
+                            <h:outputText value="#{community.userPerceivedTrust.value}" />
                         </p:column>
 
                         <p:column headerText="Last Updated" sortBy="#{community.userPerceivedTrust.lastUpdated}">
@@ -102,11 +143,7 @@
                         </p:column>
 
                         <p:column headerText="Your Rating" sortBy="#{community.rating}">
-                            <p:rating value="#{community.rating}" >
-                                <p:ajax event="rate" listener="#{trustController.onRating}" update="communityTable" />
-                                <p:ajax event="cancel" listener="#{trustController.onCancelledRating}" update="communityTable" />
-                                <f:attribute name="ratedEntityId" value="#{community.trusteeId}" />
-                            </p:rating>
+                            <p:rating value="#{community.rating}" readonly="true" />
                         </p:column>
 
                     </p:dataTable>
@@ -116,12 +153,17 @@
                     <p:dataTable id="serviceTable" var="service"
                                  value="#{trustController.services}" 
                                  emptyMessage="No trusted services found"
+                                 rowKey="#{service.trusteeId.entityId}"  
+                                 selection="#{trustController.selectedEntity}" 
+                                 selectionMode="single"
                                  paginator="true" rows="15"
                                  paginatorAlwaysVisible="false"
                                  filteredValue="#{trustController.filteredServices}"
                                  filterDelay="500"
                                  sortBy="#{service.userPerceivedTrust.value}"
                                  sortOrder="descending">
+
+                        <p:ajax event="rowSelect" update=":mainForm:trustDetail" oncomplete="trustDialogWidget.show()" />
 
                         <p:column headerText="ID" sortBy="#{service.trusteeId.entityId}"
                                   filterBy="#{service.trusteeId.entityId}"
@@ -130,18 +172,7 @@
                         </p:column>
 
                         <p:column headerText="Trust Level" sortBy="#{service.userPerceivedTrust.value}">
-                            <h:outputLabel id="serviceValue" value="#{service.userPerceivedTrust.value}" />
-                            <p:overlayPanel id="serviceTrustDetails" for="serviceValue" showEvent="mouseover" hideEvent="mouseout" at="right">
-                                <p:panelGrid columns="2">  
-                                     <f:facet name="header">Trust Level Details</f:facet>  
-
-                                     <h:outputLabel value="Direct Trust Level" />
-                                     <h:outputLabel value="#{service.directTrust.value}" />
-
-                                     <h:outputLabel value="Indirect Trust Level" />
-                                     <h:outputLabel value="#{service.indirectTrust.value}" />
-                                 </p:panelGrid>  
-                             </p:overlayPanel>
+                            <h:outputText value="#{service.userPerceivedTrust.value}" />
                         </p:column>
 
                         <p:column headerText="Last Updated" sortBy="#{service.userPerceivedTrust.lastUpdated}">
@@ -149,18 +180,14 @@
                         </p:column>
 
                         <p:column headerText="Your Rating" sortBy="#{service.rating}">
-                            <p:rating value="#{service.rating}" >
-                                <p:ajax event="rate" listener="#{trustController.onRating}" update="serviceTable" />
-                                <p:ajax event="cancel" listener="#{trustController.onCancelledRating}" update="serviceTable" />
-                                <f:attribute name="ratedEntityId" value="#{service.trusteeId}" />
-                            </p:rating>
+                            <p:rating value="#{service.rating}" readonly="true" />
                         </p:column>
 
                     </p:dataTable>
                 </p:tab>
 
             </p:tabView>
-            </h:form>
+
         </p:panel>
 
     </ui:define>

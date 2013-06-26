@@ -36,8 +36,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.RequestScoped;
-import javax.faces.event.AjaxBehaviorEvent;
+import javax.faces.bean.ViewScoped;
 
 import org.primefaces.event.RateEvent;
 import org.slf4j.Logger;
@@ -57,15 +56,12 @@ import org.societies.webapp.models.TrustedEntity;
 import org.societies.webapp.service.UserService;
 
 @ManagedBean(name = "trustController")
-@RequestScoped
+@ViewScoped
 public class TrustController extends BasePageController {
 
 	private static final long serialVersionUID = -1250855340010366453L;
 
 	private static Logger LOG = LoggerFactory.getLogger(TrustController.class);
-	
-	/* N.B. This should match the f:attribute name of the rating component! */
-	private static final String RATING_F_ATTR_NAME = "ratedEntityId";
 
 	@ManagedProperty(value = "#{trustBroker}")
 	private ITrustBroker trustBroker;
@@ -84,6 +80,8 @@ public class TrustController extends BasePageController {
 	
 	private List<TrustedEntity> services = new ArrayList<TrustedEntity>();
 	private List<TrustedEntity> filteredServices = new ArrayList<TrustedEntity>();
+	
+	private TrustedEntity selectedEntity;
 	
 	public TrustController() {
 		// controller constructor - called every time this page is requested!
@@ -188,14 +186,29 @@ public class TrustController extends BasePageController {
         this.filteredServices = filteredServices;  
     }
     
+    public TrustedEntity getSelectedEntity() {
+    	
+    	if (LOG.isDebugEnabled())
+    		LOG.debug("getSelectedEntity=" + this.selectedEntity);
+    	return this.selectedEntity;
+    }
+    
+    public void setSelectedEntity(TrustedEntity selectedEntity) {
+    	
+    	if (LOG.isDebugEnabled())
+    		LOG.debug("setSelectedEntity=" + selectedEntity);
+    	this.selectedEntity = selectedEntity;
+    }
+    
     public void onRating(RateEvent rateEvent) {  
         
     	if (LOG.isDebugEnabled())
     		LOG.debug("onRating event " + rateEvent);
     	
     	try {
-    		final TrustedEntityId ratedTeid = (TrustedEntityId) 
-    				rateEvent.getComponent().getAttributes().get(RATING_F_ATTR_NAME);
+    		if (this.selectedEntity == null)
+    			throw new IllegalStateException("No trusted entity selected!");
+    		final TrustedEntityId ratedTeid = this.selectedEntity.getTrusteeId();
     		final Double rating = 0.2d * new Double((Integer) rateEvent.getRating());
     		this.updateTrustRating(ratedTeid, rating);
     		
@@ -204,24 +217,6 @@ public class TrustController extends BasePageController {
     		super.addGlobalMessage("A surprising new problem has occurred!", 
     				e.getLocalizedMessage(), FacesMessage.SEVERITY_ERROR);
     		return;
-    	}
-    }  
-      
-    public void onCancelledRating(AjaxBehaviorEvent rateEvent) {  
-        
-    	if (LOG.isDebugEnabled())
-    		LOG.debug("onCancelledRating event " + rateEvent);
-    	
-    	try {
-    		final TrustedEntityId ratedTeid = (TrustedEntityId) 
-    				rateEvent.getComponent().getAttributes().get(RATING_F_ATTR_NAME);
-    		final Double rating = new Double(0);
-    		this.updateTrustRating(ratedTeid, rating);
-    		
-    	} catch (Exception e) {
-
-    		super.addGlobalMessage("A surprising new problem has occurred!", 
-					e.getLocalizedMessage(), FacesMessage.SEVERITY_ERROR);
     	}
     }
 	
@@ -240,6 +235,9 @@ public class TrustController extends BasePageController {
 				final Map<TrustedEntityId, TrustedEntity> trustedEntities = 
 						new HashMap<TrustedEntityId, TrustedEntity>();
 				for (final ExtTrustRelationship tr : dbResult) {
+					// Omit *my* CSS from the list of trusted entities!
+					if (myTeid.equals(tr.getTrusteeId()))
+						continue;
 					TrustedEntity trustedEntity = trustedEntities.get(tr.getTrusteeId()); 
 					if (trustedEntity == null)
 						trustedEntity = new TrustedEntity(myTeid, tr.getTrusteeId());
@@ -287,15 +285,17 @@ public class TrustController extends BasePageController {
 						TrustedEntityType.CSS, this.userService.getUserID());
     			final CountDownLatch cdLatch = new CountDownLatch(1);
     			final TrustUpdateListener listener = new TrustUpdateListener(cdLatch);
-    			this.trustBroker.registerTrustUpdateListener(listener, new TrustQuery(myTeid)
-    					.setTrusteeId(ratedTeid).setTrustValueType(TrustValueType.USER_PERCEIVED));
+    			this.trustBroker.registerTrustUpdateListener(listener, 
+    					new TrustQuery(myTeid).setTrusteeId(ratedTeid)
+    							.setTrustValueType(TrustValueType.USER_PERCEIVED));
     			if (LOG.isDebugEnabled())
     				LOG.debug("Adding trust evidence: '" + myTeid + "' rated '" + ratedTeid + "' with " + rating);
     			this.trustEvidenceCollector.addDirectEvidence(myTeid, ratedTeid,
     					TrustEvidenceType.RATED, new Date(), rating);
     			cdLatch.await(2, TimeUnit.SECONDS);
-    			this.trustBroker.unregisterTrustUpdateListener(listener, new TrustQuery(myTeid)
-				.setTrusteeId(ratedTeid).setTrustValueType(TrustValueType.USER_PERCEIVED));
+    			this.trustBroker.unregisterTrustUpdateListener(listener, 
+    					new TrustQuery(myTeid).setTrusteeId(ratedTeid)
+    							.setTrustValueType(TrustValueType.USER_PERCEIVED));
     			if (TrustedEntityType.CSS == ratedTeid.getEntityType())
     				this.users = this.retrieveTrustedEntities(TrustedEntityType.CSS);
     			else if (TrustedEntityType.CIS == ratedTeid.getEntityType())

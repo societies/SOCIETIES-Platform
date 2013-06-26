@@ -53,6 +53,8 @@ import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.UserPreferenceManagement;
+import org.societies.personalisation.UserPreferenceManagement.impl.cis.CisEventListener;
+import org.societies.personalisation.UserPreferenceManagement.impl.cis.CommunitiesHandler;
 import org.societies.personalisation.UserPreferenceManagement.impl.merging.MergingManager;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
@@ -413,6 +415,12 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 
 	public void setCisManager(ICisManager cisManager) {
 		this.cisManager = cisManager;
+	}
+
+
+	public CommunitiesHandler getCommunitiesHandler() {
+		// TODO Auto-generated method stub
+		return this.communitiesHandler;
 	}
 
 	

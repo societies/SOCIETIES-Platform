@@ -44,7 +44,13 @@ public class DataTypeFactory {
 	 */
 	public static DataIdentifier fromUri(String dataIdUri) {
 		String[] uri = dataIdUri.split("://");
-		DataIdentifierScheme scheme = DataIdentifierScheme.fromValue(uri[0]);
+		DataIdentifierScheme scheme = null;
+		try {
+			scheme = DataIdentifierScheme.fromValue(uri[0]);
+		}
+		catch(IllegalArgumentException e) {
+			scheme = DataIdentifierScheme.CONTEXT;
+		}
 
 		DataIdentifier dataId = new SimpleDataIdentifier();
 		dataId.setScheme(scheme);
@@ -60,6 +66,18 @@ public class DataTypeFactory {
 		dataId.setType(path.substring(end+1, endType));
 		dataId.setUri(dataIdUri);
 		return dataId;
+	}
+	
+	/**
+	 * Retrieve the scheme of a DataIdentifier for sure: from its URI or its type field
+	 * @param dataId
+	 * @return Data scheme
+	 */
+	public static DataIdentifierScheme getScheme(DataIdentifier dataId) {
+		if (null != dataId.getScheme()) {
+			return dataId.getScheme();
+		}
+		return fromUri(dataId.getUri()).getScheme();
 	}
 	
 	/**

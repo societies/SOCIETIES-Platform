@@ -240,7 +240,7 @@ public class PostProcessor
 
 		LOG.debug("Creating condition from String: "+temp);
 		String noBars = removeChar(temp, '|');
-		noBars.trim();
+		noBars = noBars.trim();
 		String[] tuple = noBars.split("=");
 		//IAction action = new Action(ServiceResourceIdentifier, ServiceType, tuple[0].trim(), tuple[1].trim());
 		IPreferenceCondition condition = cache.getPreferenceCondition(tuple[0].trim(), tuple[1].trim());

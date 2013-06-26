@@ -32,9 +32,9 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.listener.
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 
 /**
  * Interface exposed to Societies components in order to remotely manage access control over resources
@@ -46,11 +46,17 @@ public interface IPrivacyDataManagerRemote {
 	 * Remote call to check permission to access/use/disclose a data
 	 * 
 	 * @param requestor Requestor of the obfuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
-	 * @param dataId ID of the requested data.
+	 * @param dataId Id list of the requested data.
 	 * @param actions Actions requested over this data.
 	 * @param listener The callback object
 	 */
-	public void checkPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions, IPrivacyDataManagerListener listener) throws PrivacyException;
+	public void checkPermission(RequestorBean requestor, List<DataIdentifier> dataId, List<Action> actions, IPrivacyDataManagerListener listener) throws PrivacyException;
+	/**
+	 * Will be removed in 1.2
+	 * @see checkPermission
+	 */
+	@Deprecated
+	public void checkPermission(Requestor requestor, DataIdentifier dataId, List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions, IPrivacyDataManagerListener listener) throws PrivacyException;
 
 	/**
 	 * Remote call to protect a data following the user preferences by obfuscating it to a correct

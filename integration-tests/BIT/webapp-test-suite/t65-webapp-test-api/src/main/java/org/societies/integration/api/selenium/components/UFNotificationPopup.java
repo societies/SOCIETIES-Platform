@@ -62,6 +62,14 @@ public class UFNotificationPopup extends BasePageComponent {
     public static final String SELECTMANY_ANY_OPTION_ANY_INDEX = SELECTMANY_POPUP_PANEL_ANY_INDEX + "//label";
     public static final String SELECTMANY_BUTTON_ANY_INDEX = SELECTMANY_POPUP_PANEL_ANY_INDEX + "//span[text()='Submit']";
 
+    public static final String TA_POPUP_PANEL = POPUP_PATH + "//div[@id='mainForm:notificationGrid:%s:timedAbortPopupPanel']";
+    public static final String TA_ACCEPT_BUTTON = TA_POPUP_PANEL + "//button[contains(@id, 'taAcceptButton')]";
+    public static final String TA_ABORT_BUTTON = TA_POPUP_PANEL + "//button[contains(@id, 'taAbortButton')]";
+
+    public static final String TA_POPUP_PANEL_ANY_INDEX = POPUP_PATH + "//div[starts-with(@id,'mainForm:notificationGrid:') and contains(@id, ':timedAbortPopupPanel')]";
+    public static final String TA_ACCEPT_BUTTON_ANY_INDEX = TA_POPUP_PANEL_ANY_INDEX + "//button[contains(@id, 'taAcceptButton')]";
+    public static final String TA_ABORT_BUTTON_ANY_INDEX = TA_POPUP_PANEL_ANY_INDEX + "//button[contains(@id, 'taAbortButton')]";
+
     public UFNotificationPopup(WebDriver driver) {
         super(driver);
 
@@ -74,6 +82,8 @@ public class UFNotificationPopup extends BasePageComponent {
 
         while (true) {
             try {
+                verifyElementsVisible(By.xpath(ACKNACK_POPUP_PANEL_ANY_INDEX));
+
                 answerAckNackRequestWithAnyOption();
                 i--;
             } catch (NoSuchElementException ex) {
@@ -86,6 +96,8 @@ public class UFNotificationPopup extends BasePageComponent {
 
         while (true) {
             try {
+                verifyElementsVisible(By.xpath(SELECTONE_POPUP_PANEL_ANY_INDEX));
+
                 answerSelectOneRequestWithAnyOption();
                 i--;
             } catch (NoSuchElementException ex) {
@@ -98,6 +110,8 @@ public class UFNotificationPopup extends BasePageComponent {
 
         while (true) {
             try {
+                verifyElementsVisible(By.xpath(SELECTMANY_POPUP_PANEL_ANY_INDEX));
+
                 answerSelectManyRequestWithAnyOption();
                 i--;
             } catch (NoSuchElementException ex) {
@@ -107,6 +121,21 @@ public class UFNotificationPopup extends BasePageComponent {
             if (i <= 0)
                 fail("Too many requests to accept");
         }
+
+        while (true) {
+            try {
+                verifyElementsVisible(By.xpath(TA_POPUP_PANEL_ANY_INDEX));
+
+                abortTimedAbortRequest();
+                i--;
+            } catch (NoSuchElementException ex) {
+                break;
+            }
+
+            if (i <= 0)
+                fail("Too many requests to accept");
+        }
+
 
     }
 
@@ -176,7 +205,24 @@ public class UFNotificationPopup extends BasePageComponent {
         clickButton(By.xpath(String.format(SELECTMANY_BUTTON, index)));
     }
 
+    public void acceptTimedAbortRequest() {
+        clickButton(By.xpath(TA_ACCEPT_BUTTON_ANY_INDEX));
+    }
+
+    public void abortTimedAbortRequest() {
+        clickButton(By.xpath(TA_ABORT_BUTTON_ANY_INDEX));
+    }
+
+    public void acceptTimedAbortRequest(int index) {
+        clickButton(By.xpath(String.format(TA_ACCEPT_BUTTON, index)));
+    }
+
+    public void abortTimedAbortRequest(int index) {
+        clickButton(By.xpath(String.format(TA_ABORT_BUTTON, index)));
+    }
+
     public void close() {
         clickButton(By.xpath(CLOSE_BTN_PATH));
     }
+
 }

@@ -28,11 +28,13 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyAgreementManagerListener;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.schema.identity.RequestorBean;
 
 /**
  * Interface exposed to Societies components to read remotely the stored privacy policy agreements
  * @author Olivier Maridat (Trialog)
- * @created 17-nov.-2011 11:12:31
+ * @created 17 nov. 2011
+ * @updated 16 jun. 2013
  */
 public interface IPrivacyAgreementManagerRemote {
 	/**
@@ -43,5 +45,11 @@ public interface IPrivacyAgreementManagerRemote {
 	 * @param listener The callback object
 	 * @throws PrivacyException 
 	 */
+	public void getPrivacyAgreement(RequestorBean requestor, IIdentity targetedNode, IPrivacyAgreementManagerListener listener) throws PrivacyException;
+	/**
+	 * Will be removed in 1.2
+	 * @see getPrivacyAgreement
+	 */
+	@Deprecated
 	public void getPrivacyAgreement(Requestor requestor, IIdentity targetedNode, IPrivacyAgreementManagerListener listener) throws PrivacyException;
 }

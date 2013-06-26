@@ -65,6 +65,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.listener.
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
 import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
@@ -739,6 +740,17 @@ public @ResponseBody JsonResponse getMyCommunities( ){
 		public PrivPolCallBack(){
 			returnList = new ArrayBlockingQueue<RequestPolicy>(1);
 		}
+		
+		@Override
+		public void onPrivacyPolicyRetrieved(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy p) {
+			try {
+				this.privacyPolicy = RequestPolicyUtils.toRequestPolicy(p, commMngrRef.getIdManager());
+				insertComObjInQueue(this.privacyPolicy);
+			} catch (InvalidFormatException e) {
+				onOperationAborted("Privacy policy retrieved, but we can't understand it.", e);
+			}
+		}
+		
 		@Override
 		public void onPrivacyPolicyRetrieved(RequestPolicy p) {
 			this.privacyPolicy = p;
