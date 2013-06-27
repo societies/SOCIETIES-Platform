@@ -27,41 +27,73 @@ package org.societies.privacytrust.privacyprotection.assessment.util;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentException;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.springframework.osgi.context.BundleContextAware;
+import org.springframework.osgi.service.ServiceUnavailableException;
 
 /**
- * Describe your class here...
+ * Mapper for Java classes, OSGi bundles, and SOCIETIES 3rd party services.
  *
  * @author mitjav
  *
  */
 public class ServiceResolver implements BundleContextAware {
 
-	private static BundleContext bundleContext;
 	private static Logger LOG = LoggerFactory.getLogger(ServiceResolver.class);
+
+	private BundleContext bundleContext;
+	private IServiceDiscovery serviceDiscovery;
+	
+	private Map<String, List<BundleInfo>> class2bundleMap = new HashMap<String, List<BundleInfo>>();
 
 	@Override
 	public void setBundleContext(BundleContext bundleContext) {
-		ServiceResolver.bundleContext = bundleContext;
+		this.bundleContext = bundleContext;
 	}
 
 	public void init() {
 		LOG.debug("init()");
 	}
 	
+	/**
+	 * Setter to be called only automatically by Spring dependency injection.
+	 * 
+	 * @param serviceDiscovery the serviceDiscovery to set
+	 */
+	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
+		LOG.debug("setServiceDiscovery()");
+		this.serviceDiscovery = serviceDiscovery;
+	}
+
+//	public String getServiceIdFromBundle(String bundleSymbolicName) {
+//		
+//	}
+//	
+//	public List<String> getServiceIdFromClass(String className) {
+//		
+//	}
+
 	public List<String> getBundleSymbolicName(String className) {
 		
 		LOG.debug("getBundleSymbolicName({})", className);
 
+		List<BundleInfo> previousInfo = class2bundleMap.get(className);
+		if (previousInfo != null) {
+//			return previousInfo.;
+		}
+		
 		Enumeration<URL> entries;
 		URL entry;
 		String cn;
@@ -102,7 +134,13 @@ public class ServiceResolver implements BundleContextAware {
 				//LOG.debug("Entry class name: {}", cn);
 				if (className.equals(cn)) {
 					LOG.debug("Found matching class name in {}", bundle.getSymbolicName());
-					result.add(bundle.getSymbolicName());
+					try {
+						ServiceResourceIdentifier serviceId;
+						serviceId = getServiceId(bundle);
+						result.add(serviceId.getIdentifier().toASCIIString());
+					} catch (AssessmentException e) {
+						result.add(bundle.getSymbolicName());
+					}
 				}
 			}
 		}
@@ -112,10 +150,29 @@ public class ServiceResolver implements BundleContextAware {
 		return result;
 	}
 	
-//	private ServiceResourceIdentifier getServiceId(Bundle bundle) {
-//		
-//		Service service = ServiceModelUtils.getServiceFromBundle(bundle, serviceDiscovery);
-//		
-//		return service.getServiceIdentifier();
-//	}
+	private ServiceResourceIdentifier getServiceId(Bundle bundle) throws AssessmentException {
+		
+		try {
+			// The proxy is not null even if the service is not available, this
+			// is used mainly to trigger ServiceUnavailableException
+			if (serviceDiscovery != null) {
+				LOG.debug("getServiceId(): Using service discovery to map bundle {} to service ID",
+						bundle.getSymbolicName());
+				Service service = ServiceModelUtils.getServiceFromBundle(bundle, serviceDiscovery);
+				if (service == null) {
+					throw new AssessmentException("Bundle " + bundle.getSymbolicName() +
+							" does not seem to be a SOCIETIES 3P service");
+				}
+				return service.getServiceIdentifier();
+			}
+			else {
+				LOG.warn("getServiceId(): Service discovery proxy is null.");
+				throw new AssessmentException("Service discovery proxy is null.");				
+			}
+		} catch (ServiceUnavailableException e) {
+			LOG.debug("getServiceId(): Service discovery not available, cannot map bundle {} to service ID",
+					bundle.getSymbolicName());
+			throw new AssessmentException("Service discovery not available, cannot map bundle to service ID");
+		}
+	}
 }

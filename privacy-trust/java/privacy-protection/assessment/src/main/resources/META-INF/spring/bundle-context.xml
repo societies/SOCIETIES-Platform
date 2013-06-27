@@ -60,6 +60,7 @@
 	<bean id="serviceResolver"
 		class="org.societies.privacytrust.privacyprotection.assessment.util.ServiceResolver"
 		init-method="init" >
+		<property name="serviceDiscovery" ref="serviceDiscovery" />
 	</bean>
 
 	<bean id="privacyLogAppender"
