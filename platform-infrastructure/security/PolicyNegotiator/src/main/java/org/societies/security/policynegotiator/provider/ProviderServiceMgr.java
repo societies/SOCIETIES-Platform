@@ -211,9 +211,11 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 	}
 
 	/**
+	 * Get URIs for all files for given service.
+	 * Signature is appended to each URI as the URL parameter.
 	 * 
-	 * @param serviceId
-	 * @return
+	 * @param serviceId ID of the service to get URIs for
+	 * @return All URIs
 	 * @throws NegotiationException When service is not found
 	 */
 	protected List<URI> getSignedUris(String serviceId) throws NegotiationException {
@@ -299,8 +301,8 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
 	/**
 	 * 
-	 * @param id
-	 * @return
+	 * @param id Service ID
+	 * @return SLA / SOP options
 	 * @throws NegotiationException When service is not found
 	 */
 	protected String getSlaXmlOptions(String id) throws NegotiationException {

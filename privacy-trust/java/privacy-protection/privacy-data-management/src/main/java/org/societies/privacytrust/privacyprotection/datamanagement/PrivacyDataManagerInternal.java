@@ -40,11 +40,14 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.identity.SimpleDataIdentifier;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.model.PrivacyPermission;
 
@@ -116,7 +119,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier, java.util.List)
 	 */
 	@Override
-	public ResponseItem getPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
+	public List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> getPermissions(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		// Check Dependency injection
 		if (!isDepencyInjectionDone()) {
 			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
@@ -136,6 +139,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		}
 
 		Session session = sessionFactory.openSession();
+		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
 		ResponseItem permission = null;
 		try {
 			// -- Retrieve the privacy permission
@@ -171,6 +175,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 				// - Return the most relevant privacy permission
 				permission = relevantPrivacyPermission.createResponseItem();
 				LOG.debug("PrivacyPermission retrieved: "+relevantPrivacyPermission.toString());
+				permissions.add(permission);
 			}
 		}
 		catch (Exception e) {
@@ -181,7 +186,10 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 				session.close();
 			}
 		}
-		return permission;
+		if (permissions.size() <= 0) {
+			return null;
+		}
+		return ResponseItemUtils.toResponseItemBeans(permissions);
 	}
 
 	/*
@@ -265,6 +273,16 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			throw new PrivacyException("[Parameters] DataId or DataType is missing");
 		}
 		return updatePermission(requestor, dataId, permission.getRequestItem().getActions(), permission.getDecision());
+	}
+
+	@Override
+	public boolean updatePermissions(Requestor requestor, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> permissions1) throws PrivacyException {
+		List<ResponseItem> permissions = ResponseItemUtils.toResponseItems(permissions1);
+		boolean res = true;
+		for (ResponseItem permission : permissions) {
+			res &= updatePermission(requestor, permission);
+		}
+		return res;
 	}
 
 	/*

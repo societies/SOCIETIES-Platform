@@ -25,10 +25,12 @@
 package org.societies.privacytrust.trust.api.repo;
 
 import java.util.Set;
+import java.util.SortedSet;
 
 import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
+import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 
 public interface ITrustRepository {
@@ -118,4 +120,60 @@ public interface ITrustRepository {
 	public Set<ITrustedEntity> retrieveEntities(final TrustedEntityId trustorId,
 			final TrustedEntityType entityType,	final TrustValueType valueType)
 					throws TrustRepositoryException;
+	
+	/**
+	 * Returns the mean trust value of the specified type assigned by the
+	 * supplied trustor. The type of the entities whose trust values to 
+	 * estimate the mean of may optionally be provided.
+	 * 
+	 * @param trustorId
+	 *            (required) the identifier of the trustor.
+	 * @param valueType
+	 *            (required) the type of trust values whose mean is to be
+	 *            calculated.
+	 * @param entityType
+	 *            (optional) the trusted entity type to match; otherwise
+	 *            <code>null</code> to match all entity types.
+	 * @return all entities matching the specified criteria.
+	 * @throws TrustRepositoryException
+	 *             if there is a problem accessing the Trust Repository.
+	 * @throws NullPointerException
+	 *             if any of the required parameters is <code>null</null>.
+	 * @since 1.1
+	 */
+	public double retrieveMeanTrustValue(final TrustedEntityId trustorId,
+			final TrustValueType valueType, final TrustedEntityType entityType)
+					throws TrustRepositoryException;
+	
+	/**
+	 * Returns a set of CSSs from the Trust Repository whose elements are
+	 * ordered based on their similarity to the specified trustor. More 
+	 * specifically, the first element in the returned set is the CSS with the
+	 * lowest similarity value (or <code>null</code>), while the last element
+	 * has the greatest similarity value. The size of the returned set may
+	 * optionally be limited, i.e. only the <code>maxResults</code> with the
+	 * greater similarity will be returned. A similarity value threshold may
+	 * also be specified.
+	 * 
+	 * @param trustorId
+	 *            (required) the identifier of the trustor.
+	 * @param similarityThreshold
+	 *            (optional) the lowest similarity value to match (inclusive);
+	 *            <code>null</code> to match any similarity value.
+	 * @param maxResults
+	 *            (optional) the maximum number of CSSs to retrieve;
+	 *            <code>null</code> to retrieve all CSSs.
+	 * @return a set of CSSs from the Trust Repository whose elements are
+	 *             ordered based on their similarity to the specified trustor.
+	 * @throws TrustRepositoryException
+	 *             if there is a problem accessing the Trust Repository.
+	 * @throws NullPointerException
+	 *             if any of the required parameters is <code>null</null>.
+	 * @throws IllegalArgumentException
+	 *             if the specified maxResults is less than 1.
+	 * @since 1.1
+	 */
+	public SortedSet<ITrustedCss> retrieveCssBySimilarity(
+			final TrustedEntityId trustorId, final Double similarityThreshold,
+			final Integer maxResults) throws TrustRepositoryException;
 }

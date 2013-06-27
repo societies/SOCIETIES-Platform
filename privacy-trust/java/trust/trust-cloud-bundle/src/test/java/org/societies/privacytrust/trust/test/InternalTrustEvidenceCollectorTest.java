@@ -46,7 +46,7 @@ import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.ITrustNodeMgr;
-import org.societies.privacytrust.trust.api.evidence.model.IDirectTrustEvidence;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -126,11 +126,11 @@ public class InternalTrustEvidenceCollectorTest {
 		this.internalTrustEvidenceCollector.addDirectEvidence(subjectCssTeid, 
 				objectCssTeid, TrustEvidenceType.RATED, now, new Double(0.5d));
 		// verify
-		final Set<IDirectTrustEvidence> evidenceSet = 
-				this.trustEvidenceRepo.retrieveDirectEvidence(subjectCssTeid, 
-						objectCssTeid, TrustEvidenceType.RATED, now, null);
+		final Set<ITrustEvidence> evidenceSet = 
+				this.trustEvidenceRepo.retrieveEvidence(subjectCssTeid, 
+						objectCssTeid, TrustEvidenceType.RATED, now, null, null);
 		assertFalse(evidenceSet.isEmpty());
-		IDirectTrustEvidence directEvidence = evidenceSet.iterator().next();
+		ITrustEvidence directEvidence = evidenceSet.iterator().next();
 		assertEquals(TrustEvidenceType.RATED, directEvidence.getType());
 		assertEquals(new Double(0.5d), (Double) directEvidence.getInfo());
 		assertTrue(directEvidence.getTimestamp().compareTo(now) == 0);
@@ -183,11 +183,11 @@ public class InternalTrustEvidenceCollectorTest {
 		this.internalTrustEvidenceCollector.addDirectEvidence(subjectCssTeid, 
 				objectCisTeid, TrustEvidenceType.RATED, now, new Double(0.5d));
 		// verify
-		final Set<IDirectTrustEvidence> evidenceSet = 
-				this.trustEvidenceRepo.retrieveDirectEvidence(subjectCssTeid, 
-						objectCisTeid, TrustEvidenceType.RATED, now, null);
+		final Set<ITrustEvidence> evidenceSet = 
+				this.trustEvidenceRepo.retrieveEvidence(subjectCssTeid, 
+						objectCisTeid, TrustEvidenceType.RATED, now, null, null);
 		assertFalse(evidenceSet.isEmpty());
-		IDirectTrustEvidence directEvidence = evidenceSet.iterator().next();
+		ITrustEvidence directEvidence = evidenceSet.iterator().next();
 		assertEquals(TrustEvidenceType.RATED, directEvidence.getType());
 		assertEquals(new Double(0.5d), (Double) directEvidence.getInfo());
 		assertTrue(directEvidence.getTimestamp().compareTo(now) == 0);
@@ -206,11 +206,11 @@ public class InternalTrustEvidenceCollectorTest {
 		this.internalTrustEvidenceCollector.addDirectEvidence(subjectCssTeid, 
 				objectServiceTeid, TrustEvidenceType.RATED, now, new Double(0.5d));
 		// verify
-		final Set<IDirectTrustEvidence> evidenceSet = 
-				this.trustEvidenceRepo.retrieveDirectEvidence(subjectCssTeid, 
-						objectServiceTeid, TrustEvidenceType.RATED, now, null);
+		final Set<ITrustEvidence> evidenceSet = 
+				this.trustEvidenceRepo.retrieveEvidence(subjectCssTeid, 
+						objectServiceTeid, TrustEvidenceType.RATED, now, null, null);
 		assertFalse(evidenceSet.isEmpty());
-		IDirectTrustEvidence directEvidence = evidenceSet.iterator().next();
+		ITrustEvidence directEvidence = evidenceSet.iterator().next();
 		assertEquals(TrustEvidenceType.RATED, directEvidence.getType());
 		assertEquals(new Double(0.5d), (Double) directEvidence.getInfo());
 		assertTrue(directEvidence.getTimestamp().compareTo(now) == 0);

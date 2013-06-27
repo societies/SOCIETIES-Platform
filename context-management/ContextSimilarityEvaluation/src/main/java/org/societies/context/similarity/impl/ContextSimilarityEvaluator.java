@@ -24,30 +24,38 @@
  */
 package org.societies.context.similarity.impl;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.lang.reflect.*;
-import org.societies.context.api.similarity.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.context.model.CtxEvaluationResults;
+import org.societies.context.api.similarity.ICtxSimilarityEvaluator;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author John
  *
  */
+@Service
 public class ContextSimilarityEvaluator implements ICtxSimilarityEvaluator {
 	
-	private evaluationResults er;
+	private CtxEvaluationResults er;
+	private static final Logger LOG = LoggerFactory.getLogger(ContextSimilarityEvaluator.class);
 
 	public ContextSimilarityEvaluator(){
 		//
-		er = new evaluationResults();
+		er = new CtxEvaluationResults();
 		er.init();
 	}
 	
-	public org.societies.context.api.similarity.evaluationResults evaluateSimilarity (String[] ids, ArrayList<String> attrib){
+	public CtxEvaluationResults evaluateSimilarity (String[] ids, ArrayList<String> attrib){
 		
-		// 
+		//
+		LOG.info("EBOYLANLOGevaluateSim cse.evaluateSimilarity called");
 		for (String att : attrib){
 			evaluateAttribute( att,ids);
 		}
@@ -61,13 +69,13 @@ public class ContextSimilarityEvaluator implements ICtxSimilarityEvaluator {
 				er.setResult(false);
 			}
 		}
-		return (org.societies.context.api.similarity.evaluationResults) er;
+		return er;
 	}
 	
 
 	private void evaluateAttribute(String att, String[] ids){
 		String path = "org.societies.context.similarity.attributes." + att;
-		
+		LOG.info("EBOYLANLOGevaluateattrib cse.evaluateAttribute called");
 		try {
 			Class<?> c = Class.forName(path);
 			String[] argu = ids;
@@ -85,6 +93,7 @@ public class ContextSimilarityEvaluator implements ICtxSimilarityEvaluator {
 	
 	private void evaluateAttributeSummary(String att, HashMap<String, Double> attributeResults){
 		Double max = 0.0;
+		LOG.info("EBOYLANLOGevaluateattrib cse.evaluateAttributeSummary called");
 		for (Double resultV : attributeResults.values()  ){
 			if (resultV > max){
 				max = resultV;

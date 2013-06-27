@@ -36,13 +36,6 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
  */
 public interface IPreferenceCondition extends Serializable {
 
-	/**
-	 * Method to compare each field of the conditions
-	 * @return		true if they match, false otherwise
-	 * 
-	 * @param pc    the preference condition to compare this condition to
-	 */
-	public boolean equals(IPreferenceCondition pc);
 
 	/**
 	 * Method to compare each field of the conditions excluding the value field

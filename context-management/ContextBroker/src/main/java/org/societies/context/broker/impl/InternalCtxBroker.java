@@ -71,6 +71,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
+import org.societies.api.context.model.CtxEvaluationResults;
 import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
@@ -78,6 +79,7 @@ import org.societies.context.api.community.db.ICommunityCtxDBMgr;
 import org.societies.context.api.community.inference.ICommunityCtxInferenceMgr;
 import org.societies.context.api.event.CtxChangeEventTopic;
 import org.societies.context.api.event.ICtxEventMgr;
+import org.societies.context.api.similarity.ICtxSimilarityEvaluator;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 import org.societies.context.api.user.inference.IUserCtxInferenceMgr;
@@ -95,9 +97,10 @@ import org.societies.context.broker.impl.comm.callbacks.RetrieveCtxCallback;
 import org.societies.context.broker.impl.comm.callbacks.RetrieveIndividualEntCallback;
 import org.societies.context.broker.impl.comm.callbacks.UpdateCtxCallback;
 import org.societies.context.broker.impl.util.CtxBrokerUtils;
+//import org.societies.context.similarity.impl.ContextSimilarityEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Async; 
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.societies.api.identity.util.DataTypeUtils;
@@ -231,6 +234,14 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		return this.createEntity(null, null, type);
 	}
+
+	/**
+	 * The Context Similarity Evaluator service reference.
+	 *
+	 * @see {@link #setCtxSimilarityEvaluator(ICtxSimilarityEvaluator)}
+	 */
+	@Autowired(required=true)
+	private ICtxSimilarityEvaluator ctxSimilarityEval;
 
 	@Override
 	@Async
@@ -973,6 +984,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<List<CtxHistoryAttribute>> retrieveHistory(
 			CtxAttributeIdentifier attrId, Date startDate, Date endDate) throws CtxException {
 
+		/*
 		final List<CtxHistoryAttribute> result = new ArrayList<CtxHistoryAttribute>();
 		IIdentity targetCss;
 		try {
@@ -985,8 +997,8 @@ public class InternalCtxBroker implements ICtxBroker {
 		this.logRequest(null, targetCss);
 
 		result.addAll(this.userCtxHistoryMgr.retrieveHistory(attrId, startDate, endDate));
-
-		return new AsyncResult<List<CtxHistoryAttribute>>(result);
+		 */
+		return this.retrieveHistory(null, attrId, startDate, endDate);
 	}
 
 	@Override
@@ -1444,6 +1456,16 @@ public class InternalCtxBroker implements ICtxBroker {
 		this.userCtxInferenceMgr = userCtxInferenceMgr;
 	}
 
+	/**
+	 * Sets the UserCtxInferenceMgr service reference.
+	 * 
+	 * @param ICtxSimilarityEvaluator
+	 *            the ctxSimilarityEval service reference to set.
+	 */
+	public void setCtxSimilarityEvaluator(ICtxSimilarityEvaluator ICSE) {
+		this.ctxSimilarityEval = ICSE;
+	}
+
 
 	/**
 	 * Sets the {@link IPrivacyLogAppender} service reference.
@@ -1677,7 +1699,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			CtxEntityIdentifier entityId, CtxModelType modelType, String type)
 					throws CtxException {
 
-		//TODO access control aplies?
+
 		if(requestor == null) requestor = getLocalRequestor();
 
 		if (entityId == null)
@@ -1695,16 +1717,17 @@ public class InternalCtxBroker implements ICtxBroker {
 					+ "' under entity " + entityId);
 
 		final List<CtxIdentifier> result = new ArrayList<CtxIdentifier>();
-		final CtxEntity entity;
+		//final CtxEntity entity;
 		try {
 			final IIdentity targetId = this.commMgr.getIdManager().fromJid(entityId.getOwnerId());
+
+			List<CtxIdentifier> listResults = this.lookup(requestor, targetId, modelType, type).get();
+			result.addAll(listResults);
+			/*
 			if (IdentityType.CIS.equals(targetId.getType()))
 				entity = (CtxEntity) this.communityCtxDBMgr.retrieve(entityId);
 			else
 				entity = (CtxEntity) this.userCtxDBMgr.retrieve(entityId);
-
-			// TODO check local or remote
-			// TODO if local then CtxDBMgr should provide the method - temp hack follows
 
 			if (CtxModelType.ATTRIBUTE.equals(modelType)) {
 				final Set<CtxAttribute> attrs = entity.getAttributes(type);
@@ -1717,6 +1740,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				for (final CtxAssociationIdentifier assocId : assocIds)
 					result.add(assocId);
 			}
+			 */
 		} catch (Exception e) {
 
 			throw new CtxBrokerException("Could not look up context " + modelType
@@ -1814,8 +1838,41 @@ public class InternalCtxBroker implements ICtxBroker {
 			// community context
 		}else if (IdentityType.CIS.equals(target.getType())){
 
-			localCtxIdListResult = this.communityCtxDBMgr.lookupCommunityCtxEntity(type);
+			if (this.isLocalCisId(target)){
+				//localCtxIdListResult = this.communityCtxDBMgr.lookupCommunityCtxEntity(type);	
+				localCtxIdListResult = this.communityCtxDBMgr.lookup(modelType, type);
 
+				return new AsyncResult<List<CtxIdentifier>>(localCtxIdListResult);
+
+			} else {
+
+				final LookupCallback callbackCIS = new LookupCallback();
+
+				ctxBrokerClient.lookup(requestor, target, modelType, type, callbackCIS);
+
+				synchronized (callbackCIS) {
+
+					try {
+						callbackCIS.wait();
+						remoteCtxIdListResult = callbackCIS.getResult();
+
+					} catch (InterruptedException e) {
+
+						throw new CtxBrokerException("Interrupted while waiting for remote createEntity");
+					}
+				}
+
+				return new AsyncResult<List<CtxIdentifier>>(remoteCtxIdListResult);
+			}
+
+
+
+			/*
+			LOG.debug(" retrieving community attributes:: " + modelType +" .. "+type);
+
+			localCtxIdListResult = this.communityCtxDBMgr.lookup(modelType, type);
+			LOG.debug(" retrieving community attributes results :: "+ localCtxIdListResult);
+			 */
 		} else throw new CtxBrokerException("objects identifier does not correspond to a CSS or a CIS");
 
 		return new AsyncResult<List<CtxIdentifier>>(localCtxIdListResult);
@@ -2059,7 +2116,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			try {
 				updatedObjectResult = this.communityCtxDBMgr.update(ctxModelObj);					
 				LOG.info("UPDATE Community Context object with id : " + updatedObjectResult.getId());
-
+				storeHoc(ctxModelObj);
 			} catch (Exception e) {
 				throw new CtxBrokerException(
 						"Platform context broker failed to update context model object with id "
@@ -2480,8 +2537,40 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<List<CtxHistoryAttribute>> retrieveHistory(
 			Requestor requestor, CtxAttributeIdentifier attrId, Date startDate,
 			Date endDate) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		if(requestor == null) requestor = getLocalRequestor();
+
+		final List<CtxHistoryAttribute> result = new ArrayList<CtxHistoryAttribute>();
+		IIdentity identity;
+		try {
+			identity = this.commMgr.getIdManager().fromJid(attrId.getOwnerId());
+		} catch (InvalidFormatException ife) {
+			throw new CtxBrokerException("Could not create IIdentity from JID '"
+					+ attrId.getOwnerId() + "': " + ife.getLocalizedMessage(), ife);
+		}
+
+		this.logRequest(requestor, identity);
+
+
+		if (IdentityType.CSS.equals(identity.getType()) 
+				|| IdentityType.CSS_RICH.equals(identity.getType())
+				|| IdentityType.CSS_LIGHT.equals(identity.getType())) {
+
+			if (this.commMgr.getIdManager().isMine(identity) ) {
+				//hocObj = internalCtxBroker.retrieveHistory(attrId, startDate, endDate);
+				result.addAll(this.userCtxHistoryMgr.retrieveHistory(attrId, startDate, endDate));
+			} else {
+				LOG.info("remote call is not supported for ctx history data");
+			}
+
+		} else if (IdentityType.CIS.equals(identity.getType())){
+			if (isLocalCisId(identity) ) {
+				result.addAll(this.userCtxHistoryMgr.retrieveHistory(attrId, startDate, endDate));
+			} else {
+				LOG.info("remote call is not supported for ctx history data");
+			}
+		}
+		return new AsyncResult<List<CtxHistoryAttribute>>(result);
 	}
 
 
@@ -2747,8 +2836,33 @@ public class InternalCtxBroker implements ICtxBroker {
 			// community context
 		}else if (IdentityType.CIS.equals(targetCSS.getType())){
 
+			if (this.isLocalCisId(targetCSS)){
 
-			localCtxIdListResult = this.communityCtxDBMgr.lookupCommunityCtxEntity(type);
+				localCtxIdListResult = this.communityCtxDBMgr.lookupCommunityCtxEntity(type);	
+
+				return new AsyncResult<List<CtxIdentifier>>(localCtxIdListResult);
+
+			} else {
+				final LookupCallback callbackCIS = new LookupCallback();
+
+				CtxModelType modelType = null;
+				ctxBrokerClient.lookup(requestor, targetCSS, modelType, type, callbackCIS);
+
+
+				synchronized (callbackCIS) {
+
+					try {
+						callbackCIS.wait();
+						remoteCtxIdListResult = callbackCIS.getResult();
+
+					} catch (InterruptedException e) {
+
+						throw new CtxBrokerException("Interrupted while waiting for remote createEntity");
+					}
+				}
+
+				return new AsyncResult<List<CtxIdentifier>>(remoteCtxIdListResult);
+			}			
 
 			//LOG.info("skata 3 this.communityCtxDBMgr.lookup(modelType, type);: "+this.communityCtxDBMgr.lookup(modelType, type));
 
@@ -2772,13 +2886,13 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Override
 	public Future<List<CtxModelObject>> retrieve(Requestor requestor,
 			List<CtxIdentifier> ctxIdList) throws CtxException {
-		
+
 		List<CtxModelObject> results = new ArrayList<CtxModelObject>();
-		
+
 		for(CtxIdentifier identifier : ctxIdList){
-			
+
 			CtxModelObject object = null;
-			
+
 			try {
 				object = this.retrieve(requestor, identifier).get();
 				results.add(object);
@@ -2789,7 +2903,7 @@ public class InternalCtxBroker implements ICtxBroker {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-				
+
 		}
 		return new AsyncResult<List<CtxModelObject>>(results);
 	}
@@ -2800,6 +2914,17 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		Requestor req = null;
 		return this.retrieve(req, ctxIdList);
+	}
+
+	/**
+	 * added by eboylan for CSE integration test
+	 */
+	@Override
+	public CtxEvaluationResults evaluateSimilarity(String[] ids, ArrayList<String> attrib) throws CtxException {
+		LOG.info("EBOYLANLOGFOOTPRINT: ctxSimilarity broker = " + ctxSimilarityEval);
+		LOG.info("EBOYLANLOGFOOTPRINT internalCtxBroker.evaluateSimilarity called");
+		CtxEvaluationResults evalResult = (CtxEvaluationResults) this.ctxSimilarityEval.evaluateSimilarity(ids, attrib); //this.
+		return evalResult;
 	}
 
 }

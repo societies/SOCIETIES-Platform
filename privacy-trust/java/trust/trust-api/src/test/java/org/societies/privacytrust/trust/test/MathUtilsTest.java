@@ -140,8 +140,9 @@ public class MathUtilsTest {
 		final double[] e_sample = {0.2, 0.1, 0.15, 0.1, 0.2, 0.15, 0.2, 0.1, 0.15, 0.1, 0.2, 0.15, 0.2};
 		final double[] f_sample = {0.2, 0.1, 0.15, 0.1, 0.2, 0.15, 0.2, 0.1, 0.15, 0.1};
 	 
-		assertTrue(Double.isNaN(MathUtils.cos(a_sample, b_sample)));
-		assertTrue(Double.isNaN(MathUtils.cos(b_sample, a_sample)));
+		assertEquals(1.0d, MathUtils.cos(a_sample, b_sample), DELTA);
+		assertEquals(1.0d, MathUtils.cos(b_sample, a_sample), DELTA);
+		assertEquals(1.0d, MathUtils.cos(a_sample, a_sample), DELTA);
 		assertEquals(1.0d, MathUtils.cos(b_sample, c_sample), DELTA);
 		assertTrue(MathUtils.cos(b_sample, d_sample) < MathUtils.cos(b_sample, e_sample));
 		boolean caughtException = false;

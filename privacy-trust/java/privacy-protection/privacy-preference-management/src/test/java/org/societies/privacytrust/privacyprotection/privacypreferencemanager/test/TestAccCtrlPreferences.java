@@ -73,6 +73,7 @@ import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
@@ -123,6 +124,7 @@ public class TestAccCtrlPreferences {
 	private ITrustBroker trustBroker = Mockito.mock(ITrustBroker.class);
 	private IUserFeedback userFeedback = Mockito.mock(IUserFeedback.class);
 	private IPrivacyAgreementManager agreementMgr = Mockito.mock(IPrivacyAgreementManager.class);
+	private IEventMgr eventManager = Mockito.mock(IEventMgr.class);
 	private PrivacyPreferenceManager privPrefMgr;
 	private Resource resourceWithID;
 	private List<Action> actions;
@@ -157,7 +159,7 @@ public class TestAccCtrlPreferences {
 		this.privPrefMgr.setTrustBroker(trustBroker);
 		this.privPrefMgr.setUserFeedback(userFeedback);
 		this.privPrefMgr.setAgreementMgr(agreementMgr);
-		
+		this.privPrefMgr.setEventMgr(eventManager);
 		this.setupRequestor();
 		this.setupContext();
 		this.setupPolicyDetails();
@@ -262,12 +264,13 @@ public class TestAccCtrlPreferences {
 		Assert.assertEquals(this.accCtrlmodel, accCtrlPreferenceModel);
 
 		Assert.assertEquals(ResourceUtils.getDataIdentifier(resourceWithID), this.locationAttribute.getId());
-		ResponseItem item = privPrefMgr.checkPermission(requestorCisBean, this.locationAttribute.getId(), actions);
-		Assert.assertNotNull(item);
+		List<ResponseItem> items = privPrefMgr.checkPermission(requestorCisBean, this.locationAttribute.getId(), actions);
+		Assert.assertNotNull(items);
+		Assert.assertTrue(items.size() > 0);
 		
-		Assert.assertNotNull(item.getDecision());
+		Assert.assertNotNull(items.get(0).getDecision());
 		
-		Assert.assertEquals(Decision.PERMIT, item.getDecision());
+		Assert.assertEquals(Decision.PERMIT, items.get(0).getDecision());
 		
 		/**
 		 * to be removed after refactoring of obj model
@@ -276,19 +279,20 @@ public class TestAccCtrlPreferences {
 		List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actionObjList = new ArrayList<org.societies.api.privacytrust.privacy.model.privacypolicy.Action>();
 		actionObjList.add(actionRead);
 
-		org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem item2 = privPrefMgr.checkPermission(requestorCis, this.locationAttribute.getId(), actionObjList);
+		List<org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem> items2 = privPrefMgr.checkPermission(requestorCis, this.locationAttribute.getId(), actionObjList);
 		
 		/**
 		 * end of to be removed test
 		 */
-		Assert.assertNotNull(item2);
-		Assert.assertNotNull(item2.getDecision());
-		Assert.assertEquals(Decision.PERMIT, item.getDecision());
+		Assert.assertNotNull(items2);
+		Assert.assertTrue(items2.size() > 0);
+		Assert.assertNotNull(items2.get(0).getDecision());
+		Assert.assertEquals(Decision.PERMIT.name(), items2.get(0).getDecision().name());
 
 		ResponseItem evRespItem = privPrefMgr.evaluateAccCtrlPreference(accCtrlDetails, conditions);
 		Assert.assertNotNull(evRespItem);
 		Assert.assertNotNull(evRespItem.getDecision());
-		Assert.assertEquals(Decision.PERMIT, evRespItem.getDecision());
+		Assert.assertEquals(Decision.PERMIT.name(), evRespItem.getDecision().name());
 		
 		
 		boolean deleted = privPrefMgr.deleteAccCtrlPreference(accCtrlDetails);
@@ -330,9 +334,11 @@ public class TestAccCtrlPreferences {
 		org.societies.api.privacytrust.privacy.model.privacypolicy.Action actionCreate = new org.societies.api.privacytrust.privacy.model.privacypolicy.Action(org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants.CREATE);
 		actionObjList.add(actionCreate);
 		
-		org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem checkPermissionNotExistModel = privPrefMgr.checkPermission(requestorCis, this.locationAttribute.getId(), actionObjList);
-		Assert.assertFalse(checkPermissionNotExistModel.getRequestItem().getActions().contains(actionCreate));
-		Assert.assertTrue(checkPermissionNotExistModel.getRequestItem().getActions().contains(actionRead));
+		List<org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem> checkPermissionNotExistModels = privPrefMgr.checkPermission(requestorCis, this.locationAttribute.getId(), actionObjList);
+		Assert.assertNotNull(checkPermissionNotExistModels);
+		Assert.assertTrue(checkPermissionNotExistModels.size() > 0);
+		Assert.assertFalse(checkPermissionNotExistModels.get(0).getRequestItem().getActions().contains(actionCreate));
+		Assert.assertTrue(checkPermissionNotExistModels.get(0).getRequestItem().getActions().contains(actionRead));
 		
 	}
 	private void setupAgreement() {

@@ -321,12 +321,12 @@ public class ConditionUtils {
 		return conditionBeans;
 	}
 
-	public static boolean contains(ConditionConstants conditionToCheck, List<Condition> conditions) {
+	public static boolean contains(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants conditionToCheck, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition> conditions) {
 		if (null == conditions || conditions.size() <= 0 || null == conditionToCheck) {
 			return false;
 		}
-		for(Condition condition : conditions) {
-			if (condition.getConditionName().equals(conditionToCheck)) {
+		for(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition condition : conditions) {
+			if (condition.getConditionConstant().equals(conditionToCheck)) {
 				return true;
 			}
 		}

@@ -25,6 +25,8 @@
 package org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
@@ -36,6 +38,7 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.IMonitor;
 
 
 public class ContextCacheUpdater /*extends EventListener*/ implements CtxChangeEventListener{
@@ -44,10 +47,13 @@ public class ContextCacheUpdater /*extends EventListener*/ implements CtxChangeE
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private PrivateContextCache contextCache;
 	private ArrayList<CtxAttributeIdentifier> attrList;
+	private Hashtable<CtxIdentifier, ArrayList<IMonitor>> clients;
+	
 	public ContextCacheUpdater(ICtxBroker broker, PrivateContextCache cache){
 		this.ctxBroker = broker;
 		this.contextCache = cache;
 		this.attrList = new ArrayList<CtxAttributeIdentifier>();
+		this.clients = new Hashtable<CtxIdentifier, ArrayList<IMonitor>>();
 	}
 
 	public void registerForContextEvent(CtxAttributeIdentifier id){
@@ -66,6 +72,47 @@ public class ContextCacheUpdater /*extends EventListener*/ implements CtxChangeE
 		}
 		
 	}
+	
+	private boolean isMonitorRegistered(CtxIdentifier id, IMonitor client){
+		if (this.clients.containsKey(id)){
+			ArrayList<IMonitor> monitors = this.clients.get(id);
+			for (IMonitor monitor : monitors){
+				if  (monitor.getMonitorID().equalsIgnoreCase(client.getMonitorID())){
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	public void registerForContextEvent(CtxAttributeIdentifier id, IMonitor client){
+		if (this.clients.containsKey(id)){
+			if (!this.isMonitorRegistered(id, client)){
+				this.clients.get(id).add(client);
+			}
+		}else{
+			ArrayList<IMonitor> monitorList = new ArrayList<IMonitor>();
+			monitorList.add(client);
+			this.clients.put(id, monitorList);
+		}
+		
+		if (this.attrList.contains(id)){
+			this.logging.debug("Already Registered for context events for : "+id.getType()+" ID: "+id.toUriString());
+			return;
+		}
+		try {
+			//this.broker.registerUpdateNotification(this, id);
+			
+			this.ctxBroker.registerForChanges(this, id);
+			this.logging.debug("Registered for context events for : "+id.getType()+" ID: "+id.toUriString());
+		} catch (CtxException e) {
+			this.logging.debug("Unable to register for context events for : "+id.getType()+" ID: "+id.toUriString());
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
 /*	@Override
 	public void handlePSSEvent(PSSEvent arg0) {
 		// nothing to do. Context Events are only sent as Peer Events
@@ -108,6 +155,13 @@ public class ContextCacheUpdater /*extends EventListener*/ implements CtxChangeE
 				this.logging.debug("Event received: type: "+type+" value: "+value);
 				
 				this.contextCache.updateCache(ctxAttr);
+				
+				if (this.clients.containsKey(ctxId)){
+					ArrayList<IMonitor> arrayList = this.clients.get(ctxId);
+					for (IMonitor monitor : arrayList){
+						monitor.onModification(event);
+					}
+				}
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

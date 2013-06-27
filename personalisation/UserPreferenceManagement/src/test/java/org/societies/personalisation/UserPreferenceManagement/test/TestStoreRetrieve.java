@@ -36,6 +36,7 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
@@ -49,6 +50,7 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
@@ -80,6 +82,7 @@ public class TestStoreRetrieve {
 
 	UserPreferenceConditionMonitor pcm ;
 	ICtxBroker ctxBroker = Mockito.mock(ICtxBroker.class);
+	ICommManager commManager = Mockito.mock(ICommManager.class);
 	UserPreferenceManagement prefMgr;
 	private IIdentity mockId;
 	private IndividualCtxEntity ctxEntity;
@@ -96,7 +99,7 @@ public class TestStoreRetrieve {
 	private PreferenceDetails preferenceDetails;
 	private final static String preferenceKey1 = "preference_1";
 	private final static String preferenceKey2 = "preference_2";
-	
+	private IIdentityManager idMgr = Mockito.mock(IIdentityManager.class);
 	@Before
 	public void setUp(){
 		pcm = new UserPreferenceConditionMonitor();
@@ -104,18 +107,22 @@ public class TestStoreRetrieve {
 		pcm.setEventMgr(Mockito.mock(IEventMgr.class));
 		pcm.setPersoMgr(Mockito.mock(IInternalPersonalisationManager.class));
 		pcm.setUserPrefLearning(Mockito.mock(IC45Learning.class));
-		pcm.initialisePreferenceManagement();	
-		this.prefMgr = pcm.getPreferenceManager();
+		pcm.setCommManager(commManager);
+		
+		
 		setupContextAttributes();
 		setupPreferenceCtxAttributes();
 		this.createPreference();
 		this.setupMocks();
+		pcm.initialisePreferenceManagement();	
+		this.prefMgr = pcm.getPreferenceManager();
 	}
 	
 	private void setupMocks(){
 		List<CtxIdentifier> preferenceEntityList = new ArrayList<CtxIdentifier>();
 		preferenceEntityList.add(preferenceCtxEntity.getId());
 		try {
+			Mockito.when(commManager.getIdManager()).thenReturn(idMgr);
 			Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PREFERENCE)).thenReturn(new AsyncResult<List<CtxIdentifier>>(preferenceEntityList));
 			Mockito.when(ctxBroker.createAttribute((CtxEntityIdentifier) this.preferenceCtxEntity.getId(), preferenceKey1)).thenReturn(new AsyncResult<CtxAttribute>(this.preferenceAttribute1));
 			Mockito.when(ctxBroker.update(preferenceAttribute1)).thenReturn(new AsyncResult<CtxModelObject>(preferenceAttribute1));
@@ -130,8 +137,10 @@ public class TestStoreRetrieve {
 			e.printStackTrace();
 		}
 	}
+	
+	
 	@Test
-	public void TestStoreRetrieve(){
+	public void Test(){
 		preferenceDetails = new PreferenceDetails("", this.serviceID, this.preferenceName);
 		Assert.assertEquals(true, this.prefMgr.storePreference(mockId, preferenceDetails, this.preference));
 		
@@ -191,7 +200,7 @@ public class TestStoreRetrieve {
 	}
 
 	private void setupContextAttributes() {
-		mockId = new MyIdentity(IdentityType.CSS, "myId", "domain");
+		mockId = new MockIdentity(IdentityType.CSS, "myId", "domain");
 		CtxEntityIdentifier ctxEntityId = new CtxEntityIdentifier(mockId.getJid(), CtxEntityTypes.PERSON, new Long(1));
 		ctxEntity = new IndividualCtxEntity(ctxEntityId);	
 		

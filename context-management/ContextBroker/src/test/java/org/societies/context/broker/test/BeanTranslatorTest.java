@@ -6,7 +6,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.After;
@@ -17,10 +19,14 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.CtxModelBeanTranslator;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
@@ -28,6 +34,7 @@ import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
+import org.societies.api.schema.context.model.CtxAttributeBean;
 import org.societies.api.schema.context.model.CtxEntityBean;
 import org.societies.api.schema.context.model.CtxModelObjectBean;
 import org.societies.context.api.user.inference.IUserCtxInferenceMgr;
@@ -35,6 +42,8 @@ import org.societies.context.broker.impl.InternalCtxBroker;
 import org.societies.context.community.db.impl.CommunityCtxDBMgr;
 import org.societies.context.user.db.impl.UserCtxDBMgr;
 import org.societies.context.userHistory.impl.UserContextHistoryManagement;
+
+
 
 public class BeanTranslatorTest {
 
@@ -96,12 +105,12 @@ public class BeanTranslatorTest {
 	public void setUp() throws Exception { 
 
 		internalCtxBroker = new InternalCtxBroker();
-		internalCtxBroker.setUserCtxDBMgr(new UserCtxDBMgr());
-		internalCtxBroker.setCommunityCtxDBMgr(new CommunityCtxDBMgr());
-		internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
+		//internalCtxBroker.setUserCtxDBMgr(new UserCtxDBMgr());
+		//internalCtxBroker.setCommunityCtxDBMgr(new CommunityCtxDBMgr());
+		//internalCtxBroker.setUserCtxHistoryMgr(new UserContextHistoryManagement());
 		//internalCtxBroker.setUserCtxInferenceMgr(new UserCtxInferenceMgr());
 		//internalCtxBroker.setIdentityMgr(mockIdentityMgr);
-		internalCtxBroker.createIndividualEntity(cssMockIdentity, CtxEntityTypes.PERSON); // TODO remove?
+		//internalCtxBroker.createIndividualEntity(cssMockIdentity, CtxEntityTypes.PERSON); // TODO remove?
 		//internalCtxBroker.createCssNode(mockNetworkNode); // TODO remove?
 		
 		//this.commMgr.getIdManager().fromJid(ctxModelObj.getOwnerId());
@@ -168,6 +177,39 @@ public class BeanTranslatorTest {
 		System.out.println("ctxObj  id "+ctxObj.getId().toString() );
 				
 
+	}
+	
+	
+	@Test
+	public void testAttributeTranslation() throws Exception {
+
+		CtxIdentifierFactory ctxFactory = CtxIdentifierFactory.getInstance();
+		CtxIdentifier attrID = ctxFactory.fromString("context://emma.ict-societies.eu/ENTITY/device/32768/ATTRIBUTE/temperature/32769");
+		CtxAttribute attr = new CtxAttribute((CtxAttributeIdentifier) attrID);
+		System.out.println("attr id:"+attr.getId() );
+		System.out.println("attr type "+attr.getModelType() );
+		
+		MockBlobClass blob = new MockBlobClass(999);
+		System.out.println("blob "+blob);
+		byte[] blobBytes = SerialisationHelper.serialise(blob);
+		System.out.println("attr binary value "+blobBytes);
+		attr.setBinaryValue(blobBytes);
+		
+		CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+		
+		CtxAttributeBean attrBean = ctxBeanTranslator.fromCtxAttribute(attr);
+		
+		System.out.println("attrBean id "+attrBean.getId() );
+		System.out.println("attrBean type "+attrBean.getBinaryValue() );
+		
+		CtxAttribute attribute = ctxBeanTranslator.fromCtxAttributeBean(attrBean);
+		
+		System.out.println("attr id "+attribute.getId());
+		
+		MockBlobClass retrievedBlob = (MockBlobClass) SerialisationHelper.deserialise(attribute.getBinaryValue(), this.getClass().getClassLoader());
+		System.out.println("attr binary value "+retrievedBlob);
+		
+		
 	}
 	
 }

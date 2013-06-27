@@ -101,39 +101,91 @@ public class Tester {
 		try{
 			logging.info("start performing actions ");
 			if( !retrieveUserIntentModel() ){
+				int i=0;
+				
+				//1 
+				i++;
+				setContext("loc1", "");
+				Thread.sleep(2500);
+				logging.info("action:"+i+" setBackgroundColour : red");
+				this.helloWorldService.setBackgroundColour(userId, "red");
+				Thread.sleep(4500);
+				
+				//2
+				i++;
+				logging.info("action:"+i+" setVolume : 10");
+				this.helloWorldService.setVolume(userId, "10");
+				Thread.sleep(5000);
+				
+				//3 
+				i++;
+				setContext("", "status1");
+				Thread.sleep(2500);
+				logging.info("action:"+i+" setBackgroundColour : red");
+				this.helloWorldService.setBackgroundColour(userId, "red");
+				Thread.sleep(4500);
 
-				for (int i=0; i<4; i++){
-					//	log("Step: "+i);
-					//setContext("home", "free");
-					
-					Thread.sleep(2500);
-					logging.info("action:"+i+" setBackgroundColour : red");
-					this.helloWorldService.setBackgroundColour(userId, "red");
-					Thread.sleep(4500);
-					
-					logging.info("action:"+i+" setVolume : 10");
-					this.helloWorldService.setVolume(userId, "10");
-					Thread.sleep(5000);
-				}
+				//4
+				i++;
+				logging.info("action:"+i+" setVolume : 10");
+				this.helloWorldService.setVolume(userId, "10");
+				Thread.sleep(5000);
+
+				//5
+				i++;
+				setContext("loc2", "status2");
+				Thread.sleep(2500);
+				logging.info("action:"+i+" setBackgroundColour : red");
+				this.helloWorldService.setBackgroundColour(userId, "red");
+				Thread.sleep(4500);
+
+				//6
+				i++;
+				logging.info("action:"+i+" setVolume : 10");
+				this.helloWorldService.setVolume(userId, "10");
+				Thread.sleep(5000);
+			
+				/*
+				//7
+				i++;
+				logging.info("action:"+i+" setBackgroundColour : red");
+				this.helloWorldService.setBackgroundColour(userId, "red");
+				Thread.sleep(4500);
+
+				//8
+				i++;
+				logging.info("action:"+i+" setVolume : 10");
+				this.helloWorldService.setVolume(userId, "10");
+				Thread.sleep(5000);
+*/
+				////////////////
+				// at this point a new model will be learned
+			
 			}
 			historyDataRetrieval();
-			
+
 			logging.info("start predictions ");
-			logging.info("1 Tester: set background colour (black)");
-			this.helloWorldService.setBackgroundColour(userId, "black");
-		
-			Thread.sleep(15000);
-			// no prediction should be available for background: black
-			//Assert.assertEquals("", this.helloWorldService.getVolume(userId));
-			logging.info("1 Tester: volume equals: "+ this.helloWorldService.getVolume(userId));
 			
-			logging.info("2 Tester: set background colour (red)");
+			setContext("loc2", "status1");
+			Thread.sleep(2500);
+			logging.info("1  set background colour (red)");
 			this.helloWorldService.setBackgroundColour(userId, "red");
 			Thread.sleep(15000);
-			
-			System.out.println("2 dynamic change of volume... ");
-			System.out.println("2 Tester: volume should be 10 and it is:"+ this.helloWorldService.getVolume(userId));
+
+			logging.info("...... dynamic change of volume... ");
+			logging.info("...... volume should be 10 and it is:"+ this.helloWorldService.getVolume(userId));
 			Assert.assertEquals("10", this.helloWorldService.getVolume(userId));
+			
+			
+			setContext("loc1", "status100");
+			Thread.sleep(2500);
+			logging.info("2 set background colour (black)");
+			this.helloWorldService.setBackgroundColour(userId, "black");
+			logging.info("no prediction should be available for background 'black', volume value should be the same as before '10'");
+			Assert.assertEquals("10", this.helloWorldService.getVolume(userId));
+			//logging.info("1 Tester: volume equals: "+ this.helloWorldService.getVolume(userId));
+			
+			
 		}
 
 		catch (InterruptedException e) {
@@ -223,21 +275,27 @@ public class Tester {
 
 
 	private void setContext(String symLocValue, String statusValue){
+
+
 		try {
-			CtxAttributeIdentifier locAttrId = symLocAttribute.getId();
-			this.symLocAttribute = (CtxAttribute) this.ctxBroker.updateAttribute(locAttrId, symLocValue).get();
 
+			if( symLocValue != ""){
+				CtxAttributeIdentifier locAttrId = symLocAttribute.getId();
+				this.symLocAttribute = (CtxAttribute) this.ctxBroker.updateAttribute(locAttrId, symLocValue).get();
+			}
+			if(statusValue != "" ){
+				CtxAttributeIdentifier statusAttrId = statusAttribute.getId();
+				this.statusAttribute = (CtxAttribute) this.ctxBroker.updateAttribute(statusAttrId, statusValue).get();
 
+			}
 			//the code below was replaced by the call to updateAttribute with the id and value above. 
 			//the code below doesn't work unless a fresh copy of the attribute is retrieved 
 			//this.symLocAttribute.setStringValue(symLocValue);
 			//this.symLocAttribute = (CtxAttribute) this.ctxBroker.update(symLocAttribute).get();
 
-			CtxAttributeIdentifier statusAttrId = statusAttribute.getId();
-			this.statusAttribute = (CtxAttribute) this.ctxBroker.updateAttribute(statusAttrId, statusValue).get();
 			//			this.statusAttribute.setStringValue(statusValue);
 			//			this.statusAttribute = (CtxAttribute) this.ctxBroker.update(statusAttribute).get();
-			logging.debug("changeContext("+symLocValue+", "+statusValue+");");
+			logging.info("changeContext("+symLocValue+", "+statusValue+");");
 
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block

@@ -53,6 +53,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
@@ -232,13 +233,13 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		String testTitle = new String("testGetPermission: only 1 action");
 		LOG.info("[Test] "+testTitle);
 		boolean dataUpdated = false;
-		ResponseItem responseItem = null;
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> responseItems = null;
 		Decision permission = Decision.PERMIT;
 		List<Action> actions = new ArrayList<Action>();
 		actions.add(new Action(ActionConstants.READ));
 		try {
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, dataId, actions, permission);
-			responseItem = privacyDataManagerInternal.getPermission(requestorCis, dataId, actions);
+			responseItems = privacyDataManagerInternal.getPermissions(requestorCis, dataId, actions);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
@@ -247,9 +248,10 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			fail("[Error "+testTitle+"] error: "+e.getMessage());
 		}
 		assertTrue("Data not updated", dataUpdated);
-		assertNotNull("ResponseItem permission can't be retrieved", responseItem);
-		assertEquals("Permission result not as expected", permission, responseItem.getDecision());
-		assertEquals("Permission action list not as expected", actions, responseItem.getRequestItem().getActions());
+		assertNotNull("ResponseItem permission can't be retrieved", responseItems);
+		assertTrue("ResponseItem permission can't be retrieved", responseItems.size() > 0);
+		assertEquals("Permission result not as expected", permission.name(), responseItems.get(0).getDecision().name());
+		assertTrue("Permission action list not as expected", ActionUtils.equal(ActionUtils.toActionBeans(actions), responseItems.get(0).getRequestItem().getActions()));
 	}
 
 	@Test
@@ -258,7 +260,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		String testTitle = new String("testGetPermission: 3 actions with 1 optional");
 		LOG.info("[Test] "+testTitle);
 		boolean dataUpdated = false;
-		ResponseItem responseItem = null;
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> responseItems = null;
 		List<Action> actions = new ArrayList<Action>();
 		actions.add(new Action(ActionConstants.READ));
 		actions.add(new Action(ActionConstants.WRITE));
@@ -266,7 +268,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		Decision permission = Decision.PERMIT;
 		try {
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, dataId, actions, permission);
-			responseItem = privacyDataManagerInternal.getPermission(requestorCis, dataId, actions);
+			responseItems = privacyDataManagerInternal.getPermissions(requestorCis, dataId, actions);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
@@ -275,9 +277,10 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			fail("[Error "+testTitle+"] error: "+e.getMessage());
 		}
 		assertTrue("Data not updated", dataUpdated);
-		assertNotNull("ResponseItem permission can't be retrieved", responseItem);
-		assertEquals("Permission result not as expected", permission, responseItem.getDecision());
-		assertEquals("Permission action list not as expected", actions, responseItem.getRequestItem().getActions());
+		assertNotNull("ResponseItem permission can't be retrieved", responseItems);
+		assertTrue("ResponseItem permission can't be retrieved", responseItems.size() > 0);
+		assertEquals("Permission result not as expected", permission.name(), responseItems.get(0).getDecision().name());
+		assertTrue("Permission action list not as expected", ActionUtils.equal(ActionUtils.toActionBeans(actions), responseItems.get(0).getRequestItem().getActions()));
 	}
 
 
@@ -291,14 +294,14 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		LOG.info("[Test] "+testTitle);
 		boolean dataUpdated = false;
 		boolean dataDeleted = false;
-		ResponseItem responseItem = null;
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> responseItems = null;
 		try {
 			List<Action> actions = new ArrayList<Action>();
 			actions.add(new Action(ActionConstants.READ));
 			Decision permission = Decision.PERMIT;
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, dataId, actions, permission);
 			dataDeleted = privacyDataManagerInternal.deletePermissions(requestorCis, dataId);
-			responseItem = privacyDataManagerInternal.getPermission(requestorCis, dataId, actions);
+			responseItems = privacyDataManagerInternal.getPermissions(requestorCis, dataId, actions);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
@@ -308,7 +311,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		}
 		assertTrue("Privacy permission not added", dataUpdated);
 		assertTrue("Privacy permission not deleted", dataDeleted);
-		assertNull("ResponseItem permission still available", responseItem);
+		assertNull("ResponseItem permission still available", responseItems);
 	}
 
 

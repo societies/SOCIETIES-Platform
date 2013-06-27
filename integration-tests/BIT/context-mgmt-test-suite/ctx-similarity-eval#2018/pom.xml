@@ -3,7 +3,7 @@
 	
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>bit.context_similarity_eval.2018</artifactId>
-	<name>Context Similarity eval Integration Test</name>
+	<name>Context Similarity Evaluation Integration Test</name>
 	<packaging>bundle</packaging>
 	<version>${release.version}</version>
 

@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,12 +37,18 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxHistoryAttribute;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -73,6 +80,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	private static final Logger LOG = LoggerFactory.getLogger(CRISTUserIntentTaskManager.class);
 	public static final int UPDATE_TRIGGER_THRESHOLD = 5;
 	public static final int MAX_HISTORY_LENGTH = 1000;
+	public static final double COMMUNITY_MODEL_WEIGHT = 0.5; // how much the community influence the individual, from 0 to 1
 	public static HashMap<String, CtxAttributeIdentifier> REGISTERED_CONTEXTS = null;
 
 	private ArrayList<CRISTHistoryData> historyList = new ArrayList<CRISTHistoryData>();
@@ -1092,6 +1100,8 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	}
 	
 	public void displayIntentModel() {
+		//System.out.println("This is the intentModel.toString(): " + intentModel.toString()); //nearly the same as below
+		System.out.println(getCRISTUIModel(intentModel.toString()).toString());
 		System.out.println("This is the intentModel: ");
 		Set<String> modelKeys = intentModel.keySet();
 		Object[] keyArray = modelKeys.toArray();
@@ -1100,8 +1110,192 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 			System.out.println("intentModel is not null, but its length is zero.");
 		}
 		for (int i = 0; i < keyArray.length; i++) {
-			System.out.println(keyArray[i].toString() + ": " + intentModel.get(keyArray[i]));
+			System.out.println(keyArray[i].toString() + "=" + intentModel.get(keyArray[i]));
 		}
 	}
+
+	
+	
+	
+	
+	
+	//---------------------- for community model -------------------------
+	
+
+	
+	// create a community CRIST model, store in the contextDB, and return the communityCristModelCtxAttrId
+	// may return null
+	public CtxAttributeIdentifier createCommunityCRISTModel(IIdentity cisId) {
+		try {
+			CtxEntityIdentifier communityCtxEntityId;
+			if (this.ctxBroker.retrieveCommunityEntityId(cisId) != null) {
+				communityCtxEntityId = this.ctxBroker.retrieveCommunityEntityId(cisId).get(); 
+			}
+			// what if no ctxEntity of this cisId in the contextDB
+			else {
+				System.out.println("ctxBroker.createEntity(cisId, CtxEntityTypes.COMMUNITY): " + ctxBroker.createEntity(cisId, CtxEntityTypes.COMMUNITY)); //null
+				communityCtxEntityId = ctxBroker.createEntity(cisId, CtxEntityTypes.COMMUNITY).get().getId();
+			}
+			
+			CtxAttribute communityCristModelCtxAttr = this.ctxBroker.createAttribute(communityCtxEntityId, CtxAttributeTypes.CRIST_MODEL).get();
+			// what if already a CRIST_MODEL Attribute? 
+			
+			// fill with local IndividualCRISTModel, because "The CSS who creates the CIS will be added as a member to the CIS and with the owner role."
+			communityCristModelCtxAttr.setStringValue(intentModel.toString());
+			communityCristModelCtxAttr.setValueType(CtxAttributeValueType.STRING);
+			
+			
+			CtxAttributeIdentifier communityCristModelCtxAttrId = communityCristModelCtxAttr.getId();
+			return communityCristModelCtxAttrId;
+
+		
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		} catch (CtxException e) {
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+	
+	// update community CRIST model and store in the contextDB
+	// may return null
+	public CtxAttributeIdentifier updateCommunityCRISTModel(IIdentity cisId) {
+		
+
+		try {
+			
+			// retrieve CommunityCRISTModel 
+			List<CtxIdentifier> attrIds = this.ctxBroker.lookup(cisId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.CRIST_MODEL).get(); // can this method lookup communityCristModelCtxAttrId?
+			// what if attrIds == null? return createCommunityCRISTModel(cisId)
+			CtxAttributeIdentifier communityCristModelCtxAttrId = (CtxAttributeIdentifier) attrIds.get(0); // if more than one CRIST_MODEL, only get the first one.
+	
+			CtxAttribute communityCristModelCtxAttr = (CtxAttribute) this.ctxBroker.retrieve(communityCristModelCtxAttrId).get();
+			
+			LinkedHashMap<String, Integer> communityCRISTModel = retrieveCommunityCRISTModel(communityCristModelCtxAttrId);
+			
+			// merge CommunityCRISTModel and local IndividualCRISTModel
+			for (String currentKey : intentModel.keySet()) {
+				Integer individualScore = this.intentModel.get(currentKey);
+				if (communityCRISTModel.containsKey(currentKey)) {
+					communityCRISTModel.put(currentKey, individualScore + communityCRISTModel.get(currentKey));
+				} else {
+					communityCRISTModel.put(currentKey, individualScore);
+				}
+			}
+
+			
+			// store to the contextDB
+			communityCristModelCtxAttr.setStringValue(communityCRISTModel.toString());
+			communityCristModelCtxAttrId = (CtxAttributeIdentifier) this.ctxBroker.update(communityCristModelCtxAttr).get().getId();
+
+			return communityCristModelCtxAttrId;
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+		return null;
+
+
+
+	}
+	
+	// merge Community CRIST Model with local Individual CRIST Model to a new Individual model, under the permission from the user.
+	public void updateIndividualCRISTModelWithCommunity(IIdentity cisId) {
+		
+		try {
+			
+			// retrieve CommunityCRISTModel 
+			List<CtxIdentifier> attrIds = this.ctxBroker.lookup(cisId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.CRIST_MODEL).get(); // can this method lookup communityCristModelCtxAttrId?
+			// what if attrIds == null? return createCommunityCRISTModel(cisId)
+			CtxAttributeIdentifier communityCristModelCtxAttrId = (CtxAttributeIdentifier) attrIds.get(0); // if more than one CRIST_MODEL, only get the first one.
+	
+			LinkedHashMap<String, Integer> communityCRISTModel = retrieveCommunityCRISTModel(communityCristModelCtxAttrId);
+			
+			// merge CommunityCRISTModel and local IndividualCRISTModel to a new local IndividualCRISTModel
+			for (String currentKey : communityCRISTModel.keySet()) {
+				Integer communityScore = communityCRISTModel.get(currentKey);
+				if (this.intentModel.containsKey(currentKey)) {
+					this.intentModel.put(currentKey, (int)Math.ceil(communityScore * COMMUNITY_MODEL_WEIGHT) + this.intentModel.get(currentKey));
+				} else {
+					this.intentModel.put(currentKey, (int)Math.ceil(communityScore * COMMUNITY_MODEL_WEIGHT));
+				}
+
+			}
+
+
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+	}
+	
+	
+	// retrieve community CRIST model from the contextDB
+	// may return null
+	//ctxAttribute or ctxAttributeIdentifier is unique, related with its CtxEntity, not like ctxAttributeType, which is not unique.
+	public LinkedHashMap<String, Integer> retrieveCommunityCRISTModel(CtxAttributeIdentifier communityCristModelCtxAttrId) {
+		
+		try {
+			Future<CtxModelObject> ctxAttributeRetrievedStringFuture = this.ctxBroker
+					.retrieve(communityCristModelCtxAttrId);
+			CtxAttribute retrievedCtxAttribute = (CtxAttribute) ctxAttributeRetrievedStringFuture
+					.get();
+			return getCRISTUIModel(getValue(retrievedCtxAttribute));
+			
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		} catch (CtxException e) {
+			e.printStackTrace();
+		}
+		return null;
+
+		
+	}
+	
+	private LinkedHashMap<String, Integer> getCRISTUIModel(String UIModelString){
+		LinkedHashMap<String, Integer> UIModel = new LinkedHashMap<String, Integer>();
+		// UIModelString = {STARTING_ACTION@RoomA#http://testService_MyTV: TVService: channel: 1=1, http://testService_MyTV: TVService: channel: 1@RoomB#http://testService_MyTV: TVService: channel: 2=5, http://testService_MyTV: TVService: channel: 2@RoomA#http://testService_MyTV: TVService: channel: 1=4, http://testService_MyTV: TVService: channel: 2@RoomA#http://testService_MyTV: TVService: channel: 2=1, http://testService_MyTV: TVService: channel: 2@RoomB#http://testService_MyTV: TVService: channel: 1=5, http://testService_MyTV: TVService: channel: 1@RoomA#http://testService_MyTV: TVService: channel: 2=4}
+
+		String UIModelString_clean = UIModelString.substring(1, UIModelString.length()-1); // no {...}
+		String[] itemString = UIModelString_clean.split(", ");
+		for (int i = 0; i < itemString.length; i++) {
+			// itemString[0] = STARTING_ACTION@RoomA#http://testService_MyTV: TVService: channel: 1=1
+			int indexOfEqual = itemString[i].indexOf('=');
+			UIModel.put(itemString[i].substring(0, indexOfEqual), Integer.parseInt(itemString[i].substring(indexOfEqual+1)));
+		}
+	
+		
+		return UIModel;
+		
+	}
+	
+	
+	
+	
+	
 
 }

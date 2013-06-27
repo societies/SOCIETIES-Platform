@@ -44,7 +44,7 @@ public class locationCoordinates {
 		gcd = new GetContextData();
 	}
 		
-	public HashMap<String, Double> evaluate(IIdentity[] allOwners){
+	public HashMap<String, Double> evaluate(String[] allOwners){
 	
 		HashMap<String, Double> results = new HashMap<String, Double>();
 		
@@ -53,11 +53,11 @@ public class locationCoordinates {
 		userList = new String[allOwners.length];
 		int i = 0; 
 				
-		for (IIdentity css : allOwners){
+		for (String css : allOwners){
 			// get context value
-			CtxAttribute contextResult = gcd.getContext(css, cat.LOCATION_COORDINATES);
-			String contextValue = contextResult.getStringValue();			
-			String[] splitString = contextValue.split(",");
+			//CtxAttribute contextResult = gcd.getContext(css, cat.LOCATION_COORDINATES);
+			//String contextValue = contextResult.getStringValue();			
+			String[] splitString = css.split(",");
 			calculateDistance(splitString[0], splitString[1]);
 		}
 		 

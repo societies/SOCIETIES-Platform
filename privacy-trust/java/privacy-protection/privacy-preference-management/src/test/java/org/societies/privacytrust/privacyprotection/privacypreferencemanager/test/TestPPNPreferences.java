@@ -63,6 +63,7 @@ import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
 import org.societies.api.schema.identity.DataIdentifierScheme;
@@ -102,6 +103,7 @@ public class TestPPNPreferences {
 	private ITrustBroker trustBroker = Mockito.mock(ITrustBroker.class);
 	private IUserFeedback userFeedback = Mockito.mock(IUserFeedback.class);
 	private IPrivacyAgreementManager agreementMgr = Mockito.mock(IPrivacyAgreementManager.class);
+	private IEventMgr eventMgr = Mockito.mock(IEventMgr.class);
 	private PrivacyPreferenceManager privPrefMgr;
 	private PPNPreferenceDetailsBean ppNetails;
 	private RequestorCisBean requestorCisBean;
@@ -127,7 +129,7 @@ public class TestPPNPreferences {
 		this.privPrefMgr.setTrustBroker(trustBroker);
 		this.privPrefMgr.setUserFeedback(userFeedback);
 		this.privPrefMgr.setAgreementMgr(agreementMgr);
-		
+		this.privPrefMgr.setEventMgr(eventMgr);
 		this.userId = new MyIdentity(IdentityType.CSS, "xcmanager","societies.local");
 		
 		this.setupRequestor();

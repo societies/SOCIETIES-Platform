@@ -45,6 +45,12 @@ org.societies.api.context.model.CtxAttributeTypes {
 	public static final String CAUI_MODEL = "caui_model";
 
 	/**
+	 * @since 0.0.8
+	 */
+	public static final String CACI_MODEL = "caci_model";
+
+	
+	/**
 	 * 
 	 */
 	public static final String CRIST_MODEL = "crist_model";
@@ -91,6 +97,7 @@ org.societies.api.context.model.CtxAttributeTypes {
 	 */
 	public static final String D_NET = "dNet";
 
+	
 	/**
 	 * 
 	 */
@@ -100,7 +107,12 @@ org.societies.api.context.model.CtxAttributeTypes {
 	 *
 	 */
 	public static final String PRIVACY_POLICY_REGISTRY = "privacyPolicyRegistry";
-
+	
+	/**
+	 *
+	 */
+	public static final String PRIVACY_POLICY = "privacyPolicy";
+	
 	/**
 	 * @since 0.0.8
 	 */
@@ -116,6 +128,9 @@ org.societies.api.context.model.CtxAttributeTypes {
 	 */
 	public static final String UID = "uid";
 	
+	
+	
+	 
 	/**
 	 * @since 0.0.8
 	 */

@@ -20,8 +20,6 @@
 
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
-import java.util.Date;
-
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -93,7 +91,7 @@ public interface IPrivacyLogAppender {
 	 * General logger for transmission of data.
 	 * 
 	 * @param entry
-	 * @return
+	 * @return True if OK to proceed with data transmission, false if not.
 	 */
 	public boolean log(DataTransmissionLogEntry entry);
 	

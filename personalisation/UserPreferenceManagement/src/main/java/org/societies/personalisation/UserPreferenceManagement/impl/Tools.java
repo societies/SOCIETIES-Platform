@@ -35,6 +35,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.preference.api.model.ContextPreferenceCondition;
 import org.societies.personalisation.preference.api.model.IPreference;
@@ -69,10 +70,11 @@ public class Tools {
 			return null;
 		}
 		log("constructing PreferenceTreeModel for preference: \n"+p.toString());
-		IPreferenceTreeModel iptm = new PreferenceTreeModel(p);
-		iptm.setServiceType(serviceType);
-		iptm.setServiceID(serviceID);
-		iptm.setPreferenceName(preferenceName);
+		PreferenceDetails details = new PreferenceDetails();
+		details.setPreferenceName(preferenceName);
+		details.setServiceID(serviceID);
+		details.setServiceType(serviceType);
+		IPreferenceTreeModel iptm = new PreferenceTreeModel(details, p);
 		return iptm;
 		
 	}

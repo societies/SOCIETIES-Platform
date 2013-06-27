@@ -101,7 +101,7 @@ public class RequestorUtils {
 			sb.append("</Subject>");
 		}
 		return sb.toString();
-	}	
+	}
 
 	public static String toString(RequestorBean bean){
 		StringBuilder builder = new StringBuilder();
@@ -128,6 +128,22 @@ public class RequestorUtils {
 		}
 		builder.append("]");
 		return builder.toString();
+	}
+
+	public static String toUriString(RequestorBean requestor){
+		StringBuilder sb = new StringBuilder();
+		if (null != requestor) {
+			sb.append(requestor.getRequestorId());
+			if (requestor instanceof RequestorCisBean) {
+				sb.append(((RequestorCisBean)requestor).getCisRequestorId());
+			}
+			if (requestor instanceof RequestorServiceBean) {
+				if (null != ((RequestorServiceBean)requestor).getRequestorServiceId()) {
+					sb.append(((RequestorServiceBean)requestor).getRequestorServiceId().getServiceInstanceIdentifier());
+				}
+			}
+		}
+		return sb.toString().hashCode()+"";
 	}
 
 

@@ -78,6 +78,8 @@ public class GetContextData {
 	public void setCommMang(ICommManager commMang) {
 		this.commMang = commMang;
 	}
+
+
 	
 
 }

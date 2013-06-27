@@ -66,7 +66,7 @@ public interface ICommunityRecommendationManager {
 
 	/**
 	 * 
-	 * Return a list of CIS identities sorted by relevance
+	 * Return a list of CIS identities sorted by relevance. The IIdentiy list can be used to retrieve more info from the Context Broker
 	 * 
 	 * @param limit Maximum results to return. Default value if null is 10.
 	 * @param primaryfilter An array of filters. The primary filter is applied when you want an exact result

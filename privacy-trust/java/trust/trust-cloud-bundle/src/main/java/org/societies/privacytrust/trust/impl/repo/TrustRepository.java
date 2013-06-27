@@ -24,13 +24,20 @@
  */
 package org.societies.privacytrust.trust.impl.repo;
 
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -41,6 +48,7 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.event.ITrustEventMgr;
 import org.societies.privacytrust.trust.api.event.TrustEventTopic;
+import org.societies.privacytrust.trust.api.model.ITrustedCss;
 import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.societies.privacytrust.trust.api.repo.TrustRepositoryException;
@@ -64,6 +72,39 @@ public class TrustRepository implements ITrustRepository {
 
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(TrustRepository.class);
+	
+	private static Comparator<ITrustedCss> CssSimilarityComparator = 
+			new Comparator<ITrustedCss>() {
+
+		/*
+		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+		 */
+		@Override
+		public int compare(ITrustedCss css1, ITrustedCss css2) {
+			
+			// null_css == null_css
+			if (css1 == null && css2 == null) 
+				return 0; 
+		    // css1 > null_css 
+		    if (css1 != null && css2 == null) 
+		    	return +1;
+		    // null_css < css2
+		    if (css1 == null && css2 != null) 
+		    	return -1;
+		    
+		    // null_simil == null_simil
+		    if (css1.getSimilarity() == null && css2.getSimilarity() == null)
+		    	return 0;
+		    // simil1 > null_simil
+		    if (css1.getSimilarity() != null && css2.getSimilarity() == null)
+		    	return +1;
+		    // null_simil < simil2
+		    if (css1.getSimilarity() == null && css2.getSimilarity() != null)
+		    	return -1;
+		    
+		    return css1.getSimilarity().compareTo(css2.getSimilarity());
+		}
+	};
 	
 	/** The Trust Event Mgr service reference. */
 	@Autowired
@@ -310,6 +351,100 @@ public class TrustRepository implements ITrustRepository {
 		return result;
 	}
 	
+	/*
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#retrieveMeanTrustValue(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType, org.societies.api.privacytrust.trust.model.TrustedEntityType)
+	 */
+	@Override
+	public double retrieveMeanTrustValue(final TrustedEntityId trustorId,
+			final TrustValueType valueType, final TrustedEntityType entityType)
+					throws TrustRepositoryException {
+		
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (valueType == null)
+			throw new NullPointerException("valueType can't be null");
+		
+		final String valueProperty;
+		if (TrustValueType.DIRECT == valueType)
+			valueProperty = "directTrust.value";
+		else if (TrustValueType.INDIRECT == valueType)
+			valueProperty = "indirectTrust.value";
+		else // if (TrustValueType.USER_PERCEIVED == valueType)
+			valueProperty = "userPerceivedTrust.value";
+		
+		double sumValue = 0.0d;
+		int countValue = 0;
+		if (null == entityType) {
+			final SumN cssSumN = this.retrieveSumNTrustValue(
+					trustorId, valueProperty, TrustedCss.class);
+			final SumN cisSumN = this.retrieveSumNTrustValue(
+					trustorId, valueProperty, TrustedCis.class);
+			final SumN svcSumN = this.retrieveSumNTrustValue(
+					trustorId, valueProperty, TrustedService.class);
+			sumValue += cssSumN.sum + cisSumN.sum + svcSumN.sum;
+			countValue += cssSumN.n + cisSumN.n + svcSumN.n;
+			
+		} else if (TrustedEntityType.CSS == entityType) {
+			final SumN sumN = this.retrieveSumNTrustValue(
+					trustorId, valueProperty, TrustedCss.class);
+			sumValue += sumN.sum;
+			countValue += sumN.n;
+		} else if (TrustedEntityType.CIS == entityType) {
+			final SumN sumN = this.retrieveSumNTrustValue(
+					trustorId, valueProperty, TrustedCis.class);
+			sumValue += sumN.sum;
+			countValue += sumN.n;
+		} else if (TrustedEntityType.SVC == entityType) {
+			final SumN sumN = this.retrieveSumNTrustValue(
+					trustorId, valueProperty, TrustedService.class);
+			sumValue += sumN.sum;
+			countValue += sumN.n;
+		} else {
+			throw new TrustRepositoryException("Unsupported entityType: "
+					+ entityType);
+		}
+		
+		return (countValue > 0) ? sumValue / countValue : 0.0d; 
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#retrieveCssBySimilarity(org.societies.api.privacytrust.trust.model.TrustedEntityId, java.lang.Double, java.lang.Integer)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public SortedSet<ITrustedCss> retrieveCssBySimilarity(
+			final TrustedEntityId trustorId, final Double similarityThreshold, 
+			final Integer maxResults) throws TrustRepositoryException {
+		
+		if (trustorId == null)
+			throw new NullPointerException("trustorId can't be null");
+		if (maxResults != null && maxResults < 1)
+			throw new IllegalArgumentException("maxResults can't be less than 1");
+		
+		final SortedSet<ITrustedCss> result =
+				new TreeSet<ITrustedCss>(CssSimilarityComparator);
+		Session session = null;
+		try {
+			session = sessionFactory.openSession();
+			final Criteria criteria = session.createCriteria(TrustedCss.class)
+					.add(Restrictions.eq("trustorId", trustorId))
+					.addOrder(Order.desc("similarity"));
+			if (similarityThreshold != null)
+				criteria.add(Restrictions.ge("similarity", similarityThreshold));
+			if (maxResults != null)
+				criteria.setMaxResults(maxResults);
+			result.addAll(criteria.list());
+		} catch (Exception e) {
+			throw new TrustRepositoryException("Could not retrieve entities trusted by '"
+					+ trustorId + "': " + e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+		
+		return result;
+	}
+	
 	@SuppressWarnings("unchecked")
 	private <T extends TrustedEntity> Set<T> doRetrieveEntities(
 			final TrustedEntityId trustorId, final Class<T> entityClass,
@@ -337,5 +472,59 @@ public class TrustRepository implements ITrustRepository {
 		}
 		
 		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private SumN retrieveSumNTrustValue(
+			final TrustedEntityId trustorId, final String valueProperty,	
+			final Class<? extends TrustedEntity> entityClass) 
+					throws TrustRepositoryException {
+		
+		Session session = null;
+		try {
+			session = sessionFactory.openSession();
+			final Criteria criteria = session.createCriteria(entityClass)
+					.add(Restrictions.eq("trustorId", trustorId));
+			final ProjectionList projList = Projections.projectionList();
+			projList.add(Projections.sum(valueProperty));
+			projList.add(Projections.count(valueProperty));
+			criteria.setProjection(projList);
+			final List<Object[]> results = criteria.list();
+			double totalSum = 0.0d;
+			int totalCount = 0;
+			for (Object[] resultsEntry : results) {
+				if (resultsEntry[0] != null) {
+					totalSum += (Double) resultsEntry[0];
+					totalCount += (Integer) resultsEntry[1];
+				}
+			}
+			return new SumN(totalSum, totalCount);
+		
+		} catch (Exception e) {
+			throw new TrustRepositoryException("Could not estimate mean trust value assigned by '"
+					+ trustorId + "': " + e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+	}
+	
+	/**
+	 * Utility class to calculate the mean.
+	 * 
+	 * mean = sum / n;
+	 *
+	 * @since 1.1
+	 */
+	private class SumN {
+		
+		private final double sum;
+		private final int n;
+		
+		private SumN(final double sum, final int n) {
+			
+			this.sum = sum;
+			this.n = n;
+		}
 	}
 }

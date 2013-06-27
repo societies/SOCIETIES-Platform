@@ -30,11 +30,13 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
@@ -162,6 +164,28 @@ public class UserLocationRefiner {
 			LOG.info(this.getClass() + " instantiated");
 	}
 
+	public CtxAttribute refineOnDemandGPSCoords(final CtxAttributeIdentifier attrId)
+			throws UserCtxInferenceException {
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Refining attribute '" + attrId + "' on-demand");
+		if (!CtxAttributeTypes.LOCATION_COORDINATES.equals(attrId.getType()))
+			throw new UserCtxInferenceException("Could not refine attribute '"
+					+ attrId + "': Unsupported attribute type: " + attrId.getType());
+		
+		// TODO add real inference
+		CtxAttribute refinedAttr ;
+		try {
+			refinedAttr = this.internalCtxBroker.retrieveAttribute(attrId, false).get();
+		} catch (Exception e) {
+			
+			throw new UserCtxInferenceException("Could not refine attribute '"
+					+ attrId + "': " + e.getLocalizedMessage(), e);
+		} 
+		
+		return refinedAttr;
+	}
+	
 	public CtxAttribute refineOnDemand(final CtxAttributeIdentifier attrId) 
 			throws UserCtxInferenceException {
 		

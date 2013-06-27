@@ -1,0 +1,23 @@
+{% extends "SocietiesTestEngineBundle::layout.html.twig" %}
+
+{% block title %}{{ parent() }} - Login{% endblock %}
+
+{% block TestEngine_body %}
+ 
+  {# If there is an error, display alert dialog #}
+  {% if error %}
+    <div class="alert alert-error">{{ error.message }}</div>
+  {% endif %}
+ 
+  {# Form, redirection to « login_check » route to check the login info #}
+  <form action="{{ path('login_check') }}" method="post">
+    <label for="username">Login: </label>
+    <input type="text" id="username" name="_username" value="{{ last_username }}" />
+ 
+    <label for="password">Password: </label>
+    <input type="password" id="password" name="_password" />
+    <br />
+    <input type="submit" value="Connexion" />
+  </form>
+ 
+{% endblock %}

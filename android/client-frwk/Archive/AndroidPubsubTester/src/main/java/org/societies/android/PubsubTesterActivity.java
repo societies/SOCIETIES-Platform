@@ -30,7 +30,7 @@ import android.util.Log;
 
 public class PubsubTesterActivity extends Activity {
 
-	private static final String LOG_TAG = PubsubTesterActivity.class.getName();
+	private static final String LOG_TAG = PubsubTesterActivity.class.getCanonicalName();
     
 	private static final List<String> classList = Collections.singletonList("org.societies.api.schema.examples.calculatorbean.CalcBean");
 	

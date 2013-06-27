@@ -29,6 +29,7 @@ import java.util.Date;
 
 import javax.swing.tree.DefaultTreeModel;
 
+import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
@@ -40,44 +41,20 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  */
 public class PreferenceTreeModel extends DefaultTreeModel implements IPreferenceTreeModel, Serializable {
 
-	private ServiceResourceIdentifier serviceID;
-	private String serviceType;
-	private String preferenceName;
 	private IPreference preference;
 	private Date lastModifiedDate;
+	private final PreferenceDetails preferenceDetails;
 
-	public PreferenceTreeModel(IPreference root) {
+	public PreferenceTreeModel(PreferenceDetails preferenceDetails, IPreference root) {
 		super(root);
+		this.preferenceDetails = preferenceDetails;
 		this.preference = root;
 	}
 
 	public IPreference getRootPreference(){
 		return this.preference;
 	}
-	public String getPreferenceName() {
-		return this.preferenceName;
-	}
 
-	public ServiceResourceIdentifier getServiceID() {
-		return this.serviceID;
-	}
-
-	public String getServiceType() {
-		return this.serviceType;
-	}
-
-	public void setPreferenceName(String prefname) {
-		this.preferenceName = prefname;
-	}
-
-	public void setServiceID(ServiceResourceIdentifier id) {
-		this.serviceID = id;
-		
-	}
-	public void setServiceType(String type) {
-		this.serviceType = type;
-		
-	}
 
 	/* (non-Javadoc)
 	 * @see org.personalsmartspace.pm.prefmodel.api.platform.IPreferenceTreeModel#getLastModifiedDate()
@@ -93,6 +70,10 @@ public class PreferenceTreeModel extends DefaultTreeModel implements IPreference
 	@Override
 	public void setLastModifiedDate(Date d) {
 		this.lastModifiedDate = d;
+	}
+
+	public PreferenceDetails getPreferenceDetails() {
+		return preferenceDetails;
 	}
 	
 

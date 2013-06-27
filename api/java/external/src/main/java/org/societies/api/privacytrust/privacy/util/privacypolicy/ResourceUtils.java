@@ -69,6 +69,15 @@ public class ResourceUtils {
 		resource.setDataType(dataType);
 		return resource;
 	}
+	
+
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource create(DataIdentifier dataId) {
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource();
+		resource.setDataIdUri(dataId.getUri());
+		resource.setDataType(dataId.getType());
+		resource.setScheme(dataId.getScheme());
+		return resource;
+	}
 
 
 	public static String getDataIdUri(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource) {
@@ -192,7 +201,6 @@ public class ResourceUtils {
 		}
 		return false;
 	}
-
 
 	public static Resource toResource(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resourceBean)
 	{

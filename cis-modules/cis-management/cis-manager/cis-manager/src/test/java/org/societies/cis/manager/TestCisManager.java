@@ -302,8 +302,10 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		when(mockPrivacyPolicyManager.deletePrivacyPolicy(any(org.societies.api.identity.RequestorCis.class))).thenReturn(true);
 		when(mockPrivacyPolicyManager.updatePrivacyPolicy(anyString(),any(org.societies.api.identity.RequestorCis.class))).thenReturn(null);
 		
+		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
+		permissions.add(new ResponseItem(new RequestItem(null, null, null, true),Decision.PERMIT));
 		when(mockIPrivacyDataManager.checkPermission(any(Requestor.class), any(DataIdentifier.class), any(Action.class))).
-		thenReturn(new ResponseItem(new RequestItem(null, null, null, true),Decision.PERMIT));
+		thenReturn(permissions);
 		
 		doNothing().when(mockEventMgr).publishInternalEvent(any(org.societies.api.osgi.event.InternalEvent.class));
 		

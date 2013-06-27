@@ -236,7 +236,7 @@ public abstract class TrustedEntity implements ITrustedEntity {
 		
 		final StringBuilder sb = new StringBuilder();
 		
-		sb.append("{");
+		sb.append("(");
 		sb.append("trustorId=" + this.trustorId);
 		sb.append(",");
 		sb.append("trusteeId=" + this.trusteeId);
@@ -246,7 +246,7 @@ public abstract class TrustedEntity implements ITrustedEntity {
 		sb.append("indirectTrust=" + this.indirectTrust);
 		sb.append(",");
 		sb.append("userPerceivedTrust=" + this.userPerceivedTrust);
-		sb.append("}");
+		sb.append(")");
 		
 		return sb.toString();
 	}

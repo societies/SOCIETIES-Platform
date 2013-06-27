@@ -64,27 +64,41 @@ public class SelectSNActivity extends Activity {
 		@Override
 		public void onClick(View v) {
 
-			switch(v.getId()){				
-			case R.id.fb_connector:
+			//Due to changes in the way that Android compiles APKLIB projects, R.id.xxxx is no longer a constant but is declared as:
+			//public static int
+			//As a result, expressions such as R.id.xxxx are longer constants and switch statements no longer work - use if statements instead
+			//cf. http://tools.android.com/tips/non-constant-fields
+		
+			if (v.getId() == R.id.fb_connector) {
 				Log.d(Constants.DEBUG_TAG, "[onClick] fb_connector");
 				openBrowser(Constants.FB_URL, Constants.FB_CODE);
-				break;
-
-			case R.id.fq_connector: 
-				Log.d(Constants.DEBUG_TAG, "[onClick] fq_connector");
-				openBrowser(Constants.FQ_URL, Constants.FQ_CODE);
-				break;
-
-			case R.id.tw_connector: 
+			} else if (v.getId() == R.id.tw_connector) {
 				Log.d(Constants.DEBUG_TAG, "[onClick] tw_connector");
 				openBrowser(Constants.TW_URL, Constants.TW_CODE);
-				break;
-
-			case R.id.lk_connector: 
+			} else if (v.getId() == R.id.lk_connector) {
 				Log.d(Constants.DEBUG_TAG, "[onClick] lk_connector");		
 				openBrowser(Constants.LK_URL, Constants.LK_CODE);
-				break;
 			}
+			
+//			switch(v.getId()){				
+//			case R.id.fb_connector:
+//				break;
+//
+//			case R.id.fq_connector: 
+//				Log.d(Constants.DEBUG_TAG, "[onClick] fq_connector");
+//				openBrowser(Constants.FQ_URL, Constants.FQ_CODE);
+//				break;
+//
+//			case R.id.tw_connector: 
+//				Log.d(Constants.DEBUG_TAG, "[onClick] tw_connector");
+//				openBrowser(Constants.TW_URL, Constants.TW_CODE);
+//				break;
+//
+//			case R.id.lk_connector: 
+//				Log.d(Constants.DEBUG_TAG, "[onClick] lk_connector");		
+//				openBrowser(Constants.LK_URL, Constants.LK_CODE);
+//				break;
+//			}
 		}
 	};
 
