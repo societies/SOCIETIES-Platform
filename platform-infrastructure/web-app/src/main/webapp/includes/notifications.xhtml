@@ -14,12 +14,14 @@
               draggable="true" modal="false">
 
 
-        <p>Bugs/incomplete:</p>
-        <ul>
-            <li>Wrong item disappearing on submit</li>
-            <li>Remove Timed Abort from GUI when it expires</li>
-            <li>Input validation</li>
-        </ul>
+        <!--
+                <p>Bugs/incomplete:</p>
+                <ul>
+                    <li>Wrong item disappearing on submit</li>
+                    <li>Remove Timed Abort from GUI when it expires</li>
+                    <li>Input validation</li>
+                </ul>
+        -->
 
         <h:outputLink value="notification_history.xhtml">Notification history</h:outputLink>
 
@@ -128,23 +130,26 @@
                 <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
                 <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
-                <!-- TMIED ABORT -->
+                <!-- TIMED ABORT -->
 
                 <h:panelGrid columns="1">
-                    <p:poll interval="1" update="timedAbortTimeLeft"/>
-                    <h:outputText value="Time left: #{notification.friendlyTimeLeft}" id="timedAbortTimeLeft"/>
+                    <p:poll interval="1" update="taAbortButton"/>
 
-                    <p>Click this button to cancel</p>
-
-                   <!-- <f:metadata>
+                    <f:metadata>
                         <f:viewParam name="result" value="{notification.result}"/>
                     </f:metadata>
-                    <p:commandButton value="Abort" process="timedAbortPopupPanel"
+                    <p:commandButton id="taAcceptButton"
+                                     value="Accept" process="timedAbortPopupPanel"
                                      update="notificationGrid"
-                                     actionListener="{notifications.submitItem(notification.itemId)}">
+                                     actionListener="#{notifications.submitItem(notification.itemId)}">
+                        <f:param name="result" value="accept"/>
+                    </p:commandButton>
+                    <p:commandButton id="taAbortButton"
+                                     value="Abort (#{notification.friendlyTimeLeft})" process="timedAbortPopupPanel"
+                                     update="notificationGrid"
+                                     actionListener="#{notifications.submitItem(notification.itemId)}">
                         <f:param name="result" value="abort"/>
                     </p:commandButton>
--->
                 </h:panelGrid>
             </p:panel>
 

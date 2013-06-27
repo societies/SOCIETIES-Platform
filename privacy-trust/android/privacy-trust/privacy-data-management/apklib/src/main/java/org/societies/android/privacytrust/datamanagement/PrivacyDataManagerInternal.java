@@ -50,8 +50,8 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	 * (non-Javadoc)
 	 * @see org.societies.android.privacytrust.api.IPrivacyDataManagerInternal#getPermission(org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.identity.DataIdentifier, java.util.List)
 	 */
-	public PrivacyPermission getPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
-		PrivacyPermission permission = null;
+	public List<PrivacyPermission> getPermissions(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
+		List<PrivacyPermission> permissions = null;
 		//		Session session = sessionFactory.openSession();
 		//		Transaction t = session.beginTransaction();
 		//		try {
@@ -88,7 +88,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		//				session.close();
 		//			}
 		//		}
-		return permission;
+		return permissions;
 	}
 
 	/*
@@ -102,10 +102,10 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		action.setActionConstant(ActionConstants.READ);
 		actions.add(action);
 		// Retrieve privacy permission
-		PrivacyPermission privacyPermission = getPermission(requestor, dataId, actions);
+		List<PrivacyPermission> privacyPermissions = getPermissions(requestor, dataId, actions);
 		// Retrieve obfuscation level
-		if (null != privacyPermission) {
-			return privacyPermission.getObfuscationLevel();
+		if (null != privacyPermissions && privacyPermissions.size() > 0) {
+			return privacyPermissions.get(0).getObfuscationLevel();
 		}
 		// No obfuscation level: default value
 		return -1;

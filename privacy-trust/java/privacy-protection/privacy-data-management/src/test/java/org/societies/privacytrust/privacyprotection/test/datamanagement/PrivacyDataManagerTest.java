@@ -61,6 +61,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
@@ -148,61 +149,71 @@ public class PrivacyDataManagerTest {
 
 	@Test
 	@Rollback(true)
-	public void CheckPermissionPreviouslyAdded() {
+	public void testCheckPermissionPreviouslyAdded() {
 		String testTitle = new String("CheckPermission: previously added permission");
 		LOG.info("[TEST] "+testTitle);
 		boolean dataUpdated = false;
-		ResponseItem permission = null;
+		List<ResponseItem> permissions = null;
 		try {
 			Action action = new Action(ActionConstants.READ);
 			List<Action> actions = new ArrayList<Action>();
 			actions.add(action);
 			Decision decision = Decision.PERMIT;
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, decision);
-			permission = privacyDataManager.checkPermission(requestor, dataId, actions);
+			permissions = privacyDataManager.checkPermission(requestor, dataId, actions);
 		} catch (PrivacyException e) {
 			LOG.error("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
 		}
+		catch (Exception e) {
+			LOG.error("[Test Exception] "+testTitle, e);
+			fail("[Error "+testTitle+"] error: "+e.getMessage());
+		}
 		assertTrue("Data permission not updated", dataUpdated);
-		assertNotNull("No permission retrieved", permission);
-		LOG.debug("Permission retrieved: "+permission.toString());
-		assertNotNull("No permission decision retrieved", permission.getDecision());
-		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permission.getDecision().name());
+		assertNotNull("No permission retrieved", permissions);
+		assertTrue("No permission retrieved", permissions.size() > 0);
+		LOG.debug("Permission retrieved: "+ResponseItemUtils.toString(ResponseItemUtils.toResponseItemBeans(permissions)));
+		assertNotNull("No permission decision retrieved", permissions.get(0).getDecision());
+		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permissions.get(0).getDecision().name());
 	}
 
 	@Test
 	@Rollback(true)
-	public void CheckPermissionPreviouslyAddedRequestorCis() {
+	public void testCheckPermissionPreviouslyAddedRequestorCis() {
 		String testTitle = new String("CheckPermission: previously added permission, the requestor is a CIS");
 		LOG.info("[TEST] "+testTitle);
 		boolean dataUpdated = false;
-		ResponseItem permission = null;
+		List<ResponseItem> permissions = null;
 		try {
 			Action action = new Action(ActionConstants.READ);
 			List<Action> actions = new ArrayList<Action>();
 			actions.add(action);
 			Decision decision = Decision.PERMIT;
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, dataId, actions, decision);
-			permission = privacyDataManager.checkPermission(requestorCis, dataId, actions);
+			permissions = privacyDataManager.checkPermission(requestorCis, dataId, actions);
 		} catch (PrivacyException e) {
 			LOG.error("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
 		}
+		catch (Exception e) {
+			LOG.error("[Test Exception] "+testTitle, e);
+			fail("[Error "+testTitle+"] error: "+e.getMessage());
+		}
 		assertTrue("Data permission not updated", dataUpdated);
-		assertNotNull("No permission retrieved", permission);
-		LOG.debug("Permission retrieved: "+permission.toString());
-		assertNotNull("No permission decision retrieved", permission.getDecision());
-		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permission.getDecision().name());
+		assertNotNull("No permission retrieved", permissions);
+		assertTrue("No permission retrieved", permissions.size() > 0);
+		LOG.debug("Permission retrieved: "+ResponseItemUtils.toString(ResponseItemUtils.toResponseItemBeans(permissions)));
+		assertNotNull("No permission decision retrieved", permissions.get(0).getDecision());
+		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permissions.get(0).getDecision().name());
 	}
 
 	@Test
 	@Rollback(true)
-	public void CheckPermissionPreviouslyAddedRequestorCisError() {
+	public void testCheckPermissionPreviouslyAddedRequestorCisError() {
 		String testTitle = new String("CheckPermission: the requestor is a CIS, previously added permission with a CSS requestor");
 		LOG.info("[TEST] "+testTitle);
 		boolean dataUpdated = false;
-		ResponseItem permission = null;
+		List<ResponseItem> permissions = null;
 		try {
 			Action read = new Action(ActionConstants.READ);
 			Action write = new Action(ActionConstants.WRITE);
@@ -211,49 +222,55 @@ public class PrivacyDataManagerTest {
 			actions.add(write);
 			Decision decision = Decision.PERMIT;
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, decision);
-			permission = privacyDataManager.checkPermission(requestorCis, dataId, actions);
+			permissions = privacyDataManager.checkPermission(requestorCis, dataId, actions);
 		} catch (PrivacyException e) {
 			LOG.error("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
 		}
+		catch (Exception e) {
+			LOG.error("[Test Exception] "+testTitle, e);
+			fail("[Error "+testTitle+"] error: "+e.getMessage());
+		}
 		assertTrue("Data permission not updated", dataUpdated);
-		assertNotNull("No permission retrieved", permission);
-		LOG.debug("Permission retrieved: "+permission.toString());
-		assertNotNull("No permission decision retrieved", permission.getDecision());
-		assertEquals("Bad permission retrieved", Decision.DENY.name(), permission.getDecision().name());
+		assertNotNull("No permission retrieved", permissions);
+		assertTrue("No permission retrieved", permissions.size() > 0);
+		LOG.debug("Permission retrieved: "+ResponseItemUtils.toString(ResponseItemUtils.toResponseItemBeans(permissions)));
+		assertNotNull("No permission decision retrieved", permissions.get(0).getDecision());
+		assertEquals("Bad permission retrieved", Decision.DENY.name(), permissions.get(0).getDecision().name());
 	}
 
 	@Test
 	@Rollback(true)
-	public void CheckPermissionPreviouslyDeleted() {
+	public void testCheckPermissionPreviouslyDeleted() {
 		String testTitle = new String("CheckPermission: permission previously deleted, it is sure that it doesn't exist");
 		LOG.info("[TEST] "+testTitle);
 		boolean dataDeleted = false;
-		ResponseItem permission = null;
+		List<ResponseItem> permissions = null;
 		try {
 			Action action = new Action(ActionConstants.READ);
 			List<Action> actions = new ArrayList<Action>();
 			actions.add(action);
 			dataDeleted = privacyDataManagerInternal.deletePermissions(requestor, dataId);
-			permission = privacyDataManager.checkPermission(requestor, dataId, actions);
+			permissions = privacyDataManager.checkPermission(requestor, dataId, actions);
 		} catch (PrivacyException e) {
 			LOG.error("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
 		}
 		assertTrue("Data permission not deleted", dataDeleted);
-		assertNotNull("No permission retrieved", permission);
-		LOG.info("Permission retrieved: "+permission.toString());
-		assertNotNull("No permission decision retrieved", permission.getDecision());
-		assertEquals("Bad permission retrieved", Decision.DENY.name(), permission.getDecision().name());
+		assertNotNull("No permission retrieved", permissions);
+		assertTrue("No permission retrieved", permissions.size() > 0);
+		LOG.debug("Permission retrieved: "+ResponseItemUtils.toString(ResponseItemUtils.toResponseItemBeans(permissions)));
+		assertNotNull("No permission decision retrieved", permissions.get(0).getDecision());
+		assertEquals("Bad permission retrieved", Decision.DENY.name(), permissions.get(0).getDecision().name());
 	}
 	@Test
 	@Rollback(true)
-	public void CheckPermissionPreviouslyDeletedRequestorCis() {
+	public void testCheckPermissionPreviouslyDeletedRequestorCis() {
 		String testTitle = new String("CheckPermission: permission previously deleted, it is sure that it doesn't exist. The requestor is a CIS.");
 		LOG.info("[TEST] "+testTitle);
 		boolean dataUpdated = false;
 		boolean dataDeleted = false;
-		ResponseItem permission = null;
+		List<ResponseItem> permissions = null;
 		try {
 			Action read = new Action(ActionConstants.READ);
 			Action write = new Action(ActionConstants.WRITE, true);
@@ -262,17 +279,18 @@ public class PrivacyDataManagerTest {
 			actions.add(write);
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, dataId, actions, Decision.PERMIT);
 			dataDeleted = privacyDataManagerInternal.deletePermissions(requestorCis, dataId);
-			permission = privacyDataManager.checkPermission(requestorCis, dataId, actions);
+			permissions = privacyDataManager.checkPermission(requestorCis, dataId, actions);
 		} catch (PrivacyException e) {
 			LOG.error("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
 		}
 		assertTrue("Data permission not updated", dataUpdated);
 		assertTrue("Data permission not deleted", dataDeleted);
-		assertNotNull("No permission retrieved", permission);
-		LOG.info("Permission retrieved: "+permission.toString());
-		assertNotNull("No permission decision retrieved", permission.getDecision());
-		assertEquals("Bad permission retrieved", Decision.DENY.name(), permission.getDecision().name());
+		assertNotNull("No permission retrieved", permissions);
+		assertTrue("No permission retrieved", permissions.size() > 0);
+		LOG.debug("Permission retrieved: "+ResponseItemUtils.toString(ResponseItemUtils.toResponseItemBeans(permissions)));
+		assertNotNull("No permission decision retrieved", permissions.get(0).getDecision());
+		assertEquals("Bad permission retrieved", Decision.DENY.name(), permissions.get(0).getDecision().name());
 	}
 
 	/* --- CHECK PERMISSION CIS --- */
@@ -283,23 +301,24 @@ public class PrivacyDataManagerTest {
 		String testTitle = new String("CheckPermissionCis: previously added permission");
 		LOG.info("[TEST] "+testTitle);
 		boolean dataUpdated = false;
-		ResponseItem permission = null;
+		List<ResponseItem> permissions = null;
 		try {
 			Action action = new Action(ActionConstants.READ);
 			List<Action> actions = new ArrayList<Action>();
 			actions.add(action);
 			Decision decision = Decision.PERMIT;
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, cisDataId, actions, decision);
-			permission = privacyDataManager.checkPermission(requestor, cisDataId, actions);
+			permissions = privacyDataManager.checkPermission(requestor, cisDataId, actions);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
 		}
 		assertTrue("Data permission not updated", dataUpdated);
-		assertNotNull("No permission retrieved", permission);
-		LOG.info("Permission retrieved: "+permission.toString());
-		assertNotNull("No permission decision retrieved", permission.getDecision());
-		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permission.getDecision().name());
+		assertNotNull("No permission retrieved", permissions);
+		assertTrue("No permission retrieved", permissions.size() > 0);
+		LOG.debug("Permission retrieved: "+ResponseItemUtils.toString(ResponseItemUtils.toResponseItemBeans(permissions)));
+		assertNotNull("No permission decision retrieved", permissions.get(0).getDecision());
+		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permissions.get(0).getDecision().name());
 	}
 
 	@Test
@@ -308,22 +327,23 @@ public class PrivacyDataManagerTest {
 		String testTitle = new String("CheckPermissionCis: permission previously deleted, it is sure that it doesn't exist");
 		LOG.info("[TEST] "+testTitle);
 		boolean dataDeleted = false;
-		ResponseItem permission = null;
+		List<ResponseItem> permissions = null;
 		try {
 			Action action = new Action(ActionConstants.READ);
 			List<Action> actions = new ArrayList<Action>();
 			actions.add(action);
 			dataDeleted = privacyDataManagerInternal.deletePermissions(requestor, cisDataId);
-			permission = privacyDataManager.checkPermission(requestor, cisDataId, actions);
+			permissions = privacyDataManager.checkPermission(requestor, cisDataId, actions);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
 		}
-		assertTrue("Data permission not deleted", dataDeleted);
-		assertNotNull("No permission retrieved", permission);
-		LOG.info("Permission retrieved: "+permission.toString());
-		assertNotNull("No permission decision retrieved", permission.getDecision());
-		assertEquals("Bad permission retrieved", Decision.DENY.name(), permission.getDecision().name());
+		assertTrue("Data permission not updated", dataDeleted);
+		assertNotNull("No permission retrieved", permissions);
+		assertTrue("No permission retrieved", permissions.size() > 0);
+		LOG.debug("Permission retrieved: "+ResponseItemUtils.toString(ResponseItemUtils.toResponseItemBeans(permissions)));
+		assertNotNull("No permission decision retrieved", permissions.get(0).getDecision());
+		assertEquals("Bad permission retrieved", Decision.DENY.name(), permissions.get(0).getDecision().name());
 	}
 
 	/* --- OBFUSCATION --- */
@@ -362,25 +382,6 @@ public class PrivacyDataManagerTest {
 		assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
 	}
 
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager#hasObfuscatedVersion(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)}.
-	 */
-	@Test
-	@Ignore
-	public void testHasObfuscatedVersion() {
-		String testTitle = new String("testHasObfuscatedVersion");
-		LOG.info("[TEST] "+testTitle);
-		String actual = "";
-		boolean expection = false;
-		try {
-			actual = privacyDataManager.hasObfuscatedVersion(null, null, null);
-		} catch (PrivacyException e) {
-			expection = true;
-		}
-		assertFalse(expection);
-		assertNull(actual);
-	}
-
 
 	/* --- Data Id --- */
 	@Test
@@ -388,42 +389,56 @@ public class PrivacyDataManagerTest {
 		String testTitle = new String("testFromUriString: multiple test of DataId parsing");
 		LOG.info("[TEST] "+testTitle);
 
-		String ownerId = "owner@domain.com";
-		String dataId1 = "context://"+ownerId+"/locationSymbolic/";
-		String dataId2 = "context://owner@domain.com/locationSymbolic";
-		String dataId3 = "context:///locationSymbolic/";
-		String dataId4 = "context:///locationSymbolic";
-		String dataId5 = "context:///";
+		String ownerId = "owner.domain.com";
+		String dataId1 = DataIdentifierScheme.CIS+"://"+ownerId+"/locationSymbolic/";
+		String dataId1b = "CIS://"+ownerId+"/locationSymbolic/";
+		String dataId2 = DataIdentifierScheme.CIS+"://"+ownerId+"/locationSymbolic";
+		String dataId3 = DataIdentifierScheme.CIS+":///locationSymbolic/";
+		String dataId4 = DataIdentifierScheme.CIS+":///locationSymbolic";
+		String dataId5 = DataIdentifierScheme.CIS+":///";
+		String dataId6 = DataIdentifierScheme.CONTEXT+"://"+ownerId+"/ENTITY/person/1/ATTRIBUTE/name/13";
+		String dataId6b = "CONTEXT://"+ownerId+"/ENTITY/person/1/ATTRIBUTE/name/13";
+		try {
+			// CIS
+			assertNotNull("Data id from "+dataId1+" should not be null", DataIdentifierFactory.fromUri(dataId1));
+			assertEquals("Owner id from "+dataId1+" not retrieved", ownerId, DataIdentifierFactory.fromUri(dataId1).getOwnerId());
+			assertNotNull("Data id from "+dataId1b+" should not be null", DataIdentifierFactory.fromUri(dataId1b));
+			assertEquals("Owner id from "+dataId1b+" not retrieved", ownerId, DataIdentifierFactory.fromUri(dataId1b).getOwnerId());
 
-		assertNotNull("Data id from "+dataId1+" should not be null", DataIdentifierUtils.fromUri(dataId1));
-		assertEquals("Owner id from "+dataId1+" not retrieved", ownerId, DataIdentifierUtils.fromUri(dataId1).getOwnerId());
+			assertNotNull("Data id from "+dataId2+" should not be null", DataIdentifierFactory.fromUri(dataId2));
+			assertEquals("Owner id from "+dataId2+" not retrieved", ownerId, DataIdentifierFactory.fromUri(dataId2).getOwnerId());
 
-		assertNotNull("Data id from "+dataId2+" should not be null", DataIdentifierUtils.fromUri(dataId2));
-		assertEquals("Owner id from "+dataId2+" not retrieved", ownerId, DataIdentifierUtils.fromUri(dataId2).getOwnerId());
+			assertNotNull("Data id from "+dataId3+" should not be null", DataIdentifierFactory.fromUri(dataId3));
+			assertEquals("Owner id from "+dataId3+" not retrieved", "", DataIdentifierFactory.fromUri(dataId3).getOwnerId());
 
-		assertNotNull("Data id from "+dataId3+" should not be null", DataIdentifierUtils.fromUri(dataId3));
-		assertEquals("Owner id from "+dataId3+" not retrieved", "", DataIdentifierUtils.fromUri(dataId3).getOwnerId());
+			assertNotNull("Data id from "+dataId4+" should not be null", DataIdentifierFactory.fromUri(dataId4));
+			assertEquals("Owner id from "+dataId4+" not retrieved", "", DataIdentifierFactory.fromUri(dataId4).getOwnerId());
+			assertEquals("Data type from "+dataId4+" not retrieved", "locationSymbolic", DataIdentifierFactory.fromUri(dataId4).getType());
 
-		assertNotNull("Data id from "+dataId4+" should not be null", DataIdentifierUtils.fromUri(dataId4));
-		assertEquals("Owner id from "+dataId4+" not retrieved", "", DataIdentifierUtils.fromUri(dataId4).getOwnerId());
-		assertEquals("Data type from "+dataId4+" not retrieved", "locationSymbolic", DataIdentifierUtils.fromUri(dataId4).getType());
+			assertNotNull("Data id from "+dataId5+" should not be null", DataIdentifierFactory.fromUri(dataId5));
+			assertEquals("Owner id from "+dataId5+" not retrieved", "", DataIdentifierFactory.fromUri(dataId5).getOwnerId());
+			assertEquals("Data type from "+dataId5+" not retrieved", "", DataIdentifierFactory.fromUri(dataId5).getType());
 
-		assertNotNull("Data id from "+dataId5+" should not be null", DataIdentifierUtils.fromUri(dataId5));
-		assertEquals("Owner id from "+dataId5+" not retrieved", "", DataIdentifierUtils.fromUri(dataId5).getOwnerId());
-		assertEquals("Data type from "+dataId5+" not retrieved", "", DataIdentifierUtils.fromUri(dataId5).getType());
+			// Context
+			assertNotNull("Data id from "+dataId6+" should not be null", DataIdentifierFactory.fromUri(dataId6));
+			assertEquals("Owner id from "+dataId6+" not retrieved", ownerId, DataIdentifierFactory.fromUri(dataId6).getOwnerId());
+			assertEquals("Data type from "+dataId6+" not retrieved", "name", DataIdentifierFactory.fromUri(dataId6).getType());
+
+			assertNotNull("Data id from "+dataId6b+" should not be null", DataIdentifierFactory.fromUri(dataId6b));
+			assertEquals("Owner id from "+dataId6b+" not retrieved", ownerId, DataIdentifierFactory.fromUri(dataId6b).getOwnerId());
+			assertEquals("Data type from "+dataId6b+" not retrieved", "name", DataIdentifierFactory.fromUri(dataId6b).getType());
+		}
+		catch(MalformedCtxIdentifierException e) {
+			LOG.info("[Error MalformedCtxIdentifierException] "+testTitle, e);
+			fail("[Error MalformedCtxIdentifierException] "+testTitle+":"+e.getMessage());
+		}
 	}
-	
+
 	@Test
 	public void testSchemes() {
 		String testTitle = new String("testSchemes: multiple test on DataIdentifierScheme");
 		LOG.info("[TEST] "+testTitle);
 
-		String ownerId = "owner@domain.com";
-		String dataId1 = DataIdentifierScheme.CONTEXT+"://"+ownerId+"/locationSymbolic/";
-		String dataId2 = DataIdentifierScheme.CONTEXT+"://owner@domain.com/locationSymbolic";
-		String dataId3 = DataIdentifierScheme.CONTEXT+":///locationSymbolic/";
-		String dataId4 = DataIdentifierScheme.CONTEXT+":///locationSymbolic";
-		String dataId5 = DataIdentifierScheme.CONTEXT+":///";
 		DataIdentifierScheme schemeCtx1 = DataIdentifierScheme.CONTEXT;
 		DataIdentifierScheme schemeCtx2 = DataIdentifierScheme.CONTEXT;
 		DataIdentifierScheme schemeCis = DataIdentifierScheme.CIS;

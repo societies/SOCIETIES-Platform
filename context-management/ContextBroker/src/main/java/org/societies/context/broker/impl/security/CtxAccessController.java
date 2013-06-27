@@ -24,6 +24,8 @@
  */
 package org.societies.context.broker.impl.security;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.broker.CtxAccessControlException;
@@ -102,11 +104,12 @@ public class CtxAccessController implements ICtxAccessController {
 			if (LOG.isDebugEnabled())
 				LOG.debug("Checking " + action + " permission: requestor=" + requestor 
 						+ ",target=" + target + ",ctxId="	+ ctxId);
-			final ResponseItem response = this.privacyDataMgr.checkPermission(
-					requestor, target, ctxId, new Action(action));
+			final List<ResponseItem> responses = this.privacyDataMgr.checkPermission(
+					requestor, ctxId, new Action(action));
 			if (LOG.isDebugEnabled())
-				LOG.debug("ResponseItem is " + response);
-			if (response == null || !Decision.PERMIT.equals(response.getDecision()))
+				LOG.debug("ResponseItem is " + responses);
+			// TODO: manage all checkPermission responses, and not just the first one
+			if (responses == null || responses.size() <= 0 || !Decision.PERMIT.equals(responses.get(0).getDecision()))
 				throw new CtxAccessControlException(action + " access denied for requestor "
 						+ requestor + " on target " + target); 
 		} catch (PrivacyException pe) {

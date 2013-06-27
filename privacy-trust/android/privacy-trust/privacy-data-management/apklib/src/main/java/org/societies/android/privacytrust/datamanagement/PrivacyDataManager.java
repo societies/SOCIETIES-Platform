@@ -24,6 +24,7 @@
  */
 package org.societies.android.privacytrust.datamanagement;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.societies.android.api.identity.util.DataIdentifierFactory;
@@ -70,6 +71,18 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 	@Override
 	public void checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
+		List<DataIdentifier> dataIds = new ArrayList<DataIdentifier>();
+		dataIds.add(dataId);
+		checkPermission(clientPackage, requestor, dataIds, actions);
+	}
+	@Override
+	public void checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, Action action) throws PrivacyException {
+		List<Action> actions = new ArrayList<Action>();
+		actions.add(action);
+		checkPermission(clientPackage, requestor, dataId, actions);
+	}
+	@Override
+	public void checkPermission(String clientPackage, RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException {
 		// -- Verify parameters
 		if (null == clientPackage || "".equals(clientPackage)) {
 			throw new PrivacyException(new MissingClientPackageException());
@@ -78,14 +91,20 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			Log.e(TAG, "verifyParemeters: Not enought information: requestor is missing");
 			throw new NullPointerException("Not enought information: requestor is missing");
 		}
-		if (null == dataId) {
+		if (null == dataIds) {
 			Log.e(TAG, "verifyParemeters: Not enought information: data id is missing");
 			throw new NullPointerException("Not enought information: data id is missing");
 		}
 
 		// -- Launch action
 		CheckPermissionTask task = new CheckPermissionTask(context, clientPackage); 
-		task.execute(requestor, dataId, actions);
+		task.execute(requestor, dataIds, actions);
+	}
+	@Override
+	public void checkPermission(String clientPackage, RequestorBean requestor, List<DataIdentifier> dataIds, Action action) throws PrivacyException {
+		List<Action> actions = new ArrayList<Action>();
+		actions.add(action);
+		checkPermission(clientPackage, requestor, dataIds, actions);
 	}
 	private class CheckPermissionTask extends AsyncTask<Object, Object, Boolean> {
 		private Context context;
@@ -104,26 +123,26 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 
 		protected Boolean doInBackground(Object... args) {
 			RequestorBean requestor = (RequestorBean) args[0];
-			DataIdentifier dataId = (DataIdentifier) args[1];
+			List<DataIdentifier> dataIds = (List<DataIdentifier>) args[1];
 			List<Action> actions = (List<Action>) args[2];
 
 			try {
 				// -- Retrieve a stored permission
-				ResponseItem privacyPermission = privacyDataManagerInternal.getPermission(requestor, dataId, actions);
-				if (null != privacyPermission) {
-					Log.d(TAG, "Local Permission retrieved");
-					// Publish progress
-					if (!checkAndPublishProgress((progress = 100), "Local permission retrieved")) {
-						return false;
-					}
-					intentSender.sendIntentCheckPermission(clientPackage, privacyPermission);
-					return true;
-				}
+				//				ResponseItem privacyPermission = privacyDataManagerInternal.getPermission(requestor, dataId, actions);
+				//				if (null != privacyPermission) {
+				//					Log.d(TAG, "Local Permission retrieved");
+				//					// Publish progress
+				//					if (!checkAndPublishProgress((progress = 100), "Local permission retrieved")) {
+				//						return false;
+				//					}
+				//					intentSender.sendIntentCheckPermission(clientPackage, privacyPermission);
+				//					return true;
+				//				}
 
 
 				// -- Permission not available: remote call
 				Log.d(TAG, "No Local Permission retrieved: remote call");
-				privacyDataManagerRemote.checkPermission(clientPackage, requestor, dataId, actions);
+				privacyDataManagerRemote.checkPermission(clientPackage, requestor, dataIds, actions);
 				// Publish progress
 				if (!checkAndPublishProgress((progress = progress+30), "Remote access control required: request sent")) {
 					return false;
@@ -279,24 +298,6 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		}
 	}
 
-	@Override
-	public void hasObfuscatedVersion(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
-		// -- Verify parameters
-		//		if (null == requestor) {
-		//			Log.e(TAG, "verifyParemeters: Not enought information: requestor is missing");
-		//			throw new NullPointerException("Not enought information: requestor is missing");
-		//		}
-		//		if (null == dataWrapper) {
-		//			Log.e(TAG, "verifyParemeters: Not enought information: data wrapper is missing");
-		//			throw new NullPointerException("Not enought information: data wrapper is missing");
-		//		}
-		//		if (null == dataWrapper.getDataId()) {
-		//			Log.e(TAG, "verifyParemeters: Not enought information: data id is missing");
-		//			throw new NullPointerException("Not enought information: data id is missing");
-		//		}
-
-		//		return dataWrapper.getDataId();
-	}
 
 	@Override
 	public boolean startService() {

@@ -49,7 +49,7 @@ public interface IPrivacyDataManagerInternal {
 	 * @return The ResponseItem of this permission
 	 * @throws PrivacyException
 	 */
-	public PrivacyPermission getPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
+	public List<PrivacyPermission> getPermissions(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
 	
 	/**
 	 * Find the relevant obfuscation

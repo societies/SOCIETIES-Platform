@@ -77,7 +77,7 @@ public class PrivacyDataManagerActivity extends Activity implements OnClickListe
 	private boolean ipBoundToService = false;
 	private IPrivacyDataManager privacyDataManagerService = null;
 	private ClientCommunicationMgr clientCommManager;
-	private ResponseItem retrievedpermission;
+	private List<ResponseItem> retrievedpermissions;
 
 
 	//Enter local user credentials and domain name
@@ -140,11 +140,11 @@ public class PrivacyDataManagerActivity extends Activity implements OnClickListe
 			StringBuffer sb = new StringBuffer();
 			sb.append(intent.getAction()+": "+(ack ? "success" : "failure"));
 			if (ack && (intent.getAction().equals(MethodType.CHECK_PERMISSION.name()))) {
-				retrievedpermission = (ResponseItem) intent.getSerializableExtra(IPrivacyDataManager.INTENT_RETURN_VALUE_KEY);
-				sb.append("Privacy permission retrieved: "+(null != retrievedpermission));
-				if (null != retrievedpermission) {
-					sb.append("\nDecision: "+retrievedpermission.getDecision().name());
-					sb.append("\nOn resource: "+retrievedpermission.getRequestItem().getResource().getDataIdUri());
+				retrievedpermissions = (List<ResponseItem>) intent.getSerializableExtra(IPrivacyDataManager.INTENT_RETURN_VALUE_KEY);
+				sb.append("Privacy permission retrieved: "+(null != retrievedpermissions && retrievedpermissions.size() > 0));
+				if (null != retrievedpermissions && retrievedpermissions.size() > 0) {
+					sb.append("\nDecision: "+retrievedpermissions.get(0).getDecision().name());
+					sb.append("\nOn resource: "+retrievedpermissions.get(0).getRequestItem().getResource().getDataIdUri());
 				}
 			}
 			txtResult.setText(sb.toString());

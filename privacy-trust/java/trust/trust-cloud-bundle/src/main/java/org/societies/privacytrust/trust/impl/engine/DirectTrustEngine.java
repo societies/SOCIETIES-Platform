@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -115,7 +116,7 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		if (evidence == null)
 			throw new NullPointerException("evidence can't be null");
 		
-		final Set<ITrustedEntity> resultSet = new HashSet<ITrustedEntity>();
+		Set<ITrustedEntity> resultSet = new HashSet<ITrustedEntity>();
 		
 		if (!this.areRelevant(trustorId, evidence))
 			return resultSet;
@@ -126,19 +127,26 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 			
 			// Retrieve all TrustedEntities trusted by the trustor
 			// having the same type as the object referenced in the specified TrustEvidence
-			final Set<ITrustedEntity> entitySet = this.trustRepo.retrieveEntities(
+			resultSet = this.trustRepo.retrieveEntities(
 					trustorId, evidence.getObjectId().getEntityType(), null);
+			ITrustedEntity trustee = null;
+			// 1. Obtain reference to trustee
+			// 2. Remove myCss from result set
+			final Iterator<ITrustedEntity> resultIter = resultSet.iterator();
+			while (resultIter.hasNext()) {
+			
+				final ITrustedEntity entity = resultIter.next();
+				if (entity.getTrusteeId().equals(evidence.getObjectId())) {
+					trustee = entity;
+					continue;
+				}
+				if (entity.getTrusteeId().equals(trustorId))
+					resultIter.remove();
+			}
+			if (trustee == null)
+				throw new TrustEngineException("Could not retrieve identified trustee");
 			if (LOG.isDebugEnabled())
-				LOG.debug("entitySet=" + entitySet);
-			resultSet.addAll(entitySet);
-			
-			final Map<TrustedEntityId,ITrustedEntity> entityMap = 
-					new HashMap<TrustedEntityId, ITrustedEntity>(entitySet.size());
-			for (final ITrustedEntity entity : entitySet)
-				entityMap.put(entity.getTrusteeId(), entity);
-			
-			final ITrustedEntity trustee = entityMap.get(evidence.getObjectId());
-			// TODO if trustee == null die
+				LOG.debug("trustee=" + trustee + ", resultSet=" + resultSet);
 			
 			switch (evidence.getType()) {
 
@@ -178,7 +186,7 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 					LOG.debug("user is member of " + user.getCommunities().size() + " communities");
 					LOG.debug("community has " + community.getMembers().size() + " members");
 				}
-				this.trustRepo.updateEntity(user); // TODO add to resultSet?
+				this.trustRepo.updateEntity(user);
 				break;
 				
 			default:
@@ -186,11 +194,11 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 						+ evidence.getType());
 			}
 			
-			final Set<ITrustedCss> userSet = new HashSet<ITrustedCss>(entitySet.size());
-			final Set<ITrustedCis> communitySet = new HashSet<ITrustedCis>(entitySet.size());
-			final Set<ITrustedService> serviceSet = new HashSet<ITrustedService>(entitySet.size());
+			final Set<ITrustedCss> userSet = new HashSet<ITrustedCss>(resultSet.size());
+			final Set<ITrustedCis> communitySet = new HashSet<ITrustedCis>(resultSet.size());
+			final Set<ITrustedService> serviceSet = new HashSet<ITrustedService>(resultSet.size());
 			
-			for (final ITrustedEntity entity : entitySet) {
+			for (final ITrustedEntity entity : resultSet) {
 				if (entity instanceof ITrustedCss)
 					userSet.add((ITrustedCss) entity);
 				else if (entity instanceof ITrustedCis)
@@ -202,7 +210,7 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 			if (!userSet.isEmpty()) {
 				this.evaluateUsers(userSet);
 				final Set<ITrustedEntity> allCommunitySet = this.trustRepo.retrieveEntities(
-						trustorId, TrustedEntityType.CIS, null);
+						trustorId, TrustedEntityType.CIS, null); // TODO why????
 				if (!allCommunitySet.isEmpty()) {
 					final Set<ITrustedCis> theAllCommunitySet = 
 							new HashSet<ITrustedCis>(allCommunitySet.size());
@@ -218,7 +226,7 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 				this.evaluateServices(serviceSet);
 			}
 			
-			// Add related evidence
+			// Add related evidence to trustee
 			trustee.addEvidence(evidence);
 			
 			// persist updated TrustedEntities in the Trust Repository
@@ -226,8 +234,7 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 				trustRepo.updateEntity(entity);
 
 		} catch (Exception e) {
-			throw new TrustEngineException("Could not evaluate direct trust evidence " 
-					+ evidence + ": " + e.getLocalizedMessage(), e);
+			throw new TrustEngineException(e.getLocalizedMessage(), e);
 		}
 		
 		return resultSet;
@@ -393,32 +400,58 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		return myCss;
 	}
 	
+	/**
+	 * Checks if the specified piece of evidence is relevant for the supplied
+	 * trustor. More specifically, a piece of evidence is relevant for direct
+	 * trust evaluation if:
+	 * <ol>
+	 *   <li>trustorId != evidence.objectId, i.e. ignore evidence about trustor</li>
+	 *   <li>trustorId == evidence.subjectId</li>
+	 *     <ol>
+	 *       <li>type == {@link TrustEvidenceType#RATED RATED}</li>
+	 *       <li>type == {@link TrustEvidenceType#FRIENDED_USER FRIENDED_USER}</li>
+	 *       <li>type == {@link TrustEvidenceType#UNFRIENDED_USER UNFRIENDED_USER}</li>
+	 *       <li>type == {@link TrustEvidenceType#USED_SERVICE USED_SERVICE}</li>
+	 *     </ol>
+	 *   <li>type == {@link TrustEvidenceType#JOINED_COMMUNITY JOINED_COMMUNITY}</li>
+	 *   <li>type == {@link TrustEvidenceType#LEFT_COMMUNITY LEFT_COMMUNITY}</li>
+	 * </ol>
+	 * 
+	 * @param trustorId
+	 * @param evidence
+	 * @return <code>true</code> if the specified piece of evidence is relevant
+	 *         for the supplied trustor; <code>false</code> otherwise.
+	 */
 	private boolean areRelevant(final TrustedEntityId trustorId,
-			final ITrustEvidence evidence) throws TrustEngineException {
+			final ITrustEvidence evidence) {
 		
 		boolean result = false;
 		
-		switch (evidence.getType()) {
+		if (!trustorId.equals(evidence.getObjectId())) {
+		
+			switch (evidence.getType()) {
 
-		case RATED:
-		case FRIENDED_USER:
-		case UNFRIENDED_USER:
-		case USED_SERVICE:
-			if (trustorId.equals(evidence.getSubjectId()))
+			case RATED:
+			case FRIENDED_USER:
+			case UNFRIENDED_USER:
+			case USED_SERVICE:
+				if (trustorId.equals(evidence.getSubjectId()))
+					result = true;
+				break;
+
+			case JOINED_COMMUNITY:
+			case LEFT_COMMUNITY:
 				result = true;
-			break;
-			
-		case JOINED_COMMUNITY:
-		case LEFT_COMMUNITY:
-			result = true;
-			break;
-			
-		default:
-			if (LOG.isDebugEnabled())
-				LOG.debug("Trust evidence " + evidence 
-						+ " is not relevant for trustor '" + trustorId + "'");
+				break;
+				
+			default:
+				// NOP
+			}
 		}
 		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Trust evidence '" + evidence + "' is relevant for trustor '"
+					+ trustorId + "': " + result);
 		return result;
 	}
 

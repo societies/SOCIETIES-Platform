@@ -19,7 +19,7 @@ public class UFTestInit extends IntegrationTestCase {
     private static IUserFeedbackHistoryRepository userFeedbackHistoryRepository;
 
     public UFTestInit() {
-        super(99999, TestWebappUserFeedback.class);
+        super(2077, TestWebappUserFeedback.class);
         log.debug("Starting UFTestInit");
 
     }

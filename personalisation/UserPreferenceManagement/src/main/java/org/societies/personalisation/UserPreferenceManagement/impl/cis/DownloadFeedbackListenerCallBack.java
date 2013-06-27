@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.personalisation.UserPreferenceManagement.impl.monitoring;
+package org.societies.personalisation.UserPreferenceManagement.impl.cis;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -34,6 +34,8 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.internal.useragent.feedback.IUserFeedbackResponseEventListener;
 import org.societies.personalisation.UserPreferenceManagement.impl.UserPreferenceManagement;
+import org.societies.personalisation.UserPreferenceManagement.impl.monitoring.PersonalisationConstants;
+import org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor;
 import org.societies.personalisation.preference.api.model.IPreferenceCondition;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 import org.societies.personalisation.preference.api.model.PreferenceOutcome;
@@ -53,6 +55,8 @@ public class DownloadFeedbackListenerCallBack implements IUserFeedbackResponseEv
 	
 	public enum FeedbackType {DOWNLOAD,UPLOAD};
 	
+	private boolean responseReceived = false;
+	
 	public DownloadFeedbackListenerCallBack(Hashtable<String, PreferenceDetails> detailsTable, UserPreferenceConditionMonitor pcm, FeedbackType type){
 		this.detailsTable = detailsTable;
 		this.pcm = pcm;
@@ -65,8 +69,8 @@ public class DownloadFeedbackListenerCallBack implements IUserFeedbackResponseEv
 		
 	}
 	@Override
-	public void responseReceived(Object arg0) {
-		List<String> responses = (List<String>) arg0;
+	public void responseReceived(Object obj) {
+		List<String> responses = (List<String>) obj;
 		
 		
 		
@@ -111,6 +115,23 @@ public class DownloadFeedbackListenerCallBack implements IUserFeedbackResponseEv
 			}
 
 		}
+		this.responseReceived = true;
+		
+	}
+	public boolean isResponseReceived() {
+		return responseReceived;
+	}
+	public void setResponseReceived(boolean responseReceived) {
+		this.responseReceived = responseReceived;
+	}
+	public Hashtable<String, PreferenceDetails> getDetailsTable() {
+		return detailsTable;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
 	}
 
 }

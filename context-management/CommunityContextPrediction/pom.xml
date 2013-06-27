@@ -26,6 +26,17 @@
 			<artifactId>societies-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>context-mgmt-api</artifactId>

@@ -40,20 +40,15 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
-import org.societies.api.identity.Requestor;
 import org.societies.api.identity.util.DataIdentifierFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
-import org.societies.api.internal.privacytrust.privacyprotection.util.remote.Util;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBeanResult;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 
 
 public class PrivacyDataManagerCommServer {
@@ -93,11 +88,16 @@ public class PrivacyDataManagerCommServer {
 
 	private boolean checkPermission(PrivacyDataManagerBean bean, PrivacyDataManagerBeanResult beanResult) {
 		try {
-			Requestor requestor = Util.getRequestorFromBean(bean.getRequestor(), commManager);
-			List<Action> actions = ActionUtils.toActions(bean.getActions());
-			DataIdentifier dataId = DataIdentifierFactory.fromUri(bean.getDataIdUri());
-			ResponseItem permission = privacyDataManager.checkPermission(requestor, dataId, actions);
-			beanResult.setPermission(ResponseItemUtils.toResponseItemBean(permission));
+			List<DataIdentifier> dataIds = DataIdentifierFactory.fromUris(bean.getDataIdUris());
+			List<ResponseItem> permissions = privacyDataManager.checkPermission(bean.getRequestor(), dataIds, bean.getActions());
+			if (null != permissions && permissions.size() > 0) {
+				beanResult.setPermissions(permissions);
+			}
+			else {
+				beanResult.setAck(false);
+				beanResult.setAckMessage("No permission retrieved");
+			}
+
 		}
 		catch (MalformedCtxIdentifierException e) {
 			LOG.error("MalformedCtxIdentifierException: "+MethodType.CHECK_PERMISSION, e);

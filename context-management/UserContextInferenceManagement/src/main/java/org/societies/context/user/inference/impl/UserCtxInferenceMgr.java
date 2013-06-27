@@ -202,7 +202,7 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 		if (LOG.isDebugEnabled())
 			LOG.debug("Refining attribute '" + attrId + "'");
 		CtxAttribute refinedAttribute;
-		if (CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()))
+		if (CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()) || CtxAttributeTypes.LOCATION_COORDINATES.equals(attrId.getType()))
 			refinedAttribute = this.userCtxRefiner.refineOnDemand(attrId);
 		else
 			throw new UserCtxInferenceException("Could not refine attribute '"
@@ -230,7 +230,10 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 			LOG.debug("Refining attribute '" + attrId + "'");
 		if (CtxAttributeTypes.LOCATION_SYMBOLIC.equals(attrId.getType()))
 			this.userCtxRefiner.refineContinuously(attrId, 0d); // TODO handle updateFrequency
-		else
+		else if(CtxAttributeTypes.LOCATION_COORDINATES.equals(attrId.getType())){
+			LOG.debug("todo : refine gps coordinates");
+		}
+		else 
 			throw new UserCtxInferenceException("Could not refine attribute '"
 					+ attrId + "' continuously: Unsupported attribute type: " + attrId.getType());
 	}

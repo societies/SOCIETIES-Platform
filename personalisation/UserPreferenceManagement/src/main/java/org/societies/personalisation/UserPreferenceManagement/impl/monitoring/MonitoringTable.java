@@ -188,10 +188,10 @@ public class MonitoringTable {
 		Enumeration<CtxIdentifier> ctxIDs = this.mainDataTable.keys();
 		while (ctxIDs.hasMoreElements()){
 			MonitoredInfo info = this.mainDataTable.get(ctxIDs.nextElement());
-			s.concat((info.toString()+"\n"));
+			s = s.concat((info.toString()+"\n"));
 		}
 		
-		s.concat("--$$$$$-- PCM Monitoring table --$$$$$--- \n");
+		s = s.concat("--$$$$$-- PCM Monitoring table --$$$$$--- \n");
 		
 		return s;
 	}

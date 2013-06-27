@@ -24,6 +24,7 @@
  */
 package org.societies.privacytrust.remote.privacydatamanagement;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
+import org.societies.api.identity.util.DataIdentifierUtils;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IDataObfuscationListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
@@ -41,10 +43,10 @@ import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscat
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.MethodType;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.privacytrust.remote.PrivacyCommClientCallback;
 
 /**
@@ -65,11 +67,8 @@ public class PrivacyDataManagerCommClient implements IPrivacyDataManagerRemote {
 	}
 
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote#checkPermission(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxIdentifier, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Action, org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener)
-	 */
 	@Override
-	public void checkPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions, IPrivacyDataManagerListener listener) throws PrivacyException {
+	public void checkPermission(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions, IPrivacyDataManagerListener listener) throws PrivacyException {
 		// -- Search receiver
 		IIdentity toIdentity = commManager.getIdManager().getThisNetworkNode();
 		Stanza stanza = new Stanza(toIdentity);
@@ -80,15 +79,26 @@ public class PrivacyDataManagerCommClient implements IPrivacyDataManagerRemote {
 		// -- Create message
 		PrivacyDataManagerBean bean = new PrivacyDataManagerBean();
 		bean.setMethod(MethodType.CHECK_PERMISSION);
-		bean.setRequestor(RequestorUtils.toRequestorBean(requestor));
-		bean.setDataIdUri(dataId.getUri());
-		bean.setActions(ActionUtils.toActionBeans(actions));
+		bean.setRequestor(requestor);
+		List<String> dataUris = new ArrayList<String>();
+		for(DataIdentifier dataId : dataIds) {
+			dataUris.add(DataIdentifierUtils.toUriString(dataId));
+		}
+		bean.setDataIdUris(dataUris);
+		bean.setActions(actions);
 		try {
 			this.commManager.sendIQGet(stanza, bean, privacyCommClientCallback);
 		} catch (CommunicationException e) {
 			LOG.error("CommunicationException: "+MethodType.CHECK_PERMISSION, e);
 			throw new PrivacyException("CommunicationException: "+MethodType.CHECK_PERMISSION, e);
 		}
+	}
+	@Override
+	@Deprecated
+	public void checkPermission(Requestor requestor, DataIdentifier dataId, List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions, IPrivacyDataManagerListener listener) throws PrivacyException {
+		List<DataIdentifier> dataIds = new ArrayList<DataIdentifier>();
+		dataIds.add(dataId);
+		checkPermission(RequestorUtils.toRequestorBean(requestor), dataIds, ActionUtils.toActionBeans(actions), listener);
 	}
 
 	/*
@@ -123,15 +133,11 @@ public class PrivacyDataManagerCommClient implements IPrivacyDataManagerRemote {
 
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
-		LOG.info("[DependencyInjection] CommManager injected");
 	}
 	public void setListeners(PrivacyDataManagerCommClientCallback listeners) {
 		this.listeners = listeners;
-		LOG.info("[DependencyInjection] PrivacyDataManagerCommClientCallback injected");
 	}
-	public void setPrivacyCommClientCallback(
-			PrivacyCommClientCallback privacyCommClientCallback) {
+	public void setPrivacyCommClientCallback(PrivacyCommClientCallback privacyCommClientCallback) {
 		this.privacyCommClientCallback = privacyCommClientCallback;
-		LOG.info("[DependencyInjection] PrivacyCommClientCallback injected");
 	}
 }

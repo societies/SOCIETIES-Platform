@@ -24,6 +24,11 @@
  */
 package org.societies.api.identity.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
@@ -38,6 +43,8 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
  *
  */
 public class DataIdentifierFactory {
+	private static final Logger LOG = LoggerFactory.getLogger(DataIdentifierFactory.class.getName());
+
 	/**
 	 * Generate a simple DataIdentifier from schema, owner id and type
 	 * 
@@ -65,7 +72,7 @@ public class DataIdentifierFactory {
 	public static DataIdentifier create(DataIdentifierScheme scheme, IIdentity ownerId, String dataType) {
 		return create(scheme, (null != ownerId ? ownerId.getJid() : ""), dataType);
 	}
-	
+
 	/**
 	 * Create the relevant DataIdentifier extension using a correct URI
 	 *
@@ -76,7 +83,20 @@ public class DataIdentifierFactory {
 	public static DataIdentifier fromUri(String dataIdUri) throws MalformedCtxIdentifierException
 	{
 		String[] uri = dataIdUri.split("://");
-		DataIdentifierScheme scheme = DataIdentifierScheme.fromValue(uri[0]);
+		DataIdentifierScheme scheme = null;
+		try {
+			scheme = DataIdentifierScheme.fromValue(uri[0]);
+		}
+		catch(IllegalArgumentException e) {
+			try {
+				scheme = DataIdentifierScheme.valueOf(uri[0]);
+				dataIdUri = scheme+"://"+uri[1];
+			}
+			catch(Exception e2) {
+				LOG.error("Hum, can't understand this scheme in the URI \""+uri[0]+"\". Use CONTEXT by default.", e, e2);
+				scheme = DataIdentifierScheme.CONTEXT;
+			}
+		}
 
 		// Context
 		if (DataIdentifierScheme.CONTEXT.equals(scheme)) {
@@ -109,6 +129,18 @@ public class DataIdentifierFactory {
 		dataId.setType(path.substring(end+1, endType));
 		return dataId;
 	}
+
+	public static List<DataIdentifier> fromUris(List<String> dataUris) throws MalformedCtxIdentifierException {
+		List<DataIdentifier> dataIds = new ArrayList<DataIdentifier>();
+		if (null == dataUris || dataUris.size() <= 0) {
+			return dataIds;
+		}
+		for (String dataUri : dataUris) {
+			dataIds.add(fromUri(dataUri));
+		}
+		return dataIds;
+	}
+
 
 	/**
 	 * Generate a simple DataIdentifier from schema and type

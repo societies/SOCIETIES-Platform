@@ -27,8 +27,11 @@ package org.societies.privacytrust.privacyprotection.privacypolicy.registry;
 import java.io.Serializable;
 import java.util.Hashtable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.identity.Requestor;
+import org.societies.api.identity.util.RequestorUtils;
+import org.societies.api.schema.identity.RequestorBean;
 
 /**
  * Class that keeps a registry of all the privacy policies of the services this PSS provides to other PSSs
@@ -37,26 +40,28 @@ import org.societies.api.identity.Requestor;
  *
  */
 public class PrivacyPolicyRegistry implements Serializable{
+	private static final Logger LOG = LoggerFactory.getLogger(PrivacyPolicyRegistry.class.getName());
+
 	private static final long serialVersionUID = -7184601590881429985L;
-	private Hashtable<Integer, CtxIdentifier> policies;
+	private Hashtable<String, CtxIdentifier> policies;
 
 
 	public PrivacyPolicyRegistry(){
-		this.policies = new Hashtable<Integer, CtxIdentifier>();		
+		this.policies = new Hashtable<String, CtxIdentifier>();		
 	}
-	
+
 
 	/**
 	 * method to retrieve a policy document from the registry
 	 * @param requestor		the serviceID of the service or Identity of CIS for which the policy is for
 	 * @return				the policy document
 	 */
-	public CtxIdentifier getPolicyStorageID(Requestor requestor){
+	public CtxIdentifier getPolicyStorageID(RequestorBean requestor){
 		if (requestor==null){
 			return null;
 		}
-		if (this.policies.containsKey(requestor.hashCode())){
-			return this.policies.get(requestor.hashCode());
+		if (this.policies.containsKey(RequestorUtils.toUriString(requestor))) {
+			return this.policies.get(RequestorUtils.toUriString(requestor));
 		}
 		return null;
 	}
@@ -66,11 +71,11 @@ public class PrivacyPolicyRegistry implements Serializable{
 	 * @param requestor	the serviceID of the service or the IIdentity of the CIS for which this policy is for
 	 * @param policy	the policy document 
 	 */
-	public void addPolicy (Requestor requestor, CtxIdentifier ctxID){
+	public void addPolicy (RequestorBean requestor, CtxIdentifier ctxID){
 		if (this.policies == null){
-			this.policies = new Hashtable<Integer, CtxIdentifier>();	
+			this.policies = new Hashtable<String, CtxIdentifier>();	
 		}
-		this.policies.put(requestor.hashCode(), ctxID);
+		this.policies.put(RequestorUtils.toUriString(requestor), ctxID);
 	}
 
 	/**
@@ -81,52 +86,32 @@ public class PrivacyPolicyRegistry implements Serializable{
 		return this.policies.isEmpty();
 	}
 
-	/**
-	 * method to change all the serviceIdentifiers and DPIs according to the new public DPI advertised by this PSS
-	 * 
-	 * @param newPublicDPI the new public DPI 
-	 */
-	/*	public void setPublicDPIinServiceID(IDigitalPersonalIdentifier newPublicDPI){
-		Enumeration<IServiceIdentifier> serviceIDs = this.policies.keys();
-		while (serviceIDs.hasMoreElements()){
-			IServiceIdentifier oldserviceID = serviceIDs.nextElement();
-			IServiceIdentifier pssID = new PssServiceIdentifier(oldserviceID.getLocalServiceId(),newPublicDPI);
-			RequestPolicy policy = this.getPolicy(oldserviceID);
-			Subject newSubject = new Subject(newPublicDPI,pssID);
-			policy.setRequestor(newSubject);
-			this.policies.remove(oldserviceID);
-			this.policies.put(pssID, policy);
-		}
-
-	}*/
-
-	public void replaceServiceIdentifier(Requestor oldRequestor, Requestor newRequestor){
+	public void replaceServiceIdentifier(RequestorBean oldRequestor, RequestorBean newRequestor){
 		CtxIdentifier ctxID = this.getPolicyStorageID(oldRequestor);
 		if (ctxID==null){
 			return;
 		}
-		this.policies.remove(oldRequestor);
-		this.policies.put(newRequestor.hashCode(), ctxID);
+		this.policies.remove(RequestorUtils.toUriString(oldRequestor));
+		this.policies.put(RequestorUtils.toUriString(newRequestor), ctxID);
 	}
 
-	public void removePolicy(Requestor requestor){
-
-		if (this.policies.containsKey(requestor.hashCode())){
-			this.policies.remove(requestor.hashCode());
+	public void removePolicy(RequestorBean requestor){
+		if (this.policies.containsKey(RequestorUtils.toUriString(requestor))){
+			this.policies.remove(RequestorUtils.toUriString(requestor));
 		}
 	}
 
 	/**
 	 * @return the policies
 	 */
-	public Hashtable<Integer, CtxIdentifier> getPolicies() {
+	public Hashtable<String, CtxIdentifier> getPolicies() {
 		return policies;
 	}
 
 	/**
 	 * @param policies the policies to set
 	 */
-	public void setPolicies(Hashtable<Integer, CtxIdentifier> policies) {
+	public void setPolicies(Hashtable<String, CtxIdentifier> policies) {
 		this.policies = policies;
 	}
 }

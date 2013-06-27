@@ -26,6 +26,8 @@ package org.societies.personalisation.CommunityPreferenceManagement.impl.merging
 
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.personalisation.preference.api.model.IPreferenceCondition;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 import org.societies.personalisation.preference.api.model.OperatorConstants;
@@ -38,7 +40,8 @@ public class SingleRule{
 	private ArrayList<IPreferenceCondition> conditions;
 	private IPreferenceOutcome outcome;
 	private int confidence;
-	
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
+
 	public SingleRule(){
 		this.conditions = new ArrayList<IPreferenceCondition>();
 	}
@@ -85,7 +88,7 @@ public class SingleRule{
 		
 		//CtxAttributeIdentifier ctxId = pc.getCtxIdentifier();
 		String contextType = pc.getname();
-		System.out.println("%%%%%%%   Context name: "+contextType+" %%%%%%%%%%%%%%%%");
+		this.logging.debug("%%%%%%%   Context name: "+contextType+" %%%%%%%%%%%%%%%%");
 		String value = pc.getvalue();
 		OperatorConstants op = pc.getoperator();
 		
@@ -115,13 +118,29 @@ public class SingleRule{
 		}
 	}
 	
-	public boolean equals(SingleRule sr){
-		
-		if (!(sr.getOutcome().equals(this.outcome))){
+
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((conditions == null) ? 0 : conditions.hashCode());
+		result = prime * result + confidence;
+		result = prime * result + ((outcome == null) ? 0 : outcome.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object sr){
+		if (!(sr instanceof SingleRule)){
+			return false;
+		}
+		if (!(((SingleRule) sr).getOutcome().equals(this.outcome))){
 			return false;
 		}
 		
-		return this.hasSameConditions(sr);
+		return this.hasSameConditions((SingleRule) sr);
 	}
 	
 	private boolean hasSameConditions(SingleRule sr){
@@ -145,6 +164,8 @@ public class SingleRule{
 		
 		return true;		
 	}
+	
+	
 	public boolean conflicts(SingleRule sr){
 		if (sr.getOutcome().equals(this.outcome)){
 			return false;			

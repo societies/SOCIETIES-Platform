@@ -9,7 +9,7 @@ public class TestInit extends IntegrationTestCase {
     private static final Logger log = LoggerFactory.getLogger(TestInit.class);
 
     public TestInit() {
-        super(99999, TestIndexPage.class, TestExamplePage.class, TestProfileSettings.class);
+        super(2078, TestIndexPage.class, TestExamplePage.class, TestProfileSettings.class);
         log.debug("Starting TestInit");
 
     }
