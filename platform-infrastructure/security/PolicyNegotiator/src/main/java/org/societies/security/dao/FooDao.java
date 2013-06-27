@@ -62,7 +62,7 @@ public class FooDao {
 		this.sessionFactory = sessionFactory;
 	}
 
-	public List<Foo> getAll() throws Exception {
+	public List<Foo> getAll() throws HibernateException {
 		
 		Session session = null;
 		List<Foo> result;
@@ -76,9 +76,9 @@ public class FooDao {
 			//query.setParameter("myId", "value");
 			
 			result = (List<Foo>) query.list();
-		} catch (Exception e) {
+		} catch (HibernateException e) {
 			log.warn("Could not read from data source", e);
-			throw new Exception(e);
+			throw e;
 		} finally {
 			if (session != null) {
 				session.close();
@@ -87,7 +87,7 @@ public class FooDao {
 		return result;
 	}
 
-	public void delete(Foo object) throws Exception {
+	public void delete(Foo object) throws HibernateException {
 		
 		Session session = null;
 		
@@ -99,9 +99,9 @@ public class FooDao {
 //			Query query = session.createQuery("SELECT foo FROM foo WHERE id = :myId");
 //			query.setParameter("myId", object.getId());
 			
-		} catch (Exception e) {
+		} catch (HibernateException e) {
 			log.warn("Could not delete from data source", e);
-			throw new Exception(e);
+			throw e;
 		} finally {
 			if (session != null) {
 				session.close();
@@ -109,7 +109,7 @@ public class FooDao {
 		}
 	}
 
-	public void write(Foo object) throws Exception {
+	public void save(Foo object) throws HibernateException {
 
 		Session session = null;
 		Transaction t = null;
@@ -119,13 +119,13 @@ public class FooDao {
 			t = session.beginTransaction();
 			session.save(object);
 			t.commit();
-		} catch (Exception e) {
+		} catch (HibernateException e) {
 			log.error(e.getMessage());
 			if (t != null) { 
 				log.warn("Rolling back transaction");
 				t.rollback();
 			}
-			throw new Exception(e);
+			throw e;
 		} finally {
 			// This code is always called. 
 			// If a session has been open it should always be closed,
@@ -136,7 +136,7 @@ public class FooDao {
 		}
 	}
 	
-	public boolean update(Foo object) throws Exception {
+	public boolean update(Foo object) throws HibernateException {
 	
 		boolean returnedStatus = false;
 		Session session = null;
@@ -154,10 +154,6 @@ public class FooDao {
 			}
 			log.error(he.getMessage());
 			throw he;
-		}
-		catch (Exception e) {
-			log.error(e.getMessage());
-			throw new Exception(e);
 		}
 		finally{
 			if (session != null){

@@ -90,13 +90,20 @@ public class NegotiationProvider implements INegotiationProvider {
 		
 		LOG.debug("init()");
 		
+		accessDb();
+
+		LOG.debug("init() end");
+	}
+	
+	private void accessDb() throws Exception {
+
 		Foo foo = new Foo("juhu");
 		List<Foo> fooList;
 		
 		fooList = fooDao.getAll();
 		LOG.info("size of list = {}", fooList.size());
 		
-		fooDao.write(foo);
+		fooDao.save(foo);
 		fooList = fooDao.getAll();
 		LOG.info("size of list = {}", fooList.size());
 		
@@ -110,8 +117,6 @@ public class NegotiationProvider implements INegotiationProvider {
 
 		fooDao.delete(foo);
 		LOG.info("size of list = {}", fooList.size());
-
-		LOG.debug("init() end");
 	}
 	
 	// Getters and setters for beans
