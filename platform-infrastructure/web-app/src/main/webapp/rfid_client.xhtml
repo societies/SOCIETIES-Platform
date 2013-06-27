@@ -1,0 +1,49 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="templates/main_template.xhtml">
+
+	<ui:define name="html_head">
+		<title>SOCIETIES RFID settings</title>
+	</ui:define>
+
+	<ui:define name="body">
+	<p:panel>
+			<f:facet name="header">
+                RFID User Administration page
+            </f:facet>
+            
+		<ui:fragment rendered="#{!rfidClientController.registered}">
+		
+			<h:panelGrid columns="2" style="margin-bottom:10px;margin-left:10px">
+				<h:outputLabel for="rfidTagNumber" value="Rfid Tag Number:"
+					style="font-weight:bold" />
+
+				<p:inputText id="rfidTagNumber"
+					value="#{rfidClientController.myRfidTag}" required="true" />
+
+				<h:outputLabel for="passwd" value="Pass key:"
+					style="font-weight:bold" />
+
+				<p:inputText id="passwd" value="#{rfidClientController.mypasswd}"
+					required="true" />
+
+
+				<h:outputLabel for="serverJid" value="RFID Server Identity:"
+					style="font-weight:bold" />
+
+				<p:inputText id="serverJid"
+					value="#{rfidClientController.serverJid}" required="true" />
+
+				<p:commandButton value="Submit" id="register"
+					actionListener="#{rfidClientController.register}" ajax="false"/>
+			</h:panelGrid>
+
+		</ui:fragment>
+		</p:panel>
+	</ui:define>
+</ui:composition>
+</html>
