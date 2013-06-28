@@ -50,6 +50,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.css.devicemgmt.IAction;
 import org.societies.api.css.devicemgmt.IDevice;
 import org.societies.api.css.devicemgmt.IDriverService;
@@ -60,6 +61,10 @@ import org.societies.api.css.devicemgmt.model.DeviceMgmtEventConstants;
 import org.societies.api.css.devicemgmt.model.DeviceStateVariableConstants;
 import org.societies.api.css.devicemgmt.model.DeviceTypeConstants;
 import org.societies.api.css.devicemgmt.rfid.IRfidDriver;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.CSSEventConstants;
 import org.societies.api.osgi.event.EventListener;
@@ -74,6 +79,8 @@ import org.springframework.osgi.context.BundleContextAware;
 
 public class RfidServer extends EventListener implements IRfidServer, ServiceTrackerCustomizer, BundleContextAware {
 
+	
+	
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	//private ServiceResourceIdentifier myServiceId;
 	//private List<String> myServiceTypes = new ArrayList<String>();
@@ -98,6 +105,14 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 	
 	private IDevice iDevice;
 	
+	private ContextRetriever ctxRetriever;
+	
+	private ICommManager commManager;
+	private IIdentityManager idManager;
+
+	private IIdentity serverIdentity;
+	private ICtxBroker ctxBroker;
+	private RfidWebAppEventListener webAppEventListener;
 	
 	@Override
 	public void setBundleContext(BundleContext bundleContext) {
@@ -148,6 +163,11 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 		this.registerRFIDReaders();
 		
 		frame = new ServerGUIFrame(this);
+		
+		this.ctxRetriever = new ContextRetriever(getCtxBroker(), this.serverIdentity);
+		this.tagtoIdentityTable = ctxRetriever.getTagToIdentity();
+		this.tagToPasswordTable = ctxRetriever.getTagToPassword();
+		this.webAppEventListener = new RfidWebAppEventListener(this);
 	}
 	
 	
@@ -226,6 +246,8 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 		this.logging.debug("Registering for RFIDEvent: "+eventFilter);
 		
 		this.eventMgr.subscribeInternalEvent(this, new String[]{EventTypes.RFID_UPDATE_EVENT}, eventFilter);
+		
+		
 	}
 	
 	
@@ -275,43 +297,6 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 		}
 		
 		
-		//OLD CODE BELOW
-		/*String symLoc = "";
-		if (this.wUnitToSymlocTable.containsKey(wUnit)){
-			symLoc = this.wUnitToSymlocTable.get(wUnit);
-			if (this.tagToTimerTable.containsKey(rfidTagNumber)){
-				this.tagToTimerTable.get(rfidTagNumber).cancel();
-			}
-			
-		}else{
-			logging.debug("wUnit: "+wUnit+" not found, wUnit length: "+wUnit.length());
-			Enumeration<String> e = this.wUnitToSymlocTable.keys();
-			logging.debug("Existing wUnits: ");
-			while (e.hasMoreElements()){
-				String u = e.nextElement();
-				logging.debug(u+" size: "+u.length());
-			}
-			
-		}
-		if (!symLoc.equalsIgnoreCase("")){
-			Timer timer = new Timer();
-			RFIDUpdateTimerTask task = new RFIDUpdateTimerTask(this, rfidTagNumber);
-			timer.schedule(task, 1000);
-			this.tagToTimerTable.put(rfidTagNumber, timer);
-		}		
-		if (this.tagtoIdentityTable.containsKey(rfidTagNumber)){
-			String dpi = this.tagtoIdentityTable.get(rfidTagNumber);
-			//String clientServiceID = this.dpiToServiceID.get(dpi);
-			//this.sendUpdateMessage(dpi, clientServiceID, rfidTagNumber, symLoc);
-			this.rfidClientRemote.sendUpdate(dpi, symLoc, rfidTagNumber);
-			this.frame.addRow(dpi, rfidTagNumber, wUnit, symLoc);
-
-		}else{
-			//JOptionPane.showMessageDialog(null, "Tag: "+rfidTagNumber+" in location "+symLoc+" not registered to a DPI");
-			logging.debug("Tag: "+rfidTagNumber+" in location "+symLoc+" not registered to a DPI");
-			this.frame.addRow("Unregistered", rfidTagNumber, wUnit, symLoc);
-		}*/
-		
 		
 	}
 
@@ -326,7 +311,9 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 					this.removeOldRegistration(dpiAsString);
 					
 					this.tagtoIdentityTable.put(tagNumber, dpiAsString);
-					//this.dpiToServiceID.put(dpiAsString, serviceID);
+					this.ctxRetriever.setTagToIdentity(tagtoIdentityTable);
+					this.ctxRetriever.setTagToPassword(tagToPasswordTable);
+					this.ctxRetriever.updateContext();
 					this.rfidClientRemote.acknowledgeRegistration(dpiAsString, 0);
 					this.frame.setNewDPIRegistered(tagNumber, dpiAsString);
 					logging.debug("Registration successfull. Sent Acknowledgement 0");
@@ -347,7 +334,7 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 
 	
 
-	private void removeOldRegistration( String dpiAsString){
+	public void removeOldRegistration( String dpiAsString){
 		if (this.tagtoIdentityTable.contains(dpiAsString)){
 			
 			Enumeration<String> tags = this.tagtoIdentityTable.keys();
@@ -365,12 +352,14 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 				}
 			}
 		}
-		
-		/*if (this.dpiToServiceID.containsKey(dpiAsString)){
-			this.dpiToServiceID.remove(dpiAsString);
-		}*/
+	}
 	
-
+	public void deleteTag(String tag){
+		this.tagtoIdentityTable.remove(tag);
+		this.tagToPasswordTable.remove(tag);
+		this.ctxRetriever.setTagToIdentity(tagtoIdentityTable);
+		this.ctxRetriever.setTagToPassword(tagToPasswordTable);
+		this.ctxRetriever.updateContext();
 	}
 	public String getPassword() {
 		int n = 4;
@@ -472,5 +461,23 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 	@Override
 	public void removedService(ServiceReference reference, Object service) {
 		
+	}
+
+	public ICommManager getCommManager() {
+		return commManager;
+	}
+
+	public void setCommManager(ICommManager commManager) {
+		this.commManager = commManager;
+		idManager = commManager.getIdManager();
+		serverIdentity = idManager.getThisNetworkNode();
+	}
+
+	public ICtxBroker getCtxBroker() {
+		return ctxBroker;
+	}
+
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		this.ctxBroker = ctxBroker;
 	}
 }

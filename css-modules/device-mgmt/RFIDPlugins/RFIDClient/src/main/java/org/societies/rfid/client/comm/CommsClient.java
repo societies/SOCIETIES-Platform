@@ -56,7 +56,7 @@ public class CommsClient implements IRfidServer, ICommCallback{
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
 			  Arrays.asList("http://societies.org/api/rfid/schema/server"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-		  Arrays.asList("org.societies.api.rfid.schema.server.RfidServerBean"));
+		  Arrays.asList("org.societies.api.rfid.schema.server"));
 	//PRIVATE VARIABLES
 	private ICommManager commManager;
 	private static Logger logging = LoggerFactory.getLogger(CommsClient.class);

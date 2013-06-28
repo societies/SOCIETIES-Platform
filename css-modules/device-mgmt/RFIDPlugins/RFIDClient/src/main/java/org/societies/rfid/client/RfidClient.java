@@ -45,6 +45,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.osgi.event.CSSEvent;
+import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
@@ -62,6 +63,7 @@ import org.societies.rfid.server.api.remote.IRfidServer;
 
 public class RfidClient extends EventListener implements IRfidClient {
 
+	private static final String RFID_EVENT_TYPE = "org/societies/rfid";
 	private static final String RFID_REGISTRATION_ERROR = "RFID_REGISTRATION_ERROR";
 	private static final String RFID_INFO = "RFID_INFO";
 	private final static String CTX_SOURCE_ID = "CTX_SOURCE_ID";
@@ -70,8 +72,8 @@ public class RfidClient extends EventListener implements IRfidClient {
 	private final static String RFID_SERVER = "RFID_SERVER";
 	private final static String RFID_REGISTERED = "RFID_REGISTERED";
 	private final static String RFID_LAST_LOCATION = "RFID_LAST_LOCATION";
-	
-	
+
+
 	private ICommManager commManager;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private ICtxSourceMgr ctxSourceMgr;
@@ -94,31 +96,31 @@ public class RfidClient extends EventListener implements IRfidClient {
 		this.registerForRfidWebEvents();
 		this.registerWithContextSourceManager();
 		try {
-            //first try to see if there is information in the DB.
+			//first try to see if there is information in the DB.
 			List<CtxIdentifier> entities = this.ctxBroker.lookup(CtxModelType.ENTITY, RFID_INFO).get();
 
-            boolean haveAllInfo = true;
+			boolean haveAllInfo = true;
 			if (entities.size()>0){
-                String rfidServer = "";
-                String rfidTag = "";
-                String password = "";
+				String rfidServer = "";
+				String rfidTag = "";
+				String password = "";
 
 				CtxIdentifier entityId = entities.get(0);
 				CtxEntity entity = (CtxEntity) this.ctxBroker.retrieve(entityId).get();
-				
-				
+
+
 				Set<CtxAttribute> passwords = entity.getAttributes(RFID_PASSWORD);
 
 				Iterator<CtxAttribute> iterator = passwords.iterator();
 
 				if (iterator.hasNext()){
 					CtxAttribute attribute = iterator.next();
-                    password = attribute.getStringValue();
+					password = attribute.getStringValue();
 					this.information.put(RFID_PASSWORD, attribute);
 
 				}else{
-                    haveAllInfo = false;
-                }
+					haveAllInfo = false;
+				}
 
 				Set<CtxAttribute> rfidServers = entity.getAttributes(RFID_SERVER);
 
@@ -127,10 +129,10 @@ public class RfidClient extends EventListener implements IRfidClient {
 				if (iterator.hasNext()){
 					CtxAttribute attribute = iterator.next();
 					this.information.put(RFID_SERVER, attribute);
-                    rfidServer = attribute.getStringValue();
+					rfidServer = attribute.getStringValue();
 				}else{
-                    haveAllInfo=  false;
-                }
+					haveAllInfo=  false;
+				}
 				Set<CtxAttribute> rfidTags = entity.getAttributes(RFID_TAG);
 
 				iterator = rfidTags.iterator();
@@ -138,18 +140,18 @@ public class RfidClient extends EventListener implements IRfidClient {
 				if (iterator.hasNext()){
 					CtxAttribute attribute = iterator.next();
 					this.information.put(RFID_TAG, attribute);
-                    rfidTag = attribute.getStringValue();
+					rfidTag = attribute.getStringValue();
 				}else{
-                    haveAllInfo = false;
-                }
+					haveAllInfo = false;
+				}
 
-				
+
 				//TODO: IF i HAVE ALL THE INFO, REGISTER WITH RFID SERVER
 
-                if (haveAllInfo){
+				if (haveAllInfo){
 
-                    this.rfidServerRemote.registerRFIDTag(rfidServer,rfidTag, userIdentity.getBareJid(), null, password);
-                }
+					this.rfidServerRemote.registerRFIDTag(rfidServer,rfidTag, userIdentity.getBareJid(), null, password);
+				}
 			}
 
 		} catch (CtxException e) {
@@ -166,7 +168,7 @@ public class RfidClient extends EventListener implements IRfidClient {
 	}
 
 	private void registerForRfidWebEvents(){
-		this.getEvMgr().subscribeInternalEvent(this, new String[]{"ac/hw/rfid"}, null);
+		this.getEvMgr().subscribeInternalEvent(this, new String[]{RFID_EVENT_TYPE}, null);
 	}
 
 
@@ -184,7 +186,7 @@ public class RfidClient extends EventListener implements IRfidClient {
 				else{
 					ctxEntity = (CtxEntity) this.ctxBroker.retrieve(list.get(0)).get();
 				}
-			
+
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -199,6 +201,7 @@ public class RfidClient extends EventListener implements IRfidClient {
 	}
 
 	private void updateContext(String type, String value){
+
 		try {
 			if (this.ctxEntity==null){
 
@@ -219,11 +222,13 @@ public class RfidClient extends EventListener implements IRfidClient {
 				if (iterator.hasNext()){
 					CtxAttribute attribute = iterator.next();
 					attribute.setStringValue(value);
-					this.ctxBroker.update(attribute).get();
+					attribute = (CtxAttribute) this.ctxBroker.update(attribute).get();
+					this.information.put(type, attribute);
 				}else{
 					CtxAttribute ctxAttribute = this.ctxBroker.createAttribute(ctxEntity.getId(), type).get();
 					ctxAttribute.setStringValue(value);
-					this.ctxBroker.update(ctxAttribute).get();
+					ctxAttribute = (CtxAttribute) this.ctxBroker.update(ctxAttribute).get();
+					this.information.put(type, ctxAttribute);
 				}
 			}else{
 				this.logging.error("Entity: "+RFID_INFO+" could not be retrieved/created");
@@ -243,7 +248,7 @@ public class RfidClient extends EventListener implements IRfidClient {
 
 	@Override
 	public void sendUpdate(String symLoc, String tagNumber) {
-		
+
 
 		if (this.myCtxSourceId==null){
 			this.registerWithContextSourceManager();
@@ -275,7 +280,7 @@ public class RfidClient extends EventListener implements IRfidClient {
 
 	public void handleInternalEvent(InternalEvent event) {
 		this.logging.debug("Received event - type: "+event.geteventType()+" event source "+event.geteventSource()+" event name: "+event.geteventName());
-		if (event.geteventType().equals("ac/hw/rfid")){
+		if (event.geteventType().equals(RFID_EVENT_TYPE) && (event.geteventName().equalsIgnoreCase("registerRequest"))){
 			Hashtable<String, String> hash = (Hashtable<String, String>) event.geteventInfo();
 			if (hash!=null){
 				String action = hash.get("action");
@@ -307,26 +312,40 @@ public class RfidClient extends EventListener implements IRfidClient {
 		switch (rStatus){
 		case 0 : 
 			this.updateContext(RFID_REGISTERED, "true");
-			
+
 			String rfidtag = this.information.get(RFID_TAG).getStringValue();
 			this.logging.debug("Successfully registered tag: "+rfidtag);
+
 			break;
 		case 1 :
 			this.updateContext(RFID_REGISTRATION_ERROR, "The password for registering your RFID tag number was incorrect. Please enter your password again.");
 			this.logging.debug("RFID_REGISTRATION_ERROR: Incorrect password");
+
 			break;
 		case 2 :
 			this.updateContext(RFID_REGISTRATION_ERROR, "The RFID tag number was not recognised. Please enter a valid RFID tag number. ");
 			this.logging.debug("RFID_REGISTRATION_ERROR: Unrecognised rfid tag number");
-			break;
-		default: this.updateContext(RFID_REGISTRATION_ERROR, "An unknown error occured");
-		this.logging.debug("RFID_REGISTRATION_ERROR: Unknown error");
-		break;
 
+			break;
+		default: 
+			this.updateContext(RFID_REGISTRATION_ERROR, "An unknown error occured");
+			this.logging.debug("RFID_REGISTRATION_ERROR: Unknown error");
+			break;
 		}
+		this.publishEvent();
 
 	}
 
+
+	private void publishEvent(){
+		InternalEvent event = new InternalEvent(RFID_EVENT_TYPE, "registrationResult", this.getClass().getName(), information);
+		try {
+			this.evMgr.publishInternalEvent(event);
+		} catch (EMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * @return the commManager
@@ -397,126 +416,6 @@ public class RfidClient extends EventListener implements IRfidClient {
 	public void setEvMgr(IEventMgr evMgr) {
 		this.evMgr = evMgr;
 	}
-
-
-	/*
-	private void registerForSLMEvents() {
-		String eventFilter = "(&" + 
-				"(" + CSSEventConstants.EVENT_NAME + "="+ServiceMgmtEventType.NEW_SERVICE+")" +
-				"(" + CSSEventConstants.EVENT_SOURCE + "=org/societies/servicelifecycle)" +
-				")";
-		this.getEvMgr().subscribeInternalEvent(this, new String[]{EventTypes.SERVICE_LIFECYCLE_EVENT}, eventFilter);
-		this.logging.debug("Subscribed to "+EventTypes.SERVICE_LIFECYCLE_EVENT+" events");
-
-	}
-
-
-	private void unRegisterFromSLMEvents()
-	{
-		String eventFilter = "(&" + 
-				"(" + CSSEventConstants.EVENT_NAME + "="+ServiceMgmtEventType.NEW_SERVICE+")" +
-				"(" + CSSEventConstants.EVENT_SOURCE + "=org/societies/servicelifecycle)" +
-				")";
-
-		this.evMgr.unSubscribeInternalEvent(this, new String[]{EventTypes.SERVICE_LIFECYCLE_EVENT}, eventFilter);
-		//this.evMgr.subscribeInternalEvent(this, new String[]{EventTypes.SERVICE_LIFECYCLE_EVENT}, eventFilter);
-		this.logging.debug("Unsubscribed from "+EventTypes.SERVICE_LIFECYCLE_EVENT+" events");
-	} */
-
-	/*	@Override
-	public void handleInternalEvent(InternalEvent event) {
-		if (event.geteventType().equals(ServiceMgmtEventType.SERVICE_STARTED)){
-		ServiceMgmtEvent slmEvent = (ServiceMgmtEvent) event.geteventInfo();
-
-		if (slmEvent.getBundleSymbolName().equalsIgnoreCase("ac.hw.rfid.RFIDClientApp")){
-			this.logging.debug("Received SLM event for my bundle");
-
-			if (slmEvent.getEventType().equals(ServiceMgmtEventType.NEW_SERVICE)){
-				ServiceResourceIdentifier myClientServiceID = slmEvent.getServiceId();
-				this.serverIdentity = this.services.getServer(myClientServiceID);
-				this.logging.debug("Retrieved my server's identity: "+this.serverIdentity.getJid());
-				//this.requestServerIdentityFromUser();
-				//ServiceResourceIdentifier serviceId = this.portalServerRemote.getServerServiceId(serverIdentity);
-
-				//UIManager.put("ClassLoader", ClassLoader.getSystemClassLoader());
-
-				ServiceResourceIdentifier serviceId = this.getServices().getServerServiceIdentifier(myClientServiceID);
-				this.logging.debug("Retrieved my server's serviceID: "+serviceId.getIdentifier());
-				this.requestor = new RequestorService(serverIdentity, serviceId);
-
-				boolean registered = this.register();
-				if (registered){
-					UIManager.put("ClassLoader", ClassLoader.getSystemClassLoader());
-					clientGUI = new ClientGUIFrame(this.rfidServerRemote, this.getCtxBroker(), this.userIdentity, this.serverIdentity, serviceId);
-					this.logging.debug("Started client");
-				}else{
-					this.logging.debug("unable to register as a context source with the ICtxSourceMgr");
-				}
-
-				this.unRegisterFromSLMEvents();
-
-			}
-		}else{
-			this.logging.debug("Received SLM event but it wasn't related to my bundle");
-		}
-
-	}
-
-
-		private void updateContextDirectly(String value){
-
-		try {
-			Future<IndividualCtxEntity> retrieveIndividualEntity = this.ctxBroker.retrieveIndividualEntity(userIdentity);
-			CtxEntity person = retrieveIndividualEntity.get();
-			if (person!=null){
-				Future<List<CtxIdentifier>> lookup = this.ctxBroker.lookup(person.getId(), CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC);
-				List<CtxIdentifier> attributes = lookup.get();
-
-				if (attributes.size()==0){
-					this.logging.debug("no symbolic location attributes found");
-				}else{
-					for (int i=0; i<attributes.size(); i++){
-						CtxAttribute attr = this.ctxBroker.updateAttribute((CtxAttributeIdentifier) attributes.get(i), value).get();
-						this.logging.debug("Updating attribute: "+attr.getId().toUriString()+" with value: "+attr.getStringValue());
-					}
-				}
-			}else{
-				this.logging.debug("Entity Person is null");
-			}
-
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e){
-			e.printStackTrace();
-			this.logging.error(e.getMessage());
-		}
-	}
-
-
-		@Override
-	public void acknowledgeRegistration(Integer rStatus) {
-
-		while (this.clientGUI==null){
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		this.clientGUI.acknowledgeRegistration(rStatus);
-		this.logging.debug("Received acknowledgement for registration");
-
-	}
-	 *
-	 */
 
 } 
 

@@ -31,7 +31,7 @@
 		<!-- <osgi:reference id="rfidDriver" interface="org.societies.api.css.devicemgmt.rfid.IRfidDriver"></osgi:reference> -->
 		<osgi:reference id="eventMgr" interface="org.societies.api.osgi.event.IEventMgr"></osgi:reference>
 		
-		
+		<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker" ></osgi:reference>
 		<!--  <osgi:reference id="upcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/> -->
 
 	

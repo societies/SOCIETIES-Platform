@@ -16,6 +16,8 @@
 		<property name="rfidClientRemote" ref="rfidClientRemote"></property>
 		<!-- <property name="rfidDriver" ref="rfidDriver"></property> -->
 		<property name="eventMgr" ref="eventMgr"></property>
+		<property name="commManager" ref="commManager"></property>
+		<property name="ctxBroker" ref="ctxBroker"></property>
 	</bean>
 
 	<bean id="rfidClientRemote"
