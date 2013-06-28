@@ -83,7 +83,7 @@ public class PrivacyPolicyTestController extends BasePageController {
         @Override
         public void userLoggedOut() {
 //            if (log.isTraceEnabled())
-//                log.trace("userLoggedOut()");
+//               log.trace("userLoggedOut()");
         }
     }
 
@@ -276,9 +276,9 @@ public class PrivacyPolicyTestController extends BasePageController {
 
 
         List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
-        responseItems.add(buildResponseItem("http://this.is.a.win/", "winning - " + guid));
-//        responseItems.add(buildResponseItem("http://paddy.rules/", "paddy"));
-//        responseItems.add(buildResponseItem("http://something.something.something/", "dark side"));
+        responseItems.add(buildResponseItem("http://this.is.a.win/", "Location"));
+        responseItems.add(buildResponseItem("http://paddy.rules/", "Status"));
+        responseItems.add(buildResponseItem("http://something.something.something/", "Hair colour"));
 
         ResponsePolicy responsePolicy = new ResponsePolicy();
         responsePolicy.setRequestor(requestorBean);

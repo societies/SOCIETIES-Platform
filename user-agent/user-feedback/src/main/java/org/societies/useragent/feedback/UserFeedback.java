@@ -512,8 +512,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         event.setNegotiationDetails(details);
         event.setResponsePolicy(policy);
 
-
+        //add new request to result hashmap
         UserFeedbackResult<ResponsePolicy> result = new UserFeedbackResult<ResponsePolicy>(requestId);
+
         synchronized (negotiationResults) {
             negotiationResults.put(requestId, result);
         }
@@ -537,10 +538,10 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             log.error("Error storing PPN request bean to database", ex);
         }
 
+        //send pubsub event to all user agents
         try {
             if (log.isDebugEnabled())
                 log.debug("Sending PPN request event via pubsub");
-
 
             // HACK: When hibernate persists the ufBean object, it changes the options list to a org.hibernate.collection.PersistentList
             // When this is deserialised at the other side, hibernate gets upset. Really the serialiser should be converting any
