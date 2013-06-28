@@ -117,7 +117,6 @@
 		           		!com.sun.org.apache.xerces.internal.jaxp.datatype,
 		           		org.xmpp.component;version="0.1.0",
 		           		-->
-		           		<DynamicImport-Package>*</DynamicImport-Package>
 		           		<Embed-Dependency>
 			           		*;scope=compile|runtime
 		           		</Embed-Dependency>

@@ -370,9 +370,11 @@ public class CommManagerHelper {
         JID originalFrom = iq.getFrom();
         String id = iq.getID();
 
+        ClassLoader oldClassloader = null;
+        
         try {
             IFeatureServer fs = getFeatureServer(namespace);
-            ClassLoader oldClassloader = clm.classLoaderMagic(fs);
+            oldClassloader = clm.classLoaderMagic(fs);
 
             Class<?> c = getClass(namespace, element.getName());
 
@@ -384,7 +386,7 @@ public class CommManagerHelper {
             if (iq.getType().equals(IQ.Type.set))
                 responseBean = fs.setQuery(TinderUtils.stanzaFromPacket(iq), bean);
 
-            return buildResponseIQ(originalFrom, id, responseBean, oldClassloader);
+            return buildResponseIQ(originalFrom, id, responseBean);
         } catch (XMPPError e) {
             return buildApplicationErrorResponse(originalFrom, id, e);
         } catch (UnavailableException e) {
@@ -398,12 +400,15 @@ public class CommManagerHelper {
                     + "Error (un)marshalling the message:" + e.getMessage();
             return buildErrorResponse(originalFrom, id, message, e);
         } catch (ClassNotFoundException e) {
-            String message = e.getClass().getName() + ": Unable to create class for serialisation - " + e.getMessage();
+            String message = e.getClass().getName() + ": Unable to load class from classloader '"+Thread.currentThread().getContextClassLoader().toString()+"' for serialisation - " + e.getMessage();
             return buildErrorResponse(originalFrom, id, message, e);
         } catch (Exception e) {
             LOG.error("Uncaught exception occurred", e);
             String message = e.getClass().getName() + "Unable to serialise Simple element";
             return buildErrorResponse(originalFrom, id, message, e);
+        } finally {
+        	if (oldClassloader != null)
+                Thread.currentThread().setContextClassLoader(oldClassloader);
         }
     }
 
@@ -411,14 +416,8 @@ public class CommManagerHelper {
         String packageStr = getPackage(namespace);
         String beanName = name.substring(0, 1).toUpperCase() + name.substring(1);
 
-        // TODO issue rasing
-        try {
-            clm.currentNewClassloader.loadClass(packageStr + "." + beanName);
-        } catch (ClassNotFoundException e) {
-            LOG.warn("### ClassLoader '" + clm.currentNewClassloader.toString() + "' could not load Class '" + packageStr + "." + beanName + "' ###", e);
-        }
-
         return Thread.currentThread().getContextClassLoader().loadClass(packageStr + "." + beanName);
+
     }
 
     public void dispatchMessage(Message message) {
@@ -609,7 +608,7 @@ public class CommManagerHelper {
         return errorResponse;
     }
 
-    private synchronized IQ buildResponseIQ(JID originalFrom, String id, Object responseBean, ClassLoader oldClassloader)
+    private synchronized IQ buildResponseIQ(JID originalFrom, String id, Object responseBean)
             throws DocumentException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         Document document = null;
@@ -624,9 +623,6 @@ public class CommManagerHelper {
             ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
             document = reader.read(is);
         }
-
-        if (oldClassloader != null)
-            Thread.currentThread().setContextClassLoader(oldClassloader);
 
         IQ responseIq = new IQ(Type.result, id);
         responseIq.setTo(originalFrom);
