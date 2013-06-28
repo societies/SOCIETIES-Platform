@@ -286,6 +286,10 @@ public class CACIPrediction {
 
 		LOG.debug("retrieveCACIModel commEntIDList  1 "+commEntIDList);
 
+		
+		//TODO keep local caci model
+		//TODO remove remote com to community
+		
 		if(!commEntIDList.isEmpty()){
 
 			for(CtxEntityIdentifier cisEntID : commEntIDList){
@@ -346,10 +350,12 @@ public class CACIPrediction {
 				attr = (CtxAttribute) this.ctxBroker.retrieve(caciModelAttributeId).get();
 				//} else {
 				//	attr = this.ctxBroker.createAttribute(indiEnt.getId(), CtxAttributeTypes.CACI_MODEL).get();
+				byte[] binaryModel = SerialisationHelper.serialise(modelData);
+				LOG.debug("skataaaaaa updating caci model  " +attr.getId() +" model: "+modelData );
+				
+				this.ctxBroker.updateAttribute(attr.getId(), binaryModel).get();
 			}
-			byte[] binaryModel = SerialisationHelper.serialise(modelData);
-
-			this.ctxBroker.updateAttribute(attr.getId(), binaryModel).get();
+			
 
 		} catch (Exception e) {
 			LOG.error("CtxAttribute of type "+CtxAttributeTypes.CACI_MODEL+ "was not updated with caci model "+e.getLocalizedMessage());

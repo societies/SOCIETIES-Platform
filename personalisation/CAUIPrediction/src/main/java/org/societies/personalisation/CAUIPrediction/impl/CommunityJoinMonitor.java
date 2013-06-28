@@ -44,10 +44,12 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 	private ICtxBroker ctxBroker;
 	private final IIdentity ownerId;
 	private ICommManager commMgr;
+	
+	/// check community estimation communities state 
 	//private final Set<String> communities = new CopyOnWriteArraySet<String>();
 	private final Set<String> communities = new CopyOnWriteArraySet<String>();
 
-	@Autowired (required=true)
+	//@Autowired (required=true)
 	public CommunityJoinMonitor(ICtxBroker ctxBrok, ICommManager commMngr) throws Exception{
 		this.commMgr = commMngr;
 		this.ctxBroker = ctxBrok;
@@ -130,6 +132,8 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 
 				if(!cisEntIdSet.isEmpty() ){
 
+					//TODO keep state of old/current communities
+					// REMOVE for loop
 					for(CtxEntityIdentifier cisEntityID : cisEntIdSet){
 
 						LOG.debug("CssJoinedCommunityHandler  4 cisEntityID "+ cisEntityID );
@@ -181,7 +185,7 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 
 				try {
 					// retrieve caciModelAttr from CIS ctx DB
-					CtxAttribute caciModelAttrRemote = (CtxAttribute) ctxBroker.retrieve((CtxAttributeIdentifier) attributeCaciID).get();
+					CtxAttribute caciModelAttrRemote = (CtxAttribute) ctxBroker.retrieveAttribute((CtxAttributeIdentifier) attributeCaciID,false).get();
 
 					LOG.debug("*** remote caci attribute retrieved " + caciModelAttrRemote);
 					LOG.debug("***onModification 1 caciModelAttrRemote= " + caciModelAttrRemote.getId());
