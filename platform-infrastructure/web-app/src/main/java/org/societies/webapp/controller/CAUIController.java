@@ -93,7 +93,7 @@ public class CAUIController extends BasePageController {
 		LOG.info("setEnableUserPrediction  : "+ bool);
 	}
 
-	public Boolean isEnableUserPrediction(){
+	public boolean getEnableUserPrediction(){
 		LOG.info("getEnableUserPrediction  : "+ this.enableUserPrediction);
 		return this.enableUserPrediction ;
 	}
@@ -121,15 +121,17 @@ public class CAUIController extends BasePageController {
 
 		if (type.equals(CtxAttributeTypes.CAUI_MODEL)){
 			model = this.cauiPrediction.getCAUIActiveModel();
+			LOG.info("getCAUIActiveModel  : "+ model);
 			if(!model.isEmpty()){
-				LOG.info("getCAUIActiveModel  : "+ model);
+
 				result = convertModel(model);
 				return result;
 			}
 		} else if(type.equals(CtxAttributeTypes.CACI_MODEL) ){
-			model = this.cauiPrediction.getCAUIActiveModel();
+			model = this.cauiPrediction.getCACIActiveModel();
+			LOG.info("getCACIActiveModel  : "+ model);
 			if(!model.isEmpty()){				
-				LOG.info("getCACIActiveModel  : "+ model);
+
 				result = convertModel(model);
 				return result;
 			}
@@ -165,23 +167,28 @@ public class CAUIController extends BasePageController {
 			for(IUserIntentAction sourceAct : originalModel.keySet()){
 
 				//String sourcActionString = sourceAct.toString();
-				
+			
 				String sourcActionString = sourceAct.getparameterName() +"="+ sourceAct.getvalue();
-
+				LOG.info("convertModel 0 sourcActionString : "+ sourcActionString);
+				
 				HashMap<String, Double> targetMap = new HashMap<String, Double>();
-				HashMap<IUserIntentAction, Double> targetMapOriginal = originalModel.get(sourceAct);
+				if( originalModel.get(sourceAct) != null) {
 
-				for(IUserIntentAction targetActOrig : targetMapOriginal.keySet()){
-					String trimedTargetStr = targetActOrig.getparameterName()+"="+targetActOrig.getvalue();
-					Double transProb = targetMapOriginal.get(targetActOrig);
-					DecimalFormat df = new DecimalFormat("#.##");
-					Double transProbTrimmed = Double.parseDouble(df.format(transProb));
-					targetMap.put(trimedTargetStr, transProbTrimmed);
 
+					HashMap<IUserIntentAction, Double> targetMapOriginal = originalModel.get(sourceAct);
+
+					for(IUserIntentAction targetActOrig : targetMapOriginal.keySet()){
+						String trimedTargetStr = targetActOrig.getparameterName()+"="+targetActOrig.getvalue();
+						Double transProb = targetMapOriginal.get(targetActOrig);
+						DecimalFormat df = new DecimalFormat("#.##");
+						Double transProbTrimmed = Double.parseDouble(df.format(transProb));
+						targetMap.put(trimedTargetStr, transProbTrimmed);
+
+					}
+					CAUIAction cauiAct = new CAUIAction(sourcActionString, targetMap);
+					LOG.info("convertModel  : "+ cauiAct);
+					result.add(cauiAct);
 				}
-				CAUIAction cauiAct = new CAUIAction(sourcActionString, targetMap);
-				LOG.info("convertModel  : "+ cauiAct);
-				result.add(cauiAct);
 			}		
 		}
 		return result;
@@ -192,18 +199,23 @@ public class CAUIController extends BasePageController {
 
 		System.out.println("learnUserModel");
 
-		IIdentity cssID = null ; 
+		//IIdentity cssID = getOwnerId(); 
 		//if( getOwnerId() != null) {	cssID = getOwnerId();		}
 		LOG.info("service ref for cauiDisc "+ this.cauiPrediction);
 		LOG.info("service ref for broker  "+ this.internalCtxBroker);
 		this.cauiPrediction.generateNewUserModel();
 		LOG.info("discovery started..." );
-		addGlobalMessage("MODEL LEARNING TRIGGERED for cssID", "click on refresh model button", FacesMessage.SEVERITY_INFO);
+		addGlobalMessage("MODEL LEARNING TRIGGERED for user", "click on refresh model button", FacesMessage.SEVERITY_INFO);
 	}
 
 
-	public void refreshUserModel(){
-		addGlobalMessage("MODEL REFRESHED", "Retrieving model from DB", FacesMessage.SEVERITY_INFO);
+	public void refreshModels(){
+
+		this.userActionsList = this.getActiveModel(CtxAttributeTypes.CAUI_MODEL);
+		this.communityActionsList = this.getActiveModel(CtxAttributeTypes.CACI_MODEL);
+		//init();
+		addGlobalMessage("CAUI AND CACI MODELS REFRESHED", "Retrieving model from DB", FacesMessage.SEVERITY_INFO);
+
 	}
 
 
@@ -211,9 +223,9 @@ public class CAUIController extends BasePageController {
 
 		addGlobalMessage("learn community Model", "for id "+i, FacesMessage.SEVERITY_INFO);
 		IIdentity cisId = null;
-
+		LOG.debug("discovery started..." );
 		this.cauiPrediction.generateNewCommunityModel(cisId);
-		LOG.info("discovery started..." );
+
 	}
 
 
@@ -252,11 +264,13 @@ public class CAUIController extends BasePageController {
 
 
 	public ICommManager getCommMngrRef() {
+		LOG.info("get getCommMngrRef "+this.commMngrRef);
 		return this.commMngrRef;
 	}
 
 
 	public void setCommMngrRef(ICommManager commMngrRef) {
+		LOG.info("set getCommMngrRef "+this.commMngrRef);
 		this.commMngrRef = commMngrRef;
 	}
 

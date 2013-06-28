@@ -320,7 +320,12 @@ public class CAUITaskManager implements ICAUITaskManager{
 
 	@Override
 	public void updateModel(UserIntentModelData model) {
+		this.activeUserIntentModel = new UserIntentModelData(); 
 		this.activeUserIntentModel = model;
+		if(model!=null){
+			LOG.info("updating active model : "+model.getActionModel() );	
+		}
+		
 	}
 
 	@Override

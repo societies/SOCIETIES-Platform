@@ -39,14 +39,14 @@
 						actionListener="#{cauiController.learnUserModel()}"
 						update="userTable" />
 					<p:commandButton value="Refresh user model"
-						actionListener="#{cauiController.refreshUserModel()}"
+						actionListener="#{cauiController.refreshModels}"
 						update="userTable" />
 				
-				<!-- <h:outputText value="Enable prediction: " />
-        		<p:selectBooleanCheckbox value="#{CAUIController.enableUserPrediction}">  
-             
-           			 <p:ajax update="msg" listener="#{CAUIController.setEnableUserPrediction}"/>  
-        		</p:selectBooleanCheckbox> 
+				<h:outputText value="Enable prediction: " />
+        		<p:selectBooleanCheckbox value="#{cauiController.enableUserPrediction}">  
+             </p:selectBooleanCheckbox> 
+           		<!--	 <p:ajax update="msg" listener="#{CAUIController.setEnableUserPrediction}"/>  
+        		
 				 -->  
 				</p:tab>
 
@@ -66,10 +66,10 @@
 					</p:dataTable>
 
 					<p:commandButton value="Learn new community model"
-						actionListener="#{cauiController.showMeAMessage}" />
+						actionListener="#{cauiController.learnCommunityModel}  />
 
 					<p:commandButton value="Refresh community model"
-						actionListener="#{cauiController.showMeAMessage}" />
+						actionListener="#{cauiController.refreshModels}" update="communityTable"/>
 				</p:tab>
 
 

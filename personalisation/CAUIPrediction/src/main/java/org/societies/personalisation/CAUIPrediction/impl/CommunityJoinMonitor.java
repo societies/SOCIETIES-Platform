@@ -120,50 +120,29 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 		@Override
 		public void run() {
 			//LOG.info("CssJoinedCommunityHandler  2 "+ this.ctxId );
+			CtxEntityIdentifier cssEntId = null;
 			try {
 				CtxAssociation isMemberOfAssoc = (CtxAssociation) ctxBroker.retrieve(this.ctxId).get();
 				LOG.debug("CssJoinedCommunityHandler  3 "+ isMemberOfAssoc.getId() );
-				CtxEntityIdentifier cssEntId = isMemberOfAssoc.getParentEntity();
+				cssEntId = isMemberOfAssoc.getParentEntity();
 
 				Set<CtxEntityIdentifier> cisEntIdSet = isMemberOfAssoc.getChildEntities();
-				//	CommunityCtxEntity cisEnt =  (CommunityCtxEntity) ctxBroker.retrieve(cisEntId).get();
 
 				if(!cisEntIdSet.isEmpty() ){
-					
+
 					for(CtxEntityIdentifier cisEntityID : cisEntIdSet){
 
-						LOG.debug("CssJoinedCommunityHandler  4 "+ cisEntityID );
-
-						//remote lookup in cis is not working
-						//	List<CtxIdentifier> caciIdList = ctxBroker.lookup(cisEntityID, CtxModelType.ATTRIBUTE,  CtxAttributeTypes.CACI_MODEL).get();
-						
-						// use this instead
-						CommunityCtxEntity comEntity = (CommunityCtxEntity) ctxBroker.retrieve(cisEntityID).get();
-						Set<CtxAttribute> caciAttrSet =  comEntity.getAttributes(CtxAttributeTypes.CACI_MODEL);
-
-						LOG.debug("CssJoinedCommunityHandler  5 caciIdList "+ caciAttrSet );
+						LOG.debug("CssJoinedCommunityHandler  4 cisEntityID "+ cisEntityID );
 						// register for new caci model update events
-						if( ! caciAttrSet.isEmpty())	{
-							
-							for(CtxAttribute caciAttr : caciAttrSet) {
-															
-								if (LOG.isInfoEnabled())
-									LOG.info("Registering for context changes related to CIS CACI_Model ctx attribute '"
-											+ caciAttr.getId() + "'");
+						
+						ctxBroker.registerForChanges(new CACIModelEventHandler(), cisEntityID , CtxAttributeTypes.CACI_MODEL);
 
-								ctxBroker.registerForChanges(new CACIModelEventHandler(), caciAttr.getId());
-							}							
-						}
+						if (LOG.isInfoEnabled())
+							LOG.info("Registering for context changes related to CIS CACI_Model ctx attribute '");
 					}
 				}
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (CtxException e) {
-				// TODO Auto-generated catch block
+			} catch (Exception e) {
+				LOG.error(" Exception while trying to register for context changes related to CIS CACI_Model ctx attribute of cis: '" +cssEntId +"' "+e.getLocalizedMessage() );
 				e.printStackTrace();
 			}
 		}
@@ -175,24 +154,24 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 
 
 		CACIModelEventHandler(){
-					LOG.debug("inside CACIModelEventHandler ------------------");
+			LOG.debug("inside CACIModelEventHandler ------------------");
 		}
 
 		@Override
 		public void onCreation(CtxChangeEvent event) {
-			//		LOG.info("inside CACIModelEventHandler ------------------ onCreation "+event.getId());
+					LOG.info("inside CACIModelEventHandler ------------------ onCreation "+event.getId());
 
 		}
 
 		@Override
 		public void onUpdate(CtxChangeEvent event) {
-			//		LOG.info("inside CACIModelEventHandler ------------------ onUpdate "+event.getId());
+				LOG.info("inside CACIModelEventHandler ------------------ onUpdate "+event.getId());
 			//
 		}
 
 		@Override
 		public void onModification(CtxChangeEvent event) {
-			//	LOG.info("inside CACIModelEventHandler ------------------ onModification ");
+				LOG.info("inside CACIModelEventHandler ------------------ onModification ");
 
 			if (CtxAttributeTypes.CACI_MODEL.equals(event.getId().getType())) 
 				LOG.debug("update of caci model received  : event.getId(): "+ event.getId() + " --- event.getSource():"+ event.getSource());
@@ -203,38 +182,38 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 				try {
 					// retrieve caciModelAttr from CIS ctx DB
 					CtxAttribute caciModelAttrRemote = (CtxAttribute) ctxBroker.retrieve((CtxAttributeIdentifier) attributeCaciID).get();
-					
+
 					LOG.debug("*** remote caci attribute retrieved " + caciModelAttrRemote);
 					LOG.debug("***onModification 1 caciModelAttrRemote= " + caciModelAttrRemote.getId());
 
-					
+
 					//store caciModel to local CSS ctx DB
 					CtxAttribute caciModelAttrLocal = null;
-					List<CtxIdentifier> caciModelAttrLocalList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, "CAUI_CACI_MODEL").get();
-						LOG.debug("***onModification 2 caciModelAttrLocalList= " + caciModelAttrLocalList.size());
+					List<CtxIdentifier> caciModelAttrLocalList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
+					LOG.debug("***onModification 2 caciModelAttrLocalList= " + caciModelAttrLocalList.size());
 					IIdentity localcssID = getOwnerId();
 					CtxEntityIdentifier entityID = ctxBroker.retrieveIndividualEntityId(null, localcssID).get();
 
 					//	LOG.info("***onModification 3 entityID= " + entityID.toString());
-					if( caciModelAttrLocalList.size() == 0){
-						caciModelAttrLocal = ctxBroker.createAttribute(entityID, "CAUI_CACI_MODEL").get();
-								LOG.debug("***onModification 4 ctxBroker.createAttribute= " + caciModelAttrLocal.getId());
+					if( caciModelAttrLocalList.isEmpty()){
+					//	caciModelAttrLocal = ctxBroker.createAttribute(entityID, CtxAttributeTypes.CACI_MODEL).get();
+						LOG.debug("***onModification 4 ctxBroker.createAttribute= null ");
 					} else {
 						CtxAttributeIdentifier attrID = (CtxAttributeIdentifier) caciModelAttrLocalList.get(0);
 						caciModelAttrLocal = (CtxAttribute) ctxBroker.retrieveAttribute(attrID, false).get();
-								LOG.debug("***onModification 5 ctxBroker.retrieveAttribute= " + caciModelAttrLocal.getId());
+						LOG.debug("***onModification 5 ctxBroker.retrieveAttribute= " + caciModelAttrLocal.getId());
 					}
-					caciModelAttrRemote.getBinaryValue();
+					
 					if(caciModelAttrRemote.getBinaryValue() != null){
 						UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(caciModelAttrRemote.getBinaryValue(), this.getClass().getClassLoader());
-						
+
 						byte[] binaryModel = SerialisationHelper.serialise(newUIModelData); 
 						caciModelAttrLocal.setBinaryValue(binaryModel);
 						ctxBroker.update(caciModelAttrLocal);
 						LOG.debug("*** model  stored in = " + caciModelAttrLocal.getId());
 					}
-					
-					
+
+
 
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
