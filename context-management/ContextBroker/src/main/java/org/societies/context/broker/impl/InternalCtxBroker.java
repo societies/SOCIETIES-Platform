@@ -518,9 +518,10 @@ public class InternalCtxBroker implements ICtxBroker {
 			// TODO check if CIS is locally maintained or a remote call is necessary
 			// TODO cis monitor should have previously add specific type in inferable types list
 
-			if (enableInference){
-
-				//LOG.info("1 estimateCommunityContext identifier:" +identifier);
+			if (enableInference && this.communityCtxInferenceMgr.getInferrableTypes().contains(identifier.getType())){
+				
+				LOG.info("1 estimateCommunityContext identifier:" +identifier);
+				
 				CtxAttribute commAttrEstimated = this.communityCtxInferenceMgr.estimateCommunityContext(identifier.getScope(), identifier);
 
 				if(commAttrEstimated != null ){
@@ -530,12 +531,9 @@ public class InternalCtxBroker implements ICtxBroker {
 						//LOG.info("4 estimateCommunityContext persisting "+ commAttrEstimated.getId());
 						try {
 							attribute = (CtxAttribute) this.update(commAttrEstimated).get();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (ExecutionException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						} catch (Exception e) {
+							LOG.error("Could not update estimated community context for communityAttrId: "+commAttrEstimated.getId() +" "
+									+ e.getLocalizedMessage(), e);
 						}
 						//LOG.info("5 estimateCommunityContext persisted ");
 					}
