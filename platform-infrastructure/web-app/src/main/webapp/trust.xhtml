@@ -35,7 +35,7 @@
                 </p:row>
                 <p:row>
                     <p:column>
-                        <h:outputText value="Direct Trust Level:" />  
+                        <h:outputText value="Direct Trust Level:" />
                     </p:column>
                     <p:column>
                         <h:outputText value="#{trustController.selectedEntity.directTrust.value != null ? trustController.selectedEntity.directTrust.value : '-'}" />
@@ -59,7 +59,7 @@
                         <h:outputText value="Your rating:" />  
                     </p:column>
                     <p:column>
-                        <p:rating value="#{trustController.selectedEntity.rating}" cancel="false">
+                        <p:rating value="#{trustController.selectedEntity.rating}" cancel="false" disabled="#{trustController.selectedEntity.directTrust.value == null}">
                             <p:ajax event="rate" listener="#{trustController.onRating}" update=":mainForm:tabView"/>
                             <f:attribute name="ratedEntityId" value="#{trustController.selectedEntity.trusteeId}" />
                         </p:rating>
@@ -106,7 +106,7 @@
                         </p:column>
 
                         <p:column headerText="Your Rating" sortBy="#{user.rating}">
-                            <p:rating value="#{user.rating}" readonly="true" />
+                            <p:rating value="#{user.rating}" readonly="true" disabled="#{user.directTrust.value == null}" />
                         </p:column>
 
                     </p:dataTable>
@@ -143,7 +143,7 @@
                         </p:column>
 
                         <p:column headerText="Your Rating" sortBy="#{community.rating}">
-                            <p:rating value="#{community.rating}" readonly="true" />
+                            <p:rating value="#{community.rating}" readonly="true" disabled="#{community.directTrust.value == null}" />
                         </p:column>
 
                     </p:dataTable>
@@ -180,7 +180,7 @@
                         </p:column>
 
                         <p:column headerText="Your Rating" sortBy="#{service.rating}">
-                            <p:rating value="#{service.rating}" readonly="true" />
+                            <p:rating value="#{service.rating}" readonly="true" disabled="#{service.directTrust.value == null}" />
                         </p:column>
 
                     </p:dataTable>

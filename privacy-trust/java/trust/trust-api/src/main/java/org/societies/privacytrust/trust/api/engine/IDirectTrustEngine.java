@@ -40,6 +40,8 @@ import org.societies.privacytrust.trust.api.model.ITrustedEntity;
  */
 public interface IDirectTrustEngine {
 	
+	public static final double RATING_WEIGHT = 0.5d;
+	
 	/**
 	 * TODO
 	 * 
