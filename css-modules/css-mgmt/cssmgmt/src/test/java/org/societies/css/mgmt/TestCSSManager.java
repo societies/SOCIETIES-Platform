@@ -3,6 +3,8 @@ package org.societies.css.mgmt;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.osgi.framework.BundleContext;
@@ -13,17 +15,21 @@ import org.junit.Test;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.css.management.ICSSRemoteManager;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
+import org.societies.api.schema.cssmanagement.CssNode;
 import org.societies.api.schema.cssmanagement.CssRecord;
 import org.societies.api.schema.cssmanagement.CssRequest;
 import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
 import org.societies.api.internal.css.cssRegistry.ICssRegistry;
 import org.societies.api.internal.css.cssRegistry.exception.CssRegistrationException;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.activity.IActivityFeedManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
+import org.societies.api.css.FriendFilter;
 import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.activity.IActivityFeedManager;
 
@@ -47,7 +53,7 @@ public class TestCSSManager {
 	
 	
 	
-	private ICssRegistry cssRegistry;
+	private ICssRegistry mockcssRegistry;
 //	private ICommManager CommManagerMock;
 	private BundleContext context;
 	
@@ -61,6 +67,7 @@ public class TestCSSManager {
 	
 	private ICssDirectoryRemote mockCssDirectoryRemote;
 	private ICSSRemoteManager mockcssManagerRemote;
+	private IServiceDiscovery mockserviceDiscovery;
 	
 	
 
@@ -74,14 +81,33 @@ public class TestCSSManager {
 		pubSubManagerMock = mock(PubsubClient.class);
 		activityFeedMock = mock(IActivityFeed.class);
 		mockActivityFeedManager = mock(IActivityFeedManager.class);
-		cssRegistry = mock(ICssRegistry.class);
+		mockcssRegistry = mock(ICssRegistry.class);
 		mockCssDirectoryRemote = mock (ICssDirectoryRemote.class);
 		mockcssManagerRemote = mock(ICSSRemoteManager.class);
+		mockserviceDiscovery = mock(IServiceDiscovery.class);
 		
-		when(commManagerMock.getIdManager()).thenReturn(identityManagerMock);	
+		when(commManagerMock.getIdManager()).thenReturn(identityManagerMock);
 		when(identityManagerMock.getThisNetworkNode()).thenReturn(iNetworkNodeMock);
-		//when(activityFeedMock.getOrCreateFeed(null, null, null)).thenReturn(activityFeedMock);
 		when(mockActivityFeedManager.getOrCreateFeed(eq(TEST_IDENTITY_1), eq(TEST_IDENTITY_1), eq(true))).thenReturn(activityFeedMock);
+		
+		CssNode cssnode = new CssNode();
+		cssnode.setIdentity(TEST_IDENTITY);
+		cssnode.setCssNodeMAC("aa:bb:cc:dd:ee");
+		cssnode.setInteractable("true");
+		cssnode.setType(0);
+		cssnode.setStatus(0);
+		List<CssNode> cssNodes = new ArrayList<CssNode>();
+		cssNodes.add(cssnode);
+		
+		CssRecord value = new CssRecord();
+		value.setCssIdentity(TEST_IDENTITY);
+		value.setEmailID(TEST_EMAIL);
+		value.setForeName(TEST_FORENAME);
+		value.setHomeLocation(TEST_HOME_LOCATION);
+		value.setCssNodes(cssNodes);
+		
+		when(mockcssRegistry.getCssRecord()).thenReturn(value);
+	
 		
 		
 	}
@@ -133,7 +159,7 @@ public class TestCSSManager {
 		CSSManager manager = new CSSManager();
 		
 		// cssRegistry registry = cssRegistry.getInstance();
-		manager.setCssRegistry(cssRegistry);
+		manager.setCssRegistry(mockcssRegistry);
 		
 		//manager.getCssRecord();
 		
@@ -195,16 +221,16 @@ public class TestCSSManager {
 
 		
 		CSSManager manager = new CSSManager();
-		manager.setCssRegistry(cssRegistry);
+		manager.setCssRegistry(mockcssRegistry);
 		
 		manager.getCssRecord();
 		
 		Future<CssInterfaceResult> result = manager.getCssRecord();		
 		assertNotNull(result);
 		
-		manager.setCssRegistry(cssRegistry);
+		manager.setCssRegistry(mockcssRegistry);
 		try {
-			cssRegistry.registerCss(profile);
+			mockcssRegistry.registerCss(profile);
 		} catch (CssRegistrationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -228,10 +254,18 @@ public class TestCSSManager {
 		request.setRequestStatus(CssRequestStatusType.PENDING);
 		request.setOrigin(CssRequestOrigin.REMOTE);
 		
+		CssRequest request1 = new CssRequest();
+		
+		
+		request1.setCssIdentity(TEST_IDENTITY_1);
+		request1.setRequestStatus(CssRequestStatusType.ACCEPTED);
+		request1.setOrigin(CssRequestOrigin.LOCAL);
+		
 		CSSManager manager = new CSSManager();
+		
 		manager.setCssDirectoryRemote(mockCssDirectoryRemote);
 		
-		manager.setCssRegistry(cssRegistry);
+		manager.setCssRegistry(mockcssRegistry);
 		manager.updateCssFriendRequest(request);
 		
 		request.setRequestStatus(CssRequestStatusType.DELETEFRIEND);
@@ -244,12 +278,20 @@ public class TestCSSManager {
 		manager.sendCssFriendRequest(TEST_IDENTITY_1);
 		
 		manager.getCssFriends();
+		manager.findAllCssRequests();
+		manager.findAllCssFriendRequests();
+		manager.updateCssRequest(request);
 		
 	}
 	
 	@Test
 	public void testnodestuff() {
 		CssRecord profile = new CssRecord();
+		profile.setCssIdentity(TEST_IDENTITY);
+		profile.setEmailID(TEST_EMAIL);
+		profile.setForeName(TEST_FORENAME);
+		profile.setHomeLocation(TEST_HOME_LOCATION);
+		
 		
 		boolean retValue = false;
 		
@@ -261,11 +303,100 @@ public class TestCSSManager {
 		request.setOrigin(CssRequestOrigin.REMOTE);
 		
 		CSSManager manager = new CSSManager();
-		manager.setCssRegistry(cssRegistry);
+		manager.setCssRegistry(mockcssRegistry);
+		try {
+			mockcssRegistry.registerCss(profile);
+		} catch (CssRegistrationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		manager.setNodeType(profile, TEST_IDENTITY_1, 0, 0, TEST_IDENTITY_NAME, "true");
+		
+		manager.getthisNodeType(TEST_IDENTITY_1);
+		
+		manager.removeNode(profile, TEST_IDENTITY);
 		
 		
 		manager.setPubSubManager(pubSubManagerMock);
 		manager.getPubSubManager();
+	}
+	
+	@Test
+	public void testmodifyrecord() {
+		CssRecord profile = new CssRecord();
+		profile.setCssIdentity(TEST_IDENTITY);
+		profile.setEmailID(TEST_EMAIL);
+		profile.setForeName(TEST_FORENAME);
+		profile.setHomeLocation(TEST_HOME_LOCATION);
+		
+		CssAdvertisementRecord cssad = new CssAdvertisementRecord();
+		cssad.setId(TEST_IDENTITY);
+		cssad.setName(TEST_NAME);
+		cssad.setUri(TEST_SOCIAL_URI);
+		
+		CssAdvertisementRecord cssad2 = new CssAdvertisementRecord();
+		cssad.setId(TEST_IDENTITY_1);
+		cssad.setName(TEST_IDENTITY_NAME);
+		cssad.setUri(TEST_SOCIAL_URI);
+		
+		boolean retValue = false;
+		
+		CSSManager manager = new CSSManager();
+		manager.setCssRegistry(mockcssRegistry);
+		manager.modifyCssRecord(profile);
+		manager.setCssDirectoryRemote(mockCssDirectoryRemote);
+		manager.addAdvertisementRecord(cssad);
+		manager.deleteAdvertisementRecord(cssad);
+		manager.addAdvertisementRecord(cssad);
+		manager.updateAdvertisementRecord(cssad, cssad2);
+		manager.findAllCssAdvertisementRecords();
+		List<CssAdvertisementRecord> listCssAds = new ArrayList<CssAdvertisementRecord>();
+		listCssAds.add(cssad);
+		
+		manager.setServiceDiscovery(mockserviceDiscovery);
+		//manager.findAllCssServiceDetails(listCssAds);
+		manager.getCssDirectoryRemote().addCssAdvertisementRecord(cssad);
+		manager.getCssDirectoryRemote().addCssAdvertisementRecord(cssad2);
+		//manager.getCssAdvertisementRecordsFull();
+		
+		
+	}
+	
+	@Test
+	public void testfriendstuff() {
+		CssRecord profile = new CssRecord();
+		profile.setCssIdentity(TEST_IDENTITY);
+		profile.setEmailID(TEST_EMAIL);
+		profile.setForeName(TEST_FORENAME);
+		profile.setHomeLocation(TEST_HOME_LOCATION);
+		
+		CssRequest request = new CssRequest();
+		
+		request.setCssIdentity(TEST_IDENTITY);
+		request.setRequestStatus(CssRequestStatusType.PENDING);
+		request.setOrigin(CssRequestOrigin.LOCAL);
+		
+		boolean retValue = false;
+		
+		CSSManager manager = new CSSManager();
+		manager.setCssRegistry(mockcssRegistry);
+		manager.modifyCssRecord(profile);
+		manager.setCssDirectoryRemote(mockCssDirectoryRemote);
+		manager.setCssManagerRemote(mockcssManagerRemote);
+		
+		manager.getFriendRequests();
+		manager.acceptCssFriendRequest(request);
+		manager.declineCssFriendRequest(request);
+		
+		FriendFilter filter = new FriendFilter();
+		int filterFlag = 0x0000000000;
+		filter.setFilterFlag(filterFlag );
+		//manager.getSuggestedFriends(filter);
+		
+		manager.pushtoContext(profile);
+		
+		
+		
+		
 	}
 }
