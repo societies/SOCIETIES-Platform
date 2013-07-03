@@ -25,7 +25,6 @@
 package org.societies.api.internal.context.broker;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -51,7 +50,6 @@ import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
-import org.societies.api.context.model.CtxEvaluationResults;
  
 /**
  * This interface provides access to current, past and future context data. The
@@ -197,17 +195,41 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	public void enableCtxMonitoring(CtxAttributeValueType type) throws CtxException;
 
 	/**
+	 * Looks up context model objects (i.e. entities, attributes or 
+	 * associations) of the specified type associated with the identified
+	 * target CSS or CIS. The method returns a list of
+	 * {@link CtxIdentifier CtxIdentifiers} referencing the context model
+	 * objects that match the supplied criteria. 
+	 * <p>
+	 * Contrary to {@link #lookup(IIdentity, CtxModelType, String)},
+	 * this method may perform additional queries based on the context data 
+	 * sub-types associated with the originally specified type.
+	 *  
+	 * @param type
+	 *            the type of the context model objects to lookup.
+	 * @return a list of {@link CtxIdentifier CtxIdentifiers} referencing the
+	 *         context model objects that match the supplied criteria.
+	 * @throws CtxException
+	 *             if there is a problem performing the look-up operation.
+	 * @throws NullPointerException 
+	 *             if any of the specified target or type is <code>null</code>.
+	 * @since 2.0
+	 */
+	public Future<List<CtxIdentifier>> lookup(final IIdentity target, 
+			final String type) throws CtxException;
+	
+	/**
 	 * Looks up for a list of CtxModelObjects defined by the CtxModelType (CtxEntity,
 	 * CtxAttribute, CtxAssociation) of  the specified type.
 	 * 
 	 * @param modelType
 	 * @param type
 	 * @return ctxIdentifier 
-	 * @throws CtxException 
+	 * @throws CtxException
+	 * @deprecated As of 2.0, use {@link #lookup(IIdentity, CtxModelType, String)}. 
 	 */
+	@Deprecated
 	public Future<List<CtxIdentifier>> lookup(CtxModelType modelType, String type) throws CtxException;
-	
-	public Future<List<CtxIdentifier>> lookup(String type) throws CtxException;
 	
 	/**
 	  * Looks up context model objects of the specified type associated with the
@@ -700,20 +722,6 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	 * @throws CtxException 
 	 */
 	public Future<List<CtxAttribute>> retrieveFuture(CtxAttributeIdentifier attrId, int modificationIndex) throws CtxException;
-
-	
-	/**
-	 * There are several methods missing that would express the similarity of context
-	 * values or objects in a quantifiable form (and not via a sorted list of
-	 * most/least similar reference objects/values).
-	 * 
-	 * @param objectUnderComparison
-	 * @param referenceObjects
-	 * @throws CtxException 
-	 * @since 0.0.1
-	 */
-	public Future<List<Object>> evaluateSimilarity(Serializable objectUnderComparison, List<Serializable> referenceObjects) throws CtxException;
-
 		
 	//***********************************************
 	//     Context History Management Methods  
@@ -850,10 +858,4 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	 * @throws CtxException 
 	 */
 	public void disableCtxRecording() throws CtxException;
-	
-	/**
-	 * added by Eboylan for CSE integration test
-	 */
-	public CtxEvaluationResults evaluateSimilarity(String[] ids,
-            ArrayList<String> attrib) throws CtxException;
 }

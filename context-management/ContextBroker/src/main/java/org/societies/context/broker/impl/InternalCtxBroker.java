@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,13 +46,13 @@ import org.societies.api.context.broker.CtxAccessControlException;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
-import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxEvaluationResults;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
@@ -66,12 +65,12 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
+import org.societies.api.identity.util.DataTypeUtils;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
-import org.societies.api.context.model.CtxEvaluationResults;
 import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
@@ -97,13 +96,11 @@ import org.societies.context.broker.impl.comm.callbacks.RetrieveCtxCallback;
 import org.societies.context.broker.impl.comm.callbacks.RetrieveIndividualEntCallback;
 import org.societies.context.broker.impl.comm.callbacks.UpdateCtxCallback;
 import org.societies.context.broker.impl.util.CtxBrokerUtils;
-//import org.societies.context.similarity.impl.ContextSimilarityEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.osgi.service.ServiceUnavailableException;
-import org.springframework.scheduling.annotation.Async; 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
-import org.societies.api.identity.util.DataTypeUtils;
 
 /**
  * Internal Context Broker Implementation
@@ -369,12 +366,13 @@ public class InternalCtxBroker implements ICtxBroker {
 		return this.lookupEntities(null, null, entityType, attribType, minAttribValue, maxAttribValue);
 	}
 
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#lookup(org.societies.api.identity.IIdentity, org.societies.api.context.model.CtxModelType, java.lang.String)
+	 */
 	@Override
 	@Async
 	public Future<List<CtxIdentifier>> lookup(IIdentity target,
 			CtxModelType modelType, String type) throws CtxException {
-
-
 
 		return this.lookup(null, target, modelType, type);
 	}
@@ -855,15 +853,6 @@ public class InternalCtxBroker implements ICtxBroker {
 	//***********************************************
 	//     Context Inference Methods  
 	//***********************************************
-
-	@Override
-	public Future<List<Object>> evaluateSimilarity(
-			Serializable objectUnderComparison,
-			List<Serializable> referenceObjects) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 
 	@Override
 	public Future<List<CtxAttribute>> retrieveFuture(
@@ -2724,194 +2713,123 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		return this.createEntity(req, identity, type);
 	}
-
-	private boolean isLocalCisId(final IIdentity cisId) {
-
-		if (cisId == null)
-			throw new NullPointerException("cisId can't be null");
-		if (!IdentityType.CIS.equals(cisId.getType()))
-			throw new IllegalArgumentException("cisId IdentityType is not CIS");
-
-		boolean result = false;
-		if (this.commMgrFactory.getAllCISCommMgrs().get(cisId) != null)
-			result = true;
-
-		return result;
-	}
-
+	
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#lookup(org.societies.api.identity.IIdentity, java.lang.String)
+	 */
 	@Override
-	public Future<List<CtxIdentifier>> lookup(Requestor requestor, IIdentity targetCSS,
-			String type) throws CtxException {
+	public Future<List<CtxIdentifier>> lookup(final IIdentity target, 
+			final String type) throws CtxException {
+		
+		return this.lookup(null, target, type);
+	}
+	
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#lookup(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, java.lang.String)
+	 */
+	@Override
+	public Future<List<CtxIdentifier>> lookup(Requestor requestor,
+			final IIdentity target, final String type) throws CtxException {
 
-		if(requestor == null) requestor = getLocalRequestor();
-		if(targetCSS == null) targetCSS = getLocalIdentity();
-
-		LOG.debug("skata 3 internal empty type "+type );
-
+		if (requestor == null) 
+			requestor = this.getLocalRequestor();
+		if (target == null)
+			throw new NullPointerException("target can't be null");
 		if (type == null)
 			throw new NullPointerException("type can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("lookup: requestor=" + requestor + ", target="
+					+ target + ", type=" + type);
 
-		List<CtxIdentifier>  localCtxIdListResult = new ArrayList<CtxIdentifier>();
-		List<CtxIdentifier> remoteCtxIdListResult = new ArrayList<CtxIdentifier>();
+		final List<CtxIdentifier> result = new ArrayList<CtxIdentifier>();
 
-		if (IdentityType.CSS.equals(targetCSS.getType()) 
-				|| IdentityType.CSS_RICH.equals(targetCSS.getType())
-				|| IdentityType.CSS_LIGHT.equals(targetCSS.getType())){
-
-			// local call
-			if (this.commMgr.getIdManager().isMine(targetCSS)) {
-
-				Set<CtxIdentifier> ctxIdListFromDb;
-				try {
-					// add olivier's component
-					Set<String> lookableTypes = new HashSet<String>();
-					DataTypeUtils dataType = new DataTypeUtils();
-					lookableTypes = dataType.getLookableDataTypes(type);
-					LOG.debug(" lookableTypes ****  "+lookableTypes);
-
-					ctxIdListFromDb = this.userCtxDBMgr.lookup(targetCSS.getJid(), lookableTypes);
-
-					LOG.debug("  ctxIdListFromDb ****  "+ctxIdListFromDb);
-
-				} catch (Exception e) {
-					throw new CtxBrokerException("Platform context broker failed to lookup " 
-							+ type	+ " objects of type " + type + ": " 
-							+  e.getLocalizedMessage(), e);
-				} 
-				if (!ctxIdListFromDb.isEmpty()) {
-
-					for (final CtxIdentifier ctxId : ctxIdListFromDb) {		
-
-						if(!requestor.equals(this.getLocalRequestor())){
-							try {
-								LOG.info("Lookup method, enforcing access control for requestor: "+requestor);
-								this.ctxAccessController.checkPermission(requestor, targetCSS,
-										new CtxPermission(ctxId, CtxPermission.READ));
-								localCtxIdListResult.add(ctxId);
-
-
-							} catch (CtxAccessControlException cace) {
-								// do nothing
-							}
-						} else localCtxIdListResult.add(ctxId);
-
-					}
-					if (localCtxIdListResult.isEmpty())
-						throw new CtxAccessControlException("Could not lookup " 
-								+ type	+ " objects of type " + type 
-								+ ": Access denied");
-
-					LOG.debug("  ctxIdListFromDb localCtxIdListResult****  "+localCtxIdListResult);
-
-					return new AsyncResult<List<CtxIdentifier>>(localCtxIdListResult);
-				}
-				// remote call
-			} else {
-				LOG.debug("remote call ");
-
-				final LookupCallback callback = new LookupCallback();
-
-				CtxModelType modelType = null;
-
-				ctxBrokerClient.lookup(requestor, targetCSS, modelType, type, callback);
-
-				synchronized (callback) {
-
-					try {
-						callback.wait();
-						remoteCtxIdListResult = callback.getResult();
-
-					} catch (InterruptedException e) {
-
-						throw new CtxBrokerException("Interrupted while waiting for remote createEntity");
-					}
-				}
-
-				return new AsyncResult<List<CtxIdentifier>>(remoteCtxIdListResult);
-
+		if (this.isLocalId(target)) { // L O C A L
+			
+			// Retrieve sub-types
+			final DataTypeUtils dataTypeUtil = new DataTypeUtils();
+			final Set<String> subTypes = dataTypeUtil.getLookableDataTypes(type);
+			if (LOG.isDebugEnabled())
+				LOG.debug("'" + type + "' subTypes: " + subTypes);
+			
+			if (IdentityType.CIS != target.getType()) { // U S E R
+				
+				result.addAll(this.userCtxDBMgr.lookup(target.getJid(), subTypes));
+				
+			} else { // C O M M U N I T Y
+			
+				// TODO lookup in Community DB
+				throw new CtxBrokerException("Generic lookup for CIS data is not supported yet");
 			}
+			
+			// TODO access control ?
+			// TODO obfuscation ?
+			
+		} else { // R E M O T E
+			
+			final LookupCallback callback = new LookupCallback();
+			this.ctxBrokerClient.lookup(requestor, target, null, type, callback);
+			synchronized (callback) {
+				try {
+					callback.wait();
+					if (callback.getException() == null)
+						result.addAll(callback.getResult());
+					else
+						throw callback.getException();
 
-			// community context
-		}else if (IdentityType.CIS.equals(targetCSS.getType())){
-
-			if (this.isLocalCisId(targetCSS)){
-
-				localCtxIdListResult = this.communityCtxDBMgr.lookupCommunityCtxEntity(type);	
-
-				return new AsyncResult<List<CtxIdentifier>>(localCtxIdListResult);
-
-			} else {
-				final LookupCallback callbackCIS = new LookupCallback();
-
-				CtxModelType modelType = null;
-				ctxBrokerClient.lookup(requestor, targetCSS, modelType, type, callbackCIS);
-
-
-				synchronized (callbackCIS) {
-
-					try {
-						callbackCIS.wait();
-						remoteCtxIdListResult = callbackCIS.getResult();
-
-					} catch (InterruptedException e) {
-
-						throw new CtxBrokerException("Interrupted while waiting for remote createEntity");
-					}
+				} catch (InterruptedException e) {
+					throw new CtxBrokerException("Interrupted while waiting for remote lookup response");
 				}
-
-				return new AsyncResult<List<CtxIdentifier>>(remoteCtxIdListResult);
-			}			
-
-			//LOG.info("skata 3 this.communityCtxDBMgr.lookup(modelType, type);: "+this.communityCtxDBMgr.lookup(modelType, type));
-
-		} else throw new CtxBrokerException("objects identifier does not correspond to a CSS or a CIS");
-
-
-
-		return null;
+			}
+		}
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("lookup: result=" + result);
+		return new AsyncResult<List<CtxIdentifier>>(result);
 	}
-
+	
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#retrieve(java.util.List)
+	 */
 	@Override
-	public Future<List<CtxIdentifier>> lookup(String type) throws CtxException {
+	public Future<List<CtxModelObject>> retrieve(
+			final List<CtxIdentifier> ctxIdList) throws CtxException {
 
-
-		Requestor req = null;
-		IIdentity id = null;
-
-		return this.lookup(req, id, type);
+		return this.retrieve(null, ctxIdList);
 	}
 
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#retrieve(org.societies.api.identity.Requestor, java.util.List)
+	 */
 	@Override
 	public Future<List<CtxModelObject>> retrieve(Requestor requestor,
-			List<CtxIdentifier> ctxIdList) throws CtxException {
+			final List<CtxIdentifier> ctxIdList) throws CtxException {
+		
+		if (ctxIdList == null)
+			throw new NullPointerException("ctxIdList can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("retrieve: requestor=" + requestor + ", ctxIdList="
+					+ ctxIdList);
 
-		List<CtxModelObject> results = new ArrayList<CtxModelObject>();
+		final List<CtxModelObject> result = new ArrayList<CtxModelObject>(
+				ctxIdList.size());
 
-		for(CtxIdentifier identifier : ctxIdList){
-
-			CtxModelObject object = null;
-
+		for (final CtxIdentifier ctxId : ctxIdList) {
 			try {
-				object = this.retrieve(requestor, identifier).get();
-				results.add(object);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				result.add(this.retrieve(requestor, ctxId).get());
+			} catch (CtxException ce) {
+				// This can also be a CtxAccessControlException
+				// TODO Should we immediately fail in case of a CtxAccessControlException ? 
+				throw ce;
+			} catch (Exception e) {
+				throw new CtxBrokerException(e.getLocalizedMessage(), e);
 			}
-
 		}
-		return new AsyncResult<List<CtxModelObject>>(results);
-	}
-
-	@Override
-	public Future<List<CtxModelObject>> retrieve(List<CtxIdentifier> ctxIdList)
-			throws CtxException {
-
-		Requestor req = null;
-		return this.retrieve(req, ctxIdList);
+						
+		if (LOG.isDebugEnabled())
+			LOG.debug("retrieve: result=" + result);
+		return new AsyncResult<List<CtxModelObject>>(result);
 	}
 
 	/**
@@ -2924,5 +2842,35 @@ public class InternalCtxBroker implements ICtxBroker {
 		CtxEvaluationResults evalResult = (CtxEvaluationResults) this.ctxSimilarityEval.evaluateSimilarity(ids, attrib); //this.
 		return evalResult;
 	}
+	
+	private boolean isLocalId(final IIdentity id) {
 
+		if (id == null)
+			throw new NullPointerException("id can't be null");
+		if (!IdentityType.CIS.equals(id.getType())) // U S E R  I D
+			return this.isLocalCssId(id);
+		else                                        // C O M M U N I T Y  I D
+			return this.isLocalCisId(id);
+	}
+
+	private boolean isLocalCssId(final IIdentity cssId) {
+
+		if (cssId == null)
+			throw new NullPointerException("cssId can't be null");
+		if (IdentityType.CIS.equals(cssId.getType()))
+			throw new IllegalArgumentException("cssId IdentityType is not CSS");
+
+		return this.commMgr.getIdManager().isMine(cssId);
+	}
+	
+	private boolean isLocalCisId(final IIdentity cisId) {
+
+		if (cisId == null)
+			throw new NullPointerException("cisId can't be null");
+		if (!IdentityType.CIS.equals(cisId.getType()))
+			throw new IllegalArgumentException("cisId IdentityType is not CIS");
+
+		return (this.commMgrFactory.getAllCISCommMgrs().get(cisId) != null)
+				? true : false;
+	}
 }

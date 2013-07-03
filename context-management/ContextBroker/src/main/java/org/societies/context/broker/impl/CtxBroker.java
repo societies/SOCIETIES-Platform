@@ -48,7 +48,6 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -471,17 +470,6 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 
 		return ctxEntIdList;
 	}
-
-	@Override
-	@Async
-	public Future<List<Object>> evaluateSimilarity(
-			Serializable objectUnderComparison,
-			List<Serializable> referenceObjects) throws CtxException {
-
-		Future<List<Object>> obj = internalCtxBroker.evaluateSimilarity(objectUnderComparison, referenceObjects);
-		return obj;
-	}
-
 
 	@Override
 	@Async
