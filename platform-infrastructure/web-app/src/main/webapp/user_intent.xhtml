@@ -18,9 +18,9 @@
             </f:facet>
 			<!-- 	<h:form> -->
 
-        
-        
-        
+
+
+
 
 			<p:tabView id="tabView" dynamic="true" activeIndex="0">
 
@@ -41,13 +41,8 @@
 					<p:commandButton value="Refresh user model"
 						actionListener="#{cauiController.refreshModels}"
 						update="userTable" />
-				
-				<h:outputText value="Enable prediction: " />
-        		<p:selectBooleanCheckbox value="#{cauiController.enableUserPrediction}">  
-             </p:selectBooleanCheckbox> 
-           		<!--	 <p:ajax update="msg" listener="#{CAUIController.setEnableUserPrediction}"/>  
-        		
-				 -->  
+
+					
 				</p:tab>
 
 
@@ -66,10 +61,11 @@
 					</p:dataTable>
 
 					<p:commandButton value="Learn new community model"
-						actionListener="#{cauiController.learnCommunityModel}  />
+						actionListener="#{cauiController.learnCommunityModel}" />
 
 					<p:commandButton value="Refresh community model"
-						actionListener="#{cauiController.refreshModels}" update="communityTable"/>
+						actionListener="#{cauiController.refreshModels}"
+						update="communityTable" />
 				</p:tab>
 
 
@@ -85,13 +81,29 @@
 						</p:column>
 					</p:dataTable>
 					<p:commandButton value="Refresh Prediction Log"
-						actionListener="#{cauiController.showMeAMessage}" update="predictionLogTable" />
+						actionListener="#{cauiController.refreshModels}"
+						update="predictionLogTable" />
 				</p:tab>
 
-
+				<p:tab title="Options">
+				<h:outputText value="Enable prediction based on User model: " />
+					<p:selectBooleanCheckbox
+						value="#{cauiController.enableUserPrediction}">
+					</p:selectBooleanCheckbox>
+				
+				<h:outputText value="Enable prediction based on Community model: " />
+					<p:selectBooleanCheckbox
+						value="#{cauiController.enableCommunityPrediction}">
+					</p:selectBooleanCheckbox>
+				
+				 <p:commandButton value="Submit" actionListener="#{cauiController.updateComUsrPred}"/> 
+					
+				
+				
+				</p:tab>
 			</p:tabView>
-			
-			
+
+
 			<!-- 	</h:form> -->
 		</p:panel>
 
