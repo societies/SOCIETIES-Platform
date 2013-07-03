@@ -113,4 +113,13 @@ public interface ICommunityCtxInferenceMgr {
 	 */
 	public void refineContext(CtxAttributeIdentifier ctxAttrId);
 
+	
+	/**
+	 * Returns a list of CtxAttributeTypes that can be inferred. 
+	 * 
+	 *  @return Set of ctxAttributeTypes
+	 *  @since 0.0.8
+	 */
+	public List<String> getInferrableTypes();
+	
 }

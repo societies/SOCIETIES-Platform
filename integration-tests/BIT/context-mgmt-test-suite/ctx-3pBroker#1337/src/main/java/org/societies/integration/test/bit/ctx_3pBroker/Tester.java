@@ -119,7 +119,7 @@ public class Tester {
 	@After
 	public void tearDown(){
 
-		
+
 		if(this.deviceEntity != null) {
 
 			try {
@@ -135,7 +135,7 @@ public class Tester {
 		if (this.cisIdentity !=null){
 			this.cisManager.deleteCis(this.cisIdentity.getBareJid());
 		}
-		
+
 	}
 
 
@@ -185,6 +185,68 @@ public class Tester {
 		// lookup/retrieve community entity
 		lookupCommunityCreateHistory();
 
+		retrieveAttributeCommInf();
+
+	}
+
+
+	/*
+	 * this test will retrieve a community attribute that triggers inference
+	 * and a community attribute that doesn't trigger inference 
+	 */
+	private void retrieveAttributeCommInf(){
+
+		try {
+			CtxEntityIdentifier commEntityId = this.externalCtxBroker.retrieveCommunityEntityId(this.requestorService, this.cisIdentity).get();
+
+			CtxAttribute activitiesAttr = this.externalCtxBroker.createAttribute(this.requestorService, commEntityId, CtxAttributeTypes.ACTIVITIES).get();
+			activitiesAttr.setStringValue("activity1,activity2");
+			CtxAttribute activitiesAttrUpdated = (CtxAttribute) this.externalCtxBroker.update(this.requestorService,activitiesAttr ).get();
+			LOG.info(" update activities: "+activitiesAttrUpdated.getComplexValue().getPairs());
+			LOG.info(" retrieved activities getFreshness 1: "+activitiesAttrUpdated.getQuality().getFreshness());
+			
+			
+			CtxAttribute moviesAttr = this.externalCtxBroker.createAttribute(this.requestorService, commEntityId, CtxAttributeTypes.MOVIES).get();
+			moviesAttr.setStringValue("movie1,movie2");
+			CtxAttribute moviesAttrUpdated = (CtxAttribute) this.externalCtxBroker.update(this.requestorService,moviesAttr ).get();
+			LOG.info(" update movies: "+moviesAttrUpdated.getComplexValue().getPairs());
+			LOG.info(" retrieved movies getFreshness 1: "+moviesAttrUpdated.getQuality().getFreshness());
+			
+			Thread.sleep(5000);
+			
+			// if community ctx estimator is called a complex value type should be present
+			LOG.info(" trigger community inference test" );
+			CtxAttribute attrActivitiesRetrieved = (CtxAttribute) this.externalCtxBroker.retrieve(requestorService,activitiesAttr.getId() ).get();
+			LOG.info(" retrieved activities: "+attrActivitiesRetrieved.getComplexValue().getPairs());
+			LOG.info(" retrieved activities getFreshness 2: "+attrActivitiesRetrieved.getQuality().getFreshness());
+			LOG.info(" retrieved activities Freshness should be the same: "+attrActivitiesRetrieved.getQuality().getFreshness()+" "+activitiesAttrUpdated.getQuality().getFreshness());
+			LOG.info(" retrieved activities Freshness should be the same: "+attrActivitiesRetrieved.getQuality().getLastUpdated()+" "+activitiesAttrUpdated.getQuality().getLastUpdated());
+			assertEquals(attrActivitiesRetrieved.getQuality().getLastUpdated(), activitiesAttrUpdated.getQuality().getLastUpdated());
+			
+			CtxAttribute attrMoviesRetrieved = (CtxAttribute) this.externalCtxBroker.retrieve(requestorService,moviesAttr.getId()).get();
+			LOG.info(" retrieved movies getFreshness 2 : "+attrMoviesRetrieved.getQuality().getFreshness());
+			LOG.info(" retrieved movies: "+attrMoviesRetrieved.getComplexValue().getPairs());
+			LOG.info(" retrieved movies Freshness should NOT be the same: "+attrMoviesRetrieved.getQuality().getFreshness()+" "+moviesAttrUpdated.getQuality().getFreshness());
+			LOG.info(" retrieved movies Freshness should NOT be the same (last updated): "+attrMoviesRetrieved.getQuality().getLastUpdated()+" "+moviesAttrUpdated.getQuality().getLastUpdated());
+			Assert.assertNotSame(attrMoviesRetrieved.getQuality().getLastUpdated(), moviesAttrUpdated.getQuality().getLastUpdated());
+			
+			
+
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+
+
 	}
 
 
@@ -225,12 +287,12 @@ public class Tester {
 			// create community attributes
 			// update community attributes , stored in history
 			// retrieve community attributes
-			
+
 			LOG.info(" interestCommAttr commEntityId : " +commEntityId );
-			
+
 			CtxAttribute interestCommAttr = this.externalCtxBroker.createAttribute(this.requestorService, commEntityId, CtxAttributeTypes.INTERESTS).get();
 			LOG.info(" interestCommAttr interestCommAttr : " +interestCommAttr.getId());
-			
+
 			interestCommAttr.setHistoryRecorded(true);
 			interestCommAttr.setStringValue("aa,bb,cc");
 			CtxAttribute interestCommAttr1 = (CtxAttribute) this.externalCtxBroker.update(this.requestorService, interestCommAttr).get();

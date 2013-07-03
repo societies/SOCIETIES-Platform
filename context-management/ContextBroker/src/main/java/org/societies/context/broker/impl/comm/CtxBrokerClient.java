@@ -419,8 +419,9 @@ public class CtxBrokerClient implements ICommCallback {
 			// 2. target id
 			ctxBrokerLookupBean.setTargetCss(toIdentity.getBareJid());
 			// 3. model type
-			ctxBrokerLookupBean.setModelType(
-					CtxModelBeanTranslator.getInstance().ctxModelTypeBeanFromCtxModelType(modelType));
+			if (modelType != null)
+				ctxBrokerLookupBean.setModelType(
+						CtxModelBeanTranslator.getInstance().ctxModelTypeBeanFromCtxModelType(modelType));
 			// 4 . type
 			ctxBrokerLookupBean.setType(type);
 			cbPacket.setLookup(ctxBrokerLookupBean);

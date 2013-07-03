@@ -40,6 +40,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxEvaluationResults;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
@@ -115,17 +116,6 @@ public interface ICtxBroker {
 			final IIdentity targetId, final String type) throws CtxException;
 
 	/**
-	 * There are several methods missing that would express the similarity of context
-	 * values or objects in a quantifiable form (and not via a sorted list of
-	 * most/least similar reference objects/values).
-	 * 
-	 * @param objectUnderComparison
-	 * @param referenceObjects
-	 * @throws CtxException 
-	 */
-	public Future<List<Object>> evaluateSimilarity(final Serializable objectUnderComparison, final List<Serializable> referenceObjects) throws CtxException;
-
-	/**
 	 * Looks up context model objects of the specified type associated with the
 	 * identified target CSS or CIS. The requestor on whose behalf the look-up
 	 * will be performed must also be specified. The method returns a list of
@@ -157,29 +147,32 @@ public interface ICtxBroker {
 			final IIdentity target, final CtxModelType modelType,
 			final String type) throws CtxException;
 
-
 	/**
-	 * Looks up context model objects (i.e. entities, attributes or associations) of the
-	 * specified type.The method returns a list of {@link CtxIdentifier CtxIdentifiers}
-	 * referencing the context model objects that match the supplied criteria. 
-	 * 
-	 * This method exploits a context data hierarchy and performs in a dynamic manner 
-	 * additional queries related with the initially queried data type.  
+	 * Looks up context model objects (i.e. entities, attributes or 
+	 * associations) of the specified type associated with the identified
+	 * target CSS or CIS. The requestor on whose behalf the look-up will be
+	 * performed must also be specified. The method returns a list of
+	 * {@link CtxIdentifier CtxIdentifiers} referencing the context model
+	 * objects that match the supplied criteria. 
+	 * <p>
+	 * Contrary to {@link #lookup(Requestor, IIdentity, CtxModelType, String)},
+	 * this method may perform additional queries based on the context data 
+	 * sub-types associated with the originally specified type.
 	 *  
 	 * @param requestor
 	 *            the requestor on whose behalf to lookup the context model 
-	 *            objects
+	 *            objects.
 	 * @param type
-	 *            the type of the context model objects to lookup
-	 * @throws CtxException
-	 *             if there is a problem performing the look-up operation
+	 *            the type of the context model objects to lookup.
 	 * @return a list of {@link CtxIdentifier CtxIdentifiers} referencing the
 	 *         context model objects that match the supplied criteria.
-	 * 
+	 * @throws CtxException
+	 *             if there is a problem performing the look-up operation.
+	 * @throws NullPointerException 
+	 *             if any of the specified target or type is <code>null</code>.
 	 */
 	public Future<List<CtxIdentifier>> lookup(final Requestor requestor,
 			final IIdentity target, final String type) throws CtxException;
-
 
 	/**
 	 * Looks up context model objects (i.e. attributes or associations) of the
@@ -578,8 +571,6 @@ public interface ICtxBroker {
 	/**
 	 * added by eboylan for CSE integration test
 	 */
-	public org.societies.api.context.model.CtxEvaluationResults evaluateSimilarity(String[] ids,
+	public CtxEvaluationResults evaluateSimilarity(String[] ids,
             ArrayList<String> attrib) throws CtxException;
-
-
 }

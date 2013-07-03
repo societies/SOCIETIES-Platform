@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske dru≈æbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVA√á√ÉO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -22,16 +22,61 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.performance.test.upper_tester.trust;
+package org.societies.android.platform.context;
+
+import org.societies.android.api.internal.context.IInternalCtxClient;
+
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.util.Log;
 
 /**
- * Describe your class here...
- *
- * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 2.0
+ * This wrapper class acts as a local wrapper for the Android Context Client. It uses the
+ * base service implementation {@link ContextBrokerBase}.
  */
-public class DirectTrustEvidenceParams {
+public class ServiceContextBrokerLocal extends Service {
 
-	/** Empty constructor required by ??? */
-	public DirectTrustEvidenceParams() {}
+    private static final String TAG = ServiceContextBrokerLocal.class.getName();
+    
+    private IBinder binder = null;
+    
+    /*
+     * @see android.app.Service#onCreate()
+     */
+    @Override
+	public void onCreate() {
+    	
+    	Log.d(TAG, "onCreate");
+		this.binder = new ServiceContextBrokerLocalBinder();
+	}
+
+    /*
+     * @see android.app.Service#onDestroy()
+     */
+	@Override
+	public void onDestroy() {
+		
+		Log.d(TAG, "onDestroy");
+	}
+	
+	/*
+	 * @see android.app.Service#onBind(android.content.Intent)
+	 */
+	@Override
+	public IBinder onBind(Intent intent) {
+		
+		Log.d(TAG, "onBind");
+		return this.binder;
+	}
+
+	/** The Binder object for local service invocation. */
+	public class ServiceContextBrokerLocalBinder extends Binder {
+		
+		public IInternalCtxClient getService() {
+
+			return new ContextBrokerBase(ServiceContextBrokerLocal.this, true);
+		}
+	}
 }

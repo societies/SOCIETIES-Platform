@@ -22,9 +22,10 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.performance.test.upper_tester.trust;
+package org.societies.integration.performance.test.upper_tester.trust.direct;
 
 import org.societies.integration.performance.test.lower_tester.PerformanceTestMgmtInfo;
+import org.societies.integration.performance.test.upper_tester.trust.TrustEvidenceParams;
 
 /**
  * Performance tests for the Trust Management & Evaluation components.
@@ -32,8 +33,8 @@ import org.societies.integration.performance.test.lower_tester.PerformanceTestMg
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 2.0
  */
-public interface ITrustPerformanceTest {
+public interface ITestDirectTrustPerformance {
 	
-	public void evaluateIndirectTrustTest(PerformanceTestMgmtInfo performanceTestMgmtInfo,
-			DirectTrustEvidenceParams directTrustEvidenceParams);
+	public void testEvaluateDirectTrust(PerformanceTestMgmtInfo performanceTestMgmtInfo,
+			TrustEvidenceParams trustEvidenceParams);
 }
