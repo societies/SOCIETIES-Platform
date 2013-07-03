@@ -194,17 +194,11 @@ public class UserContextInheritanceMgr implements IUserCtxInheritanceMgr {
 	 * @since 0.0.3
 	 */
 	public CtxAttribute compareQoC(CtxAttribute ctxAtt1, CtxAttribute ctxAtt2) {
-		DateTime dt = new DateTime();
-		Calendar cale = GregorianCalendar.getInstance();
-		
 		long freshnessOfFirstAttribute = ctxAtt1.getQuality().getFreshness();
 		long freshnessOfSecondAttribute = ctxAtt2.getQuality().getFreshness();
 
-		Date lastUpdatedFirstAttribute = (Date) ctxAtt1.getQuality().getLastUpdated();
-		Date lastUpdatedSecondAttribute = (Date) ctxAtt2.getQuality().getLastUpdated();
-
 		Double precisionOfFirstAttribute = ctxAtt1.getQuality().getPrecision();
-		Double precisionOfSecondtAttribute = ctxAtt2.getQuality().getPrecision();
+		ctxAtt2.getQuality().getPrecision();
 		
 		double base=0.0;
 		if (freshnessOfFirstAttribute < freshnessOfSecondAttribute) {
