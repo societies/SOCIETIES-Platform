@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>android-parent</artifactId>
+		<version>RELEASE</version>
+	</parent>
+
+	<groupId>org.societies.android.security</groupId>
+	<artifactId>security-client</artifactId>
+	<name>Security Services</name>
+	<version>${release.version}</version>
+	<packaging>apklib</packaging>	
+	<dependencies>
+		<dependency>
+	    	<groupId>com.google.android</groupId>
+	        <artifactId>android</artifactId> 
+	        <exclusions>
+				<!-- Provided by Android -->
+				<exclusion>
+					<artifactId>xpp3</artifactId>
+					<groupId>xpp3</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+        		<groupId>org.societies.android.api.internal</groupId>
+        		<artifactId>societies-android-api-internal</artifactId>
+        		<version>${release.version}</version>
+        		<type>apklib</type>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.android.platform.comms.helper</groupId>
+			<artifactId>societies-android-comms-helper</artifactId>
+			<version>${release.version}</version>
+			<type>apklib</type>
+		</dependency>
+		<dependency>
+			<artifactId>xpp3</artifactId>
+			<groupId>xpp3</groupId>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</reporting>
+	
+	<developers>
+		<developer>
+			<name>Mitja Vardjan</name>
+			<email>mitja.vardjan@setcce.si</email>
+			<organization>SETCCE</organization>
+			<organizationUrl>http://www.setcce.si/</organizationUrl>
+			<roles>
+				<role>owner</role>
+				<role>developer</role>
+				<role>tester</role>
+			</roles>
+		</developer>
+	</developers>
+	
+</project>
