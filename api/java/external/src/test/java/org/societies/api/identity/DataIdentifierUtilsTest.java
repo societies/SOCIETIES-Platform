@@ -24,9 +24,15 @@
  */
 package org.societies.api.identity;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -108,7 +114,7 @@ public class DataIdentifierUtilsTest {
 		assertFalse("Type should not be equals if one is empty (5/6)", DataIdentifierUtils.hasSameType(id9, id10));
 		assertFalse("Type should not be equals if one is empty (inverse) (6/6)", DataIdentifierUtils.hasSameType(id10, id9));
 	}
-	
+
 	@Test
 	public void testIsParentType() {
 		String testTitle = "Get scheme";
@@ -173,5 +179,53 @@ public class DataIdentifierUtilsTest {
 		assertFalse("Type should not be equals if one is empty (inverse) (4/4)", DataIdentifierUtils.isParentOrSameType(id10, id1));
 		assertFalse("Type should not be equals if one is empty (5/6)", DataIdentifierUtils.isParentOrSameType(id9, id10));
 		assertFalse("Type should not be equals if one is empty (inverse) (6/6)", DataIdentifierUtils.isParentOrSameType(id10, id9));
+	}
+
+
+	@Test
+	public void testSortByParent() {
+		Set<DataIdentifier> nameList = new HashSet<DataIdentifier>();
+		Set<DataIdentifier> actionList = new HashSet<DataIdentifier>();
+		DataIdentifier nameId = null;
+		DataIdentifier actionId = null;
+		try {
+			nameId = DataIdentifierFactory.create(DataIdentifierScheme.CONTEXT, "fooCss", CtxAttributeTypes.NAME);
+			nameList.add(DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://fooCss/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.NAME_FIRST+"/33"));
+			nameList.add(DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://fooCss/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.NAME_LAST+"/38"));
+			actionId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://fooCss/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.ACTION+"/42");
+			actionList.add(actionId);
+		} catch (MalformedCtxIdentifierException e) {
+			LOG.error("Faillure during data id creation from URI", e);
+			fail("Faillure during data id creation from URI: "+e);
+		}
+		// - List1
+		// Parameters
+		Set<DataIdentifier> list1 = new HashSet<DataIdentifier>();
+		list1.addAll(nameList);
+		list1.add(actionId);
+		// Expected
+		Map<String, Set<DataIdentifier>> expectedMap1 = new HashMap<String, Set<DataIdentifier>>();
+		expectedMap1.put(nameId.getType(), nameList);
+		expectedMap1.put(actionId.getType(), actionList);
+		assertEquals("NAME_FIRST (leaf), NAME_LAST (leaf), ACTION (root and leaf)  should be sorted as: NAME -> NAME_FIRST, NAME_LAST ; ACTION -> ACTION", expectedMap1, DataIdentifierUtils.sortByParent(list1));
+
+		// - List2
+		// Parameters
+		Set<DataIdentifier> list2 = new HashSet<DataIdentifier>();
+		list2.addAll(nameList);
+		list2.add(nameId);
+		list2.add(actionId);
+		assertEquals("NAME (root not leaf), NAME_FIRST (leaf), NAME_LAST (leaf), ACTION (root and leaf) should be sorted as: NAME -> NAME_FIRST, NAME_LAST ; ACTION -> ACTION", expectedMap1, DataIdentifierUtils.sortByParent(list2));
+
+		// - List3
+		// Parameters
+		Set<DataIdentifier> list3 = new HashSet<DataIdentifier>();
+		list3.add(nameId);
+		list3.add(actionId);
+		// Expected
+		Map<String, Set<DataIdentifier>> expectedMap3 = new HashMap<String, Set<DataIdentifier>>();
+		expectedMap3.put(nameId.getType(), null);
+		expectedMap3.put(actionId.getType(), actionList);
+		assertEquals("NAME (root not leaf), ACTION (root and leaf) should be sorted as: NAME -> null ; ACTION -> ACTION", expectedMap3, DataIdentifierUtils.sortByParent(list3));
 	}
 }
