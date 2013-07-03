@@ -33,6 +33,9 @@
     <osgi:reference id="privacyAssessment"
                     interface="org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment"/>
 
+    <osgi:reference id="privacyPolicyManager"
+                    interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager"/>
+
     <osgi:reference id="userFeedbackHistoryRepository"
                     interface="org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository"/>
     <osgi:reference id="privacyPolicyNegotiationHistoryRepository"

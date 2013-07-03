@@ -1,0 +1,25 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="/templates/main_template.xhtml">
+
+    <ui:define name="html_head">
+        <title>My privacy policies | SOCIETES</title>
+    </ui:define>
+
+    <ui:define name="body">
+        <div class="hr grid_12 clearfix"></div>
+        <!-- Left Column -->
+        <section id="left_col" class="grid_8">
+            <div class="breadcrumbs"><a href="">Home</a> / <a href="privacy-policy-browser.xhtml">Privacy Policy Browser</a></div>
+            <section>
+                <h4 class="form_title"><h:outputText value="#{privacyPolicyBrowserController.testString}" /> Browser</h4>
+                <div class="hr dotted clearfix"></div>
+                <p>Select a privacy policy.</p>
+                <div class="hr dotted clearfix"></div>
+            </section>
+        </section>
+        <div class="hr grid_12 clearfix"></div>
+    </ui:define>
+</ui:composition>
+</html>
