@@ -195,6 +195,22 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	public void enableCtxMonitoring(CtxAttributeValueType type) throws CtxException;
 
 	/**
+	 * Looks up context model objects of the specified CtxModelType (CtxEntity,
+	 * CtxAttribute, or CtxAssociation) and the supplied type.
+	 * 
+	 * @param modelType
+	 * @param type
+	 * @return ctxIdentifier 
+	 * @throws CtxException
+	 * @throws NullPointerException 
+	 *             if any of the specified parameters is <code>null</code>.
+	 * @deprecated As of 2.0, use {@link #lookup(IIdentity, CtxModelType, String)}. 
+	 */
+	@Deprecated
+	public Future<List<CtxIdentifier>> lookup(final CtxModelType modelType, 
+			final String type) throws CtxException;
+	
+	/**
 	 * Looks up context model objects (i.e. entities, attributes or 
 	 * associations) of the specified type associated with the identified
 	 * target CSS or CIS. The method returns a list of
@@ -212,24 +228,11 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	 * @throws CtxException
 	 *             if there is a problem performing the look-up operation.
 	 * @throws NullPointerException 
-	 *             if any of the specified target or type is <code>null</code>.
+	 *             if any of the specified parameters is <code>null</code>.
 	 * @since 2.0
 	 */
 	public Future<List<CtxIdentifier>> lookup(final IIdentity target, 
 			final String type) throws CtxException;
-	
-	/**
-	 * Looks up for a list of CtxModelObjects defined by the CtxModelType (CtxEntity,
-	 * CtxAttribute, CtxAssociation) of  the specified type.
-	 * 
-	 * @param modelType
-	 * @param type
-	 * @return ctxIdentifier 
-	 * @throws CtxException
-	 * @deprecated As of 2.0, use {@link #lookup(IIdentity, CtxModelType, String)}. 
-	 */
-	@Deprecated
-	public Future<List<CtxIdentifier>> lookup(CtxModelType modelType, String type) throws CtxException;
 	
 	/**
 	  * Looks up context model objects of the specified type associated with the
@@ -252,8 +255,8 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	  * @throws NullPointerException
 	  *             if any of the specified parameters is <code>null</code>
 	  */
-	 public Future<List<CtxIdentifier>> lookup(final IIdentity target, final CtxModelType modelType,
-	   final String type) throws CtxException;
+	 public Future<List<CtxIdentifier>> lookup(final IIdentity target, 
+			 final CtxModelType modelType, final String type) throws CtxException;
 	 
 	 /**
 	  * Looks up context model objects (i.e. attributes or associations) of the
