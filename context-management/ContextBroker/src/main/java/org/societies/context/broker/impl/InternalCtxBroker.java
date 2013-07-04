@@ -2033,7 +2033,53 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		return new AsyncResult<CtxModelObject>(objectResult);
 	}
+	
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#retrieve(java.util.List)
+	 */
+	@Override
+	public Future<List<CtxModelObject>> retrieve(
+			final List<CtxIdentifier> ctxIdList) throws CtxException {
 
+		final Requestor requestor = this.getLocalRequestor();
+		return this.retrieve(requestor, ctxIdList);
+	}
+
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#retrieve(org.societies.api.identity.Requestor, java.util.List)
+	 */
+	@Override
+	public Future<List<CtxModelObject>> retrieve(Requestor requestor,
+			final List<CtxIdentifier> ctxIdList) throws CtxException {
+		
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (ctxIdList == null)
+			throw new NullPointerException("ctxIdList can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("retrieve: requestor=" + requestor + ", ctxIdList="
+					+ ctxIdList);
+
+		final List<CtxModelObject> result = new ArrayList<CtxModelObject>(
+				ctxIdList.size());
+
+		for (final CtxIdentifier ctxId : ctxIdList) {
+			try {
+				result.add(this.retrieve(requestor, ctxId).get());
+			} catch (CtxException ce) {
+				// This can also be a CtxAccessControlException
+				// TODO Should we immediately fail in case of a CtxAccessControlException ? 
+				throw ce;
+			} catch (Exception e) {
+				throw new CtxBrokerException(e.getLocalizedMessage(), e);
+			}
+		}
+						
+		if (LOG.isDebugEnabled())
+			LOG.debug("retrieve: result=" + result);
+		return new AsyncResult<List<CtxModelObject>>(result);
+	}
 
 	@Override
 	@Async
@@ -2714,50 +2760,6 @@ public class InternalCtxBroker implements ICtxBroker {
 		Requestor req = null;
 
 		return this.createEntity(req, identity, type);
-	}
-	
-	/*
-	 * @see org.societies.api.internal.context.broker.ICtxBroker#retrieve(java.util.List)
-	 */
-	@Override
-	public Future<List<CtxModelObject>> retrieve(
-			final List<CtxIdentifier> ctxIdList) throws CtxException {
-
-		return this.retrieve(null, ctxIdList);
-	}
-
-	/*
-	 * @see org.societies.api.context.broker.ICtxBroker#retrieve(org.societies.api.identity.Requestor, java.util.List)
-	 */
-	@Override
-	public Future<List<CtxModelObject>> retrieve(Requestor requestor,
-			final List<CtxIdentifier> ctxIdList) throws CtxException {
-		
-		if (ctxIdList == null)
-			throw new NullPointerException("ctxIdList can't be null");
-		
-		if (LOG.isDebugEnabled())
-			LOG.debug("retrieve: requestor=" + requestor + ", ctxIdList="
-					+ ctxIdList);
-
-		final List<CtxModelObject> result = new ArrayList<CtxModelObject>(
-				ctxIdList.size());
-
-		for (final CtxIdentifier ctxId : ctxIdList) {
-			try {
-				result.add(this.retrieve(requestor, ctxId).get());
-			} catch (CtxException ce) {
-				// This can also be a CtxAccessControlException
-				// TODO Should we immediately fail in case of a CtxAccessControlException ? 
-				throw ce;
-			} catch (Exception e) {
-				throw new CtxBrokerException(e.getLocalizedMessage(), e);
-			}
-		}
-						
-		if (LOG.isDebugEnabled())
-			LOG.debug("retrieve: result=" + result);
-		return new AsyncResult<List<CtxModelObject>>(result);
 	}
 
 	/**

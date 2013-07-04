@@ -42,6 +42,7 @@
 	<bean id="ctxDataHierarchyTestCase"
 		class="org.societies.integration.test.bit.context.hierarchy.CtxDataHierarchyTestCase"
 		init-method="run">
+		<property name="internalCtxBroker" ref="internalCtxBroker" />
 		<property name="ctxBroker" ref="ctxBroker" />
 		<property name="commManager" ref="commManager" />
 
