@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxOriginType;
@@ -205,11 +206,17 @@ public class DataWrapperFactory {
 			if (!(data instanceof CtxAttribute) || !CtxAttributeTypes.LOCATION_COORDINATES.equals(data.getId().getType())) {
 				continue;
 			}
-			CtxAttribute attribute = (CtxAttribute)data;
-			attribute.setStringValue(obfuscatedData.getLatitude()+","+obfuscatedData.getLongitude());
-			attribute.getQuality().setPrecision(obfuscatedData.getAccuracy());
-			attribute.getQuality().setOriginType(CtxOriginType.INFERRED);
-			obfuscatedCtxDataList.add(attribute);
+			// Copy
+			CtxAttribute newCtxObject = new CtxAttribute((CtxAttributeIdentifier)data.getId());
+			newCtxObject.setHistoryRecorded(((CtxAttribute)data).isHistoryRecorded());
+			newCtxObject.setSourceId(((CtxAttribute)data).getSourceId());
+			newCtxObject.setValueMetric(((CtxAttribute)data).getValueMetric());
+			newCtxObject.setValueType(((CtxAttribute)data).getValueType());
+			// Update
+			newCtxObject.setStringValue(obfuscatedData.getLatitude()+","+obfuscatedData.getLongitude());
+			newCtxObject.getQuality().setPrecision(obfuscatedData.getAccuracy());
+			newCtxObject.getQuality().setOriginType(CtxOriginType.INFERRED);
+			obfuscatedCtxDataList.add(newCtxObject);
 			break;
 		}
 		return obfuscatedCtxDataList;
@@ -261,6 +268,9 @@ public class DataWrapperFactory {
 	}
 	public static List<CtxModelObject> retrieveName(DataWrapper obfuscatedDataWrapper, List<CtxModelObject> originalCtxDataList) {
 		Name obfuscatedData = retrieveName(obfuscatedDataWrapper);
+		if (null == obfuscatedData) {
+			return null;
+		}
 		List<CtxModelObject> obfuscatedCtxDataList = new ArrayList<CtxModelObject>();
 		int found = 0;
 		for (CtxModelObject data : originalCtxDataList) {
@@ -269,15 +279,29 @@ public class DataWrapperFactory {
 			}
 			if (CtxAttributeTypes.NAME_FIRST.equals(data.getId().getType())) {
 				found++;
-				((CtxAttribute)data).setStringValue(obfuscatedData.getFirstName());
-				((CtxAttribute)data).getQuality().setOriginType(CtxOriginType.INFERRED);
-				obfuscatedCtxDataList.add(data);
+				// Copy
+				CtxAttribute newCtxObject = new CtxAttribute((CtxAttributeIdentifier)data.getId());
+				newCtxObject.setHistoryRecorded(((CtxAttribute)data).isHistoryRecorded());
+				newCtxObject.setSourceId(((CtxAttribute)data).getSourceId());
+				newCtxObject.setValueMetric(((CtxAttribute)data).getValueMetric());
+				newCtxObject.setValueType(((CtxAttribute)data).getValueType());
+				// Update
+				newCtxObject.setStringValue(obfuscatedData.getFirstName());
+				newCtxObject.getQuality().setOriginType(CtxOriginType.INFERRED);
+				obfuscatedCtxDataList.add(newCtxObject);
 			}
 			if (CtxAttributeTypes.NAME_LAST.equals(data.getId().getType())) {
 				found++;
-				((CtxAttribute)data).setStringValue(obfuscatedData.getLastName());
-				((CtxAttribute)data).getQuality().setOriginType(CtxOriginType.INFERRED);
-				obfuscatedCtxDataList.add(data);
+				// Copy
+				CtxAttribute newCtxObject = new CtxAttribute((CtxAttributeIdentifier)data.getId());
+				newCtxObject.setHistoryRecorded(((CtxAttribute)data).isHistoryRecorded());
+				newCtxObject.setSourceId(((CtxAttribute)data).getSourceId());
+				newCtxObject.setValueMetric(((CtxAttribute)data).getValueMetric());
+				newCtxObject.setValueType(((CtxAttribute)data).getValueType());
+				// Update
+				newCtxObject.setStringValue(obfuscatedData.getLastName());
+				newCtxObject.getQuality().setOriginType(CtxOriginType.INFERRED);
+				obfuscatedCtxDataList.add(newCtxObject);
 			}
 			if (found >= 2)
 				break;

@@ -426,9 +426,6 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		if (null == dataWrapper || null == dataWrapper.getData() || null == dataWrapper.getDataType()) {
 			throw new PrivacyException("[Parameters] Not enought information: data missing or data type is missing");
 		}
-		if (!isDependencyInjectionDone(2)) {
-			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
-		}
 		// Obfuscation disabled
 		if (!isEnabled()) {
 			return new AsyncResult<DataWrapper>(dataWrapper);
@@ -442,8 +439,8 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		try {
 			obfuscationLevel = privacyPreferenceManager.evaluateDObfPreference(dataObfuscationPrefDetails);
 		}
-		catch(ServiceUnavailableException e) {
-			LOG.error("[Obfuscation] Can't retrieve obfuscation level from privacy preferences manager");
+		catch(Exception e) {
+			LOG.error("[Obfuscation] Can't retrieve obfuscation level from privacy preferences manager", e);
 			return new AsyncResult<DataWrapper>(dataWrapper);
 		}
 		// - Performance loggings
@@ -471,22 +468,18 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			// No possible obfuscation: store CtxModelObject to send them back later
 			if (null == dataWrapper) {
 				obfuscatedCtxDataList.addAll(group.getValue());
+				continue;
 			}
 			// Launch obfuscation
 			futureResults.put(group.getKey(), obfuscateData(requestor, dataWrapper));
 		}
+		
 		// -- Retrieve results
 		for (Entry<String, Future<DataWrapper>> group : futureResults.entrySet()) {
 			List<CtxModelObject> originalCtxDataList = obfuscableGroups.get(group.getKey());
 			try {
 				DataWrapper obfuscateDataWrapper = group.getValue().get();
 				obfuscatedCtxDataList.addAll(DataWrapperFactory.retrieveData(obfuscateDataWrapper, originalCtxDataList));
-			} catch (InterruptedException e) {
-				LOG.error("Can't retrieve some obfuscated data: "+group.getKey(), e);
-				obfuscatedCtxDataList.addAll(originalCtxDataList);
-			} catch (ExecutionException e) {
-				LOG.error("Can't retrieve some obfuscated data: "+group.getKey(), e);
-				obfuscatedCtxDataList.addAll(originalCtxDataList);
 			} catch (Exception e) {
 				LOG.error("Can't retrieve some obfuscated data: "+group.getKey(), e);
 				obfuscatedCtxDataList.addAll(originalCtxDataList);

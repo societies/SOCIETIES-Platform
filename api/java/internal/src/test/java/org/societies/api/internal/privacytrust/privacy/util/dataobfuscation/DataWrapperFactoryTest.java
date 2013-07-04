@@ -66,11 +66,14 @@ public class DataWrapperFactoryTest {
 	private DataIdentifier actionId = null;
 	private DataIdentifier locationCoordinatesId = null;
 	// Data
+	private List<CtxModelObject> ctxDataListNameCopy;
 	private List<CtxModelObject> ctxDataListName;
 	private List<CtxModelObject> ctxDataListAction;
 	private List<CtxModelObject> ctxDataListLocationCoordinates;
 	private CtxAttribute firstname;
 	private CtxAttribute lastname;
+	private CtxAttribute firstnameCopy;
+	private CtxAttribute lastnameCopy;
 	private CtxAttribute action;
 	private CtxAttribute locationCoordinates;
 
@@ -88,6 +91,18 @@ public class DataWrapperFactoryTest {
 			fail("Faillure during data id creation from URI: "+e);
 		}
 		// Create list of CtxModelObject lists
+		ctxDataListNameCopy = new ArrayList<CtxModelObject>();
+		firstnameCopy = new CtxAttribute((CtxAttributeIdentifier) firstnameId);
+		firstnameCopy.setStringValue(firstnameStr);
+		firstnameCopy.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
+		firstnameCopy.setValueType(CtxAttributeValueType.STRING);
+		ctxDataListNameCopy.add(firstnameCopy);
+		lastnameCopy = new CtxAttribute((CtxAttributeIdentifier) lastnameId);
+		lastnameCopy.setStringValue(lastnameStr);
+		lastnameCopy.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
+		lastnameCopy.setValueType(CtxAttributeValueType.STRING);
+		ctxDataListNameCopy.add(lastnameCopy);
+		
 		ctxDataListName = new ArrayList<CtxModelObject>();
 		firstname = new CtxAttribute((CtxAttributeIdentifier) firstnameId);
 		firstname.setStringValue(firstnameStr);
@@ -125,6 +140,7 @@ public class DataWrapperFactoryTest {
 		assertNotNull("Generated wrapper should not be null", dataWrapper1);
 		assertEquals("First name should be "+firstname, firstnameStr, ((Name)dataWrapper1.getData()).getFirstName());
 		assertEquals("Last name should be "+lastname, lastnameStr, ((Name)dataWrapper1.getData()).getLastName());
+		assertEquals("Data wrapper should have a correct type", CtxAttributeTypes.NAME, dataWrapper1.getDataType());
 		DataWrapper dataWrapper1b = DataWrapperFactory.getDataWrapper(CtxAttributeTypes.NAME, ctxDataListLocationCoordinates);
 		assertNotNull("Generated wrapper should not be null", dataWrapper1b);
 		assertEquals("First name should be empty", "", ((Name)dataWrapper1b.getData()).getFirstName());
@@ -139,11 +155,14 @@ public class DataWrapperFactoryTest {
 		assertTrue("lastname should in the retrieved list", ctxDataListNameRetrieved.contains(lastname));
 		assertFalse("locationCoordinates should not be in the retrieved list", ctxDataListNameRetrieved.contains(locationCoordinates));
 		assertFalse("action should not be in the retrieved list", ctxDataListNameRetrieved.contains(action));
+		assertEquals("action data list should still be equals to its copy", ctxDataListNameCopy, ctxDataListNameRetrieved);
 
 
 		// -- Action
 		DataWrapper dataWrapper2 = DataWrapperFactory.getDataWrapper(CtxAttributeTypes.ACTION, ctxDataListAction);
 		assertNull("Generated wrapper should be null", dataWrapper2);
+		DataWrapper dataWrapper2b = DataWrapperFactory.getDataWrapper(DataWrapperFactory.NOT_OBFUSCABLE_TYPE, ctxDataListAction);
+		assertNull("Generated wrapper should be null", dataWrapper2b);
 
 
 		// -- Location coordinates
@@ -152,6 +171,7 @@ public class DataWrapperFactoryTest {
 		assertTrue("Latitude should be "+latitude+" but is "+((LocationCoordinates)dataWrapper3.getData()).getLatitude(), latitude == ((LocationCoordinates)dataWrapper3.getData()).getLatitude());
 		assertTrue("Longitude should be "+longitude+" but is "+((LocationCoordinates)dataWrapper3.getData()).getLongitude(), longitude == ((LocationCoordinates)dataWrapper3.getData()).getLongitude());
 		assertTrue("Accuracy should be "+accuracy+" but is "+((LocationCoordinates)dataWrapper3.getData()).getAccuracy(), accuracy == ((LocationCoordinates)dataWrapper3.getData()).getAccuracy());
+		assertEquals("Data wrapper should have a correct type", CtxAttributeTypes.LOCATION_COORDINATES, dataWrapper3.getDataType());
 
 		// Retrieve
 		expectedRetrievedListSize = 1;
@@ -224,6 +244,7 @@ public class DataWrapperFactoryTest {
 		assertFalse("No unobfuscable data should be retrieved "+ctxDataListNameRetrieved, ctxDataListNameRetrieved.containsKey(DataWrapperFactory.NOT_OBFUSCABLE_TYPE));
 		assertTrue("Obfuscable data group should be used", ctxDataListNameRetrieved.containsKey(CtxAttributeTypes.NAME));
 		assertEquals("A correct list should be retrieved", ctxDataListName, ctxDataListNameRetrieved.get(CtxAttributeTypes.NAME));
+		assertEquals("A correct list should be retrieved (even copy)", ctxDataListNameCopy, ctxDataListNameRetrieved.get(CtxAttributeTypes.NAME));
 
 		// -- Action
 		Map<String, List<CtxModelObject>> ctxDataListActionRetrieved = DataWrapperFactory.sortByObfuscability(ctxDataListAction);
