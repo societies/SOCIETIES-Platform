@@ -25,8 +25,12 @@
 package org.societies.privacytrust.privacyprotection.datamanagement;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
@@ -35,6 +39,7 @@ import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
@@ -43,6 +48,7 @@ import org.societies.api.identity.util.DataIdentifierUtils;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
+import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.DataWrapperFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
@@ -450,6 +456,43 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		// -- Obfuscate the data
 		DataWrapper obfuscatedDataWrapper = dataObfuscationManager.obfuscateData(dataWrapper, obfuscationLevel);
 		return new AsyncResult<DataWrapper>(obfuscatedDataWrapper);
+	}
+
+	@Async
+	@Override
+	public Future<List<CtxModelObject>> obfuscateData(RequestorBean requestor, List<CtxModelObject> ctxDataList) throws PrivacyException {
+		Map<String, List<CtxModelObject>> obfuscableGroups = DataWrapperFactory.sortByObfuscability(ctxDataList);
+		List<CtxModelObject> obfuscatedCtxDataList = new ArrayList<CtxModelObject>();
+		Map<String, Future<DataWrapper>> futureResults = new HashMap<String, Future<DataWrapper>>();
+		// -- Launch obfuscations
+		for (Entry<String, List<CtxModelObject>> group : obfuscableGroups.entrySet()) {
+			// Retrieve relevant wrapper
+			DataWrapper dataWrapper = DataWrapperFactory.getDataWrapper(group.getKey(), group.getValue());
+			// No possible obfuscation: store CtxModelObject to send them back later
+			if (null == dataWrapper) {
+				obfuscatedCtxDataList.addAll(group.getValue());
+			}
+			// Launch obfuscation
+			futureResults.put(group.getKey(), obfuscateData(requestor, dataWrapper));
+		}
+		// -- Retrieve results
+		for (Entry<String, Future<DataWrapper>> group : futureResults.entrySet()) {
+			List<CtxModelObject> originalCtxDataList = obfuscableGroups.get(group.getKey());
+			try {
+				DataWrapper obfuscateDataWrapper = group.getValue().get();
+				obfuscatedCtxDataList.addAll(DataWrapperFactory.retrieveData(group.getKey(), obfuscateDataWrapper, originalCtxDataList));
+			} catch (InterruptedException e) {
+				LOG.error("Can't retrieve some obfuscated data: "+group.getKey(), e);
+				obfuscatedCtxDataList.addAll(originalCtxDataList);
+			} catch (ExecutionException e) {
+				LOG.error("Can't retrieve some obfuscated data: "+group.getKey(), e);
+				obfuscatedCtxDataList.addAll(originalCtxDataList);
+			} catch (Exception e) {
+				LOG.error("Can't retrieve some obfuscated data: "+group.getKey(), e);
+				obfuscatedCtxDataList.addAll(originalCtxDataList);
+			}
+		}
+		return new AsyncResult<List<CtxModelObject>>(obfuscatedCtxDataList);
 	}
 
 	@Async
