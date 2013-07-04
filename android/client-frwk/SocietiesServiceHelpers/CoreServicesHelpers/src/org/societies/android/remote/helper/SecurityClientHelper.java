@@ -28,7 +28,6 @@ package org.societies.android.remote.helper;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.societies.android.api.comms.IMethodCallback;
-import org.societies.android.api.privacytrust.trust.ITrustClient;
 import org.societies.android.api.security.digsig.IDigSigClient;
 import org.societies.android.api.security.digsig.IDigSigClientCallback;
 import org.societies.android.api.security.digsig.IDigSigClientHelper;
@@ -54,8 +53,6 @@ import android.util.Log;
  * TODO: Insert a timer to automatically unbind from the Platform Events service after a defined amount 
  * of inactivity
  * 
- * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 1.1
  */
 public class SecurityClientHelper implements IDigSigClientHelper {
 	
@@ -71,7 +68,7 @@ public class SecurityClientHelper implements IDigSigClientHelper {
 	/** The client to use for all service method invocations. */
 	private String client;
 	
-	private boolean connectedToTrustClient;
+	private boolean connectedToDigSigClient;
 	private Messenger targetService;
 	
 	/** The BroadcastReceiver to receive the results via Intents. */
@@ -102,8 +99,8 @@ public class SecurityClientHelper implements IDigSigClientHelper {
     	@Override
     	public void onServiceConnected(ComponentName name, IBinder service) {
     		
-        	Log.d(TAG, "Connecting to Trust Client service");
-        	SecurityClientHelper.this.connectedToTrustClient = true;
+        	Log.d(TAG, "Connecting to DigSig Client service");
+        	SecurityClientHelper.this.connectedToDigSigClient = true;
         	// get a remote binder
         	SecurityClientHelper.this.targetService = new Messenger(service);
         	Log.d(TAG, "Target service " + name.getShortClassName() 
@@ -122,11 +119,11 @@ public class SecurityClientHelper implements IDigSigClientHelper {
     	@Override
         public void onServiceDisconnected(ComponentName name) {
         	
-        	Log.d(TAG, "Disconnecting from Trust Client service");
+        	Log.d(TAG, "Disconnecting from DigSig Client service");
         	//Unregister broadcast receiver if service binding broken. Otherwise
         	//the next set-up of the service will one extra receiver causing possible problems.
 			SecurityClientHelper.this.teardownBroadcastReceiver();
-			SecurityClientHelper.this.connectedToTrustClient = false;
+			SecurityClientHelper.this.connectedToDigSigClient = false;
         }
     };
 
@@ -139,7 +136,7 @@ public class SecurityClientHelper implements IDigSigClientHelper {
 		
 		this.context = context;
 		this.client = this.context.getApplicationContext().getPackageName();
-		this.connectedToTrustClient = false;
+		this.connectedToDigSigClient = false;
 		this.targetService = null;
 		this.methodQueues = (ConcurrentLinkedQueue[]) 
 				new ConcurrentLinkedQueue[classMethods.values().length];
@@ -157,7 +154,7 @@ public class SecurityClientHelper implements IDigSigClientHelper {
 		
 		Log.d(TAG, "setUpService");
 		
-		if (!this.connectedToTrustClient) {
+		if (!this.connectedToDigSigClient) {
 			this.setupBroadcastReceiver();
 			this.startupCallback = callback;
         	Intent serviceIntent = new Intent(
@@ -178,7 +175,7 @@ public class SecurityClientHelper implements IDigSigClientHelper {
 			throw new NullPointerException("callback can't be null");
 		
 		Log.d(TAG, "tearDownService");
-		if (this.connectedToTrustClient) {
+		if (this.connectedToDigSigClient) {
 			this.teardownBroadcastReceiver();
 	       	this.context.unbindService(this.securityClientConnection);
 			Log.d(TAG, "tearDownService completed");
@@ -187,9 +184,6 @@ public class SecurityClientHelper implements IDigSigClientHelper {
 		return false;
 	}
 
-	/*
-	 * @see org.societies.android.api.privacytrust.trust.ITrustClientHelper#retrieveTrustRelationships(org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean, org.societies.android.api.privacytrust.trust.ITrustClientCallback)
-	 */
 	@Override
 	public void signXml(String xml, String xmlNodeId, final IDigSigClientCallback callback) {
 		
@@ -202,17 +196,17 @@ public class SecurityClientHelper implements IDigSigClientHelper {
 		
 		Log.d(TAG, "signXml: xmlNodeId = " + xmlNodeId + ", callback=" + callback);
 
-		if (this.connectedToTrustClient) {
+		if (this.connectedToDigSigClient) {
 			// Add callback class to method queue tail
 			this.initialiseQueue(classMethods.signXml.ordinal());
 			this.methodQueues[classMethods.signXml.ordinal()]
 					.add(callback);
 
 			// Select target method and create message to convey remote invocation
-	   		String targetMethod = ITrustClient.methodsArray[2];
+	   		String targetMethod = IDigSigClient.methodsArray[2];
 			android.os.Message outMessage = 
 					android.os.Message.obtain(null, ServiceMethodTranslator.getMethodIndex(
-							ITrustClient.methodsArray, targetMethod), 0, 0);
+							IDigSigClient.methodsArray, targetMethod), 0, 0);
 
 			Bundle outBundle = new Bundle();
 			outBundle.putString(ServiceMethodTranslator.getMethodParameterName(
@@ -244,9 +238,15 @@ public class SecurityClientHelper implements IDigSigClientHelper {
 				}
 			}
 		} else {
-			Log.e(TAG, "Not connected to Trust Client service");
+			Log.e(TAG, "Not connected to DigSig Client service");
 			callback.onException(new DigSigClientNotConnectedException());
 		}
+	}
+	
+	@Override
+	public void verifyXml(String xml, IDigSigClientCallback callback) {
+		Log.d(TAG, "verifyXml, callback=" + callback);
+		// TODO
 	}
 
     /**
@@ -262,21 +262,21 @@ public class SecurityClientHelper implements IDigSigClientHelper {
 			
 			Log.d(TAG, "Received action: " + intent.getAction());
 
-			if (intent.getAction().equals(IDigSigClient.RETRIEVE_TRUST_VALUE)) {
+			if (intent.getAction().equals(IDigSigClient.SIGN_XML)) {
 
 				if (null != SecurityClientHelper.this.methodQueues[classMethods.signXml.ordinal()]) {
 					final IDigSigClientCallback retrievedCallback = 
 							SecurityClientHelper.this.methodQueues[classMethods.signXml.ordinal()].poll();
 					if (null != retrievedCallback) {
 						final String exceptionMessage = intent.getStringExtra(
-								ITrustClient.INTENT_EXCEPTION_KEY);
+								IDigSigClient.INTENT_EXCEPTION_KEY);
 						if (exceptionMessage != null) {
 							retrievedCallback.onException(new DigSigClientInvocationException(
 									exceptionMessage));
 							return;
 						}
 						final Double defaultTrustValue = -1.0d;
-						final Double trustValue = intent.getDoubleExtra(ITrustClient.INTENT_RETURN_VALUE_KEY, defaultTrustValue);
+						final Double trustValue = intent.getDoubleExtra(IDigSigClient.INTENT_RETURN_VALUE_KEY, defaultTrustValue);
 						if (defaultTrustValue.equals(trustValue))
 							retrievedCallback.onRetrievedTrustValue(null);
 						else
@@ -327,14 +327,10 @@ public class SecurityClientHelper implements IDigSigClientHelper {
     	
         final IntentFilter intentFilter = new IntentFilter();
         
-        Log.d(TAG, "intentFilter.addAction " + ITrustClient.RETRIEVE_TRUST_RELATIONSHIPS); 
-        intentFilter.addAction(ITrustClient.RETRIEVE_TRUST_RELATIONSHIPS);
-        Log.d(TAG, "intentFilter.addAction " + ITrustClient.RETRIEVE_TRUST_RELATIONSHIP); 
-        intentFilter.addAction(ITrustClient.RETRIEVE_TRUST_RELATIONSHIP);
-        Log.d(TAG, "intentFilter.addAction " + ITrustClient.RETRIEVE_TRUST_VALUE); 
-        intentFilter.addAction(ITrustClient.RETRIEVE_TRUST_VALUE);
-        Log.d(TAG, "intentFilter.addAction " + ITrustClient.ADD_DIRECT_TRUST_EVIDENCE); 
-        intentFilter.addAction(ITrustClient.ADD_DIRECT_TRUST_EVIDENCE);
+        Log.d(TAG, "intentFilter.addAction " + IDigSigClient.SIGN_XML); 
+        intentFilter.addAction(IDigSigClient.SIGN_XML);
+        Log.d(TAG, "intentFilter.addAction " + IDigSigClient.VERIFY_XML); 
+        intentFilter.addAction(IDigSigClient.VERIFY_XML);
 
         return intentFilter;
     }

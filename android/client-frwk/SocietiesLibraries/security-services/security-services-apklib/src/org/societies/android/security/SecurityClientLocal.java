@@ -24,7 +24,7 @@
  */
 package org.societies.android.security;
 
-import org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient;
+import org.societies.android.api.security.digsig.IDigSigClient;
 
 import android.app.Service;
 import android.content.Intent;
@@ -33,8 +33,8 @@ import android.os.IBinder;
 import android.util.Log;
 
 /**
- * This wrapper class acts as a local wrapper for the Trust Client. It uses the
- * base service implementation {@link TrustClientBase}.
+ * This wrapper class acts as a local wrapper for the DigSig Client. It uses the
+ * base service implementation {@link SecurityClientBase}.
  */
 public class SecurityClientLocal extends Service {
 	
@@ -49,7 +49,7 @@ public class SecurityClientLocal extends Service {
 	public void onCreate () {
     	
     	Log.d(TAG, "onCreate");
-		this.binder = new TrustClientLocalBinder();
+		this.binder = new SecurityClientLocalBinder();
 	}
 
     /*
@@ -72,9 +72,9 @@ public class SecurityClientLocal extends Service {
 	}
 
 	/** The Binder object for local service invocation. */
-	public class TrustClientLocalBinder extends Binder {
+	public class SecurityClientLocalBinder extends Binder {
 		
-		public IInternalTrustClient getService() {
+		public IDigSigClient getService() {
 
 			return new SecurityClientBase(SecurityClientLocal.this, true);
 		}

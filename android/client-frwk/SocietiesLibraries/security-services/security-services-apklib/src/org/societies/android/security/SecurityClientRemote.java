@@ -24,7 +24,7 @@
  */
 package org.societies.android.security;
 
-import org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient;
+import org.societies.android.api.security.digsig.IDigSigClient;
 import org.societies.android.api.utilities.RemoteServiceHandler;
 
 import android.app.Service;
@@ -33,12 +33,6 @@ import android.os.IBinder;
 import android.os.Messenger;
 import android.util.Log;
 
-/**
- * Describe your class here...
- *
- * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 1.0
- */
 public class SecurityClientRemote extends Service {
 
 	private static final String TAG = SecurityClientRemote.class.getName();
@@ -56,7 +50,7 @@ public class SecurityClientRemote extends Service {
 				new SecurityClientBase(this.getApplicationContext());
 
 		this.inMessenger = new Messenger(new RemoteServiceHandler(
-				securityClientBase.getClass(), securityClientBase, IInternalTrustClient.methodsArray));
+				securityClientBase.getClass(), securityClientBase, IDigSigClient.methodsArray));
 	}
 
 	/*

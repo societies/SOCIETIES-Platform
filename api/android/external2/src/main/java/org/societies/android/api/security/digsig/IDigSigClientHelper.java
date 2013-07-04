@@ -41,5 +41,9 @@ public interface IDigSigClientHelper extends ICoreSocietiesServices {
 	 * @param xmlNodeId Identifier of the XML node to sign (value of attribute "Id")
 	 * @param callback The callback that would return XML with embedded signature.
 	 */
-	public void signXml(String xml, String xmlNodeId, final IDigSigClientCallback callback);
+	public void signXml(String xml, String xmlNodeId, IDigSigClientCallback callback)
+			throws DigSigException;
+	
+    public void verifyXml(String xml, IDigSigClientCallback callback)
+    		throws DigSigException;
 }
