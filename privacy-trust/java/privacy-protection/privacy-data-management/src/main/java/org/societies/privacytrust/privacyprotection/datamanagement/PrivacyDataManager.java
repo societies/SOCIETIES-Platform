@@ -480,7 +480,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			List<CtxModelObject> originalCtxDataList = obfuscableGroups.get(group.getKey());
 			try {
 				DataWrapper obfuscateDataWrapper = group.getValue().get();
-				obfuscatedCtxDataList.addAll(DataWrapperFactory.retrieveData(group.getKey(), obfuscateDataWrapper, originalCtxDataList));
+				obfuscatedCtxDataList.addAll(DataWrapperFactory.retrieveData(obfuscateDataWrapper, originalCtxDataList));
 			} catch (InterruptedException e) {
 				LOG.error("Can't retrieve some obfuscated data: "+group.getKey(), e);
 				obfuscatedCtxDataList.addAll(originalCtxDataList);

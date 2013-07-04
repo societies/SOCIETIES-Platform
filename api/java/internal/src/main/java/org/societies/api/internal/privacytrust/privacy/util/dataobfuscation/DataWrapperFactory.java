@@ -29,8 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxModelObject;
@@ -50,10 +48,11 @@ import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscat
  * @updated 04 jul. 2013
  */
 public class DataWrapperFactory {
-	private static Logger LOG = LoggerFactory.getLogger(DataWrapperFactory.class.getName());
-	
+	//	private static Logger LOG = LoggerFactory.getLogger(DataWrapperFactory.class.getName());
+
 	public static final String NOT_OBFUSCABLE_TYPE = "NOT_OBFUCSABLE";
 
+	
 	// -- CONTEXT ATTRIBUTE
 
 	/**
@@ -66,7 +65,7 @@ public class DataWrapperFactory {
 	 */
 	public static Map<String, List<CtxModelObject>> sortByObfuscability(List<CtxModelObject> ctxDataList) {
 		if (null == ctxDataList || ctxDataList.size() <= 0) {
-			LOG.error("Can't sort null values");
+			//			LOG.error("Can't sort null values");
 			return null;
 		}
 		String notObfuscableType = "NOT_OBFUCSABLE";
@@ -74,24 +73,34 @@ public class DataWrapperFactory {
 		ObfuscatorInfoFactory obfuscatorInfoFactory = new ObfuscatorInfoFactory();
 		Map<String, List<CtxModelObject>> sorted = new HashMap<String, List<CtxModelObject>>();
 		for(CtxModelObject data : ctxDataList) {
-			// Retrieve parent type
-			String dataTypeParent = dataTypeUtils.getParent(data.getId().getType());
 			List<CtxModelObject> dataTypeGroup = null;
-			// Parent type
-			if (null == dataTypeParent) {
-				dataTypeParent = data.getId().getType();
+			String dataType = data.getId().getType();
+			// -- Directly an obfuscable type ?
+			ObfuscatorInfo obfuscatorInfo = obfuscatorInfoFactory.getObfuscatorInfo(dataType);
+			if (null != obfuscatorInfo && obfuscatorInfo.isObfuscable()) {
+				dataTypeGroup = new ArrayList<CtxModelObject>();
+				dataTypeGroup.add(data);
+				sorted.put(dataType, dataTypeGroup);
+				continue;
 			}
+			// -- Parent obfuscable?
+			// Retrieve parent type
+			String dataTypeParent = dataTypeUtils.getParent(dataType);
+			// Already a parent type
+			if (null == dataTypeParent) {
+				dataTypeParent = dataType;
+			}
+			// Is obfuscable ?
+			obfuscatorInfo = obfuscatorInfoFactory.getObfuscatorInfo(dataTypeParent);
+			if (null == obfuscatorInfo || !obfuscatorInfo.isObfuscable()) {
+				dataTypeParent = notObfuscableType;
+			}
+			// Retrieve this group or create it
 			dataTypeGroup = sorted.get(dataTypeParent);
 			if (null == dataTypeGroup) {
 				dataTypeGroup = new ArrayList<CtxModelObject>();
 			}
-			ObfuscatorInfo obfuscatorInfo = obfuscatorInfoFactory.getObfuscatorInfo(dataTypeParent);
-			if (null != obfuscatorInfo && obfuscatorInfo.isObfuscable()) {
-				dataTypeGroup = sorted.get(dataTypeParent);
-			}
-			else {
-				dataTypeParent = notObfuscableType;
-			}
+			// Add data
 			dataTypeGroup.add(data);
 			sorted.put(dataTypeParent, dataTypeGroup);
 		}
@@ -108,7 +117,7 @@ public class DataWrapperFactory {
 	 */
 	public static DataWrapper getDataWrapper(String obfuscableType, List<CtxModelObject> ctxDataList) {
 		if (null == obfuscableType || null == ctxDataList || ctxDataList.size() <= 0) {
-			LOG.error("Can't find a data wrapper from null values");
+			//			LOG.error("Can't find a data wrapper from null values");
 			return null;
 		}
 
@@ -130,17 +139,17 @@ public class DataWrapperFactory {
 	 * @param originaCtxDataList Original list of ctx attribute, not yet obfuscated. They will used to generate the list of obfuscated ctx attributes
 	 * @return A list of obfuscated ctx attributes, same size as the original list but potentially in a different order. Null if null parameters
 	 */
-	public static List<CtxModelObject> retrieveData(String obfuscableType, DataWrapper obfuscatedDataWrapper, List<CtxModelObject> originalCtxDataList) {
+	public static List<CtxModelObject> retrieveData(DataWrapper obfuscatedDataWrapper, List<CtxModelObject> originalCtxDataList) {
 		List<CtxModelObject> data = null;
-		if (null == obfuscableType || null == obfuscatedDataWrapper || null == originalCtxDataList || originalCtxDataList.size() <= 0) {
-			LOG.error("Can't retrieve data from null values");
+		if (null == obfuscatedDataWrapper || null == originalCtxDataList || originalCtxDataList.size() <= 0) {
+			//			LOG.error("Can't retrieve data from null values");
 			return data;
 		}
 		// Retrieve data depending of their types
-		if (CtxAttributeTypes.LOCATION_COORDINATES.equals(obfuscableType)) {
+		if (CtxAttributeTypes.LOCATION_COORDINATES.equals(obfuscatedDataWrapper.getDataType())) {
 			data = retrieveLocationCoordinates(obfuscatedDataWrapper, originalCtxDataList);
 		}
-		else if (CtxAttributeTypes.NAME.equals(obfuscableType)) {
+		else if (CtxAttributeTypes.NAME.equals(obfuscatedDataWrapper.getDataType())) {
 			data = retrieveName(obfuscatedDataWrapper, originalCtxDataList);
 		}
 		return data;
