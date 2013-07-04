@@ -25,19 +25,15 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
  */
 package org.societies.android.remote.helper;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.privacytrust.trust.ITrustClient;
+import org.societies.android.api.security.digsig.IDigSigClient;
 import org.societies.android.api.security.digsig.IDigSigClientCallback;
 import org.societies.android.api.security.digsig.IDigSigClientHelper;
 import org.societies.android.api.services.ICoreSocietiesServices;
 import org.societies.android.api.utilities.ServiceMethodTranslator;
-import org.societies.api.schema.identity.RequestorBean;
-import org.societies.api.schema.privacytrust.trust.model.TrustRelationshipBean;
-import org.societies.api.schema.privacytrust.trust.model.TrustedEntityIdBean;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -48,7 +44,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Messenger;
-import android.os.Parcelable;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -166,7 +161,7 @@ public class SecurityClientHelper implements IDigSigClientHelper {
 			this.setupBroadcastReceiver();
 			this.startupCallback = callback;
         	Intent serviceIntent = new Intent(
-        			ICoreSocietiesServices.TRUST_CLIENT_SERVICE_INTENT);
+        			ICoreSocietiesServices.DIGSIG_CLIENT_SERVICE_INTENT);
         	this.context.bindService(serviceIntent, this.securityClientConnection,
         			Context.BIND_AUTO_CREATE);
 		}
@@ -224,13 +219,14 @@ public class SecurityClientHelper implements IDigSigClientHelper {
 					targetMethod, 0), this.client);
 			Log.d(TAG, "client: " + this.client);
 			
-			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 1), requestor);
-			Log.d(TAG, "requestor: " + requestor.getRequestorId());
-			
-			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
-					targetMethod, 2), trustorId);
-			Log.d(TAG, "trustorId: " + trustorId.getEntityId());
+//			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
+//					targetMethod, 1), requestor);
+//			Log.d(TAG, "requestor: " + requestor.getRequestorId());
+//			
+//			outBundle.putParcelable(ServiceMethodTranslator.getMethodParameterName(
+//					targetMethod, 2), trustorId);
+//			Log.d(TAG, "trustorId: " + trustorId.getEntityId());
+			//FIXME
 			
 	   		outMessage.setData(outBundle);
 			Log.d(TAG, "Invoking service method: " + targetMethod);
@@ -259,14 +255,14 @@ public class SecurityClientHelper implements IDigSigClientHelper {
      * Since more than one instance of this class can exist for an app, i.e. more than one component could be communicating, 
      * callback IDs or queues cannot be assumed to exist for a particular Broadcast receiver.
      */
-    private class TrustClientHelperReceiver extends BroadcastReceiver {
+    private class DigSigClientHelperReceiver extends BroadcastReceiver {
 		
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			
 			Log.d(TAG, "Received action: " + intent.getAction());
 
-			if (intent.getAction().equals(ITrustClient.RETRIEVE_TRUST_VALUE)) {
+			if (intent.getAction().equals(IDigSigClient.RETRIEVE_TRUST_VALUE)) {
 
 				if (null != SecurityClientHelper.this.methodQueues[classMethods.signXml.ordinal()]) {
 					final IDigSigClientCallback retrievedCallback = 
@@ -307,7 +303,7 @@ public class SecurityClientHelper implements IDigSigClientHelper {
     	
         Log.d(TAG, "Set up broadcast receiver");
         
-        this.receiver = new TrustClientHelperReceiver();
+        this.receiver = new DigSigClientHelperReceiver();
         this.context.registerReceiver(this.receiver, createIntentFilter());    
         Log.d(TAG, "Register broadcast receiver");
 

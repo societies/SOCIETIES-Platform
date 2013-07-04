@@ -80,6 +80,7 @@
         <service android:name="org.societies.android.platform.useragent.feedback.EventListener" />
         <service android:name="org.societies.android.platform.useragent.feedback.EventHistory" />
         <service android:name="org.societies.android.privacytrust.trust.TrustClientLocal" />
+        <service android:name="org.societies.android.security.SecurityClientLocal" />
         <!-- REMOTE SERVICES -->
         <service android:name="org.societies.android.platform.cis.CisDirectoryRemote" android:label="Cis Directory Remote" >
            <intent-filter>
@@ -116,6 +117,12 @@
             android:label="Trust Client Remote" >
             <intent-filter>
                 <action android:name="org.societies.android.privacytrust.trust.TrustClientRemote" />
+            </intent-filter>
+        </service>
+        <service android:name="org.societies.android.security.SecurityClientRemote" 
+            android:label="Security Client Remote" >
+            <intent-filter>
+                <action android:name="org.societies.android.security.SecurityClientRemote" />
             </intent-filter>
         </service>
         <service android:name="org.societies.android.platform.context.ServiceContextBrokerRemote" 

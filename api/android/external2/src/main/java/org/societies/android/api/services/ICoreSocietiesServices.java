@@ -38,6 +38,7 @@ public interface ICoreSocietiesServices {
 	final static String COMMS_SERVICE_INTENT = "org.societies.android.platform.comms.app.ServicePlatformCommsRemote";
 	final static String TRUST_CLIENT_SERVICE_INTENT = "org.societies.android.privacytrust.trust.TrustClientRemote";
 	final static String CONTEXT_SERVICE_INTENT = "org.societies.android.platform.context.ServiceContextBrokerRemote";
+	final static String DIGSIG_CLIENT_SERVICE_INTENT = "org.societies.android.security.SecurityClientRemote";
 	
 	/**
 	 * 
