@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.trust.test;
+package org.societies.android.security.test;
 
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
@@ -31,8 +31,8 @@ import java.util.concurrent.TimeUnit;
 import org.societies.android.api.common.ADate;
 import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient;
-import org.societies.android.privacytrust.trust.container.TestServiceTrustClientLocal;
-import org.societies.android.privacytrust.trust.container.TestServiceTrustClientLocal.LocalTrustClientBinder;
+import org.societies.android.security.container.TestServiceSecurityClientLocal;
+import org.societies.android.security.container.TestServiceSecurityClientLocal.LocalSecurityClientBinder;
 import org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustRelationshipBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean;
@@ -52,9 +52,9 @@ import android.util.Log;
  * 1. Ensure that {@link TestInternalTrustClient#TEST_TRUSTOR_ID} matches the
  * JID of the cloud node of the android client.
  */
-public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustClientLocal> {
+public class TestInternalSecurityClient extends ServiceTestCase<TestServiceSecurityClientLocal> {
 
-	private static final String TAG = TestInternalTrustClient.class.getName();
+	private static final String TAG = TestInternalSecurityClient.class.getName();
 	private static final String CLIENT = "org.societies.android.privacytrust.trust.container";
 	private static final long DELAY = 5000l;
 
@@ -82,9 +82,9 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 	private CountDownLatch serviceStartedSignal;
 	private CountDownLatch testDoneSignal;
 
-	public TestInternalTrustClient() {
+	public TestInternalSecurityClient() {
 
-		super(TestServiceTrustClientLocal.class);
+		super(TestServiceSecurityClientLocal.class);
 	}
 
 	protected void setUp() throws Exception {
@@ -93,8 +93,8 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 
 		this.receiver = this.setupBroadcastReceiver();
 		this.serviceStartedSignal = new CountDownLatch(1);
-		Intent commsIntent = new Intent(getContext(), TestServiceTrustClientLocal.class);
-		LocalTrustClientBinder binder = (LocalTrustClientBinder) bindService(commsIntent);
+		Intent commsIntent = new Intent(getContext(), TestServiceSecurityClientLocal.class);
+		LocalSecurityClientBinder binder = (LocalSecurityClientBinder) bindService(commsIntent);
 		assertNotNull(binder);
 		this.trustClient = (IInternalTrustClient) binder.getService();
 		this.trustClient.startService();
@@ -550,7 +550,7 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 				final boolean serviceStarted = intent.getBooleanExtra(IServiceManager.INTENT_RETURN_VALUE_KEY, false);
 				Log.d(TAG, "Service started: " + serviceStarted);
 				assertTrue("Service not started", serviceStarted);
-				TestInternalTrustClient.this.serviceStartedSignal.countDown();
+				TestInternalSecurityClient.this.serviceStartedSignal.countDown();
 				return;
 				
 			} else if (intent.getAction().equals(IInternalTrustClient.RETRIEVE_TRUST_RELATIONSHIPS)) {
@@ -558,7 +558,7 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 				final Parcelable[] trustRelationships = (Parcelable[]) 
 						intent.getParcelableArrayExtra(IInternalTrustClient.INTENT_RETURN_VALUE_KEY);
 				assertNotNull(trustRelationships);
-				assertEquals(TestInternalTrustClient.this.expectedTrustRelationships.length,
+				assertEquals(TestInternalSecurityClient.this.expectedTrustRelationships.length,
 						trustRelationships.length);
 				
 				for (final Parcelable pTrustRelationship : trustRelationships) {
@@ -592,7 +592,7 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 					
 					boolean foundTrustRelationship = false;
 					for (final TrustRelationshipBean expectedTrustRelationship 
-							: TestInternalTrustClient.this.expectedTrustRelationships) {
+							: TestInternalSecurityClient.this.expectedTrustRelationships) {
 						
 						if (trustorId.getEntityId().equals(expectedTrustRelationship.getTrustorId().getEntityId())
 								&& trustorId.getEntityType().equals(expectedTrustRelationship.getTrustorId().getEntityType())
@@ -612,7 +612,7 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 				
 				final TrustRelationshipBean trustRelationship =
 						intent.getParcelableExtra(IInternalTrustClient.INTENT_RETURN_VALUE_KEY);
-				if (TestInternalTrustClient.this.expectedTrustRelationship == null) {
+				if (TestInternalSecurityClient.this.expectedTrustRelationship == null) {
 					assertNull(trustRelationship);
 					Log.d(TAG, "Retrieved expected null trust relationship");
 				} else {
@@ -665,10 +665,10 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 				Log.d(TAG, "Added direct trust evidence");
 				// TODO the method is void. what to do?
 			} 
-			TestInternalTrustClient.this.testEndTime = System.currentTimeMillis();
+			TestInternalSecurityClient.this.testEndTime = System.currentTimeMillis();
 			Log.d(TAG, intent.getAction() + " elapse time: " 
-					+ (TestInternalTrustClient.this.testEndTime - TestInternalTrustClient.this.testStartTime));
-			TestInternalTrustClient.this.testDoneSignal.countDown();
+					+ (TestInternalSecurityClient.this.testEndTime - TestInternalSecurityClient.this.testStartTime));
+			TestInternalSecurityClient.this.testDoneSignal.countDown();
 		}
 	}
 

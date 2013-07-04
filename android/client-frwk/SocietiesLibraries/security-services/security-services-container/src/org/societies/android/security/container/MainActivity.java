@@ -22,9 +22,9 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.trust.container;
+package org.societies.android.security.container;
 
-import org.societies.android.privacytrust.trust.container.R;
+import org.societies.android.security.container.R;
 
 import android.os.Bundle;
 import android.app.Activity;

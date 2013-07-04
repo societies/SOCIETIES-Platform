@@ -22,11 +22,11 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.android.privacytrust.trust.container;
+package org.societies.android.security.container;
 
 import java.lang.ref.WeakReference;
 
-import org.societies.android.privacytrust.trust.TrustClientBase;
+import org.societies.android.security.SecurityClientBase;
 
 import android.app.Service;
 import android.content.Intent;
@@ -39,11 +39,11 @@ import android.util.Log;
  * service. It uses the base service implementation 
  * {@link TrustClientBase} to provide the service functionality.
  */
-public class TestServiceTrustClientLocal extends Service {
+public class TestServiceSecurityClientLocal extends Service {
 
-	private static final String TAG = TestServiceTrustClientLocal.class.getName();
+	private static final String TAG = TestServiceSecurityClientLocal.class.getName();
 	
-	private LocalTrustClientBinder binder;
+	private LocalSecurityClientBinder binder;
 
 	/*
 	 * @see android.app.Service#onCreate()
@@ -52,9 +52,9 @@ public class TestServiceTrustClientLocal extends Service {
 	public void onCreate () {
 		
 		Log.d(TAG, "onCreate");
-		this.binder = new LocalTrustClientBinder();
+		this.binder = new LocalSecurityClientBinder();
 		// inject reference to current service
-		this.binder.addouterClassreference(new TrustClientBase(this));
+		this.binder.addouterClassreference(new SecurityClientBase(this));
 	}
 
 	/*
@@ -86,16 +86,16 @@ public class TestServiceTrustClientLocal extends Service {
 	 * any clients that have a Binder reference, indirectly hold the Service object reference.
 	 * This prevents a common Android Service memory leak.
 	 */
-	public static class LocalTrustClientBinder extends Binder {
+	public static class LocalSecurityClientBinder extends Binder {
 		
-		private WeakReference<TrustClientBase> outerClassReference = null;
+		private WeakReference<SecurityClientBase> outerClassReference = null;
 
-		public void addouterClassreference(TrustClientBase instance) {
+		public void addouterClassreference(SecurityClientBase instance) {
 			
-			this.outerClassReference = new WeakReference<TrustClientBase>(instance);
+			this.outerClassReference = new WeakReference<SecurityClientBase>(instance);
 		}
 
-		public TrustClientBase getService() {
+		public SecurityClientBase getService() {
 			
 			return outerClassReference.get();
 		}
