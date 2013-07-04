@@ -1,25 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	
+
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>bit.lookableDataTypes.2001</artifactId>
-	<name>Ctx Mgm data Hierarchy Integration Test</name>
+	<groupId>org.societies.integration.test</groupId>
+	<artifactId>bit.ctx_data_hierarchy.2001</artifactId>
+	<name>#2001 Context Data Hierarchy Integration Test</name>
 	<packaging>bundle</packaging>
 	<version>${release.version}</version>
-
-	<developers>
-   		<developer>
-			<name>Nikos Kalatzis</name>
-			<email>nikosk@cn.ntua.gr</email>
-			<organization>ICCS</organization>
-			<organizationUrl>http://www.iccs.gr/</organizationUrl>
-			<roles>
-				<role>owner</role>
-				<role>developer</role>
-			</roles>
-			<timezone>+2</timezone>
-		</developer>
-	</developers>
 
 	<parent>
 		<groupId>org.societies</groupId>
@@ -28,16 +15,9 @@
 	</parent>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
+	    <dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -45,20 +25,11 @@
 			<artifactId>societies-api-internal</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>org.societies.api.external</groupId>
-			<artifactId>societies-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.context</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.beans</artifactId>
+	    <dependency>
+			<groupId>org.societies.integration.test.util</groupId>
+			<artifactId>integrationtestutil</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -67,13 +38,12 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.societies.integration.test.util</groupId>
-			<artifactId>integrationtestutil</artifactId>
-			<version>1.0-SNAPSHOT</version>
-			<scope>compile</scope>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
-
 
 	<build>
 		<plugins>
@@ -91,9 +61,6 @@
 							junit;scope=compile|runtime,
 						</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
-						<!-- <Import-Package> org.slf4j.*, org.societies.service.api, org.societies.integration.test.*, 
-							org.junit.*, </Import-Package> -->
-
 					</instructions>
 				</configuration>
 			</plugin>
@@ -135,6 +102,28 @@
 			</plugin>
 		</plugins>
 	</build>
-	
-	<groupId>org.societies</groupId>
+
+	<developers>
+		<developer>
+			<name>Nikos Kalatzis</name>
+			<email>nikosk@cn.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>owner</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+2</timezone>
+		</developer>
+		<developer>
+			<name>Nicolas Liampotis</name>
+			<email>nicolas.liampotis@cn.ntua.gr</email>
+			<organization>ICCS</organization>
+			<organizationUrl>http://www.iccs.gr/</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>+2</timezone>
+		</developer>
+	</developers>
 </project>

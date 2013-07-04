@@ -17,7 +17,7 @@
 		file if you do not want to. The rationale for keeping these definitions separate 
 		is to facilitate integration testing of the bundle outside of an OSGi container -->
 
-<import resource="classpath*:test-bundle-context-osgi.xml" />
+	<import resource="classpath*:test-bundle-context-osgi.xml" />
 
 	<osgi:reference id="ctxBroker"
 		interface="org.societies.api.context.broker.ICtxBroker">
@@ -26,6 +26,5 @@
 	<osgi:reference id="commManager"
 		interface="org.societies.api.comm.xmpp.interfaces.ICommManager">
 	</osgi:reference>
-	
 		
 </beans>

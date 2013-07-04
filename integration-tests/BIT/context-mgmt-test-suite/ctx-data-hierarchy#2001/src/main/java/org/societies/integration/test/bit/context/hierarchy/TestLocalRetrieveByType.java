@@ -22,28 +22,16 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.integration.test.bit.context.hierarchy;
 
-package org.societies.integration.test.bit.lookableDataTypes;
+import static org.junit.Assert.*;
 
-
-
-import java.io.IOException;
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import junit.framework.Assert;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import org.junit.After;
 import org.junit.Before;
@@ -52,33 +40,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
-import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
-import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
-import org.societies.api.context.model.IndividualCtxEntity;
-import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorService;
-import org.societies.api.internal.sns.ISocialConnector;
-import org.societies.api.internal.sns.ISocialData;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.context.broker.ICtxBroker;
 import org.societies.integration.test.userfeedback.UserFeedbackMockResult;
 import org.societies.integration.test.userfeedback.UserFeedbackType;
-import org.springframework.scheduling.annotation.AsyncResult;
-
 
 /**
  * 
@@ -86,13 +65,12 @@ import org.springframework.scheduling.annotation.AsyncResult;
  * @author nikosk
  *
  */
-public class Tester {
+public class TestLocalRetrieveByType {
 
-	private ICtxBroker externalCtxBroker;
+	private static Logger LOG = LoggerFactory.getLogger(TestLocalRetrieveByType.class);
+	
+	private ICtxBroker ctxBroker;
 	private ICommManager commMgr;
-	//private ISocialData socialData ; 
-
-	private static Logger LOG = LoggerFactory.getLogger(Tester.class);
 
 	private INetworkNode cssNodeId;
 	private IIdentity cssOwnerId;
@@ -110,19 +88,14 @@ public class Tester {
 	CtxAttribute ctxAttrDeviceNameFirst;
 	CtxAttribute ctxAttrDeviceNameLast;
 
-
-	public Tester(){
-
-	}
-
 	@Before
 	public void setUp(){
 
 		LOG.info("*** initiallizing " );
-		LOG.info("*** " +LookableDataTypesTest.getUserFeedbackMocker());
+		LOG.info("*** " +CtxDataHierarchyTestCase.getUserFeedbackMocker());
 
-		LookableDataTypesTest.getUserFeedbackMocker().setEnabled(true);
-		LookableDataTypesTest.getUserFeedbackMocker().addReply(UserFeedbackType.ACKNACK, new UserFeedbackMockResult("Allow"));
+		CtxDataHierarchyTestCase.getUserFeedbackMocker().setEnabled(true);
+		CtxDataHierarchyTestCase.getUserFeedbackMocker().addReply(UserFeedbackType.ACKNACK, new UserFeedbackMockResult("Allow"));
 
 	}
 	
@@ -131,7 +104,7 @@ public class Tester {
 
 		try {
 			LOG.info("*** tear down **** " );
-			this.externalCtxBroker.remove(this.requestorService, this.deviceCtxEnt.getId());
+			this.ctxBroker.remove(this.requestorService, this.deviceCtxEnt.getId());
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -142,8 +115,8 @@ public class Tester {
 	@Test
 	public void Test(){
 
-		this.externalCtxBroker = LookableDataTypesTest.getCtxBroker();
-		this.commMgr = LookableDataTypesTest.getCommManager();
+		this.ctxBroker = CtxDataHierarchyTestCase.getCtxBroker();
+		this.commMgr = CtxDataHierarchyTestCase.getCommManager();
 
 
 
@@ -191,17 +164,17 @@ public class Tester {
 
 		try {
 			
-			this.deviceCtxEnt = this.externalCtxBroker.createEntity(this.requestorService, this.cssOwnerId, CtxEntityTypes.DEVICE).get();
+			this.deviceCtxEnt = this.ctxBroker.createEntity(this.requestorService, this.cssOwnerId, CtxEntityTypes.DEVICE).get();
 
-			CtxAttribute ctxAttrDeviceNameFirstTemp = this.externalCtxBroker.createAttribute(this.requestorService, this.deviceCtxEnt.getId(), CtxAttributeTypes.NAME_FIRST).get();
+			CtxAttribute ctxAttrDeviceNameFirstTemp = this.ctxBroker.createAttribute(this.requestorService, this.deviceCtxEnt.getId(), CtxAttributeTypes.NAME_FIRST).get();
 			ctxAttrDeviceNameFirstTemp.setStringValue("MyFirstNameLocal");
 
-			CtxAttribute ctxAttrDeviceNameLastTemp = this.externalCtxBroker.createAttribute(this.requestorService, this.deviceCtxEnt.getId(), CtxAttributeTypes.NAME_LAST).get();
+			CtxAttribute ctxAttrDeviceNameLastTemp = this.ctxBroker.createAttribute(this.requestorService, this.deviceCtxEnt.getId(), CtxAttributeTypes.NAME_LAST).get();
 			ctxAttrDeviceNameLastTemp.setStringValue("MyLastNameLocal");
 
 			// with this update the attribute is stored in Context DB
-			this.ctxAttrDeviceNameFirst = (CtxAttribute) this.externalCtxBroker.update(requestorService, ctxAttrDeviceNameFirstTemp).get();
-			this.ctxAttrDeviceNameLast = (CtxAttribute) this.externalCtxBroker.update(requestorService, ctxAttrDeviceNameLastTemp).get();
+			this.ctxAttrDeviceNameFirst = (CtxAttribute) this.ctxBroker.update(requestorService, ctxAttrDeviceNameFirstTemp).get();
+			this.ctxAttrDeviceNameLast = (CtxAttribute) this.ctxBroker.update(requestorService, ctxAttrDeviceNameLastTemp).get();
 
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -223,12 +196,12 @@ public class Tester {
 
 		LOG.info("*** retrieveCtxDataLocal : test new lookup method*** ");
 		try {
-			List<CtxIdentifier> ctxIdList = this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxAttributeTypes.NAME).get();
+			List<CtxIdentifier> ctxIdList = this.ctxBroker.lookup(this.requestorService, this.cssOwnerId, CtxAttributeTypes.NAME).get();
 			LOG.info("lookable list: "+ ctxIdList);
 			LOG.info("lookable list size : "+ ctxIdList.size());
 
 
-			List<CtxModelObject> ctxDataObjList = this.externalCtxBroker.retrieve(this.requestorService, ctxIdList).get();
+			List<CtxModelObject> ctxDataObjList = this.ctxBroker.retrieve(this.requestorService, ctxIdList).get();
 
 			CtxAttribute ctxAttributeNameFirstRetrieved = null;
 			CtxAttribute ctxAttributeNameLastRetrieved = null;
@@ -256,7 +229,7 @@ public class Tester {
 			for(CtxIdentifier id :ctxIdList ){
 
 				if( id instanceof CtxAttributeIdentifier ){
-					CtxAttribute ctxAttribute = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
+					CtxAttribute ctxAttribute = (CtxAttribute) this.ctxBroker.retrieve(this.requestorService, id).get();	
 
 					if(ctxAttribute.getType().equalsIgnoreCase("nameFirst")){
 						LOG.info("retrieved ctxAttribute id : "+ ctxAttribute.getId());
@@ -270,7 +243,7 @@ public class Tester {
 					}
 
 				} else if( id instanceof CtxAssociationIdentifier ){
-					CtxAssociation ctxAssociation = (CtxAssociation) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
+					CtxAssociation ctxAssociation = (CtxAssociation) this.ctxBroker.retrieve(this.requestorService, id).get();	
 					LOG.info("retrieved ctxAssociation id : "+ ctxAssociation.getId());
 				}
 			}
@@ -281,14 +254,14 @@ public class Tester {
 
 			/*	
 			LOG.info("*** test lookup with null model type *** ");
-			List<CtxIdentifier> ctxIdListNullModelType = this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.NAME).get();	
+			List<CtxIdentifier> ctxIdListNullModelType = this.ctxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.NAME).get();	
 			LOG.info("ctxIdListNullModelType list: "+ ctxIdList);
 			LOG.info("ctxIdListNullModelType list size : "+ ctxIdList.size());
 
 			for(CtxIdentifier id :ctxIdListNullModelType ){
 
 				if( id instanceof CtxAttributeIdentifier ){
-					CtxAttribute ctxAttribute = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
+					CtxAttribute ctxAttribute = (CtxAttribute) this.ctxBroker.retrieve(this.requestorService, id).get();	
 
 					if(ctxAttribute.getType().equalsIgnoreCase("nameFirst")){
 						LOG.info("retrieved ctxAttribute id : "+ ctxAttribute.getId());
@@ -301,7 +274,7 @@ public class Tester {
 					}
 
 				} else if( id instanceof CtxAssociationIdentifier ){
-					CtxAssociation ctxAssociation = (CtxAssociation) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
+					CtxAssociation ctxAssociation = (CtxAssociation) this.ctxBroker.retrieve(this.requestorService, id).get();	
 					LOG.info("retrieved ctxAssociation id : "+ ctxAssociation.getId());
 				}
 			}
@@ -334,14 +307,14 @@ public class Tester {
 		try {
 			IIdentity remoteTarget = this.commMgr.getIdManager().fromJid(this.remoteTargetID);
 
-			List<CtxIdentifier> ctxIdList = this.externalCtxBroker.lookup(this.requestorService, remoteTarget, CtxAttributeTypes.NAME).get();
+			List<CtxIdentifier> ctxIdList = this.ctxBroker.lookup(this.requestorService, remoteTarget, CtxAttributeTypes.NAME).get();
 			LOG.info("remote lookable list: "+ ctxIdList);
 			LOG.info("remote lookable list size : "+ ctxIdList.size());
 
 			for(CtxIdentifier id :ctxIdList ){
 
 				if( id instanceof CtxAttributeIdentifier ){
-					CtxAttribute ctxAttribute = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
+					CtxAttribute ctxAttribute = (CtxAttribute) this.ctxBroker.retrieve(this.requestorService, id).get();	
 
 					if(ctxAttribute.getType().equalsIgnoreCase("nameFirst")){
 						LOG.info("remote retrieved ctxAttribute id : "+ ctxAttribute.getId());
@@ -354,14 +327,14 @@ public class Tester {
 					}
 
 				} else if( id instanceof CtxAssociationIdentifier ){
-					CtxAssociation ctxAssociation = (CtxAssociation) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
+					CtxAssociation ctxAssociation = (CtxAssociation) this.ctxBroker.retrieve(this.requestorService, id).get();	
 					LOG.info("retrieved ctxAssociation id : "+ ctxAssociation.getId());
 				}
 			}
 
 
 			LOG.info("*** remote test lookup with null model type *** ");
-			List<CtxIdentifier> ctxIdListNullModelType = this.externalCtxBroker.lookup(this.requestorService, remoteTarget, CtxModelType.ATTRIBUTE, CtxAttributeTypes.NAME).get();	
+			List<CtxIdentifier> ctxIdListNullModelType = this.ctxBroker.lookup(this.requestorService, remoteTarget, CtxModelType.ATTRIBUTE, CtxAttributeTypes.NAME).get();	
 
 			LOG.info("remote ctxIdListNullModelType list: "+ ctxIdListNullModelType);
 			LOG.info("remote ctxIdListNullModelType list size : "+ ctxIdListNullModelType.size());
@@ -371,7 +344,7 @@ public class Tester {
 				LOG.info("remote retrieved ctxAttribute id : "+ id);
 
 				if( id instanceof CtxAttributeIdentifier ){
-					CtxAttribute ctxAttribute = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
+					CtxAttribute ctxAttribute = (CtxAttribute) this.ctxBroker.retrieve(this.requestorService, id).get();	
 
 					if(ctxAttribute.getType().equalsIgnoreCase("nameFirst")){
 						LOG.info("remote retrieved ctxAttribute id : "+ ctxAttribute.getId());
@@ -384,7 +357,7 @@ public class Tester {
 					}
 
 				} else if( id instanceof CtxAssociationIdentifier ){
-					CtxAssociation ctxAssociation = (CtxAssociation) this.externalCtxBroker.retrieve(this.requestorService, id).get();	
+					CtxAssociation ctxAssociation = (CtxAssociation) this.ctxBroker.retrieve(this.requestorService, id).get();	
 					LOG.info("retrieved ctxAssociation id : "+ ctxAssociation.getId());
 				}
 			}			
@@ -412,7 +385,7 @@ public class Tester {
 		try {
 			IIdentity remoteTarget = this.commMgr.getIdManager().fromJid(this.remoteTargetID);
 
-			CtxEntity deviceCtxEnt = this.externalCtxBroker.createEntity(this.requestorService, remoteTarget, CtxEntityTypes.DEVICE).get();
+			CtxEntity deviceCtxEnt = this.ctxBroker.createEntity(this.requestorService, remoteTarget, CtxEntityTypes.DEVICE).get();
 
 			/*
 			 * Set<String> postAddressWorkChildren = new HashSet<String>();
@@ -423,15 +396,15 @@ public class Tester {
 			addChildren("ADDRESS_WORK", postAddressWorkChildren);
 			 */
 
-			CtxAttribute ctxAttrDeviceNameFirst = this.externalCtxBroker.createAttribute(this.requestorService, deviceCtxEnt.getId(), CtxAttributeTypes.NAME_FIRST).get();
+			CtxAttribute ctxAttrDeviceNameFirst = this.ctxBroker.createAttribute(this.requestorService, deviceCtxEnt.getId(), CtxAttributeTypes.NAME_FIRST).get();
 			ctxAttrDeviceNameFirst.setStringValue("MyFirstNameRemote");
 
-			CtxAttribute ctxAttrDeviceNameLast = this.externalCtxBroker.createAttribute(this.requestorService, deviceCtxEnt.getId(), CtxAttributeTypes.NAME_LAST).get();
+			CtxAttribute ctxAttrDeviceNameLast = this.ctxBroker.createAttribute(this.requestorService, deviceCtxEnt.getId(), CtxAttributeTypes.NAME_LAST).get();
 			ctxAttrDeviceNameLast.setStringValue("MyLastNameRemote");
 
 			// with this update the attribute is stored in Context DB
-			this.externalCtxBroker.update(requestorService, ctxAttrDeviceNameFirst).get();
-			this.externalCtxBroker.update(requestorService, ctxAttrDeviceNameLast).get();
+			this.ctxBroker.update(requestorService, ctxAttrDeviceNameFirst).get();
+			this.ctxBroker.update(requestorService, ctxAttrDeviceNameLast).get();
 
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -448,7 +421,4 @@ public class Tester {
 		}
 
 	}
-
-
-
 }
