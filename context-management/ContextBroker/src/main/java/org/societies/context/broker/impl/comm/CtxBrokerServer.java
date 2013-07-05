@@ -39,7 +39,6 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.context.broker.CtxAccessControlException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
@@ -63,7 +62,6 @@ import org.societies.api.schema.context.contextmanagement.CtxBrokerRequestBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerResponseBean;
 import org.societies.api.schema.context.model.CtxAssociationBean;
 import org.societies.api.schema.context.model.CtxAttributeBean;
-import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
 import org.societies.api.schema.context.model.CtxEntityBean;
 import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
 import org.societies.api.schema.context.model.CtxIdentifierBean;
@@ -373,6 +371,10 @@ public class CtxBrokerServer implements IFeatureServer{
 						? CtxModelBeanTranslator.getInstance().fromCtxModelObject(removedModelObject) : null;
 				beanResponse.setRemoveBeanResult(removedModelObjectBean);
 
+			} catch (CtxAccessControlException cace) {
+				LOG.error("Failed to remove context model object: " + cace.getLocalizedMessage(), cace);
+				// TODO send application error when supported
+				throw new XMPPError(StanzaError.not_authorized, cace.getLocalizedMessage(), null);
 			} catch (Exception e) {
 				LOG.error("Failed to remove context model object: " + e.getLocalizedMessage(), e);
 				// TODO send application error when supported
@@ -389,37 +391,27 @@ public class CtxBrokerServer implements IFeatureServer{
 				Requestor requestor = getRequestorFromBean(reqBeanLookup);
 				String targetCssString = cbPayload.getLookup().getTargetCss();
 				IIdentity targetCss = this.identMgr.fromJid(targetCssString);
-				CtxModelType modelType = 
-						CtxModelBeanTranslator.getInstance().ctxModelTypeFromCtxModelTypeBean(cbPayload.getLookup().getModelType());
+				final CtxModelType modelType = (cbPayload.getLookup().getModelType() != null)
+						? CtxModelBeanTranslator.getInstance().ctxModelTypeFromCtxModelTypeBean(cbPayload.getLookup().getModelType())
+						: null;
 				String type = cbPayload.getLookup().getType().toString();
-				List<CtxIdentifier> lookupResultsList = ctxbroker.lookup(requestor, targetCss, modelType, type).get();
+				final List<CtxIdentifier> lookupResultsList = (modelType != null)
+						? this.ctxbroker.lookup(requestor, targetCss, modelType, type).get()
+						: this.ctxbroker.lookup(requestor, targetCss, type).get();
 				if (lookupResultsList.size() > 0) {
 					List<CtxIdentifierBean> identBeanList = new ArrayList<CtxIdentifierBean>(); 
 
 					if (LOG.isDebugEnabled())
 					    LOG.debug("lookupResultsList=" + lookupResultsList);
 					
-					for (CtxIdentifier identifier : lookupResultsList) {
-						CtxIdentifierBean ctxIdBean = 
+					for (final CtxIdentifier identifier : lookupResultsList) {
+						final CtxIdentifierBean ctxIdBean = 
 									 CtxModelBeanTranslator.getInstance().fromCtxIdentifier(identifier);
 							identBeanList.add(ctxIdBean);
-					
-						
-					/*	if (identifier.getModelType().equals(CtxModelType.ATTRIBUTE)){
-							CtxAttributeIdentifier attrId = (CtxAttributeIdentifier) identifier;
-							CtxAttributeIdentifierBean attrIdBean = 
-									(CtxAttributeIdentifierBean) CtxModelBeanTranslator.getInstance().fromCtxIdentifier(attrId);
-							identBeanList.add(attrIdBean);
-						}
-						*/						
 					}
 					beanResponse.setCtxBrokerLookupBeanResult(identBeanList);
 				}
 
-			} catch (CtxAccessControlException cace) {
-				LOG.error("Failed to perfrom lookup: " + cace.getLocalizedMessage(), cace);
-				// TODO send application error when supported
-				throw new XMPPError(StanzaError.not_authorized, cace.getLocalizedMessage(), null);
 			} catch (Exception e) {
 				LOG.error("Failed to perform lookup: " + e.getLocalizedMessage(), e);
 				// TODO send application error when supported

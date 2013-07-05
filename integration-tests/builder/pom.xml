@@ -57,6 +57,7 @@
 		<module>../BIT/context-mgmt-test-suite/ctx-3pBroker#1337</module>
 		<module>../BIT/context-mgmt-test-suite/ctx-identity#1083</module>
 		<module>../BIT/context-mgmt-test-suite/ctx-src-registration#1028</module>
+		<module>../BIT/context-mgmt-test-suite/ctx-data-hierarchy#2001</module>
 		<module>../BIT/css-test-suite/CreateCSSCloduNode-#755</module>
 		<module>../BIT/css-test-suite/CSS-Devices/use-devices/get_data_from_device#899</module>
 		<module>../BIT/css-test-suite/RetrieveContextAs3PService#861</module>

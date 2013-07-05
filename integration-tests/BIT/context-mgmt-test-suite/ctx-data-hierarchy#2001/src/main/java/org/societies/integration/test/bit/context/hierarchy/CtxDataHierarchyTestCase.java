@@ -22,59 +22,70 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.lookableDataTypes;
-
+package org.societies.integration.test.bit.context.hierarchy;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.broker.ICtxBroker;
 import org.societies.integration.test.IntegrationTestCase;
 
-
 /**
- * 
  *
  * @author nikosk
- *
+ * @since 2.0
  */
-public class LookableDataTypesTest extends IntegrationTestCase{
+public class CtxDataHierarchyTestCase extends IntegrationTestCase {
 
+	private static org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker;
 	
-	public static ICtxBroker ctxBroker;
-	public static ICommManager commManager;
+	private static ICtxBroker ctxBroker;
+	
+	private static ICommManager commManager;
 		
-	
-	public LookableDataTypesTest(){
-		super(2001, new Class[]{Tester.class});
+	public CtxDataHierarchyTestCase() {
+		
+		super(2001, new Class[] { TestLocalInternalRetrieveByType.class,
+				TestLocalRetrieveByType.class });
 	}
 
+	public static org.societies.api.internal.context.broker.ICtxBroker getInternalCtxBroker() {
+		
+		return internalCtxBroker;
+	}
 	
-
+	/**
+	 * @param internalCtxBroker the internal ctxBroker to set
+	 */
+	public void setInternalCtxBroker(org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker) {
+		
+		CtxDataHierarchyTestCase.internalCtxBroker = internalCtxBroker;
+	}
+	
 	public static ICtxBroker getCtxBroker() {
+		
 		return ctxBroker;
 	}
 	
 	/**
 	 * @param ctxBroker the ctxBroker to set
 	 */
-	public  void setCtxBroker(ICtxBroker ctxBroker) {
-		LookableDataTypesTest.ctxBroker = ctxBroker;
-
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		
+		CtxDataHierarchyTestCase.ctxBroker = ctxBroker;
 	}
-	
-	
 	
 	/**
 	 * @return the commMgr
 	 */
-	public static ICommManager  getCommManager() {
+	public static ICommManager getCommManager() {
+		
 		return commManager ;
 	}
 
 	/**
 	 * @param commMgr the commMgr to set
 	 */
-	public  void setCommManager(ICommManager commMgr) {
-		LookableDataTypesTest.commManager = commMgr;
+	public void setCommManager(ICommManager commMgr) {
+		
+		CtxDataHierarchyTestCase.commManager = commMgr;
 	}		
-
 }
