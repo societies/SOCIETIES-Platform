@@ -94,10 +94,10 @@ public class UserContextInheritanceMgrTest {
 
 	static CtxAssociation assoc;
 	static CtxAssociationIdentifier assocID;
-	
+
 	static Set<CtxAssociationIdentifier> mockedAssociationIds;
 
-	private IIdentity mockIdentiy;
+	private IIdentity mockIdentiyCSSID;
 	private INetworkNode netNode = Mockito.mock(INetworkNode.class); ;
 
 	ICtxBroker mockctxBroker = Mockito.mock(ICtxBroker.class);
@@ -105,14 +105,14 @@ public class UserContextInheritanceMgrTest {
 	IIdentityManager idm = Mockito.mock(IIdentityManager.class);
 	IndividualCtxEntity mockedIndividualEntity = Mockito.mock(IndividualCtxEntity.class);
 	CtxAssociationTypes mockedCtxAssocTypes = Mockito.mock(CtxAssociationTypes.class);
-	
+
 	IndividualCtxEntity mockedCSS = Mockito.mock(IndividualCtxEntity.class);
 	IndividualCtxEntity mCSS = new IndividualCtxEntity(entityCSSID);
 	UserContextInheritanceMgr userInheritance;
-	
-	
+
+
 	private static String cssIdString = "context://john.societies.local/ENTITY/person/31";
-										
+
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -139,8 +139,8 @@ public class UserContextInheritanceMgrTest {
 		Set<CtxAttribute> attrSetCSS = new HashSet<CtxAttribute>();
 		attrSetCSS.add(attrTemperatureCSS);
 		indiEntityCSS = CtxModelObjectFactory.getInstance().createIndividualEntity(entityCSSID, new Date(), attrSetCSS, new HashSet<CtxAssociationIdentifier>(), new HashSet<CtxEntityIdentifier>());
-		
-		
+
+
 		//create community entity and add temperature attribute to it
 		entityCISIDA = new CtxEntityIdentifier("context://cis-1eebff13-9750-404a-8e3b-1a91b79cd5e7.ict-societies.eu/ENTITY/community/32767");
 		attrTemperatureCISAID = new CtxAttributeIdentifier(entityCISIDA,CtxAttributeTypes.TEMPERATURE, 122L);
@@ -163,9 +163,9 @@ public class UserContextInheritanceMgrTest {
 		Set<CtxAttribute> attrSetCISC = new HashSet<CtxAttribute>();
 		attrSetCISC.add(attrTemperatureCISC);
 		entityCISC = CtxModelObjectFactory.getInstance().createCommunityEntity(entityCISIDC, new Date(), new HashSet(), new HashSet(), new HashSet(), new HashSet());
-		
-		
-		
+
+
+
 		/*
 			entityCISIDB = new CtxEntityIdentifier("context://cis-1eebff13-9750-404a-8e3b-1a91b79cd5e8.ict-societies.eu/ENTITY/community/32768");
 			entityCISB = CtxModelObjectFactory.getInstance().createCommunityEntity(entityCISIDB, new Date(), new HashSet(), new HashSet(), new HashSet(), new HashSet());
@@ -176,97 +176,107 @@ public class UserContextInheritanceMgrTest {
 			attrTemperatureCISCID = new CtxAttributeIdentifier("context://cis-1eebff13-9750-404a-8e3b-1a91b79cd5e9.ict-societies.eu/ENTITY/community/32769/ATTRIBUTE/temperature/30");
 			attrTemperatureCISC = CtxModelObjectFactory.getInstance().createAttribute(attrTemperatureCISCID, new Date(), new Date(), "ooo");
 		 */
-		Set<CtxAssociationIdentifier> mockSetOfAssocIds_IS_MEMBER_OF = new HashSet<CtxAssociationIdentifier>();
-
+		
+		
 		assocID = new CtxAssociationIdentifier("context://university.ict-societies.eu/ASSOCIATION/isMemberOf/2");
-		assoc = new CtxAssociation(assocID);
-		assoc.setParentEntity(entityCSSID);
-		assoc.addChildEntity(entityCISIDA);
-		assoc.addChildEntity(entityCISIDB);
+		//assoc = new CtxAssociation(assocID);
+		//assoc.setParentEntity(entityCSSID);
+		//assoc.addChildEntity(entityCISIDA);
+		//assoc.addChildEntity(entityCISIDB);
+
+		Set<CtxEntityIdentifier> childEntIDs = new HashSet<CtxEntityIdentifier>();
+		childEntIDs.add(entityCISIDA);
+		childEntIDs.add(entityCISIDB);
+		
+		assoc = CtxModelObjectFactory.getInstance().createAssociation(assocID, new Date(), entityCSSID, childEntIDs);
+
+		// this will be used as a reply		
+		Set<CtxAssociationIdentifier> mockSetOfAssocIds_IS_MEMBER_OF = new HashSet<CtxAssociationIdentifier>();
+		mockSetOfAssocIds_IS_MEMBER_OF.add(assocID);
 		
 		
-		//create IIdentity
-		mockIdentiy = new IIdentity() {
-			
+		mockIdentiyCSSID = new IIdentity() {
+
 			@Override
 			public IdentityType getType() {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			public String getJid() {
 				// TODO Auto-generated method stub
 				return "context://john.societies.local/ENTITY/person/31";
 			}
-			
+
 			@Override
 			public String getIdentifier() {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			public String getDomain() {
 				// TODO Auto-generated method stub
 				return null;
 			}
-			
+
 			@Override
 			public String getBareJid() {
 				// TODO Auto-generated method stub
 				return "john@societies.local";
 			}
 		};
+
+	
 		
 		
-		mockSetOfAssocIds_IS_MEMBER_OF.add(assocID);
-		System.out.println(mockSetOfAssocIds_IS_MEMBER_OF.iterator().next());
-		System.out.println("OWNERID "+ assocID.getOwnerId());
-		System.out.println("!!!!!! "+indiEntityCSS.getAssociations(CtxAssociationTypes.IS_MEMBER_OF));
+
 		
 		System.out.println("ASSOC ID is: "+assocID);
-		
-		System.out.println("the is member of is "+assoc.getParentEntity());
-		
-		//assoc.addChildEntity(entityCISIDB);
-		//assoc.addChildEntity(entityCISIDC);
+		System.out.println("parent entity: "+assoc.getParentEntity());
+		System.out.println("children entity: "+assoc.getChildEntities());
 
 		System.out.println("before mocking entityCSSID :"+entityCSSID +" entityCSS :"+indiEntityCSS);
-//context://john.societies.local/ENTITY/person/31
-//org.societies.api.context.model.IndividualCtxEntity@77a9138
-		
+		//context://john.societies.local/ENTITY/person/31
+		//org.societies.api.context.model.IndividualCtxEntity@77a9138
+
 		System.out.println("cssIdString "+cssIdString +" mockcomMngr "+mockctxBroker);		
-//context://john.societies.local/ENTITY/person/31
-//Mock for ICtxBroker, hashCode: 1535375202
-	
+		//context://john.societies.local/ENTITY/person/31
+		//Mock for ICtxBroker, hashCode: 1535375202
+
 		Mockito.when(mockcomMngr.getIdManager()).thenReturn(idm);
 		Mockito.when(idm.getThisNetworkNode()).thenReturn(netNode);
-		Mockito.when(netNode.getBareJid()).thenReturn(mockIdentiy.getJid().toString());
+		Mockito.when(netNode.getBareJid()).thenReturn(mockIdentiyCSSID.getJid().toString());
 		//Mockito.when(mockctxBroker.lookup(CtxModelType.ATTRIBUTE, "dianneConfidenceLevel")).thenReturn(new AsyncResult(new ArrayList<CtxIdentifier>()));
 
 		Mockito.when(mockcomMngr.getIdManager()).thenReturn(idm);
-		Mockito.when(idm.fromJid(cssIdString)).thenReturn(mockIdentiy);
+		Mockito.when(idm.fromJid(cssIdString)).thenReturn(mockIdentiyCSSID);
 
-System.out.println("mockIdentity is "+mockIdentiy);
-System.out.println("indiEntity is "+ indiEntityCSS);
-//null
-// org.societies.api.context.model.IndividualCtxEntity@7fc9aef8
+		System.out.println("mockIdentity is "+mockIdentiyCSSID);
+		System.out.println("indiEntity is "+ indiEntityCSS);
 
-//Mockito.when(mockedCSS.getAssociations(CtxAssociationTypes.IS_MEMBER_OF)).thenReturn(mockSetOfAssocIds_IS_MEMBER_OF);
+		Mockito.when(mockedCSS.getAssociations(CtxAssociationTypes.IS_MEMBER_OF)).thenReturn(mockSetOfAssocIds_IS_MEMBER_OF);
+		
 		System.out.println("The return size of mockedCSS is "+mockSetOfAssocIds_IS_MEMBER_OF.size());
 		System.out.println("The object is "+mockSetOfAssocIds_IS_MEMBER_OF.iterator().next());
-//context://university.ict-societies.eu/ASSOCIATION/isMemberOf/2
-	
 		
-		System.out.println(mockctxBroker + "         " + mockIdentiy +"    " + indiEntityCSS);	
-		Mockito.when(mockctxBroker.retrieveIndividualEntity(mockIdentiy).get().getAssociations()).thenReturn(mockSetOfAssocIds_IS_MEMBER_OF);
+
+		System.out.println("mocked Broker:"+mockctxBroker + "   Mocked identity CSSid:" + mockIdentiyCSSID);	
+		System.out.println("indiEntityCSS:" + indiEntityCSS.getId());
+
+		Mockito.when(mockctxBroker.retrieveIndividualEntity(mockIdentiyCSSID)).thenReturn(new AsyncResult<IndividualCtxEntity>(indiEntityCSS));
+		System.out.println("assoc : "+ assoc.getChildEntities());
+		Mockito.when(mockctxBroker.retrieve(attrTemperatureCSSID)).thenReturn(new AsyncResult<CtxModelObject>(attrTemperatureCSS));
+		
+		
+		//Set<CtxAssociationIdentifier> setOfCSSAssocIds = cssEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF);
 		//Mockito.when(Mockito.any(CtxEntity.class).getAssociations()).thenReturn(mockSetOfAssocIds_IS_MEMBER_OF);
-	
-System.out.println("0.... the indiEntityCSS from mock is "+ indiEntityCSS);
+
+		System.out.println("0.... the indiEntityCSS from mock is "+ indiEntityCSS);
 		//Mockito.when(mockctxBroker.retrieveIndividualEntity(Mockito.any(IIdentity.class)).get()).thenReturn(mockedIndividualEntity);
 		//Mockito.when(mockedIndividualEntity.getAssociations()).thenReturn(mockedAssociationIds);
-	
+
 		userInheritance = new UserContextInheritanceMgr();
 		userInheritance.setCtxBroker(mockctxBroker);
 		userInheritance.setCommMngr(mockcomMngr);
@@ -286,24 +296,29 @@ System.out.println("0.... the indiEntityCSS from mock is "+ indiEntityCSS);
 		// entities and attributes created.... start testing...
 		System.out.println("attributeCSSA "+ attrTemperatureCISA.getStringValue());
 		System.out.println("entityCSS "+ indiEntityCSS.getId());
-		
+
 		System.out.println("attrTemperatureCISB :"+attrTemperatureCISB.getStringValue());
 		System.out.println("attrTemperatureCISC :"+attrTemperatureCISC.getStringValue());
 		System.out.println("entityCSS"+indiEntityCSS.getAttributes().size());
-		
+
 		System.out.println("attrTemperatureCISBID "+ attrTemperatureCISBID);
 
-		
+
 		assertEquals("context://john.societies.local/ENTITY/person/31",indiEntityCSS.getId().toString());
 
-		IndividualCtxEntity indiEntRetrieved = this.mockctxBroker.retrieveIndividualEntity(mockIdentiy).get();
+		IndividualCtxEntity indiEntRetrieved = this.mockctxBroker.retrieveIndividualEntity(mockIdentiyCSSID).get();
 
 		assertEquals(indiEntityCSS.getId().toString(),indiEntRetrieved.getId().toString());
 		System.out.println(" indiEntRetrieved attributes : "+indiEntRetrieved.getAttributes(CtxAttributeTypes.TEMPERATURE));
 		/// ...
 		//System.out.println("USER INH "+ userInheritance.communityInheritance(attrTemperatureCISBID));
 		try {
+			System.out.println(" START REAL TESTING" );
+			System.out.println(" attrTemperatureCSSID: "+ attrTemperatureCSSID );
+			
 			CtxAttribute a = (CtxAttribute) userInheritance.communityInheritance(attrTemperatureCSSID);
+			System.out.println(" result a:" +a);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
