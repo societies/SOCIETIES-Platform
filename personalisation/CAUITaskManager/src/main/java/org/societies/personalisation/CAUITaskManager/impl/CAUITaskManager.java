@@ -199,7 +199,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
 
 		for(IUserIntentAction action : actionsMap.keySet()){
-			if (action.getServiceID().getServiceInstanceIdentifier().equals(serviceId) && action.getparameterName().equals(actionType)) actionResult.add(action);
+			if (action.getServiceID().getIdentifier().toString().equals(serviceId) && action.getparameterName().equals(actionType)) actionResult.add(action);
 		}
 		return actionResult;
 	}

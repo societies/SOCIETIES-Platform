@@ -385,15 +385,17 @@ public class CAUIPrediction implements ICAUIPrediction{
 		if(cauiModelExist == true && enableCauiPrediction == true){
 			//LOG.info("serviceID.getIdentifier().toString() "+serviceID.getIdentifier().toString() );
 			List<IUserIntentAction> actionList = cauiTaskManager.retrieveActionsByServiceType(serviceID.getIdentifier().toString(), userActionType);
-			//LOG.info("action LIST "+actionList );
+			LOG.info("action LIST 0 : "+actionList );
 			// compare current context and choose proper action
 			if(actionList.size()>0) {
+				LOG.info("action LIST 1: "+actionList );
 				predictedAction = findBestMatchingAction(actionList);
-
+				LOG.info("action LIST 2: "+predictedAction );
+				
 			}
 
 		} else {
-			LOG.info("no model exist - predictionRequestsCounter:" +predictionRequestsCounter);
+			LOG.info("no model exist or caui prediction is disabled - predictionRequestsCounter:" +predictionRequestsCounter);
 		}
 
 		if(predictedAction != null)	{
@@ -404,7 +406,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 			this.recordPrediction(predictedAction);		
 
 		}
-		//LOG.info("getCurrentIntentAction based on serviceID and actionType : "+predictedAction );
+		LOG.info("getCurrentIntentAction based on serviceID and actionType : "+predictedAction );
 		return new AsyncResult<IUserIntentAction>(predictedAction);
 	}
 

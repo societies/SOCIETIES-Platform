@@ -51,6 +51,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.personalisation.model.IAction;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 //import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
@@ -76,6 +77,12 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	//LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = null;
 	LinkedHashMap<String,HashMap<String,Double>> transProb = null;
 	HashMap<String,List<String>> contextActionsMap = new HashMap<String,List<String>>();
+
+	Map<String , ServiceResourceIdentifier> sriMap = new HashMap<String , ServiceResourceIdentifier>();
+
+	public Map<String, ServiceResourceIdentifier> getSriMap() {
+		return sriMap;
+	}
 
 
 	List<String> charList = null;
@@ -153,7 +160,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				//LOG.info("6. Generate UserIntentModelData");
 				ConstructUIModel cmodel = new ConstructUIModel(cauiTaskManager,ctxBroker); 
 				UserIntentModelData modelData = null;
-				modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap);
+				modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap,this.sriMap);
 
 				CtxAttribute ctxAttr = storeModelCtxDB(modelData);
 				LOG.debug("model stored under attribute id: "+ctxAttr.getId());
@@ -309,7 +316,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			for (int i = 0; i < historySize ; i++) {
 				MockHistoryData currentHocData =  historyData.get(i);
 				List<String> actionNameObjTemp = new ArrayList<String>();
-				String actionName = currentHocData.getServiceId()+"#"+currentHocData.getParameterName()+"#"+currentHocData.getActionValue();
+				String actionName = currentHocData.getServiceId()+"#"+currentHocData.getParameterName()+"#"+currentHocData.getActionValue()+"#"+currentHocData.getServiceType();
 				//LOG.info("action name "+actionName);
 				actionNameObjTemp.add(actionName);
 
@@ -329,7 +336,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 					if( i+k < historySize ){
 						tempHocData = historyData.get(i+k);
 						//String tempNextActName = tempHocData.getActionValue();
-						String tempNextActName = tempHocData.getServiceId()+"#"+tempHocData.getParameterName()+"#"+tempHocData.getActionValue();
+						String tempNextActName = tempHocData.getServiceId()+"#"+tempHocData.getParameterName()+"#"+tempHocData.getActionValue()+"#"+tempHocData.getServiceType();
 
 						actionNameObjTemp.add(tempNextActName);
 
@@ -560,7 +567,12 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			try {
 				IAction retrievedAction = (IAction) SerialisationHelper.deserialise(primaryHocAttr.getBinaryValue(), this.getClass().getClassLoader());
 				String serviceIdentString = retrievedAction.getServiceID().getServiceInstanceIdentifier();
-
+				
+				ServiceResourceIdentifier sri  = retrievedAction.getServiceID();
+				this.sriMap.put(serviceIdentString, sri);
+				
+				String serviceType = retrievedAction.getServiceType();
+				
 				List<CtxHistoryAttribute> listHocAttrs = ctxHocTuples.get(primaryHocAttr);
 
 				Map<String,String> context = new HashMap<String,String>();
@@ -569,7 +581,8 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 					String value = castAttrValuetoString(escortingHocAttr);
 					context.put(escortingHocAttr.getType(), value);
 				}
-				MockHistoryData mockHocData = new MockHistoryData(retrievedAction.getparameterName(), retrievedAction.getvalue(), context,primaryHocAttr.getLastModified(),serviceIdentString);
+				
+				MockHistoryData mockHocData = new MockHistoryData(retrievedAction.getparameterName(), retrievedAction.getvalue(), context,primaryHocAttr.getLastModified(),serviceIdentString, serviceType);
 				result.add(mockHocData);
 
 			}  catch (ClassNotFoundException e) {
@@ -722,7 +735,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		for (int i = 0; i < historySize ; i++) {
 			MockHistoryData currentHocData =  historyData.get(i);
 			List<String> actionNameObjTemp = new ArrayList<String>();
-			String actionName = currentHocData.getServiceId()+"#"+currentHocData.getParameterName()+"#"+currentHocData.getActionValue();
+			String actionName = currentHocData.getServiceId()+"#"+currentHocData.getParameterName()+"#"+currentHocData.getActionValue()+"#"+currentHocData.getServiceType();
 			//LOG.info("action name "+actionName);
 			actionNameObjTemp.add(actionName);
 
@@ -742,7 +755,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				if( i+k < historySize ){
 					tempHocData = historyData.get(i+k);
 					//String tempNextActName = tempHocData.getActionValue();
-					String tempNextActName = tempHocData.getServiceId()+"#"+tempHocData.getParameterName()+"#"+tempHocData.getActionValue();
+					String tempNextActName = tempHocData.getServiceId()+"#"+tempHocData.getParameterName()+"#"+tempHocData.getActionValue()+"#"+tempHocData.getServiceType();
 
 					actionNameObjTemp.add(tempNextActName);
 
