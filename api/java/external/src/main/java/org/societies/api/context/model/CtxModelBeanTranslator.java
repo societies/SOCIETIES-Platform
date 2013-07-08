@@ -316,14 +316,26 @@ public final class CtxModelBeanTranslator {
 		if (identifier.getModelType().equals(CtxModelType.ENTITY)) {
 			ctxIdBean = new CtxEntityIdentifierBean();
 			ctxIdBean.setString(identifier.toString());
+			ctxIdBean.setOwnerId(identifier.getOwnerId());
+			ctxIdBean.setType(identifier.getType());
+			ctxIdBean.setModelType(ctxModelTypeBeanFromCtxModelType(identifier.getModelType()));
+			ctxIdBean.setObjectNumber(identifier.getObjectNumber());
 		}
 		else if (identifier.getModelType().equals(CtxModelType.ATTRIBUTE)) {
 			ctxIdBean = new CtxAttributeIdentifierBean(); 
 			ctxIdBean.setString(identifier.toString()); 
+			ctxIdBean.setOwnerId(identifier.getOwnerId());
+			ctxIdBean.setType(identifier.getType());
+			ctxIdBean.setModelType(ctxModelTypeBeanFromCtxModelType(identifier.getModelType()));
+			ctxIdBean.setObjectNumber(identifier.getObjectNumber());
 		}
 		else if (identifier.getModelType().equals(CtxModelType.ASSOCIATION)) {
 			ctxIdBean = new CtxAssociationIdentifierBean(); 
 			ctxIdBean.setString(identifier.toString());
+			ctxIdBean.setOwnerId(identifier.getOwnerId());
+			ctxIdBean.setType(identifier.getType());
+			ctxIdBean.setModelType(ctxModelTypeBeanFromCtxModelType(identifier.getModelType()));
+			ctxIdBean.setObjectNumber(identifier.getObjectNumber());
 		}
 
 		return ctxIdBean;
