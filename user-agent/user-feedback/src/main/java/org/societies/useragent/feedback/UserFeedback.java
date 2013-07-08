@@ -190,7 +190,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
             log.debug("Finished recalling stored UF requests");
         } catch (Exception ex) {
-            log.error("Error recalling stored UF requests", ex);
+            log.error("Error recalling stored UF requests #193 - UserFeedback will continue without database support. \n" + ex.getMessage());
         }
 
         try {
@@ -213,7 +213,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
             log.debug("Finished recalling stored PPN requests");
         } catch (Exception ex) {
-            log.error("Error recalling stored PPN requests", ex);
+            log.error("Error recalling stored PPN requests #216 - UserFeedback will continue without database support. \n" + ex.getMessage());
         }
 
         String msg = "User Feedback Initialised\n" +
@@ -315,7 +315,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                 userFeedbackHistoryRepository.insert(ufBean);
             }
         } catch (Exception ex) {
-            log.error("Error storing user feedback request bean to database", ex);
+            log.error("Error storing user feedback request bean to database #318 - UserFeedback will continue without database support. \n" + ex.getMessage());
         }
 
         //send pubsub event to all user agents
@@ -424,7 +424,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                 userFeedbackHistoryRepository.insert(ufBean);
             }
         } catch (Exception ex) {
-            log.error("Error storing user feedback request bean to database", ex);
+            log.error("Error storing user feedback request bean to database #427 - UserFeedback will continue without database support. \n" + ex.getMessage());
         }
 
         //send pubsub event to all user agents
@@ -534,7 +534,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                 privacyPolicyNegotiationHistoryRepository.insert(event);
             }
         } catch (Exception ex) {
-            log.error("Error storing PPN request bean to database", ex);
+            log.error("Error storing PPN request bean to database #537 - UserFeedback will continue without database support. \n" + ex.getMessage());
         }
 
         try {
@@ -635,7 +635,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 //                userFeedbackHistoryRepository.insert(event);
 //            }
 //        } catch (Exception ex) {
-//            log.error("Error storing user feedback request bean to database", ex);
+//            log.error("Error storing user feedback request bean to database #638 - UserFeedback will continue without database support. \n" + ex.getMessage());
 //        }
 
 
@@ -693,7 +693,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                 ufBean = userFeedbackHistoryRepository.getByRequestId(requestId);
             }
         } catch (Exception ex) {
-            log.error("Error storing user feedback request bean to database", ex);
+            log.error("Error storing user feedback request bean to database #696 - UserFeedback will continue without database support. \n" + ex.getMessage());
         }
 
         //send pubsub event to all user agents
@@ -841,7 +841,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                     userFeedbackHistoryRepository.completeExpFeedback(responseID, expFeedbackBean.getFeedback());
                 }
             } catch (Exception ex) {
-                log.error("Error updating user feedback stage in database", ex);
+                log.error("Error updating user feedback stage in database #844 - UserFeedback will continue without database support. \n" + ex.getMessage());
             }
             // inform clients that UF is complete
             try {
@@ -914,7 +914,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                     userFeedbackHistoryRepository.completeImpFeedback(responseID, impFeedbackBean.isAccepted());
                 }
             } catch (Exception ex) {
-                log.error("Error updating user feedback stage in database", ex);
+                log.error("Error updating user feedback stage in database #917 - UserFeedback will continue without database support. \n" + ex.getMessage());
             }
             // inform clients that UF is complete
             try {
@@ -990,7 +990,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                     privacyPolicyNegotiationHistoryRepository.updateStage(responseID, FeedbackStage.COMPLETED);
                 }
             } catch (Exception ex) {
-                log.error("Error updating PPN stage in database", ex);
+                log.error("Error updating PPN stage in database #993 - UserFeedback will continue without database support. \n" + ex.getMessage());
             }
             // inform clients that negotiation is complete
             try {
@@ -1059,7 +1059,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 //                    userFeedbackHistoryRepository.updateStage(responseID, FeedbackStage.COMPLETED);
 //                }
 //            } catch (Exception ex) {
-//                log.error("Error updating access control request stage in database", ex);
+//                log.error("Error updating access control request stage in database #1062 - UserFeedback will continue without database support. \n" + ex.getMessage());
 //            }
             // inform clients that negotiation is complete
             try {
