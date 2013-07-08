@@ -2655,9 +2655,10 @@ public class InternalCtxBroker implements ICtxBroker {
 		CtxAttribute result = (CtxAttribute) this.userCtxDBMgr.retrieve(ctxAttrId);
 		// Check if inference is applicable/required:
 		// 1. inferrable attribute type AND
-		// 2. either has no value OR a value of poor quality
+		// 2. existing attribute either has no value OR a value of poor quality
 		try {
-			if (this.userCtxInferenceMgr.getInferrableTypes().contains(result.getType())
+			if (result != null 
+					&& this.userCtxInferenceMgr.getInferrableTypes().contains(result.getType())
 					&& (!CtxBrokerUtils.hasValue(result) || 
 							this.userCtxInferenceMgr.isPoorQuality(result.getQuality()))) {
 				if (LOG.isDebugEnabled())
