@@ -35,15 +35,31 @@ import org.societies.integration.test.IntegrationTestCase;
  */
 public class CtxDataHierarchyTestCase extends IntegrationTestCase {
 
+	private static org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker;
+	
 	private static ICtxBroker ctxBroker;
 	
 	private static ICommManager commManager;
 		
 	public CtxDataHierarchyTestCase() {
 		
-		super(2001, new Class[] { TestLocalRetrieveByType.class });
+		super(2001, new Class[] { TestLocalInternalRetrieveByType.class,
+				TestLocalRetrieveByType.class });
 	}
 
+	public static org.societies.api.internal.context.broker.ICtxBroker getInternalCtxBroker() {
+		
+		return internalCtxBroker;
+	}
+	
+	/**
+	 * @param internalCtxBroker the internal ctxBroker to set
+	 */
+	public void setInternalCtxBroker(org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker) {
+		
+		CtxDataHierarchyTestCase.internalCtxBroker = internalCtxBroker;
+	}
+	
 	public static ICtxBroker getCtxBroker() {
 		
 		return ctxBroker;

@@ -26,8 +26,6 @@ package org.societies.integration.test.bit.context.hierarchy;
 
 import static org.junit.Assert.*;
 
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +36,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
@@ -47,11 +44,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.RequestorService;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.services.ServiceUtils;
-import org.societies.integration.test.userfeedback.UserFeedbackMockResult;
-import org.societies.integration.test.userfeedback.UserFeedbackType;
+import org.societies.api.internal.context.broker.ICtxBroker;
 
 /**
  * The test {@link #setUp()} method creates the following data:
@@ -62,24 +55,20 @@ import org.societies.integration.test.userfeedback.UserFeedbackType;
  *     context entity of the CSS owner (if not exists).</li>
  * </ol>
  * 
- * The external Context Broker is used to retrieve the context data above by
+ * The internal Context Broker is used to retrieve the context data above by
  * looking up the generic attribute type {@link CtxAttributeTypes#NAME NAME}.
  * 
- * @author nikosk
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 2.0
  */
-public class TestLocalRetrieveByType {
+public class TestLocalInternalRetrieveByType {
 
-	private static Logger LOG = LoggerFactory.getLogger(TestLocalRetrieveByType.class);
-	
-	private static final String SERVICE_ID = "requestor.societies.org";
-	private static final String SERVICE_SRI = "css://requestor.societies.org/HelloWorld";
+	private static Logger LOG = LoggerFactory.getLogger(TestLocalInternalRetrieveByType.class);
 	
 	private static final String USER_NAME_FIRST = "John";
 	private static final String USER_NAME_LAST = "Do";
 	
-	private org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker;
-	private ICtxBroker ctxBroker;
+	private ICtxBroker internalCtxBroker;
 	private ICommManager commMgr;
 
 	/** The identifiers of the context model objects created in this test. */
@@ -87,15 +76,6 @@ public class TestLocalRetrieveByType {
 
 	/** The CSS owner ID. */
 	private IIdentity userId;
-	
-	/** The 3P service ID. */
-	private IIdentity serviceId;
-	
-	/** The 3P service SRI. */
-	private ServiceResourceIdentifier serviceSri;
-	
-	/** The 3P service requestor. */
-	private RequestorService requestorService;
 	
 	private CtxAttributeIdentifier userNameFirstCtxAttrId;
 	private String userNameFirstCtxAttrValue;
@@ -106,27 +86,12 @@ public class TestLocalRetrieveByType {
 	public void setUp() throws Exception {
 		
 		this.internalCtxBroker = CtxDataHierarchyTestCase.getInternalCtxBroker();
-		this.ctxBroker = CtxDataHierarchyTestCase.getCtxBroker();
 		this.commMgr = CtxDataHierarchyTestCase.getCommManager();
 		
 		this.userId = this.commMgr.getIdManager().fromJid(
 				this.commMgr.getIdManager().getThisNetworkNode().getBareJid());
 		if (LOG.isInfoEnabled())
 			LOG.info("*** setUp: userId=" + this.userId);
-		
-		this.serviceId = this.commMgr.getIdManager().fromJid(SERVICE_ID);
-		if (LOG.isInfoEnabled())
-			LOG.info("*** setUp: serviceId=" + this.serviceId);
-		
-		this.serviceSri = new ServiceResourceIdentifier();
-		this.serviceSri.setServiceInstanceIdentifier(SERVICE_SRI);
-		this.serviceSri.setIdentifier(new URI(SERVICE_SRI));
-		if (LOG.isInfoEnabled())
-			LOG.info("*** setUp: serviceSri=" + ServiceUtils.serviceResourceIdentifierToString(this.serviceSri));
-		
-		this.requestorService = new RequestorService(serviceId, serviceSri);
-		if (LOG.isInfoEnabled())
-			LOG.info("*** setUp: requestorService=" + this.requestorService);
 		
 		final IndividualCtxEntity userCtxEnt = 
 				this.internalCtxBroker.retrieveIndividualEntity(this.userId).get();
@@ -158,24 +123,12 @@ public class TestLocalRetrieveByType {
 		this.userNameLastCtxAttrValue = userNameLastCtxAttr.getStringValue();
 		if (LOG.isInfoEnabled())
 			LOG.info("*** setUp: userNameLastCtxAttrValue=" + this.userNameLastCtxAttrValue);
-
-		if (!CtxDataHierarchyTestCase.getUserFeedbackMocker().isEnabled()) {
-			CtxDataHierarchyTestCase.getUserFeedbackMocker().setEnabled(true);
-			CtxDataHierarchyTestCase.getUserFeedbackMocker().addReply(
-					UserFeedbackType.ACKNACK, new UserFeedbackMockResult("Allow"));
-		}
-		if (LOG.isInfoEnabled())
-			LOG.info("*** setUp: UserFeedbackMocker.isEnabled="
-					+ CtxDataHierarchyTestCase.getUserFeedbackMocker().isEnabled());
 	}
 	
 	@After
 	public void tearDown() throws Exception {
 
 		this.userId = null;
-		this.serviceId = null;
-		this.serviceSri = null;
-		this.requestorService = null;
 		this.userNameFirstCtxAttrId = null;
 		this.userNameFirstCtxAttrValue = null;
 		this.userNameLastCtxAttrId = null;
@@ -193,8 +146,8 @@ public class TestLocalRetrieveByType {
 		if (LOG.isInfoEnabled())
 			LOG.info("*** Starting testRetrieveUserName");
 
-		final List<CtxIdentifier> userNameCtxIds = this.ctxBroker.lookup(
-				this.requestorService, this.userId, CtxAttributeTypes.NAME).get();
+		final List<CtxIdentifier> userNameCtxIds = this.internalCtxBroker.lookup(
+				this.userId, CtxAttributeTypes.NAME).get();
 		assertNotNull(userNameCtxIds);
 		if (LOG.isInfoEnabled())
 			LOG.info("*** testRetrieveUserName: userNameCtxIds=" + userNameCtxIds);
@@ -204,7 +157,7 @@ public class TestLocalRetrieveByType {
 		assertTrue(userNameCtxIds.contains(this.userNameLastCtxAttrId));
 		
 		final List<CtxModelObject> userNames = 
-				this.ctxBroker.retrieve(this.requestorService, userNameCtxIds).get();
+				this.internalCtxBroker.retrieve(userNameCtxIds).get();
 		assertNotNull(userNames);
 		if (LOG.isInfoEnabled())
 			LOG.info("*** testRetrieveUserName: userNames=" + userNames);
@@ -232,17 +185,10 @@ public class TestLocalRetrieveByType {
 		if (LOG.isInfoEnabled())
 			LOG.info("*** Starting testIllegalRetrieve");
 
-		boolean nullRequestorExceptionCaught = false;
-		try {
-			this.ctxBroker.lookup(null, this.userId, CtxAttributeTypes.NAME).get();
-		} catch (NullPointerException npe) {
-			nullRequestorExceptionCaught = true;
-		}
-		assertTrue(nullRequestorExceptionCaught);
 		
 		boolean nullTargetExceptionCaught = false;
 		try {
-			this.ctxBroker.lookup(this.requestorService, null, CtxAttributeTypes.NAME).get();
+			this.internalCtxBroker.lookup((IIdentity) null, CtxAttributeTypes.NAME).get();
 		} catch (NullPointerException npe) {
 			nullTargetExceptionCaught = true;
 		}
@@ -250,23 +196,15 @@ public class TestLocalRetrieveByType {
 		
 		boolean nullTypeExceptionCaught = false;
 		try {
-			this.ctxBroker.lookup(this.requestorService, this.userId, null).get();
+			this.internalCtxBroker.lookup(this.userId, null).get();
 		} catch (NullPointerException npe) {
 			nullTypeExceptionCaught = true;
 		}
 		assertTrue(nullTypeExceptionCaught);
 		
-		nullRequestorExceptionCaught = false;
-		try {
-			this.ctxBroker.retrieve(null, new ArrayList<CtxIdentifier>()).get();
-		} catch (NullPointerException npe) {
-			nullRequestorExceptionCaught = true;
-		}
-		assertTrue(nullRequestorExceptionCaught);
-		
 		boolean nullCtxIdListExceptionCaught = false;
 		try {
-			this.ctxBroker.retrieve(this.requestorService, (List<CtxIdentifier>) null).get();
+			this.internalCtxBroker.retrieve((List<CtxIdentifier>) null).get();
 		} catch (NullPointerException npe) {
 			nullCtxIdListExceptionCaught = true;
 		}

@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.concurrent.Future;
 
 import org.societies.api.context.CtxException;
+import org.societies.api.context.broker.CtxAccessControlException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
@@ -461,36 +462,83 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	public Future<CtxModelObject> remove(CtxIdentifier identifier) throws CtxException;
 
 	/**
-	 * Retrieves the specified context model object. Automatically enables inference for Context Attributes
-	 * that does not fulfill QoC requirements or contain a null value.
+	 * Retrieves the {@link CtxModelObject} identified by the specified 
+	 * {@link CtxIdentifier}. Note that the method may enable inference if the
+	 * requested context attribute does not fulfill QoC requirements or 
+	 * contains a <code>null</code> value. The method returns <code>null</code>
+	 * if the requested context model object does not exist in the Context DB.
+	 * The requestor on whose behalf to retrieve the context model object is
+	 * implicitly set to the local CSS. If the latter is not allowed to 
+	 * retrieve the identified context model object, a {@link CtxAccessControlException}
+	 * is thrown.
 	 * 
-	 * @param the {@link CtxIdentifier} of the context data object to be retrieved
-	 * @return the {@link CtxModelObject} for the respective identifiers
-	 * @throws CtxException 
+	 * @param ctxId
+	 *            the {@link CtxIdentifier} of the {@link CtxModelObject} to
+	 *            retrieve.
+	 * @throws CtxAccessControlException
+	 *             if the local CSS is not allowed to retrieve the identified
+	 *             context model object.
+	 * @throws CtxException
+	 *             if there is a problem performing the retrieve operation.
+	 * @throws NullPointerException
+	 *             if the specified ctxId is <code>null</code>.
 	 */
-	public Future<CtxModelObject> retrieve(CtxIdentifier identifier) throws CtxException;
+	public Future<CtxModelObject> retrieve(final CtxIdentifier ctxId) 
+			throws CtxException;
 	
 	/**
-	 * Retrieves the context model objects specified in the set. Automatically enables inference 
-	 * for Context Attributes that do not fulfill QoC requirements or contain a null value. 
-	 * The total volume of the data objects contained in the results may be high.   
-    
+	 * Retrieves the context model object(s) identified in the specified list.
+	 * Note that the method may enable inference for context attributes that
+	 * do not fulfill QoC requirements or contain a <code>null</code> value.
+	 * The requestor on whose behalf to retrieve the context model object(s)
+	 * is implicitly set to the local CSS. The returned list contains only the
+	 * context model objects which the local CSS is granted access to. Note 
+	 * that if the local CSS is denied access to <i>all</i> of the identified
+	 * context model object(s), a {@link CtxAccessControlException} is thrown.
 	 * 
-	 * @param a list of {@link CtxIdentifier} of the context data object to be retrieved
-	 * @return a list of {@link CtxModelObject} for the respective identifiers
+	 * @param ctxIdList
+	 *            the list of {@link CtxIdentifier CtxIdentifiers} to retrieve.
+	 * @return a list containing the identified context model objects which the
+	 *             specified requestor is granted access to.
+	 * @throws CtxAccessControlException
+	 *             if the local CSS is denied access to all of the
+	 *             specified context model object(s).
 	 * @throws CtxException 
+	 *             if there is a problem performing the retrieve operation.
+	 * @throws NullPointerException
+	 *             if the specified ctxIdList is <code>null</code>.
 	 */
-	public Future<List<CtxModelObject>> retrieve(List<CtxIdentifier> ctxIdentifiersList) throws CtxException;
-	
+	public Future<List<CtxModelObject>> retrieve(
+			final List<CtxIdentifier> ctxIdList) throws CtxException;
 	
 	/**
-	 * Retrieves the specified CtxAttribute. Inference is enabled according to parameter enableInference.
+	 * Retrieves the {@link CtxAttribute} identified by the specified 
+	 * {@link CtxAttributeIdentifier}. Note that if the identified context
+	 * attribute is not maintained in the local Context DB, an 
+	 * {@link IllegalArgumentException} is thrown. If enableInference is set to
+	 * <code>true</code>, the method may enable inference if the requested
+	 * context attribute does not fulfill QoC requirements or contains a
+	 * <code>null</code> value. The method returns <code>null</code> if the
+	 * requested context attribute does not exist in the local Context DB.
 	 * 
-	 * @param identifier
+	 * @param ctxAttrId
+	 *            the {@link CtxAttributeIdentifier} of the {@link CtxAttribute}
+	 *            to retrieve.
 	 * @param enableInference
-	 * @throws CtxException 
+	 *            <code>true</code> to enable inference (if applicable); 
+	 *            <code>false</code> otherwise.
+	 * @return the identified context attribute.
+	 * @throws CtxException
+	 *             if there is a problem performing the retrieve/infer operation.
+	 * @throws NullPointerException
+	 *             if the specified ctxAttrId is <code>null</code>.
+	 * @throws IllegalArgumentException
+	 *             if the specified ctxAttrId identifies a remotely managed 
+	 *             context attribute.
 	 */
-	 public Future<CtxAttribute> retrieveAttribute(CtxAttributeIdentifier identifier, boolean enableInference) throws CtxException;
+	 public Future<CtxAttribute> retrieveAttribute(
+			 final CtxAttributeIdentifier ctxAttrId, 
+			 final boolean enableInference) throws CtxException;
 	
 	/**
 	 * Retrieves the {@link IndividualCtxEntity} which represents the owner
@@ -547,12 +595,25 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 			throws CtxException;
 	
 	/**
-	 * Updates a single context model object.
+	 * Updates the specified {@link CtxModelObject}. In case of a remotely
+	 * managed context model object, the requestor on whose behalf to update
+	 * the context model object is implicitly set to the local CSS. If the
+	 * local CSS is not allowed to update the context model, a 
+	 * {@link CtxAccessControlException} is thrown; otherwise the method
+	 * returns the updated context model object. 
 	 * 
-	 * @param identifier
+	 * @param ctxModelObject
+	 *             the {@link CtxModelObject} to update.
+	 * @return the updated {@link CtxModelObject}.
+	 * @throws CtxAccessControlException
+	 *             if the local CSS is not allowed to update the specified
+	 *             context model object.
 	 * @throws CtxException 
+	 *             if there is a problem performing the update operation.
+	 * @throws NullPointerException
+	 *             if the specified ctxModelObject is <code>null</code>.
 	 */
-	public Future<CtxModelObject> update(CtxModelObject identifier) throws CtxException;
+	public Future<CtxModelObject> update(CtxModelObject ctxModelObject) throws CtxException;
 
 	/**
 	 * Updates the {@link CtxAttribute} identified by the specified {@link CtxAttributeIdentifier}
