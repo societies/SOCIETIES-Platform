@@ -282,6 +282,9 @@ public class CommManagerHelper {
 
             Object bean = s.read(c, element.asXML());
 
+            if (LOG.isTraceEnabled())
+                LOG.trace("dispatchIQResult(): " + c.getCanonicalName() + "\n" + element.asXML());
+
             callback.receiveResult(TinderUtils.stanzaFromPacket(iq), bean);
         } catch (UnavailableException e) {
             LOG.error("Unable to find package for namespace", e);
