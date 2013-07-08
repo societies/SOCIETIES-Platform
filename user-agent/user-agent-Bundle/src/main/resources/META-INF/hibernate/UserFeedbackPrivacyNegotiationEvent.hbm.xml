@@ -6,9 +6,7 @@
 <hibernate-mapping>
     <class name="org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent"
            table="UserFeedbackPrivacyNegotiationEvent">
-        <!--<meta attribute="class-description">
-            This class contains the employee detail.
-        </meta>-->
+
         <id name="requestId" type="string" column="requestId"/>
 
         <property name="method" column="method" type="org.societies.api.schema.useragent.feedback.FeedbackMethodType"/>
@@ -16,12 +14,13 @@
         <property name="requestDate" column="requestDate" type="java.util.Date"/>
         <property name="type" column="type" type="int"/>
 
-        <property name="responsePolicy" column="responsePolicy"
-                  type="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy"/>
+        <one-to-one name="responsePolicy"
+                    class="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy"
+                    cascade="save-update"/>
 
-        <property name="negotiationDetails"
-                  column="negotiationDetails"
-                  type="org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean"/>
+        <one-to-one name="negotiationDetails"
+                    class="org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean"
+                    cascade="all"/>
 
     </class>
 </hibernate-mapping>

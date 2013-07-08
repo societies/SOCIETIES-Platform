@@ -11,7 +11,9 @@
             <generator class="uuid"/>
         </id>
 
-        <property name="requestor" column="method" type="org.societies.api.schema.identity.RequestorBean"/>
+        <one-to-one name="requestor"
+                    class="org.societies.api.schema.identity.RequestorBean"
+                    cascade="all"/>
 
     </class>
 </hibernate-mapping>

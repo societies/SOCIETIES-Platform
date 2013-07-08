@@ -6,9 +6,7 @@
 <hibernate-mapping>
     <class name="org.societies.api.schema.identity.RequestorBean"
            table="IdentityRequestorBean">
-        <!--<meta attribute="class-description">
-            This class contains the employee detail.
-        </meta>-->
+
         <id name="requestorId" type="string" column="requestorId">
             <generator class="uuid"/>
         </id>
