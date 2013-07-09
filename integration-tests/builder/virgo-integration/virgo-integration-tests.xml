@@ -56,7 +56,7 @@
 		<module>../../BIT/security-test-suite/policy-negotiate-consumer</module>
 		<module>../../BIT/context-mgmt-test-suite/comm-ctx-estimation#1108</module>
 		<module>../../BIT/context-mgmt-test-suite/communication-ctx-frwk#1064</module>
-		<module>../../BIT/context-mgmt-test-suite/ctx-3pBroker#1337</module>
+		<module>../../BIT/context-mgmt-test-suite/3p-ctx-broker#1858</module>
 		<module>../../BIT/context-mgmt-test-suite/ctx-eventing</module>
 		<module>../../BIT/context-mgmt-test-suite/ctx-identity#1083</module>
 		<module>../../BIT/context-mgmt-test-suite/ctx-src-registration#1028</module>

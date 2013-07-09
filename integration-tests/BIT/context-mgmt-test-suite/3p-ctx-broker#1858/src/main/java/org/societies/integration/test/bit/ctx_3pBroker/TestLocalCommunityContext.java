@@ -22,22 +22,16 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.societies.integration.test.bit.ctx_3pBroker;
 
-
+import static org.junit.Assert.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
-
-import junit.framework.Assert;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import org.junit.After;
 import org.junit.Before;
@@ -51,16 +45,12 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.context.model.CtxAttributeValueType;
-import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
-import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
@@ -70,40 +60,31 @@ import org.societies.api.context.broker.ICtxBroker;
 import org.societies.integration.test.userfeedback.UserFeedbackMockResult;
 import org.societies.integration.test.userfeedback.UserFeedbackType;
 
-
 /**
  * 
  *
  * @author nikosk
  *
  */
-public class Tester {
+public class TestLocalCommunityContext {
 
 	private ICtxBroker externalCtxBroker;
 	private ICommManager commMgr;
 	public ICisManager cisManager;
 
-	private static Logger LOG = LoggerFactory.getLogger(Tester.class);
+	private static Logger LOG = LoggerFactory.getLogger(TestLocalCommunityContext.class);
 
 	private INetworkNode cssNodeId;
 	private IIdentity cssOwnerId;
 
 	private RequestorService requestorService = null;
-	private IIdentity userIdentity = null;
 	private IIdentity serviceIdentity = null;
 
 	private IIdentity cisIdentity = null;
 
 	private ServiceResourceIdentifier myServiceID;
 
-
 	CtxEntityIdentifier cssOwnerEntityId ;
-	CtxEntity deviceEntity = null;
-
-
-	public Tester(){
-
-	}
 
 	@Before
 	public void setUp(){
@@ -113,29 +94,14 @@ public class Tester {
 
 		Test1858.getUserFeedbackMocker().setEnabled(true);
 		Test1858.getUserFeedbackMocker().addReply(UserFeedbackType.ACKNACK, new UserFeedbackMockResult("Allow"));
-
 	}
 
 	@After
-	public void tearDown(){
-
-
-		if(this.deviceEntity != null) {
-
-			try {
-				this.externalCtxBroker.remove(this.requestorService, this.deviceEntity.getId());
-
-
-			} catch (CtxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+	public void tearDown() throws Exception {
 
 		if (this.cisIdentity !=null){
 			this.cisManager.deleteCis(this.cisIdentity.getBareJid());
 		}
-
 	}
 
 
@@ -145,7 +111,6 @@ public class Tester {
 		this.externalCtxBroker = Test1858.getCtxBroker();
 		this.commMgr = Test1858.getCommManager();
 		this.cisManager = Test1858.getCisManager();
-
 
 		LOG.info("*** " + this.getClass() + " instantiated");
 
@@ -173,12 +138,8 @@ public class Tester {
 
 		LOG.info("*** requestor service = " + this.requestorService);
 
-		LOG.info("*** Starting examples...");
-		// TODO createRemoteEntity();
-		this.retrieveIndividualEntity();
-
-		this.createEntityUpdateAttribute();
-
+		LOG.info("*** Starting test...");
+		
 		//create a community entity/attributes
 		this.cisIdentity = this.createCIS();
 
@@ -186,9 +147,7 @@ public class Tester {
 		lookupCommunityCreateHistory();
 
 		retrieveAttributeCommInf();
-
 	}
-
 
 	/*
 	 * this test will retrieve a community attribute that triggers inference
@@ -228,11 +187,8 @@ public class Tester {
 			LOG.info(" retrieved movies: "+attrMoviesRetrieved.getComplexValue().getPairs());
 			LOG.info(" retrieved movies Freshness should NOT be the same: "+attrMoviesRetrieved.getQuality().getFreshness()+" "+moviesAttrUpdated.getQuality().getFreshness());
 			LOG.info(" retrieved movies Freshness should NOT be the same (last updated): "+attrMoviesRetrieved.getQuality().getLastUpdated()+" "+moviesAttrUpdated.getQuality().getLastUpdated());
-			Assert.assertNotSame(attrMoviesRetrieved.getQuality().getLastUpdated(), moviesAttrUpdated.getQuality().getLastUpdated());
+			assertNotSame(attrMoviesRetrieved.getQuality().getLastUpdated(), moviesAttrUpdated.getQuality().getLastUpdated());
 			
-			
-
-
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -243,12 +199,7 @@ public class Tester {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-
-
-
 	}
-
 
 	private void lookupCommunityCreateHistory(){
 
@@ -326,148 +277,7 @@ public class Tester {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-
 	}
-
-
-
-	private void createEntityUpdateAttribute(){
-		LOG.info("*** updateOperatorAttributes : updates an existing  Location attribute");
-
-
-		try {
-			this.deviceEntity = this.externalCtxBroker.createEntity(this.requestorService,   this.cssOwnerId, CtxEntityTypes.DEVICE).get();
-			List<CtxIdentifier> listAttrIds =  this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get(); 
-
-			if(listAttrIds.size() == 0){
-				//create location attribute
-				LOG.info("location attribute doesn't exist ... creating");
-				this.externalCtxBroker.createAttribute(this.requestorService, this.deviceEntity.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC).get(); 
-			}
-
-			List<CtxIdentifier> listAttrIds2 =  this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get(); 
-			LOG.info("location attribute identifiers "+listAttrIds2);
-
-			CtxAttributeIdentifier locationAttributeId = null;
-
-			//the test will run correct for only one location attribute
-			if(listAttrIds2.size() > 0){
-				locationAttributeId = (CtxAttributeIdentifier) listAttrIds2.get(0);  
-				CtxAttribute locationAttributeRetrieved = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, locationAttributeId).get();
-				LOG.info("locationAttributeRetrieved  :" + locationAttributeRetrieved.getId());
-				String locationSymbolicValue  = locationAttributeRetrieved.getStringValue();
-				LOG.info("locationAttributeRetrieved value (should be null) :" + locationSymbolicValue);
-
-				locationAttributeRetrieved.setStringValue("ATHENS");
-				LOG.info("value set...."+locationAttributeRetrieved.getStringValue()+" trying to update location attribute :" +locationAttributeRetrieved.getId());
-				this.externalCtxBroker.update(this.requestorService, locationAttributeRetrieved );				
-				LOG.info("update successfull");
-
-				LOG.info("retrieve location attribute based on existing identifier:"+ locationAttributeId);
-				CtxAttribute locationAttributeWithValue = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, locationAttributeId).get();
-				LOG.info("locationAttributeWithValue value :" + locationAttributeWithValue.getStringValue());
-				assertEquals("ATHENS", locationAttributeWithValue.getStringValue());
-
-			}	
-
-			LOG.info("retrieve location attribute based on lookup ************* ");
-			List<CtxIdentifier> listAttrIds3 =  this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get(); 
-			LOG.info("retrieve location attribute based on lookup ids"+listAttrIds3);
-			if(listAttrIds3.size() > 0){
-				CtxAttributeIdentifier locationAttributeId3 = (CtxAttributeIdentifier) listAttrIds3.get(0); 
-				CtxAttribute locationAttributeRetrieved3 = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, locationAttributeId3).get();
-				LOG.info("locationAttributeRetrieved  :" + locationAttributeRetrieved3.getId());
-				String locationSymbolicValue  = locationAttributeRetrieved3.getStringValue();
-				LOG.info("locationAttributeRetrieved value :" + locationSymbolicValue);
-				assertEquals("ATHENS", locationSymbolicValue);
-			}
-
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
-	}
-
-
-
-	private CtxAttribute createOperatorAttributeBirthday(){
-
-		LOG.info("createOperatorAttributeBirthday");
-		CtxAttribute ctxAttrBirthday = null;
-
-		try {
-			//			CtxEntityIdentifier cssOwnerEntityId = 
-			//					this.externalCtxBroker.retrieveIndividualEntityId(this.requestorService, this.cssOwnerId).get();
-			//			LOG.info("createOperatorAttributeBirthday:  Retrieved CSS owner context entity id " + cssOwnerEntityId);
-
-			LOG.info("createOperatorAttributeBirthday: lookup for birthday attribute ");
-			List<CtxIdentifier> listAttrBDays =  this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.BIRTHDAY).get(); 
-
-			if(listAttrBDays.size() == 0 ){
-				LOG.info("createOperatorAttributeBirthday: create attribute birthday ");
-				ctxAttrBirthday = this.externalCtxBroker.createAttribute(this.requestorService, cssOwnerEntityId, CtxAttributeTypes.BIRTHDAY).get(); 
-			} else ctxAttrBirthday =  (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, listAttrBDays.get(0)).get();
-
-			LOG.info("createOperatorAttributeBirthday: set value of attribute birthday and update");
-			ctxAttrBirthday.setStringValue("today"); 
-			ctxAttrBirthday.setValueType(CtxAttributeValueType.STRING);
-
-			this.externalCtxBroker.update(this.requestorService, ctxAttrBirthday).get();
-
-			LOG.info("createOperatorAttributeBirthday:  lookup for birthday attribute 2 (after creation-update)");
-			List<CtxIdentifier> listAttrBDays2 =  this.externalCtxBroker.lookup(this.requestorService, this.cssOwnerId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.BIRTHDAY).get(); 
-			LOG.info("should not be zero listAttrBDays :" + listAttrBDays2); 
-
-			assertNotNull(listAttrBDays2);
-
-			CtxAttribute ctxAttrBirthdayRetrieved1 = null;
-
-			LOG.info("createOperatorAttributeBirthday: retrieve birthday attribute from db ");
-
-			//this one works
-			ctxAttrBirthdayRetrieved1 = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService, listAttrBDays2.get(0)).get();
-
-			LOG.info("createOperatorAttributeBirthday: withoutLookup ctxAttrBirthdayRetrieved:" + ctxAttrBirthdayRetrieved1.getId());
-
-			String ctxAttrBirthdayRetrievedValue  = ctxAttrBirthdayRetrieved1.getStringValue();
-			LOG.info("createOperatorAttributeBirthday : withoutLookup ctxAttrBirthdayRetrieved value :" + ctxAttrBirthdayRetrievedValue);
-			assertEquals("today",ctxAttrBirthdayRetrievedValue);
-
-		} catch (Exception e) {
-
-			LOG.error("3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
-		}	
-
-		return ctxAttrBirthday;
-	}
-
-
-	private void retrieveIndividualEntity() {
-
-		LOG.info("*** retrieveIndividualEntityId");
-		try {
-			CtxEntityIdentifier cssOwnerEntityId = 
-					this.externalCtxBroker.retrieveIndividualEntityId(this.requestorService, this.cssOwnerId).get();
-			LOG.info("*** retrieveIndividualEntityId: Retrieved CSS owner context entity id " + cssOwnerEntityId);
-			IndividualCtxEntity individualEntity = (IndividualCtxEntity) this.externalCtxBroker.retrieve(this.requestorService, cssOwnerEntityId).get();
-			LOG.info("*** retrieveIndividualEntityId: Retrieved CSS owner context entity id " + cssOwnerEntityId);
-			assertNotNull(individualEntity);
-			assertNotNull(cssOwnerEntityId);
-
-		} catch (Exception e) {
-			LOG.error("3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
-		}
-	}
-
 
 	protected IIdentity createCIS() {
 
@@ -495,5 +305,4 @@ public class Tester {
 
 		return cisID;
 	}
-
 }

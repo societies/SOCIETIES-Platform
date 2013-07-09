@@ -24,12 +24,11 @@
  */
 package org.societies.integration.test.bit.ctx_3pBroker;
 
-
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.broker.ICtxBroker;
 import org.societies.integration.test.IntegrationTestCase;
-import org.societies.integration.test.bit.ctx_3pBroker.Tester;
+import org.societies.integration.test.bit.ctx_3pBroker.TestLocalUserContext;
 
 /**
  * 
@@ -39,22 +38,34 @@ import org.societies.integration.test.bit.ctx_3pBroker.Tester;
  */
 public class Test1858 extends IntegrationTestCase {
 
-	
+	private static org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker;
 	public static ICtxBroker ctxBroker;
 	public static ICommManager commManager;
-	public static ICisManager cisManager;
+	public static ICisManager cisManager;	
 	
-	
-	public Test1858(){
-		super(1337, new Class[]{Tester.class});
+	public Test1858() {
 		
+		super(1858, new Class[] { TestLocalUserContext.class, TestLocalCommunityContext.class });
 	}
 	
+	public static org.societies.api.internal.context.broker.ICtxBroker getInternalCtxBroker() {
 
+		return internalCtxBroker;
+	}
+
+	/**
+	 * @param internalCtxBroker the internal ctxBroker to set
+	 */
+	public void setInternalCtxBroker(org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker) {
+
+		Test1858.internalCtxBroker = internalCtxBroker;
+	}
+	
 	/**
 	 * @return the ctxBroker
 	 */
 	public static ICtxBroker getCtxBroker() {
+		
 		return ctxBroker;
 	}
 
@@ -62,14 +73,15 @@ public class Test1858 extends IntegrationTestCase {
 	 * @param ctxBroker the ctxBroker to set
 	 */
 	public  void setCtxBroker(ICtxBroker ctxBroker) {
+		
 		Test1858.ctxBroker = ctxBroker;
-
 	}
 	
 	/**
 	 * @return the commMgr
 	 */
 	public static ICommManager  getCommManager() {
+		
 		return commManager ;
 	}
 
@@ -77,10 +89,12 @@ public class Test1858 extends IntegrationTestCase {
 	 * @param commMgr the commMgr to set
 	 */
 	public  void setCommManager(ICommManager commMgr) {
+		
 		Test1858.commManager = commMgr;
 	}		
 
 	public static ICisManager getCisManager() {
+		
 		return cisManager;
 	}
 
@@ -88,5 +102,4 @@ public class Test1858 extends IntegrationTestCase {
 		
 		Test1858.cisManager = cisManager;
 	}
-
 }

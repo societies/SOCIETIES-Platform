@@ -32,12 +32,13 @@ import org.societies.api.context.broker.CtxAccessControlException;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.context.broker.api.security.CtxAccessControllerException;
 import org.societies.context.broker.api.security.CtxPermission;
 import org.societies.context.broker.api.security.ICtxAccessController;
@@ -64,7 +65,8 @@ public class CtxAccessController implements ICtxAccessController {
 
 	CtxAccessController() {
 		
-		LOG.info(this.getClass() + " instantiated");
+		if (LOG.isInfoEnabled())
+			LOG.info(this.getClass() + " instantiated");
 	}
 	
 	/*
@@ -83,7 +85,8 @@ public class CtxAccessController implements ICtxAccessController {
 			throw new NullPointerException("perm can't be null");
 		
 		if (LOG.isDebugEnabled())
-			LOG.debug("Checking permission " + perm);
+			LOG.debug("checkPermission: requestor=" + requestor + ", target="
+					+ target + ", perm=" + perm);
 		
 		if (perm.getActions().indexOf(CtxPermission.READ) != -1)
 			this.doCheckPermission(requestor, target, perm.getResource(), ActionConstants.READ);
@@ -97,21 +100,27 @@ public class CtxAccessController implements ICtxAccessController {
 	
 	private void doCheckPermission(final Requestor requestor, 
 			final IIdentity target, final CtxIdentifier ctxId, 
-			final ActionConstants action) throws CtxAccessControlException,
+			final ActionConstants actionConst) throws CtxAccessControlException,
 			CtxAccessControllerException {
 		
 		try {
 			if (LOG.isDebugEnabled())
-				LOG.debug("Checking " + action + " permission: requestor=" + requestor 
-						+ ",target=" + target + ",ctxId="	+ ctxId);
+				LOG.debug("doCheckPermission: requestor=" + requestor + ", target="
+						+ target + ", ctxId=" + ctxId + ", actionConst=" + actionConst);
+			final Action action = new Action();
+			action.setActionConstant(actionConst);
 			final List<ResponseItem> responses = this.privacyDataMgr.checkPermission(
-					requestor, ctxId, new Action(action));
-			if (LOG.isDebugEnabled())
-				LOG.debug("ResponseItem is " + responses);
-			// TODO: manage all checkPermission responses, and not just the first one
-			if (responses == null || responses.size() <= 0 || !Decision.PERMIT.equals(responses.get(0).getDecision()))
-				throw new CtxAccessControlException(action + " access denied for requestor "
-						+ requestor + " on target " + target); 
+					RequestorUtils.toRequestorBean(requestor), ctxId, action);
+			boolean accessDenied = true;
+			for (final ResponseItem response : responses) {
+				if (LOG.isDebugEnabled())
+					LOG.debug("response: decision=" + response.getDecision());
+				if (Decision.PERMIT == response.getDecision())
+					accessDenied = false;
+			}
+			if (accessDenied)
+				throw new CtxAccessControlException(action + " access to '"
+						+ ctxId + "' denied for requestor '" + requestor + "'"); 
 		} catch (PrivacyException pe) {
 			throw new CtxAccessControllerException("Failed to perform access control: "
 					+ "PrivacyDataManager checkPermission failed: "

@@ -2,8 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>bit.ctx_3p_broker.1858</artifactId>
-	<name>3p CtxBroker Integration Test</name>
+	<groupId>org.societies.integration.test</groupId>
+	<artifactId>bit.3p_ctx_broker.1858</artifactId>
+	<name>#1858 3P Context Broker Integration Test</name>
 	<packaging>bundle</packaging>
 	<version>${release.version}</version>
 
@@ -45,20 +46,10 @@
 			<artifactId>societies-api-internal</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.societies.api.external</groupId>
 			<artifactId>societies-api</artifactId>
 			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.context</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.beans</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -136,5 +127,4 @@
 		</plugins>
 	</build>
 	
-	<groupId>org.societies</groupId>
 </project>

@@ -21,12 +21,6 @@
        bundle. We've kept the osgi definitions in a separate 
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
-
-  <!-- >bean id="TestCase749" class="org.societies.integration.test.bit.user_intent_learning.TestCase749" init-method="startTest">
-		<property name="mathServiceConsumer" ref ="mathServiceConsumer" />
-  	</bean -->
-
-<!-- >context:component-scan base-package="org.societies.integration.test.bit.user_intent_learning"></context:component-scan-->
 	
 	<!-- Import common test case configuration: enable annotation config, create userfeedback mocker bean, autowire userfeedbackMocker in the IntegrationTestCase class -->
 <import resource="classpath*:test-bundle-context.xml" />
@@ -46,13 +40,11 @@
     </property>
 </bean>
 	
-	
-	<bean id="TestCase1337" class="org.societies.integration.test.bit.ctx_3pBroker.Test1858" init-method="run">
+	<bean id="test1858" class="org.societies.integration.test.bit.ctx_3pBroker.Test1858" init-method="run">
+	    <property name="internalCtxBroker" ref ="internalCtxBroker" />
 		<property name="ctxBroker" ref ="ctxBroker" />
 		<property name="commManager" ref="commManager" />
 		<property name="cisManager" ref="cisManager" />
-		 
   	</bean>
-  	
   	
 </beans>
