@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,15 +138,22 @@ public class CAUIPrediction implements ICAUIPrediction{
 		LOG.debug("CAUIPrediction initialised");
 		LOG.debug("registerForNewUiModelEvent");
 
-		//set caui Active model if exists
+		//set caui Active model if exists in ctx DB
 		retrieveCAUIModelDB();
-		registerForNewUserCommModelEvent();
-		
+
+		//set caui Active model if exists in ctx DB
+		retrieveCACIModelDB();
+
+		// creates (if don't exist) caui and caci(local) attributes 
+		// registers for modifications events of both 
+		registerForCAUI_CACI_ModelEvent();
+
+
 		this.caciPredictor = new CACIPrediction(this.ctxBroker, this.caciTaskManager, this.commsMgr);
-	
+
 	}
 
-	
+
 	public CAUIPrediction(){
 
 	}
@@ -538,7 +546,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	}
 
-	private void registerForNewUserCommModelEvent(){
+	private void registerForCAUI_CACI_ModelEvent(){
 
 		if (this.ctxBroker == null) {
 			LOG.error("Could not register context event listener: ctxBroker is not available");
@@ -547,6 +555,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 
 		CtxAttributeIdentifier uiModelAttributeId = null;
+		CtxAttributeIdentifier caciModelAttributeId = null;
+
 		IndividualCtxEntity operator;
 		try {
 			//operator = this.ctxBroker.retrieveCssOperator().get();
@@ -565,64 +575,42 @@ public class CAUIPrediction implements ICAUIPrediction{
 			if (ls.size()>0) {
 				uiModelAttributeId = (CtxAttributeIdentifier) ls.get(0);
 			} else {
-				CtxAttribute attr = this.ctxBroker.createAttribute(operator.getId(), CtxAttributeTypes.CAUI_MODEL).get();
+				CtxAttribute attr = this.ctxBroker.createAttribute(this.operatorEntId, CtxAttributeTypes.CAUI_MODEL).get();
 				uiModelAttributeId = attr.getId();
 			}
 
 			if (uiModelAttributeId != null){
-
-				if(uiModelAttributeId instanceof CtxAttributeIdentifier){
-					CtxAttribute uiModelAttr;
-
-					uiModelAttr = (CtxAttribute) ctxBroker.retrieve(uiModelAttributeId).get();
-
-					// this is used in case of reboot and model already exist in db
-					if(uiModelAttr.getBinaryValue() != null){
-						UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
-						setCAUIActiveModel(newUIModelData);	
-					}
-				}
-				this.ctxBroker.registerForChanges(new MyCtxUIModelChangeEventListener(),uiModelAttributeId);	
-
+				this.ctxBroker.registerForChanges(new MyCtxUIModelChangeEventListener(),this.operatorEntId, CtxAttributeTypes.CAUI_MODEL);	
+				LOG.debug("registration for context attribute updates of type CACI ");
 			}		
 
-			///register for caci model
-			/*
-			List<CtxIdentifier> lsCaci = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
-			CtxAttributeIdentifier caciModelAttributeId = null;
+		} catch (Exception e) {
+			LOG.error("Exception while registering for CAUI model context updates " +e.getLocalizedMessage()) ; 
+			e.printStackTrace();
+		}
 
+
+		try {
+			List<CtxIdentifier> lsCaci = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
 			if (lsCaci.size()>0) {
 				caciModelAttributeId = (CtxAttributeIdentifier) lsCaci.get(0);
-		
 
-			
 			} else {
-				CtxAttribute attr = this.ctxBroker.createAttribute(operator.getId(), CtxAttributeTypes.CACI_MODEL).get();
+				CtxAttribute attr = this.ctxBroker.createAttribute(this.operatorEntId, CtxAttributeTypes.CACI_MODEL).get();
 				caciModelAttributeId = attr.getId();
 			}
-*/
-			this.ctxBroker.registerForChanges(new MyCtxCACIIModelChangeEventListener(), this.operatorEntId, CtxAttributeTypes.CACI_MODEL);
-			//LOG.info("registration for context attribute updates of type CAUI: "+uiModelAttributeId);
-		} catch (InterruptedException e) {
-			// 
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// 
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// 
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
 
-			e.printStackTrace();
-		} catch (IOException e) {
+			if (caciModelAttributeId != null){
+				this.ctxBroker.registerForChanges(new MyCtxCACIIModelChangeEventListener(), this.operatorEntId, CtxAttributeTypes.CACI_MODEL);
+				LOG.debug("registration for context attribute updates of type CACI ");	
+			}
 
+		} catch (Exception e) {
+			LOG.error("Exception while registering for CACI model context updates " +e.getLocalizedMessage()) ; 
 			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-
-			e.printStackTrace();
-		}			
+		}
 	}
+
 
 	public void setCAUIActiveModel(UserIntentModelData newUIModelData){
 
@@ -636,7 +624,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 
 
-	
+
 	public void setCACIActiveModel (UserIntentModelData newUIModelData){
 
 		if (newUIModelData != null){
@@ -644,7 +632,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 			LOG.info("caci model set - actions map: "+newUIModelData.getActionModel());
 		}
 	}
-	
+
 	private class MyCtxUIModelChangeEventListener implements CtxChangeEventListener {
 
 
@@ -819,32 +807,17 @@ public class CAUIPrediction implements ICAUIPrediction{
 					setCAUIActiveModel(newUIModelData);
 				}
 			}
-
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
+			LOG.error("Exception when retrieving CtxAttribute of type CAUI model from local Context DB "+e.getLocalizedMessage());
 			e.printStackTrace();
 		}
-
-
-
 	}
+
 
 	private void retrieveCACIModelDB(){
 
 		try {
-			List<CtxIdentifier>	listModels = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, "CAUI_CACI_MODEL").get();
+			List<CtxIdentifier>	listModels = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
 			if(!listModels.isEmpty()){
 				CtxAttribute modelAttr = (CtxAttribute) this.ctxBroker.retrieve(listModels.get(0)).get();
 				if(modelAttr.getBinaryValue() != null){
@@ -852,28 +825,11 @@ public class CAUIPrediction implements ICAUIPrediction{
 					setCACIActiveModel(newUIModelData);	
 				}				
 			}
-
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
+			LOG.error("Exception when retrieving CtxAttribute of type CACI model from local Context DB "+e.getLocalizedMessage());
 			e.printStackTrace();
 		}
-
-
-
 	}
-
 
 
 	private CtxAttribute retrieveOperatorsCtx(String type){
@@ -1102,7 +1058,108 @@ public class CAUIPrediction implements ICAUIPrediction{
 		this.caciDiscovery = caciDiscovery;
 	}
 
-	//Services registration
+
+	@Override
+	public CtxAttribute retrieveCACIModel(IIdentity cisID) {
+
+		CtxAttribute caciAttr = null;
+		  
+		CtxEntityIdentifier entID = null;
+
+		try {
+			//TODO remove this option
+			if( cisID == null ){
+			
+				List<CtxEntityIdentifier> commEntIDList = retrieveBelongingCIS();
+				entID = commEntIDList.get(0);
+			
+			} else {
+				
+				entID = this.ctxBroker.retrieveIndividualEntityId(null, cisID).get();
+			}
+
+			List<CtxIdentifier> caciModelList = this.ctxBroker.lookup(entID, CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
+
+			if(!caciModelList.isEmpty()){
+				caciAttr = (CtxAttribute) this.ctxBroker.retrieve(caciModelList.get(0)).get();
+
+				if(caciAttr.getBinaryValue() != null){
+					//currentCaciModelAttr = caciAttr;
+
+					UserIntentModelData newCACIModelData = (UserIntentModelData) SerialisationHelper.deserialise(caciAttr.getBinaryValue(), this.getClass().getClassLoader());
+					LOG.debug("retrieveCACIModel commEntIDList  4  caciAttr "+newCACIModelData );
+					storeCaciModelDB(newCACIModelData);
+					//setCACIActiveModel(newCACIModelData);	
+				}
+			}
+		} catch (Exception e) {
+			LOG.error("CtxAttribute of type "+CtxAttributeTypes.CACI_MODEL+ "was not updated with caci model "+e.getLocalizedMessage());
+			e.printStackTrace();
+		} 
+		return caciAttr;
+	}
+
+
+	public void storeCaciModelDB(UserIntentModelData modelData){
+
+		final INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
+		final String cssOwnerStr = cssNodeId.getBareJid();
+		CtxAttribute attr = null;
+
+		try {
+			IIdentity cssOwnerId = this.commsMgr.getIdManager().fromJid(cssOwnerStr);
+			CtxEntityIdentifier indiEntId = this.ctxBroker.retrieveIndividualEntityId(null, cssOwnerId).get();
+
+			List<CtxIdentifier> lsCaci = this.ctxBroker.lookup(indiEntId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
+			CtxAttributeIdentifier caciModelAttributeId = null;
+
+			if (lsCaci.size()>0) {
+				caciModelAttributeId = (CtxAttributeIdentifier) lsCaci.get(0);
+				attr = (CtxAttribute) this.ctxBroker.retrieve(caciModelAttributeId).get();
+				byte[] binaryModel = SerialisationHelper.serialise(modelData);
+				LOG.debug("skataaaaaa updating caci model  " +attr.getId() +" model: "+modelData );
+
+				this.ctxBroker.updateAttribute(attr.getId(), binaryModel).get();
+			}
+
+		} catch (Exception e) {
+			LOG.error("CtxAttribute of type "+CtxAttributeTypes.CACI_MODEL+ "was not updated with caci model "+e.getLocalizedMessage());
+			e.printStackTrace();
+		} 
+	}
+
+
+	public List<CtxEntityIdentifier> retrieveBelongingCIS(){
+
+		List<CtxEntityIdentifier> commEntIDList = new ArrayList<CtxEntityIdentifier>();
+
+		List<CtxIdentifier> listISMemberOf = new ArrayList<CtxIdentifier>();
+		try {
+			listISMemberOf = this.ctxBroker.lookup(CtxModelType.ASSOCIATION, CtxAssociationTypes.IS_MEMBER_OF).get();
+			LOG.debug(".............listISMemberOf................." +listISMemberOf);
+
+			if(!listISMemberOf.isEmpty() ){
+				CtxAssociation assoc = (CtxAssociation) this.ctxBroker.retrieve(listISMemberOf.get(0)).get();
+				Set<CtxEntityIdentifier> entIDSet = assoc.getChildEntities();
+
+				for(CtxEntityIdentifier entId : entIDSet){
+					IIdentity cisId = this.commsMgr.getIdManager().fromJid(entId.getOwnerId());
+					LOG.debug("cis id : "+cisId );
+					CtxEntityIdentifier commId = this.ctxBroker.retrieveCommunityEntityId(cisId).get();
+					commEntIDList.add(commId);
+				}
+			}
+
+		} catch (Exception e) {
+			LOG.error("Unable to retrieve CISids that css belongs to " +e.getLocalizedMessage());
+		} 
+
+		return commEntIDList;
+	}
+
+
+
+
 
 
 }

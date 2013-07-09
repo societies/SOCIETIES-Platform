@@ -245,7 +245,7 @@ public class CAUIController extends BasePageController {
 	}
 
 
-	public void refreshModels(){
+	public void refreshUserModels(){
 
 		this.userActionsList = this.getActiveModel(CtxAttributeTypes.CAUI_MODEL);
 		this.communityActionsList = this.getActiveModel(CtxAttributeTypes.CACI_MODEL);
@@ -254,7 +254,15 @@ public class CAUIController extends BasePageController {
 		addGlobalMessage("Prediction model and log tables REFRESHED", "Retrieving model from DB", FacesMessage.SEVERITY_INFO);
 
 	}
+	
+	public void refreshCommunityModels(){
 
+		LOG.debug("this.cauiPrediction.retrieveCACIModel(null)");
+		
+		this.cauiPrediction.retrieveCACIModel(null);
+		addGlobalMessage("Retriece community model from remote cis", "Retrieving model from DB", FacesMessage.SEVERITY_INFO);
+
+	}
 
 	public void learnCommunityModel(){
 

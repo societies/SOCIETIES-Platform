@@ -132,6 +132,14 @@ public interface ICAUIPrediction {
 	
 	public Boolean isCommunityPredictionEnabled();
 	
+	/**
+	 * Retrieves community intent model from the community of the specified Identifier 
+	 * 
+	 * @param cisID
+	 * 
+	 * @return community model stored in CtxAttribute
+	 */
+	public CtxAttribute retrieveCACIModel(IIdentity cisID);
 	
 		
 }
