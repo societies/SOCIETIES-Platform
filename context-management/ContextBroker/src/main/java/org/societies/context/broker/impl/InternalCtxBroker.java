@@ -717,48 +717,6 @@ public class InternalCtxBroker implements ICtxBroker {
 	}
 	// ********************** HISTORY CODE *******************************end of hoc code	
 
-	/*
-	 * Inference of a ctxAttribute will be triggered in case:
-	 * a) retrieved value is null
-	 * b) qoc of the retrieved value is not acceptable
-	 */	
-	protected CtxAttribute initiateInference(CtxAttribute ctxAttr){
-
-		CtxAttribute inferedCtxAttr  = null;
-
-		Boolean inferValue = false;
-		Boolean isInferable = false;
-
-		//CtxAttribute ctxAttr = (CtxAttribute) modelObjReturn;
-
-		if(this.userCtxInferenceMgr.getInferrableTypes().contains(ctxAttr.getType()))  isInferable = true;
-
-		if( !CtxBrokerUtils.hasValue(ctxAttr) && isInferable) {
-			//LOG.info("has value "+ CtxBrokerUtils.hasValue(ctxAttr));
-			inferValue = true;
-		}
-
-		if (CtxBrokerUtils.hasValue(ctxAttr) && isInferable) {
-			if (this.userCtxInferenceMgr.isPoorQuality(ctxAttr.getQuality())) 
-				inferValue = true;
-		}
-		//	LOG.info("inferValue: "+ inferValue);
-
-		//TO DO remove following line when integration is completed
-		inferValue = false;
-		if(inferValue){
-			//		LOG.info("before inference infered CtxAttr: "+ ctxAttr.getStringValue());	
-			// TO DO multiple inference methods will be added
-			inferedCtxAttr = userCtxInferenceMgr.predictContext(ctxAttr.getId(), new Date());	
-			//		LOG.info("after inference inferedCtxAttr: "+ inferedCtxAttr.getId());
-			//		LOG.info("after inference inferedCtxAttr: "+ inferedCtxAttr.getStringValue());
-			//modelObjReturn = (CtxModelObject) inferedCtxAttr;
-		}
-
-		return inferedCtxAttr;
-	}
-
-
 	@Override
 	@Async
 	public Future<CtxAttribute> updateAttribute(
