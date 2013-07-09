@@ -133,32 +133,32 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			if (null != permissions && permissions.size() > 0) {
 				return permissions;
 			}
-
-			// -- Permission not available
-			permissions = null;
-			// - Access control for CSS data: ask to PrivacyPreferenceManager
-			if (isCssAccessControl(dataId)) {
-				permissions = checkPermissionCssData(requestor, dataId, actions);
-			}
-			// - Access control for CIS data: use the CIS privacy policy
-			else {
-				permissions = checkPermissionCisData(requestor, dataId, actions);
-			}
-
-			// - Still no permission available: deny access
-			if (null == permissions || permissions.size() <= 0) {
-				permissions = new ArrayList<ResponseItem>();
-				ResponseItem permission = ResponseItemUtils.create(Decision.DENY, requestItemNull);
-				permissions.add(permission);
-			}
-			// Store new permission retrieved from PrivacyPreferenceManager
-			privacyDataManagerInternal.updatePermissions(RequestorUtils.toRequestor(requestor, commManager.getIdManager()), permissions);
+		} catch (Exception e) {
+			LOG.warn("Error when retrieving stored decisions", e);
 		}
-		catch (InvalidFormatException e) {
-			LOG.error("[Error] with the requestor, return DENY", e);
+
+		// -- Permission not available
+		permissions = null;
+		// - Access control for CSS data: ask to PrivacyPreferenceManager
+		if (isCssAccessControl(dataId)) {
+			permissions = checkPermissionCssData(requestor, dataId, actions);
+		}
+		// - Access control for CIS data: use the CIS privacy policy
+		else {
+			permissions = checkPermissionCisData(requestor, dataId, actions);
+		}
+		
+		// -- Still no permission available: deny access
+		if (null == permissions || permissions.size() <= 0) {
 			permissions = new ArrayList<ResponseItem>();
 			ResponseItem permission = ResponseItemUtils.create(Decision.DENY, requestItemNull);
 			permissions.add(permission);
+		}
+		// Store new permission retrieved from PrivacyPreferenceManager
+		try {
+			privacyDataManagerInternal.updatePermissions(RequestorUtils.toRequestor(requestor, commManager.getIdManager()), permissions);
+		} catch (Exception e) {
+			LOG.warn("Error during decisions storage", e);
 		}
 		return permissions;
 	}
