@@ -55,6 +55,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.services.ServiceUtils;
+import org.societies.api.context.broker.CtxAccessControlException;
 import org.societies.api.context.broker.ICtxBroker;
 import org.societies.integration.test.userfeedback.UserFeedbackMockResult;
 import org.societies.integration.test.userfeedback.UserFeedbackType;
@@ -69,7 +70,7 @@ public class TestLocalUserContext {
 
 	private static Logger LOG = LoggerFactory.getLogger(TestLocalUserContext.class);
 	
-	private static final String SERVICE_ID_SUFFIX = "-requestor.societies.org";
+	private static final String SERVICE_ID_SUFFIX = ".societies.org";
 	private static final String SERVICE_SRI = "css://requestor.societies.org/HelloWorld";
 	
 	private static final String USER_BIRTHDAY = "today";
@@ -115,12 +116,12 @@ public class TestLocalUserContext {
 			LOG.info("*** setUp: userId=" + this.userId);
 		
 		this.allowedServiceId = this.commMgr.getIdManager().fromJid(
-				"ALLOWED-" + UUID.randomUUID().toString() + SERVICE_ID_SUFFIX);
+				"GoodGuy-" + UUID.randomUUID().toString() + SERVICE_ID_SUFFIX);
 		if (LOG.isInfoEnabled())
 			LOG.info("*** setUp: allowedServiceId=" + this.allowedServiceId);
 		
 		this.deniedServiceId = this.commMgr.getIdManager().fromJid(
-				"DENIED-" + UUID.randomUUID().toString() + SERVICE_ID_SUFFIX);
+				"BadGuy-" + UUID.randomUUID().toString() + SERVICE_ID_SUFFIX);
 		if (LOG.isInfoEnabled())
 			LOG.info("*** setUp: deniedServiceId=" + this.deniedServiceId);
 		
@@ -248,15 +249,33 @@ public class TestLocalUserContext {
 		assertEquals(this.userBirthdayCtxAttrId, userBirthdayCtxAttr.getId());
 		assertEquals(this.userBirthdayCtxAttrValue, userBirthdayCtxAttr.getStringValue());
 		
-		// Retrieve one more time to verify READ permission has been stored, i.e. no User Feedback.
+		// Retrieve one more time to verify granted READ permission has been stored, i.e. no User Feedback involved.
 		Test1858.getUserFeedbackMocker().removeAllReplies();
 		this.ctxBroker.retrieve(
 				this.allowedRequestorService, userBirthdayCtxAttrIds.get(0)).get();
 		
-		// Setup mock User Feedback to deny access *once*
-		//Test1858.getUserFeedbackMocker().addReply(
-		//		UserFeedbackType.CHECKBOXLIST, new UserFeedbackMockResult(1, ""));
-		// TODO this.ctxBroker.retrieve(this.deniedRequestorService, userBirthdayCtxAttrIds.get(0)).get();
+		// Setup mock User Feedback to deny READ access *once*
+		Test1858.getUserFeedbackMocker().addReply(
+				UserFeedbackType.CHECKBOXLIST, new UserFeedbackMockResult(1, "DENY"));
+		boolean caughtCtxAccessControlException = false;
+		try {
+			this.ctxBroker.retrieve(this.deniedRequestorService, 
+					userBirthdayCtxAttrIds.get(0)).get();
+		} catch (CtxAccessControlException cace) {
+			caughtCtxAccessControlException = true;
+		}
+		assertTrue(caughtCtxAccessControlException);
+		
+		// Retrieve one more time to verify denied READ permission has been stored, i.e. no User Feedback involved.
+		Test1858.getUserFeedbackMocker().removeAllReplies();
+		caughtCtxAccessControlException = false;
+		try {
+			this.ctxBroker.retrieve(this.deniedRequestorService,
+					userBirthdayCtxAttrIds.get(0)).get();
+		} catch (CtxAccessControlException cace) {
+			caughtCtxAccessControlException = true;
+		}
+		assertTrue(caughtCtxAccessControlException);
 		
 		LOG.info("*** testRetrieveUserAttribute: END");
 	}
