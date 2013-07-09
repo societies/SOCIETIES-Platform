@@ -106,7 +106,7 @@ public class CtxAccessController implements ICtxAccessController {
 		try {
 			if (LOG.isDebugEnabled())
 				LOG.debug("doCheckPermission: requestor=" + requestor + ", target="
-						+ target + ", ctxId=" + ctxId + ", actionConst=" + actionConst);
+						+ target + ", ctxId=" + ctxId + ", actionConst=" + actionConst.name());
 			final Action action = new Action();
 			action.setActionConstant(actionConst);
 			final List<ResponseItem> responses = this.privacyDataMgr.checkPermission(
@@ -119,8 +119,9 @@ public class CtxAccessController implements ICtxAccessController {
 					accessDenied = false;
 			}
 			if (accessDenied)
-				throw new CtxAccessControlException(action + " access to '"
-						+ ctxId + "' denied for requestor '" + requestor + "'"); 
+				throw new CtxAccessControlException("'" + actionConst.name()
+						+ "' access to '" + ctxId + "' denied for requestor '"
+						+ requestor + "'"); 
 		} catch (PrivacyException pe) {
 			throw new CtxAccessControllerException("Failed to perform access control: "
 					+ "PrivacyDataManager checkPermission failed: "
