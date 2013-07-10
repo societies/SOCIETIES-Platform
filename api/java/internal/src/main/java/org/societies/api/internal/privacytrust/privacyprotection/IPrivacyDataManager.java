@@ -27,6 +27,7 @@ package org.societies.api.internal.privacytrust.privacyprotection;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
@@ -116,4 +117,18 @@ public interface IPrivacyDataManager {
 	 * @throws PrivacyException if parameters are not correct (especially the data wrapper), or if the privacy layer is not ready
 	 */
 	public Future<DataWrapper> obfuscateData(RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException;
+	
+	/**
+	 * Protect a data following the user preferences by obfuscating it to a correct
+	 * obfuscation level. The data of the list will be grouped by type and obfuscated 
+	 * by group.
+	 * This is a duplication of {@link #obfuscateData(RequestorBean, DataWrapper)}
+	 * for utility purpose, specific to Context.
+	 *
+	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
+	 * @param ctxDataList List of context data, which may eventually contains several obfuscation group
+	 * @return A list of obfuscated data. Same size as the "ctxDataList" parameter, but potentially in a different order.
+	 * @throws PrivacyException if parameters are not correct, or if the privacy layer is not ready
+	 */
+	public Future<List<CtxModelObject>> obfuscateData(RequestorBean requestor, List<CtxModelObject> ctxDataList) throws PrivacyException;
 }

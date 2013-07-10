@@ -24,7 +24,6 @@
  */
 package org.societies.api.identity.util;
 
-import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.schema.identity.DataTypeDescription;
@@ -114,6 +113,6 @@ public class DataTypeDescriptionUtils {
 	}
 	
 	public static String computeFriendlyName(String dataTypeIdentifier) {
-		return WordUtils.capitalizeFully(dataTypeIdentifier, new char[]{'_'}).replaceAll("_", " ");
+		return dataTypeIdentifier.replaceAll("_", " ");
 	}
 }

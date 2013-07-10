@@ -20,9 +20,7 @@
 package org.societies.privacytrust.privacyprotection.test.datamanagement;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -33,7 +31,6 @@ import java.util.concurrent.Future;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -41,6 +38,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
@@ -49,13 +52,13 @@ import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.util.DataIdentifierFactory;
-import org.societies.api.identity.util.DataIdentifierUtils;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.DataWrapperFactory;
+import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.NameUtils;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Name;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Name;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfPreferenceDetailsBean;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
@@ -66,6 +69,7 @@ import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager;
 import org.societies.util.commonmock.MockIdentity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +85,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "PrivacyDataManagerInternalTest-context.xml" })
 public class PrivacyDataManagerTest {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerTest.class.getSimpleName());
+	private static final Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerTest.class.getSimpleName());
 
 	@Autowired
 	IPrivacyDataManager privacyDataManager;
@@ -348,12 +352,7 @@ public class PrivacyDataManagerTest {
 
 	/* --- OBFUSCATION --- */
 
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager#obfuscateData(org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper, double, org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.listener.IDataObfuscationListener)}.
-	 * @throws PrivacyException 
-	 */
 	@Test
-	@Ignore("PrivacyPreferenceManager not ready yet")
 	public void testObfuscateData() {
 		String testTitle = new String("testObfuscateData");
 		LOG.info("[TEST] "+testTitle);
@@ -377,9 +376,142 @@ public class PrivacyDataManagerTest {
 		}
 
 		// Verify
-		LOG.info("### Orginal name:\n"+wrapper.getData().toString());
-		LOG.info("### Obfuscated name:\n"+obfuscatedDataWrapper.getData().toString());
+		LOG.info("### Orginal name:\n"+NameUtils.toString((Name) wrapper.getData()));
+		LOG.info("### Obfuscated name:\n"+NameUtils.toString((Name) obfuscatedDataWrapper.getData()));
 		assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
+	}
+
+	@Test
+	public void testObfuscateCtxData() {
+		String testTitle = new String("testObfuscateCtxData");
+		LOG.info("[TEST] "+testTitle);
+		// -- Prepare data
+		// Values
+		String ownerId = "fooCss";
+		String firstnameStr = "Olivier";
+		String lastnameStr = "Maridat";
+		double latitude = 45.255;
+		double longitude = 2.45;
+		double accuracy = 100.5;
+		// Ids
+		DataIdentifier nameId;
+		DataIdentifier firstnameId = null;
+		DataIdentifier lastnameId = null;
+		DataIdentifier actionId = null;
+		DataIdentifier locationCoordinatesId = null;
+		// Data
+		List<CtxModelObject> ctxDataListName;
+		List<CtxModelObject> ctxDataListAction;
+		List<CtxModelObject> ctxDataListLocationCoordinates;
+		List<CtxModelObject> ctxDataListMix;
+		CtxAttribute firstname;
+		CtxAttribute lastname;
+		CtxAttribute action;
+		CtxAttribute locationCoordinates;
+		// Generate Ids
+		try {
+			nameId = DataIdentifierFactory.create(DataIdentifierScheme.CONTEXT, ownerId, CtxAttributeTypes.NAME);
+			firstnameId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+ownerId+"/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.NAME_FIRST+"/33");
+			lastnameId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+ownerId+"/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.NAME_LAST+"/38");
+			actionId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+ownerId+"/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.ACTION+"/42");
+			locationCoordinatesId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+ownerId+"/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.LOCATION_COORDINATES+"/76");
+		} catch (MalformedCtxIdentifierException e) {
+			fail("Faillure during data id creation from URI: "+e);
+		}
+		// Create list of CtxModelObject lists
+		ctxDataListName = new ArrayList<CtxModelObject>();
+		firstname = new CtxAttribute((CtxAttributeIdentifier) firstnameId);
+		firstname.setStringValue(firstnameStr);
+		firstname.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
+		firstname.setValueType(CtxAttributeValueType.STRING);
+		ctxDataListName.add(firstname);
+		lastname = new CtxAttribute((CtxAttributeIdentifier) lastnameId);
+		lastname.setStringValue(lastnameStr);
+		lastname.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
+		lastname.setValueType(CtxAttributeValueType.STRING);
+		ctxDataListName.add(lastname);
+
+		ctxDataListAction = new ArrayList<CtxModelObject>();
+		action = new CtxAttribute((CtxAttributeIdentifier) actionId);
+		action.setStringValue("Do this !");
+		action.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
+		action.setValueType(CtxAttributeValueType.STRING);
+		ctxDataListAction.add(action);
+
+		ctxDataListLocationCoordinates = new ArrayList<CtxModelObject>();
+		locationCoordinates = new CtxAttribute((CtxAttributeIdentifier) locationCoordinatesId);
+		locationCoordinates.setStringValue(latitude+","+longitude);
+		locationCoordinates.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
+		locationCoordinates.getQuality().setPrecision(accuracy);
+		action.setValueType(CtxAttributeValueType.STRING);
+		ctxDataListLocationCoordinates.add(locationCoordinates);
+		
+		ctxDataListMix = new ArrayList<CtxModelObject>();
+		ctxDataListMix.addAll(ctxDataListAction);
+		ctxDataListMix.addAll(ctxDataListLocationCoordinates);
+		ctxDataListMix.addAll(ctxDataListName);
+		
+		// Requestor
+		IIdentity requestorId = Mockito.mock(IIdentity.class);
+		Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
+		RequestorBean requestor = RequestorUtils.create(requestorId.getJid());
+		
+		// Mock Privacy preference manager
+		IPrivacyPreferenceManager privacyPreferencesManagerMocked = Mockito.mock(IPrivacyPreferenceManager.class);
+		Mockito.when(privacyPreferencesManagerMocked.evaluateDObfPreference((DObfPreferenceDetailsBean) Mockito.any())).thenReturn(0.5);
+		((PrivacyDataManager)privacyDataManager).setPrivacyPreferenceManager(privacyPreferencesManagerMocked);
+		
+		// -- Launch obfuscation
+		List<CtxModelObject> obfuscatedNameDataList = null;
+		List<CtxModelObject> obfuscatedActionDataList = null;
+		List<CtxModelObject> obfuscatedLocationCoordinatesDataList = null;
+		List<CtxModelObject> obfuscatedMixDataList = null;
+		try {
+			obfuscatedNameDataList = privacyDataManager.obfuscateData(requestor, ctxDataListName).get();
+			obfuscatedActionDataList = privacyDataManager.obfuscateData(requestor, ctxDataListAction).get();
+			obfuscatedLocationCoordinatesDataList = privacyDataManager.obfuscateData(requestor, ctxDataListLocationCoordinates).get();
+			obfuscatedMixDataList = privacyDataManager.obfuscateData(requestor, ctxDataListMix).get();
+		} catch (PrivacyException e) {
+			LOG.error("[Test PrivacyException] "+testTitle+": "+e.getMessage()+"\n", e);
+			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
+		} catch (InterruptedException e) {
+			LOG.error("[Test InterruptedException] "+testTitle+": Async interrupted error "+e.getMessage()+"\n", e);
+			fail("[Error "+testTitle+"] Privacy error: Async interrupted error "+e.getMessage());
+		} catch (ExecutionException e) {
+			LOG.error("[Test ExecutionException] "+testTitle+": Async execution error "+e.getMessage()+"\n", e);
+			fail("[Error "+testTitle+"] Privacy error: Async execution error "+e.getMessage());
+		}
+
+		// -- Verify
+		// Name
+		assertNotNull("Retrieved name obfuscated data should not be null", obfuscatedNameDataList);
+		assertTrue("Name data list size should not have been modified", ctxDataListName.size() == obfuscatedNameDataList.size());
+		int lastNameIndex = 0;
+		if (CtxAttributeTypes.NAME_LAST.equals(obfuscatedNameDataList.get(1).getId().getType())) {
+			lastNameIndex = 1;
+		}
+		assertEquals("Name data should have been obfuscated", "M.", ((CtxAttribute)obfuscatedNameDataList.get(lastNameIndex)).getStringValue());
+		LOG.info("Original result 1: "+((CtxAttribute)ctxDataListName.get(0)).getStringValue()+"|"+((CtxAttribute)ctxDataListName.get(0)).getQuality().getOriginType());
+		LOG.info("Original result 2: "+((CtxAttribute)ctxDataListName.get(1)).getStringValue()+"|"+((CtxAttribute)ctxDataListName.get(1)).getQuality().getOriginType());
+		LOG.info("Obfuscated result 1: "+((CtxAttribute)obfuscatedNameDataList.get(0)).getStringValue()+"|"+((CtxAttribute)obfuscatedNameDataList.get(0)).getQuality().getOriginType());
+		LOG.info("Obfuscated result 2: "+((CtxAttribute)obfuscatedNameDataList.get(1)).getStringValue()+"|"+((CtxAttribute)obfuscatedNameDataList.get(1)).getQuality().getOriginType());
+		
+		// Action
+		assertNotNull("Retrieved action obfuscated data should not be null", obfuscatedActionDataList);
+		assertTrue("Action data list size should not have been modified", ctxDataListAction.size() == obfuscatedActionDataList.size());
+		assertEquals("Unobfuscable data should not be obfuscated", ctxDataListAction, obfuscatedActionDataList);
+		
+		// Location coordinates
+		assertNotNull("Retrieved obfuscated data should not be null", obfuscatedLocationCoordinatesDataList);
+		assertTrue("Location Coordinates Data list size should not have been modified", ctxDataListLocationCoordinates.size() == obfuscatedLocationCoordinatesDataList.size());
+		LOG.info("Original result: "+((CtxAttribute)ctxDataListLocationCoordinates.get(0)).getStringValue()+","+((CtxAttribute)ctxDataListLocationCoordinates.get(0)).getQuality().getPrecision()+"|"+((CtxAttribute)ctxDataListLocationCoordinates.get(0)).getQuality().getOriginType());
+		LOG.info("Obfuscated result: "+((CtxAttribute)obfuscatedLocationCoordinatesDataList.get(0)).getStringValue()+","+((CtxAttribute)obfuscatedLocationCoordinatesDataList.get(0)).getQuality().getPrecision()+"|"+((CtxAttribute)obfuscatedLocationCoordinatesDataList.get(0)).getQuality().getOriginType());
+		
+		// Mix
+		assertNotNull("Retrieved mix obfuscated data should not be null", obfuscatedMixDataList);
+		assertTrue("Mix Data list size should not have been modified", ctxDataListMix.size() == obfuscatedMixDataList.size());
+		
+		// TODO: check a little bit more
 	}
 
 
