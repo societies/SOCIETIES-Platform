@@ -181,7 +181,7 @@ public class CommManagerHelper {
                 return response;
             }
         } catch (DocumentException e) {
-            LOG.error(e.getMessage());
+            LOG.error("DocumentException trying to build XML document from '"+os.toString()+"': "+e.getMessage());
             return buildErrorResponse(iq.getFrom(), iq.getID(), e.getMessage(), e);
         }
 
