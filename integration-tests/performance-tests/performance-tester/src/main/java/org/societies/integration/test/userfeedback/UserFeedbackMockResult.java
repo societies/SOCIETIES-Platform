@@ -199,6 +199,6 @@ public class UserFeedbackMockResult {
 	}
 	
 	public boolean isResult() {
-		return null != null && result.size() >= 0;
+		return null != result && result.size() >= 0;
 	}
 }
