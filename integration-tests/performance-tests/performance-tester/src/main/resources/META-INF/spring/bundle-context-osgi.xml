@@ -11,9 +11,9 @@
       
       <osgi:reference id="CisManager" interface="org.societies.api.cis.management.ICisManager"/>
       
-      <osgi:reference id="CssManager" interface="org.societies.api.internal.css.ICSSInternalManager"/>
+      <osgi:reference id="internalCssManager" interface="org.societies.api.internal.css.ICSSInternalManager"/>
       
-      <osgi:reference id="CssDirectoryRemote" interface="org.societies.api.css.directory.ICssDirectoryRemote"/>  
+      <!-- <osgi:reference id="CssDirectoryRemote" interface="org.societies.api.css.directory.ICssDirectoryRemote"/> -->  
       
       <osgi:reference id="commManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
 	

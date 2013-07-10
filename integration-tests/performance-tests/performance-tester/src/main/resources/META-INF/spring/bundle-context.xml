@@ -60,8 +60,8 @@
   	</bean>
 	
 	<bean name="CssMgmtPerformanceTest" class="org.societies.integration.performance.test.upper_tester.rafik.CssMgmtPerformanceTestImpl">
-  		<property name="cssManager" ref="CssManager"/>
-  		<property name="cssDirectoryRemote" ref="CssDirectoryRemote"/>
+  		<property name="internalCssManager" ref="internalCssManager"/>
+  		<!-- <property name="cssDirectoryRemote" ref="CssDirectoryRemote"/> -->
   		<property name="commManager" ref="commManager"/>
   	</bean>
 	
