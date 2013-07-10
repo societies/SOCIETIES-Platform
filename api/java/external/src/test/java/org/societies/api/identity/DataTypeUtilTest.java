@@ -30,7 +30,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.BeforeClass;
@@ -97,6 +99,44 @@ public class DataTypeUtilTest {
 	}
 
 	@Test
+	public void testSortByParent() {
+		Set<String> nameList = new HashSet<String>();
+		nameList.add(CtxAttributeTypes.NAME_FIRST);
+		nameList.add(CtxAttributeTypes.NAME_LAST);
+		Set<String> actionList = new HashSet<String>();
+		actionList.add(CtxAttributeTypes.ACTION);
+		// - List1
+		// Parameters
+		Set<String> list1 = new HashSet<String>();
+		list1.addAll(nameList);
+		list1.add(CtxAttributeTypes.ACTION);
+		// Expected
+		Map<String, Set<String>> expectedMap1 = new HashMap<String, Set<String>>();
+		expectedMap1.put(CtxAttributeTypes.NAME, nameList);
+		expectedMap1.put(CtxAttributeTypes.ACTION, actionList);
+		assertEquals("NAME_FIRST (leaf), NAME_LAST (leaf), ACTION (root and leaf)  should be sorted as: NAME -> NAME_FIRST, NAME_LAST ; ACTION -> ACTION", expectedMap1, dataTypeUtil.sortByParent(list1));
+
+		// - List2
+		// Parameters
+		Set<String> list2 = new HashSet<String>();
+		list2.addAll(nameList);
+		list2.add(CtxAttributeTypes.NAME);
+		list2.add(CtxAttributeTypes.ACTION);
+		assertEquals("NAME (root not leaf), NAME_FIRST (leaf), NAME_LAST (leaf), ACTION (root and leaf) should be sorted as: NAME -> NAME_FIRST, NAME_LAST ; ACTION -> ACTION", expectedMap1, dataTypeUtil.sortByParent(list2));
+
+		// - List3
+		// Parameters
+		Set<String> list3 = new HashSet<String>();
+		list3.add(CtxAttributeTypes.NAME);
+		list3.add(CtxAttributeTypes.ACTION);
+		// Expected
+		Map<String, Set<String>> expectedMap3 = new HashMap<String, Set<String>>();
+		expectedMap3.put(CtxAttributeTypes.NAME, null);
+		expectedMap3.put(CtxAttributeTypes.ACTION, actionList);
+		assertEquals("NAME (root not leaf), ACTION (root and leaf) should be sorted as: NAME -> null ; ACTION -> ACTION", expectedMap3, dataTypeUtil.sortByParent(list3));
+	}
+
+	@Test
 	public void testGetChildren() {
 		// Name FIRST
 		assertNull("NAME_FIRST should not have children", dataTypeUtil.getChildren(CtxAttributeTypes.NAME_FIRST));
@@ -129,7 +169,7 @@ public class DataTypeUtilTest {
 		assertNotNull("root should have children", actualrootChildrenList);
 		assertTrue("root don't have the correct children (expected: "+expectedrootChildrenList+", but was "+actualrootChildrenList+")", actualrootChildrenList.containsAll(expectedrootChildrenList));
 	}
-	
+
 	@Test
 	public void testGetChildrenRecursive() {
 		Set<String> test1 = dataTypeUtil.getChildren(CtxAttributeTypes.NAME);
@@ -138,7 +178,7 @@ public class DataTypeUtilTest {
 		assertNotNull("2: NAME should have children", test2);
 		Set<String> test3 = dataTypeUtil.getChildren(CtxAttributeTypes.NAME, true);
 		assertNotNull("3: NAME should have children", test3);
-		
+
 		// Namefirst
 		assertNull("NAME_FIRST should not have children", dataTypeUtil.getChildren(CtxAttributeTypes.NAME_FIRST, true));
 		// Action
@@ -177,7 +217,7 @@ public class DataTypeUtilTest {
 		Set<String> test2 = dataTypeUtil.getChildren(CtxAttributeTypes.NAME);
 		assertNotNull("1: NAME should have children", test1);
 		assertNotNull("2: NAME should have children", test2);
-		
+
 		// NAME_FIRST
 		Set<String> expectedNameFirstChildrenList = new HashSet<String>();
 		expectedNameFirstChildrenList.add(CtxAttributeTypes.NAME_FIRST);

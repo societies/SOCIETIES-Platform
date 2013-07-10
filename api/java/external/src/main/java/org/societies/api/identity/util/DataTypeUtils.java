@@ -183,7 +183,51 @@ public class DataTypeUtils {
 		// No parent
 		return null;
 	}
-	
+
+	/**
+	 * To sort a list of data types by their parent
+	 * E.g. NAME_FIRST (leaf), NAME_LAST (leaf), ACTION (root and leaf)  will be sorted as: NAME -> NAME_FIRST, NAME_LAST ; ACTION -> ACTION
+	 * E.g. NAME (root not leaf), NAME_FIRST (leaf), NAME_LAST (leaf), ACTION (root and leaf) will be sorted as: NAME -> NAME_FIRST, NAME_LAST ; ACTION -> ACTION
+	 * E.g. NAME (root not leaf), ACTION (root and leaf) will be sorted as: NAME -> null ; ACTION -> ACTION
+	 * @param dataTypes List of data type names
+	 * @return A map of parent types and their related sub-types (or this parent type if it is also a leaf)
+	 */
+	public Map<String, Set<String>> sortByParent(Set<String> dataTypes) {
+		if (null == dataTypes || dataTypes.size() <= 0) {
+			return null;
+		}
+		// -- Create the map
+		Map<String, Set<String>> sorted = new HashMap<String, Set<String>>();
+		for(String dataType : dataTypes) {
+			// Retrieve parent type
+			String dataTypeParent = getParent(dataType);
+			Set<String> dataTypeGroup = null;
+			// Parent type
+			if (null == dataTypeParent) {
+				dataTypeParent = dataType;
+				// Parent & leaf
+				if (isLeaf(dataType)) {
+					dataTypeGroup = new HashSet<String>();
+					dataTypeGroup.add(dataType);
+				}
+				// Parent with children
+				else {
+					dataTypeGroup = sorted.get(dataTypeParent);
+				}
+			}
+			// Child
+			else {
+				dataTypeGroup = sorted.get(dataTypeParent);
+				if (null == dataTypeGroup) {
+					dataTypeGroup = new HashSet<String>();
+				}
+				dataTypeGroup.add(dataType);
+			}
+			sorted.put(dataTypeParent, dataTypeGroup);
+		}
+		return sorted;
+	}
+
 	/**
 	 * To retrieve the friendly description of a data type
 	 * If no existing friendly description is retrieved, the data type is sanitized and returned
@@ -247,7 +291,7 @@ public class DataTypeUtils {
 		legumeChildren.add("middle");
 		legumeChildren.add("leaf1");
 		addChildren("root", legumeChildren);
-		
+
 		Set<String> courgeChildren = new HashSet<String>();
 		courgeChildren.add("leaf2");
 		addChildren("middle", courgeChildren);

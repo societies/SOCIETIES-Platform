@@ -24,6 +24,9 @@
  */
 package org.societies.api.identity.util;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.societies.api.context.model.CtxIdentifier;
@@ -110,6 +113,51 @@ public class DataIdentifierUtils {
 		String type2 = DataTypeFactory.getType(id2);
 		Set<String> subTypes1 = (new DataTypeUtils()).getLookableDataTypes(type1);
 		return subTypes1.contains(type2);
+	}
+	
+	/**
+	 * To sort a list of data ids by their parent type
+	 * E.g. Ids of types NAME_FIRST (leaf), NAME_LAST (leaf), ACTION (root and leaf)  will be sorted as: NAME -> NAME_FIRST, NAME_LAST ; ACTION -> ACTION
+	 * E.g. Ids of types NAME (root not leaf), NAME_FIRST (leaf), NAME_LAST (leaf), ACTION (root and leaf) will be sorted as: NAME -> NAME_FIRST, NAME_LAST ; ACTION -> ACTION
+	 * E.g. Ids of types NAME (root not leaf), ACTION (root and leaf) will be sorted as: NAME -> null ; ACTION -> ACTION
+	 * @param dataIds List of data ids
+	 * @return A map of parent types and their related data id (or this parent type if it is also a leaf)
+	 */
+	public static Map<String, Set<DataIdentifier>> sortByParent(Set<DataIdentifier> dataIds) {
+		if (null == dataIds || dataIds.size() <= 0) {
+			return null;
+		}
+		// -- Create the map
+		Map<String, Set<DataIdentifier>> sorted = new HashMap<String, Set<DataIdentifier>>();
+		DataTypeUtils dataTypeUtils = new DataTypeUtils();
+		for(DataIdentifier dataId : dataIds) {
+			// Retrieve parent type
+			String dataTypeParent = dataTypeUtils.getParent(dataId.getType());
+			Set<DataIdentifier> dataTypeGroup = null;
+			// Parent type
+			if (null == dataTypeParent) {
+				dataTypeParent = dataId.getType();
+				// Parent & leaf
+				if (dataTypeUtils.isLeaf(dataId.getType())) {
+					dataTypeGroup = new HashSet<DataIdentifier>();
+					dataTypeGroup.add(dataId);
+				}
+				// Parent with children
+				else {
+					dataTypeGroup = sorted.get(dataTypeParent);
+				}
+			}
+			// Child
+			else {
+				dataTypeGroup = sorted.get(dataTypeParent);
+				if (null == dataTypeGroup) {
+					dataTypeGroup = new HashSet<DataIdentifier>();
+				}
+				dataTypeGroup.add(dataId);
+			}
+			sorted.put(dataTypeParent, dataTypeGroup);
+		}
+		return sorted;
 	}
 
 	/**
