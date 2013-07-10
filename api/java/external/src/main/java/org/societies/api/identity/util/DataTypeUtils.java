@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.schema.identity.DataTypeDescription;
 
@@ -42,7 +40,7 @@ import org.societies.api.schema.identity.DataTypeDescription;
  * @author Olivier Maridat (Trialog)
  */
 public class DataTypeUtils {
-	private static Logger LOG = LoggerFactory.getLogger(DataTypeUtils.class.getName());
+//	private static Logger LOG = LoggerFactory.getLogger(DataTypeUtils.class.getName());
 	private static Map<String, Set<String>> dataTypeHierarchy;
 	private static Map<String, String> dataTypeAntiHierarchy;
 	private static Map<String, DataTypeDescription> dataTypeDescription;
@@ -51,7 +49,7 @@ public class DataTypeUtils {
 
 	public DataTypeUtils() {
 		if (!loaded) {
-			LOG.debug("SOCIETIES data type hierarchy loading... This message should apear only one time. If you see it several times, please contact Olivier Maridat (Trialog)");
+//			LOG.debug("SOCIETIES data type hierarchy loading... This message should apear only one time. If you see it several times, please contact Olivier Maridat (Trialog)");
 			dataTypeHierarchy = new HashMap<String, Set<String>>();
 			dataTypeAntiHierarchy = new HashMap<String, String>();
 			dataTypeDescription = new HashMap<String, DataTypeDescription>();
