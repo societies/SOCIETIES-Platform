@@ -73,6 +73,8 @@ public class TestLocalUserContext {
 	private static final String SERVICE_ID_SUFFIX = ".societies.org";
 	private static final String SERVICE_SRI = "css://requestor.societies.org/HelloWorld";
 	
+	private static final String USER_NAME_FIRST = "John";
+	private static final String USER_NAME_LAST = "Do";
 	private static final String USER_BIRTHDAY = "today";
 	
 	private org.societies.api.internal.context.broker.ICtxBroker internalCtxBroker;
@@ -100,6 +102,10 @@ public class TestLocalUserContext {
 	/** The "bad" 3P service requestor. */
 	private RequestorService deniedRequestorService;
 	
+	private CtxAttributeIdentifier userNameFirstCtxAttrId;
+	private String userNameFirstCtxAttrValue;
+	private CtxAttributeIdentifier userNameLastCtxAttrId;
+	private String userNameLastCtxAttrValue;
 	private CtxAttributeIdentifier userBirthdayCtxAttrId;
 	private String userBirthdayCtxAttrValue;
 
@@ -141,7 +147,35 @@ public class TestLocalUserContext {
 		
 		final IndividualCtxEntity userCtxEnt = 
 				this.internalCtxBroker.retrieveIndividualEntity(this.userId).get();
-		
+	
+		// Create NAME_FIRST user attribute if not exists
+		CtxAttribute userNameFirstCtxAttr = this.createCtxAttributeIfNotExists(
+				userCtxEnt, CtxAttributeTypes.NAME_FIRST);
+		if (userNameFirstCtxAttr.getStringValue() == null) {
+			userNameFirstCtxAttr.setStringValue(USER_NAME_FIRST);
+			this.internalCtxBroker.update(userNameFirstCtxAttr);
+		}
+		this.userNameFirstCtxAttrId = userNameFirstCtxAttr.getId();
+		if (LOG.isInfoEnabled())
+			LOG.info("*** setUp: userNameFirstCtxAttrId=" + this.userNameFirstCtxAttrId);
+		this.userNameFirstCtxAttrValue = userNameFirstCtxAttr.getStringValue();
+		if (LOG.isInfoEnabled())
+			LOG.info("*** setUp: userNameFirstCtxAttrValue=" + this.userNameFirstCtxAttrValue);
+
+		// Create NAME_LAST user attribute if not exists
+		CtxAttribute userNameLastCtxAttr = this.createCtxAttributeIfNotExists(
+				userCtxEnt, CtxAttributeTypes.NAME_LAST);
+		if (userNameLastCtxAttr.getStringValue() == null) {
+			userNameLastCtxAttr.setStringValue(USER_NAME_LAST);	
+			this.internalCtxBroker.update(userNameLastCtxAttr);
+		}
+		this.userNameLastCtxAttrId = userNameLastCtxAttr.getId();
+		if (LOG.isInfoEnabled())
+			LOG.info("*** setUp: userNameLastCtxAttrId=" + this.userNameLastCtxAttrId);
+		this.userNameLastCtxAttrValue = userNameLastCtxAttr.getStringValue();
+		if (LOG.isInfoEnabled())
+			LOG.info("*** setUp: userNameLastCtxAttrValue=" + this.userNameLastCtxAttrValue);
+
 		// Create BIRTHDAY user attribute if not exists
 		CtxAttribute userBirthdayCtxAttr = this.createCtxAttributeIfNotExists(
 				userCtxEnt, CtxAttributeTypes.BIRTHDAY);
@@ -172,12 +206,12 @@ public class TestLocalUserContext {
 		this.allowedServiceId = null;
 		this.serviceSri = null;
 		this.allowedRequestorService = null;
-		this.userBirthdayCtxAttrId = null;
-		this.userBirthdayCtxAttrValue = null;
-		/*this.userNameFirstCtxAttrId = null;
+		this.userNameFirstCtxAttrId = null;
 		this.userNameFirstCtxAttrValue = null;
 		this.userNameLastCtxAttrId = null;
-		this.userNameLastCtxAttrValue = null;*/
+		this.userNameLastCtxAttrValue = null;
+		this.userBirthdayCtxAttrId = null;
+		this.userBirthdayCtxAttrValue = null;
 		
 		if (LOG.isInfoEnabled())
 			LOG.info("tearDown: Removing '" + this.testCtxIds + "' from Context DB");
@@ -279,6 +313,118 @@ public class TestLocalUserContext {
 		
 		LOG.info("*** testRetrieveUserAttribute: END");
 	}
+	
+	@Test
+	public void testRetrieveUserAttributes() throws Exception {
+
+		LOG.info("*** testRetrieveUserAttributes: START");
+		
+		final CtxEntityIdentifier userCtxEntId = 
+				this.ctxBroker.retrieveIndividualEntityId(this.allowedRequestorService, this.userId).get();
+		assertNotNull(userCtxEntId);
+		final List<CtxIdentifier> userCtxAttrIds =  this.ctxBroker.lookup(
+				this.allowedRequestorService, userCtxEntId, CtxModelType.ATTRIBUTE,
+				CtxAttributeTypes.NAME_FIRST).get();
+		LOG.info("*** testRetrieveUserAttributes: userCtxAttrIds=" + userCtxAttrIds);
+		assertNotNull(userCtxAttrIds);
+		assertFalse(userCtxAttrIds.isEmpty());
+		assertEquals(1, userCtxAttrIds.size());
+		assertTrue(userCtxAttrIds.contains(this.userNameFirstCtxAttrId));
+		
+		userCtxAttrIds.addAll(this.ctxBroker.lookup(
+				this.allowedRequestorService, userCtxEntId, CtxModelType.ATTRIBUTE,
+				CtxAttributeTypes.NAME_LAST).get());
+		LOG.info("*** testRetrieveUserAttributes: userCtxAttrIds=" + userCtxAttrIds);
+		assertNotNull(userCtxAttrIds);
+		assertFalse(userCtxAttrIds.isEmpty());
+		assertEquals(2, userCtxAttrIds.size());
+		assertTrue(userCtxAttrIds.contains(this.userNameLastCtxAttrId));
+		
+		userCtxAttrIds.addAll(this.ctxBroker.lookup(
+				this.allowedRequestorService, userCtxEntId, CtxModelType.ATTRIBUTE,
+				CtxAttributeTypes.BIRTHDAY).get());
+		LOG.info("*** testRetrieveUserAttributes: userCtxAttrIds=" + userCtxAttrIds);
+		assertNotNull(userCtxAttrIds);
+		assertFalse(userCtxAttrIds.isEmpty());
+		assertEquals(3, userCtxAttrIds.size());
+		assertTrue(userCtxAttrIds.contains(this.userBirthdayCtxAttrId));
+
+		// Setup mock User Feedback to allow READ access *three* times
+		// TODO This WILL break once the User Feedback supports multiple options per pop-up 
+		Test1858.getUserFeedbackMocker().addReply(
+				UserFeedbackType.CHECKBOXLIST, new UserFeedbackMockResult(3, "READ"));
+		List<CtxModelObject> userCtxModelObjects = this.ctxBroker.retrieve(
+				this.allowedRequestorService, userCtxAttrIds).get();
+		LOG.info("*** testRetrieveUserAttributes: userCtxModelObjects=" + userCtxModelObjects);
+		assertNotNull(userCtxModelObjects);
+		assertFalse(userCtxModelObjects.isEmpty());
+		assertEquals(3, userCtxModelObjects.size());
+		boolean foundUserNameFirst = false;
+		boolean foundUserNameLast = false;
+		boolean foundUserBirthday = false;
+		for (CtxModelObject userCtxModelObject : userCtxModelObjects) {
+			if (this.userNameFirstCtxAttrId.equals(userCtxModelObject.getId()))
+				foundUserNameFirst = true;
+			else if (this.userNameLastCtxAttrId.equals(userCtxModelObject.getId()))
+				foundUserNameLast = true;
+			else if (this.userBirthdayCtxAttrId.equals(userCtxModelObject.getId()))
+				foundUserBirthday = true;
+		}
+		assertTrue(foundUserNameFirst);
+		assertTrue(foundUserNameLast);
+		assertTrue(foundUserBirthday);
+		
+		// Retrieve one more time to verify granted READ permission has been stored, i.e. no User Feedback involved.
+		Test1858.getUserFeedbackMocker().removeAllReplies();
+		userCtxModelObjects = this.ctxBroker.retrieve(this.allowedRequestorService,
+				userCtxAttrIds).get();
+		assertNotNull(userCtxModelObjects);
+		assertFalse(userCtxModelObjects.isEmpty());
+		assertEquals(3, userCtxModelObjects.size());
+		
+		// Setup mock User Feedback to allow READ access *once* and then deny for the next *two* questions
+		// This will grant READ access to BIRTHDAY but not NAME_FIRST or NAME_LAST
+		Test1858.getUserFeedbackMocker().addReply(
+				UserFeedbackType.CHECKBOXLIST, new UserFeedbackMockResult(1, "READ"));
+		Test1858.getUserFeedbackMocker().addReply(
+				UserFeedbackType.CHECKBOXLIST, new UserFeedbackMockResult(2, "DENY"));
+		userCtxModelObjects = this.ctxBroker.retrieve(
+				this.deniedRequestorService, userCtxAttrIds).get();
+		LOG.info("*** testRetrieveUserAttributes: userCtxModelObjects=" + userCtxModelObjects);
+		assertNotNull(userCtxModelObjects);
+		assertFalse(userCtxModelObjects.isEmpty());
+		assertEquals(1, userCtxModelObjects.size());
+		assertEquals(this.userBirthdayCtxAttrId, userCtxModelObjects.get(0).getId());
+		
+		Test1858.getUserFeedbackMocker().removeAllReplies();
+		
+		// Test CtxAccessControlException is thrown when retrieving denied attributes only
+		final List<CtxIdentifier> deniedCtxIdList = new ArrayList<CtxIdentifier>();
+		deniedCtxIdList.add(this.userNameFirstCtxAttrId);
+		deniedCtxIdList.add(this.userNameLastCtxAttrId);
+		boolean caughtCtxAccessControlException = false;
+		try {
+			this.ctxBroker.retrieve(this.deniedRequestorService, 
+					deniedCtxIdList).get();
+		} catch (CtxAccessControlException cace) {
+			LOG.info("*** testRetrieveUserAttributes: expectedCtxAccessControlException=" + cace.getLocalizedMessage());
+			caughtCtxAccessControlException = true;
+		}
+		assertTrue(caughtCtxAccessControlException);
+		
+		// Test retrieving allowed attribute only
+		final List<CtxIdentifier> allowedCtxIdList = new ArrayList<CtxIdentifier>();
+		allowedCtxIdList.add(this.userBirthdayCtxAttrId);
+		userCtxModelObjects = this.ctxBroker.retrieve(this.deniedRequestorService, 
+					allowedCtxIdList).get();
+		LOG.info("*** testRetrieveUserAttributes: userCtxModelObjects=" + userCtxModelObjects);
+		assertNotNull(userCtxModelObjects);
+		assertFalse(userCtxModelObjects.isEmpty());
+		assertEquals(1, userCtxModelObjects.size());
+		assertEquals(this.userBirthdayCtxAttrId, userCtxModelObjects.get(0).getId());
+		
+		LOG.info("*** testRetrieveUserAttributes: END");
+	}
 
 	@Test
 	public void testCRUD() throws Exception {
@@ -299,85 +445,85 @@ public class TestLocalUserContext {
 		// Add new Context Entity ID to list for removal
 		this.testCtxIds.add(deviceCtxEnt.getId());
 		
-		// Test creation of LOCATION_COORDINATES attribute under DEVICE entity
-		final CtxAttribute deviceCoordsCtxAttr = this.ctxBroker.createAttribute(
+		// Test creation of TEMPERATURE attribute under DEVICE entity
+		final CtxAttribute deviceTempCtxAttr = this.ctxBroker.createAttribute(
 				this.allowedRequestorService, deviceCtxEnt.getId(), 
-				CtxAttributeTypes.LOCATION_COORDINATES).get();
-		LOG.info("*** testCRUD: deviceCoordsCtxAttr=" + deviceCoordsCtxAttr);
-		// Verify creation of LOCATION_COORDINATES attribute through create result
-		assertNotNull(deviceCoordsCtxAttr);
-		assertNotNull(deviceCoordsCtxAttr.getId());
-		assertEquals(deviceCtxEnt.getId(), deviceCoordsCtxAttr.getId().getScope());
-		assertEquals(deviceCtxEnt.getId(), deviceCoordsCtxAttr.getScope());
-		assertEquals(CtxAttributeTypes.LOCATION_COORDINATES, deviceCoordsCtxAttr.getId().getType());
+				CtxAttributeTypes.TEMPERATURE).get();
+		LOG.info("*** testCRUD: deviceTempCtxAttr=" + deviceTempCtxAttr);
+		// Verify creation of TEMPERATURE attribute through create result
+		assertNotNull(deviceTempCtxAttr);
+		assertNotNull(deviceTempCtxAttr.getId());
+		assertEquals(deviceCtxEnt.getId(), deviceTempCtxAttr.getId().getScope());
+		assertEquals(deviceCtxEnt.getId(), deviceTempCtxAttr.getScope());
+		assertEquals(CtxAttributeTypes.TEMPERATURE, deviceTempCtxAttr.getId().getType());
 		
-		// Test search for LOCATION_COORDINATES attribute through lookup(IIdentity target, String attrType)
+		// Test search for TEMPERATURE attribute through lookup(IIdentity target, String attrType)
 		List<CtxIdentifier> ctxAttrIds = this.ctxBroker.lookup(
 				this.allowedRequestorService, this.userId,
-				CtxAttributeTypes.LOCATION_COORDINATES).get();
+				CtxAttributeTypes.TEMPERATURE).get();
 		LOG.info("*** testCRUD: lookup(IIdentity target, String attrType)=" + ctxAttrIds);
 		assertNotNull(ctxAttrIds);
 		assertFalse(ctxAttrIds.isEmpty());
 		assertTrue(ctxAttrIds.size() >= 1);
-		assertTrue(ctxAttrIds.contains(deviceCoordsCtxAttr.getId()));
+		assertTrue(ctxAttrIds.contains(deviceTempCtxAttr.getId()));
 		
-		// Test search for LOCATION_COORDINATES attribute through lookup(IIdentity target, CtxModelType modelType, String attrType)
+		// Test search for TEMPERATURE attribute through lookup(IIdentity target, CtxModelType modelType, String attrType)
 		ctxAttrIds = this.ctxBroker.lookup(this.allowedRequestorService, 
 				this.userId, CtxModelType.ATTRIBUTE, 
-				CtxAttributeTypes.LOCATION_COORDINATES).get();
+				CtxAttributeTypes.TEMPERATURE).get();
 		LOG.info("*** testCRUD: lookup(IIdentity target, CtxModelType modelType, String attrType)=" + ctxAttrIds);
 		assertNotNull(ctxAttrIds);
 		assertFalse(ctxAttrIds.isEmpty());
 		assertTrue(ctxAttrIds.size() >= 1);
-		assertTrue(ctxAttrIds.contains(deviceCoordsCtxAttr.getId()));
+		assertTrue(ctxAttrIds.contains(deviceTempCtxAttr.getId()));
 		
-		// Test search for LOCATION_COORDINATES attribute through lookup(CtxEntityIdentifier scope, CtxModelType modelType, String attrType)
+		// Test search for TEMPERATURE attribute through lookup(CtxEntityIdentifier scope, CtxModelType modelType, String attrType)
 		ctxAttrIds = this.ctxBroker.lookup(this.allowedRequestorService, 
 				deviceCtxEnt.getId(), CtxModelType.ATTRIBUTE, 
-				CtxAttributeTypes.LOCATION_COORDINATES).get();
+				CtxAttributeTypes.TEMPERATURE).get();
 		LOG.info("*** testCRUD: lookup(CtxEntityIdentifier scope, CtxModelType modelType, String attrType)=" + ctxAttrIds);
 		assertNotNull(ctxAttrIds);
 		assertFalse(ctxAttrIds.isEmpty());
 		assertTrue(ctxAttrIds.size() >= 1); // TODO should be assertEquals(1, ctxAttrIds.size()); 
-		assertTrue(ctxAttrIds.contains(deviceCoordsCtxAttr.getId()));
+		assertTrue(ctxAttrIds.contains(deviceTempCtxAttr.getId()));
 		
-		// Test retrieval of LOCATION_COORDINATES attribute through retrieve(CtxIdentifier ctxId)
+		// Test retrieval of TEMPERATURE attribute through retrieve(CtxIdentifier ctxId)
 		// Setup mock User Feedback to allow READ access *once*
 		Test1858.getUserFeedbackMocker().addReply(
 				UserFeedbackType.CHECKBOXLIST, new UserFeedbackMockResult(1, "READ"));
-		CtxAttribute deviceCoordsCtxAttrCopy = (CtxAttribute) this.ctxBroker.retrieve(
-				this.allowedRequestorService, deviceCoordsCtxAttr.getId()).get();
-		LOG.info("*** testCRUD: retrieve(CtxIdentifier ctxId)=" + deviceCoordsCtxAttrCopy);
-		assertNotNull(deviceCoordsCtxAttrCopy);
-		assertEquals(deviceCoordsCtxAttr, deviceCoordsCtxAttrCopy);
+		CtxAttribute deviceTempCtxAttrCopy = (CtxAttribute) this.ctxBroker.retrieve(
+				this.allowedRequestorService, deviceTempCtxAttr.getId()).get();
+		LOG.info("*** testCRUD: retrieve(CtxIdentifier ctxId)=" + deviceTempCtxAttrCopy);
+		assertNotNull(deviceTempCtxAttrCopy);
+		assertEquals(deviceTempCtxAttr, deviceTempCtxAttrCopy);
 		
-		// Test update of LOCATION_COORDINATES attribute through retrieve(CtxModelObject ctxModelObject)
+		// Test update of TEMPERATURE attribute through retrieve(CtxModelObject ctxModelObject)
 		// Setup mock User Feedback to allow WRITE access *once*
 		Test1858.getUserFeedbackMocker().addReply(
 				UserFeedbackType.CHECKBOXLIST, new UserFeedbackMockResult(1, "WRITE"));
-		deviceCoordsCtxAttrCopy.setStringValue("foo");
-		deviceCoordsCtxAttrCopy = (CtxAttribute) this.ctxBroker.update(
-				this.allowedRequestorService, deviceCoordsCtxAttrCopy).get();
-		LOG.info("*** testCRUD: update(CtxModelObject ctxModelObject)=" + deviceCoordsCtxAttrCopy);
-		assertNotNull(deviceCoordsCtxAttrCopy);
-		assertEquals(deviceCoordsCtxAttr, deviceCoordsCtxAttrCopy);
-		assertEquals("foo", deviceCoordsCtxAttrCopy.getStringValue());
-		assertEquals(CtxAttributeValueType.STRING, deviceCoordsCtxAttrCopy.getValueType());
+		deviceTempCtxAttrCopy.setStringValue("foo");
+		deviceTempCtxAttrCopy = (CtxAttribute) this.ctxBroker.update(
+				this.allowedRequestorService, deviceTempCtxAttrCopy).get();
+		LOG.info("*** testCRUD: update(CtxModelObject ctxModelObject)=" + deviceTempCtxAttrCopy);
+		assertNotNull(deviceTempCtxAttrCopy);
+		assertEquals(deviceTempCtxAttr, deviceTempCtxAttrCopy);
+		assertEquals("foo", deviceTempCtxAttrCopy.getStringValue());
+		assertEquals(CtxAttributeValueType.STRING, deviceTempCtxAttrCopy.getValueType());
 		
-		// Test retrieval of LOCATION_COORDINATES attribute through retrieve(List<CtxIdentifier> ctxIdList)
+		// Test retrieval of TEMPERATURE attribute through retrieve(List<CtxIdentifier> ctxIdList)
 		// Mock User Feedback should not be involved
 		Test1858.getUserFeedbackMocker().removeAllReplies();
 		final List<CtxIdentifier> ctxIdList = new ArrayList<CtxIdentifier>();
-		ctxIdList.add(deviceCoordsCtxAttr.getId());
+		ctxIdList.add(deviceTempCtxAttr.getId());
 		final List<CtxModelObject> ctxMoList = this.ctxBroker.retrieve(
 				this.allowedRequestorService, ctxIdList).get();
 		LOG.info("*** testCRUD: retrieve(List<CtxIdentifier> ctxIdList)=" + ctxMoList);
 		assertNotNull(ctxMoList);
 		assertFalse(ctxMoList.isEmpty());
 		assertEquals(1, ctxMoList.size());
-		deviceCoordsCtxAttrCopy = (CtxAttribute) ctxMoList.get(0);
-		assertNotNull(deviceCoordsCtxAttrCopy);
-		assertEquals(deviceCoordsCtxAttr, deviceCoordsCtxAttrCopy);
+		deviceTempCtxAttrCopy = (CtxAttribute) ctxMoList.get(0);
+		assertNotNull(deviceTempCtxAttrCopy);
+		assertEquals(deviceTempCtxAttr, deviceTempCtxAttrCopy);
 		
 		LOG.info("*** testCRUD: END");
 	}

@@ -24,18 +24,18 @@
  */
 package org.societies.context.broker.api.security;
 
+import java.util.List;
+
 import org.societies.api.context.broker.CtxAccessControlException;
-import org.societies.api.identity.IIdentity;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.Requestor;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 
 /**
  * This interface is used for access control operations and decisions regarding
  * context data. More specifically, the ICtxAccessController is used to decide
  * whether an access to a context resource is to be allowed or denied, based on
- * the privacy policy currently in effect.
- * <p>
- * The {@link #checkPermission} method determines whether the access request
- * indicated by a specified {@link CtxPermission} should be granted or denied. 
+ * the privacy preferences/policy currently in effect. 
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 0.4
@@ -43,29 +43,63 @@ import org.societies.api.identity.Requestor;
 public interface ICtxAccessController {
 
 	/**
-	 * Determines whether the access request indicated by the specified
-	 * {@link CtxPermission} should be allowed or denied to the supplied 
-	 * requestor, based on the privacy policy currently in effect on the given
-	 * target CSS or CIS. This method quietly returns if the access request is
-	 * permitted, or throws a CtxAccessControlException otherwise.
+	 * Determines whether the specified access request to the identified 
+	 * context model object should be allowed or denied for the supplied
+	 * requestor. The type of the access request is indicated by the specified
+	 * {@link ActionConstants}. Note that this method quietly returns if the
+	 * access request is permitted, or throws a {@link CtxAccessControlException}
+	 * otherwise.
 	 * 
 	 * @param requestor
-	 *            the entity requesting the specified permission
-	 * @param target
-	 *            the target CSS or CIS whose privacy policy to check for the
-	 *            requested permission
-	 * @param perm
-	 *            the requested permission
+	 *            the entity requesting access to the specified context model
+	 *            object.
+	 * @param ctxId
+	 *            the context model object whose access is being requested.
+	 * @param actionConst
+	 *            the type of the access request, e.g. {@link ActionConstants#READ}.
 	 * @throws CtxAccessControlException
-	 *             if the specified permission is not permitted, based on the
-	 *             current privacy policy
+	 *             if the specified access request is not permitted.
 	 * @throws CtxAccessControllerException
-	 *             if the specified permission cannot be checked against the
-	 *             current privacy policy 
+	 *             if a permission for the specified access request cannot be
+	 *             determined.
 	 * @throws NullPointerException
-	 *             if any of the specified parameters is <code>null</code>
+	 *             if any of the specified parameters is <code>null</code>.
+	 * @since 2.0
 	 */
 	public void checkPermission(final Requestor requestor, 
-			final IIdentity target, final CtxPermission perm)
+			final CtxIdentifier ctxId, final ActionConstants actionConst)
 			throws CtxAccessControlException, CtxAccessControllerException;
+	
+	/**
+	 * Determines whether the specified access request to the identified 
+	 * context model object(s) should be allowed or denied for the supplied
+	 * requestor. The type of the access request is indicated by the specified
+	 * {@link ActionConstants}. The method returns a list of the context 
+	 * identifiers for which the specified access request is allowed. Note that
+	 * if the supplied requestor is denied access to all of the identified
+	 * context model objects, the method throws a {@link CtxAccessControlException}.
+	 * 
+	 * @param requestor
+	 *            the entity requesting access to the specified context model
+	 *            object.
+	 * @param ctxIdList
+	 *            the list of context model objects whose access is being 
+	 *            requested.
+	 * @param actionConst
+	 *            the type of the access request, e.g. {@link ActionConstants#READ}.
+	 * @return a list of the context identifiers for which the specified access
+	 *             request is allowed.
+	 * @throws CtxAccessControlException
+	 *             if the specified access request is not permitted.
+	 * @throws CtxAccessControllerException
+	 *             if a permission for the specified access request cannot be
+	 *             determined.
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>.
+	 * @since 2.0
+	 */
+	public List<CtxIdentifier> checkPermission(final Requestor requestor, 
+			final List<? extends CtxIdentifier> ctxIdList, 
+			final ActionConstants actionConst) throws 
+			CtxAccessControlException, CtxAccessControllerException;
 }

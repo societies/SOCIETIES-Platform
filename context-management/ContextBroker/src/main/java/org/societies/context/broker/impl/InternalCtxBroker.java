@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.broker.CtxAccessControlException;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
@@ -73,6 +74,7 @@ import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 import org.societies.context.api.community.db.ICommunityCtxDBMgr;
 import org.societies.context.api.community.inference.ICommunityCtxInferenceMgr;
 import org.societies.context.api.event.CtxChangeEventTopic;
@@ -82,7 +84,6 @@ import org.societies.context.api.user.db.IUserCtxDBMgr;
 import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 import org.societies.context.api.user.inference.IUserCtxInferenceMgr;
 import org.societies.context.broker.api.CtxBrokerException;
-import org.societies.context.broker.api.security.CtxPermission;
 import org.societies.context.broker.api.security.ICtxAccessController;
 import org.societies.context.broker.impl.comm.CtxBrokerClient;
 import org.societies.context.broker.impl.comm.callbacks.CreateAssociationCallback;
@@ -1748,8 +1749,8 @@ public class InternalCtxBroker implements ICtxBroker {
 			// Check if access control is required.
 			if(!requestor.equals(this.getLocalRequestor())) {
 				// Check READ permission
-				this.ctxAccessController.checkPermission(requestor, target,
-						new CtxPermission(ctxId, CtxPermission.READ));
+				this.ctxAccessController.checkPermission(requestor, ctxId, 
+						ActionConstants.READ);
 			}
 			// No CtxAccessControlException thrown implies READ access has been granted
 			
@@ -1885,7 +1886,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	 * @see org.societies.api.context.broker.ICtxBroker#retrieve(org.societies.api.identity.Requestor, java.util.List)
 	 */
 	@Override
-	public Future<List<CtxModelObject>> retrieve(Requestor requestor,
+	public Future<List<CtxModelObject>> retrieve(final Requestor requestor,
 			final List<CtxIdentifier> ctxIdList) throws CtxException {
 		
 		if (requestor == null)
@@ -1900,17 +1901,111 @@ public class InternalCtxBroker implements ICtxBroker {
 		final List<CtxModelObject> result = new ArrayList<CtxModelObject>(
 				ctxIdList.size());
 
+		// Indicates whether a CtxAccessControlException has been thrown
+		boolean isAccessControlExceptionThrown = false;
+		// The local user context IDs specified in the request
+		final List<CtxIdentifier> localUserCtxIdList = new ArrayList<CtxIdentifier>(ctxIdList.size());
+		// The local community context IDs specified in the request
+		final List<CtxIdentifier> localCommunityCtxIdList = new ArrayList<CtxIdentifier>(ctxIdList.size());
+		// The remote context IDs specified in the request
+		final List<CtxIdentifier> remoteCtxIdList = new ArrayList<CtxIdentifier>(ctxIdList.size());
+		
 		for (final CtxIdentifier ctxId : ctxIdList) {
-			try {
-				result.add(this.retrieve(requestor, ctxId).get());
-			} catch (CtxException ce) {
-				// This can also be a CtxAccessControlException
-				// TODO Should we immediately fail in case of a CtxAccessControlException ? 
-				throw ce;
-			} catch (Exception e) {
-				throw new CtxBrokerException(e.getLocalizedMessage(), e);
+			final IIdentity target = this.extractIIdentity(ctxId);
+			if (this.isLocalId(target)) { // L O C A L
+				
+				if (IdentityType.CIS != target.getType()) { // U S E R
+					// Collect all local user context IDs to be retrieved
+					localUserCtxIdList.add(ctxId);
+					
+				} else { // C O M M U N I T Y
+					// Collect all local community context IDs to be retrieved
+					localCommunityCtxIdList.add(ctxId);
+				}
+				
+			} else { // R E M O T E
+				// Collect all remote context IDs to be retrieved
+				remoteCtxIdList.add(ctxId);
 			}
 		}
+		
+		if (!localUserCtxIdList.isEmpty()) { // L O C A L  U S E R
+			
+			// Check if access control is required.
+			if(!requestor.equals(this.getLocalRequestor())) {
+				// Check READ permission
+				List<CtxIdentifier> allowedUserCtxIdList = new ArrayList<CtxIdentifier>();
+				try {
+					allowedUserCtxIdList = this.ctxAccessController.checkPermission(
+							requestor, localUserCtxIdList, ActionConstants.READ);
+				} catch (CtxAccessControlException cace) {
+					// Flag that a CtxAccessControlException has been thrown
+					isAccessControlExceptionThrown = true;
+				}
+				// Retain only allowed user context IDs 
+				localUserCtxIdList.retainAll(allowedUserCtxIdList);
+			}
+						
+			for (final CtxIdentifier localUserCtxId : localUserCtxIdList) {
+				final CtxModelObject ctxModelObject = this.userCtxDBMgr.retrieve(localUserCtxId); 
+				if (ctxModelObject != null)
+					result.add(ctxModelObject);
+			}
+		}
+		
+		if (!localCommunityCtxIdList.isEmpty()) { // L O C A L  C O M M U N I T Y
+			
+			// Check if access control is required.
+			if(!requestor.equals(this.getLocalRequestor())) {
+				// Check READ permission
+				List<CtxIdentifier> allowedCommunityCtxIdList = new ArrayList<CtxIdentifier>();
+				try {
+					allowedCommunityCtxIdList = this.ctxAccessController.checkPermission(
+							requestor, localCommunityCtxIdList, ActionConstants.READ);
+				} catch (CtxAccessControlException cace) {
+					// Flag that a CtxAccessControlException has been thrown
+					isAccessControlExceptionThrown = true;
+				}
+				// Retain only allowed community context IDs 
+				localCommunityCtxIdList.retainAll(allowedCommunityCtxIdList);
+			}
+						
+			for (final CtxIdentifier localCommunityCtxId : localCommunityCtxIdList) {
+				final CtxModelObject ctxModelObject = this.communityCtxDBMgr.retrieve(localCommunityCtxId); 
+				if (ctxModelObject != null)
+					result.add(ctxModelObject);
+			}
+		}
+		
+		if (!remoteCtxIdList.isEmpty()) { // R E M O T E
+			
+			final List<Future<CtxModelObject>> remoteResults = 
+					new ArrayList<Future<CtxModelObject>>(remoteCtxIdList.size());
+			
+			// Perform remote retrieve asynchronously
+			for (final CtxIdentifier remoteCtxId : remoteCtxIdList) {
+				remoteResults.add(this.retrieve(requestor, remoteCtxId));
+			}
+			
+			for (final Future<CtxModelObject> remoteResult : remoteResults) {
+				try {
+					final CtxModelObject ctxModelObject = remoteResult.get();
+					if (ctxModelObject != null)
+						result.add(ctxModelObject);
+				// TODO } catch (CtxAccessControlException cace) {
+					// Flag that a CtxAccessControlException has been thrown
+				//	isAccessControlExceptionThrown = true;
+				} catch (Exception e) {
+					throw new CtxBrokerException("Could not perform remote retrieve for '"
+							+ remoteCtxIdList + "': " + e.getLocalizedMessage(), e);
+				}
+			}
+		}
+		
+		if (isAccessControlExceptionThrown && result.isEmpty())
+			throw new CtxAccessControlException("'" + ActionConstants.READ.name()
+					+ "' access to '" + ctxIdList + "' denied for requestor '"
+					+ requestor + "'");
 						
 		if (LOG.isDebugEnabled())
 			LOG.debug("retrieve: result=" + result);
@@ -1954,8 +2049,8 @@ public class InternalCtxBroker implements ICtxBroker {
 			// Check if access control is required
 			if (!requestor.equals(this.getLocalRequestor())) {
 				// Check WRITE permission
-				this.ctxAccessController.checkPermission(requestor, target,	
-						new CtxPermission(ctxModelObject.getId(), CtxPermission.WRITE));
+				this.ctxAccessController.checkPermission(requestor, 
+						ctxModelObject.getId(), ActionConstants.WRITE);
 			}
 			// No CtxAccessControlException thrown implies WRITE access has been granted
 			
@@ -2230,8 +2325,8 @@ public class InternalCtxBroker implements ICtxBroker {
 
 				if(!requestor.equals(this.getLocalRequestor())){
 
-					this.ctxAccessController.checkPermission(requestor, target,
-							new CtxPermission(identifier, CtxPermission.DELETE));
+					this.ctxAccessController.checkPermission(requestor, identifier,
+							ActionConstants.DELETE);
 				}
 				try {
 					objectResult = this.userCtxDBMgr.remove(identifier);	
