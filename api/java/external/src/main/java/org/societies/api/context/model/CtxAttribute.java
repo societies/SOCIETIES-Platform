@@ -481,4 +481,26 @@ public class CtxAttribute extends CtxModelObject {
 		
 		this.historyRecorded = historyRecorded;
 	}
+	
+	/**
+	 * Returns a String representation of this context attribute.
+     * 
+     * @return a String representation of this context attribute.
+     * @since 2.0
+     */
+	@Override
+	public String toString() {
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append(this.getClass().getSimpleName());
+		sb.append(" {id=");
+		sb.append(this.getId());
+		sb.append(", lastModified=");
+		sb.append(this.getLastModified());
+		sb.append(", value=");
+		sb.append(this.getValue());
+		sb.append("}");
+		
+		return sb.toString();
+	}
 }
