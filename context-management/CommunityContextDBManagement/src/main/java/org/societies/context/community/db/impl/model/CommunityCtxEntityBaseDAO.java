@@ -60,6 +60,11 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 			query = "select entity.ctxId from CommunityCtxEntityBaseDAO as entity where entity.ctxId.owner_id = :ownerId"
 	),
 	@NamedQuery(
+			name = "getCommunityCtxEntityBaseIdByOwnerIdAndType",
+			query = "select entity.ctxId from CommunityCtxEntityBaseDAO as entity where entity.ctxId.owner_id = :ownerId " +
+					"and entity.ctxId.type = :type"
+	),
+	@NamedQuery(
 			name = "getCommunityCtxEntityBaseIdsByType",
 			query = "select entity.ctxId from CommunityCtxEntityBaseDAO as entity where entity.ctxId.type = :type"
 	),

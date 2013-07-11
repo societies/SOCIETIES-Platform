@@ -391,10 +391,10 @@ public class CommunityCtxDBMgrTest {
 	    ids = communityDB.lookup(CIS_IIDENTITY_STRING12, types);
 	    assertTrue(ids.contains(entId));
 	    assertEquals(entId.getOwnerId(),CIS_IIDENTITY_STRING12);
-	    assertEquals(3, ids.size());
+	    assertEquals(1, ids.size());
 	              
-	    assertTrue(ids.contains(entId2));
-	    assertTrue(ids.contains(entId3));
+	    assertTrue(!ids.contains(entId2));
+	    assertTrue(!ids.contains(entId3));
 	    assertEquals(entId2.getOwnerId(),CIS_IIDENTITY_STRING13);
 
 	    final Set<String> types2 = new HashSet<String>();
@@ -405,10 +405,10 @@ public class CommunityCtxDBMgrTest {
 	    //
 	    ids = communityDB.lookup(attribute.getOwnerId(), types2);
 	    assertTrue(ids.contains(attribute.getId()));
-	    assertEquals(3, ids.size());
+	    assertEquals(1, ids.size());
 	              
-	    assertTrue(ids.contains(attribute2.getId()));
-	    assertTrue(ids.contains(attribute3.getId()));
+	    assertTrue(!ids.contains(attribute2.getId()));
+	    assertTrue(!ids.contains(attribute3.getId()));
 	       
    }
 	
