@@ -422,6 +422,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		return foundList;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Set<CtxIdentifier> lookup(String ownerId, Set<String> types)
 			throws CtxException {
@@ -429,11 +430,34 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		if (types == null) 
 			throw new NullPointerException("types can't be null");
 		
+		final Session session = sessionFactory.openSession();
+		Query query;
+		
 		final Set<CtxIdentifier> ids = new HashSet<CtxIdentifier>();
 		for (String type:types) {
-			ids.addAll(this.lookup(CtxModelType.ENTITY, type));
-			ids.addAll(this.lookup(CtxModelType.ATTRIBUTE, type));
-			ids.addAll(this.lookup(CtxModelType.ASSOCIATION, type));
+			//lookup for entities
+			query = session.getNamedQuery("getCtxEntityIdsByOwnerIdAndType");
+			query.setParameter("ownerId", ownerId, Hibernate.STRING);
+			query.setParameter("type", type, Hibernate.STRING);
+			ids.addAll(query.list());
+
+			//lookup for attributes
+			query = session.getNamedQuery("getCtxEntityIdsByOwnerId");
+			query.setParameter("ownerId", ownerId, Hibernate.STRING);
+			Set<CtxEntityIdentifier> entityIds = new HashSet<CtxEntityIdentifier>();
+			entityIds.addAll(query.list());
+			for (CtxEntityIdentifier entityId:entityIds) {
+				query = session.getNamedQuery("getCtxAttributeIdsByScopeAndType");
+				query.setParameter("scope", entityId.toString(), Hibernate.STRING);
+				query.setParameter("type", type, Hibernate.STRING);
+				ids.addAll(query.list());				
+			}
+
+			//lookup for associations
+			query = session.getNamedQuery("getCtxAssociationIdsByOwnerIdAndType");
+			query.setParameter("ownerId", ownerId, Hibernate.STRING);
+			query.setParameter("type", type, Hibernate.STRING);
+			ids.addAll(query.list());
 		}
 
 		return ids;
