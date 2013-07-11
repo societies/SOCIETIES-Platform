@@ -133,12 +133,11 @@ public class CommManagerHelper {
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         try {
+        	os.write(XMPPNode.ITEM_QUERY_RESPONSE_OPEN_BYTES);
             if (node == null) {
                 // return top level nodes
-                os.write(XMPPNode.ITEM_QUERY_RESPONSE_OPEN_BYTES);
                 for (XMPPNode n : allToplevelNodes)
                     os.write(n.getItemXmlBytes());
-                os.write(XMPPNode.ITEM_QUERY_RESPONSE_CLOSE_BYTES);
             } else {
                 // return specific nodes
                 // check if some root-level node matches specified node
@@ -156,14 +155,14 @@ public class CommManagerHelper {
                     }
                 }
 
+                // if found node, write it (and children)
                 if (localNode != null) {
                     os.write(localNode.getQueryXmlBytes());
-
                     for (XMPPNode n : localNode.getChildren())
                         os.write(n.getItemXmlBytes());
                 }
-                os.write(XMPPNode.ITEM_QUERY_RESPONSE_CLOSE_BYTES);
             }
+            os.write(XMPPNode.ITEM_QUERY_RESPONSE_CLOSE_BYTES);
         } catch (IOException e) {
             LOG.error(e.getMessage());
         }
@@ -181,7 +180,7 @@ public class CommManagerHelper {
                 return response;
             }
         } catch (DocumentException e) {
-            LOG.error(e.getMessage());
+            LOG.error("DocumentException trying to build XML document from '"+os.toString()+"': "+e.getMessage());
             return buildErrorResponse(iq.getFrom(), iq.getID(), e.getMessage(), e);
         }
 
