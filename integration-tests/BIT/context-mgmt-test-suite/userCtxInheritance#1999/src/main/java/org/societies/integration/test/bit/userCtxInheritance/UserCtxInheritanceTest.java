@@ -1,4 +1,4 @@
-package org.societies.integration.test.bit.comm_ctx_estimation;
+package org.societies.integration.test.bit.userCtxInheritance;
 
 import static org.junit.Assert.*;
 
@@ -33,7 +33,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 
 public class UserCtxInheritanceTest {
 
-	private static Logger LOG = LoggerFactory.getLogger(EstimateCommunityCtx.class);
+	private static Logger LOG = LoggerFactory.getLogger(UserCtxInheritanceTest.class);
 
 	private IIdentity cssIDUniversity;
 	private IIdentity cssIDEmma;
