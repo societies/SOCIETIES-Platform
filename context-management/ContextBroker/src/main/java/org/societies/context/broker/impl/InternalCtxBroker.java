@@ -1802,10 +1802,9 @@ public class InternalCtxBroker implements ICtxBroker {
 				}
 			}
 			
-			// TODO Obfuscate result if 
-			// 1. requestor is not local AND
-			// 2. result is a context attribute
-			if(!requestor.equals(this.getLocalRequestor()) && result instanceof CtxAttribute) {
+			// Obfuscate non-null result if requestor is not local
+			if (result != null && !requestor.equals(this.getLocalRequestor())) {
+				result = this.ctxAccessController.obfuscate(requestor, result);
 			}
 			
 		} else { // R E M O T E
@@ -2006,6 +2005,11 @@ public class InternalCtxBroker implements ICtxBroker {
 				if (ctxModelObject != null)
 					result.add(ctxModelObject);
 			}
+		}
+		
+		// Obfuscate non-empty result if requestor is not local
+		if(!result.isEmpty() && !requestor.equals(this.getLocalRequestor())) {
+			result.retainAll(this.ctxAccessController.obfuscate(requestor, result));
 		}
 		
 		if (!remoteCtxIdList.isEmpty()) { // R E M O T E
