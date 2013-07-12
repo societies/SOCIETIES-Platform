@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.context.broker.CtxAccessControlException;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxIdentifierFactory;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
@@ -163,6 +164,56 @@ public class CtxAccessController implements ICtxAccessController {
 			throw new CtxAccessControlException("'" + actionConst.name()
 					+ "' access to '" + ctxIdList + "' denied for requestor '"
 					+ requestor + "'");
+		return result;
+	}
+	
+	/*
+	 * @see org.societies.context.broker.api.security.ICtxAccessController#obfuscate(org.societies.api.identity.Requestor, org.societies.api.context.model.CtxModelObject)
+	 */
+	@Override
+	public CtxModelObject obfuscate(final Requestor requestor, 
+			final CtxModelObject ctxModelObject) 
+					throws CtxAccessControllerException {
+	
+		if (ctxModelObject == null)
+			throw new NullPointerException("ctxModelObject can't be null");
+		
+		final List<CtxModelObject> ctxModelObjectList = new ArrayList<CtxModelObject>(1);
+		ctxModelObjectList.add(ctxModelObject);
+		return this.obfuscate(requestor, ctxModelObjectList).get(0);
+	}
+	
+	/*
+	 * @see org.societies.context.broker.api.security.ICtxAccessController#obfuscate(org.societies.api.identity.Requestor, java.util.List)
+	 */
+	@Override
+	public List<CtxModelObject> obfuscate(final Requestor requestor, 
+			final List<CtxModelObject> ctxModelObjectList) 
+					throws CtxAccessControllerException {
+			
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (ctxModelObjectList == null)
+			throw new NullPointerException("ctxModelObjectList can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("obfuscate: requestor=" + requestor 
+					+ ", ctxModelObjectList=" + ctxModelObjectList);
+		
+		final List<CtxModelObject> result = new ArrayList<CtxModelObject>(ctxModelObjectList.size());
+		try {
+			result.addAll(this.privacyDataMgr.obfuscateData(
+					RequestorUtils.toRequestorBean(requestor), ctxModelObjectList).get());
+		} catch (ServiceUnavailableException sue) {
+			throw new CtxAccessControllerException("Failed to perform obfuscation: "
+					+ "PrivacyDataManager service is not available");
+		} catch (Exception e) {
+			throw new CtxAccessControllerException("Failed to perform obfuscation: "
+					+ e.getLocalizedMessage(), e);
+		}
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("obfuscate: result=" + result);
 		return result;
 	}
 	

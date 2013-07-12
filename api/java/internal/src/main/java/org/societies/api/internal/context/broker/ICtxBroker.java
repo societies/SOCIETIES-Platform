@@ -51,6 +51,8 @@ import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.internal.context.model.CtxEntityTypes;
  
 /**
  * This interface provides access to current, past and future context data. The
@@ -65,45 +67,6 @@ import org.societies.api.internal.context.model.CtxAssociationTypes;
  * @since 0.0.2
  */
 public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker {
-	
-	/**
-	 * Creates a {@link CtxAssociation} on the local CSS. 
-	 * 
-	 * @param type
-	 *            the type of the context association to create
-	 * @throws CtxException 
-	 * @see {@link CtxAssociationTypes}
-	 */
-	public Future<CtxAssociation> createAssociation(String type) throws CtxException;
-
-	/**
-	 * Creates a {@link CtxAssociation} with the specified type on the
-	 * identified CSS or CIS.
-	 * 
-	 * @param targetId
-	 *            the {@link IIdentity} of the CSS or CIS where the context
-	 *            association will be created
-	 * @param type
-	 *            the type of the context association to create
-	 * @throws CtxException 
-	 */
-	public Future<CtxAssociation> createAssociation(final IIdentity targetId,
-			final String type) throws CtxException;
-
-	/**
-	 * Creates a {@link CtxAttribute} of the specified type which is associated to
-	 * the identified context entity (scope). 
-	 * 
-	 * @param scope
-	 *            the identifier of the context entity to associate with the new
-	 *            attribute
-	 * @param type
-	 *            the type of the context attribute to create
-	 * @throws CtxException 
-	 * @since 0.0.1
-	 */
-	public Future<CtxAttribute> createAttribute(final CtxEntityIdentifier scope,
-			final String type) throws CtxException;
 
 	/**
 	 * Creates a {@link CtxEntity} on the local CSS.
@@ -116,16 +79,23 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	
 	/**
 	 * Creates a {@link CtxEntity} with the specified type on the identified
-	 * CSS or CIS.
-	 * 
-	 * @param targetId
+	 * CSS or CIS. The requestor on whose behalf to create the entity is 
+	 * implicitly set to the local CSS. The method returns the newly created 
+	 * context entity.
+	 *  
+	 * @param target
 	 *            the {@link IIdentity} of the CSS or CIS where the context
 	 *            entity will be created
 	 * @param type
-	 *            the type of the context entity to create
+	 *            the type of the context entity to create.
+	 * @return the newly created context entity.
 	 * @throws CtxException 
+	 *            if there is a problem performing the create operation.
+	 * @throws NullPointerException
+	 *            if any of the specified parameters is <code>null</code>.
+	 * @see CtxEntityTypes 
 	 */
-	public Future<CtxEntity> createEntity(final IIdentity targetId,
+	public Future<CtxEntity> createEntity(final IIdentity target,
 			final String type) throws CtxException;
 
 	/**
@@ -178,6 +148,59 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	 */
 	public Future<CtxEntity> createCssNode(final INetworkNode cssNodeId)
 			throws CtxException;
+	
+	/**
+	 * Creates a {@link CtxAttribute} with the specified type which is 
+	 * associated with the identified context entity (scope). The requestor on
+	 * whose behalf to create the attribute is implicitly set to the local CSS.
+	 * The method returns the newly created context attribute. 
+	 * 
+	 * @param scope
+	 *            the identifier of the context entity to associate with the new
+	 *            attribute.
+	 * @param type
+	 *            the type of the context attribute to create.
+	 * @return the newly created context attribute.
+	 * @throws CtxException 
+	 *             if there is a problem performing the create operation.
+	 * @throws NullPointerException
+	 *            if any of the specified parameters is <code>null</code>.
+	 * @see CtxAttributeTypes 
+	 * @since 0.0.1
+	 */
+	public Future<CtxAttribute> createAttribute(final CtxEntityIdentifier scope,
+			final String type) throws CtxException;
+	
+	/**
+	 * Creates a {@link CtxAssociation} on the local CSS. 
+	 * 
+	 * @param type
+	 *            the type of the context association to create
+	 * @throws CtxException 
+	 * @see {@link CtxAssociationTypes}
+	 */
+	public Future<CtxAssociation> createAssociation(final String type) throws CtxException;
+
+	/**
+	 * Creates a {@link CtxAssociation} with the specified type on the
+	 * identified CSS or CIS. The requestor on whose behalf to create the 
+	 * association is implicitly set to the local CSS. The method returns the
+	 * newly created context association.
+	 *  
+	 * @param target
+	 *            the {@link IIdentity} of the CSS or CIS where the context
+	 *            association will be created.
+	 * @param type
+	 *            the type of the context association to create.
+	 * @return the newly created context association.
+	 * @throws CtxException 
+	 *            if there is a problem performing the create operation.
+	 * @throws NullPointerException
+	 *            if any of the specified parameters is <code>null</code>.
+	 * @see CtxAssociationTypes 
+	 */
+	public Future<CtxAssociation> createAssociation(final IIdentity target,
+			final String type) throws CtxException;
 	
 	/**
 	 * Disables context monitoring to Context Database
@@ -454,12 +477,26 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 					throws CtxException;
 	
 	/**
-	 * Removes the specified context model object.
+	 * Removes the identified context model object. The method returns the
+	 * removed context model object or <code>null</code> if the identified 
+	 * context model object does not exist in the Context DB. The requestor on
+	 * whose behalf to remove the context model object is implicitly set to the
+	 * local CSS. If the latter is not allowed to remove the identified context
+	 * model object, a {@link CtxAccessControlException} is thrown.
 	 * 
-	 * @param the {@link CtxIdentifier} of the context data object to be retrieved.
+	 * @param ctxId
+	 *            the {@link CtxIdentifier} of the context model object to be 
+	 *            removed.
+	 * @return the removed context model object.
+	 * @throws CtxAccessControlException
+	 *             if the local CSS is not allowed to remove the identified 
+	 *             context model object.
 	 * @throws CtxException 
+	 *             if there is a problem performing the remove operation.
+	 * @throws NullPointerException
+	 *             if the specified ctxId is <code>null</code>.
 	 */
-	public Future<CtxModelObject> remove(CtxIdentifier identifier) throws CtxException;
+	public Future<CtxModelObject> remove(final CtxIdentifier ctxId) throws CtxException;
 
 	/**
 	 * Retrieves the {@link CtxModelObject} identified by the specified 
