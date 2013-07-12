@@ -214,23 +214,6 @@ public class InternalCtxBroker implements ICtxBroker {
 		LOG.info(this.getClass() + " instantiated");
 	}
 
-
-	@Override
-	@Async
-	public Future<CtxAssociation> createAssociation(String type) throws CtxException {
-
-		return this.createAssociation(null, null, type);
-	}
-
-
-	@Override
-	@Async
-	public Future<CtxAttribute> createAttribute(CtxEntityIdentifier scope,
-			String type) throws CtxException {
-
-		return this.createAttribute(null, scope, type);
-	}
-
 	/*
 	 * @see org.societies.api.internal.context.broker.ICtxBroker#createEntity(java.lang.String)
 	 */
@@ -279,7 +262,7 @@ public class InternalCtxBroker implements ICtxBroker {
 		if (this.isLocalId(target)) { // L O C A L
 			
 			if (IdentityType.CIS != target.getType()) { // U S E R
-				// TODO Add target parameter to UserCtxDBMgr
+				// TODO Add target parameter to UserCtxDBMgr interface
 				result = this.userCtxDBMgr.createEntity(type);
 				
 			} else { // C O M M U N I T Y
@@ -427,6 +410,94 @@ public class InternalCtxBroker implements ICtxBroker {
 		}
 
 		return new AsyncResult<CtxEntity>(result);
+	}
+	
+	@Override
+	@Async
+	public Future<CtxAttribute> createAttribute(CtxEntityIdentifier scope,
+			String type) throws CtxException {
+
+		return this.createAttribute(null, scope, type);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#createAssociation(java.lang.String)
+	 */
+	@Override
+	@Async
+	public Future<CtxAssociation> createAssociation(final String type) throws CtxException {
+
+		final Requestor requestor = this.getLocalRequestor();
+		final IIdentity target = this.getLocalIdentity();
+		return this.createAssociation(requestor, target, type);
+	}
+	
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#createAssociation(org.societies.api.identity.IIdentity, java.lang.String)
+	 */
+	@Override
+	@Async
+	public Future<CtxAssociation> createAssociation(final IIdentity target,
+			final String type) throws CtxException {
+
+		final Requestor requestor = this.getLocalRequestor();
+		return this.createAssociation(requestor, target, type);
+	}
+	
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#createAssociation(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity, java.lang.String)
+	 */
+	@Override
+	@Async
+	public Future<CtxAssociation> createAssociation(final Requestor requestor,
+			final IIdentity target, final String type) throws CtxException {
+
+		if (requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (target == null)
+			throw new NullPointerException("target can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("createAssociation: requestor=" + requestor + ", target="
+					+ target + ", type=" + type);
+		
+		CtxAssociation result = null;
+		
+		if (this.isLocalId(target)) { // L O C A L
+			
+			if (IdentityType.CIS != target.getType()) { // U S E R
+				// TODO Add target parameter to UserCtxDBMgr interface
+				result = this.userCtxDBMgr.createAssociation(type);
+				
+			} else { // C O M M U N I T Y
+			
+				result = this.communityCtxDBMgr.createAssociation(target.getBareJid(), type);
+			}
+			
+		} else { // R E M O T E
+			
+			final CreateAssociationCallback callback = new CreateAssociationCallback();
+			this.ctxBrokerClient.createAssociation(requestor, target, type, callback);
+			synchronized (callback) {
+				try {
+					callback.wait();
+					if (callback.getException() == null)
+						result = callback.getResult();
+					else
+						throw callback.getException();
+
+				} catch (InterruptedException ie) {
+					throw new CtxBrokerException("Interrupted while waiting for remote createAssociation: "
+							+ ie.getLocalizedMessage(), ie);
+				}
+			}
+		}
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("createAssociation: result=" + result);
+		return new AsyncResult<CtxAssociation>(result);	
 	}
 	
 	/*
@@ -1677,56 +1748,6 @@ public class InternalCtxBroker implements ICtxBroker {
 		return new AsyncResult<CtxAttribute>(ctxAttributeResult);
 	}
 
-	@Override
-	@Async
-	public Future<CtxAssociation> createAssociation(Requestor requestor,
-			IIdentity targetId, String type) throws CtxException {
-
-		if (requestor == null) requestor = this.getLocalRequestor();
-		if (targetId == null) targetId = this.getLocalIdentity();
-
-
-		CtxAssociation associationResult = null;
-		// CSS case
-		if (IdentityType.CSS.equals(targetId.getType()) 
-				|| IdentityType.CSS_RICH.equals(targetId.getType())
-				|| IdentityType.CSS_LIGHT.equals(targetId.getType())) {
-
-
-
-			if (this.commMgr.getIdManager().isMine(targetId)) {
-
-				associationResult = this.userCtxDBMgr.createAssociation(type);
-
-			}else {
-
-				final CreateAssociationCallback callback = new CreateAssociationCallback();
-				this.ctxBrokerClient.createAssociation(requestor, targetId, type, callback);
-
-				synchronized (callback) {
-					try {
-						callback.wait();
-						associationResult = callback.getResult();
-
-					} catch (InterruptedException e) {
-						throw new CtxBrokerException("Interrupted while waiting for remote createEntity: "+e.getLocalizedMessage(),e);
-					}
-				}			
-			}
-
-		} else if (IdentityType.CIS.equals(targetId.getType())){
-
-			associationResult = this.communityCtxDBMgr.createAssociation(targetId.toString(), type);
-			LOG.info("Community Context CREATE ASSOCIATION performed with context ID:"+associationResult.getId()+" of type:"+associationResult.getType());
-		} 
-
-
-		if (associationResult!=null)
-			return new AsyncResult<CtxAssociation>(associationResult);
-		else 
-			return new AsyncResult<CtxAssociation>(null);	
-	}
-
 	/*
 	 * @see org.societies.api.internal.context.broker.ICtxBroker#retrieve(org.societies.api.context.model.CtxIdentifier)
 	 */
@@ -2677,15 +2698,6 @@ public class InternalCtxBroker implements ICtxBroker {
 	public void setCtxAccessController(ICtxAccessController ctxAccessController) {
 
 		this.ctxAccessController = ctxAccessController;
-	}
-
-
-	@Override
-	public Future<CtxAssociation> createAssociation(IIdentity identity, String type)
-			throws CtxException {
-
-		Requestor req = null;
-		return this.createAssociation(req, identity, type);
 	}
 
 	/**

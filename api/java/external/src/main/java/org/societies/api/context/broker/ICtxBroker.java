@@ -35,11 +35,13 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxEvaluationResults;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
@@ -72,10 +74,10 @@ public interface ICtxBroker {
 	 * be specified. The method returns the newly created context entity.
 	 *  
 	 * @param requestor
-	 *            the entity on whose behalf to create the context entity.
+	 *            the requestor on whose behalf to create the context entity.
 	 * @param target
 	 *            the {@link IIdentity} of the CSS or CIS where the context
-	 *            entity will be created
+	 *            entity will be created.
 	 * @param type
 	 *            the type of the context entity to create.
 	 * @return the newly created context entity.
@@ -83,6 +85,7 @@ public interface ICtxBroker {
 	 *            if there is a problem performing the create operation.
 	 * @throws NullPointerException
 	 *            if any of the specified parameters is <code>null</code>.
+	 * @see CtxEntityTypes
 	 */
 	public Future<CtxEntity> createEntity(final Requestor requestor, 
 			final IIdentity target, final String type) throws CtxException;
@@ -105,20 +108,28 @@ public interface ICtxBroker {
 					throws CtxException;
 
 	/**
-	 * Creates a {@link CtxAssociation} with the specified type on the
-	 * identified CSS or CIS.
-	 * 
+	 * Creates a {@link CtxAssociation} with the specified type on the 
+	 * identified CSS or CIS. The requestor on whose behalf to create the
+	 * association must also be specified. The method returns the newly created
+	 * context association.
+	 *  
 	 * @param requestor
-	 *            the entity requesting to create the context association
-	 * @param targetId
+	 *            the requestor on whose behalf to create the context 
+	 *            association.
+	 * @param target
 	 *            the {@link IIdentity} of the CSS or CIS where the context
 	 *            association will be created
 	 * @param type
-	 *            the type of the context association to create
+	 *            the type of the context association to create.
+	 * @return the newly created context association.
 	 * @throws CtxException 
+	 *            if there is a problem performing the create operation.
+	 * @throws NullPointerException
+	 *            if any of the specified parameters is <code>null</code>.
+	 * @see CtxAssociationTypes 
 	 */
 	public Future<CtxAssociation> createAssociation(final Requestor requestor, 
-			final IIdentity targetId, final String type) throws CtxException;
+			final IIdentity target, final String type) throws CtxException;
 
 	/**
 	 * Looks up context model objects (i.e. entities, attributes or 
