@@ -27,6 +27,7 @@ package org.societies.context.user.inheritance.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
@@ -92,14 +93,18 @@ public class UserContextInheritanceMgr implements IUserCtxInheritanceMgr {
 		}
 	}
 
-	public ArrayList<CtxAttributeTypes>  inferTypes(ArrayList<String> inferrableTypes) {
-		//TODO 
-		//CtxAttributeIdentifier attributeTypes = (CtxAttributeIdentifier) ctxBroker.retrieve(this, ctxAttId);
-		ArrayList<CtxAttributeTypes> listOfInferableTypes = new ArrayList<CtxAttributeTypes>();
-		//listOfInferableTypes.add(CtxAttributeTypes.TEMPERATURE);
+	public List<String>  inferTypes() {
 		
+		final List<String> inferrableTypes = new CopyOnWriteArrayList<String>();
+		inferrableTypes.add(CtxAttributeTypes.TEMPERATURE);
+		inferrableTypes.add(CtxAttributeTypes.INTERESTS);
+		inferrableTypes.add(CtxAttributeTypes.BOOKS);
+		inferrableTypes.add(CtxAttributeTypes.ACTIVITIES);
+		inferrableTypes.add(CtxAttributeTypes.OCCUPATION);
+		inferrableTypes.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		inferrableTypes.add(CtxAttributeTypes.TEMPERATURE);
 		
-		return listOfInferableTypes;
+		return inferrableTypes;
 	}
 
 	public CtxAttribute communityInheritance(CtxAttributeIdentifier ctxAttrId) throws InvalidFormatException, InterruptedException, ExecutionException, CtxException {
