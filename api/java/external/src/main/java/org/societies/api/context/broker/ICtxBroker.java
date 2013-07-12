@@ -335,14 +335,30 @@ public interface ICtxBroker {
 					throws CtxException;
 
 	/**
-	 * Removes the specified context model object.
+	 * Removes the identified context model object. The method returns the
+	 * removed context model object or <code>null</code> if the identified 
+	 * context model object does not exist in the Context DB. The requestor on
+	 * whose behalf to remove the context model object must also be specified.
+	 * If the specified requestor is not allowed to remove the identified
+	 * context model object, a {@link CtxAccessControlException} is thrown.
 	 * 
-	 * @param requestor
-	 * @param identifier
+	 * @param requstor
+	 *            the requestor on whose behalf to retrieve the identified
+	 *            context model object.
+	 * @param ctxId
+	 *            the {@link CtxIdentifier} of the context model object to be 
+	 *            removed.
+	 * @return the removed context model object.
+	 * @throws CtxAccessControlException
+	 *             if the local CSS is not allowed to remove the identified 
+	 *             context model object.
 	 * @throws CtxException 
+	 *             if there is a problem performing the remove operation.
+	 * @throws NullPointerException
+	 *             if the specified ctxId is <code>null</code>. 
 	 */
 	public Future<CtxModelObject> remove(final Requestor requestor, 
-			final CtxIdentifier identifier) throws CtxException;
+			final CtxIdentifier ctxId) throws CtxException;
 
 	/**
 	 * Retrieves the {@link CtxModelObject} identified by the specified 
@@ -355,7 +371,7 @@ public interface ICtxBroker {
 	 * retrieve the identified context model object, a {@link CtxAccessControlException}
 	 * is thrown.
 	 * 
-	 * @param requestor
+	 * @param requstor
 	 *            the requestor on whose behalf to retrieve the identified
 	 *            context model object.
 	 * @param ctxId
