@@ -68,19 +68,24 @@ public interface ICtxBroker {
 
 	/**
 	 * Creates a {@link CtxEntity} with the specified type on the identified
-	 * CSS or CIS.
+	 * CSS or CIS. The requestor on whose behalf to create the entity must also
+	 * be specified. The method returns the newly created context entity.
 	 *  
 	 * @param requestor
-	 *            the entity requesting to create the context entity.
-	 * @param targetId
+	 *            the entity on whose behalf to create the context entity.
+	 * @param target
 	 *            the {@link IIdentity} of the CSS or CIS where the context
 	 *            entity will be created
 	 * @param type
-	 *            the type of the context entity to create
+	 *            the type of the context entity to create.
+	 * @return the newly created context entity.
 	 * @throws CtxException 
+	 *            if there is a problem performing the create operation.
+	 * @throws NullPointerException
+	 *            if any of the specified parameters is <code>null</code>.
 	 */
 	public Future<CtxEntity> createEntity(final Requestor requestor, 
-			final IIdentity targetId, final String type) throws CtxException;
+			final IIdentity target, final String type) throws CtxException;
 
 	/**
 	 * Creates a {@link CtxAttribute} with the specified type which is

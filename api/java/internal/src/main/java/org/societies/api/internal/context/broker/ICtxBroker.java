@@ -116,16 +116,22 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	
 	/**
 	 * Creates a {@link CtxEntity} with the specified type on the identified
-	 * CSS or CIS.
-	 * 
-	 * @param targetId
+	 * CSS or CIS. The requestor on whose behalf to create the entity is 
+	 * implicitly set to the local CSS. The method returns the newly created 
+	 * context entity.
+	 *  
+	 * @param target
 	 *            the {@link IIdentity} of the CSS or CIS where the context
 	 *            entity will be created
 	 * @param type
-	 *            the type of the context entity to create
+	 *            the type of the context entity to create.
+	 * @return the newly created context entity.
 	 * @throws CtxException 
+	 *            if there is a problem performing the create operation.
+	 * @throws NullPointerException
+	 *            if any of the specified parameters is <code>null</code>. 
 	 */
-	public Future<CtxEntity> createEntity(final IIdentity targetId,
+	public Future<CtxEntity> createEntity(final IIdentity target,
 			final String type) throws CtxException;
 
 	/**
