@@ -177,6 +177,7 @@
       <xs:enumeration value="integer"/>
       <xs:enumeration value="double"/>
       <xs:enumeration value="binary"/>
+      <xs:enumeration value="complex"/>
     </xs:restriction>
   </xs:simpleType>
 
