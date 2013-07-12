@@ -57,7 +57,6 @@ import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
-import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
@@ -412,12 +411,75 @@ public class InternalCtxBroker implements ICtxBroker {
 		return new AsyncResult<CtxEntity>(result);
 	}
 	
+	/*
+	 * @see org.societies.api.internal.context.broker.ICtxBroker#createAttribute(org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 */
 	@Override
 	@Async
-	public Future<CtxAttribute> createAttribute(CtxEntityIdentifier scope,
-			String type) throws CtxException {
+	public Future<CtxAttribute> createAttribute(final CtxEntityIdentifier scope,
+			final String type) throws CtxException {
 
-		return this.createAttribute(null, scope, type);
+		final Requestor requestor = this.getLocalRequestor();
+		return this.createAttribute(requestor, scope, type);
+	}
+	
+	/*
+	 * @see org.societies.api.context.broker.ICtxBroker#createAttribute(org.societies.api.identity.Requestor, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
+	 */
+	@Override
+	@Async
+	public Future<CtxAttribute> createAttribute(final Requestor requestor,
+			final CtxEntityIdentifier scope, final String type) throws CtxException {
+
+		if(requestor == null)
+			throw new NullPointerException("requestor can't be null");
+		if (scope == null)
+			throw new NullPointerException("scope can't be null");
+		if (type == null)
+			throw new NullPointerException("type can't be null");
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("createAttribute: requestor=" + requestor + ", scope="
+					+ scope + ", type=" + type);
+		
+		CtxAttribute result = null;
+		
+		// Extract target IIdentity
+		final IIdentity target = this.extractIIdentity(scope);
+		
+		if (this.isLocalId(target)) { // L O C A L
+			
+			if (IdentityType.CIS != target.getType()) { // U S E R
+				
+				result = this.userCtxDBMgr.createAttribute(scope, type);
+			
+			} else { // C O M M U N I T Y
+			
+				result = this.communityCtxDBMgr.createAttribute(scope, type);
+			}
+			
+		} else { // R E M O T E
+			
+			final CreateAttributeCallback callback = new CreateAttributeCallback();
+			this.ctxBrokerClient.createAttribute(requestor, target, scope, type, callback);
+			synchronized (callback) {
+				try {
+					callback.wait();
+					if (callback.getException() == null)
+						result = callback.getResult();
+					else
+						throw callback.getException(); 
+					
+				} catch (InterruptedException ie) {
+					throw new CtxBrokerException("Interrupted while waiting for remote createAttribute: "
+							+ ie.getLocalizedMessage(), ie);
+				}
+			}
+		}
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("createAttribute: result=" + result);
+		return new AsyncResult<CtxAttribute>(result);
 	}
 	
 	/*
@@ -1675,77 +1737,6 @@ public class InternalCtxBroker implements ICtxBroker {
 		} catch (ServiceUnavailableException sue) {
 			// do nothing
 		}
-	}
-
-	/*
-	 * @see org.societies.api.context.broker.ICtxBroker#createAttribute(org.societies.api.identity.Requestor, org.societies.api.context.model.CtxEntityIdentifier, java.lang.String)
-	 */
-	@Override
-	@Async
-	public Future<CtxAttribute> createAttribute(Requestor requestor,
-			CtxEntityIdentifier scope, String type) throws CtxException {
-
-		if(requestor == null)requestor = getLocalRequestor();
-
-		if (scope == null)
-			throw new NullPointerException("scope can't be null");
-		if (type == null)
-			throw new NullPointerException("type can't be null");
-
-		CtxAttribute ctxAttributeResult = null;
-		IIdentity scopeID;
-
-		try {
-			scopeID = this.commMgr.getIdManager().fromJid(scope.getOwnerId());
-		} catch (InvalidFormatException e1) {
-			throw new CtxBrokerException(scope.getOwnerId()
-					+ ": Invalid owner IIdentity String: " 
-					+ e1.getLocalizedMessage(), e1);
-		} 
-
-		if (IdentityType.CSS.equals(scopeID.getType()) 
-				|| IdentityType.CSS_RICH.equals(scopeID.getType())
-				|| IdentityType.CSS_LIGHT.equals(scopeID.getType())) {
-
-			//local call
-			if (this.commMgr.getIdManager().isMine(scopeID)){
-
-				ctxAttributeResult  =	this.userCtxDBMgr.createAttribute(scope, type);	
-
-				LOG.info("Context CREATE ATTRIBUTE performed for context ID:"+ctxAttributeResult.getId()+" of type:"+ctxAttributeResult.getType());			
-
-				//TODO origin type should be set in db manager
-				if (ctxAttributeResult.getQuality().getOriginType() == null) {
-					ctxAttributeResult.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
-				}			
-
-			} else {
-
-				// remote call
-				final CreateAttributeCallback callback = new CreateAttributeCallback();
-				ctxBrokerClient.createAttribute(requestor, scopeID, scope, type, callback);
-				synchronized (callback) {
-					try {
-						//LOG.info("Attribute creation Callback wait");
-						callback.wait();
-						ctxAttributeResult = callback.getResult();
-						//LOG.info("ctxAttribute retrieved from callback : "+ctxAttribute.getId());
-					} catch (InterruptedException e) {
-
-						throw new CtxBrokerException("Interrupted while waiting for remote ctxAttribute");
-					}
-				}
-				//end of remote code
-			}
-
-			//community context 
-		} else if (IdentityType.CIS.equals(scopeID.getType())){
-
-			ctxAttributeResult = this.communityCtxDBMgr.createAttribute(scope, type);
-			LOG.info("Community Context CREATE ATTRIBUTE performed with context ID:"+ctxAttributeResult.getId()+" of type:"+ctxAttributeResult.getType());
-		} 
-
-		return new AsyncResult<CtxAttribute>(ctxAttributeResult);
 	}
 
 	/*

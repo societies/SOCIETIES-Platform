@@ -38,6 +38,7 @@ import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
@@ -92,16 +93,23 @@ public interface ICtxBroker {
 
 	/**
 	 * Creates a {@link CtxAttribute} with the specified type which is
-	 * associated to the identified context entity (scope).
+	 * associated with the identified context entity (scope). The requestor on
+	 * whose behalf to create the attribute must also be specified. The method
+	 * returns the newly created context attribute.
 	 * 
 	 * @param requestor
-	 *            the entity requesting to create the context attribute
+	 *            the requestor on whose behalf to create the context attribute.
 	 * @param scope
 	 *            the identifier of the context entity to associate with the new
-	 *            attribute
+	 *            attribute.
 	 * @param type
-	 *            the type of the context attribute to create
+	 *            the type of the context attribute to create.
+	 * @return the newly created context attribute.
 	 * @throws CtxException 
+	 *             if there is a problem performing the create operation.
+	 * @throws NullPointerException
+	 *            if any of the specified parameters is <code>null</code>.
+	 * @see CtxAttributeTypes
 	 */
 	public Future<CtxAttribute> createAttribute(final Requestor requestor,
 			final CtxEntityIdentifier scope, final String type)

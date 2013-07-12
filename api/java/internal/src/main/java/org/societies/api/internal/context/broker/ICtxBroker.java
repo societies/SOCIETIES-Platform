@@ -51,6 +51,7 @@ import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
  
 /**
@@ -149,15 +150,22 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 			throws CtxException;
 	
 	/**
-	 * Creates a {@link CtxAttribute} of the specified type which is associated to
-	 * the identified context entity (scope). 
+	 * Creates a {@link CtxAttribute} with the specified type which is 
+	 * associated with the identified context entity (scope). The requestor on
+	 * whose behalf to create the attribute is implicitly set to the local CSS.
+	 * The method returns the newly created context attribute. 
 	 * 
 	 * @param scope
 	 *            the identifier of the context entity to associate with the new
-	 *            attribute
+	 *            attribute.
 	 * @param type
-	 *            the type of the context attribute to create
+	 *            the type of the context attribute to create.
+	 * @return the newly created context attribute.
 	 * @throws CtxException 
+	 *             if there is a problem performing the create operation.
+	 * @throws NullPointerException
+	 *            if any of the specified parameters is <code>null</code>.
+	 * @see CtxAttributeTypes 
 	 * @since 0.0.1
 	 */
 	public Future<CtxAttribute> createAttribute(final CtxEntityIdentifier scope,
