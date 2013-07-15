@@ -43,7 +43,7 @@ public class CAUIController extends BasePageController {
 
 	private boolean enableUserPrediction = true;
 	private boolean enableCommunityPrediction = true;
-	
+
 	static int i = 0;
 
 	private List<CAUIAction> userActionsList = new ArrayList<CAUIAction>();
@@ -68,12 +68,12 @@ public class CAUIController extends BasePageController {
 
 		//LOG.info("isUserPredictionEnabled ::"+this.cauiPrediction.isUserPredictionEnabled());
 		//this.enableUserPrediction = this.cauiPrediction.isUserPredictionEnabled();
-		
+
 		//LOG.info("isCommunityPredictionEnabled ::"+this.cauiPrediction.isCommunityPredictionEnabled());
 		//this.enableCommunityPrediction = this.cauiPrediction.isCommunityPredictionEnabled();
-		
-		
-		
+
+
+
 		LOG.info("action records ::"+this.userActionsList);
 		LOG.info("community records ::"+this.communityActionsList);
 		LOG.info("predictionLogList ::"+this.predictionLogList);
@@ -96,7 +96,7 @@ public class CAUIController extends BasePageController {
 
 
 	public void setEnableUserPrediction(boolean bool){
-		
+
 		this.enableUserPrediction = bool;
 		LOG.info("setEnableUserPrediction  : "+ bool);
 	}
@@ -108,33 +108,33 @@ public class CAUIController extends BasePageController {
 
 
 	public void updateComUsrPred(){
-		
+
 		LOG.info("updateComUsrPred  usr : "+ this.enableUserPrediction);
 		LOG.info("updateComUsrPred  comm : "+ this.enableCommunityPrediction);
-		
+
 		this.cauiPrediction.enableCommPrediction(this.enableCommunityPrediction);
 		this.cauiPrediction.enableUserPrediction(this.enableUserPrediction);
-		
+
 		//this.enableUserPrediction = this.cauiPrediction.isUserPredictionEnabled();
 		//this.enableCommunityPrediction = this.cauiPrediction.isCommunityPredictionEnabled();
 	}
-	
-	
-	
+
+
+
 	public void setEnableCommunityPrediction(boolean bool){
 		this.enableCommunityPrediction = bool;
 		LOG.info("setEnableCommunityPrediction  : "+ bool);
 	}
 
 	public boolean getEnableCommunityPrediction(){
-		
-		
+
+
 		LOG.info("getEnableCommunityPrediction  : "+ this.enableCommunityPrediction);
-		
+
 		return this.enableCommunityPrediction ;
 	}
-	
-	
+
+
 	public List<CAUIAction> getUserActionsList(){
 
 		return this.userActionsList;
@@ -203,10 +203,10 @@ public class CAUIController extends BasePageController {
 			for(IUserIntentAction sourceAct : originalModel.keySet()){
 
 				//String sourcActionString = sourceAct.toString();
-			
+
 				String sourcActionString = sourceAct.getparameterName() +"="+ sourceAct.getvalue();
 				LOG.info("convertModel 0 sourcActionString : "+ sourcActionString);
-				
+
 				HashMap<String, Double> targetMap = new HashMap<String, Double>();
 				if( originalModel.get(sourceAct) != null) {
 
@@ -250,15 +250,15 @@ public class CAUIController extends BasePageController {
 		this.userActionsList = this.getActiveModel(CtxAttributeTypes.CAUI_MODEL);
 		this.communityActionsList = this.getActiveModel(CtxAttributeTypes.CACI_MODEL);
 		this.predictionLogList = this.getPredictionLog();
-	
+
 		addGlobalMessage("Prediction model and log tables REFRESHED", "Retrieving model from DB", FacesMessage.SEVERITY_INFO);
 
 	}
-	
+
 	public void refreshCommunityModels(){
 
 		LOG.debug("this.cauiPrediction.retrieveCACIModel(null)");
-		
+
 		this.cauiPrediction.retrieveCACIModel(null);
 		addGlobalMessage("Retriece community model from remote cis", "Retrieving model from DB", FacesMessage.SEVERITY_INFO);
 
@@ -271,6 +271,30 @@ public class CAUIController extends BasePageController {
 		LOG.debug("discovery started..." );
 		this.cauiPrediction.generateNewCommunityModel(cisId);
 
+	}
+
+	public List<String> retrieveMyCISids (String query){
+		List<String> results = new ArrayList<String>();  
+
+		for (int i = 0; i < 10; i++) {  
+			results.add(query + i);  
+			LOG.debug("result : "+results);
+		}
+		return results;
+	}
+
+
+	private  String myCISids = "";
+	
+	
+
+	public String getMyCISids() {
+		return myCISids;
+	}
+
+
+	public void setMyCISids(String myCISids) {
+		this.myCISids = myCISids;
 	}
 
 
