@@ -43,14 +43,14 @@ public class UserCtxInheritanceTest {
 
 	public void setUp(){
 
-		LOG.info("EstimateCommunityCtx started");
+		LOG.info("UserInheritanceCTX started");
 
 	}
 
 	@Test
 	public void TestUserCtxInheritance() {
 
-		LOG.info("TestCreateCommunityEntities");
+		LOG.info("TestUserInheritabceCtx");
 		this.ctxBroker=Test1999.getCtxBroker();
 		this.commManager= Test1999.getCommManager();
 		this.cisManager = Test1999.getCisManager();
