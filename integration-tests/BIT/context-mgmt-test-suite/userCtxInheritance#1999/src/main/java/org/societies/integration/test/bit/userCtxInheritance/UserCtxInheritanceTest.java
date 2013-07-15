@@ -1,13 +1,11 @@
 package org.societies.integration.test.bit.userCtxInheritance;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +24,6 @@ import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
-import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -36,14 +33,9 @@ public class UserCtxInheritanceTest {
 	private static Logger LOG = LoggerFactory.getLogger(UserCtxInheritanceTest.class);
 
 	private IIdentity cssIDUniversity;
-	private IIdentity cssIDEmma;
 
 	// run test in university's container
 	private String targetUniversity = "university.ict-societies.eu";
-	private String targetEmma= "emma.ict-societies.eu";
-
-	//private IndividualCtxEntity emma;
-	private IndividualCtxEntity university;
 
 	public ICtxBroker ctxBroker;
 	public ICommManager commManager;
@@ -56,7 +48,7 @@ public class UserCtxInheritanceTest {
 	}
 
 	@Test
-	public void TestEstimateCommunityCtx() {
+	public void TestUserCtxInheritance() {
 
 		LOG.info("TestCreateCommunityEntities");
 		this.ctxBroker=Test1999.getCtxBroker();
@@ -68,89 +60,41 @@ public class UserCtxInheritanceTest {
 
 		try {
 			this.cssIDUniversity =  this.commManager.getIdManager().fromJid(targetUniversity);
-			this.cssIDEmma =  this.commManager.getIdManager().fromJid(targetEmma);
 
 			// setting uni attributes 
 
-			// university interests 
-			LOG.info("university's identity : " + this.cssIDUniversity.toString());
-			//CtxEntityIdentifier universityEntityID = this.ctxBroker.retrieveIndividualEntityId(null, this.cssIDUniversity).get();
-
-			LOG.info("Creating the temperature attribute for University");
-			CtxAttribute temperatureUniversity = updateIntegerAttr(this.cssIDUniversity, CtxAttributeTypes.TEMPERATURE, 10 );
-			assertEquals(temperatureUniversity.getType(), CtxAttributeTypes.TEMPERATURE);
-			LOG.info("university's temperature created : " + temperatureUniversity.getId());
-
-			LOG.info("Creating the interests attribute for University");
-			CtxAttribute interestsUniversitys = updateStringAttr(this.cssIDUniversity, CtxAttributeTypes.INTERESTS,"reading,socialnetworking,cinema,sports" );
-			assertEquals(interestsUniversitys.getType(), CtxAttributeTypes.INTERESTS);
-			LOG.info("university's Interests created : " + interestsUniversitys.getId());
+			// university locationsymbolic 
 			
-			CtxAttribute languagesUniversity = updateStringAttr(this.cssIDUniversity, CtxAttributeTypes.LANGUAGES, "English,Spanish,French" );
-			assertEquals(languagesUniversity.getType(), CtxAttributeTypes.LANGUAGES);
-			LOG.info("university's Languages created : " + languagesUniversity.getId());
-
 			CtxAttribute locationUniversity = updateStringAttr(this.cssIDUniversity, CtxAttributeTypes.LOCATION_SYMBOLIC,"zoneA" );
 			assertEquals(locationUniversity.getType(), CtxAttributeTypes.LOCATION_SYMBOLIC);
 			LOG.info("university's location created : " + locationUniversity.getId());
 
-			//String s = "125.6,127.7";
-			/*CtxAttribute locationCoordUniversity = updateStringAttr(this.cssIDUniversity, CtxAttributeTypes.LOCATION_COORDINATES, "125.6,127.7" );
-			//assertEquals(locationCoordUniversity.getType(), CtxAttributeTypes.LOCATION_COORDINATES);
-			LOG.info("university's locationCoordinated created : " + locationCoordUniversity.getId());*/
-
-
-			// E-M-M-A's interest (remote comm will be initiated)
-			LOG.info("emma's identity : " + this.cssIDEmma.toString());
-			LOG.info("Creating the temperature attribute for Emma");
-			CtxAttribute temperatureEmma = updateIntegerAttr(this.cssIDEmma, CtxAttributeTypes.TEMPERATURE, 20 );
-			assertEquals(temperatureEmma.getType(), CtxAttributeTypes.TEMPERATURE);
-			LOG.info("emma's temperature created : " + temperatureEmma.getId());
-
-			LOG.info("Creating the interests attribute for Emma");
-			CtxAttribute interestsEmma =  updateStringAttr(this.cssIDEmma,CtxAttributeTypes.INTERESTS,"cooking,horseRiding,restaurants,cinema" );
-			assertEquals(interestsEmma.getType(), CtxAttributeTypes.INTERESTS);
-			LOG.info("emmas's INTERESTS created : " + interestsEmma.getId());
-
-			CtxAttribute languagesEmma = updateStringAttr(this.cssIDEmma, CtxAttributeTypes.LANGUAGES, "English,German,Greek" );
-			assertEquals(languagesEmma.getType(), CtxAttributeTypes.LANGUAGES);
-			LOG.info("Emma's Languages created : " + languagesEmma.getId());
-
-			CtxAttribute locationEmma  = updateStringAttr(this.cssIDEmma,CtxAttributeTypes.LOCATION_SYMBOLIC,"zoneA" );
-			assertEquals(locationEmma.getType(), CtxAttributeTypes.LOCATION_SYMBOLIC);
-			LOG.info("emmas's location created : " + locationEmma.getId());
-
-			/*CtxAttribute locationCoordEmma = updateStringAttr(this.cssIDEmma, CtxAttributeTypes.LOCATION_COORDINATES,"10.5,60.5" );
-			assertEquals(locationCoordEmma.getType(), CtxAttributeTypes.LOCATION_COORDINATES);
-			LOG.info("Emma's location created : " + locationCoordEmma.getId());*/
-
 			// create CIS
 			IIdentity cisID = this.createCIS();
 
-			// at this point a community Entity should be created in universitys container
-			// at this point an association should be created in universitys container
-			LOG.info("wait until community entity and attributes are created for cisID"+ cisID  );
+			// at this point a community Entity should be created in university's container
+			// at this point an association should be created in university's container
+			
 			Thread.sleep(40000);
+			
 
 			CtxEntityIdentifier ctxCommunityEntityIdentifier = this.ctxBroker.retrieveCommunityEntityId(cisID).get();
-			LOG.info("ctxCommunityEntity id : " + ctxCommunityEntityIdentifier.toString());
 			CommunityCtxEntity communityEntity = (CommunityCtxEntity) this.ctxBroker.retrieve(ctxCommunityEntityIdentifier).get();
-			LOG.info("ctxCommunityEntity : " + communityEntity);
+			CtxAttribute locationSym1stCis = updateStringAttr(cisID, CtxAttributeTypes.LOCATION_SYMBOLIC, "Zone 1");
 
-			this.ctxBroker.createAttribute(communityEntity.getId(), CtxAttributeTypes.INTERESTS);
-			this.ctxBroker.createAttribute(communityEntity.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC);
-			this.ctxBroker.createAttribute(communityEntity.getId(), CtxAttributeTypes.TEMPERATURE);
-			this.ctxBroker.createAttribute(communityEntity.getId(), CtxAttributeTypes.LANGUAGES);
-			//this.ctxBroker.createAttribute(communityEntity.getId(), CtxAttributeTypes.LOCATION_COORDINATES);
-
-
-			LOG.info("ctxCommunityEntity members : " + communityEntity.getMembers());
-			LOG.info("ctxCommunityEntity members size : " + communityEntity.getMembers().size());
-
+			IIdentity cisId2 = this.createCIS();
+			
+			Thread.sleep(40000);
+			
+			CtxEntityIdentifier ctxCommunityEntityIdentifier2 = this.ctxBroker.retrieveCommunityEntityId(cisId2).get();
+			CommunityCtxEntity communityEntity2 = (CommunityCtxEntity) this.ctxBroker.retrieve(ctxCommunityEntityIdentifier2).get();	
+			CtxAttribute locationSym2ndCis = updateStringAttr(cisId2, CtxAttributeTypes.LOCATION_SYMBOLIC, "Zone 2");
 
 			// the following lines will be removed with code adding a css member to the cis
 			// adding emma to community
 			Set<CtxAssociationIdentifier> comAssocIdSet = communityEntity.getAssociations(CtxAssociationTypes.HAS_MEMBERS);
+			
+			Set<CtxAssociationIdentifier> comAssocIdSet2 = communityEntity2.getAssociations(CtxAssociationTypes.HAS_MEMBERS);
 			LOG.info("ctxCommunityEntity members comAssocIdSet : " + comAssocIdSet);
 			LOG.info("ctxCommunityEntity members comAssocIdSet size : " + comAssocIdSet.size());
 
@@ -159,13 +103,15 @@ public class UserCtxInheritanceTest {
 			if(comAssocIdSet != null ){
 				for(CtxAssociationIdentifier assocID : comAssocIdSet){
 					hasMembersAssoc = (CtxAssociation) this.ctxBroker.retrieve(assocID).get();	
-					LOG.info("hasMembersAssoc getChildEntities: " + hasMembersAssoc.getChildEntities());
-					LOG.info("hasMembersAssoc size: " + hasMembersAssoc.getChildEntities().size());
-					LOG.info("hasMembersAssoc getParentEntity: " + hasMembersAssoc.getParentEntity());
-
-					CtxEntityIdentifier emmaEntityID = this.ctxBroker.retrieveIndividualEntityId(null,this.cssIDEmma).get();
-					hasMembersAssoc.addChildEntity(emmaEntityID);
-
+					CtxEntityIdentifier uniEntityID = this.ctxBroker.retrieveIndividualEntityId(null,this.cssIDUniversity).get();
+					hasMembersAssoc.addChildEntity(uniEntityID);
+					hasMembersAssoc = (CtxAssociation) this.ctxBroker.update(hasMembersAssoc).get();
+				}
+			}
+			
+			if(comAssocIdSet2 != null ){
+				for(CtxAssociationIdentifier assocID : comAssocIdSet2){
+					hasMembersAssoc = (CtxAssociation) this.ctxBroker.retrieve(assocID).get();	
 					CtxEntityIdentifier uniEntityID = this.ctxBroker.retrieveIndividualEntityId(null,this.cssIDUniversity).get();
 					hasMembersAssoc.addChildEntity(uniEntityID);
 					hasMembersAssoc = (CtxAssociation) this.ctxBroker.update(hasMembersAssoc).get();
@@ -173,21 +119,19 @@ public class UserCtxInheritanceTest {
 			}
 
 			CommunityCtxEntity communityEntityUpdated = (CommunityCtxEntity) this.ctxBroker.retrieve(ctxCommunityEntityIdentifier).get();
+			CommunityCtxEntity communityEntityUpdated2 = (CommunityCtxEntity) this.ctxBroker.retrieve(ctxCommunityEntityIdentifier2).get();
+
 			LOG.info("Updated ctxCommunityEntity : " + communityEntityUpdated.getMembers());
 			LOG.info("Updated ctxCommunityEntity members : " + communityEntityUpdated.getMembers());
 			// the upper lines will be removed with code adding a css member to the cis
 			// a community now exists with two members university (local) and emma (remote)
 
-
-			//test estimations 
-
-			fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.INTERESTS);
-			fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC);
-			fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.TEMPERATURE);
-			fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.LANGUAGES);
+			//test inheritance 
+			//fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.INTERESTS);
+			//fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC);
+			//fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.TEMPERATURE);
+			//fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.LANGUAGES);
 			//fetchCommunityValue(communityEntityUpdated.getId(), CtxAttributeTypes.LOCATION_COORDINATES);
-
-			// assertEquals("zoneA", locationSymbolicValue);
 
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
@@ -202,15 +146,12 @@ public class UserCtxInheritanceTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
-
 
 	private CtxAttribute updateStringAttr(IIdentity identity, String attributeType, String value){
 		CtxAttribute attributeUpdated = null;
 		List<CtxIdentifier> attributeList;
 		//List<CtxIdentifier> emmaInterestList = this.ctxBroker.lookup(null, this.cssIDEmma,CtxModelType.ATTRIBUTE,CtxAttributeTypes.INTERESTS).get();
-
 
 		try {
 			attributeList = this.ctxBroker.lookup(identity, CtxModelType.ATTRIBUTE,attributeType).get();
@@ -241,7 +182,6 @@ public class UserCtxInheritanceTest {
 
 		return attributeUpdated;
 	}
-
 
 	private CtxAttribute updateIntegerAttr(IIdentity identity, String attributeType, Integer value){
 		CtxAttribute attributeUpdated = null;
@@ -323,7 +263,6 @@ public class UserCtxInheritanceTest {
 			e.printStackTrace();
 		}
 
-
 	}
 
 
@@ -333,15 +272,15 @@ public class UserCtxInheritanceTest {
 		IIdentity cisID = null;
 		try {
 			Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> ();
+			
 			LOG.info("*** trying to create cis:");
-			ICisOwned cisOwned = this.cisManager.createCis("testCIS5", "cisType", cisCriteria, "nice CIS").get();
+			ICisOwned cisOwned = this.cisManager.createCis("testCIS5", "cisType", cisCriteria, "nice CIS").get();		
+			
+			String cisIDString = cisOwned.getCisId();
+			cisID = this.commManager.getIdManager().fromJid(cisIDString);
 			LOG.info("*** cis created: "+cisOwned.getCisId());
-
 			LOG.info("*** cisOwned " +cisOwned);
 			LOG.info("*** cisOwned.getCisId() " +cisOwned.getCisId());
-			String cisIDString = cisOwned.getCisId();
-
-			cisID = this.commManager.getIdManager().fromJid(cisIDString);
 
 		} catch (InterruptedException e) {
 			e.printStackTrace();
