@@ -42,13 +42,9 @@ public interface IUserCtxInheritanceMgr {
 	 * @since 0.0.1
 	 */
 
-	public CtxAttribute communityInheritance(CtxAttributeIdentifier ctxAttrId){
-		
-	}
+	public CtxAttribute communityInheritance(CtxAttributeIdentifier ctxAttrId);
 	
-	public CtxAttribute compareQoC(CtxAttribute ctxAtt1, CtxAttribute ctxAtt2) {
-		
-	}
+	public CtxAttribute compareQoC(CtxAttribute ctxAtt1, CtxAttribute ctxAtt2);
 	
 	public void getCIS(IIdentity cisId);
 
