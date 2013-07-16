@@ -19,46 +19,21 @@
  */
 package org.societies.privacytrust.privacyprotection.test.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxIdentifierFactory;
-import org.societies.api.context.model.MalformedCtxIdentifierException;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.Requestor;
-import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.DataWrapperFactory;
-import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.Name;
-import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
-import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 import org.societies.privacytrust.privacyprotection.model.PrivacyPermission;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Olivier Maridat (Trialog)
@@ -66,92 +41,95 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 public class PrivacyPermissionTest {
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyPermissionTest.class.getSimpleName());
-	
+
 	public PrivacyPermission privacyPermission;
 	public static List<Action> actions0;
 	public static List<Action> actions1;
 	public static List<Action> actions2;
-	
+
 	@BeforeClass
 	public static void setUpClass() {
 		actions0 = new ArrayList<Action>();
-		
+
 		actions1 = new ArrayList<Action>();
-		actions1.add(new Action(ActionConstants.READ));
-		
+		actions1.add(ActionUtils.create(ActionConstants.READ));
+
 		actions2 = new ArrayList<Action>();
-		actions2.add(new Action(ActionConstants.READ, true));
-		actions2.add(new Action(ActionConstants.WRITE, false));
+		actions2.add(ActionUtils.create(ActionConstants.READ, true));
+		actions2.add(ActionUtils.create(ActionConstants.WRITE, false));
 	}
-	
+
 	@Before
 	public void setUp() {
 		privacyPermission = new PrivacyPermission();
 	}
-	
+
 	@After
 	public void tearDown() {
 		privacyPermission = null;
 	}
-	
-	
+
+
 	@Test
 	public void testSet1Action() {
 		String testTitle = new String("testSet1Action");
 		LOG.info("[Test] "+testTitle);
-		
+
 		// -- 1 action in the list
 		LOG.info("Expected actions:");
 		for(Action action : actions1) {
-			LOG.info(action.getActionType().name()+":"+action.isOptional());
+			LOG.info(action.getActionConstant().name()+":"+action.isOptional());
 		}
-		privacyPermission.setActions(actions1);
+		privacyPermission.setActionsToData(actions1);
 		LOG.info("Setted actions: "+privacyPermission.getActions());
-		List<Action> retrievedActions1 = privacyPermission.getActionsFromString();
+		List<Action> retrievedActions1 = privacyPermission.getActionsFromData();
 		LOG.info("Retrieved actions: ");
 		for(Action action : retrievedActions1) {
-			LOG.info(action.getActionType().name()+":"+action.isOptional());
+			LOG.info(action.getActionConstant().name()+":"+action.isOptional());
 		}
-		assertEquals("Expected same but are not", actions1, retrievedActions1);
+		assertTrue("Expected same but are not", ActionUtils.equal(actions1, retrievedActions1));
 	}
-	
+
 	@Test
 	public void testSet2Actions() {
 		String testTitle = new String("testSet2Actions");
 		LOG.info("[Test] "+testTitle);
-		
 		// -- 1 action in the list
 		LOG.info("Expected actions:");
 		for(Action action : actions2) {
-			LOG.info(action.getActionType().name()+":"+action.isOptional());
+			LOG.info(action.getActionConstant().name()+":"+action.isOptional());
 		}
-		privacyPermission.setActions(actions2);
+		privacyPermission.setActionsToData(actions2);
 		LOG.info("Setted actions: "+privacyPermission.getActions());
-		List<Action> retrievedActions2 = privacyPermission.getActionsFromString();
+		LOG.info("Setted action optional flags: "+privacyPermission.getActionOptionalFlags());
+		int posOptional = 0;
+		int endOptional = privacyPermission.getActionOptionalFlags().indexOf('/', posOptional);
+		assertTrue("Should be true but string was "+privacyPermission.getActionOptionalFlags().substring(posOptional, endOptional), "true".equals(privacyPermission.getActionOptionalFlags().substring(posOptional, endOptional)));
+		List<Action> retrievedActions2 = privacyPermission.getActionsFromData();
 		LOG.info("Retrieved actions: ");
 		for(Action action : retrievedActions2) {
-			LOG.info(action.getActionType().name()+":"+action.isOptional());
+			LOG.info(action.getActionConstant().name()+":"+action.isOptional());
 		}
-		assertEquals("Expected same but are not", actions2, retrievedActions2);
+		assertTrue("Expected same but are not", ActionUtils.equal(actions2, retrievedActions2));
 	}
-	
+
 	@Test
 	public void testSet0Action() {
 		String testTitle = new String("testSet0Action");
 		LOG.info("[Test] "+testTitle);
-		
+
 		// -- 1 action in the list
 		LOG.info("Expected actions:");
 		for(Action action : actions0) {
-			LOG.info(action.getActionType().name()+":"+action.isOptional());
+			LOG.info(action.getActionConstant().name()+":"+action.isOptional());
 		}
-		privacyPermission.setActions(actions0);
+		privacyPermission.setActionsToData(actions0);
 		LOG.info("Setted actions: "+privacyPermission.getActions());
-		List<Action> retrievedActions0 = privacyPermission.getActionsFromString();
+		List<Action> retrievedActions0 = privacyPermission.getActionsFromData();
 		LOG.info("Retrieved actions: ");
 		for(Action action : retrievedActions0) {
-			LOG.info(action.getActionType().name()+":"+action.isOptional());
+			LOG.info(action.getActionConstant().name()+":"+action.isOptional());
 		}
-		assertEquals("Expected same but are not", actions0, retrievedActions0);
+		assertTrue("Expected same but are not", ActionUtils.equal(actions0, retrievedActions0));
 	}
 }

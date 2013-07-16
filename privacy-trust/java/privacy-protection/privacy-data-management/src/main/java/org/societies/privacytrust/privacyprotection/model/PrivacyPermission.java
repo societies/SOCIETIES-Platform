@@ -26,6 +26,7 @@ package org.societies.privacytrust.privacyprotection.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -36,20 +37,32 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 
+import org.eclipse.jetty.util.log.Log;
+import org.hibernate.annotations.Index;
+import org.hibernate.annotations.IndexColumn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.identity.util.DataIdentifierFactory;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
+import org.societies.api.identity.util.DataIdentifierUtils;
+import org.societies.api.identity.util.RequestorUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestItemUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.privacytrust.privacyprotection.datamanagement.util.PrivacyDataManagerInternalDeprecation;
 
 /**
  * Entity to store privacy permissions for access control persistence
@@ -60,31 +73,30 @@ import org.societies.api.schema.identity.DataIdentifier;
 @Entity
 @Table(name = "PrivacyPermission")
 public class PrivacyPermission implements Serializable {
+	private static final Logger LOG = LoggerFactory.getLogger(PrivacyPermission.class);
 	private static final long serialVersionUID = -5745233622018708564L;
 
 	@Id
 	@GeneratedValue
 	private Long id;
-	private String requestorId;
-	@Enumerated
-	private PrivacyPolicyTypeConstants permissionType; 
-	@Basic(optional=true)
-	private String serviceId;
-	@Basic(optional=true)
-	private String cisId;
 	private String dataId;
+	private String requestorId;
 	/**
-	 * List of actions
-	 * Format:  value/value/.../
-	 * E.g.: READ/WRITE/
+	 * List of actions.
+	 * Syntax: action1:action2:action3
+	 * E.g.: READ/WRITE
 	 */
 	private String actions;
 	/**
-	 * List of action status. In the same order of the list of actions.
-	 * Format:  value/value/.../
-	 * E.g.: false/true/
+	 * List of action optional flags. In the same order of the list of actions.
+	 * Syntax: optional1/optional2/optional3
+	 * E.g.: 1/1/0
 	 */
-	private String actionsOptional;
+	private String actionOptionalFlags;
+	/**
+	 * Number of actions for this tuple
+	 */
+	private int nbOfActions;
 	@Enumerated
 	private Decision permission;
 
@@ -104,18 +116,12 @@ public class PrivacyPermission implements Serializable {
 	 * @param actionsStatus
 	 * @param permission
 	 */
-	public PrivacyPermission(String requestorId,
-			PrivacyPolicyTypeConstants permissionType, String serviceId,
-			String cisId, String dataId, String actions, String actionsOptional,
-			Decision permission) {
+	public PrivacyPermission(String requestorId, String dataId, String actions, String actionOptionalFlags, Decision permission) {
 		super();
 		this.requestorId = requestorId;
-		this.permissionType = permissionType;
-		this.serviceId = serviceId;
-		this.cisId = cisId;
 		this.dataId = dataId;
 		this.actions = actions;
-		this.actionsOptional = actionsOptional;
+		this.actionOptionalFlags = actionOptionalFlags;
 		this.permission = permission;
 	}
 
@@ -126,22 +132,22 @@ public class PrivacyPermission implements Serializable {
 	 * @param actions
 	 * @param permission
 	 */
-	public PrivacyPermission(Requestor requestor, DataIdentifier dataId, List<Action> actions, Decision permission) {
+	public PrivacyPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions, Decision permission) {
 		super();
 		setRequestor(requestor);
 		setDataId(dataId);
-		setActions(actions);
+		setActionsToData(actions);
 		setPermission(permission);
 	}
 
 	/**
 	 * @param requestor
 	 * @param permission
+	 * @throws MalformedCtxIdentifierException 
 	 */
-	public PrivacyPermission(Requestor requestor, ResponseItem permission) {
-		this(requestor, permission.getRequestItem().getResource().getDataId(), permission.getRequestItem().getActions(), permission.getDecision());
+	public PrivacyPermission(RequestorBean requestor, ResponseItem permission) throws MalformedCtxIdentifierException {
+		this(requestor, ResourceUtils.getDataIdentifier(permission.getRequestItem().getResource()), permission.getRequestItem().getActions(), permission.getDecision());
 	}
-
 
 
 	/* --- Intelligent Setters --- */
@@ -149,245 +155,143 @@ public class PrivacyPermission implements Serializable {
 	/**
 	 * Retrieve the access control permission as a ResponseItem
 	 * @return Permission wrapped as a ResponseItem
-	 * @throws MalformedCtxIdentifierException 
 	 */
-	public ResponseItem createResponseItem() throws MalformedCtxIdentifierException {
+	public ResponseItem createResponseItem() {
 		// - Create the resource
-		DataIdentifier dataId = DataIdentifierFactory.fromUri(this.dataId);
-		Resource resource = new Resource(dataId);
+		Resource resource = null;
+		try {
+			resource = ResourceUtils.create(DataIdentifierFactory.fromUri(this.dataId));
+		} catch (MalformedCtxIdentifierException e) {
+			LOG.error("Can't retrieve the data identifier", e);
+		}
 
 		// - Create the list of actions
-		List<Action> actions = getActionsFromString();
+		List<Action> actions = getActionsFromData();
 
 		// - Create the ResponseItem
-		RequestItem requestItem = new RequestItem(resource, actions, new ArrayList<Condition>());
-		ResponseItem reponseItem = new ResponseItem(requestItem, permission);
-
+		RequestItem requestItem = RequestItemUtils.create(resource, actions, new ArrayList<Condition>());
+		ResponseItem reponseItem = ResponseItemUtils.create(permission, requestItem);
 		return reponseItem;
-	}
-
-	public void setRequestor(Requestor requestor) {
-		if (requestor != null) {
-			this.requestorId = requestor.getRequestorId().getJid();
-			if (requestor instanceof RequestorCis) {
-				this.permissionType = PrivacyPolicyTypeConstants.CIS;
-				this.serviceId = null;
-				this.cisId = ((RequestorCis) requestor).getCisRequestorId().getJid();
-			}
-			else if (requestor instanceof RequestorService) {
-				this.permissionType = PrivacyPolicyTypeConstants.SERVICE;
-				this.serviceId = ((RequestorService) requestor).getRequestorServiceId().getIdentifier().toString();
-				this.cisId = null;
-			}
-		}
 	}
 
 	public void setDataId(DataIdentifier dataId) {
 		if (dataId != null) {
-			this.dataId = dataId.getUri();
+			this.dataId = DataIdentifierUtils.toUriString(dataId);
 		}
 	}
 
-	/**
-	 * @return
-	 */
-	public List<Action> getActionsFromString() {
+	public void setRequestor(RequestorBean requestor) {
+		if (requestor != null) {
+			this.requestorId = RequestorUtils.toUriString(requestor);
+		}
+	}
+
+	public List<Action> getActionsFromData() {
 		List<Action> actions = new ArrayList<Action>();
 		if (null != this.actions && !"".equals(this.actions)) {
 			int pos = 0, end;
 			int posOptional = 0, endOptional;
 			// Loop over actions
 			while ((end = this.actions.indexOf('/', pos)) >= 0) {
-//				String action = this.actions.substring(pos, end);
-//				int positionOptional = action.indexOf(':');
-//				ActionConstants actionType = ActionConstants.valueOf(action.substring(0, positionOptional));
-//				boolean optional = "false".equals(action.substring(positionOptional+1, action.length())) ? false : true;
-//				actions.add(new Action(actionType, optional));
-//				pos = end + 1;
 				String action = this.actions.substring(pos, end);
-				ActionConstants actionType = ActionConstants.valueOf(action);
 				pos = end + 1;
-				
-				endOptional = this.actionsOptional.indexOf('/', posOptional);
-				boolean optional = "true".equals(this.actionsOptional.substring(posOptional, endOptional));
+
+				endOptional = this.actionOptionalFlags.indexOf('/', posOptional);
+				boolean optional = "true".equals(this.actionOptionalFlags.substring(posOptional, endOptional));
 				posOptional = endOptional + 1;
-				
-				actions.add(new Action(actionType, optional));
+
+				actions.add(ActionUtils.create(action, optional));
 			}
 		}
 		return actions;
 	}
 
-	/*
-	 * Set a list of actions as a formatted string value:optional/value:optional/...
-	 */
-	public void setActions(List<Action> actions) {
+	public void setActionsToData(List<Action> actions) {
+		if (null == actions)
+			return;
+		Collections.sort(actions, new ActionUtils.ActionComparator());
 		StringBuilder strActions = new StringBuilder();
-		StringBuilder strActionsOptional = new StringBuilder();
-		if (null != actions) {
-			for(int i=0; i<actions.size(); i++) {
-//				sb.append(actions.get(i).getActionType().name()+":"+actions.get(i).isOptional()+"/");
-				strActions.append(actions.get(i).getActionType().name()+"/");
-				strActionsOptional.append(actions.get(i).isOptional()+"/");
-			}
+		StringBuilder strAtionOptionalFlags = new StringBuilder();
+		for(Action action : actions) {
+			// sb.append(action.getActionConstant().name()+":"+action.isOptional()+"/");
+			strActions.append(action.getActionConstant().value()+"/");
+			strAtionOptionalFlags.append(action.isOptional()+"/");
 		}
+		this.nbOfActions = actions.size();
 		this.actions = strActions.toString();
-		this.actionsOptional = strActionsOptional.toString();
+		this.actionOptionalFlags = strAtionOptionalFlags.toString();
 	}
 
 	/**
 	 * @param permission ResponseItem permission
 	 */
 	public void setResponseItem(ResponseItem permission) {
-		setDataId(permission.getRequestItem().getResource().getDataId());
-		setActions(permission.getRequestItem().getActions());
+		setDataId(ResourceUtils.getDataIdUri(permission.getRequestItem().getResource()));
+		setActionsToData(permission.getRequestItem().getActions());
 		setPermission(permission.getDecision());
 	}
 
 
 
 	/* --- Normal Setters ---*/
-
-	/**
-	 * @return the id
-	 */
 	public Long getId() {
 		return id;
 	}
-
-	/**
-	 * @param id the id to set
-	 */
 	public void setId(Long id) {
 		this.id = id;
 	}
 
-	/**
-	 * @return the permission
-	 */
-	public Decision getPermission() {
-		return permission;
-	}
-
-	/**
-	 * @param permission the permission to set
-	 */
-	public void setPermission(Decision permission) {
-		this.permission = permission;
-	}
-
-	/**
-	 * @return the dataId
-	 */
 	public String getDataId() {
 		return dataId;
 	}
-
-	/**
-	 * @param dataId the dataId to set
-	 */
 	public void setDataId(String dataId) {
 		this.dataId = dataId;
 	}
 
-	/**
-	 * @return the requestorId
-	 */
 	public String getRequestorId() {
 		return requestorId;
 	}
-
-	/**
-	 * @param requestorId the requestorId to set
-	 */
 	public void setRequestorId(String requestorId) {
 		this.requestorId = requestorId;
 	}
 
-	/**
-	 * @return the permissionType
-	 */
-	public PrivacyPolicyTypeConstants getPermissionType() {
-		return permissionType;
-	}
-
-	/**
-	 * @param permissionType the permissionType to set
-	 */
-	public void setPermissionType(PrivacyPolicyTypeConstants permissionType) {
-		this.permissionType = permissionType;
-	}
-
-	/**
-	 * @return the serviceId
-	 */
-	public String getServiceId() {
-		return serviceId;
-	}
-
-	/**
-	 * @param serviceId the serviceId to set
-	 */
-	public void setServiceId(String serviceId) {
-		this.serviceId = serviceId;
-	}
-
-	/**
-	 * @return the cisId
-	 */
-	public String getCisId() {
-		return cisId;
-	}
-
-	/**
-	 * @param cisId the cisId to set
-	 */
-	public void setCisId(String cisId) {
-		this.cisId = cisId;
-	}
-
-	/**
-	 * @return the actions
-	 */
 	public String getActions() {
 		return actions;
 	}
-	/**
-	 * @param actions the actions to set
-	 */
 	public void setActions(String actions) {
 		this.actions = actions;
 	}
-	
-	/**
-	 * @return the actions
-	 */
-	public String getActionsOptional() {
-		return actionsOptional;
+
+	public String getActionOptionalFlags() {
+		return actionOptionalFlags;
 	}
-	/**
-	 * @param actions the actions to set
-	 */
-	public void setActionsOptional(String actionsOptional) {
-		this.actionsOptional = actionsOptional;
+	public void setActionOptionalFlags(String actionOptionalFlags) {
+		this.actionOptionalFlags = actionOptionalFlags;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+	public int getNbOfActions() {
+		return nbOfActions;
+	}
+	public void setNbOfActions(int nbOfActions) {
+		this.nbOfActions = nbOfActions;
+	}
+
+	public Decision getPermission() {
+		return permission;
+	}
+	public void setPermission(Decision permission) {
+		this.permission = permission;
+	}
+
+
 	@Override
 	public String toString() {
 		return "PrivacyPermission ["
 				+ (id != null ? "id=" + id + ", " : "")
-				+ (requestorId != null ? "requestorId=" + requestorId + ", "
-						: "")
-				+ (permissionType != null ? "permissionType=" + permissionType
-						+ ", " : "")
-				+ (serviceId != null ? "serviceId=" + serviceId + ", " : "")
-				+ (cisId != null ? "cisId=" + cisId + ", " : "")
+				+ (requestorId != null ? "requestorId=" + requestorId + ", " : "")
 				+ (dataId != null ? "dataId=" + dataId + ", " : "")
-				+ (actions != null ? "actions=" + actions + ", " : "")
-				+ (actionsOptional != null ? "actionsOptional=" + actionsOptional + ", " : "")
+				+ (actions != null ? nbOfActions+" actions=" + actions + ", " : "")
+				+ (actionOptionalFlags != null ? "actionOptionalFlags=" + actionOptionalFlags + ", " : "")
 				+ (permission != null ? "permission=" + permission : "") + "]";
 	}
 }

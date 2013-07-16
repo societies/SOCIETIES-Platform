@@ -24,8 +24,10 @@
  */
 package org.societies.api.identity.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,6 +44,22 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
  *
  */
 public class DataIdentifierUtils {
+	/**
+	 * Generate a list of URI: sheme://ownerId/type from these data ids
+	 * @param dataIds List of data identifier
+	 * @return List of URI string representing these data identifier
+	 */
+	public static List<String> toUriString(List<DataIdentifier> dataIds) {
+		if (null == dataIds || dataIds.size() <= 0) {
+			return null;
+		}
+		List<String> dataIdsString = new ArrayList<String>();
+		for(DataIdentifier dataId : dataIds) {
+			dataIdsString.add(toUriString(dataId));
+		}
+		return dataIdsString;
+	}
+	
 	/**
 	 * Generate a URI: sheme://ownerId/type
 	 * @param dataId

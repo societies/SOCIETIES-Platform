@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
@@ -43,7 +42,6 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.identity.Requestor;
 import org.societies.api.identity.util.DataIdentifierUtils;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.logging.IPerformanceMessage;
@@ -74,15 +72,15 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Respons
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
+import org.societies.privacytrust.privacyprotection.datamanagement.util.PrivacyDataManagerUtility;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
  * @author Olivier Maridat (Trialog)
  */
-public class PrivacyDataManager implements IPrivacyDataManager {
+public class PrivacyDataManager extends PrivacyDataManagerUtility implements IPrivacyDataManager {
 	private static final Logger LOG = LoggerFactory.getLogger(PrivacyDataManager.class);
 	private static final Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage"); // to define a dedicated Logger for Performance Testing
 	private static long performanceObfuscationCount = 0;
@@ -96,6 +94,13 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	private ICisManager cisManager;
 	/* Data */
 	/**
+	 * To choose between development and production mode.
+	 * In development mode, it is possible to disable the
+	 * privacy access control layer by a configuration
+	 * parameter.
+	 */
+	private static final boolean IS_DEVELOPMENT_MODE = false;
+	/**
 	 * Flag to enable/disable access control and obfuscation
 	 */
 	private boolean enabled;
@@ -105,10 +110,16 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 * ACCESS CONTROL
 	 * ******************************* */
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.identity.DataIdentifier, java.util.List)
-	 */
+
+	@Override
+	public List<ResponseItem> checkPermission(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException {
+		List<ResponseItem> responseItemList = new ArrayList<ResponseItem>();
+		for(DataIdentifier dataId : dataIds) {
+			responseItemList.addAll(checkPermission(requestor, dataId, actions));
+		}
+		return responseItemList;
+	}	
+
 	@Override
 	public List<ResponseItem> checkPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		// -- Verify parameters
@@ -132,15 +143,17 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			return permissions;
 		}
 
+		LOG.info("[checkPermission] Test");
 
 		// -- Retrieve a stored permission
 		try {
-			permissions = privacyDataManagerInternal.getPermissions(RequestorUtils.toRequestor(requestor, commManager.getIdManager()), dataId, ActionUtils.toActions(actions));
+			permissions = privacyDataManagerInternal.getPermissions(requestor, dataId, actions);
 			if (null != permissions && permissions.size() > 0) {
+				LOG.info("[checkPermission] Not permissions retrieved ("+RequestorUtils.toUriString(requestor)+", "+DataIdentifierUtils.toUriString(dataId)+")");
 				return permissions;
 			}
 		} catch (Exception e) {
-			LOG.warn("Error when retrieving stored decisions", e);
+			LOG.error("Error when retrieving stored decisions", e);
 		}
 
 		// -- Permission not available
@@ -153,7 +166,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		else {
 			permissions = checkPermissionCisData(requestor, dataId, actions);
 		}
-		
+
 		// -- Still no permission available: deny access
 		if (null == permissions || permissions.size() <= 0) {
 			permissions = new ArrayList<ResponseItem>();
@@ -164,59 +177,10 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		try {
 			privacyDataManagerInternal.updatePermissions(RequestorUtils.toRequestor(requestor, commManager.getIdManager()), permissions);
 		} catch (Exception e) {
-			LOG.warn("Error during decisions storage", e);
+			LOG.error("Error during decisions storage", e);
 		}
 		return permissions;
 	}
-
-	@Deprecated
-	@Override
-	public List<org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem> checkPermission(Requestor requestor, DataIdentifier dataId, List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions) throws PrivacyException {
-		return ResponseItemUtils.toResponseItems(checkPermission(RequestorUtils.toRequestorBean(requestor), dataId, ActionUtils.toActionBeans(actions)));
-	}
-	@Deprecated
-	@Override
-	public List<org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem> checkPermission(Requestor requestor, DataIdentifier dataId, org.societies.api.privacytrust.privacy.model.privacypolicy.Action action) throws PrivacyException {
-		return ResponseItemUtils.toResponseItems(checkPermission(RequestorUtils.toRequestorBean(requestor), dataId, ActionUtils.toActionBean(action)));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.identity.DataIdentifier, org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action)
-	 */
-	@Override
-	public List<ResponseItem> checkPermission(RequestorBean requestor, DataIdentifier dataId, Action action) throws PrivacyException {
-		List<Action> actions = new ArrayList<Action>();
-		actions.add(action);
-		return checkPermission(requestor, dataId, actions);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, java.util.List, java.util.List)
-	 */
-	@Override
-	public List<ResponseItem> checkPermission(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException {
-		List<ResponseItem> responseItemList = new ArrayList<ResponseItem>();
-		for(DataIdentifier dataId : dataIds) {
-			responseItemList.addAll(checkPermission(requestor, dataId, actions));
-		}
-		return responseItemList;
-	}	
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, java.util.List, org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action)
-	 */
-	@Override
-	public List<ResponseItem> checkPermission(RequestorBean requestor, List<DataIdentifier> dataIds, Action action) throws PrivacyException {
-		List<ResponseItem> responseItemList = new ArrayList<ResponseItem>();
-		for(DataIdentifier dataId : dataIds) {
-			responseItemList.addAll(checkPermission(requestor, dataId, action));
-		}
-		return responseItemList;
-	}
-
 
 	public List<ResponseItem> checkPermissionCisData(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		// -- Verify parameters
@@ -412,10 +376,6 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 * OBFUSCATION
 	 * ******************************* */
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#obfuscateData(org.societies.api.schema.identity.RequestorBean, org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper)
-	 */
 	@Async
 	@Override
 	public Future<DataWrapper> obfuscateData(RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
@@ -450,6 +410,8 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			return new AsyncResult<DataWrapper>(dataWrapper);
 		}
 
+		LOG.debug("Obfuscation level: "+obfuscationLevel);
+
 		// -- Obfuscate the data
 		DataWrapper obfuscatedDataWrapper = dataObfuscationManager.obfuscateData(dataWrapper, obfuscationLevel);
 		return new AsyncResult<DataWrapper>(obfuscatedDataWrapper);
@@ -473,7 +435,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			// Launch obfuscation
 			futureResults.put(group.getKey(), obfuscateData(requestor, dataWrapper));
 		}
-		
+
 		// -- Retrieve results
 		for (Entry<String, Future<DataWrapper>> group : futureResults.entrySet()) {
 			List<CtxModelObject> originalCtxDataList = obfuscableGroups.get(group.getKey());
@@ -532,14 +494,15 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		this.cisManager = cisManager;
 	}
 
-	/**
-	 * @return the enabled
-	 */
 	public boolean isEnabled() {
-		return enabled;
+		if (IS_DEVELOPMENT_MODE) 
+			return enabled;
+		return true;
 	}
 	/**
-	 * @param enabled the enabled to set
+	 * To enable / disable the privacy access control layer.
+	 * This is for development purpose, and will not be enforced in production mode.
+	 * @param enabled
 	 */
 	@Value("${accesscontrol.privacy.enabled:1}")
 	public void setEnabled(boolean enabled) {

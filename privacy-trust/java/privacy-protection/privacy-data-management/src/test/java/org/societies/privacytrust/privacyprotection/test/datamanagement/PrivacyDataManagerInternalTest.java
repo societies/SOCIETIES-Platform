@@ -242,10 +242,10 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			responseItems = privacyDataManagerInternal.getPermissions(requestorCis, dataId, actions);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
-			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
+			fail("[Error "+testTitle+"] Privacy error: "+e);
 		} catch (Exception e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
-			fail("[Error "+testTitle+"] error: "+e.getMessage());
+			fail("[Error "+testTitle+"] error: "+e);
 		}
 		assertTrue("Data not updated", dataUpdated);
 		assertNotNull("ResponseItem permission can't be retrieved", responseItems);
@@ -253,7 +253,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		assertEquals("Permission result not as expected", permission.name(), responseItems.get(0).getDecision().name());
 		assertTrue("Permission action list not as expected", ActionUtils.equal(ActionUtils.toActionBeans(actions), responseItems.get(0).getRequestItem().getActions()));
 	}
-
+	
 	@Test
 	@Rollback(true)
 	public void testGetPermission3Actions() {
@@ -281,6 +281,31 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		assertTrue("ResponseItem permission can't be retrieved", responseItems.size() > 0);
 		assertEquals("Permission result not as expected", permission.name(), responseItems.get(0).getDecision().name());
 		assertTrue("Permission action list not as expected", ActionUtils.equal(ActionUtils.toActionBeans(actions), responseItems.get(0).getRequestItem().getActions()));
+	}
+
+	@Test
+	@Rollback(true)
+	public void testGetPermissionPreviouslyAddedRequestorCisError() {
+		String testTitle = new String("testGetPermission: 2 actions, PERMIT for requestor so must be deny for requestorCis");
+		LOG.info("[Test] "+testTitle);
+		boolean dataUpdated = false;
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> responseItems = null;
+		List<Action> actions = new ArrayList<Action>();
+		actions.add(new Action(ActionConstants.READ));
+		actions.add(new Action(ActionConstants.WRITE));
+		Decision permission = Decision.PERMIT;
+		try {
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, permission);
+			responseItems = privacyDataManagerInternal.getPermissions(requestorCis, dataId, actions);
+		} catch (PrivacyException e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] Privacy error: "+e);
+		} catch (Exception e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] error: "+e);
+		}
+		assertTrue("Data not updated", dataUpdated);
+		assertNull("ResponseItem permission should not be retrieved", responseItems);
 	}
 
 

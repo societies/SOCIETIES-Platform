@@ -135,15 +135,17 @@ public class RequestorUtils {
 		if (null != requestor) {
 			sb.append(requestor.getRequestorId());
 			if (requestor instanceof RequestorCisBean) {
+				sb.append("/");
 				sb.append(((RequestorCisBean)requestor).getCisRequestorId());
 			}
 			if (requestor instanceof RequestorServiceBean) {
+				sb.append("/");
 				if (null != ((RequestorServiceBean)requestor).getRequestorServiceId()) {
 					sb.append(((RequestorServiceBean)requestor).getRequestorServiceId().getServiceInstanceIdentifier());
 				}
 			}
 		}
-		return sb.toString().hashCode()+"";
+		return sb.toString();
 	}
 
 

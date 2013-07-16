@@ -33,6 +33,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -458,7 +459,7 @@ public class PrivacyDataManagerTest {
 		
 		// Mock Privacy preference manager
 		IPrivacyPreferenceManager privacyPreferencesManagerMocked = Mockito.mock(IPrivacyPreferenceManager.class);
-		Mockito.when(privacyPreferencesManagerMocked.evaluateDObfPreference((DObfPreferenceDetailsBean) Mockito.any())).thenReturn(0.5);
+		Mockito.when(privacyPreferencesManagerMocked.evaluateDObfPreference((DObfPreferenceDetailsBean) Matchers.anyObject())).thenReturn(0.5);
 		((PrivacyDataManager)privacyDataManager).setPrivacyPreferenceManager(privacyPreferencesManagerMocked);
 		
 		// -- Launch obfuscation

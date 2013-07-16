@@ -30,6 +30,7 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 
@@ -39,34 +40,40 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Respons
  */
 public interface IPrivacyDataManagerInternal {
 	/**
-	 * Retrieve the relevant privacy permissions
+	 * Retrieve the relevant permissions for these data identifier and these actions
 	 * 
 	 * @param requestor Requestor of the data. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
-	 * @param dataId Id of the requested data.
-	 * @return List of ResponseItem of these permissions
+	 * @param dataId List of ids of the requested data.
+	 * @param actions List of actions requested over these data
+	 * @return The list of available privacy permissions for each data (if any). Most relevant permissions (as many actions as possible) will be returned.
 	 * @throws PrivacyException if wrong parameters or storage issue
 	 */
-	//	public List<ResponseItem> getPermissions(RequestorBean requestor, DataIdentifier dataId) throws PrivacyException;
+	public List<ResponseItem> getPermissions(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException;
+
+	/**
+	 * Retrieve the relevant permissions
+	 * Duplication of methods {@link #getPermissions(RequestorBean, List, List)} for utility purpose
+	 * @see IPrivacyDataManagerInternal#getPermissions(RequestorBean, List, List)
+	 */
+	public List<ResponseItem> getPermissions(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
+
+	/**
+	 * Retrieve the relevant permissions for this data identifier
+	 * Duplication of methods {@link #getPermissions(RequestorBean, List, List)} for utility purpose
+	 * @see IPrivacyDataManagerInternal#getPermissions(RequestorBean, List, List)
+	 */
+	public List<ResponseItem> getPermissions(RequestorBean requestor, DataIdentifier dataId) throws PrivacyException;
+
 	/**
 	 * Will be removed in R1.2
-	 * @see IPrivacyDataManagerInternal#getPermissions(Requestor, DataIdentifier)
+	 * @see IPrivacyDataManagerInternal#getPermissions(RequestorBean, DataIdentifier)
 	 */
 	@Deprecated
 	public List<org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem> getPermissions(Requestor requestor, DataIdentifier dataId) throws PrivacyException;
 
 	/**
-	 * Retrieve the relevant permissions
-	 * 
-	 * @param requestor Requestor of the data. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
-	 * @param dataId Id of the requested data.
-	 * @param actions List of actions requested over this data
-	 * @return The ResponseItem of this permission
-	 * @throws PrivacyException if wrong parameters or storage issue
-	 */
-	//	public List<ResponseItem> getPermissions(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
-	/**
 	 * Will be removed in R1.2
-	 * @see IPrivacyDataManagerInternal#getPermissions(Requestor, DataIdentifier, List)
+	 * @see IPrivacyDataManagerInternal#getPermissions(RequestorBean, DataIdentifier, List)
 	 */
 	@Deprecated
 	public List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> getPermissions(Requestor requestor, DataIdentifier dataId, List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions) throws PrivacyException;
@@ -82,7 +89,8 @@ public interface IPrivacyDataManagerInternal {
 	 * @return Success of the operation
 	 * @throws PrivacyException
 	 */
-	//	public boolean updatePermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions, Decision permission) throws PrivacyException;
+//		public boolean updatePermissions(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions, List<Decision> permissions) throws PrivacyException;
+		public boolean updatePermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions, Decision permission) throws PrivacyException;
 	/**
 	 * Will be removed in R1.2
 	 * @see IPrivacyDataManagerInternal#updatePermission(RequestorBean, DataIdentifier, List, Decision)
@@ -114,7 +122,7 @@ public interface IPrivacyDataManagerInternal {
 	 * @return Success of the operation
 	 * @throws PrivacyException
 	 */
-	//	public boolean updatePermissions(RequestorBean requestor, List<ResponseItem> permissions) throws PrivacyException;
+//	public boolean updatePermissions(RequestorBean requestor, List<ResponseItem> permissions) throws PrivacyException;
 	/**
 	 * Will be removed in R1.2
 	 * @see IPrivacyDataManagerInternal#updatePermissions(RequestorBean, List)
@@ -154,4 +162,7 @@ public interface IPrivacyDataManagerInternal {
 	 */
 	@Deprecated
 	public boolean deletePermission(Requestor requestor, DataIdentifier dataId, List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions) throws PrivacyException;
+
+	boolean deletePermissions(RequestorBean requestor, DataIdentifier dataId) throws PrivacyException;
+	boolean deletePermissions(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
 }
