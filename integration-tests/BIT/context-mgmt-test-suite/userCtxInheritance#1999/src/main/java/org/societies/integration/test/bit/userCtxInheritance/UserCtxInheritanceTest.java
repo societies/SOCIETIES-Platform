@@ -27,7 +27,9 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.context.*;
+
+
+
 
 public class UserCtxInheritanceTest {
 
@@ -125,10 +127,10 @@ public class UserCtxInheritanceTest {
 			LOG.info("The location of the CIS-AA is: "+locationSym1stCis.getStringValue());
 			LOG.info("The location of the CIS-BB is: "+locationSym2ndCis.getStringValue());
 			// the upper lines will be removed with code adding a css member to the cis
-			// a community now exists with two members university (local) and emma (remote)
+			// two communities now exist with university being in both communities
 
 			//test inheritance 
-			
+		
 
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block

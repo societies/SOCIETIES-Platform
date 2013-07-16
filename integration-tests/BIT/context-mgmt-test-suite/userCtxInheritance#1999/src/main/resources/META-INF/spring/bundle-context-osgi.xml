@@ -28,5 +28,8 @@
 	<osgi:reference id="cisManager" 
 		interface="org.societies.api.cis.management.ICisManager">
 	</osgi:reference>
+	<osgi:reference id="inheritanceMgr" 
+		interface="org.societies.context.api.user.inheritance.IUserCtxInheritanceMgr">
+	</osgi:reference>
 	
 </beans>
