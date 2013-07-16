@@ -79,50 +79,58 @@ public interface IPrivacyDataManagerInternal {
 	public List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> getPermissions(Requestor requestor, DataIdentifier dataId, List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions) throws PrivacyException;
 
 	/**
-	 * Update access control permissions over a data
+	 * Update access control permission over a data
 	 * 
 	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
 	 * @param dataId ID of the requested data.
 	 * @param ownerId the ID of the owner of the data. Generally the local CSS Id.
 	 * @param actions List of actions to request over this data.
-	 * @param permission Permission.
+	 * @param decision Permission decision for this data.
 	 * @return Success of the operation
 	 * @throws PrivacyException
 	 */
-//		public boolean updatePermissions(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions, List<Decision> permissions) throws PrivacyException;
-		public boolean updatePermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions, Decision permission) throws PrivacyException;
-	/**
-	 * Will be removed in R1.2
-	 * @see IPrivacyDataManagerInternal#updatePermission(RequestorBean, DataIdentifier, List, Decision)
-	 */
-	@Deprecated
-	public boolean updatePermission(Requestor requestor, DataIdentifier dataId, List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions, org.societies.api.privacytrust.privacy.model.privacypolicy.Decision permission) throws PrivacyException;
+	public boolean updatePermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions, Decision decision) throws PrivacyException;
 
 	/**
 	 * Update access control permissions over a data
+	 * Duplication of methods {@link #updatePermission(RequestorBean, DataIdentifier, List, Decision)} for utility purpose
+	 * @pre dataIds and decisions have the same size
+	 * 
+	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
+	 * @param dataId ID of the requested data.
+	 * @param ownerId the ID of the owner of the data. Generally the local CSS Id.
+	 * @param actions List of actions to request over this data.
+	 * @param decisions Permission decision for each data.
+	 * @return Success of the operation
+	 * @throws PrivacyException
+	 * @see {@link #updatePermission(RequestorBean, DataIdentifier, List, Decision)}
+	 */
+	public boolean updatePermissions(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions, List<Decision> decisions) throws PrivacyException;
+
+	/**
+	 * Update access control permissions over a data
+	 * Duplication of methods {@link #updatePermission(RequestorBean, DataIdentifier, List, Decision)} for utility purpose
 	 * 
 	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
 	 * @param permission Expression of the permission
 	 * @return Success of the operation
 	 * @throws PrivacyException
+	 * @see {@link #updatePermission(RequestorBean, DataIdentifier, List, Decision)}
 	 */
-	//	public boolean updatePermission(RequestorBean requestor, ResponseItem permission) throws PrivacyException;
-	/**
-	 * Will be removed in R1.2
-	 * @see IPrivacyDataManagerInternal#updatePermission(RequestorBean, ResponseItem)
-	 */
-	@Deprecated
-	public boolean updatePermission(Requestor requestor, org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem permission) throws PrivacyException;
+	public boolean updatePermission(RequestorBean requestor, ResponseItem permission) throws PrivacyException;
 
 	/**
 	 * Update access control permissions over a data
+	 * Duplication of methods {@link #updatePermission(RequestorBean, DataIdentifier, List, Decision)} for utility purpose
 	 * 
 	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
 	 * @param permissions List of permissions
 	 * @return Success of the operation
 	 * @throws PrivacyException
+	 * @see {@link #updatePermission(RequestorBean, DataIdentifier, List, Decision)}
 	 */
-//	public boolean updatePermissions(RequestorBean requestor, List<ResponseItem> permissions) throws PrivacyException;
+	public boolean updatePermissions(RequestorBean requestor, List<ResponseItem> permissions) throws PrivacyException;
+
 	/**
 	 * Will be removed in R1.2
 	 * @see IPrivacyDataManagerInternal#updatePermissions(RequestorBean, List)
@@ -131,31 +139,46 @@ public interface IPrivacyDataManagerInternal {
 	public boolean updatePermissions(Requestor requestor, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> permissions) throws PrivacyException;
 
 	/**
-	 * Delete relevant permissions
+	 * Will be removed in R1.2
+	 * @see IPrivacyDataManagerInternal#updatePermission(RequestorBean, ResponseItem)
+	 */
+	@Deprecated
+	public boolean updatePermission(Requestor requestor, org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem permission) throws PrivacyException;
+
+	/**
+	 * Will be removed in R1.2
+	 * @see IPrivacyDataManagerInternal#updatePermission(RequestorBean, DataIdentifier, List, Decision)
+	 */
+	@Deprecated
+	public boolean updatePermission(Requestor requestor, DataIdentifier dataId, List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions, org.societies.api.privacytrust.privacy.model.privacypolicy.Decision permission) throws PrivacyException;
+
+
+	/**
+	 * Delete the relevant permissions
 	 * 
 	 * @param requestor Requestor of the obfuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
-	 * @param dataId ID of the requested data.
-	 * @param ownerId the ID of the owner of the data. Generally the local CSS Id.
+	 * @param dataId Id of the requested data.
 	 * @return Success of the operation
 	 * @throws PrivacyException
 	 */
-	//	public boolean deletePermissions(RequestorBean requestor, DataIdentifier dataId) throws PrivacyException;
+	public boolean deletePermissions(RequestorBean requestor, DataIdentifier dataId) throws PrivacyException;
+	/**
+	 * Delete the relevant permissions
+	 * 
+	 * @param requestor Requestor of the obfuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
+	 * @param dataId Id of the requested data.
+	 * @param actions List of actions
+	 * @return Success of the operation
+	 * @throws PrivacyException
+	 */
+	public boolean deletePermissions(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
 	/**
 	 * Will be removed in R1.2
 	 * @see IPrivacyDataManagerInternal#updatePermissions(RequestorBean, List)
 	 */
 	@Deprecated
 	public boolean deletePermissions(Requestor requestor, DataIdentifier dataId) throws PrivacyException;
-	/**
-	 * Delete the relevant permission
-	 * 
-	 * @param requestor Requestor of the obfuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
-	 * @param dataId ID of the requested data.
-	 * @param ownerId the ID of the owner of the data. Generally the local CSS Id.
-	 * @return Success of the operation
-	 * @throws PrivacyException
-	 */
-	//	public boolean deletePermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
+
 	/**
 	 * Will be removed in R1.2
 	 * @see IPrivacyDataManagerInternal#updatePermissions(RequestorBean, List)
@@ -163,6 +186,4 @@ public interface IPrivacyDataManagerInternal {
 	@Deprecated
 	public boolean deletePermission(Requestor requestor, DataIdentifier dataId, List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions) throws PrivacyException;
 
-	boolean deletePermissions(RequestorBean requestor, DataIdentifier dataId) throws PrivacyException;
-	boolean deletePermissions(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
 }

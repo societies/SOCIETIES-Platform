@@ -27,10 +27,13 @@ package org.societies.privacytrust.privacyprotection.datamanagement.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 
@@ -52,6 +55,42 @@ public abstract class PrivacyDataManagerInternalUtility extends PrivacyDataManag
 	}
 
 	public abstract List<ResponseItem> getPermissions(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException;
+
+
+	@Override
+	public boolean updatePermissions(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions, List<Decision> decisions) throws PrivacyException {
+		if (null == dataIds || null == decisions || dataIds.size() != decisions.size()) {
+			return false;
+		}
+
+		boolean res = true;
+		for(int i=0; i<dataIds.size(); i++) {
+			res &= updatePermission(requestor, dataIds.get(i), actions, decisions.get(i));
+		}
+		return res;
+	}
+
+	@Override
+	public boolean updatePermission(RequestorBean requestor, ResponseItem permission) throws PrivacyException {
+		DataIdentifier dataId;
+		try {
+			dataId = ResourceUtils.getDataIdentifier(permission.getRequestItem().getResource());
+		} catch (MalformedCtxIdentifierException e) {
+			throw new PrivacyException("Can't retrieve the data id", e);
+		}
+		return this.updatePermission(requestor, dataId, permission.getRequestItem().getActions(), permission.getDecision());
+	}
+
+	@Override
+	public boolean updatePermissions(RequestorBean requestor, List<ResponseItem> permissions) throws PrivacyException {
+		boolean res = true;
+		for (ResponseItem permission : permissions) {
+			res &= updatePermission(requestor, permission);
+		}
+		return res;
+	}
+
+	public abstract boolean updatePermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions, Decision permission) throws PrivacyException;
 
 
 	@Override

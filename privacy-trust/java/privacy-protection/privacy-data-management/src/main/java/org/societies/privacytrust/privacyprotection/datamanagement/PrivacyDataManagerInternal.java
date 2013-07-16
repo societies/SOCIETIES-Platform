@@ -101,7 +101,7 @@ public class PrivacyDataManagerInternal extends PrivacyDataManagerInternalUtilit
 	}
 
 	@Override
-	public boolean updatePermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions, Decision permission) throws PrivacyException {
+	public boolean updatePermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions, Decision decision) throws PrivacyException {
 		// Verifications
 		if (null == requestor) {
 			throw new PrivacyException("[Parameters] RequestorId is missing");
@@ -111,6 +111,9 @@ public class PrivacyDataManagerInternal extends PrivacyDataManagerInternalUtilit
 		}
 		if (null == actions || actions.size() <= 0) {
 			throw new PrivacyException("[Parameters] Actions are missing");
+		}
+		if (null == decision) {
+			throw new PrivacyException("[Parameters] Decision is missing");
 		}
 
 		Session session = null;
@@ -126,14 +129,14 @@ public class PrivacyDataManagerInternal extends PrivacyDataManagerInternalUtilit
 			// -- Update this privacy permission
 			// - Privacy Permission doesn't exist: create a new one
 			if (null == privacyPermission) {
-				privacyPermission = new PrivacyPermission(requestor, dataId, actions, permission);
+				privacyPermission = new PrivacyPermission(requestor, dataId, actions, decision);
 			}
 			// - Privacy permission already exists: update it
 			else {
 				privacyPermission.setRequestor(requestor);
 				privacyPermission.setDataId(dataId);
 				privacyPermission.setActionsToData(actions);
-				privacyPermission.setPermission(permission);
+				privacyPermission.setPermission(decision);
 			}
 			// - Update
 			session.saveOrUpdate(privacyPermission);
