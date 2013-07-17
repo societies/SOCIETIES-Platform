@@ -794,7 +794,15 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	//***********************************************
 	//     Context Inference Methods  
 	//***********************************************	
-	
+		
+	/**
+	 * This method initiates the inheritance of the specified context attribute value based on community ctx attributes of 
+	 * the same type maintained in context db of CISs that the user belongs.
+	 *  
+	 *  @param ctxAttrId the context attribute id 
+	 *  @return ctxAttribute object 
+	 */
+	public CtxAttribute communityInheritance(CtxAttributeIdentifier ctxAttrId);
 	
 	/**
 	 * This method initiates the estimation of a community context attribute value. The method returns the ctxAttribute with 

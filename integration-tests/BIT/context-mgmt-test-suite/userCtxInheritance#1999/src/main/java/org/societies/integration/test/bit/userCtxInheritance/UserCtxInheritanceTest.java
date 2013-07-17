@@ -130,8 +130,11 @@ public class UserCtxInheritanceTest {
 			// two communities now exist with university being in both communities
 
 			//test inheritance 
-		
-
+			LOG.info("testing inheritance - start");
+			ctxBroker.communityInheritance(locationSym1stCis.getId());
+			LOG.info("testing inheritance - end");
+			
+			
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
