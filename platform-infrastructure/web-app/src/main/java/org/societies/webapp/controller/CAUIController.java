@@ -37,6 +37,7 @@ public class CAUIController extends BasePageController {
 	private static Logger LOG = LoggerFactory.getLogger(CAUIController.class);
 
 	private static final long serialVersionUID = 1L;
+	private ICommManager commMngrRef;
 
 	private String stringProperty;
 	private boolean boolProperty;
@@ -45,14 +46,31 @@ public class CAUIController extends BasePageController {
 	private boolean enableCommunityPrediction = true;
 
 	static int i = 0;
+	
 
 	private List<CAUIAction> userActionsList = new ArrayList<CAUIAction>();
 	private List<CAUIAction> communityActionsList = new ArrayList<CAUIAction>();
 	private List<CAUIActionLog> predictionLogList = new ArrayList<CAUIActionLog>();
+	private String cisId ;
+	//private List<String> cisIdList ;
+	private String[] cisIdList ;
+	
+
+
+	public String[] getCisIdList() {
+		return cisIdList;
+	}
+
+
+	public void setCisIdList(String[] cisIdList) {
+		this.cisIdList = cisIdList;
+	}
 
 
 	public CAUIController() {
-
+		
+		//cisIdList = new ArrayList<String>();
+		cisIdList = new String[] {"name1", "name2", "name2"};
 		LOG.info(this.getClass().getName() + "constructor instantiated");
 	}
 
@@ -62,8 +80,8 @@ public class CAUIController extends BasePageController {
 
 		LOG.info(this.getClass().getName() + " initialising");
 
-		this.userActionsList = this.getActiveModel(CtxAttributeTypes.CAUI_MODEL);
-		this.communityActionsList = this.getActiveModel(CtxAttributeTypes.CACI_MODEL);
+		this.userActionsList = this.getCAUIActiveModel();
+		this.communityActionsList = this.getCACIActiveModel();
 		this.predictionLogList = this.getPredictionLog();
 
 		//LOG.info("isUserPredictionEnabled ::"+this.cauiPrediction.isUserPredictionEnabled());
@@ -72,14 +90,16 @@ public class CAUIController extends BasePageController {
 		//LOG.info("isCommunityPredictionEnabled ::"+this.cauiPrediction.isCommunityPredictionEnabled());
 		//this.enableCommunityPrediction = this.cauiPrediction.isCommunityPredictionEnabled();
 
-
-
 		LOG.info("action records ::"+this.userActionsList);
 		LOG.info("community records ::"+this.communityActionsList);
 		LOG.info("predictionLogList ::"+this.predictionLogList);
-
-		//learnUserModel();
-		//learnUserModel();
+		LOG.info("cisId ::"+this.cisId);
+		
+		
+		///cisIdList.add("aaaaa");
+		//cisIdList.add("bbbbb");
+		//cisIdList.add("ccccc");
+		LOG.info("cisIdList ::"+this.cisIdList.length);
 	}
 
 
@@ -92,8 +112,28 @@ public class CAUIController extends BasePageController {
 	@ManagedProperty(value = "#{cauiPrediction}")
 	private ICAUIPrediction cauiPrediction;
 
-	private ICommManager commMngrRef;
+	
+	
+	public String getCisId() {
+		return cisId;
+	}
 
+	public void setCisId(String cisId) {
+		this.cisId = cisId;
+	}
+
+	/*
+	public List<String> getCisIdList() {
+		return cisIdList;
+	}
+
+
+	public void setCisIdList(List<String> cisIdList) {
+		this.cisIdList = cisIdList;
+	}
+	*/
+	
+	
 
 	public void setEnableUserPrediction(boolean bool){
 
@@ -133,8 +173,9 @@ public class CAUIController extends BasePageController {
 
 		return this.enableCommunityPrediction ;
 	}
-
-
+	
+	
+	
 	public List<CAUIAction> getUserActionsList(){
 
 		return this.userActionsList;
@@ -150,6 +191,41 @@ public class CAUIController extends BasePageController {
 		return this.predictionLogList;
 	}
 
+	
+	
+	
+	public List<CAUIAction> getCAUIActiveModel(){
+
+		List<CAUIAction> result = new ArrayList<CAUIAction>();
+		HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> model = new 	HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>>();
+
+		
+			model = this.cauiPrediction.getCAUIActiveModel();
+			LOG.info("getCAUIActiveModel  : "+ model);
+			if(!model.isEmpty()){
+				result = convertModel(model);
+			
+			}
+			return result;
+	}
+			
+	public List<CAUIAction> getCACIActiveModel(){
+
+		List<CAUIAction> result = new ArrayList<CAUIAction>();
+		HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> model = new 	HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>>();
+
+		
+			model = this.cauiPrediction.getCACIActiveModel();
+			LOG.info("getCAUIActiveModel  : "+ model);
+			if(!model.isEmpty()){
+				result = convertModel(model);
+			
+			}
+			return result;
+	}
+			
+			
+	/*
 	public List<CAUIAction> getActiveModel(String type){
 
 		List<CAUIAction> result = new ArrayList<CAUIAction>();
@@ -174,7 +250,8 @@ public class CAUIController extends BasePageController {
 		} 
 		return result;
 	}
-
+	*/
+	
 
 	public List<CAUIActionLog>  getPredictionLog(){
 
@@ -209,7 +286,6 @@ public class CAUIController extends BasePageController {
 
 				HashMap<String, Double> targetMap = new HashMap<String, Double>();
 				if( originalModel.get(sourceAct) != null) {
-
 
 					HashMap<IUserIntentAction, Double> targetMapOriginal = originalModel.get(sourceAct);
 
@@ -247,9 +323,9 @@ public class CAUIController extends BasePageController {
 
 	public void refreshUserModels(){
 
-		this.userActionsList = this.getActiveModel(CtxAttributeTypes.CAUI_MODEL);
-		this.communityActionsList = this.getActiveModel(CtxAttributeTypes.CACI_MODEL);
-		this.predictionLogList = this.getPredictionLog();
+		this.userActionsList = this.getCAUIActiveModel();
+	//	this.communityActionsList = this.getCACIActiveModel();
+		
 
 		addGlobalMessage("Prediction model and log tables REFRESHED", "Retrieving model from DB", FacesMessage.SEVERITY_INFO);
 
@@ -258,12 +334,22 @@ public class CAUIController extends BasePageController {
 	public void refreshCommunityModels(){
 
 		LOG.debug("this.cauiPrediction.retrieveCACIModel(null)");
-
-		this.cauiPrediction.retrieveCACIModel(null);
+		this.userActionsList = this.getCACIActiveModel();
+		//this.cauiPrediction.retrieveCACIModel(null);
 		addGlobalMessage("Retriece community model from remote cis", "Retrieving model from DB", FacesMessage.SEVERITY_INFO);
 
 	}
 
+	public void refreshPredictionLog(){
+
+		LOG.debug("this.cauiPrediction.refreshPredictionLoc");
+
+		
+		this.predictionLogList = this.getPredictionLog();
+		addGlobalMessage("Refreshing prediction log", "xxx", FacesMessage.SEVERITY_INFO);
+
+	}
+	
 	public void learnCommunityModel(){
 
 		addGlobalMessage("learn community Model", "for id "+i, FacesMessage.SEVERITY_INFO);
@@ -273,30 +359,19 @@ public class CAUIController extends BasePageController {
 
 	}
 
-	public List<String> retrieveMyCISids (String query){
+	public List<String> retrieveCISids (){
 		List<String> results = new ArrayList<String>();  
-
-		for (int i = 0; i < 10; i++) {  
-			results.add(query + i);  
+	
+		//for (int i = 0; i < 10; i++) {  
+			results.add("aaaaa");
+			results.add("bbbbb");
+			results.add("ccccc");
 			LOG.debug("result : "+results);
-		}
-		return results;
+		//}		
+		return  results;
 	}
-
-
-	private  String myCISids = "";
 	
 	
-
-	public String getMyCISids() {
-		return myCISids;
-	}
-
-
-	public void setMyCISids(String myCISids) {
-		this.myCISids = myCISids;
-	}
-
 
 	private IIdentity getOwnerId(){
 

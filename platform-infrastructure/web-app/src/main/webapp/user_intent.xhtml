@@ -11,12 +11,12 @@
 	</ui:define>
 
 	<ui:define name="body">
-		<!-- <h:head /> -->
+
 		<p:panel>
 			<f:facet name="header">
                 Context Aware User Intent Model
             </f:facet>
-			<!-- 	<h:form> -->
+
 
 
 
@@ -42,7 +42,7 @@
 							actionListener="#{cauiController.learnUserModel()}"
 							update="userTable" />
 						<p:commandButton value="Refresh user model"
-							actionListener="#{cauiController.refreshUserModels}"
+							actionListener="#{cauiController.refreshUserModels()}"
 							update="userTable" />
 					</h:panelGrid>
 
@@ -52,37 +52,33 @@
 
 
 				<p:tab title="Community Model">
-				
+								
+				<p:dataTable id="communityTable" var="CAUIAction" value="#{cauiController.communityActionsList}">
+						<p:column headerText="Source User Action">
+							<h:outputText value="#{CAUIAction.sourceAction}" />
+						</p:column>
+						<p:column headerText="Target User Action : transition probability">
+							<h:outputText value="#{CAUIAction.targetAction}" />
+						</p:column>
+					</p:dataTable>
+					
+					<h:selectOneMenu value="#{cauiController.cisId}">
+					 	 <f:selectItem itemLabel="Select local CIS id" itemValue="" /> 
+						 <f:selectItems value="#{cauiController.cisIdList}" />  
+					</h:selectOneMenu>
+					
+					<p:commandButton value="Learn new community model"
+						actionListener="#{cauiController.learnCommunityModel()}" />
 
+					<p:commandButton value="Refresh community model"
+						actionListener="#{cauiController.refreshCommunityModels()}"
+						update="communityTable" />
 
-						<p:dataTable id="communityTable" var="CAUIAction"
-							value="#{cauiController.communityActionsList}">
-							<p:column headerText="Source User Action">
-								<h:outputText value="#{CAUIAction.sourceAction}" />
-							</p:column>
-							<p:column
-								headerText="Target User Action : transition probability">
-								<h:outputText value="#{CAUIAction.targetAction}" />
-							</p:column>
-						</p:dataTable>
-
-						<p:commandButton value="Learn new community model"
-							actionListener="#{cauiController.learnCommunityModel}" />
-
-						<p:commandButton value="Refresh community model"
-							actionListener="#{cauiController.refreshCommunityModels}"
-							update="communityTable" />
-						<!-- 					
-					<p:autoComplete id="dd" dropdown="true"
-							value="#{cauiController.myCISids}"
-							completeMethod="#{cauiController.retrieveMyCISids}" />
-				 -->
-				
 				</p:tab>
 
 
 				<p:tab title="Prediction Log">
-					
+
 					<p:dataTable id="predictionLogTable" var="CAUIActionLog"
 						value="#{cauiController.predictionLogList}">
 
@@ -94,32 +90,32 @@
 						</p:column>
 					</p:dataTable>
 					<p:commandButton value="Refresh Prediction Log"
-						actionListener="#{cauiController.refreshModels}"
+						actionListener="#{cauiController.refreshPredictionLog}"
 						update="predictionLogTable" />
 				</p:tab>
 
 				<p:tab title="Options">
-				
-					<h:outputText value="Enable prediction based on User model: " />
-					<p:selectBooleanCheckbox
-						value="#{cauiController.enableUserPrediction}">
-					</p:selectBooleanCheckbox>
+					<h:panelGrid raws="3">
+						<h:outputText value="Enable prediction based on User model: " />
+						<p:selectBooleanCheckbox
+							value="#{cauiController.enableUserPrediction}">
+						</p:selectBooleanCheckbox>
 
-					<h:outputText value="Enable prediction based on Community model: " />
-					<p:selectBooleanCheckbox
-						value="#{cauiController.enableCommunityPrediction}">
-					</p:selectBooleanCheckbox>
+						<h:outputText value="Enable prediction based on Community model: " />
+						<p:selectBooleanCheckbox
+							value="#{cauiController.enableCommunityPrediction}">
+						</p:selectBooleanCheckbox>
 
-					<p:commandButton value="Submit"
-						actionListener="#{cauiController.updateComUsrPred}" />
+						<p:commandButton value="Submit"
+							actionListener="#{cauiController.updateComUsrPred}" />
 
-
+					</h:panelGrid>
 
 				</p:tab>
 			</p:tabView>
 
 
-			<!-- 	</h:form> -->
+
 		</p:panel>
 
 	</ui:define>
