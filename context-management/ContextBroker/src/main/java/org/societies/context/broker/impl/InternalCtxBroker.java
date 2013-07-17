@@ -2835,4 +2835,16 @@ public class InternalCtxBroker implements ICtxBroker {
 		
 		return this.extractIIdentity(ctxModelObject.getId());
 	}
+
+	@Override
+	public CtxAttribute communityInheritance(CtxAttributeIdentifier ctxAttrID) {
+		
+		if (ctxAttrID == null)
+			throw new NullPointerException("Exception while initiating context inheritance, ctxAttrID can't be null");
+		
+		//TODO add more controls
+		CtxAttribute ctxAttribute = this.userCtxInferenceMgr.inheritContext(ctxAttrID);
+		
+		return ctxAttribute;
+	}
 }
