@@ -40,6 +40,13 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Respons
  */
 public abstract class PrivacyDataManagerUtility extends PrivacyDataManagerDeprecation implements IPrivacyDataManager {
 	@Override
+	public List<ResponseItem> checkPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
+		List<DataIdentifier> dataIds = new ArrayList<DataIdentifier>();
+		dataIds.add(dataId);
+		return checkPermission(requestor, dataIds, actions);
+	}
+	
+	@Override
 	public List<ResponseItem> checkPermission(RequestorBean requestor, DataIdentifier dataId, Action action) throws PrivacyException {
 		List<Action> actions = new ArrayList<Action>();
 		actions.add(action);
@@ -52,8 +59,6 @@ public abstract class PrivacyDataManagerUtility extends PrivacyDataManagerDeprec
 		actions.add(action);
 		return checkPermission(requestor, dataIds, actions);
 	}
-
-	public abstract List<ResponseItem> checkPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
 
 	public abstract List<ResponseItem> checkPermission(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException;
 }

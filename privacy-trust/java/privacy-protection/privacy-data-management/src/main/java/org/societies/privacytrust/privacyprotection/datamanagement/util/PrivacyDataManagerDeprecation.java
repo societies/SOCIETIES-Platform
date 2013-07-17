@@ -48,6 +48,7 @@ public abstract class PrivacyDataManagerDeprecation implements IPrivacyDataManag
 	public List<org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem> checkPermission(Requestor requestor, DataIdentifier dataId, List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions) throws PrivacyException {
 		return ResponseItemUtils.toResponseItems(checkPermission(RequestorUtils.toRequestorBean(requestor), dataId, ActionUtils.toActionBeans(actions)));
 	}
+	
 	@Deprecated
 	@Override
 	public List<org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem> checkPermission(Requestor requestor, DataIdentifier dataId, org.societies.api.privacytrust.privacy.model.privacypolicy.Action action) throws PrivacyException {
@@ -55,4 +56,6 @@ public abstract class PrivacyDataManagerDeprecation implements IPrivacyDataManag
 	}
 	
 	public abstract List<ResponseItem> checkPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
+	
+	public abstract List<ResponseItem> checkPermission(RequestorBean requestor, DataIdentifier dataId, Action actions) throws PrivacyException;
 }

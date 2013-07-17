@@ -234,7 +234,7 @@ public class PrivacyDataManagerDeprecationTest {
 		}
 		catch (Exception e) {
 			LOG.error("[Test Exception] "+testTitle, e);
-			fail("[Error "+testTitle+"] error: "+e.getMessage());
+			fail("[Error "+testTitle+"] error: "+e);
 		}
 		assertTrue("Data permission not updated", dataUpdated);
 		assertNotNull("No permission retrieved", permissions);
@@ -259,7 +259,7 @@ public class PrivacyDataManagerDeprecationTest {
 			permissions = privacyDataManager.checkPermission(requestor, dataId, actions);
 		} catch (PrivacyException e) {
 			LOG.error("[Test PrivacyException] "+testTitle, e);
-			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
+			fail("[Error "+testTitle+"] Privacy error: "+e);
 		}
 		assertTrue("Data permission not deleted", dataDeleted);
 		assertNotNull("No permission retrieved", permissions);
