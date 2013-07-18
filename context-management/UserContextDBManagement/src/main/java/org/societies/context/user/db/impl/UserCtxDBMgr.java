@@ -66,6 +66,7 @@ import org.societies.context.user.db.impl.model.CtxModelObjectDAO;
 import org.societies.context.user.db.impl.model.CtxQualityDAO;
 import org.societies.context.user.db.impl.model.IndividualCtxEntityDAO;
 import org.societies.context.user.db.impl.model.UserCtxModelObjectNumberDAO;
+import org.societies.context.user.db.impl.model.hibernate.CtxEntityIdentifierCompositeType;
 import org.societies.context.user.db.impl.model.hibernate.CtxEntityIdentifierType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -513,6 +514,9 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		if (types == null) 
 			throw new NullPointerException("types can't be null");
 		
+		final CtxModelObjectDAO dao;
+
+
 		final Session session = sessionFactory.openSession();
 		Query query;
 		
@@ -524,7 +528,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
             case ENTITY:
 			//lookup for entities
 				query = session.getNamedQuery("getCtxEntityIdsByIdAndType");
-				query.setParameter("entityId", entityId, Hibernate.STRING);
+				query.setParameter("entityId", entityId, Hibernate.custom(CtxEntityIdentifierCompositeType.class));
 				query.setParameter("type", type, Hibernate.STRING);
 				ids.addAll(query.list());
 				break;
@@ -540,12 +544,12 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
             case ASSOCIATION:
 				//lookup for associations
 				query = session.getNamedQuery("getCtxAssociationIdsByChildEntityIdAndType");
-				query.setParameter("childEntId", entityId, Hibernate.STRING);
+				query.setParameter("childEntId", entityId, Hibernate.custom(CtxEntityIdentifierType.class));
 				query.setParameter("type", type, Hibernate.STRING);
 				ids.addAll(query.list());
 				
 				query = session.getNamedQuery("getCtxAssociationsByParentEntityIdAndType");
-				query.setParameter("parentEntId", entityId, Hibernate.STRING);
+				query.setParameter("parentEntId", entityId, Hibernate.custom(CtxEntityIdentifierType.class));
 				query.setParameter("type", type, Hibernate.STRING);
 				ids.addAll(query.list());
 				break;
