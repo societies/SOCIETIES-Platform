@@ -80,6 +80,16 @@ import org.societies.context.community.db.impl.model.hibernate.CtxEntityIdentifi
 			name = "getCommunityCtxAssociationsByParentEntityId",
 			query = "select distinct association from CommunityCtxAssociationDAO as association " +
 					"where association.parentEntity = :parentEntId"
+	),
+	@NamedQuery(
+			name = "getCommunityCtxAssociationIdsByChildEntityIdAndType",
+			query = "select distinct association.ctxId from CommunityCtxAssociationDAO as association inner join association.childEntities as childEntity " +
+					"where childEntity = :childEntId and association.ctxId.type = :type"
+	),
+	@NamedQuery(
+			name = "getCommunityCtxAssociationsByParentEntityIdAndType",
+			query = "select distinct association.ctxId from CommunityCtxAssociationDAO as association " +
+					"where association.parentEntity = :parentEntId and association.ctxId.type = :type"
 	)
 })
 @Entity

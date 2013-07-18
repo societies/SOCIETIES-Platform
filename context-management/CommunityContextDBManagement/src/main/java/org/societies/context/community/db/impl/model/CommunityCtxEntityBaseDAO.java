@@ -65,6 +65,11 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 					"and entity.ctxId.type = :type"
 	),
 	@NamedQuery(
+			name = "getCommunityCtxEntityBaseIdByIdAndType",
+			query = "select entity.ctxId from CommunityCtxEntityBaseDAO as entity where entity.ctxId = :entityId " +
+					"and entity.ctxId.type = :type"
+	),
+	@NamedQuery(
 			name = "getCommunityCtxEntityBaseIdsByType",
 			query = "select entity.ctxId from CommunityCtxEntityBaseDAO as entity where entity.ctxId.type = :type"
 	),
