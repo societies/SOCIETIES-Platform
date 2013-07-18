@@ -22,57 +22,70 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.api.user.inheritance;
+package org.societies.integration.test.bit.userCtxInheritance;
 
-//import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxAttributeValueType;
+
+import org.societies.api.cis.management.ICisManager;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.integration.test.IntegrationTestCase;
 
 /**
- * @author <a href="mailto:ybouloudis@amitec.gr">Yiorgos Bouloudis</a> (AMITEC) 
+ * 
+ *
+ * @author Yiorgos
+ *
  */
-public interface IUserCtxInheritanceMgr {
+public class Test1999 extends IntegrationTestCase{
 
-	/**
-	 * Gets an indicated CIS.
-	 * 
-	 * @param cisId
-	 * @since 0.0.1
-	 */
-
-	public CtxAttribute communityInheritance(CtxAttributeIdentifier ctxAttrId);
 	
-	public CtxAttribute compareQoC(CtxAttribute ctxAtt1, CtxAttribute ctxAtt2);
+	public static ICtxBroker ctxBroker;
+	public static ICommManager commManager;
+	public static ICisManager cisManager;
 	
-	public void getCIS(IIdentity cisId);
+	
+	public Test1999(){
+		super(1999, new Class[]{UserCtxInheritanceTest.class});
+		//super(1856, new Class[]{EstimateCommunityCtx.class});
+	}
 
 	/**
-	 * Gets the Context Attribe of an indicated type and CIS.
-	 * 
-	 * @param contextAttributeIdentifier
-	 * @param type
-	 * @param cisId
-	 * @since 0.0.1
+	 * @return the ctxBroker
 	 */
-	public void getContextAttribute(CtxAttributeIdentifier contextAttributeIdentifier, CtxAttributeValueType type, IIdentity cisId);
+	public static ICtxBroker getCtxBroker() {
+		return ctxBroker;
+	}
 
 	/**
-	 * Inherits the Context Attribute of a specified type.
-	 * 
-	 * @param contextAttributeIdentifier
-	 * @param type
-	 * @since 0.0.1
+	 * @param ctxBroker the ctxBroker to set
 	 */
-	public void inheritContextAttribute(CtxAttributeIdentifier contextAttributeIdentifier, CtxAttributeValueType type);
+	public  void setCtxBroker(ICtxBroker ctxBroker) {
+		Test1999.ctxBroker = ctxBroker;
+
+	}
+	
+	/**
+	 * @return the commMgr
+	 */
+	public static ICommManager  getCommManager() {
+		return commManager ;
+	}
 
 	/**
-	 * Resolves conflicts using specified algorithms.
-	 * 
-	 * @param conflictResolutionsAlgorithms
-	 * @since 0.0.1
+	 * @param commMgr the commMgr to set
 	 */
-	public void resolveConflicts(ConflictResolutionAlgorithm conflictResolutionsAlgorithms);
+	public  void setCommManager(ICommManager commMgr) {
+		Test1999.commManager = commMgr;
+	}	
+
+
+	public static ICisManager getCisManager() {
+		return cisManager;
+	}
+
+	public void setCisManager(ICisManager cisManager) {
+		
+		Test1999.cisManager = cisManager;
+	}
 
 }
