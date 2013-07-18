@@ -167,6 +167,24 @@ public interface IUserCtxDBMgr {
 	 * @param type
 	 */
 	public Set<CtxIdentifier> lookup(String ownerId, Set<String> types) throws CtxException;
+
+	/**
+	 * Looks up all CtxModelObjects for the specified set of types and for the specified ownerId and modelType.
+	 * 
+	 * @param ownerId
+	 * @param modelType
+	 * @param type
+	 */
+	public Set<CtxIdentifier> lookup(String ownerId, CtxModelType modelType, Set<String> types) throws CtxException;
+	
+	/**
+	 * Looks up all CtxModelObjects for the specified set of types and for the specified enityId and modelType.
+	 * 
+	 * @param entityId
+	 * @param modelType
+	 * @param type
+	 */
+	public Set<CtxIdentifier> lookup(CtxEntityIdentifier entityId, CtxModelType modelType, Set<String> types) throws CtxException;
 	
 	/**
 	 * Looks up CtxEntities of the specified type, containing the specified

@@ -442,16 +442,10 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			ids.addAll(query.list());
 
 			//lookup for attributes
-			query = session.getNamedQuery("getCtxEntityIdsByOwnerId");
-			query.setParameter("ownerId", ownerId, Hibernate.STRING);
-			Set<CtxEntityIdentifier> entityIds = new HashSet<CtxEntityIdentifier>();
-			entityIds.addAll(query.list());
-			for (CtxEntityIdentifier entityId:entityIds) {
-				query = session.getNamedQuery("getCtxAttributeIdsByScopeAndType");
-				query.setParameter("scope", entityId.toString(), Hibernate.STRING);
-				query.setParameter("type", type, Hibernate.STRING);
-				ids.addAll(query.list());				
-			}
+        	query = session.getNamedQuery("getCtxAttributeIdsByOwnerIdAndType");
+        	query.setParameter("ownerId", ownerId, Hibernate.STRING);
+        	query.setParameter("type", type, Hibernate.STRING);
+        	ids.addAll(query.list());
 
 			//lookup for associations
 			query = session.getNamedQuery("getCtxAssociationIdsByOwnerIdAndType");
@@ -463,6 +457,104 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		return ids;
 	}
 	
+	@Override
+	public Set<CtxIdentifier> lookup(String ownerId, CtxModelType modelType,
+			Set<String> types) throws CtxException {
+
+		if (modelType == null)
+			throw new NullPointerException("modelType can't be null");
+		if (types == null) 
+			throw new NullPointerException("types can't be null");
+		
+		final Session session = sessionFactory.openSession();
+		Query query;
+		
+		final Set<CtxIdentifier> ids = new HashSet<CtxIdentifier>();
+		for (String type:types) {
+			
+            switch (modelType) {
+            
+            case ENTITY:
+			//lookup for entities
+				query = session.getNamedQuery("getCtxEntityIdsByOwnerIdAndType");
+				query.setParameter("ownerId", ownerId, Hibernate.STRING);
+				query.setParameter("type", type, Hibernate.STRING);
+				ids.addAll(query.list());
+				break;
+
+            case ATTRIBUTE:
+				//lookup for attributes
+            	query = session.getNamedQuery("getCtxAttributeIdsByOwnerIdAndType");
+            	query.setParameter("ownerId", ownerId, Hibernate.STRING);
+            	query.setParameter("type", type, Hibernate.STRING);
+            	ids.addAll(query.list());
+				break;
+
+            case ASSOCIATION:
+				//lookup for associations
+				query = session.getNamedQuery("getCtxAssociationIdsByOwnerIdAndType");
+				query.setParameter("ownerId", ownerId, Hibernate.STRING);
+				query.setParameter("type", type, Hibernate.STRING);
+				ids.addAll(query.list());
+				break;
+            }
+		}
+
+		return ids;
+		
+	}
+
+	@Override
+	public Set<CtxIdentifier> lookup(CtxEntityIdentifier entityId,
+			CtxModelType modelType, Set<String> types) throws CtxException {
+
+		if (modelType == null)
+			throw new NullPointerException("modelType can't be null");
+		if (types == null) 
+			throw new NullPointerException("types can't be null");
+		
+		final Session session = sessionFactory.openSession();
+		Query query;
+		
+		final Set<CtxIdentifier> ids = new HashSet<CtxIdentifier>();
+		for (String type:types) {
+			
+            switch (modelType) {
+            
+            case ENTITY:
+			//lookup for entities
+				query = session.getNamedQuery("getCtxEntityIdsByIdAndType");
+				query.setParameter("entityId", entityId, Hibernate.STRING);
+				query.setParameter("type", type, Hibernate.STRING);
+				ids.addAll(query.list());
+				break;
+
+            case ATTRIBUTE:
+				//lookup for attributes
+            	query = session.getNamedQuery("getCtxAttributeIdsByScopeAndType");
+            	query.setParameter("scope", entityId.toString(), Hibernate.STRING);
+            	query.setParameter("type", type, Hibernate.STRING);
+            	ids.addAll(query.list());
+				break;
+
+            case ASSOCIATION:
+				//lookup for associations
+				query = session.getNamedQuery("getCtxAssociationIdsByChildEntityIdAndType");
+				query.setParameter("childEntId", entityId, Hibernate.STRING);
+				query.setParameter("type", type, Hibernate.STRING);
+				ids.addAll(query.list());
+				
+				query = session.getNamedQuery("getCtxAssociationsByParentEntityIdAndType");
+				query.setParameter("parentEntId", entityId, Hibernate.STRING);
+				query.setParameter("type", type, Hibernate.STRING);
+				ids.addAll(query.list());
+				break;
+            }
+		}
+
+		return ids;
+	}
+
 	/*
 	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#lookupEntities(java.lang.String, java.lang.String, java.io.Serializable, java.io.Serializable)
 	 */
