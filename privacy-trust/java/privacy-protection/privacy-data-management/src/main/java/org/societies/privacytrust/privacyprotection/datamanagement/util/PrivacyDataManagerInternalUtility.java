@@ -57,6 +57,20 @@ public abstract class PrivacyDataManagerInternalUtility extends PrivacyDataManag
 	public abstract List<ResponseItem> getPermissions(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException;
 
 
+
+	@Override
+	public boolean updatePermissions(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions, Decision decision) throws PrivacyException {
+		if (null == dataIds || null == decision || dataIds.size() <= 0) {
+			return false;
+		}
+
+		boolean res = true;
+		for(int i=0; i<dataIds.size(); i++) {
+			res &= updatePermission(requestor, dataIds.get(i), actions, decision);
+		}
+		return res;
+	}
+	
 	@Override
 	public boolean updatePermissions(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions, List<Decision> decisions) throws PrivacyException {
 		if (null == dataIds || null == decisions || dataIds.size() != decisions.size()) {
@@ -69,7 +83,7 @@ public abstract class PrivacyDataManagerInternalUtility extends PrivacyDataManag
 		}
 		return res;
 	}
-
+	
 	@Override
 	public boolean updatePermission(RequestorBean requestor, ResponseItem permission) throws PrivacyException {
 		DataIdentifier dataId;

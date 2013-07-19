@@ -19,6 +19,7 @@
  */
 package org.societies.privacytrust.privacyprotection.test.datamanagement;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -27,11 +28,11 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +41,7 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.model.CisAttributeTypes;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -52,9 +54,8 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
-import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.util.DataIdentifierFactory;
+import org.societies.api.identity.util.DataIdentifierUtils;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.DataWrapperFactory;
 import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.NameUtils;
@@ -113,8 +114,8 @@ public class PrivacyDataManagerTest {
 		// Data Id
 		try {
 			Random randomer = new Random((new Date()).getTime()); 
-			dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+myCssId.getJid()+"/ENTITY/person/1/ATTRIBUTE/name/"+randomer.nextInt(200));
-			cisDataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+cisId.getJid()+"/cis-member-list");
+			dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+myCssId.getJid()+"/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.NAME_FIRST+"/"+randomer.nextInt(200));
+			cisDataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+cisId.getJid()+"/"+CisAttributeTypes.MEMBER_LIST);
 		}
 		catch (MalformedCtxIdentifierException e) {
 			LOG.error("setUp(): DataId creation error "+e+"\n", e);
@@ -155,7 +156,7 @@ public class PrivacyDataManagerTest {
 			actions.add(ActionUtils.create(ActionConstants.READ));
 			Decision decision = Decision.PERMIT;
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, decision);
-			permissions = privacyDataManager.checkPermission(requestor, dataId, actions);
+			permissions = privacyDataManager.checkPermission(requestor, dataId, ActionUtils.create(ActionConstants.READ));
 		} catch (PrivacyException e) {
 			LOG.error("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e);
@@ -281,6 +282,67 @@ public class PrivacyDataManagerTest {
 		LOG.debug("Permission retrieved: "+ResponseItemUtils.toString((permissions)));
 		assertNotNull("No permission decision retrieved", permissions.get(0).getDecision());
 		assertEquals("Bad permission retrieved", Decision.DENY.name(), permissions.get(0).getDecision().name());
+	}
+	
+	@Test
+	public void testSortByAccessControlType() {
+		String testTitle = new String("testSortByAccessControlType: sort several data ids");
+		LOG.info("[TEST] "+testTitle);
+		
+		// NULL
+		List<DataIdentifier> dataIds = null;
+		Map<String, List<DataIdentifier>> sorted = ((PrivacyDataManager)privacyDataManager).sortByAccessControlType(dataIds);
+		assertNull("Sorted map should be null", sorted);
+		// Empty
+		dataIds = new ArrayList<DataIdentifier>();
+		sorted = ((PrivacyDataManager)privacyDataManager).sortByAccessControlType(dataIds);
+		assertNull("Sorted map should be null (empty)", sorted);
+		
+		// 1 CSS data id
+		dataIds.add(dataId);
+		sorted = ((PrivacyDataManager)privacyDataManager).sortByAccessControlType(dataIds);
+		assertNotNull("Sorted map should not be null (both)", sorted);
+		int exceptedSize = 1;
+		assertTrue("Not the good size, expected "+exceptedSize+" but was "+sorted.size()+" (both)", sorted.size() == exceptedSize);
+		assertTrue("Shoud contain CSS data ids (both)", sorted.containsKey(((PrivacyDataManager)privacyDataManager).CSS_ACCESS_CONTROL_TYPE));
+		List<DataIdentifier> retrievedDataIds = sorted.get(((PrivacyDataManager)privacyDataManager).CSS_ACCESS_CONTROL_TYPE);
+		assertTrue("Data list Not the good size, expected "+exceptedSize+" but was "+retrievedDataIds.size()+" (both)", retrievedDataIds.size() == exceptedSize);
+		assertTrue("Should be equal to expected data id. Excepted: "+DataIdentifierUtils.toUriString(dataId)+" but was "+DataIdentifierUtils.toUriString(retrievedDataIds.get(0))+" (both)", DataIdentifierUtils.equal(dataId, retrievedDataIds.get(0)));
+		assertFalse("Shoud not contain CIS data ids (both)", sorted.containsKey(((PrivacyDataManager)privacyDataManager).CIS_ACCESS_CONTROL_TYPE));
+		
+		// 1 CIS data id
+		dataIds = new ArrayList<DataIdentifier>();
+		dataIds.add(cisDataId);
+		sorted = ((PrivacyDataManager)privacyDataManager).sortByAccessControlType(dataIds);
+		assertNotNull("Sorted map should not be null (both)", sorted);
+		exceptedSize = 1;
+		assertTrue("Not the good size, expected "+exceptedSize+" but was "+sorted.size()+" (CIS)", sorted.size() == exceptedSize);
+		assertTrue("Shoud contain CIS data ids (CIS)", sorted.containsKey(((PrivacyDataManager)privacyDataManager).CIS_ACCESS_CONTROL_TYPE));
+		retrievedDataIds = sorted.get(((PrivacyDataManager)privacyDataManager).CIS_ACCESS_CONTROL_TYPE);
+		assertTrue("Data list Not the good size, expected "+exceptedSize+" but was "+retrievedDataIds.size()+" (CIS)", retrievedDataIds.size() == exceptedSize);
+		assertTrue("Should be equal to expected data id. Excepted: "+DataIdentifierUtils.toUriString(cisDataId)+" but was "+DataIdentifierUtils.toUriString(retrievedDataIds.get(0))+" (CIS)", DataIdentifierUtils.equal(cisDataId, retrievedDataIds.get(0)));
+		assertFalse("Shoud not contain CSS data ids (CIS)", sorted.containsKey(((PrivacyDataManager)privacyDataManager).CSS_ACCESS_CONTROL_TYPE));
+		
+		// -- Both
+		dataIds = new ArrayList<DataIdentifier>();
+		dataIds.add(dataId);
+		dataIds.add(cisDataId);
+		sorted = ((PrivacyDataManager)privacyDataManager).sortByAccessControlType(dataIds);
+		assertNotNull("Sorted map should not be null (both)", sorted);
+		exceptedSize = 2;
+		assertTrue("Not the good size, expected "+exceptedSize+" but was "+sorted.size()+" (both)", sorted.size() == exceptedSize);
+		// CIS
+		assertTrue("Shoud contain CIS data ids (CIS)(both)", sorted.containsKey(((PrivacyDataManager)privacyDataManager).CIS_ACCESS_CONTROL_TYPE));
+		retrievedDataIds = sorted.get(((PrivacyDataManager)privacyDataManager).CIS_ACCESS_CONTROL_TYPE);
+		exceptedSize = 1;
+		assertTrue("Data list Not the good size, expected "+exceptedSize+" but was "+retrievedDataIds.size()+" (CIS)(both)", retrievedDataIds.size() == exceptedSize);
+		assertTrue("Should be equal to expected data id. Excepted: "+DataIdentifierUtils.toUriString(cisDataId)+" but was "+DataIdentifierUtils.toUriString(retrievedDataIds.get(0))+" (CIS)(both)", DataIdentifierUtils.equal(cisDataId, retrievedDataIds.get(0)));
+		// CSS
+		assertTrue("Shoud contain CSS data ids (CSS)(both)", sorted.containsKey(((PrivacyDataManager)privacyDataManager).CSS_ACCESS_CONTROL_TYPE));
+		retrievedDataIds = sorted.get(((PrivacyDataManager)privacyDataManager).CSS_ACCESS_CONTROL_TYPE);
+		exceptedSize = 1;
+		assertTrue("Data list Not the good size, expected "+exceptedSize+" but was "+retrievedDataIds.size()+" (CSS)(both)", retrievedDataIds.size() == exceptedSize);
+		assertTrue("Should be equal to expected data id. Excepted: "+DataIdentifierUtils.toUriString(dataId)+" but was "+DataIdentifierUtils.toUriString(retrievedDataIds.get(0))+" (CSS)(both)", DataIdentifierUtils.equal(dataId, retrievedDataIds.get(0)));
 	}
 
 	/* --- CHECK PERMISSION CIS --- */

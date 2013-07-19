@@ -19,6 +19,7 @@
  */
 package org.societies.privacytrust.privacyprotection.test.model;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -30,9 +31,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.model.CisAttributeTypes;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.privacytrust.privacyprotection.model.PrivacyPermission;
 
 /**
@@ -131,5 +137,31 @@ public class PrivacyPermissionTest {
 			LOG.info(action.getActionConstant().name()+":"+action.isOptional());
 		}
 		assertTrue("Expected same but are not", ActionUtils.equal(actions0, retrievedActions0));
+	}
+	
+	@Test
+	public void testNotNominalCases() {
+		String testTitle = new String("testNotNominalCases");
+		LOG.info("[Test] "+testTitle);
+		
+		assertNull("Should be null", PrivacyPermission.createResponseItems(null));
+		assertNull("Should be null 2", PrivacyPermission.createResponseItems(new ArrayList<PrivacyPermission>()));
+		
+		PrivacyPermission internalPermission = new PrivacyPermission(RequestorUtils.create("myCss.societies.local"), null, new ArrayList<Action>(), Decision.PERMIT);
+		ResponseItem responseItem = internalPermission.createResponseItem();
+		assertNull("Resource should be null", responseItem.getRequestItem().getResource());
+		
+		internalPermission = new PrivacyPermission("myCss.societies.local", DataIdentifierScheme.CIS+"://myCss.societies.local/"+CisAttributeTypes.MEMBER_LIST, "read/write/", "false/false/", Decision.PERMIT);
+		responseItem = internalPermission.createResponseItem();
+		assertNotNull("Resource should not be null", responseItem.getRequestItem().getResource());
+		List<Action> expectedActions = new ArrayList<Action>();
+		expectedActions.add(ActionUtils.create(ActionConstants.READ));
+		expectedActions.add(ActionUtils.create(ActionConstants.WRITE));
+		List<Action> retrievedActions0 = internalPermission.getActionsFromData();
+		LOG.info("Retrieved actions: ");
+		for(Action action : retrievedActions0) {
+			LOG.info(action.getActionConstant().name()+":"+action.isOptional());
+		}
+		assertTrue("Expected same but are not", ActionUtils.equal(expectedActions, retrievedActions0));
 	}
 }

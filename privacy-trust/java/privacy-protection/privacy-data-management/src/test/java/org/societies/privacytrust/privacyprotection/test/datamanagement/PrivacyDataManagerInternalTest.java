@@ -40,6 +40,7 @@ import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.util.DataIdentifierFactory;
+import org.societies.api.identity.util.DataIdentifierUtils;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
@@ -68,7 +69,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Olivier Maridat (Trialog)
  *
  */
-// Run this test case using Spring jUnit
 @RunWith(SpringJUnit4ClassRunner.class)
 // Search context configuration file in classpath:<ClassName>-context.xml
 @ContextConfiguration(locations = { "PrivacyDataManagerInternalTest-context.xml" })
@@ -79,7 +79,8 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 	IPrivacyDataManagerInternal privacyDataManagerInternal;
 
 	// -- Mocked data
-	private DataIdentifier dataId;
+	private DataIdentifier dataId1;
+	private DataIdentifier dataId2;
 	private RequestorBean requestor;
 	private RequestorBean requestorCis;
 
@@ -97,7 +98,8 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		// Data Id
 		try {
 			Random randomer = new Random((new Date()).getTime()); 
-			dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+myCssId.getJid()+"/ENTITY/person/1/ATTRIBUTE/name/"+randomer.nextInt(200));
+			dataId1 = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+myCssId.getJid()+"/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.NAME_FIRST+"/"+randomer.nextInt(200));
+			dataId2 = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+myCssId.getJid()+"/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.NAME_LAST+"/"+randomer.nextInt(200));
 		}
 		catch (Exception e) {
 			LOG.error("setUp(): DataId creation error "+e+"\n", e);
@@ -120,7 +122,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			List<Action> actions = new ArrayList<Action>();
 			actions.add(ActionUtils.create(ActionConstants.READ));
 			Decision permission = Decision.PERMIT;
-			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, permission);
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId1, actions, permission);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e);
@@ -142,8 +144,8 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			List<Action> actions = new ArrayList<Action>();
 			actions.add(ActionUtils.create(ActionConstants.READ));
 			Decision permission = Decision.PERMIT;
-			dataUpdated1 = privacyDataManagerInternal.updatePermission(requestorCis, dataId, actions, permission);
-			dataUpdated2 = privacyDataManagerInternal.updatePermission(requestorCis, dataId, actions, permission);
+			dataUpdated1 = privacyDataManagerInternal.updatePermission(requestorCis, dataId1, actions, permission);
+			dataUpdated2 = privacyDataManagerInternal.updatePermission(requestorCis, dataId1, actions, permission);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e);
@@ -157,6 +159,44 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 
 	@Test
 	@Rollback(true)
+	public void testUpdatePermissionSeveralData() {
+		String testTitle = new String("testUpdatePermissionSeveralData: update 2 data at the same time");
+		LOG.info("[Test] "+testTitle);
+		boolean dataUpdated01 = false;
+		boolean dataUpdated02 = false;
+		boolean dataUpdated1 = false;
+		boolean dataUpdated2 = false;
+		try {
+			List<DataIdentifier> dataIds = new ArrayList<DataIdentifier>();
+			dataIds.add(dataId1);
+			dataIds.add(dataId2);
+			List<Action> actions = new ArrayList<Action>();
+			actions.add(ActionUtils.create(ActionConstants.READ));
+			Decision decision1 = Decision.PERMIT;
+			List<Decision> decisions = new ArrayList<Decision>();
+			decisions.add(Decision.PERMIT);
+			decisions.add(Decision.DENY);
+			dataUpdated01 = privacyDataManagerInternal.updatePermissions(requestorCis, dataIds, actions, new ArrayList<Decision>());
+			dataUpdated02 = privacyDataManagerInternal.updatePermissions(requestorCis, null, actions, decision1);
+			dataUpdated1 = privacyDataManagerInternal.updatePermissions(requestorCis, dataIds, actions, decision1);
+			dataUpdated2 = privacyDataManagerInternal.updatePermissions(requestorCis, dataIds, actions, decisions);
+		} catch (PrivacyException e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] Privacy error: "+e);
+		} catch (Exception e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] error: "+e);
+		}
+		assertFalse("Data wrongly updated", dataUpdated01);
+		assertFalse("Data wrongly updated", dataUpdated02);
+		assertTrue("Data not updated", dataUpdated1);
+		assertTrue("Data not updated the second time", dataUpdated1);
+		assertTrue("Data not updated", dataUpdated2);
+		assertTrue("Data not updated the second time", dataUpdated2);
+	}
+
+	@Test
+	@Rollback(true)
 	public void testUpdatePermissionResponseItem() {
 		String testTitle = new String("testUpdatePermissionResponseItem: update using a ResponseItem");
 		LOG.info("[Test] "+testTitle);
@@ -165,7 +205,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			List<Action> actions = new ArrayList<Action>();
 			actions.add(ActionUtils.create(ActionConstants.READ));
 			Decision decision = Decision.PERMIT;
-			Resource resource = ResourceUtils.create(dataId);
+			Resource resource = ResourceUtils.create(dataId1);
 			RequestItem requestItem = RequestItemUtils.create(resource, actions, new ArrayList<Condition>());
 			ResponseItem permission = ResponseItemUtils.create(decision, requestItem);
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, permission);
@@ -212,7 +252,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		List<Action> actions = new ArrayList<Action>();
 		actions.add(ActionUtils.create(ActionConstants.READ));
 		Decision permission = Decision.PERMIT;
-		dataUpdated = privacyDataManagerInternal.updatePermission(null, dataId, actions, permission);
+		dataUpdated = privacyDataManagerInternal.updatePermission(null, dataId1, actions, permission);
 		assertFalse("Data has been updated but should not", dataUpdated);
 	}
 
@@ -237,7 +277,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		boolean dataUpdated = false;
 		List<Action> actions = new ArrayList<Action>();
 		Decision permission = Decision.PERMIT;
-		dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, permission);
+		dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId1, actions, permission);
 		assertFalse("Data has been updated but should not", dataUpdated);
 	}
 
@@ -250,7 +290,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		boolean dataUpdated = false;
 		List<Action> actions = new ArrayList<Action>();
 		actions.add(ActionUtils.create(ActionConstants.READ));
-		dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, null);
+		dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId1, actions, null);
 		assertFalse("Data has been updated but should not", dataUpdated);
 	}
 
@@ -270,8 +310,8 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		List<Action> actions = new ArrayList<Action>();
 		actions.add(ActionUtils.create(ActionConstants.READ));
 		try {
-			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, dataId, actions, permission);
-			responseItems = privacyDataManagerInternal.getPermissions(requestorCis, dataId, actions);
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, dataId1, actions, permission);
+			responseItems = privacyDataManagerInternal.getPermissions(requestorCis, dataId1, actions);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e);
@@ -304,9 +344,9 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		actions2.add(ActionUtils.create(ActionConstants.READ));
 		Decision permission = Decision.PERMIT;
 		try {
-			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, dataId, actions1, permission);
-			responseItems1 = privacyDataManagerInternal.getPermissions(requestorCis, dataId, actions1);
-			responseItems2 = privacyDataManagerInternal.getPermissions(requestorCis, dataId, actions2);
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, dataId1, actions1, permission);
+			responseItems1 = privacyDataManagerInternal.getPermissions(requestorCis, dataId1, actions1);
+			responseItems2 = privacyDataManagerInternal.getPermissions(requestorCis, dataId1, actions2);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e);
@@ -326,6 +366,173 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		assertEquals("Permission result not as expected (inverse)", permission.name(), responseItems2.get(0).getDecision().name());
 		assertTrue("Permission action list not as expected (inverse)", ActionUtils.equal(actions1, responseItems2.get(0).getRequestItem().getActions()));
 	}
+	
+
+	@Test
+	@Rollback(true)
+	public void testGetPermissionDeny() {
+		String testTitle = new String("testGetPermissionDeny: add permissions DENY/PERMIT with different actions and retrieve them");
+		LOG.info("[Test] "+testTitle);
+		boolean dataUpdated1 = false;
+		boolean dataUpdated2 = false;
+		List<ResponseItem> responseItems1 = null;
+		List<ResponseItem> responseItems2 = null;
+		List<Action> actions1 = new ArrayList<Action>();
+		actions1.add(ActionUtils.create(ActionConstants.READ));
+		actions1.add(ActionUtils.create(ActionConstants.WRITE));
+		List<Action> actions2 = new ArrayList<Action>();
+		actions2.add(ActionUtils.create(ActionConstants.CREATE, true));
+		actions2.add(ActionUtils.create(ActionConstants.READ));
+		try {
+			dataUpdated1 = privacyDataManagerInternal.updatePermission(requestorCis, dataId1, actions1, Decision.DENY);
+			dataUpdated2 = privacyDataManagerInternal.updatePermission(requestorCis, dataId1, actions2, Decision.PERMIT);
+			responseItems1 = privacyDataManagerInternal.getPermissions(requestorCis, dataId1, actions1);
+			responseItems2 = privacyDataManagerInternal.getPermissions(requestorCis, dataId1, actions2);
+		} catch (PrivacyException e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] Privacy error: "+e);
+		} catch (Exception e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] error: "+e);
+		}
+		assertTrue("Data not updated", dataUpdated1);
+		assertTrue("Data not updated", dataUpdated2);
+		assertNotNull("ResponseItem permission can't be retrieved", responseItems1);
+		assertTrue("ResponseItem permission can't be retrieved", responseItems1.size() > 0);
+		assertEquals("Permission result not as expected", Decision.DENY.name(), responseItems1.get(0).getDecision().name());
+		assertTrue("Permission action list not as expected", ActionUtils.equal(actions1, responseItems1.get(0).getRequestItem().getActions()));
+
+		// Inverse
+		assertNotNull("ResponseItem permission can't be retrieved (inverse)", responseItems2);
+		assertTrue("ResponseItem permission can't be retrieved (inverse)", responseItems2.size() > 0);
+		assertEquals("Permission result not as expected (inverse)", Decision.PERMIT.name(), responseItems2.get(0).getDecision().name());
+		assertTrue("Permission action list not as expected (inverse)", ActionUtils.equal(actions2, responseItems2.get(0).getRequestItem().getActions()));
+	}
+
+	@Test
+	@Rollback(true)
+	public void testGetPermission2TimesDifferentActions() {
+		String testTitle = new String("testUpdatePermission2TimesDifferentActions: update 2 times the same data permission but with differant actions");
+		LOG.info("[Test] "+testTitle);
+		boolean dataUpdated1 = false;
+		boolean dataUpdated2 = false;
+		List<ResponseItem> responseItems1 = new ArrayList<ResponseItem>();
+		List<ResponseItem> responseItems2 = new ArrayList<ResponseItem>();
+		List<Action> actions1 = new ArrayList<Action>();
+		actions1.add(ActionUtils.create(ActionConstants.READ));
+		List<Action> actions2 = new ArrayList<Action>();
+		actions2.add(ActionUtils.create(ActionConstants.WRITE));
+		Decision decision1 = Decision.PERMIT;
+		Decision decision2 = Decision.DENY;
+		try {
+			dataUpdated1 = privacyDataManagerInternal.updatePermission(requestorCis, dataId1, actions1, decision1);
+			dataUpdated2 = privacyDataManagerInternal.updatePermission(requestorCis, dataId1, actions2, decision2);
+			responseItems1 = privacyDataManagerInternal.getPermissions(requestorCis, dataId1, actions1);
+			responseItems2 = privacyDataManagerInternal.getPermissions(requestorCis, dataId1, actions2);
+		} catch (PrivacyException e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] Privacy error: "+e);
+		} catch (Exception e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] error: "+e);
+		}
+		assertTrue("Data not updated", dataUpdated1);
+		assertTrue("Data not updated the second time", dataUpdated2);
+
+		// 1
+		assertNotNull("ResponseItem permission can't be retrieved (1)", responseItems1);
+		assertTrue("ResponseItem permission can't be retrieved (1)", responseItems1.size() > 0);
+		int nbExpected = 1;
+		assertTrue("Not the nb expected, expected"+nbExpected+" (1)", responseItems1.size() == nbExpected);
+		ResponseItem responseItem = ResponseItemUtils.findResponseItem(dataId1, responseItems1).get(0);
+		assertEquals("Permission result not as expected (1)", decision1.name(), responseItem.getDecision().name());
+		assertTrue("Permission action list not as expected (1)", ActionUtils.equal(actions1, responseItem.getRequestItem().getActions()));
+
+		// 2
+		assertNotNull("ResponseItem permission can't be retrieved (2)", responseItems2);
+		assertTrue("ResponseItem permission can't be retrieved (2)", responseItems2.size() > 0);
+		assertTrue("Not the nb expected, expected"+nbExpected+" (2)", responseItems2.size() == nbExpected);
+		responseItem = ResponseItemUtils.findResponseItem(dataId1, responseItems2).get(0);
+		assertEquals("Permission result not as expected (2)", decision2.name(), responseItem.getDecision().name());
+		assertTrue("Permission action list not as expected (2)", ActionUtils.equal(actions2, responseItem.getRequestItem().getActions()));
+	}
+
+	@Test
+	@Rollback(true)
+	public void testGetPermissionSeveralData() {
+		String testTitle = new String("testGetPermissionSeveralData: store several data with different actions / decisions and retrieve them");
+		LOG.info("[Test] "+testTitle);
+		boolean dataUpdated1 = false;
+		boolean dataUpdated2 = true;
+		List<ResponseItem> responseItems0 = null;
+		List<ResponseItem> responseItems1 = null;
+		List<ResponseItem> responseItems2 = null;
+		List<Action> actions1 = new ArrayList<Action>();
+		actions1.add(ActionUtils.create(ActionConstants.READ));
+		actions1.add(ActionUtils.create(ActionConstants.CREATE, true));
+		List<Action> actions2 = new ArrayList<Action>();
+		actions2.add(ActionUtils.create(ActionConstants.WRITE));
+		List<Decision> decisions = new ArrayList<Decision>();
+		try {
+			List<DataIdentifier> dataIds = new ArrayList<DataIdentifier>();
+			dataIds.add(dataId1);
+			dataIds.add(dataId2);
+			decisions.add(Decision.DENY);
+			decisions.add(Decision.PERMIT);
+			dataUpdated1 = privacyDataManagerInternal.updatePermissions(requestorCis, dataIds, actions1, decisions);
+			dataUpdated2 = privacyDataManagerInternal.updatePermissions(requestorCis, dataIds, actions2, Decision.PERMIT);
+			responseItems0 = privacyDataManagerInternal.getPermissions(requestorCis, dataId1);
+			responseItems1 = privacyDataManagerInternal.getPermissions(requestorCis, dataIds, actions1);
+			responseItems2 = privacyDataManagerInternal.getPermissions(requestorCis, dataIds, actions2);
+		} catch (PrivacyException e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] Privacy error: "+e);
+		} catch (Exception e) {
+			LOG.info("[Test PrivacyException] "+testTitle, e);
+			fail("[Error "+testTitle+"] error: "+e);
+		}
+		assertTrue("Data not updated 1", dataUpdated1);
+		assertTrue("Data not updated 2", dataUpdated2);
+		//0
+		assertNotNull("ResponseItem permission can't be retrieved (0)", responseItems0);
+		assertTrue("ResponseItem permission can't be retrieved (0)", responseItems0.size() > 0);
+		List<ResponseItem> responseItems = ResponseItemUtils.findResponseItem(dataId1, responseItems0);
+		LOG.info("getPermissions for all actions: "+ResponseItemUtils.toString(responseItems));
+		if (ActionUtils.equal(actions1, responseItems.get(0).getRequestItem().getActions())) {
+			assertEquals("Permission result not as expected (0)", decisions.get(0).name(), responseItems.get(0).getDecision().name());
+			assertEquals("Permission result not as expected (0)", Decision.PERMIT.name(), responseItems.get(1).getDecision().name());
+		}
+		else if (ActionUtils.equal(actions2, responseItems.get(0).getRequestItem().getActions())) {
+			assertEquals("Permission result not as expected (0)", decisions.get(0).name(), responseItems.get(1).getDecision().name());
+			assertEquals("Permission result not as expected (0)", Decision.PERMIT.name(), responseItems.get(0).getDecision().name());
+		}
+		else {
+			fail("Should match the actions");
+		}
+
+		// 1
+		assertNotNull("ResponseItem permission can't be retrieved (1)", responseItems1);
+		assertTrue("ResponseItem permission can't be retrieved (1)", responseItems1.size() > 0);
+		LOG.info("getPermissions for one data+actions1 (1): "+ResponseItemUtils.toString(responseItems1));
+		responseItems = ResponseItemUtils.findResponseItem(dataId1, responseItems1);
+		assertNotNull("This data id should have been retrieved "+DataIdentifierUtils.toUriString(dataId1)+" (1)", responseItems);
+		ResponseItem responseItem = responseItems.get(0);
+		assertEquals("Permission result not as expected (1)", decisions.get(0).name(), responseItem.getDecision().name());
+		assertTrue("Permission action list not as expected (1)", ActionUtils.equal(actions1, responseItem.getRequestItem().getActions()));
+		responseItem = ResponseItemUtils.findResponseItem(dataId2, responseItems1).get(0);
+		assertEquals("Permission result not as expected (1)", decisions.get(1).name(), responseItem.getDecision().name());
+		assertTrue("Permission action list not as expected (1)", ActionUtils.equal(actions1, responseItem.getRequestItem().getActions()));
+
+		// 2
+		assertNotNull("ResponseItem permission can't be retrieved (2)", responseItems2);
+		assertTrue("ResponseItem permission can't be retrieved (2)", responseItems2.size() > 0);
+		responseItem = ResponseItemUtils.findResponseItem(dataId1, responseItems2).get(0);
+		assertEquals("Permission result not as expected (2)", Decision.PERMIT.name(), responseItem.getDecision().name());
+		assertTrue("Permission action list not as expected (2)", ActionUtils.equal(actions2, responseItem.getRequestItem().getActions()));
+		responseItem = ResponseItemUtils.findResponseItem(dataId2, responseItems2).get(0);
+		assertEquals("Permission result not as expected (2)", Decision.PERMIT.name(), responseItem.getDecision().name());
+		assertTrue("Permission action list not as expected (2)", ActionUtils.equal(actions2, responseItem.getRequestItem().getActions()));
+	}
 
 	@Test
 	@Rollback(true)
@@ -340,9 +547,9 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		actions.add(ActionUtils.create(ActionConstants.WRITE));
 		Decision permission = Decision.PERMIT;
 		try {
-			dataDeleted = privacyDataManagerInternal.deletePermissions(requestorCis, dataId, actions);
-			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, permission);
-			responseItems = privacyDataManagerInternal.getPermissions(requestorCis, dataId, actions);
+			dataDeleted = privacyDataManagerInternal.deletePermissions(requestorCis, dataId1, actions);
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId1, actions, permission);
+			responseItems = privacyDataManagerInternal.getPermissions(requestorCis, dataId1, actions);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e);
@@ -373,9 +580,9 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			List<Action> actions = new ArrayList<Action>();
 			actions.add(ActionUtils.create(ActionConstants.READ));
 			Decision permission = Decision.PERMIT;
-			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, dataId, actions, permission);
-			dataDeleted = privacyDataManagerInternal.deletePermissions(requestorCis, dataId);
-			responseItems = privacyDataManagerInternal.getPermissions(requestorCis, dataId, actions);
+			dataUpdated = privacyDataManagerInternal.updatePermission(requestorCis, dataId1, actions, permission);
+			dataDeleted = privacyDataManagerInternal.deletePermissions(requestorCis, dataId1);
+			responseItems = privacyDataManagerInternal.getPermissions(requestorCis, dataId1, actions);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e);

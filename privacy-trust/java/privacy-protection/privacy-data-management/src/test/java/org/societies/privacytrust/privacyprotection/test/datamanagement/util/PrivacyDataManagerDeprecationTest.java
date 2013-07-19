@@ -17,7 +17,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.test.datamanagement;
+package org.societies.privacytrust.privacyprotection.test.datamanagement.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -65,6 +65,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
@@ -84,7 +85,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 //Run this test case using Spring jUnit
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "PrivacyDataManagerInternalTest-context.xml" })
+@ContextConfiguration(locations = { "../PrivacyDataManagerInternalTest-context.xml" })
 public class PrivacyDataManagerDeprecationTest {
 	private static final Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerDeprecationTest.class.getSimpleName());
 
@@ -165,7 +166,7 @@ public class PrivacyDataManagerDeprecationTest {
 			actions.add(action);
 			Decision decision = Decision.PERMIT;
 			dataUpdated = privacyDataManagerInternal.updatePermission(requestor, dataId, actions, decision);
-			permissions = privacyDataManager.checkPermission(requestor, dataId, actions);
+			permissions = privacyDataManager.checkPermission(requestor, dataId, new Action(ActionConstants.READ));
 		} catch (PrivacyException e) {
 			LOG.error("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
@@ -350,237 +351,7 @@ public class PrivacyDataManagerDeprecationTest {
 		assertNotNull("No permission decision retrieved", permissions.get(0).getDecision());
 		assertEquals("Bad permission retrieved", Decision.DENY.name(), permissions.get(0).getDecision().name());
 	}
-
-	/* --- OBFUSCATION --- */
-
-	@Test
-	public void testObfuscateData() {
-		String testTitle = new String("testObfuscateData");
-		LOG.info("[TEST] "+testTitle);
-		DataWrapper wrapper = DataWrapperFactory.getNameWrapper("Olivier", "Maridat");
-		DataWrapper obfuscatedDataWrapper = null;
-		try {
-			IIdentity requestorId = Mockito.mock(IIdentity.class);
-			Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
-			RequestorBean requestor = RequestorUtils.create(requestorId.getJid());
-			Future<DataWrapper> obfuscatedDataWrapperAsync = privacyDataManager.obfuscateData(requestor, wrapper);
-			obfuscatedDataWrapper = obfuscatedDataWrapperAsync.get();
-		} catch (PrivacyException e) {
-			LOG.error("[Test PrivacyException] "+testTitle+": "+e.getMessage()+"\n", e);
-			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
-		} catch (InterruptedException e) {
-			LOG.error("[Test InterruptedException] "+testTitle+": Async interrupted error "+e.getMessage()+"\n", e);
-			fail("[Error "+testTitle+"] Privacy error: Async interrupted error "+e.getMessage());
-		} catch (ExecutionException e) {
-			LOG.error("[Test ExecutionException] "+testTitle+": Async execution error "+e.getMessage()+"\n", e);
-			fail("[Error "+testTitle+"] Privacy error: Async execution error "+e.getMessage());
-		}
-
-		// Verify
-		LOG.info("### Orginal name:\n"+NameUtils.toString((Name) wrapper.getData()));
-		LOG.info("### Obfuscated name:\n"+NameUtils.toString((Name) obfuscatedDataWrapper.getData()));
-		assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
-	}
-
-	@Test
-	public void testObfuscateCtxData() {
-		String testTitle = new String("testObfuscateCtxData");
-		LOG.info("[TEST] "+testTitle);
-		// -- Prepare data
-		// Values
-		String ownerId = "fooCss";
-		String firstnameStr = "Olivier";
-		String lastnameStr = "Maridat";
-		double latitude = 45.255;
-		double longitude = 2.45;
-		double accuracy = 100.5;
-		// Ids
-		DataIdentifier nameId;
-		DataIdentifier firstnameId = null;
-		DataIdentifier lastnameId = null;
-		DataIdentifier actionId = null;
-		DataIdentifier locationCoordinatesId = null;
-		// Data
-		List<CtxModelObject> ctxDataListName;
-		List<CtxModelObject> ctxDataListAction;
-		List<CtxModelObject> ctxDataListLocationCoordinates;
-		List<CtxModelObject> ctxDataListMix;
-		CtxAttribute firstname;
-		CtxAttribute lastname;
-		CtxAttribute action;
-		CtxAttribute locationCoordinates;
-		// Generate Ids
-		try {
-			nameId = DataIdentifierFactory.create(DataIdentifierScheme.CONTEXT, ownerId, CtxAttributeTypes.NAME);
-			firstnameId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+ownerId+"/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.NAME_FIRST+"/33");
-			lastnameId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+ownerId+"/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.NAME_LAST+"/38");
-			actionId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+ownerId+"/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.ACTION+"/42");
-			locationCoordinatesId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+ownerId+"/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.LOCATION_COORDINATES+"/76");
-		} catch (MalformedCtxIdentifierException e) {
-			fail("Faillure during data id creation from URI: "+e);
-		}
-		// Create list of CtxModelObject lists
-		ctxDataListName = new ArrayList<CtxModelObject>();
-		firstname = new CtxAttribute((CtxAttributeIdentifier) firstnameId);
-		firstname.setStringValue(firstnameStr);
-		firstname.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
-		firstname.setValueType(CtxAttributeValueType.STRING);
-		ctxDataListName.add(firstname);
-		lastname = new CtxAttribute((CtxAttributeIdentifier) lastnameId);
-		lastname.setStringValue(lastnameStr);
-		lastname.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
-		lastname.setValueType(CtxAttributeValueType.STRING);
-		ctxDataListName.add(lastname);
-
-		ctxDataListAction = new ArrayList<CtxModelObject>();
-		action = new CtxAttribute((CtxAttributeIdentifier) actionId);
-		action.setStringValue("Do this !");
-		action.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
-		action.setValueType(CtxAttributeValueType.STRING);
-		ctxDataListAction.add(action);
-
-		ctxDataListLocationCoordinates = new ArrayList<CtxModelObject>();
-		locationCoordinates = new CtxAttribute((CtxAttributeIdentifier) locationCoordinatesId);
-		locationCoordinates.setStringValue(latitude+","+longitude);
-		locationCoordinates.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
-		locationCoordinates.getQuality().setPrecision(accuracy);
-		action.setValueType(CtxAttributeValueType.STRING);
-		ctxDataListLocationCoordinates.add(locationCoordinates);
-		
-		ctxDataListMix = new ArrayList<CtxModelObject>();
-		ctxDataListMix.addAll(ctxDataListAction);
-		ctxDataListMix.addAll(ctxDataListLocationCoordinates);
-		ctxDataListMix.addAll(ctxDataListName);
-		
-		// Requestor
-		IIdentity requestorId = Mockito.mock(IIdentity.class);
-		Mockito.when(requestorId.getJid()).thenReturn("otherCss@societies.local");
-		RequestorBean requestor = RequestorUtils.create(requestorId.getJid());
-		
-		// Mock Privacy preference manager
-		IPrivacyPreferenceManager privacyPreferencesManagerMocked = Mockito.mock(IPrivacyPreferenceManager.class);
-		Mockito.when(privacyPreferencesManagerMocked.evaluateDObfPreference((DObfPreferenceDetailsBean) Matchers.anyObject())).thenReturn(0.5);
-		((PrivacyDataManager)privacyDataManager).setPrivacyPreferenceManager(privacyPreferencesManagerMocked);
-		
-		// -- Launch obfuscation
-		List<CtxModelObject> obfuscatedNameDataList = null;
-		List<CtxModelObject> obfuscatedActionDataList = null;
-		List<CtxModelObject> obfuscatedLocationCoordinatesDataList = null;
-		List<CtxModelObject> obfuscatedMixDataList = null;
-		try {
-			obfuscatedNameDataList = privacyDataManager.obfuscateData(requestor, ctxDataListName).get();
-			obfuscatedActionDataList = privacyDataManager.obfuscateData(requestor, ctxDataListAction).get();
-			obfuscatedLocationCoordinatesDataList = privacyDataManager.obfuscateData(requestor, ctxDataListLocationCoordinates).get();
-			obfuscatedMixDataList = privacyDataManager.obfuscateData(requestor, ctxDataListMix).get();
-		} catch (PrivacyException e) {
-			LOG.error("[Test PrivacyException] "+testTitle+": "+e.getMessage()+"\n", e);
-			fail("[Error "+testTitle+"] Privacy error: "+e.getMessage());
-		} catch (InterruptedException e) {
-			LOG.error("[Test InterruptedException] "+testTitle+": Async interrupted error "+e.getMessage()+"\n", e);
-			fail("[Error "+testTitle+"] Privacy error: Async interrupted error "+e.getMessage());
-		} catch (ExecutionException e) {
-			LOG.error("[Test ExecutionException] "+testTitle+": Async execution error "+e.getMessage()+"\n", e);
-			fail("[Error "+testTitle+"] Privacy error: Async execution error "+e.getMessage());
-		}
-
-		// -- Verify
-		// Name
-		assertNotNull("Retrieved name obfuscated data should not be null", obfuscatedNameDataList);
-		assertTrue("Name data list size should not have been modified", ctxDataListName.size() == obfuscatedNameDataList.size());
-		int lastNameIndex = 0;
-		if (CtxAttributeTypes.NAME_LAST.equals(obfuscatedNameDataList.get(1).getId().getType())) {
-			lastNameIndex = 1;
-		}
-		assertEquals("Name data should have been obfuscated", "M.", ((CtxAttribute)obfuscatedNameDataList.get(lastNameIndex)).getStringValue());
-		LOG.info("Original result 1: "+((CtxAttribute)ctxDataListName.get(0)).getStringValue()+"|"+((CtxAttribute)ctxDataListName.get(0)).getQuality().getOriginType());
-		LOG.info("Original result 2: "+((CtxAttribute)ctxDataListName.get(1)).getStringValue()+"|"+((CtxAttribute)ctxDataListName.get(1)).getQuality().getOriginType());
-		LOG.info("Obfuscated result 1: "+((CtxAttribute)obfuscatedNameDataList.get(0)).getStringValue()+"|"+((CtxAttribute)obfuscatedNameDataList.get(0)).getQuality().getOriginType());
-		LOG.info("Obfuscated result 2: "+((CtxAttribute)obfuscatedNameDataList.get(1)).getStringValue()+"|"+((CtxAttribute)obfuscatedNameDataList.get(1)).getQuality().getOriginType());
-		
-		// Action
-		assertNotNull("Retrieved action obfuscated data should not be null", obfuscatedActionDataList);
-		assertTrue("Action data list size should not have been modified", ctxDataListAction.size() == obfuscatedActionDataList.size());
-		assertEquals("Unobfuscable data should not be obfuscated", ctxDataListAction, obfuscatedActionDataList);
-		
-		// Location coordinates
-		assertNotNull("Retrieved obfuscated data should not be null", obfuscatedLocationCoordinatesDataList);
-		assertTrue("Location Coordinates Data list size should not have been modified", ctxDataListLocationCoordinates.size() == obfuscatedLocationCoordinatesDataList.size());
-		LOG.info("Original result: "+((CtxAttribute)ctxDataListLocationCoordinates.get(0)).getStringValue()+","+((CtxAttribute)ctxDataListLocationCoordinates.get(0)).getQuality().getPrecision()+"|"+((CtxAttribute)ctxDataListLocationCoordinates.get(0)).getQuality().getOriginType());
-		LOG.info("Obfuscated result: "+((CtxAttribute)obfuscatedLocationCoordinatesDataList.get(0)).getStringValue()+","+((CtxAttribute)obfuscatedLocationCoordinatesDataList.get(0)).getQuality().getPrecision()+"|"+((CtxAttribute)obfuscatedLocationCoordinatesDataList.get(0)).getQuality().getOriginType());
-		
-		// Mix
-		assertNotNull("Retrieved mix obfuscated data should not be null", obfuscatedMixDataList);
-		assertTrue("Mix Data list size should not have been modified", ctxDataListMix.size() == obfuscatedMixDataList.size());
-		
-		// TODO: check a little bit more
-	}
-
-
-	/* --- Data Id --- */
-	@Test
-	public void testFromUriString() {
-		String testTitle = new String("testFromUriString: multiple test of DataId parsing");
-		LOG.info("[TEST] "+testTitle);
-
-		String ownerId = "owner.domain.com";
-		String dataId1 = DataIdentifierScheme.CIS+"://"+ownerId+"/locationSymbolic/";
-		String dataId1b = "CIS://"+ownerId+"/locationSymbolic/";
-		String dataId2 = DataIdentifierScheme.CIS+"://"+ownerId+"/locationSymbolic";
-		String dataId3 = DataIdentifierScheme.CIS+":///locationSymbolic/";
-		String dataId4 = DataIdentifierScheme.CIS+":///locationSymbolic";
-		String dataId5 = DataIdentifierScheme.CIS+":///";
-		String dataId6 = DataIdentifierScheme.CONTEXT+"://"+ownerId+"/ENTITY/person/1/ATTRIBUTE/name/13";
-		String dataId6b = "CONTEXT://"+ownerId+"/ENTITY/person/1/ATTRIBUTE/name/13";
-		try {
-			// CIS
-			assertNotNull("Data id from "+dataId1+" should not be null", DataIdentifierFactory.fromUri(dataId1));
-			assertEquals("Owner id from "+dataId1+" not retrieved", ownerId, DataIdentifierFactory.fromUri(dataId1).getOwnerId());
-			assertNotNull("Data id from "+dataId1b+" should not be null", DataIdentifierFactory.fromUri(dataId1b));
-			assertEquals("Owner id from "+dataId1b+" not retrieved", ownerId, DataIdentifierFactory.fromUri(dataId1b).getOwnerId());
-
-			assertNotNull("Data id from "+dataId2+" should not be null", DataIdentifierFactory.fromUri(dataId2));
-			assertEquals("Owner id from "+dataId2+" not retrieved", ownerId, DataIdentifierFactory.fromUri(dataId2).getOwnerId());
-
-			assertNotNull("Data id from "+dataId3+" should not be null", DataIdentifierFactory.fromUri(dataId3));
-			assertEquals("Owner id from "+dataId3+" not retrieved", "", DataIdentifierFactory.fromUri(dataId3).getOwnerId());
-
-			assertNotNull("Data id from "+dataId4+" should not be null", DataIdentifierFactory.fromUri(dataId4));
-			assertEquals("Owner id from "+dataId4+" not retrieved", "", DataIdentifierFactory.fromUri(dataId4).getOwnerId());
-			assertEquals("Data type from "+dataId4+" not retrieved", "locationSymbolic", DataIdentifierFactory.fromUri(dataId4).getType());
-
-			assertNotNull("Data id from "+dataId5+" should not be null", DataIdentifierFactory.fromUri(dataId5));
-			assertEquals("Owner id from "+dataId5+" not retrieved", "", DataIdentifierFactory.fromUri(dataId5).getOwnerId());
-			assertEquals("Data type from "+dataId5+" not retrieved", "", DataIdentifierFactory.fromUri(dataId5).getType());
-
-			// Context
-			assertNotNull("Data id from "+dataId6+" should not be null", DataIdentifierFactory.fromUri(dataId6));
-			assertEquals("Owner id from "+dataId6+" not retrieved", ownerId, DataIdentifierFactory.fromUri(dataId6).getOwnerId());
-			assertEquals("Data type from "+dataId6+" not retrieved", "name", DataIdentifierFactory.fromUri(dataId6).getType());
-
-			assertNotNull("Data id from "+dataId6b+" should not be null", DataIdentifierFactory.fromUri(dataId6b));
-			assertEquals("Owner id from "+dataId6b+" not retrieved", ownerId, DataIdentifierFactory.fromUri(dataId6b).getOwnerId());
-			assertEquals("Data type from "+dataId6b+" not retrieved", "name", DataIdentifierFactory.fromUri(dataId6b).getType());
-		}
-		catch(MalformedCtxIdentifierException e) {
-			LOG.info("[Error MalformedCtxIdentifierException] "+testTitle, e);
-			fail("[Error MalformedCtxIdentifierException] "+testTitle+":"+e.getMessage());
-		}
-	}
-
-	@Test
-	public void testSchemes() {
-		String testTitle = new String("testSchemes: multiple test on DataIdentifierScheme");
-		LOG.info("[TEST] "+testTitle);
-
-		DataIdentifierScheme schemeCtx1 = DataIdentifierScheme.CONTEXT;
-		DataIdentifierScheme schemeCtx2 = DataIdentifierScheme.CONTEXT;
-		DataIdentifierScheme schemeCis = DataIdentifierScheme.CIS;
-
-		assertEquals("Schemes should be equals", schemeCtx1, schemeCtx2);
-		assertEquals("Schemes name should be equals", schemeCtx1.name(), schemeCtx2.name());
-		assertTrue("Schemes should not be equals", !schemeCtx1.equals(schemeCis));
-		assertTrue("Schemes name should not be equals", !schemeCtx1.name().equals(schemeCis.name()));
-	}
+	
 
 	// -- Dependency Injection
 	public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {

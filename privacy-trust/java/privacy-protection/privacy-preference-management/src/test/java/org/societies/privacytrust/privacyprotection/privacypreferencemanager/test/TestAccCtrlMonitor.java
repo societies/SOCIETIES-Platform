@@ -773,6 +773,13 @@ public class TestAccCtrlMonitor {
 			// TODO Auto-generated method stub
 			return false;
 		}
+		@Override
+		public boolean updatePermissions(RequestorBean requestor,
+				List<DataIdentifier> dataIds, List<Action> actions,
+				Decision decision) throws PrivacyException {
+			// TODO Auto-generated method stub
+			return false;
+		}
 		
 	}
 }

@@ -94,6 +94,22 @@ public interface IPrivacyDataManagerInternal {
 	/**
 	 * Update access control permissions over a data
 	 * Duplication of methods {@link #updatePermission(RequestorBean, DataIdentifier, List, Decision)} for utility purpose
+	 * @pre The same decision will be applied to all data ids
+	 * 
+	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.
+	 * @param dataId ID of the requested data.
+	 * @param ownerId the ID of the owner of the data. Generally the local CSS Id.
+	 * @param actions List of actions to request over this data.
+	 * @param decision Permission decision to apply to each data
+	 * @return Success of the operation
+	 * @throws PrivacyException
+	 * @see {@link #updatePermission(RequestorBean, DataIdentifier, List, Decision)}
+	 */
+	public boolean updatePermissions(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions, Decision decision) throws PrivacyException;
+	
+	/**
+	 * Update access control permissions over a data
+	 * Duplication of methods {@link #updatePermission(RequestorBean, DataIdentifier, List, Decision)} for utility purpose
 	 * @pre dataIds and decisions have the same size
 	 * 
 	 * @param requestor Requestor of the ofuscation. It may be a CSS, or a CSS requesting a data through a 3P service, or a CIS.

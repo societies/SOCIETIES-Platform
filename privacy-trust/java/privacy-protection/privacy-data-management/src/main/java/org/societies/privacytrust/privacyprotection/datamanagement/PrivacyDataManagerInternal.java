@@ -42,6 +42,7 @@ import org.societies.api.identity.util.DataIdentifierUtils;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
@@ -78,13 +79,29 @@ public class PrivacyDataManagerInternal extends PrivacyDataManagerInternalUtilit
 
 			// Search all matching permissions
 			List<PrivacyPermission> privacyPermissions = findPrivacyPermissions(session, requestor, dataIds, actions, false);
-			// Keep the most relevants
+			LOG.info("Get: "+(null == privacyPermissions ? "0" : privacyPermissions.size())+" permissions retrieved");
+			if (null == privacyPermissions) {
+				return null;
+			}
+			int i = 1;
+			for(PrivacyPermission perm : privacyPermissions) {
+				LOG.info((i++)+": "+perm);
+			}
+
+			// Keep the most relevants for these actions
 			permissions = new ArrayList<ResponseItem>();
-			for(DataIdentifier dataId : dataIds) {
-				ResponseItem permission = selectRelevantPermission(dataId, privacyPermissions);
-				if (null != permission) {
-					permissions.add(permission);
+			if (actions != null && actions.size() > 0) {
+				for(DataIdentifier dataId : dataIds) {
+					PrivacyPermission permission = selectRelevantPermission(dataId, privacyPermissions);
+					if (null != permission) {
+						LOG.info("Get: on of the retrieved and selected permission. "+permission);
+						permissions.add(permission.createResponseItem());
+					}
 				}
+			}
+			else {
+				LOG.info("Get: don't check actions and keep them all");
+				permissions.addAll(PrivacyPermission.createResponseItems(privacyPermissions));
 			}
 			// Robustness
 			if (permissions.size() <= 0) {
@@ -129,10 +146,12 @@ public class PrivacyDataManagerInternal extends PrivacyDataManagerInternalUtilit
 			// -- Update this privacy permission
 			// - Privacy Permission doesn't exist: create a new one
 			if (null == privacyPermission) {
+				LOG.info("Update: no permission retrieved, create a new one");
 				privacyPermission = new PrivacyPermission(requestor, dataId, actions, decision);
 			}
 			// - Privacy permission already exists: update it
 			else {
+				LOG.info("Update: permission retrieved, update it. "+privacyPermission);
 				privacyPermission.setRequestor(requestor);
 				privacyPermission.setDataId(dataId);
 				privacyPermission.setActionsToData(actions);
@@ -140,6 +159,7 @@ public class PrivacyDataManagerInternal extends PrivacyDataManagerInternalUtilit
 			}
 			// - Update
 			session.saveOrUpdate(privacyPermission);
+			LOG.info("Update: updated permission is "+privacyPermission);
 			t.commit();
 			result = true;
 		} catch (Exception e) {
@@ -291,7 +311,7 @@ public class PrivacyDataManagerInternal extends PrivacyDataManagerInternalUtilit
 	 * @param privacyPermissions
 	 * @return The most relevant permission
 	 */
-	private ResponseItem selectRelevantPermission(DataIdentifier dataId, List<PrivacyPermission> privacyPermissions) {
+	private PrivacyPermission selectRelevantPermission(DataIdentifier dataId, List<PrivacyPermission> privacyPermissions) {
 		if (null == privacyPermissions || privacyPermissions.size() <= 0) {
 			return null;
 		}
@@ -301,16 +321,18 @@ public class PrivacyDataManagerInternal extends PrivacyDataManagerInternalUtilit
 		// Find the most relevant PERMIT (even if we need to avoid some optional actions)
 		boolean found = false;
 		for(PrivacyPermission privacyPermission : privacyPermissions) {
-			// Store one matching privacy permission
+			// Interesting permission
 			if (DataIdentifierUtils.toUriString(dataId).equals(privacyPermission.getDataId())) {
+				// Store one matching privacy permission
 				aPrivacyPermission = privacyPermission;
-			}
-			// If it matches to PERMIT, this is the most relevant
-			if(privacyPermission.getPermission().equals(Decision.PERMIT)) {
-				mostRelevantPrivacyPermission = privacyPermission;
-				privacyPermissions.remove(privacyPermission);
-				found = true;
-				break;
+
+				// If it matches to PERMIT, this is the most relevant
+				if(privacyPermission.getPermission().equals(Decision.PERMIT)) {
+					mostRelevantPrivacyPermission = privacyPermission;
+					privacyPermissions.remove(privacyPermission);
+					found = true;
+					break;
+				}
 			}
 		}
 		// If no PERMIT has been found: take a matching permission (if any)
@@ -321,7 +343,7 @@ public class PrivacyDataManagerInternal extends PrivacyDataManagerInternalUtilit
 		if (null == mostRelevantPrivacyPermission) {
 			return null;
 		}
-		return mostRelevantPrivacyPermission.createResponseItem();
+		return mostRelevantPrivacyPermission;
 	}
 
 

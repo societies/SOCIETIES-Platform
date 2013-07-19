@@ -29,23 +29,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-
-import org.eclipse.jetty.util.log.Log;
-import org.hibernate.annotations.Index;
-import org.hibernate.annotations.IndexColumn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
-import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.RequestorService;
 import org.societies.api.identity.util.DataIdentifierFactory;
 import org.societies.api.identity.util.DataIdentifierUtils;
 import org.societies.api.identity.util.RequestorUtils;
@@ -56,13 +48,11 @@ import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUti
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.privacytrust.privacyprotection.datamanagement.util.PrivacyDataManagerInternalDeprecation;
 
 /**
  * Entity to store privacy permissions for access control persistence
@@ -161,7 +151,7 @@ public class PrivacyPermission implements Serializable {
 		Resource resource = null;
 		try {
 			resource = ResourceUtils.create(DataIdentifierFactory.fromUri(this.dataId));
-		} catch (MalformedCtxIdentifierException e) {
+		} catch (Exception e) {
 			LOG.error("Can't retrieve the data identifier", e);
 		}
 
@@ -172,6 +162,17 @@ public class PrivacyPermission implements Serializable {
 		RequestItem requestItem = RequestItemUtils.create(resource, actions, new ArrayList<Condition>());
 		ResponseItem reponseItem = ResponseItemUtils.create(permission, requestItem);
 		return reponseItem;
+	}
+
+	public static List<ResponseItem> createResponseItems(List<PrivacyPermission> privacyPermissions) {
+		if (null == privacyPermissions || privacyPermissions.size() <= 0) {
+			return null;
+		}
+		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
+		for(PrivacyPermission privacyPermission : privacyPermissions) {
+			permissions.add(privacyPermission.createResponseItem());
+		}
+		return permissions;
 	}
 
 	public void setDataId(DataIdentifier dataId) {

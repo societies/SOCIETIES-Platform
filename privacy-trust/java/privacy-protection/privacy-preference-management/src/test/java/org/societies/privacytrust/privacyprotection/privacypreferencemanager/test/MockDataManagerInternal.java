@@ -214,4 +214,15 @@ public class MockDataManagerInternal implements IPrivacyDataManagerInternal {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public boolean updatePermissions(
+			RequestorBean requestor,
+			List<DataIdentifier> dataIds,
+			List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions,
+			org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision decision)
+			throws PrivacyException {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

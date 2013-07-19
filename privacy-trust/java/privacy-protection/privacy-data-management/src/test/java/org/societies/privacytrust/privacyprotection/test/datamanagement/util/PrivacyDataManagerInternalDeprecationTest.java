@@ -17,7 +17,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.privacyprotection.test.datamanagement;
+package org.societies.privacytrust.privacyprotection.test.datamanagement.util;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertNotNull;
@@ -72,7 +72,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 // Run this test case using Spring jUnit
 @RunWith(SpringJUnit4ClassRunner.class)
 // Search context configuration file in classpath:<ClassName>-context.xml
-@ContextConfiguration(locations = { "PrivacyDataManagerInternalTest-context.xml" })
+@ContextConfiguration(locations = { "../PrivacyDataManagerInternalTest-context.xml" })
 public class PrivacyDataManagerInternalDeprecationTest extends AbstractTransactionalJUnit4SpringContextTests {
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerInternalDeprecationTest.class.getSimpleName());
 
