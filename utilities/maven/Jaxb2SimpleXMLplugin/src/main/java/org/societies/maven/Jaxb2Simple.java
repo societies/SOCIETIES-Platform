@@ -176,6 +176,8 @@ public class Jaxb2Simple extends AbstractMojo
 			newSchemaContent = replaceParcelableStuff(javaFile, newSchemaContent);
 		}
 
+		newSchemaContent = createEqualsMethod(javaFile, newSchemaContent);
+
 		return newSchemaContent;
 	}
 
@@ -282,7 +284,7 @@ public class Jaxb2Simple extends AbstractMojo
 		textToFind = "import org.w3._2001.xmlschema.Adapter2;";
 		textToReplace = "import org.societies.simple.basic.DateConverter;";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
-		
+
 		//import javax.xml.bind.annotation.adapters.CollapsedStringAdapter; -> import org.societies.simple.converters.CollapsedStringAdapter;
 		textToFind = "import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;";
 		textToReplace = "import org.societies.simple.basic.CollapsedStringAdapter;";
@@ -292,7 +294,7 @@ public class Jaxb2Simple extends AbstractMojo
 		textToFind = "@XmlJavaTypeAdapter\\(Adapter1.*\\.class?\\)";
 		textToReplace = "@Convert(URIConverter.class)";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
-		
+
 		//@XmlJavaTypeAdapter(Adapter1 .class) -> @Convert(URIConverter.class)
 		textToFind = "@XmlJavaTypeAdapter\\(Adapter2.*\\.class?\\)";
 		textToReplace = "@Convert(DateConverter.class)";
@@ -301,7 +303,7 @@ public class Jaxb2Simple extends AbstractMojo
 		textToFind = "import java.util.Date;";
 		textToReplace = "import java.text.DateFormat;\nimport java.text.SimpleDateFormat;\nimport java.util.Date;";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
-		
+
 		//@XmlJavaTypeAdapter(CollapsedStringAdapter.class) -> @Convert(CollapsedStringAdapter.class)
 		textToFind = "@XmlJavaTypeAdapter\\(CollapsedStringAdapter.class?\\)";
 		textToReplace = "@Convert(CollapsedStringAdapter.class)";
@@ -478,11 +480,236 @@ public class Jaxb2Simple extends AbstractMojo
 		textToFind = "@Element\\(defaultValue = \".*\", required=false\\)";
 		textToReplace = "";
 		newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
-		
+
 		// /@XmlSchemaType.*/d 
 		// /@XmlAnyAttribute.*/d 
 
 		return newSchemaContent;
+	}
+
+
+	private String createEqualsMethod(File javaFile, String schemaContent) {
+		String textToFind; String textToReplace;
+
+		// -- Check if this file has to be Parcelable
+		if (isPatternMatching("Adapter1", javaFile.getAbsolutePath())) {
+			return schemaContent;
+		}
+		if (isPatternMatching("Adapter2", javaFile.getAbsolutePath())) {
+			return schemaContent;
+		}
+		if (!isPatternMatching("xjc", javaFile.getAbsolutePath())) {
+			return schemaContent;
+		}
+
+		// -- Collect information about the file
+		// Retrieve ClassName (even if it is an enum)
+		Pattern patternClassName = Pattern.compile("public (?:abstract )?(class|enum) (.+)( |\\s)");
+		Matcher matcherClassName = patternClassName.matcher(schemaContent);
+		// Not a class or an enum: stop everything
+		if (!matcherClassName.find()) {
+			return schemaContent;
+		}
+		String className = matcherClassName.group(2).trim();
+		className = className.replace(" {", ""); // For enum and empty class it is useful
+		getLog().debug("###ClassName:"+className);
+		// Is it an enum?
+		boolean isEnum = "enum".equals(matcherClassName.group(1).trim());
+		// Is abstract?
+		boolean isAbstract = isPatternMatching(" abstract ", schemaContent);
+		// Is it extending something?
+		boolean isExtension = isPatternMatching("extends ", schemaContent);
+		// Is it requiring a default constructor?
+		boolean requiredDefaultConstructor = !isPatternMatching("public "+className+"\\(", schemaContent);
+
+		// Retrieve all Fields information
+		LinkedHashMap <String, String> fields = new LinkedHashMap <String, String>();
+		Pattern patternFields = Pattern.compile("(?:protected|private) (?:final )?(?:static )?([^ ]+) ([^ ]+);\n", Pattern.CASE_INSENSITIVE);
+		Matcher matcherFields = patternFields.matcher(schemaContent);
+		while (matcherFields.find()) {
+			// In case the name is overrided
+			Pattern patternOverrideField = Pattern.compile("@Element\\(name = \"("+matcherFields.group(2)+")\",? ?.*? ?\\)", Pattern.CASE_INSENSITIVE);
+			Matcher matcherOverrideField = patternOverrideField.matcher(schemaContent);
+			if (matcherOverrideField.find()) {
+				fields.put(matcherOverrideField.group(1), matcherFields.group(1));
+				getLog().debug("#Attr:"+matcherFields.group(1)+" "+matcherOverrideField.group(1));
+			}
+			// Not overrided, use the found one
+			else {
+				fields.put(matcherFields.group(2), matcherFields.group(1));
+				getLog().debug("#Attr:"+matcherFields.group(1)+" "+matcherFields.group(2));
+			}
+
+		}
+
+		String newSchemaContent = new String(schemaContent);
+		if (!isEnum && !isAbstract) {
+			// Equals
+			StringBuilder equalsStuff = new StringBuilder("\t/**\n\t * This method is not tested, and using contains on this object may failed\n\t */\n\tpublic boolean equals(Object o) {\n");
+			equalsStuff.append("\t\tif (o == null) { return false; }\n");
+			equalsStuff.append("\t\tif (o == this) { return true; }\n");
+			equalsStuff.append("\t\tif (o.getClass() != getClass()) {\n");
+			equalsStuff.append("\t\t\treturn false;\n");
+			equalsStuff.append("\t\t}\n");
+			// No fields
+			if (fields.size() <= 0) {
+				equalsStuff.append("\t\treturn true;\n");
+			}
+			else {
+				equalsStuff.append("\t\t"+className+" rhs = ("+className+") o;\n");
+				equalsStuff.append("\t\treturn (\n");
+				// Super equals
+				if (isExtension) {
+					equalsStuff.append("\t\t\tsuper.equals(rhs)\n");
+				}
+				// Equals for all fields
+				int i = 0;
+				for (String fieldName : fields.keySet()) {
+					String type = fields.get(fieldName);
+					String fieldNameUcfirst = fieldName.replaceFirst("[a-zA-Z]{1}", fieldName.substring(0,1).toUpperCase());
+					equalsStuff.append("\t\t\t");
+					// Not first
+					if (isExtension || 0 != i) {
+						equalsStuff.append("&& ");
+					}
+					String accessor = "get"+fieldNameUcfirst+"()";
+					if (isBooleanType(type)) {
+						accessor = "is"+fieldNameUcfirst+"()";
+					}
+					// Simple type
+					if (isSimpleType(type)) {
+						equalsStuff.append("this."+accessor+" == rhs."+accessor);
+					}
+					// Object type
+					else {
+						equalsStuff.append("this."+accessor+" == rhs."+accessor); // same reference
+						equalsStuff.append("|| (null != this."+accessor+" && this."+accessor+".equals(rhs."+accessor+"))"); // or same content
+					}
+					//				else if (!isListType(type)) {
+					//				}
+					//				// List type
+					//				else {
+					//				}
+					equalsStuff.append("\n");
+					i++;
+				}
+				equalsStuff.append("\t\t);\n");
+			}
+			equalsStuff.append("\t}\n\n");
+			
+			// - HashCode
+			StringBuilder hashCodeStuff = new StringBuilder("\t/**\n\t * This method is not tested, and using contains on this object may failed\n\t */\n\tpublic int hashCode() {\n");
+			hashCodeStuff.append("\t\tint result = 7;\n");
+			hashCodeStuff.append("\t\tfinal int multiplier = 31;\n");
+			// No fields
+			if (!isExtension && fields.size() <= 0) {
+				hashCodeStuff.append("\t\treturn result*multiplier;\n");
+			}
+			else {
+				// Super equals
+				if (isExtension) {
+					hashCodeStuff.append("\t\tresult = multiplier*result + super.hashCode();\n");
+				}
+				// Equals for all fields
+				int i = 0;
+				for (String fieldName : fields.keySet()) {
+					String type = fields.get(fieldName);
+					String fieldNameUcfirst = fieldName.replaceFirst("[a-zA-Z]{1}", fieldName.substring(0,1).toUpperCase());
+					hashCodeStuff.append("\t\t");
+					String accessor = "get"+fieldNameUcfirst+"()";
+					if (isBooleanType(type)) {
+						accessor = "is"+fieldNameUcfirst+"()";
+					}
+					// Simple type
+					if (isSimpleType(type)) {
+						if (isBooleanType(type)) {
+							hashCodeStuff.append("result = multiplier*result + (this."+accessor+" ? 1231 : 1237);\n");
+						}
+						else if ("long".equals(type)) {
+							hashCodeStuff.append("result = multiplier*result + (int)(this."+accessor+" ^(this."+accessor+" >>> 32));\n");
+						}
+						else {
+							hashCodeStuff.append("result = multiplier*result + (int)this."+accessor+";\n");
+						}
+					}
+					// Object type
+					else {
+						hashCodeStuff.append("result = multiplier*result + (null == this."+accessor+" ? 0 : this."+accessor+".hashCode());\n");
+					}
+					i++;
+				}
+				hashCodeStuff.append("\t\treturn result;\n");
+			}
+			hashCodeStuff.append("\t}\n\n");
+			
+
+			// - ToString
+			StringBuilder toStringStuff = new StringBuilder("\tpublic String toString() {\n");
+			toStringStuff.append("\t\tfinal String separator = System.getProperty(\"line.separator\");\n");
+			toStringStuff.append("\t\tStringBuilder sb = new StringBuilder(\""+className+"(\"+separator);\n");
+			if (isExtension || fields.size() > 0) {
+				// Super
+				if (isExtension) {
+					toStringStuff.append("\t\tsb.append(super.toString());\n");
+				}
+				// Actual fields
+				int i = 0;
+				for (String fieldName : fields.keySet()) {
+					String type = fields.get(fieldName);
+					String fieldNameUcfirst = fieldName.replaceFirst("[a-zA-Z]{1}", fieldName.substring(0,1).toUpperCase());
+					toStringStuff.append("\t\t");
+					String accessor = "get"+fieldNameUcfirst+"()";
+					if (isBooleanType(type)) {
+						accessor = "is"+fieldNameUcfirst+"()";
+					}
+					// Simple type
+					if (isSimpleType(type)) {
+						if (isBooleanType(type)) {
+							toStringStuff.append("sb.append(\""+fieldNameUcfirst+": \"+(this."+accessor+" ? \"yes\" : \"no\"));\n");
+						}
+						else {
+							toStringStuff.append("sb.append(\""+fieldNameUcfirst+": \"+this."+accessor+");\n");
+						}
+					}
+					// Object type
+					else {
+						toStringStuff.append("sb.append(\""+fieldNameUcfirst+": \"+this."+accessor+");\n");
+					}
+					// Not the end
+					if ((i+1) != fields.size()) {
+						toStringStuff.append("\t\tsb.append(\",\"+separator);\n");
+					}
+					i++;
+				}
+			}
+			toStringStuff.append("\t\tsb.append(\")\"+separator);\n");
+			toStringStuff.append("\t\treturn sb.toString();\n");
+			toStringStuff.append("\t}\n\n");
+			
+			textToFind = "}\n$";
+			textToReplace = "\n"+equalsStuff.toString()+hashCodeStuff.toString()+toStringStuff.toString()+"\n}\n";
+			newSchemaContent = findReplacePattern(newSchemaContent, textToFind, textToReplace);
+		}
+
+		return newSchemaContent;
+	}
+
+	private boolean isListType(String type) {
+		return (!isSimpleType(type) && isListOrArray(type));
+	}
+
+	private boolean isSimpleType(String type) {
+		return ("int".equals(type)
+				|| "double".equals(type)
+				|| "boolean".equals(type)
+				|| "byte".equals(type)
+				|| "float".equals(type)
+				|| "long".equals(type)
+				);
+	}
+
+	private boolean isBooleanType(String type) {
+		return ("boolean".equals(type) || "Boolean".equals(type));
 	}
 
 	private String replaceParcelableStuff(File javaFile, String schemaContent) {
@@ -597,9 +824,9 @@ public class Jaxb2Simple extends AbstractMojo
 		if (!isEnum || (isEnum && fieldClasses.size() > 0)) {
 			str.append("\t"+(isEnum ? "" : "public ")+"PARCELABLECLASSNAME(Parcel in) {\n");
 			// Call to super constructor: already done in read	
-//			if (isExtension) {
-//				str.append("\t\tsuper(in);\n");
-//			}
+			//			if (isExtension) {
+			//				str.append("\t\tsuper(in);\n");
+			//			}
 			if (isEnum) {
 				str.append("READPARCELABLE");
 			}
@@ -612,7 +839,7 @@ public class Jaxb2Simple extends AbstractMojo
 		str.append("\tpublic int describeContents() {\n");
 		str.append("\t\treturn 0;\n");
 		str.append("\t}\n\n");
-		
+
 		if (!isEnum) {
 			str.append("\tprotected void readFromParcel(Parcel in) {\n");
 			if (isExtension) {
@@ -703,7 +930,7 @@ public class Jaxb2Simple extends AbstractMojo
 			}
 			if ("Byte".equals(typeToParcelableRawType(type, false)) ) {
 				String sByteCode = "dest.writeInt(" + fieldName + ".length);\n\t\t" + 
-								   "dest.writeByteArray(" + fieldName + ")";
+						"dest.writeByteArray(" + fieldName + ")";
 				return sByteCode;
 			}
 			return writedMethod+"("+fieldName+")";
@@ -751,13 +978,13 @@ public class Jaxb2Simple extends AbstractMojo
 			}
 			if ("Byte".equals(typeToParcelableRawType(type, false)) ) {
 				String sByteCode = fieldName + " = new byte[in.readInt()];\n\t\t" + 
-								   "in.readByteArray(" + fieldName + ")";
+						"in.readByteArray(" + fieldName + ")";
 				return sByteCode;
 			}
 			if (globalType.endsWith("List")) {
-			    return "if (null == "+fieldName+") { "+fieldName+" = new ArrayList(); }\n\t\t"+
-			      readMethod+"("+fieldName+")";
-			   }
+				return "if (null == "+fieldName+") { "+fieldName+" = new ArrayList(); }\n\t\t"+
+						readMethod+"("+fieldName+")";
+			}
 			return readMethod+"("+fieldName+")";
 		}
 		if ("URI".equals(typeToParcelableRawType(type, false))) {

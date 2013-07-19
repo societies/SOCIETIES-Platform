@@ -133,17 +133,17 @@ public class RequestorUtils {
 	public static String toUriString(RequestorBean requestor){
 		StringBuilder sb = new StringBuilder();
 		if (null != requestor) {
-			sb.append(requestor.getRequestorId());
-			if (requestor instanceof RequestorCisBean) {
-				sb.append(((RequestorCisBean)requestor).getCisRequestorId());
-			}
-			if (requestor instanceof RequestorServiceBean) {
-				if (null != ((RequestorServiceBean)requestor).getRequestorServiceId()) {
-					sb.append(((RequestorServiceBean)requestor).getRequestorServiceId().getServiceInstanceIdentifier());
-				}
-			}
+		sb.append(requestor.getRequestorId());
+		if (requestor instanceof RequestorCisBean) {
+		sb.append(((RequestorCisBean)requestor).getCisRequestorId());
 		}
-		return sb.toString();
+		if (requestor instanceof RequestorServiceBean) {
+		if (null != ((RequestorServiceBean)requestor).getRequestorServiceId()) {
+		sb.append(((RequestorServiceBean)requestor).getRequestorServiceId().getServiceInstanceIdentifier());
+		}
+		}
+		}
+		return sb.toString().hashCode()+"";
 	}
 
 

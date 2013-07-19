@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.societies.api.identity.util.DataIdentifierUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
@@ -195,6 +196,30 @@ public class ResponseItemUtils {
 			return null;
 		}
 		return dataIds;
+	}
+
+
+	/**
+	 * Retrieve the ResponseItems for this data id
+	 * @param dataId Data id to match
+	 * @param responseItems List of response items
+	 * @return ResponseItems matching this data id
+	 */
+	public static List<ResponseItem> findResponseItem(DataIdentifier dataId, List<ResponseItem> responseItems) {
+		if (null == responseItems || responseItems.size() <= 0) {
+			return null;
+		}
+		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
+		for(Iterator<ResponseItem> it = responseItems.iterator(); it.hasNext();) {
+			ResponseItem permission = it.next();
+			if (DataIdentifierUtils.equal(dataId, permission.getRequestItem().getResource())) {
+				permissions.add(permission);
+			}
+		}
+		if (permissions.size() <= 0) {
+			return null;
+		}
+		return permissions;
 	}
 
 
