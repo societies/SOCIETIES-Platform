@@ -22,57 +22,73 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.context.api.user.inheritance;
+package org.societies.api.context.model.test.util;
 
-//import org.societies.api.mock.EntityIdentifier;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxAttributeValueType;
+import java.io.Serializable;
 
 /**
- * @author <a href="mailto:ybouloudis@amitec.gr">Yiorgos Bouloudis</a> (AMITEC) 
+ * A Serializable class used for testing context attributes with binary values.
+ *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 2.0
  */
-public interface IUserCtxInheritanceMgr {
+public class MockBlobClass implements Serializable {
 
-	/**
-	 * Gets an indicated CIS.
-	 * 
-	 * @param cisId
-	 * @since 0.0.1
-	 */
-
-	public CtxAttribute communityInheritance(CtxAttributeIdentifier ctxAttrId);
+	private static final long serialVersionUID = 1490587976482520647L;
 	
-	public CtxAttribute compareQoC(CtxAttribute ctxAtt1, CtxAttribute ctxAtt2);
+	private int seed;
 	
-	public void getCIS(IIdentity cisId);
+	public MockBlobClass(int seed) {
+		
+		this.seed = seed;
+	}
 
 	/**
-	 * Gets the Context Attribe of an indicated type and CIS.
-	 * 
-	 * @param contextAttributeIdentifier
-	 * @param type
-	 * @param cisId
-	 * @since 0.0.1
+	 * @return the seed
 	 */
-	public void getContextAttribute(CtxAttributeIdentifier contextAttributeIdentifier, CtxAttributeValueType type, IIdentity cisId);
+	public int getSeed() {
+		
+		return seed;
+	}
 
 	/**
-	 * Inherits the Context Attribute of a specified type.
-	 * 
-	 * @param contextAttributeIdentifier
-	 * @param type
-	 * @since 0.0.1
+	 * @param seed the seed to set
 	 */
-	public void inheritContextAttribute(CtxAttributeIdentifier contextAttributeIdentifier, CtxAttributeValueType type);
+	public void setSeed(int seed) {
+		
+		this.seed = seed;
+	}
 
-	/**
-	 * Resolves conflicts using specified algorithms.
-	 * 
-	 * @param conflictResolutionsAlgorithms
-	 * @since 0.0.1
+	/*
+	 * @see java.lang.Object#hashCode()
 	 */
-	public void resolveConflicts(ConflictResolutionAlgorithm conflictResolutionsAlgorithms);
+	@Override
+	public int hashCode() {
+		
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + this.seed;
+		
+		return result;
+	}
 
+	/*
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object that) {
+		
+		if (this == that)
+			return true;
+		if (that == null)
+			return false;
+		if (this.getClass() != that.getClass())
+			return false;
+		
+		MockBlobClass other = (MockBlobClass) that;
+		if (this.seed != other.seed)
+			return false;
+		
+		return true;
+	}
 }

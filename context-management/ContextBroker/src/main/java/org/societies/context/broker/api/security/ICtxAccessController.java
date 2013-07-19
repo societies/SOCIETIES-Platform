@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.societies.api.context.broker.CtxAccessControlException;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.identity.Requestor;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 
@@ -102,4 +103,44 @@ public interface ICtxAccessController {
 			final List<? extends CtxIdentifier> ctxIdList, 
 			final ActionConstants actionConst) throws 
 			CtxAccessControlException, CtxAccessControllerException;
+	
+	/**
+	 * Obfuscates the specified context model object. The requestor on whose
+	 * behalf to perform the obfuscation must also be specified. The method
+	 * returns the obfuscated context model object.
+	 * 
+	 * @param requestor
+	 *            the requestor on whose behalf to perform the obfuscation.
+	 * @param ctxModelObject
+	 *            the context model object to obfuscate.
+	 * @return the obfuscated context model object.
+	 * @throws CtxAccessControllerException
+	 *             if there is a problem performing the obfuscation.
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>.
+	 * @since 2.0
+	 */
+	public CtxModelObject obfuscate(final Requestor requestor, 
+			final CtxModelObject ctxModelObject) 
+					throws CtxAccessControllerException;
+	
+	/**
+	 * Obfuscates the specified list of context model objects. The requestor on
+	 * whose behalf to perform the obfuscation must also be specified. The 
+	 * method returns a list containing the obfuscated context model objects.
+	 * 
+	 * @param requestor
+	 *            the requestor on whose behalf to perform the obfuscation.
+	 * @param ctxModelObjectList
+	 *            the list of context model objects to obfuscate.
+	 * @return a list containing the obfuscated context model objects.
+	 * @throws CtxAccessControllerException
+	 *             if there is a problem performing the obfuscation.
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>.
+	 * @since 2.0
+	 */
+	public List<CtxModelObject> obfuscate(final Requestor requestor, 
+			final List<CtxModelObject> ctxModelObjectList) 
+					throws CtxAccessControllerException;
 }

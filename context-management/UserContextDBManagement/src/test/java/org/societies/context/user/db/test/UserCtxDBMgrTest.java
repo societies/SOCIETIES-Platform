@@ -604,6 +604,7 @@ public class UserCtxDBMgrTest {
 	    final Set<String> types = new HashSet<String>();
 	    types.add(entId.getType());
 	    types.add(entId3.getType());
+
 	    //
 	    // Lookup entities
 	    //
@@ -627,6 +628,105 @@ public class UserCtxDBMgrTest {
 	    assertTrue(ids.contains(attribute2.getId()));
 	    assertTrue(ids.contains(attribute3.getId()));
 	       
+	    //
+	    // Lookup entities using modelType and type
+	    //
+	    final Set<String> types3 = new HashSet<String>();
+	    types3.add(entId3.getType());
+	    ids = userDB.lookup(CSS_ID, CtxModelType.ENTITY, types3);
+	    assertTrue(ids.contains(entId3));
+	    assertEquals(1, ids.size());
+	    
+	    //
+	    // Lookup attributes using modelType and type
+	    //
+	    ids = userDB.lookup(attribute.getOwnerId(), CtxModelType.ATTRIBUTE, types2);
+	    assertTrue(ids.contains(attribute.getId()));
+	    assertTrue(ids.contains(attribute2.getId()));
+	    assertTrue(ids.contains(attribute3.getId()));
+	    assertEquals(3, ids.size());
+	    
+	    // 
+	    // Lookup entities using entityId and type
+	    //
+	    ids = userDB.lookup(entId, CtxModelType.ENTITY, types);
+	    assertTrue(ids.contains(entId));
+	    assertEquals(1, ids.size());	
+	    
+	    //
+	    // Lookup attributes using entityId and type
+	    //
+	    ids = userDB.lookup(entId, CtxModelType.ATTRIBUTE, types2);
+	    assertTrue(ids.contains(attribute.getId()));
+	    assertEquals(1, ids.size());
+	    
+	    //ASSOCIATIONS
+		// Create IndividualCtxEntity
+		IndividualCtxEntity indEntity = 
+				this.userDB.createIndividualEntity(CSS_ID, CtxEntityTypes.PERSON);
+		assertNotNull(indEntity.getAssociations());
+		assertEquals(1, indEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).size());
+		assertTrue(indEntity.getCommunities().isEmpty());
+		
+		CtxAssociationIdentifier isMemberOfAssociationId = 
+				indEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next();
+		CtxAssociation isMemberOfAssociation = 
+				(CtxAssociation) this.userDB.retrieve(isMemberOfAssociationId);
+		assertNotNull(isMemberOfAssociation.getParentEntity());
+		assertEquals(indEntity.getId(), isMemberOfAssociation.getParentEntity());
+
+		// Add Child Entities
+		final CtxEntityIdentifier childEntityId = userDB.createEntity(CtxEntityTypes.COMMUNITY).getId();
+		isMemberOfAssociation.addChildEntity(childEntityId);
+		isMemberOfAssociation = (CtxAssociation) this.userDB.update(isMemberOfAssociation);
+		assertEquals(indEntity.getId(), isMemberOfAssociation.getParentEntity());
+		assertEquals(1, isMemberOfAssociation.getChildEntities().size());
+		assertTrue(isMemberOfAssociation.getChildEntities().contains(childEntityId));
+		// check association from the entity's side
+		indEntity = (IndividualCtxEntity) this.userDB.retrieve(indEntity.getId());
+		assertEquals(1, indEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).size());
+		assertEquals(1, indEntity.getCommunities().size());
+		assertTrue(indEntity.getCommunities().contains(childEntityId));
+
+		final CtxEntityIdentifier childEntityId2 = userDB.createEntity(CtxEntityTypes.COMMUNITY).getId();
+		isMemberOfAssociation.addChildEntity(childEntityId2);
+		isMemberOfAssociation = (CtxAssociation) this.userDB.update(isMemberOfAssociation);
+		assertEquals(indEntity.getId(), isMemberOfAssociation.getParentEntity());
+		assertEquals(2, isMemberOfAssociation.getChildEntities().size());
+		assertTrue(isMemberOfAssociation.getChildEntities().contains(childEntityId));
+		assertTrue(isMemberOfAssociation.getChildEntities().contains(childEntityId2));
+		// check association from the entity's side
+		indEntity = (IndividualCtxEntity) this.userDB.retrieve(indEntity.getId());
+		assertEquals(1, indEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).size());
+		assertEquals(2, indEntity.getCommunities().size());
+		assertTrue(indEntity.getCommunities().contains(childEntityId));
+		assertTrue(indEntity.getCommunities().contains(childEntityId2));
+
+	    // 
+	    // Lookup associations using entityId and type
+	    //
+		// using the child entityId
+	    final Set<String> types4 = new HashSet<String>();
+	    types4.add(isMemberOfAssociation.getType());
+	    ids = userDB.lookup(childEntityId, CtxModelType.ASSOCIATION, types4);
+	    assertTrue(ids.contains(isMemberOfAssociation.getId()));
+	    assertEquals(1, ids.size());
+	    // using the parent entityId
+	    ids = userDB.lookup(indEntity.getId(), CtxModelType.ASSOCIATION, types4);
+	    assertTrue(ids.contains(isMemberOfAssociation.getId()));
+	    assertEquals(1, ids.size());
+	    
+	    //
+	    // Lookup associations using ownerId and type
+	    //
+	    ids = userDB.lookup(isMemberOfAssociation.getOwnerId(), types4);
+	    assertTrue(ids.contains(isMemberOfAssociation.getId()));
+	    
+	    //
+	    // Lookup associations using ownerId, modelType and type
+	    //
+	    ids = userDB.lookup(isMemberOfAssociation.getOwnerId(), CtxModelType.ASSOCIATION, types4);
+	    assertTrue(ids.contains(isMemberOfAssociation.getId()));
    }
    /*
 	@Ignore
