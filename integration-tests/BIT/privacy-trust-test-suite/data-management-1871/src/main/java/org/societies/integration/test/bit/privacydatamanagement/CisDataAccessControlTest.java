@@ -141,8 +141,8 @@ public class CisDataAccessControlTest {
 			// - Identities
 			myCssId = TestCase.commManager.getIdManager().getThisNetworkNode();
 			memberCssId =  TestCase.commManager.getIdManager().fromJid("university.societies.local");
-			otherCssId =  TestCase.commManager.getIdManager().fromJid("emma.societies.local");
-			requestorService = getRequestorService();
+			otherCssId =  TestCase.commManager.getIdManager().fromJid("noOne.societies.local");
+			requestorService = new RequestorService(myCssId, ServiceUtils.generateServiceResourceIdentifierFromString("myGreatService testInstance"));
 
 			// - Let memberCssId joins CIS "Members Only Cis"
 			cisMembersOnly.addMember(memberCssId.getJid(), "participant");
@@ -237,7 +237,7 @@ public class CisDataAccessControlTest {
 			permissionsOther1 = TestCase.privacyDataManager.checkPermission(new Requestor(otherCssId), cisMembersOnlyDataId, actionsRead);
 			permissionsMember1 = TestCase.privacyDataManager.checkPermission(new Requestor(memberCssId), cisMembersOnlyDataId, actionsRead);
 			permissionsMe1 = TestCase.privacyDataManager.checkPermission(new Requestor(myCssId), cisMembersOnlyDataId, actionsRead);
-			permissionsOther2 = TestCase.privacyDataManager.checkPermission(requestorService, cisMembersOnlyDataId, actionsRead);
+			permissionsOther2 = TestCase.privacyDataManager.checkPermission(new Requestor(otherCssId), cisMembersOnlyDataId, actionsRead);
 			permissionsMember2 = TestCase.privacyDataManager.checkPermission(new Requestor(memberCssId), cisMembersOnlyDataId, actionsRead);
 			permissionsMe2 = TestCase.privacyDataManager.checkPermission(new Requestor(myCssId), cisMembersOnlyDataId, actionsRead);
 		} catch (PrivacyException e) {

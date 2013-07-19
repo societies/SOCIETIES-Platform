@@ -578,12 +578,14 @@ public class Jaxb2Simple extends AbstractMojo
 					}
 					// Simple type
 					if (isSimpleType(type)) {
-						equalsStuff.append("this."+accessor+" == rhs."+accessor);
+						equalsStuff.append("(this."+accessor+" == rhs."+accessor+")");
 					}
 					// Object type
 					else {
+						equalsStuff.append("(");
 						equalsStuff.append("this."+accessor+" == rhs."+accessor); // same reference
 						equalsStuff.append("|| (null != this."+accessor+" && this."+accessor+".equals(rhs."+accessor+"))"); // or same content
+						equalsStuff.append(")");
 					}
 					//				else if (!isListType(type)) {
 					//				}

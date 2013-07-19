@@ -86,11 +86,10 @@
 			<version>${release.version}</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- Uncomment when testing enabled -->
 		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.0.7</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
