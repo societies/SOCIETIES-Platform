@@ -87,11 +87,12 @@
 			<scope>compile</scope>
 		</dependency>
 		<!-- Uncomment when testing enabled -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>1.0.7</version>
-		</dependency> -->
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -119,7 +120,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<skipTests>true</skipTests>
+					<skipTests>false</skipTests>
 				</configuration>
 			</plugin>
 			<plugin>
