@@ -60,6 +60,7 @@
 		<module>../../css-modules/css-registry</module>
 		<module>../../css-modules/css-mgmt/cssCommsMgmt</module>
 		<module>../../css-modules/css-mgmt/cssmgmt</module>
+		
 
 		<!-- CIS Mgmt: 1 bundle (path to be corrected) -->
 		<module>../../cis-modules/cis-management/cis-manager-client</module>
@@ -70,7 +71,7 @@
 		<module>../../css-modules/device-mgmt/DeviceRegistry/</module>
 		<module>../../css-modules/device-mgmt/DeviceCommsMgr/</module>
 		<module>../../css-modules/device-mgmt/RFIDDriver/</module>
-
+		<module>../../css-modules/device-mgmt/RFIDPlugins</module>
 		<!-- SNS: 1 bundle -->
 		<module>../../platform-infrastructure/sns/connectors/GooglePlusConnector</module>
 		<module>../../platform-infrastructure/sns/connectors/FacebookConnector</module>
