@@ -30,7 +30,6 @@ public class ContextRetriever {
 	private static final String RFID_SERVER_ENTITY = "RFID_SERVER_ENTITY";
 	private Hashtable<String, String> tagToPassword;
 	private Hashtable<String, String> tagToIdentity;
-	private CtxEntity ctxEntity;
 	private ICtxBroker ctxBroker;
 	private IIdentity serverIdentity;
 
@@ -40,10 +39,10 @@ public class ContextRetriever {
 		this.tagToPassword = new Hashtable<String, String>();
 		this.tagToIdentity = new Hashtable<String, String>();
 		try {
-			List<CtxIdentifier> list = ctxBroker.lookup(CtxModelType.ENTITY, RFID_SERVER_ENTITY).get();
+			List<CtxIdentifier> list = ctxBroker.lookup(serverIdentity, CtxModelType.ENTITY, RFID_SERVER_ENTITY).get();
 			if (list.size()>0){
 				CtxIdentifier ctxEntityId = list.get(0);
-				ctxEntity = (CtxEntity) ctxBroker.retrieve(ctxEntityId).get();
+				CtxEntity ctxEntity = (CtxEntity) ctxBroker.retrieve(ctxEntityId).get();
 				Set<CtxAttribute> tagToPassAttributes = ctxEntity.getAttributes(TAG_TO_PASSWORD);
 				if (tagToPassAttributes.size()>0){
 					this.tagToPassword = (Hashtable<String, String>) SerialisationHelper.deserialise(tagToPassAttributes.iterator().next().getBinaryValue(), this.getClass().getClassLoader());
@@ -89,26 +88,30 @@ public class ContextRetriever {
 	}
 
 	public void updateContext(){
-		if ((this.tagToIdentity.size()==0) && (this.tagToPassword.size()==0)){
-			return;
-		}
 		try {
-			if (this.ctxEntity==null){
-
-				this.ctxEntity = this.ctxBroker.createEntity(serverIdentity, RFID_SERVER_ENTITY).get();
-			}
+			
+				List<CtxIdentifier> list = ctxBroker.lookup(serverIdentity, CtxModelType.ENTITY, RFID_SERVER_ENTITY).get();
+				CtxEntity ctxEntity;
+				if (list.size()>0){
+					CtxIdentifier ctxEntityId = list.get(0);
+					ctxEntity = (CtxEntity) ctxBroker.retrieve(ctxEntityId).get();
+				}else{
+					ctxEntity = this.ctxBroker.createEntity(serverIdentity, RFID_SERVER_ENTITY).get();
+				}
+			
+			
+			
 			
 			if (this.tagToPassword.size()!=0){
 				Set<CtxAttribute> tagToPasswordAttributes = ctxEntity.getAttributes(TAG_TO_PASSWORD);
 				if (tagToPasswordAttributes.size()==0){
-					CtxAttribute tagToPasswordAttribute = this.ctxBroker.createAttribute(this.ctxEntity.getId(), TAG_TO_PASSWORD).get();
-					tagToPasswordAttribute.setBinaryValue(SerialisationHelper.serialise(tagToPassword));
-					ctxBroker.update(tagToPasswordAttribute);
+					CtxAttribute tagToPasswordAttribute = this.ctxBroker.createAttribute(ctxEntity.getId(), TAG_TO_PASSWORD).get();
+					this.ctxBroker.updateAttribute(tagToPasswordAttribute.getId(), SerialisationHelper.serialise(tagToPassword)).get();
 
 				}else{
 					CtxAttribute tagToPasswordAttribute = tagToPasswordAttributes.iterator().next();
-					tagToPasswordAttribute.setBinaryValue(SerialisationHelper.serialise(tagToPassword));
-					ctxBroker.update(tagToPasswordAttribute);
+					this.ctxBroker.updateAttribute(tagToPasswordAttribute.getId(), SerialisationHelper.serialise(tagToPassword)).get();
+					
 
 				}
 			}
@@ -116,14 +119,13 @@ public class ContextRetriever {
 			if (this.tagToIdentity.size()!=0){
 				Set<CtxAttribute> tagToIdAttributes = ctxEntity.getAttributes(TAG_TO_IDENTITY);
 				if (tagToIdAttributes.size()==0){
-					CtxAttribute tagToIdentityAttribute = this.ctxBroker.createAttribute(this.ctxEntity.getId(), TAG_TO_IDENTITY).get();
-					tagToIdentityAttribute.setBinaryValue(SerialisationHelper.serialise(tagToIdentity));
-					ctxBroker.update(tagToIdentityAttribute);
+					CtxAttribute tagToIdentityAttribute = this.ctxBroker.createAttribute(ctxEntity.getId(), TAG_TO_IDENTITY).get();
+					this.ctxBroker.updateAttribute(tagToIdentityAttribute.getId(), SerialisationHelper.serialise(tagToIdentity));
+					
 					
 				}else{
 					CtxAttribute tagToIdentityAttribute = tagToIdAttributes.iterator().next();
-					tagToIdentityAttribute.setBinaryValue(SerialisationHelper.serialise(tagToIdentity));
-					ctxBroker.update(tagToIdentityAttribute);
+					this.ctxBroker.updateAttribute(tagToIdentityAttribute.getId(), SerialisationHelper.serialise(tagToIdentity));
 				}
 				
 			}

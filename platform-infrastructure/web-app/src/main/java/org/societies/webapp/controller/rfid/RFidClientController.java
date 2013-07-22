@@ -1,5 +1,6 @@
 package org.societies.webapp.controller.rfid;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -34,10 +35,11 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
 import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
 import javax.swing.JOptionPane;
 
 @ManagedBean(name = "rfidClientController")
-@SessionScoped
+@ViewScoped
 public class RFidClientController extends BasePageController{
 
 	
@@ -48,6 +50,9 @@ public class RFidClientController extends BasePageController{
 	private final static String RFID_SERVER = "RFID_SERVER";
 	private final static String RFID_REGISTERED = "RFID_REGISTERED";
 	private final static String RFID_LAST_LOCATION = "RFID_LAST_LOCATION";
+	private static final String RFID_REGISTRATION_ERROR = "RFID_REGISTRATION_ERROR";
+	private static final String RFID_EVENT_TYPE = "org/societies/rfid";
+	
 	
     @ManagedProperty(value = "#{userService}")
     private UserService userService; // NB: MUST include public getter/setter
@@ -69,15 +74,30 @@ public class RFidClientController extends BasePageController{
 	private IIdentityManager idManager;
 	private boolean registerStatus = false;
 	private RfidEventListener rfidEventListener;
+	private String regError = "";
 	
     public RFidClientController() {
         
     	    	
     }
+    
+    @PreDestroy
+    public void destroyEventListener(){
+    	if (this.rfidEventListener!=null){
+    		
+    		this.rfidEventListener.unsubscribe();
+    		
+    	}
+    }
 
-	@PostConstruct
+    @PostConstruct
+    public void initController(){
+    	rfidEventListener = new RfidEventListener(this, eventManager);
+    	this.retrieveRfidInfo();
+    }
+	
 	public void retrieveRfidInfo(){
-		rfidEventListener = new RfidEventListener(this, eventManager);
+		
 		this.log.debug("Retrieving RFID information from context");
 		try {
 			List<CtxIdentifier> list = this.ctxBroker.lookup(CtxModelType.ENTITY, RFID_INFO).get();
@@ -113,7 +133,20 @@ public class RFidClientController extends BasePageController{
 					this.lastRecordedLocation = attribute.getStringValue();
 				}
 				
+				attributes  = ctxEntity.getAttributes(RFID_PASSWORD);
+				iterator = attributes.iterator();
+				if (iterator.hasNext()){
+					CtxAttribute attribute = iterator.next();
+					this.mypasswd = attribute.getStringValue();
+				}
 				
+				attributes  = ctxEntity.getAttributes(RFID_REGISTRATION_ERROR);
+				iterator = attributes.iterator();
+				if (iterator.hasNext()){
+					CtxAttribute attribute = iterator.next();
+					this.regError = attribute.getStringValue();
+				}
+
 			}
 			
 		} catch (InterruptedException e) {
@@ -268,6 +301,14 @@ public class RFidClientController extends BasePageController{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public String getRegError() {
+		return regError;
+	}
+
+	public void setRegError(String regError) {
+		this.regError = regError;
 	}
 	
 }

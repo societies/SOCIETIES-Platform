@@ -1,16 +1,19 @@
 package org.societies.webapp.controller.rfid;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.SessionScoped;
 import javax.faces.bean.ViewScoped;
 
 import org.primefaces.context.RequestContext;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.osgi.event.EMSException;
@@ -24,7 +27,9 @@ import org.societies.webapp.service.UserService;
 public class RFidServerController extends BasePageController {
 
 	
-    @ManagedProperty(value = "#{userService}")
+    private static final String RFID_SERVER_EVENT_TYPE = "org/societies/rfid/server";
+
+	@ManagedProperty(value = "#{userService}")
     private UserService userService; // NB: MUST include public getter/setter
     
     @ManagedProperty(value= "#{eventManager}")
@@ -42,16 +47,13 @@ public class RFidServerController extends BasePageController {
 
 	private IIdentityManager idManager;
 
+	private IIdentity serverIdentity;
+
     public RFidServerController() {
         // controller constructor - called every time this page is requested!
     	this.setRfidBeans(new ArrayList<RfidBean>());
-    	RfidBean example = new RfidBean();
-    	example.setPassword("password");
-    	example.setRfidTag("rfidNumber");
-    	example.setSymLoc("symLoc");
-    	example.setUserIdentity("UserId");
-    	example.setWakeupUnit("WakeupUnit");
-    	getRfidBeans().add(example);
+    	this.addRfidBean = new RfidBean();
+    	this.selectedRfidBean = new RfidBean();
     }
 
     public UserService getUserService() {
@@ -62,7 +64,11 @@ public class RFidServerController extends BasePageController {
         this.userService = userService;
     }
 
-	
+    @PostConstruct
+	public void retrieveRFIDRecords(){
+    	this.getRfidBeans();
+		
+	}
 
 	public void addTag(){
 		
@@ -70,20 +76,12 @@ public class RFidServerController extends BasePageController {
 		
 		this.rfidBeans.add(addRfidBean);
 		Hashtable<String, String> hash = new Hashtable<String, String>();
-		
-/*		hash.put("action", "register");
-		hash.put("rfidTag", this.myRfidTag);
-		hash.put("password", this.mypasswd);
-		hash.put("serverJid", this.serverJid.getJid());*/
-		if (this.addRfidBean==null){
-			this.log.debug("addRfid is null");
-		}
 		hash.put("tag", this.addRfidBean.getRfidTag());
 		if (!(this.addRfidBean.getPassword()==null || this.addRfidBean.getPassword()=="")){
 			hash.put("password", this.addRfidBean.getPassword());
 		}
 		
-		InternalEvent event = new InternalEvent("org/societies/rfid/server", "addNewTag", this.getClass().getName(), hash);
+		InternalEvent event = new InternalEvent(RFID_SERVER_EVENT_TYPE, "addNewTag", this.getClass().getName(), hash);
 		try {
 			this.eventManager.publishInternalEvent(event);
 			this.log.debug("Published add new tag event");
@@ -95,12 +93,12 @@ public class RFidServerController extends BasePageController {
 	}
 
 	public void deleteTag(){
-		this.log.debug("Delete record");
+		this.log.debug("Delete rfid record");
         Hashtable<String, String> hash = new Hashtable<String, String>();
 
 
         hash.put("tag", this.selectedRfidBean.getRfidTag());
-        InternalEvent event = new InternalEvent("org/societies/rfid/server", "deleteTag", this.getClass().getName(), hash);
+        InternalEvent event = new InternalEvent(RFID_SERVER_EVENT_TYPE, "deleteTag", this.getClass().getName(), hash);
         try {
             this.eventManager.publishInternalEvent(event);
             this.log.debug("Published deletion event");
@@ -141,6 +139,7 @@ public class RFidServerController extends BasePageController {
 	public void setCommManager(ICommManager commManager) {
 		idManager = commManager.getIdManager();
 		this.commManager = commManager;
+		this.serverIdentity = idManager.getThisNetworkNode();
 	}
 
 	public RfidBean getSelectedRfidBean() {
@@ -155,6 +154,23 @@ public class RFidServerController extends BasePageController {
 	}
 
 	public List<RfidBean> getRfidBeans() {
+		this.rfidBeans = new ArrayList<RfidBean>();
+		ContextRetriever contextRetriever = new ContextRetriever(ctxBroker, serverIdentity);
+		Hashtable<String,String> tagToIdentity = contextRetriever.getTagToIdentity();
+		Hashtable<String,String> tagToPassword = contextRetriever.getTagToPassword();
+		
+		Enumeration<String> rfidTags = tagToPassword.keys();
+		
+		while(rfidTags.hasMoreElements()){
+			String rfidTag = rfidTags.nextElement();
+			RfidBean bean = new RfidBean();
+			bean.setRfidTag(rfidTag);
+			bean.setPassword(tagToPassword.get(rfidTag));
+			if (tagToIdentity.containsKey(rfidTag)){
+				bean.setUserIdentity(tagToIdentity.get(rfidTag));
+			}
+			this.rfidBeans.add(bean);
+		}
 		return rfidBeans;
 	}
 

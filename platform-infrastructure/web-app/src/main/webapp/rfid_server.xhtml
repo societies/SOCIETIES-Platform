@@ -98,8 +98,8 @@
 				<h:outputText
 					value="#{rfidServerController.selectedRfidBean.wakeupUnit}"
 					style="font-weight:bold" />
-				<p:commandButton value="Delete" id="delete"
-					icon="ui-icon-circle-close"
+				<p:commandButton value="Delete" id="delete" update=":mainForm:rfidTable"
+					icon="ui-icon-circle-close" oncomplete="rfidDlg.hide();"
 					actionListener="#{rfidServerController.deleteTag}" />
 
 			</h:panelGrid>

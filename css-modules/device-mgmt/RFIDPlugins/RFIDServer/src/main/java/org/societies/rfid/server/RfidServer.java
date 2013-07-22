@@ -25,10 +25,6 @@
 
 package org.societies.rfid.server;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -36,8 +32,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Timer;
 
-
-import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -60,10 +54,8 @@ import org.societies.api.css.devicemgmt.model.DeviceMgmtDriverServiceNames;
 import org.societies.api.css.devicemgmt.model.DeviceMgmtEventConstants;
 import org.societies.api.css.devicemgmt.model.DeviceStateVariableConstants;
 import org.societies.api.css.devicemgmt.model.DeviceTypeConstants;
-import org.societies.api.css.devicemgmt.rfid.IRfidDriver;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.CSSEventConstants;
@@ -73,7 +65,6 @@ import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.rfid.client.api.remote.IRfidClient;
 import org.societies.rfid.server.api.IRfidServer;
-import org.societies.rfid.server.gui.ServerGUIFrame;
 import org.springframework.osgi.context.BundleContextAware;
 
 
@@ -90,7 +81,7 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 	private Hashtable<String, String> tagtoIdentityTable;
 	
 	private Hashtable<String, String> wUnitToSymlocTable;
-	private ServerGUIFrame frame;
+	
 	
 	private IEventMgr eventMgr;
 	
@@ -161,8 +152,6 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 			
 		}
 		this.registerRFIDReaders();
-		
-		frame = new ServerGUIFrame(this);
 		
 		this.ctxRetriever = new ContextRetriever(getCtxBroker(), this.serverIdentity);
 		this.tagtoIdentityTable = ctxRetriever.getTagToIdentity();
@@ -278,7 +267,6 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 				
 				this.tagToTimerTable.get(rfidTagNumber).setSymLoc(this.wUnitToSymlocTable.get(wUnit));
 				this.logging.debug("setting symloc: "+this.wUnitToSymlocTable.get(wUnit)+" to: "+rfidTagNumber);
-				this.frame.addRow(this.tagtoIdentityTable.get(rfidTagNumber), rfidTagNumber, wUnit, this.wUnitToSymlocTable.get(wUnit));
 			}else{
 				if (this.tagtoIdentityTable.containsKey(rfidTagNumber)){
 					this.logging.debug("tag "+rfidTagNumber+" registered to identity "+tagtoIdentityTable.get(rfidTagNumber));
@@ -287,13 +275,11 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 					Timer timer = new Timer();
 					timer.schedule(task, new Date(), 5000);
 					this.logging.debug("Created timer");
-					this.frame.addRow(this.tagtoIdentityTable.get(rfidTagNumber), rfidTagNumber, wUnit, this.wUnitToSymlocTable.get(wUnit));
 				}
 			}
 			
 		}else{
 			this.logging.debug("wUnit :"+wUnit+" doesn't match any symLoc");
-			this.frame.addRow("Unregistered", rfidTagNumber, wUnit, "Unknown");
 		}
 		
 		
@@ -302,7 +288,7 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 
 	@Override
 	public void registerRFIDTag(String tagNumber, String dpiAsString, String serviceID, String password) {
-		logging.debug("Received request to register RFID tag: "+tagNumber+" from identity: "+dpiAsString+" and serviceID: "+serviceID);
+		logging.debug("Received request to register RFID tag: "+tagNumber+" from identity: "+dpiAsString+" and serviceID: "+serviceID+" and password: "+password);
 			if (this.tagToPasswordTable.containsKey(tagNumber)){
 				String myPass = this.tagToPasswordTable.get(tagNumber);
 				logging.debug("Tag exists");
@@ -315,7 +301,6 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 					this.ctxRetriever.setTagToPassword(tagToPasswordTable);
 					this.ctxRetriever.updateContext();
 					this.rfidClientRemote.acknowledgeRegistration(dpiAsString, 0);
-					this.frame.setNewDPIRegistered(tagNumber, dpiAsString);
 					logging.debug("Registration successfull. Sent Acknowledgement 0");
 
 				}else{
@@ -347,7 +332,6 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 					/*if (this.dpiToServiceID.containsKey(dpiAsString)){
 						this.dpiToServiceID.remove(dpiAsString);
 					}*/
-					this.frame.setNewDPIRegistered(tag, "");
 					return;
 				}
 			}
@@ -360,6 +344,23 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 		this.ctxRetriever.setTagToIdentity(tagtoIdentityTable);
 		this.ctxRetriever.setTagToPassword(tagToPasswordTable);
 		this.ctxRetriever.updateContext();
+		this.logging.debug("deleted rfidTag: "+tag);
+		this.printInformation();
+		
+	}
+	
+	private void printInformation(){
+		Enumeration<String> keys = this.tagToPasswordTable.keys();
+		int i=1;
+		while(keys.hasMoreElements()){
+			String nextElement = keys.nextElement();
+			if (this.tagtoIdentityTable.containsKey(nextElement)){
+				this.logging.debug("Rfid record "+i+") rfidTag: "+nextElement+", password: "+tagToPasswordTable.get(nextElement)+", identity: "+this.tagtoIdentityTable.get(nextElement));
+			}else{
+				this.logging.debug("Rfid record "+i+") rfidTag: "+nextElement+", password: "+tagToPasswordTable.get(nextElement));
+			}
+			i++;
+		}
 	}
 	public String getPassword() {
 		int n = 4;
@@ -379,9 +380,13 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 		return new String(pw);
 	}
 
-	public void storePassword(String tagNumber, String password){
+	public void addTag(String tagNumber, String password){
 		this.tagToPasswordTable.put(tagNumber, password);
 		this.tagtoIdentityTable.remove(tagNumber);
+		this.ctxRetriever.setTagToIdentity(tagtoIdentityTable);
+		this.ctxRetriever.setTagToPassword(tagToPasswordTable);
+		this.ctxRetriever.updateContext();
+		this.printInformation();
 	}
 	
 

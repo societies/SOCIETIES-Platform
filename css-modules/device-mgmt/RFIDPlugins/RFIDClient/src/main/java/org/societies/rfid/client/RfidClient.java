@@ -145,12 +145,15 @@ public class RfidClient extends EventListener implements IRfidClient {
 					haveAllInfo = false;
 				}
 
+				this.updateContext(RFID_REGISTERED, "false");
+				this.updateContext(RFID_REGISTRATION_ERROR, "");
+				this.logging.debug("set "+RFID_REGISTERED+" to false");
 
 				//TODO: IF i HAVE ALL THE INFO, REGISTER WITH RFID SERVER
 
 				if (haveAllInfo){
-
 					this.rfidServerRemote.registerRFIDTag(rfidServer,rfidTag, userIdentity.getBareJid(), null, password);
+					this.logging.debug("sent registerRFIDTag message");
 				}
 			}
 
@@ -318,16 +321,19 @@ public class RfidClient extends EventListener implements IRfidClient {
 
 			break;
 		case 1 :
+			this.updateContext(RFID_REGISTERED, "false");
 			this.updateContext(RFID_REGISTRATION_ERROR, "The password for registering your RFID tag number was incorrect. Please enter your password again.");
 			this.logging.debug("RFID_REGISTRATION_ERROR: Incorrect password");
 
 			break;
 		case 2 :
+			this.updateContext(RFID_REGISTERED, "false");
 			this.updateContext(RFID_REGISTRATION_ERROR, "The RFID tag number was not recognised. Please enter a valid RFID tag number. ");
 			this.logging.debug("RFID_REGISTRATION_ERROR: Unrecognised rfid tag number");
 
 			break;
 		default: 
+			this.updateContext(RFID_REGISTERED, "false");
 			this.updateContext(RFID_REGISTRATION_ERROR, "An unknown error occured");
 			this.logging.debug("RFID_REGISTRATION_ERROR: Unknown error");
 			break;
