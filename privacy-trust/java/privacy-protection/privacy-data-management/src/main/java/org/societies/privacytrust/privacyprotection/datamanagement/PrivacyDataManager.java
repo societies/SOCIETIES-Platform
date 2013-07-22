@@ -127,7 +127,7 @@ public class PrivacyDataManager extends PrivacyDataManagerUtility implements IPr
 		if (null == actions || actions.size() <= 0 || !ActionUtils.atLeast1MandatoryAction(actions)) {
 			throw new PrivacyException("[Parameters] Actions are missing, at least one mandatory action is required, they can't be all optional.");
 		}
-		// TODO Check that all dataIds are leaf (in data hierarchy)
+		// TODO Check that all dataIds are leaf (in data hierarchy)?
 		// Create useful values for default result
 		List<DataIdentifier> remainingDataIds = new ArrayList<DataIdentifier>(); // deep copy of dataIds
 		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
@@ -164,7 +164,7 @@ public class PrivacyDataManager extends PrivacyDataManagerUtility implements IPr
 		// -- Some permissions are missing: retrieve them
 		List<ResponseItem> newPermissions = new ArrayList<ResponseItem>();
 		Map<String, List<DataIdentifier>> sortedDataIds = sortByAccessControlType(remainingDataIds);
-		LOG.info("Check: Remaining data "+DataIdentifierUtils.toUriString(remainingDataIds));
+		LOG.debug("Check: Remaining data "+DataIdentifierUtils.toUriString(remainingDataIds));
 		// - Access control for CSS data: ask to PrivacyPreferenceManager
 		if (sortedDataIds.containsKey(CSS_ACCESS_CONTROL_TYPE)) {
 			List<ResponseItem> newCssPermissions = checkPermissionCssData(requestor, sortedDataIds.get(CSS_ACCESS_CONTROL_TYPE), actions);
@@ -235,12 +235,12 @@ public class PrivacyDataManager extends PrivacyDataManagerUtility implements IPr
 		finally {
 			// Error case
 			if (null == currentCssId) {
-				LOG.info("[CIS access control] No currentCSS");
+				LOG.error("[CIS access control] No current CSS found");
 				permissions.add(permissionDeny);
 				return permissions;
 			}
 			if (null != currentCssId && !(requestor instanceof RequestorServiceBean) && !(requestor instanceof RequestorCisBean) && requestor.getRequestorId().equals(currentCssId.getJid())) {
-				LOG.info("[CIS access control] Internal call: always PERMIT");
+				LOG.debug("[CIS access control] Internal call: always PERMIT");
 				permissions.add(permissionPermit);
 				return permissions;
 			}
@@ -255,12 +255,12 @@ public class PrivacyDataManager extends PrivacyDataManagerUtility implements IPr
 			privacyPolicy = privacyPolicyManager.getPrivacyPolicy(requestorCis);
 		}
 		catch(Exception e) {
-			LOG.info("[CIS access control] Error: The privacy policy can not be retrieved for this CIS: "+RequestorUtils.toString(requestorCis), e);
+			LOG.error("[CIS access control] Error: The privacy policy can not be retrieved for this CIS: "+RequestorUtils.toString(requestorCis), e);
 			privacyPolicy = null;
 		}
 		// Can't retrieve the privacy policy OR empty one: DENY all
 		if (null == privacyPolicy || null == privacyPolicy.getRequestItems() || privacyPolicy.getRequestItems().size() <= 0) {
-			LOG.info("[CIS access control] No privacy policy");
+			LOG.error("[CIS access control] No privacy policy");
 			permissions.add(permissionDeny);
 			return permissions;
 		}
@@ -284,7 +284,7 @@ public class PrivacyDataManager extends PrivacyDataManagerUtility implements IPr
 			actionsDeepCopy.add(ActionUtils.create(actions.get(i).getActionConstant(), actions.get(i).isOptional()));
 		}
 		try {
-			LOG.info("[CIS access control] Searching: "+dataId.getUri()+" in Cis Privacy Policy: "+RequestPolicyUtils.toXmlString(privacyPolicy));
+			LOG.debug("[CIS access control] Searching: "+dataId.getUri()+" in Cis Privacy Policy: "+RequestPolicyUtils.toXmlString(privacyPolicy));
 			for(RequestItem request : privacyPolicy.getRequestItems()) {
 				DataIdentifier requestItemId = ResourceUtils.getDataIdentifier(request.getResource());
 				// - Match data id or data type
@@ -294,7 +294,7 @@ public class PrivacyDataManager extends PrivacyDataManagerUtility implements IPr
 					boolean canBeSharedWith3pServices = ConditionUtils.contains(ConditionConstants.SHARE_WITH_3RD_PARTIES, request.getConditions());
 					// All requested actions are matching AND if this data is public
 					if (allRequestedActionsMatch && canBeSharedWith3pServices) {
-						LOG.info("[CIS access control] All requested items are matching (public): PERMIT");
+						LOG.debug("[CIS access control] All requested items are matching (public): PERMIT");
 						permissions.add(permissionPermit);
 						return permissions;
 					}
@@ -305,7 +305,7 @@ public class PrivacyDataManager extends PrivacyDataManagerUtility implements IPr
 					}
 					//  All requested actions are matching AND if this data is members only
 					if (allRequestedActionsMatch && canBeSharedWithCisMembersOnly) {
-						LOG.info("[CIS access control] All requested items are matching (members only): PERMIT if necessary");
+						LOG.debug("[CIS access control] All requested items are matching (members only): PERMIT if necessary");
 						// Is it a CIS member?
 						if (isCisMember(cisMemberList, dataId.getOwnerId(), requestor.getRequestorId())) {
 							permissions.add(permissionPermit);
@@ -316,13 +316,13 @@ public class PrivacyDataManager extends PrivacyDataManagerUtility implements IPr
 					}
 					// Requested actions are partially matching AND if this data is public
 					if (actionsThatMatch.size() > 0 && canBeSharedWith3pServices) {
-						LOG.info("[CIS access control] Some requested items are matching (public)");
+						LOG.debug("[CIS access control] Some requested items are matching (public)");
 						actionsDeepCopy.removeAll(actionsThatMatch);
 						continue;
 					}
 					// Requested actions are partially matching AND if this data is members only
 					if (actionsThatMatch.size() > 0 && canBeSharedWithCisMembersOnly) {
-						LOG.info("[CIS access control] Some requested items are matching (members only)");
+						LOG.debug("[CIS access control] Some requested items are matching (members only)");
 						// Is it a CIS member?
 						if (isCisMember(cisMemberList, dataId.getOwnerId(), requestor.getRequestorId())) {
 							actionsDeepCopy.removeAll(actionsThatMatch);
@@ -335,9 +335,9 @@ public class PrivacyDataManager extends PrivacyDataManagerUtility implements IPr
 			}
 		}
 		catch(Exception e) {
-			LOG.info("Exception during CIS Data Access control", e);
+			LOG.error("Exception during CIS Data Access control", e);
 		}
-		LOG.info("[CIS access control] No requested items are matching, or an error appears, or anyway they are privates: always DENY");
+		LOG.debug("[CIS access control] No requested items are matching, or an error appears, or anyway they are privates: always DENY");
 		permissions.clear();
 		permissions.add(permissionDeny);
 		return permissions;
@@ -478,8 +478,6 @@ public class PrivacyDataManager extends PrivacyDataManagerUtility implements IPr
 		if (obfuscationLevel >= 1) {
 			return new AsyncResult<DataWrapper>(dataWrapper);
 		}
-
-		LOG.debug("Obfuscation level: "+obfuscationLevel);
 
 		// -- Obfuscate the data
 		DataWrapper obfuscatedDataWrapper = dataObfuscationManager.obfuscateData(dataWrapper, obfuscationLevel);
