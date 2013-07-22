@@ -57,6 +57,10 @@ public class ActionUtils {
 		action.setOptional(optional);
 		return action;
 	}
+	
+	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action create(String actionConstantValue, boolean optional) {
+		return create(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants.fromValue(actionConstantValue), optional);
+	}
 
 	/**
 	 * Create a list of mandatory actions

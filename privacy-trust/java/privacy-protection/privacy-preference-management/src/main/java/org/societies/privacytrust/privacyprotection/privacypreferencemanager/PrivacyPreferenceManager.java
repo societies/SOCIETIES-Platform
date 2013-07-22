@@ -186,11 +186,10 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 
 
 	@Override
-	public List<ResponseItem> checkPermission(RequestorBean requestor, DataIdentifier dataId,
-			List<Action> actions) throws PrivacyException {
+	public List<ResponseItem> checkPermission(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException {
 		// TODO Auto-generated method stub
 		AccessControlPreferenceManager  accCtrlMgr = getAccessControlPreferenceManager();
-		return accCtrlMgr.checkPermission(requestor, dataId, actions);
+		return accCtrlMgr.checkPermission(requestor, dataIds, actions);
 	}
 
 	@Override

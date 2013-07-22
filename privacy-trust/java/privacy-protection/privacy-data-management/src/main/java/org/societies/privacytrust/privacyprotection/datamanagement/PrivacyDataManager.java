@@ -26,11 +26,11 @@ package org.societies.privacytrust.privacyprotection.datamanagement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
@@ -43,7 +43,6 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.identity.Requestor;
 import org.societies.api.identity.util.DataIdentifierUtils;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.logging.IPerformanceMessage;
@@ -63,6 +62,7 @@ import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUti
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
+import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
@@ -74,15 +74,15 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Respons
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
+import org.societies.privacytrust.privacyprotection.datamanagement.util.PrivacyDataManagerUtility;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.osgi.service.ServiceUnavailableException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
  * @author Olivier Maridat (Trialog)
  */
-public class PrivacyDataManager implements IPrivacyDataManager {
+public class PrivacyDataManager extends PrivacyDataManagerUtility implements IPrivacyDataManager {
 	private static final Logger LOG = LoggerFactory.getLogger(PrivacyDataManager.class);
 	private static final Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage"); // to define a dedicated Logger for Performance Testing
 	private static long performanceObfuscationCount = 0;
@@ -95,6 +95,15 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	private ICommManager commManager;
 	private ICisManager cisManager;
 	/* Data */
+	public static final String CSS_ACCESS_CONTROL_TYPE = "CSS";
+	public static final String CIS_ACCESS_CONTROL_TYPE = "CIS";
+	/**
+	 * To choose between development and production mode.
+	 * In development mode, it is possible to disable the
+	 * privacy access control layer by a configuration
+	 * parameter.
+	 */
+	private static final boolean IS_DEVELOPMENT_MODE = false;
 	/**
 	 * Flag to enable/disable access control and obfuscation
 	 */
@@ -105,119 +114,107 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 * ACCESS CONTROL
 	 * ******************************* */
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.identity.DataIdentifier, java.util.List)
-	 */
+
 	@Override
-	public List<ResponseItem> checkPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
+	public List<ResponseItem> checkPermission(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException {
 		// -- Verify parameters
 		if (null == requestor) {
 			throw new PrivacyException("[Parameters] Not enought information: requestor or owner id is missing");
 		}
-		if (null == dataId) {
+		if (null == dataIds || dataIds.size() <= 0) {
 			throw new PrivacyException("[Parameters] Not enought information: data id is missing. At least the data type is expected.");
 		}
 		if (null == actions || actions.size() <= 0 || !ActionUtils.atLeast1MandatoryAction(actions)) {
 			throw new PrivacyException("[Parameters] Actions are missing, at least one mandatory action is required, they can't be all optional.");
 		}
+		// TODO Check that all dataIds are leaf (in data hierarchy)?
 		// Create useful values for default result
+		List<DataIdentifier> remainingDataIds = new ArrayList<DataIdentifier>(); // deep copy of dataIds
 		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
-		List<Condition> conditions = new ArrayList<Condition>();
-		Resource resource = ResourceUtils.create(dataId);
-		RequestItem requestItemNull = RequestItemUtils.create(resource, actions, conditions);
+		List<RequestItem> requestedItems = new ArrayList<RequestItem>();
+		for(Iterator<DataIdentifier> it = dataIds.iterator(); it.hasNext();) {
+			DataIdentifier dataId = it.next();
+			remainingDataIds.add(dataId);
+			requestedItems.add(RequestItemUtils.create(ResourceUtils.create(dataId), actions, new ArrayList<Condition>()));
+		}
 		// Access control disabled
 		if (!isEnabled()) {
-			permissions.add(ResponseItemUtils.create(Decision.PERMIT, requestItemNull));
-			return permissions;
+			permissions.addAll(ResponseItemUtils.createList(Decision.PERMIT, requestedItems, false));
+			return permissions;  // no storage
 		}
 
-
-		// -- Retrieve a stored permission
+		// -- Retrieve stored permissions
 		try {
-			permissions = privacyDataManagerInternal.getPermissions(RequestorUtils.toRequestor(requestor, commManager.getIdManager()), dataId, ActionUtils.toActions(actions));
-			if (null != permissions && permissions.size() > 0) {
-				return permissions;
+			permissions = privacyDataManagerInternal.getPermissions(requestor, dataIds, actions);
+			// All decisions already stored
+			if (null != permissions && permissions.size() == dataIds.size()) {
+				return permissions;  // no re-storage
 			}
 		} catch (Exception e) {
-			LOG.warn("Error when retrieving stored decisions", e);
+			LOG.warn("Error when retrieving stored decisions. Let's continue without storage", e);
+		}
+		if (null == permissions) {
+			permissions = new ArrayList<ResponseItem>();
+		}
+		List<DataIdentifier> availableDataIds = ResponseItemUtils.getDataIdentifiers(permissions);
+		if (null != availableDataIds) {
+			remainingDataIds.removeAll(availableDataIds);
 		}
 
-		// -- Permission not available
-		permissions = null;
+		// -- Some permissions are missing: retrieve them
+		List<ResponseItem> newPermissions = new ArrayList<ResponseItem>();
+		Map<String, List<DataIdentifier>> sortedDataIds = sortByAccessControlType(remainingDataIds);
+		LOG.debug("Check: Remaining data "+DataIdentifierUtils.toUriString(remainingDataIds));
 		// - Access control for CSS data: ask to PrivacyPreferenceManager
-		if (isCssAccessControl(dataId)) {
-			permissions = checkPermissionCssData(requestor, dataId, actions);
+		if (sortedDataIds.containsKey(CSS_ACCESS_CONTROL_TYPE)) {
+			List<ResponseItem> newCssPermissions = checkPermissionCssData(requestor, sortedDataIds.get(CSS_ACCESS_CONTROL_TYPE), actions);
+			if (null != newCssPermissions && newCssPermissions.size() > 0) {
+				newPermissions.addAll(newCssPermissions);
+			}
 		}
 		// - Access control for CIS data: use the CIS privacy policy
-		else {
-			permissions = checkPermissionCisData(requestor, dataId, actions);
+		if (sortedDataIds.containsKey(CIS_ACCESS_CONTROL_TYPE)) {
+			List<ResponseItem> newCisPermissions = checkPermissionCisData(requestor, sortedDataIds.get(CIS_ACCESS_CONTROL_TYPE), actions);
+			if (null != newCisPermissions && newCisPermissions.size() > 0) {
+				newPermissions.addAll(newCisPermissions);
+			}
 		}
-		
-		// -- Still no permission available: deny access
+		permissions.addAll(newPermissions);
+		availableDataIds = ResponseItemUtils.getDataIdentifiers(newPermissions);
+		if (null != availableDataIds) {
+			remainingDataIds.removeAll(availableDataIds);
+		}
+
+		//-- Still some remainings? DENY them (no storage)
+		if (null != remainingDataIds && remainingDataIds.size() > 0) {
+			for(Iterator<DataIdentifier> it = remainingDataIds.iterator(); it.hasNext();) {
+				DataIdentifier dataId = it.next();
+				permissions.add(ResponseItemUtils.create(Decision.DENY, RequestItemUtils.create(ResourceUtils.create(dataId), new ArrayList<Action>(), new ArrayList<Condition>())));
+			}
+		}
+
+		// -- Still no permission available: deny access to all
 		if (null == permissions || permissions.size() <= 0) {
-			permissions = new ArrayList<ResponseItem>();
-			ResponseItem permission = ResponseItemUtils.create(Decision.DENY, requestItemNull);
-			permissions.add(permission);
+			permissions.addAll(ResponseItemUtils.createList(Decision.DENY, requestedItems, true));
+			return permissions; // no storage
 		}
-		// Store new permission retrieved from PrivacyPreferenceManager
+
+		// -- Store new permission retrieved from PrivacyPreferenceManager
 		try {
-			privacyDataManagerInternal.updatePermissions(RequestorUtils.toRequestor(requestor, commManager.getIdManager()), permissions);
+			privacyDataManagerInternal.updatePermissions(requestor, newPermissions);
 		} catch (Exception e) {
-			LOG.warn("Error during decisions storage", e);
+			LOG.error("Error during decisions storage", e);
+		}
+		return permissions;
+	}	
+
+	public List<ResponseItem> checkPermissionCisData(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException {
+		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
+		for (DataIdentifier dataId : dataIds) {
+			permissions.addAll(checkPermissionCisData(requestor, dataId, actions));
 		}
 		return permissions;
 	}
-
-	@Deprecated
-	@Override
-	public List<org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem> checkPermission(Requestor requestor, DataIdentifier dataId, List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions) throws PrivacyException {
-		return ResponseItemUtils.toResponseItems(checkPermission(RequestorUtils.toRequestorBean(requestor), dataId, ActionUtils.toActionBeans(actions)));
-	}
-	@Deprecated
-	@Override
-	public List<org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem> checkPermission(Requestor requestor, DataIdentifier dataId, org.societies.api.privacytrust.privacy.model.privacypolicy.Action action) throws PrivacyException {
-		return ResponseItemUtils.toResponseItems(checkPermission(RequestorUtils.toRequestorBean(requestor), dataId, ActionUtils.toActionBean(action)));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, org.societies.api.schema.identity.DataIdentifier, org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action)
-	 */
-	@Override
-	public List<ResponseItem> checkPermission(RequestorBean requestor, DataIdentifier dataId, Action action) throws PrivacyException {
-		List<Action> actions = new ArrayList<Action>();
-		actions.add(action);
-		return checkPermission(requestor, dataId, actions);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, java.util.List, java.util.List)
-	 */
-	@Override
-	public List<ResponseItem> checkPermission(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException {
-		List<ResponseItem> responseItemList = new ArrayList<ResponseItem>();
-		for(DataIdentifier dataId : dataIds) {
-			responseItemList.addAll(checkPermission(requestor, dataId, actions));
-		}
-		return responseItemList;
-	}	
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#checkPermission(org.societies.api.schema.identity.RequestorBean, java.util.List, org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action)
-	 */
-	@Override
-	public List<ResponseItem> checkPermission(RequestorBean requestor, List<DataIdentifier> dataIds, Action action) throws PrivacyException {
-		List<ResponseItem> responseItemList = new ArrayList<ResponseItem>();
-		for(DataIdentifier dataId : dataIds) {
-			responseItemList.addAll(checkPermission(requestor, dataId, action));
-		}
-		return responseItemList;
-	}
-
-
 	public List<ResponseItem> checkPermissionCisData(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		// -- Verify parameters
 		if (!isDependencyInjectionDone(3)) {
@@ -238,10 +235,11 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		finally {
 			// Error case
 			if (null == currentCssId) {
+				LOG.error("[CIS access control] No current CSS found");
 				permissions.add(permissionDeny);
 				return permissions;
 			}
-			if (null != currentCssId && requestor.getRequestorId().equals(currentCssId.getJid())) {
+			if (null != currentCssId && !(requestor instanceof RequestorServiceBean) && !(requestor instanceof RequestorCisBean) && requestor.getRequestorId().equals(currentCssId.getJid())) {
 				LOG.debug("[CIS access control] Internal call: always PERMIT");
 				permissions.add(permissionPermit);
 				return permissions;
@@ -262,6 +260,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		}
 		// Can't retrieve the privacy policy OR empty one: DENY all
 		if (null == privacyPolicy || null == privacyPolicy.getRequestItems() || privacyPolicy.getRequestItems().size() <= 0) {
+			LOG.error("[CIS access control] No privacy policy");
 			permissions.add(permissionDeny);
 			return permissions;
 		}
@@ -290,8 +289,6 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 				DataIdentifier requestItemId = ResourceUtils.getDataIdentifier(request.getResource());
 				// - Match data id or data type
 				if (DataIdentifierUtils.isParentOrSameType(requestItemId, dataId)) {
-					//				if ((null != request.getResource().getDataId() && dataId.getUri().equals(request.getResource().getDataId().getUri()))
-					//						|| (null != request.getResource().getScheme() && null != request.getResource().getDataType() && dataId.getScheme().value().equals(request.getResource().getScheme().value()) && dataId.getType().equals(request.getResource().getDataType()))) {
 					List<Action> actionsThatMatch = new ArrayList<Action>();
 					boolean allRequestedActionsMatch = ActionUtils.contains(actionsDeepCopy, request.getActions(), actionsThatMatch);
 					boolean canBeSharedWith3pServices = ConditionUtils.contains(ConditionConstants.SHARE_WITH_3RD_PARTIES, request.getConditions());
@@ -346,7 +343,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		return permissions;
 	}
 
-	public List<ResponseItem> checkPermissionCssData(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
+	public List<ResponseItem> checkPermissionCssData(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException {
 		// Dependency injection
 		if (!isDependencyInjectionDone(4)) {
 			throw new PrivacyException("[Dependency Injection] PrivacyDataManager not ready");
@@ -354,7 +351,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		// -- Retrieve a permission using the PrivacyPreferenceManager
 		List<ResponseItem> permissions = null;
 		try {
-			permissions = privacyPreferenceManager.checkPermission(requestor, dataId, actions);
+			permissions = privacyPreferenceManager.checkPermission(requestor, dataIds, actions);
 		} catch (Exception e) {
 			LOG.error("Error when retrieving permission from PrivacyPreferenceManager", e);
 		}
@@ -386,6 +383,42 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		return new ArrayList<ICisParticipant>(cisMemberListIncome);
 	}
 
+
+	/**
+	 * Will sort these data ids in two types: CSS or CIS data id
+	 * @param dataIds List to sort
+	 * @return A map containing two list of data ids max.
+	 * One at the key {@link PrivacyDataManager#CSS_ACCESS_CONTROL_TYPE}.
+	 * The other at the key {@link PrivacyDataManager#CIS_ACCESS_CONTROL_TYPE}.
+	 * NULL is returned if no data id is provided.
+	 */
+	public Map<String, List<DataIdentifier>> sortByAccessControlType(List<DataIdentifier> dataIds) {
+		if (null == dataIds || dataIds.size() <= 0) {
+			return null;
+		}
+		Map<String, List<DataIdentifier>> sorted = new HashMap<String, List<DataIdentifier>>();
+		// Split in two lists
+		List<DataIdentifier> cssList = new ArrayList<DataIdentifier>();
+		List<DataIdentifier> cisList = new ArrayList<DataIdentifier>();
+		for(Iterator<DataIdentifier> it = dataIds.iterator(); it.hasNext();) {
+			DataIdentifier dataId = it.next();
+			if (isCssAccessControl(dataId)) {
+				cssList.add(dataId);
+			}
+			else {
+				cisList.add(dataId);
+			}
+		}
+		// Store in the map
+		if (cssList.size() > 0) {
+			sorted.put(CSS_ACCESS_CONTROL_TYPE, cssList);
+		}
+		if (cisList.size() > 0) {
+			sorted.put(CIS_ACCESS_CONTROL_TYPE, cisList);
+		}
+		return sorted;
+	}
+
 	/**
 	 * 
 	 * @param dataId
@@ -412,10 +445,6 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 	 * OBFUSCATION
 	 * ******************************* */
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager#obfuscateData(org.societies.api.schema.identity.RequestorBean, org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper)
-	 */
 	@Async
 	@Override
 	public Future<DataWrapper> obfuscateData(RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException {
@@ -473,7 +502,7 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 			// Launch obfuscation
 			futureResults.put(group.getKey(), obfuscateData(requestor, dataWrapper));
 		}
-		
+
 		// -- Retrieve results
 		for (Entry<String, Future<DataWrapper>> group : futureResults.entrySet()) {
 			List<CtxModelObject> originalCtxDataList = obfuscableGroups.get(group.getKey());
@@ -532,14 +561,15 @@ public class PrivacyDataManager implements IPrivacyDataManager {
 		this.cisManager = cisManager;
 	}
 
-	/**
-	 * @return the enabled
-	 */
 	public boolean isEnabled() {
-		return enabled;
+		if (IS_DEVELOPMENT_MODE) 
+			return enabled;
+		return true;
 	}
 	/**
-	 * @param enabled the enabled to set
+	 * To enable / disable the privacy access control layer.
+	 * This is for development purpose, and will not be enforced in production mode.
+	 * @param enabled
 	 */
 	@Value("${accesscontrol.privacy.enabled:1}")
 	public void setEnabled(boolean enabled) {

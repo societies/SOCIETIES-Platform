@@ -24,6 +24,7 @@
  */
 package org.societies.api.identity.util;
 
+import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.schema.identity.DataTypeDescription;
@@ -46,7 +47,7 @@ public class DataTypeDescriptionUtils {
 			throws NullPointerException {
 		return create(dataTypeIdentifier, null, "");
 	}
-	
+
 	/**
 	 * 
 	 * @param dataTypeIdentifier
@@ -111,8 +112,22 @@ public class DataTypeDescriptionUtils {
 		.append(o1.getFriendlyDescription(), rhs.getFriendlyDescription())
 		.isEquals();
 	}
-	
+
 	public static String computeFriendlyName(String dataTypeIdentifier) {
-		return dataTypeIdentifier.replaceAll("_", " ");
+		return capitalizeString(dataTypeIdentifier.replaceAll("_", " ").toLowerCase());
+	}
+
+	public static String capitalizeString(String string) {
+		char[] chars = string.toLowerCase().toCharArray();
+		boolean found = false;
+		for (int i = 0; i < chars.length; i++) {
+			if (!found && Character.isLetter(chars[i])) {
+				chars[i] = Character.toUpperCase(chars[i]);
+				found = true;
+			} else if (Character.isWhitespace(chars[i]) || chars[i]=='.' || chars[i]=='\'') { // You can add other chars here
+				found = false;
+			}
+		}
+		return String.valueOf(chars);
 	}
 }

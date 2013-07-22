@@ -69,12 +69,12 @@ public class NameObfuscator extends DataObfuscator<Name> {
 		// 0: nothing
 		Name obfuscatedName = new Name();
 		int stepNumber = obfuscatorInfo.getNbOfObfuscationLevelStep();
-		if (obfuscationLevel <= 0) {
+		if (obfuscationLevel <= (double)0) {
 			obfuscatedName.setFirstName("");
 			obfuscatedName.setLastName("");
 		}
 		// 1: first letters
-		else if (obfuscationLevel > 0 && obfuscationLevel <= (double)1/(double)stepNumber) {
+		else if (obfuscationLevel > (double)0 && obfuscationLevel <= (double)1/(double)stepNumber) {
 			obfuscatedName.setFirstName((data.getFirstName() != "" ? data.getFirstName().substring(0, 1)+"." : ""));
 			obfuscatedName.setLastName((data.getLastName() != "" ? data.getLastName().substring(0, 1)+"." : ""));
 		}
@@ -89,7 +89,7 @@ public class NameObfuscator extends DataObfuscator<Name> {
 			obfuscatedName.setLastName(data.getLastName());
 		}
 		// 4: everything
-		else if (obfuscationLevel >= 1) {
+		else if (obfuscationLevel >= (double)1) {
 			obfuscatedName.setFirstName(data.getFirstName());
 			obfuscatedName.setLastName(data.getLastName());
 		}

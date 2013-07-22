@@ -195,6 +195,18 @@ public class AccessControlPreferenceManager {
 	 * (non-Javadoc)
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#checkPermission(org.societies.api.identity.Requestor, org.societies.api.context.model.CtxAttributeIdentifier, java.util.List)
 	 */
+	public List<ResponseItem> checkPermission(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException{
+		if (null==dataIds || dataIds.size() <= 0){
+			this.logging.debug("requested permission for null CtxIdentifier. returning : null");
+			return null;
+			
+		}
+		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
+		for(DataIdentifier dataId : dataIds) {
+			permissions.addAll(checkPermission(requestor, dataId, actions));
+		}
+		return permissions;
+	}
 	public List<ResponseItem> checkPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException{
 
 		if (null==dataId){

@@ -74,11 +74,11 @@ public interface IPrivacyPreferenceManager {
 	 * @return	responseItem that indicates the resource, the Actions and Conditions and the Decision to permit or deny
 	 * 
 	 * @param requestor the identity of the requestor (maybe RequestorService or RequestorCis)
-	 * @param ctxId    the affected context identifier
+	 * @param dataIds    Requested leaf data identififers
 	 * @param actions    the actions requested
 	 * @exception PrivacyPreferenceException PrivacyPreferenceException
 	 */
-	public List<ResponseItem> checkPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions)
+	public List<ResponseItem> checkPermission(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions)
 	  throws PrivacyException;
 
 	/**

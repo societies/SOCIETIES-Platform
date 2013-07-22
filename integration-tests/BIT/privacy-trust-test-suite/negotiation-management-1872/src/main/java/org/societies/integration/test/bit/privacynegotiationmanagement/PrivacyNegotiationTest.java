@@ -317,6 +317,7 @@ public class PrivacyNegotiationTest {
 	}
 
 	@Test
+	@Ignore
 	public void testStartNegotiationCisFaillure() {
 		String testTitle = new String("Start Negotiation CIS: faillure");
 		LOG.info("[#"+testCaseNumber+"][Test] "+testTitle);
