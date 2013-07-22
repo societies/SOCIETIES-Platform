@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+
 /**
  * This data class maintains only the necessary information derived from a history attribute 
  * 
@@ -18,9 +20,9 @@ public class MockHistoryData {
 	Date timestamp;
 	
 	String contextValue = "";
-	
-	
-	
+
+	String serviceType = "";
+		
 	// The Action parameter name
 	String parameterName;
 
@@ -29,16 +31,17 @@ public class MockHistoryData {
 	
 	// The service id that the action refers to 
 	String serviceId = "";
-	
+		
 	// Context data that escort an action
 	Map<String,String> contextMap = new HashMap<String,String>();
 	
-	public MockHistoryData(String parameterName,String actionValue, Map<String,String> context, Date timestamp, String serviceId){
+	public MockHistoryData(String parameterName,String actionValue, Map<String,String> context, Date timestamp, String serviceId, String serviceType){
 		this.parameterName = parameterName;
 		this.actionValue = actionValue;
 		this.contextMap = context;
 		this.timestamp = timestamp;
 		this.serviceId  = serviceId;
+		this.serviceType = serviceType;
 	}
 
 	public Map<String,String> getContext() {
@@ -61,7 +64,6 @@ public class MockHistoryData {
 		return parameterName;
 	}
 
-
 	public void setParameterName(String parameterName) {
 		this.parameterName = parameterName;
 	}
@@ -79,6 +81,14 @@ public class MockHistoryData {
 
 	public void setSymLoc() {
 		
+	}
+	
+	public String getServiceType() {
+		return this.serviceType;
+	}
+	
+	public void setServiceType(String serviceType) {
+		this.serviceType = serviceType;
 	}
 	
 	public String getServiceId() {

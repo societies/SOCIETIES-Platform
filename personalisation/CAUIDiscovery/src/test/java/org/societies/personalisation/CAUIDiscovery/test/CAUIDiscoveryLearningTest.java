@@ -101,8 +101,9 @@ public class CAUIDiscoveryLearningTest {
 			printTransProbDictionary(trans3ProbDictionary);
 
 			System.out.println("6. Generate UserIntentModelData");
-			ConstructUIModel cmodel = new ConstructUIModel(discover.getCauiTaskManager(),null); 
-			UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap);
+			ConstructUIModel cmodel = new ConstructUIModel(discover.getCauiTaskManager(),null);
+			System.out.println("6. discover.getSriMap()" +discover.getSriMap());
+			UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap,discover.getSriMap());
 
 			System.out.println("*********** model created *******"+ modelData.getActionModel());
 			for( IUserIntentAction userAction  : modelData.getActionModel().keySet()){
@@ -167,10 +168,10 @@ public class CAUIDiscoveryLearningTest {
 		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
 		ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
 		try {
-			serviceId1.setIdentifier(new URI("http://testService1"));
-			serviceId2.setIdentifier(new URI("http://testService2"));
-			serviceId1.setServiceInstanceIdentifier("http://testService1");
-			serviceId2.setServiceInstanceIdentifier("http://testService2");
+			serviceId1.setIdentifier(new URI("xc.societies.local/NEC_Cobrowse_Service1"));
+			serviceId2.setIdentifier(new URI("xc.societies.local/NEC_Cobrowse_Service2"));
+			serviceId1.setServiceInstanceIdentifier("cobrowse-webapp");
+			serviceId2.setServiceInstanceIdentifier("cobrowse-webapp");
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}

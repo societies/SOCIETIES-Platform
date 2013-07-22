@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
@@ -69,7 +68,7 @@ public class ResourceUtils {
 		resource.setDataType(dataType);
 		return resource;
 	}
-	
+
 
 	public static org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource create(DataIdentifier dataId) {
 		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource resource = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource();

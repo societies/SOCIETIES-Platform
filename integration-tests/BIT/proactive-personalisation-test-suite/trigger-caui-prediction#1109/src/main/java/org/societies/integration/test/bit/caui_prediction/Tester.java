@@ -119,15 +119,14 @@ public class Tester {
 			try {
 				//	IIdentity cssOwnerId = getOwnerId();
 
-				serviceId1.setIdentifier(new URI("css://nikosk@societies.org/radioService"));
-				serviceId1.setServiceInstanceIdentifier("css://nikosk@societies.org/radioService");
+				serviceId1.setIdentifier(new URI("xc.societies.local/Cobrowse_Service1"));
+				serviceId1.setServiceInstanceIdentifier("cobrowse-webapp1");
 
-				serviceId2.setIdentifier(new URI("css://nikosk@societies.org/navigatorService"));
-				serviceId2.setServiceInstanceIdentifier("css://nikosk@societies.org/navigatorService");
-
-
+				serviceId2.setIdentifier(new URI("xc.societies.local/Cobrowse_Service2"));
+				serviceId2.setServiceInstanceIdentifier("cobrowse-webapp2");
+				
 				serviceIdRandom.setIdentifier(new URI("css://nikosk@societies.org/randomService"));
-				serviceIdRandom.setServiceInstanceIdentifier("css://nikosk@societies.org/randomService");
+				serviceIdRandom.setServiceInstanceIdentifier("randomService3");
 
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
@@ -250,12 +249,13 @@ public class Tester {
 
 			IIdentity cssOwnerId = getOwnerId();
 
-			ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
-			serviceId.setIdentifier(new URI("css://nikosk@societies.org/radioService"));
-			serviceId.setServiceInstanceIdentifier("css://nikosk@societies.org/radioService");
+			ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
+			serviceId1.setIdentifier(new URI("xc.societies.local/Cobrowse_Service1"));
+			serviceId1.setServiceInstanceIdentifier("cobrowse-webapp1");
 
+			
 			// this action simulates an action performed by the user 
-			IAction actionRadio1 = new Action(serviceId, "serviceType1", "setRadio", "on");
+			IAction actionRadio1 = new Action(serviceId1, "serviceType1", "setRadio", "on");
 			printOperatorAttr();
 			LOG.info("A action performed :  "+ actionRadio1 );
 
@@ -320,8 +320,8 @@ public class Tester {
 			IIdentity cssOwnerId = getOwnerId();
 
 			ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
-			serviceId2.setIdentifier(new URI("css://nikosk@societies.org/navigatorService"));
-			serviceId2.setServiceInstanceIdentifier("css://nikosk@societies.org/navigatorService");
+			serviceId2.setIdentifier(new URI("xc.societies.local/Cobrowse_Service2"));
+			serviceId2.setServiceInstanceIdentifier("cobrowse-webapp2");
 
 			// this action simulates an action performed by the user 
 			IAction action4 = new Action(serviceId2, "serviceType2", "setDestination", "gasStation");
@@ -345,15 +345,15 @@ public class Tester {
 
 		LOG.info("Test 1876 : TestGetCurrentIntentAction");
 
-		ServiceResourceIdentifier serviceId3 = new ServiceResourceIdentifier();
+		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
 		try {
 			IIdentity cssOwnerId = getOwnerId();
 
 			LOG.info("TestGetCurrentIntentAction : waiting 9000 ");
 			Thread.sleep(9000);
 
-			serviceId3.setIdentifier(new URI("css://nikosk@societies.org/radioService"));
-			serviceId3.setServiceInstanceIdentifier("css://nikosk@societies.org/radioService");
+			serviceId1.setIdentifier(new URI("xc.societies.local/Cobrowse_Service1"));
+			serviceId1.setServiceInstanceIdentifier("cobrowse-webapp1");
 
 			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "Home-Parking");
 			//setContext(CtxAttributeTypes.TEMPERATURE, new Integer(30));
@@ -362,9 +362,15 @@ public class Tester {
 			LOG.info("print current context");
 			printOperatorAttr();
 
-			IUserIntentAction currentAction = TestCase1109.cauiPrediction.getCurrentIntentAction(cssOwnerId, serviceId3, "setVolume").get();
+			LOG.info("input for TestGetCurrentIntentAction serviceId1:" + serviceId1);
+			LOG.info("input for TestGetCurrentIntentAction serviceId1:" + serviceId1.getServiceInstanceIdentifier());
+			LOG.info("input for TestGetCurrentIntentAction serviceId1:" + serviceId1.getIdentifier());
+			
+			LOG.info("input for TestGetCurrentIntentAction cssOwnerId:" + cssOwnerId); 
+			
+			IUserIntentAction currentAction = TestCase1109.cauiPrediction.getCurrentIntentAction(cssOwnerId, serviceId1, "setVolume").get();
 
-
+			LOG.info("outcome for TestGetCurrentIntentAction ");
 			LOG.info("currentAction "+currentAction.getActionID());
 			LOG.info("currentAction context: "+currentAction.getActionContext());
 			LOG.info("confidence level of predicted action: "+currentAction.getConfidenceLevel());

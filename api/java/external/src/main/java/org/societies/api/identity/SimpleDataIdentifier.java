@@ -25,8 +25,6 @@
 package org.societies.api.identity;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.util.DataIdentifierFactory;
 import org.societies.api.identity.util.DataIdentifierUtils;
@@ -41,7 +39,7 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
  */
 public class SimpleDataIdentifier extends DataIdentifier {
 	private static final long serialVersionUID = 4137288721938940079L;
-	private static final Logger LOG = LoggerFactory.getLogger(SimpleDataIdentifier.class.getName());
+//	private static final Logger LOG = LoggerFactory.getLogger(SimpleDataIdentifier.class.getName());
 
 	@Override
 	public String getUri() {
@@ -61,7 +59,7 @@ public class SimpleDataIdentifier extends DataIdentifier {
 				type = dataId.getType();
 				ownerId = dataId.getOwnerId();
 			} catch (MalformedCtxIdentifierException e) {
-				LOG.error("Can't retrieve the data id from its URI");
+//				LOG.error("Can't retrieve the data id from its URI");
 			}
 		}
 		return type;
@@ -76,7 +74,7 @@ public class SimpleDataIdentifier extends DataIdentifier {
 				type = dataId.getType();
 				ownerId = dataId.getOwnerId();
 			} catch (MalformedCtxIdentifierException e) {
-				LOG.error("Can't retrieve the data id from its URI");
+//				LOG.error("Can't retrieve the data id from its URI");
 			}
 		}
 		return scheme;

@@ -132,15 +132,26 @@ public abstract class CtxModelObject implements Serializable {
 		return this.getId().getObjectNumber();
 	}
 	
-	/* TODO
-	 * Returns a String representation of this context model object
+	/**
+	 * Returns a String representation of this context model object.
      * 
-     * @return a String representation of this context model object
-     * 
+     * @return a String representation of this context model object.
+     * @since 2.0
+     */
 	@Override
 	public String toString() {
-	}*/
-	
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append(this.getClass().getSimpleName());
+		sb.append(" {id=");
+		sb.append(this.id);
+		sb.append(", lastModified=");
+		sb.append(this.lastModified);
+		sb.append("}");
+		
+		return sb.toString();
+	}
+
 	/**
 	 * @see java.lang.Object#hashCode()
 	 * @since 0.0.2

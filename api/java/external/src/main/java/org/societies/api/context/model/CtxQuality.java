@@ -68,7 +68,7 @@ public class CtxQuality implements Serializable {
 	private Date lastUpdated;
 	
 	/** The origin type of the current context attribute value. */
-	private CtxOriginType originType;
+	private CtxOriginType originType = CtxOriginType.MANUALLY_SET;
 	
 	/** The precision of the current context attribute value. */
 	private Double precision;

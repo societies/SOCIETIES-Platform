@@ -96,8 +96,12 @@ public class SopSuitability {
 		
 		// Get preference values one by one. Values are usually numerical.
 		for (int k = 0; k < preferences.length; k++) {
-			//preferences[k] = personalizationMgr.getPreference(requestor, ownerID, serviceType, serviceId, preferenceName);
-			//preferences[k] = personalizationMgr.getPreference(policyNegotiator, poliyNegotiator, "game", serviceId, preferenceName);
+//			try {
+//				preferences[k] = personalizationMgr.getPreference(requestor, ownerID, serviceType, serviceId, preferenceName);
+//				preferences[k] = personalizationMgr.getPreference(policyNegotiator, poliyNegotiator, "game", serviceId, preferenceName);
+//			} catch (ServiceUnavailableException e) {
+//				LOG.info("Personalization Manager not available");
+//			}
 			preferences[k] = rnd.nextDouble();  // FIXME: call personalization manager instead
 		}
 		return preferences;

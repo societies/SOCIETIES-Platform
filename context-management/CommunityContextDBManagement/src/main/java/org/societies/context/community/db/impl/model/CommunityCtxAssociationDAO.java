@@ -57,6 +57,11 @@ import org.societies.context.community.db.impl.model.hibernate.CtxEntityIdentifi
 			query = "select association.ctxId from CommunityCtxAssociationDAO as association where association.ctxId.type = :type"
 	),
 	@NamedQuery(
+			name = "getCommunityCtxAssociationIdsByOwnerIdAndType",
+			query = "select association.ctxId from CommunityCtxAssociationDAO as association " + 
+					"where association.ctxId.owner_id = :ownerId and association.ctxId.type = :type"
+	),
+	@NamedQuery(
 			name = "getCommunityCtxAssociationIdsByParentEntityId",
 			query = "select distinct association.ctxId from CommunityCtxAssociationDAO as association " +
 					"where association.parentEntity = :parentEntId"
@@ -75,6 +80,16 @@ import org.societies.context.community.db.impl.model.hibernate.CtxEntityIdentifi
 			name = "getCommunityCtxAssociationsByParentEntityId",
 			query = "select distinct association from CommunityCtxAssociationDAO as association " +
 					"where association.parentEntity = :parentEntId"
+	),
+	@NamedQuery(
+			name = "getCommunityCtxAssociationIdsByChildEntityIdAndType",
+			query = "select distinct association.ctxId from CommunityCtxAssociationDAO as association inner join association.childEntities as childEntity " +
+					"where childEntity = :childEntId and association.ctxId.type = :type"
+	),
+	@NamedQuery(
+			name = "getCommunityCtxAssociationsByParentEntityIdAndType",
+			query = "select distinct association.ctxId from CommunityCtxAssociationDAO as association " +
+					"where association.parentEntity = :parentEntId and association.ctxId.type = :type"
 	)
 })
 @Entity

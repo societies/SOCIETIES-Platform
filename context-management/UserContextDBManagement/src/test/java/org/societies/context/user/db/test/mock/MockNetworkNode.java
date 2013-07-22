@@ -77,7 +77,7 @@ public class MockNetworkNode implements INetworkNode {
 	@Override
 	public String getBareJid() {
 		
-		return "jave.societies.local";
+		return "jane.societies.local";
 	}
 
 	/* (non-Javadoc)

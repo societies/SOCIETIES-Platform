@@ -652,8 +652,6 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 				createCtxAttribute(cisEntity.getId(), CtxAttributeTypes.NAME, this.cis.getCommunityName());
 				// ABOUT
 				createCtxAttribute(cisEntity.getId(), CtxAttributeTypes.ABOUT, this.cis.getDescription());
-				//CACI
-				createCtxAttribute(cisEntity.getId(), CtxAttributeTypes.CACI_MODEL, "noModel");
 				
 				// add ctx attributes based on privacy policy
 				List<String> attrTypesList = getPrivPolicyAttributeTypes(cisOwnerId, cisId);

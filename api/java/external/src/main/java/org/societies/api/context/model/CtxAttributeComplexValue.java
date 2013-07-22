@@ -25,9 +25,9 @@
 package org.societies.api.context.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class is used to represent complex context attribute values which describe the
@@ -36,7 +36,7 @@ import java.util.HashMap;
  * @author <a href="mailto:pkosmidis@cn.ntua.gr">Pavlos Kosmides</a> (ICCS)
  * @since 1.0
  */
-public class CtxAttributeComplexValue implements Serializable{
+public class CtxAttributeComplexValue implements Serializable {
 
 	private static final long serialVersionUID = 1738555858962493332L;
 
@@ -53,14 +53,10 @@ public class CtxAttributeComplexValue implements Serializable{
 	private String locationgps;
 
 	/** The mode value of the current context attribute */
-	private ArrayList<Integer> mode;
+	private List<Integer> mode;
 
 	/** The pairs depict a pair of a string with an integer value */
-	HashMap<String, Integer> pairs = new HashMap<String, Integer>();
-	
-	public CtxAttributeComplexValue() {
-		// TODO Auto-generated constructor stub
-	}
+	private Map<String, Integer> pairs = new HashMap<String, Integer>();
 
 	/** 
 	 * Returns the average of the current context attribute value.
@@ -172,7 +168,7 @@ public class CtxAttributeComplexValue implements Serializable{
 	 * 
 	 * @return the mode of the current context attribute value.
 	 */
-	public ArrayList<Integer> getMode() {
+	public List<Integer> getMode() {
 		
 		return this.mode;
 	}
@@ -183,7 +179,7 @@ public class CtxAttributeComplexValue implements Serializable{
 	 * @param mode
 	 * 			the mode of the current context attribute value.
 	 */
-	public void setMode(ArrayList<Integer> mode) {
+	public void setMode(List<Integer> mode) {
 		
 		this.mode = mode;
 	}
@@ -193,7 +189,7 @@ public class CtxAttributeComplexValue implements Serializable{
 	 * 
 	 * @return the pair <String, Integer> of the current context attribute value.
 	 */
-	public HashMap<String, Integer> getPairs() {
+	public Map<String, Integer> getPairs() {
 		
 		return this.pairs;
 	}
@@ -204,10 +200,8 @@ public class CtxAttributeComplexValue implements Serializable{
 	 * @param pairs
 	 * 			the pair <String, Integer> of the current context attribute value.
 	 */
-	public void setPairs(HashMap<String, Integer> pairs) {
+	public void setPairs(Map<String, Integer> pairs) {
 		
 		this.pairs = pairs;
 	}
-	
-
 }

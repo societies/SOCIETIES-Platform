@@ -107,6 +107,17 @@ public class TestByTrustor {
 		this.teid2 = new TrustedEntityId(TrustedEntityType.SVC, SERVICE_ID2);
 		LOG.info("*** teid2 = " + this.teid2);
 		
+		// This should establish a DIRECT trust relationship with Service 1
+		this.internalTrustEvidenceCollector.addDirectEvidence(
+				this.myTeid, this.teid1, TrustEvidenceType.USED_SERVICE, 
+				new Date(), null);
+		// This should establish a DIRECT trust relationship with Service 2
+		this.internalTrustEvidenceCollector.addDirectEvidence(
+				this.myTeid, this.teid2, TrustEvidenceType.USED_SERVICE, 
+				new Date(), null);
+
+		Thread.sleep(TestCase1962.getTimeout());
+		
 		this.listener = new MyTrustUpdateEventListener();
 		try {
 			this.internalTrustBroker.registerTrustUpdateListener(
@@ -140,8 +151,6 @@ public class TestByTrustor {
 		
 		LOG.info("*** testTrustUpdateListenerByTrustor adding trust ratings");
 		try {
-			/** Hack to overcome MySQL inability to store millisecond info. */
-			Thread.sleep(TestCase1962.getTimeout());
 			// This should should trigger two TrustUpdateEvents that *must* be caught by the listener
 			this.internalTrustEvidenceCollector.addDirectEvidence(
 					this.myTeid, this.teid2, TrustEvidenceType.RATED, 

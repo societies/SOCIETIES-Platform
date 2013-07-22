@@ -52,6 +52,16 @@ import org.societies.api.context.model.CtxAttributeValueType;
 	@NamedQuery(
 			name = "getCommunityCtxAttributeIdsByType",
 			query = "select attribute.ctxId from CommunityCtxAttributeDAO as attribute where attribute.ctxId.type = :type"
+	),
+	@NamedQuery(
+			name = "getCommunityCtxAttributeIdsByScopeAndType",
+			query = "select attribute.ctxId from CommunityCtxAttributeDAO as attribute where attribute.ctxId.scope = :scope " + 
+					"and attribute.ctxId.type = :type"
+	),
+	@NamedQuery(
+			name = "getCommunityCtxAttributeIdsByOwnerIdAndType",
+			query = "select distinct attribute.ctxId from CommunityCtxAttributeDAO as attribute inner join attribute.entity as entity where entity.ctxId.owner_id = :ownerId " + 
+					"and attribute.ctxId.type = :type"
 	)
 })
 @Entity

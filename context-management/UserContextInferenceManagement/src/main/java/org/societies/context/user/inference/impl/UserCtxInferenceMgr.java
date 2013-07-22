@@ -46,6 +46,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.user.inference.IUserCtxInferenceMgr;
 import org.societies.context.api.user.inference.UserCtxInferenceException;
 import org.societies.context.api.user.refinement.IUserCtxRefiner;
+import org.societies.context.api.user.inheritance.IUserCtxInheritanceMgr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -61,6 +62,9 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 
 	@Autowired(required=false)
 	private IUserCtxRefiner userCtxRefiner;
+	
+	@Autowired(required=false)
+	private IUserCtxInheritanceMgr userCtxInheritance;
 	
 	private ICtxBroker internalCtxBroker;
 	
@@ -272,5 +276,15 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 			LOG.debug("Removing '" + attrType + "' from list of inferrable attributes");
 		if (this.inferrableTypes.contains(attrType))
 			this.inferrableTypes.remove(attrType);
+	}
+
+	@Override
+	public CtxAttribute inheritContext(CtxAttributeIdentifier ctxAttrId) {
+		
+		CtxAttribute attr = null;
+		LOG.debug("inference manager inheritContext called for:" + ctxAttrId);
+		//TODO add more controls
+		attr = this.userCtxInheritance.communityInheritance(ctxAttrId);
+		return attr;
 	}
 }
