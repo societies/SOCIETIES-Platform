@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.Future;
 
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -131,6 +132,13 @@ public interface ICAUIPrediction {
 	public Boolean isUserPredictionEnabled();
 	
 	public Boolean isCommunityPredictionEnabled();
+	
+	/**
+	 * Retrieves a list of CtxEntityIdentifiers of the CISs that are created and hosted by this CSS node 
+	 * 
+	 * @return list of CtxEntityIdentifiers
+	 */
+	public List<CtxEntityIdentifier> retrieveMyCIS();
 	
 	/**
 	 * Retrieves community intent model from the community of the specified Identifier 

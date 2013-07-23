@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -1063,18 +1064,18 @@ public class CAUIPrediction implements ICAUIPrediction{
 	public CtxAttribute retrieveCACIModel(IIdentity cisID) {
 
 		CtxAttribute caciAttr = null;
-		  
+
 		CtxEntityIdentifier entID = null;
 
 		try {
 			//TODO remove this option
 			if( cisID == null ){
-			
+
 				List<CtxEntityIdentifier> commEntIDList = retrieveBelongingCIS();
 				entID = commEntIDList.get(0);
-			
+
 			} else {
-				
+
 				entID = this.ctxBroker.retrieveIndividualEntityId(null, cisID).get();
 			}
 
@@ -1134,8 +1135,12 @@ public class CAUIPrediction implements ICAUIPrediction{
 		List<CtxEntityIdentifier> commEntIDList = new ArrayList<CtxEntityIdentifier>();
 
 		List<CtxIdentifier> listISMemberOf = new ArrayList<CtxIdentifier>();
+
+		final INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
+		final String cssOwnerStr = cssNodeId.getBareJid();
 		try {
-			listISMemberOf = this.ctxBroker.lookup(CtxModelType.ASSOCIATION, CtxAssociationTypes.IS_MEMBER_OF).get();
+			this.cssOwnerId = this.commsMgr.getIdManager().fromJid(cssOwnerStr);
+			listISMemberOf = this.ctxBroker.lookup(this.cssOwnerId, CtxModelType.ASSOCIATION, CtxAssociationTypes.IS_MEMBER_OF).get();
 			LOG.debug(".............listISMemberOf................." +listISMemberOf);
 
 			if(!listISMemberOf.isEmpty() ){
@@ -1158,8 +1163,46 @@ public class CAUIPrediction implements ICAUIPrediction{
 	}
 
 
+	public List<CtxEntityIdentifier> retrieveMyCIS(){
+
+		LOG.debug(".............retrieveMyCIS................." );
+		List<CtxEntityIdentifier> commEntIDList = new ArrayList<CtxEntityIdentifier>();
+		List<CtxEntityIdentifier> result = new ArrayList<CtxEntityIdentifier>();
+
+		final INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
+		final String cssOwnerStr = cssNodeId.getBareJid();
+
+		try {
+			this.cssOwnerId = this.commsMgr.getIdManager().fromJid(cssOwnerStr);
+			commEntIDList = this.retrieveBelongingCIS();
+			//TODO remove this line and add code to check if cis is local
+			result.addAll(commEntIDList);
+			
+			
+			LOG.debug(".............retrieveMyCIS..commEntIDList " +commEntIDList);
+/*
+			if(!commEntIDList.isEmpty() ){
+				for(CtxEntityIdentifier entId :commEntIDList){
+					LOG.debug(".............retrieveMyCIS..entId.getOwnerId().." +entId.getOwnerId());
+					LOG.debug(".............retrieveMyCIS..this.cssOwnerId.toString().." +this.cssOwnerId.toString());
+
+					if(entId.getOwnerId().equals(this.cssOwnerId.toString())){
+						LOG.debug("community entity is local ");
+						result.add(entId);
+					}
+				}
+			}
+*/
+		} catch (Exception e) {
+			LOG.error("Unable to retrieve CISids that css belongs to " +e.getLocalizedMessage());
+		} 
+		LOG.debug(".............retrieveMyCIS..result.." +result);
+		return result;
+	}
+
+	
+	
 
 
-
-
+	
 }
