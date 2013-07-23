@@ -80,8 +80,9 @@ public class TestLocalCommunityContext {
 	private RequestorService requestorService = null;
 	private IIdentity serviceIdentity = null;
 
-	private IIdentity cisIdentity = null;
-
+	private IIdentity cisIdentity1 = null;
+	private IIdentity cisIdentity2 = null;
+	
 	private ServiceResourceIdentifier myServiceID;
 
 	CtxEntityIdentifier cssOwnerEntityId ;
@@ -99,9 +100,14 @@ public class TestLocalCommunityContext {
 	@After
 	public void tearDown() throws Exception {
 
-		if (this.cisIdentity !=null){
-			this.cisManager.deleteCis(this.cisIdentity.getBareJid());
+		
+		if (this.cisIdentity1 !=null){
+			this.cisManager.deleteCis(this.cisIdentity1.getBareJid());
 		}
+		if (this.cisIdentity2 !=null){
+			this.cisManager.deleteCis(this.cisIdentity2.getBareJid());
+		}
+	
 	}
 
 
@@ -141,8 +147,8 @@ public class TestLocalCommunityContext {
 		LOG.info("*** Starting test...");
 		
 		//create a community entity/attributes
-		this.cisIdentity = this.createCIS();
-
+		this.cisIdentity1 = this.createCIS("testCIS1");
+		this.cisIdentity2 = this.createCIS("testCIS2");
 		// lookup/retrieve community entity
 		lookupCommunityCreateHistory();
 
@@ -154,9 +160,10 @@ public class TestLocalCommunityContext {
 	 * and a community attribute that doesn't trigger inference 
 	 */
 	private void retrieveAttributeCommInf(){
-
+		
+		LOG.info("starting test retrieveAttributeCommInf ");
 		try {
-			CtxEntityIdentifier commEntityId = this.externalCtxBroker.retrieveCommunityEntityId(this.requestorService, this.cisIdentity).get();
+			CtxEntityIdentifier commEntityId = this.externalCtxBroker.retrieveCommunityEntityId(this.requestorService, this.cisIdentity1).get();
 
 			CtxAttribute activitiesAttr = this.externalCtxBroker.createAttribute(this.requestorService, commEntityId, CtxAttributeTypes.ACTIVITIES).get();
 			activitiesAttr.setStringValue("activity1,activity2");
@@ -202,46 +209,78 @@ public class TestLocalCommunityContext {
 	}
 
 	private void lookupCommunityCreateHistory(){
-
+		
+		LOG.info("starting test lookupCommunityCreateHistory ");
+		
 		CommunityCtxEntity communityEntity = null;
 		Date startDate = new Date();
 
 		try {
 			Thread.sleep(9000);
-			CtxEntityIdentifier commEntityId = this.externalCtxBroker.retrieveCommunityEntityId(this.requestorService, this.cisIdentity).get();
+			CtxEntityIdentifier commEntityId1 = this.externalCtxBroker.retrieveCommunityEntityId(this.requestorService, this.cisIdentity1).get();
+			CtxEntityIdentifier commEntityId2 = this.externalCtxBroker.retrieveCommunityEntityId(this.requestorService, this.cisIdentity2).get();
 			//CommunityCtxEntity commEntity = (CommunityCtxEntity) this.externalCtxBroker.retrieve(this.requestorService, commEntityId).get();
 			//LOG.info("commEntity : " +commEntity );
-			assertNotNull(commEntityId);
+			assertNotNull(commEntityId1);
+			assertNotNull(commEntityId2);
+			
+			LOG.info("commEntityId 1: " +commEntityId1 );
+			LOG.info("commEntityId 2: " +commEntityId2 );
 
-			LOG.info("commEntityId : " +commEntityId );
-
-			CtxAttribute commAttr =  this.externalCtxBroker.createAttribute(this.requestorService, commEntityId, CtxAttributeTypes.EMAIL).get();
-			commAttr.setStringValue("communityemail");
-			this.externalCtxBroker.update(this.requestorService, commAttr);
+			CtxAttribute commAttr1 =  this.externalCtxBroker.createAttribute(this.requestorService, commEntityId1, CtxAttributeTypes.EMAIL).get();
+			commAttr1.setStringValue("communityemail1");
+			this.externalCtxBroker.update(this.requestorService, commAttr1);
 			Thread.sleep(4000);
 
-			LOG.info("community this.cisIdentity : " +this.cisIdentity );
-			List<CtxIdentifier> resultsEnt = this.externalCtxBroker.lookup(this.requestorService, this.cisIdentity, CtxModelType.ENTITY, CtxEntityTypes.COMMUNITY).get();
-			List<CtxIdentifier> resultsAttr = this.externalCtxBroker.lookup(this.requestorService, this.cisIdentity, CtxModelType.ATTRIBUTE, CtxAttributeTypes.EMAIL).get();
+			CtxAttribute commAttr2 =  this.externalCtxBroker.createAttribute(this.requestorService, commEntityId2, CtxAttributeTypes.EMAIL).get();
+			commAttr2.setStringValue("communityemail2");
+			this.externalCtxBroker.update(this.requestorService, commAttr2);
+			Thread.sleep(4000);
 
-			String value = "";
-			LOG.info("community this.cisIdentity resultsEnt: " +resultsEnt );
-			LOG.info("community this.cisIdentity resultsAttr: " +resultsAttr );
-			if(resultsAttr.size() > 0){
-				CtxAttribute commEmailAttr = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService,resultsAttr.get(0)).get();	
-				value = commEmailAttr.getStringValue();	
-				LOG.info("community this.cisIdentity value: " +value );
+			
+			LOG.info("community this.cisIdentity 1: " +this.cisIdentity1 );
+			List<CtxIdentifier> resultsEnt1 = this.externalCtxBroker.lookup(this.requestorService, this.cisIdentity1, CtxModelType.ENTITY, CtxEntityTypes.COMMUNITY).get();
+			List<CtxIdentifier> resultsAttr1 = this.externalCtxBroker.lookup(this.requestorService, this.cisIdentity1, CtxModelType.ATTRIBUTE, CtxAttributeTypes.EMAIL).get();
+
+			String value1 = "";
+			LOG.info("community this.cisIdentity resultsEnt1 : " +resultsEnt1 );
+			LOG.info("community this.cisIdentity resultsAttr1 : " +resultsAttr1 );
+			if(resultsAttr1.size() > 0){
+				CtxAttribute commEmailAttr1 = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService,resultsAttr1.get(0)).get();	
+				value1 = commEmailAttr1.getStringValue();	
+				LOG.info("community this.cisIdentity value: " +value1 );
 			}
-			assertEquals("communityemail", value);
+			assertEquals("communityemail1", value1);
 
 
+			LOG.info("community this.cisIdentity 2 : " +this.cisIdentity2 );
+			List<CtxIdentifier> resultsEnt2 = this.externalCtxBroker.lookup(this.requestorService, this.cisIdentity2, CtxModelType.ENTITY, CtxEntityTypes.COMMUNITY).get();
+			List<CtxIdentifier> resultsAttr2 = this.externalCtxBroker.lookup(this.requestorService, this.cisIdentity2, CtxModelType.ATTRIBUTE, CtxAttributeTypes.EMAIL).get();
+
+			String value2 = "";
+			LOG.info("community this.cisIdentity resultsEnt: " +resultsEnt2 );
+			LOG.info("community this.cisIdentity resultsAttr: " +resultsAttr2 );
+			if(resultsAttr2.size() > 0){
+				CtxAttribute commEmailAttr2 = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService,resultsAttr2.get(0)).get();	
+				value2 = commEmailAttr2.getStringValue();	
+				LOG.info("community this.cisIdentity value: " +value2 );
+			}
+			assertEquals("communityemail2", value2);
+
+			
+			
+			
+
+			
+			
+			
 			// create community attributes
 			// update community attributes , stored in history
 			// retrieve community attributes
 
-			LOG.info(" interestCommAttr commEntityId : " +commEntityId );
+			LOG.info(" interestCommAttr commEntityId : " +commEntityId1 );
 
-			CtxAttribute interestCommAttr = this.externalCtxBroker.createAttribute(this.requestorService, commEntityId, CtxAttributeTypes.INTERESTS).get();
+			CtxAttribute interestCommAttr = this.externalCtxBroker.createAttribute(this.requestorService, commEntityId1, CtxAttributeTypes.INTERESTS).get();
 			LOG.info(" interestCommAttr interestCommAttr : " +interestCommAttr.getId());
 
 			interestCommAttr.setHistoryRecorded(true);
@@ -279,13 +318,13 @@ public class TestLocalCommunityContext {
 		}
 	}
 
-	protected IIdentity createCIS() {
+	protected IIdentity createCIS(String name) {
 
 		IIdentity cisID = null;
 		try {
 			Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> ();
 			LOG.info("*** trying to create cis:");
-			ICisOwned cisOwned = this.cisManager.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
+			ICisOwned cisOwned = this.cisManager.createCis(name, "cisType", cisCriteria, "nice CIS").get();
 			LOG.info("*** cis created: "+cisOwned.getCisId());
 
 			LOG.info("*** cisOwned " +cisOwned);

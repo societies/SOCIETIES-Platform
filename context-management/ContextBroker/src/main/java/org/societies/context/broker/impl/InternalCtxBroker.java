@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -691,7 +692,12 @@ public class InternalCtxBroker implements ICtxBroker {
 				
 			} else { // C O M M U N I T Y
 				// TODO Add IIdentity JID param to CommunityDBMgr
-				result.addAll(this.communityCtxDBMgr.lookup(modelType, type));
+				Set<String> typeSet = new HashSet<String>();
+				typeSet.add(type);
+				//LOG.debug("inside community lookup: "+ target.getJid() );
+				//LOG.debug("inside community lookup modelType : "+ modelType+" type "+ typeSet );
+				//LOG.debug("results :"+ this.communityCtxDBMgr.lookup(target.getJid(), modelType, typeSet));
+				result.addAll(this.communityCtxDBMgr.lookup(target.getJid(), modelType, typeSet));
 			}
 			
 		} else { // R E M O T E
