@@ -52,32 +52,32 @@
 
 
 				<p:tab title="Community Model">
+					<h:panelGrid raws="5">
+						<p:dataTable id="communityTable" var="CAUIAction"
+							value="#{cauiController.communityActionsList}">
+							<p:column headerText="Source User Action">
+								<h:outputText value="#{CAUIAction.sourceAction}" />
+							</p:column>
+							<p:column
+								headerText="Target User Action : transition probability">
+								<h:outputText value="#{CAUIAction.targetAction}" />
+							</p:column>
+						</p:dataTable>
+						<h:outputText value="Select local CIS id" />
+						<h:selectOneMenu value="#{cauiController.cisId}">
+							<f:selectItems value="#{cauiController.retrieveCisIdList()}" />
+						</h:selectOneMenu>
 
-					<p:dataTable id="communityTable" var="CAUIAction"
-						value="#{cauiController.communityActionsList}">
-						<p:column headerText="Source User Action">
-							<h:outputText value="#{CAUIAction.sourceAction}" />
-						</p:column>
-						<p:column headerText="Target User Action : transition probability">
-							<h:outputText value="#{CAUIAction.targetAction}" />
-						</p:column>
-					</p:dataTable>
-
-					<h:selectOneMenu value="#{cauiController.cisId}"  >
-						<f:selectItem itemLabel="Select local CIS id" itemValue="" />
-						<f:selectItems value="#{cauiController.retrieveCisIdList()}" />
-					</h:selectOneMenu>
-
-					<p:commandButton value="Learn new community model"
-						action="#{cauiController.learnCommunityModel}">
-					</p:commandButton>
+						<p:commandButton value="Learn new community model"
+							action="#{cauiController.learnCommunityModel}">
+						</p:commandButton>
 
 
 
-					<p:commandButton value="Refresh community model"
-						actionListener="#{cauiController.refreshCommunityModels()}"
-						update="communityTable" />
-
+						<p:commandButton value="Refresh community model"
+							actionListener="#{cauiController.refreshCommunityModels()}"
+							update="communityTable" />
+					</h:panelGrid>
 				</p:tab>
 
 

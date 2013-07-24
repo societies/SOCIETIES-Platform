@@ -251,7 +251,7 @@ public class CAUIController extends BasePageController {
 
 
 		model = this.cauiPrediction.getCACIActiveModel();
-		LOG.info("getCAUIActiveModel  : "+ model);
+		LOG.info("getCACIActiveModel  : "+ model);
 		if(!model.isEmpty()){
 			result = convertModel(model);
 
@@ -359,19 +359,18 @@ public class CAUIController extends BasePageController {
 	public void refreshUserModels(){
 
 		this.userActionsList = this.getCAUIActiveModel();
-		//	this.communityActionsList = this.getCACIActiveModel();
+		LOG.debug("this.userActionsList :"+this.userActionsList);
 
-
-		addGlobalMessage("Prediction model and log tables REFRESHED", "Retrieving model from DB", FacesMessage.SEVERITY_INFO);
+		addGlobalMessage("Refreshing user model", "Retrieving model from DB", FacesMessage.SEVERITY_INFO);
 
 	}
 
 	public void refreshCommunityModels(){
 
-		LOG.debug("this.cauiPrediction.retrieveCACIModel(null)");
-		this.userActionsList = this.getCACIActiveModel();
-		//this.cauiPrediction.retrieveCACIModel(null);
-		addGlobalMessage("Retriece community model from remote cis", "Retrieving model from DB", FacesMessage.SEVERITY_INFO);
+		this.communityActionsList = this.getCACIActiveModel();
+		LOG.debug("this.communityActionsList :"+this.communityActionsList);
+
+		addGlobalMessage("Refreshing community model", "Retrieving model from DB", FacesMessage.SEVERITY_INFO);
 
 	}
 
