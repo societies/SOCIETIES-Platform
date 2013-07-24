@@ -528,7 +528,15 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 for(int i=0;i<ciss.length;i++){
 			 assertEquals(cissCheck[i], 1);
 		 }
-	
+		 
+		 // test of getCISByName
+		 ICis retrievedCis =cisManagerUnderTestInterface.getCis(ciss[0].getCisId());
+		 assertEquals(retrievedCis.getName(), TEST_CIS_NAME_1);
+		 assertEquals(retrievedCis.getOwnerId(), CIS_MANAGER_CSS_ID);
+		 // geting a failed CIS
+		 assertNull(cisManagerUnderTestInterface.getCis(CIS_MANAGER_CSS_ID));
+		 
+		 
 		// CLEANING UP
 
 		 for(int i=0;i<ciss.length;i++){
@@ -776,7 +784,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		
 		cisManagerUnderTestInterface = cisManagerUnderTest;
-		ICisOwned Iciss =  (cisManagerUnderTestInterface.createCis(
+		Cis Iciss =  (Cis)(cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_1, TEST_CIS_TYPW ,null,"")).get();
 				
 	
@@ -806,7 +814,13 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 for(int i=0;i<memberCheck.length;i++){
 			 assertEquals(memberCheck[i], 1);
 		 }	
-	
+		 
+		 // check a getMember
+		 ICisParticipant element =  Iciss.getMember(MEMBER_JID_1);
+		 assertEquals(element.getMembersJid(),MEMBER_JID_1);
+		 assertEquals(element.getMembershipType(),MEMBER_ROLE_1);
+		 // check a invalid getMember
+		 assertNull(Iciss.getMember("julio.xmpp"));
 	 
 		// CLEANING UP
 		 cisManagerUnderTestInterface.deleteCis(Iciss.getCisId());
