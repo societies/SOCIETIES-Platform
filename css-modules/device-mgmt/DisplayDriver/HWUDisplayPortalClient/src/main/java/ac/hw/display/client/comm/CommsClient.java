@@ -39,13 +39,13 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.util.SerialisationHelper;
-import org.societies.api.display.schema.displayportalserverbean.DisplayPortalServerBean;
-import org.societies.api.display.schema.displayportalserverbean.DisplayPortalServerIPAddressResultBean;
-import org.societies.api.display.schema.displayportalserverbean.DisplayPortalServerMethodType;
-import org.societies.api.display.schema.displayportalserverbean.DisplayPortalServerScreenLocationResultBean;
-import org.societies.api.display.schema.displayportalserverbean.DisplayPortalServerServiceIDResultBean;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerBean;
+import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerIPAddressResultBean;
+import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerMethodType;
+import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerScreenLocationResultBean;
+import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerServiceIDResultBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 import ac.hw.display.server.api.remote.IDisplayPortalServer;
@@ -60,12 +60,12 @@ public class CommsClient implements IDisplayPortalServer, ICommCallback{
 
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-            Arrays.asList("http://societies.org/api/display/schema/displayportalserverbean",
+            Arrays.asList("http://societies.org/api/schema/css/devicemgmt/display/displayportalserverbean",
                     "http://societies.org/api/schema/servicelifecycle/model"));
 			 // Arrays.asList("http://societies.org/api/ext3p/schema/displayportalserverbean",
 			//		  "http://societies.org/api/schema/servicelifecycle/model"));
 	private static final List<String> PACKAGES = Collections.unmodifiableList(
-		  Arrays.asList("org.societies.api.display.schema.displayportalserverbean",//"org.societies.api.ext3p.schema.displayportalserverbean",
+		  Arrays.asList("org.societies.api.schema.css.devicemgmt.display.displayportalserverbean",//"org.societies.api.ext3p.schema.displayportalserverbean",
 				  "org.societies.api.schema.servicelifecycle.model"));
 				  
 	private ICommManager commManager;
