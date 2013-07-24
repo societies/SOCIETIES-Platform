@@ -40,12 +40,6 @@
             <artifactId>societies-api-internal</artifactId>
             <scope>provided</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.societies.api.display</groupId>
-            <artifactId>societies-api-display</artifactId>
-            <version>${release.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.societies</groupId>
             <artifactId>common-ext-libs</artifactId>
