@@ -72,6 +72,8 @@
 		<module>../../css-modules/device-mgmt/DeviceCommsMgr/</module>
 		<module>../../css-modules/device-mgmt/RFIDDriver/</module>
 		<module>../../css-modules/device-mgmt/RFIDPlugins</module>
+        <module>../../css-modules/device-mgmt/DisplayDriver</module>
+        <module>../../css-modules/device-mgmt/DisplayDriverWebAdmin</module>
 		<!-- SNS: 1 bundle -->
 		<module>../../platform-infrastructure/sns/connectors/GooglePlusConnector</module>
 		<module>../../platform-infrastructure/sns/connectors/FacebookConnector</module>

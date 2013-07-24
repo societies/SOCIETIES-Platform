@@ -26,6 +26,7 @@ package org.societies.api.css.devicemgmt.display;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
+
 /**
  * Describe your class here...
  *
@@ -33,6 +34,8 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  *
  */
 public interface IDisplayPortalServer {
+
+    public void setScreens();
 
 	public String requestAccess(String identity, String location);
 	
@@ -43,7 +46,7 @@ public interface IDisplayPortalServer {
 	public ServiceResourceIdentifier getServerServiceId();
 
 
-    public String requestAccess(IIdentity serverIdentity, String identity, String location);
+/*    public String requestAccess(IIdentity serverIdentity, String identity, String location);
 
     public void releaseResource(IIdentity serverIdentity, String identity, String location);
 
@@ -51,5 +54,5 @@ public interface IDisplayPortalServer {
 
     public ServiceResourceIdentifier getServerServiceId(IIdentity serverIdentity);
 
-
+*/
 }
