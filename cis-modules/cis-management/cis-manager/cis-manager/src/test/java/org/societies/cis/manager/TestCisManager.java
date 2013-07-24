@@ -68,6 +68,9 @@ import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
+import org.societies.api.schema.cis.community.Criteria;
+import org.societies.api.schema.cis.community.GetMembershipCriteriaResponse;
+import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
@@ -461,13 +464,13 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		}
 		
 		Future<ICisOwned> testCIS = cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_1, TEST_CIS_TYPW , cisCriteria,""); //TODO: test criteria and description
+				TEST_CIS_NAME_1, TEST_CIS_TYPW , cisCriteria,"description"); //TODO: test criteria and description
 		try {
 			assertNotNull(testCIS.get());
 			assertNotNull(testCIS.get().getCisId());
 			assertEquals(testCIS.get().getName(), TEST_CIS_NAME_1);
 			assertEquals(testCIS.get().getCisType(), TEST_CIS_TYPW);
-
+			assertEquals(testCIS.get().getDescription(), "description");
 			// CLEANING UP
 			cisManagerUnderTest.deleteCis(testCIS.get().getCisId());
 
@@ -1110,6 +1113,113 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 icssRemote.setInfo(c,new SetInfoCallBack(IcissOwned));
 	
 	}
+	
+	@Test
+	public void criteriaManipulationTest() throws InterruptedException, ExecutionException {
+
+		System.out.println("criteria manipulation test");
+		
+		cisManagerUnderTest = new CisManager();
+		this.setMockingOnCISManager(cisManagerUnderTest);
+		
+		cisManagerUnderTestInterface = cisManagerUnderTest;
+		ICisOwned IcissOwned =  (cisManagerUnderTestInterface.createCis(
+				TEST_CIS_NAME_1, TEST_CIS_TYPW , null,"")).get();
+		
+		// add criteria 1
+		MembershipCriteria m1 = new MembershipCriteria();
+		Rule r = new Rule();
+		r.setOperation("equals");
+		ArrayList<String> a = new ArrayList<String>();
+		a.add("Brazil");
+		r.setValues(a);
+		m1.setRule(r);
+		
+		assertTrue(IcissOwned.addCriteria("location", m1));		
+
+		// add criteria 2
+		MembershipCriteria m2 = new MembershipCriteria();
+		r = new Rule();
+		r.setOperation("differentFrom");
+		a = new ArrayList<String>();
+		a.add("married");
+		r.setValues(a);
+		m2.setRule(r);
+		m2.setRank(1);
+		assertTrue(IcissOwned.addCriteria("status", m2));
+		
+		// add broken criteria
+		MembershipCriteria m3 = new MembershipCriteria();
+		assertFalse(IcissOwned.addCriteria("status", m3));
+		
+		// remove criteria 1
+		assertTrue(IcissOwned.removeCriteria("location", m1));
+		
+		// remove criteria that should have not been added
+		assertFalse(IcissOwned.removeCriteria("status", m3));
+		
+		// remove criteria from non existing context
+		assertFalse(IcissOwned.removeCriteria("test", m3));
+
+		
+		// callback that will do the real test
+
+		 class GetCritCallBack implements ICisManagerCallback{
+			 
+			 ICisOwned IcissOwned;
+				
+			public GetCritCallBack(ICisOwned IcissOwned){
+					this.IcissOwned = IcissOwned;
+			}
+			 
+			public void receiveResult(boolean result){fail("should have received a CommunityMethods obj");}
+			public void receiveResult(int result) {fail("should have received a CommunityMethods obj");}
+			public void receiveResult(String result){fail("should have received a CommunityMethods obj");}
+
+			public void receiveResult(CommunityMethods result) {
+				if(result == null || result.getGetMembershipCriteriaResponse() == null || result.getGetMembershipCriteriaResponse().getMembershipCrit() == null){
+					fail("Communy obj is null");
+					return;
+				}
+				else{
+					
+					GetMembershipCriteriaResponse critRestp = result.getGetMembershipCriteriaResponse();
+
+					// TODO: do the checks
+					MembershipCrit m = critRestp.getMembershipCrit();
+					List<Criteria> l = m.getCriteria();
+					assertEquals(l.size(),1);
+					Criteria a = l.get(0);
+					assertEquals(a.getAttrib(),"status");
+					assertEquals(a.getOperator(),"differentFrom");
+					assertEquals(a.getRank().intValue(),1);
+					assertEquals(a.getValue1(),"married");
+					
+					
+				}
+				
+				
+				
+			}
+		}		
+		// end of callback
+
+
+		//calling the callback
+		IcissOwned.getMembershipCriteria(new GetCritCallBack(IcissOwned));
+
+			
+		
+		
+		// CLEANING UP
+		cisManagerUnderTestInterface.deleteCis(IcissOwned.getCisId());
+	
+		
+		
+		
+		
+	}
+	
 
 	//@Ignore
 	@Test
@@ -1164,6 +1274,9 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		q3.put("hair","blond");
 		q3.put("location","Brazil");		
 		assertTrue(IcissOwned.checkQualification(q3));
+		
+		// CLEANING UP
+		cisManagerUnderTestInterface.deleteCis(IcissOwned.getCisId());
 	
 	}
 	
