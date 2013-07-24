@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyDataManagerRemote;
 import org.societies.integration.test.CapabilityTestCase;
-import org.societies.integration.test.userfeedback.UserFeedbackMocker;
 
 public class TestCase extends CapabilityTestCase {
 	private static Logger LOG = LoggerFactory.getLogger(TestCase.class);

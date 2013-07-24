@@ -19,12 +19,8 @@
  */
 package org.societies.privacytrust.privacyprotection.test.dataobfuscation.obfuscator;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 
 import org.junit.After;
 import org.junit.Before;
@@ -32,12 +28,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.DataWrapperFactory;
-import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.NameUtils;
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
-import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Name;
-import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.NameObfuscator;
 import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.util.RandomBetween;
 
 /**

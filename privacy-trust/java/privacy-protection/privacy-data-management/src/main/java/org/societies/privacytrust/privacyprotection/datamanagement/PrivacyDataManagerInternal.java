@@ -42,7 +42,6 @@ import org.societies.api.identity.util.DataIdentifierUtils;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;

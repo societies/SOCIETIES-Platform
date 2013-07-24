@@ -49,7 +49,6 @@ import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.DataWrapperFactory;
 import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.LocationCoordinatesUtils;
 import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.NameUtils;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.LocationCoordinates;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Name;

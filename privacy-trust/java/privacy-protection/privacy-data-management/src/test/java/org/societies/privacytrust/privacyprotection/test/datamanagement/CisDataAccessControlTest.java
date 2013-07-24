@@ -51,9 +51,6 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.RequestorService;
 import org.societies.api.identity.util.DataIdentifierFactory;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
@@ -61,7 +58,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyM
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ConditionUtils;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestItemUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
@@ -78,7 +74,6 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Conditi
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.services.ServiceUtils;
 import org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager;

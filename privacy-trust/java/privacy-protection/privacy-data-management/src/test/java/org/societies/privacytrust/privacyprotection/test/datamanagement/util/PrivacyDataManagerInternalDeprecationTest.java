@@ -19,7 +19,8 @@
  */
 package org.societies.privacytrust.privacyprotection.test.datamanagement.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -32,13 +33,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IdentityType;
@@ -59,7 +56,6 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.util.commonmock.MockIdentity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.ExpectedException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;

@@ -24,7 +24,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -72,7 +71,6 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.Cond
 import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.services.ServiceUtils;
 import org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager;
 import org.societies.util.commonmock.MockIdentity;

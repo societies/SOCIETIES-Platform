@@ -24,13 +24,9 @@
  */
 package org.societies.api.privacytrust.privacy.util.privacypolicy;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.util.RequestorUtils;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
