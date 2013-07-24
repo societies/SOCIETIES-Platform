@@ -30,7 +30,6 @@ package org.societies.api.cis.management;
  *
  */
 
-import org.societies.api.activity.IActivityFeed;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 

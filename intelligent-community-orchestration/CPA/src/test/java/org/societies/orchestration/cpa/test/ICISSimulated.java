@@ -84,11 +84,7 @@ public class ICISSimulated implements ICisOwned {
     public void getMembershipCriteria(ICisManagerCallback callback) {
     }
 
-    @Override
-	public void getInfo(ICisManagerCallback callback) {
-		// TODO Auto-generated method stub
-
-	}
+  
 
     @Override
     public void getInfo(Requestor req,ICisManagerCallback callback){
@@ -96,11 +92,7 @@ public class ICISSimulated implements ICisOwned {
 
 	}
     
-    @Override
-    public void getListOfMembers(ICisManagerCallback callback) {
-    	// TODO Auto-generated method stub
-    	
-    }
+
 	@Override
 	public void getListOfMembers(Requestor requestor, ICisManagerCallback callback) {
 		// TODO Auto-generated method stub

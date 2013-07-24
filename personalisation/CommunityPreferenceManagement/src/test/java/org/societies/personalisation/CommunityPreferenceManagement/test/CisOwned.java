@@ -66,23 +66,6 @@ public class CisOwned implements ICisOwned {
 		return this.cisID.getBareJid();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.cis.management.ICis#getInfo(org.societies.api.cis.management.ICisManagerCallback)
-	 */
-	@Override
-	public void getInfo(ICisManagerCallback arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.cis.management.ICis#getListOfMembers(org.societies.api.cis.management.ICisManagerCallback)
-	 */
-	@Override
-	public void getListOfMembers(ICisManagerCallback arg0) {
-		// TODO Auto-generated method stub
-
-	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.api.cis.management.ICis#getMembershipCriteria(org.societies.api.cis.management.ICisManagerCallback)
