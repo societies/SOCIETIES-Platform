@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druzbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVACAO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -35,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
@@ -44,11 +43,11 @@ import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.context.api.user.inheritance.ConflictResolutionAlgorithm;
@@ -107,8 +106,6 @@ public class UserContextInheritanceMgr implements IUserCtxInheritanceMgr {
 		
 		return inferrableTypes;
 	}
-
-
 
 	/**
 	 *
@@ -176,14 +173,16 @@ public class UserContextInheritanceMgr implements IUserCtxInheritanceMgr {
 
 	@Override
 	public CtxAttribute communityInheritance(CtxAttributeIdentifier ctxAttrId) {
+		LOG.info("in the main method");
 		CtxAttribute retAttribute = null;
 		List<CtxIdentifier> cisCtxAttributeIdList = new ArrayList<CtxIdentifier>();
+		List<CtxIdentifier> totalListOfCisCtxAttributeId = new ArrayList<CtxIdentifier>();
 		ArrayList<CtxAttribute> listWithCtxAttributeObjs = new ArrayList<CtxAttribute>();
-		ArrayList<CommunityCtxEntity> setOfParentCISsEntities = new ArrayList<CommunityCtxEntity>();
-		ArrayList<CtxEntityIdentifier> setOfCISsIds = new ArrayList<CtxEntityIdentifier>();
 		ArrayList<CtxAssociation> setOfCtxAssociationsObj = new ArrayList<CtxAssociation>();	
 		Set<CtxAssociationIdentifier> setOfCSSAssocIds = new HashSet<CtxAssociationIdentifier>();
+		Set<CtxEntityIdentifier> assocChildId = new HashSet<CtxEntityIdentifier>();
 
+		 
 		
 		//Given the css entity, fetch a set of association ids, type "isMemberOf"
 		String cssIdString = commMngr.getIdManager().getThisNetworkNode().getBareJid();
@@ -191,29 +190,31 @@ public class UserContextInheritanceMgr implements IUserCtxInheritanceMgr {
 		try {
 			ownerId = commMngr.getIdManager().fromJid(cssIdString);
 			IndividualCtxEntity cssEntity = this.ctxBroker.retrieveIndividualEntity(ownerId).get();
-			//Use the broker to get the association ids of type is_Member_Of and then the objects
 			setOfCSSAssocIds = cssEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF);
-			
+			CtxAttribute a = this.ctxBroker.retrieveAttribute(ctxAttrId, false).get();
+			String attributeType = a.getType();
 			for (CtxAssociationIdentifier cssAssocId:setOfCSSAssocIds){			
 				CtxAssociation assocObj = (CtxAssociation) ctxBroker.retrieve(cssAssocId).get();
 				setOfCtxAssociationsObj.add(assocObj);
 			}
 			//from the association objects, get the CIS ids (getParent method) (for each .getChildEntities get the entities where the getOwnerId = jid of the CIS (by using the comm manager))
 
-			for (CtxAssociation assocObj:setOfCtxAssociationsObj){
-				CtxIdentifier assocParentId = assocObj.getParentEntity();
-				setOfCISsIds.add((CtxEntityIdentifier) assocParentId);
-				CtxModelObject cisObj = ctxBroker.retrieve(assocParentId).get();
-				setOfParentCISsEntities.add((CommunityCtxEntity) cisObj);	
+			for (CtxAssociation assocObj:setOfCtxAssociationsObj){		
+				 assocChildId = assocObj.getChildEntities();
+				LOG.info("The assocParentId is :"+assocChildId); //Ta 10 CIS, p.x. context://cis-84e13f1b-6e7a-4e3b-b184-22c19f2372f6.ict-societies.eu/ENTITY/community/32774
 			}
 			
 			//use the  lookup (requestor, targerid, attribute, attId.getType()) to retrieve a set of att ids
-			for (CtxEntityIdentifier cisIdentifier:setOfCISsIds){
-				cisCtxAttributeIdList = ctxBroker.lookup(cisIdentifier, CtxModelType.ATTRIBUTE, ctxAttrId.getType()).get();
-			}
+			
+			for (CtxEntityIdentifier cisIdentifier:assocChildId){
+				cisCtxAttributeIdList = this.ctxBroker.lookup(new Requestor(ownerId), cisIdentifier, CtxModelType.ATTRIBUTE, attributeType).get();
+				totalListOfCisCtxAttributeId.addAll(cisCtxAttributeIdList);
+				}
+			LOG.info("the total list of CIS Attributes is "+totalListOfCisCtxAttributeId.size());
 			
 			// through the broker, retrieve the attribute objects
-			for (CtxIdentifier attId:cisCtxAttributeIdList){
+			//for (CtxIdentifier attId:cisCtxAttributeIdList){
+			for (CtxIdentifier attId:totalListOfCisCtxAttributeId){
 				CtxAttribute attrEntity = (CtxAttribute) ctxBroker.retrieve(attId).get();
 				listWithCtxAttributeObjs.add(attrEntity);	
 			}
@@ -225,6 +226,10 @@ public class UserContextInheritanceMgr implements IUserCtxInheritanceMgr {
 					retAttribute = (CtxAttribute)compareQoC(currAtt, listWithCtxAttributeObjs.get(i));
 					currAtt=retAttribute;
 				}
+
+			}else{
+				retAttribute =listWithCtxAttributeObjs.get(0);
+				
 			}
 
 		} catch (InvalidFormatException e) {
