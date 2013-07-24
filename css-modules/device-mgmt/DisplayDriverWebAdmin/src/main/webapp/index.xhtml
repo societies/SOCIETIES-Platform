@@ -1,0 +1,97 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+<title>Display Driver Screen Configuration</title>
+</h:head>
+<f:view contentType="text/html">
+<h:body>
+
+
+    <!-- FORM TO DISPLAY AND DELETE SCREENS -->
+    <h:form id="displayDeleteForm">
+        <p:growl id="growl" showDetail="true" life="3000" />
+
+        <p:dataTable var="screen" id="screenTable" value="#{screenData.screenDataModel}" selection="#{screenData.selectedScreens}">
+
+             <p:column headerText="Screen ID">
+                 <h:outputText value="#{screen.screenID}" />
+            </p:column>
+
+             <p:column headerText="Location ID">
+                 <h:outputText value="#{screen.locationID}" />
+             </p:column>
+
+            <p:column headerText="IP Address">
+                 <h:outputText value="#{screen.ipAddress}" />
+            </p:column>
+
+            <p:column selectionMode="multiple"  style="width:4%"/>
+
+
+        </p:dataTable>
+
+        <p:commandButton value="Add screen" onclick="asDialogue.show()"/>
+        <p:commandButton id="deleteBtn" value="Delete screen(s)" update=":displayDeleteForm:deleteConfirmDialog" oncomplete="deleteConfirm.show()"/>
+
+        <!-- DIALOGUE TO DELETE SCREENS -->
+        <p:confirmDialog id="deleteConfirmDialog" global="true" showEffect="fade" hideEffect="explode" widgetVar="deleteConfirm"
+                 header="Delete screen(s)?" message="Are you sure you want to delete the following screen(s)?">
+            <p:dataTable id="displayMulti" value="#{screenData.selectedScreens}" var="selectedScreen">
+                <p:column headerText="Screen ID">
+                    <h:outputText value="#{selectedScreen.screenID}" />
+                </p:column>
+
+                <p:column headerText="Location ID">
+                    <h:outputText value="#{selectedScreen.locationID}" />
+                </p:column>
+
+                <p:column headerText="IP Address">
+                    <h:outputText value="#{selectedScreen.ipAddress}" />
+                </p:column>
+            </p:dataTable>
+
+            <p:commandButton value="Delete" actionListener="#{screenData.delete()}" update=":displayDeleteForm:screenTable, :displayDeleteForm:growl" oncomplete="deleteConfirm.hide()"/>
+            <p:commandButton value="Cancel" onclick="deleteConfirm.hide()"/>
+
+        </p:confirmDialog>
+    </h:form>
+
+    <!--FORM TO ADD A SCREEN -->
+    <h:form id="addScreenForm">
+        <p:dialog id="addScreenDialog" header="Add Screen" widgetVar="asDialogue" modal="true" height="200">
+            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+
+                <h:outputText value="Screen ID: " />
+                <p:inputText id="screen-id" value="#{screenBean.screenID}" />
+
+                <h:outputText value="Location ID: " />
+                <p:inputText id="location-id" value="#{screenBean.locationID}" />
+
+                <h:outputText value="IP Address: " />
+                <p:inputText id="ip-address" value="#{screenBean.ipAddress}" />
+
+            </h:panelGrid>
+            <p:commandButton value="Add" update=":displayDeleteForm:growl,:displayDeleteForm:screenTable" actionListener="#{screenData.addScreen(screenBean)}" oncomplete="handleLoginRequest(xhr, status, args)" />
+        </p:dialog>
+    </h:form>
+
+    <!--JAVA SCRIPT TO ALERT USER OF INVALID INPUT -->
+    <script type="text/javascript">
+        function handleLoginRequest(xhr, status, args) {
+        if(!args.screenAdded) {
+        asDialogue.jq.effect("shake", { times:5 }, 100);
+        }
+        else {
+        asDialogue.hide();
+        }
+        }
+    </script>
+
+</h:body>
+</f:view>
+
+</html>
