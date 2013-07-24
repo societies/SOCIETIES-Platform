@@ -125,13 +125,16 @@ public class ScreenData implements Serializable {
 
     //DELETES USER SELECTED SCREENS FROM DB
     public void delete() {
+        int count = 0;
+        FacesMessage msg = null;
         for(Screens screens : selectedScreens)
         {
             log.debug("Deleting screen with ID: " + screens.getScreenID());
             screenDAO.deleteScreens(screens);
-
+            count++;
         }
-        this.displayPortalServer.setScreens();
+        msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Delete Screens", String.valueOf(count) + " screens have been deleted!");
+        FacesContext.getCurrentInstance().addMessage(null, msg);
         refreshScreens();
         selectedScreens = null;
     }
