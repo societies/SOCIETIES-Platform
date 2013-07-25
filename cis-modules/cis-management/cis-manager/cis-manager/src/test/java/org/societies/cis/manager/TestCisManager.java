@@ -515,7 +515,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		ciss[1] = (cisManagerUnderTestInterface.createCis(
 				TEST_CIS_NAME_2, TEST_CIS_TYPW ,null,"")).get();
 		ciss[2] = (cisManagerUnderTestInterface.createCis(
-				TEST_CIS_NAME_3, TEST_CIS_TYPW ,null,"")).get();
+				TEST_CIS_NAME_3, TEST_CIS_TYPW ,null,"","<RequestPolicy></RequestPolicy>")).get();
 
 		List<ICisOwned> l = cisManagerUnderTestInterface.getListOfOwnedCis();
 		Iterator<ICisOwned> it = l.iterator();
@@ -586,6 +586,11 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		ICis element = it.next(); 
 		jidTobeDeleted = element.getCisId();
 		
+		
+		//TEST DELETE NON EXISTING CIS
+		assertFalse(cisManagerUnderTestInterface.deleteCis("nonexistingjid.xmpp"));
+		
+		// TEST DELETE EXISTING CIS
 		boolean presence = false;
 		
 		presence = cisManagerUnderTestInterface.deleteCis(jidTobeDeleted);
@@ -671,6 +676,9 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			
 			Iciss.removeMemberFromCIS(MEMBER_JID_1);
 			
+			// test removing non existing member
+			assertFalse(Iciss.removeMemberFromCIS("non.existing.user"));
+			
 			int memberCheck = 0;
 			
 			Set<ICisParticipant> l = Iciss.getMemberList();
@@ -718,6 +726,12 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			assertEquals(ciss[1],cisManagerUnderTest.searchCisByName("alfaromeo").get(0));
 			assertEquals(2,cisManagerUnderTest.searchCisByName("alfa").size());
 			assertEquals(0,cisManagerUnderTest.searchCisByName("gama").size());
+			
+			// test a getOwnedCis FAIL
+			assertNull(cisManagerUnderTest.getOwnedCis("invalidJid.xmpp"));
+			// test a getOwnedCis SUCCESS
+			ICisOwned test0 = cisManagerUnderTest.getOwnedCis(ciss[0].getCisId());
+			assertEquals(ciss[0],test0);
 			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -1091,9 +1105,11 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 class SetInfoCallBack implements ICisManagerCallback{
 			 
 			 ICisOwned IcissOwned;
+			 Community inputCommunity;
 				
-			public SetInfoCallBack(ICisOwned IcissOwned){
+			public SetInfoCallBack(ICisOwned IcissOwned,Community inputCommunity){
 					this.IcissOwned = IcissOwned;
+					this.inputCommunity = inputCommunity;
 			}
 			 
 			public void receiveResult(boolean result){fail("should have received a Communy obj");}
@@ -1108,34 +1124,57 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 				else{
 					
 					Community communityResultObject = result.getSetInfoResponse().getCommunity();
+					
+					// case when I  try to set the jid or the name
+					if((null != inputCommunity.getCommunityJid() && inputCommunity.getCommunityJid().equals("invalidJid")) ||
+							(null != inputCommunity.getCommunityName() &&	inputCommunity.getCommunityName().equals("invalidName"))
+							){
+						assertFalse(result.getSetInfoResponse().isResult().booleanValue());
+					}
+					else{ // setting a valid field
+						assertTrue(result.getSetInfoResponse().isResult().booleanValue());
+						
+						// check vs input on create
+						assertEquals(communityResultObject.getCommunityName(), TEST_CIS_NAME_1);
+						assertEquals(communityResultObject.getCommunityType(), TEST_CIS_TYPE2);
+						//assertEquals(communityResultObject.getMembershipMode().intValue(), TEST_CIS_MODE); TODO: add criteria test
+						assertEquals(communityResultObject.getDescription(), TEST_CIS_DESC);
+						// check between non-callback interface
+						assertEquals(communityResultObject.getCommunityName(), IcissOwned.getName());
+						assertEquals(communityResultObject.getCommunityJid(), IcissOwned.getCisId());
+						assertEquals(communityResultObject.getDescription(), IcissOwned.getDescription());
+						
+						// CLEANING UP
+						cisManagerUnderTestInterface.deleteCis(IcissOwned.getCisId());
 
-					assertTrue(result.getSetInfoResponse().isResult().booleanValue());
-				
-					// check vs input on create
-					assertEquals(communityResultObject.getCommunityName(), TEST_CIS_NAME_1);
-					assertEquals(communityResultObject.getCommunityType(), TEST_CIS_TYPE2);
-					//assertEquals(communityResultObject.getMembershipMode().intValue(), TEST_CIS_MODE); TODO: add criteria test
-					assertEquals(communityResultObject.getDescription(), TEST_CIS_DESC);
-					// check between non-callback interface
-					assertEquals(communityResultObject.getCommunityName(), IcissOwned.getName());
-					assertEquals(communityResultObject.getCommunityJid(), IcissOwned.getCisId());
-					assertEquals(communityResultObject.getDescription(), IcissOwned.getDescription());
+					
+					
+					}
 				}
 				
 				
-				// CLEANING UP
-				cisManagerUnderTestInterface.deleteCis(IcissOwned.getCisId());
+
 				
 			}
 		}		
 		// end of callback
-		// call and wait for callback
+
+		 // FAIL CASE 1 
 		 Community c = new Community();
+		 c.setCommunityName("invalidName");
+		 icssRemote.setInfo(c,new SetInfoCallBack(IcissOwned,c));
+
+		 // FAIL CASE 2 
+		 c = new Community();
+		 c.setCommunityJid("invalidJid");
+		 icssRemote.setInfo(c,new SetInfoCallBack(IcissOwned,c));
+		 
+		 
+		 // SUCCESS CASE, MUST BE CALLED AFTER THE FAILED ONES AS IT TRIGGERS THE REMOVAL OF THE CIS
+		 c = new Community();
 		 c.setCommunityType(TEST_CIS_TYPE2);
 		 c.setDescription(TEST_CIS_DESC);
-		 
-		 
-		 icssRemote.setInfo(c,new SetInfoCallBack(IcissOwned));
+		 icssRemote.setInfo(c,new SetInfoCallBack(IcissOwned,c));
 	
 	}
 	
