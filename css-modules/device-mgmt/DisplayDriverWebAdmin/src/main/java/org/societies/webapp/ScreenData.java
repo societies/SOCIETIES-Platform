@@ -81,7 +81,6 @@ public class ScreenData implements Serializable {
                 screenAdded = true;
                 screenDAO.save(screen);
                 refreshScreens();
-                this.displayPortalServer.setScreens();
                 log.debug("Screen: " + screenID + " added to DB.");
                 msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Screen successfully added", "Screen: " + screenID + " has successfully been " +
                         "added to the database.");
@@ -107,6 +106,7 @@ public class ScreenData implements Serializable {
     {
         screenList = (List<Screens>) screenDAO.getAllScreens();
         this.screenDataModel = new ScreenDataModel(screenList);
+        this.displayPortalServer.setScreens();
         log.debug("Current Screen List: " + screenList.toString());
     }
 
