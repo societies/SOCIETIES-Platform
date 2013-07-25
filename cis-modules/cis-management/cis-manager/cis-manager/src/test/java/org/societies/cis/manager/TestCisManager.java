@@ -32,6 +32,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -300,7 +302,16 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		doNothing().when(mockICisDirRemote1).deleteCisAdvertisementRecord(any(org.societies.api.schema.cis.directory.CisAdvertisementRecord.class));
 		
 		mockCssDirectoryRemote = mock (ICssDirectoryRemote.class);
-		doNothing().when(mockCssDirectoryRemote).searchByID(any(List.class), any(ICssDirectoryCallback.class));
+		doAnswer(new Answer() {
+				     public Object answer(InvocationOnMock invocation) {
+				         Object[] args = invocation.getArguments();
+				         ICssDirectoryCallback mock = (ICssDirectoryCallback)args[1];
+				         mock.getResult(cssDirectoryResults);
+				         return null;
+				     }
+				 }).when(mockCssDirectoryRemote).searchByID(any(List.class), any(ICssDirectoryCallback.class));
+		 
+		
 		
 		when(mockPrivacyPolicyManager.deletePrivacyPolicy(any(org.societies.api.identity.RequestorCis.class))).thenReturn(true);
 		when(mockPrivacyPolicyManager.updatePrivacyPolicy(anyString(),any(org.societies.api.identity.RequestorCis.class))).thenReturn(null);
@@ -995,7 +1006,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	}
 	
-	@Ignore
+	//@Ignore
 	@Test
 	public void getInfoWithCallback() throws InterruptedException, ExecutionException {
 
@@ -1060,7 +1071,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	
 	}
 	
-	//@Ignore
+	
 	@Test
 	public void setInfoWithCallback() throws InterruptedException, ExecutionException {
 
@@ -1212,6 +1223,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 					
 				}
 				
+				// CLEANING UP
+				cisManagerUnderTestInterface.deleteCis(IcissOwned.getCisId());
 				
 				
 			}
@@ -1225,8 +1238,6 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 			
 		
 		
-		// CLEANING UP
-		cisManagerUnderTestInterface.deleteCis(IcissOwned.getCisId());
 	
 		
 		
