@@ -566,7 +566,7 @@ public class CtxModelBeanTranslatorTest {
 		assertEquals(userLocationCoordsAttr.getSourceId(), userLocationCoordsAttrBean.getSourceId());
 		// quality
 		assertEquals(userLocationCoordsAttr.getQuality().getLastUpdated(), userLocationCoordsAttrBean.getQuality().getLastUpdated());
-		// TODO fix error below "expected:<MANUALLY_SET> but was:<manuallySet>"
+		assertNotNull(userLocationCoordsAttrBean.getQuality().getOriginType());
 		assertEquals(userLocationCoordsAttr.getQuality().getOriginType().name(), userLocationCoordsAttrBean.getQuality().getOriginType().name());
 		assertEquals(CtxModelBeanTranslator.NaD, userLocationCoordsAttrBean.getQuality().getPrecision());
 		assertEquals(CtxModelBeanTranslator.NaD, userLocationCoordsAttrBean.getQuality().getUpdateFrequency());
@@ -599,7 +599,7 @@ public class CtxModelBeanTranslatorTest {
 		assertEquals(communityNameAttr.getSourceId(), communityNameAttrBean.getSourceId());
 		// quality
 		assertEquals(communityNameAttr.getQuality().getLastUpdated(), communityNameAttrBean.getQuality().getLastUpdated());
-		// TODO fix error below "expected:<MANUALLY_SET> but was:<manuallySet>"
+		assertNotNull(communityNameAttrBean.getQuality().getOriginType());
 		assertEquals(communityNameAttr.getQuality().getOriginType().name(), communityNameAttrBean.getQuality().getOriginType().name());
 		assertEquals(CtxModelBeanTranslator.NaD, communityNameAttrBean.getQuality().getPrecision());
 		assertEquals(CtxModelBeanTranslator.NaD, communityNameAttrBean.getQuality().getUpdateFrequency());
@@ -629,7 +629,7 @@ public class CtxModelBeanTranslatorTest {
 		assertEquals(communityNameAttr.getSourceId(), communityNameAttrBean.getSourceId());
 		// quality
 		assertEquals(communityNameAttr.getQuality().getLastUpdated(), communityNameAttrBean.getQuality().getLastUpdated());
-		// TODO fix error below "expected:<MANUALLY_SET> but was:<manuallySet>"
+		assertNotNull(communityNameAttrBean.getQuality().getOriginType());
 		assertEquals(communityNameAttr.getQuality().getOriginType().name(), communityNameAttrBean.getQuality().getOriginType().name());
 		assertEquals(CtxModelBeanTranslator.NaD, communityNameAttrBean.getQuality().getPrecision());
 		assertEquals(CtxModelBeanTranslator.NaD, communityNameAttrBean.getQuality().getUpdateFrequency());
@@ -663,7 +663,7 @@ public class CtxModelBeanTranslatorTest {
 		assertEquals(communityNameAttr.getSourceId(), communityNameAttrBean.getSourceId());
 		// quality
 		assertEquals(communityNameAttr.getQuality().getLastUpdated(), communityNameAttrBean.getQuality().getLastUpdated());
-		// TODO fix error below "expected:<MANUALLY_SET> but was:<manuallySet>"
+		assertNotNull(communityNameAttrBean.getQuality().getOriginType());
 		assertEquals(communityNameAttr.getQuality().getOriginType().name(), communityNameAttrBean.getQuality().getOriginType().name());
 		assertEquals(CtxModelBeanTranslator.NaD, communityNameAttrBean.getQuality().getPrecision());
 		assertEquals(CtxModelBeanTranslator.NaD, communityNameAttrBean.getQuality().getUpdateFrequency());
@@ -696,7 +696,7 @@ public class CtxModelBeanTranslatorTest {
 		assertEquals(communityNameAttr.getSourceId(), communityNameAttrBean.getSourceId());
 		// quality
 		assertEquals(communityNameAttr.getQuality().getLastUpdated(), communityNameAttrBean.getQuality().getLastUpdated());
-		// TODO fix error below "expected:<MANUALLY_SET> but was:<manuallySet>"
+		assertNotNull(communityNameAttrBean.getQuality().getOriginType());
 		assertEquals(communityNameAttr.getQuality().getOriginType().name(), communityNameAttrBean.getQuality().getOriginType().name());
 		assertEquals(CtxModelBeanTranslator.NaD, communityNameAttrBean.getQuality().getPrecision());
 		assertEquals(CtxModelBeanTranslator.NaD, communityNameAttrBean.getQuality().getUpdateFrequency());
