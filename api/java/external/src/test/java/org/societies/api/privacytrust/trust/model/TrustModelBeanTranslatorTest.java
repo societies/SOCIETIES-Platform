@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.privacytrust.trust.test;
+package org.societies.api.privacytrust.trust.model;
 
 import static org.junit.Assert.*;
 
@@ -281,8 +281,14 @@ public class TrustModelBeanTranslatorTest {
 	@Test
 	public void testFromTrustEvidenceType() throws Exception {
 		
-		assertEquals(TrustEvidenceTypeBean.USED_SERVICE, 
-				TrustModelBeanTranslator.getInstance().fromTrustEvidenceType(TrustEvidenceType.USED_SERVICE));
+		assertEquals(TrustEvidenceTypeBean.SHARED_CONTEXT, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceType(TrustEvidenceType.SHARED_CONTEXT));
+		assertEquals(TrustEvidenceTypeBean.WITHHELD_CONTEXT, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceType(TrustEvidenceType.WITHHELD_CONTEXT));
+		assertEquals(TrustEvidenceTypeBean.DIRECTLY_TRUSTED, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceType(TrustEvidenceType.DIRECTLY_TRUSTED));
+		assertEquals(TrustEvidenceTypeBean.RATED, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceType(TrustEvidenceType.RATED));
 		assertEquals(TrustEvidenceTypeBean.FRIENDED_USER, 
 				TrustModelBeanTranslator.getInstance().fromTrustEvidenceType(TrustEvidenceType.FRIENDED_USER));
 		assertEquals(TrustEvidenceTypeBean.UNFRIENDED_USER, 
@@ -291,8 +297,8 @@ public class TrustModelBeanTranslatorTest {
 				TrustModelBeanTranslator.getInstance().fromTrustEvidenceType(TrustEvidenceType.JOINED_COMMUNITY));
 		assertEquals(TrustEvidenceTypeBean.LEFT_COMMUNITY, 
 				TrustModelBeanTranslator.getInstance().fromTrustEvidenceType(TrustEvidenceType.LEFT_COMMUNITY));
-		assertEquals(TrustEvidenceTypeBean.RATED, 
-				TrustModelBeanTranslator.getInstance().fromTrustEvidenceType(TrustEvidenceType.RATED));
+		assertEquals(TrustEvidenceTypeBean.USED_SERVICE, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceType(TrustEvidenceType.USED_SERVICE));
 	}
 	
 	/**
@@ -302,8 +308,14 @@ public class TrustModelBeanTranslatorTest {
 	@Test
 	public void testFromTrustEvidenceTypeBean() throws Exception {
 		
-		assertEquals(TrustEvidenceType.USED_SERVICE, 
-				TrustModelBeanTranslator.getInstance().fromTrustEvidenceTypeBean(TrustEvidenceTypeBean.USED_SERVICE));
+		assertEquals(TrustEvidenceType.SHARED_CONTEXT, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceTypeBean(TrustEvidenceTypeBean.SHARED_CONTEXT));
+		assertEquals(TrustEvidenceType.WITHHELD_CONTEXT, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceTypeBean(TrustEvidenceTypeBean.WITHHELD_CONTEXT));
+		assertEquals(TrustEvidenceType.DIRECTLY_TRUSTED, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceTypeBean(TrustEvidenceTypeBean.DIRECTLY_TRUSTED));
+		assertEquals(TrustEvidenceType.RATED, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceTypeBean(TrustEvidenceTypeBean.RATED));
 		assertEquals(TrustEvidenceType.FRIENDED_USER, 
 				TrustModelBeanTranslator.getInstance().fromTrustEvidenceTypeBean(TrustEvidenceTypeBean.FRIENDED_USER));
 		assertEquals(TrustEvidenceType.UNFRIENDED_USER, 
@@ -312,7 +324,7 @@ public class TrustModelBeanTranslatorTest {
 				TrustModelBeanTranslator.getInstance().fromTrustEvidenceTypeBean(TrustEvidenceTypeBean.JOINED_COMMUNITY));
 		assertEquals(TrustEvidenceType.LEFT_COMMUNITY, 
 				TrustModelBeanTranslator.getInstance().fromTrustEvidenceTypeBean(TrustEvidenceTypeBean.LEFT_COMMUNITY));
-		assertEquals(TrustEvidenceType.RATED, 
-				TrustModelBeanTranslator.getInstance().fromTrustEvidenceTypeBean(TrustEvidenceTypeBean.RATED));
+		assertEquals(TrustEvidenceType.USED_SERVICE, 
+				TrustModelBeanTranslator.getInstance().fromTrustEvidenceTypeBean(TrustEvidenceTypeBean.USED_SERVICE));
 	}
 }
