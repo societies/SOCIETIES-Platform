@@ -320,53 +320,27 @@ public class CAUITaskManager implements ICAUITaskManager{
 
 	@Override
 	public void updateModel(UserIntentModelData model) {
-		activeUserIntentModel = model;
+		this.activeUserIntentModel = new UserIntentModelData(); 
+		this.activeUserIntentModel = model;
+		if(model!=null){
+			LOG.info("updating active model : "+model.getActionModel() );	
+		}
+		
 	}
 
 	@Override
 	public UserIntentModelData createModel() {
-		activeUserIntentModel =  new UserIntentModelData();
-		return activeUserIntentModel;
+		this.activeUserIntentModel =  new UserIntentModelData();
+		return this.activeUserIntentModel;
 	}
 
+	@Override
+	public HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> getCAUIActiveModel(){
 
-	//*********************************************
-	// visualisation classes
-	//*********************************************
-
-	public void displayTask (IUserIntentTask task) {
-		/*
-		Double [][] matrix = task.getMatrix();
-		List<IUserIntentAction> actionList = task.getActions();
-		System.out.print(actionList+"\n");
-		for (int i = 0; i < matrix.length; i++)
-		{
-			for (int j = 0; j < matrix[i].length; j++)
-			{
-				System.out.print(" "+matrix[i][j]+"                 ");
-			}
-			System.out.println();
+		if ( this.activeUserIntentModel != null){
+			return this.activeUserIntentModel.getActionModel();
 		}
-		 */
-	}
-
-
-	public void displayModel (UserIntentModelData model) {
-
-		/*
-		Double [][] matrix = model.getMatrix();
-		List<IUserIntentTask> taskList = model.getTaskList();
-		System.out.print(taskList+"\n");
-		//	System.out.print(matrix+"\n");
-		for (int i = 0; i < matrix.length; i++)
-		{
-			for (int j = 0; j < matrix[i].length; j++)
-			{
-				System.out.print(" "+matrix[i][j]+"                 ");
-			}
-			System.out.println();
-		}
-		 */
+		return null;
 	}
 
 	@Override

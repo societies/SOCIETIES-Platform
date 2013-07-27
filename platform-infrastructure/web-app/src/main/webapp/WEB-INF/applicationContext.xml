@@ -44,4 +44,7 @@
 
 	<osgi:reference id="cssLocalManager" interface="org.societies.api.internal.css.ICSSInternalManager"/>
 
+	<osgi:reference id="cauiPrediction" interface="org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction">
+	</osgi:reference>
+
 </beans>

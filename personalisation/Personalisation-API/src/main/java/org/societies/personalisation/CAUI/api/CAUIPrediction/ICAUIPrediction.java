@@ -25,10 +25,13 @@
 package org.societies.personalisation.CAUI.api.CAUIPrediction;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.Future;
 
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -43,12 +46,19 @@ import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 public interface ICAUIPrediction {
 
 	/**
-	 * This method allows the system to provide predictions 
+	 * This method allows the system to provide predictions based on user model
 	 * 
 	 * @param bool
 	 */
-	public void enablePrediction(Boolean bool);
+	public void enableUserPrediction(Boolean bool);
 
+	/**
+	 * This method allows the system to provide predictions based on community model 
+	 * 
+	 * @param bool
+	 */
+	public void enableCommPrediction(Boolean bool);
+	
 	/**
 	 * Allows any service to request a context-based user intent prediction.
 	 *  
@@ -85,4 +95,59 @@ public interface ICAUIPrediction {
 	 */
 	public void receivePredictionFeedback(IAction action);
 	
+	/**
+	 * This method return a map describing the transitions among performed user actions and possible future actions
+	 * based on a learned user model.
+	 * 
+	 * @return user model
+	 */
+	public HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> getCAUIActiveModel();
+	
+	/**
+	 * This method return a map describing the transitions among performed user actions and possible future actions 
+	 * based on a learned community model 
+	 * 
+	 * @return community model
+	 */
+	 
+	public HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> getCACIActiveModel();
+
+	/**
+	 * This method initiates the generation of a new user model.
+	 */
+	public void generateNewUserModel();
+	
+	/**
+	 * This methods initiates the generation of a new Context Aware Community Intent model
+	 */
+	public void generateNewCommunityModel(IIdentity cisId);
+	
+	/**
+	 * Returns a list of the last 100 string representations of performed action/predicted action pairs 
+	 * @return
+	 */	
+	public List<Entry<String, String>> getPredictionPairLog();
+	
+	
+	public Boolean isUserPredictionEnabled();
+	
+	public Boolean isCommunityPredictionEnabled();
+	
+	/**
+	 * Retrieves a list of CtxEntityIdentifiers of the CISs that are created and hosted by this CSS node 
+	 * 
+	 * @return list of CtxEntityIdentifiers
+	 */
+	public List<CtxEntityIdentifier> retrieveMyCIS();
+	
+	/**
+	 * Retrieves community intent model from the community of the specified Identifier 
+	 * 
+	 * @param cisID
+	 * 
+	 * @return community model stored in CtxAttribute
+	 */
+	public CtxAttribute retrieveCACIModel(IIdentity cisID);
+	
+		
 }

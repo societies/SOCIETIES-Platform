@@ -165,7 +165,7 @@ public class Tester {
 		}
 	}
 
-	
+	@Ignore
 	@Test
 	public void createCACIModel(){
 
