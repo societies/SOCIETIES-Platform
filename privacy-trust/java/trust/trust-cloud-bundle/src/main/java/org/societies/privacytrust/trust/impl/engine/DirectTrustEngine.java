@@ -75,6 +75,8 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 	static {
 		
         final Map<TrustEvidenceType, Double> aMap = new HashMap<TrustEvidenceType, Double>();
+        aMap.put(TrustEvidenceType.SHARED_CONTEXT, +1.0d);
+        aMap.put(TrustEvidenceType.WITHHELD_CONTEXT, -10.0d);
         aMap.put(TrustEvidenceType.FRIENDED_USER, +10.0d);
         aMap.put(TrustEvidenceType.UNFRIENDED_USER, -50.0d);
         aMap.put(TrustEvidenceType.USED_SERVICE, +1.0d);
@@ -108,14 +110,14 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 	public Set<ITrustedEntity> evaluate(final TrustedEntityId trustorId, 
 			final ITrustEvidence evidence) throws TrustEngineException {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Evaluating trust evidence " + evidence
-					+ " on behalf of '" + trustorId + "'");
-		
 		if (trustorId == null)
 			throw new NullPointerException("trustorId can't be null");
 		if (evidence == null)
 			throw new NullPointerException("evidence can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Evaluating trust evidence " + evidence
+					+ " on behalf of '" + trustorId + "'");
 		
 		Set<ITrustedEntity> resultSet = new HashSet<ITrustedEntity>();
 		
@@ -168,6 +170,8 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 				break;
 				
 			// Update score
+			case SHARED_CONTEXT:
+			case WITHHELD_CONTEXT:
 			case FRIENDED_USER:
 			case UNFRIENDED_USER:
 			case USED_SERVICE:
@@ -419,6 +423,8 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 	 *   <li>trustorId != evidence.objectId, i.e. ignore evidence about trustor</li>
 	 *   <li>trustorId == evidence.subjectId</li>
 	 *     <ol>
+	 *       <li>type == {@link TrustEvidenceType#SHARED_CONTEXT SHARED_CONTEXT}</li>
+	 *       <li>type == {@link TrustEvidenceType#WITHHELD_CONTEXT WITHHELD_CONTEXT}</li>
 	 *       <li>type == {@link TrustEvidenceType#RATED RATED}</li>
 	 *       <li>type == {@link TrustEvidenceType#FRIENDED_USER FRIENDED_USER}</li>
 	 *       <li>type == {@link TrustEvidenceType#UNFRIENDED_USER UNFRIENDED_USER}</li>
@@ -442,6 +448,8 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		
 			switch (evidence.getType()) {
 
+			case SHARED_CONTEXT:
+			case WITHHELD_CONTEXT:
 			case RATED:
 			case FRIENDED_USER:
 			case UNFRIENDED_USER:
