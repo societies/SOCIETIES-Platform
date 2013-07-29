@@ -38,7 +38,9 @@ public class PrivacyPolicyNegotiationHistoryRepository implements IPrivacyPolicy
 
     @Override
     public List<UserFeedbackPrivacyNegotiationEvent> listPrevious(int howMany) {
-        Query query = session.createQuery("FROM UserFeedbackPrivacyNegotiationEvent uf ORDER BY uf.requestDate");
+        // TODO: Re-enable requestDate order/filter when requestDate field is available again
+//        Query query = session.createQuery("FROM UserFeedbackPrivacyNegotiationEvent uf ORDER BY uf.requestDate");
+        Query query = session.createQuery("FROM UserFeedbackPrivacyNegotiationEvent uf");
         query.setMaxResults(howMany);
 
         return query.list();
@@ -46,15 +48,19 @@ public class PrivacyPolicyNegotiationHistoryRepository implements IPrivacyPolicy
 
     @Override
     public List<UserFeedbackPrivacyNegotiationEvent> listSince(Date sinceWhen) {
-        Query query = session.createQuery("FROM UserFeedbackPrivacyNegotiationEvent uf WHERE uf.requestDate > :date ORDER BY uf.requestDate");
-        query.setDate("date", sinceWhen);
+        // TODO: Re-enable requestDate order/filter when requestDate field is available again
+//        Query query = session.createQuery("FROM UserFeedbackPrivacyNegotiationEvent uf WHERE uf.requestDate > :date ORDER BY uf.requestDate");
+        Query query = session.createQuery("FROM UserFeedbackPrivacyNegotiationEvent uf");
+//        query.setDate("date", sinceWhen);
 
         return query.list();
     }
 
     @Override
     public List<UserFeedbackPrivacyNegotiationEvent> listIncomplete() {
-        Query query = session.createQuery("FROM UserFeedbackPrivacyNegotiationEvent uf WHERE uf.stage != :stage ORDER BY uf.requestDate");
+        // TODO: Re-enable requestDate order/filter when requestDate field is available again
+//        Query query = session.createQuery("FROM UserFeedbackPrivacyNegotiationEvent uf WHERE uf.stage != :stage ORDER BY uf.requestDate");
+        Query query = session.createQuery("FROM UserFeedbackPrivacyNegotiationEvent uf WHERE uf.stage != :stage");
         query.setParameter("stage", FeedbackStage.COMPLETED);
 
         return query.list();

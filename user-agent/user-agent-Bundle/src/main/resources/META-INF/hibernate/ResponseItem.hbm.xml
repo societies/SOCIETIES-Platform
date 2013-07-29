@@ -6,9 +6,7 @@
 <hibernate-mapping>
     <class name="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem"
            table="PrivacyPolicyResponseItem">
-        <!--<meta attribute="class-description">
-            This class contains the employee detail.
-        </meta>-->
+
         <id name="responseItemId" type="string" column="responseItemId">
             <generator class="uuid"/>
         </id>
@@ -16,8 +14,9 @@
         <property name="decision" column="decision"
                   type="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision"/>
 
-        <property name="requestItem" column="requestItem"
-                  type="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem"/>
+        <one-to-one name="requestItem"
+                    class="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem"
+                    cascade="all"/>
 
     </class>
 </hibernate-mapping>

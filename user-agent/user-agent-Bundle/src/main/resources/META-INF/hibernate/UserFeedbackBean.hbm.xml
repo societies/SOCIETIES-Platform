@@ -5,9 +5,7 @@
 
 <hibernate-mapping>
     <class name="org.societies.api.schema.useragent.feedback.UserFeedbackBean" table="UserFeedbackBean">
-        <!--<meta attribute="class-description">
-            This class contains the employee detail.
-        </meta>-->
+
         <id name="requestId" type="string" column="requestId"/>
 
         <property name="method" column="method" type="org.societies.api.schema.useragent.feedback.FeedbackMethodType"/>
