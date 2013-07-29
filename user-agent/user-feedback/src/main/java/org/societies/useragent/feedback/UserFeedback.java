@@ -1015,7 +1015,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                 pubsub.publisherPublish(myCloudID,
                         EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP,
                         responseID,
-                        negotiationResults.get(responseID));
+                        result);
             } catch (Exception ex) {
                 log.error("Error transmitting PPN complete via pubsub", ex);
             }
@@ -1163,7 +1163,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
         //fire response pubsub event to all user agents
         try {
-            pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.IMPLICIT_RESPONSE, null, resultBean);
+            pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.IMPLICIT_RESPONSE, requestId, resultBean);
         } catch (XMPPError e) {
             log.error("Error submitting implicit response", e);
         } catch (CommunicationException e) {
