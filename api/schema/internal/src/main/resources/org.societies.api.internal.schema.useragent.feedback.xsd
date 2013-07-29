@@ -24,7 +24,7 @@
                 <xs:element name="stage" type="ns3:feedbackStage"
                             minOccurs="0"/>
                 <xs:element name="requestId" type="xs:string" minOccurs="0"/>
-                <xs:element name="requestDate" type="xs:dateTime" minOccurs="0"/>
+                <!--<xs:element name="requestDate" type="xs:dateTime" minOccurs="0"/>-->
                 <xs:element name="type" type="xs:int"/>
                 <xs:element name="responsePolicy" type="ns2:responsePolicy" minOccurs="1" maxOccurs="1"/>
                 <xs:element name="negotiationDetails" type="negotiationDetailsBean" minOccurs="1" maxOccurs="1"/>
