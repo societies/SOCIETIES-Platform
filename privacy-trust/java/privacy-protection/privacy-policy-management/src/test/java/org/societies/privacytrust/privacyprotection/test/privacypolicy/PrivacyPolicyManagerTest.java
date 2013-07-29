@@ -313,7 +313,8 @@ public class PrivacyPolicyManagerTest extends AbstractJUnit4SpringContextTests {
 		}
 		assertTrue("Privacy policy not created", RequestPolicyUtils.equal(cisPolicy, privacyPolicy1));
 		assertTrue("Privacy policy not updated", RequestPolicyUtils.equal(servicePolicy2, privacyPolicy2));
-		assertFalse("Same privacy policies but it should not", privacyPolicy1.equals(privacyPolicy2));
+		assertFalse("Same privacy policies but it should not 1", RequestPolicyUtils.equal(privacyPolicy1, privacyPolicy2));
+		assertFalse("Same privacy policies but it should not 2", privacyPolicy1.equals(privacyPolicy2));
 	}
 
 

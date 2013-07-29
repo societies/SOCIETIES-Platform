@@ -41,9 +41,10 @@ public class DataTypeDescriptionUtilTest {
 		String dataType = "HELLO_THE_WORLD";
 		String expectedResult = "Hello The World";
 		DataTypeDescription dataTypeDescriptionResult = DataTypeDescriptionUtils.create(dataType);
+		assertEquals("Data type friendly name should be the same 1",expectedResult, DataTypeDescriptionUtils.computeFriendlyName(dataType));
 		assertNotNull("Result should not be null", dataTypeDescriptionResult);
 		assertNotNull("Computed friendly name should not be null", dataTypeDescriptionResult.getFriendlyName());
-		assertEquals("Data type friendly name should be the same", expectedResult, dataTypeDescriptionResult.getFriendlyName());
+		assertEquals("Data type friendly name should be the same 2", expectedResult, dataTypeDescriptionResult.getFriendlyName());
 	}
 
 }

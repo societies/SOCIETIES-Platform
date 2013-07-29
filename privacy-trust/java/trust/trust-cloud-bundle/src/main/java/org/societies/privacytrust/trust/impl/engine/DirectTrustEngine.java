@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
+import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.engine.IDirectTrustEngine;
@@ -74,7 +75,9 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 	static {
 		
         final Map<TrustEvidenceType, Double> aMap = new HashMap<TrustEvidenceType, Double>();
-        aMap.put(TrustEvidenceType.FRIENDED_USER, +5.0d);
+        aMap.put(TrustEvidenceType.SHARED_CONTEXT, +1.0d);
+        aMap.put(TrustEvidenceType.WITHHELD_CONTEXT, -10.0d);
+        aMap.put(TrustEvidenceType.FRIENDED_USER, +10.0d);
         aMap.put(TrustEvidenceType.UNFRIENDED_USER, -50.0d);
         aMap.put(TrustEvidenceType.USED_SERVICE, +1.0d);
         EVIDENCE_SCORE_MAP = Collections.unmodifiableMap(aMap);
@@ -107,14 +110,14 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 	public Set<ITrustedEntity> evaluate(final TrustedEntityId trustorId, 
 			final ITrustEvidence evidence) throws TrustEngineException {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Evaluating trust evidence " + evidence
-					+ " on behalf of '" + trustorId + "'");
-		
 		if (trustorId == null)
 			throw new NullPointerException("trustorId can't be null");
 		if (evidence == null)
 			throw new NullPointerException("evidence can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Evaluating trust evidence " + evidence
+					+ " on behalf of '" + trustorId + "'");
 		
 		Set<ITrustedEntity> resultSet = new HashSet<ITrustedEntity>();
 		
@@ -122,29 +125,31 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 			return resultSet;
 
 		try {
-			// Create the trusted entity the evidence object refers to if not already available
-			super.createEntityIfAbsent(trustorId, evidence.getObjectId());
-			
-			// Retrieve all TrustedEntities trusted by the trustor
+			// Retrieve all TrustedEntities DIRECTLY trusted by the trustor
 			// having the same type as the object referenced in the specified TrustEvidence
 			resultSet = this.trustRepo.retrieveEntities(
-					trustorId, evidence.getObjectId().getEntityType(), null);
+					trustorId, evidence.getObjectId().getEntityType(), TrustValueType.DIRECT);
 			ITrustedEntity trustee = null;
-			// 1. Obtain reference to trustee
+			// 1. Obtain reference to trustee (if already contained in the result set)
 			// 2. Remove myCss from result set
 			final Iterator<ITrustedEntity> resultIter = resultSet.iterator();
 			while (resultIter.hasNext()) {
 			
 				final ITrustedEntity entity = resultIter.next();
+				// 1. Obtain reference to trustee
 				if (entity.getTrusteeId().equals(evidence.getObjectId())) {
 					trustee = entity;
 					continue;
 				}
+				// 2. Remove myCss from result set
 				if (entity.getTrusteeId().equals(trustorId))
 					resultIter.remove();
 			}
-			if (trustee == null)
-				throw new TrustEngineException("Could not retrieve identified trustee");
+			// Create trustee if not available
+			if (trustee == null) {
+				trustee = super.createEntityIfAbsent(trustorId, evidence.getObjectId());
+				resultSet.add(trustee);
+			}
 			if (LOG.isDebugEnabled())
 				LOG.debug("trustee=" + trustee + ", resultSet=" + resultSet);
 			
@@ -152,11 +157,21 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 
 			// Update rating
 			case RATED:
+				// Ignore rating if there is no prior direct trust relationship
+				if (trustee.getDirectTrust().getValue() == null) {
+					if (LOG.isDebugEnabled())
+						LOG.debug("Ignoring rating for trustee '" + trustee.getTrusteeId()
+								+ "' by trustor '" + trustorId
+								+ "' - No prior direct trust relationship");
+					return new HashSet<ITrustedEntity>();
+				}
 				// TODO check null info
 				trustee.getDirectTrust().setRating((Double) evidence.getInfo());
 				break;
 				
 			// Update score
+			case SHARED_CONTEXT:
+			case WITHHELD_CONTEXT:
 			case FRIENDED_USER:
 			case UNFRIENDED_USER:
 			case USED_SERVICE:
@@ -408,6 +423,8 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 	 *   <li>trustorId != evidence.objectId, i.e. ignore evidence about trustor</li>
 	 *   <li>trustorId == evidence.subjectId</li>
 	 *     <ol>
+	 *       <li>type == {@link TrustEvidenceType#SHARED_CONTEXT SHARED_CONTEXT}</li>
+	 *       <li>type == {@link TrustEvidenceType#WITHHELD_CONTEXT WITHHELD_CONTEXT}</li>
 	 *       <li>type == {@link TrustEvidenceType#RATED RATED}</li>
 	 *       <li>type == {@link TrustEvidenceType#FRIENDED_USER FRIENDED_USER}</li>
 	 *       <li>type == {@link TrustEvidenceType#UNFRIENDED_USER UNFRIENDED_USER}</li>
@@ -431,6 +448,8 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		
 			switch (evidence.getType()) {
 
+			case SHARED_CONTEXT:
+			case WITHHELD_CONTEXT:
 			case RATED:
 			case FRIENDED_USER:
 			case UNFRIENDED_USER:
@@ -455,20 +474,32 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 		return result;
 	}
 
+	/**
+	 *         { RATING_WEIGHT * rating + (1 - RATING_WEIGHT) * 0.1 * stanineScore, if rating && stanineScore != null 
+	 * value = { rating, if staninceScore == null
+	 *         { 0.1 * stanineScore, if rating == null
+	 *         
+	 * @param rating
+	 * @param stanineScore
+	 * @return
+	 */
 	private static Double estimateValue(final Double rating, final Double stanineScore) {
 
+		if (LOG.isDebugEnabled())
+			LOG.debug("estimateValue: rating=" + rating + ", stanineScore=" + stanineScore); 
+		
 		if (rating == null && stanineScore == null)
 			return null;
 
 		if (stanineScore == null)
-			return 0.5d * rating;
+			return rating;
 
 		final Double normalisedScore = 0.1d * stanineScore;
 
 		if (rating == null)
-			return 0.5d * normalisedScore; // TODO use constant
+			return normalisedScore;
 
-		return (0.5d * rating + 0.5d * normalisedScore); // TODO use constant
+		return (RATING_WEIGHT * rating + (1.0d - RATING_WEIGHT) * normalisedScore);
 	}
 
 	private class DirectTrustEvidenceHandler implements Runnable {

@@ -30,6 +30,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import org.apache.commons.collections.ListUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -78,6 +79,7 @@ import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
@@ -264,7 +266,9 @@ public class TestAccCtrlPreferences {
 		Assert.assertEquals(this.accCtrlmodel, accCtrlPreferenceModel);
 
 		Assert.assertEquals(ResourceUtils.getDataIdentifier(resourceWithID), this.locationAttribute.getId());
-		List<ResponseItem> items = privPrefMgr.checkPermission(requestorCisBean, this.locationAttribute.getId(), actions);
+		List<DataIdentifier> dataIds = new ArrayList<DataIdentifier>();
+		dataIds.add(this.locationAttribute.getId());
+		List<ResponseItem> items = privPrefMgr.checkPermission(requestorCisBean, dataIds, actions);
 		Assert.assertNotNull(items);
 		Assert.assertTrue(items.size() > 0);
 		

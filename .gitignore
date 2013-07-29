@@ -10,6 +10,7 @@ out/
 bin/
 gen/
 target/
+target-android/
 build/
 *.apk
 *.jar

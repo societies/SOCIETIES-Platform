@@ -26,7 +26,6 @@ package org.societies.privacytrust.privacyprotection.api.model.privacypreference
 
 
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.Requestor;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
@@ -55,11 +54,11 @@ public class IdentitySelectionPreferenceOutcome extends IPrivacyOutcome{
 		return PrivacyPreferenceTypeConstants.IDENTITY_SELECTION;
 	}
 
-	
+
 	public void setIdentity(IIdentity userId){
 		this.userIdentity = userId;
 	}
-	
+
 	public IIdentity getIdentity(){
 		return this.userIdentity;
 	}
@@ -121,6 +120,6 @@ public class IdentitySelectionPreferenceOutcome extends IPrivacyOutcome{
 	public void setShouldUseIdentity(boolean shouldUseIdentity) {
 		this.shouldUseIdentity = shouldUseIdentity;
 	}
-	
+
 }
 

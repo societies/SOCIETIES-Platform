@@ -67,7 +67,6 @@ import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
 import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
 import org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator;
 import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ContextPreferenceCondition;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
@@ -630,8 +629,8 @@ public class PrivacyPreferenceUtils {
 		}
 		return true;
 	}
-	
-	
+
+
 	public static boolean equals (AccessControlPreferenceDetailsBean bean1, Object bean2){
 
 		if (bean1 == bean2) {
@@ -667,8 +666,8 @@ public class PrivacyPreferenceUtils {
 		}
 		return true;
 	}
-	
-	
+
+
 	public static boolean equals(DObfPreferenceDetailsBean bean1, Object bean2){
 		if (bean1 == bean2) {
 			return true;
@@ -697,7 +696,7 @@ public class PrivacyPreferenceUtils {
 		}
 		return true;
 	}
-	
+
 	public static boolean equals(IDSPreferenceDetailsBean bean1, Object bean2){
 		if (bean1 == bean2) {
 			return true;
@@ -725,7 +724,7 @@ public class PrivacyPreferenceUtils {
 		}
 		return true;
 	}
-	
+
 	public static String toString(AccessControlPreferenceDetailsBean bean){
 		StringBuilder builder = new StringBuilder();
 		builder.append("AccessControlPreferenceDetailsBean [getResource()=");
@@ -737,7 +736,7 @@ public class PrivacyPreferenceUtils {
 		builder.append("]");
 		return builder.toString();
 	}
-	
+
 	public static String toString(PPNPreferenceDetailsBean bean){
 		StringBuilder builder = new StringBuilder();
 		builder.append("PPNPreferenceDetailsBean [getResource()=");
@@ -756,7 +755,7 @@ public class PrivacyPreferenceUtils {
 		builder.append("]");
 		return builder.toString();
 	}
-	
+
 	public static String toString(DObfPreferenceDetailsBean bean){
 		StringBuilder builder = new StringBuilder();
 		builder.append("DObfPreferenceDetailsBean [getResource()=");

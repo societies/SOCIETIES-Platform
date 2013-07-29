@@ -8,6 +8,10 @@
   <xs:complexType name="ctxIdentifierBean" abstract="true">
     <xs:sequence>
       <xs:element name="string" type="xs:string"/>
+      <xs:element name="ownerId" type="xs:string" minOccurs="0"/>
+      <xs:element name="modelType" type="tns:ctxModelTypeBean" minOccurs="0"/>
+      <xs:element name="type" type="xs:string" minOccurs="0"/>
+      <xs:element name="objectNumber" type="xs:long"/>
     </xs:sequence>
   </xs:complexType>
   
@@ -173,6 +177,7 @@
       <xs:enumeration value="integer"/>
       <xs:enumeration value="double"/>
       <xs:enumeration value="binary"/>
+      <xs:enumeration value="complex"/>
     </xs:restriction>
   </xs:simpleType>
 

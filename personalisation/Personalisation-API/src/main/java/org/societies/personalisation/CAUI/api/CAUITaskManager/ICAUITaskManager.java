@@ -159,11 +159,10 @@ public interface ICAUITaskManager {
 	 */
 	public Map<IUserIntentAction, IUserIntentTask> identifyActionTaskInModel(String par, String val, HashMap<String, Serializable> currentContext, String[] lastAction);
 
-	public void displayTask (IUserIntentTask task);
-	
-	public void displayModel (UserIntentModelData model);
-	
+
 	public void setActionLink(IUserIntentAction sourceAction ,IUserIntentAction targetAction, Double transProb);
 
 	public Map<IUserIntentAction, Double> retrieveNextActions(IUserIntentAction currentAction);
+	
+	public HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> getCAUIActiveModel();
 }
