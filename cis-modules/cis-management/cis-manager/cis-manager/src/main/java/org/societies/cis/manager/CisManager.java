@@ -864,7 +864,8 @@ public class CisManager implements ICisManager, IFeatureServer {
 
 			CommunityManager c = (CommunityManager) payload;
 
-			// >>>>>>>>>>>>>>>>>>>>>>>>>>>>treating getSubscribedTo notifications >>>>>>>>>>>>>>>>>>>>>>>>>>>>
+			// this notification will be received only if the user is ADDED by another CSS
+			// if he joins, the subscription will come through the join callback
 			if (c.getNotification().getSubscribedTo()!= null) {
 				LOG.info("subscribedTo received");
 				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCommunity().getCommunityName(), 
