@@ -47,6 +47,7 @@ import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.cis.management.*;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.*;
@@ -72,15 +73,23 @@ import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.GetMembershipCriteriaResponse;
+import org.societies.api.schema.cis.community.JoinResponse;
+import org.societies.api.schema.cis.community.LeaveResponse;
 import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.ParticipantRole;
+import org.societies.api.schema.cis.manager.CommunityManager;
+import org.societies.api.schema.cis.manager.Create;
+import org.societies.api.schema.cis.manager.ListCrit;
+import org.societies.api.schema.cis.manager.ListResponse;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.cis.mgmtClient.CisManagerClient;
 import org.societies.identity.IdentityImpl;
 import org.societies.identity.NetworkNodeImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.AsyncResult;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 
@@ -102,6 +111,7 @@ import static org.mockito.Mockito.*;
 @RunWith(org.springframework.test.context.junit4.SpringJUnit4ClassRunner.class)  
 @PrepareForTest( { Activity.class })
 @ContextConfiguration(locations = { "../../../../CisManagerTest-context.xml" })
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTests {
 	private static Logger LOG = LoggerFactory
 			.getLogger(TestCisManager.class);
@@ -388,7 +398,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		mockCSSendpoint = mock (ICommManager.class);
 
 		mockIICisManagerId = mock (IIdentityManager.class);
-		CIS_MANAGER_CSS_ID += "newtest";
+		//CIS_MANAGER_CSS_ID += "1";
 		testCisManagerId = new NetworkNodeImpl(CIS_MANAGER_CSS_ID);
 
 		
@@ -494,7 +504,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		}
 		
 		System.out.println("end of testing create CIS");
-	
+		assertEquals(cisManagerUnderTest.getCisList().size(),0);
 	}
 	
 	//@Ignore
@@ -555,7 +565,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 }
 
 		 System.out.println("end of list CIS");
-		 
+		 assertEquals(cisManagerUnderTest.getCisList().size(),0);
 	}
 
 	//@Rollback(true)
@@ -623,7 +633,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	     }
 
 		System.out.println("end of delete CIS");
-	
+		assertEquals(cisManagerUnderTest.getCisList().size(),0);
 	}
 	
 	//@Ignore
@@ -650,7 +660,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		// CLEANING UP
 		cisManagerUnderTestInterface.deleteCis(Iciss.getCisId());
-
+		assertEquals(cisManagerUnderTest.getCisList().size(),0);
 		
 	}
 	
@@ -699,7 +709,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		// CLEANING UP
 		cisManagerUnderTestInterface.deleteCis(Iciss.getCisId());
-
+		assertEquals(cisManagerUnderTest.getCisList().size(),0);
 		
 	}
 	
@@ -748,7 +758,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 for(int i=0;i<ciss.length;i++){
 			 cisManagerUnderTestInterface.deleteCis(ciss[i].getCisId());
 		 }
-
+		 assertEquals(cisManagerUnderTest.getCisList().size(),0);
 
 	}
 	
@@ -794,7 +804,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 for(int i=0;i<ciss.length;i++){
 			 cisManagerUnderTestInterface.deleteCis(ciss[i].getCisId());
 		 }
-
+		 assertEquals(cisManagerUnderTest.getCisList().size(),0);
 
 		
 	}
@@ -849,6 +859,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	 
 		// CLEANING UP
 		 cisManagerUnderTestInterface.deleteCis(Iciss.getCisId());
+		 assertEquals(cisManagerUnderTest.getCisList().size(),0);
 	}
 	
 	//@Ignore
@@ -921,8 +932,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 				 }
 
 				// CLEANING UP
-				 cisManagerUnderTestInterface.deleteCis(this.parentJid);
-
+				 assertTrue(cisManagerUnderTestInterface.deleteCis(this.parentJid));
+				 assertEquals(cisManagerUnderTest.getCisList().size(),0);
 				
 			}
 		}
@@ -1004,8 +1015,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 				
 				
 				// CLEANING UP
-				cisManagerUnderTestInterface.deleteCis(this.cisJid);
-				
+				assertTrue(cisManagerUnderTest.deleteCis(TEST_CISID_1));
+				assertEquals(cisManagerUnderTest.getCisList().size(),0);
 			}
 
 
@@ -1075,7 +1086,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 				
 				// CLEANING UP
 				cisManagerUnderTestInterface.deleteCis(this.IcissOwned.getCisId());
-				
+				assertEquals(cisManagerUnderTest.getCisList().size(),0);
 			}
 		}		
 		// end of callback
@@ -1146,7 +1157,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 						
 						// CLEANING UP
 						cisManagerUnderTestInterface.deleteCis(IcissOwned.getCisId());
-
+						assertEquals(cisManagerUnderTest.getCisList().size(),0);
 					
 					
 					}
@@ -1264,7 +1275,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 				
 				// CLEANING UP
 				cisManagerUnderTestInterface.deleteCis(IcissOwned.getCisId());
-				
+				assertEquals(cisManagerUnderTest.getCisList().size(),0);
 				
 			}
 		}		
@@ -1341,6 +1352,159 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		// CLEANING UP
 		cisManagerUnderTestInterface.deleteCis(IcissOwned.getCisId());
+		assertEquals(cisManagerUnderTest.getCisList().size(),0);
+	
+	}
+	
+	@Test
+	public void testCisManagergetQuery() throws InterruptedException, ExecutionException  {
+
+		System.out.println("testing Cis Manager get Query methods");
+		
+		cisManagerUnderTest = new CisManager();
+		this.setMockingOnCISManager(cisManagerUnderTest);
+		
+		// creating the test stanza
+		Stanza stanza = new Stanza(testCisManagerId); // set the to
+		stanza.setFrom(testCisManagerId);// set the from
+		
+		assertEquals(cisManagerUnderTest.getCisList().size(),0);
+		// 1 CREATE CIS
+		// packet creation
+		CommunityManager packet = new CommunityManager();
+		Create create = new Create();
+		Community community = new Community();
+		community.setCommunityName(TEST_CIS_NAME_1);
+		community.setCommunityType(TEST_CIS_TYPW);
+		community.setDescription("description");
+		MembershipCrit membershipCrit = new MembershipCrit();
+		Criteria crit = new Criteria();
+		crit.setRank(1);
+		crit.setAttrib(CtxAttributeTypes.ADDRESS_HOME_COUNTRY);
+		crit.setOperator("equals");
+		crit.setValue1("Brazil");
+		
+		membershipCrit.setCriteria(Arrays.asList(crit));
+		community.setMembershipCrit(membershipCrit);		
+		create.setCommunity(community);
+		packet.setCreate(create);
+		// done creating the packet
+		try {
+			CommunityManager createReturn = (CommunityManager) cisManagerUnderTest.getQuery(stanza, packet);
+
+			assertEquals(cisManagerUnderTest.getCisList().size(),1);
+		
+			assertNotNull(createReturn.getCreate());
+			assertTrue(createReturn.getCreate().isResult());
+			assertNotNull(createReturn.getCreate().getCommunity());
+			assertNotNull(createReturn.getCreate().getCommunity().getCommunityJid());
+			
+			ICisOwned  cis1 = cisManagerUnderTest.getOwnedCis(createReturn.getCreate().getCommunity().getCommunityJid());
+			
+			assertEquals(createReturn.getCreate().getCommunity().getCommunityName(), TEST_CIS_NAME_1);
+			assertEquals(createReturn.getCreate().getCommunity().getCommunityName(), cis1.getName());
+			assertEquals(createReturn.getCreate().getCommunity().getCommunityType(), TEST_CIS_TYPW);
+			assertEquals(createReturn.getCreate().getCommunity().getDescription(), "description");
+			
+			
+			// 2 Incomplete CREATE CIS
+			// packet creation
+			packet = new CommunityManager();
+			create = new Create();
+			community = new Community();
+			create.setCommunity(community);
+			packet.setCreate(create);
+			createReturn = (CommunityManager) cisManagerUnderTest.getQuery(stanza, packet);
+			// proper test
+			assertNotNull(createReturn.getCreate());
+			assertFalse(createReturn.getCreate().isResult());
+			assertEquals(cisManagerUnderTest.getCisList().size(),1);
+			
+			// 3 SUBSCRIBE
+			CisManagerClient cisCallbackClient = new CisManagerClient();
+			CisManagerClientCallback joinCallback = new CisManagerClientCallback(stanza.getId(), cisCallbackClient ,cisManagerUnderTest);
+			// packet creation
+			CommunityMethods payload = new CommunityMethods();
+			JoinResponse joinResp = new JoinResponse();
+			joinResp.setResult(true);
+			community = new Community();
+			community.setCommunityName(TEST_CIS_NAME_2);
+			community.setCommunityType(TEST_CIS_TYPW);
+			community.setDescription("description 2");
+			community.setOwnerJid(MEMBER_JID_1);
+			community.setCommunityJid(TEST_CISID_2);
+			payload.setJoinResponse(joinResp);
+			joinResp.setCommunity(community);
+			
+			joinCallback.receiveResult(stanza, payload);
+			assertEquals(cisManagerUnderTest.getCisList().size(),2);
+			
+			// 4 List through query 
+			// packet creation
+			packet = new CommunityManager();
+			org.societies.api.schema.cis.manager.List l = new org.societies.api.schema.cis.manager.List();
+			l.setListCriteria(ListCrit.ALL);
+			packet.setList(l);
+			// CAll the list method
+			ListResponse listResp = (ListResponse) cisManagerUnderTest.getQuery(stanza, packet);
+
+			assertNotNull(listResp);
+			List<Community> listCom= listResp.getCommunity();
+			assertNotNull(listCom);
+			if(listCom.size()==2){
+				Community c1 = listCom.get(0);
+				Community c2 = listCom.get(1);
+				if(c1.getCommunityName().equalsIgnoreCase(TEST_CIS_NAME_1)){
+					assertEquals(c1.getCommunityName(), TEST_CIS_NAME_1);
+					assertEquals(c1.getCommunityType(), TEST_CIS_TYPW);
+					assertEquals(c1.getDescription(), "description");
+					assertEquals(c2.getCommunityName(), TEST_CIS_NAME_2);
+					assertEquals(c2.getCommunityType(), TEST_CIS_TYPW);
+					assertEquals(c2.getDescription(), "description 2");
+					assertEquals(c2.getCommunityJid(), TEST_CISID_2);
+				}else{
+					assertEquals(c2.getCommunityName(), TEST_CIS_NAME_1);
+					assertEquals(c2.getCommunityType(), TEST_CIS_TYPW);
+					assertEquals(c2.getDescription(), "description");
+					assertEquals(c1.getCommunityName(), TEST_CIS_NAME_2);
+					assertEquals(c1.getCommunityType(), TEST_CIS_TYPW);
+					assertEquals(c1.getDescription(), "description 2");
+					assertEquals(c1.getCommunityJid(), TEST_CISID_2);
+				}
+			}else{
+				fail("list size different than 2, it was " + listCom.size());
+			}
+
+			// Leave
+			// packet creation
+			cisCallbackClient = new CisManagerClient();
+			stanza.setId("testId");
+			stanza.setFrom(testCisId_2);
+			CisManagerClientCallback leaveCallback = new CisManagerClientCallback(stanza.getId(), cisCallbackClient ,cisManagerUnderTest);
+			// packet creation
+			payload = new CommunityMethods();
+			LeaveResponse lResp = new LeaveResponse();
+			lResp.setResult(true);
+			payload.setLeaveResponse(lResp);
+			
+			leaveCallback.receiveResult(stanza, payload);
+			
+			// now there should be no subscribed CIS
+			assertEquals(cisManagerUnderTest.getSubscribedCISs().size(),0);
+			
+			
+			
+			// CLEANING UP
+			cisManagerUnderTest.deleteCis(createReturn.getCreate().getCommunity().getCommunityJid());
+
+		} catch (XMPPError e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		System.out.println("end of testing create CIS");
+		
+
 	
 	}
 	
