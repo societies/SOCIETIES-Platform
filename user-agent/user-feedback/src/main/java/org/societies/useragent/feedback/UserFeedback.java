@@ -827,11 +827,11 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         //set result value in hashmap
         synchronized (expResults) {
             if (!expResults.containsKey(responseID)) {
-                if (log.isTraceEnabled())
-                    log.trace(String.format("This isn't the node where the exp feedback request ID [%s] originated",
+                if (log.isDebugEnabled())
+                    log.debug(String.format("This isn't the node where the exp feedback request ID [%s] originated",
                             responseID));
 
-                if (log.isTraceEnabled()) {
+                if (log.isDebugEnabled()) {
                     StringBuilder bld = new StringBuilder();
                     bld.append("Exp feedback requests outstanding:-\n");
                     for (String s : expResults.keySet()) {
@@ -839,7 +839,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                         bld.append(s);
                         bld.append('\n');
                     }
-                    log.trace(bld.toString());
+                    log.debug(bld.toString());
                 }
 
                 return;
@@ -902,11 +902,11 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         //set result value in hashmap
         synchronized (impResults) {
             if (!impResults.containsKey(responseID)) {
-                if (log.isTraceEnabled())
-                    log.trace(String.format("This isn't the node where the imp feedback request ID [%s] originated",
+                if (log.isDebugEnabled())
+                    log.debug(String.format("This isn't the node where the imp feedback request ID [%s] originated",
                             responseID));
 
-                if (log.isTraceEnabled()) {
+                if (log.isDebugEnabled()) {
                     StringBuilder bld = new StringBuilder();
                     bld.append("Imp feedback requests outstanding:-\n");
                     for (String s : impResults.keySet()) {
@@ -914,7 +914,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                         bld.append(s);
                         bld.append('\n');
                     }
-                    log.trace(bld.toString());
+                    log.debug(bld.toString());
                 }
 
                 return;
@@ -980,11 +980,11 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         //set result value in hashmap
         synchronized (negotiationResults) {
             if (!negotiationResults.containsKey(responseID)) {
-                if (log.isTraceEnabled())
-                    log.trace(String.format("This isn't the node where the PPN request ID [%s] originated",
+                if (log.isDebugEnabled())
+                    log.debug(String.format("This isn't the node where the PPN request ID [%s] originated",
                             responseID));
 
-                if (log.isTraceEnabled()) {
+                if (log.isDebugEnabled()) {
                     StringBuilder bld = new StringBuilder();
                     bld.append("PPN requests outstanding:-\n");
                     for (String s : negotiationResults.keySet()) {
@@ -992,7 +992,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                         bld.append(s);
                         bld.append('\n');
                     }
-                    log.trace(bld.toString());
+                    log.debug(bld.toString());
                 }
 
                 return;
@@ -1051,11 +1051,11 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         //set result value in hashmap
         synchronized (accessCtrlResults) {
             if (!accessCtrlResults.containsKey(responseID)) {
-                if (log.isTraceEnabled())
-                    log.trace(String.format("This isn't the node where the AC request ID [%s] originated",
+                if (log.isDebugEnabled())
+                    log.debug(String.format("This isn't the node where the AC request ID [%s] originated",
                             responseID));
 
-                if (log.isTraceEnabled()) {
+                if (log.isDebugEnabled()) {
                     StringBuilder bld = new StringBuilder();
                     bld.append("AC requests outstanding:-\n");
                     for (String s : accessCtrlResults.keySet()) {
@@ -1063,7 +1063,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                         bld.append(s);
                         bld.append('\n');
                     }
-                    log.trace(bld.toString());
+                    log.debug(bld.toString());
                 }
 
                 return;

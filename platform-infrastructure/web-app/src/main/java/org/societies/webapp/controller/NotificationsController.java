@@ -162,8 +162,8 @@ public class NotificationsController extends BasePageController {
                     String id = ((UserFeedbackBean) item).getRequestId();
                     String[] options = ((UserFeedbackBean) item).getOptions().toArray(new String[((UserFeedbackBean) item).getOptions().size()]);
 
-                    if (log.isTraceEnabled())
-                        log.trace(String.format("Received %s event for [%s] with options {%s}",
+                    if (log.isDebugEnabled())
+                        log.debug(String.format("Received %s event for [%s] with options {%s}",
                                 node,
                                 id,
                                 Arrays.toString(options)));
@@ -173,8 +173,8 @@ public class NotificationsController extends BasePageController {
                     String id = ((ExpFeedbackResultBean) item).getRequestId();
                     String[] options = ((ExpFeedbackResultBean) item).getFeedback().toArray(new String[((ExpFeedbackResultBean) item).getFeedback().size()]);
 
-                    if (log.isTraceEnabled())
-                        log.trace(String.format("Received %s event for [%s] with options {%s}",
+                    if (log.isDebugEnabled())
+                        log.debug(String.format("Received %s event for [%s] with options {%s}",
                                 node,
                                 id,
                                 Arrays.toString(options)));
@@ -187,8 +187,8 @@ public class NotificationsController extends BasePageController {
                 } else if (item instanceof UserFeedbackPrivacyNegotiationEvent) {
                     String id = String.valueOf(((UserFeedbackPrivacyNegotiationEvent) item).getRequestId());
 
-                    if (log.isTraceEnabled())
-                        log.trace(String.format("Received %s event for [%s] with options {%s}",
+                    if (log.isDebugEnabled())
+                        log.debug(String.format("Received %s event for [%s] with options {%s}",
                                 node,
                                 id,
                                 "null"));
@@ -197,8 +197,8 @@ public class NotificationsController extends BasePageController {
                 } else {
                     log.warn(String.format("Unknown response payload type %s, attempting to remove by message ID", item.getClass().getSimpleName()));
 
-                    if (log.isTraceEnabled())
-                        log.trace(String.format("Received %s event for [%s] with options {%s}",
+                    if (log.isDebugEnabled())
+                        log.debug(String.format("Received %s event for [%s] with options {%s}",
                                 node,
                                 itemId,
                                 "null"));
@@ -326,7 +326,7 @@ public class NotificationsController extends BasePageController {
     private final Set<String> allNotificationIDs = new HashSet<String>();
 
     public NotificationsController() {
-        log.trace("NotificationsController ctor()");
+        log.debug("NotificationsController ctor()");
 
         timedAbortProcessorThread = new Thread(new TimedAbortProcessor(timedAbortsToWatch));
         timedAbortProcessorThread.setName("TimedAbortProcessor");
