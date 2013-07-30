@@ -39,7 +39,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.negotiation.Neg
 import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
-import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
@@ -50,7 +49,8 @@ import org.societies.security.policynegotiator.xml.Xml;
 import org.societies.security.policynegotiator.xml.XmlException;
 
 /**
- * This class receives results from async invocations of {@link INegotiationProvider}
+ * This class receives results from async invocations of
+ * {@link org.societies.api.internal.security.policynegotiator.INegotiationProvider}
  *
  * @author Mitja Vardjan
  *

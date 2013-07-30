@@ -36,7 +36,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyN
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PPNegotiationEvent;
 import org.societies.api.internal.privacytrust.privacyprotection.negotiation.FailedNegotiationEvent;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
-import org.societies.api.internal.security.storage.ISecureStorage;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
@@ -70,7 +69,7 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 	 * policy negotiations complete.
 	 * 
 	 * @param slaKey The key to gather SLA from secure storage using
-	 * {@link ISecureStorage#getDocument(String)}
+	 * {@link org.societies.api.internal.security.storage.ISecureStorage#getDocument(String)}
 	 */
 	public PrivacyPolicyNegotiationListener(INegotiationCallback finalCallback, String slaKey,
 			List<URI> fileUris, IEventMgr eventMgr, String[] eventTypes, int id) {
