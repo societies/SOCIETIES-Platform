@@ -26,6 +26,7 @@ package org.societies.context.api.user.inheritance;
 
 //import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
 
@@ -40,6 +41,11 @@ public interface IUserCtxInheritanceMgr {
 	 * @param cisId
 	 * @since 0.0.1
 	 */
+
+	public CtxAttribute communityInheritance(CtxAttributeIdentifier ctxAttrId);
+	
+	public CtxAttribute compareQoC(CtxAttribute ctxAtt1, CtxAttribute ctxAtt2);
+	
 	public void getCIS(IIdentity cisId);
 
 	/**

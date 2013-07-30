@@ -25,11 +25,8 @@
 package org.societies.api.cis.management;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Future;
 
-import org.societies.api.activity.IActivityFeed;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.identity.InvalidFormatException;

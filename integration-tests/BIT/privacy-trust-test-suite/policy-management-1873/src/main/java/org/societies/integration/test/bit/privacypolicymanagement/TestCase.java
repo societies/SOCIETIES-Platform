@@ -38,7 +38,6 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.integration.test.IntegrationTestCase;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class TestCase extends IntegrationTestCase {
 	private static Logger LOG = LoggerFactory.getLogger(TestCase.class.getName());

@@ -33,6 +33,18 @@ package org.societies.api.privacytrust.trust.evidence;
 public enum TrustEvidenceType {
 
 	/**
+	 * The enum constant for sharing context information.
+	 * @since 2.0
+	 */
+	SHARED_CONTEXT,
+	
+	/**
+	 * The enum constant for withholding context information.
+	 * @since 2.0
+	 */
+	WITHHELD_CONTEXT,
+	
+	/**
 	 * The enum constant for direct trust relationships.
 	 * 
 	 * @since 1.0

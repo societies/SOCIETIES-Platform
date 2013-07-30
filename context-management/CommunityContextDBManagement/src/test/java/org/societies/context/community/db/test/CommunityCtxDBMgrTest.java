@@ -85,6 +85,8 @@ public class CommunityCtxDBMgrTest {
 	private static final String CIS_IIDENTITY_STRING14 = "myCIS14.societies.local";
 	private static final String CIS_IIDENTITY_COMMUNITY_PARENT = "myCISCommunityParent.societies.local";
 	private static final String CIS_IIDENTITY_ENTITY_CHILD = "myCISEntityChild.societies.local";
+	private static final String CIS_IIDENTITY_COMMUNITY_PARENT2 = "myCISCommunityParent2.societies.local";
+	private static final String CIS_IIDENTITY_ENTITY_CHILD2 = "myCISEntityChild2.societies.local";
 
 	@Autowired
 	private ICommunityCtxDBMgr communityDB;
@@ -391,10 +393,10 @@ public class CommunityCtxDBMgrTest {
 	    ids = communityDB.lookup(CIS_IIDENTITY_STRING12, types);
 	    assertTrue(ids.contains(entId));
 	    assertEquals(entId.getOwnerId(),CIS_IIDENTITY_STRING12);
-	    assertEquals(3, ids.size());
+	    assertEquals(1, ids.size());
 	              
-	    assertTrue(ids.contains(entId2));
-	    assertTrue(ids.contains(entId3));
+	    assertTrue(!ids.contains(entId2));
+	    assertTrue(!ids.contains(entId3));
 	    assertEquals(entId2.getOwnerId(),CIS_IIDENTITY_STRING13);
 
 	    final Set<String> types2 = new HashSet<String>();
@@ -405,11 +407,89 @@ public class CommunityCtxDBMgrTest {
 	    //
 	    ids = communityDB.lookup(attribute.getOwnerId(), types2);
 	    assertTrue(ids.contains(attribute.getId()));
-	    assertEquals(3, ids.size());
+	    assertEquals(1, ids.size());
 	              
-	    assertTrue(ids.contains(attribute2.getId()));
-	    assertTrue(ids.contains(attribute3.getId()));
-	       
+	    assertTrue(!ids.contains(attribute2.getId()));
+	    assertTrue(!ids.contains(attribute3.getId()));
+
+	    //
+	    // Lookup entities using modelType and type
+	    //
+	    final Set<String> types3 = new HashSet<String>();
+	    types3.add(entId3.getType());
+	    ids = communityDB.lookup(CIS_IIDENTITY_STRING14, CtxModelType.ENTITY, types3);
+	    assertTrue(ids.contains(entId3));
+	    assertEquals(1, ids.size());
+	    
+	    //
+	    // Lookup attributes using modelType and type
+	    //
+	    ids = communityDB.lookup(attribute.getOwnerId(), CtxModelType.ATTRIBUTE, types2);
+	    assertTrue(ids.contains(attribute.getId()));
+	    assertTrue(!ids.contains(attribute2.getId()));
+	    assertTrue(!ids.contains(attribute3.getId()));
+	    assertEquals(1, ids.size());
+	    
+	    // 
+	    // Lookup entities using entityId and type
+	    //
+	    ids = communityDB.lookup(entId, CtxModelType.ENTITY, types);
+	    assertTrue(ids.contains(entId));
+	    assertEquals(1, ids.size());	
+	    
+	    //
+	    // Lookup attributes using entityId and type
+	    //
+	    ids = communityDB.lookup(entId, CtxModelType.ATTRIBUTE, types2);
+	    assertTrue(ids.contains(attribute.getId()));
+	    assertEquals(1, ids.size());
+	    
+	    //ASSOCIATIONS
+		CtxAssociation association = this.communityDB.createAssociation(CIS_IIDENTITY_COMMUNITY_PARENT2, CtxAssociationTypes.HAS_PARAMETERS);
+		
+		CommunityCtxEntity communityEntity = this.communityDB.createCommunityEntity(CIS_IIDENTITY_COMMUNITY_PARENT2);
+		CtxEntity entity = this.communityDB.createEntity(CIS_IIDENTITY_ENTITY_CHILD2, CtxEntityTypes.PERSON);
+		
+		//set parent entity
+		final CtxEntityIdentifier parentEntityId = communityEntity.getId();
+		association.setParentEntity(parentEntityId);
+		association = (CtxAssociation) this.communityDB.update(association);
+		assertNotNull(association.getParentEntity());
+		assertEquals(parentEntityId, association.getParentEntity());
+		
+		//add child entity
+		final CtxEntityIdentifier childEntityId = entity.getId();
+		association.addChildEntity(childEntityId);
+		association = (CtxAssociation) this.communityDB.update(association);
+		assertEquals(communityEntity.getId(), association.getParentEntity());
+		assertEquals(1, association.getChildEntities().size());
+		assertTrue(association.getChildEntities().contains(childEntityId));
+		
+	    // 
+	    // Lookup associations using entityId and type
+	    //
+		// using the child entityId
+	    final Set<String> types4 = new HashSet<String>();
+	    types4.add(association.getType());
+	    ids = communityDB.lookup(childEntityId, CtxModelType.ASSOCIATION, types4);
+	    assertTrue(ids.contains(association.getId()));
+	    assertEquals(1, ids.size());
+	    // using the parent entityId
+	    ids = communityDB.lookup(parentEntityId, CtxModelType.ASSOCIATION, types4);
+	    assertTrue(ids.contains(association.getId()));
+	    assertEquals(1, ids.size());
+	    
+	    //
+	    // Lookup associations using ownerId and type
+	    //
+	    ids = communityDB.lookup(association.getOwnerId(), types4);
+	    assertTrue(ids.contains(association.getId()));
+	    //
+	    // Lookup associations using ownerId, modelType and type
+	    //
+	    ids = communityDB.lookup(association.getOwnerId(), CtxModelType.ASSOCIATION, types4);
+	    assertTrue(ids.contains(association.getId()));
+	    
    }
 	
    @Test

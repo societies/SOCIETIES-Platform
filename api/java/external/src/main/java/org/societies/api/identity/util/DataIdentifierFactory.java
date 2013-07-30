@@ -27,8 +27,6 @@ package org.societies.api.identity.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
@@ -43,7 +41,7 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
  *
  */
 public class DataIdentifierFactory {
-	private static final Logger LOG = LoggerFactory.getLogger(DataIdentifierFactory.class.getName());
+//	private static final Logger LOG = LoggerFactory.getLogger(DataIdentifierFactory.class.getName());
 
 	/**
 	 * Generate a simple DataIdentifier from schema, owner id and type
@@ -93,7 +91,7 @@ public class DataIdentifierFactory {
 				dataIdUri = scheme+"://"+uri[1];
 			}
 			catch(Exception e2) {
-				LOG.error("Hum, can't understand this scheme in the URI \""+uri[0]+"\". Use CONTEXT by default.", e, e2);
+//				LOG.error("Hum, can't understand this scheme in the URI \""+uri[0]+"\". Use CONTEXT by default.", e, e2);
 				scheme = DataIdentifierScheme.CONTEXT;
 			}
 		}

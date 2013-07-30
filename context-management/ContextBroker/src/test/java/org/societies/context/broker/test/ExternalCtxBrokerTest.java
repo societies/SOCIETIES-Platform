@@ -59,7 +59,7 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
-import org.societies.context.broker.api.security.CtxPermission;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 import org.societies.context.broker.api.security.ICtxAccessController;
 import org.societies.context.broker.impl.CtxBroker;
 import org.societies.context.broker.impl.InternalCtxBroker;
@@ -245,8 +245,8 @@ public class ExternalCtxBrokerTest {
 		//when(getLocalRequestor()).thenReturn(new Requestor(mockIdentityLocal));
 		//doNothing().when()
 		
-		doNothing().when(mockCtxAccessController).checkPermission(requestor, mockIdentityLocal, 
-				new CtxPermission(ctxAssocHasParam.getId(), CtxPermission.READ));
+		doNothing().when(mockCtxAccessController).checkPermission(requestor, 
+				ctxAssocHasParam.getId(), ActionConstants.READ);
 		
 		//doNothing().when(internalCtxBroker).getLocalRequestor()
 		
@@ -512,7 +512,7 @@ public class ExternalCtxBrokerTest {
 
 		// mock checkPermission
 		doNothing().when(mockCtxAccessController).checkPermission(
-				requestor, mockIdentityLocal, new CtxPermission(emptyAttribute.getId(), CtxPermission.WRITE));
+				requestor, emptyAttribute.getId(), ActionConstants.WRITE);
 
 		// Set the attribute's initial value
 		emptyAttribute.setIntegerValue(100);
@@ -567,8 +567,7 @@ public class ExternalCtxBrokerTest {
 		emptyAttribute = this.ctxBroker.createAttribute(requestor, deviceEntity.getId(), "attrType").get();
 
 		doThrow(new CtxAccessControlException()).when(mockCtxAccessController).checkPermission(
-				requestor, mockIdentityLocal, 
-				new CtxPermission(emptyAttribute.getId(), CtxPermission.WRITE));
+				requestor, emptyAttribute.getId(), ActionConstants.WRITE);
 
 		// Set the attribute's initial value
 		emptyAttribute.setIntegerValue(100);
@@ -589,8 +588,7 @@ public class ExternalCtxBrokerTest {
 
 		// mock checkPermission
 		doNothing().when(mockCtxAccessController).checkPermission(
-				requestor, mockIdentityLocal, 
-				new CtxPermission(ctxAttributeLocationCoords1.getId(), CtxPermission.WRITE));
+				requestor, ctxAttributeLocationCoords1.getId(), ActionConstants.WRITE);
 
 		MockBlobClass coordinatesValue = new MockBlobClass(125125);
 		ctxAttributeLocationCoords1.setBinaryValue(SerialisationHelper.serialise(coordinatesValue));
@@ -601,8 +599,7 @@ public class ExternalCtxBrokerTest {
 
 		// mock checkPermission
 		doNothing().when(mockCtxAccessController).checkPermission(
-				requestor, mockIdentityLocal, 
-				new CtxPermission(ctxAttributeLocationSymb.getId(), CtxPermission.WRITE));
+				requestor, ctxAttributeLocationSymb.getId(), ActionConstants.WRITE);
 
 		ctxAttributeLocationSymb.setStringValue("Athens");
 		this.ctxBroker.update(requestor,ctxAttributeLocationSymb);
@@ -615,8 +612,7 @@ public class ExternalCtxBrokerTest {
 
 		// mock checkPermission
 		doNothing().when(mockCtxAccessController).checkPermission(
-				requestor, mockIdentityLocal, 
-				new CtxPermission(ctxAttributeLocationCoords2.getId(), CtxPermission.WRITE));
+				requestor, ctxAttributeLocationCoords2.getId(), ActionConstants.WRITE);
 
 		MockBlobClass coordinatesValue2 = new MockBlobClass(135135);
 		ctxAttributeLocationCoords2.setBinaryValue(SerialisationHelper.serialise(coordinatesValue2));
@@ -627,8 +623,7 @@ public class ExternalCtxBrokerTest {
 
 		// mock checkPermission
 		doNothing().when(mockCtxAccessController).checkPermission(
-				requestor, mockIdentityLocal, 
-				new CtxPermission(ctxAttributeLocationSymb2.getId(), CtxPermission.WRITE));
+				requestor, ctxAttributeLocationSymb2.getId(), ActionConstants.WRITE);
 
 		ctxAttributeLocationSymb2.setStringValue("Caracas");
 		this.ctxBroker.update(requestor,ctxAttributeLocationSymb2);
@@ -648,8 +643,7 @@ public class ExternalCtxBrokerTest {
 
 		// mock checkPermission
 		doNothing().when(mockCtxAccessController).checkPermission(
-				requestor, mockIdentityLocal, 
-				new CtxPermission(entId, CtxPermission.READ));
+				requestor, entId, ActionConstants.READ);
 
 		CtxEntity ent1 = (CtxEntity) this.ctxBroker.retrieve(requestor, entId).get();
 		Set<CtxAttribute> atrrSet1 = ent1.getAttributes(CtxAttributeTypes.LOCATION_SYMBOLIC);
@@ -677,7 +671,4 @@ public class ExternalCtxBrokerTest {
 			}		
 		 */
 	}
-
-	
-
 }

@@ -89,32 +89,6 @@ public interface ICis extends ICisRemote{
 	 */
 	public void getMembershipCriteria(ICisManagerCallback callback);
 
-	
-	/**
-	 * Get info from a CIS.
-	 * The callback must be able to retrieve a community object
-	 * defined at org.societies.api.schema.cis.community 
-	 * it has the  info from the CIS
-	 * 
-	 * 
-	 * @param callback callback function
-	 */
-	@Deprecated
-    public void getInfo(ICisManagerCallback callback);
-	
-
-
-    /**
-     * Get list of members from a CIS.
-     * The callback must be able to retrieve a community object
-     * defined at org.societies.api.schema.cis.community 
-     * which will have a Who with a list of Participant objects
-     * 
-     * @param callback callback function
-     */
-    @Deprecated
-    public void getListOfMembers(ICisManagerCallback callback);
-
 
     
 	/**

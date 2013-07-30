@@ -24,8 +24,6 @@
  */
 package org.societies.api.context.model;
 
-import java.io.Serializable;
-
 /**
  * This class is used to represent context bonds among members of a 
  * {@link CommunityCtxEntity}. Each bond refers to a {@link CtxAttribute} of a

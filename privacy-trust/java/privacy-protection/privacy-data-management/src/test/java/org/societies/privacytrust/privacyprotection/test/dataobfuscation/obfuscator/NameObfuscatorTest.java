@@ -80,23 +80,23 @@ public class NameObfuscatorTest {
 		}
 		// Verify
 		assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
-		LOG.info("### Orginal name:\n"+obfuscator.getDataWrapper().getData().toString());
-		LOG.info("### Obfuscated name:\n"+obfuscatedDataWrapper.getData().toString());
+		LOG.info("### Orginal name:\n"+NameUtils.toString((Name) obfuscator.getDataWrapper().getData()));
+		LOG.info("### Obfuscated name:\n"+NameUtils.toString((Name) obfuscatedDataWrapper.getData()));
 		Name actual = (Name) obfuscatedDataWrapper.getData();
 		if (0 == obfuscationLevel) {
 			Name expected = NameUtils.create("", "");
 			assertTrue("Data not well obfuscated (expected: "+NameUtils.toString(expected)+" but was "+NameUtils.toString(actual)+")", NameUtils.equals(actual, expected));
 		}
-		else if (1/4 == obfuscationLevel) {
+		else if ((double)1/(double)4 == obfuscationLevel) {
 			Name expected = NameUtils.create("O.", "M.");
 			assertTrue("Data not well obfuscated (expected: "+NameUtils.toString(expected)+" but was "+NameUtils.toString(actual)+")", NameUtils.equals(actual, expected));
 		}
-		else if (2/4 == obfuscationLevel) {
-			Name expected = NameUtils.create("Olivier", "");
+		else if ((double)2/(double)4 == obfuscationLevel) {
+			Name expected = NameUtils.create("Olivier", "M.");
 			assertTrue("Data not well obfuscated (expected: "+NameUtils.toString(expected)+" but was "+NameUtils.toString(actual)+")", NameUtils.equals(actual, expected));
 		}
-		else if (3/4 == obfuscationLevel) {
-			Name expected = NameUtils.create("", "Maridat");
+		else if ((double)3/(double)4 == obfuscationLevel) {
+			Name expected = NameUtils.create("O.", "Maridat");
 			assertTrue("Data not well obfuscated (expected: "+NameUtils.toString(expected)+" but was "+NameUtils.toString(actual)+")", NameUtils.equals(actual, expected));
 		}
 		else if (1 == obfuscationLevel) {
@@ -118,8 +118,8 @@ public class NameObfuscatorTest {
 		}
 		// Verify
 		assertNotNull("Obfuscated data null", obfuscatedDataWrapper);
-		LOG.info("### Orginal name:\n"+obfuscator.getDataWrapper().getData().toString());
-		LOG.info("### Obfuscated name:\n"+obfuscatedDataWrapper.getData().toString());
+		LOG.info("### Orginal name:\n"+NameUtils.toString((Name) obfuscator.getDataWrapper().getData()));
+		LOG.info("### Obfuscated name:\n"+NameUtils.toString((Name) obfuscatedDataWrapper.getData()));
 		Name actual = (Name) obfuscatedDataWrapper.getData();
 		if (obfuscationLevel < 0) {
 			Name expected = NameUtils.create("", "");

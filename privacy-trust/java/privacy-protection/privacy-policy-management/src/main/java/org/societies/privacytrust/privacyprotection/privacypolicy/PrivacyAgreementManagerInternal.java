@@ -156,7 +156,7 @@ public class PrivacyAgreementManagerInternal implements IPrivacyAgreementManager
 			else {
 				agreementId = agreementIdList.get(0);
 			}
-			
+
 			// - Remove from context
 			ctxBroker.remove(agreementId);
 			return true;
@@ -166,7 +166,7 @@ public class PrivacyAgreementManagerInternal implements IPrivacyAgreementManager
 			LOG.error("[Error deleteAgreement] Can't find the agreement.", e);
 		} catch (ExecutionException e) {
 			LOG.error("[Error deleteAgreement] Can't find the agreement.", e);
-			
+
 		}
 		return false;
 	}
@@ -227,7 +227,7 @@ public class PrivacyAgreementManagerInternal implements IPrivacyAgreementManager
 		}
 		return CtxAttributeTypes.PRIVACY_POLICY_AGREEMENT+requestor.hashCode();
 	}
-	
+
 	/**
 	 * To find the agreement id on the context
 	 * @param requestor

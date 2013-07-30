@@ -12,7 +12,7 @@
                     interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/>
 
     <osgi:reference id="internalCtxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker"/>
-
+    <osgi:reference id="eventManager" interface="org.societies.api.osgi.event.IEventMgr" />
     <!--TODO : Should not be using cardinality 0..1, this needs to be updated but since privacy api changed and IPrivacyPolicyManagerRemote
     no longer available, not just cardinality that needs to be changed, code does too. So leaving this for now, as that bundle deploys -->
 <!--     <osgi:reference id="privacyPolicyManager"
@@ -43,5 +43,8 @@
     <osgi:reference id="trustEvidenceCollector" interface="org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector"/>
 
 	<osgi:reference id="cssLocalManager" interface="org.societies.api.internal.css.ICSSInternalManager"/>
+
+	<osgi:reference id="cauiPrediction" interface="org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction">
+	</osgi:reference>
 
 </beans>

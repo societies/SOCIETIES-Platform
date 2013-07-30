@@ -1,0 +1,121 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.societies.api.display</groupId>
+	<artifactId>societies-api-display</artifactId>
+	<name>SOCIETIES Display Driver API</name>
+	<!-- the api version is the same as the release -->
+	<version>${release.version}</version>
+	<!-- the packaging tag enables the creation of the correct manifest using 
+		the maven-bundle-plugin -->
+	<packaging>bundle</packaging>
+
+
+
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<version>RELEASE</version>
+	</parent>
+
+	<dependencies>
+		<!-- add your dependencies here -->
+		<dependency>
+			<groupId>org.societies.api.display</groupId>
+			<artifactId>societies-display-schema</artifactId>
+			<version>${release.version}</version>
+		</dependency>
+		<!-- Needed for OSGI (Internal) Event -->
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<version>4.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.simpleframework</groupId>
+			<artifactId>simple-xml</artifactId>
+			<version>2.6.4</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.maven.converters</groupId>
+			<artifactId>SimpleXMLConverters</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- Needed for Societies-specific annotations -->
+		<!-- <dependency> -->
+		<!-- <groupId>org.societies.utilities</groupId> -->
+		<!-- <artifactId>societies-annotations</artifactId> -->
+		<!-- <version>${release.version}</version> -->
+		<!-- </dependency> -->
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<!-- the API will export all interfaces packages for the rest of modules. 
+							The exclusion of internal package can be avoided as the plugin excludes automatically 
+							'internal' and 'impl' package names org.societies.api.** -->
+						<_exportcontents>
+							!org.societies.api.display.schema,
+							*
+						</_exportcontents>
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
+							<version>${release.version}</version>
+							<type>bundle</type>
+							<overWrite>true</overWrite>
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<reportPlugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-javadoc-plugin</artifactId>
+							<version>2.8</version>
+						</plugin>
+					</reportPlugins>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

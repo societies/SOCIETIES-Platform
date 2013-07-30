@@ -107,9 +107,7 @@ import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyBehaviourConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.springframework.scheduling.annotation.AsyncResult;
-//import org.societies.api.comm.xmpp.pubsub.PubsubClient;
-//import org.societies.api.schema.cis.community.Leave;
-//import org.societies.api.schema.cis.community.Leave;
+
 
 
 // this is the class which manages all the CIS from a CSS
@@ -305,10 +303,7 @@ public class CisManager implements ICisManager, IFeatureServer {
 	public void init() {		
 		this.isDepencyInjectionDone(); // TODO: move this to other parts of the code and
 		// throw exceptions
-		
-		while (getiCommMgr().getIdManager() ==null)
-			;//just wait untill the XCommanager is ready
-		
+
 		cisManagerId = getiCommMgr().getIdManager().getThisNetworkNode();
 		LOG.info("Jid = " + cisManagerId.getBareJid() + ", domain = " + cisManagerId.getDomain() );
 
@@ -320,9 +315,7 @@ public class CisManager implements ICisManager, IFeatureServer {
 
 		LOG.info("listener registered");
 		
-		// testing to add hard coded context atributtes
-		//this.addHardCodedQualifications();
-		//polManager.inferPrivacyPolicy(PrivacyPolicyTypeConstants.CIS, null);
+
 		startup();
 		LOG.info("CISManager started up with "+this.ownedCISs.size()
 				+" owned CISes and "+this.subscribedCISs.size()+" subscribed CISes");
@@ -646,8 +639,6 @@ public class CisManager implements ICisManager, IFeatureServer {
 				
 				//TODO: check if the sender is allowed to create a CIS
 				Create create = c.getCreate(); 
-				//String ownerJid = create.getCommunity().getOwnerJid(); // TODO: owner must be retrieved other way
-				//String cisJid = create.getCommunityJid();
 				String cisType = create.getCommunity().getCommunityType();
 				String cisName = create.getCommunity().getCommunityName();
 				String cisDescription;
@@ -873,7 +864,8 @@ public class CisManager implements ICisManager, IFeatureServer {
 
 			CommunityManager c = (CommunityManager) payload;
 
-			// >>>>>>>>>>>>>>>>>>>>>>>>>>>>treating getSubscribedTo notifications >>>>>>>>>>>>>>>>>>>>>>>>>>>>
+			// this notification will be received only if the user is ADDED by another CSS
+			// if he joins, the subscription will come through the join callback
 			if (c.getNotification().getSubscribedTo()!= null) {
 				LOG.info("subscribedTo received");
 				this.subscribeToCis(new CisRecord(c.getNotification().getSubscribedTo().getCommunity().getCommunityName(), 
@@ -933,10 +925,6 @@ public class CisManager implements ICisManager, IFeatureServer {
 		return null;
 	}
 	
-	@Deprecated
-	public boolean deleteCis(String cssId, String cssPassword, String cisId){
-		return false;
-	}
 
 	@Override
 	public boolean deleteCis(String cisId) {
@@ -964,7 +952,7 @@ public class CisManager implements ICisManager, IFeatureServer {
 			 Cis element = it.next();
 			 if(element.getName().contains(name))
 			 l.add(element);
-			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
+
 	     }
 		
 		Iterator<CisSubscribedImp> it2 = this.getSubscribedCISs().iterator();
@@ -972,7 +960,7 @@ public class CisManager implements ICisManager, IFeatureServer {
 			CisSubscribedImp element = it2.next();
 			 if(element.getName().contains(name))
 			 l.add(element);
-			 //LOG.info("CIS with id " + element.getCisRecord().getCisId());
+			 
 	     }
 		
 		return l;
@@ -1055,7 +1043,6 @@ public class CisManager implements ICisManager, IFeatureServer {
 			session.save(o);
 			t.commit();
 			LOG.info("Saving CIS object succeded!");
-//			Query q = session.createQuery("select o from Cis aso");
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -1064,9 +1051,7 @@ public class CisManager implements ICisManager, IFeatureServer {
 		}finally{
 			if(session!=null){
 				session.close();
-				//session = sessionFactory.openSession();
-				//LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
-				//session.close();
+
 			}
 			
 		}
@@ -1079,7 +1064,6 @@ public class CisManager implements ICisManager, IFeatureServer {
 			session.update(o);
 			t.commit();
 			LOG.info("Updated CIS object succeded!");
-//			Query q = session.createQuery("select o from Cis aso");
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -1088,9 +1072,6 @@ public class CisManager implements ICisManager, IFeatureServer {
 		}finally{
 			if(session!=null){
 				session.close();
-				//session = sessionFactory.openSession();
-				//LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
-				//session.close();
 			}
 			
 		}
@@ -1103,7 +1084,6 @@ public class CisManager implements ICisManager, IFeatureServer {
 			session.delete(o);
 			t.commit();
 			LOG.info("Deleting object in CisManager succeded!");
-//			Query q = session.createQuery("select o from Cis aso");
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -1112,9 +1092,6 @@ public class CisManager implements ICisManager, IFeatureServer {
 		}finally{
 			if(session!=null){
 				session.close();
-				//session = sessionFactory.openSession();
-				//LOG.info("checkquery returns: "+session.createCriteria(Cis.class).list().size()+" hits ");
-				//session.close();
 			}
 		}
 	}
@@ -1126,7 +1103,6 @@ public class CisManager implements ICisManager, IFeatureServer {
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 		LOG.info("in setsessionfactory!! sessionFactory is: "+sessionFactory);
-		//ActivityFeed.setStaticSessionFactory(sessionFactory);
 		for(Cis cis : ownedCISs)
 			cis.setSessionFactory(sessionFactory);
 	}

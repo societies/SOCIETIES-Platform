@@ -312,7 +312,16 @@
 		</xs:complexType>
 	</xs:element>
 	
-	<xs:element name='leave' type='empty' />
+	<xs:element name='leave' >
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base='empty'>
+					<xs:attribute name='jid' type='xs:string'/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	
 	<xs:element name='invite'>
 		<xs:complexType>
 			<xs:simpleContent>
