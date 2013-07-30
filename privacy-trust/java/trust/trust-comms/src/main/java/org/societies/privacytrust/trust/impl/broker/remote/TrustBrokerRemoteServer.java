@@ -50,6 +50,7 @@ import org.societies.api.schema.privacytrust.trust.broker.TrustValueRequestBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustValueResponseBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustRelationshipBean;
 import org.societies.api.privacytrust.trust.ITrustBroker;
+import org.societies.api.privacytrust.trust.TrustQuery;
 import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
 import org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator;
 import org.societies.api.privacytrust.trust.model.TrustRelationship;
@@ -91,8 +92,7 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 	
 	TrustBrokerRemoteServer() {
 		
-		if (LOG.isInfoEnabled())
-			LOG.info(this.getClass() + " instantiated");
+		LOG.info("{} instantiated", this.getClass());
 	}
 	
 	/*
@@ -124,8 +124,7 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 		if (payload == null)
 			throw new NullPointerException("payload can't be null");
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("getQuery: stanza=" + stanza + ", payload=" + payload);
+		LOG.debug("getQuery: stanza={}, payload={}", stanza, payload);
 		
 		if (!(payload instanceof TrustBrokerRequestBean))
 			throw new XMPPError(StanzaError.bad_request, "Unknown request bean class: "
@@ -135,8 +134,7 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 		final TrustBrokerResponseBean responseBean = new TrustBrokerResponseBean();
 		responseBean.setMethodName(requestBean.getMethodName());
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("getQuery: requestBean.getMethodName()=" + requestBean.getMethodName());
+		LOG.debug("getQuery: requestBean.getMethodName()={}", requestBean.getMethodName());
 		if (MethodName.RETRIEVE_TRUST_RELATIONSHIPS.equals(requestBean.getMethodName())) {
 			
 			final TrustRelationshipsRequestBean trustRelationshipsRequestBean =
@@ -173,19 +171,18 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 						&& trustRelationshipsRequestBean.getTrusteeType() == null
 						&& trustRelationshipsRequestBean.getTrustValueType() == null) {
 					
-					if (LOG.isDebugEnabled())
-						LOG.debug("getQuery: requestor=" + requestor + ", trustorId=" + trustorId);
+					LOG.debug("getQuery: requestor={}, trustorId={}", requestor, trustorId);
 					result = this.trustBroker.retrieveTrustRelationships(
-							requestor, trustorId).get();
+							requestor, new TrustQuery(trustorId)).get();
 					
 				} else if (trustRelationshipsRequestBean.getTrusteeId() != null) {
 				
 					final TrustedEntityId trusteeId = TrustModelBeanTranslator.getInstance().
 							fromTrustedEntityIdBean(trustRelationshipsRequestBean.getTrusteeId());
-					if (LOG.isDebugEnabled())
-						LOG.debug("getQuery: requestor=" + requestor + ", trustorId=" + trustorId + ", trusteeId=" + trusteeId);
+					LOG.debug("getQuery: requestor={}, trustorId={}, trusteeId={}",
+							new Object[] { requestor, trustorId, trusteeId });
 					result = this.trustBroker.retrieveTrustRelationships(
-							requestor, trustorId, trusteeId).get();
+							requestor, new TrustQuery(trustorId).setTrusteeId(trusteeId)).get();
 					
 				} else if (trustRelationshipsRequestBean.getTrusteeType() != null) {
 				
@@ -195,26 +192,27 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 				
 						final TrustValueType trustValueType = TrustModelBeanTranslator.getInstance().
 								fromTrustValueTypeBean(trustRelationshipsRequestBean.getTrustValueType());
-						if (LOG.isDebugEnabled())
-							LOG.debug("getQuery: requestor=" + requestor + ", trustorId=" + trustorId + ", trusteeType=" + trusteeType + ", trustValueType=" + trustValueType);
+						LOG.debug("getQuery: requestor={}, trustorId={}, trusteeType={}, trustValueType={}", 
+								new Object[] { requestor, trustorId, trustValueType });
 						result = this.trustBroker.retrieveTrustRelationships(
-								requestor, trustorId, trusteeType, trustValueType).get();
+								requestor, new TrustQuery(trustorId).setTrusteeType(trusteeType)
+								.setTrustValueType(trustValueType)).get();
 						
 					} else { // if (trustRelationshipsRequestBean.getTrustValueType() == null)
 				
-						if (LOG.isDebugEnabled())
-							LOG.debug("getQuery: requestor=" + requestor + ", trustorId=" + trustorId + ", trusteeType=" + trusteeType);
+						LOG.debug("getQuery: requestor={}, trustorId={}, trusteeType={}",
+									new Object[] { requestor, trustorId, trusteeType });
 						result = this.trustBroker.retrieveTrustRelationships(
-								requestor, trustorId, trusteeType).get();
+								requestor, new TrustQuery(trustorId).setTrusteeType(trusteeType)).get();
 					}
 				} else if (trustRelationshipsRequestBean.getTrustValueType() != null) {
 
 					final TrustValueType trustValueType = TrustModelBeanTranslator.getInstance().
 							fromTrustValueTypeBean(trustRelationshipsRequestBean.getTrustValueType());
-					if (LOG.isDebugEnabled())
-							LOG.debug("getQuery: requestor=" + requestor + ", trustorId=" + trustorId + ", trustValueType=" + trustValueType);
+					LOG.debug("getQuery: requestor={}, trustorId={}, trustValueType={}",
+							new Object[] { requestor, trustorId, trustValueType });
 					result = this.trustBroker.retrieveTrustRelationships(
-							requestor, trustorId, trustValueType).get();
+							requestor, new TrustQuery(trustorId).setTrustValueType(trustValueType)).get();
 				} else {
 					LOG.error("Invalid TrustBroker remote retrieve trust relationships request: "
 							+ "Missing parameters");
@@ -226,9 +224,10 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 				final TrustRelationshipsResponseBean trustRelationshipsResponseBean = 
 						new TrustRelationshipsResponseBean();
 				final List<TrustRelationshipBean> resultBean = new ArrayList<TrustRelationshipBean>();
-				for (final TrustRelationship trustRelationship : result)
+				for (final TrustRelationship trustRelationship : result) {
 					resultBean.add(TrustModelBeanTranslator.getInstance().
 							fromTrustRelationship(trustRelationship));
+				}
 				trustRelationshipsResponseBean.setResult(resultBean);
 				responseBean.setRetrieveTrustRelationships(trustRelationshipsResponseBean);
 				
@@ -300,16 +299,18 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 						fromTrustedEntityIdBean(trustRelationshipRequestBean.getTrusteeId());
 				final TrustValueType trustValueType = TrustModelBeanTranslator.getInstance().
 						fromTrustValueTypeBean(trustRelationshipRequestBean.getTrustValueType());
-				if (LOG.isDebugEnabled())
-					LOG.debug("getQuery: requestor=" + requestor + ", trustorId=" + trustorId + ", trusteeId=" + trusteeId + ", trustValueType=" + trustValueType);
+				LOG.debug("getQuery: requestor={}, trustorId={}, trusteeId={}, trustValueType={}",
+						new Object[] { requestor, trustorId, trusteeId, trustValueType });
 				final TrustRelationship result = this.trustBroker.retrieveTrustRelationship(
-						requestor, trustorId, trusteeId, trustValueType).get();
+						requestor, new TrustQuery(trustorId).setTrusteeId(trusteeId)
+						.setTrustValueType(trustValueType)).get();
 				
 				final TrustRelationshipResponseBean trustRelationshipResponseBean = 
 						new TrustRelationshipResponseBean(); 
-				if (result != null)
+				if (result != null) {
 					trustRelationshipResponseBean.setResult(
 							TrustModelBeanTranslator.getInstance().fromTrustRelationship(result));
+				}
 				responseBean.setRetrieveTrustRelationship(trustRelationshipResponseBean);
 				
 			} catch (MalformedTrustedEntityIdException mteide) {
@@ -377,13 +378,17 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 						fromTrustedEntityIdBean(trustValueRequestBean.getTrusteeId());
 				final TrustValueType trustValueType = TrustModelBeanTranslator.getInstance().
 						fromTrustValueTypeBean(trustValueRequestBean.getTrustValueType());
+				LOG.debug("getQuery: requestor={}, trustorId={}, trusteeId={}, trustValueType={}",
+						new Object[] { requestor, trustorId, trusteeId, trustValueType });
 				final Double result = this.trustBroker.retrieveTrustValue(
-						requestor, trustorId, trusteeId, trustValueType).get();
+						requestor, new TrustQuery(trustorId).setTrusteeId(trusteeId)
+						.setTrustValueType(trustValueType)).get();
 				
 				final TrustValueResponseBean trustValueResponseBean = 
 						new TrustValueResponseBean(); 
-				if (result != null)
+				if (result != null) {
 					trustValueResponseBean.setResult(result);
+				}
 				responseBean.setRetrieveTrustValue(trustValueResponseBean);
 				
 			} catch (MalformedTrustedEntityIdException mteide) {
@@ -418,8 +423,8 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 	 */
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
-		// TODO Auto-generated method stub
 		
+		LOG.warn("Received unexpected message: staza={}, payload={}", stanza, payload);
 	}
 
 	/*
@@ -427,7 +432,9 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 	 */
 	@Override
 	public Object setQuery(Stanza stanza, Object payload) throws XMPPError {
-		// TODO Auto-generated method stub
+		
+		LOG.warn("Received unexpected setQuery request: staza={}, payload={}", stanza, payload);
+		
 		return null;
 	}
 }
