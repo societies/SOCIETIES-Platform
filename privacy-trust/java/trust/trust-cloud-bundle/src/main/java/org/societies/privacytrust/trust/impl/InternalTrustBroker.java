@@ -88,8 +88,7 @@ public class InternalTrustBroker implements ITrustBroker {
 			
 	InternalTrustBroker() {
 		
-		if (LOG.isInfoEnabled())
-			LOG.info(this.getClass() + " instantiated");
+		LOG.info("{} instantiated", this.getClass());
 	}
 	
 	/*
@@ -131,13 +130,14 @@ public class InternalTrustBroker implements ITrustBroker {
 		if (query == null)
 			throw new NullPointerException("query can't be null");
 		
-		if (query.getTrusteeId() != null)
+		if (query.getTrusteeId() != null) {
 			return this.doRetrieveTrustRelationships(requestor, 
 					query.getTrustorId(), query.getTrusteeId());
-		else
+		} else {
 			return this.doRetrieveTrustRelationshipsByType(requestor, 
 					query.getTrustorId(), query.getTrusteeType(),
 					query.getTrustValueType());
+		}
 	}
 	
 	/*
@@ -151,13 +151,14 @@ public class InternalTrustBroker implements ITrustBroker {
 		if (query == null)
 			throw new NullPointerException("query can't be null");
 		
-		if (query.getTrusteeId() != null)
+		if (query.getTrusteeId() != null) {
 			return this.doRetrieveTrustRelationships(null, 
 					query.getTrustorId(), query.getTrusteeId());
-		else
+		} else {
 			return this.doRetrieveTrustRelationshipsByType(null, 
 					query.getTrustorId(), query.getTrusteeType(),
 					query.getTrustValueType());
+		}
 	}
 
 	/*
@@ -171,13 +172,14 @@ public class InternalTrustBroker implements ITrustBroker {
 		if (query == null)
 			throw new NullPointerException("query can't be null");
 		
-		if (query.getTrusteeId() != null)
+		if (query.getTrusteeId() != null) {
 			return this.doRetrieveExtTrustRelationships( 
 					query.getTrustorId(), query.getTrusteeId());
-		else
+		} else {
 			return this.doRetrieveExtTrustRelationshipsByType( 
 					query.getTrustorId(), query.getTrusteeType(),
 					query.getTrustValueType());
+		}
 	}
 	
 	/*
@@ -207,51 +209,48 @@ public class InternalTrustBroker implements ITrustBroker {
 		if (requestor == null)
 			requestor = this.trustNodeMgr.getLocalRequestor();
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving all trust relationships between trustor '" 
-					+ trustorId	+ "' and trustee '" + trusteeId 
-					+ "' on behalf of requestor '" + requestor + "'");
+		LOG.debug("Retrieving all trust relationships between trustor '{}'" 
+				+ " and trustee '{}' on behalf of requestor '{}'",
+				new Object[] { trustorId, trusteeId, requestor });
 		
 		final Set<TrustRelationship> trustRelationships =
 				new LinkedHashSet<TrustRelationship>();
 		try {
 			final boolean doLocal = (this.trustNodeMgr.getMyIds().contains(trustorId) 
 					&& this.trustNodeMgr.isMaster());
-			if (LOG.isDebugEnabled())
-				LOG.debug("doLocal for trustor '" + trustorId + "' is " + doLocal);
+			LOG.debug("doLocal for trustor '{}' is {}", trustorId, doLocal);
 			if (doLocal) { // L O C A L
 
-				if (this.trustRepo == null)
+				if (this.trustRepo == null) {
 					throw new TrustBrokerException(
-							"Could not retrieve all trust relationships between trustor '" 
-							+ trustorId	+ "' and trustee '" + trusteeId 
-							+ "' on behalf of requestor '" + requestor + "'" 
-							+ "': ITrustRepository service is not available");
+							"ITrustRepository service is not available");
+				}
 				final ITrustedEntity entity = this.trustRepo.retrieveEntity(trustorId, trusteeId);
 				if (entity != null) {
 					
-					if (entity.getDirectTrust().getValue() != null)
+					if (entity.getDirectTrust().getValue() != null) {
 						trustRelationships.add(new TrustRelationship(trustorId, trusteeId, 
 								TrustValueType.DIRECT, entity.getDirectTrust().getValue(), 
 								entity.getDirectTrust().getLastUpdated()));
-					if (entity.getIndirectTrust().getValue() != null)
+					}
+					if (entity.getIndirectTrust().getValue() != null) {
 						trustRelationships.add(new TrustRelationship(trustorId, trusteeId, 
 								TrustValueType.INDIRECT, entity.getIndirectTrust().getValue(), 
 								entity.getIndirectTrust().getLastUpdated()));
-					if (entity.getUserPerceivedTrust().getValue() != null)
+					}
+					if (entity.getUserPerceivedTrust().getValue() != null) {
 						trustRelationships.add(new TrustRelationship(trustorId, trusteeId, 
 								TrustValueType.USER_PERCEIVED, entity.getUserPerceivedTrust().getValue(), 
 								entity.getUserPerceivedTrust().getLastUpdated()));
+					}
 				}
 
 			} else { // R E M O T E
 
-				if (this.trustBrokerRemoteClient == null)
+				if (this.trustBrokerRemoteClient == null) {
 					throw new TrustBrokerException(
-							"Could not retrieve all trust relationships between trustor '" 
-							+ trustorId	+ "' and trustee '" + trusteeId 
-							+ "' on behalf of requestor '" + requestor + "'"
-							+ "': ITrustBrokerRemoteClient service is not available");
+							"ITrustBrokerRemoteClient service is not available");
+				}
 
 				final RemoteClientCallback callback = new RemoteClientCallback();
 				this.trustBrokerRemoteClient.retrieveTrustRelationships(
@@ -275,11 +274,7 @@ public class InternalTrustBroker implements ITrustBroker {
 			}
 			
 		} catch (ServiceUnavailableException sue) {
-			throw new TrustBrokerException(
-					"Could not retrieve all trust relationships between trustor '" 
-					+ trustorId	+ "' and trustee '" + trusteeId 
-					+ "' on behalf of requestor '" + requestor + "'" 
-					+ "': " + sue.getLocalizedMessage(), sue);
+			throw new TrustBrokerException(sue.getLocalizedMessage(), sue);
 		}
 			
 		return new AsyncResult<Set<TrustRelationship>>(trustRelationships);
@@ -290,52 +285,52 @@ public class InternalTrustBroker implements ITrustBroker {
 			final TrustedEntityId trustorId, final TrustedEntityId trusteeId) 
 					throws TrustException {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving all (extended) trust relationships between trustor '" 
-					+ trustorId	+ "' and trustee '" + trusteeId + "'");
+		LOG.debug("Retrieving all (extended) trust relationships between trustor '{}'" 
+				+ " and trustee '{}'", trustorId, trusteeId);
 		
-		if (!this.trustNodeMgr.getMyIds().contains(trustorId))
+		if (!this.trustNodeMgr.getMyIds().contains(trustorId)) {
 			throw new TrustAccessControlException("Trustor '" + trustorId 
 					+ "' is not recognised as a local CSS");
+		}
 		
 		final Set<ExtTrustRelationship> trustRelationships =
 				new LinkedHashSet<ExtTrustRelationship>();
 		try {
 			final boolean doLocal = (this.trustNodeMgr.isMaster());
-			if (LOG.isDebugEnabled())
-				LOG.debug("doLocal for trustor '" + trustorId + "' is " + doLocal);
+			LOG.debug("doLocal for trustor '{}' is {}", trustorId, doLocal);
 			if (doLocal) { // L O C A L
 
-				if (this.trustRepo == null)
+				if (this.trustRepo == null) {
 					throw new TrustBrokerException(
-							"Could not retrieve all (extended) trust relationships between trustor '" 
-							+ trustorId	+ "' and trustee '" + trusteeId
-							+ "': ITrustRepository service is not available");
+							"ITrustRepository service is not available");
+				}
 				final ITrustedEntity entity = this.trustRepo.retrieveEntity(trustorId, trusteeId);
 				if (entity != null) {
 					// TODO Assign trust evidence per trust value type
 					final Set<TrustEvidence> trustEvidence = fromITrustedEvidence(entity.getEvidence());
-					if (entity.getDirectTrust().getValue() != null)
+					if (entity.getDirectTrust().getValue() != null) {
 						trustRelationships.add(new ExtTrustRelationship(trustorId, trusteeId, 
 								TrustValueType.DIRECT, entity.getDirectTrust().getValue(), 
 								entity.getDirectTrust().getLastUpdated(), trustEvidence));
-					if (entity.getIndirectTrust().getValue() != null)
+					}
+					if (entity.getIndirectTrust().getValue() != null) {
 						trustRelationships.add(new ExtTrustRelationship(trustorId, trusteeId, 
 								TrustValueType.INDIRECT, entity.getIndirectTrust().getValue(), 
 								entity.getIndirectTrust().getLastUpdated(), trustEvidence));
-					if (entity.getUserPerceivedTrust().getValue() != null)
+					}
+					if (entity.getUserPerceivedTrust().getValue() != null) {
 						trustRelationships.add(new ExtTrustRelationship(trustorId, trusteeId, 
 								TrustValueType.USER_PERCEIVED, entity.getUserPerceivedTrust().getValue(), 
 								entity.getUserPerceivedTrust().getLastUpdated(), trustEvidence));
+					}
 				}
 
 			} else { // R E M O T E  ( I N T R A - C S S )
 
-				if (this.trustBrokerRemoteClient == null)
+				if (this.trustBrokerRemoteClient == null) {
 					throw new TrustBrokerException(
-							"Could not retrieve all (extended) trust relationships between trustor '" 
-							+ trustorId	+ "' and trustee '" + trusteeId 
-							+ "': ITrustBrokerRemoteClient service is not available");
+							"ITrustBrokerRemoteClient service is not available");
+				}
 				
 				throw new IllegalStateException("Unimplemented remote method call: "
 						+ "Retrieve all (extended) trust relationships between trustor '" 
@@ -362,10 +357,7 @@ public class InternalTrustBroker implements ITrustBroker {
 			}
 			
 		} catch (ServiceUnavailableException sue) {
-			throw new TrustBrokerException(
-					"Could not retrieve all (extended) trust relationships between trustor '" 
-					+ trustorId	+ "' and trustee '" + trusteeId 
-					+ "': " + sue.getLocalizedMessage(), sue);
+			throw new TrustBrokerException(sue.getLocalizedMessage(), sue);
 		}
 			
 		return new AsyncResult<Set<ExtTrustRelationship>>(trustRelationships);
@@ -452,62 +444,57 @@ public class InternalTrustBroker implements ITrustBroker {
 		if (requestor == null)
 			requestor = this.trustNodeMgr.getLocalRequestor();
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving trust relationship of type '" + trustValueType 
-					+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
-					+ "' on behalf of requestor '" + requestor + "'");
+		LOG.debug("Retrieving trust relationship of type '{}'" 
+				+ " assigned to entity '{}' by '{}'" 
+				+ " on behalf of requestor '{}'",
+				new Object[] {trustValueType, trusteeId, trustorId, requestor});
 		
 		TrustRelationship trustRelationship = null;
 		try {
 			final boolean doLocal = (this.trustNodeMgr.getMyIds().contains(trustorId) 
 					&& this.trustNodeMgr.isMaster());
-			if (LOG.isDebugEnabled())
-				LOG.debug("doLocal for trustor '" + trustorId + "' is " + doLocal);
+			LOG.debug("doLocal for trustor '{}' is {}", trustorId, doLocal);
 			if (doLocal) { // L O C A L
 
-				if (this.trustRepo == null)
+				if (this.trustRepo == null) {
 					throw new TrustBrokerException(
-							"Could not retrieve trust relationship of type '" + trustValueType 
-								+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
-								+ "' on behalf of requestor '" + requestor + "'" 
-							+ "': ITrustRepository service is not available");
+							"ITrustRepository service is not available");
+				}
 				final ITrustedEntity entity = this.trustRepo.retrieveEntity(trustorId, trusteeId);
 				if (entity != null) {
 					if (TrustValueType.DIRECT == trustValueType) {
-						if (entity.getDirectTrust().getValue() != null)
+						if (entity.getDirectTrust().getValue() != null) {
 							trustRelationship = new TrustRelationship(trustorId,
 									trusteeId, trustValueType, 
 									entity.getDirectTrust().getValue(),
 									entity.getDirectTrust().getLastUpdated());
+						}
 					} else if (TrustValueType.INDIRECT == trustValueType) {
-						if (entity.getIndirectTrust().getValue() != null)
+						if (entity.getIndirectTrust().getValue() != null) {
 							trustRelationship = new TrustRelationship(trustorId,
 									trusteeId, trustValueType,
 									entity.getIndirectTrust().getValue(),
 									entity.getIndirectTrust().getLastUpdated());
+						}
 					} else if (TrustValueType.USER_PERCEIVED == trustValueType) {
-						if (entity.getUserPerceivedTrust().getValue() != null)
+						if (entity.getUserPerceivedTrust().getValue() != null) {
 							trustRelationship = new TrustRelationship(trustorId,
 									trusteeId, trustValueType,
 									entity.getUserPerceivedTrust().getValue(),
 									entity.getUserPerceivedTrust().getLastUpdated());
+						}
 					} else {
 						throw new TrustBrokerException(
-								"Could not retrieve trust relationship of type '" + trustValueType 
-								+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
-								+ "' on behalf of requestor '" + requestor + "'" 
-								+ "': Unsupported trust value type '" + trustValueType + "'");
+								"Unsupported trust value type '" + trustValueType + "'");
 					}
 				}
 
 			} else { // R E M O T E
 
-				if (this.trustBrokerRemoteClient == null)
+				if (this.trustBrokerRemoteClient == null) {
 					throw new TrustBrokerException(
-							"Could not retrieve trust relationship of type '" + trustValueType
-							+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
-							+ "' on behalf of requestor '" + requestor + "'"
-							+ "': ITrustBrokerRemoteClient service is not available");
+							"ITrustBrokerRemoteClient service is not available");
+				}
 
 				final RemoteClientCallback callback = new RemoteClientCallback();
 				this.trustBrokerRemoteClient.retrieveTrustRelationship(
@@ -531,11 +518,7 @@ public class InternalTrustBroker implements ITrustBroker {
 			}
 			
 		} catch (ServiceUnavailableException sue) {
-			throw new TrustBrokerException(
-					"Could not retrieve trust relationship of type '" + trustValueType 
-					+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
-					+ "' on behalf of requestor '" + requestor + "'" 
-					+ "': " + sue.getLocalizedMessage(), sue);
+			throw new TrustBrokerException(sue.getLocalizedMessage(), sue);
 		}
 			
 		return new AsyncResult<TrustRelationship>(trustRelationship);
@@ -546,63 +529,62 @@ public class InternalTrustBroker implements ITrustBroker {
 			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
 			final TrustValueType trustValueType) throws TrustException {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving (extended) trust relationship of type '" + trustValueType 
-					+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId + "'");
+		LOG.debug("Retrieving (extended) trust relationship of type '{}'" 
+				+ " assigned to entity '{}' by '{}'",
+				new Object[] {trustValueType, trusteeId, trustorId});
 		
-		if (!this.trustNodeMgr.getMyIds().contains(trustorId))
+		if (!this.trustNodeMgr.getMyIds().contains(trustorId)) {
 			throw new TrustAccessControlException("Trustor '" + trustorId 
 					+ "' is not recognised as a local CSS");
+		}
 		
 		ExtTrustRelationship trustRelationship = null;
 		try {
 			final boolean doLocal = (this.trustNodeMgr.isMaster());
-			if (LOG.isDebugEnabled())
-				LOG.debug("doLocal for trustor '" + trustorId + "' is " + doLocal);
+			LOG.debug("doLocal for trustor '{}' is {}", trustorId, doLocal);
 			if (doLocal) { // L O C A L
 
-				if (this.trustRepo == null)
+				if (this.trustRepo == null) {
 					throw new TrustBrokerException(
-							"Could not retrieve (extended) trust relationship of type '" + trustValueType 
-								+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
-								+ "': ITrustRepository service is not available");
+							"ITrustRepository service is not available");
+				}
 				final ITrustedEntity entity = this.trustRepo.retrieveEntity(trustorId, trusteeId);
 				// TODO Assign trust evidence per trust value type
 				final Set<TrustEvidence> trustEvidence = fromITrustedEvidence(entity.getEvidence());
 				if (entity != null) {
 					if (TrustValueType.DIRECT == trustValueType) {
-						if (entity.getDirectTrust().getValue() != null)
+						if (entity.getDirectTrust().getValue() != null) {
 							trustRelationship = new ExtTrustRelationship(trustorId,
 									trusteeId, trustValueType, 
 									entity.getDirectTrust().getValue(),
 									entity.getDirectTrust().getLastUpdated(), trustEvidence);
+						}
 					} else if (TrustValueType.INDIRECT == trustValueType) {
-						if (entity.getIndirectTrust().getValue() != null)
+						if (entity.getIndirectTrust().getValue() != null) {
 							trustRelationship = new ExtTrustRelationship(trustorId,
 									trusteeId, trustValueType,
 									entity.getIndirectTrust().getValue(),
 									entity.getIndirectTrust().getLastUpdated(), trustEvidence);
+						}
 					} else if (TrustValueType.USER_PERCEIVED == trustValueType) {
-						if (entity.getUserPerceivedTrust().getValue() != null)
+						if (entity.getUserPerceivedTrust().getValue() != null) {
 							trustRelationship = new ExtTrustRelationship(trustorId,
 									trusteeId, trustValueType,
 									entity.getUserPerceivedTrust().getValue(),
 									entity.getUserPerceivedTrust().getLastUpdated(), trustEvidence);
+						}
 					} else {
 						throw new TrustBrokerException(
-								"Could not retrieve (extended) trust relationship of type '" + trustValueType 
-								+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
-								+ "': Unsupported trust value type '" + trustValueType + "'");
+								"Unsupported trust value type '" + trustValueType + "'");
 					}
 				}
 
 			} else { // R E M O T E ( I N T R A - C S S )
 
-				if (this.trustBrokerRemoteClient == null)
+				if (this.trustBrokerRemoteClient == null) {
 					throw new TrustBrokerException(
-							"Could not retrieve (extended) trust relationship of type '" + trustValueType
-							+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
-							+ "': ITrustBrokerRemoteClient service is not available");
+							"ITrustBrokerRemoteClient service is not available");
+				}
 				
 				throw new IllegalStateException("Unimplemented remote method call: "
 						+ "Retrieve all (extended) trust relationships between trustor '" 
@@ -630,10 +612,7 @@ public class InternalTrustBroker implements ITrustBroker {
 			}
 			
 		} catch (ServiceUnavailableException sue) {
-			throw new TrustBrokerException(
-					"Could not retrieve (extended) trust relationship of type '" + trustValueType 
-					+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
-					+ "': " + sue.getLocalizedMessage(), sue);
+			throw new TrustBrokerException(sue.getLocalizedMessage(), sue);
 		}
 			
 		return new AsyncResult<ExtTrustRelationship>(trustRelationship);
@@ -700,49 +679,42 @@ public class InternalTrustBroker implements ITrustBroker {
 		if (requestor == null)
 			requestor = this.trustNodeMgr.getLocalRequestor();
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving trust value of type '" + trustValueType 
-					+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
-					+ "' on behalf of requestor '" + requestor + "'");
+		LOG.debug("Retrieving trust value of type '{}'" 
+				+ " assigned to entity '{}' by '{}'" 
+				+ " on behalf of requestor '{}'",
+				new Object[] { trustValueType, trusteeId, trustorId, requestor });
 		
 		Double trustValue = null;
 		try {
 			final boolean doLocal = (this.trustNodeMgr.getMyIds().contains(trustorId) 
 					&& this.trustNodeMgr.isMaster());
-			if (LOG.isDebugEnabled())
-				LOG.debug("doLocal for trustor '" + trustorId + "' is " + doLocal);
+			LOG.debug("doLocal for trustor '{}' is {}", trustorId, doLocal);
 			if (doLocal) { // L O C A L
 
-				if (this.trustRepo == null)
+				if (this.trustRepo == null) {
 					throw new TrustBrokerException(
-							"Could not retrieve trust value of type '" + trustValueType 
-								+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
-								+ "' on behalf of requestor '" + requestor + "'" 
-							+ "': ITrustRepository service is not available");
+							"ITrustRepository service is not available");
+				}
 				final ITrustedEntity entity = this.trustRepo.retrieveEntity(trustorId, trusteeId);
 				if (entity != null) {
-					if (TrustValueType.DIRECT == trustValueType)
+					if (TrustValueType.DIRECT == trustValueType) {
 						trustValue = entity.getDirectTrust().getValue();
-					else if (TrustValueType.INDIRECT == trustValueType)
+					} else if (TrustValueType.INDIRECT == trustValueType) {
 						trustValue = entity.getIndirectTrust().getValue();
-					else if (TrustValueType.USER_PERCEIVED == trustValueType)
+					} else if (TrustValueType.USER_PERCEIVED == trustValueType) {
 						trustValue = entity.getUserPerceivedTrust().getValue();
-					else
+					} else {
 						throw new TrustBrokerException(
-								"Could not retrieve trust value of type '" + trustValueType 
-								+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
-								+ "' on behalf of requestor '" + requestor + "'" 
-								+ "': Unsupported trust value type '" + trustValueType + "'");
+								"Unsupported trust value type '" + trustValueType + "'");
+					}
 				}
 
 			} else { // R E M O T E
 
-				if (this.trustBrokerRemoteClient == null)
+				if (this.trustBrokerRemoteClient == null) {
 					throw new TrustBrokerException(
-							"Could not retrieve trust value of type '" + trustValueType
-							+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
-							+ "' on behalf of requestor '" + requestor + "'"
-							+ "': ITrustBrokerRemoteClient service is not available");
+							"ITrustBrokerRemoteClient service is not available");
+				}
 
 				final RemoteClientCallback callback = new RemoteClientCallback();
 				this.trustBrokerRemoteClient.retrieveTrustValue(
@@ -750,10 +722,11 @@ public class InternalTrustBroker implements ITrustBroker {
 				synchronized (callback) {
 					try {
 						callback.wait();
-						if (callback.getException() == null)
+						if (callback.getException() == null) {
 							trustValue = callback.getTrustValue();
-						else 
+						} else { 
 							throw callback.getException();
+						}
 						
 					} catch (InterruptedException ie) {
 
@@ -766,11 +739,7 @@ public class InternalTrustBroker implements ITrustBroker {
 			}
 			
 		} catch (ServiceUnavailableException sue) {
-			throw new TrustBrokerException(
-					"Could not retrieve trust value of type '" + trustValueType 
-					+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
-					+ "' on behalf of requestor '" + requestor + "'" 
-					+ "': " + sue.getLocalizedMessage(), sue);
+			throw new TrustBrokerException(sue.getLocalizedMessage(), sue);
 		}
 			
 		return new AsyncResult<Double>(trustValue);
@@ -848,82 +817,80 @@ public class InternalTrustBroker implements ITrustBroker {
 		if (requestor == null)
 			requestor = this.trustNodeMgr.getLocalRequestor();
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving trust relationships of trustor '" 
-					+ trustorId	+ "' with entities of type '" + trusteeType 
-					+ "' and trust values of type '" + trustValueType
-					+ "' on behalf of requestor '" + requestor + "'");
+		LOG.debug("Retrieving trust relationships of trustor '{}'"
+				+ " with entities of type '{}'" 
+				+ " and trust values of type '{}'"
+				+ " on behalf of requestor '{}'",
+				new Object[] {trustorId, trusteeType, trustValueType, requestor});
 		
 		final Set<TrustRelationship> trustRelationships =
 				new LinkedHashSet<TrustRelationship>();
 		try {
 			final boolean doLocal = (this.trustNodeMgr.getMyIds().contains(trustorId) 
 					&& this.trustNodeMgr.isMaster());
-			if (LOG.isDebugEnabled())
-				LOG.debug("doLocal for trustor '" + trustorId + "' is " + doLocal);
+			LOG.debug("doLocal for trustor '{}' is {}", trustorId, doLocal);
 			if (doLocal) { // L O C A L
 
-				if (this.trustRepo == null)
+				if (this.trustRepo == null) {
 					throw new TrustBrokerException(
-							"Could not retrieve trust relationships of trustor '" 
-							+ trustorId	+ "' with entities of type '" + trusteeType 
-							+ "' and trust values of type '" + trustValueType
-							+ "' on behalf of requestor '" + requestor + "'" 
-							+ "': ITrustRepository service is not available");
+							"ITrustRepository service is not available");
+				}
 				
 				final Set<ITrustedEntity> entities = 
 						this.trustRepo.retrieveEntities(trustorId, trusteeType, trustValueType);		
 				for (final ITrustedEntity entity : entities) {
 					
 					if (entity.getDirectTrust().getValue() != null
-							&& (null == trustValueType || TrustValueType.DIRECT == trustValueType))
+							&& (null == trustValueType || TrustValueType.DIRECT == trustValueType)) {
 						trustRelationships.add(new TrustRelationship(trustorId, 
 								entity.getTrusteeId(), TrustValueType.DIRECT, 
 								entity.getDirectTrust().getValue(), 
 								entity.getDirectTrust().getLastUpdated()));
+					}
 					if (entity.getIndirectTrust().getValue() != null
-							&& (null == trustValueType || TrustValueType.INDIRECT == trustValueType))
+							&& (null == trustValueType || TrustValueType.INDIRECT == trustValueType)) {
 						trustRelationships.add(new TrustRelationship(trustorId,
 								entity.getTrusteeId(), 
 								TrustValueType.INDIRECT, 
 								entity.getIndirectTrust().getValue(), 
 								entity.getIndirectTrust().getLastUpdated()));
+					}
 					if (entity.getUserPerceivedTrust().getValue() != null
-							&& (null == trustValueType || TrustValueType.USER_PERCEIVED == trustValueType))
+							&& (null == trustValueType || TrustValueType.USER_PERCEIVED == trustValueType)) {
 						trustRelationships.add(new TrustRelationship(trustorId, 
 								entity.getTrusteeId(), 
 								TrustValueType.USER_PERCEIVED, 
 								entity.getUserPerceivedTrust().getValue(), 
 								entity.getUserPerceivedTrust().getLastUpdated()));
+					}
 				}
 
 			} else { // R E M O T E
 
-				if (this.trustBrokerRemoteClient == null)
+				if (this.trustBrokerRemoteClient == null) {
 					throw new TrustBrokerException(
-							"Could not retrieve trust relationships of trustor '" 
-							+ trustorId	+ "' with entities of type '" + trusteeType 
-							+ "' and trust values of type '" + trustValueType
-							+ "' on behalf of requestor '" + requestor + "'"
-							+ "': ITrustBrokerRemoteClient service is not available");
+							"ITrustBrokerRemoteClient service is not available");
+				}
 
 				final RemoteClientCallback callback = new RemoteClientCallback();
-				if (trusteeType != null && trustValueType == null)
+				if (trusteeType != null && trustValueType == null) {
 					this.trustBrokerRemoteClient.retrieveTrustRelationships(
 							requestor, trustorId, trusteeType, callback);
-				else if (trusteeType == null && trustValueType != null)
+				} else if (trusteeType == null && trustValueType != null) {
 					this.trustBrokerRemoteClient.retrieveTrustRelationships(
 							requestor, trustorId, trustValueType, callback);
-				else
+				} else {
 					this.trustBrokerRemoteClient.retrieveTrustRelationships(
 							requestor, trustorId, callback);
+				}
 				synchronized (callback) {
 					try {
 						callback.wait();
-						if (callback.getException() == null)
+						if (callback.getException() == null) {
 							trustRelationships.addAll(callback.getTrustRelationships());
-						else
+						} else {
 							throw callback.getException();
+						}
 						
 					} catch (InterruptedException ie) {
 
@@ -937,12 +904,7 @@ public class InternalTrustBroker implements ITrustBroker {
 			}
 			
 		} catch (ServiceUnavailableException sue) {
-			throw new TrustBrokerException(
-					"Could not retrieve trust relationships of trustor '" 
-					+ trustorId	+ "' with entities of type '" + trusteeType 
-					+ "' and trust values of type '" + trustValueType
-					+ "' on behalf of requestor '" + requestor + "'" 
-					+ "': " + sue.getLocalizedMessage(), sue);
+			throw new TrustBrokerException(sue.getLocalizedMessage(), sue);
 		}
 			
 		return new AsyncResult<Set<TrustRelationship>>(trustRelationships);
@@ -954,29 +916,27 @@ public class InternalTrustBroker implements ITrustBroker {
 			final TrustedEntityType trusteeType,
 			final TrustValueType trustValueType) throws TrustException {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving (extended) trust relationships of trustor '" 
-					+ trustorId	+ "' with entities of type '" + trusteeType 
-					+ "' and trust values of type '" + trustValueType + "'");
+		LOG.debug("Retrieving (extended) trust relationships of trustor '{}'" 
+					+ " with entities of type '{}'" 
+					+ " and trust values of type '{}'",
+					new Object[] { trustorId, trusteeType, trustValueType });
 		
-		if (!this.trustNodeMgr.getMyIds().contains(trustorId))
+		if (!this.trustNodeMgr.getMyIds().contains(trustorId)) {
 			throw new TrustAccessControlException("Trustor '" + trustorId 
 					+ "' is not recognised as a local CSS");
+		}
 		
 		final Set<ExtTrustRelationship> trustRelationships =
 				new LinkedHashSet<ExtTrustRelationship>();
 		try {
 			final boolean doLocal = (this.trustNodeMgr.isMaster());
-			if (LOG.isDebugEnabled())
-				LOG.debug("doLocal for trustor '" + trustorId + "' is " + doLocal);
+			LOG.debug("doLocal for trustor '{}' is {}", trustorId, doLocal);
 			if (doLocal) { // L O C A L
 
-				if (this.trustRepo == null)
+				if (this.trustRepo == null) {
 					throw new TrustBrokerException(
-							"Could not retrieve (extended) trust relationships of trustor '" 
-							+ trustorId	+ "' with entities of type '" + trusteeType 
-							+ "' and trust values of type '" + trustValueType
-							+ "': ITrustRepository service is not available");
+							"ITrustRepository service is not available");
+				}
 				
 				final Set<ITrustedEntity> entities = 
 						this.trustRepo.retrieveEntities(trustorId, trusteeType, trustValueType);		
@@ -985,35 +945,36 @@ public class InternalTrustBroker implements ITrustBroker {
 					// TODO Assign trust evidence per trust value type
 					final Set<TrustEvidence> trustEvidence = fromITrustedEvidence(entity.getEvidence());
 					if (entity.getDirectTrust().getValue() != null
-							&& (null == trustValueType || TrustValueType.DIRECT == trustValueType))
+							&& (null == trustValueType || TrustValueType.DIRECT == trustValueType)) {
 						trustRelationships.add(new ExtTrustRelationship(trustorId, 
 								entity.getTrusteeId(), TrustValueType.DIRECT, 
 								entity.getDirectTrust().getValue(), 
 								entity.getDirectTrust().getLastUpdated(), trustEvidence));
+					}
 					if (entity.getIndirectTrust().getValue() != null
-							&& (null == trustValueType || TrustValueType.INDIRECT == trustValueType))
+							&& (null == trustValueType || TrustValueType.INDIRECT == trustValueType)) {
 						trustRelationships.add(new ExtTrustRelationship(trustorId,
 								entity.getTrusteeId(), 
 								TrustValueType.INDIRECT, 
 								entity.getIndirectTrust().getValue(), 
 								entity.getIndirectTrust().getLastUpdated(), trustEvidence));
+					}
 					if (entity.getUserPerceivedTrust().getValue() != null
-							&& (null == trustValueType || TrustValueType.USER_PERCEIVED == trustValueType))
+							&& (null == trustValueType || TrustValueType.USER_PERCEIVED == trustValueType)) {
 						trustRelationships.add(new ExtTrustRelationship(trustorId, 
 								entity.getTrusteeId(), 
 								TrustValueType.USER_PERCEIVED, 
 								entity.getUserPerceivedTrust().getValue(), 
 								entity.getUserPerceivedTrust().getLastUpdated(), trustEvidence));
+					}
 				}
 
 			} else { // R E M O T E ( I N T R A - C S S )
 
-				if (this.trustBrokerRemoteClient == null)
+				if (this.trustBrokerRemoteClient == null) {
 					throw new TrustBrokerException(
-							"Could not retrieve (extended) trust relationships of trustor '" 
-							+ trustorId	+ "' with entities of type '" + trusteeType 
-							+ "' and trust values of type '" + trustValueType
-							+ "': ITrustBrokerRemoteClient service is not available");
+							"ITrustBrokerRemoteClient service is not available");
+				}
 
 				throw new IllegalStateException("Unimplemented remote method call: "
 						+ "Retrieve (extended) trust relationships of trustor '" 
@@ -1050,52 +1011,10 @@ public class InternalTrustBroker implements ITrustBroker {
 			}
 			
 		} catch (ServiceUnavailableException sue) {
-			throw new TrustBrokerException(
-					"Could not retrieve (extended) trust relationships of trustor '" 
-					+ trustorId	+ "' with entities of type '" + trusteeType 
-					+ "' and trust values of type '" + trustValueType
-					+ "': " + sue.getLocalizedMessage(), sue);
+			throw new TrustBrokerException(sue.getLocalizedMessage(), sue);
 		}
 			
 		return new AsyncResult<Set<ExtTrustRelationship>>(trustRelationships);
-	}
-	
-	/*
-	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId)
-	 */
-	@Override
-	public void registerTrustUpdateListener(final Requestor requestor,
-			final ITrustUpdateEventListener listener, 
-			final TrustedEntityId trustorId) throws TrustException {
-		
-		if (requestor == null)
-			throw new NullPointerException("requestor can't be null");
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		
-		this.doRegisterTrustUpdateListener(
-				requestor, listener, trustorId, null, null);
-	}
-	
-	/*
-	 * @see org.societies.api.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId)
-	 */
-	@Override
-	public void unregisterTrustUpdateListener(final Requestor requestor,
-			final ITrustUpdateEventListener listener, 
-			final TrustedEntityId trustorId) throws TrustException {
-		
-		if (requestor == null)
-			throw new NullPointerException("requestor can't be null");
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		
-		this.doUnregisterTrustUpdateListener(
-				requestor, listener, trustorId, null, null);
 	}
 	
 	/*
@@ -1111,14 +1030,15 @@ public class InternalTrustBroker implements ITrustBroker {
 		if (query == null)
 			throw new NullPointerException("query can't be null");
 		
-		if (query.getTrusteeType() != null)
+		if (query.getTrusteeType() != null) {
 			this.doRegisterTrustUpdateListenerByType(requestor, listener,
 					query.getTrustorId(), query.getTrusteeType(),
 					query.getTrustValueType());
-		else
+		} else {
 			this.doRegisterTrustUpdateListener(requestor, listener, 
 					query.getTrustorId(), query.getTrusteeId(), 
 					query.getTrustValueType());
+		}
 	}
 	
 	/*
@@ -1134,14 +1054,15 @@ public class InternalTrustBroker implements ITrustBroker {
 		if (query == null)
 			throw new NullPointerException("query can't be null");
 		
-		if (query.getTrusteeType() != null)
+		if (query.getTrusteeType() != null) {
 			this.doUnregisterTrustUpdateListenerByType(requestor, listener,
 					query.getTrustorId(), query.getTrusteeType(), 
 					query.getTrustValueType());
-		else
+		} else {
 			this.doUnregisterTrustUpdateListener(requestor, listener, 
 					query.getTrustorId(), query.getTrusteeId(), 
 					query.getTrustValueType());
+		}
 	}
 	
 	/*
@@ -1155,14 +1076,15 @@ public class InternalTrustBroker implements ITrustBroker {
 		if (query == null)
 			throw new NullPointerException("query can't be null");
 		
-		if (query.getTrusteeType() != null)
+		if (query.getTrusteeType() != null) {
 			this.doRegisterTrustUpdateListenerByType(null, listener,
 					query.getTrustorId(), query.getTrusteeType(),
 					query.getTrustValueType());
-		else
+		} else {
 			this.doRegisterTrustUpdateListener(null, listener, 
 					query.getTrustorId(), query.getTrusteeId(), 
 					query.getTrustValueType());
+		}
 	}
 	
 	/*
@@ -1176,104 +1098,15 @@ public class InternalTrustBroker implements ITrustBroker {
 		if (query == null)
 			throw new NullPointerException("query can't be null");
 		
-		if (query.getTrusteeType() != null)
+		if (query.getTrusteeType() != null) {
 			this.doUnregisterTrustUpdateListenerByType(null, listener,
 					query.getTrustorId(), query.getTrusteeType(),
 					query.getTrustValueType());
-		else
+		} else {
 			this.doUnregisterTrustUpdateListener(null, listener, 
 					query.getTrustorId(), query.getTrusteeId(), 
 					query.getTrustValueType());
-	}
-	
-	/*
-	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
-	 */
-	@Override
-	public void registerTrustUpdateListener(final Requestor requestor,
-			final ITrustUpdateEventListener listener, 
-			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
-					throws TrustException {
-		
-		if (requestor == null)
-			throw new NullPointerException("requestor can't be null");
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
-			throw new NullPointerException("trusteeId can't be null");
-		
-		this.doRegisterTrustUpdateListener(
-				requestor, listener, trustorId, trusteeId, null);
-	}
-	
-	/*
-	 * @see org.societies.api.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
-	 */
-	@Override
-	public void unregisterTrustUpdateListener(final Requestor requestor,
-			final ITrustUpdateEventListener listener, 
-			final TrustedEntityId trustorId, final TrustedEntityId trusteeId)
-					throws TrustException {
-		
-		if (requestor == null)
-			throw new NullPointerException("requestor can't be null");
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
-			throw new NullPointerException("trusteeId can't be null");
-		
-		this.doUnregisterTrustUpdateListener(
-				requestor, listener, trustorId, trusteeId, null);
-	}
-	
-	/*
-	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
-	 */
-	@Override
-	public void registerTrustUpdateListener(final Requestor requestor,
-			final ITrustUpdateEventListener listener, 
-			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
-			final TrustValueType trustValueType) throws TrustException {
-		
-		if (requestor == null)
-			throw new NullPointerException("requestor can't be null");
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
-			throw new NullPointerException("trusteeId can't be null");
-		if (trustValueType == null)
-			throw new NullPointerException("trustValueType can't be null");
-		
-		this.doRegisterTrustUpdateListener(
-				requestor, listener, trustorId, trusteeId, trustValueType);
-	}
-	
-	/*
-	 * @see org.societies.api.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
-	 */
-	@Override
-	public void unregisterTrustUpdateListener(final Requestor requestor,
-			final ITrustUpdateEventListener listener, 
-			final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
-			final TrustValueType trustValueType) throws TrustException {
-		
-		if (requestor == null)
-			throw new NullPointerException("requestor can't be null");
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
-			throw new NullPointerException("trusteeId can't be null");
-		
-		this.doUnregisterTrustUpdateListener(
-				requestor, listener, trustorId, trusteeId, trustValueType);
+		}
 	}
 	
 	private void doRegisterTrustUpdateListener(Requestor requestor,
@@ -1284,45 +1117,40 @@ public class InternalTrustBroker implements ITrustBroker {
 		if (requestor == null)
 			requestor = this.trustNodeMgr.getLocalRequestor();
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Registering for trust value updates of type '" + trustValueType 
-					+ "' assigned to entity '"	+ trusteeId	+ "' by '" + trustorId 
-					+ "' on behalf of requestor '" + requestor + "'");
+		LOG.debug("Registering for trust value updates of type '{}'" 
+				+ " assigned to entity '{}' by '{}'" 
+				+ " on behalf of requestor '{}'",
+				new Object[] {trustValueType, trusteeId, trustorId, requestor });
 		
-		if (this.trustEventMgr == null)
+		if (this.trustEventMgr == null) {
 			throw new TrustBrokerException(
-					"Could not register for trust value updates of type '" 
-					+ trustValueType + "' assigned to entity '"	+ trusteeId	
-					+ "' by '" + trustorId 
-					+ "' on behalf of requestor '" + requestor + "'" 
-					+ ": ITrustEventMgr service is not available");
+					"ITrustEventMgr service is not available");
+		}
 		
 		final String[] topics;
-		if (null == trustValueType)
+		if (null == trustValueType) {
 			topics = new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED,
 				TrustEventTopic.INDIRECT_TRUST_UPDATED,
 				TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
-		else if (TrustValueType.DIRECT == trustValueType)
+		} else if (TrustValueType.DIRECT == trustValueType) { 
 			topics = new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED };
-		else if (TrustValueType.INDIRECT == trustValueType)
+		} else if (TrustValueType.INDIRECT == trustValueType) {
 			topics = new String[] { TrustEventTopic.INDIRECT_TRUST_UPDATED };
-		else if (TrustValueType.USER_PERCEIVED == trustValueType)
+		} else if (TrustValueType.USER_PERCEIVED == trustValueType) {
 			topics = new String[] { TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
-		else
+		} else {
 			throw new TrustBrokerException(
-					"Could not register for trust value updates of type '" 
-					+ trustValueType + "' assigned to entity '"	+ trusteeId	
-					+ "' by '" + trustorId 
-					+ "' on behalf of requestor '" + requestor + "'"
-					+ ": Unsupported trust value type '" + trustValueType + "'");
+					"Unsupported trust value type '" + trustValueType + "'");
+		}
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Registering event listener for trustor '" + trustorId 
-					+ "' and trustee '" + trusteeId + "' to topics '" + Arrays.toString(topics) + "'");
-		if (trusteeId == null)
+		LOG.debug("Registering event listener for trustor '{}'" 
+				+ " and trustee '{}' to topics '{}'",
+				new Object[] {trustorId, trusteeId, Arrays.toString(topics)});
+		if (trusteeId == null) {
 			this.trustEventMgr.registerUpdateListener(listener, topics, trustorId);
-		else
+		} else {
 			this.trustEventMgr.registerUpdateListener(listener, topics, trustorId, trusteeId);
+		}
 	}
 	
 	private void doUnregisterTrustUpdateListener(Requestor requestor,
@@ -1367,146 +1195,11 @@ public class InternalTrustBroker implements ITrustBroker {
 		if (LOG.isDebugEnabled())
 			LOG.debug("Unregistering event listener for trustor '" + trustorId 
 					+ "' and trustee '" + trusteeId + "' from topics '" + Arrays.toString(topics) + "'");
-		if (trusteeId == null)
+		if (trusteeId == null) {
 			this.trustEventMgr.unregisterUpdateListener(listener, topics, trustorId);
-		else
+		} else {
 			this.trustEventMgr.unregisterUpdateListener(listener, topics, trustorId, trusteeId);
-	}
-	
-	/*
-	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType)
-	 */
-	@Override
-	public void registerTrustUpdateListener(final Requestor requestor,
-			final ITrustUpdateEventListener listener, 
-			final TrustedEntityId trustorId, final TrustedEntityType trusteeType)
-					throws TrustException {
-		
-		if (requestor == null)
-			throw new NullPointerException("requestor can't be null");
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeType == null)
-			throw new NullPointerException("trusteeType can't be null");
-		
-		this.doRegisterTrustUpdateListenerByType(
-				requestor, listener, trustorId, trusteeType, null);
-	}
-	
-	/*
-	 * @see org.societies.api.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType)
-	 */
-	@Override
-	public void unregisterTrustUpdateListener(final Requestor requestor,
-			final ITrustUpdateEventListener listener, 
-			final TrustedEntityId trustorId, final TrustedEntityType trusteeType)
-					throws TrustException {
-		
-		if (requestor == null)
-			throw new NullPointerException("requestor can't be null");
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeType == null)
-			throw new NullPointerException("trusteeType can't be null");
-		
-		this.doUnregisterTrustUpdateListenerByType(
-				requestor, listener, trustorId, trusteeType, null);
-	}
-	
-	/*
-	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
-	 */
-	@Override
-	public void registerTrustUpdateListener(final Requestor requestor,
-			final ITrustUpdateEventListener listener, 
-			final TrustedEntityId trustorId,
-			final TrustValueType trustValueType) throws TrustException {
-		
-		if (requestor == null)
-			throw new NullPointerException("requestor can't be null");
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trustValueType == null)
-			throw new NullPointerException("trustValueType can't be null");
-		
-		this.doRegisterTrustUpdateListener(
-				requestor, listener, trustorId, null, trustValueType);
-	}
-	
-	/*
-	 * @see org.societies.api.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)
-	 */
-	@Override
-	public void unregisterTrustUpdateListener(final Requestor requestor,
-			final ITrustUpdateEventListener listener, 
-			final TrustedEntityId trustorId,
-			final TrustValueType trustValueType) throws TrustException {
-		
-		if (requestor == null)
-			throw new NullPointerException("requestor can't be null");
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trustValueType == null)
-			throw new NullPointerException("trustValueType can't be null");
-		
-		this.doUnregisterTrustUpdateListener(
-				requestor, listener, trustorId, null, trustValueType);
-	}
-	
-	/*
-	 * @see org.societies.api.privacytrust.trust.ITrustBroker#registerTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType, org.societies.api.privacytrust.trust.model.TrustValueType)
-	 */
-	@Override
-	public void registerTrustUpdateListener(final Requestor requestor,
-			final ITrustUpdateEventListener listener, 
-			final TrustedEntityId trustorId, final TrustedEntityType trusteeType,
-			final TrustValueType trustValueType) throws TrustException {
-		
-		if (requestor == null)
-			throw new NullPointerException("requestor can't be null");
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeType == null)
-			throw new NullPointerException("trusteeType can't be null");
-		if (trustValueType == null)
-			throw new NullPointerException("trustValueType can't be null");
-		
-		this.doRegisterTrustUpdateListenerByType(
-				requestor, listener, trustorId, trusteeType, trustValueType);
-	}
-	
-	/*
-	 * @see org.societies.api.privacytrust.trust.ITrustBroker#unregisterTrustUpdateListener(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType, org.societies.api.privacytrust.trust.model.TrustValueType)
-	 */
-	@Override
-	public void unregisterTrustUpdateListener(final Requestor requestor,
-			final ITrustUpdateEventListener listener, 
-			final TrustedEntityId trustorId, final TrustedEntityType trusteeType,
-			final TrustValueType trustValueType) throws TrustException {
-		
-		if (requestor == null)
-			throw new NullPointerException("requestor can't be null");
-		if (listener == null)
-			throw new NullPointerException("listener can't be null");
-		if (trustorId == null)
-			throw new NullPointerException("trustorId can't be null");
-		if (trusteeType == null)
-			throw new NullPointerException("trusteeType can't be null");
-		if (trustValueType == null)
-			throw new NullPointerException("trustValueType can't be null");
-		
-		this.doUnregisterTrustUpdateListenerByType(
-				requestor, listener, trustorId, trusteeType, trustValueType);
+		}
 	}
 	
 	private void doRegisterTrustUpdateListenerByType(Requestor requestor,
@@ -1517,41 +1210,35 @@ public class InternalTrustBroker implements ITrustBroker {
 		if (requestor == null)
 			requestor = this.trustNodeMgr.getLocalRequestor();
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("Registering for trust value updates of type '" + trustValueType 
-					+ "' assigned to entities of type '" + trusteeType + "' by '" + trustorId 
-					+ "' on behalf of requestor '" + requestor + "'");
+		LOG.debug("Registering for trust value updates of type '{}'" 
+				+ " assigned to entities of type '{}' by '{}'" 
+				+ " on behalf of requestor '{}'",
+				new Object[] { trustValueType, trusteeType, trustorId, requestor});
 
-		if (this.trustEventMgr == null)
+		if (this.trustEventMgr == null) {
 			throw new TrustBrokerException(
-					"Could not register for trust value updates of type '" 
-					+ trustValueType + "' assigned to entities of type '" 
-					+ trusteeType + "' by '" + trustorId 
-					+ "' on behalf of requestor '" + requestor + "'" 
-					+ ": ITrustEventMgr service is not available");
+					"ITrustEventMgr service is not available");
+		}
 
 		final String[] topics;
-		if (null == trustValueType)
+		if (null == trustValueType) {
 			topics = new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED,
 				TrustEventTopic.INDIRECT_TRUST_UPDATED,
 				TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
-		else if (TrustValueType.DIRECT == trustValueType)
+		} else if (TrustValueType.DIRECT == trustValueType) {
 			topics = new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED };
-		else if (TrustValueType.INDIRECT == trustValueType)
+		} else if (TrustValueType.INDIRECT == trustValueType) {
 			topics = new String[] { TrustEventTopic.INDIRECT_TRUST_UPDATED };
-		else if (TrustValueType.USER_PERCEIVED == trustValueType)
+		} else if (TrustValueType.USER_PERCEIVED == trustValueType) {
 			topics = new String[] { TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
-		else
+		} else {
 			throw new TrustBrokerException(
-					"Could not register for trust value updates of type '" 
-					+ trustValueType + "' assigned to entities of type '" 
-					+ trusteeType + "' by '" + trustorId 
-					+ "' on behalf of requestor '" + requestor + "'"
-					+ ": Unsupported trust value type '" + trustValueType + "'");
+					"Unsupported trust value type '" + trustValueType + "'");
+		}
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("Registering event listener for trustor '" + trustorId 
-					+ "' and trustee type '" + trusteeType + "' to topics '" + Arrays.toString(topics) + "'");
+		LOG.debug("Registering event listener for trustor '{}'" 
+				+ " and trustee type '{}' to topics '{}'",
+				new Object[] { trustorId, trusteeType, Arrays.toString(topics)});
 		this.trustEventMgr.registerUpdateListener(listener, topics, trustorId, trusteeType);
 	}
 	
@@ -1563,41 +1250,35 @@ public class InternalTrustBroker implements ITrustBroker {
 		if (requestor == null)
 			requestor = this.trustNodeMgr.getLocalRequestor();
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("Unregistering from trust value updates of type '" + trustValueType 
-					+ "' assigned to entities of type '" + trusteeType + "' by '" + trustorId 
-					+ "' on behalf of requestor '" + requestor + "'");
+		LOG.debug("Unregistering from trust value updates of type '{}'" 
+				+ " assigned to entities of type '{}' by '{}'" 
+				+ " on behalf of requestor '{}'",
+				new Object[] { trustValueType, trusteeType, trustorId, requestor});
 
-		if (this.trustEventMgr == null)
+		if (this.trustEventMgr == null) {
 			throw new TrustBrokerException(
-					"Could not unregister from trust value updates of type '" 
-					+ trustValueType + "' assigned to entities of type '" 
-					+ trusteeType + "' by '" + trustorId 
-					+ "' on behalf of requestor '" + requestor + "'" 
-					+ ": ITrustEventMgr service is not available");
+					"ITrustEventMgr service is not available");
+		}
 
 		final String[] topics;
-		if (null == trustValueType)
+		if (null == trustValueType) {
 			topics = new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED,
 				TrustEventTopic.INDIRECT_TRUST_UPDATED,
 				TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
-		else if (TrustValueType.DIRECT == trustValueType)
+		} else if (TrustValueType.DIRECT == trustValueType) {
 			topics = new String[] { TrustEventTopic.DIRECT_TRUST_UPDATED };
-		else if (TrustValueType.INDIRECT == trustValueType)
+		} else if (TrustValueType.INDIRECT == trustValueType) {
 			topics = new String[] { TrustEventTopic.INDIRECT_TRUST_UPDATED };
-		else if (TrustValueType.USER_PERCEIVED == trustValueType)
+		} else if (TrustValueType.USER_PERCEIVED == trustValueType) {
 			topics = new String[] { TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED };
-		else
-			throw new TrustBrokerException(
-					"Could not unregister from trust value updates of type '" 
-					+ trustValueType + "' assigned to entities of type '" 
-					+ trusteeType + "' by '" + trustorId 
-					+ "' on behalf of requestor '" + requestor + "'"
-					+ ": Unsupported trust value type '" + trustValueType + "'");
+		} else {
+			throw new TrustBrokerException("Unsupported trust value type '"
+					+ trustValueType + "'");
+		}
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("Unregistering event listener for trustor '" + trustorId 
-					+ "' and trustee type '" + trusteeType + "' from topics '" + Arrays.toString(topics) + "'");
+		LOG.debug("Unregistering event listener for trustor '{}'" 
+					+ "' and trustee type '{}' from topics '{}'",
+					new Object[] { trustorId, trusteeType, Arrays.toString(topics)});
 		this.trustEventMgr.unregisterUpdateListener(listener, topics, trustorId, trusteeType);
 	}
 	
@@ -1683,11 +1364,12 @@ public class InternalTrustBroker implements ITrustBroker {
 	private static Set<TrustEvidence> fromITrustedEvidence(Set<ITrustEvidence> evidenceSet) {
 		
 		final Set<TrustEvidence> result = new LinkedHashSet<TrustEvidence>(evidenceSet.size());
-		for (final ITrustEvidence evidence : evidenceSet)
+		for (final ITrustEvidence evidence : evidenceSet) {
 			result.add(new TrustEvidence(evidence.getSubjectId(),
 					evidence.getObjectId(), evidence.getType(), 
 					evidence.getTimestamp(), evidence.getInfo(), 
 					evidence.getSourceId()));
+		}
 		
 		return result;
 	}

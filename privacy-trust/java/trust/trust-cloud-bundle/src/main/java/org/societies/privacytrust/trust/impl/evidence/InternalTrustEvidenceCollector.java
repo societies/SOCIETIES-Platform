@@ -31,8 +31,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
+import org.societies.api.osgi.event.CSSEvent;
+import org.societies.api.osgi.event.EventListener;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
+import org.societies.api.privacytrust.trust.model.TrustEvidence;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.ITrustNodeMgr;
 import org.societies.privacytrust.trust.api.evidence.remote.ITrustEvidenceCollectorRemoteClient;
@@ -66,10 +72,20 @@ public class InternalTrustEvidenceCollector implements ITrustEvidenceCollector {
 	@Autowired(required=false)
 	private ITrustEvidenceCollectorRemoteClient trustEvidenceCollectorRemoteClient;
 	
-	InternalTrustEvidenceCollector() {
+	@Autowired(required=true)
+	InternalTrustEvidenceCollector(IEventMgr eventMgr) throws Exception {
 		
-		if (LOG.isInfoEnabled())
-			LOG.info(this.getClass() + " instantiated");
+		LOG.info("{} instantiated", this.getClass());
+		
+		try {
+			LOG.info("Registering for trust evidence events...");
+			eventMgr.subscribeInternalEvent(new TrustEvidenceEventListener(), 
+					new String[] { EventTypes.TRUST_EVIDENCE_EVENT }, null);
+		} catch (Exception e) {
+			LOG.error(this.getClass() + " could not be initialised: "
+					+ e.getLocalizedMessage(), e);
+			throw e;
+		}
 	}
 	
 	/*
@@ -176,29 +192,22 @@ public class InternalTrustEvidenceCollector implements ITrustEvidenceCollector {
 		if (requestor == null)
 			requestor = this.trustNodeMgr.getLocalRequestor();
 		
-		if (LOG.isDebugEnabled()) 
-			LOG.debug("Adding trust evidence with subjectId '"
-					+ subjectId	+ "', objectId '" + objectId + "', type '" 
-					+ type + "', timestamp '" + timestamp + "', info '" + info
-					+ "' and sourceId '" + sourceId 
-					+ "' on behalf of requestor '" + requestor + "'");
+		LOG.debug("Adding trust evidence with subjectId '{}'"
+					+ ", objectId '{}', type '{}', timestamp '{}'"
+				    + ", info '{}' and sourceId '{}'"
+					+ "' on behalf of requestor '{}'", new Object[] {
+							subjectId, objectId, type, timestamp, info, sourceId, requestor });
 		
 		try {
 			final boolean doLocal = this.trustNodeMgr.isMaster();
-			if (LOG.isDebugEnabled())
-				LOG.debug("doLocal is " + doLocal);
+			LOG.debug("doLocal is {}", doLocal);
 			if (doLocal) {
 
 				if (this.trustEvidenceRepository == null)
 					throw new TrustEvidenceCollectorException(
-							"Could not add indirect evidence with subjectId '"
-									+ subjectId	+ "', objectId '" + objectId 
-									+ "', type '" + type + "', timestamp '" 
-									+ timestamp + "', info '" + info
-									+ "' and sourceId '" + sourceId 
-									+ "' on behalf of requestor '" + requestor
-									+ "': ITrustEvidenceRepository service is not available");
-				this.trustEvidenceRepository.addEvidence(subjectId, objectId, type, timestamp, info, sourceId);
+							"ITrustEvidenceRepository service is not available");
+				this.trustEvidenceRepository.addEvidence(
+						subjectId, objectId, type, timestamp, info, sourceId);
 				
 			} else {
 
@@ -206,13 +215,7 @@ public class InternalTrustEvidenceCollector implements ITrustEvidenceCollector {
 						new TrustEvidenceCollectorRemoteCallback();
 				if (this.trustEvidenceCollectorRemoteClient == null)
 					throw new TrustEvidenceCollectorException(
-							"Could not add indirect evidence with subjectId '"
-									+ subjectId	+ "', objectId '" + objectId 
-									+ "', type '" + type + "', timestamp '" 
-									+ timestamp + "', info '" + info
-									+ "' and sourceId '" + sourceId 
-									+ "' on behalf of requestor '" + requestor 
-									+ "': ITrustEvidenceCollectorRemote service is not available");
+							"ITrustEvidenceCollectorRemote service is not available");
 				this.trustEvidenceCollectorRemoteClient.addIndirectEvidence(
 						requestor, subjectId, objectId, type, timestamp, info,
 						sourceId, callback);
@@ -223,26 +226,20 @@ public class InternalTrustEvidenceCollector implements ITrustEvidenceCollector {
 							throw callback.getException();
 						
 					} catch (InterruptedException ie) {
-					throw new TrustEvidenceCollectorException(
-							"Interrupted while adding indirect trust evidence with subjectId '"
-									+ subjectId	+ "', objectId '" + objectId 
-									+ "', type '" + type + "', timestamp '" 
-									+ timestamp + "', info '" + info
-									+ "' and sourceId '" + sourceId 
-									+ "' on behalf of requestor '" + requestor + "'");
+						throw new TrustEvidenceCollectorException(
+								"Interrupted while adding indirect trust evidence with subjectId '"
+										+ subjectId	+ "', objectId '" + objectId 
+										+ "', type '" + type + "', timestamp '" 
+										+ timestamp + "', info '" + info
+										+ "' and sourceId '" + sourceId 
+										+ "' on behalf of requestor '" + requestor + "'");
 					}
 				}
 			}
 			
 		} catch (ServiceUnavailableException sue) {
 			throw new TrustEvidenceCollectorException(
-					"Could not add indirect evidence with subjectId '"
-					+ subjectId	+ "', objectId '" + objectId 
-					+ "', type '" + type + "', timestamp '" 
-					+ timestamp + "', info '" + info
-					+ "' and sourceId '" + sourceId 
-					+ "' on behalf of requestor '" + requestor 
-					+ "': " + sue.getLocalizedMessage(), sue);
+					sue.getLocalizedMessage(), sue);
 		}
 	}
 	
@@ -288,6 +285,45 @@ public class InternalTrustEvidenceCollector implements ITrustEvidenceCollector {
 		private TrustException getException() {
 			
 			return this.trustException;
+		}
+	}
+	
+	private class TrustEvidenceEventListener extends EventListener {
+	
+		/*
+		 * @see org.societies.api.osgi.event.EventListener#handleExternalEvent(org.societies.api.osgi.event.CSSEvent)
+		 */
+		@Override
+		public void handleExternalEvent(CSSEvent event) {
+			
+			LOG.warn("Received unexpected external event {}", event);
+		}
+
+		/*
+		 * @see org.societies.api.osgi.event.EventListener#handleInternalEvent(org.societies.api.osgi.event.InternalEvent)
+		 */
+		@Override
+		public void handleInternalEvent(InternalEvent event) {
+			
+			LOG.debug("Received internal event {}", event);
+			
+			if (!(event.geteventInfo() instanceof TrustEvidence)) {
+				LOG.error("Could not handle internal '" + event.geteventType() + "'"
+						+ "event: Expected event info of type " 
+						+ TrustEvidence.class + " but was " + event.geteventInfo());
+				return;
+			}
+			final TrustEvidence evidence = (TrustEvidence) event.geteventInfo();
+			final Requestor requestor = trustNodeMgr.getLocalRequestor();
+			try {
+				doAddEvidence(requestor, evidence.getSubjectId(),
+						evidence.getObjectId(), evidence.getType(), 
+						evidence.getTimestamp(), evidence.getInfo(),
+						evidence.getSourceId());
+			} catch (Exception e) {
+				LOG.error("Could not add trust evidence '"
+						+ evidence + "': " + e.getLocalizedMessage(), e);
+			}
 		}
 	}
 }
