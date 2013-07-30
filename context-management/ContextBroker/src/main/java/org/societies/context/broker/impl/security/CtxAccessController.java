@@ -24,19 +24,34 @@
  */
 package org.societies.context.broker.impl.security;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.broker.CtxAccessControlException;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.RequestorService;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
+import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
+import org.societies.api.privacytrust.trust.model.TrustEvidence;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.util.TrustedEntityIdFactory;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
@@ -63,12 +78,23 @@ public class CtxAccessController implements ICtxAccessController {
 	private static final Logger LOG = LoggerFactory.getLogger(CtxAccessController.class);
 	
 	/** The Privacy Data Mgr service reference. */
+	@Autowired(required=false)
 	private IPrivacyDataManager privacyDataMgr;
+	
+	/** The Event Mgr service reference. */
+	@Autowired(required=true)
+	private IEventMgr eventMgr;
+	
+	/** The Comms Mgr service reference. */
+	@Autowired(required=true)
+	private ICommManager commMgr;
+	
+	/** The executor service. */
+	private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 	CtxAccessController() {
 		
-		if (LOG.isInfoEnabled())
-			LOG.info(this.getClass() + " instantiated");
+		LOG.info("{} instantiated", this.getClass());
 	}
 	
 	/*
@@ -86,9 +112,8 @@ public class CtxAccessController implements ICtxAccessController {
 		if (actionConst == null)
 			throw new NullPointerException("actionConst can't be null");
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("checkPermission: requestor=" + requestor + ", ctxId="
-					+ ctxId + ", actionConst=" + actionConst.name());
+		LOG.debug("checkPermission: requestor={}, ctxId={}, actionConst={}", 
+				new Object[] { requestor, ctxId, actionConst.name() });
 		
 		boolean accessDenied = true;
 		try {
@@ -97,10 +122,10 @@ public class CtxAccessController implements ICtxAccessController {
 			final List<ResponseItem> responses = this.privacyDataMgr.checkPermission(
 					RequestorUtils.toRequestorBean(requestor), ctxId, action);
 			for (final ResponseItem response : responses) {
-				if (LOG.isDebugEnabled())
-					LOG.debug("response: decision=" + response.getDecision());
-				if (Decision.PERMIT == response.getDecision())
+				LOG.debug("response: decision={}", response.getDecision());
+				if (Decision.PERMIT == response.getDecision()) {
 					accessDenied = false;
+				}
 			}
 		} catch (ServiceUnavailableException sue) {
 			throw new CtxAccessControllerException("Failed to perform access control: "
@@ -110,10 +135,16 @@ public class CtxAccessController implements ICtxAccessController {
 					+ e.getLocalizedMessage(), e);
 		}
 		
-		if (accessDenied)
+		if (accessDenied) {
+			this.executorService.submit(new TrustEvidenceDispatcher(
+					requestor, ctxId, TrustEvidenceType.WITHHELD_CONTEXT));
 			throw new CtxAccessControlException("'" + actionConst.name()
 					+ "' access to '" + ctxId + "' denied for requestor '"
 					+ requestor + "'");
+		} else {
+			this.executorService.submit(new TrustEvidenceDispatcher(
+					requestor, ctxId, TrustEvidenceType.SHARED_CONTEXT));
+		}
 	}
 	
 	/*
@@ -131,9 +162,8 @@ public class CtxAccessController implements ICtxAccessController {
 		if (actionConst == null)
 			throw new NullPointerException("actionConst can't be null");
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("checkPermission: requestor=" + requestor + ", ctxIdList="
-					+ ctxIdList + ", actionConst=" + actionConst.name());
+		LOG.debug("checkPermission: requestor={}, ctxIdList={}, actionConst={}",
+				new Object[] { requestor, ctxIdList, actionConst.name() });
 		
 		final List<CtxIdentifier> result = new ArrayList<CtxIdentifier>(ctxIdList.size());
 		try {
@@ -147,10 +177,17 @@ public class CtxAccessController implements ICtxAccessController {
 			for (final ResponseItem response : responses) {
 				final String ctxIdStr = ResourceUtils.getDataIdUri(
 						response.getRequestItem().getResource());
-				if (LOG.isDebugEnabled())
-					LOG.debug("response: ctxIdStr=" + ctxIdStr + ", decision=" + response.getDecision());
-				if (Decision.PERMIT == response.getDecision())
-					result.add(CtxIdentifierFactory.getInstance().fromString(ctxIdStr));
+				final CtxIdentifier ctxId = CtxIdentifierFactory.getInstance().fromString(ctxIdStr); 
+				LOG.debug("response: ctxId={}, decision={}", 
+						ctxId, response.getDecision());
+				if (Decision.PERMIT == response.getDecision()) {
+					result.add(ctxId);
+					this.executorService.submit(new TrustEvidenceDispatcher(
+							requestor, ctxId, TrustEvidenceType.SHARED_CONTEXT));
+				} else {
+					this.executorService.submit(new TrustEvidenceDispatcher(
+							requestor, ctxId, TrustEvidenceType.WITHHELD_CONTEXT));
+				}
 			}
 		} catch (ServiceUnavailableException sue) {
 			throw new CtxAccessControllerException("Failed to perform access control: "
@@ -160,10 +197,13 @@ public class CtxAccessController implements ICtxAccessController {
 					+ e.getLocalizedMessage(), e);
 		}
 		
-		if (result.isEmpty() && !ctxIdList.isEmpty())
+		if (result.isEmpty() && !ctxIdList.isEmpty()) {
 			throw new CtxAccessControlException("'" + actionConst.name()
 					+ "' access to '" + ctxIdList + "' denied for requestor '"
 					+ requestor + "'");
+		}
+		
+		LOG.debug("checkPermission: result={}", result);
 		return result;
 	}
 	
@@ -180,6 +220,7 @@ public class CtxAccessController implements ICtxAccessController {
 		
 		final List<CtxModelObject> ctxModelObjectList = new ArrayList<CtxModelObject>(1);
 		ctxModelObjectList.add(ctxModelObject);
+		
 		return this.obfuscate(requestor, ctxModelObjectList).get(0);
 	}
 	
@@ -196,9 +237,8 @@ public class CtxAccessController implements ICtxAccessController {
 		if (ctxModelObjectList == null)
 			throw new NullPointerException("ctxModelObjectList can't be null");
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("obfuscate: requestor=" + requestor 
-					+ ", ctxModelObjectList=" + ctxModelObjectList);
+		LOG.debug("obfuscate: requestor={}, ctxModelObjectList={}",
+				requestor, ctxModelObjectList);
 		
 		final List<CtxModelObject> result = new ArrayList<CtxModelObject>(ctxModelObjectList.size());
 		try {
@@ -212,20 +252,73 @@ public class CtxAccessController implements ICtxAccessController {
 					+ e.getLocalizedMessage(), e);
 		}
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("obfuscate: result=" + result);
+		LOG.debug("obfuscate: result={}", result);
 		return result;
 	}
 	
-	/**
-	 * Sets the {@link IPrivacyDataManager} service reference.
-	 * 
-	 * @param privacyDataMgr
-	 *            the {@link IPrivacyDataManager} service reference to set
-	 */
-	@Autowired(required=false)
-	public void setPrivacyDataMgr(IPrivacyDataManager privacyDataMgr) {
+	private class TrustEvidenceDispatcher implements Runnable {
 		
-		this.privacyDataMgr = privacyDataMgr;
+		private final Requestor requestor;
+		
+		private final CtxIdentifier ctxId;
+		
+		private final TrustEvidenceType evidenceType;
+		
+		private TrustEvidenceDispatcher(final Requestor requestor,
+				final CtxIdentifier ctxId, final TrustEvidenceType evidenceType) {
+			
+			this.requestor = requestor;
+			this.ctxId = ctxId;
+			this.evidenceType = evidenceType;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			
+			LOG.debug("TrustEvidenceDispatcher: requestor={}, ctxId={}, evidenceType={}",
+					new Object[] { this.requestor, this.ctxId, this.evidenceType });
+			
+			try {
+				final TrustedEntityId subjectId = this.extractSubjectId(this.ctxId);
+				final TrustedEntityId objectId = this.extractObjectId(this.requestor);
+				final Date timestamp = new Date();
+				final Serializable info = this.ctxId.getType();
+				final TrustEvidence trustEvidence = new TrustEvidence(
+						subjectId, objectId, this.evidenceType, timestamp, info, null);
+				
+				LOG.debug("TrustEvidenceDispatcher: trustEvidence={}", trustEvidence);
+				eventMgr.publishInternalEvent(new InternalEvent(
+						EventTypes.TRUST_EVIDENCE_EVENT,           // eventType
+						this.evidenceType.name(),                  // eventName
+						CtxAccessController.class.getSimpleName(), // eventType
+						trustEvidence                              // eventInfo
+						));
+			} catch (Exception e) {
+				LOG.error("Could not dispatch trust evidence: " + e.getLocalizedMessage(), e);
+			}
+		}
+
+		private TrustedEntityId extractSubjectId(final CtxIdentifier ctxId) throws Exception {
+
+			final IIdentity ownerId = commMgr.getIdManager().fromJid(ctxId.getOwnerId());
+			return TrustedEntityIdFactory.fromIIdentity(ownerId);
+		}
+
+		private TrustedEntityId extractObjectId(final Requestor requestor) throws Exception {
+
+			if (requestor instanceof RequestorService) { // S E R V I C E
+				return TrustedEntityIdFactory.fromServiceResourceIdentifier(
+						((RequestorService) requestor).getRequestorServiceId());
+			} else if (requestor instanceof RequestorCis) { // C O M M U N I T Y 
+				return TrustedEntityIdFactory.fromIIdentity(
+						((RequestorCis) requestor).getCisRequestorId());
+			} else { // U S E R
+				return TrustedEntityIdFactory.fromIIdentity(
+						requestor.getRequestorId());
+			}
+		}
 	}
 }
