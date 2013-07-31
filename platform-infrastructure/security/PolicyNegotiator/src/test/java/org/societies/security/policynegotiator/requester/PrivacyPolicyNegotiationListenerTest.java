@@ -53,7 +53,6 @@ public class PrivacyPolicyNegotiationListenerTest {
 			this.negotiationError = true;
 			this.msg = msg;
 		}
-		
 	}
 	
 	@Before
