@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.policynegotiator;
+package org.societies.security.policynegotiator.requester;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -35,9 +35,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
+import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.internal.security.storage.ISecureStorage;
+import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.security.policynegotiator.requester.NegotiationRequester;
@@ -100,6 +102,21 @@ public class NegotiationRequesterUnitTest {
 		assertNotNull(classUnderTest.getPersonalizationMgr());
 		assertNotNull(classUnderTest.getSecureStorage());
 		assertNotNull(classUnderTest.getSignatureMgr());
+		
+		IPrivacyPolicyNegotiationManager privacyPolicyNegotiationMgr = mock(IPrivacyPolicyNegotiationManager.class);
+		assertFalse(classUnderTest.isPrivacyPolicyNegotiationMgrAvailable());
+		classUnderTest.setPrivacyPolicyNegotiationManager(privacyPolicyNegotiationMgr);
+		assertSame(privacyPolicyNegotiationMgr, classUnderTest.getPrivacyPolicyNegotiationManager());
+		assertTrue(classUnderTest.isPrivacyPolicyNegotiationMgrAvailable());
+		
+		classUnderTest.setPrivacyPolicyNegotiationIncluded(false);
+		assertFalse(classUnderTest.isPrivacyPolicyNegotiationIncluded());
+		classUnderTest.setPrivacyPolicyNegotiationIncluded(true);
+		assertTrue(classUnderTest.isPrivacyPolicyNegotiationIncluded());
+
+		IEventMgr eventMgr = mock(IEventMgr.class);
+		classUnderTest.setEventMgr(eventMgr);
+		assertSame(eventMgr, classUnderTest.getEventMgr());
 	}
 	
 	/**
@@ -121,6 +138,7 @@ public class NegotiationRequesterUnitTest {
 			public void onNegotiationError(String msg) {
 			}
 		};
-		classUnderTest.startNegotiation(provider, false, callback);
+		classUnderTest.setPrivacyPolicyNegotiationIncluded(false);
+		classUnderTest.startNegotiation(provider, callback);
 	}
 }

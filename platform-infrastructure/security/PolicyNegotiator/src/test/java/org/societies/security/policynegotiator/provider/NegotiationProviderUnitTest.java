@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.policynegotiator;
+package org.societies.security.policynegotiator.provider;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -36,10 +36,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.internal.schema.security.policynegotiator.NegotiationType;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
+import org.societies.api.internal.security.digsig.ISlaSignatureMgr;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.security.policynegotiator.provider.NegotiationProvider;
+import org.societies.security.policynegotiator.provider.ProviderServiceMgr;
 
 public class NegotiationProviderUnitTest {
 
@@ -72,8 +74,20 @@ public class NegotiationProviderUnitTest {
 
 	@Test
 	public void testSettersAndGetters() {
+		
 		assertNotNull(classUnderTest.getGroupMgr());
+		assertSame(groupMgrMock, classUnderTest.getGroupMgr());
+		
 		assertNotNull(classUnderTest.getSignatureMgr());
+		assertSame(signatureMgrMock, classUnderTest.getSignatureMgr());
+		
+		ISlaSignatureMgr slaSignatureMgr = mock(ISlaSignatureMgr.class);
+		classUnderTest.setSlaSignatureMgr(slaSignatureMgr);
+		assertSame(slaSignatureMgr, classUnderTest.getSlaSignatureMgr());
+		
+		ProviderServiceMgr providerServiceMgr = mock(ProviderServiceMgr.class);
+		classUnderTest.setProviderServiceMgr(providerServiceMgr);
+		assertSame(providerServiceMgr, classUnderTest.getProviderServiceMgr());
 	}
 
 	/**
