@@ -85,6 +85,9 @@ public class ServiceMgmt implements IServices {
 		
 		try{
 			
+			if(logger.isDebugEnabled())
+				logger.debug("Trying to get ServiceResourceIdentifier for class: " + callingClass);
+			
 			// First we get the calling Bundle
 			Bundle serviceBundle = FrameworkUtil.getBundle(callingClass);
 		
@@ -100,7 +103,7 @@ public class ServiceMgmt implements IServices {
 		
 		} catch(Exception ex){
 			ex.printStackTrace();
-			logger.error("Exceptioon occured: " + ex.getMessage());
+			logger.error("Exception occured: " + ex.getMessage());
 			return null;
 		}
 	}
