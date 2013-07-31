@@ -40,7 +40,10 @@ import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessCo
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.feedback.IUserFeedbackResponseEventListener;
-import org.societies.api.internal.useragent.model.*;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
+import org.societies.api.internal.useragent.model.ExpProposalType;
+import org.societies.api.internal.useragent.model.FeedbackForm;
+import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
@@ -49,13 +52,10 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Respons
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.societies.api.schema.useragent.feedback.*;
 import org.societies.useragent.api.feedback.IInternalUserFeedback;
+import org.societies.useragent.api.feedback.IPrivacyPolicyNegotiationHistoryRepository;
+import org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository;
 import org.societies.useragent.api.model.UserFeedbackEventTopics;
-import org.societies.useragent.feedback.guis.AckNackGUI;
-import org.societies.useragent.feedback.guis.CheckBoxGUI;
-import org.societies.useragent.feedback.guis.RadioGUI;
-import org.societies.useragent.feedback.guis.TimedGUI;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.AsyncResult;
 
 import java.util.*;
 import java.util.concurrent.Future;
@@ -76,15 +76,6 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                     "org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent",
                     "org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent"));
 
-    //GUI types for forms
-    private static final String RADIO = "radio";
-    private static final String CHECK = "check";
-    private static final String ACK = "ack";
-    private static final String ABORT = "abort";
-    private static final String NOTIFICATION = "notification";
-    private static final String PRIVACY_NEGOTIATION = "privacy-negotiation";
-    private static final String PRIVACY_ACCESS_CONTROL = "privacy-access-control";
-    private static final String UNDEFINED = "undefined";
 
     @Autowired
     private ICommManager commsMgr;
@@ -92,11 +83,11 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     @Autowired
     private PubsubClient pubsub;
 
-//    @Autowired
-//    private IUserFeedbackHistoryRepository userFeedbackHistoryRepository; // TODO: re-enable me after fixing bug #2096
+    @Autowired
+    private IUserFeedbackHistoryRepository userFeedbackHistoryRepository;
 
-//    @Autowired
-//    private IPrivacyPolicyNegotiationHistoryRepository privacyPolicyNegotiationHistoryRepository; // TODO: re-enable me after fixing bug #2096
+    @Autowired
+    private IPrivacyPolicyNegotiationHistoryRepository privacyPolicyNegotiationHistoryRepository;
 
     private final Map<String, UserFeedbackResult<List<String>>> expResults = new HashMap<String, UserFeedbackResult<List<String>>>();
     private final Map<String, IUserFeedbackResponseEventListener<List<String>>> expCallbacks = new HashMap<String, IUserFeedbackResponseEventListener<List<String>>>();
@@ -107,14 +98,13 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     private final Map<String, UserFeedbackResult<List<ResponseItem>>> accessCtrlResults = new HashMap<String, UserFeedbackResult<List<ResponseItem>>>();
     private final Map<String, IUserFeedbackResponseEventListener<List<ResponseItem>>> accessCtrlCallbacks = new HashMap<String, IUserFeedbackResponseEventListener<List<ResponseItem>>>();
 
-    private RequestManager requestMgr;
+    private final RequestManager requestMgr = new RequestManager();
     private IIdentity myCloudID;
 
 
     public void initialiseUserFeedback() {
         log.debug("User Feedback initialising");
 
-        requestMgr = new RequestManager();
         expResults.clear();
         impResults.clear();
         negotiationResults.clear();
@@ -180,8 +170,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         try {
             log.debug("Recalling stored PPN requests");
 
-//            List<UserFeedbackPrivacyNegotiationEvent> userFeedbackPrivacyNegotiationEvents = privacyPolicyNegotiationHistoryRepository.listIncomplete();
-            List<UserFeedbackPrivacyNegotiationEvent> userFeedbackPrivacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>();// TODO: re-enable me
+            List<UserFeedbackPrivacyNegotiationEvent> userFeedbackPrivacyNegotiationEvents = privacyPolicyNegotiationHistoryRepository.listIncomplete();
             for (UserFeedbackPrivacyNegotiationEvent userFeedbackPrivacyNegotiationEvent : userFeedbackPrivacyNegotiationEvents) {
                 String requestId = userFeedbackPrivacyNegotiationEvent.getRequestId();
 
@@ -206,8 +195,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         try {
             log.debug("Recalling stored UF requests");
 
-//            List<UserFeedbackBean> userFeedbackBeans = userFeedbackHistoryRepository.listIncomplete(); // TODO: re-enable me after fixing bug #2096
-            List<UserFeedbackBean> userFeedbackBeans = new ArrayList<UserFeedbackBean>();
+            List<UserFeedbackBean> userFeedbackBeans = userFeedbackHistoryRepository.listIncomplete();
 
             for (UserFeedbackBean userFeedbackBean : userFeedbackBeans) {
                 String requestId = userFeedbackBean.getRequestId();
@@ -312,20 +300,19 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             }
         }
 
-        // TODO: re-enable me after fixing bug #2096
-//        // store in database before sending pubsub event
-//        try {
-//            if (userFeedbackHistoryRepository == null) {
-//                log.warn("userFeedbackHistoryRepository is null - cannot store user feedback request bean in database");
-//            } else {
-//                if (log.isDebugEnabled())
-//                    log.debug("Storing user feedback bean in database");
-//
-//                userFeedbackHistoryRepository.insert(ufBean);
-//            }
-//        } catch (Exception ex) {
-//            log.error("Error storing user feedback request bean to database #318 - UserFeedback will continue without database support. \n" + ex.getMessage());
-//        }
+        // store in database before sending pubsub event
+        try {
+            if (userFeedbackHistoryRepository == null) {
+                log.warn("userFeedbackHistoryRepository is null - cannot store user feedback request bean in database");
+            } else {
+                if (log.isDebugEnabled())
+                    log.debug("Storing user feedback bean in database");
+
+                userFeedbackHistoryRepository.insert(ufBean);
+            }
+        } catch (Exception ex) {
+            log.error("Error storing user feedback request bean to database #318 - UserFeedback will continue without database support. \n" + ex.getMessage());
+        }
 
         //send pubsub event to all user agents
         try {
@@ -422,20 +409,19 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             }
         }
 
-        // TODO: re-enable me after fixing bug #2096
-//        // store in database before sending pubsub event
-//        try {
-//            if (userFeedbackHistoryRepository == null) {
-//                log.warn("userFeedbackHistoryRepository is null - cannot store user feedback request bean in database");
-//            } else {
-//                if (log.isDebugEnabled())
-//                    log.debug("Storing user feedback bean in database");
-//
-//                userFeedbackHistoryRepository.insert(ufBean);
-//            }
-//        } catch (Exception ex) {
-//            log.error("Error storing user feedback request bean to database #427 - UserFeedback will continue without database support. \n" + ex.getMessage());
-//        }
+        // store in database before sending pubsub event
+        try {
+            if (userFeedbackHistoryRepository == null) {
+                log.warn("userFeedbackHistoryRepository is null - cannot store user feedback request bean in database");
+            } else {
+                if (log.isDebugEnabled())
+                    log.debug("Storing user feedback bean in database");
+
+                userFeedbackHistoryRepository.insert(ufBean);
+            }
+        } catch (Exception ex) {
+            log.error("Error storing user feedback request bean to database #427 - UserFeedback will continue without database support. \n" + ex.getMessage());
+        }
 
         //send pubsub event to all user agents
         try {
@@ -534,20 +520,19 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             }
         }
 
-        // TODO: re-enable me after fixing bug #2096
-//        // store in database before sending pubsub event
-//        try {
-//            if (privacyPolicyNegotiationHistoryRepository == null) {
-//                log.warn("privacyPolicyNegotiationHistoryRepository is null - cannot store PPN request bean in database");
-//            } else {
-//                if (log.isDebugEnabled())
-//                    log.debug("Storing PPN bean in database");
-//
-//                privacyPolicyNegotiationHistoryRepository.insert(event);
-//            }
-//        } catch (Exception ex) {
-//            log.error("Error storing PPN request bean to database #537 - UserFeedback will continue without database support. \n" + ex.getMessage());
-//        }
+        // store in database before sending pubsub event
+        try {
+            if (privacyPolicyNegotiationHistoryRepository == null) {
+                log.warn("privacyPolicyNegotiationHistoryRepository is null - cannot store PPN request bean in database");
+            } else {
+                if (log.isDebugEnabled())
+                    log.debug("Storing PPN bean in database");
+
+                privacyPolicyNegotiationHistoryRepository.insert(event);
+            }
+        } catch (Exception ex) {
+            log.error("Error storing PPN request bean to database #537 - UserFeedback will continue without database support. \n" + ex.getMessage());
+        }
 
         //send pubsub event to all user agents
         try {
@@ -692,22 +677,21 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         ufBean.setProposalText(notificationTxt);
         ufBean.setMethod(FeedbackMethodType.SHOW_NOTIFICATION);
 
-        // TODO: re-enable me after fixing bug #2096
-//        // store in database before sending pubsub event
-//        try {
-//            if (userFeedbackHistoryRepository == null) {
-//                log.warn("userFeedbackHistoryRepository is null - cannot store user feedback request bean in database");
-//
-//            } else {
-//                if (log.isDebugEnabled())
-//                    log.debug("Storing user feedback bean in database");
-//
-//                userFeedbackHistoryRepository.insert(ufBean);
-//                ufBean = userFeedbackHistoryRepository.getByRequestId(requestId);
-//            }
-//        } catch (Exception ex) {
-//            log.error("Error storing user feedback request bean to database #696 - UserFeedback will continue without database support. \n" + ex.getMessage());
-//        }
+        // store in database before sending pubsub event
+        try {
+            if (userFeedbackHistoryRepository == null) {
+                log.warn("userFeedbackHistoryRepository is null - cannot store user feedback request bean in database");
+
+            } else {
+                if (log.isDebugEnabled())
+                    log.debug("Storing user feedback bean in database");
+
+                userFeedbackHistoryRepository.insert(ufBean);
+                ufBean = userFeedbackHistoryRepository.getByRequestId(requestId);
+            }
+        } catch (Exception ex) {
+            log.error("Error storing user feedback request bean to database #696 - UserFeedback will continue without database support. \n" + ex.getMessage());
+        }
 
         //send pubsub event to all user agents
         try {
@@ -745,20 +729,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         }
 
         if (eventTopic.equalsIgnoreCase(UserFeedbackEventTopics.REQUEST)) {
-
-//            if (item instanceof ElementNSImpl) {
-//                log.warn("Pubsub item is ElementNSImpl, using wrapped user data");
-//                item = ((ElementNSImpl) item).item(0);
-//            }
-
-//            if (item == null || !(item instanceof UserFeedbackBean)) {
-//                log.warn(String.format("Received pubsub event with topic '%s', ID '%s' and class '%s' - Required UserFeedbackBean ",
-//                        eventTopic,
-//                        itemID,
-//                        item != null ? item.getClass().getCanonicalName() : "[null item]"
-//                ));
-//                return;
-//            }
+            // TODO: It would be nice to refactor all GUI code into a separate class (UserFeedbackGuiFactory?)
 
             //read from request bean
             UserFeedbackBean ufBean = (UserFeedbackBean) item;
@@ -810,7 +781,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
      */
     private void processExpFeedbackRequestEvent(String requestId, int type, String proposalText, List<String> optionsList) {
         //create feedback form
-        FeedbackForm fbForm = generateExpFeedbackForm(requestId, type, proposalText, optionsList);
+        FeedbackForm fbForm = UserFeedbackGuiFactory.generateExpFeedbackForm(requestId, type, proposalText, optionsList);
         //add new request to queue
         requestMgr.addRequest(fbForm);
     }
@@ -848,15 +819,14 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             if (log.isDebugEnabled())
                 log.debug("This is the node where the exp feedback request originated");
 
-            // TODO: re-enable me after fixing bug #2096
-//            // update result
-//            try {
-//                if (userFeedbackHistoryRepository != null) {
-//                    userFeedbackHistoryRepository.completeExpFeedback(responseID, expFeedbackBean.getFeedback());
-//                }
-//            } catch (Exception ex) {
-//                log.error("Error updating user feedback stage in database #844 - UserFeedback will continue without database support. \n" + ex.getMessage());
-//            }
+            // update result
+            try {
+                if (userFeedbackHistoryRepository != null) {
+                    userFeedbackHistoryRepository.completeExpFeedback(responseID, expFeedbackBean.getFeedback());
+                }
+            } catch (Exception ex) {
+                log.error("Error updating user feedback stage in database #844 - UserFeedback will continue without database support. \n" + ex.getMessage());
+            }
 
             // inform clients that UF is complete
             try {
@@ -885,7 +855,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
     private void processImpFeedbackRequestEvent(String requestId, int type, String proposalText, int timeout) {
         //create feedback form
-        FeedbackForm fbForm = generateImpFeedbackForm(requestId, type, proposalText, timeout);
+        FeedbackForm fbForm = UserFeedbackGuiFactory.generateImpFeedbackForm(requestId, type, proposalText, timeout);
         //add new request to queue
         requestMgr.addRequest(fbForm);
     }
@@ -923,15 +893,14 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             if (log.isDebugEnabled())
                 log.debug("This is the node where the imp feedback request originated");
 
-            // TODO: re-enable me after fixing bug #2096
-//            // update result
-//            try {
-//                if (userFeedbackHistoryRepository != null) {
-//                    userFeedbackHistoryRepository.completeImpFeedback(responseID, impFeedbackBean.isAccepted());
-//                }
-//            } catch (Exception ex) {
-//                log.error("Error updating user feedback stage in database #917 - UserFeedback will continue without database support. \n" + ex.getMessage());
-//            }
+            // update result
+            try {
+                if (userFeedbackHistoryRepository != null) {
+                    userFeedbackHistoryRepository.completeImpFeedback(responseID, impFeedbackBean.isAccepted());
+                }
+            } catch (Exception ex) {
+                log.error("Error updating user feedback stage in database #917 - UserFeedback will continue without database support. \n" + ex.getMessage());
+            }
 
             // inform clients that UF is complete
             try {
@@ -963,7 +932,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
      */
     private void processNotificationRequestEvent(String requestId, String proposalText) {
         //create feedback form
-        FeedbackForm fbForm = generateNotificationForm(requestId, proposalText);
+        FeedbackForm fbForm = UserFeedbackGuiFactory.generateNotificationForm(requestId, proposalText);
         //add new request to queue
         requestMgr.addRequest(fbForm);
     }
@@ -1001,15 +970,14 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             if (log.isDebugEnabled())
                 log.debug("This is the node where the PPN request originated");
 
-            // TODO: re-enable me after fixing bug #2096
-//            // update result
-//            try {
-//                if (privacyPolicyNegotiationHistoryRepository != null) {
-//                    privacyPolicyNegotiationHistoryRepository.updateStage(responseID, FeedbackStage.COMPLETED);
-//                }
-//            } catch (Exception ex) {
-//                log.error("Error updating PPN stage in database #993 - UserFeedback will continue without database support. \n" + ex.getMessage());
-//            }
+            // update result
+            try {
+                if (privacyPolicyNegotiationHistoryRepository != null) {
+                    privacyPolicyNegotiationHistoryRepository.updateStage(responseID, FeedbackStage.COMPLETED);
+                }
+            } catch (Exception ex) {
+                log.error("Error updating PPN stage in database #993 - UserFeedback will continue without database support. \n" + ex.getMessage());
+            }
 
             // inform clients that negotiation is complete
             try {
@@ -1172,67 +1140,6 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         }
     }
 
-
-    /*
-     * Helper methods to generate feedback forms - explicit, implicit and notification
-     */
-    private static FeedbackForm generateExpFeedbackForm(String requestId, int type, String proposalText, List<String> optionsList) {
-        FeedbackForm newFbForm = new FeedbackForm();
-        //add unique id
-        newFbForm.setID(requestId);
-        //add text to show to user
-        newFbForm.setText(proposalText);
-        //add data
-        String[] optionsArray = new String[optionsList.size()];
-        for (int i = 0; i < optionsList.size(); i++) {
-            optionsArray[i] = optionsList.get(i);
-        }
-        newFbForm.setData(optionsArray);
-        //add type
-        if (type == ExpProposalType.RADIOLIST) {
-            newFbForm.setType(RADIO);
-        } else if (type == ExpProposalType.CHECKBOXLIST) {
-            newFbForm.setType(CHECK);
-        } else if (type == ExpProposalType.ACKNACK) {
-            newFbForm.setType(ACK);
-        } else {
-            log.error("Could not understand this type of explicit GUI: " + type);
-        }
-        return newFbForm;
-    }
-
-    private static FeedbackForm generateImpFeedbackForm(String requestId, int type, String proposalText, int timeout) {
-        FeedbackForm newFbForm = new FeedbackForm();
-        //add unique id
-        newFbForm.setID(requestId);
-        //add text to show user
-        newFbForm.setText(proposalText);
-        //add data
-        String[] data = {Integer.toString(timeout)};
-        newFbForm.setData(data);
-        //add type
-        if (type == ImpProposalType.TIMED_ABORT) {
-            newFbForm.setType(ABORT);
-        } else {
-            log.error("Could not understand this type of implicit GUI: " + type);
-        }
-        return newFbForm;
-    }
-
-    private static FeedbackForm generateNotificationForm(String requestId, String notificationTxt) {
-        FeedbackForm newFbForm = new FeedbackForm();
-        //add unique id
-        newFbForm.setID(requestId);
-        //add text to show user
-        newFbForm.setText(notificationTxt);
-        //add data
-        String[] data = {"5000"};
-        newFbForm.setData(data);
-        //add type
-        newFbForm.setType(NOTIFICATION);
-        return newFbForm;
-    }
-
     /*
      *Called by UACommsServer to request explicit feedback for remote User Agent
      *
@@ -1241,27 +1148,8 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
      */
     @Override
     public Future<List<String>> getExplicitFBforRemote(int type, ExpProposalContent content) {
-        log.debug("Request for explicit feedback received from remote User Agent");
-        List<String> result;
-
-        //show GUIs on local device
-        log.debug("Returning explicit feedback to UACommsServer");
-        String proposalText = content.getProposalText();
-        String[] options = content.getOptions();
-        if (type == ExpProposalType.RADIOLIST) {
-            log.debug("Radio list GUI");
-            RadioGUI gui = new RadioGUI();
-            result = gui.displayGUI(proposalText, options);
-        } else if (type == ExpProposalType.CHECKBOXLIST) {
-            log.debug("Check box list GUI");
-            CheckBoxGUI gui = new CheckBoxGUI();
-            result = gui.displayGUI(proposalText, options);
-        } else { //ACK-NACK
-            log.debug("ACK/NACK GUI");
-            result = AckNackGUI.displayGUI(proposalText, options);
-        }
-
-        return new AsyncResult<List<String>>(result);
+        // TODO: Added this delegate so I didn't have to change classes consuming UF. Would be nice to refactor all GUI code into a separate class
+        return UserFeedbackGuiFactory.getExplicitFBforRemote(type, content);
     }
 
     /*
@@ -1272,38 +1160,23 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
      */
     @Override
     public Future<Boolean> getImplicitFBforRemote(int type, ImpProposalContent content) {
-        log.debug("Request for implicit feedback received from remote User Agent");
-        Boolean result = null;
-
-        //show GUIs on local device
-        log.debug("Returning implicit feedback to UACommsServer");
-        String proposalText = content.getProposalText();
-        int timeout = content.getTimeout();
-        if (type == ImpProposalType.TIMED_ABORT) {
-            log.debug("Timed Abort GUI");
-            TimedGUI gui = new TimedGUI();
-            result = gui.displayGUI(proposalText, timeout);
-        }
-
-        return new AsyncResult<Boolean>(result);
+        // TODO: Added this delegate so I didn't have to change classes consuming UF. Would be nice to refactor all GUI code into a separate class
+        return UserFeedbackGuiFactory.getImplicitFBforRemote(type, content);
     }
 
     @Override
     public List<UserFeedbackBean> listStoredFeedbackBeans(int howMany) {
-//        return userFeedbackHistoryRepository.listPrevious(howMany);
-        return new ArrayList<UserFeedbackBean>(); // TODO: re-enable me after fixing bug #2096
+        return userFeedbackHistoryRepository.listPrevious(howMany);
     }
 
     @Override
     public List<UserFeedbackBean> listStoredFeedbackBeans(Date sinceWhen) {
-//        return userFeedbackHistoryRepository.listSince(sinceWhen);
-        return new ArrayList<UserFeedbackBean>(); // TODO: re-enable me after fixing bug #2096
+        return userFeedbackHistoryRepository.listSince(sinceWhen);
     }
 
     @Override
     public List<UserFeedbackBean> listIncompleteFeedbackBeans() {
-//        return userFeedbackHistoryRepository.listIncomplete();
-        return new ArrayList<UserFeedbackBean>(); // TODO: re-enable me after fixing bug #2096
+        return userFeedbackHistoryRepository.listIncomplete();
     }
 
     public void setCommsMgr(ICommManager commsMgr) {
@@ -1314,14 +1187,13 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         this.pubsub = pubsub;
     }
 
-    // TODO: re-enable me after fixing bug #2096
-//    public void setUserFeedbackHistoryRepository(IUserFeedbackHistoryRepository userFeedbackHistoryRepository) {
-//        this.userFeedbackHistoryRepository = userFeedbackHistoryRepository;
-//    }
-//
-//    public void setPrivacyPolicyNegotiationHistoryRepository(IPrivacyPolicyNegotiationHistoryRepository privacyPolicyNegotiationHistoryRepository) {
-//        this.privacyPolicyNegotiationHistoryRepository = privacyPolicyNegotiationHistoryRepository;
-//    }
+    public void setUserFeedbackHistoryRepository(IUserFeedbackHistoryRepository userFeedbackHistoryRepository) {
+        this.userFeedbackHistoryRepository = userFeedbackHistoryRepository;
+    }
+
+    public void setPrivacyPolicyNegotiationHistoryRepository(IPrivacyPolicyNegotiationHistoryRepository privacyPolicyNegotiationHistoryRepository) {
+        this.privacyPolicyNegotiationHistoryRepository = privacyPolicyNegotiationHistoryRepository;
+    }
 
     /**
      * This is a non-api method which is used by integration tests to clear the internal state of the UF module
