@@ -75,13 +75,13 @@
                 <p:inputText id="ip-address" value="#{screenBean.ipAddress}" />
 
             </h:panelGrid>
-            <p:commandButton value="Add" update=":displayDeleteForm:growl,:displayDeleteForm:screenTable" actionListener="#{screenData.addScreen(screenBean)}" oncomplete="handleLoginRequest(xhr, status, args)" />
+            <p:commandButton value="Add" update=":displayDeleteForm:growl,:displayDeleteForm:screenTable" actionListener="#{screenData.addScreen(screenBean)}" oncomplete="handleAddRequest(xhr, status, args)" />
         </p:dialog>
     </h:form>
 
     <!--JAVA SCRIPT TO ALERT USER OF INVALID INPUT -->
     <script type="text/javascript">
-        function handleLoginRequest(xhr, status, args) {
+        function handleAddRequest(xhr, status, args) {
         if(!args.screenAdded) {
         asDialogue.jq.effect("shake", { times:5 }, 100);
         }
