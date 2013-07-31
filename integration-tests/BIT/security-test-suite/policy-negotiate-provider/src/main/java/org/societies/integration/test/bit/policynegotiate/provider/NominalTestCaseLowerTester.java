@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,6 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.domainauthority.LocalPath;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
-import org.societies.api.internal.security.policynegotiator.NegotiationException;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.integration.test.IntegrationTestUtils;
 
@@ -70,8 +68,8 @@ public class NominalTestCaseLowerTester {
 	 * This method is called only one time, at the very beginning of the process
 	 * (after the constructor) in order to initialize the process.
 	 * Select the relevant service example: the Calculator
-	 * @throws NegotiationException 
-	 * @throws URISyntaxException 
+	 * @throws org.societies.api.internal.security.policynegotiator.NegotiationException 
+	 * @throws java.net.URISyntaxException 
 	 * @throws InterruptedException 
 	 */
 	@BeforeClass
