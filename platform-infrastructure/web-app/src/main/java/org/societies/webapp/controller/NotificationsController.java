@@ -506,8 +506,21 @@ public class NotificationsController extends BasePageController {
         if (log.isDebugEnabled())
             log.debug("Loading most recent " + howMany + " notifications");
 
-        final List<UserFeedbackBean> userFeedbackBeans = userFeedbackHistoryRepository.listPrevious(howMany);
-        final List<UserFeedbackPrivacyNegotiationEvent> userFeedbackPrivacyNegotiationEvents = privacyPolicyNegotiationHistoryRepository.listPrevious(howMany);
+        List<UserFeedbackBean> userFeedbackBeans;
+        List<UserFeedbackPrivacyNegotiationEvent> userFeedbackPrivacyNegotiationEvents;
+
+        try {
+            userFeedbackBeans = userFeedbackHistoryRepository.listPrevious(howMany);
+        } catch (Exception ex) {
+            log.warn("Recoverable error: Error recalling UF records: " + ex.getMessage());
+            userFeedbackBeans = new ArrayList<UserFeedbackBean>();
+        }
+        try {
+            userFeedbackPrivacyNegotiationEvents = privacyPolicyNegotiationHistoryRepository.listPrevious(howMany);
+        } catch (Exception ex) {
+            log.warn("Recoverable error: Error recalling PPN records: " + ex.getMessage());
+            userFeedbackPrivacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>();
+        }
 
         replaceCacheWithList(userFeedbackBeans, userFeedbackPrivacyNegotiationEvents);
     }
@@ -516,8 +529,21 @@ public class NotificationsController extends BasePageController {
         if (log.isDebugEnabled())
             log.debug("Loading notifications since " + sinceWhen);
 
-        final List<UserFeedbackBean> userFeedbackBeans = userFeedbackHistoryRepository.listSince(sinceWhen);
-        final List<UserFeedbackPrivacyNegotiationEvent> userFeedbackPrivacyNegotiationEvents = privacyPolicyNegotiationHistoryRepository.listSince(sinceWhen);
+        List<UserFeedbackBean> userFeedbackBeans;
+        List<UserFeedbackPrivacyNegotiationEvent> userFeedbackPrivacyNegotiationEvents;
+
+        try {
+            userFeedbackBeans = userFeedbackHistoryRepository.listSince(sinceWhen);
+        } catch (Exception ex) {
+            log.warn("Recoverable error: Error recalling UF records: " + ex.getMessage());
+            userFeedbackBeans = new ArrayList<UserFeedbackBean>();
+        }
+        try {
+            userFeedbackPrivacyNegotiationEvents = privacyPolicyNegotiationHistoryRepository.listSince(sinceWhen);
+        } catch (Exception ex) {
+            log.warn("Recoverable error: Error recalling PPN records: " + ex.getMessage());
+            userFeedbackPrivacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>();
+        }
 
         replaceCacheWithList(userFeedbackBeans, userFeedbackPrivacyNegotiationEvents);
     }
