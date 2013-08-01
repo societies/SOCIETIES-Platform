@@ -18,7 +18,7 @@
             columns="1" emptyMessage="No notifications :(" id="notificationHistoryGrid">
 
 <p:panel id="ppnPanel_unread" styleClass="unread-notification"
-         header="#{notification.title}"
+         header="Negotiation with #{notification.title}"
          rendered="#{notification.type eq 'PPN' and notification.complete eq false}">
 
     <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
@@ -27,7 +27,6 @@
     <!-- PRIVACY POLICY NEGOTIATION -->
 
     <h:panelGrid columns="1">
-        <h:outputText value="#{notification.title}"/>
 
         <h:outputText value="#{notification.arrivalDate}"/>
 
@@ -37,16 +36,15 @@
 </p:panel>
 
 <p:panel id="ppnPanel"
-         header="#{notification.title}"
+         header="Negotiation with #{notification.title}"
          rendered="#{notification.type eq 'PPN' and notification.complete eq true}">
 
-    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
+    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
     <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
     <!-- PRIVACY POLICY NEGOTIATION -->
 
     <h:panelGrid columns="1">
-        <h:outputText value="#{notification.title}"/>
 
         <h:outputText value="#{notification.arrivalDate}"/>
 
@@ -59,7 +57,7 @@
          header="#{notification.title}"
          rendered="#{notification.type eq 'ACK_NACK' and notification.complete eq false}">
 
-    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
+    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
     <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
     <!-- ACK/NACK -->
