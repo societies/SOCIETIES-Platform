@@ -900,19 +900,20 @@ public class CisManager implements ICisManager, IFeatureServer {
 			if (c.getNotification().getDeleteMemberNotification() != null) {
 				LOG.info("delete member notification received");
 				DeleteMemberNotification d = (DeleteMemberNotification) c.getNotification().getDeleteMemberNotification();
-				if(d.getMemberJid() != this.cisManagerId.getBareJid()){
+				if(!d.getMemberJid().equalsIgnoreCase(this.cisManagerId.getBareJid())){
 					LOG.warn("delete member notification had a different member than me...");
-				}
-				if(!this.subscribedCISs.contains(new CisRecord(d.getCommunityJid()))){
-					LOG.info("CIS is not part of the list of subscribed CISs");
-				}
-				else{
-					CisSubscribedImp temp = new CisSubscribedImp(new CisRecord(d.getCommunityJid()));
-					temp = subscribedCISs.get(subscribedCISs.indexOf(temp)); // temp now is the real object
-
-					
-					this.subscribedCISs.remove(temp);// removing it from the list
-					this.deletePersisted(temp); // removing it from the database
+				}else{
+					if(!this.subscribedCISs.contains(new CisSubscribedImp(new CisRecord(d.getCommunityJid())))){
+						LOG.info("CIS is not part of the list of subscribed CISs");
+					}
+					else{
+						CisSubscribedImp temp = new CisSubscribedImp(new CisRecord(d.getCommunityJid()));
+						temp = subscribedCISs.get(subscribedCISs.indexOf(temp)); // temp now is the real object
+	
+						
+						this.subscribedCISs.remove(temp);// removing it from the list
+						this.deletePersisted(temp); // removing it from the database
+					}
 				}
 				return;
 			}
@@ -1057,25 +1058,6 @@ public class CisManager implements ICisManager, IFeatureServer {
 		}
 	}
 	
-	private void updatePersisted(Object o){
-		Session session = sessionFactory.openSession();
-		Transaction t = session.beginTransaction();
-		try{
-			session.update(o);
-			t.commit();
-			LOG.info("Updated CIS object succeded!");
-			
-		}catch(Exception e){
-			e.printStackTrace();
-			t.rollback();
-			LOG.warn("Updating CIS object failed, rolling back");
-		}finally{
-			if(session!=null){
-				session.close();
-			}
-			
-		}
-	}
 	
 	private void deletePersisted(Object o){
 		Session session = sessionFactory.openSession();
@@ -1182,9 +1164,9 @@ public class CisManager implements ICisManager, IFeatureServer {
 			j.setQualification(lq);
 	}
 	
-	// TODO just for test purposes, delete later
+	// just for test purposes, delete later
 	// set the user as a protestant from Paris =D
-	private void addHardCodedQualifications(){
+/*	private void addHardCodedQualifications(){
 		
 		if(internalCtxBroker !=null){ // check if it has been wired
 			
@@ -1228,7 +1210,7 @@ public class CisManager implements ICisManager, IFeatureServer {
 			}
 		}
 		
-	}
+	}*/
 	
 	
 	// client methods
