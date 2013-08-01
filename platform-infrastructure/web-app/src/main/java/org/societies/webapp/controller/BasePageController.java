@@ -32,7 +32,7 @@ public abstract class BasePageController implements Serializable {
             else if (severity == FacesMessage.SEVERITY_WARN)
                 log.warn(logMsg);
             else
-                log.trace(logMsg);
+                log.debug(logMsg);
         } catch (Exception ex) {
             // This method gets called from so many places, that it's worth catching any possible exception
             // Generally speaking, missing a message to a user is not a problem as the messages are usually non critical

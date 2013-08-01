@@ -37,21 +37,21 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     private String negotiationID;
 
     public PrivacyPolicyNegotiationController() {
-        if (log.isTraceEnabled())
-            log.trace("PrivacyPolicyNegotiationController ctor()");
+        if (log.isDebugEnabled())
+            log.debug("PrivacyPolicyNegotiationController ctor()");
 
     }
 
     @PostConstruct
     public void initMethod() {
-        if (log.isTraceEnabled())
-            log.trace("PrivacyPolicyNegotiationController init()");
+        if (log.isDebugEnabled())
+            log.debug("PrivacyPolicyNegotiationController init()");
         negotiationID = getIdFromQueryString();
         UserFeedbackPrivacyNegotiationEvent event = negotiationListener.getNegotiationEvent(negotiationID);
 
         if (event != null) {
-            if (log.isTraceEnabled())
-                log.trace("Preparing event for GUI with ID " + negotiationID);
+            if (log.isDebugEnabled())
+                log.debug("Preparing event for GUI with ID " + negotiationID);
 
             prepareEventForGUI(event);
         } else {
@@ -66,8 +66,8 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
     @SuppressWarnings("UnusedDeclaration")
     public void setNegotiationListener(PrivacyPolicyNegotiationListener negotiationListener) {
-        if (log.isTraceEnabled())
-            log.trace("setNegotiationListener()");
+        if (log.isDebugEnabled())
+            log.debug("setNegotiationListener()");
         this.negotiationListener = negotiationListener;
     }
 
@@ -149,11 +149,11 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     }
 
     private String checkNextNegotiation() {
-        if (log.isTraceEnabled())
+        if (log.isDebugEnabled())
             if ((negotiationListener.getQueuedNegotiationCount() > 0))
-                log.trace("Next negotiation ID should be " + negotiationListener.getNextNegotiationID());
+                log.debug("Next negotiation ID should be " + negotiationListener.getNextNegotiationID());
             else
-                log.trace("No more negotiations in queue");
+                log.debug("No more negotiations in queue");
 
         return (negotiationListener.getQueuedNegotiationCount() > 0)
                 ? "next" // redirect to next negotiation page

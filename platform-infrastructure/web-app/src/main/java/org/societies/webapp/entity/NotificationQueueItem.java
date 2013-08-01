@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Date;
 
 public class NotificationQueueItem implements Serializable, Comparable<NotificationQueueItem> {
@@ -131,9 +130,6 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     }
 
     public void setResult(String result) {
-        if (log.isTraceEnabled())
-            log.trace("setResult() for " + getTitle() + "=" + result);
-
         this.results = new String[]{result};
     }
 
@@ -142,9 +138,6 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     }
 
     public void setResults(String[] results) {
-        if (log.isTraceEnabled())
-            log.trace("setResults() for " + getTitle() + "=" + Arrays.toString(results));
-
         this.results = results;
     }
 

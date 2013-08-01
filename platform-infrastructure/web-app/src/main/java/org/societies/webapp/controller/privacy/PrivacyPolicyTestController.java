@@ -37,8 +37,6 @@ public class PrivacyPolicyTestController extends BasePageController {
     private class PubSubListener implements Subscriber {
 
         public void registerForEvents() {
-//            if (log.isTraceEnabled())
-//                log.trace("registerForEvents()");
 
             if (getPubsubClient() == null) {
                 log.error("PubSubClient was null, cannot register for events");
@@ -63,7 +61,7 @@ public class PrivacyPolicyTestController extends BasePageController {
 
         @Override
         public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object item) {
-            if (log.isTraceEnabled())
+            if (log.isDebugEnabled())
                 log.debug("pubsubEvent(): node=" + node + " item=" + item);
 
         }
@@ -74,16 +72,11 @@ public class PrivacyPolicyTestController extends BasePageController {
 
         @Override
         public void userLoggedIn() {
-//            if (log.isTraceEnabled())
-//                log.trace("userLoggedIn()");
-
             pubSubListener.registerForEvents();
         }
 
         @Override
         public void userLoggedOut() {
-//            if (log.isTraceEnabled())
-//                log.trace("userLoggedOut()");
         }
     }
 
@@ -102,7 +95,7 @@ public class PrivacyPolicyTestController extends BasePageController {
     private static int req_counter = 0;
 
     public PrivacyPolicyTestController() {
-        log.trace("PrivacyPolicyTestController ctor()");
+        log.debug("PrivacyPolicyTestController ctor()");
     }
 
     @PostConstruct
@@ -134,8 +127,8 @@ public class PrivacyPolicyTestController extends BasePageController {
 
     @SuppressWarnings("UnusedDeclaration")
     public void setUserService(UserService userService) {
-//        if (log.isTraceEnabled())
-//            log.trace("setUserService() = " + userService);
+//        if (log.isDebugEnabled())
+//            log.debug("setUserService() = " + userService);
 
         if (this.userService != null) {
             this.userService.removeLoginListener(loginListener);
@@ -276,9 +269,9 @@ public class PrivacyPolicyTestController extends BasePageController {
 
 
         List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
-        responseItems.add(buildResponseItem("http://this.is.a.win/", "winning - " + guid));
-//        responseItems.add(buildResponseItem("http://paddy.rules/", "paddy"));
-//        responseItems.add(buildResponseItem("http://something.something.something/", "dark side"));
+        responseItems.add(buildResponseItem("http://this.is.a.win/", "Location"));
+        responseItems.add(buildResponseItem("http://paddy.rules/", "Status"));
+        responseItems.add(buildResponseItem("http://something.something.something/", "Hair colour"));
 
         ResponsePolicy responsePolicy = new ResponsePolicy();
         responsePolicy.setRequestor(requestorBean);

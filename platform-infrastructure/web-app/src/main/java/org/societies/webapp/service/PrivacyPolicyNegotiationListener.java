@@ -5,6 +5,7 @@ import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
@@ -62,30 +63,6 @@ public class PrivacyPolicyNegotiationListener extends BasePageController {
             }
         }
 
-        public void sendResponse(ResponsePolicy responsePolicy, NegotiationDetailsBean negotiationDetails) {
-            if (log.isDebugEnabled())
-                log.debug("sendResponse(): privacyNegotiationResponse");
-
-            UserFeedbackPrivacyNegotiationEvent payload = new UserFeedbackPrivacyNegotiationEvent();
-            payload.setResponsePolicy(responsePolicy);
-            payload.setNegotiationDetails(negotiationDetails);
-
-            try {
-                getPubsubClient().publisherPublish(getUserService().getIdentity(),
-                        EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE,
-                        String.valueOf(negotiationDetails.getNegotiationID()),
-                        payload);
-
-                if (log.isDebugEnabled())
-                    log.debug("Sent " + EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE + " with ID " + negotiationDetails.getNegotiationID());
-            } catch (Exception e) {
-                addGlobalMessage("Error publishing notification of completed negotiation",
-                        e.getMessage(),
-                        FacesMessage.SEVERITY_ERROR);
-                log.error("Error publishing notification of completed negotiation", e);
-            }
-        }
-
         @Override
         public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object item) {
             if (log.isDebugEnabled()) {
@@ -100,7 +77,7 @@ public class PrivacyPolicyNegotiationListener extends BasePageController {
 
             // get the policy from the event payload
             UserFeedbackPrivacyNegotiationEvent privEvent = (UserFeedbackPrivacyNegotiationEvent) item;
-            addRequestToQueue(String.valueOf(privEvent.getNegotiationDetails().getNegotiationID()), privEvent);
+            addRequestToQueue(String.valueOf(privEvent.getRequestId()), privEvent);
 
 
             // notify the user
@@ -135,6 +112,9 @@ public class PrivacyPolicyNegotiationListener extends BasePageController {
     @ManagedProperty(value = "#{userService}")
     private UserService userService;
 
+    @ManagedProperty(value = "#{userFeedback}")
+    private IUserFeedback userFeedback;
+
     private final Map<String, UserFeedbackPrivacyNegotiationEvent> negotiationEventQueue = new HashMap<String, UserFeedbackPrivacyNegotiationEvent>();
 
     public PrivacyPolicyNegotiationListener() {
@@ -153,6 +133,7 @@ public class PrivacyPolicyNegotiationListener extends BasePageController {
         }
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public PubsubClient getPubsubClient() {
         return pubsubClient;
     }
@@ -162,6 +143,7 @@ public class PrivacyPolicyNegotiationListener extends BasePageController {
         this.pubsubClient = pubsubClient;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public UserService getUserService() {
         return userService;
     }
@@ -177,6 +159,16 @@ public class PrivacyPolicyNegotiationListener extends BasePageController {
 
         this.userService = userService;
         this.userService.addLoginListener(loginListener);
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public IUserFeedback getUserFeedback() {
+        return userFeedback;
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void setUserFeedback(IUserFeedback userFeedback) {
+        this.userFeedback = userFeedback;
     }
 
     public int getQueuedNegotiationCount() {
@@ -200,7 +192,17 @@ public class PrivacyPolicyNegotiationListener extends BasePageController {
 
         responsePolicy.setNegotiationStatus(NegotiationStatus.ONGOING);
 
-        pubSubListener.sendResponse(responsePolicy, negotiationDetails);
+        try {
+            userFeedback.submitExplicitResponse(itemId, negotiationDetails, responsePolicy);
+
+            if (log.isDebugEnabled())
+                log.debug("Sent " + EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE + " with ID " + itemId);
+        } catch (Exception e) {
+            addGlobalMessage("Error publishing notification of completed negotiation",
+                    e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
+            log.error("Error publishing notification of completed negotiation", e);
+        }
 
         // Remove from queue
         removeRequestFromQueue(itemId);
@@ -219,7 +221,17 @@ public class PrivacyPolicyNegotiationListener extends BasePageController {
 
         responsePolicy.setNegotiationStatus(NegotiationStatus.FAILED);
 
-        pubSubListener.sendResponse(responsePolicy, negotiationDetails);
+        try {
+            userFeedback.submitExplicitResponse(itemId, negotiationDetails, responsePolicy);
+
+            if (log.isDebugEnabled())
+                log.debug("Sent " + EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE + " with ID " + itemId);
+        } catch (Exception e) {
+            addGlobalMessage("Error publishing notification of completed negotiation",
+                    e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
+            log.error("Error publishing notification of completed negotiation", e);
+        }
 
         //Remove from queue
         removeRequestFromQueue(itemId);

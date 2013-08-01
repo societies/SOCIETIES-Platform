@@ -129,9 +129,6 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     }
 
     public void setResult(String result) {
-        if (log.isTraceEnabled())
-            log.trace("setResult() for " + getTitle() + "=" + result);
-
         this.result = result;
     }
 
@@ -140,9 +137,6 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     }
 
     public void setResults(String[] results) {
-        if (log.isTraceEnabled())
-            log.trace("setResults() for " + getTitle() + "=" + Arrays.toString(results));
-
         this.results = results;
     }
 

@@ -144,7 +144,7 @@ public class ProfileSettingsController extends BasePageController {
         if (userPreferenceConditionMonitor == null)
             log.error("setUserPreferenceConditionMonitor() = null");
         else
-            log.trace("setUserPreferenceConditionMonitor() = " + userPreferenceConditionMonitor.toString());
+            log.debug("setUserPreferenceConditionMonitor() = " + userPreferenceConditionMonitor.toString());
 
         this.userPreferenceConditionMonitor = userPreferenceConditionMonitor;
 
@@ -183,7 +183,7 @@ public class ProfileSettingsController extends BasePageController {
 
     /* Web app Getters and Setters */
     public TreeNode getPreferencesRootNode() {
-//        log.trace("getPreferencesRootNode()");
+//        log.debug("getPreferencesRootNode()");
         if (preferencesRootNode == null)
             populatePreferencesRootNode();
 
@@ -191,12 +191,12 @@ public class ProfileSettingsController extends BasePageController {
     }
 
     public void setSelectedTreeNode(TreeNode selectedTreeNode) {
-//        log.trace("setSelectedTreeNode() = " + selectedTreeNode);
+//        log.debug("setSelectedTreeNode() = " + selectedTreeNode);
         this.selectedTreeNode = selectedTreeNode;
     }
 
     public TreeNode getSelectedTreeNode() {
-//        log.trace("getSelectedTreeNode() = " + selectedTreeNode);
+//        log.debug("getSelectedTreeNode() = " + selectedTreeNode);
         return selectedTreeNode;
     }
 
@@ -264,7 +264,7 @@ public class ProfileSettingsController extends BasePageController {
             }
 
             availablePreferenceNames = names.toArray(new String[names.size()]);
-            log.trace("Found " + availablePreferenceNames.length + " preference names: " + Arrays.toString(availablePreferenceNames));
+            log.debug("Found " + availablePreferenceNames.length + " preference names: " + Arrays.toString(availablePreferenceNames));
         }
 
         return availablePreferenceNames;
@@ -331,7 +331,7 @@ public class ProfileSettingsController extends BasePageController {
 
     /* Public methods */
     public void savePreferenceState() {
-        log.trace("savePreferenceState()");
+        log.debug("savePreferenceState()");
         treeChangesMade = true;
 
         TreeNode node = getSelectedTreeNode();
@@ -353,7 +353,7 @@ public class ProfileSettingsController extends BasePageController {
                 addGlobalMessage("Condition NOT updated for " + preferenceDetails.getPreferenceName(),
                         "Operator was null - something has gone wrong",
                         FacesMessage.SEVERITY_ERROR);
-//                log.trace("Operator was null - Condition NOT updated for " + preferenceDetails.getPreferenceName());
+//                log.debug("Operator was null - Condition NOT updated for " + preferenceDetails.getPreferenceName());
             } else {
 
 //                userPreferenceManagement.storePreference(userService.getIdentity(), preferenceDetails, preference);
@@ -362,7 +362,7 @@ public class ProfileSettingsController extends BasePageController {
                 addGlobalMessage("Condition updated for " + preferenceDetails.getPreferenceName(),
                         String.format(fmt, condition.getname(), condition.getoperator(), condition.getvalue()),
                         FacesMessage.SEVERITY_INFO);
-//                log.trace("Condition updated for " + preferenceDetails.getPreferenceName());
+//                log.debug("Condition updated for " + preferenceDetails.getPreferenceName());
             }
 
         } else if (node.getData() instanceof IPreferenceOutcome) {
@@ -383,7 +383,7 @@ public class ProfileSettingsController extends BasePageController {
                 addGlobalMessage("Outcome updated for " + preferenceDetails.getPreferenceName(),
                         String.format(fmt, outcome.getparameterName(), outcome.getvalue(), outcome.getQualityofPreference(), outcome.getConfidenceLevel()),
                         FacesMessage.SEVERITY_INFO);
-//                log.trace("Outcome updated for " + preferenceDetails.getPreferenceName());
+//                log.debug("Outcome updated for " + preferenceDetails.getPreferenceName());
             }
         } else {
 
@@ -397,7 +397,7 @@ public class ProfileSettingsController extends BasePageController {
     }
 
     public void deleteSelectedNode() {
-        log.trace("deleteSelectedNode()");
+        log.debug("deleteSelectedNode()");
         treeChangesMade = true;
 
         TreeNode node = getSelectedTreeNode();
@@ -439,7 +439,7 @@ public class ProfileSettingsController extends BasePageController {
             addGlobalMessage("Condition removed for " + preferenceDetails.getPreferenceName(),
                     String.format(fmt, condition.getname(), condition.getoperator(), condition.getvalue()),
                     FacesMessage.SEVERITY_INFO);
-//            log.trace("Condition removed for " + preferenceDetails.getPreferenceName());
+//            log.debug("Condition removed for " + preferenceDetails.getPreferenceName());
 
         } else if (node.getData() instanceof IPreferenceOutcome) {
 
@@ -447,7 +447,7 @@ public class ProfileSettingsController extends BasePageController {
             PreferenceDetails preferenceDetails = outcomeToPDMap.get(outcome);
             IPreference preference = outcomeToPreferenceMap.get(outcome);
 
-            log.trace("Deleting outcome...");
+            log.debug("Deleting outcome...");
             IPreference parent = (IPreference) preference.getParent();
             // remove the preference from its parent
             parent.remove(preference);
@@ -458,7 +458,7 @@ public class ProfileSettingsController extends BasePageController {
             addGlobalMessage("Outcome removed for " + preferenceDetails.getPreferenceName(),
                     String.format(fmt, outcome.getparameterName(), outcome.getvalue(), outcome.getQualityofPreference(), outcome.getConfidenceLevel()),
                     FacesMessage.SEVERITY_INFO);
-//            log.trace("Outcome removed for " + preferenceDetails.getPreferenceName());
+//            log.debug("Outcome removed for " + preferenceDetails.getPreferenceName());
 
         } else {
 
@@ -472,7 +472,7 @@ public class ProfileSettingsController extends BasePageController {
     }
 
     public void addPreference() {
-        log.trace("addPreference()");
+        log.debug("addPreference()");
         treeChangesMade = true;
 
         String prefName = getNewPreferenceName(); // set from the GUI
@@ -507,10 +507,10 @@ public class ProfileSettingsController extends BasePageController {
 
 
         // store
-        log.trace("Storing locally...");
+        log.debug("Storing locally...");
         pdToPreferenceTreeModelMap.put(preferenceDetails, model);
         pdToPreferenceMap.put(preferenceDetails, preferenceNode);
-//        log.trace("Storing to UPM...");
+//        log.debug("Storing to UPM...");
 //        userPreferenceManagement.storePreference(userService.getIdentity(), preferenceDetails, outcomeNode);
 
         // notify user
@@ -521,7 +521,7 @@ public class ProfileSettingsController extends BasePageController {
     }
 
     public void addConditionOnly() {
-        log.trace("addConditionOnly()");
+        log.debug("addConditionOnly()");
         treeChangesMade = true;
 
         ContextPreferenceCondition newCondition = conditionToAdd;
@@ -535,12 +535,12 @@ public class ProfileSettingsController extends BasePageController {
             preferenceDetails = outcomeToPDMap.get(selectedOutcome);
             selectedObject = outcomeToPreferenceMap.get(selectedOutcome);
             parentObject = (IPreference) selectedObject.getParent();
-            log.trace("Adding condition before outcome");
+            log.debug("Adding condition before outcome");
         } else if (selectedCondition != null) {
             preferenceDetails = conditionToPDMap.get(selectedCondition);
             selectedObject = conditionToPreferenceMap.get(selectedCondition);
             parentObject = (IPreference) selectedObject.getParent();
-            log.trace("Adding condition before condition");
+            log.debug("Adding condition before condition");
         } else {
             addGlobalMessage("Add outcome failed",
                     "PreferenceDetails was null - something has gone wrong",
@@ -557,16 +557,16 @@ public class ProfileSettingsController extends BasePageController {
             return;
         }
 
-        log.trace("Creating objects...");
+        log.debug("Creating objects...");
         IPreference newConditionPreference = createCondition(preferenceDetails, newCondition);
         if (newConditionPreference == null)
             return;
 
 
-        log.trace("Storing...");
+        log.debug("Storing...");
         if ("before".equals(addConditionMode)) {
             // This condition goes BEFORE the selected object, and AFTER the selected object's parent
-            log.trace("Adding BEFORE");
+            log.debug("Adding BEFORE");
 //            parentObject.remove(selectedObject);
             selectedObject.removeFromParent();
 
@@ -575,7 +575,7 @@ public class ProfileSettingsController extends BasePageController {
 
         } else if ("after".equals(addConditionMode)) {
             // this condition goes AFTER the selected object
-            log.trace("Adding AFTER");
+            log.debug("Adding AFTER");
 
             selectedObject.add(newConditionPreference);
         }
@@ -589,7 +589,7 @@ public class ProfileSettingsController extends BasePageController {
     }
 
     public void addConditionAndOutcome() {
-        log.trace("addConditionAndOutcome()");
+        log.debug("addConditionAndOutcome()");
         treeChangesMade = true;
 
         PreferenceDetails preferenceDetails;
@@ -602,11 +602,11 @@ public class ProfileSettingsController extends BasePageController {
         if (selectedCondition != null) {
             preferenceDetails = conditionToPDMap.get(selectedCondition);
             selectedPreferenceObject = conditionToPreferenceMap.get(selectedCondition);
-            log.trace("Adding condition and outcome after condition");
+            log.debug("Adding condition and outcome after condition");
         } else if (selectedPreference != null) {
             preferenceDetails = (selectedPreference);
             selectedPreferenceObject = pdToPreferenceMap.get(selectedPreference);
-            log.trace("Adding condition and outcome after preference");
+            log.debug("Adding condition and outcome after preference");
         } else {
             addGlobalMessage("Add condition and outcome failed",
                     "PreferenceDetails was null - something has gone wrong",
@@ -623,7 +623,7 @@ public class ProfileSettingsController extends BasePageController {
             return;
         }
 
-        log.trace("Creating objects...");
+        log.debug("Creating objects...");
         IPreference newConditionPreference = createCondition(preferenceDetails, newCondition);
         if (newConditionPreference == null)
             return;
@@ -632,7 +632,7 @@ public class ProfileSettingsController extends BasePageController {
         if (newOutcomePreference == null)
             return;
 
-        log.trace("Storing locally...");
+        log.debug("Storing locally...");
         // the outcome goes AFTER the new condition object
         newConditionPreference.add(newOutcomePreference);
         // this condition goes AFTER the selected object
@@ -647,7 +647,7 @@ public class ProfileSettingsController extends BasePageController {
     }
 
     public void addOutcomeOnly() {
-        log.trace("addOutcomeOnly()");
+        log.debug("addOutcomeOnly()");
         treeChangesMade = true;
 
         PreferenceDetails preferenceDetails;
@@ -659,11 +659,11 @@ public class ProfileSettingsController extends BasePageController {
         if (selectedCondition != null) {
             preferenceDetails = conditionToPDMap.get(selectedCondition);
             parentPreferenceObject = conditionToPreferenceMap.get(selectedCondition);
-            log.trace("Adding outcome to condition");
+            log.debug("Adding outcome to condition");
         } else if (selectedPreference != null) {
             preferenceDetails = selectedPreference;
             parentPreferenceObject = pdToPreferenceMap.get(selectedPreference);
-            log.trace("Adding outcome to preference");
+            log.debug("Adding outcome to preference");
         } else {
             addGlobalMessage("Add outcome failed",
                     "PreferenceDetails was null - something has gone wrong",
@@ -703,7 +703,7 @@ public class ProfileSettingsController extends BasePageController {
     }
 
     private IPreference createCondition(PreferenceDetails preferenceDetails, ContextPreferenceCondition newCondition) {
-        log.trace("createCondition()");
+        log.debug("createCondition()");
         treeChangesMade = true;
 
         // validate
@@ -750,10 +750,10 @@ public class ProfileSettingsController extends BasePageController {
             return null;
         }
 
-        log.trace("Creating objects...");
+        log.debug("Creating objects...");
         IPreference newConditionPreference = new PreferenceTreeNode(newCondition);
 
-        log.trace("Storing locally...");
+        log.debug("Storing locally...");
         conditionToPDMap.put(newCondition, preferenceDetails);
         conditionToPreferenceMap.put(newCondition, newConditionPreference);
 
@@ -761,7 +761,7 @@ public class ProfileSettingsController extends BasePageController {
     }
 
     private IPreference createOutcome(PreferenceDetails preferenceDetails, PreferenceOutcome newOutcome) {
-        log.trace("createOutcome()");
+        log.debug("createOutcome()");
         treeChangesMade = true;
 
         IPreference parentPreferenceObject;
@@ -775,10 +775,10 @@ public class ProfileSettingsController extends BasePageController {
             return null;
         }
 
-        log.trace("Creating objects...");
+        log.debug("Creating objects...");
         IPreference newOutcomePreference = new PreferenceTreeNode(newOutcome);
 
-        log.trace("Storing locally...");
+        log.debug("Storing locally...");
         outcomeToPDMap.put(newOutcome, preferenceDetails);
         outcomeToPreferenceMap.put(newOutcome, newOutcomePreference);
 
@@ -787,24 +787,24 @@ public class ProfileSettingsController extends BasePageController {
 
 
     public void saveTreeChanges() {
-        log.trace("saveTreeChanges()");
+        log.debug("saveTreeChanges()");
         Set<PreferenceDetails> preferenceDetailsSet = pdToPreferenceMap.keySet();
 
         for (PreferenceDetails pd : preferenceDetailsSet) {
             log.debug("Storing preference: " + pd.getPreferenceName());
 
             IPreferenceTreeModel model = pdToPreferenceTreeModelMap.get(pd);
-            log.trace(model.toString());
+            log.debug(model.toString());
 
             userPreferenceManagement.storePreference(userService.getIdentity(), pd, pdToPreferenceMap.get(pd));
         }
 
         loadPreferenceTreeData();
-        log.trace("end saveTreeChanges()");
+        log.debug("end saveTreeChanges()");
     }
 
     public void revertChanges() {
-        log.trace("saveTreeChanges()");
+        log.debug("saveTreeChanges()");
         loadPreferenceTreeData();
     }
 
@@ -836,7 +836,7 @@ public class ProfileSettingsController extends BasePageController {
 
     /* Private helper methods */
     private void clearData() {
-        log.trace("clearData()");
+        log.debug("clearData()");
         preferencesRootNode = null;
         selectedTreeNode = null;
         selectedPreference = null;
@@ -857,7 +857,7 @@ public class ProfileSettingsController extends BasePageController {
     }
 
     private void loadPreferenceTreeData() {
-        log.trace("loadPreferenceTreeData()");
+        log.debug("loadPreferenceTreeData()");
         clearData();
 
         if (userPreferenceManagement == null) {
@@ -882,13 +882,13 @@ public class ProfileSettingsController extends BasePageController {
         // sort the preferences by name
         Collections.sort(detailsList, new PreferenceDetailsComparator());
 
-        log.trace("Loaded " + detailsList.size() + " preferences");
+        log.debug("Loaded " + detailsList.size() + " preferences");
         for (PreferenceDetails preferenceDetails : detailsList) {
             try {
                 IPreferenceTreeModel preferenceTreeModel =
                         userPreferenceManagement.getModel(userService.getIdentity(), preferenceDetails);
 
-                log.trace(" - Loaded preference " + preferenceDetails.getPreferenceName());
+                log.debug(" - Loaded preference " + preferenceDetails.getPreferenceName());
 
                 pdToPreferenceTreeModelMap.put(preferenceDetails, preferenceTreeModel);
             } catch (Exception ex) {
@@ -898,7 +898,7 @@ public class ProfileSettingsController extends BasePageController {
     }
 
     private void populatePreferencesRootNode() {
-        log.trace("populatePreferencesRootNode()");
+        log.debug("populatePreferencesRootNode()");
         preferencesRootNode = new DefaultTreeNode("Preferences", null);
         preferencesRootNode.setExpanded(true);
 
@@ -923,7 +923,7 @@ public class ProfileSettingsController extends BasePageController {
                 preferenceDetails,
                 preferencesRootNode);
         preferenceNode.setExpanded(true);
-        log.trace("Creating preference node: " + preferenceDetails.getPreferenceName());
+        log.debug("Creating preference node: " + preferenceDetails.getPreferenceName());
 
         IPreference preference = preferenceTreeModel.getRootPreference();
 
@@ -945,7 +945,7 @@ public class ProfileSettingsController extends BasePageController {
                 condition,
                 preferenceNode);
         conditionNode.setExpanded(true);
-        log.trace("Creating condition node: " + condition.getname());
+        log.debug("Creating condition node: " + condition.getname());
 
         conditionToPDMap.put(condition, preferenceDetails);
         conditionToPreferenceMap.put(condition, preference);
@@ -965,7 +965,7 @@ public class ProfileSettingsController extends BasePageController {
                 outcome,
                 conditionNode);
         outcomeNode.setExpanded(true);
-        log.trace("Creating outcome node: " + outcome.getparameterName());
+        log.debug("Creating outcome node: " + outcome.getparameterName());
 
         outcomeToPDMap.put(outcome, preferenceDetails);
         outcomeToPreferenceMap.put(outcome, preference);

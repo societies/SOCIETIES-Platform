@@ -4,6 +4,7 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.schema.useragent.feedback.*;
@@ -118,7 +119,7 @@ public class NotificationsController extends BasePageController {
             // create the correct notification type for the incoming event
             if (EventTypes.UF_PRIVACY_NEGOTIATION.equals(node)) {
                 UserFeedbackPrivacyNegotiationEvent ppn = (UserFeedbackPrivacyNegotiationEvent) item;
-                NotificationQueueItem newItem = NotificationQueueItem.forPrivacyPolicyNotification(String.valueOf(ppn.getNegotiationDetails().getNegotiationID()), ppn);
+                NotificationQueueItem newItem = NotificationQueueItem.forPrivacyPolicyNotification(String.valueOf(ppn.getRequestId()), ppn);
 
                 addItemToQueue(newItem);
 
@@ -161,8 +162,8 @@ public class NotificationsController extends BasePageController {
                     String id = ((UserFeedbackBean) item).getRequestId();
                     String[] options = ((UserFeedbackBean) item).getOptions().toArray(new String[((UserFeedbackBean) item).getOptions().size()]);
 
-                    if (log.isTraceEnabled())
-                        log.trace(String.format("Received %s event for [%s] with options {%s}",
+                    if (log.isDebugEnabled())
+                        log.debug(String.format("Received %s event for [%s] with options {%s}",
                                 node,
                                 id,
                                 Arrays.toString(options)));
@@ -172,8 +173,8 @@ public class NotificationsController extends BasePageController {
                     String id = ((ExpFeedbackResultBean) item).getRequestId();
                     String[] options = ((ExpFeedbackResultBean) item).getFeedback().toArray(new String[((ExpFeedbackResultBean) item).getFeedback().size()]);
 
-                    if (log.isTraceEnabled())
-                        log.trace(String.format("Received %s event for [%s] with options {%s}",
+                    if (log.isDebugEnabled())
+                        log.debug(String.format("Received %s event for [%s] with options {%s}",
                                 node,
                                 id,
                                 Arrays.toString(options)));
@@ -184,10 +185,10 @@ public class NotificationsController extends BasePageController {
                     String[] options = new String[]{((ImpFeedbackResultBean) item).isAccepted() ? "true" : "false"};
                     markQueueItemComplete(id, options);
                 } else if (item instanceof UserFeedbackPrivacyNegotiationEvent) {
-                    String id = String.valueOf(((UserFeedbackPrivacyNegotiationEvent) item).getNegotiationDetails().getNegotiationID());
+                    String id = String.valueOf(((UserFeedbackPrivacyNegotiationEvent) item).getRequestId());
 
-                    if (log.isTraceEnabled())
-                        log.trace(String.format("Received %s event for [%s] with options {%s}",
+                    if (log.isDebugEnabled())
+                        log.debug(String.format("Received %s event for [%s] with options {%s}",
                                 node,
                                 id,
                                 "null"));
@@ -196,8 +197,8 @@ public class NotificationsController extends BasePageController {
                 } else {
                     log.warn(String.format("Unknown response payload type %s, attempting to remove by message ID", item.getClass().getSimpleName()));
 
-                    if (log.isTraceEnabled())
-                        log.trace(String.format("Received %s event for [%s] with options {%s}",
+                    if (log.isDebugEnabled())
+                        log.debug(String.format("Received %s event for [%s] with options {%s}",
                                 node,
                                 itemId,
                                 "null"));
@@ -218,46 +219,6 @@ public class NotificationsController extends BasePageController {
 
             if (log.isDebugEnabled()) {
                 log.debug("numUnansweredNotifications=" + getNumUnansweredNotifications());
-            }
-        }
-
-        public void sendExplicitResponse(ExpFeedbackResultBean responseBean) {
-            if (log.isTraceEnabled())
-                log.trace("sendExplicitResponse()");
-
-            try {
-                getPubsubClient().publisherPublish(getUserService().getIdentity(),
-                        UserFeedbackEventTopics.EXPLICIT_RESPONSE,
-                        responseBean.getRequestId(),
-                        responseBean);
-
-                if (log.isDebugEnabled())
-                    log.debug("Sent " + UserFeedbackEventTopics.EXPLICIT_RESPONSE + " with ID " + responseBean.getRequestId());
-            } catch (Exception e) {
-                addGlobalMessage("Error publishing notification of completed explicit UF request",
-                        e.getMessage(),
-                        FacesMessage.SEVERITY_ERROR);
-                log.error("Error publishing notification of completed explicit UF request", e);
-            }
-        }
-
-        public void sendImplicitResponse(ImpFeedbackResultBean responseBean) {
-            if (log.isTraceEnabled())
-                log.trace("sendImplicitResponse()");
-
-            try {
-                getPubsubClient().publisherPublish(getUserService().getIdentity(),
-                        UserFeedbackEventTopics.IMPLICIT_RESPONSE,
-                        responseBean.getRequestId(),
-                        responseBean);
-
-                if (log.isDebugEnabled())
-                    log.debug("Sent " + UserFeedbackEventTopics.IMPLICIT_RESPONSE + " with ID " + responseBean.getRequestId());
-            } catch (Exception e) {
-                addGlobalMessage("Error publishing notification of completed implicit UF request",
-                        e.getMessage(),
-                        FacesMessage.SEVERITY_ERROR);
-                log.error("Error publishing notification of completed implicit UF request", e);
             }
         }
 
@@ -348,6 +309,9 @@ public class NotificationsController extends BasePageController {
     @ManagedProperty(value = "#{userService}")
     private UserService userService;
 
+    @ManagedProperty(value = "#{userFeedback}")
+    private IUserFeedback userFeedback;
+
     @ManagedProperty(value = "#{userFeedbackHistoryRepository}")
     private IUserFeedbackHistoryRepository userFeedbackHistoryRepository;
 
@@ -362,7 +326,7 @@ public class NotificationsController extends BasePageController {
     private final Set<String> allNotificationIDs = new HashSet<String>();
 
     public NotificationsController() {
-        log.trace("NotificationsController ctor()");
+        log.debug("NotificationsController ctor()");
 
         timedAbortProcessorThread = new Thread(new TimedAbortProcessor(timedAbortsToWatch));
         timedAbortProcessorThread.setName("TimedAbortProcessor");
@@ -428,6 +392,16 @@ public class NotificationsController extends BasePageController {
         this.userFeedbackHistoryRepository = userFeedbackHistoryRepository;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
+    public IUserFeedback getUserFeedback() {
+        return userFeedback;
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void setUserFeedback(IUserFeedback userFeedback) {
+        this.userFeedback = userFeedback;
+    }
+
     @PostConstruct
     public void postConstruct() {
         timedAbortProcessorThread.start();
@@ -484,8 +458,6 @@ public class NotificationsController extends BasePageController {
         if (selectedItem.getType().equals(NotificationQueueItem.TYPE_ACK_NACK)
                 || selectedItem.getType().equals(NotificationQueueItem.TYPE_SELECT_ONE)
                 || selectedItem.getType().equals(NotificationQueueItem.TYPE_SELECT_MANY)) {
-            ExpFeedbackResultBean responseBean = new ExpFeedbackResultBean();
-            responseBean.setRequestId(selectedItem.getItemId());
 
             List<String> feedback = new ArrayList<String>();
             if (selectedItem.getType().equals(NotificationQueueItem.TYPE_SELECT_MANY)) {
@@ -495,17 +467,32 @@ public class NotificationsController extends BasePageController {
                 // add one result
                 feedback.add(selectedItem.getResult());
             }
-            responseBean.setFeedback(feedback);
 
-            pubSubListener.sendExplicitResponse(responseBean);
+            try {
+                userFeedback.submitExplicitResponse(selectedItem.getItemId(), feedback);
+
+                if (log.isDebugEnabled())
+                    log.debug("Sent " + UserFeedbackEventTopics.EXPLICIT_RESPONSE + " with ID " + selectedItem.getItemId());
+            } catch (Exception e) {
+                addGlobalMessage("Error publishing notification of completed explicit UF request",
+                        e.getMessage(),
+                        FacesMessage.SEVERITY_ERROR);
+                log.error("Error publishing notification of completed explicit UF request", e);
+            }
 
         } else if (selectedItem.getType().equals(NotificationQueueItem.TYPE_TIMED_ABORT)) {
 
-            ImpFeedbackResultBean responseBean = new ImpFeedbackResultBean();
-            responseBean.setRequestId(selectedItem.getItemId());
-            responseBean.setAccepted(ABORT_STRING.equals(selectedItem.getResult()));
+            try {
+                userFeedback.submitImplicitResponse(selectedItem.getItemId(), ABORT_STRING.equals(selectedItem.getResult()));
 
-            pubSubListener.sendImplicitResponse(responseBean);
+                if (log.isDebugEnabled())
+                    log.debug("Sent " + UserFeedbackEventTopics.IMPLICIT_RESPONSE + " with ID " + selectedItem.getItemId());
+            } catch (Exception e) {
+                addGlobalMessage("Error publishing notification of completed implicit UF request",
+                        e.getMessage(),
+                        FacesMessage.SEVERITY_ERROR);
+                log.error("Error publishing notification of completed implicit UF request", e);
+            }
 
         } else if (selectedItem.getType().equals(NotificationQueueItem.TYPE_NOTIFICATION)) {
             // no response is required
