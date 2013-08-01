@@ -129,4 +129,29 @@ public class UserFeedbackHistoryRepository implements IUserFeedbackHistoryReposi
         session.flush();
     }
 
+    @Override
+    public int truncate() {
+        Session session = getSessionFactory().openSession();
+        Transaction transaction = null;
+        int count = -1;
+        try {
+            transaction = session.beginTransaction();
+            Query query = session.createQuery("delete from UserFeedbackBean");
+            count = query.executeUpdate();
+            transaction.commit();
+
+            session.flush();
+        } catch (RuntimeException ex) {
+            if (transaction != null)
+                transaction.rollback();
+
+            log.error("Error clearing table", ex);
+            throw ex;
+        } finally {
+            session.close();
+        }
+
+        return count;
+    }
+
 }
