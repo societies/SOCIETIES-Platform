@@ -225,6 +225,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     }
 
 
+    @Override
     public Future<List<String>> getExplicitFB(String requestId, int type, ExpProposalContent content) {
         Future<List<String>> result = getExplicitFBAsync(requestId, type, content, null);
 
@@ -269,6 +270,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         return getExplicitFBAsync(requestId, type, content, callback);
     }
 
+    @Override
     public Future<List<String>> getExplicitFBAsync(String requestId, int type, ExpProposalContent content, IUserFeedbackResponseEventListener<List<String>> callback) {
         if (log.isDebugEnabled()) {
             log.debug("Received request for explicit feedback\n" +
@@ -336,6 +338,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     }
 
 
+    @Override
     public Future<Boolean> getImplicitFB(String requestId, int type, ImpProposalContent content) {
         Future<Boolean> result = getImplicitFBAsync(requestId, type, content, null);
 
@@ -380,6 +383,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         return getImplicitFBAsync(requestId, type, content, callback);
     }
 
+    @Override
     public Future<Boolean> getImplicitFBAsync(String requestId, int type, ImpProposalContent content, IUserFeedbackResponseEventListener<Boolean> callback) {
         if (log.isDebugEnabled()) {
             log.debug("Received request for implicit feedback\n" +
@@ -445,6 +449,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     }
 
 
+    @Override
     public Future<ResponsePolicy> getPrivacyNegotiationFB(String requestId, ResponsePolicy policy, NegotiationDetailsBean details) {
         Future<ResponsePolicy> result = getPrivacyNegotiationFBAsync(requestId, policy, details, null);
 
@@ -489,6 +494,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         return getPrivacyNegotiationFBAsync(requestId, policy, details, callback);
     }
 
+    @Override
     public Future<ResponsePolicy> getPrivacyNegotiationFBAsync(String requestId, ResponsePolicy policy, NegotiationDetailsBean details, IUserFeedbackResponseEventListener<ResponsePolicy> callback) {
 
         if (log.isDebugEnabled()) {
@@ -560,6 +566,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     }
 
 
+    @Override
     public Future<List<ResponseItem>> getAccessControlFB(String requestId, Requestor requestor, List<ResponseItem> items) {
         Future<List<ResponseItem>> result = getAccessControlFBAsync(requestId, requestor, items, null);
 
@@ -604,6 +611,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         return getAccessControlFBAsync(requestId, requestor, items, callback);
     }
 
+    @Override
     public Future<List<ResponseItem>> getAccessControlFBAsync(String requestId, Requestor requestor, List<ResponseItem> items, IUserFeedbackResponseEventListener<List<ResponseItem>> callback) {
         UserFeedbackAccessControlEvent event = new UserFeedbackAccessControlEvent();
         event.setMethod(GET_EXPLICIT_FB);
