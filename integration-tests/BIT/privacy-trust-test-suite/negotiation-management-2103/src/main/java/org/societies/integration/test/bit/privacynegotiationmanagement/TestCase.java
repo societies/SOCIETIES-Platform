@@ -24,6 +24,11 @@
  */
 package org.societies.integration.test.bit.privacynegotiationmanagement;
 
+
+import java.io.File;
+import java.net.URL;
+
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -35,6 +40,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacy
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.integration.test.IntegrationTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.osgi.context.BundleContextAware;
 
 /**
  * The test case 1872 aims to test the privacy negotiation management
@@ -45,7 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Olivier Maridat (Trialog)
  *
  */
-public class TestCase extends IntegrationTestCase {
+public class TestCase extends IntegrationTestCase implements BundleContextAware{
 	private static Logger LOG = LoggerFactory.getLogger(TestCase.class);
 
 	public static IPrivacyPolicyManager privacyPolicyManager;
@@ -56,16 +62,23 @@ public class TestCase extends IntegrationTestCase {
 	public static ICommManager commManager;
 	public static ICtxBroker ctxBroker;
 	public static IEventMgr eventManager;
+	private static File policyFile;
+	private static BundleContext context;
 
 	public TestCase() {
 		// Call the super constructor
 		// with test case number
 		// and test case classes to run
-		super(1872, new Class[]{PrivacyNegotiationTest.class});
+		super(2103, new Class[]{PrivacyNegotiationTest.class});
 		PrivacyNegotiationTest.testCaseNumber = this.testCaseNumber;
+		
 	}
 
 
+	public static File getFile(){
+		URL fileURL = context.getBundle().getResource("Privacy-Policy.xml");
+		return new File(fileURL.getFile());
+	}
 	/* -- Dependency injection --- */
 	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
 		this.privacyPolicyManager = privacyPolicyManager;
@@ -131,5 +144,13 @@ public class TestCase extends IntegrationTestCase {
 			return false;
 		}
 		return true;
+	}
+
+
+	@Override
+	public void setBundleContext(BundleContext context) {
+		TestCase.context = context;
+		// TODO Auto-generated method stub
+		
 	}
 }
