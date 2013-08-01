@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:osgi="http://www.springframework.org/schema/osgi"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                      http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+    <!-- definitions using elements of the osgi namespace can be included in
+        this file. There is no requirement to keep these definitions in a separate
+        file if you do not want to. The rationale for keeping these definitions separate
+        is to facilitate integration testing of the bundle outside of an OSGi container -->
+
+
+    <osgi:service ref="userActionMonitor">
+        <osgi:interfaces>
+            <value>org.societies.api.useragent.monitoring.IUserActionMonitor</value>
+            <value>org.societies.useragent.api.monitoring.IInternalUserActionMonitor</value>
+        </osgi:interfaces>
+    </osgi:service>
+
+    <osgi:service ref="decisionMaker">
+        <osgi:interfaces>
+            <value>org.societies.api.internal.useragent.decisionmaking.IDecisionMaker</value>
+        </osgi:interfaces>
+    </osgi:service>
+
+    <osgi:service ref="userFeedback">
+        <osgi:interfaces>
+            <value>org.societies.api.internal.useragent.feedback.IUserFeedback</value>
+            <value>org.societies.useragent.api.feedback.IInternalUserFeedback</value>
+        </osgi:interfaces>
+    </osgi:service>
+
+    <osgi:service ref="uaCommsClient">
+        <osgi:interfaces>
+            <value>org.societies.useragent.api.remote.IUserAgentRemoteMgr</value>
+        </osgi:interfaces>
+    </osgi:service>
+
+    <!-- Import External services -->
+
+    <!-- context Broker is needed by internalUserActionMonitor (at least) -->
+    <osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker">
+    </osgi:reference>
+
+    <!-- event manager (local eventing) is needed by the internalUserActionMonitor -->
+    <osgi:reference id="eventManager" interface="org.societies.api.osgi.event.IEventMgr">
+    </osgi:reference>
+
+    <!-- comms manager is needed by the internalUserActionMonitor -->
+    <osgi:reference id="commsManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager">
+    </osgi:reference>
+
+    <!-- pubsub is needed by the user feedback -->
+    <osgi:reference id="pubsub" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient">
+    </osgi:reference>
+
+    <!-- IServiceDiscovery is needed by dm (at least) <osgi:reference id="servicedis" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery">
+    </osgi:reference>-->
+    <!-- CSS Manager is needed by internalUserActionMonitor -->
+    <osgi:reference id="cssManager" interface="org.societies.api.internal.css.ICSSInternalManager">
+    </osgi:reference>
+
+    <osgi:reference id="dataSource" interface="javax.sql.DataSource"/>
+
+</beans>

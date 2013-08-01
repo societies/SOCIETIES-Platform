@@ -34,10 +34,13 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
+import org.societies.api.privacytrust.trust.TrustQuery;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
+import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 
@@ -62,6 +65,12 @@ public class TestTrustBasedPrefEval {
 	 * </ul>
 	 */
 	private static final double TRUST_VALUE_THRESHOLD = 0.5d;
+	
+	/** The rating (high) assigned to {@link #USER_ID1}. */
+	private static final double TRUST_RATING_USER_1 = 0.75d;
+	
+	/** The rating (high) assigned to {@link #USER_ID2}. */
+	private static final double TRUST_RATING_USER_2 = 0.25d;
 	
 	private static final long WAIT_TRUST_EVAL = 1000l;
 	
@@ -109,22 +118,33 @@ public class TestTrustBasedPrefEval {
 		
 		// setup trust values
 		// User 1
-		// my CSS is friends with User 1
+		// my CSS has shared context with User 1
 		this.internalTrustEvidenceCollector.addDirectEvidence(
-				myTeid, teid1, TrustEvidenceType.FRIENDED_USER, new Date(), null);
+				myTeid, teid1, TrustEvidenceType.SHARED_CONTEXT, new Date(), 
+				CtxAttributeTypes.LOCATION_SYMBOLIC);
 		// my CSS trusts User 1
 		this.internalTrustEvidenceCollector.addDirectEvidence(
-				myTeid, teid1, TrustEvidenceType.RATED, new Date(), new Double(0.75));
+				myTeid, teid1, TrustEvidenceType.RATED, new Date(), 
+				new Double(TRUST_RATING_USER_1));
 		Thread.sleep(WAIT_TRUST_EVAL);
-		final Double trust1 = this.internalTrustBroker.retrieveTrust(myTeid, teid1).get();
-		LOG.info("*** trust1 = " + trust1);
+		final Double trustValue1 = this.internalTrustBroker.retrieveTrustValue(
+				new TrustQuery(this.myTeid).setTrusteeId(this.teid1)
+				.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
+		LOG.info("*** trustValue1 = " + trustValue1);
 		// User 2
+		// my CSS has withheld context from User 2
+		this.internalTrustEvidenceCollector.addDirectEvidence(
+				this.myTeid, this.teid2, TrustEvidenceType.WITHHELD_CONTEXT, new Date(), 
+				CtxAttributeTypes.LOCATION_SYMBOLIC);
 		// my CSS doesn't trust User 2
 		this.internalTrustEvidenceCollector.addDirectEvidence(
-				myTeid, teid2, TrustEvidenceType.RATED, new Date(), new Double(0.25));
+				this.myTeid, this.teid2, TrustEvidenceType.RATED, new Date(), 
+				new Double(TRUST_RATING_USER_2));
 		Thread.sleep(WAIT_TRUST_EVAL);
-		final Double trust2 = this.internalTrustBroker.retrieveTrust(myTeid, teid2).get();
-		LOG.info("*** trust2 = " + trust2);
+		final Double trustValue2 = this.internalTrustBroker.retrieveTrustValue(
+				new TrustQuery(myTeid).setTrusteeId(teid2)
+				.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
+		LOG.info("*** trustValue2 = " + trustValue2);
 		
 		// TODO privacy pref setup
 	}
@@ -144,11 +164,17 @@ public class TestTrustBasedPrefEval {
 		
 		// 1. Verify that trust values have been properly setup
 		// User 1
-		final Double trust1 = this.internalTrustBroker.retrieveTrust(myTeid, teid1).get();
-		assertTrue(trust1 > TRUST_VALUE_THRESHOLD);
+		final Double trustValue1 = this.internalTrustBroker.retrieveTrustValue(
+				new TrustQuery(this.myTeid).setTrusteeId(this.teid1)
+				.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
+		assertNotNull(trustValue1);
+		assertTrue(trustValue1 > TRUST_VALUE_THRESHOLD);
 		// User 2
-		final Double trust2 = this.internalTrustBroker.retrieveTrust(myTeid, teid2).get();
-		assertTrue(trust2 < TRUST_VALUE_THRESHOLD);
+		final Double trustValue2 = this.internalTrustBroker.retrieveTrustValue(
+				new TrustQuery(this.myTeid).setTrusteeId(this.teid2)
+				.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
+		assertNotNull(trustValue2);
+		assertTrue(trustValue2 < TRUST_VALUE_THRESHOLD);
 		
 		// TODO 2. privacy pref
 	}
