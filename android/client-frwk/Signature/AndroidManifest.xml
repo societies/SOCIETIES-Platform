@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="org.societies.security.digsig"
+      android:versionCode="1"
+      android:versionName="1.0">
+
+
+    <application android:icon="@drawable/icon" android:label="@string/app_name">
+        <activity android:name="MainActivity"
+                  android:label="@string/app_name">
+            <intent-filter>
+            	<category android:name="android.intent.category.LAUNCHER"></category>
+                <action android:name="android.intent.action.MAIN"></action>
+            </intent-filter>
+        </activity>
+        <activity android:name="ListFilesActivity" android:label="Please select a file">
+            <intent-filter>                
+            </intent-filter>
+        </activity>
+        
+        <activity android:name="ListIdentitiesActivity" android:label="Please select digital identity">
+            <intent-filter>                
+            </intent-filter>
+        </activity>
+        
+        <activity android:name="PassEntryActivity"></activity>
+		
+		<activity android:name="SignActivity">
+		    <intent-filter>
+		    	<category android:name="android.intent.category.DEFAULT"></category>                
+		    	<action android:name="org.societies.security.digsig.action.Sign"></action>
+            </intent-filter>     
+		</activity>
+		
+		<activity android:name="VerifyActivity">
+		    <intent-filter>
+		    	<category android:name="android.intent.category.DEFAULT"></category>                
+		    	<action android:name="org.societies.security.digsig.action.Verify"></action>
+            </intent-filter>     
+		</activity>
+		
+		<activity android:name="InstallIdentityActivity">
+			<intent-filter>                
+				<category android:name="android.intent.category.DEFAULT"></category>
+		    	<action android:name="org.societies.security.digsig.action.InstallIdentity"></action>
+            </intent-filter>
+		</activity>
+    </application>
+</manifest>
