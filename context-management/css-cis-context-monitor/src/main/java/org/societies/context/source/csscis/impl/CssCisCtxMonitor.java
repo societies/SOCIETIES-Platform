@@ -607,7 +607,8 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 	 * (2) Create community ctx attributes 
 	 * (3) Update community ctx entity HAS_MEMBERS association
 	 * (4) Update community owner ctx entity IS_MEMBER_OF association
-	 * (5) Subscribe for CIS Activity Feed to monitor membership changes
+	 * (5) Update community owner ctx entity IS_ADMIN_OF association
+	 * (6) Subscribe for CIS Activity Feed to monitor membership changes
 	 */
 	private class CisCreatedHandler implements Runnable {
 
@@ -662,15 +663,14 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 						(CtxAssociation) ctxBroker.retrieve(hasMembersAssocId).get();
 				hasMembersAssoc.addChildEntity(cisOwnerEntity.getId());
 				ctxBroker.update(hasMembersAssoc);
-				// TODO owning CSS ?
-				// TODO administrating CSS ?
+				
 				// TODO membership criteria / bonds
 
 				// (4) Update community owner ctx entity IS_MEMBER_OF association
 				final CtxAssociation isMemberOfAssoc;
 				if (cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).isEmpty()) {
 					isMemberOfAssoc = ctxBroker.createAssociation(
-							new Requestor(cisOwnerId), cisOwnerId, CtxAssociationTypes.IS_MEMBER_OF).get();
+							cisOwnerId, CtxAssociationTypes.IS_MEMBER_OF).get();
 				} else {
 					isMemberOfAssoc = (CtxAssociation) ctxBroker.retrieve(
 							cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next()).get();
@@ -678,8 +678,21 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 				isMemberOfAssoc.setParentEntity(cisOwnerEntity.getId());
 				isMemberOfAssoc.addChildEntity(cisEntity.getId());
 				ctxBroker.update(isMemberOfAssoc);
+				
+				// (5) Update community owner ctx entity IS_ADMIN_OF association
+				final CtxAssociation isAdminOfAssoc;
+				if (cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_ADMIN_OF).isEmpty()) {
+					isAdminOfAssoc = ctxBroker.createAssociation(
+							cisOwnerId, CtxAssociationTypes.IS_ADMIN_OF).get();
+				} else {
+					isAdminOfAssoc = (CtxAssociation) ctxBroker.retrieve(
+							cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_ADMIN_OF).iterator().next()).get();
+				}
+				isAdminOfAssoc.setParentEntity(cisOwnerEntity.getId());
+				isAdminOfAssoc.addChildEntity(cisEntity.getId());
+				ctxBroker.update(isAdminOfAssoc);
 
-				// (5) Subscribe for CIS Activity Feed to monitor membership changes
+				// (6) Subscribe for CIS Activity Feed to monitor membership changes
 				LOG.info("Subscribing for the ActivityFeed of CIS '{}'", cisIdStr);
 				pubsubClient.subscriberSubscribe(cisOwnerId, cisIdStr, CssCisCtxMonitor.this);
 
@@ -702,8 +715,9 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 	/**
 	 * (1) Unsubscribe from CIS Activity Feed to stop monitoring membership changes
 	 * (2) Update community owner's ctx entity IS_MEMBER_OF association
-	 * (3) Remove community's HAS_MEMBERS/IS_MEMBER_OF ctx association
-	 * (4) Remove community's ctx entity
+	 * (3) Update community owner's ctx entity IS_ADMIN_OF association
+	 * (4) Remove community's HAS_MEMBERS/IS_MEMBER_OF ctx association
+	 * (5) Remove community's ctx entity
 	 */
 	private class CisRemovedHandler implements Runnable {
 
@@ -732,7 +746,6 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 				LOG.info("Unsubscribing from the ActivityFeed of CIS '{}'", cisIdStr);
 				pubsubClient.subscriberUnsubscribe(cisOwnerId, cisIdStr, CssCisCtxMonitor.this);
 				
-				// (2) Update owner's ctx entity IS_MEMBER_OF association
 				final CtxEntityIdentifier cisEntityId = ctxBroker.retrieveCommunityEntityId(cisId).get();
 				if (cisEntityId == null) {
 					LOG.error("Failed to retrieve CommunityCtxEntity ID of CIS '"
@@ -744,6 +757,8 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 					LOG.error("Could not retrieve IndividualCtxEntity for CIS creator '" + cisOwnerId + "'");
 					return;
 				}
+				
+				// (2) Update owner's ctx entity IS_MEMBER_OF association
 				if (cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().hasNext()) {
 					final CtxAssociation isMemberOfAssoc = (CtxAssociation) ctxBroker.retrieve(
 							cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next()).get();
@@ -755,7 +770,19 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 					}
 				}
 				
-				// (3) Remove community HAS_MEMBERS/IS_MEMBER_OF ctx associations
+				// (3) Update owner's ctx entity IS_ADMIN_OF association
+				if (cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_ADMIN_OF).iterator().hasNext()) {
+					final CtxAssociation isAdminOfAssoc = (CtxAssociation) ctxBroker.retrieve(
+							cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_ADMIN_OF).iterator().next()).get();
+					if (isAdminOfAssoc != null 
+							&& isAdminOfAssoc.getChildEntities().contains(cisEntityId)) {
+						LOG.info("Removing '{}' from IS_ADMIN_OF association of '{}'", cisEntityId, cisOwnerEntity.getId());
+						isAdminOfAssoc.removeChildEntity(cisEntityId);
+						ctxBroker.update(isAdminOfAssoc);
+					}
+				}
+				
+				// (4) Remove community HAS_MEMBERS/IS_MEMBER_OF ctx associations
 				final CommunityCtxEntity cisEntity = 
 						(CommunityCtxEntity) ctxBroker.retrieve(cisEntityId).get();
 				if (cisEntity == null) {
@@ -772,10 +799,9 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 					ctxBroker.remove(cisEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next());
 				}
 
-				// TODO owning CSS ?
 				// TODO membership criteria / bonds
 
-				// (4) Remove community ctx entity
+				// (5) Remove community ctx entity
 				LOG.info("Removing CommunityCtxEntity with ID '{}'", cisEntityId);
 				ctxBroker.remove(cisEntityId);
 
