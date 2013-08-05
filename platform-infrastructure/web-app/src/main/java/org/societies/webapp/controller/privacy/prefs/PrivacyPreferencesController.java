@@ -92,11 +92,13 @@ public class PrivacyPreferencesController extends BasePageController{
 	
 	public void retrieveIDSPreferences(){
 		setIdsPreferenceDetails(privPrefmgr.getIDSPreferenceDetails());
+
 		
 	}
 	
 	public void retrieveDObfPreferences(){
 		setdObfPreferenceDetails(privPrefmgr.getDObfPreferenceDetails());
+		DObfPreferenceDetailsBean bean;
 		
 	}
 	

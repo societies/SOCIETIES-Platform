@@ -202,8 +202,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Autowired(required=true)
 	InternalCtxBroker(CtxBootLoader ctxBootLoader) {
 
-		if (LOG.isInfoEnabled())
-			LOG.info(this.getClass() + " instantiated");
+		LOG.info("{} instantiated", this.getClass());
 	}
 
 	/*
@@ -246,16 +245,18 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<CtxEntity> createEntity(final Requestor requestor,
 			final IIdentity target, final String type) throws CtxException {
 
-		if (requestor == null)
+		if (requestor == null) {
 			throw new NullPointerException("requestor can't be null");
-		if (target == null)
+		}
+		if (target == null) {
 			throw new NullPointerException("target can't be null");
-		if (type == null)
+		}
+		if (type == null) {
 			throw new NullPointerException("type can't be null");
+		}
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("createEntity: requestor=" + requestor + ", target="
-					+ target + ", type=" + type);
+		LOG.debug("createEntity: requestor={}, target={}, type={}",
+				new Object[] { requestor, target, type });
 		
 		CtxEntity result = null;
 
@@ -277,10 +278,11 @@ public class InternalCtxBroker implements ICtxBroker {
 			synchronized (callback) {
 				try {
 					callback.wait();
-					if (callback.getException() == null)
+					if (callback.getException() == null) {
 						result = callback.getResult();
-					else
+					} else {
 						throw callback.getException();
+					}
 					
 				} catch (InterruptedException ie) {
 
@@ -290,8 +292,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			}
 		}
 		
-		if (LOG.isDebugEnabled())	
-			LOG.debug("createEntity: result=" + result);
+		LOG.debug("createEntity: result={}", result);
 		return new AsyncResult<CtxEntity>(result);
 	}
 
@@ -300,24 +301,25 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<IndividualCtxEntity> createIndividualEntity(
 			final IIdentity cssId, final String ownerType) throws CtxException {
 
-		if (cssId == null)
+		if (cssId == null) {
 			throw new NullPointerException("cssId can't be null");
-		if (ownerType == null)
+		}
+		if (ownerType == null) {
 			throw new NullPointerException("ownerType can't be null");
+		}
 
 		IndividualCtxEntity cssOwnerEnt = null;
 
 		try {
-			if (LOG.isInfoEnabled())
-				LOG.info("Creating event topics '" + Arrays.toString(EVENT_TOPICS) 
-						+ "' for CSS owner " + cssId);
+			LOG.info("Creating event topics '{}' for CSS owner {}", 
+					Arrays.toString(EVENT_TOPICS), cssId);
 			this.ctxEventMgr.createTopics(cssId, EVENT_TOPICS);
 
-			LOG.info("Checking if CSS owner context entity " + cssId + " exists...");
+			LOG.info("Checking if CSS owner context entity for {} exists...", cssId);
 			cssOwnerEnt = this.retrieveIndividualEntity(cssId).get();
 			if (cssOwnerEnt != null) {
 
-				LOG.info("Found CSS owner context entity " + cssOwnerEnt.getId());
+				LOG.info("Found CSS owner context entity {}", cssOwnerEnt);
 			} else {
 
 				cssOwnerEnt = this.userCtxDBMgr.createIndividualEntity(
@@ -328,7 +330,7 @@ public class InternalCtxBroker implements ICtxBroker {
 						cssOwnerEnt.getId(), CtxAttributeTypes.ID); 
 
 				this.updateAttribute(cssIdAttr.getId(), cssId.toString());
-				LOG.info("Created CSS owner context entity " + cssOwnerEnt.getId());
+				LOG.info("Created CSS owner context entity {}" + cssOwnerEnt);
 			}
 
 			return new AsyncResult<IndividualCtxEntity>(cssOwnerEnt);
@@ -345,20 +347,23 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<CommunityCtxEntity> createCommunityEntity(IIdentity cisId)
 			throws CtxException {
 
-		if (cisId == null)
+		if (cisId == null) {
 			throw new NullPointerException("cisId can't be null");
-		if (!IdentityType.CIS.equals(cisId.getType()))
+		}
+		if (!IdentityType.CIS.equals(cisId.getType())) {
 			throw new IllegalArgumentException("cisId is not of type CIS");
+		}
 
-		if (LOG.isInfoEnabled())
-			LOG.info("Creating event topics '" + Arrays.toString(EVENT_TOPICS) 
-					+ "' for CIS " + cisId);
+		LOG.debug("createCommunityEntity: cisId={}", cisId);
+		
+		LOG.info("Creating event topics '{}' for CIS {}", Arrays.toString(EVENT_TOPICS), cisId);
 		this.ctxEventMgr.createTopics(cisId, EVENT_TOPICS);
 
-		CommunityCtxEntity communityCtxEnt = communityCtxDBMgr.createCommunityEntity(cisId.toString());
+		final CommunityCtxEntity result = 
+				this.communityCtxDBMgr.createCommunityEntity(cisId.toString());
 
-		LOG.info("Community Context CREATE ENTITY performed with context ID:"+communityCtxEnt.getId()+" of type:"+communityCtxEnt.getType());
-		return new AsyncResult<CommunityCtxEntity>(communityCtxEnt);
+		LOG.debug("createCommunityEntity: result={}", result);
+		return new AsyncResult<CommunityCtxEntity>(result);
 	}
 
 	/*
@@ -369,30 +374,33 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<CtxEntity> createCssNode(final INetworkNode cssNodeId)
 			throws CtxException {
 
-		if (cssNodeId == null)
+		if (cssNodeId == null) {
 			throw new NullPointerException("cssNodeId can't be null");
+		}
 
 		CtxEntity result = null;
 		try {
-			LOG.info("Checking if CSS node context entity " + cssNodeId + " exists...");
+			LOG.info("Checking if CSS node context entity {} exists...", cssNodeId);
 			result = this.retrieveCssNode(cssNodeId).get();
 			if (result != null) {
-				LOG.info("Found CSS node context entity " + result);
+				LOG.info("Found CSS node context entity {}", result);
 			} else {
 				final IIdentity cssId = this.commMgr.getIdManager().fromJid(
 						cssNodeId.getBareJid().replace('@', '.')); // Android JIDs contain '@' instead of '.'
 				final IndividualCtxEntity cssEnt = this.retrieveIndividualEntity(cssId).get();
-				if (cssEnt == null)
+				if (cssEnt == null) {
 					throw new CtxBrokerException("The IndividualCtxEntity for CSS '" 
 							+ cssId + "' could not be found. Does node " + cssNodeId
 							+ " belong to a local CSS?");
+				}
 				final CtxAssociation ownsCssNodesAssoc;
-				if (cssEnt.getAssociations(CtxAssociationTypes.OWNS_CSS_NODES).isEmpty())
+				if (cssEnt.getAssociations(CtxAssociationTypes.OWNS_CSS_NODES).isEmpty()) {
 					ownsCssNodesAssoc = this.userCtxDBMgr.createAssociation(
 							CtxAssociationTypes.OWNS_CSS_NODES);
-				else
+				} else {
 					ownsCssNodesAssoc = (CtxAssociation) this.userCtxDBMgr.retrieve(
 							cssEnt.getAssociations(CtxAssociationTypes.OWNS_CSS_NODES).iterator().next());
+				}
 				ownsCssNodesAssoc.setParentEntity(cssEnt.getId());
 				result = this.userCtxDBMgr.createEntity(CtxEntityTypes.CSS_NODE);
 				ownsCssNodesAssoc.addChildEntity(result.getId());
@@ -401,7 +409,7 @@ public class InternalCtxBroker implements ICtxBroker {
 						result.getId(), CtxAttributeTypes.ID);
 				cssNodeIdAttr.setStringValue(cssNodeId.toString());
 				this.userCtxDBMgr.update(cssNodeIdAttr);
-				LOG.info("Created CSS node context entity " + result.getId());
+				LOG.info("Created CSS node context entity {}", result);
 			}
 
 		} catch (Exception e) {
@@ -432,16 +440,18 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<CtxAttribute> createAttribute(final Requestor requestor,
 			final CtxEntityIdentifier scope, final String type) throws CtxException {
 
-		if(requestor == null)
+		if(requestor == null) {
 			throw new NullPointerException("requestor can't be null");
-		if (scope == null)
+		}
+		if (scope == null) {
 			throw new NullPointerException("scope can't be null");
-		if (type == null)
+		}
+		if (type == null) {
 			throw new NullPointerException("type can't be null");
+		}
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("createAttribute: requestor=" + requestor + ", scope="
-					+ scope + ", type=" + type);
+		LOG.debug("createAttribute: requestor={}, scope={}, type={}",
+				new Object[] { requestor, scope, type });
 		
 		CtxAttribute result = null;
 		
@@ -466,10 +476,11 @@ public class InternalCtxBroker implements ICtxBroker {
 			synchronized (callback) {
 				try {
 					callback.wait();
-					if (callback.getException() == null)
+					if (callback.getException() == null) {
 						result = callback.getResult();
-					else
-						throw callback.getException(); 
+					} else {
+						throw callback.getException();
+					}
 					
 				} catch (InterruptedException ie) {
 					throw new CtxBrokerException("Interrupted while waiting for remote createAttribute: "
@@ -478,8 +489,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			}
 		}
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("createAttribute: result=" + result);
+		LOG.debug("createAttribute: result={}", result);
 		return new AsyncResult<CtxAttribute>(result);
 	}
 	
@@ -515,16 +525,18 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<CtxAssociation> createAssociation(final Requestor requestor,
 			final IIdentity target, final String type) throws CtxException {
 
-		if (requestor == null)
+		if (requestor == null) {
 			throw new NullPointerException("requestor can't be null");
-		if (target == null)
+		}
+		if (target == null) {
 			throw new NullPointerException("target can't be null");
-		if (type == null)
+		}
+		if (type == null) {
 			throw new NullPointerException("type can't be null");
+		}
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("createAssociation: requestor=" + requestor + ", target="
-					+ target + ", type=" + type);
+		LOG.debug("createAssociation: requestor={}, target={}, type={}",
+				new Object[] { requestor, target, type });
 		
 		CtxAssociation result = null;
 		
@@ -546,10 +558,11 @@ public class InternalCtxBroker implements ICtxBroker {
 			synchronized (callback) {
 				try {
 					callback.wait();
-					if (callback.getException() == null)
+					if (callback.getException() == null) {
 						result = callback.getResult();
-					else
+					} else {
 						throw callback.getException();
+					}
 
 				} catch (InterruptedException ie) {
 					throw new CtxBrokerException("Interrupted while waiting for remote createAssociation: "
@@ -558,8 +571,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			}
 		}
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("createAssociation: result=" + result);
+		LOG.debug("createAssociation: result={}", result);
 		return new AsyncResult<CtxAssociation>(result);	
 	}
 	

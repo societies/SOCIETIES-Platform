@@ -132,8 +132,9 @@ public class UserCtxDBMgrTest {
 		assertNotNull(indEntity.getAttributes());
 		assertTrue(indEntity.getAttributes().isEmpty());
 		assertNotNull(indEntity.getAssociations());
-		assertEquals(1, indEntity.getAssociations().size());
+		assertEquals(2, indEntity.getAssociations().size());
 		assertEquals(1, indEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).size());
+		assertEquals(1, indEntity.getAssociations(CtxAssociationTypes.IS_ADMIN_OF).size());
 		assertNotNull(indEntity.getCommunities());
 		assertTrue(indEntity.getCommunities().isEmpty());
 	}
@@ -587,7 +588,6 @@ public class UserCtxDBMgrTest {
 
 	@Test
 	public void testLookupSetOfTypes() throws CtxException{
-		System.out.println("---- testLookupSetOfTypes");
 		   
 		Set<CtxIdentifier> ids;
 	    
