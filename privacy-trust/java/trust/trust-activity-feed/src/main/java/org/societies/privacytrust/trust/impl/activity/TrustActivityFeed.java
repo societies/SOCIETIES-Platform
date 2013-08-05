@@ -24,6 +24,10 @@
  */
 package org.societies.privacytrust.trust.impl.activity;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.activity.IActivity;
@@ -35,8 +39,10 @@ import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.privacytrust.trust.TrustQuery;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
+import org.societies.api.privacytrust.trust.model.TrustRelationship;
 import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.util.TrustValueFormat;
 import org.societies.api.privacytrust.trust.model.util.TrustedEntityIdFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -55,6 +61,20 @@ public class TrustActivityFeed implements ITrustUpdateEventListener {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(TrustActivityFeed.class);
 	
+	private static final int MAX_ENTRIES = 64;
+	private static final double VALUE_UPDATE_THRESHOLD = 0.15d;
+	
+	private final Map<TrustedEntityId, Double> cache = Collections.synchronizedMap(
+			new LinkedHashMap<TrustedEntityId, Double>(MAX_ENTRIES+1, .75F, true) {
+				
+				private static final long serialVersionUID = 5204510380073235862L;
+
+				// This method is called just after a new entry has been added
+				public boolean removeEldestEntry(Map.Entry<TrustedEntityId, Double> eldest) {
+					return size() > MAX_ENTRIES;
+				}
+			});
+	
 	/** The CSS activity feed. */
 	private IActivityFeed cssActivityFeed;
 	
@@ -65,20 +85,18 @@ public class TrustActivityFeed implements ITrustUpdateEventListener {
 			IActivityFeedManager activityFeedMgr,
 			ICommManager commMgr) throws Exception {
 
-		if (LOG.isInfoEnabled())
-			LOG.info(this.getClass() + " instantiated");
+		LOG.info("{} instantiated", this.getClass());
 
 		try {
-			if (LOG.isInfoEnabled())
-				LOG.info("Obtaining reference to CSS Activity Feed");
-			this.cssActivityFeedId = commMgr.getIdManager().getThisNetworkNode().toString(); 
+			this.cssActivityFeedId = commMgr.getIdManager().getThisNetworkNode().toString();
+			LOG.info("Obtaining reference to CSS Activity Feed of '{}'",
+					this.cssActivityFeedId);
 			this.cssActivityFeed = activityFeedMgr.getOrCreateFeed(
-					cssActivityFeedId, cssActivityFeedId, false);
+					this.cssActivityFeedId, this.cssActivityFeedId, false);
 
 			final IIdentity cssOwnerId = commMgr.getIdManager().getCloudNode();
 			final TrustedEntityId cssTeid = TrustedEntityIdFactory.fromIIdentity(cssOwnerId);
-			if (LOG.isInfoEnabled())
-				LOG.info("Registering for updates of user-preceived trust");
+			LOG.info("Registering for updates of trust values as perceived by '{}'", cssTeid);
 			trustBroker.registerTrustUpdateListener(this, new TrustQuery(cssTeid)
 					.setTrustValueType(TrustValueType.USER_PERCEIVED));
 			
@@ -96,20 +114,26 @@ public class TrustActivityFeed implements ITrustUpdateEventListener {
 	@Override
 	public void onUpdate(TrustUpdateEvent event) {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Received event " + event);
+		LOG.debug("Received event {}", event);
 		
-		final TrustedEntityId trusteeId = event.getTrustRelationship().getTrusteeId();
-		if (trusteeId.equals(event.getTrustRelationship().getTrustorId())) {
-			if (LOG.isDebugEnabled())
-				LOG.debug("Ignoring event " + event);
+		final TrustRelationship tr = event.getTrustRelationship();
+		final TrustedEntityId trusteeId = tr.getTrusteeId();
+		if (trusteeId.equals(tr.getTrustorId())) {
+			LOG.debug("Ignoring event {}", event);
 			return;
 		}
+		final Double newTrustValue = tr.getTrustValue();
 		final String activity = "Trust value of '" + trusteeId + "' changed to "
-				+ event.getTrustRelationship().getTrustValue();
-		if (LOG.isDebugEnabled())
-			LOG.debug("Adding activity '" + activity + "'");
-		this.addCssActivity(activity);
+				+ TrustValueFormat.formatPercent(newTrustValue);
+		final Double oldTrustValue = this.cache.get(trusteeId);
+		if (oldTrustValue == null || newTrustValue == null || Math.abs(
+				newTrustValue - oldTrustValue) > VALUE_UPDATE_THRESHOLD) {
+			LOG.debug("Adding activity '{}'", activity);
+			this.addCssActivity(activity);
+			this.cache.put(trusteeId, newTrustValue);
+		} else {
+			LOG.debug("Ignoring activity '{}'", activity);
+		}
 	}
 	
 	private void addCssActivity(final String action){
