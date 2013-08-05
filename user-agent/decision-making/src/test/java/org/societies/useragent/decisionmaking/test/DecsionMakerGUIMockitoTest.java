@@ -3,6 +3,7 @@ package org.societies.useragent.decisionmaking.test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.atLeastOnce;
 
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.framework.BundleContext;
@@ -96,13 +97,14 @@ public class DecsionMakerGUIMockitoTest{
     	classUnderTest.makeDecision(intents, preferences);
     	
 //    	then check whether the mock call has been as expected
-    	verify(intent).getServiceID();
-    	verify(intent).getparameterName();
-    	verify(intent).getvalue();
-    	verify(preference, timesForNow( 1 )).getServiceID();
-    	verify(preference).getparameterName();
-    	verify(preference).getvalue();
-    	verify(mock).resolveConflict(intent, preference);
+    	verify(intent, atLeastOnce()).getServiceID();
+    	verify(intent, atLeastOnce()).getparameterName();
+    	verify(intent, atLeastOnce()).getvalue();
+    	verify(preference, atLeastOnce()).getServiceID();
+    	verify(preference, atLeastOnce()).getparameterName();
+    	verify(preference, atLeastOnce()).getvalue();
+//    	verify(preference).getServiceID();
+    	verify(mock, atLeastOnce()).resolveConflict(intent, preference);
     	}catch(Exception e){
     		
     	}
