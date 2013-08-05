@@ -105,12 +105,15 @@ public class CtxAccessController implements ICtxAccessController {
 			final CtxIdentifier ctxId, final ActionConstants actionConst)
 			throws CtxAccessControlException, CtxAccessControllerException {
 
-		if (requestor == null)
+		if (requestor == null) {
 			throw new NullPointerException("requestor can't be null");
-		if (ctxId == null)
+		}
+		if (ctxId == null) {
 			throw new NullPointerException("ctxId can't be null");
-		if (actionConst == null)
+		}
+		if (actionConst == null) {
 			throw new NullPointerException("actionConst can't be null");
+		}
 		
 		LOG.debug("checkPermission: requestor={}, ctxId={}, actionConst={}", 
 				new Object[] { requestor, ctxId, actionConst.name() });
@@ -155,12 +158,15 @@ public class CtxAccessController implements ICtxAccessController {
 			final ActionConstants actionConst) throws 
 			CtxAccessControlException, CtxAccessControllerException {
 		
-		if (requestor == null)
+		if (requestor == null) {
 			throw new NullPointerException("requestor can't be null");
-		if (ctxIdList == null)
+		}
+		if (ctxIdList == null) {
 			throw new NullPointerException("ctxIdList can't be null");
-		if (actionConst == null)
+		}
+		if (actionConst == null) {
 			throw new NullPointerException("actionConst can't be null");
+		}
 		
 		LOG.debug("checkPermission: requestor={}, ctxIdList={}, actionConst={}",
 				new Object[] { requestor, ctxIdList, actionConst.name() });
@@ -215,8 +221,9 @@ public class CtxAccessController implements ICtxAccessController {
 			final CtxModelObject ctxModelObject) 
 					throws CtxAccessControllerException {
 	
-		if (ctxModelObject == null)
+		if (ctxModelObject == null) {
 			throw new NullPointerException("ctxModelObject can't be null");
+		}
 		
 		final List<CtxModelObject> ctxModelObjectList = new ArrayList<CtxModelObject>(1);
 		ctxModelObjectList.add(ctxModelObject);
@@ -232,10 +239,12 @@ public class CtxAccessController implements ICtxAccessController {
 			final List<CtxModelObject> ctxModelObjectList) 
 					throws CtxAccessControllerException {
 			
-		if (requestor == null)
+		if (requestor == null) {
 			throw new NullPointerException("requestor can't be null");
-		if (ctxModelObjectList == null)
+		}
+		if (ctxModelObjectList == null) {
 			throw new NullPointerException("ctxModelObjectList can't be null");
+		}
 		
 		LOG.debug("obfuscate: requestor={}, ctxModelObjectList={}",
 				requestor, ctxModelObjectList);
@@ -244,6 +253,10 @@ public class CtxAccessController implements ICtxAccessController {
 		try {
 			result.addAll(this.privacyDataMgr.obfuscateData(
 					RequestorUtils.toRequestorBean(requestor), ctxModelObjectList).get());
+			// TODO Check with Obfuscation Mgmt
+			if (result.isEmpty()) {
+				result.addAll(ctxModelObjectList);
+			}
 		} catch (ServiceUnavailableException sue) {
 			throw new CtxAccessControllerException("Failed to perform obfuscation: "
 					+ "PrivacyDataManager service is not available");
