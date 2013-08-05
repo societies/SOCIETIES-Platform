@@ -71,7 +71,7 @@ public class MockUF implements IUserFeedback{
 
 
     public Future<Boolean> getImplicitFB(int type, ImpProposalContent content){
-    	new Future<Boolean>(){
+    	return new Future<Boolean>(){
     		public Boolean get(){
     			return true;
     		}
@@ -134,6 +134,6 @@ public class MockUF implements IUserFeedback{
 
     public void submitImplicitResponse(String id, Boolean result){}
 
-    void clear(){}
+    public void clear(){}
 
 }

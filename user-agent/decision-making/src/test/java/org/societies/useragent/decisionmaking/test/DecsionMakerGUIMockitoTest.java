@@ -99,7 +99,7 @@ public class DecsionMakerGUIMockitoTest{
     	verify(intent).getServiceID();
     	verify(intent).getparameterName();
     	verify(intent).getvalue();
-    	verify(preference).getServiceID();
+    	verify(preference, timesForNow( 1 )).getServiceID();
     	verify(preference).getparameterName();
     	verify(preference).getvalue();
     	verify(mock).resolveConflict(intent, preference);
