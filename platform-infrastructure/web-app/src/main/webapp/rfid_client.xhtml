@@ -16,8 +16,13 @@
                 RFID User Administration page
             </f:facet>
 
-		<h:panelGrid 
-			rendered="#{!rfidClientController.registered and !rfidClientController.registerStatus}">
+
+		<!-- <p:growl id="growl" showDetail="true" life="3000" /> -->
+
+		<h:panelGrid id="mainPanel"
+			rendered="#{!rfidClientController.registered}"><!--  and !rfidClientController.registerStatus}">-->
+			
+			<p:messages id="errorMessage"  showDetail="true" />
 
 			<h:panelGrid columns="2" style="margin-bottom:10px;margin-left:10px"
 				id="panelRequest">
@@ -25,33 +30,40 @@
 					style="font-weight:bold" />
 
 				<p:inputText id="rfidTagNumber"
-					value="#{rfidClientController.myRfidTag}" required="true" />
+					value="#{rfidClientController.myRfidTag}" />
 
 				<h:outputLabel for="passwd" value="Pass key:"
 					style="font-weight:bold" />
 
-				<p:inputText id="passwd" value="#{rfidClientController.mypasswd}"
-					required="true" />
+				<p:inputText id="passwd" value="#{rfidClientController.mypasswd}" />
 
 
 				<h:outputLabel for="serverJid" value="RFID Server Identity:"
 					style="font-weight:bold" />
 
 				<p:inputText id="serverJid"
-					value="#{rfidClientController.serverJid}" required="true" />
+					value="#{rfidClientController.serverJid}"  />
 
-				<p:commandButton value="Submit" id="register" ajax="false"
-					actionListener="#{rfidClientController.register}"/>
+				<p:commandButton value="Submit" id="register"
+					onclick="blockUI.show()"
+					actionListener="#{rfidClientController.register}"
+					oncomplete="blockUI.hide()" update=":mainForm" />
 
 
 			</h:panelGrid>
 
+			<p:blockUI id="blockUI" widgetVar="blockUI" block=":mainForm">  
+       			LOADING<br />
+				<p:graphicImage value="/images/ajax-loader.gif" />
+			</p:blockUI>
+
 		</h:panelGrid>
-		
+
 		<ui:fragment
-			rendered="#{rfidClientController.registered or rfidClientController.registerStatus}">
+			rendered="#{rfidClientController.registered}"><!-- or rfidClientController.registerStatus}"> -->
 			<h:panelGrid columns="2" style="margin-bottom:10px;margin-left:10px"
 				id="panelDisplay">
+
 				<h:outputLabel for="rfidTagNumberDisplay" value="Rfid Tag Number:"
 					style="font-weight:bold" />
 
@@ -83,10 +95,13 @@
 				<h:outputText id="LastKnownLocationDisplay"
 					value="#{rfidClientController.lastRecordedLocation}" />
 
-				<h:outputLabel for="regError" value="Registration error"
+			<!-- 	<h:outputLabel for="regError" value="Registration error"
 					style="font-weight:bold" />
 
-				<h:outputText id="regError" value="#{rfidClientController.regError}" />
+				<h:outputText id="regError" value="#{rfidClientController.regError}" /> -->
+
+				<p:commandButton id="unregisterBtn" value="Unregister" ajax="false"
+					actionListener="#{rfidClientController.unregister}" />
 			</h:panelGrid>
 		</ui:fragment>
 

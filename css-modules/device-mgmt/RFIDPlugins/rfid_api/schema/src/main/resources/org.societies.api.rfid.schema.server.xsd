@@ -26,6 +26,8 @@
 	<xs:simpleType name="rfidServerMethodType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="registerRFIDTag" />
+			<xs:enumeration value="unregisterRFIDTag" />
+			<xs:enumeration value="ackDeleteTag" />
 		</xs:restriction>
 	</xs:simpleType>
 	

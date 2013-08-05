@@ -107,6 +107,25 @@ public class CommsClient implements IRfidClient, ICommCallback{
 		}
 		
 	}
+	
+	public void deleteTag(String identity, String tag) {
+		try {
+			IIdentity toIdentity = idMgr.fromJid(identity);
+			Stanza stanza = new Stanza(toIdentity);
+			RfidClientBean clientBean = new RfidClientBean();
+			clientBean.setMethod(RfidClientMethodType.DELETE_TAG);
+			clientBean.setTagNumber(tag);
+			commManager.sendMessage(stanza, clientBean);
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	
+	}
 
 	/*
 	 * (non-Javadoc)
