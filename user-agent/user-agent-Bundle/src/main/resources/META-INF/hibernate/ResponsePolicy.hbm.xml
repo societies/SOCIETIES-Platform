@@ -8,10 +8,11 @@
            table="PrivacyPolicyResponsePolicy">
 
         <id name="responsePolicyId" type="string" column="responsePolicyId">
-            <generator class="uuid"/>
+            <generator class="assigned"/>
         </id>
 
-        <list name="responseItems" lazy="false">
+        <list name="responseItems" lazy="false"
+                cascade="all">
             <key column="ResponseItem_id"/>
             <index column="responseItem_index"/>
             <one-to-many class="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem"/>

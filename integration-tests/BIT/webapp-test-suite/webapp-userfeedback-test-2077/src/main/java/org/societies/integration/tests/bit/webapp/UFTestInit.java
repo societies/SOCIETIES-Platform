@@ -9,6 +9,7 @@ import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.integration.test.IntegrationTestCase;
 import org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository;
 
+@SuppressWarnings({"MethodMayBeStatic", "UnusedDeclaration"})
 public class UFTestInit extends IntegrationTestCase {
 
     private static final Logger log = LoggerFactory.getLogger(UFTestInit.class);
@@ -19,7 +20,10 @@ public class UFTestInit extends IntegrationTestCase {
     private static IUserFeedbackHistoryRepository userFeedbackHistoryRepository;
 
     public UFTestInit() {
-        super(2077, TestWebappUserFeedback.class);
+        super(2077,
+                TestWebappUserFeedback.class,
+                TestWebappPrivacyNegotiation.class
+        );
         log.debug("Starting UFTestInit");
 
     }
@@ -28,7 +32,6 @@ public class UFTestInit extends IntegrationTestCase {
         return pubsub;
     }
 
-    @SuppressWarnings("MethodMayBeStatic")
     public void setPubsub(PubsubClient pubsub) {
         UFTestInit.pubsub = pubsub;
     }
@@ -41,7 +44,6 @@ public class UFTestInit extends IntegrationTestCase {
         return UFTestInit.commsMgr;
     }
 
-    @SuppressWarnings("MethodMayBeStatic")
     public void setCommsMgr(ICommManager commsMgr) {
         UFTestInit.commsMgr = commsMgr;
     }
@@ -50,12 +52,10 @@ public class UFTestInit extends IntegrationTestCase {
         return userFeedback;
     }
 
-    @SuppressWarnings("MethodMayBeStatic")
     public void setUserFeedback(IUserFeedback userFeedback) {
         UFTestInit.userFeedback = userFeedback;
     }
 
-    @SuppressWarnings("MethodMayBeStatic")
     public void setUserFeedbackHistoryRepository(IUserFeedbackHistoryRepository userFeedbackHistoryRepository) {
         UFTestInit.userFeedbackHistoryRepository = userFeedbackHistoryRepository;
     }

@@ -90,10 +90,6 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
         return arrivalDate;
     }
 
-    public Object getPrivacyPolicyNegotiation() {
-        return ufPPN;
-    }
-
     public String getItemId() {
         return itemId;
     }

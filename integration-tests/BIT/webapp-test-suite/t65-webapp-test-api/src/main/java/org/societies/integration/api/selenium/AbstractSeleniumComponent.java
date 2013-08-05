@@ -74,6 +74,10 @@ public abstract class AbstractSeleniumComponent {
 
     protected void clickButton(By by) {
         WebElement button = waitUntilVisible(by);
+        clickButton(button);
+    }
+
+    protected void clickButton(WebElement button) {
         button.click();
     }
 
