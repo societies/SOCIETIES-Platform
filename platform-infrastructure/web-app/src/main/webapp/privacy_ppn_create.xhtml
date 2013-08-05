@@ -1,0 +1,92 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="templates/main_template.xhtml">
+
+	<ui:define name="html_head">
+		<title>Privacy Preferences</title>
+	</ui:define>
+
+	<ui:define name="body">
+		<div class="hr grid_12 clearfix"></div>
+		<!-- Left Column -->
+		<section id="left_col" class="grid_12">
+			<div class="breadcrumbs">
+				<a href="index.xhtml">Home</a> / 
+				<a href="privacysettings.xhtml">Privacy	Settings</a> / 
+				<a href="privacypreferences.xhtml">Privacy	Preferences</a> / 
+				<a href="privacy_ppn_create.xhtml">Create New PPN Preference</a> 
+			</div>
+
+			<section class="form_style_main">
+
+				<h4 class="form_title">Create new Privacy Policy Negotiation Preference</h4>
+					
+					
+				<p:contextMenu for="treeSingle">
+					<p:menuitem value="View" update="messages"
+						actionListener="#{PPNcreateBean.displaySelectedSingle}" process="@this"
+						icon="ui-icon-search" />
+					<p:menuitem value="Delete" update="treeSingle" process="@this"
+						actionListener="#{PPNcreateBean.deleteNode}" icon="ui-icon-close" />
+					<p:menuitem value="Add Condition" update="treeSingle" process="@this"
+						actionListener="#{p:widgetVar('addConddlg').show();}" icon="ui-icon-plus"/>
+					<p:menuitem value="Add Outcome" update="treeSingle" process="@this"
+						actionListener="#{PPNcreateBean.addOutcome}" icon="ui-icon-plus" />
+					<p:menuitem value="Edit" update="treeSingle" process="@this"
+						actionListener="#{PPNcreateBean.editNode}" icon="ui-icon-pencil" />
+						
+				</p:contextMenu>
+
+				<p:tree id="treeSingle" value="#{PPNcreateBean.root}" var="node"
+					selectionMode="single" selection="#{PPNcreateBean.selectedNode}"
+					dynamic="true">
+
+					<p:treeNode>
+						<h:outputText value="#{node}" />
+					</p:treeNode>
+				</p:tree>
+
+			</section>
+		</section>
+
+		<div class="hr grid_12 clearfix"></div>
+
+
+	<p:dialog id="addConditionDialog" header="Add Condition"
+		widgetVar="addConddlg" resizable="false">
+
+		<h:panelGrid columns="2" cellpadding="5">
+		
+			<h:outputLabel for="ctxId" value="Condition:" />
+			
+                <h:selectOneMenu id="ctxId" value="#{PPNcreateBean.ctxId}" required="true">
+                   
+                    <f:selectItems value="#{PPNcreateBean.ctxIds}" />
+                </h:selectOneMenu>
+
+			<h:outputLabel for="ctxValue" value="Value:" />
+			<p:inputText id="ctxValue" value="#{PPNcreateBean.ctxValue}" label="value" required="true">
+			</p:inputText>  
+
+			<f:facet name="footer">
+				<p:commandButton id="AddConditionButton" value="Add" 
+					actionListener="#{PPNcreateBean.addCondition}"
+					oncomplete="addConddlg.hide()" />
+			</f:facet>
+		</h:panelGrid>
+
+	</p:dialog>
+	
+	</ui:define>
+	
+	
+	
+    <ui:define name="dialogs">
+        <ui:include src="includes/dialogs/privacyPreferencesComponents.xhtml"/>
+    </ui:define> 	
+</ui:composition>
+</html>
