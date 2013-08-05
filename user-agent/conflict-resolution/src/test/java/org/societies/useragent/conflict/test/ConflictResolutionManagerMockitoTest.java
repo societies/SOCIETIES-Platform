@@ -11,49 +11,44 @@ import org.junit.Before;
 import org.junit.Test;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.useragent.conflict.ConflictResolutionRule;
-import org.societies.useragent.conflict.EnsembleConflictResolutionRule;
-import org.societies.useragent.conflict.EnsembleConflictResolutionRule.Operator;
+import org.societies.useragent.conflict.ConflictResolutionManager;
 
-public class EnsembleConflictResolutionRuleORMockitoTest {
+public class ConflictResolutionManagerMockitoTest {
 	private IOutcome intent;
 	private IOutcome preference;
-	private ConflictResolutionRule mock$1; 
-	private ConflictResolutionRule mock$2; 
-    private EnsembleConflictResolutionRule classUnderTest;
+    private ConflictResolutionRule mock; 
+    private ConflictResolutionManager classUnderTest;
     @Before  
     public void setUp() {  
 //    	creat mocked class
-        mock$1 = mock(ConflictResolutionRule.class); 
-        mock$2 = mock(ConflictResolutionRule.class); 
+        mock = mock(ConflictResolutionRule.class); 
         intent=mock(IOutcome.class);
         preference=mock(IOutcome.class);
-//      creat an instance of your tested class 
+//      creat an instance of your tested class
+        classUnderTest = new ConflictResolutionManager();
+        
 //      set mock class to the test class
-        classUnderTest = new EnsembleConflictResolutionRule(mock$1,mock$2, Operator.OR);
+        classUnderTest.addRule(mock);   
     }  
     
     @Test  
     public void collaborationCallTest() {  
 //    	set mock class Behavior
-    	String trtr=UUID.randomUUID().toString();
-    	when(intent.getvalue()).thenReturn(trtr);
+    	when(intent.getvalue()).thenReturn(UUID.randomUUID().toString());
     	when(preference.getvalue()).thenReturn(UUID.randomUUID().toString());
-    	when(mock$1.match(intent, preference)).thenReturn(true);
-    	when(mock$2.match(intent, preference)).thenReturn(false);
+    	when(mock.match(intent, preference)).thenReturn(false);
 //    	call the method of your class under test 
-    	classUnderTest.match(intent, preference);
+    	classUnderTest.resolveConflict(intent,preference);
+    	
 //    	then check whether the mock call has been as expected
-    	verify(mock$1).match(intent, preference);
-    	verify(mock$2).match(intent, preference);
+    	verify(mock).match(intent, preference);
     }  
     
     @After  
     public void tearDown(){  
     	intent=null;
     	preference=null;
-    	mock$1 = null;
-    	mock$2 = null;
+    	mock = null;
     	classUnderTest = null;
     }  
-
 }
