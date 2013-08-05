@@ -28,7 +28,7 @@ import java.util.*;
 
 import javax.swing.UIManager;
 
-import org.societies.display.server.dao.IScreenDAO;
+
 //import org.societies.display.server.dao.impl.MockScreenDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,11 +40,12 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 import org.societies.api.services.IServices;
 
 
+
+import org.societies.api.css.devicemgmt.display.IDisplayPortalServer;
 import org.societies.display.server.dao.impl.ScreenDAO;
 import org.societies.display.server.gui.ScreenConfigurationDialog;
 import org.societies.display.server.model.Screen;
 import org.societies.display.server.model.ScreenConfiguration;
-import org.societies.api.css.devicemgmt.display.IDisplayPortalServer;
 /**
  * Describe your class here...
  *
@@ -99,13 +100,14 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 	}
 
     //GET SCREENS FROM DB
+	@Override
     public void setScreens()
     {
         this.LOG.debug("SETTING SCREENS");
         this.screens=screenDAO.getAllScreens();
         //REMOVE ALL SCREENS FROM SCREEN CONFIG
         screenconfig.removeAllScreens();
-        //GET A NEW SCREEN CONFIGURATION (ORGINALLY CALLED FROM SCREENCONFIGFIDALOGUE
+        //GET A NEW SCREEN CONFIGURATION (ORGINALLY CALLED FROM SCREENCONFIGFIDALOGUE)
         //AND ADD THE SCREENS TO THE SCREENCONFIG
         for(Screen screen : screens)
         {
@@ -114,6 +116,7 @@ public class DisplayPortalServer implements IDisplayPortalServer{
         this.LOG.debug(this.toString() + " " + screens.toString());
     }
 
+	//NOT USED ANY MORE //
     private void getScreenConfigurationFromUser() {
 		ScreenConfigurationDialog dialog = new ScreenConfigurationDialog();
 	

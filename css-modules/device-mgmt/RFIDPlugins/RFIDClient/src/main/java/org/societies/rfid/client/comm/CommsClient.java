@@ -120,6 +120,62 @@ public class CommsClient implements IRfidServer, ICommCallback{
 		
 	}
 	
+	@Override
+	public void ackDeleteTag(String serverJid, String tag) {
+		this.logging.debug("Sending message - deleteTag");
+		try{
+		IIdentity toIdentity = idMgr.fromJid(serverJid);
+		
+		RfidServerBean serverBean = new RfidServerBean();
+		serverBean.setMethod(RfidServerMethodType.ACK_DELETE_TAG);	
+		serverBean.setTagNumber(tag);
+		Stanza stanza = new Stanza(toIdentity);
+		
+		commManager.sendMessage(stanza, serverBean);
+		this.logging.debug("Sent message - deleteTag");
+		} catch (InvalidFormatException e) {
+			this.logging.debug("Error sending message - deleteTag");
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CommunicationException e) {
+			this.logging.debug("Error sending message - deleteTag");
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
+	@Override
+	public void unregisterRFIDTag(String serverIdentity, String tagNumber,
+			String userIdentity, String serviceID, String password) {
+		this.logging.debug("Sending message - unregisterRFIDTag");
+		try{
+		IIdentity toIdentity = idMgr.fromJid(serverIdentity);
+		
+		RfidServerBean serverBean = new RfidServerBean();
+		serverBean.setMethod(RfidServerMethodType.UNREGISTER_RFID_TAG);
+		serverBean.setIdentity(userIdentity);
+		serverBean.setTagNumber(tagNumber);
+		serverBean.setServiceID(serviceID);
+		serverBean.setPassword(password);
+		
+		Stanza stanza = new Stanza(toIdentity);
+		
+		commManager.sendMessage(stanza, serverBean);
+		this.logging.debug("Sent message - unregisterRFIDTag");
+		} catch (InvalidFormatException e) {
+			this.logging.debug("Error sending message - unregisterRFIDTag");
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CommunicationException e) {
+			this.logging.debug("Error sending message - unregisterRFIDTag");
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#receiveItems(org.societies.api.comm.xmpp.datatypes.Stanza, java.lang.String, java.util.List)
 	 */
