@@ -29,6 +29,7 @@ public class RfidWebAppEventListener extends EventListener{
 		this.server = server;
 		eventMgr = server.getEventMgr();
 		eventMgr.subscribeInternalEvent(this, new String[]{RFID_SERVER_EVENT_TYPE}, null);
+		logging.debug("registered for events!");
 		
 	}
 
@@ -55,7 +56,7 @@ public class RfidWebAppEventListener extends EventListener{
 				}
 			}else if (event.geteventName().equalsIgnoreCase("deleteTag")){
 				if (payload.containsKey("tag")){
-					this.server.deleteTag(payload.get("tag"));
+					this.server.requestDeleteTag(payload.get("tag"));
 				}
 			}
 		}

@@ -30,13 +30,15 @@ import java.util.TimerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.rfid.client.api.remote.IRfidClient;
+import org.societies.rfid.server.api.IRfidServer;
 
 
 public class RFIDUpdateTimerTask extends TimerTask{
 
 
 	private String tagNumber;
-	private IRfidClient rfidClient;
+	//private IRfidClient rfidClient;
+	private IRfidServer rfidServer;
 	private String symLoc;
 	private String userJid;
 	private boolean readyToSend = true;
@@ -44,8 +46,9 @@ public class RFIDUpdateTimerTask extends TimerTask{
 	private Date timeStamp;
 	private long updateInterval = 5000;
 	
-	public RFIDUpdateTimerTask(IRfidClient client, String tagNumber, String symLoc, String userID){
-		this.rfidClient = client;
+	public RFIDUpdateTimerTask(IRfidServer server, String tagNumber, String symLoc, String userID){
+		//this.rfidClient = client;
+		this.rfidServer = server;
 		this.tagNumber = tagNumber;
 		this.symLoc = symLoc;
 		this.userJid = userID;
@@ -63,7 +66,7 @@ public class RFIDUpdateTimerTask extends TimerTask{
 		}
 		
 		
-			this.rfidClient.sendUpdate(this.userJid, this.symLoc.trim(), this.tagNumber);	
+			this.rfidServer.sendRemoteUpdate(this.tagNumber, this.symLoc.trim());//(this.userJid, this.symLoc.trim(), this.tagNumber);	
 			this.logging.debug("Sent remote Symbolic Location update message [value:"+this.symLoc+"]");
 	
 		
