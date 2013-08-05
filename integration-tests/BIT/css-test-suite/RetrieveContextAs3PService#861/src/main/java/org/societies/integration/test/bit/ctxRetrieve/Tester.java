@@ -24,20 +24,18 @@
  */
 package org.societies.integration.test.bit.ctxRetrieve;
 
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.Future;
 
-import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
@@ -45,11 +43,6 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RuleTarget;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 /*import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
@@ -67,23 +60,33 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
  */
 public class Tester {
 	
+	private static final String DEFAULT_NAME_VALUE = "Chuck Norris"; 
+	
 	private IIdentityManager identityManager;
 	private ICtxBroker ctxBroker;
 	private IIdentity userIdentity;
 	private IndividualCtxEntity cssPersonEntity;
 	private CtxAttribute nameAttribute;
-	private CtxAttribute nameAttribute2;
+	
+	/** 
+	 * The name attribute value, i.e. either {@link #DEFAULT_NAME_VALUE} or the
+	 * String value of an existing name attribute. 
+	 */
+	private String nameAttributeValue;
 	private Requestor requestor;
 	private IIdentity serviceIdentity;
 	//private IPrivacyPreferenceManager privPrefMgr;
 	private IHelloWorld helloWorld;
+	
+	/** The identifiers of the context model objects created in this test. */
+	private Set<CtxIdentifier> testCtxIds = new HashSet<CtxIdentifier>(); 
 	
 	public Tester(){
 		UIManager.put("ClassLoader", ClassLoader.getSystemClassLoader());
 	}
 	
 	@Before
-	public void setup(){
+	public void setup() throws Exception {
 		identityManager = Test861.getIdentityManager();
 		ctxBroker = Test861.getCtxBroker();
 		//privPrefMgr = Test861.getPrivPrefMgr();
@@ -91,25 +94,21 @@ public class Tester {
 		
 		userIdentity = identityManager.getThisNetworkNode();
 		
-		
-		try {
-			Future<IndividualCtxEntity> retrieveIndividualEntity = ctxBroker.retrieveIndividualEntity(userIdentity);
-			this.cssPersonEntity = retrieveIndividualEntity.get();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		Future<IndividualCtxEntity> retrieveIndividualEntity = ctxBroker.retrieveIndividualEntity(userIdentity);
+		this.cssPersonEntity = retrieveIndividualEntity.get();
 		
 		this.setupRequestor();
-		this.createNonInferrableAttribute();
+		this.createOrRetrieveNonInferrableAttribute();
 		//this.createPPNPreference1();
 		//this.createPPNPreference2();
+	}
+	
+	@After
+	public void tearDown() throws Exception {
+		
+		for (final CtxIdentifier ctxId : this.testCtxIds) {
+			this.ctxBroker.remove(ctxId);
+		}
 	}
 	
 	@Test
@@ -134,33 +133,24 @@ public class Tester {
 		
 	}
 
-	private void createNonInferrableAttribute(){
-		try {
-			Future<CtxAttribute> createAttribute = this.ctxBroker.createAttribute(this.cssPersonEntity.getId(), CtxAttributeTypes.NAME);
-			
-			nameAttribute = createAttribute.get();
-			
-			nameAttribute.setStringValue("Chuck Norris");
-			
-			Future<CtxAttribute> createAttribute2 = this.ctxBroker.createAttribute(this.cssPersonEntity.getId(), CtxAttributeTypes.NAME);
-			
-			nameAttribute2 = createAttribute2.get();
-			
-			nameAttribute2.setStringValue("Walker, Texas Ranger");
-			
-			
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+	private void createOrRetrieveNonInferrableAttribute() throws Exception {
 	
+		final Set<CtxAttribute> nameAttrs = 
+				this.cssPersonEntity.getAttributes(CtxAttributeTypes.NAME); 
+		if (nameAttrs.iterator().hasNext()) {
+			this.nameAttribute = nameAttrs.iterator().next();
+		} else {
+			Future<CtxAttribute> createAttribute = this.ctxBroker.createAttribute(
+					this.cssPersonEntity.getId(), CtxAttributeTypes.NAME);
+			this.nameAttribute = createAttribute.get();
+			this.nameAttribute.setStringValue(DEFAULT_NAME_VALUE);
+			this.nameAttribute = (CtxAttribute) this.ctxBroker.update(
+					this.nameAttribute).get();
+			// Add to set of context data items to be removed in {@link #tearDown}
+			this.testCtxIds.add(this.nameAttribute.getId());
+		}
+		this.nameAttributeValue = nameAttribute.getStringValue();
+	}
 	
 /*	private void createPPNPreference1(){
 		
