@@ -37,8 +37,32 @@ import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
 /**
- * This interface provides access to the trust values associated with individuals,
- * communities and services.
+ * This interface provides access to the {@link TrustRelationship trust relationships} 
+ * established with other individuals (CSSs), communities (CISs) or services. 
+ * The trust value associated with the relationship between a trustor and a trustee 
+ * can be {@link TrustValueType#DIRECT direct}, {@link TrustValueType#INDIRECT indirect}
+ * or {@link TrustValueType#USER_PERCEIVED user-perceived}.
+ * <p>
+ * For example, to retrieve all trust relationships established by a particular
+ * trustor, the following {@link TrustQuery trust query} can be used:
+ * <pre>
+ * final TrustQuery query = new TrustQuery(trustorId);
+ * Set&lt;TrustRelationship&gt; trs = trustBroker.retrieveTrustRelationships(query); 
+ * </pre>
+ * To retrieve the trust relationships established by a particular
+ * trustor with any CIS, the following trust query can be used:
+ * <pre>
+ * final TrustQuery query = new TrustQuery(trustorId).setTrusteeType(TrustedEntityType.CIS);
+ * Set&lt;TrustRelationship&gt; trs = trustBroker.retrieveTrustRelationships(query); 
+ * </pre>
+ * If the trust consumer is only interested in the trust relationship of a 
+ * certain type between a trustor and a trustee, the following trust query can
+ * be used:
+ * <pre>
+ * final TrustQuery query = new TrustQuery(trustorId).setTrusteeId(trusteeId)
+ *                            .setTrustValueType(TrustValueType.USER_PERCEIVED);
+ * TrustRelationship tr = trustBroker.retrieveTrustRelationship(query); 
+ * </pre>
  * 
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @see TrustRelationship
