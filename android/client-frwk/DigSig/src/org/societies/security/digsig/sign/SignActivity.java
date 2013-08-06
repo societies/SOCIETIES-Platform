@@ -31,7 +31,8 @@ import android.util.Log;
 
 public class SignActivity extends Activity {	
 	private final static int SELECT_IDENTITY = 1;	
-	
+	private static final String TAG = SignActivity.class.getSimpleName();
+
 	private AndroidSecureStorage secureStorage;
 		
 	private KeyFactory keyFactory;
@@ -45,7 +46,8 @@ public class SignActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+        Log.i(TAG, "onCreate");
+
         try {
         	secureStorage = AndroidSecureStorage.getInstance();
         	keyFactory = KeyFactory.getInstance("RSA");
@@ -71,11 +73,14 @@ public class SignActivity extends Activity {
         }
         
         Intent i = new Intent(this,ListIdentitiesActivity.class);
-		startActivityForResult(i, SELECT_IDENTITY);        
+		startActivityForResult(i, SELECT_IDENTITY);
     }
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+		Log.i(TAG, "onActivityResult");
+
 		super.onActivityResult(requestCode, resultCode, data);
 		
 		if (requestCode == SELECT_IDENTITY && resultCode==RESULT_OK) {

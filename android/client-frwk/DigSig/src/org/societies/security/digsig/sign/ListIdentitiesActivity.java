@@ -19,6 +19,9 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 
 public class ListIdentitiesActivity extends ListActivity {
+	
+	private static final String TAG = ListIdentitiesActivity.class.getSimpleName();
+
 	private AndroidSecureStorage secureStorage;
 	private CertificateFactory certFactory;
 		
@@ -30,7 +33,10 @@ public class ListIdentitiesActivity extends ListActivity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+        
+		Log.i(TAG, "onCreate");
+
+        super.onCreate(savedInstanceState);
 		
 		secureStorage = AndroidSecureStorage.getInstance();
 		try {
@@ -49,7 +55,10 @@ public class ListIdentitiesActivity extends ListActivity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
+        
+		Log.i(TAG, "onActivityResult");
+
+        super.onActivityResult(requestCode, resultCode, data);
 		
 		if (requestCode == UNLOCK_AND_LIST_IDENTITY) {
 			setList();

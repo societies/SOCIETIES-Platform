@@ -12,6 +12,7 @@ import org.societies.security.digsig.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -20,6 +21,7 @@ public class MainActivity extends Activity {
 	private final static int SIGN = 1;
 	private final static int VERIFY = 2;
 	
+	private static final String TAG = MainActivity.class.getSimpleName();
 	
     /** Called when the activity is first created. */
     @Override
@@ -34,11 +36,11 @@ public class MainActivity extends Activity {
 				startActivity(i);
 			}
 		});
-        
         Button listBtn = (Button) findViewById(R.id.button3);
         listBtn.setOnClickListener(new View.OnClickListener() {		
 			public void onClick(View v) {
 				
+		        Log.i(TAG, "button3 clicked");
 				byte[] val = null;
 				try {
 					val = "<xml><miki Id='Miki1'>aadsads</miki></xml>".getBytes("UTF-8");
