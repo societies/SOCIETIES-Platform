@@ -110,7 +110,13 @@ public class CommsServer implements IFeatureServer {
 			}else if(clientBean.getMethod().equals(RfidClientMethodType.SEND_UPDATE)){
 				this.LOG.debug("Received rfid update: "+clientBean.getSymLoc()+" for my tag number: "+clientBean.getTagNumber());
 				this.rfidClient.sendUpdate(clientBean.getSymLoc().trim(), clientBean.getTagNumber().trim());
-			}else{
+			}else if(clientBean.getMethod().equals(RfidClientMethodType.DELETE_TAG)){
+				String serverJid = stanza.getFrom().getJid();
+				String tag = clientBean.getTagNumber();
+				//this.LOG.debug("Received rfid update: "+clientBean.getSymLoc()+" for my tag number: "+clientBean.getTagNumber());
+				this.rfidClient.deleteContext(serverJid, tag);
+			}
+			else{
 				this.LOG.debug("Payload object not of type: "+RfidClientBean.class.getName()+". Ignoring message from: "+stanza.getFrom().getJid());
 			}
 		}

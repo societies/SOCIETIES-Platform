@@ -32,7 +32,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.schema.servicelifecycle.model.Service;
-import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 
 /**
  * The callback for a remote service discovery call

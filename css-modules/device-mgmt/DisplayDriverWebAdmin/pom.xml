@@ -41,10 +41,10 @@
 
     <developers>
         <developer>
-            <id>pkudaiyar</id>
-            <name>Perumal K</name>
-            <email>kperumalin@hotmail.com</email>
-            <organization>Intel</organization>
+            <id>swwhyte</id>
+            <name>Stuart Whyte</name>
+            <email>sww2@hw.ac.uk</email>
+            <organization>HWU</organization>
             <roles>
                 <role>developer</role>
             </roles>
@@ -79,59 +79,8 @@
             <type>libd</type>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>org.aspectj-library</artifactId>
-            <type>libd</type>
-            <version>1.6.2.RELEASE</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-            <version>4.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <version>4.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet</artifactId>
-            <version>3.0.0.v201103241009</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.web.servlet</artifactId>
-            <version>3.0.5.RELEASE</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>1.5.2</version>
-        </dependency>
         <!-- the following jars should be available in the repository/usr folder -->
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>com.springsource.javax.validation</artifactId>
-            <version>1.0.0.GA</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>com.springsource.javax.servlet.jsp.jstl</artifactId>
-            <version>1.2.0.v20110728</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.osgi</groupId>
-            <artifactId>org.springframework.osgi.web</artifactId>
-            <version>1.2.1</version>
-        </dependency>
+
         <dependency>
             <groupId>org.societies.api.external</groupId>
             <artifactId>societies-api</artifactId>
@@ -143,69 +92,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.societies.platform</groupId>
-            <artifactId>socialdata</artifactId>
-            <version>${release.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.societies.personalisation</groupId>
-            <artifactId>personalisation_api</artifactId>
-            <version>${release.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.societies.useragent</groupId>
-            <artifactId>feedback</artifactId>
-            <version>${release.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.shindig</groupId>
-            <artifactId>shindig-social-api</artifactId>
-            <version>3.0.0-beta4</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.societies.cis</groupId>
-            <artifactId>CisDirectoryClient</artifactId>
-            <version>${release.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.societies</groupId>
-            <artifactId>activityfeed-client</artifactId>
-            <version>${version.cis}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.societies.useragent</groupId>
-            <artifactId>user-agent-api</artifactId>
-            <version>${release.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.societies.cis</groupId>
-            <artifactId>cis-management-client</artifactId>
-            <version>${version.cis}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.7.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-            <version>1.7.1</version>
-        </dependency>
 
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -222,76 +108,8 @@
             <artifactId>hibernate-jpa-2.0-api</artifactId>
             <version>1.0.1.Final</version>
         </dependency>
-        <dependency>
-            <groupId>javax.transaction</groupId>
-            <artifactId>com.springsource.javax.transaction</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.25</version>
-        </dependency>
 
 
-        <!-- JFree Chart -->
-        <dependency>
-            <groupId>org.jfree.chart</groupId>
-            <artifactId>org.jfree.chart-library</artifactId>
-            <type>libd</type>
-            <version>1.0.9</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jfree.chart</groupId>
-            <artifactId>com.springsource.org.jfree.chart</artifactId>
-            <version>1.0.9</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jfree</groupId>
-            <artifactId>com.springsource.org.jfree</artifactId>
-            <version>1.0.12</version>
-        </dependency>
-
-        <!-- <dependency> <groupId>org.societies.api.schema</groupId> <artifactId>societies-api-schema</artifactId>
-            <version>${release.version}</version> <scope>provided</scope> </dependency> -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>com.springsource.javax.servlet</artifactId>
-            <version>2.5.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.simpleframework</groupId>
-            <artifactId>simple-xml</artifactId>
-            <version>2.6.4</version>
-            <scope>provided</scope>
-            <exclusions>
-                <!-- StAX is not available on Android -->
-                <exclusion>
-                    <artifactId>stax</artifactId>
-                    <groupId>stax</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>stax-api</artifactId>
-                    <groupId>stax</groupId>
-                </exclusion>
-                <!-- Provided by Android -->
-                <exclusion>
-                    <artifactId>xpp3</artifactId>
-                    <groupId>xpp3</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
         <!-- PrimeFaces dependencies -->
         <dependency>
@@ -299,17 +117,7 @@
             <artifactId>primefaces</artifactId>
             <version>3.5</version>
         </dependency>
-        <!-- needed for PrimeFaces push -->
-        <!--<dependency>
-            <groupId>org.atmosphere</groupId>
-            <artifactId>atmosphere-runtime</artifactId>
-            <version>${primepush-version}</version>
-        </dependency>-->
-        <!--<dependency>
-            <groupId>org.atmosphere</groupId>
-            <artifactId>atmosphere-compat-tomcat7</artifactId>
-            <version>${primepush-version}</version>
-        </dependency>-->
+
 
         <!-- Java EE6 dependencies -->
         <dependency>
@@ -323,29 +131,6 @@
             <version>2.1.17</version>
         </dependency>
 
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jstl</artifactId>
-            <version>1.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
-            <version>2.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.webflow</groupId>
-            <artifactId>spring-faces</artifactId>
-            <version>2.3.2.RELEASE</version>
-        </dependency>
 
         <!-- Virgo/Tomcat needs this -->
         <dependency>

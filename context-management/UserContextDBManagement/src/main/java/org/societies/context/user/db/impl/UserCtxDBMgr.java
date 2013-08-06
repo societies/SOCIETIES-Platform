@@ -26,6 +26,7 @@ package org.societies.context.user.db.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -70,8 +71,6 @@ import org.societies.context.user.db.impl.model.hibernate.CtxEntityIdentifierCom
 import org.societies.context.user.db.impl.model.hibernate.CtxEntityIdentifierType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import cern.colt.Arrays;
 
 /**
  * Implementation of the {@link IUserCtxDBMgr} interface.
@@ -319,6 +318,11 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 		final CtxAssociation isMemberOfAssoc = this.createAssociation(CtxAssociationTypes.IS_MEMBER_OF);
 		isMemberOfAssoc.setParentEntity(id);
 		this.update(isMemberOfAssoc);
+		
+		// create IS_ADMIN_OF association for new IndividualCtxEntity
+		final CtxAssociation isAdminOfAssoc = this.createAssociation(CtxAssociationTypes.IS_ADMIN_OF);
+		isAdminOfAssoc.setParentEntity(id);
+		this.update(isAdminOfAssoc);
 		
 		if (!entityDAO.getEventTopics().isEmpty()) {
 			final CtxChangeEvent event = new CtxChangeEvent(entityDAO.getId());
