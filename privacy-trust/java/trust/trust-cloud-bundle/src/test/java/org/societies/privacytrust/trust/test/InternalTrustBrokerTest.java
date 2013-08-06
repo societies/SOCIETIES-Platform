@@ -502,17 +502,9 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		// verify related evidence
 		assertNotNull(retrievedTrustRelationship.getTrustEvidence());
 		assertFalse(retrievedTrustRelationship.getTrustEvidence().isEmpty());
-		assertEquals(2, retrievedTrustRelationship.getTrustEvidence().size());
+		assertEquals(1, retrievedTrustRelationship.getTrustEvidence().size());
 		Iterator<TrustEvidence> evidenceIter = retrievedTrustRelationship.getTrustEvidence().iterator();
-		// old CSS evidence
-		evidence = evidenceIter.next();
-		assertEquals(cssEvidence.getSubjectId(), evidence.getSubjectId());
-		assertEquals(cssEvidence.getObjectId(), evidence.getObjectId());
-		assertEquals(cssEvidence.getType(), evidence.getType());
-		assertEquals(cssEvidence.getTimestamp(), evidence.getTimestamp());
-		assertEquals(cssEvidence.getInfo(), evidence.getInfo());
-		assertEquals(cssEvidence.getSourceId(), evidence.getSourceId());
-		// new CSS evidence
+		// indirect evidence
 		TrustEvidence evidence2 = evidenceIter.next();
 		assertEquals(cssEvidence2.getSubjectId(), evidence2.getSubjectId());
 		assertEquals(cssEvidence2.getObjectId(), evidence2.getObjectId());
@@ -899,16 +891,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		// verify related evidence
 		assertNotNull(retrievedTrustRelationship.getTrustEvidence());
 		assertFalse(retrievedTrustRelationship.getTrustEvidence().isEmpty());
-		assertEquals(2, retrievedTrustRelationship.getTrustEvidence().size());
+		assertEquals(1, retrievedTrustRelationship.getTrustEvidence().size());
 		Iterator<TrustEvidence> evidenceIter = retrievedTrustRelationship.getTrustEvidence().iterator();
-		// old CSS evidence
-		evidence = evidenceIter.next();
-		assertEquals(cssEvidence.getSubjectId(), evidence.getSubjectId());
-		assertEquals(cssEvidence.getObjectId(), evidence.getObjectId());
-		assertEquals(cssEvidence.getType(), evidence.getType());
-		assertEquals(cssEvidence.getTimestamp(), evidence.getTimestamp());
-		assertEquals(cssEvidence.getInfo(), evidence.getInfo());
-		assertEquals(cssEvidence.getSourceId(), evidence.getSourceId());
 		// new CSS evidence
 		TrustEvidence evidence2 = evidenceIter.next();
 		assertEquals(cssEvidence2.getSubjectId(), evidence2.getSubjectId());
@@ -947,6 +931,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
+		assertNotNull(retrievedTrustRelationship.getTrustEvidence());
+		assertTrue(retrievedTrustRelationship.getTrustEvidence().isEmpty());
 		
 		// remove created entities
 		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);

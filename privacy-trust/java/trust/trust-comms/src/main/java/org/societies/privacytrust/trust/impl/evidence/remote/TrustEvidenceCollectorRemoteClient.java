@@ -24,9 +24,7 @@
  */
 package org.societies.privacytrust.trust.impl.evidence.remote;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -49,6 +47,7 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.privacytrust.trust.api.evidence.remote.ITrustEvidenceCollectorRemoteClient;
 import org.societies.privacytrust.trust.api.evidence.remote.ITrustEvidenceCollectorRemoteClientCallback;
 import org.societies.privacytrust.trust.impl.remote.TrustCommsClientCallback;
+import org.societies.privacytrust.trust.impl.remote.util.TrustCommsClientTranslator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -134,7 +133,8 @@ public class TrustEvidenceCollectorRemoteClient implements
 			addEvidenceBean.setTimestamp(timestamp);
 			// 6. info
 			if (info != null)
-				addEvidenceBean.setInfo(serialise(info));
+				addEvidenceBean.setInfo(
+						TrustCommsClientTranslator.getInstance().serialise(info));
 			
 			final TrustEvidenceCollectorRequestBean requestBean = new TrustEvidenceCollectorRequestBean();
 			requestBean.setMethodName(MethodName.ADD_DIRECT_EVIDENCE);
@@ -216,7 +216,8 @@ public class TrustEvidenceCollectorRemoteClient implements
 			addEvidenceBean.setTimestamp(timestamp);
 			// 6. info
 			if (info != null)
-				addEvidenceBean.setInfo(serialise(info));
+				addEvidenceBean.setInfo(
+						TrustCommsClientTranslator.getInstance().serialise(info));
 			// 7. sourceId
 			addEvidenceBean.setSourceId(
 					TrustModelBeanTranslator.getInstance().fromTrustedEntityId(sourceId));
@@ -246,22 +247,5 @@ public class TrustEvidenceCollectorRemoteClient implements
 					+ "': Could not serialise info object into byte[]: " 
 					+ ioe.getLocalizedMessage(), ioe);
 		}
-	}
-	
-	/**
-	 * Serialises the specified object into a byte array
-	 * 
-	 * @param object
-	 *            the object to serialise
-	 * @return a byte array of the serialised object
-	 * @throws IOException if the serialisation of the specified object fails
-	 */
-	private static byte[] serialise(Serializable object) throws IOException {
-
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		final ObjectOutputStream oos = new ObjectOutputStream(baos);
-		oos.writeObject(object);
-		
-		return baos.toByteArray();
 	}
 }

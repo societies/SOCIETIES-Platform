@@ -26,6 +26,7 @@ package org.societies.privacytrust.trust.api.broker.remote;
 
 import java.util.Set;
 
+import org.societies.api.internal.privacytrust.trust.model.ExtTrustRelationship;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.model.TrustRelationship;
 
@@ -46,10 +47,24 @@ public interface ITrustBrokerRemoteClientCallback {
 	
 	/**
 	 * 
+	 * @param extTrustRelationships
+	 * @since 1.2
+	 */
+	public void onRetrievedExtTrustRelationships(Set<ExtTrustRelationship> extTrustRelationships);
+	
+	/**
+	 * 
 	 * @param trustRelationship
 	 * @since 1.0
 	 */
 	public void onRetrievedTrustRelationship(TrustRelationship trustRelationship);
+	
+	/**
+	 * 
+	 * @param trustRelationship
+	 * @since 1.2
+	 */
+	public void onRetrievedExtTrustRelationship(ExtTrustRelationship extTrustRelationship);
 	
 	/**
 	 * 
