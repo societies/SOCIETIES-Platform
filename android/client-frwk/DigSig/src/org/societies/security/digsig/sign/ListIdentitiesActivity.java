@@ -7,10 +7,12 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import org.societies.security.digsig.trust.AndroidSecureStorage;
+import org.societies.security.digsig.trust.AndroidSecureStorageConstants;
 
 import org.societies.security.digsig.R;
 import android.app.ListActivity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -29,7 +31,6 @@ public class ListIdentitiesActivity extends ListActivity {
 	private ArrayList<Integer> certNumbers;
 	
 	private final static int UNLOCK_AND_LIST_IDENTITY = 3;	
-	private static final String UNLOCK_ACTION = "android.credentials.UNLOCK";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +46,16 @@ public class ListIdentitiesActivity extends ListActivity {
 		        	
 		
 		if (secureStorage.test()!= AndroidSecureStorage.NO_ERROR) {
-			Intent intent = new Intent(UNLOCK_ACTION);	
+			
+			String unlockAction;
+//			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+//				unlockAction = AndroidSecureStorageConstants.UNLOCK_ACTION_PRE_HONEYCOMB;
+//			}
+//			else {
+				unlockAction = AndroidSecureStorageConstants.UNLOCK_ACTION_HONEYCOMB;
+//			}
+
+			Intent intent = new Intent(unlockAction);	
 		    startActivityForResult(intent, UNLOCK_AND_LIST_IDENTITY);		    
 			return;
 		}

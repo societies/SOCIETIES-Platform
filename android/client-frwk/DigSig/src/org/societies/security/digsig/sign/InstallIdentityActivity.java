@@ -7,9 +7,11 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
 import org.societies.security.digsig.trust.AndroidSecureStorage;
+import org.societies.security.digsig.trust.AndroidSecureStorageConstants;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -19,8 +21,6 @@ public class InstallIdentityActivity extends Activity {
 	private final static int PASS_ENTRY 	= 2;
 	private final static int UNLOCK_AND_INSTALL_IDENTITY = 3;
 		
-	private static final String UNLOCK_ACTION = "android.credentials.UNLOCK";
-	
 	private AndroidSecureStorage secureStorage;
 		
 	private String inputFileName = null;
@@ -83,9 +83,16 @@ public class InstallIdentityActivity extends Activity {
 		int code = secureStorage.test();
 		
 		if (code == AndroidSecureStorage.LOCKED || code == AndroidSecureStorage.UNINITIALIZED) {
-			 Intent intent = new Intent(UNLOCK_ACTION);	
-		     startActivityForResult(intent, UNLOCK_AND_INSTALL_IDENTITY);
-		     return;
+			String unlockAction;
+//			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+//				unlockAction = AndroidSecureStorageConstants.UNLOCK_ACTION_PRE_HONEYCOMB;
+//			}
+//			else {
+				unlockAction = AndroidSecureStorageConstants.UNLOCK_ACTION_HONEYCOMB;
+//			}
+			Intent intent = new Intent(unlockAction);
+		    startActivityForResult(intent, UNLOCK_AND_INSTALL_IDENTITY);
+		    return;
 		} 
 		
 		installIdentity();
