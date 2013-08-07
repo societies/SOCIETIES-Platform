@@ -903,7 +903,10 @@ public class Cis implements IFeatureServer, ICisOwned {
 							e.printStackTrace();
 							ar.setResult(false);
 						}
-					}					
+					}
+					else{
+						ar.setResult(false);
+					}
 //				}
 				result.setAddMemberResponse(ar);
 				return result;
@@ -914,19 +917,24 @@ public class Cis implements IFeatureServer, ICisOwned {
 				CommunityMethods result = new CommunityMethods();
 				DeleteMemberResponse dr = new DeleteMemberResponse();
 				Participant p = c.getDeleteMember().getParticipant();
-				dr.setParticipant(p);			
-//				if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
-					//requester is not the owner
-//					dr.setResult(false);
-//				}else{
-					try{
-						dr.setResult(this.removeMemberFromCIS(p.getJid()));
-					}
-					catch(Exception e){
-						e.printStackTrace();
-						dr.setResult(false);
-					}
-//				}
+				dr.setParticipant(p);
+				if(null == p || null == p.getJid()){
+					dr.setResult(false);
+				}
+				else{			
+	//				if(!senderJid.equalsIgnoreCase(this.getOwnerId())){//first check if the one requesting the add has the rights
+						//requester is not the owner
+	//					dr.setResult(false);
+	//				}else{
+						try{
+							dr.setResult(this.removeMemberFromCIS(p.getJid()));
+						}
+						catch(Exception e){
+							e.printStackTrace();
+							dr.setResult(false);
+						}
+	//				}
+				}
 				result.setDeleteMemberResponse(dr);
 				return result;
 			}
