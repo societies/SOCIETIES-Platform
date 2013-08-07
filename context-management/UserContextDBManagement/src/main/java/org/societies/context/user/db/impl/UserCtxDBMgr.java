@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -67,7 +68,6 @@ import org.societies.context.user.db.impl.model.CtxModelObjectDAO;
 import org.societies.context.user.db.impl.model.CtxQualityDAO;
 import org.societies.context.user.db.impl.model.IndividualCtxEntityDAO;
 import org.societies.context.user.db.impl.model.UserCtxModelObjectNumberDAO;
-import org.societies.context.user.db.impl.model.hibernate.CtxEntityIdentifierCompositeType;
 import org.societies.context.user.db.impl.model.hibernate.CtxEntityIdentifierType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -96,11 +96,10 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	@Autowired(required=true)
 	UserCtxDBMgr (ICommManager commMgr) {
 
-		LOG.info(this.getClass() + " instantiated");
+		LOG.info("{} instantiated", this.getClass());
 		
 		this.privateId = commMgr.getIdManager().getThisNetworkNode().getBareJid();
-		if (LOG.isDebugEnabled())
-			LOG.debug("privateId=" + this.privateId);
+		LOG.debug("privateId={}", this.privateId);
 	}
 
 	/*
@@ -108,7 +107,7 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	 */
 	public UserCtxDBMgr() {
 
-		LOG.info(this.getClass() + " instantiated - fooId");
+		LOG.info("{} instantiated - fooId", this.getClass());
 
 		// TODO !!!!!! Identity should be instantiated properly
 		this.privateId = null;
@@ -120,8 +119,9 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	@Override
 	public CtxAssociation createAssociation(String type) throws CtxException {
 
-		if (type == null)
+		if (type == null) {
 			throw new NullPointerException("type can't be null");
+		}
 
 		final Long modelObjectNumber = this.generateNextObjectNumber();
 		final CtxAssociationIdentifier id = new CtxAssociationIdentifier(
@@ -136,13 +136,15 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			tx.commit();
 		}
 		catch (Exception e) {
-			if (tx != null)
+			if (tx != null) {
 				tx.rollback();
+			}
 			throw new UserCtxDBMgrException("Could not create association of type '"
 					+ type + "': " + e.getLocalizedMessage(), e);
 		} finally {
-			if (session != null)
+			if (session != null) {
 				session.close();
+			}
 		}
 		
 		if (!associationDAO.getEventTopics().isEmpty()) {
@@ -172,10 +174,12 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	public CtxAttribute createAttribute(final CtxEntityIdentifier scope,
 			final String type) throws CtxException {
 
-		if (scope == null)
+		if (scope == null) {
 			throw new NullPointerException("scope can't be null");
-		if (type == null)
+		}
+		if (type == null) {
 			throw new NullPointerException("type can't be null");
+		}
 		
 		final CtxEntityDAO entityDAO;
 		try {
@@ -184,9 +188,10 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			throw new UserCtxDBMgrException("Could not create attribute of type '"
 					+ type + "': " + e.getLocalizedMessage(), e);
 		}
-		if (entityDAO == null)	
+		if (entityDAO == null) {	
 			throw new UserCtxDBMgrException("Could not create attribute of type '"
 					+ type + "': Scope not found: " + scope);
+		}
 
 		final Long modelObjectNumber = this.generateNextObjectNumber();
 		final CtxAttributeIdentifier id =	
@@ -203,13 +208,15 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			session.save(attributeDAO);
 			tx.commit();				
 		} catch (Exception e) {
-			if (tx != null)
+			if (tx != null) {
 				tx.rollback();
+			}
 			throw new UserCtxDBMgrException("Could not create attribute of type '"
 					+ type + "': " + e.getLocalizedMessage(), e);
 		} finally {
-			if (session != null)
+			if (session != null) {
 				session.close();
+			}
 		}
 		
 		if (!attributeDAO.getEventTopics().isEmpty()) {
@@ -238,6 +245,10 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	@Override
 	public CtxEntity createEntity(String type) throws CtxException {
 
+		if (type == null) {
+			throw new NullPointerException("type can't be null");
+		}
+		
 		final Long modelObjectNumber = this.generateNextObjectNumber();
 		final CtxEntityIdentifier id = 
 				new CtxEntityIdentifier(this.privateId, type, modelObjectNumber);		
@@ -251,13 +262,15 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			tx.commit();
 		}
 		catch (Exception e) {
-			if (tx != null)
+			if (tx != null) {
 				tx.rollback();
+			}
 			throw new UserCtxDBMgrException("Could not create entity of type '" 
 					+ "': " + e.getLocalizedMessage(), e);
 		} finally {
-			if (session != null)
+			if (session != null) {
 				session.close();
+			}
 		}
 		
 		if (!entityDAO.getEventTopics().isEmpty()) {
@@ -287,10 +300,12 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	public IndividualCtxEntity createIndividualEntity(final String ownerId,
 			final String type) throws CtxException {
 
-		if (ownerId == null)
+		if (ownerId == null) {
 			throw new NullPointerException("ownerId can't be null");
-		if (type == null)
+		}
+		if (type == null) {
 			throw new NullPointerException("type can't be null");
+		}
 			
 		final Long modelObjectNumber = this.generateNextObjectNumber();
 		final CtxEntityIdentifier id = 
@@ -305,13 +320,15 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			tx.commit();
 		}
 		catch (Exception e) {
-			if (tx != null)
+			if (tx != null) {
 				tx.rollback();
+			}
 			throw new UserCtxDBMgrException("Could not create individual entity of type '" 
 					+ type + "': " + e.getLocalizedMessage(), e);
 		} finally {
-			if (session != null)
+			if (session != null) {
 				session.close();
+			}
 		}
 		
 		// create IS_MEMBER_OF association for new IndividualCtxEntity
@@ -351,8 +368,9 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	public IndividualCtxEntity retrieveIndividualEntity(final String ownerId)
 			throws CtxException {
 
-		if (ownerId == null)
+		if (ownerId == null) {
 			throw new NullPointerException("ownerId can't be null");
+		}
 			
 		final IndividualCtxEntity entity;
 		
@@ -361,17 +379,18 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 			final Query query = session.getNamedQuery("getIndividualCtxEntityIdByOwnerId");
 			query.setParameter("ownerId", ownerId, Hibernate.STRING);
 			final CtxEntityIdentifier entityId = (CtxEntityIdentifier) query.uniqueResult();
-			if (entityId != null)
+			if (entityId != null) {
 				entity = (IndividualCtxEntity) this.retrieve(entityId);
-			else 
+			} else { 
 				entity = null;
-      
+			}
         } catch (Exception e) {
         	throw new UserCtxDBMgrException("Could not retrieve individual entity for CSS '"
         			+ ownerId + "': "	+ e.getLocalizedMessage(), e);
 		} finally {
-			if (session != null)
+			if (session != null) {
 				session.close();
+			}
 		}
 			
 		return entity;
@@ -382,20 +401,24 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<CtxIdentifier> lookup(CtxModelType modelType, String type) throws CtxException {
+	public List<CtxIdentifier> lookup(final CtxModelType modelType, 
+			final String type) throws CtxException {
 		
-		if (modelType == null)
+		if (modelType == null) {
 			throw new NullPointerException("modelType can't be null");
-		if (type == null)
+		}
+		if (type == null) {
 			throw new NullPointerException("type can't be null");
+		}
 		
-		final List<CtxIdentifier> foundList = new ArrayList<CtxIdentifier>();
+		LOG.debug("lookup: modelType={}, type={}", modelType, type);
+		
+		final List<CtxIdentifier> result = new ArrayList<CtxIdentifier>();
 		
 //        final boolean isWildcardType = type.contains("%");
 
 		final Session session = sessionFactory.openSession();
 		final Query query;
-		
         try {
             switch (modelType) {
             
@@ -409,158 +432,182 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
             	query = session.getNamedQuery("getCtxAssociationIdsByType");
             	break;
             default:
-                throw new UserCtxDBMgrException("Unsupported context model type: " + modelType);
+                throw new IllegalArgumentException("Unsupported context model type: " + modelType);
             }
 
             query.setParameter("type", type, Hibernate.STRING);
-            foundList.addAll(query.list());
+            result.addAll(query.list());
             
         } catch (Exception e) {
-        	throw new UserCtxDBMgrException("Could not lookup "	+ modelType 
-        			+ " objects of type '" + type + "': "
-        			+ e.getLocalizedMessage(), e);
+        	throw new UserCtxDBMgrException(e.getLocalizedMessage(), e);
 		} finally {
-			if (session != null)
+			if (session != null) {
 				session.close();
+			}
 		}
 
-		return foundList;
+        LOG.debug("lookup: result={}", result);
+		return result;
 	}
 
-	@SuppressWarnings("unchecked")
+	/*
+	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#lookup(java.lang.String, java.util.Set)
+	 */
 	@Override
-	public Set<CtxIdentifier> lookup(String ownerId, Set<String> types)
+	public Set<CtxIdentifier> lookup(final String ownerId, final Set<String> types)
 			throws CtxException {
 
-		if (types == null) 
-			throw new NullPointerException("types can't be null");
-		
-		final Session session = sessionFactory.openSession();
-		Query query;
-		
-		final Set<CtxIdentifier> ids = new HashSet<CtxIdentifier>();
-		for (String type:types) {
-			//lookup for entities
-			query = session.getNamedQuery("getCtxEntityIdsByOwnerIdAndType");
-			query.setParameter("ownerId", ownerId, Hibernate.STRING);
-			query.setParameter("type", type, Hibernate.STRING);
-			ids.addAll(query.list());
-
-			//lookup for attributes
-        	query = session.getNamedQuery("getCtxAttributeIdsByOwnerIdAndType");
-        	query.setParameter("ownerId", ownerId, Hibernate.STRING);
-        	query.setParameter("type", type, Hibernate.STRING);
-        	ids.addAll(query.list());
-
-			//lookup for associations
-			query = session.getNamedQuery("getCtxAssociationIdsByOwnerIdAndType");
-			query.setParameter("ownerId", ownerId, Hibernate.STRING);
-			query.setParameter("type", type, Hibernate.STRING);
-			ids.addAll(query.list());
+		if (ownerId == null) { 
+			throw new NullPointerException("ownerId can't be null");
 		}
+		if (types == null) { 
+			throw new NullPointerException("types can't be null");
+		}
+		if (types.isEmpty()) { 
+			throw new IllegalArgumentException("types can't be empty");
+		}
+		
+		LOG.debug("lookup: ownerId={}, types={}", ownerId, types);
+		
+		final Set<CtxIdentifier> result = new LinkedHashSet<CtxIdentifier>();
+		
+		result.addAll(this.lookup(ownerId, CtxModelType.ENTITY, types));
+		result.addAll(this.lookup(ownerId, CtxModelType.ATTRIBUTE, types));
+		result.addAll(this.lookup(ownerId, CtxModelType.ASSOCIATION, types));
 
-		return ids;
+		LOG.debug("lookup: result={}", result);
+		return result;
 	}
 	
+	/*
+	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#lookup(java.lang.String, org.societies.api.context.model.CtxModelType, java.util.Set)
+	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Set<CtxIdentifier> lookup(String ownerId, CtxModelType modelType,
-			Set<String> types) throws CtxException {
+	public Set<CtxIdentifier> lookup(final String ownerId, 
+			final CtxModelType modelType, final Set<String> types)
+					throws CtxException {
 
-		if (modelType == null)
+		if (ownerId == null) {
+			throw new NullPointerException("ownerId can't be null");
+		}
+		if (modelType == null) {
 			throw new NullPointerException("modelType can't be null");
-		if (types == null) 
+		}
+		if (types == null) {
 			throw new NullPointerException("types can't be null");
-		
-		final Session session = sessionFactory.openSession();
-		Query query;
-		
-		final Set<CtxIdentifier> ids = new HashSet<CtxIdentifier>();
-		for (String type:types) {
-			
-            switch (modelType) {
-            
-            case ENTITY:
-			//lookup for entities
-				query = session.getNamedQuery("getCtxEntityIdsByOwnerIdAndType");
-				query.setParameter("ownerId", ownerId, Hibernate.STRING);
-				query.setParameter("type", type, Hibernate.STRING);
-				ids.addAll(query.list());
-				break;
-
-            case ATTRIBUTE:
-				//lookup for attributes
-            	query = session.getNamedQuery("getCtxAttributeIdsByOwnerIdAndType");
-            	query.setParameter("ownerId", ownerId, Hibernate.STRING);
-            	query.setParameter("type", type, Hibernate.STRING);
-            	ids.addAll(query.list());
-				break;
-
-            case ASSOCIATION:
-				//lookup for associations
-				query = session.getNamedQuery("getCtxAssociationIdsByOwnerIdAndType");
-				query.setParameter("ownerId", ownerId, Hibernate.STRING);
-				query.setParameter("type", type, Hibernate.STRING);
-				ids.addAll(query.list());
-				break;
-            }
+		}
+		if (types.isEmpty()) { 
+			throw new IllegalArgumentException("types can't be empty");
 		}
 
-		return ids;
-		
+		LOG.debug("lookup: ownerId={}, modelType={}, types={}", 
+				new Object[] { ownerId, modelType, types });
+
+		final Set<CtxIdentifier> result = new LinkedHashSet<CtxIdentifier>();
+
+		final Session session = sessionFactory.openSession();
+		try {
+			final Query query;
+			switch (modelType) {
+			case ENTITY:
+				// lookup for entities
+				query = session.getNamedQuery("getCtxEntityIdsByOwnerIdAndType");
+				break;
+			case ATTRIBUTE:
+				// lookup for attributes
+				query = session.getNamedQuery("getCtxAttributeIdsByOwnerIdAndType");
+				break;
+			case ASSOCIATION:
+				// lookup for associations
+				query = session.getNamedQuery("getCtxAssociationIdsByOwnerIdAndType");
+				break;
+			default:
+				throw new IllegalArgumentException("Unsupported context model type: " + modelType);
+			}
+
+			for (final String type : types) {
+				query.setParameter("ownerId", ownerId, Hibernate.STRING);
+				query.setParameter("type", type, Hibernate.STRING);
+				result.addAll(query.list());
+			}
+		} catch (Exception e) {
+			throw new UserCtxDBMgrException(e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+
+		LOG.debug("lookup: result={}", result);
+		return result;
 	}
 
+	/*
+	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#lookup(CtxEntityIdentifier, CtxModelType, Set)
+	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public Set<CtxIdentifier> lookup(CtxEntityIdentifier entityId,
-			CtxModelType modelType, Set<String> types) throws CtxException {
+	public Set<CtxIdentifier> lookup(final CtxEntityIdentifier scope,
+			final CtxModelType modelType, final Set<String> types) throws CtxException {
 
-		if (modelType == null)
+		if (scope == null) {
+			throw new NullPointerException("scope can't be null");
+		}
+		if (modelType == null) {
 			throw new NullPointerException("modelType can't be null");
-		if (types == null) 
+		}
+		if (types == null) { 
 			throw new NullPointerException("types can't be null");
+		}
+		if (types.isEmpty()) { 
+			throw new IllegalArgumentException("types can't be empty");
+		}
 		
-		final CtxModelObjectDAO dao;
-
+		LOG.debug("lookup: scope={}, modelType={}, types={}", 
+				new Object[] { scope, modelType, types });
+		
+		final Set<CtxIdentifier> result = new LinkedHashSet<CtxIdentifier>();
 
 		final Session session = sessionFactory.openSession();
-		Query query;
-		
-		final Set<CtxIdentifier> ids = new HashSet<CtxIdentifier>();
-		for (String type:types) {
-			
-            switch (modelType) {
-            
-            case ENTITY:
-			//lookup for entities
-				query = session.getNamedQuery("getCtxEntityIdsByIdAndType");
-				query.setParameter("entityId", entityId, Hibernate.custom(CtxEntityIdentifierCompositeType.class));
-				query.setParameter("type", type, Hibernate.STRING);
-				ids.addAll(query.list());
-				break;
+		try {
+			for (final String type : types) {
+				switch (modelType) {
+				case ATTRIBUTE:
+					// lookup for attributes
+					final Query query = session.getNamedQuery("getCtxAttributeIdsByScopeAndType");
+					query.setParameter("scope", scope.toString(), Hibernate.STRING);
+					query.setParameter("type", type, Hibernate.STRING);
+					result.addAll(query.list());
+					break;
+					
+				case ASSOCIATION:
+					// lookup for associations
+					final Query childQuery = session.getNamedQuery("getCtxAssociationIdsByChildEntityIdAndType");
+					childQuery.setParameter("childEntId", scope, Hibernate.custom(CtxEntityIdentifierType.class));
+					childQuery.setParameter("type", type, Hibernate.STRING);
+					result.addAll(childQuery.list());
 
-            case ATTRIBUTE:
-				//lookup for attributes
-            	query = session.getNamedQuery("getCtxAttributeIdsByScopeAndType");
-            	query.setParameter("scope", entityId.toString(), Hibernate.STRING);
-            	query.setParameter("type", type, Hibernate.STRING);
-            	ids.addAll(query.list());
-				break;
-
-            case ASSOCIATION:
-				//lookup for associations
-				query = session.getNamedQuery("getCtxAssociationIdsByChildEntityIdAndType");
-				query.setParameter("childEntId", entityId, Hibernate.custom(CtxEntityIdentifierType.class));
-				query.setParameter("type", type, Hibernate.STRING);
-				ids.addAll(query.list());
-				
-				query = session.getNamedQuery("getCtxAssociationsByParentEntityIdAndType");
-				query.setParameter("parentEntId", entityId, Hibernate.custom(CtxEntityIdentifierType.class));
-				query.setParameter("type", type, Hibernate.STRING);
-				ids.addAll(query.list());
-				break;
-            }
+					final Query parentQuery = session.getNamedQuery("getCtxAssociationsByParentEntityIdAndType");
+					parentQuery.setParameter("parentEntId", scope, Hibernate.custom(CtxEntityIdentifierType.class));
+					parentQuery.setParameter("type", type, Hibernate.STRING);
+					result.addAll(parentQuery.list());
+					break;
+					
+				default:
+					throw new IllegalArgumentException("Unsupported context model type: " + modelType);
+				}
+			}
+		} catch (Exception e) {
+			throw new UserCtxDBMgrException(e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
 		}
 
-		return ids;
+		LOG.debug("lookup: result={}", result);
+		return result;
 	}
 
 	/*

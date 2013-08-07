@@ -644,14 +644,7 @@ public class UserCtxDBMgrTest {
 	    assertTrue(ids.contains(attribute.getId()));
 	    assertTrue(ids.contains(attribute2.getId()));
 	    assertTrue(ids.contains(attribute3.getId()));
-	    assertEquals(3, ids.size());
-	    
-	    // 
-	    // Lookup entities using entityId and type
-	    //
-	    ids = userDB.lookup(entId, CtxModelType.ENTITY, types);
-	    assertTrue(ids.contains(entId));
-	    assertEquals(1, ids.size());	
+	    assertEquals(3, ids.size());	
 	    
 	    //
 	    // Lookup attributes using entityId and type
