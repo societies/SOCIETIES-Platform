@@ -287,9 +287,11 @@ public class CisManager implements ICisManager, IFeatureServer {
 
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
+											"http://societies.org/api/schema/activityfeed",
 											 "http://societies.org/api/schema/cis/community"));
 	private final static List<String> PACKAGES = Collections
 			.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
+											"org.societies.api.schema.activityfeed",
 											 "org.societies.api.schema.cis.community"));
 
 	private static Logger LOG = LoggerFactory.getLogger(CisManager.class);	
