@@ -5,8 +5,6 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import org.societies.security.digsig.R;
-
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;

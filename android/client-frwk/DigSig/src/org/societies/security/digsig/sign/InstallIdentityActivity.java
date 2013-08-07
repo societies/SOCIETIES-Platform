@@ -17,6 +17,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class InstallIdentityActivity extends Activity {
+	
+	private static final String TAG = InstallIdentityActivity.class.getSimpleName();
+
 	private final static int LIST_PFX_FILES = 1;
 	private final static int PASS_ENTRY 	= 2;
 	private final static int UNLOCK_AND_INSTALL_IDENTITY = 3;
@@ -40,6 +43,7 @@ public class InstallIdentityActivity extends Activity {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		Log.i(TAG, "onActivityResult");
 		super.onActivityResult(requestCode, resultCode, data);
 		
 		if (requestCode == LIST_PFX_FILES && resultCode==RESULT_OK)
@@ -75,6 +79,7 @@ public class InstallIdentityActivity extends Activity {
 				reportFailedInstall();				
 			}			
 		} else if (requestCode == UNLOCK_AND_INSTALL_IDENTITY) {
+			Log.i(TAG, "UNLOCK_AND_LIST_IDENTITY");
 			installIdentity();						  
 		}
 	}

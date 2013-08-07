@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import org.societies.security.digsig.trust.AndroidSecureStorage;
 import org.societies.security.digsig.trust.AndroidSecureStorageConstants;
 
-import org.societies.security.digsig.R;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Build;
@@ -71,6 +70,7 @@ public class ListIdentitiesActivity extends ListActivity {
         super.onActivityResult(requestCode, resultCode, data);
 		
 		if (requestCode == UNLOCK_AND_LIST_IDENTITY) {
+			Log.i(TAG, "UNLOCK_AND_LIST_IDENTITY");
 			setList();
 		}
 	}

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import org.societies.security.digsig.common.SigResult;
 import org.societies.security.digsig.utility.StreamUtil;
 
-import org.societies.security.digsig.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,18 +28,18 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
           
-        Button installBtn = (Button) findViewById(R.id.button2);
+        Button installBtn = (Button) findViewById(R.id.buttonMainInstallIdentity);
         installBtn.setOnClickListener(new View.OnClickListener() {			
 			public void onClick(View v) {								
 				Intent i = new Intent("org.societies.security.digsig.action.InstallIdentity");
 				startActivity(i);
 			}
 		});
-        Button listBtn = (Button) findViewById(R.id.button3);
+        Button listBtn = (Button) findViewById(R.id.buttonMainSign);
         listBtn.setOnClickListener(new View.OnClickListener() {		
 			public void onClick(View v) {
 				
-		        Log.i(TAG, "button3 clicked");
+		        Log.i(TAG, "buttonSign clicked");
 				byte[] val = null;
 				try {
 					val = "<xml><miki Id='Miki1'>aadsads</miki></xml>".getBytes("UTF-8");
@@ -57,7 +56,7 @@ public class MainActivity extends Activity {
 			}
 		});
         
-        Button verifyBtn = (Button) findViewById(R.id.button1);
+        Button verifyBtn = (Button) findViewById(R.id.buttonMainVerify);
         verifyBtn.setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {

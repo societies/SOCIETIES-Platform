@@ -1,6 +1,5 @@
 package org.societies.security.digsig.sign;
 
-import org.societies.security.digsig.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,7 +19,7 @@ public class PassEntryActivity extends Activity {
 		
 		editText = (EditText) findViewById(R.id.editText1);
 		
-		Button btn1 = (Button) findViewById(R.id.button1);
+		Button btn1 = (Button) findViewById(R.id.buttonPassEntryOK);
 		btn1.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Intent i = getIntent();
@@ -31,7 +30,7 @@ public class PassEntryActivity extends Activity {
 			}
 		});		
 		
-		Button btn2 = (Button) findViewById(R.id.button2);
+		Button btn2 = (Button) findViewById(R.id.buttonPassEntryCancel);
 		btn2.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				setResult(RESULT_CANCELED);				

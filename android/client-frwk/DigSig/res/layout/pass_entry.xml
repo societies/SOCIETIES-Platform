@@ -5,7 +5,7 @@
   android:orientation="vertical" android:layout_width="match_parent">
     <EditText android:text="" android:id="@+id/editText1" android:layout_height="wrap_content" android:inputType="textPassword" android:layout_width="match_parent"></EditText>
     <LinearLayout android:id="@+id/linearLayout1" android:layout_height="match_parent" android:layout_width="match_parent">
-        <Button android:text="OK" android:layout_weight="1" android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/button1"></Button>
-        <Button android:text="Cancel" android:layout_weight="1" android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/button2"></Button>
+        <Button android:text="OK" android:layout_weight="1" android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/buttonPassEntryOK"></Button>
+        <Button android:text="Cancel" android:layout_weight="1" android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/buttonPassEntryCancel"></Button>
     </LinearLayout>
 </LinearLayout>
