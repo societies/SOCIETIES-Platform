@@ -19,7 +19,7 @@
             <url>http://repository.springsource.com/maven/bundles/external</url>
         </repository>
     </repositories>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <version>${release.version}</version>
 
     <parent>
@@ -109,26 +109,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Bundle-Version>${project.version}</Bundle-Version>
-                        <Include-Resource>{maven-resources}</Include-Resource>
-                        <Import-Package>
-                            !org.jboss.resource.adapter.jdbc.vendor,
-                            org.societies.**,
-                            org.junit.**;
-                            *;resolution:=optional
-                        </Import-Package>
-
-                    </instructions>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
