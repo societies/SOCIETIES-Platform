@@ -33,7 +33,7 @@
 					<p:menuitem value="Delete" update="treeSingle" process="@this"
 						actionListener="#{PPNcreateBean.deleteNode}" icon="ui-icon-close" />
 					<p:menuitem value="Add Condition" update="treeSingle" process="@this"
-						actionListener="#{p:widgetVar('addConddlg').show();}" icon="ui-icon-plus"/>
+						actionListener="addConddlg.show()" icon="ui-icon-plus"/>
 					<p:menuitem value="Add Outcome" update="treeSingle" process="@this"
 						actionListener="#{PPNcreateBean.addOutcome}" icon="ui-icon-plus" />
 					<p:menuitem value="Edit" update="treeSingle" process="@this"
