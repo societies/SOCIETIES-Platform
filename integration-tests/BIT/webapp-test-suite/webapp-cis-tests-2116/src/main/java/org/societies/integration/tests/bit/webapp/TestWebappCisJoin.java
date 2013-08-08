@@ -194,7 +194,7 @@ public class TestWebappCisJoin extends SeleniumTest {
     }
 
     @Test
-    public void temporaryTest_mockCisJoin_andEnsurePpnAppears() throws Exception {
+    public void temporaryTest_mockCisJoin_ensurePpnAppears_andAcceptsOK() throws Exception {
         // TODO: This test must either be replaced, or expanded to use the GUI to join the CIS
         // Currently the test uses the ICisManager to join a CIS and test that the join was successful
         // When you are creating the T65 pages to manage CISs, you should expand this test
@@ -252,6 +252,70 @@ public class TestWebappCisJoin extends SeleniumTest {
         InternalEvent event = results.get(requestorCisBean);
         if (event.geteventInfo() instanceof FailedNegotiationEvent) {
             Assert.fail("Negotiation has failed");
+        }
+
+        indexPage.verifyNumberInNotificationsBubble(0);
+    }
+
+    @Test
+    public void temporaryTest_mockCisJoin_ensurePpnAppears_andFailsOK() throws Exception {
+        // TODO: This test must either be replaced, or expanded to use the GUI to join the CIS
+        // Currently the test uses the ICisManager to join a CIS and test that the join was successful
+        // When you are creating the T65 pages to manage CISs, you should expand this test
+
+        indexPage.doLogin(USERNAME, PASSWORD);
+
+        // verify requests empty
+        indexPage.verifyNumberInNotificationsBubble(0);
+
+        // send the request
+        log.debug("Sending join request");
+        final NegotiationDetails details = new NegotiationDetails(RequestorUtils.toRequestor(requestorCisBean, commManager.getIdManager()), 123);
+        nonBlocking(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    privacyPolicyNegotiationManager.negotiateCISPolicy(details);
+                } catch (PrivacyException e) {
+                    log.error("Error with CIS policy negotiation", e);
+                }
+            }
+        });
+
+        // verify request received by webapp
+        log.debug("Verifying notification displayed");
+        indexPage.verifyNumberInNotificationsBubble(1);
+
+        // switch to the notification page
+        log.debug("Viewing notification");
+        UFNotificationPopup ufNotificationPopup = indexPage.clickNotificationBubble();
+        PrivacyPolicyNegotiationRequestPage ppnPage = ufNotificationPopup.clickFirstPPNLink();
+
+        // accept the negotiation
+        log.debug("Accepting notification");
+        ppnPage.clickCancelPpnButton();
+
+        Date timeout = new Date(new Date().getTime() + TIMEOUT_TIME_MS);
+
+        log.debug("Waiting for results up to " + TIMEOUT_TIME_MS + "ms...");
+        while (!results.containsKey(requestorCisBean)
+                && new Date().before(timeout)) {
+            synchronized (results) {
+                try {
+                    results.wait(100);
+                } catch (InterruptedException e) {
+                    log.error("", e);
+                }
+            }
+        }
+
+        if (!results.containsKey(requestorCisBean))
+            Assert.fail("PPN results not received within an acceptable time");
+
+        log.debug("Result received " + results.containsKey(requestorCisBean));
+        InternalEvent event = results.get(requestorCisBean);
+        if (!(event.geteventInfo() instanceof FailedNegotiationEvent)) {
+            Assert.fail("Negotiation has NOT failed");
         }
 
         indexPage.verifyNumberInNotificationsBubble(0);
