@@ -38,6 +38,7 @@ import org.societies.api.schema.privacytrust.trust.broker.ExtTrustRelationshipsR
 import org.societies.api.schema.privacytrust.trust.broker.MethodName;
 import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipsRemoveRequestBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipsRequestBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustValueRequestBean;
 import org.societies.api.privacytrust.trust.TrustException;
@@ -315,6 +316,50 @@ public class TrustBrokerRemoteClient implements ITrustBrokerRemoteClient {
 			throw new TrustBrokerCommsException(
 					"Could not retrieve trust value assigned by trustor '"
 					+ query.getTrustorId() + "': " + ce.getLocalizedMessage(), ce);
+		}
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClient#removeTrustRelationships(org.societies.api.privacytrust.trust.TrustQuery, org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClientCallback)
+	 */
+	@Override
+	public void removeTrustRelationships(final TrustQuery query,
+			final ITrustBrokerRemoteClientCallback callback) 
+					throws TrustException {
+		
+		if (query == null) {
+			throw new NullPointerException("query can't be null");
+		}
+		if (callback == null) {
+			throw new NullPointerException("callback can't be null");
+		}
+		
+		LOG.debug("Removing trust relationships matching query '{}'", query);
+		
+		try {
+			final IIdentity toIdentity = 
+					this.commManager.getIdManager().getCloudNode(); 
+			final Stanza stanza = new Stanza(toIdentity);
+			
+			this.trustBrokerRemoteClientCallback.addClient(stanza.getId(), callback);
+			
+			final TrustRelationshipsRemoveRequestBean removeBean = 
+					new TrustRelationshipsRemoveRequestBean();
+			// (required) query
+			removeBean.setQuery(TrustCommsClientTranslator.getInstance()
+					.fromTrustQuery(query));
+			
+			final TrustBrokerRequestBean requestBean = new TrustBrokerRequestBean();
+			requestBean.setMethodName(MethodName.REMOVE_TRUST_RELATIONSHIPS);
+			requestBean.setRemoveTrustRelationships(removeBean);
+			
+			this.commManager.sendIQGet(stanza, requestBean, this.trustCommsClientCallback);
+			
+		} catch (CommunicationException ce) {
+			
+			throw new TrustBrokerCommsException(
+					"Could not remove trust relationships matching query '"
+					+ query + "': " + ce.getLocalizedMessage(), ce);
 		}
 	}
 }

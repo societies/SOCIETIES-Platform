@@ -166,4 +166,28 @@ public interface ITrustBrokerRemoteClient {
 	public void retrieveTrustValue(final Requestor requestor, 
 			final TrustQuery query,	final ITrustBrokerRemoteClientCallback callback)
 					throws TrustException;
+	
+	/**
+	 * Removes the trust relationships matching the supplied trust query. The
+	 * trustor specified in the trust query <i>must</i> identity the local CSS,
+	 * otherwise an exception will be thrown. The method returns 
+	 * <code>true</code> if any trust relationships matched the specified 
+	 * query. The result is returned through the 
+	 * {@link ITrustBrokerRemoteClientCallback#onRemovedTrustRelationships}
+	 * method.
+	 *
+	 * @param query
+	 *            (required) the query identifying the trust relationships to
+	 *            be removed.
+	 * @param callback
+	 *            (required) the callback to receive the result.
+	 * @throws TrustException if the trust relationships cannot be removed.
+	 * @throws NullPointerException if any of the specified parameters is 
+	 *         <code>null</code>.
+	 * @since 1.2
+	 * @see TrustRelationship
+	 */
+	public void removeTrustRelationships(final TrustQuery query, 
+			final ITrustBrokerRemoteClientCallback callback) 
+					throws TrustException;
 }
