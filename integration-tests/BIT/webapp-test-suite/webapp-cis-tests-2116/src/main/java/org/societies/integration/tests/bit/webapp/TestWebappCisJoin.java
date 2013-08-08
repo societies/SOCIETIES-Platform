@@ -28,8 +28,7 @@ import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -56,12 +55,14 @@ import org.societies.integration.api.selenium.pages.PrivacyPolicyNegotiationRequ
 
 import java.io.File;
 import java.net.URL;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
 public class TestWebappCisJoin extends SeleniumTest {
 
     private static final Logger log = LoggerFactory.getLogger(TestWebappCisJoin.class);
+    private static final long TIMEOUT_TIME_MS = 10000;
 
     private class InternalEventListener extends EventListener {
 
@@ -103,7 +104,7 @@ public class TestWebappCisJoin extends SeleniumTest {
     }
 
     private static final String USERNAME = "paddy";
-    private static final String PASSWORD = "paddy";
+    private static final String PASSWORD = "p";
 
     private IndexPage indexPage;
 
@@ -118,6 +119,8 @@ public class TestWebappCisJoin extends SeleniumTest {
     private IPrivacyPolicyManager privacyPolicyManager;
     private IPrivacyPolicyNegotiationManager privacyPolicyNegotiationManager;
     private IEventMgr eventManager;
+
+    private BundleContext bundleContext;
 
     private final Hashtable<RequestorBean, InternalEvent> results = new Hashtable<RequestorBean, InternalEvent>();
 
@@ -135,11 +138,12 @@ public class TestWebappCisJoin extends SeleniumTest {
         privacyPolicyManager = WebappCISTestsInit.getPrivacyPolicyManager();
         privacyPolicyNegotiationManager = WebappCISTestsInit.getPrivacyPolicyNegotiationManager();
         eventManager = WebappCISTestsInit.getEventManager();
+        bundleContext = WebappCISTestsInit.getBundleContext();
 
         thisUserId = commManager.getIdManager().getThisNetworkNode();
 
         // register result listener
-        synchronized (results){
+        synchronized (results) {
             results.clear();
         }
         internalEventListener = new InternalEventListener(results);
@@ -193,6 +197,7 @@ public class TestWebappCisJoin extends SeleniumTest {
     public void temporaryTest_mockCisJoin_andEnsurePpnAppears() throws Exception {
         // TODO: This test must either be replaced, or expanded to use the GUI to join the CIS
         // Currently the test uses the ICisManager to join a CIS and test that the join was successful
+        // When you are creating the T65 pages to manage CISs, you should expand this test
 
         indexPage.doLogin(USERNAME, PASSWORD);
 
@@ -200,32 +205,50 @@ public class TestWebappCisJoin extends SeleniumTest {
         indexPage.verifyNumberInNotificationsBubble(0);
 
         // send the request
-        NegotiationDetails details = new NegotiationDetails(RequestorUtils.toRequestor(requestorCisBean, commManager.getIdManager()), 123);
-        privacyPolicyNegotiationManager.negotiateCISPolicy(details);
+        log.debug("Sending join request");
+        final NegotiationDetails details = new NegotiationDetails(RequestorUtils.toRequestor(requestorCisBean, commManager.getIdManager()), 123);
+        nonBlocking(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    privacyPolicyNegotiationManager.negotiateCISPolicy(details);
+                } catch (PrivacyException e) {
+                    log.error("Error with CIS policy negotiation", e);
+                }
+            }
+        });
 
         // verify request received by webapp
+        log.debug("Verifying notification displayed");
         indexPage.verifyNumberInNotificationsBubble(1);
 
         // switch to the notification page
+        log.debug("Viewing notification");
         UFNotificationPopup ufNotificationPopup = indexPage.clickNotificationBubble();
         PrivacyPolicyNegotiationRequestPage ppnPage = ufNotificationPopup.clickFirstPPNLink();
 
         // accept the negotiation
+        log.debug("Accepting notification");
         ppnPage.clickAcceptPpnButton();
 
-        log.debug("checking whether result has been received");
-        while (!results.containsKey(requestorCisBean)) {
+        Date timeout = new Date(new Date().getTime() + TIMEOUT_TIME_MS);
+
+        log.debug("Waiting for results up to " + TIMEOUT_TIME_MS + "ms...");
+        while (!results.containsKey(requestorCisBean)
+                && new Date().before(timeout)) {
             synchronized (results) {
                 try {
-                    log.debug("Waiting for results.");
-                    results.wait();
+                    results.wait(100);
                 } catch (InterruptedException e) {
                     log.error("", e);
                 }
             }
         }
 
-        log.debug("result received " + results.containsKey(requestorCisBean));
+        if (!results.containsKey(requestorCisBean))
+            Assert.fail("PPN results not received within an acceptable time");
+
+        log.debug("Result received " + results.containsKey(requestorCisBean));
         InternalEvent event = results.get(requestorCisBean);
         if (event.geteventInfo() instanceof FailedNegotiationEvent) {
             Assert.fail("Negotiation has failed");
@@ -234,10 +257,15 @@ public class TestWebappCisJoin extends SeleniumTest {
         indexPage.verifyNumberInNotificationsBubble(0);
     }
 
-    private static File getPolicyFile() {
-        Bundle bundle = FrameworkUtil.getBundle(TestWebappCisJoin.class);
+    private static void nonBlocking(Runnable method) {
+        new Thread(method).start();
+    }
 
-        URL fileURL = bundle.getResource("Privacy-Policy.xml");
+    private File getPolicyFile() {
+        if (bundleContext == null)
+            throw new NullPointerException("Bundle context is null");
+
+        URL fileURL = bundleContext.getBundle().getResource("Privacy-Policy.xml");
         return new File(fileURL.getFile());
     }
 

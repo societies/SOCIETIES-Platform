@@ -24,6 +24,7 @@
  */
 package org.societies.integration.tests.bit.webapp;
 
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -32,9 +33,10 @@ import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyM
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.integration.test.IntegrationTestCase;
+import org.springframework.osgi.context.BundleContextAware;
 
 @SuppressWarnings({"MethodMayBeStatic", "UnusedDeclaration"})
-public class WebappCISTestsInit extends IntegrationTestCase {
+public class WebappCISTestsInit extends IntegrationTestCase implements BundleContextAware {
 
     private static final Logger log = LoggerFactory.getLogger(WebappCISTestsInit.class);
 
@@ -43,6 +45,7 @@ public class WebappCISTestsInit extends IntegrationTestCase {
     private static IPrivacyPolicyManager privacyPolicyManager;
     private static IPrivacyPolicyNegotiationManager privacyPolicyNegotiationManager;
     private static IEventMgr eventManager;
+    private static BundleContext bundleContext;
 
     public WebappCISTestsInit() {
         super(2116,
@@ -91,4 +94,12 @@ public class WebappCISTestsInit extends IntegrationTestCase {
         WebappCISTestsInit.eventManager = eventManager;
     }
 
+    @Override
+    public void setBundleContext(BundleContext bundleContext) {
+        WebappCISTestsInit.bundleContext = bundleContext;
+    }
+
+    public static BundleContext getBundleContext() {
+        return bundleContext;
+    }
 }
