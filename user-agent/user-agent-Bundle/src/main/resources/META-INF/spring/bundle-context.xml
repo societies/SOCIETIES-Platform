@@ -99,16 +99,12 @@
     </bean>
 
     <bean id="userFeedbackHistoryRepositoryBean"
-          class="org.societies.useragent.feedback.UserFeedbackHistoryRepository"
-          init-method="init"
-          destroy-method="destroy">
+          class="org.societies.useragent.feedback.UserFeedbackHistoryRepository">
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
     <bean id="privacyPolicyNegotiationHistoryRepositoryBean"
-          class="org.societies.useragent.feedback.PrivacyPolicyNegotiationHistoryRepository"
-          init-method="init"
-          destroy-method="destroy">
+          class="org.societies.useragent.feedback.PrivacyPolicyNegotiationHistoryRepository">
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 

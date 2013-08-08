@@ -7,8 +7,8 @@
     <class name="org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean"
            table="NegotiationDetailsBean">
 
-        <id name="negotiationID" type="string" column="negotiationID">
-            <generator class="uuid"/>
+        <id name="negotiationID" type="int" column="negotiationID">
+            <generator class="assigned"/>
         </id>
 
         <one-to-one name="requestor"

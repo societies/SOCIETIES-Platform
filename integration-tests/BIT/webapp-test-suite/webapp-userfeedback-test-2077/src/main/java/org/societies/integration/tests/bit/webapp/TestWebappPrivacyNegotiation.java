@@ -46,7 +46,7 @@ public class TestWebappPrivacyNegotiation extends SeleniumTest {
     private final SecureRandom random = new SecureRandom();
 
     public TestWebappPrivacyNegotiation() {
-        log.debug("TestWebappUserFeedback constructor");
+        log.debug("TestWebappUserFeedback ctor()");
     }
 
     @Before

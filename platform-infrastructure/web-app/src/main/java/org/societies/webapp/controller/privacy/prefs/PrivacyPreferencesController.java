@@ -98,8 +98,6 @@ public class PrivacyPreferencesController extends BasePageController{
 	
 	public void retrieveDObfPreferences(){
 		setdObfPreferenceDetails(privPrefmgr.getDObfPreferenceDetails());
-		DObfPreferenceDetailsBean bean;
-		
 	}
 	
 	

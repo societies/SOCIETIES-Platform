@@ -7,7 +7,19 @@
     <groupId>org.societies.integration.api</groupId>
     <artifactId>t65-webapp-test-api</artifactId>
     <name>T65 Web App Integration Test API</name>
-    <packaging>bundle</packaging>
+    <repositories>
+        <repository>
+            <id>repository.springsource.com.release</id>
+            <name>SpringSource OBR - Release</name>
+            <url>http://repository.springsource.com/maven/bundles/release</url>
+        </repository>
+        <repository>
+            <id>repository.springsource.com.external</id>
+            <name>SpringSource OBR - External</name>
+            <url>http://repository.springsource.com/maven/bundles/external</url>
+        </repository>
+    </repositories>
+    <packaging>jar</packaging>
     <version>${release.version}</version>
 
     <parent>
@@ -79,17 +91,17 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>2.25.0</version>
+            <version>2.31.0</version>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-htmlunit-driver</artifactId>
-            <version>2.25.0</version>
+            <version>2.31.0</version>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
+            <groupId>org.junit</groupId>
+            <artifactId>com.springsource.org.junit</artifactId>
+            <version>4.10.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -97,26 +109,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Bundle-Version>${project.version}</Bundle-Version>
-                        <Include-Resource>{maven-resources}</Include-Resource>
-                        <Import-Package>
-                            !org.jboss.resource.adapter.jdbc.vendor,
-                            org.societies.**,
-                            org.junit.**;
-                            *;resolution:=optional
-                        </Import-Package>
-
-                    </instructions>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

@@ -72,6 +72,7 @@ public class UFNotificationPopup extends BasePageComponent {
     public static final String TA_ABORT_BUTTON_ANY_INDEX = TA_POPUP_PANEL_ANY_INDEX + "//button[contains(@id, 'taAbortButton')]";
 
     public static final String PPN_MORE_INFO_LINK = "//a[@href='privacy_policy_negotiation.xhtml?id=%s']";
+    public static final String FIRST_PPN_MORE_INFO_LINK = "//a[contains(@href,'privacy_policy_negotiation.xhtml?id=')]";
 
 
     public UFNotificationPopup(WebDriver driver) {
@@ -232,6 +233,15 @@ public class UFNotificationPopup extends BasePageComponent {
     public PrivacyPolicyNegotiationRequestPage clickPPNLink(String requestId) {
         log.debug("Selecting PPN link for request ID " + requestId);
         WebElement ele = waitUntilVisible(By.xpath(String.format(PPN_MORE_INFO_LINK, requestId)));
+        ele.click();
+        waitUntilStale(ele);
+
+        return new PrivacyPolicyNegotiationRequestPage(getDriver());
+    }
+
+    public PrivacyPolicyNegotiationRequestPage clickFirstPPNLink() {
+        log.debug("Selecting first PPN link");
+        WebElement ele = waitUntilVisible(By.xpath(FIRST_PPN_MORE_INFO_LINK));
         ele.click();
         waitUntilStale(ele);
 

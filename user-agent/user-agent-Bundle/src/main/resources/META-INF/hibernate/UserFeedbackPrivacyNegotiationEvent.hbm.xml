@@ -7,7 +7,9 @@
     <class name="org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent"
            table="UserFeedbackPrivacyNegotiationEvent">
 
-        <id name="requestId" type="string" column="requestId"/>
+        <id name="requestId" type="string" column="requestId">
+            <generator class="assigned"/>
+        </id>
 
         <property name="method" column="method" type="org.societies.api.schema.useragent.feedback.FeedbackMethodType"/>
         <property name="stage" column="stage" type="org.societies.api.schema.useragent.feedback.FeedbackStage"/>
@@ -16,11 +18,12 @@
 
         <one-to-one name="responsePolicy"
                     class="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy"
-                    cascade="save-update"/>
+                    cascade="all"
+                    lazy="false"/>
 
-        <one-to-one name="negotiationDetails"
-                    class="org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean"
-                    cascade="all"/>
+         <one-to-one name="negotiationDetails"
+                     class="org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean"
+                     cascade="all"/>
 
     </class>
 </hibernate-mapping>
