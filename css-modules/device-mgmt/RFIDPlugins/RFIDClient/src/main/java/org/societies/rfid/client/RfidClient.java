@@ -44,6 +44,7 @@ import org.societies.api.context.source.ICtxSourceMgr;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventListener;
@@ -71,6 +72,7 @@ public class RfidClient extends EventListener implements IRfidClient {
 	private final static String RFID_PASSWORD = "RFID_PASSWORD";
 	private final static String RFID_SERVER = "RFID_SERVER";
 	private final static String RFID_REGISTERED = "RFID_REGISTERED";
+	private final static String RFID_UNREGISTERED = "RFID_UNREGISTERED";
 	private final static String RFID_LAST_LOCATION = "RFID_LAST_LOCATION";
 
 
@@ -79,6 +81,7 @@ public class RfidClient extends EventListener implements IRfidClient {
 	private ICtxSourceMgr ctxSourceMgr;
 	private IIdentityManager idm;
 	private IIdentity userIdentity;
+	private IUserFeedback userFeedback;
 
 	private ClientGUIFrame clientGUI;
 
@@ -97,13 +100,14 @@ public class RfidClient extends EventListener implements IRfidClient {
 		this.registerWithContextSourceManager();
 		try {
 			//first try to see if there is information in the DB.
-			List<CtxIdentifier> entities = this.ctxBroker.lookup(CtxModelType.ENTITY, RFID_INFO).get();
+			List<CtxIdentifier> entities = this.ctxBroker.lookup(userIdentity, CtxModelType.ENTITY, RFID_INFO).get();
 
 			boolean haveAllInfo = true;
 			if (entities.size()>0){
 				String rfidServer = "";
 				String rfidTag = "";
 				String password = "";
+				//	boolean rfidRegistered = false;
 
 				CtxIdentifier entityId = entities.get(0);
 				CtxEntity entity = (CtxEntity) this.ctxBroker.retrieve(entityId).get();
@@ -145,16 +149,29 @@ public class RfidClient extends EventListener implements IRfidClient {
 					haveAllInfo = false;
 				}
 
-				this.updateContext(RFID_REGISTERED, "false");
-				this.updateContext(RFID_REGISTRATION_ERROR, "");
-				this.logging.debug("set "+RFID_REGISTERED+" to false");
+				Set<CtxAttribute> rfidRegistration = entity.getAttributes(RFID_REGISTERED);
+
+				iterator = rfidRegistration.iterator();
+
+				if (iterator.hasNext()){
+					CtxAttribute attribute = iterator.next();
+					this.information.put(RFID_REGISTERED, attribute);
+					//	rfidRegistered = attribute.getStringValue().equalsIgnoreCase("true");
+				}else{
+					haveAllInfo = false;
+				}
+
+				//	this.updateContext(RFID_REGISTERED, "false");
+				//	this.updateContext(RFID_REGISTRATION_ERROR, "");
+				//	this.logging.debug("set "+RFID_REGISTERED+" to false");
 
 				//TODO: IF i HAVE ALL THE INFO, REGISTER WITH RFID SERVER
 
 				if (haveAllInfo){
 					this.rfidServerRemote.registerRFIDTag(rfidServer,rfidTag, userIdentity.getBareJid(), null, password);
 					this.logging.debug("sent registerRFIDTag message");
-				}
+				}			
+
 			}
 
 		} catch (CtxException e) {
@@ -167,13 +184,20 @@ public class RfidClient extends EventListener implements IRfidClient {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 
+		
 	}
 
 	private void registerForRfidWebEvents(){
 		this.getEvMgr().subscribeInternalEvent(this, new String[]{RFID_EVENT_TYPE}, null);
 	}
 
+	//NOTIFIES USER THAT THEY ARE UNREGISTERD WHEN DELETING REGISTERED TAG ON SERVER
+	public void notifyUser(String tag)
+	{
+		userFeedback.showNotification("You have been unregistered from the RFID tag: " + tag);
+	}
 
 
 	private void registerWithContextSourceManager(){
@@ -182,7 +206,7 @@ public class RfidClient extends EventListener implements IRfidClient {
 			myCtxSourceId = this.ctxSourceMgr.register(CtxSourceNames.RFID, CtxAttributeTypes.LOCATION_SYMBOLIC).get();
 
 			if (this.ctxEntity==null){
-				List<CtxIdentifier> list = this.ctxBroker.lookup(CtxModelType.ENTITY, RFID_INFO).get();
+				List<CtxIdentifier> list = this.ctxBroker.lookup(userIdentity, CtxModelType.ENTITY, RFID_INFO).get();
 				if (list.size()==0){
 					ctxEntity = this.ctxBroker.createEntity(RFID_INFO).get();
 				}
@@ -203,25 +227,57 @@ public class RfidClient extends EventListener implements IRfidClient {
 		}
 	}
 
+
+	//DELETES (UNREGISTERS USER) FROM DB - WHEN TAG IS DELETED ON SERVER
+	@Override
+	public void deleteContext(String serverJid, String tag)
+	{
+		try{
+			List<CtxIdentifier> list = this.ctxBroker.lookup(userIdentity, CtxModelType.ENTITY, RFID_INFO).get();
+			this.ctxBroker.remove(list.get(0)).get();
+			this.ctxEntity = this.ctxBroker.createEntity(RFID_INFO).get();
+			if(serverJid!=null)
+			{
+				this.rfidServerRemote.ackDeleteTag(serverJid, tag);
+			}
+			this.information.clear();//CLEAR INFO
+		}catch(Exception e) {}
+
+	}
+
+	//DELETES (UNREGISTERS USER) FROM DB - WHEN USER UNREGISTERS
+	public void deleteContext()
+	{
+		try{
+			List<CtxIdentifier> list = this.ctxBroker.lookup(userIdentity, CtxModelType.ENTITY, RFID_INFO).get();
+			this.ctxBroker.remove(list.get(0)).get();
+			this.ctxEntity = this.ctxBroker.createEntity(RFID_INFO).get();
+		}catch(Exception e) {}
+		this.information.clear();//CLEAR INFO
+
+
+	}
+
+
 	private void updateContext(String type, String value){
 
 		try {
-			if (this.ctxEntity==null){
+		//	if (this.ctxEntity==null){
 
-				List<CtxIdentifier> list = this.ctxBroker.lookup(CtxModelType.ENTITY, RFID_INFO).get();
+			List<CtxIdentifier> list = this.ctxBroker.lookup(userIdentity, CtxModelType.ENTITY, RFID_INFO).get();
+			//	List<CtxIdentifier> list = this.ctxBroker.lookup(CtxModelType.ENTITY, RFID_INFO).get();
 				if (list.size()==0){
 					this.ctxEntity = this.ctxBroker.createEntity(RFID_INFO).get();
 				}else{
 					this.ctxEntity = (CtxEntity) this.ctxBroker.retrieve(list.get(0)).get();
 				}
 
-			}
+		//	}
 
 			if (this.ctxEntity!=null){
 				Set<CtxAttribute> attributes = this.ctxEntity.getAttributes(type);
-
 				Iterator<CtxAttribute> iterator = attributes.iterator();
-
+				
 				if (iterator.hasNext()){
 					CtxAttribute attribute = iterator.next();
 					attribute.setStringValue(value);
@@ -286,7 +342,9 @@ public class RfidClient extends EventListener implements IRfidClient {
 		if (event.geteventType().equals(RFID_EVENT_TYPE) && (event.geteventName().equalsIgnoreCase("registerRequest"))){
 			Hashtable<String, String> hash = (Hashtable<String, String>) event.geteventInfo();
 			if (hash!=null){
-				String action = hash.get("action");
+				//IF REGISTERING, REMOVE ANY CONTEXT WHICH EXISTS?
+				deleteContext();
+				//	String action = hash.get("action");
 				String rfidTag = hash.get("rfidTag");
 				this.updateContext(RFID_TAG, rfidTag);
 				this.logging.debug("Stored RFID_TAG");
@@ -301,6 +359,27 @@ public class RfidClient extends EventListener implements IRfidClient {
 
 			}
 		}
+		else if (event.geteventType().equals(RFID_EVENT_TYPE) && (event.geteventName().equalsIgnoreCase("unregisterRequest"))){
+			Hashtable<String, String> hash = (Hashtable<String, String>) event.geteventInfo();
+			deleteContext();
+			if (hash!=null){
+				String action = hash.get("action");
+				String rfidTag = hash.get("rfidTag");
+				//this.updateContext(RFID_TAG, null);
+				this.logging.debug("Removed RFID_TAG");
+				String password = hash.get("password");
+				//	this.updateContext(RFID_PASSWORD, null);
+				this.logging.debug("Removed RFID_PASSWORD");
+				String serverJid = hash.get("serverJid");
+				//	this.updateContext(RFID_SERVER, null);
+				this.logging.debug("Removed RFID_SERVER");
+				this.rfidServerRemote.unregisterRFIDTag(serverJid, rfidTag, this.userIdentity.getJid(), "", password);
+				this.logging.debug("Requested RFID tag unregistration");
+
+				//this.rfidServerRemote.unregisterRFIDTag(serverJid, rfidTag, this.userIdentity.getJid(), "", password);
+
+			}
+		}
 	}
 
 	@Override
@@ -312,11 +391,12 @@ public class RfidClient extends EventListener implements IRfidClient {
 
 	@Override
 	public void acknowledgeRegistration(Integer rStatus) {
+		String rfidtag;
 		switch (rStatus){
 		case 0 : 
 			this.updateContext(RFID_REGISTERED, "true");
 
-			String rfidtag = this.information.get(RFID_TAG).getStringValue();
+			rfidtag = this.information.get(RFID_TAG).getStringValue();
 			this.logging.debug("Successfully registered tag: "+rfidtag);
 
 			break;
@@ -332,13 +412,21 @@ public class RfidClient extends EventListener implements IRfidClient {
 			this.logging.debug("RFID_REGISTRATION_ERROR: Unrecognised rfid tag number");
 
 			break;
+		case 3 :
+			//	this.updateContext(RFID_REGISTERED, "false");
+			rfidtag = this.information.get(RFID_TAG).getStringValue();
+			this.logging.debug("Successfully unregistered tag: "+rfidtag);
+
+			break;
 		default: 
 			this.updateContext(RFID_REGISTERED, "false");
 			this.updateContext(RFID_REGISTRATION_ERROR, "An unknown error occured");
 			this.logging.debug("RFID_REGISTRATION_ERROR: Unknown error");
 			break;
 		}
-		this.publishEvent();
+
+		publishEvent();
+
 
 	}
 
@@ -395,6 +483,20 @@ public class RfidClient extends EventListener implements IRfidClient {
 	 */
 	public void setRfidServerRemote(IRfidServer rfidServer) {
 		this.rfidServerRemote = rfidServer;
+	}
+
+	/**
+	 * @return the userFeedback
+	 */
+	public IUserFeedback getUserFeedback() {
+		return userFeedback;
+	}
+
+	/**
+	 * @param userFeedback the userFeedback to set
+	 */
+	public void setUserFeedback(IUserFeedback userFeedback) {
+		this.userFeedback = userFeedback;
 	}
 
 	/**

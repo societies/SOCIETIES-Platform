@@ -24,9 +24,6 @@
  */
 package org.societies.context.api.community.estimation;
 
-import java.awt.Point;
-import java.util.ArrayList;
-
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;

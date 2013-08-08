@@ -91,14 +91,14 @@ public class IndirectTrustEngine extends TrustEngine implements IIndirectTrustEn
 	public Set<ITrustedEntity> evaluate(final TrustedEntityId trustorId, 
 			final ITrustEvidence evidence) throws TrustEngineException {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Evaluating trust evidence " + evidence
-					+ " on behalf of '" + trustorId + "'");
-		
 		if (trustorId == null)
 			throw new NullPointerException("trustorId can't be null");
 		if (evidence == null)
 			throw new NullPointerException("evidence can't be null");
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Evaluating trust evidence " + evidence
+					+ " on behalf of '" + trustorId + "'");
 		
 		final Set<ITrustedEntity> resultSet = new HashSet<ITrustedEntity>();
 		

@@ -28,10 +28,11 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
+import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -54,7 +55,6 @@ import org.societies.context.api.user.history.IUserCtxHistoryMgr;
 import org.societies.context.userHistory.impl.model.UserCtxHistoryAttributeDAO;
 import org.societies.context.userHistory.impl.model.UserCtxHistoryDAOTranslator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -240,7 +240,11 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 			List<CtxAttributeIdentifier> tempEscListIds = new ArrayList<CtxAttributeIdentifier>();
 			List<CtxAttributeIdentifier> tupleListIds = this.getCtxHistoryTuples(ctxAttribute.getId(),tempEscListIds);
 
-			List<CtxIdentifier> tupleAttrIDsList = this.userCtxDBMgr.lookup(CtxModelType.ATTRIBUTE, tupleAttrType);
+			final Set<String> types = new HashSet<String>();
+			types.add(tupleAttrType);
+			List<CtxIdentifier> tupleAttrIDsList = new ArrayList<CtxIdentifier>(); 
+			tupleAttrIDsList.addAll(this.userCtxDBMgr.lookup(
+					ctxAttribute.getOwnerId(), CtxModelType.ATTRIBUTE, types));
 			if(tupleAttrIDsList.size() > 0){
 				if (LOG.isDebugEnabled())
 					LOG.debug("retrieved: "+ tupleAttrType);
@@ -391,9 +395,12 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 		final String tupleAttrType = "tuple_"+primaryAttrIdentifier.getType().toString()+"_"+primaryAttrIdentifier.getObjectNumber().toString();
 
-		List<CtxIdentifier> ls;
+		List<CtxIdentifier> ls = new ArrayList<CtxIdentifier>();
 		try {
-			ls = this.userCtxDBMgr.lookup(CtxModelType.ATTRIBUTE, tupleAttrType);
+			final Set<String> types = new HashSet<String>();
+			types.add(tupleAttrType);
+			ls.addAll(this.userCtxDBMgr.lookup(primaryAttrIdentifier.getOwnerId(), 
+					CtxModelType.ATTRIBUTE, types));
 			if (ls.size() > 0) {
 				CtxIdentifier id = ls.get(0);
 				final CtxAttribute tupleIdsAttribute = (CtxAttribute) this.userCtxDBMgr.retrieve(id);

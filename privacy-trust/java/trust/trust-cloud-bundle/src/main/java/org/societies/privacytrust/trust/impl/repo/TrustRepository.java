@@ -116,7 +116,7 @@ public class TrustRepository implements ITrustRepository {
 	
 	TrustRepository() {
 		
-		LOG.info(this.getClass() + " instantiated");
+		LOG.info("{} instantiated", this.getClass());
 	}
 	
 	/*
@@ -126,10 +126,12 @@ public class TrustRepository implements ITrustRepository {
 	public ITrustedEntity createEntity(final TrustedEntityId trustorId,
 			final TrustedEntityId trusteeId) throws TrustRepositoryException {
 		
-		if (trustorId == null)
+		if (trustorId == null) {
 			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
+		}
+		if (trusteeId == null) {
 			throw new NullPointerException("trusteeId can't be null");
+		}
 
 		final ITrustedEntity entity;
 		switch (trusteeId.getEntityType()) {
@@ -148,8 +150,7 @@ public class TrustRepository implements ITrustRepository {
 					+ trusteeId.getEntityType());
 		}
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Adding trusted entity " + entity + " to the Trust Repository...");
+		LOG.debug("Adding trusted entity {} to the Trust Repository...", entity);
 		
 		Session session = null;
 		Transaction tx = null;
@@ -161,17 +162,20 @@ public class TrustRepository implements ITrustRepository {
 			tx.commit();
 			
 		} catch (ConstraintViolationException cve) {
-			LOG.warn("Rolling back transaction for existing entity " + entity);
-			if (tx != null)
+			LOG.warn("Entity " + entity + " already exists");
+			if (tx != null) {
 				tx.rollback();
+			}
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for entity " + entity);
-			if (tx != null)
+			if (tx != null) {
 				tx.rollback();
-			throw new TrustRepositoryException("Could not add entity " + entity, e);
+			}
+			throw new TrustRepositoryException(e.getLocalizedMessage(), e);
 		} finally {
-			if (session != null)
+			if (session != null) {
 				session.close();
+			}
 		}
 		
 		return this.retrieveEntity(trustorId, trusteeId);
@@ -185,18 +189,21 @@ public class TrustRepository implements ITrustRepository {
 			final TrustedEntityId trusteeId)
 			throws TrustRepositoryException {
 		
-		if (trustorId == null)
+		if (trustorId == null) {
 			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
+		}
+		if (trusteeId == null) {
 			throw new NullPointerException("trusteeId can't be null");
+		}
 		
 		Class<? extends TrustedEntity> entityClass = TrustedEntity.class;
-		if (TrustedEntityType.CSS.equals(trusteeId.getEntityType()))
+		if (TrustedEntityType.CSS.equals(trusteeId.getEntityType())) {
 			entityClass = TrustedCss.class;
-		else if (TrustedEntityType.CIS.equals(trusteeId.getEntityType()))
+		} else if (TrustedEntityType.CIS.equals(trusteeId.getEntityType())) {
 			entityClass = TrustedCis.class;
-		else if (TrustedEntityType.SVC.equals(trusteeId.getEntityType()))
+		} else if (TrustedEntityType.SVC.equals(trusteeId.getEntityType())) {
 			entityClass = TrustedService.class;
+		}
 		// TODO TrustedEntityType.LGC
 		
 		final ITrustedEntity result;
@@ -217,11 +224,11 @@ public class TrustRepository implements ITrustRepository {
 			
 			result = (ITrustedEntity) criteria.uniqueResult();
 		} catch (Exception e) {
-			throw new TrustRepositoryException("Could not retrieve entity ("
-					+ trustorId + "," + trusteeId + "): " + e.getLocalizedMessage(), e);
+			throw new TrustRepositoryException(e.getLocalizedMessage(), e);
 		} finally {
-			if (session != null)
+			if (session != null) {
 				session.close();
+			}
 		}
 			
 		return result;
@@ -234,11 +241,12 @@ public class TrustRepository implements ITrustRepository {
 	public ITrustedEntity updateEntity(ITrustedEntity entity)
 			throws TrustRepositoryException {
 		
-		if (entity == null)
+		if (entity == null) {
 			throw new NullPointerException("entity can't be null");
+		}
 		
 		TrustedEntity result = null;
-		final Session session = sessionFactory.openSession();
+		final Session session = this.sessionFactory.openSession();
 		Transaction tx = null;
 		try {
 			tx = session.beginTransaction();
@@ -246,34 +254,34 @@ public class TrustRepository implements ITrustRepository {
 			tx.commit();
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for entity " + entity);
-			if (tx != null)
+			if (tx != null) {
 				tx.rollback();
-			throw new TrustRepositoryException("Could not add entity " + entity
-					+ ": " + e.getLocalizedMessage(), e);
+			}
+			throw new TrustRepositoryException(e.getLocalizedMessage(), e);
 		} finally {
-			if (session != null)
+			if (session != null) {
 				session.close();
+			}
 		}
 		
 		while (!result.getUpdateEventQueue().isEmpty()) {
 			final TrustUpdateEvent event = result.getUpdateEventQueue().poll();
 			final String eventTopic;
-			if (TrustValueType.DIRECT == event.getTrustRelationship().getTrustValueType())
+			if (TrustValueType.DIRECT == event.getTrustRelationship().getTrustValueType()) {
 				eventTopic = TrustEventTopic.DIRECT_TRUST_UPDATED;
-			else if (TrustValueType.INDIRECT == event.getTrustRelationship().getTrustValueType())
+			} else if (TrustValueType.INDIRECT == event.getTrustRelationship().getTrustValueType()) {
 				eventTopic = TrustEventTopic.INDIRECT_TRUST_UPDATED;
-			else //if (TrustValueType.USER_PERCEIVED == event.getTrustRelationship().getTrustValueType())
+			} else { //if (TrustValueType.USER_PERCEIVED == event.getTrustRelationship().getTrustValueType())
 				eventTopic = TrustEventTopic.USER_PERCEIVED_TRUST_UPDATED;
+			}
 			if (this.trustEventMgr == null) {
 				LOG.error("Could not post TrustUpdateEvent " + event
 						+ " to topic '" + eventTopic + "': " 
 						+ "Trust Event Mgr is not available");
 			} else {
-				if (LOG.isDebugEnabled())
-					LOG.debug("Posting TrustUpdateEvent " + event
-							+ " to topic '" + eventTopic + "'");
-				this.trustEventMgr.postEvent(event, 
-						new String[] { eventTopic });
+				LOG.debug("Posting TrustUpdateEvent {} to topic '{}'", 
+						event, eventTopic);
+				this.trustEventMgr.postEvent(event, new String[] { eventTopic });
 			}
 		}
 		
@@ -284,17 +292,20 @@ public class TrustRepository implements ITrustRepository {
 	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#removeEntity(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityId)
 	 */
 	@Override
-	public void removeEntity(final TrustedEntityId trustorId,
+	public boolean removeEntity(final TrustedEntityId trustorId,
 			final TrustedEntityId trusteeId) throws TrustRepositoryException {
 
-		if (trustorId == null)
+		if (trustorId == null) {
 			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
+		}
+		if (trusteeId == null) {
 			throw new NullPointerException("trusteeId can't be null");
+		}
 		
 		final ITrustedEntity entity = this.retrieveEntity(trustorId, trusteeId);
-		if (entity == null)
-			return;
+		if (entity == null) {
+			return false;
+		}
 		
 		Session session = null;
 		Transaction tx = null;
@@ -305,14 +316,17 @@ public class TrustRepository implements ITrustRepository {
 			tx.commit();
 		} catch (Exception e) {
 			LOG.warn("Rolling back transaction for entity " + entity);
-			if (tx != null)
+			if (tx != null) {
 				tx.rollback();
-			throw new TrustRepositoryException("Could not remove entity " + entity
-					+ ": " + e.getLocalizedMessage(), e);
+			}
+			throw new TrustRepositoryException(e.getLocalizedMessage(), e);
 		} finally {
-			if (session != null)
+			if (session != null) {
 				session.close();
+			}
 		}
+		
+		return true;
 	}
 	
 	/*
@@ -323,21 +337,23 @@ public class TrustRepository implements ITrustRepository {
 			final TrustedEntityType entityType, final TrustValueType valueType)
 					throws TrustRepositoryException {
 		
-		if (trustorId == null)
+		if (trustorId == null) {
 			throw new NullPointerException("trustorId can't be null");
+		}
 		
 		final Class<? extends TrustedEntity> daClass;
-		if (null == entityType)
+		if (null == entityType) {
 			daClass = null;
-		else if (TrustedEntityType.CSS == entityType)
+		} else if (TrustedEntityType.CSS == entityType) {
 			daClass = TrustedCss.class;
-		else if (TrustedEntityType.CIS == entityType)
+		} else if (TrustedEntityType.CIS == entityType) {
 			daClass = TrustedCis.class;
-		else if (TrustedEntityType.SVC == entityType)
+		} else if (TrustedEntityType.SVC == entityType) {
 			daClass = TrustedService.class;
-		else
+		} else {
 			throw new TrustRepositoryException("Unsupported entityType: "
 					+ entityType);
+		}
 			
 		final Set<ITrustedEntity> result = new HashSet<ITrustedEntity>();
 		if (null != daClass) {
@@ -359,18 +375,21 @@ public class TrustRepository implements ITrustRepository {
 			final TrustValueType valueType, final TrustedEntityType entityType)
 					throws TrustRepositoryException {
 		
-		if (trustorId == null)
+		if (trustorId == null) {
 			throw new NullPointerException("trustorId can't be null");
-		if (valueType == null)
+		}
+		if (valueType == null) {
 			throw new NullPointerException("valueType can't be null");
+		}
 		
 		final String valueProperty;
-		if (TrustValueType.DIRECT == valueType)
+		if (TrustValueType.DIRECT == valueType) {
 			valueProperty = "directTrust.value";
-		else if (TrustValueType.INDIRECT == valueType)
+		} else if (TrustValueType.INDIRECT == valueType) {
 			valueProperty = "indirectTrust.value";
-		else // if (TrustValueType.USER_PERCEIVED == valueType)
+		} else { // if (TrustValueType.USER_PERCEIVED == valueType)
 			valueProperty = "userPerceivedTrust.value";
+		}
 		
 		double sumValue = 0.0d;
 		int countValue = 0;
@@ -416,10 +435,12 @@ public class TrustRepository implements ITrustRepository {
 			final TrustedEntityId trustorId, final Double similarityThreshold, 
 			final Integer maxResults) throws TrustRepositoryException {
 		
-		if (trustorId == null)
+		if (trustorId == null) {
 			throw new NullPointerException("trustorId can't be null");
-		if (maxResults != null && maxResults < 1)
+		}
+		if (maxResults != null && maxResults < 1) {
 			throw new IllegalArgumentException("maxResults can't be less than 1");
+		}
 		
 		final SortedSet<ITrustedCss> result =
 				new TreeSet<ITrustedCss>(CssSimilarityComparator);
@@ -429,20 +450,60 @@ public class TrustRepository implements ITrustRepository {
 			final Criteria criteria = session.createCriteria(TrustedCss.class)
 					.add(Restrictions.eq("trustorId", trustorId))
 					.addOrder(Order.desc("similarity"));
-			if (similarityThreshold != null)
+			if (similarityThreshold != null) {
 				criteria.add(Restrictions.ge("similarity", similarityThreshold));
-			if (maxResults != null)
+			}
+			if (maxResults != null) {
 				criteria.setMaxResults(maxResults);
+			}
 			result.addAll(criteria.list());
 		} catch (Exception e) {
-			throw new TrustRepositoryException("Could not retrieve entities trusted by '"
-					+ trustorId + "': " + e.getLocalizedMessage(), e);
+			throw new TrustRepositoryException(e.getLocalizedMessage(), e);
 		} finally {
-			if (session != null)
+			if (session != null) {
 				session.close();
+			}
 		}
 		
 		return result;
+	}
+	
+	/*
+	 * @see org.societies.privacytrust.trust.api.repo.ITrustRepository#removeEntities(org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType, org.societies.api.privacytrust.trust.model.TrustValueType)
+	 */
+	@Override
+	public boolean removeEntities(final TrustedEntityId trustorId,
+			final TrustedEntityType entityType, final TrustValueType valueType)
+					throws TrustRepositoryException {
+		
+		final Class<? extends TrustedEntity> daClass;
+		if (null == entityType) {
+			daClass = null;
+		} else if (TrustedEntityType.CSS == entityType) {
+			daClass = TrustedCss.class;
+		} else if (TrustedEntityType.CIS == entityType) {
+			daClass = TrustedCis.class;
+		} else if (TrustedEntityType.SVC == entityType) {
+			daClass = TrustedService.class;
+		} else {
+			throw new TrustRepositoryException("Unsupported entityType: "
+					+ entityType);
+		}
+			
+		final Set<ITrustedEntity> entities = new HashSet<ITrustedEntity>();
+		if (null != daClass) {
+			entities.addAll(this.doRetrieveEntities(trustorId, daClass, valueType));
+		} else {
+			entities.addAll(this.doRetrieveEntities(trustorId, TrustedCss.class, valueType));
+			entities.addAll(this.doRetrieveEntities(trustorId, TrustedCis.class, valueType));
+			entities.addAll(this.doRetrieveEntities(trustorId, TrustedService.class, valueType));
+		}
+		
+		for (final ITrustedEntity entity : entities) {
+			this.removeEntity(entity.getTrustorId(), entity.getTrusteeId());
+		}
+		
+		return (entities.isEmpty()) ? false : true;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -454,21 +515,25 @@ public class TrustRepository implements ITrustRepository {
 		Session session = null;
 		try {
 			session = sessionFactory.openSession();
-			final Criteria criteria = session.createCriteria(entityClass)
-					.add(Restrictions.eq("trustorId", trustorId));
-			if (TrustValueType.DIRECT == valueType)
+			final Criteria criteria = session.createCriteria(entityClass);
+			
+			if (trustorId != null) {
+				criteria.add(Restrictions.eq("trustorId", trustorId));
+			}
+			if (TrustValueType.DIRECT == valueType) {
 				criteria.add(Restrictions.isNotNull("directTrust.value"));
-			else if (TrustValueType.INDIRECT == valueType)
+			} else if (TrustValueType.INDIRECT == valueType) {
 				criteria.add(Restrictions.isNotNull("indirectTrust.value"));
-			else if (TrustValueType.USER_PERCEIVED == valueType)
+			} else if (TrustValueType.USER_PERCEIVED == valueType) {
 				criteria.add(Restrictions.isNotNull("userPerceivedTrust.value"));
+			}
 			result.addAll(criteria.list());
 		} catch (Exception e) {
-			throw new TrustRepositoryException("Could not retrieve entities trusted by '"
-					+ trustorId + "': " + e.getLocalizedMessage(), e);
+			throw new TrustRepositoryException(e.getLocalizedMessage(), e);
 		} finally {
-			if (session != null)
+			if (session != null) {
 				session.close();
+			}
 		}
 		
 		return result;
@@ -501,11 +566,11 @@ public class TrustRepository implements ITrustRepository {
 			return new SumN(totalSum, totalCount);
 		
 		} catch (Exception e) {
-			throw new TrustRepositoryException("Could not estimate mean trust value assigned by '"
-					+ trustorId + "': " + e.getLocalizedMessage(), e);
+			throw new TrustRepositoryException(e.getLocalizedMessage(), e);
 		} finally {
-			if (session != null)
+			if (session != null) {
 				session.close();
+			}
 		}
 	}
 	

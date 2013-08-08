@@ -5,19 +5,13 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Date;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-
-import junit.framework.Assert;
 
 
-import org.junit.Test;
-import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
@@ -25,15 +19,11 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
-import org.societies.api.context.model.IndividualCtxEntity;
+
 import org.societies.api.context.model.util.SerialisationHelper;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
-import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 import org.societies.personalisation.CAUIDiscovery.impl.CAUIDiscovery;

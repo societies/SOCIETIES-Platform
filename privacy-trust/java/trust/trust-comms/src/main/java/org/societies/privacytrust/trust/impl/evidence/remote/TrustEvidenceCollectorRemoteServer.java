@@ -24,11 +24,7 @@
  */
 package org.societies.privacytrust.trust.impl.evidence.remote;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectStreamClass;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
@@ -56,6 +52,7 @@ import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
 import org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.privacytrust.trust.impl.remote.util.TrustCommsClientTranslator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -205,7 +202,8 @@ public class TrustEvidenceCollectorRemoteServer implements IFeatureServer {
 				// 6. info
 				final Serializable info;
 				if (addEvidenceRequestBean.getInfo() != null)
-					info = deserialise(addEvidenceRequestBean.getInfo(), this.getClass().getClassLoader());
+					info = TrustCommsClientTranslator.getInstance().deserialise(
+							addEvidenceRequestBean.getInfo(), this.getClass().getClassLoader());
 				else
 					info = null;
 			
@@ -323,7 +321,8 @@ public class TrustEvidenceCollectorRemoteServer implements IFeatureServer {
 				// 6. info
 				final Serializable info;
 				if (addEvidenceRequestBean.getInfo() != null)
-					info = deserialise(addEvidenceRequestBean.getInfo(), this.getClass().getClassLoader());
+					info = TrustCommsClientTranslator.getInstance().deserialise(
+							addEvidenceRequestBean.getInfo(), this.getClass().getClassLoader());
 				else
 					info = null;
 				// 7. sourceId
@@ -400,70 +399,5 @@ public class TrustEvidenceCollectorRemoteServer implements IFeatureServer {
 	public Object setQuery(Stanza stanza, Object payload) throws XMPPError {
 		// TODO Auto-generated method stub
 		return null;
-	}
-	
-	/**
-	 * Deserialises an object from the specified byte array
-	 * 
-	 * @param objectData
-	 *            the object to deserialise
-	 * @param classLoader
-	 *            the <code>ClassLoader</code> to use for deserialisation
-	 * @return the deserialised object
-	 * @throws IOException if the deserialisation of the specified byte array fails
-	 * @throws ClassNotFoundException if the class of the deserialised object cannot be found
-	 */
-	private static Serializable deserialise(byte[] objectData,
-			ClassLoader classLoader) throws IOException, ClassNotFoundException {
-
-		final Serializable result;
-		CustomObjectInputStream ois = null;
-		try {
-			ois = new CustomObjectInputStream(
-					new ByteArrayInputStream(objectData), classLoader);
-
-			result = (Serializable) ois.readObject();
-		} finally {
-			if (ois != null)
-				ois.close();
-		}
-
-		return result;
-	}
-	
-	/**
-	 * Credits go to jboss/hibernate for the inspiration
-	 */
-	private static final class CustomObjectInputStream extends ObjectInputStream {
-
-		// The ClassLoader to use for deserialisation
-		private ClassLoader classLoader;
-
-		public CustomObjectInputStream(InputStream is, ClassLoader cl)
-				throws IOException {
-			super(is);
-			this.classLoader = cl;
-		}
-
-		protected Class<?> resolveClass(ObjectStreamClass clazz)
-				throws IOException, ClassNotFoundException {
-
-			String className = clazz.getName();
-			Class<?> resolvedClass = null;
-
-			if (LOG.isDebugEnabled())
-				LOG.debug("Attempting to resolve class " + className);
-			try {
-				resolvedClass = this.classLoader.loadClass(className);
-				if (LOG.isDebugEnabled())
-					LOG.debug(className	+ " resolved through specified class loader");
-			} catch (ClassNotFoundException e) {
-				if (LOG.isDebugEnabled())
-					LOG.debug("Asking parent class to resolve " + className);
-				resolvedClass = super.resolveClass(clazz);
-			}
-
-			return resolvedClass;
-		}
 	}
 }

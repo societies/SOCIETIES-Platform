@@ -19,7 +19,6 @@
  */
 package org.societies.personalisation.CACIDiscovery.impl;
 
-import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 
 public class UIModelSimilarityEval {

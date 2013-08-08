@@ -35,6 +35,8 @@
 					nillable="false" minOccurs="0" />
 				<xs:element name="lookup" type="lookupBean"
 					nillable="false" minOccurs="0" />
+				<xs:element name="lookupByScope" type="lookupByScopeBean"
+					nillable="false" minOccurs="0" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -163,6 +165,16 @@
 		</xs:sequence>
 	</xs:complexType>
 	
+	<xs:complexType name="lookupByScopeBean">
+		<xs:sequence>
+			<xs:element name="requestor" type="tnsid:requestorBean"
+				minOccurs="0" />
+			<xs:element name="scope" type="tns:ctxEntityIdentifierBean" minOccurs="1" />
+			<xs:element name="modelType" type="tns:ctxModelTypeBean" minOccurs="1" />
+			<xs:element name="type" type="xs:string" minOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+	
 	<xs:element name="ctxChangeEventBean">
 		<xs:complexType>
 			<xs:sequence>
@@ -182,6 +194,7 @@
 			<xs:enumeration value="UPDATE" />
 			<xs:enumeration value="REMOVE" />
 			<xs:enumeration value="LOOKUP" />
+			<xs:enumeration value="LOOKUP_BY_SCOPE" />
 		</xs:restriction>
 	</xs:simpleType>
 

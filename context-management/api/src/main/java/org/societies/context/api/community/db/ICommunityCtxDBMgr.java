@@ -112,16 +112,6 @@ public interface ICommunityCtxDBMgr {
 	 */
 	public CtxAssociation createAssociation(final String cisId,
 			final String type) throws CtxException;
-
-	/**
-	 * Looks up CtxModelObjects, i.e. CtxEntities, CtxAttributes, or
-	 * CtxAssociations, of the specified type.
-	 * 
-	 * @param modelType
-	 * @param type
-	 */
-	@Deprecated
-	public List<CtxIdentifier> lookup(CtxModelType modelType, String type) throws CtxException;
 	
 	/**
 	 * Looks up all CtxModelObjects for the specified set of types and for the specified ownerId.

@@ -26,13 +26,13 @@ package org.societies.privacytrust.trust.api.util;
 
 import static org.apache.commons.math.util.MathUtils.EPSILON; 
 
+import java.util.Arrays;
+
 import org.apache.commons.math.linear.ArrayRealVector;
 import org.apache.commons.math.linear.RealVector;
 import org.apache.commons.math.stat.StatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import cern.colt.Arrays;
 
 /**
  * Describe your class here...
@@ -47,23 +47,20 @@ public class MathUtils {
 
 	public static double[] normalise(final double[] sample) {
 	
-		if (LOG.isDebugEnabled())
-			LOG.debug("sample=" + Arrays.toString(sample));
+		LOG.debug("normalise: sample={}", Arrays.toString(sample));
 		
 		final double[] normalisedSample = StatUtils.normalize(sample);
 		for (int i = 0; i < normalisedSample.length; ++i)
 			if (Double.isNaN(normalisedSample[i]))
 				normalisedSample[i] = 0.0d;
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("normalisedSample=" + Arrays.toString(normalisedSample));
+		LOG.debug("normalise: normalisedSample={}", Arrays.toString(normalisedSample));
 		return normalisedSample;
 	}
 	
 	public static double[] stanine(final double[] input) {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("input=" + Arrays.toString(input));
+		LOG.debug("stanine: input={}", Arrays.toString(input));
 		final double[] zscores = normalise(input);
 		final double[] stanines = new double[zscores.length];
 		for (int i = 0; i < zscores.length; ++i) {
@@ -87,8 +84,7 @@ public class MathUtils {
 				stanines[i] = 9;
 		}
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("stanines=" + Arrays.toString(stanines));
+		LOG.debug("stanine: stanines={}", Arrays.toString(stanines));
 		return stanines;
 	}
 	

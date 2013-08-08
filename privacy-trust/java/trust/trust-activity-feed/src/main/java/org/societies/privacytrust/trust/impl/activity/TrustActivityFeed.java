@@ -24,20 +24,32 @@
  */
 package org.societies.privacytrust.trust.impl.activity;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.activity.IActivityFeedManager;
+import org.societies.api.cis.directory.ICisDirectory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.privacytrust.trust.TrustQuery;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
+import org.societies.api.privacytrust.trust.model.TrustRelationship;
 import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityType;
+import org.societies.api.privacytrust.trust.model.util.TrustValueFormat;
 import org.societies.api.privacytrust.trust.model.util.TrustedEntityIdFactory;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.api.services.ServiceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -55,8 +67,30 @@ public class TrustActivityFeed implements ITrustUpdateEventListener {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(TrustActivityFeed.class);
 	
+	private static final int MAX_ENTRIES = 64;
+	private static final double VALUE_UPDATE_THRESHOLD = 0.15d;
+	
+	private final Map<TrustedEntityId, TrustActivity> cache = Collections.synchronizedMap(
+			new LinkedHashMap<TrustedEntityId, TrustActivity>(MAX_ENTRIES+1, .75F, true) {
+				
+				private static final long serialVersionUID = 5204510380073235862L;
+
+				// This method is called just after a new entry has been added
+				public boolean removeEldestEntry(Map.Entry<TrustedEntityId, TrustActivity> eldest) {
+					return size() > MAX_ENTRIES;
+				}
+			});
+	
 	/** The CSS activity feed. */
 	private IActivityFeed cssActivityFeed;
+	
+	/** The CIS Directory service reference. */
+	@Autowired(required=false)
+	private ICisDirectory cisDir;
+	
+	/** The Service Discovery service reference. */
+	@Autowired(required=false)
+	private IServiceDiscovery serviceDisco;
 	
 	private final String cssActivityFeedId;
 
@@ -65,20 +99,18 @@ public class TrustActivityFeed implements ITrustUpdateEventListener {
 			IActivityFeedManager activityFeedMgr,
 			ICommManager commMgr) throws Exception {
 
-		if (LOG.isInfoEnabled())
-			LOG.info(this.getClass() + " instantiated");
+		LOG.info("{} instantiated", this.getClass());
 
 		try {
-			if (LOG.isInfoEnabled())
-				LOG.info("Obtaining reference to CSS Activity Feed");
-			this.cssActivityFeedId = commMgr.getIdManager().getThisNetworkNode().toString(); 
+			this.cssActivityFeedId = commMgr.getIdManager().getThisNetworkNode().toString();
+			LOG.info("Obtaining reference to CSS Activity Feed of '{}'",
+					this.cssActivityFeedId);
 			this.cssActivityFeed = activityFeedMgr.getOrCreateFeed(
-					cssActivityFeedId, cssActivityFeedId, false);
+					this.cssActivityFeedId, this.cssActivityFeedId, false);
 
 			final IIdentity cssOwnerId = commMgr.getIdManager().getCloudNode();
 			final TrustedEntityId cssTeid = TrustedEntityIdFactory.fromIIdentity(cssOwnerId);
-			if (LOG.isInfoEnabled())
-				LOG.info("Registering for updates of user-preceived trust");
+			LOG.info("Registering for updates of trust values as perceived by '{}'", cssTeid);
 			trustBroker.registerTrustUpdateListener(this, new TrustQuery(cssTeid)
 					.setTrustValueType(TrustValueType.USER_PERCEIVED));
 			
@@ -96,20 +128,39 @@ public class TrustActivityFeed implements ITrustUpdateEventListener {
 	@Override
 	public void onUpdate(TrustUpdateEvent event) {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Received event " + event);
+		LOG.debug("Received event {}", event);
 		
-		final TrustedEntityId trusteeId = event.getTrustRelationship().getTrusteeId();
-		if (trusteeId.equals(event.getTrustRelationship().getTrustorId())) {
-			if (LOG.isDebugEnabled())
-				LOG.debug("Ignoring event " + event);
+		final TrustRelationship tr = event.getTrustRelationship();
+		final TrustedEntityId trusteeId = tr.getTrusteeId();
+		if (trusteeId.equals(tr.getTrustorId())) {
+			LOG.debug("Ignoring event {}", event);
 			return;
 		}
-		final String activity = "Trust value of '" + trusteeId + "' changed to "
-				+ event.getTrustRelationship().getTrustValue();
-		if (LOG.isDebugEnabled())
-			LOG.debug("Adding activity '" + activity + "'");
-		this.addCssActivity(activity);
+		
+		final String friendlyTrusteeId;
+		final Double newTrustValue = tr.getTrustValue();
+		// Check cache for last activity		
+		final TrustActivity lastActivity = this.cache.get(trusteeId);
+		if (lastActivity == null) {
+			friendlyTrusteeId = this.formatTeid(trusteeId);
+		} else {
+			friendlyTrusteeId = lastActivity.getTrusteeId();
+		}
+		// Create new activity
+		final TrustActivity newActivity = new TrustActivity(
+				friendlyTrusteeId, newTrustValue); 
+		// Check if new activity needs to be published
+		if (lastActivity == null || lastActivity.getTrustValue() == null 
+				|| newTrustValue == null || Math.abs(
+				newTrustValue - lastActivity.getTrustValue()) > VALUE_UPDATE_THRESHOLD) {
+			LOG.debug("Adding activity '{}'", newActivity);
+			this.addCssActivity(newActivity.toString());
+			// Cache new activity
+			this.cache.put(trusteeId, newActivity);
+		} else {
+			LOG.debug("Ignoring activity '{}'", newActivity);
+		}
+		LOG.debug("onUpdate: cache={}", this.cache);
 	}
 	
 	private void addCssActivity(final String action){
@@ -120,5 +171,65 @@ public class TrustActivityFeed implements ITrustUpdateEventListener {
 	    activity.setVerb(action);
 
 	    this.cssActivityFeed.addActivity(activity);
+	}
+	
+	private String formatTeid(final TrustedEntityId teid) {
+		
+		final String entityId = teid.getEntityId();
+		try {
+			if (TrustedEntityType.CSS == teid.getEntityType()) {
+				return entityId;
+			} else if (TrustedEntityType.CIS == teid.getEntityType()) {
+				final List<CisAdvertisementRecord> cisAds = this.cisDir.searchByID(entityId).get();
+				if (!cisAds.isEmpty() && cisAds.get(0).getName() != null) {
+					return cisAds.get(0).getName();
+				}
+			} else if (TrustedEntityType.SVC == teid.getEntityType()) {
+				final org.societies.api.schema.servicelifecycle.model.Service service = 
+						this.serviceDisco.getService(ServiceUtils
+								.generateServiceResourceIdentifierFromString(entityId)).get();
+				if (service != null && service.getServiceName() != null) {
+					return service.getServiceName();
+				}
+			}
+		} catch (Exception e) {
+
+			LOG.warn("Could not format TEID '" + teid + "': " 
+					+ e.getLocalizedMessage());
+		}
+		
+		return teid.toString();
+	}
+	
+	private class TrustActivity {
+		
+		private final String trusteeId;
+		private final Double trustValue;
+		
+		private TrustActivity(final String trusteeId, final Double trustValue) {
+			
+			this.trusteeId = trusteeId;
+			this.trustValue = trustValue;
+		}
+		
+		private String getTrusteeId() {
+			
+			return this.trusteeId;
+		}
+		
+		private Double getTrustValue() {
+			
+			return this.trustValue;
+		}
+		
+		/*
+		 * @see java.lang.Object#toString()
+		 */
+		@Override
+		public String toString() {
+	
+			return "Trust level of " + this.trusteeId + " changed to "
+					+ TrustValueFormat.formatPercent(this.trustValue);
+		}
 	}
 }

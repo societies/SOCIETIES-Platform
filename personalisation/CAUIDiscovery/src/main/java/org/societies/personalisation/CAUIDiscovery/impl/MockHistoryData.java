@@ -5,8 +5,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-
 /**
  * This data class maintains only the necessary information derived from a history attribute 
  * 
