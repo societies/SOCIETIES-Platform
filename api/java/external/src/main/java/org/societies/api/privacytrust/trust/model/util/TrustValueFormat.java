@@ -24,44 +24,62 @@
  */
 package org.societies.api.privacytrust.trust.model.util;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
-import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
-import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.api.privacytrust.trust.model.TrustedEntityType;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.api.services.ServiceUtils;
+import java.text.NumberFormat;
 
 /**
- * This class provides utility methods in order to instantiate 
- * {@link TrustedEntityId TrustedEntityIds} from {@link IIdentity} or
- * {@link ServiceResourceIdentifier} instances.
+ * This class provides utility methods in order to format trust values as
+ * user-friendly Strings.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 1.0
+ * @since 1.2
  */
-public class TrustedEntityIdFactory {
+public class TrustValueFormat {
 
-	public static TrustedEntityId fromIIdentity(final IIdentity identity) 
-			throws MalformedTrustedEntityIdException {
+	/**
+	 * Formats the specified trust value as a percentage. With this formatter,
+	 * a decimal fraction such as 0.75 is displayed as <code>"75%"</code>. The 
+	 * method returns <code>"-"</code> if the specified trust value is 
+	 * <code>null</code>.
+	 * 
+	 * @param trustValue
+	 *            the trust value to format as a percentage.
+	 * @return a String representing the specified trust value as a percentage.
+	 * @throws IllegalArgumentException if the specified value is an out of 
+	 *         range Double, i.e. not within [0,1].
+	 */
+	public static String formatPercent(Double trustValue) {
 		
-		if (identity == null)
-			throw new NullPointerException("identity can't be null");
+		if (trustValue == null)
+			return "-";
 		
-		if (IdentityType.CIS.equals(identity.getType()))
-			return new TrustedEntityId(TrustedEntityType.CIS, identity.getBareJid());
-		else
-			return new TrustedEntityId(TrustedEntityType.CSS, identity.getBareJid());
+		if (trustValue < 0d || trustValue > 1d)
+			throw new IllegalArgumentException("trustValue is out of range [0,1]");
+		
+		final NumberFormat percentFormatter = NumberFormat.getPercentInstance();
+		return percentFormatter.format(trustValue);
 	}
 	
-	public static TrustedEntityId fromServiceResourceIdentifier(
-			final ServiceResourceIdentifier sri) 
-					throws MalformedTrustedEntityIdException {
+	/**
+	 * Formats the specified trust value as a fraction of 100. With this 
+	 * formatter, a decimal fraction such as 0.75 is displayed as 
+	 * <code>"75/100"</code>. The method returns <code>"-"</code> if the 
+	 * specified trust value is <code>null</code>.
+	 * 
+	 * @param trustValue
+	 *            the trust value to format as a fraction of 100.
+	 * @return a String representing the specified trust value as a fraction of
+	 *         100.
+	 * @throws IllegalArgumentException if the specified value is an out of 
+	 *         range Double, i.e. not within [0,1].
+	 */
+	public static String formatFraction(Double trustValue) {
 		
-		if (sri == null)
-			throw new NullPointerException("sri can't be null");
+		if (trustValue == null)
+			return "-";
 		
-		return new TrustedEntityId(TrustedEntityType.SVC, 
-				ServiceUtils.serviceResourceIdentifierToString(sri));
+		if (trustValue < 0d || trustValue > 1d)
+			throw new IllegalArgumentException("trustValue is out of range [0,1]");
+		
+		return new String(Math.round(100 * trustValue) + "/100");
 	}
 }

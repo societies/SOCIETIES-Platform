@@ -27,11 +27,7 @@ package org.societies.integration.test.bit.ctx_3pBroker;
 import static org.junit.Assert.*;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Date;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -42,160 +38,302 @@ import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxEntityTypes;
-import org.societies.api.context.model.CtxHistoryAttribute;
-import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.INetworkNode;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.context.broker.CtxAccessControlException;
 import org.societies.api.context.broker.ICtxBroker;
-import org.societies.integration.test.userfeedback.UserFeedbackMockResult;
-import org.societies.integration.test.userfeedback.UserFeedbackType;
 
 /**
- * 
+ * This test creates two CISs:
+ * <ol>
+ * <li>CIS: allowed attributes = { ACTIVITIES, MOVIES } (<b>public</b> access)</li>
+ * <li>CIS: allowed attributes = { ACTIVITIES, MOVIES } (<b>members-only</b> access)</li>
+ * </ol>
  *
  * @author nikosk
- *
  */
 public class TestLocalCommunityContext {
 
-	private ICtxBroker externalCtxBroker;
-	private ICommManager commMgr;
-	public ICisManager cisManager;
-
 	private static Logger LOG = LoggerFactory.getLogger(TestLocalCommunityContext.class);
-
-	private INetworkNode cssNodeId;
-	private IIdentity cssOwnerId;
-
-	private RequestorService requestorService = null;
-	private IIdentity serviceIdentity = null;
-
-	private IIdentity cisIdentity1 = null;
-	private IIdentity cisIdentity2 = null;
 	
-	private ServiceResourceIdentifier myServiceID;
+	private static final String MEMBERS_ONLY = "SHARE_WITH_CIS_MEMBERS_ONLY";
+	
+	private static final String PUBLIC = "SHARE_WITH_3RD_PARTIES";
+	
+	private static final long CIS_CREATION_TIMEOUT = 2000l;
+	
+	private static final String NON_MEMBER_USER_ID = "nikosk.societies.local";
+	
+	/** The external Context Broker service reference. */
+	private ICtxBroker ctxBroker;
+	
+	/** The CIS Mgr service reference. */
+	private ICisManager cisManager;
+	
+	/** The Comms Mgr service reference. */
+	private ICommManager commMgr;
+	
+	/** The CSS owner ID. */
+	private IIdentity userId;
+	
+	/** The ID of a CSS which is not member of the created CISs. */
+	private IIdentity nonMemberId;
+
+	private IIdentity publicCisId;
+	private IIdentity membersOnlyCisId;
+	
+	private ServiceResourceIdentifier serviceId;
 
 	CtxEntityIdentifier cssOwnerEntityId ;
 
 	@Before
-	public void setUp(){
+	public void setUp() throws Exception {
 
-		LOG.info("*** initiallizing " );
-		LOG.info("*** " +Test1858.getUserFeedbackMocker());
+		LOG.info("*** setUp");
+		// obtain service refs
+		this.ctxBroker = Test1858.getCtxBroker();
+		this.commMgr = Test1858.getCommManager();
+		this.cisManager = Test1858.getCisManager();
+		
+		// setup test data
+		this.userId = this.commMgr.getIdManager().fromJid(
+				this.commMgr.getIdManager().getThisNetworkNode().getBareJid());
+		LOG.info("*** setUp: userId={}", this.userId);
+		
+		this.nonMemberId = this.commMgr.getIdManager().fromJid(NON_MEMBER_USER_ID);
+		LOG.info("*** setUp: nonMemberId={}", this.nonMemberId);
 
-		Test1858.getUserFeedbackMocker().setEnabled(true);
-		Test1858.getUserFeedbackMocker().addReply(UserFeedbackType.ACKNACK, new UserFeedbackMockResult("Allow"));
+		this.serviceId = new ServiceResourceIdentifier();
+		this.serviceId.setServiceInstanceIdentifier("css://service@societies.org/HelloEarth");
+		this.serviceId.setIdentifier(new URI("css://service@societies.org/HelloEarth"));
+		LOG.info("*** setUp: serviceId={}", this.serviceId);
+
+		// create CIS1
+		this.publicCisId = this.createCis("testCIS1", new String[] {
+				CtxAttributeTypes.ACTIVITIES, CtxAttributeTypes.MOVIES }, PUBLIC);
+		LOG.info("*** setUp: publicCisId={}", this.publicCisId);
+		// create CIS2
+		this.membersOnlyCisId = this.createCis("testCIS2", new String[] {
+				CtxAttributeTypes.ACTIVITIES, CtxAttributeTypes.MOVIES }, MEMBERS_ONLY);
+		LOG.info("*** setUp: membersOnlyCisId={}", this.membersOnlyCisId);
+		
+		Thread.sleep(CIS_CREATION_TIMEOUT);
 	}
 
 	@After
 	public void tearDown() throws Exception {
 
+		LOG.info("*** tearDown");
+		// reset test data
+		this.userId = null;
+		this.nonMemberId = null;
+		this.serviceId = null;
 		
-		if (this.cisIdentity1 !=null){
-			this.cisManager.deleteCis(this.cisIdentity1.getBareJid());
+		if (this.publicCisId != null) {
+			LOG.info("*** tearDown: Removing publicCisId {}", this.publicCisId);
+			this.cisManager.deleteCis(this.publicCisId.getBareJid());
+			this.publicCisId = null;
 		}
-		if (this.cisIdentity2 !=null){
-			this.cisManager.deleteCis(this.cisIdentity2.getBareJid());
+		if (this.membersOnlyCisId !=null) {
+			LOG.info("*** tearDown: Removing membersOnlyCis {}", this.membersOnlyCisId);
+			this.cisManager.deleteCis(this.membersOnlyCisId.getBareJid());
+			this.membersOnlyCisId = null;
 		}
-	
+		
+		// reset service references
+		this.ctxBroker = null;
+		this.commMgr = null;
+		this.cisManager = null;
 	}
 
-
+	/**
+	 * <ol>
+	 * <li>Member performs CRUD on Public CIS</li>
+	 * <li>Member performs CRUD on Members-Only CIS</li>
+	 * </ol>
+	 * @throws Exception
+	 */
 	@Test
-	public void Test(){
-
-		this.externalCtxBroker = Test1858.getCtxBroker();
-		this.commMgr = Test1858.getCommManager();
-		this.cisManager = Test1858.getCisManager();
-
-		LOG.info("*** " + this.getClass() + " instantiated");
-
-		try {
-			this.cssNodeId = commMgr.getIdManager().getThisNetworkNode();
-			//LOG.info("*** cssNodeId = " + this.cssNodeId);
-
-			final String cssOwnerStr = this.cssNodeId.getBareJid();
-			this.cssOwnerId = commMgr.getIdManager().fromJid(cssOwnerStr);
-			LOG.info("*** cssOwnerId = " + this.cssOwnerId);
-
-			this.serviceIdentity = commMgr.getIdManager().fromJid("nikosk@societies.org");
-			myServiceID = new ServiceResourceIdentifier();
-			myServiceID.setServiceInstanceIdentifier("css://nikosk@societies.org/HelloEarth");
-			myServiceID.setIdentifier(new URI("css://nikosk@societies.org/HelloEarth"));
-
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		this.requestorService = new RequestorService(serviceIdentity, myServiceID);
-
-		LOG.info("*** requestor service = " + this.requestorService);
-
-		LOG.info("*** Starting test...");
+	public void testMemberCRUD() throws Exception {
 		
-		//create a community entity/attributes
-		this.cisIdentity1 = this.createCIS("testCIS1");
-		this.cisIdentity2 = this.createCIS("testCIS2");
-		// lookup/retrieve community entity
-		lookupCommunityCreateHistory();
+		LOG.info("*** testMemberCRUD: START");
+		
+		final RequestorService requestorService =
+				new RequestorService(this.userId, this.serviceId);
+		
+		// verify CRUD on public CIS by member CSS/3P
+		final CtxEntityIdentifier publicCisEntId = 
+				this.ctxBroker.retrieveCommunityEntityId(requestorService, this.publicCisId).get();
+		LOG.info("*** testMemberCRUD: publicCisEntId={}", publicCisEntId);
+		assertNotNull(publicCisEntId);
+		
+		final CtxAttribute publicActivitiesAttr =	this.ctxBroker.createAttribute(
+				requestorService, publicCisEntId, CtxAttributeTypes.ACTIVITIES).get();
+		assertNotNull(publicActivitiesAttr);
+		assertNull(publicActivitiesAttr.getStringValue());
+		
+		publicActivitiesAttr.setStringValue("activity1,activity2");
+		final CtxAttribute publicActivitiesAttrUpdated = (CtxAttribute) 
+				this.ctxBroker.update(requestorService, publicActivitiesAttr).get();
+		assertNotNull(publicActivitiesAttrUpdated);
+		assertNotNull(publicActivitiesAttrUpdated.getStringValue());
+		assertEquals("activity1,activity2", publicActivitiesAttrUpdated.getStringValue());
+		LOG.info("*** testMemberCRUD: updated activities: {}", publicActivitiesAttrUpdated.getStringValue());
 
-		retrieveAttributeCommInf();
+		final CtxAttribute publicActivitiesAttrRetrieved = (CtxAttribute)
+				this.ctxBroker.retrieve(requestorService, publicActivitiesAttr.getId()).get();
+		assertNotNull(publicActivitiesAttrRetrieved);
+		assertNotNull(publicActivitiesAttrRetrieved.getStringValue());
+		assertEquals("activity1,activity2", publicActivitiesAttrRetrieved.getStringValue());
+		
+		// verify CRUD on members-only CIS by member CSS/3P
+		final CtxEntityIdentifier membersOnlyCisEntId = 
+				this.ctxBroker.retrieveCommunityEntityId(requestorService, this.membersOnlyCisId).get();
+		LOG.info("*** testMemberCRUD: membersOnlyCisEntId={}", membersOnlyCisEntId);
+		assertNotNull(membersOnlyCisEntId);
+		
+		final CtxAttribute membersOnlyActivitiesAttr =	this.ctxBroker.createAttribute(
+				requestorService, membersOnlyCisEntId, CtxAttributeTypes.ACTIVITIES).get();
+		assertNotNull(membersOnlyActivitiesAttr);
+		assertNull(membersOnlyActivitiesAttr.getStringValue());
+		
+		membersOnlyActivitiesAttr.setStringValue("activity1,activity2");
+		final CtxAttribute membersOnlyActivitiesAttrUpdated = (CtxAttribute) 
+				this.ctxBroker.update(requestorService, membersOnlyActivitiesAttr).get();
+		assertNotNull(membersOnlyActivitiesAttrUpdated);
+		assertNotNull(membersOnlyActivitiesAttrUpdated.getStringValue());
+		assertEquals("activity1,activity2", membersOnlyActivitiesAttrUpdated.getStringValue());
+		LOG.info("*** testMemberCRUD: updated activities: {}", membersOnlyActivitiesAttrUpdated.getStringValue());
+
+		final CtxAttribute membersOnlyActivitiesAttrRetrieved = (CtxAttribute)
+				this.ctxBroker.retrieve(requestorService, membersOnlyActivitiesAttr.getId()).get();
+		assertNotNull(membersOnlyActivitiesAttrRetrieved);
+		assertNotNull(membersOnlyActivitiesAttrRetrieved.getStringValue());
+		assertEquals("activity1,activity2", membersOnlyActivitiesAttrRetrieved.getStringValue());
+			
+		LOG.info("*** testMemberCRUD: END");
 	}
+	
+	/**
+	 * <ol>
+	 * <li>Non-member performs CRUD on Public CIS</li>
+	 * <li>Non-member performs CRUD on Members-Only CIS</li>
+	 * </ol>
+	 * @throws Exception
+	 */
+	@Test
+	public void testPublicCRUD() throws Exception {
+		
+		LOG.info("*** testPublicCRUD: START");
+		
+		final RequestorService requestorService =
+				new RequestorService(this.nonMemberId, this.serviceId);
+		
+		// verify CRUD on public CIS by non-member CSS/3P
+		final CtxEntityIdentifier publicCisEntId = 
+				this.ctxBroker.retrieveCommunityEntityId(requestorService, this.publicCisId).get();
+		LOG.info("*** testPublicCRUD: publicCisEntId={}", publicCisEntId);
+		assertNotNull(publicCisEntId);
+		
+		final CtxAttribute publicActivitiesAttr =	this.ctxBroker.createAttribute(
+				requestorService, publicCisEntId, CtxAttributeTypes.ACTIVITIES).get();
+		assertNotNull(publicActivitiesAttr);
+		assertNull(publicActivitiesAttr.getStringValue());
+		
+		publicActivitiesAttr.setStringValue("activity1,activity2");
+		final CtxAttribute publicActivitiesAttrUpdated = (CtxAttribute) 
+				this.ctxBroker.update(requestorService, publicActivitiesAttr).get();
+		assertNotNull(publicActivitiesAttrUpdated);
+		assertNotNull(publicActivitiesAttrUpdated.getStringValue());
+		assertEquals("activity1,activity2", publicActivitiesAttrUpdated.getStringValue());
+		LOG.info("*** testPublicCRUD: updated activities: {}", publicActivitiesAttrUpdated.getStringValue());
 
+		final CtxAttribute publicActivitiesAttrRetrieved = (CtxAttribute)
+				this.ctxBroker.retrieve(requestorService, publicActivitiesAttr.getId()).get();
+		assertNotNull(publicActivitiesAttrRetrieved);
+		assertNotNull(publicActivitiesAttrRetrieved.getStringValue());
+		assertEquals("activity1,activity2", publicActivitiesAttrRetrieved.getStringValue());
+		
+		// verify CRUD on members-only CIS by non-member CSS/3P
+		final CtxEntityIdentifier membersOnlyCisEntId = 
+				this.ctxBroker.retrieveCommunityEntityId(requestorService, this.membersOnlyCisId).get();
+		LOG.info("*** testPublicCRUD: membersOnlyCisEntId={}", membersOnlyCisEntId);
+		assertNotNull(membersOnlyCisEntId);
+		
+		final CtxAttribute membersOnlyActivitiesAttr =	this.ctxBroker.createAttribute(
+				requestorService, membersOnlyCisEntId, CtxAttributeTypes.ACTIVITIES).get();
+		assertNotNull(membersOnlyActivitiesAttr);
+		assertNull(membersOnlyActivitiesAttr.getStringValue());
+		
+		membersOnlyActivitiesAttr.setStringValue("activity1,activity2");
+		boolean accessControlExceptionCaught = false;
+		try {
+			this.ctxBroker.update(requestorService, membersOnlyActivitiesAttr).get();
+		} catch (CtxAccessControlException cace) {
+			accessControlExceptionCaught = true;
+		}
+		assertTrue(accessControlExceptionCaught);
+
+		accessControlExceptionCaught = false;
+		try {
+			this.ctxBroker.retrieve(requestorService, membersOnlyActivitiesAttr.getId()).get();
+		} catch (CtxAccessControlException cace) {
+			accessControlExceptionCaught = true;
+		}
+		assertTrue(accessControlExceptionCaught);
+			
+		LOG.info("*** testPublicCRUD: END");
+	}
+	
 	/*
 	 * this test will retrieve a community attribute that triggers inference
 	 * and a community attribute that doesn't trigger inference 
-	 */
-	private void retrieveAttributeCommInf(){
+	 *
+	@Test
+	public void retrieveAttributeCommInf(){
 		
+		final RequestorService requestorService =
+				new RequestorService(this.userId, this.serviceId);
+
 		LOG.info("starting test retrieveAttributeCommInf ");
 		try {
-			CtxEntityIdentifier commEntityId = this.externalCtxBroker.retrieveCommunityEntityId(this.requestorService, this.cisIdentity1).get();
+			CtxEntityIdentifier commEntityId = this.ctxBroker.retrieveCommunityEntityId(requestorService, this.publicCisId).get();
 
-			CtxAttribute activitiesAttr = this.externalCtxBroker.createAttribute(this.requestorService, commEntityId, CtxAttributeTypes.ACTIVITIES).get();
+			CtxAttribute activitiesAttr = this.ctxBroker.createAttribute(requestorService, commEntityId, CtxAttributeTypes.ACTIVITIES).get();
 			activitiesAttr.setStringValue("activity1,activity2");
-			CtxAttribute activitiesAttrUpdated = (CtxAttribute) this.externalCtxBroker.update(this.requestorService,activitiesAttr ).get();
+			CtxAttribute activitiesAttrUpdated = (CtxAttribute) this.ctxBroker.update(requestorService,activitiesAttr ).get();
 			LOG.info(" update activities: "+activitiesAttrUpdated.getComplexValue().getPairs());
 			LOG.info(" retrieved activities getFreshness 1: "+activitiesAttrUpdated.getQuality().getFreshness());
-			
-			
-			CtxAttribute moviesAttr = this.externalCtxBroker.createAttribute(this.requestorService, commEntityId, CtxAttributeTypes.MOVIES).get();
+
+
+			CtxAttribute moviesAttr = this.ctxBroker.createAttribute(requestorService, commEntityId, CtxAttributeTypes.MOVIES).get();
 			moviesAttr.setStringValue("movie1,movie2");
-			CtxAttribute moviesAttrUpdated = (CtxAttribute) this.externalCtxBroker.update(this.requestorService,moviesAttr ).get();
+			CtxAttribute moviesAttrUpdated = (CtxAttribute) this.ctxBroker.update(requestorService,moviesAttr ).get();
 			LOG.info(" update movies: "+moviesAttrUpdated.getComplexValue().getPairs());
 			LOG.info(" retrieved movies getFreshness 1: "+moviesAttrUpdated.getQuality().getFreshness());
-			
+
 			Thread.sleep(5000);
-			
+
 			// if community ctx estimator is called a complex value type should be present
 			LOG.info(" trigger community inference test" );
-			CtxAttribute attrActivitiesRetrieved = (CtxAttribute) this.externalCtxBroker.retrieve(requestorService,activitiesAttr.getId() ).get();
+			CtxAttribute attrActivitiesRetrieved = (CtxAttribute) this.ctxBroker.retrieve(requestorService,activitiesAttr.getId() ).get();
 			LOG.info(" retrieved activities: "+attrActivitiesRetrieved.getComplexValue().getPairs());
 			LOG.info(" retrieved activities getFreshness 2: "+attrActivitiesRetrieved.getQuality().getFreshness());
 			LOG.info(" retrieved activities Freshness should be the same: "+attrActivitiesRetrieved.getQuality().getFreshness()+" "+activitiesAttrUpdated.getQuality().getFreshness());
 			LOG.info(" retrieved activities Freshness should be the same: "+attrActivitiesRetrieved.getQuality().getLastUpdated()+" "+activitiesAttrUpdated.getQuality().getLastUpdated());
 			assertEquals(attrActivitiesRetrieved.getQuality().getLastUpdated(), activitiesAttrUpdated.getQuality().getLastUpdated());
-			
-			CtxAttribute attrMoviesRetrieved = (CtxAttribute) this.externalCtxBroker.retrieve(requestorService,moviesAttr.getId()).get();
+
+			CtxAttribute attrMoviesRetrieved = (CtxAttribute) this.ctxBroker.retrieve(requestorService,moviesAttr.getId()).get();
 			LOG.info(" retrieved movies getFreshness 2 : "+attrMoviesRetrieved.getQuality().getFreshness());
 			LOG.info(" retrieved movies: "+attrMoviesRetrieved.getComplexValue().getPairs());
 			LOG.info(" retrieved movies Freshness should NOT be the same: "+attrMoviesRetrieved.getQuality().getFreshness()+" "+moviesAttrUpdated.getQuality().getFreshness());
 			LOG.info(" retrieved movies Freshness should NOT be the same (last updated): "+attrMoviesRetrieved.getQuality().getLastUpdated()+" "+moviesAttrUpdated.getQuality().getLastUpdated());
 			assertNotSame(attrMoviesRetrieved.getQuality().getLastUpdated(), moviesAttrUpdated.getQuality().getLastUpdated());
-			
+
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -207,8 +345,9 @@ public class TestLocalCommunityContext {
 			e.printStackTrace();
 		}
 	}
-
-	private void lookupCommunityCreateHistory(){
+	
+	@Test
+	public void lookupCommunityCreateHistory(){
 		
 		LOG.info("starting test lookupCommunityCreateHistory ");
 		
@@ -217,8 +356,8 @@ public class TestLocalCommunityContext {
 
 		try {
 			Thread.sleep(9000);
-			CtxEntityIdentifier commEntityId1 = this.externalCtxBroker.retrieveCommunityEntityId(this.requestorService, this.cisIdentity1).get();
-			CtxEntityIdentifier commEntityId2 = this.externalCtxBroker.retrieveCommunityEntityId(this.requestorService, this.cisIdentity2).get();
+			CtxEntityIdentifier commEntityId1 = this.ctxBroker.retrieveCommunityEntityId(this.requestorService, this.cisId1).get();
+			CtxEntityIdentifier commEntityId2 = this.ctxBroker.retrieveCommunityEntityId(this.requestorService, this.cisId2).get();
 			//CommunityCtxEntity commEntity = (CommunityCtxEntity) this.externalCtxBroker.retrieve(this.requestorService, commEntityId).get();
 			//LOG.info("commEntity : " +commEntity );
 			assertNotNull(commEntityId1);
@@ -227,80 +366,73 @@ public class TestLocalCommunityContext {
 			LOG.info("commEntityId 1: " +commEntityId1 );
 			LOG.info("commEntityId 2: " +commEntityId2 );
 
-			CtxAttribute commAttr1 =  this.externalCtxBroker.createAttribute(this.requestorService, commEntityId1, CtxAttributeTypes.EMAIL).get();
+			CtxAttribute commAttr1 =  this.ctxBroker.createAttribute(this.requestorService, commEntityId1, CtxAttributeTypes.EMAIL).get();
 			commAttr1.setStringValue("communityemail1");
-			this.externalCtxBroker.update(this.requestorService, commAttr1);
+			this.ctxBroker.update(this.requestorService, commAttr1);
 			Thread.sleep(4000);
 
-			CtxAttribute commAttr2 =  this.externalCtxBroker.createAttribute(this.requestorService, commEntityId2, CtxAttributeTypes.EMAIL).get();
+			CtxAttribute commAttr2 =  this.ctxBroker.createAttribute(this.requestorService, commEntityId2, CtxAttributeTypes.EMAIL).get();
 			commAttr2.setStringValue("communityemail2");
-			this.externalCtxBroker.update(this.requestorService, commAttr2);
+			this.ctxBroker.update(this.requestorService, commAttr2);
 			Thread.sleep(4000);
 
 			
-			LOG.info("community this.cisIdentity 1: " +this.cisIdentity1 );
-			List<CtxIdentifier> resultsEnt1 = this.externalCtxBroker.lookup(this.requestorService, this.cisIdentity1, CtxModelType.ENTITY, CtxEntityTypes.COMMUNITY).get();
-			List<CtxIdentifier> resultsAttr1 = this.externalCtxBroker.lookup(this.requestorService, this.cisIdentity1, CtxModelType.ATTRIBUTE, CtxAttributeTypes.EMAIL).get();
+			LOG.info("community this.cisIdentity 1: " +this.cisId1 );
+			List<CtxIdentifier> resultsEnt1 = this.ctxBroker.lookup(this.requestorService, this.cisId1, CtxModelType.ENTITY, CtxEntityTypes.COMMUNITY).get();
+			List<CtxIdentifier> resultsAttr1 = this.ctxBroker.lookup(this.requestorService, this.cisId1, CtxModelType.ATTRIBUTE, CtxAttributeTypes.EMAIL).get();
 
 			String value1 = "";
 			LOG.info("community this.cisIdentity resultsEnt1 : " +resultsEnt1 );
 			LOG.info("community this.cisIdentity resultsAttr1 : " +resultsAttr1 );
 			if(resultsAttr1.size() > 0){
-				CtxAttribute commEmailAttr1 = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService,resultsAttr1.get(0)).get();	
+				CtxAttribute commEmailAttr1 = (CtxAttribute) this.ctxBroker.retrieve(this.requestorService,resultsAttr1.get(0)).get();	
 				value1 = commEmailAttr1.getStringValue();	
 				LOG.info("community this.cisIdentity value: " +value1 );
 			}
 			assertEquals("communityemail1", value1);
 
 
-			LOG.info("community this.cisIdentity 2 : " +this.cisIdentity2 );
-			List<CtxIdentifier> resultsEnt2 = this.externalCtxBroker.lookup(this.requestorService, this.cisIdentity2, CtxModelType.ENTITY, CtxEntityTypes.COMMUNITY).get();
-			List<CtxIdentifier> resultsAttr2 = this.externalCtxBroker.lookup(this.requestorService, this.cisIdentity2, CtxModelType.ATTRIBUTE, CtxAttributeTypes.EMAIL).get();
+			LOG.info("community this.cisIdentity 2 : " +this.cisId2 );
+			List<CtxIdentifier> resultsEnt2 = this.ctxBroker.lookup(this.requestorService, this.cisId2, CtxModelType.ENTITY, CtxEntityTypes.COMMUNITY).get();
+			List<CtxIdentifier> resultsAttr2 = this.ctxBroker.lookup(this.requestorService, this.cisId2, CtxModelType.ATTRIBUTE, CtxAttributeTypes.EMAIL).get();
 
 			String value2 = "";
 			LOG.info("community this.cisIdentity resultsEnt: " +resultsEnt2 );
 			LOG.info("community this.cisIdentity resultsAttr: " +resultsAttr2 );
 			if(resultsAttr2.size() > 0){
-				CtxAttribute commEmailAttr2 = (CtxAttribute) this.externalCtxBroker.retrieve(this.requestorService,resultsAttr2.get(0)).get();	
+				CtxAttribute commEmailAttr2 = (CtxAttribute) this.ctxBroker.retrieve(this.requestorService,resultsAttr2.get(0)).get();	
 				value2 = commEmailAttr2.getStringValue();	
 				LOG.info("community this.cisIdentity value: " +value2 );
 			}
 			assertEquals("communityemail2", value2);
 
-			
-			
-			
-
-			
-			
-			
 			// create community attributes
 			// update community attributes , stored in history
 			// retrieve community attributes
 
 			LOG.info(" interestCommAttr commEntityId : " +commEntityId1 );
 
-			CtxAttribute interestCommAttr = this.externalCtxBroker.createAttribute(this.requestorService, commEntityId1, CtxAttributeTypes.INTERESTS).get();
+			CtxAttribute interestCommAttr = this.ctxBroker.createAttribute(this.requestorService, commEntityId1, CtxAttributeTypes.INTERESTS).get();
 			LOG.info(" interestCommAttr interestCommAttr : " +interestCommAttr.getId());
 
 			interestCommAttr.setHistoryRecorded(true);
 			interestCommAttr.setStringValue("aa,bb,cc");
-			CtxAttribute interestCommAttr1 = (CtxAttribute) this.externalCtxBroker.update(this.requestorService, interestCommAttr).get();
+			CtxAttribute interestCommAttr1 = (CtxAttribute) this.ctxBroker.update(this.requestorService, interestCommAttr).get();
 			LOG.info(" interestCommAttr interestCommAttr 1: " +interestCommAttr1.getId());
 			Thread.sleep(1000);
 			interestCommAttr1.setStringValue("aa,bb,cc,dd");
-			CtxAttribute interestCommAttr2 = (CtxAttribute) this.externalCtxBroker.update(this.requestorService, interestCommAttr1).get();
+			CtxAttribute interestCommAttr2 = (CtxAttribute) this.ctxBroker.update(this.requestorService, interestCommAttr1).get();
 
 			Thread.sleep(1000);
 			interestCommAttr2.setStringValue("aa,bb,cc,dd,ee");
-			CtxAttribute interestCommAttr3 = (CtxAttribute) this.externalCtxBroker.update(this.requestorService, interestCommAttr2).get();
+			CtxAttribute interestCommAttr3 = (CtxAttribute) this.ctxBroker.update(this.requestorService, interestCommAttr2).get();
 
 			Thread.sleep(1000);
 			Date endDate = new Date();
 			LOG.info("startDate  : " + startDate);
 			LOG.info("endDate  : " + endDate);
 
-			List<CtxHistoryAttribute> historyList = this.externalCtxBroker.retrieveHistory(this.requestorService,interestCommAttr.getId(), startDate, endDate).get();
+			List<CtxHistoryAttribute> historyList = this.ctxBroker.retrieveHistory(this.requestorService,interestCommAttr.getId(), startDate, endDate).get();
 			LOG.info("historyList  : " + historyList);
 			assertEquals(3, historyList.size());
 
@@ -317,31 +449,137 @@ public class TestLocalCommunityContext {
 			e.printStackTrace();
 		}
 	}
+*/
+	/**
+	 * 
+	 * @param name
+	 * @param attrTypes
+	 * @param mode {@link #MEMBERS_ONLY} or {@link TestLocalCommunityContext#PUBLIC}
+	 * @return
+	 * @throws Exception
+	 */
+	private IIdentity createCis(String name, String[] attrTypes, String mode) throws Exception {
 
-	protected IIdentity createCIS(String name) {
+		final Hashtable<String, MembershipCriteria> cisCriteria = 
+				new Hashtable<String, MembershipCriteria> ();
+		LOG.info("*** createCis: name='{}'", name);
+		final ICisOwned cisOwned = 
+				this.cisManager.createCis(name, "cisType", cisCriteria, "nice CIS",
+						this.createPrivacyPolicy(attrTypes, mode)).get();
+		final String cisIdStr = cisOwned.getCisId();
 
-		IIdentity cisID = null;
-		try {
-			Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> ();
-			LOG.info("*** trying to create cis:");
-			ICisOwned cisOwned = this.cisManager.createCis(name, "cisType", cisCriteria, "nice CIS").get();
-			LOG.info("*** cis created: "+cisOwned.getCisId());
-
-			LOG.info("*** cisOwned " +cisOwned);
-			LOG.info("*** cisOwned.getCisId() " +cisOwned.getCisId());
-			String cisIDString = cisOwned.getCisId();
-
-			cisID = this.commMgr.getIdManager().fromJid(cisIDString);
-
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return cisID;
+		return this.commMgr.getIdManager().fromJid(cisIdStr);
+	}
+	
+	/**
+	 * 
+	 * @param attrTypes
+	 * @param mode {@link #MEMBERS_ONLY} or {@link TestLocalCommunityContext#PUBLIC}
+	 * @return
+	 */
+	private String createPrivacyPolicy(String[] attrTypes, String mode) {
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append("<RequestPolicy>"
+				+ "<Target>"
+				+ "<Resource>"
+				+ "<Attribute AttributeId=\"cis\""
+				+ " DataType=\"http://www.w3.org/2001/XMLSchema#string\">"
+				+ "<AttributeValue>cis-member-list</AttributeValue>"
+				+ "</Attribute>"
+				+ "</Resource>"
+				+ "<Action>"
+				+ "<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\"" 
+				+ " DataType=\"org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants\">"
+				+ "<AttributeValue>READ</AttributeValue>"
+				+ "</Attribute>"
+				+ "<optional>false</optional>"
+				+ "</Action>"
+				+ "<Action>"
+				+ "<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\"" 
+				+ " DataType=\"org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants\">"
+				+ "<AttributeValue>CREATE</AttributeValue>"
+				+ "</Attribute>"
+				+ "<optional>false</optional>"
+				+ "</Action>"
+				+ "<Condition>"
+				+ "<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\"" 
+				+ " DataType=\"org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants\">"
+				+ "<AttributeValue DataType=\"RIGHT_TO_OPTOUT\">1</AttributeValue>"
+				+ "</Attribute>"
+				+ "<optional>false</optional>"
+				+ "</Condition>"
+				+ "<Condition>"
+				+ "<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\"" 
+				+ " DataType=\"org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants\">"
+				+ "<AttributeValue DataType=\"STORE_IN_SECURE_STORAGE\">1</AttributeValue>"
+				+ "</Attribute>"
+				+ "<optional>false</optional>"
+				+ "</Condition>"
+				+ "<Condition>"
+				+ "<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\"" 
+				+ " DataType=\"org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants\">"
+				+ "<AttributeValue DataType=\"SHARE_WITH_CIS_MEMBERS_ONLY\">1</AttributeValue>"
+				+ "</Attribute>"
+				+ "<optional>false</optional>"
+				+ "</Condition>"
+				+ "<optional>false</optional>"
+				+ "</Target>");
+				for (final String attrType : attrTypes) {
+					sb.append("<Target>"
+							+ "<Resource>"
+							+ "<Attribute AttributeId=\"context\""
+							+ " DataType=\"http://www.w3.org/2001/XMLSchema#string\">"
+							+ "<AttributeValue>" + attrType + "</AttributeValue>"
+							+ "</Attribute>"
+							+ "</Resource>"
+							+ "<Action>"
+							+ "<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\"" 
+							+ " DataType=\"org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants\">"
+							+ "<AttributeValue>CREATE</AttributeValue>"
+							+ "</Attribute>"
+							+ "<optional>false</optional>"
+							+ "</Action>"
+							+ "<Action>"
+							+ "<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\"" 
+							+ " DataType=\"org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants\">"
+							+ "<AttributeValue>READ</AttributeValue>"
+							+ "</Attribute>"
+							+ "<optional>false</optional>"
+							+ "</Action>"
+							+ "<Action>"
+							+ "<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\"" 
+							+ " DataType=\"org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants\">"
+							+ "<AttributeValue>WRITE</AttributeValue>"
+							+ "</Attribute>"
+							+ "<optional>false</optional>"
+							+ "</Action>"
+							+ "<Condition>"
+							+ "<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\"" 
+							+ " DataType=\"org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants\">"
+							+ "<AttributeValue DataType=\"RIGHT_TO_OPTOUT\">1</AttributeValue>"
+							+ "</Attribute>"
+							+ "<optional>false</optional>"
+							+ "</Condition>"
+							+ "<Condition>"
+							+ "<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\"" 
+							+ " DataType=\"org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants\">"
+							+ "<AttributeValue DataType=\"STORE_IN_SECURE_STORAGE\">1</AttributeValue>"
+							+ "</Attribute>"
+							+ "<optional>false</optional>"
+							+ "</Condition>"
+							+ "<Condition>"
+							+ "<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\"" 
+							+ " DataType=\"org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants\">"
+							+ "<AttributeValue DataType=\"" + mode + "\">1</AttributeValue>"
+							+ "</Attribute>"
+							+ "<optional>false</optional>"
+							+ "</Condition>"
+							+ "<optional>false</optional>"
+							+ "</Target>");
+				}
+				sb.append("</RequestPolicy>");
+		
+		return sb.toString();
 	}
 }

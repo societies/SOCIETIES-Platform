@@ -84,6 +84,18 @@ public class CtxAssociationTypes {
 	public static final String HAS_PRIVACY_POLICY_AGREEMENTS = "hasPrivacyPolicyAgreements";
 	
 	/**
+	 * Directed context association between an {@link IndividualCtxEntity} 
+	 * (parent entity) and the {@link CommunityCtxEntity CommunityCtxEntities}
+	 * (child entities) this individual is the administrator of. More 
+	 * specifically, each IndividualCtxEntity must have exactly <i>one</i> 
+	 * association of this type which may have zero or more child entities
+	 * representing the CISs this individual administrates.  
+	 * 
+	 *  @since 1.2
+	 */
+	public static final String IS_ADMIN_OF = "isAdminOf";
+	
+	/**
 	 * Directed context association.
 	 */
 	public static final String IS_CONNECTED_TO_SNS = "isConnectedToSns";
