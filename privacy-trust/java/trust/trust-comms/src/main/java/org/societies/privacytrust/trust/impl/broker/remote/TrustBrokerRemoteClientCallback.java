@@ -46,6 +46,7 @@ import org.societies.api.schema.privacytrust.trust.broker.ExtTrustRelationshipsR
 import org.societies.api.schema.privacytrust.trust.broker.MethodName;
 import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipResponseBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipsRemoveResponseBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipsResponseBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustValueResponseBean;
 import org.societies.api.schema.privacytrust.trust.model.ExtTrustRelationshipBean;
@@ -110,10 +111,12 @@ public class TrustBrokerRemoteClientCallback implements ICommCallback {
 	@Override
 	public void receiveError(Stanza stanza, XMPPError error) {
 		
-		if (stanza == null)
+		if (stanza == null) {
 			throw new NullPointerException("stanza can't be null");
-		if (error == null)
+		}
+		if (error == null) {
 			throw new NullPointerException("error can't be null");
+		}
 		
 		LOG.debug("Received error: stanza={}, error={}", stanza, error);
 		if (stanza.getId() == null) {
@@ -167,10 +170,12 @@ public class TrustBrokerRemoteClientCallback implements ICommCallback {
 	@Override
 	public void receiveResult(final Stanza stanza, final Object payload) {
 		
-		if (stanza == null)
+		if (stanza == null) {
 			throw new NullPointerException("stanza can't be null");
-		if (payload == null)
+		}
+		if (payload == null) {
 			throw new NullPointerException("payload can't be null");
+		}
 		
 		LOG.debug("receiveResult: stanza={}, payload={}", stanza, payload);
 		if (stanza.getId() == null) {
@@ -328,6 +333,29 @@ public class TrustBrokerRemoteClientCallback implements ICommCallback {
 			
 			callback.onRetrievedTrustValue(trustValueResponseBean.getResult());
 			
+		} else if (MethodName.REMOVE_TRUST_RELATIONSHIPS == responseBean.getMethodName()) {
+
+			final TrustRelationshipsRemoveResponseBean removeResponseBean =
+					responseBean.getRemoveTrustRelationships();
+			if (removeResponseBean == null) {
+				LOG.error("Invalid TrustBroker remote remove trust relationships response: "
+						+ "TrustRelationshipsRemoveResponseBean can't be null");
+				callback.onException(new TrustBrokerCommsException(
+						"Invalid TrustBroker remote remove trust relationships response: "
+								+ "TrustRelationshipsRemoveResponseBean can't be null"));
+				return;
+			}
+
+			try {
+				// This conversion can throw a NPE but we'll catch it 
+				callback.onRemovedTrustRelationships(removeResponseBean.isQueryMatched());
+			} catch (Exception e) {
+				LOG.error("Invalid TrustBroker remote remove trust relationships result: "
+						+ e.getLocalizedMessage(), e);
+				callback.onException(new TrustBrokerCommsException(
+						"Invalid TrustBroker remote retrieve extended trust relationships result: "
+								+ e.getLocalizedMessage(), e));
+			}
 		} else {
 			
 			LOG.error("Unsupported TrustBroker remote response method: "

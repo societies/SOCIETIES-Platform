@@ -771,6 +771,8 @@ public class InternalTrustBroker implements ITrustBroker {
 		
 		private Double trustValue;
 		
+		private boolean removeQueryMatched;
+		
 		private TrustException trustException;
 		
 		/*
@@ -856,6 +858,23 @@ public class InternalTrustBroker implements ITrustBroker {
 		private Double getTrustValue() {
 			
 			return this.trustValue;
+		}
+		
+		/*
+		 * @see org.societies.privacytrust.trust.api.broker.remote.ITrustBrokerRemoteClientCallback#onRemovedTrustRelationships(boolean)
+		 */
+		@Override
+		public void onRemovedTrustRelationships(boolean result) {
+			
+			this.removeQueryMatched = result;
+			synchronized (this) {
+	            notifyAll();
+	        }
+		}
+		
+		private boolean isRemoveQueryMatched() {
+			
+			return this.removeQueryMatched;
 		}
 		
 		/*
@@ -993,14 +1012,15 @@ public class InternalTrustBroker implements ITrustBroker {
 		synchronized (callback) {
 			try {
 				callback.wait();
-				if (callback.getException() == null)
+				if (callback.getException() == null) {
 					return callback.getTrustRelationships();
-				else
+				} else {
 					throw callback.getException();
+				}
 			} catch (InterruptedException ie) {
 				throw new TrustBrokerException(
-						"Interrupted while waiting for remote response for query '"
-								+ query + "'");
+						"Interrupted while waiting for remote response: "
+								+ ie.getLocalizedMessage(), ie);
 			}
 		}
 	}
@@ -1023,14 +1043,15 @@ public class InternalTrustBroker implements ITrustBroker {
 		synchronized (callback) {
 			try {
 				callback.wait();
-				if (callback.getException() == null)
+				if (callback.getException() == null) {
 					return callback.getExtTrustRelationships();
-				else
+				} else {
 					throw callback.getException();
+				}
 			} catch (InterruptedException ie) {
 				throw new TrustBrokerException(
-						"Interrupted while waiting for remote response for query '"
-								+ query + "'");
+						"Interrupted while waiting for remote response: "
+								+ ie.getLocalizedMessage(), ie);
 			}
 		}
 	}
@@ -1054,14 +1075,15 @@ public class InternalTrustBroker implements ITrustBroker {
 		synchronized (callback) {
 			try {
 				callback.wait();
-				if (callback.getException() == null)
+				if (callback.getException() == null) {
 					return callback.getTrustRelationship();
-				else
+				} else {
 					throw callback.getException();
+				}
 			} catch (InterruptedException ie) {
 				throw new TrustBrokerException(
-						"Interrupted while waiting for remote response for query '"
-								+ query + "'");
+						"Interrupted while waiting for remote response: "
+								+ ie.getLocalizedMessage(), ie);
 			}
 		}
 	}
@@ -1084,14 +1106,15 @@ public class InternalTrustBroker implements ITrustBroker {
 		synchronized (callback) {
 			try {
 				callback.wait();
-				if (callback.getException() == null)
+				if (callback.getException() == null) {
 					return callback.getExtTrustRelationship();
-				else
+				} else {
 					throw callback.getException();
+				}
 			} catch (InterruptedException ie) {
 				throw new TrustBrokerException(
-						"Interrupted while waiting for remote response for query '"
-								+ query + "'");
+						"Interrupted while waiting for remote response: "
+								+ ie.getLocalizedMessage(), ie);
 			}
 		}
 	}
@@ -1115,14 +1138,15 @@ public class InternalTrustBroker implements ITrustBroker {
 		synchronized (callback) {
 			try {
 				callback.wait();
-				if (callback.getException() == null)
+				if (callback.getException() == null) {
 					return callback.getTrustValue();
-				else
+				} else {
 					throw callback.getException();
+				}
 			} catch (InterruptedException ie) {
 				throw new TrustBrokerException(
-						"Interrupted while waiting for remote response for query '"
-								+ query + "'");
+						"Interrupted while waiting for remote response: "
+								+ ie.getLocalizedMessage(), ie);
 			}
 		}
 	}
@@ -1130,19 +1154,30 @@ public class InternalTrustBroker implements ITrustBroker {
 	private boolean removeRemoteTrustRelationships(final TrustQuery query) 
 			throws TrustException {
 
-		@SuppressWarnings("unused")
 		final RemoteClientCallback callback = new RemoteClientCallback();
 		try {
 			if (this.trustBrokerRemoteClient == null) {
 				throw new TrustBrokerException(
 						"ITrustBrokerRemoteClient service is not available");
 			}
-		
-			// TODO
-			return false;
-			
+			this.trustBrokerRemoteClient.removeTrustRelationships(query, callback);
 		} catch (ServiceUnavailableException sue) {
 			throw new TrustBrokerException(sue.getLocalizedMessage(), sue);
+		}
+		
+		synchronized (callback) {
+			try {
+				callback.wait();
+				if (callback.getException() == null) {
+					return callback.isRemoveQueryMatched();
+				} else {
+					throw callback.getException();
+				}
+			} catch (InterruptedException ie) {
+				throw new TrustBrokerException(
+						"Interrupted while waiting for remote response: "
+								+ ie.getLocalizedMessage(), ie);
+			}
 		}
 	}
 	

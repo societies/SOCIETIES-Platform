@@ -49,6 +49,8 @@ import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerRequestBean
 import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipRequestBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipResponseBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipsRemoveRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipsRemoveResponseBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipsRequestBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipsResponseBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustValueRequestBean;
@@ -220,6 +222,26 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 						+ "TrustValueRequestBean can't be null");
 			}
 			return this.handleRequest(trustValueRequestBean);
+			
+		} else if (MethodName.REMOVE_TRUST_RELATIONSHIPS.equals(requestBean.getMethodName())) {
+
+			final TrustRelationshipsRemoveRequestBean removeRequestBean =
+					requestBean.getRemoveTrustRelationships();
+			if (removeRequestBean == null) {
+				LOG.error("Invalid TrustBroker remote remove trust relationships request: "
+						+ "TrustRelationshipsRemoveRequestBean can't be null");
+				throw new XMPPError(StanzaError.bad_request, 
+						"Invalid TrustBroker remote remove trust relationships request: "
+								+ "TrustRelationshipsRemoveRequestBean can't be null");
+			}
+			if (!this.commManager.getIdManager().isMine(stanza.getFrom())) {
+				LOG.error("Invalid TrustBroker remote remove trust relationships request: "
+						+ "stanza source '" + stanza.getFrom() + "' is not recognised as a local CSS");
+				throw new XMPPError(StanzaError.not_authorized, 
+						"Invalid TrustBroker remote remove trust relationships request: "
+								+ "stanza source '" + stanza.getFrom() + "' is not recognised as a local CSS");
+			}
+			return this.handleRequest(removeRequestBean);
 			
 		} else {
 			LOG.error("Unsupported TrustBroker remote request method: "
@@ -529,6 +551,53 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 					+ e.getLocalizedMessage(), e);
 			throw new XMPPError(StanzaError.internal_server_error, 
 					"Could not retrieve trust value: "
+					+ e.getLocalizedMessage());
+		}
+		
+		return responseBean;
+	}
+	
+	private TrustBrokerResponseBean handleRequest(
+			TrustRelationshipsRemoveRequestBean requestBean) throws XMPPError {
+		
+		final TrustBrokerResponseBean responseBean = new TrustBrokerResponseBean();
+		responseBean.setMethodName(MethodName.REMOVE_TRUST_RELATIONSHIPS);
+		
+		if (requestBean.getQuery() == null) {
+			LOG.error("Invalid TrustBroker remote remove trust relationships request: "
+					+ "query can't be null");
+			throw new XMPPError(StanzaError.bad_request, 
+					"Invalid TrustBroker remote remove trust relationships request: "
+					+ "query can't be null");
+		}
+		
+		try {
+			// (required) query
+			final TrustQuery query = TrustCommsClientTranslator.getInstance().
+					fromTrustQueryBean(requestBean.getQuery());
+			
+			LOG.debug("handleRequest: query={}", query);
+			final boolean result = this.internalTrustBroker
+					.removeTrustRelationships(query).get();
+			
+			final TrustRelationshipsRemoveResponseBean removeResponseBean = 
+					new TrustRelationshipsRemoveResponseBean(); 
+			removeResponseBean.setQueryMatched(result);
+			responseBean.setRemoveTrustRelationships(removeResponseBean);
+			
+		} catch (MalformedTrustedEntityIdException mteide) {
+			
+			LOG.error("Invalid TrustBroker remote remove trust relationships request: "
+					+ mteide.getLocalizedMessage(), mteide);
+			throw new XMPPError(StanzaError.bad_request, 
+					"Invalid TrustBroker remote remove trust relationships request: "
+					+ mteide.getLocalizedMessage());
+		} catch (Exception e) {
+			
+			LOG.error("Could not remove trust relationships: "
+					+ e.getLocalizedMessage(), e);
+			throw new XMPPError(StanzaError.internal_server_error, 
+					"Could not remove trust relationships: "
 					+ e.getLocalizedMessage());
 		}
 		

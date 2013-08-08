@@ -21,6 +21,7 @@
 				<xs:element name="retrieveTrustRelationship" type="tns:trustRelationshipRequestBean" nillable="false" minOccurs="0"/>
 				<xs:element name="retrieveExtTrustRelationship" type="tns:extTrustRelationshipRequestBean" nillable="false" minOccurs="0"/>
 				<xs:element name="retrieveTrustValue" type="tns:trustValueRequestBean" nillable="false" minOccurs="0"/>
+				<xs:element name="removeTrustRelationships" type="tns:trustRelationshipsRemoveRequestBean" nillable="false" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -34,6 +35,7 @@
 				<xs:element name="retrieveTrustRelationship" type="tns:trustRelationshipResponseBean" nillable="false" minOccurs="0"/>
 				<xs:element name="retrieveExtTrustRelationship" type="tns:extTrustRelationshipResponseBean" nillable="false" minOccurs="0"/>
 				<xs:element name="retrieveTrustValue" type="tns:trustValueResponseBean" nillable="false" minOccurs="0"/>
+				<xs:element name="removeTrustRelationships" type="tns:trustRelationshipsRemoveResponseBean" nillable="false" minOccurs="0"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -45,6 +47,7 @@
 			<xs:enumeration value="RETRIEVE_TRUST_RELATIONSHIP"/>
 			<xs:enumeration value="RETRIEVE_EXT_TRUST_RELATIONSHIP"/>
 			<xs:enumeration value="RETRIEVE_TRUST_VALUE"/>
+			<xs:enumeration value="REMOVE_TRUST_RELATIONSHIPS"/>
 		</xs:restriction>
 	</xs:simpleType>
 	
@@ -117,6 +120,18 @@
 	<xs:complexType name="trustValueResponseBean">
 		<xs:sequence>
 			<xs:element name="result" type="xs:double" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="trustRelationshipsRemoveRequestBean">
+		<xs:sequence>
+			<xs:element name="query" type="tns:trustQueryBean" nillable="false" minOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="trustRelationshipsRemoveResponseBean">
+		<xs:sequence>
+			<xs:element name="queryMatched" type="xs:boolean" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
   

@@ -74,6 +74,18 @@ public interface ITrustBrokerRemoteClientCallback {
 	public void onRetrievedTrustValue(Double trustValue);
 	
 	/**
+	 * Sets the result of a trust query identifying trust relationships to be
+	 * removed. The result is <code>true</code> if any trust relationships
+	 * matched the specified query.
+	 * 
+	 * @param result
+	 *            <code>true</code> if any trust relationships matched the
+	 *            specified query; <code>false</code> otherwise. 
+	 * @since 1.2
+	 */
+	public void onRemovedTrustRelationships(boolean result);
+	
+	/**
 	 * Associates an exception with this callback.
 	 * 
 	 * @param exception the exception to associate with this callback.
