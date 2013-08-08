@@ -19,8 +19,8 @@ public class PassEntryActivity extends Activity {
 		
 		editText = (EditText) findViewById(R.id.editText1);
 		
-		Button btn1 = (Button) findViewById(R.id.buttonPassEntryOK);
-		btn1.setOnClickListener(new View.OnClickListener() {
+		Button btnOk = (Button) findViewById(R.id.buttonPassEntryOK);
+		btnOk.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Intent i = getIntent();
 				String pass = editText.getText().toString();
@@ -30,8 +30,8 @@ public class PassEntryActivity extends Activity {
 			}
 		});		
 		
-		Button btn2 = (Button) findViewById(R.id.buttonPassEntryCancel);
-		btn2.setOnClickListener(new View.OnClickListener() {
+		Button btnCancel = (Button) findViewById(R.id.buttonPassEntryCancel);
+		btnCancel.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				setResult(RESULT_CANCELED);				
 			}

@@ -64,9 +64,9 @@ public class SignActivity extends Activity {
         	
         	serializer = domImpl.createLSSerializer();
         	DOMConfiguration config = serializer.getDomConfig();
-        	config.setParameter("comments", new Boolean(true));
+        	config.setParameter("comments", Boolean.valueOf(true));
         } catch(Exception e) {
-        	Log.e("SignActivity", "Failed to initialize", e);
+        	Log.e(TAG, "Failed to initialize", e);
         	setResult(RESULT_CANCELED);        	
         	finish();
         	return;
@@ -109,12 +109,12 @@ public class SignActivity extends Activity {
 			PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(encodedKey );            
 			key = keyFactory.generatePrivate(privKeySpec);
 		} catch (Exception e) { 
-			Log.e("SignActivity", "Failed while decoding identity!", e);
+			Log.e(TAG, "Failed while decoding identity!", e);
 			setResult(RESULT_CANCELED);
 			finish();			
 		}
 		if (cert==null || key==null) {
-			Log.e("SignActivity", "Retrieved empty identity from storage!");
+			Log.e(TAG, "Retrieved empty identity from storage!");
 			setResult(RESULT_CANCELED);
 			finish();
 			return;
@@ -158,7 +158,7 @@ public class SignActivity extends Activity {
 			finish();				
 	    } catch (Exception e) 
 	    {  
-	    	Log.e("SignActivity", "Failed while signing!", e);
+	    	Log.e(TAG, "Failed while signing!", e);
 	    	setResult(RESULT_CANCELED);
 	    	finish();	    	
 	    }	    		    		    		

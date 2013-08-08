@@ -11,6 +11,7 @@ import org.societies.security.digsig.utility.StreamUtil;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -31,7 +32,7 @@ public class MainActivity extends Activity {
         Button installBtn = (Button) findViewById(R.id.buttonMainInstallIdentity);
         installBtn.setOnClickListener(new View.OnClickListener() {			
 			public void onClick(View v) {								
-				Intent i = new Intent("org.societies.security.digsig.action.InstallIdentity");
+				Intent i = new Intent(MainActivity.this, InstallIdentityActivity.class);
 				startActivity(i);
 			}
 		});
@@ -45,13 +46,13 @@ public class MainActivity extends Activity {
 					val = "<xml><miki Id='Miki1'>aadsads</miki></xml>".getBytes("UTF-8");
 				} catch (Exception e) {}
 								
-				Intent i = new Intent("org.societies.security.digsig.action.Sign");
+				Intent i = new Intent(MainActivity.this, SignActivity.class);
 				i.putExtra("XML",val);
 				
 				ArrayList<String> idsToSign = new ArrayList<String>();
 				idsToSign.add("Miki1");
 				i.putStringArrayListExtra("IDS_TO_SIGN", idsToSign);
-										
+				
 				startActivityForResult(i, SIGN);
 			}
 		});
@@ -60,7 +61,7 @@ public class MainActivity extends Activity {
         verifyBtn.setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				Intent i = new Intent("org.societies.security.digsig.action.Verify");
+				Intent i = new Intent(MainActivity.this, VerifyActivity.class);
 				
 				ByteArrayOutputStream os = new ByteArrayOutputStream();				
 				InputStream is = getResources().openRawResource(R.raw.sample);
@@ -83,7 +84,7 @@ public class MainActivity extends Activity {
 			try
 			{
 				byte[] signedXml = data.getByteArrayExtra("SIGNED_XML");
-				FileOutputStream os = new FileOutputStream("/mnt/sdcard/signed2.xml");
+				FileOutputStream os = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/signed2.xml");
 				os.write(signedXml);
 				os.close();
 			
