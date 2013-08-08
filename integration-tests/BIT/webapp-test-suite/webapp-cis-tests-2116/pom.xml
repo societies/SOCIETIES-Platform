@@ -101,6 +101,14 @@
             <artifactId>com.springsource.org.junit</artifactId>
             <version>4.10.0</version>
         </dependency>
+
+        <dependency>
+            <!-- Dunno why this is needed now, but Virgo is complaining that "org.w3c.dom.ElementTraversal" can't be found -->
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>1.4.01</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -120,6 +128,7 @@
                         <Import-Package>
                             !org.jboss.resource.adapter.jdbc.vendor,
                             org.springframework.osgi.context,
+                            org.w3c.**,
                             org.societies.**,
                             org.junit.**,
                             *;resolution:=optional
