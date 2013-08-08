@@ -622,25 +622,20 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		final List<CtxIdentifier> result = new ArrayList<CtxIdentifier>();
 
-		if (this.isLocalId(target)) { // L O C A L
-
+		if (this.isLocalId(target)) { 
+			// L O C A L
 			// Retrieve sub-types
-			final DataTypeUtils dataTypeUtil = new DataTypeUtils();
-			final Set<String> subTypes = dataTypeUtil.getLookableDataTypes(type);
+			final Set<String> subTypes = new DataTypeUtils().getLookableDataTypes(type);
 			LOG.debug("lookup: type={}, subTypes={}", type, subTypes);
-
-			if (IdentityType.CIS != target.getType()) { // U S E R
-
-				result.addAll(this.userCtxDBMgr.lookup(target.getJid(), subTypes));
-
-			} else { // C O M M U N I T Y
-
-				// TODO lookup in Community DB
-				throw new CtxBrokerException("Generic lookup for CIS data is not supported yet");
+			if (IdentityType.CIS != target.getType()) { 
+				// U S E R
+				result.addAll(this.userCtxDBMgr.lookup(target.getBareJid(), subTypes));
+			} else { 
+				// C O M M U N I T Y
+				result.addAll(this.communityCtxDBMgr.lookup(target.getBareJid(), subTypes));
 			}
-
-		} else { // R E M O T E
-
+		} else { 
+			// R E M O T E
 			final LookupCallback callback = new LookupCallback();
 			this.ctxBrokerClient.lookup(requestor, target, null, type, callback);
 			synchronized (callback) {
@@ -700,24 +695,19 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		final List<CtxIdentifier> result = new ArrayList<CtxIdentifier>();
 
-		if (this.isLocalId(target)) { // L O C A L
-
-			if (IdentityType.CIS != target.getType()) { // U S E R
-
-				//result.addAll(this.userCtxDBMgr.lookup(modelType, type));
-				final Set<String> typeSet = new HashSet<String>();
-				typeSet.add(type);
-				result.addAll(this.userCtxDBMgr.lookup(target.getBareJid(), modelType, typeSet));
-
-			} else { // C O M M U N I T Y
-
-				final Set<String> typeSet = new HashSet<String>();
-				typeSet.add(type);
-				result.addAll(this.communityCtxDBMgr.lookup(target.getBareJid(), modelType, typeSet));
+		if (this.isLocalId(target)) {
+			final Set<String> types = new HashSet<String>();
+			types.add(type);
+			// L O C A L
+			if (IdentityType.CIS != target.getType()) { 
+				// U S E R
+				result.addAll(this.userCtxDBMgr.lookup(target.getBareJid(), modelType, types));
+			} else { 
+				// C O M M U N I T Y
+				result.addAll(this.communityCtxDBMgr.lookup(target.getBareJid(), modelType, types));
 			}
-
-		} else { // R E M O T E
-
+		} else { 
+			// R E M O T E
 			final LookupCallback callback = new LookupCallback();
 			this.ctxBrokerClient.lookup(requestor, target, modelType, type, callback);
 			synchronized (callback) {
@@ -743,11 +733,11 @@ public class InternalCtxBroker implements ICtxBroker {
 	 */
 	@Override
 	@Async
-	public Future<List<CtxIdentifier>> lookup(final CtxEntityIdentifier entityId, 
+	public Future<List<CtxIdentifier>> lookup(final CtxEntityIdentifier scope, 
 			final CtxModelType modelType, final String type) throws CtxException {
 
 		final Requestor requestor = this.getLocalRequestor();
-		return this.lookup(requestor, entityId, modelType, type);
+		return this.lookup(requestor, scope, modelType, type);
 	}
 
 	/*
@@ -756,14 +746,14 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Override
 	@Async
 	public Future<List<CtxIdentifier>> lookup(final Requestor requestor,
-			final CtxEntityIdentifier entityId, final CtxModelType modelType, 
+			final CtxEntityIdentifier scope, final CtxModelType modelType, 
 			final String type) throws CtxException {
 
 		if (requestor == null) {
 			throw new NullPointerException("requestor can't be null");
 		}
-		if (entityId == null) {
-			throw new NullPointerException("entityId can't be null");
+		if (scope == null) {
+			throw new NullPointerException("scope can't be null");
 		}
 		if (modelType == null) {
 			throw new NullPointerException("modelType can't be null");
@@ -776,40 +766,41 @@ public class InternalCtxBroker implements ICtxBroker {
 			throw new IllegalArgumentException("modelType is not ATTRIBUTE or ASSOCIATION");
 		}
 
-		LOG.debug("lookup: requestor={}, entityId={}, modelType={}, type={}",
-				new Object[] { requestor, entityId, modelType, type });
+		LOG.debug("lookup: requestor={}, scope={}, modelType={}, type={}",
+				new Object[] { requestor, scope, modelType, type });
 
 		final List<CtxIdentifier> result = new ArrayList<CtxIdentifier>();
 
-		final IIdentity target = this.extractIIdentity(entityId);
-		// TODO Test
-		//final CtxEntity entity;
-		try {
-			List<CtxIdentifier> listResults = this.lookup(requestor, target, modelType, type).get();
-			result.addAll(listResults);
-			/*
-			if (IdentityType.CIS.equals(targetId.getType()))
-				entity = (CtxEntity) this.communityCtxDBMgr.retrieve(entityId);
-			else
-				entity = (CtxEntity) this.userCtxDBMgr.retrieve(entityId);
-
-			if (CtxModelType.ATTRIBUTE.equals(modelType)) {
-				final Set<CtxAttribute> attrs = entity.getAttributes(type);
-				for (final CtxAttribute attr : attrs)
-					result.add(attr.getId());
-
-			} else if (CtxModelType.ASSOCIATION.equals(modelType))  {
-
-				final Set<CtxAssociationIdentifier> assocIds = entity.getAssociations(type);
-				for (final CtxAssociationIdentifier assocId : assocIds)
-					result.add(assocId);
+		// Extract target IIdentity
+		final IIdentity target = this.extractIIdentity(scope);
+		
+		if (this.isLocalId(target)) {
+			final Set<String> types = new HashSet<String>();
+			types.add(type);
+			// L O C A L
+			if (IdentityType.CIS != target.getType()) { 
+				// U S E R
+				result.addAll(this.userCtxDBMgr.lookup(scope, modelType, types));
+			} else { 
+				// C O M M U N I T Y
+				result.addAll(this.communityCtxDBMgr.lookup(scope, modelType, types));
 			}
-			 */
-		} catch (Exception e) {
-
-			throw new CtxBrokerException("Could not look up context " + modelType
-					+ "(s) of type '" + type + "' under entity " + entityId
-					+ ": " + e.getLocalizedMessage(), e);
+		} else { 
+			// R E M O T E
+			final LookupCallback callback = new LookupCallback();
+			this.ctxBrokerClient.lookup(requestor, scope, modelType, type, callback);
+			synchronized (callback) {
+				try {
+					callback.wait();
+					if (callback.getException() == null) {
+						result.addAll(callback.getResult());
+					} else {
+						throw callback.getException();
+					}
+				} catch (InterruptedException e) {
+					throw new CtxBrokerException("Interrupted while waiting for remote lookup");
+				}
+			}
 		}
 
 		LOG.debug("lookup: result={}", result);

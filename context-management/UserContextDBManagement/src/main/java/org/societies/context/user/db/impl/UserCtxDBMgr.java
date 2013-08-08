@@ -397,60 +397,6 @@ public class UserCtxDBMgr implements IUserCtxDBMgr {
 	}
 
 	/*
-	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#lookup(org.societies.api.context.model.CtxModelType, java.lang.String)
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<CtxIdentifier> lookup(final CtxModelType modelType, 
-			final String type) throws CtxException {
-		
-		if (modelType == null) {
-			throw new NullPointerException("modelType can't be null");
-		}
-		if (type == null) {
-			throw new NullPointerException("type can't be null");
-		}
-		
-		LOG.debug("lookup: modelType={}, type={}", modelType, type);
-		
-		final List<CtxIdentifier> result = new ArrayList<CtxIdentifier>();
-		
-//        final boolean isWildcardType = type.contains("%");
-
-		final Session session = sessionFactory.openSession();
-		final Query query;
-        try {
-            switch (modelType) {
-            
-            case ENTITY:
-            	query = session.getNamedQuery("getCtxEntityIdsByType");
-            	break;
-            case ATTRIBUTE:
-            	query = session.getNamedQuery("getCtxAttributeIdsByType");
-            	break;
-            case ASSOCIATION:
-            	query = session.getNamedQuery("getCtxAssociationIdsByType");
-            	break;
-            default:
-                throw new IllegalArgumentException("Unsupported context model type: " + modelType);
-            }
-
-            query.setParameter("type", type, Hibernate.STRING);
-            result.addAll(query.list());
-            
-        } catch (Exception e) {
-        	throw new UserCtxDBMgrException(e.getLocalizedMessage(), e);
-		} finally {
-			if (session != null) {
-				session.close();
-			}
-		}
-
-        LOG.debug("lookup: result={}", result);
-		return result;
-	}
-
-	/*
 	 * @see org.societies.context.api.user.db.IUserCtxDBMgr#lookup(java.lang.String, java.util.Set)
 	 */
 	@Override
