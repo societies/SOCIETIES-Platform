@@ -26,8 +26,8 @@ package org.societies.privacytrust.trust.impl;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +36,9 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
+import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.api.privacytrust.trust.model.TrustedEntityType;
+import org.societies.api.privacytrust.trust.model.util.TrustedEntityIdFactory;
 import org.societies.privacytrust.trust.api.ITrustNodeMgr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,27 +54,13 @@ public class TrustNodeMgr implements ITrustNodeMgr {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TrustNodeMgr.class);
 	
+	/** The Comms Mgr service reference. */
+	@Autowired(required=true)
 	private ICommManager commMgr;
 	
-	private final Collection<TrustedEntityId> myTEIDs = new CopyOnWriteArraySet<TrustedEntityId>();
-	
-	@Autowired
-	public TrustNodeMgr(ICommManager commMgr) throws Exception {
+	TrustNodeMgr() {
 		
-		if (LOG.isInfoEnabled())
-			LOG.info(this.getClass() + " instantiated");
-		
-		this.commMgr = commMgr;
-		
-		final Set<IIdentity> publicIds = this.commMgr.getIdManager().getPublicIdentities();
-		for (final IIdentity publicId : publicIds) {
-			final String publicIdStr = publicId.getBareJid();
-			final TrustedEntityId publicTeid = new TrustedEntityId(
-					TrustedEntityType.CSS, publicIdStr);
-			if (LOG.isInfoEnabled())
-				LOG.info("Adding my trustor TEID '" + publicTeid + "'");
-			this.myTEIDs.add(publicTeid);
-		}
+		LOG.info("{} instantiated", this.getClass());
 	}
 	
 	/*
@@ -82,7 +69,18 @@ public class TrustNodeMgr implements ITrustNodeMgr {
 	@Override
 	public Collection<TrustedEntityId> getMyIds() {
 		
-		return Collections.unmodifiableCollection(this.myTEIDs);
+		final Set<IIdentity> publicIds = this.commMgr.getIdManager().getPublicIdentities();
+		final Set<TrustedEntityId> result = new HashSet<TrustedEntityId>(publicIds.size());
+		for (final IIdentity publicId : publicIds) {
+			try {
+				result.add(TrustedEntityIdFactory.fromIIdentity(publicId));
+			} catch (MalformedTrustedEntityIdException mteide) {
+				LOG.error("Could not create trusted entity id: " 
+						+ mteide.getLocalizedMessage(), mteide);
+			}
+		}
+		
+		return Collections.unmodifiableCollection(result);
 	}
 	
 	/*
@@ -120,8 +118,9 @@ public class TrustNodeMgr implements ITrustNodeMgr {
 	@Override
 	public IIdentity fromId(final TrustedEntityId teid) {
 		
-		if (teid == null)
+		if (teid == null) {
 			throw new NullPointerException("teid can't be null");
+		}
 		
 		try {
 			return this.commMgr.getIdManager().fromJid(teid.getEntityId());
