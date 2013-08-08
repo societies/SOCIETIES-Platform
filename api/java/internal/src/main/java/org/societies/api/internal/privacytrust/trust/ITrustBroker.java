@@ -155,6 +155,28 @@ public interface ITrustBroker extends org.societies.api.privacytrust.trust.ITrus
 	public Future<Double> retrieveTrustValue(final TrustQuery query)
 			throws TrustException;
 	
+	/**
+	 * Removes the trust relationships matching the supplied trust query. The
+	 * method returns <code>true</code> if any trust relationships matched the
+	 * specified query. If the specified requestor is denied access to the 
+	 * requested trust relationships, a TrustAccessControlException is thrown.
+	 * 
+	 * @param query
+	 *            (required) the query identifying the trust relationships to
+	 *            be removed.
+	 * @return <code>true</code> if any trust relationships matched the
+	 *         specified query; <code>false</code> otherwise. 
+	 * @throws TrustAccessControlException if the specified requestor is denied
+	 *         access to the requested trust relationships.
+	 * @throws TrustException if the requested trust relationships cannot be 
+	 *         removed.
+	 * @throws NullPointerException if any of the required parameters is 
+	 *         <code>null</code>.
+	 * @since 1.2
+	 */
+	public Future<Boolean> removeTrustRelationships(
+			final TrustQuery query)	throws TrustException;
+	
 	/**  
 	 * Registers the specified listener for trust update events matching the 
 	 * supplied trust query.
