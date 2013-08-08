@@ -2,7 +2,6 @@ package org.societies.comm.xmpp.event;
 
 import org.societies.api.identity.IIdentity;
 import org.springframework.context.ApplicationEvent;
-import org.w3c.dom.Element;
 
 public class PubsubEvent extends ApplicationEvent {
 

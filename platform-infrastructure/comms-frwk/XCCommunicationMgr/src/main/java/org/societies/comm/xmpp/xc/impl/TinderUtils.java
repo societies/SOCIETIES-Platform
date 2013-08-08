@@ -2,7 +2,6 @@ package org.societies.comm.xmpp.xc.impl;
 
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.identity.IdentityManagerImpl;
 import org.xmpp.packet.IQ;

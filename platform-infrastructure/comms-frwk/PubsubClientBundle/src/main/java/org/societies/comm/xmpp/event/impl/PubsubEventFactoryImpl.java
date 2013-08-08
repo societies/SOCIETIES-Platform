@@ -17,7 +17,6 @@ import org.societies.api.comm.xmpp.pubsub.Subscription;
 import org.societies.api.identity.IIdentity;
 import org.societies.comm.xmpp.pubsub.impl.PubsubClientImpl;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
-import org.w3c.dom.Element;
 
 public class PubsubEventFactoryImpl extends PubsubEventFactory implements Subscriber {
 	
