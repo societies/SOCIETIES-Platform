@@ -131,15 +131,25 @@ public class TestByTrustor {
 	@After
 	public void tearDown() throws Exception {
 		
-		try {
-			this.internalTrustBroker.unregisterTrustUpdateListener(
-					this.listener, new TrustQuery(this.myTeid));
-		} catch (TrustException te) {
-			fail("Failed to unregister TrustUpdateEvent listener: "
-					+ te.getLocalizedMessage());
+		if (this.myTeid != null) {
+			if (this.teid1 != null) {
+				this.internalTrustBroker.removeTrustRelationships(
+						new TrustQuery(this.myTeid).setTrusteeId(this.teid1));
+			}
+			if (this.teid2 != null) {
+				this.internalTrustBroker.removeTrustRelationships(
+						new TrustQuery(this.myTeid).setTrusteeId(this.teid2));
+			}
+			if (this.listener != null) {
+				try {
+					this.internalTrustBroker.unregisterTrustUpdateListener(
+							this.listener, new TrustQuery(this.myTeid));
+				} catch (TrustException te) {
+					fail("Failed to unregister TrustUpdateEvent listener: "
+							+ te.getLocalizedMessage());
+				}
+			}
 		}
-		// TODO
-		// 1. remove test trust data db? currently not supported
 	}
 
 	@Test
