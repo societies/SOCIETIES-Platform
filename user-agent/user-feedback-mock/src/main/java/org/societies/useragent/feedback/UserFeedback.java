@@ -25,12 +25,6 @@
 
 package org.societies.useragent.feedback;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.Future;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -47,12 +41,13 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Respons
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 import org.societies.useragent.api.feedback.IInternalUserFeedback;
-import org.societies.useragent.api.feedback.IPrivacyPolicyNegotiationHistoryRepository;
-import org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.AsyncResult;
 
-public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
+import java.util.*;
+import java.util.concurrent.Future;
+
+public class UserFeedback implements IUserFeedback, IInternalUserFeedback {
 
     private static final Logger log = LoggerFactory.getLogger(UserFeedback.class);
 
@@ -78,9 +73,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 
 
     public Future<List<String>> getExplicitFB(String requestId, int type, ExpProposalContent content) {
-    	
-    	return new AsyncResult<List<String>>(Arrays.asList(content.getOptions()));
-    	
+
+        return new AsyncResult<List<String>>(Arrays.asList(content.getOptions()));
+
     }
 
     @Override
@@ -95,9 +90,20 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 
     @Override
     public Future<List<String>> getExplicitFBAsync(int type, ExpProposalContent content, IUserFeedbackResponseEventListener<List<String>> callback) {
-    	return new AsyncResult<List<String>>(new ArrayList<String>());
+        return new AsyncResult<List<String>>(new ArrayList<String>());
     }
 
+    @Override
+    public Future<List<String>> getExplicitFBAsync(String requestId, int type, ExpProposalContent content, IUserFeedbackResponseEventListener<List<String>> callback) {
+        ArrayList<String> results = new ArrayList<String>();
+        Collections.addAll(results, content.getOptions());
+        return new AsyncResult<List<String>>(results);
+    }
+
+    @Override
+    public Future<Boolean> getImplicitFB(String requestId, int type, ImpProposalContent content) {
+        return new AsyncResult<Boolean>(true);
+    }
 
 
     @Override
@@ -112,9 +118,18 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 
     @Override
     public Future<Boolean> getImplicitFBAsync(int type, ImpProposalContent content, IUserFeedbackResponseEventListener<Boolean> callback) {
-       return new AsyncResult<Boolean>(true);
+        return new AsyncResult<Boolean>(true);
     }
 
+    @Override
+    public Future<Boolean> getImplicitFBAsync(String requestId, int type, ImpProposalContent content, IUserFeedbackResponseEventListener<Boolean> callback) {
+        return new AsyncResult<Boolean>(true);
+    }
+
+    @Override
+    public Future<ResponsePolicy> getPrivacyNegotiationFB(String requestId, ResponsePolicy policy, NegotiationDetailsBean details) {
+        return new AsyncResult<ResponsePolicy>(policy);
+    }
 
 
     @Override
@@ -124,15 +139,24 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 
     @Override
     public Future<ResponsePolicy> getPrivacyNegotiationFBAsync(ResponsePolicy policy, NegotiationDetailsBean details) {
-    	return new AsyncResult<ResponsePolicy>(policy);
+        return new AsyncResult<ResponsePolicy>(policy);
     }
 
     @Override
     public Future<ResponsePolicy> getPrivacyNegotiationFBAsync(ResponsePolicy policy, NegotiationDetailsBean details, IUserFeedbackResponseEventListener<ResponsePolicy> callback) {
-    	return new AsyncResult<ResponsePolicy>(policy);
+        return new AsyncResult<ResponsePolicy>(policy);
     }
 
-    
+    @Override
+    public Future<ResponsePolicy> getPrivacyNegotiationFBAsync(String requestId, ResponsePolicy policy, NegotiationDetailsBean details, IUserFeedbackResponseEventListener<ResponsePolicy> callback) {
+        return new AsyncResult<ResponsePolicy>(policy);
+    }
+
+    @Override
+    public Future<List<ResponseItem>> getAccessControlFB(String requestId, Requestor requestor, List<ResponseItem> items) {
+        return new AsyncResult<List<ResponseItem>>(items);
+    }
+
 
     @Override
     public Future<List<ResponseItem>> getAccessControlFB(Requestor requestor, List<ResponseItem> items) {
@@ -141,27 +165,25 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 
     @Override
     public Future<List<ResponseItem>> getAccessControlFBAsync(Requestor requestor, List<ResponseItem> items) {
-    	return new AsyncResult<List<ResponseItem>>(items);
+        return new AsyncResult<List<ResponseItem>>(items);
     }
 
     @Override
     public Future<List<ResponseItem>> getAccessControlFBAsync(Requestor requestor, List<ResponseItem> items, IUserFeedbackResponseEventListener<List<ResponseItem>> callback) {
-    	return new AsyncResult<List<ResponseItem>>(items);
+        return new AsyncResult<List<ResponseItem>>(items);
     }
 
-   
-
-
-
+    @Override
+    public Future<List<ResponseItem>> getAccessControlFBAsync(String requestId, Requestor requestor, List<ResponseItem> items, IUserFeedbackResponseEventListener<List<ResponseItem>> callback) {
+        return new AsyncResult<List<ResponseItem>>(items);
+    }
 
 
     @Override
     public void showNotification(String notificationTxt) {
-       
+
     }
 
-
-  
 
     /*
      * The following methods are called by the UserFeedbackController as part of the platform web-app
@@ -180,7 +202,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
 
     @Override
     public void submitExplicitResponse(String requestId, NegotiationDetailsBean negotiationDetails, ResponsePolicy result) {
-      
+
     }
 
     @Override
@@ -193,18 +215,18 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
      * Helper methods to generate feedback forms - explicit, implicit and notification
      */
     private static FeedbackForm generateExpFeedbackForm(String requestId, int type, String proposalText, List<String> optionsList) {
-    	return new FeedbackForm();
+        return new FeedbackForm();
     }
 
     private static FeedbackForm generateImpFeedbackForm(String requestId, int type, String proposalText, int timeout) {
-    	return new FeedbackForm();
+        return new FeedbackForm();
     }
 
     private static FeedbackForm generateNotificationForm(String requestId, String notificationTxt) {
         return new FeedbackForm();
     }
 
- 
+
 
     public void setCommsMgr(ICommManager commsMgr) {
         this.commsMgr = commsMgr;
@@ -224,39 +246,30 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback{
     }
 
 
-	@Override
-	public Future<List<String>> getExplicitFBforRemote(int arg0,
-			ExpProposalContent arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Future<List<String>> getExplicitFBforRemote(int arg0, ExpProposalContent arg1) {
+        ArrayList<String> results = new ArrayList<String>();
+        Collections.addAll(results, arg1.getOptions());
+        return new AsyncResult<List<String>>(results);
+    }
 
+    @Override
+    public Future<Boolean> getImplicitFBforRemote(int arg0, ImpProposalContent arg1) {
+        return new AsyncResult<Boolean>(true);
+    }
 
-	@Override
-	public Future<Boolean> getImplicitFBforRemote(int arg0,
-			ImpProposalContent arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public List<UserFeedbackBean> listIncompleteFeedbackBeans() {
+        return new ArrayList<UserFeedbackBean>();
+    }
 
+    @Override
+    public List<UserFeedbackBean> listStoredFeedbackBeans(int arg0) {
+        return new ArrayList<UserFeedbackBean>();
+    }
 
-	@Override
-	public List<UserFeedbackBean> listIncompleteFeedbackBeans() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public List<UserFeedbackBean> listStoredFeedbackBeans(int arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
-	public List<UserFeedbackBean> listStoredFeedbackBeans(Date arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public List<UserFeedbackBean> listStoredFeedbackBeans(Date arg0) {
+        return new ArrayList<UserFeedbackBean>();
+    }
 }
