@@ -307,6 +307,38 @@ public class InternalTrustBroker implements ITrustBroker {
 	}
 	
 	/*
+	 * @see org.societies.api.internal.privacytrust.trust.ITrustBroker#removeTrustRelationships(org.societies.api.privacytrust.trust.TrustQuery)
+	 */
+	@Override
+	@Async
+	public Future<Boolean> removeTrustRelationships(
+			final TrustQuery query)	throws TrustException {
+		
+		if (query == null) {
+			throw new NullPointerException("query can't be null");
+		}
+		
+		LOG.debug("Removing trust relationship matching query '{}'", query);
+		
+		if (!this.trustNodeMgr.getMyIds().contains(query.getTrustorId())) {
+			throw new TrustAccessControlException("Trustor '"
+					+ query.getTrustorId() + "' is not recognised as a local CSS");
+		}
+		
+		if (this.isLocalQuery(query)) {
+			// L O C A L
+			LOG.debug("query '{}' is LOCAL", query);
+			return new AsyncResult<Boolean>(
+					this.removeLocalTrustRelationships(query));
+		} else {
+			// R E M O T E  ( I N T R A - C S S ) 
+			LOG.debug("query '{}' is REMOTE", query);
+			return new AsyncResult<Boolean>(
+					this.removeRemoteTrustRelationships(query));
+		}
+	}
+	
+	/*
 	 * @see org.societies.api.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(org.societies.api.identity.Requestor, org.societies.api.privacytrust.trust.model.TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustedEntityType)
 	 */
 	@Override
@@ -922,6 +954,26 @@ public class InternalTrustBroker implements ITrustBroker {
 		}
 	}
 	
+	private boolean removeLocalTrustRelationships(final TrustQuery query) 
+			throws TrustException {
+		
+		try {
+			if (this.trustRepo == null) {
+				throw new TrustBrokerException(
+						"ITrustRepository service is not available");
+			}
+			if (query.getTrusteeId() != null) {
+				return this.trustRepo.removeEntity(query.getTrustorId(), 
+						query.getTrusteeId());
+			} else {
+				return this.trustRepo.removeEntities(query.getTrustorId(), 
+						query.getTrusteeType(), query.getTrustValueType());
+			}
+		} catch (ServiceUnavailableException sue) {
+			throw new TrustBrokerException(sue.getLocalizedMessage(), sue);
+		}
+	}
+	
 	private Set<TrustRelationship> retrieveRemoteTrustRelationships(
 			final Requestor requestor, final TrustQuery query) 
 			throws TrustException {
@@ -1072,6 +1124,25 @@ public class InternalTrustBroker implements ITrustBroker {
 						"Interrupted while waiting for remote response for query '"
 								+ query + "'");
 			}
+		}
+	}
+	
+	private boolean removeRemoteTrustRelationships(final TrustQuery query) 
+			throws TrustException {
+
+		@SuppressWarnings("unused")
+		final RemoteClientCallback callback = new RemoteClientCallback();
+		try {
+			if (this.trustBrokerRemoteClient == null) {
+				throw new TrustBrokerException(
+						"ITrustBrokerRemoteClient service is not available");
+			}
+		
+			// TODO
+			return false;
+			
+		} catch (ServiceUnavailableException sue) {
+			throw new TrustBrokerException(sue.getLocalizedMessage(), sue);
 		}
 	}
 	
