@@ -30,7 +30,7 @@
                         <h:outputText value="Overall Trust Level:" /> 
                     </p:column>
                     <p:column style="font-weight: bold;">
-                        <h:outputText value="#{trustController.selectedEntity.userPerceivedTrust.value != null ? trustController.selectedEntity.userPerceivedTrust.value : '-'}" />
+                        <h:outputText value="#{trustController.selectedEntity.userPerceivedTrust.stringValue != null ? trustController.selectedEntity.userPerceivedTrust.stringValue : '-'}" />
                     </p:column>
                 </p:row>
                 <p:row>
@@ -38,7 +38,7 @@
                         <h:outputText value="Direct Trust Level:" />
                     </p:column>
                     <p:column>
-                        <h:outputText value="#{trustController.selectedEntity.directTrust.value != null ? trustController.selectedEntity.directTrust.value : '-'}" />
+                        <h:outputText value="#{trustController.selectedEntity.directTrust.stringValue != null ? trustController.selectedEntity.directTrust.stringValue : '-'}" />
                     </p:column>
                 </p:row>
                 <p:row>
@@ -46,7 +46,7 @@
                         <h:outputText value="Indirect Trust Level:" />  
                     </p:column>
                     <p:column>
-                        <h:outputText value="#{trustController.selectedEntity.indirectTrust.value != null ? trustController.selectedEntity.indirectTrust.value : '-'}" />
+                        <h:outputText value="#{trustController.selectedEntity.indirectTrust.stringValue != null ? trustController.selectedEntity.indirectTrust.stringValue : '-'}" />
                     </p:column>
                 </p:row>
                 <p:row>  
@@ -98,7 +98,7 @@
                         </p:column>
 
                         <p:column headerText="Trust Level" sortBy="#{user.userPerceivedTrust.value}">
-                            <h:outputText value="#{user.userPerceivedTrust.value}" />
+                            <h:outputText value="#{user.userPerceivedTrust.stringValue}" />
                         </p:column>
 
                         <p:column headerText="Last Updated" sortBy="#{user.userPerceivedTrust.lastUpdated}">
@@ -135,7 +135,7 @@
                         </p:column>
 
                         <p:column headerText="Trust Level" sortBy="#{community.userPerceivedTrust.value}">
-                            <h:outputText value="#{community.userPerceivedTrust.value}" />
+                            <h:outputText value="#{community.userPerceivedTrust.stringValue}" />
                         </p:column>
 
                         <p:column headerText="Last Updated" sortBy="#{community.userPerceivedTrust.lastUpdated}">
@@ -171,8 +171,8 @@
                             <h:outputText value="#{service.trusteeId.entityId}" />
                         </p:column>
 
-                        <p:column headerText="Trust Level" sortBy="#{service.userPerceivedTrust.value}">
-                            <h:outputText value="#{service.userPerceivedTrust.value}" />
+                        <p:column headerText="Trust Level" sortBy="#{service.userPerceivedTrust.stringValue}">
+                            <h:outputText value="#{service.userPerceivedTrust.stringValue}" />
                         </p:column>
 
                         <p:column headerText="Last Updated" sortBy="#{service.userPerceivedTrust.lastUpdated}">
