@@ -33,34 +33,34 @@ public class ClassLoaderManager {
 	}
 
 	public ClassLoader classLoaderMagic(ICommCallback callback) {
-		LOG.debug("getting classloader for ICommCallback "+callback.toString());
+		LOG.debug("getting classloader for ICommCallback {}",callback.toString());
 		ClassLoader newClassloader = callbackRegistry.get(callback.getClass());
 		ClassLoader oldClassloader = Thread.currentThread().getContextClassLoader();
 		
 		if (newClassloader!=null) {
-			LOG.debug("found a classloader for this context! oldClassloader="+oldClassloader.toString()+" newClassloader="+newClassloader);
+			LOG.debug("found a classloader for this context! oldClassloader={} newClassloader={}",oldClassloader.toString(),newClassloader);
 			Thread.currentThread().setContextClassLoader(newClassloader);
 			return oldClassloader;
 		}
 		else {
-			LOG.debug("no classloader found! contextClassLoader="+oldClassloader.toString());
+			LOG.debug("no classloader found! contextClassLoader=",oldClassloader.toString());
 		}
 		
 		return null;
 	}
 
 	public ClassLoader classLoaderMagic(IFeatureServer fs) {
-		LOG.debug("getting classloader for IFeatureServer "+fs.toString());
+		LOG.debug("getting classloader for IFeatureServer {}",fs.toString());
 		ClassLoader newClassloader = fsRegistry.get(fs.getClass());
 		ClassLoader oldClassloader = Thread.currentThread().getContextClassLoader();
 		
 		if (newClassloader!=null) {
-			LOG.debug("found a classloader for this context! oldClassloader="+oldClassloader.toString()+" newClassloader="+newClassloader);
+			LOG.debug("found a classloader for this context! oldClassloader={} newClassloader={}",oldClassloader.toString(),newClassloader);
 			Thread.currentThread().setContextClassLoader(newClassloader);
 			return oldClassloader;
 		}
 		else {
-			LOG.debug("no classloader found! contextClassLoader="+oldClassloader.toString());
+			LOG.debug("no classloader found! contextClassLoader={}",oldClassloader.toString());
 		}
 		
 		return null;
@@ -82,18 +82,18 @@ public class ClassLoaderManager {
 //	}
 
 	public ClassLoader classLoaderMagicTemp(String id) {
-		LOG.debug("getting classloader for request id "+id);
+		LOG.debug("getting classloader for request id {}",id);
 		ClassLoader newClassloader = callbackTemporary.get(id);
 		ClassLoader oldClassloader = Thread.currentThread().getContextClassLoader(); // not old classloader verification required here
 		
 		if (newClassloader!=null) {
-			LOG.debug("found a classloader for this context! oldClassloader="+oldClassloader.toString()+" newClassloader="+newClassloader);
+			LOG.debug("found a classloader for this context! oldClassloader={} newClassloader={}",oldClassloader.toString(),newClassloader);
 			callbackTemporary.remove(id);
 			Thread.currentThread().setContextClassLoader(newClassloader);
 			return oldClassloader;
 		}
 		else {
-			LOG.debug("no classloader found! contextClassLoader="+oldClassloader.toString());
+			LOG.debug("no classloader found! contextClassLoader={}",oldClassloader.toString());
 		}
 		
 		return null;
