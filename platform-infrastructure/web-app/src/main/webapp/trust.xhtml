@@ -16,10 +16,20 @@
                 <f:facet name="header">
                     <p:row>
                         <p:column colspan="2">
-                            <h:outputText value="#{trustController.selectedEntity.trusteeId.entityId}" />
+                            <h:outputText value="#{trustController.selectedEntity.trusteeName}" />
                         </p:column>
                     </p:row>
                 </f:facet>
+                <p:row>  
+                    <p:column colspan="2">  
+                        <p:spacer height="0"/>  
+                    </p:column>  
+                </p:row>
+                <p:row>
+                    <p:column colspan="2">
+                        <h:outputText value="#{trustController.selectedEntity.trusteeId}" />
+                    </p:column>
+                </p:row>
                 <p:row>  
                     <p:column colspan="2">  
                         <p:spacer height="0"/>  
@@ -91,10 +101,10 @@
 
                         <p:ajax event="rowSelect" update=":mainForm:trustDetail" oncomplete="trustDialogWidget.show()" />
 
-                        <p:column headerText="ID" sortBy="#{user.trusteeId.entityId}"
-                                  filterBy="#{user.trusteeId.entityId}"
+                        <p:column headerText="Name" sortBy="#{user.trusteeName}"
+                                  filterBy="#{user.trusteeName}"
                                   filterMatchMode="contains">
-                            <h:outputText value="#{user.trusteeId.entityId}" />
+                            <h:outputText value="#{user.trusteeName}" />
                         </p:column>
 
                         <p:column headerText="Trust Level" sortBy="#{user.userPerceivedTrust.value}">
@@ -128,10 +138,10 @@
 
                         <p:ajax event="rowSelect" update=":mainForm:trustDetail" oncomplete="trustDialogWidget.show()" />
 
-                        <p:column headerText="ID" sortBy="#{community.trusteeId.entityId}"
-                                  filterBy="#{community.trusteeId.entityId}"
+                        <p:column headerText="Name" sortBy="#{community.trusteeName}"
+                                  filterBy="#{community.trusteeName}"
                                   filterMatchMode="contains"> 
-                            <h:outputText value="#{community.trusteeId.entityId}" />
+                            <h:outputText value="#{community.trusteeName}" />
                         </p:column>
 
                         <p:column headerText="Trust Level" sortBy="#{community.userPerceivedTrust.value}">
@@ -165,10 +175,10 @@
 
                         <p:ajax event="rowSelect" update=":mainForm:trustDetail" oncomplete="trustDialogWidget.show()" />
 
-                        <p:column headerText="ID" sortBy="#{service.trusteeId.entityId}"
-                                  filterBy="#{service.trusteeId.entityId}"
+                        <p:column headerText="ID" sortBy="#{service.trusteeName}"
+                                  filterBy="#{service.trusteeName}"
                                   filterMatchMode="contains"> 
-                            <h:outputText value="#{service.trusteeId.entityId}" />
+                            <h:outputText value="#{service.trusteeName}" />
                         </p:column>
 
                         <p:column headerText="Trust Level" sortBy="#{service.userPerceivedTrust.stringValue}">

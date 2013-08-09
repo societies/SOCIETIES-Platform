@@ -41,9 +41,11 @@ import javax.faces.bean.ViewScoped;
 import org.primefaces.event.RateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.directory.ICisDirectory;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
 import org.societies.api.internal.privacytrust.trust.model.ExtTrustRelationship;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.privacytrust.trust.TrustQuery;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
@@ -53,6 +55,8 @@ import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.api.privacytrust.trust.model.util.TrustValueFormat;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.api.services.ServiceUtils;
 import org.societies.webapp.models.TrustedEntity;
 import org.societies.webapp.service.UserService;
 
@@ -72,6 +76,14 @@ public class TrustController extends BasePageController {
 
 	@ManagedProperty(value = "#{userService}")
 	private UserService userService;
+	
+	/** The CIS Directory service reference. */
+	@ManagedProperty(value = "#{cisDirectory}")
+	private ICisDirectory cisDirectory;
+	
+	/** The Service Discovery service reference. */
+	@ManagedProperty(value = "#{serviceDiscovery}")
+	private IServiceDiscovery serviceDiscovery;
 	
 	private List<TrustedEntity> users = new ArrayList<TrustedEntity>();
 	private List<TrustedEntity> filteredUsers = new ArrayList<TrustedEntity>();
@@ -106,7 +118,7 @@ public class TrustController extends BasePageController {
 
 	public ITrustBroker getTrustBroker() {
 
-		return trustBroker;
+		return this.trustBroker;
 	}
 
 	public void setTrustBroker(ITrustBroker trustBroker) {
@@ -116,7 +128,7 @@ public class TrustController extends BasePageController {
 	
 	public ITrustEvidenceCollector getTrustEvidenceCollector() {
 
-		return trustEvidenceCollector;
+		return this.trustEvidenceCollector;
 	}
 
 	public void setTrustEvidenceCollector(ITrustEvidenceCollector trustEvidenceCollector) {
@@ -126,12 +138,32 @@ public class TrustController extends BasePageController {
 
 	public UserService getUserService() {
 
-		return userService;
+		return this.userService;
 	}
 
 	public void setUserService(UserService userService) {
 
 		this.userService = userService;
+	}
+	
+	public ICisDirectory getCisDirectory() {
+
+		return this.cisDirectory;
+	}
+
+	public void setCisDirectory(ICisDirectory cisDirectory) {
+
+		this.cisDirectory = cisDirectory;
+	}
+	
+	public IServiceDiscovery getServiceDiscovery() {
+
+		return this.serviceDiscovery;
+	}
+
+	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
+
+		this.serviceDiscovery = serviceDiscovery;
 	}
 	
 	public List<TrustedEntity> getUsers() {
@@ -235,7 +267,8 @@ public class TrustController extends BasePageController {
 					}
 					TrustedEntity trustedEntity = trustedEntities.get(tr.getTrusteeId()); 
 					if (trustedEntity == null) {
-						trustedEntity = new TrustedEntity(myTeid, tr.getTrusteeId());
+						final String trusteeName = this.formatTeid(tr.getTrusteeId());
+						trustedEntity = new TrustedEntity(myTeid, tr.getTrusteeId(), trusteeName);
 					}
 					if (TrustValueType.DIRECT == tr.getTrustValueType()) {
 						trustedEntity.getDirectTrust().setValue(tr.getTrustValue());
@@ -274,6 +307,35 @@ public class TrustController extends BasePageController {
 		} // end if userIsLoggedIn
 		
 		return result;
+	}
+	
+	private String formatTeid(final TrustedEntityId teid) {
+
+		final String entityId = teid.getEntityId();
+		try {
+			if (TrustedEntityType.CSS == teid.getEntityType()) {
+				return entityId;
+			} else if (TrustedEntityType.CIS == teid.getEntityType()) {
+				final List<CisAdvertisementRecord> cisAds = this.cisDirectory.searchByID(entityId).get();
+				if (!cisAds.isEmpty() && cisAds.get(0).getName() != null) {
+					return cisAds.get(0).getName();
+				}
+			} else if (TrustedEntityType.SVC == teid.getEntityType()) {
+				final org.societies.api.schema.servicelifecycle.model.Service service = 
+						this.serviceDiscovery.getService(ServiceUtils
+								.generateServiceResourceIdentifierFromString(entityId)).get();
+				if (service != null && service.getServiceName() != null) {
+					return service.getServiceName();
+				}
+			}
+		} catch (Exception e) {
+
+			LOG.warn("Could not format TEID '" + teid + "': " 
+					+ e.getLocalizedMessage());
+			return entityId;
+		}
+		
+		return teid.toString();
 	}
 	
 	private String formatTrustValue(Double trustValue) {
