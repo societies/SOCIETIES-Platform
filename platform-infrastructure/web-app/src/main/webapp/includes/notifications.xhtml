@@ -28,16 +28,15 @@
         <p:dataGrid var="notification" value="#{notifications.unansweredNegotiationQueue}"
                     columns="1" emptyMessage="No notifications :(" id="notificationGrid">
 
-            <p:panel header="#{notification.title}" rendered="#{notification.type eq 'PPN'}"
+            <p:panel header="Negotiation with #{notification.title}" rendered="#{notification.type eq 'PPN'}"
                      id="ppnPopupPanel" styleClass="unread-notification-header">
 
-                <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
-                <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+                <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+                <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
                 <!-- PRIVACY POLICY NEGOTIATION -->
 
                 <h:panelGrid columns="1">
-                    <h:outputText value="#{notification.title}"/>
 
                     <h:outputText value="#{notification.arrivalDate}"/>
 
