@@ -85,15 +85,13 @@ public class TrustController extends BasePageController {
 	
 	public TrustController() {
 		// controller constructor - called every time this page is requested!
-		if (LOG.isDebugEnabled())
-			LOG.debug(this.getClass().getName() + " instantiated");
+		LOG.info("{} instantiated", this.getClass());
 	}
 	
 	@PostConstruct
 	public void init() {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug(this.getClass().getName() + " initialising");
+		LOG.debug("init");
 		
 		this.users.addAll(this.retrieveTrustedEntities(TrustedEntityType.CSS));
 		this.filteredUsers.addAll(this.users);
@@ -137,8 +135,7 @@ public class TrustController extends BasePageController {
 	
 	public List<TrustedEntity> getUsers() {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("getUsers");
+		LOG.debug("getUsers");
 		return this.users;
 	}
 	
@@ -154,8 +151,7 @@ public class TrustController extends BasePageController {
 	
 	public List<TrustedEntity> getCommunities() {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("getCommunities");
+		LOG.debug("getCommunities");
 		return this.communities;
 	}
 	
@@ -171,8 +167,7 @@ public class TrustController extends BasePageController {
 	
 	public List<TrustedEntity> getServices() {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("getServices");
+		LOG.debug("getServices");
 		return this.services;
 	}
 	
@@ -188,26 +183,24 @@ public class TrustController extends BasePageController {
     
     public TrustedEntity getSelectedEntity() {
     	
-    	if (LOG.isDebugEnabled())
-    		LOG.debug("getSelectedEntity=" + this.selectedEntity);
+    	LOG.debug("getSelectedEntity={}", this.selectedEntity);
     	return this.selectedEntity;
     }
     
     public void setSelectedEntity(TrustedEntity selectedEntity) {
     	
-    	if (LOG.isDebugEnabled())
-    		LOG.debug("setSelectedEntity=" + selectedEntity);
+    	LOG.debug("setSelectedEntity={}", selectedEntity);
     	this.selectedEntity = selectedEntity;
     }
     
     public void onRating(RateEvent rateEvent) {  
         
-    	if (LOG.isDebugEnabled())
-    		LOG.debug("onRating event " + rateEvent);
+    	LOG.debug("onRating: event={}", rateEvent);
     	
     	try {
-    		if (this.selectedEntity == null)
+    		if (this.selectedEntity == null) {
     			throw new IllegalStateException("No trusted entity selected!");
+    		}
     		final TrustedEntityId ratedTeid = this.selectedEntity.getTrusteeId();
     		final Double rating = 0.2d * new Double((Integer) rateEvent.getRating());
     		this.updateTrustRating(ratedTeid, rating);
@@ -236,11 +229,13 @@ public class TrustController extends BasePageController {
 						new HashMap<TrustedEntityId, TrustedEntity>();
 				for (final ExtTrustRelationship tr : dbResult) {
 					// Omit *my* CSS from the list of trusted entities!
-					if (myTeid.equals(tr.getTrusteeId()))
+					if (myTeid.equals(tr.getTrusteeId())) {
 						continue;
+					}
 					TrustedEntity trustedEntity = trustedEntities.get(tr.getTrusteeId()); 
-					if (trustedEntity == null)
+					if (trustedEntity == null) {
 						trustedEntity = new TrustedEntity(myTeid, tr.getTrusteeId());
+					}
 					if (TrustValueType.DIRECT == tr.getTrustValueType()) {
 						trustedEntity.getDirectTrust().setValue(tr.getTrustValue());
 						trustedEntity.getDirectTrust().setLastUpdated(tr.getTimestamp());
@@ -251,15 +246,13 @@ public class TrustController extends BasePageController {
 						trustedEntity.getUserPerceivedTrust().setValue(tr.getTrustValue());
 						trustedEntity.getUserPerceivedTrust().setLastUpdated(tr.getTimestamp());
 					}
-					if (LOG.isDebugEnabled())
-						LOG.debug("Found evidence for '" + tr.getTrusteeId() + "': " + tr.getTrustEvidence());
+					LOG.debug("retrieveTrustedEntities: trusteeId={}, evidence={}", tr.getTrusteeId(), tr.getTrustEvidence());
 					for (final TrustEvidence evidence : tr.getTrustEvidence()) {
 						// Handle RATED evidence
 						if (TrustEvidenceType.RATED == evidence.getType() && evidence.getInfo() instanceof Double) {
 							final Double dblRating = (Double) evidence.getInfo() * 5.0d;
 							final Integer intRating = dblRating.intValue();
-							if (LOG.isDebugEnabled())
-								LOG.debug("Initialising rating for '" + tr.getTrusteeId() + "' to " + intRating);
+							LOG.debug("retrieveTrustedEntities: trusteeId={}, rating={}", tr.getTrusteeId(), intRating);
 							trustedEntity.setRating(intRating);
 						}
 					}
@@ -288,20 +281,21 @@ public class TrustController extends BasePageController {
     			this.trustBroker.registerTrustUpdateListener(listener, 
     					new TrustQuery(myTeid).setTrusteeId(ratedTeid)
     							.setTrustValueType(TrustValueType.USER_PERCEIVED));
-    			if (LOG.isDebugEnabled())
-    				LOG.debug("Adding trust evidence: '" + myTeid + "' rated '" + ratedTeid + "' with " + rating);
+    			LOG.debug("Adding trust evidence: '{}' rated '{}' with {}",
+    					new Object[] { myTeid, ratedTeid, rating });
     			this.trustEvidenceCollector.addDirectEvidence(myTeid, ratedTeid,
     					TrustEvidenceType.RATED, new Date(), rating);
     			cdLatch.await(2, TimeUnit.SECONDS);
     			this.trustBroker.unregisterTrustUpdateListener(listener, 
     					new TrustQuery(myTeid).setTrusteeId(ratedTeid)
     							.setTrustValueType(TrustValueType.USER_PERCEIVED));
-    			if (TrustedEntityType.CSS == ratedTeid.getEntityType())
+    			if (TrustedEntityType.CSS == ratedTeid.getEntityType()) {
     				this.users = this.retrieveTrustedEntities(TrustedEntityType.CSS);
-    			else if (TrustedEntityType.CIS == ratedTeid.getEntityType())
+    			} else if (TrustedEntityType.CIS == ratedTeid.getEntityType()) {
     				this.communities = this.retrieveTrustedEntities(TrustedEntityType.CIS);
-    			else if (TrustedEntityType.SVC == ratedTeid.getEntityType())
+    			} else if (TrustedEntityType.SVC == ratedTeid.getEntityType()) {
     				this.services = this.retrieveTrustedEntities(TrustedEntityType.SVC);
+    			}
     			
     		} catch (Exception e) {
 
@@ -329,10 +323,7 @@ public class TrustController extends BasePageController {
 		@Override
 		public void onUpdate(TrustUpdateEvent trustUpdateEvent) {
 			
-			if (LOG.isDebugEnabled())
-				LOG.debug(trustUpdateEvent.getTrustRelationship().getTrustValueType() 
-						+ " trust in '" + trustUpdateEvent.getTrustRelationship().getTrusteeId() 
-						+ "' updated");
+			LOG.debug("onUpdate: trustUpdateEvent={}", trustUpdateEvent);
 			this.cdLatch.countDown();
 		} 
 	}
