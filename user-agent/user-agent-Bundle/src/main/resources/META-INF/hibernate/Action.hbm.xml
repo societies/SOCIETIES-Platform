@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action"
+           table="PrivacyPolicyAction">
+
+        <id name="actionId" type="string" column="actionId">
+            <generator class="uuid"/>
+        </id>
+
+        <property name="actionConstant" column="actionConstant"
+                  type="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants"/>
+
+        <property name="optional" column="optional" type="boolean"/>
+
+    </class>
+</hibernate-mapping>
