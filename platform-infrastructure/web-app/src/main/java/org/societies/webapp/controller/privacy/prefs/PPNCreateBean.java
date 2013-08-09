@@ -28,12 +28,15 @@ package org.societies.webapp.controller.privacy.prefs;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
@@ -46,10 +49,20 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.ContextPreferenceConditionBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.OperatorConstantsBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPOutcomeBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PrivacyPreferenceConditionBean;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ContextPreferenceCondition;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.OperatorConstants;
 /**
  * @author Eliza
  *
@@ -65,7 +78,7 @@ public class PPNCreateBean implements Serializable{
 	private TreeNode selectedNode;
 
 	private List<String> ctxIds = new ArrayList<String>();
-	private String ctxId = "enter a value";
+	private String selectedCtxID = "";
 	
 	@ManagedProperty(value="#{internalCtxBroker}")
 	private ICtxBroker ctxBroker;
@@ -77,20 +90,38 @@ public class PPNCreateBean implements Serializable{
 	
 	private IIdentity userId;
 	
+	Hashtable<String, CtxIdentifier> ctxIDTable = new Hashtable<String, CtxIdentifier>();
+	
+	private List<OperatorConstants> operators = new ArrayList<OperatorConstants>();
+	
+	private OperatorConstants selectedOperator;
+	
+	private PPNPreferenceDetailsBean preferenceDetails = new PPNPreferenceDetailsBean();
+	
 	public PPNCreateBean() {
-		root = new DefaultTreeNode("Root", null);
-		TreeNode node0 = new DefaultTreeNode("UnderRoot", root);
+/*		setRoot(new DefaultTreeNode("Root", null));
+		TreeNode node0 = new DefaultTreeNode("UnderRoot", getRoot());*/
+
+		preferenceDetails.setRequestor(new RequestorBean());
+		preferenceDetails.getRequestor().setRequestorId("");
+		preferenceDetails.setResource(new Resource());
+		preferenceDetails.getResource().setDataType("");
+		setOperators(Arrays.asList(OperatorConstants.values()));
 	}
 
-	public TreeNode getRoot() {
-		return root;
-	}
 
+
+	public void savePreferenceDetails(){
+		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "PPN preference details set", "Set requestor: "+preferenceDetails.getRequestor().getRequestorId()+"\nSet resource: "+preferenceDetails.getResource().getDataType());
+		FacesContext.getCurrentInstance().addMessage(null, message);
+	}
 	public TreeNode getSelectedNode() {
 		return selectedNode;
 	}
 
 	public void setSelectedNode(TreeNode selectedNode) {
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Set selected node"));
+		this.logging.debug("Setting selected node: "+selectedNode.toString());
 		this.selectedNode = selectedNode;
 	}
 	
@@ -108,9 +139,14 @@ public class PPNCreateBean implements Serializable{
 	
 	
 	public void addCondition(){
-        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Selected", "id: "+this.ctxId+", value: "+this.ctxValue);
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Selected", "id: "+this.selectedCtxID+", value: "+this.ctxValue);
 
         FacesContext.getCurrentInstance().addMessage(null, message);
+        
+        
+		
+		ContextPreferenceCondition condition = new ContextPreferenceCondition(this.ctxIDTable.get(selectedCtxID), selectedOperator, ctxValue);
+        TreeNode node = new DefaultTreeNode(condition, getRoot());
 	}
 	public void addOutcome(){
 		
@@ -129,16 +165,26 @@ public class PPNCreateBean implements Serializable{
 	
 	
     public void deleteNode() {
+    	if (selectedNode==null){
+    		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Node not selected", "You must select a node to delete");
+    		FacesContext.getCurrentInstance().addMessage(null, message);
+    		return;
+    	}
     	if (selectedNode.getParent()==null){
     		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Deleting root node", "You can't delete the root node. If you want to cancel, this use the back button");
     		FacesContext.getCurrentInstance().addMessage(null, message);
     		return;
     	}
+    	
+    	
         selectedNode.getChildren().clear();
         selectedNode.getParent().getChildren().remove(selectedNode);
         selectedNode.setParent(null);
         
         selectedNode = null;
+        
+        FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Deletion", "Node deleted");
+        FacesContext.getCurrentInstance().addMessage(null, message);
     }
 
 	public List<String> getCtxIds() {
@@ -151,7 +197,10 @@ public class PPNCreateBean implements Serializable{
 		    this.ctxIds.clear();
 		    
 		    while(iterator.hasNext()){
-		    	this.ctxIds.add(iterator.next().getId().getUri());
+		    	
+		    	CtxAttributeIdentifier id = iterator.next().getId();
+				this.ctxIds.add(id.getUri());
+				this.ctxIDTable.put(id.getUri(), id);
 		    }
 		   this.logging.debug("Found "+this.ctxIds.size()+" context attributes");
 			
@@ -198,15 +247,60 @@ public class PPNCreateBean implements Serializable{
 		this.ctxValue = ctxValue;
 	}
 
-	public String getCtxId() {
-		if (!this.ctxIds.isEmpty()){
-			this.ctxId = ctxIds.get(0);
-		}
-		return ctxId;
+
+
+	public List<OperatorConstants> getOperators() {
+		return operators;
 	}
 
-	public void setCtxId(String ctxId) {
-		this.ctxId = ctxId;
+	public void setOperators(List<OperatorConstants> operators) {
+		this.operators = operators;
+	}
+
+	public OperatorConstants getSelectedOperator() {
+		if (selectedOperator==null){
+			return OperatorConstants.EQUALS;
+		}
+		return selectedOperator;
+	}
+
+	public void setSelectedOperator(OperatorConstants selectedOperator) {
+		this.selectedOperator = selectedOperator;
+	}
+
+	public String getSelectedCtxID() {
+		if (!this.ctxIds.isEmpty()){
+			this.selectedCtxID = ctxIds.get(0);
+		}
+		return selectedCtxID;
+	}
+
+	public void setSelectedCtxID(String selectedCtxID) {
+		this.selectedCtxID = selectedCtxID;
+	}
+
+
+
+	public TreeNode getRoot() {
+		return root;
+	}
+
+
+
+	public void setRoot(TreeNode root) {
+		this.root = root;
+	}
+
+
+
+	public PPNPreferenceDetailsBean getPreferenceDetails() {
+		return preferenceDetails;
+	}
+
+
+
+	public void setPreferenceDetails(PPNPreferenceDetailsBean preferenceDetails) {
+		this.preferenceDetails = preferenceDetails;
 	}
 	
 }
