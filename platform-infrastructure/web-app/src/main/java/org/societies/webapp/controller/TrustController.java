@@ -52,6 +52,7 @@ import org.societies.api.privacytrust.trust.model.TrustEvidence;
 import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
+import org.societies.api.privacytrust.trust.model.util.TrustValueFormat;
 import org.societies.webapp.models.TrustedEntity;
 import org.societies.webapp.service.UserService;
 
@@ -238,12 +239,18 @@ public class TrustController extends BasePageController {
 					}
 					if (TrustValueType.DIRECT == tr.getTrustValueType()) {
 						trustedEntity.getDirectTrust().setValue(tr.getTrustValue());
+						trustedEntity.getDirectTrust().setStringValue(
+								this.formatTrustValue(tr.getTrustValue()));
 						trustedEntity.getDirectTrust().setLastUpdated(tr.getTimestamp());
 					} else if (TrustValueType.INDIRECT == tr.getTrustValueType()) {
 						trustedEntity.getIndirectTrust().setValue(tr.getTrustValue());
+						trustedEntity.getIndirectTrust().setStringValue(
+								this.formatTrustValue(tr.getTrustValue()));
 						trustedEntity.getIndirectTrust().setLastUpdated(tr.getTimestamp());
 					} else if (TrustValueType.USER_PERCEIVED == tr.getTrustValueType()) {
 						trustedEntity.getUserPerceivedTrust().setValue(tr.getTrustValue());
+						trustedEntity.getUserPerceivedTrust().setStringValue(
+								this.formatTrustValue(tr.getTrustValue()));
 						trustedEntity.getUserPerceivedTrust().setLastUpdated(tr.getTimestamp());
 					}
 					LOG.debug("retrieveTrustedEntities: trusteeId={}, evidence={}", tr.getTrusteeId(), tr.getTrustEvidence());
@@ -267,6 +274,11 @@ public class TrustController extends BasePageController {
 		} // end if userIsLoggedIn
 		
 		return result;
+	}
+	
+	private String formatTrustValue(Double trustValue) {
+		
+		return TrustValueFormat.formatPercent(trustValue);
 	}
 	
 	private void updateTrustRating(final TrustedEntityId ratedTeid,

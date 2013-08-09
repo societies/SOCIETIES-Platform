@@ -38,6 +38,8 @@ public class Trust implements Serializable {
 	private static final long serialVersionUID = -5916408015523467580L;
 
 	private Double value;
+	
+	private String stringValue;
 
 	private Date lastUpdated;
 
@@ -46,9 +48,19 @@ public class Trust implements Serializable {
 		return this.value;
 	}
 
-	public void setValue(Double newValue) {
+	public void setValue(Double value) {
 		
-		this.value = newValue;
+		this.value = value;
+	}
+	
+	public String getStringValue() {
+		
+		return this.stringValue;
+	}
+
+	public void setStringValue(String stringValue) {
+		
+		this.stringValue = stringValue;
 	}
 
 	public Date getLastUpdated() {
