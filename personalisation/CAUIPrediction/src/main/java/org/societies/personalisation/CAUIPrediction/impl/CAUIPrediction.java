@@ -119,7 +119,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 	//boolean caciFreshness = true;
 
 	protected CtxAttribute currentCaciModelAttr;
-	CACIPrediction caciPredictor = null;
+	private CACIPrediction caciPredictor = null;
 
 	private IIdentity cssOwnerId;
 	private CtxEntityIdentifier operatorEntId;
@@ -251,7 +251,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 				}			
 			}
 		} else if(enableCACIPrediction == true && caciModelExist == true) {
-			LOG.info("no CAUI model exist ... utilize community model ");
+			LOG.info("CAUI predictor not able to perform prediction ... community model to be used");
 
 			results = this.caciPredictor.getPrediction(requestor, action);
 
