@@ -240,8 +240,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 				if(nextActionsMap.size()>0){
 					for(IUserIntentAction nextAction : nextActionsMap.keySet()){
 						Double doubleConf = nextActionsMap.get(nextAction);
-						//doubleConf = doubleConf*100;
-						doubleConf = 70.0;
+						doubleConf = doubleConf*100;
+						//doubleConf = 70.0;
 						nextAction.setConfidenceLevel(doubleConf.intValue());
 						//LOG.info("6. nextActionsMap " +nextAction);
 						results.add(nextAction);

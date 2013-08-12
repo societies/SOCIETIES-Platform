@@ -106,7 +106,7 @@ public class CAUICACIPrediction {
 
 		IUserIntentAction userActionSetChannel = TestCase2120.cauiTaskManager.createAction(this.serviceSri ,SERVICE_TYPE,"SetChannel","radio1");
 		userActionSetChannel.setActionContext(context);
-
+		
 		IUserIntentAction userActionOff = TestCase2120.cauiTaskManager.createAction(this.serviceSri ,SERVICE_TYPE,"radio","off");
 		userActionOff.setActionContext(context);
 
