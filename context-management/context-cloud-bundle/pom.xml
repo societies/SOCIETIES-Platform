@@ -116,6 +116,11 @@
 			<artifactId>user-context-refinement</artifactId>
 			<version>${version.cm}</version>
 		</dependency>
+			<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>user-context-prediction</artifactId>
+			<version>${version.cm}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.societies.context-management</groupId>
 			<artifactId>user-context-inheritance</artifactId>
@@ -141,6 +146,8 @@
 			<artifactId>context-activity-feed</artifactId>
 			<version>${version.cm}</version>
 		</dependency>
+		
+		
 		
 		<!-- added by eboylan 		-->
 		<dependency>
