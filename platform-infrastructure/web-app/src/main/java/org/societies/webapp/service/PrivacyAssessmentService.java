@@ -361,7 +361,7 @@ public class PrivacyAssessmentService implements Serializable {
 		String ylabel = "Correlation of data transmission and data access";
 
 		HashMap<String, AssessmentResultClassName> assResult;
-		assResult = assessment.getAssessmentAllClasses(model.getStartDate(), model.getEndDate());
+		assResult = assessment.getAssessmentAllClasses(model.isIncludePlatformBundles(), model.getStartDate(), model.getEndDate());
 
 		int size = assResult.size();
 		String[] labels = new String[size];
@@ -435,7 +435,7 @@ public class PrivacyAssessmentService implements Serializable {
 		String ylabel = "Number of accesses to local data";
 
 		Map<String, Integer> dataAccessClasses;
-		dataAccessClasses = assessment.getNumDataAccessEventsForAllClasses(model.getStartDate(), model.getEndDate());
+		dataAccessClasses = assessment.getNumDataAccessEventsForAllClasses(model.isIncludePlatformBundles(), model.getStartDate(), model.getEndDate());
 		log.debug("Number of data access events (by class): {}", dataAccessClasses.size());
 		PlotData[] plotData = new PlotData[] {mapToArrays(dataAccessClasses)};
 		String[] plotDataLabels = new String[] {"data"};
@@ -449,7 +449,7 @@ public class PrivacyAssessmentService implements Serializable {
 		String ylabel = "Number of accesses to local data";
 
 		Map<String, Integer> dataAccessBundles;
-		dataAccessBundles = assessment.getNumDataAccessEventsForAllBundles(model.getStartDate(), model.getEndDate());
+		dataAccessBundles = assessment.getNumDataAccessEventsForAllBundles(model.isIncludePlatformBundles(), model.getStartDate(), model.getEndDate());
 		log.debug("Number of data access events (by bundle): {}", dataAccessBundles.size());
 		PlotData[] plotData = new PlotData[] {mapToArrays(dataAccessBundles)};
 		String[] plotDataLabels = new String[] {"data"};

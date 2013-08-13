@@ -183,7 +183,7 @@ public class AssessmentTest {
 		
 //		result1 = assessment.getAssessmentAllClasses();
 //		assessment.assessAllNow();
-		result2 = assessment.getAssessmentAllClasses(null, null);
+		result2 = assessment.getAssessmentAllClasses(true, null, null);
 		
 //		assertEquals(0, result1.size());
 		assertEquals(4, result2.size());

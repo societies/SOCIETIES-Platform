@@ -144,21 +144,26 @@ public class Assessment implements IAssessment {
 	}
 	
 	@Override
-	public HashMap<String, AssessmentResultClassName> getAssessmentAllClasses(Date start, Date end) {
+	public HashMap<String, AssessmentResultClassName> getAssessmentAllClasses(boolean includePlatform, Date start, Date end) {
 
 		LOG.info("getAssessmentAllClasses({}, {})", start, end);
 		
 		updateResultsIfNeeded(start, end);
-		return assessmentByClass;
+		if (includePlatform) {
+			return assessmentByClass;
+		}
+		else {
+			return nonPlatformClasses();
+		}
 	}
 
 	@Override
-	public HashMap<String, AssessmentResultBundle> getAssessmentAllBundles(boolean includePlatformBundles, Date start, Date end) {
+	public HashMap<String, AssessmentResultBundle> getAssessmentAllBundles(boolean includePlatform, Date start, Date end) {
 
-		LOG.info("getAssessmentAllBundles(" + includePlatformBundles + ", {}, {})", start, end);
+		LOG.info("getAssessmentAllBundles(" + includePlatform + ", {}, {})", start, end);
 		
 		updateResultsIfNeeded(start, end);
-		if (includePlatformBundles) {
+		if (includePlatform) {
 			return assessmentByBundle;
 		}
 		else {
@@ -168,16 +173,31 @@ public class Assessment implements IAssessment {
 	
 	private HashMap<String, AssessmentResultBundle> nonPlatformBundles() {
 		
-		HashMap<String, AssessmentResultBundle> nonPlatformBundles = new HashMap<String, AssessmentResultBundle>();
+		HashMap<String, AssessmentResultBundle> nonPlatformEntities = new HashMap<String, AssessmentResultBundle>();
 		
 		for (String id : assessmentByBundle.keySet()) {
-			// TODO: In far future, maybe replace this check with a more secure and reliable one, e.g. use bundle signatures
-			if (!id.startsWith(PLATFORM_GROUP_ID_PREFIX)) {
-				nonPlatformBundles.put(id, assessmentByBundle.get(id));
+			if (!isPlatformEntity(id)) {
+				nonPlatformEntities.put(id, assessmentByBundle.get(id));
 			}
 		}
+		return nonPlatformEntities;
+	}
+	
+	private HashMap<String, AssessmentResultClassName> nonPlatformClasses() {
 		
-		return nonPlatformBundles;
+		HashMap<String, AssessmentResultClassName> nonPlatformEntities = new HashMap<String, AssessmentResultClassName>();
+		
+		for (String id : assessmentByClass.keySet()) {
+			if (!isPlatformEntity(id)) {
+				nonPlatformEntities.put(id, assessmentByClass.get(id));
+			}
+		}
+		return nonPlatformEntities;
+	}
+	
+	private boolean isPlatformEntity(String entity) {
+		// TODO: In far future, maybe replace this check with a more secure and reliable one, e.g. use bundle signatures
+		return entity.startsWith(PLATFORM_GROUP_ID_PREFIX); 
 	}
 
 	@Override
@@ -292,19 +312,51 @@ public class Assessment implements IAssessment {
 	}
 	
 	@Override
-	public Map<String, Integer> getNumDataAccessEventsForAllClasses(Date start, Date end) {
+	public Map<String, Integer> getNumDataAccessEventsForAllClasses(boolean includePlatform, Date start, Date end) {
+
+		Map<String, Integer> resultAll;
+		
 		start = nonNullStart(start);
 		end = nonNullEnd(end);
-		return dataAccessAnalyzer.getNumDataAccessEventsForAllClasses(start, end);
+		
+		resultAll = dataAccessAnalyzer.getNumDataAccessEventsForAllClasses(start, end);
+		if (includePlatform) {
+			return resultAll;
+		}
+		else {
+			Map<String, Integer> result = new HashMap<String, Integer>();
+			for (String id : resultAll.keySet()) {
+				if (!isPlatformEntity(id)) {
+					result.put(id, resultAll.get(id));
+				}
+			}
+			return result;
+		}
 	}
 
 	@Override
-	public Map<String, Integer> getNumDataAccessEventsForAllBundles(Date start, Date end) {
+	public Map<String, Integer> getNumDataAccessEventsForAllBundles(boolean includePlatform, Date start, Date end) {
+
+		Map<String, Integer> resultAll;
+		
 		start = nonNullStart(start);
 		end = nonNullEnd(end);
-		return dataAccessAnalyzer.getNumDataAccessEventsForAllBundles(start, end);
+		
+		resultAll = dataAccessAnalyzer.getNumDataAccessEventsForAllBundles(start, end);
+		if (includePlatform) {
+			return resultAll;
+		}
+		else {
+			Map<String, Integer> result = new HashMap<String, Integer>();
+			for (String id : resultAll.keySet()) {
+				if (!isPlatformEntity(id)) {
+					result.put(id, resultAll.get(id));
+				}
+			}
+			return result;
+		}
 	}
-
+	
 	@Override
 	public List<IIdentity> getDataTransmissionReceivers() {
 		return dataTransferAnalyzer.getDataTransmissionReceivers();

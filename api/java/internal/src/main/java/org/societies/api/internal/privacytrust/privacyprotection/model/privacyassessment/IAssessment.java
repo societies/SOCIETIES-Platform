@@ -58,22 +58,25 @@ public interface IAssessment {
 	/**
 	 * Get a-posteriori assessment for all sender classes.
 	 * 
+	 * @param includePlatform True to get results not only for classes from 3rd party bundles, but
+	 * from the SOCIETIES platform bundles, too.
+	 * False to get results for classes from 3rd party bundles only.
 	 * @param start Calculate results from events after this time. Pass null for no limit.
 	 * @param end Calculate results from events before this time. Pass null for no limit.
 	 */
-	public HashMap<String, AssessmentResultClassName> getAssessmentAllClasses(Date start, Date end);
+	public HashMap<String, AssessmentResultClassName> getAssessmentAllClasses(boolean includePlatform, Date start, Date end);
 	
 	/**
 	 * Get a-posteriori assessment for all sender bundles.
 	 * 
-	 * @param includePlatformBundles True to get results not only for 3rd party bundles, but
+	 * @param includePlatform True to get results not only for 3rd party bundles, but
 	 * for the SOCIETIES platform bundles, too.
 	 * False to get results for 3rd party bundles only.
 	 * @param start Calculate results from events after this time. Pass null for no limit.
 	 * @param end Calculate results from events before this time. Pass null for no limit.
 	 */
 	public HashMap<String, AssessmentResultBundle> getAssessmentAllBundles(
-			boolean includePlatformBundles, Date start, Date end);
+			boolean includePlatform, Date start, Date end);
 
 	/**
 	 * Get a-posteriori assessment for a particular sender {@link IIdentity}.
@@ -181,21 +184,27 @@ public interface IAssessment {
 	/**
 	 * Get number of local data access events in given time period, grouped by requestor class name.
 	 * 
+	 * @param includePlatform True to get results not only for classes from 3rd party bundles, but
+	 * from the SOCIETIES platform bundles, too.
+	 * False to get results for classes from 3rd party bundles only.
 	 * @param start Match only events after this time. Pass null for no limit.
 	 * @param end Match only events before this time. Pass null for no limit.
 	 * @return Number of data access events for each requestor identity
 	 */
-	public Map<String, Integer> getNumDataAccessEventsForAllClasses(Date start, Date end);
+	public Map<String, Integer> getNumDataAccessEventsForAllClasses(boolean includePlatform, Date start, Date end);
 
 	/**
 	 * Get number of local data access events in given time period, grouped by symbolic name of
 	 * requestor bundle.
 	 * 
+	 * @param includePlatform True to get results not only for 3rd party bundles, but
+	 * for the SOCIETIES platform bundles, too.
+	 * False to get results for 3rd party bundles only.
 	 * @param start Match only events after this time. Pass null for no limit.
 	 * @param end Match only events before this time. Pass null for no limit.
 	 * @return Number of data access events for each requestor identity
 	 */
-	public Map<String, Integer> getNumDataAccessEventsForAllBundles(Date start, Date end);
+	public Map<String, Integer> getNumDataAccessEventsForAllBundles(boolean includePlatform, Date start, Date end);
 	
 	/**
 	 * @return All identities the messages have been sent to.
