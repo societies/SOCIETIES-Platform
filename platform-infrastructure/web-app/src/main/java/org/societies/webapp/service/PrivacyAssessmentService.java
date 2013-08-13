@@ -398,7 +398,7 @@ public class PrivacyAssessmentService implements Serializable {
 		String ylabel = "Correlation of data transmission and data access";
 
 		HashMap<String, AssessmentResultBundle> assResult;
-		assResult = assessment.getAssessmentAllBundles(model.getStartDate(), model.getEndDate());
+		assResult = assessment.getAssessmentAllBundles(model.isIncludePlatformBundles(), model.getStartDate(), model.getEndDate());
 
 		int size = assResult.size();
 		String[] labels = new String[size];

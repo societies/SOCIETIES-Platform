@@ -56,6 +56,8 @@ import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
 public class Assessment implements IAssessment {
 
 	private static Logger LOG = LoggerFactory.getLogger(Assessment.class);
+	
+	private static final String PLATFORM_GROUP_ID_PREFIX = "org.societies.";
 
 	private PrivacyLog privacyLog;
 	private DataTransferAnalyzer dataTransferAnalyzer;
@@ -151,12 +153,31 @@ public class Assessment implements IAssessment {
 	}
 
 	@Override
-	public HashMap<String, AssessmentResultBundle> getAssessmentAllBundles(Date start, Date end) {
+	public HashMap<String, AssessmentResultBundle> getAssessmentAllBundles(boolean includePlatformBundles, Date start, Date end) {
 
-		LOG.info("getAssessmentAllBundles({}, {})", start, end);
+		LOG.info("getAssessmentAllBundles(" + includePlatformBundles + ", {}, {})", start, end);
 		
 		updateResultsIfNeeded(start, end);
-		return assessmentByBundle;
+		if (includePlatformBundles) {
+			return assessmentByBundle;
+		}
+		else {
+			return nonPlatformBundles();
+		}
+	}
+	
+	private HashMap<String, AssessmentResultBundle> nonPlatformBundles() {
+		
+		HashMap<String, AssessmentResultBundle> nonPlatformBundles = new HashMap<String, AssessmentResultBundle>();
+		
+		for (String id : assessmentByBundle.keySet()) {
+			// TODO: In far future, maybe replace this check with a more secure and reliable one, e.g. use bundle signatures
+			if (!id.startsWith(PLATFORM_GROUP_ID_PREFIX)) {
+				nonPlatformBundles.put(id, assessmentByBundle.get(id));
+			}
+		}
+		
+		return nonPlatformBundles;
 	}
 
 	@Override

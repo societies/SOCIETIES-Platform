@@ -66,10 +66,14 @@ public interface IAssessment {
 	/**
 	 * Get a-posteriori assessment for all sender bundles.
 	 * 
+	 * @param includePlatformBundles True to get results not only for 3rd party bundles, but
+	 * for the SOCIETIES platform bundles, too.
+	 * False to get results for 3rd party bundles only.
 	 * @param start Calculate results from events after this time. Pass null for no limit.
 	 * @param end Calculate results from events before this time. Pass null for no limit.
 	 */
-	public HashMap<String, AssessmentResultBundle> getAssessmentAllBundles(Date start, Date end);
+	public HashMap<String, AssessmentResultBundle> getAssessmentAllBundles(
+			boolean includePlatformBundles, Date start, Date end);
 
 	/**
 	 * Get a-posteriori assessment for a particular sender {@link IIdentity}.

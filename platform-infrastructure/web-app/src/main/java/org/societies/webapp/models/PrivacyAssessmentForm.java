@@ -57,6 +57,13 @@ public class PrivacyAssessmentForm implements Serializable {
      * Perform periodic assessment in background
      */
 	private boolean autoAssessment;
+    
+    /**
+     * True to get results not only for 3rd party bundles, but
+	 * for the SOCIETIES platform bundles, too.
+	 * False to get results for 3rd party bundles only.
+     */
+	private boolean includePlatformBundles;
 	
 	/**
 	 * Period in seconds for periodic assessment
@@ -130,6 +137,20 @@ public class PrivacyAssessmentForm implements Serializable {
 	public void setAutoAssessment(boolean autoAssessment) {
 		log.debug("autoAssessment = {}", autoAssessment);
 		this.autoAssessment = autoAssessment;
+	}
+
+	/**
+	 * @return the includePlatformBundles
+	 */
+	public boolean isIncludePlatformBundles() {
+		return includePlatformBundles;
+	}
+
+	/**
+	 * @param includePlatformBundles the includePlatformBundles to set
+	 */
+	public void setIncludePlatformBundles(boolean includePlatformBundles) {
+		this.includePlatformBundles = includePlatformBundles;
 	}
 
 	/**

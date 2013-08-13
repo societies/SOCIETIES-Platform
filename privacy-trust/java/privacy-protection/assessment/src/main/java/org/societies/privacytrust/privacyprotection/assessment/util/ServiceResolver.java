@@ -133,6 +133,8 @@ public class ServiceResolver implements BundleContextAware {
 				}
 				//LOG.debug("Entry class name: {}", cn);
 				if (className.equals(cn)) {
+					// Can't get anything better than bundle symbolic name.
+					// Method Bundle.getLocation() does not return anything user friendly.
 					LOG.debug("Found matching class name in {}", bundle.getSymbolicName());
 					try {
 						ServiceResourceIdentifier serviceId;
