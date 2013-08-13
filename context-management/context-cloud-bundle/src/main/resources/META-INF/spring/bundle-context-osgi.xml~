@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                      http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+	<!-- definitions using elements of the osgi namespace can be included in 
+		this file. There is no requirement to keep these definitions in a separate 
+		file if you do not want to. The rationale for keeping these definitions separate 
+		is to facilitate integration testing of the bundle outside of an OSGi container -->
+
+	<!-- context broker -->
+	<osgi:service ref="internalCtxBroker">
+		<osgi:interfaces>
+			<value>org.societies.api.internal.context.broker.ICtxBroker</value>
+		</osgi:interfaces>
+	</osgi:service>
+
+	<osgi:service ref="ctxBroker">
+		<osgi:interfaces>
+			<value>org.societies.api.context.broker.ICtxBroker</value>
+		</osgi:interfaces>
+	</osgi:service>
+
+	<!--- added by EBoylan --->
+	<osgi:service ref="intCtxBroker">
+		<osgi:interfaces>
+			<value>org.societies.context.broker.impl.InternalCtxBroker</value>
+		</osgi:interfaces>
+	</osgi:service>
+	
+	
+	<!-- ctx source mgmt -->
+	<osgi:service ref="contextSourceManagement">
+		<osgi:interfaces>
+			<value>org.societies.api.context.source.ICtxSourceMgr</value>
+		</osgi:interfaces>
+	</osgi:service>
+
+	<!-- importing external services -->
+
+	<!-- context broker -->
+	<osgi:reference id="commMgr"
+		interface="org.societies.api.comm.xmpp.interfaces.ICommManager"
+		cardinality="1..1" />
+	<osgi:reference id="commMgrFactory"
+		interface="org.societies.api.internal.comm.ICISCommunicationMgrFactory"
+		cardinality="1..1" />
+	<osgi:reference id="privacyDataMgr"
+		interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyDataManager"
+		cardinality="0..1" timeout="10000" />
+	<osgi:reference id="privacyLogAppender"
+		interface="org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender"
+		cardinality="0..1" timeout="100" />
+	<osgi:reference id="dataSource" 
+	    interface="javax.sql.DataSource" />
+
+
+
+	<!-- event mgr -->
+	<osgi:reference id="eventManager"
+		interface="org.societies.api.osgi.event.IEventMgr" 
+		cardinality="1..1" />
+	<osgi:reference id="pubsubClient"
+		interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"
+		cardinality="1..1" />
+
+	<osgi:reference id="deviceManager"
+		interface="org.societies.api.internal.css.devicemgmt.IDeviceManager"
+		cardinality="1..1" />
+		
+	<!-- context activity feed -->
+	<osgi:reference id="activityFeedMgr" 
+		interface="org.societies.api.activity.IActivityFeedManager" 
+		cardinality="1..1" />
+
+</beans>

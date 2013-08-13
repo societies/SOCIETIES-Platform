@@ -25,15 +25,11 @@
 package org.societies.platform.servicelifecycle.servicecontrol;
 
 import java.io.File;
-import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.BlockingQueue;
 import java.util.jar.JarFile;
 
 import org.osgi.framework.Bundle;
@@ -50,7 +46,6 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.css.devicemgmt.model.DeviceMgmtConstants;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
-import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderSLMCallback;
@@ -63,7 +58,6 @@ import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegis
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRegistrationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
-import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceSharingNotificationException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceUpdateException;
 import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
@@ -80,7 +74,6 @@ import org.societies.api.schema.servicelifecycle.model.ServiceType;
 import org.societies.api.services.ServiceMgmtEventType;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.osgi.util.OsgiListenerUtils;
-import org.springframework.scheduling.annotation.Async;
 
 /**
  * 
@@ -269,19 +262,21 @@ public class ServiceRegistryListener implements BundleContextAware,
 								log.warn("Adding security and privacy failed!");
 								return;
 							}
+							sendEvent(ServiceMgmtEventType.NEW_SERVICE,service,serBndl);
+							sendEvent(ServiceMgmtEventType.SERVICE_STARTED,service,serBndl);
 						} else{
 							if(log.isDebugEnabled())
 								log.debug("It's a restart, but this service doesn't need security & privacy updates");
 						}
-						sendEvent(ServiceMgmtEventType.NEW_SERVICE,service,serBndl);
+						
 						
 					} else{
 						if(log.isDebugEnabled())
 							log.debug("Just restarting the service, no need to update stuff yet.");
+						this.getServiceReg().changeStatusOfService(service.getServiceIdentifier(), ServiceStatus.STARTED);
+						sendEvent(ServiceMgmtEventType.SERVICE_STARTED,service,serBndl);
 					}
 					
-					this.getServiceReg().changeStatusOfService(service.getServiceIdentifier(), ServiceStatus.STARTED);
-					sendEvent(ServiceMgmtEventType.SERVICE_STARTED,service,serBndl);
 
 				}
 					

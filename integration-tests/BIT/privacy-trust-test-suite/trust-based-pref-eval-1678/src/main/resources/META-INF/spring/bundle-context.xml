@@ -22,6 +22,20 @@
        configuration file so that this file can easily be used
        for integration testing outside of an OSGi environment -->
 	
+	<import resource="classpath*:test-bundle-context.xml" />
+
+	<!-- Enable the configuration of this test case through a config file -->
+	<bean id="TestCaseProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<list>
+				<value>classpath:META-INF/spring/org.societies.integration.test.properties</value>
+				<value>file:${CONFIG_DIR}/org.societies.integration.test.properties</value>
+			</list>
+		</property>
+	</bean>
+  
 	<bean id="testCase1678" class="org.societies.integration.test.bit.privacytrust.TestCase1678" init-method="run">
 		<property name="internalTrustEvidenceCollector" ref ="internalTrustEvidenceCollector" />
 		<property name="internalTrustBroker" ref ="internalTrustBroker" />

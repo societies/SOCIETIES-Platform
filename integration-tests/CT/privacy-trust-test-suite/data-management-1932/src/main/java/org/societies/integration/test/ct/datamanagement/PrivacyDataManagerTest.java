@@ -40,7 +40,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
@@ -59,6 +58,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
@@ -144,6 +144,20 @@ public class PrivacyDataManagerTest extends IntegrationTest {
 					errorException = e;
 					lock.countDown();
 				}
+				@Override
+				public void onAccessControlChecked(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> permissions) {
+					succeed = true;
+					try {
+						retrievedPermission = ResponseItemUtils.toResponseItem(permissions.get(0));
+					}
+					catch(Exception e) {
+						succeed = false;
+						onAccessControlAborted("No permission retrieved", e);
+					}
+					finally {
+						lock.countDown();
+					}
+				}
 			});
 
 			boolean releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
@@ -212,12 +226,6 @@ public class PrivacyDataManagerTest extends IntegrationTest {
 					errorException = e;
 					lock.countDown();
 				}
-				@Override
-				public void onObfuscatedVersionRetrieved(CtxIdentifier dataId, boolean retrieved) {
-					succeed = false;
-					errorMsg = "onObfuscatedVersionRetrieved should no be called";
-					lock.countDown();
-				}
 			});
 
 			boolean releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
@@ -277,12 +285,6 @@ public class PrivacyDataManagerTest extends IntegrationTest {
 					succeed = false;
 					errorMsg = msg;
 					errorException = e;
-					lock.countDown();
-				}
-				@Override
-				public void onObfuscatedVersionRetrieved(CtxIdentifier dataId, boolean retrieved) {
-					succeed = false;
-					errorMsg = "onObfuscatedVersionRetrieved should no be called";
 					lock.countDown();
 				}
 			});

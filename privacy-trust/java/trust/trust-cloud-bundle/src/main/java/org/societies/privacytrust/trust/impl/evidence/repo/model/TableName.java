@@ -33,14 +33,9 @@ package org.societies.privacytrust.trust.impl.evidence.repo.model;
 public class TableName {
 
 	/**
+	 * The name of the table containing trust evidence information.
 	 * 
-	 * @since 0.3
+	 * @since 1.1
 	 */
-	public static final String DIRECT_TRUST_EVIDENCE = "org_societies_trust_direct_evidence";
-	
-	/**
-	 * 
-	 * @since 0.3
-	 */
-	public static final String INDIRECT_TRUST_EVIDENCE = "org_societies_trust_indirect_evidence";
+	public static final String TRUST_EVIDENCE = "org_societies_trust_evidence";
 }

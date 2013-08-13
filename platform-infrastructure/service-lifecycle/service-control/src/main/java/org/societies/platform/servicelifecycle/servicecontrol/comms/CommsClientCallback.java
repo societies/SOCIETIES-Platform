@@ -36,9 +36,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
-import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResultBean;
-import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryResultBean;
 import org.societies.api.internal.servicelifecycle.IServiceControlCallback;
 
 

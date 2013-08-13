@@ -25,6 +25,7 @@
 package org.societies.api.context.broker;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -34,11 +35,15 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxBond;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxEntityTypes;
+import org.societies.api.context.model.CtxEvaluationResults;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
@@ -66,64 +71,101 @@ public interface ICtxBroker {
 
 	/**
 	 * Creates a {@link CtxEntity} with the specified type on the identified
-	 * CSS or CIS.
-	 * 
+	 * CSS or CIS. The requestor on whose behalf to create the entity must also
+	 * be specified. The method returns the newly created context entity.
+	 *  
 	 * @param requestor
-	 *            the entity requesting to create the context entity.
-	 * @param targetId
+	 *            the requestor on whose behalf to create the context entity.
+	 * @param target
 	 *            the {@link IIdentity} of the CSS or CIS where the context
-	 *            entity will be created
+	 *            entity will be created.
 	 * @param type
-	 *            the type of the context entity to create
+	 *            the type of the context entity to create.
+	 * @return the newly created context entity.
 	 * @throws CtxException 
+	 *            if there is a problem performing the create operation.
+	 * @throws NullPointerException
+	 *            if any of the specified parameters is <code>null</code>.
+	 * @see CtxEntityTypes
 	 */
 	public Future<CtxEntity> createEntity(final Requestor requestor, 
-			final IIdentity targetId, final String type) throws CtxException;
+			final IIdentity target, final String type) throws CtxException;
 
 	/**
 	 * Creates a {@link CtxAttribute} with the specified type which is
-	 * associated to the identified context entity (scope).
+	 * associated with the identified context entity (scope). The requestor on
+	 * whose behalf to create the attribute must also be specified. The method
+	 * returns the newly created context attribute.
 	 * 
 	 * @param requestor
-	 *            the entity requesting to create the context attribute
+	 *            the requestor on whose behalf to create the context attribute.
 	 * @param scope
 	 *            the identifier of the context entity to associate with the new
-	 *            attribute
+	 *            attribute.
 	 * @param type
-	 *            the type of the context attribute to create
+	 *            the type of the context attribute to create.
+	 * @return the newly created context attribute.
 	 * @throws CtxException 
+	 *             if there is a problem performing the create operation.
+	 * @throws NullPointerException
+	 *            if any of the specified parameters is <code>null</code>.
+	 * @see CtxAttributeTypes
 	 */
 	public Future<CtxAttribute> createAttribute(final Requestor requestor,
 			final CtxEntityIdentifier scope, final String type)
 					throws CtxException;
 
 	/**
-	 * Creates a {@link CtxAssociation} with the specified type on the
-	 * identified CSS or CIS.
-	 * 
+	 * Creates a {@link CtxAssociation} with the specified type on the 
+	 * identified CSS or CIS. The requestor on whose behalf to create the
+	 * association must also be specified. The method returns the newly created
+	 * context association.
+	 *  
 	 * @param requestor
-	 *            the entity requesting to create the context association
-	 * @param targetId
+	 *            the requestor on whose behalf to create the context 
+	 *            association.
+	 * @param target
 	 *            the {@link IIdentity} of the CSS or CIS where the context
 	 *            association will be created
 	 * @param type
-	 *            the type of the context association to create
+	 *            the type of the context association to create.
+	 * @return the newly created context association.
 	 * @throws CtxException 
+	 *            if there is a problem performing the create operation.
+	 * @throws NullPointerException
+	 *            if any of the specified parameters is <code>null</code>.
+	 * @see CtxAssociationTypes 
 	 */
 	public Future<CtxAssociation> createAssociation(final Requestor requestor, 
-			final IIdentity targetId, final String type) throws CtxException;
+			final IIdentity target, final String type) throws CtxException;
 
 	/**
-	 * There are several methods missing that would express the similarity of context
-	 * values or objects in a quantifiable form (and not via a sorted list of
-	 * most/least similar reference objects/values).
-	 * 
-	 * @param objectUnderComparison
-	 * @param referenceObjects
-	 * @throws CtxException 
+	 * Looks up context model objects (i.e. entities, attributes or 
+	 * associations) of the specified type associated with the identified
+	 * target CSS or CIS. The requestor on whose behalf the look-up will be
+	 * performed must also be specified. The method returns a list of
+	 * {@link CtxIdentifier CtxIdentifiers} referencing the context model
+	 * objects that match the supplied criteria. 
+	 * <p>
+	 * Contrary to {@link #lookup(Requestor, IIdentity, CtxModelType, String)},
+	 * this method may perform additional queries based on the context data 
+	 * sub-types associated with the originally specified type.
+	 *  
+	 * @param requestor
+	 *            the requestor on whose behalf to lookup the context model 
+	 *            objects.
+	 * @param type
+	 *            the type of the context model objects to lookup.
+	 * @return a list of {@link CtxIdentifier CtxIdentifiers} referencing the
+	 *         context model objects that match the supplied criteria.
+	 * @throws CtxException
+	 *             if there is a problem performing the look-up operation.
+	 * @throws NullPointerException 
+	 *             if any of the specified parameters is <code>null</code>.
 	 */
-	public Future<List<Object>> evaluateSimilarity(final Serializable objectUnderComparison, final List<Serializable> referenceObjects) throws CtxException;
-
+	public Future<List<CtxIdentifier>> lookup(final Requestor requestor,
+			final IIdentity target, final String type) throws CtxException;
+	
 	/**
 	 * Looks up context model objects of the specified type associated with the
 	 * identified target CSS or CIS. The requestor on whose behalf the look-up
@@ -144,9 +186,6 @@ public interface ICtxBroker {
 	 *            the type of the context model objects to lookup
 	 * @return a list of {@link CtxIdentifier CtxIdentifiers} referencing the
 	 *         context model objects that match the supplied criteria.
-	 * @throws CtxAccessControlException
-	 *             if the specified requestor is not allowed to perform the
-	 *             look-up
 	 * @throws CtxException
 	 *             if there is a problem performing the look-up operation 
 	 * @throws NullPointerException
@@ -155,30 +194,6 @@ public interface ICtxBroker {
 	public Future<List<CtxIdentifier>> lookup(final Requestor requestor,
 			final IIdentity target, final CtxModelType modelType,
 			final String type) throws CtxException;
-
-
-	/**
-	 * Looks up context model objects (i.e. entities, attributes or associations) of the
-	 * specified type.The method returns a list of {@link CtxIdentifier CtxIdentifiers}
-	 * referencing the context model objects that match the supplied criteria. 
-	 * 
-	 * This method exploits a context data hierarchy and performs in a dynamic manner 
-	 * additional queries related with the initially queried data type.  
-	 *  
-	 * @param requestor
-	 *            the requestor on whose behalf to lookup the context model 
-	 *            objects
-	 * @param type
-	 *            the type of the context model objects to lookup
-	 * @throws CtxException
-	 *             if there is a problem performing the look-up operation
-	 * @return a list of {@link CtxIdentifier CtxIdentifiers} referencing the
-	 *         context model objects that match the supplied criteria.
-	 * 
-	 */
-	public Future<List<CtxIdentifier>> lookup(final Requestor requestor,
-			final IIdentity target, final String type) throws CtxException;
-
 
 	/**
 	 * Looks up context model objects (i.e. attributes or associations) of the
@@ -344,57 +359,87 @@ public interface ICtxBroker {
 					throws CtxException;
 
 	/**
-	 * Removes the specified context model object.
+	 * Removes the identified context model object. The method returns the
+	 * removed context model object or <code>null</code> if the identified 
+	 * context model object does not exist in the Context DB. The requestor on
+	 * whose behalf to remove the context model object must also be specified.
+	 * If the specified requestor is not allowed to remove the identified
+	 * context model object, a {@link CtxAccessControlException} is thrown.
 	 * 
-	 * @param requestor
-	 * @param identifier
+	 * @param requstor
+	 *            the requestor on whose behalf to retrieve the identified
+	 *            context model object.
+	 * @param ctxId
+	 *            the {@link CtxIdentifier} of the context model object to be 
+	 *            removed.
+	 * @return the removed context model object.
+	 * @throws CtxAccessControlException
+	 *             if the local CSS is not allowed to remove the identified 
+	 *             context model object.
 	 * @throws CtxException 
+	 *             if there is a problem performing the remove operation.
+	 * @throws NullPointerException
+	 *             if the specified ctxId is <code>null</code>. 
 	 */
 	public Future<CtxModelObject> remove(final Requestor requestor, 
-			final CtxIdentifier identifier) throws CtxException;
+			final CtxIdentifier ctxId) throws CtxException;
 
 	/**
 	 * Retrieves the {@link CtxModelObject} identified by the specified 
-	 * {@link CtxIdentifier}. The requestor on whose behalf to retrieve the
-	 * context model object must also be specified. The method returns
-	 * <code>null</code> if the requested context model object does not exist
-	 * in the Context DB. If the specified requestor is not allowed to retrieve
-	 * the identified context model object, a {@link CtxAccessControlException}
+	 * {@link CtxIdentifier}. Note that the method may enable inference if the
+	 * requested context attribute does not fulfill QoC requirements or 
+	 * contains a <code>null</code> value. The requestor on whose behalf to 
+	 * retrieve the context model object must also be specified. The method 
+	 * returns <code>null</code> if the requested context model object does not
+	 * exist in the Context DB. If the specified requestor is not allowed to
+	 * retrieve the identified context model object, a {@link CtxAccessControlException}
+	 * is thrown.
+	 * 
+	 * @param requstor
+	 *            the requestor on whose behalf to retrieve the identified
+	 *            context model object.
+	 * @param ctxId
+	 *            the {@link CtxIdentifier} of the {@link CtxModelObject} to
+	 *            retrieve.
+	 * @throws CtxAccessControlException
+	 *             if the specified requestor is not allowed to retrieve the
+	 *             identified context model object.
+	 * @throws CtxException
+	 *             if there is a problem performing the retrieve operation.
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>.
+	 */
+	public Future<CtxModelObject> retrieve(final Requestor requestor, 
+			final CtxIdentifier ctxId) throws CtxException;
+
+	/**
+	 * Retrieves the context model object(s) identified in the specified list.
+	 * Note that the method may enable inference for context attributes that
+	 * do not fulfill QoC requirements or contain a <code>null</code> value.
+	 * The requestor on whose behalf to retrieve the context model object(s)
+	 * must also be specified. The returned list contains only the context 
+	 * model objects which the specified requestor is granted access to. 
+	 * Note that if the specified requestor is denied access to <i>all</i> of
+	 * the identified context model object(s), a {@link CtxAccessControlException}
 	 * is thrown.
 	 * 
 	 * @param requestor
 	 *            the requestor on whose behalf to retrieve the identified
-	 *            context model object
-	 * @param identifier
-	 *            the {@link CtxIdentifier} of the {@link CtxModelObject} to
-	 *            retrieve 
+	 *            context model object(s).
+	 * @param ctxIdList
+	 *            the list of {@link CtxIdentifier CtxIdentifiers} to retrieve.
+	 * @return a list containing the identified context model objects which the
+	 *             specified requestor is granted access to.
 	 * @throws CtxAccessControlException
-	 *             if the specified requestor is not allowed to retrieve the
-	 *             identified context model object
-	 * @throws CtxException
-	 *             if there is a problem performing the retrieve operation
-	 * @throws NullPointerException
-	 *             if the specified identifier is <code>null</code> 
-	 */
-	public Future<CtxModelObject> retrieve(final Requestor requestor, 
-			final CtxIdentifier identifier) throws CtxException;
-
-	/**
-	 * Retrieves the context model objects specified in the set. Automatically enables inference 
-	 * for Context Attributes that do not fulfill QoC requirements or contain a null value. 
-	 * The total volume of the data objects contained in the results may be high.   
-	 * 
-	 * @param requestor
-	 *            the requestor on whose behalf to retrieve the identified
-	 *            context model object
-	 * @param set of identifiers
-	 * 
+	 *             if the specified requestor is denied access to all of the
+	 *             specified context model object(s).
 	 * @throws CtxException 
-	 *  if there is a problem performing the retrieve operation
+	 *             if there is a problem performing the retrieve operation.
+	 * @throws NullPointerException
+	 *             if any of the specified parameters is <code>null</code>.
 	 */
 	public Future<List<CtxModelObject>> retrieve(final Requestor requestor, 
-			final List<CtxIdentifier> ctxIdentifiersList) throws CtxException;
-	
+			final List<CtxIdentifier> ctxIdList) throws CtxException;
 		
 	/**
 	 * Retrieves the {@link CtxEntityIdentifier} of the 
@@ -502,25 +547,27 @@ public interface ICtxBroker {
 
 	/**
 	 * Updates the specified {@link CtxModelObject}. The requestor on whose
-	 * behalf to update the context model object must also be specified. The
-	 * method returns the updated context model object.
+	 * behalf to update the context model object must also be specified. If the
+	 * specified requestor is not allowed to update the context model, a 
+	 * {@link CtxAccessControlException} is thrown; otherwise the method
+	 * returns the updated context model object.
 	 * 
 	 * @param requestor
 	 *            the requestor on whose behalf to update the specified
-	 *            context model object
-	 * @param object
-	 *             the {@link CtxModelObject} to update
-	 * @return the updated {@link CtxModelObject}
+	 *            context model object.
+	 * @param ctxModelObject
+	 *             the {@link CtxModelObject} to update.
+	 * @return the updated {@link CtxModelObject}.
 	 * @throws CtxAccessControlException
 	 *             if the specified requestor is not allowed to update the
-	 *             specified context model object
+	 *             specified context model object.
 	 * @throws CtxException 
-	 *             if there is a problem performing the update operation
+	 *             if there is a problem performing the update operation.
 	 * @throws NullPointerException
-	 *             if the specified context model object is <code>null</code>
+	 *             if any of the specified parameters is <code>null</code>.
 	 */
 	public Future<CtxModelObject> update(final Requestor requestor,
-			final CtxModelObject object) throws CtxException;
+			final CtxModelObject ctxModelObject) throws CtxException;
 
 	/**
 	 * 
@@ -573,5 +620,10 @@ public interface ICtxBroker {
 	 */
 	public Future<List<CtxEntityIdentifier>> retrieveParentCommunities(final Requestor requestor,
 			final CtxEntityIdentifier community) throws CtxException;
-
+	
+	/**
+	 * added by eboylan for CSE integration test
+	 */
+	public CtxEvaluationResults evaluateSimilarity(String[] ids,
+            ArrayList<String> attrib) throws CtxException;
 }

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition"
+           table="PrivacyPolicyCondition">
+
+        <id name="conditionId" type="string" column="conditionId">
+            <generator class="uuid"/>
+        </id>
+
+        <property name="conditionConstant" column="conditionConstant"
+                  type="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants"/>
+
+        <property name="optional" column="optional" type="boolean"/>
+
+        <property name="value" column="value" type="string"/>
+
+    </class>
+</hibernate-mapping>

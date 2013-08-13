@@ -104,11 +104,11 @@ public class MergingManager implements IC45Consumer{
 				ServiceResourceIdentifier serviceID = output.getServiceId();
 				String serviceType = output.getServiceType();
 				List<IPreferenceTreeModel> treeList = output.getTreeList();
-				PreferenceMerger prefMerger = new PreferenceMerger();
+				PreferenceMerger prefMerger = new PreferenceMerger(pcm.getUserFeedbackMgr());
 				logging.debug("Trees in C45output: "+treeList.size());
 				for (IPreferenceTreeModel tree : treeList){
 					logging.debug(tree.toString());
-					String prefName = tree.getPreferenceName();
+					String prefName = tree.getPreferenceDetails().getPreferenceName();
 					if (prefName==null){
 						prefName = this.getPreferenceName(tree);
 					}

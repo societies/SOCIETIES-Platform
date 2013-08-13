@@ -26,6 +26,7 @@ package org.societies.privacytrust.trust.impl.evidence.monitor;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
 import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.TrustQuery;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
@@ -46,10 +48,9 @@ import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.privacytrust.trust.api.ITrustNodeMgr;
-import org.societies.privacytrust.trust.api.evidence.model.IIndirectTrustEvidence;
+import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.api.evidence.repo.TrustEvidenceRepositoryException;
-import org.societies.privacytrust.trust.impl.evidence.repo.model.IndirectTrustEvidence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -100,15 +101,15 @@ public class IndirectTrustEvidenceMonitor implements ITrustUpdateEventListener {
 	IndirectTrustEvidenceMonitor(ITrustNodeMgr trustNodeMgr, 
 			ITrustBroker trustBroker) throws Exception {
 		
-		if (LOG.isInfoEnabled())
-			LOG.info(this.getClass() + " instantiated");
+		LOG.info("{} instantiated", this.getClass());
 		
 		this.trustNodeMgr = trustNodeMgr;
 		this.trustBroker = trustBroker;
 		try {
 			for (final TrustedEntityId myTeid : trustNodeMgr.getMyIds()) {
-				this.initConnections(myTeid);
-				trustBroker.registerTrustUpdateListener(this, myTeid, TrustValueType.DIRECT);
+				this.retrieveConnections(myTeid);
+				trustBroker.registerTrustUpdateListener(this, 
+						new TrustQuery(myTeid).setTrustValueType(TrustValueType.DIRECT));
 			}
 			this.scheduler.scheduleWithFixedDelay(new MaintenanceDaemon(),
 					WAIT, WAIT, TimeUnit.SECONDS);
@@ -125,8 +126,7 @@ public class IndirectTrustEvidenceMonitor implements ITrustUpdateEventListener {
 	@Override
 	public void onUpdate(TrustUpdateEvent event) {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Received event " + event);
+		LOG.debug("Received event {}", event);
 		
 		if (event.getTrustRelationship() == null) {
 			LOG.error("Could not handle DIRECT trust update event: "
@@ -160,33 +160,31 @@ public class IndirectTrustEvidenceMonitor implements ITrustUpdateEventListener {
 			
 			final TrustedEntityId trustorId = this.updatedRelationship.getTrustorId();
 			final TrustedEntityId trusteeId = this.updatedRelationship.getTrusteeId();
-			// IF the trustor is me:
-			//   Check if the trustee is:
-			//     1. of type CSS, and
-			//     2. new connection that is not already monitored
+			// IF the trustor is mine THEN
+			//   If the trustee is:
+			//     1. of type CSS, AND
+			//     2. not me, AND
+			//     3. not already monitored connection THEN
+			//       Add trustee to connections to be monitored
 			// ELSE
 			//   Add indirect trust evidence
-			if (trustNodeMgr.getMyIds().contains(trustorId)) {
-				if (TrustedEntityType.CSS != trusteeId.getEntityType()) {
-					if (LOG.isDebugEnabled())
-						LOG.debug("Nothing to do - '" + trusteeId 
-								+ "' cannot be monitored");
+			if (IndirectTrustEvidenceMonitor.this.trustNodeMgr.getMyIds().contains(trustorId)) {
+				if (TrustedEntityType.CSS != trusteeId.getEntityType()
+						|| trustorId.equals(trusteeId)) {
+					LOG.debug("Nothing to do - '{}' cannot be monitored", trusteeId);
 					return;
 				}
-				if (monitoredConnections.contains(trusteeId)) {
-					if (LOG.isDebugEnabled())
-						LOG.debug("Nothing to do - '" + trusteeId 
-								+ "' already monitored");
+				if (IndirectTrustEvidenceMonitor.this.monitoredConnections.contains(trusteeId)) {
+					LOG.debug("Nothing to do - '{}' already monitored", trusteeId);
 					return;
 				} else {
-					if (LOG.isDebugEnabled())
-						LOG.debug("Adding '" + trusteeId 
-								+ "' to connections to be monitored");
-					unmonitoredConnections.add(trusteeId);
+					LOG.debug("Adding '{}' to connections to be monitored", trusteeId);
+					IndirectTrustEvidenceMonitor.this.unmonitoredConnections.add(trusteeId);
 				}
 			} else {
 				try {
-					addIndirectEvidence(this.updatedRelationship, trustorId);
+					IndirectTrustEvidenceMonitor.this.addIndirectEvidence(
+							this.updatedRelationship, trustorId);
 				} catch (TrustException te) {
 					LOG.error("Could not add indirect trust evidence from relationship "
 							+ this.updatedRelationship + ": " 
@@ -208,16 +206,20 @@ public class IndirectTrustEvidenceMonitor implements ITrustUpdateEventListener {
 		@Override
 		public void run() {
 
-			if (LOG.isDebugEnabled())
-				LOG.debug("Connections to monitor for direct trust updates: " + unmonitoredConnections);
-			for (final TrustedEntityId connectionId : new HashSet<TrustedEntityId>(unmonitoredConnections)) {
+			LOG.debug("Connections to monitor for direct trust updates: {}", 
+					IndirectTrustEvidenceMonitor.this.unmonitoredConnections);
+			for (final TrustedEntityId connectionId : new HashSet<TrustedEntityId>(
+					IndirectTrustEvidenceMonitor.this.unmonitoredConnections)) {
 
 				try {
 					IndirectTrustEvidenceMonitor.this.retrieveOpinions(connectionId);
-					trustBroker.registerTrustUpdateListener(
-							IndirectTrustEvidenceMonitor.this, connectionId, TrustValueType.DIRECT);
-					IndirectTrustEvidenceMonitor.this.unmonitoredConnections.remove(connectionId);
-					IndirectTrustEvidenceMonitor.this.monitoredConnections.add(connectionId);
+					IndirectTrustEvidenceMonitor.this.trustBroker.registerTrustUpdateListener(
+							IndirectTrustEvidenceMonitor.this, 
+							new TrustQuery(connectionId).setTrustValueType(TrustValueType.DIRECT));
+					if (IndirectTrustEvidenceMonitor.this.unmonitoredConnections.remove(connectionId)) {
+						LOG.info("Started monitoring connection '{}' for direct trust updates", connectionId);
+						IndirectTrustEvidenceMonitor.this.monitoredConnections.add(connectionId);
+					}
 				} catch (Exception e) {
 					LOG.warn("Failed to register for trust updates of CSS '" + connectionId 
 							+ "': " + e.getLocalizedMessage() + ". Will re-attempt to register in "
@@ -235,44 +237,44 @@ public class IndirectTrustEvidenceMonitor implements ITrustUpdateEventListener {
 		final TrustEvidenceType type = TrustEvidenceType.DIRECTLY_TRUSTED;
 		final Double trustValue = trustRelationship.getTrustValue();
 		final Date ts = trustRelationship.getTimestamp();
-		if (LOG.isDebugEnabled())
-			LOG.debug("Adding indirect trust evidence: subjectId="
-					+ subjectId + ", objectId="	+ objectId 
-					+ ", type=" + type + ", ts=" + ts + ", trustValue=" 
-					+ trustValue + ", sourceId=" + sourceId);
+		
 		// Ignore evidence where subjectId == objectId
-		if (!subjectId.equals(objectId))
+		if (!subjectId.equals(objectId)) {
+			LOG.debug("Adding indirect trust evidence: subjectId={}, objectId={}"
+					+ ", type={}, ts={}, trustValue={}, sourceId={}", 
+					new Object[] { subjectId, objectId, type, ts, trustValue, sourceId });
 			this.trustEvidenceCollector.addIndirectEvidence(subjectId, 
 					objectId, type, ts, trustValue, sourceId);
-		else
-			if (LOG.isDebugEnabled())
-				LOG.debug("Ignoring indirect trust evidence: subjectId="
-						+ subjectId + ", objectId="	+ objectId 
-						+ ", type=" + type + ", ts=" + ts + ", trustValue=" 
-						+ trustValue + ", sourceId=" + sourceId);
+		} else {
+			LOG.debug("Ignoring indirect trust evidence: subjectId={}, objectId={}"
+				+ ", type={}, ts={}, trustValue={}, sourceId={}", 
+				new Object[] { subjectId, objectId, type, ts, trustValue, sourceId });
+		}
 	}
 	
 	private void retrieveOpinions(final TrustedEntityId connectionId)
 			throws TrustException {
 		
+		LOG.debug("retrieveOpinions: connectionId={}", connectionId);
+		
 		final Set<TrustRelationship> retrievedRelationships;
-		final Set<IIndirectTrustEvidence> existingEvidenceSet;
+		final Set<ITrustEvidence> existingEvidenceSet;
 		try {
+			existingEvidenceSet = this.trustEvidenceRepository.retrieveLatestEvidence(
+					connectionId, null, TrustEvidenceType.DIRECTLY_TRUSTED, connectionId);
+			// Get the last evidence timestamp
+			Date lastEvidenceTimestamp = null;
+			final Iterator<ITrustEvidence> evidenceIter = existingEvidenceSet.iterator();
+			while (evidenceIter.hasNext()) {
+				lastEvidenceTimestamp = evidenceIter.next().getTimestamp();
+			}
+			// Fetch trust relationships after lastEvidenceTimestamp 
+			// TODO Add fromDate param to TrustQuery 
 			retrievedRelationships = this.trustBroker.retrieveTrustRelationships(
-					connectionId, TrustValueType.DIRECT).get();
-			// If connection has no opinions do nothing
-			if (retrievedRelationships.isEmpty())
-				return;
-			existingEvidenceSet = this.trustEvidenceRepository.retrieveLatestIndirectEvidence(
-					null, null, TrustEvidenceType.DIRECTLY_TRUSTED, connectionId);
+					new TrustQuery(connectionId).setTrustValueType(TrustValueType.DIRECT)).get();			
 			for (final TrustRelationship retrievedRelationship : retrievedRelationships) {
-				for (final IIndirectTrustEvidence existingEvidence : existingEvidenceSet) {
-					if (retrievedRelationship.getTrustorId().equals(existingEvidence.getSubjectId())
-							&& retrievedRelationship.getTrusteeId().equals(existingEvidence.getObjectId())
-							&& retrievedRelationship.getTimestamp().getTime() > existingEvidence.getTimestamp().getTime()) {
+				if (lastEvidenceTimestamp == null || retrievedRelationship.getTimestamp().compareTo(lastEvidenceTimestamp) > 0) {
 						this.addIndirectEvidence(retrievedRelationship, connectionId);
-						break;
-					}
 				}
 			}
 		} catch (TrustEvidenceRepositoryException tere) {
@@ -286,15 +288,30 @@ public class IndirectTrustEvidenceMonitor implements ITrustUpdateEventListener {
 		}
 	}
 	
-	private void initConnections(final TrustedEntityId myTeid) 
+	/**
+	 * Retrieves the connections to be monitored on behalf of the specified
+	 * trustor. More specifically, the method finds all CSSs directly trusted
+	 * by the specified trustor; any CSSs not already monitored are added to
+	 * the {@link #unmonitoredConnections} set.
+	 * 
+	 * @param myTeid
+	 * @throws TrustException
+	 */
+	private void retrieveConnections(final TrustedEntityId myTeid) 
 			throws TrustException {
 		
+		LOG.debug("retrieveConnections: myTeid={}", myTeid);
+		
 		try {
-			final Set<TrustRelationship> trustRelationships = 
-					this.trustBroker.retrieveTrustRelationships(myTeid,
-							TrustedEntityType.CSS, TrustValueType.DIRECT).get();
-			for (final TrustRelationship trustRelationship : trustRelationships)
-				this.unmonitoredConnections.add(trustRelationship.getTrusteeId());
+			final Set<TrustRelationship> trs = this.trustBroker.retrieveTrustRelationships(
+					new TrustQuery(myTeid).setTrusteeType(TrustedEntityType.CSS)
+					.setTrustValueType(TrustValueType.DIRECT)).get();
+			for (final TrustRelationship tr : trs) {
+				if (!myTeid.equals(tr.getTrusteeId()) 
+						&& !this.monitoredConnections.contains(tr.getTrusteeId())) {
+					this.unmonitoredConnections.add(tr.getTrusteeId());
+				}
+			}
 		} catch (Exception e) {
 			throw new TrustEvidenceMonitorException(
 					"Interrupted while retrieving DIRECT trust relationships of trustor '"

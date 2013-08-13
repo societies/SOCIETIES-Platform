@@ -50,11 +50,18 @@ import org.societies.api.schema.context.model.CtxQualityBean;
 import org.societies.api.schema.context.model.IndividualCtxEntityBean;
 
 public final class CtxModelBeanTranslator {
-
-	protected byte[] binaryValue;
 	
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CtxModelBeanTranslator.class);
+	
+	/** A constant holding a Not-an-Integer (NaI) value of integer type. */
+	public static Integer NaI = Integer.MIN_VALUE;
+	
+	/** A constant holding a Not-a-Double (NaD) value of double type. */
+	public static Double NaD = Double.MIN_VALUE;
+	
+	/** A constant holding a Not-a-Binary (NaB) value of binary type. */
+	public static byte[] NaB = new byte[] { Byte.MIN_VALUE };
 
 	private static CtxModelBeanTranslator instance = new CtxModelBeanTranslator();
 
@@ -315,14 +322,26 @@ public final class CtxModelBeanTranslator {
 		if (identifier.getModelType().equals(CtxModelType.ENTITY)) {
 			ctxIdBean = new CtxEntityIdentifierBean();
 			ctxIdBean.setString(identifier.toString());
+			ctxIdBean.setOwnerId(identifier.getOwnerId());
+			ctxIdBean.setType(identifier.getType());
+			ctxIdBean.setModelType(ctxModelTypeBeanFromCtxModelType(identifier.getModelType()));
+			ctxIdBean.setObjectNumber(identifier.getObjectNumber());
 		}
 		else if (identifier.getModelType().equals(CtxModelType.ATTRIBUTE)) {
 			ctxIdBean = new CtxAttributeIdentifierBean(); 
 			ctxIdBean.setString(identifier.toString()); 
+			ctxIdBean.setOwnerId(identifier.getOwnerId());
+			ctxIdBean.setType(identifier.getType());
+			ctxIdBean.setModelType(ctxModelTypeBeanFromCtxModelType(identifier.getModelType()));
+			ctxIdBean.setObjectNumber(identifier.getObjectNumber());
 		}
 		else if (identifier.getModelType().equals(CtxModelType.ASSOCIATION)) {
 			ctxIdBean = new CtxAssociationIdentifierBean(); 
 			ctxIdBean.setString(identifier.toString());
+			ctxIdBean.setOwnerId(identifier.getOwnerId());
+			ctxIdBean.setType(identifier.getType());
+			ctxIdBean.setModelType(ctxModelTypeBeanFromCtxModelType(identifier.getModelType()));
+			ctxIdBean.setObjectNumber(identifier.getObjectNumber());
 		}
 
 		return ctxIdBean;
@@ -337,21 +356,37 @@ public final class CtxModelBeanTranslator {
 	public CtxAttributeBean fromCtxAttribute(CtxAttribute attr) {
 
 		CtxAttributeBean bean = new CtxAttributeBean();
-		byte[] minBinaryValue = new byte[] {Byte.MIN_VALUE};
+		// id
+		bean.setId(fromCtxIdentifier(attr.getId()));
+		// lastModified
+		bean.setLastModified(attr.getLastModified());
+		// binaryValue
 		if (attr.getBinaryValue() == null)
-			bean.setBinaryValue(minBinaryValue);
+			bean.setBinaryValue(NaB);
 		else
 			bean.setBinaryValue(attr.getBinaryValue());
-		bean.setDoubleValue(attr.getDoubleValue());
+		// doubleValue
+		if (attr.getDoubleValue() == null)
+			bean.setDoubleValue(NaD);
+		else
+			bean.setDoubleValue(attr.getDoubleValue());
 		bean.setHistoryRecorded(attr.isHistoryRecorded());
-		bean.setId(fromCtxIdentifier(attr.getId()));
-		bean.setIntegerValue(attr.getIntegerValue());
-		bean.setLastModified(attr.getLastModified());
-		bean.setSourceId(attr.getSourceId());
+		// integerValue
+		if (attr.getIntegerValue() == null)
+			bean.setIntegerValue(NaI);
+		else
+			bean.setIntegerValue(attr.getIntegerValue());
+		// stringValue
 		bean.setStringValue(attr.getStringValue());
-		bean.setValueMetric(attr.getValueMetric());
+		// valueType
 		bean.setValueType(fromCtxAttributeValueType(attr.getValueType()));
+		// valueMetric
+		bean.setValueMetric(attr.getValueMetric());
+		// historyRecorded
+		bean.setHistoryRecorded(attr.isHistoryRecorded());
+		// sourceId
 		bean.setSourceId(attr.getSourceId());
+		// quality
 		bean.setQuality(fromCtxQuality(attr.getQuality()));
 
 		return bean;
@@ -360,47 +395,35 @@ public final class CtxModelBeanTranslator {
 	public CtxAttribute fromCtxAttributeBean(CtxAttributeBean bean) 
 			throws MalformedCtxIdentifierException {
 
+		// id
 		final CtxAttribute object = new CtxAttribute(
 				(CtxAttributeIdentifier) fromCtxIdentifierBean(bean.getId()));
+		// lastModified
 		object.setLastModified(bean.getLastModified());
-		// Handle value
+		// value
 		if (bean.getStringValue() != null)
 			object.setValue(bean.getStringValue());
-		else if (bean.getIntegerValue() != null)
-			if (bean.getIntegerValue() == -1)
-				object.setValue(null);
-			else
-				object.setValue(bean.getIntegerValue());
-		else if (bean.getDoubleValue() != null)
-			if (bean.getDoubleValue() == -1.0)
-				object.setValue(null);
-			else
-				object.setValue(bean.getDoubleValue());
-		else if (bean.getBinaryValue() != null) {
-			byte[] minBinaryValue = new byte[] {Byte.MIN_VALUE};
-			if (bean.getBinaryValue() == minBinaryValue)
-				object.setValue(binaryValue);
-			else
-				object.setValue(bean.getBinaryValue());
-		}
-		// Handle value meta-data
+		else if (bean.getIntegerValue() != NaI)
+			object.setValue(bean.getIntegerValue());
+		else if (bean.getDoubleValue() != NaD)
+			object.setValue(bean.getDoubleValue());
+		else if (bean.getBinaryValue() != NaB)
+			object.setValue(bean.getBinaryValue());
+		// valueType
 		object.setValueType(fromCtxAttributeValueTypeBean(bean.getValueType()));
+		// valueMetric
 		object.setValueMetric(bean.getValueMetric());
-		// Handle other params
+		// historyRecorded
 		object.setHistoryRecorded(bean.isHistoryRecorded());
+		// sourceId
 		object.setSourceId(bean.getSourceId());
-		// Handle QoC
+		// quality
 		object.getQuality().setLastUpdated(bean.getQuality().getLastUpdated());
-		if(bean.getQuality().getOriginType() != null ){
+		if(bean.getQuality().getOriginType() != null)
 			object.getQuality().setOriginType(fromCtxOriginTypeBean(bean.getQuality().getOriginType()));
-		}
-		if (bean.getQuality().getPrecision() == -1)
-			object.getQuality().setPrecision(null);
-		else
+		if (bean.getQuality().getPrecision() != NaD)
 			object.getQuality().setPrecision(bean.getQuality().getPrecision());
-		if (bean.getQuality().getPrecision() == -1)
-			object.getQuality().setPrecision(null);
-		else
+		if (bean.getQuality().getUpdateFrequency() != NaD)
 			object.getQuality().setUpdateFrequency(bean.getQuality().getUpdateFrequency());
 
 		return object;
@@ -510,8 +533,14 @@ public final class CtxModelBeanTranslator {
 	public CtxQualityBean fromCtxQuality(CtxQuality quality) {
 
 		final CtxQualityBean bean = new CtxQualityBean();
-		bean.setPrecision(quality.getPrecision());
-		bean.setUpdateFrequency(quality.getUpdateFrequency());
+		if (quality.getPrecision() == null)
+			bean.setPrecision(NaD);
+		else
+			bean.setPrecision(quality.getPrecision());
+		if (quality.getUpdateFrequency() == null)
+			bean.setUpdateFrequency(NaD);
+		else
+			bean.setUpdateFrequency(quality.getUpdateFrequency());
 		bean.setOriginType(fromCtxOriginType(quality.getOriginType()));
 		bean.setLastUpdated(quality.getLastUpdated());
 
@@ -664,6 +693,9 @@ public final class CtxModelBeanTranslator {
 		case BINARY: 
 			result = CtxAttributeValueTypeBean.BINARY;
 			break;
+		case COMPLEX: 
+			result = CtxAttributeValueTypeBean.COMPLEX;
+			break;
 		case DOUBLE:
 			result = CtxAttributeValueTypeBean.DOUBLE;
 			break;
@@ -678,8 +710,7 @@ public final class CtxModelBeanTranslator {
 			break;
 		}
 
-		return result; 	
-
+		return result;
 	}
 
 	public CtxAttributeValueType fromCtxAttributeValueTypeBean(CtxAttributeValueTypeBean valueTypeBean) {
@@ -691,6 +722,9 @@ public final class CtxModelBeanTranslator {
 		switch (valueTypeBean) {
 		case BINARY:
 			result = CtxAttributeValueType.BINARY;
+			break;
+		case COMPLEX:
+			result = CtxAttributeValueType.COMPLEX;
 			break;
 		case DOUBLE:
 			result = CtxAttributeValueType.DOUBLE;

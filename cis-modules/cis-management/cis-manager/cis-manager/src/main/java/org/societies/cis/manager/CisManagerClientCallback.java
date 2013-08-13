@@ -13,7 +13,6 @@ import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommCallback;
-import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
 
 
@@ -28,9 +27,7 @@ public class CisManagerClientCallback implements ICommCallback {
 			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/cis/manager",
 //								"http://societies.org/api/schema/activity",
 						  		"http://societies.org/api/schema/cis/community"));
-			//.singletonList("http://societies.org/api/schema/cis/manager");
 	private final static List<String> PACKAGES = Collections
-			//.singletonList("org.societies.api.schema.cis.manager");
 			.unmodifiableList( Arrays.asList("org.societies.api.schema.cis.manager",
 //					"org.societies.api.schema.activity",
 					"org.societies.api.schema.cis.community"));
@@ -38,12 +35,10 @@ public class CisManagerClientCallback implements ICommCallback {
 	private static Logger LOG = LoggerFactory.getLogger(CisManagerClientCallback.class);
 	
 	private CisManager cisManag;
-	//private ICisManagerCallback sourceCallback = null;
 	
 	public CisManagerClientCallback (String clientId, ICisManagerCallback sourceCallback,CisManager cisManag) {
 		clients.put(clientId, sourceCallback);
 		
-		//this.sourceCallback = sourceCallback;
 		this.cisManag = cisManag;
 	}
 	
@@ -121,8 +116,7 @@ public class CisManagerClientCallback implements ICommCallback {
 				}
 				else{ // there is no result field
 					LOG.warn("unsubscription response was mallformed");
-					//this.sourceCallback.receiveResult( (CommunityMethods)null);
-					//return;
+
 				}
 			}
 			// end of join response
@@ -136,15 +130,14 @@ public class CisManagerClientCallback implements ICommCallback {
 				}
 				else{ // there is no result field
 					LOG.warn("get info failed");
-					//this.sourceCallback.receiveResult( (CommunityMethods)null);
-					//return;
+
 				}
 			}
 
 			// return callback for all cases
 			ICisManagerCallback callback = this.getRequestingClient(stanza.getId());
 			callback.receiveResult(c);
-			//this.sourceCallback.receiveResult(c);
+
 			
 			
 			

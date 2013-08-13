@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0"
+	targetNamespace="http://societies.org/api/rfid/schema/client"
+	xmlns:tns="http://societies.org/api/rfid/schema/client"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+
+	<xs:element name="RfidClientBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="rStatus" type="xs:int"
+					minOccurs="0" />
+				<xs:element name="method" type="tns:rfidClientMethodType"
+					minOccurs="0" />
+				<xs:element name="symLoc" type="xs:string"
+					minOccurs="0" />
+				<xs:element name="tagNumber" type="xs:string" 
+					minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
+	<xs:simpleType name="rfidClientMethodType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="acknowledgeRegistration" />
+			<xs:enumeration value="deleteTag" />
+			<xs:enumeration value="sendUpdate" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+</xs:schema>
+

@@ -115,11 +115,11 @@ public class Tester2 {
 			//this.helloWorld.displayUserLocation();
 	
 			try {
-				ResponseItem rItem = this.privacyDataManager.checkPermission(requestor, this.nameAttribute.getId(), new Action(ActionConstants.READ));
-				ResponseItem rItem2 = this.privacyDataManager.checkPermission(requestor, this.nameAttribute2.getId(), new Action(ActionConstants.READ));
+				List<ResponseItem> rItems = this.privacyDataManager.checkPermission(requestor, this.nameAttribute.getId(), new Action(ActionConstants.READ));
+				List<ResponseItem> rItems2 = this.privacyDataManager.checkPermission(requestor, this.nameAttribute2.getId(), new Action(ActionConstants.READ));
 				
 				
-				if (rItem.getDecision().equals(Decision.DENY)){
+				if (rItems != null && rItems.size() > 0 && Decision.DENY.equals(rItems.get(0).getDecision())){
 					for (CtxAttribute attr: attrs){
 						if (attr.getStringValue().equalsIgnoreCase("Chuck Norris")){
 							TestCase.fail("HelloWorld service got access to an attribute it shouldn't have");
@@ -127,7 +127,7 @@ public class Tester2 {
 					}
 				}
 				
-				if (rItem.getDecision().equals(Decision.PERMIT)){
+				if (rItems != null && rItems.size() > 0 && Decision.PERMIT.equals(rItems.get(0).getDecision())){
 					boolean foundAttribute = false;
 					for (CtxAttribute attr: attrs){
 						if (attr.getStringValue().equalsIgnoreCase("Chuck Norris")){
@@ -142,7 +142,7 @@ public class Tester2 {
 				
 				
 				
-				if (rItem2.getDecision().equals(Decision.DENY)){
+				if (rItems2 != null && rItems2.size() > 0 && rItems2.get(0).getDecision().equals(Decision.DENY)){
 					for (CtxAttribute attr: attrs){
 						if (attr.getStringValue().equalsIgnoreCase("Walker, Texas Ranger")){
 							TestCase.fail("HelloWorld service got access to an attribute it shouldn't have");
@@ -150,7 +150,7 @@ public class Tester2 {
 					}
 				}
 				
-				if (rItem2.getDecision().equals(Decision.PERMIT)){
+				if (rItems2 != null && rItems2.size() > 0 && rItems2.get(0).getDecision().equals(Decision.PERMIT)){
 					boolean foundAttribute = false;
 					for (CtxAttribute attr: attrs){
 						if (attr.getStringValue().equalsIgnoreCase("Walker, Texas Ranger")){
@@ -163,8 +163,7 @@ public class Tester2 {
 					}
 				}
 			} catch (PrivacyException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				TestCase.fail("Error during data access:"+e.getMessage());
 			}
 		
 	}

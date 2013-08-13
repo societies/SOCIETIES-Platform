@@ -76,7 +76,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 public class TestActionEvent {
 
 	private CtxEntity personEntity;
-	private MyIdentity mockId;
+	private MockIdentity mockId;
 	private CtxAttribute statusAttribute;
 	private CtxAttribute symLocAttribute;
 	private ICtxBroker ctxBroker = Mockito.mock(ICtxBroker.class);
@@ -240,7 +240,7 @@ public class TestActionEvent {
 	}
 
 	private void createPersonEntity() {
-		mockId = new MyIdentity(IdentityType.CSS, "myId", "domain");
+		mockId = new MockIdentity(IdentityType.CSS, "myId", "domain");
 		CtxEntityIdentifier ctxPersonId = new CtxEntityIdentifier(mockId.getJid(), "Person", new Long(1));
 		personEntity = new CtxEntity(ctxPersonId);
 		

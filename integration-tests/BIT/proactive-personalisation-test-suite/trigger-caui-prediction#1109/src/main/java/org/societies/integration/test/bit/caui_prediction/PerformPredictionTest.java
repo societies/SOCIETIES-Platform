@@ -57,8 +57,8 @@ public class PerformPredictionTest {
 
 			ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 
-			serviceId.setIdentifier(new URI("css://nikosk@societies.org/radioService"));
-			serviceId.setServiceInstanceIdentifier("css://nikosk@societies.org/radioService");
+			serviceId.setIdentifier(new URI("xc.societies.local/NEC_Cobrowse_Service"));
+			serviceId.setServiceInstanceIdentifier("cobrowse-webapp");
 
 			// this action simulates an action performed by the user 
 			IAction actionRadio1 = new Action(serviceId, "serviceType1", "setRadio", "on");

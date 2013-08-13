@@ -24,18 +24,32 @@
  */
 package org.societies.api.internal.privacytrust.privacyprotection.model.listener;
 
-import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 
 
 /**
  * This interface defines a listener for an obfuscation operation.
  * @author Olivier Maridat (Trialog)
- * @date 14 oct. 2011
+ * @created 14-oct.-2011
+ * @updated 05-jun.-2013
  */
 public interface IDataObfuscationListener {
-	public void onObfuscationDone(DataWrapper data);
+	/**
+	 * Send back the obfuscated data
+	 * @param obfuscatedData Obfuscated data wrapped in a DataWrapper (of the same type that the one used to launch the obfuscation)
+	 */
+	public void onObfuscationDone(DataWrapper obfuscatedData);
+	
+	/**
+	 * The operation has been cancelled (by the user or the system)
+	 * @param msg Explanation about the cancel (if any)
+	 */
 	public void onObfuscationCancelled(String msg);
+	
+	/**
+	 * The operation has been aborted (by the system)
+	 * @param msg Explanation about the abort (if any)
+	 * @param e Error explanation
+	 */
 	public void onObfuscationAborted(String msg, Exception e);
-	public void onObfuscatedVersionRetrieved(CtxIdentifier dataId, boolean retrieved);
 }

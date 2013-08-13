@@ -65,7 +65,7 @@ public class CisManagerClientCallback implements ICisManagerCallback{
 			if (communityResultObject.getJoinResponse().isResult()){
 				LOG.info("### [CisManagerClientCallback] join successfully done");
 				
-				performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "Join CIS successfully done", PerformanceTestResult.SUCCESS_STATUS);
+				performanceTestResult = new PerformanceTestResult(this.getClass().getName(), "Join CIS: " + communityJid +" successfully done" , PerformanceTestResult.SUCCESS_STATUS);
 				performanceLowerTester.testFinish(performanceTestResult);
 			}
 			else

@@ -28,7 +28,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.net.URI;
@@ -41,8 +40,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +50,6 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.identity.util.RequestorUtils;
-import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyDataManagerListener;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
@@ -61,9 +57,9 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -74,7 +70,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  * @author Olivier Maridat (Trialog)
  *
  */
-public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
+public class PrivacyPolicyManagerTest {
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManagerTest.class);
 	public static Integer testCaseNumber = 0;
 
@@ -114,6 +110,19 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 				lock.countDown();
 			}
 
+			@Override
+			public void onPrivacyPolicyRetrieved(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy privacyPolicy) {
+				succeed = true;
+				try {
+					retrievedPrivacyPolicy = RequestPolicyUtils.toRequestPolicy(privacyPolicy, TestCase.commManager.getIdManager());
+				} catch (InvalidFormatException e) {
+					onOperationAborted("Privacy policy retrieved, but it is ununderstandable", e);
+				}
+				resultMsg = "Privacy policy retrieved or updated!";
+				//				LOG.debug("onPrivacyPolicyRetrieved"+resultMsg);
+				lock.countDown();
+			}
+			
 			@Override
 			public void onOperationSucceed(String msg) {
 				succeed = true;
@@ -684,47 +693,5 @@ public class PrivacyPolicyManagerTest implements IPrivacyPolicyManagerListener {
 		IIdentity otherCssId = TestCase.commManager.getIdManager().fromJid("olivier.societies.local");
 		IIdentity cisId = TestCase.commManager.getIdManager().fromJid("cis-one.societies.local");
 		return new RequestorCis(otherCssId, cisId);
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener#onPrivacyPolicyRetrieved(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
-	 */
-	@Override
-	public void onPrivacyPolicyRetrieved(RequestPolicy privacyPolicy) {
-		LOG.info("onPrivacyPolicyRetrieved: "+privacyPolicy.toXMLString());
-		if (null != privacyPolicy) {
-			LOG.info(privacyPolicy.toXMLString());
-		}
-		else {
-			LOG.error("*** Privacy Policy retrieved is null!");
-		}
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener#onOperationSucceed(java.lang.String)
-	 */
-	@Override
-	public void onOperationSucceed(String msg) {
-		LOG.info("onOperationSucceed: "+msg);
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener#onOperationCancelled(java.lang.String)
-	 */
-	@Override
-	public void onOperationCancelled(String msg) {
-		LOG.info("onOperationCancelled: "+msg);
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener#onOperationAborted(java.lang.String, java.lang.Exception)
-	 */
-	@Override
-	public void onOperationAborted(String msg, Exception e) {
-		LOG.info("onOperationAborted: "+msg, e);
 	}
 }

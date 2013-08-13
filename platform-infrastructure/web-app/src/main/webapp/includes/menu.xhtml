@@ -22,10 +22,12 @@
                     <li><a href="privacysettings.xhtml">Privacy Settings</a>
 					<ul>
 						<li><a href="privacysettings.xhtml">Privacy Policy</a></li>
-						<li><a href="privacypreference.xhtml">Privacy Preference</a></li>
+						<li><a href="privacypreferences.xhtml">Privacy Preferences</a></li>
 						<li><a href="privacy_assessment.xhtml">Privacy Assessment</a></li>
+						<li><a href="privacy_assessment_settings.xhtml">Privacy Assessment Settings</a></li>
 					</ul>
 					</li>
+                    <li><a href="trust.xhtml">Trust Settings</a></li>
 				</ul>
 			</li>
             <li><a href="your_installed_apps.xhtml"><br/>Apps</a>
@@ -48,13 +50,14 @@
             <li>
                 <div class="notification-bubble">
                     <p:commandLink update="notificationDialog"
-                                   oncomplete="#{p:widgetVar('notificationDialog')}.show();">
+                                   oncomplete="#{p:widgetVar('notificationDialog')}.show();"
+                                   rendered="#{loginController.loggedIn and noNotificationPopup ne 'true'}">
 
                         <p:outputPanel id="notification-count-wrapper">
                             <h:outputText
                                     id="notification-count"
-                                    rendered="#{userService.userLoggedIn and notifications.numUnreadNotifications gt 0}"
-                                    value="#{notifications.numUnreadNotifications}"/>
+                                    rendered="#{userService.userLoggedIn and notifications.numUnansweredNotifications gt 0}"
+                                    value="#{notifications.numUnansweredNotifications}"/>
                         </p:outputPanel>
                     </p:commandLink>
                 </div>

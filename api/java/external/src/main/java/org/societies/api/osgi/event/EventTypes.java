@@ -95,6 +95,28 @@ public class EventTypes {
 
 	/** Used by ICO for recommendation messages  	 */
 	public static final String ICO_RECOMMENDTION_EVENT = "org/societies/orchestration/ICO";
+	
+	/**
+	 * Used to publish new {@link org.societies.api.privacytrust.trust.model.TrustEvidence trust evidence}
+	 * to the Trust Evidence Collector. The event is structured as follows:
+	 * <table> 
+	 *   <tr>
+	 *     <td><code>eventName:</code></td>
+	 *     <td>The type of the new piece of trust evidence, i.e. {@link org.societies.api.privacytrust.trust.evidence.TrustEvidenceType#name TrustEvidenceType#name}</td>
+	 *   </tr>
+     *   <tr>
+     *     <td><code>eventSource:</code></td> 
+     *     <td>The name of the component that found the evidence, e.g. "CtxBroker"</td>
+     *   </tr>
+     *   <tr>
+     *     <td><code>eventInfo:</code></td> 
+     *     <td>The new piece of {@link org.societies.api.privacytrust.trust.model.TrustEvidence TrustEvidence}</td>
+     *   </tr>  
+     * </table>
+     * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+     * @since 1.2
+     */
+	public static final String TRUST_EVIDENCE_EVENT = "org/societies/privacytrust/trust/event/TRUST_EVIDENCE";
 
 	// CIS RELATED EVENTS
 

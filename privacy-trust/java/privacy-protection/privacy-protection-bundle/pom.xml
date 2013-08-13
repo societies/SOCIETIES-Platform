@@ -149,6 +149,7 @@
 							org.societies.identity,
 							*;resolution:=optional
 						</Import-Package> <!-- Added org.societies.identity import because of Privacy policy serialization -->
+						<Export-Package>org.societies.privacytrust.privacyprotection.api.*</Export-Package>
 					</instructions>
 				</configuration>
 			</plugin>

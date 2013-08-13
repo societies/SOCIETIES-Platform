@@ -62,6 +62,7 @@ public class CtxEntityTypes {
     /**
      * 
      */
+    @Deprecated
     public static final String PRIVACY_POLICY = "privacyPolicy";
     
     /**

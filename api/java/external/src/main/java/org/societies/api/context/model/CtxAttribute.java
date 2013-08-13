@@ -98,9 +98,6 @@ public class CtxAttribute extends CtxModelObject {
 	/** The QoC meta-data. */
 	private final CtxQuality quality = new CtxQuality(this);
 	
-	/** The complex value of this context attribute. */
-	private CtxAttributeComplexValue complexValue = new CtxAttributeComplexValue();
-	
 	/** The identifier of the context source for the current attribute value. */
 	private String sourceId;
 	
@@ -287,48 +284,51 @@ public class CtxAttribute extends CtxModelObject {
 	}
 
 	/**
-	 * Returns the value of this context attribute or <code>null</code>
-	 * if the value is not a String.
+	 * Returns the complex value of this context attribute or <code>null</code>
+	 * if the value is not of type {@link CtxAttributeComplexValue}.
 	 * 
-	 * @return the value of this context attribute or <code>null</code>
-	 *         if the value is not a String.
+	 * @return the complex value of this context attribute or <code>null</code>
+	 *         if the value is not of type {@link CtxAttributeComplexValue}.
+	 * @see #getStringValue()
 	 * @see #getIntegerValue()
 	 * @see #getDoubleValue()
 	 * @see #getBinaryValue()
-	 * @see #getComplexValue()
 	 */
 	public CtxAttributeComplexValue getComplexValue() {
-		this.binaryValue = this.getBinaryValue();
-		if (binaryValue != null)
+		
+		if (this.binaryValue != null) {
 			try {
-				this.complexValue = (CtxAttributeComplexValue) SerialisationHelper.deserialise(binaryValue, complexValue.getClass().getClassLoader());
+				return (CtxAttributeComplexValue) SerialisationHelper.deserialise(
+						this.binaryValue, this.getClass().getClassLoader());
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				return null;
 			}
-		return this.complexValue;
+		} else {
+			return null;
+		}
 	}
 	
 	/**
-	 * Sets the value of this context attribute to the specified String.
+	 * Sets the complex value of this context attribute to the specified
+	 * {@link CtxAttributeComplexValue}.
 	 * 
 	 * @param value
-	 *            the String value to set
+	 *            the {@link CtxAttributeComplexValue} value to set.
+	 * @see #setStringValue(String)
 	 * @see #setIntegerValue(Integer)
 	 * @see #setDoubleValue(Double)
 	 * @see #setBinaryValue(byte[])
-	 * @see #setComplexValue(CtxAttributeComplexValue)
 	 */
 	public void setComplexValue(CtxAttributeComplexValue value) {
 
 		try {
-			this.binaryValue = SerialisationHelper.serialise(value);
+			final byte[] serialisedComplexValue = SerialisationHelper.serialise(value);
+			this.setBinaryValue(serialisedComplexValue);
+			this.setValueType(CtxAttributeValueType.COMPLEX);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IllegalArgumentException("Could not serialise complex value '"
+					+ value + "': " + e.getLocalizedMessage(), e);
 		}
-		this.setBinaryValue(binaryValue);
-		this.setValueType(CtxAttributeValueType.COMPLEX);
 	}
 	
 	Serializable getValue() {
@@ -480,5 +480,27 @@ public class CtxAttribute extends CtxModelObject {
 	public void setHistoryRecorded(boolean historyRecorded) {
 		
 		this.historyRecorded = historyRecorded;
+	}
+	
+	/**
+	 * Returns a String representation of this context attribute.
+     * 
+     * @return a String representation of this context attribute.
+     * @since 2.0
+     */
+	@Override
+	public String toString() {
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append(this.getClass().getSimpleName());
+		sb.append(" {id=");
+		sb.append(this.getId());
+		sb.append(", lastModified=");
+		sb.append(this.getLastModified());
+		sb.append(", value=");
+		sb.append(this.getValue());
+		sb.append("}");
+		
+		return sb.toString();
 	}
 }

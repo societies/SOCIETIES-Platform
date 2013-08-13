@@ -59,6 +59,10 @@
         <activity android:name="org.societies.android.platform.useragent.feedback.guis.AcknackPopup" />
         <activity android:name="org.societies.android.platform.useragent.feedback.guis.CheckboxPopup" />
         <activity android:name="org.societies.android.platform.useragent.feedback.guis.RadioPopup" />
+        <activity android:name="org.societies.android.platform.useragent.feedback.guis.SimpleNotificationPopup" />
+        <activity android:name="org.societies.android.platform.useragent.feedback.guis.TimedAbortPopup" />
+        <activity android:name="org.societies.android.platform.useragent.feedback.guis.UserFeedbackHistoryList" />
+        <activity android:name="org.societies.android.platform.useragent.feedback.guis.NotificationHistoryPopup" />
         <!-- LOCAL SERVICES -->
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceManagementLocal" />
 		<service android:name="org.societies.android.platform.servicemonitor.ServiceUtilitiesRemote" />
@@ -70,10 +74,12 @@
         <service android:name="org.societies.android.platform.socialdata.SocialData" />
         <service android:name="org.societies.android.platform.css.friends.FriendsManagerLocal" />
         <service android:name="org.societies.android.platform.css.friends.EventService" />
-        <service android:name="org.societies.android.platform.useragent.feedback.EventListener" />
         <service android:name="org.societies.android.privacytrust.datamanagement.service.PrivacyDataManagerLocalService" />
         <service android:name="org.societies.android.privacytrust.policymanagement.service.PrivacyPolicyManagerLocalService" />
         <service android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidLocal" />
+        <service android:name="org.societies.android.platform.useragent.feedback.EventListener" />
+        <service android:name="org.societies.android.platform.useragent.feedback.EventHistory" />
+        <service android:name="org.societies.android.privacytrust.trust.TrustClientLocal" />
         <!-- REMOTE SERVICES -->
         <service android:name="org.societies.android.platform.cis.CisDirectoryRemote" android:label="Cis Directory Remote" >
            <intent-filter>

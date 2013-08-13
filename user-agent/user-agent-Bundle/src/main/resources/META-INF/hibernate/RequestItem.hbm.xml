@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem"
+           table="PrivacyPolicyRequestItem">
+
+        <id name="requestItemId" type="string" column="requestItemId">
+            <generator class="uuid"/>
+        </id>
+
+        <array name="actions" table="RequestItem_actions">
+            <key column="action_id"/>
+            <index column="action_index"/>
+            <element column="action" type="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action"/>
+        </array>
+
+        <list name="conditions" lazy="false">
+            <key column="condition_id"/>
+            <index column="condition_index"/>
+            <one-to-many class="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition"/>
+        </list>
+
+        <property name="optional" column="optional" type="boolean"/>
+
+        <one-to-one name="resource"
+                    class="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource"
+                    cascade="all"/>
+
+    </class>
+</hibernate-mapping>

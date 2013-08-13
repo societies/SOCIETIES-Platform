@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 import org.societies.api.activity.IActivity;
-import org.societies.api.cis.management.ICisOwned;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 

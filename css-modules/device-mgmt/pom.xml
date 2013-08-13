@@ -26,5 +26,7 @@
 		<module>DeviceDriverSimulator</module>
 		<module>devicemanager</module>
 		<module>devicemanagerconsumer</module>
+		<module>RFIDDriver</module>
+		<module>RFIDPlugins</module>
 	</modules>
 </project>

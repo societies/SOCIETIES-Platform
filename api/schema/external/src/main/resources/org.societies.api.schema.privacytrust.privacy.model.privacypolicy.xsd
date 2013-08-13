@@ -12,7 +12,8 @@
 
 	<xs:complexType name="responseItem">
 		<xs:sequence>
-			<xs:element name="decision" type="tns:decision" minOccurs="0" />
+            <xs:element name="responseItemId" type="xs:string" minOccurs="0" />
+            <xs:element name="decision" type="tns:decision" minOccurs="0" />
 			<xs:element name="requestItem" type="tns:requestItem"
 				minOccurs="0" />
 		</xs:sequence>
@@ -33,7 +34,8 @@
 
 	<xs:complexType name="requestItem">
 		<xs:sequence>
-			<xs:element name="actions" type="tns:action" nillable="true"
+            <xs:element name="requestItemId" type="xs:string" minOccurs="0" />
+            <xs:element name="actions" type="tns:action" nillable="true"
 				minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="conditions" type="tns:condition"
 				nillable="true" minOccurs="0" maxOccurs="unbounded" />
@@ -52,7 +54,8 @@
 
 	<xs:complexType name="condition">
 		<xs:sequence>
-			<xs:element name="conditionConstant" type="tns:conditionConstants"
+            <xs:element name="conditionId" type="xs:string" minOccurs="0" />
+            <xs:element name="conditionConstant" type="tns:conditionConstants"
 				minOccurs="0" />
 			<xs:element name="optional" type="xs:boolean" />
 			<xs:element name="value" type="xs:string" minOccurs="0" />
@@ -61,6 +64,7 @@
 
 	<xs:complexType name="resource">
 		<xs:sequence>
+			<xs:element name="resourceId" type="xs:string" minOccurs="0" />
 			<xs:element name="dataIdUri" type="xs:string" minOccurs="0" />
 			<xs:element name="dataType" type="xs:string" minOccurs="0" />
 			<xs:element name="scheme" type="ns1:dataIdentifierScheme"
@@ -78,10 +82,11 @@
 				minOccurs="0" />
 		</xs:sequence>
 	</xs:complexType>
-	
+
 	<xs:complexType name="responsePolicy">
 		<xs:sequence>
-			<xs:element name="responseItems" type="tns:responseItem" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="responsePolicyId" type="xs:string" minOccurs="0" />
+            <xs:element name="responseItems" type="tns:responseItem" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:element name="negotiationStatus" type="tns:negotiationStatus" nillable="false" minOccurs="1" maxOccurs="1" />
 			<xs:element name="requestor" type="ns1:requestorBean" minOccurs="0" />
 		</xs:sequence>
@@ -103,7 +108,7 @@
 			<xs:enumeration value="failed"/>
 		</xs:restriction>
 	</xs:simpleType>
-	
+
 	<xs:simpleType name="privacyPolicyTypeConstants">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="service" />

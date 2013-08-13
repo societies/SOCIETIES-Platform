@@ -117,8 +117,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 	TrustEventMgr(ITrustNodeMgr trustNodeMgr, PubsubClient pubsubClient)
 			throws Exception {
 		
-		if (LOG.isInfoEnabled())
-			LOG.info(this.getClass() + " instantiated");
+		LOG.info("{} instantiated", this.getClass());
 		this.trustNodeMgr = trustNodeMgr;
 		this.pubsubClient = pubsubClient;
 		try {
@@ -136,10 +135,12 @@ public class TrustEventMgr implements ITrustEventMgr {
 	@Override
 	public void postEvent(final TrustEvent event, final String[] topics) {
 		
-		if (event == null)
+		if (event == null) {
 			throw new NullPointerException("event can't be null");
-		if (topics == null)
+		}
+		if (topics == null) {
 			throw new NullPointerException("topics can't be null");
+		}
 		
 		this.localDispatchingService.execute(new LocalTrustEventDispatcher(
 				event, topics));
@@ -154,10 +155,12 @@ public class TrustEventMgr implements ITrustEventMgr {
 	public void registerUpdateListener(final ITrustUpdateEventListener listener, 
 			final String[] topics) throws TrustEventMgrException {
 		
-		if (listener == null)
+		if (listener == null) {
 			throw new NullPointerException("listener can't be null");
-		if (topics == null)
+		} 
+		if (topics == null) {
 			throw new NullPointerException("topics can't be null");
+		}
 		
 		this.doRegisterUpdateListener(listener, topics, null, null);
 	}
@@ -169,10 +172,12 @@ public class TrustEventMgr implements ITrustEventMgr {
 	public void unregisterUpdateListener(final ITrustUpdateEventListener listener, 
 			final String[] topics) throws TrustEventMgrException {
 		
-		if (listener == null)
+		if (listener == null) {
 			throw new NullPointerException("listener can't be null");
-		if (topics == null)
+		}
+		if (topics == null) {
 			throw new NullPointerException("topics can't be null");
+		}
 		
 		this.doUnregisterUpdateListener(listener, topics, null, null);
 	}
@@ -185,14 +190,18 @@ public class TrustEventMgr implements ITrustEventMgr {
 			final String[] topics, final TrustedEntityId trustorId) 
 					throws TrustEventMgrException {
 		
-		if (listener == null)
+		if (listener == null) {
 			throw new NullPointerException("listener can't be null");
-		if (topics == null)
+		}
+		if (topics == null) {
 			throw new NullPointerException("topics can't be null");
-		if (topics.length == 0)
+		}
+		if (topics.length == 0) {
 			throw new IllegalArgumentException("topics can't be empty");
-		if (trustorId == null)
+		}
+		if (trustorId == null) {
 			throw new NullPointerException("trustorId can't be null");
+		}
 		
 		this.doRegisterUpdateListener(listener, topics, trustorId, null);
 	}
@@ -205,14 +214,18 @@ public class TrustEventMgr implements ITrustEventMgr {
 			final String[] topics, final TrustedEntityId trustorId)
 					throws TrustEventMgrException {
 		
-		if (listener == null)
+		if (listener == null) {
 			throw new NullPointerException("listener can't be null");
-		if (topics == null)
+		}
+		if (topics == null) {
 			throw new NullPointerException("topics can't be null");
-		if (topics.length == 0)
+		}
+		if (topics.length == 0) {
 			throw new IllegalArgumentException("topics can't be empty");
-		if (trustorId == null)
+		}
+		if (trustorId == null) {
 			throw new NullPointerException("trustorId can't be null");
+		}
 		
 		this.doUnregisterUpdateListener(listener, topics, trustorId, null);
 	}
@@ -225,16 +238,21 @@ public class TrustEventMgr implements ITrustEventMgr {
 			final String[] topics, final TrustedEntityId trustorId,
 			final TrustedEntityId trusteeId) throws TrustEventMgrException {
 		
-		if (listener == null)
+		if (listener == null) {
 			throw new NullPointerException("listener can't be null");
-		if (topics == null)
+		}
+		if (topics == null) {
 			throw new NullPointerException("topics can't be null");
-		if (topics.length == 0)
+		}
+		if (topics.length == 0) {
 			throw new IllegalArgumentException("topics can't be empty");
-		if (trustorId == null)
+		}
+		if (trustorId == null) {
 			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
+		}
+		if (trusteeId == null) {
 			throw new NullPointerException("trusteeId can't be null");
+		}
 		
 		this.doRegisterUpdateListener(listener, topics, trustorId, trusteeId);
 	}
@@ -247,16 +265,21 @@ public class TrustEventMgr implements ITrustEventMgr {
 			final String[] topics, final TrustedEntityId trustorId,
 			final TrustedEntityId trusteeId) throws TrustEventMgrException {
 		
-		if (listener == null)
+		if (listener == null) {
 			throw new NullPointerException("listener can't be null");
-		if (topics == null)
+		}
+		if (topics == null) {
 			throw new NullPointerException("topics can't be null");
-		if (topics.length == 0)
+		}
+		if (topics.length == 0) {
 			throw new IllegalArgumentException("topics can't be empty");
-		if (trustorId == null)
+		}
+		if (trustorId == null) {
 			throw new NullPointerException("trustorId can't be null");
-		if (trusteeId == null)
+		}
+		if (trusteeId == null) {
 			throw new NullPointerException("trusteeId can't be null");
+		}
 		
 		this.doUnregisterUpdateListener(listener, topics, trustorId, trusteeId);
 	}
@@ -305,16 +328,21 @@ public class TrustEventMgr implements ITrustEventMgr {
 			final String[] topics, final TrustedEntityId trustorId,
 			final TrustedEntityType trusteeType) throws TrustEventMgrException {
 		
-		if (listener == null)
+		if (listener == null) {
 			throw new NullPointerException("listener can't be null");
-		if (topics == null)
+		}
+		if (topics == null) {
 			throw new NullPointerException("topics can't be null");
-		if (topics.length == 0)
+		}
+		if (topics.length == 0) {
 			throw new IllegalArgumentException("topics can't be empty");
-		if (trustorId == null)
+		}
+		if (trustorId == null) {
 			throw new NullPointerException("trustorId can't be null");
-		if (trusteeType == null)
+		}
+		if (trusteeType == null) {
 			throw new NullPointerException("trusteeType can't be null");
+		}
 		
 		this.doRegisterUpdateListenerByType(listener, topics, trustorId, trusteeType);
 	}
@@ -327,16 +355,21 @@ public class TrustEventMgr implements ITrustEventMgr {
 			final String[] topics, final TrustedEntityId trustorId,
 			final TrustedEntityType trusteeType) throws TrustEventMgrException {
 		
-		if (listener == null)
+		if (listener == null) {
 			throw new NullPointerException("listener can't be null");
-		if (topics == null)
+		}
+		if (topics == null) {
 			throw new NullPointerException("topics can't be null");
-		if (topics.length == 0)
+		}
+		if (topics.length == 0) {
 			throw new IllegalArgumentException("topics can't be empty");
-		if (trustorId == null)
+		}
+		if (trustorId == null) {
 			throw new NullPointerException("trustorId can't be null");
-		if (trusteeType == null)
+		}
+		if (trusteeType == null) {
 			throw new NullPointerException("trusteeType can't be null");
+		}
 		
 		this.doUnregisterUpdateListenerByType(listener, topics, trustorId, trusteeType);
 	}
@@ -382,27 +415,23 @@ public class TrustEventMgr implements ITrustEventMgr {
 			final String[] topics, final String filter) 
 					throws TrustEventMgrException {
 		
-		if (LOG.isInfoEnabled()) 
-			LOG.info("Registering local TrustUpdateEvent listener " + listener 
-					+ " to topics "	+ Arrays.toString(topics) 
-					+ " using filter '" + filter + "'");
+		LOG.info("Registering local TrustUpdateEvent listener {}" 
+				+ " to topics {} using filter '{}'", new Object[] {
+						listener, Arrays.toString(topics), filter });
 		final LocalTrustEventHandler localHandler = 
 				new LocalTrustUpdateEventHandler(listener, filter);
-		if (LOG.isDebugEnabled())
-			LOG.debug("localHandlers size before register: " + this.localHandlers.size());
+		LOG.debug("localHandlers size before register: {}", this.localHandlers.size());
 		if (this.localHandlers.add(localHandler)) {
-			if (LOG.isDebugEnabled()) 
-				LOG.debug("Registering local TrustUpdateEvent handler " + localHandler 
-						+ " to topics "	+ Arrays.toString(topics) 
-						+ " using filter '" + filter + "'");
+			LOG.debug("Registering local TrustUpdateEvent handler {}" 
+					+ " to topics {} using filter '{}'", new Object[] {
+							localHandler, Arrays.toString(topics), filter });
 			this.eventMgr.subscribeInternalEvent(localHandler,
 				topics,	filter);
 		} else {
 			LOG.warn("TrustUpdateEvent listener " + listener + " already registered to topics "
 					+ Arrays.toString(topics));
 		}
-		if (LOG.isDebugEnabled())
-			LOG.debug("localHandlers size after register: " + this.localHandlers.size());
+		LOG.debug("localHandlers size after register: {}", this.localHandlers.size());
 	}
 	
 	private void doUnregisterLocalUpdateListener(
@@ -410,27 +439,23 @@ public class TrustEventMgr implements ITrustEventMgr {
 			final String[] topics, final String filter) 
 					throws TrustEventMgrException {
 		
-		if (LOG.isInfoEnabled()) 
-			LOG.info("Unregistering local TrustUpdateEvent listener "
-					+ listener + " from topics " + Arrays.toString(topics) 
-					+ " using filter '" + filter + "'");
+		LOG.info("Unregistering local TrustUpdateEvent listener {} from topics {}"
+				+ " using filter '{}'", new Object[] { listener, 
+						Arrays.toString(topics), filter });
 		final LocalTrustEventHandler localHandler = 
 				new LocalTrustUpdateEventHandler(listener, filter);
-		if (LOG.isDebugEnabled())
-			LOG.debug("localHandlers size before unregister: " + this.localHandlers.size());
+		LOG.debug("localHandlers size before unregister: {}", this.localHandlers.size());
 		if (this.localHandlers.remove(localHandler)) {
-			if (LOG.isDebugEnabled()) 
-				LOG.debug("Unregistering local TrustUpdateEvent handler " + localHandler 
-						+ " from topics "	+ Arrays.toString(topics) 
-						+ " using filter '" + filter + "'");
+			LOG.debug("Unregistering local TrustUpdateEvent handler {}"  
+					+ " from topics {} using filter '{}'", new Object[] {
+							localHandler, Arrays.toString(topics), filter });
 			this.eventMgr.unSubscribeInternalEvent(localHandler, topics, filter);
 		} else {
 			LOG.warn("Nothing to do - TrustUpdateEvent listener " + listener 
 					+ " was not registered to topics " 
 					+ Arrays.toString(topics));
 		}
-		if (LOG.isDebugEnabled())
-			LOG.debug("localHandlers size after unregister: " + this.localHandlers.size());
+		LOG.debug("localHandlers size after unregister: {}", this.localHandlers.size());
 	}
 	
 	private void doRegisterRemoteUpdateListener(
@@ -439,12 +464,10 @@ public class TrustEventMgr implements ITrustEventMgr {
 			final String trustorIdFilter, final String trusteeIdFilter)
 					throws TrustEventMgrException {
 		
-		if (LOG.isInfoEnabled()) 
-			LOG.info("Registering remote TrustUpdateEvent listener " 
-					+ listener + " to topics " + Arrays.toString(topics)
-					+ " using filters"
-					+ ": trustorIdFilter=" + trustorIdFilter
-					+ ", trusteeIdFilter=" + trusteeIdFilter);
+		LOG.info("Registering remote TrustUpdateEvent listener {} to topics {}" 
+				+ " using filters: trustorIdFilter={}, trusteeIdFilter={}",
+				new Object[] { listener, Arrays.toString(topics), 
+						trustorIdFilter, trusteeIdFilter });
 		try {
 			final IIdentity pubsubId;
 			if (trustorId != null)
@@ -457,16 +480,16 @@ public class TrustEventMgr implements ITrustEventMgr {
 				final RemoteTrustUpdateEventHandler remoteHandler =
 						new RemoteTrustUpdateEventHandler(listener, trustorIdFilter,
 								trusteeIdFilter, trustValueType);
-				if (LOG.isDebugEnabled())
-					LOG.debug("remoteHandlers size before register: " + this.remoteHandlers.size());
+				LOG.debug("remoteHandlers size before register: {}", this.remoteHandlers.size());
 				if (this.remoteHandlers.add(remoteHandler)) {
-					if (LOG.isDebugEnabled()) 
-						LOG.debug("Registering remote TrustUpdateEvent handler "
-								+ remoteHandler + " to topic " + topics[i]
-								+ " of pubsubId " + pubsubId + " using filters"
-								+ ": trustorIdFilter=" + trustorIdFilter
-								+ ", trusteeIdFilter=" + trusteeIdFilter
-								+ ", trustValueType=" + trustValueType);
+					LOG.debug("Registering remote TrustUpdateEvent handler {}"
+							+ " to topic {} of pubsubId {} using filters"
+							+ ": trustorIdFilter={}, trusteeIdFilter={}" 
+							+ ", trustValueType={}", new Object[] { 
+									remoteHandler, topics[i], pubsubId,
+									trustorIdFilter, trusteeIdFilter, 
+									trustValueType });
+					
 					try {
 						this.pubsubClient.subscriberSubscribe(pubsubId, 
 								topics[i], remoteHandler);
@@ -475,11 +498,10 @@ public class TrustEventMgr implements ITrustEventMgr {
 						throw e;
 					}
 				} else {
-					LOG.warn("TrustUpdateEvent listener " + listener + " already registered to topic "
-							+ topics[i]);
+					LOG.warn("TrustUpdateEvent listener " + listener 
+							+ " already registered to topic " + topics[i]);
 				}
-				if (LOG.isDebugEnabled())
-					LOG.debug("remoteHandlers size after register: " + this.remoteHandlers.size());
+				LOG.debug("remoteHandlers size after register: {}", this.remoteHandlers.size());
 			}
 		} catch (Exception e) {
 			throw new TrustEventMgrException("Could not register remote TrustUpdateEvent listener "
@@ -494,12 +516,11 @@ public class TrustEventMgr implements ITrustEventMgr {
 			final String trustorIdFilter, final String trusteeIdFilter)
 					throws TrustEventMgrException {
 		
-		if (LOG.isInfoEnabled()) 
-			LOG.info("Unregistering remote TrustUpdateEvent listener " 
-					+ listener + " from topics " + Arrays.toString(topics)
-					+ " using filters"
-					+ ": trustorIdFilter=" + trustorIdFilter
-					+ ", trusteeIdFilter=" + trusteeIdFilter);
+		LOG.info("Unregistering remote TrustUpdateEvent listener {}"
+				+ " from topics {} using filters: trustorIdFilter={}"
+				+ ", trusteeIdFilter=", new Object[] { 
+						listener, Arrays.toString(topics),
+						trustorIdFilter, trusteeIdFilter });
 		try {
 			final IIdentity pubsubId;
 			if (trustorId != null)
@@ -512,16 +533,15 @@ public class TrustEventMgr implements ITrustEventMgr {
 				final RemoteTrustUpdateEventHandler remoteHandler =
 						new RemoteTrustUpdateEventHandler(listener, trustorIdFilter,
 								trusteeIdFilter, trustValueType);
-				if (LOG.isDebugEnabled())
-					LOG.debug("remoteHandlers size before unregister: " + this.remoteHandlers.size());
+				LOG.debug("remoteHandlers size before unregister: {}", this.remoteHandlers.size());
 				if (this.remoteHandlers.remove(remoteHandler)) {
-					if (LOG.isDebugEnabled()) 
-						LOG.debug("Unregistering remote TrustUpdateEvent handler "
-								+ remoteHandler + " from topic " + topics[i]
-								+ " of pubsubId " + pubsubId + " using filters"
-								+ ": trustorIdFilter=" + trustorIdFilter
-								+ ", trusteeIdFilter=" + trusteeIdFilter
-								+ ", trustValueType=" + trustValueType);
+					LOG.debug("Unregistering remote TrustUpdateEvent handler {}"
+							+ " from topic {} of pubsubId {} using filters"
+							+ ": trustorIdFilter={}, trusteeIdFilter={}" 
+							+ ", trustValueType={}", new Object[] { 
+									remoteHandler, topics[i], pubsubId,
+									trustorIdFilter, trusteeIdFilter, 
+									trustValueType });
 					try {
 						this.pubsubClient.subscriberUnsubscribe(pubsubId, 
 								topics[i], remoteHandler);
@@ -533,8 +553,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 					LOG.warn("Nothing to do - TrustUpdateEvent listener " + listener 
 							+ " was not registered to topic " + topics[i]);
 				}
-				if (LOG.isDebugEnabled())
-					LOG.debug("remoteHandlers size after unregister: " + this.remoteHandlers.size());
+				LOG.debug("remoteHandlers size after unregister: {}", this.remoteHandlers.size());
 			}
 		} catch (Exception e) {
 			throw new TrustEventMgrException("Could not unregister remote TrustUpdateEvent listener "
@@ -551,10 +570,12 @@ public class TrustEventMgr implements ITrustEventMgr {
 			final ITrustEvidenceUpdateEventListener listener, 
 			final String[] topics) throws TrustEventMgrException {
 		
-		if (listener == null)
+		if (listener == null) {
 			throw new NullPointerException("listener can't be null");
-		if (topics == null)
+		}
+		if (topics == null) {
 			throw new NullPointerException("topics can't be null");
+		}
 		
 		this.doRegisterEvidenceUpdateListener(listener, topics, null, null);
 	}
@@ -567,10 +588,12 @@ public class TrustEventMgr implements ITrustEventMgr {
 			final ITrustEvidenceUpdateEventListener listener, 
 			final String[] topics) throws TrustEventMgrException {
 		
-		if (listener == null)
+		if (listener == null) {
 			throw new NullPointerException("listener can't be null");
-		if (topics == null)
+		}
+		if (topics == null) {
 			throw new NullPointerException("topics can't be null");
+		}
 		
 		this.doUnregisterEvidenceUpdateListener(listener, topics, null, null);
 	}
@@ -584,16 +607,21 @@ public class TrustEventMgr implements ITrustEventMgr {
 			final String[] topics, final TrustedEntityId subjectId,
 			final TrustedEntityId objectId) throws TrustEventMgrException {
 		
-		if (listener == null)
+		if (listener == null) {
 			throw new NullPointerException("listener can't be null");
-		if (topics == null)
+		}
+		if (topics == null) {
 			throw new NullPointerException("topics can't be null");
-		if (topics.length == 0)
+		}
+		if (topics.length == 0) {
 			throw new IllegalArgumentException("topics can't be empty");
-		if (subjectId == null)
+		}
+		if (subjectId == null) {
 			throw new NullPointerException("subjectId can't be null");
-		if (objectId == null)
+		}
+		if (objectId == null) {
 			throw new NullPointerException("objectId can't be null");
+		}
 		
 		this.doRegisterEvidenceUpdateListener(listener, topics, subjectId, objectId);
 	}
@@ -607,16 +635,21 @@ public class TrustEventMgr implements ITrustEventMgr {
 			final String[] topics, final TrustedEntityId subjectId,
 			final TrustedEntityId objectId) throws TrustEventMgrException {
 		
-		if (listener == null)
+		if (listener == null) {
 			throw new NullPointerException("listener can't be null");
-		if (topics == null)
+		}
+		if (topics == null) {
 			throw new NullPointerException("topics can't be null");
-		if (topics.length == 0)
+		}
+		if (topics.length == 0) {
 			throw new IllegalArgumentException("topics can't be empty");
-		if (subjectId == null)
+		}
+		if (subjectId == null) {
 			throw new NullPointerException("subjectId can't be null");
-		if (objectId == null)
+		}
+		if (objectId == null) {
 			throw new NullPointerException("objectId can't be null");
+		}
 		
 		this.doUnregisterEvidenceUpdateListener(listener, topics, subjectId, objectId);
 	}
@@ -627,13 +660,11 @@ public class TrustEventMgr implements ITrustEventMgr {
 			final TrustedEntityId objectId) throws TrustEventMgrException {
 		
 		final String filter = this.createLocalFilter(subjectId, objectId);
-		if (LOG.isInfoEnabled()) 
-			LOG.info("Registering TrustEvidenceUpdateEvent listener " 
-					+ listener + " to topics " + Arrays.toString(topics));
+		LOG.info("Registering TrustEvidenceUpdateEvent listener {}" 
+					+ " to topics {}", listener, Arrays.toString(topics));
 		final LocalTrustEventHandler localHandler = 
 				new LocalTrustEvidenceUpdateEventHandler(listener, filter);
-		if (LOG.isDebugEnabled())
-			LOG.debug("localHandlers size before register: " + this.localHandlers.size());
+		LOG.debug("localHandlers size before register: {}", this.localHandlers.size());
 		if (this.localHandlers.add(localHandler)) {
 			this.eventMgr.subscribeInternalEvent(localHandler, topics, filter);
 		} else {
@@ -641,8 +672,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 					+ listener + " already registered to topics " 
 					+ Arrays.toString(topics));
 		}
-		if (LOG.isDebugEnabled())
-			LOG.debug("localHandlers size after register: " + this.localHandlers.size());
+		LOG.debug("localHandlers size after register: {}", this.localHandlers.size());
 	}
 	
 	private void doUnregisterEvidenceUpdateListener(
@@ -651,13 +681,11 @@ public class TrustEventMgr implements ITrustEventMgr {
 			final TrustedEntityId objectId) throws TrustEventMgrException {
 		
 		final String filter = this.createLocalFilter(subjectId, objectId);
-		if (LOG.isInfoEnabled()) 
-			LOG.info("Unregistering TrustEvidenceUpdateEvent listener " 
-					+ listener + " from topics " + Arrays.toString(topics));
+		LOG.info("Unregistering TrustEvidenceUpdateEvent listener {}" 
+				+ " from topics {}", listener, Arrays.toString(topics));
 		final LocalTrustEventHandler localHandler = 
 				new LocalTrustEvidenceUpdateEventHandler(listener, filter);
-		if (LOG.isDebugEnabled())
-			LOG.debug("localHandlers size before unregister: " + this.localHandlers.size());
+		LOG.debug("localHandlers size before unregister: {}", this.localHandlers.size());
 		if (this.localHandlers.remove(localHandler)) {
 			this.eventMgr.unSubscribeInternalEvent(localHandler, topics, filter);
 		} else {
@@ -665,8 +693,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 					+ listener + " was never registered to topics "
 					+ Arrays.toString(topics));
 		}
-		if (LOG.isDebugEnabled())
-			LOG.debug("localHandlers size after unregister: " + this.localHandlers.size());
+		LOG.debug("localHandlers size after unregister: {}", this.localHandlers.size());
 	}
 	
 	private void postLocalUpdateEvent(final TrustUpdateEvent event, 
@@ -689,13 +716,12 @@ public class TrustEventMgr implements ITrustEventMgr {
 				return;
 			}
 			try {
-				if (LOG.isDebugEnabled())
-					LOG.debug("Posting internal event"
-							+ ": type=" + internalEvent.geteventType()
-							+ ", name=" + internalEvent.geteventName()
-							+ ", source=" + internalEvent.geteventSource()
-							+ ", info=" + internalEvent.geteventInfo()
-							+ " to topic " + topics[i]);
+				LOG.debug("Posting internal event: type={}, name={}, source={}" 
+						+ ", info={} to topic '{}'", new Object[] { 
+								internalEvent.geteventType(),
+								internalEvent.geteventName(), 
+								internalEvent.geteventSource(),
+								internalEvent.geteventInfo(), topics[i] });
 				this.eventMgr.publishInternalEvent(internalEvent);
 			} catch (EMSException emse) {
 
@@ -720,13 +746,12 @@ public class TrustEventMgr implements ITrustEventMgr {
 					event.getSource().getSubjectId().toString(), event.getSource());
 			
 			try {
-				if (LOG.isDebugEnabled())
-					LOG.debug("Posting internal event"
-							+ ": type=" + internalEvent.geteventType()
-							+ ", name=" + internalEvent.geteventName()
-							+ ", source=" + internalEvent.geteventSource()
-							+ ", info=" + internalEvent.geteventInfo()
-							+ " to topic " + topics[i]);
+				LOG.debug("Posting internal event: type={}, name={}, source={}" 
+						+ ", info={} to topic '{}'", new Object[] { 
+								internalEvent.geteventType(),
+								internalEvent.geteventName(), 
+								internalEvent.geteventSource(),
+								internalEvent.geteventInfo(), topics[i] });
 				this.eventMgr.publishInternalEvent(internalEvent);
 			} catch (EMSException emse) {
 
@@ -772,11 +797,9 @@ public class TrustEventMgr implements ITrustEventMgr {
 		for (int i = 0; i < topics.length; ++i) {
 
 			try {
-				if (LOG.isDebugEnabled())
-					LOG.debug("Posting pubsub event"
-							+ ": pubsubId=" + pubsubId
-							+ ", itemId=" + itemId
-							+ " to topic " + topics[i]);
+				LOG.debug("Posting pubsub event: pubsubId={}, itemId={}"
+						+ " to topic '{}'", new Object[] { pubsubId, itemId,
+								topics[i] });
 				this.pubsubClient.publisherPublish(pubsubId, topics[i], 
 						itemId, eventBean);
 			} catch (Exception e) {
@@ -799,7 +822,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 		private LocalTrustEventDispatcher(TrustEvent event, String[] topics) {
 			
 			this.event = event;
-			this.topics = topics;
+			this.topics = Arrays.copyOf(topics, topics.length);
 		}
 		
 		/*
@@ -809,14 +832,12 @@ public class TrustEventMgr implements ITrustEventMgr {
 		public void run() {
 			
 			if (this.event instanceof TrustUpdateEvent) {
-				if (LOG.isDebugEnabled()) 
-					LOG.debug("Posting local TrustUpdateEvent '" + this.event 
-							+ "' to topics '" + Arrays.toString(this.topics) + "'");
+				LOG.debug("Posting local TrustUpdateEvent '{}' to topics '{}'",
+						this.event, Arrays.toString(this.topics));
 				postLocalUpdateEvent((TrustUpdateEvent) event, topics);
 			} else if (this.event instanceof TrustEvidenceUpdateEvent) {
-				if (LOG.isDebugEnabled()) 
-					LOG.debug("Posting local TrustEvidenceUpdateEvent '" + this.event 
-							+ "' to topics '" + Arrays.toString(this.topics) + "'");
+				LOG.debug("Posting local TrustEvidenceUpdateEvent '{}' to topics '{}'",
+						this.event, Arrays.toString(this.topics));
 				postLocalEvidenceUpdateEvent((TrustEvidenceUpdateEvent) event, topics);
 			} else {
 				LOG.error("Could not post local trust event "
@@ -835,7 +856,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 		private RemoteTrustEventDispatcher(TrustEvent event, String[] topics) {
 			
 			this.event = event;
-			this.topics = topics;
+			this.topics = Arrays.copyOf(topics, topics.length);
 		}
 		
 		/*
@@ -845,14 +866,12 @@ public class TrustEventMgr implements ITrustEventMgr {
 		public void run() {
 			
 			if (this.event instanceof TrustUpdateEvent) {
-				if (LOG.isDebugEnabled()) 
-					LOG.debug("Posting remote TrustUpdateEvent '" + this.event 
-							+ "' to topics '" + Arrays.toString(this.topics) + "'");
+				LOG.debug("Posting remote TrustUpdateEvent '{}' to topics '{}'",
+						this.event, Arrays.toString(this.topics));
 				postRemoteUpdateEvent((TrustUpdateEvent) this.event, this.topics);
 			} else if (this.event instanceof TrustEvidenceUpdateEvent) {
-				if (LOG.isDebugEnabled())
-					LOG.debug("Ignoring TrustEvidenceUpdateEvent '" + this.event 
-							+ "': Remote publishing not supported");
+				LOG.debug("Ignoring TrustEvidenceUpdateEvent '{}'" 
+							+ ": Remote publishing not supported", this.event);
 				//postLocalEvidenceUpdateEvent((TrustEvidenceUpdateEvent) event, topics);// TODO for testing ppubsub eventing locally
 			} else {
 				LOG.error("Could not post remote trust event "
@@ -937,12 +956,11 @@ public class TrustEventMgr implements ITrustEventMgr {
 		@Override
 		public void handleInternalEvent(InternalEvent internalEvent) {
 			
-			if (LOG.isDebugEnabled())
-				LOG.debug("Received internal event"
-					+ ": type=" + internalEvent.geteventType()
-					+ ", name=" + internalEvent.geteventName()
-					+ ", source=" + internalEvent.geteventSource()
-					+ ", info=" + internalEvent.geteventInfo());
+			LOG.debug("Received internal event: type={}, name={}, source={}" 
+					+ ", info={}", new Object[] { internalEvent.geteventType(),
+							internalEvent.geteventName(), 
+							internalEvent.geteventSource(),
+							internalEvent.geteventInfo() });
 			
 			if (!(internalEvent.geteventInfo() instanceof TrustRelationship)) {
 				LOG.error("Cannot handle internal event"
@@ -956,8 +974,8 @@ public class TrustEventMgr implements ITrustEventMgr {
 			final TrustRelationship trustRelationship = 
 					(TrustRelationship) internalEvent.geteventInfo();
 			final TrustUpdateEvent event = new TrustUpdateEvent(trustRelationship);
-			if (LOG.isDebugEnabled())
-				LOG.debug("Forwarding local TrustUpdateEvent " + event + " to listener");
+			LOG.debug("Forwarding local TrustUpdateEvent {} to listener {}", 
+					event, super.listener);
 			((ITrustUpdateEventListener) super.listener).onUpdate(event);
 		}
 
@@ -989,12 +1007,11 @@ public class TrustEventMgr implements ITrustEventMgr {
 		@Override
 		public void handleInternalEvent(final InternalEvent internalEvent) {
 			
-			if (LOG.isDebugEnabled())
-				LOG.debug("Received internal event"
-					+ ": type=" + internalEvent.geteventType()
-					+ ", name=" + internalEvent.geteventName()
-					+ ", source=" + internalEvent.geteventSource()
-					+ ", info=" + internalEvent.geteventInfo());
+			LOG.debug("Received internal event: type={}, name={}, source={}" 
+					+ ", info={}", new Object[] { internalEvent.geteventType(),
+							internalEvent.geteventName(), 
+							internalEvent.geteventSource(),
+							internalEvent.geteventInfo() });
 			
 			if (!(internalEvent.geteventInfo() instanceof ITrustEvidence)) {
 				LOG.error("Cannot handle internal event"
@@ -1004,12 +1021,11 @@ public class TrustEventMgr implements ITrustEventMgr {
 						+ ": Unexpected eventInfo: " + internalEvent.geteventInfo());
 				return;
 			}
-			final ITrustEvidence evidence = 
-					(ITrustEvidence) internalEvent.geteventInfo(); 
 			final TrustEvidenceUpdateEvent event = 
-					new TrustEvidenceUpdateEvent(evidence);
-			if (LOG.isDebugEnabled())
-				LOG.debug("Forwarding local TrustEvidenceUpdateEvent " + event + " to listener");
+					new TrustEvidenceUpdateEvent((ITrustEvidence) 
+							internalEvent.geteventInfo());
+			LOG.debug("Forwarding local TrustEvidenceUpdateEvent {} to listener {}", 
+					event, super.listener);
 			((ITrustEvidenceUpdateEventListener) super.listener).onNew(event);
 		}
 
@@ -1057,10 +1073,9 @@ public class TrustEventMgr implements ITrustEventMgr {
 		public void pubsubEvent(IIdentity pubsubService, String node, 
 				String itemId, Object payload) {
 			
-			if (LOG.isDebugEnabled())
-				LOG.debug("pubsubEvent:pubsubService=" + pubsubService
-						+ ",node=" + node + ",itemId=" + itemId 
-						+ ",payload=" + payload);
+			LOG.debug("pubsubEvent: pubsubService={}, node={}, itemId={}"  
+					+ ", payload={}", new Object[] { pubsubService, node,
+							itemId, payload });
 			
 			if (itemId == null) {
 				LOG.error("Cannot handle remote TrustUpdateEvent: "
@@ -1089,27 +1104,25 @@ public class TrustEventMgr implements ITrustEventMgr {
 						trustRelationship.getTrustorId().toString());
 				final Matcher trusteeIdMatcher = this.trusteeIdPattern.matcher(
 						trustRelationship.getTrusteeId().toString());
-				if (LOG.isDebugEnabled())
-					LOG.debug("Checking remote TrustUpdateEvent for trust relationship "
-							+ trustRelationship + " using filters"
-							+ ": trustorIdPattern=" + this.trustorIdPattern.pattern()
-							+ ", trusteeIdPattern=" + this.trusteeIdPattern.pattern()
-							+ ", trustValueType=" + this.trustValueType);
+				LOG.debug("Checking remote TrustUpdateEvent for trust relationship {}"
+						+ " using filters: trustorIdPattern={}"
+						+ ", trusteeIdPattern={}, trustValueType={}",
+						new Object[] { trustRelationship, this.trustorIdPattern.pattern(),
+								this.trusteeIdPattern.pattern(), this.trustValueType });
 				if (!trustorIdMatcher.matches()
 						|| !trusteeIdMatcher.matches() 
 						|| this.trustValueType != trustRelationship.getTrustValueType()) {
-					if (LOG.isDebugEnabled())
-						LOG.debug("Ignoring remote TrustUpdateEvent for trust relationship "
-								+ trustRelationship + " using filters"
-								+ ": trustorIdPattern=" + this.trustorIdPattern.pattern()
-								+ ", trusteeIdPattern=" + this.trusteeIdPattern.pattern()
-								+ ", trustValueType=" + this.trustValueType);
+					LOG.debug("Ignoring remote TrustUpdateEvent for trust relationship {}"
+							+ " using filters: trustorIdPattern={}"
+							+ ", trusteeIdPattern={}, trustValueType={}",
+							new Object[] { trustRelationship, this.trustorIdPattern.pattern(),
+									this.trusteeIdPattern.pattern(), this.trustValueType });
 					return;
 				}
 				
 				final TrustUpdateEvent event = new TrustUpdateEvent(trustRelationship); 
-				if (LOG.isDebugEnabled())
-					LOG.debug("Forwarding remote TrustUpdateEvent " + event + " to listener");
+				LOG.debug("Forwarding remote TrustUpdateEvent {} to listener {}", 
+						event, this.listener);
 				this.listener.onUpdate(event);
 			} catch (Exception e) {
 				LOG.error("Cannot handle remote TrustUpdateEvent: "
@@ -1242,9 +1255,8 @@ public class TrustEventMgr implements ITrustEventMgr {
 	
 	private void createRemoteTopics() throws TrustEventMgrException {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Adding remote trust event payload classes '" 
-					+ EVENT_SCHEMA_CLASSES + "'");
+		LOG.debug("Adding remote trust event payload classes '{}'",
+				EVENT_SCHEMA_CLASSES);
 		try {
 			this.pubsubClient.addSimpleClasses(EVENT_SCHEMA_CLASSES);
 		} catch (Exception e) {
@@ -1277,8 +1289,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 		
 		for (final String topic : EVENT_REMOTE_TOPICS) {	
 			if (existingTopics == null || !existingTopics.contains(topic)) {
-				if (LOG.isInfoEnabled())
-					LOG.info("Creating pubsub node '" + topic + "' for IIdentity " + ownerId);
+				LOG.info("Creating pubsub node '{}' for IIdentity '{}'", topic, ownerId);
 				try {
 					this.pubsubClient.ownerCreate(ownerId, topic);
 				} catch (Exception e) {
@@ -1287,8 +1298,7 @@ public class TrustEventMgr implements ITrustEventMgr {
 							+ e.getLocalizedMessage(), e);
 				}
 			} else {
-				if (LOG.isInfoEnabled())
-					LOG.info("Found pubsub node '" + topic + "' for IIdentity " + ownerId);
+				LOG.info("Found pubsub node '{}' for IIdentity '{}'", topic, ownerId);
 			}
 		}
 	}

@@ -29,14 +29,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.identity.IIdentity;
@@ -67,7 +66,7 @@ public class CommunityCtxInferenceMgr implements ICommunityCtxInferenceMgr{
 	CommunityCtxInferenceMgr(){
 
 		LOG.info(this.getClass() + "instantiated ");
-
+		assignInfAttributeTypes();
 
 		//	this.internalCtxBroker = internalCtxBroker;
 		//	LOG.info(this.getClass() + "internalCtxBroker instantiated "+ this.internalCtxBroker);
@@ -76,16 +75,48 @@ public class CommunityCtxInferenceMgr implements ICommunityCtxInferenceMgr{
 
 		//	this.communityCtxEstimation = communityCtxEstimation; 
 		//	LOG.info(this.getClass() + "communityCtxEstimation instantiated " +this.communityCtxEstimation);
+
+	}
+
+
+	private void assignInfAttributeTypes(){
+
+		// inference is supported for the following community attribute types 
+		this.inferrableTypes.add(CtxAttributeTypes.TEMPERATURE);
+		this.inferrableTypes.add(CtxAttributeTypes.INTERESTS);
+		this.inferrableTypes.add(CtxAttributeTypes.AGE);
+		this.inferrableTypes.add(CtxAttributeTypes.LANGUAGES);
+		this.inferrableTypes.add(CtxAttributeTypes.LOCATION_COORDINATES);
+		this.inferrableTypes.add(CtxAttributeTypes.OCCUPATION);
+		this.inferrableTypes.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		this.inferrableTypes.add(CtxAttributeTypes.BOOKS);
+		this.inferrableTypes.add(CtxAttributeTypes.FAVOURITE_QUOTES);
+		this.inferrableTypes.add(CtxAttributeTypes.MOVIES);
+
+	}
+
+	@Override
+	public List<String> getInferrableTypes(){
+
+		if (LOG.isDebugEnabled())
+			LOG.debug("getInferrableTypes "+ this.inferrableTypes);
+		return Collections.unmodifiableList(this.inferrableTypes);
 	}
 
 	@Override
 	public CtxAttribute estimateCommunityContext(CtxEntityIdentifier communityEntIdentifier,
 			CtxAttributeIdentifier communityAttrId) {
-
+	
+		if (communityEntIdentifier == null)
+			throw new NullPointerException("communityEntIdentifier can't be null");
+		
+		if (communityAttrId == null)
+			throw new NullPointerException("communityAttrId can't be null");
+		
 		CtxAttribute ctxAttrReturn = null; 
 		//LOG.info("0 commCtxInfMgr :" +communityEntIdentifier +" ");
 		try {
-			ctxAttrReturn = this.internalCtxBroker.retrieveAttribute(communityAttrId, false).get();
+		//	ctxAttrReturn = this.internalCtxBroker.retrieveAttribute(communityAttrId, false).get();
 			if (LOG.isDebugEnabled()) 	{
 				LOG.debug("communityEntIdentifier "+communityEntIdentifier.toString());
 				LOG.debug("communityAttrId "+communityAttrId.toString());
@@ -93,17 +124,9 @@ public class CommunityCtxInferenceMgr implements ICommunityCtxInferenceMgr{
 			//LOG.info("1 commCtxInfMgr ctxAttrReturn:" +ctxAttrReturn);
 			ctxAttrReturn = this.communityContextEstimation.estimateCommunityCtx(communityEntIdentifier, communityAttrId);
 
-			//LOG.info("2 commCtxInfMgr ctxAttrReturn estimated :" +ctxAttrReturn);
-		} catch (InterruptedException e) {
-			
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			LOG.error("Could not estimate community context for communityAttrId: "+communityAttrId +" "
+					+ e.getLocalizedMessage(), e);
 		}
 		return ctxAttrReturn;
 	}

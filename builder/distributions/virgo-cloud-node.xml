@@ -26,7 +26,7 @@
 	OF SUCH DAMAGE. -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-			http://maven.apache.org/maven-v4_0_0.x">
+			http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<!-- Setup the identity of this builder -->
@@ -60,6 +60,7 @@
 		<module>../../css-modules/css-registry</module>
 		<module>../../css-modules/css-mgmt/cssCommsMgmt</module>
 		<module>../../css-modules/css-mgmt/cssmgmt</module>
+		
 
 		<!-- CIS Mgmt: 1 bundle (path to be corrected) -->
 		<module>../../cis-modules/cis-management/cis-manager-client</module>
@@ -70,7 +71,9 @@
 		<module>../../css-modules/device-mgmt/DeviceRegistry/</module>
 		<module>../../css-modules/device-mgmt/DeviceCommsMgr/</module>
 		<module>../../css-modules/device-mgmt/RFIDDriver/</module>
-
+		<module>../../css-modules/device-mgmt/RFIDPlugins</module>
+        <module>../../css-modules/device-mgmt/DisplayDriver</module>
+        <module>../../css-modules/device-mgmt/DisplayDriverWebAdmin</module>
 		<!-- SNS: 1 bundle -->
 		<module>../../platform-infrastructure/sns/connectors/GooglePlusConnector</module>
 		<module>../../platform-infrastructure/sns/connectors/FacebookConnector</module>

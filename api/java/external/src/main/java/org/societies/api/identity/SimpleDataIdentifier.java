@@ -25,8 +25,11 @@
 package org.societies.api.identity;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.util.DataIdentifierFactory;
 import org.societies.api.identity.util.DataIdentifierUtils;
 import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 
 /**
  * Simple data identifier implementations that helps managing data identifiers
@@ -35,12 +38,48 @@ import org.societies.api.schema.identity.DataIdentifier;
  *
  */
 public class SimpleDataIdentifier extends DataIdentifier {
+	private static final long serialVersionUID = 4137288721938940079L;
+//	private static final Logger LOG = LoggerFactory.getLogger(SimpleDataIdentifier.class.getName());
+
 	@Override
 	public String getUri() {
+		if (null != uri) {
+			return uri;
+		}
 		uri = DataIdentifierUtils.toUriString(this);
 		return uri;
 	}
-	
+
+	@Override
+	public String getType() {
+		if (null == type && null != uri) {
+			try {
+				DataIdentifier dataId = DataIdentifierFactory.fromUri(uri);
+				scheme = dataId.getScheme();
+				type = dataId.getType();
+				ownerId = dataId.getOwnerId();
+			} catch (MalformedCtxIdentifierException e) {
+//				LOG.error("Can't retrieve the data id from its URI");
+			}
+		}
+		return type;
+	}
+
+	@Override
+	public DataIdentifierScheme getScheme() {
+		if (null == scheme && null != uri) {
+			try {
+				DataIdentifier dataId = DataIdentifierFactory.fromUri(uri);
+				scheme = dataId.getScheme();
+				type = dataId.getType();
+				ownerId = dataId.getOwnerId();
+			} catch (MalformedCtxIdentifierException e) {
+//				LOG.error("Can't retrieve the data id from its URI");
+			}
+		}
+		return scheme;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -68,9 +107,9 @@ public class SimpleDataIdentifier extends DataIdentifier {
 		// -- Verify obj type
 		SimpleDataIdentifier rhs = (SimpleDataIdentifier) obj;
 		return new EqualsBuilder()
-			.append(this.getScheme(), rhs.getScheme())
-			.append(this.getOwnerId(), rhs.getOwnerId())
-			.append(this.getType(), rhs.getType())
-			.isEquals();
+		.append(this.getScheme(), rhs.getScheme())
+		.append(this.getOwnerId(), rhs.getOwnerId())
+		.append(this.getType(), rhs.getType())
+		.isEquals();
 	}
 }

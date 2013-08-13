@@ -24,7 +24,10 @@
  */
 package org.societies.android.api.identity.util;
 
+import java.util.Set;
+
 import org.societies.android.api.identity.SimpleDataIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 
@@ -42,10 +45,24 @@ public class DataIdentifierUtils {
 	 */
 	public static String toUriString(DataIdentifier dataId)
 	{
+		if (dataId instanceof CtxIdentifier) {
+			return ((CtxIdentifier) dataId).toUriString();
+		}
+		return toUriString(dataId.getScheme(), dataId.getOwnerId(), dataId.getType());
+	}
+	
+	/**
+	 * Generate a URI: sheme://ownerid/type
+	 * @param scheme
+	 * @param ownerId
+	 * @param dataType
+	 * @return
+	 */
+	public static String toUriString(DataIdentifierScheme scheme, String ownerId, String dataType) {
 		StringBuilder str = new StringBuilder("");
-		str.append((dataId.getScheme() != null ? dataId.getScheme().value()+"://" : "/"));
-		str.append((dataId.getOwnerId() != null ? dataId.getOwnerId()+"/" : "/"));
-		str.append((dataId.getType() != null ? dataId.getType()+"/" : "/"));
+		str.append((scheme != null ? scheme.value()+"://" : "://"));
+		str.append((ownerId != null ? ownerId+"/" : "/"));
+		str.append((dataType != null ? dataType+"/" : "/"));
 		return str.toString();
 	}
 	
@@ -55,13 +72,43 @@ public class DataIdentifierUtils {
 	 * @param dataType
 	 * @return
 	 */
-	public static String toUriString(DataIdentifierScheme scheme, String dataType)
-	{
-		StringBuilder str = new StringBuilder("");
-		str.append((scheme != null ? scheme.value()+"://" : "/"));
-		str.append("/");
-		str.append((dataType != null ? dataType+"/" : "/"));
-		return str.toString();
+	public static String toUriString(DataIdentifierScheme scheme, String dataType) {
+		return toUriString(scheme, "", dataType);
+	}
+	
+	/**
+	 * scheme + type are equals?
+	 */
+	public static boolean hasSameType(DataIdentifier id1, DataIdentifier id2) {
+		if (null == id1 || null == id2) {
+			return false;
+		}
+		// Scheme equal?
+		if (!DataIdentifierSchemeUtils.equal(DataTypeFactory.getScheme(id1), DataTypeFactory.getScheme(id2))) {
+			return false;
+		}
+		// Type equal?
+		String type1 = DataTypeFactory.getType(id1);
+		String type2 = DataTypeFactory.getType(id2);
+		return type1.equals(type2);
+	}
+	
+	/**
+	 * scheme + type are equals, or id1 type is a parent type of id2 type?
+	 */
+	public static boolean isParentOrSameType(DataIdentifier id1, DataIdentifier id2) {
+		if (null == id1 || null == id2) {
+			return false;
+		}
+		// Scheme equal?
+		if (!DataIdentifierSchemeUtils.equal(DataTypeFactory.getScheme(id1), DataTypeFactory.getScheme(id2))) {
+			return false;
+		}
+		// Type equal?
+		String type1 = DataTypeFactory.getType(id1);
+		String type2 = DataTypeFactory.getType(id2);
+		Set<String> subTypes1 = (new DataTypeUtils()).getLookableDataTypes(type1);
+		return subTypes1.contains(type2);
 	}
 	
 	public static DataIdentifier fromUri(String dataIdUri)

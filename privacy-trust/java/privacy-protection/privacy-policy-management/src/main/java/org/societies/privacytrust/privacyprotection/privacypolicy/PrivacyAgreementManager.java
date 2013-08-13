@@ -99,7 +99,7 @@ public class PrivacyAgreementManager implements IPrivacyAgreementManager {
 		}
 		return null;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager#checkAgreement(org.societies.api.identity.Requestor, org.societies.api.identity.IIdentity)
 	 */
@@ -116,7 +116,7 @@ public class PrivacyAgreementManager implements IPrivacyAgreementManager {
 		if (!isDepencyInjectionDone()) {
 			throw new PrivacyException("[Dependency Injection] PrivacyPolicyAgreementManager not ready");
 		}
-		
+
 		try {
 			List<CtxIdentifier> agreementIdList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, PrivacyAgreementManagerInternal.getAgreementIdOnCtx(requestor, ownerId)).get();
 			if (null == agreementIdList || agreementIdList.size() <= 0) {

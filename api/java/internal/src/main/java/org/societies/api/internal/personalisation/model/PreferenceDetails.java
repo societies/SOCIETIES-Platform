@@ -183,7 +183,8 @@ public class PreferenceDetails implements Serializable {
 		if (this.serviceID==null){
 			sID="GenericID";
 		}else{
-			sID = this.serviceID.getServiceInstanceIdentifier();
+			sID = ServiceModelUtils.serviceResourceIdentifierToString(serviceID);
+			
 		}
 
 

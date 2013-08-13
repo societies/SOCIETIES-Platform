@@ -59,6 +59,8 @@ import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
+import org.societies.api.privacytrust.trust.model.util.TrustedEntityIdFactory;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.trust.api.ITrustNodeMgr;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -234,10 +236,9 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 				}
 				final IAction lastAction = (IAction) SerialisationHelper.deserialise(
 						lastActionAttr.getBinaryValue(), this.getClass().getClassLoader());
-				if (LOG.isDebugEnabled())
-					LOG.debug("lastAction=" + lastAction);
+				LOG.debug("lastAction={}", lastAction);
 				final String userId = lastActionAttr.getId().getOwnerId();
-				final String serviceId = lastAction.getServiceID().getIdentifier().toString();
+				final ServiceResourceIdentifier serviceId = lastAction.getServiceID();
 				final Date ts = lastActionAttr.getLastModified();
 				addServiceEvidence(userId, serviceId, ts);
 						
@@ -564,14 +565,14 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	}
 	
 	private void addServiceEvidence(final String userId, 
-			final String serviceId,	final Date ts) throws TrustException {
+			final ServiceResourceIdentifier serviceId, final Date ts)
+					throws TrustException {
 		
 		final TrustedEntityId subjectId = new TrustedEntityId(
 				TrustedEntityType.CSS,
 				userId);
-		final TrustedEntityId objectId = new TrustedEntityId(
-				TrustedEntityType.SVC, 
-				serviceId);
+		final TrustedEntityId objectId = 
+				TrustedEntityIdFactory.fromServiceResourceIdentifier(serviceId);
 		
 		final TrustEvidenceType type = TrustEvidenceType.USED_SERVICE;
 		if (LOG.isDebugEnabled())
@@ -659,10 +660,10 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 					final String memberId = memberEntId.getOwnerId();
 					if (LOG.isDebugEnabled())
 						LOG.debug("Checking existing evidence about '" + memberId + "' being member of community '" + communityId + "'");
-					if (trustEvidenceRepository.retrieveDirectEvidence(
+					if (trustEvidenceRepository.retrieveEvidence(
 							new TrustedEntityId(TrustedEntityType.CSS, memberId), 
 							new TrustedEntityId(TrustedEntityType.CIS, communityId),
-							TrustEvidenceType.JOINED_COMMUNITY, null, null).isEmpty())
+							TrustEvidenceType.JOINED_COMMUNITY, null, null, null).isEmpty())
 						addMembershipEvidence(memberId, communityId, TrustEvidenceType.JOINED_COMMUNITY, new Date());
 					members.add(memberId);
 				}

@@ -28,7 +28,7 @@ public class LoginController extends BasePageController {
 
     @SuppressWarnings("UnusedDeclaration")
     public void setUserService(UserService userService) {
-        log.trace("setUserService() has been called with " + userService);
+        log.debug("setUserService() has been called with " + userService);
         this.userService = userService;
     }
 
@@ -39,7 +39,7 @@ public class LoginController extends BasePageController {
 
     @SuppressWarnings("UnusedDeclaration")
     public void setOpenfireLoginService(OpenfireLoginService openfireLoginService) {
-        log.trace("setOpenfireLoginService() has been called with " + openfireLoginService);
+        log.debug("setOpenfireLoginService() has been called with " + openfireLoginService);
         this.openfireLoginService = openfireLoginService;
     }
 
@@ -47,7 +47,7 @@ public class LoginController extends BasePageController {
     private String loginDialogPassword;
 
     public LoginController() {
-        log.trace("LoginController() ctor");
+        log.debug("LoginController() ctor");
     }
 
     public String loginButtonAction() {
@@ -93,7 +93,7 @@ public class LoginController extends BasePageController {
     }
 
     public String logoutAction() {
-        log.trace("logoutAction()");
+        log.debug("logoutAction()");
 
         if (!isLoggedIn())
             return "false";

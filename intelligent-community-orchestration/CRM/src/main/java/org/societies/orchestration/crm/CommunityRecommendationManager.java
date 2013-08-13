@@ -330,7 +330,7 @@ public class  CommunityRecommendationManager implements ICommunityRecommendation
 		taskList.add(futureTaskConcept);
 		executor.execute(futureTaskConcept);
 
-		List<String[]> list = new ArrayList<String[]>();;
+		List<String[]> list = new ArrayList<String[]>();
 		for(FutureTask<String[]> fut : taskList){
 			try {
 				list.add(fut.get());

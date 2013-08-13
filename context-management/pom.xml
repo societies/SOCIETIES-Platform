@@ -24,7 +24,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-			http://maven.apache.org/maven-v4_0_0.x">
+			http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<!-- All builder projects should inherit from version-parent -->
@@ -57,8 +57,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 		<module>css-cis-context-monitor</module>
 		<module>ContextSimilarityEvaluation</module>
 		<module>CommunityContextEstimation</module>
+		<module>UserContextInheritance</module>
 		<module>context-performance-tests</module>
 		<module>context-activity-feed</module>
+		
 		<!-- <module>context-data-init</module>  -->
 	</modules>
 </project>

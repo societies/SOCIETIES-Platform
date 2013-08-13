@@ -29,6 +29,7 @@ import java.util.Date;
 
 import javax.swing.tree.TreeModel;
 
+import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 
@@ -47,11 +48,6 @@ public interface IPreferenceTreeModel extends TreeModel, Serializable {
 	 */
 	public Date getLastModifiedDate();
 
-	/**
-	 * Method to retrieve the name of the preference object included in this model
-	 * @return the name of the preference as String
-	 */
-	public String getPreferenceName();
 
 	/**
 	 * Method to return the preference object included in this model (Returns the root
@@ -60,20 +56,6 @@ public interface IPreferenceTreeModel extends TreeModel, Serializable {
 	 */
 	public IPreference getRootPreference();
 
-	/**
-	 *
-	 * Method to retrieve the serviceID of the service affected by this preference
-	 * model
-	 * @return	the serviceID as String
-	 */
-	public ServiceResourceIdentifier getServiceID();
-
-	/**
-	 * Method to retrieve the service type of the service affected by this preference
-	 * model
-	 * @return	the serviceType as String
-	 */
-	public String getServiceType();
 
 	/**
 	 * Method to record the last time this preference changed either due to learning
@@ -82,27 +64,13 @@ public interface IPreferenceTreeModel extends TreeModel, Serializable {
 	 * @param d    d
 	 */
 	public void setLastModifiedDate(Date d);
-
+	
+	
 	/**
-	 * Method to set the preference name of this object
+	 * Method to get the details that this preference refers to 
 	 * 
-	 * @param prefname    the name of the preference object included in this model
+	 * @return the details (serviceid, service type, preference name)
 	 */
-	public void setPreferenceName(String prefname);
-
-	/**
-	 * 
-	 * Method to set the serviceID of the service affected by this preference model
-	 * 
-	 * @param id    the serviceID
-	 */
-	public void setServiceID(ServiceResourceIdentifier id);
-
-	/**
-	 * Method to set the serviceType of the service affected by this preference model
-	 * 
-	 * @param type    the type of service as String
-	 */
-	public void setServiceType(String type);
+	public PreferenceDetails getPreferenceDetails();
 
 }

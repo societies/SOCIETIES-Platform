@@ -44,6 +44,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
 import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.TrustQuery;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
@@ -112,10 +113,21 @@ public class TestByTrustorTrustee {
 		this.teid2 = new TrustedEntityId(TrustedEntityType.SVC, this.serviceId2.toString());
 		LOG.info("*** teid2 = " + this.teid2);
 		
+		// This should establish a DIRECT trust relationship with Service 1
+		this.internalTrustEvidenceCollector.addDirectEvidence(
+				this.myTeid, this.teid1, TrustEvidenceType.USED_SERVICE, 
+				new Date(), null);
+		// This should establish a DIRECT trust relationship with Service 2
+		this.internalTrustEvidenceCollector.addDirectEvidence(
+				this.myTeid, this.teid2, TrustEvidenceType.USED_SERVICE, 
+				new Date(), null);
+
+		Thread.sleep(TestCase1962.getTimeout());
+		
 		this.listener = new MyTrustUpdateEventListener();
 		try {
 			this.internalTrustBroker.registerTrustUpdateListener(
-					this.listener, this.myTeid, this.teid1);
+					this.listener, new TrustQuery(this.myTeid).setTrusteeId(this.teid1));
 		} catch (TrustException te) {
 			fail("Failed to register TrustUpdateEvent listener: "
 					+ te.getLocalizedMessage());
@@ -125,15 +137,25 @@ public class TestByTrustorTrustee {
 	@After
 	public void tearDown() throws Exception {
 		
-		try {
-			this.internalTrustBroker.unregisterTrustUpdateListener(
-					this.listener, this.myTeid, this.teid1);
-		} catch (TrustException te) {
-			fail("Failed to unregister TrustUpdateEvent listener: "
-					+ te.getLocalizedMessage());
+		if (this.myTeid != null) {
+			if (this.teid1 != null) {
+				this.internalTrustBroker.removeTrustRelationships(
+						new TrustQuery(this.myTeid).setTrusteeId(this.teid1));
+			}
+			if (this.teid2 != null) {
+				this.internalTrustBroker.removeTrustRelationships(
+						new TrustQuery(this.myTeid).setTrusteeId(this.teid2));
+			}
+			if (this.listener != null) {
+				try {
+					this.internalTrustBroker.unregisterTrustUpdateListener(
+							this.listener, new TrustQuery(this.myTeid).setTrusteeId(this.teid1));
+				} catch (TrustException te) {
+					fail("Failed to unregister TrustUpdateEvent listener: "
+							+ te.getLocalizedMessage());
+				}
+			}
 		}
-		// TODO
-		// 1. remove test trust data db? currently not supported
 	}
 	
 	@Test
@@ -145,8 +167,6 @@ public class TestByTrustorTrustee {
 		
 		LOG.info("*** testTrustUpdateListenerByTrustorAndTrustee adding trust ratings");
 		try {
-			/** Hack to overcome MySQL inability to store millisecond info. */
-			Thread.sleep(TestCase1962.getTimeout());
 			// This should should trigger two TrustUpdateEvents that should *not* be caught by the listener
 			this.internalTrustEvidenceCollector.addDirectEvidence(
 					this.myTeid, this.teid2, TrustEvidenceType.RATED, 
@@ -178,7 +198,8 @@ public class TestByTrustorTrustee {
 				assertEquals("Received trust value type was incorrect", TrustValueType.DIRECT,
 						event.getTrustRelationship().getTrustValueType());
 				Double newTrustValue1 = this.internalTrustBroker.retrieveTrustValue(
-						this.myTeid, this.teid1, TrustValueType.DIRECT).get();
+						new TrustQuery(this.myTeid).setTrusteeId(this.teid1)
+						.setTrustValueType(TrustValueType.DIRECT)).get();
 				assertEquals("Received DIRECT trust value was incorrect", newTrustValue1, 
 						event.getTrustRelationship().getTrustValue());
 				assertNotNull("Received timestamp was null", 
@@ -195,7 +216,8 @@ public class TestByTrustorTrustee {
 				assertEquals("Received trust value type was incorrect", TrustValueType.USER_PERCEIVED,
 						event.getTrustRelationship().getTrustValueType());
 				newTrustValue1 = this.internalTrustBroker.retrieveTrustValue(
-						this.myTeid, this.teid1, TrustValueType.USER_PERCEIVED).get();
+						new TrustQuery(this.myTeid).setTrusteeId(this.teid1)
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 				assertEquals("Received USER_PERCEIVED trust value was incorrect", newTrustValue1, 
 						event.getTrustRelationship().getTrustValue());
 				assertNotNull("Received timestamp was null", 

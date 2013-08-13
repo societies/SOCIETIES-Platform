@@ -29,36 +29,44 @@ import java.util.HashMap;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
+import org.societies.context.similarity.impl.ContextSimilarityEvaluator;
 import org.societies.context.similarity.reference.OccupationRef;
 import org.societies.context.similarity.utilities.GetContextData;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class occupation {
 
 	private OccupationRef occRef; 
 	private GetContextData gcd;
 	private CtxAttributeTypes cat;
+	private static final Logger LOG = LoggerFactory.getLogger(occupation.class);
 	//private HashMap 
 	
 	public occupation (){
 		occRef = new OccupationRef();
 		gcd = new GetContextData();
 		
+
+		
 	}
 	
-	public HashMap<String, Double> evaluate(IIdentity[] allOwners){
+	public HashMap<String, Double> evaluate(String[] allOwners){
 		HashMap<String, Double> results = new HashMap<String, Double>();
 		HashMap<String, Integer> resultcount = new HashMap<String, Integer>();
 		Integer totalCount = allOwners.length;
  
-		for (IIdentity css : allOwners){
+		for (String css : allOwners){
 
 			// get context value
 			// TODO  sort this out later
-			CtxAttribute contextResult = gcd.getContext(css, cat.OCCUPATION);
-			String contextValue = contextResult.getStringValue();
+			//CtxAttribute contextResult = gcd.getContext(css, cat.OCCUPATION);
+			//String contextValue = contextResult.getStringValue();
 			// 
-			String[] indivresult = occRef.find(contextValue);
+			String[] indivresult = occRef.find(css);//(contextValue);
 			for (String i : indivresult){
+				LOG.info("EBOYLANTESTSTRINGOCC: " + i);
 				if (resultcount.containsKey(i)){
 					resultcount.put(i, resultcount.get(i) + 1);
 				} else {
@@ -68,12 +76,15 @@ public class occupation {
 			}
 			//
 			
-		}
+			}
+		LOG.info("EBOYLANLOGFOOTPrint: " + resultcount.toString());
 		//analyse results
 		for (String k : resultcount.keySet()){
 			float percent=(float)resultcount.get(k)/totalCount*100;
 			results.put(k, (double)percent);
+			LOG.info("EBOYLANOCCUPATIONPERCENT: " + percent);
 		}
+		LOG.info("EBOYLANOCCUUPATIONRESULT: " + results);
 		
 		return results;
 		//

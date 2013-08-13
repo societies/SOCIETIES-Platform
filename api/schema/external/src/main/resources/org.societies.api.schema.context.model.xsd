@@ -8,6 +8,10 @@
   <xs:complexType name="ctxIdentifierBean" abstract="true">
     <xs:sequence>
       <xs:element name="string" type="xs:string"/>
+      <xs:element name="ownerId" type="xs:string" minOccurs="0"/>
+      <xs:element name="modelType" type="tns:ctxModelTypeBean" minOccurs="0"/>
+      <xs:element name="type" type="xs:string" minOccurs="0"/>
+      <xs:element name="objectNumber" type="xs:long"/>
     </xs:sequence>
   </xs:complexType>
   
@@ -69,8 +73,10 @@
       <xs:extension base="tns:ctxModelObjectBean">
         <xs:sequence>
           <xs:element name="stringValue" type="xs:string" minOccurs="0"/>
-          <xs:element name="integerValue" type="xs:int" minOccurs="0" default="-1"/>
-          <xs:element name="doubleValue" type="xs:double"  minOccurs="0" default="-1"/>
+<!--            <xs:element name="integerValue" type="xs:int" minOccurs="0" default="-1"/>
+          <xs:element name="doubleValue" type="xs:double"  minOccurs="0" default="-1"/>-->
+          <xs:element name="integerValue" type="xs:int" minOccurs="0"/>
+          <xs:element name="doubleValue" type="xs:double"  minOccurs="0"/>
           <xs:element name="binaryValue" type="xs:base64Binary"  minOccurs="0"/>
           <xs:element name="valueType" type="tns:ctxAttributeValueTypeBean" minOccurs="0"/>
           <xs:element name="valueMetric" type="xs:string" minOccurs="0"/>
@@ -86,8 +92,10 @@
     <xs:sequence>
       <xs:element name="lastUpdated" type="xs:dateTime" minOccurs="0" />
       <xs:element name="originType" type="tns:ctxOriginTypeBean" minOccurs="0"/>
-      <xs:element name="precision" type="xs:double" minOccurs="0" default="-1"/>
-      <xs:element name="updateFrequency" type="xs:double" minOccurs="0" default="-1"/>
+<!--       <xs:element name="precision" type="xs:double" minOccurs="0" default="-1"/>
+      <xs:element name="updateFrequency" type="xs:double" minOccurs="0" default="-1"/> -->
+      <xs:element name="precision" type="xs:double" minOccurs="0"/>
+      <xs:element name="updateFrequency" type="xs:double" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   
@@ -169,6 +177,7 @@
       <xs:enumeration value="integer"/>
       <xs:enumeration value="double"/>
       <xs:enumeration value="binary"/>
+      <xs:enumeration value="complex"/>
     </xs:restriction>
   </xs:simpleType>
 

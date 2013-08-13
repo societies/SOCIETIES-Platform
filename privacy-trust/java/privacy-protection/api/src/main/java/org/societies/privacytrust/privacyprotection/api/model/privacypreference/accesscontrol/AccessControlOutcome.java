@@ -25,18 +25,9 @@
 package org.societies.privacytrust.privacyprotection.api.model.privacypreference.accesscontrol;
 
 import java.io.Serializable;
-import java.net.URISyntaxException;
-import java.util.List;
 
-
-import org.societies.api.identity.Requestor;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RuleTarget;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PrivacyOutcomeConstantsBean;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
-import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyOutcomeConstants;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
 
 /**
@@ -58,13 +49,13 @@ public class AccessControlOutcome extends IPrivacyOutcome implements Serializabl
 	private PrivacyOutcomeConstantsBean effect;
 
 	private int confidenceLevel;
-	
-	
+
+
 
 	public AccessControlOutcome(PrivacyOutcomeConstantsBean effect){
 		this.effect = effect;
 	}
-	
+
 	public PrivacyOutcomeConstantsBean getEffect(){
 		return this.effect;
 	}
@@ -85,7 +76,7 @@ public class AccessControlOutcome extends IPrivacyOutcome implements Serializabl
 	public int getConfidenceLevel() {
 		return this.confidenceLevel;
 	}
-	
+
 	public void setConfidenceLevel(int c){
 		this.confidenceLevel = c;
 	}

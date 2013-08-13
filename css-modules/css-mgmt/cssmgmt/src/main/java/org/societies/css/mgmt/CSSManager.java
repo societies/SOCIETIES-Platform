@@ -111,7 +111,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.societies.api.css.ICSSManager;
 
-public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSManager {
+public class CSSManager implements ICSSInternalManager, ICSSManager {
 	private static Logger LOG = LoggerFactory.getLogger(CSSManager.class);
 
 	public static final String TEST_IDENTITY_1 = "node11";
@@ -132,7 +132,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 	public static final String TEST_PASSWORD = "androidpass";
 	public static final String TEST_SOCIAL_URI = "sombody@fb.com";
 
-	private static final String THIS_NODE = "XCManager.societies.local";
+	
 	private static final List<String> cssPubsubClassList = Collections.unmodifiableList(
 		Arrays.asList("org.societies.api.schema.cssmanagement.CssEvent",
 				"org.societies.api.schema.css.directory.CssFriendEvent"));
@@ -145,7 +145,8 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
     private IIdentityManager idManager;
     private ICommManager commManager;
     private IIdentity pubsubID;
-    //private ICisManager cisManager;
+    
+    
     
     private Random randomGenerator;
     
@@ -165,6 +166,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
         /**
          * added false as we don't want to create a pubsub node
          */
+        
         activityFeed = getiActivityFeedManager().getOrCreateFeed(idManager.getThisNetworkNode().toString(), idManager.getThisNetworkNode().toString(), true);
 		this.createMinimalCSSRecord(idManager.getCloudNode().getJid());
         
@@ -179,7 +181,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 	 */
 	private void subscribeToPubSubNodes() {
         LOG.debug("Subscribing to relevant Pubsub nodes");
-//        pubSubManager.subscriberSubscribe(???);
+
 
 	}
 
@@ -204,11 +206,11 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
     	        pubSubManager.ownerCreate(pubsubID, CSSManagerEnums.CSS_FRIEND_REQUEST_ACCEPTED_EVENT);
     	        
     		} catch (XMPPError e) {
-    			e.printStackTrace();
+    			LOG.error("Ops! XMPP Error", e);
     		} catch (CommunicationException e) {
-    			e.printStackTrace();
+    			LOG.error("Ops! Communication Exception", e);
     		} catch (Exception e) {
-    			e.printStackTrace();
+    			LOG.error("Ops! Exception", e);
     		} finally {
     	        LOG.debug(CSSManagerEnums.ADD_CSS_NODE + " PubsubNode created for CSSManager");
     	        LOG.debug(CSSManagerEnums.DEPART_CSS_NODE + " PubsubNode created for CSSManager");
@@ -255,9 +257,9 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 			}
 			
 		} catch (UnknownHostException e) {
-			e.printStackTrace();
+			LOG.error("Ops! Unkown host Exception", e);
 		} catch (SocketException e){
-			e.printStackTrace();
+			LOG.error("Ops! Socket Exception", e);
 		}
 
 		try {
@@ -270,24 +272,16 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 				cssProfile.getCssNodes().add(cssNode);
 				cssProfile.setCssIdentity(identity);
 				
-//				cssProfile.setCssInactivation("0");
-
-//				cssProfile.setCssRegistration(this.getDate());
-
-//				cssProfile.setStatus(CSSManagerEnums.cssStatus.Active.ordinal());
-//				cssProfile.setCssUpTime(0);
 				cssProfile.setEmailID("");
 				cssProfile.setEntity(CSSManagerEnums.entityType.Organisation.ordinal());
 				cssProfile.setForeName("");
 				cssProfile.setHomeLocation("");
-//				cssProfile.setIdentityName("");
-//				cssProfile.setImID("");
 				cssProfile.setName("");
 				cssProfile.setPassword("");
-//				cssProfile.setPresence(CSSManagerEnums.presenceType.Available.ordinal());
+
 				cssProfile.setSex(CSSManagerEnums.genderType.Unspecified.ordinal());
 				cssProfile.setSex(CSSManagerEnums.entityType.Person.ordinal());
-//				cssProfile.setSocialURI("");
+
 				cssProfile.setWorkplace("");
 				cssProfile.setPosition("");
 
@@ -295,10 +289,8 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 					this.cssRegistry.registerCss(cssProfile);
 					LOG.debug("Registering CSS with local database");
 				} catch (CssRegistrationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOG.error("Ops! Registration Exception", e);;
 				}
-				// internal eventing
 
 				LOG.info("minimal CSSRecord -> Generating CSS_Record to push to context");
 
@@ -320,8 +312,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 
 			}
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Registration Exception", e);
 		}
 	
 	}
@@ -355,8 +346,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 					this.cssRegistry.registerCss(update);
 			}
 		} catch (CssRegistrationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			LOG.error("Ops! Registration Exception", e1);
 		}
 	}
 	public Future<CssInterfaceResult> changeCSSNodeStatus(CssRecord profile) {
@@ -380,8 +370,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 				LOG.error("Unable to find CssRecord");
 			}
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Registration Exception", e);
 		}
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
@@ -435,8 +424,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 			}
 
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Registration Exception", e);
 		}
 		
 		this.pushtoContext(cssRecord);
@@ -504,9 +492,8 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 				LOG.error("Css Record does not exist");
 			}
 
-		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (CssRegistrationException e) { 
+			LOG.error("Ops! Registration Exception", e);
 		}
 
 
@@ -556,19 +543,6 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 
 				LOG.info("Generating CSS_Record_Event to notify Record has been created");
 
-/*				LOG.info("Generating CSS_Record_Event to notify Record has changed");
-				if(this.getEventMgr() != null){
-					InternalEvent event = new InternalEvent(EventTypes.CSS_RECORD_EVENT, "CSS Record modified", this.idManager.getThisNetworkNode().toString(), cssRecord);
-					try {
-						LOG.info("Calling PublishInternalEvent with details :" +event.geteventType() +event.geteventName() +event.geteventSource() +event.geteventInfo());
-						this.getEventMgr().publishInternalEvent(event);
-					} catch (EMSException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						LOG.error("error trying to internally publish SUBS CIS event");
-					}
-				}*/
-
 				this.updateCssRegistry(cssRecord);
 				LOG.debug("Updating CSS with local database");
 
@@ -581,8 +555,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 
 
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Registration Exception", e);
 		}
 
 		return new AsyncResult<CssInterfaceResult>(result);
@@ -595,8 +568,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 		try {
 			result = cssRegistry.registerCss(profile);
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Registration Exception", e);
 		}
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
@@ -605,53 +577,15 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 	public Future<CssInterfaceResult> registerCSSNode(CssRecord profile) {
 
 		LOG.info("CSS Manager registerCSSNode Called");
-		String nodeid = null;
-		String identity = null;
-		int status = 0;
-		int type = 0;
-		String MAC = null;
-		String Interactable = null;
+		
 		CssInterfaceResult result = new CssInterfaceResult();
 		LOG.info("CssRecord passed in: " +profile);
 		List<CssNode> cssNodes = new ArrayList<CssNode>();
-		//nodeid = idManager.getThisNetworkNode().toString();
-		//LOG.info("+++++++++++++ nodeid =: " +profile);
-		//LOG.info("+++++++++++++ nodeStatus =: " +status);
-		//LOG.info("+++++++++++++ nodeType =: " +type);
-		//CssNode cssnode = new CssNode();
-		//cssnode.setIdentity(nodeid);
-		//cssnode.setStatus(CSSManagerEnums.nodeStatus.Hibernating.ordinal());
-		//status = cssnode.getStatus();
-		//cssnode.setType(CSSManagerEnums.nodeType.Android.ordinal());
-		//type = cssnode.getType();
-
-		//LOG.info("############# nodeid =: " +nodeid);
-		//LOG.info("############# nodeStatus =: " +status);
-		//LOG.info("############# nodeType =: " +type);
-
-
 		cssNodes = profile.getCssNodes();
-		//cssNodes.add(0, cssnode);
-		//profile.setCssNodes(cssNodes);
-		nodeid = idManager.getThisNetworkNode().toString();
-		//for (CssNode cssNode : profile.getCssNodes()) {
-			//cssNode.setIdentity(identity);
-			//cssNode.setStatus(status);
-			//cssNode.setType(type);
+		LOG.info("cssNodes Array Size is : " +cssNodes.size());
 
-			LOG.info("cssNodes Array Size is : " +cssNodes.size());
-			//}
-
-			this.modifyCssRecord(profile);
-		//try {
-	//		LOG.info("+++++++++++++ Calling cssRegistry Register CSSRecord ");
-		//	result = cssRegistry.registerCss(profile);
-
-			//result = true;
-	//	} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-		//	e.printStackTrace();
-	//	}
+		this.modifyCssRecord(profile);
+		
 		return new AsyncResult<CssInterfaceResult>(result);
 
 	}
@@ -664,8 +598,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 		try {
 			result = cssRegistry.registerCss(profile);
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Registration Exception", e);
 		}
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
@@ -698,8 +631,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 
 
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Registration Exception", e);
 		}
 
 		return new AsyncResult<CssInterfaceResult>(result);
@@ -714,8 +646,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 			result.setResultStatus(true);
 
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Registration Exception", e);
 		}
 		return new AsyncResult<CssInterfaceResult>(result);
 
@@ -725,12 +656,8 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 	public Future<CssInterfaceResult> unregisterCSSNode(CssRecord profile) {
 		LOG.info("CSS Manager UNregisterCSSNode Called");
 		CssInterfaceResult result = new CssInterfaceResult();
-		String nodeid = null;
 		List<CssNode> cssNodes = new ArrayList<CssNode>();
-		nodeid = idManager.getThisNetworkNode().toString();
 		CssNode cssnode = new CssNode();
-
-
 		cssNodes = profile.getCssNodes();
 		cssNodes.remove(cssnode); 
 		profile.setCssNodes(cssNodes);
@@ -739,8 +666,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 			cssRegistry.registerCss(profile);
 			result.setResultStatus(true);
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Registration Exception", e);
 		}
 		return new AsyncResult<CssInterfaceResult>(result);
 
@@ -753,8 +679,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 			cssRegistry.unregisterCss(profile);
 			result.setResultStatus(true);
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Registration Exception", e);
 		}
 		return new AsyncResult<CssInterfaceResult>(result);
 	}
@@ -837,8 +762,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 
 		for (CssAdvertisementRecord cssAdd : listCssAds) {
 			try {
-				asyncResult = getServiceDiscovery().getServices(cssAdd.getId()); // TODO
-																					// on
+				asyncResult = getServiceDiscovery().getServices(cssAdd.getId());
 				cssServiceList = asyncResult.get();
 				if (cssServiceList != null) {
 					for (Service cssService : cssServiceList) {
@@ -847,14 +771,11 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 					cssServiceList.clear();
 				}
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error("Ops!Interrupted Exception", e);
 			} catch (ServiceDiscoveryException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error("Ops! Service Discovery Exception", e);
 			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error("Ops! Execution Exception", e);
 			}
 
 		}
@@ -882,11 +803,9 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 				LOG.debug("Subscriber : " + identity + " subscribed to: " + CSSManagerEnums.ADD_CSS_NODE);
 			}
 		} catch (XMPPError e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			LOG.error("Ops! XMPP Error", e1);
 		} catch (CommunicationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			LOG.error("Ops! Communication Exception", e1);
 		}
 
 
@@ -894,13 +813,11 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 	    	String status = this.pubSubManager.publisherPublish(pubsubID, pubsubNodeName, Integer.toString(this.randomGenerator.nextInt()), event);
 			LOG.debug("Event published: " + status);
 		} catch (XMPPError e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! XMPP Error", e);
 		} catch (CommunicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Communication Exception", e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Ops! Exception", e);
 		}
 
 	}
@@ -975,13 +892,6 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 	 */
 	public void setCssRegistry(ICssRegistry cssRegistry) {
 		this.cssRegistry = cssRegistry;
-//		try {
-//			this.cssRegistry.registerCss(createCSSRecord());
-//		} catch (CssRegistrationException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-
 	}
 
 	/**
@@ -1065,12 +975,10 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 	public Future<List<CssRequest>> findAllCssRequests() {
 		List<CssRequest> recordList = new ArrayList<CssRequest>();
 
-		//TODO:
 		try {
 			recordList = cssRegistry.getCssRequests();
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Regristration Exception", e);
 		}
 
 		return new AsyncResult<List<CssRequest>>(recordList);
@@ -1089,12 +997,10 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 	public Future<List<CssRequest>> findAllCssFriendRequests() {
 		List<CssRequest> recordList = new ArrayList<CssRequest>();
 
-		//TODO:
 		try {
 			recordList = cssRegistry.getCssFriendRequests();
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Regristration Exception", e);
 		}
 
 		return new AsyncResult<List<CssRequest>>(recordList);
@@ -1112,13 +1018,12 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 	@Override
 	public void updateCssRequest(CssRequest request) {
 
-		//TODO: This is our resp0onse to a request by other css
-		//we can acept, ignored etc
+		//TODO: This is our response to a request by other css
+		//we can accept, ignored etc
 		try {
 			cssRegistry.updateCssRequestRecord(request);
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Regristration Exception", e);
 		}
 
 
@@ -1162,8 +1067,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 			cssRegistry.updateCssFriendRequestRecord(request);
 			cssRegistry.updateCssRequestRecord(request);
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Regristration Exception", e);
 		}
 
 		LOG.info("updateCssFriendRequest and we're back : " );
@@ -1187,10 +1091,11 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 			cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
 				@Override
 				public void getResult(List<CssAdvertisementRecord> resultList) {
-					if (resultList.size() > 0)
+					if (resultList.size() > 0){
 						addActivityToCSSAF("Removed " + resultList.get(0).getName() + " from friends");
-					else
+					}else{
 						addActivityToCSSAF("Removed " + who + " from friends");
+					}
 				}
 			});
 		}
@@ -1201,10 +1106,11 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 			cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
 				@Override
 				public void getResult(List<CssAdvertisementRecord> resultList) {
-					if (resultList.size() > 0)
+					if (resultList.size() > 0){
 						addActivityToCSSAF("Cancelled friend request to " + resultList.get(0).getName());
-					else
+					}else{
 						addActivityToCSSAF("Cancelled friend request to " + who);
+					}
 				}
 			});
 		}
@@ -1217,24 +1123,22 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 	 */
 	@Override
 	public void sendCssFriendRequest(String cssFriendId) {
-		// TODO Auto-generated method stub
-
-
+		
 		CssRequest request = new CssRequest();
 		request.setCssIdentity(cssFriendId);
-		//TODO : check if it exists first
+		
+		//check if it exists first
 		request.setRequestStatus(CssRequestStatusType.PENDING);
 		try {
 			cssRegistry.updateCssFriendRequestRecord(request);
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Regristration Exception", e);
 		}
 
 		// This will always be initalliated locally so no need to check origin
 		// db updated ow send it to friend and forget about it
 		//cssManagerRemote.se
-		System.out.println("~~~~~~~~~~~~~~~ sending Friend request : " +cssFriendId);
+		LOG.info("~~~~~~~~~~~~~~~ sending Friend request : " +cssFriendId);
 		LOG.info("sending Friend request : " +cssFriendId);
 		cssManagerRemote.sendCssFriendRequest(cssFriendId);
 
@@ -1245,10 +1149,11 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 		cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
 			@Override
 			public void getResult(List<CssAdvertisementRecord> resultList) {
-				if (resultList.size() > 0)
+				if (resultList.size() > 0){
 					addActivityToCSSAF("Sent " + resultList.get(0).getName() + " a friend request");
-				else
+				}else{
 					addActivityToCSSAF("Sent friend request to " + who);
+				}
 			}
 		});
 	}
@@ -1297,8 +1202,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 
 
 			} catch (CssRegistrationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error("Ops! Regristration Exception", e);
 			}
 
 	}
@@ -1328,7 +1232,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 
 			} catch (CssRegistrationException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error("Ops! Regristration Exception", e);
 			}
 
 		return new AsyncResult<List<CssAdvertisementRecord>>(friendAdList);
@@ -1338,12 +1242,6 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 	public Future<String> getthisNodeType(String nodeId) {
 		String Type = null, nodeid = null;
 		LOG.info("getthisNodeType has been called: ");
-		List<CSSNode> cssnodes = new ArrayList<CSSNode>();
-		Future<List<CSSNode>> asyncResult = null;
-		List<CSSNode> incssnodes = null;
-		int android = 0;
-
-		//nodeid = idManager.getThisNetworkNode().toString();
 		nodeid = nodeId;
 		LOG.info("nodeid is now : " +nodeid);
 
@@ -1351,8 +1249,7 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 		try {
 			currentCssRecord = cssRegistry.getCssRecord();
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Regristration Exception", e);
 		}
 
 		if (currentCssRecord.getCssNodes() != null) {
@@ -1381,16 +1278,8 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 
 		List<CssNode> cssNodes = new ArrayList<CssNode>();
 		CssNode cssnode = new CssNode();
-		CssNode tmpNode = new CssNode();
 		LOG.info("From Webapp cssNodes SIZE is: " +cssrecord.getCssNodes().size());
-		/*
-		try {
-			cssrecord = cssRegistry.getCssRecord();
-		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		*/
+		
 		LOG.info("from CSSRegistry cssNodes SIZE is: " +cssrecord.getCssNodes().size());
 
 		LOG.info("setNodeType nodeId passed in is: " +nodeId );
@@ -1407,11 +1296,6 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 		cssnode.setCssNodeMAC(cssnodemac);
 		cssnode.setInteractable(interactable);
 
-		//cssnode.setCssNodeMAC(cssnodemac);
-		//cssnode.setInteractable(interactable);
-
-
-
 		cssNodes = cssrecord.getCssNodes();
 
 		LOG.info(" cssNodes are BEFORE : " +cssNodes);
@@ -1419,7 +1303,6 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 			LOG.info(" cssNode BEFORE index: " +index + " identity is now : " +cssNodes.get(index).getIdentity());
 		}
 
-		//cssNodes.add(tmpNode);
 		cssNodes.add(cssnode);
 
 		LOG.info("cssNodes are AFTER : " +cssNodes);
@@ -1435,7 +1318,6 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 			LOG.info("cssNode index: " +index + " Status is now : " +cssNodes.get(index).getStatus());
 			LOG.info("cssNode index: " +index +" type is now : " +cssNodes.get(index).getType());
 			LOG.info("cssNode index: " +index +" MAC is now : " +cssNodes.get(index).getCssNodeMAC());
-			//LOG.info(" cssNode index: " +index +" type is now : " +cssNodes.get(index).isInteractable());
 		}
 
 
@@ -1446,55 +1328,41 @@ public class CSSManager implements ICSSLocalManager, ICSSInternalManager, ICSSMa
 public void removeNode(CssRecord cssrecord, String nodeId ) {
 
 		List<CssNode> cssNodes = new ArrayList<CssNode>();
-		//List<CssNode> tmpNodes = new ArrayList<CssNode>(cssNodes.size());
-		CssNode cssnode = new CssNode();
-		CssNode tmpNode = new CssNode();
-		//CssRecord newrecord = cssrecord;
 
 		try {
 			cssRegistry.unregisterCss(cssrecord);
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Regristration Exception", e);
 		}
 
 		cssNodes = cssrecord.getCssNodes();
-
 
 		LOG.info("removeNode cssNodes SIZE is: " +cssrecord.getCssNodes().size());
 		LOG.info("removeNode nodeId to remove is : " +nodeId);
 		int index = 0;
 
-		//LOG.info("removeNode cssNodes SIZE is now : " +cssrecord.getCssNodes().size());
 		cssNodes = cssrecord.getCssNodes();
 		for (index = 0; index < cssrecord.getCssNodes().size(); index ++) {
 			if (cssNodes.get(index).getIdentity().equalsIgnoreCase(nodeId)) {
 				LOG.info("removeNode loop identity : " +cssNodes.get(index).getIdentity());
 				cssNodes.remove(index); 
 				LOG.info("removeNode Node Removed : ");
-				//tmpNodes.add(cssnode);
 			}
-			//tmpNodes.add(cssnode);
 			LOG.info("removeNode cssNodes element is : " +cssNodes.get(index).getIdentity());
 		}
 		cssrecord.setCssNodes(cssNodes);
 		LOG.info("removeNode cssrecord SIZE final : " +cssrecord.getCssNodes().size());
-		//LOG.info("removeNode newrecord SIZE final : " +newrecord.getCssNodes().size());
 
 		try {
 			cssRegistry.registerCss(cssrecord);
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Regristration Exception", e);
 		}
-		//this.modifyCssRecord(cssrecord); 
 
 	}
 
 @SuppressWarnings("unchecked")
 public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
-
-	ISocialData socialData = null;
 
 	List<CssAdvertisementRecord> recordList = new ArrayList<CssAdvertisementRecord>();
 	List<CssAdvertisementRecord> cssFriends = new ArrayList<CssAdvertisementRecord>();
@@ -1527,11 +1395,6 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		LOG.info("cssFriends contains " +cssFriends +" entries");
 	}
 
-	LOG.info("cssFriends contains " +cssFriends);
-	LOG.info("CSS Directory contains " +cssFriends.size() +" entries");
-
-	LOG.info("Contacting SN Connector to get list");
-	LOG.info("getSocialData() returns " +getSocialData());
 
 	// Generate the connector
 	Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
@@ -1541,8 +1404,6 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	  ISocialConnector conn = it.next();
   	  
 	LOG.info("SocialNetwork connector contains " +conn.getConnectorName());
-
-	//socialdata.updateSocialData();
 	}
 
 	snFriends = (List<Person>) socialdata.getSocialPeople();
@@ -1578,7 +1439,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
     	}catch(Exception ex){name = "- NOT AVAILABLE -";}
     	index++;
     }
-	//}
+	
     
     //compare the lists to create
     
@@ -1588,9 +1449,8 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
     
     //compare the two lists
     LOG.info("Compare the two lists to generate a common Friends list");
-    int i = 1;
-   // for (int index =0; index < cssFriends.size(); index++)
-   // {
+
+   
     for (CssAdvertisementRecord friend : cssFriends) {
     	LOG.info("CSS Friends iterator List contains " +friend);
         if (socialFriends.contains(friend.getName())) {
@@ -1601,11 +1461,9 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
         	}
         	
         }
-       // i++;
+       
     }
-    //}
     LOG.info("common Friends List NOW contains " +commonFriends.size() +" entries");
-	//return commonFriends;
 	return new AsyncResult<List<CssAdvertisementRecord>>(commonFriends);
 
 	}
@@ -1615,7 +1473,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	 * 
 	 * @return String today's date
 	 */
-	private String getDate() {
+/*	private String getDate() {
 		Calendar today = Calendar.getInstance();
 
 		StringBuffer date = new StringBuffer();
@@ -1625,13 +1483,12 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		date.append(Integer.toString(today.get(Calendar.DAY_OF_MONTH)));
 
 		return date.toString();
-	}
+	}*/
 
 	@Override
 	public Future<List<CssAdvertisementRecord>> getFriendRequests() {
 		List<CssRequest> pendingfriendList = new ArrayList<CssRequest>();
 		List<CssAdvertisementRecord> friendReqList = new ArrayList<CssAdvertisementRecord>();
-		List<CssAdvertisementRecord> recordList = new ArrayList<CssAdvertisementRecord>();
 		List<String> pendingList = new ArrayList<String>();	
 
 
@@ -1643,7 +1500,6 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		    	LOG.info("CSS FriendRequest iterator List contains " +pendingfriendList);
 		    	LOG.info("cssrequest status is: " +cssrequest.getRequestStatus());
 		        if (cssrequest.getRequestStatus().value().equalsIgnoreCase("pending")) {
-		        	//cssrequest.getCssIdentity();
 		        	pendingList.add(cssrequest.getCssIdentity());
 		        	LOG.info("pendingList size is now: " +pendingfriendList.size());
 		        	LOG.info("pendingList entry is: " +cssrequest.getCssIdentity());
@@ -1666,7 +1522,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 
 			} catch (CssRegistrationException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error("Ops! Regristration Exception", e);
 			}
 
 		return new AsyncResult<List<CssAdvertisementRecord>>(friendReqList);
@@ -1674,7 +1530,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 
 	public void acceptCssFriendRequest(CssRequest request) {
 
-		//TODO: This is called either locally or remotle
+		//This is called either locally or remote
 		//Locally, we can cancel pending request, or leave css's
 		// remotely, it will be an accepted of the request we sent
 			try {
@@ -1688,14 +1544,11 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 						LOG.info("Calling PublishInternalEvent with details :" +event.geteventType() +event.geteventName() +event.geteventSource() +event.geteventInfo());
 						this.getEventMgr().publishInternalEvent(event);
 					} catch (EMSException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						LOG.error("error trying to internally publish SUBS CIS event");
+						LOG.error("error trying to internally publish SUBS CIS event", e);
 					}
 				}
 			} catch (CssRegistrationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.error("Ops! Regristration Exception", e);
 			}
 
 			// If this was initiated locally then inform remote css
@@ -1726,11 +1579,11 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 			cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
 				@Override
 				public void getResult(List<CssAdvertisementRecord> resultList) {
-					if (resultList.size() > 0)
-						//addActivityToCSSAF(resultList.get(0).getName() + " accepted your friend request");
+					if (resultList.size() > 0){
 						addActivityToCSSAF("Accepted friend request from " +resultList.get(0).getName());
-					else
+					}else{
 						addActivityToCSSAF("Accepted friend request from " + who);
+					}
 				}
 			});
 		}
@@ -1764,19 +1617,17 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		try {
 			cssRegistry.updateCssFriendRequestRecord(request);
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Regristration Exception", e);
 		}
 
 		// If this was initiated locally then inform remote css
 		// We only want to sent messages to remote Css's for this function if we initiated the call locally
 		if (request.getOrigin() == CssRequestOrigin.LOCAL) {
-			// If we have denied the requst , we won't sent message,it will just remain at pending in remote cs db
+			// If we have denied the request , we won't sent message,it will just remain at pending in remote cs db
 			// otherwise send message to remote css
 
 			//called updateCssFriendRequest on remote
 			request.setOrigin(CssRequestOrigin.REMOTE);
-			//cssManagerRemote.acceptCssFriendRequest(request); 
 			cssManagerRemote.declineCssFriendRequest(request);
 		}
 		if (request.getOrigin() == CssRequestOrigin.REMOTE) {
@@ -1794,18 +1645,19 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
 			@Override
 			public void getResult(List<CssAdvertisementRecord> resultList) {
-				if (resultList.size() > 0)
+				if (resultList.size() > 0){
 					addActivityToCSSAF(resultList.get(0).getName() + " declined your friend request");
-				else
+				}else{
 					addActivityToCSSAF("Declined friend request from " + who);
+				}
 			}
 		});
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Future<HashMap<IIdentity, Integer>> getSuggestedFriends(
 			FriendFilter filter) {
-		ISocialData socialData = null;
 
 		
 		Integer filt = filter.getFilterFlag();
@@ -1832,14 +1684,14 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		List<CssAdvertisementRecord> cssFriends = new ArrayList<CssAdvertisementRecord>();
 		List<IIdentity> cssFriend = new ArrayList<IIdentity>();
 		List<Person> snFriends = new ArrayList<Person>();
-		List<String> socialFriends = new ArrayList<String>();
+//		List<String> socialFriends = new ArrayList<String>();
 		List<ICis> cisList = new ArrayList<ICis>();	
 		List<String> facebookFriends = new ArrayList<String>();
 		List<String> twitterFriends = new ArrayList<String>();
 		List<String> linkedinFriends = new ArrayList<String>();
 		List<String> foursquareFriends = new ArrayList<String>();
 		List<String> googleplusFriends = new ArrayList<String>();
-		List<String> CISMembersFriends = new ArrayList<String>();
+//		List<String> CISMembersFriends = new ArrayList<String>();
 		List<String> alreadyListed = new ArrayList<String>();
 		Future<List<CssAdvertisementRecordDetailed>> asynchallcss =  this.getCssAdvertisementRecordsFull();
 		List<CssAdvertisementRecordDetailed> allcssDetails = new ArrayList<CssAdvertisementRecordDetailed>();
@@ -1869,12 +1721,11 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 				for(int i = 0; i < cisList.size(); i++){
 					try{
 						cisManager.getListOfMembers(service, this.getCommManager().getIdManager().fromJid(cisList.get(i).getCisId()), callback1);
-						//result = callback1.getComMethObj();
 						callback1.receiveResult(result);
 						participant = result.getWhoResponse().getParticipant();
 						
 					}catch (InvalidFormatException e) {	
-					 	e.printStackTrace();
+						LOG.error("Ops! Invalid Format Exception", e);
 					}
 					
 					
@@ -1884,9 +1735,9 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 				try {
 					allcssDetails = asynchallcss.get();
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					LOG.error("Ops! Interrupted Exception", e);
 				} catch (ExecutionException e) {
-					e.printStackTrace();
+					LOG.error("Ops! Execution Exception", e);
 				}
 				
 				CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
@@ -1902,8 +1753,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 								try {
 									cssFriend.add(this.commManager.getIdManager().fromJid(recordList.get(i).getId()));
 								} catch (InvalidFormatException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
+									LOG.error("Ops! Invalid Format Exception", e);
 								}
 							}
 						
@@ -1913,10 +1763,6 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 						LOG.info("This is my OWN ID not adding it");
 					}
 				}
-				
-			
-			
-				//cssFriends.add((CssAdvertisementRecord) (participant));
 			}
 				
 			// first get all the cssdirectory records
@@ -1925,9 +1771,9 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 					try {
 						allcssDetails = asynchallcss.get();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+						LOG.error("Ops! Interrupted Exception", e);
 					} catch (ExecutionException e) {
-						e.printStackTrace();
+						LOG.error("Ops! Execution Exception", e);
 					}
 					
 					CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
@@ -1943,8 +1789,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 							try {
 								cssFriend.add((this.commManager.getIdManager().fromJid(cssAdd.getId())));
 							} catch (InvalidFormatException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+								LOG.error("Ops! Invalid Format Exception", e);
 							}
 						}
 					}
@@ -1965,11 +1810,9 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 					}
 				}
 			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				LOG.error("Ops! Interrupted Exception", e1);
 			} catch (ExecutionException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				LOG.error("Ops! Execution Exception", e1);
 			}
 
 			for (CssAdvertisementRecord cssAdd : recordList) {
@@ -1984,8 +1827,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 						try {
 							cssFriend.add((this.commManager.getIdManager().fromJid(cssAdd.getId())));
 						} catch (InvalidFormatException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							LOG.error("Ops! Invalid Format Exception", e);
 						}
 					}
 						
@@ -1998,13 +1840,14 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 		}
 
 		// Generate the connector
-		Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
+//		Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
 		LOG.info("social connectors is " +socialdata.getSocialConnectors());
 		
 		LOG.info("Getting social friends");
 		String domain ="";
 		snFriends = (List<Person>) socialdata.getSocialPeople();
 		LOG.info("Social Friends snFriends list size is " +snFriends.size());
+		
 		if (snFriends == null) {
 			LOG.info("Social Friends is Null");
 			snFriends = new ArrayList<Person>();
@@ -2012,16 +1855,13 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 
 	    Iterator<Person> itt = snFriends.iterator();
 	    LOG.info("Social Friends Iterator " +itt);
-	    int index =1;
+
 	    while(itt.hasNext()){
 	    	Person p =null;
 	    	
 	    		p = itt.next();
 
 				String name = "Username NA";
-				String img = "";
-				String link = "";
-				String thumb = "";
 				String id = null;
 				try {
 					if (p.getName() != null) {
@@ -2034,9 +1874,13 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 								name = p.getName().getFamilyName();
 								LOG.info("name familyname " +name);
 							}
+							
+							//Check brackets
+							
 							if (p.getName().getGivenName() != null) {
-								if (name.length() > 0)
+								if (name.length() > 0){
 									name += " ";
+								}
 								name += p.getName().getGivenName();
 								LOG.info("name givenname " +name);
 							}
@@ -2056,8 +1900,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 						LOG.info("ID " +id);
 					}
 				} catch (Exception ex) {
-				LOG.error("Error while parsing the Person OBJ");
-				ex.printStackTrace();
+				LOG.error("Error while parsing the Person OBJ", ex);
 			}
 	    	
 	    				
@@ -2096,10 +1939,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	    flag = BitCompareUtil.isFacebookFlagged(filt);
 	   
 	    if(flag){
-	    	for (CssAdvertisementRecord friend : cssFriends) {
-	        	
-	        	boolean contains = facebookFriends.contains(friend.getName());
-	        	
+	    	for (CssAdvertisementRecord friend : cssFriends) {	        	
 	        	
 	            if (facebookFriends.contains(friend.getName())) {
 	            	if(commonFriends.containsKey(friend)){
@@ -2108,8 +1948,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	            		try {
 							commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), value1);
 						} catch (InvalidFormatException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							LOG.error("Ops! Invalid format Exception", e);
 						}
 	            		LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
 	            			
@@ -2118,7 +1957,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	            		try {
 							commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), facebook);
 						} catch (InvalidFormatException e) {
-							e.printStackTrace();
+							LOG.error("Ops! Invalid format Exception", e);
 						}            		
 	            	}
 	            	
@@ -2140,8 +1979,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	            		try {
 							commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), value1);
 						} catch (InvalidFormatException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							LOG.error("Ops! Invalid format Exception", e);
 						}
 	            		LOG.info("twitter adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
 	            	}
@@ -2152,7 +1990,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	            		try {
 							commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), twitter);
 						} catch (InvalidFormatException e) {
-							e.printStackTrace();
+							LOG.error("Ops! Invalid format Exception", e);
 						}
 	            	}
 	       
@@ -2171,10 +2009,9 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	            		try {
 							commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), value1);
 						} catch (InvalidFormatException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							LOG.error("Ops! Invalid format Exception", e);
 						}
-	            		LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
+	            		LOG.info("Linkedin adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
 	            	}
 	            	
 	            		
@@ -2182,7 +2019,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	            		try {
 							commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), linkedin);
 						} catch (InvalidFormatException e) {
-							e.printStackTrace();
+							LOG.error("Ops! Invalid format Exception", e);
 						}
 	            		
 	            	}
@@ -2202,10 +2039,9 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	            		try {
 							commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), value1);
 						} catch (InvalidFormatException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							LOG.error("Ops! Invalid format Exception", e);
 						}
-	            		LOG.info("facebook adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
+	            		LOG.info("foursquare adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
 	            	}
 	            	
 	            		
@@ -2213,7 +2049,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	            		try {
 							commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), foursquare);
 						} catch (InvalidFormatException e) {
-							e.printStackTrace();
+							LOG.error("Ops! Invalid format Exception", e);
 						}
 	            		
 	            	}
@@ -2234,8 +2070,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	 	                 		try {
 	 	     						commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), value1);
 	 	     					} catch (InvalidFormatException e) {
-	 	     						// TODO Auto-generated catch block
-	 	     						e.printStackTrace();
+	 	     						LOG.error("Ops! Invalid format Exception", e);
 	 	     					}
 	 	                 		LOG.info("googleplus adding to commonfriends: " +friend.getName() +"with filter setting: " +value1);
 	            			 }
@@ -2245,7 +2080,7 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 	                     		try {
 									commonFriends.put(this.commManager.getIdManager().fromJid(friend.getId()), googleplus);
 								} catch (InvalidFormatException e) {
-									e.printStackTrace();
+									LOG.error("Ops! Invalid format Exception", e);
 								}
 	                     		
 	                     	}
@@ -2286,8 +2121,6 @@ public Future<List<CssAdvertisementRecord>> suggestedFriends( ) {
 
 public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetails(
 			FriendFilter filter) {
-
-	ISocialData socialData = null;
 
 	
 	Integer filt = filter.getFilterFlag();
@@ -2353,12 +2186,11 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			for(int i = 0; i < cisList.size(); i++){
 				try{
 					cisManager.getListOfMembers(service, this.getCommManager().getIdManager().fromJid(cisList.get(i).getCisId()), callback1);
-					//result = callback1.getComMethObj();
 					callback1.receiveResult(result);
 					participant = result.getWhoResponse().getParticipant();
 					
 				}catch (InvalidFormatException e) {	
-				 	e.printStackTrace();
+					LOG.error("Ops! Invalid format Exception", e);
 				}
 				
 				
@@ -2368,9 +2200,9 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			try {
 				allcssDetails = asynchallcss.get();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				LOG.error("Ops! Interrupted Exception", e);
 			} catch (ExecutionException e) {
-				e.printStackTrace();
+				LOG.error("Ops! Execution Exception", e);
 			}
 			
 			CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
@@ -2392,10 +2224,6 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 					LOG.info("This is my OWN ID not adding it");
 				}
 			}
-			
-		
-		
-			//cssFriends.add((CssAdvertisementRecord) (participant));
 		}
 			
 		// first get all the cssdirectory records
@@ -2404,9 +2232,9 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 				try {
 					allcssDetails = asynchallcss.get();
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					LOG.error("Ops! Interrupted Exception", e);
 				} catch (ExecutionException e) {
-					e.printStackTrace();
+					LOG.error("Ops! Execution Exception", e);
 				}
 				
 				CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
@@ -2430,9 +2258,9 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		try {
 			allcssDetails = asynchallcss.get();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			LOG.error("Ops! Interrupted Exception", e);
 		} catch (ExecutionException e) {
-			e.printStackTrace();
+			LOG.error("Ops! Execution Exception", e);
 		}
 		
 		CssDirectoryRemoteClient callback = new CssDirectoryRemoteClient();
@@ -2448,11 +2276,9 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 				}
 			}
 		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			LOG.error("Ops! Interrupted Exception", e1);
 		} catch (ExecutionException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			LOG.error("Ops! Execution Exception", e1);
 		}
 
 		for (CssAdvertisementRecord cssAdd : recordList){
@@ -2473,7 +2299,7 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 	}
 
 	// Generate the connector
-	Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
+//	Iterator<ISocialConnector> it = socialdata.getSocialConnectors().iterator();
 	LOG.info("social connectors is " +socialdata.getSocialConnectors());
 	
 	LOG.info("Getting social friends");
@@ -2487,16 +2313,14 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 
     Iterator<Person> itt = snFriends.iterator();
     LOG.info("Social Friends Iterator " +itt);
-    int index =1;
+   
     while(itt.hasNext()){
     	Person p =null;
     	
     		p = itt.next();
 
 			String name = "Username NA";
-			String img = "";
-			String link = "";
-			String thumb = "";
+
 			String id = null;
 			try {
 				if (p.getName() != null) {
@@ -2510,8 +2334,9 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 							LOG.debug("name familyname " +name);
 						}
 						if (p.getName().getGivenName() != null) {
-							if (name.length() > 0)
+							if (name.length() > 0){
 								name += " ";
+							}
 							name += p.getName().getGivenName();
 							LOG.debug("name givenname " +name);
 						}
@@ -2531,8 +2356,7 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 					LOG.debug("ID " +id);
 				}
 			} catch (Exception ex) {
-			LOG.error("Error while parsing the Person OBJ");
-			ex.printStackTrace();
+			LOG.error("Error while parsing the Person OBJ", ex);
 		}
     	
     				
@@ -2577,9 +2401,6 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
    
     if(flag){
     	for (CssAdvertisementRecord friend : cssFriends) {
-        	
-        	boolean contains = facebookFriends.contains(friend.getName());
-        	
         	
             if (facebookFriends.contains(friend.getName())) {
             	if (commonFriends.containsKey(friend)){
@@ -2736,7 +2557,6 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		//SAVE TO DATABASE
 		String targetCSSid = identity.toString();
 		CssRequest request = new CssRequest();
-		//request.setCssIdentity(targetCSSid);
 		request.setCssIdentity(service.getRequestorId().toString());
 		request.setRequestStatus(CssRequestStatusType.PENDING);
 		request.setOrigin(CssRequestOrigin.REMOTE);
@@ -2744,8 +2564,8 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			cssRegistry.updateCssRequestRecord(request);
 
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			LOG.error("Ops! Registration Exception", e);
 		}
 
 		// We only want to sent messages to remote Css's for this function if we initiated the call locally
@@ -2774,9 +2594,9 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 					String status = CSSManager.this.pubSubManager.publisherPublish(pubsubID, CSSManagerEnums.CSS_FRIEND_REQUEST_RECEIVED_EVENT, Integer.toString(CSSManager.this.randomGenerator.nextInt()), payload);
 					LOG.debug("Published Event Status: " + status);
 				} catch (XMPPError e) {
-					e.printStackTrace();
+					LOG.error("Ops! EMPP error", e);
 				} catch (CommunicationException e) {
-					e.printStackTrace();
+					LOG.error("Ops! Communication Exception", e);
 				}
 			}
 		});
@@ -2787,10 +2607,11 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
 			@Override
 			public void getResult(List<CssAdvertisementRecord> resultList) {
-				if (resultList.size() > 0)
+				if (resultList.size() > 0){
 					addActivityToCSSAF(resultList.get(0).getName() + " sent you a friend request");
-				else
+				}else{
 					addActivityToCSSAF("Recieved friend request from " + who);
+				}
 			}
 		});
 	}
@@ -2811,8 +2632,7 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			cssRegistry.updateCssFriendRequestRecord(request);
 			cssRegistry.updateCssRequestRecord(request);
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Registration Exception", e);
 		}
 		LOG.info("updateCssFriendRequest and we're back : " );
 		// If this was initiated locally then inform remote css
@@ -2841,9 +2661,9 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 						String status = CSSManager.this.pubSubManager.publisherPublish(pubsubID, CSSManagerEnums.CSS_FRIEND_REQUEST_ACCEPTED_EVENT, Integer.toString(CSSManager.this.randomGenerator.nextInt()), payload);
 						LOG.debug("Published Event Status: " + status);
 					} catch (XMPPError e) {
-						e.printStackTrace();
+						LOG.error("Ops! XMPP error", e);
 					} catch (CommunicationException e) {
-						e.printStackTrace();
+						LOG.error("Ops! Communication Exception", e);
 					}
 				}
 			});
@@ -2856,10 +2676,11 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
 			@Override
 			public void getResult(List<CssAdvertisementRecord> resultList) {
-				if (resultList.size() > 0)
+				if (resultList.size() > 0){
 					addActivityToCSSAF("Friend request " + request.getRequestStatus() + " by " + resultList.get(0).getName());
-				else
+				}else{
 					addActivityToCSSAF("Friend request " + request.getRequestStatus() + " by " + who);
+				}
 				
 			}
 		});
@@ -2885,12 +2706,12 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		cssDirectoryRemote.searchByID(listIDs, new ICssDirectoryCallback() {
 			@Override
 			public void getResult(List<CssAdvertisementRecord> resultList) {
-				if (resultList.size() > 0)
-					//addActivityToCSSAF(resultList.get(0).getName() + " accepted your friend request");
+				if (resultList.size() > 0){
 					addActivityToCSSAF(" Accepted friend request from " +resultList.get(0).getName());
 			
-				else
+				}else{
 					addActivityToCSSAF("Friend request accepted by " + who);
+				}
 				
 			}
 		});
@@ -2911,8 +2732,7 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			cssRegistry.updateCssFriendRequestRecord(request);
 			cssRegistry.updateCssRequestRecord(request);
 		} catch (CssRegistrationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Ops! Registration Exception", e);
 		}
 		// If this was initiated locally then inform remote css
 		// We only want to sent messages to remote Css's for this function if we initiated the call locally
@@ -2931,7 +2751,6 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 
 		final String cssIdStr = record.getCssIdentity();
 		LOG.info("pushtoContext is HERE: ");
-		//final String cssIdStr = "jane.societies.local";
 		LOG.info("pushtoContext cssIdStr: " +cssIdStr);
 
 
@@ -2944,26 +2763,28 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			LOG.info("pushtoContext ownerCtxId: " +ownerCtxId);
 
 			String value;
-			List<CssNode> value1;
 			int value2;
 
 			// NAME
 			value = record.getName();
 			LOG.info("pushtoContext NAME value: " +value);
-			if (value != null && !value.isEmpty())
+			if (value != null && !value.isEmpty()){
 				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.NAME, value);
+			}
 
 			// EMAIL
 			value = record.getEmailID();
 			LOG.info("pushtoContext EMAIL value: " +value);
-			if (value != null && !value.isEmpty())
+			if (value != null && !value.isEmpty()){
 				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.EMAIL, value);
+			}
 			
 			// HomeLocation
 			value = record.getHomeLocation();
 			LOG.info("pushtoContext HomeLocation value: " +value);
-			if (value != null && !value.isEmpty())
+			if (value != null && !value.isEmpty()){
 				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.ADDRESS_HOME_CITY, value);
+			}
 			
 			// Entity
 			value2 = record.getEntity();
@@ -2987,13 +2808,13 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			// ForeName
 			value = record.getForeName();
 			LOG.info("pushtoContext FORENAME value: " +value);
-			if (value != null && !value.isEmpty())
+			if (value != null && !value.isEmpty()){
 				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.NAME_FIRST, value);
+			}
 			
 			// Sex
 			value2 = record.getSex();
 			LOG.info("pushtoContext SEX value: " +value2);
-			//if (value2 != null && !value2.isEmpty()
 			if (value2 >= 0 && value2 <=2){
 							
 				if(value2 == CSSManagerEnums.genderType.Male.ordinal()){
@@ -3013,30 +2834,25 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			// CSS Identity
 			value = record.getCssIdentity();
 			LOG.info("pushtoContext IDENTITY value: " +value);
-			if (value != null && !value.isEmpty())
+			if (value != null && !value.isEmpty()){
 				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.ID, value);
+				}
 
 			// Workplace
 			value = record.getWorkplace();
 			LOG.info("pushtoContext WORKPLACE value: " +value);
-			if (value != null && !value.isEmpty())
+			if (value != null && !value.isEmpty()){
 				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.ADDRESS_WORK_CITY, value);
+			}
 			
 			// Position
 			value = record.getPosition();
 			LOG.info("pushtoContext POSITION value: " +value);
-			if (value != null && !value.isEmpty())
+			if (value != null && !value.isEmpty()){
 				updateCtxAttribute(ownerCtxId, CtxAttributeTypes.WORK_POSITION, value);
+			}
 			
 			// CSS Nodes
-//			value1 = record.getCssNodes();
-//			if (record.getCssNodes() != null) {
-//				for (CssNode cssNode : record.getCssNodes()) {
-//					INetworkNode cssNodeId = (INetworkNode) commManager.getIdManager().fromJid(cssNode.getIdentity());
-//					LOG.info("pushtoContext CSSNODES value: " +value1);
-//					this.ctxBroker.createCssNode(cssNodeId);
-//				}
-//			}
 			
 			List<CssNode> cssNodes = new ArrayList<CssNode>();
 			cssNodes = record.getCssNodes();
@@ -3073,7 +2889,6 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 						LOG.info("pushtoContext CssNodeStatus value: " +value);
 					}
 			  }
-			   // updateCtxAttribute(cssNodeEnt.getId(), CtxAttributeTypes.CSS_NODE_STATUS, value2);
 			  
 			  // TODO Type
 			  value2 = cssNode.getType();
@@ -3096,19 +2911,19 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 					}
 				  
 			  }
-				  
-			    //updateCtxAttribute(cssNodeEnt.getId(), CtxAttributeTypes.CSS_NODE_TYPE, value);
 			  
 			  // MAC Address
 			  value = cssNode.getCssNodeMAC();
-			  if (value != null && !value.isEmpty())
-			    updateCtxAttribute(cssNodeEnt.getId(), CtxAttributeTypes.MAC_ADDRESS, value);
+			  if (value != null && !value.isEmpty()){
+				  updateCtxAttribute(cssNodeEnt.getId(), CtxAttributeTypes.MAC_ADDRESS, value);	
+			  }  
 			  LOG.info("pushtoContext MAC Address value: " +value);
 
 			  // Interactable
 			  value = cssNode.getInteractable();
-			  if (value != null && !value.isEmpty())
-			    updateCtxAttribute(cssNodeEnt.getId(), CtxAttributeTypes.IS_INTERACTABLE, value);
+			  if (value != null && !value.isEmpty()){
+				  updateCtxAttribute(cssNodeEnt.getId(), CtxAttributeTypes.IS_INTERACTABLE, value);
+			  } 
 			  LOG.info("pushtoContext Interactable value: " +value);
 			}
 
@@ -3137,10 +2952,11 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 		final List<CtxIdentifier> ctxIds = 
 				this.ctxBroker.lookup(ownerCtxId, CtxModelType.ATTRIBUTE, type).get();
 		final CtxAttribute attr;
-		if (!ctxIds.isEmpty())
+		if (!ctxIds.isEmpty()){
 			attr = (CtxAttribute) this.ctxBroker.retrieve(ctxIds.get(0)).get();
-		else
+		}else{
 			attr = this.ctxBroker.createAttribute(ownerCtxId, type).get();
+		}
 
 		attr.setStringValue(value);
 		attr.setValueType(CtxAttributeValueType.STRING);
@@ -3150,14 +2966,16 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 	
 	private CtxAttribute retrieveCtxAttribute(CtxEntityIdentifier ownerCtxId, String type) throws Exception {
 
-		  if (LOG.isDebugEnabled())
+		  if (LOG.isDebugEnabled()){
 		    LOG.debug("Retrieving '" + type + "' attribute of entity " + ownerCtxId);
+		  }
 		  final List<CtxIdentifier> ctxIds = ctxBroker.lookup(ownerCtxId, CtxModelType.ATTRIBUTE, type).get();
 		  
-		  if (!ctxIds.isEmpty())
+		  if (!ctxIds.isEmpty()){
 		    return (CtxAttribute) this.ctxBroker.retrieve(ctxIds.get(0)).get();
-		  else
+		  }else{
 		    return null;
+		  }
 		}
 
 	@Override
@@ -3184,9 +3002,9 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 			Future<List<IActivity>> result = activityFeed.getActivities(timePeriod, limitResults);
 			listSchemaActivities = ConvertIActivities(result.get());
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			LOG.error("Ops! Interrupted Exception", e);
 		} catch (ExecutionException e) {
-			e.printStackTrace();
+			LOG.error("Ops! Execution Exception", e);
 		}
 		return new AsyncResult(listSchemaActivities); 
 	}
@@ -3199,13 +3017,16 @@ public Future<HashMap<CssAdvertisementRecord, Integer>> getSuggestedFriendsDetai
 				org.societies.api.schema.activity.MarshaledActivity ma = new org.societies.api.schema.activity.MarshaledActivity();
 				ma.setActor(activity.getActor());
 				ma.setVerb(activity.getVerb());
-		        if(activity.getObject()!=null && activity.getObject().isEmpty() == false )
+		        if(activity.getObject()!=null && activity.getObject().isEmpty() == false ){
 		        	ma.setObject(activity.getObject());
-		        if(activity.getPublished()!=null && activity.getPublished().isEmpty() == false )
+		        }
+		        if(activity.getPublished()!=null && activity.getPublished().isEmpty() == false ){
 		        	ma.setPublished(activity.getPublished());
+		        }
 	
-		        if(activity.getTarget()!=null && activity.getTarget().isEmpty() == false )
+		        if(activity.getTarget()!=null && activity.getTarget().isEmpty() == false ){
 		        	ma.setTarget(activity.getTarget());
+		        }
 		        listSchemaActivities.add(ma);
 			} catch (Exception ex) {
 				LOG.error("Exception converting to MarshaledActivity: " + ex);

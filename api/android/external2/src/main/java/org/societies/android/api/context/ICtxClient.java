@@ -45,33 +45,34 @@ import org.societies.api.schema.identity.RequestorBean;
 public interface ICtxClient extends IServiceManager {
 	
 	//Intents
-	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.platform.ctxclient.ReturnValue";
-	public static final String INTENT_RETURN_STATUS_KEY = "org.societies.android.platform.ctxclient.ReturnStatus";
-
-	public static final String CREATE_ENTITY = "org.societies.android.platform.ctxclient.CREATE_ENTITY";
-	public static final String CREATE_ATTRIBUTE = "org.societies.android.platform.ctxclient.CREATE_ATTRIBUTE";
-	public static final String CREATE_ASSOCIATION = "org.societies.android.platform.ctxclient.CREATE_ASSOCIATION";
-	public static final String LOOKUP = "org.societies.android.platform.ctxclient.LOOKUP";
-	public static final String LOOKUP_CTX_ENTITY = "org.societies.android.platform.ctxclient.LOOKUP_CTX_ENTITY";
-	public static final String LOOKUP_ENTITIES = "org.societies.android.platform.ctxclient.LOOKUP_ENTITIES";
-	public static final String REMOVE = "org.societies.android.platform.ctxclient.REMOVE";
-	public static final String RETRIEVE = "org.societies.android.platform.ctxclient.RETRIEVE";
-	public static final String RETRIEVE_INDIVIDUAL_ENTITY_ID = "org.societies.android.platform.ctxclient.RETRIEVE_INDIVIDUAL_ENTITY_ID";
-	public static final String RETRIEVE_COMMUNITY_ENTITY_ID = "org.societies.android.platform.ctxclient.RETRIEVE_COMMUNITY_ENTITY_ID";
-	public static final String UPDATE = "org.societies.android.platform.ctxclient.UPDATE";
+	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.platform.context.ReturnValue";
+	public static final String INTENT_RETURN_STATUS_KEY = "org.societies.android.platform.context.ReturnStatus";
+	public static final String INTENT_EXCEPTION_VALUE_KEY = "org.societies.android.platform.context.ExceptionValue";
+	
+	public static final String CREATE_ENTITY = "org.societies.android.platform.context.CREATE_ENTITY";
+	public static final String CREATE_ATTRIBUTE = "org.societies.android.platform.context.CREATE_ATTRIBUTE";
+	public static final String CREATE_ASSOCIATION = "org.societies.android.platform.context.CREATE_ASSOCIATION";
+	public static final String LOOKUP = "org.societies.android.platform.context.LOOKUP";
+	public static final String LOOKUP_CTX_ENTITY = "org.societies.android.platform.context.LOOKUP_CTX_ENTITY";
+	public static final String LOOKUP_ENTITIES = "org.societies.android.platform.context.LOOKUP_ENTITIES";
+	public static final String REMOVE = "org.societies.android.platform.context.REMOVE";
+	public static final String RETRIEVE = "org.societies.android.platform.context.RETRIEVE";
+	public static final String RETRIEVE_INDIVIDUAL_ENTITY_ID = "org.societies.android.platform.context.RETRIEVE_INDIVIDUAL_ENTITY_ID";
+	public static final String RETRIEVE_COMMUNITY_ENTITY_ID = "org.societies.android.platform.context.RETRIEVE_COMMUNITY_ENTITY_ID";
+	public static final String UPDATE = "org.societies.android.platform.context.UPDATE";
 	
 	//Array of interface method signatures
-	String methodsArray [] = {"createEntity(String client, final RequestoBean requestor, final string targetCss, final String type)",
-			"createAttribute(String client, final RequestorBean requestor, final CtxEntityIdentifierBean scope, final String type)",
-			"createAssociation(String client, final RequestorBean requestor, final String targetCss, final String type)",
-			"lookup(String client, final RequestorBean requestor, final String target, final CtxModelTypeBean modelType, final String type)",
-			"lookup(String client, final RequestorBean requestor, final CtxEntityIdentifierBean entityId, final CtxModelTypeBean modelType, final String type)",
-			"lookupEntities(String client, final RequestorBean requestor, final String targetCss, final String entityType, final String attribType, final Serializable minAttribValue, final Serializable maxAttribValue)",
-			"remove(String client, final RequestorBean requestor, final CtxIdentifierBean identifier)",
-			"retrieve(String client, final RequestorBean requestor, final CtxIdentifierBean identifier)",
-			"retrieveIndividualEntityId(String client, final RequestorBean requestor, final String cssId)",
-			"retrieveCommunityEntityId(String client, final RequestorBean requestor, final String cisId)",
-			"update(String client, final RequestorBean requestor, final CtxModelObjectBean object)",
+	String methodsArray [] = {"createEntity(String client, org.societies.api.schema.identity.RequestorBean requestor, String targetCss, String type)",
+			"createAttribute(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.context.model.CtxEntityIdentifierBean scope, String type)",
+			"createAssociation(String client, org.societies.api.schema.identity.RequestorBean requestor, String targetCss, String type)",
+			"lookup(String client, org.societies.api.schema.identity.RequestorBean requestor, String target, org.societies.api.schema.context.model.CtxModelTypeBean modelType, String type)",
+			"lookup(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.context.model.CtxEntityIdentifierBean entityId, org.societies.api.schema.context.model.CtxModelTypeBean modelType, String type)",
+			"lookupEntities(String client, org.societies.api.schema.identity.RequestorBean requestor, String targetCss, String entityType, String attribType, Serializable minAttribValue, Serializable maxAttribValue)",
+			"remove(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.context.model.CtxIdentifierBean identifier)",
+			"retrieve(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.context.model.CtxIdentifierBean identifier)",
+			"retrieveIndividualEntityId(String client, org.societies.api.schema.identity.RequestorBean requestor, String cssId)",
+			"retrieveCommunityEntityId(String client, org.societies.api.schema.identity.RequestorBean requestor, String cisId)",
+			"update(String client, org.societies.api.schema.identity.RequestorBean requestor, org.societies.api.schema.context.model.CtxModelObjectBean object)",
 			"startService()",
 			"stopService()"
 	};

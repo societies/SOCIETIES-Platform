@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0"
+	targetNamespace="http://societies.org/api/rfid/schema/server"
+	xmlns:tns="http://societies.org/api/rfid/schema/server"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+
+	<xs:element name="RfidServerBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="tagNumber" type="xs:string"
+					minOccurs="0" />
+				<xs:element name="method" type="tns:rfidServerMethodType"
+					minOccurs="0" />
+				<xs:element name="identity" type="xs:string"
+					minOccurs="0" />
+				<xs:element name="serviceID" type="xs:string" 
+					minOccurs="0"/>
+				<xs:element name="password" type="xs:string" 
+					minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
+	<xs:simpleType name="rfidServerMethodType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="registerRFIDTag" />
+			<xs:enumeration value="unregisterRFIDTag" />
+			<xs:enumeration value="ackDeleteTag" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+</xs:schema>
+

@@ -90,12 +90,6 @@
 			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>org.societies</groupId>
-			<artifactId>activityfeed</artifactId>
-			<version>${version.cis}</version>
-
-		</dependency>
 		
 		
 		<dependency>
