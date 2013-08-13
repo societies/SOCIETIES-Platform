@@ -205,15 +205,15 @@ public class CACIDiscovery implements ICACIDiscovery{
 	private CtxAttribute storeModelCtxDB(UserIntentModelData modelData){
 
 		if(modelData.getActionModel().isEmpty()) {
-			LOG.info("No community actions in CACI model , couldn't store model to Ctx DB");
+			LOG.debug("No community actions in CACI model , couldn't store model to Ctx DB");
 			return null;
 		}
 
 		if( this.cisIdentifier == null) {
-			LOG.info("CIS identifiers is not defined");
+			LOG.debug("CIS identifier is not defined");
 			return null;
 		} 		
-		LOG.info("community model "+modelData.getActionModel() );
+		LOG.debug("community model "+modelData.getActionModel() );
 
 		CtxAttribute ctxAttrCACIModel = null;
 		try {
@@ -232,21 +232,12 @@ public class CACIDiscovery implements ICACIDiscovery{
 				uiModelAttributeId = attr.getId();
 				ctxAttrCACIModel = ctxBroker.updateAttribute(uiModelAttributeId, binaryModel).get();
 			}			
-			LOG.info("CACI Model stored in community ctx DB" + ctxAttrCACIModel.getId());
+			LOG.debug("CACI Model stored in community ctx DB" + ctxAttrCACIModel.getId());
 
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
+		}  catch (Exception e) {
+			LOG.error("Exception while storing CACI model in context DB" + e.getLocalizedMessage());
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}  catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 		return ctxAttrCACIModel;
 	}
 

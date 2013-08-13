@@ -103,11 +103,6 @@ public class CAUIPrediction implements ICAUIPrediction{
 	// Coupled of String representation of performed action and respective predicted action   
 	public static java.util.List<java.util.Map.Entry<String,String>> predictionPairList= new java.util.ArrayList<java.util.Map.Entry<String,String>>();
 
-	@Override
-	public java.util.List<java.util.Map.Entry<String, String>> getPredictionPairLog() {
-		return predictionPairList;
-	}
-
 	int predictionRequestsCounter = 0;
 	int discoveryThreshold = 6;
 	public boolean cauiModelExist = false;
@@ -208,7 +203,15 @@ public class CAUIPrediction implements ICAUIPrediction{
 		}
 
 		if(cauiModelExist == true && enableCauiPrediction == true){
-
+			
+			if(currentUIModelData != null ) 	{
+				
+				LOG.debug("set latest caui model " + currentUIModelData);
+				this.cauiTaskManager.updateModel(currentUIModelData);
+			}
+			LOG.debug("caui model to be used for prediction: "+ this.cauiTaskManager.getCAUIActiveModel() );
+			
+			
 			//LOG.info("1. model exists " +modelExist);
 			//LOG.info("START PREDICTION caui modelExist "+modelExist);
 			//UIModelBroker setModel = new UIModelBroker(ctxBroker,cauiTaskManager);	
@@ -218,11 +221,9 @@ public class CAUIPrediction implements ICAUIPrediction{
 			//LOG.info("2. action perf par:"+ par+" action val:"+val);
 			//add code here for retrieving current context;
 
-
-
 			// identify performed action in model
-			List<IUserIntentAction> actionsList = cauiTaskManager.retrieveActionsByTypeValue(par, val);
-			LOG.debug("3. cauiTaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
+			List<IUserIntentAction> actionsList = this.cauiTaskManager.retrieveActionsByTypeValue(par, val);
+			LOG.debug("1. CAUIMODEL TaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
 
 
 			if(actionsList.size()>0){
@@ -232,8 +233,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 				IUserIntentAction currentAction = findBestMatchingAction(actionsList);
 
-				LOG.debug("4. currentAction " +currentAction);
-				Map<IUserIntentAction,Double> nextActionsMap = cauiTaskManager.retrieveNextActions(currentAction);	
+				LOG.debug("2. CAUIMODEL currentAction " +currentAction);
+				Map<IUserIntentAction,Double> nextActionsMap = this.cauiTaskManager.retrieveNextActions(currentAction);	
 				//LOG.info("5. nextActionsMap " +nextActionsMap);
 
 				// no context
@@ -252,7 +253,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 			}
 		} else if(enableCACIPrediction == true && caciModelExist == true) {
 			LOG.info("CAUI predictor not able to perform prediction ... community model to be used");
-
+			
 			results = this.caciPredictor.getPrediction(requestor, action);
 
 		} else LOG.info("neither caci, nor caui are able to perform prediction");
@@ -625,6 +626,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		if (newUIModelData != null){
 			this.caciPredictor.setCACIActiveModel(newUIModelData);
+			caciModelExist = true;	
+			
 			LOG.info("caci model set - actions map: "+newUIModelData.getActionModel());
 		}
 	}
@@ -1195,7 +1198,10 @@ public class CAUIPrediction implements ICAUIPrediction{
 		return result;
 	}
 
-	
+	@Override
+	public java.util.List<java.util.Map.Entry<String, String>> getPredictionPairLog() {
+		return predictionPairList;
+	}
 	
 
 

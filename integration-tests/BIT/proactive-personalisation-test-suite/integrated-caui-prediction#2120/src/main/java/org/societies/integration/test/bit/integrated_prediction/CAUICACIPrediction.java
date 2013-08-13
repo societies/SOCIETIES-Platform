@@ -39,6 +39,7 @@ import java.util.concurrent.ExecutionException;
 import junit.framework.Assert;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -76,22 +77,55 @@ public class CAUICACIPrediction {
 
 	boolean modelExist = false;
 
-	@Before
+	@BeforeClass 
 	public void setUp() throws Exception {
-
-		createCAUIModel();
-		//createCACIModel();
-	}
-
-
-
-	public void createCAUIModel() throws URISyntaxException{
 
 		this.serviceSri = new ServiceResourceIdentifier();
 		this.serviceSri.setServiceInstanceIdentifier(SERVICE_SRI);
 		this.serviceSri.setIdentifier(new URI(SERVICE_SRI));
+		
+		createCAUIModel();
+		createCACIModel();
+	}
 
+	public void createCACIModel() throws URISyntaxException{
+		
+		LOG.info("createCACIModel");
+		HashMap<String,Serializable> context = new HashMap<String,Serializable>();
+		context.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "home");
+		context.put(CtxAttributeTypes.STATUS, "free");
 
+		UserIntentModelData modelData = TestCase2120.cauiTaskManager.createModel();
+
+		IUserIntentAction userActionOn = TestCase2120.cauiTaskManager.createAction(this.serviceSri ,SERVICE_TYPE,"radio","on");
+		userActionOn.setActionContext(context);
+
+		IUserIntentAction userActionOff = TestCase2120.cauiTaskManager.createAction(this.serviceSri ,SERVICE_TYPE,"radio","off");
+		userActionOff.setActionContext(context);
+		/*
+		IUserIntentAction userActionSetVol = TestCase2120.cauiTaskManager.createAction(this.serviceSri ,SERVICE_TYPE,"SetVolume","medium");
+		userActionSetVol.setActionContext(context);
+
+		IUserIntentAction userActionSetChannel = TestCase2120.cauiTaskManager.createAction(this.serviceSri ,SERVICE_TYPE,"SetChannel","radio1");
+		userActionSetChannel.setActionContext(context);
+		*/
+		
+		TestCase2120.cauiTaskManager.setActionLink(userActionOn, userActionOff, 1.0d);	
+		//TestCase2120.cauiTaskManager.setActionLink(userActionOn, userActionSetChannel, 0.7d);
+		//TestCase2120.cauiTaskManager.setActionLink(userActionSetVol, userActionOff, 1.0d);	
+		//TestCase2120.cauiTaskManager.setActionLink(userActionSetChannel, userActionOff, 1.0d);	
+
+		modelData  = TestCase2120.cauiTaskManager.retrieveModel();
+		
+		storeModelCtxDB(modelData,CtxAttributeTypes.CACI_MODEL);
+
+		LOG.info("CACI modelData ::"+modelData.getActionModel());
+		
+	}
+
+	public void createCAUIModel() throws URISyntaxException, InterruptedException{
+
+		LOG.info("createCAUIModel");
 		HashMap<String,Serializable> context = new HashMap<String,Serializable>();
 		context.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "home");
 		context.put(CtxAttributeTypes.STATUS, "free");
@@ -117,41 +151,67 @@ public class CAUICACIPrediction {
 		TestCase2120.cauiTaskManager.setActionLink(userActionSetChannel, userActionOff, 1.0d);	
 
 		modelData  = TestCase2120.cauiTaskManager.retrieveModel();
-		storeModelCtxDB(modelData);
+		storeModelCtxDB(modelData,CtxAttributeTypes.CAUI_MODEL);
 
-		LOG.debug("CAUI modelData ::"+modelData.getActionModel());
+		LOG.info("CAUI modelData ::"+modelData.getActionModel());
+		Thread.sleep(5000);
 		
-		/*
-		target.put(userActionSetVol, 0.5d);
-		model.put(userActionOn,target);
-		target.clear();
+	}
 
-		//On --> setChannel 0.5
-		target.put(userActionSetChannel,0.5d);
-		model.put(userActionOn,target);
-		target.clear();
+	@Test
+	public void TestPerformOnDemandCACIPrediction() throws InterruptedException, ExecutionException {
+		
+		Thread.sleep(2000);
+		LOG.info("skata1");
+		TestCase2120.cauiPrediction.enableUserPrediction(false);
+		assertFalse(TestCase2120.cauiPrediction.isUserPredictionEnabled());
+		LOG.info("skata2");
+		
+		TestCase2120.cauiPrediction.enableCommPrediction(true);
+		assertTrue(TestCase2120.cauiPrediction.isCommunityPredictionEnabled());
+		
+		IIdentity cssOwnerId = getOwnerId();
 
-		// SetVol--> off 1.0
-		// SetChannel --> off 1.0
-		target.put(userActionOff,1.0d);
-		model.put(userActionSetVol,target);
-		model.put(userActionSetChannel,target);
-		target.clear();
+		// this action simulates an action performed by the user 
+		IAction actionRadio1 = new Action(this.serviceSri ,SERVICE_TYPE,"radio","on");
+		LOG.info("skata3 "+actionRadio1 );
+		
+		List<IUserIntentAction> actionList = TestCase2120.cauiPrediction.getPrediction(cssOwnerId, actionRadio1).get();
+		LOG.info("CACi:: List of predicted actions :  "+  actionList );
+		
+		boolean parNameflag = false;
+		boolean valueflag = false;
+		
+		if(actionList.size()>0){
 
-		UserIntentModelData intentModel =  
-		 */
+			for(IUserIntentAction predictedAction: actionList){
+				String parName = predictedAction.getparameterName();
+				String value = predictedAction.getvalue();	
+
+				if(parName.equals("radio") ) parNameflag = true;
+				if(value.equals("off") ) valueflag = true;
+			
+				LOG.info("CACI PREDICTION perform prediction :"+ predictedAction +" conf level: "+predictedAction.getConfidenceLevel());
+			}
+		}
+	
+		assertTrue(parNameflag);
+		assertTrue(valueflag);
+		
 	}
 
 
 
-
 	@Test
-	public void TestPerformOnDemandPrediction() {
+	public void TestPerformOnDemandCAUIPrediction() {
 
+		
+		TestCase2120.cauiPrediction.enableUserPrediction(true);
+		assertTrue(TestCase2120.cauiPrediction.isUserPredictionEnabled());
 		try {	
 			LOG.info("TestPerformOnDemandPrediction : waiting 9000 for model creation ");
 			Thread.sleep(5000);
-
+			 
 			IIdentity cssOwnerId = getOwnerId();
 
 			// this action simulates an action performed by the user 
@@ -212,8 +272,6 @@ public class CAUICACIPrediction {
 			e.printStackTrace();
 		}  
 	}
-
-
 
 
 	private CtxAttribute setContext(String type, Serializable value){
@@ -299,7 +357,7 @@ public class CAUICACIPrediction {
 	}
 
 
-	private CtxAttribute storeModelCtxDB(UserIntentModelData modelData){
+	private CtxAttribute storeModelCtxDB(UserIntentModelData modelData, String attributeType){
 
 		CtxAttribute ctxAttrCAUIModel = null;
 		try {
@@ -313,7 +371,7 @@ public class CAUICACIPrediction {
 			IIdentity cssOwnerId = TestCase2120.getCommMgr().getIdManager().fromJid(cssOwnerStr);
 
 			IndividualCtxEntity operator = TestCase2120.getCtxBroker().retrieveIndividualEntity(cssOwnerId).get();
-			List<CtxIdentifier> cauiModelAttrList = TestCase2120.getCtxBroker().lookup(operator.getId(),CtxModelType.ATTRIBUTE ,CtxAttributeTypes.CAUI_MODEL).get();
+			List<CtxIdentifier> cauiModelAttrList = TestCase2120.getCtxBroker().lookup(operator.getId(),CtxModelType.ATTRIBUTE ,attributeType).get();
 
 			if(!cauiModelAttrList.isEmpty()){
 				CtxAttributeIdentifier attrId = (CtxAttributeIdentifier) cauiModelAttrList.get(0);
@@ -325,12 +383,12 @@ public class CAUICACIPrediction {
 
 				ctxAttrCAUIModel = TestCase2120.getCtxBroker().updateAttribute(ctxAttrCAUIModel.getId(), binaryModel).get();
 			} else {
-				ctxAttrCAUIModel = TestCase2120.getCtxBroker().createAttribute(operator.getId(),CtxAttributeTypes.CAUI_MODEL).get();
+				ctxAttrCAUIModel = TestCase2120.getCtxBroker().createAttribute(operator.getId(),attributeType).get();
 				ctxAttrCAUIModel = TestCase2120.getCtxBroker().updateAttribute(ctxAttrCAUIModel.getId(), binaryModel).get();
 			}
 
 		} catch (Exception e) {
-			LOG.error("Exception while storing CAUI model in context DB" + e.getLocalizedMessage());
+			LOG.error("Exception while storing"+ attributeType +"model in context DB" + e.getLocalizedMessage());
 			e.printStackTrace();
 		} 
 		return ctxAttrCAUIModel;
