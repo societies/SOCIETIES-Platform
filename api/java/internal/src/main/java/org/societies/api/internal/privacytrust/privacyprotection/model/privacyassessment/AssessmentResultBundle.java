@@ -25,30 +25,25 @@
 package org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment;
 
 /**
- * 
+ * Privacy Assessment result for a particular sender in form of a particular bundle symbolic name
+ * or service ID that is mapped to the bundle.
+ * Based on all data packets that were sent by this sender.
+ * This assessment is more reliable because the sender identity is determined by the assessment.
  *
  * @author Mitja Vardjan
  *
  */
-public class AssessmentException extends Exception {
+public class AssessmentResultBundle extends AssessmentResult {
+
+	public AssessmentResultBundle(String sender) {
+		super(sender);
+	}
 
 	/**
-	 * Generated serial version ID
+	 * @return the sender
 	 */
-	private static final long serialVersionUID = 8199267032424112244L;
-
-	public AssessmentException() {
-	}
-	
-	public AssessmentException(String msg) {
-		super(msg);
-	}
-	
-	public AssessmentException(Throwable cause) {
-		super(cause);
-	}
-	
-	public AssessmentException(String msg, Throwable cause) {
-		super(msg, cause);
+	@Override
+	public String getSender() {
+		return (String) sender;
 	}
 }

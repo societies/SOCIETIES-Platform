@@ -424,9 +424,18 @@ public class CAUITaskManager implements ICAUITaskManager{
 				}
 			}	
 		}
-		//System.out.println("actionsScoreMap  " +actionsScoreMap);
+		System.out.println("actionsScoreMap  " +actionsScoreMap);
+		
+		
 		if(!actionsScoreMap.values().isEmpty()){
-
+			
+			// check if no context matches, return empty set
+			boolean allValuesZero = true;
+			for(Integer value : actionsScoreMap.values()){
+				if (value != 0)  allValuesZero = false;
+			}
+			if(allValuesZero) return bestActionList;
+			
 			int maxValueInMap=(Collections.max(actionsScoreMap.values()));  // This will return max value in the Hashmap
 			for(IUserIntentAction action  : actionsScoreMap.keySet()){
 				if(actionsScoreMap.get(action).equals(maxValueInMap)) {
