@@ -2,7 +2,6 @@ package org.societies.personalisation.CAUIDiscovery.test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Future;
 
 import org.societies.api.identity.IIdentity;

@@ -1,7 +1,6 @@
 package org.societies.personalisation.CAUIDiscovery.impl;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 

@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.slf4j.Logger;
@@ -13,26 +12,20 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
-import org.societies.personalisation.CACI.api.CACIDiscovery.ICACIDiscovery;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
-import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.webapp.models.CAUIAction;
 import org.societies.webapp.models.CAUIActionLog;
 import org.societies.webapp.service.UserService;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.internal.context.model.CtxAttributeTypes;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.RequestScoped;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
+
 
 @ManagedBean(name = "cauiController")
 @ViewScoped

@@ -31,7 +31,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.commons.math.estimation.EstimatedParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -42,10 +41,8 @@ import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
@@ -53,8 +50,6 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.restfb.types.Event;
 
 public class CommunityMembershipChangeListener implements CtxChangeEventListener {
 
@@ -76,7 +71,7 @@ public class CommunityMembershipChangeListener implements CtxChangeEventListener
 		// fetch my CSS entity
 		IndividualCtxEntity ownerEnt = ctxBroker.retrieveIndividualEntity(this.ownerId).get();
 		// fetch OWNS_COMMUNITIES assoc
-		Set<CtxAssociationIdentifier> ownsCISsSet = ownerEnt.getAssociations(CtxAssociationTypes.IS_MEMBER_OF);
+		Set<CtxAssociationIdentifier> ownsCISsSet = ownerEnt.getAssociations(CtxAssociationTypes.IS_ADMIN_OF);
 		// TODO The "IS_MEMBER_OF will change in "OWNS_COMMUNITIES"
 
 		if (ownsCISsSet.isEmpty()){
@@ -241,7 +236,7 @@ public class CommunityMembershipChangeListener implements CtxChangeEventListener
 
 	@Override
 	public void onModification(CtxChangeEvent event) {
-		if (CtxAssociationTypes.IS_MEMBER_OF.equals(event.getId().getType())) // TODO change OWNS_COMMUNITIES
+		if (CtxAssociationTypes.IS_ADMIN_OF.equals(event.getId().getType())) // TODO change OWNS_COMMUNITIES
 			this.executorService.execute(new UserOwnsCommunitiesHandler(event.getId()));
 	}
 

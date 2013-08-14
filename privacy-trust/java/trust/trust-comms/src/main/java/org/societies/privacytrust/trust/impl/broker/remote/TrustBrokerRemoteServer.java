@@ -39,24 +39,30 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.util.RequestorUtils;
+import org.societies.api.internal.privacytrust.trust.model.ExtTrustRelationship;
+import org.societies.api.schema.privacytrust.trust.broker.ExtTrustRelationshipRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.ExtTrustRelationshipResponseBean;
+import org.societies.api.schema.privacytrust.trust.broker.ExtTrustRelationshipsRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.ExtTrustRelationshipsResponseBean;
 import org.societies.api.schema.privacytrust.trust.broker.MethodName;
 import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerRequestBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustBrokerResponseBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipRequestBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipResponseBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipsRemoveRequestBean;
+import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipsRemoveResponseBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipsRequestBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustRelationshipsResponseBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustValueRequestBean;
 import org.societies.api.schema.privacytrust.trust.broker.TrustValueResponseBean;
+import org.societies.api.schema.privacytrust.trust.model.ExtTrustRelationshipBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustRelationshipBean;
 import org.societies.api.privacytrust.trust.ITrustBroker;
 import org.societies.api.privacytrust.trust.TrustQuery;
 import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
 import org.societies.api.privacytrust.trust.model.TrustModelBeanTranslator;
 import org.societies.api.privacytrust.trust.model.TrustRelationship;
-import org.societies.api.privacytrust.trust.model.TrustValueType;
-import org.societies.api.privacytrust.trust.model.TrustedEntityId;
-import org.societies.api.privacytrust.trust.model.TrustedEntityType;
+import org.societies.privacytrust.trust.impl.remote.util.TrustCommsClientTranslator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -85,6 +91,10 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 	/** The Trust Broker service reference. */
 	@Autowired(required=true)
 	private ITrustBroker trustBroker;
+	
+	/** The internal Trust Broker service reference. */
+	@Autowired(required=true)
+	private org.societies.api.internal.privacytrust.trust.ITrustBroker internalTrustBroker;
 	
 	/** The Communications Mgr service reference. */
 	@Autowired(required=true)
@@ -124,15 +134,14 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 		if (payload == null)
 			throw new NullPointerException("payload can't be null");
 		
-		LOG.debug("getQuery: stanza={}, payload={}", stanza, payload);
+		LOG.debug("getQuery: stanza={}, payload={}", stanza, payload); 
 		
-		if (!(payload instanceof TrustBrokerRequestBean))
+		if (!(payload instanceof TrustBrokerRequestBean)) {
 			throw new XMPPError(StanzaError.bad_request, "Unknown request bean class: "
 					+ payload.getClass());
+		}
 		
 		final TrustBrokerRequestBean requestBean = (TrustBrokerRequestBean) payload;
-		final TrustBrokerResponseBean responseBean = new TrustBrokerResponseBean();
-		responseBean.setMethodName(requestBean.getMethodName());
 		
 		LOG.debug("getQuery: requestBean.getMethodName()={}", requestBean.getMethodName());
 		if (MethodName.RETRIEVE_TRUST_RELATIONSHIPS.equals(requestBean.getMethodName())) {
@@ -146,110 +155,28 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 						"Invalid TrustBroker remote retrieve trust relationships request: "
 						+ "TrustRelationshipsRequestBean can't be null");
 			}
-			if (trustRelationshipsRequestBean.getRequestor() == null) {
-				LOG.error("Invalid TrustBroker remote retrieve trust relationships request: "
-						+ "requestor can't be null");
-				throw new XMPPError(StanzaError.bad_request, 
-						"Invalid TrustBroker remote retrieve trust relationships request: "
-						+ "requestor can't be null");
-			}
-			if (trustRelationshipsRequestBean.getTrustorId() == null) {
-				LOG.error("Invalid TrustBroker remote retrieve trust relationships request: "
-						+ "trustorId can't be null");
-				throw new XMPPError(StanzaError.bad_request, 
-						"Invalid TrustBroker remote retrieve trust relationships request: "
-						+ "trustorId can't be null");
-			}
-			
-			try {
-				final Requestor requestor = RequestorUtils.toRequestor(
-						trustRelationshipsRequestBean.getRequestor(), this.commManager.getIdManager());
-				final TrustedEntityId trustorId = TrustModelBeanTranslator.getInstance().
-						fromTrustedEntityIdBean(trustRelationshipsRequestBean.getTrustorId());
-				final Set<TrustRelationship> result; 
-				if (trustRelationshipsRequestBean.getTrusteeId() == null
-						&& trustRelationshipsRequestBean.getTrusteeType() == null
-						&& trustRelationshipsRequestBean.getTrustValueType() == null) {
-					
-					LOG.debug("getQuery: requestor={}, trustorId={}", requestor, trustorId);
-					result = this.trustBroker.retrieveTrustRelationships(
-							requestor, new TrustQuery(trustorId)).get();
-					
-				} else if (trustRelationshipsRequestBean.getTrusteeId() != null) {
-				
-					final TrustedEntityId trusteeId = TrustModelBeanTranslator.getInstance().
-							fromTrustedEntityIdBean(trustRelationshipsRequestBean.getTrusteeId());
-					LOG.debug("getQuery: requestor={}, trustorId={}, trusteeId={}",
-							new Object[] { requestor, trustorId, trusteeId });
-					result = this.trustBroker.retrieveTrustRelationships(
-							requestor, new TrustQuery(trustorId).setTrusteeId(trusteeId)).get();
-					
-				} else if (trustRelationshipsRequestBean.getTrusteeType() != null) {
-				
-					final TrustedEntityType trusteeType = TrustModelBeanTranslator.getInstance().
-							fromTrustedEntityTypeBean(trustRelationshipsRequestBean.getTrusteeType());
-					if (trustRelationshipsRequestBean.getTrustValueType() != null) {
-				
-						final TrustValueType trustValueType = TrustModelBeanTranslator.getInstance().
-								fromTrustValueTypeBean(trustRelationshipsRequestBean.getTrustValueType());
-						LOG.debug("getQuery: requestor={}, trustorId={}, trusteeType={}, trustValueType={}", 
-								new Object[] { requestor, trustorId, trustValueType });
-						result = this.trustBroker.retrieveTrustRelationships(
-								requestor, new TrustQuery(trustorId).setTrusteeType(trusteeType)
-								.setTrustValueType(trustValueType)).get();
-						
-					} else { // if (trustRelationshipsRequestBean.getTrustValueType() == null)
-				
-						LOG.debug("getQuery: requestor={}, trustorId={}, trusteeType={}",
-									new Object[] { requestor, trustorId, trusteeType });
-						result = this.trustBroker.retrieveTrustRelationships(
-								requestor, new TrustQuery(trustorId).setTrusteeType(trusteeType)).get();
-					}
-				} else if (trustRelationshipsRequestBean.getTrustValueType() != null) {
-
-					final TrustValueType trustValueType = TrustModelBeanTranslator.getInstance().
-							fromTrustValueTypeBean(trustRelationshipsRequestBean.getTrustValueType());
-					LOG.debug("getQuery: requestor={}, trustorId={}, trustValueType={}",
-							new Object[] { requestor, trustorId, trustValueType });
-					result = this.trustBroker.retrieveTrustRelationships(
-							requestor, new TrustQuery(trustorId).setTrustValueType(trustValueType)).get();
-				} else {
-					LOG.error("Invalid TrustBroker remote retrieve trust relationships request: "
-							+ "Missing parameters");
-					throw new XMPPError(StanzaError.bad_request, 
-							"Invalid TrustBroker remote retrieve trust relationships request: "
-							+ "Missing parameters");
-				}
-				
-				final TrustRelationshipsResponseBean trustRelationshipsResponseBean = 
-						new TrustRelationshipsResponseBean();
-				final List<TrustRelationshipBean> resultBean = new ArrayList<TrustRelationshipBean>();
-				for (final TrustRelationship trustRelationship : result) {
-					resultBean.add(TrustModelBeanTranslator.getInstance().
-							fromTrustRelationship(trustRelationship));
-				}
-				trustRelationshipsResponseBean.setResult(resultBean);
-				responseBean.setRetrieveTrustRelationships(trustRelationshipsResponseBean);
-				
-			} catch (MalformedTrustedEntityIdException mteide) {
-				
-				LOG.error("Invalid TrustBroker remote retrieve trust relationships request: "
-						+ mteide.getLocalizedMessage(), mteide);
-				throw new XMPPError(StanzaError.bad_request, 
-						"Invalid TrustBroker remote retrieve trust relationships request: "
-						+ mteide.getLocalizedMessage());
-			} catch (XMPPError xmppe) {
-				
-				throw xmppe;
-			} catch (Exception e) {
-				
-				LOG.error("Could not retrieve trust relationships: "
-						+ e.getLocalizedMessage(), e);
-				throw new XMPPError(StanzaError.internal_server_error, 
-						"Could not retrieve trust relationships: "
-						+ e.getLocalizedMessage());
-			} 
+			return this.handleRequest(trustRelationshipsRequestBean);
 		
+		} else if (MethodName.RETRIEVE_EXT_TRUST_RELATIONSHIPS.equals(requestBean.getMethodName())) {
+			
+			final ExtTrustRelationshipsRequestBean extTrustRelationshipsRequestBean =
+					requestBean.getRetrieveExtTrustRelationships();
+			if (extTrustRelationshipsRequestBean == null) {
+				LOG.error("Invalid TrustBroker remote retrieve extended trust relationships request: "
+						+ "ExtTrustRelationshipsRequestBean can't be null");
+				throw new XMPPError(StanzaError.bad_request, 
+						"Invalid TrustBroker remote retrieve extended trust relationships request: "
+						+ "ExtTrustRelationshipsRequestBean can't be null");
+			}
+			if (!this.commManager.getIdManager().isMine(stanza.getFrom())) {
+				LOG.error("Invalid TrustBroker remote retrieve extended trust relationships request: "
+						+ "stanza source '" + stanza.getFrom() + "' is not recognised as a local CSS");
+				throw new XMPPError(StanzaError.not_authorized, 
+						"Invalid TrustBroker remote retrieve extended trust relationships request: "
+						+ "stanza source '" + stanza.getFrom() + "' is not recognised as a local CSS");
+			}
+			return this.handleRequest(extTrustRelationshipsRequestBean);
+			
 		} else if (MethodName.RETRIEVE_TRUST_RELATIONSHIP.equals(requestBean.getMethodName())) {
 			
 			final TrustRelationshipRequestBean trustRelationshipRequestBean =
@@ -261,73 +188,27 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 						"Invalid TrustBroker remote retrieve trust relationship request: "
 						+ "TrustRelationshipRequestBean can't be null");
 			}
-			if (trustRelationshipRequestBean.getRequestor() == null) {
-				LOG.error("Invalid TrustBroker remote retrieve trust relationship request: "
-						+ "requestor can't be null");
-				throw new XMPPError(StanzaError.bad_request, 
-						"Invalid TrustBroker remote retrieve trust relationship request: "
-						+ "requestor can't be null");
-			}
-			if (trustRelationshipRequestBean.getTrustorId() == null) {
-				LOG.error("Invalid TrustBroker remote retrieve trust relationship request: "
-						+ "trustorId can't be null");
-				throw new XMPPError(StanzaError.bad_request, 
-						"Invalid TrustBroker remote retrieve trust relationship request: "
-						+ "trustorId can't be null");
-			}
-			if (trustRelationshipRequestBean.getTrusteeId() == null) {
-				LOG.error("Invalid TrustBroker remote retrieve trust relationship request: "
-						+ "trusteeId can't be null");
-				throw new XMPPError(StanzaError.bad_request, 
-						"Invalid TrustBroker remote retrieve trust relationship request: "
-						+ "trusteeId can't be null");
-			}
-			if (trustRelationshipRequestBean.getTrustValueType() == null) {
-				LOG.error("Invalid TrustBroker remote retrieve trust relationship request: "
-						+ "trustValueType can't be null");
-				throw new XMPPError(StanzaError.bad_request, 
-						"Invalid TrustBroker remote retrieve trust relationship request: "
-						+ "trustValueType can't be null");
-			}
+			return this.handleRequest(trustRelationshipRequestBean);
 			
-			try {
-				final Requestor requestor = RequestorUtils.toRequestor(
-						trustRelationshipRequestBean.getRequestor(), this.commManager.getIdManager());
-				final TrustedEntityId trustorId = TrustModelBeanTranslator.getInstance().
-						fromTrustedEntityIdBean(trustRelationshipRequestBean.getTrustorId());
-				final TrustedEntityId trusteeId = TrustModelBeanTranslator.getInstance().
-						fromTrustedEntityIdBean(trustRelationshipRequestBean.getTrusteeId());
-				final TrustValueType trustValueType = TrustModelBeanTranslator.getInstance().
-						fromTrustValueTypeBean(trustRelationshipRequestBean.getTrustValueType());
-				LOG.debug("getQuery: requestor={}, trustorId={}, trusteeId={}, trustValueType={}",
-						new Object[] { requestor, trustorId, trusteeId, trustValueType });
-				final TrustRelationship result = this.trustBroker.retrieveTrustRelationship(
-						requestor, new TrustQuery(trustorId).setTrusteeId(trusteeId)
-						.setTrustValueType(trustValueType)).get();
-				
-				final TrustRelationshipResponseBean trustRelationshipResponseBean = 
-						new TrustRelationshipResponseBean(); 
-				if (result != null) {
-					trustRelationshipResponseBean.setResult(
-							TrustModelBeanTranslator.getInstance().fromTrustRelationship(result));
-				}
-				responseBean.setRetrieveTrustRelationship(trustRelationshipResponseBean);
-				
-			} catch (MalformedTrustedEntityIdException mteide) {
-				
-				LOG.error("Invalid TrustBroker remote retrieve trust relationship request: "
-						+ mteide.getLocalizedMessage(), mteide);
+		} else if (MethodName.RETRIEVE_EXT_TRUST_RELATIONSHIP.equals(requestBean.getMethodName())) {
+			
+			final ExtTrustRelationshipRequestBean extTrustRelationshipRequestBean =
+					requestBean.getRetrieveExtTrustRelationship();
+			if (extTrustRelationshipRequestBean == null) {
+				LOG.error("Invalid TrustBroker remote retrieve extended trust relationship request: "
+						+ "ExtTrustRelationshipRequestBean can't be null");
 				throw new XMPPError(StanzaError.bad_request, 
-						"Invalid TrustBroker remote retrieve trust relationship request: "
-						+ mteide.getLocalizedMessage());
-			} catch (Exception e) {
-				
-				LOG.error("Could not retrieve trust relationship: "
-						+ e.getLocalizedMessage(), e);
-				throw new XMPPError(StanzaError.internal_server_error, 
-						"Could not retrieve trust relationship: "
-						+ e.getLocalizedMessage());
-			} 
+						"Invalid TrustBroker remote retrieve extended trust relationship request: "
+						+ "ExtTrustRelationshipRequestBean can't be null");
+			}
+			if (!this.commManager.getIdManager().isMine(stanza.getFrom())) {
+				LOG.error("Invalid TrustBroker remote retrieve extended trust relationship request: "
+						+ "stanza source '" + stanza.getFrom() + "' is not recognised as a local CSS");
+				throw new XMPPError(StanzaError.not_authorized, 
+						"Invalid TrustBroker remote retrieve extended trust relationship request: "
+						+ "stanza source '" + stanza.getFrom() + "' is not recognised as a local CSS");
+			}
+			return this.handleRequest(extTrustRelationshipRequestBean);
 		
 		} else if (MethodName.RETRIEVE_TRUST_VALUE.equals(requestBean.getMethodName())) {
 			
@@ -340,72 +221,27 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 						"Invalid TrustBroker remote retrieve trust value request: "
 						+ "TrustValueRequestBean can't be null");
 			}
-			if (trustValueRequestBean.getRequestor() == null) {
-				LOG.error("Invalid TrustBroker remote retrieve trust value request: "
-						+ "requestor can't be null");
-				throw new XMPPError(StanzaError.bad_request, 
-						"Invalid TrustBroker remote retrieve trust value request: "
-						+ "requestor can't be null");
-			}
-			if (trustValueRequestBean.getTrustorId() == null) {
-				LOG.error("Invalid TrustBroker remote retrieve trust value request: "
-						+ "trustorId can't be null");
-				throw new XMPPError(StanzaError.bad_request, 
-						"Invalid TrustBroker remote retrieve trust value request: "
-						+ "trustorId can't be null");
-			}
-			if (trustValueRequestBean.getTrusteeId() == null) {
-				LOG.error("Invalid TrustBroker remote retrieve trust value request: "
-						+ "trusteeId can't be null");
-				throw new XMPPError(StanzaError.bad_request, 
-						"Invalid TrustBroker remote retrieve trust value request: "
-						+ "trusteeId can't be null");
-			}
-			if (trustValueRequestBean.getTrustValueType() == null) {
-				LOG.error("Invalid TrustBroker remote retrieve trust value request: "
-						+ "trustValueType can't be null");
-				throw new XMPPError(StanzaError.bad_request, 
-						"Invalid TrustBroker remote retrieve trust value request: "
-						+ "trustValueType can't be null");
-			}
+			return this.handleRequest(trustValueRequestBean);
 			
-			try {
-				final Requestor requestor = RequestorUtils.toRequestor(
-						trustValueRequestBean.getRequestor(), this.commManager.getIdManager());
-				final TrustedEntityId trustorId = TrustModelBeanTranslator.getInstance().
-						fromTrustedEntityIdBean(trustValueRequestBean.getTrustorId());
-				final TrustedEntityId trusteeId = TrustModelBeanTranslator.getInstance().
-						fromTrustedEntityIdBean(trustValueRequestBean.getTrusteeId());
-				final TrustValueType trustValueType = TrustModelBeanTranslator.getInstance().
-						fromTrustValueTypeBean(trustValueRequestBean.getTrustValueType());
-				LOG.debug("getQuery: requestor={}, trustorId={}, trusteeId={}, trustValueType={}",
-						new Object[] { requestor, trustorId, trusteeId, trustValueType });
-				final Double result = this.trustBroker.retrieveTrustValue(
-						requestor, new TrustQuery(trustorId).setTrusteeId(trusteeId)
-						.setTrustValueType(trustValueType)).get();
-				
-				final TrustValueResponseBean trustValueResponseBean = 
-						new TrustValueResponseBean(); 
-				if (result != null) {
-					trustValueResponseBean.setResult(result);
-				}
-				responseBean.setRetrieveTrustValue(trustValueResponseBean);
-				
-			} catch (MalformedTrustedEntityIdException mteide) {
-				
-				LOG.error("Invalid TrustBroker remote retrieve trust value request: "
-						+ mteide.getLocalizedMessage(), mteide);
+		} else if (MethodName.REMOVE_TRUST_RELATIONSHIPS.equals(requestBean.getMethodName())) {
+
+			final TrustRelationshipsRemoveRequestBean removeRequestBean =
+					requestBean.getRemoveTrustRelationships();
+			if (removeRequestBean == null) {
+				LOG.error("Invalid TrustBroker remote remove trust relationships request: "
+						+ "TrustRelationshipsRemoveRequestBean can't be null");
 				throw new XMPPError(StanzaError.bad_request, 
-						"Invalid TrustBroker remote retrieve trust value request: "
-						+ mteide.getLocalizedMessage());
-			} catch (Exception e) {
-				
-				LOG.error("Could not retrieve trust value: "
-						+ e.getLocalizedMessage(), e);
-				throw new XMPPError(StanzaError.internal_server_error, 
-						"Could not retrieve trust value: "
-						+ e.getLocalizedMessage());
-			} 
+						"Invalid TrustBroker remote remove trust relationships request: "
+								+ "TrustRelationshipsRemoveRequestBean can't be null");
+			}
+			if (!this.commManager.getIdManager().isMine(stanza.getFrom())) {
+				LOG.error("Invalid TrustBroker remote remove trust relationships request: "
+						+ "stanza source '" + stanza.getFrom() + "' is not recognised as a local CSS");
+				throw new XMPPError(StanzaError.not_authorized, 
+						"Invalid TrustBroker remote remove trust relationships request: "
+								+ "stanza source '" + stanza.getFrom() + "' is not recognised as a local CSS");
+			}
+			return this.handleRequest(removeRequestBean);
 			
 		} else {
 			LOG.error("Unsupported TrustBroker remote request method: "
@@ -414,8 +250,6 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 					"Unsupported TrustBroker remote request method: "
 					+ requestBean.getMethodName());
 		}
-		
-		return responseBean;
 	}
 
 	/*
@@ -436,5 +270,337 @@ public class TrustBrokerRemoteServer implements IFeatureServer {
 		LOG.warn("Received unexpected setQuery request: staza={}, payload={}", stanza, payload);
 		
 		return null;
+	}
+	
+	private TrustBrokerResponseBean handleRequest(
+			TrustRelationshipsRequestBean requestBean) throws XMPPError {
+		
+		final TrustBrokerResponseBean responseBean = new TrustBrokerResponseBean();
+		responseBean.setMethodName(MethodName.RETRIEVE_TRUST_RELATIONSHIPS);
+		
+		if (requestBean.getRequestor() == null) {
+			LOG.error("Invalid TrustBroker remote retrieve trust relationships request: "
+					+ "requestor can't be null");
+			throw new XMPPError(StanzaError.bad_request, 
+					"Invalid TrustBroker remote retrieve trust relationships request: "
+					+ "requestor can't be null");
+		}
+		if (requestBean.getQuery() == null) {
+			LOG.error("Invalid TrustBroker remote retrieve trust relationships request: "
+					+ "query can't be null");
+			throw new XMPPError(StanzaError.bad_request, 
+					"Invalid TrustBroker remote retrieve trust relationships request: "
+					+ "query can't be null");
+		}
+		
+		try {
+			// (required) requestor
+			final Requestor requestor = RequestorUtils.toRequestor(
+					requestBean.getRequestor(), this.commManager.getIdManager());
+			// (required) query
+			final TrustQuery query = TrustCommsClientTranslator.getInstance().
+					fromTrustQueryBean(requestBean.getQuery());
+			
+			LOG.debug("handleRequest: requestor={}, query={}", requestor, query);
+			final Set<TrustRelationship> result = this.trustBroker.retrieveTrustRelationships(
+					requestor, query).get();
+			
+			final TrustRelationshipsResponseBean trustRelationshipsResponseBean = 
+					new TrustRelationshipsResponseBean();
+			final List<TrustRelationshipBean> resultBean = new ArrayList<TrustRelationshipBean>();
+			for (final TrustRelationship trustRelationship : result) {
+				resultBean.add(TrustModelBeanTranslator.getInstance().
+						fromTrustRelationship(trustRelationship));
+			}
+			trustRelationshipsResponseBean.setResult(resultBean);
+			responseBean.setRetrieveTrustRelationships(trustRelationshipsResponseBean);
+			
+		} catch (MalformedTrustedEntityIdException mteide) {
+			
+			LOG.error("Invalid TrustBroker remote retrieve trust relationships request: "
+					+ mteide.getLocalizedMessage(), mteide);
+			throw new XMPPError(StanzaError.bad_request, 
+					"Invalid TrustBroker remote retrieve trust relationships request: "
+					+ mteide.getLocalizedMessage());
+			
+		} catch (Exception e) {
+			
+			LOG.error("Could not retrieve trust relationships: "
+					+ e.getLocalizedMessage(), e);
+			throw new XMPPError(StanzaError.internal_server_error, 
+					"Could not retrieve trust relationships: "
+					+ e.getLocalizedMessage());
+		} 
+		
+		return responseBean;
+	}
+	
+	private TrustBrokerResponseBean handleRequest(
+			ExtTrustRelationshipsRequestBean requestBean) throws XMPPError {
+		
+		final TrustBrokerResponseBean responseBean = new TrustBrokerResponseBean();
+		responseBean.setMethodName(MethodName.RETRIEVE_EXT_TRUST_RELATIONSHIPS);
+		
+		if (requestBean.getQuery() == null) {
+			LOG.error("Invalid TrustBroker remote retrieve extended trust relationships request: "
+					+ "query can't be null");
+			throw new XMPPError(StanzaError.bad_request, 
+					"Invalid TrustBroker remote retrieve extended trust relationships request: "
+					+ "query can't be null");
+		}
+		
+		try {
+			// (required) query
+			final TrustQuery query = TrustCommsClientTranslator.getInstance().
+					fromTrustQueryBean(requestBean.getQuery());
+			
+			LOG.debug("handleRequest: query={}", query);
+			final Set<ExtTrustRelationship> result = this.internalTrustBroker
+					.retrieveExtTrustRelationships(query).get();
+			
+			final ExtTrustRelationshipsResponseBean extTrustRelationshipsResponseBean = 
+					new ExtTrustRelationshipsResponseBean();
+			final List<ExtTrustRelationshipBean> resultBean = new ArrayList<ExtTrustRelationshipBean>();
+			for (final ExtTrustRelationship extTrustRelationship : result) {
+				resultBean.add(TrustCommsClientTranslator.getInstance().
+						fromExtTrustRelationship(extTrustRelationship));
+			}
+			extTrustRelationshipsResponseBean.setResult(resultBean);
+			responseBean.setRetrieveExtTrustRelationships(extTrustRelationshipsResponseBean);
+			
+		} catch (MalformedTrustedEntityIdException mteide) {
+			
+			LOG.error("Invalid TrustBroker remote retrieve extended trust relationships request: "
+					+ mteide.getLocalizedMessage(), mteide);
+			throw new XMPPError(StanzaError.bad_request, 
+					"Invalid TrustBroker remote retrieve extended trust relationships request: "
+					+ mteide.getLocalizedMessage());
+			
+		} catch (Exception e) {
+			
+			LOG.error("Could not retrieve extended trust relationships: "
+					+ e.getLocalizedMessage(), e);
+			throw new XMPPError(StanzaError.internal_server_error, 
+					"Could not retrieve extended trust relationships: "
+					+ e.getLocalizedMessage());
+		} 
+		
+		return responseBean;
+	}
+	
+	private TrustBrokerResponseBean handleRequest(
+			TrustRelationshipRequestBean requestBean) throws XMPPError {
+		
+		final TrustBrokerResponseBean responseBean = new TrustBrokerResponseBean();
+		responseBean.setMethodName(MethodName.RETRIEVE_TRUST_RELATIONSHIP);
+		
+		if (requestBean.getRequestor() == null) {
+			LOG.error("Invalid TrustBroker remote retrieve trust relationship request: "
+					+ "requestor can't be null");
+			throw new XMPPError(StanzaError.bad_request, 
+					"Invalid TrustBroker remote retrieve trust relationship request: "
+					+ "requestor can't be null");
+		}
+		if (requestBean.getQuery() == null) {
+			LOG.error("Invalid TrustBroker remote retrieve trust relationship request: "
+					+ "query can't be null");
+			throw new XMPPError(StanzaError.bad_request, 
+					"Invalid TrustBroker remote retrieve trust relationship request: "
+					+ "query can't be null");
+		}
+		
+		try {
+			// (required) requestor
+			final Requestor requestor = RequestorUtils.toRequestor(
+					requestBean.getRequestor(), this.commManager.getIdManager());
+			// (required) query
+			final TrustQuery query = TrustCommsClientTranslator.getInstance().
+					fromTrustQueryBean(requestBean.getQuery());
+			
+			LOG.debug("handleRequest: requestor={}, query={}", requestor, query);
+			final TrustRelationship result = this.trustBroker.retrieveTrustRelationship(
+					requestor, query).get();
+			
+			final TrustRelationshipResponseBean trustRelationshipResponseBean = 
+					new TrustRelationshipResponseBean(); 
+			if (result != null) {
+				trustRelationshipResponseBean.setResult(
+						TrustModelBeanTranslator.getInstance().fromTrustRelationship(result));
+			}
+			responseBean.setRetrieveTrustRelationship(trustRelationshipResponseBean);
+			
+		} catch (MalformedTrustedEntityIdException mteide) {
+			
+			LOG.error("Invalid TrustBroker remote retrieve trust relationship request: "
+					+ mteide.getLocalizedMessage(), mteide);
+			throw new XMPPError(StanzaError.bad_request, 
+					"Invalid TrustBroker remote retrieve trust relationship request: "
+					+ mteide.getLocalizedMessage());
+		} catch (Exception e) {
+			
+			LOG.error("Could not retrieve trust relationship: "
+					+ e.getLocalizedMessage(), e);
+			throw new XMPPError(StanzaError.internal_server_error, 
+					"Could not retrieve trust relationship: "
+					+ e.getLocalizedMessage());
+		}
+		
+		return responseBean;
+	}
+	
+	private TrustBrokerResponseBean handleRequest(
+			ExtTrustRelationshipRequestBean requestBean) throws XMPPError {
+		
+		final TrustBrokerResponseBean responseBean = new TrustBrokerResponseBean();
+		responseBean.setMethodName(MethodName.RETRIEVE_EXT_TRUST_RELATIONSHIP);
+		
+		if (requestBean.getQuery() == null) {
+			LOG.error("Invalid TrustBroker remote retrieve extended trust relationship request: "
+					+ "query can't be null");
+			throw new XMPPError(StanzaError.bad_request, 
+					"Invalid TrustBroker remote retrieve extended trust relationship request: "
+					+ "query can't be null");
+		}
+		
+		try {
+			// (required) query
+			final TrustQuery query = TrustCommsClientTranslator.getInstance().
+					fromTrustQueryBean(requestBean.getQuery());
+			
+			LOG.debug("handleRequest: query={}", query);
+			final ExtTrustRelationship result = this.internalTrustBroker
+					.retrieveExtTrustRelationship(query).get();
+			
+			final ExtTrustRelationshipResponseBean extTrustRelationshipResponseBean = 
+					new ExtTrustRelationshipResponseBean(); 
+			if (result != null) {
+				extTrustRelationshipResponseBean.setResult(
+						TrustCommsClientTranslator.getInstance().fromExtTrustRelationship(result));
+			}
+			responseBean.setRetrieveExtTrustRelationship(extTrustRelationshipResponseBean);
+			
+		} catch (MalformedTrustedEntityIdException mteide) {
+			
+			LOG.error("Invalid TrustBroker remote retrieve exteded trust relationship request: "
+					+ mteide.getLocalizedMessage(), mteide);
+			throw new XMPPError(StanzaError.bad_request, 
+					"Invalid TrustBroker remote retrieve extended trust relationship request: "
+					+ mteide.getLocalizedMessage());
+		} catch (Exception e) {
+			
+			LOG.error("Could not retrieve extended trust relationship: "
+					+ e.getLocalizedMessage(), e);
+			throw new XMPPError(StanzaError.internal_server_error, 
+					"Could not retrieve extended trust relationship: "
+					+ e.getLocalizedMessage());
+		}
+		
+		return responseBean;
+	}
+	
+	private TrustBrokerResponseBean handleRequest(
+			TrustValueRequestBean requestBean) throws XMPPError {
+		
+		final TrustBrokerResponseBean responseBean = new TrustBrokerResponseBean();
+		responseBean.setMethodName(MethodName.RETRIEVE_TRUST_VALUE);
+		
+		if (requestBean.getRequestor() == null) {
+			LOG.error("Invalid TrustBroker remote retrieve trust value request: "
+					+ "requestor can't be null");
+			throw new XMPPError(StanzaError.bad_request, 
+					"Invalid TrustBroker remote retrieve trust value request: "
+					+ "requestor can't be null");
+		}
+		if (requestBean.getQuery() == null) {
+			LOG.error("Invalid TrustBroker remote retrieve trust value request: "
+					+ "query can't be null");
+			throw new XMPPError(StanzaError.bad_request, 
+					"Invalid TrustBroker remote retrieve trust value request: "
+					+ "query can't be null");
+		}
+		
+		try {
+			// (required) requestor
+			final Requestor requestor = RequestorUtils.toRequestor(
+					requestBean.getRequestor(), this.commManager.getIdManager());
+			// (required) query
+			final TrustQuery query = TrustCommsClientTranslator.getInstance().
+					fromTrustQueryBean(requestBean.getQuery());
+			
+			LOG.debug("handleRequest: requestor={}, query={}", requestor, query);
+			final Double result = this.trustBroker.retrieveTrustValue(
+					requestor,query).get();
+			
+			final TrustValueResponseBean trustValueResponseBean = 
+					new TrustValueResponseBean(); 
+			if (result != null) {
+				trustValueResponseBean.setResult(result);
+			}
+			responseBean.setRetrieveTrustValue(trustValueResponseBean);
+			
+		} catch (MalformedTrustedEntityIdException mteide) {
+			
+			LOG.error("Invalid TrustBroker remote retrieve trust value request: "
+					+ mteide.getLocalizedMessage(), mteide);
+			throw new XMPPError(StanzaError.bad_request, 
+					"Invalid TrustBroker remote retrieve trust value request: "
+					+ mteide.getLocalizedMessage());
+		} catch (Exception e) {
+			
+			LOG.error("Could not retrieve trust value: "
+					+ e.getLocalizedMessage(), e);
+			throw new XMPPError(StanzaError.internal_server_error, 
+					"Could not retrieve trust value: "
+					+ e.getLocalizedMessage());
+		}
+		
+		return responseBean;
+	}
+	
+	private TrustBrokerResponseBean handleRequest(
+			TrustRelationshipsRemoveRequestBean requestBean) throws XMPPError {
+		
+		final TrustBrokerResponseBean responseBean = new TrustBrokerResponseBean();
+		responseBean.setMethodName(MethodName.REMOVE_TRUST_RELATIONSHIPS);
+		
+		if (requestBean.getQuery() == null) {
+			LOG.error("Invalid TrustBroker remote remove trust relationships request: "
+					+ "query can't be null");
+			throw new XMPPError(StanzaError.bad_request, 
+					"Invalid TrustBroker remote remove trust relationships request: "
+					+ "query can't be null");
+		}
+		
+		try {
+			// (required) query
+			final TrustQuery query = TrustCommsClientTranslator.getInstance().
+					fromTrustQueryBean(requestBean.getQuery());
+			
+			LOG.debug("handleRequest: query={}", query);
+			final boolean result = this.internalTrustBroker
+					.removeTrustRelationships(query).get();
+			
+			final TrustRelationshipsRemoveResponseBean removeResponseBean = 
+					new TrustRelationshipsRemoveResponseBean(); 
+			removeResponseBean.setQueryMatched(result);
+			responseBean.setRemoveTrustRelationships(removeResponseBean);
+			
+		} catch (MalformedTrustedEntityIdException mteide) {
+			
+			LOG.error("Invalid TrustBroker remote remove trust relationships request: "
+					+ mteide.getLocalizedMessage(), mteide);
+			throw new XMPPError(StanzaError.bad_request, 
+					"Invalid TrustBroker remote remove trust relationships request: "
+					+ mteide.getLocalizedMessage());
+		} catch (Exception e) {
+			
+			LOG.error("Could not remove trust relationships: "
+					+ e.getLocalizedMessage(), e);
+			throw new XMPPError(StanzaError.internal_server_error, 
+					"Could not remove trust relationships: "
+					+ e.getLocalizedMessage());
+		}
+		
+		return responseBean;
 	}
 }

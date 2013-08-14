@@ -21,8 +21,6 @@ package org.societies.personalisation.CAUIPrediction.impl;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,13 +28,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
-import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -48,12 +44,10 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
-import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
@@ -66,7 +60,6 @@ import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
-import org.societies.personalisation.CAUI.api.model.IUserIntentTask;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
@@ -126,7 +119,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 	//boolean caciFreshness = true;
 
 	protected CtxAttribute currentCaciModelAttr;
-	CACIPrediction caciPredictor = null;
+	private CACIPrediction caciPredictor = null;
 
 	private IIdentity cssOwnerId;
 	private CtxEntityIdentifier operatorEntId;
@@ -247,8 +240,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 				if(nextActionsMap.size()>0){
 					for(IUserIntentAction nextAction : nextActionsMap.keySet()){
 						Double doubleConf = nextActionsMap.get(nextAction);
-						//doubleConf = doubleConf*100;
-						doubleConf = 70.0;
+						doubleConf = doubleConf*100;
+						//doubleConf = 70.0;
 						nextAction.setConfidenceLevel(doubleConf.intValue());
 						//LOG.info("6. nextActionsMap " +nextAction);
 						results.add(nextAction);
@@ -258,7 +251,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 				}			
 			}
 		} else if(enableCACIPrediction == true && caciModelExist == true) {
-			LOG.info("no CAUI model exist ... utilize community model ");
+			LOG.info("CAUI predictor not able to perform prediction ... community model to be used");
 
 			results = this.caciPredictor.getPrediction(requestor, action);
 

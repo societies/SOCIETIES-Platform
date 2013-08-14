@@ -2,8 +2,6 @@ package org.societies.personalisation.CAUIDiscovery.impl;
 
 
 import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;

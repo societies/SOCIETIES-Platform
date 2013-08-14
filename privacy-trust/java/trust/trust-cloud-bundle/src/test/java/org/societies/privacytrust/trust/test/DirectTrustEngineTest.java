@@ -286,7 +286,7 @@ public class DirectTrustEngineTest {
 		assertNotNull(evaluatedCss.getDirectTrust().getScore());
 		assertTrue(evaluatedCss.getDirectTrust().getScore() > IDirectTrust.INIT_SCORE);
 		assertNotNull(evaluatedCss.getDirectTrust().getValue());
-		assertEquals(0.5d, evaluatedCss.getDirectTrust().getValue(), EPSILON);
+		assertTrue(evaluatedCss.getDirectTrust().getValue() > 0.5d);
 		
 		// CSS2 shared context 1
 		final TrustedEntityId trusteeCssTeid2 = trusteeCssTeidList.get(1);
@@ -316,7 +316,7 @@ public class DirectTrustEngineTest {
 		assertNotNull(evaluatedCss2.getDirectTrust().getScore());
 		assertTrue(evaluatedCss2.getDirectTrust().getScore() > IDirectTrust.INIT_SCORE);
 		assertNotNull(evaluatedCss2.getDirectTrust().getValue());
-		assertEquals(0.5d, evaluatedCss2.getDirectTrust().getValue(), EPSILON);
+		assertTrue(evaluatedCss2.getDirectTrust().getValue() > 0.5d);
 		// verify CSS trust == CSS2 trust
 		assertEquals(evaluatedCss.getDirectTrust().getValue(), evaluatedCss2.getDirectTrust().getValue(), EPSILON);
 		

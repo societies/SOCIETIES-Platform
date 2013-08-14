@@ -27,7 +27,6 @@ package org.societies.personalisation.CAUI.api.model;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

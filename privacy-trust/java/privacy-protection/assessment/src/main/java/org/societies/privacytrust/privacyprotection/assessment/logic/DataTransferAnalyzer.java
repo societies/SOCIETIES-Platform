@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentException;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResult;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultBundle;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
@@ -178,6 +179,34 @@ public class DataTransferAnalyzer {
 		for (DataTransmissionLogEntry tr : matchedTransmissions) {
 			corrByAll += tr.getCorrelationWithDataAccess();
 			corrBySender += tr.getCorrelationWithDataAccessBySenderClass();
+		}
+		fillResult(result, corrByAll, corrBySender, matchedTransmissions);
+		return result;
+	}
+	
+	public AssessmentResultBundle estimatePrivacyBreachForBundle(String sender, Date start, Date end)
+			throws AssessmentException {
+		
+		if (sender == null) {
+			LOG.warn("estimatePrivacyBreachForBundle({}): sender is null", sender);
+			throw new AssessmentException("sender is null");
+		}
+		
+		correlation.run();
+
+		AssessmentResultBundle result = new AssessmentResultBundle(sender);
+		PrivacyLogFilter filter = new PrivacyLogFilter();
+		filter.setSenderBundle(sender);
+		filter.setStart(start);
+		filter.setEnd(end);
+		
+		double corrByAll = 0;
+		double corrBySender = 0;
+		List<DataTransmissionLogEntry> matchedTransmissions = privacyLog.search(filter);
+		
+		for (DataTransmissionLogEntry tr : matchedTransmissions) {
+			corrByAll += tr.getCorrelationWithDataAccess();
+			corrBySender += tr.getCorrelationWithDataAccessBySenderBundle();
 		}
 		fillResult(result, corrByAll, corrBySender, matchedTransmissions);
 		return result;

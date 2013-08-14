@@ -254,7 +254,7 @@ public class NominalTestCaseLowerTester {
 		HashMap<String, AssessmentResultClassName> result;
 		
 		assessment.assessAllNow(null, null);
-		result = assessment.getAssessmentAllClasses(null, null);
+		result = assessment.getAssessmentAllClasses(true, null, null);
 		HashMap<String, Double> corrs0 = new HashMap<String, Double>();
 		for (String key : result.keySet()) {
 			corrs0.put(key, result.get(key).getCorrWithDataAccessBySender());
@@ -267,7 +267,7 @@ public class NominalTestCaseLowerTester {
 		Thread.sleep(100);
 
 		assessment.assessAllNow(null, null);
-		result = assessment.getAssessmentAllClasses(null, null);
+		result = assessment.getAssessmentAllClasses(true, null, null);
 		HashMap<String, Double> corrs1 = new HashMap<String, Double>();
 		for (String key : result.keySet()) {
 			corrs1.put(key, result.get(key).getCorrWithDataAccessBySender());
@@ -278,7 +278,7 @@ public class NominalTestCaseLowerTester {
 		Thread.sleep(100);
 		
 		assessment.assessAllNow(null, null);
-		result = assessment.getAssessmentAllClasses(null, null);
+		result = assessment.getAssessmentAllClasses(true, null, null);
 		HashMap<String, Double> corrs2 = new HashMap<String, Double>();
 		for (String key : result.keySet()) {
 			corrs2.put(key, result.get(key).getCorrWithDataAccessBySender());

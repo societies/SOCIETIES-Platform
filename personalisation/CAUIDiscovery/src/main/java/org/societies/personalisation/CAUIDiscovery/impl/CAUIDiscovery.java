@@ -41,7 +41,6 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
-import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
@@ -55,7 +54,6 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 //import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
-import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 
 // remove after testing
@@ -655,7 +653,14 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			IndividualCtxEntity operator = ctxBroker.retrieveIndividualEntity(cssOwnerId).get();
 			//LOG.info("discovery operator retrieved "+operator);
 
-			ctxAttrCAUIModel = lookupAttrHelp(CtxAttributeTypes.CAUI_MODEL);
+			List<CtxIdentifier> cauiModelAttrList = ctxBroker.lookup(operator.getId(),CtxModelType.ATTRIBUTE ,CtxAttributeTypes.CAUI_MODEL).get();
+			
+			if(!cauiModelAttrList.isEmpty()){
+				CtxAttributeIdentifier attrId = (CtxAttributeIdentifier) cauiModelAttrList.get(0);
+				ctxAttrCAUIModel = (CtxAttribute) ctxBroker.retrieve(attrId).get();
+			}
+			
+			//ctxAttrCAUIModel = lookupAttrHelp(CtxAttributeTypes.CAUI_MODEL);
 			if(ctxAttrCAUIModel != null){
 
 				ctxAttrCAUIModel = ctxBroker.updateAttribute(ctxAttrCAUIModel.getId(), binaryModel).get();
@@ -664,22 +669,10 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				ctxAttrCAUIModel = ctxBroker.updateAttribute(ctxAttrCAUIModel.getId(), binaryModel).get();
 			}
 
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
+			LOG.error("Exception while storing CAUI model in context DB" + e.getLocalizedMessage());
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 		return ctxAttrCAUIModel;
 	}
 

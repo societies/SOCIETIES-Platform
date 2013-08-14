@@ -26,10 +26,8 @@ package org.societies.personalisation.CAUI.api.model;
 
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 public class UserIntentTask implements IUserIntentTask,Serializable{
@@ -42,7 +40,7 @@ public class UserIntentTask implements IUserIntentTask,Serializable{
 
 	int confidenceLevel;
 
-	private double transProb;
+	//private double transProb;
 
 	//A map that contains the context type and the context values assigned to this UserTask;
 	Map<String, Serializable> taskContext;

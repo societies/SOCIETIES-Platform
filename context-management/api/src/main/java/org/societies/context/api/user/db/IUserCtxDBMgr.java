@@ -150,15 +150,6 @@ public interface IUserCtxDBMgr {
 	 * @param identifier
 	 */
 	public CtxModelObject remove(CtxIdentifier identifier) throws CtxException;
-	
-	/**
-	 * Looks up CtxModelObjects, i.e. CtxEntities, CtxAttributes, or
-	 * CtxAssociations, of the specified type.
-	 * 
-	 * @param modelType
-	 * @param type
-	 */
-	public List<CtxIdentifier> lookup(CtxModelType modelType, String type) throws CtxException;
 
 	/**
 	 * Looks up all CtxModelObjects for the specified set of types and for the specified ownerId.
