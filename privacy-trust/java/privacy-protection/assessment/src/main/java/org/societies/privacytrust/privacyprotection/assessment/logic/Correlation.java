@@ -76,6 +76,7 @@ public class Correlation {
 		double corrByAll;
 		double corrBySender;
 		double corrBySenderClass;
+		double corrBySenderBundle;
 		List<DataTransmissionLogEntry> newDataTransmissions = getNewDataTransmissions();
 		
 		for (DataTransmissionLogEntry tr : newDataTransmissions) {
@@ -85,6 +86,7 @@ public class Correlation {
 			corrByAll = 0;
 			corrBySender = 0;
 			corrBySenderClass = 0;
+			corrBySenderBundle = 0;
 			
 			for (DataAccessLogEntry ac : dataAccess) {
 				
@@ -108,10 +110,19 @@ public class Correlation {
 				else if (isAnyMemberEqual(tr.getSenderStack(), ac.getRequestorStack())) {
 					corrBySenderClass += corr;
 				}
+
+				if (ac.getRequestorBundles() == null || tr.getSenderBundles() == null) {
+					//LOG.warn("Requestor or sender bundles is null");
+				}
+				else if (isAnyMemberEqual(tr.getSenderBundles(), ac.getRequestorBundles())) {
+					// TODO: this IF condition can result in overestimated correlation for events with multiple bundles
+					corrBySenderBundle += corr;
+				}
 			}
 			tr.setCorrelationWithDataAccess(corrByAll);
 			tr.setCorrelationWithDataAccessBySender(corrBySender);
 			tr.setCorrelationWithDataAccessBySenderClass(corrBySenderClass);
+			tr.setCorrelationWithDataAccessBySenderBundle(corrBySenderBundle);
 		}
 		lastRun = new Date();
 	}
