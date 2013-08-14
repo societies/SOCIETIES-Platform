@@ -25,7 +25,7 @@
 package org.societies.privacytrust.trust.impl.repo;
 
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -355,7 +355,7 @@ public class TrustRepository implements ITrustRepository {
 					+ entityType);
 		}
 			
-		final Set<ITrustedEntity> result = new HashSet<ITrustedEntity>();
+		final Set<ITrustedEntity> result = new LinkedHashSet<ITrustedEntity>();
 		if (null != daClass) {
 			result.addAll(this.doRetrieveEntities(trustorId, daClass, valueType));
 		} else {
@@ -490,7 +490,7 @@ public class TrustRepository implements ITrustRepository {
 					+ entityType);
 		}
 			
-		final Set<ITrustedEntity> entities = new HashSet<ITrustedEntity>();
+		final Set<ITrustedEntity> entities = new LinkedHashSet<ITrustedEntity>();
 		if (null != daClass) {
 			entities.addAll(this.doRetrieveEntities(trustorId, daClass, valueType));
 		} else {
@@ -511,7 +511,7 @@ public class TrustRepository implements ITrustRepository {
 			final TrustedEntityId trustorId, final Class<T> entityClass,
 			final TrustValueType valueType)	throws TrustRepositoryException {
 		
-		final Set<T> result = new HashSet<T>();
+		final Set<T> result = new LinkedHashSet<T>();
 		Session session = null;
 		try {
 			session = sessionFactory.openSession();
