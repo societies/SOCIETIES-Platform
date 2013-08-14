@@ -53,7 +53,7 @@ public class ConstructUIModel {
 
 	public UserIntentModelData constructNewModel(LinkedHashMap<List<String>,HashMap<String,Double>> transDictionaryAll, HashMap<String,List<String>> ctxActionsMap, Map<String , ServiceResourceIdentifier> sriMap){
 
-		//System.out.println("cauiTaskManager "+cauiTaskManager);
+		System.out.println("cauiTaskManager "+cauiTaskManager);
 		UserIntentModelData modelData = cauiTaskManager.createModel();
 		
 		//create all actions and assign context
@@ -145,12 +145,16 @@ public class ConstructUIModel {
 		return modelData;
 	}
 
+	
+	/*
+	 * debugging helper class
+	 */
 	public void printTransProbDictionary (LinkedHashMap<String,HashMap<String,Double>> transProbDictionary){
 
 		//System.out.println ("** ConstructUIModel ** total number of entries: " + transProbDictionary.size());
 		for(String actions : transProbDictionary.keySet()){
 			HashMap<String,Double> transTargets = transProbDictionary.get(actions);
-			//System.out.println("Action:"+actions+ "| target: "+transTargets);
+			System.out.println("Action:"+actions+ "| target: "+transTargets);
 		}
 	}	
 
