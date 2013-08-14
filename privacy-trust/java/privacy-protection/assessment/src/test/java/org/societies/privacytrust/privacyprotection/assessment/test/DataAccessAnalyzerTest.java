@@ -71,6 +71,16 @@ public class DataAccessAnalyzerTest {
 	private List<String> stack2 = new ArrayList<String>();
 	private List<String> stack3 = new ArrayList<String>();
 
+	private String bundle1 = "bundle1";
+	private String bundle2 = "bundle2";
+	private String bundle3 = "bundle3";
+	private String bundle4 = "bundle4";
+
+	private List<String> bundles1 = new ArrayList<String>();
+	private List<String> bundles2 = new ArrayList<String>();
+	private List<String> bundles3 = new ArrayList<String>();
+	private List<String> bundles4 = new ArrayList<String>();
+
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -81,18 +91,24 @@ public class DataAccessAnalyzerTest {
 		stack2.add(class2);
 		stack3.add(class3);
 
+		bundles1.add(bundle1);
+		bundles2.add(bundle2);
+		bundles3.add(bundle3);
+		bundles4.add(bundle2);
+		bundles4.add(bundle4);
+
 		PrivacyLog privacyLog;
 		
 		privacyLog = new PrivacyLog();
 		
-		privacyLog.append(new DataAccessLogEntry(time1, id1, class1, stack1, id1, -1));
-		privacyLog.append(new DataAccessLogEntry(time2, id1, class2, stack2, id2, -1));
-		privacyLog.append(new DataAccessLogEntry(time3, id1, class3, stack3, id1, -1));
-		privacyLog.append(new DataAccessLogEntry(time4, id1, class3, stack3, id1, -1));
-		privacyLog.append(new DataAccessLogEntry(time5, id1, class1, stack1, id3, -1));
-		privacyLog.append(new DataAccessLogEntry(time6, id2, class1, stack1, id4, -1));
-		privacyLog.append(new DataAccessLogEntry(time7, id2, class1, stack1, id1, -1));
-		privacyLog.append(new DataAccessLogEntry(time7, null, null, null, null, -1));
+		privacyLog.append(new DataAccessLogEntry(time1, id1, class1, stack1, bundles1, id1, -1));
+		privacyLog.append(new DataAccessLogEntry(time2, id1, class2, stack2, bundles1, id2, -1));
+		privacyLog.append(new DataAccessLogEntry(time3, id1, class3, stack3, bundles1, id1, -1));
+		privacyLog.append(new DataAccessLogEntry(time4, id1, class3, stack3, bundles1, id1, -1));
+		privacyLog.append(new DataAccessLogEntry(time5, id1, class1, stack1, bundles1, id3, -1));
+		privacyLog.append(new DataAccessLogEntry(time6, id2, class1, stack1, bundles1, id4, -1));
+		privacyLog.append(new DataAccessLogEntry(time7, id2, class1, stack1, bundles1, id1, -1));
+		privacyLog.append(new DataAccessLogEntry(time7, null, null, null, null, null, -1));
 
 		dataAccessAnalyzer = new DataAccessAnalyzer(privacyLog.getDataAccess());
 	}

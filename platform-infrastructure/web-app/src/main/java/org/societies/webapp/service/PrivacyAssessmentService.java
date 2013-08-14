@@ -53,6 +53,7 @@ import org.primefaces.model.StreamedContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultBundle;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment;
@@ -295,7 +296,9 @@ public class PrivacyAssessmentService implements Serializable {
 		generateImageReceiverIds();
 		generateImageSenderIds();
 		generateImageSenderClass();
+		generateImageSenderBundle();
 		generateImageDataAccessClass();
+		generateImageDataAccessBundle();
 		generateImageDataAccessIds();
 	}
 
@@ -358,7 +361,7 @@ public class PrivacyAssessmentService implements Serializable {
 		String ylabel = "Correlation of data transmission and data access";
 
 		HashMap<String, AssessmentResultClassName> assResult;
-		assResult = assessment.getAssessmentAllClasses(model.getStartDate(), model.getEndDate());
+		assResult = assessment.getAssessmentAllClasses(model.isIncludePlatformBundles(), model.getStartDate(), model.getEndDate());
 
 		int size = assResult.size();
 		String[] labels = new String[size];
@@ -388,6 +391,43 @@ public class PrivacyAssessmentService implements Serializable {
 		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, 2);
 	}
 
+	private void generateImageSenderBundle() {
+
+		String title = "Local bundles which sent data and their correlation with data access";
+		String xlabel = "Sender bundle";
+		String ylabel = "Correlation of data transmission and data access";
+
+		HashMap<String, AssessmentResultBundle> assResult;
+		assResult = assessment.getAssessmentAllBundles(model.isIncludePlatformBundles(), model.getStartDate(), model.getEndDate());
+
+		int size = assResult.size();
+		String[] labels = new String[size];
+		double[][] data = new double[2][size];
+		Iterator<String> iterator = assResult.keySet().iterator();
+
+		log.debug("privacyAssessment(): size = {}", size);
+
+		for (int k = 0; k < size; k++) {
+			labels[k] = iterator.next();
+			data[0][k] = assResult.get(labels[k]).getCorrWithDataAccessBySender();
+			data[1][k] = assResult.get(labels[k]).getCorrWithDataAccessByAll();
+
+			log.debug("privacyAssessment(): label[{}] = {}", k, labels[k]);
+			log.debug("privacyAssessment(): data[0][{}] = {}", k, data[0][k]);
+			log.debug("privacyAssessment(): data[1][{}] = {}", k, data[1][k]);
+		}
+
+		PlotData[] plotData = new PlotData[] {
+				new PlotData(data[0], labels),
+				new PlotData(data[1], labels)
+		};
+		String[] plotDataLabels = new String[] {
+				"Correlation with data access by the sender bundle",
+				"Correlation with data access by any bundle"
+		};
+		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, 3);
+	}
+
 	private void generateImageDataAccessClass() {
 
 		String title = "Java classes which accessed local data";
@@ -395,11 +435,25 @@ public class PrivacyAssessmentService implements Serializable {
 		String ylabel = "Number of accesses to local data";
 
 		Map<String, Integer> dataAccessClasses;
-		dataAccessClasses = assessment.getNumDataAccessEventsForAllClasses(model.getStartDate(), model.getEndDate());
+		dataAccessClasses = assessment.getNumDataAccessEventsForAllClasses(model.isIncludePlatformBundles(), model.getStartDate(), model.getEndDate());
 		log.debug("Number of data access events (by class): {}", dataAccessClasses.size());
 		PlotData[] plotData = new PlotData[] {mapToArrays(dataAccessClasses)};
 		String[] plotDataLabels = new String[] {"data"};
-		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, 3);
+		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, 4);
+	}
+
+	private void generateImageDataAccessBundle() {
+
+		String title = "Bundles which accessed local data";
+		String xlabel = "Bundle";
+		String ylabel = "Number of accesses to local data";
+
+		Map<String, Integer> dataAccessBundles;
+		dataAccessBundles = assessment.getNumDataAccessEventsForAllBundles(model.isIncludePlatformBundles(), model.getStartDate(), model.getEndDate());
+		log.debug("Number of data access events (by bundle): {}", dataAccessBundles.size());
+		PlotData[] plotData = new PlotData[] {mapToArrays(dataAccessBundles)};
+		String[] plotDataLabels = new String[] {"data"};
+		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, 5);
 	}
 
 	private void generateImageDataAccessIds() {
@@ -413,6 +467,6 @@ public class PrivacyAssessmentService implements Serializable {
 		log.debug("Number of data access events (by identity): {}", identities.size());
 		PlotData[] plotData = new PlotData[] {mapToArrays(identities)};
 		String[] plotDataLabels = new String[] {"data"};
-		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, 4);
+		createBarchart(title, xlabel, ylabel, plotData, plotDataLabels, 6);
 	}
 }

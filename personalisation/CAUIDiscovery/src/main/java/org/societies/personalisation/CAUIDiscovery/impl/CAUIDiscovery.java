@@ -39,7 +39,6 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
@@ -51,7 +50,6 @@ import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-//import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
@@ -72,22 +70,18 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 	IPerformanceMessage m;
 
-	//LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = null;
 	LinkedHashMap<String,HashMap<String,Double>> transProb = null;
 	HashMap<String,List<String>> contextActionsMap = new HashMap<String,List<String>>();
 
 	Map<String , ServiceResourceIdentifier> sriMap = new HashMap<String , ServiceResourceIdentifier>();
 
-	public Map<String, ServiceResourceIdentifier> getSriMap() {
-		return sriMap;
-	}
 
 
 	List<String> charList = null;
-	//List<MockHistoryData> historyList = null;
+	
 
 	public CAUIDiscovery(){
-		//actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
+		
 		//remove after testing
 		//cauiTaskManager = new CAUITaskManager();
 	}
@@ -126,7 +120,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 	// constructor
 	public void initialiseCAUIDiscovery(){
-		//actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
+	
 	}
 
 	@Override
@@ -164,7 +158,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				LOG.debug("model stored under attribute id: "+ctxAttr.getId());
 				LOG.debug("modelData "+ modelData.getActionModel());
 						
-				System.out.println("*********** model created *******"+ modelData.getActionModel());
+				LOG.debug("*********** model created *******"+ modelData.getActionModel());
 			
 				// performance log code
 				byte entBytes [] = toByteArray(modelData);
@@ -208,10 +202,10 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 	public  LinkedHashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> generateDictionaries(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history){
 
-		LOG.info("2. Convert History Data");
+		LOG.debug("2. Convert History Data");
 		List<MockHistoryData> convertedHistory = convertHistoryData(history);
 
-		LOG.info("3. Generate Transition Dictionary");
+		LOG.debug("3. Generate Transition Dictionary");
 
 		LinkedHashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> actCtxDictionaryAll = new LinkedHashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>>();
 		LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = null;
@@ -832,7 +826,11 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		//}
 		return actCtxDictionary;
 	}
-
+	
+	
+	public Map<String, ServiceResourceIdentifier> getSriMap() {
+		return sriMap;
+	}
 
 	//*************** Model storage to hard drive *****************
 	/*
