@@ -308,19 +308,19 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		LOG.debug("situationContext :"+ situationContext);
 		
-		LOG.debug("skata 1 cauiModelExist :"+ cauiModelExist +" enableCauiPrediction:"+enableCauiPrediction);
+		//LOG.debug("skata 1 cauiModelExist :"+ cauiModelExist +" enableCauiPrediction:"+enableCauiPrediction);
 		
 		if(cauiModelExist == true && enableCauiPrediction == true){
 
 			if(currentUIModelData != null ) 	{
-				LOG.debug("skata 2 currentUIModelData :"+ currentUIModelData );
+				//LOG.debug("skata 2 currentUIModelData :"+ currentUIModelData );
 				this.cauiTaskManager.updateModel(currentUIModelData);
 			}
 			
 			if(cauiTaskManager.retrieveActionsByContext(situationContext) != null ) {
 				
 				results = cauiTaskManager.retrieveActionsByContext(situationContext);
-				LOG.debug("skata 3 results :"+ results );
+			//	LOG.debug("skata 3 results :"+ results );
 				
 				// prediction performance log
 				long endTime = System.currentTimeMillis();
@@ -1067,7 +1067,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 				caciModelAttributeId = (CtxAttributeIdentifier) lsCaci.get(0);
 				attr = (CtxAttribute) this.ctxBroker.retrieve(caciModelAttributeId).get();
 				byte[] binaryModel = SerialisationHelper.serialise(modelData);
-				LOG.debug("skataaaaaa updating caci model  " +attr.getId() +" model: "+modelData );
+				//LOG.debug("skataaaaaa updating caci model  " +attr.getId() +" model: "+modelData );
 
 				this.ctxBroker.updateAttribute(attr.getId(), binaryModel).get();
 			}
