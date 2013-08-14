@@ -81,9 +81,9 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Export-Package>
+						<!-- <Export-Package>
 							org.societies.css.mgmt.comms.*
-						</Export-Package>
+						</Export-Package> -->
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
 					</instructions>

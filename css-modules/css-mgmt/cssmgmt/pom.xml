@@ -116,7 +116,7 @@
 						<Embed-Transitive>false</Embed-Transitive>
 						<Import-Package>*;resolution:=optional</Import-Package>
 						<!-- TEMPOARY! Temporary hack so that the webapp can access the CssDirectoryClient callback -->
-						<Export-Package>org.societies.css.mgmt</Export-Package>
+						<!--<Export-Package>org.societies.css.mgmt</Export-Package> -->
 					</instructions>
 				</configuration>
 			</plugin>
