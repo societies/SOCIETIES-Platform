@@ -43,4 +43,12 @@ public class AssessmentException extends Exception {
 	public AssessmentException(String msg) {
 		super(msg);
 	}
+	
+	public AssessmentException(Throwable cause) {
+		super(cause);
+	}
+	
+	public AssessmentException(String msg, Throwable cause) {
+		super(msg, cause);
+	}
 }

@@ -15,6 +15,19 @@
 	<context:annotation-config />
 
 	<tx:annotation-driven />
+	
+	<bean id="assessmentProperties"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreResourceNotFound" value="true"></property>
+		<property name="locations">
+			<list>
+				<value>classpath:META-INF/spring/org.societies.local.properties</value>
+			    <value>file:${CONFIG_DIR}/org.societies.platform.properties</value>
+			</list>
+		</property>
+	</bean>
+	
 
 	<!-- Privacy Assessment Configuration with Spring AOP -->
 
@@ -59,8 +72,10 @@
 
 	<bean id="serviceResolver"
 		class="org.societies.privacytrust.privacyprotection.assessment.util.ServiceResolver"
-		init-method="init" >
+		init-method="init"
+		depends-on="assessmentProperties" >
 		<property name="serviceDiscovery" ref="serviceDiscovery" />
+		<property name="scanAllBundles" value="${privacy.assessment.scanAllBundles:false}" />
 	</bean>
 
 	<bean id="privacyLogAppender"

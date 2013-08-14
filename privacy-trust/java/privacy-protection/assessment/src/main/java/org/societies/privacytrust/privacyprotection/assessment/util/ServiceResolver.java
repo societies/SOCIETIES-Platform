@@ -26,6 +26,7 @@ package org.societies.privacytrust.privacyprotection.assessment.util;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +34,7 @@ import java.util.Map;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentException;
@@ -55,9 +57,14 @@ public class ServiceResolver implements BundleContextAware {
 
 	private BundleContext bundleContext;
 	private IServiceDiscovery serviceDiscovery;
+	private boolean scanAllBundles;
 	
-	private Map<String, List<BundleInfo>> class2bundleMap = new HashMap<String, List<BundleInfo>>();
+	private Map<String, List<String>> class2bundleMap = new HashMap<String, List<String>>();
 
+	public ServiceResolver() {
+		LOG.debug("constructor()");
+	}
+	
 	@Override
 	public void setBundleContext(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
@@ -76,6 +83,11 @@ public class ServiceResolver implements BundleContextAware {
 		LOG.debug("setServiceDiscovery()");
 		this.serviceDiscovery = serviceDiscovery;
 	}
+	
+	public void setScanAllBundles(boolean scanAllBundles) {
+		LOG.debug("setScanAllBundles({})", scanAllBundles);
+		this.scanAllBundles = scanAllBundles;
+	}
 
 //	public String getServiceIdFromBundle(String bundleSymbolicName) {
 //		
@@ -89,9 +101,11 @@ public class ServiceResolver implements BundleContextAware {
 		
 		LOG.debug("getBundleSymbolicName({})", className);
 
-		List<BundleInfo> previousInfo = class2bundleMap.get(className);
-		if (previousInfo != null) {
-//			return previousInfo.;
+		long startTime = new Date().getTime();
+		
+		List<String> bundleSymNames = class2bundleMap.get(className);
+		if (bundleSymNames != null) {
+			return bundleSymNames;
 		}
 		
 		Enumeration<URL> entries;
@@ -110,11 +124,13 @@ public class ServiceResolver implements BundleContextAware {
 		Bundle[] bundles = bundleContext.getBundles();
 		//LOG.debug("Number of all bundles: {}", bundles.length);
 		
-		for (Bundle bundle : bundles) {
+		for (int k = bundles.length - 1; k >= 0; k--) {
 
 			//LOG.debug("Getting entries for bundle ID {}: {}", bundle.getBundleId(), bundle.getSymbolicName());
+			
+			LOG.debug("Bundle ID: {}", bundles[k].getBundleId());
 
-			entries = bundle.findEntries("/", "*.class", true);
+			entries = bundles[k].findEntries("/", "*.class", true);
 			while (entries != null && entries.hasMoreElements()) {
 				entry = entries.nextElement();
 				//LOG.debug("Found entry: {}", entry);
@@ -135,20 +151,28 @@ public class ServiceResolver implements BundleContextAware {
 				if (className.equals(cn)) {
 					// Can't get anything better than bundle symbolic name.
 					// Method Bundle.getLocation() does not return anything user friendly.
-					LOG.debug("Found matching class name in {}", bundle.getSymbolicName());
+					LOG.debug("Found matching class name in {}", bundles[k].getSymbolicName());
 					try {
 						ServiceResourceIdentifier serviceId;
-						serviceId = getServiceId(bundle);
+						serviceId = getServiceId(bundles[k]);
 						result.add(serviceId.getIdentifier().toASCIIString());
 					} catch (AssessmentException e) {
-						result.add(bundle.getSymbolicName());
+						result.add(bundles[k].getSymbolicName());
 					}
+					// Stop searching this bundle and go to next bundle
+					break;
 				}
+			}
+			if (!result.isEmpty() && !scanAllBundles) {
+				break;
 			}
 		}
 		if (result.size() > 1) {
 			LOG.warn("Class {} is present in multiple ({}) bundles", className, result.size());
 		}
+		class2bundleMap.put(className, result);
+		LOG.debug("Stored mapping for class {}. Map size: {}", className, class2bundleMap.size());
+		LOG.debug("getBundleSymbolicName({}) took {} ms", className, new Date().getTime() - startTime);
 		return result;
 	}
 	
@@ -177,4 +201,28 @@ public class ServiceResolver implements BundleContextAware {
 			throw new AssessmentException("Service discovery not available, cannot map bundle to service ID");
 		}
 	}
+	
+//	public static String getBundleSymbolicName(Class<?> clazz) throws AssessmentException {
+//		
+//		Bundle bundle;
+//		
+//		if (clazz == null) {
+//			return null;
+//		}
+//		
+//		try {
+//			bundle = FrameworkUtil.getBundle(clazz);
+//		} catch (Exception e) {
+//			throw new AssessmentException("Could not get bundle information for class " +
+//					(clazz == null ? null : clazz.getName()));
+//		}
+//		
+//		if (bundle == null) {
+//			throw new AssessmentException("No OSGi bundle contains class " +
+//					(clazz == null ? null : clazz.getName()));
+//		}
+//		else {
+//			return bundle.getSymbolicName();
+//		}
+//	}
 }
