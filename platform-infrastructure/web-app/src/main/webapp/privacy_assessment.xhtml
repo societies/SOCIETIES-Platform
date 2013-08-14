@@ -68,16 +68,18 @@
                         	<p:calendar value="#{privacyAssessmentForm.endDate}" pattern="yyyy-MM-ddHH:mm" />
                         	or leave blank for no limit.
                         </li>
+                        	<p:selectBooleanCheckbox type="checkbox" name="" id="check1" value="#{privacyAssessmentForm.includePlatformBundles}"
+							immediate="true" valueChangeListener="#{assessmentController.assessNow}" /> <!--itemLabel="Show also platform bundles"-->
+                            <!--label for="check1">Show platform bundles</label-->
+							Show also platform bundles
+                        <li>
+                        </li>
                         <li class="clearfix">
                             <p class="success">Thank you! Success Message here.</p>
 
                             <p class="error">Sorry, an error has occured. Please try again later.</p>
 
 					        <p:commandButton value="Update" icon="ui-icon ui-icon-arrowrefresh-1-w" actionListener="#{assessmentController.assessNow}" update="dynamicImage"/>
-<!--
-							<br/><br/>
-                            <a href="privacy_assessment_settings.xhtml">Advanced Settings</a>
--->
                         </li>
                     </ul>
                     
@@ -105,7 +107,13 @@
 				
 							<p:spacer width="1" height="15" />
 							<p:spacer width="1" height="15" />
-
+							
+							<h:outputText value="Filter results" />
+							<h:outputText value="By default, the results are shown only for 3rd party bundles. To show also results for the SOCIETIES platform bundles, tick the relevant checkbox at the bottom." />
+				
+							<p:spacer width="1" height="15" />
+							<p:spacer width="1" height="15" />
+							
 							<h:outputText value="Interpreting results" />
 							<h:outputText value="A high value does not necessarily indicate malicious behavior, or a violation of any agreement or privacy policy. Keep in mind the correlation results are only an assessment, and many services may be accessing and/or transmitting your data in scope of their normal operation. It is up to you to decide if data access and data transmission are excessive or not." />
 							
