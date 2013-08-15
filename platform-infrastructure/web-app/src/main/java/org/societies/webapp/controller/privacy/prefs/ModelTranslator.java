@@ -25,8 +25,19 @@
 
 package org.societies.webapp.controller.privacy.prefs;
 
+import java.util.Enumeration;
+import java.util.List;
+
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PrivacyPreferenceBean;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceCondition;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyCondition;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyPreference;
 
 
 /**
@@ -35,12 +46,70 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
  */
 public class ModelTranslator {
 
+	private static final Logger logging = LoggerFactory.getLogger(ModelTranslator.class);
 	
 	public TreeNode getJSFTreeNode(){
 		return null;
 	}
 	
-	public IPrivacyPreference getSocietiesTreeNode(){
-		return null;
+	/**
+	 * This method translates a primefaces tree to a swing tree (societies). This method assumes the tree has been checked for errors and assumes that all 
+	 * objects (data) embedded in each rootNode are either conditions in the form of IPrivacyPreferenceCondition
+	 * or outcomes in the form of IPrivacyOutcome  
+	 * @param rootNode
+	 * @return
+	 */
+	public static PrivacyPreference getPrivacyPreference(TreeNode rootNode){
+		PrivacyPreference privacyPreference;
+		
+		if (rootNode.getData() instanceof IPrivacyOutcome){
+			privacyPreference = new PrivacyPreference((IPrivacyOutcome) rootNode.getData());
+			return privacyPreference;
+		}
+		
+		
+		if (rootNode.getData() instanceof IPrivacyPreferenceCondition){
+			privacyPreference = new PrivacyPreference((IPrivacyPreferenceCondition) rootNode.getData());
+		}else{
+			privacyPreference = new PrivacyPreference();
+		}
+		
+		List<TreeNode> children = rootNode.getChildren();
+		for (TreeNode child : children){
+			privacyPreference.add(getPrivacyPreference(child));
+			
+		}
+		return privacyPreference;
+	}
+	
+	
+	public static TreeNode getPrivacyPreference(IPrivacyPreference privacyPreference, TreeNode root){
+		TreeNode treeNode;
+		
+		if (privacyPreference.getUserObject() instanceof IPrivacyOutcome){
+			treeNode = new DefaultTreeNode(privacyPreference.getUserObject(), root);
+			logging.debug("Added subnode: "+treeNode +" to parent node: "+root);
+			return root;
+		}
+		
+		if (privacyPreference.getUserObject() instanceof IPrivacyPreferenceCondition){
+			treeNode = new DefaultTreeNode(privacyPreference.getUserObject(), root);
+			logging.debug("Added subnode: "+treeNode +" to parent node: "+root);
+		}else{
+			//assuming this is the root
+			treeNode = root;
+			logging.debug("This is the root node. Setting: "+treeNode +" as parent node");
+		}
+		
+		Enumeration<PrivacyPreference> children = privacyPreference.children();
+		
+		while (children.hasMoreElements()){
+			
+			PrivacyPreference nextElement = children.nextElement();
+			getPrivacyPreference(nextElement, treeNode);
+		}
+		logging.debug("Added subnode: "+treeNode +" to parent node: "+root);
+		return treeNode;
+		
 	}
 }

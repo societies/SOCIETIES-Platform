@@ -1181,6 +1181,25 @@ public class InternalTrustBroker implements ITrustBroker {
 		}
 	}
 	
+	private boolean removeRemoteTrustRelationships(final TrustQuery query) 
+			throws TrustException {
+
+		@SuppressWarnings("unused")
+		final RemoteClientCallback callback = new RemoteClientCallback();
+		try {
+			if (this.trustBrokerRemoteClient == null) {
+				throw new TrustBrokerException(
+						"ITrustBrokerRemoteClient service is not available");
+			}
+		
+			// TODO
+			return false;
+			
+		} catch (ServiceUnavailableException sue) {
+			throw new TrustBrokerException(sue.getLocalizedMessage(), sue);
+		}
+	}
+	
 	private Set<ITrustedEntity> retrieveTrustedEntities(final TrustQuery query) 
 					throws TrustException {
 
