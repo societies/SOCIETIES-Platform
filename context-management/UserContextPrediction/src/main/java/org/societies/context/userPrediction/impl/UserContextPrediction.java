@@ -24,11 +24,14 @@
  */
 package org.societies.context.userPrediction.impl;
 
-import java.io.IOException;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.ExecutionException;
 
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.learning.SupervisedLearning;
@@ -37,118 +40,62 @@ import org.neuroph.core.learning.TrainingElement;
 import org.neuroph.core.learning.TrainingSet;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.util.TransferFunctionType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.context.api.user.prediction.IUserCtxPredictionMgr;
-import org.societies.context.api.user.prediction.PredictionMethod;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class UserContextPrediction implements IUserCtxPredictionMgr {
 
-	/** The logging facility. */
+
 	private static final Logger LOG = LoggerFactory.getLogger(UserContextPrediction.class);
+	private ICtxBroker ctxBroker;
+	private ICommManager commMgr;
 	
-	private ICtxBroker internalCtxBroker;
-	
-	@Autowired(required=true)
-	public UserContextPrediction(ICtxBroker internalCtxBroker){
-		
-		if (LOG.isInfoEnabled())
-			LOG.info(this.getClass() + " instantiated");
-
-		this.internalCtxBroker = internalCtxBroker;
-		
-		LOG.info("internalCtxBroker "+this.internalCtxBroker );
-		
-		System.out.println("aaaa2 "+this.createDataSet());
-		//this.runNNFromMapOfContext(this.createDataSet(), 5);
-	}
-
-	/**
-	 * @param args the command line arguments
-	 */
 	private static Vector<String> desiredOutput = new Vector<String>();
-	String deviceList = "homePc, homePc, carPC, carPC, OfficePC, OfficePC, mobilePhone, none, TV, n/a, homePc, homePc, carPC, OfficePC, OfficePC, tttt, TV, n/a, carPC, OfficePC, OfficePC, mobilePhone, none, TV, n/a, homePc, carPC, OfficePC, OfficePC, tttt, TV, n/a";
-	String statusList = "sitting, sitting, sitting, sitting, sitting, sitting, walking, standing, lying, lying, sitting, sitting, sitting, sitting, sitting, standing, lying, lying, sitting, sitting, sitting, walking, standing, lying, lying, sitting, sitting, sitting, sitting, standing, lying, lying";
-	String activityList = "Browsing, Emailing, driving, driving, working, working, chatting, chatting, watching_movie, sleeping, Browsing, Browsing, driving, working, working, working, watching_movie, sleeping, driving, working, working, chatting, chatting, watching_movie, sleeping, Browsing, driving, working, working, working, watching_movie, sleeping";
-	String locationList = "home, home, kifisiasStr, vouliagmenisStr, office, office, office, cantine, home, home, home, home, kifisiasStr, office, office, cantine, home, home, vouliagmenisStr, office, office, office, cantine, home, home, home, kifisiasStr, office, office, cantine, home, home" ;
-	String tod = "morning, morning, morning, morning, morning, afternoon, afternoon, afternoon, night, night, morning, morning, morning, morning, afternoon, afternoon, night, night, morning, morning, afternoon, afternoon, afternoon, night, night, morning, morning, morning, afternoon, afternoon, night, night";
+	NeuralNetwork loadedMlPerceptron = null;
 
-	public static void main(String[] args) throws IOException {
+	HashMap<String, HashMap<String, Double>> dictionary = new HashMap<String, HashMap<String, Double>>();
 
-	//	UserContextPrediction predictor = new UserContextPrediction();
-	//	System.out.println("aaaa2 "+predictor.createDataSet());
-	//	predictor.runNNFromMapOfContext(predictor.createDataSet(), 5);
+
+
+	public UserContextPrediction(ICtxBroker ctxBroker, ICommManager commMgr){
+		if (LOG.isDebugEnabled()){
+			LOG.info(this.getClass() + "instantiated ");
+		}
+		this.ctxBroker = ctxBroker;
+		this.commMgr = commMgr;
 	}
 
-
-	private HashMap<String, Vector<String>> createDataSet(){
-
-		HashMap<String, Vector<String>> dataSet = new HashMap<String, Vector<String>> ();
-
-		dataSet.put("DEVICE", readData("DEVICE"));
-		dataSet.put("PHYSICAL_STATUS", readData("PHYSICAL_STATUS"));
-		dataSet.put("ACTIVITY", readData("ACTIVITY"));
-		dataSet.put("LOCATION_SYMBOLIC", readData("LOCATION_SYMBOLIC"));
-		dataSet.put("ToD", readData("ToD"));
+	public UserContextPrediction(){
 		
-		return dataSet;
 	}
-
-
-
-	private Vector<String> readData(String type){
-
-		Vector<String> genericVector = new Vector<String>();
-		String []  dataArray = null;
-
-		if(type.equals("DEVICE")){
-			dataArray = deviceList.split("\\, ");	
-			for(String value : dataArray){
-				genericVector.add(value);
-			}
-
-		} else if(type.equals("PHYSICAL_STATUS")){
-			dataArray = statusList.split("\\, ");	
-			for(String value : dataArray){
-				genericVector.add(value);
-			}
-		} else if(type.equals("ACTIVITY")){
-			dataArray = activityList.split("\\, ");	
-			for(String value : dataArray){
-				genericVector.add(value);
-			}
-		} else if(type.equals("LOCATION_SYMBOLIC")){
-			dataArray = locationList.split("\\, ");	
-			for(String value : dataArray){
-				genericVector.add(value);
-			}
-		} else if(type.equals("ToD")){
-			dataArray = tod.split("\\, ");	
-			for(String value : dataArray){
-				genericVector.add(value);
-			}
-		} 
-
-				
-		return genericVector;
-	}
-
-
-
-
-	private void runNNFromMapOfContext(HashMap<?, ?> mapOfContext, int neurons) {
+	
+	
+	public void runNNFromMapOfContext(HashMap<?, ?> mapOfContext, int neurons) {
 
 		Vector<String> ToDVector = new Vector<String>();
 		Vector<String> LocationVector = new Vector<String>();
 		Vector<String> DeviceVector = new Vector<String>();
 		Vector<String> ActivityVector = new Vector<String>();
 		Vector<String> PhysicalStatusVector = new Vector<String>();
+
+
+
+
 
 		Iterator<?> it = mapOfContext.keySet().iterator();
 		//elements
@@ -198,32 +145,68 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 		//learn
 		mlp.learn(trainingSet);
 		//test
-		testNeuralNetwork(mlp, trainingSet);
+		//testNeuralNetwork(mlp, trainingSet);
 
 		//save neural network
 		mlp.save("MLPForContextData@"+ neurons +".nnet");
 
 		//load neural network
-		NeuralNetwork loadedMlPerceptron = NeuralNetwork.load("MLPForContextData@"+ neurons +".nnet");
+		this.loadedMlPerceptron = NeuralNetwork.load("MLPForContextData@"+ neurons +".nnet");
 
 		//test loaded neural network
-		System.out.println("Testing loaded neural network");
-		testNeuralNetwork(loadedMlPerceptron, trainingSet);
+		//		System.out.println("Testing loaded neural network");
+		//testNeuralNetwork(this.loadedMlPerceptron, trainingSet);
+
+		//System.out.println("dictionary : " + this.dictionary);
 
 	}
 
 
-	public static void testNeuralNetwork(NeuralNetwork nnet, TrainingSet<SupervisedTrainingElement> tset) {
+	public void testNeuralNetwork(NeuralNetwork nnet, TrainingSet<SupervisedTrainingElement> tset) {
 
 		for(int i=0; i<tset.size(); i++) {
 			TrainingElement trainingElement = tset.elementAt(i);
 			nnet.setInput(trainingElement.getInput());
 			nnet.calculate();
 			double[] networkOutput = nnet.getOutput();
-			System.out.print("Input:" + arrayToString(trainingElement.getInput()) + " Trained Output:" + desiredOutput.get(i));
-			System.out.println(" Output:" + arrayToString(networkOutput)); 
+			System.out.print("Input num :" + arrayToString(trainingElement.getInput()) + " Trained Output num:" + desiredOutput.get(i));
+			System.out.print("\n Input types :" + arrayToTypes(trainingElement.getInput()) + " Trained Output type:" + numberToType("PHYSICAL_STATUS",desiredOutput.get(i)));
+
+			String netOut = arrayToString(networkOutput);
+			System.out.println("\n prediction value:" + netOut); 
+			System.out.println(" prediction type :" + numberToType("PHYSICAL_STATUS",netOut) );
 		}
+
 	}
+	
+	/*
+	 * new interface
+	 */
+	public String predictContext(String type, Map<String,String> situation) {
+
+		String outcome = "";
+		//convertStringToNum()
+
+
+		double input[]= {typeToNumber("ToD","morning"), typeToNumber("LOCATION_SYMBOLIC","home"), typeToNumber("DEVICE","homePc"),
+				typeToNumber("ACTIVITY","Browsing")};
+		//String typeString = arrayToTypes(input);
+
+		this.loadedMlPerceptron.setInput(input);
+		this.loadedMlPerceptron.calculate();
+
+		double[] networkOutput = this.loadedMlPerceptron.getOutput();
+
+		String netOut = arrayToString(networkOutput);
+		outcome = numberToType("PHYSICAL_STATUS" , netOut);
+
+		//	System.out.println("\n prediction input:" + typesString);
+		//	System.out.println("\n prediction num value:" + netOut);
+		  System.out.println("\n prediction string value:" + outcome);
+
+		return outcome;
+	}
+
 
 	public static String arrayToString(double[] array) { 
 		String str= "";
@@ -231,6 +214,104 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 			str += array[i]+" ";
 		return str;
 	}
+
+	public String arrayToTypes(double[] array) { 
+		String str= "";
+		//		ToD
+		//		LOCATION_SYMBOLIC
+		//		DEVICE
+		//		ACTIVITY
+		//		PHYSICAL_STATUS
+
+
+		for (int i = 0; i < array.length; i++){
+			Double doubleValue = array[i];
+			String stringValue = doubleValue.toString(); 
+			String type = "";
+			if(i==0){
+				type = numberToType("ToD" ,stringValue);	
+			} else if(i==1){
+				type = numberToType("LOCATION_SYMBOLIC" ,stringValue);
+			} else if (i==2){
+				type = numberToType("DEVICE" ,stringValue);
+			} else if (i==3){
+				type = numberToType("ACTIVITY" ,stringValue);
+			} else if (i==4){
+				type = numberToType("PHYSICAL_STATUS" ,stringValue);
+			}
+			str += type+" ";
+		}
+
+		return str;
+	}
+
+	/*
+	 * converts a numerical value to the respective attribute string value 
+	 * 
+	 */
+	public String numberToType(String attributeType , String attrNumericalValue){
+
+		String type = ""; 
+		Double numericalValue = Double.valueOf(attrNumericalValue);
+
+		//System.out.println("Identify value of "+attributeType+" for double:"+ attrNumericalValue);
+		//System.out.println("Identify value of "+attributeType+" for double:"+ numericalValue);
+
+		for(String attrType : this.dictionary.keySet()){
+			if(attributeType.equals(attrType)){
+				HashMap<String,Double> attTypeValues = this.dictionary.get(attributeType);
+				//	System.out.println("all values for "+attributeType+" are "+attTypeValues);
+				//System.out.println("current value:  "+numericalValue);
+				for(String valueString : attTypeValues.keySet()){
+					//System.out.println("compare with "+valueString);
+					//if(numericalValue.equals(attTypeValues.get(valueString))) type = valueString;
+					if(areEqual(numericalValue,attTypeValues.get(valueString))) {
+						type = valueString;
+						//System.out.println("identified value: "+type);
+					}
+				}		
+			}
+		}
+		return type;
+	}
+
+	/*
+	 * converts a string type value to the respective attribute numerical value 
+	 * 
+	 */
+	public Double typeToNumber(String attributeType , String stringValue){
+
+		Double numOut = null;
+
+		for(String attrType : this.dictionary.keySet()){
+
+			if(attributeType.equals(attrType)){
+				HashMap<String,Double> attTypeValues = this.dictionary.get(attributeType);
+				numOut = attTypeValues.get(stringValue);
+			}
+		}
+
+		return numOut;
+	}
+
+
+	private Boolean areEqual(Double a, Double b){
+		Boolean result = false;
+
+		if( a <= 0.001) a= 0d;
+		if( b <= 0.001) b= 0d;
+
+		if(a.equals(b)) return true;
+
+		Double out = Math.abs(a-b)/Math.max(a, b);
+
+		if( out <= 0.1){
+			result = true;
+		}
+
+		return result;
+	}
+
 
 	private Vector<String> transformType(String type, Vector<?> values) {
 
@@ -253,11 +334,13 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 			typeValues.put((String) typesSeen.get(i), value);
 		}
 
+		this.dictionary.put(type, typeValues);
+
 		// put values for each type seen
 		for (int i = 0; i < values.size(); i++) {
 			valueNum.add(i, String.valueOf(typeValues.get(values.get(i))));
 		}
-
+		System.out.println("typeValues "+typeValues);
 		return valueNum;
 	}
 
@@ -288,9 +371,58 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 	@Override
 	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID,
 			Date date) {
-		// TODO Auto-generated method stub
+
+		CtxAttribute predictedCtxAttr = null;
+
+		String locationValue = "";
+		String type = ctxAttrID.getType();
+		CtxEntityIdentifier entId;
+	
+		
+		
+		try {
+		
+			predictedCtxAttr = (CtxAttribute) this.ctxBroker.retrieve(ctxAttrID);
+			
+			entId = this.ctxBroker.retrieveIndividualEntityId(null, getOwnerId()).get();
+			List<CtxIdentifier> locationList = this.ctxBroker.lookup(entId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+				
+			if(!locationList.isEmpty()){
+				CtxAttribute locationAttr = (CtxAttribute) this.ctxBroker.retrieve(locationList.get(0));
+				locationValue = locationAttr.getStringValue();
+			}
+			
+			HashMap<String,String> situation = new HashMap<String,String>();
+			situation.put("ToD", "");
+			situation.put("LOCATION_SYMBOLIC", locationValue);
+			situation.put("DEVICE", "");
+			situation.put("ACTIVITY", "");
+			
+			String prdValue = this.predictContext(type, situation);
+			
+			predictedCtxAttr.setStringValue(prdValue);
+			
+			
+		} catch (Exception e) {
+			LOG.error("Exception while predicting context for attrID:"+ ctxAttrID+". "+e.getLocalizedMessage());
+			e.printStackTrace();
+		} 		
+		
+		LOG.debug("predictedCtxAttr :"+ predictedCtxAttr);
+		LOG.debug("prdValue :"+ predictedCtxAttr.getStringValue());
+		
+		return predictedCtxAttr;
+	}
+
+
+	/*
+	 * new interface
+	 */
+	public String predictContext(String type, Date date) {
+
 		return null;
 	}
+
 
 	@Override
 	public CtxAttribute predictContext(CtxAttributeIdentifier ctxAttrID,
@@ -328,4 +460,28 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 
 	}
 
+	/*
+	private CtxIdentifier getEntityID(){
+		
+	}
+	*/
+	
+	private IIdentity getOwnerId(){
+
+		IIdentity cssOwnerId = null;
+		try {
+			final INetworkNode cssNodeId = this.commMgr.getIdManager().getThisNetworkNode();
+			//LOG.info("*** cssNodeId = " + cssNodeId);
+			final String cssOwnerStr = cssNodeId.getBareJid();
+			cssOwnerId = this.commMgr.getIdManager().fromJid(cssOwnerStr);
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return cssOwnerId;
+	}
+
+	
+	
 }
