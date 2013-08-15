@@ -61,7 +61,6 @@ import org.societies.context.api.community.prediction.ICommunityCtxPredictionMgr
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
-
 public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 	//It needs refinement!!
 
@@ -78,17 +77,18 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 		LOG.info(this.getClass() + "CommunityContextPrediction instantiated ");
 	}
 
-	/* It uses the appropriate ctxBroker method to retrieve the input from User Context Prediction
+	/* It uses the appropriate ctxBroker method to retrieve the input from User Context Prediction. This method 
+	 * is the retrieveFuture(CtxAttributeIdentifier attrId, Date date) with Date=null?
 	 * 
 	 */
 	//@Override
 	public CtxAttribute predictCommunityCtx(CtxEntityIdentifier communityCtxId, CtxAttributeIdentifier ctxAttributeIdentifier) throws InvalidFormatException {
 
-		LOG.info("estimateCommunityCtx 1");
+		LOG.info("predictCommunityCtx 1");
 		CtxAttribute communityAttr = null;
 
 		// this values will be set in complexAttrType
-		double meanIntegerValue = 0.0;
+		double meanPredictedIntegerValue = 0.0;
 
 		ArrayList<Integer> integerAttrValues = new ArrayList<Integer>();
 		ArrayList<String> stringAttrValues = new ArrayList<String>();
@@ -138,130 +138,146 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 
 		CtxAttributeComplexValue complexValue = new CtxAttributeComplexValue();
 
-
 		try {
 
 			String ownerId = commMngr.getIdManager().getThisNetworkNode().getBareJid();
 			IIdentity identityOfOwner = commMngr.getIdManager().fromJid(ownerId);
 			Requestor requestorCSS = new Requestor(identityOfOwner);
 
-			//TODO check if CtxAttribute is null
 			communityAttr = (CtxAttribute) internalCtxBroker.retrieveAttribute(ctxAttributeIdentifier, false).get();
-			String attributeType = ctxAttributeIdentifier.getType().toString();
+			
+			if (communityAttr!=null){
+				
+				String attributeType = ctxAttributeIdentifier.getType().toString();
 
-			// checks if attribute type is included in the list of types that can be estimated
-			if(attributeTypesSetToBeChecked.contains(attributeType)){
+				// checks if attribute type is included in the list of types that can be estimated
+				
+				if(attributeTypesSetToBeChecked.contains(attributeType)){
 
-				List<CtxHistoryAttribute> retrievedCommunityHistoryAtributes = internalCtxBroker.retrieveHistory(requestorCSS, ctxAttributeIdentifier, null, null).get();
-				Set<CtxEntityIdentifier> communityMembers = ((CommunityCtxEntity) retrievedCommunityHistoryAtributes).getMembers();
+					//List<CtxHistoryAttribute> retrievedCommunityHistoryAtributes = internalCtxBroker.retrieveHistory(requestorCSS, ctxAttributeIdentifier, null, null).get();
+					//Set<CtxEntityIdentifier> communityMembers = ((CommunityCtxEntity) retrievedCommunityHistoryAtributes).getMembers();
+					//List<CtxAttribute> retrievedCommunityAtributes = internalCtxBroker.retrieveFuture(requestorCSS, ctxAttributeIdentifier, null).get();
+					//Set<CtxEntityIdentifier> communityMembers = ((CommunityCtxEntity) retrievedCommunityAtributes).getMembers();
+				
+					CommunityCtxEntity retrievedCommunity = (CommunityCtxEntity) internalCtxBroker.retrieve(communityCtxId).get();
+					Set<CtxEntityIdentifier> communityMembers = retrievedCommunity.getMembers();
+					
+					for(CtxEntityIdentifier comMemb:communityMembers){
+						IndividualCtxEntity individualMember = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
 
-				for(CtxEntityIdentifier comMemb:communityMembers){
-					IndividualCtxEntity individualMember = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
+						LOG.info("predictCommunityCtx 3 "+ individualMember.getId());
 
-					LOG.info("estimateCommunityCtx 3 "+ individualMember.getId());
+						Set<CtxAttribute> individualCSSAttributeList = individualMember.getAttributes(attributeType);	
 
-					Set<CtxAttribute> list = individualMember.getAttributes(attributeType);	
-
-					for (CtxAttribute ca:list){
-						if(ca.getIntegerValue()!= null){
-							integerAttrValues.add(ca.getIntegerValue());
-						}
-
-						if(ca.getStringValue()!= null){
-							stringAttrValues.add(ca.getStringValue());
-						}
-						if(ca.getDoubleValue()!= null){
-							doubleAttrValues.add(ca.getDoubleValue());
+						for (CtxAttribute ca:individualCSSAttributeList){
+							CtxAttributeIdentifier ctxAttrId = ca.getId();
+							List<CtxAttribute> listOfFutureCtxAttribute = internalCtxBroker.retrieveFuture(requestorCSS, ctxAttrId, null).get();
+							if (listOfFutureCtxAttribute.size()==1){
+								if(listOfFutureCtxAttribute.get(0).getIntegerValue()!=null){
+									integerAttrValues.add(listOfFutureCtxAttribute.get(0).getIntegerValue());
+								}
+								if(listOfFutureCtxAttribute.get(0).getStringValue()!= null){
+									stringAttrValues.add(listOfFutureCtxAttribute.get(0).getStringValue());
+							}
+								if(listOfFutureCtxAttribute.get(0).getDoubleValue()!= null){
+									doubleAttrValues.add(listOfFutureCtxAttribute.get(0).getDoubleValue());
+								}						
+							}
+							else{
+								LOG.info("Cannot calculate the predicted community value");
+							}
+							
 						}
 					}
+
+					// Integer values
+					// average, median, 
+					if( !integerAttrValues.isEmpty()){
+						LOG.info("predictCommunityCtx 4for integer" );
+						//average
+						meanPredictedIntegerValue = ccpNumMean(integerAttrValues);	
+						complexValue.setAverage(meanPredictedIntegerValue);
+						LOG.info("Mean Predicted Integer Value is :"+meanPredictedIntegerValue);
+
+						// pairs
+						LOG.info("Calculating Pairs");
+						HashMap<String,Integer> pairs = new HashMap<String,Integer>();
+						pairs = ccpStringPairs(stringAttrValues);
+						LOG.info("PAIRS are :"+pairs.get(0));
+						complexValue.setPairs(pairs);
+
+						//range 
+						LOG.info("Calculating Range ");
+						Integer [] range = ccpNumRange(integerAttrValues);
+						complexValue.setRangeMax(range[1]);
+						complexValue.setRangeMin(range[0]);
+						LOG.info("predictCommunityCtx 4 integer finished ");							
+
+						//median
+						LOG.info("Calculating Median");
+						Double medianNumber = ccpNumMedian(integerAttrValues);
+						LOG.info("The median is "+medianNumber);
+						complexValue.setMedian(medianNumber);
+						LOG.info("pewdictCommunityCtx 4 integer finished ");
+
+						//mode
+						LOG.info("Calculating Mode");
+						//ArrayList<Integer> modeNumber = cceNumMode(integerAttrValues);
+						//complexValue.setMode(integerAttrValues);
+						ArrayList<Integer> modeNumber = ccpNumMode(integerAttrValues);
+						complexValue.setMode(modeNumber);
+
+						LOG.info("Calculating ConvexHull");
+						//Converting the integers to Points2D
+						ArrayList<String> finalStringArrayList = new ArrayList<String>();
+						ArrayList<Point2D> cH = new ArrayList<Point2D>();
+
+						for (String strPoint:stringAttrValues){
+							String[] helperString = strPoint.split(",");
+							for (String s1:helperString){
+								finalStringArrayList.add(s1);
+							}
+						}
+						cH = ccpGeomConvexHull(CommunityContextPrediction.splitString(finalArrayStringList.toString()));
+						ArrayList<String> stringPoints = new ArrayList<String>();
+						for (Point2D point:cH){
+							stringPoints.add(point.toString());
+						}
+						complexValue.setLocationGPS(stringPoints.toString());
+						//TODO add any other applicable
+
+					}
+
+					// calculate strings 
+					if( !stringAttrValues.isEmpty()){
+
+						for (String s: stringAttrValues){
+							String[] helper = s.split(",");
+							for (String s1:helper){
+								finalArrayStringList.add(s1);
+							}
+						}	
+						HashMap<String,Integer> occurences = new HashMap<String,Integer>();
+						occurences = ccpStringPairs(finalArrayStringList);
+						LOG.info("estimateCommunityCtx 5 string "+ modeStringValue);
+						complexValue.setPairs(occurences);
+					}
+					communityAttr.setComplexValue(complexValue);
+					LOG.info("estimateCommunityCtx 6 communityAttr "+ communityAttr.getId());
 				}
 
-				// Integer values
-				// average, median, 
-				if( !integerAttrValues.isEmpty()){
-					LOG.info("estimateCommunityCtx 4for integer" );
+				// calculate double
+				if(!doubleAttrValues.isEmpty()){
 					//average
-					meanIntegerValue = ccpNumMean(integerAttrValues);	
-					complexValue.setAverage(meanIntegerValue);
-					LOG.info("Mean Integer Value is :"+meanIntegerValue);
-
-					// pairs
-					LOG.info("Calculating Pairs");
-					HashMap<String,Integer> pairs = new HashMap<String,Integer>();
-					pairs = ccpStringPairs(stringAttrValues);
-					LOG.info("PAIRS are :"+pairs.get(0));
-					complexValue.setPairs(pairs);
-
-					//range 
-					LOG.info("Calculating Range ");
-					Integer [] range = ccpNumRange(integerAttrValues);
-					complexValue.setRangeMax(range[1]);
-					complexValue.setRangeMin(range[0]);
-					LOG.info("estimateCommunityCtx 4 integer finished ");							
+					// TODO add a method cceNumMean that will take array of doubles
+					//range
 
 					//median
-					LOG.info("Calculating Median");
-					Double medianNumber = ccpNumMedian(integerAttrValues);
-					LOG.info("The median is "+medianNumber);
-					complexValue.setMedian(medianNumber);
-					LOG.info("estimateCommunityCtx 4 integer finished ");
 
 					//mode
-					LOG.info("Calculating Mode");
-					//ArrayList<Integer> modeNumber = cceNumMode(integerAttrValues);
-					//complexValue.setMode(integerAttrValues);
-					ArrayList<Integer> modeNumber = ccpNumMode(integerAttrValues);
-					complexValue.setMode(modeNumber);
-
-					LOG.info("Calculating ConvexHull");
-					//Converting the integers to Points2D
-					ArrayList<String> finalStringArrayList = new ArrayList<String>();
-					ArrayList<Point2D> cH = new ArrayList<Point2D>();
-
-					for (String strPoint:stringAttrValues){
-						String[] helperString = strPoint.split(",");
-						for (String s1:helperString){
-							finalStringArrayList.add(s1);
-						}
-					}
-					cH = ccpGeomConvexHull(CommunityContextPrediction.splitString(finalArrayStringList.toString()));
-					ArrayList<String> stringPoints = new ArrayList<String>();
-					for (Point2D point:cH){
-						stringPoints.add(point.toString());
-					}
-					complexValue.setLocationGPS(stringPoints.toString());
-					//TODO add any other applicable
-
 				}
-
-				// calculate strings 
-				if( !stringAttrValues.isEmpty()){
-
-					for (String s: stringAttrValues){
-						String[] helper = s.split(",");
-						for (String s1:helper){
-							finalArrayStringList.add(s1);
-						}
-					}	
-					HashMap<String,Integer> occurences = new HashMap<String,Integer>();
-					occurences = ccpStringPairs(finalArrayStringList);
-					LOG.info("estimateCommunityCtx 5 string "+ modeStringValue);
-					complexValue.setPairs(occurences);
-				}
-				communityAttr.setComplexValue(complexValue);
-				LOG.info("estimateCommunityCtx 6 communityAttr "+ communityAttr.getId());
-			}
-
-			// calculate double
-			if(!doubleAttrValues.isEmpty()){
-				//average
-				// TODO add a method cceNumMean that will take array of doubles
-				//range
-
-				//median
-
-				//mode
-			}
+				
+			}			
 
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
