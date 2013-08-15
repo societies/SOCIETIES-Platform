@@ -29,7 +29,12 @@ import java.util.List;
 
 import org.societies.api.activity.IActivity;
 import org.societies.orchestration.cpa.impl.SocialGraphVertex;
-
+/**
+ * Created with IntelliJ IDEA.
+ * User:  bjornmagnus.mathisen@sintef.no
+ * Date: 12/5/12
+ * Time: 1:32 PM
+ */
 public interface ActorComparator {
 	public double compare(SocialGraphVertex member1,SocialGraphVertex member2, List<IActivity> activityDiff);
 }

@@ -24,13 +24,12 @@
  */
 package org.societies.orchestration.cpa.impl;
 
+import gate.Annotation;
+import gate.AnnotationSet;
 import org.societies.api.cis.orchestration.model.ISocialGraphEdge;
 import org.societies.api.cis.orchestration.model.ISocialGraphVertex;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 public class SocialGraphVertex implements ISocialGraphVertex {
     private static final int maxLastActs = 10;
@@ -39,6 +38,9 @@ public class SocialGraphVertex implements ISocialGraphVertex {
     public List<String> trends;
     public Queue<String> lastActs;
     private boolean trend = false;
+    private long timestamp; //timestamp of last text added.
+    //this will contain TERM -> value, e.g. "Person" -> "John"
+    private HashMap<String, List<String>> terms;
 	public SocialGraphVertex(){
         init();
 	}
@@ -50,6 +52,7 @@ public class SocialGraphVertex implements ISocialGraphVertex {
         edges = new ArrayList<ISocialGraphEdge>();
         trends = new ArrayList<String>();
         lastActs = new LinkedList<String>();
+        terms = new HashMap<String, List<String>>();
     }
 	public String getName() {
 		return name;
@@ -84,5 +87,47 @@ public class SocialGraphVertex implements ISocialGraphVertex {
 
     public void setTrend(boolean trend) {
         this.trend = trend;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+    public void addTerm(String key, List<String> value){
+        terms.put(key,value);
+    }
+    public List<String> getTerm(String key){
+        return terms.get(key);
+    }
+    public HashMap<String, List<String>> getTerms(){
+        return terms;
+    }
+    public void merge(Map<String, AnnotationSet> annotationSetMap){
+        boolean found = false;
+        List<String> tmpNewTerm = null;
+        Iterator<Annotation> annotationIterator;
+        for(String key : annotationSetMap.keySet()){
+            if(terms.containsKey(key)){ //the key is present in the cache, check if it conaints the same amount of captured terms..
+                found = false;
+                annotationIterator  = annotationSetMap.get(key).iterator();
+                Annotation cur = null;
+                while(annotationIterator.hasNext()){
+                    cur = annotationIterator.next();
+                    if(!terms.get(key).contains(cur.toString()))
+                        terms.get(key).add(cur.toString());
+                }
+            } else  //the key is not present in cache, add to cache
+            {
+                tmpNewTerm = new ArrayList<String>();
+                annotationIterator = annotationSetMap.get(key).iterator();
+                while(annotationIterator.hasNext()){
+                    tmpNewTerm.add(annotationIterator.next().toString());
+                }
+                terms.put(key,tmpNewTerm);
+            }
+        }
     }
 }

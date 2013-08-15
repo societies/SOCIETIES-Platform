@@ -50,10 +50,10 @@ public class Activity implements IActivity {
 	
 	private String ownerId;
 	
-	public String getOwnerId() {
+	public final String getOwnerId() {
 		return ownerId;
 	}
-	public void setOwnerId(String ownerId) {
+	public final void setOwnerId(String ownerId) {
 		this.ownerId = ownerId;
 	}
 	public Activity()
@@ -93,72 +93,69 @@ public class Activity implements IActivity {
 	
 	@Column(name="verb")
 	@Override
-	public String getVerb() {
+	public final String getVerb() {
 		return verb;
 	}
 
 	@Column(name="verb")
 	@Override
-	public void setVerb(String verb) {
+	public final void setVerb(String verb) {
 		this.verb = verb;
 		data.put("verb", new ActivityString(verb));
 		
 	}
 	@Column(name="actor")
 	@Override
-	public String getActor() {
+	public final String getActor() {
 		return actor;
 	}
 	@Column(name="actor")
 	@Override
-	public void setActor(String actor) {
+	public final void setActor(String actor) {
 //        System.out.println("this: "+this.hashCode()+ " in setActor oldactor:"+this.actor+ " newactor: "+actor);
 		this.actor = actor;
 		data.put("actor", new ActivityString(actor));
 	}
 	@Column(name="object")
 	@Override
-	public String getObject() {
+	public final String getObject() {
 		return object;
 	}
 	@Column(name="object")
 	@Override
-	public void setObject(String object) {
+	public final void setObject(String object) {
 		this.object = object;
 		data.put("object", new ActivityString(object));
 		
 	}
 	@Column(name="target")
 	@Override
-	public String getTarget() {
+	public final String getTarget() {
 		return target;
 	}
 	@Column(name="target")
 	@Override
-	public void setTarget(String target) {
+	public final void setTarget(String target) {
 		this.target = target;
 		data.put("target", new ActivityString(target));
 	}
-	public Long getId() {
+	public final Long getId() {
 		return id;
 	}
-	private void setId(Long id) {
-		this.id = id;
-	}
 
-	public long getTime() {
+	public final long getTime() {
 		return time;
 	}
 
-	public void setTime(long time) {
+	public final void setTime(long time) {
 		this.time = time;
 	}
 	@Override
-	public String getPublished() {
+	public final String getPublished() {
 		return published;
 	}
 	@Override
-	public void setPublished(String published) {
+	public final void setPublished(String published) {
 		this.published = published;
         try{
 		this.time = Long.parseLong(published);
@@ -170,10 +167,10 @@ public class Activity implements IActivity {
 		data.put("published", new ActivityString(published));
 		
 	}
-	public ActivityString getValue(String key){
+	public final ActivityString getValue(String key){
 		return data.get(key);
 	}
-    public String toString(){
+    public final String toString(){
         return getPublished()+":"+getActor()+":"+getVerb()+":"+getObject()+":"+getTarget();
     }
 }

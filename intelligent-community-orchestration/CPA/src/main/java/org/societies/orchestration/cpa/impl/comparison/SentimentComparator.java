@@ -18,7 +18,6 @@ import java.util.List;
  * User: bjornmagnus.mathisen@sintef.no
  * Date: 5/15/13
  * Time: 11:04
- * To change this template use File | Settings | File Templates.
  */
 public class SentimentComparator implements ActorComparator {
     private ActivitySpout activitySpout = new ActivitySpout(null);

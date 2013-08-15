@@ -80,32 +80,32 @@ import java.lang.reflect.Method;
 @Table(name = "org_societies_activity_ActivityFeed")
 public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
 
-    protected String owner;
+    private String owner;
     @Id
     private String id;// represents the owner of the activity feed
     @OneToMany
-    protected
-    Set<Activity> list;
+    private Set<Activity> list;
     @Transient
     private SessionFactory sessionFactory;
     @Transient
-    protected static Logger LOG = LoggerFactory.getLogger(ActivityFeed.class);
+    private static Logger LOG = LoggerFactory.getLogger(ActivityFeed.class);
 
   
-    public boolean pubSubEnabled;
+    private boolean pubSubEnabled;
     
     @Transient
     private PubsubClient pubSubcli;
     @Transient
     private IIdentity ownerCSS;
     public ActivityFeed(String id, String owner){
-        this.owner = owner; this.setId(id);
+        this.owner = owner;
+        this.id = id;
         initClass();
-        pubSubEnabled = false;
+        setPubSubEnabled(false);
     }
     public ActivityFeed(){
         initClass();
-        pubSubEnabled = false;
+        setPubSubEnabled(false);
     }
     public void initClass(){
         list = new HashSet<Activity>();// from Thomas
@@ -120,7 +120,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     // version with PubSub
     synchronized public void startUp(SessionFactory sessionFactory){
         this.setSessionFactory(sessionFactory);
-        if (pubSubEnabled)
+        if (isPubSubEnabled())
         	this.setPubSubcli(pubSubcli);
     }
     
@@ -128,45 +128,44 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     public void connectPubSub(IIdentity ownerCSS){ //ASSUME PUBSUB NODE PERSISTING (CONFIGURATION), CHECK IF IT EXISTS
         this.ownerCSS = ownerCSS;
         // pubsub code
-        if (!pubSubEnabled)
+        if (!isPubSubEnabled()) {
         	return;
+        }
         	
         LOG.debug("starting pubsub at activityfeed pubsub");
         if(null != pubSubcli && null != ownerCSS){
-            List<String> l = null;
+            List<String> l;
             try {
                 l = pubSubcli.discoItems(ownerCSS, null);
             } catch (XMPPError e) {
-                LOG.warn("XMPPError at activityfeed pubsub");
-                e.printStackTrace();
+                LOG.warn("XMPPError at activityfeed pubsub: ",e);
                 return;
             } catch (CommunicationException e) {
-                LOG.warn("Com at activityfeed pubsub");
-                e.printStackTrace();
+                LOG.warn("Com at activityfeed pubsub",e);
                 return;
             }
             boolean nodeExists = false;
-            if(l.size() == 0)
+            if(l.size() == 0) {
                 LOG.warn("empty disco item list");
+            }
 
             if(l != null && l.size()>0){
                 for(String temp : l){
                     LOG.warn("Existing node is " + temp);
-                    if (temp.equals(this.getId()))
+                    if (temp.equals(this.getId())) {
                         nodeExists=true;
+                    }
                 }
 
             }
-            if(false == nodeExists){
+            if(!nodeExists){
                 try {
                     LOG.warn("going to create a pubsub node");
                     pubSubcli.ownerCreate(ownerCSS, this.getId());
                 } catch (XMPPError e) {
-                    LOG.warn("XMPPError at activityfeed pubsub");
-                    e.printStackTrace();
+                    LOG.warn("XMPPError at activityfeed pubsub: ",e);
                 } catch (CommunicationException e) {
-                    LOG.warn("Com at activityfeed pubsub");
-                    e.printStackTrace();
+                    LOG.warn("Com at activityfeed pubsub: ",e);
                 }
             }else{
                 LOG.warn("node exists");
@@ -185,11 +184,11 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
             ret = session.createCriteria(Activity.class).add(Restrictions.eq("ownerId",this.getId())).list().size();
         }catch  (Exception e)
         {
-            LOG.error("Error while trying to count activities");
-            e.printStackTrace();
+            LOG.error("Error while trying to count activities: ",e);
         } finally {
-            if (session != null)
+            if (session != null) {
                 session.close();
+            }
         }
         return ret;
     }
@@ -211,32 +210,31 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
             actv_id = (Long) session.save(newAct);
             t.commit();
         }catch(Exception e){
-            e.printStackTrace();
-            if (t != null)
+
+            if (t != null) {
                 t.rollback();
-            LOG.warn("Saving activity failed, rolling back");
+            }
+            LOG.error("Saving activity failed, rolling back: ",e);
             err = true;
         }finally{
-            if (session != null)
+            if (session != null) {
                 session.close();
+            }
 
         }
 
         // Publishing TO PUBSUB
-        if(false == err && pubSubEnabled && getPubSubcli() !=null){
+        if(!err && isPubSubEnabled() && getPubSubcli() !=null){
             try {
                 LOG.info("going to call pubsub");
                 getPubSubcli().publisherPublish(this.ownerCSS, this.getId(), Long.toString(actv_id), iactivToMarshActiv(newAct));
             } catch (XMPPError e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.error("XMPPError publishing activity to pubsub: ",e);
             } catch (CommunicationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.error("Communication error publishing activity to pubsub: ",e);
             }
         }
-        LOG.info("done publishing activity on pubsub");
-
+        LOG.debug("done publishing activity on pubsub");
     }
 
     @Override
@@ -277,13 +275,14 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
 
             t.commit();
         }catch(Exception e){
-            if (t != null)
+            if (t != null) {
                 t.rollback();
-            e.printStackTrace();
-            LOG.warn("deleting activities failed, rolling back");
+            }
+            LOG.error("deleting activities failed, rolling back",e);
         }finally{
-            if (session != null)
+            if (session != null) {
                 session.close();
+            }
 
         }
 
@@ -315,8 +314,9 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     }
 
     public boolean deleteActivity(IActivity activity) {
-        if(!list.contains(activity))
+        if(!list.contains(activity)) {
             return false;
+        }
         boolean ret = list.remove(activity);
         Session session = null;
         Transaction t = null;
@@ -327,13 +327,14 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
             session.delete(activity);
             t.commit();
         }catch (Exception e){
-            if (t != null)
+            if (t != null) {
                 t.rollback();
-            e.printStackTrace();
-            LOG.error("Error when trying to delete activity");
+            }
+            LOG.error("Error when trying to delete activity: ",e);
         }finally {
-            if(session!=null)
+            if(session!=null) {
                 session.close();
+            }
         }
         return ret;
     }
@@ -386,14 +387,14 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
             }
             t.commit();
         }catch(Exception e){
-            if (t != null)
+            if (t != null) {
                 t.rollback();
-            LOG.warn("Importing of activities from social data failed..");
-            e.printStackTrace();
-
+            }
+            LOG.error("Importing of activities from social data failed:",e);
         }finally{
-            if(session!=null)
+            if(session!=null) {
                 session.close();
+            }
         }
 
         return ret;
@@ -401,8 +402,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
 
     @Override
     public IActivity getEmptyIActivity(){
-        Activity a = new Activity();
-        return a;
+        return new Activity();
     }
 
     //timeperiod: "millisecondssinceepoch millisecondssinceepoch+n"
@@ -429,15 +429,12 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
             session = this.getSessionFactory().openSession();
 
             retList = session.createCriteria(Activity.class).add(Restrictions.gt("time", new Long(fromTime))).add(Restrictions.lt("time", new Long(toTime))).add(Restrictions.eq("ownerId",this.getId())).list();
-            LOG.info(" list size: "+retList.size()+" no criteria: "+session.createCriteria(Activity.class).list().size());
-            LOG.info(" FISK "+session.createCriteria(Activity.class).add(Restrictions.gt("time", new Long(fromTime))).add(Restrictions.lt("time", new Long(toTime))).list().size());
         } catch (Exception e) {
-            LOG.error("getting activities query failed: ");
-            e.printStackTrace();
-
+            LOG.error("getting activities query failed: ",e);
         } finally {
-            if (session != null)
+            if (session != null) {
                 session.close();
+            }
         }
 
         LOG.info("time period: "+fromTime+" - " + toTime);
@@ -446,8 +443,6 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
                 if(Long.parseLong(act.getPublished())>=fromTime && Long.parseLong(act.getPublished())<=toTime){
                     act.repopHash();
                     ret.add(act);
-/*                    System.out.println("adding: actor: "+act
-                            .getActor()+" time: "+act.getPublished());*/
                 }
             }
 
@@ -463,12 +458,11 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
             return ret;
         }
         //start parsing query..
-        JSONObject arr = null;
+        JSONObject arr;
         try {
             arr = new JSONObject(query);
         } catch (JSONException e) {
-            LOG.error("Error parsing JSON");
-            e.printStackTrace();
+            LOG.error("Error parsing JSON: ",e);
             return ret;
         }
         LOG.info("loaded JSON");
@@ -478,12 +472,11 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
             filterBy = (new JSONArray(arr.getString("filterBy"))).getString(0);
             filterValue = (new JSONArray(arr.getString("filterValue"))).getString(0);
         } catch (JSONException e1) {
-            LOG.error("Error parsing JSON");
-            e1.printStackTrace();
+            LOG.error("Error parsing JSON: ",e1);
             return ret;
         }
         LOG.info("loaded JSON values");
-        Method method = null;
+        Method method;
         try {
             method = ActivityString.class.getMethod(methodName, String.class);
         } catch (SecurityException e) {
@@ -496,28 +489,21 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
             }
             return ret;
         }
-        LOG.info("created method");
+        LOG.debug("created method");
         //filter..
         try {
             for(IActivity act : tmp){
                 if((Boolean)method.invoke(((Activity)act).getValue(filterBy),filterValue) ){
-
                     ret.add(act);
                 }
             }
-            LOG.error("((Activity)tmp.get(0)).getValue(filterBy).toString(): "+((Activity)tmp.get(0)).getValue(filterBy).toString());
-            LOG.error("((Activity)tmp.get(0)):"+((Activity)tmp.get(0)));
-            LOG.error("((Activity)tmp.get(0)).getValue(\"actor\"):" + ((Activity)tmp.get(0)).getValue("actor"));
-            LOG.error(((Activity)tmp.get(0)).hashCode()+": ((Activity)tmp.get(0)).getActor():" + ((Activity)tmp.get(0)).getActor());
+
         } catch (IllegalArgumentException e) {
-            LOG.error("Illegal argument for the filterOp");
-            e.printStackTrace();
+            LOG.error("Illegal argument for the filterOp: ",e);
         } catch (IllegalAccessException e) {
-            LOG.error("Illegal access for the filterOp");
-            e.printStackTrace();
+            LOG.error("Illegal access for the filterOp: ",e);
         } catch (InvocationTargetException e) {
-            LOG.error("Invocation target exception for the filterOp");
-            e.printStackTrace();
+            LOG.error("Invocation target exception for the filterOp: ",e);
         }
         return ret;
     }
@@ -552,7 +538,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     @Override
     public void getActivities(String timePeriod, long n, IActivityFeedCallback c) {
         LOG.debug("local get activities WITH CALLBACK called");
-
+        long nn = n;
         List<IActivity> iActivityList = this.getActivitiesFromDB(timePeriod);
         List<IActivity> ret = new ArrayList<IActivity>();
         Collections.sort(iActivityList,new Comparator<IActivity>() {
@@ -561,10 +547,12 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
                 return (Long.parseLong(iActivity.getPublished())>Long.parseLong(iActivity1.getPublished())) ? 1 : -1;
             }
         });
-        if(iActivityList.size()<n)
-            n = iActivityList.size();
-        for(int i=0;i<n;i++)
+        if(iActivityList.size()<nn) {
+            nn = iActivityList.size();
+        }
+        for(int i=0;i<nn;i++) {
             ret.add(iActivityList.get(i));
+        }
 
         org.societies.api.schema.activityfeed.MarshaledActivityFeed ac = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
         GetActivitiesResponse g = new GetActivitiesResponse();
@@ -607,8 +595,9 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
                 return (Long.parseLong(iActivity.getPublished())>Long.parseLong(iActivity1.getPublished())) ? 1 : -1;
             }
         });
-        for(int i=0;i<n;i++)
+        for(int i=0;i<n;i++) {
             ret.add(iActivityList.get(i));
+        }
 
         org.societies.api.schema.activityfeed.MarshaledActivityFeed ac = new org.societies.api.schema.activityfeed.MarshaledActivityFeed();
         GetActivitiesResponse g = new GetActivitiesResponse();
@@ -626,13 +615,14 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     @Async
     @Override
     public Future<List<IActivity>> getActivities(String query, String timePeriod, long n) {
-
+        long nn = n;
         List<IActivity> iActivityList = null;
         List<IActivity> result = new ArrayList<IActivity>();
-        if (timePeriod == null || timePeriod.length() == 0)
+        if (timePeriod == null || timePeriod.length() == 0) {
         	iActivityList = this.getActivitiesFromDB(query);
-        else	
+        } else {
         	iActivityList = this.getActivitiesFromDB(query,timePeriod);
+        }
        
        if (iActivityList != null)
        {
@@ -643,11 +633,13 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
                }
            });
     	  
-    	   if (n == 0 || n > iActivityList.size())
-    		   n = iActivityList.size();
+    	   if (nn == 0 || nn > iActivityList.size()) {
+    		   nn = iActivityList.size();
+           }
     	   
-    	   for(int i=0;i<n;i++)
+    	   for(int i=0;i<nn;i++) {
     		   result.add(iActivityList.get(i));
+           }
        }
        
        return new AsyncResult<List<IActivity>>(result);
@@ -656,7 +648,7 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     @Async
     @Override
     public Future<List<IActivity>> getActivities(String timePeriod, long n) {
-
+        long nn = n;
         List<IActivity> iActivityList = null;
         List<IActivity> result = new ArrayList<IActivity>();
         iActivityList = this.getActivitiesFromDB(timePeriod);
@@ -669,11 +661,13 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
                }
            });
     	  
-    	   if (n == 0 || n > iActivityList.size())
-    		   n = iActivityList.size();
+    	   if (nn == 0 || nn > iActivityList.size()) {
+    		   nn = iActivityList.size();
+           }
     	   
-    	   for(int i=0;i<n;i++)
+    	   for(int i=0;i<nn;i++) {
     		   result.add(iActivityList.get(i));
+           }
         }
         return new AsyncResult<List<IActivity>>(result);
     }
@@ -689,13 +683,16 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     }
 
     public String getContentIfNotNull(ActivityObject a){
-        if(a == null) return null;
-        if(a.getObjectType().contains("person"))
+        if(a == null) { return null; }
+        if(a.getObjectType().contains("person")) {
             return a.getDisplayName();
-        if(a.getObjectType().contains("note"))
+        }
+        if(a.getObjectType().contains("note")) {
             return "note";
-        if(a.getObjectType().contains("bookmark"))
+        }
+        if(a.getObjectType().contains("bookmark")) {
             return a.getUrl();
+        }
         return a.getContent();
     }
 
@@ -703,17 +700,18 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
         org.societies.api.schema.activity.MarshaledActivity a = new org.societies.api.schema.activity.MarshaledActivity();
         a.setActor(iActivity.getActor());
         a.setVerb(iActivity.getVerb());
-        if(iActivity.getObject()!=null && iActivity.getObject().isEmpty() == false )
+        if(iActivity.getObject()!=null && !iActivity.getObject().isEmpty() ) {
             a.setObject(iActivity.getObject());
-        if(iActivity.getPublished()!=null && iActivity.getPublished().isEmpty() == false )
+        }
+        if(iActivity.getPublished()!=null && !iActivity.getPublished().isEmpty() ) {
             a.setPublished(iActivity.getPublished());
-
-        if(iActivity.getTarget()!=null && iActivity.getTarget().isEmpty() == false )
+        }
+        if(iActivity.getTarget()!=null && !iActivity.getTarget().isEmpty() ) {
             a.setTarget(iActivity.getTarget());
+        }
         return a;
     }
 
-    // TODO: dont we need to use a transaction here
     public void clear(){
         Session session = null;
         Transaction t = null;
@@ -730,13 +728,15 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
             t.commit();
 
         } catch (Exception e) {
-            if (t != null)
+            if (t != null) {
                 t.rollback();
-            LOG.warn("clear of activities failed");
-            e.printStackTrace();
+            }
+            LOG.warn("clear of activities failed:",e);
+
         } finally {
-            if(session!=null)
+            if(session!=null) {
                 session.close();
+            }
         }
     }
 
@@ -772,4 +772,11 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
         this.sessionFactory = sessionFactory;
     }
 
+    public boolean isPubSubEnabled() {
+        return pubSubEnabled;
+    }
+
+    public void setPubSubEnabled(boolean pubSubEnabled) {
+        this.pubSubEnabled = pubSubEnabled;
+    }
 }

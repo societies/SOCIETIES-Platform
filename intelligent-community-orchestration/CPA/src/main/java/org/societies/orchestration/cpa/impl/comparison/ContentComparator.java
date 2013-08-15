@@ -39,7 +39,6 @@ import org.societies.api.activity.IActivity;
 import org.societies.orchestration.cpa.impl.SocialGraphVertex;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
@@ -49,15 +48,16 @@ import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
- * User: epic
- * Date: 12/4/12
- * Time: 10:41 AM
- * To change this template use File | Settings | File Templates.
+ * User:  bjornmagnus.mathisen@sintef.no
+ * Date: 12/5/12
+ * Time: 1:32 PM
  */
 public class ContentComparator implements ActorComparator {
 
     private SerialAnalyserController annieController;
     private URL pluginURL;
+    private int annotationsDone = 0;
+    private int fruitfulannotationsDone = 0;
 
     private static Logger LOG = LoggerFactory
             .getLogger(ContentComparator.class);
@@ -129,45 +129,79 @@ public class ContentComparator implements ActorComparator {
 
         String member1Text = "";  int m1count = 0;
         String member2Text = "";  int m2count = 0;
+        long m1lastTimeStamp = 0;
+        long m2lastTimeStamp = 0;
         for(IActivity act: activityDiff){
             if(contains(member1,act)){
                 m1count ++;
                 //add new link (or add weight to an old link)
                 member1Text += ". "+act.getObject();
+                if(Long.parseLong(act.getPublished())>m1lastTimeStamp)
+                    m1lastTimeStamp = Long.parseLong(act.getPublished());
             }
-            else if( contains(member2,act) ) {
+            if( contains(member2,act) ) {
                 m2count ++;
                 member2Text += ". "+act.getObject();
+                if(Long.parseLong(act.getPublished())>m2lastTimeStamp)
+                    m2lastTimeStamp = Long.parseLong(act.getPublished());
             }
 
         }
         if(member1Text.length() == 0 || member1Text.length() == 0)
             return 0;
-        LOG.info("comparing two members m1 totaltextlength: "+member1Text.length()+" numberof: "+m1count+ " ratio: "+((double)member1Text.length())/((double)m1count));
-        LOG.info("comparing two members m2 totaltextlength: "+member2Text.length()+" numberof: "+m2count+ " ratio: "+((double)member2Text.length())/((double)m2count));
-        long start = System.currentTimeMillis();
-        Map<String,AnnotationSet> m1annotations = getAnnotations(member1Text);
-        long timespent = (System.currentTimeMillis()-start);
-        LOG.info("annotating "+member1Text.length()+" time spent: "+timespent+" per char: "+((double)(System.currentTimeMillis()-start))/((double)member1Text.length()));
-        start = System.currentTimeMillis();
-        Map<String,AnnotationSet> m2annotations = getAnnotations(member2Text);
-        timespent = (System.currentTimeMillis()-start);
-        LOG.info("annotating "+member2Text.length()+" time spent: "+timespent+" per char: "+((double)(System.currentTimeMillis()-start))/((double)member2Text.length()));
+        LOG.info("USER: "+member1.getName()+" m1lastTimeStamp: "+m1lastTimeStamp+" member1.getTimestamp(): "+member1.getTimestamp());
+        LOG.info("USER: "+member2.getName()+" m2lastTimeStamp: "+m2lastTimeStamp+" member2.getTimestamp(): "+member2.getTimestamp());
+/*        LOG.info("comparing two members m1 totaltextlength: "+member1Text.length()+" numberof: "
+                +m1count+ " ratio: "+((double)member1Text.length())/((double)m1count));
+        LOG.info("comparing two members m2 totaltextlength: "+member2Text.length()+" numberof: "
+                +m2count+ " ratio: "+((double)member2Text.length())/((double)m2count));*/
+        Map<String, List<String>> m1annotations = null;
+        long start=0,timespent=0;
+        if(m1lastTimeStamp>member1.getTimestamp()){
+            start = System.currentTimeMillis();
+            member1.merge(getAnnotations(member1Text)); //cache the extraction
+            member1.setTimestamp(m1lastTimeStamp);
+            m1annotations = member1.getTerms();
+            timespent = (System.currentTimeMillis()-start);
+            LOG.info("annotating "+member1Text.length()+" time spent: "+timespent+" per char: "
+                    +((double)(System.currentTimeMillis()-start))/((double)member1Text.length()));
+            Map<String, List<String>> currentAnnotationSets = member1.getTerms();
+            annotationsDone++;
 
+
+        } else {
+            m1annotations = member1.getTerms();
+        }
+
+        Map<String, List<String>> m2annotations = null;
+        if(m2lastTimeStamp>member2.getTimestamp()){
+            start = System.currentTimeMillis();
+            member2.merge(getAnnotations(member2Text)); //cache the extraction
+            member2.setTimestamp(m2lastTimeStamp);
+            m2annotations = member2.getTerms();
+            timespent = (System.currentTimeMillis()-start);
+            LOG.info("annotating "+member2Text.length()+" time spent: "+timespent+" per char: "
+                    +((double)(System.currentTimeMillis()-start))/((double)member2Text.length()));
+            annotationsDone++;
+        } else {
+            m2annotations = member2.getTerms();
+        }
         //check if the two members have talked about the same locations.
-        AnnotationSet l1 = m1annotations.get("Location");
-        AnnotationSet l2 = m2annotations.get("Location");
-        Iterator<Annotation> it = null;
+        List<String> l1 = m1annotations.get("Location");
+        List<String> l2 = m2annotations.get("Location");
+        /*List<String> l3 = m2annotations.get("Address");*/
+        Iterator<String> it = null;
         if(l1 != null && l2!=null){
             it = l1.iterator();
             while(it.hasNext()){
                 if(l2.contains(it.next()))
                     ret++;
             }
+
         }
         //check if the two members have talked about the same persons.
-        AnnotationSet p1 = m1annotations.get("Person");
-        AnnotationSet p2 = m2annotations.get("Person");
+        List<String> p1 = m1annotations.get("Person");
+        List<String> p2 = m2annotations.get("Person");
         if(p1!=null && p2!=null){
             it = p1.iterator();
             while(it.hasNext()){
@@ -176,13 +210,13 @@ public class ContentComparator implements ActorComparator {
             }
         }
         //look for ..
-        LOG.info("ret: "+ret);
+        LOG.info("fruitfulannotationsDone: "+fruitfulannotationsDone+" annotationsDone: "+annotationsDone+" ret: "+ret);
         return ret;
     }
-    private Map<String,AnnotationSet> getAnnotations(String str){
+    private Map<String, AnnotationSet> getAnnotations(String str){
         LOG.info("trying to annotate str of size: "+str.length());
 
-        Map<String,AnnotationSet> ret = new HashMap<String,AnnotationSet>();
+        Map<String, AnnotationSet> ret = new HashMap<String, AnnotationSet >();
         if(str == null || str.length() == 0){
             LOG.info("str is null escaping..");
             return ret;
@@ -212,8 +246,10 @@ public class ContentComparator implements ActorComparator {
         if(ret == null){
             LOG.info("ret is null after getnamedannotation...");
             ret = new HashMap<String, AnnotationSet>();
-        }else
+        }else {
+            fruitfulannotationsDone++;
             LOG.info("found something!: "+ret.values().iterator().next().toString());
+        }
         return ret;
 
     }

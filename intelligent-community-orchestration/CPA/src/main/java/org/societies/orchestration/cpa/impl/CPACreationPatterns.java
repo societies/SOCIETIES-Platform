@@ -47,19 +47,22 @@ import java.util.Set;
 
 public class CPACreationPatterns
 {
-	public SocialGraph getGraph() {
-		return graph;
-	}
-	public void setGraph(SocialGraph graph) {
-		this.graph = graph;
-	}
+
 	private long lastTime = 0L;
 	private SocialGraph graph = new SocialGraph();
 	private int numEdgesToRemove = 4;
 	private GraphAnalyser analyser;
 	private static final String JUNGBETWEENNESS = "jungbetweenness";
 	private Set<Set<SocialGraphVertex>> clusterSets ;
-	public CPACreationPatterns(){}
+
+    public CPACreationPatterns(){}
+
+    public SocialGraph getGraph() {
+        return graph;
+    }
+    public void setGraph(SocialGraph graph) {
+        this.graph = graph;
+    }
 	public void init(){
 		//TODO: read config
 		String analyserprop = JUNGBETWEENNESS;
