@@ -93,7 +93,7 @@ public class AccessControlOutcome extends IPrivacyOutcome implements Serializabl
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("PPNPOutcome [effect=");
+		builder.append("AccessControlOutcome [effect=");
 		builder.append(effect);
 		builder.append(", confidenceLevel=");
 		builder.append(confidenceLevel);

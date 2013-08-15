@@ -37,6 +37,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.SessionScoped;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
@@ -70,13 +71,15 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ppn.PPNPOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ppn.PPNPrivacyPreferenceTreeModel;
 import org.societies.webapp.controller.BasePageController;
+import org.societies.webapp.controller.TrustController;
+import org.societies.webapp.service.PrivacyUtilService;
 /**
  * @author Eliza
  *
  */
 @ViewScoped
-@ManagedBean(name="PPNcreateBean")
-public class PPNCreateBean extends BasePageController implements Serializable{
+@ManagedBean(name="PPNeditBean")
+public class PPNEditBean extends BasePageController implements Serializable{
 
 	private final Logger logging = LoggerFactory.getLogger(getClass());
 
@@ -85,6 +88,8 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 	private TreeNode selectedNode;
 
 
+	@ManagedProperty(value="#{privacyUtilService}")
+	private PrivacyUtilService privacyUtilService;
 
 	@ManagedProperty(value="#{commMngrRef}")
 	private ICommManager commMgr;
@@ -92,15 +97,14 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 	@ManagedProperty(value = "#{privPrefMgr}")
 	private IPrivacyPreferenceManager privPrefmgr;
 
-	private IIdentity userId;
-
 
 
 	private List<OperatorConstants> operators = new ArrayList<OperatorConstants>();
 
 	private OperatorConstants selectedOperator;
 
-	private PPNPreferenceDetailsBean preferenceDetails = new PPNPreferenceDetailsBean();
+
+	private PPNPreferenceDetailsBean preferenceDetails;
 
 	private int requestorType;
 
@@ -125,7 +129,7 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 
 	private String displaySpecificRequestor;
 
-	public PPNCreateBean() {
+	public PPNEditBean() {
 
 	}
 
@@ -133,10 +137,6 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 	@PostConstruct
 	public void setup(){
 
-		preferenceDetails.setRequestor(new RequestorBean());
-		preferenceDetails.getRequestor().setRequestorId("");
-		preferenceDetails.setResource(new Resource());
-		preferenceDetails.getResource().setDataType("");
 		setOperators(Arrays.asList(OperatorConstants.values()));
 		setDecisions(Arrays.asList(Decision.values()));
 
@@ -161,8 +161,26 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 			this.privacyConditionData.put(c, temp);
 
 		}
-
-
+		
+		Map<String, String> requestParameterMap = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+		if (requestParameterMap.containsKey("ppnDetailUUID")){
+			try{
+				
+				this.preferenceDetails = this.privacyUtilService.getPpnPreferenceDetailsBean(requestParameterMap.get("ppnDetailUUID"));
+				this.logging.debug("got ppn details: "+this.preferenceDetails.toString());
+				PPNPrivacyPreferenceTreeModel ppnPreference = this.privPrefmgr.getPPNPreference(preferenceDetails);
+				this.logging.debug("Retrieved ppn preference : \n"+ppnPreference.getRootPreference().toString());
+				TreeNode node = new DefaultTreeNode("Root", null); 
+				this.root = ModelTranslator.getPrivacyPreference(ppnPreference.getRootPreference(), node);
+				this.logging.debug("*** AFter translation of model: ****\n");
+				printTree();
+			} catch (Exception e){
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error getting ppn detail bean"));
+				this.logging.debug("Error getting ppn detail bean");
+			}
+		}else{
+			this.logging.debug("RequestParameterMap does not contain key ppnDetailUUID");
+		}
 	}
 
 
@@ -532,7 +550,7 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 
 
 		PrivacyPreference privacyPreference = ModelTranslator.getPrivacyPreference(root);
-		this.logging.debug("Printing preference before save: \n"+privacyPreference.toString());
+
 		this.logging.debug("Saving preferences with details: "+preferenceDetails.toString());
 		PPNPrivacyPreferenceTreeModel model = new PPNPrivacyPreferenceTreeModel(preferenceDetails, privacyPreference);
 		if (this.privPrefmgr.storePPNPreference(preferenceDetails, model)){
@@ -553,7 +571,6 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 
 	public void setCommMgr(ICommManager commMgr) {
 		this.commMgr = commMgr;
-		this.userId = this.commMgr.getIdManager().getThisNetworkNode();
 	}
 
 
@@ -583,13 +600,10 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 			this.root = new DefaultTreeNode("Root", null);
 			this.logging.debug("loading tree with default tree node");
 			PPNPOutcome outcome = new PPNPOutcome(Decision.PERMIT);
-			TreeNode node0 = new DefaultTreeNode(outcome, root);
-
-			this.logging.debug("((((((((((((((");
-			this.logging.debug("getRoot");
-			this.logging.debug(node0+" ");
-			this.logging.debug("))))))))))))))))))");
+			TreeNode node0 = new DefaultTreeNode(outcome, root);	
 		}
+		this.logging.debug("getRoot");
+		this.printTree();
 		return root;
 	}
 
@@ -795,6 +809,16 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 
 	public void setDisplaySpecificRequestor(String displaySpecificRequestor) {
 		this.displaySpecificRequestor = displaySpecificRequestor;
+	}
+
+
+	public PrivacyUtilService getPrivacyUtilService() {
+		return privacyUtilService;
+	}
+
+
+	public void setPrivacyUtilService(PrivacyUtilService privacyUtilService) {
+		this.privacyUtilService = privacyUtilService;
 	}
 
 
