@@ -69,11 +69,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.societies.api.display</groupId>
-            <artifactId>societies-api-display</artifactId>
-            <version>${release.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>org.springframework.spring-library</artifactId>
             <type>libd</type>
