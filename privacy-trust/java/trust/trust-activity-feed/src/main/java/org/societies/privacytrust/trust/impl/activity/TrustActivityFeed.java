@@ -34,7 +34,8 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.activity.IActivityFeedManager;
-import org.societies.api.cis.directory.ICisDirectory;
+import org.societies.api.cis.directory.ICisDirectoryCallback;
+import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
@@ -70,6 +71,9 @@ public class TrustActivityFeed implements ITrustUpdateEventListener {
 	private static final int MAX_ENTRIES = 64;
 	private static final double VALUE_UPDATE_THRESHOLD = 0.15d;
 	
+	/** The time to wait for CIS Directory responses in milliseconds. */
+	private static final long WAIT_CIS_DIR = 2000l;
+	
 	private final Map<TrustedEntityId, TrustActivity> cache = Collections.synchronizedMap(
 			new LinkedHashMap<TrustedEntityId, TrustActivity>(MAX_ENTRIES+1, .75F, true) {
 				
@@ -77,7 +81,7 @@ public class TrustActivityFeed implements ITrustUpdateEventListener {
 
 				// This method is called just after a new entry has been added
 				public boolean removeEldestEntry(Map.Entry<TrustedEntityId, TrustActivity> eldest) {
-					return size() > MAX_ENTRIES;
+					return this.size() > MAX_ENTRIES;
 				}
 			});
 	
@@ -86,7 +90,7 @@ public class TrustActivityFeed implements ITrustUpdateEventListener {
 	
 	/** The CIS Directory service reference. */
 	@Autowired(required=false)
-	private ICisDirectory cisDir;
+	private ICisDirectoryRemote cisDir;
 	
 	/** The Service Discovery service reference. */
 	@Autowired(required=false)
@@ -180,9 +184,14 @@ public class TrustActivityFeed implements ITrustUpdateEventListener {
 			if (TrustedEntityType.CSS == teid.getEntityType()) {
 				return entityId;
 			} else if (TrustedEntityType.CIS == teid.getEntityType()) {
-				final List<CisAdvertisementRecord> cisAds = this.cisDir.searchByID(entityId).get();
-				if (!cisAds.isEmpty() && cisAds.get(0).getName() != null) {
-					return cisAds.get(0).getName();
+				final CisDirCallback cisDirCallback = new CisDirCallback();
+				this.cisDir.searchByID(entityId, cisDirCallback);
+				synchronized (cisDirCallback) {
+					cisDirCallback.wait(WAIT_CIS_DIR);
+					final List<CisAdvertisementRecord> cisAds = cisDirCallback.getCisAds(); 
+					if (cisAds != null && !cisAds.isEmpty() && cisAds.get(0).getName() != null) {
+						return cisAds.get(0).getName();
+					}
 				}
 			} else if (TrustedEntityType.SVC == teid.getEntityType()) {
 				final org.societies.api.schema.servicelifecycle.model.Service service = 
@@ -230,6 +239,29 @@ public class TrustActivityFeed implements ITrustUpdateEventListener {
 	
 			return "Trust level of " + this.trusteeId + " changed to "
 					+ TrustValueFormat.formatPercent(this.trustValue);
+		}
+	}
+	
+	private class CisDirCallback implements ICisDirectoryCallback {
+
+		private List<CisAdvertisementRecord> cisAds;
+		
+		/*
+		 * @see org.societies.api.cis.directory.ICisDirectoryCallback#getResult(java.util.List)
+		 */
+		@Override
+		public void getResult(List<CisAdvertisementRecord> cisAds) {
+		
+			LOG.debug("CisDirCallback.getResult: cisAds={}", cisAds);
+			this.cisAds = cisAds;
+			synchronized (this) {
+	            this.notifyAll();
+	        }
+		}
+		
+		private List<CisAdvertisementRecord> getCisAds() {
+			
+			return this.cisAds;
 		}
 	}
 }
