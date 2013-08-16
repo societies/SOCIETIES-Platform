@@ -1,8 +1,5 @@
-package org.societies.webapp.model;
-
-
 /**
- * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFOD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
  * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
  * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
@@ -26,61 +23,16 @@ package org.societies.webapp.model;
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.io.Serializable;
+package org.societies.diosplay.server.dao;
 
+import org.societies.display.server.model.Screen;
 
-import javax.faces.bean.ManagedBean;
-import javax.persistence.*;
+import java.util.List;
 
-@Entity
-@Table(name="screen")
-@ManagedBean(name = "screenBean")
-public class Screens implements Serializable {
+public interface IScreenDAO {
 
-    private String screenID;
-    private String locationID;
-    private String ipAddress;
-
-    public Screens()
-    {
-
-    }
-
-    public Screens(String screenID,String locationID, String ipAddress)
-    {
-        this.screenID=screenID;
-        this.locationID=locationID;
-        this.ipAddress=ipAddress;
-    }
-
-    @Id
-    @Column(name="screenID")
-    public String getScreenID() {
-        return screenID;
-    }
-
-    public void setScreenID(String screenID) {
-        this.screenID = screenID;
-    }
-
-    @Column(name="locationID")
-    public String getLocationID() {
-        return locationID;
-    }
-
-    public void setLocationID(String locationID) {
-        this.locationID = locationID;
-    }
-
-
-    @Column(name="ipAddress")
-    public String getIpAddress() {
-        return ipAddress;
-    }
-
-    public void setIpAddress(String ipAddress) {
-        this.ipAddress = ipAddress;
-    }
+        List getAllScreens();
+        void addScreen(Screen screen);
 
 
 }

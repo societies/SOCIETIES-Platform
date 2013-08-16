@@ -1,4 +1,5 @@
-package org.societies.webapp.dao;
+package org.societies.webapp.model;
+
 
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
@@ -25,16 +26,61 @@ package org.societies.webapp.dao;
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.societies.webapp.model.Screen;
+import java.io.Serializable;
 
-import java.util.List;
 
-public interface IScreenDAO {
+import javax.faces.bean.ManagedBean;
+import javax.persistence.*;
 
-        void save(Screen screen);
-        void update(Screen screen);
-        void deleteScreens(Screen screen);
-        List<Screen> getAllScreens();
+@Entity
+@Table(name="screen")
+@ManagedBean(name = "screenBean")
+public class Screen implements Serializable {
+
+    private String screenID;
+    private String locationID;
+    private String ipAddress;
+
+    public Screen()
+    {
+
+    }
+
+    public Screen(String screenID,String locationID, String ipAddress)
+    {
+        this.screenID=screenID;
+        this.locationID=locationID;
+        this.ipAddress=ipAddress;
+    }
+
+    @Id
+    @Column(name="screenID")
+    public String getScreenID() {
+        return screenID;
+    }
+
+    public void setScreenID(String screenID) {
+        this.screenID = screenID;
+    }
+
+    @Column(name="locationID")
+    public String getLocationID() {
+        return locationID;
+    }
+
+    public void setLocationID(String locationID) {
+        this.locationID = locationID;
+    }
+
+
+    @Column(name="ipAddress")
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
 
 
 }

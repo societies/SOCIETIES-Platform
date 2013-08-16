@@ -25,21 +25,22 @@ package org.societies.webapp;
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import org.hibernate.SessionFactory;
 import org.primefaces.context.RequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.css.devicemgmt.display.IDisplayPortalServer;
 import org.societies.webapp.dao.ScreenDAO;
 import org.societies.webapp.model.ScreenDataModel;
-import org.societies.webapp.model.Screens;
+import org.societies.webapp.model.Screen;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.context.FacesContext;
-import java.io.Serializable;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,7 +53,7 @@ public class ScreenData implements Serializable {
 
     private ScreenDataModel screenDataModel;
     private ScreenDAO screenDAO;
-    private List<Screens> screenList;
+    private List<Screen> screenList;
 
     @ManagedProperty(value = "#{displayPortalServer}")
     private IDisplayPortalServer displayPortalServer;
@@ -60,7 +61,10 @@ public class ScreenData implements Serializable {
     private Pattern pattern;
     private Matcher matcher;
 
-    private Screens[] selectedScreens;
+    private Screen[] selectedScreens;
+    
+    @ManagedProperty(value = "#{sessionFactory}")
+    private SessionFactory sessionFactory;
 
     private static final String IPADDRESS_PATTERN =
             "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
@@ -76,7 +80,7 @@ public class ScreenData implements Serializable {
 
     @PostConstruct
     public void init() {
-        this.screenDAO = new ScreenDAO();
+        this.screenDAO = new ScreenDAO(sessionFactory);    
         refreshScreens();
     }
 
@@ -90,7 +94,7 @@ public class ScreenData implements Serializable {
 
 
     //CHECKS USER INPUT THEN ADDS SCREEN TO DB
-    public void addScreen(Screens screen) {
+    public void addScreen(Screen screen) {
         log.debug("IN VALIDATION");
         RequestContext context = RequestContext.getCurrentInstance();
         FacesMessage msg = null;
@@ -129,18 +133,18 @@ public class ScreenData implements Serializable {
     //RETRIEVES SCREEN FROM DB TO BE DISPLAYED
     public void refreshScreens()
     {
-        screenList = (List<Screens>) screenDAO.getAllScreens();
+        screenList = screenDAO.getAllScreens();
         this.screenDataModel = new ScreenDataModel(screenList);
         this.displayPortalServer.setScreens();
         log.debug("Current Screen List: " + screenList.toString());
     }
 
 
-    public void setSelectedScreens(Screens[] selectedScreens) {
+    public void setSelectedScreens(Screen[] selectedScreens) {
         this.selectedScreens = selectedScreens;
     }
 
-    public Screens[] getSelectedScreens() {
+    public Screen[] getSelectedScreens() {
         return selectedScreens;
     }
 
@@ -152,7 +156,7 @@ public class ScreenData implements Serializable {
     public void delete() {
         int count = 0;
         FacesMessage msg = null;
-        for(Screens screens : selectedScreens)
+        for(Screen screens : selectedScreens)
         {
             log.debug("Deleting screen with ID: " + screens.getScreenID());
             screenDAO.deleteScreens(screens);
@@ -178,6 +182,21 @@ public class ScreenData implements Serializable {
     public void setDisplayPortalServer(IDisplayPortalServer displayPortalServer) {
         this.displayPortalServer = displayPortalServer;
     }
+    
+	/**
+	 * @return the sessionFactory
+	 */
+	public SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+
+	/**
+	 * @param sessionFactory
+	 *            the sessionFactory to set
+	 */
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
 
 
 }

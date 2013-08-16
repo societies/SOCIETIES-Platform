@@ -1,185 +1,169 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
-    <!-- change the artifactid to your project artifactid -->
-    <groupId>org.societies.display</groupId>
-    <artifactId>DisplayPortalServerApp</artifactId>
-    <packaging>bundle</packaging>
-    <version>${release.version}</version>
+	<modelVersion>4.0.0</modelVersion>
+	<!-- change the artifactid to your project artifactid -->
+	<groupId>org.societies.display</groupId>
+	<artifactId>DisplayPortalServerApp</artifactId>
+	<packaging>bundle</packaging>
+	<version>${release.version}</version>
 
-    <developers>
-        <developer>
-            <name>Elizabeth Papadopoulou</name>
-            <email>E.Papadopoulou@hw.ac.uk</email>
-            <organization>HWU</organization>
-            <organizationUrl>http://www.hw.ac.uk/</organizationUrl>
-            <roles>
-                <role>Senior Developer</role>
-            </roles>
-            <timezone>+0</timezone>
-        </developer>
-    </developers>
-
-
-    <parent>
-        <groupId>org.societies</groupId>
-        <artifactId>spring-osgi-parent</artifactId>
-        <version>RELEASE</version>
-    </parent>
-
-    <dependencies>
-        <!-- add your dependencies here -->
-        <dependency>
-            <groupId>org.societies.api.external</groupId>
-            <artifactId>societies-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.societies.api.internal</groupId>
-            <artifactId>societies-api-internal</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.societies</groupId>
-            <artifactId>common-ext-libs</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <version>4.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>com.springsource.org.hibernate</artifactId>
-            <version>3.3.2.GA</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>com.springsource.org.hibernate.annotations</artifactId>
-            <version>3.4.0.GA-A</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
-            <version>1.0.1.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.transaction</groupId>
-            <artifactId>com.springsource.javax.transaction</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-
-       <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.25</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.12.1.GA</version>
-        </dependency>
-
-        <dependency>
-            <groupId>antlr</groupId>
-            <artifactId>antlr</artifactId>
-            <version>2.7.7</version>
-        </dependency>
-
-    </dependencies>
+	<developers>
+		<developer>
+			<name>Elizabeth Papadopoulou</name>
+			<email>E.Papadopoulou@hw.ac.uk</email>
+			<organization>HWU</organization>
+			<organizationUrl>http://www.hw.ac.uk/</organizationUrl>
+			<roles>
+				<role>Senior Developer</role>
+			</roles>
+			<timezone>+0</timezone>
+		</developer>
+	</developers>
 
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-                        <Embed-Transitive>false</Embed-Transitive>
-                        <Export-Package>org.societies.api.display.schema.displayportalserverbean.*</Export-Package>
-                        <Include-Resource>{maven-resources}</Include-Resource>
-                        <Import-Package>*;resolution:=optional</Import-Package>
-                       <!-- com.sun.faces.application,
-                        com.sun.faces.application.view,
-                        com.sun.faces.application.resource,
-                        com.sun.faces.component,
-                        com.sun.faces.component.visit,
-                        com.sun.faces.config,
-                        com.sun.faces.context,
-                        com.sun.faces.ext.render,
-                        com.sun.faces.facelets.component,
-                        com.sun.faces.facelets.impl,
-                        com.sun.faces.facelets.tag.jsf,
-                        com.sun.faces.lifecycle,
-                        com.sun.faces.renderkit,
-                        com.sun.faces.renderkit.html_basic,
-                        javax.faces.application,
-                        javax.faces.component,
-                        javax.faces.component.html,
-                        javax.faces.event,
-                        javax.faces.webapp,
-                        javax.servlet.http,
-                        org.eclipse.virgo.web.dm,
-                        org.slf4j,
-                        org.springframework.web.context,
-                        org.springframework.web.context.request,
-                        org.springframework.web.jsf.el,
-                        </Import-Package> -->
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<version>RELEASE</version>
+	</parent>
 
-                    </instructions>
-                </configuration>
-            </plugin>
-            <!-- used to exclude some certain files -->
-            <!--             <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <configuration>
-                                <excludes>
-                                    <exclude>**/impl/dataLoading/**</exclude>
-                                </excludes>
-                            </configuration>
-                        </plugin> -->
+	<dependencies>
+		<!-- add your dependencies here -->
+		<dependency>
+			<groupId>org.societies.api.external</groupId>
+			<artifactId>societies-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies.api.internal</groupId>
+			<artifactId>societies-api-internal</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>common-ext-libs</artifactId>
+			<scope>provided</scope>
+		</dependency>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <configuration>
-                    <artifactItems>
-                        <artifactItem>
-                            <groupId>${project.groupId}</groupId>
-                            <artifactId>${project.artifactId}</artifactId>
-                            <version>${release.version}</version>
-                            <type>bundle</type>
-                            <overWrite>true</overWrite>
-                            <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
-                        </artifactItem>
-                        <artifactItem>
-                            <groupId>javax.servlet</groupId>
-                            <artifactId>com.springsource.javax.servlet</artifactId>
-                            <version>2.5.0</version>
-                        </artifactItem>
-                    </artifactItems>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>4.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>hibernate_classes</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+	<!-- 	<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>com.springsource.org.hibernate</artifactId>
+			<version>3.3.2.GA</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>com.springsource.org.hibernate.annotations</artifactId>
+			<version>3.4.0.GA-A</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate.javax.persistence</groupId>
+			<artifactId>hibernate-jpa-2.0-api</artifactId>
+			<version>1.0.1.Final</version>
+		</dependency> -->
+		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>com.springsource.javax.transaction</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+
+		 <dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.25</version>
+		</dependency>
+<!-- 
+		<dependency>
+			<groupId>javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.12.1.GA</version>
+		</dependency> -->
+
+		<dependency>
+			<groupId>antlr</groupId>
+			<artifactId>antlr</artifactId>
+			<version>2.7.7</version>
+		</dependency>
+
+	</dependencies>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Transitive>false</Embed-Transitive>
+						<Export-Package>org.societies.api.display.schema.displayportalserverbean.*</Export-Package>
+						<Include-Resource>{maven-resources}</Include-Resource>
+						<Import-Package>org.hibernate.proxy;resolution:=optional,
+						org.springframework.orm.hibernate3,
+							*;resolution:=optional</Import-Package>
+						<!-- com.sun.faces.application, com.sun.faces.application.view, com.sun.faces.application.resource, 
+							com.sun.faces.component, com.sun.faces.component.visit, com.sun.faces.config, 
+							com.sun.faces.context, com.sun.faces.ext.render, com.sun.faces.facelets.component, 
+							com.sun.faces.facelets.impl, com.sun.faces.facelets.tag.jsf, com.sun.faces.lifecycle, 
+							com.sun.faces.renderkit, com.sun.faces.renderkit.html_basic, javax.faces.application, 
+							javax.faces.component, javax.faces.component.html, javax.faces.event, javax.faces.webapp, 
+							javax.servlet.http, org.eclipse.virgo.web.dm, org.slf4j, org.springframework.web.context, 
+							org.springframework.web.context.request, org.springframework.web.jsf.el, 
+							</Import-Package> -->
+
+					</instructions>
+				</configuration>
+			</plugin>
+			<!-- used to exclude some certain files -->
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-compiler-plugin</artifactId> 
+				<configuration> <excludes> <exclude>**/impl/dataLoading/**</exclude> </excludes> 
+				</configuration> </plugin> -->
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>${project.artifactId}</artifactId>
+							<version>${release.version}</version>
+							<type>bundle</type>
+							<overWrite>true</overWrite>
+							<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+						</artifactItem>
+						<artifactItem>
+							<groupId>javax.servlet</groupId>
+							<artifactId>com.springsource.javax.servlet</artifactId>
+							<version>2.5.0</version>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
