@@ -7,7 +7,6 @@
 
     <osgi:reference id="commMngrRef" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
     <osgi:reference id="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager"/>
-    <osgi:reference id="cisDirectory" interface="org.societies.api.cis.directory.ICisDirectory"/>
     <osgi:reference id="cisDirectoryRemote" interface="org.societies.api.cis.directory.ICisDirectoryRemote"/>
     <osgi:reference id="userPreferenceConditionMonitor"
                     interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/>
