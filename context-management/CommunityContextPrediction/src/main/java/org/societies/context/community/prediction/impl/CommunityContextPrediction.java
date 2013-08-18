@@ -39,7 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
@@ -65,7 +66,7 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 	//It needs refinement!!
 
 	/** The logging facility. */
-	private static final Logger LOG = (Logger) LoggerFactory.getLogger(CommunityContextPrediction.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CommunityContextPrediction.class);
 
 	@Autowired(required=false)
 	private ICtxBroker internalCtxBroker;
@@ -75,6 +76,7 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 
 	public CommunityContextPrediction() {
 		LOG.info(this.getClass() + "CommunityContextPrediction instantiated ");
+		
 	}
 
 	/* It uses the appropriate ctxBroker method to retrieve the input from User Context Prediction. This method 
@@ -790,9 +792,21 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 
 
 	@Override
-	public CtxIdentifier predictContext(CtxAttributeIdentifier arg0, Date arg1) {
-		// TODO Auto-generated method stub
-		return null;
+	public CtxAttribute predictContext(CtxAttributeIdentifier attrID, Date date) {
+				if (attrID == null) {
+			throw new NullPointerException("attribute Id can't be null");
+		}
+
+		CtxAttribute result = null;
+		
+		try {
+			result = this.predictCommunityCtx(attrID.getScope(),attrID);
+		
+		} catch (Exception e) {
+			LOG.error("Exception while performing community ctx prediction for ctx attribute id:"+ attrID+"."+ e.getLocalizedMessage());
+			e.printStackTrace();
+		}		
+		return result;
 	}
 
 

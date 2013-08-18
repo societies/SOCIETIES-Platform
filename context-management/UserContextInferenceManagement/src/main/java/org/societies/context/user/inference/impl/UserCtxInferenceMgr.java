@@ -45,6 +45,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.user.inference.IUserCtxInferenceMgr;
 import org.societies.context.api.user.inference.UserCtxInferenceException;
+import org.societies.context.api.user.prediction.IUserCtxPredictionMgr;
 import org.societies.context.api.user.refinement.IUserCtxRefiner;
 import org.societies.context.api.user.inheritance.IUserCtxInheritanceMgr;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +66,10 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 	
 	@Autowired(required=false)
 	private IUserCtxInheritanceMgr userCtxInheritance;
+	
+	@Autowired(required=false)
+	private IUserCtxPredictionMgr userPredMgr;
+	
 	
 	private ICtxBroker internalCtxBroker;
 	
@@ -169,32 +174,44 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 
 	@Override
 	public CtxAttribute predictContext(CtxAttributeIdentifier attrID, Date date) {
-		CtxAttribute ctxAttribute = null;
-		LOG.debug("predict context " +date);
-		LOG.debug("no value predict context " +ctxAttribute);
-		try {
-			ctxAttribute = this.internalCtxBroker.retrieveAttribute(attrID, false).get();
-			ctxAttribute.setStringValue("HOME");
 		
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (attrID == null) {
+			throw new NullPointerException("attribute Id can't be null");
 		}
-		LOG.debug("with value predict context return " +ctxAttribute);
-		return ctxAttribute;
+
+		CtxAttribute result = null;
+		
+		try {
+			result = this.userPredMgr.predictContext(attrID, date);
+			
+		} catch (Exception e) {
+			LOG.error("Exception on predicting context attribute :"+attrID+".  "+ e.getLocalizedMessage());
+			e.printStackTrace();
+		} 
+
+		LOG.debug("retrieveFuture: result={}", result);
+		return result;
 	}
 
 	@Override
-	public CtxAttribute predictContext(CtxAttributeIdentifier arg0, int arg1) {
-		CtxAttribute ctxAttribute = null;
+	public CtxAttribute predictContext(CtxAttributeIdentifier attrID, int arg1) {
+		
+				
+		CtxAttribute result = null;
+		Date date = new Date();
+		
+		LOG.debug("predict context " +date);
+		
+		try {
+			result = this.userPredMgr.predictContext(attrID, date);
+			
+		} catch (Exception e) {
+			LOG.error("Exception on predicting context attribute :"+attrID+".  "+ e.getLocalizedMessage());
+			e.printStackTrace();
+		} 
 
-		return ctxAttribute;
+		LOG.debug("retrieveFuture: result={}", result);
+		return result;
 	}
 
 	/*

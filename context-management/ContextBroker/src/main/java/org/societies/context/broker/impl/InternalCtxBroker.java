@@ -773,7 +773,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		// Extract target IIdentity
 		final IIdentity target = this.extractIIdentity(scope);
-		
+
 		if (this.isLocalId(target)) {
 			final Set<String> types = new HashSet<String>();
 			types.add(type);
@@ -1121,17 +1121,28 @@ public class InternalCtxBroker implements ICtxBroker {
 		LOG.debug("retrieveFuture: attrId={}, date={}", attrId, date);
 
 		final IIdentity target = this.extractIIdentity(attrId);
-
 		this.logRequest(null, target);
 
 		final List<CtxAttribute> result = new ArrayList<CtxAttribute>();
-		// TODO
 
+		if (this.isLocalId(target)) {
+			
+			// L O C A L
+			if (IdentityType.CIS != target.getType()) { 
+				// U S E R
+				result.add(this.userCtxInferenceMgr.predictContext(attrId, date));
+			} else { 
+				// C O M M U N I T Y
+				result.add(this.communityCtxInferenceMgr.predictContext(attrId, date));
+			}
+		}
+		
 		LOG.debug("retrieveFuture: result={}", result);
 		return new AsyncResult<List<CtxAttribute>>(result);
 	}
 
 	@Override
+	@Async
 	public Future<List<CtxAttribute>> retrieveFuture(
 			CtxAttributeIdentifier attrId, int modificationIndex) throws CtxException {
 
@@ -1142,7 +1153,16 @@ public class InternalCtxBroker implements ICtxBroker {
 		this.logRequest(null, target);
 
 		final List<CtxAttribute> result = new ArrayList<CtxAttribute>();
-		// TODO
+
+		Date date = new Date();
+
+		try {
+			result.addAll(this.retrieveFuture(attrId, date).get());
+
+		} catch (Exception e) {
+			LOG.error("Exception on predicting context attribute :"+attrId+".  "+ e.getLocalizedMessage());
+			e.printStackTrace();
+		} 
 
 		LOG.debug("retrieveFuture: result={}", result);
 		return new AsyncResult<List<CtxAttribute>>(result);
@@ -2508,16 +2528,50 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Override
 	public Future<List<CtxAttribute>> retrieveFuture(Requestor requestor,
 			CtxAttributeIdentifier attrId, Date date) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		LOG.debug("retrieveFuture: attrId={}, date={}", attrId, date);
+
+		final IIdentity target = this.extractIIdentity(attrId);
+
+		this.logRequest(null, target);
+
+		List<CtxAttribute> result = new ArrayList<CtxAttribute>();
+
+		try {
+			result = this.retrieveFuture(attrId, date).get();
+
+		} catch (Exception e) {
+			LOG.error("Exception on predicting context attribute :"+attrId+".  "+ e.getLocalizedMessage());
+			e.printStackTrace();
+		} 
+
+		LOG.debug("retrieveFuture: result={}", result);
+		return new AsyncResult<List<CtxAttribute>>(result);
 	}
 
 	@Override
 	public Future<List<CtxAttribute>> retrieveFuture(Requestor requestor,
 			CtxAttributeIdentifier attrId, int modificationIndex)
 					throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+		LOG.debug("retrieveFuture: attrId={}, modificationIndex={}", attrId, modificationIndex);
+
+		final IIdentity target = this.extractIIdentity(attrId);
+
+		this.logRequest(null, target);
+
+		List<CtxAttribute> result = new ArrayList<CtxAttribute>();
+
+		try {
+
+			result = this.retrieveFuture(attrId, null).get();
+
+		} catch (Exception e) {
+			LOG.error("Exception on predicting context attribute :"+attrId+" for modification index : "+modificationIndex+". "+ e.getLocalizedMessage());
+			e.printStackTrace();
+		}
+
+		LOG.debug("retrieveFuture: result={}", result);
+		return new AsyncResult<List<CtxAttribute>>(result);
 	}
 
 	@Override
