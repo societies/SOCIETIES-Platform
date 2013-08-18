@@ -323,7 +323,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 		this.activeUserIntentModel = new UserIntentModelData(); 
 		this.activeUserIntentModel = model;
 		if(model!=null){
-			LOG.info("updating active model : "+model.getActionModel() );	
+			LOG.debug("updating active model : "+model.getActionModel() );	
 		}
 		
 	}
@@ -425,8 +425,8 @@ public class CAUITaskManager implements ICAUITaskManager{
 				}
 			}	
 		}
-		System.out.println("actionsScoreMap  " +actionsScoreMap);
-		
+		//System.out.println("actionsScoreMap  " +actionsScoreMap);
+		LOG.debug("actionsScoreMap  " +actionsScoreMap);
 		
 		if(!actionsScoreMap.values().isEmpty()){
 			
