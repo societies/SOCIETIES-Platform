@@ -222,7 +222,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 	@Override
 	public UserIntentAction retrieveCurrentIntentAction(IIdentity arg0,
 			IIdentity arg1, ServiceResourceIdentifier arg2, String arg3) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -257,14 +257,15 @@ public class CAUITaskManager implements ICAUITaskManager{
 
 	@Override
 	public boolean taskBelongsToModel(IUserIntentTask arg0) {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
 
 	@Override
 	public boolean actionBelongsToModel(IUserIntentAction arg0) {
-		// TODO Auto-generated method stub
+		
+		
 		return false;
 	}
 
