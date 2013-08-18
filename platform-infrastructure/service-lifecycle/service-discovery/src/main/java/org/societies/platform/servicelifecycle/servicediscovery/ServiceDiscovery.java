@@ -34,6 +34,7 @@ import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -54,8 +55,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 /**
  * The implementation of Service Discovery
  *
- * @author mmanniox
- *
+ * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN) *
  */
 public class ServiceDiscovery implements IServiceDiscovery {
 
@@ -111,9 +111,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 		this.serviceReg = serviceReg;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.servicelifecycle.IServiceDiscovery#getServices()
-	 */
+
 	@Override
 	@Async
 	public Future<List<Service>> getLocalServices() throws ServiceDiscoveryException {
@@ -139,15 +137,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 		return new AsyncResult<List<Service>>(result);
 	}
 
-	
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.societies.api.internal.servicelifecycle.IServiceDiscovery#getServices
-	 * ()
-	 */
 	@Override
 	@Async
 	public Future<List<Service>> getServices(String jid)
@@ -177,14 +167,6 @@ public class ServiceDiscovery implements IServiceDiscovery {
 	}
 		
 
-		
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.societies.api.internal.servicelifecycle.IServiceDiscovery#getServices
-	 * (org.societies.api.comm.xmpp.datatypes.Identity)
-	 */
 	@Override
 	@Async
 	public Future<List<Service>> getServices(IIdentity node)
@@ -218,27 +200,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 					myCIS = true;
 				}
 			}
-			/*
-			switch (node.getType())
-			{
-			case CSS:
-			case CSS_RICH:
-			case CSS_LIGHT:
-				serviceList = getServiceReg().retrieveServicesSharedByCSS(node.getJid());
-				break;
-			case CIS:
-				if(logger.isDebugEnabled()) logger.debug("Retrieving services of a CIS");
-				ICisOwned myCis = getCisManager().getOwnedCis(node.getJid());
-				if(myCis != null){
-					if(logger.isDebugEnabled()) logger.debug("We're dealing with our CIS! Local search!");
-					serviceList = getServiceReg().retrieveServicesSharedByCIS(node.getJid());			
-				}
-				break;
-			default: 
-				logger.warn("Unknown node!");
-				break;
-			}
-			*/
+
 		}catch (ServiceRetrieveException e)	{
 
 			//TODO Auto-generated catch block
@@ -292,6 +254,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 	}
 
 	@Override
+	@Async
 	public Future<Service> getService(ServiceResourceIdentifier serviceId)
 			throws ServiceDiscoveryException {
 
@@ -348,6 +311,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 	}
 
 	@Override
+	@Async
 	public Future<List<Service>> searchServices(Service filter)
 			throws ServiceDiscoveryException {
 		
@@ -372,6 +336,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 	}
 
 	@Override
+	@Async
 	public Future<List<Service>> searchServices(Service filter, IIdentity node)
 			throws ServiceDiscoveryException {
 
@@ -403,6 +368,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 	}
 
 	@Override
+	@Async
 	public Future<List<Service>> searchServices(Service filter, String jid)
 			throws ServiceDiscoveryException {
 		
@@ -420,6 +386,5 @@ public class ServiceDiscovery implements IServiceDiscovery {
 		}
 			
 	}
-
 
 }

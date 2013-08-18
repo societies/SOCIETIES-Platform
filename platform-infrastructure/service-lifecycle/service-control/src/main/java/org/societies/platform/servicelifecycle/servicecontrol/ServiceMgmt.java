@@ -239,6 +239,7 @@ public class ServiceMgmt implements IServices {
 			return false;
 	}
 	
+	@Override
 	public boolean shareService(ServiceResourceIdentifier serviceId, IIdentity node){
 		
 		if(logger.isDebugEnabled())
@@ -270,5 +271,7 @@ public class ServiceMgmt implements IServices {
 
 		return result;
 	}
+	
+	
 
 }

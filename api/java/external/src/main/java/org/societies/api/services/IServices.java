@@ -25,6 +25,9 @@
 package org.societies.api.services;
 
 
+import java.util.List;
+
+import org.societies.api.cis.management.ICis;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -94,5 +97,13 @@ public interface IServices {
 	 * @return the service category
 	 */
 	public String getMyCategory(ServiceResourceIdentifier serviceId);
+
+	/**
+	 * @param serviceId
+	 * @param node
+	 * @return
+	 */
+	boolean shareService(ServiceResourceIdentifier serviceId, IIdentity node);
+	
 
 }
