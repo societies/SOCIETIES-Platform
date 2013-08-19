@@ -61,7 +61,7 @@ import org.societies.api.activity.IActivityFeed;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.attributes.Rule.OperationType;
-import org.societies.api.cis.directory.ICisDirectory;
+//import org.societies.api.cis.directory.ICisDirectory;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.cis.directory.ICisDirectoryCallback;
 import org.societies.api.cis.management.ICis;
