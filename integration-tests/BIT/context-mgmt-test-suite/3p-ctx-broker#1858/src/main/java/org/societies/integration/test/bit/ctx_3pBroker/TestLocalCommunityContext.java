@@ -64,7 +64,7 @@ public class TestLocalCommunityContext {
 	
 	private static final String PUBLIC = "SHARE_WITH_3RD_PARTIES";
 	
-	private static final long CIS_CREATION_TIMEOUT = 2000l;
+	private static final long CIS_CREATION_TIMEOUT = 5000l;
 	
 	private static final String NON_MEMBER_USER_ID = "nikosk.societies.local";
 	
