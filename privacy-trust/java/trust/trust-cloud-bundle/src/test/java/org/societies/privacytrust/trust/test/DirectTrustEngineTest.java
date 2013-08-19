@@ -171,7 +171,7 @@ public class DirectTrustEngineTest {
 		MockitoAnnotations.initMocks(this);
 		final Collection<TrustedEntityId> myIds = new HashSet<TrustedEntityId>();
 		myIds.add(myCssTeid);
-		when(mockTrustNodeMgr.getMyIds()).thenReturn(myIds);
+		when(this.mockTrustNodeMgr.getMyIds()).thenReturn(myIds);
 	}
 
 	/**
@@ -179,6 +179,11 @@ public class DirectTrustEngineTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
+		
+		// clean trust database
+		this.trustRepo.removeEntities(null, null, null);
+		// clean trust evidence database
+		this.trustEvidenceRepo.removeEvidence(null, null, null, null, null, null);
 	}
 
 	/**
@@ -250,10 +255,6 @@ public class DirectTrustEngineTest {
 		assertTrue(evaluatedCss.getDirectTrust().getScore() > IDirectTrust.INIT_SCORE);
 		assertNotNull(evaluatedCss.getDirectTrust().getValue());
 		assertTrue(evaluatedCss.getDirectTrust().getValue() >= 0.6d);
-		
-		// clean database
-		this.trustRepo.removeEntity(myCssTeid, trusteeCssTeid);
-		this.trustEvidenceRepo.removeEvidence(null, null, null, null, null, null);
 	}
 	
 	/**
@@ -384,11 +385,6 @@ public class DirectTrustEngineTest {
 		assertTrue(evaluatedCss.getDirectTrust().getValue() < 0.5d);
 		// verify CSS trust < CSS2 trust
 		assertTrue(evaluatedCss.getDirectTrust().getValue() < evaluatedCss2.getDirectTrust().getValue());
-		
-		// clean database
-		this.trustRepo.removeEntity(myCssTeid, trusteeCssTeid);
-		this.trustRepo.removeEntity(myCssTeid, trusteeCssTeid2);
-		this.trustEvidenceRepo.removeEvidence(null, null, null, null, null, null);
 	}
 	
 	/**
@@ -456,10 +452,6 @@ public class DirectTrustEngineTest {
 		assertTrue(evaluatedCss.getDirectTrust().getScore() > IDirectTrust.INIT_SCORE);
 		assertNotNull(evaluatedCss.getDirectTrust().getValue());
 		assertTrue(evaluatedCss.getDirectTrust().getValue() >= 0.6d);
-		
-		// clean database
-		this.trustRepo.removeEntity(myCssTeid, trusteeCssTeid);
-		this.trustEvidenceRepo.removeEvidence(null, null, null, null, null, null);
 	}
 
 	/**
@@ -471,11 +463,16 @@ public class DirectTrustEngineTest {
 		
 		// trust rating
 		final TrustedEntityId trusteeCisTeid = trusteeCisTeidList.get(0);
-		final Double rating = new Double(0.8d);
-		final Date timestamp = new Date();
+		final Double highRating = new Double(1.0d);
+		final Double mediumRating = new Double(0.6d);
+		final Double lowRating = new Double(0.2d);
+		// timestamp
+		final Date now = new Date();
+		// Ugly hack for MySQL - remove ms precision from date
+		final Date timestamp = new Date(1000 * (now.getTime() / 1000));
 		ITrustEvidence evidence = this.trustEvidenceRepo.addEvidence(
 				myCssTeid, trusteeCisTeid,
-				TrustEvidenceType.RATED, timestamp, rating, null);
+				TrustEvidenceType.RATED, timestamp, highRating, null);
 
 		Set<ITrustedEntity> resultSet = this.engine.evaluate(myCssTeid, evidence);
 		// verify this has no effect as there is no direct trust relationship with the CSS yet
@@ -492,7 +489,7 @@ public class DirectTrustEngineTest {
 		assertFalse(resultSet.isEmpty());
 		assertTrue(resultSet.size() == 1);
 		assertTrue(resultSet.iterator().next() instanceof ITrustedCis);
-		ITrustedCis evaluatedCis = (ITrustedCis) resultSet.iterator().next();
+		final ITrustedCis evaluatedCis = (ITrustedCis) resultSet.iterator().next();
 		// verify association with evidence
 		assertNotNull(evaluatedCis.getEvidence());
 		assertTrue(evaluatedCis.getEvidence().contains(evidence));
@@ -505,37 +502,88 @@ public class DirectTrustEngineTest {
 		assertNotNull(evaluatedCis.getDirectTrust().getScore());
 		assertTrue(evaluatedCis.getDirectTrust().getScore() > IDirectTrust.INIT_SCORE);
 		assertNotNull(evaluatedCis.getDirectTrust().getValue());
+		assertTrue(evaluatedCis.getDirectTrust().getValue() > 0.5d);
 
-		// trust rating
+		// high trust rating
 		evidence = this.trustEvidenceRepo.addEvidence(
 				myCssTeid, trusteeCisTeid,
-				TrustEvidenceType.RATED, timestamp, rating, null);
+				TrustEvidenceType.RATED, new Date(timestamp.getTime()+1000l), highRating, null);
 		resultSet = this.engine.evaluate(myCssTeid, evidence);
 		// verify updated direct trust relationship with CSS
 		assertNotNull(resultSet);
 		assertFalse(resultSet.isEmpty());
 		assertTrue(resultSet.size() == 1);
 		assertTrue(resultSet.iterator().next() instanceof ITrustedCis);
-		evaluatedCis = (ITrustedCis) resultSet.iterator().next();
+		final ITrustedCis evaluatedCis2 = (ITrustedCis) resultSet.iterator().next();
 		// verify association with evidence
-		assertNotNull(evaluatedCis.getEvidence());
-		assertTrue(evaluatedCis.getEvidence().contains(evidence));
+		assertNotNull(evaluatedCis2.getEvidence());
+		assertTrue(evaluatedCis2.getEvidence().contains(evidence));
 		// verify updated trust
-		assertNotNull(evaluatedCis.getDirectTrust().getLastModified());
-		assertNotNull(evaluatedCis.getDirectTrust().getLastUpdated());
-		assertEquals(evaluatedCis.getDirectTrust().getLastModified(), 
-				evaluatedCis.getDirectTrust().getLastUpdated());
-		assertNotNull(evaluatedCis.getDirectTrust().getRating());
-		assertEquals(rating, evaluatedCis.getDirectTrust().getRating());
-		assertNotNull(evaluatedCis.getDirectTrust().getScore());
-		assertTrue(evaluatedCis.getDirectTrust().getScore() > IDirectTrust.INIT_SCORE);
-		assertNotNull(evaluatedCis.getDirectTrust().getValue());
-		assertTrue(evaluatedCis.getDirectTrust().getValue() >= 0.6d);
-
-		// clean database
-		this.trustRepo.removeEntity(myCssTeid, myCssTeid);
-		this.trustRepo.removeEntity(myCssTeid, trusteeCisTeid);
-		this.trustEvidenceRepo.removeEvidence(null, null, null, null, null, null);
+		assertNotNull(evaluatedCis2.getDirectTrust().getLastModified());
+		assertNotNull(evaluatedCis2.getDirectTrust().getLastUpdated());
+		assertEquals(evaluatedCis2.getDirectTrust().getLastModified(), 
+				evaluatedCis2.getDirectTrust().getLastUpdated());
+		assertNotNull(evaluatedCis2.getDirectTrust().getRating());
+		assertEquals(highRating, evaluatedCis2.getDirectTrust().getRating());
+		assertNotNull(evaluatedCis2.getDirectTrust().getScore());
+		assertTrue(evaluatedCis2.getDirectTrust().getScore() > IDirectTrust.INIT_SCORE);
+		assertNotNull(evaluatedCis2.getDirectTrust().getValue());
+		assertTrue(evaluatedCis2.getDirectTrust().getValue() > evaluatedCis.getDirectTrust().getValue());
+		
+		// medium trust rating
+		evidence = this.trustEvidenceRepo.addEvidence(
+				myCssTeid, trusteeCisTeid,
+				TrustEvidenceType.RATED, new Date(timestamp.getTime()+2000l), mediumRating, null);
+		resultSet = this.engine.evaluate(myCssTeid, evidence);
+		// verify updated direct trust relationship with CSS
+		assertNotNull(resultSet);
+		assertFalse(resultSet.isEmpty());
+		assertTrue(resultSet.size() == 1);
+		assertTrue(resultSet.iterator().next() instanceof ITrustedCis);
+		final ITrustedCis evaluatedCis3 = (ITrustedCis) resultSet.iterator().next();
+		// verify association with evidence
+		assertNotNull(evaluatedCis3.getEvidence());
+		assertTrue(evaluatedCis3.getEvidence().contains(evidence));
+		// verify updated trust
+		assertNotNull(evaluatedCis3.getDirectTrust().getLastModified());
+		assertNotNull(evaluatedCis3.getDirectTrust().getLastUpdated());
+		assertEquals(evaluatedCis3.getDirectTrust().getLastModified(), 
+				evaluatedCis3.getDirectTrust().getLastUpdated());
+		assertNotNull(evaluatedCis3.getDirectTrust().getRating());
+		assertEquals(mediumRating, evaluatedCis3.getDirectTrust().getRating());
+		assertNotNull(evaluatedCis3.getDirectTrust().getScore());
+		assertTrue(evaluatedCis3.getDirectTrust().getScore() > IDirectTrust.INIT_SCORE);
+		assertNotNull(evaluatedCis3.getDirectTrust().getValue());
+		assertTrue(evaluatedCis3.getDirectTrust().getValue() < evaluatedCis2.getDirectTrust().getValue());
+		assertEquals(evaluatedCis.getDirectTrust().getValue(), evaluatedCis3.getDirectTrust().getValue(), EPSILON);
+		
+		// low trust rating
+		evidence = this.trustEvidenceRepo.addEvidence(
+				myCssTeid, trusteeCisTeid,
+				TrustEvidenceType.RATED, new Date(timestamp.getTime()+3000l), lowRating, null);
+		resultSet = this.engine.evaluate(myCssTeid, evidence);
+		// verify updated direct trust relationship with CSS
+		assertNotNull(resultSet);
+		assertFalse(resultSet.isEmpty());
+		assertTrue(resultSet.size() == 1);
+		assertTrue(resultSet.iterator().next() instanceof ITrustedCis);
+		final ITrustedCis evaluatedCis4 = (ITrustedCis) resultSet.iterator().next();
+		// verify association with evidence
+		assertNotNull(evaluatedCis4.getEvidence());
+		assertTrue(evaluatedCis4.getEvidence().contains(evidence));
+		// verify updated trust
+		assertNotNull(evaluatedCis4.getDirectTrust().getLastModified());
+		assertNotNull(evaluatedCis4.getDirectTrust().getLastUpdated());
+		assertEquals(evaluatedCis4.getDirectTrust().getLastModified(), 
+				evaluatedCis4.getDirectTrust().getLastUpdated());
+		assertNotNull(evaluatedCis4.getDirectTrust().getRating());
+		assertEquals(lowRating, evaluatedCis4.getDirectTrust().getRating());
+		assertNotNull(evaluatedCis4.getDirectTrust().getScore());
+		assertTrue(evaluatedCis4.getDirectTrust().getScore() > IDirectTrust.INIT_SCORE);
+		assertNotNull(evaluatedCis4.getDirectTrust().getValue());
+		assertTrue(evaluatedCis4.getDirectTrust().getValue() < 0.5d);
+		assertTrue(evaluatedCis4.getDirectTrust().getValue() < evaluatedCis2.getDirectTrust().getValue());
+		assertTrue(evaluatedCis4.getDirectTrust().getValue() < evaluatedCis3.getDirectTrust().getValue());
 	}
 
 	/**
@@ -543,9 +591,9 @@ public class DirectTrustEngineTest {
 	 * @throws Exception 
 	 */
 	@Test
-	public void testEvaluateOneCisMultipleLifecycleEvents() throws Exception {
+	public void testEvaluateCisMultipleEvidence() throws Exception {
 		
-		final TrustedEntityId trusteeCisTeid = trusteeCisTeidList.get(1);
+		final TrustedEntityId trusteeCisTeid = trusteeCisTeidList.get(0);
 		
 		// Joined Community evidence
 		// timestamp
@@ -560,6 +608,10 @@ public class DirectTrustEngineTest {
 		final ITrustedCss cisMember = (ITrustedCss) this.trustRepo.retrieveEntity(myCssTeid, myCssTeid);
 		final ITrustedCis evaluatedCis = (ITrustedCis) this.trustRepo.retrieveEntity(myCssTeid, trusteeCisTeid);
 		// verify
+		assertNotNull(resultSet);
+		assertTrue(!resultSet.isEmpty());
+		assertEquals(1, resultSet.size());
+		assertTrue(resultSet.contains(evaluatedCis));
 		// from the member's side
 		assertNotNull(cisMember);
 		assertNotNull(cisMember.getDirectTrust().getRating());
@@ -575,10 +627,6 @@ public class DirectTrustEngineTest {
 		assertTrue(cisMember.getEvidence().isEmpty());
 
 		// from the community's side
-		assertNotNull(resultSet);
-		assertTrue(!resultSet.isEmpty());
-		assertTrue(resultSet.size() >= 1);
-		assertTrue(resultSet.contains(evaluatedCis));
 		assertFalse(evaluatedCis.getMembers().isEmpty());
 		assertTrue(evaluatedCis.getMembers().contains(cisMember));
 		// verify association with evidence
@@ -591,8 +639,8 @@ public class DirectTrustEngineTest {
 				evaluatedCis.getDirectTrust().getLastUpdated());
 		assertNull(evaluatedCis.getDirectTrust().getRating());
 		assertNotNull(evaluatedCis.getDirectTrust().getScore());
-		assertEquals(cisMember.getDirectTrust().getScore(), evaluatedCis.getDirectTrust().getScore());
 		assertNotNull(evaluatedCis.getDirectTrust().getValue());
+		assertTrue(evaluatedCis.getDirectTrust().getValue() > 0.5d);
 		
 		// add another member
 		final TrustedEntityId trusteeCssTeid2 = trusteeCssTeidList.get(0);
@@ -605,79 +653,144 @@ public class DirectTrustEngineTest {
 		
 		final Set<ITrustedEntity> resultSet2 = this.engine.evaluate(myCssTeid, evidence2);
 		final ITrustedCss cisMember2 = (ITrustedCss) this.trustRepo.retrieveEntity(myCssTeid, trusteeCssTeid2);
-		final ITrustedCis evaluatedCis2 = (ITrustedCis) this.trustRepo.retrieveEntity(myCssTeid, trusteeCisTeid);
+		final ITrustedCis updatedCis = (ITrustedCis) this.trustRepo.retrieveEntity(myCssTeid, trusteeCisTeid);
 		// verify
+		assertNotNull(resultSet2);
+		assertTrue(!resultSet2.isEmpty());
+		assertEquals(1, resultSet2.size());
+		assertTrue(resultSet2.contains(updatedCis));
 		// from the member's side
 		assertNotNull(cisMember2);
 		assertFalse(cisMember2.getCommunities().isEmpty());
-		assertTrue(cisMember2.getCommunities().contains(evaluatedCis2));
+		assertTrue(cisMember2.getCommunities().contains(updatedCis));
 		// verify association with evidence
 		assertNotNull(cisMember2.getEvidence());
 		assertTrue(cisMember2.getEvidence().isEmpty());
 		
 		// from the community's side
-		assertNotNull(resultSet2);
-		assertTrue(!resultSet2.isEmpty());
-		assertTrue(resultSet2.size() >= 1);
-		assertFalse(evaluatedCis2.getMembers().isEmpty());
+		assertFalse(updatedCis.getMembers().isEmpty());
 		// contains first member (myself)
-		assertTrue(evaluatedCis2.getMembers().contains(cisMember));
+		assertTrue(updatedCis.getMembers().contains(cisMember));
 		// contains other member
-		assertTrue(evaluatedCis2.getMembers().contains(cisMember2));
+		assertTrue(updatedCis.getMembers().contains(cisMember2));
 		// verify association with evidence
-		assertNotNull(evaluatedCis2.getEvidence());
-		assertTrue(evaluatedCis2.getEvidence().contains(evidence));
-		assertTrue(evaluatedCis2.getEvidence().contains(evidence2));
+		assertNotNull(updatedCis.getEvidence());
+		assertTrue(updatedCis.getEvidence().contains(evidence));
+		assertTrue(updatedCis.getEvidence().contains(evidence2));
 		// verify updated trust
-		assertNotNull(evaluatedCis2.getDirectTrust().getLastModified());
-		assertNotNull(evaluatedCis2.getDirectTrust().getLastUpdated());
-		assertTrue(Math.abs(evaluatedCis2.getDirectTrust().getLastModified().getTime() - 
-				evaluatedCis2.getDirectTrust().getLastUpdated().getTime()) < 1000);
-		assertNull(evaluatedCis2.getDirectTrust().getRating());
-		assertNotNull(evaluatedCis2.getDirectTrust().getScore());
-		assertEquals(cisMember2.getDirectTrust().getScore(), evaluatedCis2.getDirectTrust().getScore());
-		assertNotNull(evaluatedCis2.getDirectTrust().getValue());
-		//System.out.println(evaluatedCis2.getDirectTrust().getValue());
-		assertTrue(evaluatedCis.getDirectTrust().getValue() >= evaluatedCis2.getDirectTrust().getValue());
+		assertNotNull(updatedCis.getDirectTrust().getLastModified());
+		assertNotNull(updatedCis.getDirectTrust().getLastUpdated());
+		assertTrue(Math.abs(updatedCis.getDirectTrust().getLastModified().getTime() - 
+				updatedCis.getDirectTrust().getLastUpdated().getTime()) < 1000);
+		assertNull(updatedCis.getDirectTrust().getRating());
+		assertNotNull(updatedCis.getDirectTrust().getScore());
+		assertTrue(updatedCis.getDirectTrust().getScore() > IDirectTrust.INIT_SCORE);
+		assertNotNull(updatedCis.getDirectTrust().getValue());
+		assertEquals(evaluatedCis.getDirectTrust().getValue(), updatedCis.getDirectTrust().getValue(), EPSILON);
+		
+		final int NUM_EXTRA_CSS = 10;
+		final int NUM_EXTRA_CIS = 6;
+		
+		// Add DIRECTLY trusted CSSs to the trust DB
+		for (int i = 1; i <= NUM_EXTRA_CSS; ++i) {
+			ITrustedEntity entity = this.trustRepo.createEntity(myCssTeid, trusteeCssTeidList.get(i));
+			entity.getDirectTrust().setValue(0.5d);
+			this.trustRepo.updateEntity(entity);
+		}
+		
+		// Add INDIRECTLY trusted CSSs to the trust DB
+		for (int i = NUM_EXTRA_CSS+1; i <= 2*NUM_EXTRA_CSS; ++i) {
+			ITrustedEntity entity = this.trustRepo.createEntity(myCssTeid, trusteeCssTeidList.get(i));
+			entity.getIndirectTrust().setValue(0.5d);
+			this.trustRepo.updateEntity(entity);
+		}
+		
+		// Add INDIRECTLY trusted CISs to the trust DB
+		for (int i = 1; i <= NUM_EXTRA_CIS; ++i) {
+			ITrustedEntity entity = this.trustRepo.createEntity(myCssTeid, trusteeCisTeidList.get(i));
+			entity.getIndirectTrust().setValue(0.5d);
+			this.trustRepo.updateEntity(entity);
+		}
+		
+		// Updated trust in CIS member evidence
+		final Date timestamp3 = new Date(timestamp2.getTime() + 1000);
+		final ITrustEvidence evidence3 = this.trustEvidenceRepo.addEvidence(
+				myCssTeid, trusteeCssTeid2,
+				TrustEvidenceType.WITHHELD_CONTEXT, timestamp3, null, null);
+
+		final Set<ITrustedEntity> resultSet3 = this.engine.evaluate(myCssTeid, evidence3);
+		final ITrustedCss updatedCisMember2 = (ITrustedCss) 
+				this.trustRepo.retrieveEntity(myCssTeid, trusteeCssTeid2);
+		final ITrustedCis updated2Cis = (ITrustedCis) 
+				this.trustRepo.retrieveEntity(myCssTeid, trusteeCisTeid);
+		// verify
+		assertNotNull(resultSet3);
+		assertTrue(!resultSet3.isEmpty());
+		assertEquals(NUM_EXTRA_CSS+2, resultSet3.size());
+		assertTrue(resultSet3.contains(updatedCisMember2));
+		assertTrue(resultSet3.contains(updated2Cis));
+		// from the member's side
+		assertNotNull(updatedCisMember2);
+		assertFalse(updatedCisMember2.getCommunities().isEmpty());
+		assertTrue(updatedCisMember2.getCommunities().contains(updatedCis));
+		// verify association with evidence
+		assertNotNull(updatedCisMember2.getEvidence());
+		assertFalse(updatedCisMember2.getEvidence().isEmpty());
+		assertTrue(updatedCisMember2.getEvidence().contains(evidence3));
+
+		// from the community's side
+		assertFalse(updated2Cis.getMembers().isEmpty());
+		// contains first member (myself)
+		assertTrue(updated2Cis.getMembers().contains(cisMember));
+		// contains other member
+		assertTrue(updated2Cis.getMembers().contains(updatedCisMember2));
+		// verify association with evidence
+		assertNotNull(updated2Cis.getEvidence());
+		assertTrue(updated2Cis.getEvidence().contains(evidence));
+		assertTrue(updated2Cis.getEvidence().contains(evidence2));
+		// verify updated trust
+		assertNotNull(updated2Cis.getDirectTrust().getLastModified());
+		assertNotNull(updated2Cis.getDirectTrust().getLastUpdated());
+		assertEquals(updated2Cis.getDirectTrust().getLastModified().getTime(), 
+				updated2Cis.getDirectTrust().getLastUpdated().getTime());
+		assertNull(updated2Cis.getDirectTrust().getRating());
+		assertNotNull(updated2Cis.getDirectTrust().getScore());
+		assertTrue(updated2Cis.getDirectTrust().getScore() > IDirectTrust.INIT_SCORE);
+		assertNotNull(updated2Cis.getDirectTrust().getValue());
+		assertEquals(updatedCisMember2.getDirectTrust().getValue(), updated2Cis.getDirectTrust().getValue(), EPSILON);
 		
 		// remove last member
 
 		// Left Community evidence
-		final Date timestamp3 = new Date(timestamp2.getTime() + 1000);
-		final ITrustEvidence evidence3 = this.trustEvidenceRepo.addEvidence(
+		final Date timestamp4 = new Date(timestamp3.getTime() + 1000);
+		final ITrustEvidence evidence4 = this.trustEvidenceRepo.addEvidence(
 				trusteeCssTeid2, trusteeCisTeid,
-				TrustEvidenceType.LEFT_COMMUNITY, timestamp3, null, null);
+				TrustEvidenceType.LEFT_COMMUNITY, timestamp4, null, null);
 
-		final Set<ITrustedEntity> resultSet3 = this.engine.evaluate(myCssTeid, evidence3);
-		final ITrustedCss cisMember3 = (ITrustedCss) this.trustRepo.retrieveEntity(myCssTeid, trusteeCssTeid2);
-		final ITrustedCis evaluatedCis3 = (ITrustedCis) this.trustRepo.retrieveEntity(myCssTeid, trusteeCisTeid);
+		final Set<ITrustedEntity> resultSet4 = this.engine.evaluate(myCssTeid, evidence4);
+		final ITrustedCss updated2CisMember2 = (ITrustedCss) this.trustRepo.retrieveEntity(myCssTeid, trusteeCssTeid2);
+		final ITrustedCis updated3Cis = (ITrustedCis) this.trustRepo.retrieveEntity(myCssTeid, trusteeCisTeid);
 		// verify
+		assertNotNull(resultSet4);
+		assertFalse(resultSet4.isEmpty());
+		assertEquals(1, resultSet4.size());
+		assertTrue(resultSet4.contains(updated3Cis));
 		// from the member's side
-		assertNotNull(cisMember3);
-		assertTrue(cisMember3.getCommunities().isEmpty());
+		assertNotNull(updated2CisMember2);
+		assertTrue(updated2CisMember2.getCommunities().isEmpty());
 		// from the community's side
-		assertNotNull(resultSet3);
-		assertTrue(!resultSet3.isEmpty());
-		assertTrue(resultSet3.size() >= 1);
-		assertFalse(evaluatedCis3.getMembers().isEmpty());
+		assertFalse(updated3Cis.getMembers().isEmpty());
 		// contains first member (myself)
-		assertTrue(evaluatedCis3.getMembers().contains(cisMember));
+		assertTrue(updated3Cis.getMembers().contains(cisMember));
 		// should not contain other member
-		assertFalse(evaluatedCis3.getMembers().contains(cisMember3));
-		assertNotNull(evaluatedCis3.getDirectTrust().getLastModified());
-		assertNotNull(evaluatedCis3.getDirectTrust().getLastUpdated());
-		assertNull(evaluatedCis3.getDirectTrust().getRating());
-		assertNotNull(evaluatedCis3.getDirectTrust().getScore());
-		assertEquals(cisMember.getDirectTrust().getScore(), evaluatedCis3.getDirectTrust().getScore());
-		assertNotNull(evaluatedCis3.getDirectTrust().getValue());
-		//System.out.println(evaluatedCis3.getDirectTrust().getValue());
-		assertTrue(evaluatedCis2.getDirectTrust().getValue() <= evaluatedCis3.getDirectTrust().getValue());
-		
-		// clean database
-		this.trustRepo.removeEntity(myCssTeid, myCssTeid);
-		this.trustRepo.removeEntity(myCssTeid, trusteeCssTeid2);
-		this.trustRepo.removeEntity(myCssTeid, trusteeCisTeid);
-		this.trustEvidenceRepo.removeEvidence(myCssTeid, null, null, null, null, null);
+		assertFalse(updated3Cis.getMembers().contains(updated2CisMember2));
+		assertNotNull(updated3Cis.getDirectTrust().getLastModified());
+		assertNotNull(updated3Cis.getDirectTrust().getLastUpdated());
+		assertNull(updated3Cis.getDirectTrust().getRating());
+		assertNotNull(updated3Cis.getDirectTrust().getScore());
+		assertTrue(updated3Cis.getDirectTrust().getScore() > IDirectTrust.INIT_SCORE);
+		assertNotNull(updated3Cis.getDirectTrust().getValue());
+		assertEquals(evaluatedCis.getDirectTrust().getValue(), updated3Cis.getDirectTrust().getValue(), EPSILON);
 	}
 	
 	/**
@@ -749,9 +862,5 @@ public class DirectTrustEngineTest {
 		assertTrue(evaluatedSvc.getDirectTrust().getScore() > IDirectTrust.INIT_SCORE);
 		assertNotNull(evaluatedSvc.getDirectTrust().getValue());
 		assertTrue(evaluatedSvc.getDirectTrust().getValue() >= 0.6d);
-
-		// clean database
-		this.trustRepo.removeEntity(myCssTeid, trusteeSvcTeid);
-		this.trustEvidenceRepo.removeEvidence(null, null, null, null, null, null);
 	}
 }

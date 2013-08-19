@@ -22,29 +22,74 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.servicelifecycle;
+package org.societies.webapp.controller.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.api.osgi.event.CSSEvent;
+import org.societies.api.osgi.event.EventListener;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.services.ServiceMgmtEvent;
+import org.societies.api.services.ServiceMgmtEventType;
 
 /**
- * The generic payload class for Service Management Events
+ * Describe your class here...
  *
  * @author <a href="mailto:sanchocsa@gmail.com">Sancho Rêgo</a> (PTIN)
  *
  */
-public class ServiceMgmtInternalEvent extends ServiceMgmtEvent {
+public class ServiceMgmtListener extends EventListener {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3374214689982043798L;
+	private static final Logger log = LoggerFactory.getLogger(ServiceMgmtListener.class);
+	private ServicesController controller;
+	private IEventMgr eventMgr;
+	
+	public ServiceMgmtListener(ServicesController controller, IEventMgr eventMgr) {
+		if(log.isDebugEnabled())
+			log.debug("Service Management Listener for Webapp created!");
+		this.controller = controller;
+		this.eventMgr = eventMgr;
+		eventMgr.subscribeInternalEvent(this, new String[]{EventTypes.SERVICE_LIFECYCLE_EVENT}, null);
+	}
 
-	/**
-	 * 
+	/* (non-Javadoc)
+	 * @see org.societies.api.osgi.event.EventListener#handleInternalEvent(org.societies.api.osgi.event.InternalEvent)
 	 */
-	public ServiceMgmtInternalEvent() {
-		// TODO Auto-generated constructor stub
+	@Override
+	public void handleInternalEvent(InternalEvent event) {
+		if(log.isDebugEnabled())
+			log.debug("InternalEvent arrived: " + event.geteventName());
+		if(event.geteventType().equals(EventTypes.SERVICE_LIFECYCLE_EVENT)){
+			ServiceMgmtEvent ourEvent = (ServiceMgmtEvent) event.geteventInfo();
+			log.debug("Received event is of type: {}",ourEvent.getEventType());
+			
+			switch(ourEvent.getEventType()){
+				case NEW_SERVICE: ;
+				case SERVICE_REMOVED: ;
+				case SERVICE_SHARED: ;
+				case SERVICE_UNSHARED: ;
+				case SERVICE_STARTED: ;
+				case SERVICE_STOPPED: ;
+			default: 
+			}
+		}
+		
+	}
+
+
+	@Override
+	public void handleExternalEvent(CSSEvent event) {
+		if(log.isDebugEnabled())
+			log.debug("Nothing to do with a CSSEvent!");
+		
 	}
 	
+	public void unsubscribe(){
+		this.eventMgr.unSubscribeInternalEvent(this, new String[]{EventTypes.SERVICE_LIFECYCLE_EVENT}, null);
+		if(log.isDebugEnabled())
+			log.debug("Service Management Listener for Webapp: unregistered!");
+	}
 
 }

@@ -166,7 +166,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				this.predictionModelSizePerformanceLog(modelSize);
 				// end of performance log code
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				LOG.error("Exception when constructing new CAUI model. "+e.getLocalizedMessage());
 				e.printStackTrace();
 			}	
 			
@@ -182,13 +182,10 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			results = ctxBroker.retrieveHistoryTuples(attributeType, listOfEscortingAttributeIds, null, null).get();
 			LOG.debug(" history: "+ attributeType  +" retrieveHistoryTupleData: " +results);
 		
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
+			LOG.error("Exception when retrieving context history data for type:"+attributeType+" ."+e.getLocalizedMessage());
 			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 		return results;
 	}
 
@@ -579,13 +576,11 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				MockHistoryData mockHocData = new MockHistoryData(retrievedAction.getparameterName(), retrievedAction.getvalue(), context,primaryHocAttr.getLastModified(),serviceIdentString, serviceType);
 				result.add(mockHocData);
 
-			}  catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
+			}  catch (Exception e) {
+				LOG.error("Exception when processing ctx history data in order to discover a new user intent model " +e.getLocalizedMessage() );
 				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			} 
+			
 		}
 		return result;
 	}
@@ -605,7 +600,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		return valueStr;
 	}
 
-
+/*
 	protected CtxAttribute lookupAttrHelp(String type){
 		CtxAttribute ctxAttr = null;
 		try {
@@ -627,7 +622,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		}
 		return ctxAttr;
 	}
-
+*/
 
 
 	private CtxAttribute storeModelCtxDB(UserIntentModelData modelData){
@@ -699,7 +694,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			bytes = bos.toByteArray ();
 		}
 		catch (IOException ex) {
-			//TODO: Handle the exception
+			LOG.error("Exception when converting an object to byte array " +obj+"."+ex.getLocalizedMessage());
 		}
 		return bytes;
 	}
@@ -831,54 +826,4 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	public Map<String, ServiceResourceIdentifier> getSriMap() {
 		return sriMap;
 	}
-
-	//*************** Model storage to hard drive *****************
-	/*
-	public LinkedHashMap<String,ActionDictObject> retrieveModel(){
-		LinkedHashMap<String,ActionDictObject> model = new  LinkedHashMap<String,ActionDictObject>();
-		System.out.println("retrieve file 'taskModel' ");
-
-		File file = new File("taskModel");  
-		FileInputStream f;
-		try {
-			f = new FileInputStream(file);
-			ObjectInputStream s = new ObjectInputStream(f);  
-			model = (LinkedHashMap<String,ActionDictObject>)s.readObject();         
-			s.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}  
-		return model;
-	}
-
-
-
-
-	public void storeDictionary(LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary ){
-
-		System.out.println("storing to file 'taskModel' ");
-		//this.actCtxDictionary = actCtxDictionary;
-		File file = new File("taskModel");  
-		FileOutputStream f;
-		try {
-			f = new FileOutputStream(file);
-			ObjectOutputStream s = new ObjectOutputStream(f);          
-			s.writeObject(actCtxDictionary);
-			s.flush();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}  
-	}
-	 */
 }

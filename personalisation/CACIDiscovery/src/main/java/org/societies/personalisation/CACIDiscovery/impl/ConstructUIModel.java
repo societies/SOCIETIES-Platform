@@ -149,6 +149,7 @@ public class ConstructUIModel {
 		for(String actions : transProbDictionary.keySet()){
 			HashMap<String,Double> transTargets = transProbDictionary.get(actions);
 			//System.out.println("Action:"+actions+ "| target: "+transTargets);
+			LOG.debug("Action:"+actions+ "| target: "+transTargets);
 		}
 	}	
 

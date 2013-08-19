@@ -307,7 +307,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 				result.put(newMapAction, newTransProb);
 
 			}
-			//TODO fix probabilities 
+			// fix probabilities 
 			// should sum to 1
 			for(IUserIntentAction actionTemp :result.keySet()){
 				Double currentProb = result.get(actionTemp);

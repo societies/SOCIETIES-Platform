@@ -41,7 +41,8 @@ import javax.faces.bean.ViewScoped;
 import org.primefaces.event.RateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.cis.directory.ICisDirectory;
+import org.societies.api.cis.directory.ICisDirectoryCallback;
+import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
 import org.societies.api.internal.privacytrust.trust.model.ExtTrustRelationship;
@@ -67,6 +68,9 @@ public class TrustController extends BasePageController {
 	private static final long serialVersionUID = -1250855340010366453L;
 
 	private static Logger LOG = LoggerFactory.getLogger(TrustController.class);
+	
+	/** The time to wait for CIS Directory responses in milliseconds. */
+	private static final long WAIT_CIS_DIR = 1000l;
 
 	@ManagedProperty(value = "#{trustBroker}")
 	private ITrustBroker trustBroker;
@@ -78,8 +82,8 @@ public class TrustController extends BasePageController {
 	private UserService userService;
 	
 	/** The CIS Directory service reference. */
-	@ManagedProperty(value = "#{cisDirectory}")
-	private ICisDirectory cisDirectory;
+	@ManagedProperty(value = "#{cisDirectoryRemote}")
+	private ICisDirectoryRemote cisDirectory;
 	
 	/** The Service Discovery service reference. */
 	@ManagedProperty(value = "#{serviceDiscovery}")
@@ -146,12 +150,12 @@ public class TrustController extends BasePageController {
 		this.userService = userService;
 	}
 	
-	public ICisDirectory getCisDirectory() {
+	public ICisDirectoryRemote getCisDirectory() {
 
 		return this.cisDirectory;
 	}
 
-	public void setCisDirectory(ICisDirectory cisDirectory) {
+	public void setCisDirectory(ICisDirectoryRemote cisDirectory) {
 
 		this.cisDirectory = cisDirectory;
 	}
@@ -316,9 +320,14 @@ public class TrustController extends BasePageController {
 			if (TrustedEntityType.CSS == teid.getEntityType()) {
 				return entityId;
 			} else if (TrustedEntityType.CIS == teid.getEntityType()) {
-				final List<CisAdvertisementRecord> cisAds = this.cisDirectory.searchByID(entityId).get();
-				if (!cisAds.isEmpty() && cisAds.get(0).getName() != null) {
-					return cisAds.get(0).getName();
+				final CisDirCallback cisDirCallback = new CisDirCallback();
+				this.cisDirectory.searchByID(entityId, cisDirCallback);
+				synchronized (cisDirCallback) {
+					cisDirCallback.wait(WAIT_CIS_DIR);
+					final List<CisAdvertisementRecord> cisAds = cisDirCallback.getCisAds(); 
+					if (cisAds != null && !cisAds.isEmpty() && cisAds.get(0).getName() != null) {
+						return cisAds.get(0).getName();
+					}
 				}
 			} else if (TrustedEntityType.SVC == teid.getEntityType()) {
 				final org.societies.api.schema.servicelifecycle.model.Service service = 
@@ -400,5 +409,28 @@ public class TrustController extends BasePageController {
 			LOG.debug("onUpdate: trustUpdateEvent={}", trustUpdateEvent);
 			this.cdLatch.countDown();
 		} 
+	}
+	
+	private class CisDirCallback implements ICisDirectoryCallback {
+
+		private List<CisAdvertisementRecord> cisAds;
+		
+		/*
+		 * @see org.societies.api.cis.directory.ICisDirectoryCallback#getResult(java.util.List)
+		 */
+		@Override
+		public void getResult(List<CisAdvertisementRecord> cisAds) {
+		
+			LOG.debug("CisDirCallback.getResult: cisAds={}", cisAds);
+			this.cisAds = cisAds;
+			synchronized (this) {
+	            this.notifyAll();
+	        }
+		}
+		
+		private List<CisAdvertisementRecord> getCisAds() {
+			
+			return this.cisAds;
+		}
 	}
 }

@@ -6,8 +6,8 @@
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
     <osgi:reference id="commMngrRef" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
+
     <osgi:reference id="cisManager" interface="org.societies.api.cis.management.ICisManager"/>
-    <osgi:reference id="cisDirectory" interface="org.societies.api.cis.directory.ICisDirectory"/>
     <osgi:reference id="cisDirectoryRemote" interface="org.societies.api.cis.directory.ICisDirectoryRemote"/>
     <osgi:reference id="userPreferenceConditionMonitor"
                     interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/>
@@ -25,6 +25,9 @@
 
     <!--Required for service discovery-->
     <osgi:reference id="serviceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"
+                    cardinality="0..1"/>
+                    
+   	<osgi:reference id="serviceControl" interface="org.societies.api.internal.servicelifecycle.IServiceControl"
                     cardinality="0..1"/>
 
     <osgi:reference id="pubsubClient" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"/>

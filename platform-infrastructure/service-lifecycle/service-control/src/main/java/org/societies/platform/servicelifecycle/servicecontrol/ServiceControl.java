@@ -25,6 +25,7 @@
 package org.societies.platform.servicelifecycle.servicecontrol;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -69,6 +70,7 @@ import org.societies.api.services.ServiceMgmtEventType;
 import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.api.internal.servicelifecycle.IServiceControlRemote;
 import org.societies.api.internal.servicelifecycle.ServiceControlException;
+import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.internal.servicelifecycle.ServiceMgmtInternalEvent;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
@@ -794,6 +796,39 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 
 	@Async
 	@Override
+	public Future<ServiceControlResult> installService(InputStream inputStream, String fileName)
+			throws ServiceControlException {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("Installing service from a received input stream!");
+		ServiceControlResult returnResult = new ServiceControlResult();
+		returnResult.setServiceId(null);
+		
+		URI jarLocation = ServiceDownloader.downloadServerJar(inputStream, fileName);
+		
+		if(jarLocation == null){
+			if(logger.isDebugEnabled())
+				logger.debug("Problem with downloading jar, no file available!");
+			
+			returnResult.setMessage(ResultMessage.COMMUNICATION_ERROR);
+			sendUserNotification("Service not installed: Failure to download jar!");
+			return new AsyncResult<ServiceControlResult>(returnResult);	
+		}
+		
+		try {
+			Future<ServiceControlResult> asyncResult = installService(jarLocation.toURL());
+			ServiceControlResult result = asyncResult.get();
+			return new AsyncResult<ServiceControlResult>(result);
+		} catch (Exception e) {
+			logger.error("Exception while installing bundle!");
+			e.printStackTrace();
+			throw new ServiceControlException("Exception while attempting to install a bundle.", e);
+		}
+		
+	}
+
+	@Async
+	@Override
 	public Future<ServiceControlResult> installService(URL bundleLocation, IIdentity node)
 			throws ServiceControlException {
 		
@@ -848,7 +883,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(logger.isDebugEnabled())
 					logger.debug("It's the local node, installing...");
 				
-				URI jarLocation = ServiceDownloader.downloadJar(bundleLocation);
+				URI jarLocation = ServiceDownloader.downloadServerJar(bundleLocation);
 				
 				if(jarLocation == null){
 					if(logger.isDebugEnabled())
@@ -1421,6 +1456,45 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		}
 		
 		return new AsyncResult<ServiceControlResult>(returnResult);
+	}
+	
+	@Override
+	@Async
+	public Future<List<ICis>> getCisServiceIsSharedWith(ServiceResourceIdentifier serviceId){
+		if(logger.isDebugEnabled())
+			logger.debug("Getting all CIS the service is shared with...");
+		
+		List<ICis> finalResult = new ArrayList<ICis>();
+		try{
+				
+			String myLocalJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
+			String serviceJid = ServiceModelUtils.getJidFromServiceIdentifier(serviceId);
+				
+			// Is it supposed to be local?
+			if(!myLocalJid.equals(serviceJid)){
+					
+				//TODO
+				
+					
+			} else{
+					
+				List<String> cisList = getServiceReg().retrieveCISSharedService(serviceId);
+				for(String cisId : cisList){
+					ICis myCis = getCisManager().getCis(cisId);
+					if(myCis != null){
+						finalResult.add(myCis);
+					}
+							
+				}
+			}
+			
+		} catch(Exception ex){
+			ex.printStackTrace();
+			logger.error("getService():: Exception getting Service: " + ex);
+		}
+			
+		return new AsyncResult<List<ICis>>(finalResult);
+
 	}
 	
 	private void sendEvent(ServiceMgmtEventType eventType, Service service,IIdentity node){	

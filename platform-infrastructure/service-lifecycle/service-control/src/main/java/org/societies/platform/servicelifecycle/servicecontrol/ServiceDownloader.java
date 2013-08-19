@@ -85,7 +85,7 @@ public class ServiceDownloader {
 		}
 	}
 	
-	public static URI downloadJar(URL jarURL){
+	public static URI downloadServerJar(URL jarURL){
 		
 		String filePath = jarURL.getFile();
 
@@ -99,6 +99,26 @@ public class ServiceDownloader {
 		
 		try {
 			File downloadedClient = writeFile(jarURL.openStream(),filePath);
+			
+			if(logger.isDebugEnabled())
+				logger.debug("Jar downloaded to path: " + downloadedClient.getAbsolutePath());
+			
+			return downloadedClient.toURI();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public static URI downloadServerJar(InputStream is, String fileName){
+		
+		String filePath = SERVERFOLDER+"/"+fileName;
+		
+
+		try {
+			File downloadedClient = writeFile(is,filePath);
 			
 			if(logger.isDebugEnabled())
 				logger.debug("Jar downloaded to path: " + downloadedClient.getAbsolutePath());
