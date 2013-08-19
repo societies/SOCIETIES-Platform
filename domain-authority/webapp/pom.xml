@@ -225,6 +225,7 @@
 							org.societies.maven.converters;resolution:=optional,
 							org.societies.simple.basic;resolution:=optional,
 							org.societies.api.identity;resolution:=optional,
+							org.societies.api.identity.util;resolution:=optional,
 
 							<!-- Form validation -->
 							
