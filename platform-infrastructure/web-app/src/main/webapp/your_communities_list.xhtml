@@ -1,6 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
@@ -31,9 +32,28 @@
             <section class="itemlist">
                 <header>
                 </header>
-                <a href="#" onclick="doAjaxGetMyCommunities();">Refresh My Communities</a>
                 <ul class="keyinfolist" id="mycis">
-                    <li> Temp Note: To be loaded on document load but for now, select Refresh My Communities above to populate</li>
+                    <ui:repeat value="#{cismanager.communities}" var="mycommunity">
+    				    <li class="keyinfo bypostauthor">
+                        <figure class="gravatar">
+                            <a class="friend_profile.xhtml"><img alt="" src="images/launcher_societies.png"
+                                                                height="58" width="58"/></a>
+                        </figure>
+                        <div class="keyinfo_content">
+                            <div class="clearfix">
+                                <time datetime="2012-09-30T00:01Z"
+                                      class="keyinfo-meta keyinfometadata">Location, Sep 30, 2012 at 0:01 am
+                                </time>
+                                <br/>
+                                <H6>Name:     #{mycommunity.getName()}</H6> 								
+                                <H6>Identity: #{mycommunity.getId()}</H6>
+                            </div>
+                            <div class="keyinfo_text">
+                            </div>
+                        </div>
+                        <p:commandButton value="Leave Community" action="#{cismanager.leaevcis(mycommunity)}"/>
+                        </li>
+                      </ui:repeat>
                 </ul>
 
                 <div class="hr clearfix"></div>
@@ -45,31 +65,19 @@
             <div class="hr dotted clearfix"></div>
             <section>
                 <header>
-                    <h3>Suggested Communities...</h3>
+                    <h3>Owned Communities...</h3>
                 </header>
-                <a href="#" onclick="doAjaxGetSuggestedCommunities();">Refresh Suggested Communities</a>
-                <ul class="sidebar" id="mysuggestedcis">
-                    <li> Temp Note: To be loaded on document load but for now, select Refresh Suggested Communities above to populate</li>
+                <br/> <br/>
+                <ul>
+                	<ui:repeat value="#{cismanager.ownedcommunities}" var="owncommunity">
+                		<li> #{owncommunity.name}</li>
+                	</ui:repeat>
                 </ul>
             </section>
             <section>
                 <header>
                     <h3>Other Activity</h3>
                 </header>
-                <div class="hr dotted clearfix"></div>
-                <ul class="contact_data">
-                    <li>
-                        <figure class="gravatar">
-                            <img alt="" src="images/webcommunity_pic_sample1.jpg" height="48" width="48"/>
-                        </figure>
-                        <strong>Community Name</strong> dolor sit amet, consectetur adipiscing elit. Ipsum dolor sit amet, elit.
-                    </li>
-                </ul>
-                <ul class="contact_data">
-                    <li>Other Link - <a href="#">Link 1</a></li>
-                    <li>Other Link - <a href="#">Link 2</a></li>
-                    <li>Other Link - <a href="#">Link 3</a></li>
-                </ul>
             </section>
             <div class="hr dotted clearfix"></div>
             <div class="sidebar_bottom_BG"></div>

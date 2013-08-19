@@ -1,6 +1,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:ui="http://java.sun.com/jsf/facelets"
+				 xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:form="http://www.springframework.org/tags/form"
                 template="templates/main_template.xhtml">
 
@@ -78,30 +82,11 @@
 
             <div class="hr dotted clearfix"></div>
             <ul>
-                <li class="clearfix">
-                    <label for="">Community Name</label>
-                    <form:input path="cisName"/>
+                <li> Community Name: <h:inputText value="#{cismanager.cisname}" /></li>
 
-                    <div class="clear"></div>
-                    <form:errors path="cisName" cssClass="error"/></li>
+                <li> Community type: <h:inputText value="#{cismanager.cistype}" /></li>
 
-
-                <li class="clearfix">
-                    <label for="">Community type</label>
-                    <form:input path="cisType"/>
-
-                    <div class="clear"></div>
-                    <form:errors path="cisType" cssClass="error"/>
-                </li>
-
-
-                <li class="clearfix">
-                    <label for="">Description</label>
-                    <form:textarea path="cisDescription" rows="30" cols="30"/>
-
-                    <div class="clear"></div>
-                    <form:errors path="cisDescription" cssClass="cisDescription"/>
-                </li>
+                <li> Description: <h:inputText value="#{cismanager.cisdesc}" /></li>
 
                 <li class="clearfix">
                     <label for="">Criteira</label>
@@ -185,8 +170,8 @@
                     <li class="clearfix">
                     <p class="success">Thank you! Success Message here.</p>
                     <p class="error">Sorry, an error has occured. Please try again later.</p>	-->
-                    <div id="button">
-                        <input type="submit" id="createCISbutton" class="sendButton" value="Create Community"/>
+                    <div>
+                        <p:commandButton value="Create Community" action="#{cismanager.createcommunity()}"/>
                     </div>
                 </li>
             </ul>
