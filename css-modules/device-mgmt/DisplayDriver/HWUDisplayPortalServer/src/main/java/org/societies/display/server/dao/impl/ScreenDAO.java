@@ -30,7 +30,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.diosplay.server.dao.IScreenDAO;
+import org.societies.display.server.dao.IScreenDAO;
 import org.societies.display.server.model.Screen;
 
 import java.util.List;
