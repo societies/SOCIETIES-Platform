@@ -6,9 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.pubsub.PubsubClient;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
@@ -17,7 +14,6 @@ import org.societies.api.internal.useragent.model.ImpProposalType;
 import org.societies.integration.api.selenium.SeleniumTest;
 import org.societies.integration.api.selenium.components.UFNotificationPopup;
 import org.societies.integration.api.selenium.pages.IndexPage;
-import org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository;
 
 import java.util.Date;
 import java.util.List;
@@ -29,15 +25,11 @@ public class TestWebappUserFeedback extends SeleniumTest {
     private static final Logger log = LoggerFactory.getLogger(TestWebappUserFeedback.class);
 
     private static final String USERNAME = "paddy";
-    private static final String PASSWORD = "paddy";
+    private static final String PASSWORD = "p";
 
     private IndexPage indexPage;
 
-    private PubsubClient pubsubClient;
-    private IIdentityManager idMgr;
-    private IIdentity userID;
     private IUserFeedback userFeedback;
-    private IUserFeedbackHistoryRepository userFeedbackHistoryRepository;
 
     public TestWebappUserFeedback() {
         log.debug("TestWebappUserFeedback constructor");
@@ -47,11 +39,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
     public void setupTest() {
         log.debug("Setting up test");
 
-        this.pubsubClient = UFTestInit.getPubsub();
-        this.idMgr = UFTestInit.getIdMgr();
-        this.userID = this.idMgr.getThisNetworkNode();
         this.userFeedback = UFTestInit.getUserFeedback();
-        this.userFeedbackHistoryRepository = UFTestInit.getUserFeedbackHistoryRepository();
 
         indexPage = new IndexPage(getDriver());
 
@@ -60,7 +48,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
 
     @After
     public void tearDown() {
-//        pubSubListener.unregisterForEvents();
+
     }
 
     @Test

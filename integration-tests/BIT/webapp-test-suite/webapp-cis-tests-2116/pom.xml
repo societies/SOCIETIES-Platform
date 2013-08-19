@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.societies.integration.test</groupId>
-    <artifactId>bit.webapp_userfeedback_test.2077</artifactId>
-    <name>#2077 T65 Web App User Feedback Integration Test</name>
+    <artifactId>bit.webapp_cis_tests.2116</artifactId>
+    <name>#2116 CIS management for T65 webapp test suite</name>
     <packaging>bundle</packaging>
     <version>${release.version}</version>
 
@@ -31,21 +31,13 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.spring-library</artifactId>
-            <type>libd</type>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.version}</version>
+            <groupId>org.societies.api.external</groupId>
+            <artifactId>societies-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.societies.api.internal</groupId>
             <artifactId>societies-api-internal</artifactId>
-            <version>${release.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -56,9 +48,21 @@
         </dependency>
 
         <dependency>
-            <groupId>org.societies.api.external</groupId>
-            <artifactId>societies-api</artifactId>
-            <version>${release.version}</version>
+            <groupId>org.societies</groupId>
+            <artifactId>common-ext-libs</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.spring-library</artifactId>
+            <type>libd</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -85,20 +89,27 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>2.25.0</version>
+            <version>2.31.0</version>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-htmlunit-driver</artifactId>
-            <version>2.25.0</version>
+            <version>2.31.0</version>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit</groupId>
+            <artifactId>com.springsource.org.junit</artifactId>
+            <version>4.10.0</version>
+        </dependency>
+
+        <dependency>
+            <!-- Dunno why this is needed now, but Virgo is complaining that "org.w3c.dom.ElementTraversal" can't be found -->
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>1.4.01</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
-
 
     <build>
         <plugins>
@@ -116,6 +127,8 @@
                         <Include-Resource>{maven-resources}</Include-Resource>
                         <Import-Package>
                             !org.jboss.resource.adapter.jdbc.vendor,
+                            org.springframework.osgi.context,
+                            org.w3c.**,
                             org.societies.**,
                             org.junit.**,
                             *;resolution:=optional
@@ -154,6 +167,5 @@
             </plugin>
         </plugins>
     </build>
-
 
 </project>
