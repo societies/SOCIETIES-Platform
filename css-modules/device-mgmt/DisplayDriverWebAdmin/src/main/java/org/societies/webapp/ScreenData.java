@@ -55,7 +55,7 @@ public class ScreenData implements Serializable {
     private ScreenDAO screenDAO;
     private List<Screen> screenList;
 
-    @ManagedProperty(value = "#{displayPortalServer}")
+    //@ManagedProperty(value = "#{displayPortalServer}")
     private IDisplayPortalServer displayPortalServer;
 
     private Pattern pattern;
@@ -63,7 +63,7 @@ public class ScreenData implements Serializable {
 
     private Screen[] selectedScreens;
     
-    @ManagedProperty(value = "#{sessionFactory}")
+   // @ManagedProperty(value = "#{sessionFactory}")
     private SessionFactory sessionFactory;
 
     private static final String IPADDRESS_PATTERN =
@@ -78,7 +78,7 @@ public class ScreenData implements Serializable {
     public ScreenData() {
     }
 
-    @PostConstruct
+   // @PostConstruct
     public void init() {
         this.screenDAO = new ScreenDAO(sessionFactory);    
         refreshScreens();
