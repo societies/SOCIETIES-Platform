@@ -46,11 +46,11 @@ public class ScreenDAO implements IScreenDAO{
     }
 
     @Override
-    public List getAllScreens() {
+    public List<Screen> getAllScreens() {
 
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
-        List screens = null;
+        List<Screen> screens = null;
         try {
             transaction = session.beginTransaction();
             screens = session.createQuery(" from  " + Screen.class.getName()).list();
@@ -72,8 +72,6 @@ public class ScreenDAO implements IScreenDAO{
         Transaction transaction = null;
         try {
             transaction = session.beginTransaction();
-            //City city = new City();
-            //city.setName(cityName);
             session.save(screen);
             transaction.commit();
         }catch (HibernateException e) {

@@ -31,7 +31,7 @@ import java.util.List;
 
 public interface IScreenDAO {
 
-        List getAllScreens();
+        List<Screen> getAllScreens();
         void addScreen(Screen screen);
 
 
