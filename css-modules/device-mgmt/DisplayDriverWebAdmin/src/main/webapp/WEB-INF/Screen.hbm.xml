@@ -4,12 +4,11 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-    <class name="org.societies.webapp.model.Screens" table="screen">
+    <class name="org.societies.webapp.model.Screen" table="screen">
         <meta attribute="class-description">
             This class contains the screen detail.
         </meta>
         <id name="screenID" type="string" column="screenID">
-            <generator class="native"/>
         </id>
         <property name="locationID" column="locationID" type="string"/>
         <property name="ipAddress" column="ipAddress" type="string"/>

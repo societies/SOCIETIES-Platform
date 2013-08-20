@@ -16,7 +16,7 @@
 	</parent>
 	
 	<modules>
-		<module>display_api</module>
+		
 		<module>HWUDisplayPortalClient</module>
 		<module>HWUDisplayPortalServer</module>
 

@@ -1,6 +1,3 @@
-package org.societies.webapp.model;
-
-
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
@@ -25,62 +22,22 @@ package org.societies.webapp.model;
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.societies.integration.test.bit.installservicehwudisplay;
 
-import java.io.Serializable;
+import org.societies.api.css.devicemgmt.display.IDisplayableService;
 
+public class myTestService implements IDisplayableService{
 
-import javax.faces.bean.ManagedBean;
-import javax.persistence.*;
+	@Override
+	public void serviceStarted(String IPAddress) {
+		// TODO Auto-generated method stub
+		
+	}
 
-@Entity
-@Table(name="screen")
-@ManagedBean(name = "screenBean")
-public class Screens implements Serializable {
-
-    private String screenID;
-    private String locationID;
-    private String ipAddress;
-
-    public Screens()
-    {
-
-    }
-
-    public Screens(String screenID,String locationID, String ipAddress)
-    {
-        this.screenID=screenID;
-        this.locationID=locationID;
-        this.ipAddress=ipAddress;
-    }
-
-    @Id
-    @Column(name="screenID")
-    public String getScreenID() {
-        return screenID;
-    }
-
-    public void setScreenID(String screenID) {
-        this.screenID = screenID;
-    }
-
-    @Column(name="locationID")
-    public String getLocationID() {
-        return locationID;
-    }
-
-    public void setLocationID(String locationID) {
-        this.locationID = locationID;
-    }
-
-
-    @Column(name="ipAddress")
-    public String getIpAddress() {
-        return ipAddress;
-    }
-
-    public void setIpAddress(String ipAddress) {
-        this.ipAddress = ipAddress;
-    }
-
+	@Override
+	public void serviceStopped(String IPAddress) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
