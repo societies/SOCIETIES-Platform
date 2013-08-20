@@ -83,7 +83,7 @@ package org.societies.integration.performance.test.upper_tester.trust;
  * </pre>
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 2.0
+ * @since 1.2
  */
 public class TrustEvidenceParams {
 

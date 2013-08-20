@@ -82,7 +82,7 @@ public class IndirectTrustEngineTest {
 	private static final int TRUSTEE_CIS_LIST_SIZE = 10;
 	private static final String TRUSTEE_CIS_ID_BASE = BASE_ID + "TrusteeCisIIdentity";
 	
-	private static final int TRUSTEE_SERVICE_LIST_SIZE = 500;
+	private static final int TRUSTEE_SERVICE_LIST_SIZE = 200;
 	private static final String TRUSTEE_SERVICE_ID_BASE = BASE_ID + "TrusteeServiceResourceIdentifier";
 	
 	private static final int TRUSTEE_SERVICE_TYPE_LIST_SIZE = 10;
@@ -178,6 +178,11 @@ public class IndirectTrustEngineTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
+		
+		// clean trust database
+		this.trustRepo.removeEntities(null, null, null);
+		// clean trust evidence database
+		this.trustEvidenceRepo.removeEvidence(null, null, null, null, null, null);
 	}
 
 	/*
@@ -207,6 +212,11 @@ public class IndirectTrustEngineTest {
 		ITrustedService trusteeSvc = (ITrustedService) 
 				this.trustRepo.retrieveEntity(myCssTeid, trusteeSvcTeid);
 		assertNotNull(trusteeSvc);
+		// verify evidence association
+		assertNotNull(trusteeSvc.getEvidence());
+		assertFalse(trusteeSvc.getEvidence().isEmpty());
+		assertTrue(trusteeSvc.getEvidence().contains(evidence));
+		// verify value
 		assertNull(trusteeSvc.getDirectTrust().getValue());
 		assertNotNull(trusteeSvc.getIndirectTrust().getValue());
 		// indirect trust = mean of direct trust values of myCSS
@@ -240,6 +250,11 @@ public class IndirectTrustEngineTest {
 		ITrustedService trusteeSvc2 = (ITrustedService) 
 				this.trustRepo.retrieveEntity(myCssTeid, trusteeSvcTeid2);
 		assertNotNull(trusteeSvc2);
+		// verify evidence association
+		assertNotNull(trusteeSvc2.getEvidence());
+		assertFalse(trusteeSvc2.getEvidence().isEmpty());
+		assertTrue(trusteeSvc2.getEvidence().contains(evidence2));
+		// verify value
 		assertNull(trusteeSvc2.getDirectTrust().getValue());
 		assertNotNull(trusteeSvc2.getIndirectTrust().getValue());
 		// indirect trust = mean of direct trust values of myCSS
@@ -261,6 +276,12 @@ public class IndirectTrustEngineTest {
 		trusteeSvc2 = (ITrustedService) 
 				this.trustRepo.retrieveEntity(myCssTeid, trusteeSvcTeid2);
 		assertNotNull(trusteeSvc2);
+		// verify evidence association
+		assertNotNull(trusteeSvc2.getEvidence());
+		assertFalse(trusteeSvc2.getEvidence().isEmpty());
+		assertTrue(trusteeSvc2.getEvidence().contains(evidence2));
+		assertTrue(trusteeSvc2.getEvidence().contains(evidence3));
+		// verify value
 		assertNull(trusteeSvc2.getDirectTrust().getValue());
 		assertNotNull(trusteeSvc2.getIndirectTrust().getValue());
 		// indirect trust = mean of direct trust values of myCSS + (trust opinion - mean = 0) 
@@ -274,7 +295,7 @@ public class IndirectTrustEngineTest {
 		
 		// Add similar trust preferences between myCSS - CSS
 		// Add dissimilar trust preferences between myCSS - CSS2
-		for (int i = 100; i < 200; ++i) {
+		for (int i = 100; i < 150; ++i) {
 			
 			final TrustedEntityId trusteeSvcTeidX = trusteeServiceTeidList.get(i);
 			final Double commonValue = new Double(0.8);
@@ -352,10 +373,6 @@ public class IndirectTrustEngineTest {
 		// verify similarity with CSS2 is lower than that with CSS
 		similarityCss2 = ((ITrustedCss) this.trustRepo.retrieveEntity(myCssTeid, trusteeCssTeid2)).getSimilarity();
 		assertTrue(similarityCss.compareTo(similarityCss2) > 0);*/
-		
-		// clean trust repo
-		// this.trustRepo.remove
-		this.trustEvidenceRepo.removeEvidence(null, null, null, null, null, null);
 	}
 	
 	@Test
@@ -412,9 +429,5 @@ public class IndirectTrustEngineTest {
 		// verify evidence is ignored
 		assertNotNull(entities);
 		assertTrue(entities.isEmpty());
-		
-		// clean trust repo
-		this.trustRepo.removeEntity(myCssTeid, trusteeCssTeid2);
-		this.trustEvidenceRepo.removeEvidence(null, null, null, null, null, null);
 	}
 }

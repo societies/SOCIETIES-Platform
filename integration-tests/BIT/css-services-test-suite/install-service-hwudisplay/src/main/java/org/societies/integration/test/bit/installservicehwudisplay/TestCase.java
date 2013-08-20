@@ -22,19 +22,52 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.performance.test.upper_tester.trust.direct;
+package org.societies.integration.test.bit.installservicehwudisplay;
 
-import org.societies.integration.performance.test.lower_tester.PerformanceTestMgmtInfo;
-import org.societies.integration.performance.test.upper_tester.trust.TrustEvidenceParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.societies.integration.test.IntegrationTestCase;
+import org.societies.api.css.devicemgmt.display.IDisplayDriver;
 
 /**
- * Performance tests for the Direct Trust Engine.
+ * Test HWU Display Service
+ * 
+ * @author Stuart(HWU)
  *
- * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 1.2
  */
-public interface ITestDirectTrustPerformance {
+public class TestCase extends IntegrationTestCase {
+	private static Logger LOG = LoggerFactory.getLogger(TestCase.class);
+
+	public static IDisplayDriver displayDriver;
 	
-	public void testEvaluateDirectTrust(PerformanceTestMgmtInfo performanceTestMgmtInfo,
-			TrustEvidenceParams trustEvidenceParams);
+	
+	/* -- Dependency injection --*/
+	public IDisplayDriver getDisplayDriver() {
+		return displayDriver;
+	}
+
+
+	public void setDisplayDriver(IDisplayDriver displayDriver) {
+		this.displayDriver = displayDriver;
+	}
+
+
+
+	public TestCase() {
+		// Call the super constructor
+		// with test case number
+		// and test case classes to run
+		super(99999, new Class[]{InstallServiceHWUDisplay.class});
+	}
+
+
+	
+	public static boolean isDepencyInjectionDone() {
+		if (null == displayDriver) {
+			LOG.info("[Dependency Injection] Missing IDisplayDriver");
+			return false;
+		}
+		return true;
+	}
+	
 }

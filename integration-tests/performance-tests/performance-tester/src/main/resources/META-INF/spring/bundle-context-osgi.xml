@@ -67,6 +67,17 @@
 			</osgi:service-properties>
        </osgi:service>
        
+       <osgi:service ref="testIndirectTrustPerformance">	
+			<osgi:interfaces>
+				<value>org.societies.integration.performance.test.upper_tester.trust.indirect.ITestIndirectTrustPerformance</value>
+			</osgi:interfaces>
+			<osgi:service-properties>
+				<entry key="service.exported.interfaces" value="*"/>
+				<entry key="service.exported.configs" value="org.apache.cxf.ws"/>	
+				<entry key="org.apache.cxf.ws.address" value="${ws.host.name}${ws.trust.indirect}"/>
+			</osgi:service-properties>
+       </osgi:service>
+       
        <!--...............................................................and this.............................................................. -->
        
 </beans>

@@ -11,11 +11,14 @@
        keeping these definitions separate is to facilitate integration
        testing of the bundle outside of an OSGi container -->
        
+       
        	<osgi:service ref="displayPortalServer">
         <osgi:interfaces>
         <value>org.societies.api.css.devicemgmt.display.IDisplayPortalServer</value>
         </osgi:interfaces>
         </osgi:service>
+
+		<osgi:reference id="dataSource" interface="javax.sql.DataSource"></osgi:reference>
 
 
 
