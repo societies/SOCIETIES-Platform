@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,21 +37,20 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
-import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.osgi.event.EventTypes;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.societies.api.schema.useragent.feedback.FeedbackMethodType;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
+import org.societies.test.util.api.IUserfeedbackMocker;
+import org.societies.test.util.api.model.UserFeedbackMockResult;
+import org.societies.test.util.api.model.UserFeedbackType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+
 
 /**
  * @author Rafik
