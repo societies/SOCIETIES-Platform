@@ -43,7 +43,7 @@ public class ListFilesActivity extends ListActivity {
 				}
 			});
         	
-        	setListAdapter(new ArrayAdapter<String>(this, R.layout.file_list, fileArray));
+        	setListAdapter(new ArrayAdapter<String>(this, R.layout.list_files, fileArray));
         }
      
         

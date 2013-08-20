@@ -105,7 +105,7 @@ public class ListIdentitiesActivity extends ListActivity {
 			certNumbers.add(count-1);
 		}
 		
-		setListAdapter(new ArrayAdapter<String>(this, R.layout.file_list, certNames));	
+		setListAdapter(new ArrayAdapter<String>(this, R.layout.list_files, certNames));	
 				
 		getListView().setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,long itemPos) {				
