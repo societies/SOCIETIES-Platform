@@ -6,8 +6,8 @@
                       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
     <osgi:reference id="commMngrRef" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
-    <osgi:reference id="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager"/>
-    <osgi:reference id="cisDirectory" interface="org.societies.api.cis.directory.ICisDirectory"/>
+
+    <osgi:reference id="cisManager" interface="org.societies.api.cis.management.ICisManager"/>
     <osgi:reference id="cisDirectoryRemote" interface="org.societies.api.cis.directory.ICisDirectoryRemote"/>
     <osgi:reference id="userPreferenceConditionMonitor"
                     interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/>
@@ -26,6 +26,9 @@
     <!--Required for service discovery-->
     <osgi:reference id="serviceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"
                     cardinality="0..1"/>
+                    
+   	<osgi:reference id="serviceControl" interface="org.societies.api.internal.servicelifecycle.IServiceControl"
+                    cardinality="0..1"/>
 
     <osgi:reference id="pubsubClient" interface="org.societies.api.comm.xmpp.pubsub.PubsubClient"/>
 
@@ -43,6 +46,7 @@
 
     <osgi:reference id="trustEvidenceCollector" interface="org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector"/>
 
+	<osgi:reference id="privPrefMgr" interface="org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager"/>
 	<osgi:reference id="cssLocalManager" interface="org.societies.api.internal.css.ICSSInternalManager"/>
 
 	<osgi:reference id="cauiPrediction" interface="org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction">	

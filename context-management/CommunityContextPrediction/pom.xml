@@ -3,10 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<!-- The Basics -->
+	<name>Community Context Prediction</name>
 	<artifactId>community-context-prediction</artifactId>
 	<groupId>org.societies.context-management</groupId>
 	<version>${version.cm}</version>
-	<packaging>bundle</packaging>
+	
+		
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -50,7 +52,7 @@
 		<version>RELEASE</version>
 	</parent>
 
-	<!-- Build Settings -->
+	<!-- Build Settings 
 	<build>
 		<plugins>
 			<plugin>
@@ -88,9 +90,9 @@
 			</plugin>
 		</plugins>
 	</build>
-
+-->
 	<!-- More Project Information -->
-	<name>Community Context Prediction</name>
+	
 	<developers>
 		<developer>
 			<name>Giorgos Bouloudis</name>

@@ -301,7 +301,7 @@ public class ServiceModelUtils extends org.societies.api.services.ServiceUtils{
 		return !getClients(serviceId,serviceDiscovery).isEmpty();
 
 	}
-	
+
 	public static List<Service> getClients(ServiceResourceIdentifier service, IServiceDiscovery serviceDiscovery){
 		
 		List<Service> clients = new ArrayList<Service>();
@@ -324,13 +324,23 @@ public class ServiceModelUtils extends org.societies.api.services.ServiceUtils{
 		
 	}
 
+	/**
+	 * This method converts a Service Resource Identifier into a Base64 encoded string.
+	 * 
+	 * @param serviceId
+	 * @return
+	 */
 	public static String getServiceId64Encode(ServiceResourceIdentifier serviceId){
 
 		return new String(Base64.encode(serviceResourceIdentifierToString(serviceId).getBytes()));
 		
 	}
 
-	
+	/**
+	 * This method takes a Base64 Encoded string and converts it to a Service Resource Identifier
+	 * @param encoded64
+	 * @return
+	 */
 	public static ServiceResourceIdentifier getServiceId64Decode(String encoded64){
 		
 		return generateServiceResourceIdentifierFromString(new String(Base64.decode(encoded64.getBytes())));

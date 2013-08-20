@@ -26,12 +26,16 @@
 package org.societies.webapp.controller.privacy.prefs;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.AccessControlPreferenceDetailsBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfPreferenceDetailsBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSPreferenceDetailsBean;
@@ -42,6 +46,7 @@ import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.webapp.controller.BasePageController;
+import org.societies.webapp.service.PrivacyUtilService;
 import org.societies.webapp.service.UserService;
 
 /**
@@ -52,12 +57,18 @@ import org.societies.webapp.service.UserService;
 @ManagedBean(name="PrivacyPrefsController")
 public class PrivacyPreferencesController extends BasePageController{
 
+	private final Logger logging = LoggerFactory.getLogger(getClass());
+	
 	@ManagedProperty(value = "#{privPrefMgr}")
 	private IPrivacyPreferenceManager privPrefmgr;
 	
 	
     @ManagedProperty(value = "#{userService}")
     private UserService userService; // NB: MUST include public getter/setter
+
+
+	@ManagedProperty(value="#{privacyUtilService}")
+	private PrivacyUtilService privacyUtilService;
 
     private PPNPreferenceDetailsBean selectedPPNDetail;
     private AccessControlPreferenceDetailsBean selectedAccCtrlDetail;
@@ -71,6 +82,9 @@ public class PrivacyPreferencesController extends BasePageController{
 
 
 	private List<DObfPreferenceDetailsBean> dObfPreferenceDetails;
+
+
+	private String uuid;
     
 	@PostConstruct
 	public void initController(){
@@ -78,13 +92,21 @@ public class PrivacyPreferencesController extends BasePageController{
 		this.retrieveAccCtrlPreferences();
 		this.retrieveDObfPreferences();
 		this.retrieveDObfPreferences();
+		uuid = UUID.randomUUID().toString();
 	}
 	public void retrievePPNPreferences() {
 		
 		setPpnPreferenceDetails(privPrefmgr.getPPNPreferenceDetails());
+		
 
 	}
 	
+	public String storePPNDetailToUtils(){
+		this.logging.debug("Adding ppn preference details bean to util service");
+		this.privacyUtilService.setPpnPreferenceDetailsBean(uuid, selectedPPNDetail);
+		return "privacy_ppn_edit.xhtml";
+		
+	}
 	public void retrieveAccCtrlPreferences(){
 		setAccCtrlPreferenceDetails(privPrefmgr.getAccCtrlPreferenceDetails());
 		
@@ -136,15 +158,18 @@ public class PrivacyPreferencesController extends BasePageController{
 
 
 	public AccessControlPreferenceDetailsBean getSelectedAccCtrlDetail() {
+		
 		return selectedAccCtrlDetail;
 	}
 	public void setSelectedAccCtrlDetail(AccessControlPreferenceDetailsBean selectedAccCtrlDetail) {
 		this.selectedAccCtrlDetail = selectedAccCtrlDetail;
 	}
 	public PPNPreferenceDetailsBean getSelectedPPNDetail() {
+		
 		return selectedPPNDetail;
 	}
 	public void setSelectedPPNDetail(PPNPreferenceDetailsBean selectedPPNDetail) {
+		this.logging.debug("Setting selectedPPNDetail: "+selectedPPNDetail.toString());
 		this.selectedPPNDetail = selectedPPNDetail;
 	}
 	public List<PPNPreferenceDetailsBean> getPpnPreferenceDetails() {
@@ -170,6 +195,19 @@ public class PrivacyPreferencesController extends BasePageController{
 	}
 	public void setdObfPreferenceDetails(List<DObfPreferenceDetailsBean> dObfPreferenceDetails) {
 		this.dObfPreferenceDetails = dObfPreferenceDetails;
+	}
+	public PrivacyUtilService getPrivacyUtilService() {
+		return privacyUtilService;
+	}
+	public void setPrivacyUtilService(PrivacyUtilService privacyUtilService) {
+		this.privacyUtilService = privacyUtilService;
+	}
+	public String getUuid() {
+		
+		return uuid;
+	}
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 	
 	

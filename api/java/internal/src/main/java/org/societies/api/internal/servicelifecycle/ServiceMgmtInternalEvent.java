@@ -37,6 +37,11 @@ public class ServiceMgmtInternalEvent extends ServiceMgmtEvent {
 	/**
 	 * 
 	 */
+	private static final long serialVersionUID = 3374214689982043798L;
+
+	/**
+	 * 
+	 */
 	public ServiceMgmtInternalEvent() {
 		// TODO Auto-generated constructor stub
 	}

@@ -247,13 +247,17 @@ public class CAUITaskModelManagerTest {
 		situationConext4.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "moon");
 		situationConext4.put(CtxAttributeTypes.STATUS, "free");
 		//situationConext2.put(CtxAttributeTypes.TEMPERATURE, "15");
-		List<IUserIntentAction> results4 =  modelManager.retrieveActionsByContext(situationConext3);
-		System.out.println("output 4 "+ results4);
-		//assertEquals(1,results3.size());
+		List<IUserIntentAction> results4 =  modelManager.retrieveActionsByContext(situationConext4);
+		System.out.println("output for ctx loc:moon and status:free "+ results4);
+		assertEquals(2,results4.size());
 
-		
-		
-	
+		Map<String, Serializable> situationConext5 = new HashMap<String, Serializable>();
+		situationConext5.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "xxx");
+		situationConext5.put(CtxAttributeTypes.STATUS, "yyyy");
+		//situationConext2.put(CtxAttributeTypes.TEMPERATURE, "15");
+		List<IUserIntentAction> results5 =  modelManager.retrieveActionsByContext(situationConext5);
+		System.out.println("output for ctx loc:xxx and status:yyy "+ results5);
+		assertEquals(0,results5.size());
 	}
 
 	@Ignore
@@ -393,7 +397,7 @@ public class CAUITaskModelManagerTest {
 		actions.put(userActionB,targetActionsMapActionB);
 
 		//actions.put(userActionA, userActionB, 0.82)
-
+		//System.out.println("model :   "+ actions);
 		IUserIntentTask task = modelManager.createTask("TaskA", actions);
 		taskID = task.getTaskID() ;
 	}

@@ -26,18 +26,13 @@ public class UIModelSimilarityEval {
 	public UIModelSimilarityEval(){
 		
 	}
-	
-	
+		
 	public Double evaluateSimilarity(UserIntentModelData modelA, UserIntentModelData modelB){
 		Double result = 0.0;
-		
-		
 		
 		if( modelA.getActionModel().keySet().equals(modelB.getActionModel().keySet())){
 			result = 1.0;
 		}
-		
-		//TODO extend similarity eval with target actions
 		
 		return result;
 	}

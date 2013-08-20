@@ -773,7 +773,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		// Extract target IIdentity
 		final IIdentity target = this.extractIIdentity(scope);
-		
+
 		if (this.isLocalId(target)) {
 			final Set<String> types = new HashSet<String>();
 			types.add(type);
@@ -918,7 +918,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	private void storeHoc(CtxModelObject ctxModelObj) throws CtxException {
 
 		// ********************** HISTORY CODE ******************************* 
-		// TODO move to HoC
+
 		// this part allows the storage of attribute updates to context history
 		if (CtxModelType.ATTRIBUTE.equals(ctxModelObj.getModelType())) {
 			final CtxAttribute ctxAttr = (CtxAttribute) ctxModelObj;
@@ -1121,17 +1121,28 @@ public class InternalCtxBroker implements ICtxBroker {
 		LOG.debug("retrieveFuture: attrId={}, date={}", attrId, date);
 
 		final IIdentity target = this.extractIIdentity(attrId);
-
 		this.logRequest(null, target);
 
 		final List<CtxAttribute> result = new ArrayList<CtxAttribute>();
-		// TODO
 
+		if (this.isLocalId(target)) {
+			
+			// L O C A L
+			if (IdentityType.CIS != target.getType()) { 
+				// U S E R
+				result.add(this.userCtxInferenceMgr.predictContext(attrId, date));
+			} else { 
+				// C O M M U N I T Y
+				result.add(this.communityCtxInferenceMgr.predictContext(attrId, date));
+			}
+		}
+		
 		LOG.debug("retrieveFuture: result={}", result);
 		return new AsyncResult<List<CtxAttribute>>(result);
 	}
 
 	@Override
+	@Async
 	public Future<List<CtxAttribute>> retrieveFuture(
 			CtxAttributeIdentifier attrId, int modificationIndex) throws CtxException {
 
@@ -1142,7 +1153,16 @@ public class InternalCtxBroker implements ICtxBroker {
 		this.logRequest(null, target);
 
 		final List<CtxAttribute> result = new ArrayList<CtxAttribute>();
-		// TODO
+
+		Date date = new Date();
+
+		try {
+			result.addAll(this.retrieveFuture(attrId, date).get());
+
+		} catch (Exception e) {
+			LOG.error("Exception on predicting context attribute :"+attrId+".  "+ e.getLocalizedMessage());
+			e.printStackTrace();
+		} 
 
 		LOG.debug("retrieveFuture: result={}", result);
 		return new AsyncResult<List<CtxAttribute>>(result);
@@ -1271,10 +1291,12 @@ public class InternalCtxBroker implements ICtxBroker {
 		//final String tupleAttrType = "tupleIds_" + primaryAttrIdentifier.toString();
 
 		final String tupleAttrType = "tuple_"+primaryAttrIdentifier.getType().toString()+"_"+primaryAttrIdentifier.getObjectNumber().toString();
-
+		
 		List<CtxIdentifier> ls;
 		try {
-			ls = this.lookup(CtxModelType.ATTRIBUTE, tupleAttrType).get();
+			//ls = this.lookup(CtxModelType.ATTRIBUTE, tupleAttrType).get();
+			ls = this.lookup(primaryAttrIdentifier.getScope(), CtxModelType.ATTRIBUTE, tupleAttrType).get();
+			
 			if (ls.size() > 0) {
 				CtxIdentifier id = ls.get(0);
 				final CtxAttribute tupleIdsAttribute = (CtxAttribute) this.userCtxDBMgr.retrieve(id);
@@ -1283,20 +1305,11 @@ public class InternalCtxBroker implements ICtxBroker {
 				tupleAttrIDs = (List<CtxAttributeIdentifier>) SerialisationHelper.deserialise(tupleIdsAttribute.getBinaryValue(), this.getClass().getClassLoader());
 			}
 
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
+			LOG.error("Exception when trying to get the history tuples identifiers for attrID: "+primaryAttrIdentifier+". "+e.getLocalizedMessage());
 			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+		} 
+		
 		return new AsyncResult<List<CtxAttributeIdentifier>>(tupleAttrIDs);
 	}
 
@@ -1347,7 +1360,8 @@ public class InternalCtxBroker implements ICtxBroker {
 			newTupleAttrIDs.addAll(newAttrList);
 
 			List<CtxIdentifier> ls;			
-			ls = this.lookup(CtxModelType.ATTRIBUTE, tupleAttrType).get();
+			//ls = this.lookup(CtxModelType.ATTRIBUTE, tupleAttrType).get();
+			ls = this.lookup(primaryAttrIdentifier.getScope(), CtxModelType.ATTRIBUTE, tupleAttrType).get();
 			if (ls.size() > 0) {
 				CtxIdentifier id = ls.get(0);
 				final CtxAttribute tupleIdsAttribute = (CtxAttribute) this.userCtxDBMgr.retrieve(id);
@@ -1362,19 +1376,11 @@ public class InternalCtxBroker implements ICtxBroker {
 				}
 			}
 
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
+			LOG.error("Exception when trying to updateHistoryTuples for attrID: "+primaryAttrIdentifier+". "+e.getLocalizedMessage());
 			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
+		
 
 		return new AsyncResult<List<CtxAttributeIdentifier>>(results);
 	}
@@ -1386,9 +1392,12 @@ public class InternalCtxBroker implements ICtxBroker {
 			Date startDate, Date endDate) {
 
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
-
+		
 		try {
-			List<CtxIdentifier> ctxAttrListIds = this.lookup(CtxModelType.ATTRIBUTE, attributeType).get();
+			IIdentity localID = this.getLocalIdentity();
+
+			//List<CtxIdentifier> ctxAttrListIds = this.lookup(CtxModelType.ATTRIBUTE, attributeType).get();
+			List<CtxIdentifier> ctxAttrListIds = this.lookup(localID, CtxModelType.ATTRIBUTE, attributeType).get();
 			//LOG.info("ctxAttribute list "+ctxAttrListIds);
 			CtxAttributeIdentifier primaryAttrId = null;
 
@@ -1414,14 +1423,8 @@ public class InternalCtxBroker implements ICtxBroker {
 			tupleResults = shortByTime((HashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>) tupleResults);
 
 
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
+			LOG.error("Exception when trying to retrieve history tuples for attribute Type: "+attributeType+". "+e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 
@@ -1441,7 +1444,11 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		//LOG.info("retrieveHistoryTuples updating hocAttrs primaryAttr: "+primaryAttrId);
 
-		if(primaryAttrId!= null){ // TODO throw NPE otherwise
+		if (primaryAttrId == null) {
+			throw new NullPointerException("primary CtxAttribute Id can't be null");
+		}
+
+		if(primaryAttrId!= null){ 
 
 			IIdentity targetCss;
 			try {
@@ -1457,7 +1464,8 @@ public class InternalCtxBroker implements ICtxBroker {
 			List<CtxIdentifier> listIds;
 
 			try {
-				listIds = this.lookup(CtxModelType.ATTRIBUTE,tupleAttrType).get();
+				listIds = this.lookup(primaryAttrId.getScope(), CtxModelType.ATTRIBUTE,tupleAttrType).get();
+				//listIds = this.lookup(CtxModelType.ATTRIBUTE,tupleAttrType).get();
 				if( listIds.size()>0){
 
 					CtxAttributeIdentifier tupleAttrTypeID = (CtxAttributeIdentifier) listIds.get(0);
@@ -1474,7 +1482,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 						// list of historic attributes contained in "tuple_status" retrieved
 						//LOG.info("retrieveHistoryTuples tupleValueList: "+tupleValueList);
-						//int ia = 0;
+						
 						//for each historic attr 
 						for (CtxHistoryAttribute tupledHoCAttrTemp : tupleValueList){
 							//the key , primary historic attribute
@@ -1495,23 +1503,14 @@ public class InternalCtxBroker implements ICtxBroker {
 						}// end of for loop
 					}	
 				}//if size
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
+			} catch (Exception e) {
+				LOG.error("Exception when trying to retrieve history tuples for attribute id: "+primaryAttrId+". "+e.getLocalizedMessage());
 				e.printStackTrace();
 			}
 		}
-		if(results == null){
-			results = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
-		}
+		//if(results == null){
+		//	results = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
+		//}
 		//LOG.info("retrieveHistoryTuples results: "+results);
 
 		return new AsyncResult<Map<CtxHistoryAttribute, List<CtxHistoryAttribute>>>(results);
@@ -1538,75 +1537,6 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		return result;
 	}
-
-
-	/*
-	public void storeHoCAttributeTuples(CtxAttribute primaryAttr){
-
-		//String tupleAttrType = "tuple_"+primaryAttr.getType().toString();
-		LOG.info("storing hoc tuples for " +primaryAttr.getId());
-
-		String tupleAttrType = "tuple_"+primaryAttr.getId().getType().toString()+"_"+primaryAttr.getId().getObjectNumber().toString();
-		//LOG.info("store: tuple attr type "+ tupleAttrType);
-		// the attr that will maintain the tuples; 
-		CtxAttribute tupleAttr = null;
-		List<CtxHistoryAttribute> tupleValueList = new ArrayList<CtxHistoryAttribute>();
-		try {
-			List<CtxAttributeIdentifier> tempEscListIds = new ArrayList<CtxAttributeIdentifier>();
-			List<CtxAttributeIdentifier> tupleListIds = this.getHistoryTuples(primaryAttr.getId(),tempEscListIds).get();
-
-			List<CtxIdentifier> tupleAttrIDsList = this.lookup(CtxModelType.ATTRIBUTE, tupleAttrType).get();
-			if(tupleAttrIDsList.size() != 0){
-				LOG.info("retrieved: "+ tupleAttrType);
-				//tuple_status retrieved
-				tupleAttr = (CtxAttribute) this.retrieveAttribute( (CtxAttributeIdentifier) tupleAttrIDsList.get(0), false).get();
-			} else {
-				LOG.info("created: "+ tupleAttrType);
-				//tuple_status created
-				tupleAttr = this.createAttribute(primaryAttr.getScope(), tupleAttrType).get();
-			} 
-
-			//prepare value of ctxAttribute
-			for (CtxAttributeIdentifier tupleAttrID : tupleListIds) {
-				//for one of the escorting attrIds retrieve all history and find the latest value
-
-				List<CtxHistoryAttribute> allValues = this.retrieveHistory(tupleAttrID, null, null).get();
-				if (allValues != null){
-					//finding latest hoc value
-					int size = allValues.size();
-					int last = 0;
-					if (size >= 1){
-						last = size-1;    
-						CtxHistoryAttribute latestHoCAttr2 = allValues.get(last);
-						if (latestHoCAttr2 != null )tupleValueList.add(latestHoCAttr2);
-						LOG.info(" latestHoCAttr2 attribute to be stored in tuple: "+ latestHoCAttr2);
-					}
-				}           
-
-			}
-			byte[] tupleValueListBlob = SerialisationHelper.serialise((Serializable) tupleValueList);
-			if(tupleAttr != null) tupleAttr.setBinaryValue(tupleValueListBlob);
-
-			//LOG.info("ready to store tupleAttr: "+tupleAttr);
-
-			CtxHistoryAttribute hocAttr = this.userCtxHistoryMgr.createHistoryAttribute(tupleAttr);
-
-
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
-	}
-	 */
 
 	@Override
 	@Async
@@ -2508,16 +2438,50 @@ public class InternalCtxBroker implements ICtxBroker {
 	@Override
 	public Future<List<CtxAttribute>> retrieveFuture(Requestor requestor,
 			CtxAttributeIdentifier attrId, Date date) throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+
+		LOG.debug("retrieveFuture: attrId={}, date={}", attrId, date);
+
+		final IIdentity target = this.extractIIdentity(attrId);
+
+		this.logRequest(null, target);
+
+		List<CtxAttribute> result = new ArrayList<CtxAttribute>();
+
+		try {
+			result = this.retrieveFuture(attrId, date).get();
+
+		} catch (Exception e) {
+			LOG.error("Exception on predicting context attribute :"+attrId+".  "+ e.getLocalizedMessage());
+			e.printStackTrace();
+		} 
+
+		LOG.debug("retrieveFuture: result={}", result);
+		return new AsyncResult<List<CtxAttribute>>(result);
 	}
 
 	@Override
 	public Future<List<CtxAttribute>> retrieveFuture(Requestor requestor,
 			CtxAttributeIdentifier attrId, int modificationIndex)
 					throws CtxException {
-		// TODO Auto-generated method stub
-		return null;
+		LOG.debug("retrieveFuture: attrId={}, modificationIndex={}", attrId, modificationIndex);
+
+		final IIdentity target = this.extractIIdentity(attrId);
+
+		this.logRequest(null, target);
+
+		List<CtxAttribute> result = new ArrayList<CtxAttribute>();
+
+		try {
+
+			result = this.retrieveFuture(attrId, null).get();
+
+		} catch (Exception e) {
+			LOG.error("Exception on predicting context attribute :"+attrId+" for modification index : "+modificationIndex+". "+ e.getLocalizedMessage());
+			e.printStackTrace();
+		}
+
+		LOG.debug("retrieveFuture: result={}", result);
+		return new AsyncResult<List<CtxAttribute>>(result);
 	}
 
 	@Override
@@ -2701,8 +2665,8 @@ public class InternalCtxBroker implements ICtxBroker {
 	 */
 	@Override
 	public CtxEvaluationResults evaluateSimilarity(String[] ids, ArrayList<String> attrib) throws CtxException {
-		LOG.info("EBOYLANLOGFOOTPRINT: ctxSimilarity broker = " + ctxSimilarityEval);
-		LOG.info("EBOYLANLOGFOOTPRINT internalCtxBroker.evaluateSimilarity called");
+		//LOG.info("EBOYLANLOGFOOTPRINT: ctxSimilarity broker = " + ctxSimilarityEval);
+		//LOG.info("EBOYLANLOGFOOTPRINT internalCtxBroker.evaluateSimilarity called");
 		CtxEvaluationResults evalResult = (CtxEvaluationResults) this.ctxSimilarityEval.evaluateSimilarity(ids, attrib); //this.
 		return evalResult;
 	}

@@ -68,7 +68,9 @@ public class CACIPrediction {
 	static boolean caciPredictionEnabled = true;
 	static boolean caciFreshness = false;
 	static boolean cacimodelExist = false;
-
+	
+	public UserIntentModelData currentCACIModelData;
+	
 	public CACIPrediction(ICtxBroker ctxBroker, ICommManager commsMgr){
 
 		this.ctxBroker = ctxBroker;
@@ -130,16 +132,25 @@ public class CACIPrediction {
 	public List<IUserIntentAction> getPrediction(IIdentity requestor,
 			IAction action){
 
-		List<IUserIntentAction> predictedActionsList = new ArrayList<IUserIntentAction>();
+		//List<IUserIntentAction> predictedActionsList = new ArrayList<IUserIntentAction>();
 		// identify performed action in model
 		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
 
 		String par = action.getparameterName();
 		String val = action.getvalue();
 
-
+		if(currentCACIModelData != null ) 	{
+			
+			LOG.debug("set latest CACI model " + currentCACIModelData);
+			this.caciTaskManager.updateModel(currentCACIModelData);
+		}
+		
+		
+		
+		LOG.debug("cacimodel to be used for prediction: "+ this.caciTaskManager.getCAUIActiveModel() );
+		
 		List<IUserIntentAction> actionsList = this.caciTaskManager.retrieveActionsByTypeValue(par, val);
-		LOG.debug("3. caciTaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
+		LOG.debug("1. CACIMODEL TaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
 
 		if(actionsList.size()>0){
 
@@ -148,7 +159,7 @@ public class CACIPrediction {
 
 			IUserIntentAction currentAction = findBestMatchingAction(actionsList);
 
-			LOG.debug("4. caci currentAction " +currentAction);
+			LOG.debug("2. CACIMODEL currentAction " +currentAction);
 			Map<IUserIntentAction,Double> nextActionsMap = this.caciTaskManager.retrieveNextActions(currentAction);	
 			//LOG.info("5. nextActionsMap " +nextActionsMap);
 
@@ -156,18 +167,18 @@ public class CACIPrediction {
 			if(nextActionsMap.size()>0){
 				for(IUserIntentAction nextAction : nextActionsMap.keySet()){
 					Double doubleConf = nextActionsMap.get(nextAction);
-					//doubleConf = doubleConf*100;
-					doubleConf = 70.0;
+					doubleConf = doubleConf*100;
+					//doubleConf = 70.0;
 					nextAction.setConfidenceLevel(doubleConf.intValue());
 					//LOG.info("6. nextActionsMap " +nextAction);
 					results.add(nextAction);
 
-					LOG.info(" ****** caci prediction map created "+ results);
+					LOG.debug(" ****** caci prediction map created "+ results);
 				}
 			}			
 		}
 
-		return predictedActionsList;
+		return results;
 	}
 
 
@@ -322,7 +333,7 @@ public class CACIPrediction {
 				caciModelAttributeId = (CtxAttributeIdentifier) lsCaci.get(0);
 				attr = (CtxAttribute) this.ctxBroker.retrieve(caciModelAttributeId).get();
 				byte[] binaryModel = SerialisationHelper.serialise(modelData);
-				LOG.debug("skataaaaaa updating caci model  " +attr.getId() +" model: "+modelData );
+				LOG.debug("updating caci model  " +attr.getId() +" model: "+modelData );
 
 				this.ctxBroker.updateAttribute(attr.getId(), binaryModel).get();
 			}
@@ -394,6 +405,7 @@ public class CACIPrediction {
 		if (newCACIModelData != null){
 			this.caciTaskManager.updateModel(null);
 			this.caciTaskManager.updateModel(newCACIModelData);
+			currentCACIModelData = newCACIModelData;
 			cacimodelExist = true;		 
 			LOG.info("caci model set - actions map: "+newCACIModelData.getActionModel());
 		}

@@ -48,7 +48,7 @@ import org.societies.api.schema.cssmanagement.CssRequest;
 import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.MethodType;
 import org.societies.utilities.DBC.Dbc;
-import org.societies.api.identity.INetworkNode;
+
 
 public class CommsClient implements ICommCallback, ICSSRemoteManager {
 

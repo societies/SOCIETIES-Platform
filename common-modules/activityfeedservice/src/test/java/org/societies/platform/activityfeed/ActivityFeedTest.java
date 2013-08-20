@@ -152,7 +152,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("exception in test:", e);
 		}
 
 		assertNotNull(results);
@@ -302,8 +302,7 @@ AbstractTransactionalJUnit4SpringContextTests {
 			LOG.info("testing filtering filter result: "+results.size());
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            LOG.error("Test exception: ",e);
 		}
 		//assert(results!=null);
 		assert(results.size()>0);

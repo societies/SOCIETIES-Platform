@@ -50,7 +50,7 @@
 	    <osgi:listener ref="ctxTrustEvidenceMonitor" bind-method="bindCtxBroker" unbind-method="unbindCtxBroker" />
 	</osgi:reference>
 	<osgi:reference id="cisDirectory"
-		interface="org.societies.api.cis.directory.ICisDirectory"
+		interface="org.societies.api.cis.directory.ICisDirectoryRemote"
 		cardinality="0..1" >
 	</osgi:reference>
 	<osgi:reference id="serviceDiscovery"

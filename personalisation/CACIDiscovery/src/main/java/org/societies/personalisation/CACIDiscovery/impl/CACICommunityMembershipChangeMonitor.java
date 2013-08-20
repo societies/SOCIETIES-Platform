@@ -1,7 +1,7 @@
 package org.societies.personalisation.CACIDiscovery.impl;
 
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+//import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ public class CACICommunityMembershipChangeMonitor implements CtxChangeEventListe
 	private ICtxBroker ctxBroker;
 	private final IIdentity ownerId;
 	private ICommManager commMgr;
-	private final Set<String> communities = new CopyOnWriteArraySet<String>();
+	//private final Set<String> communities = new CopyOnWriteArraySet<String>();
 
 
 	@Autowired (required=true)
@@ -120,16 +120,6 @@ public class CACICommunityMembershipChangeMonitor implements CtxChangeEventListe
 		}
 	}
 
-	
-
-	
-	
-	
-	
-	
-	
-	
-	
 	//end of constructor
 	/*
 	private void registerMembershipChanges(IIdentity cisId) {
@@ -240,10 +230,6 @@ public class CACICommunityMembershipChangeMonitor implements CtxChangeEventListe
 		}		
 
 	}
-
-
-
-	
 
 
 }

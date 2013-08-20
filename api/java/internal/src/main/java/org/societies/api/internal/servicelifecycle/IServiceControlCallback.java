@@ -34,7 +34,17 @@ import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlRe
  */
 public interface IServiceControlCallback {
 
+	/**
+	 * Used by the remote method, when it wishes to return the result.
+	 * 
+	 * @param result
+	 */
 	public void setResult(ServiceControlResult result);
 	
+	/**
+	 * Used by the calling method in order to obtain the reply.
+	 * 
+	 * @return
+	 */
 	public ServiceControlResult getResult();
 }

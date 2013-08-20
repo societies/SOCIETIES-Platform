@@ -267,18 +267,18 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 					LOG.debug("Retrieving history for escorting attribute " + tupleAttrID);
 				
 				List<CtxHistoryAttribute> allValues = this.retrieveHistory(tupleAttrID, null, null);
-				if (LOG.isDebugEnabled())
-					LOG.debug("Retrieved history " + allValues);
+				//if (LOG.isDebugEnabled())
+					//LOG.debug("Retrieved history " + allValues);
 				if (allValues != null){
 					//finding latest hoc value
 					int size = allValues.size();
-					if (LOG.isDebugEnabled())
-						LOG.debug("Retrieved history size " + size);
+					//if (LOG.isDebugEnabled())
+						//LOG.debug("Retrieved history size " + size);
 					int last = 0;
 					if (size >= 1){
 						last = size-1;
-						if (LOG.isDebugEnabled())
-							LOG.debug("Retrieved history last " + last);
+						//if (LOG.isDebugEnabled())
+						//	LOG.debug("Retrieved history last " + last);
 						CtxHistoryAttribute latestHoCAttr2 = allValues.get(last);
 						if (latestHoCAttr2 != null )tupleValueList.add(latestHoCAttr2);
 					}
@@ -293,11 +293,8 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 			CtxHistoryAttribute hocAttr = this.createHistoryAttribute(tupleAttr);
 
 
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
+			LOG.error("Exception while storing tuples for ctxAttribute id:"+ctxAttribute.getId()+" ."+e.getLocalizedMessage());
 			e.printStackTrace();
 		}		
 
@@ -318,12 +315,12 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 	}
 
-	// TODO throws UserCtxHistoryException
+
 	@Override
 	public List<CtxHistoryAttribute> retrieveHistory(final CtxAttributeIdentifier attrId) throws CtxException{
 
 		if (attrId == null)
-			throw new NullPointerException("attrId can't be null");
+			throw new UserCtxHistoryMgrException("attrId can't be null");
 
 		final List<CtxHistoryAttribute> results = new LinkedList<CtxHistoryAttribute>();
 		try {
@@ -332,8 +329,8 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 				results.add(UserCtxHistoryDAOTranslator.getInstance()
 						.fromUserCtxHistoryAttributeDAO(historyDAO));
 		} catch (Exception e) {
-			// TODO throw new UserCtxHistoryMgrException
-			throw new IllegalStateException("Could not retrieve history of context attribute "
+
+			throw new UserCtxHistoryMgrException("Could not retrieve history of context attribute "
 					+ attrId + ": " + e.getLocalizedMessage(), e);
 		}
 		return results;
@@ -351,7 +348,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 				results.add(UserCtxHistoryDAOTranslator.getInstance()
 						.fromUserCtxHistoryAttributeDAO(historyDAO));
 		} catch (Exception e) {
-			// TODO throw new UserCtxHistoryMgrException
+			
 			throw new IllegalStateException("Could not retrieve history of context attribute "
 					+ attrId + ": " + e.getLocalizedMessage(), e);
 		}
@@ -361,21 +358,21 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	@Override
 	public int removeCtxHistory(CtxAttribute arg0, Date arg1, Date arg2)
 			throws CtxException {
-		// TODO Auto-generated method stub
+
 		return 0;
 	}
 
 	@Override
 	public int removeHistory(String arg0, Date arg1, Date arg2)
 			throws CtxException {
-		// TODO Auto-generated method stub
+
 		return 0;
 	}
 
 	@Override
 	public List<CtxHistoryAttribute> retrieveHistory(
 			CtxAttributeIdentifier arg0, int arg1) throws CtxException {
-		// TODO Auto-generated method stub
+
 		return null;
 	}
 
@@ -409,11 +406,8 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 				tupleAttrIDs = (List<CtxAttributeIdentifier>) SerialisationHelper.deserialise(tupleIdsAttribute.getBinaryValue(), this.getClass().getClassLoader());
 			}
 
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
+			LOG.error("Exception while getting ctx history tuples for id:"+primaryAttrIdentifier+". "+e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 
@@ -423,7 +417,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	@Override
 	public Boolean removeCtxHistoryTuples(CtxAttributeIdentifier arg0,
 			List<CtxAttributeIdentifier> arg1) throws CtxException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -449,7 +443,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 			// add the escorting attr ids
 			allAttrIds.addAll(listOfEscortingAttributeIds);
 
-			//TODO add a control to verify that only correct identifiers hava been added.
+			
 			// set history flag for all escorting attributes
 						
 			for (CtxAttributeIdentifier escortingAttrID : allAttrIds) {
@@ -478,6 +472,8 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 			//LOG.info("tuple Attr ids "+allAttrIds);
 
 		} catch (IOException e) {
+			LOG.error("Exception while setting ctx history tuples for id:"+primaryAttrIdentifier+". "+e.getLocalizedMessage());
+			
 			e.printStackTrace();
 		}
 
@@ -488,7 +484,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	public List<CtxAttributeIdentifier> updateCtxHistoryTuples(
 			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1)
 					throws CtxException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 

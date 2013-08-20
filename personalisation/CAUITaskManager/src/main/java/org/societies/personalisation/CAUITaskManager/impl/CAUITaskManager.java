@@ -222,7 +222,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 	@Override
 	public UserIntentAction retrieveCurrentIntentAction(IIdentity arg0,
 			IIdentity arg1, ServiceResourceIdentifier arg2, String arg3) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -257,14 +257,15 @@ public class CAUITaskManager implements ICAUITaskManager{
 
 	@Override
 	public boolean taskBelongsToModel(IUserIntentTask arg0) {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
 
 	@Override
 	public boolean actionBelongsToModel(IUserIntentAction arg0) {
-		// TODO Auto-generated method stub
+		
+		
 		return false;
 	}
 
@@ -322,7 +323,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 		this.activeUserIntentModel = new UserIntentModelData(); 
 		this.activeUserIntentModel = model;
 		if(model!=null){
-			LOG.info("updating active model : "+model.getActionModel() );	
+			LOG.debug("updating active model : "+model.getActionModel() );	
 		}
 		
 	}
@@ -425,8 +426,17 @@ public class CAUITaskManager implements ICAUITaskManager{
 			}	
 		}
 		//System.out.println("actionsScoreMap  " +actionsScoreMap);
+		LOG.debug("actionsScoreMap  " +actionsScoreMap);
+		
 		if(!actionsScoreMap.values().isEmpty()){
-
+			
+			// check if no context matches, return empty set
+			boolean allValuesZero = true;
+			for(Integer value : actionsScoreMap.values()){
+				if (value != 0)  allValuesZero = false;
+			}
+			if(allValuesZero) return bestActionList;
+			
 			int maxValueInMap=(Collections.max(actionsScoreMap.values()));  // This will return max value in the Hashmap
 			for(IUserIntentAction action  : actionsScoreMap.keySet()){
 				if(actionsScoreMap.get(action).equals(maxValueInMap)) {
