@@ -3,7 +3,6 @@ package org.societies.integration.tests.bit.webapp;
 import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +14,7 @@ import org.societies.integration.api.selenium.SeleniumTest;
 import org.societies.integration.api.selenium.components.UFNotificationPopup;
 import org.societies.integration.api.selenium.pages.IndexPage;
 import org.societies.integration.api.selenium.pages.PrivacyPolicyNegotiationRequestPage;
+import org.societies.integration.api.selenium.pages.TestPage;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -46,6 +46,7 @@ public class TestWebappPrivacyNegotiation extends SeleniumTest {
         log.debug("Setting up test");
 
         this.userFeedback = UFTestInit.getUserFeedback();
+        userFeedback.clear();
 
         indexPage = new IndexPage(getDriver());
 
@@ -57,7 +58,6 @@ public class TestWebappPrivacyNegotiation extends SeleniumTest {
     }
 
     @Test
-    @Ignore("Disable until repositories are working again")
     public void eventsAppearAtLogin() {
         String requestId = UUID.randomUUID().toString();
 
@@ -67,7 +67,9 @@ public class TestWebappPrivacyNegotiation extends SeleniumTest {
 
         indexPage.doLogin(USERNAME, PASSWORD);
 
-        indexPage.verifyNumberInNotificationsBubble(1);
+        int number = indexPage.getNumberInNotificationsBubble();
+        // there may already be some notifications in the bubble
+        Assert.assertTrue(number >= 1);
 
         indexPage.clickNotificationBubble();
 
@@ -83,14 +85,18 @@ public class TestWebappPrivacyNegotiation extends SeleniumTest {
 
         // login, check no notifications existing
         indexPage.doLogin(USERNAME, PASSWORD);
-        indexPage.verifyNumberInNotificationsBubble(0);
+
+        TestPage testPage = indexPage.navigateToTestPage();
+        testPage.clickResetUFButton();
+
+        testPage.verifyNumberInNotificationsBubble(0);
 
         // send PPN
         Future<ResponsePolicy> responsePolicyFuture = buildAndSendPPN(requestId);
         Assert.assertFalse(responsePolicyFuture.isDone());
 
         // ensure notification displayed
-        indexPage.verifyNumberInNotificationsBubble(1);
+        testPage.verifyNumberInNotificationsBubble(1);
 
         // switch to the notification page
         UFNotificationPopup ufNotificationPopup = indexPage.clickNotificationBubble();
@@ -105,7 +111,7 @@ public class TestWebappPrivacyNegotiation extends SeleniumTest {
         ResponsePolicy policy = responsePolicyFuture.get();
         Assert.assertEquals(NegotiationStatus.ONGOING, policy.getNegotiationStatus());
 
-        indexPage.verifyNumberInNotificationsBubble(0);
+        testPage.verifyNumberInNotificationsBubble(0);
 
         log.debug("Test complete");
     }
