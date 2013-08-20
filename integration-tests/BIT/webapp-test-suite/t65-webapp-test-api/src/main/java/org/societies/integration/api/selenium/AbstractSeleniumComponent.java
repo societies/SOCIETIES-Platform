@@ -186,6 +186,9 @@ public abstract class AbstractSeleniumComponent {
                 }
             } catch (NoSuchElementException ex) {
                 return;
+            } catch (StaleElementReferenceException ex) {
+                // occasionally happens when isDisplayed() is called in this fashion, shouldn't be an issue
+                continue; // just try again
             }
 
             threadSleep();
