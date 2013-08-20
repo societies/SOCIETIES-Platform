@@ -80,8 +80,7 @@ public class TestDirectTrustPerformance implements ITestDirectTrustPerformance {
 	
 	public TestDirectTrustPerformance() {
 		
-		if (LOG.isInfoEnabled())
-			LOG.info(this.getClass().getName() + " instantiated");
+		LOG.info("{} instantiated", this.getClass().getName());
 	}
 	
 	/*
@@ -121,14 +120,12 @@ public class TestDirectTrustPerformance implements ITestDirectTrustPerformance {
 			}
 
 			// Start test
-			if (LOG.isInfoEnabled())
-				LOG.info("START testEvaluateDirectTrust for params: " + trustEvidenceSet);
+			LOG.info("START testEvaluateDirectTrust for params: {}", trustEvidenceSet);
 			final Set<TrustRelationship> result = new LinkedHashSet<TrustRelationship>();
 			final TrustedEntityId myTeid = new TrustedEntityId(TrustedEntityType.CSS, myCssId);
 			for (final TrustEvidence trustEvidence : trustEvidenceSet) {
 
-				if (LOG.isInfoEnabled())
-					LOG.info("Evaluating evidence '" + trustEvidence + "'");
+				LOG.info("Evaluating evidence '{}'", trustEvidence);
 				// Create a DIRECT trust query for the entity specified in this piece of evidence
 				final TrustQuery trustQuery = new TrustQuery(myTeid).setTrusteeId(
 						trustEvidence.getObjectId()).setTrustValueType(TrustValueType.DIRECT);
@@ -153,8 +150,7 @@ public class TestDirectTrustPerformance implements ITestDirectTrustPerformance {
 				}
 				final TrustRelationship updatedTrustRelationship =
 						trustListener.getUpdatedTrustRelationship();
-				if (LOG.isInfoEnabled())
-					LOG.info("Updated trust relationship '" + updatedTrustRelationship + "'");
+				LOG.info("Updated trust relationship '{}'", updatedTrustRelationship);
 				// Verify Trust Relationships properties
 				if (!myTeid.equals(updatedTrustRelationship.getTrustorId())) {
 					this.fail("Expected trustorId '" + myTeid + "' but was '"
@@ -175,8 +171,7 @@ public class TestDirectTrustPerformance implements ITestDirectTrustPerformance {
 			}
 			
 			// End test
-			if (LOG.isInfoEnabled())
-				LOG.info("END testEvaluateDirectTrust for params: " + trustEvidenceSet);
+			LOG.info("END testEvaluateDirectTrust for params: {}", trustEvidenceSet);
 			this.performanceTestResult = new PerformanceTestResult(this.getClass().getName(),
 					"Updated trust relationships: " + result,
 					PerformanceTestResult.SUCCESS_STATUS);
@@ -246,7 +241,7 @@ public class TestDirectTrustPerformance implements ITestDirectTrustPerformance {
 			
 			this.updatedTrustRelationship = event.getTrustRelationship();
 			// Signal event has been received
-			cdLatch.countDown();
+			TestDirectTrustPerformance.this.cdLatch.countDown();
 		}
 		
 		private TrustRelationship getUpdatedTrustRelationship() {
