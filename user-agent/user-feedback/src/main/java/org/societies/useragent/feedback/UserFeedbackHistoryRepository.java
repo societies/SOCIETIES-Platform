@@ -97,14 +97,18 @@ public class UserFeedbackHistoryRepository implements IUserFeedbackHistoryReposi
     @Override
     public void insert(UserFeedbackBean ufBean) {
         Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
 
         try {
-            Transaction transaction = session.beginTransaction();
-
             session.save(ufBean);
 
             transaction.commit();
             session.flush();
+        } catch (RuntimeException ex) {
+            if (transaction != null)
+                transaction.rollback();
+
+            throw ex;
         } finally {
             session.close();
         }
@@ -113,16 +117,21 @@ public class UserFeedbackHistoryRepository implements IUserFeedbackHistoryReposi
     @Override
     public void updateStage(String requestId, FeedbackStage newStage) {
         Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+
+        UserFeedbackBean item = getByRequestId(requestId);
+        item.setStage(newStage);
 
         try {
-            Transaction transaction = session.beginTransaction();
-
-            UserFeedbackBean item = getByRequestId(requestId);
-            item.setStage(newStage);
             session.update(item);
 
             transaction.commit();
             session.flush();
+        } catch (RuntimeException ex) {
+            if (transaction != null)
+                transaction.rollback();
+
+            throw ex;
         } finally {
             session.close();
         }

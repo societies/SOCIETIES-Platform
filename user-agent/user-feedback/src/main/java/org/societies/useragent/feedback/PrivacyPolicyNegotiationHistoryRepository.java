@@ -85,8 +85,6 @@ public class PrivacyPolicyNegotiationHistoryRepository implements IPrivacyPolicy
 
             List results = query.list();
 
-            session.close();
-
             if (results.size() == 0) {
                 log.warn("Found no UserFeedbackPrivacyNegotiationEvent with requestId=" + requestId);
                 return null;
@@ -105,13 +103,13 @@ public class PrivacyPolicyNegotiationHistoryRepository implements IPrivacyPolicy
 
         try {
             session.save(event);
+
             transaction.commit();
             session.flush();
         } catch (RuntimeException ex) {
             if (transaction != null)
                 transaction.rollback();
 
-            log.error("Error creating new record", ex);
             throw ex;
         } finally {
             session.close();
@@ -125,15 +123,16 @@ public class PrivacyPolicyNegotiationHistoryRepository implements IPrivacyPolicy
 
         UserFeedbackPrivacyNegotiationEvent item = getByRequestId(requestId);
         item.setStage(newStage);
+
         try {
             session.update(item);
+
             transaction.commit();
             session.flush();
         } catch (RuntimeException ex) {
             if (transaction != null)
                 transaction.rollback();
 
-            log.error("Error updating record", ex);
             throw ex;
         } finally {
             session.close();
