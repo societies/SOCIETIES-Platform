@@ -332,19 +332,19 @@ public class Tester {
         //      3. COMPLETED PubSub event is sent from server
         //      4. Correct notification disappears on Android, T65
 
-
         //1. Empty database, clean startup
-        mySQLHelper.clearTable("UserFeedbackBean_options");
-        mySQLHelper.clearTable("UserFeedbackBean");
-
         mySQLHelper.clearTable("IdentityRequestorBean");
         mySQLHelper.clearTable("NegotiationDetailsBean");
-        mySQLHelper.clearTable("PrivacyPolicyResource");
+
+        mySQLHelper.clearTable("PrivacyPolicyAction");
         mySQLHelper.clearTable("PrivacyPolicyCondition");
-        mySQLHelper.clearTable("RequestItem_actions");
+        mySQLHelper.clearTable("PrivacyPolicyResource");
         mySQLHelper.clearTable("PrivacyPolicyRequestItem");
         mySQLHelper.clearTable("PrivacyPolicyResponseItem");
+        mySQLHelper.clearTable("PrivacyPolicyRequestItem");
         mySQLHelper.clearTable("PrivacyPolicyResponsePolicy");
+        mySQLHelper.clearTable("UserFeedbackBean");
+        mySQLHelper.clearTable("UserFeedbackBean_options");
         mySQLHelper.clearTable("UserFeedbackPrivacyNegotiationEvent");
 
         log.info("Clearing UserFeedback");

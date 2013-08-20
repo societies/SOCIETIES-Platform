@@ -26,8 +26,8 @@
           init-method="initialiseUserFeedback">
         <property name="commsMgr" ref="commsManager"/>
         <property name="pubsub" ref="pubsub"/>
-        <!--<property name="privacyPolicyNegotiationHistoryRepository" ref="privacyPolicyNegotiationHistoryRepositoryBean"/>-->
-        <!--<property name="userFeedbackHistoryRepository" ref="userFeedbackHistoryRepositoryBean"/>-->
+        <property name="privacyPolicyNegotiationHistoryRepository" ref="privacyPolicyNegotiationHistoryRepositoryBean"/>
+        <property name="userFeedbackHistoryRepository" ref="userFeedbackHistoryRepositoryBean"/>
     </bean>
 
     <bean id="decisionMaker"
