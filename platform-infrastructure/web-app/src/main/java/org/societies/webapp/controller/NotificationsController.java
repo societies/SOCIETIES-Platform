@@ -319,8 +319,9 @@ public class NotificationsController extends BasePageController {
     private IPrivacyPolicyNegotiationHistoryRepository privacyPolicyNegotiationHistoryRepository;
 
     private final List<NotificationQueueItem> timedAbortsToWatch = new ArrayList<NotificationQueueItem>();
-    // NB: to avoid deadlocks, always synchronise on negotiationQueue, not on queueIDs
+    // NB: to avoid deadlocks, always synchronise on unansweredNotifications, not on unansweredNotificationIDs
     private final List<NotificationQueueItem> unansweredNotifications = new LinkedList<NotificationQueueItem>();
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final Set<String> unansweredNotificationIDs = new HashSet<String>();
     private final List<NotificationQueueItem> allNotifications = new LinkedList<NotificationQueueItem>();
     private final Set<String> allNotificationIDs = new HashSet<String>();
@@ -502,7 +503,11 @@ public class NotificationsController extends BasePageController {
 
     }
 
-    public void reloadFromRepository(int howMany) {
+    public void clearNotifications(){
+        reloadFromRepository(0);
+    }
+
+    private void reloadFromRepository(int howMany) {
         if (log.isDebugEnabled())
             log.debug("Loading most recent " + howMany + " notifications");
 
@@ -525,7 +530,7 @@ public class NotificationsController extends BasePageController {
         replaceCacheWithList(userFeedbackBeans, userFeedbackPrivacyNegotiationEvents);
     }
 
-    public void reloadFromRepository(Date sinceWhen) {
+    private void reloadFromRepository(Date sinceWhen) {
         if (log.isDebugEnabled())
             log.debug("Loading notifications since " + sinceWhen);
 

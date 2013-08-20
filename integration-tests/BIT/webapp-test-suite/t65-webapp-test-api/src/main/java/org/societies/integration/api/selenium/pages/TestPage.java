@@ -24,20 +24,18 @@
  */
 package org.societies.integration.api.selenium.pages;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.societies.integration.api.selenium.components.LoginDialog;
 
-public class IndexPage extends BaseSocietiesPage {
+public class TestPage extends BaseSocietiesPage {
+    private static final String RESET_UF_BUTTON = "//*[@id='mainForm:resetNotificationsController']";
 
-    public IndexPage(WebDriver driver) {
+    public TestPage(WebDriver driver) {
         super(driver);
     }
 
-    public void doLogin(String username, String password) {
-        LoginDialog dialog = new LoginDialog(getDriver());
-        dialog.doLogin(username, password);
-
-//        closeAllGrowls();
+    public void clickResetUFButton() {
+        clickButton(By.xpath(RESET_UF_BUTTON));
     }
 
 }
