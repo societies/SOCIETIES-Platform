@@ -22,19 +22,19 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.performance.test.upper_tester.trust.direct;
+package org.societies.integration.performance.test.upper_tester.trust.indirect;
 
 import org.societies.integration.performance.test.lower_tester.PerformanceTestMgmtInfo;
 import org.societies.integration.performance.test.upper_tester.trust.TrustEvidenceParams;
 
 /**
- * Performance tests for the Direct Trust Engine.
+ * Performance tests for the Indirect Trust Engine.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
  * @since 1.2
  */
-public interface ITestDirectTrustPerformance {
+public interface ITestIndirectTrustPerformance {
 	
-	public void testEvaluateDirectTrust(PerformanceTestMgmtInfo performanceTestMgmtInfo,
+	public void testEvaluateIndirectTrust(PerformanceTestMgmtInfo performanceTestMgmtInfo,
 			TrustEvidenceParams trustEvidenceParams);
 }
