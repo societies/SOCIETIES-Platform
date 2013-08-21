@@ -506,8 +506,9 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 			LOG.debug("Handling evidence {}", this.evidence);
 			
 			try {
-				for (final TrustedEntityId myId : DirectTrustEngine.super.trustNodeMgr.getMyIds())
+				for (final TrustedEntityId myId : DirectTrustEngine.super.trustNodeMgr.getMyIds()) {
 					evaluate(myId, evidence);
+				}
 			} catch (TrustException te) {
 				
 				LOG.error("Could not handle evidence "

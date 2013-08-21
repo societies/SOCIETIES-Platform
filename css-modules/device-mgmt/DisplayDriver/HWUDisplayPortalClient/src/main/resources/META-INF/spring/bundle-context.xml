@@ -16,7 +16,6 @@
 	    <property name="commManager" ref="commManager"></property>
 		<property name="portalServerRemote" ref="displayServerRemote"></property>
 		<property name="ctxBroker" ref="ctxBroker"></property>
-		<property name="services" ref="IServices"></property>
 		<property name="evMgr" ref="eventMgmtRef"></property>
 	</bean>
 

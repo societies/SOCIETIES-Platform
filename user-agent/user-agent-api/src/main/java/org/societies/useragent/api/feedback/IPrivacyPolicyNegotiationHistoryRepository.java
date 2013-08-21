@@ -19,4 +19,6 @@ public interface IPrivacyPolicyNegotiationHistoryRepository {
     void insert(UserFeedbackPrivacyNegotiationEvent event);
 
     void updateStage(String requestId, FeedbackStage newStage);
+
+    int truncate();
 }

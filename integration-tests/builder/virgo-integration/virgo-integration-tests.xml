@@ -83,6 +83,7 @@
         <module>../../BIT/webapp-test-suite/t65-webapp-test-api</module>
         <module>../../BIT/webapp-test-suite/webapp-integration-tests-2078</module>
         <module>../../BIT/webapp-test-suite/webapp-userfeedback-test-2077</module>
+        <module>../../BIT/webapp-test-suite/webapp-cis-tests-2116</module>
 
 		<!-- CT Tests -->
 		<module>../../CT/privacy-trust-test-suite</module>
