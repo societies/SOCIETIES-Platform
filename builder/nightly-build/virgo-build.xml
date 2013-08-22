@@ -29,27 +29,19 @@
 			http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies</groupId>
-	<artifactId>virgo-nightly-builder</artifactId>
+	<artifactId>virgo-builder</artifactId>
 	<packaging>pom</packaging>
 	<version>0.1</version>
-	<name>Virgo Nightly Builder</name>
-
+	<name>Virgo Builder</name>
 
 	<modules>
-		<!-- Virgo Build -->
-		<module>virgo-build.xml</module>
+		<module>societies-clean.xml</module>
 		
-		<!-- What's that? -->
-		<module>../../css-modules/device-mgmt/DeviceDriverSimulator/</module>
-		<module>../../css-modules/device-mgmt/devicemanagerconsumer/</module>
-	
-		<!-- Integration tests -->
-		<module>../../integration-tests/builder/virgo-integration/virgo-integration-tests.xml</module>
+		<module>../distributions/virgo-baseline.xml</module>
+		<module>../distributions/virgo-cloud-node.xml</module>
+		<module>../distributions/virgo-da-node.xml</module>
 		
-		<!-- Performance tests -->
-		<module>../../integration-tests/performance-tests/performance-tester</module>
-		
-				
-		
+		<!-- Why is that separate? -->
+		<module>../../platform-infrastructure/comms-frwk/RichCommsBundle</module>
 	</modules>
 </project>

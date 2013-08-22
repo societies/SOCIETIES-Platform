@@ -59,6 +59,7 @@ public class EventListener extends Service {
     //TRACKING CONNECTION TO EVENTS MANAGER
     private boolean boundToEventMgrService = false;
     private BroadcastReceiver receiver;
+    @SuppressWarnings("FieldCanBeLocal")
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
     private EventsHelper eventsHelper;
@@ -168,36 +169,38 @@ public class EventListener extends Service {
             else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_REQUEST_INTENT)) {
                 UserFeedbackPrivacyNegotiationEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
 
+                String id = String.valueOf(eventPayload.getRequestId());
+
                 synchronized (processedIncomingEvents) {
-                    String id = String.valueOf(eventPayload.getNegotiationDetails().getNegotiationID());
 
                     if (processedIncomingEvents.contains(id)) {
-                        Log.w(LOG_TAG, "Ignoring duplicate PPN event received: " + id);
+                        Log.w(LOG_TAG, "Ignoring duplicate PPN event received: id=" + id);
                         return;
                     }
 
                     processedIncomingEvents.add(id);
                 }
 
-                Log.d(LOG_TAG, "Privacy Negotiation event received");
+                Log.d(LOG_TAG, "Privacy Negotiation event received: id=" + id);
                 launchPrivacyPolicyNegotiation(eventPayload);
             }
             //PERMISSION REQUEST EVENT - payload is UserFeedbackBean
             else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_REQUEST_INTENT)) {
                 UserFeedbackBean eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
 
+                String id = eventPayload.getRequestId();
+
                 synchronized (processedIncomingEvents) {
-                    String id = eventPayload.getRequestId();
 
                     if (processedIncomingEvents.contains(id)) {
-                        Log.w(LOG_TAG, "Ignoring duplicate UF event received: " + id);
+                        Log.w(LOG_TAG, "Ignoring duplicate UF event received: id=" + id);
                         return;
                     }
 
                     processedIncomingEvents.add(id);
                 }
 
-                Log.d(LOG_TAG, "General Permission request event received");
+                Log.d(LOG_TAG, "General Permission request event received: id=" + id);
                 String description = "Accept privacy policy?";
                 addUserFeedbackNotification(description, "Privacy Policy", eventPayload);
             }
