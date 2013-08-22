@@ -24,7 +24,7 @@ public class Sign {
 		 * The xml document to sign.
 		 * Type: byte[]
 		 */
-		public static final String DOC_TO_SIGN = "DOC_TO_SIGN";
+		public static final String DOC_TO_SIGN = "XML";
 	
 		/**
 		 * The signed xml document.
@@ -48,7 +48,7 @@ public class Sign {
 		 * The identity to use when signing.
 		 * Type: String
 		 */
-		public static final String IDENTITY = "IDENTITY";
+		public static final String IDENTITY = "SELECTED";
 		
 		/**
 		 * All supported types of the signature in output document
