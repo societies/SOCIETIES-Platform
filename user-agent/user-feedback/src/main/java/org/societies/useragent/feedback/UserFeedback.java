@@ -1187,6 +1187,18 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         return userFeedbackHistoryRepository.listIncomplete();
     }
 
+    @Override
+    public List<UserFeedbackPrivacyNegotiationEvent> listIncompletePrivacyRequests() {
+        return privacyPolicyNegotiationHistoryRepository.listIncomplete();
+    }
+
+    @Override
+    public List<UserFeedbackAccessControlEvent> listIncompleteAccessRequests() {
+        // TODO: When we have a repository for this, return the correct list
+        log.warn("Returning null list because we don't have an Access Control repository yet");
+        return null;
+    }
+
     public void setCommsMgr(ICommManager commsMgr) {
         this.commsMgr = commsMgr;
     }
