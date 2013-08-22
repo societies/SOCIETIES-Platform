@@ -35,6 +35,7 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackHistoryRequest;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.personalisation.model.Action;
@@ -43,12 +44,14 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
 import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
-import org.societies.api.schema.useragent.feedback.UserFeedbackHistoryRequest;
 import org.societies.api.schema.useragent.monitoring.UserActionMonitorBean;
 import org.societies.useragent.api.feedback.IInternalUserFeedback;
 import org.societies.useragent.api.monitoring.IInternalUserActionMonitor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class UACommsServer implements IFeatureServer {
@@ -173,17 +176,17 @@ public class UACommsServer implements IFeatureServer {
 
     private UserFeedbackHistoryRequest getQuery(Stanza stanza, UserFeedbackHistoryRequest requestBean) {
 
-        List<UserFeedbackBean> result;
+        List<UserFeedbackBean> userFeedbackBeans;
 
         switch (requestBean.getRequestType()) {
             case BY_COUNT:
-                result = feedback.listStoredFeedbackBeans(requestBean.getHowMany());
+                userFeedbackBeans = feedback.listStoredFeedbackBeans(requestBean.getHowMany());
                 break;
 //            case BY_DATE:
 //                result = feedback.listStoredFeedbackBeans(requestBean.getSinceWhen());
 //                break;
             case OUTSTANDING:
-                result = feedback.listIncompleteFeedbackBeans();
+                userFeedbackBeans = feedback.listIncompleteFeedbackBeans();
                 break;
             default:
                 log.warn("Invalid requestBean.requestType: " + requestBean.getRequestType().name());
@@ -191,10 +194,11 @@ public class UACommsServer implements IFeatureServer {
         }
 
         if (log.isDebugEnabled())
-            log.debug("About to transmit " + result.size() + " UserFeedbackBeans");
+            log.debug("About to transmit {} UserFeedbackBeans and {} UserFeedbackPrivacyNegotiationEvents",
+                    userFeedbackBeans.size());
 
         // NB: Hibernate will return a persistent list, which is no good to us
-        requestBean.setUserFeedbackBean(new ArrayList<UserFeedbackBean>(result));
+        requestBean.setUserFeedbackBean(new ArrayList<UserFeedbackBean>(userFeedbackBeans));
 
         // NB: Now get rid of all the hibernate mess inside the beans
         for (UserFeedbackBean bean : requestBean.getUserFeedbackBean()) {

@@ -70,7 +70,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     private static final List<String> EVENT_SCHEMA_CLASSES =
             Collections.unmodifiableList(Arrays.asList(
                     "org.societies.api.schema.useragent.feedback.UserFeedbackBean",
-                    "org.societies.api.schema.useragent.feedback.UserFeedbackHistoryRequest",
+                    "org.societies.api.internal.schema.useragent.feedback.UserFeedbackHistoryRequest",
                     "org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean",
                     "org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean",
                     "org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent",
