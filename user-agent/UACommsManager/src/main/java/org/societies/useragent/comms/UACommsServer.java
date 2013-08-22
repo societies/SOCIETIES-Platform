@@ -35,11 +35,14 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackHistoryRequest;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
 import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
@@ -59,10 +62,12 @@ public class UACommsServer implements IFeatureServer {
 
     public static final List<String> NAMESPACES = Collections.unmodifiableList(
             Arrays.asList("http://societies.org/api/schema/useragent/monitoring",
-                    "http://societies.org/api/schema/useragent/feedback"));
+                    "http://societies.org/api/schema/useragent/feedback",
+                    "http://societies.org/api/internal/schema/useragent/feedback"));
     public static final List<String> PACKAGES = Collections.unmodifiableList(
             Arrays.asList("org.societies.api.schema.useragent.monitoring",
-                    "org.societies.api.schema.useragent.feedback"));
+                    "org.societies.api.schema.useragent.feedback",
+                    "org.societies.api.internal.schema.useragent.feedback"));
 
     //PRIVATE VARIABLES
     private ICommManager commsMgr;
@@ -177,36 +182,68 @@ public class UACommsServer implements IFeatureServer {
     private UserFeedbackHistoryRequest getQuery(Stanza stanza, UserFeedbackHistoryRequest requestBean) {
 
         List<UserFeedbackBean> userFeedbackBeans;
+        List<UserFeedbackPrivacyNegotiationEvent> userFeedbackPrivacyNegotiationEvents;
+        List<UserFeedbackAccessControlEvent> userFeedbackAccessControlEvents;
 
         switch (requestBean.getRequestType()) {
             case BY_COUNT:
                 userFeedbackBeans = feedback.listStoredFeedbackBeans(requestBean.getHowMany());
+                userFeedbackPrivacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>(); // TODO: fill this list
+                userFeedbackAccessControlEvents = new ArrayList<UserFeedbackAccessControlEvent>(); // TODO: fill this list
                 break;
 //            case BY_DATE:
 //                result = feedback.listStoredFeedbackBeans(requestBean.getSinceWhen());
+//                userFeedbackPrivacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>(); // TODO: fill this list
+//                userFeedbackAccessControlEvents = new ArrayList<UserFeedbackAccessControlEvent>(); // TODO: fill this list
 //                break;
             case OUTSTANDING:
                 userFeedbackBeans = feedback.listIncompleteFeedbackBeans();
+                userFeedbackPrivacyNegotiationEvents = feedback.listIncompletePrivacyRequests();
+                userFeedbackAccessControlEvents = feedback.listIncompleteAccessRequests();
                 break;
             default:
                 log.warn("Invalid requestBean.requestType: " + requestBean.getRequestType().name());
                 return null;
         }
 
-        if (log.isDebugEnabled())
-            log.debug("About to transmit {} UserFeedbackBeans and {} UserFeedbackPrivacyNegotiationEvents",
-                    userFeedbackBeans.size());
+        // check to make sure none of our repositories have returned null
+        if (userFeedbackBeans == null)
+            userFeedbackBeans = new ArrayList<UserFeedbackBean>();
+        if (userFeedbackPrivacyNegotiationEvents == null)
+            userFeedbackPrivacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>();
+        if (userFeedbackAccessControlEvents == null)
+            userFeedbackAccessControlEvents = new ArrayList<UserFeedbackAccessControlEvent>();
 
         // NB: Hibernate will return a persistent list, which is no good to us
         requestBean.setUserFeedbackBean(new ArrayList<UserFeedbackBean>(userFeedbackBeans));
+        requestBean.setUserFeedbackPrivacyNegotiationEvent(new ArrayList<UserFeedbackPrivacyNegotiationEvent>(userFeedbackPrivacyNegotiationEvents));
+        requestBean.setUserFeedbackAccessControlEvent(new ArrayList<UserFeedbackAccessControlEvent>(userFeedbackAccessControlEvents));
 
         // NB: Now get rid of all the hibernate mess inside the beans
         for (UserFeedbackBean bean : requestBean.getUserFeedbackBean()) {
             bean.setOptions(new ArrayList<String>(bean.getOptions())); // persistent list
 //            bean.setRequestDate(new Date(bean.getRequestDate().getTime())); // java.sql.Timestamp
         }
+        for (UserFeedbackPrivacyNegotiationEvent event : requestBean.getUserFeedbackPrivacyNegotiationEvent()) {
+            event.getResponsePolicy().setResponseItems(new ArrayList<ResponseItem>(event.getResponsePolicy().getResponseItems())); // persistent list
+//            bean.setRequestDate(new Date(bean.getRequestDate().getTime())); // java.sql.Timestamp
+        }
+        for (UserFeedbackAccessControlEvent event : requestBean.getUserFeedbackAccessControlEvent()) {
+            event.setResponseItems(new ArrayList<ResponseItem>(event.getResponseItems())); // persistent list
+//            bean.setRequestDate(new Date(bean.getRequestDate().getTime())); // java.sql.Timestamp
+        }
 
-//        return result.toArray(new UserFeedbackBean[result.size()]);
+        if (log.isDebugEnabled())
+            log.debug("About to transmit {} UserFeedbackBeans, {} UserFeedbackPrivacyNegotiationEvents, {} UserFeedbackAccessControlEvents",
+                    new Object[]{userFeedbackBeans.size(), userFeedbackPrivacyNegotiationEvents.size(), userFeedbackAccessControlEvents.size()}
+            );
+
+        // TODO: Debugging - remove me
+        log.warn("Setting lists to null for debugging purposes - be sure to remove me before production");
+        requestBean.setUserFeedbackBean(null);
+//        requestBean.setUserFeedbackPrivacyNegotiationEvent(null);
+//        requestBean.setUserFeedbackAccessControlEvent(null);
+
         return requestBean;
     }
 
