@@ -6,4 +6,6 @@
     <string name="installIdentity">Install Identity</string>
     <string name="testSigning">Test Signing</string>
     <string name="testVerification">Test Verification</string>
+    <string name="isRequestingToSign">is requesting to sign a document. Allow?</string>
+    <string name="unknownApp">Unknown app</string>
 </resources>

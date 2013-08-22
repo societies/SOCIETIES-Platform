@@ -16,13 +16,9 @@
             </intent-filter>
         </activity>
         <activity android:name="ListFilesActivity" android:label="Please select a file">
-            <intent-filter>                
-            </intent-filter>
         </activity>
         
         <activity android:name="ListIdentitiesActivity" android:label="Please select digital identity">
-            <intent-filter>                
-            </intent-filter>
         </activity>
         
         <activity android:name="PassEntryActivity"></activity>

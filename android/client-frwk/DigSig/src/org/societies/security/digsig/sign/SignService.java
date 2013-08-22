@@ -51,10 +51,10 @@ public class SignService extends IntentService {
 
 		Log.i(TAG, "intent received");
 
-		byte[] doc = intent.getByteArrayExtra(Sign.DOC_TO_SIGN);
-		String identity = intent.getStringExtra(Sign.IDENTITY);
-		List<String> ids = intent.getStringArrayListExtra(Sign.IDS_TO_SIGN);
-		String outputType = intent.getStringExtra(Sign.OUTPUT_TYPE);
+		byte[] doc = intent.getByteArrayExtra(Sign.Params.DOC_TO_SIGN);
+		String identity = intent.getStringExtra(Sign.Params.IDENTITY);
+		List<String> ids = intent.getStringArrayListExtra(Sign.Params.IDS_TO_SIGN);
+		String outputType = intent.getStringExtra(Sign.Params.OUTPUT_TYPE);
 
 		Log.i(TAG, "DOC_TO_SIGN = " + doc);
 		Log.i(TAG, "IDENTITY = " + identity);
