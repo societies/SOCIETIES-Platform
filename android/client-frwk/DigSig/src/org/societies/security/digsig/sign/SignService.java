@@ -109,66 +109,66 @@ public class SignService extends IntentService {
 	}
 
 	private void doSign(Intent data) {
-		int selected = data.getIntExtra("SELECTED", -1);
-		if (selected==-1) return;
-
-		String certKey = String.format("CERT_%d", selected);
-		String keyKey = String.format("KEY_%d", selected);
-
-		byte[] encodedCert = secureStorage.getWithStringKey(certKey);
-		byte[] encodedKey = secureStorage.getWithStringKey(keyKey);
-		if (encodedCert==null || encodedKey==null) return;
-
-		// Parse key and cert
-		X509Certificate cert = null;
-		Key key = null;
-
-		try {
-			cert = (X509Certificate) certFactory.generateCertificate(new ByteArrayInputStream(encodedCert));
-
-			PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(encodedKey );            
-			key = keyFactory.generatePrivate(privKeySpec);
-		} catch (Exception e) { 
-			Log.e(TAG, "Failed while decoding identity!", e);
-		}
-		if (cert==null || key==null) {
-			Log.e(TAG, "Retrieved empty identity from storage!");
-			return;
-		}
-
-		Document doc;
-		XMLSignature sig;
-		try	{	    
-			byte[] val = getIntent().getByteArrayExtra("XML");        
-
-			doc = docBuilder.parse(new ByteArrayInputStream(val));
-			sig = new XMLSignature(doc,null,XMLSignature.ALGO_ID_SIGNATURE_RSA);
-
-			doc.getDocumentElement().appendChild(sig.getElement());
-
-			Transforms transforms = new Transforms(doc);            
-			transforms.addTransform(Transforms.TRANSFORM_C14N_WITH_COMMENTS); // Also must use c14n
-
-			ArrayList<String> idsToSign = getIntent().getStringArrayListExtra("IDS_TO_SIGN");            
-			for (String id : idsToSign)             
-				sig.addDocument("#"+id,transforms,MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA1);            
-
-			sig.addKeyInfo(cert);
-
-			sig.sign(key);
-
-			sig.getElement().setAttribute("Id", "Signature-"+UUID.randomUUID().toString());
-
-			LSOutput domOutput = domImpl.createLSOutput();
-			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			domOutput.setByteStream(output);
-			domOutput.setEncoding("UTF-8");	        
-			serializer.write(doc, domOutput);
-
-			Intent result = getIntent();
-			result.putExtra("SIGNED_XML", output.toByteArray());	
-		} catch (Exception e) {  
-			Log.e(TAG, "Failed while signing!", e);
-		}	    		    		    		
+//		int selected = data.getIntExtra("SELECTED", -1);
+//		if (selected==-1) return;
+//
+//		String certKey = String.format("CERT_%d", selected);
+//		String keyKey = String.format("KEY_%d", selected);
+//
+//		byte[] encodedCert = secureStorage.getWithStringKey(certKey);
+//		byte[] encodedKey = secureStorage.getWithStringKey(keyKey);
+//		if (encodedCert==null || encodedKey==null) return;
+//
+//		// Parse key and cert
+//		X509Certificate cert = null;
+//		Key key = null;
+//
+//		try {
+//			cert = (X509Certificate) certFactory.generateCertificate(new ByteArrayInputStream(encodedCert));
+//
+//			PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(encodedKey );            
+//			key = keyFactory.generatePrivate(privKeySpec);
+//		} catch (Exception e) { 
+//			Log.e(TAG, "Failed while decoding identity!", e);
+//		}
+//		if (cert==null || key==null) {
+//			Log.e(TAG, "Retrieved empty identity from storage!");
+//			return;
+//		}
+//
+//		Document doc;
+//		XMLSignature sig;
+//		try	{	    
+//			byte[] val = getIntent().getByteArrayExtra("XML");        
+//
+//			doc = docBuilder.parse(new ByteArrayInputStream(val));
+//			sig = new XMLSignature(doc,null,XMLSignature.ALGO_ID_SIGNATURE_RSA);
+//
+//			doc.getDocumentElement().appendChild(sig.getElement());
+//
+//			Transforms transforms = new Transforms(doc);            
+//			transforms.addTransform(Transforms.TRANSFORM_C14N_WITH_COMMENTS); // Also must use c14n
+//
+//			ArrayList<String> idsToSign = getIntent().getStringArrayListExtra("IDS_TO_SIGN");            
+//			for (String id : idsToSign)             
+//				sig.addDocument("#"+id,transforms,MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA1);            
+//
+//			sig.addKeyInfo(cert);
+//
+//			sig.sign(key);
+//
+//			sig.getElement().setAttribute("Id", "Signature-"+UUID.randomUUID().toString());
+//
+//			LSOutput domOutput = domImpl.createLSOutput();
+//			ByteArrayOutputStream output = new ByteArrayOutputStream();
+//			domOutput.setByteStream(output);
+//			domOutput.setEncoding("UTF-8");	        
+//			serializer.write(doc, domOutput);
+//
+//			Intent result = getIntent();
+//			result.putExtra("SIGNED_XML", output.toByteArray());	
+//		} catch (Exception e) {  
+//			Log.e(TAG, "Failed while signing!", e);
+//		}	    		    		    		
 	}
 }

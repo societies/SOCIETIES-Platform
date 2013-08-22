@@ -29,52 +29,54 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-public class SignActivity extends Activity {	
-	private final static int SELECT_IDENTITY = 1;	
+public class SignActivity extends Activity {
+	
+	private final static int SELECT_IDENTITY = 1;
 	private static final String TAG = SignActivity.class.getSimpleName();
 
 	private AndroidSecureStorage secureStorage;
-		
+
 	private KeyFactory keyFactory;
 	private CertificateFactory certFactory;
 	private DocumentBuilderFactory dbf;
-    private DocumentBuilder docBuilder;	
-    private DOMImplementationImpl domImpl;
+	private DocumentBuilder docBuilder;
+	private DOMImplementationImpl domImpl;
 	private LSSerializer serializer;
-    
-    /** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.i(TAG, "onCreate");
 
-        try {
-        	secureStorage = AndroidSecureStorage.getInstance();
-        	keyFactory = KeyFactory.getInstance("RSA");
-        	certFactory = CertificateFactory.getInstance("X.509");
-        	
-        	if (!Init.isInitialized()) Init.init();
-        	
-        	dbf = DocumentBuilderFactory.newInstance();
-        	dbf.setNamespaceAware(true);
-        	
-        	docBuilder = dbf.newDocumentBuilder();
-        	
-        	domImpl = new DOMImplementationImpl();
-        	
-        	serializer = domImpl.createLSSerializer();
-        	DOMConfiguration config = serializer.getDomConfig();
-        	config.setParameter("comments", Boolean.valueOf(true));
-        } catch(Exception e) {
-        	Log.e(TAG, "Failed to initialize", e);
-        	setResult(RESULT_CANCELED);        	
-        	finish();
-        	return;
-        }
-        
-        Intent i = new Intent(this,ListIdentitiesActivity.class);
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		Log.i(TAG, "onCreate");
+
+		try {
+			secureStorage = AndroidSecureStorage.getInstance();
+			keyFactory = KeyFactory.getInstance("RSA");
+			certFactory = CertificateFactory.getInstance("X.509");
+
+			if (!Init.isInitialized())
+				Init.init();
+
+			dbf = DocumentBuilderFactory.newInstance();
+			dbf.setNamespaceAware(true);
+
+			docBuilder = dbf.newDocumentBuilder();
+
+			domImpl = new DOMImplementationImpl();
+
+			serializer = domImpl.createLSSerializer();
+			DOMConfiguration config = serializer.getDomConfig();
+			config.setParameter("comments", Boolean.valueOf(true));
+		} catch (Exception e) {
+			Log.e(TAG, "Failed to initialize", e);
+			setResult(RESULT_CANCELED);
+			finish();
+			return;
+		}
+
+		Intent i = new Intent(this, ListIdentitiesActivity.class);
 		startActivityForResult(i, SELECT_IDENTITY);
-    }
+	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -82,85 +84,91 @@ public class SignActivity extends Activity {
 		Log.i(TAG, "onActivityResult");
 
 		super.onActivityResult(requestCode, resultCode, data);
-		
-		if (requestCode == SELECT_IDENTITY && resultCode==RESULT_OK) {
-			doSign(data);					   
+
+		if (requestCode == SELECT_IDENTITY && resultCode == RESULT_OK) {
+			doSign(data);
 		}
 	}
-    
+
 	private void doSign(Intent data) {
 		int selected = data.getIntExtra("SELECTED", -1);
-		if (selected==-1) return;
-		
+		if (selected == -1)
+			return;
+
 		String certKey = String.format("CERT_%d", selected);
 		String keyKey = String.format("KEY_%d", selected);
-		
+
 		byte[] encodedCert = secureStorage.getWithStringKey(certKey);
 		byte[] encodedKey = secureStorage.getWithStringKey(keyKey);
-		if (encodedCert==null || encodedKey==null) return;
-				
+		if (encodedCert == null || encodedKey == null)
+			return;
+
 		// Parse key and cert
 		X509Certificate cert = null;
 		Key key = null;
-		
+
 		try {
-			cert = (X509Certificate) certFactory.generateCertificate(new ByteArrayInputStream(encodedCert));
-			
-			PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(encodedKey );            
+			cert = (X509Certificate) certFactory
+					.generateCertificate(new ByteArrayInputStream(encodedCert));
+
+			PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(
+					encodedKey);
 			key = keyFactory.generatePrivate(privKeySpec);
-		} catch (Exception e) { 
+		} catch (Exception e) {
 			Log.e(TAG, "Failed while decoding identity!", e);
 			setResult(RESULT_CANCELED);
-			finish();			
+			finish();
 		}
-		if (cert==null || key==null) {
+		if (cert == null || key == null) {
 			Log.e(TAG, "Retrieved empty identity from storage!");
 			setResult(RESULT_CANCELED);
 			finish();
 			return;
 		}
-				
-					                   
-        Document doc;
-        XMLSignature sig;
-	    try	    	    
-	    {	    
-	    	byte[] val = getIntent().getByteArrayExtra("XML");        
-	    	
-	        doc = docBuilder.parse(new ByteArrayInputStream(val));
-	        sig = new XMLSignature(doc,null,XMLSignature.ALGO_ID_SIGNATURE_RSA);
-	        
-	        doc.getDocumentElement().appendChild(sig.getElement());
-	        
-	        Transforms transforms = new Transforms(doc);            
-            transforms.addTransform(Transforms.TRANSFORM_C14N_WITH_COMMENTS); // Also must use c14n
-                    
-            ArrayList<String> idsToSign = getIntent().getStringArrayListExtra("IDS_TO_SIGN");            
-            for (String id : idsToSign)             
-            	sig.addDocument("#"+id,transforms,MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA1);            
-            
-            sig.addKeyInfo(cert);
-					
+
+		Document doc;
+		XMLSignature sig;
+		try {
+			byte[] val = getIntent().getByteArrayExtra("XML");
+
+			doc = docBuilder.parse(new ByteArrayInputStream(val));
+			sig = new XMLSignature(doc, null,
+					XMLSignature.ALGO_ID_SIGNATURE_RSA);
+
+			doc.getDocumentElement().appendChild(sig.getElement());
+
+			Transforms transforms = new Transforms(doc);
+			// Also must use c14n
+			transforms.addTransform(Transforms.TRANSFORM_C14N_WITH_COMMENTS);
+
+			ArrayList<String> idsToSign = getIntent().getStringArrayListExtra(
+					"IDS_TO_SIGN");
+			for (String id : idsToSign)
+				sig.addDocument("#" + id, transforms,
+						MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA1);
+
+			sig.addKeyInfo(cert);
+
 			sig.sign(key);
-			
-			sig.getElement().setAttribute("Id", "Signature-"+UUID.randomUUID().toString());
-							
-	        LSOutput domOutput = domImpl.createLSOutput();
-	        ByteArrayOutputStream output = new ByteArrayOutputStream();
-	        domOutput.setByteStream(output);
-	        domOutput.setEncoding("UTF-8");	        
-	        serializer.write(doc, domOutput);
-	        
-	        Intent result = getIntent();
-	        result.putExtra("SIGNED_XML", output.toByteArray());	
-	        	        
-	        setResult(RESULT_OK,result);
-			finish();				
-	    } catch (Exception e) 
-	    {  
-	    	Log.e(TAG, "Failed while signing!", e);
-	    	setResult(RESULT_CANCELED);
-	    	finish();	    	
-	    }	    		    		    		
+
+			sig.getElement().setAttribute("Id",
+					"Signature-" + UUID.randomUUID().toString());
+
+			LSOutput domOutput = domImpl.createLSOutput();
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			domOutput.setByteStream(output);
+			domOutput.setEncoding("UTF-8");
+			serializer.write(doc, domOutput);
+
+			Intent result = getIntent();
+			result.putExtra("SIGNED_XML", output.toByteArray());
+
+			setResult(RESULT_OK, result);
+			finish();
+		} catch (Exception e) {
+			Log.e(TAG, "Failed while signing!", e);
+			setResult(RESULT_CANCELED);
+			finish();
+		}
 	}
 }
