@@ -1,4 +1,5 @@
 /**
+
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
  * informacijske druzbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
@@ -83,4 +84,10 @@ public class PrivacyUtilService implements Serializable{
 		this.accCtrlDetails.put(key, bean);
 	}
 	
+	
+	public void removePpnPreferenceDetailsBean(String key){
+		if (this.ppnDetails.containsKey(key)){
+			ppnDetails.remove(key);
+		}
+	}
 }

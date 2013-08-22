@@ -23,18 +23,20 @@
 
 			<section class="form_style_main">
 
-				<h4 class="form_title">Create new Privacy Policy Negotiation
-					Preference</h4>
+				<h4 class="form_title">Create new Privacy Policy Negotiation Preference</h4>
 				<div class="hr grid_12 clearfix"></div>
 				
+						<h5>Privacy Preference Details</h5>				
 					<h:panelGrid columns="2" cellpadding="5">
-						<h5>Privacy Preference Details</h5>
-						<div class="hr grid_12 clearfix"></div>
+						
+
 						<h:outputLabel for="requestorId" value="Requestor:"></h:outputLabel>
 						<h:outputText id="requestorId"
 							value="#{PPNcreateBean.preferenceDetails.requestor.requestorId}"></h:outputText>
 						<h:outputLabel for="specificRequestor" value="For: "></h:outputLabel>
 						<h:outputText id="specificRequestor" value="#{PPNcreateBean.displaySpecificRequestor}" />
+						<h:outputLabel for="resourceType" value="Resource: " />
+						<h:outputText id="resourceType" value="#{PPNcreateBean.preferenceDetails.resource.dataType}" />
 
 					</h:panelGrid>
 				
@@ -176,14 +178,23 @@
 					value="#{PPNcreateBean.preferenceDetails.requestor.requestorId}"
 					label="Requestor">
 				</p:inputText>
+				
+				
+				<h:outputLabel for="dataScheme" value="Resource Scheme:" />
+				<h:selectOneMenu id="dataScheme"
+					value="#{PPNcreateBean.preferenceDetails.resource.scheme}">
+					<f:selectItems value="#{PPNcreateBean.schemeList}" />
+					<p:ajax update="resource"
+						listener="#{PPNcreateBean.handleSchemeTypeChange}" />
+				</h:selectOneMenu>				
 
+				<h:outputLabel for="resource" value="Resource type:" />
+				<p:selectOneMenu id="resource" editable="#{PPNcreateBean.editableResource}"
+					value="#{PPNcreateBean.preferenceDetails.resource.dataType}" label="value">
+					<f:selectItems value="#{PPNcreateBean.resourceTypes}" />
+				</p:selectOneMenu>
+				
 
-
-				<h:outputLabel for="resource" value="Resource type" />
-				<h:inputText id="resource"
-					value="#{PPNcreateBean.preferenceDetails.resource.dataType}"
-					label="resource type">
-				</h:inputText>
 				<p:outputPanel id="customPanel">
 					<p:selectOneRadio id="customRadio"
 						value="#{PPNcreateBean.requestorType}" layout="custom">
@@ -213,7 +224,7 @@
 				</p:outputPanel>
 				<f:facet name="footer">
 					<p:commandButton id="SavePrefDetails" value="Submit"
-						process="preferenceDetailsDialog" update="mainForm:requestorId,mainForm:specificRequestor"
+						process="preferenceDetailsDialog" update="mainForm:requestorId,mainForm:specificRequestor, mainForm:resourceType"
 						actionListener="#{PPNcreateBean.savePreferenceDetails}">
 					</p:commandButton>
 				</f:facet>

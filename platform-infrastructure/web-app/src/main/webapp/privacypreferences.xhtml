@@ -50,18 +50,22 @@
         </p:column>
 
 					<p:column style="width: 4%">
-						<p:commandButton icon="ui-icon-zoomin" action="#{PrivacyPrefsController.storePPNDetailToUtils}"
-							title="View-Edit-Delete">
+						<p:commandButton icon="ui-icon-wrench"
+							action="#{PrivacyPrefsController.storePPNDetailToUtils}"
+							title="View-Edit-Delete" ajax="false">
 							<f:setPropertyActionListener value="#{ppnPreferenceDetail}"
-								target="#{PrivacyPrefsController.selectedPPNDetail}" />			
-							<f:param name="ppnDetailUUID" value="#{PrivacyPrefsController.uuid}" />				
+								target="#{PrivacyPrefsController.selectedPPNDetail}" />
+
+							<f:param name="ppnDetailUUID"
+								value="#{PrivacyPrefsController.ppnUUID}" />
 						</p:commandButton>
 					</p:column>
 				</p:dataTable>
 
 				<p:toolbar>
 					<p:toolbarGroup align="left">
-						<p:button value="Create New" href="privacy_ppn_create.xhtml">
+						<p:button value="Create New PPN preference"
+							href="privacy_ppn_create.xhtml">
 						</p:button>
 					</p:toolbarGroup>
 				</p:toolbar>
@@ -91,7 +95,26 @@
 					<p:column headerText="Resource ID">
         #{accCtrlPreference.resource.dataIdUri}
         </p:column>
+					<p:column style="width: 4%">
+						<p:commandButton icon="ui-icon-wrench"
+							action="#{PrivacyPrefsController.storeAccCtrlDetailToUtils}"
+							title="View-Edit-Delete" ajax="false">
+							<f:setPropertyActionListener value="#{accCtrlPreference}"
+								target="#{PrivacyPrefsController.selectedAccCtrlDetail}" />
+
+							<f:param name="accCtrlDetailUUID"
+								value="#{PrivacyPrefsController.accCtrlUUID}" />
+						</p:commandButton>
+					</p:column>
 				</p:dataTable>
+
+				<p:toolbar>
+					<p:toolbarGroup align="left">
+						<p:button value="Create New Access Control preference"
+							href="privacy_accCtrl_create.xhtml">
+						</p:button>
+					</p:toolbarGroup>
+				</p:toolbar>
 
 				<p:dataTable id="idsDetails" var="idsPreference"
 					value="#{PrivacyPrefsController.idsPreferenceDetails}">
