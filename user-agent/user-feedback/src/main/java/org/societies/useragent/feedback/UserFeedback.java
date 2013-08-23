@@ -689,13 +689,11 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         try {
             if (userFeedbackHistoryRepository == null) {
                 log.warn("userFeedbackHistoryRepository is null - cannot store user feedback request bean in database");
-
             } else {
                 if (log.isDebugEnabled())
                     log.debug("Storing user feedback bean in database");
 
                 userFeedbackHistoryRepository.insert(ufBean);
-                ufBean = userFeedbackHistoryRepository.getByRequestId(requestId);
             }
         } catch (Exception ex) {
             log.error("Error storing user feedback request bean to database #696 - UserFeedback will continue without database support. \n" + ex.getMessage());
@@ -704,7 +702,12 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         //send pubsub event to all user agents
         try {
             if (log.isDebugEnabled())
-                log.debug("Sending user feedback request event via pubsub");
+                log.debug("Sending user feedback request event via pubsub with ID " + requestId);
+
+            // HACK: When hibernate persists the ufBean object, it changes the options list to a org.hibernate.collection.PersistentList
+            // When this is deserialised at the other side, hibernate gets upset. Really the serialiser should be converting any
+            // PersistentList back to an ArrayList
+            ufBean.setOptions(new ArrayList<String>()); // list is empty anyway for implicit feedback
 
             pubsub.publisherPublish(myCloudID,
                     UserFeedbackEventTopics.REQUEST,
