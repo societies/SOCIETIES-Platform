@@ -6,13 +6,16 @@
 <hibernate-mapping>
     <class name="org.societies.api.schema.useragent.feedback.UserFeedbackBean" table="UserFeedbackBean">
 
-        <id name="requestId" type="string" column="requestId"/>
+        <id name="requestId" type="string" column="requestId">
+            <generator class="assigned"/>
+        </id>
 
         <property name="method" column="method" type="org.societies.api.schema.useragent.feedback.FeedbackMethodType"/>
         <property name="stage" column="stage" type="org.societies.api.schema.useragent.feedback.FeedbackStage"/>
         <!--<property name="requestDate" column="requestDate" type="java.util.Date"/>-->
         <property name="type" column="type" type="int"/>
-        <list name="options" table="UserFeedbackBean_options" lazy="false">
+        <list name="options" table="UserFeedbackBean_options" lazy="false"
+                cascade="all">
             <key column="option_id"/>
             <index column="option_index"/>
             <element column="value" type="string"/>

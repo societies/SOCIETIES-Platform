@@ -24,16 +24,10 @@
  */
 package org.societies.integration.api.selenium.pages;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.societies.integration.api.selenium.SeleniumTest;
 import org.societies.integration.api.selenium.components.LoginDialog;
 
 public class IndexPage extends BaseSocietiesPage {
-    private static final String NAV_ROOT = "//ul[@id='navigation']";
-    private static final String NAV_MY_ACCOUNT_MENU = NAV_ROOT + "/li/a[@href='myProfile.xhtml']";
-    private static final String NAV_PROFILE_SETTINGS_ITEM = NAV_ROOT + "/li/ul[@class='sub-menu']/li/a[text()='Profile Settings']";
 
     public IndexPage(WebDriver driver) {
         super(driver);
@@ -45,32 +39,5 @@ public class IndexPage extends BaseSocietiesPage {
 
 //        closeAllGrowls();
     }
-
-    public ProfileSettingsPage navigateToProfileSettings() {
-        openMenu(NAV_MY_ACCOUNT_MENU);
-
-        ProfileSettingsPage profileSettingsPage = new ProfileSettingsPage(getDriver());
-        return profileSettingsPage;
-    }
-
-    public ExamplePage navigateToExamplePage() {
-        // Unfortunately our "example" link doesn't actually exist
-        // openMenu(NAV_MY_ACCOUNT_MENU, NAV_PROFILE_SETTINGS_ITEM);
-
-        // so we have to cheat
-        getDriver().get(SeleniumTest.BASE_URL + "/example.xhtml");
-
-        ExamplePage examplePage = new ExamplePage(getDriver());
-        return examplePage;
-    }
-
-    private void openMenu(String menuXpath) {
-        WebElement menuHeader = waitUntilVisible(By.xpath(menuXpath));
-
-        moveMouseTo(menuHeader);
-
-        clickButton(By.xpath(NAV_PROFILE_SETTINGS_ITEM));
-    }
-
 
 }

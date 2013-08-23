@@ -29,6 +29,8 @@ import java.util.*;
 import javax.swing.UIManager;
 
 
+
+import org.hibernate.SessionFactory;
 //import org.societies.display.server.dao.impl.MockScreenDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,15 +56,15 @@ import org.societies.display.server.model.ScreenConfiguration;
  */
 public class DisplayPortalServer implements IDisplayPortalServer{
 
-	
-	
+
+
 	private List<String> screenIPAddresses;
 
 	private static Logger LOG = LoggerFactory.getLogger(DisplayPortalServer.class);
 
 
 	private Hashtable<String, String> currentlyUsedScreens;
-	
+
 	private ScreenConfiguration screenconfig;
 
 	private IServices services;
@@ -70,56 +72,62 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 
 
 	private ServiceResourceIdentifier myServiceId;
-	
+
 	private ICommManager commManager;
 	private IIdentityManager idMgr;
 
 	private IIdentity serverIdentity;
 
-    private List<Screen> screens;
-    private ScreenDAO screenDAO;
+	private List<Screen> screens;
+	private ScreenDAO screenDAO;
 
-    public DisplayPortalServer(){
+	private SessionFactory sessionFactory;
+
+
+
+	public DisplayPortalServer(){
 		screenIPAddresses = new ArrayList<String>();
 		screens = new ArrayList<Screen>();
-       //SETUP UP TO GET SCREENS FROM DB
-        screenDAO = new ScreenDAO();
+
 	}
-	
+
 	public void initialiseServer(){
 		UIManager.put("ClassLoader", ClassLoader.getSystemClassLoader());
+		//SETUP UP TO GET SCREENS FROM DB
+		screenDAO = new ScreenDAO(sessionFactory);
 		currentlyUsedScreens = new Hashtable<String, String>();
-        //SET UP A NEW SCREEN CONFIGURATION
-        this.screenconfig = new ScreenConfiguration();
-        //SET THE SCREENS BY RETRIEVING FROM DB
-        setScreens();
-        this.LOG.debug("SCREENS : "  + screens.toString());
+		//SET UP A NEW SCREEN CONFIGURATION
+		this.screenconfig = new ScreenConfiguration();
+		//SET THE SCREENS BY RETRIEVING FROM DB
+		setScreens();
+		this.LOG.debug("SCREENS : "  + screens.toString());
 
-        //DO NOT NEED TO GET SCREENS FROM USER NOW
-        //this.getScreenConfigurationFromUser();
+
+		//DO NOT NEED TO GET SCREENS FROM USER NOW
+		//this.getScreenConfigurationFromUser();
 	}
 
-    //GET SCREENS FROM DB
+	//GET SCREENS FROM DB
 	@Override
-    public void setScreens()
-    {
-        this.LOG.debug("SETTING SCREENS");
-        this.screens=screenDAO.getAllScreens();
-        //REMOVE ALL SCREENS FROM SCREEN CONFIG
-        screenconfig.removeAllScreens();
-        //GET A NEW SCREEN CONFIGURATION (ORGINALLY CALLED FROM SCREENCONFIGFIDALOGUE)
-        //AND ADD THE SCREENS TO THE SCREENCONFIG
-        for(Screen screen : screens)
-        {
-            screenconfig.addScreen(screen);
-        }
-        this.LOG.debug(this.toString() + " " + screens.toString());
-    }
+	public void setScreens()
+	{
+		this.LOG.debug("SETTING SCREENS");
+		this.screens=screenDAO.getAllScreens();
+		//REMOVE ALL SCREENS FROM SCREEN CONFIG
+		screenconfig.removeAllScreens();
+		//GET A NEW SCREEN CONFIGURATION (ORGINALLY CALLED FROM SCREENCONFIGFIDALOGUE)
+		//AND ADD THE SCREENS TO THE SCREENCONFIG
+		for(Screen screen : screens)
+		{
+			screenconfig.addScreen(screen);
+		}
+		this.LOG.debug(this.toString() + " " + screens.toString());
+	}
 
 	//NOT USED ANY MORE //
-    private void getScreenConfigurationFromUser() {
+	private void getScreenConfigurationFromUser() {
 		ScreenConfigurationDialog dialog = new ScreenConfigurationDialog();
-	
+
 		screenconfig = dialog.getScreens();
 		if (dialog!=null){
 			dialog.dispose();
@@ -128,37 +136,37 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 		this.LOG.debug("initialised");
 	}
 
-	
 
-	
+
+
 	@Override
 	public String requestAccess(String identity, String location) {
 		try{
-		this.LOG.debug("Request from: "+identity+" to use screen in location: "+location);
-		if (this.currentlyUsedScreens.containsKey(location)){
-			return "REFUSED";
-		}else{
-			Screen screen = this.screenconfig.getScreenBasedOnLocation(location);
-			if (screen==null){
-				this.LOG.debug("There is no screen at location: "+location+"\n. Available locations are: \n"+this.screenconfig.toString());
+			this.LOG.debug("Request from: "+identity+" to use screen in location: "+location);
+			if (this.currentlyUsedScreens.containsKey(location)){
 				return "REFUSED";
+			}else{
+				Screen screen = this.screenconfig.getScreenBasedOnLocation(location);
+				if (screen==null){
+					this.LOG.debug("There is no screen at location: "+location+"\n. Available locations are: \n"+this.screenconfig.toString());
+					return "REFUSED";
+				}
+
+				String ipAddress = screen.getIpAddress();
+
+				if (ipAddress==null){
+					this.LOG.debug("IP address for screen: "+screen.getScreenId()+" is null");
+					return "REFUSED";
+				}
+
+				return ipAddress;
 			}
-			
-			String ipAddress = screen.getIpAddress();
-			
-			if (ipAddress==null){
-				this.LOG.debug("IP address for screen: "+screen.getScreenId()+" is null");
-				return "REFUSED";
-			}
-			
-			return ipAddress;
-		}
 		}
 		catch (Exception e){
 			e.printStackTrace();
 			this.LOG.debug("Unknown Exception occured: "+e.getMessage());
 		}
-		
+
 		return "REFUSED";
 	}
 
@@ -172,18 +180,18 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 				this.currentlyUsedScreens.remove(location);
 			}
 		}
-		
+
 	}
 
 	@Override
 	public String[] getScreenLocations() {
 		return this.screenconfig.getLocations();
 	}
-	
+
 	public static void main(String[] args){
 		DisplayPortalServer server = new DisplayPortalServer();
 		server.initialiseServer();
-		
+
 	}
 
 	@Override
@@ -194,7 +202,7 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 				this.myServiceId = ServiceModelUtils.generateServiceResourceIdentifier(this.serverIdentity, this.getClass());
 
 			}
-			
+
 			if (this.myServiceId==null){
 				this.LOG.debug("ServiceID could not be retrieved");
 			}else{
@@ -234,8 +242,21 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 		serverIdentity = this.idMgr.getThisNetworkNode();
 	}
 
+	/**
+	 * @return the sessionFactory
+	 */
+	public SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+	/**
+	 * @param sessionFactory the services to sessionFactory
+	 */
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
 
-   /* public void setScreenDAO(IScreenDAO screenDAO) {
+
+	/* public void setScreenDAO(IScreenDAO screenDAO) {
         this.screenDAO = screenDAO;
     }
 

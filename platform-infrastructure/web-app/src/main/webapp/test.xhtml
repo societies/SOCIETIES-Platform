@@ -64,6 +64,13 @@
                              id="countLabel"/>
             </p:panel>
 
+            <p:panel>
+                <p:commandButton id="resetNotificationsController"
+                                 value="Reset Notifications Controller"
+                                 actionListener="#{notifications.clearNotifications()}"
+                                 process="@this"/>
+            </p:panel>
+
         </p:panelGrid>
 
 

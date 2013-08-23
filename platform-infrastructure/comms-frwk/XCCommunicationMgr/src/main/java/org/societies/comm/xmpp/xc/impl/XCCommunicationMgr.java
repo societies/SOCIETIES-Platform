@@ -164,8 +164,8 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 
     @Override
     protected IQ handleIQGet(IQ iq) {
-        if (log.isTraceEnabled())
-            log.trace("IQ GET received: " + iq.toXML());
+        if (log.isDebugEnabled())
+            log.debug("IQ GET received: " + iq.toXML());
         else if (log.isDebugEnabled()) {
             String msg = "IQ GET received: id=%s node=%s";
             log.debug(String.format(msg,
@@ -177,7 +177,9 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
         IQ response = helper.dispatchIQ(iq);
         response.setFrom(thisIdentity.getJid());
         // TODO mitja
-        log.info("Sending IQ response: " + response.toXML());
+
+        if (log.isDebugEnabled())
+            log.debug("Sending IQ response: " + response.toXML());
         return response;
     }
 
@@ -188,8 +190,8 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 
     @Override
     protected void handleIQResult(IQ iq) {
-        if (log.isTraceEnabled())
-            log.trace("IQ Result received: " + iq.toXML());
+        if (log.isDebugEnabled())
+            log.debug("IQ Result received: " + iq.toXML());
         else if (log.isDebugEnabled()) {
             String msg = "IQ Result received: id=%s node=%s";
             log.debug(String.format(msg,
@@ -209,13 +211,16 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
 
     @Override
     protected void handleMessage(Message message) {
-        log.info("Message received: " + message.toXML());
+        if (log.isDebugEnabled())
+            log.debug("Message received: " + message.toXML());
         helper.dispatchMessage(message);
     }
 
     @Override
     protected void handlePresence(Presence presence) {
-        log.info("Received presence: " + presence.toXML());
+        if (log.isDebugEnabled())
+            log.debug("Received presence: " + presence.toXML());
+
         try {
             IIdentity nodeIdentity = idm.fromJid(presence.getFrom().toString());
             if (nodeIdentity instanceof INetworkNode) {
@@ -227,15 +232,16 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
                 }
             }
         } catch (InvalidFormatException e) {
+            log.warn("Error handling presence", e);
             e.printStackTrace();
         }
 
         log.info("OtherNodes: " + Arrays.toString(otherNodes.toArray()));
     }
 
-	/*
+    /*
      * Implementation of CommunicationManager methods
-	 */
+     */
     @Override
     public void register(IFeatureServer fs) throws CommunicationException {
         helper.register(fs);
@@ -276,7 +282,10 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
         stanza.setFrom(thisIdentity);
         Type mType = Message.Type.valueOf(type);
         Message m = helper.sendMessage(stanza, mType, payload);
-        log.info("Sending message: " + m.toXML());
+
+        if (log.isDebugEnabled())
+            log.debug("Sending message: " + m.toXML());
+
         privacyLog(stanza, payload);
         this.send(m);
     }
@@ -287,7 +296,10 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
         checkConnectivity();
         stanza.setFrom(thisIdentity);
         Message m = helper.sendMessage(stanza, null, payload);
-        log.info("Sending message: " + m.toXML());
+
+        if (log.isDebugEnabled())
+            log.debug("Sending message: " + m.toXML());
+
         privacyLog(stanza, payload);
         this.send(m);
     }
@@ -299,8 +311,8 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
         stanza.setFrom(thisIdentity);
         IQ iq = helper.sendIQ(stanza, IQ.Type.get, payload, callback);
 
-        if (log.isTraceEnabled())
-            log.trace("Sending IQ: " + iq.toXML());
+        if (log.isDebugEnabled())
+            log.debug("Sending IQ: " + iq.toXML());
         else if (log.isDebugEnabled()) {
             String msg = "Sending IQ: id=%s node=%s";
             log.debug(String.format(msg,
@@ -319,8 +331,8 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
         stanza.setFrom(thisIdentity);
         IQ iq = helper.sendIQ(stanza, IQ.Type.set, payload, callback);
 
-        if (log.isTraceEnabled())
-            log.trace("Sending IQ: " + iq.toXML());
+        if (log.isDebugEnabled())
+            log.debug("Sending IQ: " + iq.toXML());
         else if (log.isDebugEnabled()) {
             String msg = "Sending IQ: id=%s node=%s";
             log.debug(String.format(msg,
@@ -394,25 +406,25 @@ public class XCCommunicationMgr extends AbstractComponent implements ICommManage
             return false;
     }
 
-	public IPrivacyLogAppender getPrivacyLog() {
-		return privacyLog;
-	}
+    public IPrivacyLogAppender getPrivacyLog() {
+        return privacyLog;
+    }
 
-	public void setPrivacyLog(IPrivacyLogAppender privacyLog) {
-		if (privacyLog!=null) {
-			this.privacyLog = privacyLog;
-			privacyLogEnabled = true;
-		}
-	}
-	
-	private void privacyLog(Stanza stanza, Object payload) {
-		if (privacyLogEnabled) {
-			try {
-				privacyLog.logCommsFw(stanza.getFrom(), stanza.getTo(), payload);
-			} catch (ServiceUnavailableException e) {
-				log.warn("Privacy Logger unavailable. Resuming without Privacy Logger...", e);
-				privacyLogEnabled = false;
-			}
-		}
-	}
+    public void setPrivacyLog(IPrivacyLogAppender privacyLog) {
+        if (privacyLog != null) {
+            this.privacyLog = privacyLog;
+            privacyLogEnabled = true;
+        }
+    }
+
+    private void privacyLog(Stanza stanza, Object payload) {
+        if (privacyLogEnabled) {
+            try {
+                privacyLog.logCommsFw(stanza.getFrom(), stanza.getTo(), payload);
+            } catch (ServiceUnavailableException e) {
+                log.warn("Privacy Logger unavailable. Resuming without Privacy Logger...", e);
+                privacyLogEnabled = false;
+            }
+        }
+    }
 }

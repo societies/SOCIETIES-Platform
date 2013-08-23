@@ -54,7 +54,7 @@ import org.springframework.osgi.service.ServiceUnavailableException;
  * Implementation of the {@link ITestDirectTrustPerformance} interface.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 2.0
+ * @since 1.2
  */
 public class TestDirectTrustPerformance implements ITestDirectTrustPerformance {
 
@@ -158,7 +158,7 @@ public class TestDirectTrustPerformance implements ITestDirectTrustPerformance {
 					return;
 				}
 				if (!trustEvidence.getObjectId().equals(updatedTrustRelationship.getTrusteeId())) {
-					this.fail("Expected trusteeId '" + myTeid + "' but was '"
+					this.fail("Expected trusteeId '" + trustEvidence.getObjectId() + "' but was '"
 							+ updatedTrustRelationship.getTrusteeId() + "'");
 					return;
 				}

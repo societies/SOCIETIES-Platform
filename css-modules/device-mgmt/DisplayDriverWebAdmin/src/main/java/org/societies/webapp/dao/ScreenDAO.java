@@ -28,23 +28,29 @@ package org.societies.webapp.dao;
 import java.util.List;
 
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
-
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.societies.webapp.model.Screens;
+import org.societies.webapp.model.Screen;
 
 public class ScreenDAO implements IScreenDAO{
 
     private final Logger log = LoggerFactory.getLogger(ScreenDAO.class);
+    private SessionFactory sessionFactory;
+    
+    public ScreenDAO(SessionFactory sessionFactory){
+    	this.sessionFactory=sessionFactory;
+    }
+
 
 
     @Override
-    public void save(Screens screen) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+    public void save(Screen screen) {
+        Session session = sessionFactory.openSession();
         Transaction transaction = null;
         try {
             transaction = session.beginTransaction();
@@ -59,13 +65,12 @@ public class ScreenDAO implements IScreenDAO{
     }
 
     @Override
-    public void update(Screens screen) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void update(Screen screen) {
     }
 
     @Override
-    public void deleteScreens(Screens screen) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+    public void deleteScreens(Screen screen) {
+        Session session = sessionFactory.openSession();
         Transaction transaction = null;
         try {
             transaction = session.beginTransaction();
@@ -82,14 +87,14 @@ public class ScreenDAO implements IScreenDAO{
     }
 
     @Override
-    public List getAllScreens() {
+    public List<Screen> getAllScreens() {
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Session session = sessionFactory.openSession();
         Transaction transaction = null;
-        List screens = null;
+        List<Screen> screens = null;
         try {
             transaction = session.beginTransaction();
-            screens = session.createQuery(" from  " + Screens.class.getName()).list();
+            screens = session.createQuery(" from  " + Screen.class.getName()).list();
              transaction.commit();
         } catch (HibernateException e){
             transaction.rollback();
