@@ -35,7 +35,7 @@ import org.societies.webapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-
+import javax.servlet.http.HttpSession;
 import java.lang.reflect.Field;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -43,8 +43,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
@@ -68,6 +70,7 @@ import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
+import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.cis.management.ICisRemote;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxAttributeTypes;
@@ -76,6 +79,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
+import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
@@ -90,6 +94,8 @@ import org.societies.api.schema.cis.community.Criteria;
 import org.societies.api.schema.cis.community.JoinResponse;
 import org.societies.api.schema.cis.community.LeaveResponse;
 import org.societies.api.schema.cis.community.MembershipCrit;
+import org.societies.api.schema.cis.community.Participant;
+import org.societies.api.schema.cis.community.WhoResponse;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
@@ -97,6 +103,7 @@ import org.societies.api.schema.cssmanagement.CssManagerResultActivities;
 import org.societies.api.schema.cssmanagement.CssRequest;
 import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.cis.directory.client.CisDirectoryRemoteClient;
 import org.societies.cis.mgmtClient.CisManagerClient;
 
@@ -113,6 +120,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 import org.societies.webapp.service.UserService;
+import org.societies.webapp.models.WebAppParticipant;
 
 
 @Controller
@@ -135,10 +143,24 @@ public class CISController extends BasePageController{
 	
 	@Autowired
 	private ICisManager cisManager;
-	//@Autowired
+	
+	@Autowired
+	@ManagedProperty(value = "#{commMngrRef}")
 	private ICommManager commMngrRef;
 	
 	private IActivityFeed actFeed;
+	
+	
+	@Autowired
+	@ManagedProperty(value = "#{ciscallback}")
+	private ICisManagerCallback ciscallback;
+	
+	public ICisManagerCallback getCiscallback() {
+		return ciscallback;
+	}
+	public void setCiscallback(ICisManagerCallback ciscallback) {
+		this.ciscallback = ciscallback;
+	}
 		
 	@Autowired
 	private ICisDirectoryRemote cisDirectoryRemote;
@@ -168,8 +190,14 @@ public class CISController extends BasePageController{
 		this.cisdesc = cisdesc;
 	}
 
+	List<Participant> m_remoteMemberRecords = new ArrayList<Participant>();
+	
 	private String cistype;
 	private String cisdesc;
+	//for the callback
+	private String resultCallback;
+	private Community remoteCommunity;
+	private HttpSession m_session;
 	
 	// AUTOWIRING GETTERS AND SETTERS
 		public ICisManager getCisManager() {
@@ -277,35 +305,37 @@ public class CISController extends BasePageController{
 		List<CisInfo> cisinfoList = new ArrayList<CisInfo>();
 		List<ICis> cisList = new ArrayList<ICis>();
 		cisList = this.cisManager.getCisList();
-		log.info("commList contains " +cisList);
+		log.info("cisList size is " +cisList.size());
+		log.info("cisList contains " +cisList);
 		
 		getcisDirectory().findAllCisAdvertisementRecords(callback);
 		List<CisAdvertisementRecord> adverts = callback.getResultList();
 		
-		for ( int i = 0; i < cisList.size(); i++)
-		{
-			//find ad for this id
-			boolean bFound = false;
-			int j = 0;
-			do
-			{
-				if (adverts.get(j).getId().contains(cisList.get(i).getCisId()))
-						bFound = true;
-				else
-					j++;
-			} while ((bFound == false) && (j < adverts.size()));
-			
-			if (!bFound)
-			{
-				CisInfo cisInfo = new CisInfo();
-				cisInfo.setCisid(cisList.get(i).getCisId());
-				cisInfo.setCisname(adverts.get(j).getName());
-				cisinfoList.add(cisInfo);
-			}
-			
+
+		List<String> listIds = new ArrayList<String>();
+		for(int i = 0; i < cisList.size(); i++){
+			listIds.add(cisList.get(i).getCisId());
+		}
+		
+		for (CisAdvertisementRecord cisAdd : adverts){
+
+			log.info(" @@@@@@@@@ listIds contains : " +listIds);
+				if (listIds.contains(cisAdd.getId())){
+					log.info("Already a member of CIS not adding it");
+				}else {
+					CisInfo cisInfo = new CisInfo();
+					cisInfo.setCisid(cisAdd.getId());
+					cisInfo.setCisname(cisAdd.getName());
+					cisinfoList.add(cisInfo);
+					log.info("===== adding cisid " +cisInfo.getCisid() +" and name " +cisInfo.getCisname());
+					log.info("===== cisinfoList size is " +cisinfoList.size());
+					//cisinfoList.add((cisAdd.getId()));
+				}
 		}
 		
 		
+		log.info("cisinfoList size is " +cisinfoList.size());
+		log.info("cisinfoList contains " +cisinfoList);
 		
 		//return adverts;
 		return cisinfoList;
@@ -387,9 +417,10 @@ public class CISController extends BasePageController{
 			int j = 0;
 			do
 			{
-				if (adverts.get(j).getId().contains(cisList.get(i).getCisId()))
+				
+				if (adverts.get(j).getId().contains(cisList.get(i).getCisId())){
 						bFound = true;
-				else
+				}else
 					j++;
 			} while ((bFound == false) && (j < adverts.size()));
 			
@@ -403,38 +434,230 @@ public class CISController extends BasePageController{
 			
 		}
 		
-			
+		log.info("cisinfoList contains " +cisinfoList);	
 		return cisinfoList;
 		
 		
 	}
 	
-	public void joincis(CisAdvertisementRecord adv){
+	public void joincis(CisInfo adv){
 		
 		log.info("JoinCIS method called");
-		log.info("JoinCIS method called CIS ID " +adv.getId());
+		log.info("JoinCIS method called CIS ID " +adv.getCisid());
+		
+		CisDirectoryRemoteClient callback = new CisDirectoryRemoteClient();
+		
+		cisDirectory.searchByID(adv.getCisid(), callback);
+		List<CisAdvertisementRecord> adverts = callback.getResultList();
+		log.info("callback.getResultList() size is " +adverts.size());
+		log.info("callback.getResultList() is " +adverts);
+		
 		CisManagerClient joinCallback = new CisManagerClient();
 		log.info("CisManagerClient joinCallback is " +joinCallback);
 		log.info("cisManager instance is " +cisManager);
-		cisManager.joinRemoteCIS(adv, joinCallback);
+		cisManager.joinRemoteCIS(adverts.get(0), joinCallback);
 		log.info("and we're back :( ");
 		
 	}
 	
-	public void leavecis(CisAdvertisementRecord adv){
+	public void leavecis(CisInfo adv){
 		
 		log.info("leaveCIS method called");
-		log.info("leaveCIS method called CIS ID " +adv.getId());
+		log.info("leaveCIS method called CIS ID " +adv.getCisid());
 		CisManagerClient leaveCallback = new CisManagerClient();
 		log.info("CisManagerClient joinCallback is " +leaveCallback);
-		String CISID = adv.getId();
+		String CISID = adv.getCisid();
+		
+		
 		
 		cisManager.leaveRemoteCIS(CISID, leaveCallback);
 		
 		
 	}
 	
+	public List<String> getsuggestedlistmembers(CisInfo adv){
+		List<String> suggestedMembers = new ArrayList<String>();
+		String placeholder = "placeholder";
+		String Id = adv.getCisid();
+		IIdentity cisID = null;
+		
+		try {
+		cisID = getCommMngrRef().getIdManager().fromJid(Id);
+		log.info("cisID is : " +cisID);
+		} catch (InvalidFormatException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		}
 	
+	List<ICis> cisList = getCisManager().getCisList();
+	log.info("cisList size :" +cisList.size());
+	
+	CommunityMethods methods = new CommunityMethods();
+	WhoResponse who = new WhoResponse();
+	who.getParticipant();
 	
 
+	methods.setWhoResponse(who);
+	
+	ICisManagerCallback callback = this.getCiscallback();
+	Requestor requestor = new Requestor(cisID);
+	
+	cisManager.getListOfMembers(requestor, cisID, callback);
+	
+	ServiceResourceIdentifier myServiceID = new ServiceResourceIdentifier();
+	RequestorService service = new RequestorService(cisID, myServiceID);
+	
+	cisManager.getListOfMembers(requestor , cisID, callback);
+	//callback.receiveResult(methods);
+	
+	
+		
+		
+		
+		
+		suggestedMembers.add(placeholder);
+		
+		
+		return suggestedMembers;
+	}
+	
+	public List<String> getmembers(CisInfo adv){
+		log.info("getmembers method called");
+		log.info("CisAdvertisementRecord is: " +adv.getCisid());
+		String Id = adv.getCisid();
+		IIdentity cisID = null;
+		log.info("Id is: " +Id);
+		List<String> remotemembers = new ArrayList<String>();
+		List<WebAppParticipant> membersDetails = new ArrayList<WebAppParticipant>();
+		ICisOwned thisCis = null;
+		List<ICisOwned> ownedCISs = this.getCisManager().getListOfOwnedCis();
+		log.info("ownedCISs size: " +ownedCISs.size());
+		
+		if (ownedCISs.size() > 0) 
+		{
+			
+			Iterator<ICisOwned> it = ownedCISs.iterator();
+
+			while(it.hasNext() && thisCis == null)
+			{
+				ICisOwned element = it.next();
+				if (element.getCisId().equalsIgnoreCase(Id)) 
+				{
+					thisCis = element;
+					
+				}
+			}
+		}
+		
+		if(thisCis == null)
+		{
+			
+			// "thisCIS is null";
+			//NOT LOCAL CIS, SO CALL REMOTE
+			ICis remoteCIS = this.getCisManager().getCis(Id);
+			if (remoteCIS != null) 
+			{
+				Requestor req = new Requestor(this.commMngrRef.getIdManager().getThisNetworkNode());
+				remoteCIS.getListOfMembers(req, icall);
+				
+				
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				if (m_remoteMemberRecords != null)
+				{
+					for ( int memberIndex  = 0; memberIndex < m_remoteMemberRecords.size(); memberIndex++)
+					{
+						WebAppParticipant memberDetail = new WebAppParticipant();
+						
+						memberDetail.setMembersJid(m_remoteMemberRecords.get(memberIndex).getJid());
+						memberDetail.setMembershipType(m_remoteMemberRecords.get(memberIndex).getRole());
+						log.info("membersDetail jid is: " +memberDetail.getMembersJid());
+						log.info("membersDetail type is: " +memberDetail.getMembershipType());
+						
+						membersDetails.add(memberDetail);
+						remotemembers.add(m_remoteMemberRecords.get(memberIndex).getJid());
+						
+					}
+				}
+				
+			}
+		
+		} else {
+			Set<ICisParticipant> records = thisCis.getMemberList();
+			List<String> localmembersDetails = new ArrayList<String>();
+			log.info("else Participant records size is: " +records.size());
+			
+//			CisDirectoryRemoteClient callback = new CisDirectoryRemoteClient();
+//			getcisDirectory().findAllCisAdvertisementRecords(callback);
+//			List<CisAdvertisementRecord> adverts = callback.getResultList();
+		    
+		    for (ICisParticipant s : records) {
+	            log.info("else Participant jid is: " +s.getMembersJid());
+	    	    localmembersDetails.add(s.getMembersJid());
+	            }
+			
+			
+			return localmembersDetails;
+			//return null;
+			
+		}
+		log.info("membersDetails: " +Id);
+		return remotemembers;
+	}
+	
+
+	
+	WebAppCISCallback icall = new WebAppCISCallback();//this.userFeedback);
+	
+	public class WebAppCISCallback implements ICisManagerCallback{
+		public WebAppCISCallback(){
+			super();
+			
+		}
+		
+		
+		public void receiveResult(CommunityMethods communityResultObject) {
+			if(communityResultObject == null){
+				resultCallback = "Failure getting result from remote node!";
+			}
+			else {
+				if(communityResultObject.getJoinResponse() != null){
+					if(communityResultObject.getJoinResponse().isResult()){
+						
+						if(null != communityResultObject.getJoinResponse().getCommunity()  && null != communityResultObject.getJoinResponse().getCommunity().getCommunityJid()
+								&& communityResultObject.getJoinResponse().getCommunity().getCommunityJid().isEmpty() == false){							
+							String community = communityResultObject.getJoinResponse().getCommunity().getCommunityJid(); 
+							log.info("callback for join regarindg community " + community);
+							//this.userFeedback.showNotification("Joined CIS: " + community);
+							resultCallback = "Joined CIS " + community;
+							remoteCommunity = communityResultObject.getJoinResponse().getCommunity();
+							m_session.setAttribute("community", remoteCommunity);
+							log.info("done at join response");
+						}
+						else{
+							resultCallback = "Joined CIS work but community xsd was bogus ";
+						}
+					}else{
+						resultCallback = "Failure when trying to joined CIS: " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid();
+						//this.userFeedback.showNotification("failed to join " + communityResultObject.getJoinResponse().getCommunity().getCommunityJid());
+					}
+
+				}
+				if(communityResultObject.getWhoResponse() != null){
+					log.info("### " + communityResultObject.getWhoResponse().getParticipant().size());
+
+					//m_session.setAttribute("community", remoteCommunity);
+					m_remoteMemberRecords = communityResultObject.getWhoResponse().getParticipant();					
+					//m_session.setAttribute("remoteMemberRecords", m_remoteMemberRecords);
+				}
+
+			}
+		}
+	}
+		
 }
