@@ -198,8 +198,18 @@ public class UACommsServer implements IFeatureServer {
 //                break;
             case OUTSTANDING:
                 userFeedbackBeans = feedback.listIncompleteFeedbackBeans();
-                userFeedbackPrivacyNegotiationEvents = feedback.listIncompletePrivacyRequests();
-                userFeedbackAccessControlEvents = feedback.listIncompleteAccessRequests();
+                try {
+                    userFeedbackPrivacyNegotiationEvents = feedback.listIncompletePrivacyRequests();
+                } catch (Exception ex) {
+                    log.warn("Error loading PPNs from repository", ex);
+                    userFeedbackPrivacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>();
+                }
+                try {
+                    userFeedbackAccessControlEvents = feedback.listIncompleteAccessRequests();
+                } catch (Exception ex) {
+                    log.warn("Error loading ACs from repository", ex);
+                    userFeedbackAccessControlEvents = new ArrayList<UserFeedbackAccessControlEvent>();
+                }
                 break;
             default:
                 log.warn("Invalid requestBean.requestType: " + requestBean.getRequestType().name());
