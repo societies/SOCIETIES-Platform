@@ -476,7 +476,9 @@ public class CISController extends BasePageController{
 	}
 	
 	public List<String> getsuggestedlistmembers(CisInfo adv){
+		log.info("getsuggestedlistmembers method called");
 		List<String> suggestedMembers = new ArrayList<String>();
+		List<WebAppParticipant> membersDetails = new ArrayList<WebAppParticipant>();
 		String placeholder = "placeholder";
 		String Id = adv.getCisid();
 		IIdentity cisID = null;
@@ -489,34 +491,32 @@ public class CISController extends BasePageController{
 		e.printStackTrace();
 		}
 	
-	List<ICis> cisList = getCisManager().getCisList();
-	log.info("cisList size :" +cisList.size());
-	
-	CommunityMethods methods = new CommunityMethods();
-	WhoResponse who = new WhoResponse();
-	who.getParticipant();
-	
-
-	methods.setWhoResponse(who);
-	
-	ICisManagerCallback callback = this.getCiscallback();
+//	List<ICis> cisList = getCisManager().getCisList();
+//	log.info("cisList size :" +cisList.size());
 	Requestor requestor = new Requestor(cisID);
-	
-	cisManager.getListOfMembers(requestor, cisID, callback);
 	
 	ServiceResourceIdentifier myServiceID = new ServiceResourceIdentifier();
 	RequestorService service = new RequestorService(cisID, myServiceID);
 	
-	cisManager.getListOfMembers(requestor , cisID, callback);
-	//callback.receiveResult(methods);
-	
-	
+	cisManager.getListOfMembers(requestor , cisID, icall);
 		
-		
-		
-		
-		suggestedMembers.add(placeholder);
-		
+	if (m_remoteMemberRecords != null)
+	{
+		for ( int memberIndex  = 0; memberIndex < m_remoteMemberRecords.size(); memberIndex++)
+		{
+			WebAppParticipant memberDetail = new WebAppParticipant();
+			
+			memberDetail.setMembersJid(m_remoteMemberRecords.get(memberIndex).getJid());
+			memberDetail.setMembershipType(m_remoteMemberRecords.get(memberIndex).getRole());
+			log.info("membersDetail jid is: " +memberDetail.getMembersJid());
+			log.info("membersDetail type is: " +memberDetail.getMembershipType());
+			
+			membersDetails.add(memberDetail);
+			suggestedMembers.add(m_remoteMemberRecords.get(memberIndex).getJid());
+			
+		}
+	}	
+	log.info(" >>>>>>>>>> suggestedMembers size is: " +suggestedMembers.size());
 		
 		return suggestedMembers;
 	}
