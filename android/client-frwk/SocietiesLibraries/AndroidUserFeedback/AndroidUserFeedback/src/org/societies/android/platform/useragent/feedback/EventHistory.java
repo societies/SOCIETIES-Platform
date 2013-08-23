@@ -15,10 +15,10 @@ import org.societies.android.platform.useragent.feedback.guis.NotificationHistor
 import org.societies.android.platform.useragent.feedback.model.NotificationHistoryItem;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.schema.useragent.feedback.HistoryRequestType;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackHistoryRequest;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
-import org.societies.api.schema.useragent.feedback.HistoryRequestType;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
-import org.societies.api.schema.useragent.feedback.UserFeedbackHistoryRequest;
 
 import java.util.*;
 
@@ -200,7 +200,7 @@ public class EventHistory extends Service {
         public void receiveError(Stanza stanza, XMPPError error) {
             Log.d(LOG_TAG, String.format("receiveError() \nStanza=%s\nerror=%s",
                     stanza != null ? stanza.toString() : "null",
-                    error != null ? error.toString() : "null"));
+                    error != null ? error.getStanzaErrorString() : "null"));
 
         }
 
@@ -241,9 +241,11 @@ public class EventHistory extends Service {
             Arrays.asList("userFeedbackHistoryRequest"));
 
     public static final List<String> NAMESPACES = Collections.unmodifiableList(
-            Arrays.asList("http://societies.org/api/schema/useragent/feedback"));
+            Arrays.asList("http://societies.org/api/schema/useragent/feedback",
+                    "http://societies.org/api/internal/schema/useragent/feedback"));
     public static final List<String> PACKAGES = Collections.unmodifiableList(
-            Arrays.asList("org.societies.api.schema.useragent.feedback"));
+            Arrays.asList("org.societies.api.schema.useragent.feedback",
+                    "org.societies.api.internal.schema.useragent.feedback"));
 
     // Binder given to clients
     private final IBinder serviceBinder = new LocalBinder();
