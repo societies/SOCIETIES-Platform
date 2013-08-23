@@ -306,7 +306,6 @@
 					<instructions>
 						<!-- <Bundle-Activator>org.societies.comm.common.CommonLibraryActivator</Bundle-Activator> -->
 						<Import-Package>
-                            org.apache.log4j,
 							org.osgi.framework,
 							!com.sun.*,
 							!org.gjt.*,!org.jaxen.*,!org.mortbay.*,
