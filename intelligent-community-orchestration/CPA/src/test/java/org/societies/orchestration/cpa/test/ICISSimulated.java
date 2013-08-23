@@ -42,6 +42,7 @@ import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.identity.RequestorBean;
 
 import org.societies.api.identity.Requestor;
 
@@ -92,6 +93,12 @@ public class ICISSimulated implements ICisOwned {
 
 	}
     
+    @Override
+    public void getInfo(RequestorBean req,ICisManagerCallback callback){
+		// TODO Auto-generated method stub
+
+	}
+    
 
 	@Override
 	public void getListOfMembers(Requestor requestor, ICisManagerCallback callback) {
@@ -99,6 +106,12 @@ public class ICISSimulated implements ICisOwned {
 
 	}
 
+	@Override
+	public void getListOfMembers(RequestorBean requestor, ICisManagerCallback callback) {
+		// TODO Auto-generated method stub
+
+	}
+	
 	@Override
 	public void setInfo(Community c, ICisManagerCallback callback) {
 		// TODO Auto-generated method stub

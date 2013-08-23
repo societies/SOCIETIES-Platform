@@ -25,6 +25,7 @@
 package org.societies.api.cis.management;
 
 import org.societies.api.identity.Requestor;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.utilities.annotations.SocietiesExternalInterface;
 import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesInterfaceType;
 
@@ -39,6 +40,15 @@ import org.societies.utilities.annotations.SocietiesExternalInterface.SocietiesI
 public interface ICisRemote {
 	
 	/**
+	 * same as the one below but using the Requestor object instead of RequestorBean
+	 * 
+	 * @param {@link Requestor} requestor object identifying if the user is 
+	 * @param callback callback function
+	 */
+	@Deprecated
+    public void getInfo(Requestor req,ICisManagerCallback callback);
+    
+	/**
 	 * Get info from a CIS.
 	 * The callback must be able to retrieve a community object
 	 * defined at org.societies.api.schema.cis.community 
@@ -47,7 +57,16 @@ public interface ICisRemote {
 	 * @param {@link Requestor} requestor object identifying if the user is
 	 * @param callback callback function
 	 */
-    public void getInfo(Requestor req,ICisManagerCallback callback);
+    public void getInfo(RequestorBean req,ICisManagerCallback callback);
+    
+	/**
+	 * same as the one below but using the Requestor object instead of RequestorBean
+	 * 
+	 * @param {@link Requestor} requestor object identifying if the user is 
+	 * @param callback callback function
+	 */
+    @Deprecated
+    public void getListOfMembers(Requestor req, ICisManagerCallback callback);
     
 	/**
 	 * Get list of members from a CIS.
@@ -55,9 +74,9 @@ public interface ICisRemote {
 	 * defined at org.societies.api.schema.cis.community 
 	 * which will have a Who with a list of Participant objects
 	 * 
-	 * @param {@link Requestor} requestor object identifying if the user is 
+	 * @param {@link RequestorBean} requestor object identifying if the user is 
 	 * @param callback callback function
 	 */
-    public void getListOfMembers(Requestor req, ICisManagerCallback callback);
+    public void getListOfMembers(RequestorBean req, ICisManagerCallback callback);
 
 }
