@@ -10,7 +10,7 @@ public class SimpleNotificationPopup extends UserFeedbackPopup {
                 R.id.simpleNotificationProposalText,
                 R.id.simpleNotificationAcceptButton,
                 UserFeedbackPopup.NOT_APPLICABLE,
-                IAndroidSocietiesEvents.UF_IMPLICIT_RESPONSE_INTENT);
+                IAndroidSocietiesEvents.UF_EXPLICIT_RESPONSE_INTENT);
     }
 
     @Override
