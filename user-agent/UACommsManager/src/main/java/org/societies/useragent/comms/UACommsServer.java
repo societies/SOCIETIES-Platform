@@ -187,7 +187,12 @@ public class UACommsServer implements IFeatureServer {
 
         switch (requestBean.getRequestType()) {
             case BY_COUNT:
-                userFeedbackBeans = feedback.listStoredFeedbackBeans(requestBean.getHowMany());
+                try {
+                    userFeedbackBeans = feedback.listStoredFeedbackBeans(requestBean.getHowMany());
+                } catch (Exception ex) {
+                    log.warn("Error loading UF beans from repository", ex);
+                    userFeedbackBeans = new ArrayList<UserFeedbackBean>();
+                }
                 userFeedbackPrivacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>(); // TODO: fill this list
                 userFeedbackAccessControlEvents = new ArrayList<UserFeedbackAccessControlEvent>(); // TODO: fill this list
                 break;
@@ -197,7 +202,12 @@ public class UACommsServer implements IFeatureServer {
 //                userFeedbackAccessControlEvents = new ArrayList<UserFeedbackAccessControlEvent>(); // TODO: fill this list
 //                break;
             case OUTSTANDING:
-                userFeedbackBeans = feedback.listIncompleteFeedbackBeans();
+                try {
+                    userFeedbackBeans = feedback.listIncompleteFeedbackBeans();
+                } catch (Exception ex) {
+                    log.warn("Error loading UF beans from repository", ex);
+                    userFeedbackBeans = new ArrayList<UserFeedbackBean>();
+                }
                 try {
                     userFeedbackPrivacyNegotiationEvents = feedback.listIncompletePrivacyRequests();
                 } catch (Exception ex) {
