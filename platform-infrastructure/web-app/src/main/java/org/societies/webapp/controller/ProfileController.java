@@ -30,6 +30,7 @@ import java.util.concurrent.Future;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
 
 import org.societies.api.internal.css.ICSSInternalManager;
 import org.societies.api.schema.cssmanagement.CssInterfaceResult;
@@ -59,13 +60,13 @@ public class ProfileController extends BasePageController{
 	}
 	
 	
-	private String name;
-	public String getName() {
-		return name;
+	
+	public String getFullname() {
+		return Fullname;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setFullname(String name) {
+		Fullname = name;
 	}
 
 	public String getId() {
@@ -125,20 +126,21 @@ public class ProfileController extends BasePageController{
 	}
 
 
-	private static String Id;
-	private static String email;
-	private static int sex;
-	private static String homelocation;
-	private static String workplace;
-	private static String position;
-	private static int entity;
+	private String Fullname;
+	private String Id;
+	private String email;
+	private int sex;
+	private String homelocation;
+	private String workplace;
+	private String position;
+	private int entity;
         
         public CssRecord getrecord(){
         	
         	log.info("ProfileController getrecord called");
         	
         	CssRecord record = new CssRecord();
-        	String forename = null;
+        	//String forename = null;
         	
         	Future<CssInterfaceResult> futurerecord = cssLocalManager.getCssRecord();
         	try {
@@ -150,8 +152,17 @@ public class ProfileController extends BasePageController{
     			// TODO Auto-generated catch block
     			e.printStackTrace();
     		}
-    		forename = record.getName();
-    		log.info("ProfileController getName returns forename:" +forename);
+    		//forename = record.getName();
+        	
+        	Fullname = record.getName();
+        	email = record.getEmailID();
+        	sex = record.getSex();
+        	homelocation = record.getHomeLocation();
+        	workplace = record.getWorkplace();
+        	position = record.getPosition();
+        	entity = record.getEntity();
+        	
+    		log.info("ProfileController getName returns :" +Fullname);
     		return record;
         	
         }
@@ -161,12 +172,14 @@ public class ProfileController extends BasePageController{
      	log.info("ProfileController modifyRecord called");
      	
      	CssRecord record = new CssRecord();
-     	record.setCssIdentity(Id);
-     	record.setName(name);
-     	record.setEmailID(email);
-     	record.setPosition(position);
-     	record.setHomeLocation(homelocation);
-     	record.setWorkplace(workplace);
+     	record.setCssIdentity(this.getId());
+     	log.info("Setting Record Name with : " +Fullname);
+     	record.setName(Fullname); //.setName(this.getFullname());
+     	log.info("Record Name contains : " +record.getName());
+     	record.setEmailID(this.getEmail());
+     	record.setPosition(this.getPosition());
+     	record.setHomeLocation(this.getHomelocation());
+     	record.setWorkplace(this.getWorkplace());
      	record.setSex(sex);
      	record.setEntity(entity);
      	

@@ -87,6 +87,14 @@
                 <li> Community type: <h:inputText value="#{cismanager.cistype}" /></li>
 
                 <li> Description: <h:inputText value="#{cismanager.cisdesc}" /></li>
+                
+                <li> Privacy Policy:  &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;
+                    				<h:selectOneMenu value="#{cismanager.privacypolicy}">
+                    					<f:selectItem itemValue= "0" itemLabel="Private"/>
+	                                    <f:selectItem itemValue= "1" itemLabel="Members Only"/>
+	                                    <f:selectItem itemValue= "1" itemLabel="Public"/>
+	                                </h:selectOneMenu>
+                    </li>
 
                 <li class="clearfix">
                     <label for="">Criteira</label>
@@ -127,49 +135,7 @@
 
                 </li>
                 <li class="clearfix">
-                    <!--
-                    <label for="">Choose an option</label>
-                    <div class="select-wrapper">
-                    <select name="select" required>
-                    <option value="1">Value 1</option>
-                    <option value="2">Value 2</option>
-                    <option value="3">Value 3</option>
-                    <option value="4">Value 4</option>
-                    </select>
-                    </div>
-                    <div class="clear"></div>
-                    <p id="option" class="error">Please, select an option</p>
-                    </li>
-                    <li class="clearfix">
-                    <label for="">Choose opt</label>
-                    <div class="option-group radio">
-                    <input type="radio" name="" id="radio1" />
-                    <label for="radio1">Option 1</label>
-                    <input type="radio" name="" id="radio2" />
-                    <label for="radio2">Option 2</label>
-                    <input type="radio" name="" id="radio3" />
-                    <label for="radio3">Option 3</label>
-                    </div>
-                    <div class="clear"></div>
-                    <p id="option" class="error">Please, select an option</p>
-                    </li>
-
-                    <li class="clearfix">
-                    <label for="option">Choose check </label>
-                    <div class="option-group check">
-                    <input type="checkbox" name="" id="check1" />
-                    <label for="check1">Check 1</label>
-                    <input type="checkbox" name="" id="check2" />
-                    <label for="check2">Check 2</label>
-                    <input type="checkbox" name="" id="check3" />
-                    <label for="check3">Check 3</label>
-                    </div>
-                    <div class="clear"></div>
-                    <p id="option" class="error">Please, select an option</p>
-                    </li>
-                    <li class="clearfix">
-                    <p class="success">Thank you! Success Message here.</p>
-                    <p class="error">Sorry, an error has occured. Please try again later.</p>	-->
+                    
                     <div>
                         <p:commandButton value="Create Community" action="#{cismanager.createcommunity()}"/>
                     </div>
@@ -184,35 +150,6 @@
 <aside id="sidebar_right" class="grid_4">
     <div class="sidebar_top_BG"></div>
     <div class="hr dotted clearfix"></div>
-    <!-- <section>
-    <header>
-    <h3>Other Communities...</h3>
-    </header>
-    <ul class="sidebar">
-    <li><a href="">Community name</a></li>
-    <li><a href="">Community name</a></li>
-    <li><a href="">Community name</a></li>
-    <li><a href="">Community name</a></li>
-    <li><a href="">Community name</a></li>
-    </ul>
-    </section>
-    <section>
-    <header>
-    <h3>Other Activity</h3>
-    </header>
-    <div class="hr dotted clearfix"></div>
-    <ul class="contact_data">
-    <li><figure class="gravatar">
-    <img alt="" src="images/webcommunity_pic_sample1.jpg" height="48" width="48" />
-    </figure><strong>Community Name</strong> dolor sit amet, consectetur adipiscing elit. Ipsum dolor sit amet, elit.</li>
-    </ul>
-    <ul class="contact_data">
-    <li>Other Link - <a href="#">Link 1</a></li>
-    <li>Other Link - <a href="#">Link 2</a></li>
-    <li>Other Link - <a href="#">Link 3</a></li>
-    </ul>
-    </section>
-    -->
     <div class="hr dotted clearfix"></div>
     <div class="sidebar_bottom_BG"></div>
 </aside>

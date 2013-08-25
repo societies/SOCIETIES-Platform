@@ -24,30 +24,27 @@
                 <h4 class="form_title">Profile Settings for <h:outputText value="#{loginController.username}"/></h4>
 
                 <ul>
-                    <li>Name: &#160; &#160; &#160; &#160; &#160; &#160; <h:inputText value="#{profile.record.name}"/></li>
-                    <li>Identity: &#160; &#160; &#160; &#160; &#160; <h:inputText value="#{loginController.identity.jid}"/></li>
-                    <li>E-mail: &#160; &#160; &#160; &#160; &#160; &#160; <h:inputText value="#{profile.record.emailID}"/></li>
+                    
+                    <li>Identity: &#160; &#160; &#160; &#160; &#160; <h:inputText value="#{profile.record.cssIdentity}"/></li>
+                    <li>Name: &#160; &#160; &#160; &#160; &#160; &#160; <h:inputText value="#{profile.fullname}"/></li>
+                    <li>E-mail: &#160; &#160; &#160; &#160; &#160; &#160; <h:inputText value="#{profile.email}"/></li>
                     <li>Sex: &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; 
-                    				<h:selectOneMenu value="#{profile.record.sex}">
+                    				<h:selectOneMenu value="#{profile.sex}">
 	                    				<f:selectItem itemValue= "0" itemLabel="Male"/>
 	                                    <f:selectItem itemValue= "1" itemLabel="Female"/>
 	                                    <f:selectItem itemValue= "2" itemLabel="Undefined"/>
                                     </h:selectOneMenu></li>
-                    <li>Home Location: <h:inputText value="#{profile.record.homeLocation}"/></li>
-                    <li>Workplace: &#160; &#160; &#160; &#160;<h:inputText value="#{profile.record.workplace}"/></li>
-                    <li>Position: &#160; &#160; &#160; &#160; &#160; &#160;<h:inputText value="#{profile.record.position}"/></li>
+                    <li>Home Location: <h:inputText value="#{profile.homelocation}"/></li>
+                    <li>Workplace: &#160; &#160; &#160; &#160;<h:inputText value="#{profile.workplace}"/></li>
+                    <li>Position: &#160; &#160; &#160; &#160; &#160; &#160;<h:inputText value="#{profile.position}"/></li>
                     <li>Entity:  &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;
-                    				<h:selectOneMenu value="#{profile.record.entity}">
+                    				<h:selectOneMenu value="#{profile.entity}">
                     					<f:selectItem itemValue= "0" itemLabel="Person"/>
 	                                    <f:selectItem itemValue= "1" itemLabel="Organisation"/>
 	                                </h:selectOneMenu>
-                    </li>
+                    </li>  
                     <p:commandButton value="Save" action="#{profile.modifyrecord()}"></p:commandButton>
                 </ul>
-
-                <div class="hr dotted clearfix"></div>
-                 <p:commandButton value="Save1" action="#{profile.modifyrecord()}"></p:commandButton>
-
 
             </section>
         </section>

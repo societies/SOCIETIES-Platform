@@ -189,11 +189,22 @@ public class CISController extends BasePageController{
 	public void setCisdesc(String cisdesc) {
 		this.cisdesc = cisdesc;
 	}
+	
+	
 
 	List<Participant> m_remoteMemberRecords = new ArrayList<Participant>();
 	
 	private String cistype;
 	private String cisdesc;
+	private int privacypolicy;
+	
+	public int getPrivacypolicy() {
+		return privacypolicy;
+	}
+	public void setPrivacypolicy(int privacypolicy) {
+		this.privacypolicy = privacypolicy;
+	}
+
 	//for the callback
 	private String resultCallback;
 	private Community remoteCommunity;
