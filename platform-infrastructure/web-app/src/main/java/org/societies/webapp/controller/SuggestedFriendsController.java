@@ -45,13 +45,23 @@ public class SuggestedFriendsController extends BasePageController{
 	private List<CssAdvertisementRecordDetailed> snsFriendes;
 	private List<CssAdvertisementRecord> otherFriends;
 	private List<CssAdvertisementRecordDetailed> otherFriendes;
+	private List<CssAdvertisementRecord> search;
 	
 	private Future<List<CssRequest>> asynchFR;
 	
 	private List<MarshaledActivity> activities;
 	private List<CssAdvertisementRecord> friends;
 	private String friendid;
+	private static String findfriend;
 		
+	public String getFindfriend() {
+		return findfriend;
+	}
+
+	public void setFindfriend(String findfriend) {
+		this.findfriend = findfriend;
+	}
+
 	private static String filterstring = "None";
 
 
@@ -460,6 +470,38 @@ public class SuggestedFriendsController extends BasePageController{
 		
 		SuggestedFriendsController.filterstring = filters;
 		
+		
+	}
+	
+	public List<CssAdvertisementRecord> search(String name){
+		log.info("SuggestedFriendsController Search method called ");
+		List<CssAdvertisementRecord> cssadverts = new ArrayList<CssAdvertisementRecord>();
+		List<CssAdvertisementRecord> result = new ArrayList<CssAdvertisementRecord>();
+		
+		//name = "John";
+	
+		cssadverts = this.getfriends();
+		
+		log.info("cssadverts size is : " +cssadverts.size());
+		
+		log.info("now search through the cssadverts for the name : " +name);
+		
+		if (name.isEmpty()) {
+			log.info("Search String is empty ");
+			return null;
+		}else {
+			for (CssAdvertisementRecord  advert: cssadverts) {
+				log.info("advert name is: " +advert.getName());
+	            if (advert.getName().toLowerCase().contains(name.toLowerCase())) {
+	            	log.info("this is the CssAdvertisement we are looking for " +advert.getId());
+	            	result.add(advert);
+	            } else {
+	            	log.info("this is NOT the CssAdvertisement we are looking for keep going " +advert.getId() +" name is " +advert.getName());
+	            }
+			}
+		}
+		
+		return result;
 		
 	}
 

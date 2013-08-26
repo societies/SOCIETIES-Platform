@@ -85,9 +85,14 @@
             <redirect/>
         </navigation-case>
         <navigation-case>
-            <from-action>#{profile.modifyrecord</from-action>
+            <from-action>#{profile.modifyrecord()</from-action>
             <to-view-id>/myProfile.xhtml</to-view-id>
             <redirect/>
         </navigation-case>
+        <navigation-case>
+			<from-action>#{suggestedfriends.search(suggestedfriends.findfriend)}</from-action>
+			<to-view-id>/your_societies_friends_list.xhtml</to-view-id>
+			<redirect/>
+	</navigation-case>
     </navigation-rule>
 </faces-config>
