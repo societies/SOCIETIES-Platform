@@ -5,6 +5,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import org.societies.security.digsig.trust.AndroidSecureStorage;
 import org.societies.security.digsig.trust.AndroidSecureStorageConstants;
@@ -83,8 +84,8 @@ public class ListIdentitiesActivity extends ListActivity {
 		
 		int count = 0;
 		while (true) {
-			String certKey = String.format("CERT_%d", count);
-			String keyKey = String.format("KEY_%d", count++);
+			String certKey = String.format(Locale.US, "CERT_%d", count);
+			String keyKey = String.format(Locale.US, "KEY_%d", count++);
 			
 			if (!secureStorage.contains(certKey) && !secureStorage.contains(keyKey)) break;
 			

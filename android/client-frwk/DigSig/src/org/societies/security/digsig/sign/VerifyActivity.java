@@ -135,7 +135,7 @@ public class VerifyActivity extends Activity {
             }                                	
         } 
         
-        // ToDo handle trust checking for certificates
+        // TODO handle trust checking for certificates
         // For now only fake it is ok:
         for (SigResult result : results) {
         	result.setTrustStatus(1);

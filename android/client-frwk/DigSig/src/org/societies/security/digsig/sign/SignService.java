@@ -10,6 +10,7 @@ import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -36,8 +37,6 @@ import android.widget.Toast;
 public class SignService extends IntentService {
 
 	private static final String TAG = SignService.class.getSimpleName();
-
-	private static final String RESPONSE_MESSAGE = "myResponseMessage";
 
 	private AndroidSecureStorage secureStorage;
 	private KeyFactory keyFactory;
@@ -121,8 +120,8 @@ public class SignService extends IntentService {
 			return;
 		}
 
-		String certKey = String.format("CERT_%d", selected);
-		String keyKey = String.format("KEY_%d", selected);
+		String certKey = String.format(Locale.US, "CERT_%d", selected);
+		String keyKey = String.format(Locale.US, "KEY_%d", selected);
 
 		byte[] encodedCert = secureStorage.getWithStringKey(certKey);
 		byte[] encodedKey = secureStorage.getWithStringKey(keyKey);

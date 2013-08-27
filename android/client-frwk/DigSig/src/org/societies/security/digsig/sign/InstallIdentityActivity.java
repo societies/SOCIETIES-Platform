@@ -5,6 +5,7 @@ import java.security.Key;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+import java.util.Locale;
 
 import org.societies.security.digsig.trust.AndroidSecureStorage;
 import org.societies.security.digsig.trust.AndroidSecureStorageConstants;
@@ -118,8 +119,8 @@ public class InstallIdentityActivity extends Activity {
 			
 		count = 0;
 		while (true) {
-			String certKey = String.format("CERT_%d", count);
-			String keyKey = String.format("KEY_%d", count++);
+			String certKey = String.format(Locale.US, "CERT_%d", count);
+			String keyKey = String.format(Locale.US, "KEY_%d", count++);
 			
 			if (!secureStorage.contains(certKey) && !secureStorage.contains(keyKey)) {
 				secureStorage.put(certKey,encodedCert);
