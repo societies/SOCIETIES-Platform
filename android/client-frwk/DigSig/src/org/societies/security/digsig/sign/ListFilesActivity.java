@@ -8,6 +8,7 @@ import java.util.StringTokenizer;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -32,7 +33,7 @@ public class ListFilesActivity extends ListActivity {
 		}
 					
 		/* populate list view with certificate list */
-        File sdCard = new File("/mnt/sdcard");
+        File sdCard = new File(Environment.getExternalStorageDirectory().getPath());
         if (sdCard.exists() && sdCard.isDirectory()) {
         	fileArray = sdCard.list(new FilenameFilter() {				
 				public boolean accept(File dir, String filename) {					
@@ -45,7 +46,6 @@ public class ListFilesActivity extends ListActivity {
         	
         	setListAdapter(new ArrayAdapter<String>(this, R.layout.list_files, fileArray));
         }
-     
         
         ListView lv = getListView();
         lv.setTextFilterEnabled(true);
@@ -61,12 +61,10 @@ public class ListFilesActivity extends ListActivity {
 				Log.i("miki", String.format("Selected item %d", itemPos));
 				
 				Intent intent = getIntent();
-				intent.putExtra("SELECTED", "/mnt/sdcard/" + fileArray[(int) itemPos]);
+				intent.putExtra("SELECTED", Environment.getExternalStorageDirectory().getPath() + "/" + fileArray[(int) itemPos]);
 				setResult(RESULT_OK,intent);
 				finish();				
 			}
 		});
 	}
-
-	
 }

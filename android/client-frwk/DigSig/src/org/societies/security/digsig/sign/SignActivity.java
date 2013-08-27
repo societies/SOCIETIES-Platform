@@ -1,26 +1,6 @@
 package org.societies.security.digsig.sign;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.security.Key;
-import java.security.KeyFactory;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.ArrayList;
-import java.util.UUID;
-
-import javax.xml.parsers.DocumentBuilder;
-
-import org.apache.xerces.dom.DOMImplementationImpl;
-import org.apache.xml.security.algorithms.MessageDigestAlgorithm;
-import org.apache.xml.security.signature.XMLSignature;
-import org.apache.xml.security.transforms.Transforms;
 import org.societies.security.digsig.api.Sign;
-import org.societies.security.digsig.trust.AndroidSecureStorage;
-import org.w3c.dom.Document;
-import org.w3c.dom.ls.LSOutput;
-import org.w3c.dom.ls.LSSerializer;
 
 import android.app.Activity;
 import android.content.Intent;

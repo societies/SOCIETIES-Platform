@@ -19,9 +19,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 
 public class VerifyActivity extends Activity {
@@ -72,7 +74,7 @@ public class VerifyActivity extends Activity {
         {            
             Document doc = db.parse(new ByteArrayInputStream(val));
             
-            FileOutputStream fos = new FileOutputStream("/mnt/sdcard/verify.xml");
+            FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/verify.xml");
             fos.write(val);
             fos.close();
 
