@@ -46,6 +46,24 @@
                 </h:panelGrid>
             </p:panel>
 
+            <p:panel id="acPopupPanel" header="#{notification.title}"
+                     rendered="#{notification.type eq 'AC'}"
+                     styleClass="unread-notification-header">
+
+                <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+                <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+
+                <!-- PRIVACY POLICY NEGOTIATION -->
+
+                <h:panelGrid columns="1">
+
+                    <h:outputText value="#{notification.arrivalDate}"/>
+
+                    <h:outputLink value="#{notification.infoLink}">More info</h:outputLink>
+
+                </h:panelGrid>
+            </p:panel>
+
             <p:panel id="ackNackPopupPanel" header="#{notification.title}"
                      rendered="#{notification.type eq 'ACK_NACK'}"
                      styleClass="unread-notification-header">

@@ -57,19 +57,26 @@
 
             </p:row>
 
-            <p:panel>
-                <p:poll interval="2" update="countLabel" process="@this"/>
-                <p:outputLabel value="PP Negotiations in queue:" for="countLabel"/>
-                <p:inputText value="#{privacyPolicyNegotiationListener.queuedNegotiationCount}" readonly="true"
-                             id="countLabel"/>
-            </p:panel>
+            <p:row>
+                <p:panel>
+                    <p:poll interval="2" update="countLabel" process="@this"/>
+                    <p:outputLabel value="PP Negotiations in queue: " for="countLabel"/>
+                    <p:inputText value="#{privacyPolicyNegotiationListener.queuedNegotiationCount}" readonly="true"
+                                 id="countLabel" style="width: 80px;"/>
+                </p:panel>
 
-            <p:panel>
+                <p:commandButton value="Send UF Access Control"
+                                 actionListener="#{ppNegotiationTest.sendAccessControlEvent}"
+                                 process="@this"/>
+            </p:row>
+            <p:row>
+
+
                 <p:commandButton id="resetNotificationsController"
                                  value="Reset Notifications Controller"
                                  actionListener="#{notifications.clearNotifications()}"
                                  process="@this"/>
-            </p:panel>
+            </p:row>
 
         </p:panelGrid>
 

@@ -2,6 +2,7 @@ package org.societies.webapp.entity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 
 import java.io.Serializable;
@@ -11,16 +12,19 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     protected static final Logger log = LoggerFactory.getLogger(NotificationQueueItem.class);
 
     public static final String TYPE_PRIVACY_POLICY_NEGOTIATION = "PPN";
+    public static final String TYPE_ACCESS_CONTROL = "AC";
     public static final String TYPE_TIMED_ABORT = "TIMED_ABORT";
     public static final String TYPE_ACK_NACK = "ACK_NACK";
     public static final String TYPE_SELECT_ONE = "SELECT_ONE";
     public static final String TYPE_SELECT_MANY = "SELECT_MANY";
     public static final String TYPE_NOTIFICATION = "NOTIFICATION";
     public static final String TYPE_UNKNOWN = "UNKNOWN";
-
-
     public static NotificationQueueItem forPrivacyPolicyNotification(String itemId, UserFeedbackPrivacyNegotiationEvent payload) {
         return new NotificationQueueItem(itemId, payload);
+    }
+
+    public static NotificationQueueItem forAccessControl(String itemId, UserFeedbackAccessControlEvent bean) {
+        return new NotificationQueueItem(itemId, bean);
     }
 
     public static NotificationQueueItem forTimedAbort(String itemId, String title, Date timeout) {
@@ -44,7 +48,9 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     }
 
     private final Date arrivalDate;
+
     private final UserFeedbackPrivacyNegotiationEvent ufPPN;
+    private final UserFeedbackAccessControlEvent ufAccessControl;
     private final String title;
     private final String itemId;
     private final String type;
@@ -57,9 +63,22 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
         this.arrivalDate = new Date();
         this.itemId = itemId;
         this.ufPPN = payload;
+        this.ufAccessControl = null;
         this.options = new String[0];
         this.type = TYPE_PRIVACY_POLICY_NEGOTIATION;
         this.title = payload.getNegotiationDetails().getRequestor().getRequestorId();
+        this.timeoutTime = null;
+        this.complete = false;
+    }
+
+    private NotificationQueueItem(String itemId, UserFeedbackAccessControlEvent payload) {
+        this.arrivalDate = new Date();
+        this.itemId = itemId;
+        this.ufPPN = null;
+        this.ufAccessControl = payload;
+        this.options = new String[0];
+        this.type = TYPE_ACCESS_CONTROL;
+        this.title = "Access Control Request";
         this.timeoutTime = null;
         this.complete = false;
     }
@@ -68,6 +87,7 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
         this.arrivalDate = new Date();
         this.itemId = itemId;
         this.ufPPN = null;
+        this.ufAccessControl = null;
         this.options = new String[0];
         this.type = TYPE_TIMED_ABORT;
         this.title = title;
@@ -79,6 +99,7 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
         this.arrivalDate = new Date();
         this.itemId = itemId;
         this.ufPPN = null;
+        this.ufAccessControl = null;
         this.options = options;
         this.type = type;
         this.title = title;
