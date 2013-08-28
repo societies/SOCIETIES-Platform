@@ -2,7 +2,6 @@ package org.societies.webapp.model;
 
 import org.primefaces.model.SelectableDataModel;
 import org.societies.webapp.model.Screen;
-
 import javax.faces.model.ListDataModel;
 import java.util.List;
 

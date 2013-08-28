@@ -33,13 +33,9 @@ import org.societies.api.css.devicemgmt.display.IDisplayPortalServer;
 import org.societies.webapp.dao.ScreenDAO;
 import org.societies.webapp.model.ScreenDataModel;
 import org.societies.webapp.model.Screen;
-
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
 import javax.faces.context.FacesContext;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -71,9 +67,6 @@ public class ScreenData implements Serializable {
                     + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
                     + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
                     + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
-
-
-
 
     public ScreenData() {
     }

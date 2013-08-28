@@ -48,7 +48,6 @@ import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.services.ServiceMgmtEventType;
 
-//import org.societies.api.css.devicemgmt.display.IDisplayPortalServer;
 import ac.hw.display.server.api.remote.IDisplayPortalServer;
 
 /**
