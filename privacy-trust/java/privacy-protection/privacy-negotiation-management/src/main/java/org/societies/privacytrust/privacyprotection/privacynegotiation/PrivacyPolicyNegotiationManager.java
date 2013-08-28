@@ -53,7 +53,7 @@ import org.societies.privacytrust.privacyprotection.api.identity.IIdentitySelect
 import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client.NegotiationClient;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.provider.PolicyRetriever;
 
-import javax.swing.*;
+
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
@@ -223,7 +223,6 @@ public class PrivacyPolicyNegotiationManager extends EventListener implements IP
     }
 
     public PrivacyPolicyNegotiationManager() {
-        UIManager.put("ClassLoader", ClassLoader.getSystemClassLoader());
     }
 
     public void initialisePrivacyPolicyNegotiationManager() {
