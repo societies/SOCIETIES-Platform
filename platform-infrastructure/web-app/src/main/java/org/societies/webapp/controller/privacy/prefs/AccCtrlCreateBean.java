@@ -27,11 +27,14 @@ package org.societies.webapp.controller.privacy.prefs;
 
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -40,6 +43,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
 import org.primefaces.context.RequestContext;
@@ -51,27 +55,41 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.AccessControlPreferenceDetailsBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PrivacyOutcomeConstantsBean;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
+import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyConditionsConstantValues;
+import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
+import org.societies.api.privacytrust.trust.model.TrustedEntityId;
+import org.societies.api.privacytrust.trust.model.TrustedEntityType;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ContextPreferenceCondition;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyCondition;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyPreference;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.TrustPreferenceCondition;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.accesscontrol.AccessControlOutcome;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.accesscontrol.AccessControlPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.OperatorConstants;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ppn.PPNPOutcome;
+
 /**
  * @author Eliza
  *
  */
-@SessionScoped
+@ViewScoped
 @ManagedBean(name="AccCtrlcreateBean")
 public class AccCtrlCreateBean implements Serializable{
 
@@ -89,6 +107,9 @@ public class AccCtrlCreateBean implements Serializable{
 
 	@ManagedProperty(value="#{commMngrRef}")
 	private ICommManager commMgr;
+	
+	@ManagedProperty(value = "#{privPrefMgr}")
+	private IPrivacyPreferenceManager privPrefmgr;
 
 	private String ctxValue;
 
@@ -100,8 +121,9 @@ public class AccCtrlCreateBean implements Serializable{
 	private List<OperatorConstants> operators = new ArrayList<OperatorConstants>();
 
 	private OperatorConstants selectedOperator;
+	private OperatorConstants selectedCtxOperator;
 
-	private PPNPreferenceDetailsBean preferenceDetails = new PPNPreferenceDetailsBean();
+	private AccessControlPreferenceDetailsBean preferenceDetails = new AccessControlPreferenceDetailsBean();
 
 	private int requestorType;
 
@@ -110,13 +132,45 @@ public class AccCtrlCreateBean implements Serializable{
 
 	private boolean preferenceDetailsCorrect = false;
 
-	private Decision selectedDecision;
-	private List<Decision> decisions;
+	private PrivacyOutcomeConstantsBean selectedDecision;
+	private List<PrivacyOutcomeConstantsBean> decisions;
+
+	private String trustValue;
+	
+	private ConditionConstants selectedPrivacyCondition;
+	private Map<ConditionConstants,ConditionConstants> privacyConditions;
+
+	private String selectedPrivacyValue;
+	private Map<String, String> privacyValues;
+
+	private Map<ConditionConstants,Map<String,String>> privacyConditionData = new HashMap<ConditionConstants, Map<String,String>>();
+
+	private List<DataIdentifierScheme> schemeList;
+
+	private List<String> contextTypes;
+
+	private List<String> cisTypes;
+
+	private List<String> deviceTypes;
+
+	private List<String> activityTypes;
+
+	private List<String> resourceTypes;
+
+	private boolean editableResource; 
 	
 	public AccCtrlCreateBean() {
 
 	}
 
+
+	public void startAddPrivacyConditionProcess(){
+		RequestContext.getCurrentInstance().execute("addPrivConddlg.show();");
+	}
+
+	public void startAddTrustConditionProcess(){
+		RequestContext.getCurrentInstance().execute("addTrustConddlg.show();");
+	}
 
 	@PostConstruct
 	public void setup(){
@@ -125,9 +179,85 @@ public class AccCtrlCreateBean implements Serializable{
 		preferenceDetails.getRequestor().setRequestorId("");
 		preferenceDetails.setResource(new Resource());
 		preferenceDetails.getResource().setDataType("");
+		
+		setupDataTypes();
+		this.createCtxAttributeTypesList();
+		this.createSchemeList();
 		setOperators(Arrays.asList(OperatorConstants.values()));
-		setDecisions(Arrays.asList(Decision.values()));
+		setDecisions(Arrays.asList(PrivacyOutcomeConstantsBean.values()));
+		this.setupConditions();
+		
 	}
+	
+	private void setupConditions(){
+		List<ConditionConstants> conditionsList = Arrays.asList(ConditionConstants.values());
+		this.privacyConditions = new HashMap<ConditionConstants, ConditionConstants>();
+		for (ConditionConstants c: conditionsList){
+			this.privacyConditions.put(c, c);
+			List<String> list = Arrays.asList(PrivacyConditionsConstantValues.getValues(c));
+
+			Map<String, String> temp = new HashMap<String, String>();
+
+			for (String l : list){
+				String userFriendlyString = l;
+				if (l.equalsIgnoreCase("0")){
+					userFriendlyString = "No";
+				}else if (l.equalsIgnoreCase("1")){
+					userFriendlyString = "Yes";
+				}
+				temp.put(userFriendlyString, l);
+			}
+
+			this.privacyConditionData.put(c, temp);
+
+		}
+
+		ConditionConstants cc = this.privacyConditionData.keySet().iterator().next();
+		this.setPrivacyValues(this.privacyConditionData.get(cc));
+		this.selectScheme(this.schemeList.get(0));
+	}
+	
+	private void createSchemeList() {
+		this.schemeList = new ArrayList<DataIdentifierScheme>();
+		DataIdentifierScheme[] fields = DataIdentifierScheme.values();
+		
+		for (int i=0; i<fields.length; i++){
+			if (!fields[i].name().equalsIgnoreCase("CSS"))
+				this.schemeList.add(fields[i]);
+		}
+		
+		
+	}
+	
+	private void createCtxAttributeTypesList() {
+		this.contextTypes = new ArrayList<String>();
+		Field[] fields = CtxAttributeTypes.class.getDeclaredFields();
+		
+		String[] names = new String[fields.length];
+		
+		for (int i=0; i<names.length; i++){
+			names[i] = fields[i].getName();
+			
+			
+		}
+		this.contextTypes = Arrays.asList(names);
+		
+	}
+	
+	private void setupDataTypes() {
+		this.cisTypes = new ArrayList<String>();
+		this.cisTypes.add("cis-member-list");
+		this.cisTypes.add("cis-list");
+		
+		this.deviceTypes = new ArrayList<String>();
+		this.deviceTypes.add("meta-data");
+		
+		this.activityTypes = new ArrayList<String>();
+		this.activityTypes.add("activityfeed");
+		
+		
+	}
+	
 	public void savePreferenceDetails(){
 		ServiceResourceIdentifier serviceID; 
 		String rType = "simple";
@@ -265,8 +395,8 @@ public class AccCtrlCreateBean implements Serializable{
 
 		FacesContext.getCurrentInstance().addMessage(null, message);
 
-		ContextPreferenceCondition conditionBean = new ContextPreferenceCondition(this.ctxIDTable.get(selectedCtxID), selectedOperator, ctxValue);
-		if (selectedNode.getData() instanceof PPNPOutcome){
+		ContextPreferenceCondition conditionBean = new ContextPreferenceCondition(this.ctxIDTable.get(selectedCtxID), selectedCtxOperator, ctxValue);
+		if (selectedNode.getData() instanceof AccessControlOutcome){
 			this.logging.debug("Adding condition to outcome");
 			//get the parent of the outcome node
 			TreeNode parent = selectedNode.getParent();
@@ -299,14 +429,117 @@ public class AccCtrlCreateBean implements Serializable{
 		this.logging.debug("Added new condition "+conditionBean+" to selected node:"+selectedNode);
 		printTree();
 	}
+	
+	public void addPrivacyCondition(){
+		if (selectedNode==null){
+			this.logging.debug("selected node is null - addPrivacyCondition");
+			return;
+		}
+		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Adding condition", "wait");
 
+		FacesContext.getCurrentInstance().addMessage(null, message);
+
+		Condition condition = new Condition();
+		condition.setConditionConstant(selectedPrivacyCondition);
+		condition.setValue(selectedPrivacyValue);
+		PrivacyCondition privacyCondition = new PrivacyCondition(condition); 
+
+		if (selectedNode.getData() instanceof AccessControlOutcome){
+			this.logging.debug("Adding condition to outcome");
+			//get the parent of the outcome node
+			TreeNode parent = selectedNode.getParent();
+			this.logging.debug("parent of selected node is: "+parent);
+			//remove the outcome from its parent
+			parent.getChildren().remove(selectedNode);
+			this.logging.debug("removed selected node from parent. parent now has "+parent.getChildCount()+" children nodes");
+			//create the condition node
+			TreeNode conditionNode = new DefaultTreeNode(privacyCondition, parent);
+			this.logging.debug("added: "+conditionNode+" to parent: "+parent);
+			//add the condition node to the parent node
+			//parent.getChildren().add(conditionNode);
+			//set the condition as parent of the outcome
+			selectedNode.setParent(conditionNode);
+			this.logging.debug("set parent: "+conditionNode+" for selectedNode: "+selectedNode);
+			//add the outcome node to the condition node;
+			//conditionNode.getChildren().add(selectedNode);
+		}else{
+			this.logging.debug("Adding condition to condition");
+			//create the condition node
+			TreeNode conditionNode = new DefaultTreeNode(privacyCondition, selectedNode);
+			//add the conditionNode under the selected node
+			//selectedNode.getChildren().add(conditionNode);
+			//set the selected Node to be parent of the new condition node
+			conditionNode.setParent(selectedNode);
+
+
+		}
+	}
+
+	public void addTrustCondition(){
+		if (selectedNode==null){
+			this.logging.debug("selected node is null - addPrivacyCondition");
+			return;
+		}
+		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Adding condition", "wait");
+
+		FacesContext.getCurrentInstance().addMessage(null, message);
+
+		TrustedEntityId trustId = createTrustedEntityId();
+
+		if (trustId==null){
+			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Adding trust condition failed", "Failed to create TrustedEntityId");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			return;
+		}
+
+
+		Double tValue = 1.0;
+		try{
+			tValue = Double.parseDouble(this.trustValue);
+		}catch(NumberFormatException nfe){
+			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Adding trust condition failed", "Failed to parse double value for trust");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			return;
+		}
+		TrustPreferenceCondition trustCondition = new TrustPreferenceCondition(trustId, tValue);
+		if (selectedNode.getData() instanceof AccessControlOutcome){
+			this.logging.debug("Adding condition to outcome");
+			//get the parent of the outcome node
+			TreeNode parent = selectedNode.getParent();
+			this.logging.debug("parent of selected node is: "+parent);
+			//remove the outcome from its parent
+			parent.getChildren().remove(selectedNode);
+			this.logging.debug("removed selected node from parent. parent now has "+parent.getChildCount()+" children nodes");
+			//create the condition node
+			TreeNode conditionNode = new DefaultTreeNode(trustCondition, parent);
+			this.logging.debug("added: "+conditionNode+" to parent: "+parent);
+			//add the condition node to the parent node
+			//parent.getChildren().add(conditionNode);
+			//set the condition as parent of the outcome
+			selectedNode.setParent(conditionNode);
+			this.logging.debug("set parent: "+conditionNode+" for selectedNode: "+selectedNode);
+			//add the outcome node to the condition node;
+			//conditionNode.getChildren().add(selectedNode);
+		}else{
+			this.logging.debug("Adding condition to condition");
+			//create the condition node
+			TreeNode conditionNode = new DefaultTreeNode(trustCondition, selectedNode);
+			//add the conditionNode under the selected node
+			//selectedNode.getChildren().add(conditionNode);
+			//set the selected Node to be parent of the new condition node
+			conditionNode.setParent(selectedNode);
+
+
+		}
+	}
+	
 	public void addOutcome(){
 		if (selectedNode==null){
 			this.logging.debug("selected node is null - addOutcome");
 			return;
 		}
 		
-		if (selectedNode.getData() instanceof PPNPOutcome){
+		if (selectedNode.getData() instanceof AccessControlOutcome){
 			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Adding outcome", "You can't add an outcome as a subnode of another outcome. Please select a condition node to add the new outcome to.");
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			return;
@@ -315,19 +548,43 @@ public class AccCtrlCreateBean implements Serializable{
 		if (selectedNode.getChildCount()>0){
 			List<TreeNode> children = selectedNode.getChildren();
 			for (TreeNode child :children){
-				if (child.getData() instanceof PPNPOutcome){
+				if (child.getData() instanceof AccessControlOutcome){
 					FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Adding outcome", "You can't have two outcomes under the same condition. Please delete the existing one and create a new one or edit the existing one.");
 					FacesContext.getCurrentInstance().addMessage(null, message);
 					return;
 				}
 			}
 		}
-			PPNPOutcome outcome = new PPNPOutcome(selectedDecision);
+		AccessControlOutcome outcome = new AccessControlOutcome(selectedDecision);
 			
 			TreeNode newNode = new DefaultTreeNode(outcome, selectedNode);
 		
 		
 		this.logging.debug("Added new outcome : "+newNode+" to selected node: "+selectedNode);
+
+	}
+	
+	
+	private TrustedEntityId createTrustedEntityId() {
+		try {
+			if (this.preferenceDetails.getRequestor() instanceof RequestorCisBean){
+
+				return new TrustedEntityId(TrustedEntityType.CIS, this.preferenceDetails.getRequestor().getRequestorId());
+			}
+			if (this.preferenceDetails.getRequestor() instanceof RequestorServiceBean){
+
+				return new TrustedEntityId(TrustedEntityType.SVC, ServiceModelUtils.serviceResourceIdentifierToString(((RequestorServiceBean) this.preferenceDetails.getRequestor()).getRequestorServiceId()));
+			}
+
+			if (this.preferenceDetails.getRequestor() instanceof RequestorBean){
+				return new TrustedEntityId(TrustedEntityType.CSS, this.preferenceDetails.getRequestor().getRequestorId());
+			}
+		} catch (MalformedTrustedEntityIdException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return null;
 
 	}
 	
@@ -337,15 +594,28 @@ public class AccCtrlCreateBean implements Serializable{
 			return "null node";
 		}
 		
-		if (node instanceof PPNPOutcome){
-			PPNPOutcome outcome = (PPNPOutcome) node;
-			return "Decision: "+ outcome.getDecision().value();
+		if (node instanceof AccessControlOutcome){
+			AccessControlOutcome outcome = (AccessControlOutcome) node;
+			
+			return "Decision: "+ outcome.getEffect().value();
 		}
 		
 		if (node instanceof ContextPreferenceCondition){
 			ContextPreferenceCondition condition = (ContextPreferenceCondition) node;
 			return "Condition: "+condition.getCtxIdentifier().getType()+" = "+condition.getValue();
 		}
+		
+		if (node instanceof PrivacyCondition){
+			PrivacyCondition privacyCondition = (PrivacyCondition) node;
+			return "Condition: "+privacyCondition.getCondition().getConditionConstant()+" = "+privacyCondition.getCondition().getValue();
+		}
+
+		if (node instanceof TrustPreferenceCondition){
+			TrustPreferenceCondition trustCondition = (TrustPreferenceCondition) node;
+
+			return "Condition: trustOfRequestor > "+trustCondition.getTrustThreshold();
+		}
+		
 		
 		else return "Unparseable: "+node;
 		
@@ -354,7 +624,7 @@ public class AccCtrlCreateBean implements Serializable{
 	public void editNode(){
 		if (selectedNode !=null){
 			Object data = selectedNode.getData();
-			if (data instanceof PPNPOutcome){
+			if (data instanceof AccessControlOutcome){
 
 			}
 		}
@@ -381,7 +651,7 @@ public class AccCtrlCreateBean implements Serializable{
 		selectedNode = null;
 
 		if (this.root.getChildCount()==0){
-			PPNPOutcome outcome = new PPNPOutcome(Decision.PERMIT);
+			AccessControlOutcome outcome = new AccessControlOutcome(PrivacyOutcomeConstantsBean.ALLOW);
 			
 
 			TreeNode node0 = new DefaultTreeNode(outcome, root);
@@ -395,6 +665,17 @@ public class AccCtrlCreateBean implements Serializable{
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Saving preference", "Now saving prefernece");
 		FacesContext.getCurrentInstance().addMessage(null, message);
 		this.logging.debug("savePreferences called");
+		PrivacyPreference privacyPreference = ModelTranslator.getPrivacyPreference(root);
+		this.logging.debug("Printing preference before save: \n"+privacyPreference.toString());
+		this.logging.debug("Saving preferences with details: "+preferenceDetails.toString());
+		AccessControlPreferenceTreeModel model = new AccessControlPreferenceTreeModel(preferenceDetails, privacyPreference);
+		if (this.privPrefmgr.storeAccCtrlPreference(preferenceDetails, model)){
+			message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Your new Access Control preference has been successfully saved.");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		}else{
+			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure", "An error occurred while saving your new Access Control preference.");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		}
 	}
 	
 	
@@ -496,7 +777,7 @@ public class AccCtrlCreateBean implements Serializable{
 		if (this.root==null){
 			this.root = new DefaultTreeNode("Root", null);
 			this.logging.debug("loading tree with default tree node");
-			PPNPOutcome outcome = new PPNPOutcome(Decision.PERMIT);
+			AccessControlOutcome outcome = new AccessControlOutcome(PrivacyOutcomeConstantsBean.ALLOW);
 			TreeNode node0 = new DefaultTreeNode(outcome, root);
 		}
 		return root;
@@ -510,13 +791,13 @@ public class AccCtrlCreateBean implements Serializable{
 
 
 
-	public PPNPreferenceDetailsBean getPreferenceDetails() {
+	public AccessControlPreferenceDetailsBean getPreferenceDetails() {
 		return preferenceDetails;
 	}
 
 
 
-	public void setPreferenceDetails(PPNPreferenceDetailsBean preferenceDetails) {
+	public void setPreferenceDetails(AccessControlPreferenceDetailsBean preferenceDetails) {
 		this.preferenceDetails = preferenceDetails;
 	}
 
@@ -531,32 +812,84 @@ public class AccCtrlCreateBean implements Serializable{
 
 	public void setRequestorType(int requestorType) {
 		String requestorId = this.preferenceDetails.getRequestor().getRequestorId();
-		switch (requestorType){
-		case 0:
-			RequestorCisBean cisBean = new RequestorCisBean();
-			cisBean.setRequestorId(requestorId);
-			this.preferenceDetails.setRequestor(cisBean);
-			this.logging.debug("setting requestor Type :"+requestorType);
-			break;
-		case 1:
-			RequestorServiceBean serviceBean = new RequestorServiceBean();
-			serviceBean.setRequestorId(requestorId);
-			this.preferenceDetails.setRequestor(serviceBean);
-			this.logging.debug("setting requestor Type :"+requestorType);
-			break;
-		default:
-			RequestorBean bean = new RequestorBean();
-			bean.setRequestorId(requestorId);
-			this.preferenceDetails.setRequestor(bean);
-			this.logging.debug("setting requestor Type :"+requestorType);
+		if (!preferenceDetailsCorrect){
+			switch (requestorType){
+			case 0:
+
+				RequestorCisBean cisBean = new RequestorCisBean();
+				cisBean.setRequestorId(requestorId);
+				this.preferenceDetails.setRequestor(cisBean);
+				this.logging.debug("setting requestor Type :"+requestorType);
+
+				break;
+			case 1:
+
+				RequestorServiceBean serviceBean = new RequestorServiceBean();
+				serviceBean.setRequestorId(requestorId);
+				this.preferenceDetails.setRequestor(serviceBean);
+				this.logging.debug("setting requestor Type :"+requestorType);
+
+
+				break;
+			default:
+
+				RequestorBean bean = new RequestorBean();
+				bean.setRequestorId(requestorId);
+				this.preferenceDetails.setRequestor(bean);
+				this.logging.debug("setting requestor Type :"+requestorType);
+
+				break;
+			}
+		}else{
+			this.logging.debug("setting requestorType: "+requestorType+" but not changing the preferenceDetails");
 		}
 		this.requestorType = requestorType;
 	}
 
+	public void handleSchemeTypeChange(){
+		DataIdentifierScheme scheme = this.preferenceDetails.getResource().getScheme();
+		if (scheme==null){
+			this.logging.debug("handleSchemeTypeChange: selected scheme is null");
+			return;
+		}
+		selectScheme(scheme);
 
+	}
 
-
-
+	private void selectScheme(DataIdentifierScheme scheme){
+		switch (scheme)
+		{
+		case ACTIVITY: 
+			this.resourceTypes = this.activityTypes;
+			this.editableResource = false;
+			break;
+		case CIS: 
+			this.resourceTypes = this.cisTypes;
+			this.editableResource = false;
+			break;
+		case CONTEXT:
+			this.resourceTypes = this.contextTypes;
+			this.editableResource = true;
+			break;
+		case CSS: 
+			this.resourceTypes = new ArrayList<String>();
+			this.editableResource = true;
+			break;
+		case DEVICE:
+			this.resourceTypes = this.deviceTypes;
+			this.editableResource = false;
+			break;
+		case SOCIALPROVIDER: 
+			this.resourceTypes = new ArrayList<String>();
+			this.editableResource = true;
+			break;
+		}		
+	}
+	public void handlePrivacyTypeChange(){
+		this.logging.debug("handlePrivacyTypeChange for: "+this.selectedPrivacyCondition);
+		this.setPrivacyValues(this.privacyConditionData.get(selectedPrivacyCondition));
+	}
+	
 
 	public boolean isPreferenceDetailsCorrect() {
 		this.logging.debug("preferenceDetailsCorrect: "+preferenceDetailsCorrect);
@@ -594,24 +927,167 @@ public class AccCtrlCreateBean implements Serializable{
 	}
 
 
-	public Decision getSelectedDecision() {
+	public PrivacyOutcomeConstantsBean getSelectedDecision() {
 		return selectedDecision;
 	}
 
 
-	public void setSelectedDecision(Decision selectedDecision) {
+	public void setSelectedDecision(PrivacyOutcomeConstantsBean selectedDecision) {
 		this.selectedDecision = selectedDecision;
 	}
 
 
-	public List<Decision> getDecisions() {
+	public List<PrivacyOutcomeConstantsBean> getDecisions() {
 		return decisions;
 	}
 
 
-	public void setDecisions(List<Decision> decisions) {
+	public void setDecisions(List<PrivacyOutcomeConstantsBean> decisions) {
 		this.decisions = decisions;
 	}
+
+
+	public String getTrustValue() {
+		return trustValue;
+	}
+
+
+	public void setTrustValue(String trustValue) {
+		this.trustValue = trustValue;
+	}
+
+
+	public Map<ConditionConstants,ConditionConstants> getPrivacyConditions() {
+		return privacyConditions;
+	}
+
+
+	public void setPrivacyConditions(Map<ConditionConstants,ConditionConstants> privacyConditions) {
+		this.privacyConditions = privacyConditions;
+	}
+
+
+	public String getSelectedPrivacyValue() {
+		return selectedPrivacyValue;
+	}
+
+
+	public void setSelectedPrivacyValue(String selectedPrivacyValue) {
+		this.selectedPrivacyValue = selectedPrivacyValue;
+	}
+
+
+	public Map<String, String> getPrivacyValues() {
+		return privacyValues;
+	}
+
+
+	public void setPrivacyValues(Map<String, String> privacyValues) {
+		this.privacyValues = privacyValues;
+	}
+
+
+	public List<DataIdentifierScheme> getSchemeList() {
+		return schemeList;
+	}
+
+
+	public void setSchemeList(List<DataIdentifierScheme> schemeList) {
+		this.schemeList = schemeList;
+	}
+
+
+	public List<String> getContextTypes() {
+		return contextTypes;
+	}
+
+
+	public void setContextTypes(List<String> contextTypes) {
+		this.contextTypes = contextTypes;
+	}
+
+
+	public List<String> getCisTypes() {
+		return cisTypes;
+	}
+
+
+	public void setCisTypes(List<String> cisTypes) {
+		this.cisTypes = cisTypes;
+	}
+
+
+	public List<String> getDeviceTypes() {
+		return deviceTypes;
+	}
+
+
+	public void setDeviceTypes(List<String> deviceTypes) {
+		this.deviceTypes = deviceTypes;
+	}
+
+
+	public List<String> getActivityTypes() {
+		return activityTypes;
+	}
+
+
+	public void setActivityTypes(List<String> activityTypes) {
+		this.activityTypes = activityTypes;
+	}
+
+
+	public boolean isEditableResource() {
+		return editableResource;
+	}
+
+
+	public void setEditableResource(boolean editableResource) {
+		this.editableResource = editableResource;
+	}
+
+
+	public List<String> getResourceTypes() {
+		return resourceTypes;
+	}
+
+
+	public void setResourceTypes(List<String> resourceTypes) {
+		this.resourceTypes = resourceTypes;
+	}
+
+
+	public ConditionConstants getSelectedPrivacyCondition() {
+		return selectedPrivacyCondition;
+	}
+
+
+	public void setSelectedPrivacyCondition(ConditionConstants selectedPrivacyCondition) {
+		this.selectedPrivacyCondition = selectedPrivacyCondition;
+	}
+
+
+	public IPrivacyPreferenceManager getPrivPrefmgr() {
+		return privPrefmgr;
+	}
+
+
+	public void setPrivPrefmgr(IPrivacyPreferenceManager privPrefmgr) {
+		this.privPrefmgr = privPrefmgr;
+	}
+
+
+	public OperatorConstants getSelectedCtxOperator() {
+		return selectedCtxOperator;
+	}
+
+
+	public void setSelectedCtxOperator(OperatorConstants selectedCtxOperator) {
+		this.selectedCtxOperator = selectedCtxOperator;
+	}
+
+
+
 
 
 

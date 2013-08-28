@@ -27,6 +27,7 @@ package org.societies.webapp.controller.privacy.prefs;
 
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -46,6 +47,7 @@ import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
@@ -54,6 +56,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.Priv
 import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
@@ -125,6 +128,24 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 
 	private String displaySpecificRequestor;
 
+	private List<String> contextTypes;
+
+	private List<String> cisTypes;
+
+	private List<String> deviceTypes;
+
+	private List<String> activityTypes;
+	
+	private List<String> resourceTypes = new ArrayList<String>();
+	
+	private List<DataIdentifierScheme> schemeList;
+
+	private boolean editableResource;
+	
+	
+	
+	
+
 	public PPNCreateBean() {
 
 	}
@@ -137,9 +158,18 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 		preferenceDetails.getRequestor().setRequestorId("");
 		preferenceDetails.setResource(new Resource());
 		preferenceDetails.getResource().setDataType("");
+		
+		setupDataTypes();
+		this.createCtxAttributeTypesList();
+		this.createSchemeList();
 		setOperators(Arrays.asList(OperatorConstants.values()));
 		setDecisions(Arrays.asList(Decision.values()));
+		this.setupConditions();
 
+	}
+
+
+	private void setupConditions(){
 		List<ConditionConstants> conditionsList = Arrays.asList(ConditionConstants.values());
 		this.privacyConditions = new HashMap<ConditionConstants, ConditionConstants>();
 		for (ConditionConstants c: conditionsList){
@@ -162,10 +192,9 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 
 		}
 
-
+		ConditionConstants cc = this.privacyConditionData.keySet().iterator().next();
+		this.setPrivacyValues(this.privacyConditionData.get(cc));
 	}
-
-
 	public void savePreferenceDetails(){
 		ServiceResourceIdentifier serviceID; 
 		String rType = "simple";
@@ -795,6 +824,159 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 
 	public void setDisplaySpecificRequestor(String displaySpecificRequestor) {
 		this.displaySpecificRequestor = displaySpecificRequestor;
+	}
+
+
+
+	/**
+	 * utility methods
+	 */
+	
+	private void createSchemeList() {
+		this.schemeList = new ArrayList<DataIdentifierScheme>();
+		DataIdentifierScheme[] fields = DataIdentifierScheme.values();
+		
+		ArrayList<String> tempNames = new ArrayList<String>();
+		for (int i=0; i<fields.length; i++){
+			if (!fields[i].name().equalsIgnoreCase("CSS"))
+				this.schemeList.add(fields[i]);
+		}
+		
+		
+	}
+
+	private void createCtxAttributeTypesList() {
+		this.contextTypes = new ArrayList<String>();
+		Field[] fields = CtxAttributeTypes.class.getDeclaredFields();
+		
+		String[] names = new String[fields.length];
+		
+		for (int i=0; i<names.length; i++){
+			names[i] = fields[i].getName();
+			
+			
+		}
+		this.contextTypes = Arrays.asList(names);
+		
+	}
+	
+	private void setupDataTypes() {
+		this.cisTypes = new ArrayList<String>();
+		this.cisTypes.add("cis-member-list");
+		this.cisTypes.add("cis-list");
+		
+		this.deviceTypes = new ArrayList<String>();
+		this.deviceTypes.add("meta-data");
+		
+		this.activityTypes = new ArrayList<String>();
+		this.activityTypes.add("activityfeed");
+		
+		
+	}
+
+
+	public void handleSchemeTypeChange(){
+		DataIdentifierScheme scheme = this.preferenceDetails.getResource().getScheme();
+		if (scheme==null){
+			this.logging.debug("handleSchemeTypeChange: selected scheme is null");
+			return;
+		}
+		
+		switch (scheme)
+		{
+		case ACTIVITY: 
+			this.resourceTypes = this.activityTypes;
+			this.editableResource = false;
+			break;
+		case CIS: 
+			this.resourceTypes = this.cisTypes;
+			this.editableResource = false;
+			break;
+		case CONTEXT:
+			this.resourceTypes = this.contextTypes;
+			this.editableResource = true;
+			break;
+		case CSS: 
+			this.resourceTypes = new ArrayList<String>();
+			this.editableResource = true;
+			break;
+		case DEVICE:
+			this.resourceTypes = this.deviceTypes;
+			this.editableResource = false;
+			break;
+		case SOCIALPROVIDER: 
+			this.resourceTypes = new ArrayList<String>();
+			this.editableResource = true;
+			break;
+		}
+	}
+	public List<String> getContextTypes() {
+		return contextTypes;
+	}
+
+
+	public void setContextTypes(List<String> contextTypes) {
+		this.contextTypes = contextTypes;
+	}
+
+
+	public List<DataIdentifierScheme> getSchemeList() {
+		return schemeList;
+	}
+
+
+	public void setSchemeList(List<DataIdentifierScheme> schemeList) {
+		this.schemeList = schemeList;
+	}
+
+
+	public List<String> getCisTypes() {
+		return cisTypes;
+	}
+
+
+	public void setCisTypes(List<String> cisTypes) {
+		this.cisTypes = cisTypes;
+	}
+
+
+	public List<String> getDeviceTypes() {
+		return deviceTypes;
+	}
+
+
+	public void setDeviceTypes(List<String> deviceTypes) {
+		this.deviceTypes = deviceTypes;
+	}
+
+
+	public List<String> getActivityTypes() {
+		return activityTypes;
+	}
+
+
+	public void setActivityTypes(List<String> activityTypes) {
+		this.activityTypes = activityTypes;
+	}
+
+
+	public boolean isEditableResource() {
+		return editableResource;
+	}
+
+
+	public void setEditableResource(boolean editableResource) {
+		this.editableResource = editableResource;
+	}
+
+
+	public List<String> getResourceTypes() {
+		return resourceTypes;
+	}
+
+
+	public void setResourceTypes(List<String> resourceTypes) {
+		this.resourceTypes = resourceTypes;
 	}
 
 
