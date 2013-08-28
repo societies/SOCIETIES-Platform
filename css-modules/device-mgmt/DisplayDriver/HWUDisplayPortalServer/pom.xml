@@ -69,7 +69,6 @@
 					<instructions>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
-						<Export-Package>org.societies.api.display.schema.displayportalserverbean.*</Export-Package>
 						<Include-Resource>{maven-resources}</Include-Resource>
 						<Import-Package>org.hibernate.proxy;resolution:=optional,
 						org.springframework.orm.hibernate3,
