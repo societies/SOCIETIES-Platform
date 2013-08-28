@@ -2,7 +2,10 @@ package org.societies.security.digsig.sign;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.cert.CertificateFactory;
@@ -29,6 +32,7 @@ import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
 import android.util.Log;
@@ -174,21 +178,70 @@ public class SignService extends IntentService {
 			serializer.write(doc, domOutput);
 
 			intent.putExtra("SIGNED_XML", output.toByteArray());
-			testWrite(intent);
+			writeToExternalStorage(intent);
 		} catch (Exception e) {  
 			Log.e(TAG, "Failed while signing!", e);
 		}
 	}
 	
-	private void testWrite(Intent resultIntent) {
+	private void writeToExternalStorage(Intent resultIntent) {
 		try	{
 			byte[] signedXml = resultIntent.getByteArrayExtra("SIGNED_XML");
 			FileOutputStream os = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/signed2.xml");
 			os.write(signedXml);
 			os.close();
 		
-			Toast.makeText(this, "File signed sucessfully.\nOutput is in signed2.xml on SD CARD!", Toast.LENGTH_LONG).show();
+			String msg = "File signed sucessfully.\nOutput is in signed2.xml on SD CARD.";
+			Log.i(TAG, msg);
+			Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
 		} catch(Exception e) {
+		}
+	}
+	
+	private void writeToInternalStorage(String fileName, byte[] file) throws DigSigException {
+		try {
+			FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
+			fos.write(file);
+			fos.close();
+		} catch (FileNotFoundException e) {
+			throw new DigSigException(e);
+		} catch (IOException e) {
+			throw new DigSigException(e);
+		}
+	}
+
+	/**
+	 * Read file and remove it after a successful read
+	 * 
+	 * @param fileName
+	 * @param delete Delete the file after successful read
+	 * @return The file contents
+	 * @throws DigSigException
+	 */
+	private byte[] readFromInternalStorage(String fileName, boolean delete) throws DigSigException {
+		
+		FileInputStream fis = null;
+		
+		try {
+			fis = openFileInput(fileName);
+			long size = fis.getChannel().size();
+			if (size > Integer.MAX_VALUE) {
+				fis.close();
+				throw new DigSigException("File \"" + fileName + "\" too big: " + size + " bytes");
+			}
+			byte[] file = new byte[(int) size];
+			fis.read(file);
+			fis.close();
+			if (delete) {
+				if (!deleteFile(fileName)) {
+					Log.w(TAG, "Could not delete file " + fileName);
+				}
+			}
+			return file;
+		} catch (FileNotFoundException e) {
+			throw new DigSigException(e);
+		} catch (IOException e) {
+			throw new DigSigException(e);
 		}
 	}
 }

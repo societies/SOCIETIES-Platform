@@ -15,10 +15,10 @@
                 <action android:name="android.intent.action.MAIN"></action>
             </intent-filter>
         </activity>
-        <activity android:name="ListFilesActivity" android:label="Please select a file">
+        <activity android:name="ListFilesActivity" android:label="@string/listFilesActivityName">
         </activity>
         
-        <activity android:name="ListIdentitiesActivity" android:label="Please select digital identity">
+        <activity android:name="ListIdentitiesActivity" android:label="@string/listIdentitiesActivityName">
         </activity>
         
         <activity android:name="PassEntryActivity"></activity>

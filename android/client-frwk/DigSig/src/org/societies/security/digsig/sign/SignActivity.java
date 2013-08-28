@@ -81,6 +81,8 @@ public class SignActivity extends Activity {
 			intent.putExtras(getIntent());
 			intent.putExtra(Sign.Params.IDENTITY, data.getIntExtra("SELECTED", -1));
 			startService(intent);
+			setResult(RESULT_OK);
+			finish();
 		}
 	}
 	
