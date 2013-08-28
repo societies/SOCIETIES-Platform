@@ -36,6 +36,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -76,16 +77,20 @@ public class PrivacyDataManagerTest extends IntegrationTest {
 
 
 	private RequestorBean requestor;
-	private CountDownLatch lock = new CountDownLatch(1);
+	private CountDownLatch lock;
 	private boolean succeed;
 	private String errorMsg;
 	private Exception errorException;
 	private DataWrapper obfuscatedDataWrapper;
 	private ResponseItem retrievedPermission;
+	
+	private long timestampSetUp;
+	private long timestampTearDown;
 
 
 	@Before
 	public void setUp() {
+		timestampSetUp = System.currentTimeMillis();
 		LOG.info("[#"+testCaseNumber+"] "+getClass().getSimpleName()+"::setUp");
 		// Dependency injection not ready
 		if (!TestCase.isDepencyInjectionDone()) {
@@ -95,10 +100,18 @@ public class PrivacyDataManagerTest extends IntegrationTest {
 		requestor = RequestorUtils.create(TestCase.getReceiverJid());
 
 		// Init
+		lock = new CountDownLatch(1);
 		succeed = false;
 		errorMsg = "";
 		errorException = null;
 		obfuscatedDataWrapper = null;
+	}
+	
+	@After
+	public void tearDown() {
+		LOG.info("[#"+testCaseNumber+"] tearDown");
+		timestampTearDown = System.currentTimeMillis();
+		LOG.info("[#"+testCaseNumber+"] Lasts: "+(timestampTearDown-timestampSetUp)+"ms");
 	}
 
 
@@ -160,7 +173,8 @@ public class PrivacyDataManagerTest extends IntegrationTest {
 				}
 			});
 
-			boolean releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
+			LOG.info("Wait: "+TestCase.getTimeout()+"ms ("+TimeUnit.MILLISECONDS+")");
+			boolean releaseBeforeTimeout = lock.await(2, TimeUnit.SECONDS);
 			// Check timeout
 			if (!releaseBeforeTimeout) {
 				succeed = false;
