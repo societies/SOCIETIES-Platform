@@ -45,7 +45,6 @@ import org.societies.api.services.IServices;
 
 import org.societies.api.css.devicemgmt.display.IDisplayPortalServer;
 import org.societies.display.server.dao.impl.ScreenDAO;
-import org.societies.display.server.gui.ScreenConfigurationDialog;
 import org.societies.display.server.model.Screen;
 import org.societies.display.server.model.ScreenConfiguration;
 /**
@@ -124,17 +123,7 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 		this.LOG.debug(this.toString() + " " + screens.toString());
 	}
 
-	//NOT USED ANY MORE //
-	private void getScreenConfigurationFromUser() {
-		ScreenConfigurationDialog dialog = new ScreenConfigurationDialog();
 
-		screenconfig = dialog.getScreens();
-		if (dialog!=null){
-			dialog.dispose();
-		}
-		this.LOG.debug(screenconfig.toString());
-		this.LOG.debug("initialised");
-	}
 
 
 

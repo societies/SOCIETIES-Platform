@@ -29,7 +29,6 @@ import java.util.TimerTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.rfid.client.api.remote.IRfidClient;
 import org.societies.rfid.server.api.IRfidServer;
 
 

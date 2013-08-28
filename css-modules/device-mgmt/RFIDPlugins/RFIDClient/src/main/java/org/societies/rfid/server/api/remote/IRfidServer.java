@@ -24,11 +24,6 @@
  */
 package org.societies.rfid.server.api.remote;
 
-import java.util.HashMap;
-
-
-
-
 public interface IRfidServer {
 	
 	/**

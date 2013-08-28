@@ -31,7 +31,6 @@
  */
 package org.societies.rfid.client.comm;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
