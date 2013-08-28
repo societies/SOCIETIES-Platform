@@ -29,7 +29,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.invocation.InvocationOnMock;
@@ -161,10 +160,10 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 	public static final String TEST_CIS_NAME_1 = "Flamengo Futebol Clube";
 	public static final String TEST_CIS_TYPW = "futebol";
 	
-	public static final String TEST_CISID_1 = "flamengo.societies.local";
-	public static final String TEST_CISID_2 = "santos.societies.local";
+	public static final String TEST_CISID_1 = "cis-flamengo.societies.local";
+	public static final String TEST_CISID_2 = "cis-santos.societies.local";
 	public static final String TEST_CIS_NAME_2 = "Santos Futebol Clube";
-	public static final String TEST_CISID_3 = "palmeiras.societies.local";
+	public static final String TEST_CISID_3 = "cis-palmeiras.societies.local";
 	public static final String TEST_CIS_NAME_3 = "Palmeiras Futebol Clube";
 	
 	public static final String MEMBER_JID_1 = "zico@flamengo.com";
@@ -337,12 +336,22 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		
 		when(mockPrivacyPolicyManager.deletePrivacyPolicy(any(org.societies.api.identity.RequestorCis.class))).thenReturn(true);
+		when(mockPrivacyPolicyManager.deletePrivacyPolicy(any(org.societies.api.schema.identity.RequestorCisBean.class))).thenReturn(true);
 		when(mockPrivacyPolicyManager.updatePrivacyPolicy(anyString(),any(org.societies.api.identity.RequestorCis.class))).thenReturn(null);
+		when(mockPrivacyPolicyManager.updatePrivacyPolicy(anyString(),any(org.societies.api.schema.identity.RequestorCisBean.class))).thenReturn(null);
+		
 		
 		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
 		permissions.add(new ResponseItem(new RequestItem(null, null, null, true),Decision.PERMIT));
 		when(mockIPrivacyDataManager.checkPermission(any(Requestor.class), any(DataIdentifier.class), any(Action.class))).
 		thenReturn(permissions);
+		
+		List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> permissions2 = new ArrayList<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem>();
+		org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem ri = new org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem ();
+		ri.setDecision(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision.PERMIT);
+		permissions2.add(ri);
+		when(mockIPrivacyDataManager.checkPermission(any(RequestorBean.class), any(DataIdentifier.class), any(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action.class))).
+		thenReturn(permissions2);
 		
 		doNothing().when(mockEventMgr).publishInternalEvent(any(org.societies.api.osgi.event.InternalEvent.class));
 		
@@ -1006,10 +1015,13 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 class GetListCallBack implements ICisManagerCallback{
 
 			public String cisJid = "";
+			boolean delCIs = false;// indicates if it should delete the CIS afterwards
+
 			
-			public GetListCallBack (String cisJid){
+			public GetListCallBack (String cisJid, boolean delCIs){
 				super();
 				this.cisJid = cisJid;
+				this.delCIs = delCIs;
 			}
 			 
 			public void receiveResult(boolean result){fail("should have received a Communy obj");}
@@ -1026,6 +1038,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 					int[] memberCheck = {0,0,0};
 					
 					Iterator<Participant> it = l.iterator();
+					
+					assertTrue(communityResultObject.getWhoResponse().isResult());
 					
 					while(it.hasNext()){
 						Participant element = it.next();
@@ -1046,8 +1060,10 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 				
 				
 				// CLEANING UP
-				assertTrue(cisManagerUnderTest.deleteCis(TEST_CISID_1));
-				assertEquals(cisManagerUnderTest.getCisList().size(),0);
+				if(delCIs){
+					assertTrue(cisManagerUnderTest.deleteCis(TEST_CISID_1));
+					assertEquals(cisManagerUnderTest.getCisList().size(),0);
+				}
 			}
 
 
@@ -1055,9 +1071,15 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		
 		// end of callback
 		
+		 // deprecated version
 		Iciss.getListOfMembers(new Requestor(testCisManagerId)
-				 ,new GetListCallBack(cisJid));
+				 ,new GetListCallBack(cisJid,false));
 
+		// non deprecated version
+		RequestorBean rb = new RequestorBean();
+		rb.setRequestorId(testCisManagerId.getBareJid());
+		Iciss.getListOfMembers(rb
+		 ,new GetListCallBack(cisJid,true));
 	
 	
 	}
@@ -1082,9 +1104,11 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 		 class GetInfoCallBack implements ICisManagerCallback{
 			 
 			 ICisOwned IcissOwned;
+			 boolean delCIs = false;// indicates if it should delete the CIS afterwards
 				
-			public GetInfoCallBack(ICisOwned IcissOwned){
+			public GetInfoCallBack(ICisOwned IcissOwned, boolean delCIs){
 					this.IcissOwned = IcissOwned;
+					this.delCIs = delCIs;
 			}
 			 
 			public void receiveResult(boolean result){fail("should have received a Communy obj");}
@@ -1099,6 +1123,8 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 				}
 				else{
 
+					assertTrue(communityResultObject.getGetInfoResponse().isResult());
+					
 					Community c = communityResultObject.getGetInfoResponse().getCommunity();
 					// check vs input on create
 					assertEquals(c.getCommunityName(), TEST_CIS_NAME_1);
@@ -1114,16 +1140,25 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 					
 				}
 				
-				
-				// CLEANING UP
-				cisManagerUnderTestInterface.deleteCis(this.IcissOwned.getCisId());
-				assertEquals(cisManagerUnderTest.getCisList().size(),0);
+				if(delCIs){
+					// CLEANING UP
+					cisManagerUnderTestInterface.deleteCis(this.IcissOwned.getCisId());
+					assertEquals(cisManagerUnderTest.getCisList().size(),0);
+				}
 			}
 		}		
 		// end of callback
 		// call and wait for callback
+		 
+		 // deprecated version
 		 Requestor req = new Requestor(testCisManagerId);
-		 icssRemote.getInfo(req,new GetInfoCallBack(IcissOwned));
+		 icssRemote.getInfo(req,new GetInfoCallBack(IcissOwned,false));
+		 
+		// non deprecated version
+		RequestorBean rb = new RequestorBean();
+		rb.setRequestorId(testCisManagerId.getBareJid());
+		icssRemote.getInfo(rb
+		 ,new GetInfoCallBack(IcissOwned,true));
 	
 	}
 	
@@ -1747,7 +1782,7 @@ public class TestCisManager extends AbstractTransactionalJUnit4SpringContextTest
 
 		// 3.2 testing with requestor
 		RequestorBean rb = new RequestorBean();
-		rb.setRequestorId(CIS_MANAGER_CSS_ID);
+		rb.setRequestorId(testCisManagerId.getBareJid());
 		w.setRequestor(rb);
 		
 		result	= (CommunityMethods) directCISHandler.getQuery(whoStanza, payload);	

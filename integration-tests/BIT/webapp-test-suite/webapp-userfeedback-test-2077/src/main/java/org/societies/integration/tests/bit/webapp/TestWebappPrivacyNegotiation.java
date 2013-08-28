@@ -116,6 +116,44 @@ public class TestWebappPrivacyNegotiation extends SeleniumTest {
         log.debug("Test complete");
     }
 
+    @Test
+    public void canCancelPPN() throws ExecutionException, InterruptedException {
+
+        String requestId = UUID.randomUUID().toString();
+
+        // login, check no notifications existing
+        indexPage.doLogin(USERNAME, PASSWORD);
+
+        TestPage testPage = indexPage.navigateToTestPage();
+        testPage.clickResetUFButton();
+
+        testPage.verifyNumberInNotificationsBubble(0);
+
+        // send PPN
+        Future<ResponsePolicy> responsePolicyFuture = buildAndSendPPN(requestId);
+        Assert.assertFalse(responsePolicyFuture.isDone());
+
+        // ensure notification displayed
+        testPage.verifyNumberInNotificationsBubble(1);
+
+        // switch to the notification page
+        UFNotificationPopup ufNotificationPopup = indexPage.clickNotificationBubble();
+        PrivacyPolicyNegotiationRequestPage ppnPage = ufNotificationPopup.clickPPNLink(requestId);
+
+        Assert.assertFalse(responsePolicyFuture.isDone());
+
+        ppnPage.clickCancelPpnButton();
+
+        Assert.assertTrue(responsePolicyFuture.isDone());
+
+        ResponsePolicy policy = responsePolicyFuture.get();
+        Assert.assertEquals(NegotiationStatus.FAILED, policy.getNegotiationStatus());
+
+        testPage.verifyNumberInNotificationsBubble(0);
+
+        log.debug("Test complete");
+    }
+
     private Future<ResponsePolicy> buildAndSendPPN(String requestID) {
         String requestorId = UUID.randomUUID().toString();
         int negotiationId = new BigInteger(130, random).intValue();

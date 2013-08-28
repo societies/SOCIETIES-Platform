@@ -89,8 +89,5 @@
 
     <context:annotation-config />
     <tx:annotation-driven />
-   
-   <bean id="CPACreationPatterns" class="org.societies.orchestration.cpa.impl.CPACreationPatterns" 
-   depends-on="" init-method="init">
-	</bean>
+
 </beans>

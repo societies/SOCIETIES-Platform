@@ -35,6 +35,7 @@ import org.societies.api.cis.management.ICisParticipant;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.schema.cis.community.Community;
+import org.societies.api.schema.identity.RequestorBean;
 
 /**
  * @author Eliza
@@ -111,12 +112,23 @@ public class CisOwned implements ICisOwned {
 		// TODO Auto-generated method stub
 
 	}
+	
+	@Override
+	public void getInfo(RequestorBean arg0, ICisManagerCallback arg1) {
+		// TODO Auto-generated method stub
+
+	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.api.cis.management.ICisRemote#getListOfMembers(org.societies.api.identity.Requestor, org.societies.api.cis.management.ICisManagerCallback)
 	 */
 	@Override
 	public void getListOfMembers(Requestor arg0, ICisManagerCallback arg1) {
+		// TODO Auto-generated method stub
+
+	}
+	@Override
+	public void getListOfMembers(RequestorBean arg0, ICisManagerCallback arg1) {
 		// TODO Auto-generated method stub
 
 	}
