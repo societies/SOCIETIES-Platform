@@ -27,12 +27,16 @@ package org.societies.webapp.controller.privacy.prefs;
 
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -47,37 +51,46 @@ import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.AccessControlPreferenceDetailsBean;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PrivacyOutcomeConstantsBean;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyConditionsConstantValues;
 import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
+import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ContextPreferenceCondition;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyCondition;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyPreference;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.TrustPreferenceCondition;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.accesscontrol.AccessControlOutcome;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.accesscontrol.AccessControlPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.OperatorConstants;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ppn.PPNPOutcome;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ppn.PPNPrivacyPreferenceTreeModel;
-import org.societies.webapp.controller.BasePageController;
 import org.societies.webapp.service.PrivacyUtilService;
 /**
  * @author Eliza
  *
  */
 @ViewScoped
-@ManagedBean(name="PPNeditBean")
-public class PPNEditBean extends BasePageController implements Serializable{
+@ManagedBean(name="AccCtrleditBean")
+public class AccCtrlEditBean implements Serializable{
 
 	private final Logger logging = LoggerFactory.getLogger(getClass());
 
@@ -85,24 +98,34 @@ public class PPNEditBean extends BasePageController implements Serializable{
 
 	private TreeNode selectedNode;
 
+	private List<String> ctxIds = new ArrayList<String>();
+	private String selectedCtxID = "";
 
-	@ManagedProperty(value="#{privacyUtilService}")
-	private PrivacyUtilService privacyUtilService;
+	@ManagedProperty(value="#{internalCtxBroker}")
+	private ICtxBroker ctxBroker;
 
 	@ManagedProperty(value="#{commMngrRef}")
 	private ICommManager commMgr;
-
+	
 	@ManagedProperty(value = "#{privPrefMgr}")
 	private IPrivacyPreferenceManager privPrefmgr;
 
+	@ManagedProperty(value="#{privacyUtilService}")
+	private PrivacyUtilService privacyUtilService;
+	
+	
+	private String ctxValue;
 
+	private IIdentity userId;
+
+
+	Hashtable<String, CtxIdentifier> ctxIDTable = new Hashtable<String, CtxIdentifier>();
 
 	private List<OperatorConstants> operators = new ArrayList<OperatorConstants>();
 
 	private OperatorConstants selectedOperator;
-
-
-	private PPNPreferenceDetailsBean preferenceDetails;
+	private OperatorConstants selectedCtxOperator;
+	private AccessControlPreferenceDetailsBean preferenceDetails = new AccessControlPreferenceDetailsBean();
 
 	private int requestorType;
 
@@ -111,35 +134,95 @@ public class PPNEditBean extends BasePageController implements Serializable{
 
 	private boolean preferenceDetailsCorrect = false;
 
-	private Decision selectedDecision;
-	private List<Decision> decisions;
+	private PrivacyOutcomeConstantsBean selectedDecision;
+	private List<PrivacyOutcomeConstantsBean> decisions;
 
+	private String trustValue;
+	
 	private ConditionConstants selectedPrivacyCondition;
 	private Map<ConditionConstants,ConditionConstants> privacyConditions;
 
 	private String selectedPrivacyValue;
 	private Map<String, String> privacyValues;
 
-	private Map<ConditionConstants,Map<String,String>> privacyConditionData = new HashMap<ConditionConstants, Map<String,String>>(); 
+	private Map<ConditionConstants,Map<String,String>> privacyConditionData = new HashMap<ConditionConstants, Map<String,String>>();
 
+	private List<DataIdentifierScheme> schemeList;
 
-	private String trustValue;
+	private List<String> contextTypes;
 
-	private String displaySpecificRequestor;
+	private List<String> cisTypes;
 
-	private String ppnDetailUUID;
+	private List<String> deviceTypes;
 
-	public PPNEditBean() {
+	private List<String> activityTypes;
+
+	private List<String> resourceTypes;
+
+	private boolean editableResource; 
+	
+	private String accCtrlDetailUUID;
+	
+	public AccCtrlEditBean() {
 
 	}
 
 
+	public void startAddPrivacyConditionProcess(){
+		RequestContext.getCurrentInstance().execute("addPrivConddlg.show();");
+	}
+
+	public void startAddTrustConditionProcess(){
+		RequestContext.getCurrentInstance().execute("addTrustConddlg.show();");
+	}
+
 	@PostConstruct
 	public void setup(){
-
+		
+		preferenceDetails.setRequestor(new RequestorBean());
+		preferenceDetails.getRequestor().setRequestorId("");
+		preferenceDetails.setResource(new Resource());
+		preferenceDetails.getResource().setDataType("");
+		
+		setupDataTypes();
+		this.createCtxAttributeTypesList();
+		this.createSchemeList();
 		setOperators(Arrays.asList(OperatorConstants.values()));
-		setDecisions(Arrays.asList(Decision.values()));
+		setDecisions(Arrays.asList(PrivacyOutcomeConstantsBean.values()));
+		this.setupConditions();
+		
+		Map<String, String> requestParameterMap = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+		this.logging.debug("\n\n\n\n\n\n\n\n\n\n");
+		Iterator<String> iterator = requestParameterMap.keySet().iterator();
+		while (iterator.hasNext()){
+			String key = iterator.next();
+			this.logging.debug("RequestParameter : "+key+" = "+requestParameterMap.get(key));
+		}
+		this.logging.debug("\n\n\n\n\n\n\n\n\n\n");
 
+		
+		if (requestParameterMap.containsKey("accCtrlDetailUUID")){
+			try{
+
+				setAccCtrlDetailUUID(requestParameterMap.get("accCtrlDetailUUID"));
+				this.preferenceDetails = this.privacyUtilService.getAccessControlPreferenceDetailsBean(accCtrlDetailUUID);
+				this.logging.debug("got ppn details: "+this.preferenceDetails.toString());
+				 AccessControlPreferenceTreeModel accCtrlPreference = this.privPrefmgr.getAccCtrlPreference(preferenceDetails);
+				this.logging.debug("Retrieved ppn preference : \n"+accCtrlPreference.getRootPreference().toString());
+				TreeNode node = new DefaultTreeNode("Root", null); 
+				this.root = ModelTranslator.getPrivacyPreference(accCtrlPreference.getRootPreference(), node);
+				this.logging.debug("*** AFter translation of model: ****\n");
+				printTree();
+			} catch (Exception e){
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error getting accCtrl detail bean"));
+				this.logging.debug("Error getting ppn detail bean");
+			}
+		}else{
+			this.logging.debug("RequestParameterMap does not contain key ppnDetailUUID");
+		}
+	}
+	
+	private void setupConditions(){
 		List<ConditionConstants> conditionsList = Arrays.asList(ConditionConstants.values());
 		this.privacyConditions = new HashMap<ConditionConstants, ConditionConstants>();
 		for (ConditionConstants c: conditionsList){
@@ -159,42 +242,55 @@ public class PPNEditBean extends BasePageController implements Serializable{
 			}
 
 			this.privacyConditionData.put(c, temp);
-			ConditionConstants cc = this.privacyConditionData.keySet().iterator().next();
-			this.setPrivacyValues(this.privacyConditionData.get(cc));
+
 		}
 
-		Map<String, String> requestParameterMap = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
-
-		this.logging.debug("\n\n\n\n\n\n\n\n\n\n");
-		Iterator<String> iterator = requestParameterMap.keySet().iterator();
-		while (iterator.hasNext()){
-			String key = iterator.next();
-			this.logging.debug("RequestParameter : "+key+" = "+requestParameterMap.get(key));
-		}
-		this.logging.debug("\n\n\n\n\n\n\n\n\n\n");
-
-		if (requestParameterMap.containsKey("ppnDetailUUID")){
-			try{
-
-				setPpnDetailUUID(requestParameterMap.get("ppnDetailUUID"));
-				this.preferenceDetails = this.privacyUtilService.getPpnPreferenceDetailsBean(getPpnDetailUUID());
-				this.logging.debug("got ppn details: "+this.preferenceDetails.toString());
-				PPNPrivacyPreferenceTreeModel ppnPreference = this.privPrefmgr.getPPNPreference(preferenceDetails);
-				this.logging.debug("Retrieved ppn preference : \n"+ppnPreference.getRootPreference().toString());
-				TreeNode node = new DefaultTreeNode("Root", null); 
-				this.root = ModelTranslator.getPrivacyPreference(ppnPreference.getRootPreference(), node);
-				this.logging.debug("*** AFter translation of model: ****\n");
-				printTree();
-			} catch (Exception e){
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error getting ppn detail bean"));
-				this.logging.debug("Error getting ppn detail bean");
-			}
-		}else{
-			this.logging.debug("RequestParameterMap does not contain key ppnDetailUUID");
-		}
+		ConditionConstants cc = this.privacyConditionData.keySet().iterator().next();
+		this.setPrivacyValues(this.privacyConditionData.get(cc));
+		this.selectScheme(this.schemeList.get(0));
 	}
-
-
+	
+	private void createSchemeList() {
+		this.schemeList = new ArrayList<DataIdentifierScheme>();
+		DataIdentifierScheme[] fields = DataIdentifierScheme.values();
+		
+		for (int i=0; i<fields.length; i++){
+			if (!fields[i].name().equalsIgnoreCase("CSS"))
+				this.schemeList.add(fields[i]);
+		}
+		
+		
+	}
+	
+	private void createCtxAttributeTypesList() {
+		this.contextTypes = new ArrayList<String>();
+		Field[] fields = CtxAttributeTypes.class.getDeclaredFields();
+		
+		String[] names = new String[fields.length];
+		
+		for (int i=0; i<names.length; i++){
+			names[i] = fields[i].getName();
+			
+			
+		}
+		this.contextTypes = Arrays.asList(names);
+		
+	}
+	
+	private void setupDataTypes() {
+		this.cisTypes = new ArrayList<String>();
+		this.cisTypes.add("cis-member-list");
+		this.cisTypes.add("cis-list");
+		
+		this.deviceTypes = new ArrayList<String>();
+		this.deviceTypes.add("meta-data");
+		
+		this.activityTypes = new ArrayList<String>();
+		this.activityTypes.add("activityfeed");
+		
+		
+	}
+	
 	public void savePreferenceDetails(){
 		ServiceResourceIdentifier serviceID; 
 		String rType = "simple";
@@ -249,26 +345,10 @@ public class PPNEditBean extends BasePageController implements Serializable{
 		context.execute("prefDetailsDlg.hide()");
 		this.logging.debug("Successfully validated preferenceDetails");
 		this.preferenceDetailsCorrect = true;
-
+		
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "PPN preference details set", "Set requestor: "+preferenceDetails.getRequestor().getRequestorId()+
 				"\n, type: "+rType+specific+"\nSet resource: "+preferenceDetails.getResource().getDataType());
 		FacesContext.getCurrentInstance().addMessage(null, message);
-
-
-
-
-	}
-
-
-	public String deletePreference(){
-		boolean deletePPNPreference = this.privPrefmgr.deletePPNPreference(preferenceDetails);
-
-		if (deletePPNPreference){
-			this.privacyUtilService.removePpnPreferenceDetailsBean(this.getPpnDetailUUID());
-
-			return "privacypreferences.xhtml";
-		}
-		else return "privacy_ppn_edit.xhtml";
 	}
 	public TreeNode getSelectedNode() {
 		return selectedNode;
@@ -313,7 +393,7 @@ public class PPNEditBean extends BasePageController implements Serializable{
 			str = str+child+"\n";
 			return str.concat(getChildrenToPrint(child));
 
-
+			
 		}
 		return str;
 	}
@@ -333,47 +413,23 @@ public class PPNEditBean extends BasePageController implements Serializable{
 	public void startAddConditionProcess(){
 		RequestContext.getCurrentInstance().execute("addConddlg.show();");
 	}
-
+	
 	public void startAddOutcomeProcess(){
 		RequestContext.getCurrentInstance().execute("addOutdlg.show();");
 	}
-
-	public void startAddPrivacyConditionProcess(){
-		RequestContext.getCurrentInstance().execute("addPrivConddlg.show();");
-	}
-
-	public void startAddTrustConditionProcess(){
-		RequestContext.getCurrentInstance().execute("addTrustConddlg.show();");
-	}
-
-	public void addTrustCondition(){
+	
+	public void addCondition(){
+		
 		if (selectedNode==null){
-			this.logging.debug("selected node is null - addPrivacyCondition");
+			this.logging.debug("selected node is null - addCondition");
 			return;
 		}
-		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Adding condition", "wait");
+		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Adding condition", "id: "+this.selectedCtxID+", value: "+this.ctxValue);
 
 		FacesContext.getCurrentInstance().addMessage(null, message);
 
-		TrustedEntityId trustId = createTrustedEntityId();
-
-		if (trustId==null){
-			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Adding trust condition failed", "Failed to create TrustedEntityId");
-			FacesContext.getCurrentInstance().addMessage(null, message);
-			return;
-		}
-
-
-		Double tValue = 1.0;
-		try{
-			tValue = Double.parseDouble(this.trustValue);
-		}catch(NumberFormatException nfe){
-			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Adding trust condition failed", "Failed to parse double value for trust");
-			FacesContext.getCurrentInstance().addMessage(null, message);
-			return;
-		}
-		TrustPreferenceCondition trustCondition = new TrustPreferenceCondition(trustId, tValue);
-		if (selectedNode.getData() instanceof PPNPOutcome){
+		ContextPreferenceCondition conditionBean = new ContextPreferenceCondition(this.ctxIDTable.get(selectedCtxID), selectedCtxOperator, ctxValue);
+		if (selectedNode.getData() instanceof AccessControlOutcome){
 			this.logging.debug("Adding condition to outcome");
 			//get the parent of the outcome node
 			TreeNode parent = selectedNode.getParent();
@@ -382,7 +438,7 @@ public class PPNEditBean extends BasePageController implements Serializable{
 			parent.getChildren().remove(selectedNode);
 			this.logging.debug("removed selected node from parent. parent now has "+parent.getChildCount()+" children nodes");
 			//create the condition node
-			TreeNode conditionNode = new DefaultTreeNode(trustCondition, parent);
+			TreeNode conditionNode = new DefaultTreeNode(conditionBean, parent);
 			this.logging.debug("added: "+conditionNode+" to parent: "+parent);
 			//add the condition node to the parent node
 			//parent.getChildren().add(conditionNode);
@@ -394,38 +450,18 @@ public class PPNEditBean extends BasePageController implements Serializable{
 		}else{
 			this.logging.debug("Adding condition to condition");
 			//create the condition node
-			TreeNode conditionNode = new DefaultTreeNode(trustCondition, selectedNode);
+			TreeNode conditionNode = new DefaultTreeNode(conditionBean, selectedNode);
 			//add the conditionNode under the selected node
 			//selectedNode.getChildren().add(conditionNode);
 			//set the selected Node to be parent of the new condition node
 			conditionNode.setParent(selectedNode);
-
-
-		}
-	}
-	private TrustedEntityId createTrustedEntityId() {
-		try {
-			if (this.preferenceDetails.getRequestor() instanceof RequestorCisBean){
-
-				return new TrustedEntityId(TrustedEntityType.CIS, this.preferenceDetails.getRequestor().getRequestorId());
-			}
-			if (this.preferenceDetails.getRequestor() instanceof RequestorServiceBean){
-
-				return new TrustedEntityId(TrustedEntityType.SVC, ServiceModelUtils.serviceResourceIdentifierToString(((RequestorServiceBean) this.preferenceDetails.getRequestor()).getRequestorServiceId()));
-			}
-
-			if (this.preferenceDetails.getRequestor() instanceof RequestorBean){
-				return new TrustedEntityId(TrustedEntityType.CSS, this.preferenceDetails.getRequestor().getRequestorId());
-			}
-		} catch (MalformedTrustedEntityIdException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			
 		}
 
-		return null;
-
+		this.logging.debug("Added new condition "+conditionBean+" to selected node:"+selectedNode);
+		printTree();
 	}
-
 
 	public void addPrivacyCondition(){
 		if (selectedNode==null){
@@ -441,7 +477,7 @@ public class PPNEditBean extends BasePageController implements Serializable{
 		condition.setValue(selectedPrivacyValue);
 		PrivacyCondition privacyCondition = new PrivacyCondition(condition); 
 
-		if (selectedNode.getData() instanceof PPNPOutcome){
+		if (selectedNode.getData() instanceof AccessControlOutcome){
 			this.logging.debug("Adding condition to outcome");
 			//get the parent of the outcome node
 			TreeNode parent = selectedNode.getParent();
@@ -471,50 +507,136 @@ public class PPNEditBean extends BasePageController implements Serializable{
 
 		}
 	}
+	public void addTrustCondition(){
+		if (selectedNode==null){
+			this.logging.debug("selected node is null - addPrivacyCondition");
+			return;
+		}
+		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Adding condition", "wait");
+
+		FacesContext.getCurrentInstance().addMessage(null, message);
+
+		TrustedEntityId trustId = createTrustedEntityId();
+
+		if (trustId==null){
+			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Adding trust condition failed", "Failed to create TrustedEntityId");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			return;
+		}
 
 
+		Double tValue = 1.0;
+		try{
+			tValue = Double.parseDouble(this.trustValue);
+		}catch(NumberFormatException nfe){
+			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Adding trust condition failed", "Failed to parse double value for trust");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			return;
+		}
+		TrustPreferenceCondition trustCondition = new TrustPreferenceCondition(trustId, tValue);
+		if (selectedNode.getData() instanceof AccessControlOutcome){
+			this.logging.debug("Adding condition to outcome");
+			//get the parent of the outcome node
+			TreeNode parent = selectedNode.getParent();
+			this.logging.debug("parent of selected node is: "+parent);
+			//remove the outcome from its parent
+			parent.getChildren().remove(selectedNode);
+			this.logging.debug("removed selected node from parent. parent now has "+parent.getChildCount()+" children nodes");
+			//create the condition node
+			TreeNode conditionNode = new DefaultTreeNode(trustCondition, parent);
+			this.logging.debug("added: "+conditionNode+" to parent: "+parent);
+			//add the condition node to the parent node
+			//parent.getChildren().add(conditionNode);
+			//set the condition as parent of the outcome
+			selectedNode.setParent(conditionNode);
+			this.logging.debug("set parent: "+conditionNode+" for selectedNode: "+selectedNode);
+			//add the outcome node to the condition node;
+			//conditionNode.getChildren().add(selectedNode);
+		}else{
+			this.logging.debug("Adding condition to condition");
+			//create the condition node
+			TreeNode conditionNode = new DefaultTreeNode(trustCondition, selectedNode);
+			//add the conditionNode under the selected node
+			//selectedNode.getChildren().add(conditionNode);
+			//set the selected Node to be parent of the new condition node
+			conditionNode.setParent(selectedNode);
+
+
+		}
+	}
+	
 	public void addOutcome(){
 		if (selectedNode==null){
 			this.logging.debug("selected node is null - addOutcome");
 			return;
 		}
-
-		if (selectedNode.getData() instanceof PPNPOutcome){
+		
+		if (selectedNode.getData() instanceof AccessControlOutcome){
 			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Adding outcome", "You can't add an outcome as a subnode of another outcome. Please select a condition node to add the new outcome to.");
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			return;
 		}
-
+		
 		if (selectedNode.getChildCount()>0){
 			List<TreeNode> children = selectedNode.getChildren();
 			for (TreeNode child :children){
-				if (child.getData() instanceof PPNPOutcome){
+				if (child.getData() instanceof AccessControlOutcome){
 					FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Adding outcome", "You can't have two outcomes under the same condition. Please delete the existing one and create a new one or edit the existing one.");
 					FacesContext.getCurrentInstance().addMessage(null, message);
 					return;
 				}
 			}
 		}
-		PPNPOutcome outcome = new PPNPOutcome(selectedDecision);
-
-		TreeNode newNode = new DefaultTreeNode(outcome, selectedNode);
-
-
+		AccessControlOutcome outcome = new AccessControlOutcome(selectedDecision);
+			
+			TreeNode newNode = new DefaultTreeNode(outcome, selectedNode);
+		
+		
 		this.logging.debug("Added new outcome : "+newNode+" to selected node: "+selectedNode);
 
 	}
+	
+	
+	private TrustedEntityId createTrustedEntityId() {
+		try {
+			if (this.preferenceDetails.getRequestor() instanceof RequestorCisBean){
 
+				return new TrustedEntityId(TrustedEntityType.CIS, this.preferenceDetails.getRequestor().getRequestorId());
+			}
+			if (this.preferenceDetails.getRequestor() instanceof RequestorServiceBean){
+
+				return new TrustedEntityId(TrustedEntityType.SVC, ServiceModelUtils.serviceResourceIdentifierToString(((RequestorServiceBean) this.preferenceDetails.getRequestor()).getRequestorServiceId()));
+			}
+
+			if (this.preferenceDetails.getRequestor() instanceof RequestorBean){
+				return new TrustedEntityId(TrustedEntityType.CSS, this.preferenceDetails.getRequestor().getRequestorId());
+			}
+		} catch (MalformedTrustedEntityIdException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return null;
+
+	}
+	
 	public String formatNodeForDisplay(Object node){
 		if (node==null){
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("can't format node. node is null"));
 			return "null node";
 		}
-
-		if (node instanceof PPNPOutcome){
-			PPNPOutcome bean = (PPNPOutcome) node;
-			return "Decision: "+ bean.getDecision().value();
+		
+		if (node instanceof AccessControlOutcome){
+			AccessControlOutcome outcome = (AccessControlOutcome) node;
+			
+			return "Decision: "+ outcome.getEffect().value();
 		}
-
+		
+		if (node instanceof ContextPreferenceCondition){
+			ContextPreferenceCondition condition = (ContextPreferenceCondition) node;
+			return "Condition: "+condition.getCtxIdentifier().getType()+" = "+condition.getValue();
+		}
+		
 		if (node instanceof PrivacyCondition){
 			PrivacyCondition privacyCondition = (PrivacyCondition) node;
 			return "Condition: "+privacyCondition.getCondition().getConditionConstant()+" = "+privacyCondition.getCondition().getValue();
@@ -526,14 +648,15 @@ public class PPNEditBean extends BasePageController implements Serializable{
 			return "Condition: trustOfRequestor > "+trustCondition.getTrustThreshold();
 		}
 		
+		
 		else return "Unparseable: "+node;
-
+		
 	}
 
 	public void editNode(){
 		if (selectedNode !=null){
 			Object data = selectedNode.getData();
-			if (data instanceof PPNPOutcome){
+			if (data instanceof AccessControlOutcome){
 
 			}
 		}
@@ -560,8 +683,8 @@ public class PPNEditBean extends BasePageController implements Serializable{
 		selectedNode = null;
 
 		if (this.root.getChildCount()==0){
-			PPNPOutcome outcome = new PPNPOutcome(Decision.PERMIT);
-
+			AccessControlOutcome outcome = new AccessControlOutcome(PrivacyOutcomeConstantsBean.ALLOW);
+			
 
 			TreeNode node0 = new DefaultTreeNode(outcome, root);
 		}
@@ -569,28 +692,67 @@ public class PPNEditBean extends BasePageController implements Serializable{
 		FacesContext.getCurrentInstance().addMessage(null, message);
 	}
 
-
+	
 	public void savePreference(){
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Saving preference", "Now saving prefernece");
 		FacesContext.getCurrentInstance().addMessage(null, message);
 		this.logging.debug("savePreferences called");
-
-
 		PrivacyPreference privacyPreference = ModelTranslator.getPrivacyPreference(root);
-
+		this.logging.debug("Printing preference before save: \n"+privacyPreference.toString());
 		this.logging.debug("Saving preferences with details: "+preferenceDetails.toString());
-		PPNPrivacyPreferenceTreeModel model = new PPNPrivacyPreferenceTreeModel(preferenceDetails, privacyPreference);
-		if (this.privPrefmgr.storePPNPreference(preferenceDetails, model)){
-			message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Your new Privacy Policy Negotiation preference has been successfully saved.");
+		AccessControlPreferenceTreeModel model = new AccessControlPreferenceTreeModel(preferenceDetails, privacyPreference);
+		if (this.privPrefmgr.storeAccCtrlPreference(preferenceDetails, model)){
+			message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Your new Access Control preference has been successfully saved.");
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		}else{
-			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure", "An error occurred while saving your new Privacy Policy Negotiation preference.");
+			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure", "An error occurred while saving your new Access Control preference.");
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		}
+	}
+	
+	
+	public List<String> getCtxIds() {
+		try {
+			this.logging.debug("Retrieving context attributes to be used as conditions");
+			IndividualCtxEntity individualCtxEntity = this.ctxBroker.retrieveIndividualEntity(userId).get();
+			Set<CtxAttribute> attributes = individualCtxEntity.getAttributes();
 
+			Iterator<CtxAttribute> iterator = attributes.iterator();
+			this.ctxIds.clear();
+
+			while(iterator.hasNext()){
+
+				CtxAttributeIdentifier id = iterator.next().getId();
+				this.ctxIds.add(id.getUri());
+				this.ctxIDTable.put(id.getUri(), id);
+			}
+			this.logging.debug("Found "+this.ctxIds.size()+" context attributes");
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return this.ctxIds;
 	}
 
+	public void setCtxIds(List<String> ctxIds) {
+		this.ctxIds = ctxIds;
+	}
 
+	public ICtxBroker getCtxBroker() {
+		return ctxBroker;
+	}
+
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		this.ctxBroker = ctxBroker;
+	}
 
 	public ICommManager getCommMgr() {
 		return commMgr;
@@ -598,6 +760,15 @@ public class PPNEditBean extends BasePageController implements Serializable{
 
 	public void setCommMgr(ICommManager commMgr) {
 		this.commMgr = commMgr;
+		this.userId = this.commMgr.getIdManager().getThisNetworkNode();
+	}
+
+	public String getCtxValue() {
+		return ctxValue;
+	}
+
+	public void setCtxValue(String ctxValue) {
+		this.ctxValue = ctxValue;
 	}
 
 
@@ -621,16 +792,26 @@ public class PPNEditBean extends BasePageController implements Serializable{
 		this.selectedOperator = selectedOperator;
 	}
 
+	public String getSelectedCtxID() {
+		if (!this.ctxIds.isEmpty()){
+			this.selectedCtxID = ctxIds.get(0);
+		}
+		return selectedCtxID;
+	}
+
+	public void setSelectedCtxID(String selectedCtxID) {
+		this.selectedCtxID = selectedCtxID;
+	}
+
+
 
 	public TreeNode getRoot() {
 		if (this.root==null){
 			this.root = new DefaultTreeNode("Root", null);
 			this.logging.debug("loading tree with default tree node");
-			PPNPOutcome outcome = new PPNPOutcome(Decision.PERMIT);
-			TreeNode node0 = new DefaultTreeNode(outcome, root);	
+			AccessControlOutcome outcome = new AccessControlOutcome(PrivacyOutcomeConstantsBean.ALLOW);
+			TreeNode node0 = new DefaultTreeNode(outcome, root);
 		}
-		this.logging.debug("getRoot");
-		this.printTree();
 		return root;
 	}
 
@@ -642,13 +823,13 @@ public class PPNEditBean extends BasePageController implements Serializable{
 
 
 
-	public PPNPreferenceDetailsBean getPreferenceDetails() {
+	public AccessControlPreferenceDetailsBean getPreferenceDetails() {
 		return preferenceDetails;
 	}
 
 
 
-	public void setPreferenceDetails(PPNPreferenceDetailsBean preferenceDetails) {
+	public void setPreferenceDetails(AccessControlPreferenceDetailsBean preferenceDetails) {
 		this.preferenceDetails = preferenceDetails;
 	}
 
@@ -697,10 +878,50 @@ public class PPNEditBean extends BasePageController implements Serializable{
 		this.requestorType = requestorType;
 	}
 
+	public void handleSchemeTypeChange(){
+		DataIdentifierScheme scheme = this.preferenceDetails.getResource().getScheme();
+		if (scheme==null){
+			this.logging.debug("handleSchemeTypeChange: selected scheme is null");
+			return;
+		}
+		selectScheme(scheme);
 
+	}
 
-
-
+	private void selectScheme(DataIdentifierScheme scheme){
+		switch (scheme)
+		{
+		case ACTIVITY: 
+			this.resourceTypes = this.activityTypes;
+			this.editableResource = false;
+			break;
+		case CIS: 
+			this.resourceTypes = this.cisTypes;
+			this.editableResource = false;
+			break;
+		case CONTEXT:
+			this.resourceTypes = this.contextTypes;
+			this.editableResource = true;
+			break;
+		case CSS: 
+			this.resourceTypes = new ArrayList<String>();
+			this.editableResource = true;
+			break;
+		case DEVICE:
+			this.resourceTypes = this.deviceTypes;
+			this.editableResource = false;
+			break;
+		case SOCIALPROVIDER: 
+			this.resourceTypes = new ArrayList<String>();
+			this.editableResource = true;
+			break;
+		}		
+	}
+	public void handlePrivacyTypeChange(){
+		this.logging.debug("handlePrivacyTypeChange for: "+this.selectedPrivacyCondition);
+		this.setPrivacyValues(this.privacyConditionData.get(selectedPrivacyCondition));
+	}
+	
 
 	public boolean isPreferenceDetailsCorrect() {
 		this.logging.debug("preferenceDetailsCorrect: "+preferenceDetailsCorrect);
@@ -738,42 +959,42 @@ public class PPNEditBean extends BasePageController implements Serializable{
 	}
 
 
-	public Decision getSelectedDecision() {
+	public PrivacyOutcomeConstantsBean getSelectedDecision() {
 		return selectedDecision;
 	}
 
 
-	public void setSelectedDecision(Decision selectedDecision) {
+	public void setSelectedDecision(PrivacyOutcomeConstantsBean selectedDecision) {
 		this.selectedDecision = selectedDecision;
 	}
 
 
-	public List<Decision> getDecisions() {
+	public List<PrivacyOutcomeConstantsBean> getDecisions() {
 		return decisions;
 	}
 
 
-	public void setDecisions(List<Decision> decisions) {
+	public void setDecisions(List<PrivacyOutcomeConstantsBean> decisions) {
 		this.decisions = decisions;
 	}
 
 
-	public ConditionConstants getSelectedPrivacyCondition() {
-		return selectedPrivacyCondition;
+	public String getTrustValue() {
+		return trustValue;
 	}
 
 
-	public void setSelectedPrivacyCondition(ConditionConstants selectedPrivacyCondition) {
-		this.selectedPrivacyCondition = selectedPrivacyCondition;
+	public void setTrustValue(String trustValue) {
+		this.trustValue = trustValue;
 	}
 
 
-	public Map<ConditionConstants, ConditionConstants> getPrivacyConditions() {
+	public Map<ConditionConstants,ConditionConstants> getPrivacyConditions() {
 		return privacyConditions;
 	}
 
 
-	public void setPrivacyConditions(Map<ConditionConstants, ConditionConstants> privacyConditions) {
+	public void setPrivacyConditions(Map<ConditionConstants,ConditionConstants> privacyConditions) {
 		this.privacyConditions = privacyConditions;
 	}
 
@@ -792,23 +1013,89 @@ public class PPNEditBean extends BasePageController implements Serializable{
 		return privacyValues;
 	}
 
-	public void handlePrivacyTypeChange(){
-		this.logging.debug("handlePrivacyTypeChange for: "+this.selectedPrivacyCondition);
-		this.setPrivacyValues(this.privacyConditionData.get(selectedPrivacyCondition));
-	}
 
 	public void setPrivacyValues(Map<String, String> privacyValues) {
 		this.privacyValues = privacyValues;
 	}
 
 
-	public String getTrustValue() {
-		return trustValue;
+	public List<DataIdentifierScheme> getSchemeList() {
+		return schemeList;
 	}
 
 
-	public void setTrustValue(String trustValue) {
-		this.trustValue = trustValue;
+	public void setSchemeList(List<DataIdentifierScheme> schemeList) {
+		this.schemeList = schemeList;
+	}
+
+
+	public List<String> getContextTypes() {
+		return contextTypes;
+	}
+
+
+	public void setContextTypes(List<String> contextTypes) {
+		this.contextTypes = contextTypes;
+	}
+
+
+	public List<String> getCisTypes() {
+		return cisTypes;
+	}
+
+
+	public void setCisTypes(List<String> cisTypes) {
+		this.cisTypes = cisTypes;
+	}
+
+
+	public List<String> getDeviceTypes() {
+		return deviceTypes;
+	}
+
+
+	public void setDeviceTypes(List<String> deviceTypes) {
+		this.deviceTypes = deviceTypes;
+	}
+
+
+	public List<String> getActivityTypes() {
+		return activityTypes;
+	}
+
+
+	public void setActivityTypes(List<String> activityTypes) {
+		this.activityTypes = activityTypes;
+	}
+
+
+	public boolean isEditableResource() {
+		return editableResource;
+	}
+
+
+	public void setEditableResource(boolean editableResource) {
+		this.editableResource = editableResource;
+	}
+
+
+	public List<String> getResourceTypes() {
+		return resourceTypes;
+	}
+
+
+	public void setResourceTypes(List<String> resourceTypes) {
+		this.resourceTypes = resourceTypes;
+	}
+
+
+	public ConditionConstants getSelectedPrivacyCondition() {
+		return selectedPrivacyCondition;
+	}
+
+
+	public void setSelectedPrivacyCondition(ConditionConstants selectedPrivacyCondition) {
+		this.selectedPrivacyCondition = selectedPrivacyCondition;
 	}
 
 
@@ -822,25 +1109,13 @@ public class PPNEditBean extends BasePageController implements Serializable{
 	}
 
 
-	public String getDisplaySpecificRequestor() {
-		try{
-			if (this.preferenceDetails.getRequestor() instanceof RequestorCisBean){
-				displaySpecificRequestor = "Cis: "+((RequestorCisBean) this.preferenceDetails.getRequestor()).getCisRequestorId();
-			}else if (this.preferenceDetails.getRequestor() instanceof RequestorServiceBean){
-				displaySpecificRequestor = "Service: "+ ServiceModelUtils.serviceResourceIdentifierToString(((RequestorServiceBean) this.preferenceDetails.getRequestor()).getRequestorServiceId());
-			}else {
-				displaySpecificRequestor = "None";
-			}
-		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
-		return displaySpecificRequestor;
+	public String getAccCtrlDetailUUID() {
+		return accCtrlDetailUUID;
 	}
 
 
-	public void setDisplaySpecificRequestor(String displaySpecificRequestor) {
-		this.displaySpecificRequestor = displaySpecificRequestor;
+	public void setAccCtrlDetailUUID(String accCtrlDetailUUID) {
+		this.accCtrlDetailUUID = accCtrlDetailUUID;
 	}
 
 
@@ -854,14 +1129,17 @@ public class PPNEditBean extends BasePageController implements Serializable{
 	}
 
 
-	public String getPpnDetailUUID() {
-		return ppnDetailUUID;
+	public OperatorConstants getSelectedCtxOperator() {
+		return selectedCtxOperator;
 	}
 
 
-	public void setPpnDetailUUID(String ppnDetailUUID) {
-		this.ppnDetailUUID = ppnDetailUUID;
+	public void setSelectedCtxOperator(OperatorConstants selectedCtxOperator) {
+		this.selectedCtxOperator = selectedCtxOperator;
 	}
+
+
+
 
 
 
