@@ -68,6 +68,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	//UserFeedback intents
 	final static String UF_PRIVACY_NEGOTIATION_REQUEST_INTENT  = "org.societies.useragent.feedback.privacyNegotiation";
 	final static String UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT = "org.societies.useragent.feedback.privacyNegotiationResponse";
+	final static String UF_ACCESS_CONTROL_REQUEST_INTENT       = "org.societies.useragent.feedback.accessControl.REQUEST";
+	final static String UF_ACCESS_CONTROL_RESPONSE_INTENT      = "org.societies.useragent.feedback.accessControl.RESPONSE";
 	final static String UF_REQUEST_INTENT 		   			   = "org.societies.useragent.feedback.event.REQUEST";
 	final static String UF_EXPLICIT_RESPONSE_INTENT  	       = "org.societies.useragent.feedback.event.EXPLICIT_RESPONSE";
 	final static String UF_IMPLICIT_RESPONSE_INTENT  	       = "org.societies.useragent.feedback.event.IMPLICIT_RESPONSE";
@@ -89,6 +91,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 										 DEVICE_MANAGER_EVENTING_NODE_NAME_INTENT,
 										 UF_PRIVACY_NEGOTIATION_REQUEST_INTENT,
 										 UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT,
+//										 UF_ACCESS_CONTROL_REQUEST_INTENT,
+//										 UF_ACCESS_CONTROL_RESPONSE_INTENT,
 										 UF_REQUEST_INTENT,
                                          UF_EXPLICIT_RESPONSE_INTENT,
                                          UF_IMPLICIT_RESPONSE_INTENT
@@ -116,6 +120,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	//UserFeedback pubsub nodes
 	final static String UF_PRIVACY_NEGOTIATION_REQUEST_EVENT  = "org/societies/useragent/feedback/privacyNegotiation";
 	final static String UF_PRIVACY_NEGOTIATION_RESPONSE_EVENT = "org/societies/useragent/feedback/privacyNegotiationResponse";
+	final static String UF_ACCESS_CONTROL_REQUEST_EVENT       = "org/societies/useragent/feedback/accessControl/REQUEST";
+	final static String UF_ACCESS_CONTROL_RESPONSE_EVENT      = "org/societies/useragent/feedback/accessControl/RESPONSE";
 	final static String UF_REQUEST_EVENT 					  = "org/societies/useragent/feedback/event/REQUEST";
 	final static String UF_EXPLICIT_RESPONSE_EVENT 			  = "org/societies/useragent/feedback/event/EXPLICIT_RESPONSE";
 	final static String UF_IMPLICIT_RESPONSE_EVENT 			  = "org/societies/useragent/feedback/event/IMPLICIT_RESPONSE";
@@ -136,6 +142,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 										 DEVICE_MANAGER_EVENTING_NODE_NAME_EVENT,
 										 UF_PRIVACY_NEGOTIATION_REQUEST_EVENT,
 										 UF_PRIVACY_NEGOTIATION_RESPONSE_EVENT,
+//                                         UF_ACCESS_CONTROL_REQUEST_EVENT,
+//                                         UF_ACCESS_CONTROL_RESPONSE_EVENT,
 										 UF_REQUEST_EVENT,
 										 UF_EXPLICIT_RESPONSE_EVENT,
                                          UF_IMPLICIT_RESPONSE_EVENT
@@ -163,11 +171,21 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	static final String CONTEXT_CLASS 		= "org.societies.api.schema.context.model.CtxIdentifierBean";
 	static final String FRIEND_EVENT_CLASS 	= "org.societies.api.schema.css.directory.CssFriendEvent";
 	static final String UF_PRIVACY_CLASS 	= "org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent";
+//	static final String UF_ACCESS_CLASS 	= "org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent";
 	static final String UF_REQUEST_CLASS	= "org.societies.api.schema.useragent.feedback.UserFeedbackBean";
 	static final String UF_EXPLICIT_RESPONSE_CLASS	= "org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean";
 	static final String UF_IMPLICIT_RESPONSE_CLASS	= "org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean";
 	//N.B. Add any new event payload classes to this array - order is unimportant
-	final static String pubsubPayloadClasses [] = {CSS_MANAGER_CLASS, CONTEXT_CLASS, FRIEND_EVENT_CLASS, UF_PRIVACY_CLASS, UF_REQUEST_CLASS, UF_EXPLICIT_RESPONSE_CLASS, UF_IMPLICIT_RESPONSE_CLASS};
+	final static String pubsubPayloadClasses [] = {
+                                                CSS_MANAGER_CLASS,
+                                                CONTEXT_CLASS,
+                                                FRIEND_EVENT_CLASS,
+                                                UF_PRIVACY_CLASS,
+//                                                UF_ACCESS_CLASS,
+                                                UF_REQUEST_CLASS,
+                                                UF_EXPLICIT_RESPONSE_CLASS,
+                                                UF_IMPLICIT_RESPONSE_CLASS
+    };
 	
 	final static String GENERIC_INTENT_PAYLOAD_KEY = "Pubsub_Payload_Key";
 	

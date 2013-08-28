@@ -1,5 +1,6 @@
 package org.societies.android.platform.useragent.feedback.model;
 
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 
@@ -11,12 +12,14 @@ public class NotificationHistoryItem implements Comparable<NotificationHistoryIt
     private final Date eventDate;
     private final UserFeedbackBean userFeedbackBean;
     private final UserFeedbackPrivacyNegotiationEvent privacyNegotiationEvent;
+    private final UserFeedbackAccessControlEvent accessControlEvent;
 
     public NotificationHistoryItem(String uuid, Date eventDate, UserFeedbackBean userFeedbackBean) {
         this.uuid = uuid;
         this.eventDate = eventDate;
         this.userFeedbackBean = userFeedbackBean;
         this.privacyNegotiationEvent = null;
+        this.accessControlEvent = null;
     }
 
     public NotificationHistoryItem(String uuid, Date eventDate, UserFeedbackPrivacyNegotiationEvent privacyNegotiationEvent) {
@@ -24,6 +27,15 @@ public class NotificationHistoryItem implements Comparable<NotificationHistoryIt
         this.eventDate = eventDate;
         this.userFeedbackBean = null;
         this.privacyNegotiationEvent = privacyNegotiationEvent;
+        this.accessControlEvent = null;
+    }
+
+    public NotificationHistoryItem(String uuid, Date eventDate, UserFeedbackAccessControlEvent accessControlEvent) {
+        this.uuid = uuid;
+        this.eventDate = eventDate;
+        this.userFeedbackBean = null;
+        this.privacyNegotiationEvent = null;
+        this.accessControlEvent = accessControlEvent;
     }
 
     public String getUuid() {
@@ -40,6 +52,10 @@ public class NotificationHistoryItem implements Comparable<NotificationHistoryIt
 
     public UserFeedbackPrivacyNegotiationEvent getPrivacyNegotiationEvent() {
         return privacyNegotiationEvent;
+    }
+
+    public UserFeedbackAccessControlEvent getAccessControlEvent() {
+        return accessControlEvent;
     }
 
     @Override

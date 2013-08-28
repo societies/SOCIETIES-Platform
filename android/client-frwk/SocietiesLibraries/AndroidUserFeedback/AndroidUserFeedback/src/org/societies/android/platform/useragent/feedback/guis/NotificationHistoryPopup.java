@@ -14,10 +14,13 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.platform.useragent.feedback.EventHistory;
+import org.societies.android.platform.useragent.feedback.NegotiationActivity;
 import org.societies.android.platform.useragent.feedback.R;
 import org.societies.android.platform.useragent.feedback.TimedAbortProcessor;
 import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
 import org.societies.android.platform.useragent.feedback.model.NotificationHistoryItem;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 import org.societies.api.schema.useragent.feedback.FeedbackMethodType;
 import org.societies.api.schema.useragent.feedback.FeedbackStage;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
@@ -87,6 +90,8 @@ public class NotificationHistoryPopup extends ListActivity {
         filter.addAction(IAndroidSocietiesEvents.UF_REQUEST_INTENT);
         filter.addAction(IAndroidSocietiesEvents.UF_EXPLICIT_RESPONSE_INTENT);
         filter.addAction(IAndroidSocietiesEvents.UF_IMPLICIT_RESPONSE_INTENT);
+//        filter.addAction(IAndroidSocietiesEvents.UF_ACCESS_CONTROL_REQUEST_INTENT);
+//        filter.addAction(IAndroidSocietiesEvents.UF_ACCESS_CONTROL_RESPONSE_INTENT);
         registerReceiver(privateBroadcastReceiver, filter);
 
         populateHistoryList();
@@ -133,7 +138,13 @@ public class NotificationHistoryPopup extends ListActivity {
         for (NotificationHistoryItem item : downloadedItems) {
             Map<String, String> valuesMap = new HashMap<String, String>();
 
-            valuesMap.put("propText", item.getUserFeedbackBean().getProposalText());
+            if (item.getUserFeedbackBean() != null)
+                valuesMap.put("propText", item.getUserFeedbackBean().getProposalText());
+            else if (item.getPrivacyNegotiationEvent() != null)
+                valuesMap.put("propText", "Privacy Policy Negotiation");
+            else if (item.getAccessControlEvent() != null)
+                valuesMap.put("propText", "Access Control Request");
+
             valuesMap.put("propDate", item.getEventDate().toString());
 
             valueMapsList.add(valuesMap);
@@ -150,7 +161,23 @@ public class NotificationHistoryPopup extends ListActivity {
         // get the item
         NotificationHistoryItem selectedItem = historyItemsList.get(position);
 
-        processItemClick(selectedItem.getUserFeedbackBean());
+        if (selectedItem.getUserFeedbackBean() != null)
+            processItemClick(selectedItem.getUserFeedbackBean());
+        else if (selectedItem.getPrivacyNegotiationEvent() != null)
+            processItemClick(selectedItem.getPrivacyNegotiationEvent());
+        else if (selectedItem.getAccessControlEvent() != null)
+            processItemClick(selectedItem.getAccessControlEvent());
+    }
+
+    private void processItemClick(UserFeedbackAccessControlEvent event) {
+        Log.w(LOG_TAG, "processItemClick(): UserFeedbackAccessControlEvent support not implemented");
+    }
+
+    private void processItemClick(UserFeedbackPrivacyNegotiationEvent event) {
+        Intent intent = new Intent(this.getApplicationContext(), NegotiationActivity.class);
+        intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY, (Parcelable) event);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     private void processItemClick(UserFeedbackBean ufBean) {

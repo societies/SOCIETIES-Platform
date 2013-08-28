@@ -16,6 +16,7 @@ import org.societies.android.platform.useragent.feedback.model.NotificationHisto
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.schema.useragent.feedback.HistoryRequestType;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackHistoryRequest;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
@@ -84,7 +85,7 @@ public class EventHistory extends Service {
         }
     }
 
-    private class NotificationHistoryRepository {
+    private class NotificationHistoryRepository implements ICommCallback {
         private final String LOG_TAG = NotificationHistoryRepository.class.getCanonicalName();
 
         public void loadNotifications(int howMany) {
@@ -102,9 +103,6 @@ public class EventHistory extends Service {
 
                 INetworkNode cloudNode = clientCommunicationMgr.getIdManager().getCloudNode();
 
-                RequestCallback requestCallback = new RequestCallback();
-
-
                 UserFeedbackHistoryRequest bean = new UserFeedbackHistoryRequest();
                 bean.setRequestType(HistoryRequestType.OUTSTANDING);
                 bean.setHowMany(howMany);
@@ -115,9 +113,9 @@ public class EventHistory extends Service {
                 stanza.setId(id);
 
 
-                Log.d(LOG_TAG, "Sending IQ...");
-                clientCommunicationMgr.sendIQ(stanza, IQ.Type.GET, bean, requestCallback);
-                Log.d(LOG_TAG, "IQ sent");
+                Log.d(LOG_TAG, "Sending loadNotifications IQ...");
+                clientCommunicationMgr.sendIQ(stanza, IQ.Type.GET, bean, this);
+                Log.d(LOG_TAG, "loadNotifications IQ sent");
 
             } catch (InvalidFormatException e) {
                 Log.e(LOG_TAG, "Error listing previous notification history items", e);
@@ -126,15 +124,6 @@ public class EventHistory extends Service {
             } catch (Exception e) {
                 Log.e(LOG_TAG, "Error listing previous notification history items", e);
             }
-        }
-
-    }
-
-    private class RequestCallback implements ICommCallback {
-        private final String LOG_TAG = RequestCallback.class.getCanonicalName();
-
-        public RequestCallback() {
-            Log.i(LOG_TAG, "ctor()");
         }
 
         @Override
@@ -160,6 +149,12 @@ public class EventHistory extends Service {
 
             UserFeedbackHistoryRequest request = (UserFeedbackHistoryRequest) payload;
 
+            Log.i(LOG_TAG,
+                    String.format("Received: %s UF beans, %s PPNs, %s ACs",
+                            request.getUserFeedbackBean() == null ? "null" : request.getUserFeedbackBean().size(),
+                            request.getUserFeedbackPrivacyNegotiationEvent() == null ? "null" : request.getUserFeedbackPrivacyNegotiationEvent().size(),
+                            request.getUserFeedbackAccessControlEvent() == null ? "null" : request.getUserFeedbackAccessControlEvent().size()));
+
             List<NotificationHistoryItem> historyItems = new ArrayList<NotificationHistoryItem>();
 
             // wrap the beans in NotificationHistoryItem objects
@@ -170,30 +165,24 @@ public class EventHistory extends Service {
                         bean);
                 historyItems.add(item);
             }
-
-            Log.i(LOG_TAG, "Received a response containing " + historyItems.size() + " NHIs");
-
-            replaceCacheWithList(historyItems);
-
-            if (!historyItems.isEmpty()) {
-                // pop up a notification
-
-                //CREATE INTENT FOR LAUNCHING ACTIVITY
-                Intent intent = new Intent(EventHistory.this.getApplicationContext(), NotificationHistoryPopup.class);
-//                intent.putExtra(UserFeedbackActivityIntentExtra.USERFEEDBACK_NODES, (Parcelable) ufBean);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                //CREATE ANDROID NOTIFICATION
-                int notifierFlags[] = new int[1];
-                notifierFlags[0] = Notification.FLAG_AUTO_CANCEL;
-                AndroidNotifier notifier = new AndroidNotifier(EventHistory.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierFlags);
-                notifier.notifyMessage(
-                        "Click to answer outstanding requests",
-                        "Outstanding requests",
-                        NotificationHistoryPopup.class,
-                        intent,
-                        historyItems.size() + " outstanding requests");
+            for (UserFeedbackPrivacyNegotiationEvent bean : request.getUserFeedbackPrivacyNegotiationEvent()) {
+                NotificationHistoryItem item = new NotificationHistoryItem(bean.getRequestId(),
+//                        bean.getRequestDate(),
+                        new Date(),
+                        bean);
+                historyItems.add(item);
             }
+            for (UserFeedbackAccessControlEvent bean : request.getUserFeedbackAccessControlEvent()) {
+                NotificationHistoryItem item = new NotificationHistoryItem(bean.getRequestId(),
+//                        bean.getRequestDate(),
+                        new Date(),
+                        bean);
+                historyItems.add(item);
+            }
+
+            EventHistory.this.replaceCacheWithList(historyItems);
+
+            showHistoryItemsPopup();
         }
 
         @Override
@@ -306,6 +295,29 @@ public class EventHistory extends Service {
         }
     }
 
+    private void showHistoryItemsPopup() {
+        if (historyItems.isEmpty())
+            return;
+
+        // pop up a notification
+
+        //CREATE INTENT FOR LAUNCHING ACTIVITY
+        Intent intent = new Intent(this.getApplicationContext(), NotificationHistoryPopup.class);
+//                intent.putExtra(UserFeedbackActivityIntentExtra.USERFEEDBACK_NODES, (Parcelable) ufBean);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        //CREATE ANDROID NOTIFICATION
+        int notifierFlags[] = new int[1];
+        notifierFlags[0] = Notification.FLAG_AUTO_CANCEL;
+        AndroidNotifier notifier = new AndroidNotifier(this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierFlags);
+        notifier.notifyMessage(
+                "Click to answer outstanding requests",
+                "Outstanding Requests",
+                NotificationHistoryPopup.class,
+                intent,
+                historyItems.size() + " outstanding requests");
+    }
+
     public void addIncomingEvent(UserFeedbackBean uf) {
         synchronized (historyItems) {
             if (itemIDs.contains(uf.getRequestId())) {
@@ -345,6 +357,5 @@ public class EventHistory extends Service {
     public List<NotificationHistoryItem> getHistoryItemsList() {
         return Collections.unmodifiableList(historyItems);
     }
-
 
 }
