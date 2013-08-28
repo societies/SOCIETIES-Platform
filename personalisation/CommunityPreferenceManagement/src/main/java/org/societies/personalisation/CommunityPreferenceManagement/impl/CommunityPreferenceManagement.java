@@ -22,8 +22,6 @@ package org.societies.personalisation.CommunityPreferenceManagement.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JOptionPane;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.cis.management.ICisManager;
@@ -32,7 +30,6 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
-import org.societies.api.osgi.event.IEventMgr;
 import org.societies.personalisation.CommunityPreferenceManagement.impl.comms.CommunityPreferenceManagementClient;
 import org.societies.personalisation.CommunityPreferenceManagement.impl.management.PrivatePreferenceCache;
 import org.societies.personalisation.CommunityPreferenceManagement.impl.merging.PreferenceMerger;

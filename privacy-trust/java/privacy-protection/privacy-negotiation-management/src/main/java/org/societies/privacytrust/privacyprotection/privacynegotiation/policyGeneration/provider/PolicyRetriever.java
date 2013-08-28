@@ -24,13 +24,6 @@
  */
 package org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.provider;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.EventListener;

@@ -28,24 +28,21 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.INetworkNode;
-import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.personalisation.model.IAction;

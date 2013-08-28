@@ -21,21 +21,13 @@
 package org.societies.personalisation.CRISTUserIntentPrediction.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-// import javax.annotation.PostConstruct;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.stereotype.Component;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxModelObject;
-// import org.societies.api.personalisation.model.IAction;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.logging.IPerformanceMessage;
@@ -46,13 +38,12 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager;
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
-import org.societies.personalisation.CRIST.api.model.ICRISTUserAction;
-import org.societies.personalisation.CRISTUserIntentTaskManager.impl.CRISTUserIntentTaskManager;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
-import org.societies.personalisation.common.api.model.PersonalisationTypes;
-
-import org.societies.api.internal.logging.IPerformanceMessage;
-import org.societies.api.internal.logging.PerformanceMessage;
+import org.springframework.scheduling.annotation.AsyncResult;
+// import javax.annotation.PostConstruct;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.stereotype.Component;
+// import org.societies.api.personalisation.model.IAction;
 
 // @Component
 public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
