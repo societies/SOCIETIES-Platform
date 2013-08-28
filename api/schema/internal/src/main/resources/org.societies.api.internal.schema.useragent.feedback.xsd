@@ -44,6 +44,8 @@
             <xs:sequence>
                 <xs:element name="method" type="ns3:feedbackMethodType"
                             minOccurs="0"/>
+                <xs:element name="stage" type="ns3:feedbackStage"
+                            minOccurs="0"/>
                 <xs:element name="requestId" type="xs:string" minOccurs="0"/>
                 <xs:element name="type" type="xs:int"/>
                 <!-- <xs:element name="requestID" type="xs:string" minOccurs="1" maxOccurs="1" /> -->

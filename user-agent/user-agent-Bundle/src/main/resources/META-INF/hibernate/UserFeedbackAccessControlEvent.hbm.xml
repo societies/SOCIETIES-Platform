@@ -4,10 +4,10 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-    <class name="org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent"
-           table="UFPrivacyNegotiationEvent">
+    <class name="org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent"
+           table="UFAccessControlEvent">
 
-        <id name="requestId" type="string" column="requestId">
+        <id name="requestId" type="string" column="accessRequestId">
             <generator class="assigned"/>
         </id>
 
@@ -16,14 +16,13 @@
         <!--<property name="requestDate" column="requestDate" type="java.util.Date"/>-->
         <property name="type" column="type" type="int"/>
 
-        <one-to-one name="responsePolicy"
-                    class="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy"
-                    cascade="all"
-                    lazy="false"/>
+        <list name="responseItems" cascade="all">
+            <key column="accessRequestId" not-null="false"/>
+            <list-index column="idx"/>
+            <one-to-many class="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem"/>
+        </list>
 
-        <one-to-one name="negotiationDetails"
-                    class="org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean"
-                    cascade="all"/>
+        <property name="requestor" type="org.societies.api.schema.identity.RequestorBean" column="requestor"/>
 
     </class>
 </hibernate-mapping>
