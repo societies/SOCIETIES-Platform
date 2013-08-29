@@ -60,7 +60,7 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
     private static final String LOG_TAG = NegotiationActivity.class.getCanonicalName();
 
     private EventsHelper eventsHelper;
-    UserFeedbackPrivacyNegotiationEvent eventInfo = null;
+    private UserFeedbackPrivacyNegotiationEvent privacyNegotiationEvent = null;
     private boolean isEventsConnected = false;
     private TableLayout[] tblConditions;
     private ScrollView svScroll;
@@ -76,10 +76,10 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
         //GET EVENT OBJECT
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        eventInfo = bundle.getParcelable(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY);
+        privacyNegotiationEvent = bundle.getParcelable(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY);
 
         //SET HEADER INFO
-        RequestorBean requestor = eventInfo.getNegotiationDetails().getRequestor();
+        RequestorBean requestor = privacyNegotiationEvent.getNegotiationDetails().getRequestor();
         String sRequestorType = "community";
         if (requestor instanceof RequestorServiceBean) {
             sRequestorType = "installed service";
@@ -89,7 +89,7 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
         lblHeader.setText("The " + sRequestorType + " is requesting access to your personal info for the following uses. Please select what you would like to allow:");
 
         //GENERATE RESOURCE SPINNER
-        final List<ResponseItem> responses = eventInfo.getResponsePolicy().getResponseItems();
+        final List<ResponseItem> responses = privacyNegotiationEvent.getResponsePolicy().getResponseItems();
         String[] resourceItems = new String[responses.size()];
         for (int i = 0; i < responses.size(); i++) {
             resourceItems[i] = responses.get(i).getRequestItem().getResource().getDataType();
@@ -286,7 +286,7 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
                             try {
                                 isEventsConnected = true;
                                 published = true;
-                                eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT, NegotiationActivity.this.eventInfo, new IPlatformEventsCallback() {
+                                eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT, NegotiationActivity.this.privacyNegotiationEvent, new IPlatformEventsCallback() {
                                     @Override
                                     public void returnException(int exception) {
                                     }

@@ -295,7 +295,6 @@ public class EventListener extends Service {
         Intent intent = new Intent(context, AccessControlActivity.class);
         intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY, (Parcelable) event);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
 
         //CREATE ANDROID NOTIFICATION
         int notifierFlags[] = new int[1];
@@ -306,8 +305,6 @@ public class EventListener extends Service {
                 AccessControlActivity.class,
                 intent,
                 "SOCIETIES");
-
-        Log.w(LOG_TAG, "displayAccessControlNotification(): UserFeedbackAccessControlEvent support not implemented");
 
     }
 

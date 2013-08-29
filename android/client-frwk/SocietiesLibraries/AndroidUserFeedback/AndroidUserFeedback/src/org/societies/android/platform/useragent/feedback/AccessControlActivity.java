@@ -47,6 +47,8 @@ import org.societies.android.api.events.PlatformEventsHelperNotConnectedExceptio
 import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
 import org.societies.android.remote.helper.EventsHelper;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
@@ -58,10 +60,10 @@ public class AccessControlActivity extends Activity implements OnItemSelectedLis
     private static final String LOG_TAG = AccessControlActivity.class.getCanonicalName();
 
     private EventsHelper eventsHelper;
-    private UserFeedbackAccessControlEvent accessControlEvent;
+    private UserFeedbackAccessControlEvent accessControlEvent = null;
     private boolean isEventsConnected = false;
-//    private TableLayout[] tblConditions;
-//    private ScrollView svScroll;
+    private TableLayout[] tblConditions;
+    private ScrollView svScroll;
     private boolean published = false;
 
     @Override
@@ -76,36 +78,40 @@ public class AccessControlActivity extends Activity implements OnItemSelectedLis
         Bundle bundle = intent.getExtras();
         accessControlEvent = bundle.getParcelable(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY);
 
-//        //SET HEADER INFO
-//        RequestorBean requestor = accessControlEvent.getNegotiationDetails().getRequestor();
-//        String sRequestorType = "community";
-//        if (requestor instanceof RequestorServiceBean) {
-//            sRequestorType = "installed service";
-//        }
-//        TextView lblHeader = (TextView) findViewById(R.id.txtHeader);
-//        //lblHeader.setText(sHeader + "\r\n has requested access to the following data:");
-//        lblHeader.setText("The " + sRequestorType + " is requesting access to your personal info for the following uses. Please select what you would like to allow:");
-//
-//        //GENERATE RESOURCE SPINNER
-//        final List<ResponseItem> responses = accessControlEvent.getResponsePolicy().getResponseItems();
-//        String[] resourceItems = new String[responses.size()];
-//        for (int i = 0; i < responses.size(); i++) {
-//            resourceItems[i] = responses.get(i).getRequestItem().getResource().getDataType();
-//        }
-//        Spinner spinResources = (Spinner) findViewById(R.id.spinResource);
-//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, resourceItems);
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        spinResources.setAdapter(adapter);
-//        spinResources.setOnItemSelectedListener(this);
-//
-//        //PROCESS EACH RESPONSE
-//        tblConditions = new TableLayout[responses.size()];
-//
-//        populateResponseGuiTable(responses);
-//
-//        //ADD FIRST TABLE OF CONDITIONS TO SCROLL VIEW - OTHERS ADDED ON CHANGE EVENT
-//        svScroll = (ScrollView) findViewById(R.id.svConditions);
-//        svScroll.addView(tblConditions[0]);
+        //SET HEADER INFO
+        RequestorBean requestor = accessControlEvent.getRequestor();
+
+        Log.d(LOG_TAG, String.format("Requestor is of type %s",
+                requestor != null ? requestor.getClass().getSimpleName() : "[null]"));
+
+        String sRequestorType = "community";
+        if (requestor instanceof RequestorServiceBean) {
+            sRequestorType = "installed service";
+        }
+        TextView lblHeader = (TextView) findViewById(R.id.txtHeader);
+        //lblHeader.setText(sHeader + "\r\n has requested access to the following data:");
+        lblHeader.setText("The " + sRequestorType + " is requesting access to your personal info for the following uses. Please select what you would like to allow:");
+
+        //GENERATE RESOURCE SPINNER
+        final List<ResponseItem> responses = accessControlEvent.getResponseItems();
+        String[] resourceItems = new String[responses.size()];
+        for (int i = 0; i < responses.size(); i++) {
+            resourceItems[i] = responses.get(i).getRequestItem().getResource().getDataType();
+        }
+        Spinner spinResources = (Spinner) findViewById(R.id.spinResource);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, resourceItems);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinResources.setAdapter(adapter);
+        spinResources.setOnItemSelectedListener(this);
+
+        //PROCESS EACH RESPONSE
+        tblConditions = new TableLayout[responses.size()];
+
+        populateResponseGuiTable(responses);
+
+        //ADD FIRST TABLE OF CONDITIONS TO SCROLL VIEW - OTHERS ADDED ON CHANGE EVENT
+        svScroll = (ScrollView) findViewById(R.id.svConditions);
+        svScroll.addView(tblConditions[0]);
 
         //ACCEPT BUTTON EVENT HANDLER
         Button btnAccept = (Button) findViewById(R.id.btnAccept);
@@ -174,7 +180,7 @@ public class AccessControlActivity extends Activity implements OnItemSelectedLis
 
                 tblCondition.addView(row);
             }
-//            tblConditions[response_idx] = tblCondition;
+            tblConditions[response_idx] = tblCondition;
         }
     }
 
@@ -235,8 +241,8 @@ public class AccessControlActivity extends Activity implements OnItemSelectedLis
     /* @see android.widget.AdapterView.OnItemSelectedListener#onItemSelected(android.widget.AdapterView, android.view.View, int, long) */
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//        svScroll.removeAllViews();
-//        svScroll.addView(tblConditions[position]);
+        svScroll.removeAllViews();
+        svScroll.addView(tblConditions[position]);
     }
 
     /* @see android.widget.AdapterView.OnItemSelectedListener#onNothingSelected(android.widget.AdapterView) */
@@ -247,7 +253,7 @@ public class AccessControlActivity extends Activity implements OnItemSelectedLis
 
     @Override
     public void onDestroy() {
-        Log.d(LOG_TAG, "NegotiationActivity terminating");
+        Log.d(LOG_TAG, "AccessControlActivity terminating");
         if (isEventsConnected) {
             eventsHelper.tearDownService(new IMethodCallback() {
                 @Override
@@ -284,7 +290,7 @@ public class AccessControlActivity extends Activity implements OnItemSelectedLis
                             try {
                                 isEventsConnected = true;
                                 published = true;
-                                eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT, AccessControlActivity.this.accessControlEvent, new IPlatformEventsCallback() {
+                                eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_ACCESS_CONTROL_RESPONSE_EVENT, AccessControlActivity.this.accessControlEvent, new IPlatformEventsCallback() {
                                     @Override
                                     public void returnException(int exception) {
                                     }
@@ -298,7 +304,7 @@ public class AccessControlActivity extends Activity implements OnItemSelectedLis
                                     }
                                 });
                             } catch (PlatformEventsHelperNotConnectedException e) {
-                                Log.e(LOG_TAG, "Error publishing PPN response event", e);
+                                Log.e(LOG_TAG, "Error publishing AC response event", e);
                                 e.printStackTrace();
                             }
                         }

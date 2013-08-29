@@ -37,10 +37,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
-import org.societies.android.platform.useragent.feedback.EventHistory;
-import org.societies.android.platform.useragent.feedback.NegotiationActivity;
-import org.societies.android.platform.useragent.feedback.R;
-import org.societies.android.platform.useragent.feedback.TimedAbortProcessor;
+import org.societies.android.platform.useragent.feedback.*;
 import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
 import org.societies.android.platform.useragent.feedback.model.NotificationHistoryItem;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
@@ -194,7 +191,10 @@ public class NotificationHistoryPopup extends ListActivity {
     }
 
     private void processItemClick(UserFeedbackAccessControlEvent event) {
-        Log.w(LOG_TAG, "processItemClick(): UserFeedbackAccessControlEvent support not implemented");
+        Intent intent = new Intent(this.getApplicationContext(), AccessControlActivity.class);
+        intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY, (Parcelable) event);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     private void processItemClick(UserFeedbackPrivacyNegotiationEvent event) {
