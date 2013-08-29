@@ -4,7 +4,8 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-    <class name="org.societies.api.schema.useragent.feedback.UserFeedbackBean" table="UserFeedbackBean">
+    <class name="org.societies.api.schema.useragent.feedback.UserFeedbackBean"
+           table="UserFeedbackBean">
 
         <id name="requestId" type="string" column="requestId">
             <generator class="assigned"/>
@@ -16,8 +17,8 @@
         <property name="type" column="type" type="int"/>
         <list name="options" table="UserFeedbackBean_options" lazy="false"
                 cascade="all">
-            <key column="option_id"/>
-            <index column="option_index"/>
+            <key column="requestId"/>
+            <index column="idx"/>
             <element column="value" type="string"/>
         </list>
         <property name="proposalText" column="proposalText" type="string"/>

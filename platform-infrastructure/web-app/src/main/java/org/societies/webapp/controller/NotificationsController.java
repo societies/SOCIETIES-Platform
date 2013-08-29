@@ -3,6 +3,7 @@ package org.societies.webapp.controller;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalType;
@@ -118,6 +119,16 @@ public class NotificationsController extends BasePageController {
 
             // create the correct notification type for the incoming event
             if (EventTypes.UF_PRIVACY_NEGOTIATION.equals(node)) {
+
+                if (!(item instanceof UserFeedbackPrivacyNegotiationEvent)) {
+                    log.warn(String.format("Received pubsub event with topic '%s', ID '%s' and class '%s' - Required UserFeedbackPrivacyNegotiationEvent ",
+                            node,
+                            itemId,
+                            item.getClass().getCanonicalName()
+                    ));
+                    return;
+                }
+
                 UserFeedbackPrivacyNegotiationEvent ppn = (UserFeedbackPrivacyNegotiationEvent) item;
                 NotificationQueueItem newItem = NotificationQueueItem.forPrivacyPolicyNotification(String.valueOf(ppn.getRequestId()), ppn);
 
@@ -147,6 +158,22 @@ public class NotificationsController extends BasePageController {
                         timedAbortsToWatch.add(newItem);
                     }
                 }
+
+                addItemToQueue(newItem);
+
+            } else if (EventTypes.UF_PRIVACY_ACCESS_CONTROL.equals(node)) {
+
+                if (!(item instanceof UserFeedbackAccessControlEvent)) {
+                    log.warn(String.format("Received pubsub event with topic '%s', ID '%s' and class '%s' - Required UserFeedbackAccessControlEvent ",
+                            node,
+                            itemId,
+                            item.getClass().getCanonicalName()
+                    ));
+                    return;
+                }
+
+                UserFeedbackAccessControlEvent bean = (UserFeedbackAccessControlEvent) item;
+                NotificationQueueItem newItem = NotificationQueueItem.forAccessControl(bean.getRequestId(), bean);
 
                 addItemToQueue(newItem);
 
@@ -207,8 +234,9 @@ public class NotificationsController extends BasePageController {
                 }
 
             } else {
-                String fmt = "Unknown event type %s with ID %s";
-                log.warn(String.format(fmt, item.getClass().getSimpleName(), itemId));
+                String fmt = "Unknown event %s, payload type %s with ID %s";
+                log.warn(String.format(fmt,
+                        node, item.getClass().getSimpleName(), itemId));
             }
 
 
@@ -503,7 +531,7 @@ public class NotificationsController extends BasePageController {
 
     }
 
-    public void clearNotifications(){
+    public void clearNotifications() {
         reloadFromRepository(0);
     }
 

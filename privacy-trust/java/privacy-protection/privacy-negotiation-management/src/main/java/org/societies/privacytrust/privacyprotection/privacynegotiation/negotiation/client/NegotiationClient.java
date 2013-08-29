@@ -33,8 +33,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import javax.swing.JOptionPane;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.util.SerialisationHelper;
@@ -47,6 +45,8 @@ import org.societies.api.internal.privacytrust.privacyprotection.INegotiationCli
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PPNegotiationEvent;
+import org.societies.api.internal.privacytrust.privacyprotection.negotiation.FailedNegotiationEvent;
+import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.INegotiationAgentRemote;
 import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.AgreementEnvelopeUtils;
 import org.societies.api.internal.privacytrust.privacyprotection.util.model.privacypolicy.AgreementUtils;
@@ -77,13 +77,10 @@ import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInter
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentityOption;
 import org.societies.privacytrust.privacyprotection.api.identity.IIdentitySelection;
-import org.societies.api.internal.privacytrust.privacyprotection.negotiation.FailedNegotiationEvent;
-import org.societies.api.internal.privacytrust.privacyprotection.negotiation.NegotiationDetails;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.PrivacyPolicyNegotiationManager;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client.data.DataHelper;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.client.ClientResponseChecker;
 import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.client.ClientResponsePolicyGenerator;
-import org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.client.TimedNotificationGUI;
 
 /**
  * Describe your class here...

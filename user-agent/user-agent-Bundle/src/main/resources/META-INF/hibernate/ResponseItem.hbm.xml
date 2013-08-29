@@ -5,7 +5,7 @@
 
 <hibernate-mapping>
     <class name="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem"
-           table="PrivacyPolicyResponseItem">
+           table="UFResponseItem">
 
         <id name="responseItemId" type="string" column="responseItemId">
             <generator class="uuid"/>

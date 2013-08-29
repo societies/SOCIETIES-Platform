@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent"
+           table="UFAccessControlEvent">
+
+        <id name="requestId" type="string" column="accessRequestId">
+            <generator class="assigned"/>
+        </id>
+
+        <property name="method" column="method" type="org.societies.api.schema.useragent.feedback.FeedbackMethodType"/>
+        <property name="stage" column="stage" type="org.societies.api.schema.useragent.feedback.FeedbackStage"/>
+        <!--<property name="requestDate" column="requestDate" type="java.util.Date"/>-->
+        <property name="type" column="type" type="int"/>
+
+        <list name="responseItems" cascade="all">
+            <key column="accessRequestId" not-null="false"/>
+            <list-index column="idx"/>
+            <one-to-many class="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem"/>
+        </list>
+
+        <property name="requestor" type="org.societies.api.schema.identity.RequestorBean" column="requestor"/>
+
+    </class>
+</hibernate-mapping>

@@ -3,6 +3,7 @@ package org.societies.webapp.controller.privacy;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.feedback.IUserFeedbackResponseEventListener;
@@ -263,6 +264,27 @@ public class PrivacyPolicyTestController extends BasePageController {
             }
         });
         log.info("TimedAbort: Sent");
+    }
+
+    public void sendAccessControlEvent() {
+
+        Requestor requestor = new Requestor(userService.getIdentity());
+
+        List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
+        responseItems.add(buildResponseItem("http://this.is.a.win/", "Location"));
+        responseItems.add(buildResponseItem("http://paddy.rules/", "Status"));
+        responseItems.add(buildResponseItem("http://something.something.something/", "Hair colour"));
+
+        userFeedback.getAccessControlFBAsync(requestor, responseItems, new IUserFeedbackResponseEventListener<List<ResponseItem>>() {
+            @Override
+            public void responseReceived(List<ResponseItem> result) {
+                log.info("AccessControl: Response received");
+                addGlobalMessage("AccessControl Response received",
+                        (result != null && result.size() > 0) ? result.get(0).getDecision().toString() : "null",
+                        FacesMessage.SEVERITY_INFO);
+            }
+        });
+        log.info("AccessControl: Sent");
     }
 
     private static ResponsePolicy buildResponsePolicy(String guid, RequestorBean requestorBean) {

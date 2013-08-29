@@ -27,6 +27,7 @@ package org.societies.platform.servicelifecycle.servicediscovery;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -259,7 +260,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 			throws ServiceDiscoveryException {
 
 		if(logger.isDebugEnabled())
-			logger.debug("Service Discovery::getService()");
+			logger.debug("Service Discovery::getService() for" + serviceId);
 			
 		Service result = null;
 		try{
@@ -334,6 +335,49 @@ public class ServiceDiscovery implements IServiceDiscovery {
 		
 		return new AsyncResult<List<Service>>(result);
 	}
+	
+	@Override
+	@Async
+	public Future<List<Service>> searchServicesAll(Service filter)
+			throws ServiceDiscoveryException {
+		
+		if(logger.isDebugEnabled()) logger.debug("Searching all repositories for a given service");
+		
+		HashMap<String,Service> result = new HashMap<String,Service>();
+		
+		try{
+		
+			if(logger.isDebugEnabled())
+				logger.debug("Searching all our CIS...");
+			
+			List<ICis> cisList = getCisManager().getCisList();
+			ArrayList<Future<List<Service>>> searchList = new ArrayList<Future<List<Service>>>();
+			for(ICis cis : cisList){
+				Future<List<Service>> resultSearch = searchServices(filter,cis.getCisId());
+				searchList.add(resultSearch);
+			}
+			
+			if(logger.isDebugEnabled())
+				logger.debug("Searching our local node...");
+			searchList.add(searchServices(filter));
+			
+			//And now we check...
+			for(Future<List<Service>> searchResult : searchList){
+				List<Service> foundServices = searchResult.get();
+				for(Service foundService : foundServices){
+					String key = ServiceModelUtils.serviceResourceIdentifierToString(foundService.getServiceIdentifier());
+					result.put(key, foundService);
+				}
+			}
+
+		} catch(Exception ex){
+			ex.printStackTrace();
+			logger.error("Searching for services: Exception! : " + ex);
+			throw new ServiceDiscoveryException("Exception while searching for services",ex);
+		}
+		
+		return new AsyncResult<List<Service>>(new ArrayList<Service>(result.values()));
+	}
 
 	@Override
 	@Async
@@ -341,30 +385,45 @@ public class ServiceDiscovery implements IServiceDiscovery {
 			throws ServiceDiscoveryException {
 
 		if(logger.isDebugEnabled()) logger.debug("Searching repository for a given service, on node: " + node.getJid());
-		List<Service> result = new ArrayList<Service>();
 		
 		try{
-				
-			String myLocalJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
 			
-			if(myLocalJid.equals(node.getJid())){
-				if(logger.isDebugEnabled()) logger.debug("It's the local node, so we do a local call");
-				return searchServices(filter);
+			boolean myNode;
+			INetworkNode currentNode = commMngr.getIdManager().getThisNetworkNode();
+			if (!currentNode.getJid().contentEquals(node.getJid()))
+				myNode = false;
+			else
+				myNode = true;
+			
+			// Is it our node? If so, local search
+			if(myNode){
+				if(logger.isDebugEnabled())
+					if(logger.isDebugEnabled()) logger.debug("It's the local node, so we do a local call");
+					return searchServices(filter);
+			} else{
+				//Is it one of my CIS? If so, local search
+				ICisOwned localCis = getCisManager().getOwnedCis(node.getJid());
+				if(localCis != null){
+					if(logger.isDebugEnabled()) logger.debug("We're dealing with our CIS! Local search!");
+					return new AsyncResult<List<Service>>(getServiceReg().findServices(filter, node.getJid()));
+				} else{
+					if(logger.isDebugEnabled())
+						logger.debug("Attempting to retrieve services from remote node: " + node.getJid());
+						
+					ServiceDiscoveryRemoteClient callback = new ServiceDiscoveryRemoteClient();
+					getServiceDiscoveryRemote().getServices(node, callback); 
+					new AsyncResult<List<Service>>(callback.getResultList());
+				}
+					
 			}
-			
-			if(logger.isDebugEnabled()) logger.debug("Trying to query the remote node...");
-			
-			ServiceDiscoveryRemoteClient callback = new ServiceDiscoveryRemoteClient();
-			getServiceDiscoveryRemote().searchService(filter, node, callback);
-			result = callback.getResultList();
+				
+		} catch (Exception e) {
+			logger.error("Exception while searching for services in a node! : " + e.getMessage());
+			e.printStackTrace();
+		} 
+
 		
-		} catch(Exception ex){
-			ex.printStackTrace();
-			logger.error("Exception while searching for services!");
-			throw new ServiceDiscoveryException("Exception while searching for services!",ex);
-		}
-		
-		return new AsyncResult<List<Service>>(result);
+		return new AsyncResult<List<Service>>(new ArrayList<Service>());
 	}
 
 	@Override
@@ -386,5 +445,6 @@ public class ServiceDiscovery implements IServiceDiscovery {
 		}
 			
 	}
+	
 
 }

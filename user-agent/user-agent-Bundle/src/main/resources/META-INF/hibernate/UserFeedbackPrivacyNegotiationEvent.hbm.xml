@@ -5,7 +5,7 @@
 
 <hibernate-mapping>
     <class name="org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent"
-           table="UserFeedbackPrivacyNegotiationEvent">
+           table="UFPrivacyNegotiationEvent">
 
         <id name="requestId" type="string" column="requestId">
             <generator class="assigned"/>

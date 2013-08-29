@@ -55,15 +55,6 @@
 
 	<dependencies>
 
-
-
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>org.springframework.spring-library</artifactId>
-			<type>libd</type>
-			<scope>provided</scope>
-		</dependency>
-
 		<dependency>
 			<groupId>org.societies</groupId>
 			<artifactId>common-ext-libs</artifactId>
@@ -89,6 +80,7 @@
 			<groupId>org.societies.privacytrust.privacyprotection</groupId>
 			<artifactId>api</artifactId>
 			<version>${version.pt}</version>
+			<scope>provided</scope>
 		</dependency>
 		<!-- Tools -->
 		
