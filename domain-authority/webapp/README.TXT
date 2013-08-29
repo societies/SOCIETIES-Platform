@@ -1,5 +1,3 @@
-Attention!!!
-
 To successfully build, deploy and test this WAB (web application bundle),
 follow the few lines of guidelines as below.
 
@@ -12,6 +10,6 @@ follow the few lines of guidelines as below.
 	service-lifecycle.plan 
 	societies-webapp.plan
 	
-	Then go to web browser and type http://localhost:8080/societies/login.html to start the web app
+	Then go to web browser and type http://localhost:8080/societies-platform/ to start the web app
 	 
 	
