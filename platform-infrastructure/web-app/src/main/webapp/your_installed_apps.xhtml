@@ -36,7 +36,7 @@
         <section class="grid_8 itemlist">
 			<p:accordionPanel id="services_list" value="#{servicesController.currentServices}" var="service" styleClass="accordion grid_8">  
     		<p:tab title="#{service.name}">
-    		<p:panelGrid columns="4" style="border:5px solid green">
+    		<p:panelGrid columns="4" >
     			<p:row>
     			<p:column colspan="3" rowspawn="1" style="border:2px">
     				<h:outputText value="#{service.description}" />
