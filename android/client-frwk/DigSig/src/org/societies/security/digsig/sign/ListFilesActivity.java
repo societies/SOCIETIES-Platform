@@ -5,6 +5,9 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import org.societies.security.digsig.api.Sign;
+import org.societies.security.digsig.api.Trust;
+
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,7 +28,7 @@ public class ListFilesActivity extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		StringTokenizer tokenizer = new StringTokenizer(getIntent().getStringExtra("EXTENSIONS"), ";");
+		StringTokenizer tokenizer = new StringTokenizer(getIntent().getStringExtra(Trust.Params.EXTENSIONS), ";");
 		while(tokenizer.hasMoreTokens()) {
 			String token = tokenizer.nextToken();			
 			if (token==null || token.length()==0) continue;
@@ -61,7 +64,7 @@ public class ListFilesActivity extends ListActivity {
 				Log.i("miki", String.format("Selected item %d", itemPos));
 				
 				Intent intent = getIntent();
-				intent.putExtra("SELECTED", Environment.getExternalStorageDirectory().getPath() + "/" + fileArray[(int) itemPos]);
+				intent.putExtra(Sign.Params.IDENTITY, Environment.getExternalStorageDirectory().getPath() + "/" + fileArray[(int) itemPos]);
 				setResult(RESULT_OK,intent);
 				finish();				
 			}

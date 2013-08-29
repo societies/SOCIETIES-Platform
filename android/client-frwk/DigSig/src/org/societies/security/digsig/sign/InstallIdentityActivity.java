@@ -7,6 +7,8 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.Locale;
 
+import org.societies.security.digsig.api.Sign;
+import org.societies.security.digsig.api.Trust;
 import org.societies.security.digsig.trust.AndroidSecureStorage;
 import org.societies.security.digsig.trust.AndroidSecureStorageConstants;
 
@@ -37,7 +39,7 @@ public class InstallIdentityActivity extends Activity {
 		secureStorage = AndroidSecureStorage.getInstance();
 		
 		Intent i = new Intent(this,ListFilesActivity.class);
-		i.putExtra("EXTENSIONS", "p12;pfx");
+		i.putExtra(Trust.Params.EXTENSIONS, "p12;pfx");
 		startActivityForResult(i, LIST_PFX_FILES);
 	}
 	
@@ -48,13 +50,13 @@ public class InstallIdentityActivity extends Activity {
 		
 		if (requestCode == LIST_PFX_FILES && resultCode==RESULT_OK)
 		{			
-			inputFileName = data.getStringExtra("SELECTED");
+			inputFileName = data.getStringExtra(Sign.Params.IDENTITY);
 			Log.i("InstallIdentityActivity",String.format("Returned this file name %s", inputFileName));
 			
 			Intent i = new Intent(this,PassEntryActivity.class);
 			startActivityForResult(i,PASS_ENTRY);
 		} else if (requestCode == PASS_ENTRY && resultCode==RESULT_OK) {
-			String pass = data.getStringExtra("PASSWORD");
+			String pass = data.getStringExtra(Trust.Params.PASSWORD);
 			
 			try {
 				KeyStore ks = KeyStore.getInstance("PKCS12");			

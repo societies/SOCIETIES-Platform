@@ -3,6 +3,7 @@ package org.societies.security.digsig.sign;
 import org.societies.security.digsig.api.Sign;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -55,11 +56,17 @@ public class SignActivity extends Activity {
 	private String getCallerApp() {
 		
 		String caller;
+		ComponentName callingActivity = getCallingActivity();
+		if (callingActivity == null) {
+			Log.w(TAG, "Could not get calling Activity.");
+			return getText(R.string.unknownApp).toString();
+		}
+		String packageName = callingActivity.getPackageName();
 		
 		try {
 			ApplicationInfo callerInfo;
 
-			callerInfo = getPackageManager().getApplicationInfo(getCallingActivity().getPackageName(), 0);
+			callerInfo = getPackageManager().getApplicationInfo(packageName, 0);
 			caller = getPackageManager().getApplicationLabel(callerInfo).toString();
 			Log.d(TAG, "Caller app: " + caller);
 			return caller;
@@ -79,9 +86,13 @@ public class SignActivity extends Activity {
 		if (requestCode == SELECT_IDENTITY && resultCode == RESULT_OK) {
 			Intent intent = new Intent(this, SignService.class);
 			intent.putExtras(getIntent());
-			intent.putExtra(Sign.Params.IDENTITY, data.getIntExtra("SELECTED", -1));
+			intent.putExtra(Sign.Params.IDENTITY, data.getIntExtra(Sign.Params.IDENTITY, -1));
 			startService(intent);
-			setResult(RESULT_OK);
+			if (getIntent().getByteArrayExtra(Sign.Params.DOC_TO_SIGN) == null) {
+				setResult(RESULT_OK);
+			} else {
+				setResult(RESULT_OK, intent);
+			}
 			finish();
 		}
 	}

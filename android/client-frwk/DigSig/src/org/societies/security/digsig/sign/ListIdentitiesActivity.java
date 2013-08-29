@@ -7,6 +7,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import org.societies.security.digsig.api.Sign;
 import org.societies.security.digsig.trust.AndroidSecureStorage;
 import org.societies.security.digsig.trust.AndroidSecureStorageConstants;
 
@@ -111,7 +112,7 @@ public class ListIdentitiesActivity extends ListActivity {
 		getListView().setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,long itemPos) {				
 				Intent intent = getIntent();
-				intent.putExtra("SELECTED", certNumbers.get((int)itemPos));				
+				intent.putExtra(Sign.Params.IDENTITY, certNumbers.get((int)itemPos));				
 				setResult(RESULT_OK,intent);
 				finish();				
 			}

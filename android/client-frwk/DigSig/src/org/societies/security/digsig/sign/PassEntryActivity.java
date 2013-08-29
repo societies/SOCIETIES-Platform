@@ -1,5 +1,7 @@
 package org.societies.security.digsig.sign;
 
+import org.societies.security.digsig.api.Trust;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,7 +26,7 @@ public class PassEntryActivity extends Activity {
 			public void onClick(View v) {
 				Intent i = getIntent();
 				String pass = editText.getText().toString();
-				i.putExtra("PASSWORD", pass);
+				i.putExtra(Trust.Params.PASSWORD, pass);
 				setResult(RESULT_OK, i);
 				finish();
 			}

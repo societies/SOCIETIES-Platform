@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import org.societies.security.digsig.api.Sign;
+import org.societies.security.digsig.api.Trust;
 import org.societies.security.digsig.common.SigResult;
 import org.societies.security.digsig.utility.StreamUtil;
 
@@ -47,11 +49,11 @@ public class MainActivity extends Activity {
 				} catch (Exception e) {}
 								
 				Intent i = new Intent(MainActivity.this, SignActivity.class);
-				i.putExtra("XML",val);
+				i.putExtra(Sign.Params.DOC_TO_SIGN, val);
 				
 				ArrayList<String> idsToSign = new ArrayList<String>();
 				idsToSign.add("Miki1");
-				i.putStringArrayListExtra("IDS_TO_SIGN", idsToSign);
+				i.putStringArrayListExtra(Sign.Params.IDS_TO_SIGN, idsToSign);
 				
 				startActivityForResult(i, SIGN);
 			}
@@ -68,7 +70,7 @@ public class MainActivity extends Activity {
 				
 				StreamUtil.copyStream(is, os);
 				
-				i.putExtra("XML",os.toByteArray());
+				i.putExtra(Sign.Params.DOC_TO_SIGN, os.toByteArray());
 				
 				startActivityForResult(i, VERIFY);
 			}
@@ -83,7 +85,7 @@ public class MainActivity extends Activity {
 			
 			try
 			{
-				byte[] signedXml = data.getByteArrayExtra("SIGNED_XML");
+				byte[] signedXml = data.getByteArrayExtra(Sign.Params.SIGNED_DOC);
 				FileOutputStream os = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/signed2.xml");
 				os.write(signedXml);
 				os.close();
@@ -95,7 +97,7 @@ public class MainActivity extends Activity {
 		} if (requestCode == VERIFY) {
 			if (resultCode == RESULT_OK) {
 				// get data
-				ArrayList<SigResult> sigResults = data.getParcelableArrayListExtra("RESULT");
+				ArrayList<SigResult> sigResults = data.getParcelableArrayListExtra(Trust.Params.RESULT);
 				
 				boolean allOk = true;
 				

@@ -2,10 +2,6 @@ package org.societies.security.digsig.sign;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.cert.CertificateFactory;
@@ -26,17 +22,15 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.societies.security.digsig.api.Sign;
 import org.societies.security.digsig.trust.AndroidSecureStorage;
+import org.societies.security.digsig.utility.Storage;
 import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.Document;
 import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 
 import android.app.IntentService;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Environment;
 import android.util.Log;
-import android.widget.Toast;
 
 public class SignService extends IntentService {
 
@@ -79,9 +73,9 @@ public class SignService extends IntentService {
 		Log.i(TAG, "OUTPUT_TYPE = " + outputType);
 
 //		Intent broadcastIntent = new Intent();
-//		broadcastIntent.setAction("TODO");  // FIXME
+//		broadcastIntent.setAction(TODO);
 //		broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-//		broadcastIntent.putExtra(RESPONSE_MESSAGE, "TODO");  // FIXME
+//		broadcastIntent.putExtra(RESPONSE_MESSAGE, TODO);
 //		sendBroadcast(broadcastIntent);
 		
 		try {
@@ -119,7 +113,7 @@ public class SignService extends IntentService {
 	}
 
 	private void doSign(Intent intent) {
-		int selected = intent.getIntExtra("SELECTED", -1);
+		int selected = intent.getIntExtra(Sign.Params.IDENTITY, -1);
 		if (selected==-1) {
 			return;
 		}
@@ -151,7 +145,7 @@ public class SignService extends IntentService {
 		Document doc;
 		XMLSignature sig;
 		try	{	    
-			byte[] val = intent.getByteArrayExtra("XML");        
+			byte[] val = intent.getByteArrayExtra(Sign.Params.DOC_TO_SIGN);        
 
 			doc = docBuilder.parse(new ByteArrayInputStream(val));
 			sig = new XMLSignature(doc,null,XMLSignature.ALGO_ID_SIGNATURE_RSA);
@@ -161,7 +155,7 @@ public class SignService extends IntentService {
 			Transforms transforms = new Transforms(doc);            
 			transforms.addTransform(Transforms.TRANSFORM_C14N_WITH_COMMENTS); // Also must use c14n
 
-			ArrayList<String> idsToSign = intent.getStringArrayListExtra("IDS_TO_SIGN");            
+			ArrayList<String> idsToSign = intent.getStringArrayListExtra(Sign.Params.IDS_TO_SIGN);            
 			for (String id : idsToSign)             
 				sig.addDocument("#"+id,transforms,MessageDigestAlgorithm.ALGO_ID_DIGEST_SHA1);            
 
@@ -177,71 +171,10 @@ public class SignService extends IntentService {
 			domOutput.setEncoding("UTF-8");	        
 			serializer.write(doc, domOutput);
 
-			intent.putExtra("SIGNED_XML", output.toByteArray());
-			writeToExternalStorage(intent);
+			intent.putExtra(Sign.Params.SIGNED_DOC, output.toByteArray());
+			new Storage(this).writeToExternalStorage(intent);
 		} catch (Exception e) {  
 			Log.e(TAG, "Failed while signing!", e);
-		}
-	}
-	
-	private void writeToExternalStorage(Intent resultIntent) {
-		try	{
-			byte[] signedXml = resultIntent.getByteArrayExtra("SIGNED_XML");
-			FileOutputStream os = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/signed2.xml");
-			os.write(signedXml);
-			os.close();
-		
-			String msg = "File signed sucessfully.\nOutput is in signed2.xml on SD CARD.";
-			Log.i(TAG, msg);
-			Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-		} catch(Exception e) {
-		}
-	}
-	
-	private void writeToInternalStorage(String fileName, byte[] file) throws DigSigException {
-		try {
-			FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
-			fos.write(file);
-			fos.close();
-		} catch (FileNotFoundException e) {
-			throw new DigSigException(e);
-		} catch (IOException e) {
-			throw new DigSigException(e);
-		}
-	}
-
-	/**
-	 * Read file and remove it after a successful read
-	 * 
-	 * @param fileName
-	 * @param delete Delete the file after successful read
-	 * @return The file contents
-	 * @throws DigSigException
-	 */
-	private byte[] readFromInternalStorage(String fileName, boolean delete) throws DigSigException {
-		
-		FileInputStream fis = null;
-		
-		try {
-			fis = openFileInput(fileName);
-			long size = fis.getChannel().size();
-			if (size > Integer.MAX_VALUE) {
-				fis.close();
-				throw new DigSigException("File \"" + fileName + "\" too big: " + size + " bytes");
-			}
-			byte[] file = new byte[(int) size];
-			fis.read(file);
-			fis.close();
-			if (delete) {
-				if (!deleteFile(fileName)) {
-					Log.w(TAG, "Could not delete file " + fileName);
-				}
-			}
-			return file;
-		} catch (FileNotFoundException e) {
-			throw new DigSigException(e);
-		} catch (IOException e) {
-			throw new DigSigException(e);
 		}
 	}
 }

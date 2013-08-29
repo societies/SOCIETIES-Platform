@@ -13,10 +13,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.xml.security.Init;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.signature.XMLSignature;
+import org.societies.security.digsig.api.Sign;
+import org.societies.security.digsig.api.Trust;
 import org.societies.security.digsig.common.SigResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+
 
 
 
@@ -58,7 +62,7 @@ public class VerifyActivity extends Activity {
 		certs = null;
 		results = null;
 		
-		byte[] val = getIntent().getByteArrayExtra("XML");     
+		byte[] val = getIntent().getByteArrayExtra(Sign.Params.DOC_TO_SIGN);     
 							
 		if (val==null) {
 			setResult(RESULT_CANCELED);
@@ -143,7 +147,7 @@ public class VerifyActivity extends Activity {
         
         // Write out to the intent
         Intent data = new Intent();
-        data.putParcelableArrayListExtra("RESULT", results);
+        data.putParcelableArrayListExtra(Trust.Params.RESULT, results);
         setResult(RESULT_OK, data);
         
         

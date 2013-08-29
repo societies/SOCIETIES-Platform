@@ -44,5 +44,10 @@
             </intent-filter>
 		</activity>
 		<service android:name=".SignService" android:exported="false"/>
-    </application>
+        <provider android:name="org.societies.security.digsig.sign.contentprovider.DocContentProvider"
+        		  android:authorities="org.societies.security.digsig.provider"
+        		  android:exported="true"
+        		  >
+        </provider>
+		</application>
 </manifest>

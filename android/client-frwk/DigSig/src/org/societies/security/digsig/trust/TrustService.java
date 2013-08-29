@@ -11,7 +11,9 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
+import org.societies.security.digsig.api.Trust;
 import org.societies.security.digsig.utility.Hash;
+
 
 
 import android.app.Service;
@@ -47,6 +49,8 @@ public class TrustService extends Service {
 	
 	private static final String USER_STORE_FILE = "cacerts.bks";
 	
+	private static final String CERTIFICATE = "CERTIFICATE";
+	
 	private KeyStore systemStore; 	// Stores trusted system certs
 	private KeyStore userStore;		// Stores trusted user certs	
 	
@@ -70,7 +74,7 @@ public class TrustService extends Service {
 	private void installTrusted(Intent intent) {
 		init();
 		
-		byte[] x509Data = intent.getByteArrayExtra("CERTIFICATE");
+		byte[] x509Data = intent.getByteArrayExtra(CERTIFICATE);
 		if (x509Data==null) return;
 		
 		X509Certificate cert = null;
@@ -97,7 +101,7 @@ public class TrustService extends Service {
 	private void removeTrusted(Intent intent) {
 		init();
 		
-		byte[] x509Data = intent.getByteArrayExtra("CERTIFICATE");
+		byte[] x509Data = intent.getByteArrayExtra(CERTIFICATE);
 		if (x509Data==null) return;
 		
 		X509Certificate cert = null;
@@ -126,8 +130,8 @@ public class TrustService extends Service {
 		try {
 			KeyStore signStore = KeyStore.getInstance("pkcs12");
 			
-			byte[] pkcs12Data = intent.getByteArrayExtra("PKCS12");
-			char[] password = intent.getCharArrayExtra("PASSWORD");
+			byte[] pkcs12Data = intent.getByteArrayExtra(Trust.Params.PKCS12);
+			char[] password = intent.getCharArrayExtra(Trust.Params.PASSWORD);
 			if (password == null || pkcs12Data == null) return;		
 			
 			
