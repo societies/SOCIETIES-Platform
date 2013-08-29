@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
+import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceStatus;
@@ -46,11 +47,21 @@ public class ServiceWrapper {
 
 	private Service service;
 	private ServicesController controller;
+	private List<ICis> mySharedCis;
+	private String ownerName;
+	private String sharedBy;
+	private List<String> sharedCisList;
 	private static final Logger log = LoggerFactory.getLogger(ServiceWrapper.class);
 	
 	public ServiceWrapper(Service service, ServicesController controller) {
 		if(log.isDebugEnabled())
 			log.debug("ServiceWrapper created for Service: " + service.getServiceName());
+		this.service = service;
+		this.controller = controller;
+		this.mySharedCis = new ArrayList<ICis>();
+		this.ownerName = null;
+		this.sharedBy = null;
+		this.sharedCisList = null;
 	}
 	
 	public Service getService(){
@@ -62,20 +73,24 @@ public class ServiceWrapper {
 		if(log.isDebugEnabled())
 			log.debug("ServiceWrapper changed for for Service: " + service.getServiceName());
 	}
-	public String getServiceName(){
+	public String getName(){
 		return service.getServiceName();
 	}
 	
-	public String getServiceDescription(){
+	public String getDescription(){
 		return service.getServiceDescription();
 	}
 	
-	public String getServiceType(){
+	public String getCategory(){
 		return service.getServiceCategory();
 	}
 	
-	public ServiceStatus getServiceStatus(){
+	public ServiceStatus getStatus(){
 		return service.getServiceStatus();
+	}
+	
+	public void setServiceStatus(ServiceStatus serviceStatus){
+		this.service.setServiceStatus(serviceStatus);
 	}
 	
 	public boolean isStarted(){
@@ -86,29 +101,121 @@ public class ServiceWrapper {
 		return service.getServiceStatus().equals(ServiceStatus.STOPPED);
 	}
 	
+	public String getType(){
+		switch(service.getServiceType()){
+		case DEVICE: return "Device";
+		case THIRD_PARTY_ANDROID: return "Android";
+		case THIRD_PARTY_CLIENT: return "Service Client";
+		default: return "Service";
+		}
+	}
+	
 	public String getCreator(){
 		return service.getAuthorSignature();
+	}
+	
+	public String getOwnerJid(){
+		return ServiceModelUtils.getJidFromServiceIdentifier(service.getServiceIdentifier());
+	}
+	
+	public String getOwnerName(){
+		if(ownerName == null){
+			/*List<String> cssIdList = new ArrayList();
+			cssIdList.add(getOwnerJid());
+			try{
+				List<CssAdvertisementRecord> recordList = controller.getCssDirectory().searchByID(cssIdList).get();
+				if(!recordList.isEmpty()){
+					ownerName = recordList.get(0).getName();
+				}
+			} catch(Exception ex){
+				log.error("Exception occured {}", ex.getMessage());
+				ex.printStackTrace();
+			}*/
+			if(ownerName == null || "".equals(ownerName)){
+				try{
+					controller.getCommManager().getIdManager().fromJid(getOwnerJid()).getIdentifier();
+				} catch(Exception ex){
+					log.error("Exception occured {}", ex.getMessage());
+					ex.printStackTrace();
+					ownerName = getOwnerJid();
+				}
+			}		
+			
+		}
+		return ownerName;
+	}
+	
+	public String getSharedByJid(){
+		return service.getServiceInstance().getParentJid();
+	}
+	
+	public String getSharedBy(){
+		if(sharedBy == null){
+			/*List<String> cssIdList = new ArrayList();
+			cssIdList.add(getSharedByJid());
+			try{
+				List<CssAdvertisementRecord> recordList = controller.getCssDirectory().searchByID(cssIdList).get();
+				if(!recordList.isEmpty()){
+					sharedBy = recordList.get(0).getName();
+				}
+			} catch(Exception ex){
+				log.error("Exception occured {}", ex.getMessage());
+				ex.printStackTrace();
+			}*/
+			if(sharedBy == null || "".equals(sharedBy)){
+				try{
+					controller.getCommManager().getIdManager().fromJid(getSharedByJid()).getIdentifier();
+				} catch(Exception ex){
+					log.error("Exception occured {}", ex.getMessage());
+					ex.printStackTrace();
+					sharedBy = getSharedByJid();
+				}
+			}		
+			
+		}
+		return sharedBy;
+		
+	}
+	
+	public boolean isShared(){
+		if(!isMine())
+			return true;
+		else
+			if(getSharedCisId().size() > 0)
+				return true;
+			else
+				return false;
+		
 	}
 	
 	public boolean isInstalled(){
 		if(isMine())
 			return true;
 		else{
-			return false;
+			return controller.getThirdClients().containsValue(getId());
 		}
 	}
 	
 	public boolean isCanShare(){
 		if(service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT) || !isMine())
 			return false;
-		else
+		
+		if(service.getServiceType().equals(ServiceType.THIRD_PARTY_SERVER) && service.getServiceInstance().getServiceImpl().getServiceClient() != null )
 			return true;
 
+		if(service.getServiceType().equals(ServiceType.DEVICE))
+			return true;
+		
+		return false;
+			
 	}
 	
 	public List<ICis> getSharedCis(){
 		try {
-			return controller.getServiceControl().getCisServiceIsSharedWith(service.getServiceIdentifier()).get();
+			//if(mySharedCis == null)
+				mySharedCis =  controller.getServiceControl().getCisServiceIsSharedWith(service.getServiceIdentifier()).get();
+			//else
+				return mySharedCis;
 		} catch (InterruptedException e) {
 			log.error("Exception!");
 			e.printStackTrace();
@@ -120,6 +227,61 @@ public class ServiceWrapper {
 		return new ArrayList<ICis>();
 	}
 	
+	public void setSharedCis(List<ICis> cisList){
+		mySharedCis = cisList;
+	}
+	
+	public List<String> getSharedCisId(){
+		if(sharedCisList == null){
+			sharedCisList = new ArrayList<String>();
+			List<ICis> cisList = getSharedCis();
+			for(ICis myCis : cisList){
+				sharedCisList.add(myCis.getCisId());
+			}
+		}
+		
+		return sharedCisList;
+	}
+	
+	public void setSharedCisId(List<String> cisListId){
+		
+		if(cisListId == null){
+			sharedCisList = null;
+			return;
+		}
+		
+		log.debug("Set Shared CIS, previous {}, now {}", sharedCisList.size(), cisListId.size());
+		
+		if(sharedCisList.size() > cisListId.size()){
+			log.debug("We've stopped sharing with a CIS!");
+			String removedCis = null;
+			for(String sharedCis : sharedCisList){
+				if(!cisListId.contains(sharedCis))
+					removedCis = sharedCis;
+			}
+			if(removedCis != null){
+				log.debug("The CIS we need to unshare is: {}", removedCis);
+				controller.unshareService(getId(),removedCis);
+			} else{
+				log.warn("Couldn't find the CIS to remove?!");
+			}
+		} else{
+			log.debug("We've added sharing to another CIS!");
+			String newCis = null;
+			for(String sharedCis : cisListId){
+				if(!sharedCisList.contains(sharedCis))
+					newCis = sharedCis;
+			}
+			if(newCis != null){
+				log.debug("The CIS we need to share is: {}", newCis);
+				controller.shareService(getId(),newCis);
+			} else{
+				log.warn("Couldn't find the CIS to share?!");
+			}
+		}
+		
+		this.sharedCisList = cisListId;
+	}
 	
 	public boolean isMine(){
 		try {
@@ -129,6 +291,18 @@ public class ServiceWrapper {
 			e.printStackTrace();
 			return false;
 		} 
+	}
+	
+	public boolean isDevice(){
+		return service.getServiceType().equals(ServiceType.DEVICE);
+	}
+	
+	public boolean isClient(){
+		return service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT);
+	}
+	
+	public boolean isAndroid(){
+		return service.getServiceType().equals(ServiceType.THIRD_PARTY_ANDROID);
 	}
 	
 	@Override

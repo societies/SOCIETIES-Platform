@@ -99,4 +99,14 @@ public interface IServiceDiscovery {
 	 */
 	public Future<List<Service>> searchServices(Service filter, String jid) throws ServiceDiscoveryException;
 
+	/**
+	 * Description: Searches all known services in ALL known nodes and CIS, given a certain criteria filter.
+	 * 
+	 * @param filter the filter to search   
+	 * @return a List of services retrieved
+	 * @throws ServiceDiscoveryException
+	 */
+	public Future<List<Service>> searchServicesAll(Service filter)
+			throws ServiceDiscoveryException;
+
 }

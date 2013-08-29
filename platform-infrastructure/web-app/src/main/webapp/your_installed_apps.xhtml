@@ -1,6 +1,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
@@ -8,84 +11,150 @@
     </ui:define>
 
     <ui:define name="body">
+ 		
+        <p:growl id="serMessages" showDetail="true" sticky="true" autoUpdate="true" for="servicesGrowl"/>
+    	<p:poll interval="60" update="services_list,title_header" process="@this" />
+    	        
+        	<p:blockUI id="blockUI" widgetVar="blockUI" block=":mainForm">  
+       			LOADING<br />
+				<p:graphicImage value="/images/ajax-loader.gif" />
+			</p:blockUI>
+			  	
         <div class="hr grid_12 clearfix"></div>
-        
-        <!-- Left Column -->
-        <section id="left_col" class="grid_12">
+
+        <section class="grid_12">
             <div class="breadcrumbs"><a href="index.xhtml">Home</a>
                 / <a href="your_installed_apps.xhtml">Apps</a>
             </div>
-
-            <section class="form_style_main">
-
-                <h4 class="form_title"><h:outputText value="#{servicesController.header}"/></h4>
-                <ui:repeat value="#{servicesController.currentServices}" var="service">
-				<li><h:panelGrid columns="2">
-					<p:column>
-					<img alt="" src="images/app_pic_sample1.jpg" height="48" width="48"/>				
-					<p:commandButton value="Start" rendered="#{!service.started}" action="#{servicesController.startService}" process="@this">
-						<f:setPropertyActionListener target="#{servicesController.serviceId}" value="service.id" />
-					</p:commandButton>					
-					<p:commandButton value="Stop" rendered="#{!service.started}" action="#{servicesController.stopService}" process="@this">
-						<f:setPropertyActionListener target="#{servicesController.serviceId}" value="service.id" />
+        </section>
+        <p:panel id="title_header" styleClass="form_title">
+			<h4 class="form_title"><h:outputText value="#{servicesController.header}"/></h4>
+		</p:panel>
+        
+        <!-- Left -->
+        <article id="left_col" class="grid_8">
+        <section class="grid_8 itemlist">
+			<p:accordionPanel id="services_list" value="#{servicesController.currentServices}" var="service" styleClass="accordion grid_8">  
+    		<p:tab title="#{service.name}">
+    		<p:panelGrid columns="4" style="border:5px solid green">
+    			<p:row>
+    			<p:column colspan="3" rowspawn="1" style="border:2px">
+    				<h:outputText value="#{service.description}" />
+    			</p:column>
+ 	    		<p:column colspan="1" rowspawn="2" style="border:3px">
+ 	    		<p>
+		    		<p:commandButton value="Start"
+		    		onclick="blockUI.show()" oncomplete="blockUI.hide()"
+		    		rendered="#{!service.started and servicesController.myNode and !service.device}"
+		    		action="#{servicesController.startService}" process="@this" update="services_list"
+		    		styleClass="services-button" style="width:70px" >
+						<f:setPropertyActionListener target="#{servicesController.serviceId}" value="#{service.id}" />
 					</p:commandButton>
-					<p:commandButton value="Install" rendered="#{service.installed}" action="#{servicesController.installService}" process="@this">
-						<f:setPropertyActionListener target="#{servicesController.serviceId}" value="service.id" />
+					
+					<p:commandButton value="Stop"
+					onclick="blockUI.show()" oncomplete="blockUI.hide()"
+					rendered="#{service.started and servicesController.myNode and !service.device}"
+					action="#{servicesController.stopService}" process="@this" update="services_list"
+					styleClass="services-button" style="width:70px" >
+						<f:setPropertyActionListener target="#{servicesController.serviceId}" value="#{service.id}" />
 					</p:commandButton>
-					<p:commandButton value="Remove" rendered="#{service.installed}" action="#{servicesController.removeService}" process="@this">
-						<f:setPropertyActionListener target="#{servicesController.serviceId}" value="service.id" />
+				</p><p>	
+					<p:commandButton value="Install"
+					rendered="#{!service.installed}"
+					action="#{servicesController.installService}" process="@this" 
+					styleClass="services-button" style="width:70px" >
+							<f:setPropertyActionListener target="#{servicesController.serviceId}" value="#{service.id}" />
 					</p:commandButton>
-					</p:column>
-
-					<p:column>
-					<p:commandLink value="#{service.name}" action="#{servicesController.viewServiceDetails" process="@this">
-						<f:setPropertyActionListener target="#{servicesController.serviceId}" value="service.id" />
-					</p:commandLink>
-					<h:outputText value="#{service.description}" />
-					</p:column>
-				</h:panelGrid>  
-				</li>
-				</ui:repeat>
-
-                <div class="hr dotted clearfix"></div>
-
+						
+					<p:commandButton value="Remove"
+					onclick="blockUI.show()" oncomplete="blockUI.hide()"
+					rendered="#{service.installed and !service.device}" 
+					action="#{servicesController.removeService}" process="@this" update="services_list"
+					styleClass="services-button" style="width:70px">
+						<f:setPropertyActionListener target="#{servicesController.serviceId}" value="#{service.id}" />
+					</p:commandButton>
+				</p>	
+					<p:commandButton value="Unshare"
+					onclick="blockUI.show()" oncomplete="blockUI.hide()"
+					rendered="#{!servicesController.myNode and service.mine}" 
+					action="#{servicesController.unshareService}" process="@this" update="services_list"
+					styleClass="services-button" style="width:70px">
+							<f:setPropertyActionListener target="#{servicesController.serviceId}" value="#{service.id}" />
+					</p:commandButton>
+						
+					<p:selectCheckboxMenu value="#{service.sharedCisId}" 
+					label="Sharing" filter="true" filterText="Filter" filterMatchMode="startsWith"
+					rendered="#{service.canShare and servicesController.myNode}"
+					styleClass="services-button" style="width:70px">  
+						<f:selectItems value="#{servicesController.nodeList}" var="node" itemLabel="#{node.name}" itemValue="#{node.cisId}"/>  
+						<p:ajax update="services_list" process="@this"/>
+					</p:selectCheckboxMenu>
+				</p:column>
+				</p:row>
+				<p:row>
+				<p:column colspan="1" style="font-weight: bold;" >
+					<h6><h:outputText value="#{service.type}" /></h6>
+				</p:column>
+				<p:column colspan="1">
+					<h:outputText value="Created by #{service.creator}" styleClass="keyinfometadata" rendered="#{!service.device}"/>
+				</p:column>
+				<p:column colspan="1">
+					<h:outputText value="Shared by #{service.sharedBy}" styleClass="keyinfometadata" rendered="#{service.shared}"/>
+				</p:column>
+				</p:row>
+    		</p:panelGrid>
+   			</p:tab>
+    		</p:accordionPanel>
+    		
+            <div class="hr dotted clearfix"></div>
 
             </section>
-        </section>
-        
-        <aside id="sidebar_right" class="grid_4">
+            </article>
+            <!-- Right -->
+			<aside id="sidebar_right" class="grid_4">
             <div class="sidebar_top_BG"></div>
             <div class="hr dotted clearfix"></div>
             <section>
                 <header>
-                    <h3>App Search</h3>
+                    <h3>Community Apps</h3>
                 </header>
+			<p:selectOneMenu id="nodeMenu" value="#{servicesController.selectedNode}" effect="fade" styleClass="select">
+            	<f:selectItem itemLabel="My Installed Apps" itemValue="mynode" />
+            	<f:selectItems value="#{servicesController.nodeList}" var="node" itemLabel="#{node.name}" itemValue="#{node.cisId}"/>
+            	<p:ajax update=":mainForm:services_list,:mainForm:title_header" listener="#{servicesController.selectNode}" process="@this"/>
+        		</p:selectOneMenu>
             </section>
             <section>
                 <header>
-                    <h3>Apps & Communities</h3>
+                    <h3>App Search</h3>
                 </header>
-			<p:selectOneMenu id="nodeMenu" value="#{servicesController.selectedNode}" effect="fade">
-            	<f:selectItem itemLabel="My Installed Apps" itemValue="mynode" />
-            	<f:selectItems value="#{servicesController.nodeList}" var="node" itemLabel="#{node.name}" itemValue="#{node.cisid}"/>
-            	<p:ajax update="left_col" listener="#{servicesController.selectNode}" process="@this"/>
-        		</p:selectOneMenu>
+                <p:inputText id="searchBox" value="#{servicesController.searchBy}" styleClass="websearch-input" style="text-align: right" />   
+       			<h:outputLabel for="searchMenu" value="Search by: " />  
+        		<p:selectOneMenu id="searchMenu" value="#{servicesController.searchOption}" effect="fade">  
+           			 <f:selectItems value="#{servicesController.searchOptions}" var="option" itemLabel="#{option}" itemValue="#{option}"/>  
+       			 </p:selectOneMenu>  
+       			 <p:commandButton value="Search"
+       			 onclick="blockUI.show()" oncomplete="blockUI.hide()" icon="ui-icon-search"
+       			 update=":mainForm:services_list,:mainForm:title_header"
+       			 action="#{servicesController.searchService}" process="@this,searchMenu,searchBox"/> 
             </section>
             <section>
                 <header>
                     <h3>Install App</h3>
                 </header>
                 <div class="hr dotted clearfix"></div>
-                    <p:fileUpload fileUploadListener="#{servicesController.handleFileUpload}" mode="advanced" dragDropSupport="true"  
-                    allowTypes="/(\.|\/)(jar|war)$/" />  
-				<p:messages id="serMessages" showDetail="true" autoUpdate="true" closable="true" for="serviceMessages"/>
+                    <p:fileUpload fileUploadListener="#{servicesController.handleFileUpload}"
+                    mode="advanced" dragDropSupport="true"  
+                    allowTypes="/(\.|\/)(jar|war)$/"
+                    onstart="blockUI.show()" oncomplete="blockUI.hide()"
+                    update=":mainForm:services_list" process="@this"/>  
             </section>
             <div class="hr dotted clearfix"></div>
             <div class="sidebar_bottom_BG"></div>
-        </aside>
-
+		</aside>
+		
         <div class="hr grid_12 clearfix"></div>
-
+	
     </ui:define>
 </ui:composition>
 </html>

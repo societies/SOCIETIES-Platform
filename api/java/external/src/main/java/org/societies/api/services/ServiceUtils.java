@@ -17,6 +17,9 @@ public class ServiceUtils {
 
 	public static ServiceResourceIdentifier generateServiceResourceIdentifierFromString(String serviceId){
 		
+		if(serviceId == null)
+			return null;
+		
 		ServiceResourceIdentifier result = new ServiceResourceIdentifier();
 		
 		int index = serviceId.indexOf(' ');	
@@ -36,7 +39,12 @@ public class ServiceUtils {
 	
 	public static String serviceResourceIdentifierToString(ServiceResourceIdentifier serviceId){
 		
-		return serviceId.getServiceInstanceIdentifier() + " " + serviceId.getIdentifier().toString();
+		if(serviceId == null)
+			return null;
+		
+		StringBuilder builder = new StringBuilder();
+		builder.append(serviceId.getServiceInstanceIdentifier()).append(' ').append(serviceId.getIdentifier().toString());
+		return builder.toString();
 	}
 	
 	/**
