@@ -1,26 +1,50 @@
+/**
+ * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET
+ * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
+ * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp.,
+ * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM
+ * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+ * conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.societies.android.api.events;
 
 import org.societies.android.api.css.manager.IServiceManager;
 
 /**
- * Interface defines how 3rd party and optionally, platform components, can 
+ * Interface defines how 3rd party and optionally, platform components, can
  * subscribe/publish to Societies platform events. The base eventing system used in Societies
  * is based on XMPP Pubsub event nodes. These event nodes form the basis of inter-node
- * messaging. 
- * 
- * This interface allows local Android components to subscribe/publish XMPP events using a 
+ * messaging.
+ *
+ * This interface allows local Android components to subscribe/publish XMPP events using a
  * an Android Intents/ XMPP Pubsub events translation.
- * 
- * This interface should not be used for Android inter-node eventing - use Intents.  
+ *
+ * This interface should not be used for Android inter-node eventing - use Intents.
  *
  */
 public interface IAndroidSocietiesEvents extends IServiceManager{
-	
+
 	/**
 	 * Societies Events intents
 	 * Used to create to create Intents to signal return values of a called method
 	 * If the method is locally bound it is possible to directly return a value but is discouraged
-	 * as called methods usually involve making asynchronous calls. 
+	 * as called methods usually involve making asynchronous calls.
 	 */
 	public static final String INTENT_RETURN_VALUE_KEY = "org.societies.android.platform.events.ReturnValue";
 	public static final String INTENT_EXCEPTION_VALUE_KEY = "org.societies.android.platform.events.ExceptionValue";
@@ -44,7 +68,7 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	public static final int INVALID_PUBSUB_NODE_ALREADY_EXISTS = 3;
 
 	/**
-	 * Android intent Societies platform Pubsub related intents 
+	 * Android intent Societies platform Pubsub related intents
 	 */
 	//Context Manager intents
 	final static String CONTEXT_MANAGER_CREATED_INTENT = "org.societies.android.context.CREATED";
@@ -63,8 +87,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	//Device Manager intents
 	final static String DEVICE_MANAGER_DEVICE_REGISTERED_INTENT   = "org.societies.android.device.manager.DEVICE_CONNECTED";
 	final static String DEVICE_MANAGER_DEVICE_DISCONNECTED_INTENT = "org.societies.android.device.manager.DEVICE_DISCONNECTED";
-	final static String DEVICE_MANAGER_EVENTING_NODE_NAME_INTENT  = "org.societies.android.device.manager.EVENTING_NODE_NAME";	
-	
+	final static String DEVICE_MANAGER_EVENTING_NODE_NAME_INTENT  = "org.societies.android.device.manager.EVENTING_NODE_NAME";
+
 	//UserFeedback intents
 	final static String UF_PRIVACY_NEGOTIATION_REQUEST_INTENT  = "org.societies.useragent.feedback.privacyNegotiation";
 	final static String UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT = "org.societies.useragent.feedback.privacyNegotiationResponse";
@@ -91,12 +115,12 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 										 DEVICE_MANAGER_EVENTING_NODE_NAME_INTENT,
 										 UF_PRIVACY_NEGOTIATION_REQUEST_INTENT,
 										 UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT,
-//										 UF_ACCESS_CONTROL_REQUEST_INTENT,
-//										 UF_ACCESS_CONTROL_RESPONSE_INTENT,
+										 UF_ACCESS_CONTROL_REQUEST_INTENT,
+										 UF_ACCESS_CONTROL_RESPONSE_INTENT,
 										 UF_REQUEST_INTENT,
                                          UF_EXPLICIT_RESPONSE_INTENT,
                                          UF_IMPLICIT_RESPONSE_INTENT
-										 };	
+										 };
 	/**
 	 * Android intent Societies platform Pubsub related events
 	 */
@@ -111,7 +135,7 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	final static String CSS_MANAGER_DEPART_CSS_NODE_EVENT = "departCSSNode";
 	final static String CSS_FRIEND_REQUEST_RECEIVED_EVENT = "friendRequestReceived";
 	final static String CSS_FRIEND_REQUEST_ACCEPTED_EVENT = "friendRequestAccepted";
-	
+
 	//Device Manager pubsub nodes
 	final static String DEVICE_MANAGER_DEVICE_REGISTERED_EVENT   = "DEVICE_CONNECTED";
 	final static String DEVICE_MANAGER_DEVICE_DISCONNECTED_EVENT = "DEVICE_DISCONNECTED";
@@ -120,8 +144,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	//UserFeedback pubsub nodes
 	final static String UF_PRIVACY_NEGOTIATION_REQUEST_EVENT  = "org/societies/useragent/feedback/privacyNegotiation";
 	final static String UF_PRIVACY_NEGOTIATION_RESPONSE_EVENT = "org/societies/useragent/feedback/privacyNegotiationResponse";
-	final static String UF_ACCESS_CONTROL_REQUEST_EVENT       = "org/societies/useragent/feedback/accessControl/REQUEST";
-	final static String UF_ACCESS_CONTROL_RESPONSE_EVENT      = "org/societies/useragent/feedback/accessControl/RESPONSE";
+	final static String UF_ACCESS_CONTROL_REQUEST_EVENT       = "org/societies/useragent/feedback/privacyAccessControl";
+	final static String UF_ACCESS_CONTROL_RESPONSE_EVENT      = "org/societies/useragent/feedback/privacyAccessControlResponse";
 	final static String UF_REQUEST_EVENT 					  = "org/societies/useragent/feedback/event/REQUEST";
 	final static String UF_EXPLICIT_RESPONSE_EVENT 			  = "org/societies/useragent/feedback/event/EXPLICIT_RESPONSE";
 	final static String UF_IMPLICIT_RESPONSE_EVENT 			  = "org/societies/useragent/feedback/event/IMPLICIT_RESPONSE";
@@ -142,8 +166,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 										 DEVICE_MANAGER_EVENTING_NODE_NAME_EVENT,
 										 UF_PRIVACY_NEGOTIATION_REQUEST_EVENT,
 										 UF_PRIVACY_NEGOTIATION_RESPONSE_EVENT,
-//                                         UF_ACCESS_CONTROL_REQUEST_EVENT,
-//                                         UF_ACCESS_CONTROL_RESPONSE_EVENT,
+                                         UF_ACCESS_CONTROL_REQUEST_EVENT,
+                                         UF_ACCESS_CONTROL_RESPONSE_EVENT,
 										 UF_REQUEST_EVENT,
 										 UF_EXPLICIT_RESPONSE_EVENT,
                                          UF_IMPLICIT_RESPONSE_EVENT
@@ -171,7 +195,7 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	static final String CONTEXT_CLASS 		= "org.societies.api.schema.context.model.CtxIdentifierBean";
 	static final String FRIEND_EVENT_CLASS 	= "org.societies.api.schema.css.directory.CssFriendEvent";
 	static final String UF_PRIVACY_CLASS 	= "org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent";
-//	static final String UF_ACCESS_CLASS 	= "org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent";
+	static final String UF_ACCESS_CLASS 	= "org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent";
 	static final String UF_REQUEST_CLASS	= "org.societies.api.schema.useragent.feedback.UserFeedbackBean";
 	static final String UF_EXPLICIT_RESPONSE_CLASS	= "org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean";
 	static final String UF_IMPLICIT_RESPONSE_CLASS	= "org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean";
@@ -181,71 +205,71 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
                                                 CONTEXT_CLASS,
                                                 FRIEND_EVENT_CLASS,
                                                 UF_PRIVACY_CLASS,
-//                                                UF_ACCESS_CLASS,
+                                                UF_ACCESS_CLASS,
                                                 UF_REQUEST_CLASS,
                                                 UF_EXPLICIT_RESPONSE_CLASS,
                                                 UF_IMPLICIT_RESPONSE_CLASS
     };
-	
+
 	final static String GENERIC_INTENT_PAYLOAD_KEY = "Pubsub_Payload_Key";
-	
+
 	/**
 	 * Subscribe to a specified Societies platform event (Android Intent)
-	 * 
-	 * @param client app package 
+	 *
+	 * @param client app package
 	 * @param societiesIntent specific event intent
 	 * @return boolean true if subscription takes place
 	 */
 	boolean subscribeToEvent(String client, String societiesIntent);
-	
+
 	/**
-	 * Subscribe to Societies platform events (Android Intent), specified with a filter. All platform events 
+	 * Subscribe to Societies platform events (Android Intent), specified with a filter. All platform events
 	 * that start with the filter will be subscribed to.
-	 * 
-	 * @param client app package 
+	 *
+	 * @param client app package
 	 * @param intentFilter event filter
 	 * @return boolean true if subscription takes place
 	 */
 	boolean subscribeToEvents(String client, String intentFilter);
-	
+
 	/**
 	 * Subscribe to all platform events. This should only be used if really required.
-	 * 
-	 * @param client app package 
+	 *
+	 * @param client app package
 	 * @return boolean true if subscription takes place
 	 */
 	boolean subscribeToAllEvents(String client);
-	
+
 	/**
 	 * Un-subscribe from a specified Societies platform event (Android Intent)
-	 * 
-	 * @param client app package 
+	 *
+	 * @param client app package
 	 * @param societiesIntent specific event intent
 	 * @return boolean true if subscription takes place
 	 */
 	boolean unSubscribeFromEvent(String client, String societiesIntent);
-	
+
 	/**
-	 * Un-subscribe from Societies platform events (Android Intent), specified with a filter. All platform events 
+	 * Un-subscribe from Societies platform events (Android Intent), specified with a filter. All platform events
 	 * that start with the filter will be un-subscribed from.
-	 * 
-	 * @param client app package 
+	 *
+	 * @param client app package
 	 * @param intentFilter event filter
 	 * @return boolean true if subscription takes place
 	 */
 	boolean unSubscribeFromEvents(String client, String intentFilter);
-	
+
 	/**
 	 * Un-subscribe from all current platform event subscriptions.
-	 * 
-	 * @param client app package 
+	 *
+	 * @param client app package
 	 * @return boolean true if subscription takes place
 	 */
 	boolean unSubscribeFromAllEvents(String client);
-	
+
 	/**
 	 * Publish an event to the Societies platform for consumption by other CSS nodes
-	 * 
+	 *
 	 * @param client app package
 	 * @param societiesIntent specific event intent
 	 * @param eventPayload event object
@@ -254,22 +278,22 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	 */
 	/**
 	 * Publish an event to the Societies platform for consumption by other CSS nodes
-	 * 
+	 *
 	 * @param client app package
 	 * @param societiesIntent specific event intent
 	 * @param payload
 	 * @return boolean- returned via Android intent
 	 */
 	boolean publishEvent(String client, String societiesIntent, Object payload);
-	
+
 	/**
 	 * Obtain the current number of subscribed to events
-	 * 
+	 *
 	 * @param client
 	 * @return int number of subscribed to events - returned via Android intent
 	 */
 	int getNumSubscribedNodes(String client);
-	
+
 	/**
 	 * Create a new Societies Pubsub node
 	 * @param client
@@ -280,7 +304,7 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	boolean createEvent(String client, String pubsubNode, String societiesIntent);
 	/**
 	 * Delete a Societies Pubsub node. Can only be used to delete Pubsub nodes previously created by the same client.
-	 * 
+	 *
 	 * @param client
 	 * @param pubsubNode Pubsub node to be used in Societies, e.g. org.3rdpartyservice.sampleevent
 	 * @return boolean - returned via Android intent

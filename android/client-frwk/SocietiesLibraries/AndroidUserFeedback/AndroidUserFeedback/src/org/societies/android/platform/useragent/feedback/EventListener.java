@@ -186,7 +186,7 @@ public class EventListener extends Service {
                 displayPrivacyNegotiationNotification(EventListener.this.getApplicationContext(), eventPayload);
             }
             //ACCESS CONTROL EVENT - payload is UserFeedbackAccessControlEvent
-            else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_ACCESS_CONTROL_REQUEST_EVENT)) {
+            else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_ACCESS_CONTROL_REQUEST_INTENT)) {
                 UserFeedbackAccessControlEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
 
                 String id = String.valueOf(eventPayload.getRequestId());
@@ -239,6 +239,7 @@ public class EventListener extends Service {
         intentFilter.addAction(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENTS);
         intentFilter.addAction(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS);
         //PUBSUB INTENTS
+        intentFilter.addAction(IAndroidSocietiesEvents.UF_ACCESS_CONTROL_REQUEST_INTENT);
         intentFilter.addAction(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_REQUEST_INTENT);
         intentFilter.addAction(IAndroidSocietiesEvents.UF_REQUEST_INTENT);
         return intentFilter;
@@ -291,10 +292,10 @@ public class EventListener extends Service {
 
     private static void displayAccessControlNotification(Context context, UserFeedbackAccessControlEvent event) {
         // CREATE INTENT FOR LAUNCHING ACTIVITY
-//        Intent intent = new Intent(context, NegotiationActivity.class);
-//        intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY, (Parcelable) policy);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        context.startActivity(intent);
+        Intent intent = new Intent(context, AccessControlActivity.class);
+        intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY, (Parcelable) event);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
 
         //CREATE ANDROID NOTIFICATION
         int notifierFlags[] = new int[1];
@@ -302,8 +303,8 @@ public class EventListener extends Service {
         AndroidNotifier notifier = new AndroidNotifier(context, Notification.DEFAULT_SOUND, notifierFlags);
         notifier.notifyMessage("Access control request",
                 "Access Control Request",
-                null,
-                null,
+                AccessControlActivity.class,
+                intent,
                 "SOCIETIES");
 
         Log.w(LOG_TAG, "displayAccessControlNotification(): UserFeedbackAccessControlEvent support not implemented");
