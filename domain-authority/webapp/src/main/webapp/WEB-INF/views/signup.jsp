@@ -6,17 +6,20 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-	<title>Sign In - SOCIETIES</title>
+	<title>Sign Up - SOCIETIES</title>
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" title="SOCIETIES" />
 </head>
 <body>
 
 <jsp:include page="common/header.jsp" />
 
-<div id="content" class="signin">
-	<h2>Sign In SOCIETIES</h2>
-	<form:form method="POST" action="index.html" commandName="loginForm" onsubmit="return ValidateForm(this)">
-		<h3><img src="${pageContext.request.contextPath}/images/societies_xsmall.png" alt="Logo SOCIETIES" /> Sign In</h3>
+<div id="content" class="signup">
+	<h2>Sign Up for SOCIETIES</h2>
+	<form:form method="POST" action="signup.html" commandName="loginForm" onsubmit="return ValidateForm(this)">
+		<h3>
+			<img src="${pageContext.request.contextPath}/images/societies_xsmall.png" alt="Logo SOCIETIES" />
+			Create your free personal account
+		</h3>
 		<c:if test="${not empty errormsg}">
 			<p>
 				<span class="error">${errormsg}</span>
@@ -33,10 +36,17 @@
 				</c:if>
 			</p>
 		</c:if>
-		<form:errors path="*" cssClass="errorblock" element="div" />
 		<table>
 			<tr>
-				<td>Username</td>
+				<td>Name</td>
+				<td>
+					<form:input path="name" value="${name}" required="required" />
+					<form:errors path="name" cssClass="error" />
+				</td>
+				<td></td>
+			</tr>	
+			<tr>
+				<td>Username <em style="font-size:0.8em;">(used for login)</em></td>
 				<td>
 					<form:input path="userName" value="${username}" required="required"  />
 					<form:errors path="userName" cssClass="error" />
@@ -53,11 +63,22 @@
 					<form:errors path="password" cssClass="error" />
 				</td>
 				<td></td>
+			</tr>
+			<tr>
+				<td>Password Confirmation</td>
+				<td>
+					<form:password path="passwordConfirm" value="${passwordConfirm}" required="required" />
+					<form:errors path="passwordConfirm" cssClass="error" />
+				</td>
+				<td></td>
 			</tr>	
-			<tr><td colspan="3" class="submitBlock"><input type="submit" value="Ok"/></td></tr>
+			<tr>
+				<td colspan="3" class="submitBlock">
+					<input type="submit" value="Register"/>
+				</td>
+			</tr>
 		</table>
-		
-		<h3>No SOCIETIES account yet? <strong><a href="signup.html" class="greatButton">Sign Up!</a></strong></h3>
+		<h3>Already have a SOCIETIES account? <strong><a href="index.html" class="greatButton">Sign In!</a></strong></h3>
 	</form:form>
 </div>
 
