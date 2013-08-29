@@ -65,6 +65,11 @@ public class PrivacyPolicyNegotiationListener extends BasePageController {
 
         @Override
         public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object item) {
+            if (item == null) {
+                log.warn("pubsubEvent() with NULL item on node {} with message ID {}", node, itemId);
+                return;
+            }
+
             if (log.isDebugEnabled()) {
                 String fmt = "pubsubEvent() item of type %s with message ID %s";
 
