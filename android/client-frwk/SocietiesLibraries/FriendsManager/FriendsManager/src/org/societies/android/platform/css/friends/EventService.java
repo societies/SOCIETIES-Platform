@@ -24,7 +24,9 @@
  */
 package org.societies.android.platform.css.friends;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.comms.xmpp.ICommCallback;
@@ -81,6 +83,8 @@ public class EventService extends Service {
 	private Looper mServiceLooper;
 	private ServiceHandler mServiceHandler;
 	private ClientCommunicationMgr ccm;
+	
+	private final Set<String> processedIncomingRequests = new HashSet<String>();
 
 	// Handler that receives messages from the thread
 	private final class ServiceHandler extends Handler {
@@ -209,7 +213,16 @@ public class EventService extends Service {
 			else if (intent.getAction().equals(IAndroidSocietiesEvents.CSS_FRIEND_REQUEST_RECEIVED_INTENT)) {
 				Log.d(LOG_TAG, "Frient Request received event");
 				CssFriendEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
-				//GET VCARD FOR THIS REQUEST
+				//BUGFIX TO STOP MULTIPLE NOTIFICATIONS FOR SAME REQUEST (UNKNOWN ROOT CAUSE)
+				String receivedID = eventPayload.getCssAdvert().getId(); 
+				synchronized(processedIncomingRequests) {
+					if (processedIncomingRequests.contains(receivedID)) {
+						Log.d(LOG_TAG, "Ignoring duplicate request from: " + receivedID);
+						return;
+					}
+					processedIncomingRequests.add(receivedID);
+				}
+				//CONTINUE - GET VCARD FOR THIS REQUEST
 				ICommCallback callback = new VCardCallback(eventPayload);
 		    	ccm.getVCard(eventPayload.getCssAdvert().getId(), callback);
 			}
