@@ -151,4 +151,15 @@ public interface IServiceRegistry {
 	 * @return the list of CIS where the service is shared.
 	 */
 	public List<String> retrieveCISSharedService(ServiceResourceIdentifier serviceIdentifier);
+
+	/**
+	* Description: Based on a Filter this method returns the services list
+	* matching that particular filter. Null attributes are excluded and associations are ignored.
+	* @param the object used as filter for the query
+	* @param the ID of the CIS
+	* @return the list of services that match the filter
+	* @throws ServiceRetrieveException
+	*/
+	public List<Service> findServices(Service filter, String cisId)
+			throws ServiceRetrieveException;
 }

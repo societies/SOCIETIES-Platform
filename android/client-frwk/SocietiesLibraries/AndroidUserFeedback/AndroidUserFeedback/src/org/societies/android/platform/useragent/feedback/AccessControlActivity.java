@@ -46,7 +46,7 @@ import org.societies.android.api.events.IPlatformEventsCallback;
 import org.societies.android.api.events.PlatformEventsHelperNotConnectedException;
 import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
 import org.societies.android.remote.helper.EventsHelper;
-import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
@@ -55,12 +55,12 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Respons
 
 import java.util.List;
 
-public class NegotiationActivity extends Activity implements OnItemSelectedListener {
+public class AccessControlActivity extends Activity implements OnItemSelectedListener {
 
-    private static final String LOG_TAG = NegotiationActivity.class.getCanonicalName();
+    private static final String LOG_TAG = AccessControlActivity.class.getCanonicalName();
 
     private EventsHelper eventsHelper;
-    private UserFeedbackPrivacyNegotiationEvent privacyNegotiationEvent = null;
+    private UserFeedbackAccessControlEvent accessControlEvent = null;
     private boolean isEventsConnected = false;
     private TableLayout[] tblConditions;
     private ScrollView svScroll;
@@ -76,10 +76,14 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
         //GET EVENT OBJECT
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        privacyNegotiationEvent = bundle.getParcelable(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY);
+        accessControlEvent = bundle.getParcelable(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY);
 
         //SET HEADER INFO
-        RequestorBean requestor = privacyNegotiationEvent.getNegotiationDetails().getRequestor();
+        RequestorBean requestor = accessControlEvent.getRequestor();
+
+        Log.d(LOG_TAG, String.format("Requestor is of type %s",
+                requestor != null ? requestor.getClass().getSimpleName() : "[null]"));
+
         String sRequestorType = "community";
         if (requestor instanceof RequestorServiceBean) {
             sRequestorType = "installed service";
@@ -89,7 +93,7 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
         lblHeader.setText("The " + sRequestorType + " is requesting access to your personal info for the following uses. Please select what you would like to allow:");
 
         //GENERATE RESOURCE SPINNER
-        final List<ResponseItem> responses = privacyNegotiationEvent.getResponsePolicy().getResponseItems();
+        final List<ResponseItem> responses = accessControlEvent.getResponseItems();
         String[] resourceItems = new String[responses.size()];
         for (int i = 0; i < responses.size(); i++) {
             resourceItems[i] = responses.get(i).getRequestItem().getResource().getDataType();
@@ -249,7 +253,7 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 
     @Override
     public void onDestroy() {
-        Log.d(LOG_TAG, "NegotiationActivity terminating");
+        Log.d(LOG_TAG, "AccessControlActivity terminating");
         if (isEventsConnected) {
             eventsHelper.tearDownService(new IMethodCallback() {
                 @Override
@@ -286,7 +290,7 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
                             try {
                                 isEventsConnected = true;
                                 published = true;
-                                eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_RESPONSE_INTENT, NegotiationActivity.this.privacyNegotiationEvent, new IPlatformEventsCallback() {
+                                eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_ACCESS_CONTROL_RESPONSE_EVENT, AccessControlActivity.this.accessControlEvent, new IPlatformEventsCallback() {
                                     @Override
                                     public void returnException(int exception) {
                                     }
@@ -300,7 +304,7 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
                                     }
                                 });
                             } catch (PlatformEventsHelperNotConnectedException e) {
-                                Log.e(LOG_TAG, "Error publishing PPN response event", e);
+                                Log.e(LOG_TAG, "Error publishing AC response event", e);
                                 e.printStackTrace();
                             }
                         }

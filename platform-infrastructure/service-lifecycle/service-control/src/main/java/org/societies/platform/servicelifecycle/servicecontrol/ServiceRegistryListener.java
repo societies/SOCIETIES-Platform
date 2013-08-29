@@ -745,6 +745,8 @@ public class ServiceRegistryListener implements BundleContextAware,
 		serviceEvent.setEventType(eventType);
 		serviceEvent.setServiceType(service.getServiceType());
 		serviceEvent.setServiceId(service.getServiceIdentifier());
+		serviceEvent.setServiceName(service.getServiceName());
+		
 		if(bundle != null){
 			serviceEvent.setBundleId(bundle.getBundleId());
 			serviceEvent.setBundleSymbolName(bundle.getSymbolicName());

@@ -272,6 +272,18 @@
 			<artifactId>primefaces</artifactId>
 			<version>3.5</version>
 		</dependency>
+				<!-- For fileUpload in Primefaces -->
+		<!-- <dependency>
+   			<groupId>commons-fileupload</groupId>
+    		<artifactId>commons-fileupload</artifactId>
+    		<version>1.2.2</version>
+		</dependency>
+
+		<dependency>
+    		<groupId>commons-io</groupId>
+    		<artifactId>commons-io</artifactId>
+    		<version>2.1</version>
+		</dependency>-->
 		<!-- needed for PrimeFaces push -->
 		<!--<dependency> <groupId>org.atmosphere</groupId> <artifactId>atmosphere-runtime</artifactId> 
 			<version>${primepush-version}</version> </dependency> -->
@@ -558,6 +570,9 @@
 							<!--org.apache.catalina, -->
 							<!--org.apache.catalina.comet, -->
 							<!--org.atmosphere.weblogic, -->
+							<!-- Primefaces upload -->
+							org.apache.commons.io;resolution:=optional,
+							org.apache.commons.fileupload;resolution:=optional,
 							<!-- spring DM -->
 							org.springframework.beans.factory.config,
 							org.springframework.osgi.web.context.support,

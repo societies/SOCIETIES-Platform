@@ -465,8 +465,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		
 		ServiceControlResult returnResult = new ServiceControlResult();
 		returnResult.setServiceId(serviceToInstall.getServiceIdentifier());
-		
-		
+	
 		try{
 		
 			if(logger.isDebugEnabled()) 
@@ -503,7 +502,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						logger.debug("Problem installing device!");
 					returnResult.setMessage(ResultMessage.OSGI_PROBLEM);
 					sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + returnResult.getMessage());
-
+					sendEvent(ServiceMgmtEventType.PROBLEM_OCURRED,serviceToInstall,null);
+					
 					return new AsyncResult<ServiceControlResult>(returnResult);	
 
 				} else{
@@ -540,6 +540,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(logger.isDebugEnabled()) logger.debug("Problem doing negotiation!");
 				returnResult.setMessage(ResultMessage.NEGOTIATION_ERROR);
 				sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + returnResult.getMessage());
+				sendEvent(ServiceMgmtEventType.PROBLEM_OCURRED,serviceToInstall,null);
 
 				return new AsyncResult<ServiceControlResult>(returnResult);
 			} 
@@ -550,6 +551,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					logger.debug("Negotiation was not successful!");
 				returnResult.setMessage(ResultMessage.NEGOTIATION_FAILED);
 				sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + returnResult.getMessage());
+				sendEvent(ServiceMgmtEventType.PROBLEM_OCURRED,serviceToInstall,null);
 
 				return new AsyncResult<ServiceControlResult>(returnResult);
 			}	
@@ -596,6 +598,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					if(logger.isDebugEnabled())
 						logger.debug("No client url returned from negotiation!");
 					returnResult.setMessage(ResultMessage.NEGOTIATION_ERROR);
+					sendEvent(ServiceMgmtEventType.PROBLEM_OCURRED,serviceToInstall,null);
 					sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: No file to install returned!");
 					return new AsyncResult<ServiceControlResult>(returnResult);	
 
@@ -612,6 +615,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						logger.debug("Problem with downloading jar, no file available!");
 					returnResult.setMessage(ResultMessage.COMMUNICATION_ERROR);
 					sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: Failure to download jar!");
+					sendEvent(ServiceMgmtEventType.PROBLEM_OCURRED,serviceToInstall,null);
 					return new AsyncResult<ServiceControlResult>(returnResult);	
 				}
 				
@@ -624,6 +628,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						
 					returnResult.setMessage(ResultMessage.COMMUNICATION_ERROR);
 					sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + returnResult.getMessage());
+					sendEvent(ServiceMgmtEventType.PROBLEM_OCURRED,serviceToInstall,null);
 
 					return new AsyncResult<ServiceControlResult>(returnResult);	
 				} 
@@ -658,7 +663,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						logger.debug("Installation of client was not successful");
 					returnResult.setMessage(result.getMessage());
 					sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' not installed: " + result.getMessage());
-
+					sendEvent(ServiceMgmtEventType.PROBLEM_OCURRED,serviceToInstall,null);
 				}
 	
 			}
@@ -668,6 +673,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		
 		} catch (Exception ex) {
 			sendUserNotification("Service '"+serviceToInstall.getServiceName()+"' : Problems!");
+			sendEvent(ServiceMgmtEventType.PROBLEM_OCURRED,serviceToInstall,null);
 			logger.error("Exception while attempting to install a bundle: " + ex.getMessage());
 			ex.printStackTrace();
 			throw new ServiceControlException("Exception while attempting to install a bundle.", ex);
@@ -1705,6 +1711,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			serviceEvent.setServiceType(service.getServiceType());
 			serviceEvent.setServiceId(service.getServiceIdentifier());
 			serviceEvent.setSharedNode(node);
+			serviceEvent.setServiceName(service.getServiceName());
 			
 			if(!service.getServiceType().equals(ServiceType.DEVICE)){
 				Bundle bundle = ServiceModelUtils.getBundleFromService(service, bundleContext);

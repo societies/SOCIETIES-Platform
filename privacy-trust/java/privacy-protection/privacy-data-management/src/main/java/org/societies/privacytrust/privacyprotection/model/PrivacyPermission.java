@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
@@ -70,6 +71,7 @@ public class PrivacyPermission implements Serializable {
 	@GeneratedValue
 	private Long id;
 	private String dataId;
+	@Column(length=9000)
 	private String requestorId;
 	/**
 	 * List of actions.
