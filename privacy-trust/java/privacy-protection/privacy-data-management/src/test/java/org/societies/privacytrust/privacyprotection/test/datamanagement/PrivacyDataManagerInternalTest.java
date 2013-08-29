@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -98,12 +99,35 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		// Data Id
 		try {
 			Random randomer = new Random((new Date()).getTime()); 
-			dataId1 = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+myCssId.getJid()+"/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.NAME_FIRST+"/"+randomer.nextInt(200));
-			dataId2 = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+myCssId.getJid()+"/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.NAME_LAST+"/"+randomer.nextInt(200));
+			int random1 = randomer.nextInt(200);
+			int random2 = randomer.nextInt(200);
+			while(random2 == random1) {
+				random2 = randomer.nextInt(200);
+			}
+			dataId1 = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+myCssId.getJid()+"/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.NAME_FIRST+"/"+random1);
+			dataId2 = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+myCssId.getJid()+"/ENTITY/person/1/ATTRIBUTE/"+CtxAttributeTypes.NAME_LAST+"/"+random2);
 		}
 		catch (Exception e) {
 			LOG.error("setUp(): DataId creation error "+e+"\n", e);
 			fail("setUp(): DataId creation error "+e);
+		} 
+	}
+
+	@After
+	public void tearDown() {
+		try {
+			boolean dataDeleted = privacyDataManagerInternal.deletePermissions(requestor, dataId1);
+			assertTrue("Data should be deleted (requestor, dataId1)", dataDeleted);
+			dataDeleted = privacyDataManagerInternal.deletePermissions(requestor, dataId2);
+			assertTrue("Data should be deleted (requestor, dataId2)", dataDeleted);
+			dataDeleted = privacyDataManagerInternal.deletePermissions(requestorCis, dataId1);
+			assertTrue("Data should be deleted (requestorCis, dataId1)", dataDeleted);
+			dataDeleted = privacyDataManagerInternal.deletePermissions(requestorCis, dataId2);
+			assertTrue("Data should be deleted (requestorCis, dataId2)", dataDeleted);
+		}
+		catch (Exception e) {
+			LOG.error("setUp(): privacy permissions deletion error "+e+"\n", e);
+			fail("setUp(): privacy permissions deletion error "+e);
 		} 
 	}
 
@@ -366,7 +390,7 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		assertEquals("Permission result not as expected (inverse)", permission.name(), responseItems2.get(0).getDecision().name());
 		assertTrue("Permission action list not as expected (inverse)", ActionUtils.equal(actions1, responseItems2.get(0).getRequestItem().getActions()));
 	}
-	
+
 
 	@Test
 	@Rollback(true)
@@ -463,7 +487,9 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		String testTitle = new String("testGetPermissionSeveralData: store several data with different actions / decisions and retrieve them");
 		LOG.info("[Test] "+testTitle);
 		boolean dataUpdated1 = false;
-		boolean dataUpdated2 = true;
+		boolean dataUpdated2 = false;
+		boolean dataDeleted1 = false;
+		boolean dataDeleted2 = false;
 		List<ResponseItem> responseItems0 = null;
 		List<ResponseItem> responseItems1 = null;
 		List<ResponseItem> responseItems2 = null;
@@ -484,6 +510,8 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 			responseItems0 = privacyDataManagerInternal.getPermissions(requestorCis, dataId1);
 			responseItems1 = privacyDataManagerInternal.getPermissions(requestorCis, dataIds, actions1);
 			responseItems2 = privacyDataManagerInternal.getPermissions(requestorCis, dataIds, actions2);
+			dataDeleted1 = privacyDataManagerInternal.deletePermissions(requestor, dataId1);
+			dataDeleted2 = privacyDataManagerInternal.deletePermissions(requestor, dataId2);
 		} catch (PrivacyException e) {
 			LOG.info("[Test PrivacyException] "+testTitle, e);
 			fail("[Error "+testTitle+"] Privacy error: "+e);
@@ -493,6 +521,8 @@ public class PrivacyDataManagerInternalTest extends AbstractTransactionalJUnit4S
 		}
 		assertTrue("Data not updated 1", dataUpdated1);
 		assertTrue("Data not updated 2", dataUpdated2);
+		assertTrue("Data not deleted 1", dataDeleted1);
+		assertTrue("Data not deleted 2", dataDeleted2);
 		//0
 		assertNotNull("ResponseItem permission can't be retrieved (0)", responseItems0);
 		assertTrue("ResponseItem permission can't be retrieved (0)", responseItems0.size() > 0);

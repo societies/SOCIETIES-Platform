@@ -173,8 +173,7 @@ public class PrivacyDataManagerTest extends IntegrationTest {
 				}
 			});
 
-			LOG.info("Wait: "+TestCase.getTimeout()+"ms ("+TimeUnit.MILLISECONDS+")");
-			boolean releaseBeforeTimeout = lock.await(2, TimeUnit.SECONDS);
+			boolean releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
 			// Check timeout
 			if (!releaseBeforeTimeout) {
 				succeed = false;

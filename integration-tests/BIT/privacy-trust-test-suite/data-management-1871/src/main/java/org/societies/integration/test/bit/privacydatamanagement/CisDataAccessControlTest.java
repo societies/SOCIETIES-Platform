@@ -47,6 +47,7 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.identity.util.DataIdentifierFactory;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
@@ -57,6 +58,8 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -128,8 +131,15 @@ public class CisDataAccessControlTest {
 			privacyPolicyMembersOnly = new RequestPolicy(requestItemsMembersOnly);
 			privacyPolicyPrivate = new RequestPolicy(requestItemsPrivate);
 
+			// - Identities
+			myCssId = TestCase.commManager.getIdManager().getThisNetworkNode();
+			memberCssId =  TestCase.commManager.getIdManager().fromJid("membercss.ict-societies.eu");
+			otherCssId =  TestCase.commManager.getIdManager().fromJid("othercss.ict-societies.eu");
+			requestorService = new RequestorService(myCssId, ServiceUtils.generateServiceResourceIdentifierFromString("myGreatService testInstance"));
+
 			// - CIS creation
-			Future<ICisOwned> cisPublicFuture = TestCase.cisManager.createCis("Public Cis", "1", null, "My Public Cis", privacyPolicyPublic.toXMLString());
+			String privacyPolicyPublicString = PrivacyPolicyUtils.toXacmlString(RequestPolicyUtils.toRequestPolicyBean(privacyPolicyPublic));
+			Future<ICisOwned> cisPublicFuture = TestCase.cisManager.createCis("Public Cis", "1", null, "My Public Cis", privacyPolicyPublicString);
 			cisPublic = cisPublicFuture.get();
 
 			Future<ICisOwned> cisMembersOnlyFuture = TestCase.cisManager.createCis("Members only Cis", "1", null, "My Members only Cis", privacyPolicyMembersOnly.toXMLString());
@@ -137,12 +147,6 @@ public class CisDataAccessControlTest {
 
 			Future<ICisOwned> cisPrivateFuture = TestCase.cisManager.createCis("Private Cis", "1", null, "My Private Cis", privacyPolicyPrivate.toXMLString());
 			cisPrivate = cisPrivateFuture.get();
-
-			// - Identities
-			myCssId = TestCase.commManager.getIdManager().getThisNetworkNode();
-			memberCssId =  TestCase.commManager.getIdManager().fromJid("university.societies.local");
-			otherCssId =  TestCase.commManager.getIdManager().fromJid("noOne.societies.local");
-			requestorService = new RequestorService(myCssId, ServiceUtils.generateServiceResourceIdentifierFromString("myGreatService testInstance"));
 
 			// - Let memberCssId joins CIS "Members Only Cis"
 			cisMembersOnly.addMember(memberCssId.getJid(), "participant");
