@@ -103,24 +103,6 @@ public interface IServiceControl {
 	
 	public Future<ServiceControlResult> installService(Service service) throws ServiceControlException;
 	
-	/**
-	 * This method installs a new service into the container present on a given node. DO NOT USE YET.
-	 * 
-	 * @param service the Remote Service to install
-	 * @param node The node where we wish to install the service
-	 * @return the result of the operation
-	 */
-	public Future<ServiceControlResult> installService(Service service, IIdentity node) throws ServiceControlException;
-
-	/**
-	 * This method installs a new service into the container present on a given node, given by the jid. DO NOT USE YET.
-	 * 
-	 * @param service the Remote Service to install
-	 * @param jid The node where we wish to install the service
-	 * @return the result of the operation
-	 */
-	public Future<ServiceControlResult> installService(Service service, String jid) throws ServiceControlException;
-
 	
 	/**
 	 * This method installs a new service into the container
@@ -128,7 +110,7 @@ public interface IServiceControl {
 	 * @param bundleLocation the URL of the bundle to install
 	 * @return the result of the operation
 	 */
-	public Future<ServiceControlResult> installService(URL bundleLocation) throws ServiceControlException;
+	public Future<ServiceControlResult> installService(URL bundleLocation);
 
 	/**
 	 * This method installs a new service into the container present on a given node

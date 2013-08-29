@@ -397,13 +397,9 @@ public class ServicesController extends BasePageController {
     public void shareService(String serviceId, String node){
     	setServiceId(serviceId);
     	log.debug("Sharing: {} from {}", selectedService.getServiceName(), node);
-    	
-    	/*ICis myCis = getCisManager().getCis(node);
-    	StringBuilder message = new StringBuilder();
-    	message.append("The app '").append(selectedService.getServiceName()).append("' is added to the Community '").append(myCis.getName());
-    	sendMessage("Sharing App with Community...",message.toString(),FacesMessage.SEVERITY_INFO);*/
-    	
+    	    	
     	try {
+    		setServiceId(serviceId);
     		IIdentity nodeId = getCommManager().getIdManager().fromJid(node);
     		ServiceControlResult result = getServiceControl().shareService(selectedService, nodeId).get(10, TimeUnit.SECONDS);
 			if(result.getMessage().equals(ResultMessage.SUCCESS))
@@ -423,13 +419,9 @@ public class ServicesController extends BasePageController {
     public void unshareService(String serviceId, String node){
     	setServiceId(serviceId);
     	log.debug("Removing unsharing: {} from {}", selectedService.getServiceName(), node);
-    	
-    	/*ICis myCis = getCisManager().getCis(node);
-    	StringBuilder message = new StringBuilder();
-    	message.append("The app '").append(selectedService.getServiceName()).append("' is being removed from Community '").append(myCis.getName());
-    	sendMessage("Removing App from Community...",message.toString(),FacesMessage.SEVERITY_INFO);*/
-    	
+
     	try {
+    		setServiceId(serviceId);
     		IIdentity nodeId = getCommManager().getIdManager().fromJid(node);
     		ServiceControlResult result = getServiceControl().unshareService(selectedService, nodeId).get(10, TimeUnit.SECONDS);
 			if(result.getMessage().equals(ResultMessage.SUCCESS))

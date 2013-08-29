@@ -17,7 +17,7 @@
 		this file can easily be used for integration testing outside of an OSGi environment -->
 	<task:annotation-driven />
 
-	<bean id="serListener" class="org.societies.platform.servicelifecycle.servicecontrol.ServiceRegistryListener"
+	<bean id="serListener" class="org.societies.platform.servicelifecycle.servicecontrol.OsgiRegistryListener"
 		init-method="registerListener" destroy-method="unRegisterListener" >	
 		<property name="serviceReg" ref="serviceRegRef" />
 		<property name="commMngr" ref="commMngrRef" />
@@ -27,7 +27,8 @@
 		<property name="eventMgr" ref="eventManagerRef" />	
 	</bean>
 	
-	<bean id="serviceControl" class="org.societies.platform.servicelifecycle.servicecontrol.ServiceControl" >
+	<bean id="serviceControl" class="org.societies.platform.servicelifecycle.servicecontrol.ServiceControl"
+	 init-method="InitService" destroy-method="killService" depends-on="eventManagerRef" >
 		<property name="serviceReg" ref="serviceRegRef" /> 	
 		<property name="commMngr" ref="commMngrRef" />
 		<property name="cisManager" ref="cisManagerRef" />
@@ -45,7 +46,7 @@
 	</bean>
 	
 	<bean id="ServiceControlCommsManager" class="org.societies.platform.servicelifecycle.servicecontrol.comms.CommsServer"
-  		depends-on="commMngrRef" init-method="InitService">
+  		depends-on="commMngrRef" init-method="InitService" destroy-method="killService">
   		<property name="commMngr" ref="commMngrRef"/>
   		<property name="serviceControl" ref="serviceControl"/> 
   		<property name="eventMgr" ref="eventManagerRef" />
