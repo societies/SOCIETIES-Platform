@@ -5,7 +5,6 @@
                 xmlns:c="http://java.sun.com/jsp/jstl/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:form="http://www.springframework.org/tags/form"
                 template="templates/main_template.xhtml">
 
 <ui:define name="html_head">
@@ -13,57 +12,6 @@
 </ui:define>
 
 <ui:define name="body">
-
-
-<!-- Button Script -->
-<script language="javascript">
-    function operationSelection() {
-        var areEqual = $('#operatorValue').val().toUpperCase() === "RANGE";
-        if (areEqual) {
-            $('#criteriaValue2').show();
-        } else {
-            $('#criteriaValue2').val("");
-            $('#criteriaValue2').hide();
-        }
-    }
-
-    $(document).ready(function () {
-        //startup functionality
-        $('#criteriaValue2').hide();
-
-        var i = 0;
-
-
-        document.getElementById('createCISbutton').onclick = function () {
-            document.CreateCISForm.submit();
-        }
-
-        document.getElementById("addCriteria").onclick = function () {
-            // test log string
-            // add the row
-            var row = $('<tr/>', {class: "critRow", id: i}).appendTo("#existingCriteria");
-            // column
-            var column = $('<td/>', {text: $('#attributeValue').val() + "    " + $('#operatorValue').val() + "    " + $('#criteriaValue').val() }).appendTo(row);
-            if ($('#criteriaValue2').is(":visible"))
-                column.text(column.text() + "    " + $('#criteriaValue2').val());
-            var inputAttribute = $('<input/>', {id: "ruleArray" + i + ".attribute", value: $('#attributeValue').val(), name: "ruleArray[" + i + "].attribute", type: "hidden"}).appendTo(row);
-            var inputOperator = $('<input/>', {id: "ruleArray" + i + ".operator", value: $('#operatorValue').val(), name: "ruleArray[" + i + "].operator", type: "hidden"}).appendTo(row);
-            var inputValue = $('<input/>', {id: "ruleArray" + i + ".value1", value: $('#criteriaValue').val(), name: "ruleArray[" + i + "].value1", type: "hidden"}).appendTo(row);
-            var inputValue2 = $('<input/>', {id: "ruleArray" + i + ".value2", value: $('#criteriaValue2').val(), name: "ruleArray[" + i + "].value2", type: "hidden"}).appendTo(row);
-            var inputDeleted = $('<input/>', {id: "ruleArray" + i + ".deleted", value: false, name: "ruleArray[" + i + "].deleted", type: "hidden"}).appendTo(row);
-            // button
-            var f = function () {
-                row.remove();
-                $('#ruleArray' + i + ".deleted").val(true)
-            };
-            var b = $('<button/>', {          text: "Delete", type: "button",
-                click: f
-            }).appendTo(column);
-
-            i++;
-        };// end of document.getElementById("addCriteria").onclick = function() {
-    });// end of $(document).ready(function()
-</script>
 
 <div class="hr grid_12 clearfix"></div>
 <!-- Left Column -->
@@ -73,10 +21,7 @@
     <div id="msgid">
     </div>
 
-    <!-- Form -->
     <section class="form_style_main">
-        <form:form method="POST" action="create_community.xhtml" commandName="createCISform" name="CreateCISForm">
-            <form:errors path="*" cssClass="errorblock" element="div"/>
 
             <h4 class="form_title">Create a Community</h4>
 
@@ -89,51 +34,13 @@
                 <li> Description: <h:inputText value="#{cismanager.cisdesc}" /></li>
                 
                 <li> Privacy Policy:  &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;
-                    				<h:selectOneMenu value="#{cismanager.privacypolicy}">
-                    					<f:selectItem itemValue= "0" itemLabel="Private"/>
+                    				<h:selectOneMenu value="#{cismanager.mode}">
+                    					<f:selectItem itemValue= "0" itemLabel="Private"/> 
 	                                    <f:selectItem itemValue= "1" itemLabel="Members Only"/>
-	                                    <f:selectItem itemValue= "1" itemLabel="Public"/>
+	                                    <f:selectItem itemValue= "2" itemLabel="Public"/>
 	                                </h:selectOneMenu>
                     </li>
 
-                <li class="clearfix">
-                    <label for="">Criteira</label>
-
-                    <p></p>
-
-                    <p></p>
-                    <table id="existingCriteria"></table>
-                    <p></p>
-                    <table id="critTable">
-                        <tbody>
-                        <tr id="critFistRow">
-                            <td>Attribute</td>
-                            <td>Operator</td>
-                            <td>Values</td>
-                        </tr>
-
-                        <tr>
-                            <td><form:select id="attributeValue" path="dummyAtr" cssClass="select-wrapper"><form:options
-                                    items="${listOfAttributes}"/></form:select></td>
-                            <td><form:select id="operatorValue" path="dummyOperation" cssClass="select-wrapper"
-                                             onclick="operationSelection();"
-                                             onkeypress="operationSelection();"><form:options
-                                    items="${listOfOperators}"/></form:select></td>
-                            <td><form:input id="criteriaValue" path="dummyValue"/></td>
-                            <td><form:input id="criteriaValue2" path="dummyValue2"/></td>
-                            <td>
-                                <button type="button" id="addCriteria">Add Criteria</button>
-                            </td>
-
-
-                        </tr>
-
-
-                        </tbody>
-                    </table>
-
-
-                </li>
                 <li class="clearfix">
                     
                     <div>
@@ -141,8 +48,6 @@
                     </div>
                 </li>
             </ul>
-        </form:form>
-
 
     </section>
 </section>

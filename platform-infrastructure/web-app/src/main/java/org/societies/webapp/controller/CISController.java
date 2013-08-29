@@ -30,10 +30,13 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
 
 import org.societies.api.internal.css.ICSSInternalManager;
+import org.societies.orchestration.communitylifecyclemanagementbean.Cis;
+import org.societies.webapp.controller.privacy.PrivacyPolicyUtils;
 import org.societies.webapp.models.CisInfo;
 import org.societies.webapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy; 
 
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.Field;
@@ -82,9 +85,10 @@ import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+//import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
+//import org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
 import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
@@ -97,12 +101,14 @@ import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.community.Participant;
 import org.societies.api.schema.cis.community.WhoResponse;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.api.schema.cis.manager.Create;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
 import org.societies.api.schema.cssmanagement.CssManagerResultActivities;
 import org.societies.api.schema.cssmanagement.CssRequest;
 import org.societies.api.schema.cssmanagement.CssRequestOrigin;
 import org.societies.api.schema.cssmanagement.CssRequestStatusType;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyBehaviourConstants;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.cis.directory.client.CisDirectoryRemoteClient;
 import org.societies.cis.mgmtClient.CisManagerClient;
@@ -170,6 +176,17 @@ public class CISController extends BasePageController{
 	@Autowired
 	private IPrivacyPolicyManagerRemote privacyPolicyManagerRemote;
 	
+	//@Autowired
+	//@ManagedProperty(value = "#{privacypol}")
+//	private PrivacyPolicyUtils privacypol;
+	
+//	public PrivacyPolicyUtils getPrivacypol() {
+//		return privacypol;
+//	}
+//	public void setPrivacypol(PrivacyPolicyUtils privacypol) {
+//		this.privacypol = privacypol;
+//	}
+
 	private String cisname;
 	public String getCisname() {
 		return cisname;
@@ -196,14 +213,15 @@ public class CISController extends BasePageController{
 	
 	private String cistype;
 	private String cisdesc;
-	private int privacypolicy;
+	private int mode;
 	
-	public int getPrivacypolicy() {
-		return privacypolicy;
+	public int getMode() {
+		return mode;
 	}
-	public void setPrivacypolicy(int privacypolicy) {
-		this.privacypolicy = privacypolicy;
+	public void setMode(int mode) {
+		this.mode = mode;
 	}
+	
 
 	//for the callback
 	private String resultCallback;
@@ -294,13 +312,100 @@ public class CISController extends BasePageController{
 		log.info("CISController create community called");
 		Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria>();
 		
+		PrivacyPolicyBehaviourConstants policyType = null;
+		String pPolicy = null;
+		
 		log.info("create community cisname: " +cisname);
 		log.info("create community cistype: " +cistype);
 		log.info("create community cisdesc: " +cisdesc);
+		log.info("create community mode: " +mode);
 		log.info("create community cisCriteria: " +cisCriteria);
 		
+		if(mode == 0){
+			policyType = PrivacyPolicyBehaviourConstants.PRIVATE;
+			pPolicy = "private";
+		}
+		if(mode == 1){
+			policyType = PrivacyPolicyBehaviourConstants.MEMBERS_ONLY;
+			pPolicy = "membersOnly";
+		}
+		if(mode == 2){
+			policyType = PrivacyPolicyBehaviourConstants.PUBLIC;
+			pPolicy = "public";
+		}
 		
-		cisManager.createCis(cisname, cistype, cisCriteria, cisdesc);
+		log.info("create community mode is now: " +policyType);
+		
+		
+		
+		
+		//GENERATE MEMBERSHIP CRITERIA
+		Hashtable<String, MembershipCriteria> h = null;
+		MembershipCrit m = new MembershipCrit();
+		log.info("create MembershipCrit: " +m);
+		
+		//MembershipCrit m = create.getCommunity().getMembershipCrit();
+		if (m!=null && m.getCriteria() != null && m.getCriteria().size()>0){
+			h =new Hashtable<String, MembershipCriteria>();
+			
+			// populate the hashtable
+			for (Criteria crit : m.getCriteria()) {
+				MembershipCriteria meb = new MembershipCriteria();
+				log.info("create MembershipCriteria: " +meb);
+				meb.setRank(crit.getRank());
+				Rule r = new Rule();
+				if( r.setOperation(crit.getOperator()) == false);
+				ArrayList<String> a = new ArrayList<String>();
+				a.add(crit.getValue1());
+				
+				
+				if (crit.getValue2() != null && !crit.getValue2().isEmpty()) 
+					a.add(crit.getValue2()); 
+				if( r.setValues(a) == false){
+					meb.setRule(r);
+					h.put(crit.getAttrib(), meb);
+				}
+				
+			}
+		}
+		log.info("about to create Create");
+		Create create = new Create(); 
+		create.setPrivacyPolicy(pPolicy);
+		//POLICY RECEIVED IS ENUM VALUE, CONVERT TO POLICY XML
+		//String pPolicy = "membersOnly"; //DEFAULT VALUE
+		String privacyPolicyXml = "<RequestPolicy />";
+		if(create.getPrivacyPolicy() != null && create.getPrivacyPolicy().isEmpty() == false){
+			pPolicy = create.getPrivacyPolicy();
+			log.info("pPolicy = " +pPolicy);
+		} 
+		//PrivacyPolicyBehaviourConstants policyType = PrivacyPolicyBehaviourConstants.MEMBERS_ONLY; //DEFAULT
+		PrivacyPolicyUtils utility = new PrivacyPolicyUtils();
+		log.info("Create new PrivacyPolicyUtils: " +utility );
+		RequestPolicy policyObj = null;
+		log.info("Create RequestPolicy: " +policyObj );
+		try {
+			policyType = PrivacyPolicyBehaviourConstants.fromValue(pPolicy);
+		} catch (IllegalArgumentException ex) {
+			//IGNORE - DEFAULT TO MEMBERS_ONLY
+			log.error("Exception parsing: " + pPolicy + ". " + ex);
+		}
+		//CALL POLICY UTILS TO CREATE XML FOR STORAGE
+		try {
+			log.info("call to PrivacyPolicyUtils: " );
+			//org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy policyObj = PrivacyPolicyUtils.inferCisPrivacyPolicy(policyType, m);
+			policyObj = PrivacyPolicyUtils.inferCisPrivacyPolicy(policyType, m);
+			privacyPolicyXml =  PrivacyPolicyUtils.toXacmlString(policyObj);
+			log.info("@@@@@@@########### privacyPolicyXml contains: " +privacyPolicyXml);
+		} catch (PrivacyException pEx) {
+			pEx.printStackTrace();
+		}
+		
+		// real create
+		this.cisManager.createCis(cisname, cistype, h, cisdesc, privacyPolicyXml);
+		//Cis icis = (Cis) localCreateCis(cisname, cistype, cisdesc, h, privacyPolicyXml);
+		
+		
+		//cisManager.createCis(cisname, cistype, cisCriteria, cisdesc);
 		
 	}
 	
@@ -390,13 +495,16 @@ public class CISController extends BasePageController{
 	
 	public List<ICisOwned> getownedcommunities(){
 		
-		log.debug("getownedcommunities method called");
+		log.info("getownedcommunities method called");
 		
-		Future<List<CssAdvertisementRecord>> asynchFriends = getCssLocalManager().getCssFriends();
-		List<CssAdvertisementRecord> friends = new ArrayList<CssAdvertisementRecord>();
 		List<ICisOwned> ownedCISs = cisManager.getListOfOwnedCis();
 			
 		log.info("ownedCISs SIZE is now " +ownedCISs.size());
+		
+		for(ICisOwned entry : ownedCISs){
+			log.info("entry id is " +entry.getCisId());
+			log.info("entry name is " +entry.getName());
+		}
 			
 		return ownedCISs;
 		
@@ -447,6 +555,37 @@ public class CISController extends BasePageController{
 		
 		log.info("cisinfoList contains " +cisinfoList);	
 		return cisinfoList;
+		
+		
+	}
+	
+public List<CisInfo> getmembercommunities(){
+		
+		log.info("getmembercommunities method called");
+		
+		List<ICisOwned> ownedCISs = this.getownedcommunities();
+		log.info("ownedCISs SIZE is now " +ownedCISs.size());
+		List<CisInfo> allCiss = this.getcommunities();
+		log.info("allCiss SIZE is now " +allCiss.size());
+		
+		
+		List<CisInfo> memberCISs = new ArrayList<CisInfo>();
+		//now compare the two lists and if entry not there then add to membercis list
+		
+		for(int i = 0; i < allCiss.size(); i++){
+			for(ICisOwned entry : ownedCISs){
+				log.info("entry id is " +entry.getCisId());
+				//log.info("allcssdetails ID is " +ownedCISs.get(i).getCisId());
+				if(entry.getCisId().contains(allCiss.get(i).getCisid())){
+					//log.info("ADDING record to list " +ownedCISs.get(i));
+					memberCISs.add(allCiss.get(i));
+				}
+			}
+		}
+		
+		log.info("memCISs SIZE is now " +memberCISs.size());
+			
+		return memberCISs;
 		
 		
 	}

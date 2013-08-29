@@ -34,7 +34,7 @@
                 <header>
                 </header>
                 <ol class="keyinfolist">
-                	<c:forEach items="#{cismanager.communities}" var="mycommunity">
+                	<c:forEach items="#{cismanager.membercommunities}" var="mycommunity">
     				    <li class="keyinfo bypostauthor">
                         <figure class="gravatar">
                             <a class="friend_profile.xhtml"><img alt="" src="images/launcher_societies.png"
@@ -53,7 +53,7 @@
                 		<p:commandButton value="Leave Community" action="#{cismanager.leavecis(mycommunity)}"/>
                 		</li>
                 	</c:forEach>
-                </ol>
+                </ol>                
 
                 <div class="hr clearfix"></div>
             </section>
