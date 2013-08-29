@@ -137,6 +137,11 @@ public class UserAdminController {
 		model.put("suid", "");
 		return new ModelAndView("adminlogin", model);
 	}
+	
+	@RequestMapping(value = "/useradmin.html", method = RequestMethod.GET)
+	public ModelAndView useradmin(@ModelAttribute("suid") String suid) {
+		return adminlogin(suid);
+	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/admin.html", method = RequestMethod.POST)
