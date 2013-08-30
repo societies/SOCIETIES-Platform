@@ -44,25 +44,21 @@
             <!--<from-outcome>home</from-outcome>-->
             <to-view-id>/index.xhtml</to-view-id>
         </navigation-case>
-        <!--
-                <navigation-case>
-                    <from-action>#{ppNegotiation.completeNegotiationAction}</from-action>
-                    <from-outcome>next</from-outcome>
-                    <to-view-id>/privacy_policy_negotiation.xhtml?id=#{privacyPolicyNegotiationListener.nextNegotiationID}</to-view-id>
-                </navigation-case>
-        -->
         <navigation-case>
             <from-action>#{ppNegotiation.cancelNegotiationAction}</from-action>
             <!--<from-outcome>home</from-outcome>-->
             <to-view-id>/index.xhtml</to-view-id>
         </navigation-case>
-        <!--
-                <navigation-case>
-                    <from-action>#{ppNegotiation.cancelNegotiationAction}</from-action>
-                    <from-outcome>next</from-outcome>
-                    <to-view-id>/privacy_policy_negotiation.xhtml?id=#{privacyPolicyNegotiationListener.nextNegotiationID}</to-view-id>
-                </navigation-case>
-        -->
+        <navigation-case>
+            <from-action>#{accessControlController.completeAccessRequestAction}</from-action>
+            <!--<from-outcome>home</from-outcome>-->
+            <to-view-id>/index.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-action>#{accessControlController.cancelAccessRequestAction}</from-action>
+            <!--<from-outcome>home</from-outcome>-->
+            <to-view-id>/index.xhtml</to-view-id>
+        </navigation-case>
         <!-- Redirect based on Suggested Friends page buttons -->
         <navigation-case>
             <from-action>#{suggestedfriends.getsnsFriendes}</from-action>
@@ -70,29 +66,29 @@
             <redirect/>
         </navigation-case>
         <navigation-case>
-            <from-action>#{suggestedfriends.getfriends</from-action>
+            <from-action>#{suggestedfriends.getfriends}</from-action>
             <to-view-id>/suggested_societies_friends_list.xhtml</to-view-id>
             <redirect/>
         </navigation-case>
         <navigation-case>
-            <from-action>#{suggestedfriends.getactivities</from-action>
-            <to-view-id>/suggested_societies_friends_list.xhtmll</to-view-id>
+            <from-action>#{suggestedfriends.getactivities}</from-action>
+            <to-view-id>/suggested_societies_friends_list.xhtml</to-view-id>
             <redirect/>
         </navigation-case>
         <navigation-case>
-            <from-action>#{cismanager.getsuggestedcommunities</from-action>
+            <from-action>#{cismanager.getsuggestedcommunities}</from-action>
             <to-view-id>/your_suggested_communities_list.xhtml</to-view-id>
             <redirect/>
         </navigation-case>
         <navigation-case>
-            <from-action>#{profile.modifyrecord()</from-action>
+            <from-action>#{profile.modifyrecord()}</from-action>
             <to-view-id>/myProfile.xhtml</to-view-id>
             <redirect/>
         </navigation-case>
         <navigation-case>
-			<from-action>#{suggestedfriends.search(suggestedfriends.findfriend)}</from-action>
-			<to-view-id>/your_societies_friends_list.xhtml</to-view-id>
-			<redirect/>
-	</navigation-case>
+            <from-action>#{suggestedfriends.search(suggestedfriends.findfriend)}</from-action>
+            <to-view-id>/your_societies_friends_list.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
     </navigation-rule>
 </faces-config>

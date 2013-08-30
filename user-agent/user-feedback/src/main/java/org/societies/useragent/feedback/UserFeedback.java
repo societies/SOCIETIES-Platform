@@ -1166,7 +1166,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                     pubsub.publisherPublish(myCloudID,
                             EventTypes.UF_PRIVACY_ACCESS_CONTROL_REMOVE_POPUP,
                             responseID,
-                            accessCtrlResults.get(responseID));
+                            result);
                 } catch (Exception ex) {
                     log.error("Error transmitting access control complete via pubsub", ex);
                 }
@@ -1184,6 +1184,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
                 this.accessCtrlResults.notifyAll();
             }
+
         }
     }
 

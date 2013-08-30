@@ -1,7 +1,6 @@
 package org.societies.webapp.controller.userfeedback;
 
-import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
-import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyConditionsConstantValues;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.*;
@@ -19,9 +18,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-@ManagedBean(name = "ppNegotiation", eager = true)
+@ManagedBean(name = "accessControlController")
 @ViewScoped
-public class PrivacyPolicyNegotiationController extends BasePageController {
+public class AccessControlRequestController extends BasePageController {
 
     private static String getIdFromQueryString() {
         HttpServletRequest hsr = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -38,11 +37,11 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     private IUserFeedback userFeedback;
 
     private String eventID;
-    private UserFeedbackPrivacyNegotiationEvent event;
+    private UserFeedbackAccessControlEvent event;
 
-    public PrivacyPolicyNegotiationController() {
+    public AccessControlRequestController() {
         if (log.isDebugEnabled())
-            log.debug("PrivacyPolicyNegotiationController ctor()");
+            log.debug("AccessControlRequestController ctor()");
 
     }
 
@@ -67,7 +66,7 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
         if (log.isDebugEnabled())
             log.debug("init()");
         eventID = getIdFromQueryString();
-        event = notificationsController.getPrivacyNegotiationEvent(eventID);
+        event = notificationsController.getAcceessControlEvent(eventID);
 
         if (event != null) {
             if (log.isDebugEnabled())
@@ -93,54 +92,27 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
         return PrivacyConditionsConstantValues.getValues(condition);
     }
 
-    public ResponsePolicy getResponsePolicy() {
+    public List<ResponseItem> getResponseItems() {
         return event != null
-                ? event.getResponsePolicy()
+                ? event.getResponseItems()
                 : null;
     }
 
-    public UserFeedbackPrivacyNegotiationEvent getCurrentNegotiationEvent() {
+    public UserFeedbackAccessControlEvent getCurrentAccessEvent() {
         return event;
     }
 
-    public String completeNegotiationAction() {
+    public String completeAccessRequestAction() {
         log.debug("completeNegotiation() id=" + eventID);
 
-        ResponsePolicy responsePolicy = event.getResponsePolicy();
-        NegotiationDetailsBean negotiationDetails = event.getNegotiationDetails();
-
         // TODO: validate action check boxes
-        /*for (ResponseItem response : responsePolicy.getResponseItems()) {
-            for (Action action : response.getRequestItem().getActions()) {
-                ActionWrapper wrapper = (ActionWrapper) action;
 
-                log.debug(String.format("%s: action %s selected = %s",
-                        response.getRequestItem().getResource().getDataIdUri(),
-                        action.getActionConstant().name(),
-                        wrapper.isSelected()));
-
-                // READ is always required
-                if (!wrapper.isSelected() &&
-                        (ActionConstants.READ.equals(action.getActionConstant()) || !action.isOptional())) {
-                    String msg = "Action %s is required for %s";
-
-                    addGlobalMessage("Validation failed",
-                            String.format(msg, action.getActionConstant().name(), response.getRequestItem().getResource().getDataIdUri()),
-                            FacesMessage.SEVERITY_WARN);
-                    return;
-                }
-
-            }
-        }*/
-
-        prepareEventForTransmission(responsePolicy);
-
-        responsePolicy.setNegotiationStatus(NegotiationStatus.ONGOING);
+        prepareEventForTransmission(event);
 
         try {
-            userFeedback.submitPrivacyNegotiationResponse(eventID, negotiationDetails, responsePolicy);
+            userFeedback.submitAccessControlResponse(eventID, event.getResponseItems(), event.getRequestor());
         } catch (Exception e) {
-            addGlobalMessage("Error publishing notification of completed negotiation",
+            addGlobalMessage("Error publishing notification of completed access control event",
                     e.getMessage(),
                     FacesMessage.SEVERITY_ERROR);
             log.error("Error publishing notification of completed negotiation", e);
@@ -149,34 +121,29 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
         return "home"; // previously, could redirect to next negotiation - but this makes no sense now
     }
 
-    public String cancelNegotiationAction() {
+    public String cancelAccessRequestAction() {
         log.debug("cancelNegotiation()");
 
-        ResponsePolicy responsePolicy = getCurrentNegotiationEvent().getResponsePolicy();
-        NegotiationDetailsBean negotiationDetails = getCurrentNegotiationEvent().getNegotiationDetails();
-
-        prepareEventForTransmission(responsePolicy);
-
-        responsePolicy.setNegotiationStatus(NegotiationStatus.FAILED);
+        prepareEventForTransmission(event);
 
         try {
-            userFeedback.submitPrivacyNegotiationResponse(eventID, negotiationDetails, responsePolicy);
+            userFeedback.submitAccessControlResponse(eventID, event.getResponseItems(), event.getRequestor());
         } catch (Exception e) {
-            addGlobalMessage("Error publishing notification of cancelled privacy negotiation event",
+            addGlobalMessage("Error publishing notification of cancelled access control event",
                     e.getMessage(),
                     FacesMessage.SEVERITY_ERROR);
-            log.error("Error publishing notification of cancelled privacy negotiation event", e);
+            log.error("Error publishing notification of cancelled access control event", e);
         }
 
         return "home"; // previously, could redirect to next negotiation - but this makes no sense now
     }
 
-    private static void prepareEventForGUI(UserFeedbackPrivacyNegotiationEvent event) {
+    private static void prepareEventForGUI(UserFeedbackAccessControlEvent event) {
 
-        List<ResponseItem> responseItems = event.getResponsePolicy().getResponseItems();
+        List<ResponseItem> responseItems = event.getResponseItems();
         for (ResponseItem response : responseItems) {
 
-           RequestItemWrapper request = new RequestItemWrapper(response.getRequestItem());
+            RequestItemWrapper request = new RequestItemWrapper(response.getRequestItem());
             response.setRequestItem(request);
 
             // add any missing ConditionConstants
@@ -209,8 +176,8 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
         }
     }
 
-    private static void prepareEventForTransmission(ResponsePolicy responsePolicy) {
-        for (ResponseItem response : responsePolicy.getResponseItems()) {
+    private static void prepareEventForTransmission(UserFeedbackAccessControlEvent event) {
+        for (ResponseItem response : event.getResponseItems()) {
             RequestItemWrapper requestWrapper = (RequestItemWrapper) response.getRequestItem();
             RequestItem request = requestWrapper.getRequestItem();
 
@@ -251,11 +218,11 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
         }
 
-        clearResponseItemWrapper(responsePolicy);
+        clearResponseItemWrapper(event);
     }
 
-    private static void clearResponseItemWrapper(ResponsePolicy responsePolicy) {
-        for (ResponseItem item : responsePolicy.getResponseItems()) {
+    private static void clearResponseItemWrapper(UserFeedbackAccessControlEvent event) {
+        for (ResponseItem item : event.getResponseItems()) {
             RequestItem oldItem = item.getRequestItem();
             RequestItem newItem = new RequestItem();
             newItem.setActions(oldItem.getActions());
