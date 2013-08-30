@@ -198,7 +198,7 @@ public class PrivacyPolicyNegotiationListener extends BasePageController {
         responsePolicy.setNegotiationStatus(NegotiationStatus.ONGOING);
 
         try {
-            userFeedback.submitExplicitResponse(itemId, negotiationDetails, responsePolicy);
+            userFeedback.submitPrivacyNegotiationResponse(itemId, negotiationDetails, responsePolicy);
 
             if (log.isDebugEnabled())
                 log.debug("Sent " + EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE + " with ID " + itemId);
@@ -227,7 +227,7 @@ public class PrivacyPolicyNegotiationListener extends BasePageController {
         responsePolicy.setNegotiationStatus(NegotiationStatus.FAILED);
 
         try {
-            userFeedback.submitExplicitResponse(itemId, negotiationDetails, responsePolicy);
+            userFeedback.submitPrivacyNegotiationResponse(itemId, negotiationDetails, responsePolicy);
 
             if (log.isDebugEnabled())
                 log.debug("Sent " + EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE + " with ID " + itemId);

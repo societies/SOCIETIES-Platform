@@ -46,6 +46,7 @@ import org.societies.api.internal.useragent.model.FeedbackForm;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
@@ -1218,7 +1219,24 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     }
 
     @Override
-    public void submitExplicitResponse(String requestId, NegotiationDetailsBean negotiationDetails, ResponsePolicy result) {
+    public void submitImplicitResponse(String requestId, Boolean result) {
+        //create user feedback response bean
+        ImpFeedbackResultBean resultBean = new ImpFeedbackResultBean();
+        resultBean.setRequestId(requestId);
+        resultBean.setAccepted(result);
+
+        //fire response pubsub event to all user agents
+        try {
+            pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.IMPLICIT_RESPONSE, requestId, resultBean);
+        } catch (XMPPError e) {
+            log.error("Error submitting implicit response", e);
+        } catch (CommunicationException e) {
+            log.error("Error submitting implicit response", e);
+        }
+    }
+
+    @Override
+    public void submitPrivacyNegotiationResponse(String requestId, NegotiationDetailsBean negotiationDetails, ResponsePolicy result) {
         //create user feedback response bean
         UserFeedbackPrivacyNegotiationEvent resultBean = new UserFeedbackPrivacyNegotiationEvent();
         resultBean.setMethod(GET_EXPLICIT_FB);
@@ -1239,19 +1257,23 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     }
 
     @Override
-    public void submitImplicitResponse(String requestId, Boolean result) {
+    public void submitAccessControlResponse(String requestId, List<ResponseItem> responseItems, RequestorBean requestorBean) {
         //create user feedback response bean
-        ImpFeedbackResultBean resultBean = new ImpFeedbackResultBean();
+        UserFeedbackAccessControlEvent resultBean = new UserFeedbackAccessControlEvent();
+        resultBean.setMethod(GET_EXPLICIT_FB);
+        resultBean.setType(ExpProposalType.PRIVACY_NEGOTIATION);
         resultBean.setRequestId(requestId);
-        resultBean.setAccepted(result);
+        resultBean.setResponseItems(responseItems);
+        resultBean.setRequestor(requestorBean);
 
         //fire response pubsub event to all user agents
         try {
-            pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.IMPLICIT_RESPONSE, requestId, resultBean);
+            log.info("####### Publish " + EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE + ": " + ResponseItemUtils.toXmlString(responseItems));
+            pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE, requestId, resultBean);
         } catch (XMPPError e) {
-            log.error("Error submitting implicit response", e);
+            log.error("Error submitting negotiation response", e);
         } catch (CommunicationException e) {
-            log.error("Error submitting implicit response", e);
+            log.error("Error submitting negotiation response", e);
         }
     }
 

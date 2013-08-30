@@ -7,6 +7,7 @@ import org.societies.api.internal.useragent.feedback.IUserFeedbackResponseEventL
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.FeedbackForm;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 
@@ -204,12 +205,17 @@ public class MockUF implements IUserFeedback {
      * @param requestId Id of the userfeedback request
      */
     @Override
-    public void submitExplicitResponse(String requestId, NegotiationDetailsBean
+    public void submitPrivacyNegotiationResponse(String requestId, NegotiationDetailsBean
             negotiationDetails, ResponsePolicy result) {
     }
 
     @Override
     public void submitImplicitResponse(String id, Boolean result) {
+    }
+
+    @Override
+    public void submitAccessControlResponse(String s, List<ResponseItem> responseItems, RequestorBean requestorBean) {
+
     }
 
     @Override
