@@ -97,26 +97,16 @@ public class NotificationsController extends BasePageController {
 
         @Override
         public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object item) {
-            if (log.isDebugEnabled()) {
-                log.debug(String.format("Received pubsub event with topic '%s', ID '%s' and class '%s'",
-                        node,
-                        itemId,
-                        item.getClass().getCanonicalName()
-                ));
-            }
 
             if (item == null) {
-                log.warn("Notification payload was null, not recording");
+                log.warn(String.format("Received pubsub event with NULL PAYLOAD - not recording. Node '%s', ID '%s'",
+                        node,
+                        itemId)
+                );
                 return;
             }
 
-            if (log.isDebugEnabled()) {
-                String fmt = "Event type %s, payload type %s, with message ID %s";
-                log.debug(String.format(fmt, node, item.getClass().getSimpleName(), itemId));
-            }
-
-            // create the correct notification type for the incoming event
-            // or process the response correctly
+            // create the correct notification type for the incoming event or process the response correctly
 
             if (EventTypes.UF_PRIVACY_NEGOTIATION.equals(node)) {
 
@@ -750,26 +740,30 @@ public class NotificationsController extends BasePageController {
 
     private void addItemToQueue(NotificationQueueItem item) {
         synchronized (allNotifications) {
-            if (allNotificationIDs.contains(item.getItemId())) {
-                log.warn("NQI event ID " + item.getItemId() + " already in cache - ignoring");
-                return;
-            }
+            synchronized (allNotificationIDs) {
+                if (allNotificationIDs.contains(item.getItemId())) {
+                    log.warn("NQI event ID " + item.getItemId() + " already in cache - ignoring");
+                    return;
+                }
 
-            if (log.isDebugEnabled())
-                log.debug("Adding NQI event ID [" + item.getItemId() + "] to cache");
-
-            allNotificationIDs.add(item.getItemId());
-            allNotifications.add(item);
-            Collections.sort(allNotifications);
-
-            if (!item.isComplete()) {
                 if (log.isDebugEnabled())
-                    log.debug("NQI event ID [" + item.getItemId() + "] is not completed, adding to unanswered cache");
+                    log.debug("Adding new NQI event ID [" + item.getItemId() + "] to cache");
 
-                synchronized (unansweredNotifications) {
-                    unansweredNotificationIDs.add(item.getItemId());
-                    unansweredNotifications.add(item);
-                    Collections.sort(unansweredNotifications);
+                allNotificationIDs.add(item.getItemId());
+                allNotifications.add(item);
+                Collections.sort(allNotifications);
+
+                if (!item.isComplete()) {
+                    if (log.isDebugEnabled())
+                        log.debug("NQI event ID [" + item.getItemId() + "] is not completed, adding to unanswered cache");
+
+                    synchronized (unansweredNotifications) {
+                        synchronized (unansweredNotificationIDs) {
+                            unansweredNotificationIDs.add(item.getItemId());
+                            unansweredNotifications.add(item);
+                            Collections.sort(unansweredNotifications);
+                        }
+                    }
                 }
             }
         }
@@ -783,22 +777,24 @@ public class NotificationsController extends BasePageController {
 
         // NB: All incomplete notifications should be in the unanswered queue, and only incomplete ones should be in this queue
         synchronized (unansweredNotifications) {
-            for (NotificationQueueItem nqi : allNotifications) {
-                if (!nqi.getItemId().equals(itemId)) continue;
+            synchronized (unansweredNotificationIDs) {
+                for (NotificationQueueItem nqi : allNotifications) {
+                    if (!nqi.getItemId().equals(itemId)) continue;
 
-                if (log.isDebugEnabled()) {
-                    String fmt = "Removing notification item of type %s with ID %s";
-                    log.debug(String.format(fmt, nqi.getType(), itemId));
+                    if (log.isDebugEnabled()) {
+                        String fmt = "Removing notification item of type %s with ID %s";
+                        log.debug(String.format(fmt, nqi.getType(), itemId));
+                    }
+
+                    synchronized (nqi) {
+                        nqi.setResults(results);
+                        nqi.setComplete(true);
+                        unansweredNotifications.remove(nqi);
+                        unansweredNotificationIDs.remove(itemId);
+                    }
+
+                    break;
                 }
-
-                synchronized (nqi) {
-                    nqi.setResults(results);
-                    nqi.setComplete(true);
-                    unansweredNotifications.remove(nqi);
-                    unansweredNotificationIDs.remove(itemId);
-                }
-
-                break;
             }
         }
 
