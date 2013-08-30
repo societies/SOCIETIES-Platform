@@ -1420,7 +1420,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
                 try {
                     pubsub.publisherPublish(myCloudID,
-                            UserFeedbackEventTopics.COMPLETE,
+                            EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP,
                             resultBean.getRequestId(),
                             resultBean);
                 } catch (Exception ex) {
@@ -1439,7 +1439,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
                 try {
                     pubsub.publisherPublish(myCloudID,
-                            UserFeedbackEventTopics.COMPLETE,
+                            EventTypes.UF_PRIVACY_ACCESS_CONTROL_REMOVE_POPUP,
                             resultBean.getRequestId(),
                             resultBean);
                 } catch (Exception ex) {
