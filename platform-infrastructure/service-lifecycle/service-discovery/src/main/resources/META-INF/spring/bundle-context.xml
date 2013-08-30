@@ -89,7 +89,7 @@
 	</bean>
 
 	<bean id="ServiceDiscoveryCommsManager" class="org.societies.platform.servicelifecycle.servicediscovery.comms.CommsServer"
-	depends-on="commMngrRef" init-method="InitService">
+	depends-on="commMngrRef" init-method="InitService" destroy-method="killService">
 		<property name="commMngr" ref="commMngrRef"/>
 		<property name="serviceDiscovery" ref="serviceDiscovery"/>
 		<property name="eventMgr" ref="eventManagerRef" />

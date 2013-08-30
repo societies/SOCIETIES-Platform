@@ -53,11 +53,24 @@ public class ServiceDownloader {
 
 	static final Logger logger = LoggerFactory.getLogger(ServiceDownloader.class);
 	
-	public static boolean deleteFile(URI path){
+	public static void deleteFile(URI path){
+		
+		if(logger.isDebugEnabled())
+			logger.debug("Attempting to delete file with path: " + path);
+		
+		if(path == null)
+			return;
 		
 		File file = new File(path);
-		
-		return file.delete();
+		if(file.isFile()){
+			boolean delete = file.delete();
+			if(!delete){
+				if(logger.isDebugEnabled())
+					logger.debug("First delete attempt failed, so asking Java to delete on JVM exit!");
+				file.deleteOnExit();
+			}
+				
+		}
 	}
 	
 	public static URI downloadServiceJar(URL jarURL, Service service){

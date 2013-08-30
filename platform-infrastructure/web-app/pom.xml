@@ -373,6 +373,7 @@
 							org.simpleframework.xml.convert;resolution:=optional,
 							org.societies.maven.converters;resolution:=optional,
 							org.societies.simple.basic;resolution:=optional,
+							org.societies.api.external;resolution:=optional,
 							javax.servlet.jsp.jstl.core;version="[1.2.0,2.0.0)",
 							javax.servlet;version="[3.0.0, 4.0.0)",
 							javax.servlet.resources;version="[2.4.0, 4.0.0)",
@@ -641,6 +642,7 @@
 							org.jfree.chart.urls;resolution:=optional,
 							org.jfree.data.category;resolution:=optional,
 							org.jfree.data.general;resolution:=optional,
+							org.societies.api.privacytrust.privacy.util.privacypolicy;resolution:=optional,
 							<!-- Other -->
 							*;resolution:=optional
 						</Import-Package>

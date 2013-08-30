@@ -150,29 +150,16 @@ public class ServiceWrapper {
 	}
 	
 	public String getSharedBy(){
-		if(sharedBy == null){
-			/*List<String> cssIdList = new ArrayList();
-			cssIdList.add(getSharedByJid());
+		if(sharedBy == null || "".equals(sharedBy)){
 			try{
-				List<CssAdvertisementRecord> recordList = controller.getCssDirectory().searchByID(cssIdList).get();
-				if(!recordList.isEmpty()){
-					sharedBy = recordList.get(0).getName();
-				}
+				sharedBy = controller.getCommManager().getIdManager().fromJid(getSharedByJid()).getIdentifier();
 			} catch(Exception ex){
 				log.error("Exception occured {}", ex.getMessage());
 				ex.printStackTrace();
-			}*/
-			if(sharedBy == null || "".equals(sharedBy)){
-				try{
-					controller.getCommManager().getIdManager().fromJid(getSharedByJid()).getIdentifier();
-				} catch(Exception ex){
-					log.error("Exception occured {}", ex.getMessage());
-					ex.printStackTrace();
-					sharedBy = getSharedByJid();
-				}
-			}		
+				sharedBy = getSharedByJid();
+			}
+		}		
 			
-		}
 		return sharedBy;
 		
 	}

@@ -59,15 +59,6 @@ public class ProfileController extends BasePageController{
         log.info("ProfileController constructor");
 	}
 	
-	
-	
-	public String getFullname() {
-		return Fullname;
-	}
-
-	public void setFullname(String name) {
-		Fullname = name;
-	}
 
 	public String getId() {
 		return Id;
@@ -126,7 +117,25 @@ public class ProfileController extends BasePageController{
 	}
 
 
-	private String Fullname;
+	private String Firstname;
+	public String getFirstname() {
+		return Firstname;
+	}
+
+	public void setFirstname(String firstname) {
+		Firstname = firstname;
+	}
+
+	public String getSurname() {
+		return Surname;
+	}
+
+	public void setSurname(String surname) {
+		Surname = surname;
+	}
+
+
+	private String Surname;
 	private String Id;
 	private String email;
 	private int sex;
@@ -140,7 +149,6 @@ public class ProfileController extends BasePageController{
         	log.info("ProfileController getrecord called");
         	
         	CssRecord record = new CssRecord();
-        	//String forename = null;
         	
         	Future<CssInterfaceResult> futurerecord = cssLocalManager.getCssRecord();
         	try {
@@ -152,9 +160,10 @@ public class ProfileController extends BasePageController{
     			// TODO Auto-generated catch block
     			e.printStackTrace();
     		}
-    		//forename = record.getName();
+    		//
         	
-        	Fullname = record.getName();
+        	Firstname = record.getForeName();
+        	Surname = record.getName();
         	email = record.getEmailID();
         	sex = record.getSex();
         	homelocation = record.getHomeLocation();
@@ -162,7 +171,7 @@ public class ProfileController extends BasePageController{
         	position = record.getPosition();
         	entity = record.getEntity();
         	
-    		log.info("ProfileController getName returns :" +Fullname);
+    		log.info("ProfileController getName returns :" +Surname);
     		return record;
         	
         }
@@ -173,9 +182,11 @@ public class ProfileController extends BasePageController{
      	
      	CssRecord record = new CssRecord();
      	record.setCssIdentity(this.getId());
-     	log.info("Setting Record Name with : " +Fullname);
-     	record.setName(Fullname); //.setName(this.getFullname());
-     	log.info("Record Name contains : " +record.getName());
+     	log.info("Setting Record SurName with : " +Surname);
+     	record.setForeName(Firstname);
+     	record.setName(Surname);
+     	
+     	log.info("Record SurName contains : " +record.getName());
      	record.setEmailID(this.getEmail());
      	record.setPosition(this.getPosition());
      	record.setHomeLocation(this.getHomelocation());
