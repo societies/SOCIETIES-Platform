@@ -70,12 +70,13 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     //pubsub event schemas
     private static final List<String> EVENT_SCHEMA_CLASSES =
             Collections.unmodifiableList(Arrays.asList(
-                    "org.societies.api.schema.useragent.feedback.UserFeedbackBean",
+                    "org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent",
                     "org.societies.api.internal.schema.useragent.feedback.UserFeedbackHistoryRequest",
+                    "org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent",
                     "org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean",
                     "org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean",
-                    "org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent",
-                    "org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent"));
+                    "org.societies.api.schema.useragent.feedback.UserFeedbackBean"
+            ));
 
 
     @Autowired
@@ -157,7 +158,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             pubsub.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.EXPLICIT_RESPONSE, this);
             pubsub.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.IMPLICIT_RESPONSE, this);
             pubsub.subscriberSubscribe(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, this);
+            pubsub.subscriberSubscribe(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP, this);
             pubsub.subscriberSubscribe(myCloudID, EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE, this);
+            pubsub.subscriberSubscribe(myCloudID, EventTypes.UF_PRIVACY_ACCESS_CONTROL_REMOVE_POPUP, this);
             log.debug("Pubsub registration complete!");
         } catch (Exception e) {
             log.error("Error registering for user feedback pubsub nodes", e);
@@ -787,6 +790,13 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
     @Override
     public void pubsubEvent(IIdentity identity, String eventTopic, String itemID, Object item) {
+        if (eventTopic == null) {
+            log.warn(String.format("Received pubsub event with NULL EVENT TOPIC - payload '%s', ID '%s'",
+                    item != null ? item.getClass().getSimpleName() : "null",
+                    itemID
+            ));
+            return;
+        }
         if (item == null) {
             log.warn(String.format("Received pubsub event with NULL PAYLOAD - topic '%s', ID '%s'",
                     eventTopic,
@@ -846,6 +856,8 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             UserFeedbackAccessControlEvent event = (UserFeedbackAccessControlEvent) item;
             this.processAccessControlResponseEvent(event);
 
+        } else {
+            log.warn(String.format("Unhandled pubsub event '%s' with ID '%s'", eventTopic, itemID));
         }
     }
 
