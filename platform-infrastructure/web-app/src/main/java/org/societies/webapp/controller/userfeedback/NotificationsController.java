@@ -1,4 +1,4 @@
-package org.societies.webapp.controller;
+package org.societies.webapp.controller.userfeedback;
 
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
@@ -13,6 +13,7 @@ import org.societies.useragent.api.feedback.IPrivacyPolicyNegotiationHistoryRepo
 import org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository;
 import org.societies.useragent.api.model.UserFeedbackEventTopics;
 import org.societies.webapp.ILoginListener;
+import org.societies.webapp.controller.BasePageController;
 import org.societies.webapp.entity.NotificationQueueItem;
 import org.societies.webapp.service.UserService;
 import org.springframework.context.annotation.Scope;
