@@ -1,8 +1,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:c="http://java.sun.com/jsp/jstl/core"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
@@ -10,6 +12,7 @@
     </ui:define>
 
     <ui:define name="body">
+
 
         <div class="hr grid_12 clearfix"></div>
         <section class="grid_12">
@@ -20,21 +23,16 @@
                 <div class="websearchtitle">
                     <h4 class="form_title">Your Communities</h4>
                 </div>
-                <div class="groupsearch">
-                    <form action="" class="websearch-form frame nobtn rsmall">
-                        <input type="text" name="search" class="websearch-input"
-                               placeholder="Search for Communities..."/>
-                    </form>
-                </div>
+                
             </div>
         </section>
         <!-- Left Column -->
         <article id="left_col" class="grid_8">
             <section class="itemlist">
-                <header>
+                <header><H5>Role: Participant</H5>
                 </header>
                 <ol class="keyinfolist">
-                	<c:forEach items="#{cismanager.membercommunities}" var="mycommunity">
+                    <c:forEach items="#{cismanager.membercommunities}" var="snsFriend">
     				    <li class="keyinfo bypostauthor">
                         <figure class="gravatar">
                             <a class="friend_profile.xhtml"><img alt="" src="images/launcher_societies.png"
@@ -43,21 +41,45 @@
                         <div class="keyinfo_content">
                             <div class="clearfix">
                                 <br/>
-                                <H6>Name:     #{mycommunity.getCisname()}</H6> 								
-                                <H6>Identity: #{mycommunity.getCisid()}</H6>
-                                <H6>Members: #{cismanager.getmembers(mycommunity)}</H6>
+                                <H6>Name:     #{snsFriend.getCisname()}</H6> 								
+                                <H6>Identity: #{snsFriend.getCisid()}</H6>
+                                <H6>Members: #{cismanager.getmembers(snsFriend)}</H6>
                             </div>
                             <div class="keyinfo_text">
                             </div>
                         </div>
-                		<p:commandButton value="Leave Community" action="#{cismanager.leavecis(mycommunity)}"/>
-                		</li>
-                	</c:forEach>
-                </ol>                
-
+                        <p:commandButton value="Leave Community" action="#{cismanager.leavecis(snsFriend)}"/>
+                        </li>
+                      </c:forEach>
+                </ol>
+                <div class="hr clearfix"></div>
+            </section>
+            <section class="itemlist">
+                <header><H5>Role: Owner</H5></header>
+                <ol class="keyinfolist">
+                    <c:forEach items="#{cismanager.ownedcommunities}" var="otherFriend">
+    				    <li class="keyinfo bypostauthor">
+                        <figure class="gravatar">
+                            <a class="friend_profile.xhtml"><img alt="" src="images/launcher_societies.png"
+                                                                height="58" width="58"/></a>
+                        </figure>
+                        <div class="keyinfo_content">
+                            <div class="clearfix">
+                                <br/>
+                                <H6>Name:     #{otherFriend.getCisname()}</H6> 								
+                                <H6>Identity: #{otherFriend.getCisid()}</H6>
+                                <H6>Members: #{cismanager.getmembers(otherFriend)}</H6>
+                            </div>
+                            <div class="keyinfo_text">
+                            </div>
+                        </div>
+                        </li>
+                      </c:forEach>
+                </ol>
                 <div class="hr clearfix"></div>
             </section>
         </article>
+        
         <!-- Right Column / Sidebar -->
         <aside id="sidebar_right" class="grid_4">
             <div class="sidebar_top_BG"></div>
@@ -66,10 +88,10 @@
                 <header>
                     <h3>Owned Communities...</h3>
                 </header>
-                <br/> <br/>
+       	 		<br/> <br/>
                 <ul>
-                	<ui:repeat value="#{cismanager.ownedcommunities}" var="owncommunity">
-                		<li> #{owncommunity.name}</li>
+                	<ui:repeat value="#{cismanager.ownedcommunities}" var="friend">
+                		<li> #{friend.getCisname()}</li>
                 	</ui:repeat>
                 </ul>
             </section>
@@ -77,6 +99,8 @@
                 <header>
                     <h3>Other Activity</h3>
                 </header>
+                <div class="hr dotted clearfix"></div>
+       	 		<br/> <br/>
             </section>
             <div class="hr dotted clearfix"></div>
             <div class="sidebar_bottom_BG"></div>
