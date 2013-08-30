@@ -15,7 +15,6 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -174,18 +173,12 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
         return "home"; // previously, could redirect to next negotiation - but this makes no sense now
     }
 
-    private void prepareEventForGUI(UserFeedbackPrivacyNegotiationEvent event) {
-        log.debug("prepareEventForGUI()");
+    private static void prepareEventForGUI(UserFeedbackPrivacyNegotiationEvent event) {
 
-        if (event.getResponsePolicy() == null) {
-            this.log.debug("Policy parameter is null");
-        } else {
-            this.log.debug("Policy contains: " + event.getResponsePolicy().getResponseItems().size() + " responseItems");
-        }
         List<ResponseItem> responseItems = event.getResponsePolicy().getResponseItems();
         for (ResponseItem response : responseItems) {
-            this.log.debug("Processing item: " + response.getRequestItem().getResource().getDataType());
-            RequestItemWrapper request = new RequestItemWrapper(response.getRequestItem());
+
+           RequestItemWrapper request = new RequestItemWrapper(response.getRequestItem());
             response.setRequestItem(request);
 
             // add any missing ConditionConstants
@@ -218,8 +211,7 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
         }
     }
 
-    private void prepareEventForTransmission(ResponsePolicy responsePolicy) {
-        log.debug("prepareEventForTransmission()");
+    private static void prepareEventForTransmission(ResponsePolicy responsePolicy) {
         for (ResponseItem response : responsePolicy.getResponseItems()) {
             RequestItemWrapper requestWrapper = (RequestItemWrapper) response.getRequestItem();
             RequestItem request = requestWrapper.getRequestItem();
@@ -242,10 +234,6 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
             if (!requestWrapper.getSelectedActionNames().contains("READ"))
                 requestWrapper.getSelectedActionNames().add("READ");
 
-            if (log.isDebugEnabled())
-                log.debug("actions=" + Arrays.toString(requestWrapper.getSelectedActionNames().toArray()));
-
-
             for (int i = 0; i < request.getActions().size(); i++) {
                 Action action = request.getActions().get(i);
                 boolean found = false;
@@ -261,11 +249,6 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
                     request.getActions().remove(i);
                     i--;
                 }
-            }
-
-            // TODO: remove after debugging
-            for (Action action : request.getActions()) {
-                log.debug("action: " + action.getActionConstant());
             }
 
         }
