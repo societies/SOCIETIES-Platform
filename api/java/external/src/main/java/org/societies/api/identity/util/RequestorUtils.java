@@ -69,7 +69,11 @@ public class RequestorUtils {
 		else {
 			RequestorServiceBean requestor = new RequestorServiceBean();
 			requestor.setRequestorId(requestorId);
-			requestor.setRequestorServiceId(ServiceUtils.generateServiceResourceIdentifierFromString(requestorCisOrServiceId));
+			try {
+				requestor.setRequestorServiceId(ServiceUtils.generateServiceResourceIdentifierFromString(requestorCisOrServiceId));
+			} catch(Exception e) {
+				return null;
+			}
 			return requestor;
 		}
 	}
