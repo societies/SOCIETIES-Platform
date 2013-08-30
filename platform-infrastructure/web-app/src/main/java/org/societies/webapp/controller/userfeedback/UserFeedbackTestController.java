@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-@ManagedBean(name = "ppNegotiationTest")
+@ManagedBean(name = "ufTestController")
 @SessionScoped
 public class UserFeedbackTestController extends BasePageController {
 
@@ -286,6 +286,11 @@ public class UserFeedbackTestController extends BasePageController {
         });
         log.info("AccessControl: Sent");
     }
+
+    public void resetUserFeedback() {
+        userFeedback.clear();
+    }
+
 
     private static ResponsePolicy buildResponsePolicy(String guid, RequestorBean requestorBean) {
 

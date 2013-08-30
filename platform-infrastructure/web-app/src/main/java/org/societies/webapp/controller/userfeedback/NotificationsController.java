@@ -9,8 +9,7 @@ import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.schema.useragent.feedback.*;
-import org.societies.useragent.api.feedback.IPrivacyPolicyNegotiationHistoryRepository;
-import org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository;
+import org.societies.useragent.api.feedback.IInternalUserFeedback;
 import org.societies.useragent.api.model.UserFeedbackEventTopics;
 import org.societies.webapp.ILoginListener;
 import org.societies.webapp.controller.BasePageController;
@@ -98,15 +97,13 @@ public class NotificationsController extends BasePageController {
 
         @Override
         public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object item) {
-//            if (log.isDebugEnabled()) {
-//                log.debug("pubsubEvent(): node=" + node + " item=" + item);
-//            }
-
-            // get the policy from the event payload
-//            if (item instanceof UserFeedbackPrivacyNegotiationEvent) {
-//                UserFeedbackPrivacyNegotiationEvent privEvent = (UserFeedbackPrivacyNegotiationEvent) item;
-//
-//            }
+            if (log.isDebugEnabled()) {
+                log.debug(String.format("Received pubsub event with topic '%s', ID '%s' and class '%s'",
+                        node,
+                        itemId,
+                        item.getClass().getCanonicalName()
+                ));
+            }
 
             if (item == null) {
                 log.warn("Notification payload was null, not recording");
@@ -119,127 +116,44 @@ public class NotificationsController extends BasePageController {
             }
 
             // create the correct notification type for the incoming event
+            // or process the response correctly
+
             if (EventTypes.UF_PRIVACY_NEGOTIATION.equals(node)) {
 
-                if (!(item instanceof UserFeedbackPrivacyNegotiationEvent)) {
-                    log.warn(String.format("Received pubsub event with topic '%s', ID '%s' and class '%s' - Required UserFeedbackPrivacyNegotiationEvent ",
-                            node,
-                            itemId,
-                            item.getClass().getCanonicalName()
-                    ));
-                    return;
-                }
+                processPrivacyNegotiationEvent(node, itemId, item);
 
-                UserFeedbackPrivacyNegotiationEvent ppn = (UserFeedbackPrivacyNegotiationEvent) item;
-                NotificationQueueItem newItem = NotificationQueueItem.forPrivacyPolicyNotification(String.valueOf(ppn.getRequestId()), ppn);
+            } else if (EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE.equals(node)
+                    || EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP.equals(node)) {
 
-                addItemToQueue(newItem);
-
-            } else if (UserFeedbackEventTopics.REQUEST.equals(node)) {
-
-                if (!(item instanceof UserFeedbackBean)) {
-                    log.warn(String.format("Received pubsub event with topic '%s', ID '%s' and class '%s' - Required UserFeedbackBean ",
-                            node,
-                            itemId,
-                            item.getClass().getCanonicalName()
-                    ));
-                    return;
-                }
-
-                UserFeedbackBean bean = (UserFeedbackBean) item;
-                NotificationQueueItem newItem = createNotificationQueueItemFromUserFeedbackBean(bean);
-
-                // if we get a null item back, something has gone wrong and we've already logged the error
-                if (newItem == null)
-                    return;
-
-                if (bean.getMethod() == FeedbackMethodType.GET_IMPLICIT_FB) {
-                    // This is a timed abort - add to the list of timed aborts for the watcher thread
-                    synchronized (timedAbortsToWatch) {
-                        timedAbortsToWatch.add(newItem);
-                    }
-                }
-
-                addItemToQueue(newItem);
+                processPrivacyNegotiationResponse(node, itemId, item);
 
             } else if (EventTypes.UF_PRIVACY_ACCESS_CONTROL.equals(node)) {
 
-                if (!(item instanceof UserFeedbackAccessControlEvent)) {
-                    log.warn(String.format("Received pubsub event with topic '%s', ID '%s' and class '%s' - Required UserFeedbackAccessControlEvent ",
-                            node,
-                            itemId,
-                            item.getClass().getCanonicalName()
-                    ));
-                    return;
-                }
+                processAccessControlEvent(node, itemId, item);
 
-                UserFeedbackAccessControlEvent bean = (UserFeedbackAccessControlEvent) item;
-                NotificationQueueItem newItem = NotificationQueueItem.forAccessControl(bean.getRequestId(), bean);
+            } else if (EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE.equals(node)
+                    || EventTypes.UF_PRIVACY_ACCESS_CONTROL_REMOVE_POPUP.equals(node)) {
 
-                addItemToQueue(newItem);
+                processAccessControlResponse(node, itemId, item);
 
-            } else if (EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE.equals(node)
-                    || EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP.equals(node)
-                    || EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE.equals(node)
-                    || EventTypes.UF_PRIVACY_ACCESS_CONTROL_REMOVE_POPUP.equals(node)
-                    || UserFeedbackEventTopics.EXPLICIT_RESPONSE.equals(node)
+            } else if (UserFeedbackEventTopics.REQUEST.equals(node)) {
+
+                processUserFeedbackEvent(node, itemId, item);
+
+            } else if (UserFeedbackEventTopics.EXPLICIT_RESPONSE.equals(node)
                     || UserFeedbackEventTopics.IMPLICIT_RESPONSE.equals(node)
                     || UserFeedbackEventTopics.COMPLETE.equals(node)) {
 
-                if (item instanceof UserFeedbackBean) {
-                    String id = ((UserFeedbackBean) item).getRequestId();
-                    String[] options = ((UserFeedbackBean) item).getOptions().toArray(new String[((UserFeedbackBean) item).getOptions().size()]);
-
-                    if (log.isDebugEnabled())
-                        log.debug(String.format("Received %s event for [%s] with options {%s}",
-                                node,
-                                id,
-                                Arrays.toString(options)));
-
-                    markQueueItemComplete(id, options);
-                } else if (item instanceof ExpFeedbackResultBean) {
-                    String id = ((ExpFeedbackResultBean) item).getRequestId();
-                    String[] options = ((ExpFeedbackResultBean) item).getFeedback().toArray(new String[((ExpFeedbackResultBean) item).getFeedback().size()]);
-
-                    if (log.isDebugEnabled())
-                        log.debug(String.format("Received %s event for [%s] with options {%s}",
-                                node,
-                                id,
-                                Arrays.toString(options)));
-
-                    markQueueItemComplete(id, options);
-                } else if (item instanceof ImpFeedbackResultBean) {
-                    String id = ((ImpFeedbackResultBean) item).getRequestId();
-                    String[] options = new String[]{((ImpFeedbackResultBean) item).isAccepted() ? "true" : "false"};
-                    markQueueItemComplete(id, options);
-                } else if (item instanceof UserFeedbackPrivacyNegotiationEvent) {
-                    String id = String.valueOf(((UserFeedbackPrivacyNegotiationEvent) item).getRequestId());
-
-                    if (log.isDebugEnabled())
-                        log.debug(String.format("Received %s event for [%s] with options {%s}",
-                                node,
-                                id,
-                                "null"));
-
-                    markQueueItemComplete(id, null);
-                } else {
-                    log.warn(String.format("Unknown response payload type %s, attempting to remove by message ID", item.getClass().getSimpleName()));
-
-                    if (log.isDebugEnabled())
-                        log.debug(String.format("Received %s event for [%s] with options {%s}",
-                                node,
-                                itemId,
-                                "null"));
-
-                    markQueueItemComplete(itemId, new String[]{});
-                }
+                processUserFeedbackResponse(node, itemId, item);
 
             } else {
+
                 String fmt = "Unknown event %s, payload type %s with ID %s";
                 log.warn(String.format(fmt,
                         node, item.getClass().getSimpleName(), itemId));
-            }
 
+                return;
+            }
 
             // notify the user
             // TODO: Fix PrimeFaces push
@@ -249,6 +163,150 @@ public class NotificationsController extends BasePageController {
             if (log.isDebugEnabled()) {
                 log.debug("numUnansweredNotifications=" + getNumUnansweredNotifications());
             }
+        }
+
+
+        private void processPrivacyNegotiationEvent(String node, String itemId, Object item) {
+            if (!(item instanceof UserFeedbackPrivacyNegotiationEvent)) {
+                log.warn(String.format("Received pubsub event with topic '%s', ID '%s' and class '%s' - Required UserFeedbackPrivacyNegotiationEvent",
+                        node,
+                        itemId,
+                        item.getClass().getCanonicalName()
+                ));
+                return;
+            }
+
+            UserFeedbackPrivacyNegotiationEvent ppn = (UserFeedbackPrivacyNegotiationEvent) item;
+            NotificationQueueItem newItem = NotificationQueueItem.forPrivacyPolicyNotification(String.valueOf(ppn.getRequestId()), ppn);
+
+            addItemToQueue(newItem);
+
+        }
+
+        private void processPrivacyNegotiationResponse(String node, String itemId, Object item) {
+            if (!(item instanceof UserFeedbackPrivacyNegotiationEvent)) {
+                log.warn(String.format("Received pubsub event with topic '%s', ID '%s' and class '%s' - Required UserFeedbackPrivacyNegotiationEvent",
+                        node,
+                        itemId,
+                        item.getClass().getCanonicalName()
+                ));
+                return;
+            }
+
+            String id = String.valueOf(((UserFeedbackPrivacyNegotiationEvent) item).getRequestId());
+
+            if (log.isDebugEnabled())
+                log.debug(String.format("Received %s event for [%s] with options {%s}",
+                        node,
+                        id,
+                        "null"));
+
+            markQueueItemComplete(id, null);
+        }
+
+        private void processAccessControlEvent(String node, String itemId, Object item) {
+            if (!(item instanceof UserFeedbackAccessControlEvent)) {
+                log.warn(String.format("Received pubsub event with topic '%s', ID '%s' and class '%s' - Required UserFeedbackAccessControlEvent",
+                        node,
+                        itemId,
+                        item.getClass().getCanonicalName()
+                ));
+                return;
+            }
+
+            UserFeedbackAccessControlEvent bean = (UserFeedbackAccessControlEvent) item;
+            NotificationQueueItem newItem = NotificationQueueItem.forAccessControl(bean.getRequestId(), bean);
+
+            addItemToQueue(newItem);
+        }
+
+        private void processAccessControlResponse(String node, String itemId, Object item) {
+            if (!(item instanceof UserFeedbackAccessControlEvent)) {
+                log.warn(String.format("Received pubsub event with topic '%s', ID '%s' and class '%s' - Required UserFeedbackAccessControlEvent",
+                        node,
+                        itemId,
+                        item.getClass().getCanonicalName()
+                ));
+                return;
+            }
+
+
+            String id = String.valueOf(((UserFeedbackAccessControlEvent) item).getRequestId());
+
+            if (log.isDebugEnabled())
+                log.debug(String.format("Received %s event for [%s] with options {%s}",
+                        node,
+                        id,
+                        "null"));
+
+            markQueueItemComplete(id, null);
+        }
+
+        private void processUserFeedbackEvent(String node, String itemId, Object item) {
+            if (!(item instanceof UserFeedbackBean)) {
+                log.warn(String.format("Received pubsub event with topic '%s', ID '%s' and class '%s' - Required UserFeedbackBean ",
+                        node,
+                        itemId,
+                        item.getClass().getCanonicalName()
+                ));
+                return;
+            }
+
+            UserFeedbackBean bean = (UserFeedbackBean) item;
+            NotificationQueueItem newItem = createNotificationQueueItemFromUserFeedbackBean(bean);
+
+            // if we get a null item back, something has gone wrong and we've already logged the error
+            if (newItem == null)
+                return;
+
+            if (bean.getMethod() == FeedbackMethodType.GET_IMPLICIT_FB) {
+                // This is a timed abort - add to the list of timed aborts for the watcher thread
+                synchronized (timedAbortsToWatch) {
+                    timedAbortsToWatch.add(newItem);
+                }
+            }
+
+            addItemToQueue(newItem);
+        }
+
+        private void processUserFeedbackResponse(String node, String itemId, Object item) {
+
+            String id;
+            String[] options;
+
+            if (item instanceof UserFeedbackBean) {
+
+                id = ((UserFeedbackBean) item).getRequestId();
+                options = ((UserFeedbackBean) item).getOptions().toArray(new String[((UserFeedbackBean) item).getOptions().size()]);
+
+            } else if (item instanceof ExpFeedbackResultBean) {
+
+                id = ((ExpFeedbackResultBean) item).getRequestId();
+                options = ((ExpFeedbackResultBean) item).getFeedback().toArray(new String[((ExpFeedbackResultBean) item).getFeedback().size()]);
+
+            } else if (item instanceof ImpFeedbackResultBean) {
+
+                id = ((ImpFeedbackResultBean) item).getRequestId();
+                options = new String[]{((ImpFeedbackResultBean) item).isAccepted() ? "true" : "false"};
+
+            } else {
+
+                log.warn(String.format("Received pubsub event with topic '%s', ID '%s' and class '%s' - Required UserFeedbackBean, ExpFeedbackResultBean or ImpFeedbackResultBean",
+                        node,
+                        itemId,
+                        item.getClass().getCanonicalName()
+                ));
+                return;
+            }
+
+            if (log.isDebugEnabled())
+                log.debug(String.format("Received %s event for [%s] with options {%s}",
+                        node,
+                        id,
+                        Arrays.toString(options)));
+
+            markQueueItemComplete(id, options);
+
         }
 
     }
@@ -263,7 +321,7 @@ public class NotificationsController extends BasePageController {
             pubSubListener.registerForEvents();
 
             // pre-populate the list of notifications
-            reloadFromRepository(DEFAULT_FETCH_COUNT);
+            reloadIncompleteEvents();
         }
 
         @Override
@@ -341,11 +399,17 @@ public class NotificationsController extends BasePageController {
     @ManagedProperty(value = "#{userFeedback}")
     private IUserFeedback userFeedback;
 
-    @ManagedProperty(value = "#{userFeedbackHistoryRepository}")
-    private IUserFeedbackHistoryRepository userFeedbackHistoryRepository;
+    @ManagedProperty(value = "#{internalUserFeedback}")
+    private IInternalUserFeedback internalUserFeedback;
 
-    @ManagedProperty(value = "#{privacyPolicyNegotiationHistoryRepository}")
-    private IPrivacyPolicyNegotiationHistoryRepository privacyPolicyNegotiationHistoryRepository;
+//    @ManagedProperty(value = "#{userFeedbackHistoryRepository}")
+//    private IUserFeedbackHistoryRepository userFeedbackHistoryRepository;
+//
+//    @ManagedProperty(value = "#{privacyPolicyNegotiationHistoryRepository}")
+//    private IPrivacyPolicyNegotiationHistoryRepository privacyPolicyNegotiationHistoryRepository;
+//
+//    @ManagedProperty(value = "#{accessControlHistoryRepository}")
+//    private IAccessControlHistoryRepository accessControlHistoryRepository;
 
     private final List<NotificationQueueItem> timedAbortsToWatch = new ArrayList<NotificationQueueItem>();
     // NB: to avoid deadlocks, always synchronise on unansweredNotifications, not on unansweredNotificationIDs
@@ -396,40 +460,59 @@ public class NotificationsController extends BasePageController {
         this.userService.addLoginListener(loginListener);
     }
 
-    @SuppressWarnings("UnusedDeclaration")
-    public IPrivacyPolicyNegotiationHistoryRepository getPrivacyPolicyNegotiationHistoryRepository() {
-        return privacyPolicyNegotiationHistoryRepository;
-    }
+//    @SuppressWarnings("UnusedDeclaration")
+//    public IPrivacyPolicyNegotiationHistoryRepository getPrivacyPolicyNegotiationHistoryRepository() {
+//        return privacyPolicyNegotiationHistoryRepository;
+//    }
+//
+//    @SuppressWarnings("UnusedDeclaration")
+//    public void setPrivacyPolicyNegotiationHistoryRepository(IPrivacyPolicyNegotiationHistoryRepository privacyPolicyNegotiationHistoryRepository) {
+//        if (log.isDebugEnabled())
+//            log.debug("setPrivacyPolicyNegotiationHistoryRepository() = " + privacyPolicyNegotiationHistoryRepository);
+//
+//        this.privacyPolicyNegotiationHistoryRepository = privacyPolicyNegotiationHistoryRepository;
+//    }
+//
+//    @SuppressWarnings("UnusedDeclaration")
+//    public IUserFeedbackHistoryRepository getUserFeedbackHistoryRepository() {
+//        return userFeedbackHistoryRepository;
+//    }
+//
+//    @SuppressWarnings("UnusedDeclaration")
+//    public void setUserFeedbackHistoryRepository(IUserFeedbackHistoryRepository userFeedbackHistoryRepository) {
+//        if (log.isDebugEnabled())
+//            log.debug("setUserFeedbackHistoryRepository() = " + userFeedbackHistoryRepository);
+//
+//        this.userFeedbackHistoryRepository = userFeedbackHistoryRepository;
+//    }
+//
+//    @SuppressWarnings("UnusedDeclaration")
+//    public IAccessControlHistoryRepository getAccessControlHistoryRepository() {
+//        return accessControlHistoryRepository;
+//    }
+//
+//    @SuppressWarnings("UnusedDeclaration")
+//    public void setAccessControlHistoryRepository(IAccessControlHistoryRepository accessControlHistoryRepository) {
+//        if (log.isDebugEnabled())
+//            log.debug("setAccessControlHistoryRepository() = " + accessControlHistoryRepository);
+//
+//        this.accessControlHistoryRepository = accessControlHistoryRepository;
+//    }
 
-    @SuppressWarnings("UnusedDeclaration")
-    public void setPrivacyPolicyNegotiationHistoryRepository(IPrivacyPolicyNegotiationHistoryRepository privacyPolicyNegotiationHistoryRepository) {
-        if (log.isDebugEnabled())
-            log.debug("setPrivacyPolicyNegotiationHistoryRepository() = " + privacyPolicyNegotiationHistoryRepository);
-
-        this.privacyPolicyNegotiationHistoryRepository = privacyPolicyNegotiationHistoryRepository;
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    public IUserFeedbackHistoryRepository getUserFeedbackHistoryRepository() {
-        return userFeedbackHistoryRepository;
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    public void setUserFeedbackHistoryRepository(IUserFeedbackHistoryRepository userFeedbackHistoryRepository) {
-        if (log.isDebugEnabled())
-            log.debug("setUserFeedbackHistoryRepository() = " + userFeedbackHistoryRepository);
-
-        this.userFeedbackHistoryRepository = userFeedbackHistoryRepository;
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
     public IUserFeedback getUserFeedback() {
         return userFeedback;
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     public void setUserFeedback(IUserFeedback userFeedback) {
         this.userFeedback = userFeedback;
+    }
+
+    public IInternalUserFeedback getInternalUserFeedback() {
+        return internalUserFeedback;
+    }
+
+    public void setInternalUserFeedback(IInternalUserFeedback internalUserFeedback) {
+        this.internalUserFeedback = internalUserFeedback;
     }
 
     @PostConstruct
@@ -533,73 +616,82 @@ public class NotificationsController extends BasePageController {
     }
 
     public void clearNotifications() {
-        reloadFromRepository(0);
+        reloadIncompleteEvents();
     }
 
-    private void reloadFromRepository(int howMany) {
+    private void reloadIncompleteEvents() {
         if (log.isDebugEnabled())
-            log.debug("Loading most recent " + howMany + " notifications");
+            log.debug("Loading incomplete UF, PPN and AC notifications");
 
-        List<UserFeedbackBean> userFeedbackBeans;
-        List<UserFeedbackPrivacyNegotiationEvent> userFeedbackPrivacyNegotiationEvents;
+
+        if (internalUserFeedback == null) {
+            log.warn("internalUserFeedback is null - reloading directly from hibernate repositories (some integration tests might not work)");
+        }
+
+        List<UserFeedbackBean> userFeedbackBeans = new ArrayList<UserFeedbackBean>();
+        List<UserFeedbackPrivacyNegotiationEvent> privacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>();
+        List<UserFeedbackAccessControlEvent> accessControlEvents = new ArrayList<UserFeedbackAccessControlEvent>();
 
         try {
-            userFeedbackBeans = userFeedbackHistoryRepository.listPrevious(howMany);
+            if (internalUserFeedback != null)
+                userFeedbackBeans = internalUserFeedback.listIncompleteFeedbackBeans();
+//            else
+//                userFeedbackBeans = userFeedbackHistoryRepository.listIncomplete();
         } catch (Exception ex) {
             log.warn("Recoverable error: Error recalling UF records: " + ex.getMessage());
-            userFeedbackBeans = new ArrayList<UserFeedbackBean>();
         }
+
         try {
-            userFeedbackPrivacyNegotiationEvents = privacyPolicyNegotiationHistoryRepository.listPrevious(howMany);
+            if (internalUserFeedback != null)
+                privacyNegotiationEvents = internalUserFeedback.listIncompletePrivacyRequests();
+//            else
+//                privacyNegotiationEvents = privacyPolicyNegotiationHistoryRepository.listIncomplete();
         } catch (Exception ex) {
             log.warn("Recoverable error: Error recalling PPN records: " + ex.getMessage());
-            userFeedbackPrivacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>();
         }
-
-        replaceCacheWithList(userFeedbackBeans, userFeedbackPrivacyNegotiationEvents);
-    }
-
-    private void reloadFromRepository(Date sinceWhen) {
-        if (log.isDebugEnabled())
-            log.debug("Loading notifications since " + sinceWhen);
-
-        List<UserFeedbackBean> userFeedbackBeans;
-        List<UserFeedbackPrivacyNegotiationEvent> userFeedbackPrivacyNegotiationEvents;
 
         try {
-            userFeedbackBeans = userFeedbackHistoryRepository.listSince(sinceWhen);
+            if (internalUserFeedback != null)
+                accessControlEvents = internalUserFeedback.listIncompleteAccessRequests();
+//            else
+//                accessControlEvents = accessControlHistoryRepository.listIncomplete();
         } catch (Exception ex) {
-            log.warn("Recoverable error: Error recalling UF records: " + ex.getMessage());
-            userFeedbackBeans = new ArrayList<UserFeedbackBean>();
-        }
-        try {
-            userFeedbackPrivacyNegotiationEvents = privacyPolicyNegotiationHistoryRepository.listSince(sinceWhen);
-        } catch (Exception ex) {
-            log.warn("Recoverable error: Error recalling PPN records: " + ex.getMessage());
-            userFeedbackPrivacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>();
+            log.warn("Recoverable error: Error recalling AC records: " + ex.getMessage());
         }
 
-        replaceCacheWithList(userFeedbackBeans, userFeedbackPrivacyNegotiationEvents);
+        replaceCacheWithList(userFeedbackBeans, privacyNegotiationEvents, accessControlEvents);
     }
 
-    private void replaceCacheWithList(List<UserFeedbackBean> ufList, List<UserFeedbackPrivacyNegotiationEvent> ppnList) {
+    private void replaceCacheWithList(List<UserFeedbackBean> ufList, List<UserFeedbackPrivacyNegotiationEvent> ppnList, List<UserFeedbackAccessControlEvent> acList) {
         synchronized (allNotifications) {
             synchronized (unansweredNotifications) {
                 if (log.isDebugEnabled())
-                    log.debug("Replacing cache with lists");
+                    log.debug(String.format("Replacing cache with %s UF events, %s PPN events, %S AC events",
+                            ufList != null ? ufList.size() : 0,
+                            ppnList != null ? ppnList.size() : 0,
+                            acList != null ? acList.size() : 0));
 
                 allNotifications.clear();
                 unansweredNotifications.clear();
                 allNotificationIDs.clear();
 
-                for (UserFeedbackBean uf : ufList) {
-                    NotificationQueueItem item = createNotificationQueueItemFromUserFeedbackBean(uf);
-                    addItemToQueue(item);
-                }
-                for (UserFeedbackPrivacyNegotiationEvent ppn : ppnList) {
-                    NotificationQueueItem item = NotificationQueueItem.forPrivacyPolicyNotification(ppn.getRequestId(), ppn);
-                    addItemToQueue(item);
-                }
+                if (ufList != null)
+                    for (UserFeedbackBean uf : ufList) {
+                        NotificationQueueItem item = createNotificationQueueItemFromUserFeedbackBean(uf);
+                        addItemToQueue(item);
+                    }
+
+                if (ppnList != null)
+                    for (UserFeedbackPrivacyNegotiationEvent ppn : ppnList) {
+                        NotificationQueueItem item = NotificationQueueItem.forPrivacyPolicyNotification(ppn.getRequestId(), ppn);
+                        addItemToQueue(item);
+                    }
+
+                if (acList != null)
+                    for (UserFeedbackAccessControlEvent ac : acList) {
+                        NotificationQueueItem item = NotificationQueueItem.forAccessControl(ac.getRequestId(), ac);
+                        addItemToQueue(item);
+                    }
             }
         }
     }

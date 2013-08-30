@@ -14,45 +14,45 @@
         <p:panelGrid columns="3">
             <p:row>
                 <p:commandButton value="Send PPN"
-                                 actionListener="#{ppNegotiationTest.sendPpnEvent}"
+                                 actionListener="#{ufTestController.sendPpnEvent}"
                                  process="@this"/>
                 <p:commandButton value="Send Simple Msg"
-                                 actionListener="#{ppNegotiationTest.sendSimpleNotificationEvent}"
+                                 actionListener="#{ufTestController.sendSimpleNotificationEvent}"
                                  process="@this"/>
             </p:row>
             <p:row>
                 <p:commandButton value="Send UF Ack/Nack"
-                                 actionListener="#{ppNegotiationTest.sendAckNackEvent}"
+                                 actionListener="#{ufTestController.sendAckNackEvent}"
                                  process="@this"/>
                 <p:commandButton value="Send UF Select One"
-                                 actionListener="#{ppNegotiationTest.sendSelectOneEvent}"
+                                 actionListener="#{ufTestController.sendSelectOneEvent}"
                                  process="@this"/>
                 <p:commandButton value="Send UF Select Many"
-                                 actionListener="#{ppNegotiationTest.sendSelectManyEvent}"
+                                 actionListener="#{ufTestController.sendSelectManyEvent}"
                                  process="@this"/>
             </p:row>
             <p:row>
                 <p:commandButton value="Send UF Ack/Nack (blocking)"
-                                 actionListener="#{ppNegotiationTest.sendAckNackEvent}"
+                                 actionListener="#{ufTestController.sendAckNackEvent}"
                                  process="@this"
                                  disabled="true"/>
                 <p:commandButton value="Send UF Select One (blocking)"
-                                 actionListener="#{ppNegotiationTest.sendSelectOneEvent_blocking}"
+                                 actionListener="#{ufTestController.sendSelectOneEvent_blocking}"
                                  process="@this"/>
                 <p:commandButton value="Send UF Select Many (blocking)"
-                                 actionListener="#{ppNegotiationTest.sendSelectManyEvent}"
+                                 actionListener="#{ufTestController.sendSelectManyEvent}"
                                  process="@this"
                                  disabled="true"/>
             </p:row>
             <p:row>
                 <p:commandButton value="Send UF Timed Abort (30s)"
-                                 actionListener="#{ppNegotiationTest.sendTimedAbortEvent(30)}"
+                                 actionListener="#{ufTestController.sendTimedAbortEvent(30)}"
                                  process="@this"/>
                 <p:commandButton value="Send UF Timed Abort (1m30s)"
-                                 actionListener="#{ppNegotiationTest.sendTimedAbortEvent(90)}"
+                                 actionListener="#{ufTestController.sendTimedAbortEvent(90)}"
                                  process="@this"/>
                 <p:commandButton value="Send UF Timed Abort (1h1m)"
-                                 actionListener="#{ppNegotiationTest.sendTimedAbortEvent(3660)}"
+                                 actionListener="#{ufTestController.sendTimedAbortEvent(3660)}"
                                  process="@this"/>
 
             </p:row>
@@ -66,7 +66,7 @@
                 </p:panel>
 
                 <p:commandButton value="Send UF Access Control"
-                                 actionListener="#{ppNegotiationTest.sendAccessControlEvent}"
+                                 actionListener="#{ufTestController.sendAccessControlEvent}"
                                  process="@this"/>
             </p:row>
             <p:row>
@@ -75,6 +75,11 @@
                 <p:commandButton id="resetNotificationsController"
                                  value="Reset Notifications Controller"
                                  actionListener="#{notifications.clearNotifications()}"
+                                 process="@this"/>
+
+                <p:commandButton id="resetUserFeedback"
+                                 value="Reset UserFeedback Module"
+                                 actionListener="#{ufTestController.resetUserFeedback()}"
                                  process="@this"/>
             </p:row>
 
