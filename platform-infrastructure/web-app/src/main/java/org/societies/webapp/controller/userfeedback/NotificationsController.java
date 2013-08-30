@@ -174,6 +174,10 @@ public class NotificationsController extends BasePageController {
 
             addItemToQueue(newItem);
 
+            synchronized (unansweredPrivacyNegotiationEvents) {
+                unansweredPrivacyNegotiationEvents.put(ppn.getRequestId(), ppn);
+            }
+
         }
 
         private void processPrivacyNegotiationResponse(String node, String itemId, Object item) {
@@ -195,6 +199,11 @@ public class NotificationsController extends BasePageController {
                         "null"));
 
             markQueueItemComplete(id, null);
+
+            synchronized (unansweredPrivacyNegotiationEvents) {
+                unansweredPrivacyNegotiationEvents.remove(id);
+            }
+
         }
 
         private void processAccessControlEvent(String node, String itemId, Object item) {
@@ -211,6 +220,11 @@ public class NotificationsController extends BasePageController {
             NotificationQueueItem newItem = NotificationQueueItem.forAccessControl(bean.getRequestId(), bean);
 
             addItemToQueue(newItem);
+
+            synchronized (unansweredAccessControlEvents) {
+                unansweredAccessControlEvents.put(bean.getRequestId(), bean);
+            }
+
         }
 
         private void processAccessControlResponse(String node, String itemId, Object item) {
@@ -233,6 +247,11 @@ public class NotificationsController extends BasePageController {
                         "null"));
 
             markQueueItemComplete(id, null);
+
+            synchronized (unansweredAccessControlEvents) {
+                unansweredAccessControlEvents.remove(id);
+            }
+
         }
 
         private void processUserFeedbackEvent(String node, String itemId, Object item) {
@@ -412,6 +431,9 @@ public class NotificationsController extends BasePageController {
     // NB: to avoid deadlocks, always synchronise on allNotifications first, then on allNotificationIDs
     private final List<NotificationQueueItem> allNotifications = new LinkedList<NotificationQueueItem>();
     private final Set<String> allNotificationIDs = new HashSet<String>();
+
+    private final Map<String, UserFeedbackPrivacyNegotiationEvent> unansweredPrivacyNegotiationEvents = new HashMap<String, UserFeedbackPrivacyNegotiationEvent>();
+    private final Map<String, UserFeedbackAccessControlEvent> unansweredAccessControlEvents = new HashMap<String, UserFeedbackAccessControlEvent>();
 
     public NotificationsController() {
         log.debug("NotificationsController ctor()");
@@ -601,6 +623,18 @@ public class NotificationsController extends BasePageController {
 
     public void clearNotifications() {
         reloadIncompleteEvents();
+    }
+
+    public UserFeedbackPrivacyNegotiationEvent getPrivacyNegotiationEvent(String negotiationID) {
+        synchronized (unansweredPrivacyNegotiationEvents) {
+            return unansweredPrivacyNegotiationEvents.get(negotiationID);
+        }
+    }
+
+    public UserFeedbackAccessControlEvent getAcceessControlEvent(String eventId) {
+        synchronized (unansweredAccessControlEvents) {
+            return unansweredAccessControlEvents.get(eventId);
+        }
     }
 
     private void reloadIncompleteEvents() {

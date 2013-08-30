@@ -2,13 +2,14 @@ package org.societies.webapp.controller.userfeedback;
 
 import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyConditionsConstantValues;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.*;
 import org.societies.webapp.controller.BasePageController;
-import org.societies.webapp.service.PrivacyPolicyNegotiationListener;
 import org.societies.webapp.wrappers.RequestItemWrapper;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
@@ -31,10 +32,14 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
         return "";
     }
 
-    @ManagedProperty(value = "#{privacyPolicyNegotiationListener}")
-    private PrivacyPolicyNegotiationListener negotiationListener;
+    @ManagedProperty(value = "#{notifications}")
+    private NotificationsController notificationsController;
+
+    @ManagedProperty(value = "#{userFeedback}")
+    private IUserFeedback userFeedback;
 
     private String negotiationID;
+    private UserFeedbackPrivacyNegotiationEvent event;
 
     public PrivacyPolicyNegotiationController() {
         if (log.isDebugEnabled())
@@ -42,12 +47,28 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
     }
 
+    public NotificationsController getNotificationsController() {
+        return notificationsController;
+    }
+
+    public void setNotificationsController(NotificationsController notificationsController) {
+        this.notificationsController = notificationsController;
+    }
+
+    public IUserFeedback getUserFeedback() {
+        return userFeedback;
+    }
+
+    public void setUserFeedback(IUserFeedback userFeedback) {
+        this.userFeedback = userFeedback;
+    }
+
     @PostConstruct
     public void initMethod() {
         if (log.isDebugEnabled())
             log.debug("PrivacyPolicyNegotiationController init()");
         negotiationID = getIdFromQueryString();
-        UserFeedbackPrivacyNegotiationEvent event = negotiationListener.getNegotiationEvent(negotiationID);
+        event = notificationsController.getPrivacyNegotiationEvent(negotiationID);
 
         if (event != null) {
             if (log.isDebugEnabled())
@@ -57,18 +78,6 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
         } else {
             log.warn("Event not found for ID " + negotiationID);
         }
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    public PrivacyPolicyNegotiationListener getNegotiationListener() {
-        return negotiationListener;
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    public void setNegotiationListener(PrivacyPolicyNegotiationListener negotiationListener) {
-        if (log.isDebugEnabled())
-            log.debug("setNegotiationListener()");
-        this.negotiationListener = negotiationListener;
     }
 
     @SuppressWarnings("MethodMayBeStatic")
@@ -94,13 +103,12 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     }
 
     public UserFeedbackPrivacyNegotiationEvent getCurrentNegotiationEvent() {
-        return negotiationListener.getNegotiationEvent(negotiationID);
+        return event;
     }
 
     public String completeNegotiationAction() {
         log.debug("completeNegotiation() id=" + negotiationID);
 
-        UserFeedbackPrivacyNegotiationEvent event = negotiationListener.getNegotiationEvent(negotiationID);
         ResponsePolicy responsePolicy = event.getResponsePolicy();
         NegotiationDetailsBean negotiationDetails = event.getNegotiationDetails();
 
@@ -130,9 +138,18 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
         prepareEventForTransmission(responsePolicy);
 
-        negotiationListener.completeNegotiation(negotiationID);
+        responsePolicy.setNegotiationStatus(NegotiationStatus.ONGOING);
 
-        return checkNextNegotiation();
+        try {
+            userFeedback.submitPrivacyNegotiationResponse(negotiationID, negotiationDetails, responsePolicy);
+        } catch (Exception e) {
+            addGlobalMessage("Error publishing notification of completed negotiation",
+                    e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
+            log.error("Error publishing notification of completed negotiation", e);
+        }
+
+        return "home"; // previously, could redirect to next negotiation - but this makes no sense now
     }
 
     public String cancelNegotiationAction() {
@@ -143,23 +160,19 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
         prepareEventForTransmission(responsePolicy);
 
-        negotiationListener.cancelNegotiation(negotiationID);
+        responsePolicy.setNegotiationStatus(NegotiationStatus.FAILED);
 
-        return checkNextNegotiation();
+        try {
+            userFeedback.submitPrivacyNegotiationResponse(negotiationID, negotiationDetails, responsePolicy);
+        } catch (Exception e) {
+            addGlobalMessage("Error publishing notification of completed negotiation",
+                    e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
+            log.error("Error publishing notification of completed negotiation", e);
+        }
+
+        return "home"; // previously, could redirect to next negotiation - but this makes no sense now
     }
-
-    private String checkNextNegotiation() {
-        if (log.isDebugEnabled())
-            if ((negotiationListener.getQueuedNegotiationCount() > 0))
-                log.debug("Next negotiation ID should be " + negotiationListener.getNextNegotiationID());
-            else
-                log.debug("No more negotiations in queue");
-
-        return (negotiationListener.getQueuedNegotiationCount() > 0)
-                ? "next" // redirect to next negotiation page
-                : "home"; // redirect to home
-    }
-
 
     private void prepareEventForGUI(UserFeedbackPrivacyNegotiationEvent event) {
         log.debug("prepareEventForGUI()");
