@@ -85,11 +85,11 @@ import org.springframework.osgi.util.OsgiListenerUtils;
  * 
  */
 
-public class ServiceRegistryListener implements BundleContextAware,
+public class OsgiRegistryListener implements BundleContextAware,
 		ServiceListener, BundleListener {
 
 	private BundleContext bctx;
-	private static Logger log = LoggerFactory.getLogger(ServiceRegistryListener.class);
+	private static Logger log = LoggerFactory.getLogger(OsgiRegistryListener.class);
 	private IServiceRegistry serviceReg;
 	private ICommManager commMngr;
 	private INegotiationProviderServiceMgmt negotiationProvider;
@@ -145,7 +145,7 @@ public class ServiceRegistryListener implements BundleContextAware,
 		this.commMngr = commMngr;
 	}
 	
-	public ServiceRegistryListener() {
+	public OsgiRegistryListener() {
 		log.info("Service RegistryListener Bean Instantiated");
 	}
 
