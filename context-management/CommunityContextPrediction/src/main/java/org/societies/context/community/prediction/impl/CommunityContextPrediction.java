@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske druΕΎbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAΓ‡ΓƒO, SA (PTIN), IBM Corp., 
+ * informacijske druΞ•Ξ�be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAΞ“β€΅Ξ“Ζ’O, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -23,6 +23,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.societies.context.community.prediction.impl;
+//package org.societies.context.community.prediction.impl;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;
@@ -39,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -51,7 +51,6 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
-import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
@@ -59,6 +58,7 @@ import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.context.api.community.prediction.ICommunityCtxPredictionMgr;
+import org.societies.context.api.user.prediction.IUserCtxPredictionMgr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
@@ -73,6 +73,8 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 
 	@Autowired(required=false)
 	private ICommManager commMngr;
+	
+	private IUserCtxPredictionMgr userCtxPrediction;
 
 	public CommunityContextPrediction() {
 		LOG.info(this.getClass() + "CommunityContextPrediction instantiated ");
@@ -147,54 +149,68 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 			Requestor requestorCSS = new Requestor(identityOfOwner);
 
 			communityAttr = (CtxAttribute) internalCtxBroker.retrieveAttribute(ctxAttributeIdentifier, false).get();
-			
+
 			if (communityAttr!=null){
-				
+
 				String attributeType = ctxAttributeIdentifier.getType().toString();
 
 				// checks if attribute type is included in the list of types that can be estimated
-				
+
 				if(attributeTypesSetToBeChecked.contains(attributeType)){
 
 					//List<CtxHistoryAttribute> retrievedCommunityHistoryAtributes = internalCtxBroker.retrieveHistory(requestorCSS, ctxAttributeIdentifier, null, null).get();
 					//Set<CtxEntityIdentifier> communityMembers = ((CommunityCtxEntity) retrievedCommunityHistoryAtributes).getMembers();
 					//List<CtxAttribute> retrievedCommunityAtributes = internalCtxBroker.retrieveFuture(requestorCSS, ctxAttributeIdentifier, null).get();
 					//Set<CtxEntityIdentifier> communityMembers = ((CommunityCtxEntity) retrievedCommunityAtributes).getMembers();
-				
+
 					CommunityCtxEntity retrievedCommunity = (CommunityCtxEntity) internalCtxBroker.retrieve(communityCtxId).get();
 					Set<CtxEntityIdentifier> communityMembers = retrievedCommunity.getMembers();
-					
+					List<CtxAttribute> listOfFutureCtxAttributes = new ArrayList<CtxAttribute>();
+
 					for(CtxEntityIdentifier comMemb:communityMembers){
 						IndividualCtxEntity individualMember = (IndividualCtxEntity) internalCtxBroker.retrieve(comMemb).get();
-
-						LOG.info("predictCommunityCtx 3 "+ individualMember.getId());
-
 						Set<CtxAttribute> individualCSSAttributeList = individualMember.getAttributes(attributeType);	
 
-						for (CtxAttribute ca:individualCSSAttributeList){
-							CtxAttributeIdentifier ctxAttrId = ca.getId();
-							List<CtxAttribute> listOfFutureCtxAttribute = internalCtxBroker.retrieveFuture(requestorCSS, ctxAttrId, null).get();
-							if (listOfFutureCtxAttribute.size()==1){
-								if(listOfFutureCtxAttribute.get(0).getIntegerValue()!=null){
-									integerAttrValues.add(listOfFutureCtxAttribute.get(0).getIntegerValue());
+						if (individualCSSAttributeList.size()==1){
+
+							for (CtxAttribute ca:individualCSSAttributeList){
+								CtxAttributeIdentifier ctxAttrId = ca.getId();
+
+								//List<CtxAttribute> listOfFutureCtxAttribute = internalCtxBroker.retrieveFuture(requestorCSS, ctxAttrId, null).get();
+
+								CtxAttribute predictedCtxAttribute = userCtxPrediction.predictContext(ctxAttrId, null);
+
+								if (predictedCtxAttribute!=null){
+									listOfFutureCtxAttributes.add(predictedCtxAttribute);
 								}
-								if(listOfFutureCtxAttribute.get(0).getStringValue()!= null){
-									stringAttrValues.add(listOfFutureCtxAttribute.get(0).getStringValue());
 							}
-								if(listOfFutureCtxAttribute.get(0).getDoubleValue()!= null){
-									doubleAttrValues.add(listOfFutureCtxAttribute.get(0).getDoubleValue());
-								}						
+
+						}
+
+						if (listOfFutureCtxAttributes.size()!=0 && listOfFutureCtxAttributes.get(0).getIntegerValue()!=null){
+							for (CtxAttribute futAtt:listOfFutureCtxAttributes){
+								integerAttrValues.add(futAtt.getIntegerValue());
 							}
-							else{
-								LOG.info("Cannot calculate the predicted community value");
-							}
-							
+
+						if(listOfFutureCtxAttributes.size()!=0 && listOfFutureCtxAttributes.get(0).getStringValue()!= null){
+							for (CtxAttribute futAtt:listOfFutureCtxAttributes){
+									stringAttrValues.add(futAtt.getStringValue());
+								}							}
+						if(listOfFutureCtxAttributes.size()!=0 && listOfFutureCtxAttributes.get(0).getDoubleValue()!= null){
+							for (CtxAttribute futAtt:listOfFutureCtxAttributes){
+									doubleAttrValues.add(futAtt.getDoubleValue());
+								}							
+							}						
+						}
+						else{
+							LOG.info("Cannot calculate the predicted community value");
+
 						}
 					}
 
 					// Integer values
 					// average, median, 
-					if( !integerAttrValues.isEmpty()){
+					if (!integerAttrValues.isEmpty()){
 						LOG.info("predictCommunityCtx 4for integer" );
 						//average
 						meanPredictedIntegerValue = ccpNumMean(integerAttrValues);	
@@ -261,24 +277,24 @@ public class CommunityContextPrediction implements ICommunityCtxPredictionMgr {
 						}	
 						HashMap<String,Integer> occurences = new HashMap<String,Integer>();
 						occurences = ccpStringPairs(finalArrayStringList);
-						LOG.info("estimateCommunityCtx 5 string "+ modeStringValue);
 						complexValue.setPairs(occurences);
 					}
+
+					// calculate double
+					if(!doubleAttrValues.isEmpty()){
+						//average
+						// TODO add a method cceNumMean that will take array of doubles
+						//range
+
+						//median
+
+						//mode
+					}
+
+
 					communityAttr.setComplexValue(complexValue);
-					LOG.info("estimateCommunityCtx 6 communityAttr "+ communityAttr.getId());
 				}
 
-				// calculate double
-				if(!doubleAttrValues.isEmpty()){
-					//average
-					// TODO add a method cceNumMean that will take array of doubles
-					//range
-
-					//median
-
-					//mode
-				}
-				
 			}			
 
 		} catch (InterruptedException e1) {
