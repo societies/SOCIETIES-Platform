@@ -199,7 +199,7 @@ public class UserFeedbackTestController extends BasePageController {
     }
 
     public void sendAckNackEvent() {
-        String proposalText = "Do you like " + randomIdentifier() + "s?";
+        String proposalText = "Do you like " + randomIdentifier() + "?";
         String[] options = new String[]{"Yes", "No"}; // this actually has no effect for acknack
 
         log.info("Acknack: Sending event");
@@ -232,7 +232,7 @@ public class UserFeedbackTestController extends BasePageController {
         String proposalText = "What colour is a " + randomIdentifier() + "? (testing)";
 
         log.info("SelectOne: Sending event");
-        ExpProposalContent content = new ExpProposalContent(proposalText, FEATURES);
+        ExpProposalContent content = new ExpProposalContent(proposalText, COLORS);
         userFeedback.getExplicitFBAsync(ExpProposalType.RADIOLIST, content, new IUserFeedbackResponseEventListener<List<String>>() {
             @Override
             public void responseReceived(List<String> result) {
@@ -246,7 +246,7 @@ public class UserFeedbackTestController extends BasePageController {
     }
 
     public void sendSelectManyEvent() {
-        String proposalText = "What colour is a " + randomIdentifier() + "? (testing)";
+        String proposalText = "Select features of a " + randomIdentifier() + ": (testing)";
 
         log.info("SelectMany: Sending event");
         ExpProposalContent content = new ExpProposalContent(proposalText, FEATURES);
@@ -378,6 +378,6 @@ public class UserFeedbackTestController extends BasePageController {
     private static String randomIdentifier() {
         return COLORS[random.nextInt(COLORS.length)]
                 + " " + ANIMALS[random.nextInt(ANIMALS.length)]
-                + " " + random.nextInt(Integer.MAX_VALUE);
+                + " " + random.nextInt(10000);
     }
 }
