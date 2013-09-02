@@ -103,6 +103,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	private IDeviceManager deviceMngr;
 	private IUserFeedback userFeedback;
 	private IEventMgr eventMgr;
+	private String serviceDir;
+
 	protected static boolean restart;
 	private static HashMap<Long,BlockingQueue<Service>> installServiceMap = new HashMap<Long,BlockingQueue<Service>>();
 	private static HashMap<Long,BlockingQueue<Service>> uninstallServiceMap = new HashMap<Long,BlockingQueue<Service>>();
@@ -110,7 +112,19 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 
 	private SocietiesEventListener eventListener;
 
+	private INetworkNode thisNode;
+
+	private IIdentity myId;
+
 	private static ExecutorService executor;
+	
+	public String getServiceDir() {
+		return serviceDir;
+	}
+
+	public void setServiceDir(String serviceDir) {
+		this.serviceDir = serviceDir;
+	}
 	
 	public IEventMgr getEventMgr(){
 		return eventMgr;
@@ -195,6 +209,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				logger.debug("Now creating the listener for events!");
 
 			this.eventListener = new SocietiesEventListener(this);
+			
+			thisNode = getCommMngr().getIdManager().getThisNetworkNode();
+			myId = getCommMngr().getIdManager().fromJid(thisNode.getJid());
 			
 		} catch (Exception e) {
 			logger.error("Exception registering for CIS events");
@@ -624,10 +641,18 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					
 				Future<ServiceControlResult> asyncResult = null;
 				
-				URL bundleLocation;
+				URL bundleLocation = null;
 				List<URI> urlList = negotiationResult.getServiceUri();
-				if(!urlList.isEmpty())
-					bundleLocation = negotiationResult.getServiceUri().get(0).toURL();
+				if(!urlList.isEmpty()){
+					logger.debug("More than one service client detected, finding the the virgo one!");
+					for(URI uri: urlList){
+						logger.debug("Service Client URI: {}", uri);
+						if(uri.toString().contains(".war") || uri.toString().contains(".jar")){
+							bundleLocation = uri.toURL();
+						}
+					}
+					
+				}
 				else
 				{
 					if(logger.isDebugEnabled())
@@ -638,12 +663,11 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					return new AsyncResult<ServiceControlResult>(returnResult);	
 
 				}
-				//URL bundleLocation = new URL(serviceToInstall.getServiceInstance().getServiceImpl().getServiceClient());
 
 				if(logger.isDebugEnabled())
 					logger.debug("Now trying to download the jar...");
 				
-				URI jarLocation = ServiceDownloader.downloadServiceJar(bundleLocation, serviceToInstall);
+				URI jarLocation = ServiceDownloader.downloadClientJar(bundleLocation, serviceToInstall,myNode.getIdentifier(),getServiceDir());
 				
 				if(jarLocation == null){
 					if(logger.isDebugEnabled())
@@ -733,7 +757,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		Bundle newBundle = null;
 		
 		try {
-			logger.info("Installing service bundle from location: " + bundleLocation);
+			logger.info("Installing service bundle from location: {} ", bundleLocation);
 
 			try{
 				newBundle = bundleContext.installBundle(bundleLocation.toString());		
@@ -746,8 +770,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			}
 			
 			if(logger.isDebugEnabled()){
-				logger.debug("Service bundle "+newBundle.getSymbolicName() +" has been installed with id: " + newBundle.getBundleId());
-				logger.debug("Service bundle "+newBundle.getSymbolicName() +" is in state: " + ServiceModelUtils.getBundleStateName(newBundle.getState()));
+				logger.debug("Service bundle {} has been installed with id: {}",newBundle.getSymbolicName(),newBundle.getBundleId());
+				logger.debug("Service bundle {} is in state: {}",newBundle.getSymbolicName(),ServiceModelUtils.getBundleStateName(newBundle.getState()));
+				logger.debug("Service bundle {} is in location: {}",newBundle.getSymbolicName(),newBundle.getLocation());
 			}
 			
 			//Before we start the bundle we prepare the entry on the hashmap
@@ -821,7 +846,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		ServiceControlResult returnResult = new ServiceControlResult();
 		returnResult.setServiceId(null);
 		
-		URI jarLocation = ServiceDownloader.downloadServerJar(inputStream, fileName);
+		URI jarLocation = ServiceDownloader.downloadServerJar(inputStream, fileName,myId.getIdentifier(),getServiceDir());
 		
 		if(jarLocation == null){
 			if(logger.isDebugEnabled())
@@ -906,7 +931,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(logger.isDebugEnabled())
 					logger.debug("It's the local node, installing...");
 				
-				URI jarLocation = ServiceDownloader.downloadServerJar(bundleLocation);
+				URI jarLocation = ServiceDownloader.downloadServerJar(bundleLocation,myId.getIdentifier(),getServiceDir());
 				
 				if(jarLocation == null){
 					if(logger.isDebugEnabled())
@@ -1535,14 +1560,11 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		String fullJid = getCommMngr().getIdManager().getThisNetworkNode().getJid();
 		List<Service> deleteServices = new ArrayList<Service>();
 
-		if(logger.isDebugEnabled()) 
-			logger.debug("The JID of this node is: " + fullJid);
+		logger.debug("The JID of this node is: {}",fullJid);
 		
 		try{
-			//Service filter = ServiceModelUtils.generateEmptyFilter();
-			//filter.setServiceType(ServiceType.THIRD_PARTY_CLIENT);
-			
-			List<Service> oldServices = getServiceReg().retrieveServicesSharedByCSS(fullJid);
+
+			List<Service> oldServices = getServiceReg().retrieveServicesInCSSNode(fullJid);
 			
 			for(Service oldService : oldServices){
 
@@ -1693,8 +1715,9 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		 */
 		@Override
 		public void run() {
-			if(internalEvent){
-				this.sendEvent(eventType,service,target);
+			if(internalEvent){			
+				logger.debug("Sending event of type: {} for service {}", eventType,ServiceModelUtils.serviceResourceIdentifierToString(service.getServiceIdentifier()));
+				ServiceModelUtils.sendServiceMgmtEvent(eventType,service,target,ServiceModelUtils.getBundleFromService(service, bundleContext),getEventMgr());
 			} else{
 				if(activityUpdate)
 					this.updateActivityFeed(target,verb,service);
@@ -1709,37 +1732,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			getUserFeedback().showNotification(message);
 		}
 		
-		private void sendEvent(ServiceMgmtEventType eventType, Service service,IIdentity node){
-			
-			if(logger.isDebugEnabled())
-				logger.debug("Sending event of type: " + eventType + " for service " + ServiceModelUtils.serviceResourceIdentifierToString(service.getServiceIdentifier()));
-			
-			ServiceMgmtInternalEvent serviceEvent = new ServiceMgmtInternalEvent();
-			serviceEvent.setEventType(eventType);
-			serviceEvent.setServiceType(service.getServiceType());
-			serviceEvent.setServiceId(service.getServiceIdentifier());
-			serviceEvent.setSharedNode(node);
-			serviceEvent.setServiceName(service.getServiceName());
-			
-			if(!service.getServiceType().equals(ServiceType.DEVICE)){
-				Bundle bundle = ServiceModelUtils.getBundleFromService(service, bundleContext);
-				serviceEvent.setBundleId(bundle.getBundleId());
-				serviceEvent.setBundleSymbolName(bundle.getSymbolicName());
-			} else{
-				serviceEvent.setBundleId(-1);
-				serviceEvent.setBundleSymbolName(null);
-			}
 
-			InternalEvent internalEvent = new InternalEvent(EventTypes.SERVICE_LIFECYCLE_EVENT, eventType.toString(), "org/societies/servicelifecycle", serviceEvent);
-			
-			try {
-				getEventMgr().publishInternalEvent(internalEvent);
-			} catch (EMSException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				logger.error("Error sending event!");
-			}
-		}
 		
 		private void updateActivityFeed(IIdentity target, String verb, Service service){
 			

@@ -222,6 +222,17 @@ public class ServicesController extends BasePageController {
 		selectedService = currentServices.get(serviceId).getService();
 	}
     
+	private String visibleServices;
+	
+    public String getVisibleServices() {
+		return visibleServices;
+	}
+
+	public void setVisibleServices(String visibleServices) {
+		this.visibleServices = visibleServices;
+	}
+	
+	
     private String header;
     
     public String getHeader() {
@@ -290,6 +301,9 @@ public class ServicesController extends BasePageController {
     	searchOptions = new ArrayList<String>();
     	searchOptions.add("Name");
     	searchOptions.add("Description");
+    	searchOptions.add("Category");
+    	searchOptions.add("Author");
+    	setVisibleServices("");
     	
     }
     
@@ -405,7 +419,7 @@ public class ServicesController extends BasePageController {
 			if(result.getMessage().equals(ResultMessage.SUCCESS))
 				serviceShared(selectedService.getServiceIdentifier(),selectedService.getServiceName(), nodeId);
 			else{
-				sendMessage("Problem removing App","The App couldn't be removed because " + result.getMessage() ,FacesMessage.SEVERITY_ERROR);
+				sendMessage("Problem sharing App","The App couldn't be added because " + result.getMessage() ,FacesMessage.SEVERITY_ERROR);
 			}
 		} catch (Exception e) {
 			log.error("There was an exception trying to share the service: ", e.getMessage());
@@ -519,6 +533,20 @@ public class ServicesController extends BasePageController {
     			if("Description".equals(searchOption)){
         			log.debug("Searching by Description... preparing filter!");
         			filter.setServiceDescription(searchBy);
+    			} else{
+    	   			if("Author".equals(searchOption)){
+            			log.debug("Searching by Author... preparing filter!");
+            			filter.setServiceDescription(searchBy);
+        			} else{
+        	   			if("Category".equals(searchOption)){
+                			log.debug("Searching by Author... preparing filter!");
+                			filter.setServiceCategory(searchBy);
+            			} else{
+            				log.debug("Unrecognized search option: {}",searchOption);
+            				sendMessage("No search option!","There was a problem searching!",FacesMessage.SEVERITY_WARN);
+            				return;
+            			}
+        			}
     			}
     		}
     		
@@ -610,6 +638,10 @@ public class ServicesController extends BasePageController {
     	sendMessage("Install App Failed!","SOCIETIES didn't succeed in installing the app" + serviceName,FacesMessage.SEVERITY_WARN);
     }
     
+    protected ServiceWrapper getService(ServiceResourceIdentifier serviceId){
+		return currentServices.get(ServiceModelUtils.serviceResourceIdentifierToString(serviceId));
+    }
+    
     protected void serviceRemoved(ServiceResourceIdentifier serviceId, String serviceName, ServiceType serviceType){
     	
     	log.debug("Service was removed: {}", serviceName);
@@ -646,7 +678,6 @@ public class ServicesController extends BasePageController {
     	StringBuilder message = new StringBuilder();
     	message.append("App '").append(serviceName).append("' is now shared with Community: '").append(getCisManager().getCis(sharedNode.getJid()).getName()).append("'");
     	sendMessage("App Shared", message.toString(), FacesMessage.SEVERITY_INFO);
-
     	
     }
     
