@@ -290,17 +290,20 @@ public class AccessControlActivity extends Activity implements OnItemSelectedLis
                             try {
                                 isEventsConnected = true;
                                 published = true;
-                                eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_ACCESS_CONTROL_RESPONSE_EVENT, AccessControlActivity.this.accessControlEvent, new IPlatformEventsCallback() {
+                                eventsHelper.publishEvent(IAndroidSocietiesEvents.UF_ACCESS_CONTROL_RESPONSE_INTENT, AccessControlActivity.this.accessControlEvent, new IPlatformEventsCallback() {
                                     @Override
                                     public void returnException(int exception) {
+                                        Log.e(LOG_TAG, "Error received after publishing response event: " + exception);
                                     }
 
                                     @Override
                                     public void returnAction(int result) {
+                                        Log.i(LOG_TAG, "Action received after publishing response event: " + result);
                                     }
 
                                     @Override
                                     public void returnAction(boolean resultFlag) {
+                                        Log.i(LOG_TAG, "Action received after publishing response event: " + resultFlag);
                                     }
                                 });
                             } catch (PlatformEventsHelperNotConnectedException e) {
