@@ -28,6 +28,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -80,6 +81,21 @@ public class UserFeedbackTestController extends BasePageController {
         public void userLoggedOut() {
         }
     }
+
+    private static final String[] COLORS = new String[]{
+            "RED", "ORANGE", "YELLOW", "GREEN", "BLUE", "INDIGO", "VIOLET"
+    };
+    private static final String[] FEATURES = new String[]{
+            "2 LEGS", "4 LEGS", "SWIMS", "JUMPS", "LONG NECK", "REALLY HEAVY", "WILL EAT YOU"
+    };
+    private static final String[] CLASSIFICATIONS = new String[]{
+            "KINGDOM", "PHYLYM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"
+    };
+    private static final String[] ANIMALS = new String[]{
+            "CAT", "OTTER", "MOUSE", "DOG", "HORSE", "BADGER", "OSTRICH", "SEAL", "HEDGEHOG", "LION", "TIGER", "GIRAFFE", "HEFFALUMP"
+    };
+
+    private static final Random random = new Random();
 
     @ManagedProperty(value = "#{pubsubClient}")
     private PubsubClient pubsubClient;
@@ -175,7 +191,7 @@ public class UserFeedbackTestController extends BasePageController {
     }
 
     public void sendSimpleNotificationEvent() {
-        String proposalText = "This is just a simple alert";
+        String proposalText = "I'm thinking of an animal: " + randomIdentifier();
 
         log.info("Simple: Sending event");
         userFeedback.showNotification(proposalText);
@@ -183,8 +199,8 @@ public class UserFeedbackTestController extends BasePageController {
     }
 
     public void sendAckNackEvent() {
-        String proposalText = "Pick a button";
-        String[] options = new String[]{"btn1", "btn2"}; // this actually has no effect for acknack
+        String proposalText = "Do you like " + randomIdentifier() + "s?";
+        String[] options = new String[]{"Yes", "No"}; // this actually has no effect for acknack
 
         log.info("Acknack: Sending event");
         ExpProposalContent content = new ExpProposalContent(proposalText, options);
@@ -201,10 +217,9 @@ public class UserFeedbackTestController extends BasePageController {
     }
 
     public void sendSelectOneEvent_blocking() throws InterruptedException, ExecutionException {
-        String proposalText = "Pick ONE option";
-        String[] options = new String[]{"Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"};
+        String proposalText = "What colour is a " + randomIdentifier() + "? (testing)";
 
-        ExpProposalContent content = new ExpProposalContent(proposalText, options);
+        ExpProposalContent content = new ExpProposalContent(proposalText, COLORS);
         Future<List<String>> result = userFeedback.getExplicitFB(ExpProposalType.RADIOLIST, content);
 
         // USE YOUR RESULT HERE
@@ -214,11 +229,10 @@ public class UserFeedbackTestController extends BasePageController {
     }
 
     public void sendSelectOneEvent() {
-        String proposalText = "Pick ONE option";
-        String[] options = new String[]{"Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"};
+        String proposalText = "What colour is a " + randomIdentifier() + "? (testing)";
 
         log.info("SelectOne: Sending event");
-        ExpProposalContent content = new ExpProposalContent(proposalText, options);
+        ExpProposalContent content = new ExpProposalContent(proposalText, FEATURES);
         userFeedback.getExplicitFBAsync(ExpProposalType.RADIOLIST, content, new IUserFeedbackResponseEventListener<List<String>>() {
             @Override
             public void responseReceived(List<String> result) {
@@ -232,11 +246,10 @@ public class UserFeedbackTestController extends BasePageController {
     }
 
     public void sendSelectManyEvent() {
-        String proposalText = "Pick MANY options";
-        String[] options = new String[]{"red", "orange", "yellow", "green", "blue", "indigo", "violet"};
+        String proposalText = "What colour is a " + randomIdentifier() + "? (testing)";
 
         log.info("SelectMany: Sending event");
-        ExpProposalContent content = new ExpProposalContent(proposalText, options);
+        ExpProposalContent content = new ExpProposalContent(proposalText, FEATURES);
         userFeedback.getExplicitFBAsync(ExpProposalType.CHECKBOXLIST, content, new IUserFeedbackResponseEventListener<List<String>>() {
             @Override
             public void responseReceived(List<String> result) {
@@ -253,7 +266,7 @@ public class UserFeedbackTestController extends BasePageController {
         String proposalText = "This is a timed abort";
 
         log.info("TimedAbort: Sending event");
-        ImpProposalContent content = new ImpProposalContent(proposalText, (int) sec);
+        ImpProposalContent content = new ImpProposalContent(proposalText, (int) sec * 1000);
         userFeedback.getImplicitFBAsync(ImpProposalType.TIMED_ABORT, content, new IUserFeedbackResponseEventListener<Boolean>() {
             @Override
             public void responseReceived(Boolean result) {
@@ -362,4 +375,9 @@ public class UserFeedbackTestController extends BasePageController {
         return responseItem;
     }
 
+    private static String randomIdentifier() {
+        return COLORS[random.nextInt(COLORS.length)]
+                + " " + ANIMALS[random.nextInt(ANIMALS.length)]
+                + " " + random.nextInt(Integer.MAX_VALUE);
+    }
 }
