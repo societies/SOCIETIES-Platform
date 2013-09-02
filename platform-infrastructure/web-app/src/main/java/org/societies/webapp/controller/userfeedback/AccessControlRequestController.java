@@ -103,7 +103,12 @@ public class AccessControlRequestController extends BasePageController {
     }
 
     public String completeAccessRequestAction() {
-        log.debug("completeNegotiation() id=" + eventID);
+        log.debug("completeAccessRequestAction() id=" + eventID);
+
+        if (event == null) {
+            log.warn("'event' is null - cannot proceed with completeAccessRequestAction() method");
+            return null;
+        }
 
         // TODO: validate action check boxes
 
@@ -122,7 +127,12 @@ public class AccessControlRequestController extends BasePageController {
     }
 
     public String cancelAccessRequestAction() {
-        log.debug("cancelNegotiation()");
+        log.debug("cancelAccessRequestAction()");
+
+        if (event == null) {
+            log.warn("'event' is null - cannot proceed with cancelAccessRequestAction() method");
+            return null;
+        }
 
         prepareEventForTransmission(event);
 
