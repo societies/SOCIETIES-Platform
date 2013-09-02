@@ -347,6 +347,7 @@ public class NotificationsController extends BasePageController {
 
         private boolean abort = false;
         private final List<NotificationQueueItem> timedAbortsToWatch;
+        private boolean enabled = true;
 
         public TimedAbortProcessor(List<NotificationQueueItem> timedAbortsToWatch) {
             this.timedAbortsToWatch = timedAbortsToWatch;
@@ -356,7 +357,8 @@ public class NotificationsController extends BasePageController {
         public void run() {
             while (!abort) {
                 try {
-                    processTimedAborts();
+                    if (enabled)
+                        processTimedAborts();
                 } catch (Exception ex) {
                     log.error("Error on timed abort processing thread", ex);
                 }
@@ -392,6 +394,13 @@ public class NotificationsController extends BasePageController {
             }
         }
 
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
     }
 
     public static final String ABORT_STRING = "abort";
@@ -401,6 +410,7 @@ public class NotificationsController extends BasePageController {
     private final LoginListener loginListener = new LoginListener();
     @SuppressWarnings("FieldCanBeLocal")
     private final Thread timedAbortProcessorThread;
+    private final TimedAbortProcessor timedAbortProcessor;
 
     @ManagedProperty(value = "#{pubsubClient}")
     private PubsubClient pubsubClient;
@@ -438,7 +448,8 @@ public class NotificationsController extends BasePageController {
     public NotificationsController() {
         log.debug("NotificationsController ctor()");
 
-        timedAbortProcessorThread = new Thread(new TimedAbortProcessor(timedAbortsToWatch));
+        timedAbortProcessor = new TimedAbortProcessor(timedAbortsToWatch);
+        timedAbortProcessorThread = new Thread(timedAbortProcessor);
         timedAbortProcessorThread.setName("TimedAbortProcessor");
         timedAbortProcessorThread.setDaemon(true);
     }
@@ -839,5 +850,12 @@ public class NotificationsController extends BasePageController {
 
     }
 
+    public boolean isTimedAbortProcessorEnabled() {
+        return timedAbortProcessor.isEnabled();
+    }
+
+    public void setTimedAbortProcessorEnabled(boolean enabled) {
+        this.timedAbortProcessor.setEnabled(enabled);
+    }
 
 }
