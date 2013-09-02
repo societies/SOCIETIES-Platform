@@ -175,6 +175,10 @@ public class ServiceWrapper {
 		
 	}
 	
+	public boolean isSharedWithCis(String node){
+		return getSharedCisId().contains(node);
+	}
+	
 	public boolean isInstalled(){
 		if(isMine())
 			return true;

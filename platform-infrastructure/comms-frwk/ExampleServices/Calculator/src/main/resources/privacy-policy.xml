@@ -1,13 +1,4 @@
-<RequestPolicy><Subject>
-	<Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id"
- 			DataType="org.societies.api.identity.IIdentity">
-		<AttributeValue>othercss@societies.local</AttributeValue>
-	</Attribute>
-
-	<Attribute AttributeId="CisId"
- 			DataType="org.societies.api.identity.IIdentity">
-		<AttributeValue>onecis.societies.local</AttributeValue>
-	</Attribute></Subject>
+<RequestPolicy>
 <Target>
 <Resource>
 	<Attribute AttributeId="contextType"

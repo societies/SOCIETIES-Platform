@@ -115,25 +115,19 @@ public class ServiceDiscovery implements IServiceDiscovery {
 
 	@Override
 	@Async
-	public Future<List<Service>> getLocalServices() throws ServiceDiscoveryException {
+	public Future<List<Service>> getLocalServices() {
 
-		// TODO : Fix this up!
 		INetworkNode currentNode = commMngr.getIdManager().getThisNetworkNode();
+		logger.debug("Retrieving services for this *specific* CSS Node: {} , jid: {}", currentNode.getNodeIdentifier(),currentNode.getJid());
 		
-		Future<List<Service>> asyncResult = null;
 		List<Service> result = null;
 
-		asyncResult = this.getServices(currentNode);
-
 		try {
-			result = asyncResult.get();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			result = getServiceReg().retrieveServicesInCSSNode(currentNode.getJid());
+		} catch (Exception e) {
+			logger.error("Exception occurred while trying to get local services: {}", e);
 			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 
 		return new AsyncResult<List<Service>>(result);
 	}
@@ -190,8 +184,8 @@ public class ServiceDiscovery implements IServiceDiscovery {
 			// Is it our node? If so, local search
 			if(myNode){
 				if(logger.isDebugEnabled())
-					logger.debug("We're dealing with our own node!");
-				serviceList = getServiceReg().retrieveServicesSharedByCSS(node.getJid());
+					logger.debug("We're dealing with our own CSS!");
+				serviceList = getServiceReg().retrieveServicesInCSS(node.getBareJid());
 			} else{
 				//Is it one of my CIS? If so, local search
 				ICisOwned localCis = getCisManager().getOwnedCis(node.getJid());

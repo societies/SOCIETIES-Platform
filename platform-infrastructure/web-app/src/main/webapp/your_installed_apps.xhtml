@@ -34,14 +34,17 @@
         <!-- Left -->
         <article id="left_col" class="grid_8">
         <section class="grid_8 itemlist">
-			<p:accordionPanel id="services_list" value="#{servicesController.currentServices}" var="service" styleClass="accordion grid_8">  
+			<p:accordionPanel id="services_list"
+			 value="#{servicesController.currentServices}" var="service"
+			 styleClass="accordion grid_8" multiple="true"
+			 activeIndex="#{servicesController.visibleServices}">
     		<p:tab title="#{service.name}">
-    		<p:panelGrid columns="4" >
+    		<p:panelGrid columns="6" styleClass="grid_7" >
     			<p:row>
-    			<p:column colspan="3" rowspawn="1" style="border:2px">
+    			<p:column colspan="4" rowspawn="1" style="border:2px solid green">
     				<h:outputText value="#{service.description}" />
     			</p:column>
- 	    		<p:column colspan="1" rowspawn="2" style="border:3px">
+ 	    		<p:column colspan="1" style="border:3px solid black">
  	    		<p>
 		    		<p:commandButton value="Start"
 		    		onclick="blockUI.show()" oncomplete="blockUI.hide()"
@@ -92,14 +95,14 @@
 				</p:column>
 				</p:row>
 				<p:row>
-				<p:column colspan="1" style="font-weight: bold;" >
+				<p:column colspan="2" style="font-weight: bold;" >
 					<h6><h:outputText value="#{service.type}" /></h6>
 				</p:column>
-				<p:column colspan="1">
+				<p:column colspan="2">
 					<h:outputText value="Created by #{service.creator}" styleClass="keyinfometadata" rendered="#{!service.device}"/>
 				</p:column>
-				<p:column colspan="1">
-					<h:outputText value="Shared by #{service.sharedBy}" styleClass="keyinfometadata" rendered="#{service.shared}"/>
+				<p:column colspan="2">
+					<h:outputText value="Shared by #{service.sharedBy}" styleClass="keyinfometadata" rendered="#{!service.mine or (service.shared and !servicesController.myNode)}"/>
 				</p:column>
 				</p:row>
     		</p:panelGrid>
@@ -118,7 +121,7 @@
                 <header>
                     <h3>Community Apps</h3>
                 </header>
-			<p:selectOneMenu id="nodeMenu" value="#{servicesController.selectedNode}" effect="fade" styleClass="select">
+			<p:selectOneMenu id="nodeMenu" value="#{servicesController.selectedNode}" effect="fade" styleClass="select grid_3">
             	<f:selectItem itemLabel="My Installed Apps" itemValue="mynode" />
             	<f:selectItems value="#{servicesController.nodeList}" var="node" itemLabel="#{node.name}" itemValue="#{node.cisId}"/>
             	<p:ajax update=":mainForm:services_list,:mainForm:title_header" listener="#{servicesController.selectNode}" process="@this"/>
@@ -128,14 +131,17 @@
                 <header>
                     <h3>App Search</h3>
                 </header>
-                <p:inputText id="searchBox" value="#{servicesController.searchBy}" styleClass="websearch-input" style="text-align: right" />   
+                <p:inputText id="searchBox" value="#{servicesController.searchBy}" styleClass="websearch-input grid_3" style="text-align: right"/>
+                <p>  
        			<h:outputLabel for="searchMenu" value="Search by: " />  
-        		<p:selectOneMenu id="searchMenu" value="#{servicesController.searchOption}" effect="fade">  
+        		<p:selectOneMenu id="searchMenu" value="#{servicesController.searchOption}" effect="fade" styleClass="grid_2">  
            			 <f:selectItems value="#{servicesController.searchOptions}" var="option" itemLabel="#{option}" itemValue="#{option}"/>  
        			 </p:selectOneMenu>  
+       			 </p>
        			 <p:commandButton value="Search"
        			 onclick="blockUI.show()" oncomplete="blockUI.hide()" icon="ui-icon-search"
        			 update=":mainForm:services_list,:mainForm:title_header"
+       			 styleClass="grid_3"
        			 action="#{servicesController.searchService}" process="@this,searchMenu,searchBox"/> 
             </section>
             <section>

@@ -72,29 +72,65 @@ public class ServiceMgmtListener extends EventListener {
 					return;
 				}
 				
+				ServiceWrapper service = controller.getService(ourEvent.getServiceId());
+					
 				switch(ourEvent.getEventType()){
 					case NEW_SERVICE:
 						if(ourEvent.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT) || ourEvent.getServiceType().equals(ServiceType.DEVICE))
 							controller.serviceInstalled(ourEvent.getServiceId());
 						break;
 					case SERVICE_REMOVED: 
-						if(controller.getServiceId()==null)
+						if(controller.getServiceId()==null){
 							controller.serviceRemoved(ourEvent.getServiceId(), ourEvent.getServiceName(),ourEvent.getServiceType());
+						} else{
+							log.debug("Event is being dealt with by the controller, so no need to be processed!");
+						}
 						break;
 					case SERVICE_SHARED: 
-						if(controller.getServiceId()==null)
+						if(controller.getServiceId()==null){
+							if(service != null && service.isSharedWithCis(ourEvent.getSharedNode().getJid())){
+								log.debug("Service {} is already shared with this CIS, no need to process event.", ourEvent.getServiceName() );
+								break;
+							}
 							controller.serviceShared(ourEvent.getServiceId(), ourEvent.getServiceName(), ourEvent.getSharedNode());
+						}  else{
+							log.debug("Event is being dealt with by the controller, so no need to be processed!");
+						}
 						break;
+						
 					case SERVICE_UNSHARED:
-						if(controller.getServiceId()==null)
+						if(controller.getServiceId()==null){
+							if(service != null && !service.isSharedWithCis(ourEvent.getSharedNode().getJid())){
+								log.debug("Service {} is already NOT shared with this CIS, no need to process event.", ourEvent.getServiceName() );
+								break;
+							}
 							controller.serviceUnshared(ourEvent.getServiceId(), ourEvent.getServiceName(), ourEvent.getSharedNode());
+
+						} else{
+							log.debug("Event is being dealt with by the controller, so no need to be processed!");
+						}
 						break;
 					case SERVICE_STARTED: 
-						if(controller.getServiceId()==null) controller.serviceStarted(ourEvent.getServiceId(), ourEvent.getServiceName());
+						if(controller.getServiceId()==null){
+							if(service != null && service.isStarted()){
+								log.debug("Service {} is already started, no need to process event.", ourEvent.getServiceName() );
+								break;
+							}
+							controller.serviceStarted(ourEvent.getServiceId(), ourEvent.getServiceName());
+						} else{
+							log.debug("Event is being dealt with by the controller, so no need to be processed!");
+						}
 						break;
 					case SERVICE_STOPPED:
-						if(controller.getServiceId()==null)
+						if(controller.getServiceId()==null){
+							if(service != null && service.isStopped()){
+								log.debug("Service {} is already stopped, no need to process event.", ourEvent.getServiceName() );
+								break;
+							}
 							controller.serviceStopped(ourEvent.getServiceId(), ourEvent.getServiceName());
+						} else{
+							log.debug("Event is being dealt with by the controller, so no need to be processed!");
+						}
 						break;
 					case PROBLEM_OCURRED:
 						controller.installFailed(ourEvent.getServiceId(), ourEvent.getServiceName());
