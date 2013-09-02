@@ -165,11 +165,13 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             log.error("Error registering for user feedback pubsub nodes", e);
         }
 
-        recallStoredUFRequests();
-
-        recallStoredPpnRequests();
-
-        recallStoredAccessControlRequests();
+        // TODO: Disabled persistence until we can get the hibernate issues sorted.
+        // Persistence may prove to be a lot more complicated than usual (due to the need to send our entities over pubsub)
+        // but it may ultimately not be needed - no point in saving requests if the process which spawned the request
+        // has died and can't resume
+//        recallStoredUFRequests();
+//        recallStoredPpnRequests();
+//        recallStoredAccessControlRequests();
 
         String msg = "User Feedback Initialised\n" +
                 " Exp UF requests: %s\n" +
