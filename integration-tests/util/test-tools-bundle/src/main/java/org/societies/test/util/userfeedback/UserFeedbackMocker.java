@@ -40,9 +40,9 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Respons
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.societies.api.schema.useragent.feedback.FeedbackMethodType;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
-import org.societies.integration.test.userfeedback.UserFeedbackType;
 import org.societies.test.util.api.IUserfeedbackMocker;
 import org.societies.test.util.api.model.UserFeedbackMockResult;
+import org.societies.test.util.api.model.UserFeedbackType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
