@@ -576,12 +576,16 @@ public class NotificationsController extends BasePageController {
 
         if (selectedItem.getType().equals(NotificationQueueItem.TYPE_ACK_NACK)
                 || selectedItem.getType().equals(NotificationQueueItem.TYPE_SELECT_ONE)
-                || selectedItem.getType().equals(NotificationQueueItem.TYPE_SELECT_MANY)) {
+                || selectedItem.getType().equals(NotificationQueueItem.TYPE_SELECT_MANY)
+                || selectedItem.getType().equals(NotificationQueueItem.TYPE_NOTIFICATION)) {
 
             List<String> feedback = new ArrayList<String>();
             if (selectedItem.getType().equals(NotificationQueueItem.TYPE_SELECT_MANY)) {
                 // add all results
                 Collections.addAll(feedback, selectedItem.getResults());
+            } else if (selectedItem.getType().equals(NotificationQueueItem.TYPE_NOTIFICATION)) {
+                // no response required - but we still have to send the event
+                feedback.clear();
             } else {
                 // add one result
                 feedback.add(selectedItem.getResult());
@@ -613,10 +617,6 @@ public class NotificationsController extends BasePageController {
                 log.error("Error publishing notification of completed implicit UF request", e);
             }
 
-        } else if (selectedItem.getType().equals(NotificationQueueItem.TYPE_NOTIFICATION)) {
-            // no response is required
-            // but we must manually remove item from queue
-            markQueueItemComplete(selectedItem.getItemId(), new String[]{});
         }
 
     }
