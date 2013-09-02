@@ -15,8 +15,8 @@
         <property name="stage" column="stage" type="org.societies.api.schema.useragent.feedback.FeedbackStage"/>
         <!--<property name="requestDate" column="requestDate" type="java.util.Date"/>-->
         <property name="type" column="type" type="int"/>
-        <list name="options" table="UserFeedbackBean_options" lazy="false"
-                cascade="all">
+        <list name="options" table="UserFeedbackBean_options"
+              lazy="false" cascade="all">
             <key column="requestId"/>
             <index column="idx"/>
             <element column="value" type="string"/>

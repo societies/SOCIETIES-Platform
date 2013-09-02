@@ -23,7 +23,8 @@
 
         <one-to-one name="negotiationDetails"
                     class="org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean"
-                    cascade="all"/>
+                    cascade="all"
+                    lazy="false"/>
 
     </class>
 </hibernate-mapping>

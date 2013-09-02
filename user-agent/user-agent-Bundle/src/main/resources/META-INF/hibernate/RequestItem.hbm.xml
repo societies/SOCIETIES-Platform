@@ -26,6 +26,7 @@
         <property name="optional" column="optional" type="boolean"/>
 
         <one-to-one name="resource"
+                    lazy="false"
                     class="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource"
                     cascade="all"/>
 
