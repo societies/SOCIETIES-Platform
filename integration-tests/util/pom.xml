@@ -28,7 +28,7 @@
 
 	<modules>
 		<module>integration-test-util</module>
-		<module>test-tools-bundle</module>
+		<!-- <module>test-tools-bundle</module> -->
 	</modules>
 
 </project>
