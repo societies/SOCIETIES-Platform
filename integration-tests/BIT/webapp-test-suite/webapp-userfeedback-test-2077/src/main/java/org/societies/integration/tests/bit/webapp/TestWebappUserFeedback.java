@@ -14,7 +14,6 @@ import org.societies.api.internal.useragent.model.ImpProposalType;
 import org.societies.integration.api.selenium.SeleniumTest;
 import org.societies.integration.api.selenium.components.UFNotificationPopup;
 import org.societies.integration.api.selenium.pages.IndexPage;
-import org.societies.integration.api.selenium.pages.TestPage;
 
 import java.util.Date;
 import java.util.List;
@@ -54,7 +53,25 @@ public class TestWebappUserFeedback extends SeleniumTest {
     }
 
     @Test
-    public void eventsAppearAtLogin_andCanBeAccepted() {
+    public void clearUserFeedbackMethod_sendsCorrectEvents_andWebappControllerListensCorrectly() {
+        indexPage.doLogin(USERNAME, PASSWORD);
+
+        indexPage.verifyNumberInNotificationsBubble(0);
+
+        ExpProposalContent content = new ExpProposalContent("Pick a button", new String[]{"Yes", "No"});
+        userFeedback.getExplicitFBAsync(ExpProposalType.ACKNACK, content);
+        userFeedback.getExplicitFBAsync(ExpProposalType.RADIOLIST, content);
+        userFeedback.getExplicitFBAsync(ExpProposalType.CHECKBOXLIST, content);
+
+        indexPage.verifyNumberInNotificationsBubble(3);
+
+        userFeedback.clear();
+
+        indexPage.verifyNumberInNotificationsBubble(0);
+    }
+
+    @Test
+    public void eventsAppearAtLogin_andCanBeAccepted() throws InterruptedException {
         ExpProposalContent content = new ExpProposalContent("Pick a button", new String[]{"Yes", "No"});
 
         Future<List<String>> result1 = userFeedback.getExplicitFBAsync(ExpProposalType.ACKNACK, content);
@@ -63,9 +80,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
 
         indexPage.doLogin(USERNAME, PASSWORD);
 
-        int number = indexPage.getNumberInNotificationsBubble();
-        // there may already be some notifications in the bubble
-        Assert.assertTrue(number >= 3);
+        indexPage.verifyNumberInNotificationsBubble(3);
 
         UFNotificationPopup popup = indexPage.clickNotificationBubble();
 
@@ -74,7 +89,15 @@ public class TestWebappUserFeedback extends SeleniumTest {
         Assert.assertFalse("Expected event 3 NOT to be marked done", result3.isDone());
 
         popup.answerAckNackRequest("No");
+
+        // TODO: wait until popup is stale, instead of waiting a set amount of time
+        Thread.sleep(2000);
+
+        // TODO: wait until popup is stale, instead of waiting a set amount of time
         popup.answerSelectOneRequest("Yes");
+
+        Thread.sleep(2000);
+
         popup.answerSelectManyRequest(new String[]{"Yes", "No"});
 
         log.debug("Finished responding to requests");
@@ -93,12 +116,8 @@ public class TestWebappUserFeedback extends SeleniumTest {
 
         indexPage.doLogin(USERNAME, PASSWORD);
 
-        // clear any existing data
-        TestPage testPage = indexPage.navigateToTestPage();
-        testPage.clickResetUFButton();
-
         // ensure we're starting from a clean slate
-        testPage.verifyNumberInNotificationsBubble(0);
+        indexPage.verifyNumberInNotificationsBubble(0);
 
         // send a request
         ExpProposalContent content = new ExpProposalContent("Pick a button", new String[]{"Yes", "No"});
@@ -134,12 +153,8 @@ public class TestWebappUserFeedback extends SeleniumTest {
     public void sendSelectOne_completeEventViaPopup_ensureDataUpdated() throws ExecutionException, InterruptedException {
         indexPage.doLogin(USERNAME, PASSWORD);
 
-        // clear any existing data
-        TestPage testPage = indexPage.navigateToTestPage();
-        testPage.clickResetUFButton();
-
         // ensure we're starting from a clean slate
-        testPage.verifyNumberInNotificationsBubble(0);
+        indexPage.verifyNumberInNotificationsBubble(0);
 
         // send a request
         ExpProposalContent content = new ExpProposalContent("Pick one", new String[]{"Yes", "No", "Maybe", "Sometimes", "Dont know", "Dont care"});
@@ -175,12 +190,8 @@ public class TestWebappUserFeedback extends SeleniumTest {
     public void sendSelectMany_completeEventViaPopup_ensureDataUpdated() throws ExecutionException, InterruptedException {
         indexPage.doLogin(USERNAME, PASSWORD);
 
-        // clear any existing data
-        TestPage testPage = indexPage.navigateToTestPage();
-        testPage.clickResetUFButton();
-
         // ensure we're starting from a clean slate
-        testPage.verifyNumberInNotificationsBubble(0);
+        indexPage.verifyNumberInNotificationsBubble(0);
 
         // send a request
         ExpProposalContent content = new ExpProposalContent("Pick two", new String[]{"Yes", "No", "Maybe", "Sometimes", "Dont know", "Dont care"});
@@ -218,12 +229,8 @@ public class TestWebappUserFeedback extends SeleniumTest {
     public void sendTimedAbort_acceptEventViaPopup_ensureDataUpdated() throws ExecutionException, InterruptedException {
         indexPage.doLogin(USERNAME, PASSWORD);
 
-        // clear any existing data
-        TestPage testPage = indexPage.navigateToTestPage();
-        testPage.clickResetUFButton();
-
         // ensure we're starting from a clean slate
-        testPage.verifyNumberInNotificationsBubble(0);
+        indexPage.verifyNumberInNotificationsBubble(0);
 
         // send a request
         ImpProposalContent content = new ImpProposalContent("Accept me", 30000);
@@ -259,12 +266,8 @@ public class TestWebappUserFeedback extends SeleniumTest {
     public void sendTimedAbort_abortEventViaPopup_ensureDataUpdated() throws ExecutionException, InterruptedException {
         indexPage.doLogin(USERNAME, PASSWORD);
 
-        // clear any existing data
-        TestPage testPage = indexPage.navigateToTestPage();
-        testPage.clickResetUFButton();
-
         // ensure we're starting from a clean slate
-        testPage.verifyNumberInNotificationsBubble(0);
+        indexPage.verifyNumberInNotificationsBubble(0);
 
         // send a request
         ImpProposalContent content = new ImpProposalContent("Abort me", 30000);
@@ -299,13 +302,6 @@ public class TestWebappUserFeedback extends SeleniumTest {
     @Test
     public void sendTimedAbort_ignoreEvent_ensureDataUpdated() throws ExecutionException, InterruptedException {
         indexPage.doLogin(USERNAME, PASSWORD);
-
-        // clear any existing data
-        TestPage testPage = indexPage.navigateToTestPage();
-        testPage.clickResetUFButton();
-
-        // ensure we're starting from a clean slate
-        testPage.verifyNumberInNotificationsBubble(0);
 
         // ensure we're starting from a clean slate
         indexPage.verifyNumberInNotificationsBubble(0);

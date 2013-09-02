@@ -6,21 +6,22 @@
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
-        <title>SOCIEITES :: View Privacy Policy</title>
+        <title>SOCIEITES :: Access Control Request</title>
     </ui:define>
 
     <ui:define name="body">
 
-        <h2>Privacy Policy Negotiation Request</h2>
+        <h2>Access Control Request</h2>
 
         <p:panel>
             <f:facet name="header">
-                Negotiation with: <p:outputLabel value="#{ppNegotiation.responsePolicy.requestor.requestorId}"/>
+                Access control request from <p:outputLabel
+                    value="#{accessControlController.currentAccessEvent.requestor.requestorId}"/>
             </f:facet>
 
             <p:accordionPanel id="accordionPanel"
                               multiple="true"
-                              value="#{ppNegotiation.responsePolicy.responseItems}"
+                              value="#{accessControlController.responseItems}"
                               var="responseItem">
                 <p:tab title="#{responseItem.requestItem.resource.dataType}">
                     <p:tabView id="tabView">
@@ -34,7 +35,7 @@
 
                                 <p:outputLabel for="decision">Permission:</p:outputLabel>
                                 <p:selectOneMenu id="decision" value="#{responseItem.decision}">
-                                    <f:selectItems value="#{ppNegotiation.decisionOptions}"
+                                    <f:selectItems value="#{accessControlController.decisionOptions}"
                                                    var="dec"/>
                                 </p:selectOneMenu>
                             </h:panelGrid>
@@ -82,7 +83,7 @@
                                                       noSelectionOption="true"
                                                       rendered="#{condition.optional}"/>
                                         <f:selectItems
-                                                value="#{ppNegotiation.getAvailableConditionValues(condition.conditionConstant)}"/>
+                                                value="#{accessControlController.getAvailableConditionValues(condition.conditionConstant)}"/>
                                         <p:ajax update="conditionValMsg" event="change"/>
                                     </p:selectOneMenu>
 
@@ -106,14 +107,14 @@
             <f:facet name="footer">
                 <p:messages id="validationMessages"/>
 
-                <p:commandButton id="completePpnButton"
-                                 value="Complete Negotiation"
-                                 action="#{ppNegotiation.completeNegotiationAction}"
+                <p:commandButton id="completeRequestButton"
+                                 value="Accept Request"
+                                 action="#{accessControlController.completeAccessRequestAction}"
                                  update="@form"/>
 
-                <p:commandButton id="abortPpnButton"
-                                 value="Cancel Negotiation"
-                                 action="#{ppNegotiation.cancelNegotiationAction}"
+                <p:commandButton id="abortRequestButton"
+                                 value="Cancel Request"
+                                 action="#{accessControlController.cancelAccessRequestAction}"
                                  process="@this"
                                  update="@form"/>
             </f:facet>

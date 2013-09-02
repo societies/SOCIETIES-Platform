@@ -56,15 +56,6 @@ public interface IServiceRegistry {
 	 * @throws ServiceRegistrationException
 	 */
 	public void unregisterServiceList (List<Service> servicesList) throws ServiceRegistrationException;
-
-	/**
-	 * Description: Based on a CSS identifier this method returns all services shared by CSS to other CSS or CIS 
-	 * @param CSSID that represents the identifier for CSS (this is the String returned by method getJid() of class org.societies.comm.xmpp.datatypes.Identity), 		  
-	 * @return a List of services retrieved
-	 * @throws ServiceRetrieveException
-	 */
-	public List<Service> retrieveServicesSharedByCSS (String CSSID) throws ServiceRetrieveException;
-	
 	
 	/**
 	 * Description: Based on a CIS identifier this method returns all services that are shared by a CIS 
@@ -161,5 +152,21 @@ public interface IServiceRegistry {
 	* @throws ServiceRetrieveException
 	*/
 	public List<Service> findServices(Service filter, String cisId)
+			throws ServiceRetrieveException;
+
+	/**
+	 * @param CSSID
+	 * @return
+	 * @throws ServiceRetrieveException
+	 */
+	public List<Service> retrieveServicesInCSS(String CSSID)
+			throws ServiceRetrieveException;
+
+	/**
+	 * @param CSSID
+	 * @return
+	 * @throws ServiceRetrieveException
+	 */
+	public List<Service> retrieveServicesInCSSNode(String CSSID)
 			throws ServiceRetrieveException;
 }

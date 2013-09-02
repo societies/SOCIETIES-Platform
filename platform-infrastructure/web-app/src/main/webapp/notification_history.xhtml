@@ -22,7 +22,7 @@
          rendered="#{notification.type eq 'PPN' and notification.complete eq false}">
 
     <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
-    <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+    <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
     <!-- PRIVACY POLICY NEGOTIATION -->
 
@@ -40,7 +40,7 @@
          rendered="#{notification.type eq 'PPN' and notification.complete eq true}">
 
     <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
-    <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+    <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
     <!-- PRIVACY POLICY NEGOTIATION -->
 
@@ -53,12 +53,50 @@
     </h:panelGrid>
 </p:panel>
 
+
+<p:panel id="acPopupPanel_unread" styleClass="unread-notification"
+         header="Access control request from #{notification.title}"
+         rendered="#{notification.type eq 'AC' and notification.complete eq false}">
+
+    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+    <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+
+    <!-- ACCESS CONTROL -->
+
+    <h:panelGrid columns="1">
+
+        <h:outputText value="#{notification.arrivalDate}"/>
+
+        <h:outputLink value="#{notification.infoLink}">More info</h:outputLink>
+
+    </h:panelGrid>
+</p:panel>
+
+<p:panel id="acPopupPanel"
+         header="Access control request from #{notification.title}"
+         rendered="#{notification.type eq 'AC' and notification.complete eq true}">
+
+    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+    <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+
+    <!-- ACCESS CONTROL -->
+
+    <h:panelGrid columns="1">
+
+        <h:outputText value="#{notification.arrivalDate}"/>
+
+        <h:outputLink value="#{notification.infoLink}">More info</h:outputLink>
+
+    </h:panelGrid>
+</p:panel>
+
+
 <p:panel id="ackNackPanel_unread" styleClass="unread-notification"
          header="#{notification.title}"
          rendered="#{notification.type eq 'ACK_NACK' and notification.complete eq false}">
 
-    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
-    <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+    <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
     <!-- ACK/NACK -->
 
@@ -79,20 +117,21 @@
          header="#{notification.title}"
          rendered="#{notification.type eq 'ACK_NACK' and notification.complete eq true}">
 
-    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
-    <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+    <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
     <!-- ACK/NACK -->
     <p>You picked: <h:outputText value="#{notification.result}"/></p>
 
 </p:panel>
 
+
 <p:panel id="selectOnePanel_unread" styleClass="unread-notification"
          header="#{notification.title}"
          rendered="#{notification.type eq 'SELECT_ONE' and notification.complete eq false}">
 
-    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
-    <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+    <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
     <!-- SELECT ONE / RADIO BUTTONS -->
 
@@ -112,20 +151,21 @@
          header="#{notification.title}"
          rendered="#{notification.type eq 'SELECT_ONE' and notification.complete eq true}">
 
-    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
-    <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+    <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
     <!-- SELECT ONE / RADIO BUTTONS -->
     <p>You picked: <h:outputText value="#{notification.result}"/></p>
 
 </p:panel>
 
+
 <p:panel id="selectManyPanel_unread" styleClass="unread-notification"
          header="#{notification.title}"
          rendered="#{notification.type eq 'SELECT_MANY' and notification.complete eq false}">
 
-    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
-    <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+    <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
     <!-- SELECT MANY / CHECKBOXES -->
     <h:panelGrid columns="1">
@@ -144,8 +184,8 @@
          header="#{notification.title}"
          rendered="#{notification.type eq 'SELECT_MANY' and notification.complete eq true}">
 
-    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
-    <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+    <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
     <!-- SELECT MANY / CHECKBOXES -->
     <p>You picked:</p>
@@ -155,12 +195,13 @@
 
 </p:panel>
 
+
 <p:panel id="notificationPanel_unread" styleClass="unread-notification"
          header="#{notification.title}"
          rendered="#{notification.type eq 'NOTIFICATION' and notification.complete eq false}">
 
-    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
-    <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+    <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
     <!-- SIMPLE NOTIFICATION -->
 
@@ -178,19 +219,20 @@
          header="#{notification.title}"
          rendered="#{notification.type eq 'NOTIFICATION' and notification.complete eq true}">
 
-    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
-    <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+    <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
     <!-- SIMPLE NOTIFICATION -->
 
 </p:panel>
 
+
 <p:panel id="timedAbortPanel_unread" styleClass="unread-notification"
          header="#{notification.title}"
          rendered="#{notification.type eq 'TIMED_ABORT' and notification.complete eq false}">
 
-    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
-    <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+    <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
     <!-- TIMED ABORT -->
 
@@ -216,8 +258,8 @@
          header="#{notification.title}"
          rendered="#{notification.type eq 'TIMED_ABORT' and notification.complete eq true}">
 
-    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
-    <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+    <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+    <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
     <!-- TIMED ABORT -->
 

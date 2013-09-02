@@ -178,7 +178,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	}
 
 	@Override
-	public List<Service> retrieveServicesSharedByCSS(String CSSID)
+	public List<Service> retrieveServicesInCSSNode(String CSSID)
 			throws ServiceRetrieveException {
 		List<Service> returnedServiceList = new ArrayList<Service>();
 		
@@ -206,6 +206,34 @@ public class ServiceRegistry implements IServiceRegistry {
 		return returnedServiceList;
 	}
 
+	@Override
+	public List<Service> retrieveServicesInCSS(String CSSID)
+			throws ServiceRetrieveException {
+		List<Service> returnedServiceList = new ArrayList<Service>();
+		
+		Session session = null;
+		
+		try {
+			session = sessionFactory.openSession();
+			
+			List<RegistryEntry> tmpRegistryEntryList = session
+					.createCriteria(RegistryEntry.class)
+					.createCriteria("serviceInstance")
+					.add(Restrictions.eq("cssJid", CSSID)).list();
+						
+			for (RegistryEntry registryEntry : tmpRegistryEntryList) {
+				returnedServiceList.add(registryEntry
+						.createServiceFromRegistryEntry());
+			}
+		} catch (Exception e) {
+			throw new ServiceRetrieveException(e);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		return returnedServiceList;
+	}
 	/*
 	 * (non-Javadoc)
 	 * 

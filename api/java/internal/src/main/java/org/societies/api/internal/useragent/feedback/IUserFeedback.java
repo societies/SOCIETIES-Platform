@@ -30,6 +30,7 @@ import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBe
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.FeedbackForm;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 
@@ -155,14 +156,11 @@ public interface IUserFeedback {
 
     public void submitExplicitResponse(String id, List<String> result);
 
-    /**
-     * Submit an explicit response for privacy negotiation userfeedback request type
-     *
-     * @param requestId Id of the userfeedback request
-     */
-    public void submitExplicitResponse(String requestId, NegotiationDetailsBean negotiationDetails, ResponsePolicy result);
-
     public void submitImplicitResponse(String id, Boolean result);
+
+    public void submitPrivacyNegotiationResponse(String requestId, NegotiationDetailsBean negotiationDetails, ResponsePolicy result);
+
+    public void submitAccessControlResponse(String requestId, List<ResponseItem> responseItems, RequestorBean requestorBean);
 
     public void clear();
 }

@@ -46,6 +46,7 @@ import org.societies.api.internal.useragent.model.FeedbackForm;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
@@ -61,8 +62,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.*;
 import java.util.concurrent.Future;
 
-import static org.societies.api.schema.useragent.feedback.FeedbackMethodType.GET_EXPLICIT_FB;
-
 public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subscriber {
 
     private static final Logger log = LoggerFactory.getLogger(UserFeedback.class);
@@ -70,12 +69,13 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     //pubsub event schemas
     private static final List<String> EVENT_SCHEMA_CLASSES =
             Collections.unmodifiableList(Arrays.asList(
-                    "org.societies.api.schema.useragent.feedback.UserFeedbackBean",
+                    "org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent",
                     "org.societies.api.internal.schema.useragent.feedback.UserFeedbackHistoryRequest",
+                    "org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent",
                     "org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean",
                     "org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean",
-                    "org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent",
-                    "org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent"));
+                    "org.societies.api.schema.useragent.feedback.UserFeedbackBean"
+            ));
 
 
     @Autowired
@@ -157,7 +157,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             pubsub.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.EXPLICIT_RESPONSE, this);
             pubsub.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.IMPLICIT_RESPONSE, this);
             pubsub.subscriberSubscribe(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE, this);
+            pubsub.subscriberSubscribe(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP, this);
             pubsub.subscriberSubscribe(myCloudID, EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE, this);
+            pubsub.subscriberSubscribe(myCloudID, EventTypes.UF_PRIVACY_ACCESS_CONTROL_REMOVE_POPUP, this);
             log.debug("Pubsub registration complete!");
         } catch (Exception e) {
             log.error("Error registering for user feedback pubsub nodes", e);
@@ -185,8 +187,8 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         try {
             log.debug("Recalling stored PPN requests");
 
-            List<UserFeedbackPrivacyNegotiationEvent> userFeedbackPrivacyNegotiationEvents = privacyPolicyNegotiationHistoryRepository.listIncomplete();
-            for (UserFeedbackPrivacyNegotiationEvent event : userFeedbackPrivacyNegotiationEvents) {
+            List<UserFeedbackPrivacyNegotiationEvent> privacyNegotiationEvents = privacyPolicyNegotiationHistoryRepository.listIncomplete();
+            for (UserFeedbackPrivacyNegotiationEvent event : privacyNegotiationEvents) {
                 String requestId = event.getRequestId();
 
                 UserFeedbackResult<ResponsePolicy> result = new UserFeedbackResult<ResponsePolicy>(requestId);
@@ -203,7 +205,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 //                }
             }
 
-            log.debug("Finished recalling stored PPN requests");
+            log.debug(String.format("Finished recalling %s stored PPN requests", privacyNegotiationEvents.size()));
         } catch (Exception ex) {
             log.error("Error recalling stored PPN requests #216 - UserFeedback will continue without database support. \n" + ex.getMessage());
         }
@@ -213,8 +215,8 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         try {
             log.debug("Recalling stored AC requests");
 
-            List<UserFeedbackAccessControlEvent> userFeedbackAccessControlEvents = accessControlHistoryRepository.listIncomplete();
-            for (UserFeedbackAccessControlEvent event : userFeedbackAccessControlEvents) {
+            List<UserFeedbackAccessControlEvent> accessControlEvents = accessControlHistoryRepository.listIncomplete();
+            for (UserFeedbackAccessControlEvent event : accessControlEvents) {
                 String requestId = event.getRequestId();
 
                 UserFeedbackResult<ResponsePolicy> result = new UserFeedbackResult<ResponsePolicy>(requestId);
@@ -231,7 +233,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 //                }
             }
 
-            log.debug("Finished recalling stored AC requests");
+            log.debug(String.format("Finished recalling %s stored AC requests", accessControlEvents.size()));
         } catch (Exception ex) {
             log.error("Error recalling stored AC requests #268 - UserFeedback will continue without database support. \n" + ex.getMessage());
         }
@@ -267,7 +269,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 //                }
             }
 
-            log.debug("Finished recalling stored UF requests");
+            log.debug(String.format("Finished recalling %s stored UF requests", userFeedbackBeans.size()));
         } catch (Exception ex) {
             log.error("Error recalling stored UF requests #193 - UserFeedback will continue without database support. \n" + ex.getMessage());
         }
@@ -563,7 +565,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
         UserFeedbackPrivacyNegotiationEvent event = new UserFeedbackPrivacyNegotiationEvent();
         event.setStage(FeedbackStage.PENDING_USER_RESPONSE);
-        event.setMethod(GET_EXPLICIT_FB);
+        event.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
         event.setType(ExpProposalType.PRIVACY_NEGOTIATION);
         event.setRequestId(requestId);
         event.setNegotiationDetails(details);
@@ -673,7 +675,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     @Override
     public Future<List<ResponseItem>> getAccessControlFBAsync(String requestId, Requestor requestor, List<ResponseItem> items, IUserFeedbackResponseEventListener<List<ResponseItem>> callback) {
         UserFeedbackAccessControlEvent event = new UserFeedbackAccessControlEvent();
-        event.setMethod(GET_EXPLICIT_FB);
+        event.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
         event.setType(ExpProposalType.PRIVACY_ACCESS_CONTROL);
         event.setRequestId(requestId);
         event.setRequestor(RequestorUtils.toRequestorBean(requestor));
@@ -787,6 +789,13 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
     @Override
     public void pubsubEvent(IIdentity identity, String eventTopic, String itemID, Object item) {
+        if (eventTopic == null) {
+            log.warn(String.format("Received pubsub event with NULL EVENT TOPIC - payload '%s', ID '%s'",
+                    item != null ? item.getClass().getSimpleName() : "null",
+                    itemID
+            ));
+            return;
+        }
         if (item == null) {
             log.warn(String.format("Received pubsub event with NULL PAYLOAD - topic '%s', ID '%s'",
                     eventTopic,
@@ -846,6 +855,8 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             UserFeedbackAccessControlEvent event = (UserFeedbackAccessControlEvent) item;
             this.processAccessControlResponseEvent(event);
 
+        } else {
+            log.warn(String.format("Unhandled pubsub event '%s' with ID '%s'", eventTopic, itemID));
         }
     }
 
@@ -1155,7 +1166,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                     pubsub.publisherPublish(myCloudID,
                             EventTypes.UF_PRIVACY_ACCESS_CONTROL_REMOVE_POPUP,
                             responseID,
-                            accessCtrlResults.get(responseID));
+                            result);
                 } catch (Exception ex) {
                     log.error("Error transmitting access control complete via pubsub", ex);
                 }
@@ -1173,6 +1184,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
                 this.accessCtrlResults.notifyAll();
             }
+
         }
     }
 
@@ -1206,10 +1218,27 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     }
 
     @Override
-    public void submitExplicitResponse(String requestId, NegotiationDetailsBean negotiationDetails, ResponsePolicy result) {
+    public void submitImplicitResponse(String requestId, Boolean result) {
+        //create user feedback response bean
+        ImpFeedbackResultBean resultBean = new ImpFeedbackResultBean();
+        resultBean.setRequestId(requestId);
+        resultBean.setAccepted(result);
+
+        //fire response pubsub event to all user agents
+        try {
+            pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.IMPLICIT_RESPONSE, requestId, resultBean);
+        } catch (XMPPError e) {
+            log.error("Error submitting implicit response", e);
+        } catch (CommunicationException e) {
+            log.error("Error submitting implicit response", e);
+        }
+    }
+
+    @Override
+    public void submitPrivacyNegotiationResponse(String requestId, NegotiationDetailsBean negotiationDetails, ResponsePolicy result) {
         //create user feedback response bean
         UserFeedbackPrivacyNegotiationEvent resultBean = new UserFeedbackPrivacyNegotiationEvent();
-        resultBean.setMethod(GET_EXPLICIT_FB);
+        resultBean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
         resultBean.setType(ExpProposalType.PRIVACY_NEGOTIATION);
         resultBean.setRequestId(requestId);
         resultBean.setNegotiationDetails(negotiationDetails);
@@ -1227,19 +1256,23 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     }
 
     @Override
-    public void submitImplicitResponse(String requestId, Boolean result) {
+    public void submitAccessControlResponse(String requestId, List<ResponseItem> responseItems, RequestorBean requestorBean) {
         //create user feedback response bean
-        ImpFeedbackResultBean resultBean = new ImpFeedbackResultBean();
+        UserFeedbackAccessControlEvent resultBean = new UserFeedbackAccessControlEvent();
+        resultBean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+        resultBean.setType(ExpProposalType.PRIVACY_NEGOTIATION);
         resultBean.setRequestId(requestId);
-        resultBean.setAccepted(result);
+        resultBean.setResponseItems(responseItems);
+        resultBean.setRequestor(requestorBean);
 
         //fire response pubsub event to all user agents
         try {
-            pubsub.publisherPublish(myCloudID, UserFeedbackEventTopics.IMPLICIT_RESPONSE, requestId, resultBean);
+            log.info("####### Publish " + EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE + ": " + ResponseItemUtils.toXmlString(responseItems));
+            pubsub.publisherPublish(myCloudID, EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE, requestId, resultBean);
         } catch (XMPPError e) {
-            log.error("Error submitting implicit response", e);
+            log.error("Error submitting negotiation response", e);
         } catch (CommunicationException e) {
-            log.error("Error submitting implicit response", e);
+            log.error("Error submitting negotiation response", e);
         }
     }
 
@@ -1321,6 +1354,17 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     @Override
     public void clear() {
         synchronized (this) {
+            // notify all nodes that UF has been cleared
+
+            List<UserFeedbackBean> userFeedbackBeans = new ArrayList<UserFeedbackBean>(incompleteUserFeedbackBeans.values());
+            List<UserFeedbackPrivacyNegotiationEvent> privacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>(incompletePrivacyNegotiationEvents.values());
+            List<UserFeedbackAccessControlEvent> accessControlEvents = new ArrayList<UserFeedbackAccessControlEvent>(incompleteAccessControlEvents.values());
+
+            log.warn(String.format("UserFeedback clear requested: Clearing %s UF events, %s PPN events, %s AC events",
+                    userFeedbackBeans.size(),
+                    privacyNegotiationEvents.size(),
+                    accessControlEvents.size()));
+
             expResults.clear();
             impResults.clear();
             negotiationResults.clear();
@@ -1332,6 +1376,78 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             incompleteUserFeedbackBeans.clear();
             incompletePrivacyNegotiationEvents.clear();
             incompleteAccessControlEvents.clear();
+
+            // notify other nodes that UF events are cleared
+            for (UserFeedbackBean ufBean : userFeedbackBeans) {
+                if (ufBean.getMethod() == FeedbackMethodType.GET_EXPLICIT_FB) {
+
+                    ExpFeedbackResultBean expFeedbackBean = new ExpFeedbackResultBean();
+                    expFeedbackBean.setRequestId(ufBean.getRequestId());
+                    expFeedbackBean.setFeedback(new ArrayList<String>());
+
+                    try {
+                        pubsub.publisherPublish(myCloudID,
+                                UserFeedbackEventTopics.COMPLETE,
+                                ufBean.getRequestId(),
+                                expFeedbackBean);
+                    } catch (Exception ex) {
+                        log.warn("Error transmitting user feedback complete via pubsub", ex);
+                    }
+                } else if (ufBean.getMethod() == FeedbackMethodType.GET_IMPLICIT_FB) {
+
+                    ImpFeedbackResultBean impFeedbackBean = new ImpFeedbackResultBean();
+                    impFeedbackBean.setRequestId(ufBean.getRequestId());
+                    impFeedbackBean.setAccepted(false);
+
+                    try {
+                        pubsub.publisherPublish(myCloudID,
+                                UserFeedbackEventTopics.COMPLETE,
+                                ufBean.getRequestId(),
+                                impFeedbackBean);
+                    } catch (Exception ex) {
+                        log.warn("Error transmitting user feedback clear via pubsub", ex);
+                    }
+                }
+            }
+
+            // notify other nodes that PPN events are cleared
+            for (UserFeedbackPrivacyNegotiationEvent privacyNegotiationEvent : privacyNegotiationEvents) {
+                UserFeedbackPrivacyNegotiationEvent resultBean = new UserFeedbackPrivacyNegotiationEvent();
+                resultBean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+                resultBean.setType(ExpProposalType.PRIVACY_NEGOTIATION);
+                resultBean.setRequestId(privacyNegotiationEvent.getRequestId());
+                resultBean.setNegotiationDetails(privacyNegotiationEvent.getNegotiationDetails());
+                resultBean.setResponsePolicy(privacyNegotiationEvent.getResponsePolicy());
+
+                try {
+                    pubsub.publisherPublish(myCloudID,
+                            EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP,
+                            resultBean.getRequestId(),
+                            resultBean);
+                } catch (Exception ex) {
+                    log.warn("Error transmitting user feedback clear via pubsub", ex);
+                }
+            }
+
+            // notify other nodes that AC events are cleared
+            for (UserFeedbackAccessControlEvent accessControlEvent : accessControlEvents) {
+                UserFeedbackAccessControlEvent resultBean = new UserFeedbackAccessControlEvent();
+                resultBean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
+                resultBean.setType(ExpProposalType.PRIVACY_NEGOTIATION);
+                resultBean.setRequestId(accessControlEvent.getRequestId());
+                resultBean.setResponseItems(accessControlEvent.getResponseItems());
+                resultBean.setRequestor(accessControlEvent.getRequestor());
+
+                try {
+                    pubsub.publisherPublish(myCloudID,
+                            EventTypes.UF_PRIVACY_ACCESS_CONTROL_REMOVE_POPUP,
+                            resultBean.getRequestId(),
+                            resultBean);
+                } catch (Exception ex) {
+                    log.warn("Error transmitting user feedback clear via pubsub", ex);
+                }
+            }
+
         }
     }
 }

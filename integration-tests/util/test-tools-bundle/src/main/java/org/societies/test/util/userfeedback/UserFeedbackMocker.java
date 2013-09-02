@@ -24,11 +24,6 @@
  */
 package org.societies.test.util.userfeedback;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -45,11 +40,16 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Respons
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.societies.api.schema.useragent.feedback.FeedbackMethodType;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
+import org.societies.integration.test.userfeedback.UserFeedbackType;
 import org.societies.test.util.api.IUserfeedbackMocker;
 import org.societies.test.util.api.model.UserFeedbackMockResult;
-import org.societies.test.util.api.model.UserFeedbackType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Rafik
@@ -177,7 +177,7 @@ public class UserFeedbackMocker implements IUserfeedbackMocker, Subscriber {
 				// Send as output the specified ResponsePolicy
 				else if (eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_NEGOTIATION)) {
 					LOG.info("[UserfeedbackMocker] submitExplicitResponse");
-					userFeedback.submitExplicitResponse(requestId, ufNegotiationBean.getNegotiationDetails(), mockResult.getPrivacyAgreementResult());
+					userFeedback.submitPrivacyNegotiationResponse(requestId, ufNegotiationBean.getNegotiationDetails(), mockResult.getPrivacyAgreementResult());
 				}
 				else {
 					userfeedbackReplied = false;
@@ -209,7 +209,7 @@ public class UserFeedbackMocker implements IUserfeedbackMocker, Subscriber {
 					}
 					responsePolicy.setResponseItems(responseItems);
 					LOG.info("[UserfeedbackMocker] submitExplicitResponse");
-					userFeedback.submitExplicitResponse(requestId, ufNegotiationBean.getNegotiationDetails(), responsePolicy);
+					userFeedback.submitPrivacyNegotiationResponse(requestId, ufNegotiationBean.getNegotiationDetails(), responsePolicy);
 				}
 				else {
 					userfeedbackReplied = false;
@@ -236,7 +236,7 @@ public class UserFeedbackMocker implements IUserfeedbackMocker, Subscriber {
 				// Send as output the input ResponsePolicy
 				else if (eventTopic.equalsIgnoreCase(EventTypes.UF_PRIVACY_NEGOTIATION)) {
 					LOG.debug("[UserfeedbackMocker] submitExplicitResponse");
-					userFeedback.submitExplicitResponse(ufNegotiationBean.getRequestId(), ufNegotiationBean.getNegotiationDetails(), ufNegotiationBean.getResponsePolicy());
+					userFeedback.submitPrivacyNegotiationResponse(ufNegotiationBean.getRequestId(), ufNegotiationBean.getNegotiationDetails(), ufNegotiationBean.getResponsePolicy());
 				}
 			}
 			else if (FeedbackMethodType.GET_IMPLICIT_FB.value().equals(method)) {

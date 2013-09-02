@@ -34,6 +34,8 @@
 
     <osgi:reference id="userFeedback" interface="org.societies.api.internal.useragent.feedback.IUserFeedback"/>
 
+    <osgi:reference id="internalUserFeedback" interface="org.societies.useragent.api.feedback.IInternalUserFeedback"/>
+
     <osgi:reference id="privacyAssessment"
                     interface="org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IAssessment"/>
 
@@ -41,7 +43,9 @@
                     interface="org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository"/>
     <osgi:reference id="privacyPolicyNegotiationHistoryRepository"
                     interface="org.societies.useragent.api.feedback.IPrivacyPolicyNegotiationHistoryRepository"/>
-	
+    <osgi:reference id="accessControlHistoryRepository"
+                    interface="org.societies.useragent.api.feedback.IAccessControlHistoryRepository"/>
+
     <osgi:reference id="trustBroker" interface="org.societies.api.internal.privacytrust.trust.ITrustBroker"/>
 
     <osgi:reference id="trustEvidenceCollector" interface="org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector"/>

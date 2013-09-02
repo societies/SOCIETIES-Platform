@@ -493,9 +493,10 @@ public class CISController extends BasePageController{
 		return Result;
 	}
 	
-	public List<ICisOwned> getownedcommunities(){
+	public List<CisInfo> getownedcommunities(){
 		
 		log.info("getownedcommunities method called");
+		List<CisInfo> cisinfoList = new ArrayList<CisInfo>();
 		
 		List<ICisOwned> ownedCISs = cisManager.getListOfOwnedCis();
 			
@@ -506,7 +507,35 @@ public class CISController extends BasePageController{
 			log.info("entry name is " +entry.getName());
 		}
 			
-		return ownedCISs;
+		CisDirectoryRemoteClient callback = new CisDirectoryRemoteClient();
+		getcisDirectory().findAllCisAdvertisementRecords(callback);
+		List<CisAdvertisementRecord> adverts = callback.getResultList();
+		
+		
+		for ( int i = 0; i < ownedCISs.size(); i++)
+		{
+			//find ad for this id
+			boolean bFound = false;
+			int j = 0;
+			do
+			{
+				
+				if (adverts.get(j).getId().contains(ownedCISs.get(i).getCisId())){
+						bFound = true;
+				}else
+					j++;
+			} while ((bFound == false) && (j < adverts.size()));
+			
+			if (bFound)
+			{
+				CisInfo cisInfo = new CisInfo();
+				cisInfo.setCisid(ownedCISs.get(i).getCisId());
+				cisInfo.setCisname(adverts.get(j).getName());
+				cisinfoList.add(cisInfo);
+			}
+			
+		}
+		return cisinfoList;
 		
 		
 	}
@@ -559,26 +588,31 @@ public class CISController extends BasePageController{
 		
 	}
 	
-public List<CisInfo> getmembercommunities(){
+	public List<CisInfo> getmembercommunities(){
 		
 		log.info("getmembercommunities method called");
 		
-		List<ICisOwned> ownedCISs = this.getownedcommunities();
+		CisDirectoryRemoteClient callback = new CisDirectoryRemoteClient();
+		getcisDirectory().findAllCisAdvertisementRecords(callback);
+		List<CisAdvertisementRecord> adverts = callback.getResultList();
+		
+		List<CisInfo> ownedCISs = this.getownedcommunities();
 		log.info("ownedCISs SIZE is now " +ownedCISs.size());
 		List<CisInfo> allCiss = this.getcommunities();
 		log.info("allCiss SIZE is now " +allCiss.size());
 		
 		
 		List<CisInfo> memberCISs = new ArrayList<CisInfo>();
-		//now compare the two lists and if entry not there then add to membercis list
+		memberCISs = allCiss;
+		log.info("memberCISs size is now " +memberCISs.size());
+		//now compare the two lists
 		
 		for(int i = 0; i < allCiss.size(); i++){
-			for(ICisOwned entry : ownedCISs){
-				log.info("entry id is " +entry.getCisId());
-				//log.info("allcssdetails ID is " +ownedCISs.get(i).getCisId());
-				if(entry.getCisId().contains(allCiss.get(i).getCisid())){
-					//log.info("ADDING record to list " +ownedCISs.get(i));
-					memberCISs.add(allCiss.get(i));
+			for(CisInfo entry : ownedCISs){
+				if(allCiss.get(i).getCisid().contains(entry.getCisid())){
+					memberCISs.remove(allCiss.get(i));
+				}else{
+					log.info("Not on the owned list adding to the members list " +allCiss.get(i).getCisid());
 				}
 			}
 		}

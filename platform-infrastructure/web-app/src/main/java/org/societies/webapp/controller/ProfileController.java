@@ -193,7 +193,7 @@ public class ProfileController extends BasePageController{
      	record.setWorkplace(this.getWorkplace());
      	record.setSex(sex);
      	record.setEntity(entity);
-     	
+     	log.info("entity contains : " +entity);
      	log.info("Record contains : " +record);
      	
      	cssLocalManager.modifyCssRecord(record);

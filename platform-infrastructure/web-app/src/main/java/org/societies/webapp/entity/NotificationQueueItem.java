@@ -19,6 +19,7 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     public static final String TYPE_SELECT_MANY = "SELECT_MANY";
     public static final String TYPE_NOTIFICATION = "NOTIFICATION";
     public static final String TYPE_UNKNOWN = "UNKNOWN";
+
     public static NotificationQueueItem forPrivacyPolicyNotification(String itemId, UserFeedbackPrivacyNegotiationEvent payload) {
         return new NotificationQueueItem(itemId, payload);
     }
@@ -120,9 +121,10 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     }
 
     public String getInfoLink() {
-        if (ufPPN != null) {
+        if (ufPPN != null)
             return "privacy_policy_negotiation.xhtml?id=" + itemId;
-        }
+        if (ufAccessControl != null)
+            return "access_control.xhtml?id=" + itemId;
 
         return "";
     }

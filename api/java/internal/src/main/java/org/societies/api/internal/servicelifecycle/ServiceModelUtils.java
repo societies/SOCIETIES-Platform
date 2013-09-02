@@ -15,11 +15,16 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.osgi.event.EMSException;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceImplementation;
 import org.societies.api.schema.servicelifecycle.model.ServiceInstance;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceType;
+import org.societies.api.services.ServiceMgmtEventType;
 
 
 /**
@@ -345,6 +350,34 @@ public class ServiceModelUtils extends org.societies.api.services.ServiceUtils{
 		
 		return generateServiceResourceIdentifierFromString(new String(Base64.decode(encoded64.getBytes())));
 	
+	}
+	
+	public static void sendServiceMgmtEvent(ServiceMgmtEventType eventType, Service service,IIdentity node, Bundle bundle, IEventMgr eventManager){
+		
+		ServiceMgmtInternalEvent serviceEvent = new ServiceMgmtInternalEvent();
+		serviceEvent.setEventType(eventType);
+		serviceEvent.setSharedNode(node);
+		
+		if(service != null){
+			serviceEvent.setServiceType(service.getServiceType());
+			serviceEvent.setServiceId(service.getServiceIdentifier());
+			serviceEvent.setServiceName(service.getServiceName());
+			
+			if(!service.getServiceType().equals(ServiceType.DEVICE)){
+				serviceEvent.setBundleId(bundle.getBundleId());
+				serviceEvent.setBundleSymbolName(bundle.getSymbolicName());
+			} else{
+				serviceEvent.setBundleId(-1);
+				serviceEvent.setBundleSymbolName(null);
+			}
+		}
+		InternalEvent internalEvent = new InternalEvent(EventTypes.SERVICE_LIFECYCLE_EVENT, eventType.toString(), "org/societies/servicelifecycle", serviceEvent);
+		
+		try {
+			eventManager.publishInternalEvent(internalEvent);
+		} catch (EMSException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
