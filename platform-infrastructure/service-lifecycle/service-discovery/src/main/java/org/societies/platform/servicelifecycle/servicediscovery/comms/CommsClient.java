@@ -155,7 +155,7 @@ public class CommsClient implements IServiceDiscoveryRemote, ICommCallback{
 
 		//CREATE MESSAGE BEAN
 		ServiceDiscoveryMsgBean bean = new ServiceDiscoveryMsgBean();
-		bean.setMethod(MethodName.GET_SERVICE);
+		bean.setMethod(MethodName.SEARCH_SERVICE);
 		bean.setService(filter);
 		
 		try {

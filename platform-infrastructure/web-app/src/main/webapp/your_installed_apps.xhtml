@@ -12,8 +12,8 @@
 
     <ui:define name="body">
  		
-        <p:growl id="serMessages" showDetail="true" sticky="true" autoUpdate="true" for="servicesGrowl"/>
-    	<p:poll interval="60" update="services_list,title_header" process="@this" />
+        <p:growl id="serMessages" showDetail="true" sticky="false" life="8000" autoUpdate="false" for="servicesGrowl"/>
+    	<p:poll interval="60" update="services_list,title_header,serMessages" process="@this" />
     	        
         	<p:blockUI id="blockUI" widgetVar="blockUI" block=":mainForm">  
        			LOADING<br />
@@ -38,6 +38,7 @@
 			 value="#{servicesController.currentServices}" var="service"
 			 styleClass="accordion grid_8" multiple="true"
 			 activeIndex="#{servicesController.visibleServices}">
+			 <p:ajax event="tabChange" listener="#{servicesController.onTabChange}"/>
     		<p:tab title="#{service.name}">
     		<p:panelGrid columns="6" styleClass="grid_7" >
     			<p:row>
@@ -48,49 +49,50 @@
  	    		<p>
 		    		<p:commandButton value="Start"
 		    		onclick="blockUI.show()" oncomplete="blockUI.hide()"
-		    		rendered="#{!service.started and servicesController.myNode and !service.device}"
-		    		action="#{servicesController.startService}" process="@this" update="services_list"
-		    		styleClass="services-button" style="width:70px" >
+		    		rendered="#{!service.started and servicesController.myNode and !service.device and service.mine}"
+		    		action="#{servicesController.startService}" process="@this" update="services_list,:mainForm:serMessages"
+		    		styleClass="services-button" style="width:75px" >
 						<f:setPropertyActionListener target="#{servicesController.serviceId}" value="#{service.id}" />
 					</p:commandButton>
 					
 					<p:commandButton value="Stop"
 					onclick="blockUI.show()" oncomplete="blockUI.hide()"
-					rendered="#{service.started and servicesController.myNode and !service.device}"
-					action="#{servicesController.stopService}" process="@this" update="services_list"
-					styleClass="services-button" style="width:70px" >
+					rendered="#{service.started and servicesController.myNode and !service.device and service.mine}"
+					action="#{servicesController.stopService}" process="@this" update="services_list,:mainForm:serMessages"
+					styleClass="services-button" style="width:75px" >
 						<f:setPropertyActionListener target="#{servicesController.serviceId}" value="#{service.id}" />
 					</p:commandButton>
 				</p><p>	
 					<p:commandButton value="Install"
 					rendered="#{!service.installed}"
 					action="#{servicesController.installService}" process="@this" 
-					styleClass="services-button" style="width:70px" >
+					styleClass="services-button" style="width:75px"
+					update=":mainForm:serMessages" >
 							<f:setPropertyActionListener target="#{servicesController.serviceId}" value="#{service.id}" />
 					</p:commandButton>
 						
 					<p:commandButton value="Remove"
 					onclick="blockUI.show()" oncomplete="blockUI.hide()"
-					rendered="#{service.installed and !service.device}" 
-					action="#{servicesController.removeService}" process="@this" update="services_list"
-					styleClass="services-button" style="width:70px">
+					rendered="#{service.installed and !service.device and service.mine}" 
+					action="#{servicesController.removeService}" process="@this" update="services_list,:mainForm:serMessages"
+					styleClass="services-button" style="width:75px">
 						<f:setPropertyActionListener target="#{servicesController.serviceId}" value="#{service.id}" />
 					</p:commandButton>
 				</p>	
 					<p:commandButton value="Unshare"
 					onclick="blockUI.show()" oncomplete="blockUI.hide()"
 					rendered="#{!servicesController.myNode and service.mine}" 
-					action="#{servicesController.unshareService}" process="@this" update="services_list"
-					styleClass="services-button" style="width:70px">
+					action="#{servicesController.unshareService}" process="@this" update="services_list,:mainForm:serMessages"
+					styleClass="services-button" style="width:75px">
 							<f:setPropertyActionListener target="#{servicesController.serviceId}" value="#{service.id}" />
 					</p:commandButton>
 						
 					<p:selectCheckboxMenu value="#{service.sharedCisId}" 
 					label="Sharing" filter="true" filterText="Filter" filterMatchMode="startsWith"
 					rendered="#{service.canShare and servicesController.myNode}"
-					styleClass="services-button" style="width:70px">  
+					styleClass="services-button" style="width:75px">  
 						<f:selectItems value="#{servicesController.nodeList}" var="node" itemLabel="#{node.name}" itemValue="#{node.cisId}"/>  
-						<p:ajax update="services_list" process="@this"/>
+						<p:ajax update="services_list,:mainForm:serMessages" process="@this"/>
 					</p:selectCheckboxMenu>
 				</p:column>
 				</p:row>
@@ -102,7 +104,7 @@
 					<h:outputText value="Created by #{service.creator}" styleClass="keyinfometadata" rendered="#{!service.device}"/>
 				</p:column>
 				<p:column colspan="2">
-					<h:outputText value="Shared by #{service.sharedBy}" styleClass="keyinfometadata" rendered="#{!service.mine or (service.shared and !servicesController.myNode)}"/>
+					<h:outputText value="Shared by #{service.sharedBy}" styleClass="keyinfometadata" rendered="#{!service.mine or (service.shared and (!servicesController.myNode or servicesController.didSearch)) or service.client}"/>
 				</p:column>
 				</p:row>
     		</p:panelGrid>
@@ -124,9 +126,11 @@
 			<p:selectOneMenu id="nodeMenu" value="#{servicesController.selectedNode}" effect="fade" styleClass="select grid_3">
             	<f:selectItem itemLabel="My Installed Apps" itemValue="mynode" />
             	<f:selectItems value="#{servicesController.nodeList}" var="node" itemLabel="#{node.name}" itemValue="#{node.cisId}"/>
-            	<p:ajax update=":mainForm:services_list,:mainForm:title_header" listener="#{servicesController.selectNode}" process="@this"/>
+            	<p:ajax update=":mainForm:services_list,:mainForm:title_header,:mainForm:serMessages"
+            	 listener="#{servicesController.selectNode}" process="@this"/>
         		</p:selectOneMenu>
             </section>
+            <p></p>
             <section>
                 <header>
                     <h3>App Search</h3>
@@ -140,10 +144,11 @@
        			 </p>
        			 <p:commandButton value="Search"
        			 onclick="blockUI.show()" oncomplete="blockUI.hide()" icon="ui-icon-search"
-       			 update=":mainForm:services_list,:mainForm:title_header"
+       			 update=":mainForm:services_list,:mainForm:title_header,:mainForm:serMessages"
        			 styleClass="grid_3"
        			 action="#{servicesController.searchService}" process="@this,searchMenu,searchBox"/> 
             </section>
+            <p></p>
             <section>
                 <header>
                     <h3>Install App</h3>
@@ -153,7 +158,7 @@
                     mode="advanced" dragDropSupport="true"  
                     allowTypes="/(\.|\/)(jar|war)$/"
                     onstart="blockUI.show()" oncomplete="blockUI.hide()"
-                    update=":mainForm:services_list" process="@this"/>  
+                    update=":mainForm:services_list,:mainForm:serMessages" process="@this"/>  
             </section>
             <div class="hr dotted clearfix"></div>
             <div class="sidebar_bottom_BG"></div>

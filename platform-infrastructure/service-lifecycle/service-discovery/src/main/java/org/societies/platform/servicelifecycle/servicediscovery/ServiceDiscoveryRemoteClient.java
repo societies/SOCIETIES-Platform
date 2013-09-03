@@ -43,7 +43,7 @@ public class ServiceDiscoveryRemoteClient implements IServiceDiscoveryCallback {
 
 		List<Service> resultList;
 
-		private final long TIMEOUT = 5;
+		private final long TIMEOUT = 75;
 
 		private BlockingQueue<List<Service>> returnList;		
 		

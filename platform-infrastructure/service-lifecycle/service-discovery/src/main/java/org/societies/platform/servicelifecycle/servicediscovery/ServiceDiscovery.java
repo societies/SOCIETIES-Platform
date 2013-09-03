@@ -345,24 +345,54 @@ public class ServiceDiscovery implements IServiceDiscovery {
 				logger.debug("Searching all our CIS...");
 			
 			List<ICis> cisList = getCisManager().getCisList();
-			ArrayList<Future<List<Service>>> searchList = new ArrayList<Future<List<Service>>>();
-			for(ICis cis : cisList){
+			/*for(ICis cis : cisList){
+				logger.debug("Searching in CIS {}", cis.getName());
 				Future<List<Service>> resultSearch = searchServices(filter,cis.getCisId());
-				searchList.add(resultSearch);
+				
+				List<Service> foundServices = resultSearch.get();
+				for(Service foundService : foundServices){
+					String key = ServiceModelUtils.serviceResourceIdentifierToString(foundService.getServiceIdentifier());
+					logger.debug("Found service {}", key);
+					result.put(key, foundService);
+				}
 			}
 			
 			if(logger.isDebugEnabled())
 				logger.debug("Searching our local node...");
-			searchList.add(searchServices(filter));
+			
+			
+			List<Service> foundServices = searchServices(filter).get();
+			for(Service foundService : foundServices){
+				String key = ServiceModelUtils.serviceResourceIdentifierToString(foundService.getServiceIdentifier());
+				logger.debug("Found service {}", key);
+				result.put(key, foundService);
+			}
+			*/
+			// FOR SOME REASON THIS IS NOT WORKING... the futures all return null. Doing stupid way then...
+			
+			HashMap<String,Future<List<Service>>> searchList = new HashMap<String,Future<List<Service>>>(cisList.size()+1);
+			for(ICis cis : cisList){
+				logger.debug("Searching in CIS {}", cis.getName());
+				Future<List<Service>> resultSearch = searchServices(filter,cis.getCisId());
+				searchList.put(cis.getName(), resultSearch);
+			}
+			
+			if(logger.isDebugEnabled())
+				logger.debug("Searching our local node...");
+			searchList.put("Local Node",searchServices(filter));
 			
 			//And now we check...
-			for(Future<List<Service>> searchResult : searchList){
-				List<Service> foundServices = searchResult.get();
+			for( String searchNode : searchList.keySet()){
+				logger.debug("Checking result for {}", searchNode);
+				List<Service> foundServices = searchList.get(searchNode).get();
 				for(Service foundService : foundServices){
 					String key = ServiceModelUtils.serviceResourceIdentifierToString(foundService.getServiceIdentifier());
+					logger.debug("Found service {}", key);
 					result.put(key, foundService);
 				}
 			}
+			
+			
 
 		} catch(Exception ex){
 			ex.printStackTrace();
@@ -379,6 +409,8 @@ public class ServiceDiscovery implements IServiceDiscovery {
 			throws ServiceDiscoveryException {
 
 		if(logger.isDebugEnabled()) logger.debug("Searching repository for a given service, on node: " + node.getJid());
+		
+		List<Service> foundServices = new ArrayList<Service>();
 		
 		try{
 			
@@ -398,15 +430,19 @@ public class ServiceDiscovery implements IServiceDiscovery {
 				//Is it one of my CIS? If so, local search
 				ICisOwned localCis = getCisManager().getOwnedCis(node.getJid());
 				if(localCis != null){
-					if(logger.isDebugEnabled()) logger.debug("We're dealing with our CIS! Local search!");
-					return new AsyncResult<List<Service>>(getServiceReg().findServices(filter, node.getJid()));
+					logger.debug("We're dealing with our CIS {}! Local search!", localCis.getName());
+					foundServices = getServiceReg().findServices(filter, node.getJid());
+					logger.debug("Found {} services that fulfill this criteria in {}!",foundServices.size(),localCis.getName());
+					
 				} else{
 					if(logger.isDebugEnabled())
 						logger.debug("Attempting to retrieve services from remote node: " + node.getJid());
 						
 					ServiceDiscoveryRemoteClient callback = new ServiceDiscoveryRemoteClient();
-					getServiceDiscoveryRemote().getServices(node, callback); 
-					new AsyncResult<List<Service>>(callback.getResultList());
+					getServiceDiscoveryRemote().searchService(filter, node, callback);
+					foundServices = callback.getResultList();
+					logger.debug("Found {} services that fulfill this criteria in remote CIS {}!",foundServices.size(),node.getJid());
+					
 				}
 					
 			}
@@ -417,7 +453,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 		} 
 
 		
-		return new AsyncResult<List<Service>>(new ArrayList<Service>());
+		return new AsyncResult<List<Service>>(foundServices);
 	}
 
 	@Override
@@ -425,7 +461,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 	public Future<List<Service>> searchServices(Service filter, String jid)
 			throws ServiceDiscoveryException {
 		
-		if(logger.isDebugEnabled()) logger.debug("Searching repository for a given service, on node: " + jid);
+		if(logger.isDebugEnabled()) logger.debug("Searching repository for a given service, on jid: " + jid);
 
 		try {
 			

@@ -837,7 +837,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 	
 	private void sendEvent(ServiceMgmtEventType eventType, Service service, Bundle bundle){
 		log.debug("Sending event of type: {} for service {}", eventType,ServiceModelUtils.serviceResourceIdentifierToString(service.getServiceIdentifier()));
-		ServiceModelUtils.sendServiceMgmtEvent(ServiceMgmtEventType.NEW_SERVICE, service, null, bundle, eventMgr);
+		ServiceModelUtils.sendServiceMgmtEvent(eventType, service, null, bundle, eventMgr);
 	}
 	
 	
