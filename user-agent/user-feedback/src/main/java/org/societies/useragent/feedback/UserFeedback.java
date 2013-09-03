@@ -165,11 +165,13 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             log.error("Error registering for user feedback pubsub nodes", e);
         }
 
-        recallStoredUFRequests();
-
-        recallStoredPpnRequests();
-
-        recallStoredAccessControlRequests();
+        // TODO: Disabled persistence until we can get the hibernate issues sorted.
+        // Persistence may prove to be a lot more complicated than usual (due to the need to send our entities over pubsub)
+        // but it may ultimately not be needed - no point in saving requests if the process which spawned the request
+        // has died and can't resume
+//        recallStoredUFRequests();
+//        recallStoredPpnRequests();
+//        recallStoredAccessControlRequests();
 
         String msg = "User Feedback Initialised\n" +
                 " Exp UF requests: %s\n" +
@@ -249,6 +251,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
                 String requestId = userFeedbackBean.getRequestId();
                 switch (userFeedbackBean.getMethod()) {
                     case GET_EXPLICIT_FB:
+                    case SHOW_NOTIFICATION:
                         UserFeedbackResult<List<String>> expResult = new UserFeedbackResult<List<String>>(requestId);
                         expResults.put(requestId, expResult);
                         break;
@@ -442,6 +445,10 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         if (log.isDebugEnabled()) {
             log.debug("Received request for implicit feedback\n" +
                     "    Content: " + content.getProposalText());
+        }
+
+        if (content.getTimeout() < 1000) {
+            log.warn("Implicit (Timed Abort) request timeout is < 1000ms - timeouts should be specified in milliseconds");
         }
 
         //create user feedback bean to fire in pubsub event
@@ -675,6 +682,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
     @Override
     public Future<List<ResponseItem>> getAccessControlFBAsync(String requestId, Requestor requestor, List<ResponseItem> items, IUserFeedbackResponseEventListener<List<ResponseItem>> callback) {
         UserFeedbackAccessControlEvent event = new UserFeedbackAccessControlEvent();
+        event.setStage(FeedbackStage.PENDING_USER_RESPONSE);
         event.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
         event.setType(ExpProposalType.PRIVACY_ACCESS_CONTROL);
         event.setRequestId(requestId);
@@ -736,8 +744,10 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
     @Override
     public void showNotification(String notificationTxt) {
-        log.debug("Received request for notification");
-        log.debug("Content: " + notificationTxt);
+        if (log.isDebugEnabled()) {
+            log.debug("Received request for notification\n" +
+                    "    Content: " + notificationTxt);
+        }
 
         //generate unique ID for this pubsub event and feedback request
         String requestId = UUID.randomUUID().toString();
@@ -745,10 +755,21 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         //create user feedback bean to fire in pubsub event
         UserFeedbackBean ufBean = new UserFeedbackBean();
 //        ufBean.setRequestDate(new Date());
-        ufBean.setStage(FeedbackStage.COMPLETED);
+        ufBean.setStage(FeedbackStage.PENDING_USER_RESPONSE);
         ufBean.setRequestId(requestId);
         ufBean.setProposalText(notificationTxt);
         ufBean.setMethod(FeedbackMethodType.SHOW_NOTIFICATION);
+
+        //add new request to result hashmap
+        UserFeedbackResult<List<String>> result = new UserFeedbackResult<List<String>>(requestId);
+
+        //NB: To avoid deadlocks, ALWAYS synchronise on the incomplete beans map first, then results, then callbacks
+        synchronized (incompleteUserFeedbackBeans) {
+            incompleteUserFeedbackBeans.put(requestId, ufBean);
+        }
+        synchronized (expResults) {
+            expResults.put(requestId, result);
+        }
 
         // store in database before sending pubsub event
         try {
@@ -782,8 +803,6 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             log.error("Error transmitting user feedback request bean via pubsub", ex);
         }
 
-        // NB: No wait for a simple notification
-        // NB: No response/completed event for a simple notification
     }
 
 

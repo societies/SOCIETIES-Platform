@@ -13,7 +13,8 @@
 
         <one-to-one name="requestor"
                     class="org.societies.api.schema.identity.RequestorBean"
-                    cascade="all"/>
+                    cascade="all"
+                    lazy="false"/>
 
     </class>
 </hibernate-mapping>

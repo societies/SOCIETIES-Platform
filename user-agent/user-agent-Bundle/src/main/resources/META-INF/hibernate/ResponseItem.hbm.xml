@@ -16,7 +16,8 @@
 
         <one-to-one name="requestItem"
                     class="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem"
-                    cascade="all"/>
+                    cascade="all"
+                    lazy="false"/>
 
     </class>
 </hibernate-mapping>

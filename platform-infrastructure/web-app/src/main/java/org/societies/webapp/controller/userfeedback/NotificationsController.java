@@ -347,6 +347,7 @@ public class NotificationsController extends BasePageController {
 
         private boolean abort = false;
         private final List<NotificationQueueItem> timedAbortsToWatch;
+        private boolean enabled = true;
 
         public TimedAbortProcessor(List<NotificationQueueItem> timedAbortsToWatch) {
             this.timedAbortsToWatch = timedAbortsToWatch;
@@ -356,7 +357,8 @@ public class NotificationsController extends BasePageController {
         public void run() {
             while (!abort) {
                 try {
-                    processTimedAborts();
+                    if (enabled)
+                        processTimedAborts();
                 } catch (Exception ex) {
                     log.error("Error on timed abort processing thread", ex);
                 }
@@ -392,6 +394,13 @@ public class NotificationsController extends BasePageController {
             }
         }
 
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
     }
 
     public static final String ABORT_STRING = "abort";
@@ -401,6 +410,7 @@ public class NotificationsController extends BasePageController {
     private final LoginListener loginListener = new LoginListener();
     @SuppressWarnings("FieldCanBeLocal")
     private final Thread timedAbortProcessorThread;
+    private final TimedAbortProcessor timedAbortProcessor;
 
     @ManagedProperty(value = "#{pubsubClient}")
     private PubsubClient pubsubClient;
@@ -424,11 +434,12 @@ public class NotificationsController extends BasePageController {
     private IAccessControlHistoryRepository accessControlHistoryRepository;
 
     private final List<NotificationQueueItem> timedAbortsToWatch = new ArrayList<NotificationQueueItem>();
-    // NB: to avoid deadlocks, always synchronise on unansweredNotifications first, then on unansweredNotificationIDs
+
+    // NB: to avoid deadlocks, always synchronise on allNotifications first, then on allNotificationIDs,
+    // then unansweredNotifications, then unansweredNotificationIDs
     private final List<NotificationQueueItem> unansweredNotifications = new LinkedList<NotificationQueueItem>();
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final Set<String> unansweredNotificationIDs = new HashSet<String>();
-    // NB: to avoid deadlocks, always synchronise on allNotifications first, then on allNotificationIDs
     private final List<NotificationQueueItem> allNotifications = new LinkedList<NotificationQueueItem>();
     private final Set<String> allNotificationIDs = new HashSet<String>();
 
@@ -438,7 +449,8 @@ public class NotificationsController extends BasePageController {
     public NotificationsController() {
         log.debug("NotificationsController ctor()");
 
-        timedAbortProcessorThread = new Thread(new TimedAbortProcessor(timedAbortsToWatch));
+        timedAbortProcessor = new TimedAbortProcessor(timedAbortsToWatch);
+        timedAbortProcessorThread = new Thread(timedAbortProcessor);
         timedAbortProcessorThread.setName("TimedAbortProcessor");
         timedAbortProcessorThread.setDaemon(true);
     }
@@ -576,12 +588,16 @@ public class NotificationsController extends BasePageController {
 
         if (selectedItem.getType().equals(NotificationQueueItem.TYPE_ACK_NACK)
                 || selectedItem.getType().equals(NotificationQueueItem.TYPE_SELECT_ONE)
-                || selectedItem.getType().equals(NotificationQueueItem.TYPE_SELECT_MANY)) {
+                || selectedItem.getType().equals(NotificationQueueItem.TYPE_SELECT_MANY)
+                || selectedItem.getType().equals(NotificationQueueItem.TYPE_NOTIFICATION)) {
 
             List<String> feedback = new ArrayList<String>();
             if (selectedItem.getType().equals(NotificationQueueItem.TYPE_SELECT_MANY)) {
                 // add all results
                 Collections.addAll(feedback, selectedItem.getResults());
+            } else if (selectedItem.getType().equals(NotificationQueueItem.TYPE_NOTIFICATION)) {
+                // no response required - but we still have to send the event
+                feedback.clear();
             } else {
                 // add one result
                 feedback.add(selectedItem.getResult());
@@ -597,6 +613,7 @@ public class NotificationsController extends BasePageController {
                         e.getMessage(),
                         FacesMessage.SEVERITY_ERROR);
                 log.error("Error publishing notification of completed explicit UF request", e);
+                return;
             }
 
         } else if (selectedItem.getType().equals(NotificationQueueItem.TYPE_TIMED_ABORT)) {
@@ -611,13 +628,18 @@ public class NotificationsController extends BasePageController {
                         e.getMessage(),
                         FacesMessage.SEVERITY_ERROR);
                 log.error("Error publishing notification of completed implicit UF request", e);
+                return;
             }
 
-        } else if (selectedItem.getType().equals(NotificationQueueItem.TYPE_NOTIFICATION)) {
-            // no response is required
-            // but we must manually remove item from queue
-            markQueueItemComplete(selectedItem.getItemId(), new String[]{});
         }
+
+        synchronized (unansweredNotifications) {
+            synchronized (unansweredNotificationIDs) {
+                unansweredNotifications.remove(selectedItem);
+                unansweredNotificationIDs.remove(selectedItem.getItemId());
+            }
+        }
+
 
     }
 
@@ -682,34 +704,39 @@ public class NotificationsController extends BasePageController {
 
     private void replaceCacheWithList(List<UserFeedbackBean> ufList, List<UserFeedbackPrivacyNegotiationEvent> ppnList, List<UserFeedbackAccessControlEvent> acList) {
         synchronized (allNotifications) {
-            synchronized (unansweredNotifications) {
-                if (log.isDebugEnabled())
-                    log.debug(String.format("Replacing cache with %s UF events, %s PPN events, %S AC events",
-                            ufList != null ? ufList.size() : 0,
-                            ppnList != null ? ppnList.size() : 0,
-                            acList != null ? acList.size() : 0));
+            synchronized (allNotificationIDs) {
+                synchronized (unansweredNotifications) {
+                    synchronized (unansweredNotificationIDs) {
+                        if (log.isDebugEnabled())
+                            log.debug(String.format("Replacing cache with %s UF events, %s PPN events, %S AC events",
+                                    ufList != null ? ufList.size() : 0,
+                                    ppnList != null ? ppnList.size() : 0,
+                                    acList != null ? acList.size() : 0));
 
-                allNotifications.clear();
-                unansweredNotifications.clear();
-                allNotificationIDs.clear();
+                        allNotifications.clear();
+                        unansweredNotifications.clear();
+                        allNotificationIDs.clear();
+                        unansweredNotificationIDs.clear();
 
-                if (ufList != null)
-                    for (UserFeedbackBean uf : ufList) {
-                        NotificationQueueItem item = createNotificationQueueItemFromUserFeedbackBean(uf);
-                        addItemToQueue(item);
+                        if (ufList != null)
+                            for (UserFeedbackBean uf : ufList) {
+                                NotificationQueueItem item = createNotificationQueueItemFromUserFeedbackBean(uf);
+                                addItemToQueue(item);
+                            }
+
+                        if (ppnList != null)
+                            for (UserFeedbackPrivacyNegotiationEvent ppn : ppnList) {
+                                NotificationQueueItem item = NotificationQueueItem.forPrivacyPolicyNotification(ppn.getRequestId(), ppn);
+                                addItemToQueue(item);
+                            }
+
+                        if (acList != null)
+                            for (UserFeedbackAccessControlEvent ac : acList) {
+                                NotificationQueueItem item = NotificationQueueItem.forAccessControl(ac.getRequestId(), ac);
+                                addItemToQueue(item);
+                            }
                     }
-
-                if (ppnList != null)
-                    for (UserFeedbackPrivacyNegotiationEvent ppn : ppnList) {
-                        NotificationQueueItem item = NotificationQueueItem.forPrivacyPolicyNotification(ppn.getRequestId(), ppn);
-                        addItemToQueue(item);
-                    }
-
-                if (acList != null)
-                    for (UserFeedbackAccessControlEvent ac : acList) {
-                        NotificationQueueItem item = NotificationQueueItem.forAccessControl(ac.getRequestId(), ac);
-                        addItemToQueue(item);
-                    }
+                }
             }
         }
     }
@@ -839,5 +866,12 @@ public class NotificationsController extends BasePageController {
 
     }
 
+    public boolean isTimedAbortProcessorEnabled() {
+        return timedAbortProcessor.isEnabled();
+    }
+
+    public void setTimedAbortProcessorEnabled(boolean enabled) {
+        this.timedAbortProcessor.setEnabled(enabled);
+    }
 
 }

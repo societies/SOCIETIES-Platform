@@ -59,10 +59,10 @@
 
             <p:row>
                 <p:panel>
-                    <p:poll interval="2" update="countLabel" process="@this"/>
-                    <p:outputLabel value="PP Negotiations in queue: " for="countLabel"/>
-                    <p:inputText value="#{privacyPolicyNegotiationListener.queuedNegotiationCount}" readonly="true"
-                                 id="countLabel" style="width: 80px;"/>
+                    <p:outputLabel value="Timed abort processor" for="tapEnabledButton"/>
+                    <p:selectBooleanButton id="tapEnabledButton"
+                                           value="#{notifications.timedAbortProcessorEnabled}"
+                                           onLabel="Enabled" offLabel="Disabled"/>
                 </p:panel>
 
                 <p:commandButton value="Send UF Access Control"
