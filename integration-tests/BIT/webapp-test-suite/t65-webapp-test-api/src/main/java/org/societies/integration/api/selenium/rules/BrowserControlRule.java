@@ -56,11 +56,14 @@ public class BrowserControlRule implements MethodRule {
                     statement.evaluate(); // perform the test
 
                     driver.close(); // close on success
+                    driver.quit();
 
                 } catch (Throwable t) {
 
-                    if (closeBrowserOnFailure)
+                    if (closeBrowserOnFailure) {
                         driver.close(); // close on failure
+                        driver.quit();
+                    }
 
                     throw t;
                 }
