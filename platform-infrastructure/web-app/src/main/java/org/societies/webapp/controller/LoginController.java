@@ -145,4 +145,15 @@ public class LoginController extends BasePageController {
     public String getLoginDialogPassword() {
         return loginDialogPassword;
     }
+
+    public String restLogin(String username, String password) {
+        String result = openfireLoginService.doLogin(username, password);
+        if (result == null) {
+            return "401";
+        }
+
+        userService.login();
+
+        return "200";
+    }
 }
