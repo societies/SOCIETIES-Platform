@@ -45,6 +45,7 @@ public class BaseSocietiesPage extends AbstractSeleniumComponent {
     public static final String NOTIFICATION_COUNT_PATH_WITH_NUMBER = NOTIFICATION_BUBBLE_PATH + "//span[@id='mainForm:notification-count' and text()='%s']";
 
     public static final String TEST_PAGE_URL = "test.xhtml";
+    public static final String PROFILE_SETTINGS_PAGE_URL = "profilesettings.xhtml";
     public static final String EXAMPLE_PAGE_URL = "example.xhtml";
 
     protected BaseSocietiesPage(WebDriver driver) {
@@ -91,8 +92,9 @@ public class BaseSocietiesPage extends AbstractSeleniumComponent {
 //    }
 
     public ProfileSettingsPage navigateToProfileSettings() {
-        openMenu(NAV_PROFILE_SETTINGS_ITEM,
-                new String[]{NAV_MY_ACCOUNT_MENU});
+        String url = SeleniumTest.BASE_URL + PROFILE_SETTINGS_PAGE_URL;
+        log.debug("Navigating to {}", url);
+        getDriver().get(url);
 
         return new ProfileSettingsPage(getDriver());
     }
