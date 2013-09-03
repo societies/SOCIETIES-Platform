@@ -39,10 +39,10 @@ public class Sign {
 		public static final String DOC_TO_SIGN_URL = "XML_URL";
 	
 		/**
-		 * The signed xml document.
-		 * Type: byte[]
+		 * URL of the signed xml document.
+		 * Type: String
 		 */
-		public static final String SIGNED_DOC = "SIGNED_XML";
+		public static final String SIGNED_DOC_URL = "SIGNED_XML";
 	
 		/**
 		 * Type of the signature in output document

@@ -29,13 +29,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.societies.security.digsig.api.Sign;
 import org.societies.security.digsig.sign.DigSigException;
 
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.Intent;
-import android.os.Environment;
 import android.util.Log;
 
 /**
@@ -57,20 +54,6 @@ public class Storage {
 		this.contextWrapper = contextWrapper;
 	}
 
-	
-	public void writeToExternalStorage(Intent resultIntent) {
-		try	{
-			byte[] signedXml = resultIntent.getByteArrayExtra(Sign.Params.SIGNED_DOC);
-			FileOutputStream os = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/signed2.xml");
-			os.write(signedXml);
-			os.close();
-		
-			String msg = "File signed sucessfully.\nOutput is in signed2.xml on SD CARD.";
-			Log.i(TAG, msg);
-		} catch(Exception e) {
-		}
-	}
-	
 	public void writeToInternalStorage(String fileName, byte[] file) throws DigSigException {
 		try {
 			FileOutputStream fos = contextWrapper.openFileOutput(fileName, Context.MODE_PRIVATE);

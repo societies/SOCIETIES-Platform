@@ -42,7 +42,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 import android.util.Log;
@@ -235,7 +234,8 @@ public class DocContentProvider extends ContentProvider {
 
 		Log.d(tag, "openFile(" + uri + ", " + mode + ")");
 
-		File root = Environment.getExternalStorageDirectory(); 
+//		File root = Environment.getExternalStorageDirectory();
+		File root = getContext().getFilesDir();
 
 		String fileName = uri.getEncodedPath();
 		if (fileName.startsWith("/")) {
@@ -243,8 +243,8 @@ public class DocContentProvider extends ContentProvider {
 		}
 		Log.d(tag, "File name = " + fileName);
 		
-		String pass = uri.getQueryParameter(Sign.ContentUrl.PARAM_PASSWORD);
-//		Log.d(tag, "Password = " + pass);  // TODO: remove
+//		String pass = uri.getQueryParameter(Sign.ContentUrl.PARAM_PASSWORD);
+//		Log.d(tag, "Password = " + pass);
 		
 		File path = new File(root, fileName);
 

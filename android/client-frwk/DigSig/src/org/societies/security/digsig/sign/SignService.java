@@ -178,8 +178,9 @@ public class SignService extends IntentService {
 			domOutput.setEncoding("UTF-8");	        
 			serializer.write(doc, domOutput);
 
-			intent.putExtra(Sign.Params.SIGNED_DOC, output.toByteArray());
-			new Storage(this).writeToExternalStorage(intent);
+			String path = intent.getStringExtra(Sign.Params.SIGNED_DOC_URL);
+			Log.d(TAG, "Writing signed doc to internal storage file " + path);
+			new Storage(this).writeToInternalStorage(path, output.toByteArray());
 		} catch (Exception e) {  
 			Log.e(TAG, "Failed while signing!", e);
 		}

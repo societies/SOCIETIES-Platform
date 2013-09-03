@@ -1,6 +1,7 @@
 package org.societies.security.digsig.sign;
 
 import org.societies.security.digsig.api.Sign;
+import org.societies.security.digsig.utility.RandomString;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -84,19 +85,26 @@ public class SignActivity extends Activity {
 		super.onActivityResult(requestCode, resultCode, data);
 
 		if (requestCode == SELECT_IDENTITY && resultCode == RESULT_OK) {
+			
+			String signedDocPath = RandomString.getRandomNumberString();
+			
 			Intent intent = new Intent(this, SignService.class);
 			intent.putExtras(getIntent());
 			intent.putExtra(Sign.Params.IDENTITY, data.getIntExtra(Sign.Params.IDENTITY, -1));
+			intent.putExtra(Sign.Params.SIGNED_DOC_URL, signedDocPath);
 			startService(intent);
-			if (getIntent().getByteArrayExtra(Sign.Params.DOC_TO_SIGN) == null) {
-				setResult(RESULT_OK);
-			} else {
-				setResult(RESULT_OK, intent);
-			}
+
+			Intent returnIntent = new Intent(getIntent());
+			returnIntent.putExtra(Sign.Params.SIGNED_DOC_URL, localPath2Url(signedDocPath));
+			setResult(RESULT_OK, returnIntent);
 			finish();
 		}
 	}
 	
+	private String localPath2Url(String path) {
+		return "content://org.societies.security.digsig.provider/" + path;
+	}
+
 	private void selectIdentity() {
 		Intent i = new Intent(this, ListIdentitiesActivity.class);
 		startActivityForResult(i, SELECT_IDENTITY);

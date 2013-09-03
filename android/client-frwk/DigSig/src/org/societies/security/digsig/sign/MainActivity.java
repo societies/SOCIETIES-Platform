@@ -12,6 +12,7 @@ import org.societies.security.digsig.utility.StreamUtil;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -106,14 +107,23 @@ public class MainActivity extends Activity {
 			
 			try
 			{
-				byte[] signedXml = data.getByteArrayExtra(Sign.Params.SIGNED_DOC);
-				FileOutputStream os = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/signed2.xml");
-				os.write(signedXml);
+				String signedXml = data.getStringExtra(Sign.Params.SIGNED_DOC_URL);
+				Log.d(TAG, "URL of the signed XML: " + signedXml);
+				Thread.sleep(10000);  // Allow some time for the service to sign
+				InputStream is = getContentResolver().openInputStream(Uri.parse(signedXml));
+				FileOutputStream os = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/signed3.xml");
+				int numRead;
+				byte[] buf = new byte[1024];
+				while ( (numRead = is.read(buf) ) >= 0) {
+					os.write(buf, 0, numRead);
+				}
 				os.close();
+				is.close();
 			
-				Toast.makeText(this, "File signed sucessfully.\nOutput is in signed2.xml on SD CARD!", Toast.LENGTH_LONG).show();
+				Log.d(TAG, "File signed sucessfully. Output is in signed3.xml on SD card!");
+				Toast.makeText(this, "File signed sucessfully.\nOutput is in signed3.xml on SD card!", Toast.LENGTH_LONG).show();
 			} catch(Exception e) {
-				
+				Log.w(TAG, e);
 			}					
 		} if (requestCode == VERIFY) {
 			if (resultCode == RESULT_OK) {
