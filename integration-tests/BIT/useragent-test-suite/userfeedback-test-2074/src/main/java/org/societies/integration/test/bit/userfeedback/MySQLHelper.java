@@ -53,7 +53,7 @@ public class MySQLHelper {
 
         String id = resultSet.getString(1);
 
-        sql = "SELECT `value` FROM `userfeedbackbean_options` WHERE `option_id`=?";
+        sql = "SELECT `value` FROM `userfeedbackbean_options` WHERE `requestId`=?";
         statement = conn.prepareStatement(sql);
         statement.setString(1, id);
 

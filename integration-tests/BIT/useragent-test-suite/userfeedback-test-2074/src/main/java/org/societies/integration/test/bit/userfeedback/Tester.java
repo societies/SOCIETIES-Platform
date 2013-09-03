@@ -333,19 +333,21 @@ public class Tester {
         //      4. Correct notification disappears on Android, T65
 
         //1. Empty database, clean startup
-        mySQLHelper.clearTable("IdentityRequestorBean");
-        mySQLHelper.clearTable("NegotiationDetailsBean");
 
-        mySQLHelper.clearTable("PrivacyPolicyAction");
-        mySQLHelper.clearTable("PrivacyPolicyCondition");
-        mySQLHelper.clearTable("PrivacyPolicyResource");
-        mySQLHelper.clearTable("PrivacyPolicyRequestItem");
-        mySQLHelper.clearTable("PrivacyPolicyResponseItem");
-        mySQLHelper.clearTable("PrivacyPolicyRequestItem");
-        mySQLHelper.clearTable("PrivacyPolicyResponsePolicy");
-        mySQLHelper.clearTable("UserFeedbackBean");
         mySQLHelper.clearTable("UserFeedbackBean_options");
-        mySQLHelper.clearTable("UserFeedbackPrivacyNegotiationEvent");
+        mySQLHelper.clearTable("UserFeedbackBean");
+
+        mySQLHelper.clearTable("UFAccessControlEvent");
+        mySQLHelper.clearTable("UFPrivacyNegotiationEvent");
+
+        mySQLHelper.clearTable("UFResponsePolicy");
+        mySQLHelper.clearTable("UFResponseItem");
+        mySQLHelper.clearTable("UFRequestItem");
+        mySQLHelper.clearTable("UFAction");
+        mySQLHelper.clearTable("UFCondition");
+        mySQLHelper.clearTable("UFResource");
+        mySQLHelper.clearTable("UFRequestorBean");
+
 
         log.info("Clearing UserFeedback");
         userFeedback.clear();
