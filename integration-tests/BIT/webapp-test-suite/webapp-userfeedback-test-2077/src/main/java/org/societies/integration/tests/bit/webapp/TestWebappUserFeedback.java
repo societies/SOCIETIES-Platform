@@ -93,12 +93,15 @@ public class TestWebappUserFeedback extends SeleniumTest {
         // TODO: wait until popup is stale, instead of waiting a set amount of time
         Thread.sleep(2000);
 
-        // TODO: wait until popup is stale, instead of waiting a set amount of time
         popup.answerSelectOneRequest("Yes");
 
+        // TODO: wait until popup is stale, instead of waiting a set amount of time
         Thread.sleep(2000);
 
         popup.answerSelectManyRequest(new String[]{"Yes", "No"});
+
+        // TODO: wait until popup is stale, instead of waiting a set amount of time
+        Thread.sleep(2000);
 
         log.debug("Finished responding to requests");
 
@@ -329,7 +332,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
         }
 
         Assert.assertTrue("Future object not updated after 10000ms", result1.isDone());
-        Assert.assertEquals("Incorrect value updated in Future object", Boolean.FALSE, result1.get());
+        Assert.assertEquals("Incorrect value updated in Future object", Boolean.TRUE, result1.get());
         indexPage.verifyNumberInNotificationsBubble(0);
     }
 
