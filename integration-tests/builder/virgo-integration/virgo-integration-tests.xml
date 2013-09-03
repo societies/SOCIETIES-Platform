@@ -36,6 +36,7 @@
 		<module>../../../platform-infrastructure/comms-frwk/ExampleServices/Calculator</module> <!-- to be removed when third party services example will be available -->
 		<module>../../../platform-infrastructure/comms-frwk/ExampleServices/FortuneCookie</module> <!-- to be removed when third party services example will be available -->
 		<module>../../example-service</module>
+		<module>../../example-service-server</module>
 		
 		<!-- BIT Tests -->
 		<module>../../BIT/css-services-test-suite/use-service-759</module>
