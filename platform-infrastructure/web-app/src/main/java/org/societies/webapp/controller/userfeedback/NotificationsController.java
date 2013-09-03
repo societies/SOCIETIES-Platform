@@ -384,8 +384,7 @@ public class NotificationsController extends BasePageController {
                     if (!new Date().after(ta.getTimeoutTime())) continue;
 
                     // the TA has expired, send the response
-                    ta.setResult(null); // anything other than 'ABORT' is considered 'continue'
-                    submitItem(ta.getItemId());
+                    submitItem(ta.getItemId(), Boolean.TRUE);
 
                     // remove from watch list
                     markQueueItemComplete(ta.getItemId(), new String[]{"false"});
@@ -403,7 +402,6 @@ public class NotificationsController extends BasePageController {
         }
     }
 
-    public static final String ABORT_STRING = "abort";
     public static final int DEFAULT_FETCH_COUNT = 50;
 
     private final PubSubListener pubSubListener = new PubSubListener();
@@ -559,9 +557,19 @@ public class NotificationsController extends BasePageController {
         return allNotifications;
     }
 
+    public void acceptTimedAbort(String itemId) {
+        submitItem(itemId, Boolean.TRUE);
+    }
+
+    public void abortTimedAbort(String itemId) {
+        submitItem(itemId, Boolean.FALSE);
+    }
+
     public void submitItem(String itemId) {
-        // TODO: this should probably be refactored into a UserFeedbackEventController
-        // or something similar, in order to reduce coupling
+        submitItem(itemId, null);
+    }
+
+    private void submitItem(String itemId, Object result) {
 
         log.debug("submitItem() id=" + itemId);
 
@@ -619,7 +627,7 @@ public class NotificationsController extends BasePageController {
         } else if (selectedItem.getType().equals(NotificationQueueItem.TYPE_TIMED_ABORT)) {
 
             try {
-                userFeedback.submitImplicitResponse(selectedItem.getItemId(), ABORT_STRING.equals(selectedItem.getResult()));
+                userFeedback.submitImplicitResponse(selectedItem.getItemId(), (Boolean) result);
 
                 if (log.isDebugEnabled())
                     log.debug("Sent " + UserFeedbackEventTopics.IMPLICIT_RESPONSE + " with ID " + selectedItem.getItemId());
@@ -639,8 +647,6 @@ public class NotificationsController extends BasePageController {
                 unansweredNotificationIDs.remove(selectedItem.getItemId());
             }
         }
-
-
     }
 
     public void clearNotifications() {

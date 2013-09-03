@@ -236,16 +236,22 @@
         <h:outputText value="Time left: #{notification.friendlyTimeLeft}" id="timedAbortTimeLeft"/>
         <p:poll interval="1" update="timedAbortTimeLeft"/>
 
-        <p>Click this button to cancel</p>
+        <h:panelGrid columns="1">
+            <p:poll interval="1" update="taAbortButton"/>
 
-        <!--<f:metadata>
-            <f:viewParam name="result" value="{notification.result}"/>
-        </f:metadata>
-        <p:commandButton value="Abort" process="timedAbortPanel_unread"
-                         update="@form"
-                         actionListener="{notifications.submitItem(notification.itemId)}">
-            <f:param name="result" value="abort"/>
-        </p:commandButton>-->
+            <p:commandButton id="taAcceptButton"
+                             value="Accept" process="timedAbortPopupPanel"
+                             update="notificationGrid"
+                             actionListener="#{notifications.acceptTimedAbort(notification.itemId)}">
+                <f:param name="result" value="accept"/>
+            </p:commandButton>
+            <p:commandButton id="taAbortButton"
+                             value="Abort (#{notification.friendlyTimeLeft})" process="timedAbortPopupPanel"
+                             update="notificationGrid"
+                             actionListener="#{notifications.abortTimedAbort(notification.itemId)}">
+                <f:param name="result" value="abort"/>
+            </p:commandButton>
+        </h:panelGrid>
 
     </h:panelGrid>
 </p:panel>
