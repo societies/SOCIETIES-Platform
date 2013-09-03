@@ -1,5 +1,7 @@
 package org.societies.security.digsig.sign;
 
+import java.util.Random;
+
 import org.societies.security.digsig.api.Sign;
 import org.societies.security.digsig.utility.RandomString;
 
@@ -87,15 +89,18 @@ public class SignActivity extends Activity {
 		if (requestCode == SELECT_IDENTITY && resultCode == RESULT_OK) {
 			
 			String signedDocPath = RandomString.getRandomNumberString();
+			int sid = Math.abs(new Random().nextInt());
 			
 			Intent intent = new Intent(this, SignService.class);
 			intent.putExtras(getIntent());
 			intent.putExtra(Sign.Params.IDENTITY, data.getIntExtra(Sign.Params.IDENTITY, -1));
 			intent.putExtra(Sign.Params.SIGNED_DOC_URL, signedDocPath);
+			intent.putExtra(Sign.Params.SESSION_ID, sid);
 			startService(intent);
 
 			Intent returnIntent = new Intent(getIntent());
 			returnIntent.putExtra(Sign.Params.SIGNED_DOC_URL, localPath2Url(signedDocPath));
+			returnIntent.putExtra(Sign.Params.SESSION_ID, sid);
 			setResult(RESULT_OK, returnIntent);
 			finish();
 		}

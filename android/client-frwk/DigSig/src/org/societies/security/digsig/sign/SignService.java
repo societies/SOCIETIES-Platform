@@ -125,6 +125,7 @@ public class SignService extends IntentService {
 		if (selected==-1) {
 			return;
 		}
+		Intent bcIntent = new Intent();
 
 		String certKey = String.format(Locale.US, "CERT_%d", selected);
 		String keyKey = String.format(Locale.US, "KEY_%d", selected);
@@ -181,11 +182,19 @@ public class SignService extends IntentService {
 			String path = intent.getStringExtra(Sign.Params.SIGNED_DOC_URL);
 			Log.d(TAG, "Writing signed doc to internal storage file " + path);
 			new Storage(this).writeToInternalStorage(path, output.toByteArray());
-			// TODO: send broadcast
+			bcIntent.putExtra(Sign.Params.SUCCESS, true);
+			
 		} catch (Exception e) {  
 			Log.e(TAG, "Failed while signing!", e);
-			// TODO: send broadcast
+			bcIntent.putExtra(Sign.Params.SUCCESS, false);
 		}
+		int sessionId = intent.getIntExtra(Sign.Params.SESSION_ID, -1);
+		if (sessionId < 0) {
+			Log.w(TAG, "Missing session ID");
+		}
+		bcIntent.putExtra(Sign.Params.SESSION_ID, sessionId);
+		bcIntent.setAction(Sign.ACTION_FINISHED);
+		sendBroadcast(bcIntent);
 	}
 	
 	private InputStream getDocToSign(Intent intent) throws DigSigException {

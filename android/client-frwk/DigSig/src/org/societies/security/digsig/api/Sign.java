@@ -17,6 +17,11 @@ public class Sign {
 	public static final String ACTION = "org.societies.security.digsig.action.Sign";
 
 	/**
+	 * The action in the broadcast to notify about finished signing.
+	 */
+	public static final String ACTION_FINISHED = "org.societies.security.digsig.action.SignFinished";
+
+	/**
 	 * Intent extras
 	 */
 	public class Params {
@@ -61,6 +66,18 @@ public class Sign {
 		 * Type: String
 		 */
 		public static final String IDENTITY = "IDENTITY";
+
+		/**
+		 * True if the operation completed successfully, false if an error occurred.
+		 * Type: boolean
+		 */
+		public static final String SUCCESS = "SUCCESS";
+		
+		/**
+		 * Session number. Should be non-negative. A negative value indicates a serious error.
+		 * Type: int
+		 */
+		public static final String SESSION_ID = "SESSION_ID";
 		
 		/**
 		 * All supported types of the signature in output document
