@@ -25,6 +25,7 @@
 package org.societies.security.digsig.sign.test;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.societies.security.digsig.sign.MainActivity;
 
@@ -67,12 +68,15 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 //		contentResolver.getFile();
 		
 		ContentResolver contentresolver = mActivity.getContentResolver();
-		Uri uri = Uri.parse("content://org.societies.security.digsig.provider/somedir/somefile.xml?crap=a&pass=123&morecrap=abc");
-		InputStream io;
+		Uri uri = Uri.parse("content://org.societies.security.digsig.provider/signed2.xml?pass=123");
+		InputStream is;
 		
 //		openFileDescriptor(uri, mode);
 //		openOutputStream(uri);
-		io = contentresolver.openInputStream(uri);
-		assertNotNull(io);
+		is = contentresolver.openInputStream(uri);
+		assertNotNull(is);
+		
+		OutputStream os = contentresolver.openOutputStream(uri);
+		assertNotNull(os);
 	}
 }

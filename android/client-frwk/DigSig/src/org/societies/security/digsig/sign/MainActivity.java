@@ -17,6 +17,7 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
@@ -50,6 +51,26 @@ public class MainActivity extends Activity {
 								
 				Intent i = new Intent(MainActivity.this, SignActivity.class);
 				i.putExtra(Sign.Params.DOC_TO_SIGN, val);
+				
+				ArrayList<String> idsToSign = new ArrayList<String>();
+				idsToSign.add("Miki1");
+				i.putStringArrayListExtra(Sign.Params.IDS_TO_SIGN, idsToSign);
+				
+				startActivityForResult(i, SIGN);
+			}
+		});
+        
+        listBtn = (Button) findViewById(R.id.buttonMainSignUrl);
+        listBtn.setOnClickListener(new View.OnClickListener() {		
+			public void onClick(View v) {
+				
+		        Log.i(TAG, "buttonSignUrl clicked");
+		        
+		        EditText urlEditText = (EditText) findViewById(R.id.editTextMainSignUrl);
+		        String url = urlEditText.getText().toString();
+		        
+				Intent i = new Intent(MainActivity.this, SignActivity.class);
+				i.putExtra(Sign.Params.DOC_TO_SIGN_URL, url);
 				
 				ArrayList<String> idsToSign = new ArrayList<String>();
 				idsToSign.add("Miki1");

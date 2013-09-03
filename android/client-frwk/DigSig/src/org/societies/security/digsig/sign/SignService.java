@@ -2,6 +2,10 @@ package org.societies.security.digsig.sign;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.cert.CertificateFactory;
@@ -36,6 +40,8 @@ public class SignService extends IntentService {
 
 	private static final String TAG = SignService.class.getSimpleName();
 
+	private static final String TMP_FILE_PATH = "tmpFile";
+	
 	private AndroidSecureStorage secureStorage;
 	private KeyFactory keyFactory;
 	private CertificateFactory certFactory;
@@ -63,11 +69,13 @@ public class SignService extends IntentService {
 		Log.i(TAG, "intent received");
 
 		byte[] doc = intent.getByteArrayExtra(Sign.Params.DOC_TO_SIGN);
+		String docUrl = intent.getStringExtra(Sign.Params.DOC_TO_SIGN_URL);
 		int identity = intent.getIntExtra(Sign.Params.IDENTITY, -1);
 		List<String> ids = intent.getStringArrayListExtra(Sign.Params.IDS_TO_SIGN);
 		String outputType = intent.getStringExtra(Sign.Params.OUTPUT_TYPE);
 
-		Log.i(TAG, "DOC_TO_SIGN = " + doc);
+		Log.i(TAG, "DOC_TO_SIGN = " + (doc != null ? new String(doc) : null));
+		Log.i(TAG, "DOC_TO_SIGN_URL = " + docUrl);
 		Log.i(TAG, "IDENTITY = " + identity);
 		Log.i(TAG, "IDS_TO_SIGN = " + ids);
 		Log.i(TAG, "OUTPUT_TYPE = " + outputType);
@@ -144,10 +152,9 @@ public class SignService extends IntentService {
 
 		Document doc;
 		XMLSignature sig;
-		try	{	    
-			byte[] val = intent.getByteArrayExtra(Sign.Params.DOC_TO_SIGN);        
-
-			doc = docBuilder.parse(new ByteArrayInputStream(val));
+		try	{
+			InputStream is = getDocToSign(intent);
+			doc = docBuilder.parse(is);
 			sig = new XMLSignature(doc,null,XMLSignature.ALGO_ID_SIGNATURE_RSA);
 
 			doc.getDocumentElement().appendChild(sig.getElement());
@@ -175,6 +182,50 @@ public class SignService extends IntentService {
 			new Storage(this).writeToExternalStorage(intent);
 		} catch (Exception e) {  
 			Log.e(TAG, "Failed while signing!", e);
+		}
+	}
+	
+	private InputStream getDocToSign(Intent intent) throws DigSigException {
+		
+		try {
+			byte[] val = intent.getByteArrayExtra(Sign.Params.DOC_TO_SIGN);
+			if (val != null) {
+				return new ByteArrayInputStream(val);
+			}
+			else {
+				String docUrl = intent.getStringExtra(Sign.Params.DOC_TO_SIGN_URL);
+				download(new URL(docUrl), TMP_FILE_PATH);
+				return openFileInput(TMP_FILE_PATH);
+			}
+		} catch (Exception e) {
+			throw new DigSigException(e);
+		}
+	}
+
+	private void download(URL url, String path) throws DigSigException {
+		
+		Log.d(TAG, "download(" + url + ", " + path + ")");
+
+		FileOutputStream fos;
+		
+		try {
+			HttpURLConnection c = (HttpURLConnection) url.openConnection();
+			c.setRequestMethod("GET");
+			c.setDoOutput(true);
+			c.connect();
+			InputStream is = c.getInputStream();
+
+			fos = openFileOutput(path, MODE_PRIVATE);
+
+			byte[] buffer = new byte[1024 * 1024];
+			int len = 0;
+			while ( (len = is.read(buffer)) > 0 ) {
+				fos.write(buffer, 0, len);
+			}
+			fos.close();
+
+		} catch (Exception e) {
+			throw new DigSigException(e);
 		}
 	}
 }

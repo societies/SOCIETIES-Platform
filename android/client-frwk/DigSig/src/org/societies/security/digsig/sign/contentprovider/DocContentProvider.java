@@ -235,8 +235,7 @@ public class DocContentProvider extends ContentProvider {
 
 		Log.d(tag, "openFile(" + uri + ", " + mode + ")");
 
-		File root = new File(Environment.getExternalStorageDirectory(), 
-				"/Android/data/org.societies.security.digsig/cache");
+		File root = Environment.getExternalStorageDirectory(); 
 
 		String fileName = uri.getEncodedPath();
 		if (fileName.startsWith("/")) {
