@@ -98,19 +98,19 @@ public class UserAdminController {
 	public String populateHotelForm() {
 		return "";
 	}
-	
+
 	@RequestMapping(value = "/admin-logout.html", method = RequestMethod.GET)
 	public ModelAndView adminLogout() {
 		return adminlogin("");
 	}
-	
+
 	@RequestMapping(value = "/admin.html", method = RequestMethod.GET)
 	public ModelAndView adminlogin(@ModelAttribute("suid") String suid) {
 		// Already logged
 		Map<String, Object> model = new HashMap<String, Object>();
 		if (null != suid && "logged".equals(suid)) {
 			// Save
-//			model.put("debugmsg", "adminlogin: suid is not null");
+			//			model.put("debugmsg", "adminlogin: suid is not null");
 			model.put("suid", suid);
 			// Display user admin
 			List<DaUserRecord> userRecords = daRegistry.getXmppIdentityDetails();
@@ -131,13 +131,13 @@ public class UserAdminController {
 		}
 
 		// Not logged
-//		model.put("debugmsg", "adminlogin: suid is null");
+		//		model.put("debugmsg", "adminlogin: suid is null");
 		UserAdminForm userForm = new UserAdminForm();
 		model.put("loginForm", userForm);
 		model.put("suid", "");
 		return new ModelAndView("adminlogin", model);
 	}
-	
+
 	@RequestMapping(value = "/useradmin.html", method = RequestMethod.GET)
 	public ModelAndView useradmin(@ModelAttribute("suid") String suid) {
 		return adminlogin(suid);
@@ -197,10 +197,10 @@ public class UserAdminController {
 	public ModelAndView processLogin(@Valid UserAdminForm userForm, BindingResult result, Map model, @ModelAttribute("suid") String suid) {
 		// Not logged
 		if (null == suid || !"logged".equals(suid)) {
-//			model.put("debugmsg", "processLogin: suid is null");
+			//			model.put("debugmsg", "processLogin: suid is null");
 			adminlogin(suid);
 		}
-//		model.put("debugmsg", "processLogin: suid is not null: "+suid);
+		//		model.put("debugmsg", "processLogin: suid is not null: "+suid);
 
 		List<DaUserRecord> userRecords = daRegistry.getXmppIdentityDetails();
 		// check was has changed!
@@ -242,26 +242,26 @@ public class UserAdminController {
 		}
 
 
-//		Map<String, Object> modelnew = new HashMap<String, Object>();
-//		if (reload)
-//			userRecords = daRegistry.getXmppIdentityDetails();
-//		UserAdminForm userFormNew = new UserAdminForm();
-//		userFormNew.setUserDetails(userRecords);
-//
-//
-//		modelnew.put("userForm", userFormNew);
-//		modelnew.put("userrecords", userRecords);
-//
-//		Map<String, String> userTypes = new LinkedHashMap<String, String>();
-//		userTypes.put("user", "user");
-//		userTypes.put("admin", "admin");
-//		modelnew.put("userTypes", userTypes);
-//
-//		Map<String, String> userStatusTypes = new LinkedHashMap<String, String>();
-//		userStatusTypes.put("new", "new");
-//		userStatusTypes.put("active", "active");
-//		userStatusTypes.put("deleted", "deleted");
-//		modelnew.put("userStatusTypes", userStatusTypes);
+		//		Map<String, Object> modelnew = new HashMap<String, Object>();
+		//		if (reload)
+		//			userRecords = daRegistry.getXmppIdentityDetails();
+		//		UserAdminForm userFormNew = new UserAdminForm();
+		//		userFormNew.setUserDetails(userRecords);
+		//
+		//
+		//		modelnew.put("userForm", userFormNew);
+		//		modelnew.put("userrecords", userRecords);
+		//
+		//		Map<String, String> userTypes = new LinkedHashMap<String, String>();
+		//		userTypes.put("user", "user");
+		//		userTypes.put("admin", "admin");
+		//		modelnew.put("userTypes", userTypes);
+		//
+		//		Map<String, String> userStatusTypes = new LinkedHashMap<String, String>();
+		//		userStatusTypes.put("new", "new");
+		//		userStatusTypes.put("active", "active");
+		//		userStatusTypes.put("deleted", "deleted");
+		//		modelnew.put("userStatusTypes", userStatusTypes);
 		return new ModelAndView("redirect:admin.html");
 	}
 

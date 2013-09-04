@@ -16,11 +16,12 @@
 <div id="content" class="download">
 	<h2>Download the SOCIETIES Android Client</h2>
 	<p>SOCIETIES is also available on your Android smartphone. Just download and install the two SOCIETIES Android app.</p>
+	<p><em>You need to allow your Android phone to install application outside of Google Play. Parameters > Security, and then check "Allow Unknown Sources".</em></p>
 	${errormsg}
 	${debugmsg}
 	<ul class="downloadBox">
-		<li><a href="${societiesAndroidCommsAppPath}" class="greatButton">SOCIETIES Android Comms App</a></li>
-		<li><a href="${societiesAndroidAppPath}" class="greatButton">SOCIETIES Android App</a></li>
+		<li><img src="${societiesAndroidCommsAppQrCodePath}" width="250" height="250" alt="SOCIETIES Android Comms App QrCode" /><br /><a href="${societiesAndroidCommsAppPath}" class="greatButton">SOCIETIES Android Comms App</a></li>
+		<li><img src="${societiesAndroidAppQrCodePath}" width="250" height="250" alt="SOCIETIES Android App QrCode" /><br /><a href="${societiesAndroidAppPath}" class="greatButton">SOCIETIES Android App</a></li>
 	</ul>
 	
 	<div class="article">
@@ -30,7 +31,7 @@
 			But before any login, your Android App shall be associated to your SOCIETIES account properly. However, the SOCIETIES administrator may have provide you some configuration parameters.
 			In order to create this association, launch your App and, using the Android menu button, select Preferences then CSS Configuration.
 			<br />
-			<strong>Menu -> Preference -> CSS Configuration</strong>
+			<strong>Menu > Preference > CSS Configuration</strong>
 			<br />
 			Now fills your account credentials, and eventually the parameters provided by the SOCIETIES administrator. <small>The XMPP Server IP address is only required if this SOCIETIES platform is not accessible through the Internet.</small>
 		</p>

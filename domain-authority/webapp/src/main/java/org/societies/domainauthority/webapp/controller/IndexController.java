@@ -26,10 +26,6 @@ package org.societies.domainauthority.webapp.controller;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
@@ -37,6 +33,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +46,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import net.glxn.qrgen.QRCode;
 import net.glxn.qrgen.image.ImageType;
 
+import org.apache.commons.codec.binary.Base64;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.css.directory.ICssDirectory;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
@@ -348,38 +346,40 @@ public class IndexController {
 		return new ModelAndView("signup", model);
 	}
 
-	@RequestMapping(value = "/download.html", method = RequestMethod.GET)
+	@RequestMapping(value = "/download.html")
 	public ModelAndView downloadInit() {
 		Map<String, Object> model = new HashMap<String, Object>();
+		// Retrieve current URL
+		DaUserRecord adminUserRecord = new DaUserRecord(commManager.getIdManager().getThisNetworkNode().getIdentifier(), commManager.getIdManager().getThisNetworkNode().getIdentifier()+commManager.getIdManager().getThisNetworkNode().getDomain(), commManager.getIdManager().getThisNetworkNode().getDomain(), "50000", "active", "admin", "defaultpassword");
+		List<DaUserRecord> userRecords = daRegistry.getXmppIdentityDetails();
+		for(Iterator<DaUserRecord> it = userRecords.iterator(); it.hasNext();) {
+			DaUserRecord current = it.next();
+			if ("admin".equals(current.getUserType())) {
+				adminUserRecord = current;
+				break;
+			}
+		}
 		// APK access
 		String downloadPath = context.getContextPath()+"/download/";
+		String downloadUrl = "http://"+adminUserRecord.getHost()+":"+adminUserRecord.getPort()+downloadPath;
 		String societiesAndroidCommsAppFilename = "SocietiesAndroidCommsApp.apk";
 		String societiesAndroidCommsAppPath = downloadPath+societiesAndroidCommsAppFilename;
+		String societiesAndroidCommsAppUrl = downloadUrl+societiesAndroidCommsAppFilename;
 		String societiesAndroidAppFilename = "SocietiesAndroidApp.apk";
+		String societiesAndroidAppUrl = downloadUrl+societiesAndroidAppFilename;
 		String societiesAndroidAppPath = downloadPath+societiesAndroidAppFilename;
-		
-		// QrCode generation
-		ByteArrayOutputStream out = QRCode.from("Hello World").to(ImageType.PNG).stream();
-		try {
-			FileOutputStream fout = new FileOutputStream(new File(downloadPath+"+QrCode.JPG"));
-			fout.write(out.toByteArray());
-			fout.flush();
-			fout.close();
 
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			model.put("errormsg", "Can't generate the QrCode FileNotFoundException "+e);
-		} catch (IOException e) {
-			e.printStackTrace();
-			model.put("errormsg", "Can't generate the QrCode IOException "+e);
-		} 
-		model.put("debugmsg", context.getRealPath("test"));
-		
+		model.put("societiesAndroidCommsAppQrCodePath", getQrCodeDataUri(societiesAndroidCommsAppUrl));
 		model.put("societiesAndroidCommsAppPath", societiesAndroidCommsAppPath);
+		model.put("societiesAndroidAppQrCodePath", getQrCodeDataUri(societiesAndroidAppUrl));
 		model.put("societiesAndroidAppPath", societiesAndroidAppPath);
 		return new ModelAndView("download", model);	
 	}
 
+	private String getQrCodeDataUri(String data) {
+		ByteArrayOutputStream  qrCodeData = QRCode.from(data).to(ImageType.PNG).withSize(250, 250).stream();
+		return "data:image/png;base64,"+new String(Base64.encodeBase64(qrCodeData.toByteArray()));
+	}
 
 	private static String postData(MethodType method, String openfireUrl, Map<String, String> params) {
 		try { 
