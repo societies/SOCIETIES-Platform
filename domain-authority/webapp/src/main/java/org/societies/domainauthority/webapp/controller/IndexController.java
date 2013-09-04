@@ -36,14 +36,13 @@ import java.io.StringReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.validation.Valid;
-import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -58,7 +57,6 @@ import org.societies.domainauthority.registry.DaUserRecord;
 import org.societies.domainauthority.webapp.models.LoginForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -80,6 +78,8 @@ public class IndexController {
 	DaRegistry daRegistry;
 	@Autowired
 	ICssDirectory cssDir;
+	@Autowired
+	ServletContext context;
 
 	public IndexController() {
 	}
@@ -179,7 +179,7 @@ public class IndexController {
 		String serializedPassword = toBytesString(password);
 		String redirectUrlIndex = "http://"+userRecord.getHost()+":"+userRecord.getPort()+"/societies/index.xhtml";
 		String redirectUrlLogin = "http://"+userRecord.getHost()+":"+userRecord.getPort()+"/societies/rest_login.xhtml?username="+userName+"&passworddigest="+serializedPassword+"&redirect=true";
-//		model.put("debugmsg", "Request:"+redirectUrlLogin+", Response:"+loginToUserWebapp(userRecord.getHost(), userRecord.getPort(), userName, password, false)+", Unserialized password:"+fromBytesString(serializedPassword));
+		//		model.put("debugmsg", "Request:"+redirectUrlLogin+", Response:"+loginToUserWebapp(userRecord.getHost(), userRecord.getPort(), userName, password, false)+", Unserialized password:"+fromBytesString(serializedPassword));
 		if (loginToUserWebapp(userRecord.getHost(), userRecord.getPort(), userName, password, false)) {
 			return new ModelAndView("redirect:"+redirectUrlLogin);
 		}
@@ -216,7 +216,7 @@ public class IndexController {
 		}
 		return "200".equals(sb.toString().trim());
 	}
-	
+
 	private String toBytesString(String str) {
 		StringBuilder sb = new StringBuilder();
 		byte[] bytes = str.getBytes();
@@ -232,7 +232,7 @@ public class IndexController {
 		String[] byteValues = bytesStr.split(":");
 		byte[] bytes = new byte[byteValues.length];
 		for (int i=0, len=bytes.length; i<len; i++) {
-		   bytes[i] = Byte.valueOf(byteValues[i].trim());     
+			bytes[i] = Byte.valueOf(byteValues[i].trim());     
 		}
 		return new String(bytes);
 	}
@@ -351,25 +351,32 @@ public class IndexController {
 	@RequestMapping(value = "/download.html", method = RequestMethod.GET)
 	public ModelAndView downloadInit() {
 		Map<String, Object> model = new HashMap<String, Object>();
-
+		// APK access
+		String downloadPath = context.getContextPath()+"/download/";
+		String societiesAndroidCommsAppFilename = "SocietiesAndroidCommsApp.apk";
+		String societiesAndroidCommsAppPath = downloadPath+societiesAndroidCommsAppFilename;
+		String societiesAndroidAppFilename = "SocietiesAndroidApp.apk";
+		String societiesAndroidAppPath = downloadPath+societiesAndroidAppFilename;
+		
+		// QrCode generation
 		ByteArrayOutputStream out = QRCode.from("Hello World").to(ImageType.PNG).stream();
 		try {
-			FileOutputStream fout = new FileOutputStream(new File("C:\\QR_Code.JPG"));
-
+			FileOutputStream fout = new FileOutputStream(new File(downloadPath+"+QrCode.JPG"));
 			fout.write(out.toByteArray());
-
 			fout.flush();
 			fout.close();
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			model.put("errormsg", "Can't generate the QrCode");
+			model.put("errormsg", "Can't generate the QrCode FileNotFoundException "+e);
 		} catch (IOException e) {
 			e.printStackTrace();
-			model.put("errormsg", "Can't generate the QrCode");
+			model.put("errormsg", "Can't generate the QrCode IOException "+e);
 		} 
-
-		//		model.put("debugmsg", request.getContextPath());
+		model.put("debugmsg", context.getRealPath("test"));
+		
+		model.put("societiesAndroidCommsAppPath", societiesAndroidCommsAppPath);
+		model.put("societiesAndroidAppPath", societiesAndroidAppPath);
 		return new ModelAndView("download", model);	
 	}
 

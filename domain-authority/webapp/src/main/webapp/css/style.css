@@ -55,6 +55,20 @@ form h3,form div{text-align:center;padding:0;margin:0 auto;}
 #content form .submitBlock{text-align:center;}
 table{width:100%;}
 #content th{text-align: center;}
+.download{width:60%;min-width:200px;}
+@media screen and (max-width: 1000px) {
+	#content{width:90%;}
+	.download{margin:0 auto;}
+}
+@media screen and (max-width: 500px) {
+	#content{width:100%;}
+	.download{width:100%;margin:0 auto;}
+	.download img{width:100%;min-width:350px;}
+}
+.downloadBox{width:100%;margin:0 auto;padding:0;}
+.downloadBox li{list-style: 0 none;display:inline-block;margin:8px;padding:0;}
+.article p{text-align: left;}
+.article ul{text-align: left;}
 .signup,.signin{width:50%;}
 .signup form,.signin form{width:40%;min-width:200px;padding:2px 2px 10px 2px;}
 .signup table,.signin table{width:100%;margin-bottom:20px;}
