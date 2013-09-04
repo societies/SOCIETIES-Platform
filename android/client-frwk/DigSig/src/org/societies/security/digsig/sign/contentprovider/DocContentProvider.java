@@ -27,23 +27,12 @@ package org.societies.security.digsig.sign.contentprovider;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-
-import org.societies.security.digsig.api.Sign;
-import org.societies.security.digsig.sign.db.DocDatabaseHelper;
-import org.societies.security.digsig.sign.db.DocTable;
 
 import android.content.ContentProvider;
-import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
-import android.text.TextUtils;
 import android.util.Log;
 
 /**
@@ -56,26 +45,10 @@ public class DocContentProvider extends ContentProvider {
 
 	private static final String tag = DocContentProvider.class.getSimpleName();
 
-	// database
-	private DocDatabaseHelper database;
-
-	// Used for the UriMacher
-	private static final int DOCS = 10;
-	private static final int DOC_ID = 20;
-
 	private static final String AUTHORITY = "org.societies.security.digsig.provider";
 
 	private static final String BASE_PATH = "docs";
 	public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH);
-
-	public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/docs";
-	public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/doc";
-
-	private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-	static {
-		sURIMatcher.addURI(AUTHORITY, BASE_PATH, DOCS);
-		sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", DOC_ID);
-	}
 
 	/* (non-Javadoc)
 	 * @see android.content.ContentProvider#delete(android.net.Uri, java.lang.String, java.lang.String[])
@@ -83,32 +56,7 @@ public class DocContentProvider extends ContentProvider {
 	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
 		Log.d(tag, "delete");
-		int uriType = sURIMatcher.match(uri);
-		SQLiteDatabase sqlDB = database.getWritableDatabase();
-		int rowsDeleted = 0;
-		switch (uriType) {
-		case DOCS:
-			rowsDeleted = sqlDB.delete(DocTable.TABLE_NAME, selection,
-					selectionArgs);
-			break;
-		case DOC_ID:
-			String id = uri.getLastPathSegment();
-			if (TextUtils.isEmpty(selection)) {
-				rowsDeleted = sqlDB.delete(DocTable.TABLE_NAME,
-						DocTable.COLUMN_ID + "=" + id, 
-						null);
-			} else {
-				rowsDeleted = sqlDB.delete(DocTable.TABLE_NAME,
-						DocTable.COLUMN_ID + "=" + id 
-						+ " and " + selection,
-						selectionArgs);
-			}
-			break;
-		default:
-			throw new IllegalArgumentException("Unknown URI: " + uri);
-		}
-		getContext().getContentResolver().notifyChange(uri, null);
-		return rowsDeleted;
+		return 0;
 	}
 
 	/* (non-Javadoc)
@@ -126,18 +74,7 @@ public class DocContentProvider extends ContentProvider {
 	@Override
 	public Uri insert(Uri uri, ContentValues values) {
 		Log.d(tag, "insert");
-		int uriType = sURIMatcher.match(uri);
-		SQLiteDatabase sqlDB = database.getWritableDatabase();
-		long id = 0;
-		switch (uriType) {
-		case DOCS:
-			id = sqlDB.insert(DocTable.TABLE_NAME, null, values);
-			break;
-		default:
-			throw new IllegalArgumentException("Unknown URI: " + uri);
-		}
-		getContext().getContentResolver().notifyChange(uri, null);
-		return Uri.parse(BASE_PATH + "/" + id);
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -146,7 +83,6 @@ public class DocContentProvider extends ContentProvider {
 	@Override
 	public boolean onCreate() {
 		Log.d(tag, "onCreate");
-		database = new DocDatabaseHelper(getContext());
 		return false;
 	}
 
@@ -159,33 +95,7 @@ public class DocContentProvider extends ContentProvider {
 
 		Log.d(tag, "query");
 		// Uisng SQLiteQueryBuilder instead of query() method
-		SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-
-		// Check if the caller has requested a column which does not exists
-		checkColumns(projection);
-
-		// Set the table
-		queryBuilder.setTables(DocTable.TABLE_NAME);
-
-		int uriType = sURIMatcher.match(uri);
-		switch (uriType) {
-		case DOCS:
-			break;
-		case DOC_ID:
-			// Adding the ID to the original query
-			queryBuilder.appendWhere(DocTable.COLUMN_ID + "=" + uri.getLastPathSegment());
-			break;
-		default:
-			throw new IllegalArgumentException("Unknown URI: " + uri);
-		}
-
-		SQLiteDatabase db = database.getWritableDatabase();
-		Cursor cursor = queryBuilder.query(db, projection, selection,
-				selectionArgs, null, null, sortOrder);
-		// Make sure that potential listeners are getting notified
-		cursor.setNotificationUri(getContext().getContentResolver(), uri);
-
-		return cursor;
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -196,37 +106,7 @@ public class DocContentProvider extends ContentProvider {
 			String[] selectionArgs) {
 
 		Log.d(tag, "update");
-		int uriType = sURIMatcher.match(uri);
-		SQLiteDatabase sqlDB = database.getWritableDatabase();
-		int rowsUpdated = 0;
-		switch (uriType) {
-		case DOCS:
-			rowsUpdated = sqlDB.update(DocTable.TABLE_NAME, 
-					values, 
-					selection,
-					selectionArgs);
-			break;
-		case DOC_ID:
-			String id = uri.getLastPathSegment();
-			if (TextUtils.isEmpty(selection)) {
-				rowsUpdated = sqlDB.update(DocTable.TABLE_NAME, 
-						values,
-						DocTable.COLUMN_ID + "=" + id, 
-						null);
-			} else {
-				rowsUpdated = sqlDB.update(DocTable.TABLE_NAME, 
-						values,
-						DocTable.COLUMN_ID + "=" + id 
-						+ " and " 
-						+ selection,
-						selectionArgs);
-			}
-			break;
-		default:
-			throw new IllegalArgumentException("Unknown URI: " + uri);
-		}
-		getContext().getContentResolver().notifyChange(uri, null);
-		return rowsUpdated;
+		return 0;
 	}
 
 	@Override
@@ -269,21 +149,5 @@ public class DocContentProvider extends ContentProvider {
 		}
 
 		return ParcelFileDescriptor.open(path, imode);
-	}
-
-	private void checkColumns(String[] projection) {
-		String[] available = {
-				DocTable.COLUMN_PATH_TO_UNSIGNED_DOC,
-				DocTable.COLUMN_PATH_TO_SIGNED_DOC,
-				DocTable.COLUMN_FINISHED,
-				DocTable.COLUMN_ID};
-		if (projection != null) {
-			HashSet<String> requestedColumns = new HashSet<String>(Arrays.asList(projection));
-			HashSet<String> availableColumns = new HashSet<String>(Arrays.asList(available));
-			// Check if all columns which are requested are available
-			if (!availableColumns.containsAll(requestedColumns)) {
-				throw new IllegalArgumentException("Unknown columns in projection");
-			}
-		}
 	}
 }
