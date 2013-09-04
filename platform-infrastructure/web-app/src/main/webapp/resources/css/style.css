@@ -1553,7 +1553,38 @@ ul.social-network li {
     display: inline;
 }
 
-
+.tooltip em {
+    display:none;
+}
+.tooltip:hover {
+    border: 0;
+    position: relative;
+    z-index: 500;
+    text-decoration:none;
+}
+.tooltip:hover em {
+    font-style: normal;
+    display: block;
+    position: absolute;
+    top: 20px;
+    left: -10px;
+    padding: 5px;
+    color: #000;
+    border: 1px solid #bbb;
+    background: #ffc;
+    width:170px;
+}
+.tooltip:hover em span {
+    position: absolute;
+    top: -7px;
+    left: 15px;
+    height: 7px;
+    width: 11px;
+    background: transparent url(image-infobulle.gif);
+    margin:0;
+    padding: 0;
+    border: 0;
+}
 
 /* THE END */
 

@@ -8,6 +8,7 @@
 
 	<ui:define name="html_head">
 		<title>Privacy Preferences</title>
+		<h:outputStylesheet library="css" name="hint.min.css"/>
 	</ui:define>
 
 	<ui:define name="body">
@@ -46,7 +47,7 @@
         </p:column>
 
 					<p:column headerText="Data Type">
-         #{ppnPreferenceDetail.resource.dataType}
+          #{PrivacyPrefsController.toStringDataType(ppnPreferenceDetail.resource.dataType)}
         </p:column>
 
 					<p:column style="width: 4%">
@@ -88,13 +89,13 @@
             #{accCtrlPreference.resource.scheme}
         </p:column>
 
-					<p:column headerText="Data Type">
-         #{accCtrlPreference.resource.dataType}
+		<p:column headerText="Data Type">
+        <span class="tooltip">#{PrivacyPrefsController.toStringDataType(accCtrlPreference.resource.dataType)}<em><span></span>#{accCtrlPreference.resource.dataIdUri}</em></span>
         </p:column>
 
-					<p:column headerText="Resource ID">
+					<!-- <p:column headerText="Resource ID">
         #{accCtrlPreference.resource.dataIdUri}
-        </p:column>
+        </p:column> -->
 					<p:column style="width: 4%">
 						<p:commandButton icon="ui-icon-wrench"
 							action="#{PrivacyPrefsController.storeAccCtrlDetailToUtils}"
@@ -155,7 +156,7 @@
         </p:column>
 
 					<p:column headerText="Data Type">
-         #{dobfPreference.resource.dataType}
+          #{PrivacyPrefsController.toStringDataType(dobfPreference.resource.dataType)}
         </p:column>
 
 					<p:column headerText="Resource ID">
@@ -168,7 +169,13 @@
 		</section>
 
 		<div class="hr grid_12 clearfix"></div>
-
+<script type="text/javascript">
+$(document).ready(function() {
+	$('.dataTypeBlock').click(function() {
+		$(this).children('dataUriHidden').show();
+	});
+});
+</script>
 	</ui:define>
 
 	<ui:define name="dialogs">
