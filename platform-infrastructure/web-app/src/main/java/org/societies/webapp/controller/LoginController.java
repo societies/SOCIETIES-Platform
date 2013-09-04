@@ -1,5 +1,9 @@
 package org.societies.webapp.controller;
 
+import java.io.IOException;
+import java.util.Arrays;
+
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.webapp.service.OpenfireLoginService;
 import org.societies.webapp.service.UserService;
@@ -9,6 +13,9 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.DatatypeConverter;
 
 @Controller
 @ManagedBean(name = "loginController") //required to access data from XHTML files
@@ -146,14 +153,48 @@ public class LoginController extends BasePageController {
         return loginDialogPassword;
     }
 
-    public String restLogin(String username, String password) {
-        String result = openfireLoginService.doLogin(username, password);
-        if (result == null) {
-            return "401";
+    public String restLogin(String username, String serializedPassword) {
+    	return restLogin(username, serializedPassword, false);
+    }
+    
+    public String restLogin(String username, String serializedPassword, boolean redirect) {
+        String result;
+		// Check credentiels
+        try {
+			result = openfireLoginService.doLogin(username, fromBytesString(serializedPassword));
+		} catch (Exception e) {
+			result = null;
+		}
+        // Login to the T6.5 webapp
+        if (null != result) {
+        	userService.login();
         }
 
-        userService.login();
-
+        // Redirect
+        if (redirect) {
+        	FacesContext context = FacesContext.getCurrentInstance();
+        	HttpServletResponse response = (HttpServletResponse)context.getExternalContext().getResponse();
+        	try {
+				response.sendRedirect("index.xhtml");
+			} catch (IOException e) {
+				return "Error...";
+			}
+        	return "";
+    	}
+        // Or display result number
+        if (null == result) {
+        	return "401";
+        }
         return "200";
     }
+    
+	
+	private String fromBytesString(String bytesStr) {
+		String[] byteValues = bytesStr.split(":");
+		byte[] bytes = new byte[byteValues.length];
+		for (int i=0, len=bytes.length; i<len; i++) {
+		   bytes[i] = Byte.valueOf(byteValues[i].trim());     
+		}
+		return new String(bytes);
+	}
 }

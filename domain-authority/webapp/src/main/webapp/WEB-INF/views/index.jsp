@@ -33,6 +33,14 @@
 				</c:if>
 			</p>
 		</c:if>
+		<c:if test="${not empty debugmsg}">
+			<p>
+				<span>${debugmsg}</span>
+				<c:if test="${not empty infomsg}">
+					<br />${infomsg}
+				</c:if>
+			</p>
+		</c:if>
 		<form:errors path="*" cssClass="errorblock" element="div" />
 		<table>
 			<tr>
@@ -58,6 +66,8 @@
 		</table>
 		
 		<h3>No SOCIETIES account yet? <strong><a href="signup.html" class="greatButton">Sign Up!</a></strong></h3>
+		<br />
+		<h3>Download the <strong><a href="download.html" class="greatButton">Android client</a></strong></h3>
 	</form:form>
 </div>
 

@@ -25,20 +25,30 @@
 package org.societies.domainauthority.webapp.controller;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import net.glxn.qrgen.QRCode;
+import net.glxn.qrgen.image.ImageType;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.css.directory.ICssDirectory;
@@ -48,7 +58,7 @@ import org.societies.domainauthority.registry.DaUserRecord;
 import org.societies.domainauthority.webapp.models.LoginForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.DigestUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,7 +88,7 @@ public class IndexController {
 		xmppDomain = commManager.getIdManager().getThisNetworkNode().getDomain();
 		domains.put(xmppDomain, xmppDomain);
 	}
-	
+
 	@RequestMapping(value = "/index.html", method = RequestMethod.GET)
 	public ModelAndView signInInit() {
 		Map<String, Object> model = new HashMap<String, Object>();
@@ -118,7 +128,7 @@ public class IndexController {
 			model.putAll(currentValues);
 			return new ModelAndView("signup", model);
 		}
-		
+
 		// -- AUTHENTICATE JABBER ID
 		Map<String, String> params = new LinkedHashMap<String, String>();
 		params.put("username", userName);
@@ -165,10 +175,66 @@ public class IndexController {
 			return new ModelAndView("index", model);
 		}
 
-		// GET SERVER/PORT NUMBER FROM REGISTRY
-		String redirectUrl = "http://"+userRecord.getHost()+":"+userRecord.getPort()+"/societies/login.xhtml?username="+userName+"&passworddigest="+DigestUtils.md5DigestAsHex(userName.getBytes());
-		return new ModelAndView("redirect:"+redirectUrl);
+		// Login and redirect to User Webapp
+		String serializedPassword = toBytesString(password);
+		String redirectUrlIndex = "http://"+userRecord.getHost()+":"+userRecord.getPort()+"/societies/index.xhtml";
+		String redirectUrlLogin = "http://"+userRecord.getHost()+":"+userRecord.getPort()+"/societies/rest_login.xhtml?username="+userName+"&passworddigest="+serializedPassword+"&redirect=true";
+//		model.put("debugmsg", "Request:"+redirectUrlLogin+", Response:"+loginToUserWebapp(userRecord.getHost(), userRecord.getPort(), userName, password, false)+", Unserialized password:"+fromBytesString(serializedPassword));
+		if (loginToUserWebapp(userRecord.getHost(), userRecord.getPort(), userName, password, false)) {
+			return new ModelAndView("redirect:"+redirectUrlLogin);
+		}
+		model.put("errormsg", "Your are authenticated by the SOCIETIES Domain Authority. Unfortunately, sign in failed on your SOCIETIES webapp. Please, <a href=\""+redirectUrlIndex+"\">go to your SOCIETIES webapp</a> and sign in manually, or contact a SOCIETIES administrator.");
+		return new ModelAndView("index", model);
+	}
 
+	private boolean loginToUserWebapp(String hostname, String port, String username, String password, boolean redirect) {
+		StringBuffer data = new StringBuffer();
+		StringBuffer sb = new StringBuffer();
+		String stringUrl = null;
+		try {
+			// NOTE: serializing the password is not sufficient. But the whole login system has to be refactored due to high security issues.
+			String serializedPassword = toBytesString(password);
+			stringUrl = "http://"+hostname+":"+port+"/societies/rest_login.xhtml?username="+username+"&passworddigest="+serializedPassword+"&redirect="+(redirect ? "true" : "false");
+			URL url = new URL(stringUrl.trim()); 
+			URLConnection conn = url.openConnection(); 
+			conn.setDoOutput(true); 
+			OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream()); 
+			wr.write(data.toString()); 
+			wr.flush(); 
+
+			// Get the response 
+			BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String line; 
+			while ((line = rd.readLine()) != null) {  
+				sb.append(line);
+			} 
+			wr.close(); 
+			rd.close();
+		} catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return "200".equals(sb.toString().trim());
+	}
+	
+	private String toBytesString(String str) {
+		StringBuilder sb = new StringBuilder();
+		byte[] bytes = str.getBytes();
+		for (int i=0; i<bytes.length; i++) {
+			sb.append(bytes[i]);
+			if ((i+1)!=bytes.length) {
+				sb.append(":");
+			}
+		}
+		return sb.toString();		
+	}
+	private String fromBytesString(String bytesStr) {
+		String[] byteValues = bytesStr.split(":");
+		byte[] bytes = new byte[byteValues.length];
+		for (int i=0, len=bytes.length; i<len; i++) {
+		   bytes[i] = Byte.valueOf(byteValues[i].trim());     
+		}
+		return new String(bytes);
 	}
 
 	@RequestMapping(value = "/signup.html", method = RequestMethod.GET)
@@ -282,6 +348,32 @@ public class IndexController {
 		return new ModelAndView("signup", model);
 	}
 
+	@RequestMapping(value = "/download.html", method = RequestMethod.GET)
+	public ModelAndView downloadInit() {
+		Map<String, Object> model = new HashMap<String, Object>();
+
+		ByteArrayOutputStream out = QRCode.from("Hello World").to(ImageType.PNG).stream();
+		try {
+			FileOutputStream fout = new FileOutputStream(new File("C:\\QR_Code.JPG"));
+
+			fout.write(out.toByteArray());
+
+			fout.flush();
+			fout.close();
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			model.put("errormsg", "Can't generate the QrCode");
+		} catch (IOException e) {
+			e.printStackTrace();
+			model.put("errormsg", "Can't generate the QrCode");
+		} 
+
+		//		model.put("debugmsg", request.getContextPath());
+		return new ModelAndView("download", model);	
+	}
+
+
 	private static String postData(MethodType method, String openfireUrl, Map<String, String> params) {
 		try { 
 			StringBuffer data = new StringBuffer();
@@ -315,7 +407,7 @@ public class IndexController {
 			return sb.toString();
 
 		} catch (Exception e) { 
-
+			e.printStackTrace();
 		}
 		return ""; 
 	}
@@ -335,7 +427,7 @@ public class IndexController {
 		UPDATE,
 		LOGIN;
 	}
-	
+
 	public ICssDirectory getCssDir() { return cssDir; }
 	public void setCssDir(ICssDirectory cssDir) { this.cssDir = cssDir; }
 
