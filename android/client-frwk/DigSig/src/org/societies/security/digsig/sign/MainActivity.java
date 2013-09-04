@@ -132,6 +132,7 @@ public class MainActivity extends Activity {
 					}
 					os.close();
 					is.close();
+					getContentResolver().delete(Uri.parse(signedUrl), null, null);
 				} catch(Exception e) {
 					Log.w(TAG, e);
 				}					

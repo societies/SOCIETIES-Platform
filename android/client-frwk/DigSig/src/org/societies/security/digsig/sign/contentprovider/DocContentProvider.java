@@ -55,8 +55,25 @@ public class DocContentProvider extends ContentProvider {
 	 */
 	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
+		
 		Log.d(tag, "delete");
-		throw new UnsupportedOperationException();
+
+		File root = getContext().getFilesDir();
+
+		String fileName = uri.getEncodedPath();
+		if (fileName.startsWith("/")) {
+			fileName = fileName.replaceFirst("/", "");
+		}
+		Log.d(tag, "File name = " + fileName);
+		
+		File file = new File(root, fileName);
+
+		if (file.exists() && file.delete()) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
 	}
 
 	/* (non-Javadoc)
