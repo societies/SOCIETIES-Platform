@@ -228,6 +228,7 @@ public class CommsServer extends EventListener implements IFeatureServer {
 					{
 						returnList = serviceDiscovery.searchServices(serviceMessage.getService(), stanza.getTo());
 						resultList =  returnList.get();
+						
 						if (resultList != null)
 						{
 							for (int i = 0; i < resultList.size(); i++)

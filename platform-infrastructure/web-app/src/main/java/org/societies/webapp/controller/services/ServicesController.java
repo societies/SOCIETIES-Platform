@@ -316,7 +316,7 @@ public class ServicesController extends BasePageController {
     	searchOptions.add("Name");
     	searchOptions.add("Description");
     	searchOptions.add("Category");
-    	searchOptions.add("Author");
+    	searchOptions.add("Creator");
     	setVisibleServices("");
     	
     }
@@ -550,9 +550,9 @@ public class ServicesController extends BasePageController {
         			log.debug("Searching by Description... preparing filter!");
         			filter.setServiceDescription(searchBy);
     			} else{
-    	   			if("Author".equals(searchOption)){
+    	   			if("Creator".equals(searchOption)){
             			log.debug("Searching by Author... preparing filter!");
-            			filter.setServiceDescription(searchBy);
+            			filter.setAuthorSignature(searchBy);
         			} else{
         	   			if("Category".equals(searchOption)){
                 			log.debug("Searching by Author... preparing filter!");
