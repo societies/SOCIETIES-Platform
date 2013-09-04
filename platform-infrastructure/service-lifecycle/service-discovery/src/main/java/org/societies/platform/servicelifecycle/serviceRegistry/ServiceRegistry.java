@@ -384,33 +384,27 @@ public class ServiceRegistry implements IServiceRegistry {
 	public List<Service> findServices(Service filter, String cisId)
 			throws ServiceRetrieveException {
 		
-		Session session = null;
-		List<RegistryEntry> tmpRegistryEntryList = new ArrayList<RegistryEntry>();
+		log.debug("Find service... in cis {}",cisId);
 		
-		try{
-			session = sessionFactory.openSession();
-			Criteria c = this.createCriteriaFromService(filter, session);
-			tmpRegistryEntryList = c.list();
-		} catch(Exception ex){
-			log.error("Exception in findServices: " + ex.getMessage());
-			throw new ServiceRetrieveException(ex);
-		} finally{
-			if(session!= null)
-				session.close();
-		}
-
-		List<Service> foundServices = createListService(tmpRegistryEntryList);
 		List<Service> cisServices = retrieveServicesSharedByCIS(cisId);
+		
+		log.debug("Found {} services for this CIS", cisServices.size());
+		List<Service> foundServices = findServices(filter);
+		log.debug("Found {} services for this criteria",foundServices.size());
+		
 		List<Service> finalResult = new ArrayList<Service>();
 		for(Service cisService: cisServices){
+			log.debug("cisService: {}, {}", cisService.getServiceName(), cisService.getServiceEndpoint());
 			for(Service foundService: foundServices){
 				if(ServiceModelUtils.compare(cisService.getServiceIdentifier(), foundService.getServiceIdentifier())){
+					log.debug("{} added!",cisService.getServiceName());
 					finalResult.add(cisService);
 					break;
 				}
 			}
 		}
 		
+		log.debug("Services {}", finalResult.size());
 		return finalResult;
 	}
 

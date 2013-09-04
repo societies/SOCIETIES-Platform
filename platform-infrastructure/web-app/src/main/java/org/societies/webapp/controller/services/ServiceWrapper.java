@@ -31,6 +31,7 @@ import java.util.concurrent.ExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.cis.management.ICis;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.css.directory.CssAdvertisementRecord;
 import org.societies.api.schema.servicelifecycle.model.Service;
@@ -51,6 +52,8 @@ public class ServiceWrapper {
 	private String ownerName;
 	private String sharedBy;
 	private List<String> sharedCisList;
+	private boolean mine;
+
 	private static final Logger log = LoggerFactory.getLogger(ServiceWrapper.class);
 	
 	public ServiceWrapper(Service service, ServicesController controller) {
@@ -62,6 +65,8 @@ public class ServiceWrapper {
 		this.ownerName = null;
 		this.sharedBy = null;
 		this.sharedCisList = null;
+		this.mine = ServiceModelUtils.isServiceOurs(service, controller.getCommManager());
+		
 	}
 	
 	public Service getService(){
@@ -180,6 +185,7 @@ public class ServiceWrapper {
 	}
 	
 	public boolean isInstalled(){
+		
 		if(isMine())
 			return true;
 		else{
@@ -273,15 +279,10 @@ public class ServiceWrapper {
 		
 		this.sharedCisList = cisListId;
 	}
-	
+		
 	public boolean isMine(){
-		try {
-			return ServiceModelUtils.isServiceOurs(service, controller.getCommManager());
-		} catch (Exception e) {
-			log.error("Exception accessing method on ServiceModelUtils: {}", e.getMessage());
-			e.printStackTrace();
-			return false;
-		} 
+		
+		return mine;
 	}
 	
 	public boolean isDevice(){

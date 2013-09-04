@@ -853,7 +853,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				logger.debug("Problem with downloading jar, no file available!");
 			
 			returnResult.setMessage(ResultMessage.COMMUNICATION_ERROR);
-			sendUserNotification("Service not installed: Failure to download jar!");
+			sendUserNotification("Service not installed: Failure to download jar: "+fileName);
 			return new AsyncResult<ServiceControlResult>(returnResult);	
 		}
 		

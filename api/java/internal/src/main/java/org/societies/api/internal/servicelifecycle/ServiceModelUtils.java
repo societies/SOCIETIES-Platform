@@ -274,14 +274,17 @@ public class ServiceModelUtils extends org.societies.api.services.ServiceUtils{
 	 * @param service
 	 * @param commManager
 	 * @return true or false
-	 * @throws InvalidFormatException
 	 */
-	public static boolean isServiceOurs(Service service, ICommManager commManager) throws InvalidFormatException{
+	public static boolean isServiceOurs(Service service, ICommManager commManager){
 		
-		IIdentity ourNode = commManager.getIdManager().getThisNetworkNode();
-		IIdentity serviceNode = commManager.getIdManager().fromFullJid(getJidFromServiceIdentifier(service.getServiceIdentifier()));
-			
-		return ourNode.equals(serviceNode);
+		try{
+			IIdentity ourNode = commManager.getIdManager().getThisNetworkNode();
+			IIdentity serviceNode = commManager.getIdManager().fromFullJid(getJidFromServiceIdentifier(service.getServiceIdentifier()));
+			return ourNode.equals(serviceNode);
+		} catch(Exception ex){
+			return false;
+		}
+		
 
 	}
 

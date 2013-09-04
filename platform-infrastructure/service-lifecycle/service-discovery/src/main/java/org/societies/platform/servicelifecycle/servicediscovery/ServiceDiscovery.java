@@ -30,9 +30,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.eclipse.jetty.util.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.cis.management.ICis;
@@ -66,6 +71,8 @@ public class ServiceDiscovery implements IServiceDiscovery {
 	private ICommManager commMngr;
 	private IServiceDiscoveryRemote serviceDiscoveryRemote;
 	private ICisManager cisManager;
+
+	private ExecutorService executor;
 	
 	public ICisManager getCisManager(){
 		return cisManager;
@@ -112,6 +119,10 @@ public class ServiceDiscovery implements IServiceDiscovery {
 		this.serviceReg = serviceReg;
 	}
 
+	public ServiceDiscovery(){
+		logger.info("Service Discovery Created!");
+		executor = Executors.newCachedThreadPool();
+	}
 
 	@Override
 	@Async
@@ -344,22 +355,54 @@ public class ServiceDiscovery implements IServiceDiscovery {
 			if(logger.isDebugEnabled())
 				logger.debug("Searching all our CIS...");
 			
-			List<ICis> cisList = getCisManager().getCisList();
-			ArrayList<Future<List<Service>>> searchList = new ArrayList<Future<List<Service>>>();
+			List<ICis> cisList = getCisManager().getCisList();			
+			/*HashMap<String,Future<List<Service>>> searchList = new HashMap<String,Future<List<Service>>>(cisList.size()+1);
 			for(ICis cis : cisList){
+				logger.debug("Searching in CIS {}", cis.getName());
 				Future<List<Service>> resultSearch = searchServices(filter,cis.getCisId());
-				searchList.add(resultSearch);
+				searchList.put(cis.getName(), resultSearch);
 			}
 			
 			if(logger.isDebugEnabled())
 				logger.debug("Searching our local node...");
-			searchList.add(searchServices(filter));
+			searchList.put("Local Node",searchServices(filter));
 			
 			//And now we check...
-			for(Future<List<Service>> searchResult : searchList){
-				List<Service> foundServices = searchResult.get();
+			for( String searchNode : searchList.keySet()){
+				logger.debug("Checking result for {}", searchNode);
+				List<Service> foundServices = searchList.get(searchNode).get();
 				for(Service foundService : foundServices){
 					String key = ServiceModelUtils.serviceResourceIdentifierToString(foundService.getServiceIdentifier());
+					logger.debug("Found service {}", key);
+					result.put(key, foundService);
+				}
+			}
+			*/
+			BlockingQueue<List<Service>> listServices = new ArrayBlockingQueue<List<Service>>(cisList.size());
+			for(ICis cis : cisList){
+				logger.debug("Searching in CIS {}", cis.getName());
+				try{
+					IIdentity node = getCommMngr().getIdManager().fromJid(cis.getCisId());
+					executor.execute(new SearchServiceAsync(this,filter,node,listServices));
+				} catch(Exception ex){
+					logger.error("Exception converting to node: {}",cis.getCisId());
+					ex.printStackTrace();
+				}
+				
+			}
+			
+			List<Service> searchResults = searchServices(filter).get();
+			for(Service searchResult : searchResults){
+				String key = ServiceModelUtils.serviceResourceIdentifierToString(searchResult.getServiceIdentifier());
+				logger.debug("Found service {}", key);
+				result.put(key, searchResult);
+			}
+			
+			for(int i = 0; i < cisList.size(); i++){
+				List<Service> foundServices = listServices.take();
+				for(Service foundService : foundServices){
+					String key = ServiceModelUtils.serviceResourceIdentifierToString(foundService.getServiceIdentifier());
+					logger.debug("Found service {}", key);
 					result.put(key, foundService);
 				}
 			}
@@ -380,6 +423,8 @@ public class ServiceDiscovery implements IServiceDiscovery {
 
 		if(logger.isDebugEnabled()) logger.debug("Searching repository for a given service, on node: " + node.getJid());
 		
+		List<Service> foundServices = new ArrayList<Service>();
+		
 		try{
 			
 			boolean myNode;
@@ -398,15 +443,19 @@ public class ServiceDiscovery implements IServiceDiscovery {
 				//Is it one of my CIS? If so, local search
 				ICisOwned localCis = getCisManager().getOwnedCis(node.getJid());
 				if(localCis != null){
-					if(logger.isDebugEnabled()) logger.debug("We're dealing with our CIS! Local search!");
-					return new AsyncResult<List<Service>>(getServiceReg().findServices(filter, node.getJid()));
+					logger.debug("We're dealing with our CIS {}! Local search!", localCis.getName());
+					foundServices = getServiceReg().findServices(filter, node.getJid());
+					logger.debug("Found {} services that fulfill this criteria in {}!",foundServices.size(),localCis.getName());
+					
 				} else{
 					if(logger.isDebugEnabled())
 						logger.debug("Attempting to retrieve services from remote node: " + node.getJid());
 						
 					ServiceDiscoveryRemoteClient callback = new ServiceDiscoveryRemoteClient();
-					getServiceDiscoveryRemote().getServices(node, callback); 
-					new AsyncResult<List<Service>>(callback.getResultList());
+					getServiceDiscoveryRemote().searchService(filter, node, callback);
+					foundServices = callback.getResultList();
+					logger.debug("Found {} services that fulfill this criteria in remote CIS {}!",foundServices.size(),node.getJid());
+					
 				}
 					
 			}
@@ -417,7 +466,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 		} 
 
 		
-		return new AsyncResult<List<Service>>(new ArrayList<Service>());
+		return new AsyncResult<List<Service>>(foundServices);
 	}
 
 	@Override
@@ -425,7 +474,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 	public Future<List<Service>> searchServices(Service filter, String jid)
 			throws ServiceDiscoveryException {
 		
-		if(logger.isDebugEnabled()) logger.debug("Searching repository for a given service, on node: " + jid);
+		if(logger.isDebugEnabled()) logger.debug("Searching repository for a given service, on jid: " + jid);
 
 		try {
 			
@@ -438,6 +487,33 @@ public class ServiceDiscovery implements IServiceDiscovery {
 			throw new ServiceDiscoveryException("Exception while searching for services!",ex);
 		}
 			
+	}
+	
+	private class SearchServiceAsync implements Runnable{
+	
+		private BlockingQueue<List<Service>> listServices;
+		private IIdentity node;
+		private Service filter;
+		private ServiceDiscovery parent;
+		
+		public SearchServiceAsync(ServiceDiscovery parent, Service filter, IIdentity node, BlockingQueue<List<Service>> listServices){
+			this.parent = parent;
+			this.filter = filter;
+			this.node = node;
+			this.listServices = listServices;
+		}
+		
+		@Override
+		public void run() {
+			try {
+				List<Service> result = parent.searchServices(filter, node).get();
+				listServices.add(result);
+			} catch (Exception e) {
+				logger.error("Exception in Asynch handler for {} : {}",node.getJid(),e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		
 	}
 	
 

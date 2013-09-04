@@ -190,7 +190,6 @@ public class CommsServer extends EventListener implements IFeatureServer {
 			
 			ServiceDiscoveryMsgBean serviceMessage = (ServiceDiscoveryMsgBean) payload;
 			ServiceDiscoveryResultBean serviceResult = new ServiceDiscoveryResultBean(); 
-			
 				
 			Future<List<Service>> returnList = null;
 			List<Service> resultBeanList = serviceResult.getServices();
@@ -227,9 +226,9 @@ public class CommsServer extends EventListener implements IFeatureServer {
 					
 					case SEARCH_SERVICE:
 					{
-						returnList = serviceDiscovery.getLocalServices();
+						returnList = serviceDiscovery.searchServices(serviceMessage.getService(), stanza.getTo());
 						resultList =  returnList.get();
-							
+						
 						if (resultList != null)
 						{
 							for (int i = 0; i < resultList.size(); i++)

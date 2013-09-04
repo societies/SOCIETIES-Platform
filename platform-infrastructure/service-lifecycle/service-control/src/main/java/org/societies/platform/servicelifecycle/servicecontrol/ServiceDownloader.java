@@ -187,7 +187,7 @@ public class ServiceDownloader {
 		try {
 			File directory = new File(filePath);
 			
-			if(directory.exists()){
+			if(!directory.exists()){
 				logger.debug("{} does not have a client storage to delete.",bundleName);
 				return;
 			}

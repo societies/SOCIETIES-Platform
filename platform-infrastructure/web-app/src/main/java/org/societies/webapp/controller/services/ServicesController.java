@@ -8,6 +8,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.TabChangeEvent;
+import org.primefaces.component.accordionpanel.AccordionPanel;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -89,8 +91,6 @@ public class ServicesController extends BasePageController {
 	}
 
 	public void setCisManager(ICisManager cisManager) {
-    	if(log.isDebugEnabled())
-    		log.debug("cisManager found");
 		this.cisManager = cisManager;
 	}
 
@@ -232,6 +232,10 @@ public class ServicesController extends BasePageController {
 		this.visibleServices = visibleServices;
 	}
 	
+    public void onTabChange(TabChangeEvent event) {
+        String activeIndex = ((AccordionPanel) event.getComponent()).getActiveIndex();
+        setVisibleServices(activeIndex);
+    }
 	
     private String header;
     
@@ -270,6 +274,16 @@ public class ServicesController extends BasePageController {
 
 	private ServiceMgmtListener serviceEventListener;
 	private ConcurrentLinkedQueue<QueuedMessage> messageQueue;
+
+	private boolean didSearch;
+	public boolean isDidSearch() {
+		return didSearch;
+	}
+
+	public void setDidSearch(boolean didSearch) {
+		this.didSearch = didSearch;
+	}
+
 	private final static String SERVICES_GROWL = "servicesGrowl";
 	
     public ServicesController() {
@@ -302,11 +316,11 @@ public class ServicesController extends BasePageController {
     	searchOptions.add("Name");
     	searchOptions.add("Description");
     	searchOptions.add("Category");
-    	searchOptions.add("Author");
+    	searchOptions.add("Creator");
     	setVisibleServices("");
     	
     }
-    
+        
     public void handleFileUpload(FileUploadEvent event) {  
         if(log.isDebugEnabled())
         	log.debug("Upload file was successful: " + event.getFile().getFileName());
@@ -506,6 +520,8 @@ public class ServicesController extends BasePageController {
     		
     	}
     	
+    	didSearch=false;
+    	
     }
     
     public boolean isMyNode(){
@@ -534,9 +550,9 @@ public class ServicesController extends BasePageController {
         			log.debug("Searching by Description... preparing filter!");
         			filter.setServiceDescription(searchBy);
     			} else{
-    	   			if("Author".equals(searchOption)){
+    	   			if("Creator".equals(searchOption)){
             			log.debug("Searching by Author... preparing filter!");
-            			filter.setServiceDescription(searchBy);
+            			filter.setAuthorSignature(searchBy);
         			} else{
         	   			if("Category".equals(searchOption)){
                 			log.debug("Searching by Author... preparing filter!");
@@ -560,6 +576,8 @@ public class ServicesController extends BasePageController {
 		    		ServiceWrapper servWrapped = new ServiceWrapper(service,this);
 		    		currentServices.put(servWrapped.getId(), servWrapped);		    		
 		    	}
+		    	
+		    	didSearch = true;
 			}
 		} catch (Exception e) {
 			log.error("There was an exception trying to search for services: ", e.getMessage());
