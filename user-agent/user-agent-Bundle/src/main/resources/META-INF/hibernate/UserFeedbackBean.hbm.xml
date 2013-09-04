@@ -4,19 +4,21 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-    <class name="org.societies.api.schema.useragent.feedback.UserFeedbackBean" table="UserFeedbackBean">
-        <!--<meta attribute="class-description">
-            This class contains the employee detail.
-        </meta>-->
-        <id name="requestId" type="string" column="requestId"/>
+    <class name="org.societies.api.schema.useragent.feedback.UserFeedbackBean"
+           table="UserFeedbackBean">
+
+        <id name="requestId" type="string" column="requestId">
+            <generator class="assigned"/>
+        </id>
 
         <property name="method" column="method" type="org.societies.api.schema.useragent.feedback.FeedbackMethodType"/>
         <property name="stage" column="stage" type="org.societies.api.schema.useragent.feedback.FeedbackStage"/>
         <!--<property name="requestDate" column="requestDate" type="java.util.Date"/>-->
         <property name="type" column="type" type="int"/>
-        <list name="options" table="UserFeedbackBean_options" lazy="false">
-            <key column="option_id"/>
-            <index column="option_index"/>
+        <list name="options" table="UserFeedbackBean_options"
+              lazy="false" cascade="all">
+            <key column="requestId"/>
+            <index column="idx"/>
             <element column="value" type="string"/>
         </list>
         <property name="proposalText" column="proposalText" type="string"/>

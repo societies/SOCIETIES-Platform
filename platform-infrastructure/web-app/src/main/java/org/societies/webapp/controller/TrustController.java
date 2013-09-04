@@ -41,9 +41,12 @@ import javax.faces.bean.ViewScoped;
 import org.primefaces.event.RateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.directory.ICisDirectoryCallback;
+import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
 import org.societies.api.internal.privacytrust.trust.model.ExtTrustRelationship;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.api.privacytrust.trust.TrustQuery;
 import org.societies.api.privacytrust.trust.event.ITrustUpdateEventListener;
 import org.societies.api.privacytrust.trust.event.TrustUpdateEvent;
@@ -52,6 +55,9 @@ import org.societies.api.privacytrust.trust.model.TrustEvidence;
 import org.societies.api.privacytrust.trust.model.TrustValueType;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
+import org.societies.api.privacytrust.trust.model.util.TrustValueFormat;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.api.services.ServiceUtils;
 import org.societies.webapp.models.TrustedEntity;
 import org.societies.webapp.service.UserService;
 
@@ -62,6 +68,9 @@ public class TrustController extends BasePageController {
 	private static final long serialVersionUID = -1250855340010366453L;
 
 	private static Logger LOG = LoggerFactory.getLogger(TrustController.class);
+	
+	/** The time to wait for CIS Directory responses in milliseconds. */
+	private static final long WAIT_CIS_DIR = 1000l;
 
 	@ManagedProperty(value = "#{trustBroker}")
 	private ITrustBroker trustBroker;
@@ -71,6 +80,14 @@ public class TrustController extends BasePageController {
 
 	@ManagedProperty(value = "#{userService}")
 	private UserService userService;
+	
+	/** The CIS Directory service reference. */
+	@ManagedProperty(value = "#{cisDirectoryRemote}")
+	private ICisDirectoryRemote cisDirectory;
+	
+	/** The Service Discovery service reference. */
+	@ManagedProperty(value = "#{serviceDiscovery}")
+	private IServiceDiscovery serviceDiscovery;
 	
 	private List<TrustedEntity> users = new ArrayList<TrustedEntity>();
 	private List<TrustedEntity> filteredUsers = new ArrayList<TrustedEntity>();
@@ -85,15 +102,13 @@ public class TrustController extends BasePageController {
 	
 	public TrustController() {
 		// controller constructor - called every time this page is requested!
-		if (LOG.isDebugEnabled())
-			LOG.debug(this.getClass().getName() + " instantiated");
+		LOG.info("{} instantiated", this.getClass());
 	}
 	
 	@PostConstruct
 	public void init() {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug(this.getClass().getName() + " initialising");
+		LOG.debug("init");
 		
 		this.users.addAll(this.retrieveTrustedEntities(TrustedEntityType.CSS));
 		this.filteredUsers.addAll(this.users);
@@ -107,7 +122,7 @@ public class TrustController extends BasePageController {
 
 	public ITrustBroker getTrustBroker() {
 
-		return trustBroker;
+		return this.trustBroker;
 	}
 
 	public void setTrustBroker(ITrustBroker trustBroker) {
@@ -117,7 +132,7 @@ public class TrustController extends BasePageController {
 	
 	public ITrustEvidenceCollector getTrustEvidenceCollector() {
 
-		return trustEvidenceCollector;
+		return this.trustEvidenceCollector;
 	}
 
 	public void setTrustEvidenceCollector(ITrustEvidenceCollector trustEvidenceCollector) {
@@ -127,7 +142,7 @@ public class TrustController extends BasePageController {
 
 	public UserService getUserService() {
 
-		return userService;
+		return this.userService;
 	}
 
 	public void setUserService(UserService userService) {
@@ -135,10 +150,29 @@ public class TrustController extends BasePageController {
 		this.userService = userService;
 	}
 	
+	public ICisDirectoryRemote getCisDirectory() {
+
+		return this.cisDirectory;
+	}
+
+	public void setCisDirectory(ICisDirectoryRemote cisDirectory) {
+
+		this.cisDirectory = cisDirectory;
+	}
+	
+	public IServiceDiscovery getServiceDiscovery() {
+
+		return this.serviceDiscovery;
+	}
+
+	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
+
+		this.serviceDiscovery = serviceDiscovery;
+	}
+	
 	public List<TrustedEntity> getUsers() {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("getUsers");
+		LOG.debug("getUsers");
 		return this.users;
 	}
 	
@@ -154,8 +188,7 @@ public class TrustController extends BasePageController {
 	
 	public List<TrustedEntity> getCommunities() {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("getCommunities");
+		LOG.debug("getCommunities");
 		return this.communities;
 	}
 	
@@ -171,8 +204,7 @@ public class TrustController extends BasePageController {
 	
 	public List<TrustedEntity> getServices() {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("getServices");
+		LOG.debug("getServices");
 		return this.services;
 	}
 	
@@ -188,26 +220,24 @@ public class TrustController extends BasePageController {
     
     public TrustedEntity getSelectedEntity() {
     	
-    	if (LOG.isDebugEnabled())
-    		LOG.debug("getSelectedEntity=" + this.selectedEntity);
+    	LOG.debug("getSelectedEntity={}", this.selectedEntity);
     	return this.selectedEntity;
     }
     
     public void setSelectedEntity(TrustedEntity selectedEntity) {
     	
-    	if (LOG.isDebugEnabled())
-    		LOG.debug("setSelectedEntity=" + selectedEntity);
+    	LOG.debug("setSelectedEntity={}", selectedEntity);
     	this.selectedEntity = selectedEntity;
     }
     
     public void onRating(RateEvent rateEvent) {  
         
-    	if (LOG.isDebugEnabled())
-    		LOG.debug("onRating event " + rateEvent);
+    	LOG.debug("onRating: event={}", rateEvent);
     	
     	try {
-    		if (this.selectedEntity == null)
+    		if (this.selectedEntity == null) {
     			throw new IllegalStateException("No trusted entity selected!");
+    		}
     		final TrustedEntityId ratedTeid = this.selectedEntity.getTrusteeId();
     		final Double rating = 0.2d * new Double((Integer) rateEvent.getRating());
     		this.updateTrustRating(ratedTeid, rating);
@@ -236,30 +266,37 @@ public class TrustController extends BasePageController {
 						new HashMap<TrustedEntityId, TrustedEntity>();
 				for (final ExtTrustRelationship tr : dbResult) {
 					// Omit *my* CSS from the list of trusted entities!
-					if (myTeid.equals(tr.getTrusteeId()))
+					if (myTeid.equals(tr.getTrusteeId())) {
 						continue;
+					}
 					TrustedEntity trustedEntity = trustedEntities.get(tr.getTrusteeId()); 
-					if (trustedEntity == null)
-						trustedEntity = new TrustedEntity(myTeid, tr.getTrusteeId());
+					if (trustedEntity == null) {
+						final String trusteeName = this.formatTeid(tr.getTrusteeId());
+						trustedEntity = new TrustedEntity(myTeid, tr.getTrusteeId(), trusteeName);
+					}
 					if (TrustValueType.DIRECT == tr.getTrustValueType()) {
 						trustedEntity.getDirectTrust().setValue(tr.getTrustValue());
+						trustedEntity.getDirectTrust().setStringValue(
+								this.formatTrustValue(tr.getTrustValue()));
 						trustedEntity.getDirectTrust().setLastUpdated(tr.getTimestamp());
 					} else if (TrustValueType.INDIRECT == tr.getTrustValueType()) {
 						trustedEntity.getIndirectTrust().setValue(tr.getTrustValue());
+						trustedEntity.getIndirectTrust().setStringValue(
+								this.formatTrustValue(tr.getTrustValue()));
 						trustedEntity.getIndirectTrust().setLastUpdated(tr.getTimestamp());
 					} else if (TrustValueType.USER_PERCEIVED == tr.getTrustValueType()) {
 						trustedEntity.getUserPerceivedTrust().setValue(tr.getTrustValue());
+						trustedEntity.getUserPerceivedTrust().setStringValue(
+								this.formatTrustValue(tr.getTrustValue()));
 						trustedEntity.getUserPerceivedTrust().setLastUpdated(tr.getTimestamp());
 					}
-					if (LOG.isDebugEnabled())
-						LOG.debug("Found evidence for '" + tr.getTrusteeId() + "': " + tr.getTrustEvidence());
+					LOG.debug("retrieveTrustedEntities: trusteeId={}, evidence={}", tr.getTrusteeId(), tr.getTrustEvidence());
 					for (final TrustEvidence evidence : tr.getTrustEvidence()) {
 						// Handle RATED evidence
 						if (TrustEvidenceType.RATED == evidence.getType() && evidence.getInfo() instanceof Double) {
 							final Double dblRating = (Double) evidence.getInfo() * 5.0d;
 							final Integer intRating = dblRating.intValue();
-							if (LOG.isDebugEnabled())
-								LOG.debug("Initialising rating for '" + tr.getTrusteeId() + "' to " + intRating);
+							LOG.debug("retrieveTrustedEntities: trusteeId={}, rating={}", tr.getTrusteeId(), intRating);
 							trustedEntity.setRating(intRating);
 						}
 					}
@@ -276,6 +313,45 @@ public class TrustController extends BasePageController {
 		return result;
 	}
 	
+	private String formatTeid(final TrustedEntityId teid) {
+
+		final String entityId = teid.getEntityId();
+		try {
+			if (TrustedEntityType.CSS == teid.getEntityType()) {
+				return entityId;
+			} else if (TrustedEntityType.CIS == teid.getEntityType()) {
+				final CisDirCallback cisDirCallback = new CisDirCallback();
+				this.cisDirectory.searchByID(entityId, cisDirCallback);
+				synchronized (cisDirCallback) {
+					cisDirCallback.wait(WAIT_CIS_DIR);
+					final List<CisAdvertisementRecord> cisAds = cisDirCallback.getCisAds(); 
+					if (cisAds != null && !cisAds.isEmpty() && cisAds.get(0).getName() != null) {
+						return cisAds.get(0).getName();
+					}
+				}
+			} else if (TrustedEntityType.SVC == teid.getEntityType()) {
+				final org.societies.api.schema.servicelifecycle.model.Service service = 
+						this.serviceDiscovery.getService(ServiceUtils
+								.generateServiceResourceIdentifierFromString(entityId)).get();
+				if (service != null && service.getServiceName() != null) {
+					return service.getServiceName();
+				}
+			}
+		} catch (Exception e) {
+
+			LOG.warn("Could not format TEID '" + teid + "': " 
+					+ e.getLocalizedMessage());
+			return entityId;
+		}
+		
+		return teid.toString();
+	}
+	
+	private String formatTrustValue(Double trustValue) {
+		
+		return TrustValueFormat.formatPercent(trustValue);
+	}
+	
 	private void updateTrustRating(final TrustedEntityId ratedTeid,
 			final Double rating) {
 		
@@ -288,20 +364,21 @@ public class TrustController extends BasePageController {
     			this.trustBroker.registerTrustUpdateListener(listener, 
     					new TrustQuery(myTeid).setTrusteeId(ratedTeid)
     							.setTrustValueType(TrustValueType.USER_PERCEIVED));
-    			if (LOG.isDebugEnabled())
-    				LOG.debug("Adding trust evidence: '" + myTeid + "' rated '" + ratedTeid + "' with " + rating);
+    			LOG.debug("Adding trust evidence: '{}' rated '{}' with {}",
+    					new Object[] { myTeid, ratedTeid, rating });
     			this.trustEvidenceCollector.addDirectEvidence(myTeid, ratedTeid,
     					TrustEvidenceType.RATED, new Date(), rating);
     			cdLatch.await(2, TimeUnit.SECONDS);
     			this.trustBroker.unregisterTrustUpdateListener(listener, 
     					new TrustQuery(myTeid).setTrusteeId(ratedTeid)
     							.setTrustValueType(TrustValueType.USER_PERCEIVED));
-    			if (TrustedEntityType.CSS == ratedTeid.getEntityType())
+    			if (TrustedEntityType.CSS == ratedTeid.getEntityType()) {
     				this.users = this.retrieveTrustedEntities(TrustedEntityType.CSS);
-    			else if (TrustedEntityType.CIS == ratedTeid.getEntityType())
+    			} else if (TrustedEntityType.CIS == ratedTeid.getEntityType()) {
     				this.communities = this.retrieveTrustedEntities(TrustedEntityType.CIS);
-    			else if (TrustedEntityType.SVC == ratedTeid.getEntityType())
+    			} else if (TrustedEntityType.SVC == ratedTeid.getEntityType()) {
     				this.services = this.retrieveTrustedEntities(TrustedEntityType.SVC);
+    			}
     			
     		} catch (Exception e) {
 
@@ -329,11 +406,31 @@ public class TrustController extends BasePageController {
 		@Override
 		public void onUpdate(TrustUpdateEvent trustUpdateEvent) {
 			
-			if (LOG.isDebugEnabled())
-				LOG.debug(trustUpdateEvent.getTrustRelationship().getTrustValueType() 
-						+ " trust in '" + trustUpdateEvent.getTrustRelationship().getTrusteeId() 
-						+ "' updated");
+			LOG.debug("onUpdate: trustUpdateEvent={}", trustUpdateEvent);
 			this.cdLatch.countDown();
 		} 
+	}
+	
+	private class CisDirCallback implements ICisDirectoryCallback {
+
+		private List<CisAdvertisementRecord> cisAds;
+		
+		/*
+		 * @see org.societies.api.cis.directory.ICisDirectoryCallback#getResult(java.util.List)
+		 */
+		@Override
+		public void getResult(List<CisAdvertisementRecord> cisAds) {
+		
+			LOG.debug("CisDirCallback.getResult: cisAds={}", cisAds);
+			this.cisAds = cisAds;
+			synchronized (this) {
+	            this.notifyAll();
+	        }
+		}
+		
+		private List<CisAdvertisementRecord> getCisAds() {
+			
+			return this.cisAds;
+		}
 	}
 }

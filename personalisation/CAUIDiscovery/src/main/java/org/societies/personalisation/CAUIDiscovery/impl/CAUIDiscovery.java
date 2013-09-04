@@ -28,33 +28,27 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.INetworkNode;
-import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.internal.context.model.CtxAttributeTypes;
-import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
+import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
 import org.societies.api.personalisation.model.IAction;
-//import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
-import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 
 // remove after testing
@@ -73,16 +67,18 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 	IPerformanceMessage m;
 
-	//LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = null;
 	LinkedHashMap<String,HashMap<String,Double>> transProb = null;
 	HashMap<String,List<String>> contextActionsMap = new HashMap<String,List<String>>();
 
+	Map<String , ServiceResourceIdentifier> sriMap = new HashMap<String , ServiceResourceIdentifier>();
+
+
 
 	List<String> charList = null;
-	//List<MockHistoryData> historyList = null;
+	
 
 	public CAUIDiscovery(){
-		//actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
+		
 		//remove after testing
 		//cauiTaskManager = new CAUITaskManager();
 	}
@@ -121,7 +117,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 	// constructor
 	public void initialiseCAUIDiscovery(){
-		//actCtxDictionary = new LinkedHashMap<List<String>,ActionDictObject>();
+	
 	}
 
 	@Override
@@ -130,7 +126,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		LOG.debug("start model generation");
 
 		//this should change according to sequence in CAUIDiscoveryLearningTest  
-		if (retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION) != null ){
+		if ( !retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION).isEmpty() ){
 
 			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData = retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION);
 
@@ -153,13 +149,13 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				//LOG.info("6. Generate UserIntentModelData");
 				ConstructUIModel cmodel = new ConstructUIModel(cauiTaskManager,ctxBroker); 
 				UserIntentModelData modelData = null;
-				modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap);
+				modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap,this.sriMap);
 
 				CtxAttribute ctxAttr = storeModelCtxDB(modelData);
 				LOG.debug("model stored under attribute id: "+ctxAttr.getId());
 				LOG.debug("modelData "+ modelData.getActionModel());
 						
-				System.out.println("*********** model created *******"+ modelData.getActionModel());
+				LOG.debug("*********** model created *******"+ modelData.getActionModel());
 			
 				// performance log code
 				byte entBytes [] = toByteArray(modelData);
@@ -167,27 +163,26 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				this.predictionModelSizePerformanceLog(modelSize);
 				// end of performance log code
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				LOG.error("Exception when constructing new CAUI model. "+e.getLocalizedMessage());
 				e.printStackTrace();
 			}	
 			
-		}else LOG.info("not enough history data");
+		}else LOG.info("No history data for User Intent Model learning");
 	}
 
 	private Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> retrieveHistoryTupleData(String attributeType){
 
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> results = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
 		List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
+		
 		try {
 			results = ctxBroker.retrieveHistoryTuples(attributeType, listOfEscortingAttributeIds, null, null).get();
-
-		}catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			LOG.debug(" history: "+ attributeType  +" retrieveHistoryTupleData: " +results);
+		
+		} catch (Exception e) {
+			LOG.error("Exception when retrieving context history data for type:"+attributeType+" ."+e.getLocalizedMessage());
 			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 		return results;
 	}
 
@@ -201,10 +196,10 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 	public  LinkedHashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> generateDictionaries(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> history){
 
-		LOG.info("2. Convert History Data");
+		LOG.debug("2. Convert History Data");
 		List<MockHistoryData> convertedHistory = convertHistoryData(history);
 
-		LOG.info("3. Generate Transition Dictionary");
+		LOG.debug("3. Generate Transition Dictionary");
 
 		LinkedHashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> actCtxDictionaryAll = new LinkedHashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>>();
 		LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary = null;
@@ -309,7 +304,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			for (int i = 0; i < historySize ; i++) {
 				MockHistoryData currentHocData =  historyData.get(i);
 				List<String> actionNameObjTemp = new ArrayList<String>();
-				String actionName = currentHocData.getServiceId()+"#"+currentHocData.getParameterName()+"#"+currentHocData.getActionValue();
+				String actionName = currentHocData.getServiceId()+"#"+currentHocData.getParameterName()+"#"+currentHocData.getActionValue()+"#"+currentHocData.getServiceType();
 				//LOG.info("action name "+actionName);
 				actionNameObjTemp.add(actionName);
 
@@ -329,7 +324,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 					if( i+k < historySize ){
 						tempHocData = historyData.get(i+k);
 						//String tempNextActName = tempHocData.getActionValue();
-						String tempNextActName = tempHocData.getServiceId()+"#"+tempHocData.getParameterName()+"#"+tempHocData.getActionValue();
+						String tempNextActName = tempHocData.getServiceId()+"#"+tempHocData.getParameterName()+"#"+tempHocData.getActionValue()+"#"+tempHocData.getServiceType();
 
 						actionNameObjTemp.add(tempNextActName);
 
@@ -560,7 +555,12 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			try {
 				IAction retrievedAction = (IAction) SerialisationHelper.deserialise(primaryHocAttr.getBinaryValue(), this.getClass().getClassLoader());
 				String serviceIdentString = retrievedAction.getServiceID().getServiceInstanceIdentifier();
-
+				
+				ServiceResourceIdentifier sri  = retrievedAction.getServiceID();
+				this.sriMap.put(serviceIdentString, sri);
+				
+				String serviceType = retrievedAction.getServiceType();
+				
 				List<CtxHistoryAttribute> listHocAttrs = ctxHocTuples.get(primaryHocAttr);
 
 				Map<String,String> context = new HashMap<String,String>();
@@ -569,16 +569,15 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 					String value = castAttrValuetoString(escortingHocAttr);
 					context.put(escortingHocAttr.getType(), value);
 				}
-				MockHistoryData mockHocData = new MockHistoryData(retrievedAction.getparameterName(), retrievedAction.getvalue(), context,primaryHocAttr.getLastModified(),serviceIdentString);
+				
+				MockHistoryData mockHocData = new MockHistoryData(retrievedAction.getparameterName(), retrievedAction.getvalue(), context,primaryHocAttr.getLastModified(),serviceIdentString, serviceType);
 				result.add(mockHocData);
 
-			}  catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
+			}  catch (Exception e) {
+				LOG.error("Exception when processing ctx history data in order to discover a new user intent model " +e.getLocalizedMessage() );
 				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			} 
+			
 		}
 		return result;
 	}
@@ -598,7 +597,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		return valueStr;
 	}
 
-
+/*
 	protected CtxAttribute lookupAttrHelp(String type){
 		CtxAttribute ctxAttr = null;
 		try {
@@ -620,7 +619,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		}
 		return ctxAttr;
 	}
-
+*/
 
 
 	private CtxAttribute storeModelCtxDB(UserIntentModelData modelData){
@@ -640,7 +639,14 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			IndividualCtxEntity operator = ctxBroker.retrieveIndividualEntity(cssOwnerId).get();
 			//LOG.info("discovery operator retrieved "+operator);
 
-			ctxAttrCAUIModel = lookupAttrHelp(CtxAttributeTypes.CAUI_MODEL);
+			List<CtxIdentifier> cauiModelAttrList = ctxBroker.lookup(operator.getId(),CtxModelType.ATTRIBUTE ,CtxAttributeTypes.CAUI_MODEL).get();
+			
+			if(!cauiModelAttrList.isEmpty()){
+				CtxAttributeIdentifier attrId = (CtxAttributeIdentifier) cauiModelAttrList.get(0);
+				ctxAttrCAUIModel = (CtxAttribute) ctxBroker.retrieve(attrId).get();
+			}
+			
+			//ctxAttrCAUIModel = lookupAttrHelp(CtxAttributeTypes.CAUI_MODEL);
 			if(ctxAttrCAUIModel != null){
 
 				ctxAttrCAUIModel = ctxBroker.updateAttribute(ctxAttrCAUIModel.getId(), binaryModel).get();
@@ -649,22 +655,10 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				ctxAttrCAUIModel = ctxBroker.updateAttribute(ctxAttrCAUIModel.getId(), binaryModel).get();
 			}
 
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
+			LOG.error("Exception while storing CAUI model in context DB" + e.getLocalizedMessage());
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 		return ctxAttrCAUIModel;
 	}
 
@@ -697,7 +691,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			bytes = bos.toByteArray ();
 		}
 		catch (IOException ex) {
-			//TODO: Handle the exception
+			LOG.error("Exception when converting an object to byte array " +obj+"."+ex.getLocalizedMessage());
 		}
 		return bytes;
 	}
@@ -722,7 +716,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		for (int i = 0; i < historySize ; i++) {
 			MockHistoryData currentHocData =  historyData.get(i);
 			List<String> actionNameObjTemp = new ArrayList<String>();
-			String actionName = currentHocData.getServiceId()+"#"+currentHocData.getParameterName()+"#"+currentHocData.getActionValue();
+			String actionName = currentHocData.getServiceId()+"#"+currentHocData.getParameterName()+"#"+currentHocData.getActionValue()+"#"+currentHocData.getServiceType();
 			//LOG.info("action name "+actionName);
 			actionNameObjTemp.add(actionName);
 
@@ -742,7 +736,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				if( i+k < historySize ){
 					tempHocData = historyData.get(i+k);
 					//String tempNextActName = tempHocData.getActionValue();
-					String tempNextActName = tempHocData.getServiceId()+"#"+tempHocData.getParameterName()+"#"+tempHocData.getActionValue();
+					String tempNextActName = tempHocData.getServiceId()+"#"+tempHocData.getParameterName()+"#"+tempHocData.getActionValue()+"#"+tempHocData.getServiceType();
 
 					actionNameObjTemp.add(tempNextActName);
 
@@ -824,55 +818,9 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		//}
 		return actCtxDictionary;
 	}
-
-
-	//*************** Model storage to hard drive *****************
-	/*
-	public LinkedHashMap<String,ActionDictObject> retrieveModel(){
-		LinkedHashMap<String,ActionDictObject> model = new  LinkedHashMap<String,ActionDictObject>();
-		System.out.println("retrieve file 'taskModel' ");
-
-		File file = new File("taskModel");  
-		FileInputStream f;
-		try {
-			f = new FileInputStream(file);
-			ObjectInputStream s = new ObjectInputStream(f);  
-			model = (LinkedHashMap<String,ActionDictObject>)s.readObject();         
-			s.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}  
-		return model;
+	
+	
+	public Map<String, ServiceResourceIdentifier> getSriMap() {
+		return sriMap;
 	}
-
-
-
-
-	public void storeDictionary(LinkedHashMap<List<String>,ActionDictObject> actCtxDictionary ){
-
-		System.out.println("storing to file 'taskModel' ");
-		//this.actCtxDictionary = actCtxDictionary;
-		File file = new File("taskModel");  
-		FileOutputStream f;
-		try {
-			f = new FileOutputStream(file);
-			ObjectOutputStream s = new ObjectOutputStream(f);          
-			s.writeObject(actCtxDictionary);
-			s.flush();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}  
-	}
-	 */
 }

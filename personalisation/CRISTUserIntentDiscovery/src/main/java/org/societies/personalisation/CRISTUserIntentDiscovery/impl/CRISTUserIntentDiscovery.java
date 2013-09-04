@@ -26,16 +26,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.context.CtxException;
-import org.societies.api.context.event.CtxChangeEvent;
-import org.societies.api.context.event.CtxChangeEventListener;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxIdentifier;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.ICRISTUserIntentDiscovery;
-import org.societies.personalisation.CRIST.api.CRISTUserIntentTaskManager.ICRISTUserIntentTaskManager;
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
 
 public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {

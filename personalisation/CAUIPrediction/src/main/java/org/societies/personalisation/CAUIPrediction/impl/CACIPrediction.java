@@ -19,7 +19,6 @@
  */
 package org.societies.personalisation.CAUIPrediction.impl;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,10 +32,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
@@ -51,7 +50,6 @@ import org.societies.api.personalisation.model.IAction;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
-
 
 /**
  * CAUIPrediction
@@ -70,57 +68,89 @@ public class CACIPrediction {
 	static boolean caciPredictionEnabled = true;
 	static boolean caciFreshness = false;
 	static boolean cacimodelExist = false;
+	
+	public UserIntentModelData currentCACIModelData;
+	
+	public CACIPrediction(ICtxBroker ctxBroker, ICommManager commsMgr){
 
-	protected CtxAttribute currentCaciModelAttr;
-	//private IIdentity cssOwnerId;
+		this.ctxBroker = ctxBroker;
+		this.commsMgr = commsMgr;
+	}
 
 	public CACIPrediction(ICtxBroker ctxBroker, ICAUITaskManager caciTaskManager, ICommManager commsMgr){
 
 		this.ctxBroker = ctxBroker;
 		this.caciTaskManager = caciTaskManager;
 		this.commsMgr = commsMgr;
-		
-	}
+		LOG.debug("inside CACIPrediction ");
 
-	protected IIdentity getOperatorID (){
-		
-		
-		final INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
-		final String cssOwnerStr = cssNodeId.getBareJid();
-		IIdentity cssOwnerId = null;
-		
+		//when css joins a new cis, will automatically register for caci model events.
 		try {
-			cssOwnerId = this.commsMgr.getIdManager().fromJid(cssOwnerStr);
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
-		return cssOwnerId;
-	}
-	
-	
-	public CACIPrediction(ICtxBroker ctxBroker, ICommManager commsMgr){
+			LOG.debug("register for cis join and new community model creation");
+			new CommunityJoinMonitor(this.ctxBroker ,this.commsMgr);
 
-		this.ctxBroker = ctxBroker;
-		this.commsMgr = commsMgr;
-	
-		
-	
+		} catch (Exception e) {
+			LOG.error("Exception while trying to register for new community join events " +e.getLocalizedMessage());
+		}
 	}
+
+	/*
+	private void setupLocalCaciAttr(){
+
+		CtxAttribute caciModelAttrLocal = null;
+		List<CtxIdentifier> caciModelAttrLocalList;
+		try {
+			// TODO update this with proper lookup method lookup(entID, CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL)
+			caciModelAttrLocalList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
+
+			if( !caciModelAttrLocalList.isEmpty() ){
+				// get locally stored model
+				CtxAttribute caciModelAttr = this.ctxBroker.retrieveAttribute((CtxAttributeIdentifier) caciModelAttrLocalList.get(0), false).get();
+				if(caciModelAttr.getBinaryValue() != null){
+					UserIntentModelData newCACIModelData = (UserIntentModelData) SerialisationHelper.deserialise(caciModelAttr.getBinaryValue(), this.getClass().getClassLoader());
+					setCACIActiveModel(newCACIModelData);	
+				}
+			} else {
+				LOG.debug("caci model doesn't exist -- creating empty local Caci Attribute");
+				IIdentity localcssID = getOperatorID();
+				CtxEntityIdentifier entityID = ctxBroker.retrieveIndividualEntityId(null, localcssID).get();
+				caciModelAttrLocal = ctxBroker.createAttribute(entityID, CtxAttributeTypes.CACI_MODEL).get();
+				LOG.debug("***CACI constructor ctxBroker.createAttribute= " + caciModelAttrLocal.getId());
+			}
+
+		} catch (Exception e) {
+
+			LOG.error("Exception while trying to create CACI CtxAttribute upon component start up" +e.getLocalizedMessage());
+			e.printStackTrace();
+		}
+	}
+	 */
+
+
+
 
 	public List<IUserIntentAction> getPrediction(IIdentity requestor,
 			IAction action){
 
-		List<IUserIntentAction> predictedActionsList = new ArrayList<IUserIntentAction>();
+		//List<IUserIntentAction> predictedActionsList = new ArrayList<IUserIntentAction>();
 		// identify performed action in model
 		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
-		
+
 		String par = action.getparameterName();
 		String val = action.getvalue();
+
+		if(currentCACIModelData != null ) 	{
+			
+			LOG.debug("set latest CACI model " + currentCACIModelData);
+			this.caciTaskManager.updateModel(currentCACIModelData);
+		}
 		
+		
+		
+		LOG.debug("cacimodel to be used for prediction: "+ this.caciTaskManager.getCAUIActiveModel() );
 		
 		List<IUserIntentAction> actionsList = this.caciTaskManager.retrieveActionsByTypeValue(par, val);
-		LOG.debug("3. caciTaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
+		LOG.debug("1. CACIMODEL TaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
 
 		if(actionsList.size()>0){
 
@@ -129,7 +159,7 @@ public class CACIPrediction {
 
 			IUserIntentAction currentAction = findBestMatchingAction(actionsList);
 
-			LOG.debug("4. caci currentAction " +currentAction);
+			LOG.debug("2. CACIMODEL currentAction " +currentAction);
 			Map<IUserIntentAction,Double> nextActionsMap = this.caciTaskManager.retrieveNextActions(currentAction);	
 			//LOG.info("5. nextActionsMap " +nextActionsMap);
 
@@ -137,25 +167,21 @@ public class CACIPrediction {
 			if(nextActionsMap.size()>0){
 				for(IUserIntentAction nextAction : nextActionsMap.keySet()){
 					Double doubleConf = nextActionsMap.get(nextAction);
-					//doubleConf = doubleConf*100;
-					doubleConf = 70.0;
+					doubleConf = doubleConf*100;
+					//doubleConf = 70.0;
 					nextAction.setConfidenceLevel(doubleConf.intValue());
 					//LOG.info("6. nextActionsMap " +nextAction);
 					results.add(nextAction);
-					
-					LOG.info(" ****** caci prediction map created "+ results);
+
+					LOG.debug(" ****** caci prediction map created "+ results);
 				}
 			}			
 		}
 
-
-		return predictedActionsList;
+		return results;
 	}
 
 
-	
-	
-	
 	private IUserIntentAction findBestMatchingAction(List<IUserIntentAction> actionList){
 		IUserIntentAction bestAction = null;
 
@@ -224,57 +250,61 @@ public class CACIPrediction {
 	}
 
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
 	/*
 	 * retreive caci model code from CIS context db 
-	 */
+	
 
 	public void retrieveCACIModel(){
 
 		List<CtxEntityIdentifier> commEntIDList = retrieveBelongingCIS();
 
-		for(CtxEntityIdentifier cisEntID : commEntIDList){
-			try {
-				CommunityCtxEntity commEntity = (CommunityCtxEntity) this.ctxBroker.retrieve(cisEntID).get();
-				Set<CtxAttribute> caciSet = commEntity.getAttributes(CtxAttributeTypes.CACI_MODEL);
-				for(CtxAttribute caciAttr: caciSet){
+		LOG.debug("retrieveCACIModel commEntIDList  1 "+commEntIDList);
+		//TODO keep local caci model
+		//TODO remove remote com to community
 
-					if(caciAttr.getBinaryValue() != null){
-						currentCaciModelAttr = caciAttr;
-						UserIntentModelData newCACIModelData = (UserIntentModelData) SerialisationHelper.deserialise(caciAttr.getBinaryValue(), this.getClass().getClassLoader());
-						setCACIActiveModel(newCACIModelData);	
+		if(!commEntIDList.isEmpty()){
+
+			for(CtxEntityIdentifier cisEntID : commEntIDList){
+
+				LOG.debug("retrieveCACIModel commEntIDList  2 "+commEntIDList);
+				try {
+					CommunityCtxEntity commEntity = (CommunityCtxEntity) this.ctxBroker.retrieve(cisEntID).get();
+					Set<CtxAttribute> caciSet = commEntity.getAttributes(CtxAttributeTypes.CACI_MODEL);
+					LOG.debug("retrieveCACIModel commEntIDList  3  commEntity "+commEntity.getId());
+
+					for(CtxAttribute caciAttrCommunity: caciSet){
+						LOG.debug("retrieveCACIModel commEntIDList  3  caciAttr "+caciAttrCommunity.getId());
+						if(caciAttrCommunity.getBinaryValue() != null){
+							//currentCaciModelAttr = caciAttr;
+
+							UserIntentModelData newCACIModelData = (UserIntentModelData) SerialisationHelper.deserialise(caciAttrCommunity.getBinaryValue(), this.getClass().getClassLoader());
+							LOG.debug("retrieveCACIModel commEntIDList  4  caciAttr "+newCACIModelData );
+							storeCaciModelBD(newCACIModelData);
+
+							setCACIActiveModel(newCACIModelData);	
+						}
 					}
+				} catch (Exception e) {
+					LOG.error("Exception while trying to retrieve a CACI model from an existing CIS  " +e.getLocalizedMessage());
+					e.printStackTrace();
 				}
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (CtxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
-
 		}
-	}
+	} 
+ */
 
 
+	/*
 	private Boolean getCaciFreshness(CtxAttribute currentCaciModelAttr){
 
 		Boolean isFresh = false;
@@ -283,6 +313,36 @@ public class CACIPrediction {
 		}
 
 		return isFresh;
+	}
+	 */
+
+	public void storeCaciModelDB(UserIntentModelData modelData){
+
+		final INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
+		final String cssOwnerStr = cssNodeId.getBareJid();
+		CtxAttribute attr = null;
+
+		try {
+			IIdentity cssOwnerId = this.commsMgr.getIdManager().fromJid(cssOwnerStr);
+			CtxEntityIdentifier indiEntId = this.ctxBroker.retrieveIndividualEntityId(null, cssOwnerId).get();
+
+			List<CtxIdentifier> lsCaci = this.ctxBroker.lookup(indiEntId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
+			CtxAttributeIdentifier caciModelAttributeId = null;
+
+			if (lsCaci.size()>0) {
+				caciModelAttributeId = (CtxAttributeIdentifier) lsCaci.get(0);
+				attr = (CtxAttribute) this.ctxBroker.retrieve(caciModelAttributeId).get();
+				byte[] binaryModel = SerialisationHelper.serialise(modelData);
+				LOG.debug("updating caci model  " +attr.getId() +" model: "+modelData );
+
+				this.ctxBroker.updateAttribute(attr.getId(), binaryModel).get();
+			}
+
+
+		} catch (Exception e) {
+			LOG.error("CtxAttribute of type "+CtxAttributeTypes.CACI_MODEL+ "was not updated with caci model "+e.getLocalizedMessage());
+			e.printStackTrace();
+		} 
 	}
 
 
@@ -307,19 +367,10 @@ public class CACIPrediction {
 				}
 			}
 
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (Exception e) {
+			LOG.error("Unable to retrieve CISids that css belongs to " +e.getLocalizedMessage());
+		} 
+
 		return commEntIDList;
 	}
 
@@ -352,12 +403,26 @@ public class CACIPrediction {
 	public void setCACIActiveModel (UserIntentModelData newCACIModelData){
 
 		if (newCACIModelData != null){
-			// get a new instance of cauiTaskManager
-			caciTaskManager.updateModel(newCACIModelData);
+			this.caciTaskManager.updateModel(null);
+			this.caciTaskManager.updateModel(newCACIModelData);
+			currentCACIModelData = newCACIModelData;
 			cacimodelExist = true;		 
 			LOG.info("caci model set - actions map: "+newCACIModelData.getActionModel());
 		}
 	}
 
+	protected IIdentity getOperatorID (){
 
+		final INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
+		final String cssOwnerStr = cssNodeId.getBareJid();
+		IIdentity cssOwnerId = null;
+
+		try {
+			cssOwnerId = this.commsMgr.getIdManager().fromJid(cssOwnerStr);
+		} catch (InvalidFormatException e) {
+			LOG.error("Exception while trying to retrieve operator IIdentity "+ e.getLocalizedMessage());
+			e.printStackTrace();
+		}		
+		return cssOwnerId;
+	}
 }

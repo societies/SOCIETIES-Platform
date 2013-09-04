@@ -20,8 +20,17 @@ public abstract class BasePageController implements Serializable {
             if (component == null)
                 component = "";
 
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+
+            if (facesContext == null) {
+                log.warn(String.format("facesContext is null - Couldn't deliver message '%s' to component '%s'",
+                        summary + " : " + detail,
+                        component));
+                return;
+            }
+
             FacesMessage message = new FacesMessage(severity, summary, detail);
-            FacesContext.getCurrentInstance().addMessage(component, message);
+            facesContext.addMessage(component, message);
 
             String logMsg = "MESSAGE:" + severity.toString()
                     + (component.length() > 0 ? ":" + component : ":GLOBAL")
@@ -32,7 +41,7 @@ public abstract class BasePageController implements Serializable {
             else if (severity == FacesMessage.SEVERITY_WARN)
                 log.warn(logMsg);
             else
-                log.trace(logMsg);
+                log.debug(logMsg);
         } catch (Exception ex) {
             // This method gets called from so many places, that it's worth catching any possible exception
             // Generally speaking, missing a message to a user is not a problem as the messages are usually non critical

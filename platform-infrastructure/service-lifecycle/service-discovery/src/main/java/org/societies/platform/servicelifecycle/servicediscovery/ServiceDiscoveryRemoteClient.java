@@ -32,7 +32,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
 import org.societies.api.schema.servicelifecycle.model.Service;
-import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlResult;
 
 /**
  * The callback for a remote service discovery call
@@ -44,7 +43,7 @@ public class ServiceDiscoveryRemoteClient implements IServiceDiscoveryCallback {
 
 		List<Service> resultList;
 
-		private final long TIMEOUT = 5;
+		private final long TIMEOUT = 75;
 
 		private BlockingQueue<List<Service>> returnList;		
 		

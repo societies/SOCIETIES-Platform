@@ -44,6 +44,7 @@
 		<property name="persoMgr" ref="persoMgr"></property>
 		<property name="ctxBroker" ref="ctxBroker"></property>
 		<property name="cauiDiscovery" ref="cauiDiscovery"></property>
+		<property name="caciDiscovery" ref="caciDiscovery"></property>
 		<property name="cauiTaskManager" ref="cauiTaskManager"></property>
 		<property name="caciTaskManager" ref="caciTaskManager"></property>
 		<property name="commsMgr" ref="commsMgr"></property>

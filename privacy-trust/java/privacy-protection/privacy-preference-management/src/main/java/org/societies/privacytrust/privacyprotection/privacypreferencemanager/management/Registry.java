@@ -30,8 +30,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
-import javax.swing.JOptionPane;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -41,10 +39,8 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.util.RequestorUtils;
-
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.AccCtrlMappings;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.AccessControlPreferenceDetailsBean;
-
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfMappings;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfPreferenceDetailsBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSMappings;
@@ -54,7 +50,7 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.preferen
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.RegistryBean;
 import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
-import org.societies.privacytrust.privacyprotection.util.preference.PrivacyPreferenceUtils;
+import org.societies.privacytrust.privacyprotection.api.util.PrivacyPreferenceUtils;
 
 public class Registry implements Serializable{
 

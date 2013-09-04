@@ -169,8 +169,14 @@ public final class TrustModelBeanTranslator {
 			throw new NullPointerException("trustEvidenceType can't be null");
 
 		switch (trustEvidenceType) {
-		case USED_SERVICE:
-			return TrustEvidenceTypeBean.USED_SERVICE;
+		case SHARED_CONTEXT:
+			return TrustEvidenceTypeBean.SHARED_CONTEXT;
+		case WITHHELD_CONTEXT:
+			return TrustEvidenceTypeBean.WITHHELD_CONTEXT;
+		case DIRECTLY_TRUSTED:
+			return TrustEvidenceTypeBean.DIRECTLY_TRUSTED;
+		case RATED:
+			return TrustEvidenceTypeBean.RATED;
 		case FRIENDED_USER:
 			return TrustEvidenceTypeBean.FRIENDED_USER;
 		case UNFRIENDED_USER:
@@ -178,15 +184,13 @@ public final class TrustModelBeanTranslator {
 		case JOINED_COMMUNITY:
 			return TrustEvidenceTypeBean.JOINED_COMMUNITY;
 		case LEFT_COMMUNITY:
-			return TrustEvidenceTypeBean.LEFT_COMMUNITY;
-		case RATED:
-			return TrustEvidenceTypeBean.RATED;
-		case DIRECTLY_TRUSTED:
-			return TrustEvidenceTypeBean.DIRECTLY_TRUSTED;
-		default:
-			throw new IllegalArgumentException("'" + trustEvidenceType 
-					+ "': Unsupported trust evidence type");
+			return TrustEvidenceTypeBean.LEFT_COMMUNITY;		
+		case USED_SERVICE:
+			return TrustEvidenceTypeBean.USED_SERVICE;
 		}
+		
+		throw new IllegalArgumentException("'" + trustEvidenceType 
+				+ "': Unsupported trust evidence type");
 	}
 
 	public TrustEvidenceType fromTrustEvidenceTypeBean(TrustEvidenceTypeBean trustEvidenceTypeBean) {
@@ -195,8 +199,14 @@ public final class TrustModelBeanTranslator {
 			throw new NullPointerException("trustEvidenceTypeBean can't be null");
 
 		switch (trustEvidenceTypeBean) {
-		case USED_SERVICE:
-			return TrustEvidenceType.USED_SERVICE;
+		case SHARED_CONTEXT:
+			return TrustEvidenceType.SHARED_CONTEXT;
+		case WITHHELD_CONTEXT:
+			return TrustEvidenceType.WITHHELD_CONTEXT;
+		case DIRECTLY_TRUSTED:
+			return TrustEvidenceType.DIRECTLY_TRUSTED;
+		case RATED:
+			return TrustEvidenceType.RATED;
 		case FRIENDED_USER:
 			return TrustEvidenceType.FRIENDED_USER;
 		case UNFRIENDED_USER:
@@ -205,14 +215,12 @@ public final class TrustModelBeanTranslator {
 			return TrustEvidenceType.JOINED_COMMUNITY;
 		case LEFT_COMMUNITY:
 			return TrustEvidenceType.LEFT_COMMUNITY;
-		case RATED:
-			return TrustEvidenceType.RATED;
-		case DIRECTLY_TRUSTED:
-			return TrustEvidenceType.DIRECTLY_TRUSTED;
-		default:
-			throw new IllegalArgumentException("'" + trustEvidenceTypeBean 
-					+ "': Unsupported trust evidence type bean");
+		case USED_SERVICE:
+			return TrustEvidenceType.USED_SERVICE;
 		}	
+		
+		throw new IllegalArgumentException("'" + trustEvidenceTypeBean 
+				+ "': Unsupported trust evidence type bean");
 	}
 	
 	/**

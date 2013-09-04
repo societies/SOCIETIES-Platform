@@ -47,7 +47,6 @@ import org.societies.api.personalisation.mgmt.IPersonalisationManager;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.personalisation.model.IActionConsumer;
-import org.societies.api.personalisation.model.PersonalisablePreferenceIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
@@ -138,7 +137,10 @@ public class PersonalisationCommsClient implements IPersonalisationManager, ICom
 			}
 			
 			this.results.put(getId(action.getServiceID(), action.getparameterName()), action);
-			this.results.notifyAll();
+			synchronized (this.results) {
+				this.results.notifyAll();
+			}
+			
 		}
 		
 	}
@@ -177,7 +179,10 @@ public class PersonalisationCommsClient implements IPersonalisationManager, ICom
 		
 		while (!this.results.containsKey(id)){
 			try {
-				this.results.wait();
+				synchronized (this.results) {
+					this.results.wait();
+				}
+				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -210,12 +215,15 @@ public class PersonalisationCommsClient implements IPersonalisationManager, ICom
 		};
 		
 		//waiting for the result to be returned
-		while (null==this.results.get(id).getparameterName()){
+		while (!this.results.containsKey(id)){
 			try {
-				Thread.sleep(500);
+				synchronized (this.results) {
+					this.results.wait();
+				}
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				
 			}
 		}
 		return new AsyncResult<IAction>(this.results.get(id));

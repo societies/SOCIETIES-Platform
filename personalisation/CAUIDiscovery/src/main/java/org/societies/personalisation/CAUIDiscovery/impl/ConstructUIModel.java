@@ -2,11 +2,10 @@ package org.societies.personalisation.CAUIDiscovery.impl;
 
 
 import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,7 @@ public class ConstructUIModel {
 		
 	}
 	
-	private LinkedHashMap<String,HashMap<String,Double>> filterDictionary(LinkedHashMap<String,HashMap<String,Double>> dictionary, Double limit){
+	public LinkedHashMap<String,HashMap<String,Double>> filterDictionary(LinkedHashMap<String,HashMap<String,Double>> dictionary, Double limit){
 
 		LinkedHashMap<String,HashMap<String,Double>> filtered = new LinkedHashMap<String,HashMap<String,Double>>();
 		for(String actions : dictionary.keySet()){
@@ -52,9 +51,9 @@ public class ConstructUIModel {
 	}
 
 
-	public UserIntentModelData constructNewModel(LinkedHashMap<List<String>,HashMap<String,Double>> transDictionaryAll, HashMap<String,List<String>> ctxActionsMap){
+	public UserIntentModelData constructNewModel(LinkedHashMap<List<String>,HashMap<String,Double>> transDictionaryAll, HashMap<String,List<String>> ctxActionsMap, Map<String , ServiceResourceIdentifier> sriMap){
 
-		//System.out.println("cauiTaskManager "+cauiTaskManager);
+		System.out.println("cauiTaskManager "+cauiTaskManager);
 		UserIntentModelData modelData = cauiTaskManager.createModel();
 		
 		//create all actions and assign context
@@ -64,19 +63,21 @@ public class ConstructUIModel {
 			String [] action = actionTemp.split("\\#");
 			// add here the serviceID /
 			//LOG.info("action details > serviceID: "+action[0]+" paramName: "+action[1]+" paramValue:"+action[2]);
-			String serviceId = action[0];
+			String serviceStringId = action[0];
 			//System.out.println("serviceId="+serviceId);
-			ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
-			try {
-				serviceId1.setIdentifier(new URI(serviceId));
-				serviceId1.setServiceInstanceIdentifier(serviceId);				
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
+			
+			ServiceResourceIdentifier sri = new ServiceResourceIdentifier();
+			
+			if(!sriMap.isEmpty() && sriMap.containsKey(serviceStringId)){
+				sri  = sriMap.get(serviceStringId);
 			}
 			
-			IUserIntentAction userAction = cauiTaskManager.createAction(serviceId1,"serviceType",action[1],action[2]);
-			//LOG.info("2 userAction created "+userAction);
-
+			IUserIntentAction userAction = cauiTaskManager.createAction(sri,action[3],action[1],action[2]);
+			LOG.debug("2 userAction created "+userAction);
+			LOG.debug("2 userAction service id "+userAction.getServiceID());
+			LOG.debug("2 userAction service instance id "+userAction.getServiceID().getServiceInstanceIdentifier());
+			LOG.debug("2 userAction service id "+userAction.getServiceID().getIdentifier());
+			
 			if(ctxActionsMap.get(actionTemp)!=null){
 				List<String> contexValuesStringList = ctxActionsMap.get(actionTemp);
 				HashMap<String,Serializable> context = new HashMap<String,Serializable>();
@@ -144,12 +145,16 @@ public class ConstructUIModel {
 		return modelData;
 	}
 
+	
+	/*
+	 * debugging helper class
+	 */
 	public void printTransProbDictionary (LinkedHashMap<String,HashMap<String,Double>> transProbDictionary){
 
 		//System.out.println ("** ConstructUIModel ** total number of entries: " + transProbDictionary.size());
 		for(String actions : transProbDictionary.keySet()){
 			HashMap<String,Double> transTargets = transProbDictionary.get(actions);
-			//System.out.println("Action:"+actions+ "| target: "+transTargets);
+			System.out.println("Action:"+actions+ "| target: "+transTargets);
 		}
 	}	
 

@@ -25,7 +25,6 @@
 package org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.concurrent.ExecutionException;
 

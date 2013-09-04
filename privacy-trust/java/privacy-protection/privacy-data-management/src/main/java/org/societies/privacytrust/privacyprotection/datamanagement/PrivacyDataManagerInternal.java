@@ -25,6 +25,7 @@
 package org.societies.privacytrust.privacyprotection.datamanagement;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,175 +34,90 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.RequestorService;
-import org.societies.api.identity.SimpleDataIdentifier;
+import org.societies.api.identity.util.DataIdentifierUtils;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
+import org.societies.privacytrust.privacyprotection.datamanagement.util.PrivacyDataManagerInternalUtility;
 import org.societies.privacytrust.privacyprotection.model.PrivacyPermission;
 
 /**
  * @author Olivier Maridat (Trialog)
  */
-public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerInternal.class.getSimpleName());
+public class PrivacyDataManagerInternal extends PrivacyDataManagerInternalUtility implements IPrivacyDataManagerInternal {
+	private static final Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerInternal.class);
 
 	private SessionFactory sessionFactory;
 
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermissions(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier)
-	 */
 	@Override
-	public List<ResponseItem> getPermissions(Requestor requestor, DataIdentifier dataId) throws PrivacyException {
-		// Check Dependency injection
-		if (!isDepencyInjectionDone()) {
-			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
-		}
+	public List<ResponseItem> getPermissions(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException {
 		// Verifications
 		if (null == requestor) {
 			throw new PrivacyException("[Parameters] RequestorId is missing");
 		}
-		if (null == dataId) {
-			throw new PrivacyException("[Parameters] DataId is missing");
+		if (null == dataIds || dataIds.size() <= 0) {
+			LOG.debug("[Parameters] Data id list is missing, return null");
+			return null;
 		}
-		//		if (null == dataId.getOwnerId()) {
-		//			throw new PrivacyException("[Parameters] OwnerId is missing");
-		//		}
 
-		Session session = sessionFactory.openSession();
-		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
+		List<ResponseItem> permissions = null;
+		Session session = null;
 		try {
-			// -- Retrieve the privacy permission
-			Criteria criteria = findPrivacyPermissions(session, requestor, dataId);
-			List<PrivacyPermission> privacyPermissions = (List<PrivacyPermission>) criteria.list();
+			session = sessionFactory.openSession();
 
-
-			// -- Generate the response item
-			// - Privacy Permissions don't exist
-			if (null == privacyPermissions || privacyPermissions.size() <= 0) {
-				LOG.debug("PrivacyPermission not available");
-				permissions = null;
+			// Search all matching permissions
+			List<PrivacyPermission> privacyPermissions = findPrivacyPermissions(session, requestor, dataIds, actions, false);
+			LOG.info("Get: "+(null == privacyPermissions ? "0" : privacyPermissions.size())+" permissions retrieved");
+			if (null == privacyPermissions) {
+				return null;
 			}
-			// - Privacy permissions retrieved
-			else {
-				for(PrivacyPermission privacyPermission : privacyPermissions) {
-					permissions.add(privacyPermission.createResponseItem());
-					LOG.debug("PrivacyPermission retrieved: "+privacyPermission.toString());
+			int i = 1;
+			for(PrivacyPermission perm : privacyPermissions) {
+				LOG.info((i++)+": "+perm);
+			}
+
+			// Keep the most relevants for these actions
+			permissions = new ArrayList<ResponseItem>();
+			if (actions != null && actions.size() > 0) {
+				for(DataIdentifier dataId : dataIds) {
+					PrivacyPermission permission = selectRelevantPermission(dataId, privacyPermissions);
+					if (null != permission) {
+						LOG.info("Get: on of the retrieved and selected permission. "+permission);
+						permissions.add(permission.createResponseItem());
+					}
 				}
 			}
-		}
-		catch (Exception e) {
-			throw new PrivacyException("Error during the retrieving of the privacy permission", e);
-		}
-		finally {
-			if (session != null) {
+			else {
+				LOG.info("Get: don't check actions and keep them all");
+				permissions.addAll(PrivacyPermission.createResponseItems(privacyPermissions));
+			}
+			// Robustness
+			if (permissions.size() <= 0) {
+				permissions = null;
+			}
+		} catch (Exception e) {
+			throw new PrivacyException("Error during the persistance of the privacy permission", e);
+		} finally {
+			if (null != session) {
 				session.close();
 			}
 		}
 		return permissions;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier, java.util.List)
-	 */
 	@Override
-	public List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> getPermissions(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
-		// Check Dependency injection
-		if (!isDepencyInjectionDone()) {
-			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
-		}
-		// Verifications
-		if (null == requestor) {
-			throw new PrivacyException("[Parameters] RequestorId is missing");
-		}
-		if (null == dataId) {
-			throw new PrivacyException("[Parameters] DataId is missing");
-		}
-		//		if (null == dataId.getOwnerId()) {
-		//			throw new PrivacyException("[Parameters] OwnerId is missing");
-		//		}
-		if (null == actions || actions.size() <= 0) {
-			throw new PrivacyException("[Parameters] Actions are missing");
-		}
-
-		Session session = sessionFactory.openSession();
-		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
-		ResponseItem permission = null;
-		try {
-			// -- Retrieve the privacy permission
-			Criteria criteria = findPrivacyPermissions(session, requestor, dataId, actions);
-			List<PrivacyPermission> privacyPermissions = (List<PrivacyPermission>) criteria.list();
-
-
-			// -- Generate the response item
-			// - Privacy Permissions don't exist
-			if (null == privacyPermissions || privacyPermissions.size() <= 0) {
-				LOG.debug("PrivacyPermission not available");
-				permission = null;
-			}
-			// - Privacy permissions retrieved
-			else {
-				PrivacyPermission relevantPrivacyPermission = null;
-				// Find the most relevant PERMIT (even if we need to avoid some optional actions)
-				boolean found = false;
-				for(PrivacyPermission privacyPermission : privacyPermissions) {
-					// If it matches to PERMIT, this is the most relevant
-					if (privacyPermission.getPermission().equals(Decision.PERMIT)) {
-						relevantPrivacyPermission = privacyPermission;
-						found = true;
-						break;
-					}
-				}
-				// If no PERMIT has been found: take the one relevant (i.e. the first one)
-				if (!found) {
-					relevantPrivacyPermission = privacyPermissions.get(0);
-				}
-				// - We could also try (in a second loop) to deduce a result by enlarging the research
-				// Not at the moment
-				// - Return the most relevant privacy permission
-				permission = relevantPrivacyPermission.createResponseItem();
-				LOG.debug("PrivacyPermission retrieved: "+relevantPrivacyPermission.toString());
-				permissions.add(permission);
-			}
-		}
-		catch (Exception e) {
-			throw new PrivacyException("Error during the retrieving of the privacy permission", e);
-		}
-		finally {
-			if (session != null) {
-				session.close();
-			}
-		}
-		if (permissions.size() <= 0) {
-			return null;
-		}
-		return ResponseItemUtils.toResponseItemBeans(permissions);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#updatePermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier, java.util.List, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.Decision)
-	 */
-	@Override
-	public boolean updatePermission(Requestor requestor, DataIdentifier dataId, List<Action> actions, Decision permission) throws PrivacyException {
-		// Check Dependency injection
-		if (!isDepencyInjectionDone()) {
-			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
-		}
+	public boolean updatePermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions, Decision decision) throws PrivacyException {
 		// Verifications
 		if (null == requestor) {
 			throw new PrivacyException("[Parameters] RequestorId is missing");
@@ -212,32 +128,38 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		if (null == actions || actions.size() <= 0) {
 			throw new PrivacyException("[Parameters] Actions are missing");
 		}
+		if (null == decision) {
+			throw new PrivacyException("[Parameters] Decision is missing");
+		}
 
-		Session session = sessionFactory.openSession();
+		Session session = null;
+		Transaction t = null;
 		boolean result = false;
-		Transaction t = session.beginTransaction();
 		try {
+			session = sessionFactory.openSession();
+			t = session.beginTransaction();
+
 			// -- Retrieve the privacy permission (that matches all actions)
-			Criteria criteria = findPrivacyPermissions(session, requestor, dataId, actions, true);
-			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.uniqueResult();
+			PrivacyPermission privacyPermission = findPrivacyPermissions(session, requestor, dataId, actions);
 
 			// -- Update this privacy permission
 			// - Privacy Permission doesn't exist: create a new one
 			if (null == privacyPermission) {
-				LOG.debug("PrivacyPermission doesn not already exist: create it");
-				privacyPermission = new PrivacyPermission(requestor, dataId, actions, permission);
+				LOG.info("Update: no permission retrieved, create a new one");
+				privacyPermission = new PrivacyPermission(requestor, dataId, actions, decision);
 			}
 			// - Privacy permission already exists: update it
 			else {
+				LOG.info("Update: permission retrieved, update it. "+privacyPermission);
 				privacyPermission.setRequestor(requestor);
 				privacyPermission.setDataId(dataId);
-				privacyPermission.setActions(actions);
-				privacyPermission.setPermission(permission);
+				privacyPermission.setActionsToData(actions);
+				privacyPermission.setPermission(decision);
 			}
 			// - Update
 			session.saveOrUpdate(privacyPermission);
+			LOG.info("Update: updated permission is "+privacyPermission);
 			t.commit();
-			LOG.debug("PrivacyPermission saved: "+privacyPermission.toString());
 			result = true;
 		} catch (Exception e) {
 			if (null != t) {
@@ -252,49 +174,8 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#updatePermission(org.societies.api.identity.Requestor, org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.ResponseItem)
-	 */
 	@Override
-	public boolean updatePermission(Requestor requestor, ResponseItem permission) throws PrivacyException {
-		DataIdentifier dataId;
-		// Data id
-		if (null != permission.getRequestItem().getResource().getDataId()) {
-			dataId = permission.getRequestItem().getResource().getDataId();
-		}
-		// Data type only
-		else if (null != permission.getRequestItem().getResource().getDataType() && !"".equals(permission.getRequestItem().getResource().getDataType())) {
-			dataId = new SimpleDataIdentifier();
-			dataId.setType(permission.getRequestItem().getResource().getDataType());
-			dataId.setScheme(permission.getRequestItem().getResource().getScheme());
-		}
-		else {
-			throw new PrivacyException("[Parameters] DataId or DataType is missing");
-		}
-		return updatePermission(requestor, dataId, permission.getRequestItem().getActions(), permission.getDecision());
-	}
-
-	@Override
-	public boolean updatePermissions(Requestor requestor, List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> permissions1) throws PrivacyException {
-		List<ResponseItem> permissions = ResponseItemUtils.toResponseItems(permissions1);
-		boolean res = true;
-		for (ResponseItem permission : permissions) {
-			res &= updatePermission(requestor, permission);
-		}
-		return res;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#deletePermissions(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier)
-	 */
-	@Override
-	public boolean deletePermissions(Requestor requestor, DataIdentifier dataId) throws PrivacyException {
-		// Check Dependency injection
-		if (!isDepencyInjectionDone()) {
-			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
-		}
+	public boolean deletePermissions(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		// Verifications
 		if (null == requestor) {
 			throw new PrivacyException("[Parameters] RequestorId is missing");
@@ -303,83 +184,32 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			throw new PrivacyException("[Parameters] DataId is missing");
 		}
 
-		Session session = sessionFactory.openSession();
+		Session session = null;
+		Transaction t = null;
 		boolean result = false;
-		Transaction t = session.beginTransaction();
 		try {
-			// -- Retrieve the privacy permission
-			Criteria criteria = findPrivacyPermissions(session, requestor, dataId);
-			List<PrivacyPermission> privacyPermissions = (List<PrivacyPermission>) criteria.list();
+			session = sessionFactory.openSession();
+			t = session.beginTransaction();
+
+			// -- Retrieve the privacy permissions
+			List<DataIdentifier> dataIds = new ArrayList<DataIdentifier>();
+			dataIds.add(dataId);
+			List<PrivacyPermission> privacyPermissions = findPrivacyPermissions(session, requestor, dataIds, actions, false);
 
 			// -- Delete the privacy permission
-			// - Privacy Permission doesn't exist
-			if (null == privacyPermissions || privacyPermissions.size() <= 0) {
-				LOG.debug("PrivacyPermissions not available: no need to delete");
-			}
 			// - Privacy permission retrieved: delete it
-			else {
+			if (null != privacyPermissions && privacyPermissions.size() > 0) {
 				for(Iterator<PrivacyPermission> it = privacyPermissions.iterator(); it.hasNext();) {
 					session.delete(it.next());
 				}
 				t.commit();
-				LOG.debug("PrivacyPermissions deleted.");
 			}
 			result = true;
 		} catch (Exception e) {
 			if (null != t) {
 				t.rollback();
 			}
-			throw new PrivacyException("Error during the removal of the privacy permission", e);
-		} finally {
-			if (session != null) {
-				session.close();
-			}
-		}
-		return result;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#deletePermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier, java.util.List)
-	 */
-	@Override
-	public boolean deletePermission(Requestor requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
-		// Check Dependency injection
-		if (!isDepencyInjectionDone()) {
-			throw new PrivacyException("[Dependency Injection] Data Storage Manager not ready");
-		}
-		// Verifications
-		if (null == requestor) {
-			throw new PrivacyException("[Parameters] RequestorId is missing");
-		}
-		if (null == dataId) {
-			throw new PrivacyException("[Parameters] DataId is missing");
-		}
-
-		Session session = sessionFactory.openSession();
-		boolean result = false;
-		Transaction t = session.beginTransaction();
-		try {
-			// -- Retrieve the privacy permission
-			Criteria criteria = findPrivacyPermissions(session, requestor, dataId, actions, true);
-			PrivacyPermission privacyPermission = (PrivacyPermission) criteria.list();
-
-			// -- Delete the privacy permission
-			// - Privacy Permission doesn't exist
-			if (null == privacyPermission) {
-				LOG.debug("PrivacyPermission not available: no need to delete");
-			}
-			// - Privacy permission retrieved: delete it
-			else {
-				session.delete(privacyPermission);
-				t.commit();
-				LOG.debug("PrivacyPermissions deleted.");
-			}
-			result = true;
-		} catch (Exception e) {
-			if (null != t) {
-				t.rollback();
-			}
+			result = false;
 			throw new PrivacyException("Error during the removal of the privacy permission", e);
 		} finally {
 			if (session != null) {
@@ -390,15 +220,7 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	}
 
 
-	// -- Private methods
-
-	private Criteria findPrivacyPermissions(Session session, Requestor requestor, DataIdentifier dataId) {
-		return findPrivacyPermissions(session, requestor, dataId, null);
-	}
-	private Criteria findPrivacyPermissions(Session session, Requestor requestor, DataIdentifier dataId, List<Action> actions) {
-		return findPrivacyPermissions(session, requestor, dataId, actions, false);
-	}
-
+	/* --- Private methods --- */
 	/**
 	 * Retrieve a list of privacy permission
 	 * 
@@ -409,26 +231,45 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 	 * @param mustMatchAllActions True to retrieve only if it matches all actions
 	 * @return  If all actions are mandatory: only one result
 	 * @return If some actions are optional: several results, ordered by relevance
+	 * @throws PrivacyException 
 	 */
-	private Criteria findPrivacyPermissions(Session session, Requestor requestor, DataIdentifier dataId, List<Action> actions, boolean mustMatchAllActions) {
+	private List<PrivacyPermission> findPrivacyPermissions(Session session, RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions, boolean mustMatchAllActions) throws PrivacyException {
+		List<PrivacyPermission> privacyPermissions = null;
+		try {
+			// Retrieve the privacy permissions
+			Criteria criteria = createPrivacyPermissionsCriteria(session, requestor, dataIds, actions, mustMatchAllActions);
+			privacyPermissions = (List<PrivacyPermission>) criteria.list();
+			if (null == privacyPermissions || privacyPermissions.size() <= 0) {
+				privacyPermissions = null;
+			}
+		}
+		catch (Exception e) {
+			throw new PrivacyException("Error during the retrieving of the privacy permissions", e);
+		}
+		return privacyPermissions;
+	}
+
+	/**
+	 * Duplication of {@link #findPrivacyPermissions(RequestorBean, List, List, boolean)} for one data id
+	 * All actions must match
+	 */
+	private PrivacyPermission findPrivacyPermissions(Session session, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
+		List<DataIdentifier> dataIds = new ArrayList<DataIdentifier>();
+		dataIds.add(dataId);
+		List<PrivacyPermission> privacyPermissions = findPrivacyPermissions(session, requestor, dataIds, actions, true);
+		if (null == privacyPermissions || privacyPermissions.size() <= 0) {
+			return null;
+		}
+		return privacyPermissions.get(0);
+	}
+
+
+	private Criteria createPrivacyPermissionsCriteria(Session session, RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions, boolean mustMatchAllActions) {
+		Criteria criteria = session.createCriteria(PrivacyPermission.class);
 		// -- Criteria about data id
-		Criteria criteria = session
-				.createCriteria(PrivacyPermission.class)
-				.add(Restrictions.like("dataId", dataId.getUri()));
+		criteria = criteria.add(Restrictions.in("dataId", DataIdentifierUtils.toUriString(dataIds).toArray()));
 		// -- Criteria about requestor
-		criteria.add(Restrictions.like("requestorId", requestor.getRequestorId().getJid()));
-		if (requestor instanceof RequestorCis) {
-			criteria.add(Restrictions.like("cisId", ((RequestorCis) requestor).getCisRequestorId().getJid()));
-			criteria.add(Restrictions.isNull("serviceId"));
-		}
-		else if (requestor instanceof RequestorService) {
-			criteria.add(Restrictions.isNull("cisId"));
-			criteria.add(Restrictions.like("serviceId", ((RequestorService) requestor).getRequestorServiceId().getIdentifier().toString()));
-		}
-		else {
-			criteria.add(Restrictions.isNull("cisId"));
-			criteria.add(Restrictions.isNull("serviceId"));
-		}
+		criteria.add(Restrictions.like("requestorId", RequestorUtils.toUriString(requestor)));
 		// -- Criteria about action list
 		if (null != actions && actions.size() > 0) {
 			// - Create strings
@@ -436,10 +277,11 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 			Criterion criterionMandatoryActions = null;
 			StringBuilder strAllActions = new StringBuilder();
 			StringBuilder strMandatoryActions = new StringBuilder();
+			Collections.sort(actions, new ActionUtils.ActionComparator());
 			for(Action action : actions) {
-				strAllActions.append(action.getActionType().name()+"/");
+				strAllActions.append(action.getActionConstant().value()+"/");
 				if (!action.isOptional()) {
-					strMandatoryActions.append(action.getActionType().name()+"/");
+					strMandatoryActions.append(action.getActionConstant().value()+"/");
 				}
 			}
 			// - Create the query
@@ -454,51 +296,58 @@ public class PrivacyDataManagerInternal implements IPrivacyDataManagerInternal {
 				criteria.add(Restrictions.or(criterionAllActions, criterionMandatoryActions));
 			}
 		}
+		// - Order by data id, then the number of mandatory actions, and then by decision
+		criteria.addOrder(Order.desc("dataId"));
+		criteria.addOrder(Order.desc("nbOfActions"));
+		criteria.addOrder(Order.desc("permission"));
 		return criteria;
 	}
 
-	@Deprecated
-	private boolean containsAction(List<Action> actions, Action action) {
-		if (null == actions || actions.size() <= 0 || null == action) {
-			return false;
+	/**
+	 * Select the most relevant permission for this data id
+	 * @pre The list of permissions is order by the number of actions available and their decisions. For a faster algorithm.
+	 * @param dataId
+	 * @param privacyPermissions
+	 * @return The most relevant permission
+	 */
+	private PrivacyPermission selectRelevantPermission(DataIdentifier dataId, List<PrivacyPermission> privacyPermissions) {
+		if (null == privacyPermissions || privacyPermissions.size() <= 0) {
+			return null;
 		}
-		for(Action actionTmp : actions) {
-			if (actionTmp.toXMLString().equals(action.toXMLString())) {
-				return true;
+
+		PrivacyPermission mostRelevantPrivacyPermission = null;
+		PrivacyPermission aPrivacyPermission = null;
+		// Find the most relevant PERMIT (even if we need to avoid some optional actions)
+		boolean found = false;
+		for(PrivacyPermission privacyPermission : privacyPermissions) {
+			// Interesting permission
+			if (DataIdentifierUtils.toUriString(dataId).equals(privacyPermission.getDataId())) {
+				// Store one matching privacy permission
+				aPrivacyPermission = privacyPermission;
+
+				// If it matches to PERMIT, this is the most relevant
+				if(privacyPermission.getPermission().equals(Decision.PERMIT)) {
+					mostRelevantPrivacyPermission = privacyPermission;
+					privacyPermissions.remove(privacyPermission);
+					found = true;
+					break;
+				}
 			}
 		}
-		return false;
-	}
-
-	@Deprecated
-	private boolean containsActions(List<Action> actions, List<Action> subActions) {
-		if (null == actions || actions.size() <= 0 || null == subActions || subActions.size() <= 0 || actions.size() < subActions.size()) {
-			return false;
+		// If no PERMIT has been found: take a matching permission (if any)
+		if (!found) {
+			mostRelevantPrivacyPermission = aPrivacyPermission;
 		}
-		for(Action subActionTmp : subActions) {
-			if (!containsAction(actions, subActionTmp)) {
-				return false;
-			}
+		// - Return the most relevant privacy permission
+		if (null == mostRelevantPrivacyPermission) {
+			return null;
 		}
-		return true;
+		return mostRelevantPrivacyPermission;
 	}
 
 
-	// --- Dependency Injection
+	/* --- Dependency Injection --- */
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
-		LOG.info("[Dependency Injection] sessionFactory injected");
 	}
-
-	private boolean isDepencyInjectionDone() {
-		return isDepencyInjectionDone(0);
-	}
-	private boolean isDepencyInjectionDone(int level) {
-		boolean result = true;
-		if (null == sessionFactory) {
-			result = false;
-		}
-		return result;
-	}
-
 }

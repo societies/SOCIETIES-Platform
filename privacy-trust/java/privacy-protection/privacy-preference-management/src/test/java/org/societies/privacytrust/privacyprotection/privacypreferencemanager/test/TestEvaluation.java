@@ -30,10 +30,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JOptionPane;
-
-import junit.framework.TestCase;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -63,14 +59,12 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.CtxTypes;
-import org.societies.privacytrust.privacyprotection.privacypreferencemanager.MessageBox;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager;
 import org.springframework.scheduling.annotation.AsyncResult;
 

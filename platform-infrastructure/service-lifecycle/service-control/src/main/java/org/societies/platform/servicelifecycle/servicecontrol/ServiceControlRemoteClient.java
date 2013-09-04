@@ -45,7 +45,6 @@ public class ServiceControlRemoteClient implements IServiceControlCallback {
 
 	private final long TIMEOUT = 30;
 	
-	private ServiceControlResult result;
 	private BlockingQueue<ServiceControlResult> resultList;
 	
 	public ServiceControlRemoteClient(){

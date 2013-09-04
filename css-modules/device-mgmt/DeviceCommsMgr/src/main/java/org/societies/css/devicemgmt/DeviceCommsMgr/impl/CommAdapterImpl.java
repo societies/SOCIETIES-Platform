@@ -28,7 +28,6 @@ package org.societies.css.devicemgmt.DeviceCommsMgr.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBException;
 
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;

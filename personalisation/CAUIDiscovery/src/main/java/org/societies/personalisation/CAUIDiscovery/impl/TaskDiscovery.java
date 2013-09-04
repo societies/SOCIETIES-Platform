@@ -26,6 +26,7 @@ public class TaskDiscovery {
 	}
 
 	
+	/*
 	public LinkedHashMap<List<String>,Integer>  populateTaskDictionary(){
 		LinkedHashMap<List<String>,Integer> taskDictionary = null;
 		
@@ -35,7 +36,7 @@ public class TaskDiscovery {
 		
 		return taskDictionary;
 	}
-	
+	*/
 
 	
 	public LinkedHashMap<String,ActionDictObject> getSeqs(Double limit){

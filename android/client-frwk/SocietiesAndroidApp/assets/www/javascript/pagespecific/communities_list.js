@@ -302,7 +302,7 @@ var	SocietiesCISListService = {
 				var removeMember = "";
 				if (bAdmin) {
 					removeMember = '<a href="#" onclick="SocietiesCISListService.removeMember(\'' + data[i].name + '\', \'' + data[i].jid + '\', ' + i + ')">Remove Member</a>';
-					if (data[i].role == "owner") {
+					if (data[i].role == "OWNER") {
 						//PREVENT FRIEND REQUESTS TO SELF
 						friendRequestATag = "", friendRequestATagClose = "", removeMember="";
 					}

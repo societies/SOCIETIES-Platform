@@ -26,10 +26,7 @@ package org.societies.api.privacytrust.privacy.model.privacypolicy;
 
 import java.io.Serializable;
 
-import javax.swing.JOptionPane;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.TargetMatchConstants;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
@@ -45,60 +42,60 @@ public class Resource implements Serializable{
 	private DataIdentifier dataId;
 	private String dataType;
 	private DataIdentifierScheme scheme;
-	
+
 	private Resource(){
-//		if (scheme==null){
-//			JOptionPane.showMessageDialog(null, "constructor: SCHEME IS NULL");
-//			throw new NullPointerException();
-//		}else{
-//			JOptionPane.showMessageDialog(null, "SCHEME IS: "+scheme.toString());
-//		}
+		//		if (scheme==null){
+		//			JOptionPane.showMessageDialog(null, "constructor: SCHEME IS NULL");
+		//			throw new NullPointerException();
+		//		}else{
+		//			JOptionPane.showMessageDialog(null, "SCHEME IS: "+scheme.toString());
+		//		}
 	}
 	public Resource(DataIdentifier dataId){
 		this.dataId = dataId;
 		this.dataType = dataId.getType();
 
 		this.scheme = dataId.getScheme();
-//		if (scheme==null){
-//			JOptionPane.showMessageDialog(null, "constructor: SCHEME IS NULL");
-//			throw new NullPointerException();
-//		}else{
-//			JOptionPane.showMessageDialog(null, "SCHEME IS: "+scheme.toString());
-//		}
+		//		if (scheme==null){
+		//			JOptionPane.showMessageDialog(null, "constructor: SCHEME IS NULL");
+		//			throw new NullPointerException();
+		//		}else{
+		//			JOptionPane.showMessageDialog(null, "SCHEME IS: "+scheme.toString());
+		//		}
 	}
 
-	
+
 	public Resource(DataIdentifierScheme scheme, String type){
 		this.dataType = type;
 		this.scheme = scheme;
-//		if (scheme==null){
-//			JOptionPane.showMessageDialog(null, "constructor: SCHEME IS NULL");
-//			throw new NullPointerException();
-//		}else{
-//			JOptionPane.showMessageDialog(null, "SCHEME IS: "+scheme.toString());
-//		}
+		//		if (scheme==null){
+		//			JOptionPane.showMessageDialog(null, "constructor: SCHEME IS NULL");
+		//			throw new NullPointerException();
+		//		}else{
+		//			JOptionPane.showMessageDialog(null, "SCHEME IS: "+scheme.toString());
+		//		}
 	}
 	public TargetMatchConstants getType(){
 		return TargetMatchConstants.RESOURCE;
 	}
-	
+
 	public String getDataType(){
 		return this.dataType;
 	}
 
-	
+
 	public DataIdentifier getDataId(){
 		return this.dataId;
 	}
-	
+
 	public void stripIdentifier(){
 		this.dataId = null;
 	}
-	
+
 	public void setPublicCtxIdentifier(DataIdentifier ctxId){
 		this.dataId = ctxId;
 	}
-	
+
 	public String toXMLString(){
 		StringBuilder str = new StringBuilder("\n<Resource>");
 		if (this.dataId!=null){
@@ -110,11 +107,11 @@ public class Resource implements Serializable{
 		str.append("\n</Resource>");
 		return str.toString();
 	}
-	
+
 	private String ctxIDToXMLString(){
 		StringBuilder str = new StringBuilder();
 		str.append("\n\t<Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:resource-id\"" +
-		"\n \t\t\tDataType=\"org.societies.api.context.model.CtxIdentifier\">");
+				"\n \t\t\tDataType=\"org.societies.api.context.model.CtxIdentifier\">");
 
 		str.append("\n\t\t<AttributeValue>");
 		str.append(dataId.getUri());
@@ -123,12 +120,12 @@ public class Resource implements Serializable{
 		str.append("\n\t</Attribute>");
 		return str.toString();
 	}
-	
+
 	private String ctxTypeToXMLString(){
 		StringBuilder str = new StringBuilder();
-//		if(scheme==null){
-//			JOptionPane.showMessageDialog(null, "SCHEME IS NULL");
-//		}
+		//		if(scheme==null){
+		//			JOptionPane.showMessageDialog(null, "SCHEME IS NULL");
+		//		}
 		if (scheme.equals(DataIdentifierScheme.CONTEXT)){
 			str.append("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.CONTEXT+"\"" +
 					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
@@ -137,12 +134,12 @@ public class Resource implements Serializable{
 			str.append("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.CIS+"\"" +
 					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
 		}
-		
+
 		else if (scheme.equals(DataIdentifierScheme.DEVICE)){
 			str.append("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.DEVICE+"\"" +
 					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
 		}
-		
+
 		else if (scheme.equals(DataIdentifierScheme.ACTIVITY)){
 			str.append("\n\t<Attribute AttributeId=\""+DataIdentifierScheme.ACTIVITY+"\"" +
 					"\n\t\t\tDataType=\"http://www.w3.org/2001/XMLSchema#string\">");
@@ -156,8 +153,8 @@ public class Resource implements Serializable{
 		str.append("</AttributeValue>");
 		str.append("\n\t</Attribute>");
 		return str.toString();	
-		}
-	
+	}
+
 	public String toString(){
 		return this.toXMLString();
 	}
@@ -187,9 +184,9 @@ public class Resource implements Serializable{
 		// -- Verify obj type
 		Resource rhs = (Resource) obj;
 		return new EqualsBuilder()
-			.append(this.getDataType(), rhs.getDataType())
-			.append(this.getDataId(), rhs.getDataId())
-			.isEquals();
+		.append(this.getDataType(), rhs.getDataType())
+		.append(this.getDataId(), rhs.getDataId())
+		.isEquals();
 	}
 
 	/**
@@ -199,7 +196,7 @@ public class Resource implements Serializable{
 		return scheme;
 	}
 
-	
-	
+
+
 }
 

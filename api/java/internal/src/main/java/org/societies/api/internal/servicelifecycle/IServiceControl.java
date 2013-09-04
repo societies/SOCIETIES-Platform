@@ -24,9 +24,13 @@
  */
 package org.societies.api.internal.servicelifecycle;
 
+import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.Future;
 
+import org.societies.api.cis.management.ICis;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -84,35 +88,29 @@ public interface IServiceControl {
 	 * This method installs a shared service into the container
 	 * 
 	 * @param service the Remote Service to install
+	 * @param filename the name of the service
 	 * @return the result of the operation
 	 */
+	
+	public Future<ServiceControlResult> installService(InputStream inputStream, String filename) throws ServiceControlException;
+
+	/**
+	 * This method installs a service, from a File, into the local container.
+	 * 
+	 * @param file to install
+	 * @return the result of the operation
+	 */
+	
 	public Future<ServiceControlResult> installService(Service service) throws ServiceControlException;
-
-	/**
-	 * This method installs a new service into the container present on a given node
-	 * 
-	 * @param service the Remote Service to install
-	 * @param node The node where we wish to install the service
-	 * @return the result of the operation
-	 */
-	public Future<ServiceControlResult> installService(Service service, IIdentity node) throws ServiceControlException;
-
-	/**
-	 * This method installs a new service into the container present on a given node, given by the jid
-	 * 
-	 * @param service the Remote Service to install
-	 * @param jid The node where we wish to install the service
-	 * @return the result of the operation
-	 */
-	public Future<ServiceControlResult> installService(Service service, String jid) throws ServiceControlException;
-
+	
+	
 	/**
 	 * This method installs a new service into the container
 	 * 
 	 * @param bundleLocation the URL of the bundle to install
 	 * @return the result of the operation
 	 */
-	public Future<ServiceControlResult> installService(URL bundleLocation) throws ServiceControlException;
+	public Future<ServiceControlResult> installService(URL bundleLocation);
 
 	/**
 	 * This method installs a new service into the container present on a given node
@@ -158,6 +156,19 @@ public interface IServiceControl {
 	 */
 	public Future<ServiceControlResult> unshareService(Service service, IIdentity node) throws ServiceControlException;
 	
+	/**
+	 * This method is used only once, to tell Service Control to do clean-up of the repository after a restart.
+	 * Not meant to be used by components outside the SLM, but needed to be in the API due to bean injection.
+	 * 
+	 */
 	public void cleanAfterRestart();
-	
+
+
+	/**
+	 * @param serviceId
+	 * @return
+	 */
+	public Future<List<ICis>> getCisServiceIsSharedWith(ServiceResourceIdentifier serviceId);
+
+
 }

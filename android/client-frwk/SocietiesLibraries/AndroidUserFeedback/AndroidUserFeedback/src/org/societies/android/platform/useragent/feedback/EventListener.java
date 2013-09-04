@@ -40,6 +40,7 @@ import org.societies.android.platform.androidutils.AndroidNotifier;
 import org.societies.android.platform.useragent.feedback.constants.UserFeedbackActivityIntentExtra;
 import org.societies.android.platform.useragent.feedback.guis.*;
 import org.societies.android.remote.helper.EventsHelper;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 import org.societies.api.schema.useragent.feedback.FeedbackMethodType;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
@@ -59,6 +60,7 @@ public class EventListener extends Service {
     //TRACKING CONNECTION TO EVENTS MANAGER
     private boolean boundToEventMgrService = false;
     private BroadcastReceiver receiver;
+    @SuppressWarnings("FieldCanBeLocal")
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
     private EventsHelper eventsHelper;
@@ -168,38 +170,58 @@ public class EventListener extends Service {
             else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_REQUEST_INTENT)) {
                 UserFeedbackPrivacyNegotiationEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
 
+                String id = String.valueOf(eventPayload.getRequestId());
+
                 synchronized (processedIncomingEvents) {
-                    String id = String.valueOf(eventPayload.getNegotiationDetails().getNegotiationID());
 
                     if (processedIncomingEvents.contains(id)) {
-                        Log.w(LOG_TAG, "Ignoring duplicate PPN event received: " + id);
+                        Log.w(LOG_TAG, "Ignoring duplicate PPN event received: id=" + id);
                         return;
                     }
 
                     processedIncomingEvents.add(id);
                 }
 
-                Log.d(LOG_TAG, "Privacy Negotiation event received");
-                launchPrivacyPolicyNegotiation(eventPayload);
+                Log.d(LOG_TAG, "Privacy Negotiation event received: id=" + id);
+                displayPrivacyNegotiationNotification(EventListener.this.getApplicationContext(), eventPayload);
+            }
+            //ACCESS CONTROL EVENT - payload is UserFeedbackAccessControlEvent
+            else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_ACCESS_CONTROL_REQUEST_INTENT)) {
+                UserFeedbackAccessControlEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+
+                String id = String.valueOf(eventPayload.getRequestId());
+
+                synchronized (processedIncomingEvents) {
+
+                    if (processedIncomingEvents.contains(id)) {
+                        Log.w(LOG_TAG, "Ignoring duplicate AC event received: id=" + id);
+                        return;
+                    }
+
+                    processedIncomingEvents.add(id);
+                }
+
+                Log.d(LOG_TAG, "Privacy Negotiation event received: id=" + id);
+                displayAccessControlNotification(EventListener.this.getApplicationContext(), eventPayload);
             }
             //PERMISSION REQUEST EVENT - payload is UserFeedbackBean
             else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_REQUEST_INTENT)) {
                 UserFeedbackBean eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
 
+                String id = eventPayload.getRequestId();
+
                 synchronized (processedIncomingEvents) {
-                    String id = eventPayload.getRequestId();
 
                     if (processedIncomingEvents.contains(id)) {
-                        Log.w(LOG_TAG, "Ignoring duplicate UF event received: " + id);
+                        Log.w(LOG_TAG, "Ignoring duplicate UF event received: id=" + id);
                         return;
                     }
 
                     processedIncomingEvents.add(id);
                 }
 
-                Log.d(LOG_TAG, "General Permission request event received");
-                String description = "Accept privacy policy?";
-                addUserFeedbackNotification(description, "Privacy Policy", eventPayload);
+                Log.d(LOG_TAG, "General Permission request event received: id=" + id);
+                displayUserFeedbackNotification(EventListener.this.getApplicationContext(), eventPayload);
             }
         }
     }
@@ -217,6 +239,7 @@ public class EventListener extends Service {
         intentFilter.addAction(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENTS);
         intentFilter.addAction(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS);
         //PUBSUB INTENTS
+        intentFilter.addAction(IAndroidSocietiesEvents.UF_ACCESS_CONTROL_REQUEST_INTENT);
         intentFilter.addAction(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_REQUEST_INTENT);
         intentFilter.addAction(IAndroidSocietiesEvents.UF_REQUEST_INTENT);
         return intentFilter;
@@ -267,15 +290,43 @@ public class EventListener extends Service {
         });
     }
 
-    private void launchPrivacyPolicyNegotiation(UserFeedbackPrivacyNegotiationEvent policy) {
-        //CREATE INTENT FOR LAUNCHING ACTIVITY
-        Intent intent = new Intent(this.getApplicationContext(), NegotiationActivity.class);
-        intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY, (Parcelable) policy);
+    private static void displayAccessControlNotification(Context context, UserFeedbackAccessControlEvent event) {
+        // CREATE INTENT FOR LAUNCHING ACTIVITY
+        Intent intent = new Intent(context, AccessControlActivity.class);
+        intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY, (Parcelable) event);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+
+        //CREATE ANDROID NOTIFICATION
+        int notifierFlags[] = new int[1];
+        notifierFlags[0] = Notification.FLAG_AUTO_CANCEL;
+        AndroidNotifier notifier = new AndroidNotifier(context, Notification.DEFAULT_SOUND, notifierFlags);
+        notifier.notifyMessage("Access control request",
+                "Access Control Request",
+                AccessControlActivity.class,
+                intent,
+                "SOCIETIES");
+
     }
 
-    private void addUserFeedbackNotification(String description, String eventType, UserFeedbackBean ufBean) {
+    private static void displayPrivacyNegotiationNotification(Context context, UserFeedbackPrivacyNegotiationEvent policy) {
+        //CREATE INTENT FOR LAUNCHING ACTIVITY
+        Intent intent = new Intent(context, NegotiationActivity.class);
+        intent.putExtra(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY, (Parcelable) policy);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        //CREATE ANDROID NOTIFICATION
+        int notifierFlags[] = new int[1];
+        notifierFlags[0] = Notification.FLAG_AUTO_CANCEL;
+        AndroidNotifier notifier = new AndroidNotifier(context, Notification.DEFAULT_SOUND, notifierFlags);
+        notifier.notifyMessage("Privacy policy negotiation",
+                "Privacy Policy Negotiation",
+                NegotiationActivity.class,
+                intent,
+                "SOCIETIES");
+
+    }
+
+    private static void displayUserFeedbackNotification(Context context, UserFeedbackBean ufBean) {
 
         //DETERMINE WHICH ACTIVITY TO LAUNCH
         Class activityClass;
@@ -304,16 +355,19 @@ public class EventListener extends Service {
         }
 
         //CREATE INTENT FOR LAUNCHING ACTIVITY
-        Intent intent = new Intent(this.getApplicationContext(), activityClass);
+        Intent intent = new Intent(context, activityClass);
         intent.putExtra(UserFeedbackActivityIntentExtra.USERFEEDBACK_NODES, (Parcelable) ufBean);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         //CREATE ANDROID NOTIFICATION
         int notifierFlags[] = new int[1];
         notifierFlags[0] = Notification.FLAG_AUTO_CANCEL;
-        AndroidNotifier notifier = new AndroidNotifier(EventListener.this.getApplicationContext(), Notification.DEFAULT_SOUND, notifierFlags);
-        notifier.notifyMessage(description, eventType, activityClass, intent, "SOCIETIES");
-
+        AndroidNotifier notifier = new AndroidNotifier(context, Notification.DEFAULT_SOUND, notifierFlags);
+        notifier.notifyMessage(ufBean.getProposalText(),
+                "Input required",
+                activityClass,
+                intent,
+                "SOCIETIES");
     }
 
 }

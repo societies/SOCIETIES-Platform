@@ -1,0 +1,111 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="templates/main_template.xhtml">
+
+	<ui:define name="html_head">
+		<title>SOCIETIES RFID settings</title>
+	</ui:define>
+
+	<ui:define name="body">
+
+		<f:facet name="header">
+                RFID User Administration page
+            </f:facet>
+
+
+		<!-- <p:growl id="growl" showDetail="true" life="3000" /> -->
+
+		<h:panelGrid id="mainPanel"
+			rendered="#{!rfidClientController.registered}"><!--  and !rfidClientController.registerStatus}">-->
+			
+			<p:messages id="errorMessage"  showDetail="true" />
+
+			<h:panelGrid columns="2" style="margin-bottom:10px;margin-left:10px"
+				id="panelRequest">
+				<h:outputLabel for="rfidTagNumber" value="Rfid Tag Number:"
+					style="font-weight:bold" />
+
+				<p:inputText id="rfidTagNumber"
+					value="#{rfidClientController.myRfidTag}" />
+
+				<h:outputLabel for="passwd" value="Pass key:"
+					style="font-weight:bold" />
+
+				<p:inputText id="passwd" value="#{rfidClientController.mypasswd}" />
+
+
+				<h:outputLabel for="serverJid" value="RFID Server Identity:"
+					style="font-weight:bold" />
+
+				<p:inputText id="serverJid"
+					value="#{rfidClientController.serverJid}"  />
+
+				<p:commandButton value="Submit" id="register"
+					onclick="blockUI.show()"
+					actionListener="#{rfidClientController.register}"
+					oncomplete="blockUI.hide()" update=":mainForm" />
+
+
+			</h:panelGrid>
+
+			<p:blockUI id="blockUI" widgetVar="blockUI" block=":mainForm">  
+       			LOADING<br />
+				<p:graphicImage value="/images/ajax-loader.gif" />
+			</p:blockUI>
+
+		</h:panelGrid>
+
+		<ui:fragment
+			rendered="#{rfidClientController.registered}"><!-- or rfidClientController.registerStatus}"> -->
+			<h:panelGrid columns="2" style="margin-bottom:10px;margin-left:10px"
+				id="panelDisplay">
+
+				<h:outputLabel for="rfidTagNumberDisplay" value="Rfid Tag Number:"
+					style="font-weight:bold" />
+
+				<h:outputText id="rfidTagNumberDisplay"
+					value="#{rfidClientController.myRfidTag}" />
+
+				<h:outputLabel for="passwdDisplay" value="Pass key:"
+					style="font-weight:bold" />
+
+				<h:outputText id="passwdDisplay"
+					value="#{rfidClientController.mypasswd}" />
+
+
+				<h:outputLabel for="serverJidDisplay" value="RFID Server Identity:"
+					style="font-weight:bold" />
+
+				<h:outputText id="serverJidDisplay"
+					value="#{rfidClientController.serverJid}" />
+
+				<h:outputLabel for="RfidRegisteredDisplay"
+					value="Rfid tag registered" style="font-weight:bold" />
+
+				<h:outputText id="RfidRegisteredDisplay"
+					value="#{rfidClientController.registered}" />
+
+				<h:outputLabel for="LastKnownLocationDisplay"
+					value="Last Known RFID Location" style="font-weight:bold" />
+
+				<h:outputText id="LastKnownLocationDisplay"
+					value="#{rfidClientController.lastRecordedLocation}" />
+
+			<!-- 	<h:outputLabel for="regError" value="Registration error"
+					style="font-weight:bold" />
+
+				<h:outputText id="regError" value="#{rfidClientController.regError}" /> -->
+
+				<p:commandButton id="unregisterBtn" value="Unregister" ajax="false"
+					actionListener="#{rfidClientController.unregister}" />
+			</h:panelGrid>
+		</ui:fragment>
+
+
+	</ui:define>
+</ui:composition>
+</html>

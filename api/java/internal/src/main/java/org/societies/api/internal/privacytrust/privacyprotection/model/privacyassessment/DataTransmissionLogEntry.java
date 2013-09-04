@@ -46,15 +46,18 @@ public class DataTransmissionLogEntry {
 	private final IIdentity sender;
 	private final String senderClass;
 	private final List<String> senderStack;
+	private final List<String> senderBundles;
 	private final long payloadSize;
 	private final ChannelType channelId;
 	
 	private double correlationWithDataAccess = -1;
 	private double correlationWithDataAccessBySender = -1;
 	private double correlationWithDataAccessBySenderClass = -1;
+	private double correlationWithDataAccessBySenderBundle = -1;
 
 	public DataTransmissionLogEntry(String dataType, Date time, IIdentity receiver,
-			IIdentity sender, String senderClass, List<String> senderStack, long payloadSize, ChannelType channelId) {
+			IIdentity sender, String senderClass, List<String> senderStack, List<String> senderBundles,
+			long payloadSize, ChannelType channelId) {
 		
 		this.dataType = dataType;
 		this.time = time;
@@ -100,6 +103,7 @@ public class DataTransmissionLogEntry {
 		this.sender = sender;
 		this.senderClass = senderClass;
 		this.senderStack = senderStack;
+		this.senderBundles = senderBundles;
 		this.payloadSize = payloadSize;
 		this.channelId = channelId;
 	}
@@ -138,6 +142,17 @@ public class DataTransmissionLogEntry {
 	public String getSenderClass() {
 		return senderClass;
 	}
+	
+	/**
+	 * @return the senderBundles
+	 */
+	public List<String> getSenderBundles() {
+		return senderBundles;
+	}
+
+//	public void setSenderBundles(List<String> senderBundles) {
+//		this.senderBundles = senderBundles;
+//	}
 	
 	public long getPayloadSize() {
 		return payloadSize;
@@ -227,5 +242,29 @@ public class DataTransmissionLogEntry {
 			return;
 		}
 		this.correlationWithDataAccessBySenderClass = correlation;
+	}
+
+	/**
+	 * Get correlation with those data access events where the sender bundle has accessed the data.
+	 * 
+	 * @return Correlation (non-negative value), or negative value if the
+	 * correlation has not been set yet.
+	 */
+	public double getCorrelationWithDataAccessBySenderBundle() {
+		return correlationWithDataAccessBySenderBundle;
+	}
+
+	/**
+	 * Set correlation with those data access events where the sender bundle has accessed the data
+	 * 
+	 * @param correlation Correlation with all data access events
+	 */
+	public void setCorrelationWithDataAccessBySenderBundle(double correlation) {
+		
+		if (correlation < 0) {
+			// Log a warning if logger available
+			return;
+		}
+		this.correlationWithDataAccessBySenderBundle = correlation;
 	}
 }

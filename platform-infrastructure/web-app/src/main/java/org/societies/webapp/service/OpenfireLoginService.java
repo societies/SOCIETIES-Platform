@@ -58,7 +58,7 @@ public class OpenfireLoginService implements Serializable {
 
     @SuppressWarnings("UnusedDeclaration")
     public void setCommManager(ICommManager commManager) {
-        log.trace("setCommManager() has been called with " + commManager);
+        log.debug("setCommManager() has been called with " + commManager);
         this.commManager = commManager;
     }
 
@@ -114,10 +114,7 @@ public class OpenfireLoginService implements Serializable {
                 return null;
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            //model.put("loginError", "Error logging onto openfire Account. Please try again");
-            //return new ModelAndView("pilot", model);
-            log.info("Error logging onto openfire Account");
+            log.info("Error logging onto openfire Account", e);
             return null;
         }
 

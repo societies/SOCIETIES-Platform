@@ -5,13 +5,16 @@
 
 <hibernate-mapping>
     <class name="org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean"
-           table="NegotiationDetailsBean">
+           table="UFNegotiationDetailsBean">
 
-        <id name="negotiationID" type="string" column="negotiationID">
-            <generator class="uuid"/>
+        <id name="negotiationID" type="int" column="negotiationID">
+            <generator class="assigned"/>
         </id>
 
-        <property name="requestor" column="method" type="org.societies.api.schema.identity.RequestorBean"/>
+        <one-to-one name="requestor"
+                    class="org.societies.api.schema.identity.RequestorBean"
+                    cascade="all"
+                    lazy="false"/>
 
     </class>
 </hibernate-mapping>

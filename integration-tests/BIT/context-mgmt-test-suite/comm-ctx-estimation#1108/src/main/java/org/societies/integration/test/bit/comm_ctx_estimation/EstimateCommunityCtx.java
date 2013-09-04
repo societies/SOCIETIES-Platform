@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 
+import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +26,7 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
@@ -41,7 +44,10 @@ public class EstimateCommunityCtx {
 	// run test in university's container
 	private String targetUniversity = "university.ict-societies.eu";
 	private String targetEmma= "emma.ict-societies.eu";
-
+	
+	private IIdentity cisIdentity1 = null;
+	private IIdentity cisIdentity2 = null;
+	
 	//private IndividualCtxEntity emma;
 	private IndividualCtxEntity university;
 
@@ -50,11 +56,101 @@ public class EstimateCommunityCtx {
 	public ICisManager cisManager;
 
 	public void setUp(){
-
 		LOG.info("EstimateCommunityCtx started");
 
 	}
 
+	@After
+	public void tearDown() throws Exception {
+		
+		if (this.cisIdentity1 !=null){
+			this.cisManager.deleteCis(this.cisIdentity1.getBareJid());
+		}
+		if (this.cisIdentity2 !=null){
+			this.cisManager.deleteCis(this.cisIdentity2.getBareJid());
+		}
+	
+	}
+	
+	
+
+
+	@Test
+	public void TestUserCommunityCtx() {
+	
+		LOG.info("TestUserCommunityCtx starting " );
+		this.ctxBroker=Test1108.getCtxBroker();
+		this.commManager= Test1108.getCommManager();
+		this.cisManager = Test1108.getCisManager();
+
+		this.cisIdentity1 = this.createCIS("testCIS1");
+		this.cisIdentity2 = this.createCIS("testCIS2");
+
+		try {
+			Thread.sleep(9000);
+			CtxEntityIdentifier commEntityId1 = this.ctxBroker.retrieveCommunityEntityId(this.cisIdentity1).get();
+			CtxEntityIdentifier commEntityId2 = this.ctxBroker.retrieveCommunityEntityId(this.cisIdentity2).get();
+			//CommunityCtxEntity commEntity = (CommunityCtxEntity) this.externalCtxBroker.retrieve(this.requestorService, commEntityId).get();
+			//LOG.info("commEntity : " +commEntity );
+			assertNotNull(commEntityId1);
+			assertNotNull(commEntityId2);
+
+			LOG.info("commEntityId 1: " +commEntityId1 );
+			LOG.info("commEntityId 2: " +commEntityId2 );
+
+			CtxAttribute commAttr1 =  this.ctxBroker.createAttribute(commEntityId1, CtxAttributeTypes.EMAIL).get();
+			commAttr1.setStringValue("communityemail1");
+			this.ctxBroker.update(commAttr1);
+			Thread.sleep(4000);
+
+			CtxAttribute commAttr2 =  this.ctxBroker.createAttribute(commEntityId2, CtxAttributeTypes.EMAIL).get();
+			commAttr2.setStringValue("communityemail2");
+			this.ctxBroker.update(commAttr2);
+			Thread.sleep(4000);
+
+
+			LOG.info("community this.cisIdentity 1: " +this.cisIdentity1 );
+			List<CtxIdentifier> resultsEnt1 = this.ctxBroker.lookup(this.cisIdentity1, CtxModelType.ENTITY, CtxEntityTypes.COMMUNITY).get();
+			List<CtxIdentifier> resultsAttr1 = this.ctxBroker.lookup(this.cisIdentity1, CtxModelType.ATTRIBUTE, CtxAttributeTypes.EMAIL).get();
+
+			String value1 = "";
+			LOG.info("community this.cisIdentity resultsEnt1 : " +resultsEnt1 );
+			LOG.info("community this.cisIdentity resultsAttr1 : " +resultsAttr1 );
+			if(resultsAttr1.size() > 0){
+				CtxAttribute commEmailAttr1 = (CtxAttribute) this.ctxBroker.retrieve(resultsAttr1.get(0)).get();	
+				value1 = commEmailAttr1.getStringValue();	
+				LOG.info("community this.cisIdentity value: " +value1 );
+			}
+			assertEquals("communityemail1", value1);
+
+
+			LOG.info("community this.cisIdentity 2 : " +this.cisIdentity2 );
+			List<CtxIdentifier> resultsEnt2 = this.ctxBroker.lookup(this.cisIdentity2, CtxModelType.ENTITY, CtxEntityTypes.COMMUNITY).get();
+			List<CtxIdentifier> resultsAttr2 = this.ctxBroker.lookup(this.cisIdentity2, CtxModelType.ATTRIBUTE, CtxAttributeTypes.EMAIL).get();
+
+			String value2 = "";
+			LOG.info("community this.cisIdentity resultsEnt: " +resultsEnt2 );
+			LOG.info("community this.cisIdentity resultsAttr: " +resultsAttr2 );
+			if(resultsAttr2.size() > 0){
+				CtxAttribute commEmailAttr2 = (CtxAttribute) this.ctxBroker.retrieve(resultsAttr2.get(0)).get();	
+				value2 = commEmailAttr2.getStringValue();	
+				LOG.info("community this.cisIdentity value: " +value2 );
+			}
+			assertEquals("communityemail2", value2);
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	
 	@Test
 	public void TestEstimateCommunityCtx() {
 
@@ -85,7 +181,7 @@ public class EstimateCommunityCtx {
 			CtxAttribute interestsUniversitys = updateStringAttr(this.cssIDUniversity, CtxAttributeTypes.INTERESTS,"reading,socialnetworking,cinema,sports" );
 			assertEquals(interestsUniversitys.getType(), CtxAttributeTypes.INTERESTS);
 			LOG.info("university's Interests created : " + interestsUniversitys.getId());
-			
+
 			CtxAttribute languagesUniversity = updateStringAttr(this.cssIDUniversity, CtxAttributeTypes.LANGUAGES, "English,Spanish,French" );
 			assertEquals(languagesUniversity.getType(), CtxAttributeTypes.LANGUAGES);
 			LOG.info("university's Languages created : " + languagesUniversity.getId());
@@ -226,7 +322,7 @@ public class EstimateCommunityCtx {
 			}
 			attribute.setStringValue(value);
 			attributeUpdated = (CtxAttribute) this.ctxBroker.update(attribute).get();
-			
+
 			LOG.info("The attribute to be returned is "+ attributeUpdated);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -333,7 +429,7 @@ public class EstimateCommunityCtx {
 		IIdentity cisID = null;
 		try {
 			Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> ();
-			LOG.info("*** trying to create cis:");
+			LOG.info("*** trying to create cis: "+this.cisManager);
 			ICisOwned cisOwned = this.cisManager.createCis("testCIS5", "cisType", cisCriteria, "nice CIS").get();
 			LOG.info("*** cis created: "+cisOwned.getCisId());
 
@@ -355,4 +451,30 @@ public class EstimateCommunityCtx {
 		return cisID;
 	}
 
+	protected IIdentity createCIS(String name) {
+
+		IIdentity cisID = null;
+		try {
+			Hashtable<String, MembershipCriteria> cisCriteria = new Hashtable<String, MembershipCriteria> ();
+			LOG.info("*** trying to create cis: "+this.cisManager +" cis name:"+name);
+			ICisOwned cisOwned = this.cisManager.createCis(name, "cisType", cisCriteria, "nice CIS").get();
+			LOG.info("*** cis created: "+cisOwned.getCisId());
+
+			LOG.info("*** cisOwned " +cisOwned);
+			LOG.info("*** cisOwned.getCisId() " +cisOwned.getCisId());
+			String cisIDString = cisOwned.getCisId();
+
+			cisID =this.commManager.getIdManager().fromJid(cisIDString);
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return cisID;
+	}
 }

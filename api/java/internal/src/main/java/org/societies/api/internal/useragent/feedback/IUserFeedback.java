@@ -30,6 +30,7 @@ import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBe
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.FeedbackForm;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 
@@ -40,6 +41,9 @@ import java.util.concurrent.Future;
  * @author S.Gallacher@hw.ac.uk, p.skillen@hw.ac.uk
  */
 public interface IUserFeedback {
+
+    public Future<List<String>> getExplicitFB(String requestId, int type, ExpProposalContent content);
+
     /**
      * Request explicit user feedback in a synchronous manner - i.e. the method will block, and the {@link Future} will
      * not be returned until the result has been returned from the user
@@ -64,6 +68,11 @@ public interface IUserFeedback {
      * @param type {@link org.societies.api.internal.useragent.model.ExpProposalType}
      */
     public Future<List<String>> getExplicitFBAsync(int type, ExpProposalContent content, IUserFeedbackResponseEventListener<List<String>> callback);
+
+    public Future<List<String>> getExplicitFBAsync(String requestId, int type, ExpProposalContent content, IUserFeedbackResponseEventListener<List<String>> callback);
+
+
+    public Future<Boolean> getImplicitFB(String requestId, int type, ImpProposalContent content);
 
     /**
      * Request implicit user feedback in a synchronous manner - i.e. the method will block, and the {@link Future} will
@@ -90,6 +99,11 @@ public interface IUserFeedback {
      */
     public Future<Boolean> getImplicitFBAsync(int type, ImpProposalContent content, IUserFeedbackResponseEventListener<Boolean> callback);
 
+    public Future<Boolean> getImplicitFBAsync(String requestId, int type, ImpProposalContent content, IUserFeedbackResponseEventListener<Boolean> callback);
+
+
+    public Future<ResponsePolicy> getPrivacyNegotiationFB(String requestId, ResponsePolicy policy, NegotiationDetailsBean details);
+
     /**
      * Request a privacy negotiation in a synchronous manner - i.e. the method will block, and the {@link Future} will
      * not be returned until the result has been returned from the user
@@ -108,6 +122,11 @@ public interface IUserFeedback {
      * <p>You may also specify a callback to use which will be notified immediately when the result arrives</p>
      */
     public Future<ResponsePolicy> getPrivacyNegotiationFBAsync(ResponsePolicy policy, NegotiationDetailsBean details, IUserFeedbackResponseEventListener<ResponsePolicy> callback);
+
+    public Future<ResponsePolicy> getPrivacyNegotiationFBAsync(String requestId, ResponsePolicy policy, NegotiationDetailsBean details, IUserFeedbackResponseEventListener<ResponsePolicy> callback);
+
+
+    public Future<List<ResponseItem>> getAccessControlFB(String requestId, Requestor requestor, List<ResponseItem> items);
 
     /**
      * Request access control in a synchronous manner - i.e. the method will block, and the {@link Future} will
@@ -128,20 +147,20 @@ public interface IUserFeedback {
      */
     public Future<List<ResponseItem>> getAccessControlFBAsync(Requestor requestor, List<ResponseItem> items, IUserFeedbackResponseEventListener<List<ResponseItem>> callback);
 
+    public Future<List<ResponseItem>> getAccessControlFBAsync(String requestId, Requestor requestor, List<ResponseItem> items, IUserFeedbackResponseEventListener<List<ResponseItem>> callback);
+
+
     public void showNotification(String notificationText);
 
     public FeedbackForm getNextRequest();
 
     public void submitExplicitResponse(String id, List<String> result);
 
-    /**
-     * Submit an explicit response for privacy negotiation userfeedback request type
-     *
-     * @param requestId Id of the userfeedback request
-     */
-    public void submitExplicitResponse(String requestId, NegotiationDetailsBean negotiationDetails, ResponsePolicy result);
-
     public void submitImplicitResponse(String id, Boolean result);
 
-    void clear();
+    public void submitPrivacyNegotiationResponse(String requestId, NegotiationDetailsBean negotiationDetails, ResponsePolicy result);
+
+    public void submitAccessControlResponse(String requestId, List<ResponseItem> responseItems, RequestorBean requestorBean);
+
+    public void clear();
 }

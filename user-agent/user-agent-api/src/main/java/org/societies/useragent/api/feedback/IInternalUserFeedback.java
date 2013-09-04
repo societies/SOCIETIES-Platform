@@ -25,6 +25,8 @@
 
 package org.societies.useragent.api.feedback;
 
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
@@ -34,9 +36,9 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 public interface IInternalUserFeedback {
-	
+
 	public Future<List<String>> getExplicitFBforRemote(int type, ExpProposalContent content);
-	
+
 	public Future<Boolean> getImplicitFBforRemote(int type, ImpProposalContent content);
 
     List<UserFeedbackBean> listStoredFeedbackBeans(int howMany);
@@ -44,5 +46,9 @@ public interface IInternalUserFeedback {
     List<UserFeedbackBean> listStoredFeedbackBeans(Date sinceWhen);
 
     List<UserFeedbackBean> listIncompleteFeedbackBeans();
+
+    List<UserFeedbackPrivacyNegotiationEvent> listIncompletePrivacyRequests();
+
+    List<UserFeedbackAccessControlEvent> listIncompleteAccessRequests();
 
 }

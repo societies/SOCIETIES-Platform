@@ -28,6 +28,7 @@ import java.util.Date;
 
 //import org.societies.api.mock.EntityIdentifier;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 
@@ -51,6 +52,6 @@ public interface ICommunityCtxPredictionMgr {
 	 * @param ctxObjModel
 	 * @param date
 	 */
-	public CtxIdentifier predictContext(CtxAttributeIdentifier ctxObjModel, Date date);
+	public CtxAttribute predictContext(CtxAttributeIdentifier ctxObjModel, Date date);
 
 }

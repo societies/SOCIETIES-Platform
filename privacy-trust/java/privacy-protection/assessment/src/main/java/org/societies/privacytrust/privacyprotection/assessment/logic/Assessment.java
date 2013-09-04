@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentException;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultBundle;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultClassName;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.AssessmentResultIIdentity;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry;
@@ -55,6 +56,8 @@ import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
 public class Assessment implements IAssessment {
 
 	private static Logger LOG = LoggerFactory.getLogger(Assessment.class);
+	
+	private static final String PLATFORM_GROUP_ID_PREFIX = "org.societies.";
 
 	private PrivacyLog privacyLog;
 	private DataTransferAnalyzer dataTransferAnalyzer;
@@ -62,6 +65,7 @@ public class Assessment implements IAssessment {
 	
 	private HashMap<IIdentity, AssessmentResultIIdentity> assessmentById = new HashMap<IIdentity, AssessmentResultIIdentity>();
 	private HashMap<String, AssessmentResultClassName> assessmentByClass = new HashMap<String, AssessmentResultClassName>();
+	private HashMap<String, AssessmentResultBundle> assessmentByBundle = new HashMap<String, AssessmentResultBundle>();
 	
 	private Date resultsStart;
 	private Date resultsEnd;
@@ -105,7 +109,7 @@ public class Assessment implements IAssessment {
 				LOG.debug("assessAllNow(): updating for identity {}", sender);
 				assessmentById.put(sender, ass);
 			} catch (AssessmentException e) {
-				LOG.warn("assessAllNow(): Skipped a sender identity", e);
+				LOG.warn("assessAllNow(): Skipped sender identity " + sender, e);
 			}
 		}
 		// For each sender class: calculate result and update value in assessmentByClass
@@ -115,7 +119,17 @@ public class Assessment implements IAssessment {
 				LOG.debug("assessAllNow(): updating for class {}", sender);
 				assessmentByClass.put(sender, ass);
 			} catch (AssessmentException e) {
-				LOG.warn("assessAllNow(): Skipped a sender class", e);
+				LOG.warn("assessAllNow(): Skipped sender class " + sender, e);
+			}
+		}
+		// For each sender bundle: calculate result and update value in assessmentByBundle
+		for (String sender : privacyLog.getSenderBundles()) {
+			try {
+				AssessmentResultBundle ass = dataTransferAnalyzer.estimatePrivacyBreachForBundle(sender, start, end);
+				LOG.debug("assessAllNow(): updating for bundle {}", sender);
+				assessmentByBundle.put(sender, ass);
+			} catch (AssessmentException e) {
+				LOG.warn("assessAllNow(): Skipped sender bundle " + sender, e);
 			}
 		}
 	}
@@ -130,12 +144,60 @@ public class Assessment implements IAssessment {
 	}
 	
 	@Override
-	public HashMap<String, AssessmentResultClassName> getAssessmentAllClasses(Date start, Date end) {
+	public HashMap<String, AssessmentResultClassName> getAssessmentAllClasses(boolean includePlatform, Date start, Date end) {
 
 		LOG.info("getAssessmentAllClasses({}, {})", start, end);
 		
 		updateResultsIfNeeded(start, end);
-		return assessmentByClass;
+		if (includePlatform) {
+			return assessmentByClass;
+		}
+		else {
+			return nonPlatformClasses();
+		}
+	}
+
+	@Override
+	public HashMap<String, AssessmentResultBundle> getAssessmentAllBundles(boolean includePlatform, Date start, Date end) {
+
+		LOG.info("getAssessmentAllBundles(" + includePlatform + ", {}, {})", start, end);
+		
+		updateResultsIfNeeded(start, end);
+		if (includePlatform) {
+			return assessmentByBundle;
+		}
+		else {
+			return nonPlatformBundles();
+		}
+	}
+	
+	private HashMap<String, AssessmentResultBundle> nonPlatformBundles() {
+		
+		HashMap<String, AssessmentResultBundle> nonPlatformEntities = new HashMap<String, AssessmentResultBundle>();
+		
+		for (String id : assessmentByBundle.keySet()) {
+			if (!isPlatformEntity(id)) {
+				nonPlatformEntities.put(id, assessmentByBundle.get(id));
+			}
+		}
+		return nonPlatformEntities;
+	}
+	
+	private HashMap<String, AssessmentResultClassName> nonPlatformClasses() {
+		
+		HashMap<String, AssessmentResultClassName> nonPlatformEntities = new HashMap<String, AssessmentResultClassName>();
+		
+		for (String id : assessmentByClass.keySet()) {
+			if (!isPlatformEntity(id)) {
+				nonPlatformEntities.put(id, assessmentByClass.get(id));
+			}
+		}
+		return nonPlatformEntities;
+	}
+	
+	private boolean isPlatformEntity(String entity) {
+		// TODO: In far future, maybe replace this check with a more secure and reliable one, e.g. use bundle signatures
+		return entity.startsWith(PLATFORM_GROUP_ID_PREFIX); 
 	}
 
 	@Override
@@ -162,6 +224,19 @@ public class Assessment implements IAssessment {
 		}
 		updateResultsIfNeeded(start, end);
 		return assessmentByClass.get(sender);
+	}
+
+	@Override
+	public AssessmentResultBundle getAssessmentForBundle(String sender, Date start, Date end) {
+
+		LOG.info("getAssessmentForBundle({})", sender);
+		
+		if (sender == null) {
+			LOG.warn("getAssessmentForBundle({}): invalid argument", sender);
+			return null;
+		}
+		updateResultsIfNeeded(start, end);
+		return assessmentByBundle.get(sender);
 	}
 	
 	@Override
@@ -204,6 +279,11 @@ public class Assessment implements IAssessment {
 	}
 
 	@Override
+	public List<String> getDataAccessRequestorBundles() {
+		return dataAccessAnalyzer.getDataAccessRequestorBundles();
+	}
+
+	@Override
 	public int getNumDataAccessEvents(IIdentity requestor, Date start, Date end) {
 		start = nonNullStart(start);
 		end = nonNullEnd(end);
@@ -216,7 +296,14 @@ public class Assessment implements IAssessment {
 		end = nonNullEnd(end);
 		return dataAccessAnalyzer.getNumDataAccessEvents(requestorClass, start, end);
 	}
-	
+
+	@Override
+	public int getNumDataAccessEventsForBundle(String requestorBundle, Date start, Date end) {
+		start = nonNullStart(start);
+		end = nonNullEnd(end);
+		return dataAccessAnalyzer.getNumDataAccessEventsForBundle(requestorBundle, start, end);
+	}
+
 	@Override
 	public Map<IIdentity, Integer> getNumDataAccessEventsForAllIdentities(Date start, Date end) {
 		start = nonNullStart(start);
@@ -225,10 +312,49 @@ public class Assessment implements IAssessment {
 	}
 	
 	@Override
-	public Map<String, Integer> getNumDataAccessEventsForAllClasses(Date start, Date end) {
+	public Map<String, Integer> getNumDataAccessEventsForAllClasses(boolean includePlatform, Date start, Date end) {
+
+		Map<String, Integer> resultAll;
+		
 		start = nonNullStart(start);
 		end = nonNullEnd(end);
-		return dataAccessAnalyzer.getNumDataAccessEventsForAllClasses(start, end);
+		
+		resultAll = dataAccessAnalyzer.getNumDataAccessEventsForAllClasses(start, end);
+		if (includePlatform) {
+			return resultAll;
+		}
+		else {
+			Map<String, Integer> result = new HashMap<String, Integer>();
+			for (String id : resultAll.keySet()) {
+				if (!isPlatformEntity(id)) {
+					result.put(id, resultAll.get(id));
+				}
+			}
+			return result;
+		}
+	}
+
+	@Override
+	public Map<String, Integer> getNumDataAccessEventsForAllBundles(boolean includePlatform, Date start, Date end) {
+
+		Map<String, Integer> resultAll;
+		
+		start = nonNullStart(start);
+		end = nonNullEnd(end);
+		
+		resultAll = dataAccessAnalyzer.getNumDataAccessEventsForAllBundles(start, end);
+		if (includePlatform) {
+			return resultAll;
+		}
+		else {
+			Map<String, Integer> result = new HashMap<String, Integer>();
+			for (String id : resultAll.keySet()) {
+				if (!isPlatformEntity(id)) {
+					result.put(id, resultAll.get(id));
+				}
+			}
+			return result;
+		}
 	}
 	
 	@Override

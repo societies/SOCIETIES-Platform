@@ -33,8 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
-import org.societies.api.internal.servicelifecycle.IServiceDiscoveryCallback;
-import org.societies.api.internal.servicelifecycle.IServiceDiscoveryRemote;
 import org.societies.api.comm.xmpp.datatypes.Stanza;
 import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
 import org.societies.api.comm.xmpp.exceptions.CommunicationException;
@@ -45,8 +43,6 @@ import org.springframework.scheduling.annotation.Async;
 
 import org.societies.api.schema.servicelifecycle.servicecontrol.MethodType;
 import org.societies.api.schema.servicelifecycle.servicecontrol.ServiceControlMsgBean;
-import org.societies.api.schema.servicelifecycle.servicediscovery.MethodName;
-import org.societies.api.schema.servicelifecycle.servicediscovery.ServiceDiscoveryMsgBean;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.internal.servicelifecycle.IServiceControlCallback;

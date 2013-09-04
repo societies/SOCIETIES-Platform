@@ -24,7 +24,7 @@
                 <xs:element name="stage" type="ns3:feedbackStage"
                             minOccurs="0"/>
                 <xs:element name="requestId" type="xs:string" minOccurs="0"/>
-                <xs:element name="requestDate" type="xs:dateTime" minOccurs="0"/>
+                <!--<xs:element name="requestDate" type="xs:dateTime" minOccurs="0"/>-->
                 <xs:element name="type" type="xs:int"/>
                 <xs:element name="responsePolicy" type="ns2:responsePolicy" minOccurs="1" maxOccurs="1"/>
                 <xs:element name="negotiationDetails" type="negotiationDetailsBean" minOccurs="1" maxOccurs="1"/>
@@ -44,6 +44,8 @@
             <xs:sequence>
                 <xs:element name="method" type="ns3:feedbackMethodType"
                             minOccurs="0"/>
+                <xs:element name="stage" type="ns3:feedbackStage"
+                            minOccurs="0"/>
                 <xs:element name="requestId" type="xs:string" minOccurs="0"/>
                 <xs:element name="type" type="xs:int"/>
                 <!-- <xs:element name="requestID" type="xs:string" minOccurs="1" maxOccurs="1" /> -->
@@ -52,5 +54,26 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <xs:element name="userFeedbackHistoryRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="requestType" type="historyRequestType" minOccurs="1"/>
+                <xs:element name="howMany" type="xs:int" minOccurs="0" maxOccurs="1"/>
+                <!--<xs:element name="sinceWhen" type="xs:dateTime" minOccurs="0" maxOccurs="1"/>-->
+                <xs:element ref="ns3:userFeedbackBean" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="userFeedbackPrivacyNegotiationEvent" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="userFeedbackAccessControlEvent" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:simpleType name="historyRequestType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="outstanding"/>
+            <xs:enumeration value="byCount"/>
+            <xs:enumeration value="byDate"/>
+        </xs:restriction>
+    </xs:simpleType>
 
 </xs:schema>

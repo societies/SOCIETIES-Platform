@@ -76,6 +76,8 @@ public class CommsServer extends EventListener implements IFeatureServer {
 	private IServiceControl serviceControl;
 	private IEventMgr eventMgr;
 	private ICISCommunicationMgrFactory cisCommMgrFactory;
+	private String eventFilter;
+	private String[] eventTypes;
 	
 	public IEventMgr getEventMgr(){
 		return eventMgr;
@@ -143,14 +145,30 @@ public class CommsServer extends EventListener implements IFeatureServer {
 			if(LOG.isDebugEnabled())
 				LOG.debug("Now registering for CIS Creation events");
 			String eventSource = getCommMngr().getIdManager().getThisNetworkNode().getBareJid();
-			String eventFilter = "(&" +
+			eventFilter = "(&" +
 			"(" + CSSEventConstants.EVENT_NAME + "=creation of CIS)" + 
 			"(" + CSSEventConstants.EVENT_SOURCE + "="+eventSource+")" + 
 			")";
-			String[] eventTypes = new String[] {EventTypes.CIS_CREATION};
+			eventTypes = new String[] {EventTypes.CIS_CREATION};
 			getEventMgr().subscribeInternalEvent(this, eventTypes, eventFilter);
 			
 		} catch (CommunicationException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void killService(){
+		// UnregisterStuff
+		try{
+			if(LOG.isDebugEnabled())
+				LOG.debug("Unregistering from Comm Manager... HOW?");
+			
+			if(LOG.isDebugEnabled())
+				LOG.debug("Unregistering from CIS Events...");
+			getEventMgr().unSubscribeInternalEvent(this, eventTypes, eventFilter);
+			
+		} catch(Exception e){
+			LOG.error("Exception removing Bean! :" + e.getMessage());
 			e.printStackTrace();
 		}
 	}

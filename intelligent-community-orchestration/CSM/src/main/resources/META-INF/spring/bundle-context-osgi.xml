@@ -25,9 +25,9 @@
 		<osgi:reference id="commsMgr" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"> 
 		</osgi:reference>
 		
-		<osgi:reference id="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager"/>
-		<osgi:reference id="cisAdvertisementRecords" interface="org.societies.api.cis.directory.ICisAdvertisementRecord"/>
-		<osgi:reference id="cisDirectory" interface="org.societies.api.cis.directory.ICisDirectory"/>
+		<<osgi:reference id="CisManagementBundle" interface="org.societies.api.cis.management.ICisManager"/>
+		<<osgi:reference id="cisAdvertisementRecords" interface="org.societies.api.cis.directory.ICisAdvertisementRecord"/>
+		<<osgi:reference id="cisDirectory" interface="org.societies.api.cis.directory.ICisDirectory"/>
 		
 		
 </beans>

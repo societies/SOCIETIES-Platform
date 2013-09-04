@@ -55,44 +55,27 @@
 
     <dependencies>
 
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.spring-library</artifactId>
-            <type>libd</type>
-            <scope>provided</scope>
-        </dependency>
-
+        <!-- Societies internal -->
         <dependency>
             <groupId>org.societies</groupId>
             <artifactId>hibernate_classes</artifactId>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.societies</groupId>
             <artifactId>common-ext-libs</artifactId>
             <scope>provided</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.societies.api.internal</groupId>
-            <artifactId>societies-api-internal</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
         <dependency>
             <groupId>org.societies.api.external</groupId>
             <artifactId>societies-api</artifactId>
             <scope>provided</scope>
         </dependency>
-
-
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20090211</version>
+            <groupId>org.societies.api.internal</groupId>
+            <artifactId>societies-api-internal</artifactId>
+            <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.societies.platform</groupId>
             <artifactId>socialdata</artifactId>
@@ -100,10 +83,51 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Data structures -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20090211</version>
+        </dependency>
+
+
+        <!-- Spring -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.spring-library</artifactId>
+            <type>libd</type>
+            <scope>provided</scope>
+        </dependency>
+
+
+        <!-- Testing -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.transaction</groupId>
+            <artifactId>com.springsource.javax.transaction</artifactId>
+            <version>1.1.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-core</artifactId>
+            <version>1.4.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <version>3.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.9.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -124,31 +148,6 @@
             <version>${release.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
-            <version>3.1</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.9.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.transaction</groupId>
-            <artifactId>com.springsource.javax.transaction</artifactId>
-            <version>1.1.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-core</artifactId>
-            <version>1.4.12</version>
-        </dependency>
 
     </dependencies>
     <build>
@@ -161,12 +160,12 @@
                     <instructions>
                         <Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
                         <Embed-Transitive>false</Embed-Transitive>
-                        <Export-Package>
+<!--                        <Export-Package>
                             org.societies.activity,
                             org.societies.activity.*,
                             org.societies.activity.model,
                             org.societies.activity.model.*
-                        </Export-Package>
+                        </Export-Package>-->
                         <Import-Package>org.hibernate.proxy;resolution:=optional,*;resolution:=optional</Import-Package>
                     </instructions>
                 </configuration>

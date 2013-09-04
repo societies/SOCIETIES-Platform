@@ -5,30 +5,30 @@
 
 <hibernate-mapping>
     <class name="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem"
-           table="PrivacyPolicyRequestItem">
-        <!--<meta attribute="class-description">
-            This class contains the employee detail.
-        </meta>-->
+           table="UFRequestItem">
+
         <id name="requestItemId" type="string" column="requestItemId">
             <generator class="uuid"/>
         </id>
 
-        <array name="actions" table="RequestItem_actions">
-            <key column="action_id"/>
-            <index column="action_index"/>
-            <element column="action" type="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action"/>
-        </array>
+        <list name="actions" lazy="false" cascade="all">
+            <key column="requestItemId"/>
+            <index column="idx"/>
+            <one-to-many class="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action"/>
+        </list>
 
-        <list name="conditions" lazy="false">
-            <key column="condition_id"/>
-            <index column="condition_index"/>
+        <list name="conditions" lazy="false" cascade="all">
+            <key column="requestItemId"/>
+            <index column="idx"/>
             <one-to-many class="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition"/>
         </list>
 
         <property name="optional" column="optional" type="boolean"/>
 
-        <property name="resource" column="resource"
-                  type="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource"/>
+        <one-to-one name="resource"
+                    lazy="false"
+                    class="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource"
+                    cascade="all"/>
 
     </class>
 </hibernate-mapping>

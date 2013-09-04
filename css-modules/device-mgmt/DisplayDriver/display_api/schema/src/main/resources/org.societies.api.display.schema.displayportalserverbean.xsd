@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0"
+	targetNamespace="http://societies.org/api/display/schema/displayportalserverbean"
+	xmlns:tns="http://societies.org/api/display/schema/displayportalserverbean"
+	xmlns:ns1="http://societies.org/api/schema/servicelifecycle/model"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:import namespace="http://societies.org/api/schema/servicelifecycle/model"
+	schemaLocation="../../../../../../../../api/schema/external/src/main/resources/org.societies.api.schema.servicelifecycle.model.xsd" />
+
+	<xs:element name="displayPortalServerBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="method" type="tns:displayPortalServerMethodType"
+					minOccurs="0" />
+				<xs:element name="identity" type="xs:string"
+					minOccurs="0" />
+				<xs:element name="location" type="xs:string" 
+					minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	
+
+	<xs:simpleType name="displayPortalServerMethodType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="requestAccess" />
+			<xs:enumeration value="releaseResource"/>
+			<xs:enumeration value="getScreenLocations"/>
+			<xs:enumeration value="getServerServiceId"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:element name="displayPortalServerIPAddressResultBean">
+	    <xs:complexType>
+		    <xs:sequence>
+			    <xs:element name="ipAddress" type="xs:string" minOccurs="1"></xs:element>
+		    </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+
+    <xs:element name="displayPortalServerServiceIDResultBean">
+	    <xs:complexType>
+		    <xs:sequence>
+			    <xs:element name="serviceID" type="ns1:serviceResourceIdentifier"></xs:element>
+		    </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+
+	<xs:element name="displayPortalServerScreenLocationResultBean">
+	    <xs:complexType>
+		    <xs:sequence>
+			    <xs:element name="screenLocations" type="xs:base64Binary"></xs:element>
+		    </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	
+</xs:schema>
+

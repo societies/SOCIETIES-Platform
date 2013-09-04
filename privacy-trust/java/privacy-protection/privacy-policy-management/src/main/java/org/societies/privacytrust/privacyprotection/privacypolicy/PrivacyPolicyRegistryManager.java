@@ -24,45 +24,26 @@
  */
 package org.societies.privacytrust.privacyprotection.privacypolicy;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.RequestorService;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
 import org.societies.api.schema.identity.RequestorBean;
-import org.societies.api.schema.identity.RequestorCisBean;
-import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPolicyRegistryManager;
 import org.societies.privacytrust.privacyprotection.privacypolicy.registry.PrivacyPolicyRegistry;
@@ -78,14 +59,14 @@ public class PrivacyPolicyRegistryManager implements IPrivacyPolicyRegistryManag
 	private ICommManager commManager;
 	private PrivacyPolicyRegistry policyRegistry;
 
-	
+
 	public PrivacyPolicyRegistryManager(ICtxBroker ctxBroker, ICommManager commManager) {
 		this.ctxBroker = ctxBroker;
 		this.commManager = commManager;
 		loadPrivacyPolicyRegistry();
 	}
-	
-	
+
+
 	@Override
 	public RequestPolicy getPrivacyPolicy(RequestorBean owner) throws PrivacyException {
 		RequestPolicy policy = null;
@@ -129,6 +110,12 @@ public class PrivacyPolicyRegistryManager implements IPrivacyPolicyRegistryManag
 
 		// Global store
 		CtxIdentifier id = this.storePrivacyPolicyToCtx(owner, privacyPolicy);
+		if (null == id) {
+			throw new PrivacyException("Can't retrieve the Context ID of the stored privacy policy");
+		}
+		if (null == owner) {
+			owner = privacyPolicy.getRequestor();
+		}
 		this.policyRegistry.addPolicy(owner, id);
 		this.storePrivacyPolicyRegistry();
 		return true;

@@ -29,10 +29,7 @@ import java.io.Serializable;
 
 import javax.swing.tree.DefaultTreeModel;
 
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.Requestor;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSPreferenceDetailsBean;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.PrivacyPreferenceTypeConstants;
@@ -47,10 +44,10 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
  */
 public class IDSPrivacyPreferenceTreeModel extends DefaultTreeModel implements IPrivacyPreferenceTreeModel, Serializable {
 
-	
+
 	private final IDSPreferenceDetailsBean details;
 	private IPrivacyPreference pref;
-	
+
 	public IDSPrivacyPreferenceTreeModel(IDSPreferenceDetailsBean details,  IPrivacyPreference preference){
 		super(preference);
 		this.details = details;

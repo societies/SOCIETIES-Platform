@@ -60,8 +60,8 @@
   	</bean>
 	
 	<bean name="CssMgmtPerformanceTest" class="org.societies.integration.performance.test.upper_tester.rafik.CssMgmtPerformanceTestImpl">
-  		<property name="cssManager" ref="CssManager"/>
-  		<property name="cssDirectoryRemote" ref="CssDirectoryRemote"/>
+  		<property name="internalCssManager" ref="internalCssManager"/>
+  		<!-- <property name="cssDirectoryRemote" ref="CssDirectoryRemote"/> -->
   		<property name="commManager" ref="commManager"/>
   	</bean>
 	
@@ -72,8 +72,16 @@
 	
 	<!-- Trust declarations start -->
 	
-	<bean name="trustPerformanceTest" class="org.societies.integration.performance.test.upper_tester.trust.TrustPerformanceTest">
+	<bean name="testDirectTrustPerformance" class="org.societies.integration.performance.test.upper_tester.trust.TestDirectTrustPerformance">
   		<property name="commManager" ref="commManager"/>
+  		<property name="internalTrustEvidenceCollector" ref="internalTrustEvidenceCollector"/>
+  		<property name="internalTrustBroker" ref="internalTrustBroker"/>
+  	</bean>
+  	
+	<bean name="testIndirectTrustPerformance" class="org.societies.integration.performance.test.upper_tester.trust.TestIndirectTrustPerformance">
+  		<property name="commManager" ref="commManager"/>
+  		<property name="internalTrustEvidenceCollector" ref="internalTrustEvidenceCollector"/>
+  		<property name="internalTrustBroker" ref="internalTrustBroker"/>
   	</bean>
   	
 	<!-- Trust declarations end -->

@@ -81,7 +81,8 @@ public interface IUserCtxInferenceMgr {
 	 * @since 0.0.1
 	 */
 	public void inheritContext(CtxAttributeIdentifier attrId, CtxAttributeValueType type, IIdentity cisid);
-
+	public CtxAttribute inheritContext(CtxAttributeIdentifier ctxAttrId);
+	
 	/**
 	 * Predicts context using indicated date. 
 	 * 

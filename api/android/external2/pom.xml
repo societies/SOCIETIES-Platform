@@ -25,7 +25,7 @@
             <scope>provided</scope>
 		</dependency>
     	<dependency>
-			<groupId>org.societies.api.schema</groupId>
+			<groupId>org.societies.android.api.schema</groupId>
 			<artifactId>societies-api-schema</artifactId>
 			<version>${release.version}</version>
 		</dependency>

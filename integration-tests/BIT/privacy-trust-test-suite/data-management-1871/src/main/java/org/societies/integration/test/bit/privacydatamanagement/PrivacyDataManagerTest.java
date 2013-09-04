@@ -49,7 +49,6 @@ import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.DataWrapperFactory;
 import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.LocationCoordinatesUtils;
 import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.NameUtils;
-import org.societies.api.internal.privacytrust.privacyprotection.model.dataobfuscation.wrapper.IDataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.LocationCoordinates;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Name;
@@ -79,6 +78,7 @@ public class PrivacyDataManagerTest extends IntegrationTest
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyDataManagerTest.class);
 
 	private DataIdentifier dataId;
+	private DataIdentifier dataId2;
 	private DataIdentifier cisPublicDataId;
 	private DataIdentifier cisPrivateDataId;
 	private IIdentity myCssId;
@@ -113,10 +113,15 @@ public class PrivacyDataManagerTest extends IntegrationTest
 		requestorService = getRequestorService();
 		// Data Id
 		try {
-			dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+myCssId+"/ENTITY/person/1/ATTRIBUTE/name/13");
+			Random randomer = new Random((new Date()).getTime()); 
+			String randomValue1 = ""+randomer.nextInt(200);
+			String randomValue2 = ""+randomer.nextInt(200);
+			dataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+myCssId+"/ENTITY/person/1/ATTRIBUTE/name/"+randomValue1);
+			dataId2 = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://"+myCssId+"/ENTITY/person/1/ATTRIBUTE/action/"+randomValue2);
 			cisPublicDataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+cisPublicId+"/cis-member-list/");
 			cisPrivateDataId = DataIdentifierFactory.fromUri(DataIdentifierScheme.CIS+"://"+cisPrivateId+"/cis-member-list/");
 			LOG.info("Data id: "+dataId.getUri()+" (scheme: "+dataId.getScheme()+", type: "+dataId.getType()+")");
+			LOG.info("Data id 2: "+dataId2.getUri()+" (scheme: "+dataId2.getScheme()+", type: "+dataId2.getType()+")");
 			LOG.info("Public Cis Data id: "+cisPublicDataId.getUri()+" (scheme: "+cisPublicDataId.getScheme()+", type: "+cisPublicDataId.getType()+")");
 			LOG.info("Private Cis Data id: "+cisPrivateDataId.getUri()+" (scheme: "+cisPrivateDataId.getScheme()+", type: "+cisPrivateDataId.getType()+")");
 		}
@@ -191,9 +196,6 @@ public class PrivacyDataManagerTest extends IntegrationTest
 		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permissions.get(0).getDecision().name());
 	}
 
-	/**
-	 * Test method for {@link org.societies.privacytrust.privacyprotection.datamanagement.PrivacyDataManager#checkPermission(org.societies.api.internal.mock.DataIdentifier, IIdentity, IIdentity, org.societies.api.servicelifecycle.model.IServiceResourceIdentifier)}.
-	 */
 	@Test
 	public void testCheckPermissionPreviouslyAdded()
 	{
@@ -218,6 +220,33 @@ public class PrivacyDataManagerTest extends IntegrationTest
 		assertNotNull("No permission retrieved", permissions2);
 		assertNotNull("No (real) permission retrieved", permissions2.get(0).getDecision());
 		assertEquals("Bad permission retrieved", Decision.PERMIT.name(), permissions2.get(0).getDecision().name());
+		assertEquals("Two requests, not the same answer", permissions1.get(0).toXMLString(), permissions2.get(0).toXMLString());
+	}
+	
+	@Test
+	public void testCheckPermissionDenied()
+	{
+		String testTitle = new String("CheckPermission denied result: retrieve a decision two times, the first one is DENIED by the user");
+		LOG.info("[#"+testCaseNumber+"] "+testTitle);
+
+		List<ResponseItem> permissions1 = null;
+		List<ResponseItem> permissions2 = null;
+		try {
+			TestCase.getUserFeedbackMocker().addReply(UserFeedbackType.CHECKBOXLIST, new UserFeedbackMockResult(1, "WROOONG"));
+			permissions1 = TestCase.privacyDataManager.checkPermission(requestorCis, dataId2, actionsRead);
+			TestCase.getUserFeedbackMocker().removeAllReplies(); // Just to be sure
+			permissions2 = TestCase.privacyDataManager.checkPermission(requestorCis, dataId2, actionsRead);
+		} catch (PrivacyException e) {
+			LOG.error("[#"+testCaseNumber+"] [PrivacyException] "+testTitle, e);
+			fail("PrivacyException "+testTitle+": "+e);
+		}
+		assertNotNull("No permission retrieved", permissions1);
+		assertTrue("No permission retrieved", permissions1.size() > 0);
+		assertNotNull("No (real) permission retrieved", permissions1.get(0).getDecision());
+		assertEquals("Bad permission retrieved",  Decision.DENY.name(), permissions1.get(0).getDecision().name());
+		assertNotNull("No permission retrieved", permissions2);
+		assertNotNull("No (real) permission retrieved", permissions2.get(0).getDecision());
+		assertEquals("Bad permission retrieved", Decision.DENY.name(), permissions2.get(0).getDecision().name());
 		assertEquals("Two requests, not the same answer", permissions1.get(0).toXMLString(), permissions2.get(0).toXMLString());
 	}
 

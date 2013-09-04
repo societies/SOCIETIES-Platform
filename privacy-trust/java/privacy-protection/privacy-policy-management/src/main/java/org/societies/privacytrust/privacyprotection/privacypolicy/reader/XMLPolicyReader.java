@@ -29,11 +29,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
@@ -400,142 +400,142 @@ public class XMLPolicyReader {
 			}
 		}
 
-			if (ctxType == null){
-				if (ctxID == null){
-					return null;
-				}else{
-
-					return new Resource(scheme, ctxID.getType());
-				}
+		if (ctxType == null){
+			if (ctxID == null){
+				return null;
 			}else{
-				//TODO: make the necessary changes to include the scheme in the privacy policy			
-				return new Resource(scheme,ctxType);
-			}
-		}
 
-		private ArrayList<Action> readActions(NodeList actionList){
-			ArrayList<Action> actions = new ArrayList<Action>();
-			for (int i = 0; i<actionList.getLength(); i++){
-				Action a = this.readAction((Element) actionList.item(i));
-				if (a!=null){
-					actions.add(a);
-				}
+				return new Resource(scheme, ctxID.getType());
 			}
-			return actions;
+		}else{
+			//TODO: make the necessary changes to include the scheme in the privacy policy			
+			return new Resource(scheme,ctxType);
 		}
-		private Action readAction(Element actionElement){
-			NodeList attributeList = actionElement.getElementsByTagName("Attribute");
-			Action a = null;
-			for (int i = 0; i< attributeList.getLength(); i++){
-				Element attributeElement = (Element) attributeList.item(i);
-				String attributeId = attributeElement.getAttribute("AttributeId");
-				if (attributeId.compareTo("urn:oasis:names:tc:xacml:1.0:action:action-id")==0){
-					String dataType = attributeElement.getAttribute("DataType");
-					if (dataType.compareToIgnoreCase(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants.class.getName())==0
-							|| dataType.compareToIgnoreCase("org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants")==0){
-						NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
-						Element attributeValueElement = (Element) attributeValueList.item(0);
-						ActionConstants ac = ActionConstants.valueOf(attributeValueElement.getFirstChild().getNodeValue().toUpperCase());
-						a = new Action(ac);
-					}
-				}
-			}
+	}
 
+	private ArrayList<Action> readActions(NodeList actionList){
+		ArrayList<Action> actions = new ArrayList<Action>();
+		for (int i = 0; i<actionList.getLength(); i++){
+			Action a = this.readAction((Element) actionList.item(i));
 			if (a!=null){
-				NodeList optionalNodeList = actionElement.getElementsByTagName("optional");
-				//JOptionPane.showMessageDialog(null, "in Action: "+optionalNodeList.getLength());
-				if (optionalNodeList!=null){
-					if (optionalNodeList.getLength()>0){
-						Element valueOptional = (Element) optionalNodeList.item(0);
-						String value = valueOptional.getFirstChild().getNodeValue();
-						if (value.equalsIgnoreCase("true")){
-							a.setOptional(true);
-						}
+				actions.add(a);
+			}
+		}
+		return actions;
+	}
+	private Action readAction(Element actionElement){
+		NodeList attributeList = actionElement.getElementsByTagName("Attribute");
+		Action a = null;
+		for (int i = 0; i< attributeList.getLength(); i++){
+			Element attributeElement = (Element) attributeList.item(i);
+			String attributeId = attributeElement.getAttribute("AttributeId");
+			if (attributeId.compareTo("urn:oasis:names:tc:xacml:1.0:action:action-id")==0){
+				String dataType = attributeElement.getAttribute("DataType");
+				if (dataType.compareToIgnoreCase(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants.class.getName())==0
+						|| dataType.compareToIgnoreCase("org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants")==0){
+					NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
+					Element attributeValueElement = (Element) attributeValueList.item(0);
+					ActionConstants ac = ActionConstants.valueOf(attributeValueElement.getFirstChild().getNodeValue().toUpperCase());
+					a = new Action(ac);
+				}
+			}
+		}
+
+		if (a!=null){
+			NodeList optionalNodeList = actionElement.getElementsByTagName("optional");
+			//JOptionPane.showMessageDialog(null, "in Action: "+optionalNodeList.getLength());
+			if (optionalNodeList!=null){
+				if (optionalNodeList.getLength()>0){
+					Element valueOptional = (Element) optionalNodeList.item(0);
+					String value = valueOptional.getFirstChild().getNodeValue();
+					if (value.equalsIgnoreCase("true")){
+						a.setOptional(true);
 					}
 				}
 			}
-			return a;
 		}
+		return a;
+	}
 
-		private ArrayList<Condition> readConditions(NodeList conditionList){
-			ArrayList<Condition> conditions = new ArrayList<Condition>();
-			for (int i = 0; i<conditionList.getLength(); i++){
-				Condition c = this.readCondition((Element) conditionList.item(i));
-				if (c!=null){
-					conditions.add(c);
-				}
-			}
-			return conditions;		
-		}
-
-		private Condition readCondition(Element conditionElement){
-			NodeList attributeList = conditionElement.getElementsByTagName("Attribute");
-			Condition c = null;
-			String conditionValue = null;
-			for (int i = 0; i< attributeList.getLength(); i++){
-				Element attributeElement = (Element) attributeList.item(i);
-				String attributeId = attributeElement.getAttribute("AttributeId");
-				if (attributeId.compareTo("urn:oasis:names:tc:xacml:1.0:action:condition-id")==0){
-					String dataType = attributeElement.getAttribute("DataType");
-					if (dataType.compareToIgnoreCase(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.class.getName())==0
-							|| dataType.compareToIgnoreCase("org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants")==0){
-						NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
-						Element attributeValueElement = (Element) attributeValueList.item(0);
-						ConditionConstants cc = ConditionConstants.valueOf(attributeValueElement.getAttribute("DataType"));
-
-						conditionValue = attributeValueElement.getFirstChild().getNodeValue();
-						c = new Condition(cc,conditionValue);
-					}
-				}
-			}
+	private ArrayList<Condition> readConditions(NodeList conditionList){
+		ArrayList<Condition> conditions = new ArrayList<Condition>();
+		for (int i = 0; i<conditionList.getLength(); i++){
+			Condition c = this.readCondition((Element) conditionList.item(i));
 			if (c!=null){
-				NodeList optionalNodeList = conditionElement.getElementsByTagName("optional");
-				//JOptionPane.showMessageDialog(null, "in Condition: "+optionalNodeList.getLength());
-				if (optionalNodeList!=null){
-					if (optionalNodeList.getLength()>0){
-						Element valueOptional = (Element) optionalNodeList.item(0);
-						String value = valueOptional.getFirstChild().getNodeValue();
-						if (value.equalsIgnoreCase("false")){
-							c.setOptional(false);
-						}
+				conditions.add(c);
+			}
+		}
+		return conditions;		
+	}
+
+	private Condition readCondition(Element conditionElement){
+		NodeList attributeList = conditionElement.getElementsByTagName("Attribute");
+		Condition c = null;
+		String conditionValue = null;
+		for (int i = 0; i< attributeList.getLength(); i++){
+			Element attributeElement = (Element) attributeList.item(i);
+			String attributeId = attributeElement.getAttribute("AttributeId");
+			if (attributeId.compareTo("urn:oasis:names:tc:xacml:1.0:action:condition-id")==0){
+				String dataType = attributeElement.getAttribute("DataType");
+				if (dataType.compareToIgnoreCase(org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants.class.getName())==0
+						|| dataType.compareToIgnoreCase("org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants")==0){
+					NodeList attributeValueList = attributeElement.getElementsByTagName("AttributeValue");
+					Element attributeValueElement = (Element) attributeValueList.item(0);
+					ConditionConstants cc = ConditionConstants.valueOf(attributeValueElement.getAttribute("DataType"));
+
+					conditionValue = attributeValueElement.getFirstChild().getNodeValue();
+					c = new Condition(cc,conditionValue);
+				}
+			}
+		}
+		if (c!=null){
+			NodeList optionalNodeList = conditionElement.getElementsByTagName("optional");
+			//JOptionPane.showMessageDialog(null, "in Condition: "+optionalNodeList.getLength());
+			if (optionalNodeList!=null){
+				if (optionalNodeList.getLength()>0){
+					Element valueOptional = (Element) optionalNodeList.item(0);
+					String value = valueOptional.getFirstChild().getNodeValue();
+					if (value.equalsIgnoreCase("false")){
+						c.setOptional(false);
 					}
 				}
 			}
-			return c;		
 		}
+		return c;		
+	}
 
-		private void log(String message){
-			this.logging.info(message);
+	private void log(String message){
+		this.logging.info(message);
 
-		}
+	}
 
-		public static void main(String[] args) throws IOException{
-			if (args.length>0){
-				String filePath = "";
+	public static void main(String[] args) throws IOException{
+		if (args.length>0){
+			String filePath = "";
 
-				try{
-					filePath = args[0];
-					XMLPolicyReader reader = new XMLPolicyReader(null, null);
-					reader.read(filePath);
-					//JOptionPane.showMessageDialog(null, "Read "+filePath);
-				}
-				catch(Exception e){
-					//JOptionPane.showMessageDialog(null, "Failed: "+filePath);
-					e.printStackTrace();
-				}
+			try{
+				filePath = args[0];
+				XMLPolicyReader reader = new XMLPolicyReader(null, null);
+				reader.read(filePath);
+				//JOptionPane.showMessageDialog(null, "Read "+filePath);
 			}
-
-
-		}
-
-		private void read(String filepath){
-			System.out.println(filepath);
-			File file = new File(filepath);
-
-			RequestPolicy policy = readPolicyFromFile(file);
-			System.out.println("Policy read OK: \n");
-			System.out.println(policy.toString());		
+			catch(Exception e){
+				//JOptionPane.showMessageDialog(null, "Failed: "+filePath);
+				e.printStackTrace();
+			}
 		}
 
 
 	}
+
+	private void read(String filepath){
+		System.out.println(filepath);
+		File file = new File(filepath);
+
+		RequestPolicy policy = readPolicyFromFile(file);
+		System.out.println("Policy read OK: \n");
+		System.out.println(policy.toString());		
+	}
+
+
+}

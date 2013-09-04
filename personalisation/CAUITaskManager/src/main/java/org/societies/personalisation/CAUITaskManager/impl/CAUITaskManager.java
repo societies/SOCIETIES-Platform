@@ -31,7 +31,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
@@ -199,7 +198,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
 
 		for(IUserIntentAction action : actionsMap.keySet()){
-			if (action.getServiceID().getServiceInstanceIdentifier().equals(serviceId) && action.getparameterName().equals(actionType)) actionResult.add(action);
+			if (action.getServiceID().getIdentifier().toString().equals(serviceId) && action.getparameterName().equals(actionType)) actionResult.add(action);
 		}
 		return actionResult;
 	}
@@ -223,7 +222,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 	@Override
 	public UserIntentAction retrieveCurrentIntentAction(IIdentity arg0,
 			IIdentity arg1, ServiceResourceIdentifier arg2, String arg3) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -258,14 +257,15 @@ public class CAUITaskManager implements ICAUITaskManager{
 
 	@Override
 	public boolean taskBelongsToModel(IUserIntentTask arg0) {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
 
 	@Override
 	public boolean actionBelongsToModel(IUserIntentAction arg0) {
-		// TODO Auto-generated method stub
+		
+		
 		return false;
 	}
 
@@ -320,53 +320,27 @@ public class CAUITaskManager implements ICAUITaskManager{
 
 	@Override
 	public void updateModel(UserIntentModelData model) {
-		activeUserIntentModel = model;
+		this.activeUserIntentModel = new UserIntentModelData(); 
+		this.activeUserIntentModel = model;
+		if(model!=null){
+			LOG.debug("updating active model : "+model.getActionModel() );	
+		}
+		
 	}
 
 	@Override
 	public UserIntentModelData createModel() {
-		activeUserIntentModel =  new UserIntentModelData();
-		return activeUserIntentModel;
+		this.activeUserIntentModel =  new UserIntentModelData();
+		return this.activeUserIntentModel;
 	}
 
+	@Override
+	public HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> getCAUIActiveModel(){
 
-	//*********************************************
-	// visualisation classes
-	//*********************************************
-
-	public void displayTask (IUserIntentTask task) {
-		/*
-		Double [][] matrix = task.getMatrix();
-		List<IUserIntentAction> actionList = task.getActions();
-		System.out.print(actionList+"\n");
-		for (int i = 0; i < matrix.length; i++)
-		{
-			for (int j = 0; j < matrix[i].length; j++)
-			{
-				System.out.print(" "+matrix[i][j]+"                 ");
-			}
-			System.out.println();
+		if ( this.activeUserIntentModel != null){
+			return this.activeUserIntentModel.getActionModel();
 		}
-		 */
-	}
-
-
-	public void displayModel (UserIntentModelData model) {
-
-		/*
-		Double [][] matrix = model.getMatrix();
-		List<IUserIntentTask> taskList = model.getTaskList();
-		System.out.print(taskList+"\n");
-		//	System.out.print(matrix+"\n");
-		for (int i = 0; i < matrix.length; i++)
-		{
-			for (int j = 0; j < matrix[i].length; j++)
-			{
-				System.out.print(" "+matrix[i][j]+"                 ");
-			}
-			System.out.println();
-		}
-		 */
+		return null;
 	}
 
 	@Override
@@ -452,8 +426,17 @@ public class CAUITaskManager implements ICAUITaskManager{
 			}	
 		}
 		//System.out.println("actionsScoreMap  " +actionsScoreMap);
+		LOG.debug("actionsScoreMap  " +actionsScoreMap);
+		
 		if(!actionsScoreMap.values().isEmpty()){
-
+			
+			// check if no context matches, return empty set
+			boolean allValuesZero = true;
+			for(Integer value : actionsScoreMap.values()){
+				if (value != 0)  allValuesZero = false;
+			}
+			if(allValuesZero) return bestActionList;
+			
 			int maxValueInMap=(Collections.max(actionsScoreMap.values()));  // This will return max value in the Hashmap
 			for(IUserIntentAction action  : actionsScoreMap.keySet()){
 				if(actionsScoreMap.get(action).equals(maxValueInMap)) {

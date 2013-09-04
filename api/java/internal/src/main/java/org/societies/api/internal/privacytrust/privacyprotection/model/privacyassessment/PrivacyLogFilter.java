@@ -44,6 +44,7 @@ public class PrivacyLogFilter {
 	private IIdentity receiver;
 	private IIdentity sender;
 	private String senderClass;
+	private String senderBundle;
 	private ChannelType[] channelId;
 	
 	/**
@@ -58,6 +59,7 @@ public class PrivacyLogFilter {
 		this.receiver = null;
 		this.sender = null;
 		this.senderClass = null;
+		this.senderBundle = null;
 		this.channelId = null;
 	}
 
@@ -73,6 +75,7 @@ public class PrivacyLogFilter {
 	 * @param receiver  CSS ID of the receiver
 	 * @param sender    CSS ID of the sender
 	 * @param senderClass Class name of the component that invoked sending.
+	 * @param senderBundle Symbolic name of bundle that invoked sending.
 	 * @param channelId   IDs of the possible channels.
 	 */
 	public PrivacyLogFilter(
@@ -84,6 +87,7 @@ public class PrivacyLogFilter {
 			IIdentity receiver,
 			IIdentity sender,
 			String senderClass,
+			String senderBundle,
 			ChannelType[] channelId
 			) {
 		this.dataType = dataType;
@@ -94,6 +98,7 @@ public class PrivacyLogFilter {
 		this.receiver = receiver;
 		this.sender = sender;
 		this.senderClass = senderClass;
+		this.senderBundle = senderBundle;
 		this.channelId = channelId;
 	}
 	
@@ -159,6 +164,20 @@ public class PrivacyLogFilter {
 
 	public void setSenderClass(String senderClass) {
 		this.senderClass = senderClass;
+	}
+
+	/**
+	 * @return the senderBundle
+	 */
+	public String getSenderBundle() {
+		return senderBundle;
+	}
+
+	/**
+	 * @param senderBundle the senderBundle to set
+	 */
+	public void setSenderBundle(String senderBundle) {
+		this.senderBundle = senderBundle;
 	}
 
 	public ChannelType[] getChannelId() {

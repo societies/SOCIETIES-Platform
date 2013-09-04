@@ -24,7 +24,10 @@
  */
 package org.societies.privacytrust.privacyprotection.test.privacypolicy;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.URI;
@@ -33,9 +36,6 @@ import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -73,7 +73,6 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
@@ -85,7 +84,6 @@ import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManager
 import org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client.AgreementFinaliser;
 import org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyAgreementManager;
 import org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyAgreementManagerInternal;
-import org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyManager;
 import org.societies.util.commonmock.MockIdentity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.AsyncResult;
