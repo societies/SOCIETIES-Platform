@@ -56,7 +56,7 @@ public class DocContentProvider extends ContentProvider {
 	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
 		Log.d(tag, "delete");
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -74,7 +74,7 @@ public class DocContentProvider extends ContentProvider {
 	@Override
 	public Uri insert(Uri uri, ContentValues values) {
 		Log.d(tag, "insert");
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -94,8 +94,7 @@ public class DocContentProvider extends ContentProvider {
 			String[] selectionArgs, String sortOrder) {
 
 		Log.d(tag, "query");
-		// Uisng SQLiteQueryBuilder instead of query() method
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	/* (non-Javadoc)
@@ -106,7 +105,7 @@ public class DocContentProvider extends ContentProvider {
 			String[] selectionArgs) {
 
 		Log.d(tag, "update");
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
