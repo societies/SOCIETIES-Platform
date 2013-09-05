@@ -22,9 +22,18 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.domainauthority.rest.control;
+package org.societies.domainauthority.rest.model;
 
-import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.societies.api.security.digsig.DigsigException;
+import org.societies.domainauthority.rest.control.ServiceClientJarAccess;
 
 /**
  * Description of a resource, e.g., a service file
@@ -32,21 +41,34 @@ import java.security.PublicKey;
  * @author Mitja Vardjan
  *
  */
+@Entity
+@Table(name = "org_societies_security_darest_keys")
 public class Resource {
-
-	private String path;
-	private PublicKey ownerKey;
 	
-	public Resource(String path, PublicKey ownerKey) {
+	@Id
+	@GeneratedValue
+	@Column(name="id")
+	private int id;
+
+	@Column(name="path")
+	private String path;
+
+	@Column(name="ownerCertSerialized")
+	private byte[] ownerCertSerialized;
+	
+	private X509Certificate ownerCert;
+	
+	public Resource(String path, X509Certificate ownerCert) throws DigsigException {
 		this.path = path;
-		this.ownerKey = ownerKey;
+		this.ownerCert = ownerCert;
+		this.ownerCertSerialized = ServiceClientJarAccess.getSigMgr().cert2ba(ownerCert);
 	}
 
 	/**
-	 * @return Public key of the one who has uploaded the files, e.g., the service provider
+	 * @return Public part of the certificate of the one who has uploaded the files, e.g., the service provider
 	 */
-	public PublicKey getOwnerKey() {
-		return ownerKey;
+	public X509Certificate getOwnerCert() {
+		return ownerCert;
 	}
 
 	/**
@@ -54,5 +76,42 @@ public class Resource {
 	 */
 	public String getPath() {
 		return path;
+	}
+
+	/**
+	 * @param path Relative path to the file
+	 */
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the ownerCertSerialized
+	 */
+	public byte[] getOwnerCertSerialized() {
+		return ownerCertSerialized;
+	}
+
+	/**
+	 * @param ownerCertSerialized the ownerCertSerialized to set
+	 * @throws DigsigException 
+	 */
+	public void setOwnerCertSerialized(byte[] ownerKeySerialized) throws DigsigException {
+		this.ownerCertSerialized = ownerKeySerialized;
+		this.ownerCert = ServiceClientJarAccess.getSigMgr().ba2cert(ownerKeySerialized);
 	}
 }
