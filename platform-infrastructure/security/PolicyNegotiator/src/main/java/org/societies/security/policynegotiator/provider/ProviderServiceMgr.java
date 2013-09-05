@@ -33,8 +33,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.hibernate.SessionFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
@@ -48,6 +46,8 @@ import org.societies.api.internal.security.policynegotiator.NegotiationException
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
+import org.societies.security.dao.ServiceDao;
+import org.societies.security.model.Service;
 import org.societies.security.policynegotiator.util.FileName;
 import org.societies.security.policynegotiator.util.Net;
 import org.societies.security.policynegotiator.util.UrlParamName;
@@ -62,11 +62,11 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 
 	private static Logger LOG = LoggerFactory.getLogger(ProviderServiceMgr.class);
 
-	private SessionFactory sessionFactory;
-	
 	private IClientJarServerRemote clientJarServer;
 	private ISignatureMgr signatureMgr;
 	private INegotiationProviderRemote groupMgr;
+	
+	private ServiceDao serviceDao;
 
 	private HashMap<String, Service> services = new HashMap<String, Service>();
 
@@ -94,6 +94,28 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 	public void setGroupMgr(INegotiationProviderRemote groupMgr) {
 		LOG.debug("setGroupMgr()");
 		this.groupMgr = groupMgr;
+	}
+	
+	public ServiceDao getServiceDao() {
+		return serviceDao;
+	}
+	public void setServiceDao(ServiceDao serviceDao) {
+		this.serviceDao = serviceDao;
+	}
+	
+	public void init() {
+		
+		LOG.info("init");
+		
+		List<Service> serviceList = serviceDao.getAll();
+		
+		if (serviceList != null) {
+			LOG.debug("Loading service list from previous run");
+			for (Service s : serviceList) {
+				services.put(s.getServiceId(), s);
+				LOG.debug("Loaded service [{}] {}", s.getId(), s.getServiceId());
+			}
+		}
 	}
 
 	@Override
@@ -130,9 +152,11 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 			this.clientJarServer.shareFiles(groupMgr.getIdMgr().getDomainAuthorityNode(),
 					serviceId.getIdentifier(), provider, getMyCertificate(), signature, files, cb);
 			services.put(idStr, s);
+			serviceDao.save(s);
 		}
 		else {
 			services.put(idStr, s);
+			serviceDao.save(s);
 			callback.notifySuccess();
 		}
 	}
@@ -192,6 +216,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 		
 		String idStr = serviceId.getIdentifier().toString();
 		
+		serviceDao.delete(services.get(idStr));
 		services.remove(idStr);
 	}
 

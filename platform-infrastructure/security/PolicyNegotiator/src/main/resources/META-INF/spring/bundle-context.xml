@@ -56,6 +56,7 @@
 		<property name="annotatedClasses">
 			<list>
 				<value>org.societies.security.model.Foo</value>
+			    <value>org.societies.security.model.Service</value>
 			</list>
 		</property>
 
@@ -79,13 +80,19 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
+	<bean id="serviceDao" class="org.societies.security.dao.ServiceDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
 	<bean id="ProviderServiceMgr"
 		class="org.societies.security.policynegotiator.provider.ProviderServiceMgr"
+		init-method="init"
 		>
         <property name="clientJarServer" ref="ClientJarServerRemote"/>
         <property name="signatureMgr" ref="SignatureMgr"/>
   		<property name="groupMgr" ref="NegotiationProviderRemote"/>
-	</bean>
+        <property name="serviceDao" ref="serviceDao"/>
+  	</bean>
 	
 	<bean id="NegotiationProvider"
 		class="org.societies.security.policynegotiator.provider.NegotiationProvider"

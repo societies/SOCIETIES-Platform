@@ -22,11 +22,18 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.policynegotiator.provider;
+package org.societies.security.model;
 
 import java.net.URI;
 import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.CollectionOfElements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,37 +43,85 @@ import org.slf4j.LoggerFactory;
  * @author Mitja Vardjan
  *
  */
+@Entity
+@Table(name = "org_societies_security_service")
 public class Service {
 	
 	private static Logger LOG = LoggerFactory.getLogger(Service.class);
 	
-	private String id;
+	@Id
+	@GeneratedValue
+	@Column(name="id")
+	private int id;
+	
+	@Column(name="serviceId")
+	private String serviceId;
+
+	@Column(name="slaXmlOptions")
 	private String slaXmlOptions;
+
+	@Column(name="fileServerHost")
 	private URI fileServerHost;
+
+	@CollectionOfElements
 	private List<String> files;
 
-	public Service(String id, String slaXmlOptions, URI fileServerHost, List<String> files) {
+	/**
+	 * Constructor for Hibernate.
+	 */
+	public Service() {
+	}
+	
+	public Service(String serviceId, String slaXmlOptions, URI fileServerHost, List<String> files) {
 		
-		this.id = id;
+		this.serviceId = serviceId;
 		this.slaXmlOptions = slaXmlOptions;
 		this.fileServerHost = fileServerHost;
 		this.files = files;
 		
 		LOG.debug("Service(" + id + ", ..., " + fileServerHost + ", " + files + ")");
 	}
-	
+
 	/**
 	 * @return the id
 	 */
-	public String getId() {
+	public int getId() {
 		return id;
 	}
-	
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the serviceId
+	 */
+	public String getServiceId() {
+		return serviceId;
+	}
+
+	/**
+	 * @param serviceId the serviceId to set
+	 */
+	public void setServiceId(String serviceId) {
+		this.serviceId = serviceId;
+	}
+
 	/**
 	 * @return the slaXmlOptions
 	 */
 	public String getSlaXmlOptions() {
 		return slaXmlOptions;
+	}
+
+	/**
+	 * @param slaXmlOptions the slaXmlOptions to set
+	 */
+	public void setSlaXmlOptions(String slaXmlOptions) {
+		this.slaXmlOptions = slaXmlOptions;
 	}
 
 	/**
@@ -77,6 +132,13 @@ public class Service {
 	}
 
 	/**
+	 * @param fileServerHost the fileServerHost to set
+	 */
+	public void setFileServerHost(URI fileServerHost) {
+		this.fileServerHost = fileServerHost;
+	}
+
+	/**
 	 * @return relative paths to files
 	 */
 	public List<String> getFiles() {
@@ -84,10 +146,10 @@ public class Service {
 	}
 
 	/**
-	 * @return the clientJarServer
+	 * @param files the relative paths to files
 	 */
-//	@Deprecated
-//	public IIdentity getFileServer() {
-//		return fileServer;
-//	}
+	public void setFiles(List<String> files) {
+		this.files = files;
+	}
+	
 }

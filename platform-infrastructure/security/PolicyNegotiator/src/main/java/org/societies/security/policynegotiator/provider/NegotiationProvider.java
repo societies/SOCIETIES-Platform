@@ -227,6 +227,7 @@ public class NegotiationProvider implements INegotiationProvider {
 		String serviceId;
 		Future<SlaBean> result = new AsyncResult<SlaBean>(sla);
 		
+//		sessions.remove(sessionId);  // TODO: remove session
 		sla.setSessionId(sessionId);
 		
 		try {
