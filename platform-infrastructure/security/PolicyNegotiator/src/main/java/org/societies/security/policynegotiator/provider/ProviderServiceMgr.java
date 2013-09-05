@@ -116,6 +116,9 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 				LOG.debug("Loaded service [{}] {}", s.getId(), s.getServiceId());
 			}
 		}
+		for (Service s : services.values()) {
+			LOG.debug("Files of service No. {}: {}", s.getId(), Service.decat(s.getFilesConcatenated()));
+		}
 	}
 
 	@Override
@@ -257,7 +260,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 		}
 
 		host = s.getFileServerHost().toString();
-		filePath = s.getFiles();
+		filePath = Service.decat(s.getFilesConcatenated());
 		
 		for (int k = 0; k < filePath.size(); k++) {
 			try {

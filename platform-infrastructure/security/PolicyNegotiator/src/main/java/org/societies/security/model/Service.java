@@ -25,6 +25,7 @@
 package org.societies.security.model;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -33,8 +34,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
-import org.hibernate.annotations.CollectionOfElements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,7 @@ import org.slf4j.LoggerFactory;
 public class Service {
 	
 	private static Logger LOG = LoggerFactory.getLogger(Service.class);
+	protected static final String delimiter = ":";
 	
 	@Id
 	@GeneratedValue
@@ -65,11 +67,22 @@ public class Service {
 	@Column(name="fileServerHost")
 	private URI fileServerHost;
 
-	@CollectionOfElements
-	private List<String> files;
+//	@ElementCollection
+//	private List<String> files;
+	
+//	@CollectionOfElements(targetElement = java.lang.String.class)
+//	@OneToMany(fetch=FetchType.EAGER)
+//	private List<String> files;
 
+//	@Transient
+//	private List<String> files;
+
+	// I love Hibernate
+	@Column(name="filesConcatenated", length = 100*1024)
+	private String filesConcatenated;
+	
 	/**
-	 * Constructor for Hibernate.
+	 * Constructor for Hibernate only.
 	 */
 	public Service() {
 	}
@@ -79,7 +92,9 @@ public class Service {
 		this.serviceId = serviceId;
 		this.slaXmlOptions = slaXmlOptions;
 		this.fileServerHost = fileServerHost;
-		this.files = files;
+//		this.files = files;
+
+		this.filesConcatenated = cat(files);
 		
 		LOG.debug("Service(" + id + ", ..., " + fileServerHost + ", " + files + ")");
 	}
@@ -140,18 +155,56 @@ public class Service {
 		this.fileServerHost = fileServerHost;
 	}
 
+//	/**
+//	 * @return relative paths to files
+//	 */
+//	public List<String> getFiles() {
+//		return files;
+//	}
+
 	/**
-	 * @return relative paths to files
+	 * @return the filesConcatenated
 	 */
-	public List<String> getFiles() {
-		return files;
+	public String getFilesConcatenated() {
+		return filesConcatenated;
 	}
 
 	/**
-	 * @param files the relative paths to files
+	 * @param filesConcatenated the filesConcatenated to set
 	 */
-	public void setFiles(List<String> files) {
-		this.files = files;
+	public void setFilesConcatenated(String filesConcatenated) {
+		
+		this.filesConcatenated = filesConcatenated;
+//		this.files = decat(filesConcatenated);
 	}
 	
+	// I love Hibernate
+	public static List<String> decat(String str) {
+		
+		List<String> list = new ArrayList<String>();
+		String[] strArray = str.split(delimiter);
+		
+		if (strArray != null) {
+			for (String s : strArray) {
+				list.add(s);
+			}
+		}
+		return list;
+	}
+	
+	// I love Hibernate
+	public static String cat(List<String> strings) {
+		String str = "";
+		if (strings == null) {
+			return str;
+		}
+		for (String s : strings) {
+			if (!str.isEmpty()) {
+				// TODO: use stringbuilder or something
+				str += delimiter;
+			}
+			str += s;
+		}
+		return str;
+	}
 }
