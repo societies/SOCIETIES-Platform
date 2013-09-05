@@ -57,6 +57,12 @@ public class Resource {
 	@Lob
 	@Column(name="ownerCertSerialized")
 	private byte[] ownerCertSerialized;
+
+	/**
+	 * Default constructor for Hibernate only
+	 */
+	public Resource() {
+	}
 	
 	public Resource(String path, X509Certificate ownerCert) throws DigsigException {
 		this.path = path;
