@@ -7,8 +7,7 @@
 	template="templates/main_template.xhtml">
 
 	<ui:define name="html_head">
-		<title>Privacy Preferences</title>
-		<h:outputStylesheet library="css" name="hint.min.css"/>
+		<title>Privacy Preferences - SOCIETIES</title>
 	</ui:define>
 
 	<ui:define name="body">
@@ -93,7 +92,7 @@
         <span class="tooltip">#{PrivacyPrefsController.toStringDataType(accCtrlPreference.resource.dataType)}<em><span></span>#{accCtrlPreference.resource.dataIdUri}</em></span>
         </p:column>
 
-					<!-- <p:column headerText="Resource ID">
+					<!-- Removed temporarly to take a screenshot <p:column headerText="Resource ID">
         #{accCtrlPreference.resource.dataIdUri}
         </p:column> -->
 					<p:column style="width: 4%">
@@ -169,13 +168,6 @@
 		</section>
 
 		<div class="hr grid_12 clearfix"></div>
-<script type="text/javascript">
-$(document).ready(function() {
-	$('.dataTypeBlock').click(function() {
-		$(this).children('dataUriHidden').show();
-	});
-});
-</script>
 	</ui:define>
 
 	<ui:define name="dialogs">
