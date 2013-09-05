@@ -31,6 +31,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CollectionOfElements;
@@ -54,12 +55,13 @@ public class Service {
 	@Column(name="id")
 	private int id;
 	
-	@Column(name="serviceId")
+	@Column(name="serviceId", length = 1024)
 	private String serviceId;
 
-	@Column(name="slaXmlOptions")
+	@Column(name="slaXmlOptions", length = 1024*1024)
 	private String slaXmlOptions;
 
+	@Lob
 	@Column(name="fileServerHost")
 	private URI fileServerHost;
 

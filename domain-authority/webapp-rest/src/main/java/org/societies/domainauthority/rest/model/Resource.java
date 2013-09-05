@@ -30,6 +30,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import org.societies.api.security.digsig.DigsigException;
@@ -53,23 +54,21 @@ public class Resource {
 	@Column(name="path")
 	private String path;
 
+	@Lob
 	@Column(name="ownerCertSerialized")
 	private byte[] ownerCertSerialized;
 	
-	private X509Certificate ownerCert;
-	
 	public Resource(String path, X509Certificate ownerCert) throws DigsigException {
 		this.path = path;
-		this.ownerCert = ownerCert;
 		this.ownerCertSerialized = ServiceClientJarAccess.getSigMgr().cert2ba(ownerCert);
 	}
 
-	/**
-	 * @return Public part of the certificate of the one who has uploaded the files, e.g., the service provider
-	 */
-	public X509Certificate getOwnerCert() {
-		return ownerCert;
-	}
+//	/**
+//	 * @return Public part of the certificate of the one who has uploaded the files, e.g., the service provider
+//	 */
+//	public X509Certificate getOwnerCert() {
+//		return ownerCertSerialized;
+//	}
 
 	/**
 	 * @return Relative path to the file
@@ -110,8 +109,7 @@ public class Resource {
 	 * @param ownerCertSerialized the ownerCertSerialized to set
 	 * @throws DigsigException 
 	 */
-	public void setOwnerCertSerialized(byte[] ownerKeySerialized) throws DigsigException {
+	public void setOwnerCertSerialized(byte[] ownerKeySerialized) {
 		this.ownerCertSerialized = ownerKeySerialized;
-		this.ownerCert = ServiceClientJarAccess.getSigMgr().ba2cert(ownerKeySerialized);
 	}
 }

@@ -162,7 +162,14 @@ public class ServiceClientJarAccess implements IClientJarServer {
 		for (Resource r : resources.values()) {
 			if (r.getPath().equals(filePath)) {
 				LOG.debug("isAuthorized(): file {} found", filePath);
-				X509Certificate cert = r.getOwnerCert();
+				byte[] certBytes = r.getOwnerCertSerialized();
+				X509Certificate cert;
+				try {
+					cert = sigMgr.ba2cert(certBytes);
+				} catch (DigsigException e) {
+					LOG.warn("Could not reconstruct certificate for file {} from {}", filePath, certBytes);
+					return false;
+				}
 				PublicKey publicKey = cert.getPublicKey();
 				return sigMgr.verify(filePath, signature, publicKey);
 			}
