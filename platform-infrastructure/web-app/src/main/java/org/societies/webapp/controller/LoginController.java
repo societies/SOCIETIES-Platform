@@ -3,10 +3,12 @@ package org.societies.webapp.controller;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.webapp.service.OpenfireLoginService;
 import org.societies.webapp.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import javax.faces.application.FacesMessage;
@@ -28,28 +30,9 @@ public class LoginController extends BasePageController {
     @ManagedProperty(value = "#{openfireLoginService}")
     private OpenfireLoginService openfireLoginService;
 
-    @SuppressWarnings("UnusedDeclaration")
-    public UserService getUserService() {
-        return userService;
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    public void setUserService(UserService userService) {
-        log.debug("setUserService() has been called with " + userService);
-        this.userService = userService;
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    public OpenfireLoginService getOpenfireLoginService() {
-        return openfireLoginService;
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    public void setOpenfireLoginService(OpenfireLoginService openfireLoginService) {
-        log.debug("setOpenfireLoginService() has been called with " + openfireLoginService);
-        this.openfireLoginService = openfireLoginService;
-    }
-
+    @Autowired
+	private ICommManager commMngrRef;
+    
     private String loginDialogUsername;
     private String loginDialogPassword;
 
@@ -73,9 +56,21 @@ public class LoginController extends BasePageController {
             String summary = "Login failed";
             String detail = "Username or password were blank";
             addGlobalMessage(summary, detail, FacesMessage.SEVERITY_WARN);
-
             return "false";
         }
+        
+        log.info("########### need to check this is the good node");
+        
+        String currentNodeId = openfireLoginService.getCommManager().getIdManager().getThisNetworkNode().getIdentifier();
+        log.info("########### the node is: {}", currentNodeId);
+        if (!loginDialogUsername.trim().equals(currentNodeId)) {
+            String summary = "Login failed";
+            String detail = "Username or password were wrong";
+            addGlobalMessage(summary, detail, FacesMessage.SEVERITY_WARN);
+            return "false";
+        }
+        
+        log.info("########### tthis was the good node");
 
         String result = openfireLoginService.doLogin(loginDialogUsername, loginDialogPassword);
         if (result == null) {
@@ -197,4 +192,30 @@ public class LoginController extends BasePageController {
 		}
 		return new String(bytes);
 	}
+	
+	 public UserService getUserService() {
+	        return userService;
+	    }
+
+	    public void setUserService(UserService userService) {
+	        log.debug("setUserService() has been called with " + userService);
+	        this.userService = userService;
+	    }
+
+	    public OpenfireLoginService getOpenfireLoginService() {
+	        return openfireLoginService;
+	    }
+
+	    public void setOpenfireLoginService(OpenfireLoginService openfireLoginService) {
+	        log.debug("setOpenfireLoginService() has been called with " + openfireLoginService);
+	        this.openfireLoginService = openfireLoginService;
+	    }
+	    
+	    public ICommManager getCommManager() {
+			return commMngrRef;
+		}
+		public void setCommManager(ICommManager commManager) {
+			 log.info("#############setCommManager() has been called with");
+			this.commMngrRef = commMngrRef;
+		}
 }
