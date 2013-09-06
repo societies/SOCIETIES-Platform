@@ -83,13 +83,14 @@ public class UserAdminController {
 		// Create default admin account
 		if (!bAdminfound) {
 			DaUserRecord adminRecord = new DaUserRecord();
-			adminRecord.setName(commManager.getIdManager().getThisNetworkNode().getIdentifier());
+			String username = commManager.getIdManager().getDomainAuthorityNode().getIdentifier();
+			adminRecord.setName(username);
 			adminRecord.setPassword("defaultpassword");
 			adminRecord.setUserType("admin");
 			adminRecord.setStatus("active");
 			adminRecord.setHost(xmppDomain);
 			adminRecord.setPort("50000");
-			adminRecord.setId("admin."+xmppDomain);
+			adminRecord.setId(username+xmppDomain);
 			daRegistry.addXmppIdentityDetails(adminRecord);
 		}
 	}
