@@ -90,7 +90,7 @@ public class UserAdminController {
 			adminRecord.setStatus("active");
 			adminRecord.setHost(xmppDomain);
 			adminRecord.setPort("50000");
-			adminRecord.setId(username+xmppDomain);
+			adminRecord.setId(username+"."+xmppDomain);
 			daRegistry.addXmppIdentityDetails(adminRecord);
 		}
 	}
