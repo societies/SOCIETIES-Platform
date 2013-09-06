@@ -21,7 +21,7 @@ function retrieveParameters($input) {
 		$params['max'] = intval($minmax[1]);
 	}
 	$params['max'] = !empty($params['max']) ? $params['max'] : $params['min'];
-	$params['hostName'] = $input->getOption('hostname');
+	$params['hostname'] = $input->getOption('hostname');
 	$params['daNodeName'] = $input->getOption('daNodeName');
 	$params['daDbName'] = $input->getOption('daDbName');
 	$params['secretKey'] = $input->getOption('secretKey');
@@ -33,7 +33,16 @@ function retrieveParameters($input) {
 	if (!empty($globalUsernameList)) {
 		$params['globalUsernameList'] = explode(",", $globalUsernameList);
 	}
-	
+	$params['firstWebappPort'] = $input->getOption('firstWebappPort');
+	$globalWebappPortList = $input->getOption('webappPorts');
+	if (!empty($globalWebappPortList)) {
+		$params['globalWebappPortList'] = explode(",", $globalWebappPortList);
+	}
+	$params['firstXmppPort'] = $input->getOption('firstXmppPort');
+	$globalXmppPortList = $input->getOption('xmppPorts');
+	if (!empty($globalXmppPortList)) {
+		$params['globalXmppPortList'] = explode(",", $globalXmppPortList);
+	}
 	return $params;
 }
 function retrieveContainerParameters($generator, $params, $output) {
@@ -43,23 +52,19 @@ function retrieveContainerParameters($generator, $params, $output) {
 		$params['number'] = $i;
 		$generatedParameters[] = new Parameter($params);
 	}
-	$output->writeln('######################################');
-	$output->writeln('Computed parameters for the generation');
-	$output->writeln('######################################');
+	
+	$output->writeln('#######    ... Params ...     ########');
+	print_r($generatedParameters);
 	return $generatedParameters;
 }
 
 function generateContainers($generator, $params, $output) {
 	// -- Generate containers
-	$output->writeln('######### ... Generation ... #########');
+	$output->writeln('#######   ... Creation ...    ########');
 	$content = $generator->generate($params);
 	
 	// -- Create database (if required)
 	createDatabases($params, $output);
-	
-	$output->writeln('######################################');
-	$output->writeln('Ok: go to "gen/" folder');
-	$output->writeln('######################################');
 }
 
 function createDatabases($params, $output) {
@@ -150,11 +155,11 @@ function configureUsers($params, $output) {
 		$userType = 'user';
 		// Current node is the da node
 		if ($param->daNodeName == $param->userName) {
-			$username = 'admin';
-			$hostname = '';
-			$name = 'Administrator';
-			$password = 'Administrator';
-			$portNumber = '';
+			$username = $param->userName;
+			$hostname = $param->hostName;
+			$name = $param->userName;
+			$password = 'defaultpassword';
+			$portNumber = $param->portNumber;
 			$status = 'active';
 			$userType = 'admin';
 		}
@@ -207,9 +212,7 @@ function configureUsers($params, $output) {
 		}
 	}
 	
-	$output->writeln('######################################');
-	$output->writeln('Ok: user account(s) '.(!$isAlreadyThere ? 'created and ' : '').'configured');
-	$output->writeln('######################################');
+	$output->writeln('User account(s) '.(!$isAlreadyThere ? 'created and ' : '').'configured');
 }
 
 
@@ -234,6 +237,10 @@ any spaces). Default usernames are "user<container number>"'),
 		new InputOption('dbUsername', null, InputOption::VALUE_REQUIRED, 'Database username'),
 		new InputOption('dbPassword', null, InputOption::VALUE_REQUIRED, 'Database password'),
 		new InputOption('secretKey', null, InputOption::VALUE_REQUIRED, 'XMPP Openfire secret key'),
+		new InputOption('firstWebappPort', null, InputOption::VALUE_REQUIRED, 'Webapp port of the first container. It will be increased for each container. A redirect port is associated to each port, they are computed by adding 500 to each port. Default: 50000.'),
+		new InputOption('webappPorts', null, InputOption::VALUE_REQUIRED, 'List of ports, separated by a comma without blank spaces, for the Webapp. A redirect port is associated to each port, they are computed by adding 500 to each port.'),
+		new InputOption('firstXmppPort', null, InputOption::VALUE_REQUIRED, 'XMPP port of the first container. It will be increased for each container. Default: 60000.'),
+		new InputOption('xmppPorts', null, InputOption::VALUE_REQUIRED, 'List of ports, separated by a comma without blank spaces, for the XMPP.'),
 	))
 	->setCode(function (InputInterface $input, OutputInterface $output) {
 		// -- Retrieve Params
@@ -242,7 +249,6 @@ any spaces). Default usernames are "user<container number>"'),
 		// -- Init params
 		$generator = new VirgoGenerator();
 		$generatedParameters = retrieveContainerParameters($generator, $params, $output);
-		print_r($generatedParameters);
 		
 		// -- Generate and create DB
 		generateContainers($generator, $generatedParameters, $output);
@@ -268,6 +274,10 @@ any spaces). Default usernames are "user<container number>"'),
 		new InputOption('dbUsername', null, InputOption::VALUE_REQUIRED, 'Database username'),
 		new InputOption('dbPassword', null, InputOption::VALUE_REQUIRED, 'Database password'),
 		new InputOption('secretKey', null, InputOption::VALUE_REQUIRED, 'XMPP Openfire secret key'),
+		new InputOption('firstWebappPort', null, InputOption::VALUE_REQUIRED, 'Webapp port of the first container. It will be increased for each container. A redirect port is associated to each port, they are computed by adding 500 to each port. Default: 50000.'),
+		new InputOption('webappPorts', null, InputOption::VALUE_REQUIRED, 'List of ports, separated by a comma without blank spaces, for the Webapp. A redirect port is associated to each port, they are computed by adding 500 to each port.'),
+		new InputOption('firstXmppPort', null, InputOption::VALUE_REQUIRED, 'XMPP port of the first container. It will be increased for each container. Default: 60000.'),
+		new InputOption('xmppPorts', null, InputOption::VALUE_REQUIRED, 'List of ports, separated by a comma without blank spaces, for the XMPP.'),
 	))
 	->setCode(function (InputInterface $input, OutputInterface $output) {
 		// -- Retrieve Params
@@ -300,6 +310,10 @@ any spaces). Default usernames are "user<container number>"'),
 		new InputOption('dbUsername', null, InputOption::VALUE_REQUIRED, 'Database username'),
 		new InputOption('dbPassword', null, InputOption::VALUE_REQUIRED, 'Database password'),
 		new InputOption('secretKey', null, InputOption::VALUE_REQUIRED, 'XMPP Openfire secret key'),
+		new InputOption('firstWebappPort', null, InputOption::VALUE_REQUIRED, 'Webapp port of the first container. It will be increased for each container. A redirect port is associated to each port, they are computed by adding 500 to each port. Default: 50000.'),
+		new InputOption('webappPorts', null, InputOption::VALUE_REQUIRED, 'List of ports, separated by a comma without blank spaces, for the Webapp. A redirect port is associated to each port, they are computed by adding 500 to each port.'),
+		new InputOption('firstXmppPort', null, InputOption::VALUE_REQUIRED, 'XMPP port of the first container. It will be increased for each container. Default: 60000.'),
+		new InputOption('xmppPorts', null, InputOption::VALUE_REQUIRED, 'List of ports, separated by a comma without blank spaces, for the XMPP.'),
 	))
 	->setCode(function (InputInterface $input, OutputInterface $output) {
 		// -- Retrieve Params
