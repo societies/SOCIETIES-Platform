@@ -59,10 +59,8 @@ public class LoginController extends BasePageController {
             return "false";
         }
         
-        log.info("########### need to check this is the good node");
         
         String currentNodeId = openfireLoginService.getCommManager().getIdManager().getThisNetworkNode().getIdentifier();
-        log.info("########### the node is: {}", currentNodeId);
         if (!loginDialogUsername.trim().equals(currentNodeId)) {
             String summary = "Login failed";
             String detail = "Username or password were wrong";
@@ -70,7 +68,6 @@ public class LoginController extends BasePageController {
             return "false";
         }
         
-        log.info("########### tthis was the good node");
 
         String result = openfireLoginService.doLogin(loginDialogUsername, loginDialogPassword);
         if (result == null) {
