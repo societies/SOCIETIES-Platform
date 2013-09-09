@@ -33,6 +33,7 @@ import org.societies.android.api.css.manager.IServiceManager;
 import org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient;
 import org.societies.android.privacytrust.trust.container.TestServiceTrustClientLocal;
 import org.societies.android.privacytrust.trust.container.TestServiceTrustClientLocal.LocalTrustClientBinder;
+import org.societies.api.schema.privacytrust.trust.broker.TrustQueryBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustRelationshipBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustValueTypeBean;
@@ -62,7 +63,6 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 	private static final String TEST_TRUSTOR_ID = "university.ict-societies.eu"; // MUST MATCH THE CLOUD NODE!
 	private static final String TEST_TRUSTEE_ID = "bob.societies.local"; // ANY STRING WILL DO 
 	private static final String TEST_TRUSTEE_ID2 = "arthur.societies.local"; // ANY STRING WILL DO
-	private static final double TEST_TRUST_RATING = 1.0d;
 	private static final double TEST_TRUST_VALUE_THRESHOLD = 0.4d;
 
 	/** The IIinternalTrustClient service reference. */
@@ -131,8 +131,8 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 		Log.d(TAG, "testAddDirectTrustEvidence start time: " + this.testStartTime);
 		try {
 			this.trustClient.addDirectTrustEvidence(CLIENT, 
-					subjectId, objectId, TrustEvidenceTypeBean.RATED,
-					new ADate(new Date()), new Double(TEST_TRUST_RATING));
+					subjectId, objectId, TrustEvidenceTypeBean.SHARED_CONTEXT,
+					new ADate(new Date()), null);
 		} catch (Exception e) {
 			Log.e(TAG, "Failed to add direct trust evidence: " + e.getLocalizedMessage(), e);
 		}
@@ -156,6 +156,9 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 		trustorId.setEntityId(TEST_TRUSTOR_ID);
 		trustorId.setEntityType(TrustedEntityTypeBean.CSS);
 		
+		final TrustQueryBean query = new TrustQueryBean();
+		query.setTrustorId(trustorId);
+		
 		// setup expected result
 		this.expectedTrustRelationships = new TrustRelationshipBean[2];
 		// DIRECT with TEST_TRUSTEE
@@ -166,18 +169,17 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 		trusteeId.setEntityType(TrustedEntityTypeBean.CSS);
 		this.expectedTrustRelationships[0].setTrusteeId(trusteeId);
 		this.expectedTrustRelationships[0].setTrustValueType(TrustValueTypeBean.DIRECT);
-		this.expectedTrustRelationships[0].setTrustValue(new Double(TEST_TRUST_VALUE_THRESHOLD));
+		this.expectedTrustRelationships[0].setTrustValue(Double.valueOf(TEST_TRUST_VALUE_THRESHOLD));
 		// USER_PERCEIVED with TEST_TRUSTEE
 		this.expectedTrustRelationships[1] = new TrustRelationshipBean();
 		this.expectedTrustRelationships[1].setTrustorId(trustorId);
 		this.expectedTrustRelationships[1].setTrusteeId(trusteeId);
 		this.expectedTrustRelationships[1].setTrustValueType(TrustValueTypeBean.USER_PERCEIVED);
-		this.expectedTrustRelationships[1].setTrustValue(new Double(TEST_TRUST_VALUE_THRESHOLD));
+		this.expectedTrustRelationships[1].setTrustValue(Double.valueOf(TEST_TRUST_VALUE_THRESHOLD));
 
 		Log.d(TAG, "testRetrieveTrustRelationshipsByTrustor start time: " + this.testStartTime);
 		try {
-			this.trustClient.retrieveTrustRelationships(CLIENT,
-					trustorId);
+			this.trustClient.retrieveTrustRelationships(CLIENT, query);
 		} catch (Exception e) {
 			Log.e(TAG, "Failed to retrieve trust relationships: " + e.getLocalizedMessage(), e);
 		}
@@ -206,6 +208,10 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 		trusteeId.setEntityId(TEST_TRUSTEE_ID);
 		trusteeId.setEntityType(TrustedEntityTypeBean.CSS);
 		
+		final TrustQueryBean query = new TrustQueryBean();
+		query.setTrustorId(trustorId);
+		query.setTrusteeId(trusteeId);
+		
 		// setup expected result
 		this.expectedTrustRelationships = new TrustRelationshipBean[2];
 		// DIRECT with TEST_TRUSTEE
@@ -213,18 +219,17 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 		this.expectedTrustRelationships[0].setTrustorId(trustorId);
 		this.expectedTrustRelationships[0].setTrusteeId(trusteeId);
 		this.expectedTrustRelationships[0].setTrustValueType(TrustValueTypeBean.DIRECT);
-		this.expectedTrustRelationships[0].setTrustValue(new Double(TEST_TRUST_VALUE_THRESHOLD));
+		this.expectedTrustRelationships[0].setTrustValue(Double.valueOf(TEST_TRUST_VALUE_THRESHOLD));
 		// USER_PERCEIVED with TEST_TRUSTEE
 		this.expectedTrustRelationships[1] = new TrustRelationshipBean();
 		this.expectedTrustRelationships[1].setTrustorId(trustorId);
 		this.expectedTrustRelationships[1].setTrusteeId(trusteeId);
 		this.expectedTrustRelationships[1].setTrustValueType(TrustValueTypeBean.USER_PERCEIVED);
-		this.expectedTrustRelationships[1].setTrustValue(new Double(TEST_TRUST_VALUE_THRESHOLD));
+		this.expectedTrustRelationships[1].setTrustValue(Double.valueOf(TEST_TRUST_VALUE_THRESHOLD));
 
 		Log.d(TAG, "testRetrieveTrustRelationshipsByTrustorAndTrustee start time: " + this.testStartTime);
 		try {
-			this.trustClient.retrieveTrustRelationships(CLIENT, 
-					trustorId, trusteeId);
+			this.trustClient.retrieveTrustRelationships(CLIENT, query);
 		} catch (Exception e) {
 			Log.e(TAG, "Failed to retrieve trust relationships: " + e.getLocalizedMessage(), e);
 		}
@@ -248,13 +253,16 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 		trusteeId.setEntityId(TEST_TRUSTEE_ID2);
 		trusteeId.setEntityType(TrustedEntityTypeBean.CSS);
 		
+		final TrustQueryBean query = new TrustQueryBean();
+		query.setTrustorId(trustorId);
+		query.setTrusteeId(trusteeId);
+		
 		// setup expected result
 		this.expectedTrustRelationships = new TrustRelationshipBean[0];
 
 		Log.d(TAG, "testRetrieveEmptyTrustRelationshipsByTrustorAndTrustee start time: " + this.testStartTime);
 		try {
-			this.trustClient.retrieveTrustRelationships(CLIENT, 
-					trustorId, trusteeId);
+			this.trustClient.retrieveTrustRelationships(CLIENT, query);
 		} catch (Exception e) {
 			Log.e(TAG, "Failed to retrieve trust relationships: " + e.getLocalizedMessage(), e);
 		}
@@ -286,18 +294,22 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 		final TrustValueTypeBean trustValueType =
 				TrustValueTypeBean.USER_PERCEIVED;
 		
+		final TrustQueryBean query = new TrustQueryBean();
+		query.setTrustorId(trustorId);
+		query.setTrusteeId(trusteeId);
+		query.setTrustValueType(trustValueType);
+		
 		// setup expected result
 		this.expectedTrustRelationship = new TrustRelationshipBean();
 		// USER_PERCEIVED with TEST_TRUSTEE
 		this.expectedTrustRelationship.setTrustorId(trustorId);
 		this.expectedTrustRelationship.setTrusteeId(trusteeId);
 		this.expectedTrustRelationship.setTrustValueType(trustValueType);
-		this.expectedTrustRelationship.setTrustValue(new Double(TEST_TRUST_VALUE_THRESHOLD));
+		this.expectedTrustRelationship.setTrustValue(Double.valueOf(TEST_TRUST_VALUE_THRESHOLD));
 
 		Log.d(TAG, "testRetrieveTrustRelationship start time: " + this.testStartTime);
 		try {
-			this.trustClient.retrieveTrustRelationship(CLIENT, 
-					trustorId, trusteeId, trustValueType);
+			this.trustClient.retrieveTrustRelationship(CLIENT, query);
 		} catch (Exception e) {
 			Log.e(TAG, "Failed to retrieve trust relationship: " + e.getLocalizedMessage(), e);
 		}
@@ -324,13 +336,17 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 		final TrustValueTypeBean trustValueType =
 				TrustValueTypeBean.INDIRECT;
 		
+		final TrustQueryBean query = new TrustQueryBean();
+		query.setTrustorId(trustorId);
+		query.setTrusteeId(trusteeId);
+		query.setTrustValueType(trustValueType);
+		
 		// setup expected result
 		this.expectedTrustRelationship = null;
 
 		Log.d(TAG, "testRetrieveNullTrustRelationship start time: " + this.testStartTime);
 		try {
-			this.trustClient.retrieveTrustRelationship(CLIENT, 
-					trustorId, trusteeId, trustValueType);
+			this.trustClient.retrieveTrustRelationship(CLIENT, query);
 		} catch (Exception e) {
 			Log.e(TAG, "Failed to retrieve trust relationship: " + e.getLocalizedMessage(), e);
 		}
@@ -361,11 +377,15 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 		
 		final TrustValueTypeBean trustValueType =
 				TrustValueTypeBean.USER_PERCEIVED;
+		
+		final TrustQueryBean query = new TrustQueryBean();
+		query.setTrustorId(trustorId);
+		query.setTrusteeId(trusteeId);
+		query.setTrustValueType(trustValueType);
 
 		Log.d(TAG, "testRetrieveTrustValue start time: " + this.testStartTime);
 		try {
-			this.trustClient.retrieveTrustValue(CLIENT, 
-					trustorId, trusteeId, trustValueType);
+			this.trustClient.retrieveTrustValue(CLIENT, query);
 		} catch (Exception e) {
 			Log.e(TAG, "Failed to retrieve trust value: " + e.getLocalizedMessage(), e);
 		}
@@ -392,6 +412,10 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 		final TrustedEntityTypeBean trusteeType =
 				TrustedEntityTypeBean.CSS;
 		
+		final TrustQueryBean query = new TrustQueryBean();
+		query.setTrustorId(trustorId);
+		query.setTrusteeType(trusteeType);
+		
 		// setup expected result
 		this.expectedTrustRelationships = new TrustRelationshipBean[2];
 		// DIRECT with TEST_TRUSTEE
@@ -402,18 +426,17 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 		trusteeId.setEntityType(trusteeType);
 		this.expectedTrustRelationships[0].setTrusteeId(trusteeId);
 		this.expectedTrustRelationships[0].setTrustValueType(TrustValueTypeBean.DIRECT);
-		this.expectedTrustRelationships[0].setTrustValue(new Double(TEST_TRUST_VALUE_THRESHOLD));
+		this.expectedTrustRelationships[0].setTrustValue(Double.valueOf(TEST_TRUST_VALUE_THRESHOLD));
 		// USER_PERCEIVED with TEST_TRUSTEE
 		this.expectedTrustRelationships[1] = new TrustRelationshipBean();
 		this.expectedTrustRelationships[1].setTrustorId(trustorId);
 		this.expectedTrustRelationships[1].setTrusteeId(trusteeId);
 		this.expectedTrustRelationships[1].setTrustValueType(TrustValueTypeBean.USER_PERCEIVED);
-		this.expectedTrustRelationships[1].setTrustValue(new Double(TEST_TRUST_VALUE_THRESHOLD));
+		this.expectedTrustRelationships[1].setTrustValue(Double.valueOf(TEST_TRUST_VALUE_THRESHOLD));
 
 		Log.d(TAG, "testRetrieveTrustRelationshipsByTrustorAndTrusteeType start time: " + this.testStartTime);
 		try {
-			this.trustClient.retrieveTrustRelationships(CLIENT, 
-					trustorId, trusteeType);
+			this.trustClient.retrieveTrustRelationships(CLIENT, query);
 		} catch (Exception e) {
 			Log.e(TAG, "Failed to retrieve trust relationships: " + e.getLocalizedMessage(), e);
 		}
@@ -440,6 +463,10 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 		final TrustValueTypeBean trustValueType =
 				TrustValueTypeBean.DIRECT;
 		
+		final TrustQueryBean query = new TrustQueryBean();
+		query.setTrustorId(trustorId);
+		query.setTrustValueType(trustValueType);
+		
 		// setup expected result
 		this.expectedTrustRelationships = new TrustRelationshipBean[1];
 		// DIRECT with TEST_TRUSTEE
@@ -450,12 +477,11 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 		trusteeId.setEntityType(TrustedEntityTypeBean.CSS);
 		this.expectedTrustRelationships[0].setTrusteeId(trusteeId);
 		this.expectedTrustRelationships[0].setTrustValueType(trustValueType);
-		this.expectedTrustRelationships[0].setTrustValue(new Double(TEST_TRUST_VALUE_THRESHOLD));
+		this.expectedTrustRelationships[0].setTrustValue(Double.valueOf(TEST_TRUST_VALUE_THRESHOLD));
 
 		Log.d(TAG, "testRetrieveTrustRelationshipsByTrustorAndTrustValueType start time: " + this.testStartTime);
 		try {
-			this.trustClient.retrieveTrustRelationships(CLIENT, 
-					trustorId, trustValueType);
+			this.trustClient.retrieveTrustRelationships(CLIENT, query);
 		} catch (Exception e) {
 			Log.e(TAG, "Failed to retrieve trust relationships: " + e.getLocalizedMessage(), e);
 		}
@@ -485,6 +511,11 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 		final TrustValueTypeBean trustValueType =
 				TrustValueTypeBean.DIRECT;
 		
+		final TrustQueryBean query = new TrustQueryBean();
+		query.setTrustorId(trustorId);
+		query.setTrusteeType(trusteeType);
+		query.setTrustValueType(trustValueType);
+		
 		// setup expected result
 		this.expectedTrustRelationships = new TrustRelationshipBean[1];
 		// DIRECT with TEST_TRUSTEE
@@ -495,12 +526,11 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 		trusteeId.setEntityType(trusteeType);
 		this.expectedTrustRelationships[0].setTrusteeId(trusteeId);
 		this.expectedTrustRelationships[0].setTrustValueType(trustValueType);
-		this.expectedTrustRelationships[0].setTrustValue(new Double(TEST_TRUST_VALUE_THRESHOLD));
+		this.expectedTrustRelationships[0].setTrustValue(Double.valueOf(TEST_TRUST_VALUE_THRESHOLD));
 
 		Log.d(TAG, "testRetrieveTrustRelationshipsByTrustorAndTrusteeTypeAndTrustValueType start time: " + this.testStartTime);
 		try {
-			this.trustClient.retrieveTrustRelationships(CLIENT, 
-					trustorId, trusteeType, trustValueType);
+			this.trustClient.retrieveTrustRelationships(CLIENT, query);
 		} catch (Exception e) {
 			Log.e(TAG, "Failed to retrieve trust relationships: " + e.getLocalizedMessage(), e);
 		}
@@ -658,7 +688,7 @@ public class TestInternalTrustClient extends ServiceTestCase<TestServiceTrustCli
 				Log.d(TAG, "Retrieved trust value: " + trustValue);
 				assertNotNull(trustValue);
 				assertFalse(trustValue.equals(defaultTrustValue));
-				assertTrue(trustValue > new Double(TEST_TRUST_VALUE_THRESHOLD));
+				assertTrue(trustValue > Double.valueOf(TEST_TRUST_VALUE_THRESHOLD));
 
 			} else if (intent.getAction().equals(IInternalTrustClient.ADD_DIRECT_TRUST_EVIDENCE)) {
 
