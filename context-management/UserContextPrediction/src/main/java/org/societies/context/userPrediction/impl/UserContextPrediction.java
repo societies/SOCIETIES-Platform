@@ -610,7 +610,8 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 			situation.put(CtxAttributeTypes.ACTION, activityValue);
 
 			String prdValue = this.predictContextTraining(type, situation);
-
+			
+			LOG.debug("predicted string Value: "+ prdValue);
 			predictedCtxAttr.setStringValue(prdValue);
 
 

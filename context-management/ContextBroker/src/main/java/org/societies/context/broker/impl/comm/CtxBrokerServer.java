@@ -26,8 +26,11 @@ package org.societies.context.broker.impl.comm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +42,7 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.context.broker.CtxAccessControlException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
@@ -57,6 +61,7 @@ import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerRequestBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerResponseBean;
+import org.societies.api.schema.context.model.CtxAttributeBean;
 import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
 import org.societies.api.schema.context.model.CtxIdentifierBean;
 import org.societies.api.schema.context.model.CtxModelObjectBean;
@@ -80,16 +85,16 @@ public class CtxBrokerServer implements IFeatureServer{
 			"org.societies.api.schema.identity",
 			"org.societies.api.schema.context.model",
 			"org.societies.api.schema.context.contextmanagement");
-	
+
 	private static final String[] EVENT_TYPES = { EventTypes.CIS_CREATION, EventTypes.CIS_RESTORE };
 
 	private ICommManager commManager;
-	
+
 	private ICISCommunicationMgrFactory commMgrFactory;
 
 	@Autowired(required=true)
 	private CtxBroker ctxbroker;
-	
+
 	/** The Context Event Mgmt service reference. TODO remove once pubsub persistence is enabled. */
 	private ICtxEventMgr ctxEventMgr;
 
@@ -97,7 +102,7 @@ public class CtxBrokerServer implements IFeatureServer{
 	public CtxBrokerServer(ICommManager commManager, 
 			ICISCommunicationMgrFactory commMgrFactory, IEventMgr eventMgr, ICtxEventMgr ctxEventMgr)
 					throws Exception {
-		
+
 		LOG.info("{} instantiated", this.getClass());
 		this.commManager = commManager;
 		this.commMgrFactory = commMgrFactory;
@@ -141,10 +146,10 @@ public class CtxBrokerServer implements IFeatureServer{
 			LOG.error("CtxBrokerRequestBean.getMethod() can't be null");
 			throw new XMPPError(StanzaError.bad_request, "CtxBrokerRequestBean.getMethod() can't be null");
 		}
-		
+
 		final CtxBrokerResponseBean beanResponse = new CtxBrokerResponseBean();
 		beanResponse.setMethod(cbPayload.getMethod());
-		
+
 		LOG.debug("getQuery: method={}", cbPayload.getMethod());
 		switch (cbPayload.getMethod()) {
 
@@ -176,7 +181,7 @@ public class CtxBrokerServer implements IFeatureServer{
 				throw new XMPPError(StanzaError.internal_server_error, e.getLocalizedMessage(), null);
 			} 
 			break;
-			
+
 		case CREATE_ATTRIBUTE:
 
 			try {
@@ -190,11 +195,11 @@ public class CtxBrokerServer implements IFeatureServer{
 								cbPayload.getCreateAttribute().getScope());
 				// 3. type
 				final String type = cbPayload.getCreateAttribute().getType();
-				
+
 				// request
 				final CtxAttribute ctxAttribute = this.ctxbroker.createAttribute(
 						requestor, scope, type).get();
-				
+
 				// response
 				if (ctxAttribute != null) {
 					beanResponse.setCreateAttributeBeanResult(CtxModelBeanTranslator.getInstance()
@@ -225,7 +230,7 @@ public class CtxBrokerServer implements IFeatureServer{
 				// request
 				final CtxAssociation ctxAssociation = this.ctxbroker.createAssociation(
 						requestor, target, type).get();
-				
+
 				// response
 				if (ctxAssociation != null) {
 					beanResponse.setCreateAssociationBeanResult(CtxModelBeanTranslator.getInstance()
@@ -267,7 +272,7 @@ public class CtxBrokerServer implements IFeatureServer{
 				throw new XMPPError(StanzaError.internal_server_error, e.getLocalizedMessage(), null);
 			}
 			break;
-			
+
 		case RETRIEVE_INDIVIDUAL_ENTITY_ID:
 
 			try {
@@ -278,7 +283,7 @@ public class CtxBrokerServer implements IFeatureServer{
 				// 2. cssId (required)
 				final String cssIdString = cbPayload.getRetrieveIndividualEntityId().getTargetCss();
 				final IIdentity cssId = this.commManager.getIdManager().fromJid(cssIdString);
-				
+
 				// request
 				final CtxEntityIdentifier indCtxEntId = this.ctxbroker.retrieveIndividualEntityId(
 						requestor, cssId).get();
@@ -295,7 +300,7 @@ public class CtxBrokerServer implements IFeatureServer{
 				throw new XMPPError(StanzaError.internal_server_error, e.getLocalizedMessage(), null);
 			}
 			break;
-			
+
 		case RETRIEVE_COMMUNITY_ENTITY_ID:
 
 			try {
@@ -306,7 +311,7 @@ public class CtxBrokerServer implements IFeatureServer{
 				// 2. cisId (required)
 				final String cisIdString = cbPayload.getRetrieveCommunityEntityId().getTarget();
 				final IIdentity cisId = this.commManager.getIdManager().fromJid(cisIdString);
-				
+
 				// request
 				final CtxEntityIdentifier communityCtxEntId = 
 						this.ctxbroker.retrieveCommunityEntityId(requestor, cisId).get();
@@ -348,7 +353,7 @@ public class CtxBrokerServer implements IFeatureServer{
 				throw new XMPPError(StanzaError.internal_server_error, e.getLocalizedMessage(), null);
 			}
 			break;
-			
+
 		case REMOVE:
 
 			try {
@@ -364,7 +369,7 @@ public class CtxBrokerServer implements IFeatureServer{
 
 				final CtxModelObjectBean removedModelObjectBean = (removedModelObject != null)  
 						? CtxModelBeanTranslator.getInstance().fromCtxModelObject(removedModelObject) : null;
-				beanResponse.setRemoveBeanResult(removedModelObjectBean);
+						beanResponse.setRemoveBeanResult(removedModelObjectBean);
 
 			} catch (CtxAccessControlException cace) {
 				LOG.error("Failed to remove context model object: " + cace.getLocalizedMessage(), cace);
@@ -376,7 +381,7 @@ public class CtxBrokerServer implements IFeatureServer{
 				throw new XMPPError(StanzaError.internal_server_error, e.getLocalizedMessage(), null);
 			}
 			break;
-			
+
 		case LOOKUP:
 
 			try {
@@ -390,26 +395,26 @@ public class CtxBrokerServer implements IFeatureServer{
 				// 3. modelType (optional)
 				final CtxModelType modelType = (cbPayload.getLookup().getModelType() != null)
 						? CtxModelBeanTranslator.getInstance().ctxModelTypeFromCtxModelTypeBean(cbPayload.getLookup().getModelType())
-						: null;
-				// 4. type (required)
-				final String type = cbPayload.getLookup().getType();
-				
-				// request
-				final List<CtxIdentifier> lookupResult = (modelType != null)
-						? this.ctxbroker.lookup(requestor, target, modelType, type).get()
-						: this.ctxbroker.lookup(requestor, target, type).get();
-				LOG.debug("lookupResult={}", lookupResult);
-				
-				// response bean
-				if (lookupResult.size() > 0) {
-					final List<CtxIdentifierBean> lookupResultBean = new ArrayList<CtxIdentifierBean>(); 
-					for (final CtxIdentifier identifier : lookupResult) {
-						final CtxIdentifierBean ctxIdBean = 
-								CtxModelBeanTranslator.getInstance().fromCtxIdentifier(identifier);
-						lookupResultBean.add(ctxIdBean);
-					}
-					beanResponse.setCtxBrokerLookupBeanResult(lookupResultBean);
-				}
+								: null;
+						// 4. type (required)
+						final String type = cbPayload.getLookup().getType();
+
+						// request
+						final List<CtxIdentifier> lookupResult = (modelType != null)
+								? this.ctxbroker.lookup(requestor, target, modelType, type).get()
+										: this.ctxbroker.lookup(requestor, target, type).get();
+								LOG.debug("lookupResult={}", lookupResult);
+
+								// response bean
+								if (lookupResult.size() > 0) {
+									final List<CtxIdentifierBean> lookupResultBean = new ArrayList<CtxIdentifierBean>(); 
+									for (final CtxIdentifier identifier : lookupResult) {
+										final CtxIdentifierBean ctxIdBean = 
+												CtxModelBeanTranslator.getInstance().fromCtxIdentifier(identifier);
+										lookupResultBean.add(ctxIdBean);
+									}
+									beanResponse.setCtxBrokerLookupBeanResult(lookupResultBean);
+								}
 
 			} catch (Exception e) {
 				LOG.error("Failed to perform lookup: " + e.getLocalizedMessage(), e);
@@ -434,12 +439,12 @@ public class CtxBrokerServer implements IFeatureServer{
 						.ctxModelTypeFromCtxModelTypeBean(cbPayload.getLookupByScope().getModelType());
 				// 4. type (required)
 				final String type = cbPayload.getLookupByScope().getType();
-				
+
 				// request
 				final List<CtxIdentifier> lookupResult = this.ctxbroker.lookup(
 						requestor, scope, modelType, type).get();
 				LOG.debug("lookupResult={}", lookupResult);
-				
+
 				// response bean
 				if (lookupResult.size() > 0) {
 					final List<CtxIdentifierBean> lookupResultBean = new ArrayList<CtxIdentifierBean>(); 
@@ -458,11 +463,59 @@ public class CtxBrokerServer implements IFeatureServer{
 			}
 			break;
 
+		case RETRIEVE_FUTURE:
+
+			try {
+				// 1. requestor
+				final RequestorBean requestorBean = cbPayload.getRetrieveFuture().getRequestor();
+
+				final Requestor requestor = RequestorUtils.toRequestor(
+						requestorBean, this.commManager.getIdManager());
+
+				// 2. attrID 
+				final CtxIdentifier ctxId = CtxModelBeanTranslator.getInstance().fromCtxIdentifierBean( 
+						cbPayload.getRetrieveFuture().getAttrId());
+
+
+
+				CtxAttributeIdentifier attrID = null;
+				Date date = null;
+
+				if(ctxId instanceof CtxAttributeIdentifier ){
+					attrID = (CtxAttributeIdentifier) ctxId;
+					XMLGregorianCalendar cal = cbPayload.getRetrieveFuture().getDate();
+					date = cal.toGregorianCalendar().getTime();
+				}
+
+				// request
+				final List<CtxAttribute> predictedAttsList = this.ctxbroker.retrieveFuture(requestor, 
+						attrID, date ).get();
+
+				List<CtxAttributeBean> predictedAttsListBean = new ArrayList<CtxAttributeBean>();
+
+				// response
+				// convert predictedAttsList to bean 
+				if (predictedAttsList.size() > 0 ) {
+
+					for(CtxAttribute attr : predictedAttsList ){
+
+						CtxAttributeBean attrBean = CtxModelBeanTranslator.getInstance().fromCtxAttribute(attr);
+						predictedAttsListBean.add(attrBean);
+					}					
+					beanResponse.setRetrieveFutureBeanResult(predictedAttsListBean);
+				}
+
+			} catch (Exception e) {
+				LOG.error("Failed to retrieve future attribute: " + e.getLocalizedMessage(), e);
+				// TODO send application error when supported
+				throw new XMPPError(StanzaError.internal_server_error, e.getLocalizedMessage(), null);
+			}
+			break;
 		default: 
 			throw new XMPPError(StanzaError.feature_not_implemented, 
 					"Unsupported remote context method: " + cbPayload.getMethod());
 		}
-		
+
 		LOG.debug("getQuery: beanResponse={}", beanResponse);
 		return beanResponse;
 	}
@@ -472,7 +525,7 @@ public class CtxBrokerServer implements IFeatureServer{
 	 */
 	@Override
 	public List<String> getXMLNamespaces() {
-		
+
 		return NAMESPACES;
 	}
 
@@ -481,7 +534,7 @@ public class CtxBrokerServer implements IFeatureServer{
 	 */
 	@Override
 	public List<String> getJavaPackages() {
-		
+
 		return PACKAGES;
 	}
 
@@ -510,7 +563,7 @@ public class CtxBrokerServer implements IFeatureServer{
 		 */
 		@Override
 		public void handleExternalEvent(CSSEvent event) {
-		
+
 			if (LOG.isWarnEnabled())
 				LOG.warn("Received unexpected external '" + event.geteventType() + "' event: " + event);
 		}
@@ -520,13 +573,13 @@ public class CtxBrokerServer implements IFeatureServer{
 		 */
 		@Override
 		public void handleInternalEvent(InternalEvent event) {
-			
+
 			if (LOG.isDebugEnabled())
 				LOG.debug("Received internal event: " + this.eventToString(event));
-			
+
 			if (EventTypes.CIS_CREATION.equals(event.geteventType())
 					|| EventTypes.CIS_RESTORE.equals(event.geteventType())) {
-				
+
 				if (!(event.geteventInfo() instanceof Community)) {
 
 					LOG.error("Could not handle internal " + event.geteventType() + " event: " 
@@ -554,21 +607,21 @@ public class CtxBrokerServer implements IFeatureServer{
 									+ "' for CIS " + cisId);
 						ctxEventMgr.createTopics(cisId, InternalCtxBroker.EVENT_TOPICS);
 					}
-				
+
 				} catch (Exception e) {
 					LOG.error("Could not register CtxBrokerServer to Comms Manager for CIS '" 
 							+ cisIdStr + "': " + e.getLocalizedMessage(), e);
 				}
-				
+
 			} else {
-				
+
 				if (LOG.isWarnEnabled())
 					LOG.warn("Received unexpected event of type '" + event.geteventType() + "'");
 			}
 		}
-		
+
 		private String eventToString(final InternalEvent event) {
-			
+
 			final StringBuffer sb = new StringBuffer();
 			sb.append("[");
 			sb.append("name=");
@@ -583,7 +636,7 @@ public class CtxBrokerServer implements IFeatureServer{
 			sb.append("info=");
 			sb.append(event.geteventInfo());
 			sb.append("]");
-			
+
 			return sb.toString();
 		}
 	}

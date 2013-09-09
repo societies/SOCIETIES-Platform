@@ -67,4 +67,6 @@ public interface ICtxCallback {
 	public void onRemovedModelObject(CtxModelObject ctxObj);
 	
 	public void onLookupCallback(List<CtxIdentifier> ctxIdsList);
+	
+	public void onRetrieveFutureCtx(List<CtxAttribute> ctxAttrList);
 }

@@ -93,6 +93,7 @@ import org.societies.context.broker.impl.comm.callbacks.LookupCallback;
 import org.societies.context.broker.impl.comm.callbacks.RemoveCtxCallback;
 import org.societies.context.broker.impl.comm.callbacks.RetrieveCommunityEntityIdCallback;
 import org.societies.context.broker.impl.comm.callbacks.RetrieveCtxCallback;
+import org.societies.context.broker.impl.comm.callbacks.RetrieveFutureCtxCallback;
 import org.societies.context.broker.impl.comm.callbacks.RetrieveIndividualEntCallback;
 import org.societies.context.broker.impl.comm.callbacks.UpdateCtxCallback;
 import org.societies.context.broker.impl.util.CtxBrokerUtils;
@@ -1118,54 +1119,19 @@ public class InternalCtxBroker implements ICtxBroker {
 	public Future<List<CtxAttribute>> retrieveFuture(
 			CtxAttributeIdentifier attrId, Date date) throws CtxException {
 
-		LOG.debug("retrieveFuture: attrId={}, date={}", attrId, date);
-
-		final IIdentity target = this.extractIIdentity(attrId);
-		this.logRequest(null, target);
-
-		final List<CtxAttribute> result = new ArrayList<CtxAttribute>();
-
-		if (this.isLocalId(target)) {
-			
-			// L O C A L
-			if (IdentityType.CIS != target.getType()) { 
-				// U S E R
-				result.add(this.userCtxInferenceMgr.predictContext(attrId, date));
-			} else { 
-				// C O M M U N I T Y
-				result.add(this.communityCtxInferenceMgr.predictContext(attrId, date));
-			}
-		}
-		
-		LOG.debug("retrieveFuture: result={}", result);
-		return new AsyncResult<List<CtxAttribute>>(result);
+	LOG.debug("retrieveFuture internal method ");
+		final Requestor requestor = this.getLocalRequestor();
+		return this.retrieveFuture(requestor, attrId,date );
 	}
+
 
 	@Override
 	@Async
 	public Future<List<CtxAttribute>> retrieveFuture(
 			CtxAttributeIdentifier attrId, int modificationIndex) throws CtxException {
 
-		LOG.debug("retrieveFuture: attrId={}, modificationIndex={}", attrId, modificationIndex);
-
-		final IIdentity target = this.extractIIdentity(attrId);
-
-		this.logRequest(null, target);
-
-		final List<CtxAttribute> result = new ArrayList<CtxAttribute>();
-
-		Date date = new Date();
-
-		try {
-			result.addAll(this.retrieveFuture(attrId, date).get());
-
-		} catch (Exception e) {
-			LOG.error("Exception on predicting context attribute :"+attrId+".  "+ e.getLocalizedMessage());
-			e.printStackTrace();
-		} 
-
-		LOG.debug("retrieveFuture: result={}", result);
-		return new AsyncResult<List<CtxAttribute>>(result);
+		final Requestor requestor = this.getLocalRequestor();
+		return this.retrieveFuture(requestor, attrId,modificationIndex );
 	}
 
 	//***********************************************
@@ -1291,12 +1257,12 @@ public class InternalCtxBroker implements ICtxBroker {
 		//final String tupleAttrType = "tupleIds_" + primaryAttrIdentifier.toString();
 
 		final String tupleAttrType = "tuple_"+primaryAttrIdentifier.getType().toString()+"_"+primaryAttrIdentifier.getObjectNumber().toString();
-		
+
 		List<CtxIdentifier> ls;
 		try {
 			//ls = this.lookup(CtxModelType.ATTRIBUTE, tupleAttrType).get();
 			ls = this.lookup(primaryAttrIdentifier.getScope(), CtxModelType.ATTRIBUTE, tupleAttrType).get();
-			
+
 			if (ls.size() > 0) {
 				CtxIdentifier id = ls.get(0);
 				final CtxAttribute tupleIdsAttribute = (CtxAttribute) this.userCtxDBMgr.retrieve(id);
@@ -1309,7 +1275,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			LOG.error("Exception when trying to get the history tuples identifiers for attrID: "+primaryAttrIdentifier+". "+e.getLocalizedMessage());
 			e.printStackTrace();
 		} 
-		
+
 		return new AsyncResult<List<CtxAttributeIdentifier>>(tupleAttrIDs);
 	}
 
@@ -1380,7 +1346,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			LOG.error("Exception when trying to updateHistoryTuples for attrID: "+primaryAttrIdentifier+". "+e.getLocalizedMessage());
 			e.printStackTrace();
 		} 
-		
+
 
 		return new AsyncResult<List<CtxAttributeIdentifier>>(results);
 	}
@@ -1392,7 +1358,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			Date startDate, Date endDate) {
 
 		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> tupleResults = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
-		
+
 		try {
 			IIdentity localID = this.getLocalIdentity();
 
@@ -1482,7 +1448,7 @@ public class InternalCtxBroker implements ICtxBroker {
 
 						// list of historic attributes contained in "tuple_status" retrieved
 						//LOG.info("retrieveHistoryTuples tupleValueList: "+tupleValueList);
-						
+
 						//for each historic attr 
 						for (CtxHistoryAttribute tupledHoCAttrTemp : tupleValueList){
 							//the key , primary historic attribute
@@ -2387,6 +2353,7 @@ public class InternalCtxBroker implements ICtxBroker {
 	}
 
 	@Override
+	@Async
 	public Future<CtxEntityIdentifier> retrieveCommunityEntityId(
 			final Requestor requestor, final IIdentity cisId) throws CtxException {
 
@@ -2435,31 +2402,67 @@ public class InternalCtxBroker implements ICtxBroker {
 		return new AsyncResult<CtxEntityIdentifier>(result);
 	}
 
+	
+	
 	@Override
+	@Async
 	public Future<List<CtxAttribute>> retrieveFuture(Requestor requestor,
 			CtxAttributeIdentifier attrId, Date date) throws CtxException {
 
+		if (requestor == null) {
+			throw new NullPointerException("requestor can't be null");
+		}
+		if (attrId == null) {
+			throw new NullPointerException("ctxId can't be null");
+		}
+		
 		LOG.debug("retrieveFuture: attrId={}, date={}", attrId, date);
-
+		
 		final IIdentity target = this.extractIIdentity(attrId);
 
 		this.logRequest(null, target);
 
 		List<CtxAttribute> result = new ArrayList<CtxAttribute>();
 
-		try {
-			result = this.retrieveFuture(attrId, date).get();
+		if (this.isLocalId(target)) {
 
-		} catch (Exception e) {
-			LOG.error("Exception on predicting context attribute :"+attrId+".  "+ e.getLocalizedMessage());
-			e.printStackTrace();
-		} 
+			// L O C A L
+			if (IdentityType.CIS != target.getType()) { 
+				LOG.debug(" L O C A L ");
+				// U S E R
+				result.add(this.userCtxInferenceMgr.predictContext(attrId, date));
+			} else { 
+				// C O M M U N I T Y
+				result.add(this.communityCtxInferenceMgr.predictContext(attrId, date));
+			}
+		}else { // R E M O T E
+		
+			final RetrieveFutureCtxCallback callback = new RetrieveFutureCtxCallback();
+			this.ctxBrokerClient.retrieveFuture(requestor, attrId, date, callback); 
+			synchronized (callback) {
+				try {
+					callback.wait();
+					if (callback.getException() == null) {
+						result = callback.getResult();
+						
+					} else { 
+						throw callback.getException();
+					}					
 
+				} catch (InterruptedException e) {
+
+					throw new CtxBrokerException("Interrupted while waiting for remote retrieve");
+				}
+			}
+		}
 		LOG.debug("retrieveFuture: result={}", result);
 		return new AsyncResult<List<CtxAttribute>>(result);
 	}
 
+
+	
 	@Override
+	@Async
 	public Future<List<CtxAttribute>> retrieveFuture(Requestor requestor,
 			CtxAttributeIdentifier attrId, int modificationIndex)
 					throws CtxException {
@@ -2483,12 +2486,13 @@ public class InternalCtxBroker implements ICtxBroker {
 		LOG.debug("retrieveFuture: result={}", result);
 		return new AsyncResult<List<CtxAttribute>>(result);
 	}
-
+		
+	
 	@Override
 	public Future<List<CtxHistoryAttribute>> retrieveHistory(
 			Requestor requestor, CtxAttributeIdentifier attrId,
 			int modificationIndex) throws CtxException {
-		// TODO Auto-generated method stub
+
 		return null;
 	}
 

@@ -101,4 +101,10 @@ public class RetrieveCtxCallback extends CtxCallback{
 		
 		// TODO Auto-generated method stub
 	}
+
+	@Override
+	public void onRetrieveFutureCtx(List<CtxAttribute> ctxAttrList) {
+		// TODO Auto-generated method stub
+		
+	}
 }

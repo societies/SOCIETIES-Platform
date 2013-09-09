@@ -35,49 +35,46 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 
-public class LookupCallback extends CtxCallback {
+public class RetrieveFutureCtxCallback extends CtxCallback{
 
 	/** The logging facility. */
-	private static final Logger LOG = LoggerFactory.getLogger(LookupCallback.class);
-
-	private List<CtxIdentifier> idList;
+	private static final Logger LOG = LoggerFactory.getLogger(RetrieveFutureCtxCallback.class);
 	
-	public List<CtxIdentifier> getResult() {
+	private List<CtxAttribute> result;
+	
+	public List<CtxAttribute> getResult() {
 		
-		return this.idList;
+		return this.result;
 	}
 
 	@Override
 	public void onCreatedEntity(CtxEntity retObject) {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public void onCreatedAttribute(CtxAttribute retObject) {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public void onLookupCallback(List<CtxIdentifier> ctxIdsList) {
+		// TODO Auto-generated method stub
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("onLookupCallback retObject " + ctxIdsList);
-		this.idList = ctxIdsList;
-		synchronized (this) {	            
-			notifyAll();	        
-		}
 	}
 
 	@Override
 	public void onRetrieveCtx(CtxModelObject ctxObj) {
 		// TODO Auto-generated method stub
-
 	}
-
+	
 	@Override
 	public void onUpdateCtx(CtxModelObject ctxObj) {
 		// TODO Auto-generated method stub
-
 	}
-	
+
 	@Override
 	public void onRetrievedEntityId(CtxEntityIdentifier ctxId) {
 		// TODO Auto-generated method stub
@@ -90,9 +87,7 @@ public class LookupCallback extends CtxCallback {
 		
 	}
 	
-	/*
-	 * @see org.societies.context.broker.impl.comm.ICtxCallback#onRemovedModelObject(org.societies.api.context.model.CtxModelObject)
-	 */
+	
 	@Override
 	public void onRemovedModelObject(CtxModelObject ctxObj) {
 		
@@ -101,7 +96,13 @@ public class LookupCallback extends CtxCallback {
 
 	@Override
 	public void onRetrieveFutureCtx(List<CtxAttribute> ctxAttrList) {
-		// TODO Auto-generated method stub
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("onRetrieveFutureCtx retObject " + ctxAttrList);
+		this.result = ctxAttrList;
+		synchronized (this) {	            
+			notifyAll();	        
+		}
 		
 	}
 }
