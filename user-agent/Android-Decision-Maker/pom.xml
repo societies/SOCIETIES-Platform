@@ -12,7 +12,7 @@
    </parent>
 
    <groupId>org.societies.android.platform</groupId>
-   <artifactId>desicionmaker</artifactId>
+   <artifactId>android-desicionmaker</artifactId>
    <version>${version.ua}</version> 
    <name>Android-Decision-Maker</name>
    <packaging>apk</packaging>
@@ -92,29 +92,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-
-
-		<!-- <dependency>
-			<groupId>org.asmack</groupId>
-	    	<artifactId>asmack</artifactId>
-	    	<scope>provided</scope>
-		</dependency> -->
-		<!--dependency>
-	    	<groupId>org.societies.android.jaxb</groupId>
-	    	<artifactId>jaxb-android-societies</artifactId>
-	    	<version>0.1</version>
-		</dependency-->
-		<!--dependency>
-	    	<groupId>xerces</groupId>
-	    	<artifactId>xercesImpl</artifactId>
-	    	<version>2.10.0</version>
-	    	<exclusions>
-				<exclusion>
-		    		<groupId>xml-apis</groupId> 
-		    		<artifactId>xml-apis</artifactId>
-				</exclusion>
-	    	</exclusions>
-		</dependency-->
 		<dependency>
 			<groupId>org.simpleframework</groupId>
 			<artifactId>simple-xml</artifactId>
