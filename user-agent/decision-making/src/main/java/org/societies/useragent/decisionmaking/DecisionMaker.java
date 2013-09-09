@@ -46,14 +46,16 @@ import org.societies.api.personalisation.model.IActionConsumer;
 import org.societies.useragent.conflict.ConfidenceTradeoffRule;
 import org.societies.useragent.conflict.ConflictResolutionManager;
 import org.societies.useragent.conflict.IntentPriorRule;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
+import org.societies.api.internal.personalisation.model.*;
+import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+
 
 public class DecisionMaker extends AbstractDecisionMaker implements
 		BundleContextAware {
 
 	private BundleContext myContext;
-
-	private IIdentity entityID;
 
 	private List<IActionConsumer> temporal = null;
 
@@ -99,13 +101,7 @@ public class DecisionMaker extends AbstractDecisionMaker implements
 		this.myContext = myContext;
 	}
 
-	public IIdentity getEntityID() {
-		return entityID;
-	}
-
-	public void setEntityID(IIdentity entityID) {
-		this.entityID = entityID;
-	}
+	
 
 	public DecisionMaker() {
 		ConflictResolutionManager man = new ConflictResolutionManager();
@@ -171,9 +167,12 @@ public class DecisionMaker extends AbstractDecisionMaker implements
 					String cImp = "Service:" + consumer.getServiceIdentifier()
 							+ " Action:" + action;
 					if (getUserFeedback(cImp, action)) {
+						FeedbackEvent fedb = new FeedbackEvent(entityID,
+						action, true, FeedbackTypes.IMPLEMENTED);
+						pesoMgr.returnFeedback(fedb);
 						consumer.setIAction(this.entityID, action);
 						logging.debug("Service has been matched. IAction has been sent to the service");
-					} else {
+					} else {	
 						logging.debug("Service has been matched. But user refuses to act");
 					}
 					found = true;
