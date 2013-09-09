@@ -28,7 +28,6 @@ package org.societies.useragent.monitoring.model;
 import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
 
 import org.societies.api.context.model.CtxAttributeIdentifier;
 

@@ -32,7 +32,7 @@ import org.societies.integration.api.selenium.pages.IndexPage;
 
 public class TestIndexPage extends SeleniumTest {
     private static final String USERNAME = "paddy";
-    private static final String PASSWORD = "paddy";
+    private static final String PASSWORD = "p";
 
     private IndexPage indexPage;
 

@@ -1,84 +1,77 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Societies - Home</title>
-<style>
-.error {
-	color: #ff0000;
-}
- 
-.errorblock {
-	color: #000;
-	background-color: #ffEEEE;
-	border: 3px solid #ff0000;
-	padding: 8px;
-	margin: 16px;
-}
-</style>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<title>Sign In - SOCIETIES</title>
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" title="SOCIETIES" />
 </head>
-<script language="javascript">
-function ValidateForm(frm) {
-	if (frm.password.value != frm.passwordConfirm.value) {
-		alert("Please confirm the password!");
-		return false;
-	}
-	return true;
-}
-</script>
 <body>
-<table border="0" width="100%">
-	<tr><td align="center"><img src="${pageContext.request.contextPath}/images/societiesheader.png" /></td></tr>
-</table>
 
-<!-- .................PLACE YOUR CONTENT HERE ................ -->
-<table border="0" width="100%">
-<tr><td>
+<jsp:include page="common/header.jsp" />
 
-<form:form method="POST" action="index.html" commandName="loginForm">
-	<input type="hidden" name="method" value="login" >
-	<table bgcolor="#BDBDBD">
-		<tr><td colspan="2" align="center"><font color="red">${loginError}</font></td></tr>
-		<tr><td><b>Sign in</b></td><td align="right"><img src="${pageContext.request.contextPath}/images/societies_xsmall.png" border="0"/></td></tr>
-		<tr><td colspan="2">Username</td></tr>
-		<tr><td colspan="2"><form:input path="userName" value=""  /></td></tr>
-		<tr><td colspan="2">Password</td></tr>
-		<tr><td colspan="2"><form:password path="password" value="" /></td></tr>
-		<tr><td colspan="2"><input type="submit" value="Sign in"/></td></tr>
-	</table>
-</form:form>
+<div id="content" class="signin">
+	<h2>Sign In SOCIETIES</h2>
+	<form:form method="POST" action="index.html" commandName="loginForm" onsubmit="return ValidateForm(this)">
+		<h3><img src="${pageContext.request.contextPath}/images/societies_xsmall.png" alt="Logo SOCIETIES" /> Sign In</h3>
+		<c:if test="${not empty errormsg}">
+			<p>
+				<span class="error">${errormsg}</span>
+				<c:if test="${not empty infomsg}">
+					<br />${infomsg}
+				</c:if>
+			</p>
+		</c:if>
+		<c:if test="${not empty result}">
+			<p>
+				<span class="ok">${result}</span>
+				<c:if test="${not empty infomsg}">
+					<br />${infomsg}
+				</c:if>
+			</p>
+		</c:if>
+		<c:if test="${not empty debugmsg}">
+			<p>
+				<span>${debugmsg}</span>
+				<c:if test="${not empty infomsg}">
+					<br />${infomsg}
+				</c:if>
+			</p>
+		</c:if>
+		<form:errors path="*" cssClass="errorblock" element="div" />
+		<table>
+			<tr>
+				<td>Username</td>
+				<td>
+					<form:input path="userName" value="${username}" required="required"  />
+					<form:errors path="userName" cssClass="error" />
+				</td>
+				<td>@ <form:select path="subDomain" >
+						   <form:options items="${domains}" />
+					   </form:select>
+				</td>
+			</tr>
+			<tr>
+				<td>Password</td>
+				<td>
+					<form:password path="password" value="${password}" required="required" />
+					<form:errors path="password" cssClass="error" />
+				</td>
+				<td></td>
+			</tr>	
+			<tr><td colspan="3" class="submitBlock"><input type="submit" value="Ok"/></td></tr>
+		</table>
+		
+		<h3>No SOCIETIES account yet? <strong><a href="signup.html" class="greatButton">Sign Up!</a></strong></h3>
+		<br />
+		<h3>Download the <strong><a href="download.html" class="greatButton">Android client</a></strong></h3>
+	</form:form>
+</div>
 
-</td><td>
-<font color="green">${result}</font>
-<form:form method="POST" action="index.html" commandName="loginForm" onsubmit="return ValidateForm(this)">
-	<input type="hidden" name="method" value="register" >
-	<table>
-		<tr><td colspan="2" align="center"><font color="red">${registerError}</font></td></tr>
-		<tr><td colspan="2" align="center"><b>Register New Account</b></td></tr>
-		<tr><td colspan="2">Name</td></tr>
-		<tr><td colspan="2"><form:input path="name" value="${name}" /></td></tr>
-		<tr><td colspan="2">Username</td></tr>
-		<tr><td><form:input path="userName" value="" /></td>
-			<td>@ <form:select path="subDomain" >
-					   <form:options items="${domains}" />
-				   </form:select>
-		</tr>
-		<tr><td colspan="2">Password</td></tr>
-		<tr><td colspan="2"><form:password path="password" value="${password}" /></td></tr>
-		<tr><td colspan="2">Confirm Password</td></tr>
-		<tr><td colspan="2"><form:password path="passwordConfirm" value="${passwordConfirm}" /></td></tr>
-		<tr><td colspan="2"><input type="submit" value="Register"/></td></tr>
-	</table>
-</form:form>
-	
-</td></tr>
-</table>
-
-<!-- .................END PLACE YOUR CONTENT HERE ................ --> 
+<jsp:include page="common/footer.jsp" />
 </body>
 </html>
 

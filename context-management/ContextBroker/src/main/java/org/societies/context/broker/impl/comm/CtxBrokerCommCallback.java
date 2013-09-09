@@ -142,12 +142,38 @@ public class CtxBrokerCommCallback implements ICommCallback {
 				
 			case RETRIEVE:
 				
+				if (payload.getRetrieveBeanResult() == null ) {
+					callbackClient.onException(new CtxBrokerException(
+							"Could not handle result bean: CtxBrokerResponseBean.getRetrieveBeanResult() is null"));
+					return;
+				}
 				CtxModelObject object = null;
 				if (payload.getRetrieveBeanResult() != null) {
 					object = CtxModelBeanTranslator.getInstance()
 							.fromCtxModelObjectBean(payload.getRetrieveBeanResult());
 				}
 				callbackClient.onRetrieveCtx(object);
+				
+				break;
+				
+			case RETRIEVE_FUTURE:
+				
+				if (payload.getRetrieveFutureBeanResult() == null ) {
+					callbackClient.onException(new CtxBrokerException(
+							"Could not handle result bean: CtxBrokerResponseBean.getRetrieveFutureBeanResult() is null"));
+					return;
+				}
+				
+				final List<CtxAttribute> ctxAttrFutureList = new ArrayList<CtxAttribute>();
+				
+				if (payload.getRetrieveFutureBeanResult() != null) {
+					for (final CtxAttributeBean ctxAttrBean : payload.getRetrieveFutureBeanResult()) {
+						final CtxAttribute ctxAttr = CtxModelBeanTranslator.getInstance()
+								.fromCtxAttributeBean(ctxAttrBean);	
+						ctxAttrFutureList.add(ctxAttr);
+					}
+				}
+				callbackClient.onRetrieveFutureCtx(ctxAttrFutureList); 
 				
 				break;
 				

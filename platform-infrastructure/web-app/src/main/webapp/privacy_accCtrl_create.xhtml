@@ -17,25 +17,25 @@
 			<div class="breadcrumbs">
 				<a href="index.xhtml">Home</a> / <a href="privacysettings.xhtml">Privacy
 					Settings</a> / <a href="privacypreferences.xhtml">Privacy
-					Preferences</a> / <a href="privacy_ppn_create.xhtml">Create New PPN
+					Preferences</a> / <a href="privacy_accCtrl_create.xhtml">Create New Access Control
 					Preference</a>
 			</div>
 
 			<section class="form_style_main">
 
-				<h4 class="form_title">Create new Privacy Policy Negotiation
-					Preference</h4>
+				<h4 class="form_title">Create new Access Control Preference</h4>
 				<div class="hr grid_12 clearfix"></div>
-				<section>
+				
+				<h5>Privacy Preference Details</h5>
 					<h:panelGrid columns="2" cellpadding="5">
-						<h5>Privacy Preference Details</h5>
+						
 						<h:outputLabel for="requestorId" value="Requestor:"></h:outputLabel>
 						<h:outputText id="requestorId"
 							value="#{AccCtrlcreateBean.preferenceDetails.requestor.requestorId}"></h:outputText>
 
 
 					</h:panelGrid>
-				</section>
+				
 				<p:contextMenu for="treeSingle">
 					<p:menuitem value="View" update="messages"
 						actionListener="#{AccCtrlcreateBean.displaySelectedSingle}"
@@ -45,6 +45,12 @@
 					<p:menuitem value="Add Condition"
 						actionListener="#{AccCtrlcreateBean.startAddConditionProcess}"
 						icon="ui-icon-plus" />
+					<p:menuitem value="Add Privacy Condition"
+						actionListener="#{AccCtrlcreateBean.startAddPrivacyConditionProcess}"
+						icon="ui-icon-plus" />
+					<p:menuitem value="Add Trust Condition"
+						actionListener="#{AccCtrlcreateBean.startAddTrustConditionProcess}"
+						icon="ui-icon-plus" />						
 					<p:menuitem value="Add Outcome"
 						actionListener="#{AccCtrlcreateBean.startAddOutcomeProcess}"
 						icon="ui-icon-plus" />
@@ -97,7 +103,7 @@
 
 				<h:outputLabel for="operator" value="Operator: " />
 				<p:selectOneMenu id="operator"
-					value="#{AccCtrlcreateBean.selectedOperator}">
+					value="#{AccCtrlcreateBean.selectedCtxOperator}">
 					<f:selectItems value="#{AccCtrlcreateBean.operators}" />
 				</p:selectOneMenu>
 				<h:outputLabel for="ctxValue" value="Value:" />
@@ -115,6 +121,58 @@
 			</h:panelGrid>
 
 		</p:dialog>
+
+		<p:dialog id="addTrustConditionDialog" header="Add Trust Condition"
+			widgetVar="addTrustConddlg" resizable="false" dynamic="true">
+
+			<p:inputText id="trustValue" value="#{AccCtrlcreateBean.trustValue}" />
+			<p:slider for="trustValue" />
+			<f:facet name="footer">
+				<p:commandButton id="AddTrustConditionButton" value="Add"
+					oncomplete="#{p:widgetVar('addTrustConditionDialog')}.hide()"
+					update="treeSingle" ajax="true"
+					actionListener="#{AccCtrlcreateBean.addTrustCondition}" />
+			</f:facet>
+
+		</p:dialog>
+
+		<p:dialog id="addPrivacyConditionDialog"
+			header="Add Privacy Condition" widgetVar="addPrivConddlg"
+			resizable="false" dynamic="true">
+
+			<h:panelGrid columns="2" cellpadding="5">
+
+				<h:outputLabel for="privacyCondition" value="Privacy Condition:" />
+				<h:selectOneMenu id="privacyCondition"
+					value="#{AccCtrlcreateBean.selectedPrivacyCondition}">
+					<f:selectItems value="#{AccCtrlcreateBean.privacyConditions}" />
+					<p:ajax update="privacyConditionValue"
+						listener="#{AccCtrlcreateBean.handlePrivacyTypeChange}" />
+				</h:selectOneMenu>
+
+				<h:outputLabel for="operatorForPrivacy" value="Operator: " />
+				<p:selectOneMenu id="operatorForPrivacy"
+					value="#{AccCtrlcreateBean.selectedOperator}">
+					<f:selectItems value="#{AccCtrlcreateBean.operators}" />
+
+				</p:selectOneMenu>
+
+				<h:outputLabel for="privacyConditionValue" value="Value:" />
+				<p:selectOneMenu id="privacyConditionValue"
+					value="#{AccCtrlcreateBean.selectedPrivacyValue}" label="value">
+					<f:selectItems value="#{AccCtrlcreateBean.privacyValues}" />
+				</p:selectOneMenu>
+
+				<f:facet name="footer">
+					<p:commandButton id="AddPrivacyConditionButton" value="Add"
+						oncomplete="#{p:widgetVar('addPrivacyConditionDialog')}.hide()"
+						update="treeSingle" ajax="true"
+						actionListener="#{AccCtrlcreateBean.addPrivacyCondition}" />
+				</f:facet>
+
+			</h:panelGrid>
+		</p:dialog>
+
 
 		<p:dialog id="addOutcomeDialog" header="Add Outcome"
 			widgetVar="addOutdlg" resizable="false" dynamic="true">
@@ -135,8 +193,8 @@
 			</h:panelGrid>
 		</p:dialog>
 		<p:dialog id="preferenceDetailsDialog"
-			header="Enter PPN preference details" widgetVar="prefDetailsDlg"
-			resizable="true" modal="true" closable="false">
+			header="Enter Access Control preference details" widgetVar="prefDetailsDlg"
+			resizable="true" modal="true" closable="false" visible="true">
 
 			<h:panelGrid columns="2" cellpadding="5">
 				<h:outputLabel for="requestorId2" value="Requestor JID" />

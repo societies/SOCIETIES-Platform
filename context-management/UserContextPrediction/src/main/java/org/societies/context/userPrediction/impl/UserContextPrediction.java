@@ -572,8 +572,12 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 
 		try {
 
-			predictedCtxAttr = (CtxAttribute) this.ctxBroker.retrieve(ctxAttrID);
+			predictedCtxAttr = (CtxAttribute) this.ctxBroker.retrieve(ctxAttrID).get();
 
+			if (predictedCtxAttr == null) {
+				throw new NullPointerException("attribute requested for prediction doesn't exist,  attrID:"+ctxAttrID);
+			}
+			
 			entId = this.ctxBroker.retrieveIndividualEntityId(null, getOwnerId()).get();
 			List<CtxIdentifier> locationList = this.ctxBroker.lookup(entId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get();
 
@@ -610,8 +614,13 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 			situation.put(CtxAttributeTypes.ACTION, activityValue);
 
 			String prdValue = this.predictContextTraining(type, situation);
-
-			predictedCtxAttr.setStringValue(prdValue);
+			
+			
+			LOG.debug("predicted string Value: "+ prdValue);
+			if(prdValue != null ){
+				predictedCtxAttr.setStringValue(prdValue);	
+			}
+			
 
 
 		} catch (Exception e) {

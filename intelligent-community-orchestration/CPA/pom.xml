@@ -31,11 +31,47 @@
     </properties>
 
     <dependencies>
+        <!-- SOCIETIES INTERNAL -->
         <dependency>
             <groupId>org.societies</groupId>
             <artifactId>common-ext-libs</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.societies.platform</groupId>
+            <artifactId>socialdata</artifactId>
+            <version>${release.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.societies</groupId>
+            <artifactId>hibernate_classes</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.societies</groupId>
+            <artifactId>activityfeedservice</artifactId>
+            <version>${version.cis}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.societies.api.internal</groupId>
+            <artifactId>societies-api-internal</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.societies.api.external</groupId>
+            <artifactId>societies-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.societies.platform</groupId>
+            <artifactId>facebook_connector</artifactId>
+            <scope>test</scope>
+            <version>${release.version}</version>
+        </dependency>
+
+        <!-- DATA FORMAT -->
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -53,29 +89,24 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>com.springsource.org.dom4j</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <version>2.0.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.shindig</groupId>
             <artifactId>shindig-social-api</artifactId>
             <version>3.0.0-beta4</version>
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.societies.platform</groupId>
-            <artifactId>socialdata</artifactId>
-            <version>${release.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.societies</groupId>
-            <artifactId>hibernate_classes</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.transaction</groupId>
-            <artifactId>com.springsource.javax.transaction</artifactId>
-            <version>1.1.0</version>
-            <scope>test</scope>
-        </dependency>
+
+
         <!-- spring -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -84,53 +115,50 @@
             <version>${spring.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- databases -->
-        <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>com.springsource.org.apache.derby</artifactId>
-            <version>10.5.1000001.764942</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.societies</groupId>
-            <artifactId>activityfeedservice</artifactId>
-            <version>${version.cis}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.societies.cis</groupId>
-            <artifactId>cis-manager</artifactId>
-            <version>${version.cis}</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>org.springframework.test</artifactId>
             <version>3.0.5.RELEASE</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.context</artifactId>
+            <version>3.0.5.RELEASE</version>
+        </dependency>
 
-        <!-- logging -->
+        <!-- test -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- databases -->
+        <dependency>
+            <groupId>javax.transaction</groupId>
+            <artifactId>com.springsource.javax.transaction</artifactId>
+            <version>1.1.0</version>
+            <scope>test</scope>
+        </dependency>
+
+
+
+
+        <!-- logging
+         needed because of test failure:
+         Caused by: java.lang.NoSuchMethodError: org.slf4j.helpers.MessageFormatter.format(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/String;
+	at org.slf4j.impl.Log4jLoggerAdapter.info(Log4jLoggerAdapter.java:318)
+	at org.hibernate.cfg.annotations.Version.<clinit>(Version.java:15)
+	-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>${slf4j.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>compile</scope>
+            <scope>test</scope>
         </dependency>
 
+        <!-- Graph libraries -->
         <dependency>
             <groupId>net.sf.jung</groupId>
             <artifactId>jung-graph-impl</artifactId>
@@ -143,86 +171,54 @@
             <version>2.0.1</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>net.sf.jung</groupId>
+            <artifactId>jung-visualization</artifactId>
+            <version>2.0.1</version>
+            <scope>test</scope>
+        </dependency>
 
-       <!-- <dependency>
-            <groupId>org.jruby</groupId>
-            <artifactId>jruby-core</artifactId>
-            <version>1.7.0.RC1</version>
-        </dependency>   -->
         <!-- apache commons -->
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>com.springsource.org.apache.commons.dbcp</artifactId>
             <version>1.2.2.osgi</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>com.springsource.org.apache.commons.pool</artifactId>
             <version>1.5.3</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>com.springsource.org.apache.commons.collections</artifactId>
             <version>3.2.1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>com.springsource.org.apache.commons.csv</artifactId>
             <version>1.0.0.BUILD-20080106</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>org.societies.api.internal</groupId>
-            <artifactId>societies-api-internal</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.societies.api.external</groupId>
-            <artifactId>societies-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!--  graph stuff -->
-
-
-        <dependency>
-            <groupId>net.sf.jung</groupId>
-            <artifactId>jung-visualization</artifactId>
-            <version>2.0.1</version>
             <scope>test</scope>
+        </dependency>
 
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-            <version>4.1.0</version>
-            <scope>provided</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>1.9.0</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.societies.platform</groupId>
-            <artifactId>facebook_connector</artifactId>
-            <scope>test</scope>
-            <version>${release.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>com.github.pmerienne</groupId>
             <artifactId>trident-ml</artifactId>
             <version>0.0.2</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.context</artifactId>
-            <version>3.0.5.RELEASE</version>
-        </dependency>
+
         <dependency>
             <groupId>uk.ac.gate</groupId>
             <artifactId>gate-core</artifactId>
@@ -230,16 +226,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.dom4j</groupId>
-            <artifactId>com.springsource.org.dom4j</artifactId>
-            <version>1.6.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jdom</groupId>
-            <artifactId>jdom</artifactId>
-            <version>2.0.2</version>
-        </dependency>
+
     </dependencies>
     <repositories>
         <repository>

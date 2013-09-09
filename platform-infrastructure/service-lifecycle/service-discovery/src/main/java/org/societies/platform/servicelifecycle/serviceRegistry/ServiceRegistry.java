@@ -34,9 +34,11 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Example;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CISNotFoundException;
 import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.CSSNotFoundException;
@@ -176,7 +178,7 @@ public class ServiceRegistry implements IServiceRegistry {
 	}
 
 	@Override
-	public List<Service> retrieveServicesSharedByCSS(String CSSID)
+	public List<Service> retrieveServicesInCSSNode(String CSSID)
 			throws ServiceRetrieveException {
 		List<Service> returnedServiceList = new ArrayList<Service>();
 		
@@ -204,6 +206,34 @@ public class ServiceRegistry implements IServiceRegistry {
 		return returnedServiceList;
 	}
 
+	@Override
+	public List<Service> retrieveServicesInCSS(String CSSID)
+			throws ServiceRetrieveException {
+		List<Service> returnedServiceList = new ArrayList<Service>();
+		
+		Session session = null;
+		
+		try {
+			session = sessionFactory.openSession();
+			
+			List<RegistryEntry> tmpRegistryEntryList = session
+					.createCriteria(RegistryEntry.class)
+					.createCriteria("serviceInstance")
+					.add(Restrictions.eq("cssJid", CSSID)).list();
+						
+			for (RegistryEntry registryEntry : tmpRegistryEntryList) {
+				returnedServiceList.add(registryEntry
+						.createServiceFromRegistryEntry());
+			}
+		} catch (Exception e) {
+			throw new ServiceRetrieveException(e);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		return returnedServiceList;
+	}
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -247,17 +277,17 @@ public class ServiceRegistry implements IServiceRegistry {
 		
 		// Direct Attributes
 		if (filter.getServiceName() != null)
-			c.add(Restrictions.like("serviceName", filter.getServiceName()));
+			c.add(Restrictions.like("serviceName", filter.getServiceName(),MatchMode.ANYWHERE));
 		if (filter.getServiceDescription() != null)
-			c.add(Restrictions.like("serviceDescription", filter.getServiceDescription()));
+			c.add(Restrictions.like("serviceDescription", filter.getServiceDescription(),MatchMode.ANYWHERE));
 		if (filter.getAuthorSignature() != null)
-			c.add(Restrictions.like("authorSignature", filter.getAuthorSignature()));
+			c.add(Restrictions.like("authorSignature", filter.getAuthorSignature(),MatchMode.ANYWHERE));
 		if (filter.getPrivacyPolicy() != null)
 			c.add(Restrictions.like("privacyPolicy", filter.getPrivacyPolicy()));
 		if (filter.getSecurityPolicy() != null)
 			c.add(Restrictions.like("securityPolicy", filter.getSecurityPolicy()));
 		if (filter.getServiceCategory() != null)
-			c.add(Restrictions.like("serviceCategory", filter.getServiceCategory()));
+			c.add(Restrictions.like("serviceCategory", filter.getServiceCategory(),MatchMode.ANYWHERE));
 		if (filter.getServiceEndpoint() != null)
 			c.add(Restrictions.like("serviceEndPoint", filter.getServiceEndpoint()));
 		if (filter.getContextSource() != null)
@@ -348,6 +378,34 @@ public class ServiceRegistry implements IServiceRegistry {
 		}
 
 		return createListService(tmpRegistryEntryList);
+	}
+	
+	@Override
+	public List<Service> findServices(Service filter, String cisId)
+			throws ServiceRetrieveException {
+		
+		log.debug("Find service... in cis {}",cisId);
+		
+		List<Service> cisServices = retrieveServicesSharedByCIS(cisId);
+		
+		log.debug("Found {} services for this CIS", cisServices.size());
+		List<Service> foundServices = findServices(filter);
+		log.debug("Found {} services for this criteria",foundServices.size());
+		
+		List<Service> finalResult = new ArrayList<Service>();
+		for(Service cisService: cisServices){
+			log.debug("cisService: {}, {}", cisService.getServiceName(), cisService.getServiceEndpoint());
+			for(Service foundService: foundServices){
+				if(ServiceModelUtils.compare(cisService.getServiceIdentifier(), foundService.getServiceIdentifier())){
+					log.debug("{} added!",cisService.getServiceName());
+					finalResult.add(cisService);
+					break;
+				}
+			}
+		}
+		
+		log.debug("Services {}", finalResult.size());
+		return finalResult;
 	}
 
 	/*

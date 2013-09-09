@@ -41,13 +41,13 @@
     <ctx:component-scan base-package="org.societies.webapp.controller"/>
     <ctx:component-scan base-package="org.societies.webapp.service"/>
 
-    <bean id="dataSource"
+    <!-- <bean id="dataSource"
           class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
         <property name="url" value="jdbc:mysql://localhost:3306/screenconfigdb" />
         <property name="username" value="root"/>
         <property name="password" value="root"/>
-    </bean>
+    </bean> -->
 
 
 </beans>

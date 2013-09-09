@@ -25,16 +25,12 @@
 package org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.event.CtxChangeEvent;
-import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceConditionMonitor;
-import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.dobf.DObfMonitor;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.ids.IDSMonitor;

@@ -24,7 +24,6 @@
  */
 package org.societies.api.internal.privacytrust.privacy.util.dataobfuscation;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.LocationCoordinates;
 
 /**

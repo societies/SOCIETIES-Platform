@@ -36,6 +36,7 @@
 		<module>../../../platform-infrastructure/comms-frwk/ExampleServices/Calculator</module> <!-- to be removed when third party services example will be available -->
 		<module>../../../platform-infrastructure/comms-frwk/ExampleServices/FortuneCookie</module> <!-- to be removed when third party services example will be available -->
 		<module>../../example-service</module>
+		<module>../../example-service-server</module>
 		
 		<!-- BIT Tests -->
 		<module>../../BIT/css-services-test-suite/use-service-759</module>
@@ -83,6 +84,7 @@
         <module>../../BIT/webapp-test-suite/t65-webapp-test-api</module>
         <module>../../BIT/webapp-test-suite/webapp-integration-tests-2078</module>
         <module>../../BIT/webapp-test-suite/webapp-userfeedback-test-2077</module>
+        <module>../../BIT/webapp-test-suite/webapp-cis-tests-2116</module>
 
 		<!-- CT Tests -->
 		<module>../../CT/privacy-trust-test-suite</module>

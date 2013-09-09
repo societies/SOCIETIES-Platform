@@ -26,8 +26,9 @@
           init-method="initialiseUserFeedback">
         <property name="commsMgr" ref="commsManager"/>
         <property name="pubsub" ref="pubsub"/>
-        <!--<property name="privacyPolicyNegotiationHistoryRepository" ref="privacyPolicyNegotiationHistoryRepositoryBean"/>-->
-        <!--<property name="userFeedbackHistoryRepository" ref="userFeedbackHistoryRepositoryBean"/>-->
+        <property name="accessControlHistoryRepository" ref="accessControlHistoryRepositoryBean"/>
+        <property name="privacyPolicyNegotiationHistoryRepository" ref="privacyPolicyNegotiationHistoryRepositoryBean"/>
+        <property name="userFeedbackHistoryRepository" ref="userFeedbackHistoryRepositoryBean"/>
     </bean>
 
     <bean id="decisionMaker"
@@ -81,34 +82,45 @@
                 <!-- <prop key="hibernate.dialect">${hibernate.dialect}</prop>
                 <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
                 <prop key="hibernate.jdbc.batch_size">0</prop> -->
-                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.show_sql">false</prop>
                 <prop key="hibernate.cache.use_second_level_cache">false</prop>
                 <prop key="hibernate.hbm2ddl.auto">update</prop>
                 <prop key="hibernate.format_sql">true</prop>
             </props>
         </property>
 
-        <property name="mappingDirectoryLocations" value="classpath:META-INF/hibernate"/>
+        <!--<property name="mappingDirectoryLocations" value="classpath:META-INF/hibernate"/>-->
 
-        <!--<property name="mappingResources">
+        <property name="mappingResources">
             <list>
+                <value>META-INF/hibernate/Action.hbm.xml</value>
+                <value>META-INF/hibernate/Condition.hbm.xml</value>
+                <value>META-INF/hibernate/NegotiationDetailsBean.hbm.xml</value>
+                <value>META-INF/hibernate/RequestItem.hbm.xml</value>
+                <value>META-INF/hibernate/RequestorBean.hbm.xml</value>
+                <value>META-INF/hibernate/Resource.hbm.xml</value>
+                <value>META-INF/hibernate/ResponseItem.hbm.xml</value>
+                <value>META-INF/hibernate/ResponsePolicy.hbm.xml</value>
+                <value>META-INF/hibernate/UserFeedbackAccessControlEvent.hbm.xml</value>
                 <value>META-INF/hibernate/UserFeedbackBean.hbm.xml</value>
+                <value>META-INF/hibernate/UserFeedbackPrivacyNegotiationEvent.hbm.xml</value>
             </list>
-        </property>-->
+        </property>
 
     </bean>
 
     <bean id="userFeedbackHistoryRepositoryBean"
-          class="org.societies.useragent.feedback.UserFeedbackHistoryRepository"
-          init-method="init"
-          destroy-method="destroy">
+          class="org.societies.useragent.feedback.UserFeedbackHistoryRepository">
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
     <bean id="privacyPolicyNegotiationHistoryRepositoryBean"
-          class="org.societies.useragent.feedback.PrivacyPolicyNegotiationHistoryRepository"
-          init-method="init"
-          destroy-method="destroy">
+          class="org.societies.useragent.feedback.PrivacyPolicyNegotiationHistoryRepository">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <bean id="accessControlHistoryRepositoryBean"
+          class="org.societies.useragent.feedback.AccessControlHistoryRepository">
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 

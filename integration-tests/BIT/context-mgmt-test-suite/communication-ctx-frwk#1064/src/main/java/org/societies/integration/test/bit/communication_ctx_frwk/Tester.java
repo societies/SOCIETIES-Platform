@@ -27,6 +27,7 @@ package org.societies.integration.test.bit.communication_ctx_frwk;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -50,6 +51,7 @@ import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CommunityCtxEntity;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
@@ -95,6 +97,89 @@ public class Tester {
 		this.internalCtxBroker = Test1064.getInternalCtxBroker();
 		this.commMgr = Test1064.getCommManager();
 	}
+
+	@Test
+	public void testRemotePrediction(){
+
+		LOG.info("*** REMOTE CM TEST STARTING ***");
+		LOG.info("*** " + this.getClass() + " instantiated");
+		LOG.info("*** ctxBroker service :"+Test1064.getCtxBroker());
+
+		try {	
+			INetworkNode cssNodeId = Test1064.getCommManager().getIdManager().getThisNetworkNode();
+			final String cssOwnerStr = cssNodeId.getBareJid();
+			IIdentity cssOwnerId = Test1064.getCommManager().getIdManager().fromJid(cssOwnerStr);
+			this.requestor = new Requestor(cssOwnerId);
+			LOG.info("*** requestor = " + this.requestor);
+
+			IIdentity cssIDEmma =  Test1064.getCommManager().getIdManager().fromJid(targetEmma);
+
+			List<CtxIdentifier> entityList = Test1064.getCtxBroker().lookup(requestor, cssIDEmma, CtxModelType.ENTITY ,CtxEntityTypes.DEVICE).get();
+
+			if(entityList.isEmpty() ){
+
+				CtxEntity entityEmmaDevice = Test1064.getCtxBroker().createEntity(requestor, cssIDEmma, CtxEntityTypes.DEVICE).get();
+				LOG.info("entity DEVICE created based on 3p broker "+entityEmmaDevice.getId());
+				assertNotNull(entityEmmaDevice.getId());	
+				assertEquals("device", entityEmmaDevice.getType().toLowerCase());
+
+				List<CtxIdentifier> attrList = Test1064.getCtxBroker().lookup(requestor, cssIDEmma, CtxModelType.ATTRIBUTE ,CtxAttributeTypes.TEMPERATURE).get();
+
+				if(attrList.isEmpty() ){
+					CtxAttribute attrEmmaTemperature = Test1064.getCtxBroker().createAttribute(requestor, entityEmmaDevice.getId(), CtxAttributeTypes.TEMPERATURE).get();
+					LOG.info("Attribute TEMPERATURE created in remote container "+attrEmmaTemperature.getId());
+					assertNotNull(attrEmmaTemperature.getId());	
+				
+					attrEmmaTemperature.setStringValue("hot");
+					Test1064.getCtxBroker().update(requestor, attrEmmaTemperature);
+				}
+
+			}
+			
+			List<CtxIdentifier> entityList2 = Test1064.getCtxBroker().lookup(requestor, cssIDEmma,  CtxModelType.ENTITY, CtxEntityTypes.DEVICE).get();
+			LOG.info("remote entity list ids:" +entityList2);
+			assertNotNull(entityList2);
+
+			CtxEntity entityDevRetrieved = (CtxEntity) Test1064.getCtxBroker().retrieve(requestor, entityList2.get(0)).get();
+			LOG.info("remote entity id:" +entityDevRetrieved.getId());
+			assertNotNull(entityDevRetrieved.getId());
+
+			List<CtxIdentifier> attrList2 = Test1064.getCtxBroker().lookup(requestor, cssIDEmma, CtxModelType.ATTRIBUTE ,CtxAttributeTypes.TEMPERATURE).get();
+
+			LOG.info("remote attribute list ids:" +attrList2);
+			// verify that two methods return the same results
+
+
+			CtxAttribute remoteAttrTemp = (CtxAttribute) Test1064.getCtxBroker().retrieve(requestor,attrList2.get(0)).get();
+			LOG.info("remoteAttrTemp :" +remoteAttrTemp);
+
+
+			LOG.info("STARTING FUTURE RETRIEVAL ..... ");
+			Date date = new Date();
+			List<CtxAttribute> remoteAttrTemp2 = Test1064.getCtxBroker().retrieveFuture(requestor,(CtxAttributeIdentifier) attrList2.get(0),date).get();
+			CtxAttribute attr = remoteAttrTemp2.get(0);
+			attr.getLastModified();
+			
+			LOG.info("remoteAttrTemp2 :" +remoteAttrTemp2);
+			LOG.info("ENDING FUTURE RETRIEVAL ..... ");
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+
 
 	@Ignore
 	@Test
@@ -345,22 +430,22 @@ public class Tester {
 			if(currentCISId != null){
 				List<CtxIdentifier> listCommAttributesName2 = this.internalCtxBroker.lookup(requestor, currentCISId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.NAME).get();
 				LOG.info("*** remote comm lookups based on cisID = " + listCommAttributesName2);
-				
-							
+
+
 				CtxAttribute commAttr =  (CtxAttribute) this.internalCtxBroker.retrieve(listCommAttributesName2.get(0)).get();
 				LOG.info("*** remote comm Attr value = " + commAttr.getStringValue());
-			
+
 				List<CtxIdentifier> listCommAssocs = this.internalCtxBroker.lookup(requestor, currentCISId, CtxModelType.ASSOCIATION, CtxAssociationTypes.IS_MEMBER_OF).get();
 				LOG.info("*** remote comm Assoc value = " + listCommAssocs.get(0));
-			
-			
+
+
 				List<CtxIdentifier> listCommAttributesName3 = this.internalCtxBroker.lookup(currentCISId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.NAME).get();
 				LOG.info("*** remote comm Attr list = " + listCommAttributesName3);
-			
-			}
-			
 
-			
+			}
+
+
+
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

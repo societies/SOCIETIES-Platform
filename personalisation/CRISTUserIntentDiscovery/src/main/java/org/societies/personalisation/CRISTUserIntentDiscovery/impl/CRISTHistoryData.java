@@ -1,23 +1,8 @@
 package org.societies.personalisation.CRISTUserIntentDiscovery.impl;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.context.model.CtxHistoryAttribute;
-import org.societies.api.context.model.util.SerialisationHelper;
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CRIST.api.model.CRISTUserAction;
 import org.societies.personalisation.CRIST.api.model.CRISTUserSituation;
 

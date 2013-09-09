@@ -45,7 +45,7 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityType;
  * evidence parameters into {@link TrustEvidence} objects.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 2.0
+ * @since 1.2
  * @see TrustEvidenceParams
  */
 public class TrustEvidenceParamParser {

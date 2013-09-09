@@ -62,3 +62,4 @@ platform-infrastructure/sns/.DS_Store
 
 *.properties
 !org.societies.integration.test.properties
+!org.societies.local.properties

@@ -25,7 +25,6 @@
 package org.societies.integration.tests.bit.webapp;
 
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.societies.integration.api.selenium.SeleniumTest;
@@ -35,7 +34,7 @@ import org.societies.integration.api.selenium.pages.ProfileSettingsPage;
 
 public class TestProfileSettings extends SeleniumTest {
     private static final String USERNAME = "paddy";
-    private static final String PASSWORD = "paddy";
+    private static final String PASSWORD = "p";
 
     private ProfileSettingsPage profileSettingsPage;
 
@@ -51,8 +50,6 @@ public class TestProfileSettings extends SeleniumTest {
     private ProfileSettingsPage.TreeNode volumeHomeOutcomeNode;
     private ProfileSettingsPage.TreeNode volumeWorkOutcomeNode;
 
-    private boolean dontVerifyTreeStateAfterTest;
-
     @Before
     public void setupTest() {
         log.debug("Setting up test");
@@ -63,18 +60,10 @@ public class TestProfileSettings extends SeleniumTest {
 
         buildDefaultPreferenceTree();
 
-        dontVerifyTreeStateAfterTest = false;
-
         log.debug("Finished setting up test");
     }
 
-    @After
-    public void verifyPersistBetweenSessions() {
-        if (dontVerifyTreeStateAfterTest)
-            return;
-
-        profileSettingsPage.clickSaveTreeButton();
-
+    private void verifyPersistBetweenSessions() {
         getDriver().manage().deleteAllCookies();
 //        getDriver().close();
         getDriver().get(BASE_URL);
@@ -105,8 +94,6 @@ public class TestProfileSettings extends SeleniumTest {
         profileSettingsPage.verifyUsernameInTitle(USERNAME);
         profileSettingsPage.verifyUserDetails("paddy", "societies.local.macs.hw.ac.uk", "CSS_RICH",
                 "paddy.societies.local.macs.hw.ac.uk", "paddy.societies.local.macs.hw.ac.uk");
-
-        dontVerifyTreeStateAfterTest = true;
     }
 
     @Test
@@ -214,11 +201,7 @@ public class TestProfileSettings extends SeleniumTest {
         // verify tree
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
 
-
-        // refresh page, verify again
-        IndexPage indexPage = doLogin(USERNAME, PASSWORD);
-        profileSettingsPage = indexPage.navigateToProfileSettings();
-        profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+        verifyPersistBetweenSessions();
     }
 
     @Test
@@ -267,6 +250,9 @@ public class TestProfileSettings extends SeleniumTest {
         addConditionAndOutcomeDialog.verifyConditionFieldsVisible();
         addConditionAndOutcomeDialog.verifyOutcomeFieldsNotVisible();
         addConditionAndOutcomeDialog.clickCancel();
+
+        profileSettingsPage.clickSaveTreeButton();
+        verifyPersistBetweenSessions();
 
     }
 
@@ -318,6 +304,10 @@ public class TestProfileSettings extends SeleniumTest {
         IndexPage indexPage = doLogin(USERNAME, PASSWORD);
         profileSettingsPage = indexPage.navigateToProfileSettings();
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
+
+
+        profileSettingsPage.clickSaveTreeButton();
+        verifyPersistBetweenSessions();
     }
 
     @Test
@@ -376,6 +366,8 @@ public class TestProfileSettings extends SeleniumTest {
         profileSettingsPage = indexPage.navigateToProfileSettings();
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
 
+        profileSettingsPage.clickSaveTreeButton();
+        verifyPersistBetweenSessions();
     }
 
     @Test
@@ -447,7 +439,8 @@ public class TestProfileSettings extends SeleniumTest {
         locationHomeConditionNode.subNodes.add(afternoonConditionNode);
         profileSettingsPage.verifyPreferenceTreeState(preferenceTreeRoot);
 
-
+        profileSettingsPage.clickSaveTreeButton();
+        verifyPersistBetweenSessions();
     }
 
     @Test

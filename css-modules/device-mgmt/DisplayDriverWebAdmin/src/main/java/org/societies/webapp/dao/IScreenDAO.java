@@ -25,16 +25,16 @@ package org.societies.webapp.dao;
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.societies.webapp.model.Screens;
+import org.societies.webapp.model.Screen;
 
 import java.util.List;
 
 public interface IScreenDAO {
 
-        void save(Screens screen);
-        void update(Screens screen);
-        void deleteScreens(Screens screen);
-        List getAllScreens();
+        void save(Screen screen);
+        void update(Screen screen);
+        void deleteScreens(Screen screen);
+        List<Screen> getAllScreens();
 
 
 }

@@ -1,0 +1,140 @@
+<RequestPolicy>
+    <Target>
+        <Resource>
+            <Attribute AttributeId="context"
+                       DataType="http://www.w3.org/2001/XMLSchema#string">
+                <AttributeValue>AGE</AttributeValue>
+            </Attribute>
+        </Resource>
+        <Action>
+            <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                       DataType="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants">
+                <AttributeValue>READ</AttributeValue>
+            </Attribute>
+            <optional>false</optional>
+        </Action>
+        <optional>false</optional>
+    </Target>
+    <Target>
+        <Resource>
+            <Attribute AttributeId="context"
+                       DataType="http://www.w3.org/2001/XMLSchema#string">
+                <AttributeValue>EMAIL</AttributeValue>
+            </Attribute>
+        </Resource>
+        <Action>
+            <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                       DataType="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants">
+                <AttributeValue>READ</AttributeValue>
+            </Attribute>
+            <optional>false</optional>
+        </Action>
+        <optional>false</optional>
+    </Target>
+    <Target>
+        <Resource>
+            <Attribute AttributeId="context"
+                       DataType="http://www.w3.org/2001/XMLSchema#string">
+                <AttributeValue>ADDRESS_HOME_CITY</AttributeValue>
+            </Attribute>
+        </Resource>
+        <Action>
+            <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                       DataType="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants">
+                <AttributeValue>READ</AttributeValue>
+            </Attribute>
+            <optional>false</optional>
+        </Action>
+        <optional>false</optional>
+    </Target>
+    <Target>
+        <Resource>
+            <Attribute AttributeId="context"
+                       DataType="http://www.w3.org/2001/XMLSchema#string">
+                <AttributeValue>NUM_OF_DIVORCES</AttributeValue>
+            </Attribute>
+        </Resource>
+        <Action>
+            <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                       DataType="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants">
+                <AttributeValue>READ</AttributeValue>
+            </Attribute>
+            <optional>false</optional>
+        </Action>
+        <Action>
+            <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                       DataType="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants">
+                <AttributeValue>WRITE</AttributeValue>
+            </Attribute>
+            <optional>false</optional>
+        </Action>
+        <Action>
+            <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                       DataType="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants">
+                <AttributeValue>CREATE</AttributeValue>
+            </Attribute>
+            <optional>false</optional>
+        </Action>
+        <Action>
+            <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                       DataType="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants">
+                <AttributeValue>DELETE</AttributeValue>
+            </Attribute>
+            <optional>false</optional>
+        </Action>
+        <optional>false</optional>
+    </Target>
+    <Target>
+        <Resource>
+            <Attribute AttributeId="context"
+                       DataType="http://www.w3.org/2001/XMLSchema#string">
+                <AttributeValue>MARITAL_STATUS</AttributeValue>
+            </Attribute>
+        </Resource>
+        <Action>
+            <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                       DataType="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants">
+                <AttributeValue>READ</AttributeValue>
+            </Attribute>
+            <optional>false</optional>
+        </Action>
+        <Action>
+            <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                       DataType="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants">
+                <AttributeValue>WRITE</AttributeValue>
+            </Attribute>
+            <optional>false</optional>
+        </Action>
+        <Action>
+            <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                       DataType="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants">
+                <AttributeValue>CREATE</AttributeValue>
+            </Attribute>
+            <optional>false</optional>
+        </Action>
+        <Action>
+            <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                       DataType="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants">
+                <AttributeValue>DELETE</AttributeValue>
+            </Attribute>
+            <optional>false</optional>
+        </Action>
+        <optional>false</optional>
+    </Target>
+    <Target>
+        <Resource>
+            <Attribute AttributeId="context"
+                       DataType="http://www.w3.org/2001/XMLSchema#string">
+                <AttributeValue>ABOUT</AttributeValue>
+            </Attribute>
+        </Resource>
+        <Action>
+            <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                       DataType="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants">
+                <AttributeValue>READ</AttributeValue>
+            </Attribute>
+            <optional>true</optional>
+        </Action>
+        <optional>true</optional>
+    </Target>
+</RequestPolicy>

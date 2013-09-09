@@ -233,6 +233,14 @@ public class TestLocalUserContext {
 	}
 
 	@Test
+	public void testRetrieveFutureAttr() throws Exception {
+		
+		LOG.info("*** testRetrieveFutureAttr: START");
+		
+		
+	}
+	
+	@Test
 	public void testRetrieveUserEntity() throws Exception {
 
 		LOG.info("*** testRetrieveUserEntity: START");

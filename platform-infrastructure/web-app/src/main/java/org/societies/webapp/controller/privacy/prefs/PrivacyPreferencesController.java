@@ -36,6 +36,8 @@ import javax.faces.context.FacesContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.identity.util.DataTypeUtils;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.AccessControlPreferenceDetailsBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfPreferenceDetailsBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSPreferenceDetailsBean;
@@ -84,7 +86,10 @@ public class PrivacyPreferencesController extends BasePageController{
 	private List<DObfPreferenceDetailsBean> dObfPreferenceDetails;
 
 
-	private String uuid;
+	private String ppnUUID;
+
+	private String accCtrlUUID;
+	
     
 	@PostConstruct
 	public void initController(){
@@ -92,7 +97,8 @@ public class PrivacyPreferencesController extends BasePageController{
 		this.retrieveAccCtrlPreferences();
 		this.retrieveDObfPreferences();
 		this.retrieveDObfPreferences();
-		uuid = UUID.randomUUID().toString();
+		ppnUUID = UUID.randomUUID().toString();
+		accCtrlUUID = UUID.randomUUID().toString();
 	}
 	public void retrievePPNPreferences() {
 		
@@ -103,9 +109,15 @@ public class PrivacyPreferencesController extends BasePageController{
 	
 	public String storePPNDetailToUtils(){
 		this.logging.debug("Adding ppn preference details bean to util service");
-		this.privacyUtilService.setPpnPreferenceDetailsBean(uuid, selectedPPNDetail);
+		this.privacyUtilService.setPpnPreferenceDetailsBean(ppnUUID, selectedPPNDetail);
 		return "privacy_ppn_edit.xhtml";
 		
+	}
+	
+	public String storeAccCtrlDetailToUtils(){
+		this.logging.debug("Adding accCtrl preference details bean to util service");
+		this.privacyUtilService.setAccessControlPreferenceDetailsBean(accCtrlUUID, selectedAccCtrlDetail);
+		return "privacy_accCtrl_edit.xhtml";
 	}
 	public void retrieveAccCtrlPreferences(){
 		setAccCtrlPreferenceDetails(privPrefmgr.getAccCtrlPreferenceDetails());
@@ -114,16 +126,17 @@ public class PrivacyPreferencesController extends BasePageController{
 	
 	public void retrieveIDSPreferences(){
 		setIdsPreferenceDetails(privPrefmgr.getIDSPreferenceDetails());
-
-		
 	}
 	
 	public void retrieveDObfPreferences(){
 		setdObfPreferenceDetails(privPrefmgr.getDObfPreferenceDetails());
-		DObfPreferenceDetailsBean bean;
-		
 	}
 	
+	
+	public String toStringDataType(String dataType) {
+		DataTypeUtils dataTypeUtils = new DataTypeUtils();
+		return dataTypeUtils.getFriendlyDescription(dataType).getFriendlyName();
+	}
 	
 	public String toStringRequestor(RequestorBean requestor){
 		
@@ -132,7 +145,15 @@ public class PrivacyPreferencesController extends BasePageController{
 			
 		}
 		if (requestor instanceof RequestorServiceBean){
-			return "Service: "+ServiceModelUtils.serviceResourceIdentifierToString(((RequestorServiceBean) requestor).getRequestorServiceId());
+			String completeStr = ServiceModelUtils.serviceResourceIdentifierToString(((RequestorServiceBean) requestor).getRequestorServiceId());
+			if (null == completeStr) {
+				return "none";
+			}
+			String[] serviceIdParts = completeStr.split(" ");
+			if (null == serviceIdParts || serviceIdParts.length <= 0) {
+				return "none";
+			}
+			return "Service id: "+serviceIdParts[0]+(serviceIdParts.length > 1 ? " Instance id: "+serviceIdParts[1] : "");
 			
 		}
 		
@@ -171,6 +192,7 @@ public class PrivacyPreferencesController extends BasePageController{
 	public void setSelectedPPNDetail(PPNPreferenceDetailsBean selectedPPNDetail) {
 		this.logging.debug("Setting selectedPPNDetail: "+selectedPPNDetail.toString());
 		this.selectedPPNDetail = selectedPPNDetail;
+		
 	}
 	public List<PPNPreferenceDetailsBean> getPpnPreferenceDetails() {
 		return ppnPreferenceDetails;
@@ -204,11 +226,24 @@ public class PrivacyPreferencesController extends BasePageController{
 	}
 	public String getUuid() {
 		
-		return uuid;
+		return ppnUUID;
 	}
 	public void setUuid(String uuid) {
-		this.uuid = uuid;
+		this.ppnUUID = uuid;
 	}
+	public String getPpnUUID() {
+		return ppnUUID;
+	}
+	public void setPpnUUID(String ppnUUID) {
+		this.ppnUUID = ppnUUID;
+	}
+	public String getAccCtrlUUID() {
+		return accCtrlUUID;
+	}
+	public void setAccCtrlUUID(String accCtrlUUID) {
+		this.accCtrlUUID = accCtrlUUID;
+	}
+
 	
 	
 }

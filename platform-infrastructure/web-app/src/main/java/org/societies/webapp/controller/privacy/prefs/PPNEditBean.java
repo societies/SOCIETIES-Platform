@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +38,6 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.SessionScoped;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
@@ -61,7 +61,6 @@ import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyCondition;
@@ -71,7 +70,6 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ppn.PPNPOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ppn.PPNPrivacyPreferenceTreeModel;
 import org.societies.webapp.controller.BasePageController;
-import org.societies.webapp.controller.TrustController;
 import org.societies.webapp.service.PrivacyUtilService;
 /**
  * @author Eliza
@@ -129,6 +127,8 @@ public class PPNEditBean extends BasePageController implements Serializable{
 
 	private String displaySpecificRequestor;
 
+	private String ppnDetailUUID;
+
 	public PPNEditBean() {
 
 	}
@@ -159,14 +159,25 @@ public class PPNEditBean extends BasePageController implements Serializable{
 			}
 
 			this.privacyConditionData.put(c, temp);
-
+			ConditionConstants cc = this.privacyConditionData.keySet().iterator().next();
+			this.setPrivacyValues(this.privacyConditionData.get(cc));
 		}
-		
+
 		Map<String, String> requestParameterMap = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+
+		this.logging.debug("\n\n\n\n\n\n\n\n\n\n");
+		Iterator<String> iterator = requestParameterMap.keySet().iterator();
+		while (iterator.hasNext()){
+			String key = iterator.next();
+			this.logging.debug("RequestParameter : "+key+" = "+requestParameterMap.get(key));
+		}
+		this.logging.debug("\n\n\n\n\n\n\n\n\n\n");
+
 		if (requestParameterMap.containsKey("ppnDetailUUID")){
 			try{
-				
-				this.preferenceDetails = this.privacyUtilService.getPpnPreferenceDetailsBean(requestParameterMap.get("ppnDetailUUID"));
+
+				setPpnDetailUUID(requestParameterMap.get("ppnDetailUUID"));
+				this.preferenceDetails = this.privacyUtilService.getPpnPreferenceDetailsBean(getPpnDetailUUID());
 				this.logging.debug("got ppn details: "+this.preferenceDetails.toString());
 				PPNPrivacyPreferenceTreeModel ppnPreference = this.privPrefmgr.getPPNPreference(preferenceDetails);
 				this.logging.debug("Retrieved ppn preference : \n"+ppnPreference.getRootPreference().toString());
@@ -242,6 +253,22 @@ public class PPNEditBean extends BasePageController implements Serializable{
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "PPN preference details set", "Set requestor: "+preferenceDetails.getRequestor().getRequestorId()+
 				"\n, type: "+rType+specific+"\nSet resource: "+preferenceDetails.getResource().getDataType());
 		FacesContext.getCurrentInstance().addMessage(null, message);
+
+
+
+
+	}
+
+
+	public String deletePreference(){
+		boolean deletePPNPreference = this.privPrefmgr.deletePPNPreference(preferenceDetails);
+
+		if (deletePPNPreference){
+			this.privacyUtilService.removePpnPreferenceDetailsBean(this.getPpnDetailUUID());
+
+			return "privacypreferences.xhtml";
+		}
+		else return "privacy_ppn_edit.xhtml";
 	}
 	public TreeNode getSelectedNode() {
 		return selectedNode;
@@ -498,7 +525,7 @@ public class PPNEditBean extends BasePageController implements Serializable{
 
 			return "Condition: trustOfRequestor > "+trustCondition.getTrustThreshold();
 		}
-		//TODO: add support for trust condition
+		
 		else return "Unparseable: "+node;
 
 	}
@@ -796,12 +823,17 @@ public class PPNEditBean extends BasePageController implements Serializable{
 
 
 	public String getDisplaySpecificRequestor() {
-		if (this.preferenceDetails.getRequestor() instanceof RequestorCisBean){
-			displaySpecificRequestor = "Cis: "+((RequestorCisBean) this.preferenceDetails.getRequestor()).getCisRequestorId();
-		}else if (this.preferenceDetails.getRequestor() instanceof RequestorServiceBean){
-			displaySpecificRequestor = "Service: "+ ServiceModelUtils.serviceResourceIdentifierToString(((RequestorServiceBean) this.preferenceDetails.getRequestor()).getRequestorServiceId());
-		}else {
-			displaySpecificRequestor = "None";
+		try{
+			if (this.preferenceDetails.getRequestor() instanceof RequestorCisBean){
+				displaySpecificRequestor = "Cis: "+((RequestorCisBean) this.preferenceDetails.getRequestor()).getCisRequestorId();
+			}else if (this.preferenceDetails.getRequestor() instanceof RequestorServiceBean){
+				displaySpecificRequestor = "Service: "+ ServiceModelUtils.serviceResourceIdentifierToString(((RequestorServiceBean) this.preferenceDetails.getRequestor()).getRequestorServiceId());
+			}else {
+				displaySpecificRequestor = "None";
+			}
+		}
+		catch(Exception e){
+			e.printStackTrace();
 		}
 		return displaySpecificRequestor;
 	}
@@ -819,6 +851,16 @@ public class PPNEditBean extends BasePageController implements Serializable{
 
 	public void setPrivacyUtilService(PrivacyUtilService privacyUtilService) {
 		this.privacyUtilService = privacyUtilService;
+	}
+
+
+	public String getPpnDetailUUID() {
+		return ppnDetailUUID;
+	}
+
+
+	public void setPpnDetailUUID(String ppnDetailUUID) {
+		this.ppnDetailUUID = ppnDetailUUID;
 	}
 
 

@@ -9,7 +9,6 @@ import org.jabber.protocol.pubsub.owner.Subscriptions;
 import org.simpleframework.xml.Namespace;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.convert.Registry;
 import org.simpleframework.xml.convert.RegistryStrategy;
 import org.simpleframework.xml.core.Persister;
@@ -29,6 +28,8 @@ import org.societies.api.comm.xmpp.pubsub.Subscription;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.simple.basic.URIConverter;
+import org.societies.simple.converters.XMLGregorianCalendarConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -79,6 +80,12 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
         elementToClass = new HashMap<String, Class<?>>();
 
         Registry registry = new Registry();
+        try {
+            registry.bind(com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl.class, XMLGregorianCalendarConverter.class);
+            registry.bind(java.net.URI.class, URIConverter.class);
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+        }
 		Strategy strategy = new RegistryStrategy(registry);
         serializer = new Persister(strategy);
 

@@ -24,7 +24,6 @@
  */
 package org.societies.api.privacytrust.privacy.util.privacypolicy;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -34,7 +33,6 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jetty.util.log.Log;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -59,6 +57,8 @@ public class PrivacyPolicyUtilsTest {
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyUtilsTest.class.getName());
 
 	private RequestPolicy privacyPolicy;
+	private RequestPolicy privacyPolicyWithoutRequestor;
+	private String privacyPolicyWithoutRequestorString;
 
 	@Before
 	public void setUp() {
@@ -68,6 +68,55 @@ public class PrivacyPolicyUtilsTest {
 		List<Condition> conditions2 = new ArrayList<Condition>();
 		conditions2.add(ConditionUtils.create(ConditionConstants.SHARE_WITH_3RD_PARTIES, "Yes"));
 		conditions2.add(ConditionUtils.create(ConditionConstants.MAY_BE_INFERRED, "Yes"));
+		privacyPolicyWithoutRequestorString = "<RequestPolicy>"+
+				/* There is an expected issue in <subject></subject>. The CIS ID is badly formatted. This should return a null Requestor and not failed. */
+				"<Subject>"+
+				" <Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:subject:subject-id\""+
+				"    DataType=\"org.societies.api.identity.IIdentity\">"+
+				"  <AttributeValue>othercss@societies.local</AttributeValue>"+
+				" </Attribute>"+
+				" <Attribute AttributeId=\"CisId\""+
+				"    DataType=\"org.societies.api.identity.IIdentity\">"+
+				"  <AttributeValue>onecis.societies.local</AttributeValue>"+
+				" </Attribute></Subject>"+
+				"<Target>"+
+				"<Resource>"+
+				" <Attribute AttributeId=\"contextType\""+
+				"   DataType=\"http://www.w3.org/2001/XMLSchema#string\">"+
+				"  <AttributeValue>fdsfsf</AttributeValue>"+
+				" </Attribute>"+
+				"</Resource>"+
+				"<Action>"+
+				" <Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:action-id\" "+
+				"   DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ActionConstants\">"+
+				"  <AttributeValue>WRITE</AttributeValue>"+
+				" </Attribute>"+
+				"<optional>false</optional>"+
+				"</Action>"+
+				"<Condition>"+
+				" <Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" "+
+				"   DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">"+
+				"  <AttributeValue DataType=\"SHARE_WITH_3RD_PARTIES\">dfsdf</AttributeValue>"+
+				" </Attribute>"+
+				"<optional>true</optional>"+
+				"</Condition>"+
+				"<Condition>"+
+				" <Attribute AttributeId=\"urn:oasis:names:tc:xacml:1.0:action:condition-id\" "+
+				"   DataType=\"org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.ConditionConstants\">"+
+				"  <AttributeValue DataType=\"DATA_RETENTION_IN_MINUTES\">412</AttributeValue>"+
+				" </Attribute>"+
+				"<optional>true</optional>"+
+				"</Condition>"+
+				"<optional>false</optional>"+
+				"</Target></RequestPolicy>";
+		privacyPolicyWithoutRequestor = RequestPolicyUtils.createList(null,
+				RequestItemUtils.create(ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.ACTION),
+						ActionUtils.createList(ActionConstants.READ),
+						conditions1),
+						RequestItemUtils.create(ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_COORDINATES),
+								ActionUtils.createList(ActionConstants.READ),
+								conditions2)
+				);
 		privacyPolicy = RequestPolicyUtils.createList(requestor,
 				RequestItemUtils.create(ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.ACTION),
 						ActionUtils.createList(ActionConstants.READ),
@@ -99,17 +148,22 @@ public class PrivacyPolicyUtilsTest {
 
 	@Test
 	public void testFromXacmlString() {
-		String testTitle = "testFromXml: generated a RequestPolicy from a XML privacy policy";
+		String testTitle = "testFromXacmlString: generated a RequestPolicy from a XML privacy policy";
 		LOG.info(testTitle);
 
 		RequestPolicy retrievedPrivacyPolicy = null;
+		RequestPolicy retrievedPrivacyPolicyWithoutRequestor = null;
+		RequestPolicy retrievedPrivacyPolicyWithoutRequestorString = null;
 		try {
 			retrievedPrivacyPolicy = PrivacyPolicyUtils.fromXacmlString(RequestPolicyUtils.toXmlString(privacyPolicy));
+			retrievedPrivacyPolicyWithoutRequestor = PrivacyPolicyUtils.fromXacmlString(RequestPolicyUtils.toXmlString(privacyPolicyWithoutRequestor));
+			retrievedPrivacyPolicyWithoutRequestorString = PrivacyPolicyUtils.fromXacmlString(privacyPolicyWithoutRequestorString);
 		} 
 		catch (Exception e) {
 			LOG.error("[Test Exception] "+testTitle, e);
 			fail("Error "+e.getMessage()+": "+testTitle);
 		}
+		// -- Privacy Policy with Requestor
 		assertNotNull("Privacy policy generated should not be null", retrievedPrivacyPolicy);
 		assertNotNull("Privacy policy original should not be null", privacyPolicy);
 		//		LOG.debug("**** Original XML privacy policy ****");
@@ -129,6 +183,38 @@ public class PrivacyPolicyUtilsTest {
 		assertTrue("Privacy policy generated and the original policy: not the same request items", RequestItemUtils.equal(privacyPolicy.getRequestItems(), retrievedPrivacyPolicy.getRequestItems()));
 		// All
 		assertTrue("Privacy policy generated not equal to the original policy", RequestPolicyUtils.equal(privacyPolicy, retrievedPrivacyPolicy));
+
+		// -- Privacy Policy without Requestor
+		assertNotNull("Privacy policy generated should not be null (2)", retrievedPrivacyPolicyWithoutRequestor);
+		assertNotNull("Privacy policy original should not be null (2)", privacyPolicyWithoutRequestor);
+//		LOG.info("**** Original XML privacy policy ****");
+//		LOG.info(RequestPolicyUtils.toXmlString(privacyPolicyWithoutRequestor));
+//		LOG.info("**** Generated RequestPolicy ****");
+//		LOG.info(RequestPolicyUtils.toXmlString(retrievedPrivacyPolicyWithoutRequestor));
+		assertEquals("Privacy policy generated (xml) not equal to the original policy (2)", RequestPolicyUtils.toXmlString(privacyPolicyWithoutRequestor), RequestPolicyUtils.toXmlString(retrievedPrivacyPolicyWithoutRequestor));
+		// Class
+		assertEquals("Privacy policy generated not same class as the original policy (2)", privacyPolicyWithoutRequestor.getClass(), retrievedPrivacyPolicyWithoutRequestor.getClass());
+		// Requestor
+		assertNull("Privacy policy generated should have a null requestor (2)", retrievedPrivacyPolicyWithoutRequestor.getRequestor());
+		assertTrue("Privacy policy generated and the original policy: not the same requestor (2)", RequestorUtils.equal(privacyPolicyWithoutRequestor.getRequestor(), retrievedPrivacyPolicyWithoutRequestor.getRequestor()));
+		// Request Items
+		assertEquals("Privacy policy generated and the original policy: not the same request items size (2)", privacyPolicyWithoutRequestor.getRequestItems().size(), retrievedPrivacyPolicyWithoutRequestor.getRequestItems().size());
+		for(int i=0; i<retrievedPrivacyPolicy.getRequestItems().size(); i++) {
+			assertTrue("Privacy policy generated and the original policy: not the same request item  (2)"+i, RequestItemUtils.equal(privacyPolicyWithoutRequestor.getRequestItems().get(i), retrievedPrivacyPolicyWithoutRequestor.getRequestItems().get(i)));
+		}
+		assertTrue("Privacy policy generated and the original policy: not the same request items (2)", RequestItemUtils.equal(privacyPolicyWithoutRequestor.getRequestItems(), retrievedPrivacyPolicyWithoutRequestor.getRequestItems()));
+		// All
+		assertTrue("Privacy policy generated not equal to the original policy (2)", RequestPolicyUtils.equal(privacyPolicyWithoutRequestor, retrievedPrivacyPolicyWithoutRequestor));
+
+		// -- Privacy Policy without Requestor (originaly a string)
+		assertNotNull("Privacy policy generated should not be null (3)", retrievedPrivacyPolicyWithoutRequestorString);
+		assertNotNull("Privacy policy original should not be null (3)", privacyPolicyWithoutRequestorString);
+		LOG.info("**** Original XML privacy policy ****");
+		LOG.info(privacyPolicyWithoutRequestorString);
+		LOG.info("**** Generated RequestPolicy ****");
+		LOG.info(RequestPolicyUtils.toXmlString(retrievedPrivacyPolicyWithoutRequestorString));
+		// Requestor
+		assertNull("Privacy policy generated should have a null requestor (3)", retrievedPrivacyPolicyWithoutRequestorString.getRequestor());
 	}
 
 	@Test
