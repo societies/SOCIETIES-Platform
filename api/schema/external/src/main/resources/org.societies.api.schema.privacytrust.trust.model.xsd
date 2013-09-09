@@ -39,6 +39,7 @@
       <xs:enumeration value="joinedCommunity"/>
       <xs:enumeration value="leftCommunity"/>
       <xs:enumeration value="usedService"/>
+      <xs:enumeration value="null"/>
     </xs:restriction>
   </xs:simpleType>
   
