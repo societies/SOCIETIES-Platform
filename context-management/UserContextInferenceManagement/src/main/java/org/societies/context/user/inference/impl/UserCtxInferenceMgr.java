@@ -39,6 +39,7 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAttributeValueType;
+import org.societies.api.context.model.CtxModelObjectFactory;
 import org.societies.api.context.model.CtxQuality;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
@@ -178,7 +179,9 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 		if (attrID == null) {
 			throw new NullPointerException("attribute Id can't be null");
 		}
-
+		
+		LOG.debug("predictContext: attrId={}, date={}", attrID, date);
+		
 		CtxAttribute result = null;
 		
 		try {
