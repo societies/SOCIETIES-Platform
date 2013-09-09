@@ -44,10 +44,11 @@ import org.societies.identity.IdentityManagerImpl;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.internal.personalisation.model.IOutcome;
-import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.useragent.decisionmaking.DecisionMakingBean;
+
+import org.societies.android.api.useragent.*;
+import org.societies.android.api.useragent.model.*;
 
 import android.app.Service;
 import android.content.Intent;
@@ -85,12 +86,12 @@ public class AndroidDecisionMaker extends Service implements IAndroidDecisionMak
 			Log.e(LOG_TAG, e.getMessage(), e);
 			throw new RuntimeException(e);
 		}     
-		Log.d(LOG_TAG, "User Agent service starting");
+		Log.d(LOG_TAG, "Decision Maker service starting");
 	}
 
 	@Override
 	public void onDestroy() {
-		Log.d(LOG_TAG, "User Agent service terminating");
+		Log.d(LOG_TAG, "Decision Maker service terminating");
 	}
 
 	/**
