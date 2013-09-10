@@ -133,9 +133,8 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 		String strippedFilePath;
 		
 		String idStr = serviceId.getIdentifier().toString();
-		Service s = new Service(idStr, slaXml, fileServer, files);
 
-		if (files != null && files.size() > 0) {
+		if (files != null && !files.isEmpty()) {
 			dataToSign = serviceId.getIdentifier().toASCIIString();
 	
 			for (int k = 0; k < files.size(); k++) {
@@ -154,12 +153,11 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 			IClientJarServerCallback cb = new ClientJarServerCallback(callback);
 			this.clientJarServer.shareFiles(groupMgr.getIdMgr().getDomainAuthorityNode(),
 					serviceId.getIdentifier(), provider, getMyCertificate(), signature, files, cb);
-			services.put(idStr, s);
-			serviceDao.save(s);
 		}
-		else {
-			services.put(idStr, s);
-			serviceDao.save(s);
+		Service s = new Service(idStr, slaXml, fileServer, files);
+		services.put(idStr, s);
+		serviceDao.save(s);
+		if (files == null || files.isEmpty()) {
 			callback.notifySuccess();
 		}
 	}
