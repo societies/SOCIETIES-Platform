@@ -67,8 +67,11 @@ public class ServiceTest {
 		String str = foo + Service.delimiter + bar + Service.delimiter + rnd;
 		
 		List<String> decat = Service.decat(str);
-		assertEquals(3, decat.size(), 0);
+		assertEquals(3, decat.size(), 0.0);
 		assertEquals(str, Service.cat(decat));
+		
+		assertEquals(0, Service.decat("").size(), 0.0);
+		assertEquals(0, Service.decat(null).size(), 0.0);
 	}
 
 }

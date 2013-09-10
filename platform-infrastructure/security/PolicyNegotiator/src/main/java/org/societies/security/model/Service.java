@@ -185,6 +185,11 @@ public class Service {
 	protected static List<String> decat(String str) {
 		
 		List<String> list = new ArrayList<String>();
+		
+		if (str == null || str.isEmpty()) {
+			return list;
+		}
+		
 		String[] strArray = str.split(delimiter);
 		
 		if (strArray != null) {
