@@ -29,8 +29,7 @@
 		<dependency>
 			<groupId>org.societies.example</groupId>
 			<artifactId>internalAPI</artifactId>
-			<version>${release.version}</version>	
-			<scope>provided</scope>			
+			<version>${release.version}</version>		
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>

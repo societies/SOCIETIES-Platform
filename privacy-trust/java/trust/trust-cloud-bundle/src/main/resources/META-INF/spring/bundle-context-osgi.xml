@@ -43,9 +43,18 @@
 	<osgi:reference id="dataSource" 
 	    interface="javax.sql.DataSource" 
 	    cardinality="1..1" />
+	<!-- Internal optional services -->
 	<osgi:reference id="ctxBroker"
 		interface="org.societies.api.internal.context.broker.ICtxBroker"
 		cardinality="0..1" >
 	    <osgi:listener ref="ctxTrustEvidenceMonitor" bind-method="bindCtxBroker" unbind-method="unbindCtxBroker" />
+	</osgi:reference>
+	<osgi:reference id="cisDirectory"
+		interface="org.societies.api.cis.directory.ICisDirectoryRemote"
+		cardinality="0..1" >
+	</osgi:reference>
+	<osgi:reference id="serviceDiscovery"
+		interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"
+		cardinality="0..1" >
 	</osgi:reference>
 </beans>

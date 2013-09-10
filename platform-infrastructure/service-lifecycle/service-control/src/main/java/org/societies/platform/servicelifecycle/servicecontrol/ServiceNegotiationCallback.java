@@ -122,6 +122,22 @@ public class ServiceNegotiationCallback implements INegotiationCallback, INegoti
 			return null;
 		}
 	}
+	
+	public ServiceNegotiationResult getResult(long timeout) {
+		try {
+			ServiceNegotiationResult result = resultList.poll(timeout, TimeUnit.SECONDS);
+			
+			if(logger.isDebugEnabled())
+				logger.debug("getResult: " + result);
+			
+			return result;
+			
+		} catch (InterruptedException e) {
+			logger.error("Error getting result in List");
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 	public class ServiceNegotiationResult{
 		
@@ -168,15 +184,28 @@ public class ServiceNegotiationCallback implements INegotiationCallback, INegoti
 		
 	}
 
+	
 	@Override
 	public void notifySuccess() {
 		if(logger.isDebugEnabled())
 			logger.debug("Registering Service on Policy Negotiator successful.");
+		try {
+			resultList.put(new ServiceNegotiationResult(true, null, null));
+		} catch (InterruptedException e) {
+			logger.error("Error putting result in List");
+			e.printStackTrace();
+		}
 	}
 
 
 	@Override
 	public void notifyError(String msg, Throwable e) {
 		logger.warn("Registering Service on Policy Negotiator error: " + msg);
+		try {
+			resultList.put(new ServiceNegotiationResult(false, null, msg));
+		} catch (InterruptedException ex) {
+			logger.error("Error putting result in List");
+			ex.printStackTrace();
+		}
 	}
 }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                      http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+	<!-- definitions using elements of the osgi namespace can be included in 
+		this file. There is no requirement to keep these definitions in a separate 
+		file if you do not want to. The rationale for keeping these definitions separate 
+		is to facilitate integration testing of the bundle outside of an OSGi container -->
+
+	<osgi:service ref="addService" interface="org.societies.integration.example.service.api.IAddService">
+		<osgi:service-properties>
+			<entry key="TargetPlatform" value="SOCIETIES" />
+			<entry key="ServiceProvider" value="ICT-SOCIETIES" />			
+			<entry key="ServiceMetaModel" value-ref="serMetamodel" />
+		</osgi:service-properties>
+	</osgi:service>
+
+	<bean id="serMetamodel"
+		class="org.societies.api.schema.servicelifecycle.model.Service">
+		<property name="authorSignature" value="integrator" />
+		<property name="serviceDescription" value="Example Service Server to test Integration" />
+		<property name="serviceName" value="IntegrationExampleServer" />
+		<property name="serviceType" value="THIRD_PARTY_SERVER" />
+	</bean>
+
+</beans>

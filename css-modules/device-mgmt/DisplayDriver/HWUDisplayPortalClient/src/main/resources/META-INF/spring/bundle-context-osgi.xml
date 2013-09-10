@@ -12,27 +12,12 @@
        testing of the bundle outside of an OSGi container -->
        
        	<osgi:service ref="displayPortalClient" interface="org.societies.api.css.devicemgmt.display.IDisplayDriver">
-       	    
-        <osgi:service-properties>
-			<entry key="TargetPlatform" value="SOCIETIES" />
-			<entry key="ServiceProvider" value="ICT-SOCIETIES" />
-			<entry key="ServiceMetaModel" value-ref="serMetamodel" />
-		</osgi:service-properties>
         </osgi:service>
        	
        	
 		<osgi:reference id="commManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"></osgi:reference>
 		<osgi:reference id="ctxBroker" interface="org.societies.api.context.broker.ICtxBroker"></osgi:reference>
-		<osgi:reference id="IServices" interface="org.societies.api.services.IServices"></osgi:reference>
 		<osgi:reference id="eventMgmtRef" interface="org.societies.api.osgi.event.IEventMgr"></osgi:reference>
 		
-		
-	<bean id="serMetamodel" class="org.societies.api.schema.servicelifecycle.model.Service">
-		<property name="authorSignature" value="elizaP" />
-		<property name="serviceDescription" value="Display Client service" />
-		<property name="serviceType" value="THIRD_PARTY_CLIENT" />		
-		<property name="serviceName" value="PortalDisplayClientService" />
-		<property name="privacyPolicy" value="http://www.macs.hw.ac.uk/~ceeep1/societies/privacyPolicy/DisplayDriverPrivacyPolicy.xml" />
-		<property name="serviceCategory" value="DeviceDriver"></property>
-	</bean>
+
 </beans>

@@ -28,10 +28,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -97,7 +93,6 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 
 	private boolean test = false;
 
-	private MessageBox myMessageBox;
 
 	private IUserFeedback userFeedback;
 	private AccessControlPreferenceManager accCtrlMgr;
@@ -110,21 +105,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 
 	public PrivacyPreferenceManager(){
 
-		try {
-			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		} catch (InstantiationException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		} catch (UnsupportedLookAndFeelException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		}
-		UIManager.put("ClassLoader", ClassLoader.getSystemClassLoader());
-		if (this.myMessageBox==null){
-			myMessageBox = new MessageBox();
-		}
+
 	}
 
 
@@ -134,9 +115,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, privacyDataManagerInternal, commsMgr);
 		prefCache = new PrivatePreferenceCache(ctxBroker, this.idm);
 		contextCache = new PrivateContextCache(ctxBroker);
-		if (this.myMessageBox==null){
-			myMessageBox = new MessageBox();
-		}
+
 	}
 
 	public void initialisePrivacyPreferenceManager(){
@@ -145,9 +124,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, this.privacyDataManagerInternal, commsMgr);
 		contextCache = new PrivateContextCache(ctxBroker);
 		this.accCtrlPreferenceCreator = new AccessControlPreferenceCreator(this);
-		if (this.myMessageBox==null){
-			myMessageBox = new MessageBox();
-		}
+
 		
 		accCtrlMonitor = new AccCtrlMonitor(this);
 	}
@@ -443,21 +420,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	}
 
 
-	/**
-	 * @return the myMessageBox
-	 */
-	public MessageBox getMyMessageBox() {
-		return myMessageBox;
-	}
-
-
-	/**
-	 * @param myMessageBox the myMessageBox to set
-	 */
-	public void setMyMessageBox(MessageBox myMessageBox) {
-		this.myMessageBox = myMessageBox;
-	}
-
+	
 
 	/**
 	 * @return the commsMgr

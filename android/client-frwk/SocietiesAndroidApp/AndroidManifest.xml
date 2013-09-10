@@ -55,6 +55,7 @@
         <activity android:name="org.societies.android.platform.socialdata.BridgeActivity" />
         <activity android:name="org.societies.platfrom.sns.android.socialapp.WebActivity" />
         <activity android:name="org.societies.android.platform.css.friends.AcceptFriendActivity" />
+        <activity android:name="org.societies.android.platform.useragent.feedback.AccessControlActivity" />
         <activity android:name="org.societies.android.platform.useragent.feedback.NegotiationActivity" />
         <activity android:name="org.societies.android.platform.useragent.feedback.guis.AcknackPopup" />
         <activity android:name="org.societies.android.platform.useragent.feedback.guis.CheckboxPopup" />

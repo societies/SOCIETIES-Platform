@@ -130,6 +130,7 @@ public class CisSubscribedImp implements ICis {
 		}
 	}
 	
+	// with requestor TO BE DEPRECATED
 	@Override
 	public void getInfo(Requestor req, ICisManagerCallback callback){
 		LOG.debug("client call to get info from a RemoteCIS");
@@ -160,6 +161,35 @@ public class CisSubscribedImp implements ICis {
 		}	
 	}
 	
+	// with requestorBean
+	@Override
+	public void getInfo(RequestorBean req, ICisManagerCallback callback){
+		LOG.debug("client call to get info from a RemoteCIS");
+
+		IIdentity toIdentity;
+		try {
+			toIdentity = this.cisManag.getiCommMgr().getIdManager().fromJid(this.getCisId());
+			Stanza stanza = new Stanza(toIdentity);
+			CisManagerClientCallback commsCallback = new CisManagerClientCallback(
+					stanza.getId(), callback, this.cisManag);
+
+			CommunityMethods c = new CommunityMethods();
+			GetInfo g = new GetInfo();
+			g.setRequestor(req);
+			c.setGetInfo(g);
+			
+			try {
+				LOG.info("Sending stanza with get info");
+				this.cisManag.getiCommMgr().sendIQGet(stanza, c, commsCallback);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (InvalidFormatException e1) {
+			LOG.info("Problem with the input jid when trying to send the get info");
+			e1.printStackTrace();
+		}	
+	}
 	
 
 	@Override
@@ -193,7 +223,8 @@ public class CisSubscribedImp implements ICis {
 		}	
 	}
 	
-	
+	// with requestor TO BE DEPRECATED
+	@Override
 	public void getListOfMembers(Requestor req, ICisManagerCallback callback){
 		LOG.info("client call to get list of members from a RemoteCIS");
 
@@ -207,6 +238,20 @@ public class CisSubscribedImp implements ICis {
 		this.sendXmpp(c, callback);	
 	}
 
+	// with requestor bean
+	@Override
+	public void getListOfMembers(RequestorBean req, ICisManagerCallback callback){
+		LOG.info("client call to get list of members from a RemoteCIS");
+
+		CommunityMethods c = new CommunityMethods();
+		
+		WhoRequest w = new WhoRequest();
+		c.setWhoRequest(w);
+		w.setRequestor(req);
+		
+		this.sendXmpp(c, callback);	
+	}
+	
 	
 	//Overriding hash and equals to compare cisRecord only
 

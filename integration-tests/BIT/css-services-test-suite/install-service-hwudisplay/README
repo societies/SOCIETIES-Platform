@@ -1,0 +1,11 @@
+To launch this test case:
+* compile this test case
+* put the Virgo <....test.plan> on a Virgo "pickup" directory (e.g. university container)
+* start Openfire
+* start this container
+* (Optional) add the file "org.societies.integration.test.properties" in "${CONFIG_DIR}" configured with: "userfeedback.mocked=<0 or 1>"
+* follow the tag [#1872] on the log
+
+Known issues:
+When the user feedback mocker is enabled, this test works only the first time.
+The other times, the user feedback mocker won't mock the result, so the test won't be automated.

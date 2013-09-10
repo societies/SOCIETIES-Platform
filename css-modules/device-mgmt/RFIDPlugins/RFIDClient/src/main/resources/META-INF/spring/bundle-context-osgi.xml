@@ -21,6 +21,7 @@
 		<osgi:reference id="ctxSourceMgr" interface="org.societies.api.context.source.ICtxSourceMgr"></osgi:reference>
 		<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker"></osgi:reference>
 		<osgi:reference id="eventMgmtRef" interface="org.societies.api.osgi.event.IEventMgr"></osgi:reference>
+		<osgi:reference id="userFeedback" interface="org.societies.api.internal.useragent.feedback.IUserFeedback"></osgi:reference>
 
 
 	

@@ -19,14 +19,8 @@ public class ActivityFeedCallback implements ICommCallback {
 	
 	private final static List<String> NAMESPACES = Collections
 			.unmodifiableList( Arrays.asList("http://societies.org/api/schema/activityfeed"));
-//								"http://societies.org/api/schema/activity",
-						//  		"http://societies.org/api/schema/cis/community"));
-			//.singletonList("http://societies.org/api/schema/cis/manager");
 	private final static List<String> PACKAGES = Collections
-			//.singletonList("org.societies.api.schema.cis.manager");
 			.unmodifiableList( Arrays.asList("org.societies.api.schema.activityfeed"));
-//					"org.societies.api.schema.activity",
-					//"org.societies.api.schema.cis.community"));
 	
 	
 	private IActivityFeedCallback sourceCallback = null;
@@ -38,13 +32,11 @@ public class ActivityFeedCallback implements ICommCallback {
 	
 	@Override
 	public List<String> getXMLNamespaces() {
-		// TODO Auto-generated method stub
 		return NAMESPACES;
 	}
 
 	@Override
 	public List<String> getJavaPackages() {
-		// TODO Auto-generated method stub
 		return PACKAGES;
 	}
 
@@ -56,17 +48,18 @@ public class ActivityFeedCallback implements ICommCallback {
 			LOG.info("Callback with result");
             MarshaledActivityFeed a = (MarshaledActivityFeed) payload ;
 			
-			if(a.getDeleteActivityResponse() != null)
+			if(a.getDeleteActivityResponse() != null) {
 				LOG.info("Delete Activity Response received and equal to " + a.getDeleteActivityResponse().isResult());
-			
-			if(a.getAddActivityResponse() != null)
+            }
+			if(a.getAddActivityResponse() != null) {
 				LOG.info("Add Activity Response received and equal to " + a.getAddActivityResponse().isResult());
-			
-			if(a.getCleanUpActivityFeedResponse() != null)
+            }
+			if(a.getCleanUpActivityFeedResponse() != null) {
 				LOG.info("CleanUp Activity Feed Response received and equal to " + a.getCleanUpActivityFeedResponse().getResult());	
-			
-			if(a.getGetActivitiesResponse() !=null)
+            }
+			if(a.getGetActivitiesResponse() !=null) {
 				LOG.info("Get Activities Response received");
+            }
 			
 		}
 		
@@ -78,25 +71,21 @@ public class ActivityFeedCallback implements ICommCallback {
 
 	@Override
 	public void receiveError(Stanza stanza, XMPPError error) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void receiveItems(Stanza stanza, String node, List<String> items) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
-		// TODO Auto-generated method stub
 
 	}
 

@@ -42,28 +42,18 @@ public class ActivityString implements Serializable {
 	};
 	private void readObject(ObjectInputStream ois)
 			throws ClassNotFoundException, IOException {
-		System.out.println("in readobject");
 		// Read version one types
-//		ObjectInputStream.GetField fields =
-//				ois.readFields();
-//		data = (String)fields.get("data", null);
-		//ois.defaultReadObject();
+
 		char r;
 		while(ois.available()>0){
 			r = ois.readChar();
 			data += r;
 		}
-		System.out.println("read data :\""+data+"\"");
 	}
 
 	private void writeObject(ObjectOutputStream oos)
 			throws IOException {
-		System.out.println("in writeobject");
 		// Convert to version one types
-//		ObjectOutputStream.PutField fields =
-//				oos.putFields();
-		//fields.put("data", data);
-		//oos.defaultWriteObject();
 		// Write version one types
 		oos.writeChars(data);
 	}

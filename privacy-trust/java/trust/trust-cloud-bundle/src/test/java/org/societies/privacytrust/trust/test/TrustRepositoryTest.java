@@ -72,7 +72,6 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	//private static final String TRUSTED_SERVICE_TYPE = BASE_ID + "ServiceType";
 	
 	private static TrustedEntityId trustorCssTeid;
-	
 	private static TrustedEntityId trustorCssTeid2;
 	
 	private static TrustedEntityId trustedCssTeid;
@@ -91,7 +90,6 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	public static void setUpBeforeClass() throws Exception {
 	
 		trustorCssTeid = new TrustedEntityId(TrustedEntityType.CSS, TRUSTOR_CSS_ID);
-		
 		trustorCssTeid2 = new TrustedEntityId(TrustedEntityType.CSS, TRUSTOR_CSS_ID2);
 		
 		trustedCssTeid = new TrustedEntityId(TrustedEntityType.CSS, TRUSTED_CSS_ID);
@@ -111,7 +109,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 		trustorCssTeid2 = null;
 		trustedCssTeid = null;
 		trustedCisTeid = null;
-		trustedServiceTeid = null;
+		trustedServiceTeid = null;	
 	}
 	
 	/**
@@ -420,7 +418,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 */
 	private void testRemoveCss() throws TrustRepositoryException {
 		
-		this.trustRepo.removeEntity(trustorCssTeid, trustedCssTeid);
+		assertTrue(this.trustRepo.removeEntity(trustorCssTeid, trustedCssTeid));
 		assertNull(this.trustRepo.retrieveEntity(trustorCssTeid, trustedCssTeid));
 	}
 	
@@ -666,7 +664,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 */
 	private void testRemoveCis() throws TrustRepositoryException {
 		
-		this.trustRepo.removeEntity(trustorCssTeid, trustedCisTeid);
+		assertTrue(this.trustRepo.removeEntity(trustorCssTeid, trustedCisTeid));
 		assertNull(this.trustRepo.retrieveEntity(trustorCssTeid, trustedCisTeid));
 	}
 	
@@ -918,7 +916,7 @@ public class TrustRepositoryTest extends AbstractTransactionalJUnit4SpringContex
 	 */
 	private void testRemoveService() throws TrustRepositoryException {
 		
-		this.trustRepo.removeEntity(trustorCssTeid, trustedServiceTeid);
+		assertTrue(this.trustRepo.removeEntity(trustorCssTeid, trustedServiceTeid));
 		assertNull(this.trustRepo.retrieveEntity(trustorCssTeid, trustedServiceTeid));
-	}
+	}	
 }

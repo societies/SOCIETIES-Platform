@@ -24,7 +24,7 @@
  */
 package org.societies.context.user.inheritance.impl;
 
-import java.sql.Date;
+/*import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -54,7 +54,7 @@ import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.context.api.user.inheritance.ConflictResolutionAlgorithm;
 import org.societies.context.api.user.inheritance.IUserCtxInheritanceMgr;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Service;*/
 
 /**
  * @author yboul

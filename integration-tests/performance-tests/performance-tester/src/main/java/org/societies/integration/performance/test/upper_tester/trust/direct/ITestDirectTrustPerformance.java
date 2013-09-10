@@ -28,10 +28,10 @@ import org.societies.integration.performance.test.lower_tester.PerformanceTestMg
 import org.societies.integration.performance.test.upper_tester.trust.TrustEvidenceParams;
 
 /**
- * Performance tests for the Trust Management & Evaluation components.
+ * Performance tests for the Direct Trust Engine.
  *
  * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
- * @since 2.0
+ * @since 1.2
  */
 public interface ITestDirectTrustPerformance {
 	

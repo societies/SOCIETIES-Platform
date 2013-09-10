@@ -84,17 +84,22 @@ public interface ITrustRepository {
 	public ITrustedEntity updateEntity(ITrustedEntity entity) throws TrustRepositoryException;
 	
 	/**
+	 * Removes the entity from the Trust Repository matching the specified
+	 * trustor and trustee.
 	 * 
 	 * @param trustorId
-	 *            the identifier of the trustor of the entity to be added to
-	 *            the trust repository
+	 *            (required) the identifier of the trustor of the entity to be
+	 *            removed from the trust repository
 	 * @param trusteeId
-	 *            the identifier of the trustee referenced in the entity to be
-	 *            added to the trust repository
-	 * @throws TrustRepositoryException
+	 *            (required) the identifier of the trustee referenced in the
+	 *            entity to be removed from the trust repository
+	 * @return <code>true</code> if the Trust Repository contained the 
+	 *         identified entity; <code>false</code> otherwise.
+	 * @throws TrustRepositoryException if the requested trusted entity cannot
+	 *         be removed.
 	 * @since 0.5
 	 */
-	public void removeEntity(final TrustedEntityId trustorId,
+	public boolean removeEntity(final TrustedEntityId trustorId,
 			final TrustedEntityId trusteeId) throws TrustRepositoryException;
 	
 	/**
@@ -176,4 +181,28 @@ public interface ITrustRepository {
 	public SortedSet<ITrustedCss> retrieveCssBySimilarity(
 			final TrustedEntityId trustorId, final Double similarityThreshold,
 			final Integer maxResults) throws TrustRepositoryException;
+	
+	/**
+	 * Removes all entities from the Trust Repository matching the specified 
+	 * criteria.
+	 * 
+	 * @param trustorId
+	 *            (optional) the identifier of the trustor. otherwise
+	 *            <code>null</code> to match all entities.
+	 * @param entityType
+	 *            (optional) the trusted entity type to match; otherwise
+	 *            <code>null</code> to match all entity types.
+	 * @param valueType
+	 *            (optional) the trust value type to match, i.e. filter out
+	 *            entities having a <code>null</code> value of the specified 
+	 *            type.
+	 * @return <code>true</code> if the Trust Repository contained any entities 
+	 *         matching the specified criteria; <code>false</code> otherwise.
+	 * @throws TrustRepositoryException if the requested trusted entities
+	 *         cannot be removed.
+	 * @since 1.2
+	 */
+	public boolean removeEntities(final TrustedEntityId trustorId,
+			final TrustedEntityType entityType,	final TrustValueType valueType) 
+			throws TrustRepositoryException;
 }

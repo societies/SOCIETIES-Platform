@@ -29,12 +29,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
@@ -44,6 +42,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.context.api.community.estimation.ICommunityCtxEstimationMgr;
 import org.societies.context.api.community.inference.ICommunityCtxInferenceMgr;
+import org.societies.context.api.community.prediction.ICommunityCtxPredictionMgr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -65,6 +64,10 @@ public class CommunityCtxInferenceMgr implements ICommunityCtxInferenceMgr{
 	@Autowired(required=false)
 	private ICommManager commMgr;
 
+	@Autowired(required=false)
+	private ICommunityCtxPredictionMgr communityContextPrediction;
+
+	
 	CommunityCtxInferenceMgr(){
 
 		LOG.info(this.getClass() + "instantiated ");
@@ -149,8 +152,12 @@ public class CommunityCtxInferenceMgr implements ICommunityCtxInferenceMgr{
 	}
 
 	@Override
-	public CtxAttribute predictContext(CtxAttributeIdentifier arg0, Date arg1) {
-		// TODO Auto-generated method stub
+	public CtxAttribute predictContext(CtxAttributeIdentifier attrID, Date date) {
+		
+		CtxAttribute result; 
+		
+		//communityContextPrediction.predictContext(attrID, date);
+		
 		return null;
 	}
 

@@ -24,13 +24,6 @@
  */
 package org.societies.personalisation.CRISTUserIntentDiscovery.test;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-
-import org.societies.api.personalisation.model.Action;
-import org.societies.api.personalisation.model.IAction;
-import org.societies.personalisation.CRIST.api.CRISTUserIntentDiscovery.ICRISTUserIntentDiscovery;
-import org.societies.personalisation.CRISTUserIntentDiscovery.impl.CRISTUserIntentDiscovery;
 
 /**
  * Describe your class here...

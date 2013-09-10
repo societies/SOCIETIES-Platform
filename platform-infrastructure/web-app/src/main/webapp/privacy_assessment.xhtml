@@ -68,16 +68,18 @@
                         	<p:calendar value="#{privacyAssessmentForm.endDate}" pattern="yyyy-MM-ddHH:mm" />
                         	or leave blank for no limit.
                         </li>
+                        	<p:selectBooleanCheckbox type="checkbox" name="" id="check1" value="#{privacyAssessmentForm.includePlatformBundles}"
+							immediate="true" valueChangeListener="#{assessmentController.assessNow}" /> <!--itemLabel="Show also platform components"-->
+                            <!--label for="check1">Show also platform components</label-->
+							Show also platform components
+                        <li>
+                        </li>
                         <li class="clearfix">
                             <p class="success">Thank you! Success Message here.</p>
 
                             <p class="error">Sorry, an error has occured. Please try again later.</p>
 
 					        <p:commandButton value="Update" icon="ui-icon ui-icon-arrowrefresh-1-w" actionListener="#{assessmentController.assessNow}" update="dynamicImage"/>
-<!--
-							<br/><br/>
-                            <a href="privacy_assessment_settings.xhtml">Advanced Settings</a>
--->
                         </li>
                     </ul>
                     
@@ -89,7 +91,7 @@
 							</f:facet>
 
 							<h:outputText value="Background" />
-							<h:outputText value="To assess possible transmission of your data by installed services, the platform monitors any data access or data transmission by services, and calculates privacy assessment metrics." />
+							<h:outputText value="To assess possible transmission of your data by installed services, the platform monitors any data access or data transmission by services, and calculates privacy assessment metrics. Among various metrics are correlations between data access and data transmission. These correlations are an assessment of possibility and frequency of leaks of your personal data to other users by a particular component (service/bundle, identity, or class). The correlation values do not have a particular meaning, but are directly comparable between components." />
 				
 							<p:spacer width="1" height="15" />
 							<p:spacer width="1" height="15" />
@@ -105,9 +107,15 @@
 				
 							<p:spacer width="1" height="15" />
 							<p:spacer width="1" height="15" />
-
+							
+							<h:outputText value="Filter results" />
+							<h:outputText value="By default, the results are shown only for 3rd party bundles. To show also results for the SOCIETIES platform components, tick the relevant checkbox at the bottom." />
+				
+							<p:spacer width="1" height="15" />
+							<p:spacer width="1" height="15" />
+							
 							<h:outputText value="Interpreting results" />
-							<h:outputText value="A high value does not necessarily indicate malicious behavior, or a violation of any agreement or privacy policy. Keep in mind the correlation results are only an assessment, and many services may be accessing and/or transmitting your data in scope of their normal operation. It is up to you to decide if data access and data transmission are excessive or not." />
+							<h:outputText value="A high value does not necessarily indicate malicious behavior, or a violation of any agreement or privacy policy. Keep in mind the correlation results are only an assessment, and many services may be accessing and/or transmitting your data in scope of their normal operation. It is up to you to decide if data access and data transmission are excessive or not. A non-zero correlation means your personal data could have been leaked, but it does not mean it actually happened." />
 							
 						</h:panelGrid>
 					</p:dialog>

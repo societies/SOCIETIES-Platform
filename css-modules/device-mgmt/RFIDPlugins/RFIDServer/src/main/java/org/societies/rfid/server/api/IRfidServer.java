@@ -24,10 +24,6 @@
  */
 package org.societies.rfid.server.api;
 
-import java.util.HashMap;
-
-
-
 
 public interface IRfidServer {
 	
@@ -40,4 +36,10 @@ public interface IRfidServer {
 	 * 			 
 	 */
 	public void registerRFIDTag(String tagNumber, String identity, String serviceID, String password);
+	
+	public void unregisterRFIDTag(String tagNumber, String identity, String serviceID, String password);
+	
+	public void deleteTag(String tag);
+	
+	public void sendRemoteUpdate(String tagNumber, String symLoc);
 }

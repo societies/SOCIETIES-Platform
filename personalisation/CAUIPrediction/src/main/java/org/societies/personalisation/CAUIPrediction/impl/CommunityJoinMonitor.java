@@ -1,18 +1,17 @@
 package org.societies.personalisation.CAUIPrediction.impl;
 
-import java.io.IOException;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.ExecutionException;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
@@ -34,7 +33,7 @@ import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 
 public class CommunityJoinMonitor implements CtxChangeEventListener{
 
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(CommunityJoinMonitor.class);
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -212,10 +211,11 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 
 					//store caciModel to local CSS ctx DB
 					CtxAttribute caciModelAttrLocal = null;
-					List<CtxIdentifier> caciModelAttrLocalList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
+					///List<CtxIdentifier> caciModelAttrLocalList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
+					List<CtxIdentifier> caciModelAttrLocalList = ctxBroker.lookup(caciModelAttrRemote.getScope(), CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
 					LOG.debug("***onModification 2 caciModelAttrLocalList= " + caciModelAttrLocalList.size());
-					IIdentity localcssID = getOwnerId();
-					CtxEntityIdentifier entityID = ctxBroker.retrieveIndividualEntityId(null, localcssID).get();
+					//					IIdentity localcssID = getOwnerId();
+					//					CtxEntityIdentifier entityID = ctxBroker.retrieveIndividualEntityId(null, localcssID).get();
 
 					//	LOG.info("***onModification 3 entityID= " + entityID.toString());
 					if( caciModelAttrLocalList.isEmpty()){
@@ -249,7 +249,7 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 
 		}
 
-		private IIdentity getOwnerId(){
+		public IIdentity getOwnerId(){
 
 			IIdentity cssOwnerId = null;
 			try {

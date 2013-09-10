@@ -309,7 +309,7 @@ public class PrivacyAssessmentController {
                 ylabel = "Correlation of data transmission and data access";
 
                 HashMap<String, AssessmentResultClassName> assResult;
-                assResult = assessment.getAssessmentAllClasses(null, null);
+                assResult = assessment.getAssessmentAllClasses(true, null, null);
 
                 int size = assResult.size();
                 String[] labels = new String[size];
@@ -343,7 +343,7 @@ public class PrivacyAssessmentController {
                 ylabel = "Number of accesses to local data";
 
                 Map<String, Integer> dataAccessClasses;
-                dataAccessClasses = assessment.getNumDataAccessEventsForAllClasses(new Date(0), new Date());
+                dataAccessClasses = assessment.getNumDataAccessEventsForAllClasses(true, new Date(0), new Date());
                 LOG.debug("Number of data access events (by class): {}", dataAccessClasses.size());
                 plotData = new PlotData[]{mapToArrays(dataAccessClasses)};
                 plotDataLabels = new String[]{"data"};
@@ -380,7 +380,7 @@ public class PrivacyAssessmentController {
         } else if (presentationFormat.equalsIgnoreCase(Presentation.Format.TABLE)) {
 
             HashMap<String, AssessmentResultClassName> assResult;
-            assResult = assessment.getAssessmentAllClasses(null, null);
+            assResult = assessment.getAssessmentAllClasses(true, null, null);
             model.put("assessmentResults", assResult.values());
 
             LOG.debug(PageNames.PRIVACY_ASSESSMENT + " HTTP POST end");

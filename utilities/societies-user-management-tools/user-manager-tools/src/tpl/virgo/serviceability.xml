@@ -1,0 +1,196 @@
+<configuration>
+
+	<contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
+
+	<appender name="SIFTED_LOG_FILE" class="ch.qos.logback.classic.sift.SiftingAppender">
+		<discriminator>
+			<Key>applicationName</Key>
+			<DefaultValue>virgo-server</DefaultValue>
+		</discriminator>
+		<sift>
+			<appender name="${applicationName}_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+				<file>{{Parameter.configFolderName}}serviceability/logs/${applicationName}/log.log</file>
+				<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+					<FileNamePattern>{{Parameter.configFolderName}}serviceability/logs/${applicationName}/log_%i.log</FileNamePattern>
+					<MinIndex>1</MinIndex>
+					<MaxIndex>4</MaxIndex>
+				</rollingPolicy>
+				<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+					<MaxFileSize>10MB</MaxFileSize>
+				</triggeringPolicy>
+				<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+					<Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level %-28.28thread %-64.64logger{64} %X{medic.eventCode} %msg %ex%n</Pattern>
+				</encoder>
+			</appender>
+		</sift>
+	</appender>
+	
+	<appender name="LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>{{Parameter.configFolderName}}serviceability/logs/log.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<FileNamePattern>{{Parameter.configFolderName}}serviceability/logs/log_%i.log</FileNamePattern>
+			<MinIndex>1</MinIndex>
+			<MaxIndex>4</MaxIndex>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level %-28.28thread %-64.64logger{64} %X{medic.eventCode} %msg %ex%n</Pattern>
+		</encoder>
+	</appender>
+	
+	
+	<appender name="SOCIETIES_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>{{Parameter.configFolderName}}serviceability/logs/societies_log.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>{{Parameter.configFolderName}}serviceability/logs/societies_log_%i.log</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>5</MaxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level %-28.28thread %-64.64logger{64} %X{medic.eventCode} %msg %ex%n</Pattern>
+        </encoder>
+    </appender>
+	
+	<appender name="SOCIETIES_TEST_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>{{Parameter.configFolderName}}serviceability/logs/societies_test_log.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>{{Parameter.configFolderName}}serviceability/logs/societies_test_log_%i.log</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>5</MaxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level %-28.28thread %-64.64logger{64} %X{medic.eventCode} %msg %ex%n</Pattern>
+        </encoder>
+    </appender>
+	
+	<appender name="SOCIETIES_REDONDANT_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>{{Parameter.configFolderName}}serviceability/logs/societies_redondant_log.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>{{Parameter.configFolderName}}serviceability/logs/societies_redondant_log_%i.log</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>4</MaxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level %-28.28thread %-64.64logger{64} %X{medic.eventCode} %msg %ex%n</Pattern>
+        </encoder>
+    </appender>
+	
+	<appender name="PRIVACY_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>{{Parameter.configFolderName}}serviceability/logs/privacy_log.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>serviceability/logs/privacy_log_%i.log</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>5</MaxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level %-28.28thread %-64.64logger{64} %X{medic.eventCode} %msg %ex%n</Pattern>
+        </encoder>
+    </appender>
+	
+	<appender name="COMM_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>{{Parameter.configFolderName}}serviceability/logs/comm_log.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>serviceability/logs/comm_log_%i.log</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>5</MaxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-5level %-28.28thread %-64.64logger{64} %X{medic.eventCode} %msg %ex%n</Pattern>
+        </encoder>
+    </appender>
+
+	<appender name="EVENT_LOG_STDOUT" class="org.eclipse.virgo.medic.log.logback.ReroutingAwareConsoleAppender">
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-28.28thread &lt;%X{medic.eventCode}&gt; %msg %ex%n</Pattern>
+		</encoder>
+	</appender>
+
+	<appender name="EVENT_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>{{Parameter.configFolderName}}serviceability/eventlogs/eventlog.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<FileNamePattern>{{Parameter.configFolderName}}serviceability/eventlogs/eventlog_%i.log</FileNamePattern>
+			<MinIndex>1</MinIndex>
+			<MaxIndex>4</MaxIndex>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] %-28.28thread &lt;%X{medic.eventCode}&gt; %msg %ex%n</Pattern>
+		</encoder>
+	</appender>
+
+
+	<logger level="INFO" additivity="false" name="org.eclipse.virgo.medic.eventlog.localized">
+		<appender-ref ref="EVENT_LOG_STDOUT" />
+		<appender-ref ref="EVENT_LOG_FILE" />
+	</logger>
+	
+	<logger level="INFO" additivity="false" name="org.societies.integration">
+		<appender-ref ref="EVENT_LOG_STDOUT" />
+	</logger>
+	
+	<logger level="INFO" additivity="false" name="org.eclipse.virgo.medic.eventlog.default">
+		<appender-ref ref="SIFTED_LOG_FILE" />
+		<appender-ref ref="LOG_FILE" />
+	</logger>
+	
+	<!-- Specific Societies Loggers -->
+	<logger level="TRACE" additivity="false" name="org.societies"> 	
+		<appender-ref ref="SOCIETIES_LOG_FILE" /> 
+	</logger>
+	
+	<logger level="TRACE" name="org.societies.privacytrust">
+		<appender-ref ref="PRIVACY_LOG_FILE" /> 
+	</logger>
+	
+	<logger level="TRACE" additivity="false" name="org.societies.privacytrust.privacyprotection.assessment">
+		<appender-ref ref="SOCIETIES_REDONDANT_LOG_FILE" /> 
+	</logger>
+	
+	<logger level="TRACE" additivity="false" name="org.societies.privacytrust.trust">
+		<appender-ref ref="SOCIETIES_REDONDANT_LOG_FILE" /> 
+	</logger>
+	
+	<logger level="TRACE" name="org.societies.comm">
+		<appender-ref ref="COMM_LOG_FILE" /> 
+	</logger>
+	
+	<logger level="TRACE" name="org.societies.integration">
+		<appender-ref ref="PRIVACY_LOG_FILE" />
+		<appender-ref ref="SOCIETIES_TEST_LOG_FILE" />
+	</logger>
+	
+	<logger level="DEBUG" additivity="false" name="org.societies.context.location.management.impl.PZWrapperImpl">
+		<appender-ref ref="SOCIETIES_REDONDANT_LOG_FILE" />
+	</logger>
+
+	<logger level="TRACE" additivity="false" name="org.societies.useragent.feedback">
+		<appender-ref ref="SOCIETIES_REDONDANT_LOG_FILE" />
+		<appender-ref ref="PRIVACY_LOG_FILE" />
+	</logger>
+
+	
+	<root level="INFO">
+		<appender-ref ref="SIFTED_LOG_FILE" />
+		<appender-ref ref="LOG_FILE" />
+	</root>
+
+</configuration>

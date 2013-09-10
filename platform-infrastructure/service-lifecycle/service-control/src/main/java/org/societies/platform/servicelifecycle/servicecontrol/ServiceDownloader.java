@@ -30,8 +30,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
 
+import org.eclipse.jetty.util.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.schema.servicelifecycle.model.Service;
@@ -47,70 +47,185 @@ public class ServiceDownloader {
 	/** Size of buffer */
 	private static final int BUFFER_SIZE = 1024 * 1024;
 	
-	private static final String CLIENTFOLDER = "3p-services/client";
-	private static final String SERVERFOLDER = "3p-services/server";
-	
 	private static byte[] bytes = new byte[BUFFER_SIZE];  
 
 	static final Logger logger = LoggerFactory.getLogger(ServiceDownloader.class);
 	
-	public static boolean deleteFile(URI path){
+	public static void deleteFile(URI path){
+		
+		logger.debug("Attempting to delete file with path: {}",path);
+		
+		if(path == null)
+			return;
 		
 		File file = new File(path);
-		
-		return file.delete();
+		if(file.isFile()){
+			boolean delete = file.delete();
+			if(!delete){
+				logger.debug("First delete attempt of {} failed, so asking Java to delete on JVM exit!",file.getName());
+				file.deleteOnExit();
+			}		
+		}
 	}
 	
-	public static URI downloadServiceJar(URL jarURL, Service service){
+	public static URI downloadClientJar(URL jarURL, Service service, String user, String serviceDir){
 		
-		String serviceName = service.getServiceName().replace(' ', '-');
+		String serviceName = service.getServiceName().replace(' ', '-').toLowerCase();
 		String version = service.getServiceInstance().getServiceImpl().getServiceVersion();
-		String fileName = serviceName+"-"+version;
-		String filePath = CLIENTFOLDER+"/"+fileName +"/" + serviceName +"-client.jar";
 		
-		if(logger.isDebugEnabled())
-			logger.debug("Trying to download " + jarURL.toString() + " to " + filePath);
+		StringBuilder filePathBuilder = new StringBuilder();	
+		filePathBuilder.append(serviceDir).append('/').append(user).append('/').append(serviceName).append(version).append("-client");
+		
+		// Is it a war or a jar?
+		if(jarURL.getFile().contains(".war"))
+			filePathBuilder.append(".war");
+		else
+			filePathBuilder.append(".jar");
+		
+		String filePath = filePathBuilder.toString();
+		
+		logger.debug("Trying to download {} to {}",jarURL.toString(),filePath);
 		
 		try {
 			File downloadedClient = writeFile(jarURL.openStream(),filePath);
 			
-			if(logger.isDebugEnabled())
-				logger.debug("Jar downloaded to path: " + downloadedClient.getAbsolutePath());
+			logger.debug("Jar downloaded to path: {}", downloadedClient.getAbsolutePath());
 			
 			return downloadedClient.toURI();
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			logger.error("Exception occured while trying to download Client Jar: {}",e.getMessage());
 			e.printStackTrace();
 			return null;
 		}
 	}
 	
-	public static URI downloadJar(URL jarURL){
+	public static URI downloadServerJar(URL jarURL, String user, String serviceDir){
 		
-		String filePath = jarURL.getFile();
+		String remoteFileName = jarURL.getFile();
 
-		if(jarURL.getProtocol().toLowerCase().equals("file")){
-			filePath = SERVERFOLDER+"/"+ filePath.substring(filePath.lastIndexOf('/')+1);
-		} else
-			filePath = SERVERFOLDER+"/"+jarURL.getFile();
+		StringBuilder filePathBuilder = new StringBuilder();	
+		filePathBuilder.append(serviceDir).append('/').append(user).append('/');
 		
-		if(logger.isDebugEnabled())
-			logger.debug("Trying to download " + jarURL.toString() + " to " + filePath);
+		if(jarURL.getProtocol().toLowerCase().equals("file")){
+			filePathBuilder.append(remoteFileName.substring(remoteFileName.lastIndexOf('/')+1));
+		} else
+			filePathBuilder.append(remoteFileName);
+		
+		
+		String filePath = filePathBuilder.toString();		
+		logger.debug("Trying to download {} to {}",jarURL.toString(),filePath);;
 		
 		try {
 			File downloadedClient = writeFile(jarURL.openStream(),filePath);
 			
-			if(logger.isDebugEnabled())
-				logger.debug("Jar downloaded to path: " + downloadedClient.getAbsolutePath());
+			logger.debug("Jar downloaded to path: {}", downloadedClient.getAbsolutePath());
 			
 			return downloadedClient.toURI();
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			logger.error("Exception occured while trying to download Service Jar: {}",e.getMessage());
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public static URI downloadServerJar(InputStream is, String fileName, String user, String serviceDir){
+		
+		StringBuilder filePathBuilder = new StringBuilder();	
+		filePathBuilder.append(serviceDir).append('/').append(user).append('/').append(fileName);
+		
+		String filePath = filePathBuilder.toString();	
+		logger.debug("Trying to download {} inputStream to {}",fileName,filePath);
+		
+		try {
+			File downloadedClient = writeFile(is,filePath);
+				
+			logger.debug("Jar downloaded to path: {}", downloadedClient.getAbsolutePath());
+			
+			return downloadedClient.toURI();
+			
+		} catch (IOException e) {
+			logger.error("Exception occured while trying to download Service Jar: {}",e.getMessage());
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public static URI storeClient(InputStream is, String fileName, String bundleName, String user, String serviceDir){
+		
+		StringBuilder filePathBuilder = new StringBuilder();
+		filePathBuilder.append(serviceDir).append('/').append(user).append('/').append("clientStorage");
+		filePathBuilder.append('/').append(bundleName.replace('.','-')).append('/').append(fileName);
+		
+		String filePath = filePathBuilder.toString();	
+		logger.debug("Trying to download {} inputStream to {}",fileName,filePath);
+		
+		try {
+			File downloadedClient = writeFile(is,filePath);
+				
+			logger.debug("Client jar stored in path: {}", downloadedClient.getAbsolutePath());
+			
+			return downloadedClient.toURI();
+			
+		} catch (IOException e) {
+			logger.error("Exception occured while trying to download Service Jar: {}",e.getMessage());
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public static void cleanClients(String bundleName, String user, String serviceDir){
+		
+		StringBuilder filePathBuilder = new StringBuilder();
+		filePathBuilder.append(serviceDir).append('/').append(user).append('/').append("clientStorage");
+		filePathBuilder.append('/').append(bundleName.replace('.','-'));
+		
+		String filePath = filePathBuilder.toString();	
+		logger.debug("Trying to clean client storage for {}, at {}",bundleName,filePath);
+		
+		try {
+			File directory = new File(filePath);
+			
+			if(!directory.exists()){
+				logger.debug("{} does not have a client storage to delete.",bundleName);
+				return;
+			}
+			
+			File[] clientFiles = directory.listFiles();
+			
+			if (clientFiles != null){
+				for(int i = 0; i < clientFiles.length; i++){
+					
+					File file = clientFiles[i];
+					logger.debug("Trying to delete {}", file.getName());
+					if(file.isFile()){
+						boolean delete = file.delete();
+						if(!delete){
+							logger.debug("First delete attempt of {} failed, so asking Java to delete on JVM exit!",file.getName());
+							file.deleteOnExit();
+						}		
+					}
+				}
+				
+			} else{
+				logger.debug("{} is not a directory and we couldn't find files!",filePath);
+			}
+			
+			logger.debug("Now we need to try to delete directory itself: {}",filePath);
+			
+			boolean deleteFolder = directory.delete();
+			
+			if(!deleteFolder){
+				logger.debug("First delete attempt of {} failed, so asking Java to delete on JVM exit!",directory.getName());
+				directory.deleteOnExit();
+			}	
+			
+		} catch(Exception e){
+			logger.error("Exception occured while trying to download Service Jar: {}",e.getMessage());
+			e.printStackTrace();
+		}
+
 	}
 	
 	/**

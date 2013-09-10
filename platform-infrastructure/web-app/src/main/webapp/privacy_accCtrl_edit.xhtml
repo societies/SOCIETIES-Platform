@@ -1,0 +1,208 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="templates/main_template.xhtml">
+
+	<ui:define name="html_head">
+		<title>Privacy Preferences</title>
+	</ui:define>
+
+	<ui:define name="body">
+			<ui:fragment
+			rendered="#{AccCtrleditBean.accCtrlDetailUUID eq null or AccCtrleditBean.accCtrlDetailUUID eq ''}">
+			<!-- redirect to privacypreferences page if accCtrlDetailUUID not set -->
+			<meta http-equiv="REFRESH" content="0;url=privacypreferences.xhtml" />
+		</ui:fragment>
+		<div class="hr grid_12 clearfix"></div>
+		<!-- Left Column -->
+		<section id="left_col" class="grid_12">
+			<div class="breadcrumbs">
+				<a href="index.xhtml">Home</a> / <a href="privacysettings.xhtml">Privacy
+					Settings</a> / <a href="privacypreferences.xhtml">Privacy
+					Preferences</a> / Edit Access control Preference
+					</div>
+
+			<section class="form_style_main">
+
+				<h4 class="form_title">View new Access Control Preference</h4>
+				<div class="hr grid_12 clearfix"></div>
+				
+				<h5>Privacy Preference Details</h5>
+					<h:panelGrid columns="2" cellpadding="5">
+						
+						<h:outputLabel for="requestorId" value="Requestor:"></h:outputLabel>
+						<h:outputText id="requestorId"
+							value="#{AccCtrleditBean.preferenceDetails.requestor.requestorId}"></h:outputText>
+
+
+					</h:panelGrid>
+				
+				<p:contextMenu for="treeSingle">
+					<p:menuitem value="View" update="messages"
+						actionListener="#{AccCtrleditBean.displaySelectedSingle}"
+						icon="ui-icon-search" />
+					<p:menuitem value="Delete" update="treeSingle"
+						actionListener="#{AccCtrleditBean.deleteNode}" icon="ui-icon-close" />
+					<p:menuitem value="Add Condition"
+						actionListener="#{AccCtrleditBean.startAddConditionProcess}"
+						icon="ui-icon-plus" />
+					<p:menuitem value="Add Privacy Condition"
+						actionListener="#{AccCtrleditBean.startAddPrivacyConditionProcess}"
+						icon="ui-icon-plus" />
+					<p:menuitem value="Add Trust Condition"
+						actionListener="#{AccCtrleditBean.startAddTrustConditionProcess}"
+						icon="ui-icon-plus" />						
+					<p:menuitem value="Add Outcome"
+						actionListener="#{AccCtrleditBean.startAddOutcomeProcess}"
+						icon="ui-icon-plus" />
+					<p:menuitem value="Edit" update="treeSingle"
+						actionListener="#{AccCtrleditBean.editNode}" icon="ui-icon-pencil" />
+
+				</p:contextMenu>
+
+				<h:panelGrid columns="1" cellpadding="5">
+					<p:tree id="treeSingle" value="#{AccCtrleditBean.root}" var="node"
+						selectionMode="single" selection="#{AccCtrleditBean.selectedNode}"
+						cache="false" dynamic="true" expanded="true">
+
+						<p:treeNode>
+							<h:outputText value="#{AccCtrleditBean.formatNodeForDisplay(node)}" />
+						</p:treeNode>
+					</p:tree>
+				</h:panelGrid>
+			</section>
+
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:commandButton type="button" value="Save" icon="ui-icon-disk" onclick="cd.show();" />
+					
+
+					<p:confirmDialog id ="confirmationDialog" widgetVar="cd" global="true" message="Are you sure you want to save this preference permanently?"
+							icon="ui-icon-alert" >
+						<p:commandButton value="Yes"
+							styleClass="ui-confirmdialog-yes" icon="ui-icon-check" oncomplete="cd.hide();" actionListener="#{AccCtrleditBean.savePreference}"/>
+						<p:commandButton value="No"
+							styleClass="ui-confirmdialog-no" icon="ui-icon-close" oncomplete="cd.hide();"/>
+					</p:confirmDialog>
+				</p:toolbarGroup>
+			</p:toolbar>
+
+		</section>
+
+		<div class="hr grid_12 clearfix"></div>
+
+
+		<p:dialog id="addConditionDialog" header="Add Condition"
+			widgetVar="addConddlg" resizable="false" dynamic="true">
+
+			<h:panelGrid columns="2" cellpadding="5">
+
+				<h:outputLabel for="ctxId" value="Condition:" />
+				<h:selectOneMenu id="ctxId" value="#{AccCtrleditBean.selectedCtxID}">
+					<f:selectItems value="#{AccCtrleditBean.ctxIds}" />
+				</h:selectOneMenu>
+
+				<h:outputLabel for="operator" value="Operator: " />
+				<p:selectOneMenu id="operator"
+					value="#{AccCtrleditBean.selectedCtxOperator}">
+					<f:selectItems value="#{AccCtrleditBean.operators}" />
+				</p:selectOneMenu>
+				<h:outputLabel for="ctxValue" value="Value:" />
+				<p:inputText id="ctxValue" value="#{AccCtrleditBean.ctxValue}"
+					label="value">
+				</p:inputText>
+
+				<f:facet name="footer">
+					<p:commandButton id="AddConditionButton" value="Add"
+						oncomplete="#{p:widgetVar('addConditionDialog')}.hide()"
+						update="treeSingle" ajax="true"
+						actionListener="#{AccCtrleditBean.addCondition}" />
+				</f:facet>
+
+			</h:panelGrid>
+
+		</p:dialog>
+
+		<p:dialog id="addTrustConditionDialog" header="Add Trust Condition"
+			widgetVar="addTrustConddlg" resizable="false" dynamic="true">
+
+			<p:inputText id="trustValue" value="#{AccCtrleditBean.trustValue}" />
+			<p:slider for="trustValue" />
+			<f:facet name="footer">
+				<p:commandButton id="AddTrustConditionButton" value="Add"
+					oncomplete="#{p:widgetVar('addTrustConditionDialog')}.hide()"
+					update="treeSingle" ajax="true"
+					actionListener="#{AccCtrleditBean.addTrustCondition}" />
+			</f:facet>
+
+		</p:dialog>
+
+		<p:dialog id="addPrivacyConditionDialog"
+			header="Add Privacy Condition" widgetVar="addPrivConddlg"
+			resizable="false" dynamic="true">
+
+			<h:panelGrid columns="2" cellpadding="5">
+
+				<h:outputLabel for="privacyCondition" value="Privacy Condition:" />
+				<h:selectOneMenu id="privacyCondition"
+					value="#{AccCtrleditBean.selectedPrivacyCondition}">
+					<f:selectItems value="#{AccCtrleditBean.privacyConditions}" />
+					<p:ajax update="privacyConditionValue"
+						listener="#{AccCtrleditBean.handlePrivacyTypeChange}" />
+				</h:selectOneMenu>
+
+				<h:outputLabel for="operatorForPrivacy" value="Operator: " />
+				<p:selectOneMenu id="operatorForPrivacy"
+					value="#{AccCtrleditBean.selectedOperator}">
+					<f:selectItems value="#{AccCtrleditBean.operators}" />
+
+				</p:selectOneMenu>
+
+				<h:outputLabel for="privacyConditionValue" value="Value:" />
+				<p:selectOneMenu id="privacyConditionValue"
+					value="#{AccCtrleditBean.selectedPrivacyValue}" label="value">
+					<f:selectItems value="#{AccCtrleditBean.privacyValues}" />
+				</p:selectOneMenu>
+
+				<f:facet name="footer">
+					<p:commandButton id="AddPrivacyConditionButton" value="Add"
+						oncomplete="#{p:widgetVar('addPrivacyConditionDialog')}.hide()"
+						update="treeSingle" ajax="true"
+						actionListener="#{AccCtrleditBean.addPrivacyCondition}" />
+				</f:facet>
+
+			</h:panelGrid>
+		</p:dialog>
+
+
+		<p:dialog id="addOutcomeDialog" header="Add Outcome"
+			widgetVar="addOutdlg" resizable="false" dynamic="true">
+			<h:panelGrid columns="2" cellpadding="5">
+				<h:outputLabel for="decision" value="Select your action:" />
+				<h:selectOneMenu id="decision"
+					value="#{AccCtrleditBean.selectedDecision}">
+					<f:selectItems value="#{AccCtrleditBean.decisions}" />
+				</h:selectOneMenu>
+				<f:facet name="footer">
+					<p:commandButton id="AddOutcomeButton" value="Add"
+						oncomplete="#{p:widgetVar('addOutcomeDialog')}.hide()"
+						update="treeSingle" ajax="true"
+						actionListener="#{AccCtrleditBean.addOutcome}" />
+				</f:facet>
+
+
+			</h:panelGrid>
+		</p:dialog>
+
+	</ui:define>
+
+
+
+	<ui:define name="dialogs">
+		<ui:include src="includes/dialogs/privacyPreferencesComponents.xhtml" />
+	</ui:define>
+</ui:composition>
+</html>

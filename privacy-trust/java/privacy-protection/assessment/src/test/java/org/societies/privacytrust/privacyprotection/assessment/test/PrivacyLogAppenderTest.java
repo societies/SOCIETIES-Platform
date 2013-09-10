@@ -38,6 +38,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacyas
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataTransmissionLogEntry;
 import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLog;
 import org.societies.privacytrust.privacyprotection.assessment.log.PrivacyLogAppender;
+import org.societies.privacytrust.privacyprotection.assessment.util.ServiceResolver;
 
 /**
  * Test case for Privacy Assessment
@@ -59,6 +60,7 @@ public class PrivacyLogAppenderTest {
 		privacyLogAppender = new PrivacyLogAppender();
 		PrivacyLog privacyLog = new PrivacyLog();
 		privacyLogAppender.setPrivacyLog(privacyLog);
+		privacyLogAppender.setServiceResolver(new ServiceResolver());
 	}
 
 	/**

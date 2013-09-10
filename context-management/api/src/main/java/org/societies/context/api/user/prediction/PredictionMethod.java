@@ -31,4 +31,22 @@ package org.societies.context.api.user.prediction;
  */
 public class PredictionMethod {
 
+	// available methods
+	public static final String NEURAL_NETWORKS = "neuralNetworks";
+	
+	public String currentMethod;
+	
+	public PredictionMethod(){
+		
+	}
+
+	public String getCurrentMethod() {
+		return currentMethod;
+	}
+
+	public void setCurrentMethod(String currentMethod) {
+		this.currentMethod = currentMethod;
+	}
+	
+	
 }

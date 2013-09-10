@@ -366,8 +366,7 @@ public class CommunityCtxDBMgrTest {
    
 	
 	@Test
-	public void testLookupSetOfTypes() throws CtxException{
-		System.out.println("---- testLookupSetOfTypes");
+	public void testLookupSetOfTypes() throws CtxException {
 		   
 		Set<CtxIdentifier> ids;
 	    
@@ -430,13 +429,6 @@ public class CommunityCtxDBMgrTest {
 	    assertTrue(!ids.contains(attribute3.getId()));
 	    assertEquals(1, ids.size());
 	    
-	    // 
-	    // Lookup entities using entityId and type
-	    //
-	    ids = communityDB.lookup(entId, CtxModelType.ENTITY, types);
-	    assertTrue(ids.contains(entId));
-	    assertEquals(1, ids.size());	
-	    
 	    //
 	    // Lookup attributes using entityId and type
 	    //
@@ -493,9 +485,7 @@ public class CommunityCtxDBMgrTest {
    }
 	
    @Test
-   public void testLookupCommunityCtxEntity() throws CtxException{
-	   
-	   System.out.println("---- testLookupCommunityCtxEntity");
+   public void testLookupCommunityCtxEntity() throws CtxException {
 
 	   List<CtxIdentifier> ids;
 	   CommunityCtxEntity entity = this.communityDB.createCommunityEntity(CIS_IIDENTITY_STRING10);

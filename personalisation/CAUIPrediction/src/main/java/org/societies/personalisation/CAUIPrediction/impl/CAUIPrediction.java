@@ -21,8 +21,6 @@ package org.societies.personalisation.CAUIPrediction.impl;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,13 +28,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
-import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -48,12 +44,10 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.logging.IPerformanceMessage;
 import org.societies.api.internal.logging.PerformanceMessage;
-import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
@@ -66,7 +60,6 @@ import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
-import org.societies.personalisation.CAUI.api.model.IUserIntentTask;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
@@ -110,11 +103,6 @@ public class CAUIPrediction implements ICAUIPrediction{
 	// Coupled of String representation of performed action and respective predicted action   
 	public static java.util.List<java.util.Map.Entry<String,String>> predictionPairList= new java.util.ArrayList<java.util.Map.Entry<String,String>>();
 
-	@Override
-	public java.util.List<java.util.Map.Entry<String, String>> getPredictionPairLog() {
-		return predictionPairList;
-	}
-
 	int predictionRequestsCounter = 0;
 	int discoveryThreshold = 6;
 	public boolean cauiModelExist = false;
@@ -126,7 +114,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 	//boolean caciFreshness = true;
 
 	protected CtxAttribute currentCaciModelAttr;
-	CACIPrediction caciPredictor = null;
+	private CACIPrediction caciPredictor = null;
 
 	private IIdentity cssOwnerId;
 	private CtxEntityIdentifier operatorEntId;
@@ -216,21 +204,17 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		if(cauiModelExist == true && enableCauiPrediction == true){
 
-			//LOG.info("1. model exists " +modelExist);
-			//LOG.info("START PREDICTION caui modelExist "+modelExist);
-			//UIModelBroker setModel = new UIModelBroker(ctxBroker,cauiTaskManager);	
-			//setActiveModel(requestor);
+			if(currentUIModelData != null ) this.cauiTaskManager.updateModel(currentUIModelData);
+		
+			LOG.debug("caui model to be used for prediction: "+ this.cauiTaskManager.getCAUIActiveModel() );
+	
 			String par = action.getparameterName();
 			String val = action.getvalue();
 			//LOG.info("2. action perf par:"+ par+" action val:"+val);
-			//add code here for retrieving current context;
-
-
-
+			
 			// identify performed action in model
-			List<IUserIntentAction> actionsList = cauiTaskManager.retrieveActionsByTypeValue(par, val);
-			LOG.debug("3. cauiTaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
-
+			List<IUserIntentAction> actionsList = this.cauiTaskManager.retrieveActionsByTypeValue(par, val);
+			LOG.debug("1. CAUIMODEL TaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
 
 			if(actionsList.size()>0){
 
@@ -239,16 +223,16 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 				IUserIntentAction currentAction = findBestMatchingAction(actionsList);
 
-				LOG.debug("4. currentAction " +currentAction);
-				Map<IUserIntentAction,Double> nextActionsMap = cauiTaskManager.retrieveNextActions(currentAction);	
+				LOG.debug("2. CAUIMODEL currentAction " +currentAction);
+				Map<IUserIntentAction,Double> nextActionsMap = this.cauiTaskManager.retrieveNextActions(currentAction);	
 				//LOG.info("5. nextActionsMap " +nextActionsMap);
 
 				// no context
 				if(nextActionsMap.size()>0){
 					for(IUserIntentAction nextAction : nextActionsMap.keySet()){
 						Double doubleConf = nextActionsMap.get(nextAction);
-						//doubleConf = doubleConf*100;
-						doubleConf = 70.0;
+						doubleConf = doubleConf*100;
+						//doubleConf = 70.0;
 						nextAction.setConfidenceLevel(doubleConf.intValue());
 						//LOG.info("6. nextActionsMap " +nextAction);
 						results.add(nextAction);
@@ -258,13 +242,11 @@ public class CAUIPrediction implements ICAUIPrediction{
 				}			
 			}
 		} else if(enableCACIPrediction == true && caciModelExist == true) {
-			LOG.info("no CAUI model exist ... utilize community model ");
+			LOG.info("CAUI predictor not able to perform prediction ... community model to be used");
 
 			results = this.caciPredictor.getPrediction(requestor, action);
 
-		} else LOG.info("neither caci, nor caui are able to perform prediction");
-		//LOG.info(" getPrediction(IIdentity requestor, IAction action) "+ results);
-
+		} else LOG.info("neither caci, nor caui are able to perform prediction based on action update");
 
 		if(results.size()>0){
 			String predictedActString = "";
@@ -289,7 +271,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 	@Override
 	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor, CtxAttribute contextAttribute) {
 
-		LOG.debug("getPrediction based on attr update  contextAttribute"+ contextAttribute.getId().toString()+" identity requestor"+requestor);
+		LOG.debug("getPrediction based on attr update  contextAttribute : "+ contextAttribute.getId().toString()+" identity requestor"+requestor);
 		LOG.debug("attr string value "+contextAttribute.getStringValue() );
 		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
 
@@ -297,7 +279,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		CtxAttribute currentLocation = null;
 		CtxAttribute currentStatus = null; 
-		retrieveOperatorsCtx(CtxAttributeTypes.STATUS);
+		//retrieveOperatorsCtx(CtxAttributeTypes.STATUS);
 		//CtxAttribute currentLocation = retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC);
 		if(contextAttribute.getType().equals(CtxAttributeTypes.LOCATION_SYMBOLIC)){
 			currentLocation = contextAttribute;					 
@@ -325,80 +307,47 @@ public class CAUIPrediction implements ICAUIPrediction{
 		}
 
 		LOG.debug("situationContext :"+ situationContext);
+		
+		//LOG.debug("skata 1 cauiModelExist :"+ cauiModelExist +" enableCauiPrediction:"+enableCauiPrediction);
+		
+		if(cauiModelExist == true && enableCauiPrediction == true){
 
-		if(cauiTaskManager.retrieveActionsByContext(situationContext) != null ) {
-			results = cauiTaskManager.retrieveActionsByContext(situationContext);
+			if(currentUIModelData != null ) 	{
+				//LOG.debug("skata 2 currentUIModelData :"+ currentUIModelData );
+				this.cauiTaskManager.updateModel(currentUIModelData);
+			}
+			
+			if(cauiTaskManager.retrieveActionsByContext(situationContext) != null ) {
+				
+				results = cauiTaskManager.retrieveActionsByContext(situationContext);
+			//	LOG.debug("skata 3 results :"+ results );
+				
+				// prediction performance log
+				long endTime = System.currentTimeMillis();
+				this.predictionPerformanceLog(endTime-startTime);
+				for(IUserIntentAction action : results) {
+					int confLevel = action.getConfidenceLevel();
+					this.predictionConfLevelPerformanceLog(confLevel);	
+				}
 
-			// prediction performance log
-			long endTime = System.currentTimeMillis();
-			this.predictionPerformanceLog(endTime-startTime);
-			for(IUserIntentAction action : results) {
-				int confLevel = action.getConfidenceLevel();
-				this.predictionConfLevelPerformanceLog(confLevel);	
 			}
 
-		}
+			LOG.info("action prediction based on ctx update :"+ results);		
+			return new AsyncResult<List<IUserIntentAction>>(results);
+		
+		}else if(enableCACIPrediction == true && caciModelExist == true) {
+			
+			LOG.info("CAUI predictor not able to perform prediction ... community model will be used");
+			//results = this.caciPredictor.getPrediction(requestor, action);
 
+		} else LOG.info("neither caci, nor caui are able to perform prediction based on ctx updated");
+		
+		
 		LOG.info("action prediction based on ctx update :"+ results);		
-
 		return new AsyncResult<List<IUserIntentAction>>(results);
 	}
 
 
-	/*
-	@Override
-	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor,
-			CtxAttribute contextAttribute) {
-
-		//LOG.info("getPrediction based on attr update  contextAttribute"+ contextAttribute.getId().toString()+" identity requestor"+requestor);
-		//LOG.info("attr string value "+contextAttribute.getStringValue() );
-
-		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
-		IAction lastAction = null;
-		// TODO use last predicted or performed action?
-		// if performed actions also trigger prediction... so no use ?
-		IUserIntentAction lastPredictedAction = null;
-
-		if(lastMonitoredActions.size()>0){
-			lastAction = lastMonitoredActions.get(lastMonitoredActions.size()-1);	
-			//LOG.info("getPrediction: lastAction "+lastAction.getparameterName() +" value "+lastAction.getvalue() );
-
-		}
-
-		if(lastAction != null && modelExist == true && enablePrediction == true){
-			String par = lastAction.getparameterName();
-			String val = lastAction.getvalue();
-			// identify performed action in model
-			List<IUserIntentAction> actionsList = cauiTaskManager.retrieveActionsByTypeValue(par, val);
-
-			if(actionsList.size()>0){
-				// improve this to also use context for action identification
-				IUserIntentAction currentAction = actionsList.get(0);
-				Map<IUserIntentAction,Double> nextActionsMap = cauiTaskManager.retrieveNextActions(currentAction);	
-
-				//LOG.info(" getPrediction(IIdentity requestor,CtxAttribute contextAttribute): "+nextActionsMap);
-
-				if(nextActionsMap.size()>0){
-					for(IUserIntentAction nextAction : nextActionsMap.keySet()){
-						Double doubleConf = nextActionsMap.get(nextAction);
-						//doubleConf = doubleConf*100;
-						doubleConf = 50.0;
-						nextAction.setConfidenceLevel(doubleConf.intValue());
-						LOG.info(" conf level in caui pred: "+doubleConf.intValue());
-						results.add(nextAction);
-					}
-				}			
-			}
-		} else if(lastAction == null && modelExist == true && enablePrediction == true ){
-			LOG.info("can not perform secure prediction");
-		}
-
-
-
-		LOG.info("ctx update based action prediction:"+ results);		
-		return new AsyncResult<List<IUserIntentAction>>(results);
-	}
-	 */
 	// based on the current identity, serviceid and actionType what is the predicted action value?
 	// consider also context data
 	// i.e. userActionType:setDestination --> predict value:office
@@ -420,7 +369,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 				LOG.info("action LIST 1: "+actionList );
 				predictedAction = findBestMatchingAction(actionList);
 				LOG.info("action LIST 2: "+predictedAction );
-				
+
 			}
 
 		} else {
@@ -466,15 +415,10 @@ public class CAUIPrediction implements ICAUIPrediction{
 		this.lastMonitoredActions.add(action);
 	}
 
-
-
-
 	/*
 	 * Identify best matching action according to operator's current context and predicted actions context
 	 *	 
 	 */	
-
-
 	private IUserIntentAction findBestMatchingAction(List<IUserIntentAction> actionList){
 		IUserIntentAction bestAction = null;
 
@@ -546,6 +490,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 	@Override
 	public void receivePredictionFeedback(IAction action) {
 
+		LOG.debug("receivePredictionFeedback parameterName:"+ action.getparameterName() +" value:"+action.getvalue());
 
 	}
 
@@ -632,6 +577,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		if (newUIModelData != null){
 			this.caciPredictor.setCACIActiveModel(newUIModelData);
+			caciModelExist = true;	
+
 			LOG.info("caci model set - actions map: "+newUIModelData.getActionModel());
 		}
 	}
@@ -1120,7 +1067,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 				caciModelAttributeId = (CtxAttributeIdentifier) lsCaci.get(0);
 				attr = (CtxAttribute) this.ctxBroker.retrieve(caciModelAttributeId).get();
 				byte[] binaryModel = SerialisationHelper.serialise(modelData);
-				LOG.debug("skataaaaaa updating caci model  " +attr.getId() +" model: "+modelData );
+				//LOG.debug("skataaaaaa updating caci model  " +attr.getId() +" model: "+modelData );
 
 				this.ctxBroker.updateAttribute(attr.getId(), binaryModel).get();
 			}
@@ -1179,10 +1126,10 @@ public class CAUIPrediction implements ICAUIPrediction{
 			commEntIDList = this.retrieveBelongingCIS();
 			//TODO remove this line and add code to check if cis is local
 			result.addAll(commEntIDList);
-			
-			
+
+
 			LOG.debug(".............retrieveMyCIS..commEntIDList " +commEntIDList);
-/*
+			/*
 			if(!commEntIDList.isEmpty() ){
 				for(CtxEntityIdentifier entId :commEntIDList){
 					LOG.debug(".............retrieveMyCIS..entId.getOwnerId().." +entId.getOwnerId());
@@ -1194,7 +1141,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 					}
 				}
 			}
-*/
+			 */
 		} catch (Exception e) {
 			LOG.error("Unable to retrieve CISids that css belongs to " +e.getLocalizedMessage());
 		} 
@@ -1202,9 +1149,12 @@ public class CAUIPrediction implements ICAUIPrediction{
 		return result;
 	}
 
-	
-	
+	@Override
+	public java.util.List<java.util.Map.Entry<String, String>> getPredictionPairLog() {
+		return predictionPairList;
+	}
 
 
-	
+
+
 }

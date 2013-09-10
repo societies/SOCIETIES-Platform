@@ -76,6 +76,8 @@ public class SignatureMgr implements ISignatureMgr, ISlaSignatureMgr {
 		 
 		LOG.debug("Certificate: {}", cert);
 		LOG.debug("Public key: {}", publicKey);
+		LOG.debug("Public key algo: {}", publicKey.getAlgorithm());
+		LOG.debug("Public key format: {}", publicKey.getFormat());
 		LOG.debug("Private key: {}", privateKey);
 		
 		//test();
@@ -241,5 +243,15 @@ public class SignatureMgr implements ISignatureMgr, ISlaSignatureMgr {
 	@Override
 	public String cert2str(X509Certificate cert) throws DigsigException {
 		return KeyUtil.cert2str(cert);
+	}
+
+	@Override
+	public X509Certificate ba2cert(byte[] cert) throws DigsigException {
+		return KeyUtil.ba2cert(cert);
+	}
+
+	@Override
+	public byte[] cert2ba(X509Certificate cert) throws DigsigException {
+		return KeyUtil.cert2ba(cert);
 	}
 }

@@ -26,7 +26,6 @@ package org.societies.security.digsig.util;
 
 import static org.junit.Assert.*;
 
-import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
@@ -79,29 +78,6 @@ public class KeyUtilTest {
 		assertNotNull(cert);
 	}
 
-	/**
-	 * Test method for {@link org.societies.security.digsig.util.KeyUtil#str2key(java.lang.String)}.
-	 * @throws DigsigException 
-	 */
-//	@Test
-//	public void testStr2key() throws DigsigException {
-//		
-//		PrivateKey privateKeyCopy = (PrivateKey) key2str2key(privateKey);
-//		PublicKey publicKeyCopy = (PublicKey) key2str2key(publicKey);
-//		
-//		assertNotNull(privateKey);
-//		assertNotNull(publicKey);
-//		assertEquals(privateKey, privateKeyCopy);
-//		assertNotSame(privateKey, privateKeyCopy);
-//		assertEquals(publicKey, publicKeyCopy);
-//		assertNotSame(publicKey, publicKeyCopy);
-//	}
-//	
-//	private Key key2str2key(Key key) throws DigsigException {
-//		String keyStr = KeyUtil.key2str(key);
-//		return KeyUtil.str2key(keyStr);
-//	}
-	
 	@Test
 	public void testCert2key() throws Exception {
 		

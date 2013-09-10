@@ -83,11 +83,11 @@
 		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
+    <bean id="actFeed" class="org.societies.activity.ActivityFeed" >
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
 
     <context:annotation-config />
     <tx:annotation-driven />
-   
-   <bean id="CPACreationPatterns" class="org.societies.orchestration.cpa.impl.CPACreationPatterns" 
-   depends-on="" init-method="init">
-	</bean>
+
 </beans>

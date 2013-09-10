@@ -30,6 +30,7 @@ import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdExcept
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.services.ServiceUtils;
 
 /**
  * This class provides utility methods in order to instantiate 
@@ -60,6 +61,7 @@ public class TrustedEntityIdFactory {
 		if (sri == null)
 			throw new NullPointerException("sri can't be null");
 		
-		return new TrustedEntityId(TrustedEntityType.SVC, sri.getIdentifier().toString());
+		return new TrustedEntityId(TrustedEntityType.SVC, 
+				ServiceUtils.serviceResourceIdentifierToString(sri));
 	}
 }

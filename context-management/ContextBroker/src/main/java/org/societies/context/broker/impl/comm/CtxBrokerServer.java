@@ -26,8 +26,11 @@ package org.societies.context.broker.impl.comm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +42,7 @@ import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.context.broker.CtxAccessControlException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
@@ -46,11 +50,8 @@ import org.societies.api.context.model.CtxModelBeanTranslator;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.RequestorService;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.comm.ICISCommunicationMgrFactory;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.EventListener;
@@ -60,15 +61,11 @@ import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerRequestBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerResponseBean;
-import org.societies.api.schema.context.model.CtxAssociationBean;
 import org.societies.api.schema.context.model.CtxAttributeBean;
-import org.societies.api.schema.context.model.CtxEntityBean;
 import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
 import org.societies.api.schema.context.model.CtxIdentifierBean;
 import org.societies.api.schema.context.model.CtxModelObjectBean;
 import org.societies.api.schema.identity.RequestorBean;
-import org.societies.api.schema.identity.RequestorCisBean;
-import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.context.api.event.ICtxEventMgr;
 import org.societies.context.broker.impl.CtxBroker;
 import org.societies.context.broker.impl.InternalCtxBroker;
@@ -88,30 +85,26 @@ public class CtxBrokerServer implements IFeatureServer{
 			"org.societies.api.schema.identity",
 			"org.societies.api.schema.context.model",
 			"org.societies.api.schema.context.contextmanagement");
-	
+
 	private static final String[] EVENT_TYPES = { EventTypes.CIS_CREATION, EventTypes.CIS_RESTORE };
 
 	private ICommManager commManager;
-	
+
 	private ICISCommunicationMgrFactory commMgrFactory;
 
 	@Autowired(required=true)
 	private CtxBroker ctxbroker;
-	
+
 	/** The Context Event Mgmt service reference. TODO remove once pubsub persistence is enabled. */
 	private ICtxEventMgr ctxEventMgr;
-
-	private IIdentityManager identMgr = null;
 
 	@Autowired
 	public CtxBrokerServer(ICommManager commManager, 
 			ICISCommunicationMgrFactory commMgrFactory, IEventMgr eventMgr, ICtxEventMgr ctxEventMgr)
 					throws Exception {
-		
-		if (LOG.isInfoEnabled())
-			LOG.info(this.getClass() + " instantiated");
+
+		LOG.info("{} instantiated", this.getClass());
 		this.commManager = commManager;
-		this.identMgr = this.commManager.getIdManager();
 		this.commMgrFactory = commMgrFactory;
 		this.ctxEventMgr = ctxEventMgr;
 
@@ -132,8 +125,7 @@ public class CtxBrokerServer implements IFeatureServer{
 			this.ctxEventMgr.createTopics(entry.getKey(), InternalCtxBroker.EVENT_TOPICS);
 		}
 		// Register for new/restored CISs
-		if (LOG.isInfoEnabled())
-			LOG.info("Registering for '" + Arrays.asList(EVENT_TYPES) + "' events");
+		LOG.info("Registering for '{}' events", Arrays.asList(EVENT_TYPES));
 		eventMgr.subscribeInternalEvent(new NewCisCommMgrHandler(), EVENT_TYPES, null);
 	}
 
@@ -143,70 +135,76 @@ public class CtxBrokerServer implements IFeatureServer{
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("getQuery: stanza=" + stanza + ", payload=" + payload);
+		LOG.debug("getQuery: stanza={}, payload={}", stanza, payload);
 
-		if (!(payload instanceof CtxBrokerRequestBean))
+		if (!(payload instanceof CtxBrokerRequestBean)) {
 			throw new XMPPError(StanzaError.bad_request, "Unknown request bean class: " + payload.getClass());
+		}
 
 		final CtxBrokerRequestBean cbPayload = (CtxBrokerRequestBean) payload;
 		if (cbPayload.getMethod() == null) {
 			LOG.error("CtxBrokerRequestBean.getMethod() can't be null");
 			throw new XMPPError(StanzaError.bad_request, "CtxBrokerRequestBean.getMethod() can't be null");
 		}
-		
+
 		final CtxBrokerResponseBean beanResponse = new CtxBrokerResponseBean();
 		beanResponse.setMethod(cbPayload.getMethod());
 
+		LOG.debug("getQuery: method={}", cbPayload.getMethod());
 		switch (cbPayload.getMethod()) {
 
 		case CREATE_ENTITY:
 
-			if (LOG.isDebugEnabled())
-				LOG.debug("CREATE_ENTITY");
-			String targetIdentityString = cbPayload.getCreateEntity().getTargetCss().toString();
-
-			RequestorBean reqBeanCreateEntity = cbPayload.getCreateEntity().getRequestor();
-			Requestor requestorCreateEntity = getRequestorFromBean(reqBeanCreateEntity);
-
-			IIdentity targetIdentity;
 			try {
-				targetIdentity = this.identMgr.fromJid(targetIdentityString);
+				// 1. requestor
+				final RequestorBean requestorBean = cbPayload.getCreateEntity().getRequestor();
+				final Requestor requestor = RequestorUtils.toRequestor(
+						requestorBean, this.commManager.getIdManager());
+				// 2. target (required)
+				final String targetString = cbPayload.getCreateEntity().getTargetCss();
+				final IIdentity target = this.commManager.getIdManager().fromJid(targetString);
+				// 3. type (required)
+				final String type = cbPayload.getCreateEntity().getType();
 
-				CtxEntity newCtxEntity = ctxbroker.createEntity(requestorCreateEntity, targetIdentity, cbPayload.getCreateEntity().getType().toString()).get();
+				// request
+				final CtxEntity ctxEntity = ctxbroker.createEntity(requestor,
+						target, type).get();
 
-				//create the response based on the created CtxEntity - the response should be a result bean
-				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
-				CtxEntityBean ctxEntityBean = ctxBeanTranslator.fromCtxEntity(newCtxEntity);
-			
-				//setup the CtxEntityBean from CtxEntity				
-				beanResponse.setCreateEntityBeanResult(ctxEntityBean);
-				
+				// response bean
+				if (ctxEntity != null) {
+					beanResponse.setCreateEntityBeanResult(CtxModelBeanTranslator.getInstance()
+							.fromCtxEntity(ctxEntity));
+				}
 			} catch (Exception e) {
 				LOG.error("Failed to create entity: " + e.getLocalizedMessage(), e);
 				// TODO send application error when supported
 				throw new XMPPError(StanzaError.internal_server_error, e.getLocalizedMessage(), null);
 			} 
 			break;
-			
+
 		case CREATE_ATTRIBUTE:
 
-			if (LOG.isDebugEnabled())
-				LOG.debug("CREATE_ATTRIBUTE");
 			try {
-				String ctxEntityScopeBean =  cbPayload.getCreateAttribute().getScope().getString();
-				CtxEntityIdentifier ctxEntityScope = new CtxEntityIdentifier(ctxEntityScopeBean);
-				String type = cbPayload.getCreateAttribute().getType().toString();
+				// 1. requestor
+				final RequestorBean requestorBean = cbPayload.getCreateAttribute().getRequestor();
+				final Requestor requestor = RequestorUtils.toRequestor(
+						requestorBean, this.commManager.getIdManager());
+				// 2. scope (required)
+				final CtxEntityIdentifier scope = (CtxEntityIdentifier) 
+						CtxModelBeanTranslator.getInstance().fromCtxIdentifierBean(
+								cbPayload.getCreateAttribute().getScope());
+				// 3. type
+				final String type = cbPayload.getCreateAttribute().getType();
 
-				RequestorBean reqBeanCreateAttr = cbPayload.getCreateAttribute().getRequestor();
-				Requestor requestorCreateAttr = getRequestorFromBean(reqBeanCreateAttr);
+				// request
+				final CtxAttribute ctxAttribute = this.ctxbroker.createAttribute(
+						requestor, scope, type).get();
 
-				CtxAttribute ctxAttribute = ctxbroker.createAttribute(requestorCreateAttr, ctxEntityScope, type).get();
-				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
-
-				CtxAttributeBean ctxAttributeBean = ctxBeanTranslator.fromCtxAttribute(ctxAttribute); 
-				beanResponse.setCreateAttributeBeanResult(ctxAttributeBean);
-				
+				// response
+				if (ctxAttribute != null) {
+					beanResponse.setCreateAttributeBeanResult(CtxModelBeanTranslator.getInstance()
+							.fromCtxAttribute(ctxAttribute));
+				}
 
 			} catch (Exception e) {
 				LOG.error("Failed to create attribute: " + e.getLocalizedMessage(), e);
@@ -218,23 +216,26 @@ public class CtxBrokerServer implements IFeatureServer{
 
 		case CREATE_ASSOCIATION:
 
-			if (LOG.isDebugEnabled())
-				LOG.debug("CREATE_ASSOCIATION");
-			String targetIdentityStringAssoc = cbPayload.getCreateAssociation().getTargetCss().toString();
-
-			RequestorBean reqBeanCreateAssoc = cbPayload.getCreateAssociation().getRequestor();
-			Requestor requestorCreateAssoc = getRequestorFromBean(reqBeanCreateAssoc);
-			String assocType = cbPayload.getCreateAssociation().getType();
-
-			IIdentity targetIdentityAssoc;
 			try {
-				targetIdentityAssoc = this.identMgr.fromJid(targetIdentityStringAssoc);
-				CtxAssociation association = ctxbroker.createAssociation(requestorCreateAssoc, targetIdentityAssoc, assocType).get();
-				CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
-				CtxAssociationBean ctxAssocBean = ctxBeanTranslator.fromCtxAssociation(association);
-			
-				beanResponse.setCreateAssociationBeanResult(ctxAssocBean);
-			
+				// 1. requestor
+				final RequestorBean requestorBean = cbPayload.getCreateAssociation().getRequestor();
+				final Requestor requestor = RequestorUtils.toRequestor(
+						requestorBean, this.commManager.getIdManager());
+				// 2. target (required)
+				final String targetString = cbPayload.getCreateAssociation().getTargetCss();
+				final IIdentity target = this.commManager.getIdManager().fromJid(targetString);
+				// 3. type (required)
+				final String type = cbPayload.getCreateAssociation().getType();
+
+				// request
+				final CtxAssociation ctxAssociation = this.ctxbroker.createAssociation(
+						requestor, target, type).get();
+
+				// response
+				if (ctxAssociation != null) {
+					beanResponse.setCreateAssociationBeanResult(CtxModelBeanTranslator.getInstance()
+							.fromCtxAssociation(ctxAssociation));
+				}
 			} catch (Exception e) {
 				LOG.error("Failed to create association: " + e.getLocalizedMessage(), e);
 				// TODO send application error when supported
@@ -244,21 +245,23 @@ public class CtxBrokerServer implements IFeatureServer{
 
 		case RETRIEVE:
 
-			if (LOG.isDebugEnabled())
-				LOG.debug("RETRIEVE");
 			try {
-				RequestorBean reqBeanRetrieve = cbPayload.getRetrieve().getRequestor();
-				Requestor requestorRetrieve = getRequestorFromBean(reqBeanRetrieve);
-				
-				CtxIdentifierBean ctxIdentRetrieveBean = cbPayload.getRetrieve().getId();
-				CtxIdentifier ctxIdentifier = CtxModelBeanTranslator.getInstance().fromCtxIdentifierBean(ctxIdentRetrieveBean);
-				
-				CtxModelObject retrievedObj = this.ctxbroker.retrieve(requestorRetrieve, ctxIdentifier).get();
-				// object retrieved locally 
-				// create response bean
-				CtxModelObjectBean ctxObjBean = CtxModelBeanTranslator.getInstance().fromCtxModelObject(retrievedObj);
-				beanResponse.setRetrieveBeanResult(ctxObjBean);
-
+				// 1. requestor
+				final RequestorBean requestorBean = cbPayload.getRetrieve().getRequestor();
+				final Requestor requestor = RequestorUtils.toRequestor(
+						requestorBean, this.commManager.getIdManager());
+				// 2. ctxId (required)
+				final CtxIdentifierBean ctxIdBean = cbPayload.getRetrieve().getId();
+				final CtxIdentifier ctxId = CtxModelBeanTranslator.getInstance().
+						fromCtxIdentifierBean(ctxIdBean);
+				// request
+				final CtxModelObject ctxModelObject = this.ctxbroker.retrieve(
+						requestor, ctxId).get();
+				// response bean
+				if (ctxModelObject != null) {
+					beanResponse.setRetrieveBeanResult(CtxModelBeanTranslator.getInstance()
+							.fromCtxModelObject(ctxModelObject));
+				}
 			} catch (CtxAccessControlException cace) {
 				LOG.error("Failed to retrieve context model object: " + cace.getLocalizedMessage(), cace);
 				// TODO send application error when supported
@@ -269,56 +272,56 @@ public class CtxBrokerServer implements IFeatureServer{
 				throw new XMPPError(StanzaError.internal_server_error, e.getLocalizedMessage(), null);
 			}
 			break;
-			
+
 		case RETRIEVE_INDIVIDUAL_ENTITY_ID:
 
-			if (LOG.isDebugEnabled())
-				LOG.debug("RETRIEVE_INDIVIDUAL_ENTITY_ID");
-			CtxModelBeanTranslator ctxBeanTranslator4 = CtxModelBeanTranslator.getInstance();
-			RequestorBean reqRetrieveIndiEntIDBean = cbPayload.getRetrieveIndividualEntityId().getRequestor();
-			Requestor requestorRetrieveIndiEntID = getRequestorFromBean(reqRetrieveIndiEntIDBean);
-			String individualEntityIdentityString = cbPayload.getRetrieveIndividualEntityId().getTargetCss().toString();
-
-			IIdentity cssId;
 			try {
-				cssId = this.identMgr.fromJid(individualEntityIdentityString);
-				CtxEntityIdentifier entID = this.ctxbroker.retrieveIndividualEntityId(requestorRetrieveIndiEntID, cssId).get();
+				// 1. requestor
+				final RequestorBean requestorBean = cbPayload.getRetrieveIndividualEntityId().getRequestor();
+				final Requestor requestor = RequestorUtils.toRequestor(
+						requestorBean, this.commManager.getIdManager());
+				// 2. cssId (required)
+				final String cssIdString = cbPayload.getRetrieveIndividualEntityId().getTargetCss();
+				final IIdentity cssId = this.commManager.getIdManager().fromJid(cssIdString);
 
-				CtxEntityIdentifierBean ctxEntityIdentBean = (CtxEntityIdentifierBean) ctxBeanTranslator4.fromCtxIdentifier(entID);
-				beanResponse.setRetrieveIndividualEntityIdBeanResult(ctxEntityIdentBean);
+				// request
+				final CtxEntityIdentifier indCtxEntId = this.ctxbroker.retrieveIndividualEntityId(
+						requestor, cssId).get();
 
+				// response
+				if (indCtxEntId != null) {
+					beanResponse.setRetrieveIndividualEntityIdBeanResult(
+							(CtxEntityIdentifierBean) CtxModelBeanTranslator.getInstance()
+							.fromCtxIdentifier(indCtxEntId));
+				}
 			} catch (Exception e) {
 				LOG.error("Failed to retrieve individual entity id: " + e.getLocalizedMessage(), e);
 				// TODO send application error when supported
 				throw new XMPPError(StanzaError.internal_server_error, e.getLocalizedMessage(), null);
 			}
 			break;
-			
+
 		case RETRIEVE_COMMUNITY_ENTITY_ID:
 
-			if (LOG.isDebugEnabled())
-				LOG.debug("RETRIEVE_COMMUNITY_ENTITY_ID");
-		
-			final RequestorBean retrieveCommunityEntityIdBeanRequestorBean = 
-					cbPayload.getRetrieveCommunityEntityId().getRequestor();
-			final Requestor retrieveCommunityEntityIdBeanRequstor = 
-					getRequestorFromBean(retrieveCommunityEntityIdBeanRequestorBean);
-			final String retrieveCommunityEntityIdTargetStr = 
-					cbPayload.getRetrieveCommunityEntityId().getTarget().toString();
-
-			final IIdentity retrieveCommunityEntityIdTarget;
 			try {
-				retrieveCommunityEntityIdTarget = 
-						this.identMgr.fromJid(retrieveCommunityEntityIdTargetStr);
-				final CtxEntityIdentifier communityEntityId = 
-						this.ctxbroker.retrieveCommunityEntityId(
-								retrieveCommunityEntityIdBeanRequstor, retrieveCommunityEntityIdTarget).get();
+				// 1. requestor
+				final RequestorBean requestorBean =	cbPayload.getRetrieveCommunityEntityId().getRequestor();
+				final Requestor requestor = RequestorUtils.toRequestor(
+						requestorBean, this.commManager.getIdManager());
+				// 2. cisId (required)
+				final String cisIdString = cbPayload.getRetrieveCommunityEntityId().getTarget();
+				final IIdentity cisId = this.commManager.getIdManager().fromJid(cisIdString);
 
-				final CtxEntityIdentifierBean communityEntityIdBean = 
-						(CtxEntityIdentifierBean) CtxModelBeanTranslator.getInstance()
-							.fromCtxIdentifier(communityEntityId);
-				beanResponse.setRetrieveCommunityEntityIdBeanResult(communityEntityIdBean);
+				// request
+				final CtxEntityIdentifier communityCtxEntId = 
+						this.ctxbroker.retrieveCommunityEntityId(requestor, cisId).get();
 
+				// response
+				if (communityCtxEntId != null) {
+					beanResponse.setRetrieveCommunityEntityIdBeanResult(
+							(CtxEntityIdentifierBean) CtxModelBeanTranslator.getInstance()
+							.fromCtxIdentifier(communityCtxEntId));
+				}
 			} catch (Exception e) {
 				// TODO send application error when supported
 				LOG.error("Failed to retrieve community entity id: " + e.getLocalizedMessage(), e);
@@ -328,11 +331,10 @@ public class CtxBrokerServer implements IFeatureServer{
 
 		case UPDATE:
 
-			if (LOG.isDebugEnabled())
-				LOG.debug("UPDATE");
 			try {
 				RequestorBean reqBeanUpdate = cbPayload.getUpdate().getRequestor();
-				Requestor requestorUpdate = getRequestorFromBean(reqBeanUpdate);
+				Requestor requestorUpdate = RequestorUtils.toRequestor(
+						reqBeanUpdate, this.commManager.getIdManager());
 				CtxModelObjectBean ctxModelObjBean = cbPayload.getUpdate().getCtxModelOject();
 				CtxModelObject ctxModelObject = 
 						CtxModelBeanTranslator.getInstance().fromCtxModelObjectBean(ctxModelObjBean);
@@ -351,16 +353,14 @@ public class CtxBrokerServer implements IFeatureServer{
 				throw new XMPPError(StanzaError.internal_server_error, e.getLocalizedMessage(), null);
 			}
 			break;
-			
+
 		case REMOVE:
 
-			if (LOG.isDebugEnabled())
-				LOG.debug("REMOVE");
 			try {
 				final RequestorBean removeBeanRequestorBean = 
 						cbPayload.getRemove().getRequestor();
-				final Requestor removeBeanRequestor = 
-						this.getRequestorFromBean(removeBeanRequestorBean);
+				final Requestor removeBeanRequestor = RequestorUtils.toRequestor( 
+						removeBeanRequestorBean, this.commManager.getIdManager());
 				final CtxIdentifier removeCtxId = CtxModelBeanTranslator.getInstance().fromCtxIdentifierBean( 
 						cbPayload.getRemove().getId());
 
@@ -369,7 +369,7 @@ public class CtxBrokerServer implements IFeatureServer{
 
 				final CtxModelObjectBean removedModelObjectBean = (removedModelObject != null)  
 						? CtxModelBeanTranslator.getInstance().fromCtxModelObject(removedModelObject) : null;
-				beanResponse.setRemoveBeanResult(removedModelObjectBean);
+						beanResponse.setRemoveBeanResult(removedModelObjectBean);
 
 			} catch (CtxAccessControlException cace) {
 				LOG.error("Failed to remove context model object: " + cace.getLocalizedMessage(), cace);
@@ -381,35 +381,79 @@ public class CtxBrokerServer implements IFeatureServer{
 				throw new XMPPError(StanzaError.internal_server_error, e.getLocalizedMessage(), null);
 			}
 			break;
-			
+
 		case LOOKUP:
 
-			if (LOG.isDebugEnabled())
-				LOG.debug("LOOKUP");
 			try {
-				RequestorBean reqBeanLookup = cbPayload.getLookup().getRequestor();
-				Requestor requestor = getRequestorFromBean(reqBeanLookup);
-				String targetCssString = cbPayload.getLookup().getTargetCss();
-				IIdentity targetCss = this.identMgr.fromJid(targetCssString);
+				// 1. requestor
+				final RequestorBean requestorBean = cbPayload.getLookup().getRequestor();
+				final Requestor requestor = RequestorUtils.toRequestor(
+						requestorBean, this.commManager.getIdManager());
+				// 2. target (required)
+				final String targetString = cbPayload.getLookup().getTargetCss();
+				final IIdentity target = this.commManager.getIdManager().fromJid(targetString);
+				// 3. modelType (optional)
 				final CtxModelType modelType = (cbPayload.getLookup().getModelType() != null)
 						? CtxModelBeanTranslator.getInstance().ctxModelTypeFromCtxModelTypeBean(cbPayload.getLookup().getModelType())
-						: null;
-				String type = cbPayload.getLookup().getType().toString();
-				final List<CtxIdentifier> lookupResultsList = (modelType != null)
-						? this.ctxbroker.lookup(requestor, targetCss, modelType, type).get()
-						: this.ctxbroker.lookup(requestor, targetCss, type).get();
-				if (lookupResultsList.size() > 0) {
-					List<CtxIdentifierBean> identBeanList = new ArrayList<CtxIdentifierBean>(); 
+								: null;
+						// 4. type (required)
+						final String type = cbPayload.getLookup().getType();
 
-					if (LOG.isDebugEnabled())
-					    LOG.debug("lookupResultsList=" + lookupResultsList);
-					
-					for (final CtxIdentifier identifier : lookupResultsList) {
+						// request
+						final List<CtxIdentifier> lookupResult = (modelType != null)
+								? this.ctxbroker.lookup(requestor, target, modelType, type).get()
+										: this.ctxbroker.lookup(requestor, target, type).get();
+								LOG.debug("lookupResult={}", lookupResult);
+
+								// response bean
+								if (lookupResult.size() > 0) {
+									final List<CtxIdentifierBean> lookupResultBean = new ArrayList<CtxIdentifierBean>(); 
+									for (final CtxIdentifier identifier : lookupResult) {
+										final CtxIdentifierBean ctxIdBean = 
+												CtxModelBeanTranslator.getInstance().fromCtxIdentifier(identifier);
+										lookupResultBean.add(ctxIdBean);
+									}
+									beanResponse.setCtxBrokerLookupBeanResult(lookupResultBean);
+								}
+
+			} catch (Exception e) {
+				LOG.error("Failed to perform lookup: " + e.getLocalizedMessage(), e);
+				// TODO send application error when supported
+				throw new XMPPError(StanzaError.internal_server_error, e.getLocalizedMessage(), null);
+			}
+			break;
+
+		case LOOKUP_BY_SCOPE:
+
+			try {
+				// 1. requestor
+				final RequestorBean requestorBean = cbPayload.getLookupByScope().getRequestor();
+				final Requestor requestor = RequestorUtils.toRequestor(
+						requestorBean, this.commManager.getIdManager());
+				// 2. scope (required)
+				final CtxEntityIdentifierBean scopeBean = cbPayload.getLookupByScope().getScope();
+				final CtxEntityIdentifier scope = (CtxEntityIdentifier) CtxModelBeanTranslator.getInstance()
+						.fromCtxIdentifierBean(scopeBean);
+				// 3. modelType (required)
+				final CtxModelType modelType = CtxModelBeanTranslator.getInstance()
+						.ctxModelTypeFromCtxModelTypeBean(cbPayload.getLookupByScope().getModelType());
+				// 4. type (required)
+				final String type = cbPayload.getLookupByScope().getType();
+
+				// request
+				final List<CtxIdentifier> lookupResult = this.ctxbroker.lookup(
+						requestor, scope, modelType, type).get();
+				LOG.debug("lookupResult={}", lookupResult);
+
+				// response bean
+				if (lookupResult.size() > 0) {
+					final List<CtxIdentifierBean> lookupResultBean = new ArrayList<CtxIdentifierBean>(); 
+					for (final CtxIdentifier identifier : lookupResult) {
 						final CtxIdentifierBean ctxIdBean = 
-									 CtxModelBeanTranslator.getInstance().fromCtxIdentifier(identifier);
-							identBeanList.add(ctxIdBean);
+								CtxModelBeanTranslator.getInstance().fromCtxIdentifier(identifier);
+						lookupResultBean.add(ctxIdBean);
 					}
-					beanResponse.setCtxBrokerLookupBeanResult(identBeanList);
+					beanResponse.setCtxBrokerLookupBeanResult(lookupResultBean);
 				}
 
 			} catch (Exception e) {
@@ -419,14 +463,60 @@ public class CtxBrokerServer implements IFeatureServer{
 			}
 			break;
 
+		case RETRIEVE_FUTURE:
 
+			try {
+				// 1. requestor
+				final RequestorBean requestorBean = cbPayload.getRetrieveFuture().getRequestor();
+
+				final Requestor requestor = RequestorUtils.toRequestor(
+						requestorBean, this.commManager.getIdManager());
+
+				// 2. attrID 
+				final CtxIdentifier ctxId = CtxModelBeanTranslator.getInstance().fromCtxIdentifierBean( 
+						cbPayload.getRetrieveFuture().getAttrId());
+
+
+
+				CtxAttributeIdentifier attrID = null;
+				Date date = null;
+
+				if(ctxId instanceof CtxAttributeIdentifier ){
+					attrID = (CtxAttributeIdentifier) ctxId;
+					XMLGregorianCalendar cal = cbPayload.getRetrieveFuture().getDate();
+					date = cal.toGregorianCalendar().getTime();
+				}
+
+				// request
+				final List<CtxAttribute> predictedAttsList = this.ctxbroker.retrieveFuture(requestor, 
+						attrID, date ).get();
+
+				List<CtxAttributeBean> predictedAttsListBean = new ArrayList<CtxAttributeBean>();
+
+				// response
+				// convert predictedAttsList to bean 
+				if (predictedAttsList.size() > 0 ) {
+
+					for(CtxAttribute attr : predictedAttsList ){
+
+						CtxAttributeBean attrBean = CtxModelBeanTranslator.getInstance().fromCtxAttribute(attr);
+						predictedAttsListBean.add(attrBean);
+					}					
+					beanResponse.setRetrieveFutureBeanResult(predictedAttsListBean);
+				}
+
+			} catch (Exception e) {
+				LOG.error("Failed to retrieve future attribute: " + e.getLocalizedMessage(), e);
+				// TODO send application error when supported
+				throw new XMPPError(StanzaError.internal_server_error, e.getLocalizedMessage(), null);
+			}
+			break;
 		default: 
 			throw new XMPPError(StanzaError.feature_not_implemented, 
 					"Unsupported remote context method: " + cbPayload.getMethod());
 		}
-		
-		if (LOG.isDebugEnabled())
-			LOG.debug("beanResponse ready:" + beanResponse);
+
+		LOG.debug("getQuery: beanResponse={}", beanResponse);
 		return beanResponse;
 	}
 
@@ -435,6 +525,7 @@ public class CtxBrokerServer implements IFeatureServer{
 	 */
 	@Override
 	public List<String> getXMLNamespaces() {
+
 		return NAMESPACES;
 	}
 
@@ -443,6 +534,7 @@ public class CtxBrokerServer implements IFeatureServer{
 	 */
 	@Override
 	public List<String> getJavaPackages() {
+
 		return PACKAGES;
 	}
 
@@ -464,27 +556,6 @@ public class CtxBrokerServer implements IFeatureServer{
 		return null;
 	}
 
-
-	public Requestor getRequestorFromBean(RequestorBean bean){
-		IIdentityManager idm = this.identMgr;
-		try {
-			if (bean instanceof RequestorCisBean){
-				RequestorCis requestor = new RequestorCis(idm.fromJid(bean.getRequestorId()), idm.fromJid(((RequestorCisBean) bean).getCisRequestorId()));
-				return requestor;
-
-			}else if (bean instanceof RequestorServiceBean){
-				RequestorService requestor = new RequestorService(idm.fromJid(bean.getRequestorId()), ((RequestorServiceBean) bean).getRequestorServiceId());
-				return requestor;
-			}else{
-				return new Requestor(idm.fromJid(bean.getRequestorId()));
-			}
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			LOG.error("Failed to instantiate Requestor from bean: " + e.getLocalizedMessage(), e);
-			return null;
-		}
-	}
-
 	private class NewCisCommMgrHandler extends EventListener {
 
 		/*
@@ -492,7 +563,7 @@ public class CtxBrokerServer implements IFeatureServer{
 		 */
 		@Override
 		public void handleExternalEvent(CSSEvent event) {
-		
+
 			if (LOG.isWarnEnabled())
 				LOG.warn("Received unexpected external '" + event.geteventType() + "' event: " + event);
 		}
@@ -502,13 +573,13 @@ public class CtxBrokerServer implements IFeatureServer{
 		 */
 		@Override
 		public void handleInternalEvent(InternalEvent event) {
-			
+
 			if (LOG.isDebugEnabled())
 				LOG.debug("Received internal event: " + this.eventToString(event));
-			
+
 			if (EventTypes.CIS_CREATION.equals(event.geteventType())
 					|| EventTypes.CIS_RESTORE.equals(event.geteventType())) {
-				
+
 				if (!(event.geteventInfo() instanceof Community)) {
 
 					LOG.error("Could not handle internal " + event.geteventType() + " event: " 
@@ -536,21 +607,21 @@ public class CtxBrokerServer implements IFeatureServer{
 									+ "' for CIS " + cisId);
 						ctxEventMgr.createTopics(cisId, InternalCtxBroker.EVENT_TOPICS);
 					}
-				
+
 				} catch (Exception e) {
 					LOG.error("Could not register CtxBrokerServer to Comms Manager for CIS '" 
 							+ cisIdStr + "': " + e.getLocalizedMessage(), e);
 				}
-				
+
 			} else {
-				
+
 				if (LOG.isWarnEnabled())
 					LOG.warn("Received unexpected event of type '" + event.geteventType() + "'");
 			}
 		}
-		
+
 		private String eventToString(final InternalEvent event) {
-			
+
 			final StringBuffer sb = new StringBuffer();
 			sb.append("[");
 			sb.append("name=");
@@ -565,7 +636,7 @@ public class CtxBrokerServer implements IFeatureServer{
 			sb.append("info=");
 			sb.append(event.geteventInfo());
 			sb.append("]");
-			
+
 			return sb.toString();
 		}
 	}

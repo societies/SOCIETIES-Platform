@@ -27,9 +27,10 @@ package org.societies.privacytrust.privacyprotection.privacynegotiation.negotiat
 import java.util.List;
 
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.Requestor;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement;
-import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.NegotiationAgreement;
+
+import org.societies.api.internal.schema.privacytrust.privacyprotection.model.privacypolicy.Agreement;
+
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 
 /**
@@ -44,10 +45,12 @@ public class AgreementCreator {
 		this.requestedItems = items;
 	}
 	
-	public IAgreement createAgreement(Requestor requestor, IIdentity userIdentity){
-		NegotiationAgreement na = new NegotiationAgreement(this.requestedItems);
-		na.getRequestor();
-		na.setUserIdentity(userIdentity);
+	public Agreement createAgreement(RequestorBean requestor, IIdentity userIdentity){
+		Agreement na = new Agreement();
+		na.setRequestedItems(this.requestedItems);
+		na.setRequestor(requestor);
+		
+		na.setUserIdentity(userIdentity.getJid());
 		return na;
 	}
 }

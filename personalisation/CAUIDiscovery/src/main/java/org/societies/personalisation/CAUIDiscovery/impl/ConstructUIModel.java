@@ -2,8 +2,6 @@ package org.societies.personalisation.CAUIDiscovery.impl;
 
 
 import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
@@ -37,7 +34,7 @@ public class ConstructUIModel {
 		
 	}
 	
-	private LinkedHashMap<String,HashMap<String,Double>> filterDictionary(LinkedHashMap<String,HashMap<String,Double>> dictionary, Double limit){
+	public LinkedHashMap<String,HashMap<String,Double>> filterDictionary(LinkedHashMap<String,HashMap<String,Double>> dictionary, Double limit){
 
 		LinkedHashMap<String,HashMap<String,Double>> filtered = new LinkedHashMap<String,HashMap<String,Double>>();
 		for(String actions : dictionary.keySet()){
@@ -56,7 +53,7 @@ public class ConstructUIModel {
 
 	public UserIntentModelData constructNewModel(LinkedHashMap<List<String>,HashMap<String,Double>> transDictionaryAll, HashMap<String,List<String>> ctxActionsMap, Map<String , ServiceResourceIdentifier> sriMap){
 
-		//System.out.println("cauiTaskManager "+cauiTaskManager);
+		System.out.println("cauiTaskManager "+cauiTaskManager);
 		UserIntentModelData modelData = cauiTaskManager.createModel();
 		
 		//create all actions and assign context
@@ -148,12 +145,16 @@ public class ConstructUIModel {
 		return modelData;
 	}
 
+	
+	/*
+	 * debugging helper class
+	 */
 	public void printTransProbDictionary (LinkedHashMap<String,HashMap<String,Double>> transProbDictionary){
 
 		//System.out.println ("** ConstructUIModel ** total number of entries: " + transProbDictionary.size());
 		for(String actions : transProbDictionary.keySet()){
 			HashMap<String,Double> transTargets = transProbDictionary.get(actions);
-			//System.out.println("Action:"+actions+ "| target: "+transTargets);
+			System.out.println("Action:"+actions+ "| target: "+transTargets);
 		}
 	}	
 

@@ -46,7 +46,6 @@ import org.societies.api.internal.schema.personalisation.model.PreferenceDetails
 import org.societies.api.internal.schema.personalisation.model.PreferenceTreeModelBean;
 import org.societies.personalisation.CommunityPreferenceManagement.impl.CommunityPreferenceManagement;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
-import org.societies.personalisation.preference.api.model.PreferenceTreeModel;
 import org.societies.personalisation.preference.api.model.util.PreferenceUtils;
 
 /**

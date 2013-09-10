@@ -44,22 +44,23 @@ import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.rfid.schema.server.RfidServerBean;
+import org.societies.api.rfid.schema.server.RfidServerMethodType;
 import org.societies.rfid.server.api.IRfidServer;
 
 
 public class CommsServer implements IFeatureServer {
 
 	private static final List<String> NAMESPACES = Collections.unmodifiableList(
-			  Arrays.asList("http://societies.org/api/rfid/schema/server"));
-private static final List<String> PACKAGES = Collections.unmodifiableList(
-		  Arrays.asList("org.societies.api.rfid.schema.server"));
+			Arrays.asList("http://societies.org/api/rfid/schema/server"));
+	private static final List<String> PACKAGES = Collections.unmodifiableList(
+			Arrays.asList("org.societies.api.rfid.schema.server"));
 	private IRfidServer rfidServer;
-	
+
 	//PRIVATE VARIABLES
 	private ICommManager commManager;
-	
+
 	private static Logger LOG = LoggerFactory.getLogger(CommsServer.class);
-	
+
 	//PROPERTIES
 	public ICommManager getCommManager() {
 		return commManager;
@@ -68,11 +69,11 @@ private static final List<String> PACKAGES = Collections.unmodifiableList(
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
 	}
-	
+
 	//METHODS
 	public CommsServer() {
 	}
-	
+
 	public void InitService() {
 		//REGISTER OUR ServiceManager WITH THE XMPP Communication Manager
 		try {
@@ -81,7 +82,7 @@ private static final List<String> PACKAGES = Collections.unmodifiableList(
 			e.printStackTrace();
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.societies.comm.xmpp.interfaces.FeatureServer#getJavaPackages()
 	 */
@@ -89,7 +90,7 @@ private static final List<String> PACKAGES = Collections.unmodifiableList(
 	public List<String> getJavaPackages() {
 		return PACKAGES;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.societies.comm.xmpp.interfaces.FeatureServer#getXMLNamespaces()
 	 */
@@ -97,16 +98,31 @@ private static final List<String> PACKAGES = Collections.unmodifiableList(
 	public List<String> getXMLNamespaces() {
 		return NAMESPACES;
 	}
-	
+
 	/* Put your functionality here if there is NO return object, ie, VOID  */
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
 		this.LOG.debug("Received message ");
 		if (payload instanceof RfidServerBean){
 			RfidServerBean rfidServerBean = (RfidServerBean) payload;
-			this.LOG.debug("Received RfidServerBean: tag: "+rfidServerBean.getTagNumber()+" from:"+rfidServerBean.getIdentity());
-			this.rfidServer.registerRFIDTag(rfidServerBean.getTagNumber(), rfidServerBean.getIdentity(), rfidServerBean.getServiceID(), rfidServerBean.getPassword());
-			
+			if(rfidServerBean.getMethod().equals(RfidServerMethodType.REGISTER_RFID_TAG))
+			{
+				this.LOG.debug("Received Register RfidServerBean: tag: "+rfidServerBean.getTagNumber()+" from:"+rfidServerBean.getIdentity());
+				this.rfidServer.registerRFIDTag(rfidServerBean.getTagNumber(), rfidServerBean.getIdentity(), rfidServerBean.getServiceID(), rfidServerBean.getPassword());
+
+			}
+
+
+			else if(rfidServerBean.getMethod().equals(RfidServerMethodType.UNREGISTER_RFID_TAG))
+			{
+				this.LOG.debug("Received Unregister RfidServerBean: tag: "+rfidServerBean.getTagNumber()+" from:"+rfidServerBean.getIdentity());
+				this.rfidServer.unregisterRFIDTag(rfidServerBean.getTagNumber(), rfidServerBean.getIdentity(), rfidServerBean.getServiceID(), rfidServerBean.getPassword());
+			}
+			else if(rfidServerBean.getMethod().equals(RfidServerMethodType.ACK_DELETE_TAG))
+			{
+				this.LOG.debug("Received delete RfidServerBean: tag: "+rfidServerBean.getTagNumber());
+				this.rfidServer.deleteTag(rfidServerBean.getTagNumber());
+			}
 		}
 		else{
 			this.LOG.debug("Payload object not of type: "+RfidServerBean.class.getName()+ ". Ignoring message from: "+stanza.getFrom().getJid());
@@ -147,5 +163,5 @@ private static final List<String> PACKAGES = Collections.unmodifiableList(
 		this.rfidServer = rfidServer;
 	}
 
-	
+
 }

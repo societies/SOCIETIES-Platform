@@ -102,6 +102,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>hibernate_classes</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.0</version>
@@ -132,6 +138,7 @@
 						<Embed-Transitive>false</Embed-Transitive>
 						<Import-Package>
 							org.societies.api.security.digsig;version="0",
+							org.hibernate.proxy;resolution:=optional,
 							*;resolution:=optional
 						</Import-Package>
 						<Export-Package>!*</Export-Package>

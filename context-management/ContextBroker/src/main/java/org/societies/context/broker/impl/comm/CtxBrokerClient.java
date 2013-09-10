@@ -27,7 +27,13 @@ package org.societies.context.broker.impl.comm;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,26 +52,25 @@ import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.RequestorService;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.schema.context.contextmanagement.BrokerMethodBean;
 import org.societies.api.schema.context.contextmanagement.CreateAssociationBean;
 import org.societies.api.schema.context.contextmanagement.CreateAttributeBean;
 import org.societies.api.schema.context.contextmanagement.CreateEntityBean;
 import org.societies.api.schema.context.contextmanagement.CtxBrokerRequestBean;
 import org.societies.api.schema.context.contextmanagement.LookupBean;
+import org.societies.api.schema.context.contextmanagement.LookupByScopeBean;
 import org.societies.api.schema.context.contextmanagement.RemoveBean;
 import org.societies.api.schema.context.contextmanagement.RetrieveBean;
 import org.societies.api.schema.context.contextmanagement.RetrieveCommunityEntityIdBean;
+import org.societies.api.schema.context.contextmanagement.RetrieveFutureBean;
 import org.societies.api.schema.context.contextmanagement.RetrieveIndividualEntityIdBean;
 import org.societies.api.schema.context.contextmanagement.UpdateAttributeBean;
 import org.societies.api.schema.context.contextmanagement.UpdateBean;
+import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
 import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
 import org.societies.api.schema.context.model.CtxIdentifierBean;
 import org.societies.api.schema.context.model.CtxModelObjectBean;
-import org.societies.api.schema.identity.RequestorBean;
-import org.societies.api.schema.identity.RequestorCisBean;
-import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.context.broker.api.CtxBrokerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -122,8 +127,7 @@ public class CtxBrokerClient implements ICommCallback {
 			cbPacket.setMethod(BrokerMethodBean.CREATE_ENTITY);
 
 			CreateEntityBean ctxBrokerCreateEntityBean = new CreateEntityBean();
-			RequestorBean requestorBean = createRequestorBean(requestor);
-			ctxBrokerCreateEntityBean.setRequestor(requestorBean);
+			ctxBrokerCreateEntityBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
 			ctxBrokerCreateEntityBean.setTargetCss(toIdentity.getBareJid());
 			ctxBrokerCreateEntityBean.setType(type);
 
@@ -151,8 +155,7 @@ public class CtxBrokerClient implements ICommCallback {
 
 			CreateAttributeBean ctxBrokerCreateAttributeBean = new CreateAttributeBean();
 			// 1. set requestorBean
-			RequestorBean requestorBean = createRequestorBean(requestor);
-			ctxBrokerCreateAttributeBean.setRequestor(requestorBean);
+			ctxBrokerCreateAttributeBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
 			// 2. set scope
 			CtxEntityIdentifierBean ctxEntIdBean = new CtxEntityIdentifierBean();
 			ctxEntIdBean.setString(scope.toString());
@@ -184,8 +187,7 @@ public class CtxBrokerClient implements ICommCallback {
 			cbPacket.setMethod(BrokerMethodBean.CREATE_ASSOCIATION);
 
 			CreateAssociationBean ctxBrokerCreateAssociationBean = new CreateAssociationBean();
-			RequestorBean requestorBean = createRequestorBean(requestor);
-			ctxBrokerCreateAssociationBean.setRequestor(requestorBean);
+			ctxBrokerCreateAssociationBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
 			ctxBrokerCreateAssociationBean.setType(type);
 			ctxBrokerCreateAssociationBean.setTargetCss(toIdentity.getBareJid());
 
@@ -221,8 +223,7 @@ public class CtxBrokerClient implements ICommCallback {
 			CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
 			
 			// add the method params
-			RequestorBean requestorBean = createRequestorBean(requestor);
-			ctxBrokerRetrieveBean.setRequestor(requestorBean);
+			ctxBrokerRetrieveBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
 			
 			CtxIdentifierBean ctxIdBean = ctxBeanTranslator.fromCtxIdentifier(identifier);
 			ctxBrokerRetrieveBean.setId(ctxIdBean);
@@ -252,8 +253,7 @@ public class CtxBrokerClient implements ICommCallback {
 
 			RetrieveIndividualEntityIdBean retrieveIndEntBean = new RetrieveIndividualEntityIdBean();
 			//1.requestor
-			RequestorBean requestorBean = createRequestorBean(requestor);
-			retrieveIndEntBean.setRequestor(requestorBean);
+			retrieveIndEntBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
 			//2. target id
 			retrieveIndEntBean.setTargetCss(toIdentity.getJid());
 
@@ -282,8 +282,7 @@ public class CtxBrokerClient implements ICommCallback {
 			final RetrieveCommunityEntityIdBean methodBean = new RetrieveCommunityEntityIdBean();
 
 			// 1. requestor
-			final RequestorBean requestorBean = this.createRequestorBean(requestor);
-			methodBean.setRequestor(requestorBean);
+			methodBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
 			// 2. target id
 			methodBean.setTarget(target.getJid());
 			cbPacket.setRetrieveCommunityEntityId(methodBean);
@@ -313,8 +312,7 @@ public class CtxBrokerClient implements ICommCallback {
 			cbPacket.setMethod(BrokerMethodBean.UPDATE);
 			// method bean
 			UpdateBean ctxBrokerUpdateBean = new UpdateBean();
-			RequestorBean requestorBean = this.createRequestorBean(requestor);
-			ctxBrokerUpdateBean.setRequestor(requestorBean);
+			ctxBrokerUpdateBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
 			CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
 			CtxModelObjectBean objectBean = ctxBeanTranslator.fromCtxModelObject(object);
 			ctxBrokerUpdateBean.setCtxModelOject(objectBean);
@@ -384,7 +382,7 @@ public class CtxBrokerClient implements ICommCallback {
 			cbPacket.setMethod(BrokerMethodBean.REMOVE);
 			// method bean
 			RemoveBean ctxBrokerRemoveBean = new RemoveBean();
-			ctxBrokerRemoveBean.setRequestor(this.createRequestorBean(requestor));
+			ctxBrokerRemoveBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
 			ctxBrokerRemoveBean.setId(CtxModelBeanTranslator.getInstance().fromCtxIdentifier(identifier));
 			cbPacket.setRemove(ctxBrokerRemoveBean);
 
@@ -415,13 +413,14 @@ public class CtxBrokerClient implements ICommCallback {
 			LookupBean ctxBrokerLookupBean = new LookupBean();
 
 			// 1. requestor
-			ctxBrokerLookupBean.setRequestor(this.createRequestorBean(requestor));
+			ctxBrokerLookupBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
 			// 2. target id
 			ctxBrokerLookupBean.setTargetCss(toIdentity.getBareJid());
 			// 3. model type
-			if (modelType != null)
+			if (modelType != null) {
 				ctxBrokerLookupBean.setModelType(
 						CtxModelBeanTranslator.getInstance().ctxModelTypeBeanFromCtxModelType(modelType));
+			}
 			// 4 . type
 			ctxBrokerLookupBean.setType(type);
 			cbPacket.setLookup(ctxBrokerLookupBean);
@@ -436,25 +435,90 @@ public class CtxBrokerClient implements ICommCallback {
 					+ e.getLocalizedMessage(), e);
 		} 
 	}
+	
+	public void lookup(Requestor requestor, CtxEntityIdentifier scope, 
+			CtxModelType modelType, String type, ICtxCallback callback)
+					throws CtxBrokerException {
 
-	private RequestorBean createRequestorBean(Requestor requestor){
-		if (requestor instanceof RequestorCis){
-			RequestorCisBean cisRequestorBean = new RequestorCisBean();
-			cisRequestorBean.setRequestorId(requestor.getRequestorId().getBareJid());
-			cisRequestorBean.setCisRequestorId(((RequestorCis) requestor).getCisRequestorId().getBareJid());
-			return cisRequestorBean;
-		}else if (requestor instanceof RequestorService){
-			RequestorServiceBean serviceRequestorBean = new RequestorServiceBean();
-			serviceRequestorBean.setRequestorId(requestor.getRequestorId().getBareJid());
-			serviceRequestorBean.setRequestorServiceId(((RequestorService) requestor).getRequestorServiceId());
-			return serviceRequestorBean;
-		}else{
-			RequestorBean requestorBean = new RequestorBean();
-			requestorBean.setRequestorId(requestor.getRequestorId().getBareJid());
-			return requestorBean;
-		}
+		IIdentity toIdentity = null;
+		try {
+			toIdentity = this.commManager.getIdManager().fromJid(scope.getOwnerId());
+			Stanza stanza = new Stanza(toIdentity);
+			// create request bean
+			CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+			// method type
+			cbPacket.setMethod(BrokerMethodBean.LOOKUP_BY_SCOPE);
+			// method bean
+			final LookupByScopeBean ctxBrokerLookupBean = new LookupByScopeBean();
+
+			// 1. requestor
+			ctxBrokerLookupBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
+			// 2. scope
+			ctxBrokerLookupBean.setScope((CtxEntityIdentifierBean) 
+					CtxModelBeanTranslator.getInstance().fromCtxIdentifier(scope));
+			// 3. model type
+			ctxBrokerLookupBean.setModelType(CtxModelBeanTranslator.getInstance()
+					.ctxModelTypeBeanFromCtxModelType(modelType));
+			// 4. type
+			ctxBrokerLookupBean.setType(type);
+			cbPacket.setLookupByScope(ctxBrokerLookupBean);
+
+			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
+
+			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
+
+		} catch (Exception e) {
+
+			throw new CtxBrokerException("Could not perform remote lookup: "
+					+ e.getLocalizedMessage(), e);
+		} 
 	}
 
+	public void retrieveFuture(Requestor requestor, CtxAttributeIdentifier attrID ,Date date,
+			ICtxCallback callback) throws CtxBrokerException  {
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Remote future retrieve: requestor=" + requestor + ", identifier=" + attrID);
+		
+		IIdentity toIdentity = null;
+		try {
+			toIdentity = this.commManager.getIdManager().fromJid(attrID.getOwnerId());
+			Stanza stanza = new Stanza(toIdentity);
+			CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+		
+			cbPacket.setMethod(BrokerMethodBean.RETRIEVE_FUTURE);
+
+			// use the method : retrieve
+			RetrieveFutureBean ctxBrokerRetrieveFutureBean = new RetrieveFutureBean();
+			CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+			
+			// add the method params
+			ctxBrokerRetrieveFutureBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
+			
+			CtxAttributeIdentifierBean ctxIdBean = (CtxAttributeIdentifierBean) ctxBeanTranslator.fromCtxIdentifier(attrID);
+			
+			ctxBrokerRetrieveFutureBean.setAttrId(ctxIdBean);
+
+			GregorianCalendar c = new GregorianCalendar();
+			c.setTime(date);
+			XMLGregorianCalendar date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+			ctxBrokerRetrieveFutureBean.setDate(date2);
+						
+			cbPacket.setRetrieveFuture(ctxBrokerRetrieveFutureBean);
+			
+			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
+
+			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
+
+		} catch (Exception e) {
+
+			throw new CtxBrokerException("Could not retrieve remote ctx model object "
+					+ attrID + ": " + e.getLocalizedMessage(), e);
+		}
+	}
+	
+	
+	
 	/*
 	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#getJavaPackages()
 	 */

@@ -42,29 +42,32 @@ public class DataAccessLogEntry {
 	private final IIdentity requestor;	
 	private final String requestorClass;
 	private final List<String> requestorStack;
+	private final List<String> requestorBundles;
 	private final IIdentity owner;
 	private final long dataSize;
 	
 	public DataAccessLogEntry(Date time, IIdentity requestor, String requestorClass,
-			List<String> requestorStack, IIdentity owner) {
+			List<String> requestorStack, List<String> requestorBundles, IIdentity owner) {
 		
 		this.time = time;
 		this.timeInMs = time.getTime();
 		this.requestor = requestor;
 		this.requestorClass = requestorClass;
 		this.requestorStack = requestorStack;
+		this.requestorBundles = requestorBundles;
 		this.owner = owner;
 		this.dataSize = -1;
 	}
 	
 	public DataAccessLogEntry(Date time, IIdentity requestor, String requestorClass,
-			List<String> requestorStack, IIdentity owner, long payloadSize) {
+			List<String> requestorStack, List<String> requestorBundles, IIdentity owner, long payloadSize) {
 		
 		this.time = time;
 		this.timeInMs = time.getTime();
 		this.requestor = requestor;
 		this.requestorClass = requestorClass;
 		this.requestorStack = requestorStack;
+		this.requestorBundles = requestorBundles;
 		this.owner = owner;
 		this.dataSize = payloadSize;
 	}
@@ -92,6 +95,13 @@ public class DataAccessLogEntry {
 		return requestorClass;
 	}
 	
+	/**
+	 * @return the requestorBundles
+	 */
+	public List<String> getRequestorBundles() {
+		return requestorBundles;
+	}
+
 	public IIdentity getOwner() {
 		return owner;
 	}

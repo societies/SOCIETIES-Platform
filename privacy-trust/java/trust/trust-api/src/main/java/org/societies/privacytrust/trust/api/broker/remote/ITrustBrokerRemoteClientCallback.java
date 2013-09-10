@@ -26,6 +26,7 @@ package org.societies.privacytrust.trust.api.broker.remote;
 
 import java.util.Set;
 
+import org.societies.api.internal.privacytrust.trust.model.ExtTrustRelationship;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.model.TrustRelationship;
 
@@ -46,6 +47,13 @@ public interface ITrustBrokerRemoteClientCallback {
 	
 	/**
 	 * 
+	 * @param extTrustRelationships
+	 * @since 1.2
+	 */
+	public void onRetrievedExtTrustRelationships(Set<ExtTrustRelationship> extTrustRelationships);
+	
+	/**
+	 * 
 	 * @param trustRelationship
 	 * @since 1.0
 	 */
@@ -53,10 +61,29 @@ public interface ITrustBrokerRemoteClientCallback {
 	
 	/**
 	 * 
+	 * @param trustRelationship
+	 * @since 1.2
+	 */
+	public void onRetrievedExtTrustRelationship(ExtTrustRelationship extTrustRelationship);
+	
+	/**
+	 * 
 	 * @param trustValue
 	 * @since 1.0
 	 */
 	public void onRetrievedTrustValue(Double trustValue);
+	
+	/**
+	 * Sets the result of a trust query identifying trust relationships to be
+	 * removed. The result is <code>true</code> if any trust relationships
+	 * matched the specified query.
+	 * 
+	 * @param result
+	 *            <code>true</code> if any trust relationships matched the
+	 *            specified query; <code>false</code> otherwise. 
+	 * @since 1.2
+	 */
+	public void onRemovedTrustRelationships(boolean result);
 	
 	/**
 	 * Associates an exception with this callback.

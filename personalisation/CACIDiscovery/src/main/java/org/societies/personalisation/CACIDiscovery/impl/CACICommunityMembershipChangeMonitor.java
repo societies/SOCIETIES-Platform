@@ -1,7 +1,7 @@
 package org.societies.personalisation.CACIDiscovery.impl;
 
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+//import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
@@ -10,13 +10,11 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CommunityCtxEntity;
-import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +28,7 @@ public class CACICommunityMembershipChangeMonitor implements CtxChangeEventListe
 	private ICtxBroker ctxBroker;
 	private final IIdentity ownerId;
 	private ICommManager commMgr;
-	private final Set<String> communities = new CopyOnWriteArraySet<String>();
+	//private final Set<String> communities = new CopyOnWriteArraySet<String>();
 
 
 	@Autowired (required=true)
@@ -122,16 +120,6 @@ public class CACICommunityMembershipChangeMonitor implements CtxChangeEventListe
 		}
 	}
 
-	
-
-	
-	
-	
-	
-	
-	
-	
-	
 	//end of constructor
 	/*
 	private void registerMembershipChanges(IIdentity cisId) {
@@ -242,10 +230,6 @@ public class CACICommunityMembershipChangeMonitor implements CtxChangeEventListe
 		}		
 
 	}
-
-
-
-	
 
 
 }

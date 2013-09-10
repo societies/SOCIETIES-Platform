@@ -46,12 +46,14 @@ public class MySQLHelper {
 
         ResultSet resultSet = statement.executeQuery();
 
-        if (!resultSet.next())
-            Assert.fail("No record found in database with type " + type + " and propText=[" + content.getProposalText() + "]");
+        if (!resultSet.next()) {
+            printTableContents("userfeedbackbean");
+            Assert.fail("No record found in database table 'userfeedbackbean' with type " + type + " and propText=[" + content.getProposalText() + "]");
+        }
 
         String id = resultSet.getString(1);
 
-        sql = "SELECT `value` FROM `userfeedbackbean_options` WHERE `option_id`=?";
+        sql = "SELECT `value` FROM `userfeedbackbean_options` WHERE `requestId`=?";
         statement = conn.prepareStatement(sql);
         statement.setString(1, id);
 
@@ -69,5 +71,68 @@ public class MySQLHelper {
         Tester.compareLists(expectedOptions, actualOptions);
 
         return id;
+    }
+
+    private void printTableContents(String tableName) throws SQLException {
+        String sql = "SELECT * FROM " + tableName;
+
+        log.debug("Printing table contents: " + tableName);
+
+        PreparedStatement statement = conn.prepareStatement(sql);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        StringBuilder builder = new StringBuilder();
+        StringBuilder headerBuilder = new StringBuilder();
+
+        final int cols = statement.getMetaData().getColumnCount();
+
+        headerBuilder.append(" # ");
+        for (int col = 1; col <= cols; col++) {
+            headerBuilder.append(" | ");
+            headerBuilder.append(statement.getMetaData().getColumnName(col));
+        }
+
+        // initial new line
+        builder.append("Contents of table '");
+        builder.append(tableName);
+        builder.append("'\n");
+
+        // ----------------
+        for (int i = 0; i < headerBuilder.length(); i++)
+            builder.append("-");
+        builder.append("\n");
+
+        // header
+        builder.append(headerBuilder.toString());
+        builder.append("\n");
+
+        // ----------------
+        for (int i = 0; i < headerBuilder.length(); i++)
+            builder.append("-");
+        builder.append("\n");
+
+        // body
+        int row = 0;
+        while (resultSet.next()) {
+            builder.append(++row);
+
+            for (int col = 1; col <= cols; col++) {
+                headerBuilder.append(" | ");
+                headerBuilder.append(resultSet.getObject(col));
+            }
+            builder.append("\n");
+        }
+
+        // ----------------
+        for (int i = 0; i < headerBuilder.length(); i++)
+            builder.append("-");
+        builder.append("\n");
+
+        // total row
+        builder.append("Total row count: ");
+        builder.append(row);
+
+        log.info(builder.toString());
     }
 }

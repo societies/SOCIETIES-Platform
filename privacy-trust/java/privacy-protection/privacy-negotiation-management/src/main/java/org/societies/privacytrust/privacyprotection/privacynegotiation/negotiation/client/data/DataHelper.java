@@ -24,8 +24,6 @@
  */
 package org.societies.privacytrust.privacyprotection.privacynegotiation.negotiation.client.data;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;

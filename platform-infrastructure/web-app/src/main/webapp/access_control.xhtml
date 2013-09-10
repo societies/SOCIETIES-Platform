@@ -1,0 +1,125 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                template="templates/main_template.xhtml">
+
+    <ui:define name="html_head">
+        <title>SOCIEITES :: Access Control Request</title>
+    </ui:define>
+
+    <ui:define name="body">
+
+        <h2>Access Control Request</h2>
+
+        <p:panel>
+            <f:facet name="header">
+                Access control request from <p:outputLabel
+                    value="#{accessControlController.currentAccessEvent.requestor.requestorId}"/>
+            </f:facet>
+
+            <p:accordionPanel id="accordionPanel"
+                              multiple="true"
+                              value="#{accessControlController.responseItems}"
+                              var="responseItem">
+                <p:tab title="#{responseItem.requestItem.resource.dataType}">
+                    <p:tabView id="tabView">
+
+                        <p:tab title="General">
+                            <!-- GENERAL TAB -->
+                            <h:panelGrid columns="2" cellpadding="10">
+                                <p:outputLabel for="dataType">Data type:</p:outputLabel>
+                                <p:inputText id="dataType" value="#{responseItem.requestItem.resource.dataType}"
+                                             readonly="true"/>
+
+                                <p:outputLabel for="decision">Permission:</p:outputLabel>
+                                <p:selectOneMenu id="decision" value="#{responseItem.decision}">
+                                    <f:selectItems value="#{accessControlController.decisionOptions}"
+                                                   var="dec"/>
+                                </p:selectOneMenu>
+                            </h:panelGrid>
+                            <!-- END GENERAL TAB -->
+                        </p:tab>
+
+
+                        <p:tab title="Actions">
+                            <!-- ACTIONS TAB -->
+                            <p:selectManyCheckbox layout="pageDirection" id="actionsCheckboxes"
+                                                  value="#{responseItem.requestItem.selectedActionNames}">
+                                <f:selectItems value="#{responseItem.requestItem.actions}"
+                                               var="action"
+                                               itemValue="#{action.actionConstant.name()}"
+                                               itemLabel="#{action.actionConstant.name()}"
+                                               itemDisabled="#{action.actionConstant.name() eq 'READ'}"/>
+
+                                <p:ajax process="actionsCheckboxes" update="actionsCheckboxesMsgs"/>
+                            </p:selectManyCheckbox>
+                            <p:message for="actionsCheckboxes" id="actionsCheckboxesMsgs"/>
+                            <!-- END ACTIONS TAB -->
+                        </p:tab>
+
+
+                        <p:tab title="Conditions">
+                            <!-- CONDITIONS TAB -->
+
+                            <p:dataTable id="conditionsTable"
+                                         var="condition" value="#{responseItem.requestItem.conditions}"
+                                         paginator="false" rows="20">
+
+                                <p:column headerText="Condition" style="width:50%">
+                                    #{condition.conditionConstant}
+                                </p:column>
+
+                                <p:column headerText="Value" style="width:25%">
+                                    <p:selectOneMenu
+                                            label="#{responseItem.requestItem.resource.dataType} condition #{condition.conditionConstant}"
+                                            id="conditionValue"
+                                            value="#{condition.value}"
+                                            required="#{!condition.optional}"
+                                            validatorMessage="This value is required">
+                                        <f:selectItem itemLabel="(none)"
+                                                      itemValue=""
+                                                      noSelectionOption="true"
+                                                      rendered="#{condition.optional}"/>
+                                        <f:selectItems
+                                                value="#{accessControlController.getAvailableConditionValues(condition.conditionConstant)}"/>
+                                        <p:ajax update="conditionValMsg" event="change"/>
+                                    </p:selectOneMenu>
+
+                                </p:column>
+
+                                <p:column headerText="Required" style="width:25%">
+                                    <p:outputLabel style="color:#f00;font-weight:bold;"
+                                                   rendered="#{!condition.optional}">*</p:outputLabel>
+                                    <p:message id="conditionValMsg" for="conditionValue" display="icon"/>
+                                </p:column>
+
+                            </p:dataTable>
+
+                            <!-- END CONDITIONS TAB -->
+                        </p:tab>
+
+                    </p:tabView>
+                </p:tab>
+            </p:accordionPanel>
+
+            <f:facet name="footer">
+                <p:messages id="validationMessages"/>
+
+                <p:commandButton id="completeRequestButton"
+                                 value="Accept Request"
+                                 action="#{accessControlController.completeAccessRequestAction}"
+                                 update="@form"/>
+
+                <p:commandButton id="abortRequestButton"
+                                 value="Cancel Request"
+                                 action="#{accessControlController.cancelAccessRequestAction}"
+                                 process="@this"
+                                 update="@form"/>
+            </f:facet>
+        </p:panel>
+
+    </ui:define>
+</ui:composition>
+</html>

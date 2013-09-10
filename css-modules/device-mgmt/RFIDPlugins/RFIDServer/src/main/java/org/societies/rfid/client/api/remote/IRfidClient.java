@@ -45,4 +45,6 @@ public interface IRfidClient {
 	 * @param tagNumber	the rfid tag number
 	 */
 	public void sendUpdate(String identity, String symLoc, String tagNumber);
+	
+	public void deleteTag(String identity, String tag);
 }

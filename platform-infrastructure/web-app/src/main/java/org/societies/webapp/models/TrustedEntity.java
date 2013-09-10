@@ -48,6 +48,9 @@ public class TrustedEntity implements Serializable {
 	/** The identifier of the trustee. */
 	private final TrustedEntityId trusteeId;
 	
+	/** The name of the trustee. */
+	private final String trusteeName;
+	
 	/** The direct trust in this entity. */
 	private final Trust directTrust = new Trust();
 	
@@ -66,10 +69,12 @@ public class TrustedEntity implements Serializable {
 	 * @param trusteeId
 	 * @param trustorId
 	 */
-	public TrustedEntity(final TrustedEntityId trustorId, final TrustedEntityId trusteeId) {
+	public TrustedEntity(final TrustedEntityId trustorId, final TrustedEntityId trusteeId,
+			final String trusteeName) {
 		
 		this.trustorId = trustorId;
 		this.trusteeId = trusteeId;
+		this.trusteeName = trusteeName;
 	}
 	
 	public TrustedEntityId getTrustorId() {
@@ -80,6 +85,11 @@ public class TrustedEntity implements Serializable {
 	public TrustedEntityId getTrusteeId() {
 		
 		return this.trusteeId;
+	}
+	
+	public String getTrusteeName() {
+		
+		return this.trusteeName;
 	}
 	
 	public Trust getDirectTrust() {
@@ -128,5 +138,54 @@ public class TrustedEntity implements Serializable {
 		sb.append(")");
 		
 		return sb.toString();
+	}
+
+	/*
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		
+		final int prime = 31;
+		
+		int result = 1;
+		result = prime * result
+				+ ((this.trustorId == null) ? 0 : this.trustorId.hashCode());
+		result = prime * result
+				+ ((this.trusteeId == null) ? 0 : this.trusteeId.hashCode());
+		
+		return result;
+	}
+
+	/*
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object that) {
+		
+		if (this == that)
+			return true;
+		if (that == null)
+			return false;
+		if (this.getClass() != that.getClass())
+			return false;
+		
+		final TrustedEntity other = (TrustedEntity) that;
+		if (this.trustorId == null) {
+			if (other.trustorId != null) {
+				return false;
+			}
+		} else if (!this.trustorId.equals(other.trustorId)) {
+			return false;
+		}
+		if (this.trusteeId == null) {
+			if (other.trusteeId != null) {
+				return false;
+			}
+		} else if (!this.trusteeId.equals(other.trusteeId)) {
+			return false;
+		}
+		
+		return true;
 	}
 }
