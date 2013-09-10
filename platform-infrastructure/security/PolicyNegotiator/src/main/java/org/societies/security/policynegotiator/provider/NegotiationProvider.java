@@ -80,12 +80,14 @@ public class NegotiationProvider implements INegotiationProvider {
 	}
 	
 //	@PostConstruct
-	public void init() {
+	public void init() throws Exception {
 		
 		//LOG.debug("init(): signed = {}", signatureMgr.signXml("xml", "xmlNodeId", "identity"));
 		//LOG.debug("init(): signature valid = {}", signatureMgr.verify("xml"));
 		
 		LOG.debug("init()");
+
+		LOG.debug("init() end");
 	}
 	
 	// Getters and setters for beans
@@ -116,7 +118,7 @@ public class NegotiationProvider implements INegotiationProvider {
 		LOG.debug("setProviderServiceMgr()");
 		this.providerServiceMgr = providerServiceMgr;
 	}
-	
+
 	private SlaBean createSlaBean(boolean success, int sessionId, String sla) {
 		
 		SlaBean bean = new SlaBean();
@@ -182,6 +184,7 @@ public class NegotiationProvider implements INegotiationProvider {
 		String serviceId;
 		Future<SlaBean> result = new AsyncResult<SlaBean>(sla);
 		
+//		sessions.remove(sessionId);  // TODO: remove session
 		sla.setSessionId(sessionId);
 		
 		try {

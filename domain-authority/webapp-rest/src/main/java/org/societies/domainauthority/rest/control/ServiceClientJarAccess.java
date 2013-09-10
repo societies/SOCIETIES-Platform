@@ -38,6 +38,8 @@ import org.societies.api.internal.domainauthority.IClientJarServer;
 import org.societies.api.internal.schema.domainauthority.rest.UrlBean;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
+import org.societies.domainauthority.rest.dao.ResourceDao;
+import org.societies.domainauthority.rest.model.Resource;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
@@ -50,10 +52,15 @@ public class ServiceClientJarAccess implements IClientJarServer {
 
 	private static Logger LOG = LoggerFactory.getLogger(ServiceClientJarAccess.class);
 
+	/**
+	 * Key = Relative path in local filesystem, same as Resource.getPath()
+	 */
 	private static HashMap<String, Resource> resources = new HashMap<String, Resource>();
 
 	private static ISignatureMgr sigMgr;
 	private static boolean accessControlEnabled;
+	
+	private static ResourceDao resourceDao;
 
 	public ServiceClientJarAccess() {
 		
@@ -63,6 +70,23 @@ public class ServiceClientJarAccess implements IClientJarServer {
 	public void init() {
 
 		LOG.debug("init()");
+
+		List<Resource> resourceList = resourceDao.getAll();
+		
+		if (resourceList != null) {
+			LOG.debug("Loading resource list from previous run");
+			for (Resource r : resourceList) {
+				resources.put(r.getPath(), r);
+				LOG.debug("Loaded resource [{}] {}", r.getId(), r.getPath());
+			}
+		}
+	}
+
+	public ResourceDao getResourceDao() {
+		return resourceDao;
+	}
+	public void setResourceDao(ResourceDao resourceDao) {
+		ServiceClientJarAccess.resourceDao = resourceDao;
 	}
 
 	public static ISignatureMgr getSigMgr() {
@@ -103,12 +127,18 @@ public class ServiceClientJarAccess implements IClientJarServer {
 		}
 		if (sigMgr.verify(dataToVerify, signature, providerCert.getPublicKey())) {
 			String fileList = "";
-			for (String f : files) {
-				resource = new Resource(f, providerCert.getPublicKey());
-				resources.put(resource.getPath(), resource);
-				fileList += f;
+			try {
+				for (String f : files) {
+					resource = new Resource(f, providerCert);
+					resources.put(resource.getPath(), resource);
+					resourceDao.save(resource);
+					fileList += f;
+				}
+				result.setSuccess(true);
+			} catch (DigsigException e) {
+				LOG.info("Could not register all files for sharing", e);
+				result.setSuccess(false);
 			}
-			result.setSuccess(true);
 			LOG.info("Registered new files for sharing. Service: {}. Files: {}", serviceId, fileList);
 		}
 		else {
@@ -132,7 +162,16 @@ public class ServiceClientJarAccess implements IClientJarServer {
 		for (Resource r : resources.values()) {
 			if (r.getPath().equals(filePath)) {
 				LOG.debug("isAuthorized(): file {} found", filePath);
-				return sigMgr.verify(filePath, signature, r.getOwnerKey());
+				byte[] certBytes = r.getOwnerCertSerialized();
+				X509Certificate cert;
+				try {
+					cert = sigMgr.ba2cert(certBytes);
+				} catch (DigsigException e) {
+					LOG.warn("Could not reconstruct certificate for file {} from {}", filePath, certBytes);
+					return false;
+				}
+				PublicKey publicKey = cert.getPublicKey();
+				return sigMgr.verify(filePath, signature, publicKey);
 			}
 		}
 		LOG.debug("isAuthorized(): file {} NOT found", filePath);
@@ -142,9 +181,9 @@ public class ServiceClientJarAccess implements IClientJarServer {
 	public static void addResource(String path, String certStr) throws DigsigException {
 		
 		X509Certificate cert = sigMgr.str2cert(certStr);
-		PublicKey ownerKey = cert.getPublicKey();
-		Resource resource = new Resource(path, ownerKey);
+		Resource resource = new Resource(path, cert);
 		
 		resources.put(resource.getPath(), resource);
+		resourceDao.save(resource);
 	}
 }

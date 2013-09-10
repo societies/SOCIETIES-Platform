@@ -31,8 +31,8 @@ import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.schema.servicelifecycle.model.ServiceType;
 import org.societies.api.services.ServiceMgmtEvent;
-import org.societies.api.services.ServiceMgmtEventType;
 
 /**
  * Describe your class here...
@@ -59,21 +59,89 @@ public class ServiceMgmtListener extends EventListener {
 	 */
 	@Override
 	public void handleInternalEvent(InternalEvent event) {
-		if(log.isDebugEnabled())
-			log.debug("InternalEvent arrived: " + event.geteventName());
-		if(event.geteventType().equals(EventTypes.SERVICE_LIFECYCLE_EVENT)){
-			ServiceMgmtEvent ourEvent = (ServiceMgmtEvent) event.geteventInfo();
-			log.debug("Received event is of type: {}",ourEvent.getEventType());
-			
-			switch(ourEvent.getEventType()){
-				case NEW_SERVICE: ;
-				case SERVICE_REMOVED: ;
-				case SERVICE_SHARED: ;
-				case SERVICE_UNSHARED: ;
-				case SERVICE_STARTED: ;
-				case SERVICE_STOPPED: ;
-			default: 
+		log.debug("InternalEvent arrived: {}",event.geteventName());
+
+		try{
+		
+			if(event.geteventType().equals(EventTypes.SERVICE_LIFECYCLE_EVENT)){
+				ServiceMgmtEvent ourEvent = (ServiceMgmtEvent) event.geteventInfo();
+				log.debug("Received event is of type: {} for serviceId {}",ourEvent.getEventType(),ourEvent.getServiceId());
+				
+				if(ourEvent.getServiceId() == null){
+					log.warn("Service Id of received event was null! This should not happen, aborting!");
+					return;
+				}
+				
+				ServiceWrapper service = controller.getService(ourEvent.getServiceId());
+					
+				switch(ourEvent.getEventType()){
+					case NEW_SERVICE:
+						if(ourEvent.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT) || ourEvent.getServiceType().equals(ServiceType.DEVICE))
+							controller.serviceInstalled(ourEvent.getServiceId());
+						break;
+					case SERVICE_REMOVED: 
+						if(controller.getServiceId()==null){
+							controller.serviceRemoved(ourEvent.getServiceId(), ourEvent.getServiceName(),ourEvent.getServiceType());
+						} else{
+							log.debug("Event is being dealt with by the controller, so no need to be processed!");
+						}
+						break;
+					case SERVICE_SHARED: 
+						if(controller.getServiceId()==null){
+							if(service != null && service.isSharedWithCis(ourEvent.getSharedNode().getJid())){
+								log.debug("Service {} is already shared with this CIS, no need to process event.", ourEvent.getServiceName() );
+								break;
+							}
+							controller.serviceShared(ourEvent.getServiceId(), ourEvent.getServiceName(), ourEvent.getSharedNode());
+						}  else{
+							log.debug("Event is being dealt with by the controller, so no need to be processed!");
+						}
+						break;
+						
+					case SERVICE_UNSHARED:
+						if(controller.getServiceId()==null){
+							if(service != null && !service.isSharedWithCis(ourEvent.getSharedNode().getJid())){
+								log.debug("Service {} is already NOT shared with this CIS, no need to process event.", ourEvent.getServiceName() );
+								break;
+							}
+							controller.serviceUnshared(ourEvent.getServiceId(), ourEvent.getServiceName(), ourEvent.getSharedNode());
+
+						} else{
+							log.debug("Event is being dealt with by the controller, so no need to be processed!");
+						}
+						break;
+					case SERVICE_STARTED: 
+						if(controller.getServiceId()==null){
+							if(service != null && service.isStarted()){
+								log.debug("Service {} is already started, no need to process event.", ourEvent.getServiceName() );
+								break;
+							}
+							controller.serviceStarted(ourEvent.getServiceId(), ourEvent.getServiceName());
+						} else{
+							log.debug("Event is being dealt with by the controller, so no need to be processed!");
+						}
+						break;
+					case SERVICE_STOPPED:
+						if(controller.getServiceId()==null){
+							if(service != null && service.isStopped()){
+								log.debug("Service {} is already stopped, no need to process event.", ourEvent.getServiceName() );
+								break;
+							}
+							controller.serviceStopped(ourEvent.getServiceId(), ourEvent.getServiceName());
+						} else{
+							log.debug("Event is being dealt with by the controller, so no need to be processed!");
+						}
+						break;
+					case PROBLEM_OCURRED:
+						controller.installFailed(ourEvent.getServiceId(), ourEvent.getServiceName());
+						break;
+				default: log.debug("Unknown event! {}",ourEvent.getEventType());
+				}
 			}
+			
+		} catch(Exception ex){
+			log.error("Error in this listener, so we unregister!");
+			ex.printStackTrace();
 		}
 		
 	}

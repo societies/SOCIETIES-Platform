@@ -1,0 +1,112 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.societies.integration.example.service</groupId>
+	<artifactId>IntegrationTestServer</artifactId>
+	<version>0.1</version>
+	<packaging>bundle</packaging>
+	
+	<developers>
+		<developer>
+			<id>sanchocsa</id>
+			<name>Sancho Rego</name>
+			<email>sanchocsa@gmail.com</email>
+			<organization>PTIN</organization>
+			<roles>
+				<role>owner, developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<parent>
+		<groupId>org.societies</groupId>
+		<artifactId>spring-osgi-parent</artifactId>
+		<version>RELEASE</version>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>com.springsource.slf4j.org.apache.commons.logging</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.spring-library</artifactId>
+			<type>libd</type>
+			<scope>provided</scope>
+		</dependency>		
+
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Embed-Dependency>*;scope=compile|runtime;inline=false</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+						<Import-Package>*;resolution:=optional</Import-Package>
+						<Export-Package>org.societies.integration.example.service.api</Export-Package>
+						<Include-Resource>
+                            {maven-resources}, {maven-dependencies},
+                            societies-client=target/societies-client
+                        </Include-Resource>
+					</instructions>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+          			<execution>
+            			<id>copy</id>
+            			<phase>compile</phase>
+            			<goals>
+              				<goal>copy</goal>
+            			</goals>
+            			<configuration>
+              				<artifactItems>
+	                			<artifactItem>
+									<groupId>org.societies.integration.example.service</groupId>
+									<artifactId>IntegrationTestService</artifactId>
+									<version>0.1</version>
+		                  			<outputDirectory>${project.build.directory}/societies-client</outputDirectory>
+		                  			<destFileName>IntegrationTestService-client.jar</destFileName>
+	                			</artifactItem>
+              				</artifactItems>
+            			</configuration>
+          			</execution>
+                    <execution>
+						<id>copy-installed</id>
+			            <phase>install</phase>
+			            <goals>
+			              <goal>copy</goal>
+			            </goals>
+			            <configuration>
+							<artifactItems>
+			                	<artifactItem>
+			                 		<groupId>${project.groupId}</groupId>
+									<artifactId>${project.artifactId}</artifactId>
+									<version>${project.version}</version>
+									<type>jar</type>
+									<overWrite>true</overWrite>
+									<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+			                	</artifactItem>
+							</artifactItems>
+			            </configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

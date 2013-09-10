@@ -1,8 +1,7 @@
 package org.societies.webapp.model;
 
 import org.primefaces.model.SelectableDataModel;
-import org.societies.webapp.model.Screens;
-
+import org.societies.webapp.model.Screen;
 import javax.faces.model.ListDataModel;
 import java.util.List;
 
@@ -31,22 +30,22 @@ import java.util.List;
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-public class ScreenDataModel extends ListDataModel<Screens> implements SelectableDataModel<Screens> {
+public class ScreenDataModel extends ListDataModel<Screen> implements SelectableDataModel<Screen> {
 
-    public ScreenDataModel(List<Screens> data) {
+    public ScreenDataModel(List<Screen> data) {
         super(data);
     }
 
     @Override
-    public Object getRowKey(Screens screens) {
-        return screens.getScreenID();
+    public Object getRowKey(Screen Screen) {
+        return Screen.getScreenID();
     }
 
     @Override
-    public Screens getRowData(String rowKey) {
-        List<Screens> screens = (List<Screens>) getWrappedData();
+    public Screen getRowData(String rowKey) {
+        List<Screen> Screen = (List<Screen>) getWrappedData();
 
-        for(Screens screen : screens) {
+        for(Screen screen : Screen) {
             if(screen.getScreenID().equals(rowKey))
                 return screen;
         }

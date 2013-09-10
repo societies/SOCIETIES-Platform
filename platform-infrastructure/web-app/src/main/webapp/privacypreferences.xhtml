@@ -7,7 +7,7 @@
 	template="templates/main_template.xhtml">
 
 	<ui:define name="html_head">
-		<title>Privacy Preferences</title>
+		<title>Privacy Preferences - SOCIETIES</title>
 	</ui:define>
 
 	<ui:define name="body">
@@ -46,22 +46,26 @@
         </p:column>
 
 					<p:column headerText="Data Type">
-         #{ppnPreferenceDetail.resource.dataType}
+          #{PrivacyPrefsController.toStringDataType(ppnPreferenceDetail.resource.dataType)}
         </p:column>
 
 					<p:column style="width: 4%">
-						<p:commandButton icon="ui-icon-zoomin" action="#{PrivacyPrefsController.storePPNDetailToUtils}"
-							title="View-Edit-Delete">
+						<p:commandButton icon="ui-icon-wrench"
+							action="#{PrivacyPrefsController.storePPNDetailToUtils}"
+							title="View-Edit-Delete" ajax="false">
 							<f:setPropertyActionListener value="#{ppnPreferenceDetail}"
-								target="#{PrivacyPrefsController.selectedPPNDetail}" />			
-							<f:param name="ppnDetailUUID" value="#{PrivacyPrefsController.uuid}" />				
+								target="#{PrivacyPrefsController.selectedPPNDetail}" />
+
+							<f:param name="ppnDetailUUID"
+								value="#{PrivacyPrefsController.ppnUUID}" />
 						</p:commandButton>
 					</p:column>
 				</p:dataTable>
 
 				<p:toolbar>
 					<p:toolbarGroup align="left">
-						<p:button value="Create New" href="privacy_ppn_create.xhtml">
+						<p:button value="Create New PPN preference"
+							href="privacy_ppn_create.xhtml">
 						</p:button>
 					</p:toolbarGroup>
 				</p:toolbar>
@@ -84,14 +88,33 @@
             #{accCtrlPreference.resource.scheme}
         </p:column>
 
-					<p:column headerText="Data Type">
-         #{accCtrlPreference.resource.dataType}
+		<p:column headerText="Data Type">
+        <span class="tooltip">#{PrivacyPrefsController.toStringDataType(accCtrlPreference.resource.dataType)}<em><span></span>#{accCtrlPreference.resource.dataIdUri}</em></span>
         </p:column>
 
-					<p:column headerText="Resource ID">
+					<!-- Removed temporarly to take a screenshot <p:column headerText="Resource ID">
         #{accCtrlPreference.resource.dataIdUri}
-        </p:column>
+        </p:column> -->
+					<p:column style="width: 4%">
+						<p:commandButton icon="ui-icon-wrench"
+							action="#{PrivacyPrefsController.storeAccCtrlDetailToUtils}"
+							title="View-Edit-Delete" ajax="false">
+							<f:setPropertyActionListener value="#{accCtrlPreference}"
+								target="#{PrivacyPrefsController.selectedAccCtrlDetail}" />
+
+							<f:param name="accCtrlDetailUUID"
+								value="#{PrivacyPrefsController.accCtrlUUID}" />
+						</p:commandButton>
+					</p:column>
 				</p:dataTable>
+
+				<p:toolbar>
+					<p:toolbarGroup align="left">
+						<p:button value="Create New Access Control preference"
+							href="privacy_accCtrl_create.xhtml">
+						</p:button>
+					</p:toolbarGroup>
+				</p:toolbar>
 
 				<p:dataTable id="idsDetails" var="idsPreference"
 					value="#{PrivacyPrefsController.idsPreferenceDetails}">
@@ -132,7 +155,7 @@
         </p:column>
 
 					<p:column headerText="Data Type">
-         #{dobfPreference.resource.dataType}
+          #{PrivacyPrefsController.toStringDataType(dobfPreference.resource.dataType)}
         </p:column>
 
 					<p:column headerText="Resource ID">
@@ -145,7 +168,6 @@
 		</section>
 
 		<div class="hr grid_12 clearfix"></div>
-
 	</ui:define>
 
 	<ui:define name="dialogs">

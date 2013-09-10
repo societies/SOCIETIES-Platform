@@ -26,7 +26,6 @@
 package org.societies.useragent.monitoring;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;

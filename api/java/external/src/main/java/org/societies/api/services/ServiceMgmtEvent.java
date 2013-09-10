@@ -49,6 +49,10 @@ public class ServiceMgmtEvent implements Serializable{
 	private ServiceType serviceType;
 	private IIdentity sharedNode;
 	private ServiceMgmtEventType eventType;
+
+	private String serviceName;
+
+	private String problem;
 	
 	
 	/**
@@ -120,5 +124,20 @@ public class ServiceMgmtEvent implements Serializable{
 		return this.serviceType;
 	}
 	
+	public void setServiceName(String serviceName){
+		this.serviceName = serviceName;
+	}
+	
+	public String getServiceName(){
+		return serviceName;
+	}
+	
+	public String getProblem(){
+		return problem;
+	}
+	
+	public void setProblem(String problem){
+		this.problem = problem;
+	}
 	
 }

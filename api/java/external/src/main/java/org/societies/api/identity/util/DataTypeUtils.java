@@ -314,6 +314,11 @@ public class DataTypeUtils {
 		addDataTypeDescription(CtxAttributeTypes.AGE, "Age of this entity");
 		addDataTypeDescription(CtxAttributeTypes.BOOKS, "Favorite books", "Favorite books of this entity");
 		addDataTypeDescription(CtxAttributeTypes.LOCATION_SYMBOLIC, "Symbolic location", "Symbolic location");
+		addDataTypeDescription(CtxAttributeTypes.NAME_FIRST, "First name", "First name");
+		addDataTypeDescription(CtxAttributeTypes.NAME_LAST, "Last name", "Last name");
+		addDataTypeDescription(CtxAttributeTypes.ADDRESS_HOME_CITY, "City home address", "City of this entity's home address");
+		addDataTypeDescription("ADDRESS_HOME", "Home address", "Address of this entity's home");
+		addDataTypeDescription("ADDRESS_WORK", "Work address", "Address of this entity's work");
 		return true;
 	}
 

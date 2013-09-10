@@ -110,6 +110,12 @@ public class PrivacyPolicyRegistryManager implements IPrivacyPolicyRegistryManag
 
 		// Global store
 		CtxIdentifier id = this.storePrivacyPolicyToCtx(owner, privacyPolicy);
+		if (null == id) {
+			throw new PrivacyException("Can't retrieve the Context ID of the stored privacy policy");
+		}
+		if (null == owner) {
+			owner = privacyPolicy.getRequestor();
+		}
 		this.policyRegistry.addPolicy(owner, id);
 		this.storePrivacyPolicyRegistry();
 		return true;

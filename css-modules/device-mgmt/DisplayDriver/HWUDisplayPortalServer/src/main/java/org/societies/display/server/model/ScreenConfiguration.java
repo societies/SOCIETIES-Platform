@@ -24,13 +24,9 @@
  */
 package org.societies.display.server.model;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 
 import org.slf4j.Logger;

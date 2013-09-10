@@ -1,0 +1,11 @@
+SOCIETIES - User Management Tools
+
+# Command lines
+* Create SOCIETIES user account
+** Generate Virgo containers
+** Create and intialise container database
+** Configure a new user account (and create it if necessary)
+* Deploy SOCIETIES containers into the Virgo installation folder
+
+# GUI
+* Generate Virgo containers

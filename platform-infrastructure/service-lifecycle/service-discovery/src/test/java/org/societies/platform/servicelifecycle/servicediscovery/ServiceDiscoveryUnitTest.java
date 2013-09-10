@@ -121,7 +121,7 @@ public class ServiceDiscoveryUnitTest {
 		try
 		{
 			stub(mockedHost.getJid()).toReturn(hostJid);
-			stub(mockedServiceReg.retrieveServicesSharedByCSS(mockedHost.getJid())).toReturn(null);
+			stub(mockedServiceReg.retrieveServicesInCSSNode(mockedHost.getJid())).toReturn(null);
 			stub(mockedHost.getType()).toReturn(IdentityType.CSS);
 			stub(mockedCommManager.getIdManager()).toReturn(mockedIdentityManager);
 			stub(mockedCommManager.getIdManager().getThisNetworkNode()).toReturn(mockedHost);
@@ -154,7 +154,7 @@ public class ServiceDiscoveryUnitTest {
 		try
 		{
 			stub(mockedHost.getJid()).toReturn(hostJid);
-			stub(mockedServiceReg.retrieveServicesSharedByCSS(mockedHost.getJid())).toReturn(testLocalServiceList);
+			stub(mockedServiceReg.retrieveServicesInCSSNode(mockedHost.getJid())).toReturn(testLocalServiceList);
 			stub(mockedHost.getType()).toReturn(IdentityType.CSS);
 			stub(mockedCommManager.getIdManager()).toReturn(mockedIdentityManager);
 			stub(mockedCommManager.getIdManager().getThisNetworkNode()).toReturn(mockedHost);
@@ -185,7 +185,8 @@ public class ServiceDiscoveryUnitTest {
 		try
 		{
 			stub(mockedHost.getJid()).toReturn(hostJid);
-			stub(mockedServiceReg.retrieveServicesSharedByCSS(mockedHost.getJid())).toReturn(testLocalServiceList);
+			stub(mockedServiceReg.retrieveServicesInCSSNode(mockedHost.getJid())).toReturn(testLocalServiceList);
+			stub(mockedServiceReg.retrieveServicesInCSS(mockedHost.getBareJid())).toReturn(testLocalServiceList);
 			stub(mockedHost.getType()).toReturn(IdentityType.CSS);
 			stub(mockedCommManager.getIdManager()).toReturn(mockedIdentityManager);
 			stub(mockedCommManager.getIdManager().getThisNetworkNode()).toReturn(mockedHost);

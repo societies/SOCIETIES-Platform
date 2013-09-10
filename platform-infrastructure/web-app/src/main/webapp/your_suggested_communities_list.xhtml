@@ -39,19 +39,21 @@
                 <c:forEach items="#{cismanager.suggestedcommunities}" var="sugcommunity">
     				    <li class="keyinfo bypostauthor">
                         <figure class="gravatar">
-                            <a class="friend_profile.xhtml"><img alt="" src="images/profile_pic.png"
+                            <a class="friend_profile.xhtml"><img alt="" src="images/launcher_societies.png"
                                                                 height="58" width="58"/></a>
                         </figure>
                         <div class="keyinfo_content">
                             <div class="clearfix">
                                 <br/>
-                                <H6>Name:     #{sugcommunity.getName()}</H6> 								
-                                <H6>Identity: #{sugcommunity.getId()}</H6>
+                                <H6>Name:     #{sugcommunity.getCisname()}</H6> 								
+                                <!-- <H6>Identity: #{sugcommunity.getCisid()}</H6>  -->
+                                <H6>Members: #{cismanager.getsuggestedlistmembers(sugcommunity)}</H6>
                             </div>
                             <div class="keyinfo_text">
                             </div>
                         </div>
                 		<p:commandButton value="Join Community" action="#{cismanager.joincis(sugcommunity)}"/>
+                		<!-- <p:commandButton value="Get Members" action="#{cismanager.getsuggestedlistmembers(sugcommunity)}"/> -->
                 		</li>
                 		</c:forEach>
                     
@@ -71,7 +73,7 @@
        	 		<br/> <br/>
                 <ul>
                 	<ui:repeat value="#{cismanager.communities}" var="community">
-                		<li> #{community.name}</li>
+                		<li> #{community.getCisname()}</li>
                 	</ui:repeat>
                 </ul>
             </section>

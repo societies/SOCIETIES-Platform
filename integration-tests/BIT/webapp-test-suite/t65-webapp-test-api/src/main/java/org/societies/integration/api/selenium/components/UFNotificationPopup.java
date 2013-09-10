@@ -28,6 +28,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.societies.integration.api.selenium.pages.PrivacyPolicyNegotiationRequestPage;
 
 import java.util.Arrays;
 
@@ -69,6 +70,10 @@ public class UFNotificationPopup extends BasePageComponent {
     public static final String TA_POPUP_PANEL_ANY_INDEX = POPUP_PATH + "//div[starts-with(@id,'mainForm:notificationGrid:') and contains(@id, ':timedAbortPopupPanel')]";
     public static final String TA_ACCEPT_BUTTON_ANY_INDEX = TA_POPUP_PANEL_ANY_INDEX + "//button[contains(@id, 'taAcceptButton')]";
     public static final String TA_ABORT_BUTTON_ANY_INDEX = TA_POPUP_PANEL_ANY_INDEX + "//button[contains(@id, 'taAbortButton')]";
+
+    public static final String PPN_MORE_INFO_LINK = "//a[@href='privacy_policy_negotiation.xhtml?id=%s']";
+    public static final String FIRST_PPN_MORE_INFO_LINK = "//a[contains(@href,'privacy_policy_negotiation.xhtml?id=')]";
+
 
     public UFNotificationPopup(WebDriver driver) {
         super(driver);
@@ -225,4 +230,21 @@ public class UFNotificationPopup extends BasePageComponent {
         clickButton(By.xpath(CLOSE_BTN_PATH));
     }
 
+    public PrivacyPolicyNegotiationRequestPage clickPPNLink(String requestId) {
+        log.debug("Selecting PPN link for request ID " + requestId);
+        WebElement ele = waitUntilVisible(By.xpath(String.format(PPN_MORE_INFO_LINK, requestId)));
+        ele.click();
+        waitUntilStale(ele);
+
+        return new PrivacyPolicyNegotiationRequestPage(getDriver());
+    }
+
+    public PrivacyPolicyNegotiationRequestPage clickFirstPPNLink() {
+        log.debug("Selecting first PPN link");
+        WebElement ele = waitUntilVisible(By.xpath(FIRST_PPN_MORE_INFO_LINK));
+        ele.click();
+        waitUntilStale(ele);
+
+        return new PrivacyPolicyNegotiationRequestPage(getDriver());
+    }
 }

@@ -78,6 +78,12 @@
   		<property name="internalTrustBroker" ref="internalTrustBroker"/>
   	</bean>
   	
+	<bean name="testIndirectTrustPerformance" class="org.societies.integration.performance.test.upper_tester.trust.TestIndirectTrustPerformance">
+  		<property name="commManager" ref="commManager"/>
+  		<property name="internalTrustEvidenceCollector" ref="internalTrustEvidenceCollector"/>
+  		<property name="internalTrustBroker" ref="internalTrustBroker"/>
+  	</bean>
+  	
 	<!-- Trust declarations end -->
 	
 	

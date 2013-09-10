@@ -6,9 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.comm.xmpp.pubsub.PubsubClient;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
@@ -17,7 +14,6 @@ import org.societies.api.internal.useragent.model.ImpProposalType;
 import org.societies.integration.api.selenium.SeleniumTest;
 import org.societies.integration.api.selenium.components.UFNotificationPopup;
 import org.societies.integration.api.selenium.pages.IndexPage;
-import org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository;
 
 import java.util.Date;
 import java.util.List;
@@ -29,15 +25,11 @@ public class TestWebappUserFeedback extends SeleniumTest {
     private static final Logger log = LoggerFactory.getLogger(TestWebappUserFeedback.class);
 
     private static final String USERNAME = "paddy";
-    private static final String PASSWORD = "paddy";
+    private static final String PASSWORD = "p";
 
     private IndexPage indexPage;
 
-    private PubsubClient pubsubClient;
-    private IIdentityManager idMgr;
-    private IIdentity userID;
     private IUserFeedback userFeedback;
-    private IUserFeedbackHistoryRepository userFeedbackHistoryRepository;
 
     public TestWebappUserFeedback() {
         log.debug("TestWebappUserFeedback constructor");
@@ -47,11 +39,8 @@ public class TestWebappUserFeedback extends SeleniumTest {
     public void setupTest() {
         log.debug("Setting up test");
 
-        this.pubsubClient = UFTestInit.getPubsub();
-        this.idMgr = UFTestInit.getIdMgr();
-        this.userID = this.idMgr.getThisNetworkNode();
         this.userFeedback = UFTestInit.getUserFeedback();
-        this.userFeedbackHistoryRepository = UFTestInit.getUserFeedbackHistoryRepository();
+        userFeedback.clear();
 
         indexPage = new IndexPage(getDriver());
 
@@ -60,11 +49,29 @@ public class TestWebappUserFeedback extends SeleniumTest {
 
     @After
     public void tearDown() {
-//        pubSubListener.unregisterForEvents();
+
     }
 
     @Test
-    public void eventsAppearAtLogin_andCanBeAccepted() {
+    public void clearUserFeedbackMethod_sendsCorrectEvents_andWebappControllerListensCorrectly() {
+        indexPage.doLogin(USERNAME, PASSWORD);
+
+        indexPage.verifyNumberInNotificationsBubble(0);
+
+        ExpProposalContent content = new ExpProposalContent("Pick a button", new String[]{"Yes", "No"});
+        userFeedback.getExplicitFBAsync(ExpProposalType.ACKNACK, content);
+        userFeedback.getExplicitFBAsync(ExpProposalType.RADIOLIST, content);
+        userFeedback.getExplicitFBAsync(ExpProposalType.CHECKBOXLIST, content);
+
+        indexPage.verifyNumberInNotificationsBubble(3);
+
+        userFeedback.clear();
+
+        indexPage.verifyNumberInNotificationsBubble(0);
+    }
+
+    @Test
+    public void eventsAppearAtLogin_andCanBeAccepted() throws InterruptedException {
         ExpProposalContent content = new ExpProposalContent("Pick a button", new String[]{"Yes", "No"});
 
         Future<List<String>> result1 = userFeedback.getExplicitFBAsync(ExpProposalType.ACKNACK, content);
@@ -77,19 +84,30 @@ public class TestWebappUserFeedback extends SeleniumTest {
 
         UFNotificationPopup popup = indexPage.clickNotificationBubble();
 
-        Assert.assertFalse(result1.isDone());
-        Assert.assertFalse(result2.isDone());
-        Assert.assertFalse(result3.isDone());
+        Assert.assertFalse("Expected event 1 NOT to be marked done", result1.isDone());
+        Assert.assertFalse("Expected event 2 NOT to be marked done", result2.isDone());
+        Assert.assertFalse("Expected event 3 NOT to be marked done", result3.isDone());
 
         popup.answerAckNackRequest("No");
+
+        // TODO: wait until popup is stale, instead of waiting a set amount of time
+        Thread.sleep(2000);
+
         popup.answerSelectOneRequest("Yes");
+
+        // TODO: wait until popup is stale, instead of waiting a set amount of time
+        Thread.sleep(2000);
+
         popup.answerSelectManyRequest(new String[]{"Yes", "No"});
+
+        // TODO: wait until popup is stale, instead of waiting a set amount of time
+        Thread.sleep(2000);
 
         log.debug("Finished responding to requests");
 
-        Assert.assertTrue(result1.isDone());
-        Assert.assertTrue(result2.isDone());
-        Assert.assertTrue(result3.isDone());
+        Assert.assertTrue("Expected event 1 to be marked done", result1.isDone());
+        Assert.assertTrue("Expected event 2 to be marked done", result2.isDone());
+        Assert.assertTrue("Expected event 3 to be marked done", result3.isDone());
 
         indexPage.verifyNumberInNotificationsBubble(0);
 
@@ -98,17 +116,8 @@ public class TestWebappUserFeedback extends SeleniumTest {
 
     @Test
     public void sendAckNack_completeEventViaPopup_ensureDataUpdated() throws ExecutionException, InterruptedException {
-        indexPage.doLogin(USERNAME, PASSWORD);
-        UFNotificationPopup popup;
 
-        // clear any existing data
-        try {
-            indexPage.verifyNumberInNotificationsBubble(0);
-        } catch (Exception ex) {
-            popup = indexPage.clickNotificationBubble();
-            popup.answerAllOutstandingRequestsWithAnyOption();
-            popup.close();
-        }
+        indexPage.doLogin(USERNAME, PASSWORD);
 
         // ensure we're starting from a clean slate
         indexPage.verifyNumberInNotificationsBubble(0);
@@ -119,7 +128,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
 
         // ensure request has been sent
         indexPage.verifyNumberInNotificationsBubble(1);
-        popup = indexPage.clickNotificationBubble();
+        UFNotificationPopup popup = indexPage.clickNotificationBubble();
 
         // ensure request hasn't been completed
         Assert.assertFalse(result1.isDone());
@@ -138,7 +147,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
         }
 
         Assert.assertTrue("Future object not updated after 10000ms", result1.isDone());
-        Assert.assertEquals("Value not updated in Future object", 1, result1.get().size());
+        Assert.assertEquals("Value not updated in AckNack Future object", 1, result1.get().size());
         Assert.assertEquals("Wrong value in Future object", "No", result1.get().get(0));
         indexPage.verifyNumberInNotificationsBubble(0);
     }
@@ -146,16 +155,6 @@ public class TestWebappUserFeedback extends SeleniumTest {
     @Test
     public void sendSelectOne_completeEventViaPopup_ensureDataUpdated() throws ExecutionException, InterruptedException {
         indexPage.doLogin(USERNAME, PASSWORD);
-        UFNotificationPopup popup;
-
-        // clear any existing data
-        try {
-            indexPage.verifyNumberInNotificationsBubble(0);
-        } catch (Exception ex) {
-            popup = indexPage.clickNotificationBubble();
-            popup.answerAllOutstandingRequestsWithAnyOption();
-            popup.close();
-        }
 
         // ensure we're starting from a clean slate
         indexPage.verifyNumberInNotificationsBubble(0);
@@ -166,7 +165,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
 
         // ensure request has been sent
         indexPage.verifyNumberInNotificationsBubble(1);
-        popup = indexPage.clickNotificationBubble();
+        UFNotificationPopup popup = indexPage.clickNotificationBubble();
 
         // ensure request hasn't been completed
         Assert.assertFalse(result1.isDone());
@@ -185,7 +184,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
         }
 
         Assert.assertTrue("Future object not updated after 10000ms", result1.isDone());
-        Assert.assertEquals("Value not updated in Future object", 1, result1.get().size());
+        Assert.assertEquals("Value not updated in SelectOne Future object", 1, result1.get().size());
         Assert.assertEquals("Wrong value in Future object", "Maybe", result1.get().get(0));
         indexPage.verifyNumberInNotificationsBubble(0);
     }
@@ -193,16 +192,6 @@ public class TestWebappUserFeedback extends SeleniumTest {
     @Test
     public void sendSelectMany_completeEventViaPopup_ensureDataUpdated() throws ExecutionException, InterruptedException {
         indexPage.doLogin(USERNAME, PASSWORD);
-        UFNotificationPopup popup;
-
-        // clear any existing data
-        try {
-            indexPage.verifyNumberInNotificationsBubble(0);
-        } catch (Exception ex) {
-            popup = indexPage.clickNotificationBubble();
-            popup.answerAllOutstandingRequestsWithAnyOption();
-            popup.close();
-        }
 
         // ensure we're starting from a clean slate
         indexPage.verifyNumberInNotificationsBubble(0);
@@ -213,7 +202,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
 
         // ensure request has been sent
         indexPage.verifyNumberInNotificationsBubble(1);
-        popup = indexPage.clickNotificationBubble();
+        UFNotificationPopup popup = indexPage.clickNotificationBubble();
 
         // ensure request hasn't been completed
         Assert.assertFalse(result1.isDone());
@@ -232,7 +221,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
         }
 
         Assert.assertTrue("Future object not updated after 10000ms", result1.isDone());
-        Assert.assertEquals("Value not updated in Future object", 3, result1.get().size());
+        Assert.assertEquals("Value not updated in SelectMany Future object", 3, result1.get().size());
         Assert.assertTrue("Wrong values in Future object", result1.get().contains("Maybe"));
         Assert.assertTrue("Wrong values in Future object", result1.get().contains("Dont know"));
         Assert.assertTrue("Wrong values in Future object", result1.get().contains("Dont care"));
@@ -242,16 +231,6 @@ public class TestWebappUserFeedback extends SeleniumTest {
     @Test
     public void sendTimedAbort_acceptEventViaPopup_ensureDataUpdated() throws ExecutionException, InterruptedException {
         indexPage.doLogin(USERNAME, PASSWORD);
-        UFNotificationPopup popup;
-
-        // clear any existing data
-        try {
-            indexPage.verifyNumberInNotificationsBubble(0);
-        } catch (Exception ex) {
-            popup = indexPage.clickNotificationBubble();
-            popup.answerAllOutstandingRequestsWithAnyOption();
-            popup.close();
-        }
 
         // ensure we're starting from a clean slate
         indexPage.verifyNumberInNotificationsBubble(0);
@@ -262,7 +241,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
 
         // ensure request has been sent
         indexPage.verifyNumberInNotificationsBubble(1);
-        popup = indexPage.clickNotificationBubble();
+        UFNotificationPopup popup = indexPage.clickNotificationBubble();
 
         // ensure request hasn't been completed
         Assert.assertFalse(result1.isDone());
@@ -282,23 +261,13 @@ public class TestWebappUserFeedback extends SeleniumTest {
         }
 
         Assert.assertTrue("Future object not updated after 10000ms", result1.isDone());
-        Assert.assertEquals("Value not updated in Future object", Boolean.TRUE, result1.get());
+        Assert.assertEquals("Value not updated in TimedAbort Future object", Boolean.TRUE, result1.get());
         indexPage.verifyNumberInNotificationsBubble(0);
     }
 
     @Test
     public void sendTimedAbort_abortEventViaPopup_ensureDataUpdated() throws ExecutionException, InterruptedException {
         indexPage.doLogin(USERNAME, PASSWORD);
-        UFNotificationPopup popup;
-
-        // clear any existing data
-        try {
-            indexPage.verifyNumberInNotificationsBubble(0);
-        } catch (Exception ex) {
-            popup = indexPage.clickNotificationBubble();
-            popup.answerAllOutstandingRequestsWithAnyOption();
-            popup.close();
-        }
 
         // ensure we're starting from a clean slate
         indexPage.verifyNumberInNotificationsBubble(0);
@@ -309,7 +278,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
 
         // ensure request has been sent
         indexPage.verifyNumberInNotificationsBubble(1);
-        popup = indexPage.clickNotificationBubble();
+        UFNotificationPopup popup = indexPage.clickNotificationBubble();
 
         // ensure request hasn't been completed
         Assert.assertFalse(result1.isDone());
@@ -329,23 +298,13 @@ public class TestWebappUserFeedback extends SeleniumTest {
         }
 
         Assert.assertTrue("Future object not updated after 10000ms", result1.isDone());
-        Assert.assertEquals("Value not updated in Future object", Boolean.FALSE, result1.get());
+        Assert.assertEquals("Value not updated in TimedAbort Future object", Boolean.FALSE, result1.get());
         indexPage.verifyNumberInNotificationsBubble(0);
     }
 
     @Test
     public void sendTimedAbort_ignoreEvent_ensureDataUpdated() throws ExecutionException, InterruptedException {
         indexPage.doLogin(USERNAME, PASSWORD);
-        UFNotificationPopup popup;
-
-        // clear any existing data
-        try {
-            indexPage.verifyNumberInNotificationsBubble(0);
-        } catch (Exception ex) {
-            popup = indexPage.clickNotificationBubble();
-            popup.answerAllOutstandingRequestsWithAnyOption();
-            popup.close();
-        }
 
         // ensure we're starting from a clean slate
         indexPage.verifyNumberInNotificationsBubble(0);
@@ -373,7 +332,7 @@ public class TestWebappUserFeedback extends SeleniumTest {
         }
 
         Assert.assertTrue("Future object not updated after 10000ms", result1.isDone());
-        Assert.assertEquals("Incorrect value updated in Future object", Boolean.FALSE, result1.get());
+        Assert.assertEquals("Incorrect value updated in Future object", Boolean.TRUE, result1.get());
         indexPage.verifyNumberInNotificationsBubble(0);
     }
 

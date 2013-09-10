@@ -28,7 +28,6 @@ package org.societies.css.devicemgmt.devicemanager.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 

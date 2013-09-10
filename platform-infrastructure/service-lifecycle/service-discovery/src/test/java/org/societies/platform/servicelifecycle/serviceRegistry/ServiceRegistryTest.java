@@ -221,7 +221,7 @@ public class ServiceRegistryTest extends
 	@Test
 	@Rollback(false)
 	public void retrieveServicesSharedCSS() throws Exception{
-		List<Service> returnedServiceList=serReg.retrieveServicesSharedByCSS(servicesList.get(0).getServiceInstance().getFullJid());
+		List<Service> returnedServiceList=serReg.retrieveServicesInCSSNode((servicesList.get(0).getServiceInstance().getFullJid()));
 		assertTrue(returnedServiceList.get(0).getServiceName().equals(servicesList.get(0).getServiceName()));
 	}
 	

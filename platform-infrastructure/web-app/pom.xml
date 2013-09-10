@@ -272,6 +272,18 @@
 			<artifactId>primefaces</artifactId>
 			<version>3.5</version>
 		</dependency>
+				<!-- For fileUpload in Primefaces -->
+		<!-- <dependency>
+   			<groupId>commons-fileupload</groupId>
+    		<artifactId>commons-fileupload</artifactId>
+    		<version>1.2.2</version>
+		</dependency>
+
+		<dependency>
+    		<groupId>commons-io</groupId>
+    		<artifactId>commons-io</artifactId>
+    		<version>2.1</version>
+		</dependency>-->
 		<!-- needed for PrimeFaces push -->
 		<!--<dependency> <groupId>org.atmosphere</groupId> <artifactId>atmosphere-runtime</artifactId> 
 			<version>${primepush-version}</version> </dependency> -->
@@ -361,6 +373,7 @@
 							org.simpleframework.xml.convert;resolution:=optional,
 							org.societies.maven.converters;resolution:=optional,
 							org.societies.simple.basic;resolution:=optional,
+							org.societies.api.external;resolution:=optional,
 							javax.servlet.jsp.jstl.core;version="[1.2.0,2.0.0)",
 							javax.servlet;version="[3.0.0, 4.0.0)",
 							javax.servlet.resources;version="[2.4.0, 4.0.0)",
@@ -557,6 +570,9 @@
 							<!--org.apache.catalina, -->
 							<!--org.apache.catalina.comet, -->
 							<!--org.atmosphere.weblogic, -->
+							<!-- Primefaces upload -->
+							org.apache.commons.io;resolution:=optional,
+							org.apache.commons.fileupload;resolution:=optional,
 							<!-- spring DM -->
 							org.springframework.beans.factory.config,
 							org.springframework.osgi.web.context.support,
@@ -626,6 +642,7 @@
 							org.jfree.chart.urls;resolution:=optional,
 							org.jfree.data.category;resolution:=optional,
 							org.jfree.data.general;resolution:=optional,
+							org.societies.api.privacytrust.privacy.util.privacypolicy;resolution:=optional,
 							<!-- Other -->
 							*;resolution:=optional
 						</Import-Package>

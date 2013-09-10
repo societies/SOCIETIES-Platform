@@ -1,0 +1,49 @@
+﻿@charset "utf-8";
+/* Author: Olivier Maridat (Trialog) */
+/* Creation Date : 30/09/2011 */
+
+body {
+margin: 0;
+padding: 0;
+padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+padding-bottom: 40px;
+text-align: center;
+font-size: 0.9em;
+color: black;
+font-family: Tahoma, Verdanna, Arial, Serif;
+}
+
+.container form div label{
+text-align: left;
+font-weight: bold;
+}
+.container form div textarea, .container form div input,.container form div select{
+width: 95%;
+}
+
+.container .generate{
+width: 100%;
+margin-bottom: 20px;
+}
+.container .generateBottom {
+margin-top: 20px;
+margin-bottom: 0;
+}
+
+.container pre{
+text-align: left;
+}
+
+h2{font-size: 1.1em;}
+
+pre{
+display: block;
+height: 600px;
+overflow: auto;
+}
+
+.recapitulatif {
+text-align: left;
+height: 600px;
+overflow: auto;
+}
