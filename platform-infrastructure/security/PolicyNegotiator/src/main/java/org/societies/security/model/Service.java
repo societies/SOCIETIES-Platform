@@ -34,7 +34,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,8 +177,12 @@ public class Service {
 //		this.files = decat(filesConcatenated);
 	}
 	
+	public List<String> getFiles() {
+		return decat(filesConcatenated);
+	}
+	
 	// I love Hibernate
-	public static List<String> decat(String str) {
+	protected static List<String> decat(String str) {
 		
 		List<String> list = new ArrayList<String>();
 		String[] strArray = str.split(delimiter);
@@ -193,7 +196,7 @@ public class Service {
 	}
 	
 	// I love Hibernate
-	public static String cat(List<String> strings) {
+	protected static String cat(List<String> strings) {
 		String str = "";
 		if (strings == null) {
 			return str;
