@@ -10,17 +10,8 @@
 
     <ui:define name="body">
 
-
-        <p:panelGrid columns="3">
-            <p:row>
-                <p:commandButton value="Send PPN"
-                                 actionListener="#{ufTestController.sendPpnEvent}"
-                                 process="@this"/>
-                <p:commandButton value="Send Simple Msg"
-                                 actionListener="#{ufTestController.sendSimpleNotificationEvent}"
-                                 process="@this"/>
-            </p:row>
-            <p:row>
+        <p:fieldset legend="Simple UF types">
+            <p:panelGrid columns="4">
                 <p:commandButton value="Send UF Ack/Nack"
                                  actionListener="#{ufTestController.sendAckNackEvent}"
                                  process="@this"/>
@@ -30,8 +21,15 @@
                 <p:commandButton value="Send UF Select Many"
                                  actionListener="#{ufTestController.sendSelectManyEvent}"
                                  process="@this"/>
-            </p:row>
-            <p:row>
+
+                <p:commandButton value="Send Simple Msg"
+                                 actionListener="#{ufTestController.sendSimpleNotificationEvent}"
+                                 process="@this"/>
+            </p:panelGrid>
+        </p:fieldset>
+
+        <p:fieldset legend="Blocking UF types">
+            <p:panelGrid columns="4">
                 <p:commandButton value="Send UF Ack/Nack (blocking)"
                                  actionListener="#{ufTestController.sendAckNackEvent}"
                                  process="@this"
@@ -43,8 +41,11 @@
                                  actionListener="#{ufTestController.sendSelectManyEvent}"
                                  process="@this"
                                  disabled="true"/>
-            </p:row>
-            <p:row>
+            </p:panelGrid>
+        </p:fieldset>
+
+        <p:fieldset legend="Timed Abort">
+            <p:panelGrid columns="4">
                 <p:commandButton value="Send UF Timed Abort (30s)"
                                  actionListener="#{ufTestController.sendTimedAbortEvent(30)}"
                                  process="@this"/>
@@ -55,15 +56,21 @@
                                  actionListener="#{ufTestController.sendTimedAbortEvent(3660)}"
                                  process="@this"/>
 
-            </p:row>
-
-            <p:row>
                 <p:panel>
                     <p:outputLabel value="Timed abort processor" for="tapEnabledButton"/>
                     <p:selectBooleanButton id="tapEnabledButton"
                                            value="#{notifications.timedAbortProcessorEnabled}"
+                                           immediate="true"
                                            onLabel="Enabled" offLabel="Disabled"/>
                 </p:panel>
+            </p:panelGrid>
+        </p:fieldset>
+
+        <p:fieldset legend="Complex UF types">
+            <p:panelGrid columns="4">
+                <p:commandButton value="Send PPN"
+                                 actionListener="#{ufTestController.sendPpnEvent}"
+                                 process="@this"/>
 
                 <p:commandButton value="Send UF Access Control"
                                  actionListener="#{ufTestController.sendAccessControlEvent}"
@@ -72,8 +79,12 @@
                 <p:commandButton value="Send Android UF History Request"
                                  actionListener="#{ufTestController.requestAndroidHistoryBean}"
                                  process="@this"/>
-            </p:row>
-            <p:row>
+
+            </p:panelGrid>
+        </p:fieldset>
+
+        <p:fieldset legend="Background control">
+            <p:panelGrid columns="4">
                 <p:commandButton id="resetNotificationsController"
                                  value="Reset Notifications Controller"
                                  actionListener="#{notifications.clearNotifications()}"
@@ -83,10 +94,8 @@
                                  value="Reset UserFeedback Module"
                                  actionListener="#{ufTestController.resetUserFeedback()}"
                                  process="@this"/>
-            </p:row>
-
-        </p:panelGrid>
-
+            </p:panelGrid>
+        </p:fieldset>
 
     </ui:define>
 </ui:composition>
