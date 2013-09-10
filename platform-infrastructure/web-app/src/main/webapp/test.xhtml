@@ -61,7 +61,9 @@
                     <p:selectBooleanButton id="tapEnabledButton"
                                            value="#{notifications.timedAbortProcessorEnabled}"
                                            immediate="true"
-                                           onLabel="Enabled" offLabel="Disabled"/>
+                                           onLabel="Enabled" offLabel="Disabled">
+                        <p:ajax listener="#{notifications.toggleTimedAbortProcessorEnabled}"/>
+                    </p:selectBooleanButton>
                 </p:panel>
             </p:panelGrid>
         </p:fieldset>
