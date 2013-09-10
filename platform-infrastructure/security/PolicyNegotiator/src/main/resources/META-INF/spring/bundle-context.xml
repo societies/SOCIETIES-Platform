@@ -55,7 +55,6 @@
 
 		<property name="annotatedClasses">
 			<list>
-				<value>org.societies.security.model.Foo</value>
 			    <value>org.societies.security.model.Service</value>
 			</list>
 		</property>
@@ -72,11 +71,6 @@
 
 	<bean id="transactionManager"
 		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
-		<property name="sessionFactory" ref="sessionFactory" />
-	</bean>
-
-
-	<bean id="fooDao" class="org.societies.security.dao.FooDao">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
@@ -103,7 +97,6 @@
         <property name="signatureMgr" ref="SignatureMgr"/>
         <property name="slaSignatureMgr" ref="SlaSignatureMgr"/>
         <property name="providerServiceMgr" ref="ProviderServiceMgr"/>
-        <property name="fooDao" ref="fooDao"/>
 	</bean>
 
 	<bean id="NegotiationRequester"
