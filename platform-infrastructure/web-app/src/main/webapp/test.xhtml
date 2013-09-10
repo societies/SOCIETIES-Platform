@@ -68,10 +68,12 @@
                 <p:commandButton value="Send UF Access Control"
                                  actionListener="#{ufTestController.sendAccessControlEvent}"
                                  process="@this"/>
+
+                <p:commandButton value="Send Android UF History Request"
+                                 actionListener="#{ufTestController.requestAndroidHistoryBean}"
+                                 process="@this"/>
             </p:row>
             <p:row>
-
-
                 <p:commandButton id="resetNotificationsController"
                                  value="Reset Notifications Controller"
                                  actionListener="#{notifications.clearNotifications()}"
