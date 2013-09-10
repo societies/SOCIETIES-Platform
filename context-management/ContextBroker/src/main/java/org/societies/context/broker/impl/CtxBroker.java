@@ -476,6 +476,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 	public Future<List<CtxAttribute>> retrieveFuture(
 			final Requestor requestor, CtxAttributeIdentifier attrId, Date date) throws CtxException {
 
+		/*
 		Future<List<CtxAttribute>> futureObj = null;
 
 		IIdentity targetCss;
@@ -496,6 +497,9 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			LOG.info("remote call");
 		}
 		return futureObj;
+		*/
+		LOG.info("external remote call");
+		return this.internalCtxBroker.retrieveFuture(requestor, attrId,date);
 	}
 
 	@Override
@@ -504,6 +508,7 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			final Requestor requestor, CtxAttributeIdentifier attrId,
 			int modificationIndex) throws CtxException {
 
+		/*
 		Future<List<CtxAttribute>> futureObj = null;
 
 		IIdentity targetCss;
@@ -524,6 +529,8 @@ public class CtxBroker implements org.societies.api.context.broker.ICtxBroker {
 			LOG.info("remote call");
 		}
 		return futureObj;
+		*/
+		return this.internalCtxBroker.retrieveFuture(requestor, attrId, modificationIndex);
 	}
 
 

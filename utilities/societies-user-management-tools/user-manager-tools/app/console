@@ -1,0 +1,333 @@
+#!/usr/bin/env php
+<?php
+set_time_limit(0);
+
+require 'vendor/autoload.php';
+include_once('src/tools.php');
+include_once('src/generator/virgo/VirgoGenerator.class.php');
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+
+function retrieveParameters($input) {
+	$params = array();
+	$params['min'] = $input->getArgument('minmax');
+	$minmax = explode('-', $params['min']);
+	if (count($minmax) > 1) {
+		$params['min'] = intval($minmax[0]);
+		$params['max'] = intval($minmax[1]);
+	}
+	$params['max'] = !empty($params['max']) ? $params['max'] : $params['min'];
+	$params['hostname'] = $input->getOption('hostname');
+	$params['daNodeName'] = $input->getOption('daNodeName');
+	$params['daDbName'] = $input->getOption('daDbName');
+	$params['secretKey'] = $input->getOption('secretKey');
+	$params['dbHostname'] = $input->getOption('dbHostname');
+	$params['dbPort'] = $input->getOption('dbPort');
+	$params['dbUsername'] = $input->getOption('dbUsername');
+	$params['dbPassword'] = $input->getOption('dbPassword');
+	$globalUsernameList = $input->getOption('usernames');
+	if (!empty($globalUsernameList)) {
+		$params['globalUsernameList'] = explode(",", $globalUsernameList);
+	}
+	$params['firstWebappPort'] = $input->getOption('firstWebappPort');
+	$globalWebappPortList = $input->getOption('webappPorts');
+	if (!empty($globalWebappPortList)) {
+		$params['globalWebappPortList'] = explode(",", $globalWebappPortList);
+	}
+	$params['firstXmppPort'] = $input->getOption('firstXmppPort');
+	$globalXmppPortList = $input->getOption('xmppPorts');
+	if (!empty($globalXmppPortList)) {
+		$params['globalXmppPortList'] = explode(",", $globalXmppPortList);
+	}
+	return $params;
+}
+function retrieveContainerParameters($generator, $params, $output) {
+	// $generatedParameters = $generator->parse(json_encode($params));
+	$generatedParameters = array();
+	for ($i=$params['min']; $i<=$params['max']; $i++) {
+		$params['number'] = $i;
+		$generatedParameters[] = new Parameter($params);
+	}
+	
+	$output->writeln('#######    ... Params ...     ########');
+	print_r($generatedParameters);
+	return $generatedParameters;
+}
+
+function generateContainers($generator, $params, $output) {
+	// -- Generate containers
+	$output->writeln('#######   ... Creation ...    ########');
+	$content = $generator->generate($params);
+	
+	// -- Create database (if required)
+	createDatabases($params, $output);
+}
+
+function createDatabases($params, $output) {
+	// -- Create and init database (if required)
+	$connected = false;
+	foreach($params AS $k => $param) {
+		// Connect
+		if (!$connected) {
+			$pdoOptions[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
+			$db = new PDO('mysql:host='.$param->dbHostname, $param->dbUsername, $param->dbPassword, $pdoOptions);
+			$connected = true;
+		}
+		// Create database (if necessary)
+		$db->exec('CREATE DATABASE IF NOT EXISTS '.$param->dbName.';');
+		// Initialise Domain Authority database (if necessary)
+		if ($param->daNodeName == $param->userName) {
+			// Connect to a db
+			$db = new PDO('mysql:host='.$param->dbHostname.';dbname='.$param->daDbName, $param->dbUsername, $param->dbPassword, $pdoOptions);
+			$initRequired = $db->query('SHOW TABLES LIKE "cssadvertisementrecordentry"')->rowCount() <= 0;
+			// Init
+			if ($initRequired) {
+				$done = $db->query('CREATE TABLE IF NOT EXISTS `cis_directory_advertisements` (
+				  `cis_id` varchar(255) NOT NULL,
+				  `cssownerid` varchar(255) DEFAULT NULL,
+				  `cis_name` varchar(255) DEFAULT NULL,
+				  `password` varchar(255) DEFAULT NULL,
+				  `type` varchar(255) DEFAULT NULL,
+				  PRIMARY KEY (`cis_id`)
+				) ENGINE=InnoDB DEFAULT CHARSET=latin1;');
+				$done = $db->query('CREATE TABLE IF NOT EXISTS `cis_directory_membershipcriteria` (
+				  `criteria_id` int(11) NOT NULL AUTO_INCREMENT,
+				  `attrib` varchar(255) DEFAULT NULL,
+				  `operator` varchar(255) DEFAULT NULL,
+				  `rank` int(11) DEFAULT NULL,
+				  `value1` varchar(255) DEFAULT NULL,
+				  `value2` varchar(255) DEFAULT NULL,
+				  `cis_id` varchar(255) NOT NULL,
+				  PRIMARY KEY (`criteria_id`),
+				  KEY `FKFE309A796DFA879D` (`cis_id`)
+				) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;');
+				$done = $db->query('CREATE TABLE IF NOT EXISTS `cssadvertisementrecordentry` (
+				  `ID` varchar(255) NOT NULL,
+				  `Name` varchar(255) DEFAULT NULL,
+				  `Uri` varchar(255) DEFAULT NULL,
+				  PRIMARY KEY (`ID`)
+				) ENGINE=InnoDB DEFAULT CHARSET=latin1;');
+				$done = $db->query('CREATE TABLE IF NOT EXISTS `daregistryrecordentry` (
+				  `ID` varchar(255) NOT NULL,
+				  `host` varchar(255) DEFAULT NULL,
+				  `name` varchar(255) DEFAULT NULL,
+				  `password` varchar(255) DEFAULT NULL,
+				  `port` varchar(255) DEFAULT NULL,
+				  `status` varchar(255) DEFAULT NULL,
+				  `userType` varchar(255) DEFAULT NULL,
+				  PRIMARY KEY (`ID`)
+				) ENGINE=InnoDB DEFAULT CHARSET=latin1;');
+				$done = $db->query('ALTER TABLE `cis_directory_membershipcriteria`
+				  ADD CONSTRAINT `FKFE309A796DFA879D` FOREIGN KEY (`cis_id`) REFERENCES `cis_directory_advertisements` (`cis_id`);');
+			}
+		}
+	}
+}
+
+function configureUsers($params, $output) {
+	// -- Configure user information
+	$output->writeln('####### ... Configuration ... ########');
+	$connected = false;
+	$isAlreadyThere = false;
+	foreach($params AS $k => $param) {
+		if ('params' === $k) {
+			continue;
+		}
+		// - Connect
+		createDatabases($params, $output);
+		if (!$connected) {
+			$pdoOptions[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
+			$db = new PDO('mysql:host='.$param->dbHostname.';dbname='.$param->daDbName, $param->dbUsername, $param->dbPassword, $pdoOptions);
+			$connected = true;
+		}
+		
+		// - Configure DA node
+		$username = $param->userName;
+		$hostname = $param->hostName;
+		$name = $param->userName;
+		$password = $param->userName;
+		$portNumber = $param->portNumber;
+		$status = 'active';
+		$userType = 'user';
+		// Current node is the da node
+		if ($param->daNodeName == $param->userName) {
+			$username = $param->userName;
+			$hostname = $param->hostName;
+			$name = $param->userName;
+			$password = 'defaultpassword';
+			$portNumber = $param->portNumber;
+			$status = 'active';
+			$userType = 'admin';
+		}
+		$id = $username.'.'.$param->hostName;
+		// ID already there?
+		$preparedQry = $db->prepare('SELECT COUNT(ID) AS nb FROM daregistryrecordentry WHERE ID=:id');
+		$isOk = $preparedQry->execute(array('id'=>$id));
+		$isAlreadyThere = false;
+		if ($isOk) {
+			$isAlreadyThere = $preparedQry->fetchColumn();
+		}
+		if ($isAlreadyThere) {
+			// Update DA registry
+			$preparedQry = $db->prepare('UPDATE daregistryrecordentry
+						SET host=:host, port=:port, status=:status
+						WHERE ID=:id');
+			$preparedQry->execute(array('id'=>$id,
+							'host'=>$hostname,
+							'port'=>$portNumber,
+							'status'=>$status,
+							));
+		}
+		else {
+			// Add a field to the DA registry
+			$preparedQry = $db->prepare('INSERT INTO daregistryrecordentry
+						(ID, host, name, password, port, status, userType)
+						VALUES(:id, :host, :name, :password, :port, :status, :userType)');
+			$preparedQry->execute(array('id'=>$id,
+							'host'=>$hostname,
+							'name'=>$name,
+							'password'=>$password,
+							'port'=>$portNumber,
+							'status'=>$status,
+							'userType'=>$userType
+							));
+			
+			if ($param->daNodeName != $param->userName) {
+				// Add CSS Advertisement record (public profile)
+				$preparedQry = $db->prepare('INSERT INTO  cssadvertisementrecordentry
+							(ID, Name, Uri)
+							VALUES(:id, :name, :uri)');
+				$preparedQry->execute(array('id'=>$param->userName.'.'.$param->hostName,
+								'name'=>ucfirst($param->userName),
+								'uri'=>$param->userName.'.'.$param->hostName,
+								));
+				
+				// Create Openfire account
+				file_get_contents('http://localhost:9090/plugins/societies/societies?username='.$param->userName.'&password='.$param->userName.'&type=add&secret=defaultSecret&name='.ucfirst($param->userName));
+			}
+		}
+	}
+	
+	$output->writeln('User account(s) '.(!$isAlreadyThere ? 'created and ' : '').'configured');
+}
+
+
+$console = new Application();
+
+
+// BOTH
+$console
+	->register('create')
+	->setDescription('Generates Virgo containers, create database if required and configure Societies users (create them 
+if necessary)')
+	->setDefinition(array(
+		new InputArgument('minmax', InputArgument::REQUIRED, 'Number of the container to create (e.g. 1), or number 
+interval of the containers to create (e.g. 0-4 will create five containers)'),
+		new InputOption('usernames', null, InputOption::VALUE_REQUIRED, 'List of usernames separated by a coma (without 
+any spaces). Default usernames are "user<container number>"'),
+		new InputOption('hostname', null, InputOption::VALUE_REQUIRED, 'Host name of the container(s)'),
+		new InputOption('daDbName', null, InputOption::VALUE_REQUIRED, 'DB name of the DA node db'),
+		new InputOption('daNodeName', null, InputOption::VALUE_REQUIRED, 'DA node container name (without host)'),
+		new InputOption('dbHostname', null, InputOption::VALUE_REQUIRED, 'Database host name'),
+		new InputOption('dbPort', null, InputOption::VALUE_REQUIRED, 'Database host port number'),
+		new InputOption('dbUsername', null, InputOption::VALUE_REQUIRED, 'Database username'),
+		new InputOption('dbPassword', null, InputOption::VALUE_REQUIRED, 'Database password'),
+		new InputOption('secretKey', null, InputOption::VALUE_REQUIRED, 'XMPP Openfire secret key'),
+		new InputOption('firstWebappPort', null, InputOption::VALUE_REQUIRED, 'Webapp port of the first container. It will be increased for each container. A redirect port is associated to each port, they are computed by adding 500 to each port. Default: 50000.'),
+		new InputOption('webappPorts', null, InputOption::VALUE_REQUIRED, 'List of ports, separated by a comma without blank spaces, for the Webapp. A redirect port is associated to each port, they are computed by adding 500 to each port.'),
+		new InputOption('firstXmppPort', null, InputOption::VALUE_REQUIRED, 'XMPP port of the first container. It will be increased for each container. Default: 60000.'),
+		new InputOption('xmppPorts', null, InputOption::VALUE_REQUIRED, 'List of ports, separated by a comma without blank spaces, for the XMPP.'),
+	))
+	->setCode(function (InputInterface $input, OutputInterface $output) {
+		// -- Retrieve Params
+		$params = retrieveParameters($input);
+		
+		// -- Init params
+		$generator = new VirgoGenerator();
+		$generatedParameters = retrieveContainerParameters($generator, $params, $output);
+		
+		// -- Generate and create DB
+		generateContainers($generator, $generatedParameters, $output);
+		
+		// -- Configure Users
+		configureUsers($generatedParameters, $output);
+	});
+
+// GENERATE
+$console
+	->register('create-containers')
+	->setDescription('Generates several Virgo containers, and their MySQL database')
+	->setDefinition(array(
+		new InputArgument('minmax', InputArgument::REQUIRED, 'Number of the container to create (e.g. 1), or number 
+interval of the containers to create (e.g. 0-4 will create five containers)'),
+		new InputOption('usernames', null, InputOption::VALUE_REQUIRED, 'List of usernames separated by a coma (without 
+any spaces). Default usernames are "user<container number>"'),
+		new InputOption('hostname', null, InputOption::VALUE_REQUIRED, 'Host name of the container(s)'),
+		new InputOption('daNodeName', null, InputOption::VALUE_REQUIRED, 'DA node container name (without host)'),
+		new InputOption('daDbName', null, InputOption::VALUE_REQUIRED, 'DB name of the DA node db'),
+		new InputOption('dbHostname', null, InputOption::VALUE_REQUIRED, 'Database host name'),
+		new InputOption('dbPort', null, InputOption::VALUE_REQUIRED, 'Database host port number'),
+		new InputOption('dbUsername', null, InputOption::VALUE_REQUIRED, 'Database username'),
+		new InputOption('dbPassword', null, InputOption::VALUE_REQUIRED, 'Database password'),
+		new InputOption('secretKey', null, InputOption::VALUE_REQUIRED, 'XMPP Openfire secret key'),
+		new InputOption('firstWebappPort', null, InputOption::VALUE_REQUIRED, 'Webapp port of the first container. It will be increased for each container. A redirect port is associated to each port, they are computed by adding 500 to each port. Default: 50000.'),
+		new InputOption('webappPorts', null, InputOption::VALUE_REQUIRED, 'List of ports, separated by a comma without blank spaces, for the Webapp. A redirect port is associated to each port, they are computed by adding 500 to each port.'),
+		new InputOption('firstXmppPort', null, InputOption::VALUE_REQUIRED, 'XMPP port of the first container. It will be increased for each container. Default: 60000.'),
+		new InputOption('xmppPorts', null, InputOption::VALUE_REQUIRED, 'List of ports, separated by a comma without blank spaces, for the XMPP.'),
+	))
+	->setCode(function (InputInterface $input, OutputInterface $output) {
+		// -- Retrieve Params
+		$params = retrieveParameters($input);
+
+		// -- Init params
+		$generator = new VirgoGenerator();
+		$generatedParameters = retrieveContainerParameters($generator, $params, $output);
+		print_r($generatedParameters);
+		
+		// -- Generate and create DB
+		generateContainers($generator, $generatedParameters, $output);
+	})
+;
+
+// CONFIGURE
+$console
+	->register('config-users')
+	->setDescription('Configures several Societies users, and create them if necessary')
+	->setDefinition(array(
+		new InputArgument('minmax', InputArgument::REQUIRED, 'Number of the container to create (e.g. 1), or number 
+interval of the containers to create (e.g. 0-4 will create five containers)'),
+		new InputOption('usernames', null, InputOption::VALUE_REQUIRED, 'List of usernames separated by a coma (without 
+any spaces). Default usernames are "user<container number>"'),
+		new InputOption('hostname', null, InputOption::VALUE_REQUIRED, 'Host name of the container(s)'),
+		new InputOption('daNodeName', null, InputOption::VALUE_REQUIRED, 'DA node container name (without host)'),
+		new InputOption('daDbName', null, InputOption::VALUE_REQUIRED, 'DB name of the DA node db'),
+		new InputOption('dbHostname', null, InputOption::VALUE_REQUIRED, 'Database host name'),
+		new InputOption('dbPort', null, InputOption::VALUE_REQUIRED, 'Database host port number'),
+		new InputOption('dbUsername', null, InputOption::VALUE_REQUIRED, 'Database username'),
+		new InputOption('dbPassword', null, InputOption::VALUE_REQUIRED, 'Database password'),
+		new InputOption('secretKey', null, InputOption::VALUE_REQUIRED, 'XMPP Openfire secret key'),
+		new InputOption('firstWebappPort', null, InputOption::VALUE_REQUIRED, 'Webapp port of the first container. It will be increased for each container. A redirect port is associated to each port, they are computed by adding 500 to each port. Default: 50000.'),
+		new InputOption('webappPorts', null, InputOption::VALUE_REQUIRED, 'List of ports, separated by a comma without blank spaces, for the Webapp. A redirect port is associated to each port, they are computed by adding 500 to each port.'),
+		new InputOption('firstXmppPort', null, InputOption::VALUE_REQUIRED, 'XMPP port of the first container. It will be increased for each container. Default: 60000.'),
+		new InputOption('xmppPorts', null, InputOption::VALUE_REQUIRED, 'List of ports, separated by a comma without blank spaces, for the XMPP.'),
+	))
+	->setCode(function (InputInterface $input, OutputInterface $output) {
+		// -- Retrieve Params
+		$params = retrieveParameters($input);
+		
+		// -- Init params
+		$generator = new VirgoGenerator();
+		$generatedParameters = retrieveContainerParameters($generator, $params, $output);
+		print_r($generatedParameters);
+		
+		// -- Configure Users
+		configureUsers($generatedParameters, $output);
+	})
+;
+
+// Run
+$console->run();

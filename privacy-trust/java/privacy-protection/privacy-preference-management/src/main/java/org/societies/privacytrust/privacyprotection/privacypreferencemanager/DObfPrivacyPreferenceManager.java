@@ -68,19 +68,13 @@ public class DObfPrivacyPreferenceManager {
 	
 	public double evaluateDObfPreference(DObfPreferenceDetailsBean details) {
 		DObfPreferenceTreeModel model = this.prefCache.getDObfPreference(details);
-		if (model!=null){
+		if (null != model ){
 			IPrivacyOutcome outcome = evaluatePreference(model.getRootPreference());
-			if (outcome instanceof DObfOutcome){
+			if (null != outcome && outcome instanceof DObfOutcome) {
 				return ((DObfOutcome) outcome).getObfuscationLevel();
-			}else{
-				return -1;
 			}
-		}else{
-			return -1;
 		}
-		
-		
-		
+		return 1;
 	}
 	
 	private IPrivacyOutcome evaluatePreference(IPrivacyPreference privPref){

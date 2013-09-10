@@ -27,7 +27,13 @@ package org.societies.context.broker.impl.comm;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,9 +63,11 @@ import org.societies.api.schema.context.contextmanagement.LookupByScopeBean;
 import org.societies.api.schema.context.contextmanagement.RemoveBean;
 import org.societies.api.schema.context.contextmanagement.RetrieveBean;
 import org.societies.api.schema.context.contextmanagement.RetrieveCommunityEntityIdBean;
+import org.societies.api.schema.context.contextmanagement.RetrieveFutureBean;
 import org.societies.api.schema.context.contextmanagement.RetrieveIndividualEntityIdBean;
 import org.societies.api.schema.context.contextmanagement.UpdateAttributeBean;
 import org.societies.api.schema.context.contextmanagement.UpdateBean;
+import org.societies.api.schema.context.model.CtxAttributeIdentifierBean;
 import org.societies.api.schema.context.model.CtxEntityIdentifierBean;
 import org.societies.api.schema.context.model.CtxIdentifierBean;
 import org.societies.api.schema.context.model.CtxModelObjectBean;
@@ -466,6 +474,51 @@ public class CtxBrokerClient implements ICommCallback {
 		} 
 	}
 
+	public void retrieveFuture(Requestor requestor, CtxAttributeIdentifier attrID ,Date date,
+			ICtxCallback callback) throws CtxBrokerException  {
+		
+		if (LOG.isDebugEnabled())
+			LOG.debug("Remote future retrieve: requestor=" + requestor + ", identifier=" + attrID);
+		
+		IIdentity toIdentity = null;
+		try {
+			toIdentity = this.commManager.getIdManager().fromJid(attrID.getOwnerId());
+			Stanza stanza = new Stanza(toIdentity);
+			CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+		
+			cbPacket.setMethod(BrokerMethodBean.RETRIEVE_FUTURE);
+
+			// use the method : retrieve
+			RetrieveFutureBean ctxBrokerRetrieveFutureBean = new RetrieveFutureBean();
+			CtxModelBeanTranslator ctxBeanTranslator = CtxModelBeanTranslator.getInstance();
+			
+			// add the method params
+			ctxBrokerRetrieveFutureBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
+			
+			CtxAttributeIdentifierBean ctxIdBean = (CtxAttributeIdentifierBean) ctxBeanTranslator.fromCtxIdentifier(attrID);
+			
+			ctxBrokerRetrieveFutureBean.setAttrId(ctxIdBean);
+
+			GregorianCalendar c = new GregorianCalendar();
+			c.setTime(date);
+			XMLGregorianCalendar date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+			ctxBrokerRetrieveFutureBean.setDate(date2);
+						
+			cbPacket.setRetrieveFuture(ctxBrokerRetrieveFutureBean);
+			
+			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
+
+			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
+
+		} catch (Exception e) {
+
+			throw new CtxBrokerException("Could not retrieve remote ctx model object "
+					+ attrID + ": " + e.getLocalizedMessage(), e);
+		}
+	}
+	
+	
+	
 	/*
 	 * @see org.societies.api.comm.xmpp.interfaces.ICommCallback#getJavaPackages()
 	 */

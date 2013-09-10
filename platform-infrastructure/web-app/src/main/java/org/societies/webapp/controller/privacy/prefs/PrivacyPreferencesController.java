@@ -36,6 +36,8 @@ import javax.faces.context.FacesContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.identity.util.DataTypeUtils;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.AccessControlPreferenceDetailsBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfPreferenceDetailsBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSPreferenceDetailsBean;
@@ -124,14 +126,17 @@ public class PrivacyPreferencesController extends BasePageController{
 	
 	public void retrieveIDSPreferences(){
 		setIdsPreferenceDetails(privPrefmgr.getIDSPreferenceDetails());
-
-		
 	}
 	
 	public void retrieveDObfPreferences(){
 		setdObfPreferenceDetails(privPrefmgr.getDObfPreferenceDetails());
 	}
 	
+	
+	public String toStringDataType(String dataType) {
+		DataTypeUtils dataTypeUtils = new DataTypeUtils();
+		return dataTypeUtils.getFriendlyDescription(dataType).getFriendlyName();
+	}
 	
 	public String toStringRequestor(RequestorBean requestor){
 		
@@ -140,7 +145,15 @@ public class PrivacyPreferencesController extends BasePageController{
 			
 		}
 		if (requestor instanceof RequestorServiceBean){
-			return "Service: "+ServiceModelUtils.serviceResourceIdentifierToString(((RequestorServiceBean) requestor).getRequestorServiceId());
+			String completeStr = ServiceModelUtils.serviceResourceIdentifierToString(((RequestorServiceBean) requestor).getRequestorServiceId());
+			if (null == completeStr) {
+				return "none";
+			}
+			String[] serviceIdParts = completeStr.split(" ");
+			if (null == serviceIdParts || serviceIdParts.length <= 0) {
+				return "none";
+			}
+			return "Service id: "+serviceIdParts[0]+(serviceIdParts.length > 1 ? " Instance id: "+serviceIdParts[1] : "");
 			
 		}
 		

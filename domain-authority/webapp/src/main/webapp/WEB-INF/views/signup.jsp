@@ -31,6 +31,8 @@
 		<c:if test="${not empty result}">
 			<p>
 				<span class="ok">${result}</span>
+				<br />
+				Meanwhile, you can download the <strong>SOCIETIES <a href="download.html" class="greatButton">Android client</a></strong>
 				<c:if test="${not empty infomsg}">
 					<br />${infomsg}
 				</c:if>
