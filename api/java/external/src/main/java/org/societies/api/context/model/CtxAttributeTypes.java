@@ -524,6 +524,33 @@ public class CtxAttributeTypes {
      * @since 1.0
      */
     public static final String JOBS_INTERESTS = "job_interensts";
+  
+    
+    /**
+     * This attribute type contains information about the hour of day that a context attribute was updated.
+     * Possible value types: {@link CtxAttributeValueType.INTEGER}
+     * 
+     * @since 1.0
+     */
+    public static final String  HOUR_OF_DAY = "hourOfDay";
+    
+    
+    /**
+     * This attribute type contains information about the time of day that a context attribute was updated.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *  
+     * @since 1.0
+     */
+    public static final String  TIME_OF_DAY = "timeOfDay";
+    
+    
+    /**
+     * This attribute type contains information about the day of the week that a context attribute was updated.
+     * Possible value types: {@link CtxAttributeValueType.STRING}
+     *  
+     * @since 1.0
+     */
+    public static final String  DAY_OF_WEEK = "dayOfWeek";
     
     
     /**
