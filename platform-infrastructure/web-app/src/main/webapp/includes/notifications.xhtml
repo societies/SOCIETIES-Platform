@@ -7,21 +7,8 @@
                 xmlns:f="http://java.sun.com/jsf/core">
 
 
-    <h:outputText value="This is a really dirty hack to ensure that the ppNegotation bean is initialized"
-                  rendered="#{privacyPolicyNegotiationListener.queuedNegotiationCount eq -1}"/>
-
     <p:dialog id="notificationDialog" resizable="true" header="Notifications"
               draggable="true" modal="false">
-
-
-        <!--
-                <p>Bugs/incomplete:</p>
-                <ul>
-                    <li>Wrong item disappearing on submit</li>
-                    <li>Remove Timed Abort from GUI when it expires</li>
-                    <li>Input validation</li>
-                </ul>
-        -->
 
         <h:outputLink value="notification_history.xhtml">Notification history</h:outputLink>
 
