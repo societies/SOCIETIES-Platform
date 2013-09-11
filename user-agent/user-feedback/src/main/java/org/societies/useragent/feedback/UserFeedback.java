@@ -333,7 +333,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
         //create user feedback bean to fire in pubsub event
         UserFeedbackBean ufBean = new UserFeedbackBean();
-//        ufBean.setRequestDate(new Date());
+        ufBean.setRequestDate(new Date());
         ufBean.setStage(FeedbackStage.PENDING_USER_RESPONSE);
         ufBean.setRequestId(requestId);
         ufBean.setType(type);
@@ -453,7 +453,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
         //create user feedback bean to fire in pubsub event
         UserFeedbackBean ufBean = new UserFeedbackBean();
-//        ufBean.setRequestDate(new Date());
+        ufBean.setRequestDate(new Date());
         ufBean.setStage(FeedbackStage.PENDING_USER_RESPONSE);
         ufBean.setRequestId(requestId);
         ufBean.setType(type);
@@ -577,6 +577,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         event.setRequestId(requestId);
         event.setNegotiationDetails(details);
         event.setResponsePolicy(policy);
+        event.setRequestDate(new Date());
 
         //add new request to result hashmap
         UserFeedbackResult<ResponsePolicy> result = new UserFeedbackResult<ResponsePolicy>(requestId);
@@ -688,6 +689,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         event.setRequestId(requestId);
         event.setRequestor(RequestorUtils.toRequestorBean(requestor));
         event.setResponseItems(items);
+        event.setRequestDate(new Date());
 
         //NB: To avoid deadlocks, ALWAYS synchronise on the incomplete beans map first, then results, then callbacks
         synchronized (incompleteAccessControlEvents) {
@@ -754,7 +756,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
         //create user feedback bean to fire in pubsub event
         UserFeedbackBean ufBean = new UserFeedbackBean();
-//        ufBean.setRequestDate(new Date());
+        ufBean.setRequestDate(new Date());
         ufBean.setStage(FeedbackStage.PENDING_USER_RESPONSE);
         ufBean.setRequestId(requestId);
         ufBean.setProposalText(notificationTxt);

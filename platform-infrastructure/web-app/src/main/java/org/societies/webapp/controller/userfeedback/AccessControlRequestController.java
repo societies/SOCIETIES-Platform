@@ -14,6 +14,7 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -38,6 +39,7 @@ public class AccessControlRequestController extends BasePageController {
 
     private String eventID;
     private UserFeedbackAccessControlEvent event;
+    private ConditionConstants newConditionToAdd;
 
     public AccessControlRequestController() {
         if (log.isDebugEnabled())
@@ -92,6 +94,29 @@ public class AccessControlRequestController extends BasePageController {
         return PrivacyConditionsConstantValues.getValues(condition);
     }
 
+    @SuppressWarnings("MethodMayBeStatic")
+    public List<ConditionConstants> getAvailableConditionConstants(RequestItem requestItem) {
+        List<ConditionConstants> availableConstants = new ArrayList<ConditionConstants>();
+
+        // add any missing ConditionConstants
+        for (ConditionConstants constant : ConditionConstants.values()) {
+            boolean found = false;
+
+            for (Condition condition : requestItem.getConditions()) {
+                if (constant.equals(condition.getConditionConstant())) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                availableConstants.add(constant);
+            }
+        }
+
+        return availableConstants;
+    }
+
     public List<ResponseItem> getResponseItems() {
         return event != null
                 ? event.getResponseItems()
@@ -100,6 +125,29 @@ public class AccessControlRequestController extends BasePageController {
 
     public UserFeedbackAccessControlEvent getCurrentAccessEvent() {
         return event;
+    }
+
+    public void addNewCondition(RequestItem selectedRequestItem) {
+        if (newConditionToAdd == null) {
+            log.warn("newConditionToAdd is null");
+            return;
+        }
+        if (selectedRequestItem == null) {
+            log.warn("selectedRequestItem is null");
+            return;
+        }
+
+        Condition condition = new Condition();
+        condition.setOptional(true);
+        condition.setConditionConstant(newConditionToAdd);
+        condition.setValue("");
+
+        selectedRequestItem.getConditions().add(condition);
+
+        log.debug("Adding condition {} to request item for {}",
+                new String[]{newConditionToAdd.name(), selectedRequestItem.getResource().getDataType()});
+
+        newConditionToAdd = null;
     }
 
     public String completeAccessRequestAction() {
@@ -155,26 +203,6 @@ public class AccessControlRequestController extends BasePageController {
 
             RequestItemWrapper request = new RequestItemWrapper(response.getRequestItem());
             response.setRequestItem(request);
-
-            // add any missing ConditionConstants
-            for (ConditionConstants constant : ConditionConstants.values()) {
-                boolean found = false;
-
-                for (Condition condition : request.getConditions()) {
-                    if (constant.equals(condition.getConditionConstant())) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    Condition newCondition = new Condition();
-                    newCondition.setConditionConstant(constant);
-                    newCondition.setOptional(true);
-                    newCondition.setValue("");
-                    request.getConditions().add(newCondition);
-                }
-            }
 
             // quickly sort by condition name
             Collections.sort(request.getConditions(), new Comparator<Condition>() {
@@ -243,6 +271,16 @@ public class AccessControlRequestController extends BasePageController {
             item.setRequestItem(newItem);
         }
 
+    }
+
+    public void setNewConditionToAdd(ConditionConstants newConditionToAdd) {
+        this.newConditionToAdd = newConditionToAdd;
+
+        log.debug("New condition to add: {}", newConditionToAdd);
+    }
+
+    public ConditionConstants getNewConditionToAdd() {
+        return newConditionToAdd;
     }
 
 }

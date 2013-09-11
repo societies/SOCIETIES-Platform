@@ -1,10 +1,18 @@
 package org.societies.webapp.controller.userfeedback;
 
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
+import org.societies.api.internal.schema.useragent.feedback.HistoryRequestType;
 import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackHistoryRequest;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.feedback.IUserFeedbackResponseEventListener;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
@@ -25,10 +33,7 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -97,6 +102,9 @@ public class UserFeedbackTestController extends BasePageController {
 
     private static final Random random = new Random();
 
+    @ManagedProperty(value = "#{commMngrRef}")
+    private ICommManager commManager;
+
     @ManagedProperty(value = "#{pubsubClient}")
     private PubsubClient pubsubClient;
 
@@ -163,6 +171,14 @@ public class UserFeedbackTestController extends BasePageController {
     @SuppressWarnings("UnusedDeclaration")
     public void setUserFeedback(IUserFeedback userFeedback) {
         this.userFeedback = userFeedback;
+    }
+
+    public ICommManager getCommManager() {
+        return commManager;
+    }
+
+    public void setCommManager(ICommManager commManager) {
+        this.commManager = commManager;
     }
 
     public void sendPpnEvent() throws ExecutionException, InterruptedException {
@@ -304,6 +320,63 @@ public class UserFeedbackTestController extends BasePageController {
         userFeedback.clear();
     }
 
+    public void requestAndroidHistoryBean() {
+
+        Stanza stanza = new Stanza(UUID.randomUUID().toString(),
+                commManager.getIdManager().getThisNetworkNode(),
+                commManager.getIdManager().getThisNetworkNode());
+
+        UserFeedbackHistoryRequest request = new UserFeedbackHistoryRequest();
+        request.setRequestType(HistoryRequestType.OUTSTANDING);
+
+        try {
+            commManager.sendIQGet(stanza, request, new ICommCallback() {
+                @Override
+                public List<String> getXMLNamespaces() {
+                    return Arrays.asList("http://societies.org/api/schema/useragent/feedback",
+                            "http://societies.org/api/internal/schema/useragent/feedback");
+                }
+
+                @Override
+                public List<String> getJavaPackages() {
+                    return Arrays.asList("org.societies.api.schema.useragent.feedback",
+                            "org.societies.api.internal.schema.useragent.feedback");
+                }
+
+                @Override
+                public void receiveResult(Stanza stanza, Object payload) {
+                    log.info("receiveResult stanza={}, payload={}",
+                            new Object[]{stanza, payload});
+                }
+
+                @Override
+                public void receiveError(Stanza stanza, XMPPError error) {
+                    log.error("receiveError stanza={}, error={}",
+                            new Object[]{stanza, error});
+                }
+
+                @Override
+                public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
+                    log.info("receiveInfo stanza={}, info={}",
+                            new Object[]{stanza, info});
+                }
+
+                @Override
+                public void receiveItems(Stanza stanza, String node, List<String> items) {
+                    log.info("receiveItems stanza={}, items={}",
+                            new Object[]{stanza, items});
+                }
+
+                @Override
+                public void receiveMessage(Stanza stanza, Object payload) {
+                    log.info("receiveMessage stanza={}, payload={}",
+                            new Object[]{stanza, payload});
+                }
+            });
+        } catch (CommunicationException e) {
+            log.error("Error sending testing IQ", e);
+        }
+    }
 
     private static ResponsePolicy buildResponsePolicy(String guid, RequestorBean requestorBean) {
 

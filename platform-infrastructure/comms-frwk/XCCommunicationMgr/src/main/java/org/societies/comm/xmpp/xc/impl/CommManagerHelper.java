@@ -45,6 +45,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.simple.basic.DateConverter;
 import org.societies.simple.basic.URIConverter;
 import org.societies.simple.converters.EventItemsConverter;
 import org.societies.simple.converters.PubsubItemConverter;
@@ -111,6 +112,7 @@ public class CommManagerHelper {
         s = new Persister(strategy);
         try {
             registry.bind(com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl.class, XMLGregorianCalendarConverter.class);
+            registry.bind(java.util.Date.class, DateConverter.class);
             registry.bind(java.net.URI.class, URIConverter.class);
             registry.bind(org.jabber.protocol.pubsub.event.Items.class, new EventItemsConverter(s));
             registry.bind(org.jabber.protocol.pubsub.Items.class, new PubsubItemsConverter(s));

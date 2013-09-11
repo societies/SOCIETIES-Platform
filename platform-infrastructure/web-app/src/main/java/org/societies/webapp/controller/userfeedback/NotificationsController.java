@@ -876,8 +876,11 @@ public class NotificationsController extends BasePageController {
         return timedAbortProcessor.isEnabled();
     }
 
-    public void setTimedAbortProcessorEnabled(boolean enabled) {
+    public void toggleTimedAbortProcessorEnabled() {
+        boolean enabled = !this.timedAbortProcessor.isEnabled();
         this.timedAbortProcessor.setEnabled(enabled);
+
+        log.info("timedAbortProcessor is now " + (enabled ? "ENABLED" : "DISABLED"));
     }
 
 }

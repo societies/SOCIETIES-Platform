@@ -227,17 +227,16 @@ public class UACommsServer implements IFeatureServer {
         }
 
         // check to make sure none of our repositories have returned null
-        if (userFeedbackBeans == null)
-            userFeedbackBeans = new ArrayList<UserFeedbackBean>();
-        if (userFeedbackPrivacyNegotiationEvents == null)
-            userFeedbackPrivacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>();
-        if (userFeedbackAccessControlEvents == null)
-            userFeedbackAccessControlEvents = new ArrayList<UserFeedbackAccessControlEvent>();
-
         // NB: Hibernate will return a persistent list, which is no good to us
-        requestBean.setUserFeedbackBean(new ArrayList<UserFeedbackBean>(userFeedbackBeans));
-        requestBean.setUserFeedbackPrivacyNegotiationEvent(new ArrayList<UserFeedbackPrivacyNegotiationEvent>(userFeedbackPrivacyNegotiationEvents));
-        requestBean.setUserFeedbackAccessControlEvent(new ArrayList<UserFeedbackAccessControlEvent>(userFeedbackAccessControlEvents));
+        userFeedbackBeans = (userFeedbackBeans == null
+                ? new ArrayList<UserFeedbackBean>()
+                : new ArrayList<UserFeedbackBean>(userFeedbackBeans));
+        userFeedbackPrivacyNegotiationEvents = (userFeedbackPrivacyNegotiationEvents == null
+                ? new ArrayList<UserFeedbackPrivacyNegotiationEvent>()
+                : new ArrayList<UserFeedbackPrivacyNegotiationEvent>(userFeedbackPrivacyNegotiationEvents));
+        userFeedbackAccessControlEvents = (userFeedbackAccessControlEvents == null
+                ? new ArrayList<UserFeedbackAccessControlEvent>()
+                : new ArrayList<UserFeedbackAccessControlEvent>(userFeedbackAccessControlEvents));
 
         // NB: Now get rid of all the hibernate mess inside the beans
         for (UserFeedbackBean bean : requestBean.getUserFeedbackBean()) {
@@ -258,11 +257,21 @@ public class UACommsServer implements IFeatureServer {
                     new Object[]{userFeedbackBeans.size(), userFeedbackPrivacyNegotiationEvents.size(), userFeedbackAccessControlEvents.size()}
             );
 
+        if (log.isDebugEnabled())
+            log.debug("About to transmit {} UserFeedbackBeans, {} UserFeedbackPrivacyNegotiationEvents, {} UserFeedbackAccessControlEvents",
+                    new Object[]{userFeedbackBeans.getClass(), userFeedbackPrivacyNegotiationEvents.getClass(), userFeedbackAccessControlEvents.getClass()}
+            );
+
+        requestBean.setUserFeedbackBean(userFeedbackBeans);
+        requestBean.setUserFeedbackPrivacyNegotiationEvent(userFeedbackPrivacyNegotiationEvents);
+        requestBean.setUserFeedbackAccessControlEvent(userFeedbackAccessControlEvents);
+
         // TODO: Debugging - remove me
         log.warn("Setting lists to null for debugging purposes - be sure to remove me before production");
         requestBean.setUserFeedbackBean(null);
 //        requestBean.setUserFeedbackPrivacyNegotiationEvent(null);
 //        requestBean.setUserFeedbackAccessControlEvent(null);
+
 
         return requestBean;
     }
