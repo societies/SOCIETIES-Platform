@@ -65,8 +65,10 @@ public class NegotiationRequester implements INegotiation {
 	}
 	
 //	@PostConstruct
-	public void init() {
+	public void init() throws Exception {
 		LOG.debug("init()");
+
+		LOG.debug("init() end");
 	}
 
 	// Getters and setters for other OSGi services

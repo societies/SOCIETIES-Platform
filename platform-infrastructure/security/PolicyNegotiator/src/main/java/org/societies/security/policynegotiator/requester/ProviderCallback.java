@@ -27,6 +27,8 @@ package org.societies.security.policynegotiator.requester;
 import java.net.URI;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,10 @@ import org.societies.api.internal.schema.security.policynegotiator.MethodType;
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
+import org.societies.api.internal.useragent.model.ExpProposalContent;
+import org.societies.api.internal.useragent.model.ExpProposalType;
+import org.societies.api.internal.useragent.model.ImpProposalContent;
+import org.societies.api.internal.useragent.model.ImpProposalType;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.security.digsig.DigsigException;
@@ -110,9 +116,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 							false,
 							provider.getRequestorId(),
 							callback);
-				} catch (XmlException e) {
-					LOG.warn("receiveResult(): session {}: ", sessionId, e);
-				} catch (DigsigException e) {
+				} catch (Exception e) {
 					LOG.warn("receiveResult(): session {}: ", sessionId, e);
 				}
 			}
@@ -213,7 +217,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 		}
 	}
 	
-	private String selectSopOption(String sopString) throws XmlException {
+	private String selectSopOption(String sopString) throws XmlException, InterruptedException, ExecutionException {
 		
 		Xml xml = new Xml(sopString);
 		SLA sop = new SLA(xml);
@@ -230,7 +234,21 @@ public class ProviderCallback implements INegotiationProviderCallback {
 		//SopSuitability suitability = new SopSuitability(personalizationMgr);
 		//suitability.calculateSuitability(preferenceNames, valuesInSop, weights);
 		
-		return sopName[0];  // FIXME: display all options in a pop-up GUI and return what user has chosen
+		LOG.debug("selectSopOption: creating parameters for user feedback");
+		ExpProposalContent expProposal = new ExpProposalContent("Select a policy option", sopName);
+		ImpProposalContent impProposal = new ImpProposalContent("Foo", 5000);
+		
+		LOG.debug("selectSopOption: getting user feedback \"{}\"", sopName);
+		
+//		Future<List<String>> future = UserFeedbackHelper.getUserFeedback().getExplicitFB(ExpProposalType.RADIOLIST, expProposal);
+//		List<String> selected = future.get();
+//		LOG.info("selectSopOption: user selected \"{}\"", selected.get(0));
+//		return selected.get(0);
+		
+		UserFeedbackHelper.getUserFeedback().getImplicitFB(ImpProposalType.TIMED_ABORT, impProposal);
+		
+		LOG.debug("selectSopOption: returning");
+		return sopName[0];
 	}
 	
 	private String generateKey() {

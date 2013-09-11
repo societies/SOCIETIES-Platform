@@ -86,7 +86,7 @@ public class NegotiationRequesterUnitTest {
 		classUnderTest.setSignatureMgr(signatureMgrMock);
 		classUnderTest.setSecureStorage(secureStorageMock);
 		classUnderTest.setPersonalizationMgr(personalizationMgrMock);
-		classUnderTest.init();
+//		classUnderTest.init();
 	}
 
 	/**

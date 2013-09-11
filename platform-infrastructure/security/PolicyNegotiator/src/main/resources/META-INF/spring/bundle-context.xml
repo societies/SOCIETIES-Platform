@@ -98,10 +98,17 @@
         <property name="slaSignatureMgr" ref="SlaSignatureMgr"/>
         <property name="providerServiceMgr" ref="ProviderServiceMgr"/>
 	</bean>
-
+	
+	<bean id="userFeedbackHelper"
+		class="org.societies.security.policynegotiator.requester.UserFeedbackHelper"
+		depends-on="userFeedback"
+  		>
+  		<property name="userFeedback" ref="userFeedback"/>
+	</bean>
+	
 	<bean id="NegotiationRequester"
 		class="org.societies.security.policynegotiator.requester.NegotiationRequester"
-		depends-on="NegotiationProviderRemote,SignatureMgr,eventMgmtRef"
+		depends-on="NegotiationProviderRemote,SignatureMgr,eventMgmtRef,userFeedbackHelper"
 		init-method="init"
 	>
   		<property name="groupMgr" ref="NegotiationProviderRemote"/>
@@ -140,5 +147,5 @@
   		>
   		<property name="commMgr" ref="CommManager"/>
 	</bean>
-
+	
 </beans>

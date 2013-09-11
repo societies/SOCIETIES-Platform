@@ -24,7 +24,12 @@
 		 timeout="100"
 		/>
 	<osgi:reference id="eventMgmtRef" interface="org.societies.api.osgi.event.IEventMgr" />
-	
+	<osgi:reference id="userFeedback"
+		interface="org.societies.api.internal.useragent.feedback.IUserFeedback"
+		cardinality="0..1"
+		 timeout="100"
+		/>
+		
 	<osgi:service ref="NegotiationProvider"  interface="org.societies.api.internal.security.policynegotiator.INegotiationProvider" />
 	<osgi:service ref="ProviderServiceMgr"  interface="org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt" />
 	<osgi:service ref="NegotiationRequester" interface="org.societies.api.internal.security.policynegotiator.INegotiation" />
