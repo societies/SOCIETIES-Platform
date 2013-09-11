@@ -201,32 +201,47 @@ public class PreferenceDetails implements Serializable {
 				+ ((preferenceName == null) ? 0 : preferenceName.hashCode());
 		result = prime * result
 				+ ((serviceID == null) ? 0 : serviceID.hashCode());
+		result = prime * result
+				+ ((serviceType == null) ? 0 : serviceType.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (!(obj instanceof PreferenceDetails)) {
 			return false;
+		}
 		PreferenceDetails other = (PreferenceDetails) obj;
 		if (preferenceName == null) {
-			if (other.preferenceName != null)
+			if (other.preferenceName != null) {
 				return false;
-		} else if (!preferenceName.equals(other.preferenceName))
+			}
+		} else if (!preferenceName.equals(other.preferenceName)) {
 			return false;
+		}
 		if (serviceID == null) {
-			if (other.serviceID != null)
+			if (other.serviceID != null) {
 				return false;
-		} else if (other.serviceID==null){
+			}
+		} else if (!ServiceModelUtils.compare(serviceID, other.serviceID)) {
 			return false;
-		}else if(!ServiceModelUtils.compare(serviceID, other.serviceID)){
+		}
+		if (serviceType == null) {
+			if (other.serviceType != null) {
+				return false;
+			}
+		} else if (!serviceType.equals(other.serviceType)) {
 			return false;
 		}
 		return true;
 	}
+
+
 
 }

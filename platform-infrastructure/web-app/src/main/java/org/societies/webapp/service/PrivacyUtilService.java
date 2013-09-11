@@ -35,6 +35,7 @@ import javax.faces.bean.SessionScoped;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.AccessControlPreferenceDetailsBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
 import org.springframework.context.annotation.Scope;
@@ -54,10 +55,12 @@ public class PrivacyUtilService implements Serializable{
 	
 	Map<String, PPNPreferenceDetailsBean> ppnDetails;
 	Map<String, AccessControlPreferenceDetailsBean> accCtrlDetails;
+	Map<String, PreferenceDetails> prefDetails;
 	
 	public PrivacyUtilService(){
 		this.ppnDetails = new HashMap<String, PPNPreferenceDetailsBean>();
 		this.accCtrlDetails = new HashMap<String, AccessControlPreferenceDetailsBean>();
+		this.prefDetails = new HashMap<String, PreferenceDetails>();
 	}
 	
 	public PPNPreferenceDetailsBean getPpnPreferenceDetailsBean(String key){
@@ -75,6 +78,13 @@ public class PrivacyUtilService implements Serializable{
 		return null;
 	}
 	
+	public PreferenceDetails getPreferenceDetail(String key){
+		if (this.prefDetails.containsKey(key)){
+			return this.prefDetails.get(key);
+		}
+		return null;
+	}
+	
 	public void setPpnPreferenceDetailsBean(String key, PPNPreferenceDetailsBean bean){
 		this.logging.debug("Adding ppn detail to util service: "+key+" and bean: \n"+bean.toString());
 		this.ppnDetails.put(key, bean);
@@ -84,10 +94,25 @@ public class PrivacyUtilService implements Serializable{
 		this.accCtrlDetails.put(key, bean);
 	}
 	
-	
+	public void setPreferenceDetails(String key, PreferenceDetails detail){
+		this.logging.debug("Adding preference detail to util service: "+key+" and detail: "+detail.toString());
+		this.prefDetails.put(key, detail);
+	}
 	public void removePpnPreferenceDetailsBean(String key){
 		if (this.ppnDetails.containsKey(key)){
 			ppnDetails.remove(key);
+		}
+	}
+	
+	public void removeAccCtrlPreferenceDetailsBean(String key){
+		if (this.accCtrlDetails.containsKey(key)){
+			accCtrlDetails.remove(key);
+		}
+	}
+	
+	public void removePrefDetail(String key){
+		if (this.prefDetails.containsKey(key)){
+			prefDetails.remove(key);
 		}
 	}
 }

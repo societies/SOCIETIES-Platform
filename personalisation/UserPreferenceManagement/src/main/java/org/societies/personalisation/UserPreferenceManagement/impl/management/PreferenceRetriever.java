@@ -39,7 +39,10 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.schema.personalisation.model.PreferenceTreeModelBean;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
+import org.societies.personalisation.preference.api.model.PreferenceTreeModel;
+import org.societies.personalisation.preference.api.model.util.PreferenceUtils;
 
 /**
  * @author Elizabeth
@@ -140,8 +143,9 @@ public class PreferenceRetriever {
 		try{
 			//retrieve directly the attribute in context that holds the preference as a blob value
 			CtxAttribute attrPref = (CtxAttribute) ctxBroker.retrieve(id).get();
-			IPreferenceTreeModel iptm = (IPreferenceTreeModel) SerialisationHelper.deserialise(attrPref.getBinaryValue(), this.getClass().getClassLoader());
-			return iptm;
+			PreferenceTreeModelBean modelBean = (PreferenceTreeModelBean) SerialisationHelper.deserialise(attrPref.getBinaryValue(), this.getClass().getClassLoader());
+			PreferenceTreeModel model = PreferenceUtils.toPreferenceTreeModel(modelBean);
+			return model;
 		}
 		catch (CtxException e) {
 			// TODO Auto-generated catch block

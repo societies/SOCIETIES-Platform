@@ -77,6 +77,7 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resourc
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ContextPreferenceCondition;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceCondition;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyCondition;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyPreference;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.TrustPreferenceCondition;
@@ -698,6 +699,12 @@ public class AccCtrlEditBean implements Serializable{
 		FacesContext.getCurrentInstance().addMessage(null, message);
 		this.logging.debug("savePreferences called");
 		PrivacyPreference privacyPreference = ModelTranslator.getPrivacyPreference(root);
+		IPrivacyPreferenceCondition erroneousNode = ModelTranslator.checkPreference(privacyPreference);
+		if (erroneousNode!=null){
+			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure", "Please add an outcome under this node: \n"+erroneousNode.toString()+"\nError: Condition cannot be leaf of the tree. ");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			return;
+		}		
 		this.logging.debug("Printing preference before save: \n"+privacyPreference.toString());
 		this.logging.debug("Saving preferences with details: "+preferenceDetails.toString());
 		AccessControlPreferenceTreeModel model = new AccessControlPreferenceTreeModel(preferenceDetails, privacyPreference);
@@ -710,7 +717,17 @@ public class AccCtrlEditBean implements Serializable{
 		}
 	}
 	
+	public String deletePreference(){
+		boolean deletePPNPreference = this.privPrefmgr.deleteAccCtrlPreference(preferenceDetails);
+
+		if (deletePPNPreference){
+			this.privacyUtilService.removeAccCtrlPreferenceDetailsBean(this.accCtrlDetailUUID);
+			return "privacypreferences.xhtml";
+		}
+		else return "privacy_accCtrl_edit.xhtml";
+	}
 	
+
 	public List<String> getCtxIds() {
 		try {
 			this.logging.debug("Retrieving context attributes to be used as conditions");
