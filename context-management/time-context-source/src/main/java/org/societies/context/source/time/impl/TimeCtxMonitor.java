@@ -209,25 +209,35 @@ public class TimeCtxMonitor  {
 	
 	/*
 	 * 4 hours step
-	 *	morning 7-11
-	 *	noon 11-15
-	 *	afternoon 15-19
-	 *	evening 19-23
-	 *	night 23-3
-	 *	dawn 3-7
+		earlyMorning (6 - 9) 
+		lateMorning (9 - 12)  
+		
+		earlyAfternoon (12 - 15)
+		lateAfternoon (15 - 18)
+		
+		earlyEvening (18 - 21) 
+		lateEvening (21 - 24)
+		
+		earlyNight (0 - 3)  
+		lateNight (3 - 6)
 	 */
 	private String convertTimeOfDay(DateTime date){
 		
 		//DateTime dt = new DateTime();
 		String tod = "";
 		int i = date.getHourOfDay();
-		if(i >= 7 && i < 11 )  tod="morning";
-		if(i >= 11 && i < 15 ) tod="noon";
-		if(i >= 15 && i < 19 ) tod="afternoon";
-		if(i >= 19 && i < 23 ) tod="evening";
-		if(i >= 23 ) tod="night";
-		if(i < 3 ) tod="night";
-		if(i >= 3 && i < 7 ) tod="dawn";
+		
+		if(i >= 6 && i < 9 )  tod="earlyMorning";
+		if(i >= 9 && i < 12 )  tod="lateMorning";
+			
+		if(i >= 12 && i < 15 ) tod="earlyAfternoon";
+		if(i >= 15 && i < 18 ) tod="lateAfternoon";
+		
+		if(i >= 18 && i < 21 ) tod="earlyEvening";
+		if(i >= 21 && i < 24 ) tod="lateEvening";
+		
+		if(i >= 0 && i < 3 )  tod="earlyNight";
+		if(i >= 3 && i < 6 )  tod="lateNight";
 	
 		return tod;
 	}
