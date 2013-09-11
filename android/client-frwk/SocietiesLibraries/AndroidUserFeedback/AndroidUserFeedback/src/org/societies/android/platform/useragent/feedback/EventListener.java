@@ -57,6 +57,9 @@ public class EventListener extends Service {
 
     private static final String LOG_TAG = EventListener.class.getName();
 
+    private AndroidNotifier notifier;
+
+
     //TRACKING CONNECTION TO EVENTS MANAGER
     private boolean boundToEventMgrService = false;
     private BroadcastReceiver receiver;
@@ -83,6 +86,12 @@ public class EventListener extends Service {
         }
     }
 
+
+    public EventListener() {
+
+    }
+
+
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>UserFeedback SERVICE LIFECYCLE METHODS>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     @Override
     public IBinder onBind(Intent intent) {
@@ -92,6 +101,13 @@ public class EventListener extends Service {
     @Override
     public void onCreate() {
         Log.d(this.getClass().getName(), "UserFeedback Service creating...");
+
+
+        notifier = new AndroidNotifier(this.getApplicationContext(),
+                Notification.DEFAULT_SOUND,
+                new int[]{Notification.FLAG_AUTO_CANCEL}
+        );
+
         // START BACKGROUND THREAD FOR SERVICE
         HandlerThread thread = new HandlerThread("UserFeedbackStartArguments", android.os.Process.THREAD_PRIORITY_BACKGROUND);
         thread.start();
@@ -221,7 +237,7 @@ public class EventListener extends Service {
                 }
 
                 Log.d(LOG_TAG, "General Permission request event received: id=" + id);
-                displayUserFeedbackNotification(EventListener.this.getApplicationContext(), eventPayload);
+                displayUserFeedbackNotification(eventPayload);
             }
         }
     }
@@ -326,7 +342,7 @@ public class EventListener extends Service {
 
     }
 
-    private static void displayUserFeedbackNotification(Context context, UserFeedbackBean ufBean) {
+    private void displayUserFeedbackNotification(UserFeedbackBean ufBean) {
 
         //DETERMINE WHICH ACTIVITY TO LAUNCH
         Class activityClass;
@@ -355,14 +371,11 @@ public class EventListener extends Service {
         }
 
         //CREATE INTENT FOR LAUNCHING ACTIVITY
-        Intent intent = new Intent(context, activityClass);
+        Intent intent = new Intent(this.getApplicationContext(), activityClass);
         intent.putExtra(UserFeedbackActivityIntentExtra.USERFEEDBACK_NODES, (Parcelable) ufBean);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         //CREATE ANDROID NOTIFICATION
-        int notifierFlags[] = new int[1];
-        notifierFlags[0] = Notification.FLAG_AUTO_CANCEL;
-        AndroidNotifier notifier = new AndroidNotifier(context, Notification.DEFAULT_SOUND, notifierFlags);
         notifier.notifyMessage(ufBean.getProposalText(),
                 "Input required",
                 activityClass,
