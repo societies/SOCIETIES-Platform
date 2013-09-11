@@ -61,7 +61,7 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     private boolean complete;
 
     private NotificationQueueItem(String itemId, UserFeedbackPrivacyNegotiationEvent payload) {
-        this.arrivalDate = new Date();
+        this.arrivalDate = payload.getRequestDate();
         this.itemId = itemId;
         this.ufPPN = payload;
         this.ufAccessControl = null;
@@ -73,7 +73,7 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     }
 
     private NotificationQueueItem(String itemId, UserFeedbackAccessControlEvent payload) {
-        this.arrivalDate = new Date();
+        this.arrivalDate = payload.getRequestDate();
         this.itemId = itemId;
         this.ufPPN = null;
         this.ufAccessControl = payload;
