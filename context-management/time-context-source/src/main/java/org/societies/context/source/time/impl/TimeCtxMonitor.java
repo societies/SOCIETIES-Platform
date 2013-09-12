@@ -50,6 +50,7 @@ import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
@@ -159,6 +160,7 @@ public class TimeCtxMonitor  {
 			
 			if(timeOfDayList.isEmpty()){
 				 todAttr = this.createCtxAttribute(userCtxEntId,CtxAttributeTypes.TIME_OF_DAY, null );
+			
 			} else {
 				 todAttr = (CtxAttribute) this.ctxBroker.retrieve(timeOfDayList.get(0)).get();
 			}
@@ -268,6 +270,7 @@ public class TimeCtxMonitor  {
 				CtxAttribute todAttr = (CtxAttribute) this.ctxBroker.retrieve(this.todAttrId).get();
 				String timeOfDayValue = convertTimeOfDay(date);
 				todAttr.setStringValue(timeOfDayValue);
+				todAttr.setValueType(CtxAttributeValueType.STRING);
 				this.ctxBroker.update(todAttr);
 				LOG.debug("updating tod: timeOfDayValue " +timeOfDayValue);
 			}
@@ -275,6 +278,7 @@ public class TimeCtxMonitor  {
 			if(this.hodAttrId != null){
 				CtxAttribute hodAttr = (CtxAttribute) this.ctxBroker.retrieve(this.hodAttrId).get();
 				hodAttr.setIntegerValue(date.getHourOfDay());
+				hodAttr.setValueType(CtxAttributeValueType.INTEGER);
 				this.ctxBroker.update(hodAttr);
 				LOG.debug("updating hod:  " +hodAttr);
 			}
@@ -283,6 +287,7 @@ public class TimeCtxMonitor  {
 				CtxAttribute dowAttr = (CtxAttribute) this.ctxBroker.retrieve(this.dowAttrId).get();
 				String dow = convertDayOfWeek(date);
 				dowAttr.setStringValue(dow);
+				dowAttr.setValueType(CtxAttributeValueType.STRING);
 				this.ctxBroker.update(dowAttr);
 				LOG.debug("updating  dow:  " +dow);
 			}
