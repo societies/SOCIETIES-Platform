@@ -58,7 +58,7 @@ public class PPNPOutcome extends IPrivacyOutcome implements Serializable{
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("AccessControlOutcome [decision=");
+		builder.append("PPNPOutcome [decision=");
 		builder.append(DecisionUtils.toXmlString(decision));
 		builder.append("]");
 		return builder.toString();

@@ -1,0 +1,132 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="templates/main_template.xhtml">
+
+	<ui:define name="html_head">
+		<title>SOCIETIES RFID settings</title>
+	</ui:define>
+
+	<ui:define name="body">
+
+		<p:growl id="growl" showDetail="true" life="3000" />
+
+		<p:panel id="dataPanel">
+			<f:facet name="header">
+                RFID Server Administration page
+            </f:facet>
+			<p:growl id="msgs" showDetail="true" />
+			<p:dataTable id="rfidTable" var="rfidBean" widgetVar="rfidTable"
+				value="#{rfidServerController.rfidBeans}">
+				<p:column headerText="User Id">
+					<h:outputText value="#{rfidBean.userIdentity}" />
+				</p:column>
+
+				<p:column headerText="Rfid Tag">
+					<h:outputText value="#{rfidBean.rfidTag}" />
+				</p:column>
+
+				<p:column headerText="Password">
+					<h:outputText value="#{rfidBean.password}" />
+				</p:column>
+
+				<p:column headerText="Symbolic location">
+					<h:outputText value="#{rfidBean.symLoc}" />
+				</p:column>
+
+				<p:column headerText="Wakeup Unit">
+					<h:outputText value="#{rfidBean.wakeupUnit}" />
+				</p:column>
+				<p:column style="width: 4%">
+					<p:commandButton id="selectButton" oncomplete="rfidDlg.show();"
+						update=":mainForm:viewRfidBean" icon="ui-icon-zoomin" title="View">
+						<f:setPropertyActionListener value="#{rfidBean}"
+							target="#{rfidServerController.selectedRfidBean}" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+			<h:panelGrid columns="1" cellpadding="5">
+				<p:commandButton id="addButton" value="Add New RFID tag"
+					onclick="addNewDlg.show();" />
+
+
+			</h:panelGrid>
+
+
+
+		</p:panel>
+
+
+		<p:dialog id="rfidDialog" header="RFID record Detail"
+			widgetVar="rfidDlg" modal="true" resizable="false" showEffect="fade"
+			hideEffect="explode">
+
+			<h:panelGrid id="viewRfidBean" columns="2" cellpadding="4"
+				style="margin:0 auto;">
+
+				<f:facet name="header">
+					<h:outputText value="Identity:" />
+					<h:outputText
+						value="#{rfidServerController.selectedRfidBean.userIdentity}"
+						style="font-weight:bold" />
+				</f:facet>
+
+				<h:outputText value="Rfid Tag:" />
+				<h:outputText
+					value="#{rfidServerController.selectedRfidBean.rfidTag}"
+					style="font-weight:bold" />
+
+				<h:outputText value="Password:" />
+				<h:outputText
+					value="#{rfidServerController.selectedRfidBean.password}"
+					style="font-weight:bold" />
+
+
+				<h:outputText value="Symbolic Location:" />
+				<h:outputText
+					value="#{rfidServerController.selectedRfidBean.symLoc}"
+					style="font-weight:bold" />
+
+				<h:outputText value="Wakeup Unit:" />
+				<h:outputText
+					value="#{rfidServerController.selectedRfidBean.wakeupUnit}"
+					style="font-weight:bold" />
+				<p:commandButton value="Delete" id="delete"
+					update=":mainForm:rfidTable" icon="ui-icon-circle-close"
+					oncomplete="rfidDlg.hide();"
+					actionListener="#{rfidServerController.deleteTag}" />
+
+			</h:panelGrid>
+
+		</p:dialog>
+
+		<p:dialog id="addNewDialog" header="Add new RFID"
+			widgetVar="addNewDlg" modal="true">
+			<h:panelGrid id="addNewPanel" columns="2" cellpadding="4"
+				style="margin:0 auto;">
+				<h:outputText for="newRfidTag" value="Rfid Tag:" />
+				<h:inputText id="newRfidTag"
+					value="#{rfidServerController.addRfidBean.rfidTag}"
+					style="font-weight:bold" />
+				<p:commandButton value="Add" id="addBtn"
+					actionListener="#{rfidServerController.addTag}" 
+					update="growl, :mainForm:rfidTable" oncomplete="handleAddRequest(xhr, status, args)" />
+			</h:panelGrid>
+		</p:dialog>
+
+		<!--JAVA SCRIPT TO HIDE DIALOG IF PASSES -->
+		<script type="text/javascript">
+        function handleAddRequest(xhr, status, args) {
+        if(args.tagAdded) {
+        	addNewDlg.hide();
+        }
+        
+        }
+    </script>
+
+	</ui:define>
+</ui:composition>
+</html>

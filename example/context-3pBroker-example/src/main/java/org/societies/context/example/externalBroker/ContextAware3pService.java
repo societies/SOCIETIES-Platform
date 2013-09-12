@@ -101,20 +101,20 @@ public class ContextAware3pService implements IContextAware3pService{
 
 	@Autowired(required=true)
 	public ContextAware3pService(ICtxBroker externalCtxBroker, ICommManager commsMgr){
-		
+
 		LOG.info("*** ContextAware3pService started");
 
 		//services
 		this.externalCtxBroker = externalCtxBroker;
 		this.commsMgr = commsMgr;
 		this.idMgr = commsMgr.getIdManager();
-		
-		
-		
+
+
+
 		LOG.info("ctxBroker: "+this.externalCtxBroker);
 		LOG.info("commsMgr : "+this.commsMgr );
 		LOG.info("idMgr : "+this.idMgr );
-	
+
 		//identities
 		this.userIdentity = this.idMgr.getThisNetworkNode();
 		try {
@@ -146,7 +146,7 @@ public class ContextAware3pService implements IContextAware3pService{
 		CtxEntityIdentifier cssOwnerEntityId = null;
 		try {
 			cssOwnerEntityId = this.externalCtxBroker.retrieveIndividualEntityId(requestorService, userIdentity).get();
-			
+
 		} catch (Exception e) {
 			LOG.error("3P ContextBroker sucks: " + e.getLocalizedMessage(), e);
 		}
@@ -228,7 +228,7 @@ public class ContextAware3pService implements IContextAware3pService{
 		LOG.info("*** retrieveCtxAttributeBasedOnEntity");
 		// if the CtxEntityID or CtxAttributeID is known the retrieval is performed using the ctxBroker.retrieve(CtxIdentifier) method
 		// alternatively context identifiers can be retrieved with the help of lookup methods
-		
+
 		CtxEntityIdentifier deviceCtxEntIdentifier = null;
 		try {
 			//TODO access control is still causing some problems when looking up CtxEntities 
@@ -284,8 +284,8 @@ public class ContextAware3pService implements IContextAware3pService{
 					String value = ctxAttributeLocation.getStringValue();
 					LOG.info("lookupAndRetrieveCtxAttributes attr number:"+i +" ) Retrieved ctxAttribute id " +ctxAttributeLocation.getId()+ "and value: "+ value +" (must be equal to 'home' ");	
 				}
-				
-			
+
+
 			}
 
 		} catch (InterruptedException e) {
@@ -435,15 +435,15 @@ public class ContextAware3pService implements IContextAware3pService{
 				LOG.info("commEnt member size: "+commEntityIds.size());
 				for(CtxEntityIdentifier commMemberID :commEntityIds ){
 					LOG.info("commEnt member Id:"+commMemberID.toString() );
-					
+
 					IndividualCtxEntity indiEnt = (IndividualCtxEntity) this.externalCtxBroker.retrieve(requestorService, commMemberID).get();
 					LOG.info("commEnt member object :"+indiEnt.getId().toString() );
 				}
-				
+
 			}
-			
-			
-			
+
+
+
 			List<CtxIdentifier> communityAttrIDList = this.externalCtxBroker.lookup(requestorService, ctxCommunityEntityIdentifier, CtxModelType.ATTRIBUTE, CtxAttributeTypes.INTERESTS).get();
 			LOG.info("lookup results communityAttrIDList: "+ communityAttrIDList);		
 
@@ -506,5 +506,107 @@ public class ContextAware3pService implements IContextAware3pService{
 		} 
 		LOG.info("createCtxAssociation  success");
 	}	
+
+
+	@Override
+	public void registerForLocUpdates(){
+
+		LOG.info("retrieveEntRegisterLocUpdates starting");
+		LOG.info("userIdentity : "+ userIdentity.getBareJid());
+
+		CtxAttribute locationCtxAttribute = null;
+		try {
+			CtxEntityIdentifier userEntID = this.externalCtxBroker.retrieveIndividualEntityId(requestorService, userIdentity).get();
+
+			List<CtxIdentifier> locationAttrIdList = this.externalCtxBroker.lookup(requestorService, userIdentity, CtxAttributeTypes.LOCATION_COORDINATES).get();
+
+			if(!locationAttrIdList.isEmpty()){	
+				locationCtxAttribute = (CtxAttribute) this.externalCtxBroker.retrieve(requestorService, locationAttrIdList.get(0)).get();	
+
+				LOG.info("retrieveEntRegisterLocUpdates id1:" +locationCtxAttribute.getId());
+				LOG.info("retrieveEntRegisterLocUpdates id2:" +userEntID);
+				// at this point location CtxAttribute has been retrieved
+
+				// register for updates on coordinates value
+				this.externalCtxBroker.registerForChanges(requestorService, new  LocationsCoordsChangeEventListener(this.externalCtxBroker), userEntID ,CtxAttributeTypes.LOCATION_COORDINATES);
+
+				// updating location coordinate will create a context update event that will be captured by the listener
+				// in real situations updates will be performed by context sensors (this is only for simulation)
+				locationCtxAttribute.setStringValue("111.111, 222.222");
+				LOG.info("retrieveEntRegisterLocUpdates : perform update" );
+				this.externalCtxBroker.update(requestorService, locationCtxAttribute);
+			}
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+	}
+
+
+
+	public class LocationsCoordsChangeEventListener implements CtxChangeEventListener {
+
+		ICtxBroker ctxBroker;
+
+		LocationsCoordsChangeEventListener(ICtxBroker ctxBroker){
+			this.ctxBroker = ctxBroker;
+		}
+
+		@Override
+		public void onCreation(CtxChangeEvent event) {
+
+			LOG.info(event.getId() + ": *** ONCREATION event ***");
+
+		}
+
+		@Override
+		public void onUpdate(CtxChangeEvent event) {
+
+			LOG.info(event.getId() + ": *** UPDATE event ***");
+
+		}
+
+		@Override
+		public void onModification(CtxChangeEvent event) {
+
+			LOG.info(event.getId() + ": *** MODIFIED event ***");
+			CtxIdentifier locationAttributeID = event.getId();
+
+			if(locationAttributeID instanceof CtxAttributeIdentifier){
+				try {
+					CtxAttribute locationAttribute =	(CtxAttribute) this.ctxBroker.retrieve(requestorService, locationAttributeID).get();
+
+					LOG.info("event based retrieved value: " +locationAttribute.getStringValue());
+					// it should be "111.111, 222.222"
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (CtxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+
+		@Override
+		public void onRemoval(CtxChangeEvent event) {
+
+			LOG.info(event.getId() + ": *** REMOVAL event ***");
+
+		}
+
+	}
 
 }

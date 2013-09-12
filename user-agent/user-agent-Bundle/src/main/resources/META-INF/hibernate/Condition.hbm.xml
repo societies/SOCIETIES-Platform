@@ -5,10 +5,8 @@
 
 <hibernate-mapping>
     <class name="org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition"
-           table="PrivacyPolicyCondition">
-        <!--<meta attribute="class-description">
-            This class contains the employee detail.
-        </meta>-->
+           table="UFCondition">
+
         <id name="conditionId" type="string" column="conditionId">
             <generator class="uuid"/>
         </id>

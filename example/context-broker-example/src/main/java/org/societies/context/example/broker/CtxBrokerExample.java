@@ -85,6 +85,7 @@ public class CtxBrokerExample implements Subscriber{
 
 	private INetworkNode cssNodeId;
 	
+	Date dateStart = new Date();
 	
 	//private ICSSLocalManager cssManager;
 	
@@ -133,13 +134,14 @@ public class CtxBrokerExample implements Subscriber{
 
 		try {
 			// the cis creation will also create a community ctx Entity
-			cisOwned = cisManager.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
+			cisOwned = this.cisManager.createCis("testCIS", "cisType", cisCriteria, "nice CIS").get();
 			LOG.info("*** cisOwned " +cisOwned);
 			LOG.info("*** cisOwned.getCisId() " +cisOwned.getCisId());
 			String cisIDString  = cisOwned.getCisId();
 
 			this.cisID = commMgr.getIdManager().fromJid(cisIDString);
 
+			Thread.sleep(20000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -154,6 +156,7 @@ public class CtxBrokerExample implements Subscriber{
 		LOG.info("*** cisManager this.cisID type " +this.cisID.getType());
 		
 		LOG.info("*** Starting  individual context examples...");
+		/*
 		this.retrieveIndividualEntity();
 		this.retrieveCssNode();
 		this.createContext();
@@ -163,11 +166,11 @@ public class CtxBrokerExample implements Subscriber{
 		this.simpleCtxHistoryTest();
 		this.tuplesCtxHistoryTest();
 		//this.triggerInferenceTest();
-	
+	*/	
 		// community context tests
 		LOG.info("*** Starting community context examples...");
 		retrieveCommunityEntityBasedOnCisID();
-		createCommunityEntAssociation();
+		//createCommunityEntAssociation();
 		// create entity and association refering to community
 		
 		//this.createIndividualEntities();
@@ -175,8 +178,8 @@ public class CtxBrokerExample implements Subscriber{
 	//	this.populateCommunityEntity();
 		
 	//	this.retrieveCommunityEntityBasedOnCisID();
-	///	this.lookupCommunityEntAttributes();
-		
+		//this.lookupCommunityEntAttributes();
+	
 		
 	}
 
@@ -262,18 +265,38 @@ public class CtxBrokerExample implements Subscriber{
 
 	private void retrieveCommunityEntityBasedOnCisID(){
 		try {
+			LOG.info("ctxCommunityEntity  : " + this.cisID);
 			CtxEntityIdentifier ctxCommunityEntityIdentifier = this.internalCtxBroker.retrieveCommunityEntityId(this.cisID).get();
 			LOG.info("ctxCommunityEntity  : " + ctxCommunityEntityIdentifier.toString());
 
 			CtxEntity communityEntity = (CtxEntity) this.internalCtxBroker.retrieve(ctxCommunityEntityIdentifier).get();
 
-			final IIdentity communityEntityId = this.commMgrService.getIdManager().fromJid(communityEntity.getOwnerId());
+			CtxAttribute interestCommAttr = this.internalCtxBroker.createAttribute(ctxCommunityEntityIdentifier, CtxAttributeTypes.INTERESTS).get();
+			interestCommAttr.setHistoryRecorded(true);
+			interestCommAttr.setStringValue("aa,bb,cc");
+			CtxAttribute interestCommAttr1 = (CtxAttribute) this.internalCtxBroker.update(interestCommAttr).get();
+			
+			Thread.sleep(1000);
+			interestCommAttr1.setStringValue("aa,bb,cc,dd");
+			CtxAttribute interestCommAttr2 = (CtxAttribute) this.internalCtxBroker.update(interestCommAttr1).get();
+			
+			Thread.sleep(1000);
+			interestCommAttr2.setStringValue("aa,bb,cc,dd,ee");
+			CtxAttribute interestCommAttr3 = (CtxAttribute) this.internalCtxBroker.update(interestCommAttr2).get();
+			
+			Thread.sleep(1000);
+			Date endDate = new Date();
+			LOG.info("startDate  : " + dateStart);
+			LOG.info("startDate  : " + endDate);
+			
+			List<CtxHistoryAttribute> historyList = this.internalCtxBroker.retrieveHistory(interestCommAttr.getId(), dateStart, endDate).get();
+			LOG.info("historyList  : " + historyList);
 
+			
+			final IIdentity communityEntityId = this.commMgrService.getIdManager().fromJid(communityEntity.getOwnerId());
 			if (IdentityType.CIS.equals(communityEntityId.getType())){
 				LOG.info("entity retrieved is a community entity with jid "+ communityEntityId.toString());
-
 				//TODO add communityEntity.getAttributes(); code
-
 			}
 
 		} catch (CtxException e) {
@@ -328,14 +351,14 @@ public class CtxBrokerExample implements Subscriber{
 			//	create and add bonds
 			CtxAttributeBond attributeLocationBond = new CtxAttributeBond(CtxAttributeTypes.LOCATION_SYMBOLIC, CtxBondOriginType.MANUALLY_SET);
 			attributeLocationBond.setMinValue("Athens_Greece");
-			attributeLocationBond.setMaxValue("Athens_Greece");
+			//attributeLocationBond.setMaxValue("Athens_Greece");
 			attributeLocationBond.setValueType(CtxAttributeValueType.STRING);
 			LOG.info("locationBond created : " + attributeLocationBond.toString());
 			CtxAttributeBond attributeAgeBond = new CtxAttributeBond(CtxAttributeTypes.WEIGHT, CtxBondOriginType.MANUALLY_SET);
 
 			attributeLocationBond.setValueType(CtxAttributeValueType.INTEGER);
-			attributeAgeBond.setMinValue(new Integer(18));
-			attributeAgeBond.setMinValue(new Integer(20));
+			//attributeAgeBond.setMinValue(new Integer(18));
+			//attributeAgeBond.setMinValue(new Integer(20));
 
 			this.communityEntity.addBond(attributeLocationBond);
 			this.communityEntity.addBond(attributeAgeBond);

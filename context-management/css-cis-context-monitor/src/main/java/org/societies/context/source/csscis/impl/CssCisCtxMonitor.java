@@ -24,13 +24,11 @@
  */
 package org.societies.context.source.csscis.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -44,11 +42,9 @@ import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
-import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
@@ -69,6 +65,7 @@ import org.societies.api.schema.activity.MarshaledActivity;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.css.directory.CssFriendEvent;
 import org.societies.api.schema.identity.DataIdentifierScheme;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -118,14 +115,13 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 	CssCisCtxMonitor(IEventMgr eventMgr, PubsubClient pubsubClient,
 			ICommManager commMgr) throws Exception {
 
-		if (LOG.isInfoEnabled())
-			LOG.info(this.getClass() + " instantiated");
+		LOG.info("{} instantiated", this.getClass());
 
 		this.eventMgr = eventMgr;
 		this.pubsubClient = pubsubClient;
 		this.commMgr = commMgr;
-		if (LOG.isInfoEnabled())
-			LOG.info("Registering for internal events '" + Arrays.asList(INTERNAL_EVENT_TYPES) + "'");
+		LOG.info("Registering for internal events '{}'", 
+				Arrays.asList(INTERNAL_EVENT_TYPES));
 		this.eventMgr.subscribeInternalEvent(this, INTERNAL_EVENT_TYPES, null);
 		new Thread(new PubsubEventSubscriber()).start();
 	}
@@ -136,8 +132,8 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 	@Override
 	public void handleExternalEvent(CSSEvent event) {
 
-		if (LOG.isWarnEnabled())
-			LOG.warn("Received unexpected external '" + event.geteventType() + "' event: " + event);
+		LOG.warn("Received unexpected external '" + event.geteventType() 
+				+ "' event: " + event);
 	}
 
 	/*
@@ -146,8 +142,7 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 	@Override
 	public void handleInternalEvent(InternalEvent event) {
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("Received internal event: " + eventToString(event));
+		LOG.debug("Received internal event: {}", eventToString(event));
 
 		if (EventTypes.CSS_FRIENDED_EVENT.equals(event.geteventType())) {
 
@@ -193,12 +188,13 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 			}
 
 			final Community cisRecord = (Community) event.geteventInfo();
-			if (EventTypes.CIS_SUBS.equals(event.geteventType()))
+			if (EventTypes.CIS_SUBS.equals(event.geteventType())) {
 				this.executorService.execute(new MyCssJoinedCisHandler(
 						event.geteventSource(), cisRecord.getCommunityJid()));
-			else //if (EventTypes.CIS_UNSUBS.equals(event.geteventType()))
+			} else { //if (EventTypes.CIS_UNSUBS.equals(event.geteventType()))
 				this.executorService.execute(new MyCssLeftCisHandler(
 						event.geteventSource(), cisRecord.getCommunityJid()));
+			}
 
 		} else if (EventTypes.CIS_CREATION.equals(event.geteventType())
 				|| EventTypes.CIS_DELETION.equals(event.geteventType())
@@ -220,20 +216,20 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 				return;
 			}
 
-			if (EventTypes.CIS_CREATION.equals(event.geteventType()))
+			if (EventTypes.CIS_CREATION.equals(event.geteventType())) {
 				this.executorService.execute(
 						new CisCreatedHandler((Community) event.geteventInfo()));
-			else if (EventTypes.CIS_DELETION.equals(event.geteventType()))
+			} else if (EventTypes.CIS_DELETION.equals(event.geteventType())) {
 				this.executorService.execute(
 						new CisRemovedHandler((Community) event.geteventInfo()));
-			else // if (EventTypes.CIS_RESTORE.equals(event.geteventType()))
+			} else { // if (EventTypes.CIS_RESTORE.equals(event.geteventType()))
 				this.executorService.execute(
 						new CisRestoredHandler((Community) event.geteventInfo()));
+			}
 
 		} else {
 
-			if (LOG.isWarnEnabled())
-				LOG.warn("Received unexpected event of type '" + event.geteventType() + "'");
+			LOG.warn("Received unexpected event of type '" + event.geteventType() + "'");
 		}
 	}
 
@@ -244,8 +240,7 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 	public void pubsubEvent(IIdentity pubsubService, String node,
 			String itemId, Object item) {
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("Received pubsub event: " + item);
+		LOG.debug("Received pubsub event: {}", item);
 
 		if (item instanceof CssFriendEvent) {
 
@@ -273,8 +268,7 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 				this.executorService.execute(
 						new CssLeftMyCisHandler(cssIdStr, cisIdStr));
 			} else {
-				if (LOG.isDebugEnabled())
-					LOG.debug("Ignoring CIS Activity Feed pubsub event with verb '" + verb + "'");
+				LOG.debug("Ignoring CIS Activity Feed pubsub event with verb '{}'", verb);
 			}
 		} else {
 
@@ -300,15 +294,14 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		@Override
 		public void run() {
 
-			if (LOG.isInfoEnabled())
-				LOG.info("CSS '" + myCssIdStr + "' friended '" + newFriendIdStr + "'");
+			LOG.info("CSS '{}' friended '{}", this.myCssIdStr, this.newFriendIdStr);
 
 			try {
-				final IIdentity myCssId = commMgr.getIdManager().fromJid(myCssIdStr);
+				final IIdentity myCssId = commMgr.getIdManager().fromJid(this.myCssIdStr);
 				final IndividualCtxEntity myCssEnt = 
 						ctxBroker.retrieveIndividualEntity(myCssId).get();
 
-				final IIdentity newFriendId = commMgr.getIdManager().fromJid(newFriendIdStr);
+				final IIdentity newFriendId = commMgr.getIdManager().fromJid(this.newFriendIdStr);
 				final CtxEntityIdentifier newFriendEntId =
 						ctxBroker.retrieveIndividualEntityId(
 								new Requestor(myCssId), newFriendId).get();
@@ -361,8 +354,7 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		@Override
 		public void run() {
 
-			if (LOG.isInfoEnabled())
-				LOG.info("My CSS '" + this.myCssIdStr + "' joined CIS '" + this.cisIdStr + "'");
+			LOG.info("My CSS '{}' joined CIS '{}'", this.myCssIdStr, this.cisIdStr);
 
 			try {
 				final IIdentity myCssId = commMgr.getIdManager().fromJid(
@@ -427,8 +419,7 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		@Override
 		public void run() {
 
-			if (LOG.isInfoEnabled())
-				LOG.info("My CSS '" + this.myCssIdStr + "' left CIS '" + this.cisIdStr + "'");
+			LOG.info("My CSS '{}' left CIS '{}'", this.myCssIdStr, this.cisIdStr);
 
 			try {
 				final IIdentity myCssId = commMgr.getIdManager().fromJid(
@@ -490,8 +481,7 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		@Override
 		public void run() {
 
-			if (LOG.isInfoEnabled())
-				LOG.info("CSS '" + this.cssIdStr + "' joined my CIS '" + this.myCisIdStr + "'");
+			LOG.info("CSS '{}' joined my CIS '{}'", this.cssIdStr, this.myCisIdStr);
 
 			try {
 				// Retrieve CommunityCtxEntity of CIS
@@ -522,8 +512,7 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 					return;
 				}
 
-				if (LOG.isInfoEnabled())
-					LOG.info("Adding member '" + cssEntId + "' to community '" + cisEntity.getId() + "'");
+				LOG.info("Adding member '{}' to community '{}'", cssEntId, cisEntity.getId());
 				final CtxAssociationIdentifier hasMembersAssocId = 
 						cisEntity.getAssociations(CtxAssociationTypes.HAS_MEMBERS).iterator().next();
 				final CtxAssociation hasMembersAssoc = 
@@ -561,8 +550,7 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		@Override
 		public void run() {
 
-			if (LOG.isInfoEnabled())
-				LOG.info("CSS '" + this.cssIdStr + "' left my CIS '" + this.myCisIdStr + "'");
+			LOG.info("CSS '{}' left my CIS '{}'", this.cssIdStr, this.myCisIdStr);
 
 			try {
 				// Retrieve CommunityCtxEntity of CIS
@@ -619,7 +607,8 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 	 * (2) Create community ctx attributes 
 	 * (3) Update community ctx entity HAS_MEMBERS association
 	 * (4) Update community owner ctx entity IS_MEMBER_OF association
-	 * (5) Subscribe for CIS Activity Feed to monitor membership changes
+	 * (5) Update community owner ctx entity IS_ADMIN_OF association
+	 * (6) Subscribe for CIS Activity Feed to monitor membership changes
 	 */
 	private class CisCreatedHandler implements Runnable {
 
@@ -636,9 +625,8 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		@Override
 		public void run() {
 
+			LOG.info("CIS '{}' created", this.cis.getCommunityJid());
 			try {
-				if (LOG.isInfoEnabled())
-					LOG.info("CIS '" + this.cis.getCommunityJid() + "' created");
 				// (1) Create community ctx entity
 				final String cisIdStr = this.cis.getCommunityJid();
 				final IIdentity cisId = commMgr.getIdManager().fromJid(cisIdStr);
@@ -652,56 +640,60 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 				createCtxAttribute(cisEntity.getId(), CtxAttributeTypes.NAME, this.cis.getCommunityName());
 				// ABOUT
 				createCtxAttribute(cisEntity.getId(), CtxAttributeTypes.ABOUT, this.cis.getDescription());
-				//CACI
-				createCtxAttribute(cisEntity.getId(), CtxAttributeTypes.CACI_MODEL, "noModel");
 				
 				// add ctx attributes based on privacy policy
-				List<String> attrTypesList = getPrivPolicyAttributeTypes(cisOwnerId, cisId);
-				LOG.debug("attrTypes ********* "+attrTypesList);
-				
-				if(attrTypesList!= null ){
-					for(String attrType :attrTypesList ){
-
-						createCtxAttribute(cisEntity.getId(), attrType, null);
-					}
-
+				final List<String> attrTypesList = getPrivPolicyAttributeTypes(cisOwnerId, cisId);
+				LOG.debug("CisCreatedHandler: attrTypes={}", attrTypesList);
+				for (final String attrType : attrTypesList) {
+					createCtxAttribute(cisEntity.getId(), attrType, null);
 				}
 				
 				// (3) Update community ctx entity HAS_MEMBERS association
-
 				final IndividualCtxEntity cisOwnerEntity = ctxBroker.retrieveIndividualEntity(cisOwnerId).get();
 				if (cisOwnerEntity == null) {
 					LOG.error("Could not retrieve IndividualCtxEntity for CIS creator " + cisOwnerId);
 					return;
 				}
 
-				if (LOG.isInfoEnabled())
-					LOG.info("Adding member '" + cisOwnerEntity.getId() + "' to community '" + cisEntity.getId() + "'");
+				LOG.info("Adding member '{}' to community '{}'", 
+						cisOwnerEntity.getId(), cisEntity.getId());
 				final CtxAssociationIdentifier hasMembersAssocId = 
 						cisEntity.getAssociations(CtxAssociationTypes.HAS_MEMBERS).iterator().next();
 				final CtxAssociation hasMembersAssoc = 
 						(CtxAssociation) ctxBroker.retrieve(hasMembersAssocId).get();
 				hasMembersAssoc.addChildEntity(cisOwnerEntity.getId());
 				ctxBroker.update(hasMembersAssoc);
-				// TODO owning CSS ?
-				// TODO administrating CSS ?
+				
 				// TODO membership criteria / bonds
 
 				// (4) Update community owner ctx entity IS_MEMBER_OF association
 				final CtxAssociation isMemberOfAssoc;
-				if (cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).isEmpty())
+				if (cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).isEmpty()) {
 					isMemberOfAssoc = ctxBroker.createAssociation(
-							new Requestor(cisOwnerId), cisOwnerId, CtxAssociationTypes.IS_MEMBER_OF).get();
-				else
+							cisOwnerId, CtxAssociationTypes.IS_MEMBER_OF).get();
+				} else {
 					isMemberOfAssoc = (CtxAssociation) ctxBroker.retrieve(
 							cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next()).get();
+				}
 				isMemberOfAssoc.setParentEntity(cisOwnerEntity.getId());
 				isMemberOfAssoc.addChildEntity(cisEntity.getId());
 				ctxBroker.update(isMemberOfAssoc);
+				
+				// (5) Update community owner ctx entity IS_ADMIN_OF association
+				final CtxAssociation isAdminOfAssoc;
+				if (cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_ADMIN_OF).isEmpty()) {
+					isAdminOfAssoc = ctxBroker.createAssociation(
+							cisOwnerId, CtxAssociationTypes.IS_ADMIN_OF).get();
+				} else {
+					isAdminOfAssoc = (CtxAssociation) ctxBroker.retrieve(
+							cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_ADMIN_OF).iterator().next()).get();
+				}
+				isAdminOfAssoc.setParentEntity(cisOwnerEntity.getId());
+				isAdminOfAssoc.addChildEntity(cisEntity.getId());
+				ctxBroker.update(isAdminOfAssoc);
 
-				// (5) Subscribe for CIS Activity Feed to monitor membership changes
-				if (LOG.isInfoEnabled())
-					LOG.info("Subscribing for the ActivityFeed of CIS '" + cisIdStr + "'");
+				// (6) Subscribe for CIS Activity Feed to monitor membership changes
+				LOG.info("Subscribing for the ActivityFeed of CIS '{}'", cisIdStr);
 				pubsubClient.subscriberSubscribe(cisOwnerId, cisIdStr, CssCisCtxMonitor.this);
 
 			} catch (InvalidFormatException ife) {
@@ -720,6 +712,13 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		}
 	}
 
+	/**
+	 * (1) Unsubscribe from CIS Activity Feed to stop monitoring membership changes
+	 * (2) Update community owner's ctx entity IS_MEMBER_OF association
+	 * (3) Update community owner's ctx entity IS_ADMIN_OF association
+	 * (4) Remove community's HAS_MEMBERS/IS_MEMBER_OF ctx association
+	 * (5) Remove community's ctx entity
+	 */
 	private class CisRemovedHandler implements Runnable {
 
 		private final Community cis;
@@ -735,9 +734,90 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		@Override
 		public void run() {
 
-			if (LOG.isInfoEnabled())
-				LOG.info("CIS '" + this.cis.getCommunityJid() + "' deleted");
-			// TODO Auto-generated method stub
+			LOG.info("CIS '{}' deleted", this.cis.getCommunityJid());
+			try {
+				final String cisIdStr = this.cis.getCommunityJid();
+				final IIdentity cisId = commMgr.getIdManager().fromJid(cisIdStr);
+				
+				final String cisOwnerIdStr = this.cis.getOwnerJid();
+				final IIdentity cisOwnerId = commMgr.getIdManager().fromJid(cisOwnerIdStr);
+				
+				// (1) Unsubscribe from CIS Activity Feed to stop monitoring membership changes
+				LOG.info("Unsubscribing from the ActivityFeed of CIS '{}'", cisIdStr);
+				pubsubClient.subscriberUnsubscribe(cisOwnerId, cisIdStr, CssCisCtxMonitor.this);
+				
+				final CtxEntityIdentifier cisEntityId = ctxBroker.retrieveCommunityEntityId(cisId).get();
+				if (cisEntityId == null) {
+					LOG.error("Failed to retrieve CommunityCtxEntity ID of CIS '"
+							+ cisId + "'");
+					return;
+				}
+				final IndividualCtxEntity cisOwnerEntity = ctxBroker.retrieveIndividualEntity(cisOwnerId).get();
+				if (cisOwnerEntity == null) {
+					LOG.error("Could not retrieve IndividualCtxEntity for CIS creator '" + cisOwnerId + "'");
+					return;
+				}
+				
+				// (2) Update owner's ctx entity IS_MEMBER_OF association
+				if (cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().hasNext()) {
+					final CtxAssociation isMemberOfAssoc = (CtxAssociation) ctxBroker.retrieve(
+							cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next()).get();
+					if (isMemberOfAssoc != null 
+							&& isMemberOfAssoc.getChildEntities().contains(cisEntityId)) {
+						LOG.info("Removing '{}' from IS_MEMBER_OF association of '{}'", cisEntityId, cisOwnerEntity.getId());
+						isMemberOfAssoc.removeChildEntity(cisEntityId);
+						ctxBroker.update(isMemberOfAssoc);
+					}
+				}
+				
+				// (3) Update owner's ctx entity IS_ADMIN_OF association
+				if (cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_ADMIN_OF).iterator().hasNext()) {
+					final CtxAssociation isAdminOfAssoc = (CtxAssociation) ctxBroker.retrieve(
+							cisOwnerEntity.getAssociations(CtxAssociationTypes.IS_ADMIN_OF).iterator().next()).get();
+					if (isAdminOfAssoc != null 
+							&& isAdminOfAssoc.getChildEntities().contains(cisEntityId)) {
+						LOG.info("Removing '{}' from IS_ADMIN_OF association of '{}'", cisEntityId, cisOwnerEntity.getId());
+						isAdminOfAssoc.removeChildEntity(cisEntityId);
+						ctxBroker.update(isAdminOfAssoc);
+					}
+				}
+				
+				// (4) Remove community HAS_MEMBERS/IS_MEMBER_OF ctx associations
+				final CommunityCtxEntity cisEntity = 
+						(CommunityCtxEntity) ctxBroker.retrieve(cisEntityId).get();
+				if (cisEntity == null) {
+					LOG.error("Failed to retrieve CommunityCtxEntity with ID '"
+							+ cisEntityId + "'");
+					return;
+				}
+				if (cisEntity.getAssociations(CtxAssociationTypes.HAS_MEMBERS).iterator().hasNext()) {
+					LOG.info("Removing HAS_MEMBERS association of '{}'", cisEntity.getId());
+					ctxBroker.remove(cisEntity.getAssociations(CtxAssociationTypes.HAS_MEMBERS).iterator().next());
+				}
+				if (cisEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().hasNext()) {
+					LOG.info("Removing IS_MEMBER_OF association of '{}'", cisEntity.getId());
+					ctxBroker.remove(cisEntity.getAssociations(CtxAssociationTypes.IS_MEMBER_OF).iterator().next());
+				}
+
+				// TODO membership criteria / bonds
+
+				// (5) Remove community ctx entity
+				LOG.info("Removing CommunityCtxEntity with ID '{}'", cisEntityId);
+				ctxBroker.remove(cisEntityId);
+
+			} catch (InvalidFormatException ife) {
+
+				LOG.error("Invalid IIdentity found in CIS record: " 
+						+ ife.getLocalizedMessage(), ife);
+			} catch (CtxException ce) {
+
+				LOG.error("Failed to access context data: " 
+						+ ce.getLocalizedMessage(), ce);
+			} catch (Exception e) {
+
+				LOG.error("Failed to unsubscribe from CIS ActivityFeed: " 
+						+ e.getLocalizedMessage(), e);
+			}
 		}
 	}
 
@@ -760,8 +840,7 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 		public void run() {
 
 			try {
-				if (LOG.isInfoEnabled())
-					LOG.info("CIS '" + this.cis.getCommunityJid() + "' restored");
+				LOG.info("CIS '{}' restored", this.cis.getCommunityJid());
 				// (1) Subscribe for CIS Activity Feed to monitor membership changes
 				final String cisIdStr = this.cis.getCommunityJid();
 				final IIdentity cisId = commMgr.getIdManager().fromJid(cisIdStr);
@@ -769,8 +848,7 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 				final String cisOwnerIdStr = cis.getOwnerJid();
 				final IIdentity cisOwnerId = commMgr.getIdManager().fromJid(cisOwnerIdStr);
 
-				if (LOG.isInfoEnabled())
-					LOG.info("Subscribing for the ActivityFeed of CIS '" + cisId + "'");
+				LOG.info("Subscribing for the ActivityFeed of CIS '{}'", cisId);
 				pubsubClient.subscriberSubscribe(cisOwnerId, cisIdStr, CssCisCtxMonitor.this);
 
 			} catch (InvalidFormatException ife) {
@@ -789,57 +867,48 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 	private void createCtxAttribute(CtxEntityIdentifier ownerCtxId, 
 			String type, String value) throws Exception {
 
-		if (LOG.isDebugEnabled())
-			LOG.debug("Creating '" + type + "' attribute under entity " + ownerCtxId + " with value '" + value + "'");
+		LOG.debug("Creating '{}' attribute under entity '{}' with value '{}'",
+				new Object[] { type, ownerCtxId, value });
 
 		final CtxAttribute attr = this.ctxBroker.createAttribute(ownerCtxId, type).get();
-
 		if (value != null) {
 			attr.setStringValue(value);
-			attr.setValueType(CtxAttributeValueType.STRING);
-			attr.getQuality().setOriginType(CtxOriginType.MANUALLY_SET);
 			this.ctxBroker.update(attr);
 		}
 	}
 
-	private List<String> getPrivPolicyAttributeTypes(IIdentity ownerJid, IIdentity cisId){
+	@SuppressWarnings("deprecation")
+	private List<String> getPrivPolicyAttributeTypes(final IIdentity ownerJid,
+			final IIdentity cisId){
 
-		List<String> results = new ArrayList<String>();
-		RequestorCis reqCIs = new RequestorCis(ownerJid,cisId);
-		int hash = reqCIs.hashCode();
-		String hashString = String.valueOf(hash);
-
-		String privacyPolicyType = "policyOf"+hashString;
-		List<CtxIdentifier> privacyPolicyList;
-
+		final List<String> result = new ArrayList<String>();
+		
+		final RequestorCis reqCIs = new RequestorCis(ownerJid, cisId);
+		final int hash = reqCIs.hashCode();
+		final String hashString = String.valueOf(hash);
+		final String privacyPolicyType = "policyOf"+hashString;
 		try {
-			privacyPolicyList = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE,privacyPolicyType).get();
+			final List<CtxIdentifier> privacyPolicyList = this.ctxBroker.lookup(
+					ownerJid, CtxModelType.ATTRIBUTE, privacyPolicyType).get();
 
-			if(!privacyPolicyList.isEmpty()){
-				CtxIdentifier ctxId = privacyPolicyList.get(0);
-				CtxAttribute privacyPolicyAttr = (CtxAttribute) this.ctxBroker.retrieve(ctxId).get();
-				org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy privacyPolicybean = (org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy) SerialisationHelper.deserialise(privacyPolicyAttr.getBinaryValue(), this.getClass().getClassLoader());
-				results = RequestPolicyUtils.getDataTypes(DataIdentifierScheme.CONTEXT, privacyPolicybean);
+			if (!privacyPolicyList.isEmpty()) {
+				final CtxIdentifier ctxId = privacyPolicyList.get(0);
+				final CtxAttribute privacyPolicyAttr = 
+						(CtxAttribute) this.ctxBroker.retrieve(ctxId).get();
+				final RequestPolicy privacyPolicybean = (RequestPolicy) 
+						SerialisationHelper.deserialise(privacyPolicyAttr.getBinaryValue(),
+								this.getClass().getClassLoader());
+				result.addAll(RequestPolicyUtils.getDataTypes(
+						DataIdentifierScheme.CONTEXT, privacyPolicybean));
 			}
 
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			
+			LOG.error("Could not determine context attribute types specified in CIS privacy policy: "
+					+ e.getLocalizedMessage(), e);
 		} 
 
-		return results;
+		return result;
 	}
 
 	private String eventToString(final InternalEvent event) {
@@ -876,27 +945,23 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 						new HashSet<String>(Arrays.asList(EXTERNAL_EVENT_TYPES));
 				while (!topicsToRegister.isEmpty()) {
 
-					if (LOG.isDebugEnabled())
-						LOG.debug("Pubsub events to register for '" + topicsToRegister + "'");
+					LOG.debug("Pubsub events to register for '{}'", topicsToRegister);
 					final List<String> existingTopics = pubsubClient.discoItems(pubsubId, null);
 					for (final String topic : EXTERNAL_EVENT_TYPES) {
 						if (existingTopics.contains(topic)) {
-							if (LOG.isInfoEnabled())
-								LOG.info("Registering for pubsub event '" + topic + "'"
-										+ " under pubsub id " + pubsubId);
+							LOG.info("Registering for pubsub event '{}'"
+									+ " under pubsub id {}", topic, pubsubId);
 							pubsubClient.subscriberSubscribe(pubsubId, topic, CssCisCtxMonitor.this);
 							topicsToRegister.remove(topic);
 						}
 					}
 					if (!topicsToRegister.isEmpty()) {
-						if (LOG.isWarnEnabled())
-							LOG.warn("Pubsub topics '" + topicsToRegister + "' were not available -"
-									+ " Sleeping for 15 seconds until next pubsub node discovery...");
+						LOG.warn("Pubsub topics '" + topicsToRegister + "' were not available -"
+								+ " Sleeping for 15 seconds until next pubsub node discovery...");
 						Thread.sleep(15000);
 					}
 				} 
-				if (LOG.isDebugEnabled())
-					LOG.debug("Registered for all pubsub events");
+				LOG.debug("Registered for all pubsub events");
 			} catch (Exception e) {
 				LOG.error("Could not register for pubsub events '" + Arrays.asList(EXTERNAL_EVENT_TYPES) 
 						+ "':" + e.getLocalizedMessage(), e);

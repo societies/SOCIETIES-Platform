@@ -12,7 +12,7 @@ public class StyleGuideController extends BasePageController {
     private String stringVal = "some text";
 
     public StyleGuideController() {
-        log.trace("StyleGuideController ctor()");
+        log.debug("StyleGuideController ctor()");
     }
 
 

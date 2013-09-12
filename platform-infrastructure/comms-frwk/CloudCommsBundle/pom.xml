@@ -24,11 +24,35 @@
 			<type>jar</type>
 			<scope>compile</scope>
 				<exclusions>
-					<!-- slf4j already provided -->
+					<!-- already provided by virgo -->
 					<exclusion>
 						<groupId>org.slf4j</groupId>
 						<artifactId>slf4j-api</artifactId>
 					</exclusion>
+					<!-- already provided by commons -->
+					<!-- 
+					<exclusion>
+						<groupId>dom4j</groupId>
+						<artifactId>dom4j</artifactId>
+					</exclusion>
+					<exclusion>
+				        <groupId>xpp3</groupId>
+				        <artifactId>xpp3</artifactId>
+				    </exclusion>
+				    <exclusion>
+				    	<groupId>xmlpull</groupId>
+				        <artifactId>xmlpull</artifactId>
+				    </exclusion>
+				     -->
+				    <!-- bloatware -->
+				    <exclusion>
+				    	<groupId>org.eclipse.jetty</groupId>
+				        <artifactId>jetty-server</artifactId>
+				    </exclusion>
+				    <exclusion>
+				    	<groupId>org.eclipse.jetty</groupId>
+				        <artifactId>jetty-webapp</artifactId>
+				    </exclusion>
 				</exclusions>
 		</dependency>
     	<!-- Communication Components -->
@@ -93,7 +117,6 @@
 		           		!com.sun.org.apache.xerces.internal.jaxp.datatype,
 		           		org.xmpp.component;version="0.1.0",
 		           		-->
-		           		<DynamicImport-Package>*</DynamicImport-Package>
 		           		<Embed-Dependency>
 			           		*;scope=compile|runtime
 		           		</Embed-Dependency>

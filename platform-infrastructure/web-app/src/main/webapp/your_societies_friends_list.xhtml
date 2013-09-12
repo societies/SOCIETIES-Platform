@@ -2,6 +2,7 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:p="http://primefaces.org/ui"
                 template="templates/main_template.xhtml">
 
@@ -22,7 +23,10 @@
                 </div>
                 <div class="groupsearch">
                     <form action="" class="websearch-form frame nobtn rsmall">
-                        <input type="text" name="search" class="websearch-input" placeholder="Search for Friends..."/>
+                       <!--  <input type="text" name="search" class="websearch-input" placeholder="Search for Friends..."/>  -->
+                        <h:inputText id="findfriend" value="#{suggestedfriends.findfriend}"></h:inputText>
+                        <p:commandButton value="Search for Friend" action="#{suggestedfriends.search(suggestedfriends.findfriend)}"></p:commandButton>
+    					
                     </form>
                 </div>
             </div>
@@ -63,6 +67,17 @@
         <aside id="sidebar_right" class="grid_4">
             <div class="sidebar_top_BG"></div>
             <div class="hr dotted clearfix"></div>
+            <section>
+                <header>
+                    <h3>Search friends Result...</h3>
+                </header>
+       	 		<br/> <br/>
+                <ul>
+                	<ui:repeat value="#{suggestedfriends.search(suggestedfriends.findfriend)}" var="findfriend">
+                		<li> <strong>Name:</strong> #{findfriend.getName()} <strong>ID:</strong> #{findfriend.getId()}</li>
+                	</ui:repeat>
+                </ul>
+            </section>
             <section>
                 <header>
                     <h3>CSS Activity</h3>

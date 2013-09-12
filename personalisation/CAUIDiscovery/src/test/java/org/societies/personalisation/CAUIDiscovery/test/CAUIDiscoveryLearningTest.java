@@ -5,19 +5,13 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Date;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-
-import junit.framework.Assert;
 
 
-import org.junit.Test;
-import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
@@ -25,15 +19,11 @@ import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
-import org.societies.api.context.model.IndividualCtxEntity;
+
 import org.societies.api.context.model.util.SerialisationHelper;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IdentityType;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.personalisation.CAUI.api.CAUIDiscovery.ICAUIDiscovery;
-import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 import org.societies.personalisation.CAUIDiscovery.impl.CAUIDiscovery;
@@ -101,8 +91,9 @@ public class CAUIDiscoveryLearningTest {
 			printTransProbDictionary(trans3ProbDictionary);
 
 			System.out.println("6. Generate UserIntentModelData");
-			ConstructUIModel cmodel = new ConstructUIModel(discover.getCauiTaskManager(),null); 
-			UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap);
+			ConstructUIModel cmodel = new ConstructUIModel(discover.getCauiTaskManager(),null);
+			System.out.println("6. discover.getSriMap()" +discover.getSriMap());
+			UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap,discover.getSriMap());
 
 			System.out.println("*********** model created *******"+ modelData.getActionModel());
 			for( IUserIntentAction userAction  : modelData.getActionModel().keySet()){
@@ -167,10 +158,10 @@ public class CAUIDiscoveryLearningTest {
 		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
 		ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
 		try {
-			serviceId1.setIdentifier(new URI("http://testService1"));
-			serviceId2.setIdentifier(new URI("http://testService2"));
-			serviceId1.setServiceInstanceIdentifier("http://testService1");
-			serviceId2.setServiceInstanceIdentifier("http://testService2");
+			serviceId1.setIdentifier(new URI("xc.societies.local/NEC_Cobrowse_Service1"));
+			serviceId2.setIdentifier(new URI("xc.societies.local/NEC_Cobrowse_Service2"));
+			serviceId1.setServiceInstanceIdentifier("cobrowse-webapp");
+			serviceId2.setServiceInstanceIdentifier("cobrowse-webapp");
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}

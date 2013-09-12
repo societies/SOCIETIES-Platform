@@ -9,7 +9,6 @@ import org.jabber.protocol.pubsub.owner.Subscriptions;
 import org.simpleframework.xml.Namespace;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.convert.Registry;
 import org.simpleframework.xml.convert.RegistryStrategy;
 import org.simpleframework.xml.core.Persister;
@@ -29,6 +28,8 @@ import org.societies.api.comm.xmpp.pubsub.Subscription;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.simple.basic.URIConverter;
+import org.societies.simple.converters.XMLGregorianCalendarConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -79,6 +80,12 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
         elementToClass = new HashMap<String, Class<?>>();
 
         Registry registry = new Registry();
+        try {
+            registry.bind(com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl.class, XMLGregorianCalendarConverter.class);
+            registry.bind(java.net.URI.class, URIConverter.class);
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+        }
 		Strategy strategy = new RegistryStrategy(registry);
         serializer = new Persister(strategy);
 
@@ -130,16 +137,15 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
             Subscription sub = new Subscription(stanza.getFrom(), stanza.getTo(), node, null); // TODO may break due to mismatch between "to" and local IIdentity
             org.jabber.protocol.pubsub.event.Item i = items.getItem().get(0); // TODO assume only one item per notification
 
-            Object bean = unmarshallBean((ElementNSImpl) i.getAny());
+            ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+            Object bean = unmarshallBean((ElementNSImpl) i.getAny(),true);
 
             //POST EVENT
             List<Subscriber> subscriberList = subscribers.get(sub);
             for (Subscriber subscriber : subscriberList)
                 subscriber.pubsubEvent(stanza.getFrom(), node, i.getId(), bean);
 
-            // TODO multiple subscribers and classloaders
-            // TODO CLASSLOADING MAGIC DISABLED!
-//			Thread.currentThread().setContextClassLoader(oldCl);
+			Thread.currentThread().setContextClassLoader(oldCl);
         }
     }
     // TODO subId
@@ -156,7 +162,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
 //	</message>
 
 
-    private Object unmarshallBean(ElementNSImpl eventBean) {
+    private Object unmarshallBean(ElementNSImpl eventBean, boolean clSwitch) {
         Object bean = null;
 
         //CONVERT THE .getAny() OBJECT TO XML
@@ -167,9 +173,6 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
         //SERIALISE OBJECT
         String elementID = "{" + eventBean.getNamespaceURI() + "}" + eventBean.getLocalName();
         Class<?> c = elementToClass.get(elementID);
-        // TODO CLASSLOADING MAGIC DISABLED!
-//		ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
-//		Thread.currentThread().setContextClassLoader(c.getClassLoader());
 
         if (c == null) {
             // when received xml was has not been binded print a warn and notify with raw XML
@@ -179,6 +182,9 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
             bean = eventBean;
         } else {
             // unmarshall item content
+        	if (clSwitch)
+        		Thread.currentThread().setContextClassLoader(c.getClassLoader());
+        	
             try {
                 bean = serializer.read(c, eventBeanXML);
             } catch (Exception e) {
@@ -345,7 +351,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
         List<Item> itemList = ((Pubsub) response).getItems().getItem();
         List<Object> returnList = new ArrayList<Object>();
         for (Item i : itemList)
-            returnList.add(unmarshallBean((ElementNSImpl) i.getAny()));
+            returnList.add(unmarshallBean((ElementNSImpl) i.getAny(), false));
 
         return returnList;
     }
@@ -374,7 +380,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
         List<Item> itemList = ((Pubsub) response).getItems().getItem();
         List<Object> returnList = new ArrayList<Object>();
         for (Item i : itemList)
-            returnList.add(unmarshallBean((ElementNSImpl) i.getAny()));
+            returnList.add(unmarshallBean((ElementNSImpl) i.getAny(), false));
 
         return returnList;
     }

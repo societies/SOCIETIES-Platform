@@ -22,13 +22,9 @@ package org.societies.personalisation.CAUITaskManager.test;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-
 
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;

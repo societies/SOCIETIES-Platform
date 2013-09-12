@@ -46,7 +46,7 @@ import org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator.u
  *
  */
 public class LocationCoordinatesObfuscator extends DataObfuscator<LocationCoordinates> {
-	private static Logger LOG = LoggerFactory.getLogger(LocationCoordinatesObfuscator.class.getSimpleName());
+	private static final Logger LOG = LoggerFactory.getLogger(LocationCoordinatesObfuscator.class);
 
 	/**
 	 * Radius enlargement operation id

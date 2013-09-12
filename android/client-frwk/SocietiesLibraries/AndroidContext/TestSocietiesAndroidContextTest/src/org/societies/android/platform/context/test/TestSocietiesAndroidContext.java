@@ -153,12 +153,15 @@ public class TestSocietiesAndroidContext extends ServiceTestCase <TestAndroidCon
 				Log.d(LOG_TAG, "Retrieved Model Object: " + retrievedModelObject.getId().getString());
 				attribute = (CtxAttributeBean) retrievedModelObject;
 				Log.d(LOG_TAG, "binaryValue: " + attribute.getBinaryValue() + " intValue: " + attribute.getIntegerValue() + " and doubleValue: " + attribute.getDoubleValue());
+				Log.d(LOG_TAG, "Retrieved ModelObject attribute has ownerId: " + attribute.getId().getOwnerId() + ", type: " + attribute.getId().getType() + ", objectNumber: " + attribute.getId().getObjectNumber() + " and modelType: " + attribute.getId().getModelType());
 				assertNotNull(retrievedModelObject);
 			}
 			else if (intent.getAction().equals(ICtxClient.RETRIEVE_INDIVIDUAL_ENTITY_ID)) {
 				Log.d(LOG_TAG, "RetrievedIndividualEntityId ");
 				retrievedIndEntityId = intent.getParcelableExtra(ICtxClient.INTENT_RETURN_VALUE_KEY);
 				Log.d(LOG_TAG, "Retrieved Individual Entity Id: " + retrievedIndEntityId.getString());
+				Log.d(LOG_TAG, "EntityId owner is: " + retrievedIndEntityId.getOwnerId() + ", objectNumber: " + retrievedIndEntityId.getObjectNumber() 
+						+ ", type: " + retrievedIndEntityId.getType() + " and modelType: " + retrievedIndEntityId.getModelType());
 				assertNotNull(retrievedIndEntityId);
 			}
 			else if (intent.getAction().equals(ICtxClient.RETRIEVE_COMMUNITY_ENTITY_ID)) {

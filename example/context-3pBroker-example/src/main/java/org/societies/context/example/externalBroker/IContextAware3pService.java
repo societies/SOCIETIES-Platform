@@ -48,5 +48,8 @@ public interface IContextAware3pService {
 	public void registerForContextChanges();
 	
 	public void retrievceLookupCommunityEntAttributes(IIdentity cisID);
+
+	public void registerForLocUpdates();
 	
 }
+

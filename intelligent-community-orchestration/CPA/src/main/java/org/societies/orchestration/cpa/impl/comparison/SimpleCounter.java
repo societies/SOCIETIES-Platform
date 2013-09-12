@@ -30,6 +30,12 @@ import java.util.List;
 import org.societies.api.activity.IActivity;
 import org.societies.orchestration.cpa.impl.SocialGraphVertex;
 
+/**
+ * Created with IntelliJ IDEA.
+ * User: bjornmagnus.mathisen@sintef.no
+ * Date: 5/15/13
+ * Time: 11:04
+ */
 
 public class SimpleCounter implements ActorComparator {
 	public SimpleCounter(){

@@ -24,43 +24,35 @@
  */
 package org.societies.privacytrust.privacyprotection.privacypolicy;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.CtxException;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
+import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyPolicyTypeConstants;
-import org.societies.privacytrust.privacyprotection.privacypolicy.reader.XMLPolicyReader;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyTypeConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 
 /**
  * @author Olivier Maridat (Trialog)
  * @date 5 déc. 2011
  */
 public class PrivacyPolicyManager implements IPrivacyPolicyManager {
-	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManager.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(PrivacyPolicyManager.class.getName());
 
 	ICommManager commManager;
 	ICtxBroker ctxBroker;
@@ -68,17 +60,12 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 
 
 	public void init() {
-		policyRegistryManager = new PrivacyPolicyRegistryManager(ctxBroker, commManager.getIdManager());
+		policyRegistryManager = new PrivacyPolicyRegistryManager(ctxBroker, commManager);
 	}
 
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#getPrivacyPolicy(org.societies.api.identity.Requestor)
-	 */
 	@Override
-	public RequestPolicy getPrivacyPolicy(Requestor requestor)
-			throws PrivacyException {
+	public RequestPolicy getPrivacyPolicy(RequestorBean requestor) throws PrivacyException {
 		// -- Verify
 		if (null == requestor || null == requestor.getRequestorId()) {
 			throw new PrivacyException("Not enought information to search a privacy policy. Requestor needed.");
@@ -89,23 +76,24 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		}
 
 		// -- Search
-		RequestPolicy privacyPolicy = policyRegistryManager.getPolicy(requestor);
+		RequestPolicy privacyPolicy = policyRegistryManager.getPrivacyPolicy(requestor);
 		return privacyPolicy;
 	}
+	@Deprecated
+	@Override
+	public org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy getPrivacyPolicy(Requestor requestor) throws PrivacyException {
+		try {
+			return RequestPolicyUtils.toRequestPolicy(getPrivacyPolicy(RequestorUtils.toRequestorBean(requestor)), commManager.getIdManager());
+		} catch (InvalidFormatException e) {
+			throw new PrivacyException(e);
+		}
+	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#getPrivacyPolicyFromLocation(java.lang.String)
-	 */
 	@Override
 	public String getPrivacyPolicyFromLocation(String location) throws PrivacyException {
 		return getPrivacyPolicyFromLocation(location, null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#getPrivacyPolicyFromLocation(java.lang.String, java.util.Map)
-	 */
 	@Override
 	public String getPrivacyPolicyFromLocation(String location, Map<String, String> options) throws PrivacyException {
 		// -- Read options (and create default options)
@@ -132,13 +120,9 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		return privacyPolicy;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#updatePrivacyPolicy(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
-	 */
+
 	@Override
-	public RequestPolicy updatePrivacyPolicy(RequestPolicy privacyPolicy)
-			throws PrivacyException {
+	public RequestPolicy updatePrivacyPolicy(RequestPolicy privacyPolicy) throws PrivacyException {
 		// -- Verify
 		if (null == privacyPolicy) {
 			throw new PrivacyException("The privacy policy to update is empty.");
@@ -152,17 +136,23 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		}
 
 		// -- Add
-		policyRegistryManager.addPolicy(privacyPolicy.getRequestor(), privacyPolicy);
+		policyRegistryManager.updatePrivacyPolicy(privacyPolicy.getRequestor(), privacyPolicy);
 		return privacyPolicy;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#updatePrivacyPolicy(java.lang.String, org.societies.api.identity.Requestor)
-	 */
+	@Deprecated
 	@Override
-	public RequestPolicy updatePrivacyPolicy(String privacyPolicyXml, Requestor requestor) throws PrivacyException {
+	public org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy updatePrivacyPolicy(org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy privacyPolicy) throws PrivacyException {
+		try {
+			return RequestPolicyUtils.toRequestPolicy(updatePrivacyPolicy(RequestPolicyUtils.toRequestPolicyBean(privacyPolicy)), commManager.getIdManager());
+		} catch (InvalidFormatException e) {
+			throw new PrivacyException(e);
+		}
+	}
+
+	@Override
+	public RequestPolicy updatePrivacyPolicy(String privacyPolicyXml, RequestorBean requestor) throws PrivacyException {
 		// Retrieve the privacy policy
-		RequestPolicy privacyPolicy = fromXMLString(privacyPolicyXml);
+		RequestPolicy privacyPolicy = PrivacyPolicyUtils.fromXacmlString(privacyPolicyXml);
 		if (null == privacyPolicy) {
 			throw new PrivacyException("This XML formatted string of the privacy policy can not be parsed as a privacy policy.");
 		}
@@ -171,13 +161,19 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		// Create / Store it
 		return updatePrivacyPolicy(privacyPolicy);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#deletePrivacyPolicy(org.societies.api.identity.Requestor)
-	 */
+	@Deprecated
 	@Override
-	public boolean deletePrivacyPolicy(Requestor requestor) throws PrivacyException {
+	public org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy updatePrivacyPolicy(String privacyPolicyXml, Requestor requestor) throws PrivacyException {
+		try {
+			return RequestPolicyUtils.toRequestPolicy(updatePrivacyPolicy(privacyPolicyXml, RequestorUtils.toRequestorBean(requestor)), commManager.getIdManager());
+		} catch (InvalidFormatException e) {
+			throw new PrivacyException(e);
+		}
+	}
+
+
+	@Override
+	public boolean deletePrivacyPolicy(RequestorBean requestor) throws PrivacyException {
 		// -- Verify
 		if (null == requestor || null == requestor.getRequestorId()) {
 			throw new PrivacyException("Not enought information to search a privacy policy. Requestor needed.");
@@ -188,106 +184,54 @@ public class PrivacyPolicyManager implements IPrivacyPolicyManager {
 		}
 
 		// -- Delete
+		return policyRegistryManager.deletePrivacyPolicy(requestor);
+	}
+	@Deprecated
+	@Override
+	public boolean deletePrivacyPolicy(Requestor requestor) throws PrivacyException {
+		return deletePrivacyPolicy(RequestorUtils.toRequestorBean(requestor));
+	}
+
+	@Override
+	public RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException {
+		return PrivacyPolicyUtils.inferPrivacyPolicy(privacyPolicyType, configuration);
+	}
+	@Deprecated
+	@Override
+	public org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy inferPrivacyPolicy(org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException {
 		try {
-			policyRegistryManager.deletePolicy(requestor);
-		} catch (InterruptedException e) {
-			LOG.error("[Error deletePrivacyPolicy] Can't delete privacy policy.", e);
-			return false;
-		} catch (ExecutionException e) {
-			LOG.error("[Error deletePrivacyPolicy] Can't delete privacy policy.", e);
-			return false;
-		} catch (CtxException e) {
-			LOG.error("[Error deletePrivacyPolicy] Can't delete privacy policy. Error in the context.", e);
-			return false;
+			return RequestPolicyUtils.toRequestPolicy(inferPrivacyPolicy(PrivacyPolicyTypeConstants.fromValue(privacyPolicyType.name().toLowerCase()), configuration), commManager.getIdManager());
+		} catch (InvalidFormatException e) {
+			throw new PrivacyException(e);
 		}
-		return true;
 	}
 
-	/*
-	 * Try to infer a privacy policy a configuration map
-	 * At the moment it only returns an empty privacy policy
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#inferPrivacyPolicy(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.constants.PrivacyPolicyTypeConstants, java.util.Map)
-	 */
+	@Deprecated
 	@Override
-	public RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType,
-			Map configuration) throws PrivacyException {
-		List<RequestItem> requests = new ArrayList<RequestItem>();
-		RequestPolicy privacyPolicy = new RequestPolicy(requests);
-		return privacyPolicy;
+	public String toXMLString(org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy privacyPolicy) {
+		return PrivacyPolicyUtils.toXacmlString(RequestPolicyUtils.toRequestPolicyBean(privacyPolicy));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#toXMLString(org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.RequestPolicy)
-	 */
+	@Deprecated
 	@Override
-	public String toXMLString(RequestPolicy privacyPolicy) {
-		String encoding = "UTF-8";
-		if (null == privacyPolicy) {
-			return "<?xml version=\"1.0\" encoding=\""+encoding+"\"?><RequestPolicy></RequestPolicy>";
-		}
-		String privacyPolicyXml = privacyPolicy.toXMLString();
-		// Fill XML header if necessary
-		if (!privacyPolicyXml.startsWith("<?xml")) {
-			privacyPolicyXml = "<?xml version=\"1.0\" encoding=\""+encoding+"\"?>\n"+privacyPolicyXml;
-		}
-		return privacyPolicyXml;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager#fromXMLString(java.lang.String)
-	 */
-	@Override
-	public RequestPolicy fromXMLString(String privacyPolicy) throws PrivacyException {
-		// -- Verify
-		// Empty privacy policy
-		if (null == privacyPolicy || privacyPolicy.equals("")) {
-			LOG.debug("Empty privacy policy. Return a null java object.");
-			return null;
-		}
-		// Fill XML header if necessary
-		String encoding = "UTF-8";
-		if (!privacyPolicy.startsWith("<?xml")) {
-			privacyPolicy = "<?xml version=\"1.0\" encoding=\""+encoding+"\"?>\n"+privacyPolicy;
-		}
-		// If only contains the XML header: empty privacy policy
-		if (privacyPolicy.endsWith("?>")) {
-			LOG.debug("Empty privacy policy. Return a null java object.");
-			return null;
-		}
-		// Dependency injection not ready
-		if (!isDepencyInjectionDone(1)) {
-			throw new PrivacyException("[Dependency Injection] PrivacyPolicyManager not ready");
-		}
-
-		// -- Convert Xml to Java
-		RequestPolicy result = null;
-		XMLPolicyReader xmlPolicyReader = new XMLPolicyReader(ctxBroker, commManager.getIdManager());
+	public org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy fromXMLString(String privacyPolicy) throws PrivacyException {
 		try {
-			// -- Create XMLDocument version of the privacy policy
-			DocumentBuilder xmlDocumentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			Document privacyPolicyDocument = xmlDocumentBuilder.parse(new ByteArrayInputStream(privacyPolicy.getBytes(encoding)));
-			// -- Transform XML Privacy Policy to Java Privacy Policy
-			result = xmlPolicyReader.readPolicyFromFile(privacyPolicyDocument);
-		} catch (ParserConfigurationException e) {
-			LOG.error("[Error fromXMLString] Can't parse the privacy policy.", e);
-		} catch (SAXException e) {
-			LOG.error("[Error fromXMLString] Can't parse the privacy policy. SAX error.", e);
-		} catch (IOException e) {
-			LOG.error("[Error fromXMLString] Can't parse the privacy policy. IO error.", e);
+			return RequestPolicyUtils.toRequestPolicy(PrivacyPolicyUtils.fromXacmlString(privacyPolicy), commManager.getIdManager());
+		} catch (InvalidFormatException e) {
+			throw new PrivacyException(e);
 		}
-		return result;
 	}
+
 
 
 	// -- Dependency Injection
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
-		LOG.info("[DependencyInjection] ICommManager injected");
+		LOG.debug("[DependencyInjection] ICommManager injected");
 	}
-
 	public void setCtxBroker(ICtxBroker ctxBroker) {
 		this.ctxBroker = ctxBroker;
-		LOG.info("[DependencyInjection] ICtxBroker injected");
+		LOG.debug("[DependencyInjection] ICtxBroker injected");
 	}
 
 	private boolean isDepencyInjectionDone() {

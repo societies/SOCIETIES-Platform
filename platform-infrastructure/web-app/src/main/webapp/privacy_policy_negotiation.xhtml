@@ -6,7 +6,7 @@
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
-        <title>SOCIEITES :: View Response Policy</title>
+        <title>SOCIEITES :: View Privacy Policy</title>
     </ui:define>
 
     <ui:define name="body">
@@ -22,7 +22,7 @@
                               multiple="true"
                               value="#{ppNegotiation.responsePolicy.responseItems}"
                               var="responseItem">
-                <p:tab title="#{responseItem.requestItem.resource.dataType}" >
+                <p:tab title="#{responseItem.requestItem.resource.dataType}">
                     <p:tabView id="tabView">
 
                         <p:tab title="General">
@@ -71,10 +71,12 @@
                                 </p:column>
 
                                 <p:column headerText="Value" style="width:25%">
-                                    <p:selectOneMenu id="conditionValue"
-                                                     value="#{condition.value}"
-                                                     required="#{!condition.optional}"
-                                                     validatorMessage="This value is required">
+                                    <p:selectOneMenu
+                                            label="#{responseItem.requestItem.resource.dataType} condition #{condition.conditionConstant}"
+                                            id="conditionValue"
+                                            value="#{condition.value}"
+                                            required="#{!condition.optional}"
+                                            validatorMessage="This value is required">
                                         <f:selectItem itemLabel="(none)"
                                                       itemValue=""
                                                       noSelectionOption="true"
@@ -104,11 +106,13 @@
             <f:facet name="footer">
                 <p:messages id="validationMessages"/>
 
-                <p:commandButton value="Complete Negotiation"
+                <p:commandButton id="completePpnButton"
+                                 value="Complete Negotiation"
                                  action="#{ppNegotiation.completeNegotiationAction}"
                                  update="@form"/>
 
-                <p:commandButton value="Cancel Negotiation"
+                <p:commandButton id="abortPpnButton"
+                                 value="Cancel Negotiation"
                                  action="#{ppNegotiation.cancelNegotiationAction}"
                                  process="@this"
                                  update="@form"/>

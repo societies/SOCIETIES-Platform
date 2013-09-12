@@ -17,63 +17,50 @@ public class ClassLoaderManager {
 	private static Logger LOG = LoggerFactory
 			.getLogger(ClassLoaderManager.class);
 	
-	private Map<IFeatureServer,ClassLoader> fsRegistry;
-	private Map<ICommCallback,ClassLoader> callbackRegistry;
+	private Map<Class<?>,ClassLoader> fsRegistry;
+	private Map<Class<?>,ClassLoader> callbackRegistry;
 	private Map<String,ClassLoader> callbackTemporary;
 	private Bundle thisBundle;
 	private ClassLoader thisBundlesClassLoader;
-	
-	// issue rasing TODO REMOVE
-	public ClassLoader currentNewClassloader;
 	
 	public ClassLoaderManager() {
 		thisBundle = FrameworkUtil.getBundle(this.getClass());
 		//thisBundlesClassLoader = getBundleClassloader(thisBundle);
 		thisBundlesClassLoader = this.getClass().getClassLoader();
-		fsRegistry = new HashMap<IFeatureServer, ClassLoader>();
-		callbackRegistry = new HashMap<ICommCallback, ClassLoader>();
+		fsRegistry = new HashMap<Class<?>, ClassLoader>();
+		callbackRegistry = new HashMap<Class<?>, ClassLoader>();
 		callbackTemporary = new Hashtable<String, ClassLoader>(); // Hashtable because it is synchronized
 	}
 
 	public ClassLoader classLoaderMagic(ICommCallback callback) {
-		LOG.info("getting classloader for ICommCallback "+callback.toString());
-		ClassLoader newClassloader = callbackRegistry.get(callback);
+		LOG.debug("getting classloader for ICommCallback {}",callback.toString());
+		ClassLoader newClassloader = callbackRegistry.get(callback.getClass());
 		ClassLoader oldClassloader = Thread.currentThread().getContextClassLoader();
 		
 		if (newClassloader!=null) {
-			LOG.info("found a classloader for this context! oldClassloader="+oldClassloader.toString()+" newClassloader="+newClassloader);
-			// TODO DISABLED FOR NOW! ISSUE RAISING ONLY
-			currentNewClassloader = newClassloader;
-			//Thread.currentThread().setContextClassLoader(newClassloader);
-			//return oldClassloader;
-			LOG.info("ClassLoaderManager IS DISABLED!!!");
+			LOG.debug("found a classloader for this context! oldClassloader={} newClassloader={}",oldClassloader.toString(),newClassloader);
+			Thread.currentThread().setContextClassLoader(newClassloader);
+			return oldClassloader;
 		}
 		else {
-			// TODO DISABLED FOR NOW! ISSUE RAISING ONLY
-			currentNewClassloader = thisBundlesClassLoader;
-			LOG.info("no classloader found! contextClassLoader="+oldClassloader.toString());
+			LOG.debug("no classloader found! contextClassLoader=",oldClassloader.toString());
 		}
 		
 		return null;
 	}
 
 	public ClassLoader classLoaderMagic(IFeatureServer fs) {
-		LOG.info("getting classloader for IFeatureServer "+fs.toString());
-		ClassLoader newClassloader = fsRegistry.get(fs);
+		LOG.debug("getting classloader for IFeatureServer {}",fs.toString());
+		ClassLoader newClassloader = fsRegistry.get(fs.getClass());
 		ClassLoader oldClassloader = Thread.currentThread().getContextClassLoader();
 		
 		if (newClassloader!=null) {
-			LOG.info("found a classloader for this context! oldClassloader="+oldClassloader.toString()+" newClassloader="+newClassloader);
-			// TODO DISABLED FOR NOW! ISSUE RAISING ONLY
-			currentNewClassloader = newClassloader;
-			//Thread.currentThread().setContextClassLoader(newClassloader);
-			//return oldClassloader;
-			LOG.info("ClassLoaderManager IS DISABLED!!!");
+			LOG.debug("found a classloader for this context! oldClassloader={} newClassloader={}",oldClassloader.toString(),newClassloader);
+			Thread.currentThread().setContextClassLoader(newClassloader);
+			return oldClassloader;
 		}
 		else {
-			// TODO DISABLED FOR NOW! ISSUE RAISING ONLY
-			currentNewClassloader = thisBundlesClassLoader;
-			LOG.info("no classloader found! contextClassLoader="+oldClassloader.toString());
+			LOG.debug("no classloader found! contextClassLoader={}",oldClassloader.toString());
 		}
 		
 		return null;
@@ -95,23 +82,18 @@ public class ClassLoaderManager {
 //	}
 
 	public ClassLoader classLoaderMagicTemp(String id) {
-		LOG.info("getting classloader for request id "+id);
+		LOG.debug("getting classloader for request id {}",id);
 		ClassLoader newClassloader = callbackTemporary.get(id);
 		ClassLoader oldClassloader = Thread.currentThread().getContextClassLoader(); // not old classloader verification required here
 		
 		if (newClassloader!=null) {
-			LOG.info("found a classloader for this context! oldClassloader="+oldClassloader.toString()+" newClassloader="+newClassloader);
+			LOG.debug("found a classloader for this context! oldClassloader={} newClassloader={}",oldClassloader.toString(),newClassloader);
 			callbackTemporary.remove(id);
-			// TODO DISABLED FOR NOW! ISSUE RAISING ONLY
-			currentNewClassloader = newClassloader;
-			//Thread.currentThread().setContextClassLoader(newClassloader);
-			//return oldClassloader;
-			LOG.info("ClassLoaderManager IS DISABLED!!!");
+			Thread.currentThread().setContextClassLoader(newClassloader);
+			return oldClassloader;
 		}
 		else {
-			// TODO DISABLED FOR NOW! ISSUE RAISING ONLY
-			currentNewClassloader = thisBundlesClassLoader;
-			LOG.info("no classloader found! contextClassLoader="+oldClassloader.toString());
+			LOG.debug("no classloader found! contextClassLoader={}",oldClassloader.toString());
 		}
 		
 		return null;
@@ -128,7 +110,7 @@ public class ClassLoaderManager {
 		Bundle b = FrameworkUtil.getBundle(fs.getClass());
 		LOG.info("Class "+fs.getClass().toString()+" is associated with bundle "+b.toString());
 		if (b.getBundleId()!=thisBundle.getBundleId())
-			fsRegistry.put(fs, getBundleClassloader(b));
+			fsRegistry.put(fs.getClass(), getBundleClassloader(b));
 	}
 
 	
@@ -136,7 +118,7 @@ public class ClassLoaderManager {
 		Bundle b = FrameworkUtil.getBundle(messageCallback.getClass());
 		LOG.info("Class "+messageCallback.getClass().toString()+" is associated with bundle "+b.toString());
 		if (b.getBundleId()!=thisBundle.getBundleId())
-			callbackRegistry.put(messageCallback, getBundleClassloader(b));
+			callbackRegistry.put(messageCallback.getClass(), getBundleClassloader(b));
 	}
 	
 	private ClassLoader getBundleClassloader(Bundle b) {

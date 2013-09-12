@@ -55,27 +55,7 @@ public class RemoteActivityFeed implements IActivityFeed {
 		this.iCommMgr = iCommMgr;
 		this.remoteCISid = remoteCISid;
 	}
-	
 
-
-	/*
-	public boolean deleteActivity(IActivity activity) {
-		LOG.debug("client call to delete activity to a RemoteCIS");
-		MarshaledActivityFeed ac = new MarshaledActivityFeed();
-		DeleteActivity d = new DeleteActivity();
-		ac.setDeleteActivity(d);
-		Activity a = new Activity();
-		d.setActivity(a);
-		a.setActor(activity.getActor());
-		a.setObject(activity.getObject());
-		a.setTarget(activity.getTarget());
-		a.setPublished(activity.getPublished());
-		a.setVerb(activity.getVerb());
-		this.sendXmpp(ac, new delAcCallBack());
-				
-		return true;
-	}*/
-	
 	class delAcCallBack implements IActivityFeedCallback{
 
 		public delAcCallBack(){
@@ -84,15 +64,13 @@ public class RemoteActivityFeed implements IActivityFeed {
 		
 		@Override
 		public void receiveResult(MarshaledActivityFeed activityFeedObject) {
-			// TODO Auto-generated method stub
-			
+
 		}
 		
 	}
 
 	@Override
 	public long importActivityEntries(List<?> activityEntries) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 	
@@ -188,8 +166,7 @@ public class RemoteActivityFeed implements IActivityFeed {
 	
 	@Override
 	public IActivity getEmptyIActivity(){
-		org.societies.activity.model.Activity a = new org.societies.activity.model.Activity();
-		return a;
+		return new org.societies.activity.model.Activity();
 	}
 	
 	
@@ -204,11 +181,10 @@ public class RemoteActivityFeed implements IActivityFeed {
 					stanza.getId(), callback);
 
 			try {
-				LOG.info("Sending stanza");
+				LOG.debug("Sending stanza");
 				this.iCommMgr.sendIQGet(stanza, c, commsCallback);
 			} catch (CommunicationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOG.info("Communication error during sending of xmpp: ",e);
 			}
 
 	}

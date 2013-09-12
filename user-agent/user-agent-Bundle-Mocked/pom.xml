@@ -1,0 +1,148 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.societies</groupId>
+        <artifactId>spring-osgi-parent</artifactId>
+        <version>RELEASE</version>
+    </parent>
+
+    <!-- groupId is set in parent pom -->
+    <groupId>org.societies.useragent</groupId>
+    <artifactId>userAgentBundleMocked</artifactId>
+    <version>${version.ua}</version>
+    <name>User Agent Bundle Mocked Feedback</name>
+    <packaging>bundle</packaging>
+
+    <developers>
+        <developer>
+            <name>Sarah Gallacher</name>
+            <email>S.Gallacher@hw.ac.uk</email>
+            <organization>HWU</organization>
+            <organizationUrl>http://www.hw.ac.uk/</organizationUrl>
+            <roles>
+                <role>Senior Developer</role>
+            </roles>
+            <timezone>+0</timezone>
+        </developer>
+    </developers>
+
+    <!-- List dependencies here -->
+    <dependencies>
+
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>org.springframework.spring-library</artifactId>
+            <type>libd</type>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.societies</groupId>
+            <artifactId>common-ext-libs</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.societies.api.internal</groupId>
+            <artifactId>societies-api-internal</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.societies.api.external</groupId>
+            <artifactId>societies-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+
+        <!-- USER AGENT COMPONENTS embedded: -->
+        <dependency>
+            <groupId>org.societies.useragent</groupId>
+            <artifactId>user-agent-api</artifactId>
+            <version>${version.ua}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.societies.useragent</groupId>
+            <artifactId>decisionmaking</artifactId>
+            <version>${version.ua}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.societies.useragent</groupId>
+            <artifactId>conflict</artifactId>
+            <version>${version.ua}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.societies.useragent</groupId>
+            <artifactId>monitoring</artifactId>
+            <version>${version.ua}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.societies.useragent</groupId>
+            <artifactId>feedbackMock</artifactId>
+            <version>${version.ua}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.societies.useragent</groupId>
+            <artifactId>UACommsManager</artifactId>
+            <version>${version.ua}</version>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>${project.name}</Bundle-Name>
+                        <Bundle-Version>${project.version}</Bundle-Version>
+                        <Include-Resource>{maven-resources}</Include-Resource>
+
+                        <Embed-Dependency>
+                            user-agent-api;scope=compile|runtime,
+                            conflict;scope=compile|runtime,
+                            decisionmaking;scope=compile|runtime,
+                            monitoring;scope=compile|runtime,
+                            feedbackMock;scope=compile|runtime,
+                            UACommsManager;scope=compile|runtime
+                        </Embed-Dependency>
+                        <Embed-Transitive>false</Embed-Transitive>
+
+                        <Export-Package>
+                            org.societies.useragent.**
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+            <!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>cobertura-maven-plugin</artifactId>
+                </plugin> -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <artifactItems>
+                        <artifactItem>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>${project.artifactId}</artifactId>
+                            <version>${project.version}</version>
+                            <type>jar</type>
+                            <overWrite>true</overWrite>
+                            <outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+                        </artifactItem>
+                    </artifactItems>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

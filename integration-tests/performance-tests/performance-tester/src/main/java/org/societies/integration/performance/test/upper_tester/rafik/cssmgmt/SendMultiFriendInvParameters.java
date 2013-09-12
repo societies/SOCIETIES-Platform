@@ -32,6 +32,8 @@ package org.societies.integration.performance.test.upper_tester.rafik.cssmgmt;
 public class SendMultiFriendInvParameters {
 
 	private String cssInvInitiatorId;
+	private String targetedCssList;
+	private int invitationTimeout;
 
 	/**
 	 * 
@@ -43,9 +45,11 @@ public class SendMultiFriendInvParameters {
 	/**
 	 * @param cssInvInitiatorId
 	 */
-	public SendMultiFriendInvParameters(String cssInvInitiatorId) {
+	public SendMultiFriendInvParameters(String cssInvInitiatorId, String targetedCssList, int invitationTimeout) {
 		super();
 		this.cssInvInitiatorId = cssInvInitiatorId;
+		this.targetedCssList = targetedCssList;
+		this.invitationTimeout = invitationTimeout;
 	}
 
 	/**
@@ -60,5 +64,34 @@ public class SendMultiFriendInvParameters {
 	 */
 	public void setCssInvInitiatorId(String cssInvInitiatorId) {
 		this.cssInvInitiatorId = cssInvInitiatorId;
-	}	
+	}
+
+	/**
+	 * @return the targetedCssList
+	 */
+	public String getTargetedCssList() {
+		return targetedCssList;
+	}
+
+	/**
+	 * @param targetedCssList the targetedCssList to set
+	 */
+	public void setTargetedCssList(String targetedCssList) {
+		this.targetedCssList = targetedCssList;
+	}
+
+	/**
+	 * @return the invitationTimeout
+	 */
+	public int getInvitationTimeout() {
+		return invitationTimeout;
+	}
+
+	/**
+	 * @param invitationTimeout the invitationTimeout to set
+	 */
+	public void setInvitationTimeout(int invitationTimeout) {
+		this.invitationTimeout = invitationTimeout;
+	}
+	
 }

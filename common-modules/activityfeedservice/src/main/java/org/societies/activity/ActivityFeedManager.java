@@ -67,15 +67,13 @@ public class ActivityFeedManager implements IActivityFeedManager {
     }
     @Override
     public IActivityFeed getOrCreateFeed(String owner, String feedId, Boolean bPubSub) {
-         LOG.info("In getOrCreateFeed .. ");
-        for(IActivityFeed feed : feeds){
+        LOG.debug("In getOrCreateFeed .. ");
+        for(IActivityFeed feed : feeds) {
             if(((ActivityFeed)feed).getId().contentEquals(feedId)) {
                 if(!((ActivityFeed)feed).getOwner().contentEquals(owner)) {
-                    LOG.info("right feedid but wrong owner");
+                    LOG.debug("right feedid but wrong owner");
                     return null;
                 }
-                //LOG.info("right feedid and owner");
-                //((ActivityFeed) feed).startUp(this.sessionFactory,feedId);
                 return feed;
             }
         }
@@ -84,19 +82,20 @@ public class ActivityFeedManager implements IActivityFeedManager {
         try {
             identity = commManager.getIdManager().fromJid(owner);
         } catch (InvalidFormatException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            LOG.error("Invalid Format of owner jid when creating or getting activityfeed: ", e);
         }
         //not existing, making a new one..
         ActivityFeed ret = new ActivityFeed(feedId,owner);
         if (bPubSub)
         {
-        	ret.pubSubEnabled = true;
+        	ret.setPubSubEnabled(true);
         	ret.setPubSubcli(this.pubSubClient);
         }
         
         ret.startUp(this.sessionFactory);
-        if (bPubSub)
+        if (bPubSub) {
         	ret.connectPubSub(identity);
+        }
 
         feeds.add(ret);
         persistNewFeed(ret);
@@ -109,8 +108,9 @@ public class ActivityFeedManager implements IActivityFeedManager {
         while(it.hasNext())    {
             cur = it.next();
             if(((ActivityFeed)cur).getId().contentEquals(feedId)) {
-                if(!((ActivityFeed)cur).getOwner().contentEquals(owner))
+                if(!((ActivityFeed)cur).getOwner().contentEquals(owner)) {
                     return false;
+                }
                 removeRecord(cur);
                 return feeds.remove(cur);
             }
@@ -127,14 +127,15 @@ public class ActivityFeedManager implements IActivityFeedManager {
             session.delete(deleted);
             t.commit();
         }catch (Exception e){
-            if (t != null)
+            if (t != null) {
                 t.rollback();
-            e.printStackTrace();
-            LOG.error("Error when trying to delete activityfeed");
+            }
+            LOG.error("Error when trying to delete activityfeed: ",e);
             return false;
         }finally {
-            if(session!=null)
+            if(session!=null) {
                 session.close();
+            }
         }
         return true;
     }
@@ -145,11 +146,11 @@ public class ActivityFeedManager implements IActivityFeedManager {
         	tmpFeeds = session.createCriteria(ActivityFeed.class).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list();
         	feeds.addAll(tmpFeeds);
         }catch(Exception e){
-            LOG.error("CISManager startup queries failed..");
-            e.printStackTrace();
+            LOG.error("CISManager startup queries failed: ", e);
         }finally{
-            if(session!=null)
+            if(session!=null) {
                 session.close();
+            }
         }
     }
 
@@ -167,7 +168,7 @@ public class ActivityFeedManager implements IActivityFeedManager {
             pubSubClient.addSimpleClasses(Collections
                     .unmodifiableList(Arrays.asList("org.societies.api.schema.activity.MarshaledActivity")));
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            LOG.error("Class not found during setting of pubsub: ", e);
         }
     }
 
@@ -192,7 +193,7 @@ public class ActivityFeedManager implements IActivityFeedManager {
         try{
             session.save(activityFeed);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Error during persisting of new feed: ", e);
             return false;
         }
         return true;

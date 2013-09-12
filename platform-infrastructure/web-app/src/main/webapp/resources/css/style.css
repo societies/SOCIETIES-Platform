@@ -850,6 +850,38 @@ a.keyinfo-reply-link {
     color: #777c82
 }
 
+/* ----- Services Button -------------- */
+a.services_button {
+    padding: 3px;
+}
+
+/* button reply */
+.services_button {
+	text-decoration: none;
+    font-size: 10px;
+	text-align: center;
+    display: block;
+    border: 1px solid #F99B1C;
+    background: #F7961B;
+    border: 1px solid #F99B1C;
+    font-size: 11px;
+    margin: -3px 0 0 0;
+    font-weight: bold;
+    padding: 0;
+    color: #ffffff;
+    -moz-border-radius: 1px;
+    -webkit-border-radius: 1px;
+    border-radius: 1px;
+    width: 70px;
+}
+
+.services_button:hover {
+    border: 1px solid #F99B1C;
+    background: #f26a36;
+    color: #fff;
+    text-decoration: none
+}
+
 /*
 -----Gravtar/Profile Pic---------------------------------------------------- */
 .gravatar {
@@ -1521,7 +1553,38 @@ ul.social-network li {
     display: inline;
 }
 
-
+.tooltip em {
+    display:none;
+}
+.tooltip:hover {
+    border: 0;
+    position: relative;
+    z-index: 500;
+    text-decoration:none;
+}
+.tooltip:hover em {
+    font-style: normal;
+    display: block;
+    position: absolute;
+    top: 20px;
+    left: -10px;
+    padding: 5px;
+    color: #000;
+    border: 1px solid #bbb;
+    background: #ffc;
+    width:170px;
+}
+.tooltip:hover em span {
+    position: absolute;
+    top: -7px;
+    left: 15px;
+    height: 7px;
+    width: 11px;
+    background: transparent url(image-infobulle.gif);
+    margin:0;
+    padding: 0;
+    border: 0;
+}
 
 /* THE END */
 

@@ -23,4 +23,6 @@ public interface IUserFeedbackHistoryRepository {
     void completeExpFeedback(String requestId, List<String> values);
 
     void completeImpFeedback(String requestId, boolean result);
+
+    int truncate();
 }

@@ -25,6 +25,8 @@
 
 package org.societies.orchestration.cpa.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.activity.IActivity;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.internal.orchestration.ICisDataCollector;
@@ -46,36 +48,24 @@ import java.util.List;
 
 public class CPA implements IDataCollectorSubscriber, Runnable
 {
+    protected static Logger LOG = LoggerFactory.getLogger(CPA.class);
 	private CPACreationPatterns cpaCreationPatterns;
     private ICisDataCollector collector;
 	private Date lastTemporaryCheck;
     private String cisId;
-	/*
-     * Constructor for EgocentricCommunityAnalyser
-     * 
-	 * Description: The constructor creates the EgocentricCommunityAnalyser
-	 *              component on a given CSS.
-	 * Parameters: 
-	 * 				linkedEntity - the non-CIS entity, either a user CSS or a domain deployment,
-	 *              that this object will operate on behalf of. (Currently can only be a user CSS)
-	 */
+    private List<IActivity> newActivities;
+    private List<CtxChangeEvent> newContext;
+
     public CPA(ICisDataCollector collector, String cisId){
         this.collector = collector; this.cisId = cisId;
         init();
     }
 
-//    public CPA(IIdentity linkedEntity, String linkType) {
-//		lastTemporaryCheck = new Date();
-//	}
 	private void process() {
 		cpaCreationPatterns.analyze(newActivities);
         newActivities.clear();
 	}
-	
-	
 
-    private List<IActivity> newActivities;
-    private List<CtxChangeEvent> newContext;
     @Override
     public void receiveNewData(List<?> newData) {
         if(newData.get(0) instanceof IActivity){
@@ -152,6 +142,7 @@ public class CPA implements IDataCollectorSubscriber, Runnable
         this.lastTemporaryCheck = new Date(0);
         this.cpaCreationPatterns = new CPACreationPatterns();
         this.cpaCreationPatterns.init();
+        LOG.info("new CPA started for CIS "+this.cisId);
     }
     public List<String> getTrends(int n){
         //ArrayList<String> ret = new ArrayList<String>();

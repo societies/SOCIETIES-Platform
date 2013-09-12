@@ -21,7 +21,7 @@
 
 	<dependencies>
     	<dependency>
-			<groupId>org.societies.api.schema.internal</groupId>
+			<groupId>org.societies.android.api.schema.internal</groupId>
 			<artifactId>societies-api-schema-internal</artifactId>
 			<version>${release.version}</version>
 		</dependency>		

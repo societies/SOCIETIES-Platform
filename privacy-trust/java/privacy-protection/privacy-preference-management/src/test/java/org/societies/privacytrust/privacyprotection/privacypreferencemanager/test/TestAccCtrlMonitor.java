@@ -93,6 +93,7 @@ import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.NegotiationStatus;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
@@ -639,7 +640,7 @@ public class TestAccCtrlMonitor {
 		}
 
 		@Override
-		public org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem getPermission(
+		public List<ResponseItem> getPermissions(
 				Requestor requestor,
 				DataIdentifier dataId,
 				List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions)
@@ -705,6 +706,78 @@ public class TestAccCtrlMonitor {
 			//JOptionPane.showMessageDialog(null, "Deleted permission - req/dataId/actions" );
 			this.receivedResponse.clear();
 			receivedResponse.put(4, true);
+			return false;
+		}
+		@Override
+		public boolean updatePermissions(Requestor requestor,
+				List<ResponseItem> permissions) throws PrivacyException {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		@Override
+		public List<ResponseItem> getPermissions(RequestorBean requestor,
+				List<DataIdentifier> dataIds, List<Action> actions)
+				throws PrivacyException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		@Override
+		public List<ResponseItem> getPermissions(RequestorBean requestor,
+				DataIdentifier dataId, List<Action> actions)
+				throws PrivacyException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		@Override
+		public List<ResponseItem> getPermissions(RequestorBean requestor,
+				DataIdentifier dataId) throws PrivacyException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		@Override
+		public boolean updatePermission(RequestorBean requestor,
+				DataIdentifier dataId, List<Action> actions, Decision permission)
+				throws PrivacyException {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		@Override
+		public boolean deletePermissions(RequestorBean requestor,
+				DataIdentifier dataId) throws PrivacyException {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		@Override
+		public boolean deletePermissions(RequestorBean requestor,
+				DataIdentifier dataId, List<Action> actions)
+				throws PrivacyException {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		@Override
+		public boolean updatePermissions(RequestorBean requestor,
+				List<DataIdentifier> dataIds, List<Action> actions,
+				List<Decision> decisions) throws PrivacyException {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		@Override
+		public boolean updatePermission(RequestorBean requestor,
+				ResponseItem permission) throws PrivacyException {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		@Override
+		public boolean updatePermissions(RequestorBean requestor,
+				List<ResponseItem> permissions) throws PrivacyException {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		@Override
+		public boolean updatePermissions(RequestorBean requestor,
+				List<DataIdentifier> dataIds, List<Action> actions,
+				Decision decision) throws PrivacyException {
+			// TODO Auto-generated method stub
 			return false;
 		}
 		

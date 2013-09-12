@@ -25,6 +25,8 @@
 
 package org.societies.orchestration.cpa.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.cis.orchestration.ICPA;
 import org.societies.api.internal.orchestration.ICisDataCollector;
 import org.societies.api.cis.orchestration.model.ISocialGraph;
@@ -44,6 +46,7 @@ public class CPAManager extends EventListener implements ICPA {
     private ConcurrentHashMap<String, CPA> cpaMap;
     private ICisDataCollector collector;
     private IEventMgr eventMgr;
+    protected static Logger LOG = LoggerFactory.getLogger(CPAManager.class);
     public CPAManager(){
         cpaMap= new ConcurrentHashMap<String, CPA>();
     }
@@ -61,9 +64,10 @@ public class CPAManager extends EventListener implements ICPA {
     }
     public void init(){
         this.eventMgr.subscribeInternalEvent(this,new String[]{EventTypes.CIS_CREATION,EventTypes.CIS_DELETION},null);
+        LOG.info("CPAManager bean started");
     }
     public void destroy(){
-
+        LOG.info("shutting down CPAManager bean");
     }
 
 

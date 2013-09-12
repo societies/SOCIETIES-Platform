@@ -185,6 +185,8 @@ public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph 
 				getVertices().add(newVertex);
 			} else
                 found.addAct(act.getObject());
+            if(act.getTarget()==null)
+                continue;
             found = hasVertex(act.getTarget());
 			if(found == null){
                 newVertex = new SocialGraphVertex(act.getTarget());
@@ -202,6 +204,8 @@ public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph 
 		SocialGraphEdge edge = null; SocialGraphEdge searchEdge = null;
 		for(ISocialGraphVertex vertex1 : getVertices()){
 			for(ISocialGraphVertex vertex2 : getVertices()){
+                if(vertex1.equals(vertex2))
+                    continue;
 				edge = new SocialGraphEdge((SocialGraphVertex)vertex1,(SocialGraphVertex)vertex2);
 				searchEdge = hasEdge(edge);
 				if(searchEdge == null){

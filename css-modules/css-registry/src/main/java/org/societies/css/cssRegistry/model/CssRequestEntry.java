@@ -32,7 +32,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Id;
 
-import org.societies.api.schema.cssmanagement.CssRequestStatusType;
+
 
 
 /**

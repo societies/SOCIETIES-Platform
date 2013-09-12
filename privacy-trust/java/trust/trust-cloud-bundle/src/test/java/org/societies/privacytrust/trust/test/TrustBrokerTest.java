@@ -146,6 +146,8 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 	 */
 	@After
 	public void tearDown() throws Exception {
+		// remove created entities
+		this.trustRepo.removeEntities(null, null, null);
 	}
 	
 	/**
@@ -378,11 +380,6 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(serviceUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 	
 	/**
@@ -489,9 +486,6 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
 	}
 	
 	/**
@@ -595,9 +589,6 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
 	}
 	
 	/**
@@ -701,9 +692,6 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 	
 	/**
@@ -830,9 +818,6 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(userPerceivedTrustValue2), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
 	}
 	
 	/**
@@ -959,9 +944,6 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(userPerceivedTrustValue2), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
 	}
 	
 	/**
@@ -1088,9 +1070,6 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(userPerceivedTrustValue2), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 
 	/**
@@ -1165,9 +1144,6 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 				requestor, trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(userPerceivedTrustValue2), retrievedTrustValue);
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
 	}
 
 	/**
@@ -1242,9 +1218,6 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 				requestor, trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(userPerceivedTrustValue2), retrievedTrustValue);
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
 	}
 	
 	/**
@@ -1319,9 +1292,6 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 				requestor, trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(userPerceivedTrustValue2), retrievedTrustValue);
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 	
 	/**
@@ -1464,11 +1434,6 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(3, retrievedTrustRelationships.size());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 	
 	/**
@@ -1608,11 +1573,6 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(3, retrievedTrustRelationships.size());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 	
 	/**
@@ -1751,11 +1711,6 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(serviceUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 	
 	/**
@@ -1894,11 +1849,6 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(serviceDirectTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 	
 	/**
@@ -2036,11 +1986,6 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(serviceIndirectTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 	
 	/**
@@ -2177,11 +2122,6 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(serviceUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 	
 	/**
@@ -2470,10 +2410,5 @@ public class TrustBrokerTest extends AbstractTransactionalJUnit4SpringContextTes
 				}
 			}
 		}
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 }

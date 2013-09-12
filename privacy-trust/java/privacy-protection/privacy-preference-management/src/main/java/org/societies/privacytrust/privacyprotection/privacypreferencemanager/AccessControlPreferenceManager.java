@@ -26,19 +26,14 @@ package org.societies.privacytrust.privacyprotection.privacypreferencemanager;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
-import javax.swing.JOptionPane;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
@@ -48,8 +43,6 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.util.DataIdentifierFactory;
-import org.societies.api.identity.util.DataIdentifierUtils;
-import org.societies.api.identity.util.DataTypeDescriptionUtils;
 import org.societies.api.identity.util.DataTypeUtils;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -59,7 +52,6 @@ import org.societies.api.internal.privacytrust.privacyprotection.model.privacypo
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.AccessControlPreferenceDetailsBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PrivacyOutcomeConstantsBean;
-import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PrivacyPreferenceConditionBean;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
@@ -77,8 +69,6 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decisio
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
-import org.societies.privacytrust.privacyprotection.api.IPrivacyAgreementManagerInternal;
-import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ContextPreferenceCondition;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
@@ -88,10 +78,10 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.accesscontrol.AccessControlOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.accesscontrol.AccessControlPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.OperatorConstants;
+import org.societies.privacytrust.privacyprotection.api.util.PrivacyPreferenceUtils;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PreferenceEvaluator;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PrivateContextCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.management.PrivatePreferenceCache;
-import org.societies.privacytrust.privacyprotection.util.preference.PrivacyPreferenceUtils;
 
 /**
  * @author Eliza
@@ -195,7 +185,19 @@ public class AccessControlPreferenceManager {
 	 * (non-Javadoc)
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager#checkPermission(org.societies.api.identity.Requestor, org.societies.api.context.model.CtxAttributeIdentifier, java.util.List)
 	 */
-	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException{
+	public List<ResponseItem> checkPermission(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException{
+		if (null==dataIds || dataIds.size() <= 0){
+			this.logging.debug("requested permission for null CtxIdentifier. returning : null");
+			return null;
+			
+		}
+		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
+		for(DataIdentifier dataId : dataIds) {
+			permissions.addAll(checkPermission(requestor, dataId, actions));
+		}
+		return permissions;
+	}
+	public List<ResponseItem> checkPermission(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException{
 
 		if (null==dataId){
 			this.logging.debug("requested permission for null CtxIdentifier. returning : null");
@@ -229,97 +231,98 @@ public class AccessControlPreferenceManager {
 		Resource resource = ResourceUtils.create(dataId.getUri());
 		details.setResource(resource);
 		List<AccessControlPreferenceTreeModel> models = new ArrayList<AccessControlPreferenceTreeModel>();
-		Hashtable<Action,ResponseItem> items = new Hashtable<Action,ResponseItem>();
+		Hashtable<Action,ResponseItem> alreadyStoredItems = new Hashtable<Action,ResponseItem>();
 
-		List<Action> notExistsPreference = new ArrayList<Action>();
+		List<Action> notExistsInPreference = new ArrayList<Action>();
 		for (Action action: actions){
 			details.setAction(action);
 			this.logging.debug("Retrieving preference for: "+PrivacyPreferenceUtils.toString(details));
-			this.logging.debug("Retrieved preference for: "+PrivacyPreferenceUtils.toString(details));
 			try{
 				ResponseItem evaluationResult = this.evaluateAccCtrlPreference(details, conditions); 
 				//this.checkPreferenceForAccessControl(model, requestor, dataId, conditions, action);
 				if (evaluationResult!=null){
-					items.put(action, evaluationResult);
+					alreadyStoredItems.put(action, evaluationResult);
 				}else{
-					notExistsPreference.add(action);
+					notExistsInPreference.add(action);
 				}
 			}
 			catch (PrivacyException pe){
-				notExistsPreference.add(action);
+				notExistsInPreference.add(action);
 			}
 
 		}
 
 
 		//TODO: merge response items
+		List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
 		ResponseItem item = new ResponseItem();
 		item.setDecision(Decision.PERMIT);
 		RequestItem reqItem = new RequestItem();		
 		reqItem.setResource(resource);
 		item.setRequestItem(reqItem);
+		item.setDecision(Decision.DENY); // by default
 
+		int nbOfAcceptedActions = 0;
 		DataTypeDescription dataTypeDescription =  (new DataTypeUtils()).getFriendlyDescription(dataId.getType());
 		String proposalText = requestor.getRequestorId().toString()+" is requesting access to your \"<span title=\""+dataTypeDescription.getFriendlyDescription()+"\">"+dataTypeDescription.getFriendlyName()+"</span>\" in order to perform the following actions.\n"
 				+ "Pick the allowed actions:";
-		String[] actionsStr = new String[notExistsPreference.size()];
+		String[] actionsStr = new String[notExistsInPreference.size()];
 		int i = 0;
-		for (Action a: notExistsPreference){
+		for (Action a: notExistsInPreference){
 			actionsStr[i] = a.getActionConstant().name();
 			i++;
 		}
 		ExpProposalContent expContent = new ExpProposalContent(proposalText, actionsStr);
 
-		List<String> response;
+		// -- Retrieve User Feedback
+		List<String> acceptedActions = null;
 		try {
-			response = this.userFeedback.getExplicitFB(ExpProposalType.CHECKBOXLIST, expContent).get();
-			if (response.size()==actionsStr.length){
-				for (Action act : notExistsPreference){
-					this.storeDecision(requestor, dataId, conditions, act, PrivacyOutcomeConstantsBean.ALLOW);
-					item.getRequestItem().getActions().add(act);
+			// - Ask for user's feedback
+			acceptedActions = userFeedback.getExplicitFB(ExpProposalType.CHECKBOXLIST, expContent).get();
+		}
+		catch (Exception e) {
+			logging.error("Can't retrieve user's feedback", e);
+			acceptedActions = null;
+		} 
+		finally {
+			// - Store decision AND fill the ResponseItem with the accepted actions (even if errors happened)
+			for (Action action : notExistsInPreference){
+				// Accepted by the user
+				if (null != acceptedActions && acceptedActions.contains(action.getActionConstant().name())) {
+					nbOfAcceptedActions++;
+					item.getRequestItem().getActions().add(action);
+					storeDecision(requestor, dataId, conditions, action, PrivacyOutcomeConstantsBean.ALLOW);
 				}
-				item.setDecision(Decision.PERMIT);
-
-			}else if (response.size()==0){
-				item.setDecision(Decision.DENY);
-				for (Action act : notExistsPreference){
-					this.storeDecision(requestor, dataId, conditions, act, PrivacyOutcomeConstantsBean.BLOCK);
-				}
-			}else{
-				for (Action act: notExistsPreference){
-					if (response.contains(act.getActionConstant().name())){
-						this.storeDecision(requestor, dataId, conditions, act, PrivacyOutcomeConstantsBean.ALLOW);
-						item.getRequestItem().getActions().add(act);
-						item.setDecision(Decision.PERMIT);
-					}else{
-						this.storeDecision(requestor, dataId, conditions, act, PrivacyOutcomeConstantsBean.BLOCK);
-
-					}
+				// Not accepted
+				else {
+					storeDecision(requestor, dataId, conditions, action, PrivacyOutcomeConstantsBean.BLOCK);
 				}
 			}
-
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
-
-		Enumeration<Action> actionkeys = items.keys();
-
-		while (actionkeys.hasMoreElements()){
+		// -- Fill the ResponseItem with existing previous actions
+		Enumeration<Action> actionkeys = alreadyStoredItems.keys();
+		while (actionkeys.hasMoreElements()) {
 			Action nextElement = actionkeys.nextElement();
-			if (items.get(nextElement).getDecision().equals(Decision.PERMIT)){
-				reqItem.getActions().add(nextElement);		
-			}else{
-				item.setDecision(Decision.DENY);
+			if (alreadyStoredItems.get(nextElement).getDecision().equals(Decision.PERMIT)) {
+				nbOfAcceptedActions++;
+				item.getRequestItem().getActions().add(nextElement);		
 			}
 		}
+		
+		// -- Take a decision
+		// Some actions have been accepted
+		if (nbOfAcceptedActions >= 1) {
+			item.setDecision(Decision.PERMIT);
+		}
+		// No actions have been accepted
+		else {
+			item.getRequestItem().getActions().addAll(notExistsInPreference);
+			item.getRequestItem().getActions().addAll(alreadyStoredItems.keySet());
+		}
 
-
-		return item;
+		responseItems.add(item);
+		return responseItems;
 
 	}
 
@@ -539,8 +542,8 @@ public class AccessControlPreferenceManager {
 			AccessControlPreferenceTreeModel model) {
 		return this.prefCache.addAccCtrlPreference(details, model);
 	}
-	
-	
+
+
 	/**
 	 * 
 	 * @param requestor 
@@ -549,8 +552,8 @@ public class AccessControlPreferenceManager {
 	 */
 	public Hashtable<CtxIdentifier, ArrayList<AccessControlPreferenceDetailsBean>> getContextConditions(Requestor requestor, List<DataIdentifier> dataIds){
 		Hashtable<CtxIdentifier, ArrayList<AccessControlPreferenceDetailsBean>> detailsToBeMonitored = new Hashtable<CtxIdentifier, ArrayList<AccessControlPreferenceDetailsBean>>();
-		
-		
+
+
 		List<AccessControlPreferenceDetailsBean> accCtrlPreferenceDetails = this.getAccCtrlPreferenceDetails();
 		String display = "";
 		for (AccessControlPreferenceDetailsBean detail : accCtrlPreferenceDetails){
@@ -567,7 +570,7 @@ public class AccessControlPreferenceManager {
 				//if the preference refers to this resource
 				if (requestedDataId.getType().equalsIgnoreCase(detail.getResource().getDataType())){
 					//if the preference refers to this requestor
-					
+
 
 					if (RequestorUtils.equal(detail.getRequestor(), RequestorUtils.toRequestorBean(requestor))){
 						//JOptionPane.showMessageDialog(null, "Requestor: "+RequestorUtils.toString(detail.getRequestor())+" vs "+RequestorUtils.toString(RequestorUtils.toRequestorBean(requestor)));
@@ -577,9 +580,9 @@ public class AccessControlPreferenceManager {
 						Enumeration<IPrivacyPreference> postorderEnumeration = rootPreference.postorderEnumeration();
 						ArrayList<CtxIdentifier> ctxIds = new ArrayList<CtxIdentifier>();
 						while (postorderEnumeration.hasMoreElements()){
-							
+
 							IPrivacyPreference nextElement = postorderEnumeration.nextElement();
-							
+
 							if (nextElement.getUserObject()!=null){
 								//JOptionPane.showMessageDialog(null, "Processing element "+nextElement.getUserObject().toString());
 								if (nextElement.getUserObject() instanceof ContextPreferenceCondition){
@@ -591,8 +594,8 @@ public class AccessControlPreferenceManager {
 								}
 							}
 						}
-						
-						
+
+
 						for (CtxIdentifier ctxId : ctxIds){
 							//if the ctxId already exists as a key, add the preference details to the list 
 							if (detailsToBeMonitored.containsKey(ctxId)){
@@ -608,7 +611,7 @@ public class AccessControlPreferenceManager {
 				}
 			}
 		}
-		
+
 
 		return detailsToBeMonitored;
 	}
@@ -619,7 +622,7 @@ public class AccessControlPreferenceManager {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 	public static void main(String[] args){

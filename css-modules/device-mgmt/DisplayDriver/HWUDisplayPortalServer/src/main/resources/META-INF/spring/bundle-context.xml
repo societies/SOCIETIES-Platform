@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<!-- regular spring configuration file defining the beans for this bundle. 
+		We've kept the osgi definitions in a separate configuration file so that 
+		this file can easily be used for integration testing outside of an OSGi environment -->
+
+
+
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" /> 
+		<property name="annotatedClasses">
+			<list>
+				<value>org.societies.display.server.model.Screen</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.cache.use_second_level_cache">false</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.format_sql">false</prop>
+				<prop key="hibernate.query.factory_class">org.hibernate.hql.classic.ClassicQueryTranslatorFactory</prop>
+
+			</props>
+		</property>
+		<property name="mappingDirectoryLocations" value="classpath:META-INF/" />
+	</bean>
+	
+		<bean id="displayPortalServer" class="org.societies.display.server.DisplayPortalServer"
+		name="displayPortalServer" init-method="initialiseServer">
+		<property name="commManager" ref="commManager" />
+		<property name="services" ref="IServices" />
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<!--<bean class="ac.hw.display.server.dao.impl.MockScreenDAO" id="screenDAO"/> -->
+
+	<bean id="displayPortalCommServer" class="org.societies.display.server.comm.CommsServer"
+		name="displayPortalCommServer" init-method="InitService">
+		<property name="commManager" ref="commManager"></property>
+		<property name="displayPortalServer" ref="displayPortalServer"></property>
+
+	</bean>
+	
+	<!-- <context:component-scan base-package="org.societies.personalisation.management.impl"></context:component-scan> -->
+</beans>

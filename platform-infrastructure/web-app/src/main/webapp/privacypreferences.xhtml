@@ -1,0 +1,177 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="templates/main_template.xhtml">
+
+	<ui:define name="html_head">
+		<title>Privacy Preferences - SOCIETIES</title>
+	</ui:define>
+
+	<ui:define name="body">
+		<div class="hr grid_12 clearfix"></div>
+		<!-- Left Column -->
+		<section id="left_col" class="grid_12">
+			<div class="breadcrumbs">
+				<a href="index.xhtml">Home</a> / <a href="privacysettings.xhtml">Privacy
+					Settings</a> / <a href="privacypreferences.xhtml">Privacy
+					Preferences</a>
+			</div>
+
+			<section class="form_style_main">
+
+				<h4 class="form_title">
+					Privacy Preferences for
+					<h:outputText value="#{loginController.username}" />
+				</h4>
+
+				<p:dataTable id="ppnDetails" var="ppnPreferenceDetail"
+					value="#{PrivacyPrefsController.ppnPreferenceDetails}">
+					<f:facet name="header" style="background-color:yellow;">
+                 Privacy Policy Negotiation Preferences
+                 </f:facet>
+
+					<p:column headerText="Requestor ID">
+            #{ppnPreferenceDetail.requestor.requestorId}
+        </p:column>
+
+					<p:column headerText="Requestor CIS or Service ID">
+            #{PrivacyPrefsController.toStringRequestor(ppnPreferenceDetail.requestor)}
+        </p:column>
+
+					<p:column headerText="Resource Type">
+            #{ppnPreferenceDetail.resource.scheme}
+        </p:column>
+
+					<p:column headerText="Data Type">
+          #{PrivacyPrefsController.toStringDataType(ppnPreferenceDetail.resource.dataType)}
+        </p:column>
+
+					<p:column style="width: 4%">
+						<p:commandButton icon="ui-icon-wrench"
+							action="#{PrivacyPrefsController.storePPNDetailToUtils}"
+							title="View-Edit-Delete" ajax="false">
+							<f:setPropertyActionListener value="#{ppnPreferenceDetail}"
+								target="#{PrivacyPrefsController.selectedPPNDetail}" />
+
+							<f:param name="ppnDetailUUID"
+								value="#{PrivacyPrefsController.ppnUUID}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+
+				<p:toolbar>
+					<p:toolbarGroup align="left">
+						<p:button value="Create New PPN preference"
+							href="privacy_ppn_create.xhtml">
+						</p:button>
+					</p:toolbarGroup>
+				</p:toolbar>
+
+				<p:dataTable id="accCtrlDetails" var="accCtrlPreference"
+					value="#{PrivacyPrefsController.accCtrlPreferenceDetails}">
+					<f:facet name="header" style="background-color:yellow;">
+                 Access Control Privacy Preferences
+                 </f:facet>
+
+					<p:column headerText="Requestor ID">
+            #{accCtrlPreference.requestor.requestorId}
+        </p:column>
+
+					<p:column headerText="Requestor CIS or Service ID">
+            #{PrivacyPrefsController.toStringRequestor(accCtrlPreference.requestor)}
+        </p:column>
+
+					<p:column headerText="Resource Type">
+            #{accCtrlPreference.resource.scheme}
+        </p:column>
+
+		<p:column headerText="Data Type">
+        <span class="tooltip">#{PrivacyPrefsController.toStringDataType(accCtrlPreference.resource.dataType)}<em><span></span>#{accCtrlPreference.resource.dataIdUri}</em></span>
+        </p:column>
+
+					<!-- Removed temporarly to take a screenshot <p:column headerText="Resource ID">
+        #{accCtrlPreference.resource.dataIdUri}
+        </p:column> -->
+					<p:column style="width: 4%">
+						<p:commandButton icon="ui-icon-wrench"
+							action="#{PrivacyPrefsController.storeAccCtrlDetailToUtils}"
+							title="View-Edit-Delete" ajax="false">
+							<f:setPropertyActionListener value="#{accCtrlPreference}"
+								target="#{PrivacyPrefsController.selectedAccCtrlDetail}" />
+
+							<f:param name="accCtrlDetailUUID"
+								value="#{PrivacyPrefsController.accCtrlUUID}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+
+				<p:toolbar>
+					<p:toolbarGroup align="left">
+						<p:button value="Create New Access Control preference"
+							href="privacy_accCtrl_create.xhtml">
+						</p:button>
+					</p:toolbarGroup>
+				</p:toolbar>
+
+				<p:dataTable id="idsDetails" var="idsPreference"
+					value="#{PrivacyPrefsController.idsPreferenceDetails}">
+					<f:facet name="header" style="background-color:yellow;">
+                 Identity Selection Privacy Preferences
+                 </f:facet>
+
+					<p:column headerText="Requestor ID">
+            #{idsPreference.requestor.requestorId}
+        </p:column>
+
+					<p:column headerText="Requestor CIS or Service ID">
+            #{PrivacyPrefsController.toStringRequestor(idsPreference.requestor)}
+        </p:column>
+
+					<p:column headerText="for Identity">
+        #{idsPreference.affectedIdentity}
+        </p:column>
+				</p:dataTable>
+
+
+
+				<p:dataTable id="dobfDetails" var="dobfPreference"
+					value="#{PrivacyPrefsController.dObfPreferenceDetails}">
+					<f:facet name="header" style="background-color:yellow;">
+                 Data Obfuscation Privacy Preferences
+                 </f:facet>
+
+					<p:column headerText="Requestor ID">
+            #{dobfPreference.requestor.requestorId}
+        </p:column>
+
+					<p:column headerText="Requestor CIS or Service ID">
+            #{PrivacyPrefsController.toStringRequestor(dobfPreference.requestor)}
+        </p:column>
+					<p:column headerText="Resource Type">
+            #{dobfPreference.resource.scheme}
+        </p:column>
+
+					<p:column headerText="Data Type">
+          #{PrivacyPrefsController.toStringDataType(dobfPreference.resource.dataType)}
+        </p:column>
+
+					<p:column headerText="Resource ID">
+        #{dobfPreference.resource.dataIdUri}
+        </p:column>
+				</p:dataTable>
+
+
+			</section>
+		</section>
+
+		<div class="hr grid_12 clearfix"></div>
+	</ui:define>
+
+	<ui:define name="dialogs">
+		<ui:include src="includes/dialogs/privacyPreferencesComponents.xhtml" />
+	</ui:define>
+</ui:composition>
+</html>

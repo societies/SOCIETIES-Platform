@@ -70,7 +70,7 @@ public class ObfuscatorInfoFactory {
 	 * @return Obfuscator information
 	 */
 	public ObfuscatorInfo getObfuscatorInfo(String dataType) {
-		if (mappingDataType2ObfuscatorInfo.containsKey(dataType)) {
+		if (null != dataType && mappingDataType2ObfuscatorInfo.containsKey(dataType)) {
 			return mappingDataType2ObfuscatorInfo.get(dataType);
 		}
 		return unobfuscatableInfo;

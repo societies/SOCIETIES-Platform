@@ -10,6 +10,7 @@ out/
 bin/
 gen/
 target/
+target-android/
 build/
 *.apk
 *.jar
@@ -61,3 +62,4 @@ platform-infrastructure/sns/.DS_Store
 
 *.properties
 !org.societies.integration.test.properties
+!org.societies.local.properties

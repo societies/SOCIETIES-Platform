@@ -24,9 +24,6 @@
  */
 package org.societies.personalisation.CAUI.api.model;
 
-import java.io.Serializable;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Implementation class of the ICommunityIntentTask.

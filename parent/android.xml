@@ -251,7 +251,36 @@
                             		<artifactId>build-helper-maven-plugin</artifactId>
                             		<version>1.7</version>
                         	</plugin>
-  
+ 				 <plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<executions>
+						<!-- Used to copy the generated artifact to the container defined by 
+							VIRGO_HOME -->
+						<execution>
+							<id>copy</id>
+							<phase>install</phase>
+							<goals>
+								<goal>copy</goal>
+							</goals>
+							<configuration>
+								<stripVersion>false</stripVersion>
+							</configuration>
+						</execution>
+						<!-- Used to analyze the dependencies of the project. Will print warnings 
+							during verify phase,directly before install phase -->
+						<execution>
+							<id>analyze</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>analyze-only</goal>
+							</goals>
+							<configuration>
+								<failOnWarning>false</failOnWarning>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
 	     			<plugin>
 	        			<groupId>org.codehaus.mojo</groupId>
 	        			<artifactId>findbugs-maven-plugin</artifactId>

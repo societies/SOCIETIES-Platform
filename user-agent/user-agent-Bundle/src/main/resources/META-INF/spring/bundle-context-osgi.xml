@@ -42,6 +42,9 @@
     <osgi:service ref="privacyPolicyNegotiationHistoryRepositoryBean"
                   interface="org.societies.useragent.api.feedback.IPrivacyPolicyNegotiationHistoryRepository"/>
 
+    <osgi:service ref="accessControlHistoryRepositoryBean"
+                  interface="org.societies.useragent.api.feedback.IAccessControlHistoryRepository"/>
+
 
     <!-- Import External services -->
 

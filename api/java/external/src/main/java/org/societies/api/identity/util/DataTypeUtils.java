@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.schema.identity.DataTypeDescription;
 
@@ -42,7 +40,7 @@ import org.societies.api.schema.identity.DataTypeDescription;
  * @author Olivier Maridat (Trialog)
  */
 public class DataTypeUtils {
-	private static Logger LOG = LoggerFactory.getLogger(DataTypeUtils.class.getName());
+//	private static Logger LOG = LoggerFactory.getLogger(DataTypeUtils.class.getName());
 	private static Map<String, Set<String>> dataTypeHierarchy;
 	private static Map<String, String> dataTypeAntiHierarchy;
 	private static Map<String, DataTypeDescription> dataTypeDescription;
@@ -51,7 +49,7 @@ public class DataTypeUtils {
 
 	public DataTypeUtils() {
 		if (!loaded) {
-			LOG.debug("SOCIETIES data type hierarchy loading... This message should apear only one time. If you see it several times, please contact Olivier Maridat (Trialog)");
+//			LOG.debug("SOCIETIES data type hierarchy loading... This message should apear only one time. If you see it several times, please contact Olivier Maridat (Trialog)");
 			dataTypeHierarchy = new HashMap<String, Set<String>>();
 			dataTypeAntiHierarchy = new HashMap<String, String>();
 			dataTypeDescription = new HashMap<String, DataTypeDescription>();
@@ -183,7 +181,51 @@ public class DataTypeUtils {
 		// No parent
 		return null;
 	}
-	
+
+	/**
+	 * To sort a list of data types by their parent
+	 * E.g. NAME_FIRST (leaf), NAME_LAST (leaf), ACTION (root and leaf)  will be sorted as: NAME -> NAME_FIRST, NAME_LAST ; ACTION -> ACTION
+	 * E.g. NAME (root not leaf), NAME_FIRST (leaf), NAME_LAST (leaf), ACTION (root and leaf) will be sorted as: NAME -> NAME_FIRST, NAME_LAST ; ACTION -> ACTION
+	 * E.g. NAME (root not leaf), ACTION (root and leaf) will be sorted as: NAME -> null ; ACTION -> ACTION
+	 * @param dataTypes List of data type names
+	 * @return A map of parent types and their related sub-types (or this parent type if it is also a leaf)
+	 */
+	public Map<String, Set<String>> sortByParent(Set<String> dataTypes) {
+		if (null == dataTypes || dataTypes.size() <= 0) {
+			return null;
+		}
+		// -- Create the map
+		Map<String, Set<String>> sorted = new HashMap<String, Set<String>>();
+		for(String dataType : dataTypes) {
+			// Retrieve parent type
+			String dataTypeParent = getParent(dataType);
+			Set<String> dataTypeGroup = null;
+			// Parent type
+			if (null == dataTypeParent) {
+				dataTypeParent = dataType;
+				// Parent & leaf
+				if (isLeaf(dataType)) {
+					dataTypeGroup = new HashSet<String>();
+					dataTypeGroup.add(dataType);
+				}
+				// Parent with children
+				else {
+					dataTypeGroup = sorted.get(dataTypeParent);
+				}
+			}
+			// Child
+			else {
+				dataTypeGroup = sorted.get(dataTypeParent);
+				if (null == dataTypeGroup) {
+					dataTypeGroup = new HashSet<String>();
+				}
+				dataTypeGroup.add(dataType);
+			}
+			sorted.put(dataTypeParent, dataTypeGroup);
+		}
+		return sorted;
+	}
+
 	/**
 	 * To retrieve the friendly description of a data type
 	 * If no existing friendly description is retrieved, the data type is sanitized and returned
@@ -247,7 +289,7 @@ public class DataTypeUtils {
 		legumeChildren.add("middle");
 		legumeChildren.add("leaf1");
 		addChildren("root", legumeChildren);
-		
+
 		Set<String> courgeChildren = new HashSet<String>();
 		courgeChildren.add("leaf2");
 		addChildren("middle", courgeChildren);
@@ -272,6 +314,11 @@ public class DataTypeUtils {
 		addDataTypeDescription(CtxAttributeTypes.AGE, "Age of this entity");
 		addDataTypeDescription(CtxAttributeTypes.BOOKS, "Favorite books", "Favorite books of this entity");
 		addDataTypeDescription(CtxAttributeTypes.LOCATION_SYMBOLIC, "Symbolic location", "Symbolic location");
+		addDataTypeDescription(CtxAttributeTypes.NAME_FIRST, "First name", "First name");
+		addDataTypeDescription(CtxAttributeTypes.NAME_LAST, "Last name", "Last name");
+		addDataTypeDescription(CtxAttributeTypes.ADDRESS_HOME_CITY, "City home address", "City of this entity's home address");
+		addDataTypeDescription("ADDRESS_HOME", "Home address", "Address of this entity's home");
+		addDataTypeDescription("ADDRESS_WORK", "Work address", "Address of this entity's work");
 		return true;
 	}
 

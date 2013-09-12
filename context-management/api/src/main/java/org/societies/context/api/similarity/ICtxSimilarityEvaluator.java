@@ -27,11 +27,28 @@ package org.societies.context.api.similarity;
 import java.util.ArrayList;
 
 import org.societies.api.context.model.CtxEvaluationResults;
-
 /**
- * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @author <a href="mailto:eboylan@tssg.org">Emmet Boylan</a> (TSSG)
+ * @since 1.0
+ * 
  */
 public interface ICtxSimilarityEvaluator {
+	
+	/**
+	 * Check 2 or more entities for similarity in 1 or more attributes.
+	 * @param ids
+	 * 		String array of user IDs of entities to be compared
+	 * @param attrib
+	 * 		ArrayList<String> of attributes to test for similarity eg. books and movies
+	 * @return CtxEvaluationResults
+	 * 		The returned CtxEvaluationResults can be accessed by the following methods
+	 * 			*Boolean getResult() returns a Boolean value. True for results of 50%+ similarity, false 
+	 * 				for lower.
+	 * 			*HashMap<String, String> getSummary() returns a hashmap containing attributes
+	 * 				compared as the key and the result for that attribute as the value.
+	 * 			*HashMap getAttBreakDown() returns a hashmap containing the similarity evaluation results
+	 * 				down according to the taxonomy of the attribute compared.
+	 */
 
 	public CtxEvaluationResults evaluateSimilarity(String[] ids, ArrayList<String> attrib);
 	

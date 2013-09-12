@@ -27,6 +27,7 @@ package org.societies.api.identity.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
@@ -68,7 +69,11 @@ public class RequestorUtils {
 		else {
 			RequestorServiceBean requestor = new RequestorServiceBean();
 			requestor.setRequestorId(requestorId);
-			requestor.setRequestorServiceId(ServiceUtils.generateServiceResourceIdentifierFromString(requestorCisOrServiceId));
+			try {
+				requestor.setRequestorServiceId(ServiceUtils.generateServiceResourceIdentifierFromString(requestorCisOrServiceId));
+			} catch(Exception e) {
+				return null;
+			}
 			return requestor;
 		}
 	}
@@ -101,7 +106,7 @@ public class RequestorUtils {
 			sb.append("</Subject>");
 		}
 		return sb.toString();
-	}	
+	}
 
 	public static String toString(RequestorBean bean){
 		StringBuilder builder = new StringBuilder();
@@ -128,6 +133,27 @@ public class RequestorUtils {
 		}
 		builder.append("]");
 		return builder.toString();
+	}
+
+	public static String toUriString(RequestorBean requestor){
+		StringBuilder sb = new StringBuilder();
+		sb.append("requestor://");
+		if (null != requestor) {
+			sb.append(requestor.getRequestorId());
+			if (requestor instanceof RequestorCisBean) {
+				sb.append("/"+((RequestorCisBean)requestor).getCisRequestorId());
+			}
+			if (requestor instanceof RequestorServiceBean) {
+				if (null != ((RequestorServiceBean)requestor).getRequestorServiceId()) {
+					sb.append("/"+((RequestorServiceBean)requestor).getRequestorServiceId().getServiceInstanceIdentifier());
+					if (null != ((RequestorServiceBean)requestor).getRequestorServiceId().getIdentifier()) {
+						sb.append("/"+((RequestorServiceBean)requestor).getRequestorServiceId().getIdentifier().toString());
+					}
+				}
+			}
+		}
+		// Return the md5 of this URI
+		return DigestUtils.md5Hex(sb.toString());
 	}
 
 

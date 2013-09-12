@@ -44,12 +44,15 @@ import org.societies.api.schema.identity.RequestorServiceBean;
  * @created 09-nov.-2011 16:45:26
  */
 public interface IPrivacyDataManager extends IServiceManager {
-	public String methodsArray [] = {"checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions)",
-			  	"obfuscateData(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper)",
-				"hasObfuscatedVersion(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper)",
-				"startService()",
-				"stopService()"
-			 };
+	public String methodsArray [] = {
+			"checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions)",
+			"checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, Action action)",
+			"checkPermission(String clientPackage, RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions)",
+			"checkPermission(String clientPackage, RequestorBean requestor, List<DataIdentifier> dataIds, Action action)",
+		  	"obfuscateData(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper)",
+			"startService()",
+			"stopService()"
+		 };
 	
 	/**
 	 * Intent default action: If there is an error, the action name can't be retrieve and this one is used instead.
@@ -75,11 +78,26 @@ public interface IPrivacyDataManager extends IServiceManager {
 	 * @param clientPackage Client package name
 	 * @param requestor Id of the requestor: CSS {@link RequestorBean}, CIS {@link RequestorCisBean} or the 3P service {@link RequestorServiceBean}
 	 * @param dataId Id of the requested data
-	 * @param action Actions requested over this data
+	 * @param actions Actions requested over this data
 	 * @post The response is available in an Intent: {@link MethodType}::CHECK_PERMISSION. {@link IPrivacyDataManager}INTENT_RETURN_STATUS_KEY contains the status of the request and the meaning of an eventual failure is available in {@link IPrivacyDataManager}::INTENT_RETURN_STATUS_MSG_KEY. {@link IPrivacyDataManager}::INTENT_RETURN_VALUE_KEY contains a {@link ResponseItem}
 	 * @throws PrivacyException
 	 */
 	public void checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException;
+	/**
+	 * Check permission to access/update/disclose a data
+	 * Duplication of {@link IPrivacyDataManager}{@link #checkPermission(String, RequestorBean, List, List)} for utility purpose
+	 */
+	public void checkPermission(String clientPackage, RequestorBean requestor, DataIdentifier dataId, Action action) throws PrivacyException;
+	/**
+	 * Check permission to access/update/disclose a data
+	 * Duplication of {@link IPrivacyDataManager}{@link #checkPermission(String, RequestorBean, List, List)} for utility purpose
+	 */
+	public void checkPermission(String clientPackage, RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException;
+	/**
+	 * Check permission to access/update/disclose a data
+	 * Duplication of {@link IPrivacyDataManager}{@link #checkPermission(String, RequestorBean, List, List)} for utility purpose
+	 */
+	public void checkPermission(String clientPackage, RequestorBean requestor, List<DataIdentifier> dataIds, Action action) throws PrivacyException;
 
 	/**
 	 * Protect a data following the user preferences by obfuscating it to a correct
@@ -93,14 +111,4 @@ public interface IPrivacyDataManager extends IServiceManager {
 	 * @throws PrivacyException
 	 */
 	public void obfuscateData(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException;
-
-	/**
-	 * Check if there is an obfuscated version of the data and return its ID.
-	 * @param clientPackage Client package name
-	 * @param requestor Id of the requestor: CSS {@link RequestorBean}, CIS {@link RequestorCisBean} or the 3P service {@link RequestorServiceBean}
-	 * @param dataWrapper Data Id wrapped in the relevant DataWrapper. Only the Id information is mandatory to retrieve an obfuscated version. Use {@link DataWrapperFactory} to select the relevant {@link DataWrapper}
-	 * @post The response is available in an Intent: {@link MethodType}::CHECK_PERMISSION. {@link IPrivacyDataManager}INTENT_RETURN_STATUS_KEY contains the status of the request and the meaning of an eventual failure is available in {@link IPrivacyDataManager}::INTENT_RETURN_STATUS_MSG_KEY. {@link IPrivacyDataManager}::INTENT_RETURN_VALUE_KEY contains a {@link DataIdentifier} containing the id of the data to use
-	 * @throws PrivacyException
-	 */
-	public void hasObfuscatedVersion(String clientPackage, RequestorBean requestor, DataWrapper dataWrapper) throws PrivacyException;
 }

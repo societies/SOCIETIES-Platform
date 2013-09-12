@@ -31,5 +31,9 @@
 	<bean id="mockTrustEventMgr" class="org.societies.privacytrust.trust.test.util.MockitoFactoryBean">
 		<constructor-arg name="classToBeMocked" value="org.societies.privacytrust.trust.api.event.ITrustEventMgr" />
 	</bean>
+	
+	<bean id="mockEventMgr" class="org.societies.privacytrust.trust.test.util.MockitoFactoryBean">
+		<constructor-arg name="classToBeMocked" value="org.societies.api.osgi.event.IEventMgr" />
+	</bean>
 		
 </beans>

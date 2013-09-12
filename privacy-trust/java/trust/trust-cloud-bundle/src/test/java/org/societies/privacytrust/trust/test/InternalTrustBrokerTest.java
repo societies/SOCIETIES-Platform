@@ -32,7 +32,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -46,7 +45,7 @@ import org.mockito.MockitoAnnotations;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.privacytrust.trust.model.ExtTrustRelationship;
-import org.societies.api.privacytrust.trust.TrustException;
+import org.societies.api.privacytrust.trust.TrustAccessControlException;
 import org.societies.api.privacytrust.trust.TrustQuery;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
 import org.societies.api.privacytrust.trust.model.TrustEvidence;
@@ -59,6 +58,7 @@ import org.societies.privacytrust.trust.api.evidence.model.ITrustEvidence;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.societies.privacytrust.trust.api.model.ITrustedCis;
 import org.societies.privacytrust.trust.api.model.ITrustedCss;
+import org.societies.privacytrust.trust.api.model.ITrustedEntity;
 import org.societies.privacytrust.trust.api.model.ITrustedService;
 import org.societies.privacytrust.trust.api.repo.ITrustRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,6 +86,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 	
 	private static final String TRUSTED_CIS_ID = BASE_ID + "TrusteeCisIIdentity";
 	
+	private static final String TRUSTED_CIS_ID2 = BASE_ID + "TrusteeCisIIdentity2";
+	
 	private static final String TRUSTED_SERVICE_ID = BASE_ID + "TrusteeServiceResourceIdentifier";
 	
 	//private static final String TRUSTED_SERVICE_TYPE = BASE_ID + "ServiceType";
@@ -97,6 +99,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 	private static TrustedEntityId trusteeCssTeid;
 	
 	private static TrustedEntityId trusteeCisTeid;
+	
+	private static TrustedEntityId trusteeCisTeid2;
 	
 	private static TrustedEntityId trusteeServiceTeid;
 	
@@ -123,6 +127,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		trustorCssTeid2 = new TrustedEntityId(TrustedEntityType.CSS, TRUSTOR_CSS_ID2);
 		trusteeCssTeid = new TrustedEntityId(TrustedEntityType.CSS, TRUSTED_CSS_ID);
 		trusteeCisTeid = new TrustedEntityId(TrustedEntityType.CIS, TRUSTED_CIS_ID);
+		trusteeCisTeid2 = new TrustedEntityId(TrustedEntityType.CIS, TRUSTED_CIS_ID2);
 		trusteeServiceTeid = new TrustedEntityId(TrustedEntityType.SVC, TRUSTED_SERVICE_ID);
 	}
 
@@ -136,6 +141,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		trustorCssTeid2 = null;
 		trusteeCssTeid = null;
 		trusteeCisTeid = null;
+		trusteeCisTeid2 = null;
 		trusteeServiceTeid = null;
 	}
 
@@ -159,13 +165,14 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 	 */
 	@After
 	public void tearDown() throws Exception {
+		// remove created entities
+		this.trustRepo.removeEntities(null, null, null);
 	}
 	
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
+	 * 
+	 * @throws Exception 
 	 */
 	@Test
 	public void testRetrieveAllTrustRelationships() throws Exception {
@@ -391,18 +398,12 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(serviceUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 	
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveExtTrustRelationships(TrustedEntityId)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
+	 * 
+	 * @throws Exception 
 	 */
 	@Test
 	public void testRetrieveAllExtTrustRelationships() throws Exception {
@@ -502,17 +503,9 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		// verify related evidence
 		assertNotNull(retrievedTrustRelationship.getTrustEvidence());
 		assertFalse(retrievedTrustRelationship.getTrustEvidence().isEmpty());
-		assertEquals(2, retrievedTrustRelationship.getTrustEvidence().size());
+		assertEquals(1, retrievedTrustRelationship.getTrustEvidence().size());
 		Iterator<TrustEvidence> evidenceIter = retrievedTrustRelationship.getTrustEvidence().iterator();
-		// old CSS evidence
-		evidence = evidenceIter.next();
-		assertEquals(cssEvidence.getSubjectId(), evidence.getSubjectId());
-		assertEquals(cssEvidence.getObjectId(), evidence.getObjectId());
-		assertEquals(cssEvidence.getType(), evidence.getType());
-		assertEquals(cssEvidence.getTimestamp(), evidence.getTimestamp());
-		assertEquals(cssEvidence.getInfo(), evidence.getInfo());
-		assertEquals(cssEvidence.getSourceId(), evidence.getSourceId());
-		// new CSS evidence
+		// indirect evidence
 		TrustEvidence evidence2 = evidenceIter.next();
 		assertEquals(cssEvidence2.getSubjectId(), evidence2.getSubjectId());
 		assertEquals(cssEvidence2.getObjectId(), evidence2.getObjectId());
@@ -685,18 +678,12 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(serviceUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 	
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustedEntityId)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
+	 * 
+	 * @throws Exception 
 	 */
 	@Test
 	public void testRetrieveCssTrustRelationships() throws Exception {
@@ -796,16 +783,12 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
 	}
 	
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveExtTrustRelationships(TrustedEntityId, TrustedEntityId)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
+	 * 
+	 * @throws Exception 
 	 */
 	@Test
 	public void testRetrieveCssExtTrustRelationships() throws Exception {
@@ -899,16 +882,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		// verify related evidence
 		assertNotNull(retrievedTrustRelationship.getTrustEvidence());
 		assertFalse(retrievedTrustRelationship.getTrustEvidence().isEmpty());
-		assertEquals(2, retrievedTrustRelationship.getTrustEvidence().size());
+		assertEquals(1, retrievedTrustRelationship.getTrustEvidence().size());
 		Iterator<TrustEvidence> evidenceIter = retrievedTrustRelationship.getTrustEvidence().iterator();
-		// old CSS evidence
-		evidence = evidenceIter.next();
-		assertEquals(cssEvidence.getSubjectId(), evidence.getSubjectId());
-		assertEquals(cssEvidence.getObjectId(), evidence.getObjectId());
-		assertEquals(cssEvidence.getType(), evidence.getType());
-		assertEquals(cssEvidence.getTimestamp(), evidence.getTimestamp());
-		assertEquals(cssEvidence.getInfo(), evidence.getInfo());
-		assertEquals(cssEvidence.getSourceId(), evidence.getSourceId());
 		// new CSS evidence
 		TrustEvidence evidence2 = evidenceIter.next();
 		assertEquals(cssEvidence2.getSubjectId(), evidence2.getSubjectId());
@@ -947,17 +922,15 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
+		assertNotNull(retrievedTrustRelationship.getTrustEvidence());
+		assertTrue(retrievedTrustRelationship.getTrustEvidence().isEmpty());
 	}
 	
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustedEntityId)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
-	 *
+	 * 
+	 * @throws Exception 
+	 */
 	@Test
 	public void testRetrieveCisTrustRelationships() throws Exception {
 		
@@ -969,7 +942,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		Set<TrustRelationship> retrievedTrustRelationships;
 		
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustorCssTeid, trusteeCisTeid).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeCisTeid)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertTrue(retrievedTrustRelationships.isEmpty());
 		
@@ -981,7 +954,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCis.getTrustorId(), trustedCis.getTrusteeId()).get();
+				new TrustQuery(trustedCis.getTrustorId()).setTrusteeId(trustedCis.getTrusteeId())).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(1, retrievedTrustRelationships.size());
@@ -1004,7 +977,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCis.getTrustorId(), trustedCis.getTrusteeId()).get();
+				new TrustQuery(trustedCis.getTrustorId()).setTrusteeId(trustedCis.getTrusteeId())).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(2, retrievedTrustRelationships.size());
@@ -1033,7 +1006,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCis.getTrustorId(), trustedCis.getTrusteeId()).get();
+				new TrustQuery(trustedCis.getTrustorId()).setTrusteeId(trustedCis.getTrusteeId())).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(3, retrievedTrustRelationships.size());
@@ -1053,17 +1026,13 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
 	}
 	
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustedEntityId)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
-	 *
+	 * 
+	 * @throws Exception 
+	 */
 	@Test
 	public void testRetrieveServiceTrustRelationships() throws Exception {
 		
@@ -1075,7 +1044,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		Set<TrustRelationship> retrievedTrustRelationships;
 		
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustorCssTeid, trusteeServiceTeid).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeServiceTeid)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertTrue(retrievedTrustRelationships.isEmpty());
 		
@@ -1087,7 +1056,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedService.getTrustorId(), trustedService.getTrusteeId()).get();
+				new TrustQuery(trustedService.getTrustorId()).setTrusteeId(trustedService.getTrusteeId())).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(1, retrievedTrustRelationships.size());
@@ -1110,7 +1079,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedService.getTrustorId(), trustedService.getTrusteeId()).get();
+				new TrustQuery(trustedService.getTrustorId()).setTrusteeId(trustedService.getTrusteeId())).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(2, retrievedTrustRelationships.size());
@@ -1139,7 +1108,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedService.getTrustorId(), trustedService.getTrusteeId()).get();
+				new TrustQuery(trustedService.getTrustorId()).setTrusteeId(trustedService.getTrusteeId())).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(3, retrievedTrustRelationships.size());
@@ -1159,17 +1128,13 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 	
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationship(TrustedEntityId, TrustedEntityId, TrustValueType)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
-	 *
+	 * 
+	 * @throws Exception 
+	 */
 	@Test
 	public void testRetrieveCssTrustRelationship() throws Exception {
 		
@@ -1184,13 +1149,16 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		TrustRelationship retrievedTrustRelationship;
 		
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustorCssTeid, trusteeCssTeid, TrustValueType.DIRECT).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeCssTeid)
+						.setTrustValueType(TrustValueType.DIRECT)).get(); 
 		assertNull(retrievedTrustRelationship);
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustorCssTeid, trusteeCssTeid, TrustValueType.INDIRECT).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeCssTeid)
+						.setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNull(retrievedTrustRelationship);
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustorCssTeid, trusteeCssTeid, TrustValueType.USER_PERCEIVED).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeCssTeid)
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 		assertNull(retrievedTrustRelationship);
 		
 		// add trusted CSS with trust values
@@ -1203,7 +1171,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.DIRECT).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeId(trustedCss.getTrusteeId())
+						.setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNotNull(retrievedTrustRelationship);
 		assertNotNull(retrievedTrustRelationship.getTrustorId());
 		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
@@ -1216,7 +1185,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
 		
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.INDIRECT).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeId(trustedCss.getTrusteeId())
+						.setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNotNull(retrievedTrustRelationship);
 		assertNotNull(retrievedTrustRelationship.getTrustorId());
 		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
@@ -1229,7 +1199,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
 		
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeId(trustedCss.getTrusteeId())
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 		assertNotNull(retrievedTrustRelationship);
 		assertNotNull(retrievedTrustRelationship.getTrustorId());
 		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
@@ -1251,7 +1222,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.DIRECT).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeId(trustedCss.getTrusteeId())
+						.setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNotNull(retrievedTrustRelationship);
 		assertNotNull(retrievedTrustRelationship.getTrustorId());
 		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
@@ -1264,7 +1236,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
 		
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.INDIRECT).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeId(trustedCss.getTrusteeId())
+						.setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNotNull(retrievedTrustRelationship);
 		assertNotNull(retrievedTrustRelationship.getTrustorId());
 		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
@@ -1277,7 +1250,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
 		
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeId(trustedCss.getTrusteeId())
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 		assertNotNull(retrievedTrustRelationship);
 		assertNotNull(retrievedTrustRelationship.getTrustorId());
 		assertEquals(trustedCss.getTrustorId(), retrievedTrustRelationship.getTrustorId());
@@ -1288,17 +1262,13 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(userPerceivedTrustValue2), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
 	}
 	
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationship(TrustedEntityId, TrustedEntityId, TrustValueType)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
-	 *
+	 * 
+	 * @throws Exception 
+	 */
 	@Test
 	public void testRetrieveCisTrustRelationship() throws Exception {
 		
@@ -1313,13 +1283,16 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		TrustRelationship retrievedTrustRelationship;
 		
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustorCssTeid, trusteeCisTeid, TrustValueType.DIRECT).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeCisTeid)
+						.setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNull(retrievedTrustRelationship);
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustorCssTeid, trusteeCisTeid, TrustValueType.INDIRECT).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeCisTeid)
+						.setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNull(retrievedTrustRelationship);
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustorCssTeid, trusteeCisTeid, TrustValueType.USER_PERCEIVED).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeCisTeid)
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 		assertNull(retrievedTrustRelationship);
 		
 		// add trusted CSS with trust values
@@ -1332,7 +1305,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.DIRECT).get();
+				new TrustQuery(trustedCis.getTrustorId()).setTrusteeId(trustedCis.getTrusteeId())
+						.setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNotNull(retrievedTrustRelationship);
 		assertNotNull(retrievedTrustRelationship.getTrustorId());
 		assertEquals(trustedCis.getTrustorId(), retrievedTrustRelationship.getTrustorId());
@@ -1345,7 +1319,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
 		
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.INDIRECT).get();
+				new TrustQuery(trustedCis.getTrustorId()).setTrusteeId(trustedCis.getTrusteeId())
+						.setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNotNull(retrievedTrustRelationship);
 		assertNotNull(retrievedTrustRelationship.getTrustorId());
 		assertEquals(trustedCis.getTrustorId(), retrievedTrustRelationship.getTrustorId());
@@ -1358,7 +1333,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
 		
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+				new TrustQuery(trustedCis.getTrustorId()).setTrusteeId(trustedCis.getTrusteeId())
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 		assertNotNull(retrievedTrustRelationship);
 		assertNotNull(retrievedTrustRelationship.getTrustorId());
 		assertEquals(trustedCis.getTrustorId(), retrievedTrustRelationship.getTrustorId());
@@ -1380,7 +1356,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.DIRECT).get();
+				new TrustQuery(trustedCis.getTrustorId()).setTrusteeId(trustedCis.getTrusteeId())
+						.setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNotNull(retrievedTrustRelationship);
 		assertNotNull(retrievedTrustRelationship.getTrustorId());
 		assertEquals(trustedCis.getTrustorId(), retrievedTrustRelationship.getTrustorId());
@@ -1393,7 +1370,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
 		
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.INDIRECT).get();
+				new TrustQuery(trustedCis.getTrustorId()).setTrusteeId(trustedCis.getTrusteeId())
+						.setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNotNull(retrievedTrustRelationship);
 		assertNotNull(retrievedTrustRelationship.getTrustorId());
 		assertEquals(trustedCis.getTrustorId(), retrievedTrustRelationship.getTrustorId());
@@ -1406,7 +1384,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
 		
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+				new TrustQuery(trustedCis.getTrustorId()).setTrusteeId(trustedCis.getTrusteeId())
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 		assertNotNull(retrievedTrustRelationship);
 		assertNotNull(retrievedTrustRelationship.getTrustorId());
 		assertEquals(trustedCis.getTrustorId(), retrievedTrustRelationship.getTrustorId());
@@ -1417,17 +1396,13 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(userPerceivedTrustValue2), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
 	}
 	
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationship(TrustedEntityId, TrustedEntityId, TrustValueType)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
-	 *
+	 * 
+	 * @throws Exception 
+	 */
 	@Test
 	public void testRetrieveServiceTrustRelationship() throws Exception {
 		
@@ -1442,13 +1417,16 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		TrustRelationship retrievedTrustRelationship;
 		
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustorCssTeid, trusteeServiceTeid, TrustValueType.DIRECT).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeServiceTeid)
+						.setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNull(retrievedTrustRelationship);
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustorCssTeid, trusteeServiceTeid, TrustValueType.INDIRECT).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeServiceTeid)
+						.setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNull(retrievedTrustRelationship);
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustorCssTeid, trusteeServiceTeid, TrustValueType.USER_PERCEIVED).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeServiceTeid)
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 		assertNull(retrievedTrustRelationship);
 		
 		// add trusted CSS with trust values
@@ -1461,7 +1439,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.DIRECT).get();
+				new TrustQuery(trustedService.getTrustorId()).setTrusteeId(trustedService.getTrusteeId())
+						.setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNotNull(retrievedTrustRelationship);
 		assertNotNull(retrievedTrustRelationship.getTrustorId());
 		assertEquals(trustedService.getTrustorId(), retrievedTrustRelationship.getTrustorId());
@@ -1474,7 +1453,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
 		
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.INDIRECT).get();
+				new TrustQuery(trustedService.getTrustorId()).setTrusteeId(trustedService.getTrusteeId())
+						.setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNotNull(retrievedTrustRelationship);
 		assertNotNull(retrievedTrustRelationship.getTrustorId());
 		assertEquals(trustedService.getTrustorId(), retrievedTrustRelationship.getTrustorId());
@@ -1487,7 +1467,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
 		
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+				new TrustQuery(trustedService.getTrustorId()).setTrusteeId(trustedService.getTrusteeId())
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 		assertNotNull(retrievedTrustRelationship);
 		assertNotNull(retrievedTrustRelationship.getTrustorId());
 		assertEquals(trustedService.getTrustorId(), retrievedTrustRelationship.getTrustorId());
@@ -1509,7 +1490,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.DIRECT).get();
+				new TrustQuery(trustedService.getTrustorId()).setTrusteeId(trustedService.getTrusteeId())
+						.setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNotNull(retrievedTrustRelationship);
 		assertNotNull(retrievedTrustRelationship.getTrustorId());
 		assertEquals(trustedService.getTrustorId(), retrievedTrustRelationship.getTrustorId());
@@ -1522,7 +1504,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
 		
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.INDIRECT).get();
+				new TrustQuery(trustedService.getTrustorId()).setTrusteeId(trustedService.getTrusteeId())
+						.setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNotNull(retrievedTrustRelationship);
 		assertNotNull(retrievedTrustRelationship.getTrustorId());
 		assertEquals(trustedService.getTrustorId(), retrievedTrustRelationship.getTrustorId());
@@ -1535,7 +1518,8 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
 		
 		retrievedTrustRelationship = this.internalTrustBroker.retrieveTrustRelationship(
-				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+				new TrustQuery(trustedService.getTrustorId()).setTrusteeId(trustedService.getTrusteeId())
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();					
 		assertNotNull(retrievedTrustRelationship);
 		assertNotNull(retrievedTrustRelationship.getTrustorId());
 		assertEquals(trustedService.getTrustorId(), retrievedTrustRelationship.getTrustorId());
@@ -1546,17 +1530,13 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(userPerceivedTrustValue2), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustValue(TrustedEntityId, TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
-	 *
+	 * 
+	 * @throws Exception 
+	 */
 	@Test
 	public void testRetrieveCssTrustValue() throws Exception {
 		
@@ -1571,13 +1551,16 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		Double retrievedTrustValue;
 		
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustorCssTeid, trusteeCssTeid, TrustValueType.DIRECT).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeCssTeid)
+						.setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNull(retrievedTrustValue);
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustorCssTeid, trusteeCssTeid, TrustValueType.INDIRECT).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeCssTeid)
+						.setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNull(retrievedTrustValue);
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustorCssTeid, trusteeCssTeid, TrustValueType.USER_PERCEIVED).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeCssTeid)
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 		assertNull(retrievedTrustValue);
 		
 		// add trusted CSS with trust values
@@ -1590,15 +1573,18 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.DIRECT).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeId(trustedCss.getTrusteeId())
+						.setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(directTrustValue1), retrievedTrustValue);
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.INDIRECT).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeId(trustedCss.getTrusteeId())
+						.setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(indirectTrustValue1), retrievedTrustValue);
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeId(trustedCss.getTrusteeId())
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustValue);
 		
@@ -1612,28 +1598,27 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.DIRECT).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeId(trustedCss.getTrusteeId())
+						.setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(directTrustValue2), retrievedTrustValue);
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.INDIRECT).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeId(trustedCss.getTrusteeId())
+						.setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(indirectTrustValue2), retrievedTrustValue);
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustedCss.getTrustorId(), trustedCss.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeId(trustedCss.getTrusteeId())
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(userPerceivedTrustValue2), retrievedTrustValue);
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
 	}
 
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustValue(TrustedEntityId, TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
-	 *
+	 * 
+	 * @throws Exception 
+	 */
 	@Test
 	public void testRetrieveCisTrustValue() throws Exception {
 		
@@ -1648,13 +1633,16 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		Double retrievedTrustValue;
 		
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustorCssTeid, trusteeCisTeid, TrustValueType.DIRECT).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeCisTeid)
+						.setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNull(retrievedTrustValue);
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustorCssTeid, trusteeCisTeid, TrustValueType.INDIRECT).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeCisTeid)
+						.setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNull(retrievedTrustValue);
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustorCssTeid, trusteeCisTeid, TrustValueType.USER_PERCEIVED).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeCisTeid)
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 		assertNull(retrievedTrustValue);
 		
 		// add trusted CIS with trust values
@@ -1667,15 +1655,18 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.DIRECT).get();
+				new TrustQuery(trustedCis.getTrustorId()).setTrusteeId(trustedCis.getTrusteeId())
+						.setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(directTrustValue1), retrievedTrustValue);
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.INDIRECT).get();
+				new TrustQuery(trustedCis.getTrustorId()).setTrusteeId(trustedCis.getTrusteeId())
+						.setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(indirectTrustValue1), retrievedTrustValue);
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+				new TrustQuery(trustedCis.getTrustorId()).setTrusteeId(trustedCis.getTrusteeId())
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustValue);
 		
@@ -1689,28 +1680,27 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.DIRECT).get();
+				new TrustQuery(trustedCis.getTrustorId()).setTrusteeId(trustedCis.getTrusteeId())
+						.setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(directTrustValue2), retrievedTrustValue);
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.INDIRECT).get();
+				new TrustQuery(trustedCis.getTrustorId()).setTrusteeId(trustedCis.getTrusteeId())
+						.setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(indirectTrustValue2), retrievedTrustValue);
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustedCis.getTrustorId(), trustedCis.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+				new TrustQuery(trustedCis.getTrustorId()).setTrusteeId(trustedCis.getTrusteeId())
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(userPerceivedTrustValue2), retrievedTrustValue);
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
 	}
 	
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustValue(TrustedEntityId, TrustedEntityId, org.societies.api.privacytrust.trust.model.TrustValueType)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
-	 *
+	 * 
+	 * @throws Exception 
+	 */
 	@Test
 	public void testRetrieveServiceTrustValue() throws Exception {
 		
@@ -1725,13 +1715,16 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		Double retrievedTrustValue;
 		
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustorCssTeid, trusteeServiceTeid, TrustValueType.DIRECT).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeServiceTeid)
+						.setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNull(retrievedTrustValue);
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustorCssTeid, trusteeServiceTeid, TrustValueType.INDIRECT).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeServiceTeid)
+						.setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNull(retrievedTrustValue);
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustorCssTeid, trusteeServiceTeid, TrustValueType.USER_PERCEIVED).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeId(trusteeServiceTeid)
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 		assertNull(retrievedTrustValue);
 		
 		// add trusted CIS with trust values
@@ -1744,15 +1737,18 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.DIRECT).get();
+				new TrustQuery(trustedService.getTrustorId()).setTrusteeId(trustedService.getTrusteeId())
+						.setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(directTrustValue1), retrievedTrustValue);
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.INDIRECT).get();
+				new TrustQuery(trustedService.getTrustorId()).setTrusteeId(trustedService.getTrusteeId())
+						.setTrustValueType(TrustValueType.INDIRECT)).get();					
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(indirectTrustValue1), retrievedTrustValue);
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+				new TrustQuery(trustedService.getTrustorId()).setTrusteeId(trustedService.getTrusteeId())
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(userPerceivedTrustValue1), retrievedTrustValue);
 		
@@ -1766,28 +1762,27 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.DIRECT).get();
+				new TrustQuery(trustedService.getTrustorId()).setTrusteeId(trustedService.getTrusteeId())
+						.setTrustValueType(TrustValueType.DIRECT)).get();					
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(directTrustValue2), retrievedTrustValue);
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.INDIRECT).get();
+				new TrustQuery(trustedService.getTrustorId()).setTrusteeId(trustedService.getTrusteeId())
+						.setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(indirectTrustValue2), retrievedTrustValue);
 		retrievedTrustValue = this.internalTrustBroker.retrieveTrustValue(
-				trustedService.getTrustorId(), trustedService.getTrusteeId(), TrustValueType.USER_PERCEIVED).get();
+				new TrustQuery(trustedService.getTrustorId()).setTrusteeId(trustedService.getTrusteeId())
+						.setTrustValueType(TrustValueType.USER_PERCEIVED)).get();
 		assertNotNull(retrievedTrustValue);
 		assertEquals(new Double(userPerceivedTrustValue2), retrievedTrustValue);
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 	
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustedEntityType)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
-	 *
+	 * 
+	 * @throws Exception 
+	 */
 	@Test
 	public void testRetrieveAllCssTrustRelationships() throws Exception {
 		
@@ -1805,7 +1800,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		Set<TrustRelationship> retrievedTrustRelationships;
 		
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustorCssTeid, TrustedEntityType.CSS).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeType(TrustedEntityType.CSS)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertTrue(retrievedTrustRelationships.isEmpty());
 		
@@ -1817,7 +1812,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustedEntityType.CSS).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeType(TrustedEntityType.CSS)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(1, retrievedTrustRelationships.size());
@@ -1841,7 +1836,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustedEntityType.CSS).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeType(TrustedEntityType.CSS)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(2, retrievedTrustRelationships.size());
@@ -1871,7 +1866,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustedEntityType.CSS).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeType(TrustedEntityType.CSS)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(3, retrievedTrustRelationships.size());
@@ -1903,7 +1898,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustedEntityType.CSS).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeType(TrustedEntityType.CSS)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(3, retrievedTrustRelationships.size());
@@ -1918,23 +1913,17 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustedEntityType.CSS).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeType(TrustedEntityType.CSS)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(3, retrievedTrustRelationships.size());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 	
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustedEntityType)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
-	 *
+	 * 
+	 * @throws Exception 
+	 */
 	@Test
 	public void testRetrieveAllCisTrustRelationships() throws Exception {
 		
@@ -1952,7 +1941,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		Set<TrustRelationship> retrievedTrustRelationships;
 		
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustorCssTeid, TrustedEntityType.CIS).get(); 
+				new TrustQuery(trustorCssTeid).setTrusteeType(TrustedEntityType.CIS)).get(); 
 		assertNotNull(retrievedTrustRelationships);
 		assertTrue(retrievedTrustRelationships.isEmpty());
 		
@@ -1964,7 +1953,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustedEntityType.CIS).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeType(TrustedEntityType.CIS)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertTrue(retrievedTrustRelationships.isEmpty());
 		
@@ -1976,7 +1965,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustedEntityType.CIS).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeType(TrustedEntityType.CIS)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertTrue(retrievedTrustRelationships.isEmpty());
 		
@@ -1988,7 +1977,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustedEntityType.CIS).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeType(TrustedEntityType.CIS)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertTrue(retrievedTrustRelationships.isEmpty());
 		
@@ -2002,7 +1991,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustedEntityType.CIS).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeType(TrustedEntityType.CIS)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(3, retrievedTrustRelationships.size());
@@ -2062,22 +2051,16 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustedEntityType.CIS).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrusteeType(TrustedEntityType.CIS)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(3, retrievedTrustRelationships.size());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 	
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustedEntityType)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
+	 * 
+	 * @throws Exception 
 	 */
 	@Test
 	public void testRetrieveAllServiceTrustRelationships() throws Exception {
@@ -2214,19 +2197,13 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(serviceUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 	
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustValueType)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
-	 *
+	 * 
+	 * @throws Exception 
+	 */
 	@Test
 	public void testRetrieveAllDirectTrustRelationships() throws Exception {
 		
@@ -2244,7 +2221,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		Set<TrustRelationship> retrievedTrustRelationships;
 		
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustorCssTeid, TrustValueType.DIRECT).get(); 
+				new TrustQuery(trustorCssTeid).setTrustValueType(TrustValueType.DIRECT)).get(); 
 		assertNotNull(retrievedTrustRelationships);
 		assertTrue(retrievedTrustRelationships.isEmpty());
 		
@@ -2256,7 +2233,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustValueType.DIRECT).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(1, retrievedTrustRelationships.size());
@@ -2280,7 +2257,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustValueType.DIRECT).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(1, retrievedTrustRelationships.size());
@@ -2293,7 +2270,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustValueType.DIRECT).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(1, retrievedTrustRelationships.size());
@@ -2308,7 +2285,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustValueType.DIRECT).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(2, retrievedTrustRelationships.size());
@@ -2338,7 +2315,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustValueType.DIRECT).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrustValueType(TrustValueType.DIRECT)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(3, retrievedTrustRelationships.size());
@@ -2357,19 +2334,13 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(serviceDirectTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 	
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustValueType)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
-	 *
+	 * 
+	 * @throws Exception 
+	 */
 	@Test
 	public void testRetrieveAllIndirectTrustRelationships() throws Exception {
 		
@@ -2387,7 +2358,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		Set<TrustRelationship> retrievedTrustRelationships;
 		
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustorCssTeid, TrustValueType.INDIRECT).get(); 
+				new TrustQuery(trustorCssTeid).setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertTrue(retrievedTrustRelationships.isEmpty());
 		
@@ -2399,7 +2370,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustValueType.INDIRECT).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertTrue(retrievedTrustRelationships.isEmpty());
 		
@@ -2411,7 +2382,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustValueType.INDIRECT).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(1, retrievedTrustRelationships.size());
@@ -2435,7 +2406,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustValueType.INDIRECT).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(1, retrievedTrustRelationships.size());
@@ -2450,7 +2421,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustValueType.INDIRECT).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(2, retrievedTrustRelationships.size());
@@ -2480,7 +2451,7 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 
 		// verify
 		retrievedTrustRelationships = this.internalTrustBroker.retrieveTrustRelationships(
-				trustedCss.getTrustorId(), TrustValueType.INDIRECT).get();
+				new TrustQuery(trustedCss.getTrustorId()).setTrustValueType(TrustValueType.INDIRECT)).get();
 		assertNotNull(retrievedTrustRelationships);
 		assertFalse(retrievedTrustRelationships.isEmpty());
 		assertEquals(3, retrievedTrustRelationships.size());
@@ -2499,18 +2470,12 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(serviceIndirectTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
-	}*/
+	}
 	
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustValueType)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
+	 * 
+	 * @throws Exception 
 	 */
 	@Test
 	public void testRetrieveAllUserPerceivedTrustRelationships() throws Exception {
@@ -2646,18 +2611,12 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 		assertNotNull(retrievedTrustRelationship.getTrustValue());
 		assertEquals(new Double(serviceUserPerceivedTrustValue1), retrievedTrustRelationship.getTrustValue());
 		assertNotNull(retrievedTrustRelationship.getTimestamp());
-		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
 	}
 	
 	/**
 	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#retrieveTrustRelationships(TrustedEntityId, TrustedEntityType, TrustValueType)}.
-	 * @throws TrustException 
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
+	 * 
+	 * @throws Exception
 	 */
 	@Test
 	public void testRetrieveTrustRelationshipsByType() throws Exception {
@@ -2945,10 +2904,90 @@ public class InternalTrustBrokerTest extends AbstractTransactionalJUnit4SpringCo
 				}
 			}
 		}
+	}
+
+	/**
+	 * Test method for {@link org.societies.api.internal.privacytrust.trust.ITrustBroker#removeTrustRelationships(TrustQuery)}.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testRemoveTrustRelationships() throws Exception {
 		
-		// remove created entities
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCssTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeServiceTeid);
+		boolean npeCaught = false;
+		boolean taceCaught = false;
+		
+		// verify NPE
+		try {
+			this.internalTrustBroker.removeTrustRelationships(null);
+		} catch (NullPointerException npe) {
+			npeCaught = true;
+		}
+		assertTrue(npeCaught);
+		
+		this.trustRepo.createEntity(trustorCssTeid, trusteeCssTeid);
+		// verify TrustAccessControlException
+		try {
+			this.internalTrustBroker.removeTrustRelationships(
+					new TrustQuery(trustorCssTeid2)).get();
+		} catch (TrustAccessControlException tace) {
+			taceCaught = true;
+		}
+		assertTrue(taceCaught);
+		// verify
+		assertTrue(this.internalTrustBroker.removeTrustRelationships(
+				new TrustQuery(trustorCssTeid)).get());
+		assertFalse(this.internalTrustBroker.removeTrustRelationships(
+				new TrustQuery(trustorCssTeid)).get());
+		
+		this.trustRepo.createEntity(trustorCssTeid, trusteeCssTeid);
+		// verify
+		assertFalse(this.internalTrustBroker.removeTrustRelationships(
+				new TrustQuery(trustorCssTeid).setTrusteeType(TrustedEntityType.CIS)).get());
+		assertFalse(this.internalTrustBroker.removeTrustRelationships(
+				new TrustQuery(trustorCssTeid).setTrusteeType(TrustedEntityType.SVC)).get());
+		assertTrue(this.internalTrustBroker.removeTrustRelationships(
+				new TrustQuery(trustorCssTeid).setTrusteeType(TrustedEntityType.CSS)).get());
+		assertFalse(this.internalTrustBroker.removeTrustRelationships(
+				new TrustQuery(trustorCssTeid).setTrusteeType(TrustedEntityType.CSS)).get());
+		
+		this.trustRepo.createEntity(trustorCssTeid, trusteeCssTeid);
+		this.trustRepo.createEntity(trustorCssTeid, trusteeCisTeid2);
+		// verify
+		assertFalse(this.internalTrustBroker.removeTrustRelationships(
+				new TrustQuery(trustorCssTeid).setTrusteeType(TrustedEntityType.SVC)).get());
+		assertTrue(this.internalTrustBroker.removeTrustRelationships(
+				new TrustQuery(trustorCssTeid).setTrusteeType(TrustedEntityType.CIS)).get());
+		assertFalse(this.internalTrustBroker.removeTrustRelationships(
+				new TrustQuery(trustorCssTeid).setTrusteeType(TrustedEntityType.CIS)).get());
+		assertTrue(this.internalTrustBroker.removeTrustRelationships(
+				new TrustQuery(trustorCssTeid).setTrusteeType(TrustedEntityType.CSS)).get());
+		assertFalse(this.internalTrustBroker.removeTrustRelationships(
+				new TrustQuery(trustorCssTeid).setTrusteeType(TrustedEntityType.CSS)).get());
+		
+		final ITrustedEntity trusteeCssByCss = 
+				this.trustRepo.createEntity(trustorCssTeid, trusteeCssTeid);
+		trusteeCssByCss.getDirectTrust().setValue(.5d);
+		this.trustRepo.updateEntity(trusteeCssByCss);
+		final ITrustedEntity trusteeCisByCss =
+				this.trustRepo.createEntity(trustorCssTeid, trusteeCisTeid);
+		trusteeCisByCss.getIndirectTrust().setValue(.25d);
+		this.trustRepo.updateEntity(trusteeCisByCss);
+		// verify
+		assertFalse(this.internalTrustBroker.removeTrustRelationships(
+				new TrustQuery(trustorCssTeid).setTrustValueType(TrustValueType.USER_PERCEIVED)).get());
+		assertTrue(this.internalTrustBroker.removeTrustRelationships(
+				new TrustQuery(trustorCssTeid).setTrustValueType(TrustValueType.DIRECT)).get());
+		assertFalse(this.internalTrustBroker.removeTrustRelationships(
+				new TrustQuery(trustorCssTeid).setTrustValueType(TrustValueType.DIRECT)).get());
+		assertFalse(this.internalTrustBroker.removeTrustRelationships(
+				new TrustQuery(trustorCssTeid).setTrusteeType(TrustedEntityType.CSS)
+				.setTrustValueType(TrustValueType.INDIRECT)).get());
+		assertTrue(this.internalTrustBroker.removeTrustRelationships(
+				new TrustQuery(trustorCssTeid).setTrusteeType(TrustedEntityType.CIS)
+				.setTrustValueType(TrustValueType.INDIRECT)).get());
+		assertFalse(this.internalTrustBroker.removeTrustRelationships(
+				new TrustQuery(trustorCssTeid).setTrusteeType(TrustedEntityType.CIS)
+				.setTrustValueType(TrustValueType.INDIRECT)).get());
 	}
 }

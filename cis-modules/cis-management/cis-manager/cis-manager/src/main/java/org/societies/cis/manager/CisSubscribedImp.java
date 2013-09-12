@@ -130,6 +130,7 @@ public class CisSubscribedImp implements ICis {
 		}
 	}
 	
+	// with requestor TO BE DEPRECATED
 	@Override
 	public void getInfo(Requestor req, ICisManagerCallback callback){
 		LOG.debug("client call to get info from a RemoteCIS");
@@ -160,11 +161,10 @@ public class CisSubscribedImp implements ICis {
 		}	
 	}
 	
-	
+	// with requestorBean
 	@Override
-	public void getInfo(ICisManagerCallback callback){
+	public void getInfo(RequestorBean req, ICisManagerCallback callback){
 		LOG.debug("client call to get info from a RemoteCIS");
-
 
 		IIdentity toIdentity;
 		try {
@@ -174,7 +174,10 @@ public class CisSubscribedImp implements ICis {
 					stanza.getId(), callback, this.cisManag);
 
 			CommunityMethods c = new CommunityMethods();
-			c.setGetInfo( new GetInfo());
+			GetInfo g = new GetInfo();
+			g.setRequestor(req);
+			c.setGetInfo(g);
+			
 			try {
 				LOG.info("Sending stanza with get info");
 				this.cisManag.getiCommMgr().sendIQGet(stanza, c, commsCallback);
@@ -187,6 +190,7 @@ public class CisSubscribedImp implements ICis {
 			e1.printStackTrace();
 		}	
 	}
+	
 
 	@Override
 	public void setInfo(Community c, ICisManagerCallback callback){
@@ -219,18 +223,8 @@ public class CisSubscribedImp implements ICis {
 		}	
 	}
 	
-	
+	// with requestor TO BE DEPRECATED
 	@Override
-	public void getListOfMembers(ICisManagerCallback callback){
-		LOG.info("client call to get list of members from a RemoteCIS");
-
-		CommunityMethods c = new CommunityMethods();
-		WhoRequest w = new WhoRequest();
-		c.setWhoRequest(w);
-		RequestorBean reqB = new RequestorBean();
-		reqB.setRequestorId(this.cisManag.getiCommMgr().getIdManager().getThisNetworkNode().getBareJid());
-		this.sendXmpp(c, callback);		
-	}
 	public void getListOfMembers(Requestor req, ICisManagerCallback callback){
 		LOG.info("client call to get list of members from a RemoteCIS");
 
@@ -244,6 +238,20 @@ public class CisSubscribedImp implements ICis {
 		this.sendXmpp(c, callback);	
 	}
 
+	// with requestor bean
+	@Override
+	public void getListOfMembers(RequestorBean req, ICisManagerCallback callback){
+		LOG.info("client call to get list of members from a RemoteCIS");
+
+		CommunityMethods c = new CommunityMethods();
+		
+		WhoRequest w = new WhoRequest();
+		c.setWhoRequest(w);
+		w.setRequestor(req);
+		
+		this.sendXmpp(c, callback);	
+	}
+	
 	
 	//Overriding hash and equals to compare cisRecord only
 

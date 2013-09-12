@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -24,7 +23,6 @@ import org.societies.api.identity.RequestorService;
 import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
-import org.societies.api.internal.security.policynegotiator.NegotiationException;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.integration.test.IntegrationTestUtils;
 
@@ -69,8 +67,8 @@ public class NominalTestCaseLowerTester {
 	 * This method is called only one time, at the very beginning of the process
 	 * (after the constructor) in order to initialize the process.
 	 * Select the relevant service example: the Calculator
-	 * @throws NegotiationException 
-	 * @throws URISyntaxException 
+	 * @throws org.societies.api.internal.security.policynegotiator.NegotiationException 
+	 * @throws java.net.URISyntaxException 
 	 * @throws InterruptedException 
 	 */
 	@BeforeClass
@@ -105,7 +103,7 @@ public class NominalTestCaseLowerTester {
 	 * Try to consume the service
 	 * Part 1: select the service and start it if necessary
 	 * @throws InterruptedException 
-	 * @throws URISyntaxException 
+	 * @throws java.net.URISyntaxException 
 	 */
 	@Test
 	public void testNegotiationServiceWith0Files() throws Exception {

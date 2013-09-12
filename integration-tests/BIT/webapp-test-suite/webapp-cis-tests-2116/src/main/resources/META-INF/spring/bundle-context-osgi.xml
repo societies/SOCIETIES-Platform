@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:osgi="http://www.springframework.org/schema/osgi"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                      	http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+    <osgi:reference id="commManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
+
+    <osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker"/>
+
+    <osgi:reference id="privacyPolicyManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager"/>
+
+    <osgi:reference id="privacyPolicyNegotiationManager" interface="org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyNegotiationManager"/>
+
+    <osgi:reference id="eventMgr" interface="org.societies.api.osgi.event.IEventMgr"/>
+
+</beans>

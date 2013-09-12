@@ -14,28 +14,30 @@
               draggable="true" modal="false">
 
 
-        <p>Bugs/incomplete:</p>
-        <ul>
-            <li>Wrong item disappearing on submit</li>
-            <li>Remove Timed Abort from GUI when it expires</li>
-            <li>Input validation</li>
-        </ul>
+        <!--
+                <p>Bugs/incomplete:</p>
+                <ul>
+                    <li>Wrong item disappearing on submit</li>
+                    <li>Remove Timed Abort from GUI when it expires</li>
+                    <li>Input validation</li>
+                </ul>
+        -->
 
         <h:outputLink value="notification_history.xhtml">Notification history</h:outputLink>
 
         <p:dataGrid var="notification" value="#{notifications.unansweredNegotiationQueue}"
                     columns="1" emptyMessage="No notifications :(" id="notificationGrid">
 
-            <p:panel header="#{notification.title}" rendered="#{notification.type eq 'PPN'}"
-                     id="ppnPopupPanel" styleClass="unread-notification-header">
+            <p:panel id="ppnPopupPanel" header="Negotiation with #{notification.title}"
+                     rendered="#{notification.type eq 'PPN'}"
+                     styleClass="unread-notification-header">
 
-                <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
-                <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+                <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+                <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
                 <!-- PRIVACY POLICY NEGOTIATION -->
 
                 <h:panelGrid columns="1">
-                    <h:outputText value="#{notification.title}"/>
 
                     <h:outputText value="#{notification.arrivalDate}"/>
 
@@ -44,11 +46,30 @@
                 </h:panelGrid>
             </p:panel>
 
-            <p:panel header="#{notification.title}" rendered="#{notification.type eq 'ACK_NACK'}"
-                     id="ackNackPopupPanel" styleClass="unread-notification-header">
+            <p:panel id="acPopupPanel" header="#{notification.title}"
+                     rendered="#{notification.type eq 'AC'}"
+                     styleClass="unread-notification-header">
 
-                <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
-                <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+                <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+                <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+
+                <!-- ACCESS CONTROL -->
+
+                <h:panelGrid columns="1">
+
+                    <h:outputText value="#{notification.arrivalDate}"/>
+
+                    <h:outputLink value="#{notification.infoLink}">More info</h:outputLink>
+
+                </h:panelGrid>
+            </p:panel>
+
+            <p:panel id="ackNackPopupPanel" header="#{notification.title}"
+                     rendered="#{notification.type eq 'ACK_NACK'}"
+                     styleClass="unread-notification-header">
+
+                <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+                <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
                 <!-- ACK/NACK -->
 
@@ -64,11 +85,12 @@
                 </h:panelGrid>
             </p:panel>
 
-            <p:panel header="#{notification.title}" rendered="#{notification.type eq 'SELECT_ONE'}"
-                     id="selectOnePopupPanel" styleClass="unread-notification-header">
+            <p:panel id="selectOnePopupPanel" header="#{notification.title}"
+                     rendered="#{notification.type eq 'SELECT_ONE'}"
+                     styleClass="unread-notification-header">
 
-                <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
-                <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+                <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+                <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
                 <!-- SELECT ONE / RADIO BUTTONS -->
 
@@ -84,11 +106,12 @@
                 </h:panelGrid>
             </p:panel>
 
-            <p:panel header="#{notification.title}" rendered="#{notification.type eq 'SELECT_MANY'}"
-                     id="selectManyPopupPanel" styleClass="unread-notification-header">
+            <p:panel id="selectManyPopupPanel" header="#{notification.title}"
+                     rendered="#{notification.type eq 'SELECT_MANY'}"
+                     styleClass="unread-notification-header">
 
-                <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
-                <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+                <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+                <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
                 <!-- SELECT MANY / CHECKBOXES -->
 
@@ -104,11 +127,12 @@
                 </h:panelGrid>
             </p:panel>
 
-            <p:panel header="#{notification.title}" rendered="#{notification.type eq 'NOTIFICATION'}"
-                     id="notificationPopupPanel" styleClass="unread-notification-header">
+            <p:panel id="notificationPopupPanel" header="#{notification.title}"
+                     rendered="#{notification.type eq 'NOTIFICATION'}"
+                     styleClass="unread-notification-header">
 
-                <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
-                <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+                <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+                <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
                 <!-- SIMPLE NOTIFICATION -->
 
@@ -122,29 +146,30 @@
 
             </p:panel>
 
-            <p:panel header="#{notification.title}" rendered="#{notification.type eq 'TIMED_ABORT'}"
-                     id="timedAbortPopupPanel" styleClass="unread-notification-header">
+            <p:panel id="timedAbortPopupPanel" header="#{notification.title}"
+                     rendered="#{notification.type eq 'TIMED_ABORT'}"
+                     styleClass="unread-notification-header">
 
-                <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/>
-                <h:outputText value=" [#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
+                <h:outputText value="#{notification.arrivalDate.toLocaleString()}"/><br/>
+                <h:outputText value="[#{notification.itemId}]" rendered="#{notifications.debugMode}"/>
 
-                <!-- TMIED ABORT -->
+                <!-- TIMED ABORT -->
 
                 <h:panelGrid columns="1">
-                    <p:poll interval="1" update="timedAbortTimeLeft"/>
-                    <h:outputText value="Time left: #{notification.friendlyTimeLeft}" id="timedAbortTimeLeft"/>
+                    <p:poll interval="1" update="taAbortButton"/>
 
-                    <p>Click this button to cancel</p>
-
-                   <!-- <f:metadata>
-                        <f:viewParam name="result" value="{notification.result}"/>
-                    </f:metadata>
-                    <p:commandButton value="Abort" process="timedAbortPopupPanel"
+                    <p:commandButton id="taAcceptButton"
+                                     value="Accept" process="timedAbortPopupPanel"
                                      update="notificationGrid"
-                                     actionListener="{notifications.submitItem(notification.itemId)}">
+                                     actionListener="#{notifications.acceptTimedAbort(notification.itemId)}">
+                        <f:param name="result" value="accept"/>
+                    </p:commandButton>
+                    <p:commandButton id="taAbortButton"
+                                     value="Abort (#{notification.friendlyTimeLeft})" process="timedAbortPopupPanel"
+                                     update="notificationGrid"
+                                     actionListener="#{notifications.abortTimedAbort(notification.itemId)}">
                         <f:param name="result" value="abort"/>
                     </p:commandButton>
--->
                 </h:panelGrid>
             </p:panel>
 

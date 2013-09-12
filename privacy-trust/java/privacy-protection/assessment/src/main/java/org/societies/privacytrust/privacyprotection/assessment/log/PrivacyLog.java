@@ -48,9 +48,10 @@ public class PrivacyLog implements IPrivacyLog {
 
 	private List<DataAccessLogEntry> dataAccess = new ArrayList<DataAccessLogEntry>();
 	private List<DataTransmissionLogEntry> dataTransmission = new ArrayList<DataTransmissionLogEntry>();;
-	private List<IIdentity> senderIds = new ArrayList<IIdentity>();
 
+	private List<IIdentity> senderIds = new ArrayList<IIdentity>();
 	private List<String> senderClassNames = new ArrayList<String>();
+	private List<String> senderBundles = new ArrayList<String>();
 
 	public PrivacyLog() {
 
@@ -99,6 +100,14 @@ public class PrivacyLog implements IPrivacyLog {
 			LOG.debug("append(): Adding new transmission class {}", senderClass);
 			senderClassNames.add(senderClass);
 		}
+		
+		List<String> existingSenderBundles = entry.getSenderBundles();
+		for (String senderBundle : existingSenderBundles) { 
+			if (!this.senderBundles.contains(senderBundle)) {
+				LOG.debug("append(): Adding new transmission bundle {}", senderBundle);
+				this.senderBundles.add(senderBundle);
+			}
+		}
 	}
 
 	/**
@@ -113,6 +122,13 @@ public class PrivacyLog implements IPrivacyLog {
 	 */
 	public List<String> getSenderClassNames() {
 		return senderClassNames;
+	}
+
+	/**
+	 * @return the senderBundles
+	 */
+	public List<String> getSenderBundles() {
+		return senderBundles;
 	}
 
 	@Override
@@ -178,6 +194,11 @@ public class PrivacyLog implements IPrivacyLog {
 		}
 		if (f.getSenderClass() != null) {
 			if (f.getSenderClass() != l.getSenderClass()) {
+				return false;
+			}
+		}
+		if (f.getSenderBundle() != null) {
+			if (!l.getSenderBundles().contains(f.getSenderBundle())) {
 				return false;
 			}
 		}

@@ -537,9 +537,13 @@ public class PlatformEventsBase implements IAndroidSocietiesEvents {
                                 intent.setPackage(getClient(key));
                             }
 
-                            PlatformEventsBase.this.androidContext.sendBroadcast(intent);
+                            try {
+                                PlatformEventsBase.this.androidContext.sendBroadcast(intent);
+                                Log.d(LOG_TAG, "Android Intent " + intentTarget + " sent for client: " + getClient(key));
+                            } catch (Exception ex) {
+                                Log.e(LOG_TAG, "Error sending android intent " + intentTarget + " for client key: " + key, ex);
+                            }
 
-                            Log.d(LOG_TAG, "Android Intent " + intentTarget + " sent for client: " + getClient(key));
                         }
                     }
                 }

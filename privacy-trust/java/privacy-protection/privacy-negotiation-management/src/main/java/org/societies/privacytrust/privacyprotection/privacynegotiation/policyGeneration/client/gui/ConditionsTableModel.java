@@ -24,7 +24,6 @@
  */
 package org.societies.privacytrust.privacyprotection.privacynegotiation.policyGeneration.client.gui;
 
-import java.util.Collection;
 import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;

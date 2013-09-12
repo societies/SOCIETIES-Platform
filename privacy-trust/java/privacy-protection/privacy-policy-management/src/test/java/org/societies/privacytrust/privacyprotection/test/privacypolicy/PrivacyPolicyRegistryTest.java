@@ -24,285 +24,167 @@
  */
 package org.societies.privacytrust.privacyprotection.test.privacypolicy;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CtxAssociation;
-import org.societies.api.context.model.CtxAssociationIdentifier;
-import org.societies.api.context.model.CtxAssociationTypes;
-import org.societies.api.context.model.CtxAttribute;
-import org.societies.api.context.model.CtxAttributeIdentifier;
-import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.context.model.CtxEntity;
-import org.societies.api.context.model.CtxEntityIdentifier;
-import org.societies.api.context.model.CtxEntityTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifier;
-import org.societies.api.context.model.CtxModelObject;
-import org.societies.api.context.model.CtxModelType;
-import org.societies.api.context.model.IndividualCtxEntity;
-import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.IIdentityManager;
-import org.societies.api.identity.IdentityType;
-import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
-import org.societies.api.identity.RequestorService;
-import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Condition;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Resource;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ConditionConstants;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.identity.util.DataIdentifierFactory;
+import org.societies.api.identity.util.RequestorUtils;
+import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.privacytrust.privacyprotection.privacypolicy.PrivacyPolicyRegistryManager;
-import org.societies.util.commonmock.MockIdentity;
-import org.springframework.scheduling.annotation.AsyncResult;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.services.ServiceUtils;
+import org.societies.privacytrust.privacyprotection.privacypolicy.registry.PrivacyPolicyRegistry;
 
 /**
- * Describe your class here...
- *
- * @author Eliza
- *
+ * @author Olivier Maridat (Trialog)
  */
 public class PrivacyPolicyRegistryTest {
+	private static final Logger LOG = LoggerFactory.getLogger(PrivacyPolicyRegistryTest.class.getName());
 
-	ICtxBroker ctxBroker = Mockito.mock(ICtxBroker.class);
-	PrivacyPolicyRegistryManager registryMgr;
-	IIdentityManager idManager;
-	private Requestor requestorService;
-	private Requestor requestorCis;
-	private RequestPolicy cisPolicy;
-	private RequestPolicy servicePolicy;
-	private CtxEntity personEntity;
-	private IIdentity mockId;
-	private CtxAssociation hasPrivacyPolicies;
-	private CtxEntity policyEntity;
-	private CtxAttribute cisPolicyAttribute;
-	private CtxAttribute servicePolicyAttribute;
-	private CtxAttribute registryAttribute;
+	private PrivacyPolicyRegistry privacyPolicyRegistry;
+	private RequestorBean requestorCis1;
+	private RequestorBean requestorCis2;
+	private RequestorBean requestorService;
+	private DataIdentifier mockCtxId1;
+	private DataIdentifier mockCtxId2;
+	private DataIdentifier mockCtxId3;
 
 	@Before
-	public void setUp(){
-
-
-		requestorCis = this.getRequestorCis();
-		cisPolicy = this.getRequestPolicy(requestorCis);
-		requestorService = this.getRequestorService();
-		servicePolicy = this.getRequestPolicy(requestorService);
-		this.createPersonEntity();
-		this.setupMockito();
-		registryMgr = new PrivacyPolicyRegistryManager(ctxBroker, idManager);
-	}
-
-
-	private void setupMockito() {
+	public void setUp() {
+		String testTitle = "setUp";
+		privacyPolicyRegistry = new PrivacyPolicyRegistry();
 		try {
-			Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.PRIVACY_POLICY_REGISTRY)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
-			Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, "policyOf"+this.getCtxType(requestorCis))).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
-			Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, "policyOf"+this.getCtxType(requestorService))).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
-			Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PRIVACY_POLICY)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
-			IndividualCtxEntity weirdPerson = new IndividualCtxEntity(personEntity.getId());
-			Mockito.when(ctxBroker.retrieveCssOperator()).thenReturn(new AsyncResult<IndividualCtxEntity>(weirdPerson));
-			Mockito.when(ctxBroker.createAssociation(CtxAssociationTypes.HAS_PRIVACY_POLICIES)).thenReturn(new AsyncResult<CtxAssociation>(hasPrivacyPolicies));
-			Mockito.when(ctxBroker.createEntity(CtxEntityTypes.PRIVACY_POLICY)).thenReturn(new AsyncResult<CtxEntity>(policyEntity));
-			Mockito.when(ctxBroker.createAttribute((CtxEntityIdentifier) policyEntity.getId(), "policyOf"+this.getCtxType(requestorCis))).thenReturn(new AsyncResult<CtxAttribute>(this.cisPolicyAttribute));
-			Mockito.when(ctxBroker.createAttribute((CtxEntityIdentifier) policyEntity.getId(), "policyOf"+this.getCtxType(requestorService))).thenReturn(new AsyncResult<CtxAttribute>(this.servicePolicyAttribute));
-			Mockito.when(ctxBroker.createAttribute(personEntity.getId(), CtxAttributeTypes.PRIVACY_POLICY_REGISTRY)).thenReturn(new AsyncResult<CtxAttribute>(this.registryAttribute));
-			Mockito.when(ctxBroker.retrieve(this.cisPolicyAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.cisPolicyAttribute));
-			Mockito.when(ctxBroker.retrieve(this.servicePolicyAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.servicePolicyAttribute));
-			Mockito.when(ctxBroker.remove(this.cisPolicyAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.cisPolicyAttribute));
-			Mockito.when(ctxBroker.remove(this.servicePolicyAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.servicePolicyAttribute));
-			
-			// Comm Manager
-			idManager = Mockito.mock(IIdentityManager.class);
-			IIdentity otherCssId = new MockIdentity(IdentityType.CSS, "othercss","societies.local");
-			IIdentity cisId = new MockIdentity(IdentityType.CIS, "onecis", "societies.local");
-			Mockito.when(idManager.fromJid(otherCssId.getJid())).thenReturn(otherCssId);
-			Mockito.when(idManager.fromJid(cisId.getJid())).thenReturn(cisId);
-			Mockito.when(idManager.fromJid("onecis.societies.local")).thenReturn(new MockIdentity("onecis.societies.local"));
-			Mockito.when(idManager.fromJid("onecis@societies.local")).thenReturn(new MockIdentity("onecis@societies.local"));
-			Mockito.when(idManager.fromJid("othercss@societies.local")).thenReturn(new MockIdentity("othercss@societies.local"));
-			Mockito.when(idManager.fromJid("red@societies.local")).thenReturn(new MockIdentity("red@societies.local"));
-			Mockito.when(idManager.fromJid("eliza@societies.local")).thenReturn(new MockIdentity("eliza@societies.local"));
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			mockCtxId1 = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://me.ict-societies.eu/ENTITY/person/1/ATTRIBUTE/privac-policy/13");
+			mockCtxId2 = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://me.ict-societies.eu/ENTITY/person/1/ATTRIBUTE/privac-policy/14");
+			mockCtxId3 = DataIdentifierFactory.fromUri(DataIdentifierScheme.CONTEXT+"://me.ict-societies.eu/ENTITY/person/1/ATTRIBUTE/privac-policy/15");
+		} catch (MalformedCtxIdentifierException e) {
+			LOG.info("[MalformedCtxIdentifierException "+testTitle+"] can't generate mock ctx id", e);
+			fail("[MalformedCtxIdentifierException "+testTitle+"] can't generate mock ctx id: "+e.getMessage());
 		}
-
+		requestorCis1 = RequestorUtils.create("me.ict-societies.eu", "cis-daddy.ict-societies.eu");
+		requestorCis2 = RequestorUtils.create("me.ict-societies.eu", "cis-mummy.ict-societies.eu");
+		requestorService = RequestorUtils.create("me.ict-societies.eu", ServiceUtils.generateServiceResourceIdentifierFromString("myService me.ict-societies.eu"));
 	}
-	private void createPersonEntity() {
-		mockId = new MockIdentity(IdentityType.CSS, "myId", "domain");
-		CtxEntityIdentifier ctxPersonId = new CtxEntityIdentifier(mockId.getJid(), "Person", new Long(1));
-		personEntity = new CtxEntity(ctxPersonId);
-		hasPrivacyPolicies = new CtxAssociation(new CtxAssociationIdentifier(mockId.getJid(), CtxAssociationTypes.HAS_PRIVACY_POLICIES, new Long(3)));
-		CtxEntityIdentifier policyEntityId = new CtxEntityIdentifier(mockId.getJid(), CtxEntityTypes.PRIVACY_POLICY, new Long(1));
-		policyEntity = new CtxEntity(policyEntityId);
-		CtxAttributeIdentifier cisPolicyAttributeId = new CtxAttributeIdentifier(policyEntityId, "policyOf"+this.getCtxType(requestorCis), new Long(2));
-		cisPolicyAttribute = new CtxAttribute(cisPolicyAttributeId);
-		CtxAttributeIdentifier servicePolicyAttributeId = new CtxAttributeIdentifier(policyEntityId, "policyOf"+this.getCtxType(requestorService), new Long(2));
-		servicePolicyAttribute = new CtxAttribute(servicePolicyAttributeId);
-		CtxAttributeIdentifier registryAttrId = new CtxAttributeIdentifier(ctxPersonId, CtxAttributeTypes.PRIVACY_POLICY_REGISTRY, new Long(2));
-		registryAttribute = new CtxAttribute(registryAttrId);
 
+
+	@Test
+	public void testEmptyRegistry() {
+		String testTitle = "Empty registry";
+		LOG.info("[TEST] "+testTitle);
+		CtxIdentifier ctxId1 = null;
+		CtxIdentifier ctxId2 = null;
+		CtxIdentifier ctxId3 = null;
+		try {
+			ctxId1 = privacyPolicyRegistry.getPolicyStorageID(requestorCis1);
+			ctxId2 = privacyPolicyRegistry.getPolicyStorageID(requestorCis2);
+			ctxId3 = privacyPolicyRegistry.getPolicyStorageID(requestorService);
+		}
+		catch (Exception e) {
+			LOG.info("[Exception "+testTitle+"] can't retrieve the ctx id", e);
+			fail("[Exception "+testTitle+"] can't retrieve the ctx id: "+e.getMessage());
+		}
+		assertNull("Ctx id 1 in an mepty registry should be null", ctxId1);
+		assertNull("Ctx id 2 in an mepty registry should be null", ctxId2);
+		assertNull("Ctx id 3 in an mepty registry should be null", ctxId3);
+		assertTrue("Registry should be empty", privacyPolicyRegistry.isEmpty());
 	}
 
 	@Test
-	public void testRegistryStoreRetrieve(){
-		RequestPolicy policy = null;
+	public void testExistingRegistry() {
+		String testTitle = "Existing registry";
+		LOG.info("[TEST] "+testTitle);
+		CtxIdentifier ctxId1 = null;
+		CtxIdentifier ctxId2 = null;
+		CtxIdentifier ctxId3 = null;
+		// Only requestor 1
 		try {
-			registryMgr.addPolicy(requestorCis, cisPolicy);
-			
-			policy = registryMgr.getPolicy(requestorCis);
-
-			TestCase.assertNotNull("Null policy for requestorCis: "+requestorCis.getRequestorId().getJid()+" / "+((RequestorCis)requestorCis).getCisRequestorId().getJid(), policy);
-
-			
-			registryMgr.deletePolicy(requestorCis);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			fail();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			fail();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			fail();
-		} catch (PrivacyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			fail();
+			privacyPolicyRegistry.addPolicy(requestorCis1, (CtxIdentifier) mockCtxId1);
+			ctxId1 = privacyPolicyRegistry.getPolicyStorageID(requestorCis1);
+			ctxId2 = privacyPolicyRegistry.getPolicyStorageID(requestorCis2);
+			ctxId3 = privacyPolicyRegistry.getPolicyStorageID(requestorService);
 		}
+		catch (Exception e) {
+			LOG.info("[Exception "+testTitle+"] can't retrieve the ctx id", e);
+			fail("[Exception "+testTitle+"] can't retrieve the ctx id: "+e.getMessage());
+		}
+		assertNotNull("Ctx id 1 should not be null", ctxId1);
+		assertEquals("Ctx id 1 should be equal to the added ctx id", mockCtxId1, ctxId1);
+		assertNull("Ctx id 2 should be null", ctxId2);
+		assertNull("Ctx id 3 should be null", ctxId3);
+		assertFalse("Registry should not be empty", privacyPolicyRegistry.isEmpty());
 
-		
+		// Now also requestor 2
+		ctxId1 = null;
+		ctxId2 = null;
+		ctxId3 = null;
 		try {
-			policy = registryMgr.getPolicy(requestorCis);
-
-			TestCase.assertNull(policy);
-
-
-
-
-			registryMgr.addPolicy(requestorService, servicePolicy);
-
-			RequestPolicy policy2 = registryMgr.getPolicy(requestorService);
-			TestCase.assertNotNull("Null policy for requestorService: "+requestorService.getRequestorId().getJid()+" / "+((RequestorService)requestorService).getRequestorServiceId().getServiceInstanceIdentifier().toString(), policy2);
-
-
-			registryMgr.deletePolicy(requestorService);
-			policy2 = registryMgr.getPolicy(requestorService);
-			TestCase.assertNull(policy2);
-			
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			fail();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			fail();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			fail();
-		} catch (PrivacyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			fail();
+			privacyPolicyRegistry.addPolicy(requestorCis2, (CtxIdentifier) mockCtxId2);
+			privacyPolicyRegistry.addPolicy(requestorService, (CtxIdentifier) mockCtxId3);
+			ctxId1 = privacyPolicyRegistry.getPolicyStorageID(requestorCis1);
+			ctxId2 = privacyPolicyRegistry.getPolicyStorageID(requestorCis2);
+			ctxId3= privacyPolicyRegistry.getPolicyStorageID(requestorService);
 		}
-	}
+		catch (Exception e) {
+			LOG.info("[Exception "+testTitle+"] can't retrieve the ctx id", e);
+			fail("[Exception "+testTitle+"] can't retrieve the ctx id: "+e.getMessage());
+		}
+		assertNotNull("Ctx id 1 should not be null", ctxId1);
+		assertEquals("Ctx id 1 should be equal to the added ctx id", mockCtxId1, ctxId1);
+		assertNotNull("Ctx id 2 should not be null", ctxId2);
+		assertEquals("Ctx id 2 should be equal to the added ctx id", mockCtxId2, ctxId2);
+		assertNotNull("Ctx id 3 should not be null", ctxId3);
+		assertEquals("Ctx id 3 should be equal to the added ctx id", mockCtxId3, ctxId3);
+		assertFalse("Registry should not be empty", privacyPolicyRegistry.isEmpty());
 
-
-	private RequestPolicy getRequestPolicy(Requestor requestor) {
-		RequestPolicy requestPolicy;
-
-
-		List<RequestItem> requestItems = this.getRequestItems();
-		requestPolicy = new RequestPolicy(requestor, requestItems);
-
-
-		return requestPolicy;
-	}
-
-
-	private List<RequestItem> getRequestItems() {
-		List<RequestItem> items = new ArrayList<RequestItem>();
-
-		Resource locationResource = new Resource(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
-		List<Condition> conditions = new ArrayList<Condition>();
-		conditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"NO"));
-		List<Action> actions = new ArrayList<Action>();
-		actions.add(new Action(ActionConstants.READ));
-		RequestItem rItem = new RequestItem(locationResource, actions, conditions, false);
-
-		items.add(rItem);
-
-
-		Resource someResource = new Resource(DataIdentifierScheme.CONTEXT, "someResource");
-		List<Condition> extendedConditions = new ArrayList<Condition>();
-		extendedConditions.add(new Condition(ConditionConstants.SHARE_WITH_3RD_PARTIES,"NO"));
-		extendedConditions.add(new Condition(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA, "YES"));
-		List<Action> extendedActions = new ArrayList<Action>();
-		extendedActions.add(new Action(ActionConstants.READ));
-		extendedActions.add(new Action(ActionConstants.CREATE));
-		extendedActions.add(new Action(ActionConstants.WRITE));
-		extendedActions.add(new Action(ActionConstants.DELETE));
-		RequestItem someItem = new RequestItem(someResource, extendedActions, extendedConditions, false);
-
-		items.add(someItem);
-		return items;
-
-
-
-	}
-
-	private RequestorService getRequestorService(){
-		IIdentity requestorId = new MockIdentity(IdentityType.CSS, "eliza","societies.org");
-		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
-		serviceId.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
+		// Let's remove requestor 1
+		ctxId1 = null;
+		ctxId2 = null;
+		ctxId3 = null;
 		try {
-			serviceId.setIdentifier(new URI("css://eliza@societies.org/HelloEarth"));
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			privacyPolicyRegistry.removePolicy(requestorCis1);
+			ctxId1 = privacyPolicyRegistry.getPolicyStorageID(requestorCis1);
+			ctxId2 = privacyPolicyRegistry.getPolicyStorageID(requestorCis2);
+			ctxId3 = privacyPolicyRegistry.getPolicyStorageID(requestorService);
 		}
-		return new RequestorService(requestorId, serviceId);
-	}
-
-	private RequestorCis getRequestorCis(){
-		IIdentity requestorId = new MockIdentity(IdentityType.CSS, "me","domain.com");
-		IIdentity cisId = new MockIdentity(IdentityType.CIS, "Holidays", "domain.com");
-		return new RequestorCis(requestorId, cisId);
-	}
-
-	private String getCtxType(Requestor requestor){
-		if (requestor instanceof RequestorService){
-			return ""+((RequestorService) requestor).hashCode();
-		}else if (requestor instanceof RequestorCis){
-			return ""+((RequestorCis) requestor).hashCode();
-		}else {
-			return requestor.getRequestorId().getJid();
+		catch (Exception e) {
+			LOG.info("[Exception "+testTitle+"] can't retrieve the ctx id", e);
+			fail("[Exception "+testTitle+"] can't retrieve the ctx id: "+e.getMessage());
 		}
+		assertNull("Ctx id 1 should be null", ctxId1);
+		assertNotNull("Ctx id 2 should not be null", ctxId2);
+		assertEquals("Ctx id 2 should be equal to the added ctx id", mockCtxId2, ctxId2);
+		assertNotNull("Ctx id 3 should not be null", ctxId3);
+		assertEquals("Ctx id 3 should be equal to the added ctx id", mockCtxId3, ctxId3);
+		assertFalse("Registry should not be empty", privacyPolicyRegistry.isEmpty());
+
+		// And now, let's remove requestor 2
+		ctxId1 = null;
+		ctxId2 = null;
+		ctxId3 = null;
+		try {
+			privacyPolicyRegistry.removePolicy(requestorCis2);
+			privacyPolicyRegistry.removePolicy(requestorService);
+			ctxId1 = privacyPolicyRegistry.getPolicyStorageID(requestorCis1);
+			ctxId2 = privacyPolicyRegistry.getPolicyStorageID(requestorCis2);
+			ctxId3 = privacyPolicyRegistry.getPolicyStorageID(requestorService);
+		}
+		catch (Exception e) {
+			LOG.info("[Exception "+testTitle+"] can't retrieve the ctx id", e);
+			fail("[Exception "+testTitle+"] can't retrieve the ctx id: "+e.getMessage());
+		}
+		assertNull("Ctx id 1 should be null", ctxId1);
+		assertNull("Ctx id 2 should be null", ctxId2);
+		assertNull("Ctx id 3 should be null", ctxId3);
+		assertTrue("Registry should be empty", privacyPolicyRegistry.isEmpty());
 	}
 }

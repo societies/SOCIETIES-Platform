@@ -29,7 +29,7 @@ import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.identity.Requestor;
 import org.societies.api.schema.cis.community.Community;
-
+import org.societies.api.schema.identity.RequestorBean;
 /**
  * @author Eliza
  *
@@ -50,7 +50,19 @@ public class MockCis implements ICis {
 		// TODO Auto-generated method stub
 
 	}
+	
+	@Override
+	public void getInfo(RequestorBean arg0, ICisManagerCallback arg1) {
+		// TODO Auto-generated method stub
 
+	}
+
+	
+	@Override
+	public void getListOfMembers(RequestorBean arg0, ICisManagerCallback arg1) {
+		// TODO Auto-generated method stub
+
+	}
 	/* (non-Javadoc)
 	 * @see org.societies.api.cis.management.ICisRemote#getListOfMembers(org.societies.api.identity.Requestor, org.societies.api.cis.management.ICisManagerCallback)
 	 */
@@ -78,23 +90,7 @@ public class MockCis implements ICis {
 		return jid;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.cis.management.ICis#getInfo(org.societies.api.cis.management.ICisManagerCallback)
-	 */
-	@Override
-	public void getInfo(ICisManagerCallback arg0) {
-		// TODO Auto-generated method stub
 
-	}
-
-	/* (non-Javadoc)
-	 * @see org.societies.api.cis.management.ICis#getListOfMembers(org.societies.api.cis.management.ICisManagerCallback)
-	 */
-	@Override
-	public void getListOfMembers(ICisManagerCallback arg0) {
-		// TODO Auto-generated method stub
-
-	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.api.cis.management.ICis#getMembershipCriteria(org.societies.api.cis.management.ICisManagerCallback)

@@ -64,6 +64,7 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 	private static final String BASE_ID = "atrt";
 	
 	private static final String TRUSTOR_CSS_ID = BASE_ID + "TrustorIIdentity";
+	private static final String TRUSTOR_CSS_ID2 = BASE_ID + "TrustorIIdentity2";
 	
 	private static final String TRUSTEE_CSS_ID = BASE_ID + "CssIIdentity";
 	private static final String TRUSTEE_CSS_ID2 = BASE_ID + "CssIIdentity2";
@@ -80,6 +81,7 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 	//private static final String TRUSTED_SERVICE_TYPE2 = BASE_ID + "ServiceType2";
 	
 	private static TrustedEntityId trustorCssTeid;
+	private static TrustedEntityId trustorCssTeid2;
 	
 	private static TrustedEntityId trusteeCssTeid;
 	private static TrustedEntityId trusteeCssTeid2;
@@ -102,6 +104,7 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 	public static void setUpBeforeClass() throws Exception {
 	
 		trustorCssTeid = new TrustedEntityId(TrustedEntityType.CSS, TRUSTOR_CSS_ID);
+		trustorCssTeid2 = new TrustedEntityId(TrustedEntityType.CSS, TRUSTOR_CSS_ID2);
 		
 		trusteeCssTeid = new TrustedEntityId(TrustedEntityType.CSS, TRUSTEE_CSS_ID);
 		trusteeCssTeid2 = new TrustedEntityId(TrustedEntityType.CSS, TRUSTEE_CSS_ID2);
@@ -122,6 +125,7 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 	public static void tearDownAfterClass() throws Exception {
 		
 		trustorCssTeid = null;
+		trustorCssTeid2 = null;
 		trusteeCssTeid = null;
 		trusteeCssTeid2 = null;
 		trusteeCssTeid3 = null;
@@ -144,6 +148,8 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 	 */
 	@After
 	public void tearDown() throws Exception {
+		
+		this.trustRepo.removeEntities(null, null, null);
 	}
 	
 	/**
@@ -284,11 +290,6 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 				trustorCssTeid, trusteeCisTeid2);
 		assertNotNull(trustedCis2FromDb.getMembers());
 		assertTrue(trustedCis2FromDb.getMembers().isEmpty());
-		
-		// remove CIS from DB
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid);
-		// remove CIS2 from DB
-		this.trustRepo.removeEntity(trustorCssTeid, trusteeCisTeid2);
 	}
 	
 	/**
@@ -556,13 +557,6 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 		assertTrue(entities.contains(css));
 		assertTrue(entities.contains(svc));
 		assertEquals(2, entities.size());
-		
-		this.trustRepo.removeEntity(css.getTrustorId(), css.getTrusteeId());
-		this.trustRepo.removeEntity(css2.getTrustorId(), css2.getTrusteeId());
-		this.trustRepo.removeEntity(cis.getTrustorId(), cis.getTrusteeId());
-		this.trustRepo.removeEntity(cis2.getTrustorId(), cis2.getTrusteeId());
-		this.trustRepo.removeEntity(svc.getTrustorId(), svc.getTrusteeId());
-		this.trustRepo.removeEntity(svc2.getTrustorId(), svc2.getTrusteeId());
 	}
 	
 	/**
@@ -760,11 +754,6 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 		meanTrustValue = this.trustRepo.retrieveMeanTrustValue(
 				trustorCssTeid, TrustValueType.USER_PERCEIVED, TrustedEntityType.SVC);
 		assertEquals(0.9d, meanTrustValue, DELTA);
-		
-		this.trustRepo.removeEntity(css.getTrustorId(), css.getTrusteeId());
-		this.trustRepo.removeEntity(css2.getTrustorId(), css2.getTrusteeId());
-		this.trustRepo.removeEntity(cis.getTrustorId(), cis.getTrusteeId());
-		this.trustRepo.removeEntity(svc.getTrustorId(), svc.getTrusteeId());
 	}
 	
 	/**
@@ -892,10 +881,59 @@ public class AdvancedTrustRepositoryTest extends AbstractTransactionalJUnit4Spri
 		assertEquals(2, cssSet.size());
 		assertTrue(cssSet.first().equals(css));
 		assertTrue(cssSet.last().equals(css2));
+	}
+	
+	/**
+	 * Test method for {@link org.societies.privacytrust.trust.impl.repo.TrustRepository#removeEntities(TrustedEntityId, TrustedEntityType, org.societies.api.privacytrust.trust.model.TrustValueType)}.
+	 * @throws TrustRepositoryException 
+	 */
+	@Test
+	public void testRemoveEntities() throws TrustRepositoryException {
 		
-		this.trustRepo.removeEntity(css.getTrustorId(), css.getTrusteeId());
-		this.trustRepo.removeEntity(css2.getTrustorId(), css2.getTrusteeId());
-		this.trustRepo.removeEntity(css3.getTrustorId(), css3.getTrusteeId());
-		this.trustRepo.removeEntity(css4.getTrustorId(), css4.getTrusteeId());
+		this.trustRepo.createEntity(trustorCssTeid, trusteeCssTeid);
+		assertTrue(this.trustRepo.removeEntities(null, null, null));
+		assertFalse(this.trustRepo.removeEntities(null, null, null));
+		
+		this.trustRepo.createEntity(trustorCssTeid, trusteeCssTeid);
+		assertFalse(this.trustRepo.removeEntities(trustorCssTeid2, null, null));
+		assertTrue(this.trustRepo.removeEntities(trustorCssTeid, null, null));
+		assertFalse(this.trustRepo.removeEntities(trustorCssTeid, null, null));
+		assertFalse(this.trustRepo.removeEntities(null, null, null));
+		
+		this.trustRepo.createEntity(trustorCssTeid, trusteeCssTeid);
+		assertFalse(this.trustRepo.removeEntities(null, TrustedEntityType.CIS, null));
+		assertFalse(this.trustRepo.removeEntities(null, TrustedEntityType.SVC, null));
+		assertTrue(this.trustRepo.removeEntities(null, TrustedEntityType.CSS, null));
+		assertFalse(this.trustRepo.removeEntities(null, TrustedEntityType.CSS, null));
+		assertFalse(this.trustRepo.removeEntities(null, null, null));
+		
+		this.trustRepo.createEntity(trustorCssTeid, trusteeCssTeid);
+		this.trustRepo.createEntity(trustorCssTeid, trusteeCisTeid2);
+		this.trustRepo.createEntity(trustorCssTeid2, trusteeCssTeid);
+		assertFalse(this.trustRepo.removeEntities(null, TrustedEntityType.SVC, null));
+		assertTrue(this.trustRepo.removeEntities(null, TrustedEntityType.CIS, null));
+		assertFalse(this.trustRepo.removeEntities(null, TrustedEntityType.CIS, null));
+		assertTrue(this.trustRepo.removeEntities(null, TrustedEntityType.CSS, null));
+		assertFalse(this.trustRepo.removeEntities(null, TrustedEntityType.CSS, null));
+		assertFalse(this.trustRepo.removeEntities(null, null, null));
+		
+		final ITrustedEntity trusteeCssByCss = 
+				this.trustRepo.createEntity(trustorCssTeid, trusteeCssTeid);
+		trusteeCssByCss.getDirectTrust().setValue(.5d);
+		this.trustRepo.updateEntity(trusteeCssByCss);
+		final ITrustedEntity trusteeCisByCss =
+				this.trustRepo.createEntity(trustorCssTeid, trusteeCisTeid);
+		trusteeCisByCss.getIndirectTrust().setValue(.25d);
+		this.trustRepo.updateEntity(trusteeCisByCss);
+		this.trustRepo.createEntity(trustorCssTeid2, trusteeCssTeid);
+		assertFalse(this.trustRepo.removeEntities(null, null, TrustValueType.USER_PERCEIVED));
+		assertFalse(this.trustRepo.removeEntities(trustorCssTeid2, null, TrustValueType.DIRECT));
+		assertTrue(this.trustRepo.removeEntities(trustorCssTeid, null, TrustValueType.DIRECT));
+		assertFalse(this.trustRepo.removeEntities(trustorCssTeid, null, TrustValueType.DIRECT));
+		assertFalse(this.trustRepo.removeEntities(null, TrustedEntityType.CSS, TrustValueType.INDIRECT));
+		assertTrue(this.trustRepo.removeEntities(null, TrustedEntityType.CIS, TrustValueType.INDIRECT));
+		assertFalse(this.trustRepo.removeEntities(trustorCssTeid2, TrustedEntityType.CSS, TrustValueType.INDIRECT));
+		assertTrue(this.trustRepo.removeEntities(trustorCssTeid2, TrustedEntityType.CSS, null));
+		assertFalse(this.trustRepo.removeEntities(null, null, null));
 	}
 }

@@ -24,6 +24,8 @@
  */
 package org.societies.api.identity.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.SimpleDataIdentifier;
 import org.societies.api.schema.identity.DataIdentifier;
@@ -36,6 +38,8 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
  *
  */
 public class DataTypeFactory {
+	private static final Logger LOG = LoggerFactory.getLogger(DataTypeFactory.class.getName());
+
 	/**
 	 * Create the relevant data type using a correct URI
 	 *
@@ -45,7 +49,14 @@ public class DataTypeFactory {
 	 */
 	public static DataIdentifier fromUri(String dataIdUri) {
 		String[] uri = dataIdUri.split("://");
-		DataIdentifierScheme scheme = DataIdentifierScheme.fromValue(uri[0]);
+		DataIdentifierScheme scheme = null;
+		try {
+			scheme = DataIdentifierScheme.fromValue(uri[0]);
+		}
+		catch(IllegalArgumentException e) {
+			LOG.error("Hum, can't understand this scheme in the URI \""+uri[0]+"\". Use CONTEXT by default.");
+			scheme = DataIdentifierScheme.CONTEXT;
+		}
 
 		DataIdentifier dataId = new SimpleDataIdentifier();
 		dataId.setScheme(scheme);
@@ -62,7 +73,19 @@ public class DataTypeFactory {
 		dataId.setUri(dataIdUri);
 		return dataId;
 	}
-	
+
+	/**
+	 * Retrieve the scheme of a DataIdentifier for sure: from its URI or its type field
+	 * @param dataId
+	 * @return Data scheme
+	 */
+	public static DataIdentifierScheme getScheme(DataIdentifier dataId) {
+		if (null != dataId.getScheme()) {
+			return dataId.getScheme();
+		}
+		return fromUri(dataId.getUri()).getScheme();
+	}
+
 	/**
 	 * Retrieve the type of a DataIdentifier for sure: from its URI or its type field
 	 * @param dataId

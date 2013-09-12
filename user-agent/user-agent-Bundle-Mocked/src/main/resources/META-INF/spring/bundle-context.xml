@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+        >
+
+    <!-- regular spring configuration file defining the beans for this bundle.
+        We've kept the osgi definitions in a separate configuration file so that
+        this file can easily be used for integration testing outside of an OSGi environment -->
+
+    <bean id="userActionMonitor"
+          class="org.societies.useragent.monitoring.UserActionMonitor"
+          name="userActionMonitor"
+          depends-on="ctxBroker, eventManager, commsManager, cssManager"
+          init-method="initialiseUserActionMonitor">
+        <property name="ctxBroker" ref="ctxBroker"/>
+        <property name="eventMgr" ref="eventManager"/>
+        <property name="commsMgr" ref="commsManager"/>
+        <property name="cssMgr" ref="cssManager"/>
+    </bean>
+
+    <bean id="userFeedback"
+          class="org.societies.useragent.feedback.UserFeedback"
+          name="feedback"
+          depends-on="commsManager"
+          init-method="initialiseUserFeedback">
+        <property name="commsMgr" ref="commsManager"/>
+        <property name="pubsub" ref="pubsub"/>
+    </bean>
+
+    <bean id="decisionMaker"
+          class="org.societies.useragent.decisionmaking.DecisionMaker"
+          name="dm"
+          depends-on="conflictResolutionManager,userFeedback">
+        <property name="manager" ref="conflictResolutionManager"/>
+        <property name="feedbackHandler" ref="userFeedback"/>
+    </bean>
+
+    <bean id="conflictResolutionManager"
+          class="org.societies.useragent.conflict.ConflictResolutionManager"
+          name="conflict">
+    </bean>
+
+    <bean id="uaCommsClient"
+          class="org.societies.useragent.comms.UACommsClient"
+          depends-on="commsManager"
+          init-method="initService">
+        <property name="commsMgr" ref="commsManager"/>
+    </bean>
+
+    <bean id="uaCommsServer"
+          class="org.societies.useragent.comms.UACommsServer"
+          depends-on="commsManager, userActionMonitor, userFeedback"
+          init-method="initService">
+        <property name="commsMgr" ref="commsManager"/>
+        <property name="internalUserActionMonitor" ref="userActionMonitor"/>
+        <property name="feedback" ref="userFeedback"/>
+    </bean>
+
+</beans>

@@ -36,11 +36,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
@@ -59,6 +59,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.ActionConstants;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
@@ -76,16 +77,20 @@ public class PrivacyDataManagerTest extends IntegrationTest {
 
 
 	private RequestorBean requestor;
-	private CountDownLatch lock = new CountDownLatch(1);
+	private CountDownLatch lock;
 	private boolean succeed;
 	private String errorMsg;
 	private Exception errorException;
 	private DataWrapper obfuscatedDataWrapper;
 	private ResponseItem retrievedPermission;
+	
+	private long timestampSetUp;
+	private long timestampTearDown;
 
 
 	@Before
 	public void setUp() {
+		timestampSetUp = System.currentTimeMillis();
 		LOG.info("[#"+testCaseNumber+"] "+getClass().getSimpleName()+"::setUp");
 		// Dependency injection not ready
 		if (!TestCase.isDepencyInjectionDone()) {
@@ -95,10 +100,18 @@ public class PrivacyDataManagerTest extends IntegrationTest {
 		requestor = RequestorUtils.create(TestCase.getReceiverJid());
 
 		// Init
+		lock = new CountDownLatch(1);
 		succeed = false;
 		errorMsg = "";
 		errorException = null;
 		obfuscatedDataWrapper = null;
+	}
+	
+	@After
+	public void tearDown() {
+		LOG.info("[#"+testCaseNumber+"] tearDown");
+		timestampTearDown = System.currentTimeMillis();
+		LOG.info("[#"+testCaseNumber+"] Lasts: "+(timestampTearDown-timestampSetUp)+"ms");
 	}
 
 
@@ -143,6 +156,20 @@ public class PrivacyDataManagerTest extends IntegrationTest {
 					errorMsg = "Access control aborted. "+msg;
 					errorException = e;
 					lock.countDown();
+				}
+				@Override
+				public void onAccessControlChecked(List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> permissions) {
+					succeed = true;
+					try {
+						retrievedPermission = ResponseItemUtils.toResponseItem(permissions.get(0));
+					}
+					catch(Exception e) {
+						succeed = false;
+						onAccessControlAborted("No permission retrieved", e);
+					}
+					finally {
+						lock.countDown();
+					}
 				}
 			});
 
@@ -212,12 +239,6 @@ public class PrivacyDataManagerTest extends IntegrationTest {
 					errorException = e;
 					lock.countDown();
 				}
-				@Override
-				public void onObfuscatedVersionRetrieved(CtxIdentifier dataId, boolean retrieved) {
-					succeed = false;
-					errorMsg = "onObfuscatedVersionRetrieved should no be called";
-					lock.countDown();
-				}
 			});
 
 			boolean releaseBeforeTimeout = lock.await(TestCase.getTimeout(), TimeUnit.MILLISECONDS);
@@ -277,12 +298,6 @@ public class PrivacyDataManagerTest extends IntegrationTest {
 					succeed = false;
 					errorMsg = msg;
 					errorException = e;
-					lock.countDown();
-				}
-				@Override
-				public void onObfuscatedVersionRetrieved(CtxIdentifier dataId, boolean retrieved) {
-					succeed = false;
-					errorMsg = "onObfuscatedVersionRetrieved should no be called";
 					lock.countDown();
 				}
 			});

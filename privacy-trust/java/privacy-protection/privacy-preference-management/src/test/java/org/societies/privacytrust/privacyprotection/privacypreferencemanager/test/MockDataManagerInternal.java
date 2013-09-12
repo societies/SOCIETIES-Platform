@@ -38,6 +38,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.RequestorBean;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 
 /**
@@ -86,7 +87,7 @@ public class MockDataManagerInternal implements IPrivacyDataManagerInternal {
 	 * @see org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal#getPermission(org.societies.api.identity.Requestor, org.societies.api.schema.identity.DataIdentifier, java.util.List)
 	 */
 	@Override
-	public ResponseItem getPermission(Requestor requestor,
+	public List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> getPermissions(Requestor requestor,
 			DataIdentifier dataId, List<Action> actions)
 			throws PrivacyException {
 		// TODO Auto-generated method stub
@@ -116,6 +117,111 @@ public class MockDataManagerInternal implements IPrivacyDataManagerInternal {
 	@Override
 	public boolean deletePermission(Requestor requestor, DataIdentifier dataId,
 			List<Action> actions) throws PrivacyException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean updatePermissions(
+			Requestor requestor,
+			List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> permissions)
+			throws PrivacyException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> getPermissions(
+			RequestorBean requestor,
+			List<DataIdentifier> dataIds,
+			List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions)
+			throws PrivacyException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> getPermissions(
+			RequestorBean requestor,
+			DataIdentifier dataId,
+			List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions)
+			throws PrivacyException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> getPermissions(
+			RequestorBean requestor, DataIdentifier dataId)
+			throws PrivacyException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean updatePermission(
+			RequestorBean requestor,
+			DataIdentifier dataId,
+			List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions,
+			org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision permission)
+			throws PrivacyException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean deletePermissions(RequestorBean requestor,
+			DataIdentifier dataId) throws PrivacyException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean deletePermissions(
+			RequestorBean requestor,
+			DataIdentifier dataId,
+			List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions)
+			throws PrivacyException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean updatePermissions(
+			RequestorBean requestor,
+			List<DataIdentifier> dataIds,
+			List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions,
+			List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision> decisions)
+			throws PrivacyException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean updatePermission(
+			RequestorBean requestor,
+			org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem permission)
+			throws PrivacyException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean updatePermissions(
+			RequestorBean requestor,
+			List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem> permissions)
+			throws PrivacyException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean updatePermissions(
+			RequestorBean requestor,
+			List<DataIdentifier> dataIds,
+			List<org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action> actions,
+			org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision decision)
+			throws PrivacyException {
 		// TODO Auto-generated method stub
 		return false;
 	}

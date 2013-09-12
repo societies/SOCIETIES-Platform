@@ -42,11 +42,9 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
-
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacydatamanagement.PrivacyDataManagerBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyAgreementManagerBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.privacypolicymanagement.PrivacyPolicyManagerBean;
-
 import org.societies.privacytrust.remote.privacydatamanagement.PrivacyDataManagerCommServer;
 import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyAgreementManagerCommServer;
 import org.societies.privacytrust.remote.privacypolicymanagement.PrivacyPolicyManagerCommServer;
