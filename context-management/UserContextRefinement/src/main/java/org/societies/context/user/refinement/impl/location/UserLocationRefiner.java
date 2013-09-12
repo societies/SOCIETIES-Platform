@@ -26,17 +26,17 @@ package org.societies.context.user.refinement.impl.location;
 
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.context.CtxException;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAssociation;
@@ -218,16 +218,22 @@ public class UserLocationRefiner {
 				return null; // Cannot refine if the CSS owner entity is not the parent of the OWNS_CSS_NODES association
 			if (ownsCssNodesAssoc.getChildEntities().isEmpty())
 				return null; // Cannot refine without CSS_NODE entities
-			// TODO select User Interaction Node; pick first for now
-			final CtxEntityIdentifier cssNodeEntId = ownsCssNodesAssoc.getChildEntities().iterator().next();
-			if (LOG.isDebugEnabled())
-				LOG.debug("cssNodeEntId=" + cssNodeEntId);
-			final CtxEntity cssNodeEnt = (CtxEntity) 
-					this.internalCtxBroker.retrieve(cssNodeEntId).get();
-			if (cssNodeEnt == null)
-				throw new UserCtxInferenceException("Could not refine attribute '"
-						+ attrId + "': Entity '" + cssNodeEntId +  "' does not exist");
-			final Set<CtxAttribute> inputAttrs = cssNodeEnt.getAttributes(attrId.getType());
+			// TODO check User Interaction Device node
+			final Set<CtxAttribute> inputAttrs = new LinkedHashSet<CtxAttribute>();
+			final Iterator<CtxEntityIdentifier> nodeIterator = ownsCssNodesAssoc.getChildEntities().iterator(); 
+			while (nodeIterator.hasNext()) {
+				final CtxEntityIdentifier cssNodeEntId = nodeIterator.next();
+				if (LOG.isDebugEnabled())
+					LOG.debug("cssNodeEntId=" + cssNodeEntId);
+				final CtxEntity cssNodeEnt = (CtxEntity) 
+						this.internalCtxBroker.retrieve(cssNodeEntId).get();
+				if (cssNodeEnt == null) {
+					LOG.warn("Could not refine attribute '"	+ attrId + "': Entity '" 
+							+ cssNodeEntId +  "' does not exist");
+					continue;
+				}
+				inputAttrs.addAll(cssNodeEnt.getAttributes(attrId.getType()));
+			}
 			if (LOG.isDebugEnabled())
 				LOG.debug("inputAttrs.size()=" + inputAttrs.size());
 			if (inputAttrs.isEmpty())
@@ -294,12 +300,15 @@ public class UserLocationRefiner {
 				return; // Cannot refine without CSS_NODE entities
 			if (!ownerEntId.equals(ownsCssNodesAssoc.getParentEntity()))
 				return; // Should not refine attributes under the CSS_NODE entity
-			// TODO select User Interaction Node; pick first for now
-			final CtxEntityIdentifier cssNodeEntId = ownsCssNodesAssoc.getChildEntities().iterator().next();
-			if (LOG.isDebugEnabled())
-				LOG.debug("cssNodeEntId=" + cssNodeEntId);
-			this.internalCtxBroker.registerForChanges(
-					new LocationSymbolicChangeListener(attrId), cssNodeEntId, attrId.getType());
+			final Iterator<CtxEntityIdentifier> nodeIterator = ownsCssNodesAssoc.getChildEntities().iterator(); 
+			while (nodeIterator.hasNext()) {
+				final CtxEntityIdentifier cssNodeEntId = nodeIterator.next();
+				if (LOG.isDebugEnabled())
+					LOG.debug("cssNodeEntId=" + cssNodeEntId);
+				this.internalCtxBroker.registerForChanges(
+						new LocationSymbolicChangeListener(attrId), cssNodeEntId, attrId.getType());
+			}
+			
 			if (LOG.isDebugEnabled())
 				LOG.debug("Adding " + attrId + " to set of continuously inferred attributes");
 			this.continuouslyRefinedAttrIds.add(attrId);
