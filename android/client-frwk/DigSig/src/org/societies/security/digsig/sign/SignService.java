@@ -2,6 +2,7 @@ package org.societies.security.digsig.sign;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -206,8 +207,16 @@ public class SignService extends IntentService {
 			}
 			else {
 				String docUrl = intent.getStringExtra(Sign.Params.DOC_TO_SIGN_URL);
-				download(new URL(docUrl), TMP_FILE_PATH);
-				return openFileInput(TMP_FILE_PATH);
+				URL url = new URL(docUrl);
+				String protocol = url.getProtocol();
+				if (protocol.equals("file")) {
+					return new FileInputStream(url.getPath());
+				} else if (protocol.startsWith("http") || protocol.startsWith("ftp")) {
+					download((url), TMP_FILE_PATH);
+					return openFileInput(TMP_FILE_PATH);
+				} else {
+					throw new DigSigException("Unsupported protocol: " + url.getProtocol());
+				}
 			}
 		} catch (Exception e) {
 			throw new DigSigException(e);
