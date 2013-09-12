@@ -1,4 +1,4 @@
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
@@ -27,7 +27,9 @@
 
                 <p:panel>
                     <f:facet name="header">
-                        <p:selectBooleanCheckbox id="checkbox"/>
+                        <p:selectBooleanCheckbox id="checkbox"
+                                                 value="#{responseItem.permitted}"/>
+
                         <p:outputLabel value="#{responseItem.requestItem.resource.dataType}"
                                        for="checkbox"
                                        style="margin-top: 5px;"/>
@@ -65,40 +67,31 @@
                         </p:panelGrid>
 
                         <!--Conditions-->
-                        <p:dataTable id="conditionsTable"
-                                     var="condition" value="#{responseItem.requestItem.conditions}"
-                                     tableStyle="border: 0"
-                                     paginator="false" rows="20">
+                        <p:dataGrid id="conditionsTable"
+                                    value="#{responseItem.requestItem.conditions}"
+                                    var="condition"
+                                    columns="1">
+                            <f:facet name="header">
+                                Conditions
+                            </f:facet>
 
-                            <p:column headerText="Condition" style="width:50%">
-                                #{condition.conditionConstant}
-                            </p:column>
+                            <p:outputLabel for="conditionValue" value="#{condition.conditionConstant.name()}"/>
 
-                            <p:column headerText="Value" style="width:25%">
-                                <p:selectOneMenu
-                                        label="#{responseItem.requestItem.resource.dataType} condition #{condition.conditionConstant}"
-                                        id="conditionValue"
-                                        value="#{condition.value}"
-                                        required="#{!condition.optional}"
-                                        validatorMessage="This value is required">
-                                    <f:selectItem itemLabel="(none)"
-                                                  itemValue=""
-                                                  noSelectionOption="true"
-                                                  rendered="#{condition.optional}"/>
-                                    <f:selectItems
-                                            value="#{accessControlController.getAvailableConditionValues(condition.conditionConstant)}"/>
-                                    <p:ajax update="conditionValMsg" event="change"/>
-                                </p:selectOneMenu>
+                            <p:selectOneMenu
+                                    label="#{responseItem.requestItem.resource.dataType} condition #{condition.conditionConstant}"
+                                    id="conditionValue"
+                                    value="#{condition.value}"
+                                    required="#{!condition.optional}"
+                                    validatorMessage="This value is required">
+                                <f:selectItem itemLabel="(none)"
+                                              itemValue=""
+                                              noSelectionOption="true"
+                                              rendered="#{condition.optional}"/>
+                                <f:selectItems
+                                        value="#{accessControlController.getAvailableConditionValues(condition.conditionConstant)}"/>
+                            </p:selectOneMenu>
 
-                                <p:outputLabel style="color:#f00;font-weight:bold;"
-                                               rendered="#{!condition.optional}"> *</p:outputLabel>
-                            </p:column>
-
-                            <p:column headerText="Required" style="width:25%">
-                                <p:message id="conditionValMsg" for="conditionValue" display="icon"/>
-                            </p:column>
-
-                        </p:dataTable>
+                        </p:dataGrid>
 
                         <p:commandButton outcome="productDetail" icon="ui-icon-circle-plus" title="Add condition"
                                          actionListener="#{accessControlController.addNewCondition(responseItem.requestItem)}"
@@ -113,28 +106,6 @@
                         </p:selectOneMenu>
                     </p:panel>
                 </p:panel>
-
-
-                <p:tabView id="tabView" rendered="false">
-
-                    <p:tab title="General">
-                        <!-- GENERAL TAB -->
-                        <h:panelGrid columns="2" cellpadding="10">
-                            <p:outputLabel for="dataType">Data type:</p:outputLabel>
-                            <p:inputText id="dataType" value="#{responseItem.requestItem.resource.dataType}"
-                                         readonly="true"/>
-
-                            <p:outputLabel for="decision">Permission:</p:outputLabel>
-                            <p:selectOneMenu id="decision" value="#{responseItem.decision}">
-                                <f:selectItems value="#{accessControlController.decisionOptions}"
-                                               var="dec"/>
-                            </p:selectOneMenu>
-                        </h:panelGrid>
-                        <!-- END GENERAL TAB -->
-                    </p:tab>
-
-
-                </p:tabView>
 
             </p:dataGrid>
 

@@ -7,6 +7,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.Priv
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.*;
 import org.societies.webapp.controller.BasePageController;
 import org.societies.webapp.wrappers.RequestItemWrapper;
+import org.societies.webapp.wrappers.ResponseItemWrapper;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -15,6 +16,7 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -39,6 +41,7 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
     private String eventID;
     private UserFeedbackPrivacyNegotiationEvent event;
+    private ConditionConstants newConditionToAdd;
 
     public PrivacyPolicyNegotiationController() {
         if (log.isDebugEnabled())
@@ -93,6 +96,29 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
         return PrivacyConditionsConstantValues.getValues(condition);
     }
 
+    @SuppressWarnings("MethodMayBeStatic")
+    public List<ConditionConstants> getAvailableConditionConstants(RequestItem requestItem) {
+        List<ConditionConstants> availableConstants = new ArrayList<ConditionConstants>();
+
+        // add any missing ConditionConstants
+        for (ConditionConstants constant : ConditionConstants.values()) {
+            boolean found = false;
+
+            for (Condition condition : requestItem.getConditions()) {
+                if (constant.equals(condition.getConditionConstant())) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                availableConstants.add(constant);
+            }
+        }
+
+        return availableConstants;
+    }
+
     public ResponsePolicy getResponsePolicy() {
         return event != null
                 ? event.getResponsePolicy()
@@ -101,6 +127,29 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
     public UserFeedbackPrivacyNegotiationEvent getCurrentNegotiationEvent() {
         return event;
+    }
+
+    public void addNewCondition(RequestItem selectedRequestItem) {
+        if (newConditionToAdd == null) {
+            log.warn("newConditionToAdd is null");
+            return;
+        }
+        if (selectedRequestItem == null) {
+            log.warn("selectedRequestItem is null");
+            return;
+        }
+
+        Condition condition = new Condition();
+        condition.setOptional(true);
+        condition.setConditionConstant(newConditionToAdd);
+        condition.setValue("");
+
+        selectedRequestItem.getConditions().add(condition);
+
+        log.debug("Adding condition {} to request item for {}",
+                new String[]{newConditionToAdd.name(), selectedRequestItem.getResource().getDataType()});
+
+        newConditionToAdd = null;
     }
 
     public String completeNegotiationAction() {
@@ -172,100 +221,77 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     }
 
     private static void prepareEventForGUI(UserFeedbackPrivacyNegotiationEvent event) {
+        ResponseItemWrapper.wrapList(event.getResponsePolicy().getResponseItems());
 
-        List<ResponseItem> responseItems = event.getResponsePolicy().getResponseItems();
-        for (ResponseItem response : responseItems) {
+        for (ResponseItem response : event.getResponsePolicy().getResponseItems()) {
 
-           RequestItemWrapper request = new RequestItemWrapper(response.getRequestItem());
-            response.setRequestItem(request);
+            // wrap the sub items
+            if (!(response.getRequestItem() instanceof RequestItemWrapper))
+                response.setRequestItem(new RequestItemWrapper(response.getRequestItem()));
 
-            // add any missing ConditionConstants
-            for (ConditionConstants constant : ConditionConstants.values()) {
-                boolean found = false;
-
-                for (Condition condition : request.getConditions()) {
-                    if (constant.equals(condition.getConditionConstant())) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    Condition newCondition = new Condition();
-                    newCondition.setConditionConstant(constant);
-                    newCondition.setOptional(true);
-                    newCondition.setValue("");
-                    request.getConditions().add(newCondition);
-                }
-            }
+            // set to permit by default - the user can then change
+            response.setDecision(Decision.PERMIT);
 
             // quickly sort by condition name
-            Collections.sort(request.getConditions(), new Comparator<Condition>() {
+            Collections.sort(response.getRequestItem().getConditions(), new Comparator<Condition>() {
                 @Override
                 public int compare(Condition o1, Condition o2) {
                     return o1.getConditionConstant().name().compareTo(o2.getConditionConstant().name());
                 }
             });
+
         }
+
     }
 
     private static void prepareEventForTransmission(ResponsePolicy responsePolicy) {
+        // Convert ResponseItemWrappers back to ResponseItems if necessary
+        ResponseItemWrapper.unwrapList(responsePolicy.getResponseItems());
+
         for (ResponseItem response : responsePolicy.getResponseItems()) {
-            RequestItemWrapper requestWrapper = (RequestItemWrapper) response.getRequestItem();
-            RequestItem request = requestWrapper.getRequestItem();
 
-            // remove any optional, unset ConditionConstants
-            for (int i = 0; i < request.getConditions().size(); i++) {
-                Condition condition = request.getConditions().get(i);
-
-                if (condition.isOptional() && condition.getValue() == null || "".equals(condition.getValue())) {
-                    request.getConditions().remove(i);
-                    i--;
-                }
-            }
-
+            RequestItemWrapper requestItemWrapper = (RequestItemWrapper) response.getRequestItem();
 
             // Action strings need to be converted back to Actions
             // Actually we're just filtering out the unselected ones
 
             // we always need read, add it if we haven't got it
-            if (!requestWrapper.getSelectedActionNames().contains("READ"))
-                requestWrapper.getSelectedActionNames().add("READ");
+            if (!requestItemWrapper.getSelectedActionNames().contains("READ"))
+                requestItemWrapper.getSelectedActionNames().add("READ");
 
-            for (int i = 0; i < request.getActions().size(); i++) {
-                Action action = request.getActions().get(i);
-                boolean found = false;
+            // upon return, the "Actions" field should only contain selected actions
+            requestItemWrapper.setActions(requestItemWrapper.getSelectedActions());
 
-                for (String name : requestWrapper.getSelectedActionNames()) {
-                    if (action.getActionConstant().name().equals(name)) {
-                        found = true;
-                        break;
-                    }
-                }
+            // unwrap the sub items
+            RequestItem requestItem;
+            if (response.getRequestItem() instanceof RequestItemWrapper) {
+                requestItem = ((RequestItemWrapper) response.getRequestItem()).getRequestItem();
+                response.setRequestItem(requestItem);
+            } else {
+                requestItem = response.getRequestItem();
+            }
 
-                if (!found) {
-                    request.getActions().remove(i);
+            // remove any optional, unset ConditionConstants
+            for (int i = 0; i < requestItem.getConditions().size(); i++) {
+                Condition condition = requestItem.getConditions().get(i);
+
+                if (condition.isOptional() && condition.getValue() == null || "".equals(condition.getValue())) {
+                    requestItem.getConditions().remove(i);
                     i--;
                 }
             }
-
         }
-
-        clearResponseItemWrapper(responsePolicy);
     }
 
-    private static void clearResponseItemWrapper(ResponsePolicy responsePolicy) {
-        for (ResponseItem item : responsePolicy.getResponseItems()) {
-            RequestItem oldItem = item.getRequestItem();
-            RequestItem newItem = new RequestItem();
-            newItem.setActions(oldItem.getActions());
-            newItem.setConditions(oldItem.getConditions());
-            newItem.setOptional(oldItem.isOptional());
-            newItem.setResource(oldItem.getResource());
+    public void setNewConditionToAdd(ConditionConstants newConditionToAdd) {
+        this.newConditionToAdd = newConditionToAdd;
 
-            item.setRequestItem(newItem);
-        }
-
+        log.debug("New condition to add: {}", newConditionToAdd);
     }
+
+    public ConditionConstants getNewConditionToAdd() {
+        return newConditionToAdd;
+    }
+
 
 }
