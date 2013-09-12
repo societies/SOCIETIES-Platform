@@ -44,8 +44,6 @@ import org.societies.api.internal.security.policynegotiator.INegotiationCallback
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderCallback;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ExpProposalType;
-import org.societies.api.internal.useragent.model.ImpProposalContent;
-import org.societies.api.internal.useragent.model.ImpProposalType;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.security.digsig.DigsigException;
@@ -236,19 +234,13 @@ public class ProviderCallback implements INegotiationProviderCallback {
 		
 		LOG.debug("selectSopOption: creating parameters for user feedback");
 		ExpProposalContent expProposal = new ExpProposalContent("Select a policy option", sopName);
-		ImpProposalContent impProposal = new ImpProposalContent("Foo", 5000);
 		
 		LOG.debug("selectSopOption: getting user feedback \"{}\"", sopName);
 		
-//		Future<List<String>> future = UserFeedbackHelper.getUserFeedback().getExplicitFB(ExpProposalType.RADIOLIST, expProposal);
-//		List<String> selected = future.get();
-//		LOG.info("selectSopOption: user selected \"{}\"", selected.get(0));
-//		return selected.get(0);
-		
-		UserFeedbackHelper.getUserFeedback().getImplicitFB(ImpProposalType.TIMED_ABORT, impProposal);
-		
-		LOG.debug("selectSopOption: returning");
-		return sopName[0];
+		Future<List<String>> future = UserFeedbackHelper.getUserFeedback().getExplicitFB(ExpProposalType.RADIOLIST, expProposal);
+		List<String> selected = future.get();
+		LOG.info("selectSopOption: user selected \"{}\"", selected.get(0));
+		return selected.get(0);
 	}
 	
 	private String generateKey() {
