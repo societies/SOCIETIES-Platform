@@ -25,5 +25,5 @@
 <osgi:reference id="negotiationProviderRef" interface="org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt" />
 <osgi:reference id="userFeedbackRef" interface="org.societies.api.internal.useragent.feedback.IUserFeedback" />
 <osgi:reference id="cisCommFactoryRef" interface="org.societies.api.internal.comm.ICISCommunicationMgrFactory" />
-
+<!--  <osgi:reference id="virgoDeployerRef" interface="org.eclipse.virgo.nano.deployer.api.core.ApplicationDeployer" /> -->
 </beans>

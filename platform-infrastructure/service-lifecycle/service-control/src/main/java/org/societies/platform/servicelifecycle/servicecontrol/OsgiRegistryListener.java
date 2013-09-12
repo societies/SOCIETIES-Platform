@@ -363,8 +363,12 @@ public class OsgiRegistryListener implements BundleContextAware,
 			INetworkNode myNode = commMngr.getIdManager().getThisNetworkNode();
 			
 			//TODO DEAL WITH THIS
-			service.setServiceEndpoint(myNode.getJid()  + "/" +  service.getServiceName().replaceAll(" ", ""));
-
+			//service.setServiceEndpoint(myNode.getJid()  + "/" +  service.getServiceName().replaceAll(" ", ""));
+			if(service.getServiceEndpoint() != null && !service.getServiceEndpoint().startsWith("/")){
+				log.debug("Service Endpoint was not started with '/', adding it: {}",service.getServiceEndpoint());
+				service.setServiceEndpoint("/"+service.getServiceEndpoint());
+			}
+				
 			//TODO: Do this properly!
 			ServiceInstance si = new ServiceInstance();
 

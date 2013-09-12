@@ -41,6 +41,7 @@ import java.util.concurrent.TimeUnit;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.activity.IActivity;
@@ -78,6 +79,7 @@ import org.societies.api.internal.servicelifecycle.ServiceControlException;
 import org.societies.api.internal.servicelifecycle.ServiceMgmtInternalEvent;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
+//import org.eclipse.virgo.nano.deployer.api.core.ApplicationDeployer;
 import org.societies.platform.servicelifecycle.servicecontrol.ServiceNegotiationCallback.ServiceNegotiationResult;
 import org.springframework.osgi.context.BundleContextAware;
 import org.springframework.scheduling.annotation.Async;
@@ -190,7 +192,15 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	public void setUserFeedback(IUserFeedback userFeedback){
 		this.userFeedback = userFeedback;
 	}
+	/*
+	public ApplicationDeployer getVirgoDeployer(){
+		return virgoDeployer;
+	}
 	
+	public void setVirgoDeployer(AppplicationDeployer virgoDeployer){
+		this.virgoDeployer = virgoDeployer;
+	}
+	*/
 	@Override
 	public void setBundleContext(BundleContext bundleContext) {	
 		this.bundleContext = bundleContext;
@@ -212,7 +222,21 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			thisNode = getCommMngr().getIdManager().getThisNetworkNode();
 			myId = getCommMngr().getIdManager().fromJid(thisNode.getJid());
-			
+			try{
+				Bundle[] bundles = this.bundleContext.getBundles();
+				for(int k=0; k < bundles.length; k++){
+					logger.debug("Bundle is: " + bundles[k].getSymbolicName());
+					ServiceReference[] services = bundles[k].getRegisteredServices();
+					for(int j=0; j < services.length; j++){
+						logger.debug("org.springframework.osgi.bean.name: {}", services[j].getProperty("org.springframework.osgi.bean.name"));
+						logger.debug("Object class: {}", services[j].getProperty("objectClass"));
+						logger.debug("service.id : {}", services[j].getProperty("service.id"));
+					}
+				}
+			} catch(Exception ex){
+				logger.error("Coisas é fixe: {}",ex.getLocalizedMessage());
+				ex.printStackTrace();
+			}
 		} catch (Exception e) {
 			logger.error("Exception registering for CIS events");
 			e.printStackTrace();

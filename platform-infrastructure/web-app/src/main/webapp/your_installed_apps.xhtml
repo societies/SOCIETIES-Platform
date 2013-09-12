@@ -47,6 +47,15 @@
     			</p:column>
  	    		<p:column colspan="1" style="border:3px solid black">
  	    		<p>
+ 	    			<p:commandButton value="Go"
+		    		onclick="blockUI.show()" oncomplete="blockUI.hide()"
+		    		rendered="#{service.started and servicesController.myNode and !service.device and service.mine and service.endpoint != null}"
+		    		action="#{servicesController.launchService}" process="@this" update=":mainForm:serMessages"
+		    		styleClass="services-button" style="width:75px" icon="ui-icon-extlink" >
+						<f:setPropertyActionListener target="#{servicesController.serviceId}" value="#{service.id}" />
+					</p:commandButton>
+				</p>
+				<p>	
 		    		<p:commandButton value="Start"
 		    		onclick="blockUI.show()" oncomplete="blockUI.hide()"
 		    		rendered="#{!service.started and servicesController.myNode and !service.device and service.mine}"

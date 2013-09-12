@@ -123,6 +123,10 @@ public class ServiceWrapper {
 		return ServiceModelUtils.getJidFromServiceIdentifier(service.getServiceIdentifier());
 	}
 	
+	public String getEndpoint(){
+		return service.getServiceEndpoint();
+	}
+	
 	public String getOwnerName(){
 		if(ownerName == null){
 			/*List<String> cssIdList = new ArrayList();

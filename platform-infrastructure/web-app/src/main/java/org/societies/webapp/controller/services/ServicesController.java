@@ -37,6 +37,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
 @ManagedBean(name = "servicesController")
@@ -528,6 +529,21 @@ public class ServicesController extends BasePageController {
     	return "mynode".equals(getSelectedNode());
     }
 
+    public void launchService(){
+    	log.debug("Launching 3P Service...");
+    	ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+    	StringBuilder urlBuilder = new StringBuilder();
+    	urlBuilder.append("http://").append(context.getRequestServerName()).append(':').append(context.getRequestServerPort()).append(selectedService.getServiceEndpoint());
+    	try{
+    		log.debug("Trying to launch service at URL: {}",urlBuilder.toString());
+    		context.redirect(urlBuilder.toString());
+    	} catch(Exception ex){
+    		log.error("");
+    		ex.printStackTrace();
+			sendMessage("Problem Redirecting to App","A problem occured while trying to launch app!",FacesMessage.SEVERITY_ERROR);
+
+    	}
+    }
     public void searchService(){
     	log.debug("Searching for services, the option is {} and the key is {}",getSearchOption(),getSearchBy());
     	
