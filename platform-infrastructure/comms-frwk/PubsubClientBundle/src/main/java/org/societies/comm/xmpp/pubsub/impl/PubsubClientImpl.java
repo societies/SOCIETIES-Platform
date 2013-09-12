@@ -84,6 +84,7 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
         try {
             registry.bind(com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl.class, XMLGregorianCalendarConverter.class);
             registry.bind(java.util.Date.class, DateConverter.class);
+            registry.bind(java.sql.Timestamp.class, DateConverter.class);
             registry.bind(java.net.URI.class, URIConverter.class);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);

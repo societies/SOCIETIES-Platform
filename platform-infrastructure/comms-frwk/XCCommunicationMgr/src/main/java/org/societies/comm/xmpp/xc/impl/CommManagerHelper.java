@@ -113,6 +113,7 @@ public class CommManagerHelper {
         try {
             registry.bind(com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl.class, XMLGregorianCalendarConverter.class);
             registry.bind(java.util.Date.class, DateConverter.class);
+            registry.bind(java.sql.Timestamp.class, DateConverter.class);
             registry.bind(java.net.URI.class, URIConverter.class);
             registry.bind(org.jabber.protocol.pubsub.event.Items.class, new EventItemsConverter(s));
             registry.bind(org.jabber.protocol.pubsub.Items.class, new PubsubItemsConverter(s));
