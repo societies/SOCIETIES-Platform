@@ -16,8 +16,10 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 @ManagedBean(name = "ppNegotiation", eager = true)
 @ViewScoped
@@ -39,6 +41,7 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
     private String eventID;
     private UserFeedbackPrivacyNegotiationEvent event;
+    private ConditionConstants newConditionToAdd;
 
     public PrivacyPolicyNegotiationController() {
         if (log.isDebugEnabled())
@@ -93,6 +96,29 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
         return PrivacyConditionsConstantValues.getValues(condition);
     }
 
+    @SuppressWarnings("MethodMayBeStatic")
+    public List<ConditionConstants> getAvailableConditionConstants(RequestItem requestItem) {
+        List<ConditionConstants> availableConstants = new ArrayList<ConditionConstants>();
+
+        // add any missing ConditionConstants
+        for (ConditionConstants constant : ConditionConstants.values()) {
+            boolean found = false;
+
+            for (Condition condition : requestItem.getConditions()) {
+                if (constant.equals(condition.getConditionConstant())) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                availableConstants.add(constant);
+            }
+        }
+
+        return availableConstants;
+    }
+
     public ResponsePolicy getResponsePolicy() {
         return event != null
                 ? event.getResponsePolicy()
@@ -101,6 +127,29 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
     public UserFeedbackPrivacyNegotiationEvent getCurrentNegotiationEvent() {
         return event;
+    }
+
+    public void addNewCondition(RequestItem selectedRequestItem) {
+        if (newConditionToAdd == null) {
+            log.warn("newConditionToAdd is null");
+            return;
+        }
+        if (selectedRequestItem == null) {
+            log.warn("selectedRequestItem is null");
+            return;
+        }
+
+        Condition condition = new Condition();
+        condition.setOptional(true);
+        condition.setConditionConstant(newConditionToAdd);
+        condition.setValue("");
+
+        selectedRequestItem.getConditions().add(condition);
+
+        log.debug("Adding condition {} to request item for {}",
+                new String[]{newConditionToAdd.name(), selectedRequestItem.getResource().getDataType()});
+
+        newConditionToAdd = null;
     }
 
     public String completeNegotiationAction() {
@@ -180,26 +229,8 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
             if (!(response.getRequestItem() instanceof RequestItemWrapper))
                 response.setRequestItem(new RequestItemWrapper(response.getRequestItem()));
 
-            // add any missing ConditionConstants
-            // TODO: This might need removed as part of the #1542 / #2084 UF upgrade
-            for (ConditionConstants constant : ConditionConstants.values()) {
-                boolean found = false;
-
-                for (Condition condition : response.getRequestItem().getConditions()) {
-                    if (constant.equals(condition.getConditionConstant())) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    Condition newCondition = new Condition();
-                    newCondition.setConditionConstant(constant);
-                    newCondition.setOptional(true);
-                    newCondition.setValue("");
-                    response.getRequestItem().getConditions().add(newCondition);
-                }
-            }
+            // set to permit by default - the user can then change
+            response.setDecision(Decision.PERMIT);
 
             // quickly sort by condition name
             Collections.sort(response.getRequestItem().getConditions(), new Comparator<Condition>() {
@@ -250,6 +281,16 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
                 }
             }
         }
+    }
+
+    public void setNewConditionToAdd(ConditionConstants newConditionToAdd) {
+        this.newConditionToAdd = newConditionToAdd;
+
+        log.debug("New condition to add: {}", newConditionToAdd);
+    }
+
+    public ConditionConstants getNewConditionToAdd() {
+        return newConditionToAdd;
     }
 
 
