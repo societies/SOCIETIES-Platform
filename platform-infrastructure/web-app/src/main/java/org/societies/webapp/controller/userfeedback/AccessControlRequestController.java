@@ -6,6 +6,7 @@ import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.Priv
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.*;
 import org.societies.webapp.controller.BasePageController;
 import org.societies.webapp.wrappers.RequestItemWrapper;
+import org.societies.webapp.wrappers.ResponseItemWrapper;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -91,6 +92,11 @@ public class AccessControlRequestController extends BasePageController {
 
     @SuppressWarnings("MethodMayBeStatic")
     public String[] getAvailableConditionValues(ConditionConstants condition) {
+        if (condition == null) {
+            log.warn("Condition is null in getAvailableConditionValues(..)");
+            return null;
+        }
+
         return PrivacyConditionsConstantValues.getValues(condition);
     }
 
@@ -197,80 +203,66 @@ public class AccessControlRequestController extends BasePageController {
     }
 
     private static void prepareEventForGUI(UserFeedbackAccessControlEvent event) {
+        ResponseItemWrapper.wrapList(event.getResponseItems());
 
-        List<ResponseItem> responseItems = event.getResponseItems();
-        for (ResponseItem response : responseItems) {
+        for (ResponseItem response : event.getResponseItems()) {
 
-            RequestItemWrapper request = new RequestItemWrapper(response.getRequestItem());
-            response.setRequestItem(request);
+            // wrap the sub items
+            if (!(response.getRequestItem() instanceof RequestItemWrapper))
+                response.setRequestItem(new RequestItemWrapper(response.getRequestItem()));
+
+            // set to permit by default - the user can then change
+            response.setDecision(Decision.PERMIT);
 
             // quickly sort by condition name
-            Collections.sort(request.getConditions(), new Comparator<Condition>() {
+            Collections.sort(response.getRequestItem().getConditions(), new Comparator<Condition>() {
                 @Override
                 public int compare(Condition o1, Condition o2) {
                     return o1.getConditionConstant().name().compareTo(o2.getConditionConstant().name());
                 }
             });
+
         }
+
     }
 
     private static void prepareEventForTransmission(UserFeedbackAccessControlEvent event) {
+        // Convert ResponseItemWrappers back to ResponseItems if necessary
+        ResponseItemWrapper.unwrapList(event.getResponseItems());
+
         for (ResponseItem response : event.getResponseItems()) {
-            RequestItemWrapper requestWrapper = (RequestItemWrapper) response.getRequestItem();
-            RequestItem request = requestWrapper.getRequestItem();
 
-            // remove any optional, unset ConditionConstants
-            for (int i = 0; i < request.getConditions().size(); i++) {
-                Condition condition = request.getConditions().get(i);
-
-                if (condition.isOptional() && condition.getValue() == null || "".equals(condition.getValue())) {
-                    request.getConditions().remove(i);
-                    i--;
-                }
-            }
-
+            RequestItemWrapper requestItemWrapper = (RequestItemWrapper) response.getRequestItem();
 
             // Action strings need to be converted back to Actions
             // Actually we're just filtering out the unselected ones
 
             // we always need read, add it if we haven't got it
-            if (!requestWrapper.getSelectedActionNames().contains("READ"))
-                requestWrapper.getSelectedActionNames().add("READ");
+            if (!requestItemWrapper.getSelectedActionNames().contains("READ"))
+                requestItemWrapper.getSelectedActionNames().add("READ");
 
-            for (int i = 0; i < request.getActions().size(); i++) {
-                Action action = request.getActions().get(i);
-                boolean found = false;
+            // upon return, the "Actions" field should only contain selected actions
+            requestItemWrapper.setActions(requestItemWrapper.getSelectedActions());
 
-                for (String name : requestWrapper.getSelectedActionNames()) {
-                    if (action.getActionConstant().name().equals(name)) {
-                        found = true;
-                        break;
-                    }
-                }
+            // unwrap the sub items
+            RequestItem requestItem;
+            if (response.getRequestItem() instanceof RequestItemWrapper) {
+                requestItem = ((RequestItemWrapper) response.getRequestItem()).getRequestItem();
+                response.setRequestItem(requestItem);
+            } else {
+                requestItem = response.getRequestItem();
+            }
 
-                if (!found) {
-                    request.getActions().remove(i);
+            // remove any optional, unset ConditionConstants
+            for (int i = 0; i < requestItem.getConditions().size(); i++) {
+                Condition condition = requestItem.getConditions().get(i);
+
+                if (condition.isOptional() && condition.getValue() == null || "".equals(condition.getValue())) {
+                    requestItem.getConditions().remove(i);
                     i--;
                 }
             }
-
         }
-
-        clearResponseItemWrapper(event);
-    }
-
-    private static void clearResponseItemWrapper(UserFeedbackAccessControlEvent event) {
-        for (ResponseItem item : event.getResponseItems()) {
-            RequestItem oldItem = item.getRequestItem();
-            RequestItem newItem = new RequestItem();
-            newItem.setActions(oldItem.getActions());
-            newItem.setConditions(oldItem.getConditions());
-            newItem.setOptional(oldItem.isOptional());
-            newItem.setResource(oldItem.getResource());
-
-            item.setRequestItem(newItem);
-        }
-
     }
 
     public void setNewConditionToAdd(ConditionConstants newConditionToAdd) {
@@ -282,5 +274,6 @@ public class AccessControlRequestController extends BasePageController {
     public ConditionConstants getNewConditionToAdd() {
         return newConditionToAdd;
     }
+
 
 }

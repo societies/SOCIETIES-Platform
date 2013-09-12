@@ -9,10 +9,8 @@ import java.util.List;
 public class RequestItemWrapper extends RequestItem {
     private List<Action> originalActions;
     private List<String> selectedActionNames;
-    private RequestItem prototype;
 
     public RequestItemWrapper(RequestItem prototype) {
-        this.prototype = prototype;
         this.originalActions = new ArrayList<Action>(prototype.getActions());
         this.actions = prototype.getActions();
         this.conditions = prototype.getConditions();
@@ -33,11 +31,34 @@ public class RequestItemWrapper extends RequestItem {
         this.selectedActionNames = selectedActionNames;
     }
 
+    public List<Action> getSelectedActions() {
+        List<Action> selectedActions = new ArrayList<Action>();
+
+        for (Action action : this.originalActions) {
+            for (String name : selectedActionNames) {
+                if (action.getActionConstant().name().equals(name)) {
+                    selectedActions.add(action);
+                    break;
+                }
+            }
+        }
+
+        return selectedActions;
+    }
+
     public List<Action> getOriginalActions() {
         return originalActions;
     }
 
     public RequestItem getRequestItem() {
-        return prototype;
+        RequestItem item = new RequestItem();
+
+        item.setActions(this.getActions());
+        item.setConditions(this.getConditions());
+        item.setResource(this.getResource());
+        item.setOptional(this.isOptional());
+
+        return item;
     }
+
 }
