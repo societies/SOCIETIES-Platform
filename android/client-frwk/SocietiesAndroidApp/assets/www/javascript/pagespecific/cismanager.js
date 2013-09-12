@@ -150,6 +150,10 @@ var	SocietiesCISManagerService = {
 			// Call
 			SocietiesPrivacyPolicyManagerService.getPrivacyPolicy(privacyPolicyHandler, data.ownerJid, data.communityJid, true);
 			
+			// Populate Trust Level
+			jTrustLevel.initRating('#community-trust-level', 'CIS', data.communityJid);
+			jTrustLevel.showDetails('#community-trust-level', 'CIS', communityObj.communityJid);
+			
 			$.mobile.changePage($("#community-details-page"), {transition: "fade"});
 		}
 	},
