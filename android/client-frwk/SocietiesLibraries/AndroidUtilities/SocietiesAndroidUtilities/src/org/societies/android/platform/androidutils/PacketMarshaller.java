@@ -16,6 +16,7 @@ import org.societies.android.api.comms.xmpp.Stanza;
 import org.societies.android.api.comms.xmpp.StanzaError;
 import org.societies.android.api.comms.xmpp.XMPPError;
 import org.societies.simple.basic.URIConverter;
+import org.societies.simple.converters.DateConverter;
 import org.societies.simple.converters.EventItemsConverter;
 import org.societies.simple.converters.PubsubItemConverter;
 import org.societies.simple.converters.PubsubItemsConverter;
@@ -61,6 +62,8 @@ public class PacketMarshaller {
 //			Log.i(LOG_TAG, "Registered class '"+gregorianCalendarImpl.getClass()+"' as XMLGregorianCalendarImpl");
 
             registry.bind(java.net.URI.class, URIConverter.class);
+            registry.bind(java.util.Date.class, DateConverter.class);
+            registry.bind(java.sql.Timestamp.class, DateConverter.class);
             registry.bind(org.jabber.protocol.pubsub.event.Items.class, new EventItemsConverter(s));
             registry.bind(org.jabber.protocol.pubsub.Items.class, new PubsubItemsConverter(s));
             registry.bind(org.jabber.protocol.pubsub.Item.class, new PubsubItemConverter(s));
