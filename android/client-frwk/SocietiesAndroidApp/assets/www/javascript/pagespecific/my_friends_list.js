@@ -126,6 +126,9 @@ var CSSFriendsServices = {
 	showFriendDetails: function (css_id) {
 		function success(data) {
 			CSSFriendsServices.showFriendDetailPage(data);
+			// Populate Trust Level
+			jTrustLevel.initRating('#user-trust-level', 'CSS', css_id);
+			jTrustLevel.showDetails('#user-trust-level', 'CSS', css_id);
 			$.mobile.changePage($("#friend-profile"), { transition: "fade"} );
 		}
 		
