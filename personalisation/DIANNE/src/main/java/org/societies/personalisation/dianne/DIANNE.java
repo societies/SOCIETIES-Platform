@@ -224,10 +224,13 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 		for(int i=0; i<defaultContext.length; i++){
 			try {
 				String nextType = defaultContext[i];
-				List<CtxIdentifier> attrIDs = ctxBroker.lookup(CtxModelType.ATTRIBUTE, nextType).get();
-				if(attrIDs.size() > 0){
+				IndividualCtxEntity individualCtxEntity = this.ctxBroker.retrieveIndividualEntity(cssID).get();
+				
+				Set<CtxAttribute> attributes = individualCtxEntity.getAttributes(nextType);
+				
+				if(attributes.iterator().hasNext()){
 					LOG.debug("Registering for context update: "+defaultContext[i]);
-					persoMgr.registerForContextUpdate(cssID, PersonalisationTypes.DIANNE, (CtxAttributeIdentifier)attrIDs.get(0));
+					persoMgr.registerForContextUpdate(cssID, PersonalisationTypes.DIANNE, (CtxAttributeIdentifier)attributes.iterator().next().getId());
 				}else{
 					LOG.debug("Ctx Attribute: "+defaultContext[i]+" does not yet exist - could not register for context updates");
 				}
