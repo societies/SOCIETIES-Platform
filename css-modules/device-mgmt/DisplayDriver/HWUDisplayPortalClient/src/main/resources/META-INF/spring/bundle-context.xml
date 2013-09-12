@@ -11,7 +11,7 @@
 
  
 	<bean id="displayPortalClient"
-		class="ac.hw.display.client.DisplayPortalClient"
+		class="org.societies.display.client.DisplayPortalClient"
 		name="displayPortalClient" init-method="Init">
 	    <property name="commManager" ref="commManager"></property>
 		<property name="portalServerRemote" ref="displayServerRemote"></property>
@@ -20,7 +20,7 @@
 	</bean>
 
 	<bean id="displayServerRemote"
-	    class=" ac.hw.display.client.comm.CommsClient"
+	    class="org.societies.display.client.comm.CommsClient"
 	    name="displayServerRemote"
 	    init-method="InitService">
 	    <property name="commManager" ref="commManager"></property>

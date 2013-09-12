@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package ac.hw.display.client;
+package org.societies.display.client;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -30,7 +30,6 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
-import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
 import org.societies.api.context.model.CtxAttribute;
@@ -38,8 +37,10 @@ import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
+import org.societies.api.internal.context.broker.ICtxBroker;
 
 
 /**
@@ -72,20 +73,9 @@ public class ContextEventListener implements CtxChangeEventListener{
 
 
 		try {
-
-
-			Future<CtxEntityIdentifier> futureCtxEntityId = this.ctxBroker.retrieveIndividualEntityId(requestor, userIdentity);
-			CtxEntityIdentifier ctxEntityId =futureCtxEntityId.get();
-
-			//Future<List<CtxIdentifier>> fLookupList = this.ctxBroker.lookup(requestor, userIdentity, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC);
-			//List<CtxIdentifier> lookupList = fLookupList.get();
-
-
-			//if (lookupList.size()==0){
-			//	this.LOG.debug("Did not find attribute of type : "+CtxAttributeTypes.LOCATION_SYMBOLIC);
-			//	return;
-			//}else{
-			this.ctxBroker.registerForChanges(requestor, this, ctxEntityId, CtxAttributeTypes.LOCATION_SYMBOLIC);
+			final IndividualCtxEntity individualCtxEntity = this.ctxBroker.retrieveIndividualEntity(userIdentity).get();
+			
+			this.ctxBroker.registerForChanges(this, individualCtxEntity.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC);
 			this.LOG.debug("Registered for symloc events");
 			//}
 		} catch (CtxException e) {

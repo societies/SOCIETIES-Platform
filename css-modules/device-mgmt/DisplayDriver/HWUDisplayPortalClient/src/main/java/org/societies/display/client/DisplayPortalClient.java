@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package ac.hw.display.client;
+package org.societies.display.client;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -31,7 +31,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.css.devicemgmt.display.DisplayEvent;
 import org.societies.api.css.devicemgmt.display.DisplayEventConstants;
 import org.societies.api.css.devicemgmt.display.IDisplayDriver;
@@ -39,6 +38,7 @@ import org.societies.api.css.devicemgmt.display.IDisplayableService;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.Requestor;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.CSSEventConstants;
 import org.societies.api.osgi.event.EMSException;
@@ -47,8 +47,8 @@ import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.services.ServiceMgmtEventType;
+import org.societies.display.server.api.remote.IDisplayPortalServer;
 
-import ac.hw.display.server.api.remote.IDisplayPortalServer;
 
 /**
  * Describe your class here...

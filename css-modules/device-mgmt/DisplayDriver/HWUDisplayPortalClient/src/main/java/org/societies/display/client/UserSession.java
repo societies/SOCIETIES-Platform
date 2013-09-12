@@ -22,11 +22,10 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package ac.hw.display.server.api.remote;
+package org.societies.display.client;
 
-
-import org.societies.api.identity.IIdentity;
-import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Describe your class here...
@@ -34,13 +33,61 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  * @author Eliza
  *
  */
-public interface IDisplayPortalServer {
+public class UserSession {
 
-	public String requestAccess(IIdentity serverIdentity, String identity, String location);
+	private String userIdentity;
+	private List<ServiceInfo> services;
+	private final int serviceRuntimeSocketPort;
 	
-	public void releaseResource(IIdentity serverIdentity, String identity, String location);
+	public UserSession(String userIdentity, int port){
+		this.setUserIdentity(userIdentity);
+		services = new ArrayList<ServiceInfo>();
+		this.serviceRuntimeSocketPort = port;
+	}
 	
-	public String[] getScreenLocations(IIdentity serverIdentity);
+	public void addService(ServiceInfo sInfo){
+		this.services.add(sInfo);
+	}
+
+	/**
+	 * @return the userIdentity
+	 */
+	public String getUserIdentity() {
+		return userIdentity;
+	}
+
+	/**
+	 * @param userIdentity the userIdentity to set
+	 */
+	public void setUserIdentity(String userIdentity) {
+		this.userIdentity = userIdentity;
+	}
+
+	public List<ServiceInfo> getServices() {
+		
+		return this.services;
+	}
+
+	public boolean containsService(String serviceName) {
+		for (ServiceInfo sInfo : services){
+			if (sInfo.getServiceName().equalsIgnoreCase(serviceName)){
+				return true;
+			}
+		}
+		return false;
+	}
 	
-	public ServiceResourceIdentifier getServerServiceId(IIdentity serverIdentity);
+	public ServiceInfo getService(String serviceName){
+		for (ServiceInfo sInfo: services){
+			if (sInfo.getServiceName().equalsIgnoreCase(serviceName)){
+				return sInfo;
+			}
+		}
+		return null;
+	}
+
+	public int getServiceRuntimeSocketPort() {
+		return serviceRuntimeSocketPort;
+	}
+
 }

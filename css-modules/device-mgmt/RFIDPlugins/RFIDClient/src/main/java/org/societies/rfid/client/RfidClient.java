@@ -96,9 +96,13 @@ public class RfidClient extends EventListener implements IRfidClient {
 
 
 	public void initialiseRFIDClient() {
+		logging.debug("Init RFID CLIENT");
 		this.registerForRfidWebEvents();
+		logging.debug("REGISTERED FOR WEB EVENTS");
 		this.registerWithContextSourceManager();
+		logging.debug("REGISTERED WITH CONTEXT SOURCE MANAGER");
 		try {
+			logging.debug("CHECKING FOR INFO IN DB");
 			//first try to see if there is information in the DB.
 			List<CtxIdentifier> entities = this.ctxBroker.lookup(userIdentity, CtxModelType.ENTITY, RFID_INFO).get();
 
@@ -190,6 +194,7 @@ public class RfidClient extends EventListener implements IRfidClient {
 	}
 
 	private void registerForRfidWebEvents(){
+		logging.debug("REGISTERED FOR WEB EVENTS");
 		this.getEvMgr().subscribeInternalEvent(this, new String[]{RFID_EVENT_TYPE}, null);
 	}
 
@@ -336,10 +341,11 @@ public class RfidClient extends EventListener implements IRfidClient {
 
 
 
-
+	@Override
 	public void handleInternalEvent(InternalEvent event) {
 		this.logging.debug("Received event - type: "+event.geteventType()+" event source "+event.geteventSource()+" event name: "+event.geteventName());
 		if (event.geteventType().equals(RFID_EVENT_TYPE) && (event.geteventName().equalsIgnoreCase("registerRequest"))){
+			logging.debug("GOT A REGISTER REQUEST!");
 			Hashtable<String, String> hash = (Hashtable<String, String>) event.geteventInfo();
 			if (hash!=null){
 				//IF REGISTERING, REMOVE ANY CONTEXT WHICH EXISTS?

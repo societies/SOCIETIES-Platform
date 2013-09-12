@@ -22,7 +22,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package ac.hw.display.client.comm;
+package org.societies.display.client.comm;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -47,8 +47,8 @@ import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.D
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerScreenLocationResultBean;
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerServiceIDResultBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.display.server.api.remote.IDisplayPortalServer;
 
-import ac.hw.display.server.api.remote.IDisplayPortalServer;
 
 /**
  * Describe your class here...

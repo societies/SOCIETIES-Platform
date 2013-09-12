@@ -22,9 +22,11 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package ac.hw.display.client;
+package org.societies.display.server.api.remote;
 
-import org.societies.api.css.devicemgmt.display.IDisplayableService;
+
+import org.societies.api.identity.IIdentity;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 /**
  * Describe your class here...
@@ -32,56 +34,13 @@ import org.societies.api.css.devicemgmt.display.IDisplayableService;
  * @author Eliza
  *
  */
-public class ServiceInfo {
+public interface IDisplayPortalServer {
 
-	private final String exe;
-	private final String serviceName;
-	private final boolean requiresKinect;
-	private final int servicePortNumber;
+	public String requestAccess(IIdentity serverIdentity, String identity, String location);
 	
-	private final IDisplayableService service;
+	public void releaseResource(IIdentity serverIdentity, String identity, String location);
 	
-	public ServiceInfo(IDisplayableService service, String name, String exe, int port, boolean requiresKinect){
-		this.service = service;
-		this.serviceName = name;
-		this.exe = exe;
-		this.servicePortNumber = port;
-		this.requiresKinect = requiresKinect;
-		
-	}
-
-	/**
-	 * @return the exe
-	 */
-	public String getExe() {
-		return exe;
-	}
-
-	/**
-	 * @return the serviceName
-	 */
-	public String getServiceName() {
-		return serviceName;
-	}
-
-	/**
-	 * @return the requiresKinect
-	 */
-	public boolean isKinectRequired() {
-		return requiresKinect;
-	}
-
-	/**
-	 * @return the service
-	 */
-	public IDisplayableService getService() {
-		return service;
-	}
-
-	/**
-	 * @return the servicePortNumber
-	 */
-	public int getServicePortNumber() {
-		return servicePortNumber;
-	}
+	public String[] getScreenLocations(IIdentity serverIdentity);
+	
+	public ServiceResourceIdentifier getServerServiceId(IIdentity serverIdentity);
 }

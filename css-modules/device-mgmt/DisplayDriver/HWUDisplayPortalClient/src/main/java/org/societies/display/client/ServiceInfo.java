@@ -22,10 +22,9 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package ac.hw.display.client;
+package org.societies.display.client;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.societies.api.css.devicemgmt.display.IDisplayableService;
 
 /**
  * Describe your class here...
@@ -33,61 +32,56 @@ import java.util.List;
  * @author Eliza
  *
  */
-public class UserSession {
+public class ServiceInfo {
 
-	private String userIdentity;
-	private List<ServiceInfo> services;
-	private final int serviceRuntimeSocketPort;
+	private final String exe;
+	private final String serviceName;
+	private final boolean requiresKinect;
+	private final int servicePortNumber;
 	
-	public UserSession(String userIdentity, int port){
-		this.setUserIdentity(userIdentity);
-		services = new ArrayList<ServiceInfo>();
-		this.serviceRuntimeSocketPort = port;
-	}
+	private final IDisplayableService service;
 	
-	public void addService(ServiceInfo sInfo){
-		this.services.add(sInfo);
-	}
-
-	/**
-	 * @return the userIdentity
-	 */
-	public String getUserIdentity() {
-		return userIdentity;
-	}
-
-	/**
-	 * @param userIdentity the userIdentity to set
-	 */
-	public void setUserIdentity(String userIdentity) {
-		this.userIdentity = userIdentity;
-	}
-
-	public List<ServiceInfo> getServices() {
+	public ServiceInfo(IDisplayableService service, String name, String exe, int port, boolean requiresKinect){
+		this.service = service;
+		this.serviceName = name;
+		this.exe = exe;
+		this.servicePortNumber = port;
+		this.requiresKinect = requiresKinect;
 		
-		return this.services;
 	}
 
-	public boolean containsService(String serviceName) {
-		for (ServiceInfo sInfo : services){
-			if (sInfo.getServiceName().equalsIgnoreCase(serviceName)){
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public ServiceInfo getService(String serviceName){
-		for (ServiceInfo sInfo: services){
-			if (sInfo.getServiceName().equalsIgnoreCase(serviceName)){
-				return sInfo;
-			}
-		}
-		return null;
+	/**
+	 * @return the exe
+	 */
+	public String getExe() {
+		return exe;
 	}
 
-	public int getServiceRuntimeSocketPort() {
-		return serviceRuntimeSocketPort;
+	/**
+	 * @return the serviceName
+	 */
+	public String getServiceName() {
+		return serviceName;
 	}
 
+	/**
+	 * @return the requiresKinect
+	 */
+	public boolean isKinectRequired() {
+		return requiresKinect;
+	}
+
+	/**
+	 * @return the service
+	 */
+	public IDisplayableService getService() {
+		return service;
+	}
+
+	/**
+	 * @return the servicePortNumber
+	 */
+	public int getServicePortNumber() {
+		return servicePortNumber;
+	}
 }
