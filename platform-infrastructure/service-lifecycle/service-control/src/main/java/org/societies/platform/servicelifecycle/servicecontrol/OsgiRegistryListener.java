@@ -323,32 +323,6 @@ public class OsgiRegistryListener implements BundleContextAware,
 			removeService(bundleService,bundle);
 		}
 		
-		
-		/*
-		if(bundleService == null){
-			if(event.getType() == BundleEvent.STARTED){
-				log.debug("Bundle {} does not refer to an existing service... it could be a new service, we must check!",bundle.getSymbolicName());
-				
-				executor.execute(new BundleStartAsyncHandler(bundle,5000));
-			}
-			return;
-		}
-		
-		// Now we do stuff differently depending on what the event type is...
-		switch(event.getType()){
-			case BundleEvent.STARTED: 
-				startService(bundleService,bundle);
-				break;
-			case BundleEvent.STOPPED: 
-				stopService(bundleService,bundle);
-				break;
-			case BundleEvent.UNINSTALLED: 
-				removeService(bundleService,bundle);
-				break;
-			default: log.warn("Unknown bundle event type... this shouldn't get here!");
-		}
-		*/
-		
 	}
 	
 	
@@ -362,7 +336,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 	 * @param serviceReference
 	 * @return 
 	 */
-	private Service getServiceFromOSGIService(ServiceReference<?> serviceReference) {
+	private Service getServiceFromOSGIService(ServiceReference serviceReference) {
 		
 		log.debug("Processing new Service Reference, in order to obtain a SOCIETIES service!");
 		Bundle serviceBundle = serviceReference.getBundle();
@@ -507,7 +481,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 		// Preparing the search filter		
 		Service filter = ServiceModelUtils.generateEmptyFilter();
 		filter.getServiceIdentifier().setServiceInstanceIdentifier(bundle.getSymbolicName());
-		filter.setServiceLocation(bundle.getLocation());
+		//filter.setServiceLocation(bundle.getLocation());
 		
 		List<Service> listServices;
 		try {
@@ -594,10 +568,14 @@ public class OsgiRegistryListener implements BundleContextAware,
 			String privacyLocation = service.getPrivacyPolicy();
 			if(privacyLocation != null){
 				log.debug("Attempting to retrieve Privacy Policy from supplied URL: {}",privacyLocation);
-					
-				privacyPolicy = new Scanner( new URL(privacyLocation).openStream(), "UTF-8").useDelimiter("\\A").next();
-				
-			} else{
+				try{	
+					privacyPolicy = new Scanner( new URL(privacyLocation).openStream(), "UTF-8").useDelimiter("\\A").next();
+				} catch(Exception ex){
+					log.warn("Privacy policy was supplied but couldn't be retrieved, we'll try from inside bundle!");
+				}
+			} 
+			
+			if(privacyPolicy== null){
 	
 				log.debug("Privacy Policy URL not supplied, so we check inside the .jar/war, at: {} ", bundle.getLocation());
 
@@ -615,7 +593,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 					privacyLocation = privacyLocation + "/privacy-policy.xml";
 					privacyPolicy = new Scanner( new URL(privacyLocation).openStream(), "UTF-8").useDelimiter("\\A").next();
 					
-				} else 
+				} else {
 					if(bundleFile.isFile()) {
 						
 						if(log.isDebugEnabled())
@@ -628,6 +606,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 						if(log.isDebugEnabled())
 							log.debug("Couldn't get privacy-policy from jar!");
 					}
+				}
 			}
 
 			if(privacyPolicy == null){	

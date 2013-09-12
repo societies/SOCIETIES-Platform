@@ -1,0 +1,12 @@
+{ 
+	"jTrustPlugin" : 
+		{
+		"exceptionThreshold" : 0,
+		"allArray" : true,
+		"connectService" : "connected",
+		"disconnectService" : "disconnected",
+		"retrieveTrustRelationships" : [{"trustorId":{"entityType":"CSS","entityId":"university.ict-societies.eu"},"trusteeId":{"entityType":"CSS","entityId":"emma.ict-societies.eu"},"trustValueType":"DIRECT","trustValue":0.75,"timestamp":"Sep 3, 2013 1:52:26 PM"},{"trustorId":{"entityType":"CSS","entityId":"university.ict-societies.eu"},"trusteeId":{"entityType":"CSS","entityId":"emma.ict-societies.eu"},"trustValueType":"USER_PERCEIVED","trustValue":0.5,"timestamp":"Sep 3, 2013 1:52:26 PM"}],
+		"retrieveExtTrustRelationships" : [{"timestamp":"Sep 9, 2013 1:07:38 PM","trustValueType":"DIRECT","trustEvidence":[{"type":"JOINED_COMMUNITY","timestamp":"Sep 8, 2013 6:30:20 PM","objectId":{"entityType":"CIS","entityId":"cis-c487832f-ffc8-45ab-9493-eddb47dc38eb.ict-societies.eu"},"subjectId":{"entityType":"CSS","entityId":"university.ict-societies.eu"}},{"timestamp":"Sep 8, 2013 6:30:52 PM","type":"RATED","objectId":{"entityType":"CIS","entityId":"cis-c487832f-ffc8-45ab-9493-eddb47dc38eb.ict-societies.eu"},"subjectId":{"entityType":"CSS","entityId":"university.ict-societies.eu"},"info":1}],"trustorId":{"entityType":"CSS","entityId":"university.ict-societies.eu"},"trustValue":0.8,"trusteeId":{"entityType":"CIS","entityId":"cis-c487832f-ffc8-45ab-9493-eddb47dc38eb.ict-societies.eu"}},{"timestamp":"Sep 8, 2013 6:30:51 PM","trustValueType":"USER_PERCEIVED","trustEvidence":[],"trustorId":{"entityType":"CSS","entityId":"university.ict-societies.eu"},"trustValue":0.8,"trusteeId":{"entityType":"CIS","entityId":"cis-c487832f-ffc8-45ab-9493-eddb47dc38eb.ict-societies.eu"}}],
+		"addDirectTrustEvidence": "addedTrustEvidence"
+		}
+}

@@ -19,101 +19,140 @@
                     value="#{accessControlController.currentAccessEvent.requestor.requestorId}"/>
             </f:facet>
 
-            <p:accordionPanel id="accordionPanel"
-                              multiple="true"
-                              value="#{accessControlController.responseItems}"
-                              var="responseItem">
-                <p:tab title="#{responseItem.requestItem.resource.dataType}">
-                    <p:tabView id="tabView">
+            <p:dataGrid id="dataGrid"
+                        columns="1"
+                        emptyMessage="This access control request has no items   0.o"
+                        value="#{accessControlController.responseItems}"
+                        var="responseItem">
 
-                        <p:tab title="General">
-                            <!-- GENERAL TAB -->
-                            <h:panelGrid columns="2" cellpadding="10">
-                                <p:outputLabel for="dataType">Data type:</p:outputLabel>
-                                <p:inputText id="dataType" value="#{responseItem.requestItem.resource.dataType}"
-                                             readonly="true"/>
+                <p:panel>
+                    <f:facet name="header">
+                        <p:selectBooleanCheckbox id="checkbox"/>
+                        <p:outputLabel value="#{responseItem.requestItem.resource.dataType}"
+                                       for="checkbox"
+                                       style="margin-top: 5px;"/>
+                        <p:commandButton value="Details >"
+                                         style="float:right;"
+                                         onclick="document.getElementById('#{p:component('optionsPanel')}').visible = true; return false;"
+                                         process="@none"
+                                         update="@none"/>
+                    </f:facet>
 
-                                <p:outputLabel for="decision">Permission:</p:outputLabel>
-                                <p:selectOneMenu id="decision" value="#{responseItem.decision}">
-                                    <f:selectItems value="#{accessControlController.decisionOptions}"
-                                                   var="dec"/>
-                                </p:selectOneMenu>
-                            </h:panelGrid>
-                            <!-- END GENERAL TAB -->
-                        </p:tab>
+                    <p:panel visible="true" id="optionsPanel">
+                        <!--Purpose-->
+                        <p:outputLabel value="Purpose: {still to be added}"/>
 
+                        <!--Actions-->
+                        <p:panelGrid columns="4">
+                            <p:selectOneMenu id="actionScopeMenu">
+                                <f:selectItem itemLabel="Everyone"/>
+                                <f:selectItem itemLabel="Only this app"/>
+                            </p:selectOneMenu>
 
-                        <p:tab title="Actions">
-                            <!-- ACTIONS TAB -->
-                            <p:selectManyCheckbox layout="pageDirection" id="actionsCheckboxes"
-                                                  value="#{responseItem.requestItem.selectedActionNames}">
+                            <p:outputLabel value="will be able to"/>
+
+                            <p:selectManyCheckbox id="actionsCheckboxes"
+                                                  value="#{responseItem.requestItem.selectedActionNames}"
+                                                  style="margin: 0;">
                                 <f:selectItems value="#{responseItem.requestItem.actions}"
                                                var="action"
                                                itemValue="#{action.actionConstant.name()}"
                                                itemLabel="#{action.actionConstant.name()}"
                                                itemDisabled="#{action.actionConstant.name() eq 'READ'}"/>
-
-                                <p:ajax process="actionsCheckboxes" update="actionsCheckboxesMsgs"/>
                             </p:selectManyCheckbox>
-                            <p:message for="actionsCheckboxes" id="actionsCheckboxesMsgs"/>
-                            <!-- END ACTIONS TAB -->
-                        </p:tab>
+
+                            <p:outputLabel value="your #{responseItem.requestItem.resource.dataType.toLowerCase()}"/>
+                        </p:panelGrid>
+
+                        <!--Conditions-->
+                        <p:dataTable id="conditionsTable"
+                                     var="condition" value="#{responseItem.requestItem.conditions}"
+                                     tableStyle="border: 0"
+                                     paginator="false" rows="20">
+
+                            <p:column headerText="Condition" style="width:50%">
+                                #{condition.conditionConstant}
+                            </p:column>
+
+                            <p:column headerText="Value" style="width:25%">
+                                <p:selectOneMenu
+                                        label="#{responseItem.requestItem.resource.dataType} condition #{condition.conditionConstant}"
+                                        id="conditionValue"
+                                        value="#{condition.value}"
+                                        required="#{!condition.optional}"
+                                        validatorMessage="This value is required">
+                                    <f:selectItem itemLabel="(none)"
+                                                  itemValue=""
+                                                  noSelectionOption="true"
+                                                  rendered="#{condition.optional}"/>
+                                    <f:selectItems
+                                            value="#{accessControlController.getAvailableConditionValues(condition.conditionConstant)}"/>
+                                    <p:ajax update="conditionValMsg" event="change"/>
+                                </p:selectOneMenu>
+
+                                <p:outputLabel style="color:#f00;font-weight:bold;"
+                                               rendered="#{!condition.optional}"> *</p:outputLabel>
+                            </p:column>
+
+                            <p:column headerText="Required" style="width:25%">
+                                <p:message id="conditionValMsg" for="conditionValue" display="icon"/>
+                            </p:column>
+
+                        </p:dataTable>
+
+                        <p:commandButton outcome="productDetail" icon="ui-icon-circle-plus" title="Add condition"
+                                         actionListener="#{accessControlController.addNewCondition(responseItem.requestItem)}"
+                                         process="addConditionName,@this"
+                                         update="optionsPanel"/>
+                        <p:selectOneMenu id="addConditionName"
+                                         value="#{accessControlController.newConditionToAdd}">
+                            <f:selectItems
+                                    value="#{accessControlController.getAvailableConditionConstants(responseItem.requestItem)}"
+                                    var="newCondition"
+                                    itemLabel="#{newCondition.name()}"/>
+                        </p:selectOneMenu>
+                    </p:panel>
+                </p:panel>
 
 
-                        <p:tab title="Conditions">
-                            <!-- CONDITIONS TAB -->
+                <p:tabView id="tabView" rendered="false">
 
-                            <p:dataTable id="conditionsTable"
-                                         var="condition" value="#{responseItem.requestItem.conditions}"
-                                         paginator="false" rows="20">
+                    <p:tab title="General">
+                        <!-- GENERAL TAB -->
+                        <h:panelGrid columns="2" cellpadding="10">
+                            <p:outputLabel for="dataType">Data type:</p:outputLabel>
+                            <p:inputText id="dataType" value="#{responseItem.requestItem.resource.dataType}"
+                                         readonly="true"/>
 
-                                <p:column headerText="Condition" style="width:50%">
-                                    #{condition.conditionConstant}
-                                </p:column>
+                            <p:outputLabel for="decision">Permission:</p:outputLabel>
+                            <p:selectOneMenu id="decision" value="#{responseItem.decision}">
+                                <f:selectItems value="#{accessControlController.decisionOptions}"
+                                               var="dec"/>
+                            </p:selectOneMenu>
+                        </h:panelGrid>
+                        <!-- END GENERAL TAB -->
+                    </p:tab>
 
-                                <p:column headerText="Value" style="width:25%">
-                                    <p:selectOneMenu
-                                            label="#{responseItem.requestItem.resource.dataType} condition #{condition.conditionConstant}"
-                                            id="conditionValue"
-                                            value="#{condition.value}"
-                                            required="#{!condition.optional}"
-                                            validatorMessage="This value is required">
-                                        <f:selectItem itemLabel="(none)"
-                                                      itemValue=""
-                                                      noSelectionOption="true"
-                                                      rendered="#{condition.optional}"/>
-                                        <f:selectItems
-                                                value="#{accessControlController.getAvailableConditionValues(condition.conditionConstant)}"/>
-                                        <p:ajax update="conditionValMsg" event="change"/>
-                                    </p:selectOneMenu>
 
-                                </p:column>
+                </p:tabView>
 
-                                <p:column headerText="Required" style="width:25%">
-                                    <p:outputLabel style="color:#f00;font-weight:bold;"
-                                                   rendered="#{!condition.optional}">*</p:outputLabel>
-                                    <p:message id="conditionValMsg" for="conditionValue" display="icon"/>
-                                </p:column>
-
-                            </p:dataTable>
-
-                            <!-- END CONDITIONS TAB -->
-                        </p:tab>
-
-                    </p:tabView>
-                </p:tab>
-            </p:accordionPanel>
+            </p:dataGrid>
 
             <f:facet name="footer">
                 <p:messages id="validationMessages"/>
 
-                <p:commandButton id="completeRequestButton"
-                                 value="Accept Request"
+                <p:commandButton id="acceptRememberButton"
+                                 value="Accept and remember"
                                  action="#{accessControlController.completeAccessRequestAction}"
                                  update="@form"/>
 
-                <p:commandButton id="abortRequestButton"
-                                 value="Cancel Request"
+                <p:commandButton id="acceptButton"
+                                 value="Accept just once"
+                                 action="#{accessControlController.completeAccessRequestAction}"
+                                 update="@form"/>
+
+                <p:commandButton id="refuseButton"
+                                 value="Refuse"
                                  action="#{accessControlController.cancelAccessRequestAction}"
                                  process="@this"
                                  update="@form"/>

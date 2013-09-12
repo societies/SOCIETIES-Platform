@@ -313,6 +313,19 @@ button.ui-button-icons-only {
     padding-right: 2.1em;
 }
 
+/* Special case: button inside a panel header */
+.ui-panel-titlebar .ui-button {
+    height: 20px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding: 1px 1px;
+}
+
+/* Special case: checkbox inside a panel header */
+.ui-panel-titlebar .ui-chkbox {
+    margin-right: 5px;
+}
+
 /* no icon support for input elements, provide padding by default */
 input.ui-button {
     padding: .4em 1em;
