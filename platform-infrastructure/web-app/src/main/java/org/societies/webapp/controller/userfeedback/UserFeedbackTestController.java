@@ -298,7 +298,7 @@ public class UserFeedbackTestController extends BasePageController {
 
         Requestor requestor = new Requestor(userService.getIdentity());
 
-        List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
+        List<AccessControlResponseItem> responseItems = new ArrayList<AccessControlResponseItem>();
         responseItems.add(buildResponseItem("http://this.is.a.win/", CtxAttributeTypes.NAME));
         responseItems.add(buildResponseItem("http://paddy.rules/", CtxAttributeTypes.LOCATION_COORDINATES));
         responseItems.add(buildResponseItem("http://something.something.something/", CtxAttributeTypes.STATUS));
@@ -306,9 +306,9 @@ public class UserFeedbackTestController extends BasePageController {
         responseItems.add(buildResponseItem("http://something.something.something/", CtxAttributeTypes.ADDRESS_HOME_CITY));
         responseItems.add(buildResponseItem("http://something.something.something/", CtxAttributeTypes.ADDRESS_WORK_CITY));
 
-        userFeedback.getAccessControlFBAsync(requestor, responseItems, new IUserFeedbackResponseEventListener<List<ResponseItem>>() {
+        userFeedback.getAccessControlFBAsync(requestor, responseItems, new IUserFeedbackResponseEventListener<List<AccessControlResponseItem>>() {
             @Override
-            public void responseReceived(List<ResponseItem> result) {
+            public void responseReceived(List<AccessControlResponseItem> result) {
                 log.info("AccessControl: Response received");
                 addGlobalMessage("AccessControl Response received",
                         (result != null && result.size() > 0) ? result.get(0).getDecision().toString() : "null",
@@ -394,7 +394,7 @@ public class UserFeedbackTestController extends BasePageController {
         return responsePolicy;
     }
 
-    private static ResponseItem buildResponseItem(String uri, String dataType) {
+    private static AccessControlResponseItem buildResponseItem(String uri, String dataType) {
         Action action3 = new Action();
         action3.setActionConstant(ActionConstants.READ);
         action3.setOptional(false);
@@ -429,7 +429,7 @@ public class UserFeedbackTestController extends BasePageController {
         requestItem.setOptional(false);
         requestItem.setResource(resource);
 
-        ResponseItem responseItem = new ResponseItem();
+        AccessControlResponseItem responseItem = new AccessControlResponseItem();
         responseItem.setDecision(Decision.INDETERMINATE);
         responseItem.setRequestItem(requestItem);
         return responseItem;

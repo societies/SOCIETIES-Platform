@@ -31,7 +31,7 @@ import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.FeedbackForm;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.schema.identity.RequestorBean;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.AccessControlResponseItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 
 import java.util.List;
@@ -126,28 +126,28 @@ public interface IUserFeedback {
     public Future<ResponsePolicy> getPrivacyNegotiationFBAsync(String requestId, ResponsePolicy policy, NegotiationDetailsBean details, IUserFeedbackResponseEventListener<ResponsePolicy> callback);
 
 
-    public Future<List<ResponseItem>> getAccessControlFB(String requestId, Requestor requestor, List<ResponseItem> items);
+    public Future<List<AccessControlResponseItem>> getAccessControlFB(String requestId, Requestor requestor, List<AccessControlResponseItem> items);
 
     /**
      * Request access control in a synchronous manner - i.e. the method will block, and the {@link Future} will
      * not be returned until the result has been returned from the user
      */
-    public Future<List<ResponseItem>> getAccessControlFB(Requestor requestor, List<ResponseItem> items);
+    public Future<List<AccessControlResponseItem>> getAccessControlFB(Requestor requestor, List<AccessControlResponseItem> items);
 
     /**
      * Request access control in an asynchronous manner - i.e. a {@link Future} will be returned, and you must check
      * {@link java.util.concurrent.Future#isDone()} to see if the result has been returned
      */
-    public Future<List<ResponseItem>> getAccessControlFBAsync(Requestor requestor, List<ResponseItem> items);
+    public Future<List<AccessControlResponseItem>> getAccessControlFBAsync(Requestor requestor, List<AccessControlResponseItem> items);
 
     /**
      * <p>Request access control in an asynchronous manner - i.e. a {@link Future} will be returned, and you must check
      * {@link java.util.concurrent.Future#isDone()} to see if the result has been returned</p>
      * <p>You may also specify a callback to use which will be notified immediately when the result arrives</p>
      */
-    public Future<List<ResponseItem>> getAccessControlFBAsync(Requestor requestor, List<ResponseItem> items, IUserFeedbackResponseEventListener<List<ResponseItem>> callback);
+    public Future<List<AccessControlResponseItem>> getAccessControlFBAsync(Requestor requestor, List<AccessControlResponseItem> items, IUserFeedbackResponseEventListener<List<AccessControlResponseItem>> callback);
 
-    public Future<List<ResponseItem>> getAccessControlFBAsync(String requestId, Requestor requestor, List<ResponseItem> items, IUserFeedbackResponseEventListener<List<ResponseItem>> callback);
+    public Future<List<AccessControlResponseItem>> getAccessControlFBAsync(String requestId, Requestor requestor, List<AccessControlResponseItem> items, IUserFeedbackResponseEventListener<List<AccessControlResponseItem>> callback);
 
 
     public void showNotification(String notificationText);
@@ -160,7 +160,7 @@ public interface IUserFeedback {
 
     public void submitPrivacyNegotiationResponse(String requestId, NegotiationDetailsBean negotiationDetails, ResponsePolicy result);
 
-    public void submitAccessControlResponse(String requestId, List<ResponseItem> responseItems, RequestorBean requestorBean);
+    public void submitAccessControlResponse(String requestId, List<AccessControlResponseItem> responseItems, RequestorBean requestorBean);
 
     public void clear();
 }
