@@ -110,7 +110,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 	protected static boolean restart;
 	private static HashMap<Long,BlockingQueue<Service>> installServiceMap = new HashMap<Long,BlockingQueue<Service>>();
 	private static HashMap<Long,BlockingQueue<Service>> uninstallServiceMap = new HashMap<Long,BlockingQueue<Service>>();
-	private final long TIMEOUT = 60;
+	private final long TIMEOUT = 70;
 
 	private SocietiesEventListener eventListener;
 
