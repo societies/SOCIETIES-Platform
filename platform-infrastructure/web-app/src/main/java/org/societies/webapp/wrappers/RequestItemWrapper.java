@@ -1,5 +1,6 @@
 package org.societies.webapp.wrappers;
 
+import org.societies.api.internal.privacytrust.privacy.model.dataobfuscation.ObfuscatorInfo;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 
@@ -9,6 +10,7 @@ import java.util.List;
 public class RequestItemWrapper extends RequestItem {
     private List<Action> originalActions;
     private List<String> selectedActionNames;
+    private ObfuscatorInfo obfuscatorInfo;
 
     public RequestItemWrapper(RequestItem prototype) {
         this.originalActions = new ArrayList<Action>(prototype.getActions());
@@ -48,6 +50,14 @@ public class RequestItemWrapper extends RequestItem {
 
     public List<Action> getOriginalActions() {
         return originalActions;
+    }
+
+    public ObfuscatorInfo getObfuscatorInfo() {
+        return obfuscatorInfo;
+    }
+
+    public void setObfuscatorInfo(ObfuscatorInfo obfuscatorInfo) {
+        this.obfuscatorInfo = obfuscatorInfo;
     }
 
     public RequestItem getRequestItem() {
