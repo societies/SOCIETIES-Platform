@@ -8,6 +8,7 @@ import org.societies.api.comm.xmpp.interfaces.ICommCallback;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.schema.useragent.feedback.HistoryRequestType;
@@ -300,9 +301,12 @@ public class UserFeedbackTestController extends BasePageController {
         Requestor requestor = new Requestor(userService.getIdentity());
 
         List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
-        responseItems.add(buildResponseItem("http://this.is.a.win/", "data item #1"));
-        responseItems.add(buildResponseItem("http://paddy.rules/", "data item #2"));
-        responseItems.add(buildResponseItem("http://something.something.something/", "data item #3"));
+        responseItems.add(buildResponseItem("http://this.is.a.win/", CtxAttributeTypes.NAME));
+        responseItems.add(buildResponseItem("http://paddy.rules/", CtxAttributeTypes.LOCATION_COORDINATES));
+        responseItems.add(buildResponseItem("http://something.something.something/", CtxAttributeTypes.STATUS));
+        responseItems.add(buildResponseItem("http://something.something.something/", CtxAttributeTypes.TEMPERATURE));
+        responseItems.add(buildResponseItem("http://something.something.something/", CtxAttributeTypes.ADDRESS_HOME_CITY));
+        responseItems.add(buildResponseItem("http://something.something.something/", CtxAttributeTypes.ADDRESS_WORK_CITY));
 
         userFeedback.getAccessControlFBAsync(requestor, responseItems, new IUserFeedbackResponseEventListener<List<ResponseItem>>() {
             @Override
@@ -394,35 +398,24 @@ public class UserFeedbackTestController extends BasePageController {
     }
 
     private static ResponseItem buildResponseItem(String uri, String dataType) {
-        Action action1 = new Action();
-        action1.setActionConstant(ActionConstants.CREATE);
-        action1.setOptional(true);
-        Action action2 = new Action();
-        action2.setActionConstant(ActionConstants.DELETE);
-        action2.setOptional(false);
         Action action3 = new Action();
         action3.setActionConstant(ActionConstants.READ);
         action3.setOptional(false);
+        Action action1 = new Action();
+        action1.setActionConstant(ActionConstants.CREATE);
+        action1.setOptional(true);
         Action action4 = new Action();
         action4.setActionConstant(ActionConstants.WRITE);
         action4.setOptional(true);
 
         Condition condition1 = new Condition();
         condition1.setConditionConstant(ConditionConstants.DATA_RETENTION_IN_HOURS);
-        condition1.setValue("1");
+        condition1.setValue("12");
         condition1.setOptional(false);
         Condition condition2 = new Condition();
         condition2.setConditionConstant(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA);
-        condition2.setValue("2");
+        condition2.setValue("true");
         condition2.setOptional(true);
-        Condition condition3 = new Condition();
-        condition3.setConditionConstant(ConditionConstants.RIGHT_TO_OPTOUT);
-        condition3.setValue("3");
-        condition3.setOptional(false);
-        Condition condition4 = new Condition();
-        condition4.setConditionConstant(ConditionConstants.STORE_IN_SECURE_STORAGE);
-        condition4.setValue("4");
-        condition4.setOptional(true);
 
         Resource resource = new Resource();
         resource.setDataIdUri(uri);
@@ -430,14 +423,11 @@ public class UserFeedbackTestController extends BasePageController {
 
         RequestItem requestItem = new RequestItem();
         requestItem.getActions().add(action1);
-        requestItem.getActions().add(action2);
         requestItem.getActions().add(action3);
         requestItem.getActions().add(action4);
 
         requestItem.getConditions().add(condition1);
         requestItem.getConditions().add(condition2);
-        requestItem.getConditions().add(condition3);
-        requestItem.getConditions().add(condition4);
 
         requestItem.setOptional(false);
         requestItem.setResource(resource);
