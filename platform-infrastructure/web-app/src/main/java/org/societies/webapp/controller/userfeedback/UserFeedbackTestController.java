@@ -11,7 +11,6 @@ import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
-import org.societies.api.internal.schema.useragent.feedback.HistoryRequestType;
 import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackHistoryRequest;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
@@ -94,9 +93,9 @@ public class UserFeedbackTestController extends BasePageController {
     private static final String[] FEATURES = new String[]{
             "2 LEGS", "4 LEGS", "SWIMS", "JUMPS", "LONG NECK", "REALLY HEAVY", "WILL EAT YOU"
     };
-    private static final String[] CLASSIFICATIONS = new String[]{
-            "KINGDOM", "PHYLYM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"
-    };
+//    private static final String[] CLASSIFICATIONS = new String[]{
+//            "KINGDOM", "PHYLYM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"
+//    };
     private static final String[] ANIMALS = new String[]{
             "CAT", "OTTER", "MOUSE", "DOG", "HORSE", "BADGER", "OSTRICH", "SEAL", "HEDGEHOG", "LION", "TIGER", "GIRAFFE", "HEFFALUMP"
     };
@@ -187,9 +186,8 @@ public class UserFeedbackTestController extends BasePageController {
         requestorBean.setRequestorId("req" + ++req_counter);
 
         SecureRandom random = new SecureRandom();
-        String guid = new BigInteger(130, random).toString(32);
 
-        ResponsePolicy responsePolicy = buildResponsePolicy(guid, requestorBean);
+        ResponsePolicy responsePolicy = buildResponsePolicy(requestorBean);
 
         NegotiationDetailsBean negotiationDetails = new NegotiationDetailsBean();
         negotiationDetails.setRequestor(requestorBean);
@@ -331,7 +329,6 @@ public class UserFeedbackTestController extends BasePageController {
                 commManager.getIdManager().getThisNetworkNode());
 
         UserFeedbackHistoryRequest request = new UserFeedbackHistoryRequest();
-        request.setRequestType(HistoryRequestType.OUTSTANDING);
 
         try {
             commManager.sendIQGet(stanza, request, new ICommCallback() {
@@ -382,7 +379,7 @@ public class UserFeedbackTestController extends BasePageController {
         }
     }
 
-    private static ResponsePolicy buildResponsePolicy(String guid, RequestorBean requestorBean) {
+    private static ResponsePolicy buildResponsePolicy(RequestorBean requestorBean) {
 
 
         List<ResponseItem> responseItems = new ArrayList<ResponseItem>();

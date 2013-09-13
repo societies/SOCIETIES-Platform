@@ -42,7 +42,6 @@ import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
 import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
@@ -185,71 +184,23 @@ public class UACommsServer implements IFeatureServer {
         List<UserFeedbackPrivacyNegotiationEvent> userFeedbackPrivacyNegotiationEvents;
         List<UserFeedbackAccessControlEvent> userFeedbackAccessControlEvents;
 
-        switch (requestBean.getRequestType()) {
-            case BY_COUNT:
-                try {
-                    userFeedbackBeans = feedback.listStoredFeedbackBeans(requestBean.getHowMany());
-                } catch (Exception ex) {
-                    log.warn("Error loading UF beans from repository", ex);
-                    userFeedbackBeans = new ArrayList<UserFeedbackBean>();
-                }
-                userFeedbackPrivacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>(); // TODO: fill this list
-                userFeedbackAccessControlEvents = new ArrayList<UserFeedbackAccessControlEvent>(); // TODO: fill this list
-                break;
-//            case BY_DATE:
-//                result = feedback.listStoredFeedbackBeans(requestBean.getSinceWhen());
-//                userFeedbackPrivacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>(); // TODO: fill this list
-//                userFeedbackAccessControlEvents = new ArrayList<UserFeedbackAccessControlEvent>(); // TODO: fill this list
-//                break;
-            case OUTSTANDING:
-                try {
-                    userFeedbackBeans = feedback.listIncompleteFeedbackBeans();
-                } catch (Exception ex) {
-                    log.warn("Error loading UF beans from repository", ex);
-                    userFeedbackBeans = new ArrayList<UserFeedbackBean>();
-                }
-                try {
-                    userFeedbackPrivacyNegotiationEvents = feedback.listIncompletePrivacyRequests();
-                } catch (Exception ex) {
-                    log.warn("Error loading PPNs from repository", ex);
-                    userFeedbackPrivacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>();
-                }
-                try {
-                    userFeedbackAccessControlEvents = feedback.listIncompleteAccessRequests();
-                } catch (Exception ex) {
-                    log.warn("Error loading ACs from repository", ex);
-                    userFeedbackAccessControlEvents = new ArrayList<UserFeedbackAccessControlEvent>();
-                }
-                break;
-            default:
-                log.warn("Invalid requestBean.requestType: " + requestBean.getRequestType().name());
-                return null;
+        try {
+            userFeedbackBeans = feedback.listIncompleteFeedbackBeans();
+        } catch (Exception ex) {
+            log.warn("Error loading UF beans from repository", ex);
+            userFeedbackBeans = new ArrayList<UserFeedbackBean>();
         }
-
-        // check to make sure none of our repositories have returned null
-        // NB: Hibernate will return a persistent list, which is no good to us
-        userFeedbackBeans = (userFeedbackBeans == null
-                ? new ArrayList<UserFeedbackBean>()
-                : new ArrayList<UserFeedbackBean>(userFeedbackBeans));
-        userFeedbackPrivacyNegotiationEvents = (userFeedbackPrivacyNegotiationEvents == null
-                ? new ArrayList<UserFeedbackPrivacyNegotiationEvent>()
-                : new ArrayList<UserFeedbackPrivacyNegotiationEvent>(userFeedbackPrivacyNegotiationEvents));
-        userFeedbackAccessControlEvents = (userFeedbackAccessControlEvents == null
-                ? new ArrayList<UserFeedbackAccessControlEvent>()
-                : new ArrayList<UserFeedbackAccessControlEvent>(userFeedbackAccessControlEvents));
-
-        // NB: Now get rid of all the hibernate mess inside the beans
-        for (UserFeedbackBean bean : requestBean.getUserFeedbackBean()) {
-            bean.setOptions(new ArrayList<String>(bean.getOptions())); // persistent list
-//            bean.setRequestDate(new Date(bean.getRequestDate().getTime())); // java.sql.Timestamp
+        try {
+            userFeedbackPrivacyNegotiationEvents = feedback.listIncompletePrivacyRequests();
+        } catch (Exception ex) {
+            log.warn("Error loading PPNs from repository", ex);
+            userFeedbackPrivacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>();
         }
-        for (UserFeedbackPrivacyNegotiationEvent event : requestBean.getUserFeedbackPrivacyNegotiationEvent()) {
-            event.getResponsePolicy().setResponseItems(new ArrayList<ResponseItem>(event.getResponsePolicy().getResponseItems())); // persistent list
-//            bean.setRequestDate(new Date(bean.getRequestDate().getTime())); // java.sql.Timestamp
-        }
-        for (UserFeedbackAccessControlEvent event : requestBean.getUserFeedbackAccessControlEvent()) {
-            event.setResponseItems(new ArrayList<ResponseItem>(event.getResponseItems())); // persistent list
-//            bean.setRequestDate(new Date(bean.getRequestDate().getTime())); // java.sql.Timestamp
+        try {
+            userFeedbackAccessControlEvents = feedback.listIncompleteAccessRequests();
+        } catch (Exception ex) {
+            log.warn("Error loading ACs from repository", ex);
+            userFeedbackAccessControlEvents = new ArrayList<UserFeedbackAccessControlEvent>();
         }
 
         if (log.isDebugEnabled())
@@ -267,8 +218,8 @@ public class UACommsServer implements IFeatureServer {
         requestBean.setUserFeedbackAccessControlEvent(userFeedbackAccessControlEvents);
 
         // TODO: Debugging - remove me
-        log.warn("Setting lists to null for debugging purposes - be sure to remove me before production");
-        requestBean.setUserFeedbackBean(null);
+//        log.warn("Setting lists to null for debugging purposes - be sure to remove me before production");
+//        requestBean.setUserFeedbackBean(null);
 //        requestBean.setUserFeedbackPrivacyNegotiationEvent(null);
 //        requestBean.setUserFeedbackAccessControlEvent(null);
 
