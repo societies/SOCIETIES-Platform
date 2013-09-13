@@ -53,22 +53,33 @@ public class NegotiationRequester implements INegotiation {
 	private boolean isPrivacyPolicyNegotiationMgrAvailable = false;
 	private boolean privacyPolicyNegotiationIncluded;
 	private IEventMgr eventMgr;
+
+	private PrivacyPolicyNegotiationListener negotiationListener;
 	
 //	@Autowired
 //	public NegotiationRequester(ISignatureMgr signatureMgr) {
 //		this.signatureMgr = signatureMgr;
 //		LOG.info("NegotiationRequester({})", signatureMgr);
 //	}
-	
+
 	public NegotiationRequester() {
 		LOG.info("NegotiationRequester()");
 	}
 	
 //	@PostConstruct
 	public void init() {
-		LOG.debug("init()");
+		LOG.debug("init(), creating new Listener.");
+		this.negotiationListener = new PrivacyPolicyNegotiationListener(getEventMgr());
 	}
 
+	/**
+	 * 
+	 */
+	public void destroy(){
+		LOG.debug("destroy(), cleaning listener.");
+		this.negotiationListener.unsubscribeEvents();
+		this.negotiationListener = null;
+	}
 	// Getters and setters for other OSGi services
 	public INegotiationProviderRemote getGroupMgr() {
 		return groupMgr;
@@ -119,6 +130,15 @@ public class NegotiationRequester implements INegotiation {
 		return isPrivacyPolicyNegotiationMgrAvailable;
 	}
 
+	protected PrivacyPolicyNegotiationListener getNegotiationListener() {
+		return negotiationListener;
+	}
+
+	protected void setNegotiationListener(
+			PrivacyPolicyNegotiationListener negotiationListener) {
+		this.negotiationListener = negotiationListener;
+	}
+	
 	@Override
 	public void startNegotiation(Requestor provider, boolean includePrivacyPolicyNegotiation,
 			INegotiationCallback callback) {

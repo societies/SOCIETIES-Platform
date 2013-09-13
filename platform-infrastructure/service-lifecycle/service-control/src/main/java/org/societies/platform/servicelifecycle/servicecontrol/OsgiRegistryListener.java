@@ -485,6 +485,8 @@ public class OsgiRegistryListener implements BundleContextAware,
 		// Preparing the search filter		
 		Service filter = ServiceModelUtils.generateEmptyFilter();
 		filter.getServiceIdentifier().setServiceInstanceIdentifier(bundle.getSymbolicName());
+		filter.getServiceInstance().setCssJid(thisNode.getBareJid());
+		
 		//filter.setServiceLocation(bundle.getLocation());
 		
 		List<Service> listServices;

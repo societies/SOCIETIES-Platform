@@ -222,21 +222,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			
 			thisNode = getCommMngr().getIdManager().getThisNetworkNode();
 			myId = getCommMngr().getIdManager().fromJid(thisNode.getJid());
-			try{
-				Bundle[] bundles = this.bundleContext.getBundles();
-				for(int k=0; k < bundles.length; k++){
-					logger.debug("Bundle is: " + bundles[k].getSymbolicName());
-					ServiceReference[] services = bundles[k].getRegisteredServices();
-					for(int j=0; j < services.length; j++){
-						logger.debug("org.springframework.osgi.bean.name: {}", services[j].getProperty("org.springframework.osgi.bean.name"));
-						logger.debug("Object class: {}", services[j].getProperty("objectClass"));
-						logger.debug("service.id : {}", services[j].getProperty("service.id"));
-					}
-				}
-			} catch(Exception ex){
-				logger.error("Coisas é fixe: {}",ex.getLocalizedMessage());
-				ex.printStackTrace();
-			}
+
 		} catch (Exception e) {
 			logger.error("Exception registering for CIS events");
 			e.printStackTrace();
@@ -1654,6 +1640,10 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 								logger.debug("Deleting the service from database: " + oldService);
 							}
 								deleteServices.add(oldService);
+								List<String> cisShared = getServiceReg().retrieveCISSharedService(oldService.getServiceIdentifier());
+								for(String cisJid: cisShared){
+									this.unshareService(oldService, cisJid);
+								}
 						}
 					} else{
 						if(logger.isDebugEnabled()){
@@ -1661,6 +1651,10 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 							logger.debug("Deleting the service from database: " + oldService);
 						}
 							deleteServices.add(oldService);
+							List<String> cisShared = getServiceReg().retrieveCISSharedService(oldService.getServiceIdentifier());
+							for(String cisJid: cisShared){
+								this.unshareService(oldService, cisJid);
+							}
 					}
 					
 				} else{

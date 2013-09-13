@@ -29,6 +29,7 @@ public class PrivacyPolicyNegotiationListenerTest {
 	IEventMgr eventMgr;
 	String[] eventTypes;
 	int id;
+	private PrivacyPolicyNegotiationInfo info;
 
 	private static final long TIME_TO_WAIT_IN_MS = 200;
 
@@ -63,7 +64,10 @@ public class PrivacyPolicyNegotiationListenerTest {
 		eventMgr = mock(IEventMgr.class);
 		eventTypes = new String[] {};
 		id = new Random().nextInt();
-		classUnderTest = new PrivacyPolicyNegotiationListener(finalCallback, slaKey, fileUris, eventMgr, eventTypes, id);
+		info = new PrivacyPolicyNegotiationInfo(finalCallback, slaKey, fileUris, id);
+
+		classUnderTest = new PrivacyPolicyNegotiationListener(eventMgr);
+		classUnderTest.addNegotiationInfo(info);
 	}
 
 	@Test
