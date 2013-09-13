@@ -1,5 +1,7 @@
 package org.societies.webapp.controller.userfeedback;
 
+import org.societies.api.internal.privacytrust.privacy.model.dataobfuscation.ObfuscatorInfo;
+import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.ObfuscatorInfoFactory;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyConditionsConstantValues;
@@ -37,6 +39,9 @@ public class AccessControlRequestController extends BasePageController {
 
     @ManagedProperty(value = "#{userFeedback}")
     private IUserFeedback userFeedback;
+
+    private final static ObfuscatorInfoFactory obfuscatorInfoFactory = new ObfuscatorInfoFactory();
+
 
     private String eventID;
     private UserFeedbackAccessControlEvent event;
@@ -123,10 +128,15 @@ public class AccessControlRequestController extends BasePageController {
         return availableConstants;
     }
 
-    public List<ResponseItem> getResponseItems() {
-        return event != null
-                ? event.getResponseItems()
-                : null;
+    public List<ResponseItemWrapper> getResponseItems() {
+        if (event == null)
+            return null;
+
+        ArrayList<ResponseItemWrapper> wrappers = new ArrayList<ResponseItemWrapper>();
+        for (ResponseItem item : event.getResponseItems())
+            wrappers.add((ResponseItemWrapper) item);
+
+        return wrappers;
     }
 
     public UserFeedbackAccessControlEvent getCurrentAccessEvent() {
@@ -214,6 +224,10 @@ public class AccessControlRequestController extends BasePageController {
             // set to permit by default - the user can then change
             response.setDecision(Decision.PERMIT);
 
+            // obfucsation
+            ObfuscatorInfo obfuscatorInfo = obfuscatorInfoFactory.getObfuscatorInfo(response.getRequestItem().getResource().getDataType());
+            ((RequestItemWrapper) response.getRequestItem()).setObfuscatorInfo(obfuscatorInfo);
+
             // quickly sort by condition name
             Collections.sort(response.getRequestItem().getConditions(), new Comparator<Condition>() {
                 @Override
@@ -274,6 +288,5 @@ public class AccessControlRequestController extends BasePageController {
     public ConditionConstants getNewConditionToAdd() {
         return newConditionToAdd;
     }
-
 
 }

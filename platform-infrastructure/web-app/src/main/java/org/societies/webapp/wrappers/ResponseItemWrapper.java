@@ -39,10 +39,17 @@ public class ResponseItemWrapper extends ResponseItem {
         originalList.addAll(responseItemWrappers);
     }
 
+    private double obfuscationLevel;
+
     public ResponseItemWrapper(ResponseItem prototype) {
         this.responseItemId = prototype.getResponseItemId();
         this.requestItem = prototype.getRequestItem();
         this.decision = prototype.getDecision();
+
+    }
+
+    public RequestItemWrapper getRequestItemWrapper() {
+        return (RequestItemWrapper) super.getRequestItem();
     }
 
     public boolean isPermitted() {
@@ -51,6 +58,14 @@ public class ResponseItemWrapper extends ResponseItem {
 
     public void setPermitted(boolean permitted) {
         this.decision = (permitted ? Decision.PERMIT : Decision.DENY);
+    }
+
+    public double getObfuscationLevel() {
+        return obfuscationLevel;
+    }
+
+    public void setObfuscationLevel(double obfuscationLevel) {
+        this.obfuscationLevel = obfuscationLevel;
     }
 
     public ResponseItem getResponseItem() {
