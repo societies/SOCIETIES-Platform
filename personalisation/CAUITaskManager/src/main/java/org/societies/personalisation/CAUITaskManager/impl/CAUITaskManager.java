@@ -368,18 +368,28 @@ public class CAUITaskManager implements ICAUITaskManager{
 		HashMap<IUserIntentAction, Integer> actionsScoreMap = new HashMap<IUserIntentAction, Integer>();
 
 		String currentLocationValue = "null";
-		String currentStatusValue = "null";
+		String currentDayOfWeekValue = "null";
+		Integer currentHourOfDayValue = 0;
 
 		if( situationConext.get(CtxAttributeTypes.LOCATION_SYMBOLIC) != null){
-			currentLocationValue = (String) situationConext.get(CtxAttributeTypes.LOCATION_SYMBOLIC);	
+			if(situationConext.get(CtxAttributeTypes.LOCATION_SYMBOLIC) instanceof String){
+				currentLocationValue = (String) situationConext.get(CtxAttributeTypes.LOCATION_SYMBOLIC);	
+			}
 		}
 
-		if( situationConext.get(CtxAttributeTypes.STATUS) != null){
-			currentStatusValue = (String) situationConext.get(CtxAttributeTypes.STATUS);	
+		if( situationConext.get(CtxAttributeTypes.DAY_OF_WEEK) != null){
+			if(situationConext.get(CtxAttributeTypes.DAY_OF_WEEK) instanceof String){
+				currentDayOfWeekValue = (String) situationConext.get(CtxAttributeTypes.DAY_OF_WEEK);	
+			}
+		}  
+				
+		if( situationConext.get(CtxAttributeTypes.HOUR_OF_DAY) != null){
+			if(situationConext.get(CtxAttributeTypes.HOUR_OF_DAY) instanceof Integer){
+				currentHourOfDayValue = (Integer) situationConext.get(CtxAttributeTypes.HOUR_OF_DAY);
+			}
 		}  
 
-		//Integer currentTempValue = (Integer) situationConext.get(CtxAttributeTypes.TEMPERATURE);
-
+		
 		for(IUserIntentAction action : actionList ){
 
 			HashMap<String,Serializable> actionCtx = action.getActionContext();
@@ -400,15 +410,16 @@ public class CAUITaskManager implements ICAUITaskManager{
 						actionMatchScore = actionMatchScore +1;
 					}
 
-				}  /*else if(ctxType.equals(CtxAttributeTypes.TEMPERATURE) && ctxValue instanceof Double ){
-					Integer actionTemperature= (Integer) ctxValue;
-					LOG.info("Double context temperature value :"+ actionTemperature);
-					if(currentTempValue.equals(actionTemperature)) actionMatchScore = actionMatchScore +1;
-				}*/ else if(ctxType.equals(CtxAttributeTypes.STATUS) && ctxValue instanceof String ){
-					String actionStatus = (String) ctxValue;
+				}  else if(ctxType.equals(CtxAttributeTypes.HOUR_OF_DAY) && ctxValue instanceof Integer ){
+					Integer actionHod = (Integer) ctxValue;
+					LOG.debug("Double context temperature value :"+ actionHod);
+					if(currentHourOfDayValue.equals(actionHod)) actionMatchScore = actionMatchScore +1;
+				}
+				else if(ctxType.equals(CtxAttributeTypes.DAY_OF_WEEK) && ctxValue instanceof String ){
+					String actionDow = (String) ctxValue;
 					//System.out.println(" --currentStatusValue :"+ currentStatusValue);
 					//System.out.println("********** Action status value :"+ actionStatus);
-					if(currentStatusValue.equals(actionStatus)) {
+					if(currentDayOfWeekValue.equals(actionDow)) {
 						//System.out.println("match... increase score +1 "+actionMatchScore);
 						actionMatchScore = actionMatchScore +1;
 					}

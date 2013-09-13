@@ -205,13 +205,13 @@ public class CAUIPrediction implements ICAUIPrediction{
 		if(cauiModelExist == true && enableCauiPrediction == true){
 
 			if(currentUIModelData != null ) this.cauiTaskManager.updateModel(currentUIModelData);
-		
+
 			LOG.debug("caui model to be used for prediction: "+ this.cauiTaskManager.getCAUIActiveModel() );
-	
+
 			String par = action.getparameterName();
 			String val = action.getvalue();
 			//LOG.info("2. action perf par:"+ par+" action val:"+val);
-			
+
 			// identify performed action in model
 			List<IUserIntentAction> actionsList = this.cauiTaskManager.retrieveActionsByTypeValue(par, val);
 			LOG.debug("1. CAUIMODEL TaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
@@ -307,21 +307,21 @@ public class CAUIPrediction implements ICAUIPrediction{
 		}
 
 		LOG.debug("situationContext :"+ situationContext);
-		
+
 		//LOG.debug("skata 1 cauiModelExist :"+ cauiModelExist +" enableCauiPrediction:"+enableCauiPrediction);
-		
+
 		if(cauiModelExist == true && enableCauiPrediction == true){
 
 			if(currentUIModelData != null ) 	{
 				//LOG.debug("skata 2 currentUIModelData :"+ currentUIModelData );
 				this.cauiTaskManager.updateModel(currentUIModelData);
 			}
-			
+
 			if(cauiTaskManager.retrieveActionsByContext(situationContext) != null ) {
-				
+
 				results = cauiTaskManager.retrieveActionsByContext(situationContext);
-			//	LOG.debug("skata 3 results :"+ results );
-				
+				//	LOG.debug("skata 3 results :"+ results );
+
 				// prediction performance log
 				long endTime = System.currentTimeMillis();
 				this.predictionPerformanceLog(endTime-startTime);
@@ -334,15 +334,15 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 			LOG.info("action prediction based on ctx update :"+ results);		
 			return new AsyncResult<List<IUserIntentAction>>(results);
-		
+
 		}else if(enableCACIPrediction == true && caciModelExist == true) {
-			
+
 			LOG.info("CAUI predictor not able to perform prediction ... community model will be used");
 			//results = this.caciPredictor.getPrediction(requestor, action);
 
 		} else LOG.info("neither caci, nor caui are able to perform prediction based on ctx updated");
-		
-		
+
+
 		LOG.info("action prediction based on ctx update :"+ results);		
 		return new AsyncResult<List<IUserIntentAction>>(results);
 	}
@@ -425,8 +425,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 		HashMap<IUserIntentAction, Integer> actionsScoreMap = new HashMap<IUserIntentAction, Integer>();
 
 		CtxAttribute currentLocation = retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC);
-		CtxAttribute currentStatus = retrieveOperatorsCtx(CtxAttributeTypes.STATUS);
-		//CtxAttribute currentTemp = retrieveOperatorsCtx(CtxAttributeTypes.TEMPERATURE);
+		CtxAttribute currentDow = retrieveOperatorsCtx(CtxAttributeTypes.DAY_OF_WEEK);
+		CtxAttribute currentHod = retrieveOperatorsCtx(CtxAttributeTypes.HOUR_OF_DAY);
 
 		for(IUserIntentAction action : actionList ){
 
@@ -440,30 +440,30 @@ public class CAUIPrediction implements ICAUIPrediction{
 				for(String ctxType : actionCtx.keySet()){
 					Serializable ctxValue = actionCtx.get(ctxType);
 					if( ctxValue != null){
+
 						if(ctxType.equals(CtxAttributeTypes.LOCATION_SYMBOLIC)&& ctxValue instanceof String){
 							String actionLocation = (String) ctxValue;
 							//	LOG.info("String context location value :"+ actionLocation);
 							if(currentLocation != null){
 								if(currentLocation.getStringValue() != null){
-
 									if(currentLocation.getStringValue().equals(actionLocation)) actionMatchScore = actionMatchScore +1;	
 								}
 							}					
-
 						}
-						/*else if(ctxType.equals(CtxAttributeTypes.TEMPERATURE) && ctxValue instanceof Integer ){
-					Integer actionTemperature= (Integer) ctxValue;
-					LOG.info("Integer context temperature value :"+ actionTemperature);
-					if(currentTemp.getIntegerValue().equals(actionTemperature)) actionMatchScore = actionMatchScore +1;
-					}*/
-						else if(ctxType.equals(CtxAttributeTypes.STATUS) && ctxValue instanceof String ){
-							String actionStatus = (String) ctxValue;
+						else if(ctxType.equals(CtxAttributeTypes.TIME_OF_DAY) && ctxValue instanceof Integer ){
+							Integer actionTod= (Integer) ctxValue;
+							LOG.debug("time of day :"+ actionTod);
+							if(currentHod.getIntegerValue().equals(actionTod)) actionMatchScore = actionMatchScore +1;
+						}
+						else if(ctxType.equals(CtxAttributeTypes.DAY_OF_WEEK) && ctxValue instanceof String ){
+							String actionDow = (String) ctxValue;
 							//LOG.info("String context status value :"+ actionStatus);
-							if(currentStatus != null ){
-								if(currentStatus.getStringValue() != null){
-									if( currentStatus.getStringValue().equals(actionStatus)) actionMatchScore = actionMatchScore +1;	
+							if(currentDow != null ){
+								if(currentDow.getStringValue() != null){
+									if( currentDow.getStringValue().equals(actionDow)) actionMatchScore = actionMatchScore +1;	
 								}
 							}
+
 						} else {
 							LOG.debug("findBestMatchingAction: context type:"+ctxType +" does not match");
 						}
@@ -471,7 +471,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 				}
 
 				actionsScoreMap.put(action, actionMatchScore);
-				//System.out.println("actionsScoreMap  " +actionsScoreMap);
+				LOG.debug("actionsScoreMap  " +actionsScoreMap);
 			}
 		}
 
@@ -481,7 +481,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 			if(actionsScoreMap.get(action).equals(maxValueInMap)) bestAction = action;
 		}
 
-		//LOG.info("best action "+bestAction);
+		LOG.debug("best action "+bestAction + " with score:"+ actionsScoreMap.get(bestAction));
 
 		return bestAction;
 	}
@@ -608,42 +608,29 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 					setCAUIActiveModel(newUIModelData);
 
-					//TODO register with pers manager for location updates.
 					//LOG.info("register with pers manager for ctxAttr  update");
 					if(retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC) != null){
 						CtxAttribute ctxAttrLocation = retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC);
 						persoMgr.registerForContextUpdate(getOwnerId(), PersonalisationTypes.CAUIIntent, ctxAttrLocation.getId());	
 						LOG.debug("register with pers manager for ctxAttr LOCATION_SYMBOLIC update");
 					}
-					if(retrieveOperatorsCtx(CtxAttributeTypes.STATUS) != null){
-						CtxAttribute ctxAttrStatus = retrieveOperatorsCtx(CtxAttributeTypes.STATUS);
+					if(retrieveOperatorsCtx(CtxAttributeTypes.DAY_OF_WEEK) != null){
+						CtxAttribute ctxAttrStatus = retrieveOperatorsCtx(CtxAttributeTypes.DAY_OF_WEEK);
 						persoMgr.registerForContextUpdate(getOwnerId(), PersonalisationTypes.CAUIIntent, ctxAttrStatus.getId());	
-						LOG.debug("register with pers manager for ctxAttr STATUS update");
+						LOG.debug("register with pers manager for ctxAttr DAY_OF_WEEK update");
 					}
 
-					/*	
-					if(retrieveOperatorsCtx(CtxAttributeTypes.TEMPERATURE) != null){
-						CtxAttribute ctxAttrTemp = retrieveOperatorsCtx(CtxAttributeTypes.TEMPERATURE);
-						persoMgr.registerForContextUpdate(getOwnerId(), PersonalisationTypes.CAUIIntent, ctxAttrTemp.getId());	
-						//LOG.info("register with pers manager for ctxAttr TEMPERATURE update");
+
+					if(retrieveOperatorsCtx(CtxAttributeTypes.HOUR_OF_DAY) != null){
+						CtxAttribute ctxAttrHod = retrieveOperatorsCtx(CtxAttributeTypes.HOUR_OF_DAY);
+						persoMgr.registerForContextUpdate(getOwnerId(), PersonalisationTypes.CAUIIntent, ctxAttrHod.getId());	
+						LOG.debug("register with pers manager for ctxAttr HOUR_OF_DAY update");
 					}
-					 */
-				} catch (InterruptedException e) {
 
+				} catch (Exception e) {
+					LOG.error("Exception while registering with pers manager for ctx update events "+ e.getLocalizedMessage());
 					e.printStackTrace();
-				} catch (ExecutionException e) {
-
-					e.printStackTrace();
-				} catch (CtxException e) {
-
-					e.printStackTrace();
-				} catch (IOException e) {
-
-					e.printStackTrace();
-				} catch (ClassNotFoundException e) {
-
-					e.printStackTrace();
-				}	
+				} 		
 			}
 		}
 
@@ -767,7 +754,9 @@ public class CAUIPrediction implements ICAUIPrediction{
 	private void retrieveCACIModelDB(){
 
 		try {
-			List<CtxIdentifier>	listModels = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
+			IIdentity identity = getOwnerId();
+
+			List<CtxIdentifier>	listModels = this.ctxBroker.lookup(identity, CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
 			if(!listModels.isEmpty()){
 				CtxAttribute modelAttr = (CtxAttribute) this.ctxBroker.retrieve(listModels.get(0)).get();
 				if(modelAttr.getBinaryValue() != null){
@@ -783,25 +772,31 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 
 	private CtxAttribute retrieveOperatorsCtx(String type){
+		
 		CtxAttribute ctxAttr = null;
+
 		try {
 
-			IndividualCtxEntity operator = this.ctxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
+			CtxEntityIdentifier operatorCtxID = this.ctxBroker.retrieveIndividualEntityId(null, getOwnerId()).get();
+			List<CtxIdentifier> attrList = this.ctxBroker.lookup(operatorCtxID, CtxModelType.ATTRIBUTE, type).get();
+	
+			if(!attrList.isEmpty()){
+				ctxAttr = (CtxAttribute) this.ctxBroker.retrieve(attrList.get(0)).get();
+			}
+			
+			/*
+			//IndividualCtxEntity operator = this.ctxBroker.retrieveIndividualEntity(this.cssOwnerId).get();
 
 			Set<CtxAttribute> ctxAttrSet = operator.getAttributes(type);
 			if(ctxAttrSet.size()>0){
 				List<CtxAttribute>  ctxAttrList = new ArrayList<CtxAttribute> (ctxAttrSet);
 				ctxAttr = ctxAttrList.get(0);
 			}
-
-		} catch (InterruptedException e) {
-			// 
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// 
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// 
+*/
+			
+			
+		} catch (Exception e) {
+			LOG.error("Exception when retrieving CtxAttribute of type CACI model from local Context DB "+e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 
@@ -885,12 +880,14 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		LOG.debug("generateNewCommunityModel 1 "+ cisId );
 
+		// change association type used... 
+		
 		try {
 
 			if(cisId == null){
 
 				//	List<CtxIdentifier> commEntList = this.ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.COMMUNITY).get();
-				List<CtxIdentifier> isMemberOfAssocList =	this.ctxBroker.lookup(CtxModelType.ASSOCIATION, CtxAssociationTypes.IS_MEMBER_OF).get();
+				List<CtxIdentifier> isMemberOfAssocList =	this.ctxBroker.lookup(cisId, CtxModelType.ASSOCIATION, CtxAssociationTypes.IS_MEMBER_OF).get();
 				LOG.debug("generateNewCommunityModel 2 "+ isMemberOfAssocList );
 				if (!isMemberOfAssocList.isEmpty() ) {
 

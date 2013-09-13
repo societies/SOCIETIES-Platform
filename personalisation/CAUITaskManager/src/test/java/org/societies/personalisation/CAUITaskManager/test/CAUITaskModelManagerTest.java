@@ -198,29 +198,41 @@ public class CAUITaskModelManagerTest {
 		createModel();
 		UserIntentModelData modelData = modelManager.retrieveModel();
 
-		System.out.println("actionsList  "+ modelData.getActionModel().keySet());
-
+//		System.out.println("actionsList  "+ modelData.getActionModel().keySet());
+		System.out.println("************* printing model with context ********************");
+		for(IUserIntentAction act :  modelData.getActionModel().keySet()){
+		
+			System.out.println("action : "+ act+" with ctx:"+ act.getActionContext());
+			
+		}
+		
+		
+		
 		Map<String, Serializable> currentSituationConext1 = new HashMap<String, Serializable>();
 		currentSituationConext1.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "moon");
-		currentSituationConext1.put(CtxAttributeTypes.STATUS, "busy");
+		currentSituationConext1.put(CtxAttributeTypes.DAY_OF_WEEK, "Tuesday");
+		currentSituationConext1.put(CtxAttributeTypes.HOUR_OF_DAY, 3);
 		List<IUserIntentAction> results1 =  modelManager.retrieveActionsByContext(currentSituationConext1);
 
+		System.out.println("results1 : "+results1);
+		
 		assertEquals(1,results1.size());
 		IUserIntentAction action1 = results1.get(0);
 		assertEquals("A-homePc",action1.getparameterName());
 		assertEquals("on",action1.getvalue());
-		HashMap<String,Serializable> context = action1.getActionContext();
-		assertEquals( "moon" , context.get(CtxAttributeTypes.LOCATION_SYMBOLIC));
-		assertEquals( "busy" , context.get(CtxAttributeTypes.STATUS));
 		
+		HashMap<String,Serializable> actionContext = action1.getActionContext();
+		assertEquals( "moon" , actionContext.get(CtxAttributeTypes.LOCATION_SYMBOLIC));
+		assertEquals( "Tuesday" , actionContext.get(CtxAttributeTypes.DAY_OF_WEEK));
+		assertEquals( 3 , actionContext.get(CtxAttributeTypes.HOUR_OF_DAY));
 		System.out.println("estimated action  "+ action1);
-		System.out.println("context loc "+ context.get(CtxAttributeTypes.LOCATION_SYMBOLIC));
-		System.out.println("context status "+ context.get(CtxAttributeTypes.STATUS));
+		System.out.println("context loc "+ actionContext.get(CtxAttributeTypes.LOCATION_SYMBOLIC));
+		System.out.println("context DAY_OF_WEEK "+ actionContext.get(CtxAttributeTypes.DAY_OF_WEEK));
 
 ///----------		
 		Map<String, Serializable> situationConext2 = new HashMap<String, Serializable>();
 		situationConext2.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "mars");
-		situationConext2.put(CtxAttributeTypes.STATUS, "online");
+		situationConext2.put(CtxAttributeTypes.DAY_OF_WEEK, "Wednesday");
 		List<IUserIntentAction> results2 =  modelManager.retrieveActionsByContext(situationConext2);
 		System.out.println("results2  "+ results2);
 		assertEquals(1,results2.size());
@@ -230,12 +242,12 @@ public class CAUITaskModelManagerTest {
 		assertEquals("mute",action2.getvalue());
 		HashMap<String,Serializable> context2 = action2.getActionContext();
 		assertEquals( "mars" , context2.get(CtxAttributeTypes.LOCATION_SYMBOLIC));
-		assertEquals( "online" , context2.get(CtxAttributeTypes.STATUS));
+		assertEquals( "Wednesday" , context2.get(CtxAttributeTypes.DAY_OF_WEEK));
 		
 		
 		Map<String, Serializable> situationConext3 = new HashMap<String, Serializable>();
 		situationConext3.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "null");
-		situationConext3.put(CtxAttributeTypes.STATUS, "free");
+		situationConext3.put(CtxAttributeTypes.DAY_OF_WEEK, "monday");
 		//situationConext2.put(CtxAttributeTypes.TEMPERATURE, "15");
 		List<IUserIntentAction> results3 =  modelManager.retrieveActionsByContext(situationConext3);
 		//System.out.println("output 3 "+ results3);
@@ -244,15 +256,15 @@ public class CAUITaskModelManagerTest {
 	
 		Map<String, Serializable> situationConext4 = new HashMap<String, Serializable>();
 		situationConext4.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "moon");
-		situationConext4.put(CtxAttributeTypes.STATUS, "free");
+		situationConext4.put(CtxAttributeTypes.DAY_OF_WEEK, "monday");
 		//situationConext2.put(CtxAttributeTypes.TEMPERATURE, "15");
 		List<IUserIntentAction> results4 =  modelManager.retrieveActionsByContext(situationConext4);
-		System.out.println("output for ctx loc:moon and status:free "+ results4);
+		System.out.println("output for ctx loc:moon and DAY_OF_WEEK:monday "+ results4);
 		assertEquals(2,results4.size());
 
 		Map<String, Serializable> situationConext5 = new HashMap<String, Serializable>();
 		situationConext5.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "xxx");
-		situationConext5.put(CtxAttributeTypes.STATUS, "yyyy");
+		situationConext5.put(CtxAttributeTypes.DAY_OF_WEEK, "yyyy");
 		//situationConext2.put(CtxAttributeTypes.TEMPERATURE, "15");
 		List<IUserIntentAction> results5 =  modelManager.retrieveActionsByContext(situationConext5);
 		System.out.println("output for ctx loc:xxx and status:yyy "+ results5);
@@ -362,22 +374,22 @@ public class CAUITaskModelManagerTest {
 
 		HashMap<String,Serializable> contextMap = new HashMap<String,Serializable>(); 
 		contextMap.put(CtxAttributeTypes.LOCATION_SYMBOLIC,"earth");
-		contextMap.put(CtxAttributeTypes.STATUS,"free");
-		contextMap.put(CtxAttributeTypes.TEMPERATURE,15);
+		contextMap.put(CtxAttributeTypes.DAY_OF_WEEK,"monday");
+		contextMap.put(CtxAttributeTypes.HOUR_OF_DAY,2);
 		userActionA.setActionContext(contextMap);
 
 		IUserIntentAction userActionB = modelManager.createAction(serviceId,"ServiceType","A-homePc","on");
 		contextMap = new HashMap<String,Serializable>(); 
 		contextMap.put(CtxAttributeTypes.LOCATION_SYMBOLIC,"moon");
-		contextMap.put(CtxAttributeTypes.STATUS,"busy");
-		contextMap.put(CtxAttributeTypes.TEMPERATURE,15);
+		contextMap.put(CtxAttributeTypes.DAY_OF_WEEK,"Tuesday");
+		contextMap.put(CtxAttributeTypes.HOUR_OF_DAY,3);
 		userActionB.setActionContext(contextMap);
 
 		IUserIntentAction userActionC = modelManager.createAction(serviceId,"ServiceType","C-radio","mute");
 		contextMap = new HashMap<String,Serializable>(); 
 		contextMap.put(CtxAttributeTypes.LOCATION_SYMBOLIC,"mars");
-		contextMap.put(CtxAttributeTypes.STATUS,"online");
-		contextMap.put(CtxAttributeTypes.TEMPERATURE,15);
+		contextMap.put(CtxAttributeTypes.DAY_OF_WEEK,"Wednesday");
+		contextMap.put(CtxAttributeTypes.HOUR_OF_DAY,4);
 		userActionC.setActionContext(contextMap);
 
 		modelManager.setActionLink(userActionA, userActionB, 0.82);

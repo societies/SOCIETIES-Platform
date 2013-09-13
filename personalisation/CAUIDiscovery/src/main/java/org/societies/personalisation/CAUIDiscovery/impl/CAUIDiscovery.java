@@ -295,8 +295,10 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 		List<String> currentActPhrase = null;
 		List<String> currentCtxPhraseLocation = null;
-		List<String> currentCtxPhraseStatus = null;
-		List<String> currentCtxPhraseTemperature = null;
+		List<String> currentCtxPhraseDow = null;
+		List<String> currentCtxPhraseHod = null;
+		//List<String> currentCtxPhraseStatus = null;
+		//List<String> currentCtxPhraseTemperature = null;
 
 		// j is the step and the longest phrase has 3 actions
 		for (int j=1; j<4; j++) {
@@ -310,12 +312,12 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 				//context
 				LinkedList<String> ctxObjTempLocation = new LinkedList<String>();
-				LinkedList<String> ctxObjTempStatus = new LinkedList<String>();
-				LinkedList<String> ctxObjTempTemperature = new LinkedList<String>();
+				LinkedList<String> ctxObjTempDow = new LinkedList<String>();
+				LinkedList<String> ctxObjTempHod = new LinkedList<String>();
 
 				ctxObjTempLocation.add(currentHocData.getContextValue(CtxAttributeTypes.LOCATION_SYMBOLIC));
-				ctxObjTempStatus.add(currentHocData.getContextValue(CtxAttributeTypes.STATUS));
-				ctxObjTempTemperature.add(currentHocData.getContextValue(CtxAttributeTypes.TEMPERATURE));
+				ctxObjTempDow.add(currentHocData.getContextValue(CtxAttributeTypes.DAY_OF_WEEK));
+				ctxObjTempHod.add(currentHocData.getContextValue(CtxAttributeTypes.HOUR_OF_DAY));
 
 				MockHistoryData tempHocData = null;
 				//get next action
@@ -330,25 +332,25 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 						//context
 						String tempNextCtxLoc = tempHocData.getContextValue(CtxAttributeTypes.LOCATION_SYMBOLIC);
-						String tempNextCtxStatus = tempHocData.getContextValue(CtxAttributeTypes.STATUS);
-						String tempNextCtxTemperature = tempHocData.getContextValue(CtxAttributeTypes.TEMPERATURE);
+						String tempNextCtxDow = tempHocData.getContextValue(CtxAttributeTypes.DAY_OF_WEEK);
+						String tempNextCtxHod = tempHocData.getContextValue(CtxAttributeTypes.HOUR_OF_DAY);
 
 						ctxObjTempLocation.add(tempNextCtxLoc);
-						ctxObjTempStatus.add(tempNextCtxStatus);
-						ctxObjTempTemperature.add(tempNextCtxTemperature);
+						ctxObjTempDow.add(tempNextCtxDow);
+						ctxObjTempHod.add(tempNextCtxHod);
 					}
 				}
 
 				currentActPhrase = actionNameObjTemp;
 				//context
 				currentCtxPhraseLocation = ctxObjTempLocation;
-				currentCtxPhraseStatus = ctxObjTempStatus;
-				currentCtxPhraseTemperature = ctxObjTempTemperature;
+				currentCtxPhraseDow = ctxObjTempDow;
+				currentCtxPhraseHod = ctxObjTempHod;
 
 				List<List<String>> currentCtxPhraseList = new ArrayList<List<String>>();
 				currentCtxPhraseList.add(0,currentCtxPhraseLocation );
-				currentCtxPhraseList.add(1,currentCtxPhraseStatus );
-				currentCtxPhraseList.add(2,currentCtxPhraseTemperature );
+				currentCtxPhraseList.add(1,currentCtxPhraseDow );
+				currentCtxPhraseList.add(2,currentCtxPhraseHod );
 
 				if (actionNameObjTemp.size() == j){
 					//System.out.println("j="+j+" i="+i+" actionName "+actionName+ " phrase "+currentActPhrase +" context"+currentHocData.getContext()+" ");
@@ -367,16 +369,16 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 						HashMap<List<String>,Integer> updatedMapLoc = mergeCtxMaps(currentCtxPhraseLocation, currentCtxMapLocation);
 						dicObj.setLocationContextMap(updatedMapLoc);
 
-						HashMap<List<String>,Integer> currentCtxMapStatus = new HashMap<List<String>,Integer>();
-						currentCtxMapStatus = dicObj.getStatusContextMap();
-						HashMap<List<String>,Integer> updatedMapStatus = mergeCtxMaps(currentCtxPhraseStatus, currentCtxMapStatus);
-						dicObj.setStatusContextMap(updatedMapStatus);
+						HashMap<List<String>,Integer> currentCtxMapDow = new HashMap<List<String>,Integer>();
+						currentCtxMapDow = dicObj.getDayOfWeekContextMap();
+						HashMap<List<String>,Integer> updatedMapDow = mergeCtxMaps(currentCtxPhraseDow, currentCtxMapDow);
+						dicObj.setDayOfWeekContextMap(updatedMapDow);
 
-						HashMap<List<String>,Integer> currentCtxMapTemperature = new HashMap<List<String>,Integer>();
-						currentCtxMapTemperature = dicObj.getTemperatureContextMap();
-						HashMap<List<String>,Integer> updatedMapTemperature = mergeCtxMaps(currentCtxPhraseTemperature, currentCtxMapTemperature);
-						dicObj.setTemperatureContextMap(updatedMapTemperature);
-
+						HashMap<List<String>,Integer> currentCtxMapHod = new HashMap<List<String>,Integer>();
+						currentCtxMapHod = dicObj.getHourOfDayContextMap();
+						HashMap<List<String>,Integer> updatedMapHod = mergeCtxMaps(currentCtxPhraseHod, currentCtxMapHod);
+						dicObj.setHourOfDayContextMap(updatedMapHod);
+						
 						//add updated data to dictionary
 						actCtxDictionary.put(currentActPhrase,dicObj);
 
@@ -389,13 +391,13 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 						newCtxMapLocation.put(currentCtxPhraseLocation, 1);
 						newDictObj.setLocationContextMap(newCtxMapLocation);
 
-						HashMap<List<String>,Integer> newCtxMapStatus =  new HashMap<List<String>,Integer>();
-						newCtxMapStatus.put(currentCtxPhraseStatus, 1);
-						newDictObj.setStatusContextMap(newCtxMapStatus);
+						HashMap<List<String>,Integer> newCtxMapDow =  new HashMap<List<String>,Integer>();
+						newCtxMapDow.put(currentCtxPhraseDow, 1);
+						newDictObj.setDayOfWeekContextMap(newCtxMapDow);
 
-						HashMap<List<String>,Integer> newCtxMapTemperature =  new HashMap<List<String>,Integer>();
-						newCtxMapTemperature.put(currentCtxPhraseTemperature, 1);
-						newDictObj.setTemperatureContextMap(newCtxMapTemperature);
+						HashMap<List<String>,Integer> newCtxMapHod =  new HashMap<List<String>,Integer>();
+						newCtxMapHod.put(currentCtxPhraseHod, 1);
+						newDictObj.setHourOfDayContextMap(newCtxMapHod);
 
 						actCtxDictionary.put(currentActPhrase,newDictObj);
 					}
@@ -455,32 +457,32 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 						}
 					}
 				}
-				if(dicObj.getStatusContextMap() != null){
-					HashMap<List<String>,Integer> statusMap = dicObj.getStatusContextMap();  
-					for(List<String> statusValues : statusMap.keySet()){
-						if(statusValues.size()== 1){
-							String status = statusValues.get(0);
-							int statusValueOccurences = statusMap.get(statusValues);
-							if(statusValueOccurences/actionOccurences > 0.5){
-								contextList.add(CtxAttributeTypes.STATUS+"="+status);
+				if(dicObj.getDayOfWeekContextMap() != null){
+					HashMap<List<String>,Integer> dowMap = dicObj.getDayOfWeekContextMap();  
+					for(List<String> dowValues : dowMap.keySet()){
+						if(dowValues.size()== 1){
+							String dow = dowValues.get(0);
+							int dowValueOccurences = dowMap.get(dowValues);
+							if(dowValueOccurences/actionOccurences > 0.5){
+								contextList.add(CtxAttributeTypes.DAY_OF_WEEK+"="+dow);
 							}
 						}
 					}
 				}
-				/*
-				if(dicObj.getTemperatureContextMap() != null){
-					HashMap<List<String>,Integer> temperatureMap = dicObj.getTemperatureContextMap();  
-					for(List<String> tempValues : temperatureMap.keySet()){
+				
+				if(dicObj.getHourOfDayContextMap() != null){
+					HashMap<List<String>,Integer> todMap = dicObj.getHourOfDayContextMap();  
+					for(List<String> tempValues : todMap.keySet()){
 						if(tempValues.size()== 1){
-							String temperature = tempValues.get(0);
-							int temperatureValueOccurences = temperatureMap.get(tempValues);
+							String tod = tempValues.get(0);
+							int temperatureValueOccurences = todMap.get(tempValues);
 							if(temperatureValueOccurences/actionOccurences > 0.5){
-								contextList.add("temperature="+temperature);
+								contextList.add(CtxAttributeTypes.TIME_OF_DAY+"="+tod);
 							}
 						}
 					}
 				}
-				 */
+				 
 				results.put(action, contextList);
 
 			}
@@ -707,8 +709,8 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 		List<String> currentActPhrase = null;
 		List<String> currentCtxPhraseLocation = null;
-		List<String> currentCtxPhraseStatus = null;
-		List<String> currentCtxPhraseTemperature = null;
+		List<String> currentCtxPhraseDow = null;
+		List<String> currentCtxPhraseHod = null;
 
 		// j is the step and the longest phrase has 3 actions
 		//for (int j=step; j<=step; j++) {
@@ -722,12 +724,12 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 			//context
 			LinkedList<String> ctxObjTempLocation = new LinkedList<String>();
-			LinkedList<String> ctxObjTempStatus = new LinkedList<String>();
-			LinkedList<String> ctxObjTempTemperature = new LinkedList<String>();
+			LinkedList<String> ctxObjTempDow = new LinkedList<String>();
+			LinkedList<String> ctxObjTempHod = new LinkedList<String>();
 
 			ctxObjTempLocation.add(currentHocData.getContextValue(CtxAttributeTypes.LOCATION_SYMBOLIC));
-			ctxObjTempStatus.add(currentHocData.getContextValue(CtxAttributeTypes.STATUS));
-			ctxObjTempTemperature.add(currentHocData.getContextValue(CtxAttributeTypes.TEMPERATURE));
+			ctxObjTempDow.add(currentHocData.getContextValue(CtxAttributeTypes.DAY_OF_WEEK));
+			ctxObjTempHod.add(currentHocData.getContextValue(CtxAttributeTypes.HOUR_OF_DAY));
 
 			MockHistoryData tempHocData = null;
 			//get next action
@@ -742,25 +744,25 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 					//context
 					String tempNextCtxLoc = tempHocData.getContextValue(CtxAttributeTypes.LOCATION_SYMBOLIC);
-					String tempNextCtxStatus = tempHocData.getContextValue(CtxAttributeTypes.STATUS);
-					String tempNextCtxTemperature = tempHocData.getContextValue(CtxAttributeTypes.TEMPERATURE);
+					String tempNextCtxDow = tempHocData.getContextValue(CtxAttributeTypes.DAY_OF_WEEK);
+					String tempNextCtxHod = tempHocData.getContextValue(CtxAttributeTypes.HOUR_OF_DAY);
 
 					ctxObjTempLocation.add(tempNextCtxLoc);
-					ctxObjTempStatus.add(tempNextCtxStatus);
-					ctxObjTempTemperature.add(tempNextCtxTemperature);
+					ctxObjTempDow.add(tempNextCtxDow);
+					ctxObjTempHod.add(tempNextCtxHod);
 				}
 			}
 
 			currentActPhrase = actionNameObjTemp;
 			//context
 			currentCtxPhraseLocation = ctxObjTempLocation;
-			currentCtxPhraseStatus = ctxObjTempStatus;
-			currentCtxPhraseTemperature = ctxObjTempTemperature;
+			currentCtxPhraseDow = ctxObjTempDow;
+			currentCtxPhraseHod = ctxObjTempHod;
 
 			List<List<String>> currentCtxPhraseList = new ArrayList<List<String>>();
 			currentCtxPhraseList.add(0,currentCtxPhraseLocation );
-			currentCtxPhraseList.add(1,currentCtxPhraseStatus );
-			currentCtxPhraseList.add(2,currentCtxPhraseTemperature );
+			currentCtxPhraseList.add(1,currentCtxPhraseDow );
+			currentCtxPhraseList.add(2,currentCtxPhraseHod );
 
 			if (actionNameObjTemp.size() == j){
 				//System.out.println("j="+j+" i="+i+" actionName "+actionName+ " phrase "+currentActPhrase +" context"+currentHocData.getContext()+" ");
@@ -774,20 +776,20 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 					dicObj.setTotalOccurences(previousScore+1);
 
 					//update context map
-					HashMap<List<String>,Integer> currentCtxMapLocation = new HashMap<List<String>,Integer>();
-					currentCtxMapLocation = dicObj.getLocationContextMap();
-					HashMap<List<String>,Integer> updatedMapLoc = mergeCtxMaps(currentCtxPhraseLocation, currentCtxMapLocation);
+					//HashMap<List<String>,Integer> currentCtxMapLocation = new HashMap<List<String>,Integer>();
+					//currentCtxMapLocation = dicObj.getLocationContextMap();
+					HashMap<List<String>,Integer> updatedMapLoc = mergeCtxMaps(currentCtxPhraseLocation, dicObj.getLocationContextMap());
 					dicObj.setLocationContextMap(updatedMapLoc);
 
-					HashMap<List<String>,Integer> currentCtxMapStatus = new HashMap<List<String>,Integer>();
-					currentCtxMapStatus = dicObj.getStatusContextMap();
-					HashMap<List<String>,Integer> updatedMapStatus = mergeCtxMaps(currentCtxPhraseStatus, currentCtxMapStatus);
-					dicObj.setStatusContextMap(updatedMapStatus);
+					//HashMap<List<String>,Integer> currentCtxMapDow = new HashMap<List<String>,Integer>();
+					//currentCtxMapDow = dicObj.getDayOfWeekContextMap();
+					HashMap<List<String>,Integer> updatedMapDow = mergeCtxMaps(currentCtxPhraseDow, dicObj.getDayOfWeekContextMap());
+					dicObj.setDayOfWeekContextMap(updatedMapDow);
 
-					HashMap<List<String>,Integer> currentCtxMapTemperature = new HashMap<List<String>,Integer>();
-					currentCtxMapTemperature = dicObj.getTemperatureContextMap();
-					HashMap<List<String>,Integer> updatedMapTemperature = mergeCtxMaps(currentCtxPhraseTemperature, currentCtxMapTemperature);
-					dicObj.setTemperatureContextMap(updatedMapTemperature);
+					//HashMap<List<String>,Integer> currentCtxMapHod = new HashMap<List<String>,Integer>();
+					//currentCtxMapHod = dicObj.getHourOfDayContextMap();
+					HashMap<List<String>,Integer> updatedMapHod = mergeCtxMaps(currentCtxPhraseHod, dicObj.getHourOfDayContextMap());
+					dicObj.setDayOfWeekContextMap(updatedMapHod);
 
 					//add updated data to dictionary
 					actCtxDictionary.put(currentActPhrase,dicObj);
@@ -801,13 +803,13 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 					newCtxMapLocation.put(currentCtxPhraseLocation, 1);
 					newDictObj.setLocationContextMap(newCtxMapLocation);
 
-					HashMap<List<String>,Integer> newCtxMapStatus =  new HashMap<List<String>,Integer>();
-					newCtxMapStatus.put(currentCtxPhraseStatus, 1);
-					newDictObj.setStatusContextMap(newCtxMapStatus);
+					HashMap<List<String>,Integer> newCtxMapDow =  new HashMap<List<String>,Integer>();
+					newCtxMapDow.put(currentCtxPhraseDow, 1);
+					newDictObj.setDayOfWeekContextMap(newCtxMapDow);
 
-					HashMap<List<String>,Integer> newCtxMapTemperature =  new HashMap<List<String>,Integer>();
-					newCtxMapTemperature.put(currentCtxPhraseTemperature, 1);
-					newDictObj.setTemperatureContextMap(newCtxMapTemperature);
+					HashMap<List<String>,Integer> newCtxMapHod =  new HashMap<List<String>,Integer>();
+					newCtxMapHod.put(currentCtxPhraseHod, 1);
+					newDictObj.setHourOfDayContextMap(newCtxMapHod);
 
 					actCtxDictionary.put(currentActPhrase,newDictObj);
 				}

@@ -161,13 +161,16 @@ public class Tester {
 
 			actionsTask1(action1,action2,action3);
 			randomAction(actionRandom1);
+			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "office");
 			actionsTask2(action4,action5,action6);
 			randomAction(actionRandom2);
 			actionsTask3(action7,action8);
 
+			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "home");
 			actionsTask1(action1,action2,action3);
 			randomAction(actionRandom2);
 			randomAction(actionRandom1);
+			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "office");
 			actionsTask2(action4,action5,action6);
 			randomAction(actionRandom2);
 
@@ -176,19 +179,22 @@ public class Tester {
 
 			//actionsTask3(action7,action8);
 
-
+			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "home");
 			actionsTask1(action1,action2,action3);
 			randomAction(actionRandom3);
 			randomAction(actionRandom1);
+			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "office");
 			actionsTask2(action4,action5,action6);
 			randomAction(actionRandom3);
 			randomAction(actionRandom2);
 			randomAction(actionRandom2);
 			actionsTask3(action7,action8);
-
+			
+			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "home");
 			actionsTask1(action1,action2,action3);
 			randomAction(actionRandom2);
-
+			
+			setContext(CtxAttributeTypes.LOCATION_SYMBOLIC, "office");
 			actionsTask2(action4,action5,action6);
 			randomAction(actionRandom1);
 			randomAction(actionRandom3);

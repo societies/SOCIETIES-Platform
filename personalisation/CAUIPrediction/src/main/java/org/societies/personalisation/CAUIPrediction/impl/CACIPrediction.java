@@ -182,6 +182,81 @@ public class CACIPrediction {
 	}
 
 
+	/*
+	 * Identify best matching action according to operator's current context and predicted actions context
+	 *	 
+	 */	
+	private IUserIntentAction findBestMatchingAction(List<IUserIntentAction> actionList){
+		IUserIntentAction bestAction = null;
+
+		HashMap<IUserIntentAction, Integer> actionsScoreMap = new HashMap<IUserIntentAction, Integer>();
+
+		CtxAttribute currentLocation = retrieveOperatorsCtx(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		CtxAttribute currentDow = retrieveOperatorsCtx(CtxAttributeTypes.DAY_OF_WEEK);
+		CtxAttribute currentHod = retrieveOperatorsCtx(CtxAttributeTypes.HOUR_OF_DAY);
+
+		for(IUserIntentAction action : actionList ){
+
+			HashMap<String,Serializable> actionCtx = action.getActionContext();
+			int actionMatchScore = 0;
+
+			if( actionCtx != null ){
+
+				actionMatchScore = 0;			
+
+				for(String ctxType : actionCtx.keySet()){
+					Serializable ctxValue = actionCtx.get(ctxType);
+					if( ctxValue != null){
+
+						if(ctxType.equals(CtxAttributeTypes.LOCATION_SYMBOLIC)&& ctxValue instanceof String){
+							String actionLocation = (String) ctxValue;
+							//	LOG.info("String context location value :"+ actionLocation);
+							if(currentLocation != null){
+								if(currentLocation.getStringValue() != null){
+									if(currentLocation.getStringValue().equals(actionLocation)) actionMatchScore = actionMatchScore +1;	
+								}
+							}					
+						}
+						else if(ctxType.equals(CtxAttributeTypes.TIME_OF_DAY) && ctxValue instanceof Integer ){
+							Integer actionTod= (Integer) ctxValue;
+							LOG.debug("time of day :"+ actionTod);
+							if(currentHod.getIntegerValue().equals(actionTod)) actionMatchScore = actionMatchScore +1;
+						}
+						else if(ctxType.equals(CtxAttributeTypes.DAY_OF_WEEK) && ctxValue instanceof String ){
+							String actionDow = (String) ctxValue;
+							//LOG.info("String context status value :"+ actionStatus);
+							if(currentDow != null ){
+								if(currentDow.getStringValue() != null){
+									if( currentDow.getStringValue().equals(actionDow)) actionMatchScore = actionMatchScore +1;	
+								}
+							}
+
+						} else {
+							LOG.debug("findBestMatchingAction: context type:"+ctxType +" does not match");
+						}
+					} 
+				}
+
+				actionsScoreMap.put(action, actionMatchScore);
+				LOG.debug("actionsScoreMap  " +actionsScoreMap);
+			}
+		}
+
+		int maxValueInMap=(Collections.max(actionsScoreMap.values()));  // This will return max value in the Hashmap
+		for(IUserIntentAction action  : actionsScoreMap.keySet()){
+
+			if(actionsScoreMap.get(action).equals(maxValueInMap)) bestAction = action;
+		}
+
+		LOG.debug("best action "+bestAction + " with score:"+ actionsScoreMap.get(bestAction));
+
+		return bestAction;
+	}
+	
+	/*
+	
+	
+	
 	private IUserIntentAction findBestMatchingAction(List<IUserIntentAction> actionList){
 		IUserIntentAction bestAction = null;
 
@@ -214,11 +289,11 @@ public class CACIPrediction {
 							}					
 
 						}
-						/*else if(ctxType.equals(CtxAttributeTypes.TEMPERATURE) && ctxValue instanceof Integer ){
+					else if(ctxType.equals(CtxAttributeTypes.TEMPERATURE) && ctxValue instanceof Integer ){
 					Integer actionTemperature= (Integer) ctxValue;
 					LOG.info("Integer context temperature value :"+ actionTemperature);
 					if(currentTemp.getIntegerValue().equals(actionTemperature)) actionMatchScore = actionMatchScore +1;
-					}*/
+					}
 						else if(ctxType.equals(CtxAttributeTypes.STATUS) && ctxValue instanceof String ){
 							String actionStatus = (String) ctxValue;
 							//LOG.info("String context status value :"+ actionStatus);
@@ -249,16 +324,7 @@ public class CACIPrediction {
 		return bestAction;
 	}
 
-
-
-
-
-
-
-
-
-
-
+*/
 
 	/*
 	 * retreive caci model code from CIS context db 
