@@ -88,6 +88,14 @@ public class RemoveCtxCallback extends CtxCallback {
 		// TODO Auto-generated method stub
 
 	}
+	
+	/*
+	 * @see org.societies.context.broker.impl.comm.ICtxCallback#onRetrieveCtx(org.societies.api.context.model.CtxModelObject)
+	 */
+	@Override
+	public void onRetrievedAll(List<CtxModelObject> ctxModelObjectList) {
+		// TODO Auto-generated method stub
+	}
 
 	/* (non-Javadoc)
 	 * @see org.societies.context.broker.impl.comm.ICtxCallback#onRetrievedEntityId(org.societies.api.context.model.CtxEntityIdentifier)

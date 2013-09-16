@@ -76,6 +76,14 @@ public class RetrieveCtxCallback extends CtxCallback{
 		}
 	}
 	
+	/*
+	 * @see org.societies.context.broker.impl.comm.ICtxCallback#onRetrieveCtx(org.societies.api.context.model.CtxModelObject)
+	 */
+	@Override
+	public void onRetrievedAll(List<CtxModelObject> ctxModelObjectList) {
+		// TODO Auto-generated method stub
+	}
+	
 	@Override
 	public void onUpdateCtx(CtxModelObject ctxObj) {
 		// TODO Auto-generated method stub
