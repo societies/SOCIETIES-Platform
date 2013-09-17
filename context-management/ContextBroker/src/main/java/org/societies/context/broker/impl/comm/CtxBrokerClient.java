@@ -26,8 +26,8 @@
 package org.societies.context.broker.impl.comm;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -61,6 +61,7 @@ import org.societies.api.schema.context.contextmanagement.CtxBrokerRequestBean;
 import org.societies.api.schema.context.contextmanagement.LookupBean;
 import org.societies.api.schema.context.contextmanagement.LookupByScopeBean;
 import org.societies.api.schema.context.contextmanagement.RemoveBean;
+import org.societies.api.schema.context.contextmanagement.RetrieveAllBean;
 import org.societies.api.schema.context.contextmanagement.RetrieveBean;
 import org.societies.api.schema.context.contextmanagement.RetrieveCommunityEntityIdBean;
 import org.societies.api.schema.context.contextmanagement.RetrieveFutureBean;
@@ -238,6 +239,42 @@ public class CtxBrokerClient implements ICommCallback {
 
 			throw new CtxBrokerException("Could not retrieve remote ctx model object "
 					+ identifier + ": " + e.getLocalizedMessage(), e);
+		}
+	}
+	
+	public void retrieve(final Requestor requestor, final IIdentity target, 
+			final List<CtxIdentifier> ctxIdList, final ICtxCallback callback)
+					throws CtxBrokerException  {
+		
+		LOG.debug("Remote retrieve: requestor={}, target={}, ctxIdList={}", 
+				new Object[] { requestor, target, ctxIdList });
+		try {
+			final Stanza stanza = new Stanza(target);
+			final CtxBrokerRequestBean cbPacket = new CtxBrokerRequestBean();
+			cbPacket.setMethod(BrokerMethodBean.RETRIEVE_ALL);
+			final RetrieveAllBean ctxBrokerRetrieveBean = new RetrieveAllBean();
+			// Method params
+			// 1. requestor 
+			ctxBrokerRetrieveBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
+			// 2. ctxIdList
+			final List<CtxIdentifierBean> ctxIdBeanList = 
+					new ArrayList<CtxIdentifierBean>(ctxIdList.size());
+			for (final CtxIdentifier ctxId : ctxIdList) {
+				ctxIdBeanList.add(CtxModelBeanTranslator.getInstance()
+						.fromCtxIdentifier(ctxId));
+			}
+			ctxBrokerRetrieveBean.setIds(ctxIdBeanList);
+
+			cbPacket.setRetrieveAll(ctxBrokerRetrieveBean);	
+
+			this.ctxBrokerCommCallback.addRequestingClient(stanza.getId(), callback);
+
+			this.commManager.sendIQGet(stanza, cbPacket, this.ctxBrokerCommCallback);
+
+		} catch (Exception e) {
+
+			throw new CtxBrokerException("Could not retrieve remote context model objects '"
+					+ ctxIdList + "': " + e.getLocalizedMessage(), e);
 		}
 	}
 

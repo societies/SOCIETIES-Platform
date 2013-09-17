@@ -25,9 +25,11 @@
 package org.societies.context.broker.impl.comm.callbacks;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntity;
@@ -35,32 +37,53 @@ import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelObject;
 
-public class CreateAttributeCallback extends CtxCallback {
+/**
+ * 
+ * Describe your class here...
+ *
+ * @author <a href="mailto:nicolas.liampotis@cn.ntua.gr">Nicolas Liampotis</a> (ICCS)
+ * @since 2.0
+ */
+public class RetrieveAllCtxCallback extends CtxCallback {
 
 	/** The logging facility. */
-	private static final Logger LOG = LoggerFactory.getLogger(UpdateCtxCallback.class);
-
-	private CtxAttribute result;
-
-	public CtxAttribute getResult() {
+	private static final Logger LOG = LoggerFactory.getLogger(RetrieveAllCtxCallback.class);
+	
+	private final CountDownLatch doneSignal;
+	
+	private List<CtxModelObject> result;
+	
+	public RetrieveAllCtxCallback(CountDownLatch doneSignal) {
+		
+		this.doneSignal = doneSignal;
+	}
+	
+	public List<CtxModelObject> getResult() {
 		
 		return this.result;
 	}
 	
+	/*
+	 * @see org.societies.context.broker.impl.comm.ICtxCallback#onException(org.societies.api.context.CtxException)
+	 */
+	@Override
+	public void onException(CtxException exception) {
+		
+		LOG.debug("onException: exception={}", exception);
+		super.exception = exception;
+		this.doneSignal.countDown();
+	}
+
 	@Override
 	public void onCreatedEntity(CtxEntity retObject) {
+		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void onCreatedAttribute(CtxAttribute retObject) {
-		
-		if (LOG.isDebugEnabled())
-			LOG.debug("onCreatedAttribute retObject " +retObject);
-		this.result = retObject;
-		synchronized (this) {	            
-			notifyAll();	        
-		}
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
@@ -69,10 +92,12 @@ public class CreateAttributeCallback extends CtxCallback {
 
 	}
 
+	/*
+	 * @see org.societies.context.broker.impl.comm.ICtxCallback#onRetrieveCtx(org.societies.api.context.model.CtxModelObject)
+	 */
 	@Override
 	public void onRetrieveCtx(CtxModelObject ctxObj) {
 		// TODO Auto-generated method stub
-
 	}
 	
 	/*
@@ -80,13 +105,15 @@ public class CreateAttributeCallback extends CtxCallback {
 	 */
 	@Override
 	public void onRetrievedAll(List<CtxModelObject> ctxModelObjectList) {
-		// TODO Auto-generated method stub
+		
+		LOG.debug("onRetrievedAll: ctxModelObjectList={}", ctxModelObjectList);
+		this.result = ctxModelObjectList;
+		this.doneSignal.countDown();
 	}
-
+	
 	@Override
 	public void onUpdateCtx(CtxModelObject ctxObj) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override

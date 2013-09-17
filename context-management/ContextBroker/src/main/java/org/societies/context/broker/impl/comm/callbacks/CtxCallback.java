@@ -40,7 +40,7 @@ public abstract class CtxCallback implements ICtxCallback {
 	/** The logging facility. */
 	private static final Logger LOG = LoggerFactory.getLogger(CtxCallback.class);
 	
-	private CtxException exception;
+	protected CtxException exception;
 	
 	/*
 	 * @see org.societies.context.broker.impl.comm.ICtxCallback#getException()

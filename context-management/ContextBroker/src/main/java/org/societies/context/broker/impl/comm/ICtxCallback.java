@@ -60,6 +60,13 @@ public interface ICtxCallback {
 
 	public void onRetrieveCtx(CtxModelObject ctxObj);
 	
+	/**
+	 * 
+	 * @param ctxModelObjectList
+	 * @since 2.0
+	 */
+	public void onRetrievedAll(List<CtxModelObject> ctxModelObjectList);
+	
 	public void onRetrievedEntityId(CtxEntityIdentifier ctxId);
 	
 	public void onUpdateCtx(CtxModelObject ctxObj);

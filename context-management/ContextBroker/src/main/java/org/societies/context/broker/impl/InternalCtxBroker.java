@@ -24,7 +24,6 @@
  */
 package org.societies.context.broker.impl;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -91,6 +91,7 @@ import org.societies.context.broker.impl.comm.callbacks.CreateAttributeCallback;
 import org.societies.context.broker.impl.comm.callbacks.CreateEntityCallback;
 import org.societies.context.broker.impl.comm.callbacks.LookupCallback;
 import org.societies.context.broker.impl.comm.callbacks.RemoveCtxCallback;
+import org.societies.context.broker.impl.comm.callbacks.RetrieveAllCtxCallback;
 import org.societies.context.broker.impl.comm.callbacks.RetrieveCommunityEntityIdCallback;
 import org.societies.context.broker.impl.comm.callbacks.RetrieveCtxCallback;
 import org.societies.context.broker.impl.comm.callbacks.RetrieveFutureCtxCallback;
@@ -1849,25 +1850,26 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		for (final CtxIdentifier ctxId : ctxIdList) {
 			final IIdentity target = this.extractIIdentity(ctxId);
-			if (this.isLocalId(target)) { // L O C A L
-
-				if (IdentityType.CIS != target.getType()) { // U S E R
+			if (this.isLocalId(target)) {
+				// L O C A L
+				if (IdentityType.CIS != target.getType()) { 
+					// U S E R
 					// Collect all local user context IDs to be retrieved
 					localUserCtxIdList.add(ctxId);
-
-				} else { // C O M M U N I T Y
+				} else { 
+					// C O M M U N I T Y
 					// Collect all local community context IDs to be retrieved
 					localCommunityCtxIdList.add(ctxId);
 				}
-
-			} else { // R E M O T E
+			} else { 
+				// R E M O T E
 				// Collect all remote context IDs to be retrieved
 				remoteCtxIdList.add(ctxId);
 			}
 		}
 
-		if (!localUserCtxIdList.isEmpty()) { // L O C A L  U S E R
-
+		if (!localUserCtxIdList.isEmpty()) { 
+			// L O C A L  U S E R
 			// Check if access control is required.
 			if(!requestor.equals(this.getLocalRequestor())) {
 				// Check READ permission
@@ -1891,8 +1893,8 @@ public class InternalCtxBroker implements ICtxBroker {
 			}
 		}
 
-		if (!localCommunityCtxIdList.isEmpty()) { // L O C A L  C O M M U N I T Y
-
+		if (!localCommunityCtxIdList.isEmpty()) { 
+			// L O C A L  C O M M U N I T Y
 			// Check if access control is required.
 			if(!requestor.equals(this.getLocalRequestor())) {
 				// Check READ permission
@@ -1923,25 +1925,44 @@ public class InternalCtxBroker implements ICtxBroker {
 
 		if (!remoteCtxIdList.isEmpty()) { // R E M O T E
 
-			final List<Future<CtxModelObject>> remoteResults = 
-					new ArrayList<Future<CtxModelObject>>(remoteCtxIdList.size());
-
-			// Perform remote retrieve asynchronously
+			// Create map to group context identifiers per remote target CSS/CIS
+			final Map<IIdentity, List<CtxIdentifier>> targetMap = 
+					new HashMap<IIdentity, List<CtxIdentifier>>();
 			for (final CtxIdentifier remoteCtxId : remoteCtxIdList) {
-				remoteResults.add(this.retrieve(requestor, remoteCtxId));
+				final IIdentity target = this.extractIIdentity(remoteCtxId);
+				if (targetMap.get(target) == null) {
+					targetMap.put(target, new ArrayList<CtxIdentifier>());
+				}
+				targetMap.get(target).add(remoteCtxId);
 			}
-
-			for (final Future<CtxModelObject> remoteResult : remoteResults) {
-				try {
-					final CtxModelObject ctxModelObject = remoteResult.get();
-					if (ctxModelObject != null)
-						result.add(ctxModelObject);
-					// TODO } catch (CtxAccessControlException cace) {
-					// Flag that a CtxAccessControlException has been thrown
-					//	isAccessControlExceptionThrown = true;
-				} catch (Exception e) {
-					throw new CtxBrokerException("Could not perform remote retrieve for '"
-							+ remoteCtxIdList + "': " + e.getLocalizedMessage(), e);
+			LOG.debug("retrieve: targetMap={}", targetMap);
+			
+			// Perform remote retrieve operation(s) asynchronously
+			final List<RetrieveAllCtxCallback> callbacks = 
+					new ArrayList<RetrieveAllCtxCallback>(targetMap.size());
+			// Init countdown to the number of remote CSSs/CISs 
+			final CountDownLatch doneSignal = new CountDownLatch(targetMap.size());
+			for (final Map.Entry<IIdentity, List<CtxIdentifier>> targetEntry : targetMap.entrySet()) {
+				final RetrieveAllCtxCallback callback = new RetrieveAllCtxCallback(doneSignal);
+				this.ctxBrokerClient.retrieve(requestor, targetEntry.getKey(),
+						targetEntry.getValue(), callback);
+				callbacks.add(callback);
+			}
+			try {
+				doneSignal.await();
+			} catch (InterruptedException ie) {
+				throw new CtxBrokerException("Interrupted while waiting for remote context model objects '"
+						+ remoteCtxIdList + "'");
+			}
+			for (final RetrieveAllCtxCallback callback : callbacks) {
+				if (callback.getException() == null) {
+					result.addAll(callback.getResult());
+				} else {
+					if (callback.getException() instanceof CtxAccessControlException) {
+						isAccessControlExceptionThrown = true;
+					} else {
+						throw callback.getException();
+					}
 				}
 			}
 		}
