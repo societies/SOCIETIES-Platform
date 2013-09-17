@@ -75,6 +75,7 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	final static String CONTEXT_MANAGER_UPDATED_INTENT = "org.societies.android.context.UPDATED";
 	final static String CONTEXT_MANAGER_MODIFIED_INTENT = "org.societies.android.context.MODIFIED";
 	final static String CONTEXT_MANAGER_REMOVED_INTENT = "org.societies.android.context.REMOVED";
+	final static String CONTEXT_MODIFIED_LOCATION_SYMBOLIC_INTENT = "org.societies.android.context.MODIFIED.locationSymbolic";
 
 	//CSS Manager intents
 	final static String CSS_MANAGER_ADD_CSS_NODE_INTENT    = "org.societies.android.css.manager.addCSSNode";
@@ -100,7 +101,6 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 
 	//Array of Societies Android Pubsub Intents
 	//N.B. Must be in same order as societiesAndroidEvents array to allow successful translation
-	//N.B. These events must be created at Virgo container start-up
 	final static String societiesAndroidIntents [] = {
 										 CONTEXT_MANAGER_CREATED_INTENT,
 										 CONTEXT_MANAGER_UPDATED_INTENT,
@@ -119,7 +119,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 										 UF_ACCESS_CONTROL_RESPONSE_INTENT,
 										 UF_REQUEST_INTENT,
                                          UF_EXPLICIT_RESPONSE_INTENT,
-                                         UF_IMPLICIT_RESPONSE_INTENT
+                                         UF_IMPLICIT_RESPONSE_INTENT,
+                                         CONTEXT_MODIFIED_LOCATION_SYMBOLIC_INTENT
 										 };
 	/**
 	 * Android intent Societies platform Pubsub related events
@@ -129,7 +130,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
 	final static String CONTEXT_MANAGER_UPDATED_EVENT  = "org/societies/context/change/event/UPDATED";
 	final static String CONTEXT_MANAGER_MODIFIED_EVENT = "org/societies/context/change/event/MODIFIED";
 	final static String CONTEXT_MANAGER_REMOVED_EVENT  = "org/societies/context/change/event/REMOVED";
-
+	final static String CONTEXT_MODIFIED_LOCATION_SYMBOLIC_EVENT = "org/societies/context/change/event/MODIFIED/locationSymbolic";
+	
 	//CSS Manager pubsub nodes
 	final static String CSS_MANAGER_ADD_CSS_NODE_EVENT    = "addCSSNode";
 	final static String CSS_MANAGER_DEPART_CSS_NODE_EVENT = "departCSSNode";
@@ -170,7 +172,8 @@ public interface IAndroidSocietiesEvents extends IServiceManager{
                                          UF_ACCESS_CONTROL_RESPONSE_EVENT,
 										 UF_REQUEST_EVENT,
 										 UF_EXPLICIT_RESPONSE_EVENT,
-                                         UF_IMPLICIT_RESPONSE_EVENT
+                                         UF_IMPLICIT_RESPONSE_EVENT,
+                                         CONTEXT_MODIFIED_LOCATION_SYMBOLIC_EVENT
 										 };
 
 	//Array of interface method signatures
