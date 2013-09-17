@@ -185,19 +185,19 @@ public class UACommsServer implements IFeatureServer {
         List<UserFeedbackAccessControlEvent> userFeedbackAccessControlEvents;
 
         try {
-            userFeedbackBeans = feedback.listIncompleteFeedbackBeans();
+            userFeedbackBeans = new ArrayList<UserFeedbackBean>(feedback.listIncompleteFeedbackBeans());
         } catch (Exception ex) {
             log.warn("Error loading UF beans from repository", ex);
             userFeedbackBeans = new ArrayList<UserFeedbackBean>();
         }
         try {
-            userFeedbackPrivacyNegotiationEvents = feedback.listIncompletePrivacyRequests();
+            userFeedbackPrivacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>(feedback.listIncompletePrivacyRequests());
         } catch (Exception ex) {
             log.warn("Error loading PPNs from repository", ex);
             userFeedbackPrivacyNegotiationEvents = new ArrayList<UserFeedbackPrivacyNegotiationEvent>();
         }
         try {
-            userFeedbackAccessControlEvents = feedback.listIncompleteAccessRequests();
+            userFeedbackAccessControlEvents = new ArrayList<UserFeedbackAccessControlEvent>(feedback.listIncompleteAccessRequests());
         } catch (Exception ex) {
             log.warn("Error loading ACs from repository", ex);
             userFeedbackAccessControlEvents = new ArrayList<UserFeedbackAccessControlEvent>();

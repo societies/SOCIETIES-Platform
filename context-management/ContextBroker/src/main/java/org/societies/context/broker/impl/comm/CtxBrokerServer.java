@@ -109,19 +109,16 @@ public class CtxBrokerServer implements IFeatureServer{
 		this.ctxEventMgr = ctxEventMgr;
 
 		// Register to CSS Comm Mgr
-		if (LOG.isInfoEnabled())
-			LOG.info("Registering CtxBrokerServer to Comms Manager for CSS '"
-					+ this.commManager.getIdManager().getThisNetworkNode() + "'");
+		LOG.info("Registering CtxBrokerServer to Comms Manager for CSS '{}'",
+				this.commManager.getIdManager().getThisNetworkNode());
 		this.commManager.register(this);
 		// Register to all available CIS Comm Mgrs
 		for (final Map.Entry<IIdentity, ICommManager> entry : this.commMgrFactory.getAllCISCommMgrs().entrySet()) {
-			if (LOG.isInfoEnabled())
-				LOG.info("Registering CtxBrokerServer to Comms Manager for CIS '"
-						+ entry.getKey() + "'");
+			LOG.info("Registering CtxBrokerServer to Comms Manager for CIS '{}'",
+					entry.getKey());
 			entry.getValue().register(this);
-			if (LOG.isInfoEnabled())
-				LOG.info("Creating event topics '" + Arrays.toString(InternalCtxBroker.EVENT_TOPICS) 
-						+ "' for CIS " + entry.getKey());
+			LOG.info("Creating event topics '{}' for CIS '{}'", 
+					Arrays.toString(InternalCtxBroker.EVENT_TOPICS), entry.getKey());
 			this.ctxEventMgr.createTopics(entry.getKey(), InternalCtxBroker.EVENT_TOPICS);
 		}
 		// Register for new/restored CISs
@@ -268,6 +265,42 @@ public class CtxBrokerServer implements IFeatureServer{
 				throw new XMPPError(StanzaError.not_authorized, cace.getLocalizedMessage(), null);
 			} catch (Exception e) {
 				LOG.error("Failed to retrieve context model object: " + e.getLocalizedMessage(), e);
+				// TODO send application error when supported
+				throw new XMPPError(StanzaError.internal_server_error, e.getLocalizedMessage(), null);
+			}
+			break;
+			
+		case RETRIEVE_ALL:
+
+			try {
+				// 1. requestor
+				final RequestorBean requestorBean = cbPayload.getRetrieveAll().getRequestor();
+				final Requestor requestor = RequestorUtils.toRequestor(
+						requestorBean, this.commManager.getIdManager());
+				// 2. ctxIds (required)
+				final List<CtxIdentifierBean> ctxIdBeans = cbPayload.getRetrieveAll().getIds();
+				final List<CtxIdentifier> ctxIds = new ArrayList<CtxIdentifier>(ctxIdBeans.size());
+				for (final CtxIdentifierBean ctxIdBean : ctxIdBeans) {
+					ctxIds.add(CtxModelBeanTranslator.getInstance().fromCtxIdentifierBean(ctxIdBean));
+				}
+				// request
+				final List<CtxModelObject> ctxModelObjects = this.ctxbroker.retrieve(
+						requestor, ctxIds).get();
+				// response bean
+				final List<CtxModelObjectBean> ctxModelObjectBeans =
+						new ArrayList<CtxModelObjectBean>(ctxModelObjects.size());
+				for (final CtxModelObject ctxModelObject : ctxModelObjects) {
+					ctxModelObjectBeans.add(CtxModelBeanTranslator.getInstance()
+							.fromCtxModelObject(ctxModelObject));
+				}
+				beanResponse.setRetrieveAllBeanResult(ctxModelObjectBeans);
+				
+			} catch (CtxAccessControlException cace) {
+				LOG.error("Failed to retrieve context model objects: " + cace.getLocalizedMessage(), cace);
+				// TODO send application error when supported
+				throw new XMPPError(StanzaError.not_authorized, cace.getLocalizedMessage(), null);
+			} catch (Exception e) {
+				LOG.error("Failed to retrieve context model objects: " + e.getLocalizedMessage(), e);
 				// TODO send application error when supported
 				throw new XMPPError(StanzaError.internal_server_error, e.getLocalizedMessage(), null);
 			}

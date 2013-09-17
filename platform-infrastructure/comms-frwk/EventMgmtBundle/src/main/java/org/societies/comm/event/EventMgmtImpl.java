@@ -79,7 +79,8 @@ public class EventMgmtImpl implements IEventMgr, BundleContextAware {
 		}
 		serRegMap.put(listener, bc.registerService(
 				EventHandler.class.getName(), listener, properties));
-		logger.debug("Registered for event: " + eventTypes[0]);
+		logger.debug("{} Registered for event: {}",listener,eventTypes);
+		logger.debug("We now have {} registered listeners.",serRegMap.size());
 	}
 
 	public void unSubscribeInternalEvent(EventListener listener, String[] eventTypes,
@@ -88,9 +89,10 @@ public class EventMgmtImpl implements IEventMgr, BundleContextAware {
 		if (serRegMap.containsKey(listener)) {
 			(serRegMap.get(listener)).unregister();
 			serRegMap.remove(listener);
-			logger.debug("Unregistered for event: " + eventTypes[0]);
+			logger.debug("{} Unregistered for event: {}",listener,eventTypes);
+			logger.debug("We now have {} registered listeners.",serRegMap.size());
 		} else {
-			logger.debug("Listener object does not exists to unregister: " + eventTypes[0]);
+			logger.debug("Listener object {} does not exists to unregister: {}",listener,eventTypes);
 		}
 	}
 
@@ -103,7 +105,7 @@ public class EventMgmtImpl implements IEventMgr, BundleContextAware {
 			properties.put(CSSEventConstants.EVENT_INFO, event.geteventInfo());
 			getEventAdmin().postEvent(
 					new Event(event.geteventType(), properties));
-			logger.debug("Posted event: " + event.geteventType());
+			logger.debug("Posted event: {} with name {}",event.geteventType(),event.geteventName());
 		} else {
 			throw new EMSException(
 					"Could not get OSG Event Admin Service, therefore event was not posted");
