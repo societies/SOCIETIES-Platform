@@ -27,12 +27,9 @@ package org.societies.security.policynegotiator.requester;
 import java.net.URI;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
@@ -102,19 +99,8 @@ public class ProviderCallback implements INegotiationProviderCallback {
 				String sop;
 				sop = result.getSla();
 				try {
-					String selectedSop = selectSopOption(sop);
-					IIdentity identity = requester.getGroupMgr().getIdMgr().getThisNetworkNode();
-					sop = requester.getSignatureMgr().signXml(sop, selectedSop, identity);
-					ProviderCallback callback = new ProviderCallback(requester, provider,
-							MethodType.ACCEPT_POLICY_AND_GET_SLA, includePrivacyPolicyNegotiation,
-							finalCallback); 
-					requester.getGroupMgr().acceptPolicyAndGetSla(
-							sessionId,
-							sop,
-							false,
-							provider.getRequestorId(),
-							callback);
-				} catch (Exception e) {
+					selectSopOption(sop, sessionId);
+				} catch (XmlException e) {
 					LOG.warn("receiveResult(): session {}: ", sessionId, e);
 				}
 			}
@@ -215,7 +201,7 @@ public class ProviderCallback implements INegotiationProviderCallback {
 		}
 	}
 	
-	private String selectSopOption(String sopString) throws XmlException, InterruptedException, ExecutionException {
+	private void selectSopOption(String sopString, int sessionId) throws XmlException {
 		
 		Xml xml = new Xml(sopString);
 		SLA sop = new SLA(xml);
@@ -237,10 +223,15 @@ public class ProviderCallback implements INegotiationProviderCallback {
 		
 		LOG.debug("selectSopOption: getting user feedback \"{}\"", sopName);
 		
-		Future<List<String>> future = UserFeedbackHelper.getUserFeedback().getExplicitFB(ExpProposalType.RADIOLIST, expProposal);
-		List<String> selected = future.get();
-		LOG.info("selectSopOption: user selected \"{}\"", selected.get(0));
-		return selected.get(0);
+		UserFeedbackSelectSopCallback callback = new UserFeedbackSelectSopCallback(
+				requester,
+				provider,
+				includePrivacyPolicyNegotiation,
+				sopString,
+				finalCallback,
+				sessionId);
+		
+		UserFeedbackHelper.getUserFeedback().getExplicitFBAsync(ExpProposalType.RADIOLIST, expProposal, callback);
 	}
 	
 	private String generateKey() {
