@@ -22,63 +22,21 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.domainauthority;
+package org.societies.integration.test.bit.communitysign;
 
 /**
- * Exception that may get thrown from methods that use digital signatures.
+ * 
  *
  * @author Mitja Vardjan
  *
  */
-public class ClientJarServerException extends Exception {
-
-	/**
-	 *  The Constant serialVersionUID
-	 */
-	private static final long serialVersionUID = -2334307465917723771L;
-
-	/**
-	 * Instantiates a new exception.
-	 */
-	public ClientJarServerException() {
-		super();
+public class UrlParamName {
+	
+	public static String base64ToUrl(String s) {
+		return s.replaceAll("\\+", "-").replaceAll("\\/", "_");
 	}
 
-	/**
-	 * Instantiates a new exception.
-	 * 
-	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
-	 */
-	public ClientJarServerException(String msg) {
-		super(msg);
-	}
-	
-	/**
-	 * Instantiates a new exception.
-	 * 
-	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
-	 */
-	public ClientJarServerException(Throwable e) {
-		super(e);
-	}
-	
-	/**
-	 * Instantiates a new exception.
-	 * 
-	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
-	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
-	 */
-	public ClientJarServerException(String msg, Throwable e) {
-		super(msg, e);
-	}
-	
-	/**
-	 * Instantiates a new exception.
-	 * 
-	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
-	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
-	 */
-	public ClientJarServerException(Throwable e, String msg) {
-		super(msg, e);
+	public static String url2Base64(String s) {
+		return s.replaceAll("\\-", "+").replaceAll("_", "/");
 	}
 }

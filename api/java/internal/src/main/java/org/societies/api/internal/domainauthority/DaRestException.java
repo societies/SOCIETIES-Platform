@@ -25,52 +25,60 @@
 package org.societies.api.internal.domainauthority;
 
 /**
- * 
+ * Exception that may get thrown from methods that use digital signatures.
  *
  * @author Mitja Vardjan
  *
  */
-public class UrlPath {
+public class DaRestException extends Exception {
 
-	public static final String BASE = "/rest/webresources";
+	/**
+	 *  The Constant serialVersionUID
+	 */
+	private static final long serialVersionUID = -2334307465917723771L;
+
+	/**
+	 * Instantiates a new exception.
+	 */
+	public DaRestException() {
+		super();
+	}
+
+	/**
+	 * Instantiates a new exception.
+	 * 
+	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
+	 */
+	public DaRestException(String msg) {
+		super(msg);
+	}
 	
 	/**
-	 * URL parameter. File name, including relative path.
+	 * Instantiates a new exception.
+	 * 
+	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
 	 */
-	public static final String URL_PARAM_FILE = "file";
+	public DaRestException(Throwable e) {
+		super(e);
+	}
 	
 	/**
-	 * URL parameter. Digital signature of the uploader of the file (usually the provider).
+	 * Instantiates a new exception.
+	 * 
+	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
+	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
 	 */
-	public static final String URL_PARAM_SIGNATURE = "sig";
+	public DaRestException(String msg, Throwable e) {
+		super(msg, e);
+	}
 	
 	/**
-	 * URL parameter. Public key of the uploader of the file (usually the provider).
+	 * Instantiates a new exception.
+	 * 
+	 * @param msg The message to be stored for later retrieval by {@link Throwable#getMessage()}
+	 * @param e The cause to be stored for later retrieval by {@link Throwable.getCause()}
 	 */
-	public static final String URL_PARAM_PUB_KEY = "pubkey";
-	
-	/**
-	 * URL parameter. ID of the service, not a service instance.
-	 */
-	public static final String URL_PARAM_SERVICE_ID = "service";
-	
-	/**
-	 * URL parameter. Endpoint for notifying the uploader about future events, e.g. when the resource is modified.
-	 */
-	public static final String URL_PARAM_NOTIFICATION_ENDPOINT = "endpoint";
-	
-	/**
-	 * Path for servlet that serves files.
-	 */
-	public static final String PATH_FILES = "/serviceclient";
-	
-	/**
-	 * Path for servlet for uploading provider's digital certificate.
-	 */
-	public static final String PATH_PUB_KEY = "/pubkey";
-	
-	/**
-	 * Path for servlet that serves xml documents.
-	 */
-	public static final String PATH_XML_DOCUMENTS = "/xmldocs";
+	public DaRestException(Throwable e, String msg) {
+		super(msg, e);
+	}
 }

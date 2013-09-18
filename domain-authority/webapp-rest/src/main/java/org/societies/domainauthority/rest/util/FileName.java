@@ -36,6 +36,12 @@ public class FileName {
 		return path.replaceAll(".*/", "").replaceAll(".*\\\\", "");
 	}
 	
+	/**
+	 * Replaces unsupported characters with underscores
+	 * 
+	 * @param path
+	 * @return
+	 */
 	public static String removeUnsupportedChars(String path) {
 		return path.replaceAll("[^0-9a-zA-Z\\-_\\. ,\\[\\]\\(\\)\\{\\}]", "_");
 	}

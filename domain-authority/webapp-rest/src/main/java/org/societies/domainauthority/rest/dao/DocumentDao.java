@@ -33,17 +33,17 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.domainauthority.rest.model.Resource;;
+import org.societies.domainauthority.rest.model.Document;
 
 /**
- * DAO for {@link Resource}
+ * DAO for {@link Document}
  *
  * @author Mitja Vardjan
  *
  */
-public class ResourceDao {
+public class DocumentDao {
 
-	private static Logger log = LoggerFactory.getLogger(ResourceDao.class);
+	private static Logger log = LoggerFactory.getLogger(DocumentDao.class);
 	
 	private SessionFactory sessionFactory;
 
@@ -62,20 +62,21 @@ public class ResourceDao {
 		this.sessionFactory = sessionFactory;
 	}
 
-	public List<Resource> getAll() throws HibernateException {
+	// TODO: If large XML documents or large number of documents are expected, do not store everything in memory
+	public List<Document> getAll() throws HibernateException {
 		
 		Session session = null;
-		List<Resource> result;
+		List<Document> result;
 		
 		try {
 			session = sessionFactory.openSession();
 			
-			Query query = session.createQuery("SELECT r FROM " + Resource.class.getSimpleName() + " r");
+			Query query = session.createQuery("SELECT r FROM " + Document.class.getSimpleName() + " r");
 			
 			//Query query = session.createQuery("SELECT foo FROM foo WHERE id = :myId");
 			//query.setParameter("myId", "value");
 			
-			result = (List<Resource>) query.list();
+			result = (List<Document>) query.list();
 		} catch (HibernateException e) {
 			log.warn("Could not read from data source", e);
 			throw e;
@@ -87,7 +88,37 @@ public class ResourceDao {
 		return result;
 	}
 
-	public void delete(Resource object) throws HibernateException {
+	/**
+	 * Convenience method to return a single instance that matches the query, or null if the query returns no results.
+	 *  
+	 * @param path
+	 * @return the single result or null 
+	 * @throws HibernateException
+	 */
+	public Document get(String path) throws HibernateException {
+		
+		Session session = null;
+		Document result;
+		
+		try {
+			session = sessionFactory.openSession();
+			
+			Query query = session.createQuery("SELECT r FROM " + Document.class.getSimpleName() + " WHERE path = :myPath");
+			query.setParameter("myPath", path);
+			
+			result = (Document) query.uniqueResult();
+		} catch (HibernateException e) {
+			log.warn("Could not read from data source", e);
+			throw e;
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		return result;
+	}
+
+	public void delete(Document object) throws HibernateException {
 		
 		Session session = null;
 		
@@ -109,7 +140,7 @@ public class ResourceDao {
 		}
 	}
 
-	public void save(Resource object) throws HibernateException {
+	public void save(Document object) throws HibernateException {
 
 		Session session = null;
 		Transaction t = null;
@@ -136,7 +167,7 @@ public class ResourceDao {
 		}
 	}
 	
-	public boolean update(Resource object) throws HibernateException {
+	public boolean update(Document object) throws HibernateException {
 	
 		boolean returnedStatus = false;
 		Session session = null;

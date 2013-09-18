@@ -24,9 +24,9 @@
  */
 package org.societies.domainauthority.rest.server;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 
@@ -41,34 +41,35 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.domainauthority.LocalPath;
+import org.societies.api.internal.domainauthority.DaRestException;
 import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.security.digsig.DigsigException;
-import org.societies.domainauthority.rest.control.ServiceClientJarAccess;
+import org.societies.domainauthority.rest.control.XmlDocumentAccess;
 import org.societies.domainauthority.rest.util.FileName;
 import org.societies.domainauthority.rest.util.Files;
 import org.societies.domainauthority.rest.util.UrlParamName;
 
 /**
- * Class for hosting jar files for clients of 3rd party services.
+ * Class for hosting and merging xml documents that are being signed over time by multiple parties.
  * 
  * @author Mitja Vardjan
  */
-@Path(UrlPath.PATH_FILES)
-public class ServiceClientJar extends HttpServlet {
+@Path(UrlPath.PATH_XML_DOCUMENTS)
+public class XmlDocument extends HttpServlet {
 
 	private static final long serialVersionUID = 4625772782444356957L;
 
-	private static Logger LOG = LoggerFactory.getLogger(ServiceClientJar.class);
+	private static Logger LOG = LoggerFactory.getLogger(XmlDocument.class);
 
-	public ServiceClientJar() {
+	public XmlDocument() {
 		LOG.info("Constructor");
 	}
 
 	/**
-	 * Method processing HTTP GET requests, producing "application/java-archive" MIME media type.
+	 * Method processing HTTP GET requests, producing "application/xml" MIME media type.
 	 * HTTP response: the requested file, e.g., service client in form of jar file.
 	 * Error 401 if file name or signature not valid.
 	 * Error 500 on server error.
@@ -80,43 +81,27 @@ public class ServiceClientJar extends HttpServlet {
 			LOG.warn("HTTP GET: request.getPathInfo() is null");
 			return;
 		}
-		String path = request.getParameter(UrlPath.URL_PARAM_FILE);
-		String serviceId = request.getParameter(UrlPath.URL_PARAM_SERVICE_ID);
+		String path = request.getPathInfo().replaceFirst("/", "");
+//		String path = request.getParameter(UrlPath.URL_PARAM_FILE);
 		String signature = request.getParameter(UrlPath.URL_PARAM_SIGNATURE);
 		
-		LOG.info("HTTP GET: path = {}, service ID = {}, signature = " + signature, path, serviceId);
+		LOG.info("HTTP GET: path = {}, signature = " + signature, path);
 
 		byte[] file;
 
-		if (!ServiceClientJarAccess.isAuthorized(path, signature)) {
+		if (!XmlDocumentAccess.isAuthorized(path, signature)) {
 			LOG.warn("Invalid filename or key");
 			// Return HTTP status code 401 - Unauthorized
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return;
 		}
 
-		try {
-			file = Files.getBytesFromFile(get3PServicePath(serviceId) + path);
-		} catch (FileNotFoundException e) {
-			try {
-				file = Files.getBytesFromFile(path);
-			} catch (IOException e2) {
-				LOG.warn("Could not open file {}", path, e2);
-				// Return HTTP status code 500 - Internal Server Error
-				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				return;
-			}
-		} catch (IOException e) {
-			LOG.warn("Could not open file {}", path, e);
-			// Return HTTP status code 500 - Internal Server Error
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			return;
-		}
+		file = XmlDocumentAccess.getDocumentDao().get(path).getXmlDoc();
 
 		LOG.info("Serving {}", path);
 		
 		response.setContentLength(file.length);
-		//response.setContentType("application/java-archive");
+		response.setContentType("application/xml");
 		try {
 			ServletOutputStream stream = response.getOutputStream();
 			stream.write(file);
@@ -129,37 +114,42 @@ public class ServiceClientJar extends HttpServlet {
 	}
 
 	/**
-	 * Method processing HTTP POST requests.
-	 */
-	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) {
-
-		String path = request.getParameter(UrlPath.URL_PARAM_FILE);
-		String serviceId = request.getParameter(UrlPath.URL_PARAM_SERVICE_ID);
-		String pubKey = request.getParameter(UrlPath.URL_PARAM_PUB_KEY);
-	
-		
-		LOG.info("HTTP POST from {}; path = {}, service ID = " + serviceId + ", pubKey = " + pubKey,
-				request.getRemoteHost(), path);
-		LOG.warn("HTTP POST is not implemented. For uploading files, use HTTP PUT instead.");
-	}
-
-	/**
 	 * Method processing HTTP PUT requests.
 	 */
 	@Override
 	public void doPut(HttpServletRequest request, HttpServletResponse response) {
 		
-		String path = request.getParameter(UrlPath.URL_PARAM_FILE);
-		String serviceId = request.getParameter(UrlPath.URL_PARAM_SERVICE_ID);
+		String path = request.getPathInfo().replaceFirst("/", "");
 		String cert = request.getParameter(UrlPath.URL_PARAM_PUB_KEY);
+		String endpoint = request.getParameter(UrlPath.URL_PARAM_NOTIFICATION_ENDPOINT);
+		String signature = request.getParameter(UrlPath.URL_PARAM_SIGNATURE);
 
-		LOG.info("HTTP PUT from {}; path = {}, service ID = " + serviceId + ", pubKey = " + cert,
-				request.getRemoteHost(), path);
+		LOG.info("HTTP PUT from {}; path = {}, endpoint = " + endpoint + ", pubKey = " +
+				cert + ", signature = " + signature, request.getRemoteHost(), path);
 
-		cert = UrlParamName.url2Base64(cert);
-		LOG.debug("HTTP PUT: cert fixed to {}", cert);
-
+		int status;
+		InputStream is;
+		try {
+			is = getInputStream(request);
+		} catch (DaRestException e) {
+			LOG.warn("HTTP PUT, ", e);
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
+		
+		if (path != null && cert != null && endpoint != null) {
+			status = putNewDocument(path, cert, endpoint, is);
+		} else if (path != null && signature != null) {
+			status = mergeDocument(path, signature, is);
+		} else {
+			status = HttpServletResponse.SC_BAD_REQUEST;
+			return;
+		}
+		response.setStatus(status);
+	}
+	
+	private InputStream getInputStream(HttpServletRequest request) throws DaRestException {
+		
 		// Create a factory for disk-based file items
 		FileItemFactory factory = new DiskFileItemFactory();
 
@@ -171,8 +161,7 @@ public class ServiceClientJar extends HttpServlet {
 		try {
 			items = upload.parseRequest(request);
 		} catch (FileUploadException e) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			return;
+			throw new DaRestException(e);
 		}
 
 		// Process the uploaded items
@@ -184,31 +173,64 @@ public class ServiceClientJar extends HttpServlet {
 				// Process FormField;
 			} else {
 				// Process Uploaded File
-				//path = path.replaceAll("[/\\\\]", File.separator);
-				path = get3PServicePath(serviceId) + path;
-				LOG.debug("Saving to file {}", path);
 				try {
-					Files.writeFile(item.getInputStream(), path);
-					ServiceClientJarAccess.addResource(path, cert);
+					return item.getInputStream();
 				} catch (IOException e) {
-					LOG.warn("Could not write to file {}", path, e);
-					// Return HTTP status code 500 - Internal Server Error
-					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-					return;
-				} catch (DigsigException e) {
-					LOG.warn("Could not store public key", e);
-					// Return HTTP status code 500 - Internal Server Error
-					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-					return;
+					throw new DaRestException(e);
 				}
 			}
 		}
+		throw new DaRestException("No payload found in HTTP request");
 	}
+	
+	private int putNewDocument(String path, String cert, String endpoint, InputStream is) {
 
-	private String get3PServicePath(String serviceId) {
+		cert = UrlParamName.url2Base64(cert);
+		LOG.debug("HTTP PUT: cert fixed to {}", cert);
 
-		serviceId = FileName.removeUnsupportedChars(serviceId);
-
-		return LocalPath.PATH_3P_SERVICES + File.separator + serviceId + File.separator;
+		path = FileName.removeUnsupportedChars(path);
+		LOG.debug("HTTP PUT: path fixed to {}", path);
+		
+		if (XmlDocumentAccess.getDocumentDao().get(path) != null) {
+			LOG.warn("HTTP PUT: document {} already exists", path);
+			return HttpServletResponse.SC_CONFLICT;
+		}
+		try {
+			byte[] xml = IOUtils.toByteArray(is);
+			XmlDocumentAccess.addDocument(path, cert, xml, endpoint);
+			return HttpServletResponse.SC_OK;
+		} catch (IOException e) {
+			LOG.warn("Could not write document {}", path, e);
+			// Return HTTP status code 500 - Internal Server Error
+			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+		} catch (DigsigException e) {
+			LOG.warn("Could not store public key", e);
+			// Return HTTP status code 500 - Internal Server Error
+			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+		}
+	}
+	
+	private int mergeDocument(String path, String signature, InputStream is) {
+		
+		byte[] xml;
+		try {
+			xml = IOUtils.toByteArray(is);
+		} catch (IOException e) {
+			LOG.warn("mergeDocument: ", e);
+			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+		}
+		
+		boolean success;
+		try {
+			success = XmlDocumentAccess.mergeDocument(path, xml, signature);
+		} catch (DigsigException e) {
+			LOG.warn("mergeDocument: ", e);
+			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+		}
+		if (success) {
+			return HttpServletResponse.SC_OK;
+		} else {
+			return HttpServletResponse.SC_UNAUTHORIZED;
+		}
 	}
 }

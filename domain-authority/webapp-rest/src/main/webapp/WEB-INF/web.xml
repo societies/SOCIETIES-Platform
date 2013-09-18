@@ -64,8 +64,16 @@
         </init-param>
         <load-on-startup>1</load-on-startup-->
     </servlet>
+	<servlet>
+        <servlet-name>xmldoc</servlet-name>
+        <servlet-class>org.societies.domainauthority.rest.server.XmlDocument</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>clientjar</servlet-name>
         <url-pattern>/webresources/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>xmldoc</servlet-name>
+        <url-pattern>/webresources/*.xml</url-pattern>
     </servlet-mapping>
 </web-app>

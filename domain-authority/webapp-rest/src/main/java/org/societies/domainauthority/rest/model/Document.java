@@ -22,55 +22,73 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.domainauthority;
+package org.societies.domainauthority.rest.model;
+
+import java.security.cert.X509Certificate;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Lob;
+import javax.persistence.Table;
+
+import org.societies.api.security.digsig.DigsigException;
+import org.societies.domainauthority.rest.control.ServiceClientJarAccess;
 
 /**
- * 
+ * Description of an XML document that is signed by various parties over time
  *
  * @author Mitja Vardjan
  *
  */
-public class UrlPath {
+@Entity
+@Table(name = "org_societies_security_darest_docs")
+public class Document extends Resource {
+	
+	@Lob
+	@Column(name="xmlDoc")
+	private byte[] xmlDoc;
+	
+	@Column(name="notificationEndpoint")
+	private String notificationEndpoint;
+	
+	/**
+	 * Default constructor for Hibernate only
+	 */
+	public Document() {
+	}
+	
+	public Document(String path, X509Certificate ownerCert, byte[] xmlDoc, String notificationEndpoint) throws DigsigException {
+		this.path = path;
+		this.ownerCertSerialized = ServiceClientJarAccess.getSigMgr().cert2ba(ownerCert);
+		this.xmlDoc = xmlDoc;
+		this.notificationEndpoint = notificationEndpoint;
+	}
 
-	public static final String BASE = "/rest/webresources";
-	
 	/**
-	 * URL parameter. File name, including relative path.
+	 * @return the xmlDoc
 	 */
-	public static final String URL_PARAM_FILE = "file";
-	
+	public byte[] getXmlDoc() {
+		return xmlDoc;
+	}
+
 	/**
-	 * URL parameter. Digital signature of the uploader of the file (usually the provider).
+	 * @param xmlDoc the xmlDoc to set
 	 */
-	public static final String URL_PARAM_SIGNATURE = "sig";
-	
+	public void setXmlDoc(byte[] xmlDoc) {
+		this.xmlDoc = xmlDoc;
+	}
+
 	/**
-	 * URL parameter. Public key of the uploader of the file (usually the provider).
+	 * @return the notificationEndpoint
 	 */
-	public static final String URL_PARAM_PUB_KEY = "pubkey";
-	
+	public String getNotificationEndpoint() {
+		return notificationEndpoint;
+	}
+
 	/**
-	 * URL parameter. ID of the service, not a service instance.
+	 * @param notificationEndpoint the notificationEndpoint to set
 	 */
-	public static final String URL_PARAM_SERVICE_ID = "service";
-	
-	/**
-	 * URL parameter. Endpoint for notifying the uploader about future events, e.g. when the resource is modified.
-	 */
-	public static final String URL_PARAM_NOTIFICATION_ENDPOINT = "endpoint";
-	
-	/**
-	 * Path for servlet that serves files.
-	 */
-	public static final String PATH_FILES = "/serviceclient";
-	
-	/**
-	 * Path for servlet for uploading provider's digital certificate.
-	 */
-	public static final String PATH_PUB_KEY = "/pubkey";
-	
-	/**
-	 * Path for servlet that serves xml documents.
-	 */
-	public static final String PATH_XML_DOCUMENTS = "/xmldocs";
+	public void setNotificationEndpoint(String notificationEndpoint) {
+		this.notificationEndpoint = notificationEndpoint;
+	}
 }

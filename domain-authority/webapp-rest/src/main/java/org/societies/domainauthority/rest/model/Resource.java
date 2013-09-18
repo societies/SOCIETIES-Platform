@@ -52,11 +52,11 @@ public class Resource {
 	private int id;
 
 	@Column(name="path")
-	private String path;
+	protected String path;
 
 	@Lob
 	@Column(name="ownerCertSerialized")
-	private byte[] ownerCertSerialized;
+	protected byte[] ownerCertSerialized;
 
 	/**
 	 * Default constructor for Hibernate only
@@ -68,13 +68,6 @@ public class Resource {
 		this.path = path;
 		this.ownerCertSerialized = ServiceClientJarAccess.getSigMgr().cert2ba(ownerCert);
 	}
-
-//	/**
-//	 * @return Public part of the certificate of the one who has uploaded the files, e.g., the service provider
-//	 */
-//	public X509Certificate getOwnerCert() {
-//		return ownerCertSerialized;
-//	}
 
 	/**
 	 * @return Relative path to the file
