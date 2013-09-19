@@ -70,8 +70,14 @@ public class SimpleContextGUI extends JFrame  implements ActionListener
 	 */
 	public static void main( String args[] ) 
 	{
+	
+		theSimpleContextGUI = new SimpleContextGUI();
+	} 
+	public void init() {
 		try 
 		{
+			UIManager.put("ClassLoader", getClass().getClassLoader());
+
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}
 		catch ( ClassNotFoundException e ) 
@@ -86,14 +92,16 @@ public class SimpleContextGUI extends JFrame  implements ActionListener
 		catch ( UnsupportedLookAndFeelException e ) 
 		{
 		}
-		theSimpleContextGUI = new SimpleContextGUI();
-	} 
+	}
 
 	/**
 	 */
 	public SimpleContextGUI() 
 	{
 		super( "TITLE" );
+		init();
+		
+
 		this.symlocAttributes = new HashSet<CtxAttribute>();
 		pnPanel0 = new JPanel();
 		GridBagLayout gbPanel0 = new GridBagLayout();
