@@ -86,6 +86,11 @@ public class XmlDocument extends HttpServlet {
 		String signature = request.getParameter(UrlPath.URL_PARAM_SIGNATURE);
 		
 		LOG.info("HTTP GET: path = {}, signature = " + signature, path);
+		if (path == null || signature == null) {
+			LOG.warn("Missing URL parameters");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
 
 		byte[] file;
 

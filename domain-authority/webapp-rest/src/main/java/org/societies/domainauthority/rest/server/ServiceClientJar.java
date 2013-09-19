@@ -85,6 +85,11 @@ public class ServiceClientJar extends HttpServlet {
 		String signature = request.getParameter(UrlPath.URL_PARAM_SIGNATURE);
 		
 		LOG.info("HTTP GET: path = {}, service ID = {}, signature = " + signature, path, serviceId);
+		if (path == null || serviceId == null || signature == null) {
+			LOG.warn("Missing URL parameters");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
 
 		byte[] file;
 
@@ -157,6 +162,12 @@ public class ServiceClientJar extends HttpServlet {
 		LOG.info("HTTP PUT from {}; path = {}, service ID = " + serviceId + ", pubKey = " + cert,
 				request.getRemoteHost(), path);
 
+		if (path == null || serviceId == null || cert == null) {
+			LOG.warn("Missing URL parameters");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
+		
 		cert = UrlParamName.url2Base64(cert);
 		LOG.debug("HTTP PUT: cert fixed to {}", cert);
 
