@@ -103,7 +103,7 @@ public class DocumentDao {
 		try {
 			session = sessionFactory.openSession();
 			
-			Query query = session.createQuery("SELECT r FROM " + Document.class.getSimpleName() + " WHERE path = :myPath");
+			Query query = session.createQuery("FROM " + Document.class.getSimpleName() + " WHERE path = :myPath");
 			query.setParameter("myPath", path);
 			
 			result = (Document) query.uniqueResult();

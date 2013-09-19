@@ -31,6 +31,8 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -140,6 +142,7 @@ public class Net {
 		LOG.debug("put({}, {})", fileName, destination);
 
         HttpClient httpclient = new DefaultHttpClient();
+        boolean success = false;
 
         try {
             HttpPut httpput = new HttpPut(destination);
@@ -158,6 +161,9 @@ public class Net {
             HttpEntity resEntity = response.getEntity();
 
             LOG.debug("Status: {}", response.getStatusLine().toString());
+            if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK) {
+            	success = true;
+            }
             if (resEntity != null) {
             	LOG.debug("Response content length: " + resEntity.getContentLength());
             }
@@ -171,7 +177,7 @@ public class Net {
 			} catch (Exception e) {
 			}
         }
-        return true;
+        return success;
 	}
 	
 	public void downloadAndPost(URI destination) {

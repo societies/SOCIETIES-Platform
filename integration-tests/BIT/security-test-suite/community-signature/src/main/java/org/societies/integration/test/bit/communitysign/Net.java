@@ -28,8 +28,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -61,16 +64,15 @@ public class Net {
 		this.source = source;
 	}
 	
-	public boolean download(String fileName) {
+	public boolean download(OutputStream os) {
 		
-		LOG.debug("download({})", fileName);
+		LOG.debug("download({})", os);
 		
 		long startTime = System.currentTimeMillis();
 		
 		try {
 			source.openConnection();
 			InputStream reader = source.openStream();
-			FileOutputStream writer = new FileOutputStream(fileName);
 			byte[] buffer = new byte[153600];
 			int totalBytesRead = 0;
 			int bytesRead = 0;
@@ -79,7 +81,7 @@ public class Net {
 
 			while ((bytesRead = reader.read(buffer)) > 0)
 			{  
-				writer.write(buffer, 0, bytesRead);
+				os.write(buffer, 0, bytesRead);
 				buffer = new byte[153600];
 				totalBytesRead += bytesRead;
 			}
@@ -88,13 +90,28 @@ public class Net {
 
 			LOG.info("File " + source + " downloaded. " + (new Integer(totalBytesRead).toString()) +
 					" bytes read (" + (new Long(endTime - startTime).toString()) + " ms).");
-			writer.close();
 			reader.close();
 		} catch (IOException e) {
 			LOG.warn("download(): " + source, e);
 			return false;
 		}
 		return true;
+	}
+	
+	public boolean download(String fileName) {
+		
+		FileOutputStream os;
+		boolean result;
+		
+		try {
+			os = new FileOutputStream(fileName);
+			result = download(os);
+			os.close();
+		} catch (IOException e) {
+			LOG.warn("download", e);
+			return false;
+		}
+		return result;
 	}
 	
 	public boolean post(String fileName, URI destination) {
@@ -141,6 +158,7 @@ public class Net {
 		LOG.debug("put(..., {})", destination);
 
         HttpClient httpclient = new DefaultHttpClient();
+        boolean success = false;
 
         try {
             HttpPut httpput = new HttpPut(destination);
@@ -159,6 +177,9 @@ public class Net {
             HttpEntity resEntity = response.getEntity();
 
             LOG.debug("Status: {}", response.getStatusLine().toString());
+            if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK) {
+            	success = true;
+            }
             if (resEntity != null) {
             	LOG.debug("Response content length: " + resEntity.getContentLength());
             }
@@ -172,7 +193,7 @@ public class Net {
 			} catch (Exception e) {
 			}
         }
-        return true;
+        return success;
 	}
 	
 	public void downloadAndPost(URI destination) {

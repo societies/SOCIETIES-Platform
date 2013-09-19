@@ -2,7 +2,9 @@ package org.societies.integration.test.bit.communitysign;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.cert.X509Certificate;
@@ -111,6 +113,15 @@ public class NominalTestCaseLowerTester {
 		urlStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode()));
 		httpCode = getHttpCode(new URL(urlStr));
 		assertEquals(HttpURLConnection.HTTP_OK, httpCode, 0.0);
+		
+		url = new URL(urlStr);
+		net = new Net(url);
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		net.download(os);
+		byte[] downloaded = os.toByteArray();
+		LOG.info("Size of downloaded xml: {}", downloaded.length);
+		assertEquals(xml, new String(downloaded));
+		os.close();
 		
 		// URL with invalid signature
 		String sigKeyword = UrlPath.URL_PARAM_SIGNATURE + "=";
