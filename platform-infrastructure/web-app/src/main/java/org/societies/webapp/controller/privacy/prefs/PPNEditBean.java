@@ -63,6 +63,7 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Conditi
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyPreferenceManager;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceCondition;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyCondition;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyPreference;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.TrustPreferenceCondition;
@@ -577,7 +578,12 @@ public class PPNEditBean extends BasePageController implements Serializable{
 
 
 		PrivacyPreference privacyPreference = ModelTranslator.getPrivacyPreference(root);
-
+		IPrivacyPreferenceCondition erroneousNode = ModelTranslator.checkPreference(privacyPreference);
+		if (erroneousNode!=null){
+			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failure", "Please add an outcome under this node: \n"+erroneousNode.toString()+"\nError: Condition cannot be leaf of the tree. ");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			return;
+		}
 		this.logging.debug("Saving preferences with details: "+preferenceDetails.toString());
 		PPNPrivacyPreferenceTreeModel model = new PPNPrivacyPreferenceTreeModel(preferenceDetails, privacyPreference);
 		if (this.privPrefmgr.storePPNPreference(preferenceDetails, model)){

@@ -52,7 +52,9 @@ public class PreferenceUtils {
 	public static ContextPreferenceConditionBean toContextPreferenceConditionBean(IPreferenceCondition condition){
 		ContextPreferenceConditionBean bean = new ContextPreferenceConditionBean();
 
-		bean.setCtxIdentifier(CtxModelBeanTranslator.getInstance().fromCtxIdentifier(condition.getCtxIdentifier()));
+		if (condition.getCtxIdentifier()!=null){
+			bean.setCtxIdentifier(CtxModelBeanTranslator.getInstance().fromCtxIdentifier(condition.getCtxIdentifier()));	
+		}
 		bean.setName(condition.getname());
 		bean.setOperator(toOperatorConstantsBean(condition.getoperator()));
 		bean.setType(condition.getType());
@@ -63,6 +65,17 @@ public class PreferenceUtils {
 	}
 
 	public static ContextPreferenceCondition toContextPreferenceCondition(ContextPreferenceConditionBean bean){
+		if (bean==null){
+			return null;
+		}
+		
+		if (bean.getCtxIdentifier()==null){
+			return new ContextPreferenceCondition(
+					null, 
+					toOperatorConstants(bean.getOperator()), 
+					bean.getValue(), 
+					bean.getName());
+		}
 		try {
 			return new ContextPreferenceCondition(
 					(CtxAttributeIdentifier) CtxModelBeanTranslator.getInstance().fromCtxIdentifierBean(bean.getCtxIdentifier()), 
@@ -105,7 +118,7 @@ public class PreferenceUtils {
 
 	public static PreferenceTreeNodeBean toPreferenceTreeNodeBean(IPreference node){
 		PreferenceTreeNodeBean bean = new PreferenceTreeNodeBean();
-		if (node.isLeaf()){
+		if (node.getOutcome()!=null){
 			bean.setOutcome(toActionBean(node.getOutcome()));
 			return bean;
 		}

@@ -95,7 +95,7 @@ public class AccessControlPreferenceCreator extends EventListener{
 		this.idMgr = ppMgr.getCommsMgr().getIdManager();
 		this.accCtrlPrefMgr = ppMgr.getAccessControlPreferenceManager();
 		try{
-			this.eventMgr.subscribeInternalEvent(this, new String[]{EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT}, "");
+			this.eventMgr.subscribeInternalEvent(this, new String[]{EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT}, null);
 		}catch(Exception e){
 			System.out.println("could not subscribe to event: "+EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT);
 		}
