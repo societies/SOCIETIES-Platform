@@ -1,0 +1,75 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="templates/main_template.xhtml">
+
+	<ui:define name="html_head">
+		<title>Privacy Preferences</title>
+	</ui:define>
+
+	<ui:define name="body">
+		<div class="hr grid_12 clearfix"></div>
+		<!-- Left Column -->
+		<section id="left_col" class="grid_12">
+            <div class="breadcrumbs"><a href="index.xhtml">Home</a>
+                / <a href="preferences.xhtml">User Preferences</a>
+            </div>
+
+			<section class="form_style_main">
+
+				<h4 class="form_title">
+					Preferences for
+					<h:outputText value="#{loginController.username}" />
+				</h4>
+
+				<p:dataTable id="prefDetails" var="preferenceDetail"
+					value="#{PreferenceController.preferenceDetails}">
+					<f:facet name="header" style="background-color:yellow;">
+                 User Preferences
+                 </f:facet>
+
+					<p:column headerText="Service type">
+            #{preferenceDetail.serviceType}
+        </p:column>
+
+					<p:column headerText="Service Identifier">
+            #{preferenceDetail.serviceID}
+        </p:column>
+
+					<p:column headerText="Preference name">
+            #{preferenceDetail.preferenceName}
+        </p:column>
+
+					<p:column style="width: 4%">
+						<p:commandButton icon="ui-icon-wrench"
+							action="#{PreferenceController.storePrefDetailToUtils}"
+							title="View-Edit-Delete" ajax="false">
+							<f:setPropertyActionListener value="#{preferenceDetail}"
+								target="#{PreferenceController.selectedDetail}" />
+
+							<f:param name="preferenceDetailUUID"
+								value="#{PreferenceController.preferenceDetailUUID}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+
+				<p:toolbar>
+					<p:toolbarGroup align="left">
+						<p:button value="Create new preference"
+							href="preference_create.xhtml">
+						</p:button>
+					</p:toolbarGroup>
+				</p:toolbar>
+
+
+			</section>
+		</section>
+
+		<div class="hr grid_12 clearfix"></div>
+
+	</ui:define>
+</ui:composition>
+</html>

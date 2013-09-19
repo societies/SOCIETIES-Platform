@@ -49,7 +49,9 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
+import org.societies.api.internal.schema.personalisation.model.PreferenceTreeModelBean;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
+import org.societies.personalisation.preference.api.model.util.PreferenceUtils;
 
 
 
@@ -92,15 +94,18 @@ public class PreferenceStorer {
 		return false;
 
 	}
-	public boolean storeExisting(IIdentity userId, CtxIdentifier id, IPreferenceTreeModel p){
+	public boolean storeExisting(IIdentity userId, CtxIdentifier id, IPreferenceTreeModel model){
 		try {
-			p.setLastModifiedDate(new Date());
+			
+			model.setLastModifiedDate(new Date());
+			PreferenceTreeModelBean modelBean = PreferenceUtils.toPreferenceTreeModelBean(model);
+			
 			CtxAttribute attrPreference = (CtxAttribute) ctxBroker.retrieve(id).get();
 			if (attrPreference==null){
 				return false;
 			}
 
-			attrPreference.setBinaryValue(SerialisationHelper.serialise(p));
+			attrPreference.setBinaryValue(SerialisationHelper.serialise(modelBean));
 			ctxBroker.update(attrPreference).get();
 			return true;
 			
@@ -151,9 +156,10 @@ public class PreferenceStorer {
 	}
 
 
-	public CtxIdentifier storeNewPreference(IIdentity userId, IPreferenceTreeModel iptm, String key){
+	public CtxIdentifier storeNewPreference(IIdentity userId, IPreferenceTreeModel model, String key){
 		try{
-			iptm.setLastModifiedDate(new Date());
+			model.setLastModifiedDate(new Date());
+			PreferenceTreeModelBean modelBean = PreferenceUtils.toPreferenceTreeModelBean(model);
 			Future<List<CtxIdentifier>> futureCtxIDs = ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PREFERENCE); 
 			List<CtxIdentifier> ctxIDs = futureCtxIDs.get();
 			if (ctxIDs.size()==0){
@@ -181,7 +187,7 @@ public class PreferenceStorer {
 				ctxBroker.update(assoc).get();
 				this.logging.debug("Created Preference Entity");
 				CtxAttribute attr = (ctxBroker.createAttribute(preferenceEntity.getId(), key)).get();
-				attr.setBinaryValue(SerialisationHelper.serialise(iptm));
+				attr.setBinaryValue(SerialisationHelper.serialise(modelBean));
 				ctxBroker.update(attr).get();
 				this.logging.debug("Created attribute: "+attr.getType());
 				return attr.getId();
@@ -192,7 +198,7 @@ public class PreferenceStorer {
 				}
 				CtxIdentifier preferenceEntityID = ctxIDs.get(0);
 				CtxAttribute attr = (ctxBroker.createAttribute((CtxEntityIdentifier) preferenceEntityID, key)).get();
-				attr.setBinaryValue(SerialisationHelper.serialise(iptm));
+				attr.setBinaryValue(SerialisationHelper.serialise(modelBean));
 				ctxBroker.update(attr).get();
 				this.logging.debug("Created attribute: "+attr.getType());
 				return attr.getId();

@@ -52,9 +52,9 @@ public class Action implements IAction, Serializable{
 	private ServiceResourceIdentifier serviceID;
 	private String serviceType;
 	private ArrayList<String> types;
-	private final boolean implementable;
-	private final boolean contextDependent;
-	private final boolean proactive;
+	private boolean implementable;
+	private boolean contextDependent;
+	private boolean proactive;
 
 	/**
 	 * Not to be used by 3p services

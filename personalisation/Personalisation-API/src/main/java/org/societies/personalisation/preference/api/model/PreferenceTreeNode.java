@@ -74,7 +74,7 @@ public class PreferenceTreeNode extends DefaultMutableTreeNode implements IPrefe
 		return null;
 	}
 
-	public boolean isBranch() {
+	public boolean isConditionNode() {
 		Object obj = this.getUserObject();
 		if (obj==null){
 			return true;
@@ -85,7 +85,7 @@ public class PreferenceTreeNode extends DefaultMutableTreeNode implements IPrefe
 		return false;
 	}
 	
-	public boolean isLeaf(){
+	public boolean isOutcomeNode(){
 		Object obj = this.getUserObject();
 		if (obj instanceof IPreferenceCondition){
 			return false;
@@ -199,4 +199,22 @@ public class PreferenceTreeNode extends DefaultMutableTreeNode implements IPrefe
 		}
 		return str;
 	}
+
+	@Override
+	public boolean isBranch() {
+		if (children==null){
+			return false;
+		}
+		return this.children.size()>0;
+	}
+	
+	@Override
+	public boolean isLeaf() {
+		if (children==null){
+			return true;
+		}
+		return this.children.size()==0;
+	}
+	
+	
 }
