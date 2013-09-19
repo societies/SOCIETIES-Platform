@@ -96,16 +96,29 @@ public class EventMgmtImpl implements IEventMgr, BundleContextAware {
 		}
 	}
 
-	public void publishInternalEvent(InternalEvent event) throws EMSException {
+	public void publishInternalEvent(final InternalEvent event) throws EMSException {
 		if (getEventAdmin() != null) {
-			Dictionary<String, Object> properties = new Hashtable<String, Object>();
+			final Dictionary<String, Object> properties = new Hashtable<String, Object>();
 			properties.put(CSSEventConstants.EVENT_TARGET,CSSEventConstants.INTERNAL_EVENT);
 			properties.put(CSSEventConstants.EVENT_NAME, event.geteventName());
 			properties.put(CSSEventConstants.EVENT_SOURCE,event.geteventSource());
 			properties.put(CSSEventConstants.EVENT_INFO, event.geteventInfo());
-			getEventAdmin().postEvent(
-					new Event(event.geteventType(), properties));
-			logger.debug("Posted event: {} with name {}",event.geteventType(),event.geteventName());
+			if (this.eventAdmin!=null){
+				new Thread() {
+
+					@Override
+					public void run() {
+
+						getEventAdmin().postEvent(
+								new Event(event.geteventType(), properties));
+						logger.debug("Posted event: {} with name {}",event.geteventType(),event.geteventName());
+
+					}
+				}.start();
+			}else{
+				this.logger.error("EventAdmin service is null");
+			}
+
 		} else {
 			throw new EMSException(
 					"Could not get OSG Event Admin Service, therefore event was not posted");
