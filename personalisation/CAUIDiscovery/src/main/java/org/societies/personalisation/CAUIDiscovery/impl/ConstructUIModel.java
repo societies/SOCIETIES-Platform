@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
@@ -73,10 +74,12 @@ public class ConstructUIModel {
 			}
 			
 			IUserIntentAction userAction = cauiTaskManager.createAction(sri,action[3],action[1],action[2]);
-			LOG.debug("2 userAction created "+userAction);
-			LOG.debug("2 userAction service id "+userAction.getServiceID());
-			LOG.debug("2 userAction service instance id "+userAction.getServiceID().getServiceInstanceIdentifier());
-			LOG.debug("2 userAction service id "+userAction.getServiceID().getIdentifier());
+			LOG.debug("userAction created "+userAction);
+			LOG.debug("userAction service id "+userAction.getServiceID());
+			LOG.debug("userAction service instance id "+userAction.getServiceID().getServiceInstanceIdentifier());
+			LOG.debug("userAction service id "+userAction.getServiceID().getIdentifier());
+			
+			LOG.debug("userAction ctxActionsMap"+ctxActionsMap);
 			
 			if(ctxActionsMap.get(actionTemp)!=null){
 				List<String> contexValuesStringList = ctxActionsMap.get(actionTemp);
@@ -88,7 +91,12 @@ public class ConstructUIModel {
 						String contextType = contextTypeValue[0];
 						String contextValue = contextTypeValue[1];
 						//LOG.info("constructNewModel type:"+contextType+" value:"+contextValue);
-						context.put(contextType, contextValue);
+						// if value is hod , store it as integer
+						if(contextType.equals(CtxAttributeTypes.HOUR_OF_DAY)){
+							Integer hodIntValue = Integer.parseInt(contextValue);
+							LOG.debug("escorting action context ... parsing to integer :"+hodIntValue);
+							context.put(contextType, hodIntValue);
+						}else context.put(contextType, contextValue);
 					}
 				}		
 				userAction.setActionContext(context);	

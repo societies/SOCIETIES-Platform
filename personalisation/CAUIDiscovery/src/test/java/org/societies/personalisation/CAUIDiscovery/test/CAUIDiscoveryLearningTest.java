@@ -65,17 +65,25 @@ public class CAUIDiscoveryLearningTest {
 
 		System.out.println("Converted Data: "+mockData);
 
+		
+		
 		System.out.println("3. Perform learning");
 		HashMap<Integer,LinkedHashMap<List<String>,ActionDictObject>> dictionary = discover.generateTransitionsDictionaryAll(mockData);
 
+		
+		
+		
+/*		
 		for(int i=1; i<= dictionary.size(); i++) {
 			System.out.println("Print dictionary, step: "+i+" size:"+dictionary.get(i).size());
 			printDictionary(dictionary.get(i));
 		}
-
+	*/	
+		
+		
 		HashMap<String,List<String>> ctxActionsMap =  discover.assignContextToAction(dictionary.get(1));
 		System.out.println("4. assignContextToAction");
-		System.out.println(ctxActionsMap);
+		//System.out.println(ctxActionsMap);
 
 
 		System.out.println("5. Calculate trans probabilites");
@@ -177,42 +185,44 @@ public class CAUIDiscoveryLearningTest {
 		//System.out.println ("action service ID "+actionY.getServiceID().getServiceInstanceIdentifier());
 		for (int i=0; i<4; i++){
 
-			monitorAction(action1,"home","free",10);
-			monitorAction(action1,"country","free",10);
-			monitorAction(action2,"office","busy",15);
-			monitorAction(action3,"park","away",25);
-			monitorAction(actionX,"park","away",25);
-			monitorAction(actionY,"park","away",25);
-			monitorAction(action4,"park","away",25);
-			monitorAction(action5,"park","away",25);
-			monitorAction(actionY,"park","away",25);
-			monitorAction(actionX,"park","away",25);
-			monitorAction(action1,"home","free",10);
-			monitorAction(action2,"office","busy",15);
-			monitorAction(action3,"zoo","away",25);
-			monitorAction(actionY,"park","away",25);
-			monitorAction(actionY,"park","away",25);
-			monitorAction(action1,"home","free",10);
-			monitorAction(action2,"office","busy",15);
-			monitorAction(action3,"park","away",25);
-			monitorAction(actionX,"park","away",25);
-			monitorAction(action4,"park","away",25);
-			monitorAction(action5,"park","away",25);
+			monitorAction(action1,"home","Monday",10);
+			monitorAction(action1,"country","Monday",10);
+			monitorAction(action2,"office","Tuesday",15);
+			monitorAction(action3,"park","Wednesday",2);
+			monitorAction(actionX,"park","Wednesday",2);
+			monitorAction(actionY,"park","Wednesday",2);
+			monitorAction(action4,"park","Wednesday",2);
+			monitorAction(action5,"park","Wednesday",2);
+			monitorAction(actionY,"park","Wednesday",2);
+			monitorAction(actionX,"park","Wednesday",2);
+			monitorAction(action1,"home","Tuesday",10);
+			monitorAction(action2,"office","Monday",15);
+			monitorAction(action3,"zoo","Monday",2);
+			monitorAction(actionY,"park","Monday",2);
+			monitorAction(actionY,"park","Monday",2);
+			monitorAction(action1,"home","Monday",10);
+			monitorAction(action2,"office","Monday",15);
+			monitorAction(action3,"park","Monday",2);
+			monitorAction(actionX,"park","Monday",2);
+			monitorAction(action4,"park","Monday",2);
+			monitorAction(action5,"park","Monday",2);
 		}
 	}
 
-	private void monitorAction(IAction action, String location, String status, Integer temperature){
+	private void monitorAction(IAction action, String location, String dayOfWeek, Integer hourOfDay){
 
 		CtxHistoryAttribute mockPrimaryHocActionAttrX = createMockHocActionAttr(action);
 		List<CtxHistoryAttribute> escortingCtxDataX = new ArrayList<CtxHistoryAttribute>();
 		CtxHistoryAttribute attrLocationX = createMockHocAttr(CtxAttributeTypes.LOCATION_SYMBOLIC,location);
-		CtxHistoryAttribute attrStatusX = createMockHocAttr(CtxAttributeTypes.STATUS,status);
-		CtxHistoryAttribute attrTemperatureX = createMockHocAttr(CtxAttributeTypes.TEMPERATURE,temperature);
+		
+		CtxHistoryAttribute attrDowX = createMockHocAttr(CtxAttributeTypes.DAY_OF_WEEK,dayOfWeek);
+		
+		CtxHistoryAttribute attrHodX = createMockHocAttr(CtxAttributeTypes.HOUR_OF_DAY,hourOfDay);
+		
 		escortingCtxDataX.add(attrLocationX);
-		escortingCtxDataX.add(attrStatusX);
-		escortingCtxDataX.add(attrTemperatureX);
+		escortingCtxDataX.add(attrDowX);
+		escortingCtxDataX.add(attrHodX);
 		this.mapHocData.put(mockPrimaryHocActionAttrX, escortingCtxDataX);
-
 	}
 
 
@@ -253,7 +263,7 @@ public class CAUIDiscoveryLearningTest {
 			try {
 				IAction action = (IAction)SerialisationHelper.deserialise(ctxHocAttr.getBinaryValue(), this.getClass().getClassLoader());
 				List<CtxHistoryAttribute> escortingAttrList = mapHocData.get(ctxHocAttr);
-				System.out.println(i+" primary Attr: {"+action.getparameterName() +" "+action.getvalue()+"} escorting: {" +escortingAttrList.get(0).getStringValue()+" "+escortingAttrList.get(1).getStringValue()+" "+escortingAttrList.get(2).getStringValue()+"}");
+				System.out.println(i+" primary Attr: {"+action.getparameterName() +" "+action.getvalue()+"} escorting: {" +escortingAttrList.get(0).getStringValue()+" "+escortingAttrList.get(1).getStringValue()+" "+escortingAttrList.get(2).getIntegerValue()+"}");
 				i++;
 
 			} catch (IOException e) {

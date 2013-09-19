@@ -9,6 +9,7 @@ import static org.junit.Assert.fail;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,7 +31,7 @@ import org.societies.personalisation.CAUITaskManager.impl.CAUITaskManager;
 
 public class CAUITaskModelManagerTest {
 
-	private ICAUITaskManager modelManager;
+	private CAUITaskManager modelManager;
 	String taskID = "";
 	final UserIntentModelData modelData = null;
 	String actionIDString = null;
@@ -118,7 +119,26 @@ public class CAUITaskModelManagerTest {
 			e.printStackTrace();
 		}
 	}
-
+	
+	
+	@Test
+	public void testFindBestMatchingAction() {
+	
+		List<IUserIntentAction> candidateActions = new ArrayList<IUserIntentAction>();
+		 
+		Map<String, Serializable> situationContext = new HashMap<String, Serializable>();
+		situationContext.put(CtxAttributeTypes.HOUR_OF_DAY, 2 );
+		situationContext.put(CtxAttributeTypes.DAY_OF_WEEK, "monday" );
+		situationContext.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "earth");
+		
+		List<IUserIntentAction> result = modelManager.findBestMatchingAction(candidateActions, situationContext);
+		System.out.println("testFindBestMatchingAction out: "+result);
+		
+		
+		
+	}
+	
+	
 	@Ignore
 	@Test
 	public void testCreateTaskStringDouble() {
@@ -194,7 +214,7 @@ public class CAUITaskModelManagerTest {
 	@Test
 	public void testRetrieveActionsByContext() {
 
-		System.out.println("testRetrieveActionsByContext");
+		System.out.println("______________________ testRetrieveActionsByContext");
 		createModel();
 		UserIntentModelData modelData = modelManager.retrieveModel();
 
@@ -212,9 +232,11 @@ public class CAUITaskModelManagerTest {
 		currentSituationConext1.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "moon");
 		currentSituationConext1.put(CtxAttributeTypes.DAY_OF_WEEK, "Tuesday");
 		currentSituationConext1.put(CtxAttributeTypes.HOUR_OF_DAY, 3);
-		List<IUserIntentAction> results1 =  modelManager.retrieveActionsByContext(currentSituationConext1);
+		
 
-		System.out.println("results1 : "+results1);
+		System.out.println(" ***** test 1 retrieveActionsByContext  with currentSituationConext1: "+currentSituationConext1);
+		List<IUserIntentAction> results1 =  modelManager.retrieveActionsByContext(currentSituationConext1);
+		System.out.println("results  : "+results1);
 		
 		assertEquals(1,results1.size());
 		IUserIntentAction action1 = results1.get(0);
@@ -226,17 +248,26 @@ public class CAUITaskModelManagerTest {
 		assertEquals( "Tuesday" , actionContext.get(CtxAttributeTypes.DAY_OF_WEEK));
 		assertEquals( 3 , actionContext.get(CtxAttributeTypes.HOUR_OF_DAY));
 		System.out.println("estimated action  "+ action1);
+		System.out.println("estimated action  score  "+ action1.getConfidenceLevel());
+		
+		assertEquals(100 , action1.getConfidenceLevel());
 		System.out.println("context loc "+ actionContext.get(CtxAttributeTypes.LOCATION_SYMBOLIC));
 		System.out.println("context DAY_OF_WEEK "+ actionContext.get(CtxAttributeTypes.DAY_OF_WEEK));
+		System.out.println("context HOUR_OF_DAY "+ actionContext.get(CtxAttributeTypes.HOUR_OF_DAY));
 
-///----------		
+		
+		
+		///----------		
 		Map<String, Serializable> situationConext2 = new HashMap<String, Serializable>();
 		situationConext2.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "mars");
 		situationConext2.put(CtxAttributeTypes.DAY_OF_WEEK, "Wednesday");
 		List<IUserIntentAction> results2 =  modelManager.retrieveActionsByContext(situationConext2);
+		
+		System.out.println("*****  test 2 retrieveActionsByContext  with situationConext2: "+situationConext2);
 		System.out.println("results2  "+ results2);
 		assertEquals(1,results2.size());
 		IUserIntentAction action2 = results2.get(0);
+		System.out.println("action 2 estimated action  score  "+ action2.getConfidenceLevel());
 		
 		assertEquals("C-radio",action2.getparameterName());
 		assertEquals("mute",action2.getvalue());
@@ -248,24 +279,35 @@ public class CAUITaskModelManagerTest {
 		Map<String, Serializable> situationConext3 = new HashMap<String, Serializable>();
 		situationConext3.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "null");
 		situationConext3.put(CtxAttributeTypes.DAY_OF_WEEK, "monday");
-		//situationConext2.put(CtxAttributeTypes.TEMPERATURE, "15");
+		situationConext3.put(CtxAttributeTypes.HOUR_OF_DAY, 2 );
+		System.out.println("*****  test 3 retrieveActionsByContext  with situationConext3: "+situationConext3);
 		List<IUserIntentAction> results3 =  modelManager.retrieveActionsByContext(situationConext3);
 		//System.out.println("output 3 "+ results3);
+		IUserIntentAction action3 = results3.get(0);
+		System.out.println("action confidence :"+ action3.getConfidenceLevel());
+		assertEquals(66 ,action3.getConfidenceLevel());
 		assertEquals(1,results3.size());
 
-	
+		
 		Map<String, Serializable> situationConext4 = new HashMap<String, Serializable>();
 		situationConext4.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "moon");
-		situationConext4.put(CtxAttributeTypes.DAY_OF_WEEK, "monday");
-		//situationConext2.put(CtxAttributeTypes.TEMPERATURE, "15");
+		situationConext4.put(CtxAttributeTypes.DAY_OF_WEEK, "Tuesday");
+		situationConext4.put(CtxAttributeTypes.HOUR_OF_DAY, 3);
 		List<IUserIntentAction> results4 =  modelManager.retrieveActionsByContext(situationConext4);
-		System.out.println("output for ctx loc:moon and DAY_OF_WEEK:monday "+ results4);
-		assertEquals(2,results4.size());
+		System.out.println("*****  test 4 retrieveActionsByContext  with situationConext3: "+situationConext4);
+		System.out.println("output for ctx loc:moon and DAY_OF_WEEK: Tuesday and hod:3 "+ results4);
+		IUserIntentAction action4 = results4.get(0);
+		
+		System.out.println("action confidence :"+ action4.getConfidenceLevel());
+		assertEquals(100,action4.getConfidenceLevel());
+		assertEquals(1,results4.size());
 
+		
 		Map<String, Serializable> situationConext5 = new HashMap<String, Serializable>();
 		situationConext5.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "xxx");
 		situationConext5.put(CtxAttributeTypes.DAY_OF_WEEK, "yyyy");
 		//situationConext2.put(CtxAttributeTypes.TEMPERATURE, "15");
+		System.out.println("*****  test 5 retrieveActionsByContext  with situationConext3: "+situationConext5);
 		List<IUserIntentAction> results5 =  modelManager.retrieveActionsByContext(situationConext5);
 		System.out.println("output for ctx loc:xxx and status:yyy "+ results5);
 		assertEquals(0,results5.size());
@@ -389,7 +431,7 @@ public class CAUITaskModelManagerTest {
 		contextMap = new HashMap<String,Serializable>(); 
 		contextMap.put(CtxAttributeTypes.LOCATION_SYMBOLIC,"mars");
 		contextMap.put(CtxAttributeTypes.DAY_OF_WEEK,"Wednesday");
-		contextMap.put(CtxAttributeTypes.HOUR_OF_DAY,4);
+		contextMap.put(CtxAttributeTypes.HOUR_OF_DAY, 4);
 		userActionC.setActionContext(contextMap);
 
 		modelManager.setActionLink(userActionA, userActionB, 0.82);
