@@ -76,7 +76,13 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
         //GET EVENT OBJECT
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        privacyNegotiationEvent = bundle.getParcelable(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY);
+        try {
+            privacyNegotiationEvent = bundle.getParcelable(UserFeedbackActivityIntentExtra.EXTRA_PRIVACY_POLICY);
+        } catch (Exception ex) {
+            Log.e(LOG_TAG, "Error unparceling PPN", ex);
+            Toast.makeText(this, ex.getMessage(), Toast.LENGTH_LONG).show();
+            return;
+        }
 
         //SET HEADER INFO
         RequestorBean requestor = privacyNegotiationEvent.getNegotiationDetails().getRequestor();

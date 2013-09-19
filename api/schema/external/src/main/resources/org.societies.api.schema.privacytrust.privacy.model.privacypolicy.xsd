@@ -19,6 +19,16 @@
 		</xs:sequence>
 	</xs:complexType>
 
+    <xs:complexType name="accessControlResponseItem">
+        <xs:complexContent>
+            <xs:extension base="tns:responseItem">
+                <xs:sequence>
+                    <xs:element name="obfuscationLevel" type="xs:double"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
 	<xs:complexType name="privacyPermission">
 		<xs:complexContent>
 			<xs:extension base="tns:responseItem">

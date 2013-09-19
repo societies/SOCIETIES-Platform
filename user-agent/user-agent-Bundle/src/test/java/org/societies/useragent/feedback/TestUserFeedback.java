@@ -53,8 +53,6 @@ import org.societies.api.schema.useragent.feedback.ExpFeedbackResultBean;
 import org.societies.api.schema.useragent.feedback.FeedbackMethodType;
 import org.societies.api.schema.useragent.feedback.ImpFeedbackResultBean;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
-import org.societies.useragent.api.feedback.IPrivacyPolicyNegotiationHistoryRepository;
-import org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository;
 import org.societies.useragent.api.model.UserFeedbackEventTopics;
 
 import java.math.BigInteger;
@@ -97,8 +95,6 @@ public class TestUserFeedback extends TestCase {
     // autowired vars
     private ICommManager mockCommManager;
     private PubsubClient mockPubSubClient;
-    private IUserFeedbackHistoryRepository mockUserFeedbackHistoryRepository;
-    private IPrivacyPolicyNegotiationHistoryRepository mockPrivacyPolicyNegotiationHistoryRepository;
 
     // private vars
     private IIdentityManager mockIdentityManager;
@@ -109,21 +105,14 @@ public class TestUserFeedback extends TestCase {
 
         mockCommManager = mock(ICommManager.class);
         mockPubSubClient = mock(PubsubClient.class);
-        mockUserFeedbackHistoryRepository = mock(UserFeedbackHistoryRepository.class);
-        mockPrivacyPolicyNegotiationHistoryRepository = mock(PrivacyPolicyNegotiationHistoryRepository.class);
 
         mockIdentityManager = mock(IIdentityManager.class);
 
         userFeedback = new UserFeedback();
         userFeedback.setCommsMgr(mockCommManager);
         userFeedback.setPubsub(mockPubSubClient);
-        userFeedback.setUserFeedbackHistoryRepository(mockUserFeedbackHistoryRepository);
-        userFeedback.setPrivacyPolicyNegotiationHistoryRepository(mockPrivacyPolicyNegotiationHistoryRepository);
 
         when(mockCommManager.getIdManager()).thenReturn(mockIdentityManager);
-
-        when(mockUserFeedbackHistoryRepository.listIncomplete()).thenReturn(new ArrayList<UserFeedbackBean>());// just an empty list
-        when(mockPrivacyPolicyNegotiationHistoryRepository.listIncomplete()).thenReturn(new ArrayList<UserFeedbackPrivacyNegotiationEvent>());// just an empty list
 
         userFeedback.initialiseUserFeedback();
     }
@@ -167,7 +156,6 @@ public class TestUserFeedback extends TestCase {
         log.debug("Method returned");
 
         // VERIFICATION
-        verify(mockUserFeedbackHistoryRepository).insert(Matchers.any(UserFeedbackBean.class));
         verify(mockPubSubClient).publisherPublish(Matchers.any(IIdentity.class), Matchers.eq(UserFeedbackEventTopics.REQUEST), Matchers.eq(requestId), Matchers.any(UserFeedbackBean.class));
 
         Assert.assertNotNull("Expected Future to contain result", result.get());
@@ -196,7 +184,6 @@ public class TestUserFeedback extends TestCase {
         log.debug("Method returned");
 
         // VERIFICATION
-        verify(mockUserFeedbackHistoryRepository).insert(Matchers.any(UserFeedbackBean.class));
         verify(mockPubSubClient).publisherPublish(Matchers.any(IIdentity.class), Matchers.eq(UserFeedbackEventTopics.REQUEST), Matchers.eq(requestId), Matchers.any(UserFeedbackBean.class));
 
         Assert.assertNull("Expected Future to be empty", result.get());
@@ -233,7 +220,6 @@ public class TestUserFeedback extends TestCase {
         log.debug("Method returned");
 
         // VERIFICATION
-        verify(mockUserFeedbackHistoryRepository).insert(Matchers.any(UserFeedbackBean.class));
         verify(mockPubSubClient).publisherPublish(Matchers.any(IIdentity.class), Matchers.eq(UserFeedbackEventTopics.REQUEST), Matchers.eq(requestId), Matchers.any(UserFeedbackBean.class));
 
         Assert.assertFalse(callback.isResponseRx());
@@ -345,7 +331,6 @@ public class TestUserFeedback extends TestCase {
         log.debug("Method returned");
 
         // VERIFICATION
-        verify(mockUserFeedbackHistoryRepository).insert(Matchers.any(UserFeedbackBean.class));
         verify(mockPubSubClient).publisherPublish(Matchers.any(IIdentity.class), Matchers.eq(UserFeedbackEventTopics.REQUEST), Matchers.eq(requestId), Matchers.any(UserFeedbackBean.class));
 
         Assert.assertNotNull("Expected Future to contain result", result.get());
@@ -370,7 +355,6 @@ public class TestUserFeedback extends TestCase {
         log.debug("Method returned");
 
         // VERIFICATION
-        verify(mockUserFeedbackHistoryRepository).insert(Matchers.any(UserFeedbackBean.class));
         verify(mockPubSubClient).publisherPublish(Matchers.any(IIdentity.class), Matchers.eq(UserFeedbackEventTopics.REQUEST), Matchers.eq(requestId), Matchers.any(UserFeedbackBean.class));
 
         Assert.assertNull("Expected Future to be empty", result.get());
@@ -403,7 +387,6 @@ public class TestUserFeedback extends TestCase {
         log.debug("Method returned");
 
         // VERIFICATION
-        verify(mockUserFeedbackHistoryRepository).insert(Matchers.any(UserFeedbackBean.class));
         verify(mockPubSubClient).publisherPublish(Matchers.any(IIdentity.class), Matchers.eq(UserFeedbackEventTopics.REQUEST), Matchers.eq(requestId), Matchers.any(UserFeedbackBean.class));
 
         Assert.assertFalse(callback.isResponseRx());
@@ -512,7 +495,6 @@ public class TestUserFeedback extends TestCase {
         log.debug("Method returned");
 
         // VERIFICATION
-        verify(mockUserFeedbackHistoryRepository).insert(Matchers.any(UserFeedbackBean.class));
         verify(mockPubSubClient).publisherPublish(Matchers.any(IIdentity.class), Matchers.eq(UserFeedbackEventTopics.REQUEST), Matchers.eq(requestId), Matchers.any(UserFeedbackBean.class));
 
         Assert.assertNotNull("Expected Future to contain result", result.get());
@@ -566,7 +548,6 @@ public class TestUserFeedback extends TestCase {
         log.debug("Method returned");
 
         // VERIFICATION
-        verify(mockPrivacyPolicyNegotiationHistoryRepository).insert(Matchers.any(UserFeedbackPrivacyNegotiationEvent.class));
         verify(mockPubSubClient).publisherPublish(Matchers.any(IIdentity.class), Matchers.eq(EventTypes.UF_PRIVACY_NEGOTIATION), Matchers.eq(requestId), Matchers.any(UserFeedbackPrivacyNegotiationEvent.class));
 
         Assert.assertNotNull("Expected Future to contain result", result.get());
@@ -601,7 +582,6 @@ public class TestUserFeedback extends TestCase {
         log.debug("Method returned");
 
         // VERIFICATION
-        verify(mockPrivacyPolicyNegotiationHistoryRepository).insert(Matchers.any(UserFeedbackPrivacyNegotiationEvent.class));
         verify(mockPubSubClient).publisherPublish(Matchers.any(IIdentity.class), Matchers.eq(EventTypes.UF_PRIVACY_NEGOTIATION), Matchers.eq(requestId), Matchers.any(UserFeedbackPrivacyNegotiationEvent.class));
 
         Assert.assertNull("Expected Future to be empty", result.get());
@@ -644,7 +624,6 @@ public class TestUserFeedback extends TestCase {
         log.debug("Method returned");
 
         // VERIFICATION
-        verify(mockPrivacyPolicyNegotiationHistoryRepository).insert(Matchers.any(UserFeedbackPrivacyNegotiationEvent.class));
         verify(mockPubSubClient).publisherPublish(Matchers.any(IIdentity.class), Matchers.eq(EventTypes.UF_PRIVACY_NEGOTIATION), Matchers.eq(requestId), Matchers.any(UserFeedbackPrivacyNegotiationEvent.class));
 
         Assert.assertFalse(callback.isResponseRx());

@@ -7,8 +7,8 @@ import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyConditionsConstantValues;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.*;
 import org.societies.webapp.controller.BasePageController;
+import org.societies.webapp.wrappers.AccessControlResponseItemWrapper;
 import org.societies.webapp.wrappers.RequestItemWrapper;
-import org.societies.webapp.wrappers.ResponseItemWrapper;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -128,13 +128,13 @@ public class AccessControlRequestController extends BasePageController {
         return availableConstants;
     }
 
-    public List<ResponseItemWrapper> getResponseItems() {
+    public List<AccessControlResponseItemWrapper> getResponseItems() {
         if (event == null)
             return null;
 
-        ArrayList<ResponseItemWrapper> wrappers = new ArrayList<ResponseItemWrapper>();
+        ArrayList<AccessControlResponseItemWrapper> wrappers = new ArrayList<AccessControlResponseItemWrapper>();
         for (ResponseItem item : event.getResponseItems())
-            wrappers.add((ResponseItemWrapper) item);
+            wrappers.add((AccessControlResponseItemWrapper) item);
 
         return wrappers;
     }
@@ -213,7 +213,7 @@ public class AccessControlRequestController extends BasePageController {
     }
 
     private static void prepareEventForGUI(UserFeedbackAccessControlEvent event) {
-        ResponseItemWrapper.wrapList(event.getResponseItems());
+        AccessControlResponseItemWrapper.wrapList(event.getResponseItems());
 
         for (ResponseItem response : event.getResponseItems()) {
 
@@ -242,7 +242,7 @@ public class AccessControlRequestController extends BasePageController {
 
     private static void prepareEventForTransmission(UserFeedbackAccessControlEvent event) {
         // Convert ResponseItemWrappers back to ResponseItems if necessary
-        ResponseItemWrapper.unwrapList(event.getResponseItems());
+        AccessControlResponseItemWrapper.unwrapList(event.getResponseItems());
 
         for (ResponseItem response : event.getResponseItems()) {
 

@@ -1,18 +1,19 @@
 package org.societies.webapp.wrappers;
 
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.AccessControlResponseItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ResponseItemWrapper extends ResponseItem {
+public class AccessControlResponseItemWrapper extends AccessControlResponseItem {
 
-    public static void unwrapList(List<ResponseItem> listToUnwrap) {
-        List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
-        for (ResponseItem item : listToUnwrap) {
-            if (item instanceof ResponseItemWrapper) {
-                ResponseItemWrapper wrapper = (ResponseItemWrapper) item;
+    public static void unwrapList(List<AccessControlResponseItem> listToUnwrap) {
+        List<AccessControlResponseItem> responseItems = new ArrayList<AccessControlResponseItem>();
+        for (AccessControlResponseItem item : listToUnwrap) {
+            if (item instanceof AccessControlResponseItemWrapper) {
+                AccessControlResponseItemWrapper wrapper = (AccessControlResponseItemWrapper) item;
                 responseItems.add(wrapper.getResponseItem());
             } else {
                 // no unwrapping to do
@@ -24,14 +25,14 @@ public class ResponseItemWrapper extends ResponseItem {
         listToUnwrap.addAll(responseItems);
     }
 
-    public static void wrapList(List<ResponseItem> originalList) {
-        List<ResponseItem> responseItemWrappers = new ArrayList<ResponseItem>();
-        for (ResponseItem item : originalList) {
-            if (item instanceof ResponseItemWrapper) {
+    public static void wrapList(List<AccessControlResponseItem> originalList) {
+        List<AccessControlResponseItem> responseItemWrappers = new ArrayList<AccessControlResponseItem>();
+        for (AccessControlResponseItem item : originalList) {
+            if (item instanceof AccessControlResponseItemWrapper) {
                 // no wrapping to do
                 responseItemWrappers.add(item);
             } else {
-                responseItemWrappers.add(new ResponseItemWrapper(item));
+                responseItemWrappers.add(new AccessControlResponseItemWrapper(item));
             }
         }
 
@@ -39,7 +40,7 @@ public class ResponseItemWrapper extends ResponseItem {
         originalList.addAll(responseItemWrappers);
     }
 
-    public ResponseItemWrapper(ResponseItem prototype) {
+    public AccessControlResponseItemWrapper(ResponseItem prototype) {
         this.responseItemId = prototype.getResponseItemId();
         this.requestItem = prototype.getRequestItem();
         this.decision = prototype.getDecision();
@@ -58,12 +59,13 @@ public class ResponseItemWrapper extends ResponseItem {
         this.decision = (permitted ? Decision.PERMIT : Decision.DENY);
     }
 
-    public ResponseItem getResponseItem() {
-        ResponseItem original = new ResponseItem();
+    public AccessControlResponseItem getResponseItem() {
+        AccessControlResponseItem original = new AccessControlResponseItem();
 
         original.setResponseItemId(this.responseItemId);
         original.setRequestItem(this.requestItem);
         original.setDecision(this.decision);
+        original.setObfuscationLevel(this.obfuscationLevel);
 
         return original;
     }

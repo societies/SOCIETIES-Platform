@@ -11,7 +11,6 @@ import org.societies.api.comm.xmpp.pubsub.Subscriber;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
-import org.societies.api.internal.schema.useragent.feedback.HistoryRequestType;
 import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackHistoryRequest;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
@@ -94,9 +93,9 @@ public class UserFeedbackTestController extends BasePageController {
     private static final String[] FEATURES = new String[]{
             "2 LEGS", "4 LEGS", "SWIMS", "JUMPS", "LONG NECK", "REALLY HEAVY", "WILL EAT YOU"
     };
-    private static final String[] CLASSIFICATIONS = new String[]{
-            "KINGDOM", "PHYLYM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"
-    };
+    //    private static final String[] CLASSIFICATIONS = new String[]{
+//            "KINGDOM", "PHYLYM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"
+//    };
     private static final String[] ANIMALS = new String[]{
             "CAT", "OTTER", "MOUSE", "DOG", "HORSE", "BADGER", "OSTRICH", "SEAL", "HEDGEHOG", "LION", "TIGER", "GIRAFFE", "HEFFALUMP"
     };
@@ -187,9 +186,8 @@ public class UserFeedbackTestController extends BasePageController {
         requestorBean.setRequestorId("req" + ++req_counter);
 
         SecureRandom random = new SecureRandom();
-        String guid = new BigInteger(130, random).toString(32);
 
-        ResponsePolicy responsePolicy = buildResponsePolicy(guid, requestorBean);
+        ResponsePolicy responsePolicy = buildResponsePolicy(requestorBean);
 
         NegotiationDetailsBean negotiationDetails = new NegotiationDetailsBean();
         negotiationDetails.setRequestor(requestorBean);
@@ -300,17 +298,17 @@ public class UserFeedbackTestController extends BasePageController {
 
         Requestor requestor = new Requestor(userService.getIdentity());
 
-        List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
-        responseItems.add(buildResponseItem("http://this.is.a.win/", CtxAttributeTypes.NAME));
-        responseItems.add(buildResponseItem("http://paddy.rules/", CtxAttributeTypes.LOCATION_COORDINATES));
-        responseItems.add(buildResponseItem("http://something.something.something/", CtxAttributeTypes.STATUS));
-        responseItems.add(buildResponseItem("http://something.something.something/", CtxAttributeTypes.TEMPERATURE));
-        responseItems.add(buildResponseItem("http://something.something.something/", CtxAttributeTypes.ADDRESS_HOME_CITY));
-        responseItems.add(buildResponseItem("http://something.something.something/", CtxAttributeTypes.ADDRESS_WORK_CITY));
+        List<AccessControlResponseItem> responseItems = new ArrayList<AccessControlResponseItem>();
+        responseItems.add(buildAccessResponseItem("http://this.is.a.win/", CtxAttributeTypes.NAME));
+        responseItems.add(buildAccessResponseItem("http://paddy.rules/", CtxAttributeTypes.LOCATION_COORDINATES));
+        responseItems.add(buildAccessResponseItem("http://something.something.something/", CtxAttributeTypes.STATUS));
+        responseItems.add(buildAccessResponseItem("http://something.something.something/", CtxAttributeTypes.TEMPERATURE));
+        responseItems.add(buildAccessResponseItem("http://something.something.something/", CtxAttributeTypes.ADDRESS_HOME_CITY));
+        responseItems.add(buildAccessResponseItem("http://something.something.something/", CtxAttributeTypes.ADDRESS_WORK_CITY));
 
-        userFeedback.getAccessControlFBAsync(requestor, responseItems, new IUserFeedbackResponseEventListener<List<ResponseItem>>() {
+        userFeedback.getAccessControlFBAsync(requestor, responseItems, new IUserFeedbackResponseEventListener<List<AccessControlResponseItem>>() {
             @Override
-            public void responseReceived(List<ResponseItem> result) {
+            public void responseReceived(List<AccessControlResponseItem> result) {
                 log.info("AccessControl: Response received");
                 addGlobalMessage("AccessControl Response received",
                         (result != null && result.size() > 0) ? result.get(0).getDecision().toString() : "null",
@@ -331,7 +329,6 @@ public class UserFeedbackTestController extends BasePageController {
                 commManager.getIdManager().getThisNetworkNode());
 
         UserFeedbackHistoryRequest request = new UserFeedbackHistoryRequest();
-        request.setRequestType(HistoryRequestType.OUTSTANDING);
 
         try {
             commManager.sendIQGet(stanza, request, new ICommCallback() {
@@ -382,13 +379,11 @@ public class UserFeedbackTestController extends BasePageController {
         }
     }
 
-    private static ResponsePolicy buildResponsePolicy(String guid, RequestorBean requestorBean) {
-
-
+    private static ResponsePolicy buildResponsePolicy(RequestorBean requestorBean) {
         List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
-        responseItems.add(buildResponseItem("http://this.is.a.win/", "Location"));
-        responseItems.add(buildResponseItem("http://paddy.rules/", "Status"));
-        responseItems.add(buildResponseItem("http://something.something.something/", "Hair colour"));
+        responseItems.add(buildPrivacyResponseItem("http://this.is.a.win/", "Location"));
+        responseItems.add(buildPrivacyResponseItem("http://paddy.rules/", "Status"));
+        responseItems.add(buildPrivacyResponseItem("http://something.something.something/", "Hair colour"));
 
         ResponsePolicy responsePolicy = new ResponsePolicy();
         responsePolicy.setRequestor(requestorBean);
@@ -397,7 +392,7 @@ public class UserFeedbackTestController extends BasePageController {
         return responsePolicy;
     }
 
-    private static ResponseItem buildResponseItem(String uri, String dataType) {
+    private static ResponseItem buildPrivacyResponseItem(String uri, String dataType) {
         Action action3 = new Action();
         action3.setActionConstant(ActionConstants.READ);
         action3.setOptional(false);
@@ -435,6 +430,49 @@ public class UserFeedbackTestController extends BasePageController {
         ResponseItem responseItem = new ResponseItem();
         responseItem.setDecision(Decision.INDETERMINATE);
         responseItem.setRequestItem(requestItem);
+
+        return responseItem;
+    }
+
+    private static AccessControlResponseItem buildAccessResponseItem(String uri, String dataType) {
+        Action action3 = new Action();
+        action3.setActionConstant(ActionConstants.READ);
+        action3.setOptional(false);
+        Action action1 = new Action();
+        action1.setActionConstant(ActionConstants.CREATE);
+        action1.setOptional(true);
+        Action action4 = new Action();
+        action4.setActionConstant(ActionConstants.WRITE);
+        action4.setOptional(true);
+
+        Condition condition1 = new Condition();
+        condition1.setConditionConstant(ConditionConstants.DATA_RETENTION_IN_HOURS);
+        condition1.setValue("12");
+        condition1.setOptional(false);
+        Condition condition2 = new Condition();
+        condition2.setConditionConstant(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA);
+        condition2.setValue("true");
+        condition2.setOptional(true);
+
+        Resource resource = new Resource();
+        resource.setDataIdUri(uri);
+        resource.setDataType(dataType);
+
+        RequestItem requestItem = new RequestItem();
+        requestItem.getActions().add(action1);
+        requestItem.getActions().add(action3);
+        requestItem.getActions().add(action4);
+
+        requestItem.getConditions().add(condition1);
+        requestItem.getConditions().add(condition2);
+
+        requestItem.setOptional(false);
+        requestItem.setResource(resource);
+
+        AccessControlResponseItem responseItem = new AccessControlResponseItem();
+        responseItem.setDecision(Decision.INDETERMINATE);
+        responseItem.setRequestItem(requestItem);
+
         return responseItem;
     }
 

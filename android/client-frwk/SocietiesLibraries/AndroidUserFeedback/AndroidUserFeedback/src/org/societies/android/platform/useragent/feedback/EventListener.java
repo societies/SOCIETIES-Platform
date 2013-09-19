@@ -32,6 +32,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.*;
 import android.util.Log;
+import android.widget.Toast;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IPlatformEventsCallback;
@@ -172,72 +173,77 @@ public class EventListener extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(LOG_TAG, "Received action: " + intent.getAction());
+            try {
+                Log.d(LOG_TAG, "Received action: " + intent.getAction());
 
-            //EVENT MANAGER INTENTS
-            if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT)) {
-                Log.d(LOG_TAG, "Subscribed to event: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
-            } else if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENTS)) {
-                Log.d(LOG_TAG, "Subscribed to multiple events: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
-            } else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS)) {
-                Log.d(LOG_TAG, "Un-subscribed to events: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
-            }
-            //PRIVACY NEGOTIATION EVENT - payload is UserFeedbackPrivacyNegotiatioEvent
-            else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_REQUEST_INTENT)) {
-                UserFeedbackPrivacyNegotiationEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+                //EVENT MANAGER INTENTS
+                if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT)) {
+                    Log.d(LOG_TAG, "Subscribed to event: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+                } else if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENTS)) {
+                    Log.d(LOG_TAG, "Subscribed to multiple events: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+                } else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS)) {
+                    Log.d(LOG_TAG, "Un-subscribed to events: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+                }
+                //PRIVACY NEGOTIATION EVENT - payload is UserFeedbackPrivacyNegotiatioEvent
+                else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_REQUEST_INTENT)) {
+                    UserFeedbackPrivacyNegotiationEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
 
-                String id = String.valueOf(eventPayload.getRequestId());
+                    String id = String.valueOf(eventPayload.getRequestId());
 
-                synchronized (processedIncomingEvents) {
+                    synchronized (processedIncomingEvents) {
 
-                    if (processedIncomingEvents.contains(id)) {
-                        Log.w(LOG_TAG, "Ignoring duplicate PPN event received: id=" + id);
-                        return;
+                        if (processedIncomingEvents.contains(id)) {
+                            Log.w(LOG_TAG, "Ignoring duplicate PPN event received: id=" + id);
+                            return;
+                        }
+
+                        processedIncomingEvents.add(id);
                     }
 
-                    processedIncomingEvents.add(id);
+                    Log.d(LOG_TAG, "Privacy Negotiation event received: id=" + id);
+                    displayPrivacyNegotiationNotification(EventListener.this.getApplicationContext(), eventPayload);
                 }
+                //ACCESS CONTROL EVENT - payload is UserFeedbackAccessControlEvent
+                else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_ACCESS_CONTROL_REQUEST_INTENT)) {
+                    UserFeedbackAccessControlEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
 
-                Log.d(LOG_TAG, "Privacy Negotiation event received: id=" + id);
-                displayPrivacyNegotiationNotification(EventListener.this.getApplicationContext(), eventPayload);
-            }
-            //ACCESS CONTROL EVENT - payload is UserFeedbackAccessControlEvent
-            else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_ACCESS_CONTROL_REQUEST_INTENT)) {
-                UserFeedbackAccessControlEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+                    String id = String.valueOf(eventPayload.getRequestId());
 
-                String id = String.valueOf(eventPayload.getRequestId());
+                    synchronized (processedIncomingEvents) {
 
-                synchronized (processedIncomingEvents) {
+                        if (processedIncomingEvents.contains(id)) {
+                            Log.w(LOG_TAG, "Ignoring duplicate AC event received: id=" + id);
+                            return;
+                        }
 
-                    if (processedIncomingEvents.contains(id)) {
-                        Log.w(LOG_TAG, "Ignoring duplicate AC event received: id=" + id);
-                        return;
+                        processedIncomingEvents.add(id);
                     }
 
-                    processedIncomingEvents.add(id);
+                    Log.d(LOG_TAG, "Privacy Negotiation event received: id=" + id);
+                    displayAccessControlNotification(EventListener.this.getApplicationContext(), eventPayload);
                 }
+                //PERMISSION REQUEST EVENT - payload is UserFeedbackBean
+                else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_REQUEST_INTENT)) {
+                    UserFeedbackBean eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
 
-                Log.d(LOG_TAG, "Privacy Negotiation event received: id=" + id);
-                displayAccessControlNotification(EventListener.this.getApplicationContext(), eventPayload);
-            }
-            //PERMISSION REQUEST EVENT - payload is UserFeedbackBean
-            else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_REQUEST_INTENT)) {
-                UserFeedbackBean eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+                    String id = eventPayload.getRequestId();
 
-                String id = eventPayload.getRequestId();
+                    synchronized (processedIncomingEvents) {
 
-                synchronized (processedIncomingEvents) {
+                        if (processedIncomingEvents.contains(id)) {
+                            Log.w(LOG_TAG, "Ignoring duplicate UF event received: id=" + id);
+                            return;
+                        }
 
-                    if (processedIncomingEvents.contains(id)) {
-                        Log.w(LOG_TAG, "Ignoring duplicate UF event received: id=" + id);
-                        return;
+                        processedIncomingEvents.add(id);
                     }
 
-                    processedIncomingEvents.add(id);
+                    Log.d(LOG_TAG, "General Permission request event received: id=" + id);
+                    displayUserFeedbackNotification(eventPayload);
                 }
-
-                Log.d(LOG_TAG, "General Permission request event received: id=" + id);
-                displayUserFeedbackNotification(eventPayload);
+            } catch (Exception ex) {
+                Log.e(LOG_TAG, "Error receiving pubsub event", ex);
+                Toast.makeText(context, ex.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
     }

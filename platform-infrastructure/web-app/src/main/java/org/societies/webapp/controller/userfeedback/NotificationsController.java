@@ -9,10 +9,7 @@ import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.schema.useragent.feedback.*;
-import org.societies.useragent.api.feedback.IAccessControlHistoryRepository;
 import org.societies.useragent.api.feedback.IInternalUserFeedback;
-import org.societies.useragent.api.feedback.IPrivacyPolicyNegotiationHistoryRepository;
-import org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository;
 import org.societies.useragent.api.model.UserFeedbackEventTopics;
 import org.societies.webapp.ILoginListener;
 import org.societies.webapp.controller.BasePageController;
@@ -422,15 +419,6 @@ public class NotificationsController extends BasePageController {
     @ManagedProperty(value = "#{internalUserFeedback}")
     private IInternalUserFeedback internalUserFeedback;
 
-    @ManagedProperty(value = "#{userFeedbackHistoryRepository}")
-    private IUserFeedbackHistoryRepository userFeedbackHistoryRepository;
-
-    @ManagedProperty(value = "#{privacyPolicyNegotiationHistoryRepository}")
-    private IPrivacyPolicyNegotiationHistoryRepository privacyPolicyNegotiationHistoryRepository;
-
-    @ManagedProperty(value = "#{accessControlHistoryRepository}")
-    private IAccessControlHistoryRepository accessControlHistoryRepository;
-
     private final List<NotificationQueueItem> timedAbortsToWatch = new ArrayList<NotificationQueueItem>();
 
     // NB: to avoid deadlocks, always synchronise on allNotifications first, then on allNotificationIDs,
@@ -480,39 +468,6 @@ public class NotificationsController extends BasePageController {
 
         this.userService = userService;
         this.userService.addLoginListener(loginListener);
-    }
-
-    public IPrivacyPolicyNegotiationHistoryRepository getPrivacyPolicyNegotiationHistoryRepository() {
-        return privacyPolicyNegotiationHistoryRepository;
-    }
-
-    public void setPrivacyPolicyNegotiationHistoryRepository(IPrivacyPolicyNegotiationHistoryRepository privacyPolicyNegotiationHistoryRepository) {
-        if (log.isDebugEnabled())
-            log.debug("setPrivacyPolicyNegotiationHistoryRepository() = " + privacyPolicyNegotiationHistoryRepository);
-
-        this.privacyPolicyNegotiationHistoryRepository = privacyPolicyNegotiationHistoryRepository;
-    }
-
-    public IUserFeedbackHistoryRepository getUserFeedbackHistoryRepository() {
-        return userFeedbackHistoryRepository;
-    }
-
-    public void setUserFeedbackHistoryRepository(IUserFeedbackHistoryRepository userFeedbackHistoryRepository) {
-        if (log.isDebugEnabled())
-            log.debug("setUserFeedbackHistoryRepository() = " + userFeedbackHistoryRepository);
-
-        this.userFeedbackHistoryRepository = userFeedbackHistoryRepository;
-    }
-
-    public IAccessControlHistoryRepository getAccessControlHistoryRepository() {
-        return accessControlHistoryRepository;
-    }
-
-    public void setAccessControlHistoryRepository(IAccessControlHistoryRepository accessControlHistoryRepository) {
-        if (log.isDebugEnabled())
-            log.debug("setAccessControlHistoryRepository() = " + accessControlHistoryRepository);
-
-        this.accessControlHistoryRepository = accessControlHistoryRepository;
     }
 
     public IUserFeedback getUserFeedback() {
@@ -681,8 +636,6 @@ public class NotificationsController extends BasePageController {
         try {
             if (internalUserFeedback != null)
                 userFeedbackBeans = internalUserFeedback.listIncompleteFeedbackBeans();
-            else
-                userFeedbackBeans = userFeedbackHistoryRepository.listIncomplete();
         } catch (Exception ex) {
             log.warn("Recoverable error: Error recalling UF records: " + ex.getMessage());
         }
@@ -690,8 +643,6 @@ public class NotificationsController extends BasePageController {
         try {
             if (internalUserFeedback != null)
                 privacyNegotiationEvents = internalUserFeedback.listIncompletePrivacyRequests();
-            else
-                privacyNegotiationEvents = privacyPolicyNegotiationHistoryRepository.listIncomplete();
         } catch (Exception ex) {
             log.warn("Recoverable error: Error recalling PPN records: " + ex.getMessage());
         }
@@ -699,8 +650,6 @@ public class NotificationsController extends BasePageController {
         try {
             if (internalUserFeedback != null)
                 accessControlEvents = internalUserFeedback.listIncompleteAccessRequests();
-            else
-                accessControlEvents = accessControlHistoryRepository.listIncomplete();
         } catch (Exception ex) {
             log.warn("Recoverable error: Error recalling AC records: " + ex.getMessage());
         }
