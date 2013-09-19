@@ -189,6 +189,11 @@
 			<artifactId>commons-fileupload</artifactId>
 			<version>1.1.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.societies</groupId>
+			<artifactId>hibernate_classes</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -237,6 +242,11 @@
 							org.springframework.web.servlet;resolution:=optional,
 							org.objectweb.asm;resolution:=optional,
 							javax.annotation;resolution:=optional,
+
+							org.hibernate.proxy;resolution:=optional,
+							org.springframework.orm.hibernate3;resolution:=optional,
+							org.springframework.orm.hibernate3.annotation;resolution:=optional,
+							javax.sql;resolution:=optional,
 							
 							org.societies.api.identity;resolution:=optional,
 							

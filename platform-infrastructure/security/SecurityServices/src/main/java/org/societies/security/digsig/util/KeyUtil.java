@@ -42,62 +42,15 @@ import org.societies.api.security.digsig.DigsigException;
  */
 public class KeyUtil {
 
-	/**
-	 * Convert Base64 {@link String} representation of public key to {@link PublicKey}
-	 * 
-	 * @param keyStr Base64 representation of the {@link PublicKey}
-	 * @return The {@link PublicKey}
-	 * @throws CertificateException 
-	 */
-//	public static PublicKey str2key(String keyStr) throws DigsigException {
-//
-//		byte[] keyBytes = Base64.decodeBase64(keyStr);
-////		Key key = new SecretKeySpec(keyBytes, DigSig.ALGORITHM);
-//
-//		// get the public key
-////		try {
-////			CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
-////			Certificate certificate = certificateFactory.generateCertificate(new ByteArrayInputStream(keyBytes));
-////			PublicKey key = certificate.getPublicKey();
-////	
-////			return key;
-////		} catch (CertificateException e) {
-////			throw new DigsigException(e);
-////		}
-//
-////		try {
-////			Key key = (Key) PublicKeyFactory.createKey(keyBytes);
-////		} catch (IOException e) {
-////			throw new DigsigException(e);
-////		}
-//		
-//		KeyFactory keyFactory;
-//		KeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
-//		try {
-//			keyFactory = KeyFactory.getInstance("RSA");
-//			PublicKey key = keyFactory.generatePublic(keySpec);
-//			return key;
-//		} catch (NoSuchAlgorithmException e) {
-//			throw new DigsigException(e);
-//		} catch (InvalidKeySpecException e) {
-//			throw new DigsigException(e);
-//		}
-//	}
+	public static byte[] cert2ba(X509Certificate cert) throws DigsigException {
+		
+		try {
+			return cert.getEncoded();
+		} catch (CertificateEncodingException e) {
+			throw new DigsigException(e);
+		}
+	}
 
-	/**
-	 * Convert public or private {@link Key} to {@link String}
-	 * 
-	 * @param key The key to convert
-	 * @return Base64 representation of the {@link Key}
-	 */
-//	public static String key2str(Key key) {
-//		
-//		byte[] keyBytes = key.getEncoded();
-//		String keyStr = Base64.encodeBase64String(keyBytes);
-//		
-//		return keyStr;
-//	}
-	
 	/**
 	 * Serialize X.509 certificate to String
 	 *
@@ -105,23 +58,11 @@ public class KeyUtil {
 	 * @return Serialized certificate
 	 */
 	public static String cert2str(X509Certificate cert) throws DigsigException {
-		
-		byte[] certBytes;
-		String certStr;
-		
-		try {
-			certBytes = cert.getEncoded();
-		} catch (CertificateEncodingException e) {
-			throw new DigsigException(e);
-		}
-		certStr = Base64.encodeBase64String(certBytes);
-		
-		return certStr;
+		return Base64.encodeBase64String(cert2ba(cert));
 	}
 	
-	public static X509Certificate str2cert(String certStr) throws DigsigException {
+	public static X509Certificate ba2cert(byte[] certBytes) throws DigsigException {
 
-		byte[] certBytes = Base64.decodeBase64(certStr);
 		InputStream is = new ByteArrayInputStream(certBytes);
 		CertificateFactory cf;
 		X509Certificate cert;
@@ -133,5 +74,12 @@ public class KeyUtil {
 		} catch (CertificateException e) {
 			throw new DigsigException(e);
 		}
+	}
+	
+	public static X509Certificate str2cert(String certStr) throws DigsigException {
+
+		byte[] certBytes = Base64.decodeBase64(certStr);
+		
+		return ba2cert(certBytes);
 	}
 }
