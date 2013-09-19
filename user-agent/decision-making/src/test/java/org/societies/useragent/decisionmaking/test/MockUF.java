@@ -8,7 +8,7 @@ import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.FeedbackForm;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.schema.identity.RequestorBean;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.AccessControlResponseItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
 
 import java.util.ArrayList;
@@ -157,34 +157,45 @@ public class MockUF implements IUserFeedback {
         return null;
     }
 
-    @Override
-    public Future<List<ResponseItem>> getAccessControlFB(String requestId, Requestor requestor, List<ResponseItem> items) {
+    public Future<List<AccessControlResponseItem>> getAccessControlFB(String requestId, Requestor requestor, List<AccessControlResponseItem> items) {
         return null;
     }
 
-    @Override
-    public Future<List<ResponseItem>> getAccessControlFB(Requestor requestor,
-                                                         List<ResponseItem> items) {
+    public Future<List<AccessControlResponseItem>> getAccessControlFB(Requestor requestor, List<AccessControlResponseItem> items) {
         return null;
     }
 
-    @Override
-    public Future<List<ResponseItem>> getAccessControlFBAsync(Requestor requestor,
-                                                              List<ResponseItem> items) {
+    public Future<List<AccessControlResponseItem>> getAccessControlFBAsync(Requestor requestor, List<AccessControlResponseItem> items) {
         return null;
     }
 
-    @Override
-    public Future<List<ResponseItem>> getAccessControlFBAsync(Requestor requestor,
-                                                              List<ResponseItem> items,
-                                                              IUserFeedbackResponseEventListener<List<ResponseItem>> callback) {
+    public Future<List<AccessControlResponseItem>> getAccessControlFBAsync(Requestor requestor, List<AccessControlResponseItem> items, IUserFeedbackResponseEventListener<List<AccessControlResponseItem>> callback) {
         return null;
     }
 
-    @Override
-    public Future<List<ResponseItem>> getAccessControlFBAsync(String requestId, Requestor requestor, List<ResponseItem> items, IUserFeedbackResponseEventListener<List<ResponseItem>> callback) {
+    public Future<List<AccessControlResponseItem>> getAccessControlFBAsync(String requestId, Requestor requestor, List<AccessControlResponseItem> items, IUserFeedbackResponseEventListener<List<AccessControlResponseItem>> callback) {
         return null;
     }
+
+//    public Future<List<ResponseItem>> getAccessControlFB(Requestor requestor,
+//                                                         List<ResponseItem> items) {
+//        return null;
+//    }
+
+//    public Future<List<ResponseItem>> getAccessControlFBAsync(Requestor requestor,
+//                                                              List<ResponseItem> items) {
+//        return null;
+//    }
+
+//    public Future<List<ResponseItem>> getAccessControlFBAsync(Requestor requestor,
+//                                                              List<ResponseItem> items,
+//                                                              IUserFeedbackResponseEventListener<List<ResponseItem>> callback) {
+//        return null;
+//    }
+
+//    public Future<List<ResponseItem>> getAccessControlFBAsync(String requestId, Requestor requestor, List<ResponseItem> items, IUserFeedbackResponseEventListener<List<ResponseItem>> callback) {
+//        return null;
+//    }
 
     @Override
     public void showNotification(String notificationText) {
@@ -210,13 +221,18 @@ public class MockUF implements IUserFeedback {
     }
 
     @Override
-    public void submitImplicitResponse(String id, Boolean result) {
+    public void submitAccessControlResponse(String requestId, List<AccessControlResponseItem> responseItems, RequestorBean requestorBean) {
+
     }
 
     @Override
-    public void submitAccessControlResponse(String s, List<ResponseItem> responseItems, RequestorBean requestorBean) {
-
+    public void submitImplicitResponse(String id, Boolean result) {
     }
+
+//    @Override
+//    public void submitAccessControlResponse(String s, List<ResponseItem> responseItems, RequestorBean requestorBean) {
+//
+//    }
 
     @Override
     public void clear() {

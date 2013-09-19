@@ -711,10 +711,10 @@ public class TestUserFeedback extends TestCase {
 
         Requestor requestor = new Requestor(identity);
 
-        List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
-        responseItems.add(buildResponseItem("ab.cd.ef1", "type1"));
-        responseItems.add(buildResponseItem("ab.cd.ef2", "type2"));
-        responseItems.add(buildResponseItem("ab.cd.ef3", "type3"));
+        List<AccessControlResponseItem> responseItems = new ArrayList<AccessControlResponseItem>();
+        responseItems.add(buildAccessResponseItem("ab.cd.ef1", "type1"));
+        responseItems.add(buildAccessResponseItem("ab.cd.ef2", "type2"));
+        responseItems.add(buildAccessResponseItem("ab.cd.ef3", "type3"));
 
         final UserFeedbackAccessControlEvent resultBean = new UserFeedbackAccessControlEvent();
         resultBean.setRequestId(requestId);
@@ -740,7 +740,7 @@ public class TestUserFeedback extends TestCase {
         }).start();
 
         log.debug("Requesting Access Control user feedback");
-        Future<List<ResponseItem>> result = userFeedback.getAccessControlFB(requestId, requestor, responseItems);
+        Future<List<AccessControlResponseItem>> result = userFeedback.getAccessControlFB(requestId, requestor, responseItems);
         log.debug("Method returned");
 
         // VERIFICATION
@@ -760,10 +760,10 @@ public class TestUserFeedback extends TestCase {
 
         Requestor requestor = new Requestor(identity);
 
-        List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
-        responseItems.add(buildResponseItem("ab.cd.ef1", "type1"));
-        responseItems.add(buildResponseItem("ab.cd.ef2", "type2"));
-        responseItems.add(buildResponseItem("ab.cd.ef3", "type3"));
+        List<AccessControlResponseItem> responseItems = new ArrayList<AccessControlResponseItem>();
+        responseItems.add(buildAccessResponseItem("ab.cd.ef1", "type1"));
+        responseItems.add(buildAccessResponseItem("ab.cd.ef2", "type2"));
+        responseItems.add(buildAccessResponseItem("ab.cd.ef3", "type3"));
 
         final UserFeedbackAccessControlEvent resultBean = new UserFeedbackAccessControlEvent();
         resultBean.setRequestId(requestId);
@@ -771,7 +771,7 @@ public class TestUserFeedback extends TestCase {
         resultBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
 
         log.debug("Requesting Access Control user feedback");
-        Future<List<ResponseItem>> result = userFeedback.getAccessControlFBAsync(requestId, requestor, responseItems, null);
+        Future<List<AccessControlResponseItem>> result = userFeedback.getAccessControlFBAsync(requestId, requestor, responseItems, null);
         log.debug("Method returned");
 
         // VERIFICATION
@@ -797,17 +797,17 @@ public class TestUserFeedback extends TestCase {
 
         Requestor requestor = new Requestor(identity);
 
-        List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
-        responseItems.add(buildResponseItem("ab.cd.ef1", "type1"));
-        responseItems.add(buildResponseItem("ab.cd.ef2", "type2"));
-        responseItems.add(buildResponseItem("ab.cd.ef3", "type3"));
+        List<AccessControlResponseItem> responseItems = new ArrayList<AccessControlResponseItem>();
+        responseItems.add(buildAccessResponseItem("ab.cd.ef1", "type1"));
+        responseItems.add(buildAccessResponseItem("ab.cd.ef2", "type2"));
+        responseItems.add(buildAccessResponseItem("ab.cd.ef3", "type3"));
 
         final UserFeedbackAccessControlEvent resultBean = new UserFeedbackAccessControlEvent();
         resultBean.setRequestId(requestId);
         resultBean.setResponseItems(responseItems);
         resultBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
 
-        EventCallback<List<ResponseItem>> callback = new EventCallback<List<ResponseItem>>();
+        EventCallback<List<AccessControlResponseItem>> callback = new EventCallback<List<AccessControlResponseItem>>();
 
         log.debug("Requesting Access Control user feedback");
         userFeedback.getAccessControlFBAsync(requestId, requestor, responseItems, callback);
@@ -838,17 +838,17 @@ public class TestUserFeedback extends TestCase {
 
         Requestor requestor = new Requestor(identity);
 
-        List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
-        responseItems.add(buildResponseItem("ab.cd.ef1", "type1"));
-        responseItems.add(buildResponseItem("ab.cd.ef2", "type2"));
-        responseItems.add(buildResponseItem("ab.cd.ef3", "type3"));
+        List<AccessControlResponseItem> responseItems = new ArrayList<AccessControlResponseItem>();
+        responseItems.add(buildAccessResponseItem("ab.cd.ef1", "type1"));
+        responseItems.add(buildAccessResponseItem("ab.cd.ef2", "type2"));
+        responseItems.add(buildAccessResponseItem("ab.cd.ef3", "type3"));
 
         final UserFeedbackAccessControlEvent resultBean = new UserFeedbackAccessControlEvent();
         resultBean.setRequestId(requestId);
         resultBean.setResponseItems(responseItems);
         resultBean.setRequestor(RequestorUtils.toRequestorBean(requestor));
 
-        EventCallback<List<ResponseItem>> callback = new EventCallback<List<ResponseItem>>();
+        EventCallback<List<AccessControlResponseItem>> callback = new EventCallback<List<AccessControlResponseItem>>();
 
         log.debug("Requesting Access Control user feedback");
         userFeedback.getAccessControlFBAsync(requestId, requestor, responseItems, callback);
@@ -893,9 +893,9 @@ public class TestUserFeedback extends TestCase {
 
     private static ResponsePolicy buildResponsePolicy(String guid, RequestorBean requestorBean) {
         List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
-        responseItems.add(buildResponseItem("http://this.is.a.win/", "winning - " + guid));
-        responseItems.add(buildResponseItem("http://paddy.rules/", "paddy"));
-        responseItems.add(buildResponseItem("http://something.something.something/", "dark side"));
+        responseItems.add(buildPrivacyResponseItem("http://this.is.a.win/", "winning - " + guid));
+        responseItems.add(buildPrivacyResponseItem("http://paddy.rules/", "paddy"));
+        responseItems.add(buildPrivacyResponseItem("http://something.something.something/", "dark side"));
 
         ResponsePolicy responsePolicy = new ResponsePolicy();
         responsePolicy.setRequestor(requestorBean);
@@ -904,7 +904,62 @@ public class TestUserFeedback extends TestCase {
         return responsePolicy;
     }
 
-    private static ResponseItem buildResponseItem(String uri, String dataType) {
+    private static AccessControlResponseItem buildAccessResponseItem(String uri, String dataType) {
+        Action action1 = new Action();
+        action1.setActionConstant(ActionConstants.CREATE);
+        action1.setOptional(true);
+        Action action2 = new Action();
+        action2.setActionConstant(ActionConstants.DELETE);
+        action2.setOptional(false);
+        Action action3 = new Action();
+        action3.setActionConstant(ActionConstants.READ);
+        action3.setOptional(false);
+        Action action4 = new Action();
+        action4.setActionConstant(ActionConstants.WRITE);
+        action4.setOptional(true);
+
+        Condition condition1 = new Condition();
+        condition1.setConditionConstant(ConditionConstants.DATA_RETENTION_IN_HOURS);
+        condition1.setValue("1");
+        condition1.setOptional(false);
+        Condition condition2 = new Condition();
+        condition2.setConditionConstant(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA);
+        condition2.setValue("2");
+        condition2.setOptional(true);
+        Condition condition3 = new Condition();
+        condition3.setConditionConstant(ConditionConstants.RIGHT_TO_OPTOUT);
+        condition3.setValue("3");
+        condition3.setOptional(false);
+        Condition condition4 = new Condition();
+        condition4.setConditionConstant(ConditionConstants.STORE_IN_SECURE_STORAGE);
+        condition4.setValue("4");
+        condition4.setOptional(true);
+
+        Resource resource = new Resource();
+        resource.setDataIdUri(uri);
+        resource.setDataType(dataType);
+
+        RequestItem requestItem = new RequestItem();
+        requestItem.getActions().add(action1);
+        requestItem.getActions().add(action2);
+        requestItem.getActions().add(action3);
+        requestItem.getActions().add(action4);
+
+        requestItem.getConditions().add(condition1);
+        requestItem.getConditions().add(condition2);
+        requestItem.getConditions().add(condition3);
+        requestItem.getConditions().add(condition4);
+
+        requestItem.setOptional(false);
+        requestItem.setResource(resource);
+
+        AccessControlResponseItem responseItem = new AccessControlResponseItem();
+        responseItem.setDecision(Decision.INDETERMINATE);
+        responseItem.setRequestItem(requestItem);
+        return responseItem;
+    }
+
+    private static ResponseItem buildPrivacyResponseItem(String uri, String dataType) {
         Action action1 = new Action();
         action1.setActionConstant(ActionConstants.CREATE);
         action1.setOptional(true);
