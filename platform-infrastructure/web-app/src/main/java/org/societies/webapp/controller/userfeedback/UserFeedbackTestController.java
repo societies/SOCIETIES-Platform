@@ -93,7 +93,7 @@ public class UserFeedbackTestController extends BasePageController {
     private static final String[] FEATURES = new String[]{
             "2 LEGS", "4 LEGS", "SWIMS", "JUMPS", "LONG NECK", "REALLY HEAVY", "WILL EAT YOU"
     };
-//    private static final String[] CLASSIFICATIONS = new String[]{
+    //    private static final String[] CLASSIFICATIONS = new String[]{
 //            "KINGDOM", "PHYLYM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"
 //    };
     private static final String[] ANIMALS = new String[]{
@@ -299,12 +299,12 @@ public class UserFeedbackTestController extends BasePageController {
         Requestor requestor = new Requestor(userService.getIdentity());
 
         List<AccessControlResponseItem> responseItems = new ArrayList<AccessControlResponseItem>();
-        responseItems.add(buildResponseItem("http://this.is.a.win/", CtxAttributeTypes.NAME));
-        responseItems.add(buildResponseItem("http://paddy.rules/", CtxAttributeTypes.LOCATION_COORDINATES));
-        responseItems.add(buildResponseItem("http://something.something.something/", CtxAttributeTypes.STATUS));
-        responseItems.add(buildResponseItem("http://something.something.something/", CtxAttributeTypes.TEMPERATURE));
-        responseItems.add(buildResponseItem("http://something.something.something/", CtxAttributeTypes.ADDRESS_HOME_CITY));
-        responseItems.add(buildResponseItem("http://something.something.something/", CtxAttributeTypes.ADDRESS_WORK_CITY));
+        responseItems.add(buildAccessResponseItem("http://this.is.a.win/", CtxAttributeTypes.NAME));
+        responseItems.add(buildAccessResponseItem("http://paddy.rules/", CtxAttributeTypes.LOCATION_COORDINATES));
+        responseItems.add(buildAccessResponseItem("http://something.something.something/", CtxAttributeTypes.STATUS));
+        responseItems.add(buildAccessResponseItem("http://something.something.something/", CtxAttributeTypes.TEMPERATURE));
+        responseItems.add(buildAccessResponseItem("http://something.something.something/", CtxAttributeTypes.ADDRESS_HOME_CITY));
+        responseItems.add(buildAccessResponseItem("http://something.something.something/", CtxAttributeTypes.ADDRESS_WORK_CITY));
 
         userFeedback.getAccessControlFBAsync(requestor, responseItems, new IUserFeedbackResponseEventListener<List<AccessControlResponseItem>>() {
             @Override
@@ -380,12 +380,10 @@ public class UserFeedbackTestController extends BasePageController {
     }
 
     private static ResponsePolicy buildResponsePolicy(RequestorBean requestorBean) {
-
-
         List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
-        responseItems.add(buildResponseItem("http://this.is.a.win/", "Location"));
-        responseItems.add(buildResponseItem("http://paddy.rules/", "Status"));
-        responseItems.add(buildResponseItem("http://something.something.something/", "Hair colour"));
+        responseItems.add(buildPrivacyResponseItem("http://this.is.a.win/", "Location"));
+        responseItems.add(buildPrivacyResponseItem("http://paddy.rules/", "Status"));
+        responseItems.add(buildPrivacyResponseItem("http://something.something.something/", "Hair colour"));
 
         ResponsePolicy responsePolicy = new ResponsePolicy();
         responsePolicy.setRequestor(requestorBean);
@@ -394,7 +392,49 @@ public class UserFeedbackTestController extends BasePageController {
         return responsePolicy;
     }
 
-    private static AccessControlResponseItem buildResponseItem(String uri, String dataType) {
+    private static ResponseItem buildPrivacyResponseItem(String uri, String dataType) {
+        Action action3 = new Action();
+        action3.setActionConstant(ActionConstants.READ);
+        action3.setOptional(false);
+        Action action1 = new Action();
+        action1.setActionConstant(ActionConstants.CREATE);
+        action1.setOptional(true);
+        Action action4 = new Action();
+        action4.setActionConstant(ActionConstants.WRITE);
+        action4.setOptional(true);
+
+        Condition condition1 = new Condition();
+        condition1.setConditionConstant(ConditionConstants.DATA_RETENTION_IN_HOURS);
+        condition1.setValue("12");
+        condition1.setOptional(false);
+        Condition condition2 = new Condition();
+        condition2.setConditionConstant(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA);
+        condition2.setValue("true");
+        condition2.setOptional(true);
+
+        Resource resource = new Resource();
+        resource.setDataIdUri(uri);
+        resource.setDataType(dataType);
+
+        RequestItem requestItem = new RequestItem();
+        requestItem.getActions().add(action1);
+        requestItem.getActions().add(action3);
+        requestItem.getActions().add(action4);
+
+        requestItem.getConditions().add(condition1);
+        requestItem.getConditions().add(condition2);
+
+        requestItem.setOptional(false);
+        requestItem.setResource(resource);
+
+        ResponseItem responseItem = new ResponseItem();
+        responseItem.setDecision(Decision.INDETERMINATE);
+        responseItem.setRequestItem(requestItem);
+
+        return responseItem;
+    }
+
+    private static AccessControlResponseItem buildAccessResponseItem(String uri, String dataType) {
         Action action3 = new Action();
         action3.setActionConstant(ActionConstants.READ);
         action3.setOptional(false);
@@ -432,6 +472,7 @@ public class UserFeedbackTestController extends BasePageController {
         AccessControlResponseItem responseItem = new AccessControlResponseItem();
         responseItem.setDecision(Decision.INDETERMINATE);
         responseItem.setRequestItem(requestItem);
+
         return responseItem;
     }
 
