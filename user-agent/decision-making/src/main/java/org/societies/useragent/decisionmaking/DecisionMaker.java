@@ -49,7 +49,10 @@ import org.societies.useragent.conflict.IntentPriorRule;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.personalisation.model.*;
-import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+import org.societies.api.osgi.event.EMSException;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 
 
 public class DecisionMaker extends AbstractDecisionMaker implements
@@ -169,7 +172,14 @@ public class DecisionMaker extends AbstractDecisionMaker implements
 					if (getUserFeedback(cImp, action)) {
 						FeedbackEvent fedb = new FeedbackEvent(entityID,
 						action, true, FeedbackTypes.IMPLEMENTED);
-						pesoMgr.returnFeedback(fedb);
+						InternalEvent event = new InternalEvent(
+								EventTypes.UIM_EVENT, "feedback",
+								"org/societies/useragent/decisionmaker", fedb);
+						try {
+							pesoMgr.publishInternalEvent(event);
+						} catch (EMSException e) {
+							e.printStackTrace();
+						}
 						consumer.setIAction(this.entityID, action);
 						logging.debug("Service has been matched. IAction has been sent to the service");
 					} else {	

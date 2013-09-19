@@ -62,12 +62,12 @@
 			<scope>provided</scope>
 		</dependency>
 		
-		<dependency>
+		<!--  dependency>
 			<groupId>org.societies.personalisation</groupId>
 			<artifactId>personalisation_api</artifactId>
 			<version>${version.pm}</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency-->
 		
 		<dependency>
 			<groupId>junit</groupId>
