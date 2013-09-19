@@ -32,7 +32,7 @@ package org.societies.api.internal.domainauthority;
  */
 public class UrlPath {
 
-	public static final String BASE = "/rest/webresources";
+	public static final String BASE = "/rest";
 	
 	/**
 	 * URL parameter. File name, including relative path.

@@ -34,7 +34,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Path;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -56,7 +55,6 @@ import org.societies.domainauthority.rest.util.UrlParamName;
  * 
  * @author Mitja Vardjan
  */
-@Path(UrlPath.PATH_FILES)
 public class ServiceClientJar extends HttpServlet {
 
 	private static final long serialVersionUID = 4625772782444356957L;
@@ -78,6 +76,7 @@ public class ServiceClientJar extends HttpServlet {
 
 		if (request.getPathInfo() == null) {
 			LOG.warn("HTTP GET: request.getPathInfo() is null");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
 		String path = request.getParameter(UrlPath.URL_PARAM_FILE);
@@ -126,6 +125,7 @@ public class ServiceClientJar extends HttpServlet {
 			ServletOutputStream stream = response.getOutputStream();
 			stream.write(file);
 			stream.flush();
+			response.setStatus(HttpServletResponse.SC_OK);
 		} catch (IOException e) {
 			LOG.warn("Could not write response", e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -147,6 +147,7 @@ public class ServiceClientJar extends HttpServlet {
 		LOG.info("HTTP POST from {}; path = {}, service ID = " + serviceId + ", pubKey = " + pubKey,
 				request.getRemoteHost(), path);
 		LOG.warn("HTTP POST is not implemented. For uploading files, use HTTP PUT instead.");
+		response.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	}
 
 	/**
@@ -214,6 +215,7 @@ public class ServiceClientJar extends HttpServlet {
 				}
 			}
 		}
+		response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 	}
 
 	private String get3PServicePath(String serviceId) {

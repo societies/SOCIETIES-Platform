@@ -28,6 +28,8 @@ import java.security.cert.X509Certificate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
@@ -42,8 +44,20 @@ import org.societies.domainauthority.rest.control.ServiceClientJarAccess;
  */
 @Entity
 @Table(name = "org_societies_security_darest_docs")
-public class Document extends Resource {
+public class Document {
 	
+	@Id
+	@GeneratedValue
+	@Column(name="id")
+	private int id;
+
+	@Column(name="path")
+	private String path;
+
+	@Lob
+	@Column(name="ownerCertSerialized")
+	private byte[] ownerCertSerialized;
+
 	@Lob
 	@Column(name="xmlDoc")
 	private byte[] xmlDoc;
@@ -62,6 +76,49 @@ public class Document extends Resource {
 		this.ownerCertSerialized = ServiceClientJarAccess.getSigMgr().cert2ba(ownerCert);
 		this.xmlDoc = xmlDoc;
 		this.notificationEndpoint = notificationEndpoint;
+	}
+
+	/**
+	 * @return Relative path to the file
+	 */
+	public String getPath() {
+		return path;
+	}
+
+	/**
+	 * @param path Relative path to the file
+	 */
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the ownerCertSerialized
+	 */
+	public byte[] getOwnerCertSerialized() {
+		return ownerCertSerialized;
+	}
+
+	/**
+	 * @param ownerCertSerialized the ownerCertSerialized to set
+	 * @throws DigsigException 
+	 */
+	public void setOwnerCertSerialized(byte[] ownerKeySerialized) {
+		this.ownerCertSerialized = ownerKeySerialized;
 	}
 
 	/**

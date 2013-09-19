@@ -52,11 +52,11 @@ public class Resource {
 	private int id;
 
 	@Column(name="path")
-	protected String path;
+	private String path;
 
 	@Lob
 	@Column(name="ownerCertSerialized")
-	protected byte[] ownerCertSerialized;
+	private byte[] ownerCertSerialized;
 
 	/**
 	 * Default constructor for Hibernate only

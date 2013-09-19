@@ -24,7 +24,6 @@
  */
 package org.societies.domainauthority.rest.server;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
@@ -34,7 +33,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Path;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -49,7 +47,6 @@ import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.domainauthority.rest.control.XmlDocumentAccess;
 import org.societies.domainauthority.rest.util.FileName;
-import org.societies.domainauthority.rest.util.Files;
 import org.societies.domainauthority.rest.util.UrlParamName;
 
 /**
@@ -57,7 +54,6 @@ import org.societies.domainauthority.rest.util.UrlParamName;
  * 
  * @author Mitja Vardjan
  */
-@Path(UrlPath.PATH_XML_DOCUMENTS)
 public class XmlDocument extends HttpServlet {
 
 	private static final long serialVersionUID = 4625772782444356957L;
@@ -79,6 +75,7 @@ public class XmlDocument extends HttpServlet {
 
 		if (request.getPathInfo() == null) {
 			LOG.warn("HTTP GET: request.getPathInfo() is null");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
 		String path = request.getPathInfo().replaceFirst("/", "");
@@ -111,6 +108,7 @@ public class XmlDocument extends HttpServlet {
 			ServletOutputStream stream = response.getOutputStream();
 			stream.write(file);
 			stream.flush();
+			response.setStatus(HttpServletResponse.SC_OK);
 		} catch (IOException e) {
 			LOG.warn("Could not write response", e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -148,7 +146,6 @@ public class XmlDocument extends HttpServlet {
 			status = mergeDocument(path, signature, is);
 		} else {
 			status = HttpServletResponse.SC_BAD_REQUEST;
-			return;
 		}
 		response.setStatus(status);
 	}
