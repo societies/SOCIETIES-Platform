@@ -132,7 +132,7 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 						FeedbackEvent fedb = new FeedbackEvent(entityID,
 								action, true, FeedbackTypes.CONFLICT_RESOLVED);
 						InternalEvent event = new InternalEvent(
-								EventTypes.UIM_EVENT, "feedback",
+								EventTypes.UI_EVENT, "feedback",
 								"org/societies/useragent/decisionmaker", fedb);
 						try {
 							pesoMgr.publishInternalEvent(event);
@@ -188,7 +188,7 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 					FeedbackEvent fedb = new FeedbackEvent(this.entityID,
 							action, resb, FeedbackTypes.USER_ABORTED);
 					InternalEvent event = new InternalEvent(
-							EventTypes.UIM_EVENT, "feedback",
+							EventTypes.UI_EVENT, "feedback",
 							"org/societies/useragent/decisionmaker", fedb);
 					try {
 						pesoMgr.publishInternalEvent(event);

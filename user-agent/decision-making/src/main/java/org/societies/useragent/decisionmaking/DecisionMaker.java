@@ -173,7 +173,7 @@ public class DecisionMaker extends AbstractDecisionMaker implements
 						FeedbackEvent fedb = new FeedbackEvent(entityID,
 						action, true, FeedbackTypes.IMPLEMENTED);
 						InternalEvent event = new InternalEvent(
-								EventTypes.UIM_EVENT, "feedback",
+								EventTypes.UI_EVENT, "feedback",
 								"org/societies/useragent/decisionmaker", fedb);
 						try {
 							pesoMgr.publishInternalEvent(event);

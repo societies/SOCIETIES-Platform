@@ -76,6 +76,7 @@ public class EventTypes {
 	/** Used by User Agent Montior to publish event relating to use actions. */
 	public static final String UIM_EVENT = "org/societies/useragent/monitoring/newaction";
 	public static final String UIM_STATIC_ACTION = "org/societies/useragent/monitoring/staticaction";
+	public static final String UI_EVENT = "org/societies/useragent/decisionmaker/feedback";
 
 
 	/** Used to notify peers of a failed negotiation */
@@ -96,6 +97,7 @@ public class EventTypes {
 	/** Used by ICO for recommendation messages  	 */
 	public static final String ICO_RECOMMENDTION_EVENT = "org/societies/orchestration/ICO";
 	
+
 	/**
 	 * Used to publish new {@link org.societies.api.privacytrust.trust.model.TrustEvidence trust evidence}
 	 * to the Trust Evidence Collector. The event is structured as follows:
