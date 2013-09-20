@@ -26,7 +26,10 @@
 package org.societies.api.internal.useragent.model;
 
 public class ImpProposalType {
-	
-	public static final int TIMED_ABORT = 0;
+
+    /**
+     * Request that the user either accepts or rejects an option. If the user does nothing within the time limit, the proposal is automatically accepted
+     */
+    public static final int TIMED_ABORT = 0;
 
 }

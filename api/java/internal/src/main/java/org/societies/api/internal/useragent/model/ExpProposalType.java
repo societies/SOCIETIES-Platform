@@ -27,10 +27,25 @@ package org.societies.api.internal.useragent.model;
 
 public class ExpProposalType {
 
+    /**
+     * Display a radio list (the user may select one item from the list of options)
+     */
     public static final int RADIOLIST = 0;
+    /**
+     * Display a checkbox list (the user may select zero, one, or more items from the list of options)
+     */
     public static final int CHECKBOXLIST = 1;
+    /**
+     * Display a yes/no dialog to the user
+     */
     public static final int ACKNACK = 2;
-	public static final int PRIVACY_NEGOTIATION = 3;
-	public static final int PRIVACY_ACCESS_CONTROL = 4;
+    /**
+     * Used for privacy negotiation requests only
+     */
+    public static final int PRIVACY_NEGOTIATION = 3;
+    /**
+     * Used for access control requests only
+     */
+    public static final int PRIVACY_ACCESS_CONTROL = 4;
 
 }
