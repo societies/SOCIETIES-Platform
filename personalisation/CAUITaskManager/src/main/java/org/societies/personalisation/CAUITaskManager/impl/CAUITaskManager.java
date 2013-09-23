@@ -389,8 +389,6 @@ public class CAUITaskManager implements ICAUITaskManager{
 			//System.out.println("situationConext.get(CtxAttributeTypes.HOUR_OF_DAY)");
 			if(situationConext.get(CtxAttributeTypes.HOUR_OF_DAY) instanceof Integer){
 				
-				LOG.debug("situationConext.get(CtxAttributeTypes.HOUR_OF_DAY) instanceof Integer");
-				
 				currentHourOfDayValue = (Integer) situationConext.get(CtxAttributeTypes.HOUR_OF_DAY);
 				//System.out.println("situationConext.get(CtxAttributeTypes.HOUR_OF_DAY) currentHourOfDayValue "+currentHourOfDayValue);
 			}

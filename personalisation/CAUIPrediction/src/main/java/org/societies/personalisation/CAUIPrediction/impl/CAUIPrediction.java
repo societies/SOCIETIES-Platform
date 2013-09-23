@@ -248,12 +248,13 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		} else LOG.info("neither caci, nor caui are able to perform prediction based on action update");
 
+		String predictedActString = "";
 		if(results.size()>0){
-			String predictedActString = "";
+			//String predictedActString = "";
 
 			for(IUserIntentAction predAction : results){
 				this.recordPrediction(predAction);		
-				predictedActString = predAction.toString() +"," +predictedActString; 
+				predictedActString = predAction.toString()+"/confidence:"+predAction.getConfidenceLevel() +"," +predictedActString; 
 			}
 
 			java.util.Map.Entry<String,String> predictionPair = new java.util.AbstractMap.SimpleEntry<String,String>(action.toString(),predictedActString);
@@ -263,7 +264,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 			this.predictionPerformanceLog(endTime-startTime);
 		}
 
-		LOG.info("getPrediction based on action: "+ action+" identity requestor:"+requestor+" results:"+results);
+		LOG.info("getPrediction based on action: "+ action+" identity requestor:"+requestor+" results:"+predictedActString);
 		return new AsyncResult<List<IUserIntentAction>>(results);
 	}
 

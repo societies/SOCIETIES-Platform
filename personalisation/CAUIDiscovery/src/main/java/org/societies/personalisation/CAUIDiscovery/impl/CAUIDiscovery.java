@@ -473,7 +473,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 		for(List<String> actions : dictionary.keySet()){
 			ActionDictObject dicObj = dictionary.get(actions);
 			int occurences = dicObj.getTotalOccurences();
-			System.out.println("Action:"+actions+ "# "+occurences+" | context: "+dicObj.toString());
+			//System.out.println("Action:"+actions+ "# "+occurences+" | context: "+dicObj.toString());
 		}
 	}
 
@@ -665,7 +665,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			List<String> actionNameObjTemp = new ArrayList<String>();
 			String actionName = currentHocData.getServiceId()+"#"+currentHocData.getParameterName()+"#"+currentHocData.getActionValue()+"#"+currentHocData.getServiceType();
 			//LOG.info("action name "+actionName);
-			System.out.println("action name "+actionName);
+			//System.out.println("action name "+actionName);
 			actionNameObjTemp.add(actionName);
 
 			//context
@@ -766,7 +766,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				}
 
 			}
-			System.out.println(" actCtxDictionary :::  "+actCtxDictionary);
+			LOG.debug(" actCtxDictionary :::  "+actCtxDictionary);
 		}
 		
 		

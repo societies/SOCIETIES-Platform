@@ -121,24 +121,29 @@ public class Tester {
 			
 			
 		}
+		
+		
 		//System.out.println("1Tester: set context home free");
 		setContext("home", "Monday",1);
-		Thread.sleep(1000);
-		System.out.println("1Tester: get background colour (red)");
+		logging.info("context set to 'loc=home, dow=Monday,hod=1' ");
+		Thread.sleep(5000);
+		logging.info("1Tester: get background colour (red)");
 		Assert.assertEquals("red", this.helloWorldService.getBackgroundColour(userId));
 		
 		//System.out.println("2Tester: set context work busy");
 		setContext("work", "Wednesday",3);
-		Thread.sleep(1000);
-		System.out.println("2Tester: get background colour (black)");
+		logging.info("context set to 'loc=work, dow=Wednesday,hod=3' ");
+		Thread.sleep(5000);
+		logging.info("2Tester: get background colour (black)");
 		Assert.assertEquals("black", this.helloWorldService.getBackgroundColour(userId));
 	
 	
 		// setting colour to red, predicted action should set volume to 10
-		System.out.println("3Tester: set background colour (red), wait for a prediction based on performed action ");
+		
 		this.helloWorldService.setBackgroundColour(userId, "red");
-		Thread.sleep(2000);
-		System.out.println("3Tester: get Volume ...should be 10 and it is: " +this.helloWorldService.getVolume(userId));
+		logging.info("3Tester: set background colour (red), wait for a prediction based on performed action:setBackgroundColour(userId, 'red') ");
+		Thread.sleep(5000);
+		logging.info("3Tester: get Volume ...should be 10 and it is: " +this.helloWorldService.getVolume(userId));
 		Assert.assertEquals("10", this.helloWorldService.getVolume(userId));
 	
 	}
