@@ -58,8 +58,11 @@ public class SnapshotManager implements CtxChangeEventListener{
 	 */
 	String[] defaultDef = {
 			CtxAttributeTypes.LOCATION_SYMBOLIC, 
-			CtxAttributeTypes.STATUS, 
-			CtxAttributeTypes.TEMPERATURE
+			//CtxAttributeTypes.STATUS, 
+			//CtxAttributeTypes.TEMPERATURE
+		    CtxAttributeTypes.TIME_OF_DAY,
+		    CtxAttributeTypes.DAY_OF_WEEK,
+		    CtxAttributeTypes.HOUR_OF_DAY
 	};
 	/*
 	 * End of definition

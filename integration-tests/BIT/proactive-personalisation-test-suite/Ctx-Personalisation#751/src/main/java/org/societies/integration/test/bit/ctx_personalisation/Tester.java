@@ -43,6 +43,8 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 
@@ -62,7 +64,10 @@ public class Tester {
 	private ICtxBroker ctxBroker;
 	private CtxEntity person;
 	private CtxAttribute symLocAttribute;
-	private CtxAttribute statusAttribute;
+	//private CtxAttribute statusAttribute;
+	private CtxAttribute hodAttribute;
+	private CtxAttribute dowAttribute;
+	
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 
 	public Tester(){
@@ -94,39 +99,53 @@ public class Tester {
 		
 		for (int i=0; i<10; i++){
 			log("Step: "+i);
-			setContext("home", "free");
+			
+			setContext("home", "Monday",1);
 			Thread.sleep(500);
 			this.helloWorldService.setBackgroundColour(userId, "red");
 			Thread.sleep(2500);
-			setContext("home", "busy");
+			
+			setContext("home", "Tuesday",2);
 			Thread.sleep(500);
 			this.helloWorldService.setVolume(userId, "10");
+			
 			Thread.sleep(2500);
-			setContext("work", "busy");
+			setContext("work", "Wednesday",3);
 			Thread.sleep(500);
 			this.helloWorldService.setBackgroundColour(userId, "black");
 			Thread.sleep(2500);
-			setContext("work", "free");
+			setContext("work", "Thursday",4);
 			Thread.sleep(500);
 			this.helloWorldService.setVolume(userId, "50");
 			Thread.sleep(5000);
 			
 			
 		}
+		
+		
 		//System.out.println("1Tester: set context home free");
-		setContext("home", "free");
-		Thread.sleep(1000);
-		//System.out.println("1Tester: get background colour (red)");
+		setContext("home", "Monday",1);
+		logging.info("context set to 'loc=home, dow=Monday,hod=1' ");
+		Thread.sleep(5000);
+		logging.info("1Tester: get background colour (red)");
 		Assert.assertEquals("red", this.helloWorldService.getBackgroundColour(userId));
 		
 		//System.out.println("2Tester: set context work busy");
-		setContext("work", "busy");
-		Thread.sleep(1000);
-		//System.out.println("2Tester: get background colour (black)");
+		setContext("work", "Wednesday",3);
+		logging.info("context set to 'loc=work, dow=Wednesday,hod=3' ");
+		Thread.sleep(5000);
+		logging.info("2Tester: get background colour (black)");
 		Assert.assertEquals("black", this.helloWorldService.getBackgroundColour(userId));
 	
 	
+		// setting colour to red, predicted action should set volume to 10
+		
 		this.helloWorldService.setBackgroundColour(userId, "red");
+		logging.info("3Tester: set background colour (red), wait for a prediction based on performed action:setBackgroundColour(userId, 'red') ");
+		Thread.sleep(5000);
+		logging.info("3Tester: get Volume ...should be 10 and it is: " +this.helloWorldService.getVolume(userId));
+		Assert.assertEquals("10", this.helloWorldService.getVolume(userId));
+	
 	}
 	catch (InterruptedException e) {
 		// TODO Auto-generated catch block
@@ -134,9 +153,47 @@ public class Tester {
 	}
 	
 	}
+
+	
+	
+	private void setContext(String symLocValue, String dowValue, Integer hodValue){
+		try {
+			CtxAttributeIdentifier locAttrId = symLocAttribute.getId();
+			this.symLocAttribute = (CtxAttribute) this.ctxBroker.updateAttribute(locAttrId, symLocValue).get();
+			
+			
+			//the code below was replaced by the call to updateAttribute with the id and value above. 
+			//the code below doesn't work unless a fresh copy of the attribute is retrieved 
+			//this.symLocAttribute.setStringValue(symLocValue);
+			//this.symLocAttribute = (CtxAttribute) this.ctxBroker.update(symLocAttribute).get();
+			
+			CtxAttributeIdentifier dowAttrId = dowAttribute.getId();
+			this.dowAttribute = (CtxAttribute) this.ctxBroker.updateAttribute(dowAttrId, dowValue).get();
+//			this.statusAttribute.setStringValue(statusValue);
+//			this.statusAttribute = (CtxAttribute) this.ctxBroker.update(statusAttribute).get();
+			//logging.debug("changeContext("+symLocValue+", "+dowValue+");");
+
+			CtxAttributeIdentifier hodAttrId = hodAttribute.getId();
+			this.hodAttribute = (CtxAttribute) this.ctxBroker.updateAttribute(hodAttrId, hodValue).get();
+			logging.debug("changeContext("+symLocValue+", "+dowValue+", "+ hodValue+");");
+			
+			
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	
 	
 	
+	/*
 	private void setContext(String symLocValue, String statusValue){
 		try {
 			CtxAttributeIdentifier locAttrId = symLocAttribute.getId();
@@ -165,7 +222,7 @@ public class Tester {
 			e.printStackTrace();
 		}
 	}
-	
+	*/
 	/**
 	 * PreTest setup:
 	 */
@@ -176,7 +233,8 @@ public class Tester {
 	private void setupContext() {
 		this.getPersonEntity();
 		this.getSymLocAttribute();
-		this.getStatusAttribute();
+		this.getDowAttribute();
+		this.getHodAttribute();
 	}
 
 	private void getPersonEntity(){
@@ -215,7 +273,8 @@ public class Tester {
 	private void getSymLocAttribute(){
 		try {
 			
-			Future<List<CtxIdentifier>> futureAttrs = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC);
+			this.userId = idm.getThisNetworkNode();
+			Future<List<CtxIdentifier>> futureAttrs = this.ctxBroker.lookup(this.userId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC);
 			List<CtxIdentifier> attrs = futureAttrs.get();
 			if (attrs.size() == 0){
 				symLocAttribute = this.ctxBroker.createAttribute(person.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC).get();
@@ -245,6 +304,69 @@ public class Tester {
 	}
 	
 	
+	private void getHodAttribute(){
+		try {
+			Future<List<CtxIdentifier>> futureAttrs = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.HOUR_OF_DAY);
+			List<CtxIdentifier> attrs = futureAttrs.get();
+			if (attrs.size() == 0){
+				hodAttribute = this.ctxBroker.createAttribute(person.getId(), CtxAttributeTypes.HOUR_OF_DAY).get();
+			}else{
+				hodAttribute = (CtxAttribute) this.ctxBroker.retrieve(attrs.get(0)).get();
+			}
+			
+			if (hodAttribute==null){
+				log(CtxAttributeTypes.HOUR_OF_DAY+" CtxAttribute is null");
+			}else{
+				log(CtxAttributeTypes.HOUR_OF_DAY+" CtxAttribute - NOT NULL");
+				hodAttribute.setHistoryRecorded(true);
+				hodAttribute = (CtxAttribute) ctxBroker.update(hodAttribute).get();
+			}
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}	
+	
+	
+	
+	
+	private void getDowAttribute(){
+		try {
+			Future<List<CtxIdentifier>> futureAttrs = this.ctxBroker.lookup(person.getId(),CtxModelType.ATTRIBUTE, CtxAttributeTypes.DAY_OF_WEEK);
+			List<CtxIdentifier> attrs = futureAttrs.get();
+			if (attrs.size() == 0){
+				dowAttribute = this.ctxBroker.createAttribute(person.getId(), CtxAttributeTypes.DAY_OF_WEEK).get();
+			}else{
+				dowAttribute = (CtxAttribute) this.ctxBroker.retrieve(attrs.get(0)).get();
+			}
+			
+			if (dowAttribute==null){
+				log(CtxAttributeTypes.DAY_OF_WEEK+" CtxAttribute is null");
+			}else{
+				log(CtxAttributeTypes.DAY_OF_WEEK+" CtxAttribute - NOT NULL");
+				dowAttribute.setHistoryRecorded(true);
+				dowAttribute = (CtxAttribute) ctxBroker.update(dowAttribute).get();
+			}
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}	
+	
+	
+	/*
 	private void getStatusAttribute(){
 		try {
 			Future<List<CtxIdentifier>> futureAttrs = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.STATUS);
@@ -273,7 +395,7 @@ public class Tester {
 			e.printStackTrace();
 		}
 	}	
-	
+	*/
 	
 	private void log(String msg){
 		logging.debug(this.getClass().getName()+": "+msg);
