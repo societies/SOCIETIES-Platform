@@ -1,13 +1,12 @@
 package org.societies.integration.test.bit.communitysign;
 
-import static org.junit.Assert.*;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 
+import org.custommonkey.xmlunit.XMLTestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -16,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.domainauthority.UrlPath;
+import org.societies.api.internal.security.digsig.XmlSignature;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.integration.test.IntegrationTestUtils;
 
@@ -23,7 +23,7 @@ import org.societies.integration.test.IntegrationTestUtils;
  * @author Mitja Vardjan
  *
  */
-public class NominalTestCaseLowerTester {
+public class NominalTestCaseLowerTester extends XMLTestCase {
 	
 	private static Logger LOG = LoggerFactory.getLogger(NominalTestCaseLowerTester.class);
 
@@ -93,46 +93,104 @@ public class NominalTestCaseLowerTester {
 	@Test
 	public void testDocumentUploadDownload() throws Exception {
 
-		String urlStr;
-		int httpCode;
-		
 		LOG.info("[#1879] testDocumentUploadDownload()");
 		LOG.info("[#1879] *** Domain Authority Rest server is required for this test! ***");
 
-		// URL for initial upload
+		test_1_uploadDocument();
+		test_2_downloadOriginalDocument();
+		test_3_downloadDocumentInvalidSig();
+		test_4_mergeDocument();
+		test_5_downloadMergedDocument();
+	}
+	
+	/**
+	 * Initial document upload
+	 * 
+	 * @throws Exception 
+	 */
+	private void test_1_uploadDocument() throws Exception {
+		
 		X509Certificate cert = signatureMgr.getCertificate(identityManager.getThisNetworkNode());
 		String certStr = signatureMgr.cert2str(cert);
-		urlStr = uriForFileUpload(daUrl, path, certStr, identityManager.getThisNetworkNode().getJid());
-		LOG.info("[#1879] testDocumentUploadDownload(): uploading initial document to {}", urlStr);
+		String urlStr = uriForFileUpload(daUrl, path, certStr, identityManager.getThisNetworkNode().getJid());
+		LOG.info("[#1879] test_1_uploadDocument(): uploading initial document to {}", urlStr);
 		URL url = new URL(urlStr);
 		Net net = new Net(url);
-		net.put(path, xml.getBytes(), url.toURI());
+		boolean success = net.put(path, xml.getBytes(), url.toURI());
 		
-		// URL for download
-		urlStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode()));
-		httpCode = getHttpCode(new URL(urlStr));
-		assertEquals(HttpURLConnection.HTTP_OK, httpCode, 0.0);
+		assertTrue(success);
+	}
+	
+	/**
+	 * Download original (not merged yet) document and compare it to the source
+	 * 
+	 * @throws Exception
+	 */
+	private void test_2_downloadOriginalDocument() throws Exception {
 		
-		url = new URL(urlStr);
-		net = new Net(url);
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		net.download(os);
-		byte[] downloaded = os.toByteArray();
-		LOG.info("Size of downloaded xml: {}", downloaded.length);
-		assertEquals(xml, new String(downloaded));
-		os.close();
+		byte[] downloaded = download();
+		assertXMLEqual(xml, new String(downloaded));
+	}
+	
+	/**
+	 * URL with invalid signature => download should be rejected
+	 */
+	private void test_3_downloadDocumentInvalidSig() throws Exception {
 		
-		// URL with invalid signature
+		String urlStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode()));
 		String sigKeyword = UrlPath.URL_PARAM_SIGNATURE + "=";
 		int sigKeywordEnd = urlStr.indexOf(sigKeyword) + sigKeyword.length();
 		String urlStrInvalid = urlStr.substring(0, sigKeywordEnd) + "123456789012345678901234567890" +
 				urlStr.substring(sigKeywordEnd + 30);
-		LOG.info("[#1879] testDocumentUploadDownload(): URL with invalid signature: {}", urlStrInvalid);
+		LOG.info("[#1879] test_3_downloadDocumentInvalidSig(): URL with invalid signature: {}", urlStrInvalid);
+		
 		assertEquals(urlStr.length(), urlStrInvalid.length(), 0.0);
-		httpCode = getHttpCode(new URL(urlStrInvalid));
+		int httpCode = getHttpCode(new URL(urlStrInvalid));
 		assertEquals(HttpURLConnection.HTTP_UNAUTHORIZED, httpCode, 0.0);
 	}
+
+	/**
+	 * Merge new signature into the existing document
+	 */
+	private void test_4_mergeDocument() throws Exception {
+
+		String urlStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode()));
+		LOG.info("[#1879] test_4_mergeDocument(): uploading new document to {}", urlStr);
+		URL url = new URL(urlStr);
+		Net net = new Net(url);
+		boolean success = net.put(path, xml.getBytes(), url.toURI());
+		
+		assertTrue(success);
+	}
 	
+	private void test_5_downloadMergedDocument() throws Exception {
+		byte[] downloaded = download();
+		String downloadedXml = new String(downloaded);
+		assertXMLNotEqual(xml, downloadedXml);
+		assertXMLValid(downloadedXml);
+		assertXpathNotExists(XmlSignature.XML_SIGNATURE_XPATH, xml);
+		assertXpathExists(XmlSignature.XML_SIGNATURE_XPATH, downloadedXml);
+	}
+	
+	private byte[] download() throws Exception {
+		
+		String urlStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode()));
+		int httpCode = getHttpCode(new URL(urlStr));
+		assertEquals(HttpURLConnection.HTTP_OK, httpCode, 0.0);
+		URL url = new URL(urlStr);
+		Net net = new Net(url);
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		net.download(os);
+		byte[] downloaded = os.toByteArray();
+		assertNotNull(downloaded);
+		LOG.info("Size of downloaded xml: {}", downloaded.length);
+		
+		return downloaded;
+	}
+	
+	/**
+	 * URI for file download and file merge
+	 */
 	private String uriForFileDownload(String host, String path, String signature) {
 		
 		String uriStr;

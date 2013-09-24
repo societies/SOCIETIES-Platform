@@ -24,6 +24,8 @@
  */
 package org.societies.domainauthority.rest.control;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
@@ -31,10 +33,13 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.internal.security.digsig.XmlSignature;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.domainauthority.rest.dao.DocumentDao;
 import org.societies.domainauthority.rest.model.Document;
+import org.societies.domainauthority.rest.util.Xml;
+import org.societies.domainauthority.rest.util.XmlException;
 
 /**
  * 
@@ -45,7 +50,7 @@ import org.societies.domainauthority.rest.model.Document;
 public class XmlDocumentAccess {
 
 	private static Logger LOG = LoggerFactory.getLogger(XmlDocumentAccess.class);
-
+	
 	/**
 	 * Key = Relative path in local filesystem, same as Document.getPath()
 	 */
@@ -142,8 +147,10 @@ public class XmlDocumentAccess {
 		X509Certificate cert = sigMgr.ba2cert(certBytes);
 
 		if (sigMgr.verify(path, signature, cert.getPublicKey())) {
-			merge(doc.getXmlDoc(), xml);
+			byte[] merged = merge(doc.getXmlDoc(), xml);
+			doc.setXmlDoc(merged);
 			documentDao.update(doc);
+			LOG.info("XML document merged and stored successfully");
 			return true;
 		}
 		else {
@@ -152,7 +159,21 @@ public class XmlDocumentAccess {
 		}
 	}
 	
-	private static void merge(byte[] oldXml, byte[] newXml) throws DigsigException {
-		// TODO: insert new signatures into old document
+	private static byte[] merge(byte[] oldXml, byte[] newXml) throws DigsigException {
+		
+		ByteArrayInputStream oldIs = new ByteArrayInputStream(oldXml);
+		ByteArrayInputStream newIs = new ByteArrayInputStream(newXml);
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		Xml old;
+		
+		try {
+			old = new Xml(oldIs);
+			int numInsertedNodes = old.addNodeRecursively(newIs, XmlSignature.XML_SIGNATURE_XPATH);
+			LOG.debug("merge: inserted {} new nodes", numInsertedNodes);
+			old.toOutputStream(os);
+			return os.toByteArray();
+		} catch (XmlException e) {
+			throw new DigsigException(e);
+		}
 	}
 }
