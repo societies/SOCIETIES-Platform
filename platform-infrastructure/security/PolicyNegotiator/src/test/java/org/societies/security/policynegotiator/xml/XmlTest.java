@@ -57,9 +57,17 @@ public class XmlTest extends XMLTestCase {
 		InputStream newXml = new ByteArrayInputStream("<?xml version=\"1.0\"?><xml><x><y>foo</y></x></xml>".getBytes());
 		classUnderTest.addNodeRecursively(newXml, "/xml/x/y");
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		assertXMLEqual("testAddNodeRecursively", "<?xml version=\"1.0\"?><xml><a><b></b></a><y>foo</y></xml>", classUnderTest.toString());
+	}
+
+	@Test
+	public void testToOutputStream() throws Exception {
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		classUnderTest.toOutputStream(os);
 		byte[] bytes = os.toByteArray();
-		System.out.println("Xml.toString(): " + classUnderTest.toString());
-		assertXMLEqual("testAddNodeRecursively", "<?xml version=\"1.0\"?><xml><a><b></b></a><y>foo</y></xml>", classUnderTest.toString());
+		String bytesStr = new String(bytes);
+		System.out.println("XML from byte[]: " + bytesStr);
+		System.out.println("XML from toString(): " + classUnderTest.toString());
+		assertXMLEqual("testToOutputStream", bytesStr, classUnderTest.toString());
 	}
 }

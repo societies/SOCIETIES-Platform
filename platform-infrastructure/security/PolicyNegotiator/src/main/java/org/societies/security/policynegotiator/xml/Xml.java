@@ -31,7 +31,6 @@ import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -103,24 +102,6 @@ public class Xml {
 		doc.getDocumentElement().normalize();
 		xpathObj = XPathFactory.newInstance().newXPath();
 	}
-	
-	/**
-	 * Get XML node given with XPath and parse its text contents to get double
-	 * 
-	 * @param xpath
-	 *            The XPath expression
-	 * @return The value in text contents of the node or -1 if the text contents
-	 *         could not be parsed.
-	 */
-	/*
-	 * public double getDouble(String xpath) { String value; double num;
-	 * 
-	 * value = getValue(xpath); try { num = Double.parseDouble(value); } catch
-	 * (NumberFormatException ex) { return -1; } catch (NullPointerException ex)
-	 * { return -1; }
-	 * 
-	 * return num; }
-	 */
 
 	public String getValue(String xpath) {
 		NodeList nodes;
@@ -494,7 +475,6 @@ public class Xml {
 		try {
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.transform(new DOMSource(doc), new StreamResult(os));
 		} catch (TransformerException e) {
 			throw new XmlException(e);
