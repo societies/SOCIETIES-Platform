@@ -24,11 +24,14 @@
  */
 package org.societies.security.policynegotiator.xml;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -72,6 +75,21 @@ public class Xml {
 		try {
 			db = dbf.newDocumentBuilder();
 			doc = db.parse(new InputSource(new StringReader(source)));
+		} catch (Exception ex) {
+			throw new XmlException(ex);
+		}
+		doc.getDocumentElement().normalize();
+		xpathObj = XPathFactory.newInstance().newXPath();
+	}
+
+	public Xml(InputStream source) throws XmlException {
+
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		DocumentBuilder db;
+
+		try {
+			db = dbf.newDocumentBuilder();
+			doc = db.parse(source);
 		} catch (Exception ex) {
 			throw new XmlException(ex);
 		}
@@ -436,5 +454,50 @@ public class Xml {
 			return null;
 		}
 		return attrib.getNodeValue();
+	}
+	
+	/**
+	 * Add nodes from given XML document to this XML document.
+	 * 
+	 * @param newXml source of new nodes
+	 * @param xpath XPath to nodes in newXml to be added
+	 * @throws XmlException
+	 */
+	public void addNodeRecursively(InputStream newXml, String xpath) throws XmlException {
+
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+		try {
+			DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
+	
+			Document newXmlDoc = builder.parse(newXml);
+	
+			NodeList newNodes = getNodes(newXmlDoc, xpath);
+			Node docElement = doc.getDocumentElement();
+			for (int k = 0; k < newNodes.getLength(); k++) {
+				Node firstDocImportedNode = doc.adoptNode(newNodes.item(k));
+				docElement.appendChild(firstDocImportedNode);
+			}
+		} catch (Exception e) {
+			Log.warn("addNodeRecursively", e);
+			throw new XmlException(e);
+		}
+	}
+
+	/**
+	 * Transform current document to given {@link OutputStream}
+	 * 
+	 * @param os
+	 * @throws XmlException
+	 */
+	public void toOutputStream(OutputStream os) throws XmlException {
+		
+		try {
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.transform(new DOMSource(doc), new StreamResult(os));
+		} catch (TransformerException e) {
+			throw new XmlException(e);
+		}
 	}
 }

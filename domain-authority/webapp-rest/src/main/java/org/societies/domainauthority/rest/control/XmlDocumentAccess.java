@@ -142,7 +142,7 @@ public class XmlDocumentAccess {
 		X509Certificate cert = sigMgr.ba2cert(certBytes);
 
 		if (sigMgr.verify(path, signature, cert.getPublicKey())) {
-			// TODO: insert new signature into old document
+			merge(doc.getXmlDoc(), xml);
 			documentDao.update(doc);
 			return true;
 		}
@@ -150,5 +150,9 @@ public class XmlDocumentAccess {
 			LOG.warn("Invalid signature. Merging aborted.");
 			throw new DigsigException("Invalid signature. Merging aborted.");
 		}
+	}
+	
+	private static void merge(byte[] oldXml, byte[] newXml) throws DigsigException {
+		// TODO: insert new signatures into old document
 	}
 }
