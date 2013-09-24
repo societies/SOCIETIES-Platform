@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+<Button android:text="@string/installIdentity" android:id="@+id/buttonMainInstallIdentity" android:layout_height="wrap_content" android:layout_width="match_parent"></Button>
+<Button android:text="@string/testSigning" android:id="@+id/buttonMainSign" android:layout_height="wrap_content" android:layout_width="match_parent"></Button>
+
+<EditText
+    android:id="@+id/editTextMainSignUrl"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ems="10"
+    android:inputType="textUri"
+    android:text="@string/testDefaultUrl"
+    >
+    <requestFocus />
+</EditText>
+
+<Button android:text="@string/testSigningUrl" android:id="@+id/buttonMainSignUrl" android:layout_height="wrap_content" android:layout_width="match_parent"></Button>
+<Button android:text="@string/testVerification" android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/buttonMainVerify"></Button>
+
+</LinearLayout>
