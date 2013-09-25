@@ -65,6 +65,9 @@ public class Document {
 	@Column(name="notificationEndpoint")
 	private String notificationEndpoint;
 	
+	@Column(name="numSigners")
+	private int numSigners;
+	
 	/**
 	 * Default constructor for Hibernate only
 	 */
@@ -76,6 +79,7 @@ public class Document {
 		this.ownerCertSerialized = ServiceClientJarAccess.getSigMgr().cert2ba(ownerCert);
 		this.xmlDoc = xmlDoc;
 		this.notificationEndpoint = notificationEndpoint;
+		this.numSigners = 0;
 	}
 
 	/**
@@ -149,8 +153,22 @@ public class Document {
 		this.notificationEndpoint = notificationEndpoint;
 	}
 	
+	/**
+	 * @return the numSigners
+	 */
+	public int getNumSigners() {
+		return numSigners;
+	}
+
+	/**
+	 * @param numSigners the numSigners to set
+	 */
+	public void setNumSigners(int numSigners) {
+		this.numSigners = numSigners;
+	}
+
 	@Override
 	public String toString() {
-		return "ID: " + id + ", path: " + path;
+		return "ID: " + id + ", path: " + path + ", signed by " + numSigners + " subjects.";
 	}
 }
