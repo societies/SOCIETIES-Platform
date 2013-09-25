@@ -45,9 +45,10 @@ public class UrlPath {
 	public static final String URL_PARAM_SIGNATURE = "sig";
 	
 	/**
-	 * URL parameter. Public key of the uploader of the file (usually the provider).
+	 * URL parameter. Digital certificate of the uploader of the file (usually the provider).
+	 * Should include only the public key.
 	 */
-	public static final String URL_PARAM_PUB_KEY = "pubkey";
+	public static final String URL_PARAM_CERT = "cert";
 	
 	/**
 	 * URL parameter. ID of the service, not a service instance.
@@ -63,11 +64,6 @@ public class UrlPath {
 	 * Path for servlet that serves files.
 	 */
 	public static final String PATH_FILES = "/serviceclient";
-	
-	/**
-	 * Path for servlet for uploading provider's digital certificate.
-	 */
-	public static final String PATH_PUB_KEY = "/pubkey";
 	
 	/**
 	 * Path for servlet that serves xml documents.

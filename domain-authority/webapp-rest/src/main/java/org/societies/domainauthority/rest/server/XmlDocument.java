@@ -123,7 +123,7 @@ public class XmlDocument extends HttpServlet {
 	public void doPut(HttpServletRequest request, HttpServletResponse response) {
 		
 		String path = request.getPathInfo().replaceFirst("/", "");
-		String cert = request.getParameter(UrlPath.URL_PARAM_PUB_KEY);
+		String cert = request.getParameter(UrlPath.URL_PARAM_CERT);
 		String endpoint = request.getParameter(UrlPath.URL_PARAM_NOTIFICATION_ENDPOINT);
 		String signature = request.getParameter(UrlPath.URL_PARAM_SIGNATURE);
 

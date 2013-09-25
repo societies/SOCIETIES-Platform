@@ -235,16 +235,16 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		return uriStr;
 	}
 	
-	private String uriForFileUpload(String host, String path, String pubkey, String notificationEndpoint) {
+	private String uriForFileUpload(String host, String path, String cert, String notificationEndpoint) {
 		
 		String uriStr;
 
 		LOG.debug("uriForFileUpload({}, {}, ...)", host, path);
 
-		pubkey = UrlParamName.base64ToUrl(pubkey);
+		cert = UrlParamName.base64ToUrl(cert);
 		
 		uriStr = host + UrlPath.BASE + UrlPath.PATH_XML_DOCUMENTS + "/" + path.replaceAll(".*/", "") +
-				"?" + UrlPath.URL_PARAM_PUB_KEY + "=" + pubkey +
+				"?" + UrlPath.URL_PARAM_CERT + "=" + cert +
 				"&" + UrlPath.URL_PARAM_NOTIFICATION_ENDPOINT + "=" + notificationEndpoint; 
 
 		LOG.debug("uriForFileUpload(): uri = {}", uriStr);

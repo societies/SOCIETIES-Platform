@@ -293,17 +293,17 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 		return uriStr;
 	}
 	
-	private String uriForFileUpload(String host, String filePath, URI serviceId, String pubkey) {
+	private String uriForFileUpload(String host, String filePath, URI serviceId, String cert) {
 		
 		String uriStr;
 
 		LOG.debug("uriForFileUpload({}, {}, ...)", host, filePath);
 
-		pubkey = UrlParamName.base64ToUrl(pubkey);
+		cert = UrlParamName.base64ToUrl(cert);
 		
 		uriStr = host + UrlPath.BASE + UrlPath.PATH_FILES + "/" + filePath.replaceAll(".*/", "") +
 				"?" + UrlPath.URL_PARAM_FILE + "=" + filePath +
-				"&" + UrlPath.URL_PARAM_PUB_KEY + "=" + pubkey + 
+				"&" + UrlPath.URL_PARAM_CERT + "=" + cert + 
 				"&" + UrlPath.URL_PARAM_SERVICE_ID + "=" + serviceId.toASCIIString();
 
 		LOG.debug("uriForFileUpload(): uri = {}", uriStr);
