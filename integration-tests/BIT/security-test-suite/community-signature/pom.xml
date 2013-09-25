@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.societies.integration.test</groupId>
 	<artifactId>bit.da_rest.community_signature</artifactId>
-	<name>#1879 Test community signature</name>
+	<name>#2165 Test community signature</name>
 	<packaging>bundle</packaging>
 	<version>${release.version}</version>
 

@@ -41,8 +41,10 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	private static final String id1 = "id1";
 	private static final String xml = "<?xml version = \"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
 			+ "<xml><node1 Id='" + id1 + "'>abc</node1></xml>";
-	private static final String xmlSigned = "<?xml version = \"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+	private static final String xmlSigned1 = "<?xml version = \"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
 			+ "<xml><node1 Id='" + id1 + "'>abc</node1><Signature>foo</Signature></xml>";
+	private static final String xmlSigned2 = "<?xml version = \"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+			+ "<xml><node1 Id='" + id1 + "'>abc</node1><Signature>bar</Signature></xml>";
 	private static final String path = "foo.xml";
 	
 	/**
@@ -65,16 +67,16 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	@BeforeClass
 	public static void initialization() throws Exception {
 		
-		LOG.info("[#1879] Initialization");
-		LOG.info("[#1879] Prerequisite: The CSS is created");
-		LOG.info("[#1879] Prerequisite: The user is logged to the CSS");
+		LOG.info("[#2165] Initialization");
+		LOG.info("[#2165] Prerequisite: The CSS is created");
+		LOG.info("[#2165] Prerequisite: The user is logged to the CSS");
 		
-		daUrl = TestCase1001.getDaUrl();
+		daUrl = TestCase2165.getDaUrl();
 		
-		signatureMgr = TestCase1001.getSignatureMgr();
+		signatureMgr = TestCase2165.getSignatureMgr();
 		assertNotNull(signatureMgr);
 		
-		identityManager = TestCase1001.getIdentityManager();
+		identityManager = TestCase2165.getIdentityManager();
 		assertNotNull(identityManager);
 	}
 
@@ -84,7 +86,7 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		LOG.info("[#1879] NominalTestCaseLowerTester::setUp");
+		LOG.info("[#2165] NominalTestCaseLowerTester::setUp");
 		initialization();  // The method is not called automatically despite @BeforeClass annotation
 		deletePreviousDocument();
 	}
@@ -94,14 +96,14 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	 */
 	@After
 	public void tearDown() {
-		LOG.info("[#1879] tearDown");
+		LOG.info("[#2165] tearDown");
 	}
 	
 	@Test
 	public void testDocumentUploadDownload() throws Exception {
 
-		LOG.info("[#1879] testDocumentUploadDownload()");
-		LOG.info("[#1879] *** Domain Authority Rest server is required for this test! ***");
+		LOG.info("[#2165] testDocumentUploadDownload()");
+		LOG.info("[#2165] *** Domain Authority Rest server is required for this test! ***");
 
 		t1_uploadDocument();
 		t2_downloadOriginalDocument();
@@ -112,7 +114,7 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	
 	private void deletePreviousDocument() throws Exception {
 		String urlStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode()));
-		LOG.info("[#1879] deletePreviousDocument(): deleting previous document at {}", urlStr);
+		LOG.info("[#2165] deletePreviousDocument(): deleting previous document at {}", urlStr);
 		URL url = new URL(urlStr);
 		Net net = new Net(url);
 		net.delete();
@@ -129,12 +131,17 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		X509Certificate cert = signatureMgr.getCertificate(id);
 		String certStr = signatureMgr.cert2str(cert);
 		String urlStr = uriForFileUpload(daUrl, path, certStr, identityManager.getThisNetworkNode().getJid());
-		LOG.info("[#1879] t1_uploadDocument(): uploading initial document to {}", urlStr);
+		LOG.info("[#2165] t1_uploadDocument(): uploading initial document to {}", urlStr);
 		URL url = new URL(urlStr);
 		Net net = new Net(url);
-		boolean success = net.put(path, xml.getBytes(), url.toURI());
+		boolean success;
 		
+		success = net.put(path, xml.getBytes(), url.toURI());
 		assertTrue(success);
+		
+		// The file already exists, should get an error
+		success = net.put(path, xml.getBytes(), url.toURI());
+		assertFalse(success);
 	}
 	
 	/**
@@ -158,7 +165,7 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		int sigKeywordEnd = urlStr.indexOf(sigKeyword) + sigKeyword.length();
 		String urlStrInvalid = urlStr.substring(0, sigKeywordEnd) + "123456789012345678901234567890" +
 				urlStr.substring(sigKeywordEnd + 30);
-		LOG.info("[#1879] t3_downloadDocumentInvalidSig(): URL with invalid signature: {}", urlStrInvalid);
+		LOG.info("[#2165] t3_downloadDocumentInvalidSig(): URL with invalid signature: {}", urlStrInvalid);
 		
 		assertEquals(urlStr.length(), urlStrInvalid.length(), 0.0);
 		int httpCode = getHttpCode(new URL(urlStrInvalid));
@@ -171,11 +178,14 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	private void t4_mergeDocument() throws Exception {
 
 		String urlStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode()));
-		LOG.info("[#1879] t4_mergeDocument(): uploading new document to {}", urlStr);
+		LOG.info("[#2165] t4_mergeDocument(): uploading new document to {}", urlStr);
 		URL url = new URL(urlStr);
 		Net net = new Net(url);
-		boolean success = net.put(path, xmlSigned.getBytes(), url.toURI());
+		boolean success;
 		
+		success = net.put(path, xmlSigned1.getBytes(), url.toURI());
+		assertTrue(success);
+		success = net.put(path, xmlSigned2.getBytes(), url.toURI());
 		assertTrue(success);
 	}
 	
@@ -185,6 +195,10 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		assertXMLNotEqual(xml, downloadedXml);
 		assertXpathNotExists(XmlSignature.XML_SIGNATURE_XPATH, xml);
 		assertXpathExists(XmlSignature.XML_SIGNATURE_XPATH, downloadedXml);
+		assertXpathEvaluatesTo("0", "count(/xml/Signature)",xml);
+		assertXpathEvaluatesTo("2", "count(/xml/Signature)",downloadedXml);
+		assertXpathEvaluatesTo("foo", "/xml/Signature[1]",downloadedXml);
+		assertXpathEvaluatesTo("bar", "/xml/Signature[2]",downloadedXml);
 	}
 	
 	private byte[] download() throws Exception {

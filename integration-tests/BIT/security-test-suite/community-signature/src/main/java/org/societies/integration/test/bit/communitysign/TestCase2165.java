@@ -14,19 +14,19 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.integration.test.IntegrationTestCase;
 
-public class TestCase1001 extends IntegrationTestCase {
-	private static Logger LOG = LoggerFactory.getLogger(TestCase1001.class);
+public class TestCase2165 extends IntegrationTestCase {
+	private static Logger LOG = LoggerFactory.getLogger(TestCase2165.class);
 
 	private static String daUrl;
 	private static ISignatureMgr signatureMgr;
 	private static ICommManager commManager;
 	
-	public TestCase1001() {
+	public TestCase2165() {
 		// Call the super constructor
 		// with test case number
 		// and test case classes to run
-		//super(1879, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
-		super(1879, new Class[] {NominalTestCaseLowerTester.class});
+		//super(2165, new Class[] {SpecificTestCaseUpperTester.class, NominalTestCaseLowerTester.class});
+		super(2165, new Class[] {NominalTestCaseLowerTester.class});
 		NominalTestCaseLowerTester.testCaseNumber = 1001;
 	}
 	
@@ -41,7 +41,7 @@ public class TestCase1001 extends IntegrationTestCase {
 	 * @param daUrl the daUrl to set
 	 */
 	public void setDaUrl(String daUrl) {
-		TestCase1001.daUrl = daUrl;
+		TestCase2165.daUrl = daUrl;
 		LOG.debug("setDaUrl({})", daUrl);
 	}
 
@@ -56,7 +56,7 @@ public class TestCase1001 extends IntegrationTestCase {
 	 * @param signatureMgr the signatureMgr to set
 	 */
 	public void setSignatureMgr(ISignatureMgr signatureMgr) {
-		TestCase1001.signatureMgr = signatureMgr;
+		TestCase2165.signatureMgr = signatureMgr;
 		LOG.debug("setSignatureMgr({})", signatureMgr);
 	}
 
@@ -64,7 +64,7 @@ public class TestCase1001 extends IntegrationTestCase {
 	 * @param commManager the commManager to set
 	 */
 	public void setCommManager(ICommManager commManager) {
-		TestCase1001.commManager = commManager;
+		TestCase2165.commManager = commManager;
 		LOG.debug("setCommManager({})", commManager);
 	}
 	
