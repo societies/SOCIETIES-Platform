@@ -126,9 +126,13 @@ public class XmlDocument extends HttpServlet {
 		String cert = request.getParameter(UrlPath.URL_PARAM_CERT);
 		String endpoint = request.getParameter(UrlPath.URL_PARAM_NOTIFICATION_ENDPOINT);
 		String signature = request.getParameter(UrlPath.URL_PARAM_SIGNATURE);
+		String numSignersThreshold = request.getParameter(UrlPath.URL_PARAM_NUM_SIGNERS_THRESHOLD);
 
-		LOG.info("HTTP PUT from {}; path = {}, endpoint = " + endpoint + ", pubKey = " +
-				cert + ", signature = " + signature, request.getRemoteHost(), path);
+		LOG.info("HTTP PUT from {}; path = {}, endpoint = " + endpoint +
+				", minNumSigners = " + numSignersThreshold +
+				", cert = " + cert +
+				", signature = " + signature,
+				request.getRemoteHost(), path);
 
 		int status;
 		InputStream is;
@@ -141,8 +145,18 @@ public class XmlDocument extends HttpServlet {
 		}
 		
 		if (path != null && cert != null && endpoint != null) {
-			status = putNewDocument(path, cert, endpoint, is);
+			// The uploader is putting a new document
+			int minNumSigners = Integer.MAX_VALUE;
+			if (numSignersThreshold != null) {
+				try {
+					minNumSigners = Integer.parseInt(numSignersThreshold);
+				} catch (Exception e) {
+					LOG.warn("Bad parameter: {} = {}", UrlPath.URL_PARAM_NUM_SIGNERS_THRESHOLD, numSignersThreshold);
+				}
+			}
+			status = putNewDocument(path, cert, endpoint, minNumSigners, is);
 		} else if (path != null && signature != null) {
+			// The uploader is putting a document to be merged with existing document
 			status = mergeDocument(path, signature, is);
 		} else {
 			status = HttpServletResponse.SC_BAD_REQUEST;
@@ -212,7 +226,7 @@ public class XmlDocument extends HttpServlet {
 		throw new DaRestException("No payload found in HTTP request");
 	}
 	
-	private int putNewDocument(String path, String cert, String endpoint, InputStream is) {
+	private int putNewDocument(String path, String cert, String endpoint, int minNumSigners, InputStream is) {
 
 		cert = UrlParamName.url2Base64(cert);
 		LOG.debug("HTTP PUT: cert fixed to {}", cert);
@@ -226,7 +240,7 @@ public class XmlDocument extends HttpServlet {
 		}
 		try {
 			byte[] xml = IOUtils.toByteArray(is);
-			XmlDocumentAccess.addDocument(path, cert, xml, endpoint);
+			XmlDocumentAccess.addDocument(path, cert, xml, endpoint, minNumSigners);
 			return HttpServletResponse.SC_OK;
 		} catch (IOException e) {
 			LOG.warn("Could not write document {}", path, e);

@@ -61,6 +61,11 @@ public class UrlPath {
 	public static final String URL_PARAM_NOTIFICATION_ENDPOINT = "endpoint";
 	
 	/**
+	 * URL parameter. Minimal number of signatures (threshold) for notifying the uploader about future sign events.
+	 */
+	public static final String URL_PARAM_NUM_SIGNERS_THRESHOLD = "minnumsig";
+
+	/**
 	 * Path for servlet that serves files.
 	 */
 	public static final String PATH_FILES = "/serviceclient";

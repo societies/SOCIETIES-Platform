@@ -39,6 +39,7 @@ import org.societies.api.security.xml.Xml;
 import org.societies.api.security.xml.XmlException;
 import org.societies.domainauthority.rest.dao.DocumentDao;
 import org.societies.domainauthority.rest.model.Document;
+import org.societies.domainauthority.rest.util.RemoteNotification;
 
 /**
  * 
@@ -106,10 +107,11 @@ public class XmlDocumentAccess {
 		}
 	}
 	
-	public static void addDocument(String path, String certStr, byte[] xml, String notificationEndpoint) throws DigsigException {
+	public static void addDocument(String path, String certStr, byte[] xml, String notificationEndpoint,
+			int minNumSigners) throws DigsigException {
 		
 		X509Certificate cert = sigMgr.str2cert(certStr);
-		Document doc = new Document(path, cert, xml, notificationEndpoint);
+		Document doc = new Document(path, cert, xml, notificationEndpoint, minNumSigners);
 		
 		documentDao.save(doc);
 	}
@@ -143,8 +145,11 @@ public class XmlDocumentAccess {
 				// CN from the certificate should be checked if this is not the case.
 				doc.setNumSigners(doc.getNumSigners() + 1);
 				documentDao.update(doc);
+				LOG.info("XML document merged and stored successfully");
+				if (doc.getNumSigners() >= doc.getMinNumSigners()) {
+					RemoteNotification.notifyOriginalUploader(doc);
+				}
 			}
-			LOG.info("XML document merged and stored successfully");
 			return true;
 		}
 		else {

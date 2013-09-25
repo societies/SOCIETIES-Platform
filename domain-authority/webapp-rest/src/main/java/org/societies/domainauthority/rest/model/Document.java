@@ -68,17 +68,22 @@ public class Document {
 	@Column(name="numSigners")
 	private int numSigners;
 	
+	@Column(name="minNumSigners")
+	private int minNumSigners;
+	
 	/**
 	 * Default constructor for Hibernate only
 	 */
 	public Document() {
 	}
 	
-	public Document(String path, X509Certificate ownerCert, byte[] xmlDoc, String notificationEndpoint) throws DigsigException {
+	public Document(String path, X509Certificate ownerCert, byte[] xmlDoc, String notificationEndpoint,
+			int minNumSigners) throws DigsigException {
 		this.path = path;
 		this.ownerCertSerialized = ServiceClientJarAccess.getSigMgr().cert2ba(ownerCert);
 		this.xmlDoc = xmlDoc;
 		this.notificationEndpoint = notificationEndpoint;
+		this.minNumSigners = minNumSigners;
 		this.numSigners = 0;
 	}
 
@@ -167,8 +172,24 @@ public class Document {
 		this.numSigners = numSigners;
 	}
 
+	/**
+	 * @return the minNumSigners
+	 */
+	public int getMinNumSigners() {
+		return minNumSigners;
+	}
+
+	/**
+	 * @param minNumSigners the minNumSigners to set
+	 */
+	public void setMinNumSigners(int minNumSigners) {
+		this.minNumSigners = minNumSigners;
+	}
+
 	@Override
 	public String toString() {
-		return "ID: " + id + ", path: " + path + ", signed by " + numSigners + " subjects.";
+		return "ID: " + id +
+				", path: " + path +
+				", signed by " + numSigners + " (min " + minNumSigners + ")" + " subjects.";
 	}
 }

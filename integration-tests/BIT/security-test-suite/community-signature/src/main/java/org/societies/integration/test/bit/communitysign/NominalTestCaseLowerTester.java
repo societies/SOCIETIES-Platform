@@ -132,7 +132,9 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		IIdentity id = identityManager.getThisNetworkNode();
 		X509Certificate cert = signatureMgr.getCertificate(id);
 		String certStr = signatureMgr.cert2str(cert);
-		String urlStr = uriForFileUpload(daUrl, path, certStr, identityManager.getThisNetworkNode().getJid());
+//		String notificationEndpoint = identityManager.getThisNetworkNode().getJid();
+		String notificationEndpoint = "http://localhost/tmp/societies/foo";
+		String urlStr = uriForFileUpload(daUrl, path, certStr, notificationEndpoint);
 		LOG.info("[#2165] t1_uploadDocument(): uploading initial document to {}", urlStr);
 		URL url = new URL(urlStr);
 		Net net = new Net(url);
@@ -245,7 +247,8 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		
 		uriStr = host + UrlPath.BASE + UrlPath.PATH_XML_DOCUMENTS + "/" + path.replaceAll(".*/", "") +
 				"?" + UrlPath.URL_PARAM_CERT + "=" + cert +
-				"&" + UrlPath.URL_PARAM_NOTIFICATION_ENDPOINT + "=" + notificationEndpoint; 
+				"&" + UrlPath.URL_PARAM_NOTIFICATION_ENDPOINT + "=" + notificationEndpoint +
+				"&" + UrlPath.URL_PARAM_NUM_SIGNERS_THRESHOLD + "=" + 2; 
 
 		LOG.debug("uriForFileUpload(): uri = {}", uriStr);
 		return uriStr;
