@@ -29,11 +29,10 @@
     </bean>
 
     <bean id="decisionMaker"
-          class="org.societies.useragent.decisionmaking.DecisionMaker"
-          name="dm"
-          depends-on="conflictResolutionManager,userFeedback">
-        <property name="manager" ref="conflictResolutionManager"/>
+          class="org.societies.useragent.decisionmaking.DecisionMaker">
         <property name="feedbackHandler" ref="userFeedback"/>
+        <property name="eventMgr" ref="eventManager"/>
+        <property name="commMgr" ref="commsManager" />
     </bean>
 
     <bean id="conflictResolutionManager"
