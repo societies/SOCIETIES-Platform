@@ -28,8 +28,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,12 +49,6 @@ public class XmlDocumentAccess {
 
 	private static Logger LOG = LoggerFactory.getLogger(XmlDocumentAccess.class);
 	
-	/**
-	 * Key = Relative path in local filesystem, same as Document.getPath()
-	 */
-	// TODO: do not preload all docs
-	private static HashMap<String, Document> documents = new HashMap<String, Document>();
-
 	private static ISignatureMgr sigMgr;
 	private static DocumentDao documentDao;
 
@@ -68,16 +60,6 @@ public class XmlDocumentAccess {
 	public void init() {
 
 		LOG.debug("init()");
-
-		List<Document> documentList = documentDao.getAll();
-		
-		if (documentList != null) {
-			LOG.debug("Loading document list from previous run");
-			for (Document r : documentList) {
-				documents.put(r.getPath(), r);
-				LOG.debug("Loaded document [{}] {}", r.getId(), r.getPath());
-			}
-		}
 	}
 
 	public static DocumentDao getDocumentDao() {
@@ -103,23 +85,24 @@ public class XmlDocumentAccess {
 			return false;
 		}
 		
-		for (Document r : documents.values()) {
-			if (r.getPath().equals(filePath)) {
-				LOG.debug("isAuthorized(): file {} found", filePath);
-				byte[] certBytes = r.getOwnerCertSerialized();
-				X509Certificate cert;
-				try {
-					cert = sigMgr.ba2cert(certBytes);
-				} catch (DigsigException e) {
-					LOG.warn("Could not reconstruct certificate for file {} from {}", filePath, certBytes);
-					return false;
-				}
-				PublicKey publicKey = cert.getPublicKey();
-				return sigMgr.verify(filePath, signature, publicKey);
+		Document document = documentDao.get(filePath);
+		if (document != null) {
+			LOG.debug("isAuthorized(): file {} found", filePath);
+			byte[] certBytes = document.getOwnerCertSerialized();
+			X509Certificate cert;
+			try {
+				cert = sigMgr.ba2cert(certBytes);
+			} catch (DigsigException e) {
+				LOG.warn("Could not reconstruct certificate for file {} from {}", filePath, certBytes);
+				return false;
 			}
+			PublicKey publicKey = cert.getPublicKey();
+			return sigMgr.verify(filePath, signature, publicKey);
 		}
-		LOG.debug("isAuthorized(): file {} NOT found", filePath);
-		return false;
+		else {
+			LOG.debug("isAuthorized(): file {} NOT found", filePath);
+			return false;
+		}
 	}
 	
 	public static void addDocument(String path, String certStr, byte[] xml, String notificationEndpoint) throws DigsigException {
@@ -127,7 +110,6 @@ public class XmlDocumentAccess {
 		X509Certificate cert = sigMgr.str2cert(certStr);
 		Document doc = new Document(path, cert, xml, notificationEndpoint);
 		
-		documents.put(doc.getPath(), doc);
 		documentDao.save(doc);
 	}
 	

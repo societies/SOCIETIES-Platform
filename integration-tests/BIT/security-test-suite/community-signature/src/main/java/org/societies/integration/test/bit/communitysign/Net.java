@@ -29,9 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.servlet.http.HttpServletResponse;
@@ -71,20 +69,6 @@ public class Net {
 		
 		LOG.debug("delete() {}", source);
 		
-//		try {
-//			HttpURLConnection httpCon = (HttpURLConnection) source.openConnection();
-//			httpCon.setDoOutput(true);
-//			httpCon.setRequestProperty(
-//			    "Content-Type", "application/x-www-form-urlencoded" );
-//			httpCon.setRequestMethod("DELETE");
-//			httpCon.connect();
-//			httpCon.getInputStream();
-//			return true;
-//		} catch (Exception e) {
-//			LOG.warn("delete", e);
-//			return false;
-//		}
-
 		boolean success = false;
 		HttpClient httpclient = new DefaultHttpClient();
 		try {

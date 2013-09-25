@@ -95,6 +95,7 @@ public class ResourceDao {
 			session = sessionFactory.openSession();
 			
 			session.delete(object);
+			session.flush();
 			
 //			Query query = session.createQuery("SELECT foo FROM foo WHERE id = :myId");
 //			query.setParameter("myId", object.getId());

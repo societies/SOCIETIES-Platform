@@ -148,4 +148,9 @@ public class Document {
 	public void setNotificationEndpoint(String notificationEndpoint) {
 		this.notificationEndpoint = notificationEndpoint;
 	}
+	
+	@Override
+	public String toString() {
+		return "ID: " + id + ", path: " + path;
+	}
 }

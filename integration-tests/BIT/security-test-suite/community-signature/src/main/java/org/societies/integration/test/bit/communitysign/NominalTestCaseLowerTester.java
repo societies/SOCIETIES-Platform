@@ -39,7 +39,10 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	private static IIdentityManager identityManager;
 	
 	private static final String id1 = "id1";
-	private static final String xml = "<xml><node1 Id='" + id1 + "'>abc</node1></xml>";
+	private static final String xml = "<?xml version = \"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+			+ "<xml><node1 Id='" + id1 + "'>abc</node1></xml>";
+	private static final String xmlSigned = "<?xml version = \"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+			+ "<xml><node1 Id='" + id1 + "'>abc</node1><Signature>foo</Signature></xml>";
 	private static final String path = "foo.xml";
 	
 	/**
@@ -171,7 +174,7 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		LOG.info("[#1879] t4_mergeDocument(): uploading new document to {}", urlStr);
 		URL url = new URL(urlStr);
 		Net net = new Net(url);
-		boolean success = net.put(path, xml.getBytes(), url.toURI());  // TODO: add signature
+		boolean success = net.put(path, xmlSigned.getBytes(), url.toURI());
 		
 		assertTrue(success);
 	}
@@ -180,7 +183,6 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		byte[] downloaded = download();
 		String downloadedXml = new String(downloaded);
 		assertXMLNotEqual(xml, downloadedXml);
-		assertXMLValid(downloadedXml);
 		assertXpathNotExists(XmlSignature.XML_SIGNATURE_XPATH, xml);
 		assertXpathExists(XmlSignature.XML_SIGNATURE_XPATH, downloadedXml);
 	}

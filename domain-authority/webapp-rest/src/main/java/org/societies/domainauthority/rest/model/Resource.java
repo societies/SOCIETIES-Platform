@@ -111,4 +111,9 @@ public class Resource {
 	public void setOwnerCertSerialized(byte[] ownerKeySerialized) {
 		this.ownerCertSerialized = ownerKeySerialized;
 	}
+	
+	@Override
+	public String toString() {
+		return "ID: " + id + ", path: " + path;
+	}
 }

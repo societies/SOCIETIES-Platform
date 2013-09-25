@@ -96,6 +96,8 @@ public class DocumentDao {
 	 */
 	public Document get(String path) throws HibernateException {
 		
+		log.debug("get: {}", path);
+
 		Session session = null;
 		Document result;
 		
@@ -114,17 +116,22 @@ public class DocumentDao {
 				session.close();
 			}
 		}
+		log.debug("get: returning object {}", result);
 		return result;
 	}
 
 	public void delete(Document object) throws HibernateException {
 		
+		log.info("delete: {}", object);
+
 		Session session = null;
 		
 		try {
 			session = sessionFactory.openSession();
 			
 			session.delete(object);
+			session.flush();
+			log.info("Object {} deleted", object);
 			
 //			Query query = session.createQuery("SELECT foo FROM foo WHERE id = :myId");
 //			query.setParameter("myId", object.getId());
@@ -140,6 +147,8 @@ public class DocumentDao {
 	}
 
 	public void save(Document object) throws HibernateException {
+
+		log.info("save: {}", object);
 
 		Session session = null;
 		Transaction t = null;
@@ -168,6 +177,8 @@ public class DocumentDao {
 	
 	public boolean update(Document object) throws HibernateException {
 	
+		log.info("update: {}", object);
+
 		boolean returnedStatus = false;
 		Session session = null;
 		Transaction t = null;
