@@ -62,7 +62,6 @@ public class DocumentDao {
 		this.sessionFactory = sessionFactory;
 	}
 
-	// TODO: If large XML documents or large number of documents are expected, do not store everything in memory
 	public List<Document> getAll() throws HibernateException {
 		
 		Session session = null;

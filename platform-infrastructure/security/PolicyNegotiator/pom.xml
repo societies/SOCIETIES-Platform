@@ -59,9 +59,6 @@
 
 	<dependencies>
 
-
-
-
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
@@ -94,7 +91,7 @@
 			<version>${version.comm}</version>
 			<scope>provided</scope>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>com.springsource.org.apache.httpcomponents.httpmime</artifactId>
@@ -115,13 +112,6 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>xmlunit</groupId>
-			<artifactId>xmlunit</artifactId>
-			<version>1.2</version>
-			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
 			<version>1.9.0</version>
@@ -132,8 +122,6 @@
 
 	<build>
 		<plugins>
-
-
 
 			<plugin>
 				<groupId>org.apache.felix</groupId>

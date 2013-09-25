@@ -13,9 +13,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.internal.security.digsig.XmlSignature;
+import org.societies.api.internal.security.util.UrlParamName;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.integration.test.IntegrationTestUtils;
 
@@ -78,8 +80,10 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	 * Verify that the service is installed
 	 */
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		LOG.info("[#1879] NominalTestCaseLowerTester::setUp");
+		initialization();  // The method is not called automatically despite @BeforeClass annotation
+		deletePreviousDocument();
 	}
 
 	/**
@@ -96,11 +100,19 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		LOG.info("[#1879] testDocumentUploadDownload()");
 		LOG.info("[#1879] *** Domain Authority Rest server is required for this test! ***");
 
-		test_1_uploadDocument();
-		test_2_downloadOriginalDocument();
-		test_3_downloadDocumentInvalidSig();
-		test_4_mergeDocument();
-		test_5_downloadMergedDocument();
+		t1_uploadDocument();
+		t2_downloadOriginalDocument();
+		t3_downloadDocumentInvalidSig();
+		t4_mergeDocument();
+		t5_downloadMergedDocument();
+	}
+	
+	private void deletePreviousDocument() throws Exception {
+		String urlStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode()));
+		LOG.info("[#1879] deletePreviousDocument(): deleting previous document at {}", urlStr);
+		URL url = new URL(urlStr);
+		Net net = new Net(url);
+		net.delete();
 	}
 	
 	/**
@@ -108,12 +120,13 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	 * 
 	 * @throws Exception 
 	 */
-	private void test_1_uploadDocument() throws Exception {
+	private void t1_uploadDocument() throws Exception {
 		
-		X509Certificate cert = signatureMgr.getCertificate(identityManager.getThisNetworkNode());
+		IIdentity id = identityManager.getThisNetworkNode();
+		X509Certificate cert = signatureMgr.getCertificate(id);
 		String certStr = signatureMgr.cert2str(cert);
 		String urlStr = uriForFileUpload(daUrl, path, certStr, identityManager.getThisNetworkNode().getJid());
-		LOG.info("[#1879] test_1_uploadDocument(): uploading initial document to {}", urlStr);
+		LOG.info("[#1879] t1_uploadDocument(): uploading initial document to {}", urlStr);
 		URL url = new URL(urlStr);
 		Net net = new Net(url);
 		boolean success = net.put(path, xml.getBytes(), url.toURI());
@@ -126,7 +139,7 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	 * 
 	 * @throws Exception
 	 */
-	private void test_2_downloadOriginalDocument() throws Exception {
+	private void t2_downloadOriginalDocument() throws Exception {
 		
 		byte[] downloaded = download();
 		assertXMLEqual(xml, new String(downloaded));
@@ -135,14 +148,14 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	/**
 	 * URL with invalid signature => download should be rejected
 	 */
-	private void test_3_downloadDocumentInvalidSig() throws Exception {
+	private void t3_downloadDocumentInvalidSig() throws Exception {
 		
 		String urlStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode()));
 		String sigKeyword = UrlPath.URL_PARAM_SIGNATURE + "=";
 		int sigKeywordEnd = urlStr.indexOf(sigKeyword) + sigKeyword.length();
 		String urlStrInvalid = urlStr.substring(0, sigKeywordEnd) + "123456789012345678901234567890" +
 				urlStr.substring(sigKeywordEnd + 30);
-		LOG.info("[#1879] test_3_downloadDocumentInvalidSig(): URL with invalid signature: {}", urlStrInvalid);
+		LOG.info("[#1879] t3_downloadDocumentInvalidSig(): URL with invalid signature: {}", urlStrInvalid);
 		
 		assertEquals(urlStr.length(), urlStrInvalid.length(), 0.0);
 		int httpCode = getHttpCode(new URL(urlStrInvalid));
@@ -152,18 +165,18 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	/**
 	 * Merge new signature into the existing document
 	 */
-	private void test_4_mergeDocument() throws Exception {
+	private void t4_mergeDocument() throws Exception {
 
 		String urlStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode()));
-		LOG.info("[#1879] test_4_mergeDocument(): uploading new document to {}", urlStr);
+		LOG.info("[#1879] t4_mergeDocument(): uploading new document to {}", urlStr);
 		URL url = new URL(urlStr);
 		Net net = new Net(url);
-		boolean success = net.put(path, xml.getBytes(), url.toURI());
+		boolean success = net.put(path, xml.getBytes(), url.toURI());  // TODO: add signature
 		
 		assertTrue(success);
 	}
 	
-	private void test_5_downloadMergedDocument() throws Exception {
+	private void t5_downloadMergedDocument() throws Exception {
 		byte[] downloaded = download();
 		String downloadedXml = new String(downloaded);
 		assertXMLNotEqual(xml, downloadedXml);

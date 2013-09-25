@@ -44,11 +44,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.domainauthority.LocalPath;
 import org.societies.api.internal.domainauthority.UrlPath;
+import org.societies.api.internal.security.util.FileName;
+import org.societies.api.internal.security.util.UrlParamName;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.domainauthority.rest.control.ServiceClientJarAccess;
-import org.societies.domainauthority.rest.util.FileName;
 import org.societies.domainauthority.rest.util.Files;
-import org.societies.domainauthority.rest.util.UrlParamName;
 
 /**
  * Class for hosting jar files for clients of 3rd party services.
@@ -188,9 +188,9 @@ public class ServiceClientJar extends HttpServlet {
 		}
 
 		// Process the uploaded items
-		Iterator iter = items.iterator();
+		Iterator<FileItem> iter = items.iterator();
 		while (iter.hasNext()) {
-			FileItem item = (FileItem) iter.next();
+			FileItem item = iter.next();
 
 			if (item.isFormField()) {
 				// Process FormField;

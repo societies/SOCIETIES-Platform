@@ -44,10 +44,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.domainauthority.DaRestException;
 import org.societies.api.internal.domainauthority.UrlPath;
+import org.societies.api.internal.security.util.FileName;
+import org.societies.api.internal.security.util.UrlParamName;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.domainauthority.rest.control.XmlDocumentAccess;
-import org.societies.domainauthority.rest.util.FileName;
-import org.societies.domainauthority.rest.util.UrlParamName;
+import org.societies.domainauthority.rest.model.Document;
 
 /**
  * Class for hosting and merging xml documents that are being signed over time by multiple parties.
@@ -79,7 +80,6 @@ public class XmlDocument extends HttpServlet {
 			return;
 		}
 		String path = request.getPathInfo().replaceFirst("/", "");
-//		String path = request.getParameter(UrlPath.URL_PARAM_FILE);
 		String signature = request.getParameter(UrlPath.URL_PARAM_SIGNATURE);
 		
 		LOG.info("HTTP GET: path = {}, signature = " + signature, path);
@@ -150,6 +150,33 @@ public class XmlDocument extends HttpServlet {
 		response.setStatus(status);
 	}
 	
+	@Override
+	public void doDelete(HttpServletRequest request, HttpServletResponse response) {
+		
+		String path = request.getPathInfo().replaceFirst("/", "");
+		String signature = request.getParameter(UrlPath.URL_PARAM_SIGNATURE);
+
+		LOG.info("HTTP DELETE from {}; path = {}, signature = " + signature, request.getRemoteHost(), path);
+
+		if (!XmlDocumentAccess.isAuthorized(path, signature)) {
+			LOG.warn("Invalid filename or key");
+			// Return HTTP status code 401 - Unauthorized
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			return;
+		}
+		
+		Document document = XmlDocumentAccess.getDocumentDao().get(path);
+		if (document == null) {
+			LOG.warn("HTTP DELETE: document {} not found", path);
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		}
+		else {
+			XmlDocumentAccess.getDocumentDao().delete(document);
+			LOG.info("HTTP DELETE: document {} deleted", path);
+			response.setStatus(HttpServletResponse.SC_OK);
+		}
+	}
+	
 	private InputStream getInputStream(HttpServletRequest request) throws DaRestException {
 		
 		// Create a factory for disk-based file items
@@ -167,9 +194,9 @@ public class XmlDocument extends HttpServlet {
 		}
 
 		// Process the uploaded items
-		Iterator iter = items.iterator();
+		Iterator<FileItem> iter = items.iterator();
 		while (iter.hasNext()) {
-			FileItem item = (FileItem) iter.next();
+			FileItem item = iter.next();
 
 			if (item.isFormField()) {
 				// Process FormField;

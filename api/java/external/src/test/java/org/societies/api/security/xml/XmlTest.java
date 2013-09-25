@@ -22,21 +22,49 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.domainauthority.rest.util;
+package org.societies.api.security.xml;
 
-public class XmlException extends Exception {
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 
-	private static final long serialVersionUID = -5309810828915813701L;
+import org.custommonkey.xmlunit.XMLTestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.societies.api.security.xml.Xml;
 
-	public XmlException() {
-		super();
+public class XmlTest extends XMLTestCase {
+
+	private Xml classUnderTest;
+	
+	private static final String xmlStringSource = "<?xml version=\"1.0\"?><xml><a><b></b></a></xml>";
+	
+	@Before
+	public void setUp() throws Exception {
+		classUnderTest = new Xml(xmlStringSource);
+		assertXMLEqual("setUp", xmlStringSource, classUnderTest.toString());
 	}
 
-	public XmlException(String msg) {
-		super(msg);
+	@After
+	public void tearDown() throws Exception {
+		classUnderTest = null;
 	}
 
-	public XmlException(Exception ex) {
-		super(ex);
+	@Test
+	public void testAddNodeRecursively() throws Exception {
+		InputStream newXml = new ByteArrayInputStream("<?xml version=\"1.0\"?><xml><x><y>foo</y><y></y></x></xml>".getBytes());
+		int numNodes = classUnderTest.addNodeRecursively(newXml, "/xml/x/y");
+		assertEquals(2, numNodes, 0.0);
+		assertXMLEqual("<?xml version=\"1.0\"?><xml><a><b></b></a><y>foo</y><y></y></xml>", classUnderTest.toString());
+	}
+
+	@Test
+	public void testToOutputStream() throws Exception {
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		classUnderTest.toOutputStream(os);
+		byte[] bytes = os.toByteArray();
+		String bytesStr = new String(bytes);
+		assertXMLEqual(bytesStr, classUnderTest.toString());
 	}
 }

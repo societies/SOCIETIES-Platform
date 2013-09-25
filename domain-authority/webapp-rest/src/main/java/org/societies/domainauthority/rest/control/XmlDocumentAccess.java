@@ -36,10 +36,10 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.internal.security.digsig.XmlSignature;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
+import org.societies.api.security.xml.Xml;
+import org.societies.api.security.xml.XmlException;
 import org.societies.domainauthority.rest.dao.DocumentDao;
 import org.societies.domainauthority.rest.model.Document;
-import org.societies.domainauthority.rest.util.Xml;
-import org.societies.domainauthority.rest.util.XmlException;
 
 /**
  * 
@@ -54,6 +54,7 @@ public class XmlDocumentAccess {
 	/**
 	 * Key = Relative path in local filesystem, same as Document.getPath()
 	 */
+	// TODO: do not preload all docs
 	private static HashMap<String, Document> documents = new HashMap<String, Document>();
 
 	private static ISignatureMgr sigMgr;
@@ -97,6 +98,10 @@ public class XmlDocumentAccess {
 	public static boolean isAuthorized(String filePath, String signature) {
 		
 		LOG.debug("isAuthorized({}, {})", filePath, signature);
+		
+		if (filePath == null || signature == null) {
+			return false;
+		}
 		
 		for (Document r : documents.values()) {
 			if (r.getPath().equals(filePath)) {

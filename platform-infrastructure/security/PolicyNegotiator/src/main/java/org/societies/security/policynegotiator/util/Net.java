@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 
@@ -36,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -62,6 +64,43 @@ public class Net {
 		this.source = source;
 	}
 	
+	public boolean delete() {
+		
+		LOG.debug("delete() {}", source);
+		
+//		try {
+//			HttpURLConnection httpCon = (HttpURLConnection) source.openConnection();
+//			httpCon.setDoOutput(true);
+//			httpCon.setRequestProperty(
+//			    "Content-Type", "application/x-www-form-urlencoded" );
+//			httpCon.setRequestMethod("DELETE");
+//			httpCon.connect();
+//			httpCon.getInputStream();
+//			return true;
+//		} catch (Exception e) {
+//			LOG.warn("delete", e);
+//			return false;
+//		}
+
+		boolean success = false;
+		HttpClient httpclient = new DefaultHttpClient();
+		try {
+			HttpDelete httpDelete = new HttpDelete(source.toURI());
+            HttpResponse response = httpclient.execute(httpDelete);
+            HttpEntity resEntity = response.getEntity();
+
+            LOG.debug("Status: {}", response.getStatusLine().toString());
+            if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK) {
+            	success = true;
+            }
+            EntityUtils.consume(resEntity);
+		} catch (Exception e) {
+			LOG.warn("delete(): " + source, e);
+			return false;
+		}
+		return success;
+	}
+
 	public boolean download(String fileName) {
 		
 		LOG.debug("download({})", fileName);

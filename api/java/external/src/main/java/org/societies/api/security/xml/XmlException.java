@@ -22,22 +22,21 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.policynegotiate.provider;
+package org.societies.api.security.xml;
 
-/**
- * 
- *
- * @author Mitja Vardjan
- *
- */
-public class FileName {
-	
-	public static String getBasename(String path) {
-		return path.replaceAll(".*/", "").replaceAll(".*\\\\", "");
-	}
-	
-	public static String removeUnsupportedChars(String path) {
-		return path.replaceAll("[^0-9a-zA-Z\\-_\\. ,\\[\\]\\(\\)\\{\\}]", "_");
+public class XmlException extends Exception {
+
+	private static final long serialVersionUID = -5309810828915813701L;
+
+	public XmlException() {
+		super();
 	}
 
+	public XmlException(String msg) {
+		super(msg);
+	}
+
+	public XmlException(Exception ex) {
+		super(ex);
+	}
 }

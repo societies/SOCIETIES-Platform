@@ -22,50 +22,57 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.policynegotiator.xml;
+package org.societies.api.internal.security.util;
 
 import static org.junit.Assert.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-
-import org.custommonkey.xmlunit.XMLTestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.societies.api.internal.security.util.FileName;
 
-public class XmlTest extends XMLTestCase {
-
-	private Xml classUnderTest;
+/**
+ * 
+ *
+ * @author Mitja Vardjan
+ *
+ */
+public class FileNameTest {
 	
-	private static final String xmlStringSource = "<?xml version=\"1.0\"?><xml><a><b></b></a></xml>";
-	
+	/**
+	 * @throws java.lang.Exception
+	 */
 	@Before
 	public void setUp() throws Exception {
-		classUnderTest = new Xml(xmlStringSource);
-		assertXMLEqual("setUp", xmlStringSource, classUnderTest.toString());
 	}
 
+	/**
+	 * @throws java.lang.Exception
+	 */
 	@After
 	public void tearDown() throws Exception {
-		classUnderTest = null;
 	}
 
+	/**
+	 * Test method for
+	 * {@link org.societies.api.internal.security.util.FileName#getBasename(String)}.
+	 */
 	@Test
-	public void testAddNodeRecursively() throws Exception {
-		InputStream newXml = new ByteArrayInputStream("<?xml version=\"1.0\"?><xml><x><y>foo</y><y></y></x></xml>".getBytes());
-		int numNodes = classUnderTest.addNodeRecursively(newXml, "/xml/x/y");
-		assertEquals(2, numNodes, 0.0);
-		assertXMLEqual("<?xml version=\"1.0\"?><xml><a><b></b></a><y>foo</y><y></y></xml>", classUnderTest.toString());
+	public void testGetBasename() {
+		assertEquals("cc.dd", FileName.getBasename("aa/bb/cc.dd"));
+		assertEquals("cc.dd", FileName.getBasename("aa\\bb\\cc.dd"));
 	}
 
+	/**
+	 * Test method for
+	 * {@link org.societies.api.internal.security.util.FileName#removeUnsupportedChars(String)}.
+	 */
 	@Test
-	public void testToOutputStream() throws Exception {
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		classUnderTest.toOutputStream(os);
-		byte[] bytes = os.toByteArray();
-		String bytesStr = new String(bytes);
-		assertXMLEqual(bytesStr, classUnderTest.toString());
+	public void testRemoveUnsupportedChars() {
+		assertEquals("a1_bb.cc", FileName.removeUnsupportedChars("a1:bb.cc"));
+		assertEquals("a2_bb.cc", FileName.removeUnsupportedChars("a2/bb.cc"));
+		assertEquals("a3_bb.cc", FileName.removeUnsupportedChars("a3\\bb.cc"));
+		assertEquals("a4. ,[](){}bb.cc", FileName.removeUnsupportedChars("a4. ,[](){}bb.cc"));
+		assertEquals("a5_bb_cc.dd__ee", FileName.removeUnsupportedChars("a5/bb\\cc.dd/:ee"));
 	}
 }

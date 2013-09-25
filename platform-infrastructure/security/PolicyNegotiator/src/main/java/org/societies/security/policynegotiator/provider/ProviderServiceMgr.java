@@ -43,14 +43,14 @@ import org.societies.api.internal.security.policynegotiator.INegotiationProvider
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderSLMCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.security.policynegotiator.NegotiationException;
+import org.societies.api.internal.security.util.FileName;
+import org.societies.api.internal.security.util.UrlParamName;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.security.dao.ServiceDao;
 import org.societies.security.model.Service;
-import org.societies.security.policynegotiator.util.FileName;
 import org.societies.security.policynegotiator.util.Net;
-import org.societies.security.policynegotiator.util.UrlParamName;
 
 /**
  * 

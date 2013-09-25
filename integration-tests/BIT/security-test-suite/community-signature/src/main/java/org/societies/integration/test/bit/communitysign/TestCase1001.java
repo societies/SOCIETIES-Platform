@@ -42,6 +42,7 @@ public class TestCase1001 extends IntegrationTestCase {
 	 */
 	public void setDaUrl(String daUrl) {
 		TestCase1001.daUrl = daUrl;
+		LOG.debug("setDaUrl({})", daUrl);
 	}
 
 	/**
@@ -56,6 +57,7 @@ public class TestCase1001 extends IntegrationTestCase {
 	 */
 	public void setSignatureMgr(ISignatureMgr signatureMgr) {
 		TestCase1001.signatureMgr = signatureMgr;
+		LOG.debug("setSignatureMgr({})", signatureMgr);
 	}
 
 	/**
@@ -63,6 +65,7 @@ public class TestCase1001 extends IntegrationTestCase {
 	 */
 	public void setCommManager(ICommManager commManager) {
 		TestCase1001.commManager = commManager;
+		LOG.debug("setCommManager({})", commManager);
 	}
 	
 	public static IIdentityManager getIdentityManager() {
