@@ -110,6 +110,8 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		t3_downloadDocumentInvalidSig();
 		t4_mergeDocument();
 		t5_downloadMergedDocument();
+		
+		deletePreviousDocument();
 	}
 	
 	private void deletePreviousDocument() throws Exception {
