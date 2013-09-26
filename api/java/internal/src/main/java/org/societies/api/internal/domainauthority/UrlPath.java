@@ -57,6 +57,7 @@ public class UrlPath {
 	
 	/**
 	 * URL parameter. Endpoint for notifying the uploader about future events, e.g. when the resource is modified.
+	 * Supported protocol is HTTP. On event, a HTTP GET is performed on the given endpoint (HTTP URL).
 	 */
 	public static final String URL_PARAM_NOTIFICATION_ENDPOINT = "endpoint";
 	
