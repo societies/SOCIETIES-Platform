@@ -3,7 +3,6 @@ package org.societies.security.policynegotiator.provider;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -22,7 +21,6 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.domainauthority.IClientJarServerRemote;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderSLMCallback;
-import org.societies.api.internal.security.policynegotiator.NegotiationException;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.security.comms.policynegotiator.CommsClient;
@@ -49,8 +47,6 @@ public class ProviderServiceMgrTest {
 		public boolean success = false;
 		public boolean error = false;
 		
-		public String msg = null;
-
 		@Override
 		public void notifySuccess() {
 			this.success = true;
@@ -59,7 +55,6 @@ public class ProviderServiceMgrTest {
 		@Override
 		public void notifyError(String msg, Throwable e) {
 			this.error = true;
-			this.msg = msg;
 		}
 	}
 	
@@ -157,7 +152,7 @@ public class ProviderServiceMgrTest {
 		serviceId = new ServiceResourceIdentifier();
 		serviceId.setIdentifier(new URI("societies://aaa.bbb.ccc"));
 		serviceId.setServiceInstanceIdentifier("service-1");
-		fileServer = new URI("http://localhost/foo");
+		fileServer = new URI("http://localhost:12345/foo");
 		callback = new NegotiationProviderSLMCallback();
 	}
 
@@ -218,7 +213,7 @@ public class ProviderServiceMgrTest {
 	@Test
 	public void testAddService_UrlArray_1() throws Exception {
 
-		URL[] fileUrls = new URL[] {new URL("http://localhost/foo")};
+		URL[] fileUrls = new URL[] {fileServer.toURL()};
 
 		assertFalse(callback.success);
 		assertEquals(0, classUnderTest.getServices().size(), 0.0);

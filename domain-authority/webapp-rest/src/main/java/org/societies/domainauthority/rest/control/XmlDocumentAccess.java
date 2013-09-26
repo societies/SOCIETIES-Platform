@@ -26,6 +26,7 @@ package org.societies.domainauthority.rest.control;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
@@ -38,6 +39,7 @@ import org.societies.api.security.xml.Xml;
 import org.societies.api.security.xml.XmlException;
 import org.societies.domainauthority.rest.dao.DocumentDao;
 import org.societies.domainauthority.rest.model.Document;
+import org.societies.domainauthority.rest.util.RemoteNotification;
 
 /**
  * 
@@ -105,10 +107,11 @@ public class XmlDocumentAccess {
 		}
 	}
 	
-	public static void addDocument(String path, String certStr, byte[] xml, String notificationEndpoint) throws DigsigException {
+	public static void addDocument(String path, String certStr, byte[] xml, String notificationEndpoint,
+			int minNumSigners) throws DigsigException {
 		
 		X509Certificate cert = sigMgr.str2cert(certStr);
-		Document doc = new Document(path, cert, xml, notificationEndpoint);
+		Document doc = new Document(path, cert, xml, notificationEndpoint, minNumSigners);
 		
 		documentDao.save(doc);
 	}
@@ -134,10 +137,19 @@ public class XmlDocumentAccess {
 		X509Certificate cert = sigMgr.ba2cert(certBytes);
 
 		if (sigMgr.verify(path, signature, cert.getPublicKey())) {
-			byte[] merged = merge(doc.getXmlDoc(), xml);
-			doc.setXmlDoc(merged);
-			documentDao.update(doc);
-			LOG.info("XML document merged and stored successfully");
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			int numInsertedNodes = merge(doc.getXmlDoc(), xml, os);
+			if (numInsertedNodes > 0) {
+				doc.setXmlDoc(os.toByteArray());
+				// Regardless of number of signatures, it is assumed they are from one subject.
+				// CN from the certificate should be checked if this is not the case.
+				doc.setNumSigners(doc.getNumSigners() + 1);
+				documentDao.update(doc);
+				LOG.info("XML document merged and stored successfully");
+				if (doc.getNumSigners() >= doc.getMinNumSigners()) {
+					RemoteNotification.notifyOriginalUploader(doc);
+				}
+			}
 			return true;
 		}
 		else {
@@ -146,19 +158,18 @@ public class XmlDocumentAccess {
 		}
 	}
 	
-	private static byte[] merge(byte[] oldXml, byte[] newXml) throws DigsigException {
+	private static int merge(byte[] oldXml, byte[] newXml, OutputStream result) throws DigsigException {
 		
 		ByteArrayInputStream oldIs = new ByteArrayInputStream(oldXml);
 		ByteArrayInputStream newIs = new ByteArrayInputStream(newXml);
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		Xml old;
 		
 		try {
 			old = new Xml(oldIs);
 			int numInsertedNodes = old.addNodeRecursively(newIs, XmlSignature.XML_SIGNATURE_XPATH);
 			LOG.debug("merge: inserted {} new nodes", numInsertedNodes);
-			old.toOutputStream(os);
-			return os.toByteArray();
+			old.toOutputStream(result);
+			return numInsertedNodes;
 		} catch (XmlException e) {
 			throw new DigsigException(e);
 		}

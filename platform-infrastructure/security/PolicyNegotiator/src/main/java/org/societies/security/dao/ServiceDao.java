@@ -69,12 +69,7 @@ public class ServiceDao {
 		
 		try {
 			session = sessionFactory.openSession();
-			
 			Query query = session.createQuery("SELECT s FROM " + Service.class.getSimpleName() + " s");
-			
-			//Query query = session.createQuery("SELECT foo FROM foo WHERE id = :myId");
-			//query.setParameter("myId", "value");
-			
 			result = (List<Service>) query.list();
 		} catch (HibernateException e) {
 			log.warn("Could not read from data source", e);
@@ -93,13 +88,8 @@ public class ServiceDao {
 		
 		try {
 			session = sessionFactory.openSession();
-			
 			session.delete(object);
 			session.flush();
-			
-//			Query query = session.createQuery("SELECT foo FROM foo WHERE id = :myId");
-//			query.setParameter("myId", object.getId());
-			
 		} catch (HibernateException e) {
 			log.warn("Could not delete from data source", e);
 			throw e;

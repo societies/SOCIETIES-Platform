@@ -141,7 +141,7 @@ public class ServiceClientJar extends HttpServlet {
 
 		String path = request.getParameter(UrlPath.URL_PARAM_FILE);
 		String serviceId = request.getParameter(UrlPath.URL_PARAM_SERVICE_ID);
-		String pubKey = request.getParameter(UrlPath.URL_PARAM_PUB_KEY);
+		String pubKey = request.getParameter(UrlPath.URL_PARAM_CERT);
 	
 		
 		LOG.info("HTTP POST from {}; path = {}, service ID = " + serviceId + ", pubKey = " + pubKey,
@@ -158,7 +158,7 @@ public class ServiceClientJar extends HttpServlet {
 		
 		String path = request.getParameter(UrlPath.URL_PARAM_FILE);
 		String serviceId = request.getParameter(UrlPath.URL_PARAM_SERVICE_ID);
-		String cert = request.getParameter(UrlPath.URL_PARAM_PUB_KEY);
+		String cert = request.getParameter(UrlPath.URL_PARAM_CERT);
 
 		LOG.info("HTTP PUT from {}; path = {}, service ID = " + serviceId + ", pubKey = " + cert,
 				request.getRemoteHost(), path);

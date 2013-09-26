@@ -22,61 +22,45 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.domainauthority.rest.server;
+package org.societies.domainauthority.rest.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.internal.domainauthority.UrlPath;
-import org.societies.domainauthority.rest.util.Files;
+import org.societies.domainauthority.rest.model.Document;
 
 /**
- * Class for hosting jar files for clients of 3rd party services.
- * 
+ * Helper class for contacting a remote server
+ *
  * @author Mitja Vardjan
+ *
  */
-@Path(UrlPath.PATH_PUB_KEY)
-public class CertificateUpload {
-    
-	private static Logger LOG = LoggerFactory.getLogger(CertificateUpload.class);
-	
-	public CertificateUpload() {
-		LOG.info("Constructor");
-	}
-	
-	/**
-     * Method processing HTTP POST requests.
-     */
-	@Path("{name}.pub")
-    @POST
-    public void postIt(@PathParam("name") String name,
-    		InputStream is,
-    		@Context HttpServletRequest request,
-    		@QueryParam(UrlPath.URL_PARAM_FILE) String path,
-    		@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
-    		@QueryParam(UrlPath.URL_PARAM_SIGNATURE) String signature) {
+public class RemoteNotification {
 
-		LOG.debug("HTTP POST: path = {}, service ID = {}, signature = " + signature, path, serviceId);
+	private static Logger LOG = LoggerFactory.getLogger(RemoteNotification.class);
+	
+	public static void notifyOriginalUploader(Document doc) {
+
+		if (doc == null || doc.getNotificationEndpoint() == null) {
+			LOG.warn("Notification endpoint not set");
+			return;
+		}
 		
-		// TODO
-		
-//		try {
-//			Files.writeFile(is, path);
-//		} catch (IOException e) {
-//			LOG.warn("Could not write to file {}", path, e);
-//			// Return HTTP status code 500 - Internal Server Error
-//			throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//		}
-    }
+		LOG.info("Notifying original uploader at {} about new signatures of {}", doc.getNotificationEndpoint(), doc);
+
+		URL url;
+		HttpURLConnection conn;
+		try {
+			url = new URL(doc.getNotificationEndpoint());
+			conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("GET");
+			conn.connect();
+			conn.getInputStream();
+			conn.disconnect();
+		} catch (Exception e) {
+			LOG.warn("Could not notify original uploader at " + doc.getNotificationEndpoint(), e);
+		}
+	}
 }

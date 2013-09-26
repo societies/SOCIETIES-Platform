@@ -32,8 +32,8 @@
 	</bean>
 	
     <bean
-        id="TestCase1001"
-        class="org.societies.integration.test.bit.communitysign.TestCase1001"
+        id="TestCase2165"
+        class="org.societies.integration.test.bit.communitysign.TestCase2165"
 		depends-on="bit1001Properties"
         init-method="run">
         <property name="daUrl" value="${client.repository.url:}" />
