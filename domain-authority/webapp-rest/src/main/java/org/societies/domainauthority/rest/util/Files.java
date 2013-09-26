@@ -122,5 +122,5 @@ public class Files {
 //		if (totalRead < bytes.length) {  // WRONG!
 //			throw new IOException("Could not completely read the whole contents");
 //		}
-	}  
+	}
 }

@@ -43,14 +43,14 @@ import org.societies.api.internal.security.policynegotiator.INegotiationProvider
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderSLMCallback;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.security.policynegotiator.NegotiationException;
+import org.societies.api.internal.security.util.FileName;
+import org.societies.api.internal.security.util.UrlParamName;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.security.dao.ServiceDao;
 import org.societies.security.model.Service;
-import org.societies.security.policynegotiator.util.FileName;
 import org.societies.security.policynegotiator.util.Net;
-import org.societies.security.policynegotiator.util.UrlParamName;
 
 /**
  * 
@@ -121,8 +121,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 		}
 	}
 
-	@Override
-	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
+	private void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
 			List<String> files, INegotiationProviderSLMCallback callback) throws NegotiationException {
 		
 		LOG.info("addService({}, ..., {}, " + files + ")", serviceId, fileServer);
@@ -198,17 +197,6 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 			tmp.delete();
 		}
 
-		addService(serviceId, slaXml, fileServer, files, callback);
-	}
-
-	@Override
-	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
-			String clientJarFilePath, INegotiationProviderSLMCallback callback) throws NegotiationException {
-
-		LOG.info("addService({}, ..., {}, String file)", serviceId, fileServer);
-
-		List<String> files = new ArrayList<String>();
-		files.add(clientJarFilePath);
 		addService(serviceId, slaXml, fileServer, files, callback);
 	}
 	
@@ -293,17 +281,17 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 		return uriStr;
 	}
 	
-	private String uriForFileUpload(String host, String filePath, URI serviceId, String pubkey) {
+	private String uriForFileUpload(String host, String filePath, URI serviceId, String cert) {
 		
 		String uriStr;
 
 		LOG.debug("uriForFileUpload({}, {}, ...)", host, filePath);
 
-		pubkey = UrlParamName.base64ToUrl(pubkey);
+		cert = UrlParamName.base64ToUrl(cert);
 		
 		uriStr = host + UrlPath.BASE + UrlPath.PATH_FILES + "/" + filePath.replaceAll(".*/", "") +
 				"?" + UrlPath.URL_PARAM_FILE + "=" + filePath +
-				"&" + UrlPath.URL_PARAM_PUB_KEY + "=" + pubkey + 
+				"&" + UrlPath.URL_PARAM_CERT + "=" + cert + 
 				"&" + UrlPath.URL_PARAM_SERVICE_ID + "=" + serviceId.toASCIIString();
 
 		LOG.debug("uriForFileUpload(): uri = {}", uriStr);

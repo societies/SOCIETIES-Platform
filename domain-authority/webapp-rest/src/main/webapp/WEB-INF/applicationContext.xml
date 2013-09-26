@@ -71,6 +71,7 @@
 		<property name="annotatedClasses">
 			<list>
 			    <value>org.societies.domainauthority.rest.model.Resource</value>
+			    <value>org.societies.domainauthority.rest.model.Document</value>
 			</list>
 		</property>
 
@@ -93,7 +94,11 @@
 	<bean id="resourceDao" class="org.societies.domainauthority.rest.dao.ResourceDao">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
-		
+
+	<bean id="documentDao" class="org.societies.domainauthority.rest.dao.DocumentDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+			
 	<bean id="daRestProperties"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
@@ -115,6 +120,14 @@
         <property name="resourceDao" ref="resourceDao"/>
   	</bean>
 
+	<bean id="xmlDocumentAccess"
+		class="org.societies.domainauthority.rest.control.XmlDocumentAccess"
+  		init-method="init"
+  		>
+  		<property name="sigMgr" ref="SignatureManager"/>
+        <property name="documentDao" ref="documentDao"/>
+  	</bean>
+	
 	<bean id="DomainAuthorityRestCommsServer"
 		class="org.societies.domainauthority.rest.comms.CommsServer"
 		depends-on="CommManager"

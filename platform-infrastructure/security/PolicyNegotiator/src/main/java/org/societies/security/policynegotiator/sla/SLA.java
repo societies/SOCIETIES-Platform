@@ -26,7 +26,7 @@ package org.societies.security.policynegotiator.sla;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.security.policynegotiator.xml.Xml;
+import org.societies.api.security.xml.Xml;
 import org.w3c.dom.NodeList;
 
 /**

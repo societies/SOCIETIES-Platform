@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.LoggerFactory;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.useragent.conflict.IConflictResolutionManager;
 import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
@@ -40,14 +41,32 @@ import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalType;
 import org.societies.api.personalisation.model.IAction;
-import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.api.internal.personalisation.model.*;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.societies.api.osgi.event.EMSException;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
+
 import org.slf4j.*;
 
 public abstract class AbstractDecisionMaker implements IDecisionMaker {
 	IConflictResolutionManager manager;
+
+	IIdentity entityID;
+
+	@Autowired
+	ICommManager commMgr;
+
+	@Autowired
+	IEventMgr pesoMgr;
+
+	@Autowired
 	IUserFeedback feedbackHandler;
-	public HashSet<IOutcome> hasBeenChecked=new HashSet<IOutcome>();
-	
+
+	public HashSet<IOutcome> hasBeenChecked = new HashSet<IOutcome>();
+
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 
 	public IConflictResolutionManager getManager() {
@@ -64,6 +83,23 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 
 	public void setFeedbackHandler(IUserFeedback feedbackHandler) {
 		this.feedbackHandler = feedbackHandler;
+	}
+
+	public void setPesoMgr(IEventMgr mgr) {
+		this.pesoMgr = mgr;
+	}
+
+	public IIdentity getEntityID() {
+		return entityID;
+	}
+
+	public void setEntityID(IIdentity entityID) {
+		this.entityID = entityID;
+	}
+
+	public void setCommMgr(ICommManager commMgr) {
+		this.commMgr = commMgr;
+		this.entityID = this.commMgr.getIdManager().getThisNetworkNode();
 	}
 
 	@Override
@@ -92,6 +128,17 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 					action = manager.resolveConflict(action, preference);
 					if (action == null) {
 						conflicts.add(preference);
+					} else {
+						FeedbackEvent fedb = new FeedbackEvent(entityID,
+								action, true, FeedbackTypes.CONFLICT_RESOLVED);
+						InternalEvent event = new InternalEvent(
+								EventTypes.UI_EVENT, "feedback",
+								"org/societies/useragent/decisionmaker", fedb);
+						try {
+							pesoMgr.publishInternalEvent(event);
+						} catch (EMSException e) {
+							e.printStackTrace();
+						}
 					}
 				} else if (conflict == ConflictType.UNKNOWN_CONFLICT) {
 					/* handler the unknown work */
@@ -129,23 +176,37 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 	protected boolean getUserFeedback(String content, IAction action) {
 		try {
 			IOutcome iot = (IOutcome) action;
-			if(hasBeenChecked.contains(iot)){
+			if (hasBeenChecked.contains(iot)) {
 				hasBeenChecked.remove(iot);
 				return true;
 			}
 			if (iot.getConfidenceLevel() > 50) {
 				ImpProposalContent ic = new ImpProposalContent(content, 10);
-				return feedbackHandler.getImplicitFB(
+				boolean resb = feedbackHandler.getImplicitFB(
 						ImpProposalType.TIMED_ABORT, ic).get();
+				if (resb == false) {
+					FeedbackEvent fedb = new FeedbackEvent(this.entityID,
+							action, resb, FeedbackTypes.USER_ABORTED);
+					InternalEvent event = new InternalEvent(
+							EventTypes.UI_EVENT, "feedback",
+							"org/societies/useragent/decisionmaker", fedb);
+					try {
+						pesoMgr.publishInternalEvent(event);
+					} catch (EMSException e) {
+						e.printStackTrace();
+					}
+				}
+				return resb;
 			} else {
-				ExpProposalContent epc = 
-						new ExpProposalContent(content,new String[]{"Yes","No"});
-				List<String> result= feedbackHandler.getExplicitFB(
+				ExpProposalContent epc = new ExpProposalContent(content,
+						new String[] { "Yes", "No" });
+				List<String> result = feedbackHandler.getExplicitFB(
 						ExpProposalType.RADIOLIST, epc).get();
-				if(result.get(0).equals("Yes"))
+				if (result.get(0).equals("Yes")) {
 					return true;
-				else
+				} else {
 					return false;
+				}
 			}
 		} catch (Exception e) {
 			System.err.println(e);

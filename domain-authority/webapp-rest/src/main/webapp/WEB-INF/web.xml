@@ -13,59 +13,23 @@
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
 
-	<!--context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>/WEB-INF/spring/applicationContext.xml</param-value>
-	</context-param>
-	<context-param>
-		<param-name>contextClass</param-name>
-		<param-value>org.eclipse.virgo.web.dm.ServerOsgiBundleXmlWebApplicationContext</param-value>
-	</context-param>	
-	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-	</listener-->
-
-	<!--context-param>
-		<param-name>contextConfigLocation</param-name>     
-		<param-value>
-			/WEB-INF/applicationContext.xml,
-			/WEB-INF/clientjar-servlet.xml
-		</param-value>
-	</context-param-->
-
 	<servlet>
         <servlet-name>clientjar</servlet-name>
-<!--
-        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
--->
-<!--
-        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
--->
         <servlet-class>org.societies.domainauthority.rest.server.ServiceClientJar</servlet-class>
-
-		<!--init-param>
-			<param-name>com.sun.jersey.config.feature.Redirect</param-name>
-			<param-value>true</param-value>
-		</init-param>
-
-		<init-param>
-			<param-name>com.sun.jersey.config.property.JSPTemplatesBasePath</param-name>
-			<param-value>/views/</param-value>
-		</init-param>
-
-		<init-param>
-			<param-name>com.sun.jersey.config.property.WebPageContentRegex</param-name>
-			<param-value>/(images|css|jsp)/.*</param-value>
-		</init-param-->
-
-        <!--init-param>
-            <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>org.societies.domainauthority.rest.server</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup-->
     </servlet>
-    <servlet-mapping>
+    
+	<servlet>
+        <servlet-name>xmldocument</servlet-name>
+        <servlet-class>org.societies.domainauthority.rest.server.XmlDocument</servlet-class>
+    </servlet>
+    
+	<servlet-mapping>
         <servlet-name>clientjar</servlet-name>
-        <url-pattern>/webresources/*</url-pattern>
+        <url-pattern>/serviceclient/*</url-pattern>
+    </servlet-mapping>
+    
+	<servlet-mapping>
+        <servlet-name>xmldocument</servlet-name>
+        <url-pattern>/xmldocs/*</url-pattern>
     </servlet-mapping>
 </web-app>

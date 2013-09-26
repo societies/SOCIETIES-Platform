@@ -80,7 +80,7 @@ public class ServiceClientJarAccessTest {
 //		assertEquals("www.example.com", result.getUrl().getHost());
 //		assertEquals(8080, result.getUrl().getPort(), 0.0);
 //		
-//		String start = hostname + "/rest/webresources/serviceclient/" + filePath + "?key=";
+//		String start = hostname + "/rest/serviceclient/" + filePath + "?key=";
 //		url = result.getUrl().toString();
 //		assertTrue(url.contains("?key="));
 //		assertTrue(url.startsWith(start));

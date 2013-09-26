@@ -24,7 +24,6 @@ import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.internal.security.policynegotiator.INegotiation;
 import org.societies.api.internal.security.policynegotiator.INegotiationCallback;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.integration.test.IntegrationTestUtils;
 
 /**
  * @author Mitja Vardjan
@@ -37,16 +36,10 @@ public class NominalTestCaseLowerTester {
 	private static final long TIME_TO_WAIT_IN_MS = 3000;
 	
 	private static final String SERVICE_ID_1 = "http://localhost/societies/services/service-1";
-	private static final String SERVICE_ID_3 = "http://localhost/societies/services/service-3";
 	private static final String SERVICE_ID_4 = "http://localhost/societies/services/service-4";
 	
 	private static INegotiation negotiator;
-	
-	/**
-	 * Tools for integration test
-	 */
-	private IntegrationTestUtils integrationTestUtils;
-	
+
 	/**
 	 * Test case number
 	 */
@@ -60,7 +53,6 @@ public class NominalTestCaseLowerTester {
 	
 
 	public NominalTestCaseLowerTester() {
-		integrationTestUtils = new IntegrationTestUtils();
 	}
 
 	/**
@@ -249,41 +241,6 @@ public class NominalTestCaseLowerTester {
 		LOG.info("[#1879] testNegotiationInvalid(): checking if successful");
 		assertTrue(callbackInvokedInvalid);
 		LOG.info("[#1879] testNegotiationInvalid(): SUCCESS");
-	}
-	
-	@Test
-	public void testFilesDownloadManualFilePlacement() throws Exception {
-
-		String urlStr;
-		int httpCode;
-		
-		LOG.info("[#1879] testFilesDownloadManualFilePlacement()");
-		LOG.info("[#1879] *** Domain Authority Rest server is required for this test! ***");
-
-		testNegotiationServiceWith2Files(SERVICE_ID_3);
-
-		// URL 1 with valid signature
-		urlStr = serviceFiles.get(0).toString();
-		LOG.info("[#1879] testFilesDownloadManualFilePlacement(): URL with valid signature: {}", urlStr);
-		httpCode = getHttpCode(new URL(urlStr));
-		assertEquals(HttpURLConnection.HTTP_OK, httpCode, 0.0);
-		
-		// URL 2 with valid signature
-		urlStr = serviceFiles.get(1).toString();
-		LOG.info("[#1879] testFilesDownloadManualFilePlacement(): URL with valid signature: {}", urlStr);
-		assertFalse(serviceFiles.get(0).toString().equals(serviceFiles.get(1).toString()));
-		httpCode = getHttpCode(new URL(urlStr));
-		assertEquals(HttpURLConnection.HTTP_OK, httpCode, 0.0);
-		
-		// URL with invalid signature
-		String sigKeyword = UrlPath.URL_PARAM_SIGNATURE + "=";
-		int sigKeywordEnd = serviceFiles.get(0).toString().indexOf(sigKeyword) + sigKeyword.length();
-		urlStr = serviceFiles.get(0).toString().substring(0, sigKeywordEnd) + "123456789012345678901234567890";
-		urlStr += serviceFiles.get(0).toString().substring(sigKeywordEnd + 30);
-		LOG.info("[#1879] testFilesDownloadManualFilePlacement(): URL with invalid signature: {}", urlStr);
-		assertEquals(serviceFiles.get(0).toString().length(), urlStr.length(), 0.0);
-		httpCode = getHttpCode(new URL(urlStr));
-		assertEquals(HttpURLConnection.HTTP_UNAUTHORIZED, httpCode, 0.0);
 	}
 	
 	@Test

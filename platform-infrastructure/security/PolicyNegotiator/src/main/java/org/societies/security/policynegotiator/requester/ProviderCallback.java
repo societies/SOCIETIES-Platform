@@ -43,10 +43,10 @@ import org.societies.api.internal.security.policynegotiator.INegotiationProvider
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.security.digsig.DigsigException;
+import org.societies.api.security.xml.Xml;
+import org.societies.api.security.xml.XmlException;
 import org.societies.security.policynegotiator.sla.SLA;
 import org.societies.security.policynegotiator.util.ValueGenerator;
-import org.societies.security.policynegotiator.xml.Xml;
-import org.societies.security.policynegotiator.xml.XmlException;
 
 /**
  * This class receives results from async invocations of

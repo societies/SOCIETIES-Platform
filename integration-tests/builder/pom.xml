@@ -49,6 +49,7 @@
 		<module>../BIT/comm-frwk-test-suite/messaging/remote_api_calls#771</module>
 		<module>../BIT/security-test-suite/policy-negotiate-consumer</module>
 		<module>../BIT/security-test-suite/policy-negotiate-provider</module>
+		<module>../BIT/security-test-suite/community-signature</module>
 		<!-- <module>../BIT/context-mgmt-test-suite/comm-ctx-estimation#1108</module> -->
 		<module>../BIT/context-mgmt-test-suite/communication-ctx-frwk#1064</module>
 		<module>../BIT/context-mgmt-test-suite/3p-ctx-broker#1858</module>
