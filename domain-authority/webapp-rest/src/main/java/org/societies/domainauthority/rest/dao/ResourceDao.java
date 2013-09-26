@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.societies.domainauthority.rest.model.Resource;;
 
 /**
- * Describe your class here...
+ * DAO for {@link Resource}
  *
  * @author Mitja Vardjan
  *
@@ -69,12 +69,7 @@ public class ResourceDao {
 		
 		try {
 			session = sessionFactory.openSession();
-			
 			Query query = session.createQuery("SELECT r FROM " + Resource.class.getSimpleName() + " r");
-			
-			//Query query = session.createQuery("SELECT foo FROM foo WHERE id = :myId");
-			//query.setParameter("myId", "value");
-			
 			result = (List<Resource>) query.list();
 		} catch (HibernateException e) {
 			log.warn("Could not read from data source", e);
@@ -87,18 +82,47 @@ public class ResourceDao {
 		return result;
 	}
 
+	/**
+	 * Convenience method to return a single instance that matches the query, or null if the query returns no results.
+	 *  
+	 * @param path
+	 * @return the single result or null 
+	 * @throws HibernateException
+	 */
+	public Resource get(String path) throws HibernateException {
+		
+		log.debug("get: {}", path);
+
+		Session session = null;
+		Resource result;
+		
+		try {
+			session = sessionFactory.openSession();
+			
+			Query query = session.createQuery("FROM " + Resource.class.getSimpleName() + " WHERE path = :myPath");
+			query.setParameter("myPath", path);
+			
+			result = (Resource) query.uniqueResult();
+		} catch (HibernateException e) {
+			log.warn("Could not read from data source", e);
+			throw e;
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		log.debug("get: returning object {}", result);
+		return result;
+	}
+
 	public void delete(Resource object) throws HibernateException {
 		
 		Session session = null;
 		
 		try {
 			session = sessionFactory.openSession();
-			
 			session.delete(object);
-			
-//			Query query = session.createQuery("SELECT foo FROM foo WHERE id = :myId");
-//			query.setParameter("myId", object.getId());
-			
+			session.flush();
 		} catch (HibernateException e) {
 			log.warn("Could not delete from data source", e);
 			throw e;

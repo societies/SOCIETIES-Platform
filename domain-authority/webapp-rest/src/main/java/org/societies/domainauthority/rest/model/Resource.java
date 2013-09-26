@@ -69,13 +69,6 @@ public class Resource {
 		this.ownerCertSerialized = ServiceClientJarAccess.getSigMgr().cert2ba(ownerCert);
 	}
 
-//	/**
-//	 * @return Public part of the certificate of the one who has uploaded the files, e.g., the service provider
-//	 */
-//	public X509Certificate getOwnerCert() {
-//		return ownerCertSerialized;
-//	}
-
 	/**
 	 * @return Relative path to the file
 	 */
@@ -117,5 +110,10 @@ public class Resource {
 	 */
 	public void setOwnerCertSerialized(byte[] ownerKeySerialized) {
 		this.ownerCertSerialized = ownerKeySerialized;
+	}
+	
+	@Override
+	public String toString() {
+		return "ID: " + id + ", path: " + path;
 	}
 }

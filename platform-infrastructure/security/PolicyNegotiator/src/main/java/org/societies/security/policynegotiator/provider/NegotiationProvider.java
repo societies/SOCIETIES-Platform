@@ -32,10 +32,8 @@ import java.util.Map;
 import java.util.concurrent.Future;
 
 import org.springframework.scheduling.annotation.AsyncResult;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.societies.api.internal.security.digsig.ISlaSignatureMgr;
 import org.societies.api.internal.security.policynegotiator.INegotiationProvider;
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderRemote;
@@ -44,12 +42,12 @@ import org.societies.api.internal.schema.security.policynegotiator.NegotiationTy
 import org.societies.api.internal.schema.security.policynegotiator.SlaBean;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
+import org.societies.api.security.xml.Xml;
 import org.societies.security.policynegotiator.sla.SLA;
 import org.societies.security.policynegotiator.sla.Session;
 import org.societies.security.policynegotiator.sla.SopResource;
 import org.societies.security.policynegotiator.util.DOMHelper;
 import org.societies.security.policynegotiator.util.StreamUtil;
-import org.societies.security.policynegotiator.xml.Xml;
 import org.w3c.dom.Document;
 
 //@Component

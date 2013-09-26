@@ -26,7 +26,6 @@ package org.societies.api.internal.security.policynegotiator;
 
 import java.net.URI;
 import java.net.URL;
-import java.util.List;
 
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
@@ -38,46 +37,6 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
  *
  */
 public interface INegotiationProviderServiceMgmt {
-
-	/**
-	 * Please use
-	 * {@link #addService(ServiceResourceIdentifier, String, URI, URL[], INegotiationProviderSLMCallback)}
-	 * instead.
-	 */
-	@Deprecated
-	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
-			String clientJarFilePath, INegotiationProviderSLMCallback callback)
-			throws NegotiationException;
-
-	/**
-	 * Please use
-	 * {@link #addService(ServiceResourceIdentifier, String, URI, URL[], INegotiationProviderSLMCallback)}
-	 * instead.
-	 * 
-	 * Tells Policy Negotiator that a new service is available for sharing to others.
-	 * 
-	 * @param serviceId ID of the service. The service instance need not exist at this point.
-	 * 
-	 * @param slaXml Options for Service Level Agreement (SLA) in XML format. Ignored at the moment.
-	 * 
-	 * @param fileServer Host and port of the server that should host any files related to the service,
-	 * e.g., the JAR file for service client.
-	 * If the service does not provide a client and no other files are to be made available for
-	 * service consumers to download, this parameter should be null.
-	 * 
-	 * @param files Relative paths of any files to be associated with the service and shared on the
-	 * domain authority server.
-	 * The paths are relative on the server.
-	 * Example: "3p-service/Calculator.jar" if file path on the server is $VIRGO_HOME/3p-service/Calculator.jar
-	 * 
-	 * @param callback The callback to be invoked after operation is finished.
-	 * 
-	 * @throws NegotiationException
-	 */
-	@Deprecated
-	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
-			List<String> files, INegotiationProviderSLMCallback callback)
-			throws NegotiationException;
 
 	/**
 	 * Tells Policy Negotiator that a new service is available for sharing to others.
@@ -103,18 +62,6 @@ public interface INegotiationProviderServiceMgmt {
 	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
 			URL[] fileUrls, INegotiationProviderSLMCallback callback)
 			throws NegotiationException;
-	
-	/**
-	 * Tells Policy Negotiator that a new service is available for sharing to others.
-	 * 
-	 * @param serviceId ID of the service. The service instance need not exist at this point (TBC).
-	 * 
-	 * @param slaXml Options for Service Level Agreement (SLA) in XML format. Ignored at the moment.
-	 * 
-	 * @param clientJarServer Location of the JAR file for service client, if the service provides a client.
-	 * If the service does not provide a client, this parameter should be null.
-	 */
-	//public void addService(ServiceResourceIdentifier serviceId, String slaXml, IIdentity clientJarServer);
 	
 	/**
 	 * Tells Policy Negotiator that a service is not available for sharing to others anymore.

@@ -27,7 +27,6 @@ package org.societies.domainauthority.rest.server;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 
@@ -35,15 +34,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -54,18 +44,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.domainauthority.LocalPath;
 import org.societies.api.internal.domainauthority.UrlPath;
+import org.societies.api.internal.security.util.FileName;
+import org.societies.api.internal.security.util.UrlParamName;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.domainauthority.rest.control.ServiceClientJarAccess;
-import org.societies.domainauthority.rest.util.FileName;
 import org.societies.domainauthority.rest.util.Files;
-import org.societies.domainauthority.rest.util.UrlParamName;
 
 /**
  * Class for hosting jar files for clients of 3rd party services.
  * 
  * @author Mitja Vardjan
  */
-@Path(UrlPath.PATH_FILES)
 public class ServiceClientJar extends HttpServlet {
 
 	private static final long serialVersionUID = 4625772782444356957L;
@@ -82,27 +71,24 @@ public class ServiceClientJar extends HttpServlet {
 	 * Error 401 if file name or signature not valid.
 	 * Error 500 on server error.
 	 */
-//	@Path("{name}")
-//	@GET
-//	@Produces("application/java-archive")
-//	public byte[] doGet(@PathParam("name") String name,
-//			@QueryParam(UrlPath.URL_PARAM_FILE) String path,
-//			@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
-//			@QueryParam(UrlPath.URL_PARAM_SIGNATURE) String signature) {
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 
-		//String path = name + ".jar";
 		if (request.getPathInfo() == null) {
 			LOG.warn("HTTP GET: request.getPathInfo() is null");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
-		String[] name = request.getPathInfo().split("/");
 		String path = request.getParameter(UrlPath.URL_PARAM_FILE);
 		String serviceId = request.getParameter(UrlPath.URL_PARAM_SERVICE_ID);
 		String signature = request.getParameter(UrlPath.URL_PARAM_SIGNATURE);
 		
 		LOG.info("HTTP GET: path = {}, service ID = {}, signature = " + signature, path, serviceId);
+		if (path == null || serviceId == null || signature == null) {
+			LOG.warn("Missing URL parameters");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
 
 		byte[] file;
 
@@ -111,7 +97,6 @@ public class ServiceClientJar extends HttpServlet {
 			// Return HTTP status code 401 - Unauthorized
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return;
-			//throw new WebApplicationException(HttpServletResponse.SC_UNAUTHORIZED);
 		}
 
 		try {
@@ -124,14 +109,12 @@ public class ServiceClientJar extends HttpServlet {
 				// Return HTTP status code 500 - Internal Server Error
 				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				return;
-//				throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
 		} catch (IOException e) {
 			LOG.warn("Could not open file {}", path, e);
 			// Return HTTP status code 500 - Internal Server Error
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return;
-//			throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 
 		LOG.info("Serving {}", path);
@@ -142,59 +125,50 @@ public class ServiceClientJar extends HttpServlet {
 			ServletOutputStream stream = response.getOutputStream();
 			stream.write(file);
 			stream.flush();
+			response.setStatus(HttpServletResponse.SC_OK);
 		} catch (IOException e) {
 			LOG.warn("Could not write response", e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return;
-//			throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	/**
 	 * Method processing HTTP POST requests.
 	 */
-//	@Path("{name}")
-//	@POST
-//	public void postIt(@PathParam("name") String name,
-//			InputStream is,
-//			@Context HttpServletRequest request,
-//			@QueryParam(UrlPath.URL_PARAM_FILE) String path,
-//			@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
-//			@QueryParam(UrlPath.URL_PARAM_PUB_KEY) String pubKey) {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 
 		String path = request.getParameter(UrlPath.URL_PARAM_FILE);
 		String serviceId = request.getParameter(UrlPath.URL_PARAM_SERVICE_ID);
-		String pubKey = request.getParameter(UrlPath.URL_PARAM_PUB_KEY);
+		String pubKey = request.getParameter(UrlPath.URL_PARAM_CERT);
 	
 		
 		LOG.info("HTTP POST from {}; path = {}, service ID = " + serviceId + ", pubKey = " + pubKey,
 				request.getRemoteHost(), path);
 		LOG.warn("HTTP POST is not implemented. For uploading files, use HTTP PUT instead.");
+		response.setStatus(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	}
 
 	/**
 	 * Method processing HTTP PUT requests.
 	 */
-//	@Path("{name}")
-//	@PUT
-//	public void puIt(@PathParam("name") String name,
-//			InputStream is,
-//			@Context HttpServletRequest request,
-//			@QueryParam(UrlPath.URL_PARAM_FILE) String path,
-//			@QueryParam(UrlPath.URL_PARAM_SERVICE_ID) String serviceId,
-//			@QueryParam(UrlPath.URL_PARAM_PUB_KEY) String cert) {
 	@Override
 	public void doPut(HttpServletRequest request, HttpServletResponse response) {
 		
 		String path = request.getParameter(UrlPath.URL_PARAM_FILE);
 		String serviceId = request.getParameter(UrlPath.URL_PARAM_SERVICE_ID);
-		String cert = request.getParameter(UrlPath.URL_PARAM_PUB_KEY);
+		String cert = request.getParameter(UrlPath.URL_PARAM_CERT);
 
 		LOG.info("HTTP PUT from {}; path = {}, service ID = " + serviceId + ", pubKey = " + cert,
 				request.getRemoteHost(), path);
 
+		if (path == null || serviceId == null || cert == null) {
+			LOG.warn("Missing URL parameters");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
+		
 		cert = UrlParamName.url2Base64(cert);
 		LOG.debug("HTTP PUT: cert fixed to {}", cert);
 
@@ -211,13 +185,12 @@ public class ServiceClientJar extends HttpServlet {
 		} catch (FileUploadException e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return;
-//			throw new WebApplicationException(HttpServletResponse.SC_BAD_REQUEST);
 		}
 
 		// Process the uploaded items
-		Iterator iter = items.iterator();
+		Iterator<FileItem> iter = items.iterator();
 		while (iter.hasNext()) {
-			FileItem item = (FileItem) iter.next();
+			FileItem item = iter.next();
 
 			if (item.isFormField()) {
 				// Process FormField;
@@ -234,16 +207,15 @@ public class ServiceClientJar extends HttpServlet {
 					// Return HTTP status code 500 - Internal Server Error
 					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 					return;
-//					throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				} catch (DigsigException e) {
 					LOG.warn("Could not store public key", e);
 					// Return HTTP status code 500 - Internal Server Error
 					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 					return;
-//					throw new WebApplicationException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				}
 			}
 		}
+		response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 	}
 
 	private String get3PServicePath(String serviceId) {

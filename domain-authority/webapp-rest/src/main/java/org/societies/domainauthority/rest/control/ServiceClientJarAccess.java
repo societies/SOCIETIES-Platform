@@ -27,7 +27,6 @@ package org.societies.domainauthority.rest.control;
 import java.net.URI;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -52,11 +51,6 @@ public class ServiceClientJarAccess implements IClientJarServer {
 
 	private static Logger LOG = LoggerFactory.getLogger(ServiceClientJarAccess.class);
 
-	/**
-	 * Key = Relative path in local filesystem, same as Resource.getPath()
-	 */
-	private static HashMap<String, Resource> resources = new HashMap<String, Resource>();
-
 	private static ISignatureMgr sigMgr;
 	private static boolean accessControlEnabled;
 	
@@ -70,16 +64,6 @@ public class ServiceClientJarAccess implements IClientJarServer {
 	public void init() {
 
 		LOG.debug("init()");
-
-		List<Resource> resourceList = resourceDao.getAll();
-		
-		if (resourceList != null) {
-			LOG.debug("Loading resource list from previous run");
-			for (Resource r : resourceList) {
-				resources.put(r.getPath(), r);
-				LOG.debug("Loaded resource [{}] {}", r.getId(), r.getPath());
-			}
-		}
 	}
 
 	public ResourceDao getResourceDao() {
@@ -130,7 +114,6 @@ public class ServiceClientJarAccess implements IClientJarServer {
 			try {
 				for (String f : files) {
 					resource = new Resource(f, providerCert);
-					resources.put(resource.getPath(), resource);
 					resourceDao.save(resource);
 					fileList += f;
 				}
@@ -158,24 +141,28 @@ public class ServiceClientJarAccess implements IClientJarServer {
 		if (!accessControlEnabled) {
 			return true;
 		}
-
-		for (Resource r : resources.values()) {
-			if (r.getPath().equals(filePath)) {
-				LOG.debug("isAuthorized(): file {} found", filePath);
-				byte[] certBytes = r.getOwnerCertSerialized();
-				X509Certificate cert;
-				try {
-					cert = sigMgr.ba2cert(certBytes);
-				} catch (DigsigException e) {
-					LOG.warn("Could not reconstruct certificate for file {} from {}", filePath, certBytes);
-					return false;
-				}
-				PublicKey publicKey = cert.getPublicKey();
-				return sigMgr.verify(filePath, signature, publicKey);
-			}
+		if (filePath == null || signature == null) {
+			return false;
 		}
-		LOG.debug("isAuthorized(): file {} NOT found", filePath);
-		return false;
+		
+		Resource resource = resourceDao.get(filePath);
+		if (resource != null) {
+			LOG.debug("isAuthorized(): file {} found", filePath);
+			byte[] certBytes = resource.getOwnerCertSerialized();
+			X509Certificate cert;
+			try {
+				cert = sigMgr.ba2cert(certBytes);
+			} catch (DigsigException e) {
+				LOG.warn("Could not reconstruct certificate for file {} from {}", filePath, certBytes);
+				return false;
+			}
+			PublicKey publicKey = cert.getPublicKey();
+			return sigMgr.verify(filePath, signature, publicKey);
+		}
+		else {
+			LOG.debug("isAuthorized(): file {} NOT found", filePath);
+			return false;
+		}
 	}
 	
 	public static void addResource(String path, String certStr) throws DigsigException {
@@ -183,7 +170,6 @@ public class ServiceClientJarAccess implements IClientJarServer {
 		X509Certificate cert = sigMgr.str2cert(certStr);
 		Resource resource = new Resource(path, cert);
 		
-		resources.put(resource.getPath(), resource);
 		resourceDao.save(resource);
 	}
 }

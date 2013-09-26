@@ -31,9 +31,12 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -60,6 +63,29 @@ public class Net {
 		this.source = source;
 	}
 	
+	public boolean delete() {
+		
+		LOG.debug("delete() {}", source);
+		
+		boolean success = false;
+		HttpClient httpclient = new DefaultHttpClient();
+		try {
+			HttpDelete httpDelete = new HttpDelete(source.toURI());
+            HttpResponse response = httpclient.execute(httpDelete);
+            HttpEntity resEntity = response.getEntity();
+
+            LOG.debug("Status: {}", response.getStatusLine().toString());
+            if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK) {
+            	success = true;
+            }
+            EntityUtils.consume(resEntity);
+		} catch (Exception e) {
+			LOG.warn("delete(): " + source, e);
+			return false;
+		}
+		return success;
+	}
+
 	public boolean download(String fileName) {
 		
 		LOG.debug("download({})", fileName);
@@ -140,6 +166,7 @@ public class Net {
 		LOG.debug("put({}, {})", fileName, destination);
 
         HttpClient httpclient = new DefaultHttpClient();
+        boolean success = false;
 
         try {
             HttpPut httpput = new HttpPut(destination);
@@ -158,6 +185,9 @@ public class Net {
             HttpEntity resEntity = response.getEntity();
 
             LOG.debug("Status: {}", response.getStatusLine().toString());
+            if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK) {
+            	success = true;
+            }
             if (resEntity != null) {
             	LOG.debug("Response content length: " + resEntity.getContentLength());
             }
@@ -171,7 +201,7 @@ public class Net {
 			} catch (Exception e) {
 			}
         }
-        return true;
+        return success;
 	}
 	
 	public void downloadAndPost(URI destination) {
