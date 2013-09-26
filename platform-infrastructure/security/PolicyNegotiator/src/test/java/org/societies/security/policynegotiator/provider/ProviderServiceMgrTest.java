@@ -152,7 +152,7 @@ public class ProviderServiceMgrTest {
 		serviceId = new ServiceResourceIdentifier();
 		serviceId.setIdentifier(new URI("societies://aaa.bbb.ccc"));
 		serviceId.setServiceInstanceIdentifier("service-1");
-		fileServer = new URI("http://localhost/foo");
+		fileServer = new URI("http://localhost:12345/foo");
 		callback = new NegotiationProviderSLMCallback();
 	}
 
@@ -213,7 +213,7 @@ public class ProviderServiceMgrTest {
 	@Test
 	public void testAddService_UrlArray_1() throws Exception {
 
-		URL[] fileUrls = new URL[] {new URL("http://localhost/foo")};
+		URL[] fileUrls = new URL[] {fileServer.toURL()};
 
 		assertFalse(callback.success);
 		assertEquals(0, classUnderTest.getServices().size(), 0.0);
