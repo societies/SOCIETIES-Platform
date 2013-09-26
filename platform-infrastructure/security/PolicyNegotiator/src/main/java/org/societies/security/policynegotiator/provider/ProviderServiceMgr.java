@@ -121,8 +121,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 		}
 	}
 
-	@Override
-	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
+	private void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
 			List<String> files, INegotiationProviderSLMCallback callback) throws NegotiationException {
 		
 		LOG.info("addService({}, ..., {}, " + files + ")", serviceId, fileServer);
@@ -198,17 +197,6 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 			tmp.delete();
 		}
 
-		addService(serviceId, slaXml, fileServer, files, callback);
-	}
-
-	@Override
-	public void addService(ServiceResourceIdentifier serviceId, String slaXml, URI fileServer,
-			String clientJarFilePath, INegotiationProviderSLMCallback callback) throws NegotiationException {
-
-		LOG.info("addService({}, ..., {}, String file)", serviceId, fileServer);
-
-		List<String> files = new ArrayList<String>();
-		files.add(clientJarFilePath);
 		addService(serviceId, slaXml, fileServer, files, callback);
 	}
 	

@@ -19,7 +19,6 @@ import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.internal.security.digsig.XmlSignature;
 import org.societies.api.internal.security.util.UrlParamName;
 import org.societies.api.security.digsig.ISignatureMgr;
-import org.societies.integration.test.IntegrationTestUtils;
 
 /**
  * @author Mitja Vardjan
@@ -28,11 +27,6 @@ import org.societies.integration.test.IntegrationTestUtils;
 public class NominalTestCaseLowerTester extends XMLTestCase {
 	
 	private static Logger LOG = LoggerFactory.getLogger(NominalTestCaseLowerTester.class);
-
-	/**
-	 * Tools for integration test
-	 */
-	private IntegrationTestUtils integrationTestUtils;
 	
 	private static String daUrl;
 	private static ISignatureMgr signatureMgr;
@@ -53,7 +47,6 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	public static int testCaseNumber;
 
 	public NominalTestCaseLowerTester() {
-		integrationTestUtils = new IntegrationTestUtils();
 	}
 
 	/**

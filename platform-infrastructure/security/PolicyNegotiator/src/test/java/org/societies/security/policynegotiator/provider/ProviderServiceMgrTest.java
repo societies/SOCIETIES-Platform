@@ -5,7 +5,6 @@ import static org.mockito.Mockito.*;
 
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
@@ -169,34 +168,7 @@ public class ProviderServiceMgrTest {
 	}
 
 	@Test
-	public void testAddService_ListStrings_0() throws Exception {
-		
-		List<String> files = new ArrayList<String>();
-		
-		assertFalse(callback.success);
-		assertEquals(0, classUnderTest.getServices().size(), 0.0);
-		classUnderTest.addService(serviceId, slaXml, fileServer, files, callback);
-		assertEquals(1, classUnderTest.getServices().size(), 0.0);
-
-		Thread.sleep(TIME_TO_WAIT_IN_MS);
-		assertTrue(callback.success);
-		assertFalse(callback.error);
-	}
-
-	@Test
-	public void testAddService_ListStrings_1() throws Exception {
-		
-		List<String> files = new ArrayList<String>();
-		files.add("foo.jar");
-		
-		assertFalse(callback.success);
-		assertEquals(0, classUnderTest.getServices().size(), 0.0);
-		classUnderTest.addService(serviceId, slaXml, fileServer, files, callback);
-		assertEquals(1, classUnderTest.getServices().size(), 0.0);
-	}
-
-	@Test
-	public void testAddService_UrlArray_0() throws Exception {
+	public void testAddService_0() throws Exception {
 
 		URL[] fileUrls = new URL[] {};
 
@@ -211,7 +183,7 @@ public class ProviderServiceMgrTest {
 	}
 
 	@Test
-	public void testAddService_UrlArray_1() throws Exception {
+	public void testAddService_1() throws Exception {
 
 		URL[] fileUrls = new URL[] {fileServer.toURL()};
 
@@ -222,19 +194,8 @@ public class ProviderServiceMgrTest {
 	}
 
 	@Test
-	public void testAddService_SingleFile() throws Exception {
-		
-		String filePath = "foo.jar";
-		
-		assertFalse(callback.success);
-		assertEquals(0, classUnderTest.getServices().size(), 0.0);
-		classUnderTest.addService(serviceId, slaXml, fileServer, filePath, callback);
-		assertEquals(1, classUnderTest.getServices().size(), 0.0);
-	}
-
-	@Test
 	public void testRemoveService() throws Exception {
-		testAddService_SingleFile();
+		testAddService_1();
 		assertEquals(1, classUnderTest.getServices().size(), 0.0);
 		classUnderTest.removeService(serviceId);
 		assertEquals(0, classUnderTest.getServices().size(), 0.0);
@@ -248,7 +209,7 @@ public class ProviderServiceMgrTest {
 		service = classUnderTest.getService(serviceId.getIdentifier().toASCIIString());
 		assertNull(service);
 		
-		testAddService_SingleFile();
+		testAddService_1();
 		service = classUnderTest.getService(serviceId.getIdentifier().toASCIIString());
 		assertNotNull(service);
 	}
@@ -258,7 +219,7 @@ public class ProviderServiceMgrTest {
 		
 		List<URI> signedUris;
 		
-		testAddService_UrlArray_1();
+		testAddService_1();
 		signedUris = classUnderTest.getSignedUris(serviceId.getIdentifier().toASCIIString());
 		assertEquals(1, signedUris.size(), 0.0);
 	}
