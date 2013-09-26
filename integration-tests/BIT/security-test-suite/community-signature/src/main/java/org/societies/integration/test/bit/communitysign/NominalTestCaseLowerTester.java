@@ -133,7 +133,7 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		X509Certificate cert = signatureMgr.getCertificate(id);
 		String certStr = signatureMgr.cert2str(cert);
 //		String notificationEndpoint = identityManager.getThisNetworkNode().getJid();
-		String notificationEndpoint = "http://localhost/tmp/societies/foo";
+		String notificationEndpoint = "http://localhost/societies/document-signed-by-enough-entities";
 		String urlStr = uriForFileUpload(daUrl, path, certStr, notificationEndpoint);
 		LOG.info("[#2165] t1_uploadDocument(): uploading initial document to {}", urlStr);
 		URL url = new URL(urlStr);

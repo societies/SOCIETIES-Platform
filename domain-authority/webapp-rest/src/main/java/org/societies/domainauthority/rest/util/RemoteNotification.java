@@ -43,7 +43,12 @@ public class RemoteNotification {
 	
 	public static void notifyOriginalUploader(Document doc) {
 
-		LOG.info("Notifying original uploader about new signatures of {}", doc);
+		if (doc == null || doc.getNotificationEndpoint() == null) {
+			LOG.warn("Notification endpoint not set");
+			return;
+		}
+		
+		LOG.info("Notifying original uploader at {} about new signatures of {}", doc.getNotificationEndpoint(), doc);
 
 		URL url;
 		HttpURLConnection conn;
@@ -52,9 +57,10 @@ public class RemoteNotification {
 			conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("GET");
 			conn.connect();
+			conn.getInputStream();
 			conn.disconnect();
 		} catch (Exception e) {
-			LOG.warn("notifyOriginalUploader", e);
+			LOG.warn("Could not notify original uploader at " + doc.getNotificationEndpoint(), e);
 		}
 	}
 }
