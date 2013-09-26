@@ -69,12 +69,7 @@ public class DocumentDao {
 		
 		try {
 			session = sessionFactory.openSession();
-			
 			Query query = session.createQuery("SELECT r FROM " + Document.class.getSimpleName() + " r");
-			
-			//Query query = session.createQuery("SELECT foo FROM foo WHERE id = :myId");
-			//query.setParameter("myId", "value");
-			
 			result = (List<Document>) query.list();
 		} catch (HibernateException e) {
 			log.warn("Could not read from data source", e);
@@ -128,14 +123,9 @@ public class DocumentDao {
 		
 		try {
 			session = sessionFactory.openSession();
-			
 			session.delete(object);
 			session.flush();
 			log.info("Object {} deleted", object);
-			
-//			Query query = session.createQuery("SELECT foo FROM foo WHERE id = :myId");
-//			query.setParameter("myId", object.getId());
-			
 		} catch (HibernateException e) {
 			log.warn("Could not delete from data source", e);
 			throw e;
