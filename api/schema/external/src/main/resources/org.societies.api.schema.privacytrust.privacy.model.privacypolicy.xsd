@@ -26,6 +26,7 @@
                     <xs:element name="obfuscationLevel" type="xs:double"/>
                     <xs:element name="obfuscationInput" type="xs:boolean" />
                     <xs:element name="remember" type="xs:boolean"/>
+                    <xs:element name="requestorscope" type="requestorScopeValues" />
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>
@@ -53,6 +54,7 @@
 				nillable="true" minOccurs="0" maxOccurs="unbounded" />
 			<xs:element name="optional" type="xs:boolean" />
 			<xs:element name="resource" type="tns:resource" minOccurs="0" />
+			<xs:element name="purpose" type="xs:string" />
 		</xs:sequence>
 	</xs:complexType>
 
@@ -147,6 +149,12 @@
 		</xs:restriction>
 	</xs:simpleType>
 
+	<xs:simpleType name="requestorScopeValues">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Everyone" />
+			<xs:enumeration value="Only_this_app" />
+		</xs:restriction>
+	</xs:simpleType>
 	<xs:simpleType name="conditionConstants">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="shareWith3RdParties">
