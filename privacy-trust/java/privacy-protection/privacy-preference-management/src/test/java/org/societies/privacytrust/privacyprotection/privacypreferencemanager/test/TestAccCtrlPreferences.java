@@ -356,6 +356,7 @@ public class TestAccCtrlPreferences {
 		
 
 		for (AccessControlPreferenceDetailsBean   det: accCtrlPreferenceDetails2){
+			System.out.println("************************"+ResourceUtils.toString(det.getResource()));
 			privPrefMgr.deleteAccCtrlPreference(det);
 		}
 		

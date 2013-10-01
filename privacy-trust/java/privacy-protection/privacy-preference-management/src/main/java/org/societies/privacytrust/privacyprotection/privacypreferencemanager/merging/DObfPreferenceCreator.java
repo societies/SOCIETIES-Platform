@@ -25,10 +25,88 @@
 
 package org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging;
 
+import java.util.concurrent.ExecutionException;
+
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
+import org.societies.api.context.model.CtxOriginType;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfPreferenceDetailsBean;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
+import org.societies.api.schema.identity.DataIdentifier;
+import org.societies.api.schema.identity.DataIdentifierScheme;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ContextPreferenceCondition;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceCondition;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyPreference;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.OperatorConstants;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.dobf.DObfOutcome;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.dobf.DObfPreferenceTreeModel;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager;
+
 /**
  * @author Eliza
  *
  */
 public class DObfPreferenceCreator {
 
+	final PrivacyPreferenceManager privPrefMgr;
+	final ICtxBroker ctxBroker;
+	
+	public DObfPreferenceCreator(PrivacyPreferenceManager manager){
+		this.privPrefMgr = manager;
+		this.ctxBroker = this.privPrefMgr.getCtxBroker();
+	}
+	
+	public void createPreference(RequestorBean requestor, Resource resource, double obfuscationLevel){
+		
+		DObfPreferenceDetailsBean details = new DObfPreferenceDetailsBean();
+		details.setRequestor(requestor);
+		details.setResource(resource);
+		DObfOutcome dobfOutcome = new DObfOutcome(obfuscationLevel);
+		PrivacyPreference preference = null;
+		
+		try {
+			
+			DataIdentifier dataIdentifier = ResourceUtils.getDataIdentifier(resource);
+			if (dataIdentifier.getScheme().equals(DataIdentifierScheme.CONTEXT)){
+				if (dataIdentifier instanceof CtxIdentifier){
+					CtxModelObject ctxModelObject = this.ctxBroker.retrieve((CtxIdentifier) dataIdentifier).get();
+					if (ctxModelObject instanceof CtxAttribute){
+						if (!(((CtxAttribute) ctxModelObject).getQuality().getOriginType().equals(CtxOriginType.MANUALLY_SET))){
+							String val = ((CtxAttribute) ctxModelObject).getStringValue();
+							IPrivacyPreferenceCondition condition = new ContextPreferenceCondition(ctxModelObject.getId(), OperatorConstants.EQUALS, val);
+							preference = new PrivacyPreference(condition);
+							preference.add(new PrivacyPreference(dobfOutcome));
+						}
+						
+					}
+				}
+			}
+		} catch (MalformedCtxIdentifierException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		if (preference==null){
+			preference = new PrivacyPreference(dobfOutcome);
+		}
+
+		DObfPreferenceTreeModel model = new DObfPreferenceTreeModel(details, preference);
+		privPrefMgr.storeDObfPreference(details, model);
+		
+	}
 }

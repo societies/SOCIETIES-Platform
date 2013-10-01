@@ -39,6 +39,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PreferenceEvaluator;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PrivateContextCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.management.PrivatePreferenceCache;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging.DObfPreferenceCreator;
 
 /**
  * @author Eliza
@@ -111,4 +112,5 @@ public class DObfPrivacyPreferenceManager {
 		
 		throw new PrivacyException("DObfPreferenceDetailsBean parameter did not match DObfPrivacyPreferenceTreeModel.getDetails()");		
 	}
+
 }

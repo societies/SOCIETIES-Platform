@@ -116,7 +116,7 @@ public class HelloWorld implements IHelloWorld{
 		this.idMgr = commManager.getIdManager();
 		this.userIdentity = this.idMgr.getThisNetworkNode();
 		try {
-			this.serviceIdentity = this.idMgr.fromJid("eliza@societies.org");
+			this.serviceIdentity = this.idMgr.fromJid("xcmanager.societies.local.macs.hw.ac.uk");
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
