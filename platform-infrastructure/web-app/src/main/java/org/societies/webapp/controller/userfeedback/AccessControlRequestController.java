@@ -167,6 +167,7 @@ public class AccessControlRequestController extends BasePageController {
     }
 
     public String completeAccessRequestAction() {
+    	//TODO: remember flag to set
         log.debug("completeAccessRequestAction() id=" + eventID);
 
         if (event == null) {
@@ -179,7 +180,12 @@ public class AccessControlRequestController extends BasePageController {
         prepareEventForTransmission(event);
 
         try {
-            userFeedback.submitAccessControlResponse(eventID, event.getResponseItems(), event.getRequestor());
+            List<AccessControlResponseItem> responseItems = event.getResponseItems();
+            for (AccessControlResponseItem respItem : responseItems){
+            	//set remember: true
+            	respItem.setRemember(false);
+            }
+			userFeedback.submitAccessControlResponse(eventID, responseItems, event.getRequestor());
         } catch (Exception e) {
             addGlobalMessage("Error publishing notification of completed access control event",
                     e.getMessage(),
@@ -190,6 +196,35 @@ public class AccessControlRequestController extends BasePageController {
         return "home"; // previously, could redirect to next negotiation - but this makes no sense now
     }
 
+    public String completeAccessRequestActionRemember() {
+    	//TODO: remember flag to set
+        log.debug("completeAccessRequestAction() id=" + eventID);
+
+        if (event == null) {
+            log.warn("'event' is null - cannot proceed with completeAccessRequestAction() method");
+            return null;
+        }
+
+        // TODO: validate action check boxes
+
+        prepareEventForTransmission(event);
+
+        try {
+            List<AccessControlResponseItem> responseItems = event.getResponseItems();
+            for (AccessControlResponseItem respItem : responseItems){
+            	//set remember: true
+            	respItem.setRemember(true);
+            }
+			userFeedback.submitAccessControlResponse(eventID, responseItems, event.getRequestor());
+        } catch (Exception e) {
+            addGlobalMessage("Error publishing notification of completed access control event",
+                    e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
+            log.error("Error publishing notification of completed negotiation", e);
+        }
+
+        return "home"; // previously, could redirect to next negotiation - but this makes no sense now
+    }
     public String cancelAccessRequestAction() {
         log.debug("cancelAccessRequestAction()");
 
@@ -201,7 +236,11 @@ public class AccessControlRequestController extends BasePageController {
         prepareEventForTransmission(event);
 
         try {
-            userFeedback.submitAccessControlResponse(eventID, event.getResponseItems(), event.getRequestor());
+            List<AccessControlResponseItem> responseItems = event.getResponseItems();
+            for (AccessControlResponseItem respItem : responseItems){
+            	respItem.setRemember(false);
+            }
+			userFeedback.submitAccessControlResponse(eventID, responseItems, event.getRequestor());
         } catch (Exception e) {
             addGlobalMessage("Error publishing notification of cancelled access control event",
                     e.getMessage(),
@@ -212,6 +251,32 @@ public class AccessControlRequestController extends BasePageController {
         return "home"; // previously, could redirect to next negotiation - but this makes no sense now
     }
 
+    public String cancelAccessRequestActionRemember() {
+        log.debug("cancelAccessRequestAction()");
+
+        if (event == null) {
+            log.warn("'event' is null - cannot proceed with cancelAccessRequestAction() method");
+            return null;
+        }
+
+        prepareEventForTransmission(event);
+
+        try {
+            List<AccessControlResponseItem> responseItems = event.getResponseItems();
+            for (AccessControlResponseItem respItem : responseItems){
+            	respItem.setRemember(true);
+            }
+			userFeedback.submitAccessControlResponse(eventID, responseItems, event.getRequestor());
+        } catch (Exception e) {
+            addGlobalMessage("Error publishing notification of cancelled access control event",
+                    e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
+            log.error("Error publishing notification of cancelled access control event", e);
+        }
+
+        return "home"; // previously, could redirect to next negotiation - but this makes no sense now
+    }
+    
     private static void prepareEventForGUI(UserFeedbackAccessControlEvent event) {
         AccessControlResponseItemWrapper.wrapList(event.getResponseItems());
 

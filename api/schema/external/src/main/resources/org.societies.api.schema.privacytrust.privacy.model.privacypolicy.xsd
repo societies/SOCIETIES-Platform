@@ -24,6 +24,8 @@
             <xs:extension base="tns:responseItem">
                 <xs:sequence>
                     <xs:element name="obfuscationLevel" type="xs:double"/>
+                    <xs:element name="obfuscationInput" type="xs:boolean" />
+                    <xs:element name="remember" type="xs:boolean"/>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>
