@@ -119,6 +119,16 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     public String getTitle() {
         return title;
     }
+    
+    public UserFeedbackAccessControlEvent getAccessControlEvent()
+    {
+    	return ufAccessControl;
+    }
+    
+    public UserFeedbackPrivacyNegotiationEvent getPrivacyNeoEvent()
+    {
+    	return ufPPN;
+    }
 
     public String getInfoLink() {
         if (ufPPN != null)
@@ -159,7 +169,7 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     public void setResults(String[] results) {
         this.results = results;
     }
-
+    
     public String getFriendlyTimeLeft() {
         if (timeoutTime == null)
             return "forever";

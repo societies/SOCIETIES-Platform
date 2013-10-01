@@ -6,14 +6,16 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:f="http://java.sun.com/jsf/core">
 
-
     <p:dialog id="notificationDialog" resizable="true" header="Notifications"
               draggable="true" modal="false">
 
         <h:outputLink value="notification_history.xhtml">Notification history</h:outputLink>
+        
+                            <p:poll interval="1" update="notificationGrid"/>
+        
 
         <p:dataGrid var="notification" value="#{notifications.unansweredNegotiationQueue}"
-                    columns="1" emptyMessage="No notifications :(" id="notificationGrid">
+                    columns="1" emptyMessage="No notifications" id="notificationGrid" >
 
             <p:panel id="ppnPopupPanel" header="Negotiation with #{notification.title}"
                      rendered="#{notification.type eq 'PPN'}"
@@ -143,7 +145,7 @@
                 <!-- TIMED ABORT -->
 
                 <h:panelGrid columns="1">
-                    <p:poll interval="1" update="taAbortButton"/>
+                   <!-- <p:poll interval="1" update="taAbortButton"/> -->
 
                     <p:commandButton id="taAcceptButton"
                                      value="Accept" process="timedAbortPopupPanel"

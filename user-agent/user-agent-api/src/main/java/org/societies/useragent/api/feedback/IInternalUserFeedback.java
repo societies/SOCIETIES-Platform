@@ -30,15 +30,9 @@ import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyN
 import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
-import org.societies.api.identity.Requestor;
-import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
-import org.societies.api.internal.useragent.model.FeedbackForm;
-import org.societies.api.schema.identity.RequestorBean;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.AccessControlResponseItem;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponsePolicy;
+
 import java.util.List;
 import java.util.concurrent.Future;
-
 
 public interface IInternalUserFeedback {
 
@@ -46,48 +40,10 @@ public interface IInternalUserFeedback {
 
 	public Future<Boolean> getImplicitFBforRemote(int type, ImpProposalContent content);
 
-	List<UserFeedbackBean> listIncompleteFeedbackBeans();
+    List<UserFeedbackBean> listIncompleteFeedbackBeans();
 
-	List<UserFeedbackPrivacyNegotiationEvent> listIncompletePrivacyRequests();
+    List<UserFeedbackPrivacyNegotiationEvent> listIncompletePrivacyRequests();
 
-	List<UserFeedbackAccessControlEvent> listIncompleteAccessRequests();
-
-	public FeedbackForm getNextRequest();
-
-	/**
-	 * <p>Used by the client to respond to an explicit feedback request</p>
-	 *
-	 * @param id     The unique ID of the request to which you are responding
-	 * @param result The user's responses (if Select One, the list will contain only the selected answer; if Select Many, the list will contain all selected answers; etc)
-	 */
-	public void submitExplicitResponse(String id, List<String> result);
-	/**
-	 * <p>Used by the client to respond to an implicit feedback request</p>
-	 *
-	 * @param id     The unique ID of the request to which you are responding
-	 * @param result True if the user has accepted the rest (or ignored it until the timeout time), false if the user has explicitly selected "abort"
-	 */
-	public void submitImplicitResponse(String id, Boolean result);
-
-	/**
-	 * <p>Used by the client to respond to an privacy negotiation request</p>
-	 *
-	 * @param requestId The unique ID of the request to which you are responding
-	 */
-	public void submitPrivacyNegotiationResponse(String requestId, NegotiationDetailsBean negotiationDetails, ResponsePolicy result);
-
-	/**
-	 * <p>Used by the client to respond to an access control request</p>
-	 *
-	 * @param requestId The unique ID of the request to which you are responding
-	 */
-	public void submitAccessControlResponse(String requestId, List<AccessControlResponseItem> responseItems, RequestorBean requestorBean);
-
-	/**
-	 * <p>Clears the internal state of the UserFeedback component</p>
-	 * <p>This method should usually only be used for <u>debugging and testing</u></p>
-	 */
-	public void clear();
-}
+    List<UserFeedbackAccessControlEvent> listIncompleteAccessRequests();
 
 }

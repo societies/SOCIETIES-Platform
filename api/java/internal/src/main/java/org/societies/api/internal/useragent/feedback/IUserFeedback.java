@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druzbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVACAO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -113,7 +113,7 @@ public interface IUserFeedback {
      * @param requestId A manually generated, unique, ID string to be assigned to this request. (See
      *                  {@link java.util.UUID#randomUUID()})
      * @param type      The type of user feedback request. May be one of {@link org.societies.api.internal.useragent.model.ImpProposalType}
-     * @param content   The contents of this request (including the message to be shown to the user, etc)
+     * @param content   The contents of this request (including the message to be shown to the user, timeout in seconds, etc)
      */
     public Future<Boolean> getImplicitFB(String requestId, int type, ImpProposalContent content);
 
@@ -123,7 +123,7 @@ public interface IUserFeedback {
      * may retrieve the result using {@link java.util.concurrent.Future#get()}</p>
      *
      * @param type    The type of user feedback request. May be one of {@link org.societies.api.internal.useragent.model.ImpProposalType}
-     * @param content The contents of this request (including the message to be shown to the user, etc)
+     * @param content The contents of this request (including the message to be shown to the user, timeout in seconds, etc)
      */
     public Future<Boolean> getImplicitFB(int type, ImpProposalContent content);
 
@@ -135,7 +135,7 @@ public interface IUserFeedback {
      * {@link java.util.concurrent.Future#get()}.</p>
      *
      * @param type    The type of user feedback request. May be one of {@link org.societies.api.internal.useragent.model.ImpProposalType}
-     * @param content The contents of this request (including the message to be shown to the user, etc)
+     * @param content The contents of this request (including the message to be shown to the user, timeout in seconds, etc)
      */
     public Future<Boolean> getImplicitFBAsync(int type, ImpProposalContent content);
 
@@ -147,7 +147,7 @@ public interface IUserFeedback {
      * {@link java.util.concurrent.Future#get()}.</p>
      *
      * @param type     The type of user feedback request. May be one of {@link org.societies.api.internal.useragent.model.ImpProposalType}
-     * @param content  The contents of this request (including the message to be shown to the user, etc)
+     * @param content  The contents of this request (including the message to be shown to the user, timeout in seconds, etc)
      * @param callback A callback which is notified whenever the user has responded.
      */
     public Future<Boolean> getImplicitFBAsync(int type, ImpProposalContent content, IUserFeedbackResponseEventListener<Boolean> callback);
@@ -162,7 +162,7 @@ public interface IUserFeedback {
      * @param requestId A manually generated, unique, ID string to be assigned to this request. (See
      *                  {@link java.util.UUID#randomUUID()})
      * @param type      The type of user feedback request. May be one of {@link org.societies.api.internal.useragent.model.ImpProposalType}
-     * @param content   The contents of this request (including the message to be shown to the user, etc)
+     * @param content   The contents of this request (including the message to be shown to the user, timeout in seconds, etc)
      * @param callback  A callback which is notified whenever the user has responded.
      */
     public Future<Boolean> getImplicitFBAsync(String requestId, int type, ImpProposalContent content, IUserFeedbackResponseEventListener<Boolean> callback);
@@ -303,11 +303,46 @@ public interface IUserFeedback {
      */
     public void showNotification(String notificationText);
 
+    /**
+     * ????
+     *
+     * @return ????
+     */
+    public FeedbackForm getNextRequest();
 
+    /**
+     * <p>Used by the client to respond to an explicit feedback request</p>
+     *
+     * @param id     The unique ID of the request to which you are responding
+     * @param result The user's responses (if Select One, the list will contain only the selected answer; if Select Many, the list will contain all selected answers; etc)
+     */
+    public void submitExplicitResponse(String id, List<String> result);
 
+    /**
+     * <p>Used by the client to respond to an implicit feedback request</p>
+     *
+     * @param id     The unique ID of the request to which you are responding
+     * @param result True if the user has accepted the rest (or ignored it until the timeout time), false if the user has explicitly selected "abort"
+     */
+    public void submitImplicitResponse(String id, Boolean result);
 
+    /**
+     * <p>Used by the client to respond to an privacy negotiation request</p>
+     *
+     * @param requestId The unique ID of the request to which you are responding
+     */
+    public void submitPrivacyNegotiationResponse(String requestId, NegotiationDetailsBean negotiationDetails, ResponsePolicy result);
 
+    /**
+     * <p>Used by the client to respond to an access control request</p>
+     *
+     * @param requestId The unique ID of the request to which you are responding
+     */
+    public void submitAccessControlResponse(String requestId, List<AccessControlResponseItem> responseItems, RequestorBean requestorBean);
 
-
-
+    /**
+     * <p>Clears the internal state of the UserFeedback component</p>
+     * <p>This method should usually only be used for <u>debugging and testing</u></p>
+     */
+    public void clear();
 }
