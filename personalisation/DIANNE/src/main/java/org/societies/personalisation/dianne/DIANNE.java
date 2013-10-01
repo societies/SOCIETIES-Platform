@@ -259,7 +259,8 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 		persistThread.start();
 		
 		//TEMPORARY FIX FOR #751 -
-		this.disableDIANNELearning(cssID);
+		//this.disableDIANNELearning(cssID);
+	
 	}
 
 	private void retrieveNetworks(){

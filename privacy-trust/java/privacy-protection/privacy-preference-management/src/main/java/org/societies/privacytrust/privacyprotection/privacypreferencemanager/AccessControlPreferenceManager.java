@@ -78,6 +78,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PreferenceEvaluator;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PrivateContextCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.management.PrivatePreferenceCache;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging.DObfPreferenceCreator;
 
 /**
  * @author Eliza
@@ -93,8 +94,9 @@ public class AccessControlPreferenceManager {
 	private final ICtxBroker ctxBroker;
 	private final IPrivacyAgreementManager agreementMgr;
 	private final IIdentityManager idMgr;
-
-	public AccessControlPreferenceManager(PrivatePreferenceCache prefCache, PrivateContextCache contextCache, IUserFeedback userFeedback, ITrustBroker trustBroker, ICtxBroker ctxBroker, IPrivacyAgreementManager agreementMgr, IIdentityManager idMgr){
+	private final DObfPreferenceCreator dobfPrefCreator;
+	
+	public AccessControlPreferenceManager(PrivatePreferenceCache prefCache, PrivateContextCache contextCache, IUserFeedback userFeedback, ITrustBroker trustBroker, ICtxBroker ctxBroker, IPrivacyAgreementManager agreementMgr, IIdentityManager idMgr, DObfPreferenceCreator dobfPrefCreator){
 		this.prefCache = prefCache;
 		this.contextCache = contextCache;
 		this.userFeedback = userFeedback;
@@ -102,6 +104,7 @@ public class AccessControlPreferenceManager {
 		this.ctxBroker = ctxBroker;
 		this.agreementMgr = agreementMgr;
 		this.idMgr = idMgr;
+		this.dobfPrefCreator = dobfPrefCreator;
 		
 
 	}
@@ -272,12 +275,15 @@ public class AccessControlPreferenceManager {
 			for (AccessControlResponseItem item: list){
 				if (item.isRemember()){
 					this.storeDecision(requestor, item.getRequestItem().getResource(), item.getRequestItem().getConditions(), action, item.getDecision());
+					this.logging.debug("Stored access control feedback as preference");
+				}else{
+					this.logging.debug("One-off access granted. Permission not stored permanently");
 				}
 				if (item.isObfuscationInput()){
-					//TODO: create obfuscation preference
+					this.dobfPrefCreator.createPreference(requestor, item.getRequestItem().getResource(), item.getObfuscationLevel());
+					this.logging.debug("Stored DObf preference based on user input to the access control feedback popup.");
 				}
 			}
-			//TODO: support data obfuscation.
 			permissions.addAll(list);
 			return permissions;
 		} catch (InvalidFormatException e) {
@@ -374,8 +380,16 @@ public class AccessControlPreferenceManager {
 				AccessControlResponseItem accessControlResponseItem = resultlist.get(0);
 				if (accessControlResponseItem.isRemember()){
 					this.storeDecision(requestor, resource, accessControlResponseItem.getRequestItem().getConditions(), action, accessControlResponseItem.getDecision());
+					this.logging.debug("Stored access control feedback as preference");
+				}else{
+					this.logging.debug("One-off access granted. Permission not stored permanently");
 				}
-				
+				if (accessControlResponseItem.isObfuscationInput()){
+					this.dobfPrefCreator.createPreference(requestor, accessControlResponseItem.getRequestItem().getResource(), accessControlResponseItem.getObfuscationLevel());
+					this.logging.debug("Stored DObf preference based on user input to the access control feedback popup.");
+				}else{
+					this.logging.debug("Obfuscation not requested in the access control");
+				}
 				return accessControlResponseItem;
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -499,6 +513,7 @@ public class AccessControlPreferenceManager {
 						//						conditionPreference = new PrivacyPreference(condition);
 						//						conditionPreference.add(withAllConditionsPreference);
 						//						return conditionPreference;
+						// comment from Eliza: this will never happen.
 					}
 				}else{
 					throw new PrivacyException("Could not create access control preference as there was no ctxAttribute found in DB with the provided dataIdentifier");
@@ -705,7 +720,7 @@ public class AccessControlPreferenceManager {
 		return false;
 	}
 	public static void main(String[] args){
-		AccessControlPreferenceManager prefMgr = new AccessControlPreferenceManager(null, null, null, null, null, null, null);
+		AccessControlPreferenceManager prefMgr = new AccessControlPreferenceManager(null, null, null, null, null, null, null, null);
 
 		List<Condition> conditions = new ArrayList<Condition>();
 		Condition condition = new Condition();

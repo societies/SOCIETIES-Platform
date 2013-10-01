@@ -34,6 +34,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
@@ -51,6 +52,7 @@ import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestItemUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestorUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
@@ -70,6 +72,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PrivateContextCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.management.PrivatePreferenceCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging.AccessControlPreferenceCreator;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging.DObfPreferenceCreator;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.PrivacyPreferenceConditionMonitor;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.accessCtrl.AccCtrlMonitor;
 
@@ -107,6 +110,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	private IEventMgr eventMgr;
 	private AccessControlPreferenceCreator accCtrlPreferenceCreator;
 	private AccCtrlMonitor accCtrlMonitor;
+	private DObfPreferenceCreator dobfPreferenceCreator;
 
 	public PrivacyPreferenceManager(){
 
@@ -128,7 +132,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, this.privacyDataManagerInternal, commsMgr);
 		contextCache = new PrivateContextCache(ctxBroker);
 		this.accCtrlPreferenceCreator = new AccessControlPreferenceCreator(this);
-
+		this.dobfPreferenceCreator = new DObfPreferenceCreator(this);
 		accCtrlMonitor = new AccCtrlMonitor(this);
 	}
 
@@ -136,7 +140,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 
 	public AccessControlPreferenceManager getAccessControlPreferenceManager(){
 		if (this.accCtrlMgr==null){
-			accCtrlMgr = new AccessControlPreferenceManager(prefCache, contextCache, userFeedback, trustBroker, ctxBroker, getAgreementMgr(), idm);
+			accCtrlMgr = new AccessControlPreferenceManager(prefCache, contextCache, userFeedback, trustBroker, ctxBroker, getAgreementMgr(), idm, dobfPreferenceCreator);
 		}
 		return accCtrlMgr;
 	}
@@ -215,6 +219,20 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	@Override
 	public boolean deleteAccCtrlPreference(
 			AccessControlPreferenceDetailsBean details) {
+		try {
+			DataIdentifier id = ResourceUtils.getDataIdentifier(details.getResource());
+			if (id!=null){
+				List<Action> actions = new ArrayList<Action>();
+				actions.add(details.getAction());
+				this.privacyDataManagerInternal.deletePermissions(details.getRequestor(), id, actions);
+			}
+		} catch (MalformedCtxIdentifierException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return this.getAccessControlPreferenceManager().deleteAccCtrlPreference(details);
 	}
 

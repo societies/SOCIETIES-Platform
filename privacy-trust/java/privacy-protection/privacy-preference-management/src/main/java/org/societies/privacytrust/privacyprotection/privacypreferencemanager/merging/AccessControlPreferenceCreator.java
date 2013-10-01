@@ -184,6 +184,9 @@ public class AccessControlPreferenceCreator extends EventListener{
 	private void processThisResource(RequestorBean requestor, ResponseItem item) throws PrivacyException, InvalidFormatException {
 		for (Action action : item.getRequestItem().getActions()){
 			AccessControlPreferenceDetailsBean details = new AccessControlPreferenceDetailsBean();
+			details.setAction(action);
+			details.setRequestor(requestor);
+			details.setResource(item.getRequestItem().getResource());
 			AccessControlPreferenceTreeModel accCtrlPreference = this.accCtrlPrefMgr.getAccCtrlPreference(details);
 			if (null!=accCtrlPreference){
 				PrivacyPreferenceMerger merger = new PrivacyPreferenceMerger(this.ctxBroker, this.ppMgr);

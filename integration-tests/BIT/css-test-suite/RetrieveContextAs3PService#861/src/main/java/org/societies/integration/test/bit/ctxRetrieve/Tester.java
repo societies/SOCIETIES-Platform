@@ -124,7 +124,7 @@ public class Tester {
 		serviceId.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
 		
 		try {
-			this.serviceIdentity = this.identityManager.fromJid("eliza@societies.org");
+			this.serviceIdentity = this.identityManager.fromJid("test.societies.local.macs.hw.ac.uk");
 			this.requestor = new RequestorService(serviceIdentity, serviceId);
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
