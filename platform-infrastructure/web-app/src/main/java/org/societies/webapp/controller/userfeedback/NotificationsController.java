@@ -220,6 +220,7 @@ public class NotificationsController extends BasePageController {
 
             synchronized (unansweredAccessControlEvents) {
                 unansweredAccessControlEvents.put(bean.getRequestId(), bean);
+                
             }
 
         }
@@ -650,6 +651,7 @@ public class NotificationsController extends BasePageController {
         try {
             if (internalUserFeedback != null)
                 accessControlEvents = internalUserFeedback.listIncompleteAccessRequests();
+            log.debug("Access Control Events Retrieved: " + String.valueOf(accessControlEvents.size()));
         } catch (Exception ex) {
             log.warn("Recoverable error: Error recalling AC records: " + ex.getMessage());
         }
@@ -687,6 +689,7 @@ public class NotificationsController extends BasePageController {
 
                         if (acList != null)
                             for (UserFeedbackAccessControlEvent ac : acList) {
+                            	log.debug(""+ac.getResponseItems().size());
                                 NotificationQueueItem item = NotificationQueueItem.forAccessControl(ac.getRequestId(), ac);
                                 addItemToQueue(item);
                             }
@@ -769,9 +772,11 @@ public class NotificationsController extends BasePageController {
 
                     synchronized (unansweredNotifications) {
                         synchronized (unansweredNotificationIDs) {
+                        	
                             unansweredNotificationIDs.add(item.getItemId());
                             unansweredNotifications.add(item);
                             Collections.sort(unansweredNotifications);
+                        	
                         }
                     }
                 }
