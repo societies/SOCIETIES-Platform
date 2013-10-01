@@ -35,7 +35,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
@@ -82,6 +85,7 @@ import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
 import org.societies.api.schema.identity.DataIdentifier;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorCisBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.AccessControlResponseItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
@@ -220,6 +224,29 @@ public class TestAccCtrlPreferences {
 			List<String> actionObjList = new ArrayList<String>();
 			actionObjList.add(action.getActionConstants().name());
 			Mockito.when(userFeedback.getExplicitFB(Mockito.eq(ExpProposalType.CHECKBOXLIST), (ExpProposalContent) Mockito.anyObject())).thenReturn(new AsyncResult<List<String>>(actionObjList));
+			Class<List<AccessControlResponseItem>> listClass = (Class<List<AccessControlResponseItem>>)(Class)List.class;
+			final ArgumentCaptor<List<AccessControlResponseItem>> argument = ArgumentCaptor.forClass(listClass);
+			
+			Mockito.when(userFeedback.getAccessControlFB((Requestor) Mockito.anyObject(), argument.capture())).thenAnswer(new Answer(){
+
+				@Override
+				public Object answer(InvocationOnMock invocation)
+						throws Throwable {
+					List<AccessControlResponseItem> items = argument.getValue();
+					for (AccessControlResponseItem item : items){
+						item.setDecision(Decision.PERMIT);
+						
+					}
+					return new AsyncResult<List<AccessControlResponseItem>>(items);
+				}
+				
+			});
+			
+
+			List<String> optionsList = new ArrayList<String>();
+			optionsList.add("Allow");
+			Mockito.when(userFeedback.getExplicitFB(Mockito.eq(ExpProposalType.ACKNACK), (ExpProposalContent) Mockito.anyObject())).thenReturn(new AsyncResult<List<String>>(optionsList));
+
 			List<CtxIdentifier> locationCtxIds = new ArrayList<CtxIdentifier>();
 			locationCtxIds.add(this.locationAttribute.getId());
 			Mockito.when(this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, locationAttribute.getType())).thenReturn(new AsyncResult<List<CtxIdentifier>>(locationCtxIds));
@@ -293,7 +320,7 @@ public class TestAccCtrlPreferences {
 		Assert.assertNotNull(items2.get(0).getDecision());
 		Assert.assertEquals(Decision.PERMIT.name(), items2.get(0).getDecision().name());
 
-		ResponseItem evRespItem = privPrefMgr.evaluateAccCtrlPreference(accCtrlDetails, conditions);
+		ResponseItem evRespItem = privPrefMgr.evaluateAccCtrlPreference(accCtrlDetails);
 		Assert.assertNotNull(evRespItem);
 		Assert.assertNotNull(evRespItem.getDecision());
 		Assert.assertEquals(Decision.PERMIT.name(), evRespItem.getDecision().name());

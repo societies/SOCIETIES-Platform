@@ -24,8 +24,11 @@
  */
 package org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import javax.swing.JOptionPane;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +61,7 @@ import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
@@ -126,8 +130,8 @@ public class AccessControlPreferenceCreator extends EventListener{
 						List<CtxIdentifier> ctxIDList = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, dataType).get();
 						if (ctxIDList.size()==0){
 							if (containsCreateAction(item.getRequestItem().getActions())){
-								this.privacyDataManagerInternal.updatePermission(RequestorUtils.toRequestor(agreement.getRequestor(), this.idMgr), ResponseItemUtils.toResponseItem(item));
-
+								
+								this.privacyDataManagerInternal.updatePermission(agreement.getRequestor(), item);
 							}
 
 						}else{
@@ -192,7 +196,8 @@ public class AccessControlPreferenceCreator extends EventListener{
 				this.accCtrlPrefMgr.storeAccCtrlPreference(details, this.createAccCtrlPreference(item, details));
 			}
 		}
-		this.privacyDataManagerInternal.updatePermission(RequestorUtils.toRequestor(requestor, this.idMgr), ResponseItemUtils.toResponseItem(item));
+		
+		this.privacyDataManagerInternal.updatePermission(requestor, item);
 
 	}
 	private AccessControlPreferenceTreeModel createAccCtrlPreference(

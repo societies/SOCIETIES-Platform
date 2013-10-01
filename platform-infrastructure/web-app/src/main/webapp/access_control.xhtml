@@ -157,7 +157,7 @@
 
                 <p:commandButton id="acceptRememberButton"
                                  value="Accept and remember"
-                                 action="#{accessControlController.completeAccessRequestAction}"
+                                 action="#{accessControlController.completeAccessRequestActionRemember}"
                                  update="@form"/>
 
                 <p:commandButton id="acceptButton"
@@ -165,11 +165,18 @@
                                  action="#{accessControlController.completeAccessRequestAction}"
                                  update="@form"/>
 
+                <p:commandButton id="refuseRememberButton"
+                                 value="Refuse"
+                                 action="#{accessControlController.cancelAccessRequestActionRemember}"
+                                 process="@this"
+                                 update="@form"/>
+                                 
                 <p:commandButton id="refuseButton"
                                  value="Refuse"
                                  action="#{accessControlController.cancelAccessRequestAction}"
                                  process="@this"
                                  update="@form"/>
+                                 
             </f:facet>
         </p:panel>
 

@@ -78,9 +78,34 @@ public interface IPrivacyPreferenceManager {
 	 * @param actions    the actions requested
 	 * @exception PrivacyPreferenceException PrivacyPreferenceException
 	 */
+	@Deprecated
 	public List<ResponseItem> checkPermission(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions)
 	  throws PrivacyException;
+	
+	/**
+	 * Method to check the access control permission
+	 * @return	responseItems that indicate the resource, the Actions and Conditions and the Decision to permit or deny
+	 * 
+	 * @param requestor the identity of the requestor (maybe RequestorService or RequestorCis)
+	 * @param dataIds    Requested leaf data identifiers
+	 * @param action    the action requested
+	 * @exception PrivacyPreferenceException PrivacyPreferenceException
+	 */
+	public List<ResponseItem> checkPermission(RequestorBean requestor, List<DataIdentifier> dataIds, Action action) throws PrivacyException;
 
+	
+	/**
+	 * Method to check the access control permission
+	 * @return	responseItems that indicate the resource, the Actions and Conditions and the Decision to permit or deny
+	 * 
+	 * @param requestor the identity of the requestor (maybe RequestorService or RequestorCis)
+	 * @param dataIds    Requested leaf data identifiers
+	 * @param action    the action requested
+	 * @exception PrivacyPreferenceException PrivacyPreferenceException
+	 */
+	public ResponseItem checkPermission(RequestorBean requestor, DataIdentifier dataIds, Action action) throws PrivacyException;
+	
+	
 	/**
 	 * Method to evaluate the PPN preferences for the specified responsePolicy
 	 * @param requestPolicy		the responsePolicy 
@@ -116,11 +141,12 @@ public interface IPrivacyPreferenceManager {
 
 	/**
 	 * Method to evaluate the access control preferences for the specified details
+	 * this method should only be used from the webapp. this method does not use userFeedback. 
 	 * @param details	the details to which the preference refers to
-	 * @param conditions	the conditions if applicable (from the negotiationAgreement)
-	 * @return			the ResponseItem that indicates the decision of the user about the disclosure of the specified resource
+	 * @return			the ResponseItem that indicates the decision of the user about the disclosure of the specified resource.If a preference does not exist
+	 * 					for the specified details parameter, this method will return null. 
 	 */
-	public ResponseItem evaluateAccCtrlPreference(AccessControlPreferenceDetailsBean details, List<Condition> conditions);
+	public ResponseItem evaluateAccCtrlPreference(AccessControlPreferenceDetailsBean details);
 	
 	
 	/**
