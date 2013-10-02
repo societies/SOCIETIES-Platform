@@ -5,7 +5,7 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 template="templates/main_template.xhtml">
-
+                
     <ui:define name="html_head">
         <title>SOCIEITES :: Access Control Request</title>
     </ui:define>
@@ -158,7 +158,8 @@
                 <p:commandButton id="acceptRememberButton"
                                  value="Accept and remember"
                                  action="#{accessControlController.completeAccessRequestActionRemember}"
-                                 update="@form"/>
+                                 update="@form"
+                                 />
 
                 <p:commandButton id="acceptButton"
                                  value="Accept just once"
@@ -166,13 +167,13 @@
                                  update="@form"/>
 
                 <p:commandButton id="refuseRememberButton"
-                                 value="Refuse"
+                                 value="Refuse and remember"
                                  action="#{accessControlController.cancelAccessRequestActionRemember}"
                                  process="@this"
                                  update="@form"/>
                                  
                 <p:commandButton id="refuseButton"
-                                 value="Refuse"
+                                 value="Refuse just once"
                                  action="#{accessControlController.cancelAccessRequestAction}"
                                  process="@this"
                                  update="@form"/>

@@ -5,13 +5,16 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:f="http://java.sun.com/jsf/core">
+                
+                
 
     <p:dialog id="notificationDialog" resizable="true" header="Notifications"
               draggable="true" modal="false">
 
         <h:outputLink value="notification_history.xhtml">Notification history</h:outputLink>
         
-                            <p:poll interval="1" update="notificationGrid"/>
+        <!-- Quick Fix to get the Timed&Aborts to disappear once timed out -->
+        <p:poll interval="1" update="notificationGrid"/>
         
 
         <p:dataGrid var="notification" value="#{notifications.unansweredNegotiationQueue}"
@@ -30,7 +33,10 @@
 
                     <h:outputText value="#{notification.arrivalDate}"/>
 
-                    <h:outputLink value="#{notification.infoLink}">More info</h:outputLink>
+                    <h:button outcome="/privacy_policy_negotiation.xhtml" value="View more information">
+                    <f:param name="id" value="#{notification.itemId}" />
+                    <f:param name="redirect" value="#{notifications.getView()}" />
+                    </h:button>
 
                 </h:panelGrid>
             </p:panel>
@@ -48,7 +54,10 @@
 
                     <h:outputText value="#{notification.arrivalDate}"/>
 
-                    <h:outputLink value="#{notification.infoLink}">More info</h:outputLink>
+                    <h:button outcome="/access_control.xhtml" value="View more information">
+                    <f:param name="id" value="#{notification.itemId}" />
+                    <f:param name="redirect" value="#{notifications.getView()}" />
+                    </h:button>
 
                 </h:panelGrid>
             </p:panel>

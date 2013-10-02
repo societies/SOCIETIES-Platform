@@ -621,6 +621,11 @@ public class NotificationsController extends BasePageController {
 			return unansweredPrivacyNegotiationEvents.get(negotiationID);
 		}
 	}
+	
+	public String getView()
+	{
+		return FacesContext.getCurrentInstance().getViewRoot().getViewId();
+	}
 
 	public UserFeedbackAccessControlEvent getAcceessControlEvent(String eventId) {
 		synchronized (unansweredAccessControlEvents) {
