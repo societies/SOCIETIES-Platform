@@ -64,7 +64,7 @@ import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
 import org.springframework.scheduling.annotation.AsyncResult;
-
+import org.societies.api.internal.personalisation.model.FeedbackEvent;
 import java.util.concurrent.ExecutionException;
 
 
@@ -500,9 +500,9 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 
 	@Override
-	public void receivePredictionFeedback(IAction action) {
-
-		LOG.debug("receivePredictionFeedback parameterName:"+ action.getparameterName() +" value:"+action.getvalue());
+	public void receivePredictionFeedback(FeedbackEvent feedbackEvent) {
+		
+		LOG.debug("receivePredictionFeedback parameterName:"+ feedbackEvent.getAction().getparameterName()+" getResult:"+feedbackEvent.getResult());
 
 	}
 
