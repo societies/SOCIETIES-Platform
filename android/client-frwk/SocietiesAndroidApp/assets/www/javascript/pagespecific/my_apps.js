@@ -163,6 +163,11 @@ var Societies3PServices = {
 				$('input#start_stop').val("Start Service");
 			$('input#start_stop').button('refresh');
 			
+			// Populate Trust Level
+			var sriString = jTrustLevel.encodeServiceResourceIdentifier(mServiceObj.serviceIdentifier);
+			jTrustLevel.initRating('#service-trust-level', 'SVC', sriString);
+			jTrustLevel.showDetails('#service-trust-level', 'SVC', sriString);
+			
 			try {//REFRESH FORMATTING
 				//ERRORS THE FIRST TIME AS YOU CANNOT refresh() A LISTVIEW IF NOT INITIALISED
 				$('ul#app_details').listview('refresh');

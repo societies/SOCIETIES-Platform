@@ -248,5 +248,18 @@ var jTrustLevel = {
 			}
 
 			return result;
+		},
+		
+		encodeServiceResourceIdentifier: function(sriObject) {
+
+			if (sriObject === null 
+					|| sriObject.identifier === undefined 
+					|| sriObject.identifier === null 
+					|| sriObject.serviceInstanceIdentifier === undefined 
+					|| sriObject.serviceInstanceIdentifier === null) {
+				return null;
+			}
+			
+			return sriObject.serviceInstanceIdentifier + ' ' + sriObject.identifier; 
 		}
 };
