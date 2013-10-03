@@ -5,19 +5,26 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import org.societies.security.digsig.api.SigResult;
 import org.societies.security.digsig.api.Sign;
-import org.societies.security.digsig.api.Trust;
-import org.societies.security.digsig.common.SigResult;
+import org.societies.security.digsig.api.Verify;
+import org.societies.security.digsig.apiinternal.Trust;
 import org.societies.security.digsig.utility.StreamUtil;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -41,9 +48,14 @@ public class MainActivity extends Activity {
 
 		Button installBtn = (Button) findViewById(R.id.buttonMainInstallIdentity);
 		installBtn.setOnClickListener(new View.OnClickListener() {			
-			public void onClick(View v) {								
-				Intent i = new Intent(MainActivity.this, InstallIdentityActivity.class);
-				startActivity(i);
+			public void onClick(View v) {
+				try {
+					MainActivity.this.testSignServiceRemote();
+				} catch (Exception e) {
+					Log.e(TAG, "", e);
+				}
+//				Intent i = new Intent(MainActivity.this, InstallIdentityActivity.class);
+//				startActivity(i);
 			}
 		});
 		Button listBtn = (Button) findViewById(R.id.buttonMainSign);
@@ -193,5 +205,94 @@ public class MainActivity extends Activity {
 			}
 		}
 	}
+	
+	
+	
+	
+	private static final int TIME_TO_WAIT = 3000;
+	
+	/**
+     * Target we publish for clients to send messages to IncomingHandler.
+     */
+    final Messenger mMessenger = new Messenger(new IncomingHandler());
+
+    /**
+     * Handler of incoming messages from clients.
+     */
+    static class IncomingHandler extends Handler {
+    	
+        @Override
+        public void handleMessage(Message msg) {
+            Log.i(TAG, "handleMessage: msg.what = " + msg.what + ", replyTo = " + msg.replyTo);
+            switch (msg.what) {
+                case Verify.Methods.GENERATE_URIS:
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
+        }
+    }
+
+	public void testSignServiceRemote() throws Exception {
+
+		Log.i(TAG, "testSignServiceRemote");
+
+		// Bind to the service
+    	Intent intent = new Intent("org.societies.security.digsig.action.SignServiceRemote");
+    	bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    	Thread.sleep(TIME_TO_WAIT);
+	}
+	
+    /** Messenger for communicating with the service. */
+    Messenger mService = null;
+
+    /** Flag indicating whether we have called bind on the service. */
+    boolean mBound;
+
+    /**
+     * Class for interacting with the main interface of the service.
+     */
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // This is called when the connection with the service has been
+            // established, giving us the object we can use to
+            // interact with the service.  We are communicating with the
+            // service using a Messenger, so here we get a client-side
+            // representation of that from the raw IBinder object.
+            mService = new Messenger(service);
+            mBound = true;
+            sayHello();
+        	try {
+				Thread.sleep(TIME_TO_WAIT);
+			} catch (InterruptedException e) {
+				Log.e(TAG, "could not sleep", e);
+			}
+        	
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            // This is called when the connection with the service has been
+            // unexpectedly disconnected -- that is, its process crashed.
+            mService = null;
+            mBound = false;
+        }
+    };
+
+    public void sayHello() {
+        if (!mBound) return;
+        // Create and send a message to the service, using a supported 'what' value
+        Message msg = Message.obtain(null, Verify.Methods.GENERATE_URIS, 0, 0);
+        msg.replyTo = mMessenger;
+        try {
+        	Log.i(TAG, "Sending message to service");
+            mService.send(msg);
+        	Log.i(TAG, "Message sent to service 1");
+            Thread.sleep(TIME_TO_WAIT);
+        	Log.i(TAG, "Message sent to service 2");
+        } catch (Exception e) {
+            Log.e(TAG, "sayHello", e);
+        }
+    }
+
 
 }

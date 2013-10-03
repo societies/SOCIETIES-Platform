@@ -22,75 +22,41 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.digsig.sign.test;
+package org.societies.security.digsig.apiinternal;
 
-import java.util.ArrayList;
+public class RestServer {
 
-import org.societies.security.digsig.api.Sign;
-import org.societies.security.digsig.sign.MainActivity;
-import org.societies.security.digsig.sign.R;
-import org.societies.security.digsig.sign.SignActivity;
-
-import android.app.Activity;
-import android.content.Intent;
-import android.test.ActivityInstrumentationTestCase2;
-import android.test.UiThreadTest;
-import android.util.Log;
-import android.widget.Button;
-
-/**
- * Android test case for {@link MainActivity}
- *
- * @author Mitja Vardjan
- *
- */
-public class SignActivityTest extends ActivityInstrumentationTestCase2<SignActivity> {
-
-	private static final String TAG = SignActivityTest.class.getSimpleName();
+	public static final String BASE = "/rest";
 	
-	private final static int SIGN = 1;
-
-	private Activity mActivity;
+	/**
+	 * URL parameter. File name, including relative path.
+	 */
+	public static final String URL_PARAM_FILE = "file";
 	
-	public SignActivityTest() {
-		super(SignActivity.class);
-	}
-
-	@Override
-	protected void setUp() throws Exception {
-		
-		Log.i(TAG, "setUp");
-		
-		// Required by JUnit
-		super.setUp();
-
-		setActivityInitialTouchMode(false);
-		mActivity = getActivity();
-	}
+	/**
+	 * URL parameter. Digital signature of the uploader of the file (usually the provider).
+	 */
+	public static final String URL_PARAM_SIGNATURE = "sig";
 	
-	public void testPreConditions() {
-		assertNotNull(mActivity);
-	}
+	/**
+	 * URL parameter. Digital certificate of the uploader of the file (usually the provider).
+	 * Should include only the public key.
+	 */
+	public static final String URL_PARAM_CERT = "cert";
+	
+	/**
+	 * URL parameter. Endpoint for notifying the uploader about future events, e.g. when the resource is modified.
+	 * Supported protocol is HTTP. On event, a HTTP GET is performed on the given endpoint (HTTP URL).
+	 */
+	public static final String URL_PARAM_NOTIFICATION_ENDPOINT = "endpoint";
+	
+	/**
+	 * URL parameter. Minimal number of signatures (threshold) for notifying the uploader about future sign events.
+	 */
+	public static final String URL_PARAM_NUM_SIGNERS_THRESHOLD = "minnumsig";
 
-	@UiThreadTest
-	public void testSigningDocInIntent() {
-		
-		Log.i(TAG, "testSigningDocInIntent");
-		
-		byte[] val = null;
-		try {
-			val = "<xml><miki Id='Miki1'>aadsads</miki></xml>".getBytes("UTF-8");
-		} catch (Exception e) {}
-						
-		Intent i = new Intent("org.societies.security.digsig.action.Sign");
-		i.putExtra(Sign.Params.DOC_TO_SIGN, val);
-		
-		ArrayList<String> idsToSign = new ArrayList<String>();
-		idsToSign.add("Miki1");
-		i.putStringArrayListExtra(Sign.Params.IDS_TO_SIGN, idsToSign);
-		
-		mActivity.startActivityForResult(i, SIGN);
-		Button okButton = (Button) mActivity.findViewById(R.id.buttonSignOk);
-		okButton.performClick();
-	}
+	/**
+	 * Path for servlet that serves xml documents.
+	 */
+	public static final String PATH_XML_DOCUMENTS = "/xmldocs";
 }

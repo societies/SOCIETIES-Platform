@@ -13,12 +13,15 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.xml.security.Init;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.signature.XMLSignature;
+import org.societies.security.digsig.api.SigResult;
 import org.societies.security.digsig.api.Sign;
-import org.societies.security.digsig.api.Trust;
-import org.societies.security.digsig.common.SigResult;
+import org.societies.security.digsig.apiinternal.Trust;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+
+
 
 
 

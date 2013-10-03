@@ -35,6 +35,7 @@ import org.w3c.dom.ls.LSSerializer;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.os.IBinder;
 import android.util.Log;
 
 public class SignService extends IntentService {
@@ -60,7 +61,7 @@ public class SignService extends IntentService {
 	}
 
 	@Override
-	public android.os.IBinder onBind(Intent intent) {
+	public IBinder onBind(Intent intent) {
 		return null;  // FIXME
 	}
 
@@ -81,17 +82,11 @@ public class SignService extends IntentService {
 		Log.i(TAG, "IDS_TO_SIGN = " + ids);
 		Log.i(TAG, "OUTPUT_TYPE = " + outputType);
 
-//		Intent broadcastIntent = new Intent();
-//		broadcastIntent.setAction(TODO);
-//		broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-//		broadcastIntent.putExtra(RESPONSE_MESSAGE, TODO);
-//		sendBroadcast(broadcastIntent);
-		
 		try {
 			initSecureStorage();
 			doSign(intent);
 		} catch (DigSigException e) {
-			// TODO
+			Log.w(TAG, e);
 		}
 	}
 

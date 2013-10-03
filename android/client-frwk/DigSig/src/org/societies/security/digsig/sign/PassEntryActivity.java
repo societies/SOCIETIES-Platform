@@ -1,6 +1,6 @@
 package org.societies.security.digsig.sign;
 
-import org.societies.security.digsig.api.Trust;
+import org.societies.security.digsig.apiinternal.Trust;
 
 import android.app.Activity;
 import android.content.Intent;

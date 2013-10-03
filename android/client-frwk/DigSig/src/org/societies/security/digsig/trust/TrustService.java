@@ -11,8 +11,10 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
-import org.societies.security.digsig.api.Trust;
+import org.societies.security.digsig.apiinternal.Trust;
 import org.societies.security.digsig.utility.Hash;
+
+
 
 
 

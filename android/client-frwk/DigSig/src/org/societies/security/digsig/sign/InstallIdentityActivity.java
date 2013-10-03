@@ -8,7 +8,7 @@ import java.util.Enumeration;
 import java.util.Locale;
 
 import org.societies.security.digsig.api.Sign;
-import org.societies.security.digsig.api.Trust;
+import org.societies.security.digsig.apiinternal.Trust;
 import org.societies.security.digsig.trust.AndroidSecureStorage;
 import org.societies.security.digsig.trust.AndroidSecureStorageConstants;
 

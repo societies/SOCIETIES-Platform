@@ -22,75 +22,44 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.digsig.sign.test;
+package org.societies.security.digsig.utility;
 
-import java.util.ArrayList;
+import java.util.Formatter;
 
-import org.societies.security.digsig.api.Sign;
-import org.societies.security.digsig.sign.MainActivity;
-import org.societies.security.digsig.sign.R;
-import org.societies.security.digsig.sign.SignActivity;
-
-import android.app.Activity;
-import android.content.Intent;
-import android.test.ActivityInstrumentationTestCase2;
-import android.test.UiThreadTest;
 import android.util.Log;
-import android.widget.Button;
 
-/**
- * Android test case for {@link MainActivity}
- *
- * @author Mitja Vardjan
- *
- */
-public class SignActivityTest extends ActivityInstrumentationTestCase2<SignActivity> {
-
-	private static final String TAG = SignActivityTest.class.getSimpleName();
+public class StringUtil {
 	
-	private final static int SIGN = 1;
-
-	private Activity mActivity;
+	private static final String TAG = StringUtil.class.getSimpleName();
 	
-	public SignActivityTest() {
-		super(SignActivity.class);
+	public String bytesToHexString(byte[] bytes) {
+
+		StringBuilder sb = new StringBuilder(bytes.length * 2);
+
+		Formatter formatter = new Formatter(sb);
+		for (byte b : bytes) {
+			formatter.format("%02X", b);
+		}
+
+		return sb.toString();
 	}
 
-	@Override
-	protected void setUp() throws Exception {
-		
-		Log.i(TAG, "setUp");
-		
-		// Required by JUnit
-		super.setUp();
-
-		setActivityInitialTouchMode(false);
-		mActivity = getActivity();
-	}
-	
-	public void testPreConditions() {
-		assertNotNull(mActivity);
-	}
-
-	@UiThreadTest
-	public void testSigningDocInIntent() {
-		
-		Log.i(TAG, "testSigningDocInIntent");
-		
-		byte[] val = null;
-		try {
-			val = "<xml><miki Id='Miki1'>aadsads</miki></xml>".getBytes("UTF-8");
-		} catch (Exception e) {}
-						
-		Intent i = new Intent("org.societies.security.digsig.action.Sign");
-		i.putExtra(Sign.Params.DOC_TO_SIGN, val);
-		
-		ArrayList<String> idsToSign = new ArrayList<String>();
-		idsToSign.add("Miki1");
-		i.putStringArrayListExtra(Sign.Params.IDS_TO_SIGN, idsToSign);
-		
-		mActivity.startActivityForResult(i, SIGN);
-		Button okButton = (Button) mActivity.findViewById(R.id.buttonSignOk);
-		okButton.performClick();
+	public byte[] hexStringToByteArray(String s) {
+	    
+		int len = s.length();
+	    byte[] data = new byte[len / 2];
+	    String invalidChars = s.replaceAll("[0-9]", "");
+	    invalidChars = invalidChars.replaceAll("[A-F]", "");
+	    
+	    if (len % 2 != 0 || invalidChars.length() > 0) {
+	    	Log.w(TAG, "Invalid String input: " + s);
+	    	return null;
+	    }
+	    
+	    for (int i = 0; i < len; i += 2) {
+	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+	                             + Character.digit(s.charAt(i+1), 16));
+	    }
+	    return data;
 	}
 }

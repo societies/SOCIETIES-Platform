@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import org.societies.security.digsig.api.Sign;
-import org.societies.security.digsig.api.Trust;
+import org.societies.security.digsig.apiinternal.Trust;
 
 import android.app.ListActivity;
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package org.societies.security.digsig.common;
+package org.societies.security.digsig.api;
 
 
 import android.os.Parcel;

@@ -45,7 +45,12 @@
             </intent-filter>
 		</activity>
 		<service android:name=".SignService" android:exported="false"/>
-        <provider android:name="org.societies.security.digsig.sign.contentprovider.DocContentProvider"
+		<service android:name=".SignServiceRemote" android:exported="true">
+			<intent-filter>                
+		    	<action android:name="org.societies.security.digsig.action.SignServiceRemote"></action>
+            </intent-filter>
+		</service>
+		<provider android:name="org.societies.security.digsig.sign.contentprovider.DocContentProvider"
         		  android:authorities="org.societies.security.digsig.provider"
         		  android:exported="true"
         		  android:permission="org.societies.security.digsig.provider.permission.SIGN"

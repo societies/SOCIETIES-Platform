@@ -1,11 +1,11 @@
 package org.societies.security.digsig.api;
 
-import android.app.Service;
+import android.app.Activity;
 import android.content.Intent;
 
 /**
  * External API.
- * {@link Intent} parameters to invoke signature {@link Service}
+ * {@link Intent} parameters to invoke signature {@link Activity}
  * 
  * @author Mitja Vardjan
  */
@@ -45,25 +45,25 @@ public class Sign {
 	
 		/**
 		 * URL of the signed xml document.
-		 * Type: String
+		 * Type: {@link String}
 		 */
 		public static final String SIGNED_DOC_URL = "SIGNED_XML";
 	
 		/**
 		 * Type of the signature in output document
-		 * Type: String
+		 * Type: {@link String}
 		 */
 		public static final String OUTPUT_TYPE = "OUTPUT_TYPE";
 	
 		/**
 		 * XML nodes to sign, specified as values of "Id" attribute.
-		 * Type: ArrayList of String
+		 * Type: {@link ArrayList} of {@link String}
 		 */
 		public static final String IDS_TO_SIGN = "IDS_TO_SIGN";
 	
 		/**
 		 * The identity to use when signing.
-		 * Type: String
+		 * Type: {@link String}
 		 */
 		public static final String IDENTITY = "IDENTITY";
 

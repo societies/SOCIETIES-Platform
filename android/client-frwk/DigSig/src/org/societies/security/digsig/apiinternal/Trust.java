@@ -1,4 +1,4 @@
-package org.societies.security.digsig.api;
+package org.societies.security.digsig.apiinternal;
 
 import android.content.Intent;
 
