@@ -24,6 +24,7 @@
  */
 package org.societies.privacytrust.trust.impl.evidence.monitor;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashSet;
@@ -54,6 +55,12 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.privacytrust.trust.evidence.ITrustEvidenceCollector;
+import org.societies.api.internal.servicelifecycle.ServiceMgmtInternalEvent;
+import org.societies.api.osgi.event.CSSEvent;
+import org.societies.api.osgi.event.EventListener;
+import org.societies.api.osgi.event.EventTypes;
+import org.societies.api.osgi.event.IEventMgr;
+import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.privacytrust.trust.TrustException;
 import org.societies.api.privacytrust.trust.evidence.TrustEvidenceType;
@@ -61,6 +68,7 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.api.privacytrust.trust.model.util.TrustedEntityIdFactory;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.services.ServiceMgmtEventType;
 import org.societies.privacytrust.trust.api.ITrustNodeMgr;
 import org.societies.privacytrust.trust.api.evidence.repo.ITrustEvidenceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,12 +95,16 @@ import org.springframework.stereotype.Service;
  * @since 0.4.1
  */
 @Service
-public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
+public class CtxTrustEvidenceMonitor extends EventListener implements CtxChangeEventListener {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(CtxTrustEvidenceMonitor.class);
 	
 	/** The time to wait between registration attempts for membership changes (in seconds) */
 	private static final long WAIT = 60l;
+	
+	private static final String[] INTERNAL_EVENT_TYPES = {
+		EventTypes.SERVICE_LIFECYCLE_EVENT
+	};
 	
 	@Autowired(required=true)
 	private ITrustEvidenceCollector trustEvidenceCollector;
@@ -120,14 +132,17 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
 	@Autowired
-	CtxTrustEvidenceMonitor(ITrustNodeMgr trustNodeMgr, ICommManager commMgr) throws Exception {
+	CtxTrustEvidenceMonitor(ITrustNodeMgr trustNodeMgr, ICommManager commMgr,
+			IEventMgr eventMgr) throws Exception {
 		
-		if (LOG.isInfoEnabled())
-			LOG.info(this.getClass() + " instantiated");
+		LOG.info("{} instantiated", this.getClass());
 		
 		this.commMgr = commMgr;
 		final String ownerIdStr = commMgr.getIdManager().getThisNetworkNode().getBareJid();
 		this.ownerId = commMgr.getIdManager().fromJid(ownerIdStr);
+		LOG.info("Registering for internal events '{}'", 
+				Arrays.asList(INTERNAL_EVENT_TYPES));
+		eventMgr.subscribeInternalEvent(this, INTERNAL_EVENT_TYPES, null);
 	}
 
 	/*
@@ -136,8 +151,7 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	@Override
 	public void onCreation(CtxChangeEvent event) {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Received CREATED event " + event);
+		LOG.debug("Received CREATED event {}", event);
 	}
 
 	/*
@@ -146,8 +160,7 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	@Override
 	public void onUpdate(CtxChangeEvent event) {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Received UPDATED event " + event);
+		LOG.debug("Received UPDATED event {}", event);
 	}
 
 	/*
@@ -156,8 +169,7 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	@Override
 	public void onModification(CtxChangeEvent event) {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Received MODIFIED event " + event);
+		LOG.debug("Received MODIFIED event {}", event);
 		
 		if (CtxAttributeTypes.LAST_ACTION.equals(event.getId().getType()))
 			this.executorService.execute(new UserLastActionHandler(event.getId()));
@@ -173,8 +185,7 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	@Override
 	public void onRemoval(CtxChangeEvent event) {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Received REMOVED event " + event);
+		LOG.debug("Received REMOVED event {}", event);
 	}
 	
 	/**
@@ -189,7 +200,7 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	void bindCtxBroker(ICtxBroker ctxBroker, Dictionary<Object,Object> props)
 			throws Exception {
 		
-		LOG.info("Binding service reference " + ctxBroker);
+		LOG.info("Binding service reference {}", ctxBroker);
 		this.executorService.submit(new Initialiser()).get();
 	}
 	
@@ -204,7 +215,7 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	 */
 	void unbindCtxBroker(ICtxBroker ctxBroker, Dictionary<Object,Object> props) {
 		
-		LOG.info("Unbinding service reference " + ctxBroker);
+		LOG.info("Unbinding service reference {}", ctxBroker);
 	}
 	
 	private class UserLastActionHandler implements Runnable {
@@ -240,7 +251,65 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 				final String userId = lastActionAttr.getId().getOwnerId();
 				final ServiceResourceIdentifier serviceId = lastAction.getServiceID();
 				final Date ts = lastActionAttr.getLastModified();
-				addServiceEvidence(userId, serviceId, ts);
+				addServiceEvidence(userId, serviceId, TrustEvidenceType.USED_SERVICE, ts);
+						
+			} catch (Exception e) {
+				
+				LOG.error("Could not handle CSS last action: " 
+						+ e.getLocalizedMessage(), e);
+			}
+		}	
+	}
+	
+	private class UserInstalledServiceHandler implements Runnable {
+
+		private final ServiceResourceIdentifier serviceId;
+		
+		private UserInstalledServiceHandler(ServiceResourceIdentifier serviceId) {
+			
+			this.serviceId = serviceId;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			
+			try {
+				final String userId = ownerId.getBareJid();
+				final Date ts = new Date();
+				addServiceEvidence(userId, this.serviceId, 
+						TrustEvidenceType.INSTALLED_SERVICE, ts);
+						
+			} catch (Exception e) {
+				
+				LOG.error("Could not handle CSS last action: " 
+						+ e.getLocalizedMessage(), e);
+			}
+		}	
+	}
+	
+	private class UserUninstalledServiceHandler implements Runnable {
+
+		private final ServiceResourceIdentifier serviceId;
+		
+		private UserUninstalledServiceHandler(ServiceResourceIdentifier serviceId) {
+			
+			this.serviceId = serviceId;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			
+			try {
+				final String userId = ownerId.getBareJid();
+				final Date ts = new Date();
+				addServiceEvidence(userId, this.serviceId, 
+						TrustEvidenceType.UNINSTALLED_SERVICE, ts);
 						
 			} catch (Exception e) {
 				
@@ -382,8 +451,7 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 		@Override
 		public void onCreation(CtxChangeEvent event) {
 			
-			if (LOG.isDebugEnabled())
-				LOG.debug("Received CREATED event " + event);
+			LOG.debug("Received CREATED event {}", event);
 		}
 
 		/*
@@ -392,8 +460,7 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 		@Override
 		public void onModification(CtxChangeEvent event) {
 		
-			if (LOG.isDebugEnabled())
-				LOG.debug("Received MODIFIED event " + event);
+			LOG.debug("Received MODIFIED event {}", event);
 			
 			if (event.getId() == null) {
 				LOG.error("Could not handle MODIFIED event " + event
@@ -410,8 +477,7 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 		@Override
 		public void onRemoval(CtxChangeEvent event) {
 			
-			if (LOG.isDebugEnabled())
-				LOG.debug("Received REMOVED event " + event);
+			LOG.debug("Received REMOVED event {}", event);
 		}
 
 		/*
@@ -420,8 +486,7 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 		@Override
 		public void onUpdate(CtxChangeEvent event) {
 			
-			if (LOG.isDebugEnabled())
-				LOG.debug("Received UPDATED event " + event);
+			LOG.debug("Received UPDATED event {}", event);
 		}	
 	}
 	
@@ -443,9 +508,8 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 		@Override
 		public void run() {
 		
-			if (LOG.isDebugEnabled())
-				LOG.debug("Retrieving HAS_MEMBERS association '" + this.hasMembersAssocId
-						+ "' to handle membership change of CIS '" + this.listener.communityId + "'");
+			LOG.debug("Retrieving HAS_MEMBERS association '{}' to handle membership change of CIS '{}'", 
+					this.hasMembersAssocId, this.listener.communityId);
 			try {
 				final CtxAssociation hasMembersAssoc = 
 						(CtxAssociation) ctxBroker.retrieve(this.hasMembersAssocId).get();
@@ -515,6 +579,74 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 		}
 	}
 	
+	/*
+	 * @see org.societies.api.osgi.event.EventListener#handleExternalEvent(org.societies.api.osgi.event.CSSEvent)
+	 */
+	@Override
+	public void handleExternalEvent(final CSSEvent event) {
+
+		LOG.warn("Received unexpected external '" + event.geteventType() 
+				+ "' event: " + event);
+	}
+
+	/*
+	 * @see org.societies.api.osgi.event.EventListener#handleInternalEvent(org.societies.api.osgi.event.InternalEvent)
+	 */
+	@Override
+	public void handleInternalEvent(final InternalEvent event) {
+
+		LOG.debug("Received internal event: {}", eventToString(event));
+
+		if (EventTypes.SERVICE_LIFECYCLE_EVENT.equals(event.geteventType())) {
+
+			if (ServiceMgmtEventType.NEW_SERVICE.toString().equals(event.geteventName())
+					|| ServiceMgmtEventType.SERVICE_REMOVED.toString().equals(event.geteventName())) {
+
+				if (!(event.geteventInfo() instanceof ServiceMgmtInternalEvent)) {
+
+					LOG.error("Could not handle internal '" + event.geteventType() + "' event: " 
+							+ "Expected event info of type " + ServiceMgmtInternalEvent.class
+							+ " but was " + event.geteventInfo());
+					return;
+				}
+
+				final ServiceMgmtInternalEvent serviceEvent = 
+						(ServiceMgmtInternalEvent) event.geteventInfo();
+				final ServiceResourceIdentifier sri = serviceEvent.getServiceId();
+				if (ServiceMgmtEventType.NEW_SERVICE.toString().equals(event.geteventName())) {
+					this.executorService.execute(new UserInstalledServiceHandler(sri));
+				} else if (ServiceMgmtEventType.SERVICE_REMOVED.toString().equals(event.geteventName())) {
+					this.executorService.execute(new UserUninstalledServiceHandler(sri));
+				}
+
+			} else {
+				
+				LOG.debug("Ignoring internal '" + event.geteventType() 
+						+ "' event with name '"	+ event.geteventName() + "'");
+			}
+
+		} else {
+
+			LOG.warn("Received unexpected event of type '" + event.geteventType() + "'");
+		}
+	}
+	
+	private String eventToString(final InternalEvent event) {
+
+		final StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		sb.append("name=").append(event.geteventName());
+		sb.append(",");
+		sb.append("type=").append(event.geteventType());
+		sb.append(",");
+		sb.append("source=").append(event.geteventSource());
+		sb.append(",");
+		sb.append("info=").append(event.geteventInfo());
+		sb.append("]");
+
+		return sb.toString();
+	}
+	
 	private class Initialiser implements Callable<Void> {
 		
 		/*
@@ -565,7 +697,8 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 	}
 	
 	private void addServiceEvidence(final String userId, 
-			final ServiceResourceIdentifier serviceId, final Date ts)
+			final ServiceResourceIdentifier serviceId, 
+			final TrustEvidenceType type, final Date ts)
 					throws TrustException {
 		
 		final TrustedEntityId subjectId = new TrustedEntityId(
@@ -574,11 +707,9 @@ public class CtxTrustEvidenceMonitor implements CtxChangeEventListener {
 		final TrustedEntityId objectId = 
 				TrustedEntityIdFactory.fromServiceResourceIdentifier(serviceId);
 		
-		final TrustEvidenceType type = TrustEvidenceType.USED_SERVICE;
-		if (LOG.isDebugEnabled())
-			LOG.debug("Adding direct trust evidence: subjectId="
-					+ subjectId + ", objectId="	+ objectId 
-					+ ", type=" + type + ", ts=" + ts);
+		LOG.debug("Adding direct trust evidence: subjectId={}"
+				+ ", objectId={}, type={}, ts={}", 
+				new Object[] { subjectId, objectId, type, ts });
 		trustEvidenceCollector.addDirectEvidence(
 				subjectId, objectId, type, ts, null);
 	}

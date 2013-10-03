@@ -38,6 +38,8 @@
       <xs:enumeration value="unfriendedUser"/>
       <xs:enumeration value="joinedCommunity"/>
       <xs:enumeration value="leftCommunity"/>
+      <xs:enumeration value="installedService"/>
+      <xs:enumeration value="uninstalledService"/>
       <xs:enumeration value="usedService"/>
       <xs:enumeration value="null"/>
     </xs:restriction>
