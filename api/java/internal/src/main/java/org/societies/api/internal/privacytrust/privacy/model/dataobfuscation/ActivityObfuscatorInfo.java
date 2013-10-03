@@ -40,7 +40,7 @@ public class ActivityObfuscatorInfo extends ObfuscatorInfo {
 		persistable = false;
 		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
 		nbOfObfuscationLevelStep = 1;
-		obfuscableDataType = CtxAttributeTypes.ACTION;
+		obfuscableDataType = CtxAttributeTypes.ACTIVITIES;
 		obfuscationExamples = new HashMap<Double, String>();
 		obfuscationExamples.put(0.0, "\"Emma has joined HWU Group\" will not change");
 //		obfuscationExamples.put(0.5, "\"Bad mood\" will become \"Absent\"");

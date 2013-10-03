@@ -40,7 +40,7 @@ public class PostalLocationObfuscatorInfo extends ObfuscatorInfo {
 		persistable = false;
 		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
 		nbOfObfuscationLevelStep = 1;
-		obfuscableDataType = CtxAttributeTypes.ADDRESS_HOME_CITY;
+		obfuscableDataType = CtxAttributeTypes.ADDRESS_HOME;
 		obfuscationExamples = new HashMap<Double, String>();
 		obfuscationExamples.put(0.0, "\"Rue Vaugirard, 75008 Paris\" will become \"Rue Vaugirard, 75008 Paris\" (no change)");
 	}

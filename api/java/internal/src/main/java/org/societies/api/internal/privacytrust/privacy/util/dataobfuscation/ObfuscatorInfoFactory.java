@@ -90,7 +90,7 @@ public class ObfuscatorInfoFactory {
 		mappingDataType2ObfuscatorInfo.put(CtxAttributeTypes.STATUS, new StatusObfuscatorInfo());
 		mappingDataType2ObfuscatorInfo.put(CtxAttributeTypes.TEMPERATURE, new TemperatureObfuscatorInfo());
 		PostalLocationObfuscatorInfo postalLocationObfuscatorInfo = new PostalLocationObfuscatorInfo();
-		mappingDataType2ObfuscatorInfo.put(CtxAttributeTypes.ADDRESS_HOME_CITY, postalLocationObfuscatorInfo);
-		mappingDataType2ObfuscatorInfo.put(CtxAttributeTypes.ADDRESS_WORK_CITY, postalLocationObfuscatorInfo);
+		mappingDataType2ObfuscatorInfo.put(CtxAttributeTypes.ADDRESS_HOME, postalLocationObfuscatorInfo);
+		mappingDataType2ObfuscatorInfo.put(CtxAttributeTypes.ADDRESS_WORK, postalLocationObfuscatorInfo);
 	}
 }
