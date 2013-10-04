@@ -100,6 +100,8 @@ public class CAUITaskManager implements ICAUITaskManager{
 	@Override
 	public IUserIntentAction createAction(ServiceResourceIdentifier serviceID, String serviceType, String par, String val) {
 
+		
+		//TODO check if parameters contain null values, throw exception   
 		IUserIntentAction action = new UserIntentAction (serviceID, serviceType, par,val, UIModelObjectNumberGenerator.getNextValue());
 
 		UserIntentModelData model = retrieveModel();
@@ -108,6 +110,8 @@ public class CAUITaskManager implements ICAUITaskManager{
 		model.setActionModel(actionsMap);
 		updateModel(model);
 		//this.activeModel.setActionModel(this.actionModel);
+	
+		//System.out.println("creating Action:"+ action.getActionID() );
 		return action;
 	}
 

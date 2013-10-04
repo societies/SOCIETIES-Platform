@@ -11,6 +11,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -38,24 +40,36 @@ public class CACIDiscoveryTest {
 	static CACIDiscovery discovery = null;
 	static ICAUITaskManager cauiTaskManager = null;
 		
-	private static final String SERVICE_SRI = "css://requestor.societies.org/HelloWorld";
-	private static final String SERVICE_TYPE = "radio_service";
 
-	private static ServiceResourceIdentifier serviceSri;
+	private static final String SERVICE_SRI1 = "css://requestor1.societies.org/HelloWorld";
+	private static final String SERVICE_TYPE = "radio_service";
+	private static ServiceResourceIdentifier serviceSri1;
+
+	private static final String SERVICE_SRI2 = "css://requestor2.societies.org/HelloWorld";
+	private static final String SERVICE_TYPE2 = "nav_service";
+	private static ServiceResourceIdentifier serviceSri2;
 	
 	
+	
+	static UserIntentModelData modelA =null;
+	static UserIntentModelData modelB =null;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		
-		serviceSri = new ServiceResourceIdentifier();
-		serviceSri.setServiceInstanceIdentifier(SERVICE_SRI);
-		serviceSri.setIdentifier(new URI(SERVICE_SRI));
+		serviceSri1 = new ServiceResourceIdentifier();
+		serviceSri1.setServiceInstanceIdentifier(SERVICE_SRI1);
+		serviceSri1.setIdentifier(new URI(SERVICE_SRI1));
 		
-		//discovery = new CACIDiscovery();
-		//cauiTaskManager = discovery.getCauiTaskManager();
-		//createCAUIModelA();
-		//createCAUIModelB();
+		serviceSri2 = new ServiceResourceIdentifier();
+		serviceSri2.setServiceInstanceIdentifier(SERVICE_SRI2);
+		serviceSri2.setIdentifier(new URI(SERVICE_SRI2));
+		
+		
+		
+		discovery = new CACIDiscovery();
+		cauiTaskManager = discovery.getCauiTaskManager();
+		
 	}
 
 	@AfterClass
@@ -64,7 +78,8 @@ public class CACIDiscoveryTest {
 
 	@Before
 	public void setUp() throws Exception {
-
+		modelA = createCAUIModelA();
+		modelB =  createCAUIModelB();
 		
 	
 	
@@ -75,12 +90,6 @@ public class CACIDiscoveryTest {
 	}
 
 
-	@Test
-	public void testGenerateVariousUserModels() {
-	}
-
-	
-	
 	public static UserIntentModelData createCAUIModelA() {
 
 		LOG.info("createCAUIModel");
@@ -96,16 +105,16 @@ public class CACIDiscoveryTest {
 
 		UserIntentModelData modelData = cauiTaskManager.createModel();
 
-		IUserIntentAction userActionOn1 = cauiTaskManager.createAction(serviceSri ,SERVICE_TYPE,"radio","on");
+		IUserIntentAction userActionOn1 = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"radio","on");
 		userActionOn1.setActionContext(context1);
 
-		IUserIntentAction userActionSetVol = cauiTaskManager.createAction(serviceSri ,SERVICE_TYPE,"SetVolume","medium");
+		IUserIntentAction userActionSetVol = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"SetVolume","medium");
 		userActionSetVol.setActionContext(context1);
 
-		IUserIntentAction userActionSetChannel = cauiTaskManager.createAction(serviceSri ,SERVICE_TYPE,"SetChannel","radio1");
+		IUserIntentAction userActionSetChannel = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"SetChannel","radio1");
 		userActionSetChannel.setActionContext(context1);
 
-		IUserIntentAction userActionOff1 = cauiTaskManager.createAction(serviceSri ,SERVICE_TYPE,"radio","off");
+		IUserIntentAction userActionOff1 = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"radio","off");
 		userActionOff1.setActionContext(context1);
 
 
@@ -127,108 +136,115 @@ public class CACIDiscoveryTest {
 	
 	public static UserIntentModelData createCAUIModelB(){
 
-		LOG.info("createCAUIModel");
 
 		HashMap<String,Serializable> context1 = new HashMap<String,Serializable>();
-		context1.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "home");
-		context1.put(CtxAttributeTypes.STATUS, "free");
+		context1.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "office");
+		context1.put(CtxAttributeTypes.HOUR_OF_DAY, 2);
+		context1.put(CtxAttributeTypes.DAY_OF_WEEK, "tuesday");
 
 		HashMap<String,Serializable> context2 = new HashMap<String,Serializable>();
-		context2.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "office");
-		context2.put(CtxAttributeTypes.STATUS, "free");
-
-
+		context2.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "home");
+		context2.put(CtxAttributeTypes.HOUR_OF_DAY, 1);
+		context2.put(CtxAttributeTypes.DAY_OF_WEEK, "monday");
+		
 		UserIntentModelData modelData = cauiTaskManager.createModel();
 
-		IUserIntentAction userActionOn1 = cauiTaskManager.createAction(serviceSri ,SERVICE_TYPE,"radio","on");
+		IUserIntentAction userActionOn1 = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"radio","on");
 		userActionOn1.setActionContext(context1);
 
-		
-		IUserIntentAction userActionOff1 = cauiTaskManager.createAction(serviceSri ,SERVICE_TYPE,"radio","off");
-		userActionOff1.setActionContext(context1);
-
-
+		//IUserIntentAction userActionOff1 = cauiTaskManager.createAction(serviceSri ,SERVICE_TYPE,"radio","off");
+		IUserIntentAction userActionSetMedium = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"SetVolume","medium");
+		userActionSetMedium.setActionContext(context1);
 
 		//On --> setVol 0.5
-		cauiTaskManager.setActionLink(userActionOn1, userActionOff1, 1.0d);	
-		
+		cauiTaskManager.setActionLink(userActionOn1, userActionSetMedium, 1.0d);	
+
 		modelData  = cauiTaskManager.retrieveModel();
-		
-		System.out.println("B CAUI modelData ::" +cauiTaskManager.retrieveModel().getActionModel());
-		LOG.info("CAUI modelData ::"+modelData.getActionModel());
-	
+		System.out.println("B CAUI modelData ::"+modelData.getActionModel());
+		//printModel(modelData);
+
 		return modelData;
 	}
 	
+	@Ignore
+	@Test
+	public void testAreSimilarActions() {
+		
+		System.out.println(" testareSimilarActions" );
+		IUserIntentAction userActionOn1 = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"radio","on");
+		IUserIntentAction userActionOn2 = cauiTaskManager.createAction(serviceSri2 ,SERVICE_TYPE,"radio","on");
+		IUserIntentAction userActionOn3 = cauiTaskManager.createAction(serviceSri2 ,SERVICE_TYPE,"radio","off");
+		IUserIntentAction userActionOn4 = cauiTaskManager.createAction(serviceSri2 ,SERVICE_TYPE2,"radio","on");
+		
+		System.out.println(" testareSimilarActions :  "+discovery.areSimilarActions(userActionOn1, userActionOn2));
+		assertEquals(true,discovery.areSimilarActions(userActionOn1, userActionOn2) );
+		assertEquals(false,discovery.areSimilarActions(userActionOn1, userActionOn3) );
+		assertEquals(false,discovery.areSimilarActions(userActionOn1, userActionOn4) );
+	}
 	
+	@Ignore
+	@Test
+	public void testCreateTranslationMap() {
+		
+		System.out.println("--- testCreateTranslationMap ---");
+		
+		List<UserIntentModelData> uiModelList = new ArrayList<UserIntentModelData>();
+		uiModelList.add(modelA);
+		uiModelList.add(modelB);
 	
-	
-	/*
-	public UserIntentModelData createModelA(){
+		//System.out.println("modelA"+ modelA.getActionModel().keySet());
+		//System.out.println("modelB"+ modelB.getActionModel().keySet());
 		
-		UserIntentModelData cauiModelA = new  UserIntentModelData();
+		Map<IUserIntentAction, List<IUserIntentAction>> transMap = discovery.createTranslationMap(uiModelList);
+		assertEquals(4 , transMap.keySet().size());
+		printTranlationMap(transMap);
+		System.out.println("--- end of  testCreateTranslationMap --- ");
+	}
+	@Ignore
+	@Test
+	public void testConvertUserToCommModels() {
 		
-		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionModelA = new HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>>();
-		HashMap<IUserIntentAction,Double> actionModeltarget = new HashMap<IUserIntentAction,Double>(); 
+		System.out.println("--- testConvertUserToCommModels ---");
 		
-		actionModelA.put(mockUserAction1A, null);
-		actionModelA.put(mockUserAction1B, null);
-		actionModelA.put(mockUserAction1C, null);
-		actionModelA.put(mockUserAction1D, null);
+		List<UserIntentModelData> uiModelList = new ArrayList<UserIntentModelData>();
+		uiModelList.add(modelA);
+		uiModelList.add(modelB);
+		System.out.println("modelA");
+		printModel(modelA);
+		System.out.println("modelB");
+		printModel(modelB);
 		
-		// {A-->B,C} {B-->D}, {C-->D} 
-		actionModeltarget.put(mockUserAction1B, 0.5);
-		actionModeltarget.put(mockUserAction1C, 0.5);
-		actionModelA.put(mockUserAction1A,actionModeltarget);
-			
-		HashMap<IUserIntentAction,Double> actionModeltargetX = new HashMap<IUserIntentAction,Double>(); 
-		actionModeltargetX.put(mockUserAction1D,1.0);
+		Map<IUserIntentAction, List<IUserIntentAction>> transMap = discovery.createTranslationMap(uiModelList);
+		printTranlationMap(transMap);
 		
-		actionModelA.put(mockUserAction1B,actionModeltargetX);
-		actionModelA.put(mockUserAction1C,actionModeltargetX);
+		List<UserIntentModelData> convertedUIModelList =  discovery.convertUserToCommModels(uiModelList, transMap);
 		
-		cauiModelA.setActionModel(actionModelA);
-		assertEquals(4, cauiModelA.getActionModel().size());
-		assertEquals("setRadio", mockUserAction1A.getparameterName());
-		assertEquals("on", mockUserAction1A.getvalue());
-			
-		System.out.println("mockUserAction1A:getServiceID: " +mockUserAction1A.getServiceID());
-		System.out.println("CAUI MODEL A:: " +cauiModelA.getActionModel());
-
-		return cauiModelA;
+		UserIntentModelData conModelA = convertedUIModelList.get(0);
+		UserIntentModelData conModelB = convertedUIModelList.get(1);
+		
+		
+		System.out.println("conModelA "+conModelA.getActionModel());
+		printModel(conModelA);
+		assertEquals(4, conModelA.getActionModel().size());
+		
+		System.out.println("conModelB "+conModelB.getActionModel());
+		printModel(conModelB);
+		assertEquals(2, conModelB.getActionModel().size());
+		System.out.println("--- end of testConvertUserToCommModels ---");
 	}
 	
 	
-	public UserIntentModelData createModelB(){
-		
-		UserIntentModelData cauiModelB = new  UserIntentModelData();
-		
-		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionModelB = new HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>>();
-		HashMap<IUserIntentAction,Double> actionModeltarget = new HashMap<IUserIntentAction,Double>(); 
-		
-		actionModelB.put(mockUserAction2A, null);
-		actionModelB.put(mockUserAction2B, null);
-		actionModelB.put(mockUserAction2C, null);
-		// {A-->B} {B-->C} 
-		actionModeltarget.put(mockUserAction2B, 0.5);
-		
-		actionModelB.put(mockUserAction2A,actionModeltarget);
-		
-		actionModeltarget.clear();
-		actionModeltarget.put(mockUserAction2C,1.0);
-		actionModelB.put(mockUserAction2B,actionModeltarget);
-		
-		cauiModelB.setActionModel(actionModelB);
-		
-		assertEquals(3, cauiModelB.getActionModel().size());
-		assertEquals("setVolume", mockUserAction2B.getparameterName());
-		assertEquals("medium", mockUserAction2B.getvalue());
-		
-		System.out.println("CAUI MODEL B:: " +cauiModelB.getActionModel());
 	
-		return cauiModelB;
+	void printTranlationMap(Map<IUserIntentAction, List<IUserIntentAction>> tranlationMap){
+		
+		
+		System.out.println("printing Tranlation Map");
+		for(IUserIntentAction action : tranlationMap.keySet()){
+			System.out.println("com act: "+action +" /user act->"+tranlationMap.get(action));
+		}	
 	}
-	*/
+	
+	
 	
 	@Ignore
 	@Test
@@ -246,57 +262,28 @@ public class CACIDiscoveryTest {
 
 		//UserIntentModelData merged = discovery.mergeModels(userModelList);
 		//System.out.println("merged:"+ merged);
-		
-		
-		
-		//HashMap<IUserIntentAction,Double> merged = discovery.mergeTargetMaps(mapAnew, mapBexisting);
-		
-		
 			
+		//HashMap<IUserIntentAction,Double> merged = discovery.mergeTargetMaps(mapAnew, mapBexisting);
+				
 	}
 	
-	/*
-	public static void createCAUIModel() throws URISyntaxException, InterruptedException{
+	private static void printModel(UserIntentModelData model){
 
-		LOG.info("createCAUIModel");
+		HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> allActions = new HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>>();
+		allActions = model.getActionModel();
+		System.out.println("------------printModel start ---------------");
+		for(IUserIntentAction action : allActions.keySet()){
+			System.out.println("source:"+action.getparameterName()+"/"+action.getvalue() /*+" ctx:"+ action.getActionContext()*/);
 
-		HashMap<String,Serializable> context1 = new HashMap<String,Serializable>();
-		context1.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "home");
-		context1.put(CtxAttributeTypes.STATUS, "free");
-
-		HashMap<String,Serializable> context2 = new HashMap<String,Serializable>();
-		context2.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "office");
-		context2.put(CtxAttributeTypes.STATUS, "free");
-
-
-		UserIntentModelData modelData = .cauiTaskManager.createModel();
-
-		IUserIntentAction userActionOn1 = TestCase2120.cauiTaskManager.createAction(serviceSri ,SERVICE_TYPE,"radio","on");
-		userActionOn1.setActionContext(context1);
-
-		IUserIntentAction userActionSetVol = TestCase2120.cauiTaskManager.createAction(serviceSri ,SERVICE_TYPE,"SetVolume","medium");
-		userActionSetVol.setActionContext(context1);
-
-		IUserIntentAction userActionSetChannel = TestCase2120.cauiTaskManager.createAction(serviceSri ,SERVICE_TYPE,"SetChannel","radio1");
-		userActionSetChannel.setActionContext(context1);
-
-		IUserIntentAction userActionOff1 = TestCase2120.cauiTaskManager.createAction(serviceSri ,SERVICE_TYPE,"radio","off");
-		userActionOff1.setActionContext(context1);
-
-
-
-		//On --> setVol 0.5
-		TestCase2120.cauiTaskManager.setActionLink(userActionOn1, userActionSetVol, 0.3d);	
-		TestCase2120.cauiTaskManager.setActionLink(userActionOn1, userActionSetChannel, 0.7d);
-		TestCase2120.cauiTaskManager.setActionLink(userActionSetVol, userActionOff1, 1.0d);	
-		TestCase2120.cauiTaskManager.setActionLink(userActionSetChannel, userActionOff1, 1.0d);	
-
-		modelData  = TestCase2120.cauiTaskManager.retrieveModel();
-		storeModelCtxDB(modelData,CtxAttributeTypes.CAUI_MODEL);
-
-		LOG.info("CAUI modelData ::"+modelData.getActionModel());
-		Thread.sleep(5000);
-
+			if(allActions.get(action)!=null){
+				
+			
+			HashMap<IUserIntentAction, Double> targetActions = allActions.get(action);
+			for(IUserIntentAction actionTarget : targetActions.keySet()){
+				System.out.println("--> target:"+actionTarget.getparameterName()+"/"+actionTarget.getvalue() /*+" ctx:"+ actionTarget.getActionContext()*/);	
+			}
+			}
+		}
+		System.out.println("------------printModel end ---------------");
 	}
-	*/
 }

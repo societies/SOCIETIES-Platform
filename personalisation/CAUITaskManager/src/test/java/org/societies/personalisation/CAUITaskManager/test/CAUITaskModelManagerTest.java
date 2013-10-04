@@ -86,6 +86,48 @@ public class CAUITaskModelManagerTest {
 	}
 
 	@Test
+	public void testCompareActions() {
+		
+		
+		ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
+		ServiceResourceIdentifier serviceId2 = new ServiceResourceIdentifier();
+		try {
+			serviceId1.setIdentifier(new URI("css://nikosk@societies.org/HelloEarth"));
+
+			serviceId1.setServiceInstanceIdentifier("css://nikosk@societies.org/HelloEarth");
+			
+			serviceId2.setIdentifier(new URI("css://nikosk@societies.org/HelloEarth"));
+
+			serviceId2.setServiceInstanceIdentifier("css://nikosk@societies.org/HelloEarth");
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
+		IUserIntentAction userActionA = modelManager.createAction(serviceId1,"ServiceType","A-homePc","off");
+		HashMap<String,Serializable> actionCtx = new HashMap<String,Serializable>();
+		actionCtx.put("temperature", 32);
+		actionCtx.put("noiseLevel", "loud");
+
+		userActionA.setActionContext(actionCtx);
+		userActionA.setConfidenceLevel(65);
+		userActionA.setTaskID("taskID");
+		
+		IUserIntentAction userActionB = modelManager.createAction(serviceId2,"ServiceType","A-homePc","off");
+		HashMap<String,Serializable> actionCtx2 = new HashMap<String,Serializable>();
+		actionCtx2.put("temperature", 32);
+		actionCtx2.put("noiseLevel", "loud");
+
+		userActionB.setActionContext(actionCtx2);
+		userActionB.setConfidenceLevel(65);
+		userActionB.setTaskID("taskID");
+				
+		assertEquals(userActionA,userActionB);
+	}
+	
+	@Test
 	public void testCreateAction() {
 
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
@@ -171,10 +213,13 @@ public class CAUITaskModelManagerTest {
 		createModel();
 		UserIntentModelData modelData = modelManager.retrieveModel();
 		System.out.println("testRetrieveActionsByTypeValue getActionModel "+ modelData.getActionModel());
-		List<IUserIntentAction> userActionA = modelManager.retrieveActionsByTypeValue("A-homePc", "off");
-		//System.out.println("Retrieved_userActionA:"+ userActionA);
+		List<IUserIntentAction> userActionAList = modelManager.retrieveActionsByTypeValue("A-homePc", "off");
+		System.out.println("Retrieved_userActionA:"+ userActionAList);
 		//System.out.println("Retrieved_userActionA:"+ userActionA.get(0));
-		assertEquals("css://nikosk@societies.org/HelloEarth#A-homePc=off/13", userActionA.get(0).toString());
+		IUserIntentAction act = userActionAList.get(0);
+		assertEquals("A-homePc",act.getparameterName());
+		assertEquals("off",act.getvalue());
+
 	}
 
 

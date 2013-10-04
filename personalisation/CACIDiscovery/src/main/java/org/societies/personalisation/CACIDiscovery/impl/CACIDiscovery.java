@@ -125,21 +125,19 @@ public class CACIDiscovery implements ICACIDiscovery{
 
 		//CACI model
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> communityActionsMap = new HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>>();
-
+		System.out.println("mergeModels 1 ");
 		// create translation map
-		// translate actions of various user models to a unique actions that will construct a community  model
+		// translate identical actions of various user models to a unique actions that will be part of the community  model
 		// key:commAction -- value: set of user actions
-		Map<IUserIntentAction, Set<IUserIntentAction>> translationMap =  createTranslationMap (userModelList);
-		System.out.println(" translationMap "+translationMap);
+		Map<IUserIntentAction, List<IUserIntentAction>> translationMap =  createTranslationMap (userModelList);
+		printTranlationMap(translationMap);
 
 		List<UserIntentModelData> userModelsComActionsList = convertUserToCommModels(userModelList,translationMap);
 
 		// A) create a map (communityActionsMap) with key each individual userAction and B) value a map with all possible targets 
 
-		// A)
 		// get each user intent model
 		for(UserIntentModelData userModel : userModelsComActionsList){
-
 			// get actions for this model
 			HashMap<IUserIntentAction,HashMap<IUserIntentAction, Double>> actionsMap = userModel.getActionModel();
 			LOG.debug(" initial actionsMap : "+actionsMap);
@@ -151,54 +149,67 @@ public class CACIDiscovery implements ICACIDiscovery{
 				} 
 			}
 		}
-
-		LOG.debug(" initial communityActionsMap : "+communityActionsMap);
-		System.out.println("communityActionsMap "+communityActionsMap);
-		//this.printCACIModel(communityActionsMap);		
-		//		printModels(userModelList);
-
+		
+		System.out.println("mergeModels 2 communityActionsMap "+communityActionsMap);
 
 		int i =0;
 		for(UserIntentModelData userModel : userModelList){
+		
 			i++;
-
-			LOG.debug("model i= "+i );
+			System.out.println("model i= "+i );
 			HashMap<IUserIntentAction,  HashMap<IUserIntentAction,Double>> uiModelActions = userModel.getActionModel();
 
 			for (IUserIntentAction sourceUserAct  :uiModelActions.keySet()){
-				LOG.debug("sourceUserAct " +sourceUserAct);
-				
-				System.out.println("communityActionsMap "+communityActionsMap.keySet());
-				
+				//LOG.debug("sourceUserAct " +sourceUserAct);
 				//iterate through commActions and find a commAction similar with user action
 				for(IUserIntentAction sourceComAct : communityActionsMap.keySet()){
-					
-					
-					
-					if(this.equalActions(sourceUserAct, sourceComAct)){
-						// get targets for this userAct
-						HashMap<IUserIntentAction,Double> targetUserActions = uiModelActions.get(sourceUserAct);
-						// translate targets to commAct ?
-						HashMap<IUserIntentAction,Double> targetComActionNew =  translateUsertoComActionMap(translationMap, targetUserActions);
-						LOG.debug("targetComActionNew " +targetComActionNew);
 
-						// if null or map is empty
-						if(communityActionsMap.get(sourceComAct) == null || communityActionsMap.get(sourceComAct).size() == 0){
-							communityActionsMap.put(sourceComAct, targetComActionNew);
+					if(this.areSimilarActions(sourceUserAct, sourceComAct)){
 
-						} if(communityActionsMap.get(sourceComAct).size() >0 ){
-							HashMap<IUserIntentAction,Double> targetComActionExisting = communityActionsMap.get(sourceComAct);
+						// get targets for this userAct if exist (e.g. if it is the last action of uimodel no target exist)
+						if(uiModelActions.get(sourceUserAct) != null) {
 
-							HashMap<IUserIntentAction,Double> updatedTargetComMap = mergeTargetMaps(targetComActionNew,targetComActionExisting);
-							communityActionsMap.put(sourceComAct, updatedTargetComMap);
+							HashMap<IUserIntentAction,Double> targetUserActions = uiModelActions.get(sourceUserAct);
+							// translate list of targets user action to commAction 
+							System.out.println("sourceUserAct "+sourceUserAct);
+							System.out.println("targetUserActions "+targetUserActions);
+							HashMap<IUserIntentAction,Double> targetComActionNew =  translateUsertoComActionMap(translationMap, targetUserActions);
+							LOG.debug("targetComActionNew " +targetComActionNew);
+
+							// add translated source community action along with user action to output 
+							// if entry don't exist yet
+							if(communityActionsMap.get(sourceComAct) == null || communityActionsMap.get(sourceComAct).size() == 0){
+								communityActionsMap.put(sourceComAct, targetComActionNew);
+							}  
+							// if entry already exists
+							if(communityActionsMap.get(sourceComAct).size() >0 ){
+
+								HashMap<IUserIntentAction,Double> targetComActionExisting = communityActionsMap.get(sourceComAct);
+								HashMap<IUserIntentAction,Double> updatedTargetComMap = mergeTargetMaps(targetComActionNew,targetComActionExisting);
+								communityActionsMap.put(sourceComAct, updatedTargetComMap);
+							}
+
+
+						} else {
+							// this is a final community source action, no target actions exist
+							if(communityActionsMap.get(sourceComAct) == null || communityActionsMap.get(sourceComAct).size() == 0){
+								communityActionsMap.put(sourceComAct, null);
+								System.out.println("**** adding null target for "+sourceComAct);
+							}  else {
+								// if community model already contains an edge for sourceCommAct to some target
+								// but the newly merged model doesn't contain this link recalculate and drop trans prob
+								// TODO recalculate trans prob
+								System.out.println("**** nothing to do for  "+sourceComAct);
+							}
 						}
+
 					}
 				}
 			}
-			//this.printCACIModel(communityActionsMap);
+			this.printCACIModel(communityActionsMap);
 		}
 
-		this.printCACIModel(communityActionsMap);
+		//this.printCACIModel(communityActionsMap);
 		UserIntentModelData communityModel = new UserIntentModelData();
 		communityModel.setActionModel(communityActionsMap);
 
@@ -283,6 +294,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 	public HashMap<IUserIntentAction,Double> mergeTargetMaps(HashMap<IUserIntentAction,Double> targetComActionNew, 
 			HashMap<IUserIntentAction,Double>targetComActionExisting){
 
+		//TODO add junit test
 		HashMap<IUserIntentAction,Double> result = new HashMap<IUserIntentAction,Double>();
 		result.putAll(targetComActionExisting);
 
@@ -321,7 +333,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 	/*
 	 * convert target user actions in map to community user actions in map
 	 */
-	private HashMap<IUserIntentAction,Double> translateUsertoComActionMap(Map<IUserIntentAction, Set<IUserIntentAction>> translationMap ,HashMap<IUserIntentAction,Double> targetUserActions){
+	private HashMap<IUserIntentAction,Double> translateUsertoComActionMap(Map<IUserIntentAction, List<IUserIntentAction>> translationMap ,HashMap<IUserIntentAction,Double> targetUserActions){
 
 		HashMap<IUserIntentAction,Double> targetComActions = new HashMap<IUserIntentAction,Double>();  
 
@@ -352,15 +364,15 @@ public class CACIDiscovery implements ICACIDiscovery{
 	 */
 
 
-	private Boolean mapContainsKeyAction(Map<IUserIntentAction, ?> tranlationMap,  IUserIntentAction action){
+	private Boolean mapContainsSimilarKeyAction(Map<IUserIntentAction, ?> tranlationMap,  IUserIntentAction action){
 
 		for(IUserIntentAction actionKey : tranlationMap.keySet()){
 			if(actionKey == null) {
 				return false;
 			} else {
 				//System.out.println("action 1 "+action +" action 2:"+ actionKey);	
-				if(equalActions (actionKey,action) ){
-						//System.out.println("EQUAL");
+				if(areSimilarActions (actionKey,action) ){
+					//System.out.println("EQUAL");
 					return true;
 				}
 			}
@@ -371,26 +383,13 @@ public class CACIDiscovery implements ICACIDiscovery{
 
 
 
-	private Boolean equalActions(IUserIntentAction actionA, IUserIntentAction actionB){
+	public Boolean areSimilarActions(IUserIntentAction actionA, IUserIntentAction actionB){
 
-		/*
-		System.out.println("actionA "+actionA);
-		System.out.println("actionB "+actionB);
-
-		System.out.println("A "+actionA.getServiceID().getServiceInstanceIdentifier().toString() +" b "+actionB.getServiceID().getServiceInstanceIdentifier().toString());
-		System.out.println("A "+actionA.getparameterName() +" b "+actionB.getparameterName());
-		System.out.println("A "+actionA.getvalue() +" b "+actionB.getvalue());
-*/
-		System.out.println("actionA "+actionA);
-		System.out.println("actionB "+actionB);
-		System.out.println("A "+actionA.getServiceID().getServiceInstanceIdentifier().toString() +" b "+actionB.getServiceID().getServiceInstanceIdentifier().toString());
-		
-		if(actionA.getServiceID().getServiceInstanceIdentifier().toString().equals(actionB.getServiceID().getServiceInstanceIdentifier().toString()) && actionA.getparameterName().equals(actionB.getparameterName()) 
-				&& actionA.getvalue().equals(actionB.getvalue())) {
-			//		System.out.println( "!!!!!!!!!! MATCH");
+		// ignore ServiceInstanceIdentifier, using only service type
+		if(actionA.getServiceType().equalsIgnoreCase(actionB.getServiceType()) && actionA.getparameterName().equals(actionB.getparameterName()) && actionA.getvalue().equals(actionB.getvalue())) {
+			//System.out.println( actionA +" and "+ actionB+"!!!!! are similar");
 			return true;
-		}
-		return false;
+		} else return false;
 	}
 
 
@@ -405,48 +404,20 @@ public class CACIDiscovery implements ICACIDiscovery{
 
 
 	/*
-	 *  need to add a method that translates actions with same serviceId, par,val to a unique community action.
-	 *  converts same actions of different ui models to unique actions for all models  
+	 * This method translates actions of various user intent model to community actions based on a translation map created by
+	 * method discovery.createTranslationMap(uiModelList)
+	 * Actions similarity is based on action parameters (serviceType, parameter, value)
+	 * It converts same actions of different ui models to unique actions for all models  
 	 *  
 	 *  e.g. communityActA = {userActA1,userActA2,userActA3}
 	 *  userActionModel {http://testService2#volume=low/1={http://testService1#volume=mute/2=1.0}, http://testService1#YYYY=YYYY/4={http://testService1#XXXX=XXXX/3=0.5, http://testService2#colour=blue/5=0.5}, http://testService1#XXXX=XXXX/3={http://testService1#YYYY=YYYY/4=0.5714285714285714, http://testService1#volume=high/0=0.42857142857142855}, http://testService1#volume=high/0={http://testService2#volume=low/1=1.0}, http://testService2#colour=green/6={http://testService1#YYYY=YYYY/4=1.0}, http://testService2#colour=blue/5={http://testService2#colour=green/6=1.0}, http://testService1#volume=mute/2={http://testService1#XXXX=XXXX/3=1.0}}
 	 *  communityActionModel {http://testService2#volume=low/17={http://testService1#volume=mute/23=1.0}, http://testService1#YYYY=YYYY/18={http://testService1#XXXX=XXXX/19=0.5, http://testService2#colour=blue/22=0.5}, http://testService1#XXXX=XXXX/19={http://testService1#YYYY=YYYY/18=0.5714285714285714, http://testService1#volume=high/20=0.42857142857142855}, http://testService1#volume=high/20={http://testService2#volume=low/17=1.0}, http://testService2#colour=green/21={http://testService1#YYYY=YYYY/18=1.0}, http://testService2#colour=blue/22={http://testService2#colour=green/21=1.0}, http://testService1#volume=mute/23={http://testService1#XXXX=XXXX/19=1.0}}
-	 *
 	 */
-
-	public List<UserIntentModelData> convertUserToCommModels (List<UserIntentModelData> userModelList, Map<IUserIntentAction, Set<IUserIntentAction>> tranlationMap){
+	public List<UserIntentModelData> convertUserToCommModels (List<UserIntentModelData> userModelList, Map<IUserIntentAction, List<IUserIntentAction>> tranlationMap){
 
 		List<UserIntentModelData> translatedModels = new ArrayList<UserIntentModelData>();
 
-		/*
-		Map<IUserIntentAction, Set<IUserIntentAction>> tranlationMap = new HashMap<IUserIntentAction, Set<IUserIntentAction>>();
-		//create action translator map
-		for (UserIntentModelData userModel : userModelList){
-
-			HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>> userActionModel = userModel.getActionModel();
-			//	HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>> communityActionModel = new HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>>();
-
-			for(IUserIntentAction userAction  : userActionModel.keySet()){
-
-				if(! mapContainsKeyAction(tranlationMap,userAction)){	
-					IUserIntentAction commAction = convertAction(userAction);
-					//if(!tranlationMap.containsKey(commAction)){
-					Set<IUserIntentAction> newUserActionSet = new HashSet<IUserIntentAction>();
-					newUserActionSet.add(userAction);
-					tranlationMap.put(commAction, newUserActionSet);
-				} else {
-					//System.out.println("commAction " + commAction);
-					IUserIntentAction commAction = findComAction(tranlationMap.keySet(), userAction);
-					Set<IUserIntentAction> currentActionSet  = tranlationMap.get(commAction);
-					//System.out.println("currentActionSet " + currentActionSet);
-					currentActionSet.add(userAction);
-					tranlationMap.put(commAction, currentActionSet);
-				}
-			}
-		}		
-		printTranlationMap(tranlationMap);
-		// translation map created 
-		 */
+	
 		// translate userActionModel to community action model
 		for (UserIntentModelData userModel : userModelList){
 
@@ -468,6 +439,8 @@ public class CACIDiscovery implements ICACIDiscovery{
 					}
 					communityActionModel.put(commAction, communityTargetMap);
 
+				} if(userTargetMap == null ){
+					communityActionModel.put(commAction, null);
 				}
 			}
 			LOG.debug("convertUserToCommModels userActionModel 1 communityActionModel " + communityActionModel);
@@ -483,61 +456,58 @@ public class CACIDiscovery implements ICACIDiscovery{
 
 
 
+	// translate identical actions of various user models to a unique actions that will be part of the community  model
+	// key:commAction -- value: set of user actions
+	public Map<IUserIntentAction, List<IUserIntentAction>> createTranslationMap (List<UserIntentModelData> userModelList){
 
-	public Map<IUserIntentAction, Set<IUserIntentAction>> createTranslationMap (List<UserIntentModelData> userModelList){
+		Map<IUserIntentAction, List<IUserIntentAction>> tranlationMap = new HashMap<IUserIntentAction, List<IUserIntentAction>>();
+		//int i =0;
+		List<UserIntentModelData> userModelListNewInst = new ArrayList<UserIntentModelData>();
+		userModelListNewInst.addAll(userModelList);
 
-		Map<IUserIntentAction, Set<IUserIntentAction>> tranlationMap = new HashMap<IUserIntentAction, Set<IUserIntentAction>>();
+		for (UserIntentModelData userModel : userModelListNewInst){
 
-		//create action translator map
-		for (UserIntentModelData userModel : userModelList){
-
-			int i =0;
-			HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>> userActionModel = userModel.getActionModel();
-			//	HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>> communityActionModel = new HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>>();
-			i++;
-			System.out.println("1 createTranslationMap current model: "+i + "  "+ userActionModel); 
+			HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>> userActionModel = new HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>>();
+			userActionModel = userModel.getActionModel();
+			//i++;
+			//System.out.println("1 createTranslationMap current model: "+i + "  "+userModel.getActionModel().keySet()); 
 
 			for(IUserIntentAction userAction  : userActionModel.keySet()){
+				//		System.out.println("loop userAction "+userAction); 
 
-				if(! mapContainsKeyAction(tranlationMap,userAction)){	
+				if(! mapContainsSimilarKeyAction(tranlationMap,userAction)){	
 
-					if(convertAction(userAction) != null){
-						IUserIntentAction commAction = convertAction(userAction);
-						//System.out.println("2 createTranslationMap : "+commAction); 
-						if(!tranlationMap.containsKey(commAction)){
-							Set<IUserIntentAction> newUserActionSet = new HashSet<IUserIntentAction>();
-							newUserActionSet.add(userAction);
-							tranlationMap.put(commAction, newUserActionSet);
-						}
+					IUserIntentAction commAction = createCommunityAction(userAction);
+					List<IUserIntentAction> newUserActionList = new ArrayList<IUserIntentAction>();
+					newUserActionList.add(userAction);
+					tranlationMap.put(commAction, newUserActionList);
 
-					} else {
-						//System.out.println("commAction " + commAction);
-						IUserIntentAction commAction = findComAction(tranlationMap, userAction);
-						if(tranlationMap.get(commAction) != null ){
-							Set<IUserIntentAction> currentActionSet  = tranlationMap.get(commAction);
-							//System.out.println("currentActionSet " + currentActionSet);
-							currentActionSet.add(userAction);
-							tranlationMap.put(commAction, currentActionSet);	
-						}
+				} else {
 
+					IUserIntentAction commAction = findComAction(tranlationMap, userAction);
+					if(tranlationMap.get(commAction) != null ){
+						List<IUserIntentAction> currentActionList  = tranlationMap.get(commAction);
+						//System.out.println("currentActionSet " + currentActionSet);
+						currentActionList.add(userAction);
+						tranlationMap.put(commAction, currentActionList);	
 					}
 				}
-			}	
-		}
-		printTranlationMap(tranlationMap);
-		// translation map created 
 
+			}// action list for loop 	
+		}// model list
+
+		// translation map created 
 		return tranlationMap;
 	}
 
 
 
-	private IUserIntentAction translateUserToComAction(Map<IUserIntentAction, Set<IUserIntentAction>> tranlationMap,IUserIntentAction userAction ){
+	private IUserIntentAction translateUserToComAction(Map<IUserIntentAction, List<IUserIntentAction>> tranlationMap,IUserIntentAction userAction ){
 
 		IUserIntentAction communityAction = null;
 
 		for(IUserIntentAction communityActionTemp : tranlationMap.keySet()){
-			Set<IUserIntentAction> actionSet = tranlationMap.get(communityActionTemp);
+			List<IUserIntentAction> actionSet = tranlationMap.get(communityActionTemp);
 			if(actionSet.contains(userAction)) return communityActionTemp;
 		}
 
@@ -549,12 +519,12 @@ public class CACIDiscovery implements ICACIDiscovery{
 	/*
 	 * retrieves a community action identical with the user action declared 
 	 */
-	protected IUserIntentAction findComAction(Map<IUserIntentAction, Set<IUserIntentAction>> tranlationMap, IUserIntentAction userAction ){
+	protected IUserIntentAction findComAction(Map<IUserIntentAction, List<IUserIntentAction>> tranlationMap, IUserIntentAction userAction ){
 
 		//	IUserIntentAction communityAction = null;
 
 		for(IUserIntentAction communityAction : tranlationMap.keySet() ){
-			if(this.equalActions(communityAction, userAction)) {
+			if(this.areSimilarActions(communityAction, userAction)) {
 				return communityAction;
 			}
 		}
@@ -565,12 +535,14 @@ public class CACIDiscovery implements ICACIDiscovery{
 	/*
 	 * creates a new community action based on the details of the userAction 
 	 */
-	private IUserIntentAction convertAction (IUserIntentAction userAction){
+	private IUserIntentAction createCommunityAction (IUserIntentAction userAction){
 
 		IUserIntentAction commAction = null;
 
+		cauiTaskManager.createModel();
+
 		if(userAction.getServiceID() != null && userAction.getparameterName() != null 
-				&& userAction.getvalue() != null && userAction.getServiceType()!=null){
+				&& userAction.getvalue() != null && userAction.getServiceType() != null){
 
 			commAction = cauiTaskManager.createAction(userAction.getServiceID(), userAction.getServiceType(), 
 					userAction.getparameterName(), userAction.getvalue());
@@ -581,6 +553,8 @@ public class CACIDiscovery implements ICACIDiscovery{
 			LOG.error(" CAUI User Action not valid , action ID:"+  userAction.toString());
 			throw new NullPointerException(" CAUI User Action not valid , action ID:"+  userAction.toString());
 		}
+
+		//System.out.println(" ****** created comm action: "+commAction+" based on user action:" + userAction.toString());
 		return commAction;
 	}
 
@@ -588,13 +562,13 @@ public class CACIDiscovery implements ICACIDiscovery{
 	/*
 	 * print methods  
 	 */
-	void printTranlationMap(Map<IUserIntentAction, Set<IUserIntentAction>> tranlationMap){
-		LOG.debug("tranlationMap start --- ");
+	void printTranlationMap(Map<IUserIntentAction, List<IUserIntentAction>> tranlationMap){
+
 		for(IUserIntentAction action : tranlationMap.keySet()){
-			LOG.debug("tranlated action "+action +tranlationMap.get(action) );	
-			System.out.println("tranlated action "+action +tranlationMap.get(action));
+
+			System.out.println("com act: "+action +" /user act->"+tranlationMap.get(action));
 		}	
-		LOG.debug("tranlationMap ends --- ");
+
 	}
 
 	/*
@@ -608,9 +582,9 @@ public class CACIDiscovery implements ICACIDiscovery{
 
 	private void printCACIModel(Map<IUserIntentAction, HashMap<IUserIntentAction,Double>> map){
 
-		LOG.debug("caci model");
+		System.out.println("caci model");
 		for( IUserIntentAction sourceAct : map.keySet()){
-			LOG.debug("sourceAct "+ sourceAct +" target "+map.get(sourceAct) );
+			System.out.println("sourceAct "+ sourceAct +" target "+map.get(sourceAct) );
 		}
 	}	
 
