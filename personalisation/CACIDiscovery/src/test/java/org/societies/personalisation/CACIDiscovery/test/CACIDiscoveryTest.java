@@ -166,6 +166,45 @@ public class CACIDiscoveryTest {
 		return modelData;
 	}
 	
+	@Ignore	
+	@Test
+	public void testMergeTargetMaps () {
+		
+		// {(a,0.4),(b,0.6)} + {(c,0.4),(b,0.6)} = {( b,0.6),(c,0.2),(a,0.2)}
+			
+		IUserIntentAction userActionA = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"A","A");
+		IUserIntentAction userActionB = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"B","B");
+		IUserIntentAction userActionC1 = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"C","C");
+		
+		HashMap<IUserIntentAction,Double> targetMapA = new HashMap<IUserIntentAction,Double>();
+		targetMapA.put(userActionA, 0.4);
+		targetMapA.put(userActionB, 0.4);
+		targetMapA.put(userActionC1, 0.2);
+		System.out.println("targetMapA "+targetMapA);
+		
+		
+		HashMap<IUserIntentAction,Double> targetMapB = new HashMap<IUserIntentAction,Double>();
+		IUserIntentAction userActionC2 = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"C","C");
+		IUserIntentAction userActionB2 = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE2,"B","B");
+		IUserIntentAction userActionD = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"D","D");
+		targetMapB.put(userActionC2, 0.2);
+		targetMapB.put(userActionB2, 0.8);
+		targetMapA.put(userActionD, 0.2);
+		System.out.println("targetMapB "+targetMapB);
+			
+		HashMap<IUserIntentAction,Double>  out = discovery.mergeTargetMaps(targetMapA, targetMapB);
+		System.out.println("out: "+out);
+		
+		assertEquals(0.2, out.get(userActionA));
+		assertEquals(0.1, out.get(userActionD));
+		assertEquals(0.2, out.get(userActionC2));
+		assertEquals(0.2, out.get(userActionC1));
+		// {css://requestor1.societies.org/HelloWorld#D=D/11=0.1, 
+		// css://requestor1.societies.org/HelloWorld#C=C/8=0.2, 
+		// css://requestor1.societies.org/HelloWorld#B=B/7=0.6000000000000001, 
+		// css://requestor1.societies.org/HelloWorld#A=A/6=0.2}
+	}
+	
 	@Ignore
 	@Test
 	public void testAreSimilarActions() {

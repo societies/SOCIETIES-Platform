@@ -1017,23 +1017,20 @@ public class CAUIPrediction implements ICAUIPrediction{
 		try {
 			//TODO remove this option
 			if( cisID == null ){
-
 				List<CtxEntityIdentifier> commEntIDList = retrieveBelongingCIS();
 				entID = commEntIDList.get(0);
-
 			} else {
-
-				entID = this.ctxBroker.retrieveIndividualEntityId(null, cisID).get();
+				//entID = this.ctxBroker.retrieveIndividualEntityId(null, cisID).get();
+				entID = this.ctxBroker.retrieveCommunityEntityId(cisID).get();
 			}
 
 			List<CtxIdentifier> caciModelList = this.ctxBroker.lookup(entID, CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
-
+			
 			if(!caciModelList.isEmpty()){
 				caciAttr = (CtxAttribute) this.ctxBroker.retrieve(caciModelList.get(0)).get();
 
 				if(caciAttr.getBinaryValue() != null){
 					//currentCaciModelAttr = caciAttr;
-
 					UserIntentModelData newCACIModelData = (UserIntentModelData) SerialisationHelper.deserialise(caciAttr.getBinaryValue(), this.getClass().getClassLoader());
 					//LOG.debug("retrieveCACIModel commEntIDList  4  caciAttr "+newCACIModelData );
 					storeCaciModelDB(newCACIModelData);
@@ -1041,7 +1038,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 				}
 			}
 		} catch (Exception e) {
-			LOG.error("CtxAttribute of type "+CtxAttributeTypes.CACI_MODEL+ "was not updated with caci model "+e.getLocalizedMessage());
+			LOG.error("CtxAttribute of type "+CtxAttributeTypes.CACI_MODEL+ " was not retrieved with caci model "+e.getLocalizedMessage());
 			e.printStackTrace();
 		} 
 		return caciAttr;

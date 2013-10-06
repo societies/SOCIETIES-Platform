@@ -1,6 +1,8 @@
 package org.societies.webapp.controller;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,11 +16,14 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
+import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
 import org.societies.webapp.models.CAUIAction;
 import org.societies.webapp.models.CAUIActionLog;
 import org.societies.webapp.service.UserService;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.util.SerialisationHelper;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -65,36 +70,25 @@ public class CAUIController extends BasePageController {
 
 	public CAUIController() {
 
-		//cisIdList = new ArrayList<String>();
 		cisIdList = new String[] {};
-		LOG.info(this.getClass().getName() + "constructor instantiated");
+		LOG.debug(this.getClass().getName() + "constructor instantiated");
 	}
 
 
 	@PostConstruct
 	public void init() {
 
-		LOG.info(this.getClass().getName() + " initialising");
+		LOG.debug(this.getClass().getName() + " initialising");
 
 		this.userActionsList = this.getCAUIActiveModel();
-		this.communityActionsList = this.getCACIActiveModel();
+		this.communityActionsList = this.getLocalCACIActiveModel();
 		this.predictionLogList = this.getPredictionLog();
 
-		//LOG.info("isUserPredictionEnabled ::"+this.cauiPrediction.isUserPredictionEnabled());
-		//this.enableUserPrediction = this.cauiPrediction.isUserPredictionEnabled();
-
-		//LOG.info("isCommunityPredictionEnabled ::"+this.cauiPrediction.isCommunityPredictionEnabled());
-		//this.enableCommunityPrediction = this.cauiPrediction.isCommunityPredictionEnabled();
-
-		LOG.info("action records ::"+this.userActionsList);
-		LOG.info("community records ::"+this.communityActionsList);
-		LOG.info("predictionLogList ::"+this.predictionLogList);
-		LOG.info("cisId ::"+this.cisId);
-
-		///cisIdList.add("aaaaa");
-		//cisIdList.add("bbbbb");
-		//cisIdList.add("ccccc");
-		LOG.info("cisIdList ::"+this.cisIdList.length);
+		//LOG.debug("action records ::"+this.userActionsList);
+		//LOG.debug("community records ::"+this.communityActionsList);
+		//LOG.debug("predictionLogList ::"+this.predictionLogList);
+		//LOG.debug("cisId ::"+this.cisId);
+		//LOG.debug("cisIdList ::"+this.cisIdList.length);
 	}
 
 
@@ -105,7 +99,7 @@ public class CAUIController extends BasePageController {
 
 	public String[] retrieveCisIdList(){
 
-		System.out.println("retrieveCisIdList :: fetching cis ids ");
+		LOG.debug("retrieveCisIdList :: fetching cis ids ");
 		//cisIdList = new String[] {"name1", "name2", "name2", "aaa","bbb"};
 		List<CtxEntityIdentifier> entidList = this.cauiPrediction.retrieveMyCIS();
 
@@ -166,19 +160,19 @@ public class CAUIController extends BasePageController {
 	public void setEnableUserPrediction(boolean bool){
 
 		this.enableUserPrediction = bool;
-		LOG.info("setEnableUserPrediction  : "+ bool);
+		LOG.debug("setEnableUserPrediction  : "+ bool);
 	}
 
 	public boolean getEnableUserPrediction(){
-		LOG.info("getEnableUserPrediction  : "+ this.enableUserPrediction);
+		LOG.debug("getEnableUserPrediction  : "+ this.enableUserPrediction);
 		return this.enableUserPrediction ;
 	}
 
 
 	public void updateComUsrPred(){
 
-		LOG.info("updateComUsrPred  usr : "+ this.enableUserPrediction);
-		LOG.info("updateComUsrPred  comm : "+ this.enableCommunityPrediction);
+		LOG.debug("updateComUsrPred  usr : "+ this.enableUserPrediction);
+		LOG.debug("updateComUsrPred  comm : "+ this.enableCommunityPrediction);
 
 		this.cauiPrediction.enableCommPrediction(this.enableCommunityPrediction);
 		this.cauiPrediction.enableUserPrediction(this.enableUserPrediction);
@@ -191,13 +185,13 @@ public class CAUIController extends BasePageController {
 
 	public void setEnableCommunityPrediction(boolean bool){
 		this.enableCommunityPrediction = bool;
-		LOG.info("setEnableCommunityPrediction  : "+ bool);
+		LOG.debug("setEnableCommunityPrediction  : "+ bool);
 	}
 
 	public boolean getEnableCommunityPrediction(){
 
 
-		LOG.info("getEnableCommunityPrediction  : "+ this.enableCommunityPrediction);
+		LOG.debug("getEnableCommunityPrediction  : "+ this.enableCommunityPrediction);
 
 		return this.enableCommunityPrediction ;
 	}
@@ -229,7 +223,7 @@ public class CAUIController extends BasePageController {
 
 
 		model = this.cauiPrediction.getCAUIActiveModel();
-		LOG.info("getCAUIActiveModel  : "+ model);
+		LOG.debug("getCAUIActiveModel  : "+ model);
 		if(!model.isEmpty()){
 			result = convertModel(model);
 
@@ -237,17 +231,17 @@ public class CAUIController extends BasePageController {
 		return result;
 	}
 
-	public List<CAUIAction> getCACIActiveModel(){
+	public List<CAUIAction> getLocalCACIActiveModel(){
 
 		List<CAUIAction> result = new ArrayList<CAUIAction>();
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> model = new 	HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>>();
 
 
 		model = this.cauiPrediction.getCACIActiveModel();
-		LOG.info("getCACIActiveModel  : "+ model);
+	
+		LOG.debug("getCACIActiveModel  : "+ model);
 		if(!model.isEmpty()){
 			result = convertModel(model);
-
 		}
 		return result;
 	}
@@ -291,11 +285,11 @@ public class CAUIController extends BasePageController {
 				String performed = entry.getKey();
 				String predicted = entry.getValue();
 				CAUIActionLog cauiLog = new CAUIActionLog(performed,predicted);
-				LOG.info("getPredictionLog  cauiLog : "+ cauiLog);
+				LOG.debug("getPredictionLog  cauiLog : "+ cauiLog);
 				result.add(cauiLog);
 			}
 		}
-		LOG.info("getPredictionLog result : "+ result);
+		LOG.debug("getPredictionLog result : "+ result);
 		return result;
 	}
 
@@ -310,7 +304,7 @@ public class CAUIController extends BasePageController {
 				//String sourcActionString = sourceAct.toString();
 
 				String sourcActionString = sourceAct.getparameterName() +"="+ sourceAct.getvalue();
-				LOG.info("convertModel 0 sourcActionString : "+ sourcActionString);
+				LOG.debug("convertModel 0 sourcActionString : "+ sourcActionString);
 
 				HashMap<String, Double> targetMap = new HashMap<String, Double>();
 				if( originalModel.get(sourceAct) != null) {
@@ -320,13 +314,17 @@ public class CAUIController extends BasePageController {
 					for(IUserIntentAction targetActOrig : targetMapOriginal.keySet()){
 						String trimedTargetStr = targetActOrig.getparameterName()+"="+targetActOrig.getvalue();
 						Double transProb = targetMapOriginal.get(targetActOrig);
-						DecimalFormat df = new DecimalFormat("#.##");
+						
+						DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
+						symbols.setDecimalSeparator('.');
+												
+						DecimalFormat df = new DecimalFormat("#.##",symbols );
 						Double transProbTrimmed = Double.parseDouble(df.format(transProb));
 						targetMap.put(trimedTargetStr, transProbTrimmed);
 
 					}
 					CAUIAction cauiAct = new CAUIAction(sourcActionString, targetMap);
-					LOG.info("convertModel  : "+ cauiAct);
+					LOG.debug("convertModel  : "+ cauiAct);
 					result.add(cauiAct);
 				}
 			}		
@@ -341,10 +339,10 @@ public class CAUIController extends BasePageController {
 
 		//IIdentity cssID = getOwnerId(); 
 		//if( getOwnerId() != null) {	cssID = getOwnerId();		}
-		LOG.info("service ref for cauiDisc "+ this.cauiPrediction);
-		LOG.info("service ref for broker  "+ this.internalCtxBroker);
+		LOG.debug("service ref for cauiDisc "+ this.cauiPrediction);
+		LOG.debug("service ref for broker  "+ this.internalCtxBroker);
 		this.cauiPrediction.generateNewUserModel();
-		LOG.info("discovery started..." );
+		LOG.debug("discovery started..." );
 		addGlobalMessage("MODEL LEARNING TRIGGERED for user", "click on refresh model button", FacesMessage.SEVERITY_INFO);
 	}
 
@@ -360,11 +358,37 @@ public class CAUIController extends BasePageController {
 
 	public void refreshCommunityModels(){
 
-		this.communityActionsList = this.getCACIActiveModel();
+		//this.communityActionsList = this.getLocalCACIActiveModel();
+		LOG.debug("refreshCommunityModels  1");
+		IIdentity identityCisId  = getIIdentity(this.cisId);
+		LOG.debug("refreshCommunityModels  2 selected id: "+identityCisId);
+		
+		CtxAttribute caciAttr = this.cauiPrediction.retrieveCACIModel(identityCisId);
+		UserIntentModelData newCACIModelData = null;
+		
+		LOG.debug("refreshCommunityModels  3 caciAttr id: "+caciAttr.getId());
+	
+		if(caciAttr.getBinaryValue() != null){
+			
+			try {
+				newCACIModelData = (UserIntentModelData) SerialisationHelper.deserialise(caciAttr.getBinaryValue(), this.getClass().getClassLoader());
+				
+				if(!newCACIModelData.getActionModel().isEmpty()){
+					this.communityActionsList = convertModel(newCACIModelData.getActionModel());
+					LOG.debug("refreshCommunityModels  4 newCACIModelData: "+newCACIModelData.getActionModel());
+				}
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+			
 		LOG.debug("this.communityActionsList :"+this.communityActionsList);
-
 		addGlobalMessage("Refreshing community model", "Retrieving model from DB", FacesMessage.SEVERITY_INFO);
-
 	}
 
 	public void refreshPredictionLog(){
@@ -402,7 +426,7 @@ public class CAUIController extends BasePageController {
 
 			final String cssOwnerStr = cssNodeId.getBareJid();
 			cssOwnerId = this.commMngrRef.getIdManager().fromJid(cssOwnerStr);
-			LOG.info("*** css identity = " + cssOwnerId);
+			LOG.debug("*** css identity = " + cssOwnerId);
 		} catch (InvalidFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -415,10 +439,10 @@ public class CAUIController extends BasePageController {
 
 		IIdentity result = null;
 		try {
-			LOG.info("*** getIIdentity this.commMngrRef = " + this.commMngrRef);
-			LOG.info("*** getIIdentity cisIDString = " + cisIDString);
+			LOG.debug("*** getIIdentity this.commMngrRef = " + this.commMngrRef);
+			LOG.debug("*** getIIdentity cisIDString = " + cisIDString);
 			result = this.commMngrRef.getIdManager().fromJid(cisIDString);
-			LOG.info("***getIIdentity converted identity = " + result);
+			LOG.debug("***getIIdentity converted identity = " + result);
 		} catch (InvalidFormatException e) {
 			
 			e.printStackTrace();
@@ -429,16 +453,16 @@ public class CAUIController extends BasePageController {
 	
 
 	public ICtxBroker getInternalCtxBroker() {
-		LOG.info("get internalCtxBroker manager " +internalCtxBroker);
+		LOG.debug("get internalCtxBroker manager " +internalCtxBroker);
 		return internalCtxBroker;
 	}
 
 	public void setInternalCtxBroker(ICtxBroker internalCtxBroker) {
 
 		if (internalCtxBroker == null)
-			log.info("setInternalCtxBroker() = null");
+			log.debug("setInternalCtxBroker() = null");
 		else
-			log.info("setInternalCtxBroker() = " + internalCtxBroker.toString());
+			log.debug("setInternalCtxBroker() = " + internalCtxBroker.toString());
 
 		this.internalCtxBroker = internalCtxBroker;
 	}
@@ -446,19 +470,19 @@ public class CAUIController extends BasePageController {
 
 
 	public ICommManager getCommMngrRef() {
-		LOG.info("get getCommMngrRef "+this.commMngrRef);
+		LOG.debug("get getCommMngrRef "+this.commMngrRef);
 		return this.commMngrRef;
 	}
 
 
 	public void setCommMngrRef(ICommManager commMngrRef) {
-		LOG.info("set getCommMngrRef "+this.commMngrRef);
+		LOG.debug("set getCommMngrRef "+this.commMngrRef);
 		this.commMngrRef = commMngrRef;
 	}
 
 
 	public ICAUIPrediction getCauiPrediction() {
-		LOG.info("get getCauiPrediction "+this.cauiPrediction);
+		LOG.debug("get getCauiPrediction "+this.cauiPrediction);
 		return this.cauiPrediction;
 	}
 

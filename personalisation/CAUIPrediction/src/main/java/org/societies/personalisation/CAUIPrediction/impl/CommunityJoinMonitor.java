@@ -211,12 +211,16 @@ public class CommunityJoinMonitor implements CtxChangeEventListener{
 
 					//store caciModel to local CSS ctx DB
 					CtxAttribute caciModelAttrLocal = null;
-					///List<CtxIdentifier> caciModelAttrLocalList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
-					List<CtxIdentifier> caciModelAttrLocalList = ctxBroker.lookup(caciModelAttrRemote.getScope(), CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
-					LOG.debug("***onModification 2 caciModelAttrLocalList= " + caciModelAttrLocalList.size());
-					//					IIdentity localcssID = getOwnerId();
-					//					CtxEntityIdentifier entityID = ctxBroker.retrieveIndividualEntityId(null, localcssID).get();
 
+					
+					final String ownerIdStr = commMgr.getIdManager().getThisNetworkNode().getBareJid();
+					IIdentity ownerId = commMgr.getIdManager().fromJid(ownerIdStr);
+					CtxEntityIdentifier indiEntID = ctxBroker.retrieveIndividualEntityId(null, ownerId).get();
+					
+					// use local user entity id 
+					List<CtxIdentifier> caciModelAttrLocalList = ctxBroker.lookup(indiEntID, CtxModelType.ATTRIBUTE, CtxAttributeTypes.CACI_MODEL).get();
+					LOG.debug("***onModification 2 caciModelAttrLocalList= " + caciModelAttrLocalList.size());
+					
 					//	LOG.info("***onModification 3 entityID= " + entityID.toString());
 					if( caciModelAttrLocalList.isEmpty()){
 						//	caciModelAttrLocal = ctxBroker.createAttribute(entityID, CtxAttributeTypes.CACI_MODEL).get();

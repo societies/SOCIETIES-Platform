@@ -290,42 +290,35 @@ public class CACIDiscovery implements ICACIDiscovery{
 
 	/*
 	 * merges the target action transition probs
+	 * {(d,0.4),(b,0.6)} + {(c,0.4),(b,0.6)} = {( b,0.6),(c,0.2),(d,0.2)}
 	 */
 	public HashMap<IUserIntentAction,Double> mergeTargetMaps(HashMap<IUserIntentAction,Double> targetComActionNew, 
-			HashMap<IUserIntentAction,Double>targetComActionExisting){
+			HashMap<IUserIntentAction,Double> targetComActionExisting){
 
-		//TODO add junit test
 		HashMap<IUserIntentAction,Double> result = new HashMap<IUserIntentAction,Double>();
-		result.putAll(targetComActionExisting);
-
+	
 		if( targetComActionExisting.size() == 0 ) {
 			return targetComActionNew;
 		}
-
-		for(IUserIntentAction newMapAction : targetComActionNew.keySet()){
-
-			LOG.debug("current Action " +newMapAction);
-			if(targetComActionExisting.get(newMapAction) != null){
-				LOG.debug("result" +result);
-				Double existingTransProb = targetComActionExisting.get(newMapAction);
-				Double newTransProb = targetComActionNew.get(newMapAction);
-				Double updatedTrandProb = (existingTransProb+newTransProb);
-				result.put(newMapAction, updatedTrandProb);
-
-
-			} else  {
-				LOG.debug("result" +result);
-				Double newTransProb = targetComActionNew.get(newMapAction);
-				result.put(newMapAction, newTransProb);
-
+		Set<IUserIntentAction> allKeys = new HashSet<IUserIntentAction>();
+		allKeys.addAll(targetComActionNew.keySet());
+		allKeys.addAll(targetComActionExisting.keySet());
+		
+		for(IUserIntentAction keyAction : allKeys){
+			Double valueA = 0.0;
+			Double valueB = 0.0;
+			
+			if( targetComActionExisting.get(keyAction) != null){
+				valueA = targetComActionExisting.get(keyAction);
 			}
-			// fix probabilities 
-			// should sum to 1
-			for(IUserIntentAction actionTemp :result.keySet()){
-				Double currentProb = result.get(actionTemp);
-				result.put(actionTemp, currentProb/2);
+			
+			if( targetComActionNew.get(keyAction) != null){
+				valueB = targetComActionNew.get(keyAction);
 			}
+			Double average =  (valueA+valueB)/2 ;
+			result.put(keyAction,average);
 		}
+		
 		return result;
 	}
 
