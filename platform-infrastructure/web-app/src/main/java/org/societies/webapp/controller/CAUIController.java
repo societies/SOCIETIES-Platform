@@ -1,11 +1,13 @@
 package org.societies.webapp.controller;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.slf4j.Logger;
@@ -305,7 +307,11 @@ public class CAUIController extends BasePageController {
 
 				String sourcActionString = sourceAct.getparameterName() +"="+ sourceAct.getvalue();
 				LOG.debug("convertModel 0 sourcActionString : "+ sourcActionString);
-
+				Map<String,Serializable> contextAction = new HashMap<String,Serializable>();
+				if(sourceAct.getActionContext()!= null){
+					contextAction = sourceAct.getActionContext();
+				}
+				
 				HashMap<String, Double> targetMap = new HashMap<String, Double>();
 				if( originalModel.get(sourceAct) != null) {
 
@@ -323,7 +329,7 @@ public class CAUIController extends BasePageController {
 						targetMap.put(trimedTargetStr, transProbTrimmed);
 
 					}
-					CAUIAction cauiAct = new CAUIAction(sourcActionString, targetMap);
+					CAUIAction cauiAct = new CAUIAction(sourcActionString, targetMap, contextAction);
 					LOG.debug("convertModel  : "+ cauiAct);
 					result.add(cauiAct);
 				}

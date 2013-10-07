@@ -2,6 +2,9 @@ package org.societies.webapp.models;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
+
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 
 
 public class CAUIAction implements Serializable{
@@ -15,12 +18,13 @@ public class CAUIAction implements Serializable{
 	
 	String sourceAction ="";
 	String targetAction ="";
+	String ctxAction ="";
 	
 	HashMap<String, Double>  targetActionMap = new HashMap<String, Double>();
 	
 	Double trans = 0.0;
 	
-	public CAUIAction(String sourceAction, HashMap<String, Double>  targetActionMap){
+	public CAUIAction(String sourceAction, HashMap<String, Double>  targetActionMap, Map<String,Serializable>  ctxActionMap){
 	
 		this.sourceAction = sourceAction;
 		this.targetActionMap = targetActionMap;	
@@ -29,8 +33,19 @@ public class CAUIAction implements Serializable{
 		for( String tAct :targetActionMap.keySet()){
 			Double transProb = targetActionMap.get(tAct);
 			this.targetAction = targetAction +tAct+":"+transProb+"\n";
-			
 		}
+		
+		if(ctxActionMap.get(CtxAttributeTypes.LOCATION_SYMBOLIC) != null ){
+			ctxAction = "location:"+  ctxActionMap.get(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		}
+		if(ctxActionMap.get(CtxAttributeTypes.HOUR_OF_DAY) != null ){
+			ctxAction = ctxAction +", HOUR_OF_DAY:"+  ctxActionMap.get(CtxAttributeTypes.HOUR_OF_DAY);
+		}
+		
+		if(ctxActionMap.get(CtxAttributeTypes.DAY_OF_WEEK) != null ){
+			ctxAction = ctxAction +", DAY_OF_WEEK:"+  ctxActionMap.get(CtxAttributeTypes.DAY_OF_WEEK);
+		}
+	
 	}
 
 	
@@ -77,4 +92,14 @@ public class CAUIAction implements Serializable{
 		return stringValue;
 	}
 	
+	
+	public String getCtxAction() {
+		return ctxAction;
+	}
+
+
+
+	public void setCtxAction(String ctxAction) {
+		this.ctxAction = ctxAction;
+	}
 }
