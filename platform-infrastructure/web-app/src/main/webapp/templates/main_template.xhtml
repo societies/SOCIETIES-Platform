@@ -4,97 +4,91 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui">
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
 
 <h:head>
-    <h:outputStylesheet library="css" name="style.css"/>
+	<h:outputStylesheet library="css" name="style.css" /> 
 
-    <!-- Menu -->
-    <h:outputScript library="js" name="webmenu_nav.js"/>
+	<!-- Menu -->
+	<h:outputScript library="js" name="webmenu_nav.js" />
 
-    <ui:fragment rendered="#{!loginController.loggedIn and noRedirect ne 'true'}">
-        <!-- redirect to index page if not logged in -->
-        <meta http-equiv="REFRESH" content="0;url=index.xhtml"/>
-    </ui:fragment>
+	<ui:fragment
+		rendered="#{!loginController.loggedIn and noRedirect ne 'true'}">
+		<!-- redirect to index page if not logged in -->
+		<meta http-equiv="REFRESH" content="0;url=index.xhtml" />
+	</ui:fragment>
 
-    <ui:insert name="html_head">
-        <!-- Template: HTML HEAD CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
-        <title>Societies</title>
-    </ui:insert>
+	<ui:insert name="html_head">
+		<!-- Template: HTML HEAD CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
+		<title>Societies</title>
+	</ui:insert>
 </h:head>
 
 <h:body>
-    <h:form id="mainForm" enctype="multipart/form-data">
+	<h:form id="mainForm" enctype="multipart/form-data">
 
-        <p:growl id="messages" showDetail="true" sticky="true" autoUpdate="true"/>
+		<p:growl id="messages" showDetail="true" sticky="true"
+			autoUpdate="true" />
 
 
-        <!-- TODO: Fix PrimeFaces push -->
-        <!-- quick hack to get this working until PF push is working -->
-        <p:poll interval="5" rendered="#{loginController.loggedIn}"
+		<!-- TODO: Fix PrimeFaces push -->
+		<!-- quick hack to get this working until PF push is working -->
+		 <p:poll interval="5" rendered="#{loginController.loggedIn}"
                 update="notification-count-wrapper" process="@this"/>
-        <!-- used to listen for responses if there is a pubsub notification -->
-        <!--<p:socket onMessage="handlePnb" channel="/pnb"/>-->
+		<!-- used to listen for responses if there is a pubsub notification -->
+		<!--<p:socket onMessage="handlePnb" channel="/pnb"/>-->
 
 
-        <div id="wrapper" class="clearfix wrapper">
-            <div id="container" class="container_12 clearfix container">
+		<div id="wrapper" class="clearfix wrapper">
+			<div id="container" class="container_12 clearfix container">
 
-                <!-- Header -->
-                <header id="header" class="grid_12 header">
-                    <!-- LOGIN POPUP -->
-                    <ui:include src="/includes/loginbox.xhtml"/>
-                    <!-- END LOGIN POPUP -->
+				<!-- Header -->
+				<header id="header" class="grid_12 header"> <!-- LOGIN POPUP -->
+				<ui:include src="/includes/loginbox.xhtml" /> <!-- END LOGIN POPUP -->
 
-                    <!-- MENU -->
-                    <ui:include src="/includes/menu.xhtml"/>
-                    <!-- END MENU -->
-                    <div class="clear"></div>
-                </header>
+				<!-- MENU --> <ui:include src="/includes/menu.xhtml" /> <!-- END MENU -->
+				<div class="clear"></div>
+				</header>
 
 
-                <ui:insert name="body">
-                    <!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
-                    <!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
-                    <!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
-                    <!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
-                    <!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
-                    <!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
-                    <!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
-                    <!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
-                </ui:insert>
+				<ui:insert name="body">
+					<!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
+					<!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
+					<!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
+					<!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
+					<!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
+					<!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
+					<!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
+					<!-- Template: BODY CONTENT GOES HERE IN THE IMPLEMENTING PAGE -->
+				</ui:insert>
 
-                <footer class="container_12 clearfix">
-                    <section class="footer">
-                        <p class="footer-links">
-                            <span><a href="termsofuse.xhtml">Terms of Use</a>
-                                | <a href="disclaimer.xhtml">Disclaimer</a>
-                                | <a href="privacy.xhtml">Privacy</a>
-                                | <a href="help.xhtml">Help</a>
-                                | <a href="about.xhtml">About</a>
-                            </span>
-                            <a class="float right toplink" href="#">top</a>
-                        </p>
-                    </section>
-                </footer>
+				<footer class="container_12 clearfix"> <section
+					class="footer">
+				<p class="footer-links">
+					<span><a href="termsofuse.xhtml">Terms of Use</a> | <a
+						href="disclaimer.xhtml">Disclaimer</a> | <a href="privacy.xhtml">Privacy</a>
+						| <a href="help.xhtml">Help</a> | <a href="about.xhtml">About</a>
+					</span> <a class="float right toplink" href="#">top</a>
+				</p>
+				</section> </footer>
 
-            </div>
+			</div>
 
-        </div>
+		</div>
 
-        <ui:fragment rendered="#{loginController.loggedIn and noNotificationPopup ne 'true'}">
-            <ui:include src="/includes/notifications.xhtml"/>
-        </ui:fragment>
+		<ui:fragment
+			rendered="#{loginController.loggedIn and noNotificationPopup ne 'true'}">
+			<ui:include src="/includes/notifications.xhtml" />
+		</ui:fragment>
 
-        <ui:insert name="dialogs">
-        </ui:insert>
+		<ui:insert name="dialogs">
+		</ui:insert>
+	</h:form>
 
-    </h:form>
-
-    <ui:insert name="outside_form">
-    </ui:insert>
+	<ui:insert name="outside_form">
+	</ui:insert>
 
 </h:body>
 
