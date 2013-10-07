@@ -1,0 +1,29 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="templates/main_template.xhtml">
+
+	<ui:define name="html_head">
+		<title>SOCIETIES</title>
+	</ui:define>
+
+	<ui:define name="body">
+
+		<f:facet name="header">
+                Error: The page you requested does not exist
+            </f:facet>
+
+
+		
+		<h5>Sorry, the page you requested does not exist!</h5>
+		<br />
+		<h:outputLabel
+			value="The issue has been logged. If the page requested should be available, an administrator will be notified." />
+
+
+	</ui:define>
+</ui:composition>
+</html>
