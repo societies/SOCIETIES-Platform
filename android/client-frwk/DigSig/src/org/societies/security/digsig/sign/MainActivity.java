@@ -49,20 +49,15 @@ public class MainActivity extends Activity {
 		Button installBtn = (Button) findViewById(R.id.buttonMainInstallIdentity);
 		installBtn.setOnClickListener(new View.OnClickListener() {			
 			public void onClick(View v) {
-				try {
-					MainActivity.this.testSignServiceRemote();
-				} catch (Exception e) {
-					Log.e(TAG, "", e);
-				}
-//				Intent i = new Intent(MainActivity.this, InstallIdentityActivity.class);
-//				startActivity(i);
+				Intent i = new Intent(MainActivity.this, InstallIdentityActivity.class);
+				startActivity(i);
 			}
 		});
-		Button listBtn = (Button) findViewById(R.id.buttonMainSign);
+		Button listBtn = (Button) findViewById(R.id.buttonMainXmlSign);
 		listBtn.setOnClickListener(new View.OnClickListener() {		
 			public void onClick(View v) {
 
-				Log.i(TAG, "buttonSign clicked");
+				Log.i(TAG, "buttonXmlSign clicked");
 				byte[] val = null;
 				try {
 					val = "<xml><miki Id='Miki1'>aadsads</miki></xml>".getBytes("UTF-8");
@@ -79,11 +74,11 @@ public class MainActivity extends Activity {
 			}
 		});
 
-		listBtn = (Button) findViewById(R.id.buttonMainSignUrl);
+		listBtn = (Button) findViewById(R.id.buttonMainXmlSignUrl);
 		listBtn.setOnClickListener(new View.OnClickListener() {		
 			public void onClick(View v) {
 
-				Log.i(TAG, "buttonSignUrl clicked");
+				Log.i(TAG, "buttonXmlSignUrl clicked");
 
 				EditText urlEditText = (EditText) findViewById(R.id.editTextMainSignUrl);
 				String url = urlEditText.getText().toString();
@@ -96,6 +91,20 @@ public class MainActivity extends Activity {
 				i.putStringArrayListExtra(Sign.Params.IDS_TO_SIGN, idsToSign);
 
 				startActivityForResult(i, SIGN);
+			}
+		});
+
+		listBtn = (Button) findViewById(R.id.buttonMainSign);
+		listBtn.setOnClickListener(new View.OnClickListener() {		
+			public void onClick(View v) {
+
+				Log.i(TAG, "buttonSign clicked");
+
+				try {
+					MainActivity.this.testSignServiceRemote();
+				} catch (Exception e) {
+					Log.e(TAG, "", e);
+				}
 			}
 		});
 

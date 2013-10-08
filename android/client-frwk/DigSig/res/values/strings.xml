@@ -6,8 +6,9 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="installIdentity">Install Identity</string>
-    <string name="testSigning">Test Signing (doc in intent)</string>
-    <string name="testSigningUrl">Test Signing (doc url)</string>
+    <string name="testSigning">Test Signing</string>
+    <string name="testXmlSigning">Test XML Signing (doc in intent)</string>
+    <string name="testXmlSigningUrl">Test XML Signing (doc url)</string>
     <string name="testDefaultUrl">http://192.168.1.92/tmp/societies/doc.xml</string>
     <string name="testVerification">Test Verification</string>
     <string name="isRequestingToSign">is requesting to sign a document. Allow?</string>

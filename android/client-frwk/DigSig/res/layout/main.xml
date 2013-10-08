@@ -6,6 +6,7 @@
     >
 <Button android:text="@string/installIdentity" android:id="@+id/buttonMainInstallIdentity" android:layout_height="wrap_content" android:layout_width="match_parent"></Button>
 <Button android:text="@string/testSigning" android:id="@+id/buttonMainSign" android:layout_height="wrap_content" android:layout_width="match_parent"></Button>
+<Button android:text="@string/testXmlSigning" android:id="@+id/buttonMainXmlSign" android:layout_height="wrap_content" android:layout_width="match_parent"></Button>
 
 <EditText
     android:id="@+id/editTextMainSignUrl"
@@ -18,7 +19,7 @@
     <requestFocus />
 </EditText>
 
-<Button android:text="@string/testSigningUrl" android:id="@+id/buttonMainSignUrl" android:layout_height="wrap_content" android:layout_width="match_parent"></Button>
+<Button android:text="@string/testXmlSigningUrl" android:id="@+id/buttonMainXmlSignUrl" android:layout_height="wrap_content" android:layout_width="match_parent"></Button>
 <Button android:text="@string/testVerification" android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/buttonMainVerify"></Button>
 
 </LinearLayout>
