@@ -8,13 +8,18 @@
 <Button android:text="@string/testSigning" android:id="@+id/buttonMainSign" android:layout_height="wrap_content" android:layout_width="match_parent"></Button>
 <Button android:text="@string/testXmlSigning" android:id="@+id/buttonMainXmlSign" android:layout_height="wrap_content" android:layout_width="match_parent"></Button>
 
+<TextView
+    android:id="@+id/textViewMainSignUrl"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/testDefaultUrlLabel" />
 <EditText
     android:id="@+id/editTextMainSignUrl"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:ems="10"
     android:inputType="textUri"
-    android:text="@string/testDefaultUrl"
+    android:text="@string/testDefaultUrlValue"
     >
     <requestFocus />
 </EditText>

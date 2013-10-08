@@ -120,10 +120,10 @@ public class SignServiceRemote extends Service {
     	
     	Log.i(TAG, "generateUris");
     	
-    	String host = "http://192.168.1.92";
+    	String host = getText(R.string.docServerUrl).toString();
     	String resourceName = RandomString.getRandomNumberString();
     	String cert = "certificate";  // TODO
-    	String notificationEndpoint = "http://192.168.1.92/community-signature/notification-endpoint";  // TODO
+    	String notificationEndpoint = getText(R.string.notificationEndpoint).toString();
     	String signature = "signature";  // TODO
     	
     	String uploadUri = uriForFileUpload(host, resourceName, cert, notificationEndpoint);
