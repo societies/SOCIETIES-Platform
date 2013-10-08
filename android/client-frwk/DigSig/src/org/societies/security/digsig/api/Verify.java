@@ -1,6 +1,7 @@
 package org.societies.security.digsig.api;
 
 import android.app.Service;
+import android.content.Intent;
 
 /**
  * External API.
@@ -9,6 +10,11 @@ import android.app.Service;
  * @author Mitja Vardjan
  */
 public class Verify {
+	
+	/**
+	 * The action to use when building {@link Intent} to invoke the signature service.
+	 */
+	public static final String ACTION = "org.societies.security.digsig.action.SignServiceRemote";
 	
 	/**
 	 * Intent extras
@@ -32,4 +38,26 @@ public class Verify {
 		 */
 		public static final int GENERATE_URIS = 3;
 	}
+
+	/**
+	 * Intent extras
+	 */
+	public class Params {
+		
+		/**
+		 * The URI to upload initial version of document. Any further uploads
+		 * of same document are to be done with {@link #DOWNLOAD_URI}.
+		 * 
+		 * Type: {@link String}
+		 */
+		public static final String UPLOAD_URI = "UPLOAD_URI";
+
+		/**
+		 * The URI to download and upload new versions of document that has been
+		 * initially uploaded with {@link #UPLOAD_URI}.
+		 * 
+		 * Type: {@link String}
+		 */
+		public static final String DOWNLOAD_URI = "DOWNLOAD_URI";
+	}		
 }

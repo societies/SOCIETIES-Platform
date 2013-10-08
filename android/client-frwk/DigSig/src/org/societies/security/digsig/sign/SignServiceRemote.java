@@ -33,6 +33,7 @@ import org.societies.security.digsig.utility.UrlParamName;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -91,8 +92,8 @@ public class SignServiceRemote extends Service {
                 	mService.get().verify();
                     break;
                 case Verify.Methods.GENERATE_URIS:
-                	mService.get().generateUris();
                 	Message message = Message.obtain(null, Verify.Methods.GENERATE_URIS, 0, 0);
+                	message.setData(mService.get().generateUris());
                 	try {
                 		msg.replyTo.send(message);
                 	} catch (RemoteException e) {
@@ -115,11 +116,9 @@ public class SignServiceRemote extends Service {
     	// TODO
     }
 
-    private void generateUris() {
+    private Bundle generateUris() {
     	
     	Log.i(TAG, "generateUris");
-    	
-    	mMessenger.getBinder();
     	
     	String host = "http://192.168.1.92";
     	String resourceName = RandomString.getRandomNumberString();
@@ -127,8 +126,14 @@ public class SignServiceRemote extends Service {
     	String notificationEndpoint = "http://192.168.1.92/community-signature/notification-endpoint";  // TODO
     	String signature = "signature";  // TODO
     	
-    	String downloadUri = uriForFileDownload(host, resourceName, signature);
     	String uploadUri = uriForFileUpload(host, resourceName, cert, notificationEndpoint);
+    	String downloadUri = uriForFileDownload(host, resourceName, signature);
+    	
+    	Bundle bundle = new Bundle();
+    	bundle.putString(Verify.Params.UPLOAD_URI, uploadUri);
+    	bundle.putString(Verify.Params.DOWNLOAD_URI, downloadUri);
+
+    	return bundle;
     }
 	
 	/**

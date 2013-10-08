@@ -235,6 +235,10 @@ public class MainActivity extends Activity {
             Log.i(TAG, "handleMessage: msg.what = " + msg.what + ", replyTo = " + msg.replyTo);
             switch (msg.what) {
                 case Verify.Methods.GENERATE_URIS:
+                	Log.i(TAG, "handleMessage: GENERATE_URIS: upload URI = " +
+                			msg.getData().getString(Verify.Params.UPLOAD_URI));
+                	Log.i(TAG, "handleMessage: GENERATE_URIS: download URI = " +
+                			msg.getData().getString(Verify.Params.DOWNLOAD_URI));
                     break;
                 default:
                     super.handleMessage(msg);
@@ -247,7 +251,7 @@ public class MainActivity extends Activity {
 		Log.i(TAG, "testSignServiceRemote");
 
 		// Bind to the service
-    	Intent intent = new Intent("org.societies.security.digsig.action.SignServiceRemote");
+    	Intent intent = new Intent(Verify.ACTION);
     	bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     	Thread.sleep(TIME_TO_WAIT);
 	}
