@@ -218,8 +218,6 @@ public class MainActivity extends Activity {
 	
 	
 	
-	private static final int TIME_TO_WAIT = 3000;
-	
 	/**
      * Target we publish for clients to send messages to IncomingHandler.
      */
@@ -233,6 +231,10 @@ public class MainActivity extends Activity {
         @Override
         public void handleMessage(Message msg) {
             Log.i(TAG, "handleMessage: msg.what = " + msg.what + ", replyTo = " + msg.replyTo);
+            if (!msg.getData().getBoolean(Verify.Params.SUCCESS)) {
+            	// Error
+            	return;
+            }
             switch (msg.what) {
                 case Verify.Methods.GENERATE_URIS:
                 	Log.i(TAG, "handleMessage: GENERATE_URIS: upload URI = " +
@@ -253,7 +255,6 @@ public class MainActivity extends Activity {
 		// Bind to the service
     	Intent intent = new Intent(Verify.ACTION);
     	bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-    	Thread.sleep(TIME_TO_WAIT);
 	}
 	
     /** Messenger for communicating with the service. */
@@ -274,12 +275,7 @@ public class MainActivity extends Activity {
             // representation of that from the raw IBinder object.
             mService = new Messenger(service);
             mBound = true;
-            sayHello();
-        	try {
-				Thread.sleep(TIME_TO_WAIT);
-			} catch (InterruptedException e) {
-				Log.e(TAG, "could not sleep", e);
-			}
+            generateUris();
         	
         }
 
@@ -291,17 +287,19 @@ public class MainActivity extends Activity {
         }
     };
 
-    public void sayHello() {
+    public void generateUris() {
         if (!mBound) return;
         // Create and send a message to the service, using a supported 'what' value
         Message msg = Message.obtain(null, Verify.Methods.GENERATE_URIS, 0, 0);
+        Bundle data = new Bundle();
+		data.putString(Verify.Params.NOTIFICATION_ENDPOINT, "http://192.168.1.92/societies/community-signature/notify");
+		data.putInt(Verify.Params.NUM_SIGNERS_THRESHOLD, 2);
+        msg.setData(data);
         msg.replyTo = mMessenger;
         try {
         	Log.i(TAG, "Sending message to service");
             mService.send(msg);
-        	Log.i(TAG, "Message sent to service 1");
-            Thread.sleep(TIME_TO_WAIT);
-        	Log.i(TAG, "Message sent to service 2");
+        	Log.i(TAG, "Message sent to service");
         } catch (Exception e) {
             Log.e(TAG, "sayHello", e);
         }

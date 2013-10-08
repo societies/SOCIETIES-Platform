@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="docServerUrl">http://192.168.1.92:8080</string>
-    <string name="notificationEndpoint">http://192.168.1.92/community-signature/notification-endpoint</string>
 </resources>

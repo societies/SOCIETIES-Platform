@@ -91,7 +91,7 @@ public class DigSig {
 			throw new DigSigException(e);
 		}
 
-		Log.d(TAG, sig.getProvider().getInfo());
+		Log.d(TAG, "Signature provider: " + sig.getProvider().getInfo());
 		Log.d(TAG, "Signature: " + signatureStr);
 
 		return signatureStr;

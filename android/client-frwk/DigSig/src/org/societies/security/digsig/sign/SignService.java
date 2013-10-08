@@ -7,14 +7,10 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.Key;
-import java.security.KeyFactory;
-import java.security.cert.CertificateFactory;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -26,7 +22,7 @@ import org.apache.xml.security.algorithms.MessageDigestAlgorithm;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.societies.security.digsig.api.Sign;
-import org.societies.security.digsig.trust.AndroidSecureStorage;
+import org.societies.security.digsig.trust.SecureStorage;
 import org.societies.security.digsig.utility.Storage;
 import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.Document;
@@ -35,7 +31,6 @@ import org.w3c.dom.ls.LSSerializer;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.IBinder;
 import android.util.Log;
 
 public class SignService extends IntentService {
@@ -44,10 +39,7 @@ public class SignService extends IntentService {
 
 	private static final String TMP_FILE_PATH = "tmpFile";
 	
-	private AndroidSecureStorage secureStorage;
-	private KeyFactory keyFactory;
-	private CertificateFactory certFactory;
-	private DocumentBuilderFactory dbf;
+	private SecureStorage secureStorage;
 	private DocumentBuilder docBuilder;	
 	private DOMImplementationImpl domImpl;
 	private LSSerializer serializer;
@@ -58,11 +50,6 @@ public class SignService extends IntentService {
 	 */
 	public SignService() {
 		super(TAG);
-	}
-
-	@Override
-	public IBinder onBind(Intent intent) {
-		return null;  // FIXME
 	}
 
 	@Override
@@ -83,24 +70,22 @@ public class SignService extends IntentService {
 		Log.i(TAG, "OUTPUT_TYPE = " + outputType);
 
 		try {
-			initSecureStorage();
+			init();
 			doSign(intent);
 		} catch (DigSigException e) {
 			Log.w(TAG, e);
 		}
 	}
 
-	private void initSecureStorage() throws DigSigException {
+	private void init() throws DigSigException {
 		try {
-			secureStorage = AndroidSecureStorage.getInstance();
-			keyFactory = KeyFactory.getInstance("RSA");
-			certFactory = CertificateFactory.getInstance("X.509");
-	
+			secureStorage = new SecureStorage();
+			
 			if (!Init.isInitialized()) {
 				Init.init();
 			}
 	
-			dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			dbf.setNamespaceAware(true);
 	
 			docBuilder = dbf.newDocumentBuilder();
@@ -123,26 +108,10 @@ public class SignService extends IntentService {
 		}
 		Intent bcIntent = new Intent();
 
-		String certKey = String.format(Locale.US, "CERT_%d", selected);
-		String keyKey = String.format(Locale.US, "KEY_%d", selected);
+		X509Certificate cert = secureStorage.getCertificate(selected);
+		PrivateKey key = secureStorage.getPrivateKey(selected);
 
-		byte[] encodedCert = secureStorage.getWithStringKey(certKey);
-		byte[] encodedKey = secureStorage.getWithStringKey(keyKey);
-		if (encodedCert==null || encodedKey==null) return;
-
-		// Parse key and cert
-		X509Certificate cert = null;
-		Key key = null;
-
-		try {
-			cert = (X509Certificate) certFactory.generateCertificate(new ByteArrayInputStream(encodedCert));
-
-			PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(encodedKey );            
-			key = keyFactory.generatePrivate(privKeySpec);
-		} catch (Exception e) { 
-			Log.e(TAG, "Failed while decoding identity!", e);
-		}
-		if (cert==null || key==null) {
+		if (cert == null || key == null) {
 			Log.e(TAG, "Retrieved empty identity from storage!");
 			return;
 		}

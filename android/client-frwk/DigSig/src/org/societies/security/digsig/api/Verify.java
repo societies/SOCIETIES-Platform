@@ -45,6 +45,19 @@ public class Verify {
 	public class Params {
 		
 		/**
+		 * Endpoint for notifying the uploader about future events, e.g. when the resource is modified.
+		 * Supported protocol is HTTP. On event, a HTTP GET is performed on the given endpoint (HTTP URL).
+		 * 
+		 * Type: {@link String}
+		 */
+		public static final String NOTIFICATION_ENDPOINT = "NOTIFICATION_ENDPOINT";
+
+		/**
+		 * Minimal number of signatures (threshold) for notifying the uploader about future sign events.
+		 */
+		public static final String NUM_SIGNERS_THRESHOLD = "NUM_SIGNERS_THRESHOLD";
+
+		/**
 		 * The URI to upload initial version of document. Any further uploads
 		 * of same document are to be done with {@link #DOWNLOAD_URI}.
 		 * 
@@ -59,5 +72,11 @@ public class Verify {
 		 * Type: {@link String}
 		 */
 		public static final String DOWNLOAD_URI = "DOWNLOAD_URI";
+
+		/**
+		 * True if the operation completed successfully, false if an error occurred.
+		 * Type: boolean
+		 */
+		public static final String SUCCESS = "SUCCESS";
 	}		
 }
