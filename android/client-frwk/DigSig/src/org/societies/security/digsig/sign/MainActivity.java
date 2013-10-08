@@ -214,96 +214,97 @@ public class MainActivity extends Activity {
 			}
 		}
 	}
-	
-	
-	
-	
-	/**
-     * Target we publish for clients to send messages to IncomingHandler.
-     */
-    final Messenger mMessenger = new Messenger(new IncomingHandler());
 
-    /**
-     * Handler of incoming messages from clients.
-     */
-    static class IncomingHandler extends Handler {
-    	
-        @Override
-        public void handleMessage(Message msg) {
-            Log.i(TAG, "handleMessage: msg.what = " + msg.what + ", replyTo = " + msg.replyTo);
-            if (!msg.getData().getBoolean(Verify.Params.SUCCESS)) {
-            	// Error
-            	return;
-            }
-            switch (msg.what) {
-                case Verify.Methods.GENERATE_URIS:
-                	Log.i(TAG, "handleMessage: GENERATE_URIS: upload URI = " +
-                			msg.getData().getString(Verify.Params.UPLOAD_URI));
-                	Log.i(TAG, "handleMessage: GENERATE_URIS: download URI = " +
-                			msg.getData().getString(Verify.Params.DOWNLOAD_URI));
-                    break;
-                default:
-                    super.handleMessage(msg);
-            }
-        }
-    }
+
+
+
+	/**
+	 * Target we publish for clients to send messages to IncomingHandler.
+	 */
+	final Messenger mMessenger = new Messenger(new IncomingHandler());
+
+	/**
+	 * Handler of receiving replies.
+	 */
+	static class IncomingHandler extends Handler {
+
+		@Override
+		public void handleMessage(Message msg) {
+
+			Log.i(TAG, "handleMessage: msg.what = " + msg.what);
+
+			if (!msg.getData().getBoolean(Verify.Params.SUCCESS)) {
+				// An error occurred in the service
+				return;
+			}
+			switch (msg.what) {
+			case Verify.Methods.GENERATE_URIS:
+				Log.i(TAG, "handleMessage: GENERATE_URIS: upload URI = " +
+						msg.getData().getString(Verify.Params.UPLOAD_URI));
+				Log.i(TAG, "handleMessage: GENERATE_URIS: download URI = " +
+						msg.getData().getString(Verify.Params.DOWNLOAD_URI));
+				break;
+			default:
+				super.handleMessage(msg);
+			}
+		}
+	}
 
 	public void testSignServiceRemote() throws Exception {
 
 		Log.i(TAG, "testSignServiceRemote");
 
 		// Bind to the service
-    	Intent intent = new Intent(Verify.ACTION);
-    	bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+		Intent intent = new Intent(Verify.ACTION);
+		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 	}
-	
-    /** Messenger for communicating with the service. */
-    Messenger mService = null;
 
-    /** Flag indicating whether we have called bind on the service. */
-    boolean mBound;
+	/** Messenger for communicating with the service. */
+	Messenger mService = null;
 
-    /**
-     * Class for interacting with the main interface of the service.
-     */
-    private ServiceConnection mConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            // This is called when the connection with the service has been
-            // established, giving us the object we can use to
-            // interact with the service.  We are communicating with the
-            // service using a Messenger, so here we get a client-side
-            // representation of that from the raw IBinder object.
-            mService = new Messenger(service);
-            mBound = true;
-            generateUris();
-        	
-        }
+	/** Flag indicating whether we have called bind on the service. */
+	boolean mBound;
 
-        public void onServiceDisconnected(ComponentName className) {
-            // This is called when the connection with the service has been
-            // unexpectedly disconnected -- that is, its process crashed.
-            mService = null;
-            mBound = false;
-        }
-    };
+	/**
+	 * Class for interacting with the main interface of the service.
+	 */
+	private ServiceConnection mConnection = new ServiceConnection() {
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			// This is called when the connection with the service has been
+			// established, giving us the object we can use to
+			// interact with the service.  We are communicating with the
+			// service using a Messenger, so here we get a client-side
+			// representation of that from the raw IBinder object.
+			mService = new Messenger(service);
+			mBound = true;
+			generateUris();
+		}
 
-    public void generateUris() {
-        if (!mBound) return;
-        // Create and send a message to the service, using a supported 'what' value
-        Message msg = Message.obtain(null, Verify.Methods.GENERATE_URIS, 0, 0);
-        Bundle data = new Bundle();
+		public void onServiceDisconnected(ComponentName className) {
+			// This is called when the connection with the service has been
+			// unexpectedly disconnected -- that is, its process crashed.
+			mService = null;
+			mBound = false;
+		}
+	};
+
+	private void generateUris() {
+		if (!mBound) return;
+		// Create and send a message to the service, using a supported 'what' value
+		Message msg = Message.obtain(null, Verify.Methods.GENERATE_URIS, 0, 0);
+		Bundle data = new Bundle();
 		data.putString(Verify.Params.NOTIFICATION_ENDPOINT, "http://192.168.1.92/societies/community-signature/notify");
 		data.putInt(Verify.Params.NUM_SIGNERS_THRESHOLD, 2);
-        msg.setData(data);
-        msg.replyTo = mMessenger;
-        try {
-        	Log.i(TAG, "Sending message to service");
-            mService.send(msg);
-        	Log.i(TAG, "Message sent to service");
-        } catch (Exception e) {
-            Log.e(TAG, "sayHello", e);
-        }
-    }
+		msg.setData(data);
+		msg.replyTo = mMessenger;
+		try {
+			Log.i(TAG, "Sending message to service");
+			mService.send(msg);
+			Log.i(TAG, "Message sent to service");
+		} catch (Exception e) {
+			Log.e(TAG, "sayHello", e);
+		}
+	}
 
 
 }
