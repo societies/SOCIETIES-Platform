@@ -37,7 +37,6 @@ import org.societies.security.digsig.trust.SecureStorage;
 import org.societies.security.digsig.utility.KeyUtil;
 import org.societies.security.digsig.utility.RandomString;
 import org.societies.security.digsig.utility.StringUtil;
-import org.societies.security.digsig.utility.UrlParamName;
 
 import android.app.Service;
 import android.content.Intent;
@@ -193,7 +192,11 @@ public class SignServiceRemote extends Service {
 
 		Log.d(TAG, "uriForFileUpload: host = " + host + ", path = " + path);
 
-		cert = UrlParamName.base64ToUrl(cert);
+		try {
+			cert = URLEncoder.encode(cert, ENCODING);
+		} catch (UnsupportedEncodingException e) {
+			Log.w(TAG, "Could not URL encode certificate", e);
+		}
 
 		uriStr = host + RestServer.BASE + RestServer.PATH_XML_DOCUMENTS + "/" + path.replaceAll(".*/", "") +
 				"?" + RestServer.URL_PARAM_CERT + "=" + cert;

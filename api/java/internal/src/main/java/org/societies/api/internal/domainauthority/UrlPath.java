@@ -24,6 +24,8 @@
  */
 package org.societies.api.internal.domainauthority;
 
+import java.net.URLEncoder;
+
 /**
  * 
  *
@@ -31,6 +33,11 @@ package org.societies.api.internal.domainauthority;
  *
  */
 public class UrlPath {
+	
+	/**
+	 * Encoding for URL parameters. To be used with {@link URLEncoder#encode(String, String)}
+	 */
+	public static final String ENCODING = "UTF8";
 
 	public static final String BASE = "/rest";
 	

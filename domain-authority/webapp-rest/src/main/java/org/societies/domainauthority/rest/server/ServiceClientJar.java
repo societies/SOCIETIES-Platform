@@ -45,7 +45,6 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.internal.domainauthority.LocalPath;
 import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.internal.security.util.FileName;
-import org.societies.api.internal.security.util.UrlParamName;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.domainauthority.rest.control.ServiceClientJarAccess;
 import org.societies.domainauthority.rest.util.Files;
@@ -169,7 +168,6 @@ public class ServiceClientJar extends HttpServlet {
 			return;
 		}
 		
-		cert = UrlParamName.url2Base64(cert);
 		LOG.debug("HTTP PUT: cert fixed to {}", cert);
 
 		// Create a factory for disk-based file items

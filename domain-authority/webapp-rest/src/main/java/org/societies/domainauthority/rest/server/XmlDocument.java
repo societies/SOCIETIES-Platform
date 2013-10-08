@@ -45,7 +45,6 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.internal.domainauthority.DaRestException;
 import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.internal.security.util.FileName;
-import org.societies.api.internal.security.util.UrlParamName;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.domainauthority.rest.control.XmlDocumentAccess;
 import org.societies.domainauthority.rest.model.Document;
@@ -228,7 +227,6 @@ public class XmlDocument extends HttpServlet {
 	
 	private int putNewDocument(String path, String cert, String endpoint, int minNumSigners, InputStream is) {
 
-		cert = UrlParamName.url2Base64(cert);
 		LOG.debug("HTTP PUT: cert fixed to {}", cert);
 
 		path = FileName.removeUnsupportedChars(path);

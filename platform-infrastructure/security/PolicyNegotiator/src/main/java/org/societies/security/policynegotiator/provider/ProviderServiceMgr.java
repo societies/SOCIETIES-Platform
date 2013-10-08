@@ -25,9 +25,11 @@
 package org.societies.security.policynegotiator.provider;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +46,6 @@ import org.societies.api.internal.security.policynegotiator.INegotiationProvider
 import org.societies.api.internal.security.policynegotiator.INegotiationProviderServiceMgmt;
 import org.societies.api.internal.security.policynegotiator.NegotiationException;
 import org.societies.api.internal.security.util.FileName;
-import org.societies.api.internal.security.util.UrlParamName;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.api.security.digsig.ISignatureMgr;
@@ -281,13 +282,19 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 		return uriStr;
 	}
 	
-	private String uriForFileUpload(String host, String filePath, URI serviceId, String cert) {
+	private String uriForFileUpload(String host, String filePath, URI serviceId, String cert)
+			throws NegotiationException {
 		
 		String uriStr;
 
 		LOG.debug("uriForFileUpload({}, {}, ...)", host, filePath);
 
-		cert = UrlParamName.base64ToUrl(cert);
+		try {
+			cert = URLEncoder.encode(cert, UrlPath.ENCODING);
+		} catch (UnsupportedEncodingException e) {
+			LOG.warn("uriForFileUpload: Could not encode certificate", e);
+			throw new NegotiationException("Could not encode certificate", e);
+		}
 		
 		uriStr = host + UrlPath.BASE + UrlPath.PATH_FILES + "/" + filePath.replaceAll(".*/", "") +
 				"?" + UrlPath.URL_PARAM_FILE + "=" + filePath +

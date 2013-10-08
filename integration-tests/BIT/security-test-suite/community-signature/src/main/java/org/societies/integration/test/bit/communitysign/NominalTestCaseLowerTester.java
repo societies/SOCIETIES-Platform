@@ -2,8 +2,10 @@ package org.societies.integration.test.bit.communitysign;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.cert.X509Certificate;
 
 import org.custommonkey.xmlunit.XMLTestCase;
@@ -17,7 +19,6 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.internal.security.digsig.XmlSignature;
-import org.societies.api.internal.security.util.UrlParamName;
 import org.societies.api.security.digsig.ISignatureMgr;
 
 /**
@@ -230,13 +231,14 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		return uriStr;
 	}
 	
-	private String uriForFileUpload(String host, String path, String cert, String notificationEndpoint) {
+	private String uriForFileUpload(String host, String path, String cert, String notificationEndpoint)
+			throws UnsupportedEncodingException {
 		
 		String uriStr;
 
 		LOG.debug("uriForFileUpload({}, {}, ...)", host, path);
 
-		cert = UrlParamName.base64ToUrl(cert);
+		cert = URLEncoder.encode(cert, UrlPath.ENCODING);
 		
 		uriStr = host + UrlPath.BASE + UrlPath.PATH_XML_DOCUMENTS + "/" + path.replaceAll(".*/", "") +
 				"?" + UrlPath.URL_PARAM_CERT + "=" + cert +
