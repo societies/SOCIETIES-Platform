@@ -140,6 +140,13 @@ public class MainActivity extends Activity {
 		super.onPause();
 		if (receiver != null) {
 			unregisterReceiver(receiver);
+			receiver = null;
+			Log.d(TAG, "Receiver unregistered");
+		}
+		if (mBound) {
+			unbindService(mConnection);
+			Log.d(TAG, "Service unbound");
+			mBound = false;
 		}
 	}
 
@@ -254,10 +261,12 @@ public class MainActivity extends Activity {
 				// Optionally, you can sign your XML document yourself before or after upload.
 				String uploadUri = msg.getData().getString(Verify.Params.UPLOAD_URI);
 				Log.i(TAG, "handleMessage: GENERATE_URIS: upload URI = " + uploadUri);
+//				new RetrieveFeedTask().execute(uploadUri, "PUT", "<xml><a Id='id1'>foo</a></xml>");
 				
 				// After you upload the XML document, distribute the download URI to others to sign it.
 				String downloadUri = msg.getData().getString(Verify.Params.DOWNLOAD_URI);
 				Log.i(TAG, "handleMessage: GENERATE_URIS: download URI = " + downloadUri);
+//				new RetrieveFeedTask().execute(downloadUri, "GET", "foo.xml");
 				break;
 			default:
 				super.handleMessage(msg);
@@ -269,9 +278,13 @@ public class MainActivity extends Activity {
 
 		Log.i(TAG, "testSignServiceRemote");
 
-		// Bind to the service
-		Intent intent = new Intent(Verify.ACTION);
-		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+		if (mBound) {
+			generateUris();
+		} else {
+			// Bind to the service
+			Intent intent = new Intent(Verify.ACTION);
+			bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+		}
 	}
 
 	/** Messenger for communicating with the service. */
@@ -320,6 +333,4 @@ public class MainActivity extends Activity {
 			Log.e(TAG, "sayHello", e);
 		}
 	}
-
-
 }
