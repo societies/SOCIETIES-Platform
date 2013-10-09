@@ -1,186 +1,178 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui"
-                xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:f="http://java.sun.com/jsf/core"
-                template="templates/main_template.xhtml">
-                
-    <ui:define name="html_head">
-        <title>SOCIEITES :: Access Control Request</title>
-    </ui:define>
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="templates/main_template.xhtml">
 
-    <ui:define name="body">
+	<ui:define name="html_head">
+		<title>SOCIEITES :: Access Control Request</title>
+	</ui:define>
 
-        <h2>Access Control Request</h2>
+	<ui:define name="body">
 
-        <p:panel>
-            <f:facet name="header">
+		<h2>Access Control Request</h2>
+
+		<p:panel>
+			<f:facet name="header">
                 Access control request from <p:outputLabel
-                    value="#{accessControlController.currentAccessEvent.requestor.requestorId}"/>
-            </f:facet>
+					value="#{accessControlController.currentAccessEvent.requestor.requestorId}" />
+			</f:facet>
 
-            <p:dataGrid id="dataGrid"
-                        columns="1"
-                        emptyMessage="This access control request has no items   0.o"
-                        value="#{accessControlController.responseItems}"
-                        var="responseItem">
+			<p:blockUI id="blockUI" widgetVar="blockUI" block=":mainForm">
+			Loading<br />
+				<p:graphicImage value="/images/ajax-loader.gif" />
+			</p:blockUI>
 
-                <p:panel>
-                    <f:facet name="header">
-                        <p:selectBooleanCheckbox id="checkbox"
-                                                 value="#{responseItem.permitted}"/>
+			<p:dataGrid id="dataGrid" columns="1"
+				emptyMessage="This access control request has no items   0.o"
+				value="#{accessControlController.responseItems}" var="responseItem">
 
-                        <p:outputLabel value="#{responseItem.requestItem.resource.dataType}"
-                                       for="checkbox"
-                                       style="margin-top: 5px;"/>
-                        <p:commandButton value="Details >"
-                                         style="float:right;"
-                                         onclick="document.getElementById('#{p:component('optionsPanel')}').visible = true; return false;"
-                                         process="@none"
-                                         update="@none"/>
-                    </f:facet>
+				<p:panel>
+					<f:facet name="header">
+						<p:selectBooleanCheckbox id="checkbox"
+							value="#{responseItem.permitted}" />
 
-                    <p:panel visible="true" id="optionsPanel">
-                        <!--Purpose-->
-                        <p:outputLabel value="Purpose: {still to be added}"/>
+						<p:outputLabel
+							value="#{responseItem.requestItem.resource.dataType}"
+							for="checkbox" style="margin-top: 5px;" />
+						<p:commandButton value="Details >" style="float:right;"
+							onclick="document.getElementById('#{p:component('optionsPanel')}').visible = true; return false;"
+							process="@none" update="@none" />
+					</f:facet>
 
-                        <!--Obfuscation-->
-                        <p:panelGrid columns="2" rendered="#{responseItem.requestItemWrapper.obfuscatorInfo ne null
+					<p:panel visible="true" id="optionsPanel">
+						<!--Purpose-->
+						<p:outputLabel value="Purpose: {still to be added}" />
+
+						<!--Obfuscation-->
+						<p:panelGrid columns="2"
+							rendered="#{responseItem.requestItemWrapper.obfuscatorInfo ne null
                                                              and responseItem.requestItemWrapper.obfuscatorInfo.obfuscable}">
-                            <p:outputLabel value="Do you want to blur it?"/>
+							<p:outputLabel value="Do you want to blur it?" />
 
-                            <h:panelGrid columns="2"
-                                         rendered="#{responseItem.requestItemWrapper.obfuscatorInfo.obfuscationLevelType.value() eq 'continuous'}">
-                                <h:outputText id="contObfuscationLabel" value="%#{responseItem.obfuscationLevel}"/>
-                                <p:slider for="contObfuscationLevel"
-                                          display="contObfuscationLabel"
-                                          displayTemplate="%{value}"
-                                          style="width: 200px;"
-                                          minValue="0"
-                                          maxValue="100">
-                                    <p:ajax event="slideEnd"
-                                            update="contObfuscationExample"
-                                            process="contObfuscationLevel"/>
-                                </p:slider>
-                                <h:inputHidden id="contObfuscationLevel" value="#{responseItem.obfuscationLevel}"/>
-                                <h:outputText id="contObfuscationExample"
-                                              value="#{responseItem.requestItemWrapper.obfuscatorInfo.getObfuscationExample(responseItem.obfuscationLevel)}"/>
-                            </h:panelGrid>
+							<h:panelGrid columns="2"
+								rendered="#{responseItem.requestItemWrapper.obfuscatorInfo.obfuscationLevelType.value() eq 'continuous'}">
+								<h:outputText id="contObfuscationLabel"
+									value="%#{responseItem.obfuscationLevel}" />
+								<p:slider for="contObfuscationLevel"
+									display="contObfuscationLabel" displayTemplate="%{value}"
+									style="width: 200px;" minValue="0" maxValue="100">
+									<p:ajax event="slideEnd" update="contObfuscationExample"
+										process="contObfuscationLevel" />
+								</p:slider>
+								<h:inputHidden id="contObfuscationLevel"
+									value="#{responseItem.obfuscationLevel}" />
+								<h:outputText id="contObfuscationExample"
+									value="#{responseItem.requestItemWrapper.obfuscatorInfo.getObfuscationExample(responseItem.obfuscationLevel)}" />
+							</h:panelGrid>
 
-                            <h:panelGrid columns="2"
-                                         rendered="#{responseItem.requestItemWrapper.obfuscatorInfo.obfuscationLevelType.value() eq 'discrete'}">
-                                <h:outputText id="disContObfuscationLabel" value="#{responseItem.obfuscationLevel}"/>
-                                <p:slider for="disContObfuscationLevel"
-                                          display="disContObfuscationLabel"
-                                          displayTemplate="{value}"
-                                          style="width: 200px;"
-                                          minValue="0"
-                                          maxValue="#{responseItem.requestItemWrapper.obfuscatorInfo.nbOfObfuscationLevelStep}">
-                                    <p:ajax event="slideEnd"
-                                            update="disContObfuscationExample"
-                                            process="disContObfuscationLevel"/>
-                                </p:slider>
-                                <h:inputHidden id="disContObfuscationLevel" value="#{responseItem.obfuscationLevel}"/>
-                                <h:outputText id="disContObfuscationExample"
-                                              value="#{responseItem.requestItemWrapper.obfuscatorInfo.getObfuscationExample(responseItem.obfuscationLevel)}"/>
-                            </h:panelGrid>
-                        </p:panelGrid>
+							<h:panelGrid columns="2"
+								rendered="#{responseItem.requestItemWrapper.obfuscatorInfo.obfuscationLevelType.value() eq 'discrete'}">
+								<h:outputText id="disContObfuscationLabel"
+									value="#{responseItem.obfuscationLevel}" />
+								<p:slider for="disContObfuscationLevel"
+									display="disContObfuscationLabel" displayTemplate="{value}"
+									style="width: 200px;" minValue="0"
+									maxValue="#{responseItem.requestItemWrapper.obfuscatorInfo.nbOfObfuscationLevelStep}">
+									<p:ajax event="slideEnd" update="disContObfuscationExample"
+										process="disContObfuscationLevel" />
+								</p:slider>
+								<h:inputHidden id="disContObfuscationLevel"
+									value="#{responseItem.obfuscationLevel}" />
+								<h:outputText id="disContObfuscationExample"
+									value="#{responseItem.requestItemWrapper.obfuscatorInfo.getObfuscationExample(responseItem.obfuscationLevel)}" />
+							</h:panelGrid>
+						</p:panelGrid>
 
-                        <!--Actions-->
-                        <p:panelGrid columns="4">
-                            <p:selectOneMenu id="actionScopeMenu">
-                                <f:selectItem itemLabel="Everyone"/>
-                                <f:selectItem itemLabel="Only this app"/>
-                            </p:selectOneMenu>
+						<!--Actions-->
+						<p:panelGrid columns="4">
+							<p:selectOneMenu id="actionScopeMenu">
+								<f:selectItem itemLabel="Everyone" />
+								<f:selectItem itemLabel="Only this app" />
+							</p:selectOneMenu>
 
-                            <p:outputLabel value="will be able to"/>
+							<p:outputLabel value="will be able to" />
 
-                            <p:selectManyCheckbox id="actionsCheckboxes"
-                                                  value="#{responseItem.requestItemWrapper.selectedActionNames}"
-                                                  style="margin: 0;">
-                                <f:selectItems value="#{responseItem.requestItem.actions}"
-                                               var="action"
-                                               itemValue="#{action.actionConstant.name()}"
-                                               itemLabel="#{action.actionConstant.name()}"
-                                               itemDisabled="#{action.actionConstant.name() eq 'READ'}"/>
-                            </p:selectManyCheckbox>
+							<p:selectManyCheckbox id="actionsCheckboxes"
+								value="#{responseItem.requestItemWrapper.selectedActionNames}"
+								style="margin: 0;">
+								<f:selectItems value="#{responseItem.requestItem.actions}"
+									var="action" itemValue="#{action.actionConstant.name()}"
+									itemLabel="#{action.actionConstant.name()}"
+									itemDisabled="#{action.actionConstant.name() eq 'READ'}" />
+							</p:selectManyCheckbox>
 
-                            <p:outputLabel value="your #{responseItem.requestItem.resource.dataType.toLowerCase()}"/>
-                        </p:panelGrid>
+							<p:outputLabel
+								value="your #{responseItem.requestItem.resource.dataType.toLowerCase()}" />
+						</p:panelGrid>
 
-                        <!--Conditions-->
-                        <p:dataGrid id="conditionsTable"
-                                    value="#{responseItem.requestItem.conditions}"
-                                    var="condition"
-                                    columns="1">
-                            <f:facet name="header">
+						<!--Conditions-->
+						<p:dataGrid id="conditionsTable"
+							value="#{responseItem.requestItem.conditions}" var="condition"
+							columns="1">
+							<f:facet name="header">
                                 Conditions
                             </f:facet>
 
-                            <p:outputLabel for="conditionValue" value="#{condition.conditionConstant.name()}"/>
+							<p:outputLabel for="conditionValue"
+								value="#{condition.conditionConstant.name()}" />
 
-                            <p:selectOneMenu
-                                    label="#{responseItem.requestItem.resource.dataType} condition #{condition.conditionConstant}"
-                                    id="conditionValue"
-                                    value="#{condition.value}"
-                                    required="#{!condition.optional}"
-                                    validatorMessage="This value is required">
-                                <f:selectItem itemLabel="(none)"
-                                              itemValue=""
-                                              noSelectionOption="true"
-                                              rendered="#{condition.optional}"/>
-                                <f:selectItems
-                                        value="#{accessControlController.getAvailableConditionValues(condition.conditionConstant)}"/>
-                            </p:selectOneMenu>
+							<p:selectOneMenu
+								label="#{responseItem.requestItem.resource.dataType} condition #{condition.conditionConstant}"
+								id="conditionValue" value="#{condition.value}"
+								required="#{!condition.optional}"
+								validatorMessage="This value is required">
+								<f:selectItem itemLabel="(none)" itemValue=""
+									noSelectionOption="true" rendered="#{condition.optional}" />
+								<f:selectItems
+									value="#{accessControlController.getAvailableConditionValues(condition.conditionConstant)}" />
+							</p:selectOneMenu>
 
-                        </p:dataGrid>
+						</p:dataGrid>
 
-                        <p:commandButton outcome="productDetail" icon="ui-icon-circle-plus" title="Add condition"
-                                         actionListener="#{accessControlController.addNewCondition(responseItem.requestItem)}"
-                                         process="addConditionName,@this"
-                                         update="optionsPanel"/>
-                        <p:selectOneMenu id="addConditionName"
-                                         value="#{accessControlController.newConditionToAdd}">
-                            <f:selectItems
-                                    value="#{accessControlController.getAvailableConditionConstants(responseItem.requestItem)}"
-                                    var="newCondition"
-                                    itemLabel="#{newCondition.name()}"/>
-                        </p:selectOneMenu>
-                    </p:panel>
-                </p:panel>
+						<p:commandButton outcome="productDetail"
+							icon="ui-icon-circle-plus" title="Add condition"
+							actionListener="#{accessControlController.addNewCondition(responseItem.requestItem)}"
+							process="addConditionName,@this" update="optionsPanel" />
+						<p:selectOneMenu id="addConditionName"
+							value="#{accessControlController.newConditionToAdd}">
+							<f:selectItems
+								value="#{accessControlController.getAvailableConditionConstants(responseItem.requestItem)}"
+								var="newCondition" itemLabel="#{newCondition.name()}" />
+						</p:selectOneMenu>
+					</p:panel>
+				</p:panel>
 
-            </p:dataGrid>
+			</p:dataGrid>
 
-            <f:facet name="footer">
-                <p:messages id="validationMessages"/>
+			<f:facet name="footer">
+				<p:messages id="validationMessages" />
 
-                <p:commandButton id="acceptRememberButton"
-                                 value="Accept and remember"
-                                 action="#{accessControlController.completeAccessRequestActionRemember}"
-                                 update="@form"
-                                 />
+				<p:commandButton id="acceptRememberButton"
+					value="Accept and remember" onclick="blockUI.show()"
+					action="#{accessControlController.completeAccessRequestActionRemember}"
+					update="@form" />
 
-                <p:commandButton id="acceptButton"
-                                 value="Accept just once"
-                                 action="#{accessControlController.completeAccessRequestAction}"
-                                 update="@form"/>
+				<p:commandButton id="acceptButton" value="Accept just once"
+					onclick="blockUI.show()"
+					action="#{accessControlController.completeAccessRequestAction}"
+					update="@form" />
 
-                <p:commandButton id="refuseRememberButton"
-                                 value="Refuse and remember"
-                                 action="#{accessControlController.cancelAccessRequestActionRemember}"
-                                 process="@this"
-                                 update="@form"/>
-                                 
-                <p:commandButton id="refuseButton"
-                                 value="Refuse just once"
-                                 action="#{accessControlController.cancelAccessRequestAction}"
-                                 process="@this"
-                                 update="@form"/>
-                                 
-            </f:facet>
-        </p:panel>
+				<p:commandButton id="refuseRememberButton"
+					value="Refuse and remember" onclick="blockUI.show()"
+					action="#{accessControlController.cancelAccessRequestActionRemember}"
+					process="@this" update="@form" />
 
-    </ui:define>
+				<p:commandButton id="refuseButton" value="Refuse just once"
+					onclick="blockUI.show()"
+					action="#{accessControlController.cancelAccessRequestAction}"
+					process="@this" update="@form" />
+
+			</f:facet>
+		</p:panel>
+
+	</ui:define>
 </ui:composition>
 </html>

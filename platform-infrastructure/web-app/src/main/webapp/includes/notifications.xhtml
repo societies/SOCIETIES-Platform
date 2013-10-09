@@ -10,9 +10,11 @@
 
 	<p:dialog id="notificationDialog" resizable="true"
 		header="Notifications" draggable="true" modal="false">
-		
-		<p:poll interval="1" stop="#{notifications.stopPoll()}" update="notificationGrid" />
 
+	<p:poll autoStart="false" interval="1" id="notifPoll"
+			stop="#{notifications.stopPoll()}" update="notificationGrid" />
+		
+		<p:ajax event="close" onstart="#{p:widgetVar('notifPoll')}.stop();" />
 
 		<h:button value="View notification history"
 			outcome="/notification_history.xhtml" />
@@ -20,8 +22,8 @@
 
 		<p:dataGrid var="notification"
 			value="#{notifications.unansweredNegotiationQueue}" columns="1"
-			emptyMessage="No notifications"
-			widgetVar="notificationGrid" id="notificationGrid">
+			emptyMessage="No notifications" widgetVar="notificationGrid"
+			id="notificationGrid">
 
 
 			<p:panel id="ppnPopupPanel"
@@ -166,7 +168,7 @@
 				rendered="#{notification.type eq 'TIMED_ABORT'}"
 				styleClass="unread-notification-header">
 
-			
+
 				<h:outputText value="#{notification.arrivalDate.toLocaleString()}" />
 				<br />
 				<h:outputText value="[#{notification.itemId}]"
