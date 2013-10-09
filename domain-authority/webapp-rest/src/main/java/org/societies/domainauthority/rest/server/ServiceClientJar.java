@@ -95,6 +95,7 @@ public class ServiceClientJar extends HttpServlet {
 			LOG.warn("Invalid filename or key");
 			// Return HTTP status code 401 - Unauthorized
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setHeader("WWW-Authenticate", "Digest realm=\"societies\"");
 			return;
 		}
 
