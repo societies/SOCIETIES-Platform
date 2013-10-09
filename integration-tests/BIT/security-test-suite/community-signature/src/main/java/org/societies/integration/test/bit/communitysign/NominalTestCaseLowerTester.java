@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.cert.X509Certificate;
@@ -109,10 +110,10 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	}
 	
 	private void deletePreviousDocument() throws Exception {
-		String urlStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode()));
-		LOG.info("[#2165] deletePreviousDocument(): deleting previous document at {}", urlStr);
-		URL url = new URL(urlStr);
-		Net net = new Net(url);
+		String uriStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode()));
+		LOG.info("[#2165] deletePreviousDocument(): deleting previous document at {}", uriStr);
+		URI uri = new URI(uriStr);
+		Net net = new Net(uri);
 		net.delete();
 	}
 	
@@ -128,17 +129,17 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		String certStr = signatureMgr.cert2str(cert);
 //		String notificationEndpoint = identityManager.getThisNetworkNode().getJid();
 		String notificationEndpoint = "http://localhost/societies/document-signed-by-enough-entities";
-		String urlStr = uriForFileUpload(daUrl, path, certStr, notificationEndpoint);
-		LOG.info("[#2165] t1_uploadDocument(): uploading initial document to {}", urlStr);
-		URL url = new URL(urlStr);
-		Net net = new Net(url);
+		String uriStr = uriForFileUpload(daUrl, path, certStr, notificationEndpoint);
+		LOG.info("[#2165] t1_uploadDocument(): uploading initial document to {}", uriStr);
+		URI uri = new URI(uriStr);
+		Net net = new Net(uri);
 		boolean success;
 		
-		success = net.put(path, xml.getBytes(), url.toURI());
+		success = net.put(path, xml.getBytes());
 		assertTrue(success);
 		
 		// The file already exists, should get an error
-		success = net.put(path, xml.getBytes(), url.toURI());
+		success = net.put(path, xml.getBytes());
 		assertFalse(success);
 	}
 	
@@ -175,15 +176,15 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	 */
 	private void t4_mergeDocument() throws Exception {
 
-		String urlStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode()));
-		LOG.info("[#2165] t4_mergeDocument(): uploading new document to {}", urlStr);
-		URL url = new URL(urlStr);
-		Net net = new Net(url);
+		String uriStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode()));
+		LOG.info("[#2165] t4_mergeDocument(): uploading new document to {}", uriStr);
+		URI uri = new URI(uriStr);
+		Net net = new Net(uri);
 		boolean success;
 		
-		success = net.put(path, xmlSigned1.getBytes(), url.toURI());
+		success = net.put(path, xmlSigned1.getBytes());
 		assertTrue(success);
-		success = net.put(path, xmlSigned2.getBytes(), url.toURI());
+		success = net.put(path, xmlSigned2.getBytes());
 		assertTrue(success);
 	}
 	
@@ -201,11 +202,11 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	
 	private byte[] download() throws Exception {
 		
-		String urlStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode()));
-		int httpCode = getHttpCode(new URL(urlStr));
+		String uriStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode()));
+		int httpCode = getHttpCode(new URL(uriStr));
 		assertEquals(HttpURLConnection.HTTP_OK, httpCode, 0.0);
-		URL url = new URL(urlStr);
-		Net net = new Net(url);
+		URI uri = new URI(uriStr);
+		Net net = new Net(uri);
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		net.download(os);
 		byte[] downloaded = os.toByteArray();

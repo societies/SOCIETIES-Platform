@@ -177,8 +177,15 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 			LOG.debug("addService(): Adding file: URL = {}, fileName = {}", f, fileName);
 			files.add(fileName);
 			
-			Net net = new Net(f);
+			Net net;
+			try {
+				net = new Net(f.toURI());
+			} catch (URISyntaxException e) {
+				LOG.warn("Could not download {}", f, e);
+				continue;
+			}
 			if (!net.download(tmpFile)) {
+				LOG.warn("Could not download {}", f);
 				continue;
 			}
 			URI server;
@@ -191,7 +198,8 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 				LOG.warn("Could not generate URI from {}", fileServer);
 				throw new NegotiationException(e);
 			}
-			net.put(tmpFile, server);
+			net = new Net(server);
+			net.put(tmpFile);
 		}
 		if (fileUrls != null && fileUrls.length > 0) {
 			File tmp = new File(tmpFile);

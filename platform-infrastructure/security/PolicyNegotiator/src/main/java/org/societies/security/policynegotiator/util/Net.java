@@ -29,7 +29,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -57,20 +56,20 @@ public class Net {
 
 	private static Logger LOG = LoggerFactory.getLogger(Net.class);
 
-	private URL source;
+	private URI uri;
 	
-	public Net(URL source) {
-		this.source = source;
+	public Net(URI uri) {
+		this.uri = uri;
 	}
 	
 	public boolean delete() {
 		
-		LOG.debug("delete() {}", source);
+		LOG.debug("delete() {}", uri);
 		
 		boolean success = false;
 		HttpClient httpclient = new DefaultHttpClient();
 		try {
-			HttpDelete httpDelete = new HttpDelete(source.toURI());
+			HttpDelete httpDelete = new HttpDelete(uri);
             HttpResponse response = httpclient.execute(httpDelete);
             HttpEntity resEntity = response.getEntity();
 
@@ -80,7 +79,7 @@ public class Net {
             }
             EntityUtils.consume(resEntity);
 		} catch (Exception e) {
-			LOG.warn("delete(): " + source, e);
+			LOG.warn("delete(): " + uri, e);
 			return false;
 		}
 		return success;
@@ -93,14 +92,14 @@ public class Net {
 		long startTime = System.currentTimeMillis();
 		
 		try {
-			source.openConnection();
-			InputStream reader = source.openStream();
+			uri.toURL().openConnection();
+			InputStream reader = uri.toURL().openStream();
 			FileOutputStream writer = new FileOutputStream(fileName);
 			byte[] buffer = new byte[153600];
 			int totalBytesRead = 0;
 			int bytesRead = 0;
 
-			LOG.debug("Reading file {} 150KB blocks at a time.", source);
+			LOG.debug("Reading file {} 150KB blocks at a time.", uri);
 
 			while ((bytesRead = reader.read(buffer)) > 0)
 			{  
@@ -111,25 +110,25 @@ public class Net {
 
 			long endTime = System.currentTimeMillis();
 
-			LOG.info("File " + source + " downloaded. " + (new Integer(totalBytesRead).toString()) +
+			LOG.info("File " + uri + " downloaded. " + (new Integer(totalBytesRead).toString()) +
 					" bytes read (" + (new Long(endTime - startTime).toString()) + " ms).");
 			writer.close();
 			reader.close();
 		} catch (IOException e) {
-			LOG.warn("download(): " + source, e);
+			LOG.warn("download(): " + uri, e);
 			return false;
 		}
 		return true;
 	}
 	
-	public boolean post(String fileName, URI destination) {
+	public boolean post(String fileName) {
 
-		LOG.debug("post({}, {})", fileName, destination);
+		LOG.debug("post({})", fileName);
 
         HttpClient httpclient = new DefaultHttpClient();
 
         try {
-            HttpPost httppost = new HttpPost(destination);
+            HttpPost httppost = new HttpPost(uri);
 
             FileBody bin = new FileBody(new File(fileName));
             StringBody comment = new StringBody("A binary file of some kind");
@@ -161,15 +160,15 @@ public class Net {
         return true;
 	}
 	
-	public boolean put(String fileName, URI destination) {
+	public boolean put(String fileName) {
 
-		LOG.debug("put({}, {})", fileName, destination);
+		LOG.debug("put({})", fileName);
 
         HttpClient httpclient = new DefaultHttpClient();
         boolean success = false;
 
         try {
-            HttpPut httpput = new HttpPut(destination);
+            HttpPut httpput = new HttpPut(uri);
 
             FileBody bin = new FileBody(new File(fileName));
             StringBody comment = new StringBody("A binary file of some kind");
@@ -202,9 +201,5 @@ public class Net {
 			}
         }
         return success;
-	}
-	
-	public void downloadAndPost(URI destination) {
-		// TODO
 	}
 }
