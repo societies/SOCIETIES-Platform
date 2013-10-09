@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Locale;
 
@@ -123,6 +124,15 @@ public class InstallIdentityActivity extends Activity {
 		while (true) {
 			String certKey = String.format(Locale.US, "CERT_%d", count);
 			String keyKey = String.format(Locale.US, "KEY_%d", count++);
+			
+			byte[] alreadyStoredCert = secureStorage.getWithStringKey(certKey);
+			byte[] alreadyStoredKey = secureStorage.getWithStringKey(keyKey);
+			if (Arrays.equals(alreadyStoredCert, encodedCert) && Arrays.equals(alreadyStoredKey, encodedKey)) {
+				Toast.makeText(this, "This digital identity is already installed.", Toast.LENGTH_SHORT).show();
+				setResult(RESULT_OK);
+				finish();				
+				return;
+			}
 			
 			if (!secureStorage.contains(certKey) && !secureStorage.contains(keyKey)) {
 				secureStorage.put(certKey,encodedCert);
