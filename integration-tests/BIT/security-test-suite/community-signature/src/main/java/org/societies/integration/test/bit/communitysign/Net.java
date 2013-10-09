@@ -112,8 +112,8 @@ public class Net {
 
 			long endTime = System.currentTimeMillis();
 
-			LOG.info("File " + uri + " downloaded. " + (new Integer(totalBytesRead).toString()) +
-					" bytes read (" + (new Long(endTime - startTime).toString()) + " ms).");
+			LOG.info("File " + uri + " downloaded. " + String.valueOf(totalBytesRead) +
+					" bytes read (" + String.valueOf(endTime - startTime) + " ms).");
 			reader.close();
 		} catch (IOException e) {
 			LOG.warn("download(): " + uri, e);
