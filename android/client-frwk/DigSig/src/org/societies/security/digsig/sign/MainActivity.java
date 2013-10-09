@@ -32,6 +32,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
+	
 	private final static int SIGN = 1;
 	private final static int VERIFY = 2;
 
@@ -39,6 +40,7 @@ public class MainActivity extends Activity {
 
 	private int sessionId;
 	private String signedUrl;
+	private BroadcastReceiver receiver = null;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -130,7 +132,15 @@ public class MainActivity extends Activity {
 
 	private void registerBroadcastReceiver() {
 		IntentFilter filter = new IntentFilter(Sign.ACTION_FINISHED);
-		registerReceiver(new Receiver(), filter);
+		receiver = new Receiver();
+		registerReceiver(receiver, filter);
+	}
+	
+	protected void onPause() {
+		super.onPause();
+		if (receiver != null) {
+			unregisterReceiver(receiver);
+		}
 	}
 
 	private class Receiver extends BroadcastReceiver {
@@ -242,12 +252,12 @@ public class MainActivity extends Activity {
 				
 				// Now upload your XML document with this URI.
 				// Optionally, you can sign your XML document yourself before or after upload.
-				Log.i(TAG, "handleMessage: GENERATE_URIS: upload URI = " +
-						msg.getData().getString(Verify.Params.UPLOAD_URI));
+				String uploadUri = msg.getData().getString(Verify.Params.UPLOAD_URI);
+				Log.i(TAG, "handleMessage: GENERATE_URIS: upload URI = " + uploadUri);
 				
-				// After you upload the XML document, distribute the download URI to others to sign it. 
-				Log.i(TAG, "handleMessage: GENERATE_URIS: download URI = " +
-						msg.getData().getString(Verify.Params.DOWNLOAD_URI));
+				// After you upload the XML document, distribute the download URI to others to sign it.
+				String downloadUri = msg.getData().getString(Verify.Params.DOWNLOAD_URI);
+				Log.i(TAG, "handleMessage: GENERATE_URIS: download URI = " + downloadUri);
 				break;
 			default:
 				super.handleMessage(msg);
