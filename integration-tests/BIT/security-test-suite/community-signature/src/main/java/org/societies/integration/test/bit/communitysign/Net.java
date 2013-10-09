@@ -41,6 +41,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -49,7 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
+ * HTTP methods
  *
  * @author Mitja Vardjan
  *
@@ -176,6 +177,16 @@ public class Net {
         return true;
 	}
 	
+	/**
+	 * Perform a HTTP PUT
+	 * 
+	 * @param fileName Resource name
+	 * 
+	 * @param fileContents The contents to put. If null, then fileName must be
+	 * an existing file and its contents is put.
+	 * 
+	 * @return True for success, false for error
+	 */
 	public boolean put(String fileName, byte[] fileContents) {
 
 		LOG.debug("put({}, ...)", fileName);
@@ -186,7 +197,12 @@ public class Net {
         try {
             HttpPut httpput = new HttpPut(uri);
 
-            ByteArrayBody bin = new ByteArrayBody(fileContents, fileName);
+            ContentBody bin;
+            if (fileContents == null) {
+            	bin = new FileBody(new File(fileName));
+            } else {
+            	bin = new ByteArrayBody(fileContents, fileName);
+            }
             StringBody comment = new StringBody("A binary file of some kind");
 
             MultipartEntity reqEntity = new MultipartEntity();
@@ -217,5 +233,14 @@ public class Net {
 			}
         }
         return success;
+	}
+	
+	/**
+	 * Same as {@link #put(String, byte[])} with null for 2nd parameter
+	 * @param fileName Name of existing file. Its contents will be put to the {@link URI}.
+	 * @return True for success, false for error
+	 */
+	public boolean put(String fileName) {
+		return put(fileName, null);
 	}
 }

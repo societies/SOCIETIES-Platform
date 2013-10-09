@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 
 import javax.servlet.http.HttpServletResponse;
@@ -39,6 +40,8 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -47,7 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
+ * HTTP methods
  *
  * @author Mitja Vardjan
  *
@@ -84,17 +87,16 @@ public class Net {
 		}
 		return success;
 	}
-
-	public boolean download(String fileName) {
+	
+	public boolean download(OutputStream os) {
 		
-		LOG.debug("download({})", fileName);
+		LOG.debug("download({})", os);
 		
 		long startTime = System.currentTimeMillis();
 		
 		try {
 			uri.toURL().openConnection();
 			InputStream reader = uri.toURL().openStream();
-			FileOutputStream writer = new FileOutputStream(fileName);
 			byte[] buffer = new byte[153600];
 			int totalBytesRead = 0;
 			int bytesRead = 0;
@@ -103,7 +105,7 @@ public class Net {
 
 			while ((bytesRead = reader.read(buffer)) > 0)
 			{  
-				writer.write(buffer, 0, bytesRead);
+				os.write(buffer, 0, bytesRead);
 				buffer = new byte[153600];
 				totalBytesRead += bytesRead;
 			}
@@ -112,13 +114,28 @@ public class Net {
 
 			LOG.info("File " + uri + " downloaded. " + (new Integer(totalBytesRead).toString()) +
 					" bytes read (" + (new Long(endTime - startTime).toString()) + " ms).");
-			writer.close();
 			reader.close();
 		} catch (IOException e) {
 			LOG.warn("download(): " + uri, e);
 			return false;
 		}
 		return true;
+	}
+	
+	public boolean download(String fileName) {
+		
+		FileOutputStream os;
+		boolean result;
+		
+		try {
+			os = new FileOutputStream(fileName);
+			result = download(os);
+			os.close();
+		} catch (IOException e) {
+			LOG.warn("download", e);
+			return false;
+		}
+		return result;
 	}
 	
 	public boolean post(String fileName) {
@@ -160,9 +177,19 @@ public class Net {
         return true;
 	}
 	
-	public boolean put(String fileName) {
+	/**
+	 * Perform a HTTP PUT
+	 * 
+	 * @param fileName Resource name
+	 * 
+	 * @param fileContents The contents to put. If null, then fileName must be
+	 * an existing file and its contents is put.
+	 * 
+	 * @return True for success, false for error
+	 */
+	public boolean put(String fileName, byte[] fileContents) {
 
-		LOG.debug("put({})", fileName);
+		LOG.debug("put({}, ...)", fileName);
 
         HttpClient httpclient = new DefaultHttpClient();
         boolean success = false;
@@ -170,7 +197,12 @@ public class Net {
         try {
             HttpPut httpput = new HttpPut(uri);
 
-            FileBody bin = new FileBody(new File(fileName));
+            ContentBody bin;
+            if (fileContents == null) {
+            	bin = new FileBody(new File(fileName));
+            } else {
+            	bin = new ByteArrayBody(fileContents, fileName);
+            }
             StringBody comment = new StringBody("A binary file of some kind");
 
             MultipartEntity reqEntity = new MultipartEntity();
@@ -192,7 +224,7 @@ public class Net {
             }
             EntityUtils.consume(resEntity);
         } catch (IOException e) {
-        	LOG.warn("put(): " + fileName, e);
+        	LOG.warn("put(): " + uri, e);
         	return false;
         } finally {
 			try {
@@ -201,5 +233,14 @@ public class Net {
 			}
         }
         return success;
+	}
+	
+	/**
+	 * Same as {@link #put(String, byte[])} with null for 2nd parameter
+	 * @param fileName Name of existing file. Its contents will be put to the {@link URI}.
+	 * @return True for success, false for error
+	 */
+	public boolean put(String fileName) {
+		return put(fileName, null);
 	}
 }
