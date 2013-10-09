@@ -58,16 +58,21 @@ public class Verify {
 		public static final String NUM_SIGNERS_THRESHOLD = "NUM_SIGNERS_THRESHOLD";
 
 		/**
-		 * The URI to upload initial version of document. Any further uploads
-		 * of same document are to be done with {@link #DOWNLOAD_URI}.
+		 * The URI to upload initial version of document by using HTTP PUT.
+		 * This URI can be used only once (except if you delete the document, it can then be used
+		 * again to upload a document).
+		 * Any further uploads of the same document are to be done with {@link #DOWNLOAD_URI}.
 		 * 
 		 * Type: {@link String}
 		 */
 		public static final String UPLOAD_URI = "UPLOAD_URI";
 
 		/**
-		 * The URI to download and upload new versions of document that has been
-		 * initially uploaded with {@link #UPLOAD_URI}.
+		 * The URI to:</br>
+		 * - download document by using HTTP GET</br>
+		 * - upload new versions of document by using HTTP PUT</br>
+		 * - delete document by using HTTP DELETE</br>
+		 * In any case, the document had to be uploaded first with value of {@link #UPLOAD_URI}.
 		 * 
 		 * Type: {@link String}
 		 */

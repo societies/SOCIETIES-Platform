@@ -171,6 +171,7 @@ public class XmlDocument extends HttpServlet {
 
 		LOG.info("HTTP DELETE from {}; path = {}, signature = " + signature, request.getRemoteHost(), path);
 
+		// TODO: use different authentication for deleting so only the original uploader could delete a doc.
 		if (!XmlDocumentAccess.isAuthorized(path, signature)) {
 			LOG.warn("Invalid filename or key");
 			// Return HTTP status code 401 - Unauthorized

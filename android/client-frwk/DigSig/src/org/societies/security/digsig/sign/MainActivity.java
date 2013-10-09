@@ -239,8 +239,13 @@ public class MainActivity extends Activity {
 			}
 			switch (msg.what) {
 			case Verify.Methods.GENERATE_URIS:
+				
+				// Now upload your XML document with this URI.
+				// Optionally, you can sign your XML document yourself before or after upload.
 				Log.i(TAG, "handleMessage: GENERATE_URIS: upload URI = " +
 						msg.getData().getString(Verify.Params.UPLOAD_URI));
+				
+				// After you upload the XML document, distribute the download URI to others to sign it. 
 				Log.i(TAG, "handleMessage: GENERATE_URIS: download URI = " +
 						msg.getData().getString(Verify.Params.DOWNLOAD_URI));
 				break;
