@@ -45,6 +45,12 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
         {
         	redirectPage = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath().concat("/index.xhtml");
         }
+        //QUICK HACK TO REDIRECT USER TO MY_COMMUNITIES PAGE 
+        if(redirectPage.equals("/your_suggested_communities.xhtml"))
+        {
+        	//ASSUME THEY HAVE JUST ACCEPTED A PPN TO JOIN A CIS, TAKE THEM TO THERE CIS PAGE
+        	redirectPage = "/you_communities_list.xhtml";
+        }
     }
 
     @ManagedProperty(value = "#{notifications}")
