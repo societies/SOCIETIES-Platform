@@ -27,7 +27,7 @@ import java.util.List;
 @ViewScoped
 public class PrivacyPolicyNegotiationController extends BasePageController {
 
-    private static void getIdFromQueryString() {
+    private void getIdFromQueryString() {
         HttpServletRequest hsr = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         if (hsr.getParameter("id") != null)
         {
@@ -45,11 +45,12 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
         {
         	redirectPage = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath().concat("/index.xhtml");
         }
+        log.debug("REDIRECT PAGE: " + redirectPage);
         //QUICK HACK TO REDIRECT USER TO MY_COMMUNITIES PAGE 
-        if(redirectPage.equals("/your_suggested_communities.xhtml"))
+        if(redirectPage.equals("/societies/your_suggested_communities_list.xhtml"))
         {
         	//ASSUME THEY HAVE JUST ACCEPTED A PPN TO JOIN A CIS, TAKE THEM TO THERE CIS PAGE
-        	redirectPage = "/you_communities_list.xhtml";
+        	redirectPage = "/societies/your_communities_list.xhtml";
         }
     }
 

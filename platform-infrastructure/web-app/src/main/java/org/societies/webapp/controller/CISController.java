@@ -25,6 +25,7 @@
 
 package org.societies.webapp.controller;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
@@ -39,6 +40,7 @@ import org.springframework.stereotype.Controller;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy; 
 
 import javax.servlet.http.HttpSession;
+
 import java.lang.reflect.Field;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -87,6 +89,7 @@ import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyM
 import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener;
 //import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote;
+import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 //import org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
@@ -112,10 +115,8 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Privacy
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.cis.directory.client.CisDirectoryRemoteClient;
 import org.societies.cis.mgmtClient.CisManagerClient;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -124,7 +125,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
-
 import org.societies.webapp.service.UserService;
 import org.societies.webapp.models.WebAppParticipant;
 
@@ -149,6 +149,10 @@ public class CISController extends BasePageController{
 	
 	@Autowired
 	private ICisManager cisManager;
+	
+	@ManagedProperty(value = "#{userFeedback}")
+	@Autowired
+	private IUserFeedback userFeedback;
 	
 	@Autowired
 	@ManagedProperty(value = "#{commMngrRef}")
@@ -207,7 +211,15 @@ public class CISController extends BasePageController{
 		this.cisdesc = cisdesc;
 	}
 	
+	public void setUserFeedback(IUserFeedback userFeedback)
+	{
+		this.userFeedback = userFeedback;
+	}
 	
+	public IUserFeedback getUserFeedback()
+	{
+		return this.userFeedback;
+	}
 
 	List<Participant> m_remoteMemberRecords = new ArrayList<Participant>();
 	
@@ -403,10 +415,13 @@ public class CISController extends BasePageController{
 		// real create
 		this.cisManager.createCis(cisname, cistype, h, cisdesc, privacyPolicyXml);
 		//Cis icis = (Cis) localCreateCis(cisname, cistype, cisdesc, h, privacyPolicyXml);
-		
+		String summary = "Community Created!";
+		String detail = "The community, " + cisname + ", has been created!";
 		
 		//cisManager.createCis(cisname, cistype, cisCriteria, cisdesc);
-		
+		cisname = "";
+		cistype = "";
+		cisdesc = "";
 	}
 	
 	public List<CisInfo> getsuggestedcommunities(){
