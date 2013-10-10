@@ -22,6 +22,7 @@ import android.net.LocalSocket;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UTFDataFormatException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
@@ -29,210 +30,327 @@ import java.util.ArrayList;
  * {@hide}
  */
 public class AndroidSecureStorage {
-    public static final int NO_ERROR = 1;
-    public static final int LOCKED = 2;
-    public static final int UNINITIALIZED = 3;
-    public static final int SYSTEM_ERROR = 4;
-    public static final int PROTOCOL_ERROR = 5;
-    public static final int PERMISSION_DENIED = 6;
-    public static final int KEY_NOT_FOUND = 7;
-    public static final int VALUE_CORRUPTED = 8;
-    public static final int UNDEFINED_ACTION = 9;
-    public static final int WRONG_PASSWORD = 10;
 
-    private static final LocalSocketAddress sAddress = new LocalSocketAddress("keystore", LocalSocketAddress.Namespace.RESERVED);
+	// ResponseCodes
+	public static final int NO_ERROR = 1;
+	public static final int LOCKED = 2;
+	public static final int UNINITIALIZED = 3;
+	public static final int SYSTEM_ERROR = 4;
+	public static final int PROTOCOL_ERROR = 5;
+	public static final int PERMISSION_DENIED = 6;
+	public static final int KEY_NOT_FOUND = 7;
+	public static final int VALUE_CORRUPTED = 8;
+	public static final int UNDEFINED_ACTION = 9;
+	public static final int WRONG_PASSWORD = 10;
 
-    private int mError = NO_ERROR;
+	// States
+	public enum State { UNLOCKED, LOCKED, UNINITIALIZED };
 
-    private AndroidSecureStorage() {}
+	private static final LocalSocketAddress sAddress = new LocalSocketAddress(
+			"keystore", LocalSocketAddress.Namespace.RESERVED);
 
-    public static AndroidSecureStorage getInstance() {
-        return new AndroidSecureStorage();
-    }
+	private int mError = NO_ERROR;
 
-    public int test() {
-        execute('t');
-        return mError;
-    }
+	private AndroidSecureStorage() {}
 
-    public byte[] get(byte[] key) {
-        ArrayList<byte[]> values = execute('g', key);
-        return (values == null || values.isEmpty()) ? null : values.get(0);
-    }
+	public static AndroidSecureStorage getInstance() {
+		return new AndroidSecureStorage();
+	}
 
-    public byte[] getWithStringKey(String key) {
-        return get(getBytes(key));        
-    }
-    
-    public String get(String key) {
-        byte[] value = get(getBytes(key));
-        return (value == null) ? null : toString(value);
-    }
+	public int test() {
+		execute('t');
+		return mError;
+	}
 
-    public boolean put(byte[] key, byte[] value) {
-        execute('i', key, value);
-        return mError == NO_ERROR;
-    }
-    
-    public boolean put(String key, byte[] value) {
-        execute('i', getBytes(key), value);
-        return mError == NO_ERROR;
-    }
+	public State state() {
+		execute('t');
+		switch (mError) {
+		case NO_ERROR: return State.UNLOCKED;
+		case LOCKED: return State.LOCKED;
+		case UNINITIALIZED: return State.UNINITIALIZED;
+		default: throw new AssertionError(mError);
+		}
+	}
 
-    public boolean put(String key, String value) {
-        return put(getBytes(key), getBytes(value));
-    }
+	private byte[] get(byte[] key) {
+		ArrayList<byte[]> values = execute('g', key);
+		return (values == null || values.isEmpty()) ? null : values.get(0);
+	}
 
-    public boolean delete(byte[] key) {
-        execute('d', key);
-        return mError == NO_ERROR;
-    }
+	public byte[] get(String key) {
+		return get(getKeyBytes(key));
+	}
 
-    public boolean delete(String key) {
-        return delete(getBytes(key));
-    }
+	public byte[] getWithStringKey(String key) {
+		return get(getKeyBytes(key));
+	}
 
-    public boolean contains(byte[] key) {
-        execute('e', key);
-        return mError == NO_ERROR;
-    }
+	private boolean put(byte[] key, byte[] value) {
+		execute('i', key, value);
+		return mError == NO_ERROR;
+	}
 
-    public boolean contains(String key) {
-        return contains(getBytes(key));
-    }
+	public boolean put(String key, byte[] value) {
+		return put(getKeyBytes(key), value);
+	}
 
-    public byte[][] saw(byte[] prefix) {
-        ArrayList<byte[]> values = execute('s', prefix);
-        return (values == null) ? null : values.toArray(new byte[values.size()][]);
-    }
+	private boolean delete(byte[] key) {
+		execute('d', key);
+		return mError == NO_ERROR;
+	}
 
-    public String[] saw(String prefix) {
-        byte[][] values = saw(getBytes(prefix));
-        if (values == null) {
-            return null;
-        }
-        String[] strings = new String[values.length];
-        for (int i = 0; i < values.length; ++i) {
-            strings[i] = toString(values[i]);
-        }
-        return strings;
-    }
+	public boolean delete(String key) {
+		return delete(getKeyBytes(key));
+	}
 
-    public boolean reset() {
-        execute('r');
-        return mError == NO_ERROR;
-    }
+	private boolean contains(byte[] key) {
+		execute('e', key);
+		return mError == NO_ERROR;
+	}
 
-    public boolean password(byte[] oldPassword, byte[] newPassword) {
-        execute('p', oldPassword, newPassword);
-        return mError == NO_ERROR;
-    }
+	public boolean contains(String key) {
+		return contains(getKeyBytes(key));
+	}
 
-    public boolean password(String oldPassword, String newPassword) {
-        return password(getBytes(oldPassword), getBytes(newPassword));
-    }
+	public byte[][] saw(byte[] prefix) {
+		ArrayList<byte[]> values = execute('s', prefix);
+		return (values == null) ? null : values.toArray(new byte[values.size()][]);
+	}
 
-    public boolean password(byte[] password) {
-        return password(password, password);
-    }
+	public String[] saw(String prefix) {
+		byte[][] values = saw(getKeyBytes(prefix));
+		if (values == null) {
+			return null;
+		}
+		String[] strings = new String[values.length];
+		for (int i = 0; i < values.length; ++i) {
+			strings[i] = toKeyString(values[i]);
+		}
+		return strings;
+	}
 
-    public boolean password(String password) {
-        return password(getBytes(password));
-    }
+	public boolean reset() {
+		execute('r');
+		return mError == NO_ERROR;
+	}
 
-    public boolean lock() {
-        execute('l');
-        return mError == NO_ERROR;
-    }
+	private boolean password(byte[] password) {
+		execute('p', password);
+		return mError == NO_ERROR;
+	}
 
-    public boolean unlock(byte[] password) {
-        execute('u', password);
-        return mError == NO_ERROR;
-    }
+	public boolean password(String password) {
+		return password(getPasswordBytes(password));
+	}
 
-    public boolean unlock(String password) {
-        return unlock(getBytes(password));
-    }
+	public boolean lock() {
+		execute('l');
+		return mError == NO_ERROR;
+	}
 
-    public int getLastError() {
-        return mError;
-    }
+	private boolean unlock(byte[] password) {
+		execute('u', password);
+		return mError == NO_ERROR;
+	}
 
-    private ArrayList<byte[]> execute(int code, byte[]... parameters) {
-        mError = PROTOCOL_ERROR;
+	public boolean unlock(String password) {
+		return unlock(getPasswordBytes(password));
+	}
 
-        for (byte[] parameter : parameters) {
-            if (parameter == null || parameter.length > 65535) {
-                return null;
-            }
-        }
+	public boolean isEmpty() {
+		execute('z');
+		return mError == KEY_NOT_FOUND;
+	}
 
-        LocalSocket socket = new LocalSocket();
-        try {
-            socket.connect(sAddress);
+	private boolean generate(byte[] key) {
+		execute('a', key);
+		return mError == NO_ERROR;
+	}
 
-            OutputStream out = socket.getOutputStream();
-            out.write(code);
-            for (byte[] parameter : parameters) {
-                out.write(parameter.length >> 8);
-                out.write(parameter.length);
-                out.write(parameter);
-            }
-            out.flush();
-            socket.shutdownOutput();
+	public boolean generate(String key) {
+		return generate(getKeyBytes(key));
+	}
 
-            InputStream in = socket.getInputStream();
-            if ((code = in.read()) != NO_ERROR) {
-                if (code != -1) {
-                    mError = code;
-                }
-                return null;
-            }
+	private boolean importKey(byte[] keyName, byte[] key) {
+		execute('m', keyName, key);
+		return mError == NO_ERROR;
+	}
 
-            ArrayList<byte[]> values = new ArrayList<byte[]>();
-            while (true) {
-                int i, j;
-                if ((i = in.read()) == -1) {
-                    break;
-                }
-                if ((j = in.read()) == -1) {
-                    return null;
-                }
-                byte[] value = new byte[i << 8 | j];
-                for (i = 0; i < value.length; i += j) {
-                    if ((j = in.read(value, i, value.length - i)) == -1) {
-                        return null;
-                    }
-                }
-                values.add(value);
-            }
-            mError = NO_ERROR;
-            return values;
-        } catch (IOException e) {
-            // ignore
-        } finally {
-            try {
-                socket.close();
-            } catch (IOException e) {}
-        }
-        return null;
-    }
+	public boolean importKey(String keyName, byte[] key) {
+		return importKey(getKeyBytes(keyName), key);
+	}
 
-    private static byte[] getBytes(String string) {
-        try {
-            return string.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            // will never happen
-            throw new RuntimeException(e);
-        }
-    }
+	private byte[] getPubkey(byte[] key) {
+		ArrayList<byte[]> values = execute('b', key);
+		return (values == null || values.isEmpty()) ? null : values.get(0);
+	}
 
-    private static String toString(byte[] bytes) {
-        try {
-            return new String(bytes, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            // will never happen
-            throw new RuntimeException(e);
-        }
-    }
+	public byte[] getPubkey(String key) {
+		return getPubkey(getKeyBytes(key));
+	}
+
+	private boolean delKey(byte[] key) {
+		execute('k', key);
+		return mError == NO_ERROR;
+	}
+
+	public boolean delKey(String key) {
+		return delKey(getKeyBytes(key));
+	}
+
+	private byte[] sign(byte[] keyName, byte[] data) {
+		final ArrayList<byte[]> values = execute('n', keyName, data);
+		return (values == null || values.isEmpty()) ? null : values.get(0);
+	}
+
+	public byte[] sign(String key, byte[] data) {
+		return sign(getKeyBytes(key), data);
+	}
+
+	private boolean verify(byte[] keyName, byte[] data, byte[] signature) {
+		execute('v', keyName, data, signature);
+		return mError == NO_ERROR;
+	}
+
+	public boolean verify(String key, byte[] data, byte[] signature) {
+		return verify(getKeyBytes(key), data, signature);
+	}
+
+	private boolean grant(byte[] key, byte[] uid) {
+		execute('x', key, uid);
+		return mError == NO_ERROR;
+	}
+
+	public boolean grant(String key, int uid) {
+		return grant(getKeyBytes(key), getUidBytes(uid));
+	}
+
+	private boolean ungrant(byte[] key, byte[] uid) {
+		execute('y', key, uid);
+		return mError == NO_ERROR;
+	}
+
+	public boolean ungrant(String key, int uid) {
+		return ungrant(getKeyBytes(key), getUidBytes(uid));
+	}
+
+	private long getmtime(byte[] key) {
+		final ArrayList<byte[]> values = execute('c', key);
+		if (values == null || values.isEmpty()) {
+			return -1L;
+		}
+
+		return Long.parseLong(new String(values.get(0))) * 1000L;
+	}
+
+	/**
+	 * Returns the last modification time of the key in milliseconds since the
+	 * epoch. Will return -1L if the key could not be found or other error.
+	 */
+	public long getmtime(String key) {
+		return getmtime(getKeyBytes(key));
+	}
+
+	public int getLastError() {
+		return mError;
+	}
+
+	private ArrayList<byte[]> execute(int code, byte[]... parameters) {
+		mError = PROTOCOL_ERROR;
+
+		for (byte[] parameter : parameters) {
+			if (parameter == null || parameter.length > 65535) {
+				return null;
+			}
+		}
+
+		LocalSocket socket = new LocalSocket();
+		try {
+			socket.connect(sAddress);
+
+			OutputStream out = socket.getOutputStream();
+			out.write(code);
+			for (byte[] parameter : parameters) {
+				out.write(parameter.length >> 8);
+				out.write(parameter.length);
+				out.write(parameter);
+			}
+			out.flush();
+			socket.shutdownOutput();
+
+			InputStream in = socket.getInputStream();
+			if ((code = in.read()) != NO_ERROR) {
+				if (code != -1) {
+					mError = code;
+				}
+				return null;
+			}
+
+			ArrayList<byte[]> values = new ArrayList<byte[]>();
+			while (true) {
+				int i, j;
+				if ((i = in.read()) == -1) {
+					break;
+				}
+				if ((j = in.read()) == -1) {
+					return null;
+				}
+				byte[] value = new byte[i << 8 | j];
+				for (i = 0; i < value.length; i += j) {
+					if ((j = in.read(value, i, value.length - i)) == -1) {
+						return null;
+					}
+				}
+				values.add(value);
+			}
+			mError = NO_ERROR;
+			return values;
+		} catch (IOException e) {
+			// ignore
+		} finally {
+			try {
+				socket.close();
+			} catch (IOException e) {}
+		}
+		return null;
+	}
+
+	/**
+	 * ModifiedUtf8 is used for key encoding to match the
+	 * implementation of NativeCrypto.ENGINE_load_private_key.
+	 */
+	private static byte[] getKeyBytes(String string) {
+		try {
+			int utfCount = (int) ModifiedUtf8.countBytes(string, false);
+			byte[] result = new byte[utfCount];
+			ModifiedUtf8.encode(result, 0, string);
+			return result;
+		} catch (UTFDataFormatException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static String toKeyString(byte[] bytes) {
+		try {
+			return ModifiedUtf8.decode(bytes, new char[bytes.length], 0, bytes.length);
+		} catch (UTFDataFormatException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static byte[] getPasswordBytes(String password) {
+		try {
+			return password.getBytes("UTF8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static byte[] getUidBytes(int uid) {
+		try {
+			return Integer.toString(uid).getBytes("UTF8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

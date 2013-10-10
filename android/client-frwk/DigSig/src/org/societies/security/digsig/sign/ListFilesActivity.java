@@ -20,7 +20,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 public class ListFilesActivity extends ListActivity {
-
+	
+	private static final String TAG = ListFilesActivity.class.getSimpleName();
+	
 	private ArrayList<String> exts = new ArrayList<String>(2);
 	private String[] fileArray;
 	
@@ -36,6 +38,7 @@ public class ListFilesActivity extends ListActivity {
 		}
 					
 		/* populate list view with certificate list */
+		Log.d(TAG, "External storage state = " + Environment.getExternalStorageState());
         File sdCard = new File(Environment.getExternalStorageDirectory().getPath());
         if (sdCard.exists() && sdCard.isDirectory()) {
         	fileArray = sdCard.list(new FilenameFilter() {				
