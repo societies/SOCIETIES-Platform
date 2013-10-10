@@ -22,57 +22,43 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.digsig.trust;
+package org.societies.security.digsig.apiinternal;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
-import org.societies.security.digsig.apiinternal.ISecureStorage;
-import org.societies.security.digsig.sign.DigSigException;
-
-import android.os.Build;
-import android.util.Log;
 
 /**
- * Wrapper class for {@link SecureStorageFor422} and {@link SecureStorageFor43}.
- * The appropriate implementation is selected automatically.
+ * Interface for retrieving X.509 certificates and private keys from android secure storage.
  *
  * @author Mitja Vardjan
+ *
  */
-public class SecureStorage implements ISecureStorage {
+public interface ISecureStorage {
 
-	private static final String TAG = SecureStorage.class.getSimpleName();
+	/**
+	 * Get the identity's public certificate.
+	 * 
+	 * @param index Index of identity
+	 * @return The certificate
+	 */
+	public X509Certificate getCertificate(int index);	
+
+	/**
+	 * Get the identity's private key.
+	 * 
+	 * @param index Index of identity
+	 * @return The private key
+	 */
+	public PrivateKey getPrivateKey(int index);
 	
-	private ISecureStorage impl;
-
-	public SecureStorage() throws DigSigException {
-		if (hasNewApi()) {
-			this.impl = new SecureStorageFor43();
-		}
-		else {
-			this.impl = new SecureStorageFor422();
-		}
-	}
-	
-	private boolean hasNewApi() {
-		
-		boolean result = Build.VERSION.SDK_INT >= 18;
-		Log.d(TAG, "hasNewApi: " + result);
-		return result;
-	}
-	
-	@Override
-	public X509Certificate getCertificate(int index) {
-		return impl.getCertificate(index);
-	}
-
-	@Override
-	public PrivateKey getPrivateKey(int index) {
-		return impl.getPrivateKey(index);
-	}
-
-	@Override
-	public int setIdentity(X509Certificate certificate, PrivateKey key) {
-		return impl.setIdentity(certificate, key);
-	}
+	/**
+	 * Set the identity's public certificate and private key.
+	 *
+	 * @param certificate The certificate to set
+	 * @param key The private key to set
+	 * @return Generated index of new identity.
+	 * If the identity already exists, then its existing index is returned.
+	 */
+	public int setIdentity(X509Certificate certificate, PrivateKey key);	
 }

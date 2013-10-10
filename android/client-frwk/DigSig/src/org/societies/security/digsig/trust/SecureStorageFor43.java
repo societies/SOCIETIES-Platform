@@ -24,55 +24,96 @@
  */
 package org.societies.security.digsig.trust;
 
+import java.io.ByteArrayInputStream;
+import java.security.KeyFactory;
 import java.security.PrivateKey;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Locale;
 
 import org.societies.security.digsig.apiinternal.ISecureStorage;
 import org.societies.security.digsig.sign.DigSigException;
 
-import android.os.Build;
 import android.util.Log;
 
 /**
- * Wrapper class for {@link SecureStorageFor422} and {@link SecureStorageFor43}.
- * The appropriate implementation is selected automatically.
+ * Helper class for retrieving X.509 certificates and private keys from android secure storage.
  *
  * @author Mitja Vardjan
+ *
  */
-public class SecureStorage implements ISecureStorage {
+public class SecureStorageFor43 implements ISecureStorage {
 
-	private static final String TAG = SecureStorage.class.getSimpleName();
+	private static final String TAG = SecureStorageFor43.class.getSimpleName();
 	
-	private ISecureStorage impl;
+	private AndroidSecureStorage secureStorage;
+	private KeyFactory keyFactory;
+	private CertificateFactory certFactory;
 
-	public SecureStorage() throws DigSigException {
-		if (hasNewApi()) {
-			this.impl = new SecureStorageFor43();
-		}
-		else {
-			this.impl = new SecureStorageFor422();
-		}
-	}
-	
-	private boolean hasNewApi() {
+	/**
+	 * Constructor
+	 * 
+	 * @throws DigSigException 
+	 */
+	public SecureStorageFor43() throws DigSigException {
 		
-		boolean result = Build.VERSION.SDK_INT >= 18;
-		Log.d(TAG, "hasNewApi: " + result);
-		return result;
+		try {
+			secureStorage = AndroidSecureStorage.getInstance();
+			keyFactory = KeyFactory.getInstance("RSA");
+			certFactory = CertificateFactory.getInstance("X.509");
+		} catch (Exception e) {
+			Log.e(TAG, "Failed to initialize", e);
+			throw new DigSigException(e);
+		}
 	}
 	
 	@Override
 	public X509Certificate getCertificate(int index) {
-		return impl.getCertificate(index);
-	}
+		
+		String certKey = String.format(Locale.US, "CERT_%d", index);
 
+		byte[] encodedCert = secureStorage.getWithStringKey(certKey);
+		if (encodedCert == null) {
+			Log.e(TAG, "Could not get certificate for identity No. " + index);
+			return null;
+		}
+
+		X509Certificate cert = null;
+
+		try {
+			cert = (X509Certificate) certFactory.generateCertificate(new ByteArrayInputStream(encodedCert));
+		} catch (Exception e) { 
+			Log.e(TAG, "Failed while decoding certificate for identity No. " + index, e);
+		}
+		return cert;
+	}
+	
 	@Override
 	public PrivateKey getPrivateKey(int index) {
-		return impl.getPrivateKey(index);
+		
+		String keyKey = String.format(Locale.US, "KEY_%d", index);
+
+		byte[] encodedKey = secureStorage.getWithStringKey(keyKey);
+		if (encodedKey == null) {
+			Log.e(TAG, "Could not get private key for identity No. " + index);
+			return null;
+		}
+
+		PrivateKey key = null;
+
+		try {
+			PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(encodedKey);            
+			key = keyFactory.generatePrivate(privKeySpec);
+		} catch (Exception e) { 
+			Log.e(TAG, "Failed while decoding private key for identity No. " + index, e);
+		}
+		return key;
 	}
 
 	@Override
 	public int setIdentity(X509Certificate certificate, PrivateKey key) {
-		return impl.setIdentity(certificate, key);
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

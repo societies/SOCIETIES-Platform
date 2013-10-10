@@ -3,6 +3,11 @@ package org.societies.security.digsig.sign;
 import java.io.FileInputStream;
 import java.security.Key;
 import java.security.KeyStore;
+import java.security.KeyStore.Entry;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -31,8 +36,8 @@ public class InstallIdentityActivity extends Activity {
 	private AndroidSecureStorage secureStorage;
 
 	private String inputFileName = null;
-	byte[] encodedKey = null;
-	byte[] encodedCert = null;
+	PrivateKey privateKey = null;
+	Certificate certificate = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -72,8 +77,8 @@ public class InstallIdentityActivity extends Activity {
 					X509Certificate cert = (X509Certificate) ks.getCertificate(alias);					
 					if (key==null || cert==null) continue;
 
-					encodedKey = key.getEncoded();
-					encodedCert = cert.getEncoded();
+					this.privateKey = (PrivateKey) key;
+					this.certificate = cert;
 
 					doInstallIdentity();
 					return;																			
@@ -92,23 +97,23 @@ public class InstallIdentityActivity extends Activity {
 	private void doInstallIdentity() {
 		
 		Log.i(TAG, "doInstallIdentity");
-		
-		State code = secureStorage.state();
-		Log.i(TAG, "doInstallIdentity: secure storage status = " + code);
 
-		if (code == State.LOCKED || code == State.UNINITIALIZED) {
-			String unlockAction;
-//			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-//				unlockAction = AndroidSecureStorageConstants.UNLOCK_ACTION_PRE_HONEYCOMB;
-//			}
-//			else {
-			unlockAction = AndroidSecureStorageConstants.UNLOCK_ACTION_HONEYCOMB;
-			//			}
-			Intent intent = new Intent(unlockAction);
-			Log.i(TAG, "Trying to unlock secure storage");
-			startActivityForResult(intent, UNLOCK_AND_INSTALL_IDENTITY);
-			return;
-		} 
+//		State code = secureStorage.state();
+//		Log.i(TAG, "doInstallIdentity: secure storage status = " + code);
+//
+//		if (code == State.LOCKED || code == State.UNINITIALIZED) {
+//			String unlockAction;
+////			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+////				unlockAction = AndroidSecureStorageConstants.UNLOCK_ACTION_PRE_HONEYCOMB;
+////			}
+////			else {
+//			unlockAction = AndroidSecureStorageConstants.UNLOCK_ACTION_HONEYCOMB;
+//			//			}
+//			Intent intent = new Intent(unlockAction);
+//			Log.i(TAG, "Trying to unlock secure storage");
+//			startActivityForResult(intent, UNLOCK_AND_INSTALL_IDENTITY);
+//			return;
+//		} 
 
 		installIdentity();
 	}
@@ -124,40 +129,76 @@ public class InstallIdentityActivity extends Activity {
 
 		Log.i(TAG, "installIdentity");
 		
-		State secureStorageState = secureStorage.state();
-		if (encodedCert == null || encodedKey == null || secureStorageState != State.UNLOCKED) { 
-			Log.w(TAG, "installIdentity: encodedCert = " + encodedCert + ", encodedKey = " + encodedKey +
-					", secureStorageState = " + secureStorageState);
-			reportFailedInstall();
+//		State secureStorageState = secureStorage.state();
+//		if (encodedCert == null || encodedKey == null || secureStorageState != State.UNLOCKED) { 
+//			Log.w(TAG, "installIdentity: encodedCert = " + encodedCert + ", encodedKey = " + encodedKey +
+//					", secureStorageState = " + secureStorageState);
+//			reportFailedInstall();
+//			return;
+//		}
+
+		KeyStore keyStore;
+		try {
+			keyStore = KeyStore.getInstance("AndroidKeyStore");
+			keyStore.load(null);
+			Log.i(TAG, "Key store type: " + keyStore.getType());
+			Log.i(TAG, "Key store size: " + keyStore.size());
+			Log.i(TAG, "Key store alises: " + keyStore.aliases());
+
+			keyStore.setCertificateEntry("CERT_0", certificate);
+			Log.i(TAG, "Stored certificate of type " + certificate.getType());
+			keyStore.setKeyEntry("KEY_0", privateKey, null, new Certificate[] {certificate});
+			Log.i(TAG, "Stored key of format " + privateKey.getFormat());
+
+			
+			keyStore = KeyStore.getInstance("AndroidKeyStore");
+			keyStore.load(null);
+			Log.d(TAG, "Retrieved certificate of type " + keyStore.getCertificate("CERT_0").getType());
+			Log.d(TAG, "Retrieved key of format " + keyStore.getKey("KEY_0", null));
+			
+			Toast.makeText(this, "Digital identity installed sucessfully", Toast.LENGTH_SHORT).show();
+			setResult(RESULT_OK);
+			finish();				
+			return;
+		} catch (Exception e) {
+			Log.w(TAG, "installIdentity", e);
+			setResult(RESULT_CANCELED);
+			finish();				
 			return;
 		}
 
-		int count = 0;
-
-		count = 0;
-		while (true) {
-			String certKey = String.format(Locale.US, "CERT_%d", count);
-			String keyKey = String.format(Locale.US, "KEY_%d", count++);
-
-			byte[] alreadyStoredCert = secureStorage.getWithStringKey(certKey);
-			byte[] alreadyStoredKey = secureStorage.getWithStringKey(keyKey);
-			if (Arrays.equals(alreadyStoredCert, encodedCert) && Arrays.equals(alreadyStoredKey, encodedKey)) {
-				Toast.makeText(this, "This digital identity is already installed.", Toast.LENGTH_SHORT).show();
-				setResult(RESULT_OK);
-				finish();				
-				return;
-			}
-
-			if (!secureStorage.contains(certKey) && !secureStorage.contains(keyKey)) {
-				secureStorage.put(certKey,encodedCert);
-				secureStorage.put(keyKey, encodedKey);
-
-				Log.i(TAG, "Digital identity installed sucessfully");
-				Toast.makeText(this, "Digital identity installed sucessfully", Toast.LENGTH_SHORT).show();
-				setResult(RESULT_OK);
-				finish();				
-				return;
-			}			
-		}
+//		int count = 0;
+//
+//		count = 0;
+//		while (true) {
+//			String certKey = String.format(Locale.US, "CERT_%d", count);
+//			String keyKey = String.format(Locale.US, "KEY_%d", count++);
+//
+//			byte[] alreadyStoredCert = secureStorage.getWithStringKey(certKey);
+//			byte[] alreadyStoredKey = secureStorage.getWithStringKey(keyKey);
+//			try {
+//				if (Arrays.equals(alreadyStoredCert, certificate.getEncoded()) &&
+//						Arrays.equals(alreadyStoredKey, privateKey.getEncoded())) {
+//					Toast.makeText(this, "This digital identity is already installed.", Toast.LENGTH_SHORT).show();
+//					setResult(RESULT_OK);
+//					finish();				
+//					return;
+//				}
+//	
+//				if (!secureStorage.contains(certKey) && !secureStorage.contains(keyKey)) {
+//					secureStorage.put(certKey, certificate.getEncoded());
+//					secureStorage.put(keyKey, privateKey.getEncoded());
+//	
+//					Log.i(TAG, "Digital identity installed sucessfully");
+//					Toast.makeText(this, "Digital identity installed sucessfully", Toast.LENGTH_SHORT).show();
+//					setResult(RESULT_OK);
+//					finish();				
+//					return;
+//				}
+//			} catch (CertificateEncodingException e) {
+//				Log.w(TAG, "Skipping certificate " + certKey, e);
+//				continue;
+//			}
+//		}
 	}
 }

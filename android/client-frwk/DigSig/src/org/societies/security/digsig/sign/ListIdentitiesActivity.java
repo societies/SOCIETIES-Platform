@@ -1,6 +1,7 @@
 package org.societies.security.digsig.sign;
 
 import java.io.ByteArrayInputStream;
+import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -41,6 +42,17 @@ public class ListIdentitiesActivity extends ListActivity {
         super.onCreate(savedInstanceState);
 		
 		secureStorage = AndroidSecureStorage.getInstance();
+		KeyStore keyStore;
+		try {
+			keyStore = KeyStore.getInstance("AndroidKeyStore");
+			keyStore.load(null);
+			Log.i(TAG, "Key store type: " + keyStore.getType());
+			Log.i(TAG, "Key store size: " + keyStore.size());
+			Log.i(TAG, "Key store alises: " + keyStore.aliases());
+		} catch (Exception e) {
+			Log.w(TAG, "Could not get key store", e);
+			return;
+		}
 		try {
 			certFactory = CertificateFactory.getInstance("X.509");
 		} catch (CertificateException e) {}
