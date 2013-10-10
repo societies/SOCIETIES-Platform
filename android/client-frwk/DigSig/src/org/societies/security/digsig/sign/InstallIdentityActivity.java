@@ -11,6 +11,7 @@ import java.util.Locale;
 import org.societies.security.digsig.api.Sign;
 import org.societies.security.digsig.apiinternal.Trust;
 import org.societies.security.digsig.trust.AndroidSecureStorage;
+import org.societies.security.digsig.trust.AndroidSecureStorage.State;
 import org.societies.security.digsig.trust.AndroidSecureStorageConstants;
 
 import android.app.Activity;
@@ -92,10 +93,10 @@ public class InstallIdentityActivity extends Activity {
 		
 		Log.i(TAG, "doInstallIdentity");
 		
-		int code = secureStorage.test();
+		State code = secureStorage.state();
 		Log.i(TAG, "doInstallIdentity: secure storage status = " + code);
 
-		if (code == AndroidSecureStorage.LOCKED || code == AndroidSecureStorage.UNINITIALIZED) {
+		if (code == State.LOCKED || code == State.UNINITIALIZED) {
 			String unlockAction;
 //			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
 //				unlockAction = AndroidSecureStorageConstants.UNLOCK_ACTION_PRE_HONEYCOMB;
@@ -123,9 +124,10 @@ public class InstallIdentityActivity extends Activity {
 
 		Log.i(TAG, "installIdentity");
 		
-		if (encodedCert == null || encodedKey == null || secureStorage.test() != AndroidSecureStorage.NO_ERROR) { 
+		State secureStorageState = secureStorage.state();
+		if (encodedCert == null || encodedKey == null || secureStorageState != State.UNLOCKED) { 
 			Log.w(TAG, "installIdentity: encodedCert = " + encodedCert + ", encodedKey = " + encodedKey +
-					" secureStorage.test() = " + secureStorage.test());
+					", secureStorageState = " + secureStorageState);
 			reportFailedInstall();
 			return;
 		}

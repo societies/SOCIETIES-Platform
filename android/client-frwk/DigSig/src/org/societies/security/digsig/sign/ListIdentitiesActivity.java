@@ -10,6 +10,7 @@ import java.util.Locale;
 import org.societies.security.digsig.api.Sign;
 import org.societies.security.digsig.trust.AndroidSecureStorage;
 import org.societies.security.digsig.trust.AndroidSecureStorageConstants;
+import org.societies.security.digsig.trust.AndroidSecureStorage.State;
 
 import android.app.ListActivity;
 import android.content.Intent;
@@ -45,7 +46,7 @@ public class ListIdentitiesActivity extends ListActivity {
 		} catch (CertificateException e) {}
 		        	
 		
-		if (secureStorage.test()!= AndroidSecureStorage.NO_ERROR) {
+		if (secureStorage.state()!= State.UNLOCKED) {
 			
 			String unlockAction;
 //			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
@@ -78,7 +79,7 @@ public class ListIdentitiesActivity extends ListActivity {
 	
 	
 	private void setList() {
-		if (secureStorage.test() != AndroidSecureStorage.NO_ERROR) return;
+		if (secureStorage.state() != State.UNLOCKED) return;
 		
 		certNames = new ArrayList<String>();
 		certNumbers = new ArrayList<Integer>();

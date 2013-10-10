@@ -27,7 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 /**
- * {@hide}
+ * Works with Android up to 4.2.2. Does not work with Android 4.3.
  */
 public class AndroidSecureStorage {
 
@@ -55,11 +55,6 @@ public class AndroidSecureStorage {
 
 	public static AndroidSecureStorage getInstance() {
 		return new AndroidSecureStorage();
-	}
-
-	public int test() {
-		execute('t');
-		return mError;
 	}
 
 	public State state() {
