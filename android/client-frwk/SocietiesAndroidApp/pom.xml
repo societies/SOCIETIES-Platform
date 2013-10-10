@@ -164,6 +164,14 @@
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
+				<configuration>
+				    <dex>
+				        <jvmArguments>
+                            <argument>-Xms256m</argument>
+                            <argument>-Xmx1024m</argument>
+                        </jvmArguments>
+				    </dex>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>nl.windgazer</groupId>
