@@ -1,65 +1,75 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-				 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui"
-                xmlns:c="http://java.sun.com/jsp/jstl/core"
-                xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:f="http://java.sun.com/jsf/core"
-                template="templates/main_template.xhtml">
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="templates/main_template.xhtml">
 
-<ui:define name="html_head">
-    <title>SOCIEITES</title>
-</ui:define>
+	<ui:define name="html_head">
+		<title>SOCIEITES</title>
+	</ui:define>
 
-<ui:define name="body">
+	<ui:define name="body">
 
-<div class="hr grid_12 clearfix"></div>
-<!-- Left Column -->
-<section id="left_col" class="grid_8">
-    <div class="breadcrumbs"><a href="">Home</a> / <a href="create_community.xhtml">Create community</a></div>
+		<div class="hr grid_12 clearfix"></div>
+		<!-- Left Column -->
+		<section id="left_col" class="grid_8">
+			<div class="breadcrumbs">
+				<a href="">Home</a> / <a href="create_community.xhtml">Create
+					community</a>
+			</div>
 
-    <div id="msgid">
-    </div>
+			<div id="msgid"></div>
 
-    <section class="form_style_main">
+			<section class="form_style_main">
 
-            <h4 class="form_title">Create a Community</h4>
+				<h4 class="form_title">Create a Community</h4>
 
-            <div class="hr dotted clearfix"></div>
-            <ul>
-                <li> Community Name: <h:inputText value="#{cismanager.cisname}" /></li>
+				<div class="hr dotted clearfix"></div>
+				<ul>
+					<li>Community Name: <h:inputText value="#{cismanager.cisname}" /></li>
 
-                <li> Community type: <h:inputText value="#{cismanager.cistype}" /></li>
+					<li>Community type: <h:inputText value="#{cismanager.cistype}" /></li>
 
-                <li> Description: <h:inputText value="#{cismanager.cisdesc}" /></li>
-                
-                <li> Privacy Policy:  &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;
-                    				<h:selectOneMenu value="#{cismanager.mode}">
-                    					<f:selectItem itemValue= "0" itemLabel="Private"/> 
-	                                    <f:selectItem itemValue= "1" itemLabel="Members Only"/>
-	                                    <f:selectItem itemValue= "2" itemLabel="Public"/>
-	                                </h:selectOneMenu>
-                    </li>
+					<li>Description: <h:inputText value="#{cismanager.cisdesc}" /></li>
 
-                <li class="clearfix">
-                    
-                    <div>
-                        <p:commandButton value="Create Community" action="#{cismanager.createcommunity()}"/>
-                    </div>
-                </li>
-            </ul>
+					<li>Privacy Policy: &#160; &#160; &#160; &#160; &#160; &#160;
+						&#160; &#160; <h:selectOneMenu value="#{cismanager.mode}">
+							<f:selectItem itemValue="0" itemLabel="Private" />
+							<f:selectItem itemValue="1" itemLabel="Members Only" />
+							<f:selectItem itemValue="2" itemLabel="Public" />
+						</h:selectOneMenu>
+					</li>
 
-    </section>
-</section>
-<!-- Right Column / Sidebar -->
-<aside id="sidebar_right" class="grid_4">
-    <div class="sidebar_top_BG"></div>
-    <div class="hr dotted clearfix"></div>
-    <div class="hr dotted clearfix"></div>
-    <div class="sidebar_bottom_BG"></div>
-</aside>
-<div class="hr grid_12 clearfix"></div>
+					<li class="clearfix">
 
-</ui:define>
+						<div>
+							<p:commandButton value="Create Community"
+								action="#{cismanager.createcommunity()}" oncomplete="#{p:widgetVar('createDialog')}.show()" />
+						</div>
+					</li>
+				</ul>
+
+			</section>
+
+			<p:dialog id="createDialog" header="Community Created">
+				<p:ajax event="close" update=":mainForm" />
+				<h:outputText
+					value="The community #{cismanager.cisname} has been created!" />
+			</p:dialog>
+
+		</section>
+		<!-- Right Column / Sidebar -->
+		<aside id="sidebar_right" class="grid_4">
+			<div class="sidebar_top_BG"></div>
+			<div class="hr dotted clearfix"></div>
+			<div class="hr dotted clearfix"></div>
+			<div class="sidebar_bottom_BG"></div>
+		</aside>
+		<div class="hr grid_12 clearfix"></div>
+
+	</ui:define>
 </ui:composition>
 </html>

@@ -43,7 +43,7 @@
                                 <br/>
                                 <H6>Name:     #{snsFriend.getCisname()}</H6> 								
                                 <!-- <H6>Identity: #{snsFriend.getCisid()}</H6> -->
-                                <H6>Members: #{cismanager.getmembers(snsFriend)}</H6>
+                                <!-- Doesnt work unless you own the CIS -->
                             </div>
                             <div class="keyinfo_text">
                             </div>
@@ -68,7 +68,8 @@
                                 <br/>
                                 <H6>Name:     #{otherFriend.getCisname()}</H6> 								
                                 <!-- <H6>Identity: #{otherFriend.getCisid()}</H6> -->
-                                <H6>Members: #{cismanager.getmembers(otherFriend)}</H6>
+                                <!-- To Stay consistent, this is disabled as you can't view members
+                                of a CIS which you do not own. -->
                             </div>
                             <div class="keyinfo_text">
                             </div>

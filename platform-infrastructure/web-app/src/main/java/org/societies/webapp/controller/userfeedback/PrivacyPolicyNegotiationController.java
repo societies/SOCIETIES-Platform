@@ -16,6 +16,8 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,12 +27,31 @@ import java.util.List;
 @ViewScoped
 public class PrivacyPolicyNegotiationController extends BasePageController {
 
-    private static String getIdFromQueryString() {
+    private void getIdFromQueryString() {
         HttpServletRequest hsr = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         if (hsr.getParameter("id") != null)
-            return hsr.getParameter("id");
-
-        return "";
+        {
+            eventID = hsr.getParameter("id");
+        }
+        else
+        {
+        	eventID ="";
+        }
+        if(hsr.getParameter("redirect") != null)
+        {
+        	redirectPage = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath().concat(hsr.getParameter("redirect"));
+        }
+        else
+        {
+        	redirectPage = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath().concat("/index.xhtml");
+        }
+        log.debug("REDIRECT PAGE: " + redirectPage);
+        //QUICK HACK TO REDIRECT USER TO MY_COMMUNITIES PAGE 
+        if(redirectPage.equals("/societies/your_suggested_communities_list.xhtml"))
+        {
+        	//ASSUME THEY HAVE JUST ACCEPTED A PPN TO JOIN A CIS, TAKE THEM TO THERE CIS PAGE
+        	redirectPage = "/societies/your_communities_list.xhtml";
+        }
     }
 
     @ManagedProperty(value = "#{notifications}")
@@ -39,7 +60,8 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     @ManagedProperty(value = "#{userFeedback}")
     private IUserFeedback userFeedback;
 
-    private String eventID;
+    private static String eventID;
+    private static String redirectPage;
     private UserFeedbackPrivacyNegotiationEvent event;
     private ConditionConstants newConditionToAdd;
 
@@ -69,7 +91,8 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     public void initMethod() {
         if (log.isDebugEnabled())
             log.debug("init()");
-        eventID = getIdFromQueryString();
+        getIdFromQueryString();
+       //eventID = getIdFromQueryString();
         event = notificationsController.getPrivacyNegotiationEvent(eventID);
 
         if (event != null) {
@@ -152,7 +175,7 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
         newConditionToAdd = null;
     }
 
-    public String completeNegotiationAction() {
+    public void completeNegotiationAction() {
         log.debug("completeNegotiation() id=" + eventID);
 
         ResponsePolicy responsePolicy = event.getResponsePolicy();
@@ -195,10 +218,17 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
             log.error("Error publishing notification of completed negotiation", e);
         }
 
-        return "home"; // previously, could redirect to next negotiation - but this makes no sense now
+        try {
+			FacesContext.getCurrentInstance().getExternalContext().redirect(redirectPage);
+		} catch (IOException e) {
+			addGlobalMessage("Cannot redirect you to your previous page!",
+                    e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
+			return;
+		} // previously, could redirect to next negotiation - but this makes no sense now
     }
 
-    public String cancelNegotiationAction() {
+    public void cancelNegotiationAction() {
         log.debug("cancelNegotiation()");
 
         ResponsePolicy responsePolicy = getCurrentNegotiationEvent().getResponsePolicy();
@@ -217,7 +247,14 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
             log.error("Error publishing notification of cancelled privacy negotiation event", e);
         }
 
-        return "home"; // previously, could redirect to next negotiation - but this makes no sense now
+        try {
+			FacesContext.getCurrentInstance().getExternalContext().redirect(redirectPage);
+		} catch (IOException e) {
+			addGlobalMessage("Cannot redirect you to your previous page!",
+                    e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
+			return;
+		} // previously, could redirect to next negotiation - but this makes no sense now
     }
 
     private static void prepareEventForGUI(UserFeedbackPrivacyNegotiationEvent event) {

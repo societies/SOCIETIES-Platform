@@ -18,16 +18,22 @@ import org.societies.webapp.entity.NotificationQueueItem;
 import org.societies.webapp.service.UserService;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.primefaces.push.PushContext;
+import org.primefaces.push.PushContextFactory;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 @Controller
 @Scope("session")
@@ -174,9 +180,9 @@ public class NotificationsController extends BasePageController {
 
 			addItemToQueue(newItem);
 
-			synchronized (unansweredPrivacyNegotiationEvents) {
-				unansweredPrivacyNegotiationEvents.put(ppn.getRequestId(), ppn);
-			}
+			//synchronized (unansweredPrivacyNegotiationEvents) {
+			//	unansweredPrivacyNegotiationEvents.put(ppn.getRequestId(), ppn);
+		//	}
 
 		}
 
@@ -221,13 +227,13 @@ public class NotificationsController extends BasePageController {
 
 			addItemToQueue(newItem);
 
-			synchronized (unansweredAccessControlEvents) {
-				unansweredAccessControlEvents.put(bean.getRequestId(), bean);
+			//synchronized (unansweredAccessControlEvents) {
+		//		unansweredAccessControlEvents.put(bean.getRequestId(), bean);
 
-			}
+		//	}
 
 		}
-
+		
 		private void processAccessControlResponse(String node, String itemId, Object item) {
 			if (!(item instanceof UserFeedbackAccessControlEvent)) {
 				log.warn(String.format("Received pubsub event with topic '%s', ID '%s' and class '%s' - Required UserFeedbackAccessControlEvent",
@@ -438,7 +444,6 @@ public class NotificationsController extends BasePageController {
 
 	public NotificationsController() {
 		log.debug("NotificationsController ctor()");
-
 		timedAbortProcessor = new TimedAbortProcessor(timedAbortsToWatch);
 		timedAbortProcessorThread = new Thread(timedAbortProcessor);
 		timedAbortProcessorThread.setName("TimedAbortProcessor");
@@ -607,9 +612,6 @@ public class NotificationsController extends BasePageController {
 		}
 		if (log.isDebugEnabled())
 			log.info("Notification: " + selectedItem.getItemId() + " has been removed.");
-
-		//REMOVE FROM WEBAPP
-
 	}
 
 	public void clearNotifications() {
@@ -620,6 +622,11 @@ public class NotificationsController extends BasePageController {
 		synchronized (unansweredPrivacyNegotiationEvents) {
 			return unansweredPrivacyNegotiationEvents.get(negotiationID);
 		}
+	}
+
+	public String getView()
+	{
+		return FacesContext.getCurrentInstance().getViewRoot().getViewId();
 	}
 
 	public UserFeedbackAccessControlEvent getAcceessControlEvent(String eventId) {
@@ -774,6 +781,7 @@ public class NotificationsController extends BasePageController {
 				Collections.sort(allNotifications);
 
 				if (!item.isComplete()) {
+
 					if (log.isDebugEnabled())
 						log.debug("NQI event ID [" + item.getItemId() + "] is not completed, adding to unanswered cache");
 
@@ -781,6 +789,7 @@ public class NotificationsController extends BasePageController {
 						synchronized (unansweredNotificationIDs) {
 							synchronized (unansweredAccessControlEvents) {
 								synchronized (unansweredPrivacyNegotiationEvents) {
+
 
 									unansweredNotificationIDs.add(item.getItemId());
 									unansweredNotifications.add(item);
@@ -795,10 +804,24 @@ public class NotificationsController extends BasePageController {
 									}
 								}
 							}
+
+
 						}
+
 					}
 				}
 			}
+		}
+	}
+	
+	public boolean stopPoll() {
+		synchronized(unansweredNotifications)
+		{
+			if(unansweredNotifications.size() > 0)
+			{
+				return false;
+			}
+			return true;
 		}
 	}
 
@@ -842,6 +865,7 @@ public class NotificationsController extends BasePageController {
 
 
 	}
+	
 
 	public boolean isTimedAbortProcessorEnabled() {
 		return timedAbortProcessor.isEnabled();

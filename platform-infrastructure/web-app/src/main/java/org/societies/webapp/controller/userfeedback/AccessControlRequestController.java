@@ -14,9 +14,12 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.RequestScoped;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,12 +29,24 @@ import java.util.List;
 @ViewScoped
 public class AccessControlRequestController extends BasePageController {
 
-    private static String getIdFromQueryString() {
+    private static void getIdFromQueryString() {
         HttpServletRequest hsr = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         if (hsr.getParameter("id") != null)
-            return hsr.getParameter("id");
-
-        return "";
+        {
+            eventID = hsr.getParameter("id");
+        }
+        else
+        {
+        	eventID ="";
+        }
+        if(hsr.getParameter("redirect") != null)
+        {
+        	redirectPage = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath().concat(hsr.getParameter("redirect"));
+        }
+        else
+        {
+        	redirectPage = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath().concat("/index.xhtml");
+        }
     }
 
     @ManagedProperty(value = "#{notifications}")
@@ -41,9 +56,8 @@ public class AccessControlRequestController extends BasePageController {
     private IUserFeedback userFeedback;
 
     private final static ObfuscatorInfoFactory obfuscatorInfoFactory = new ObfuscatorInfoFactory();
-
-
-    private String eventID;
+    private static String redirectPage;
+    private static String eventID;
     private UserFeedbackAccessControlEvent event;
     private ConditionConstants newConditionToAdd;
 
@@ -68,12 +82,13 @@ public class AccessControlRequestController extends BasePageController {
     public void setUserFeedback(IUserFeedback userFeedback) {
         this.userFeedback = userFeedback;
     }
+    
 
     @PostConstruct
     public void initMethod() {
         if (log.isDebugEnabled())
             log.debug("init()");
-        eventID = getIdFromQueryString();
+        getIdFromQueryString();
         event = notificationsController.getAcceessControlEvent(eventID);
 
         if (event != null) {
@@ -166,13 +181,13 @@ public class AccessControlRequestController extends BasePageController {
         newConditionToAdd = null;
     }
 
-    public String completeAccessRequestAction() {
+    public void completeAccessRequestAction() {
     	//TODO: remember flag to set
         log.debug("completeAccessRequestAction() id=" + eventID);
 
         if (event == null) {
             log.warn("'event' is null - cannot proceed with completeAccessRequestAction() method");
-            return null;
+            return;
         }
 
         // TODO: validate action check boxes
@@ -193,16 +208,23 @@ public class AccessControlRequestController extends BasePageController {
             log.error("Error publishing notification of completed negotiation", e);
         }
 
-        return "home"; // previously, could redirect to next negotiation - but this makes no sense now
+        try {
+			FacesContext.getCurrentInstance().getExternalContext().redirect(redirectPage);
+		} catch (IOException e) {
+			addGlobalMessage("Cannot redirect you to your previous page!",
+                    e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
+			return;
+		}//redirectPage; // previously, could redirect to next negotiation - but this makes no sense now
     }
 
-    public String completeAccessRequestActionRemember() {
+    public void completeAccessRequestActionRemember() {
     	//TODO: remember flag to set
         log.debug("completeAccessRequestAction() id=" + eventID);
 
         if (event == null) {
             log.warn("'event' is null - cannot proceed with completeAccessRequestAction() method");
-            return null;
+            return;
         }
 
         // TODO: validate action check boxes
@@ -222,15 +244,31 @@ public class AccessControlRequestController extends BasePageController {
                     FacesMessage.SEVERITY_ERROR);
             log.error("Error publishing notification of completed negotiation", e);
         }
+        
+        try {
+			FacesContext.getCurrentInstance().getExternalContext().redirect(redirectPage);
+		} catch (IOException e) {
+			addGlobalMessage("Cannot redirect you to your previous page!",
+                    e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
+			return;
+		}
+        /*try {
+			FacesContext.getCurrentInstance().getExternalContext().redirect("index.xhtml");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+        //return "validationMessages?faces-redirect=true";
 
-        return "home"; // previously, could redirect to next negotiation - but this makes no sense now
+       // return "home?faces-redirect=true"; // previously, could redirect to next negotiation - but this makes no sense now
     }
-    public String cancelAccessRequestAction() {
+    public void cancelAccessRequestAction() {
         log.debug("cancelAccessRequestAction()");
 
         if (event == null) {
             log.warn("'event' is null - cannot proceed with cancelAccessRequestAction() method");
-            return null;
+            return;
         }
 
         prepareEventForTransmission(event);
@@ -248,15 +286,22 @@ public class AccessControlRequestController extends BasePageController {
             log.error("Error publishing notification of cancelled access control event", e);
         }
 
-        return "home"; // previously, could redirect to next negotiation - but this makes no sense now
+        try {
+			FacesContext.getCurrentInstance().getExternalContext().redirect(redirectPage);
+		} catch (IOException e) {
+			addGlobalMessage("Cannot redirect you to your previous page!",
+                    e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
+			return;
+		} // previously, could redirect to next negotiation - but this makes no sense now
     }
 
-    public String cancelAccessRequestActionRemember() {
+    public void cancelAccessRequestActionRemember() {
         log.debug("cancelAccessRequestAction()");
 
         if (event == null) {
             log.warn("'event' is null - cannot proceed with cancelAccessRequestAction() method");
-            return null;
+            return;
         }
 
         prepareEventForTransmission(event);
@@ -274,7 +319,14 @@ public class AccessControlRequestController extends BasePageController {
             log.error("Error publishing notification of cancelled access control event", e);
         }
 
-        return "home"; // previously, could redirect to next negotiation - but this makes no sense now
+        try {
+			FacesContext.getCurrentInstance().getExternalContext().redirect(redirectPage);
+		} catch (IOException e) {
+			addGlobalMessage("Cannot redirect you to your previous page!",
+                    e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
+			return;
+		} // previously, could redirect to next negotiation - but this makes no sense now
     }
     
     private static void prepareEventForGUI(UserFeedbackAccessControlEvent event) {

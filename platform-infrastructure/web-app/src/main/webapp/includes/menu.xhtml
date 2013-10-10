@@ -3,75 +3,76 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui">
-    <!-- Logo -->
-    <h1 id="logo" class="logo-pos">
-        <a href="index.xhtml"><img src="images/societies_logo.jpg" alt="Logo"/></a>
-    </h1>
-    <!--WebMenu -->
-    <nav id="webmenu_nav">
-        <ul id="navigation" class="grid_8">
-            <li><a href="myProfile.xhtml"><br/>My Account</a>
-                <ul class="sub-menu">
-                    <li><a href="myProfile.xhtml">My Profile</a></li>
-                    <li><a href="socialnetwork.xhtml">Social Network</a></li>
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<!-- Logo -->
+	<h1 id="logo" class="logo-pos">
+		<a href="index.xhtml"><img src="images/societies_logo.jpg"
+			alt="Logo" /></a>
+	</h1>
+	<!--WebMenu -->
+	<nav id="webmenu_nav">
+		<ul id="navigation" class="grid_8">
+			<li><a href="myProfile.xhtml"><br />My Account</a>
+				<ul class="sub-menu">
+					<li><a href="myProfile.xhtml">My Profile</a></li>
+					<li><a href="socialnetwork.xhtml">Social Network</a></li>
 
-                    <!-- <li><a href="profilesettings.xhtml">Profile Settings</a></li> -->
+					<!-- <li><a href="profilesettings.xhtml">Profile Settings</a></li> -->
 
-                    <li><a href="personalisation.xhtml">Personalisation Settings</a>
-                    <ul>
-                    	<li> <a href="preferences.xhtml">Preference Settings</a> </li>
-                    	<li> <a href="user_intent.xhtml">User Intent Settings</a> </li>
-                    </ul>
-                    </li>
-                    <li><a href="securitysettings.xhtml">Security Settings</a></li>
-                    <li><a href="privacysettings.xhtml">Privacy Settings</a>
-					<ul>
-						<li><a href="privacysettings.xhtml">Privacy Policy</a></li>
-						<li><a href="privacypreferences.xhtml">Privacy Preferences</a></li>
-						<li><a href="privacy_assessment.xhtml">Privacy Assessment</a></li>
-					</ul>
-					</li>
-                    <li><a href="trust.xhtml">Trust Settings</a></li>
-				</ul>
+					<li><a href="personalisation.xhtml">Personalisation
+							Settings</a>
+						<ul>
+							<li><a href="preferences.xhtml">Preference Settings</a></li>
+							<li><a href="user_intent.xhtml">User Intent Settings</a></li>
+						</ul></li>
+					<li><a href="securitysettings.xhtml">Security Settings</a></li>
+					<li><a href="privacysettings.xhtml">Privacy Settings</a>
+						<ul>
+							<li><a href="privacysettings.xhtml">Privacy Policy</a></li>
+							<li><a href="privacypreferences.xhtml">Privacy
+									Preferences</a></li>
+							<li><a href="privacy_assessment.xhtml">Privacy
+									Assessment</a></li>
+						</ul></li>
+					<li><a href="trust.xhtml">Trust Settings</a></li>
+				</ul></li>
+			<li><a href="your_installed_apps.xhtml"><br />Apps</a></li>
+			<li><a href="your_societies_friends_list.xhtml"><br />Friends</a>
+				<ul class="sub-menu">
+					<li><a href="your_societies_friends_list.xhtml">Your
+							Friends</a></li>
+					<li><a href="suggested_societies_friends_list.xhtml">Suggested
+							Friends</a></li>
+				</ul></li>
+			<li><a href="your_communities_list.xhtml"><br />Communities</a>
+				<ul class="sub-menu">
+					<li><a href="your_communities_list.xhtml">Your Communities</a></li>
+					<li><a href="manage_communities.xhtml">Manage your
+							Communities</a></li>
+					<li><a href="create_community.xhtml">Create a Community</a></li>
+					<li><a href="your_suggested_communities_list.xhtml">Suggested
+							Communities</a></li>
+				</ul></li>
+			<li><a href="index.xhtml" class="current"><br />Home</a></li>
+			<li>
+				<div class="notification-bubble">
+					<p:commandLink update="notificationDialog"
+						oncomplete="#{p:widgetVar('notificationDialog')}.show();#{p:widgetVar('notifPoll')}.start();"
+						rendered="#{loginController.loggedIn and noNotificationPopup ne 'true'}">
+
+						<p:outputPanel id="notification-count-wrapper">
+							<h:outputText id="notification-count"
+								rendered="#{userService.userLoggedIn and notifications.numUnansweredNotifications gt 0}"
+								value="#{notifications.numUnansweredNotifications}" />
+						</p:outputPanel>
+					</p:commandLink>
+				</div>
 			</li>
-            <li><a href="your_installed_apps.xhtml"><br/>Apps</a>
-            </li>
-            <li><a href="your_societies_friends_list.xhtml"><br/>Friends</a>
-                <ul class="sub-menu">
-                    <li><a href="your_societies_friends_list.xhtml">Your Friends</a></li>
-                    <li><a href="suggested_societies_friends_list.xhtml">Suggested Friends</a></li>
-                </ul>
-            </li>
-            <li><a href="your_communities_list.xhtml"><br/>Communities</a>
-                <ul class="sub-menu">
-                    <li><a href="your_communities_list.xhtml">Your Communities</a></li>
-                    <li><a href="manage_communities.xhtml">Manage your Communities</a></li>
-                    <li><a href="create_community.xhtml">Create a Community</a></li>
-                    <li><a href="your_suggested_communities_list.xhtml">Suggested Communities</a></li>
-                </ul>
-            </li>
-            <li><a href="index.xhtml" class="current"><br/>Home</a></li>
-            <li>
-                <div class="notification-bubble">
-                    <p:commandLink update="notificationDialog"
-                                   oncomplete="#{p:widgetVar('notificationDialog')}.show();"
-                                   rendered="#{loginController.loggedIn and noNotificationPopup ne 'true'}">
-
-                        <p:outputPanel id="notification-count-wrapper">
-                            <h:outputText
-                                    id="notification-count"
-                                    rendered="#{userService.userLoggedIn and notifications.numUnansweredNotifications gt 0}"
-                                    value="#{notifications.numUnansweredNotifications}"/>
-                        </p:outputPanel>
-                    </p:commandLink>
-                </div>
-            </li>
-        </ul>
-    </nav>
-    <!-- #webmenu -->
+		</ul>
+	</nav>
+	<!-- #webmenu -->
 
 </ui:composition>
 
