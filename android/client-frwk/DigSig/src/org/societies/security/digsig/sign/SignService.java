@@ -147,6 +147,7 @@ public class SignService extends IntentService {
 			String path = intent.getStringExtra(Sign.Params.SIGNED_DOC_URL);
 			Log.d(TAG, "Writing signed doc to internal storage file " + path);
 			new Storage(this).writeToInternalStorage(path, output.toByteArray());
+			Log.d(TAG, "Written signed doc to internal storage file " + path);
 			bcIntent.putExtra(Sign.Params.SUCCESS, true);
 			
 		} catch (Exception e) {  
@@ -159,6 +160,7 @@ public class SignService extends IntentService {
 		}
 		bcIntent.putExtra(Sign.Params.SESSION_ID, sessionId);
 		bcIntent.setAction(Sign.ACTION_FINISHED);
+		Log.d(TAG, "Sending broadcast to announce finished signing");
 		sendBroadcast(bcIntent);
 	}
 	

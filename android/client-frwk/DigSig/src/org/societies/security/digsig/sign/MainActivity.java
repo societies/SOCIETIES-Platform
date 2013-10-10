@@ -126,23 +126,30 @@ public class MainActivity extends Activity {
 				startActivityForResult(i, VERIFY);
 			}
 		});
-
-		registerBroadcastReceiver();
 	}
+	
+	@Override
+	protected void onResume() {
+		
+		super.onResume();
 
-	private void registerBroadcastReceiver() {
 		IntentFilter filter = new IntentFilter(Sign.ACTION_FINISHED);
 		receiver = new Receiver();
 		registerReceiver(receiver, filter);
+		Log.d(TAG, "Receiver registered");
 	}
 	
+	@Override
 	protected void onPause() {
+		
 		super.onPause();
+		
 		if (receiver != null) {
 			unregisterReceiver(receiver);
 			receiver = null;
 			Log.d(TAG, "Receiver unregistered");
 		}
+		
 		if (mBound) {
 			unbindService(mConnection);
 			Log.d(TAG, "Service unbound");
@@ -162,6 +169,7 @@ public class MainActivity extends Activity {
 				Log.d(TAG, "Received broadcast about finished signing operation.");
 				try {
 					InputStream is = getContentResolver().openInputStream(Uri.parse(signedUrl));
+					Log.d(TAG, "External storage state = " + Environment.getExternalStorageState());
 					FileOutputStream os = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/signed.xml");
 					int numRead;
 					byte[] buf = new byte[1024];
