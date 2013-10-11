@@ -202,11 +202,25 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 						new String[] { "Yes", "No" });
 				List<String> result = feedbackHandler.getExplicitFB(
 						ExpProposalType.RADIOLIST, epc).get();
+				boolean resb;
 				if (result.get(0).equals("Yes")) {
-					return true;
+					resb = true;
 				} else {
-					return false;
+					resb = false;
 				}
+				/*						DOING FEEDBACK						*/
+				FeedbackEvent fedb = new FeedbackEvent(this.entityID,
+						action, resb, FeedbackTypes.USER_CHOICE);
+				InternalEvent event = new InternalEvent(
+						EventTypes.UI_EVENT, "feedback",
+						"org/societies/useragent/decisionmaker", fedb);
+				try {
+					this.eventMgr.publishInternalEvent(event);
+				} catch (EMSException e) {
+					e.printStackTrace();
+				}
+				/*						finish FEEDBACK						*/
+				return resb;
 			}
 		} catch (Exception e) {
 			System.err.println(e);

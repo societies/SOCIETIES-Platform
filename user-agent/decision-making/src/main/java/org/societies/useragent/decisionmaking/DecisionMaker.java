@@ -109,7 +109,7 @@ public class DecisionMaker extends AbstractDecisionMaker implements
 	public DecisionMaker() {
 		ConflictResolutionManager man = new ConflictResolutionManager();
 		man.addRule(new ConfidenceTradeoffRule());
-		man.addRule(new IntentPriorRule());
+	//	man.addRule(new IntentPriorRule());
 		super.setManager(man);
 		logging.debug("Intialized DM");
 	}
@@ -147,6 +147,8 @@ public class DecisionMaker extends AbstractDecisionMaker implements
 
 	@Override
 	protected void implementIAction(IAction action) {
+		
+	try{
 		// TODO Auto-generated method stub
 		// @temporal solution depends on the 3rd party-services
 		logging.debug("****************************************");
@@ -167,8 +169,8 @@ public class DecisionMaker extends AbstractDecisionMaker implements
 						+ action.getServiceID().getServiceInstanceIdentifier());
 				if (ServiceModelUtils.compare(consumer.getServiceIdentifier(),
 						action.getServiceID())) {
-					String cImp = "Service:" + consumer.getServiceIdentifier()
-							+ " Action:" + action;
+					String cImp = "Do you want to implement the Service:" + consumer.getServiceIdentifier()
+							+ "\n with the Parameter:" + action;
 					if (getUserFeedback(cImp, action)) {
 						FeedbackEvent fedb = new FeedbackEvent(super.getEntityID(),
 						action, true, FeedbackTypes.IMPLEMENTED);
@@ -180,8 +182,24 @@ public class DecisionMaker extends AbstractDecisionMaker implements
 						} catch (EMSException e) {
 							e.printStackTrace();
 						}
-						consumer.setIAction(super.getEntityID(), action);
-						logging.debug("Service has been matched. IAction has been sent to the service");
+						boolean service_decision=consumer.setIAction(super.getEntityID(), action);
+						if (service_decision == false) {
+							FeedbackEvent fedb2 = new FeedbackEvent(
+									super.getEntityID(), action, true,
+									FeedbackTypes.SERVICE_DECISION);
+							InternalEvent event2 = new InternalEvent(
+									EventTypes.UI_EVENT,
+									"feedback","org/societies/useragent/decisionmaker",fedb2);
+							try {
+								this.getEventMgr().publishInternalEvent(
+										event2);
+							} catch (EMSException e) {
+								e.printStackTrace();
+							}
+							logging.debug("Service has been matched. But IAction has not been properly delivered to the service");
+						}else{
+							logging.debug("Service has been matched. IAction has been sent to the service");
+						}
 					} else {	
 						logging.debug("Service has been matched. But user refuses to act");
 					}
@@ -190,9 +208,33 @@ public class DecisionMaker extends AbstractDecisionMaker implements
 			}
 		}
 		if (!found) {
+			FeedbackEvent fedb = new FeedbackEvent(super.getEntityID(),
+					action, true, FeedbackTypes.SERVICE_UNREACHABLE);
+			InternalEvent event = new InternalEvent(EventTypes.UI_EVENT,
+					"feedback", "org/societies/useragent/decisionmaker",
+					fedb);
+			try {
+				this.getEventMgr().publishInternalEvent(event);
+			} catch (EMSException e) {
+				e.printStackTrace();
+			}
 			logging.debug("No services have been founded to implement the IAction");
 		}
 
+	}catch(Exception e2){
+		FeedbackEvent fedb = new FeedbackEvent(super.getEntityID(),
+				action, true, FeedbackTypes.SYSTEM_ERROR);
+		InternalEvent event = new InternalEvent(EventTypes.UI_EVENT,
+				"feedback", "org/societies/useragent/decisionmaker",
+				fedb);
+		try {
+			this.getEventMgr().publishInternalEvent(event);
+		} catch (EMSException e) {
+			e.printStackTrace();
+		}
+		logging.debug("System fails");
+	}
+	
 	}
 
 }
