@@ -28,6 +28,7 @@ import static org.junit.Assert.*;
 
 import java.net.URI;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -38,9 +39,13 @@ import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.RequestorService;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -118,7 +123,7 @@ public class TestLocalCommunityContext {
 		LOG.info("*** setUp: publicCisId={}", this.publicCisId);
 		// create CIS2
 		this.membersOnlyCisId = this.createCis("testCIS2", new String[] {
-				CtxAttributeTypes.ACTIVITIES, CtxAttributeTypes.MOVIES }, MEMBERS_ONLY);
+				CtxAttributeTypes.ACTIVITIES, CtxAttributeTypes.MOVIES, CtxAssociationTypes.HAS_MEMBERS }, MEMBERS_ONLY);
 		LOG.info("*** setUp: membersOnlyCisId={}", this.membersOnlyCisId);
 		
 		Thread.sleep(CIS_CREATION_TIMEOUT);
@@ -214,6 +219,17 @@ public class TestLocalCommunityContext {
 		assertNotNull(membersOnlyActivitiesAttrRetrieved);
 		assertNotNull(membersOnlyActivitiesAttrRetrieved.getStringValue());
 		assertEquals("activity1,activity2", membersOnlyActivitiesAttrRetrieved.getStringValue());
+		
+		final List<CtxIdentifier> membersOnlyHasMembersIds = this.ctxBroker.lookup(
+				requestorService, membersOnlyCisEntId, CtxModelType.ASSOCIATION, CtxAssociationTypes.HAS_MEMBERS).get();
+		assertNotNull(membersOnlyHasMembersIds);
+		assertFalse(membersOnlyHasMembersIds.isEmpty());
+		
+		final CtxAssociation membersOnlyHasMembersAssocRetrieved = (CtxAssociation) 
+				this.ctxBroker.retrieve(requestorService, membersOnlyHasMembersIds.get(0)).get();
+		assertNotNull(membersOnlyHasMembersAssocRetrieved);
+		LOG.info("*** testMemberCRUD: membersOnlyHasMembersAssocRetrieved=" 
+				+ membersOnlyHasMembersAssocRetrieved);
 			
 		LOG.info("*** testMemberCRUD: END");
 	}
@@ -281,6 +297,19 @@ public class TestLocalCommunityContext {
 		accessControlExceptionCaught = false;
 		try {
 			this.ctxBroker.retrieve(requestorService, membersOnlyActivitiesAttr.getId()).get();
+		} catch (CtxAccessControlException cace) {
+			accessControlExceptionCaught = true;
+		}
+		assertTrue(accessControlExceptionCaught);
+		
+		final List<CtxIdentifier> membersOnlyHasMembersIds = this.ctxBroker.lookup(
+				requestorService, membersOnlyCisEntId, CtxModelType.ASSOCIATION, CtxAssociationTypes.HAS_MEMBERS).get();
+		assertNotNull(membersOnlyHasMembersIds);
+		assertFalse(membersOnlyHasMembersIds.isEmpty());
+		
+		accessControlExceptionCaught = false;
+		try {
+			this.ctxBroker.retrieve(requestorService, membersOnlyHasMembersIds.get(0)).get();
 		} catch (CtxAccessControlException cace) {
 			accessControlExceptionCaught = true;
 		}
