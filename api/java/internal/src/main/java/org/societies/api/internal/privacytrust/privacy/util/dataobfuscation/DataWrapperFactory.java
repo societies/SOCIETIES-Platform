@@ -53,7 +53,7 @@ public class DataWrapperFactory {
 
 	public static final String NOT_OBFUSCABLE_TYPE = "NOT_OBFUCSABLE";
 
-	
+
 	// -- CONTEXT ATTRIBUTE
 
 	/**
@@ -187,7 +187,11 @@ public class DataWrapperFactory {
 			String[] rawValue = attribute.getStringValue().split(",");
 			latitude = Double.valueOf(rawValue[0]);
 			longitude = Double.valueOf(rawValue[1]);
-			accuracy = attribute.getQuality().getPrecision();
+			if (attribute.getQuality().getPrecision()!=null){
+				accuracy = attribute.getQuality().getPrecision();
+			}else{
+				accuracy = 0.0;
+			}
 			break;
 		}
 		return getLocationCoordinatesWrapper(latitude, longitude, accuracy);
