@@ -40,12 +40,21 @@ import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.bean.ViewScoped;
+import javax.faces.component.UIComponent;
+import javax.faces.component.UIViewRoot;
+import javax.faces.component.visit.VisitCallback;
+import javax.faces.component.visit.VisitContext;
+import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
 
+import org.primefaces.component.dialog.Dialog;
+import org.primefaces.component.panel.Panel;
+import org.primefaces.component.selectonemenu.SelectOneMenu;
 import org.primefaces.context.RequestContext;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -58,6 +67,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -72,6 +82,7 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
@@ -85,6 +96,8 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.accesscontrol.AccessControlOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.accesscontrol.AccessControlPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.OperatorConstants;
+
+import com.sun.faces.component.visit.FullVisitContext;
 
 /**
  * @author Eliza
@@ -108,7 +121,7 @@ public class AccCtrlCreateBean implements Serializable{
 
 	@ManagedProperty(value="#{commMngrRef}")
 	private ICommManager commMgr;
-	
+
 	@ManagedProperty(value = "#{privPrefMgr}")
 	private IPrivacyPreferenceManager privPrefmgr;
 
@@ -118,6 +131,7 @@ public class AccCtrlCreateBean implements Serializable{
 
 
 	Hashtable<String, CtxIdentifier> ctxIDTable = new Hashtable<String, CtxIdentifier>();
+	Hashtable<String, List<String>> dataTypeToURIsTable = new Hashtable<String, List<String>>();
 
 	private List<OperatorConstants> operators = new ArrayList<OperatorConstants>();
 
@@ -137,7 +151,7 @@ public class AccCtrlCreateBean implements Serializable{
 	private List<PrivacyOutcomeConstantsBean> decisions;
 
 	private String trustValue;
-	
+
 	private ConditionConstants selectedPrivacyCondition;
 	private Map<ConditionConstants,ConditionConstants> privacyConditions;
 
@@ -148,17 +162,22 @@ public class AccCtrlCreateBean implements Serializable{
 
 	private List<DataIdentifierScheme> schemeList;
 
-	private List<String> contextTypes;
+	private List<String> contextTypes = new ArrayList<String>();
 
-	private List<String> cisTypes;
+	private List<String> cisTypes = new ArrayList<String>();
 
-	private List<String> deviceTypes;
+	private List<String> deviceTypes = new ArrayList<String>();
 
-	private List<String> activityTypes;
+	private List<String> activityTypes = new ArrayList<String>();
 
-	private List<String> resourceTypes;
+	private List<String> resourceTypes = new ArrayList<String>();
 
-	private boolean editableResource; 
+
+	private String displaySpecificRequestor;
+	private List<String> selectedResourceUriIDs = new ArrayList<String>();
+
+	private AccessControlPreferenceTreeModel existingAccCtrlPreference;
+
 	
 	public AccCtrlCreateBean() {
 
@@ -180,16 +199,26 @@ public class AccCtrlCreateBean implements Serializable{
 		preferenceDetails.getRequestor().setRequestorId("");
 		preferenceDetails.setResource(new Resource());
 		preferenceDetails.getResource().setDataType("");
-		
-		setupDataTypes();
-		this.createCtxAttributeTypesList();
+		preferenceDetails.setAction(new Action());
+
 		this.createSchemeList();
+		this.getCtxIds();
+		this.setupDataTypes();
+		this.preferenceDetails.getResource().setScheme(DataIdentifierScheme.CONTEXT);
+		this.handleSchemeTypeChange();
+		
+		if (contextTypes.size()>0){
+			this.preferenceDetails.getResource().setDataType(this.contextTypes.get(0));
+		}
+		
+		this.handleResourceTypeChange();
+		
 		setOperators(Arrays.asList(OperatorConstants.values()));
 		setDecisions(Arrays.asList(PrivacyOutcomeConstantsBean.values()));
 		this.setupConditions();
-		
+
 	}
-	
+
 	private void setupConditions(){
 		List<ConditionConstants> conditionsList = Arrays.asList(ConditionConstants.values());
 		this.privacyConditions = new HashMap<ConditionConstants, ConditionConstants>();
@@ -215,55 +244,66 @@ public class AccCtrlCreateBean implements Serializable{
 
 		ConditionConstants cc = this.privacyConditionData.keySet().iterator().next();
 		this.setPrivacyValues(this.privacyConditionData.get(cc));
-		this.selectScheme(this.schemeList.get(0));
+
 	}
-	
+
 	private void createSchemeList() {
 		this.schemeList = new ArrayList<DataIdentifierScheme>();
-		DataIdentifierScheme[] fields = DataIdentifierScheme.values();
-		
-		for (int i=0; i<fields.length; i++){
-			if (!fields[i].name().equalsIgnoreCase("CSS"))
-				this.schemeList.add(fields[i]);
-		}
-		
-		
+
+		this.schemeList.add(DataIdentifierScheme.CONTEXT);
+		this.schemeList.add(DataIdentifierScheme.CIS);
+		this.schemeList.add(DataIdentifierScheme.DEVICE);
+		this.schemeList.add(DataIdentifierScheme.ACTIVITY);
+
+
+
+
 	}
-	
-	private void createCtxAttributeTypesList() {
+
+	/*	private void createCtxAttributeTypesList() {
 		this.contextTypes = new ArrayList<String>();
-		Field[] fields = CtxAttributeTypes.class.getDeclaredFields();
-		
+				Field[] fields = CtxAttributeTypes.class.getDeclaredFields();
+
 		String[] names = new String[fields.length];
-		
+
 		for (int i=0; i<names.length; i++){
 			names[i] = fields[i].getName();
-			
-			
+
+
 		}
+		if (this.ctxIds!=null){
+			if (this.ctxIds.isEmpty()){
+				this.getCtxIds();
+			}
+		}else{
+			this.getCtxIds();
+		}
+
+
 		this.contextTypes = Arrays.asList(names);
-		
-	}
-	
+
+	}*/
+
 	private void setupDataTypes() {
 		this.cisTypes = new ArrayList<String>();
 		this.cisTypes.add("cis-member-list");
 		this.cisTypes.add("cis-list");
-		
+
 		this.deviceTypes = new ArrayList<String>();
 		this.deviceTypes.add("meta-data");
-		
+
 		this.activityTypes = new ArrayList<String>();
 		this.activityTypes.add("activityfeed");
-		
-		
+
+
 	}
-	
+
 	public void savePreferenceDetails(){
 		ServiceResourceIdentifier serviceID; 
 		String rType = "simple";
 		String specific = "";
 
+		FacesContext facesContext = FacesContext.getCurrentInstance();
 		if (requestorType==0){
 
 			try {
@@ -277,8 +317,9 @@ public class AccCtrlCreateBean implements Serializable{
 				this.logging.debug("caught exception while validating cis id");
 				e.printStackTrace();
 				preferenceDetailsCorrect = false;
-				FacesMessage message = new FacesMessage("CIS Jid is not valid");
-				FacesContext.getCurrentInstance().addMessage(null, message);
+				FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Invalid Requestor information", "selected CIS is not valid");
+				facesContext.addMessage(null, message);
+				
 				return;
 			}
 
@@ -296,7 +337,7 @@ public class AccCtrlCreateBean implements Serializable{
 				e.printStackTrace();
 				preferenceDetailsCorrect = false;
 				FacesMessage message = new FacesMessage("ServiceID is not valid");
-				FacesContext.getCurrentInstance().addMessage(null, message);
+				facesContext.addMessage(null, message);
 				return;
 			}
 
@@ -304,22 +345,56 @@ public class AccCtrlCreateBean implements Serializable{
 				this.logging.debug("service id is null");
 				preferenceDetailsCorrect = false;
 				FacesMessage message = new FacesMessage("ServiceID is not valid");
-				FacesContext.getCurrentInstance().addMessage(null, message);
+				facesContext.addMessage(null, message);
 				return;
 			}
 		}
 
-		RequestContext context = RequestContext.getCurrentInstance();
-		context.execute("prefDetailsDlg.hide()");
+		if (preferenceDetails.getResource().getDataType()==null || preferenceDetails.getResource().getDataType().isEmpty()){
+			this.logging.debug("Resource dataType is null");
+			preferenceDetailsCorrect = false;
+			FacesMessage message = new FacesMessage("Please select a valid resourceType");
+			facesContext.addMessage(null, message);
+			return;
+		}
+
+		if (preferenceDetails.getResource().getScheme().equals(DataIdentifierScheme.CONTEXT)){
+			if (preferenceDetails.getResource().getDataIdUri()==null){
+				this.logging.debug("Resource dataIdUri is null");
+				preferenceDetailsCorrect = false;
+				FacesMessage message = new FacesMessage("Please select a valid resource identifier");
+				facesContext.addMessage(null, message);
+				return;
+			}
+		}
+
+
+
 		this.logging.debug("Successfully validated preferenceDetails");
 		this.preferenceDetailsCorrect = true;
+		RequestContext context = RequestContext.getCurrentInstance();
+		context.execute("prefDetailsDlg.hide()");		
+		existingAccCtrlPreference = this.privPrefmgr.getAccCtrlPreference(preferenceDetails);
+		if (existingAccCtrlPreference!=null){
+			this.logging.debug("existingAccCtrlPreference");
+			RequestContext.getCurrentInstance().execute("pdcd.show();");
+		}else{
+
+			this.logging.debug("no existing access control preference");
+		}
 		
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "PPN preference details set", "Set requestor: "+preferenceDetails.getRequestor().getRequestorId()+
 				"\n, type: "+rType+specific+"\nSet resource: "+preferenceDetails.getResource().getDataType());
-		FacesContext.getCurrentInstance().addMessage(null, message);
+		facesContext.addMessage(null, message);
 	}
 	public TreeNode getSelectedNode() {
 		return selectedNode;
+	}
+
+	public void loadExistingPreference(){
+		TreeNode node = new DefaultTreeNode("Root!", null);
+		this.root = ModelTranslator.getPrivacyPreference(this.existingAccCtrlPreference.getRootPreference(), node);
+		printTree();
 	}
 
 	public void setSelectedNode(TreeNode selectedNode) {
@@ -361,7 +436,7 @@ public class AccCtrlCreateBean implements Serializable{
 			str = str+child+"\n";
 			return str.concat(getChildrenToPrint(child));
 
-			
+
 		}
 		return str;
 	}
@@ -378,16 +453,31 @@ public class AccCtrlCreateBean implements Serializable{
 	}
 
 
+	public String getDisplaySpecificRequestor() {
+		if (this.preferenceDetails.getRequestor() instanceof RequestorCisBean){
+			displaySpecificRequestor = "Cis: "+((RequestorCisBean) this.preferenceDetails.getRequestor()).getCisRequestorId();
+		}else if (this.preferenceDetails.getRequestor() instanceof RequestorServiceBean){
+			displaySpecificRequestor = "Service: "+ ServiceModelUtils.serviceResourceIdentifierToString(((RequestorServiceBean) this.preferenceDetails.getRequestor()).getRequestorServiceId());
+		}else {
+			displaySpecificRequestor = "None";
+		}
+		return displaySpecificRequestor;
+	}
+
+
+	public void setDisplaySpecificRequestor(String displaySpecificRequestor) {
+		this.displaySpecificRequestor = displaySpecificRequestor;
+	}
 	public void startAddConditionProcess(){
 		RequestContext.getCurrentInstance().execute("addConddlg.show();");
 	}
-	
+
 	public void startAddOutcomeProcess(){
 		RequestContext.getCurrentInstance().execute("addOutdlg.show();");
 	}
-	
+
 	public void addCondition(){
-		
+
 		if (selectedNode==null){
 			this.logging.debug("selected node is null - addCondition");
 			return;
@@ -423,14 +513,14 @@ public class AccCtrlCreateBean implements Serializable{
 			//selectedNode.getChildren().add(conditionNode);
 			//set the selected Node to be parent of the new condition node
 			conditionNode.setParent(selectedNode);
-			
-			
+
+
 		}
 
 		this.logging.debug("Added new condition "+conditionBean+" to selected node:"+selectedNode);
 		printTree();
 	}
-	
+
 	public void addPrivacyCondition(){
 		if (selectedNode==null){
 			this.logging.debug("selected node is null - addPrivacyCondition");
@@ -533,19 +623,19 @@ public class AccCtrlCreateBean implements Serializable{
 
 		}
 	}
-	
+
 	public void addOutcome(){
 		if (selectedNode==null){
 			this.logging.debug("selected node is null - addOutcome");
 			return;
 		}
-		
+
 		if (selectedNode.getData() instanceof AccessControlOutcome){
 			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Adding outcome", "You can't add an outcome as a subnode of another outcome. Please select a condition node to add the new outcome to.");
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			return;
 		}
-		
+
 		if (selectedNode.getChildCount()>0){
 			List<TreeNode> children = selectedNode.getChildren();
 			for (TreeNode child :children){
@@ -557,15 +647,15 @@ public class AccCtrlCreateBean implements Serializable{
 			}
 		}
 		AccessControlOutcome outcome = new AccessControlOutcome(selectedDecision);
-			
-			TreeNode newNode = new DefaultTreeNode(outcome, selectedNode);
-		
-		
+
+		TreeNode newNode = new DefaultTreeNode(outcome, selectedNode);
+
+
 		this.logging.debug("Added new outcome : "+newNode+" to selected node: "+selectedNode);
 
 	}
-	
-	
+
+
 	private TrustedEntityId createTrustedEntityId() {
 		try {
 			if (this.preferenceDetails.getRequestor() instanceof RequestorCisBean){
@@ -588,24 +678,24 @@ public class AccCtrlCreateBean implements Serializable{
 		return null;
 
 	}
-	
+
 	public String formatNodeForDisplay(Object node){
 		if (node==null){
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("can't format node. node is null"));
 			return "null node";
 		}
-		
+
 		if (node instanceof AccessControlOutcome){
 			AccessControlOutcome outcome = (AccessControlOutcome) node;
-			
+
 			return "Decision: "+ outcome.getEffect().value();
 		}
-		
+
 		if (node instanceof ContextPreferenceCondition){
 			ContextPreferenceCondition condition = (ContextPreferenceCondition) node;
 			return "Condition: "+condition.getCtxIdentifier().getType()+" = "+condition.getValue();
 		}
-		
+
 		if (node instanceof PrivacyCondition){
 			PrivacyCondition privacyCondition = (PrivacyCondition) node;
 			return "Condition: "+privacyCondition.getCondition().getConditionConstant()+" = "+privacyCondition.getCondition().getValue();
@@ -616,10 +706,10 @@ public class AccCtrlCreateBean implements Serializable{
 
 			return "Condition: trustOfRequestor > "+trustCondition.getTrustThreshold();
 		}
-		
-		
+
+
 		else return "Unparseable: "+node;
-		
+
 	}
 
 	public void editNode(){
@@ -653,7 +743,7 @@ public class AccCtrlCreateBean implements Serializable{
 
 		if (this.root.getChildCount()==0){
 			AccessControlOutcome outcome = new AccessControlOutcome(PrivacyOutcomeConstantsBean.ALLOW);
-			
+
 
 			TreeNode node0 = new DefaultTreeNode(outcome, root);
 		}
@@ -661,7 +751,7 @@ public class AccCtrlCreateBean implements Serializable{
 		FacesContext.getCurrentInstance().addMessage(null, message);
 	}
 
-	
+
 	public void savePreference(){
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Saving preference", "Now saving prefernece");
 		FacesContext.getCurrentInstance().addMessage(null, message);
@@ -684,22 +774,33 @@ public class AccCtrlCreateBean implements Serializable{
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		}
 	}
-	
-	
+
+
 	public List<String> getCtxIds() {
 		try {
-			this.logging.debug("Retrieving context attributes to be used as conditions");
+			this.logging.debug("Retrieving context attributes to be used as conditions and also for creating accCtrl preferences for existing types");
 			IndividualCtxEntity individualCtxEntity = this.ctxBroker.retrieveIndividualEntity(userId).get();
 			Set<CtxAttribute> attributes = individualCtxEntity.getAttributes();
 
 			Iterator<CtxAttribute> iterator = attributes.iterator();
 			this.ctxIds.clear();
-
+			this.contextTypes.clear();
 			while(iterator.hasNext()){
 
 				CtxAttributeIdentifier id = iterator.next().getId();
 				this.ctxIds.add(id.getUri());
+
 				this.ctxIDTable.put(id.getUri(), id);
+				if (this.dataTypeToURIsTable.containsKey(id.getType())){
+					this.dataTypeToURIsTable.get(id.getType()).add(id.getUri());
+					this.logging.debug("Adding "+id.getUri()+" with key: "+id.getType()+" on dataTypeToURIsTable");
+				}else{
+					contextTypes.add(id.getType());
+					ArrayList<String> list = new ArrayList<String>();
+					list.add(id.getUri());
+					this.dataTypeToURIsTable.put(id.getType(), list);
+					this.logging.debug("Created key: "+id.getType()+" and added item: "+id.getUri()+" on dataTypeToURIsTable");
+				}
 			}
 			this.logging.debug("Found "+this.ctxIds.size()+" context attributes");
 
@@ -854,49 +955,116 @@ public class AccCtrlCreateBean implements Serializable{
 	}
 
 	public void handleSchemeTypeChange(){
+		
 		DataIdentifierScheme scheme = this.preferenceDetails.getResource().getScheme();
 		if (scheme==null){
-			this.logging.debug("handleSchemeTypeChange: selected scheme is null");
+			this.logging.debug("Can't handleSchemeTypeChange: selected scheme is null");
 			return;
 		}
-		selectScheme(scheme);
-
-	}
-
-	private void selectScheme(DataIdentifierScheme scheme){
 		switch (scheme)
 		{
 		case ACTIVITY: 
 			this.resourceTypes = this.activityTypes;
-			this.editableResource = false;
+			this.preferenceDetails.getResource().setDataType(this.resourceTypes.get(0));
 			break;
 		case CIS: 
 			this.resourceTypes = this.cisTypes;
-			this.editableResource = false;
+			this.preferenceDetails.getResource().setDataType(this.resourceTypes.get(0));
 			break;
 		case CONTEXT:
 			this.resourceTypes = this.contextTypes;
-			this.editableResource = true;
-			break;
-		case CSS: 
-			this.resourceTypes = new ArrayList<String>();
-			this.editableResource = true;
+			this.preferenceDetails.getResource().setDataType(this.resourceTypes.get(0));
 			break;
 		case DEVICE:
 			this.resourceTypes = this.deviceTypes;
-			this.editableResource = false;
+			this.preferenceDetails.getResource().setDataType(this.resourceTypes.get(0));
 			break;
-		case SOCIALPROVIDER: 
+		default: 
 			this.resourceTypes = new ArrayList<String>();
-			this.editableResource = true;
+			this.preferenceDetails.getResource().setDataType("");
 			break;
-		}		
+		}	
+		
+		
+		this.logging.debug("handleSchemeTypeChange updated and now resourceType is set to: "+this.preferenceDetails.getResource().getDataType());
+		handleResourceTypeChange();
 	}
+
+	public void handleResourceTypeChange(){
+		String dataType = this.preferenceDetails.getResource().getDataType();
+		this.logging.debug("handleResourceTypeChange method called");
+		if (dataType==null){
+			this.logging.debug("Can't handleResourceTypeChange. dataType is null");
+			return;
+		}
+		
+		if (dataType.isEmpty()){
+			this.logging.debug("Can't handleResourceTypeChange. dataType is empty");
+		}
+		if (this.dataTypeToURIsTable.containsKey(dataType)){
+			selectedResourceUriIDs = this.dataTypeToURIsTable.get(dataType);
+			this.logging.debug("Found "+selectedResourceUriIDs.size()+" ctxIDs for: "+dataType);
+		}else{
+			this.logging.debug("NOT Found ctxIDs for: "+dataType);
+			selectedResourceUriIDs = new ArrayList<String>();
+		}
+
+		RequestContext.getCurrentInstance().update("resourceURIIDs");
+	}
+
+
 	public void handlePrivacyTypeChange(){
 		this.logging.debug("handlePrivacyTypeChange for: "+this.selectedPrivacyCondition);
 		this.setPrivacyValues(this.privacyConditionData.get(selectedPrivacyCondition));
 	}
+
 	
+	/*	public void printSomeStuff(){
+		try{
+			//FacesContext.getCurrentInstance().getViewRoot().get
+			//UIComponent findComponent = this.findComponent("resourceDataType1");
+			UIComponent findComponent = FacesContext.getCurrentInstance().getViewRoot().findComponent("mainForm:resourceDataType1");
+			if (findComponent==null){
+				this.logging.debug("NO COMPONENT FOUND");
+				return;
+			}else{
+				this.logging.debug("Found component: clientid:"+findComponent.getClientId()+" id: "+findComponent.getId()+" toString(): "+findComponent.toString());
+			}
+
+			SelectOneMenu soMenu = (SelectOneMenu) findComponent;
+
+			Map<String, Object> attributes = findComponent.getAttributes();
+			Iterator<String> iterator = attributes.keySet().iterator();
+			while (iterator.hasNext()){
+				String next = iterator.next();
+				Object object = attributes.get(next);
+				this.logging.debug("key: "+next+" - value: "+object.toString()+" class of obj: "+object.getClass().getName());
+			}
+
+
+		}catch (Exception e){
+			e.printStackTrace();
+			this.logging.debug("Error: ", e);
+		}
+	}*/
+	public UIComponent findComponent(final String id){
+		FacesContext context = FacesContext.getCurrentInstance(); 
+		UIViewRoot root = context.getViewRoot();
+		final UIComponent[] found = new UIComponent[1];
+		root.visitTree(new FullVisitContext(context), new VisitCallback() {     
+			@Override
+			public VisitResult visit(VisitContext context, UIComponent component) {
+				logging.debug("Found component with id: "+component.getId());
+				if(component.getId().equals(id)){
+					found[0] = component;
+					return VisitResult.COMPLETE;
+				}
+				return VisitResult.ACCEPT;              
+			}
+		});
+		return found[0];
+	}
+
 
 	public boolean isPreferenceDetailsCorrect() {
 		this.logging.debug("preferenceDetailsCorrect: "+preferenceDetailsCorrect);
@@ -905,6 +1073,17 @@ public class AccCtrlCreateBean implements Serializable{
 
 
 
+	public String getCtxTypeFromCtxId(String id){
+		CtxAttributeIdentifier ctxid;
+		try {
+			ctxid = new CtxAttributeIdentifier(id);
+			return ctxid.getType();
+		} catch (MalformedCtxIdentifierException e) {
+			// TODO Auto-generated catch block
+			this.logging.debug(" Error in getCtxTypeFromCtxId: "+id ,e);
+		}
+		return "";
+	}
 	public void setPreferenceDetailsCorrect(boolean preferenceDetailsCorrect) {
 		this.preferenceDetailsCorrect = preferenceDetailsCorrect;
 	}
@@ -1044,16 +1223,6 @@ public class AccCtrlCreateBean implements Serializable{
 	}
 
 
-	public boolean isEditableResource() {
-		return editableResource;
-	}
-
-
-	public void setEditableResource(boolean editableResource) {
-		this.editableResource = editableResource;
-	}
-
-
 	public List<String> getResourceTypes() {
 		return resourceTypes;
 	}
@@ -1092,6 +1261,23 @@ public class AccCtrlCreateBean implements Serializable{
 	public void setSelectedCtxOperator(OperatorConstants selectedCtxOperator) {
 		this.selectedCtxOperator = selectedCtxOperator;
 	}
+
+
+	public List<String> getSelectedResourceUriIDs() {
+		//this.handleResourceTypeChange();
+
+		return selectedResourceUriIDs;
+	}
+
+
+	public void setSelectedResourceUriIDs(List<String> selectedResourceUriIDs) {
+		this.selectedResourceUriIDs = selectedResourceUriIDs;
+	}
+
+
+
+
+
 
 
 

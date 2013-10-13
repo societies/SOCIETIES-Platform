@@ -11,37 +11,51 @@
 	</ui:define>
 
 	<ui:define name="body">
+		<p:messages id="privacymessages" showDetail="true" autoUpdate="true"
+			closable="true" />
+
 		<div class="hr grid_12 clearfix"></div>
 		<!-- Left Column -->
 		<section id="left_col" class="grid_12">
 			<div class="breadcrumbs">
 				<a href="index.xhtml">Home</a> / <a href="privacysettings.xhtml">Privacy
 					Settings</a> / <a href="privacypreferences.xhtml">Privacy
-					Preferences</a> / <a href="privacy_accCtrl_create.xhtml">Create New Access Control
-					Preference</a>
+					Preferences</a> / <a href="privacy_accCtrl_create.xhtml">Create New
+					Access Control Preference</a>
 			</div>
 
 			<section class="form_style_main">
 
 				<h4 class="form_title">Create new Access Control Preference</h4>
 				<div class="hr grid_12 clearfix"></div>
-				
+
 				<h5>Privacy Preference Details</h5>
-					<h:panelGrid columns="2" cellpadding="5">
-						
-						<h:outputLabel for="requestorId" value="Requestor:"></h:outputLabel>
-						<h:outputText id="requestorId"
-							value="#{AccCtrlcreateBean.preferenceDetails.requestor.requestorId}"></h:outputText>
+				<h:panelGrid columns="2" cellpadding="5">
 
+					<h:outputLabel for="requestorId" value="Requestor:"></h:outputLabel>
+					<h:outputText id="requestorId"
+						value="#{AccCtrlcreateBean.preferenceDetails.requestor.requestorId}"></h:outputText>
+					<h:outputLabel for="specificRequestor" value="For: "></h:outputLabel>
+					<h:outputText id="specificRequestor"
+						value="#{AccCtrlcreateBean.displaySpecificRequestor}" />					
+					<h:outputLabel for="actionDisplayed" value="Action: "></h:outputLabel>
+					<h:outputText id="actionDisplayed"
+						value="#{AccCtrlcreateBean.preferenceDetails.action.actionConstant}"></h:outputText>
+					<h:outputLabel for="resourceIDURI" value="Resource Identifier"></h:outputLabel>
+					<h:outputText id="resourceIDURI"
+						value="#{AccCtrlcreateBean.preferenceDetails.resource.dataIdUri}" />
+					<h:outputLabel for="resourceDataType" value="Resource dataType"></h:outputLabel>
+					<h:outputText id="resourceDataType"
+						value="#{AccCtrlcreateBean.preferenceDetails.resource.dataType}" />
+				</h:panelGrid>
 
-					</h:panelGrid>
-				
 				<p:contextMenu for="treeSingle">
 					<p:menuitem value="View" update="messages"
 						actionListener="#{AccCtrlcreateBean.displaySelectedSingle}"
 						icon="ui-icon-search" />
 					<p:menuitem value="Delete" update="treeSingle"
-						actionListener="#{AccCtrlcreateBean.deleteNode}" icon="ui-icon-close" />
+						actionListener="#{AccCtrlcreateBean.deleteNode}"
+						icon="ui-icon-close" />
 					<p:menuitem value="Add Condition"
 						actionListener="#{AccCtrlcreateBean.startAddConditionProcess}"
 						icon="ui-icon-plus" />
@@ -50,22 +64,25 @@
 						icon="ui-icon-plus" />
 					<p:menuitem value="Add Trust Condition"
 						actionListener="#{AccCtrlcreateBean.startAddTrustConditionProcess}"
-						icon="ui-icon-plus" />						
+						icon="ui-icon-plus" />
 					<p:menuitem value="Add Outcome"
 						actionListener="#{AccCtrlcreateBean.startAddOutcomeProcess}"
 						icon="ui-icon-plus" />
 					<p:menuitem value="Edit" update="treeSingle"
-						actionListener="#{AccCtrlcreateBean.editNode}" icon="ui-icon-pencil" />
+						actionListener="#{AccCtrlcreateBean.editNode}"
+						icon="ui-icon-pencil" />
 
 				</p:contextMenu>
 
 				<h:panelGrid columns="1" cellpadding="5">
-					<p:tree id="treeSingle" value="#{AccCtrlcreateBean.root}" var="node"
-						selectionMode="single" selection="#{AccCtrlcreateBean.selectedNode}"
-						cache="false" dynamic="true" expanded="true">
+					<p:tree id="treeSingle" value="#{AccCtrlcreateBean.root}"
+						var="node" selectionMode="single"
+						selection="#{AccCtrlcreateBean.selectedNode}" cache="false"
+						dynamic="true" expanded="true">
 
 						<p:treeNode>
-							<h:outputText value="#{AccCtrlcreateBean.formatNodeForDisplay(node)}" />
+							<h:outputText
+								value="#{AccCtrlcreateBean.formatNodeForDisplay(node)}" />
 						</p:treeNode>
 					</p:tree>
 				</h:panelGrid>
@@ -73,15 +90,19 @@
 
 			<p:toolbar>
 				<p:toolbarGroup align="left">
-					<p:commandButton type="button" value="Save" icon="ui-icon-disk" onclick="cd.show();" />
-					
+					<p:commandButton type="button" value="Save" icon="ui-icon-disk"
+						onclick="cd.show();" />
 
-					<p:confirmDialog id ="confirmationDialog" widgetVar="cd" global="true" message="Are you sure you want to save this preference permanently?"
-							icon="ui-icon-alert" >
-						<p:commandButton value="Yes"
-							styleClass="ui-confirmdialog-yes" icon="ui-icon-check" oncomplete="cd.hide();" actionListener="#{AccCtrlcreateBean.savePreference}"/>
-						<p:commandButton value="No"
-							styleClass="ui-confirmdialog-no" icon="ui-icon-close" oncomplete="cd.hide();"/>
+
+					<p:confirmDialog id="confirmationDialog" widgetVar="cd"
+						global="true"
+						message="Are you sure you want to save this preference permanently?"
+						icon="ui-icon-alert">
+						<p:commandButton value="Yes" styleClass="ui-confirmdialog-yes"
+							icon="ui-icon-check" oncomplete="cd.hide();"
+							actionListener="#{AccCtrlcreateBean.savePreference}" />
+						<p:commandButton value="No" styleClass="ui-confirmdialog-no"
+							icon="ui-icon-close" oncomplete="cd.hide();" />
 					</p:confirmDialog>
 				</p:toolbarGroup>
 			</p:toolbar>
@@ -94,12 +115,13 @@
 		<p:dialog id="addConditionDialog" header="Add Condition"
 			widgetVar="addConddlg" resizable="false" dynamic="true">
 
-			<h:panelGrid columns="2" cellpadding="5">
+			<h:panelGrid columns="2" cellpadding="5" styleClass="ep_dialogfix">
 
 				<h:outputLabel for="ctxId" value="Condition:" />
-				<h:selectOneMenu id="ctxId" value="#{AccCtrlcreateBean.selectedCtxID}">
-					<f:selectItems value="#{AccCtrlcreateBean.ctxIds}" />
-				</h:selectOneMenu>
+				<p:selectOneMenu id="ctxId"
+					value="#{AccCtrlcreateBean.selectedCtxID}">
+					<f:selectItems value="#{AccCtrlcreateBean.ctxIds}" var="ctxIdCondition" itemValue="#{ctxIdCondition}" itemLabel="#{AccCtrlcreateBean.getCtxTypeFromCtxId(ctxIdCondition)}"/>
+				</p:selectOneMenu>
 
 				<h:outputLabel for="operator" value="Operator: " />
 				<p:selectOneMenu id="operator"
@@ -113,6 +135,7 @@
 
 				<f:facet name="footer">
 					<p:commandButton id="AddConditionButton" value="Add"
+					process="addConditionDialog"
 						oncomplete="#{p:widgetVar('addConditionDialog')}.hide()"
 						update="treeSingle" ajax="true"
 						actionListener="#{AccCtrlcreateBean.addCondition}" />
@@ -143,12 +166,12 @@
 			<h:panelGrid columns="2" cellpadding="5">
 
 				<h:outputLabel for="privacyCondition" value="Privacy Condition:" />
-				<h:selectOneMenu id="privacyCondition"
+				<p:selectOneMenu id="privacyCondition"
 					value="#{AccCtrlcreateBean.selectedPrivacyCondition}">
 					<f:selectItems value="#{AccCtrlcreateBean.privacyConditions}" />
 					<p:ajax update="privacyConditionValue"
 						listener="#{AccCtrlcreateBean.handlePrivacyTypeChange}" />
-				</h:selectOneMenu>
+				</p:selectOneMenu>
 
 				<h:outputLabel for="operatorForPrivacy" value="Operator: " />
 				<p:selectOneMenu id="operatorForPrivacy"
@@ -178,10 +201,10 @@
 			widgetVar="addOutdlg" resizable="false" dynamic="true">
 			<h:panelGrid columns="2" cellpadding="5">
 				<h:outputLabel for="decision" value="Select your action:" />
-				<h:selectOneMenu id="decision"
+				<p:selectOneMenu id="decision"
 					value="#{AccCtrlcreateBean.selectedDecision}">
 					<f:selectItems value="#{AccCtrlcreateBean.decisions}" />
-				</h:selectOneMenu>
+				</p:selectOneMenu>
 				<f:facet name="footer">
 					<p:commandButton id="AddOutcomeButton" value="Add"
 						oncomplete="#{p:widgetVar('addOutcomeDialog')}.hide()"
@@ -193,23 +216,61 @@
 			</h:panelGrid>
 		</p:dialog>
 		<p:dialog id="preferenceDetailsDialog"
-			header="Enter Access Control preference details" widgetVar="prefDetailsDlg"
-			resizable="true" modal="true" closable="false" visible="true">
+			header="Enter Access Control preference details"
+			widgetVar="prefDetailsDlg" resizable="true" modal="true"
+			closable="false" visible="true">
 
-			<h:panelGrid columns="2" cellpadding="5">
+			<h:panelGrid id="prefDialogPanelGrid" columns="2" cellpadding="5">
+
+
 				<h:outputLabel for="requestorId2" value="Requestor JID" />
-				<p:inputText id="requestorId2"
-					value="#{AccCtrlcreateBean.preferenceDetails.requestor.requestorId}"
-					label="Requestor">
-				</p:inputText>
+				<p:selectOneMenu id="requestorId2" process="@this"
+					value="#{AccCtrlcreateBean.preferenceDetails.requestor.requestorId}">
+					<f:selectItems value="#{RequestorsController.cssAdvertisements}"
+						var="cssAdvertisement" itemLabel="#{cssAdvertisement.name}"
+						itemValue="#{cssAdvertisement.id}" />
+					<p:ajax update="requestorCis,requestorService" />
+				</p:selectOneMenu>
 
 
+				<h:outputLabel for="action" value="Action: " />
+				<p:selectOneMenu id="action"
+					value="#{AccCtrlcreateBean.preferenceDetails.action.actionConstant}"
+					required="true">
+					<f:selectItem itemLabel="Read" itemValue="READ" />
+					<f:selectItem itemLabel="Write" itemValue="WRITE" />
+					<f:selectItem itemLabel="Create" itemValue="CREATE" />
+					<f:selectItem itemLabel="Delete" itemValue="DELETE" />
+				</p:selectOneMenu>
 
-				<h:outputLabel for="resource" value="Resource type" />
-				<h:inputText id="resource"
+
+				<h:outputLabel for="dataScheme" value="Resource Scheme:" />
+				<p:selectOneMenu id="dataScheme"
+					process="dataScheme,resourceDataType1"
+					value="#{AccCtrlcreateBean.preferenceDetails.resource.scheme}">
+					<f:selectItems value="#{AccCtrlcreateBean.schemeList}" var="sch" />
+					<p:ajax update="resourceDataType1, resourceURIIDs"
+						listener="#{AccCtrlcreateBean.handleSchemeTypeChange}" />
+				</p:selectOneMenu>
+
+				<h:outputLabel for="resourceDataType1" value="Resource type:" />
+				<p:selectOneMenu id="resourceDataType1"
 					value="#{AccCtrlcreateBean.preferenceDetails.resource.dataType}"
-					label="resource type">
-				</h:inputText>
+					label="value">
+					<f:selectItems value="#{AccCtrlcreateBean.resourceTypes}" var="rdt" />
+					<p:ajax update="resourceURIIDs"
+						listener="#{AccCtrlcreateBean.handleResourceTypeChange}" />
+				</p:selectOneMenu>
+
+
+
+				<h:outputLabel for="resourceURIIDs" value="Resource URI" />
+				<p:selectOneMenu id="resourceURIIDs"
+					value="#{AccCtrlcreateBean.preferenceDetails.resource.dataIdUri}">
+					<f:selectItems value="#{AccCtrlcreateBean.selectedResourceUriIDs}" />
+				</p:selectOneMenu>
+
+
 				<p:outputPanel id="customPanel">
 					<p:selectOneRadio id="customRadio"
 						value="#{AccCtrlcreateBean.requestorType}" layout="custom">
@@ -219,33 +280,76 @@
 					</p:selectOneRadio>
 
 					<h:panelGrid columns="3">
+						<h:outputLabel for="requestorCisSelected" value="CIS" />
 						<p:radioButton id="requestorCisSelected" for="customRadio"
 							itemIndex="0" />
-						<h:outputLabel for="requestorCisSelected" value="CIS" />
-						<p:inputText id="requestorCis"
-							value="#{AccCtrlcreateBean.requestorCis}" />
 
+						<p:selectOneMenu id="requestorCis"
+							value="#{AccCtrlcreateBean.requestorCis}">
+							<f:selectItems
+								value="#{RequestorsController.getCisListByOwner(AccCtrlcreateBean.preferenceDetails.requestor.requestorId)}"
+								var="cisAdvertisement" itemLabel="#{cisAdvertisement.name}"
+								itemValue="#{cisAdvertisement.id}" />
+						</p:selectOneMenu>
+
+
+						<h:outputLabel for="requestorServiceSelected" value="Service" />
 						<p:radioButton id="requestorServiceSelected" for="customRadio"
 							itemIndex="1" />
-						<h:outputLabel for="requestorServiceSelected" value="Service" />
-						<p:inputText id="requestorService"
-							value="#{AccCtrlcreateBean.requestorService}" />
 
-						<p:radioButton id="noneSelected" for="customRadio" itemIndex="2" />
+						<p:selectOneMenu id="requestorService"
+							value="#{AccCtrlcreateBean.requestorService}">
+							<f:selectItems
+								value="#{RequestorsController.getServiceListByOwner(AccCtrlcreateBean.preferenceDetails.requestor.requestorId)}"
+								var="service" itemLabel="#{service.serviceName}"
+								itemValue="#{RequestorsController.getServiceIDAsString(service.serviceIdentifier)}" />
+						</p:selectOneMenu>
+
 						<h:outputLabel for="noneSelected" value="None" />
+						<p:radioButton id="noneSelected" for="customRadio" itemIndex="2" />
 
 					</h:panelGrid>
 
 				</p:outputPanel>
 				<f:facet name="footer">
 					<p:commandButton id="SavePrefDetails" value="Submit"
-						process="preferenceDetailsDialog" update="mainForm:requestorId"
+						process="preferenceDetailsDialog" 
+						update="mainForm:requestorId, mainForm:resourceDataType, mainForm:actionDisplayed, mainForm:resourceIDURI"
 						actionListener="#{AccCtrlcreateBean.savePreferenceDetails}">
 					</p:commandButton>
+
+
+
 				</f:facet>
 			</h:panelGrid>
 
+
+
+			<p:blockUI block="prefDialogPanelGrid"
+				trigger="requestorId2, dataScheme, resourceDataType">
+			Loading ... <br />
+				<p:graphicImage value="/images/ajax-loader.gif" />
+			</p:blockUI>
+
 		</p:dialog>
+		
+					<p:confirmDialog id="prefDetailsConfirmationDialog" widgetVar="pdcd"
+				global="true" width="450"
+				message="There is already an access control preference for the details 
+						you have entered. Do you want to edit the existing preference 
+						or replace it with a new one?"
+				icon="ui-icon-alert">
+
+				<p:commandButton value="Edit the existing one"
+					styleClass="ui-confirmdialog-yes" icon="ui-icon-check"
+					oncomplete="pdcd.hide();"
+					actionListener="#{AccCtrlcreateBean.loadExistingPreference}"
+					update="treeSingle" />
+				<p:commandButton value="Replace it with a new one"
+					styleClass="ui-confirmdialog-no" icon="ui-icon-close"
+					oncomplete="pdcd.hide();" />
+			</p:confirmDialog>
+			
 	</ui:define>
 
 

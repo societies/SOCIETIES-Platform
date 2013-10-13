@@ -413,7 +413,7 @@ public class PrivacyNegotiationTest {
 	 * **************/
 
 	private RequestorService getRequestorService() throws InvalidFormatException, URISyntaxException {
-		IIdentity requestorId = TestCase.commManager.getIdManager().fromJid("red@societies.local");
+		IIdentity requestorId = TestCase.commManager.getIdManager().fromJid("red.societies.local.macs.hw.ac.uk");
 		ServiceResourceIdentifier serviceId = new ServiceResourceIdentifier();
 		serviceId.setServiceInstanceIdentifier("css://red@societies.local/HelloEarth");
 		serviceId.setIdentifier(new URI("css://red@societies.local/HelloEarth"));
@@ -423,7 +423,7 @@ public class PrivacyNegotiationTest {
 	private RequestorCis getRequestorCis() throws InvalidFormatException {
 		IIdentity requestorId = TestCase.commManager.getIdManager().getThisNetworkNode();
 		int randomInt = new Random().nextInt();
-		IIdentity cisId =TestCase.commManager.getIdManager().fromJid("cis-"+randomInt+".societies.local");
+		IIdentity cisId =TestCase.commManager.getIdManager().fromJid("cis-"+randomInt+".societies.local.macs.hw.ac.uk");
 		return new RequestorCis(requestorId, cisId);
 	}
 

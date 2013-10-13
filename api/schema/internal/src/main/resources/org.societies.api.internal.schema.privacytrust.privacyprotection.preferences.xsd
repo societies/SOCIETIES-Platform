@@ -243,6 +243,7 @@
 				maxOccurs="1" />
 			<xs:element name="requestor" type="ns1:requestorBean"
 				minOccurs="1" maxOccurs="1" />
+		<xs:element name="action" type="ns3:action" minOccurs="1" maxOccurs="1"/>				
 		</xs:sequence>
 	</xs:complexType>
 

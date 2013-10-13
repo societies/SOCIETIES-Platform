@@ -31,8 +31,11 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -47,9 +50,14 @@ import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyConditionsConstantValues;
@@ -60,6 +68,7 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
@@ -95,6 +104,9 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 
 	@ManagedProperty(value = "#{privPrefMgr}")
 	private IPrivacyPreferenceManager privPrefmgr;
+
+	@ManagedProperty(value="#{internalCtxBroker}")
+	private ICtxBroker ctxBroker;
 
 	private IIdentity userId;
 
@@ -136,16 +148,16 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 	private List<String> deviceTypes;
 
 	private List<String> activityTypes;
-	
+
 	private List<String> resourceTypes = new ArrayList<String>();
-	
+
 	private List<DataIdentifierScheme> schemeList;
 
-	private boolean editableResource;
-	
-	
-	
-	
+	private PPNPrivacyPreferenceTreeModel existingPpnPreference;
+
+
+
+
 
 	public PPNCreateBean() {
 
@@ -159,10 +171,14 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 		preferenceDetails.getRequestor().setRequestorId("");
 		preferenceDetails.setResource(new Resource());
 		preferenceDetails.getResource().setDataType("");
-		
-		setupDataTypes();
-		this.createCtxAttributeTypesList();
+		preferenceDetails.setAction(new Action());
+
 		this.createSchemeList();
+		this.setupDataTypes();
+		this.createCtxAttributeTypesList();
+		this.selectScheme(this.schemeList.get(0));
+		this.handleSchemeTypeChange();
+		
 		setOperators(Arrays.asList(OperatorConstants.values()));
 		setDecisions(Arrays.asList(Decision.values()));
 		this.setupConditions();
@@ -246,6 +262,25 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 			}
 		}
 
+		if (preferenceDetails.getResource().getDataType()==null){
+			this.logging.debug("Resource dataType is null");
+			preferenceDetailsCorrect = false;
+			FacesMessage message = new FacesMessage("Please select a valid resourceType");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			return;
+		}
+
+		if (preferenceDetails.getAction()==null){
+			this.logging.debug("Action is null");
+			preferenceDetailsCorrect = false;
+			FacesMessage message = new FacesMessage("Please select an action");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			return;
+		}
+		existingPpnPreference = this.privPrefmgr.getPPNPreference(preferenceDetails);
+		if (existingPpnPreference!=null){
+			RequestContext.getCurrentInstance().execute("pdcd.show();");
+		}
 		RequestContext context = RequestContext.getCurrentInstance();
 		context.execute("prefDetailsDlg.hide()");
 		this.logging.debug("Successfully validated preferenceDetails");
@@ -254,6 +289,12 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "PPN preference details set", "Set requestor: "+preferenceDetails.getRequestor().getRequestorId()+
 				"\n, type: "+rType+specific+"\nSet resource: "+preferenceDetails.getResource().getDataType());
 		FacesContext.getCurrentInstance().addMessage(null, message);
+	}
+
+	public void loadExistingPreference(){
+		TreeNode node = new DefaultTreeNode("Root!", null);
+		this.root = ModelTranslator.getPrivacyPreference(this.existingPpnPreference.getRootPreference(), node);
+		printTree();
 	}
 	public TreeNode getSelectedNode() {
 		return selectedNode;
@@ -817,6 +858,16 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 	}
 
 
+	public ICtxBroker getCtxBroker() {
+		return ctxBroker;
+	}
+
+
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		this.ctxBroker = ctxBroker;
+	}
+
+
 	public String getDisplaySpecificRequestor() {
 		if (this.preferenceDetails.getRequestor() instanceof RequestorCisBean){
 			displaySpecificRequestor = "Cis: "+((RequestorCisBean) this.preferenceDetails.getRequestor()).getCisRequestorId();
@@ -838,47 +889,61 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 	/**
 	 * utility methods
 	 */
-	
+
 	private void createSchemeList() {
 		this.schemeList = new ArrayList<DataIdentifierScheme>();
-		DataIdentifierScheme[] fields = DataIdentifierScheme.values();
-		
-		ArrayList<String> tempNames = new ArrayList<String>();
-		for (int i=0; i<fields.length; i++){
-			if (!fields[i].name().equalsIgnoreCase("CSS"))
-				this.schemeList.add(fields[i]);
-		}
-		
-		
+
+		this.schemeList.add(DataIdentifierScheme.CONTEXT);
+		this.schemeList.add(DataIdentifierScheme.CIS);
+		this.schemeList.add(DataIdentifierScheme.DEVICE);
+		this.schemeList.add(DataIdentifierScheme.ACTIVITY);
+
+
 	}
 
 	private void createCtxAttributeTypesList() {
-		this.contextTypes = new ArrayList<String>();
-		Field[] fields = CtxAttributeTypes.class.getDeclaredFields();
-		
-		String[] names = new String[fields.length];
-		
-		for (int i=0; i<names.length; i++){
-			names[i] = fields[i].getName();
-			
-			
+		try{
+			this.contextTypes = new ArrayList<String>();
+			IndividualCtxEntity individualCtxEntity = this.ctxBroker.retrieveIndividualEntity(userId).get();
+			Set<CtxAttribute> attributes = individualCtxEntity.getAttributes();
+
+			Iterator<CtxAttribute> iterator = attributes.iterator();
+			this.contextTypes.clear();
+			while(iterator.hasNext()){
+
+				String ctxType = iterator.next().getType();
+
+				if (!this.contextTypes.contains(ctxType)){
+					this.logging.debug("Adding new context type: "+ctxType);
+					this.contextTypes.add(ctxType);
+				}
+			}
+			this.logging.debug("Found "+this.contextTypes.size()+" context attributes");
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		this.contextTypes = Arrays.asList(names);
-		
 	}
-	
+
 	private void setupDataTypes() {
 		this.cisTypes = new ArrayList<String>();
 		this.cisTypes.add("cis-member-list");
 		this.cisTypes.add("cis-list");
-		
+
 		this.deviceTypes = new ArrayList<String>();
 		this.deviceTypes.add("meta-data");
-		
+
 		this.activityTypes = new ArrayList<String>();
 		this.activityTypes.add("activityfeed");
-		
-		
+
+
 	}
 
 
@@ -888,35 +953,35 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 			this.logging.debug("handleSchemeTypeChange: selected scheme is null");
 			return;
 		}
-		
+		selectScheme(scheme);
+	}
+
+	private void selectScheme(DataIdentifierScheme scheme){
 		switch (scheme)
 		{
 		case ACTIVITY: 
 			this.resourceTypes = this.activityTypes;
-			this.editableResource = false;
+
 			break;
 		case CIS: 
 			this.resourceTypes = this.cisTypes;
-			this.editableResource = false;
+
 			break;
 		case CONTEXT:
 			this.resourceTypes = this.contextTypes;
-			this.editableResource = true;
+
 			break;
-		case CSS: 
-			this.resourceTypes = new ArrayList<String>();
-			this.editableResource = true;
-			break;
+
 		case DEVICE:
 			this.resourceTypes = this.deviceTypes;
-			this.editableResource = false;
+
 			break;
-		case SOCIALPROVIDER: 
+		default: 
 			this.resourceTypes = new ArrayList<String>();
-			this.editableResource = true;
 			break;
 		}
 	}
+
 	public List<String> getContextTypes() {
 		return contextTypes;
 	}
@@ -965,17 +1030,6 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 	public void setActivityTypes(List<String> activityTypes) {
 		this.activityTypes = activityTypes;
 	}
-
-
-	public boolean isEditableResource() {
-		return editableResource;
-	}
-
-
-	public void setEditableResource(boolean editableResource) {
-		this.editableResource = editableResource;
-	}
-
 
 	public List<String> getResourceTypes() {
 		return resourceTypes;

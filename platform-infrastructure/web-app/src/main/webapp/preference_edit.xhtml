@@ -125,10 +125,10 @@
 			<h:panelGrid columns="2" cellpadding="5">
 
 				<h:outputLabel for="ctxId" value="Condition:" />
-				<h:selectOneMenu id="ctxId"
+				<p:selectOneMenu id="ctxId"
 					value="#{PreferenceEditBean.selectedCtxID}">
 					<f:selectItems value="#{PreferenceEditBean.ctxIds}" />
-				</h:selectOneMenu>
+				</p:selectOneMenu>
 
 				<h:outputLabel for="operator" value="Operator: " />
 				<p:selectOneMenu id="operator"
@@ -159,10 +159,10 @@
 
 				<h:outputLabel for="action"
 					value="Enter a value for #{PreferenceEditBean.preferenceDetails.preferenceName}" />
-				<h:selectOneMenu id="action"
+				<p:selectOneMenu id="action"
 					value="#{PreferenceEditBean.selectedAction}">
 					<f:selectItems value="#{PreferenceEditBean.existingActionValues}" />
-				</h:selectOneMenu>
+				</p:selectOneMenu>
 				<h:outputText for="proactive" value="Proactive: " />
 				<p:selectBooleanButton id="proactive" value="#{PreferenceEditBean.proactive}"
 					onLabel="Yes" offLabel="No" onIcon="ui-icon-check"

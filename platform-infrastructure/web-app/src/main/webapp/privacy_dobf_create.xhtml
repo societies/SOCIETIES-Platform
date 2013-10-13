@@ -11,68 +11,69 @@
 	</ui:define>
 
 	<ui:define name="body">
+		<p:messages id="dobfmessages" showDetail="true" autoUpdate="true" closable="true" />
 		<div class="hr grid_12 clearfix"></div>
 		<!-- Left Column -->
 		<section id="left_col" class="grid_12">
 			<div class="breadcrumbs">
 				<a href="index.xhtml">Home</a> / <a href="privacysettings.xhtml">Privacy
 					Settings</a> / <a href="privacypreferences.xhtml">Privacy
-					Preferences</a> / <a href="privacy_ppn_create.xhtml">Create New PPN
-					Preference</a>
+					Preferences</a> / <a href="privacy_dobf_create.xhtml">Create New
+					Data Obfuscation Preference</a>
 			</div>
 
 			<section class="form_style_main">
 
-				<h4 class="form_title">Create new Privacy Policy Negotiation
-					Preference</h4>
+				<h4 class="form_title">Create new Data Obfuscation Preference</h4>
 				<div class="hr grid_12 clearfix"></div>
 
 				<h5>Privacy Preference Details</h5>
 				<h:panelGrid columns="2" cellpadding="5">
 
-
 					<h:outputLabel for="requestorId" value="Requestor:"></h:outputLabel>
 					<h:outputText id="requestorId"
-						value="#{PPNcreateBean.preferenceDetails.requestor.requestorId}"></h:outputText>
+						value="#{dobfcreateBean.preferenceDetails.requestor.requestorId}"></h:outputText>
 					<h:outputLabel for="specificRequestor" value="For: "></h:outputLabel>
 					<h:outputText id="specificRequestor"
-						value="#{PPNcreateBean.displaySpecificRequestor}" />
-					<h:outputLabel for="actionDisplayed" value="Action: "></h:outputLabel>
-					<h:outputText id="actionDisplayed"
-						value="#{PPNcreateBean.preferenceDetails.action.actionConstant}"></h:outputText>
-					<h:outputLabel for="resourceType" value="Resource: " />
+						value="#{dobfcreateBean.displaySpecificRequestor}" />
+					<h:outputLabel for="resourceType" value="Resource Type: " />
 					<h:outputText id="resourceType"
-						value="#{PPNcreateBean.preferenceDetails.resource.dataType}" />
+						value="#{dobfcreateBean.preferenceDetails.resource.dataType}" />
+
 
 				</h:panelGrid>
 
 				<p:contextMenu for="treeSingle">
 					<p:menuitem value="View" update="messages"
-						actionListener="#{PPNcreateBean.displaySelectedSingle}"
+						actionListener="#{dobfcreateBean.displaySelectedSingle}"
 						icon="ui-icon-search" />
 					<p:menuitem value="Delete" update="treeSingle"
-						actionListener="#{PPNcreateBean.deleteNode}" icon="ui-icon-close" />
+						actionListener="#{dobfcreateBean.deleteNode}" icon="ui-icon-close" />
+					<p:menuitem value="Add Condition"
+						actionListener="#{dobfcreateBean.startAddConditionProcess}"
+						icon="ui-icon-plus" />
 					<p:menuitem value="Add Privacy Condition"
-						actionListener="#{PPNcreateBean.startAddPrivacyConditionProcess}"
+						actionListener="#{dobfcreateBean.startAddPrivacyConditionProcess}"
 						icon="ui-icon-plus" />
 					<p:menuitem value="Add Trust Condition"
-						actionListener="#{PPNcreateBean.startAddTrustConditionProcess}"
+						actionListener="#{dobfcreateBean.startAddTrustConditionProcess}"
 						icon="ui-icon-plus" />
 					<p:menuitem value="Add Outcome"
-						actionListener="#{PPNcreateBean.startAddOutcomeProcess}"
+						actionListener="#{dobfcreateBean.startAddOutcomeProcess}"
 						icon="ui-icon-plus" />
 					<p:menuitem value="Edit" update="treeSingle"
-						actionListener="#{PPNcreateBean.editNode}" icon="ui-icon-pencil" />
+						actionListener="#{dobfcreateBean.editNode}" icon="ui-icon-pencil" />
 
 				</p:contextMenu>
 
 				<h:panelGrid columns="1" cellpadding="5">
-					<p:tree id="treeSingle" value="#{PPNcreateBean.root}" var="node"
-						selectionMode="single" selection="#{PPNcreateBean.selectedNode}"
+					<p:tree id="treeSingle" value="#{dobfcreateBean.root}" var="node"
+						selectionMode="single" selection="#{dobfcreateBean.selectedNode}"
 						cache="false" dynamic="true" expanded="true">
 
 						<p:treeNode>
-							<h:outputText value="#{PPNcreateBean.formatNodeForDisplay(node)}" />
+							<h:outputText
+								value="#{dobfcreateBean.formatNodeForDisplay(node)}" />
 						</p:treeNode>
 					</p:tree>
 				</h:panelGrid>
@@ -90,7 +91,7 @@
 						icon="ui-icon-alert">
 						<p:commandButton value="Yes" styleClass="ui-confirmdialog-yes"
 							icon="ui-icon-check" oncomplete="cd.hide();"
-							actionListener="#{PPNcreateBean.savePreference}" />
+							actionListener="#{dobfcreateBean.savePreference}" />
 						<p:commandButton value="No" styleClass="ui-confirmdialog-no"
 							icon="ui-icon-close" oncomplete="cd.hide();" />
 					</p:confirmDialog>
@@ -101,16 +102,48 @@
 
 		<div class="hr grid_12 clearfix"></div>
 
+
+		<p:dialog id="addConditionDialog" header="Add Condition"
+			widgetVar="addConddlg" resizable="false" dynamic="true">
+
+			<h:panelGrid columns="2" cellpadding="5">
+
+				<h:outputLabel for="ctxId" value="Condition:" />
+				<p:selectOneMenu id="ctxId" value="#{dobfcreateBean.selectedCtxID}">
+					<f:selectItems value="#{dobfcreateBean.ctxIds}" />
+				</p:selectOneMenu>
+
+				<h:outputLabel for="operator" value="Operator: " />
+				<p:selectOneMenu id="operator"
+					value="#{dobfcreateBean.selectedCtxOperator}">
+					<f:selectItems value="#{dobfcreateBean.operators}" />
+				</p:selectOneMenu>
+				<h:outputLabel for="ctxValue" value="Value:" />
+				<p:inputText id="ctxValue" value="#{dobfcreateBean.ctxValue}"
+					label="value">
+				</p:inputText>
+
+				<f:facet name="footer">
+					<p:commandButton id="AddConditionButton" value="Add"
+						oncomplete="#{p:widgetVar('addConditionDialog')}.hide()"
+						update="treeSingle" ajax="true"
+						actionListener="#{dobfcreateBean.addCondition}" />
+				</f:facet>
+
+			</h:panelGrid>
+
+		</p:dialog>
+
 		<p:dialog id="addTrustConditionDialog" header="Add Trust Condition"
 			widgetVar="addTrustConddlg" resizable="false" dynamic="true">
 
-			<p:inputText id="trustValue" value="#{PPNcreateBean.trustValue}" />
+			<p:inputText id="trustValue" value="#{dobfcreateBean.trustValue}" />
 			<p:slider for="trustValue" />
 			<f:facet name="footer">
 				<p:commandButton id="AddTrustConditionButton" value="Add"
 					oncomplete="#{p:widgetVar('addTrustConditionDialog')}.hide()"
 					update="treeSingle" ajax="true"
-					actionListener="#{PPNcreateBean.addTrustCondition}" />
+					actionListener="#{dobfcreateBean.addTrustCondition}" />
 			</f:facet>
 
 		</p:dialog>
@@ -123,98 +156,95 @@
 
 				<h:outputLabel for="privacyCondition" value="Privacy Condition:" />
 				<p:selectOneMenu id="privacyCondition"
-					value="#{PPNcreateBean.selectedPrivacyCondition}">
-					<f:selectItems value="#{PPNcreateBean.privacyConditions}" />
+					value="#{dobfcreateBean.selectedPrivacyCondition}">
+					<f:selectItems value="#{dobfcreateBean.privacyConditions}" />
 					<p:ajax update="privacyConditionValue"
-						listener="#{PPNcreateBean.handlePrivacyTypeChange}" />
+						listener="#{dobfcreateBean.handlePrivacyTypeChange}" />
 				</p:selectOneMenu>
 
-				<h:outputLabel for="operator" value="Operator: " />
-				<p:selectOneMenu id="operator"
-					value="#{PPNcreateBean.selectedOperator}">
-					<f:selectItems value="#{PPNcreateBean.operators}" />
+				<h:outputLabel for="operatorForPrivacy" value="Operator: " />
+				<p:selectOneMenu id="operatorForPrivacy"
+					value="#{dobfcreateBean.selectedOperator}">
+					<f:selectItems value="#{dobfcreateBean.operators}" />
 
 				</p:selectOneMenu>
 
 				<h:outputLabel for="privacyConditionValue" value="Value:" />
 				<p:selectOneMenu id="privacyConditionValue"
-					value="#{PPNcreateBean.selectedPrivacyValue}" label="value">
-					<f:selectItems value="#{PPNcreateBean.privacyValues}" />
+					value="#{dobfcreateBean.selectedPrivacyValue}" label="value">
+					<f:selectItems value="#{dobfcreateBean.privacyValues}" />
 				</p:selectOneMenu>
 
 				<f:facet name="footer">
 					<p:commandButton id="AddPrivacyConditionButton" value="Add"
 						oncomplete="#{p:widgetVar('addPrivacyConditionDialog')}.hide()"
 						update="treeSingle" ajax="true"
-						actionListener="#{PPNcreateBean.addPrivacyCondition}" />
+						actionListener="#{dobfcreateBean.addPrivacyCondition}" />
 				</f:facet>
 
 			</h:panelGrid>
 		</p:dialog>
 
 
-
-
-
+		<!-- TODO FOR OLIVIER: This is the obfuscation GUI.   DataType is in #{dobfcreateBean.preferenceDetails.resource.dataType} and the input value should be placed in #{dobfcreateBean.obfuscationLevel}-->
 		<p:dialog id="addOutcomeDialog" header="Add Outcome"
 			widgetVar="addOutdlg" resizable="false" dynamic="true">
+
 			<h:panelGrid columns="2" cellpadding="5">
-				<h:outputLabel for="decision" value="Select your action:" />
-				<p:selectOneMenu id="decision"
-					value="#{PPNcreateBean.selectedDecision}">
-					<f:selectItems value="#{PPNcreateBean.decisions}" />
-				</p:selectOneMenu>
+
+				<h:outputLabel for="obfuscationLevel"
+					value="Enter Obfuscation level for #{dobfcreateBean.preferenceDetails.resource.dataType}" />
+				<h:inputHidden id="obfuscationLevel"
+					value="#{dobfcreateBean.obfuscationLevel}" />
+				<p:slider for="txt2" display="output" style="width:200px"
+					displayTemplate="Set ratio to %{value}" />
+
 				<f:facet name="footer">
 					<p:commandButton id="AddOutcomeButton" value="Add"
 						oncomplete="#{p:widgetVar('addOutcomeDialog')}.hide()"
 						update="treeSingle" ajax="true"
-						actionListener="#{PPNcreateBean.addOutcome}" />
+						actionListener="#{dobfcreateBean.addOutcome}" />
 				</f:facet>
-
 
 			</h:panelGrid>
 		</p:dialog>
+
+
+
 		<p:dialog id="preferenceDetailsDialog"
-			header="Enter PPN preference details" widgetVar="prefDetailsDlg"
-			resizable="true" modal="true" closable="false" visible="true">
+			header="Enter Data Obfuscation preference details"
+			widgetVar="prefDetailsDlg" resizable="true" modal="true"
+			closable="false" visible="true">
 
 			<h:panelGrid columns="2" cellpadding="5">
 				<h:outputLabel for="requestorId2" value="Requestor JID" />
-				<p:selectOneMenu id="requestorId2" process="@this"
-					value="#{PPNcreateBean.preferenceDetails.requestor.requestorId}">
+
+				<p:selectOneMenu id="requestorId2"
+					value="#{dobfcreateBean.preferenceDetails.requestor.requestorId}">
 					<f:selectItems value="#{RequestorsController.cssAdvertisements}"
 						var="cssAdvertisement" itemLabel="#{cssAdvertisement.name}"
 						itemValue="#{cssAdvertisement.id}" />
 					<p:ajax update="requestorCis,requestorService" />
 				</p:selectOneMenu>
-				<h:outputLabel for="action" value="Action: " />
-				<p:selectOneMenu id="action"
-					value="#{PPNcreateBean.preferenceDetails.action.actionConstant}">
-					<f:selectItem itemLabel="Read" itemValue="READ" />
-					<f:selectItem itemLabel="Write" itemValue="WRITE" />
-					<f:selectItem itemLabel="Create" itemValue="CREATE" />
-					<f:selectItem itemLabel="Delete" itemValue="DELETE" />
-				</p:selectOneMenu>
 
-				<h:outputLabel for="dataScheme" value="Resource Scheme:" />
-				<p:selectOneMenu id="dataScheme" process="@this"  required="true"
-					value="#{PPNcreateBean.preferenceDetails.resource.scheme}">
-					<f:selectItems value="#{PPNcreateBean.schemeList}" />
-					<p:ajax update="resourceDataType1"
-						listener="#{PPNcreateBean.handleSchemeTypeChange}" />
-				</p:selectOneMenu>
 
-				<h:outputLabel for="resourceDataType1" value="Resource type:" />
-				<p:selectOneMenu id="resourceDataType1" immediate="true" required="true"
-					value="#{PPNcreateBean.preferenceDetails.resource.dataType}"
-					label="value">
-					<f:selectItems value="#{PPNcreateBean.resourceTypes}" />
-				</p:selectOneMenu>
 
+				<h:outputLabel for="resource" value="Resource type" />
+				<p:selectOneMenu id="resource"
+					value="#{dobfcreateBean.preferenceDetails.resource.dataType}">
+					<f:selectItem itemLabel="Name" itemValue="NAME" />
+					<f:selectItem itemLabel="Location Coordinates"
+						itemValue="LOCATION_COORDINATES" />
+					<f:selectItem itemLabel="Status" itemValue="STATUS" />
+					<f:selectItem itemLabel="Temperature" itemValue="TEMPERATURE" />
+					<f:selectItem itemLabel="Activity" itemValue="ACTION" />
+					<f:selectItem itemLabel="Postal Address"
+						itemValue="ADDRESS_HOME_CITY" />
+				</p:selectOneMenu>
 
 				<p:outputPanel id="customPanel">
 					<p:selectOneRadio id="customRadio"
-						value="#{PPNcreateBean.requestorType}" layout="custom">
+						value="#{dobfcreateBean.requestorType}" layout="custom">
 						<f:selectItem itemLabel="Option 1" itemValue="0" />
 						<f:selectItem itemLabel="Option 2" itemValue="1" />
 						<f:selectItem itemLabel="Option 3" itemValue="2" />
@@ -226,9 +256,9 @@
 							itemIndex="0" />
 
 						<p:selectOneMenu id="requestorCis"
-							value="#{PPNcreateBean.requestorCis}">
+							value="#{dobfcreateBean.requestorCis}">
 							<f:selectItems
-								value="#{RequestorsController.getCisListByOwner(PPNcreateBean.preferenceDetails.requestor.requestorId)}"
+								value="#{RequestorsController.getCisListByOwner(dobfcreateBean.preferenceDetails.requestor.requestorId)}"
 								var="cisAdvertisement" itemLabel="#{cisAdvertisement.name}"
 								itemValue="#{cisAdvertisement.id}" />
 						</p:selectOneMenu>
@@ -239,42 +269,41 @@
 							itemIndex="1" />
 
 						<p:selectOneMenu id="requestorService"
-							value="#{PPNcreateBean.requestorService}">
+							value="#{dobfcreateBean.requestorService}">
 							<f:selectItems
-								value="#{RequestorsController.getServiceListByOwner(PPNcreateBean.preferenceDetails.requestor.requestorId)}"
+								value="#{RequestorsController.getServiceListByOwner(dobfcreateBean.preferenceDetails.requestor.requestorId)}"
 								var="service" itemLabel="#{service.serviceName}"
 								itemValue="#{RequestorsController.getServiceIDAsString(service.serviceIdentifier)}" />
 						</p:selectOneMenu>
 
 						<p:radioButton id="noneSelected" for="customRadio" itemIndex="2" />
 						<h:outputLabel for="noneSelected" value="None" />
+
 					</h:panelGrid>
 
 				</p:outputPanel>
 				<f:facet name="footer">
 					<p:commandButton id="SavePrefDetails" value="Submit"
 						process="preferenceDetailsDialog"
-						update="mainForm:requestorId,mainForm:specificRequestor, mainForm:resourceType"
-						actionListener="#{PPNcreateBean.savePreferenceDetails}">
+						update="mainForm:requestorId, mainForm:specificRequestor, mainForm:resourceType"
+						actionListener="#{dobfcreateBean.savePreferenceDetails}">
 					</p:commandButton>
 
-					<p:confirmDialog id="prefDetailsConfirmationDialog"
-						widgetVar="pdcd" global="true"
-						message="There is already a privacy policy negotiation preference for the details you have entered. Do you want to edit the existing preference or replace it with a new one?"
+					<p:confirmDialog id="prefDetailsConfirmationDialog" widgetVar="pdcd"
+						global="true"
+						message="There is already a data obfuscation preference for the details you have entered. Do you want to edit the existing preference or replace it with a new one?"
 						icon="ui-icon-alert">
-						<p:commandButton value="Edit the existing one"
-							styleClass="ui-confirmdialog-yes" icon="ui-icon-check"
-							oncomplete="pdcd.hide();"
-							actionListener="#{PPNcreateBean.loadExistingPreference}"
-							update="treeSingle" />
-						<p:commandButton value="Replace it with a new one"
-							styleClass="ui-confirmdialog-no" icon="ui-icon-close"
-							oncomplete="pdcd.hide();" />
+						<p:commandButton value="Edit the existing one" styleClass="ui-confirmdialog-yes"
+							icon="ui-icon-check" oncomplete="pdcd.hide();"
+							actionListener="#{dobfcreateBean.loadExistingPreference}" update="treeSingle"/>
+						<p:commandButton value="Replace it with a new one" styleClass="ui-confirmdialog-no"
+							icon="ui-icon-close" oncomplete="pdcd.hide();" />
 					</p:confirmDialog>
 				</f:facet>
 			</h:panelGrid>
 
 		</p:dialog>
+
 	</ui:define>
 
 

@@ -620,6 +620,15 @@ public class PrivacyPreferenceUtils {
 		} else if (!RequestorUtils.equals(bean1.getRequestor(), other.getRequestor())){
 			return false;
 		}
+		
+		if (bean1.getAction() == null){
+			if (other.getAction()!=null){
+				return false;
+			}
+		}else if (!ActionUtils.equals(bean1.getAction(), other.getAction())){
+			return false;
+		}
+		
 		if (bean1.getResource() == null) {
 			if (other.getResource() != null) {
 				return false;

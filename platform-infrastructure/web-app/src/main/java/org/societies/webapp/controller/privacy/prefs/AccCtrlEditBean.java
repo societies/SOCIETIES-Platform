@@ -56,6 +56,7 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
@@ -64,6 +65,7 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.preferen
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PrivacyOutcomeConstantsBean;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyConditionsConstantValues;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
 import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
@@ -90,7 +92,7 @@ import org.societies.webapp.service.PrivacyUtilService;
  *
  */
 @ViewScoped
-@ManagedBean(name="AccCtrleditBean")
+@ManagedBean(name="accCtrleditBean")
 public class AccCtrlEditBean implements Serializable{
 
 	private final Logger logging = LoggerFactory.getLogger(getClass());
@@ -142,7 +144,7 @@ public class AccCtrlEditBean implements Serializable{
 	
 	private ConditionConstants selectedPrivacyCondition;
 	private Map<ConditionConstants,ConditionConstants> privacyConditions;
-
+	private String displaySpecificRequestor;
 	private String selectedPrivacyValue;
 	private Map<String, String> privacyValues;
 
@@ -159,8 +161,6 @@ public class AccCtrlEditBean implements Serializable{
 	private List<String> activityTypes;
 
 	private List<String> resourceTypes;
-
-	private boolean editableResource; 
 	
 	private String accCtrlDetailUUID;
 	
@@ -191,7 +191,7 @@ public class AccCtrlEditBean implements Serializable{
 		setOperators(Arrays.asList(OperatorConstants.values()));
 		setDecisions(Arrays.asList(PrivacyOutcomeConstantsBean.values()));
 		this.setupConditions();
-		
+		this.selectScheme(this.schemeList.get(0));
 		Map<String, String> requestParameterMap = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
 		this.logging.debug("\n\n\n\n\n\n\n\n\n\n");
 		Iterator<String> iterator = requestParameterMap.keySet().iterator();
@@ -248,18 +248,16 @@ public class AccCtrlEditBean implements Serializable{
 
 		ConditionConstants cc = this.privacyConditionData.keySet().iterator().next();
 		this.setPrivacyValues(this.privacyConditionData.get(cc));
-		this.selectScheme(this.schemeList.get(0));
+		
 	}
 	
 	private void createSchemeList() {
 		this.schemeList = new ArrayList<DataIdentifierScheme>();
-		DataIdentifierScheme[] fields = DataIdentifierScheme.values();
 		
-		for (int i=0; i<fields.length; i++){
-			if (!fields[i].name().equalsIgnoreCase("CSS"))
-				this.schemeList.add(fields[i]);
-		}
-		
+		this.schemeList.add(DataIdentifierScheme.CONTEXT);
+		this.schemeList.add(DataIdentifierScheme.CIS);
+		this.schemeList.add(DataIdentifierScheme.DEVICE);
+		this.schemeList.add(DataIdentifierScheme.ACTIVITY);
 		
 	}
 	
@@ -342,6 +340,23 @@ public class AccCtrlEditBean implements Serializable{
 			}
 		}
 
+		if (preferenceDetails.getResource().getDataType()==null){
+			this.logging.debug("Resource dataType is null");
+			preferenceDetailsCorrect = false;
+			FacesMessage message = new FacesMessage("Resource dataType is null");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			return;
+		}
+		
+		
+		if (this.getAttributeByDataType()==null){
+			this.logging.debug("DataType: "+this.preferenceDetails.getResource().getDataType()+" does not exist in context.");
+			preferenceDetailsCorrect = false;
+			FacesMessage message = new FacesMessage("Datatype: "+this.preferenceDetails.getResource().getDataType()+" does not exist in your context. Please select another resource type.");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			return;
+		}
+		
 		RequestContext context = RequestContext.getCurrentInstance();
 		context.execute("prefDetailsDlg.hide()");
 		this.logging.debug("Successfully validated preferenceDetails");
@@ -409,6 +424,22 @@ public class AccCtrlEditBean implements Serializable{
 		}
 
 	}
+	public String getDisplaySpecificRequestor() {
+		if (this.preferenceDetails.getRequestor() instanceof RequestorCisBean){
+			displaySpecificRequestor = "Cis: "+((RequestorCisBean) this.preferenceDetails.getRequestor()).getCisRequestorId();
+		}else if (this.preferenceDetails.getRequestor() instanceof RequestorServiceBean){
+			displaySpecificRequestor = "Service: "+ ServiceModelUtils.serviceResourceIdentifierToString(((RequestorServiceBean) this.preferenceDetails.getRequestor()).getRequestorServiceId());
+		}else {
+			displaySpecificRequestor = "None";
+		}
+		return displaySpecificRequestor;
+	}
+
+
+	public void setDisplaySpecificRequestor(String displaySpecificRequestor) {
+		this.displaySpecificRequestor = displaySpecificRequestor;
+	}
+
 
 
 	public void startAddConditionProcess(){
@@ -910,27 +941,20 @@ public class AccCtrlEditBean implements Serializable{
 		{
 		case ACTIVITY: 
 			this.resourceTypes = this.activityTypes;
-			this.editableResource = false;
+			
 			break;
 		case CIS: 
 			this.resourceTypes = this.cisTypes;
-			this.editableResource = false;
 			break;
 		case CONTEXT:
 			this.resourceTypes = this.contextTypes;
-			this.editableResource = true;
+			
 			break;
-		case CSS: 
-			this.resourceTypes = new ArrayList<String>();
-			this.editableResource = true;
-			break;
+
 		case DEVICE:
 			this.resourceTypes = this.deviceTypes;
-			this.editableResource = false;
-			break;
-		case SOCIALPROVIDER: 
-			this.resourceTypes = new ArrayList<String>();
-			this.editableResource = true;
+			
+			
 			break;
 		}		
 	}
@@ -945,7 +969,37 @@ public class AccCtrlEditBean implements Serializable{
 		return preferenceDetailsCorrect;
 	}
 
-
+	/**
+	 * helper methods
+	 */
+	
+	private CtxAttributeIdentifier getAttributeByDataType(){
+		if (this.preferenceDetails.getResource().getDataType()==null){
+			return  null;
+		}
+		
+		try {
+			List<CtxIdentifier> list = this.ctxBroker.lookup(this.commMgr.getIdManager().getThisNetworkNode(), CtxModelType.ATTRIBUTE, this.preferenceDetails.getResource().getDataType()).get();
+			if (list!=null){
+				if (list.size()>0){
+					
+					this.preferenceDetails.setResource(ResourceUtils.create(list.get(0)));
+					return (CtxAttributeIdentifier) list.get(0);
+				}
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
 
 	public void setPreferenceDetailsCorrect(boolean preferenceDetailsCorrect) {
 		this.preferenceDetailsCorrect = preferenceDetailsCorrect;
@@ -1085,15 +1139,6 @@ public class AccCtrlEditBean implements Serializable{
 		this.activityTypes = activityTypes;
 	}
 
-
-	public boolean isEditableResource() {
-		return editableResource;
-	}
-
-
-	public void setEditableResource(boolean editableResource) {
-		this.editableResource = editableResource;
-	}
 
 
 	public List<String> getResourceTypes() {
