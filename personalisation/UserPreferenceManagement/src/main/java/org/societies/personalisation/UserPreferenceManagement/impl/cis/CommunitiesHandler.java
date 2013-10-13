@@ -35,6 +35,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -69,6 +71,8 @@ import org.societies.personalisation.preference.api.model.util.PreferenceUtils;
  */
 public class CommunitiesHandler {
 
+	private Logger logging = LoggerFactory.getLogger(this.getClass());
+
 	private final ICommunityPreferenceManager communityPrefMgr;
 	private final ICisManager cisManager;
 	private final ICommManager commsMgr;
@@ -80,7 +84,6 @@ public class CommunitiesHandler {
 	private final IUserFeedback userFeedback;
 	private final UserPreferenceConditionMonitor pcm;
 
-	//TODO: add CisManager, serviceDiscovery dependencies in bundle 
 	public CommunitiesHandler(UserPreferenceConditionMonitor pcm) {
 		//TODO: need to check the timers
 		this.pcm = pcm;
@@ -106,10 +109,10 @@ public class CommunitiesHandler {
 		downloadTimerTask.setDone(false);
 		downloadTimer.schedule(downloadTimerTask, date);
 		return downloadTimerTask;
-		
+
 
 	}
-	
+
 	public UploaderTask scheduleUpload(Date date){
 		Timer uploadTimer = new Timer();
 		UploaderTask uploadTimerTask = new UploaderTask();
@@ -134,7 +137,7 @@ public class CommunitiesHandler {
 
 		Timer uploadTimer = new Timer();
 
-		
+
 		Calendar uploadCalendar = Calendar.getInstance();
 
 		uploadCalendar.set(Calendar.HOUR, 23);
@@ -146,24 +149,32 @@ public class CommunitiesHandler {
 		uploadTimerTask.setDone(false);
 		uploadTimer.schedule(uploadTimerTask, uploadCalendar.getTime());
 	}
-	
-	
+
+
 	public class UploaderTask extends TimerTask{
+		private Logger logging = LoggerFactory.getLogger(this.getClass());
 
 		private boolean done = false;
 
+		private List<String> list;
+
 		@Override
 		public void run() {
-			
+			this.logging.debug("Scheduled run");
 			IIdentity userId = getIdManager().getThisNetworkNode();
 			List<ICis> cisList = cisManager.getCisList();
+			if(this.logging.isDebugEnabled()){
+				this.logging.debug("Processing: "+cisList.size()+" CISs");
+			}
 			for (ICis cis: cisList){
 				try {
 
 					IIdentity cisId = getIdManager().fromJid(cis.getCisId());
+
 					List<Service> services = serviceDiscovery.getServices(cisId).get();
 
 					List<PreferenceDetails> matchingDetails = findRelevantPreferences(services, userPrefMgr.getPreferenceDetailsForAllPreferences());
+					this.logging.debug("Found relevant matching details: "+matchingDetails.size());
 					List<PreferenceDetails> allowedToUpload = new ArrayList<PreferenceDetails>();
 					List<PreferenceDetails> toBeChecked = new ArrayList<PreferenceDetails>();
 					for (PreferenceDetails prefDetail : matchingDetails){
@@ -190,15 +201,17 @@ public class CommunitiesHandler {
 						}
 					}
 
+					this.logging.debug("Uploading: "+models.size()+" preferences to CIS: "+cisId);
 					communityPrefMgr.uploadUserPreferences(cisId, models);
 
+					if (toBeChecked.size()>0){
+						String[] userFriendlyListofDetails = getUserFriendlyListofDetails(toBeChecked, FeedbackType.UPLOAD);
 
-					String[] userFriendlyListofDetails = getUserFriendlyListofDetails(toBeChecked, FeedbackType.UPLOAD);
 
-					
-					userFeedback.getExplicitFBAsync(ExpProposalType.CHECKBOXLIST, new ExpProposalContent("Please select which of these preferences you want to upload to the CIS anonymously", userFriendlyListofDetails), new DownloadFeedbackListenerCallBack(uploadTempTable, pcm, FeedbackType.UPLOAD)).get();
+						list = userFeedback.getExplicitFBAsync(ExpProposalType.CHECKBOXLIST, new ExpProposalContent("Please select which of these preferences you want to upload to the CIS anonymously", userFriendlyListofDetails), new DownloadFeedbackListenerCallBack(uploadTempTable, pcm, FeedbackType.UPLOAD)).get();
+					}
 
-					
+
 				} catch (InvalidFormatException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -216,7 +229,7 @@ public class CommunitiesHandler {
 					e.printStackTrace();
 				}
 			}
-			
+
 			this.setDone(true);
 		}
 
@@ -231,11 +244,12 @@ public class CommunitiesHandler {
 	}
 
 	public class DownloaderTask extends TimerTask{
+		private Logger logging = LoggerFactory.getLogger(this.getClass());
 
 
 		private boolean done = false;
-		
-		
+
+
 		@Override
 		public void run() {
 			List<ICis> cisList = cisManager.getCisList();
@@ -284,14 +298,16 @@ public class CommunitiesHandler {
 								pcm.processPreferenceChanged(userId, communityModel.getPreferenceDetails().getServiceID(), communityModel.getPreferenceDetails().getServiceType(), communityModel.getPreferenceDetails().getPreferenceName());
 							}
 						}
-						
+
 					}
 
 
+					if (listtoBeChecked.size()>0){
 					String[] options = getUserFriendlyListofDetails(listtoBeChecked, FeedbackType.DOWNLOAD);
 
 					DownloadFeedbackListenerCallBack feedbackListener = new DownloadFeedbackListenerCallBack(downloadTempTable, pcm, FeedbackType.DOWNLOAD);
 					userFeedback.getExplicitFBAsync(ExpProposalType.CHECKBOXLIST, new ExpProposalContent("Please select which community preferences you want to download", options), feedbackListener).get();
+					}
 					this.setDone(true);
 				} catch (InvalidFormatException e) {
 					// TODO Auto-generated catch block
@@ -331,7 +347,7 @@ public class CommunitiesHandler {
 			this.uploadTempTable.clear();	
 		}
 		for (PreferenceDetails d: communityPreferenceDetails){
-			String key = "ServiceID: "+ServiceModelUtils.serviceResourceIdentifierToString(d.getServiceID())+" - PreferenceName: "+d.getPreferenceName();
+			String key = "PreferenceName: "+d.getPreferenceName()+" for ServiceID: "+ServiceModelUtils.serviceResourceIdentifierToString(d.getServiceID());
 			options.add(key);
 			if (type.equals(FeedbackType.DOWNLOAD)){
 				this.downloadTempTable.put(key, d);
