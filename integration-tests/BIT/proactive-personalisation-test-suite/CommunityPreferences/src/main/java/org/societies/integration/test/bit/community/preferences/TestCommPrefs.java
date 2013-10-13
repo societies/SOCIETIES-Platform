@@ -22,12 +22,15 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.integration.test.bit.ctx_personalisation;
+package org.societies.integration.test.bit.community.preferences;
 
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.useragent.monitoring.IUserActionMonitor;
 import org.societies.integration.test.IntegrationTestCase;
+import org.societies.personalisation.preference.api.IUserPreferenceManagement;
+import org.societies.personalisation.preference.api.CommunityPreferenceManagement.ICommunityPreferenceManager;
+import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
 
 /**
  * Class that tests Context Triggered Personalisation. 
@@ -35,14 +38,15 @@ import org.societies.integration.test.IntegrationTestCase;
  * @author Eliza
  *
  */
-public class Test751 extends IntegrationTestCase{
+public class TestCommPrefs extends IntegrationTestCase{
 
 	private static ICtxBroker ctxBroker;
-	private static IUserActionMonitor uam;
 	private static ICommManager commsMgr;
-	private static IHelloWorld helloWorld;
+	private static IUserPreferenceConditionMonitor userPCM;
+	private static ICommunityPreferenceManager commPrefMgr;
+	private static IUserPreferenceManagement preferenceManager;
 	
-	public Test751(){
+	public TestCommPrefs(){
 		super(1874, new Class[]{Tester.class});
 	}
 
@@ -60,19 +64,6 @@ public class Test751 extends IntegrationTestCase{
 		this.ctxBroker = ctxBroker;
 	}
 
-	/**
-	 * @return the uam
-	 */
-	public static IUserActionMonitor getUam() {
-		return uam;
-	}
-
-	/**
-	 * @param uam the uam to set
-	 */
-	public void setUam(IUserActionMonitor uam) {
-		this.uam = uam;
-	}
 
 	/**
 	 * @return the commsMgr
@@ -88,17 +79,30 @@ public class Test751 extends IntegrationTestCase{
 		this.commsMgr = commsMgr;
 	}
 
-	/**
-	 * @return the helloWorld
-	 */
-	public static IHelloWorld getHelloWorld() {
-		return helloWorld;
+
+	public static IUserPreferenceConditionMonitor getUserPCM() {
+		return userPCM;
 	}
 
-	/**
-	 * @param helloWorld the helloWorld to set
-	 */
-	public void setHelloWorld(IHelloWorld helloWorld) {
-		this.helloWorld = helloWorld;
+	public static void setUserPCM(IUserPreferenceConditionMonitor userPCM) {
+		TestCommPrefs.userPCM = userPCM;
+		preferenceManager = TestCommPrefs.userPCM.getPreferenceManager();
+	}
+
+	public static ICommunityPreferenceManager getCommPrefMgr() {
+		return commPrefMgr;
+	}
+
+	public static void setCommPrefMgr(ICommunityPreferenceManager commPrefMgr) {
+		TestCommPrefs.commPrefMgr = commPrefMgr;
+		
+	}
+
+	public static IUserPreferenceManagement getPreferenceManager() {
+		return preferenceManager;
+	}
+
+	public static void setPreferenceManager(IUserPreferenceManagement preferenceManager) {
+		TestCommPrefs.preferenceManager = preferenceManager;
 	}
 }

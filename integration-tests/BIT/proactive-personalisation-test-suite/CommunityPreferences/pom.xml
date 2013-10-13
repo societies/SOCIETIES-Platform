@@ -27,6 +27,13 @@
 	</parent>
 
 	<dependencies>
+			<dependency>
+			<groupId>org.societies.personalisation</groupId>
+			<artifactId>personalisation_api</artifactId>
+			<version>${release.version}</version>
+			<scope>provided</scope>
+		</dependency>
+	
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.spring-library</artifactId>
