@@ -264,7 +264,7 @@ public class ContextCommunicator {
 			
 			//set parent entity
 			hasParameterAssoc.setParentEntity(parentEntity.getId());
-			ctxBroker.update(hasParameterAssoc);
+			hasParameterAssoc = (CtxAssociation) ctxBroker.update(hasParameterAssoc).get();
 			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
