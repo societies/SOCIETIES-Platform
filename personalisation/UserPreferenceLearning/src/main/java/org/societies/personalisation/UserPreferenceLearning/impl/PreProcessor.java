@@ -64,14 +64,18 @@ public class PreProcessor {
 				Action nextAction = (Action) SerialisationHelper.deserialise(nextActionAttr.getBinaryValue(), this.getClass().getClassLoader());
 				if (ServiceModelUtils.compare(nextAction.getServiceID(), serviceId)){
 				// 31/1/13 eliza comments out: if(nextAction.getServiceID().getServiceInstanceIdentifier().equals(serviceId.getServiceInstanceIdentifier())){
-					this.LOG.debug("Found history for this serviceId: "+ServiceModelUtils.serviceResourceIdentifierToString(serviceId)+" action: "+nextAction.getparameterName()+"->"+nextAction.getvalue());
+					if (LOG.isDebugEnabled()){
+						this.LOG.debug("Found history for this serviceId: "+ServiceModelUtils.serviceResourceIdentifierToString(serviceId)+" action: "+nextAction.getparameterName()+"->"+nextAction.getvalue());
+					}
 					if(nextAction.getparameterName().equals(parameterName)){
 						//add action and snapshot to extracted list
 						actionSubset.put(nextActionAttr, data.get(nextActionAttr));
 						if(serviceType == null){
 							serviceType = nextAction.getServiceType();
 						}
-						this.LOG.debug("Adding history record to serviceSubset"+ServiceModelUtils.serviceResourceIdentifierToString(serviceId)+" action: "+nextAction.getparameterName()+"->"+nextAction.getvalue());
+						if (LOG.isDebugEnabled()){
+							this.LOG.debug("Adding history record to serviceSubset"+ServiceModelUtils.serviceResourceIdentifierToString(serviceId)+" action: "+nextAction.getparameterName()+"->"+nextAction.getvalue());
+						}
 					}
 				}
 			} catch (Exception e) {  //CtxException

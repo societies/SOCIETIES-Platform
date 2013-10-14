@@ -52,12 +52,16 @@ public class PreferenceMerger implements IUserPreferenceMerging{
 		this.situation = title;
 
 		if (newNode.isLeaf()){
-			this.logging.debug("new node does not contain context condition. merging as leaf");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("new node does not contain context condition. merging as leaf");
+			}
 			return mergeNewNodeAsLeaf(newNode,oldTree);
 			
 		}
 		if (oldTree.isLeaf()){
-			this.logging.debug("old node does not contain context condition. merging as leaf");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("old node does not contain context condition. merging as leaf");
+			}
 			return mergeNewNodeAsLeaf(oldTree,newNode);
 			
 		}
@@ -70,8 +74,12 @@ public class PreferenceMerger implements IUserPreferenceMerging{
 		for (int i = 0; i< singleRules.size(); i++){
 			
 			SingleRule sr = singleRules.get(i);
-			logging.debug("Merging new Single Rule: "+sr.toString());
-			logging.debug("\twith: "+mergedTree.toTreeString());
+			if (logging.isDebugEnabled()){
+				logging.debug("Merging new Single Rule: "+sr.toString());
+			}
+			if (logging.isDebugEnabled()){
+				logging.debug("\twith: "+mergedTree.toTreeString());
+			}
 			IPreference temp = merge(mergedTree, sr);
 			if (temp==null){
 				return null;
@@ -119,7 +127,9 @@ public class PreferenceMerger implements IUserPreferenceMerging{
 
 		
 		for (int i=0; i<singleRules.size(); i++){
-			logging.debug("::"+singleRules.get(i).toString());
+			if (logging.isDebugEnabled()){
+				logging.debug("::"+singleRules.get(i).toString());
+			}
 		}
 		return singleRules;
 	}
@@ -132,7 +142,9 @@ public class PreferenceMerger implements IUserPreferenceMerging{
 		if (temp.size()>0){
 			return null;
 		}
-		this.logging.debug("Not in situation 1");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Not in situation 1");
+		}
 		
 		//check if we're in Situation 2 (100% match)
 		temp = this.checkMatches(oldRules, sr);
@@ -140,7 +152,9 @@ public class PreferenceMerger implements IUserPreferenceMerging{
 			//return createTree(temp);
 			return oldTree;
 		}
-		this.logging.debug("Not in Situation 2");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Not in Situation 2");
+		}
 		
 		//we're going to find a branch that has the most common conditions with this rule.
 		IPreference commonNode = this.findCommonNode(oldTree, sr);
@@ -210,11 +224,15 @@ public class PreferenceMerger implements IUserPreferenceMerging{
 		
 		//if it's an empty root, we have to repeat with all its children
 		if (ptn.getUserObject() == null){
-			this.logging.debug("current node is empty root");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("current node is empty root");
+			}
 			Enumeration<IPreference> e = ptn.children();
 			while (e.hasMoreElements()){
 				IPreference p = e.nextElement();
-				this.logging.debug("processing child :"+p.toString()+" which is child of: "+ptn.toString());
+				if (logging.isDebugEnabled()){
+					this.logging.debug("processing child :"+p.toString()+" which is child of: "+ptn.toString());
+				}
 				cnc = findCommonNode(p,sr, cnc);
 			}
 		}else{
@@ -229,14 +247,18 @@ public class PreferenceMerger implements IUserPreferenceMerging{
 		
 		//unlikely
 		if (ptn.isLeaf()){
-			this.logging.debug("current node is leaf. returning common node counter");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("current node is leaf. returning common node counter");
+			}
 			return cnc;
 		}
 		
 		IPreferenceCondition pc = (IPreferenceCondition) ptn.getUserObject();
 		//if they have a common condition, go to the children, otherwise, return and continue with siblings
 		if (sr.hasCondition(pc)){
-			this.logging.debug("Single rule: "+sr.toString()+" has common node: "+pc.toString());
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Single rule: "+sr.toString()+" has common node: "+pc.toString());
+			}
 			cnc.add(ptn, ptn.getLevel());
 			Enumeration<IPreference> e = ptn.children();
 			while (e.hasMoreElements()){
@@ -248,19 +270,27 @@ public class PreferenceMerger implements IUserPreferenceMerging{
 	
 	private IPreference addToNode(IPreference ptn, SingleRule sr){
 		
-		logging.debug(situation+"BEFORE REMOVAL: "+sr.toString());
+		if (logging.isDebugEnabled()){
+			logging.debug(situation+"BEFORE REMOVAL: "+sr.toString());
+		}
 		if (null!=ptn.getUserObject()){
-			logging.debug(this.situation+" found common node: "+ptn.getUserObject().toString());
+			if (logging.isDebugEnabled()){
+				logging.debug(this.situation+" found common node: "+ptn.getUserObject().toString());
+			}
 			//IPreferenceCondition[] cons = new IPreferenceCondition[ptn.getLevel()];
 			Object[] objs = ptn.getUserObjectPath();
 			
 			for (int i = 0; i< objs.length; i++){
 				if (objs[i] instanceof IPreferenceCondition){
 					IPreferenceCondition con = (IPreferenceCondition) objs[i];
-					logging.debug(this.situation+" removing conditions");
+					if (logging.isDebugEnabled()){
+						logging.debug(this.situation+" removing conditions");
+					}
 					if (sr.hasCondition(con)){
 						sr.removeCondition(con);
-						logging.debug(this.situation+" REMOVED "+con.toString());
+						if (logging.isDebugEnabled()){
+							logging.debug(this.situation+" REMOVED "+con.toString());
+						}
 					}
 				}
 			}
@@ -270,23 +300,33 @@ public class PreferenceMerger implements IUserPreferenceMerging{
 				}
 			}
 		}else{
-			logging.debug(this.situation+" not found common node");
+			if (logging.isDebugEnabled()){
+				logging.debug(this.situation+" not found common node");
+			}
 		}
 		
 		
-		logging.debug(situation+"AFTER REMOVAL: "+sr.toString());
+		if (logging.isDebugEnabled()){
+			logging.debug(situation+"AFTER REMOVAL: "+sr.toString());
+		}
 		IPreference leaf = new PreferenceTreeNode(sr.getOutcome());
 		for (int i = 0; i< sr.getConditions().size(); i++){
 			IPreferenceCondition pc = (IPreferenceCondition) ptn.getUserObject();
 			if (null==pc){
-				logging.debug("weird");
+				if (logging.isDebugEnabled()){
+					logging.debug("weird");
+				}
 			}
 			if (sr.getConditions().get(i) == null){
-				logging.debug("even weirder");
+				if (logging.isDebugEnabled()){
+					logging.debug("even weirder");
+				}
 			}
 			
 				//log("pc: "+pc.toString());
-			logging.debug("sr con: "+sr.getConditions().get(i).toString());
+			if (logging.isDebugEnabled()){
+				logging.debug("sr con: "+sr.getConditions().get(i).toString());
+			}
 				IPreference temp = new PreferenceTreeNode(sr.getConditions().get(i));
 				ptn.add(temp);
 				ptn = temp;
@@ -308,7 +348,9 @@ public class PreferenceMerger implements IUserPreferenceMerging{
 		
 		if (root.getUserObject()==null){
 			root.add(newNode);
-			logging.debug("root user object is null");
+			if (logging.isDebugEnabled()){
+				logging.debug("root user object is null");
+			}
 			//dpt = new DisplayPreferenceTree(new PreferenceTreeModel(root), "Merged Tree");
 			return root;
 		}else{
@@ -316,7 +358,9 @@ public class PreferenceMerger implements IUserPreferenceMerging{
 			newRoot.add(newNode);
 			newRoot.add(oldTree);
 			//dpt = new DisplayPreferenceTree(new PreferenceTreeModel(newRoot), "Merged Tree");
-			logging.debug("root user object is not null");
+			if (logging.isDebugEnabled()){
+				logging.debug("root user object is not null");
+			}
 			return newRoot;
 		}
 	}

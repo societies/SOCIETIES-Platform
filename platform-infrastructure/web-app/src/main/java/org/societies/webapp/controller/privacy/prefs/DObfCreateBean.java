@@ -135,7 +135,9 @@ public class DObfCreateBean implements Serializable{
 	public void savePreference(){
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Saving preference", "Now saving prefernece");
 		FacesContext.getCurrentInstance().addMessage(null, message);
-		this.logging.debug("savePreferences called");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("savePreferences called");
+		}
 		PrivacyPreference privacyPreference = ModelTranslator.getPrivacyPreference(root);
 		IPrivacyPreferenceCondition erroneousNode = ModelTranslator.checkPreference(privacyPreference);
 		if (erroneousNode!=null){
@@ -143,8 +145,12 @@ public class DObfCreateBean implements Serializable{
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			return;
 		}
-		this.logging.debug("Printing preference before save: \n"+privacyPreference.toString());
-		this.logging.debug("Saving preferences with details: "+preferenceDetails.toString());
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Printing preference before save: \n"+privacyPreference.toString());
+		}
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Saving preferences with details: "+preferenceDetails.toString());
+		}
 		
 		DObfPreferenceTreeModel model = new DObfPreferenceTreeModel(preferenceDetails, privacyPreference);
 		
@@ -166,19 +172,27 @@ public class DObfCreateBean implements Serializable{
 	
 	private void printTree(){
 		if (this.root==null){
-			this.logging.debug("root is null. tree is corrupted");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("root is null. tree is corrupted");
+			}
 			return;
 		}
-		this.logging.debug("********** <TREE **********");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("********** <TREE **********");
+		}
 
 		String tree = "\nRoot: "+root.getData()+" "+root.getChildCount();
 		List<TreeNode> children = this.root.getChildren();
 		for (TreeNode child : children){
 			tree = tree.concat(getChildrenToPrint(child));
 		}
-		this.logging.debug(tree);
+		if (logging.isDebugEnabled()){
+			this.logging.debug(tree);
+		}
 
-		this.logging.debug("******** </TREE> ************");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("******** </TREE> ************");
+		}
 
 	}
 	
@@ -203,14 +217,20 @@ public class DObfCreateBean implements Serializable{
 		if (requestorType==0){
 
 			try {
-				this.logging.debug("validating cis ID:"+requestorCis);
+				if (logging.isDebugEnabled()){
+					this.logging.debug("validating cis ID:"+requestorCis);
+				}
 				IIdentity cisid = this.commMgr.getIdManager().fromJid(requestorCis);
 				((RequestorCisBean) this.preferenceDetails.getRequestor()).setCisRequestorId(cisid.getBareJid());
 				rType = "cis";
 				specific = "\nid: "+((RequestorCisBean) this.preferenceDetails.getRequestor()).getCisRequestorId();
-				this.logging.debug("successfully validated CIS id");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("successfully validated CIS id");
+				}
 			} catch (InvalidFormatException e) {
-				this.logging.debug("caught exception while validating cis id");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("caught exception while validating cis id");
+				}
 				e.printStackTrace();
 				preferenceDetailsCorrect = false;
 				FacesMessage message = new FacesMessage("CIS Jid is not valid");
@@ -220,15 +240,21 @@ public class DObfCreateBean implements Serializable{
 
 		}else if (requestorType==1){
 			try{
-				this.logging.debug("validating service id: "+requestorService);
+				if (logging.isDebugEnabled()){
+					this.logging.debug("validating service id: "+requestorService);
+				}
 				serviceID = ServiceModelUtils.generateServiceResourceIdentifierFromString(requestorService);
 				rType = "service";
 				((RequestorServiceBean) this.preferenceDetails.getRequestor()).setRequestorServiceId(serviceID);
 				specific = "\nid: "+((RequestorServiceBean) this.preferenceDetails.getRequestor()).getRequestorServiceId();
-				this.logging.debug("successfully validated service id");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("successfully validated service id");
+				}
 			}
 			catch (Exception e){
-				this.logging.debug("caught exception while generating service resource id");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("caught exception while generating service resource id");
+				}
 				e.printStackTrace();
 				preferenceDetailsCorrect = false;
 				FacesMessage message = new FacesMessage("ServiceID is not valid");
@@ -237,7 +263,9 @@ public class DObfCreateBean implements Serializable{
 			}
 
 			if (serviceID == null){
-				this.logging.debug("service id is null");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("service id is null");
+				}
 				preferenceDetailsCorrect = false;
 				FacesMessage message = new FacesMessage("ServiceID is not valid");
 				FacesContext.getCurrentInstance().addMessage(null, message);
@@ -246,7 +274,9 @@ public class DObfCreateBean implements Serializable{
 		}
 		
 		if (preferenceDetails.getResource().getDataType()==null){
-			this.logging.debug("Resource dataType is null");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Resource dataType is null");
+			}
 			preferenceDetailsCorrect = false;
 			FacesMessage message = new FacesMessage("Resource dataType is null");
 			FacesContext.getCurrentInstance().addMessage(null, message);
@@ -259,7 +289,9 @@ public class DObfCreateBean implements Serializable{
 		}
 		RequestContext context = RequestContext.getCurrentInstance();
 		context.execute("prefDetailsDlg.hide()");
-		this.logging.debug("Successfully validated preferenceDetails");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Successfully validated preferenceDetails");
+		}
 		this.preferenceDetailsCorrect = true;
 		
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "DObf preference details set", "Set requestor: "+preferenceDetails.getRequestor().getRequestorId()+
@@ -332,7 +364,9 @@ public class DObfCreateBean implements Serializable{
 				RequestorCisBean cisBean = new RequestorCisBean();
 				cisBean.setRequestorId(requestorId);
 				this.preferenceDetails.setRequestor(cisBean);
-				this.logging.debug("setting requestor Type :"+requestorType);
+				if (logging.isDebugEnabled()){
+					this.logging.debug("setting requestor Type :"+requestorType);
+				}
 
 				break;
 			case 1:
@@ -340,7 +374,9 @@ public class DObfCreateBean implements Serializable{
 				RequestorServiceBean serviceBean = new RequestorServiceBean();
 				serviceBean.setRequestorId(requestorId);
 				this.preferenceDetails.setRequestor(serviceBean);
-				this.logging.debug("setting requestor Type :"+requestorType);
+				if (logging.isDebugEnabled()){
+					this.logging.debug("setting requestor Type :"+requestorType);
+				}
 
 
 				break;
@@ -349,12 +385,16 @@ public class DObfCreateBean implements Serializable{
 				RequestorBean bean = new RequestorBean();
 				bean.setRequestorId(requestorId);
 				this.preferenceDetails.setRequestor(bean);
-				this.logging.debug("setting requestor Type :"+requestorType);
+				if (logging.isDebugEnabled()){
+					this.logging.debug("setting requestor Type :"+requestorType);
+				}
 
 				break;
 			}
 		}else{
-			this.logging.debug("setting requestorType: "+requestorType+" but not changing the preferenceDetails");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("setting requestorType: "+requestorType+" but not changing the preferenceDetails");
+			}
 		}
 		this.requestorType = requestorType;
 	}

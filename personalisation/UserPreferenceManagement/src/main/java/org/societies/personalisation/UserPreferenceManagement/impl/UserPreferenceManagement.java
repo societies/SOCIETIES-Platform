@@ -96,11 +96,15 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
 
     public IPreferenceOutcome getPreference(IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName) {
         if (serviceID == null) {
-            logging.debug("Request for preference with null serviceID, returning empty Action");
+        	if(this.logging.isDebugEnabled()){
+        		logging.debug("Request for preference with null serviceID, returning empty Action");
+        	}
             return null;
         }
         if (preferenceName == null) {
-            logging.debug("Request for preference with null preferenceName, returning empty Action");
+        	if(this.logging.isDebugEnabled()){
+        		logging.debug("Request for preference with null preferenceName, returning empty Action");
+        	}
             return null;
         }
         IPreferenceTreeModel model = this.preferenceCache.getPreference(serviceType, serviceID, preferenceName);
@@ -115,48 +119,73 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
                 action = e.nextElement();
                 action.setServiceID(serviceID);
                 action.setServiceType(serviceType);
-                logging.debug("evaluated preference " + preferenceName + " of " + serviceType + ":" + ServiceModelUtils.serviceResourceIdentifierToString(serviceID) + "\nand returning value: " + action.getvalue());
+                if(this.logging.isDebugEnabled()){
+                	logging.debug("evaluated preference " + preferenceName + " of " + serviceType + ":" + ServiceModelUtils.serviceResourceIdentifierToString(serviceID) + "\nand returning value: " + action.getvalue());
+                }
                 return action;
             } else {
-                logging.debug("evaluated preference " + preferenceName + " of " + serviceType + ":" + ServiceModelUtils.serviceResourceIdentifierToString(serviceID) + "\n did not yield any actions, returning empty action");
+            	if(this.logging.isDebugEnabled()){
+            		logging.debug("evaluated preference " + preferenceName + " of " + serviceType + ":" + ServiceModelUtils.serviceResourceIdentifierToString(serviceID) + "\n did not yield any actions, returning empty action");
+            	}
             }
         }
-        logging.debug("No preference available for: " + preferenceName + " of " + serviceType + ":" + ServiceModelUtils.serviceResourceIdentifierToString(serviceID));
+        if(this.logging.isDebugEnabled()){
+        	logging.debug("No preference available for: " + preferenceName + " of " + serviceType + ":" + ServiceModelUtils.serviceResourceIdentifierToString(serviceID));
+        }
         return null;
     }
 
     public List<IPreferenceConditionIOutcomeName> getPreferenceConditions(IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID) {
-        logging.debug("extracting conditions for all preferences of : " + serviceType + ":" + ServiceModelUtils.serviceResourceIdentifierToString(serviceID));
+    	if(this.logging.isDebugEnabled()){
+    		logging.debug("extracting conditions for all preferences of : " + serviceType + ":" + ServiceModelUtils.serviceResourceIdentifierToString(serviceID));
+    	}
         List<IPreferenceConditionIOutcomeName> list = new ArrayList<IPreferenceConditionIOutcomeName>();
         List<String> prefnames = this.preferenceCache.getPreferenceNamesofService(serviceType, serviceID);
         PreferenceConditionExtractor pce = new PreferenceConditionExtractor();
         for (int i = 0; i < prefnames.size(); i++) {
-            logging.debug("extracting conditions for: " + prefnames.get(i));
+        	if(this.logging.isDebugEnabled()){
+        		logging.debug("extracting conditions for: " + prefnames.get(i));
+        	}
             IPreferenceTreeModel model = this.preferenceCache.getPreference(serviceType, serviceID, prefnames.get(i));
             if (null != model) {
-                logging.debug("got preference " + prefnames.get(i) + " from cache");
+            	if(this.logging.isDebugEnabled()){
+            		logging.debug("got preference " + prefnames.get(i) + " from cache");
+            	}
                 List<IPreferenceConditionIOutcomeName> tempList = pce.extractConditions(model);
                 if (null != tempList) {
-                    logging.debug("found conditions: ");
+                	if(this.logging.isDebugEnabled()){
+                		logging.debug("found conditions: ");
+                	}
                     for (int k = 0; k < tempList.size(); k++) {
-                        logging.debug("condition: " + tempList.get(k).getICtxIdentifier().getType());
+                    	if(this.logging.isDebugEnabled()){
+                    		logging.debug("condition: " + tempList.get(k).getICtxIdentifier().getType());
+                    	}
                     }
                     list.addAll(tempList);
                 } else {
-                    logging.debug("not found any conditions, preference must be context-independent");
+                	if(this.logging.isDebugEnabled()){
+                		logging.debug("not found any conditions, preference must be context-independent");
+                	}
                 }
             } else {
-                logging.debug("not found any preference " + prefnames.get(i));
+            	if(this.logging.isDebugEnabled()){
+            		logging.debug("not found any preference " + prefnames.get(i));
+            	}
             }
         }
-        logging.debug("found " + list.size() + " entries");
+        if(this.logging.isDebugEnabled()){
+        	logging.debug("found " + list.size() + " entries");
+        }
         return list;
     }
 
 
     public IPreferenceOutcome reEvaluatePreferences(IIdentity ownerID, CtxAttribute attribute, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName) {
-        logging.debug("New context event received, requested re-evaluation of preference: ");
-        logging.debug(preferenceName + "" + serviceType + ":" + ServiceModelUtils.serviceResourceIdentifierToString(serviceID));
+    	if(this.logging.isDebugEnabled()){
+    		logging.debug("New context event received, requested re-evaluation of preference: ");
+    		logging.debug(preferenceName + "" + serviceType + ":" + ServiceModelUtils.serviceResourceIdentifierToString(serviceID));
+    	}
+        
         this.contextCache.updateCache(attribute);
         IPreferenceTreeModel model = this.preferenceCache.getPreference(serviceType, serviceID, preferenceName);
         if (model != null) {
@@ -170,13 +199,19 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
                 o.setServiceType(serviceType);
 
                 this.outcomeConditionListTable.put(o, evaluationResult.get(o));
-                logging.debug("returning new Outcome to PCM: " + o.getparameterName() + " -> " + o.getvalue());
+                if(this.logging.isDebugEnabled()){
+                	logging.debug("returning new Outcome to PCM: " + o.getparameterName() + " -> " + o.getvalue());
+                }
             } else {
-                logging.debug("no  new outcome for PCM, returning empty Action");
+            	if(this.logging.isDebugEnabled()){
+            		logging.debug("no  new outcome for PCM, returning empty Action");
+            	}
             }
             return o;
         } else {
-            logging.debug("Preference not found in cache");
+        	if(this.logging.isDebugEnabled()){
+        		logging.debug("Preference not found in cache");
+        	}
         }
         return null;
     }
@@ -215,7 +250,9 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
             oos.flush();
             oos.close();
             bos.close();
-            this.logging.debug("Trying to store preference of size: " + bos.size());
+            if(this.logging.isDebugEnabled()){
+            	this.logging.debug("Trying to store preference of size: " + bos.size());
+            }
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -238,7 +275,9 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
 
     public boolean storePreference(IIdentity ownerID, PreferenceDetails details, IPreference preference) {
 
-        logging.debug("request to store preference: for " + details.toString() + "\nPreference:\n" + preference.toTreeString());
+    	if(this.logging.isDebugEnabled()){
+    		logging.debug("request to store preference: for " + details.toString() + "\nPreference:\n" + preference.toTreeString());
+    	}
 
         IPreferenceTreeModel model = new PreferenceTreeModel(details, preference);
         return this.preferenceCache.storePreference(ownerID, details, model);
@@ -271,20 +310,30 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
 
 
     public List<IPreferenceOutcome> reEvaluatePreferences(IIdentity dpi, CtxAttribute attr, List<PreferenceDetails> preferenceIdentifiers) {
-        logging.debug("New context event received, requested re-evaluation of preference ");
+    	if(this.logging.isDebugEnabled()){
+    		logging.debug("New context event received, requested re-evaluation of preference ");
+    	}
         List<IPreferenceOutcome> list = new ArrayList<IPreferenceOutcome>();
         this.contextCache.updateCache(attr);
-        logging.debug("updated my context cache");
+        if(this.logging.isDebugEnabled()){
+        	logging.debug("updated my context cache");
+        }
         for (int i = 0; i < preferenceIdentifiers.size(); i++) {
             PreferenceDetails details = preferenceIdentifiers.get(i);
-            logging.debug("getting preference: " + details.getServiceType() + ":" + details.getServiceID().toString() + ":" + details.getPreferenceName() + " from my preference cache");
+            if(this.logging.isDebugEnabled()){
+            	logging.debug("getting preference: " + details.getServiceType() + ":" + details.getServiceID().toString() + ":" + details.getPreferenceName() + " from my preference cache");
+            }
             IPreferenceTreeModel model = this.preferenceCache.getPreference(details);
             if (model != null) {
-                logging.debug("got valid preference from my preference cache. attempting to evaluate it");
+            	if(this.logging.isDebugEnabled()){
+            		logging.debug("got valid preference from my preference cache. attempting to evaluate it");
+            	}
             }
             IPreference preference = model.getRootPreference();
             if (null == preference) {
-                logging.debug("Preference object inside PreferenceTreeModel is null");
+            	if(this.logging.isDebugEnabled()){
+            		logging.debug("Preference object inside PreferenceTreeModel is null");
+            	}
             } else {
                 PreferenceEvaluator pEvaluator = new PreferenceEvaluator(this.contextCache);
                 Hashtable<IPreferenceOutcome, List<CtxIdentifier>> evaluationResult = pEvaluator.evaluatePreference(preference);
@@ -298,10 +347,14 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
                 }
 
                 if (null != o) {
-                    logging.debug("Evaluation result: " + o.getparameterName() + " -> " + o.getvalue());
+                	if(this.logging.isDebugEnabled()){
+                		logging.debug("Evaluation result: " + o.getparameterName() + " -> " + o.getvalue());
+                	}
                     list.add(o);
                 } else {
-                    logging.debug("Evaluation result for " + details.getServiceType() + ":" + details.getServiceID().toString() + ":" + details.getPreferenceName() + " is NULL");
+                	if(this.logging.isDebugEnabled()){
+                		logging.debug("Evaluation result for " + details.getServiceType() + ":" + details.getServiceID().toString() + ":" + details.getPreferenceName() + " is NULL");
+                	}
                 }
             }
         }
@@ -328,7 +381,9 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
         PreferenceConditionExtractor pce = new PreferenceConditionExtractor();
         IPreferenceTreeModel model = this.preferenceCache.getPreference(serviceType, serviceID, preferenceName);
         if (model == null) {
-            this.logging.debug("Preference for " + new Tools(this.ctxBroker).convertToKey(serviceType, ServiceModelUtils.serviceResourceIdentifierToString(serviceID), preferenceName) + " doesn't exist");
+        	if(this.logging.isDebugEnabled()){
+        		this.logging.debug("Preference for " + new Tools(this.ctxBroker).convertToKey(serviceType, ServiceModelUtils.serviceResourceIdentifierToString(serviceID), preferenceName) + " doesn't exist");
+        	}
             return new ArrayList<CtxIdentifier>();
         }
         List<IPreferenceConditionIOutcomeName> list = pce.extractConditions(model);

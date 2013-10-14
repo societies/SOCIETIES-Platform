@@ -65,9 +65,13 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 		//get myDeviceID from comms Mgr
 		myDeviceID = commsMgr.getIdManager().getThisNetworkNode().getJid();  //with resource
 		myCssID = commsMgr.getIdManager().getThisNetworkNode();
-		
-		LOG.debug("My device ID is: "+myDeviceID);
-		LOG.debug("My CSS ID is: "+myCssID);
+
+		if (LOG.isDebugEnabled()){
+			LOG.debug("My device ID is: "+myDeviceID);
+		}
+		if (LOG.isDebugEnabled()){
+			LOG.debug("My CSS ID is: "+myCssID);
+		}
 
 		ctxComm = new ContextCommunicator(ctxBroker, myCssID);
 
@@ -76,12 +80,16 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 
 	@Override
 	public void monitor(IIdentity owner, IAction action) {
-		LOG.debug("UAM - Received local user action!");
-		LOG.debug("action ServiceId: "+action.getServiceID().toString());
-		LOG.debug("action serviceType: "+action.getServiceType());
-		LOG.debug("action parameterName: "+action.getparameterName());
-		LOG.debug("action value: "+action.getvalue());
-		
+		if (LOG.isDebugEnabled()){
+			LOG.debug("UAM - Received local user action!");
+			LOG.debug("action ServiceId: "+action.getServiceID().toString());
+			LOG.debug("action serviceType: "+action.getServiceType());
+			LOG.debug("action parameterName: "+action.getparameterName());
+			LOG.debug("action value: "+action.getvalue());
+		}
+
+
+
 		if(!interactableSet){
 			//interactable not yet set - set now
 			setInteractable();
@@ -93,10 +101,10 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 			ctxComm.updateUID(owner, myDeviceID);
 		}
 
-		
+
 		if (action.isContextDependent()){
-		//save action in context - IIdentity (Person) > ServiceId > paramName
-		//create new entities and attributes if necessary
+			//save action in context - IIdentity (Person) > ServiceId > paramName
+			//create new entities and attributes if necessary
 			ctxComm.updateHistory(owner, action);
 			//send local event
 			UIMEvent payload = new UIMEvent(owner, action);
@@ -111,11 +119,15 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 			InternalEvent event = new InternalEvent(EventTypes.UIM_STATIC_ACTION, "staticaction", "org/societies/useragent/monitoring", payload);
 			try {
 				this.eventMgr.publishInternalEvent(event);
-				this.LOG.debug("published event: "+EventTypes.UIM_STATIC_ACTION);
+				if (LOG.isDebugEnabled()){
+					this.LOG.debug("published event: "+EventTypes.UIM_STATIC_ACTION);
+				}
 			} catch (EMSException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				this.LOG.debug("Unable to publish event: "+EventTypes.UIM_STATIC_ACTION);
+				if (LOG.isDebugEnabled()){
+					this.LOG.debug("Unable to publish event: "+EventTypes.UIM_STATIC_ACTION);
+				}
 			}
 		}
 
@@ -131,12 +143,16 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 	 */
 	@Override
 	public void monitorFromRemoteNode(String remoteNodeId, IIdentity owner, IAction action) {
-		LOG.debug("UAM - Received remote user action from light node with node ID: "+remoteNodeId);
-		LOG.debug("action ServiceId: "+action.getServiceID().toString());
-		LOG.debug("action serviceType: "+action.getServiceType());
-		LOG.debug("action parameterName: "+action.getparameterName());
-		LOG.debug("action value: "+action.getvalue());
-		
+		if (LOG.isDebugEnabled()){
+			LOG.debug("UAM - Received remote user action from light node with node ID: "+remoteNodeId);
+		}
+		if (LOG.isDebugEnabled()){
+			LOG.debug("action ServiceId: "+action.getServiceID().toString());
+
+			LOG.debug("action serviceType: "+action.getServiceType());
+			LOG.debug("action parameterName: "+action.getparameterName());
+			LOG.debug("action value: "+action.getvalue());
+		}
 		if(!interactableSet){
 			//interactable not yet set - set now
 			setInteractable();
@@ -146,7 +162,7 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 		//save action in context - IIdentity (Person) > ServiceId > paramName
 		//create new entities and attributes if necessary
 		ctxComm.updateHistory(owner, action);
-		
+
 		//update UID with remoteNodeId
 		ctxComm.updateUID(owner, remoteNodeId);
 
@@ -161,37 +177,48 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 	}
 
 
-	
+
 	private void setInteractable(){
-		LOG.debug("Setting interactable variable in UAM for this device with ID: "+myDeviceID);
+		if (LOG.isDebugEnabled()){
+			LOG.debug("Setting interactable variable in UAM for this device with ID: "+myDeviceID);
+		}
 		interactable = true;
-		
+
 		try {
 			CssInterfaceResult cssInterface = cssMgr.getCssRecord().get();
 			CssRecord record = cssInterface.getProfile();
 			if(record != null){
-				LOG.debug("Got CssRecord, checking nodes...");
+				if (LOG.isDebugEnabled()){
+					LOG.debug("Got CssRecord, checking nodes...");
+				}
 				List<CssNode> cssNodes = record.getCssNodes();
 				if(cssNodes.size() > 0){
 					boolean found = false;
 					for(CssNode nextNode: cssNodes){  //find this node by myDeviceId
 						if(nextNode.getIdentity().equals(myDeviceID)){
-							LOG.debug("Comparing nextNode with ID: "+nextNode.getIdentity()+" against this node with ID: "+myDeviceID);
-							LOG.debug("Found this device in CSS record");
-							found = true;
+							if (LOG.isDebugEnabled()){
+								LOG.debug("Comparing nextNode with ID: "+nextNode.getIdentity()+" against this node with ID: "+myDeviceID);
 							
-							 /* 
-							  * Temporary use of String
-							  */
+								LOG.debug("Found this device in CSS record");
+							}
+							found = true;
+
+							/* 
+							 * Temporary use of String
+							 */
 							String tmp = nextNode.getInteractable();
 							if(tmp == null){
 								LOG.error("getInteractable returns null for node -> "+nextNode.getIdentity()+", assuming default: not interactable");
 								interactable = false;
 							}else if(tmp.equalsIgnoreCase("true")){
-								LOG.debug("This device is interactable");
+								if (LOG.isDebugEnabled()){
+									LOG.debug("This device is interactable");
+								}
 								interactable = true;
 							}else if(tmp.equalsIgnoreCase("false")){
-								LOG.debug("This device is not interactable");
+								if (LOG.isDebugEnabled()){
+									LOG.debug("This device is not interactable");
+								}
 								interactable = false;
 							}else{
 								LOG.error("Interactable variable is not defined for this node, assuming default: not interactable");
@@ -200,11 +227,11 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 							/*
 							 * end
 							 */
-							
+
 							break;
 						}
 					}
-					
+
 					if(!found){
 						LOG.error("Could not find this device in CssRecord with ID: "+myDeviceID);
 					}
@@ -214,8 +241,8 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 			}else{
 				LOG.error("The CssRecord is null for this CSS");
 			}
-						
-			
+
+
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (ExecutionException e) {
@@ -234,7 +261,7 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 	public void setCommsMgr(ICommManager commsMgr){
 		this.commsMgr = commsMgr;
 	}
-	
+
 	public void setCssMgr(ICSSInternalManager cssMgr){
 		this.cssMgr = cssMgr;
 	}

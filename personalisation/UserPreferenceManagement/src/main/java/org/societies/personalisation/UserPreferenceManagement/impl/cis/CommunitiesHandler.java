@@ -160,7 +160,9 @@ public class CommunitiesHandler {
 
 		@Override
 		public void run() {
-			this.logging.debug("Scheduled run");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Scheduled run");
+			}
 			IIdentity userId = getIdManager().getThisNetworkNode();
 			List<ICis> cisList = cisManager.getCisList();
 			if(this.logging.isDebugEnabled()){
@@ -174,7 +176,9 @@ public class CommunitiesHandler {
 					List<Service> services = serviceDiscovery.getServices(cisId).get();
 
 					List<PreferenceDetails> matchingDetails = findRelevantPreferences(services, userPrefMgr.getPreferenceDetailsForAllPreferences());
-					this.logging.debug("Found relevant matching details: "+matchingDetails.size());
+					if(this.logging.isDebugEnabled()){
+						this.logging.debug("Found relevant matching details: "+matchingDetails.size());
+					}
 					List<PreferenceDetails> allowedToUpload = new ArrayList<PreferenceDetails>();
 					List<PreferenceDetails> toBeChecked = new ArrayList<PreferenceDetails>();
 					for (PreferenceDetails prefDetail : matchingDetails){
@@ -201,7 +205,9 @@ public class CommunitiesHandler {
 						}
 					}
 
-					this.logging.debug("Uploading: "+models.size()+" preferences to CIS: "+cisId);
+					if(this.logging.isDebugEnabled()){
+						this.logging.debug("Uploading: "+models.size()+" preferences to CIS: "+cisId);
+					}
 					communityPrefMgr.uploadUserPreferences(cisId, models);
 
 					if (toBeChecked.size()>0){

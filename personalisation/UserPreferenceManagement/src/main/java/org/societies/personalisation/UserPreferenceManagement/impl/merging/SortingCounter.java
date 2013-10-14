@@ -154,7 +154,9 @@ public class SortingCounter{
 	
 	public void printSortingCounterData(){
 		for (int i =0; i<this.ccList.size(); i++){
-			logging.debug(this.ccList.get(i).toString());
+			if(this.logging.isDebugEnabled()){
+				logging.debug(this.ccList.get(i).toString());
+			}
 		}
 	}
 	

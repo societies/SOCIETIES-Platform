@@ -99,15 +99,21 @@ public class CommunityPreferenceManagement implements ICommunityPreferenceManage
 
 		if (ownCIS){
 			//JOptionPane.showMessageDialog(null, "I own this CIS");
-			this.logging.debug("Uploading new community preferences.");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Uploading new community preferences.");
+			}
 			for (IPreferenceTreeModel newModel : models){
 				PreferenceDetails newDetail = newModel.getPreferenceDetails();
 				IPreferenceTreeModel existingModel = this.prefCache.getPreference(cisId, newDetail);
 				if (existingModel==null){
-					this.logging.debug("There's no previous preference for : "+newDetail.toString()+". Saving as is ");
+					if (logging.isDebugEnabled()){
+						this.logging.debug("There's no previous preference for : "+newDetail.toString()+". Saving as is ");
+					}
 					this.prefCache.storePreference(cisId, newDetail, newModel);
 				}else{
-					this.logging.debug("Merging individual with community preference");
+					if (logging.isDebugEnabled()){
+						this.logging.debug("Merging individual with community preference");
+					}
 					PreferenceMerger merger = new PreferenceMerger();
 					IPreference mergeTrees = merger.mergeTrees(existingModel.getRootPreference(), newModel.getRootPreference(), "");
 					IPreferenceTreeModel mergedModel = new PreferenceTreeModel(newDetail, mergeTrees);

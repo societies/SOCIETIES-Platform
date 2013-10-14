@@ -97,7 +97,9 @@ public class PreferenceController extends BasePageController{
 	
 	
 	public String storePrefDetailToUtils(){
-		this.logging.debug("Adding user preference details bean to util service");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Adding user preference details bean to util service");
+		}
 		this.privacyUtilService.setPreferenceDetails(preferenceDetailUUID, selectedDetail);
 		return "preference_edit.xhtml";
 	}
