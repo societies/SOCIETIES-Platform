@@ -902,6 +902,9 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 				final List<String> ctxTypes = PrivacyPolicyUtils.getDataTypes(
 						DataIdentifierScheme.CONTEXT, privacyPolicybean);
 				LOG.debug("getPrivPolicyAttributeTypes: ctxTypes={}", ctxTypes);
+				if (ctxTypes == null) {
+					return result;
+				}
 				for (final String ctxType : ctxTypes) {
 					if (CtxTypesUtil.isValidAttributeType(ctxType)) {
 						result.add(ctxType);
