@@ -77,10 +77,16 @@ public class ContextCommunicator {
 			//update attribute
 			CtxAttributeIdentifier attrID = mappings.get(key);
 			try {
-				ctxBroker.updateAttribute(attrID, SerialisationHelper.serialise(action));
+				ctxBroker.updateAttribute(attrID, SerialisationHelper.serialise(action)).get();
 			} catch (CtxException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}else{
@@ -131,7 +137,7 @@ public class ContextCommunicator {
 									
 									//update LAST_ACTION value
 									LOG.debug("Updating LAST_ACTION attribute with action");
-									ctxBroker.updateAttribute(lastActionAttr.getId(), SerialisationHelper.serialise(action));
+									lastActionAttr = ctxBroker.updateAttribute(lastActionAttr.getId(), SerialisationHelper.serialise(action)).get();
 									
 									//update mappings
 									LOG.debug("Updating mappings table with key: "+key+" and attributeID: "+lastActionAttr.getId());
@@ -205,7 +211,7 @@ public class ContextCommunicator {
 			
 			//set parent entity
 			usesServiceAssoc.setParentEntity(parent.getId());
-			ctxBroker.update(usesServiceAssoc);
+			usesServiceAssoc = (CtxAssociation) ctxBroker.update(usesServiceAssoc).get();
 			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -226,13 +232,13 @@ public class ContextCommunicator {
 			
 			//add as child to USES_SERVICE association
 			usesServiceAssoc.addChildEntity(serviceEntity.getId());
-			ctxBroker.update(usesServiceAssoc);
+			usesServiceAssoc = (CtxAssociation) ctxBroker.update(usesServiceAssoc).get();
 			
 			//create new ID attribute, update and add to entity
 			LOG.debug("Creating ID attribute under SERVICE entity");
 			CtxAttribute newIDAttr = ctxBroker.createAttribute(serviceEntity.getId(), CtxAttributeTypes.ID).get();
 			LOG.debug("Setting value of ID attribute to: "+serviceID);
-			ctxBroker.updateAttribute(newIDAttr.getId(), ServiceModelUtils.serviceResourceIdentifierToString(serviceID));
+			newIDAttr = ctxBroker.updateAttribute(newIDAttr.getId(), ServiceModelUtils.serviceResourceIdentifierToString(serviceID)).get();
 			/*LOG.debug("Testing serialisation and deserialisation");
 			byte[] serialised = SerialisationHelper.serialise(serviceID);
 			LOG.debug("SERIALISED: "+serialised);
@@ -284,12 +290,12 @@ public class ContextCommunicator {
 			
 			//add as child to HAS_PARAMETER association
 			hasParameterAssoc.addChildEntity(serviceParamEntity.getId());	
-			ctxBroker.update(hasParameterAssoc);
+			hasParameterAssoc = (CtxAssociation) ctxBroker.update(hasParameterAssoc).get();
 			
 			//create new PARAMETER_NAME attribute, update and add to entity
 			LOG.debug("Creating PARAMETER_NAME attribute under SERVICE_PARAMETER entity with value: "+parameterName);
 			CtxAttribute newParamAttr = ctxBroker.createAttribute(serviceParamEntity.getId(), CtxAttributeTypes.PARAMETER_NAME).get();
-			ctxBroker.updateAttribute(newParamAttr.getId(), parameterName);
+			newParamAttr = ctxBroker.updateAttribute(newParamAttr.getId(), parameterName).get();
 			
 			//create new LAST_ACTION attribute, update and add to entity
 			LOG.debug("Creating LAST_ACTION attribute under SERVICE_PARAMETER entity with value: "+lastAction);
@@ -298,7 +304,7 @@ public class ContextCommunicator {
 			if(!completed){
 				LOG.error("context tuples not set for action: "+newLastActionAttr.getType());
 			}
-			ctxBroker.updateAttribute(newLastActionAttr.getId(), SerialisationHelper.serialise(lastAction));
+			newLastActionAttr = ctxBroker.updateAttribute(newLastActionAttr.getId(), SerialisationHelper.serialise(lastAction)).get();
 			
 			//update mappings
 			LOG.debug("Updating mappings table with key: "+key+" and attributeID: "+newLastActionAttr.getId());
@@ -320,11 +326,11 @@ public class ContextCommunicator {
 			List<CtxIdentifier> attrIds = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID).get();
 			if(attrIds.size() > 0){ //found existing UID - update
 				CtxAttributeIdentifier uidAttrID = (CtxAttributeIdentifier)attrIds.get(0);
-				ctxBroker.updateAttribute(uidAttrID, myDeviceID);
+				ctxBroker.updateAttribute(uidAttrID, myDeviceID).get();
 			}else{  //no existing UID - create and populate
 				CtxEntity personEntity = ctxBroker.retrieveIndividualEntity(owner).get();
 				if(personEntity != null){
-					ctxBroker.createAttribute(personEntity.getId(), CtxAttributeTypes.UID);
+					ctxBroker.createAttribute(personEntity.getId(), CtxAttributeTypes.UID).get();
 				}else{
 					LOG.error("Could not retrieve Person EntityIdentifier from JID");
 				}
