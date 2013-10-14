@@ -28,8 +28,28 @@ import java.util.List;
 @ManagedBean(name = "accessControlController")
 @ViewScoped
 public class AccessControlRequestController extends BasePageController {
+	
+	private boolean obChecked = false;
 
-    private static void getIdFromQueryString() {
+	private int newObLevel;
+
+	public int getNewObLevel() {
+		return newObLevel;
+	}
+
+	public void setNewObLevel(int newObLevel) {
+		this.newObLevel = newObLevel;
+	}
+
+	public boolean isObChecked() {
+		return obChecked;
+	}
+
+	public void setObChecked(boolean obChecked) {
+		this.obChecked = obChecked;
+	}
+
+	private static void getIdFromQueryString() {
         HttpServletRequest hsr = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         if (hsr.getParameter("id") != null)
         {
@@ -150,8 +170,28 @@ public class AccessControlRequestController extends BasePageController {
         ArrayList<AccessControlResponseItemWrapper> wrappers = new ArrayList<AccessControlResponseItemWrapper>();
         for (ResponseItem item : event.getResponseItems())
             wrappers.add((AccessControlResponseItemWrapper) item);
-
         return wrappers;
+       
+    }
+    
+    public double getObscureLevel(AccessControlResponseItemWrapper resposneItem)
+    {
+    	log.debug("CHANGE OBSCURE LEVEL:" + newObLevel);
+    	double value = 0.0;
+    	switch(newObLevel)
+    	{
+    	case 0 : value = 0.0;
+    	break;
+    	case 1 : value = 0.3;
+    	break;
+    	case 2 : value = 0.6;
+    	break;
+    	case 3 : value = 1.0;
+    	break;
+    	}
+    	log.debug("Returning:" + value);
+    	log.debug("SHOULD SHOW " + resposneItem.getRequestItemWrapper().getObfuscatorInfo().getObfuscationExample(value));
+    	return value;
     }
 
     public UserFeedbackAccessControlEvent getCurrentAccessEvent() {
@@ -217,7 +257,7 @@ public class AccessControlRequestController extends BasePageController {
 			return;
 		}//redirectPage; // previously, could redirect to next negotiation - but this makes no sense now
     }
-
+    
     public void completeAccessRequestActionRemember() {
     	//TODO: remember flag to set
         log.debug("completeAccessRequestAction() id=" + eventID);
