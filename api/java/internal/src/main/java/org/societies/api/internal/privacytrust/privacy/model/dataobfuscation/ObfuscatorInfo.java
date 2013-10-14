@@ -26,8 +26,8 @@ package org.societies.api.internal.privacytrust.privacy.model.dataobfuscation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.ObfuscationLevelType;
 
@@ -46,7 +46,7 @@ public abstract class ObfuscatorInfo {
 	protected ObfuscationLevelType obfuscationLevelType;
 	protected int nbOfObfuscationLevelStep;
 	protected String obfuscableDataType;
-	protected Map<Double, String> obfuscationExamples;
+	protected TreeMap<Double, String> obfuscationExamples;
 
 	/**
 	 * To know if this obfuscation can be done on this node
@@ -96,25 +96,32 @@ public abstract class ObfuscatorInfo {
 	 * @return Friendly example of obfuscation. Null if no examples are provided.
 	 */
 	public String getObfuscationExample(double obfuscationLevel) {
-		// - No example: null
+		// - No example: empty
 		if (null == obfuscationExamples || obfuscationExamples.size() <= 0) {
-			return null;
+			return "";
 		}
 		// - Examples: search the good slot
-		double previous = 0;
-		String lastExample = null;
+		int index = 0;
+		double previous = 0.0;
+		String previousExample = "";
 		for(Entry<Double, String> entry : obfuscationExamples.entrySet()) {
 			double current = entry.getKey().doubleValue();
-			lastExample = entry.getValue();
-			// Current slot
-			if (obfuscationLevel >= previous && obfuscationLevel < current) {
-				return lastExample;
+			if (0 == index) {
+				previousExample = entry.getValue();
+				previous = -50000.0;
+				index++;
+				continue;
 			}
+			// Current slot
+			if (obfuscationLevel == previous || (obfuscationLevel >= previous && obfuscationLevel < current)) {
+				return previousExample;
+			}
+			previousExample = entry.getValue();
 			previous = current;
 
 		}
 		// Last slot or not in the slots: return the last one
-		return lastExample;
+		return previousExample;
 	}
 
 	/**
