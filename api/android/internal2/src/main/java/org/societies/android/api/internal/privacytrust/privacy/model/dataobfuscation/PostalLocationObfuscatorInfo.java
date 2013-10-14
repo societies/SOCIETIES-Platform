@@ -24,7 +24,7 @@
  */
 package org.societies.android.api.internal.privacytrust.privacy.model.dataobfuscation;
 
-import java.util.HashMap;
+import java.util.TreeMap;
 
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.ObfuscationLevelType;
 
@@ -40,7 +40,7 @@ public class PostalLocationObfuscatorInfo extends ObfuscatorInfo {
 		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
 		nbOfObfuscationLevelStep = 1;
 		obfuscableDataType = CtxAttributeTypes.ADDRESS_HOME_CITY;
-		obfuscationExamples = new HashMap<Double, String>();
+		obfuscationExamples = new TreeMap<Double, String>();
 		obfuscationExamples.put(0.0, "\"Rue Vaugirard, 75008 Paris\" will become \"Rue Vaugirard, 75008 Paris\" (no change)");
 	}
 }

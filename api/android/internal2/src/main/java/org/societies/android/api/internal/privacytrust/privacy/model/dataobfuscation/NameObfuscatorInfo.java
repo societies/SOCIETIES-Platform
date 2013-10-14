@@ -24,7 +24,7 @@
  */
 package org.societies.android.api.internal.privacytrust.privacy.model.dataobfuscation;
 
-import java.util.HashMap;
+import java.util.TreeMap;
 
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.ObfuscationLevelType;
 
@@ -40,7 +40,7 @@ public class NameObfuscatorInfo extends ObfuscatorInfo {
 		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
 		nbOfObfuscationLevelStep = 4;
 		obfuscableDataType = CtxAttributeTypes.NAME;
-		obfuscationExamples = new HashMap<Double, String>();
+		obfuscationExamples = new TreeMap<Double, String>();
 		obfuscationExamples.put(0.0, "\"Mr John Smith\" will become \"Mr John Smith\" (no change)");
 		obfuscationExamples.put(0.3, "\"Mr John Smith\" will become \"Mr Smith\"");
 		obfuscationExamples.put(0.6, "\"Mr John Smith\" will become \"Mr Anonymous\"");
