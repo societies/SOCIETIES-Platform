@@ -176,8 +176,15 @@ public class TestLocalCommunityContext {
 		LOG.info("*** testMemberCRUD: publicCisEntId={}", publicCisEntId);
 		assertNotNull(publicCisEntId);
 		
-		final CtxAttribute publicActivitiesAttr =	this.ctxBroker.createAttribute(
-				requestorService, publicCisEntId, CtxAttributeTypes.ACTIVITIES).get();
+		// verify attributes defined in CIS privacy policy already exist
+		final List<CtxIdentifier> publicActivitiesAttrIds = 
+				this.ctxBroker.lookup(requestorService, publicCisEntId, CtxModelType.ATTRIBUTE,
+						CtxAttributeTypes.ACTIVITIES).get();
+		assertNotNull(publicActivitiesAttrIds);
+		assertFalse(publicActivitiesAttrIds.isEmpty());
+		assertEquals(1, publicActivitiesAttrIds.size());
+		final CtxAttribute publicActivitiesAttr = (CtxAttribute) 
+				this.ctxBroker.retrieve(requestorService, publicActivitiesAttrIds.get(0)).get();
 		assertNotNull(publicActivitiesAttr);
 		assertNull(publicActivitiesAttr.getStringValue());
 		
@@ -201,8 +208,14 @@ public class TestLocalCommunityContext {
 		LOG.info("*** testMemberCRUD: membersOnlyCisEntId={}", membersOnlyCisEntId);
 		assertNotNull(membersOnlyCisEntId);
 		
-		final CtxAttribute membersOnlyActivitiesAttr =	this.ctxBroker.createAttribute(
-				requestorService, membersOnlyCisEntId, CtxAttributeTypes.ACTIVITIES).get();
+		final List<CtxIdentifier> membersOnlyActivitiesAttrIds = 
+				this.ctxBroker.lookup(requestorService, membersOnlyCisEntId, CtxModelType.ATTRIBUTE,
+						CtxAttributeTypes.ACTIVITIES).get();
+		assertNotNull(membersOnlyActivitiesAttrIds);
+		assertFalse(membersOnlyActivitiesAttrIds.isEmpty());
+		assertEquals(1, membersOnlyActivitiesAttrIds.size());
+		final CtxAttribute membersOnlyActivitiesAttr = (CtxAttribute)
+				this.ctxBroker.retrieve(requestorService, membersOnlyActivitiesAttrIds.get(0)).get();
 		assertNotNull(membersOnlyActivitiesAttr);
 		assertNull(membersOnlyActivitiesAttr.getStringValue());
 		
@@ -255,8 +268,15 @@ public class TestLocalCommunityContext {
 		LOG.info("*** testPublicCRUD: publicCisEntId={}", publicCisEntId);
 		assertNotNull(publicCisEntId);
 		
-		final CtxAttribute publicActivitiesAttr =	this.ctxBroker.createAttribute(
-				requestorService, publicCisEntId, CtxAttributeTypes.ACTIVITIES).get();
+		// verify attributes defined in CIS privacy policy already exist
+		final List<CtxIdentifier> publicActivitiesAttrIds = 
+				this.ctxBroker.lookup(requestorService, publicCisEntId, CtxModelType.ATTRIBUTE,
+						CtxAttributeTypes.ACTIVITIES).get();
+		assertNotNull(publicActivitiesAttrIds);
+		assertFalse(publicActivitiesAttrIds.isEmpty());
+		assertEquals(1, publicActivitiesAttrIds.size());
+		final CtxAttribute publicActivitiesAttr = (CtxAttribute) 
+				this.ctxBroker.retrieve(requestorService, publicActivitiesAttrIds.get(0)).get();
 		assertNotNull(publicActivitiesAttr);
 		assertNull(publicActivitiesAttr.getStringValue());
 		
@@ -280,23 +300,16 @@ public class TestLocalCommunityContext {
 		LOG.info("*** testPublicCRUD: membersOnlyCisEntId={}", membersOnlyCisEntId);
 		assertNotNull(membersOnlyCisEntId);
 		
-		final CtxAttribute membersOnlyActivitiesAttr =	this.ctxBroker.createAttribute(
-				requestorService, membersOnlyCisEntId, CtxAttributeTypes.ACTIVITIES).get();
-		assertNotNull(membersOnlyActivitiesAttr);
-		assertNull(membersOnlyActivitiesAttr.getStringValue());
+		final List<CtxIdentifier> membersOnlyActivitiesAttrIds = 
+				this.ctxBroker.lookup(requestorService, membersOnlyCisEntId, CtxModelType.ATTRIBUTE,
+						CtxAttributeTypes.ACTIVITIES).get();
+		assertNotNull(membersOnlyActivitiesAttrIds);
+		assertFalse(membersOnlyActivitiesAttrIds.isEmpty());
+		assertEquals(1, membersOnlyActivitiesAttrIds.size());
 		
-		membersOnlyActivitiesAttr.setStringValue("activity1,activity2");
 		boolean accessControlExceptionCaught = false;
 		try {
-			this.ctxBroker.update(requestorService, membersOnlyActivitiesAttr).get();
-		} catch (CtxAccessControlException cace) {
-			accessControlExceptionCaught = true;
-		}
-		assertTrue(accessControlExceptionCaught);
-
-		accessControlExceptionCaught = false;
-		try {
-			this.ctxBroker.retrieve(requestorService, membersOnlyActivitiesAttr.getId()).get();
+			this.ctxBroker.retrieve(requestorService, membersOnlyActivitiesAttrIds.get(0)).get();
 		} catch (CtxAccessControlException cace) {
 			accessControlExceptionCaught = true;
 		}
