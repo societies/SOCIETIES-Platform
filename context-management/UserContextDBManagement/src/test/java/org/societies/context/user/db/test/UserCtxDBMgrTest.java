@@ -177,7 +177,7 @@ public class UserCtxDBMgrTest {
 		assertNotNull(attribute.getQuality());
 		assertEquals(attribute, attribute.getQuality().getAttribute());
 		assertEquals(attribute.getLastModified().getTime(), attribute.getQuality().getLastUpdated().getTime());
-		assertNull(attribute.getQuality().getOriginType());
+		assertEquals(CtxOriginType.MANUALLY_SET, attribute.getQuality().getOriginType());
 		assertNull(attribute.getQuality().getPrecision());
 		assertNull(attribute.getQuality().getUpdateFrequency());
 	}
@@ -352,7 +352,7 @@ public class UserCtxDBMgrTest {
 		assertEquals(CtxAttributeValueType.STRING, attribute.getValueType());
 		assertNull(attribute.getValueMetric());
 		assertNull(attribute.getSourceId());
-		assertNull(attribute.getQuality().getOriginType());
+		assertEquals(CtxOriginType.MANUALLY_SET, attribute.getQuality().getOriginType());
 		assertNull(attribute.getQuality().getPrecision());
 		assertNull(attribute.getQuality().getUpdateFrequency());
 		
@@ -391,7 +391,7 @@ public class UserCtxDBMgrTest {
 		assertNull(attribute.getValueMetric());
 		assertNull(attribute.getSourceId());
 		assertTrue(attribute.getLastModified().getTime() - attribute.getQuality().getLastUpdated().getTime() < 1000);
-		assertNull(attribute.getQuality().getOriginType());
+		assertEquals(CtxOriginType.MANUALLY_SET, attribute.getQuality().getOriginType());
 		assertNull(attribute.getQuality().getPrecision());
 		assertNull(attribute.getQuality().getUpdateFrequency());
 		

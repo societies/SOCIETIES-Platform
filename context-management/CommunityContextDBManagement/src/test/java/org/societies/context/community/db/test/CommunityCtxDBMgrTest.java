@@ -164,7 +164,7 @@ public class CommunityCtxDBMgrTest {
 		assertNotNull(attribute.getQuality());
 		assertEquals(attribute, attribute.getQuality().getAttribute());
 		// TODO assertEquals(attribute.getLastModified(), attribute.getQuality().getLastUpdated());
-		assertNull(attribute.getQuality().getOriginType());
+		assertEquals(CtxOriginType.MANUALLY_SET, attribute.getQuality().getOriginType());
 		assertNull(attribute.getQuality().getPrecision());
 		assertNull(attribute.getQuality().getUpdateFrequency());
 	}
@@ -210,7 +210,7 @@ public class CommunityCtxDBMgrTest {
 		assertNull(attribute.getSourceId());
 		//problem with Mysql when testing
 		//assertEquals(lastUpdated, attribute.getQuality().getLastUpdated());
-		assertNull(attribute.getQuality().getOriginType());
+		assertEquals(CtxOriginType.MANUALLY_SET, attribute.getQuality().getOriginType());
 		assertNull(attribute.getQuality().getPrecision());
 		assertNull(attribute.getQuality().getUpdateFrequency());
 		

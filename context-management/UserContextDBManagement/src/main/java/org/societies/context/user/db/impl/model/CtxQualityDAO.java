@@ -74,7 +74,7 @@ public class CtxQualityDAO implements Serializable {
 	
 	/** The origin type of the current context attribute value. */
 	@Column(name = "origin_type", nullable = true, updatable = true)
-	private CtxOriginType originType;
+	private CtxOriginType originType = CtxOriginType.MANUALLY_SET;
 	
 	/** The precision of the current context attribute value. */
 	@Column(name = "precis", nullable = true, updatable = true)
