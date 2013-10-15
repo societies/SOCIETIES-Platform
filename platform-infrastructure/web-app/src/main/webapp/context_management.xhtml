@@ -235,7 +235,7 @@
    				
    				<p:column id="dialogColumn" style="width: 5px">
    					<p:calendar value="#{contextManagementController.predictedDate}" id="popupButtonCal" showOn="button" >
-   						<p:ajax event="dateSelect" process=":mainForm:displayDialog" listener="#{contextManagementController.viewPredictedValues(element.id)}"/>
+   						<p:ajax event="dateSelect" listener="#{contextManagementController.viewPredictedValues(element.id)}"/>
    					</p:calendar>
    				</p:column>
    				
