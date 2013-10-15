@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.cis.model.CisAttributeTypes;
 import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
@@ -174,6 +175,11 @@ public class PrivacyPolicyUtils {
 			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
 			requestItems.add(requestItem);
 		}
+		{
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAssociationTypes.HAS_MEMBERS);
+			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
+			requestItems.add(requestItem);
+		}
 		// - Location symbolic
 		{
 			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
@@ -205,12 +211,19 @@ public class PrivacyPolicyUtils {
 			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
 			requestItems.add(requestItem);
 		}
-		// - Occupation
+		// - Languages
 		{
-			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.WORK_POSITION);
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LANGUAGES);
 			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
 			requestItems.add(requestItem);
 		}
+		// - CACI Model
+		{
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, "caci_model");
+			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
+			requestItems.add(requestItem);
+		}
+		
 
 		// --- Prepare parameters
 		Map<String, Object> parameters = new HashMap<String, Object>();
