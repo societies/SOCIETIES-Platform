@@ -104,6 +104,13 @@ public interface IServices {
 	 * @return
 	 */
 	boolean shareService(ServiceResourceIdentifier serviceId, IIdentity node);
+
+	/**
+	 * @param serviceId
+	 * @param node
+	 * @return
+	 */
+	boolean unshareService(ServiceResourceIdentifier serviceId, IIdentity node);
 	
 
 }

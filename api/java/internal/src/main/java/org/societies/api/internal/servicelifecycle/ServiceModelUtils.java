@@ -369,6 +369,7 @@ public class ServiceModelUtils extends org.societies.api.services.ServiceUtils{
 			if(!service.getServiceType().equals(ServiceType.DEVICE)){
 				serviceEvent.setBundleId(bundle.getBundleId());
 				serviceEvent.setBundleSymbolName(bundle.getSymbolicName());
+				serviceEvent.setInterfaceName(service.getServiceInstance().getServiceImpl().getServiceNameSpace());
 			} else{
 				serviceEvent.setBundleId(-1);
 				serviceEvent.setBundleSymbolName(null);

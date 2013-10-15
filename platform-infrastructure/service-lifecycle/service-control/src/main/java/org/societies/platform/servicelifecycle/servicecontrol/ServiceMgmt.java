@@ -85,22 +85,25 @@ public class ServiceMgmt implements IServices {
 		
 		try{
 			
-			if(logger.isDebugEnabled())
-				logger.debug("Trying to get ServiceResourceIdentifier for class: " + callingClass);
+			logger.debug("Trying to get ServiceResourceIdentifier for class: {}", callingClass);
 			
 			// First we get the calling Bundle
 			Bundle serviceBundle = FrameworkUtil.getBundle(callingClass);
 		
-			if(logger.isDebugEnabled())
-				logger.debug("Bundle of service is: " + serviceBundle.getSymbolicName());
+			logger.debug("Bundle of service is: {}",serviceBundle.getSymbolicName());
 		
+			logger.debug("Bundle location is: {}",serviceBundle.getLocation());
+			
 			Service myService = ServiceModelUtils.getServiceFromBundle(serviceBundle, getServiceDiscovery());
 		
-			if(logger.isDebugEnabled())
-				logger.debug("Service is  " + myService.getServiceName());
+			logger.debug("Service is {}", myService.getServiceName());
 			
-			return myService.getServiceIdentifier();
-		
+			if(myService != null){
+				return myService.getServiceIdentifier();
+			}
+			else{
+				return null;
+			}
 		} catch(Exception ex){
 			ex.printStackTrace();
 			logger.error("Exception occured: " + ex.getMessage());
@@ -242,8 +245,7 @@ public class ServiceMgmt implements IServices {
 	@Override
 	public boolean shareService(ServiceResourceIdentifier serviceId, IIdentity node){
 		
-		if(logger.isDebugEnabled())
-			logger.debug("ServiceManagement: sharing a service with a CIS");
+		logger.info("ServiceManagement: sharing a service with a CIS");
 		
 		boolean result = false;
 		
@@ -252,15 +254,44 @@ public class ServiceMgmt implements IServices {
 			Future<Service> serviceAsync = getServiceDiscovery().getService(serviceId);
 			Service myService = serviceAsync.get();
 			
-			if(logger.isDebugEnabled())
-				logger.debug("Found service: " + myService.getServiceName());
+			logger.debug("Found service: {}", myService.getServiceName());
 			
 			Future<ServiceControlResult> shareAsync = getServiceControl().shareService(myService, node);
 			ServiceControlResult shareResult = shareAsync.get();
 			
 			if(shareResult.getMessage().equals(ResultMessage.SUCCESS)){
-				if(logger.isDebugEnabled())
-					logger.debug("Sharing with " + node.getJid() + " was successful.");
+				logger.debug("Sharing with {} was successful.", node.getJid());
+				result = true;
+			}
+		} catch(Exception ex){
+			logger.error("Exception occured: " + ex);
+			ex.printStackTrace();
+			result=false;
+		} 
+
+		return result;
+	}
+	
+	
+	@Override
+	public boolean unshareService(ServiceResourceIdentifier serviceId, IIdentity node){
+		
+		logger.info("ServiceManagement: usharing a service with a CIS");
+		
+		boolean result = false;
+		
+		try{
+			// First we get the calling Bundle
+			Future<Service> serviceAsync = getServiceDiscovery().getService(serviceId);
+			Service myService = serviceAsync.get();
+			
+			logger.debug("Found service: {}", myService.getServiceName());
+			
+			Future<ServiceControlResult> shareAsync = getServiceControl().unshareService(myService, node);
+			ServiceControlResult shareResult = shareAsync.get();
+			
+			if(shareResult.getMessage().equals(ResultMessage.SUCCESS)){
+				logger.debug("Sharing with {} was successful.", node.getJid());
 				result = true;
 			}
 		} catch(Exception ex){
