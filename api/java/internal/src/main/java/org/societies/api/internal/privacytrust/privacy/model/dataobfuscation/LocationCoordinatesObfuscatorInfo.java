@@ -42,8 +42,8 @@ public class LocationCoordinatesObfuscatorInfo extends ObfuscatorInfo {
 		nbOfObfuscationLevelStep = 0;
 		obfuscableDataType = CtxAttributeTypes.LOCATION_COORDINATES;
 		obfuscationExamples = new TreeMap<Double, String>();
-		obfuscationExamples.put(0.0, "(2.3509, 48.8566, 542) will become (2.350987, 48.8566, 542) (no change)");
+		obfuscationExamples.put(0.0, "(2.3509, 48.8566, 542) will become (5.2145, 52.2459, 1245) (anonymous)");
 		obfuscationExamples.put(0.5, "(2.3509, 48.8566, 542) will become (2.3491, 48.8555, 693)");
-		obfuscationExamples.put(1.0, "(2.3509, 48.8566, 542) will become (5.2145, 52.2459, 1245)");
+		obfuscationExamples.put(1.0, "(2.3509, 48.8566, 542) will become (2.350987, 48.8566, 542) (no change)");
 	}
 }

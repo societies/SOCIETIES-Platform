@@ -25,6 +25,8 @@
 package org.societies.api.internal.privacytrust.privacy.model.dataobfuscation;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -125,7 +127,7 @@ public abstract class ObfuscatorInfo {
 	}
 
 	/**
-	 * Retrieve all friendly obfuscation examples
+	 * Retrieve all friendly obfuscation examples (order: more obfuscated to not obfuscated)
 	 * @return All friendly obfuscation examples. Null if no examples are provided.
 	 */
 	public List<String> getAllObfuscationExamples() {
@@ -133,5 +135,37 @@ public abstract class ObfuscatorInfo {
 			return null;
 		}
 		return new ArrayList<String>(obfuscationExamples.values());
+	}
+	
+
+	/**
+	 * Retrieve all friendly obfuscation examples (reversed order: not obfuscated to more obfuscated)
+	 * @return All friendly obfuscation examples. Null if no examples are provided.
+	 */
+	public List<String> getAllObfuscationExamplesReversed() {
+		if (null == obfuscationExamples || obfuscationExamples.size() <= 0) {
+			return null;
+		}
+		List<String> exampleList = new ArrayList<String>(obfuscationExamples.values());
+		Collections.reverse(exampleList);
+		return exampleList;
+	}
+	
+	/**
+	 * Retrieve all friendly obfuscation examples (reversed order: not obfuscated to more obfuscated)
+	 * @return All friendly obfuscation examples. Null if no examples are provided.
+	 */
+	public List<ObfuscationExample> getObfuscationExamplesReversed() {
+		if (null == obfuscationExamples || obfuscationExamples.size() <= 0) {
+			return new ArrayList<ObfuscationExample>();
+		}
+		List<ObfuscationExample> exampleList = new ArrayList<ObfuscationExample>();
+		int obfuscationLevelStep = 0;
+		for(String content : obfuscationExamples.values()) {
+			exampleList.add(new ObfuscationExample(obfuscationLevelStep, content));
+			obfuscationLevelStep++;
+		}
+		Collections.reverse(exampleList);
+		return exampleList;
 	}
 }

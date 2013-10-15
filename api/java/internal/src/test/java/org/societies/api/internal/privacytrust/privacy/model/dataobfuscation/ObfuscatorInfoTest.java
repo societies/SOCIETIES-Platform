@@ -98,7 +98,7 @@ public class ObfuscatorInfoTest {
 	public void testLocationCoordinatesGetObfuscationExample() {
 		LocationCoordinatesObfuscatorInfo obfuscatorInfo = new LocationCoordinatesObfuscatorInfo();
 		double obfuscationLevel = -1.0;
-		String expected = "(2.3509, 48.8566, 542) will become (2.350987, 48.8566, 542) (no change)";
+		String expected = "(2.3509, 48.8566, 542) will become (5.2145, 52.2459, 1245) (anonymous)";
 		String actual = obfuscatorInfo.getObfuscationExample(obfuscationLevel);
 		LOG.info("For "+obfuscationLevel+": Expected: \""+expected+"\" and was: \""+actual+"\"");
 		Assert.assertEquals(expected, actual);
@@ -145,7 +145,7 @@ public class ObfuscatorInfoTest {
 		LOG.info("For "+obfuscationLevel+": Expected: \""+expected+"\" and was: \""+actual+"\"");
 		Assert.assertEquals(expected, actual);
 		
-		expected = "(2.3509, 48.8566, 542) will become (5.2145, 52.2459, 1245)";
+		expected = "(2.3509, 48.8566, 542) will become (2.350987, 48.8566, 542) (no change)";
 		obfuscationLevel = 1.0;
 		actual = obfuscatorInfo.getObfuscationExample(obfuscationLevel);
 		LOG.info("For "+obfuscationLevel+": Expected: \""+expected+"\" and was: \""+actual+"\"");

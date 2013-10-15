@@ -48,10 +48,13 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.util.DataTypeUtils;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.privacytrust.privacy.model.dataobfuscation.ObfuscatorInfo;
+import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.ObfuscatorInfoFactory;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.DObfPreferenceDetailsBean;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
+import org.societies.webapp.controller.privacy.ResourceUtils;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
@@ -70,33 +73,37 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 @ViewScoped
 @ManagedBean(name="dobfcreateBean")
 public class DObfCreateBean implements Serializable{
-	
+
 	@ManagedProperty(value="#{internalCtxBroker}")
 	private ICtxBroker ctxBroker;
 
 	@ManagedProperty(value="#{commMngrRef}")
 	private ICommManager commMgr;
-	
+
 	@ManagedProperty(value = "#{privPrefMgr}")
 	private IPrivacyPreferenceManager privPrefmgr;
-	
-	
+
+
 	private final Logger logging = LoggerFactory.getLogger(getClass());
 	private DObfPreferenceDetailsBean preferenceDetails = new DObfPreferenceDetailsBean();
 	private int requestorType;
 	private String requestorCis;
 	private boolean preferenceDetailsCorrect;
 	private String requestorService;
-	
+
 	private TreeNode selectedNode;
 	private TreeNode root;
-	
-	private double obfuscationLevel = 0;
+
+	private DataTypeUtils dataTypeUtils = new DataTypeUtils();
+	private ObfuscatorInfo obfuscatorInfo;
+	private double obfuscationLevel = 1.0;
+	private int disreteObfuscationLevel = -1;
+	private int continuousObfuscationLevel = 100;
 
 	private String displaySpecificRequestor;
 
 	private DObfPreferenceTreeModel existingDObfPreference;
-	
+
 	@PostConstruct
 	public void setup(){
 
@@ -104,18 +111,18 @@ public class DObfCreateBean implements Serializable{
 		preferenceDetails.getRequestor().setRequestorId("");
 		preferenceDetails.setResource(new Resource());
 		preferenceDetails.getResource().setDataType("");
-		
-/*		this.createCtxAttributeTypesList();
+
+		/*		this.createCtxAttributeTypesList();
 		this.createSchemeList();
 		setOperators(Arrays.asList(OperatorConstants.values()));
 		this.setupConditions();*/
-		
+
 	}
-	
+
 	/*
 	 * METHODS CALLED FROM XHTML:
 	 */
-	
+
 	public String getDisplaySpecificRequestor() {
 		try{
 			if (this.preferenceDetails.getRequestor() instanceof RequestorCisBean){
@@ -131,7 +138,7 @@ public class DObfCreateBean implements Serializable{
 		}
 		return displaySpecificRequestor;
 	}
-	
+
 	public void savePreference(){
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Saving preference", "Now saving prefernece");
 		FacesContext.getCurrentInstance().addMessage(null, message);
@@ -151,10 +158,10 @@ public class DObfCreateBean implements Serializable{
 		if (logging.isDebugEnabled()){
 			this.logging.debug("Saving preferences with details: "+preferenceDetails.toString());
 		}
-		
+
 		DObfPreferenceTreeModel model = new DObfPreferenceTreeModel(preferenceDetails, privacyPreference);
-		
-		
+
+
 		if (this.privPrefmgr.storeDObfPreference(preferenceDetails, model)){
 			message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Your new Data Obfuscation preference has been successfully saved.");
 			FacesContext.getCurrentInstance().addMessage(null, message);
@@ -169,7 +176,7 @@ public class DObfCreateBean implements Serializable{
 		this.root = ModelTranslator.getPrivacyPreference(this.existingDObfPreference.getRootPreference(), node);
 		printTree();
 	}
-	
+
 	private void printTree(){
 		if (this.root==null){
 			if (logging.isDebugEnabled()){
@@ -195,7 +202,7 @@ public class DObfCreateBean implements Serializable{
 		}
 
 	}
-	
+
 	private String getChildrenToPrint(TreeNode node){
 		String str = "\n"+node;
 
@@ -205,7 +212,7 @@ public class DObfCreateBean implements Serializable{
 			str = str+child+"\n";
 			return str.concat(getChildrenToPrint(child));
 
-			
+
 		}
 		return str;
 	}
@@ -272,7 +279,7 @@ public class DObfCreateBean implements Serializable{
 				return;
 			}
 		}
-		
+
 		if (preferenceDetails.getResource().getDataType()==null){
 			if (logging.isDebugEnabled()){
 				this.logging.debug("Resource dataType is null");
@@ -282,7 +289,7 @@ public class DObfCreateBean implements Serializable{
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			return;
 		}
-		
+
 		existingDObfPreference = this.privPrefmgr.getDObfPreference(preferenceDetails);
 		if (existingDObfPreference!=null){
 			RequestContext.getCurrentInstance().execute("pdcd.show();");
@@ -293,7 +300,7 @@ public class DObfCreateBean implements Serializable{
 			this.logging.debug("Successfully validated preferenceDetails");
 		}
 		this.preferenceDetailsCorrect = true;
-		
+
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "DObf preference details set", "Set requestor: "+preferenceDetails.getRequestor().getRequestorId()+
 				"\n, type: "+rType+specific+"\nSet resource: "+preferenceDetails.getResource().getDataType());
 		FacesContext.getCurrentInstance().addMessage(null, message);
@@ -302,7 +309,7 @@ public class DObfCreateBean implements Serializable{
 	public void startAddConditionProcess(){
 		RequestContext.getCurrentInstance().execute("addConddlg.show();");
 	}
-	
+
 	public void startAddOutcomeProcess(){
 		RequestContext.getCurrentInstance().execute("addOutdlg.show();");
 	}
@@ -313,7 +320,7 @@ public class DObfCreateBean implements Serializable{
 	public void startAddTrustConditionProcess(){
 		RequestContext.getCurrentInstance().execute("addTrustConddlg.show();");
 	}
-	
+
 	public void displaySelectedSingle() {
 		if(selectedNode != null) {
 			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Selected", selectedNode.getData().toString());
@@ -323,9 +330,22 @@ public class DObfCreateBean implements Serializable{
 			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Not Selected", "You need to select a node to display");
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		}
-
 	}
-	
+
+	public void addOutcome() {
+		if (null == selectedNode) {
+			logging.debug("selected node is null - addOutcome");
+			return;
+		}
+
+		// -- Retrieve selected obfuscation level
+		logging.debug("Selected obfuscation level: {}", obfuscationLevel);
+
+		// -- Store obfuscation level
+		// TODO ?
+	}
+
+
 	public void deleteNode() {
 		if (selectedNode==null){
 			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Node not selected", "You must select a node to delete");
@@ -347,14 +367,14 @@ public class DObfCreateBean implements Serializable{
 
 		if (this.root.getChildCount()==0){
 			DObfOutcome outcome = new DObfOutcome(0.0);
-			
+
 
 			TreeNode node0 = new DefaultTreeNode(outcome, root);
 		}
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Deletion", "Node deleted");
 		FacesContext.getCurrentInstance().addMessage(null, message);
 	}
-	
+
 	public void setRequestorType(int requestorType) {
 		String requestorId = this.preferenceDetails.getRequestor().getRequestorId();
 		if (!preferenceDetailsCorrect){
@@ -400,11 +420,11 @@ public class DObfCreateBean implements Serializable{
 	}
 
 
-	
+
 	/*
 	 * GET/SET METHODS
 	 */
-	
+
 	public int getRequestorType() {
 		return requestorType;
 	}
@@ -471,15 +491,48 @@ public class DObfCreateBean implements Serializable{
 	public void setRoot(TreeNode root) {
 		this.root = root;
 	}
-
+	
 	public double getObfuscationLevel() {
 		return obfuscationLevel;
 	}
-
 	public void setObfuscationLevel(double obfuscationLevel) {
 		this.obfuscationLevel = obfuscationLevel;
 	}
-
 	
+	public int getDisreteObfuscationLevel() {
+		if (-1 == disreteObfuscationLevel) {
+			disreteObfuscationLevel = getObfuscatorInfo().getNbOfObfuscationLevelStep();
+		}
+		return disreteObfuscationLevel;
+	}
+	public void setDisreteObfuscationLevel(int disContObfuscationLevel) {
+		this.obfuscationLevel = (double)disContObfuscationLevel/(double)obfuscatorInfo.getNbOfObfuscationLevelStep();
+		this.disreteObfuscationLevel = disContObfuscationLevel;
+		logging.debug("Discrete obfuscation level: {} -> {}", disContObfuscationLevel, obfuscationLevel);
+	}
 
+	public int getContinuousObfuscationLevel() {
+		return continuousObfuscationLevel;
+	}
+	public void setContinuousObfuscationLevel(int contObfuscationLevel) {
+		this.obfuscationLevel = (double)contObfuscationLevel/(double)100;
+		this.continuousObfuscationLevel = contObfuscationLevel;
+		logging.debug("Continuous obfuscation level: {} -> {}", contObfuscationLevel, obfuscationLevel);
+	}
+
+	public ObfuscatorInfo getObfuscatorInfo() {
+		ObfuscatorInfoFactory factory = new ObfuscatorInfoFactory();
+		obfuscatorInfo = factory.getObfuscatorInfo(preferenceDetails.getResource().getDataType());
+		if (-1 == disreteObfuscationLevel) {
+			disreteObfuscationLevel = obfuscatorInfo.getNbOfObfuscationLevelStep();
+		}
+		return obfuscatorInfo;
+	}
+	public void setObfuscatorInfo(ObfuscatorInfo obfuscatorInfo) {
+		this.obfuscatorInfo = obfuscatorInfo;
+	}
+	
+	public DataTypeUtils getDataTypeUtils() {
+		return dataTypeUtils;
+	}
 }

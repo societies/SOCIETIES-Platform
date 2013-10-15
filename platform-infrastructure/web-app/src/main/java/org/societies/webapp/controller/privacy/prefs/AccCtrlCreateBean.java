@@ -70,11 +70,16 @@ import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.util.DataTypeFactory;
+import org.societies.api.identity.util.DataTypeUtils;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.privacytrust.privacy.model.dataobfuscation.ObfuscatorInfo;
+import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.ObfuscatorInfoFactory;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.AccessControlPreferenceDetailsBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PrivacyOutcomeConstantsBean;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyConditionsConstantValues;
+import org.societies.webapp.controller.privacy.ResourceUtils;
 import org.societies.api.privacytrust.trust.model.MalformedTrustedEntityIdException;
 import org.societies.api.privacytrust.trust.model.TrustedEntityId;
 import org.societies.api.privacytrust.trust.model.TrustedEntityType;
@@ -151,7 +156,7 @@ public class AccCtrlCreateBean implements Serializable{
 	private List<PrivacyOutcomeConstantsBean> decisions;
 
 	private String trustValue;
-
+	
 	private ConditionConstants selectedPrivacyCondition;
 	private Map<ConditionConstants,ConditionConstants> privacyConditions;
 
@@ -187,9 +192,13 @@ public class AccCtrlCreateBean implements Serializable{
 	public void startAddPrivacyConditionProcess(){
 		RequestContext.getCurrentInstance().execute("addPrivConddlg.show();");
 	}
-
+	
 	public void startAddTrustConditionProcess(){
 		RequestContext.getCurrentInstance().execute("addTrustConddlg.show();");
+	}
+
+	public void startAddObfuscationConditionProcess(){
+		RequestContext.getCurrentInstance().execute("addObfuscationConddlg.show();");
 	}
 
 	@PostConstruct
@@ -631,7 +640,7 @@ public class AccCtrlCreateBean implements Serializable{
 
 		}
 	}
-
+	
 	public void addTrustCondition(){
 		if (selectedNode==null){
 			if (logging.isDebugEnabled()){
@@ -1263,17 +1272,14 @@ public class AccCtrlCreateBean implements Serializable{
 		this.decisions = decisions;
 	}
 
-
+	
 	public String getTrustValue() {
 		return trustValue;
 	}
-
-
 	public void setTrustValue(String trustValue) {
 		this.trustValue = trustValue;
 	}
-
-
+	
 	public Map<ConditionConstants,ConditionConstants> getPrivacyConditions() {
 		return privacyConditions;
 	}

@@ -4,6 +4,7 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
 	template="templates/main_template.xhtml">
 
 	<ui:define name="html_head">
@@ -40,10 +41,9 @@
 					<h:outputText id="resourceType"
 						value="#{dobfcreateBean.preferenceDetails.resource.dataType}" />
 
-
 				</h:panelGrid>
 
-				<p:contextMenu for="treeSingle">
+				<p:menubar for="treeSingle">
 					<p:menuitem value="View" update="messages"
 						actionListener="#{dobfcreateBean.displaySelectedSingle}"
 						icon="ui-icon-search" />
@@ -63,8 +63,7 @@
 						icon="ui-icon-plus" />
 					<p:menuitem value="Edit" update="treeSingle"
 						actionListener="#{dobfcreateBean.editNode}" icon="ui-icon-pencil" />
-
-				</p:contextMenu>
+				</p:menubar>
 
 				<h:panelGrid columns="1" cellpadding="5">
 					<p:tree id="treeSingle" value="#{dobfcreateBean.root}" var="node"
@@ -105,99 +104,58 @@
 
 		<p:dialog id="addConditionDialog" header="Add Condition"
 			widgetVar="addConddlg" resizable="false" dynamic="true">
-
-			<h:panelGrid columns="2" cellpadding="5">
-
-				<h:outputLabel for="ctxId" value="Condition:" />
-				<p:selectOneMenu id="ctxId" value="#{dobfcreateBean.selectedCtxID}">
-					<f:selectItems value="#{dobfcreateBean.ctxIds}" />
-				</p:selectOneMenu>
-
-				<h:outputLabel for="operator" value="Operator: " />
-				<p:selectOneMenu id="operator"
-					value="#{dobfcreateBean.selectedCtxOperator}">
-					<f:selectItems value="#{dobfcreateBean.operators}" />
-				</p:selectOneMenu>
-				<h:outputLabel for="ctxValue" value="Value:" />
-				<p:inputText id="ctxValue" value="#{dobfcreateBean.ctxValue}"
-					label="value">
-				</p:inputText>
-
-				<f:facet name="footer">
-					<p:commandButton id="AddConditionButton" value="Add"
-						oncomplete="#{p:widgetVar('addConditionDialog')}.hide()"
-						update="treeSingle" ajax="true"
-						actionListener="#{dobfcreateBean.addCondition}" />
-				</f:facet>
-
+			<h:panelGrid columns="2" cellpadding="5" closable="true">
 			</h:panelGrid>
-
 		</p:dialog>
 
 		<p:dialog id="addTrustConditionDialog" header="Add Trust Condition"
-			widgetVar="addTrustConddlg" resizable="false" dynamic="true">
-
-			<p:inputText id="trustValue" value="#{dobfcreateBean.trustValue}" />
-			<p:slider for="trustValue" />
-			<f:facet name="footer">
-				<p:commandButton id="AddTrustConditionButton" value="Add"
-					oncomplete="#{p:widgetVar('addTrustConditionDialog')}.hide()"
-					update="treeSingle" ajax="true"
-					actionListener="#{dobfcreateBean.addTrustCondition}" />
-			</f:facet>
-
+			widgetVar="addTrustConddlg" resizable="false" dynamic="true" closable="true">
 		</p:dialog>
 
 		<p:dialog id="addPrivacyConditionDialog"
 			header="Add Privacy Condition" widgetVar="addPrivConddlg"
-			resizable="false" dynamic="true">
-
-			<h:panelGrid columns="2" cellpadding="5">
-
-				<h:outputLabel for="privacyCondition" value="Privacy Condition:" />
-				<p:selectOneMenu id="privacyCondition"
-					value="#{dobfcreateBean.selectedPrivacyCondition}">
-					<f:selectItems value="#{dobfcreateBean.privacyConditions}" />
-					<p:ajax update="privacyConditionValue"
-						listener="#{dobfcreateBean.handlePrivacyTypeChange}" />
-				</p:selectOneMenu>
-
-				<h:outputLabel for="operatorForPrivacy" value="Operator: " />
-				<p:selectOneMenu id="operatorForPrivacy"
-					value="#{dobfcreateBean.selectedOperator}">
-					<f:selectItems value="#{dobfcreateBean.operators}" />
-
-				</p:selectOneMenu>
-
-				<h:outputLabel for="privacyConditionValue" value="Value:" />
-				<p:selectOneMenu id="privacyConditionValue"
-					value="#{dobfcreateBean.selectedPrivacyValue}" label="value">
-					<f:selectItems value="#{dobfcreateBean.privacyValues}" />
-				</p:selectOneMenu>
-
-				<f:facet name="footer">
-					<p:commandButton id="AddPrivacyConditionButton" value="Add"
-						oncomplete="#{p:widgetVar('addPrivacyConditionDialog')}.hide()"
-						update="treeSingle" ajax="true"
-						actionListener="#{dobfcreateBean.addPrivacyCondition}" />
-				</f:facet>
-
-			</h:panelGrid>
+			resizable="false" dynamic="true" closable="true">
 		</p:dialog>
 
 
-		<!-- TODO FOR OLIVIER: This is the obfuscation GUI.   DataType is in #{dobfcreateBean.preferenceDetails.resource.dataType} and the input value should be placed in #{dobfcreateBean.obfuscationLevel}-->
 		<p:dialog id="addOutcomeDialog" header="Add Outcome"
-			widgetVar="addOutdlg" resizable="false" dynamic="true">
+			widgetVar="addOutdlg" resizable="true" dynamic="true" closable="true">
 
-			<h:panelGrid columns="2" cellpadding="5">
-
-				<h:outputLabel for="obfuscationLevel"
-					value="Enter Obfuscation level for #{dobfcreateBean.preferenceDetails.resource.dataType}" />
-				<h:inputHidden id="obfuscationLevel"
-					value="#{dobfcreateBean.obfuscationLevel}" />
-				<p:slider for="txt2" display="output" style="width:200px"
-					displayTemplate="Set ratio to %{value}" />
+			<h:panelGrid columns="2" cellpadding="5" columnClasses="label, column">
+				<!--Continuous-->
+			    <h:panelGrid rendered="#{dobfcreateBean.obfuscatorInfo.obfuscationLevelType.value() eq 'continuous'}">
+			        <p:outputLabel for="continuousObfuscationLevelSlider" value="How do you want to blur your #{dobfcreateBean.preferenceDetails.resource.dataType}?"/>
+			        <h:outputText id="continuousObfuscationLabel" value="#{dobfcreateBean.continuousObfuscationLevel}% "/>
+			        <p:slider for="continuousObfuscationLevel"
+			                  display="continuousObfuscationLabel"
+			                  displayTemplate="{value}%"
+			                  style="width: 180px;"
+			                  minValue="0"
+			                  maxValue="100"
+			                  id="continuousObfuscationLevelSlider">
+			            <p:ajax event="slideEnd"
+			                    update="continuousObfuscationExample, continuousObfuscationLabel"
+			                    process="continuousObfuscationLevel" />
+			        </p:slider>
+			        <br />
+			        <h:inputHidden id="continuousObfuscationLevel" value="#{dobfcreateBean.continuousObfuscationLevel}"/>
+			        <h:outputText id="continuousObfuscationExample"
+			                      value="Example: #{dobfcreateBean.obfuscatorInfo.getObfuscationExample(dobfcreateBean.obfuscationLevel)}"/>
+			    </h:panelGrid>
+			
+				<!--Discrete-->
+			    <h:panelGrid columns="1" rendered="#{dobfcreateBean.obfuscatorInfo.obfuscationLevelType.value() eq 'discrete'}">
+					<p:outputLabel for="disreteObfuscationLevel" value="How do you want to blur your #{dobfcreateBean.preferenceDetails.resource.dataType}?"/>
+					<p:selectOneRadio id="disreteObfuscationLevel"
+						value="#{dobfcreateBean.disreteObfuscationLevel}"
+						layout="grid" columns="2">
+						 <f:selectItems
+							value="#{dobfcreateBean.obfuscatorInfo.getObfuscationExamplesReversed()}"
+							var="example"
+							itemLabel="#{example.content}"
+							itemValue="#{example.obfuscationLevelStep}" />  
+					</p:selectOneRadio>
+			    </h:panelGrid>
 
 				<f:facet name="footer">
 					<p:commandButton id="AddOutcomeButton" value="Add"
@@ -205,11 +163,8 @@
 						update="treeSingle" ajax="true"
 						actionListener="#{dobfcreateBean.addOutcome}" />
 				</f:facet>
-
 			</h:panelGrid>
 		</p:dialog>
-
-
 
 		<p:dialog id="preferenceDetailsDialog"
 			header="Enter Data Obfuscation preference details"
