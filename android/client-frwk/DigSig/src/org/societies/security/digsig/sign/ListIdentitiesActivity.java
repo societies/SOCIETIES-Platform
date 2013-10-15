@@ -1,17 +1,12 @@
 package org.societies.security.digsig.sign;
 
-import java.io.ByteArrayInputStream;
-import java.security.KeyStore;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Locale;
 
 import org.societies.security.digsig.api.Sign;
-import org.societies.security.digsig.trust.AndroidSecureStorage;
+import org.societies.security.digsig.apiinternal.ISecureStorage;
 import org.societies.security.digsig.trust.AndroidSecureStorageConstants;
-import org.societies.security.digsig.trust.AndroidSecureStorage.State;
+import org.societies.security.digsig.trust.SecureStorage;
 
 import android.app.ListActivity;
 import android.content.Intent;
@@ -26,8 +21,7 @@ public class ListIdentitiesActivity extends ListActivity {
 	
 	private static final String TAG = ListIdentitiesActivity.class.getSimpleName();
 
-	private AndroidSecureStorage secureStorage;
-	private CertificateFactory certFactory;
+	private ISecureStorage secureStorage;
 		
 	private ArrayList<String> certNames;
 	private ArrayList<Integer> certNumbers;
@@ -41,34 +35,29 @@ public class ListIdentitiesActivity extends ListActivity {
 
         super.onCreate(savedInstanceState);
 		
-		secureStorage = AndroidSecureStorage.getInstance();
-		KeyStore keyStore;
 		try {
-			keyStore = KeyStore.getInstance("AndroidKeyStore");
-			keyStore.load(null);
-			Log.i(TAG, "Key store type: " + keyStore.getType());
-			Log.i(TAG, "Key store size: " + keyStore.size());
-			Log.i(TAG, "Key store alises: " + keyStore.aliases());
-		} catch (Exception e) {
-			Log.w(TAG, "Could not get key store", e);
+			secureStorage = new SecureStorage();
+		} catch (DigSigException e) {
+			Log.e(TAG, "Failed to initialize", e);
+			setResult(RESULT_CANCELED);
+			finish();
 			return;
 		}
-		try {
-			certFactory = CertificateFactory.getInstance("X.509");
-		} catch (CertificateException e) {}
-		        	
+//		KeyStore keyStore;
+//		try {
+//			keyStore = KeyStore.getInstance("AndroidKeyStore");
+//			keyStore.load(null);
+//			Log.i(TAG, "Key store type: " + keyStore.getType());
+//			Log.i(TAG, "Key store size: " + keyStore.size());
+//			Log.i(TAG, "Key store alises: " + keyStore.aliases());
+//		} catch (Exception e) {
+//			Log.w(TAG, "Could not get key store", e);
+//			return;
+//		}
 		
-		if (secureStorage.state()!= State.UNLOCKED) {
+		if (!secureStorage.isReady()) {
 			
-			String unlockAction;
-//			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-//				unlockAction = AndroidSecureStorageConstants.UNLOCK_ACTION_PRE_HONEYCOMB;
-//			}
-//			else {
-				unlockAction = AndroidSecureStorageConstants.UNLOCK_ACTION_HONEYCOMB;
-//			}
-
-			Intent intent = new Intent(unlockAction);	
+			Intent intent = new Intent(AndroidSecureStorageConstants.getUnlockAction());	
 		    startActivityForResult(intent, UNLOCK_AND_LIST_IDENTITY);		    
 			return;
 		}
@@ -91,39 +80,27 @@ public class ListIdentitiesActivity extends ListActivity {
 	
 	
 	private void setList() {
-		if (secureStorage.state() != State.UNLOCKED) return;
+		if (!secureStorage.isReady()) {
+			return;
+		}
 		
 		certNames = new ArrayList<String>();
 		certNumbers = new ArrayList<Integer>();
 		
 		int count = 0;
-		while (true) {
-			String certKey = String.format(Locale.US, "CERT_%d", count);
-			String keyKey = String.format(Locale.US, "KEY_%d", count++);
-			
-			if (!secureStorage.contains(certKey) && !secureStorage.contains(keyKey)) break;
-			
+		X509Certificate cert;
+		while ((cert = secureStorage.getCertificate(count)) != null) {
+
 			// Add cert to list
-			byte[] encodedCert = secureStorage.getWithStringKey(certKey);					
-			
-			if (encodedCert==null) continue;
-			
-			X509Certificate cert = null;
-			try {
-				cert = (X509Certificate) certFactory.generateCertificate(new ByteArrayInputStream(encodedCert));
-			} catch (CertificateException e) {
-				Log.e("miki",e.getMessage());
-			}
-			if (cert==null) continue;
-			
 			certNames.add(cert.getSubjectDN().toString());
-			certNumbers.add(count-1);
+			certNumbers.add(count);
+			++count;
 		}
 		
 		setListAdapter(new ArrayAdapter<String>(this, R.layout.list_files, certNames));	
 				
 		getListView().setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,long itemPos) {				
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long itemPos) {				
 				Intent intent = getIntent();
 				intent.putExtra(Sign.Params.IDENTITY, certNumbers.get((int)itemPos));				
 				setResult(RESULT_OK,intent);

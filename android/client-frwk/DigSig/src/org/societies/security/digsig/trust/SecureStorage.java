@@ -72,7 +72,17 @@ public class SecureStorage implements ISecureStorage {
 	}
 
 	@Override
-	public int setIdentity(X509Certificate certificate, PrivateKey key) {
-		return impl.setIdentity(certificate, key);
+	public int put(X509Certificate certificate, PrivateKey key) {
+		return impl.put(certificate, key);
+	}
+	
+	@Override
+	public boolean isReady() {
+		return impl.isReady();
+	}
+	
+	@Override
+	public boolean containsCertificateAndKey(int index) {
+		return impl.containsCertificateAndKey(index);
 	}
 }

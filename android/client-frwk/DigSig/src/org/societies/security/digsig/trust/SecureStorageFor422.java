@@ -27,6 +27,7 @@ package org.societies.security.digsig.trust;
 import java.io.ByteArrayInputStream;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -34,6 +35,7 @@ import java.util.Locale;
 
 import org.societies.security.digsig.apiinternal.ISecureStorage;
 import org.societies.security.digsig.sign.DigSigException;
+import org.societies.security.digsig.trust.AndroidSecureStorage.State;
 
 import android.util.Log;
 
@@ -69,7 +71,7 @@ public class SecureStorageFor422 implements ISecureStorage {
 
 		byte[] encodedCert = secureStorage.getWithStringKey(certKey);
 		if (encodedCert == null) {
-			Log.e(TAG, "Could not get certificate for identity No. " + index);
+			Log.w(TAG, "Could not get certificate for identity No. " + index);
 			return null;
 		}
 
@@ -78,7 +80,7 @@ public class SecureStorageFor422 implements ISecureStorage {
 		try {
 			cert = (X509Certificate) certFactory.generateCertificate(new ByteArrayInputStream(encodedCert));
 		} catch (Exception e) { 
-			Log.e(TAG, "Failed while decoding certificate for identity No. " + index, e);
+			Log.w(TAG, "Failed while decoding certificate for identity No. " + index, e);
 		}
 		return cert;
 	}
@@ -90,7 +92,7 @@ public class SecureStorageFor422 implements ISecureStorage {
 
 		byte[] encodedKey = secureStorage.getWithStringKey(keyKey);
 		if (encodedKey == null) {
-			Log.e(TAG, "Could not get private key for identity No. " + index);
+			Log.w(TAG, "Could not get private key for identity No. " + index);
 			return null;
 		}
 
@@ -100,14 +102,52 @@ public class SecureStorageFor422 implements ISecureStorage {
 			PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(encodedKey);            
 			key = keyFactory.generatePrivate(privKeySpec);
 		} catch (Exception e) { 
-			Log.e(TAG, "Failed while decoding private key for identity No. " + index, e);
+			Log.w(TAG, "Failed while decoding private key for identity No. " + index, e);
 		}
 		return key;
 	}
 
 	@Override
-	public int setIdentity(X509Certificate certificate, PrivateKey key) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int put(X509Certificate certificate, PrivateKey key) {
+		int index = size();
+		try {
+			secureStorage.put(Keywords.certificate(index), certificate.getEncoded());
+			secureStorage.put(Keywords.key(index), key.getEncoded());
+		} catch (CertificateEncodingException e) {
+			Log.w(TAG, "Could not put certificate and key", e);
+			return -1;
+		}
+		return index;
+	}
+	
+	@Override
+	public boolean isReady() {
+
+		try {
+			State state = secureStorage.state();
+			Log.d(TAG, "Secure storage state = " + state);
+			return state == State.UNLOCKED;
+		} catch (Exception e) {
+			Log.w(TAG, "Could not get secure storage state", e);
+			return false;
+		}
+	}
+	
+	@Override
+	public boolean containsCertificateAndKey(int index) {
+		
+		boolean keyExists = secureStorage.getWithStringKey(Keywords.key(index)) != null;
+		boolean certExists = secureStorage.getWithStringKey(Keywords.certificate(index)) != null;
+		
+		return (keyExists && certExists);
+	}
+	
+	private int size() {
+		for (int k = 0; true; k++) {
+			if (!secureStorage.contains(Keywords.certificate(k)) &&
+					!secureStorage.contains(Keywords.key(k))) {
+				return k;
+			}
+		}
 	}
 }

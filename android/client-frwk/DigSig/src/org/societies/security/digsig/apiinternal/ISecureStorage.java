@@ -27,6 +27,9 @@ package org.societies.security.digsig.apiinternal;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
+import android.app.Activity;
+import android.content.Intent;
+
 
 /**
  * Interface for retrieving X.509 certificates and private keys from android secure storage.
@@ -37,10 +40,18 @@ import java.security.cert.X509Certificate;
 public interface ISecureStorage {
 
 	/**
+	 * Check if both certificate and private key exist for given index.
+	 * 
+	 * @param index
+	 * @return True if both certificate and private key already exist
+	 */
+	public boolean containsCertificateAndKey(int index);
+	
+	/**
 	 * Get the identity's public certificate.
 	 * 
 	 * @param index Index of identity
-	 * @return The certificate
+	 * @return The certificate, or null if there is no certificate with given index
 	 */
 	public X509Certificate getCertificate(int index);	
 
@@ -48,17 +59,27 @@ public interface ISecureStorage {
 	 * Get the identity's private key.
 	 * 
 	 * @param index Index of identity
-	 * @return The private key
+	 * @return The private key, or null if there is no key with given index
 	 */
 	public PrivateKey getPrivateKey(int index);
 	
 	/**
-	 * Set the identity's public certificate and private key.
+	 * Put an identity's public certificate and private key.
 	 *
 	 * @param certificate The certificate to set
 	 * @param key The private key to set
 	 * @return Generated index of new identity.
 	 * If the identity already exists, then its existing index is returned.
 	 */
-	public int setIdentity(X509Certificate certificate, PrivateKey key);	
+	public int put(X509Certificate certificate, PrivateKey key);
+	
+	/**
+	 * Test the secure storage if it is unlocked and ready to use.
+	 * If secure storage is not ready and locked, it could be unlocked with
+	 * {@link Activity#startActivityForResult(android.content.Intent, int)}
+	 * where {@link Intent} action is {@link UNLOCK_ACTION_HONEYCOMB}.
+	 * 
+	 * @return True if ready to use, false otherwise.
+	 */
+	public boolean isReady();
 }

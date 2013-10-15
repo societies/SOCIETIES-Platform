@@ -24,38 +24,22 @@
  */
 package org.societies.security.digsig.trust;
 
-import android.content.Intent;
-import android.os.Build;
+import java.util.Locale;
 
 /**
- * Describe your class here...
+ * Keywords for storing digital keys and certificates
  *
- * @author mitjav
+ * @author MItja Vardjan
  *
  */
-public class AndroidSecureStorageConstants {
+public class Keywords {
 
-	/**
-	 * For Android versions prior to Honeycomb
-	 */
-	private static final String UNLOCK_ACTION_PRE_HONEYCOMB = "android.credentials.UNLOCK";
-	
-	/**
-	 * For Android Honeycomb and newer versions.
-	 */
-	private static final String UNLOCK_ACTION_HONEYCOMB = "com.android.credentials.UNLOCK";
-
-	/**
-	 * Get action to start activity for unlocking secure storage.
-	 * 
-	 * @return The action to use for {@link Intent}
-	 */
-	public static String getUnlockAction() {
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-			return AndroidSecureStorageConstants.UNLOCK_ACTION_PRE_HONEYCOMB;
-		}
-		else {
-			return AndroidSecureStorageConstants.UNLOCK_ACTION_HONEYCOMB;
-		}
+	public static String key(int index) {
+		return String.format(Locale.US, "KEY_%d", index);
 	}
+	
+	public static String certificate(int index) {
+		return String.format(Locale.US, "CERT_%d", index);
+	}
+
 }

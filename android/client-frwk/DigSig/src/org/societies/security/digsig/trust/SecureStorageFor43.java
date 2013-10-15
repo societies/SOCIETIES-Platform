@@ -112,8 +112,20 @@ public class SecureStorageFor43 implements ISecureStorage {
 	}
 
 	@Override
-	public int setIdentity(X509Certificate certificate, PrivateKey key) {
+	public int put(X509Certificate certificate, PrivateKey key) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+	@Override
+	public boolean isReady() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public boolean containsCertificateAndKey(int index) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
