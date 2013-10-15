@@ -30,7 +30,6 @@ import java.security.PrivateKey;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Locale;
 
 import org.societies.security.digsig.apiinternal.ISecureStorage;
 import org.societies.security.digsig.sign.DigSigException;
@@ -51,11 +50,6 @@ public class SecureStorageFor43 implements ISecureStorage {
 	private KeyFactory keyFactory;
 	private CertificateFactory certFactory;
 
-	/**
-	 * Constructor
-	 * 
-	 * @throws DigSigException 
-	 */
 	public SecureStorageFor43() throws DigSigException {
 		
 		try {
@@ -67,15 +61,15 @@ public class SecureStorageFor43 implements ISecureStorage {
 			throw new DigSigException(e);
 		}
 	}
-	
+
 	@Override
 	public X509Certificate getCertificate(int index) {
 		
-		String certKey = String.format(Locale.US, "CERT_%d", index);
+		String certKey = Keywords.certificate(index);
 
 		byte[] encodedCert = secureStorage.getWithStringKey(certKey);
 		if (encodedCert == null) {
-			Log.e(TAG, "Could not get certificate for identity No. " + index);
+			Log.w(TAG, "Could not get certificate for identity No. " + index);
 			return null;
 		}
 
@@ -84,7 +78,7 @@ public class SecureStorageFor43 implements ISecureStorage {
 		try {
 			cert = (X509Certificate) certFactory.generateCertificate(new ByteArrayInputStream(encodedCert));
 		} catch (Exception e) { 
-			Log.e(TAG, "Failed while decoding certificate for identity No. " + index, e);
+			Log.w(TAG, "Failed while decoding certificate for identity No. " + index, e);
 		}
 		return cert;
 	}
@@ -92,11 +86,11 @@ public class SecureStorageFor43 implements ISecureStorage {
 	@Override
 	public PrivateKey getPrivateKey(int index) {
 		
-		String keyKey = String.format(Locale.US, "KEY_%d", index);
+		String keyKey = Keywords.key(index);
 
 		byte[] encodedKey = secureStorage.getWithStringKey(keyKey);
 		if (encodedKey == null) {
-			Log.e(TAG, "Could not get private key for identity No. " + index);
+			Log.w(TAG, "Could not get private key for identity No. " + index);
 			return null;
 		}
 
@@ -106,7 +100,7 @@ public class SecureStorageFor43 implements ISecureStorage {
 			PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(encodedKey);            
 			key = keyFactory.generatePrivate(privKeySpec);
 		} catch (Exception e) { 
-			Log.e(TAG, "Failed while decoding private key for identity No. " + index, e);
+			Log.w(TAG, "Failed while decoding private key for identity No. " + index, e);
 		}
 		return key;
 	}

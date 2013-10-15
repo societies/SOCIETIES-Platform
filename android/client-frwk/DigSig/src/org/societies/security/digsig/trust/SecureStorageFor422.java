@@ -31,7 +31,6 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Locale;
 
 import org.societies.security.digsig.apiinternal.ISecureStorage;
 import org.societies.security.digsig.sign.DigSigException;
@@ -67,7 +66,7 @@ public class SecureStorageFor422 implements ISecureStorage {
 	@Override
 	public X509Certificate getCertificate(int index) {
 		
-		String certKey = String.format(Locale.US, "CERT_%d", index);
+		String certKey = Keywords.certificate(index);
 
 		byte[] encodedCert = secureStorage.getWithStringKey(certKey);
 		if (encodedCert == null) {
@@ -88,7 +87,7 @@ public class SecureStorageFor422 implements ISecureStorage {
 	@Override
 	public PrivateKey getPrivateKey(int index) {
 		
-		String keyKey = String.format(Locale.US, "KEY_%d", index);
+		String keyKey = Keywords.key(index);
 
 		byte[] encodedKey = secureStorage.getWithStringKey(keyKey);
 		if (encodedKey == null) {
