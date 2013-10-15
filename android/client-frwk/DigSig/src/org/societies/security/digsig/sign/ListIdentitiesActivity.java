@@ -43,17 +43,6 @@ public class ListIdentitiesActivity extends ListActivity {
 			finish();
 			return;
 		}
-//		KeyStore keyStore;
-//		try {
-//			keyStore = KeyStore.getInstance("AndroidKeyStore");
-//			keyStore.load(null);
-//			Log.i(TAG, "Key store type: " + keyStore.getType());
-//			Log.i(TAG, "Key store size: " + keyStore.size());
-//			Log.i(TAG, "Key store alises: " + keyStore.aliases());
-//		} catch (Exception e) {
-//			Log.w(TAG, "Could not get key store", e);
-//			return;
-//		}
 		
 		if (!secureStorage.isReady()) {
 			

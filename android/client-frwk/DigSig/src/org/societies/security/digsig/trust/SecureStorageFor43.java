@@ -24,12 +24,11 @@
  */
 package org.societies.security.digsig.trust;
 
-import java.io.ByteArrayInputStream;
-import java.security.KeyFactory;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.PrivateKey;
-import java.security.cert.CertificateFactory;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.security.spec.PKCS8EncodedKeySpec;
 
 import org.societies.security.digsig.apiinternal.ISecureStorage;
 import org.societies.security.digsig.sign.DigSigException;
@@ -38,24 +37,27 @@ import android.util.Log;
 
 /**
  * Helper class for retrieving X.509 certificates and private keys from android secure storage.
+ * 
+ * This class is not public.
  *
  * @author Mitja Vardjan
  *
  */
-public class SecureStorageFor43 implements ISecureStorage {
+class SecureStorageFor43 implements ISecureStorage {
 
 	private static final String TAG = SecureStorageFor43.class.getSimpleName();
 	
-	private AndroidSecureStorage secureStorage;
-	private KeyFactory keyFactory;
-	private CertificateFactory certFactory;
+	private KeyStore secureStorage;
 
 	public SecureStorageFor43() throws DigSigException {
-		
+
 		try {
-			secureStorage = AndroidSecureStorage.getInstance();
-			keyFactory = KeyFactory.getInstance("RSA");
-			certFactory = CertificateFactory.getInstance("X.509");
+			secureStorage = KeyStore.getInstance("AndroidKeyStore");
+			secureStorage.load(null);
+			
+			Log.i(TAG, "Key store initialized. Type: " + secureStorage.getType() + "");
+			Log.d(TAG, "Key store size: " + secureStorage.size());
+			Log.d(TAG, "Key store alises: " + secureStorage.aliases());
 		} catch (Exception e) {
 			Log.e(TAG, "Failed to initialize", e);
 			throw new DigSigException(e);
@@ -67,18 +69,11 @@ public class SecureStorageFor43 implements ISecureStorage {
 		
 		String certKey = Keywords.certificate(index);
 
-		byte[] encodedCert = secureStorage.getWithStringKey(certKey);
-		if (encodedCert == null) {
-			Log.w(TAG, "Could not get certificate for identity No. " + index);
-			return null;
-		}
-
 		X509Certificate cert = null;
-
 		try {
-			cert = (X509Certificate) certFactory.generateCertificate(new ByteArrayInputStream(encodedCert));
-		} catch (Exception e) { 
-			Log.w(TAG, "Failed while decoding certificate for identity No. " + index, e);
+			cert = (X509Certificate) secureStorage.getCertificate(certKey);
+		} catch (KeyStoreException e) {
+			Log.w(TAG, "Could not get certificate for identity No. " + index, e);
 		}
 		return cert;
 	}
@@ -87,39 +82,66 @@ public class SecureStorageFor43 implements ISecureStorage {
 	public PrivateKey getPrivateKey(int index) {
 		
 		String keyKey = Keywords.key(index);
-
-		byte[] encodedKey = secureStorage.getWithStringKey(keyKey);
-		if (encodedKey == null) {
-			Log.w(TAG, "Could not get private key for identity No. " + index);
-			return null;
-		}
-
 		PrivateKey key = null;
-
+		
 		try {
-			PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(encodedKey);            
-			key = keyFactory.generatePrivate(privKeySpec);
-		} catch (Exception e) { 
-			Log.w(TAG, "Failed while decoding private key for identity No. " + index, e);
+			key = (PrivateKey) secureStorage.getKey(keyKey, null);
+		} catch (Exception e) {
+			Log.w(TAG, "Could not get private key for identity No. " + index, e);
 		}
 		return key;
 	}
 
 	@Override
 	public int put(X509Certificate certificate, PrivateKey key) {
-		// TODO Auto-generated method stub
-		return 0;
+
+		int index = size();
+
+		try {
+			secureStorage.setCertificateEntry("CERT_0", certificate);
+			Log.i(TAG, "Stored certificate of type " + certificate.getType());
+			secureStorage.setKeyEntry("KEY_0", key, null, new Certificate[] {certificate});
+			Log.i(TAG, "Stored key of format " + key.getFormat());
+			return index;
+		} catch (Exception e) {
+			Log.w(TAG, "put", e);
+			return -1;
+		}
 	}
 	
 	@Override
 	public boolean isReady() {
-		// TODO Auto-generated method stub
-		return false;
+
+		if (secureStorage == null) {
+			Log.w(TAG, "isReady(): secureStorage is null!");
+		}
+		return secureStorage != null;
 	}
 	
 	@Override
 	public boolean containsCertificateAndKey(int index) {
-		// TODO Auto-generated method stub
-		return false;
+
+		try {
+			boolean keyExists = secureStorage.getKey(Keywords.key(index), null) != null;
+			boolean certExists = secureStorage.getCertificate(Keywords.certificate(index)) != null;
+			return (keyExists && certExists);
+		} catch (Exception e) {
+			Log.w(TAG, "containsCertificateAndKey", e);
+			return false;
+		}
+	}
+	
+	private int size() {
+		try {
+			for (int k = 0; true; k++) {
+				if (!secureStorage.containsAlias(Keywords.certificate(k)) &&
+						!secureStorage.containsAlias(Keywords.key(k))) {
+					return k;
+				}
+			}
+		} catch (KeyStoreException e) {
+			Log.w(TAG, "size", e);
+			return -1;
+		}
 	}
 }

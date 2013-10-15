@@ -40,11 +40,13 @@ import android.util.Log;
 
 /**
  * Helper class for retrieving X.509 certificates and private keys from android secure storage.
+ * 
+ * This class is not public.
  *
  * @author Mitja Vardjan, based on code from Miroslav Pavleski
  *
  */
-public class SecureStorageFor422 implements ISecureStorage {
+class SecureStorageFor422 implements ISecureStorage {
 
 	private static final String TAG = SecureStorageFor422.class.getSimpleName();
 	
@@ -108,15 +110,19 @@ public class SecureStorageFor422 implements ISecureStorage {
 
 	@Override
 	public int put(X509Certificate certificate, PrivateKey key) {
+
 		int index = size();
+		
 		try {
 			secureStorage.put(Keywords.certificate(index), certificate.getEncoded());
+			Log.i(TAG, "Stored certificate of type " + certificate.getType());
 			secureStorage.put(Keywords.key(index), key.getEncoded());
+			Log.i(TAG, "Stored key of format " + key.getFormat());
+			return index;
 		} catch (CertificateEncodingException e) {
 			Log.w(TAG, "Could not put certificate and key", e);
 			return -1;
 		}
-		return index;
 	}
 	
 	@Override

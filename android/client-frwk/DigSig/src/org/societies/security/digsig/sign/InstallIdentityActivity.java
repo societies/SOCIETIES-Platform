@@ -126,45 +126,7 @@ public class InstallIdentityActivity extends Activity {
 			return;
 		}
 		
-		
-		
-
-//		KeyStore keyStore;
-//		try {
-//			keyStore = KeyStore.getInstance("AndroidKeyStore");
-//			keyStore.load(null);
-//			Log.i(TAG, "Key store type: " + keyStore.getType());
-//			Log.i(TAG, "Key store size: " + keyStore.size());
-//			Log.i(TAG, "Key store alises: " + keyStore.aliases());
-//
-//			keyStore.setCertificateEntry("CERT_0", certificate);
-//			Log.i(TAG, "Stored certificate of type " + certificate.getType());
-//			keyStore.setKeyEntry("KEY_0", privateKey, null, new Certificate[] {certificate});
-//			Log.i(TAG, "Stored key of format " + privateKey.getFormat());
-//
-//			
-//			keyStore = KeyStore.getInstance("AndroidKeyStore");
-//			keyStore.load(null);
-//			Log.d(TAG, "Retrieved certificate of type " + keyStore.getCertificate("CERT_0").getType());
-//			Log.d(TAG, "Retrieved key of format " + keyStore.getKey("KEY_0", null));
-//			
-//			Toast.makeText(this, "Digital identity installed sucessfully", Toast.LENGTH_SHORT).show();
-//			setResult(RESULT_OK);
-//			finish();				
-//			return;
-//		} catch (Exception e) {
-//			Log.w(TAG, "installIdentity", e);
-//			setResult(RESULT_CANCELED);
-//			finish();				
-//			return;
-//		}
-
-		
-		
-		
-		int count = 0;
-
-		count = -1;
+		int count = -1;
 		while (secureStorage.containsCertificateAndKey(++count)) {
 
 			X509Certificate alreadyStoredCert = secureStorage.getCertificate(count);
