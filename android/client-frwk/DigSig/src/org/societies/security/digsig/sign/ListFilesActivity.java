@@ -64,7 +64,7 @@ public class ListFilesActivity extends ListActivity {
 					return;
 				}
 				
-				Log.i("miki", String.format("Selected item %d", itemPos));
+				Log.i(TAG, String.format("Selected item %d", itemPos));
 				
 				Intent intent = getIntent();
 				intent.putExtra(Sign.Params.IDENTITY, Environment.getExternalStorageDirectory().getPath() + "/" + fileArray[(int) itemPos]);

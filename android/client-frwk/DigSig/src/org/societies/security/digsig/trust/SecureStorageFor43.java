@@ -98,9 +98,9 @@ class SecureStorageFor43 implements ISecureStorage {
 		int index = size();
 
 		try {
-			secureStorage.setCertificateEntry("CERT_0", certificate);
+			secureStorage.setCertificateEntry(Keywords.certificate(index), certificate);
 			Log.i(TAG, "Stored certificate of type " + certificate.getType());
-			secureStorage.setKeyEntry("KEY_0", key, null, new Certificate[] {certificate});
+			secureStorage.setKeyEntry(Keywords.key(index), key, null, new Certificate[] {certificate});
 			Log.i(TAG, "Stored key of format " + key.getFormat());
 			return index;
 		} catch (Exception e) {

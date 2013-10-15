@@ -5,6 +5,7 @@ import java.security.Key;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Enumeration;
 
 import org.societies.security.digsig.api.Sign;
@@ -131,7 +132,21 @@ public class InstallIdentityActivity extends Activity {
 
 			X509Certificate alreadyStoredCert = secureStorage.getCertificate(count);
 			PrivateKey alreadyStoredKey = secureStorage.getPrivateKey(count);
-			if (certificate.equals(alreadyStoredCert) && privateKey.equals(alreadyStoredKey)) {
+			
+			Log.d(TAG, "Comparing new certificate " + certificate.getSubjectDN().getName() +
+					" to already stored certificate " + alreadyStoredCert.getSubjectDN().getName());
+			Log.d(TAG, "Certificates equal = " + certificate.equals(alreadyStoredCert));
+			Log.d(TAG, "Keys equal = " + Arrays.equals(privateKey.getEncoded(), alreadyStoredKey.getEncoded()));
+			
+			// From Android 4.3, keys and certificates are somewhat changed when stored.
+			// When retrieved from Android's they still perform the same, but are not byte to byte
+			// equal to the ones that were stored.
+			// Certificates can still be compared with java.security.cert.Certificate.equals() method
+			// but there is no such method for keys.
+			// When comparing byte array representations of keys (or certificates), they will always seem different.
+			// So only certificates can be reliably compared with Certificate.equals() method.
+			if (certificate.equals(alreadyStoredCert)) {
+				
 				String msg = "Digital identity " + certificate.getSubjectDN().getName() + " is already installed.";
 				Log.i(TAG, msg);
 				Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
