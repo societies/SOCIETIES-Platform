@@ -136,7 +136,7 @@ public abstract class ObfuscatorInfo {
 		}
 		return new ArrayList<String>(obfuscationExamples.values());
 	}
-	
+
 
 	/**
 	 * Retrieve all friendly obfuscation examples (reversed order: not obfuscated to more obfuscated)
@@ -150,7 +150,7 @@ public abstract class ObfuscatorInfo {
 		Collections.reverse(exampleList);
 		return exampleList;
 	}
-	
+
 	/**
 	 * Retrieve all friendly obfuscation examples (reversed order: not obfuscated to more obfuscated)
 	 * @return All friendly obfuscation examples. Null if no examples are provided.
@@ -167,5 +167,12 @@ public abstract class ObfuscatorInfo {
 		}
 		Collections.reverse(exampleList);
 		return exampleList;
+	}
+
+	public double computeObfuscationLevel(int obfuscationLevelStep) {
+		if(ObfuscationLevelType.CONTINUOUS == obfuscationLevelType) {
+			return (double)obfuscationLevelStep/(double)100;
+		}
+		return (double)obfuscationLevelStep/(double)nbOfObfuscationLevelStep;
 	}
 }
