@@ -55,33 +55,28 @@ public class QualityofPreference implements IQualityofPreference {
 	private int successCounter;
 
 
-
-	public void finalize() throws Throwable {
-
-	}
-
 	public QualityofPreference(){
 
 	}
 
 	public int getAbortedCounter(){
-		return 0;
+		return this.abortedCounter;
 	}
 
 	public Date getLastAborted(){
-		return null;
+		return this.lastAborted;
 	}
 
 	public Date getLastModified(){
-		return null;
+		return this.lastModified;
 	}
 
 	public Date getLastSuccess(){
-		return null;
+		return this.lastSuccess;
 	}
 
 	public int getSuccessCounter(){
-		return 0;
+		return this.successCounter;
 	}
 
 	/**
@@ -93,7 +88,7 @@ public class QualityofPreference implements IQualityofPreference {
 	 */
 	@Override
 	public void increaseAbortedCounter(int level){
-
+		this.abortedCounter +=level;
 	}
 
 	/**
@@ -101,7 +96,7 @@ public class QualityofPreference implements IQualityofPreference {
 	 * @param level
 	 */
 	public void increaseSuccessCounter(int level){
-
+		this.successCounter+=level;
 	}
 
 	/**
@@ -109,7 +104,7 @@ public class QualityofPreference implements IQualityofPreference {
 	 * @param lastAborted
 	 */
 	public void setLastAborted(Date lastAborted){
-
+		this.lastAborted = lastAborted;
 	}
 
 	/**
@@ -117,7 +112,7 @@ public class QualityofPreference implements IQualityofPreference {
 	 * @param lastModified
 	 */
 	public void setLastModified(Date lastModified){
-
+		this.lastModified = lastModified;
 	}
 
 	/**
@@ -125,7 +120,7 @@ public class QualityofPreference implements IQualityofPreference {
 	 * @param lastSuccess
 	 */
 	public void setLastSuccess(Date lastSuccess){
-
+		this.lastSuccess = lastSuccess;
 	}
 
 }

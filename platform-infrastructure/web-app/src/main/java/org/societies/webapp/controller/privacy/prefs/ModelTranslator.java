@@ -116,17 +116,23 @@ public class ModelTranslator {
 
 		if (privacyPreference.getUserObject() instanceof IPrivacyOutcome){
 			treeNode = new DefaultTreeNode(privacyPreference.getUserObject(), root);
-			logging.debug("Added subnode: "+treeNode +" to parent node: "+root);
+			if (logging.isDebugEnabled()){
+				logging.debug("Added subnode: "+treeNode +" to parent node: "+root);
+			}
 			return root;
 		}
 
 		if (privacyPreference.getUserObject() instanceof IPrivacyPreferenceCondition){
 			treeNode = new DefaultTreeNode(privacyPreference.getUserObject(), root);
-			logging.debug("Added subnode: "+treeNode +" to parent node: "+root);
+			if (logging.isDebugEnabled()){
+				logging.debug("Added subnode: "+treeNode +" to parent node: "+root);
+			}
 		}else{
 			//assuming this is the root
 			treeNode = root;
-			logging.debug("This is the root node. Setting: "+treeNode +" as parent node");
+			if (logging.isDebugEnabled()){
+				logging.debug("This is the root node. Setting: "+treeNode +" as parent node");
+			}
 		}
 
 		Enumeration<PrivacyPreference> children = privacyPreference.children();
@@ -136,7 +142,9 @@ public class ModelTranslator {
 			PrivacyPreference nextElement = children.nextElement();
 			getPrivacyPreference(nextElement, treeNode);
 		}
-		logging.debug("Added subnode: "+treeNode +" to parent node: "+root);
+		if (logging.isDebugEnabled()){
+			logging.debug("Added subnode: "+treeNode +" to parent node: "+root);
+		}
 		return treeNode;
 
 	}
@@ -146,17 +154,23 @@ public class ModelTranslator {
 
 		if (preference.getUserObject() instanceof IOutcome){
 			treeNode = new DefaultTreeNode(preference.getUserObject(), root);
-			logging.debug("Added subnode: "+treeNode+" to parent node: "+root);
+			if (logging.isDebugEnabled()){
+				logging.debug("Added subnode: "+treeNode+" to parent node: "+root);
+			}
 			return root;
 		}
 
 		if (preference.getUserObject() instanceof IPreferenceCondition){
 			treeNode = new DefaultTreeNode(preference.getUserObject(), root);
-			logging.debug("Added subnode: "+treeNode+" to parent node: "+root);
+			if (logging.isDebugEnabled()){
+				logging.debug("Added subnode: "+treeNode+" to parent node: "+root);
+			}
 		}else{
 			//assuming this is the root
 			treeNode = root;
-			logging.debug("This is the root node. Setting: "+treeNode +" as parent node");
+			if (logging.isDebugEnabled()){
+				logging.debug("This is the root node. Setting: "+treeNode +" as parent node");
+			}
 		}
 
 		Enumeration<IPreference> children = preference.children();
@@ -165,7 +179,9 @@ public class ModelTranslator {
 			IPreference nextElement = children.nextElement();
 			getPreference(nextElement, treeNode);
 		}
-		logging.debug("Added subnode: "+treeNode +" to parent node: "+root);
+		if (logging.isDebugEnabled()){
+			logging.debug("Added subnode: "+treeNode +" to parent node: "+root);
+		}
 		return treeNode;
 	}
 
@@ -179,18 +195,28 @@ public class ModelTranslator {
 		while(depthFirstEnumeration.hasMoreElements()){
 			IPreference nextElement = depthFirstEnumeration.nextElement();
 			if (nextElement.getUserObject() == null){
-				logging.debug(" +1+1+ element "+nextElement.toString()+"is leaf: "+nextElement.isLeaf()+" and user object is null: ");
+				if (logging.isDebugEnabled()){
+					logging.debug(" +1+1+ element "+nextElement.toString()+"is leaf: "+nextElement.isLeaf()+" and user object is null: ");
+				}
 			}else{
-				logging.debug(" +1+1+ element "+nextElement.toString()+"is leaf: "+nextElement.isLeaf()+" and user object is of instance: "+nextElement.getUserObject().getClass().getName());
+				if (logging.isDebugEnabled()){
+					logging.debug(" +1+1+ element "+nextElement.toString()+"is leaf: "+nextElement.isLeaf()+" and user object is of instance: "+nextElement.getUserObject().getClass().getName());
+				}
 			}
 			
-			logging.debug("+2+2+" +(nextElement.isLeaf() && (nextElement.getUserObject() instanceof ContextPreferenceCondition)));
+			if (logging.isDebugEnabled()){
+				logging.debug("+2+2+" +(nextElement.isLeaf() && (nextElement.getUserObject() instanceof ContextPreferenceCondition)));
+			}
 			if (nextElement.isLeaf() && (nextElement.getUserObject() instanceof ContextPreferenceCondition)){
-				logging.debug("Returning erroneous node");
+				if (logging.isDebugEnabled()){
+					logging.debug("Returning erroneous node");
+				}
 				return nextElement.getCondition();
 			}
 		}
-		logging.debug("Returning null");
+		if (logging.isDebugEnabled()){
+			logging.debug("Returning null");
+		}
 		return null;
 	}
 

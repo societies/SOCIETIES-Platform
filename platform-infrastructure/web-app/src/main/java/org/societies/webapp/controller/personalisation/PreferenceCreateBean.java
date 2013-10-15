@@ -177,7 +177,9 @@ public class PreferenceCreateBean extends BasePageController {
 	
 	public void setupCtxIds() {
 		try {
-			this.logging.debug("Retrieving context attributes to be used as conditions");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Retrieving context attributes to be used as conditions");
+			}
 			IndividualCtxEntity individualCtxEntity = this.ctxBroker.retrieveIndividualEntity(userId).get();
 			Set<CtxAttribute> attributes = individualCtxEntity.getAttributes();
 
@@ -190,7 +192,9 @@ public class PreferenceCreateBean extends BasePageController {
 				this.ctxIds.add(id.getUri());
 				this.ctxIDTable.put(id.getUri(), id);
 			}
-			this.logging.debug("Found "+this.ctxIds.size()+" context attributes");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Found "+this.ctxIds.size()+" context attributes");
+			}
 
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -245,7 +249,9 @@ public class PreferenceCreateBean extends BasePageController {
 		RequestContext context = RequestContext.getCurrentInstance();
 		context.execute("prefDetailsDlg.hide()");
 		context.execute("outcomeDlg.show()");
-		this.logging.debug("Successfully validated preferenceDetails");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Successfully validated preferenceDetails");
+		}
 		
 		
 	}
@@ -299,7 +305,9 @@ public class PreferenceCreateBean extends BasePageController {
 	}
 	public void addCondition(){
 		if (selectedNode==null){
-			this.logging.debug("selected node is null - addCondition");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("selected node is null - addCondition");
+			}
 			return;
 		}
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Adding condition", "id: "+this.selectedCtxID+", value: "+this.ctxValue);
@@ -308,25 +316,37 @@ public class PreferenceCreateBean extends BasePageController {
 
 		ContextPreferenceCondition conditionBean = new ContextPreferenceCondition(this.ctxIDTable.get(selectedCtxID), selectedCtxOperator, ctxValue, "");
 		if (selectedNode.getData() instanceof IOutcome){
-			this.logging.debug("Adding condition to outcome");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Adding condition to outcome");
+			}
 			//get the parent of the outcome node
 			TreeNode parent = selectedNode.getParent();
-			this.logging.debug("parent of selected node is: "+parent);
+			if (logging.isDebugEnabled()){
+				this.logging.debug("parent of selected node is: "+parent);
+			}
 			//remove the outcome from its parent
 			parent.getChildren().remove(selectedNode);
-			this.logging.debug("removed selected node from parent. parent now has "+parent.getChildCount()+" children nodes");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("removed selected node from parent. parent now has "+parent.getChildCount()+" children nodes");
+			}
 			//create the condition node
 			TreeNode conditionNode = new DefaultTreeNode(conditionBean, parent);
-			this.logging.debug("added: "+conditionNode+" to parent: "+parent);
+			if (logging.isDebugEnabled()){
+				this.logging.debug("added: "+conditionNode+" to parent: "+parent);
+			}
 			//add the condition node to the parent node
 			//parent.getChildren().add(conditionNode);
 			//set the condition as parent of the outcome
 			selectedNode.setParent(conditionNode);
-			this.logging.debug("set parent: "+conditionNode+" for selectedNode: "+selectedNode);
+			if (logging.isDebugEnabled()){
+				this.logging.debug("set parent: "+conditionNode+" for selectedNode: "+selectedNode);
+			}
 			//add the outcome node to the condition node;
 			//conditionNode.getChildren().add(selectedNode);
 		}else{
-			this.logging.debug("Adding condition to condition");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Adding condition to condition");
+			}
 			//create the condition node
 			TreeNode conditionNode = new DefaultTreeNode(conditionBean, selectedNode);
 			//add the conditionNode under the selected node
@@ -337,7 +357,10 @@ public class PreferenceCreateBean extends BasePageController {
 			
 		}
 
-		this.logging.debug("Added new condition "+conditionBean+" to selected node:"+selectedNode);
+		
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Added new condition "+conditionBean+" to selected node:"+selectedNode);
+		}
 		printTree();
 	}
 	
@@ -350,7 +373,9 @@ public class PreferenceCreateBean extends BasePageController {
 	}
 	public void addOutcome(){
 		if (selectedNode==null){
-			this.logging.debug("selected node is null - addOutcome");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("selected node is null - addOutcome");
+			}
 			return;
 		}
 		
@@ -382,7 +407,9 @@ public class PreferenceCreateBean extends BasePageController {
 			TreeNode newNode = new DefaultTreeNode(outcome, selectedNode);
 		
 		
-		this.logging.debug("Added new outcome : "+newNode+" to selected node: "+selectedNode);
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Added new outcome : "+newNode+" to selected node: "+selectedNode);
+			}
 	}
 	public void editNode(){
 		
@@ -409,8 +436,12 @@ public class PreferenceCreateBean extends BasePageController {
 	public void savePreference(){
 		FacesMessage fMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Saving preference", "Now saving prefernece");
 		FacesContext.getCurrentInstance().addMessage(null, fMessage);
-		this.logging.debug("savePreferences called");
-		this.logging.debug("Before translating the preference :");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("savePreferences called");
+		}
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Before translating the preference :");
+		}
 		printTree();
 		IPreference preference = ModelTranslator.getPreference(root);
 		erroneousNode = ModelTranslator.checkPreference(preference);
@@ -418,10 +449,16 @@ public class PreferenceCreateBean extends BasePageController {
 			RequestContext.getCurrentInstance().execute("msgFailureDlg1.show();");
 			return;
 		}
-		this.logging.debug("Printing preference before save: \n"+preference.toString());
-		this.logging.debug("Saving preferences with details: "+preferenceDetails.toString());
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Printing preference before save: \n"+preference.toString());
+		}
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Saving preferences with details: "+preferenceDetails.toString());
+		}
 		
-		this.logging.debug("Saving preference to preference manager: "+preference.toTreeString());
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Saving preference to preference manager: "+preference.toTreeString());
+		}
 		if (this.preferenceManager.storePreference(userId, preferenceDetails, preference)){
 			
 			RequestContext.getCurrentInstance().execute("msgSuccessDlg.show();");
@@ -439,19 +476,27 @@ public class PreferenceCreateBean extends BasePageController {
 
 	private void printTree(){
 		if (this.root==null){
-			this.logging.debug("root is null. tree is corrupted");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("root is null. tree is corrupted");
+			}
 			return;
 		}
-		this.logging.debug("********** <TREE **********");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("********** <TREE **********");
+		}
 
 		String tree = "\nRoot: "+root.getData()+" "+root.getChildCount();
 		List<TreeNode> children = this.root.getChildren();
 		for (TreeNode child : children){
 			tree = tree.concat(getChildrenToPrint(child));
 		}
-		this.logging.debug(tree);
+		if (logging.isDebugEnabled()){
+			this.logging.debug(tree);
+		}
 
-		this.logging.debug("******** </TREE> ************");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("******** </TREE> ************");
+		}
 
 	}
 	
@@ -638,7 +683,9 @@ public class PreferenceCreateBean extends BasePageController {
 
 	public void setDefaultNodeValue(String defaultNodeValue) {
 		this.defaultNodeValue = defaultNodeValue;
-		this.logging.debug("Setting default node value: "+this.defaultNodeValue);
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Setting default node value: "+this.defaultNodeValue);
+		}
 	}
 
 	public IUserPreferenceConditionMonitor getUserPreferenceConditionMonitor() {

@@ -66,12 +66,16 @@ public class TreeConverter {
 			 convertToPreferenceTree(temp, child);
 			 
 		}
-		this.logging.debug("Converted tree:");
+		if(this.logging.isDebugEnabled()){
+			this.logging.debug("Converted tree:");
+		}
 		Enumeration<IPreference> e = pref.postorderEnumeration();
 		
 		while (e.hasMoreElements()){
 			IPreference p = e.nextElement();
-			this.logging.debug(p.toString());
+			if(this.logging.isDebugEnabled()){
+				this.logging.debug(p.toString());
+			}
 		}
 		return pref;
 	}

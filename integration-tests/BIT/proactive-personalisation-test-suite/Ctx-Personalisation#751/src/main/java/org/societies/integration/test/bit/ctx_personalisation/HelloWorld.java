@@ -33,6 +33,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.personalisation.model.Action;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.personalisation.model.IActionConsumer;
@@ -54,17 +55,14 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 	String volume;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 
+	private boolean receivedAction = false;
+	
 	public HelloWorld(){
 		bgColour = "";
 		volume = "";
-		myServiceID = new ServiceResourceIdentifier();
-		myServiceID.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
-		try {
-			myServiceID.setIdentifier(new URI("css://eliza@societies.org/HelloEarth"));
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		myServiceID = ServiceModelUtils.
+			    generateServiceResourceIdentifierFromString(
+			      "test-service test.societies.local.macs.hw.ac.uk/testService");
 	}
 	@Override
 	public ServiceResourceIdentifier getServiceIdentifier() {
@@ -87,9 +85,11 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 		if (action.getparameterName().equalsIgnoreCase("bgColour")){
 			this.bgColour = action.getvalue();
 			log("Personalised bgColour with: "+action.getvalue());
+			this.receivedAction = true;
 		}else if (action.getparameterName().equalsIgnoreCase("volume")){
 			this.volume = action.getvalue();
 			log("Personalised volume with: "+action.getvalue());
+			this.receivedAction = true;
 		}
 		return true;
 	}
@@ -134,5 +134,11 @@ public class HelloWorld implements IHelloWorld, IActionConsumer{
 	@Override
 	public List<PersonalisablePreferenceIdentifier> getPersonalisablePreferences() {
 		return new ArrayList<PersonalisablePreferenceIdentifier>();
+	}
+	public boolean isReceivedAction() {
+		return receivedAction;
+	}
+	public void setReceivedAction(boolean receivedAction) {
+		this.receivedAction = receivedAction;
 	}
 }

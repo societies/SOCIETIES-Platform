@@ -68,7 +68,9 @@ public class CommonNodeCounter {
 	public IPreference getMostCommonNode(){
 		int counter = 0;
 		IPreference ptn = null;
-		logging.debug("nc size:"+this.nc.size());
+		if (logging.isDebugEnabled()){
+			logging.debug("nc size:"+this.nc.size());
+		}
 		for (int i = 0; i< this.nc.size(); i++){
 			int c = this.nc.get(i).getCounter();
 			if (counter < c){

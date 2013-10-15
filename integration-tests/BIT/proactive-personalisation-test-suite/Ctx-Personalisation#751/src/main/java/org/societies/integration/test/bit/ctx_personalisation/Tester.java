@@ -97,52 +97,66 @@ public class Tester {
 	try{
 		//changeContext("home", "free");
 		
-		for (int i=0; i<10; i++){
+		for (int i=0; i<4; i++){
 			log("Step: "+i);
 			
 			setContext("home", "Monday",1);
-			Thread.sleep(500);
+			Thread.sleep(1000);
 			this.helloWorldService.setBackgroundColour(userId, "red");
-			Thread.sleep(2500);
+			Thread.sleep(5000);
 			
 			setContext("home", "Tuesday",2);
-			Thread.sleep(500);
+			Thread.sleep(1000);
 			this.helloWorldService.setVolume(userId, "10");
 			
-			Thread.sleep(2500);
+			Thread.sleep(5000);
 			setContext("work", "Wednesday",3);
-			Thread.sleep(500);
+			Thread.sleep(1000);
 			this.helloWorldService.setBackgroundColour(userId, "black");
-			Thread.sleep(2500);
+			Thread.sleep(5000);
 			setContext("work", "Thursday",4);
-			Thread.sleep(500);
+			Thread.sleep(1000);
 			this.helloWorldService.setVolume(userId, "50");
 			Thread.sleep(5000);
 			
 			
 		}
 		
-		
+		Thread.sleep(20000);
+		this.helloWorldService.setReceivedAction(false);
 		//System.out.println("1Tester: set context home free");
 		setContext("home", "Monday",1);
 		logging.info("context set to 'loc=home, dow=Monday,hod=1' ");
-		Thread.sleep(5000);
+		
 		logging.info("1Tester: get background colour (red)");
+		
+		while (!this.helloWorldService.isReceivedAction()){
+			Thread.sleep(5000);
+		}
 		Assert.assertEquals("red", this.helloWorldService.getBackgroundColour(userId));
 		
+		
+		Thread.sleep(20000);
+		this.helloWorldService.setReceivedAction(false);
 		//System.out.println("2Tester: set context work busy");
 		setContext("work", "Wednesday",3);
 		logging.info("context set to 'loc=work, dow=Wednesday,hod=3' ");
-		Thread.sleep(5000);
+		while (!this.helloWorldService.isReceivedAction()){
+			Thread.sleep(5000);
+		}
 		logging.info("2Tester: get background colour (black)");
 		Assert.assertEquals("black", this.helloWorldService.getBackgroundColour(userId));
 	
 	
 		// setting colour to red, predicted action should set volume to 10
-		
+		Thread.sleep(20000);
+		this.helloWorldService.setReceivedAction(false);
 		this.helloWorldService.setBackgroundColour(userId, "red");
 		logging.info("3Tester: set background colour (red), wait for a prediction based on performed action:setBackgroundColour(userId, 'red') ");
-		Thread.sleep(5000);
+		
+		while (!this.helloWorldService.isReceivedAction()){
+			Thread.sleep(5000);
+		}
 		logging.info("3Tester: get Volume ...should be 10 and it is: " +this.helloWorldService.getVolume(userId));
 		Assert.assertEquals("10", this.helloWorldService.getVolume(userId));
 	
@@ -161,7 +175,7 @@ public class Tester {
 			CtxAttributeIdentifier locAttrId = symLocAttribute.getId();
 			this.symLocAttribute = (CtxAttribute) this.ctxBroker.updateAttribute(locAttrId, symLocValue).get();
 			
-			
+			Thread.sleep(5000);
 			//the code below was replaced by the call to updateAttribute with the id and value above. 
 			//the code below doesn't work unless a fresh copy of the attribute is retrieved 
 			//this.symLocAttribute.setStringValue(symLocValue);
@@ -172,11 +186,11 @@ public class Tester {
 //			this.statusAttribute.setStringValue(statusValue);
 //			this.statusAttribute = (CtxAttribute) this.ctxBroker.update(statusAttribute).get();
 			//logging.debug("changeContext("+symLocValue+", "+dowValue+");");
-
+			Thread.sleep(5000);
 			CtxAttributeIdentifier hodAttrId = hodAttribute.getId();
 			this.hodAttribute = (CtxAttribute) this.ctxBroker.updateAttribute(hodAttrId, hodValue).get();
 			logging.debug("changeContext("+symLocValue+", "+dowValue+", "+ hodValue+");");
-			
+			Thread.sleep(5000);
 			
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block

@@ -80,7 +80,9 @@ public class PrivatePreferenceCache {
 	private IPreferenceTreeModel getPreference(CtxIdentifier id){
 		//if the preference exists in the cache return it
 		if (this.idToIPreferenceTreeModel==null){
-			this.logging.debug("Hashtable is null. Cache not initalised properly");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Hashtable is null. Cache not initalised properly");
+			}
 			this.idToIPreferenceTreeModel = new Hashtable<CtxIdentifier,IPreferenceTreeModel>();
 		}
 		IPreferenceTreeModel p = this.idToIPreferenceTreeModel.get(id);
@@ -107,34 +109,48 @@ public class PrivatePreferenceCache {
 					Registry registry = this.registries.get(nextElement);
 					CtxIdentifier id = registry.getCtxID(details);
 					if (id==null){
-						this.logging.debug("Could not find preference for :\n"+details.toString());
+						if (logging.isDebugEnabled()){
+							this.logging.debug("Could not find preference for :\n"+details.toString());
+						}
 						return null;
 					}else{
-						this.logging.debug("Found preference in DB. CtxID: "+id.toUriString()+" for: "+details.toString());
+						if (logging.isDebugEnabled()){
+							this.logging.debug("Found preference in DB. CtxID: "+id.toUriString()+" for: "+details.toString());
+						}
 
 					}
 					return this.getPreference(id);		
 				}
 			}
-			this.logging.debug("Could not find registry for cisId :"+cisId.getBareJid());
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Could not find registry for cisId :"+cisId.getBareJid());
+			}
 			return null;
 		}
-		this.logging.debug("Request for community preference with a null cisId ");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Request for community preference with a null cisId ");
+		}
 		return null;
 
 
 	}
 	public IPreferenceTreeModel getPreference(IIdentity cisId, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		if (serviceType==null){
-			this.logging.debug("request to get preference with null serviceType, returning empty model");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("request to get preference with null serviceType, returning empty model");
+			}
 			return null;
 		}
 		if (serviceID == null){
-			this.logging.debug("request to get preference with null serviceID, returning empty model");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("request to get preference with null serviceID, returning empty model");
+			}
 			return null;
 		}
 		if (preferenceName==null){
-			this.logging.debug("request to get preference with null preferenceName, returning empty model");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("request to get preference with null preferenceName, returning empty model");
+			}
 			return null;
 		}
 		return this.getPreference(cisId, new PreferenceDetails(serviceType, serviceID, preferenceName));
@@ -155,37 +171,59 @@ public class PrivatePreferenceCache {
 				registry = new Registry(cisId);
 				this.registries.put(cisId, registry);
 			}
-			this.logging.debug("Request to store community preference for:"+details.toString());
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Request to store community preference for:"+details.toString());
+			}
 
 
 			CtxIdentifier id = registry.getCtxID(details);
 			if (id==null){
-				this.logging.debug("Community Preference doesn't exist in DB. Attempt  to store new preference");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("Community Preference doesn't exist in DB. Attempt  to store new preference");
+				}
 				//preference doesn't exist. we're going to store new preference in the db
 				PreferenceStorer storer = new PreferenceStorer(this.broker);
 				CtxIdentifier newCtxIdentifier = storer.storeNewPreference(cisId, model, registry.getNameForNewPreference());
 				if (newCtxIdentifier==null){
-					this.logging.debug("Could not store NEW community preference in DB. aborting");
+					if (logging.isDebugEnabled()){
+						this.logging.debug("Could not store NEW community preference in DB. aborting");
+					}
 					return false;
 				}
-				this.logging.debug("Successfully stored NEW community preference in DB. CtxID: "+newCtxIdentifier.toUriString());
+				if (logging.isDebugEnabled()){
+					this.logging.debug("Successfully stored NEW community preference in DB. CtxID: "+newCtxIdentifier.toUriString());
+				}
 				registry.addPreference(details, newCtxIdentifier);
-				this.logging.debug("Successfully added community preference details to registry: ");
-				this.logging.debug("Stored community preference for: "+details.toString());
+				if (logging.isDebugEnabled()){
+					this.logging.debug("Successfully added community preference details to registry: ");
+				}
+				if (logging.isDebugEnabled()){
+					this.logging.debug("Stored community preference for: "+details.toString());
+				}
 				storer.storeRegistry(cisId, registry);
-				this.logging.debug("Successfully community stored registry in DB");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("Successfully community stored registry in DB");
+				}
 				this.idToIPreferenceTreeModel.put(newCtxIdentifier, model);
-				this.logging.debug("Successfully added community preference to cache");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("Successfully added community preference to cache");
+				}
 
 			}else{
-				this.logging.debug("community Preference exists in DB. Attempt  to update existing community preference");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("community Preference exists in DB. Attempt  to update existing community preference");
+				}
 				PreferenceStorer storer = new PreferenceStorer(this.broker);
 				if (!storer.storeExisting(cisId, id, model)){
 					return false;
 				}
-				this.logging.debug("Successfully updated community preference in DB. CtxID: "+id.toUriString());
+				if (logging.isDebugEnabled()){
+					this.logging.debug("Successfully updated community preference in DB. CtxID: "+id.toUriString());
+				}
 				this.idToIPreferenceTreeModel.put(id, model);
-				this.logging.debug("Successfully updated community preference cache with new preference");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("Successfully updated community preference cache with new preference");
+				}
 			}
 			return true;
 		}
@@ -194,7 +232,9 @@ public class PrivatePreferenceCache {
 
 	public void deletePreference(IIdentity cisId, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		if (cisId==null){
-			this.logging.debug("Request to delete a community preference of a null cisId");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Request to delete a community preference of a null cisId");
+			}
 			return;
 		}
 		Registry registry = null;
@@ -206,14 +246,18 @@ public class PrivatePreferenceCache {
 			}
 		}
 		if (registry==null){
-			this.logging.debug("Request to delete a preference that doesn't exist");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Request to delete a preference that doesn't exist");
+			}
 			return;
 		}
 		PreferenceDetails details = new PreferenceDetails(serviceType, serviceID, preferenceName);
 		CtxIdentifier id = registry.getCtxID(details);
 		if (id==null){
 			//preference doesn't exist. can't delete it
-			logging.debug("Preference "+preferenceName+" of "+serviceType+":"+ServiceModelUtils.serviceResourceIdentifierToString(serviceID)+"doesn't exist. Aborting deletion");
+			if (logging.isDebugEnabled()){
+				logging.debug("Preference "+preferenceName+" of "+serviceType+":"+ServiceModelUtils.serviceResourceIdentifierToString(serviceID)+"doesn't exist. Aborting deletion");
+			}
 		}else{
 			PreferenceStorer storer = new PreferenceStorer(this.broker);
 			storer.deletePreference(cisId, id);
@@ -224,7 +268,9 @@ public class PrivatePreferenceCache {
 
 	public boolean deletePreference(IIdentity cisId, PreferenceDetails details){
 		if (cisId==null){
-			this.logging.debug("Request to delete a community preference of a null cisId");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Request to delete a community preference of a null cisId");
+			}
 			return false;
 		}
 		Registry registry = null;
@@ -236,13 +282,17 @@ public class PrivatePreferenceCache {
 			}
 		}
 		if (registry==null){
-			this.logging.debug("Request to delete a preference that doesn't exist");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Request to delete a preference that doesn't exist");
+			}
 			return false;
 		}
 		CtxIdentifier id = registry.getCtxID(details);
 		if (id==null){
 			//preference doesn't exist. can't delete it
-			logging.debug("Preference :"+details.toString()+"\ndoesn't exist. Aborting deletion");
+			if (logging.isDebugEnabled()){
+				logging.debug("Preference :"+details.toString()+"\ndoesn't exist. Aborting deletion");
+			}
 			return false;
 		}
 		PreferenceStorer storer = new PreferenceStorer(this.broker);
@@ -261,7 +311,9 @@ public class PrivatePreferenceCache {
 
 	public ArrayList<PreferenceDetails> getPreferenceDetailsForAllPreferences(IIdentity cisId){
 		if (cisId==null){
-			this.logging.debug("Request to retrieve community preference details with a null cisId");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Request to retrieve community preference details with a null cisId");
+			}
 			return new ArrayList<PreferenceDetails>();
 		}
 		Enumeration<IIdentity> keys = this.registries.keys();
@@ -271,7 +323,9 @@ public class PrivatePreferenceCache {
 				return registries.get(nextElement).getPreferenceDetailsOfAllPreferences();
 			}
 		}
-		this.logging.debug("Request to retrieve all community preference details for cisId: "+cisId.getBareJid()+" but not found a registry for that cisId");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Request to retrieve all community preference details for cisId: "+cisId.getBareJid()+" but not found a registry for that cisId");
+		}
 		return new ArrayList<PreferenceDetails>();
 	}
 }

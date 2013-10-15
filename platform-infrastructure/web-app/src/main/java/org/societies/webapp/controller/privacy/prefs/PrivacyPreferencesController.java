@@ -110,7 +110,9 @@ public class PrivacyPreferencesController extends BasePageController{
 	}
 	
 	public String storePPNDetailToUtils(){
-		this.logging.debug("Adding ppn preference details bean to util service");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Adding ppn preference details bean to util service");
+		}
 		this.privacyUtilService.setPpnPreferenceDetailsBean(ppnUUID, selectedPPNDetail);
 		return "privacy_ppn_edit.xhtml";
 		
@@ -119,13 +121,17 @@ public class PrivacyPreferencesController extends BasePageController{
 
 	
 	public String storeAccCtrlDetailToUtils(){
-		this.logging.debug("Adding accCtrl preference details bean to util service");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Adding accCtrl preference details bean to util service");
+		}
 		this.privacyUtilService.setAccessControlPreferenceDetailsBean(accCtrlUUID, selectedAccCtrlDetail);
 		return "privacy_accCtrl_edit.xhtml";
 	}
 	
 	public String storeDObfDetailToUtils(){
-		this.logging.debug("Adding dobf preference details bean to util service");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Adding dobf preference details bean to util service");
+		}
 		this.privacyUtilService.setDObfPreferenceDetailsBean(dobfUUID, this.selecteddobfDetail);
 		return "privacy_dobf_edit.xhtml";
 		
@@ -202,7 +208,9 @@ public class PrivacyPreferencesController extends BasePageController{
 		return selectedPPNDetail;
 	}
 	public void setSelectedPPNDetail(PPNPreferenceDetailsBean selectedPPNDetail) {
-		this.logging.debug("Setting selectedPPNDetail: "+selectedPPNDetail.toString());
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Setting selectedPPNDetail: "+selectedPPNDetail.toString());
+		}
 		this.selectedPPNDetail = selectedPPNDetail;
 		
 	}

@@ -120,7 +120,9 @@ public class SA_AI extends Thread{
 				output.add(nextOutput);
 			}
 		}else{
-			LOG.debug("No History found this user");
+			if (LOG.isDebugEnabled()){
+				LOG.debug("No History found this user");
+			}
 		}
 		//}
 		//send DPI based output to requestor
@@ -128,7 +130,9 @@ public class SA_AI extends Thread{
 		try{
 			requestor.handleC45Output(output);
 		}catch(Exception e){
-			LOG.debug("The C45 requestor service is not available to handle response");
+			if (LOG.isDebugEnabled()){
+				LOG.debug("The C45 requestor service is not available to handle response");
+			}
 		}
 	}
 

@@ -111,11 +111,15 @@ public class RequestorsController implements Serializable{
 		String uuid = UUID.randomUUID().toString();
 		//this.cisDirectory.searchByID(ownerID, new CisDirectoryCallback(uuid, ownerID));
 		this.cisDirectory.findAllCisAdvertisementRecords(new CisDirectoryCallback(uuid, ownerID));
-		this.logging.debug("Asked cisDirectory CISs of: "+ownerID);
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Asked cisDirectory CISs of: "+ownerID);
+		}
 		while (!this.resultTable.containsKey(uuid)){
 			synchronized (this.resultTable) {
 				try {
-					this.logging.debug("Waiting for result");
+					if (logging.isDebugEnabled()){
+						this.logging.debug("Waiting for result");
+					}
 					this.resultTable.wait();
 					
 				} catch (InterruptedException e) {
@@ -126,19 +130,25 @@ public class RequestorsController implements Serializable{
 		}
 		
 		
-		this.logging.debug("Retrieved "+this.cisAdvertisements.size()+ "CISs of "+ownerID);
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Retrieved "+this.cisAdvertisements.size()+ "CISs of "+ownerID);
+		}
 		return cisAdvertisements;
 	}
 
 	public List<Service> getServiceListByOwner(String ownerID){
-		this.logging.debug("getServiceListByOwner("+ownerID+")");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("getServiceListByOwner("+ownerID+")");
+		}
 		if (ownerID==null){
 			return new ArrayList<Service>();
 		}
 		
 		try {
 			IIdentity fromJid = this.commsManager.getIdManager().fromJid(ownerID);
-			this.logging.debug("serviceDiscovery.getServices("+fromJid.getBareJid()+")");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("serviceDiscovery.getServices("+fromJid.getBareJid()+")");
+			}
 			services = this.serviceDiscovery.getServices(fromJid).get();
 			if (services==null){
 				this.services = new ArrayList<Service>();
@@ -146,7 +156,9 @@ public class RequestorsController implements Serializable{
 /*			services.get(0).getServiceIdentifier();
 			services.get(0).getServiceName();
 			*/
-			this.logging.debug("Found :"+services.size()+" services shared by: "+ownerID);
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Found :"+services.size()+" services shared by: "+ownerID);
+			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -199,20 +211,28 @@ public class RequestorsController implements Serializable{
 
 	
 	public List<CssAdvertisementRecord> getCssAdvertisements() {
-		this.logging.debug("getCssAdvertisements() called");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("getCssAdvertisements() called");
+		}
 		this.cssAdvertisements.clear();
 		try {
 			Future<List<CssAdvertisementRecordDetailed>> cssAdvertisementRecordsFull = this.cssManager.getCssAdvertisementRecordsFull();
 			if (cssAdvertisementRecordsFull!=null){
 
 				List<CssAdvertisementRecordDetailed> list = cssAdvertisementRecordsFull.get();
-				this.logging.debug("CssRecords found: "+list.size());
+				if (logging.isDebugEnabled()){
+					this.logging.debug("CssRecords found: "+list.size());
+				}
 				for (CssAdvertisementRecordDetailed cssRecord : list){
 					this.cssAdvertisements.add(cssRecord.getResultCssAdvertisementRecord());
 				}
-				this.logging.debug("Added to cssList: "+cssAdvertisements.size()+" records ");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("Added to cssList: "+cssAdvertisements.size()+" records ");
+				}
 			}else{
-				this.logging.debug("returned cssAdvertisementrecords is null");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("returned cssAdvertisementrecords is null");
+				}
 			}
 
 		} catch (InterruptedException e) {
@@ -223,7 +243,9 @@ public class RequestorsController implements Serializable{
 			e.printStackTrace();
 		}
 
-		this.logging.debug("Returning true");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Returning true");
+		}
 		return this.cssAdvertisements;
 	}
 
@@ -259,7 +281,9 @@ public class RequestorsController implements Serializable{
 			
 			cisAdvertisements.clear();
 			if (records!=null){
-				logging.debug("Received result from remote cisDirectory: "+records.size()+" CISs");
+				if (logging.isDebugEnabled()){
+					logging.debug("Received result from remote cisDirectory: "+records.size()+" CISs");
+				}
 			
 				for (CisAdvertisementRecord cisRecord : records){
 					if (cisRecord.getCssownerid().equalsIgnoreCase(ownerID)){
@@ -268,13 +292,17 @@ public class RequestorsController implements Serializable{
 					
 				}
 
-				logging.debug("From these, "+cisAdvertisements.size()+" are owned by "+ownerID);
+				if (logging.isDebugEnabled()){
+					logging.debug("From these, "+cisAdvertisements.size()+" are owned by "+ownerID);
+				}
 				synchronized (resultTable) {
 					resultTable.put(uuid, cisAdvertisements);
 					resultTable.notifyAll();
 				}
 			}else{
-				logging.debug("Received null result from remote cisDirectory");
+				if (logging.isDebugEnabled()){
+					logging.debug("Received null result from remote cisDirectory");
+				}
 
 				synchronized (resultTable) {
 					resultTable.put(this.uuid, new ArrayList<CisAdvertisementRecord>());
