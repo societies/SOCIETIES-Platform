@@ -1270,7 +1270,6 @@ body .ui-tooltip {
     border: 1px solid #313639;
     background: #f26a36 url("#{resource['primefaces-societies-theme:images/ui-bg_glass_75_f26a36_1x400.png']}") 50% 50% repeat-x;
     font-weight: normal;
-    color: #ffffff;
 }
 
 .ui-state-hover a,
@@ -2207,3 +2206,11 @@ ul.side a{
 ul.side a:hover{
 	background: #fafafa url(../images/societies_GUI_v1.png) -600px -180px no-repeat;
 }
+
+
+/**
+* Datatable
+**/
+.ui-datatable .ui-column-filter {
+	width: 80% !important;
+	}

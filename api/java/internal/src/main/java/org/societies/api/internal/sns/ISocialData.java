@@ -107,6 +107,12 @@ public interface ISocialData extends ISocialDataExternal{
      */
     boolean isAvailable(ISocialConnector connector);
     
+    /**
+     * return a map which links ConnectorID and user profile id
+     * @return Map<String, String>: Key: ConnectorId - Value: ProfileId
+     */
+    public Map<String, String> getConnectionMapper();
+    
     
 //    /**
 //     * The Method post a message (String) to a specifc SocialNetwork
@@ -114,7 +120,7 @@ public interface ISocialData extends ISocialDataExternal{
 //     * @param message the String to be posted
 //     */
 //    
-//    void postMessage(ISocialConnector.SocialNetwork socialNetworkName, String message);
+//    void postMessage(org.societies.api.schema.sns.socialdata.model.SocialNetwork socialNetworkName, String message);
 //    
 //   /**
 //    * This Method allow to post on a specific Social network more than a simple string, like events or checkin. 

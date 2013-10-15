@@ -30,7 +30,7 @@ public class PullDataFromSN {
     }
     
    
-    @Async
+   
     public void execute() {
 	
 	sd.setState(SocialDataState.DOWNLOADING_FROM_SN);
@@ -41,7 +41,7 @@ public class PullDataFromSN {
 	HashMap<String, Object> allFeeds 	= new HashMap<String, Object>();
 	
 	logger.debug("Processing connectors....");
-	for (ISocialConnector connector : sd.connectors.values()){
+	for (ISocialConnector connector : sd.getConnectors().values()){
 		
 		logger.debug("Update " + connector.getConnectorName()  + " data...");
 		
@@ -53,6 +53,7 @@ public class PullDataFromSN {
 		// Add a new profile for each connector....
 		Person profile = updateProfile(connector);
 		allProfiles.put(profile.getId(), profile);
+		sd.putConnectionMapper(connector.getID(), profile.getId());
 		
 		
 		allGroups.putAll (updateGroups(connector));
@@ -63,10 +64,10 @@ public class PullDataFromSN {
 
 	
 	// clone data...
-	sd.socialActivities = (Map<String, Object>) allFeeds.clone();
-	sd.socialFriends    = (Map<String, Object>) allFriends.clone();
-	sd.socialProfiles   = (Map<String, Object>) allProfiles.clone();
-	sd.socialGroups	    = (Map<String, Object>) allGroups.clone();
+	sd.setSocialActivities((Map<String, Object>) allFeeds.clone());
+	sd.setSocialFriends((Map<String, Object>) allFriends.clone());
+	sd.setSocialProfiles((Map<String, Object>) allProfiles.clone());
+	sd.setSocialGroups((Map<String, Object>) allGroups.clone());
 	
 	sd.updateContextBroker();
 	logger.debug("Update Thread completed");

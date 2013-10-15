@@ -56,5 +56,5 @@
 	<osgi:reference id="cauiPrediction" interface="org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction">
 	<!-- <osgi:reference id="privacypol" interface="org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;">  -->	
 	</osgi:reference>
-
+	
 </beans>

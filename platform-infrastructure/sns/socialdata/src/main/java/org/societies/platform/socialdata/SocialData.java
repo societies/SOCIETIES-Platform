@@ -64,6 +64,20 @@ public class SocialData implements ISocialData{
 	//this class provides the functionality for storing sns data to context
 	private ContextUpdater ctxUpdater;
 	
+	private HashMap<String, ISocialConnector> connectors = new HashMap<String, ISocialConnector>();
+
+	private Map<String, Object> socialFriends;
+	private Map<String, Object>	socialGroups;
+	private Map<String, Object>	socialProfiles;
+	private Map<String, Object>	socialActivities;
+	
+	//maps connection to profile
+	private Map<String, String> connectionMapper;
+
+	private long lastUpate ;
+	
+	
+	
 	public ICtxBroker getInternalCtxBroker() {
 		logger.info(this.getClass().getName()+": Return ctxBroker");
 		return internalCtxBroker;
@@ -88,24 +102,14 @@ public class SocialData implements ISocialData{
 	}
 
 	
-	HashMap<String, ISocialConnector> connectors = new HashMap<String, ISocialConnector>();
-
-	Map<String, Object> 	socialFriends;
-	Map<String, Object>	socialGroups;
-	Map<String, Object>	socialProfiles;
-	Map<String, Object>	socialActivities;
-
-
-
-	long lastUpate ;
-
-
 	public SocialData(){
 
 		socialFriends 			= new HashMap<String, Object>();
 		socialGroups			= new HashMap<String, Object>();
 		socialProfiles			= new HashMap<String, Object>();
 		socialActivities		= new HashMap<String, Object>();
+		
+		connectionMapper		= new HashMap<String, String>();
 
 		lastUpate			= new Date().getTime();
 		
@@ -244,6 +248,8 @@ public class SocialData implements ISocialData{
 			throw new Exception("Connetor already exists");
 		}
 		
+		putConnectionMapper(socialConnector.getID());
+		
 		connectors.put(socialConnector.getID(), socialConnector);
 		if (!connectorsInCtxBroker.containsKey(socialConnector.getID())){
 			
@@ -278,7 +284,7 @@ public class SocialData implements ISocialData{
 	
 	@Override
 	public void removeSocialConnector(String connectorId) throws Exception{
-
+		logger.debug("connector: "+connectors);
 	    	logger.debug("Check if the id "+connectorId + " is associated to a connector ...");
 		if (connectors.containsKey(connectorId)){
 			removeSocialConnector(connectors.get(connectorId));
@@ -362,11 +368,20 @@ public class SocialData implements ISocialData{
 	public List<Object> getSocialGroups() {
 		return new ArrayList(socialGroups.values());
 	}
+	
+	public void setSocialGroups(Map<String, Object> socialGroups){
+		this.socialGroups = socialGroups;
+	}
 
 	@Override
 	public List<Object> getSocialProfiles() {
 		return new ArrayList(socialProfiles.values());
 	}
+	
+	public void setSocialProfiles(Map<String, Object> socialProfile){
+		this.socialProfiles = socialProfile;
+	}
+
 
 	
 	@Override 
@@ -630,7 +645,6 @@ public class SocialData implements ISocialData{
 
     }
     
-
     public void postMessage(SocialNetwork snName, String data) {
 	logger.info("Post a Message to " + snName + " SN");
 	List<ISocialConnector> results = SocialNetworkUtils
@@ -693,8 +707,6 @@ public class SocialData implements ISocialData{
     }
 
     
-    
-    
 	private List<ISocialConnector> getConnectorsByName(SocialNetwork name){
 		
 	    Iterator <ISocialConnector> it = connectors.values().iterator();
@@ -743,6 +755,54 @@ public class SocialData implements ISocialData{
 	@Override
 	public void postMessage(SocialNetwork name, Message bean) {
 	    	Map<String, String> params = new HashMap<String, String>();
-    		params.put(ISocialData.POST_MESSAGE, bean.getData());		
+    		params.put(ISocialData.POST_MESSAGE, bean.getData());
+    		this.postData(name, params);
 	}
+
+	public HashMap<String, ISocialConnector> getConnectors() {
+		return connectors;
+	}
+
+	public void setConnectors(HashMap<String, ISocialConnector> connectors) {
+		this.connectors = connectors;
+	}
+
+	public Map<String, Object> getSocialFriends() {
+		return socialFriends;
+	}
+
+	public void setSocialFriends(Map<String, Object> socialFriends) {
+		this.socialFriends = socialFriends;
+	}
+
+	public Map<String, Object> getSocialActivities() {
+		return socialActivities;
+	}
+
+	public void setSocialActivities(Map<String, Object> socialActivities) {
+		this.socialActivities = socialActivities;
+	}
+
+	public Map<String, String> getConnectionMapper() {
+		return connectionMapper;
+	}
+	
+	public void setConnectionMapper(Map<String, String> connProfileMapper) {
+		this.connectionMapper = connProfileMapper;
+	}
+	
+	public void putConnectionMapper(String connectionID){
+		putConnectionMapper(connectionID, "none");
+	}
+	
+	public void putConnectionMapper(String connectionID, String profileId){
+		if(connectionMapper != null){
+			connectionMapper = new HashMap<String, String>();
+		}
+		
+		logger.debug("added new connector to mapper: "+connectionID+" - "+profileId);
+		connectionMapper.put(connectionID, profileId);
+	}
+	
+	
 }

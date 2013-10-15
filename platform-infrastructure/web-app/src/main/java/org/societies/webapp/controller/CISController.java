@@ -25,108 +25,58 @@
 
 package org.societies.webapp.controller;
 
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.RequestScoped;
-
-import org.societies.api.internal.css.ICSSInternalManager;
-import org.societies.orchestration.communitylifecyclemanagementbean.Cis;
-import org.societies.webapp.controller.privacy.PrivacyPolicyUtils;
-import org.societies.webapp.models.CisInfo;
-import org.societies.webapp.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy; 
-
-import javax.servlet.http.HttpSession;
-import java.lang.reflect.Field;
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
-import javax.validation.Valid;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.RequestScoped;
+import javax.servlet.http.HttpSession;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.societies.activity.client.ActivityFeedClient;
-import org.societies.api.activity.IActivity;
 import org.societies.api.activity.IActivityFeed;
 import org.societies.api.cis.attributes.MembershipCriteria;
 import org.societies.api.cis.attributes.Rule;
-import org.societies.api.cis.attributes.Rule.OperationType;
-//import org.societies.api.cis.directory.ICisDirectory;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
-import org.societies.api.cis.directory.ICisDirectoryCallback;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.cis.management.ICisParticipant;
-import org.societies.api.cis.management.ICisRemote;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.context.model.CtxAttributeTypes;
-import org.societies.api.css.directory.ICssDirectoryRemote;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
-import org.societies.api.identity.RequestorCis;
 import org.societies.api.identity.RequestorService;
+import org.societies.api.internal.css.ICSSInternalManager;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyPolicyManager;
-import org.societies.api.internal.privacytrust.privacyprotection.model.listener.IPrivacyPolicyManagerListener;
-//import org.societies.api.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.internal.privacytrust.privacyprotection.remote.IPrivacyPolicyManagerRemote;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
-//import org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
 import org.societies.api.schema.activity.MarshaledActivity;
-import org.societies.api.schema.activityfeed.MarshaledActivityFeed;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.cis.community.CommunityMethods;
 import org.societies.api.schema.cis.community.Criteria;
-import org.societies.api.schema.cis.community.JoinResponse;
-import org.societies.api.schema.cis.community.LeaveResponse;
 import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.community.Participant;
-import org.societies.api.schema.cis.community.WhoResponse;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.cis.manager.Create;
-import org.societies.api.schema.css.directory.CssAdvertisementRecord;
-import org.societies.api.schema.cssmanagement.CssAdvertisementRecordDetailed;
 import org.societies.api.schema.cssmanagement.CssManagerResultActivities;
-import org.societies.api.schema.cssmanagement.CssRequest;
-import org.societies.api.schema.cssmanagement.CssRequestOrigin;
-import org.societies.api.schema.cssmanagement.CssRequestStatusType;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyBehaviourConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.cis.directory.client.CisDirectoryRemoteClient;
 import org.societies.cis.mgmtClient.CisManagerClient;
-
+import org.societies.webapp.controller.privacy.PrivacyPolicyUtils;
+import org.societies.webapp.models.CisInfo;
+import org.societies.webapp.models.WebAppParticipant;
+import org.societies.webapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.servlet.ModelAndView;
-
-import org.societies.webapp.service.UserService;
-import org.societies.webapp.models.WebAppParticipant;
 
 
 @Controller
