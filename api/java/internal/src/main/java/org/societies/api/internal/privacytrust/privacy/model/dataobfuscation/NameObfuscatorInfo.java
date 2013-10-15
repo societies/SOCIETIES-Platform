@@ -39,12 +39,13 @@ public class NameObfuscatorInfo extends ObfuscatorInfo {
 		obfuscable = true;
 		persistable = false;
 		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
-		nbOfObfuscationLevelStep = 4;
+		nbOfObfuscationLevelStep = 5;
 		obfuscableDataType = CtxAttributeTypes.NAME;
 		obfuscationExamples = new TreeMap<Double, String>();
-		obfuscationExamples.put(0.0, "\"Mr John Smith\" will become \"Mr John Smith\" (no change)");
-		obfuscationExamples.put(0.3, "\"Mr John Smith\" will become \"Mr Smith\"");
-		obfuscationExamples.put(0.6, "\"Mr John Smith\" will become \"Mr Anonymous\"");
-		obfuscationExamples.put(1.0, "\"Mr John Smith\" will become \"Anonymous\"");
+		obfuscationExamples.put(0.0, "\"John Smith\" will become \" \" (anonymous)");
+		obfuscationExamples.put((double)((double)1/(double)nbOfObfuscationLevelStep), "\"John Smith\" will become \"J. S.\"");
+		obfuscationExamples.put((double)((double)2/(double)nbOfObfuscationLevelStep), "\"John Smith\" will become \"John S.\"");
+		obfuscationExamples.put((double)((double)3/(double)nbOfObfuscationLevelStep), "\"John Smith\" will become \"J. Smith\"");
+		obfuscationExamples.put((double)((double)4/(double)nbOfObfuscationLevelStep), "\"John Smith\" will become \"John Smith\" (no change)");
 	}
 }

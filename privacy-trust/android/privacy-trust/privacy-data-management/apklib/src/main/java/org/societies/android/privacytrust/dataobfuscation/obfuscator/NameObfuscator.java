@@ -26,6 +26,7 @@ package org.societies.android.privacytrust.dataobfuscation.obfuscator;
 
 import org.societies.android.api.internal.privacytrust.privacy.model.dataobfuscation.NameObfuscatorInfo;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.android.api.internal.privacytrust.privacy.util.dataobfuscation.DataWrapperUtils;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.ObfuscationLevelType;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.Name;
@@ -50,47 +51,43 @@ public class NameObfuscator extends DataObfuscator<Name> {
 	 * (non-Javadoc)
 	 * @see org.societies.android.api.internal.privacytrust.model.dataobfuscation.obfuscator.IDataObfuscator#obfuscateData(double)
 	 */
-	public DataWrapper obfuscateData(double obfuscationLevel)
-			throws PrivacyException {
-		Name name = (Name) dataWrapper.getData();
+	public DataWrapper obfuscateData(double obfuscationLevel) throws PrivacyException {
 		// -- Verify
-		if (null == name.getFirstName()) {
-			name.setFirstName("");
+		if (null == data.getFirstName()) {
+			data.setFirstName("");
 		}
-		if (null == name.getLastName()) {
-			name.setLastName("");
+		if (null == data.getLastName()) {
+			data.setLastName("");
 		}
 
 		// -- Obfuscate
-		int stepNumber = getObfuscatorInfo().getNbOfObfuscationLevelStep();
-		// 0: nothing
 		Name obfuscatedName = new Name();
-		if (obfuscationLevel <= 0) {
+		int stepNumber = obfuscatorInfo.getNbOfObfuscationLevelStep();
+		if (obfuscationLevel < (double)1/(double)stepNumber) {
 			obfuscatedName.setFirstName("");
 			obfuscatedName.setLastName("");
 		}
 		// 1: first letters
-		else if (obfuscationLevel > 0 && obfuscationLevel <= 1/stepNumber) {
-			obfuscatedName.setFirstName((name.getFirstName() != "" ? name.getFirstName().substring(0, 1)+"." : ""));
-			obfuscatedName.setLastName((name.getFirstName() != "" ? name.getLastName().substring(0, 1)+"." : ""));
+		else if (obfuscationLevel >= (double)1/(double)stepNumber && obfuscationLevel < (double)2/(double)stepNumber) {
+			obfuscatedName.setFirstName((data.getFirstName() != "" ? data.getFirstName().substring(0, 1)+"." : ""));
+			obfuscatedName.setLastName((data.getLastName() != "" ? data.getLastName().substring(0, 1)+"." : ""));
 		}
-		// 2: firstname only
-		else if (obfuscationLevel > 1/stepNumber && obfuscationLevel <= 2/stepNumber) {
-			obfuscatedName.setFirstName(name.getFirstName());
-			obfuscatedName.setLastName("");
+		// 2: firstname + lastname first letter
+		else if (obfuscationLevel >= (double)2/(double)stepNumber && obfuscationLevel < (double)3/(double)stepNumber) {
+			obfuscatedName.setFirstName(data.getFirstName());
+			obfuscatedName.setLastName((data.getLastName() != "" ? data.getLastName().substring(0, 1)+"." : ""));
 		}
-		// 3: lastname only
-		else if (obfuscationLevel > 2/stepNumber && obfuscationLevel <= 3/stepNumber) {
-			obfuscatedName.setFirstName("");
-			obfuscatedName.setLastName(name.getLastName());
+		// 3: firstname first letter + lastname
+		else if (obfuscationLevel >= (double)3/(double)stepNumber && obfuscationLevel < (double)4/(double)stepNumber) {
+			obfuscatedName.setFirstName((data.getFirstName() != "" ? data.getFirstName().substring(0, 1)+"." : ""));
+			obfuscatedName.setLastName(data.getLastName());
 		}
-		// 4: everything
-		else if (obfuscationLevel >= 1) {
-			obfuscatedName = name;
+		// 4 and last: firstname + lastname
+		else if (obfuscationLevel >= (double)4/(double)stepNumber) {
+			obfuscatedName.setFirstName(data.getFirstName());
+			obfuscatedName.setLastName(data.getLastName());
 		}
-		DataWrapper obfuscatedWrapper = new DataWrapper();
-		obfuscatedWrapper.setData(obfuscatedName);
-		return obfuscatedWrapper;
+		return DataWrapperUtils.create(dataWrapper.getDataType(), obfuscatedName);
 	}
 
 }

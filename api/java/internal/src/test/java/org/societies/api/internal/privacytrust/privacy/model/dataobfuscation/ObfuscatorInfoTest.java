@@ -12,7 +12,7 @@ public class ObfuscatorInfoTest {
 	public void testNameGetObfuscationExample() {
 		NameObfuscatorInfo obfuscatorInfo = new NameObfuscatorInfo();
 		double obfuscationLevel = -1.0;
-		String expected = "\"Mr John Smith\" will become \"Mr John Smith\" (no change)";
+		String expected = "\"John Smith\" will become \" \" (anonymous)";
 		String actual = obfuscatorInfo.getObfuscationExample(obfuscationLevel);
 		LOG.info("For "+obfuscationLevel+": Expected: \""+expected+"\" and was: \""+actual+"\"");
 		Assert.assertEquals(expected, actual);
@@ -28,17 +28,31 @@ public class ObfuscatorInfoTest {
 		actual = obfuscatorInfo.getObfuscationExample(obfuscationLevel);
 		LOG.info("For "+obfuscationLevel+": Expected: \""+expected+"\" and was: \""+actual+"\"");
 		Assert.assertEquals(expected, actual);
-		obfuscationLevel = 0.29;
+		obfuscationLevel = 0.19;
 		actual = obfuscatorInfo.getObfuscationExample(obfuscationLevel);
 		LOG.info("For "+obfuscationLevel+": Expected: \""+expected+"\" and was: \""+actual+"\"");
 		Assert.assertEquals(expected, actual);
 		
-		expected = "\"Mr John Smith\" will become \"Mr Smith\"";
-		obfuscationLevel = 0.3;
+		expected = "\"John Smith\" will become \"J. S.\"";
+		obfuscationLevel = 0.2;
 		actual = obfuscatorInfo.getObfuscationExample(obfuscationLevel);
 		LOG.info("For "+obfuscationLevel+": Expected: \""+expected+"\" and was: \""+actual+"\"");
 		Assert.assertEquals(expected, actual);
-		obfuscationLevel = 0.31;
+		obfuscationLevel = 0.21;
+		actual = obfuscatorInfo.getObfuscationExample(obfuscationLevel);
+		LOG.info("For "+obfuscationLevel+": Expected: \""+expected+"\" and was: \""+actual+"\"");
+		Assert.assertEquals(expected, actual);
+		obfuscationLevel = 0.39;
+		actual = obfuscatorInfo.getObfuscationExample(obfuscationLevel);
+		LOG.info("For "+obfuscationLevel+": Expected: \""+expected+"\" and was: \""+actual+"\"");
+		Assert.assertEquals(expected, actual);
+		
+		expected = "\"John Smith\" will become \"John S.\"";
+		obfuscationLevel = 0.4;
+		actual = obfuscatorInfo.getObfuscationExample(obfuscationLevel);
+		LOG.info("For "+obfuscationLevel+": Expected: \""+expected+"\" and was: \""+actual+"\"");
+		Assert.assertEquals(expected, actual);
+		obfuscationLevel = 0.41;
 		actual = obfuscatorInfo.getObfuscationExample(obfuscationLevel);
 		LOG.info("For "+obfuscationLevel+": Expected: \""+expected+"\" and was: \""+actual+"\"");
 		Assert.assertEquals(expected, actual);
@@ -47,7 +61,7 @@ public class ObfuscatorInfoTest {
 		LOG.info("For "+obfuscationLevel+": Expected: \""+expected+"\" and was: \""+actual+"\"");
 		Assert.assertEquals(expected, actual);
 		
-		expected = "\"Mr John Smith\" will become \"Mr Anonymous\"";
+		expected = "\"John Smith\" will become \"J. Smith\"";
 		obfuscationLevel = 0.6;
 		actual = obfuscatorInfo.getObfuscationExample(obfuscationLevel);
 		LOG.info("For "+obfuscationLevel+": Expected: \""+expected+"\" and was: \""+actual+"\"");
@@ -56,12 +70,20 @@ public class ObfuscatorInfoTest {
 		actual = obfuscatorInfo.getObfuscationExample(obfuscationLevel);
 		LOG.info("For "+obfuscationLevel+": Expected: \""+expected+"\" and was: \""+actual+"\"");
 		Assert.assertEquals(expected, actual);
-		obfuscationLevel = 0.99;
+		obfuscationLevel = 0.79;
 		actual = obfuscatorInfo.getObfuscationExample(obfuscationLevel);
 		LOG.info("For "+obfuscationLevel+": Expected: \""+expected+"\" and was: \""+actual+"\"");
 		Assert.assertEquals(expected, actual);
 		
-		expected = "\"Mr John Smith\" will become \"Anonymous\"";
+		expected = "\"John Smith\" will become \"John Smith\" (no change)";
+		obfuscationLevel = 0.8;
+		actual = obfuscatorInfo.getObfuscationExample(obfuscationLevel);
+		LOG.info("For "+obfuscationLevel+": Expected: \""+expected+"\" and was: \""+actual+"\"");
+		Assert.assertEquals(expected, actual);
+		obfuscationLevel = 0.81;
+		actual = obfuscatorInfo.getObfuscationExample(obfuscationLevel);
+		LOG.info("For "+obfuscationLevel+": Expected: \""+expected+"\" and was: \""+actual+"\"");
+		Assert.assertEquals(expected, actual);
 		obfuscationLevel = 1.0;
 		actual = obfuscatorInfo.getObfuscationExample(obfuscationLevel);
 		LOG.info("For "+obfuscationLevel+": Expected: \""+expected+"\" and was: \""+actual+"\"");

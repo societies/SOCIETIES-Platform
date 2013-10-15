@@ -24,8 +24,6 @@
  */
 package org.societies.privacytrust.privacyprotection.dataobfuscation.obfuscator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.societies.api.internal.privacytrust.privacy.model.dataobfuscation.NameObfuscatorInfo;
 import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.DataWrapperUtils;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.DataWrapper;
@@ -39,8 +37,6 @@ import org.societies.api.privacytrust.privacy.model.PrivacyException;
  *
  */
 public class NameObfuscator extends DataObfuscator<Name> {
-	private static final Logger LOG = LoggerFactory.getLogger(NameObfuscator.class);
-	
 	/**
 	 * @param dataWrapper
 	 */
@@ -64,32 +60,32 @@ public class NameObfuscator extends DataObfuscator<Name> {
 		if (null == data.getLastName()) {
 			data.setLastName("");
 		}
-		
+
 		// -- Obfuscate
 		// 0: nothing
 		Name obfuscatedName = new Name();
 		int stepNumber = obfuscatorInfo.getNbOfObfuscationLevelStep();
-		if (obfuscationLevel <= (double)0) {
+		if (obfuscationLevel < (double)1/(double)stepNumber) {
 			obfuscatedName.setFirstName("");
 			obfuscatedName.setLastName("");
 		}
 		// 1: first letters
-		else if (obfuscationLevel > (double)0 && obfuscationLevel <= (double)1/(double)stepNumber) {
+		else if (obfuscationLevel >= (double)1/(double)stepNumber && obfuscationLevel < (double)2/(double)stepNumber) {
 			obfuscatedName.setFirstName((data.getFirstName() != "" ? data.getFirstName().substring(0, 1)+"." : ""));
 			obfuscatedName.setLastName((data.getLastName() != "" ? data.getLastName().substring(0, 1)+"." : ""));
 		}
 		// 2: firstname + lastname first letter
-		else if (obfuscationLevel > (double)1/(double)stepNumber && obfuscationLevel <= (double)2/(double)stepNumber) {
+		else if (obfuscationLevel >= (double)2/(double)stepNumber && obfuscationLevel < (double)3/(double)stepNumber) {
 			obfuscatedName.setFirstName(data.getFirstName());
 			obfuscatedName.setLastName((data.getLastName() != "" ? data.getLastName().substring(0, 1)+"." : ""));
 		}
 		// 3: firstname first letter + lastname
-		else if (obfuscationLevel > (double)2/(double)stepNumber && obfuscationLevel <= (double)3/(double)stepNumber) {
+		else if (obfuscationLevel >= (double)3/(double)stepNumber && obfuscationLevel < (double)4/(double)stepNumber) {
 			obfuscatedName.setFirstName((data.getFirstName() != "" ? data.getFirstName().substring(0, 1)+"." : ""));
 			obfuscatedName.setLastName(data.getLastName());
 		}
-		// 4: everything
-		else if (obfuscationLevel >= (double)1) {
+		// 4 and last: firstname + lastname
+		else if (obfuscationLevel >= (double)4/(double)stepNumber) {
 			obfuscatedName.setFirstName(data.getFirstName());
 			obfuscatedName.setLastName(data.getLastName());
 		}
