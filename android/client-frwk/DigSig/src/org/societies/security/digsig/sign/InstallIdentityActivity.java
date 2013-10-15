@@ -147,9 +147,9 @@ public class InstallIdentityActivity extends Activity {
 			// So only certificates can be reliably compared with Certificate.equals() method.
 			if (certificate.equals(alreadyStoredCert)) {
 				
-				String msg = "Digital identity " + certificate.getSubjectDN().getName() + " is already installed.";
-				Log.i(TAG, msg);
-				Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+				Log.i(TAG, "Identity is already installed.");
+				Toast.makeText(this,  "Identity " + certificate.getSubjectDN().getName() + " is already installed.",
+						Toast.LENGTH_SHORT).show();
 				setResult(RESULT_OK);
 				finish();				
 				return;
@@ -157,9 +157,9 @@ public class InstallIdentityActivity extends Activity {
 		}
 
 		int index = secureStorage.put(certificate, privateKey);
-		String msg = "Digital identity " + certificate.getSubjectDN().getName() + " installed under index " + index;
-		Log.i(TAG, msg);
-		Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+		Log.i(TAG, "Identity installed successfully");
+		Toast.makeText(this, "Digital identity " + certificate.getSubjectDN().getName() + " installed under index " + index,
+				Toast.LENGTH_SHORT).show();
 		setResult(RESULT_OK);
 		finish();				
 		return;
