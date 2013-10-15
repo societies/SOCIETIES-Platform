@@ -260,8 +260,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			INetworkNode myNode = getCommMngr().getIdManager().getThisNetworkNode();
 			String localNodeJid = myNode.getJid();
 						
-			if(logger.isDebugEnabled())
-				logger.debug("The JID of the node where the Service is: " + nodeJid + " and the local JID: " + localNodeJid);
+			logger.debug("The JID of the node where the Service is: {} and the local JID is {}", nodeJid,localNodeJid);
 				
 			if(!nodeJid.equals(localNodeJid)){
 				
@@ -363,7 +362,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				
 				service = idList.take();
 				
-				logger.info("Service " + service.getServiceName() + " has been started.");				
+				logger.info("Service {} has been started.", service.getServiceName());				
 				returnResult.setMessage(ResultMessage.SUCCESS);
 				
 				synchronized(this){
@@ -372,7 +371,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				
 			}
 			else{
-				logger.info("Service " + service.getServiceName() + " has NOT been started successfully.");	
+				logger.info("Service {} has NOT been started successfully.",service.getServiceName() );	
 				returnResult.setMessage(ResultMessage.OSGI_PROBLEM);
 			}
 
@@ -495,7 +494,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				logger.debug("Bundle " + serviceBundle.getSymbolicName() + " is now in state " + ServiceModelUtils.getBundleStateName(serviceBundle.getState()));
 			
 			if(serviceBundle.getState() == Bundle.RESOLVED ){
-				logger.info("Service " + service.getServiceName() + " has been stopped.");
+				logger.info("Service {} has been stopped.", service.getServiceName());
 				returnResult.setMessage(ResultMessage.SUCCESS);
 				
 				Service serviceStopped = idList.take();
@@ -507,7 +506,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 			else{
-				logger.info("Service " + service.getServiceName() + " has NOT been stopped successfully.");
+				logger.info("Service {} has NOT been stopped successfully.",service.getServiceName());
 				returnResult.setMessage(ResultMessage.OSGI_PROBLEM);
 				return new AsyncResult<ServiceControlResult>(returnResult);
 			}	
@@ -1082,7 +1081,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				if(logger.isDebugEnabled()) logger.debug("Removing service: " + service.getServiceName() + " from SOCIETIES Registry");
 
 				getServiceReg().unregisterServiceList(servicesToRemove);
-				logger.info("Service " + service.getServiceName() + " has been uninstalled");
+				logger.info("Service {} has been uninstalled", service.getServiceName());
 				
 				returnResult.setMessage(ResultMessage.SUCCESS);
 				
@@ -1105,7 +1104,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				return new AsyncResult<ServiceControlResult>(returnResult);
 			}
 			
-			logger.info("Uninstalling service " + service.getServiceName());
+			logger.info("Uninstalling service {}", service.getServiceName());
 			
 			
 			//Before we uninstall the bundle we prepare the entry on the hashmap
@@ -1144,7 +1143,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 				return new AsyncResult<ServiceControlResult>(returnResult);
 				
 			} else{
-				logger.info("Service " + service.getServiceName() + " has NOT been uninstalled");
+				logger.info("Service {} has NOT been uninstalled", service.getServiceName());
 				
 				returnResult.setMessage(ResultMessage.OSGI_PROBLEM);
 				return new AsyncResult<ServiceControlResult>(returnResult);
@@ -1289,7 +1288,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					updateActivityFeed(node,"Shared",service);
 					sendEvent(ServiceMgmtEventType.SERVICE_SHARED,service,node);
 					sendUserNotification("Shared service '"+ service.getServiceName()+"' with CIS: " + myCIS.getName());
-					
+					logger.info("Shared service '"+ service.getServiceName()+"' with CIS: " + myCIS.getName());
+
 				} else {
 					
 					if(logger.isDebugEnabled())
@@ -1327,6 +1327,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 							updateActivityFeed(node,"Shared",service);
 							sendUserNotification("Shared service '"+ service.getServiceName()+"' with CIS: " + remoteCis.getName());
 							sendEvent(ServiceMgmtEventType.SERVICE_SHARED,service,node);
+							logger.info("Shared service '"+ service.getServiceName()+"' with CIS: " + remoteCis.getName());
 						}	
 					}				
 				}					
@@ -1444,6 +1445,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						updateActivityFeed(node,"Unshared",service);
 						sendEvent(ServiceMgmtEventType.SERVICE_UNSHARED,service,node);
 						sendUserNotification("No longer sharing "+ service.getServiceName() + " with " + myCIS.getName());
+						logger.info("No longer sharing "+ service.getServiceName() + " with " + getCisManager().getCis(node.getJid()).getName());
+
 					}
 		
 					returnResult.setMessage(ResultMessage.SUCCESS);
@@ -1486,6 +1489,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 								updateActivityFeed(node,"Unshared",service);
 								sendEvent(ServiceMgmtEventType.SERVICE_UNSHARED,service,node);
 								sendUserNotification("No longer sharing "+ service.getServiceName() + " with " + getCisManager().getCis(node.getJid()).getName());
+								logger.info("No longer sharing "+ service.getServiceName() + " with " + getCisManager().getCis(node.getJid()).getName());
 							}
 						}
 					}
@@ -1628,7 +1632,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 								getServiceReg().updateRegisteredService(newService);
 							}
 							
-							sendEvent(ServiceMgmtEventType.NEW_SERVICE,newService,null);
+							sendEvent(ServiceMgmtEventType.SERVICE_RESTORED,newService,null);
 							sendEvent(ServiceMgmtEventType.SERVICE_STARTED,newService,null);
 							
 							if(logger.isDebugEnabled())

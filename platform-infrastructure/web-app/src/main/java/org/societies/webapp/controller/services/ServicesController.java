@@ -136,8 +136,6 @@ public class ServicesController extends BasePageController {
 	private IIdentity selectedNode;
 	
 	public void setSelectedNode(String selectedJid){
-		if(log.isDebugEnabled())
-			log.debug("Selected Node is {}",selectedJid);
 		
 		try{
 			if("mynode".equals(selectedJid)){
@@ -493,6 +491,7 @@ public class ServicesController extends BasePageController {
     	if(log.isDebugEnabled())
     		log.debug("Selecting one node to view the services:" + selectedNode.getIdentifier());
     	
+    	setDidSearch(false);
     	
     	List<Service> serviceList;
     	try{
@@ -519,7 +518,6 @@ public class ServicesController extends BasePageController {
     		
     	}
     	
-    	didSearch=false;
     	
     }
     
@@ -592,7 +590,7 @@ public class ServicesController extends BasePageController {
 		    		currentServices.put(servWrapped.getId(), servWrapped);		    		
 		    	}
 		    	
-		    	didSearch = true;
+		    	setDidSearch(true);
 			}
 		} catch (Exception e) {
 			log.error("There was an exception trying to search for services: ", e.getMessage());

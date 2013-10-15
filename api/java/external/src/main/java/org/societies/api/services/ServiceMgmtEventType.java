@@ -33,6 +33,7 @@ package org.societies.api.services;
 public enum ServiceMgmtEventType {
 	NEW_SERVICE,
 	SERVICE_STARTED,
+	SERVICE_RESTORED,
 	SERVICE_STOPPED,
 	SERVICE_REMOVED,
 	SERVICE_SHARED,

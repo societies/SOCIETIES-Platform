@@ -413,7 +413,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 			if(service.getServiceType().equals(ServiceType.DEVICE))
 				servImpl.setServiceNameSpace("device."+service.getServiceName()+"."+myNode.getBareJid());
 			else
-				servImpl.setServiceNameSpace(serviceBundle.getSymbolicName());
+				servImpl.setServiceNameSpace(((String[]) serviceReference.getProperty("objectClass"))[0]);
 			
 			servImpl.setServiceProvider((String) serviceReference.getProperty("ServiceProvider"));
 			servImpl.setServiceClient((String) serviceReference.getProperty("ServiceClient"));
@@ -434,7 +434,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 				log.debug("Service Endpoint: {}",service.getServiceEndpoint());
 				log.debug("Service PrivacyPolicy: {}",service.getPrivacyPolicy());
 				log.debug("Service SecurityPolicy: {}",service.getSecurityPolicy());
-				log.debug("Service SecurityPolicy: {}",service.getContextSource());
+				log.debug("Service isContextSource: {}",service.getContextSource());
 				log.debug("Service Provider: {}",service.getServiceInstance().getServiceImpl().getServiceProvider());
 				log.debug("Service Namespace: {}",service.getServiceInstance().getServiceImpl().getServiceNameSpace());
 				log.debug("Service ServiceClient: {}",service.getServiceInstance().getServiceImpl().getServiceClient());
@@ -648,6 +648,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 	}
 	
 	private void installService(Service service, Bundle serviceBundle) {
+		log.info("{} has been installed in OSGI",service.getServiceName());
 		log.debug("{} has been installed in OSGI.",ServiceModelUtils.serviceResourceIdentifierToString(service.getServiceIdentifier()));
 		
 		try{
@@ -682,6 +683,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 	}
 		
 	private void startService(Service service, Bundle serviceBundle){
+		log.info("{} has been started in OSGI",service.getServiceName());
 		log.debug("{} has been started in OSGI.",ServiceModelUtils.serviceResourceIdentifierToString(service.getServiceIdentifier()));
 		
 		try{
@@ -692,13 +694,12 @@ public class OsgiRegistryListener implements BundleContextAware,
 				log.debug("{} is already started in the database, so this is a SOCIETIES restart.",service.getServiceName());
 				
 				if(ServiceModelUtils.isServiceOurs(service, getCommMngr()) && !service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT) && !service.getServiceType().equals(ServiceType.DEVICE)){
-					log.debug("{}");
 					if(!updateSecurityPolicy(service,serviceBundle) || !updatePrivacyPolicy(service,serviceBundle)){
-						log.warn("Adding security and privacy failed!");
+						log.warn("{} Adding security and privacy failed!",service.getServiceName());
 						return;
 					}
 					
-					sendEvent(ServiceMgmtEventType.NEW_SERVICE,service,serviceBundle);
+					sendEvent(ServiceMgmtEventType.SERVICE_RESTORED,service,serviceBundle);
 					sendEvent(ServiceMgmtEventType.SERVICE_STARTED,service,serviceBundle);
 				} else{
 					if(log.isDebugEnabled())
@@ -725,6 +726,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 	}
 	
 	private void stopService(Service service, Bundle serviceBundle){
+		log.info("{} has been stopped in OSGI",service.getServiceName());
 		log.debug("{} has been stopped in OSGI.",ServiceModelUtils.serviceResourceIdentifierToString(service.getServiceIdentifier()));
 		
 		try{
