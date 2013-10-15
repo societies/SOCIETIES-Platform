@@ -346,7 +346,7 @@ public class ServiceDiscovery implements IServiceDiscovery {
 	public Future<List<Service>> searchServicesAll(Service filter)
 			throws ServiceDiscoveryException {
 		
-		if(logger.isDebugEnabled()) logger.debug("Searching all repositories for a given service");
+		logger.info("Searching all repositories for a service...");
 		
 		HashMap<String,Service> result = new HashMap<String,Service>();
 		

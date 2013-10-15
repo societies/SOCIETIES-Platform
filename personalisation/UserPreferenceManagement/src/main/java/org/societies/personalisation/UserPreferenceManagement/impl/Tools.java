@@ -135,7 +135,9 @@ public class Tools {
 	}
 
 	private void log(String message){
-		this.logging.debug(this.getClass().getName()+" : "+message);
+		if(this.logging.isDebugEnabled()){
+			this.logging.debug(this.getClass().getName()+" : "+message);
+		}
 	}
 
 }

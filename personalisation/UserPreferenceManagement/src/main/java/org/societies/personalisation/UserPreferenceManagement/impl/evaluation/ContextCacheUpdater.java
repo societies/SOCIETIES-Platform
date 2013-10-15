@@ -47,15 +47,21 @@ public class ContextCacheUpdater {
 
 	public void registerForContextEvent(CtxAttributeIdentifier id){
 		if (this.attrList.contains(id)){
-			this.logging.debug("Already Registered for context events for : "+id.getType()+" ID: "+id.toUriString());
+			if(this.logging.isDebugEnabled()){
+				this.logging.debug("Already Registered for context events for : "+id.getType()+" ID: "+id.toUriString());
+			}
 			return;
 		}/* Commented out because ICtxBroker.registerForUpdates has been removed from the internal API. See ICtxBroker.registerForChanges
 		try {
 			//this.broker.registerUpdateNotification(this, id);
 			this.broker.registerForUpdates(id);
-			this.logging.debug("Registered for context events for : "+id.getType()+" ID: "+id.toUriString());
+			if(this.logging.isDebugEnabled()){
+			if(this.logging.isDebugEnabled()){this.logging.debug("Registered for context events for : "+id.getType()+" ID: "+id.toUriString());}
+			}
 		} catch (CtxException e) {
-			this.logging.debug("Unable to register for context events for : "+id.getType()+" ID: "+id.toUriString());
+			if(this.logging.isDebugEnabled()){
+			if(this.logging.isDebugEnabled()){this.logging.debug("Unable to register for context events for : "+id.getType()+" ID: "+id.toUriString());}
+			}
 			e.printStackTrace();
 		}*/
 		
@@ -72,14 +78,16 @@ public class ContextCacheUpdater {
 	@Override
 	public void handlePeerEvent(PeerEvent event) {
 		try{
+			if(this.logging.isDebugEnabled()){
 			this.logging.debug("Peer Event Received " + event.geteventType());
+			}
 			if (event.geteventType().equals(PSSEventTypes.CONTEXT_UPDATE_EVENT)){
 				ICtxAttribute ctxAttr = (ICtxAttribute) event.geteventInfo();
 				String type = ctxAttr.getType();
 				String value = ctxAttr.getStringValue();
 				ICtxIdentifier id = ctxAttr.getCtxIdentifier();
 
-				this.logging.debug("Event received: type: "+type+" value: "+value);
+				if(this.logging.isDebugEnabled()){this.logging.debug("Event received: type: "+type+" value: "+value);}
 				this.contextCache.updateCache(ctxAttr);
 			}
 		}catch(Exception e){

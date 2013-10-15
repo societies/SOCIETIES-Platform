@@ -77,7 +77,7 @@ public class MonitoredInfo {
 	}
 	
 /*	public ArrayList<String> getList(){
-		this.logging.debug("getting list of services");
+		if(this.logging.isDebugEnabled()){this.logging.debug("getting list of services");}
 		ArrayList<String> fullNames = new ArrayList<String>();
 		Iterator<PreferenceInfo> i = this.list.iterator();
 		while (i.hasNext()){

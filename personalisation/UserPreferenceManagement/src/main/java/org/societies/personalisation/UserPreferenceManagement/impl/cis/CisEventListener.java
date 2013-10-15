@@ -116,7 +116,9 @@ public class CisEventListener extends EventListener{
 						List<PreferenceDetails> detailsToDownload = new ArrayList<PreferenceDetails>();
 						for (String str: list){
 							if (this.tempTable.containsKey(str)){
-								this.logging.debug("Downloading community preference: "+str+" from: "+cisId);
+								if (logging.isDebugEnabled()){
+									this.logging.debug("Downloading community preference: "+str+" from: "+cisId);
+								}
 								PreferenceDetails preferenceDetails = this.tempTable.get(str);
 								detailsToDownload.add(preferenceDetails);
 								

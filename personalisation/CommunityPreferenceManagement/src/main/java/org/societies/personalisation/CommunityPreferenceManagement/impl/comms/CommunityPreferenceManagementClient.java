@@ -107,10 +107,9 @@ public class CommunityPreferenceManagementClient implements ICommunityPreference
 			bean.setMethodType(CommunityPersonalisationMethodType.GET_COMMUNITY_PREFERENCE_DETAILS);
 			String requestID = UUID.randomUUID().toString();
 			bean.setRequestID(requestID);
-			this.results.put(requestID, null);
 			this.commManager.sendIQGet(stanza, bean, this);
 			
-			while (this.results.get(requestID)==null){
+			while (!this.results.containsKey(requestID)){
 				synchronized (this.results) {
 					this.results.wait();
 				}
@@ -157,10 +156,9 @@ public class CommunityPreferenceManagementClient implements ICommunityPreference
 			bean.setMethodType(CommunityPersonalisationMethodType.GET_ALL_COMMUNITY_PREFERENCES);
 			String requestID = UUID.randomUUID().toString();
 			bean.setRequestID(requestID);
-			this.results.put(requestID, null);
 			this.commManager.sendIQGet(stanza, bean, this);
 			
-			while (this.results.get(requestID)==null){
+			while (!this.results.containsKey(requestID)){
 				synchronized (this.results) {
 					this.results.wait();
 				}
@@ -250,10 +248,9 @@ public class CommunityPreferenceManagementClient implements ICommunityPreference
 			bean.setDetails(detailBeans);
 			String requestID = UUID.randomUUID().toString();
 			bean.setRequestID(requestID);
-			this.results.put(requestID, null);
 			this.commManager.sendIQGet(stanza, bean, this);
 			
-			while (this.results.get(requestID)==null){
+			while (!this.results.containsKey(requestID)){
 				synchronized (this.results) {
 					this.results.wait();
 				}

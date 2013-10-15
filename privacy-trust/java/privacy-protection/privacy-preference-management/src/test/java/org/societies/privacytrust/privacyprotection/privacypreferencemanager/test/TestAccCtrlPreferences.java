@@ -249,21 +249,21 @@ public class TestAccCtrlPreferences {
 
 			List<CtxIdentifier> locationCtxIds = new ArrayList<CtxIdentifier>();
 			locationCtxIds.add(this.locationAttribute.getId());
-			Mockito.when(this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, locationAttribute.getType())).thenReturn(new AsyncResult<List<CtxIdentifier>>(locationCtxIds));
+			Mockito.when(this.ctxBroker.lookup(userId, CtxModelType.ATTRIBUTE, locationAttribute.getType())).thenReturn(new AsyncResult<List<CtxIdentifier>>(locationCtxIds));
 			
 			List<CtxIdentifier> ageCtxIds = new ArrayList<CtxIdentifier>();
 			ageCtxIds.add(this.ageAttribute.getId());
-			Mockito.when(this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, ageAttribute.getType())).thenReturn(new AsyncResult<List<CtxIdentifier>>(ageCtxIds));
+			Mockito.when(this.ctxBroker.lookup(userId, CtxModelType.ATTRIBUTE, ageAttribute.getType())).thenReturn(new AsyncResult<List<CtxIdentifier>>(ageCtxIds));
 			Mockito.when(this.ctxBroker.retrieve(ageAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.ageAttribute));
 			
 			List<CtxIdentifier> nameCtxIds = new ArrayList<CtxIdentifier>();
 			nameCtxIds.add(this.nameAttribute.getId());
-			Mockito.when(this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, nameAttribute.getType())).thenReturn(new AsyncResult<List<CtxIdentifier>>(nameCtxIds));
+			Mockito.when(this.ctxBroker.lookup(userId, CtxModelType.ATTRIBUTE, nameAttribute.getType())).thenReturn(new AsyncResult<List<CtxIdentifier>>(nameCtxIds));
 			Mockito.when(this.ctxBroker.retrieve(nameAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.nameAttribute));
 			
 			List<CtxIdentifier> statusCtxIds = new ArrayList<CtxIdentifier>();
 			statusCtxIds.add(this.statusAttribute.getId());
-			Mockito.when(this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, statusAttribute.getType())).thenReturn(new AsyncResult<List<CtxIdentifier>>(statusCtxIds));
+			Mockito.when(this.ctxBroker.lookup(userId, CtxModelType.ATTRIBUTE, statusAttribute.getType())).thenReturn(new AsyncResult<List<CtxIdentifier>>(statusCtxIds));
 			Mockito.when(this.ctxBroker.retrieve(statusAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.statusAttribute));
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block

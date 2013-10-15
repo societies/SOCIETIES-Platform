@@ -122,7 +122,9 @@ public class AA_SI extends Thread{
 				output.add(nextOutput);
 			}
 		}else{
-			LOG.debug("No History found for historyOwner: "+historyOwner.toString());
+			if (LOG.isDebugEnabled()){
+				LOG.debug("No History found for historyOwner: "+historyOwner.toString());
+			}
 		}
 		//send DPI based output to requestor
 		LOG.info("RETURNING C45 OUTPUT TO: "+requestor.getClass().getName());
@@ -131,7 +133,9 @@ public class AA_SI extends Thread{
         }catch(Exception e){
         	e.printStackTrace();
         	
-            LOG.debug("The C45 requestor service is not available to handle response\nException: "+e.toString());
+        	if (LOG.isDebugEnabled()){
+        		LOG.debug("The C45 requestor service is not available to handle response\nException: "+e.toString());
+        	}
         }
 	}
 

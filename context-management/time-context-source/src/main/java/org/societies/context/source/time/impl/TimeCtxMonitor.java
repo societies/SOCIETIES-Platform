@@ -24,45 +24,25 @@
  */
 package org.societies.context.source.time.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.comm.xmpp.pubsub.PubsubClient;
-import org.societies.api.comm.xmpp.pubsub.Subscriber;
-import org.societies.api.context.CtxException;
-import org.societies.api.context.model.CommunityCtxEntity;
-import org.societies.api.context.model.CtxAssociation;
-import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
-import org.societies.api.context.model.util.SerialisationHelper;
+import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.identity.RequestorCis;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
-import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestPolicyUtils;
-import org.societies.api.schema.identity.DataIdentifierScheme;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -90,10 +70,6 @@ public class TimeCtxMonitor  {
 
 	/** The executor service. */
 	final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
-	//CtxAttribute todAttr = null;
-	//CtxAttribute hodAttr = null;
-	//CtxAttribute dowAttr = null;
 
 	CtxAttributeIdentifier todAttrId = null;
 	CtxAttributeIdentifier hodAttrId = null;
@@ -200,13 +176,10 @@ public class TimeCtxMonitor  {
 			}
 		};
 
-		DateTime dt = new DateTime();
-		int x = dt.getMinuteOfHour();
-		int startAt = 60-x;
+		final DateTime now = new DateTime();
+		long startAt = 60l - now.getMinuteOfHour();
 		
-		final ScheduledFuture<?> beeperHandle =
-				scheduler.scheduleAtFixedRate(updateValues,startAt , 60, TimeUnit.MINUTES);
-
+		scheduler.scheduleAtFixedRate(updateValues, startAt, 60, TimeUnit.MINUTES);
 	}
 	
 	/*
@@ -255,8 +228,7 @@ public class TimeCtxMonitor  {
 		if(i == 4) dow = "Thursday";
 		if(i == 5) dow = "Friday";
 		if(i == 6) dow = "Saturday";
-		if(i == 7) dow = "Sunday";
-		
+		if(i == 7) dow = "Sunday";		
 		
 		return dow; 
 	}
@@ -271,6 +243,7 @@ public class TimeCtxMonitor  {
 				String timeOfDayValue = convertTimeOfDay(date);
 				todAttr.setStringValue(timeOfDayValue);
 				todAttr.setValueType(CtxAttributeValueType.STRING);
+				todAttr.getQuality().setOriginType(CtxOriginType.INFERRED);
 				this.ctxBroker.update(todAttr);
 				LOG.debug("updating tod: timeOfDayValue " +timeOfDayValue);
 			}
@@ -279,6 +252,7 @@ public class TimeCtxMonitor  {
 				CtxAttribute hodAttr = (CtxAttribute) this.ctxBroker.retrieve(this.hodAttrId).get();
 				hodAttr.setIntegerValue(date.getHourOfDay());
 				hodAttr.setValueType(CtxAttributeValueType.INTEGER);
+				hodAttr.getQuality().setOriginType(CtxOriginType.INFERRED);
 				this.ctxBroker.update(hodAttr);
 				LOG.debug("updating hod:  " +hodAttr);
 			}
@@ -288,18 +262,16 @@ public class TimeCtxMonitor  {
 				String dow = convertDayOfWeek(date);
 				dowAttr.setStringValue(dow);
 				dowAttr.setValueType(CtxAttributeValueType.STRING);
+				dowAttr.getQuality().setOriginType(CtxOriginType.INFERRED);
 				this.ctxBroker.update(dowAttr);
 				LOG.debug("updating  dow:  " +dow);
 			}
 		
 		} catch (Exception e) {
-			LOG.error("Exception while updating time based ctx attribute values "+ e.getLocalizedMessage());
-			e.printStackTrace();
+			LOG.error("Exception while updating time based ctx attribute values "
+					+ e.getLocalizedMessage(), e);
 		}	
 	}
-
-
-
 
 	private CtxAttribute createCtxAttribute(CtxEntityIdentifier ownerCtxId, 
 			String type, String value) throws Exception {
@@ -314,5 +286,4 @@ public class TimeCtxMonitor  {
 		}
 		return attr;
 	}	
-
 }

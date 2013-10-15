@@ -158,12 +158,16 @@ public class CommunityPreferenceManagementServer implements IFeatureServer{
 
 			}
 			else{
-				this.LOG.debug("Error - bean method type not recognised, returning null");
+				if (LOG.isDebugEnabled()){
+					this.LOG.debug("Error - bean method type not recognised, returning null");
+				}
 				return null;
 			}
 
 		}
-		this.LOG.debug("Error - bean type not recognised, returning null");
+		if (LOG.isDebugEnabled()){
+			this.LOG.debug("Error - bean type not recognised, returning null");
+		}
 		return null;
 
 

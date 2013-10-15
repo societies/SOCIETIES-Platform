@@ -53,7 +53,7 @@ public class DataWrapperFactory {
 
 	public static final String NOT_OBFUSCABLE_TYPE = "NOT_OBFUCSABLE";
 
-	
+
 	// -- CONTEXT ATTRIBUTE
 
 	/**
@@ -180,21 +180,35 @@ public class DataWrapperFactory {
 		double longitude = 0.0;
 		double accuracy = 0.0;
 		for(CtxModelObject data : ctxDataList) {
-			if (!(data instanceof CtxAttribute) || !CtxAttributeTypes.LOCATION_COORDINATES.equals(data.getId().getType())) {
+			if (null == data || null == data.getId() || !(data instanceof CtxAttribute) || !CtxAttributeTypes.LOCATION_COORDINATES.equals(data.getId().getType())) {
 				continue;
 			}
 			CtxAttribute attribute = (CtxAttribute)data;
+			if (null == attribute.getStringValue()) {
+				break;
+			}
 			String[] rawValue = attribute.getStringValue().split(",");
-			latitude = Double.valueOf(rawValue[0]);
-			longitude = Double.valueOf(rawValue[1]);
-			accuracy = attribute.getQuality().getPrecision();
+			if (rawValue.length != 2) {
+				break;
+			}
+			try {
+				latitude = Double.valueOf(rawValue[0]);
+				longitude = Double.valueOf(rawValue[1]);
+			}
+			catch(NumberFormatException e) {
+				latitude = 0.0;
+				longitude = 0.0;
+			}
+			if (null != attribute.getQuality()) {
+				accuracy = attribute.getQuality().getPrecision();
+			}
 			break;
 		}
 		return getLocationCoordinatesWrapper(latitude, longitude, accuracy);
 	}
 	public static LocationCoordinates retrieveLocationCoordinates(DataWrapper dataWrapper) {
 		String dataType = CtxAttributeTypes.LOCATION_COORDINATES;
-		if (!dataType.equals(dataWrapper.getDataType())) {
+		if (null == dataWrapper || !dataType.equals(dataWrapper.getDataType())) {
 			return null;
 		}
 		return (LocationCoordinates) dataWrapper.getData();
@@ -202,16 +216,20 @@ public class DataWrapperFactory {
 	public static List<CtxModelObject> retrieveLocationCoordinates(DataWrapper obfuscatedDataWrapper, List<CtxModelObject> originalCtxDataList) {
 		LocationCoordinates obfuscatedData = retrieveLocationCoordinates(obfuscatedDataWrapper);
 		List<CtxModelObject> obfuscatedCtxDataList = new ArrayList<CtxModelObject>();
+		if (null == obfuscatedData || null == originalCtxDataList || originalCtxDataList.isEmpty()) {
+			return obfuscatedCtxDataList;
+		}
 		for (CtxModelObject data : originalCtxDataList) {
-			if (!(data instanceof CtxAttribute) || !CtxAttributeTypes.LOCATION_COORDINATES.equals(data.getId().getType())) {
+			if (null == data || null == data.getId() || !(data instanceof CtxAttribute) || !CtxAttributeTypes.LOCATION_COORDINATES.equals(data.getId().getType())) {
 				continue;
 			}
 			// Copy
+			CtxAttribute attribute = ((CtxAttribute)data);
 			CtxAttribute newCtxObject = new CtxAttribute((CtxAttributeIdentifier)data.getId());
-			newCtxObject.setHistoryRecorded(((CtxAttribute)data).isHistoryRecorded());
-			newCtxObject.setSourceId(((CtxAttribute)data).getSourceId());
-			newCtxObject.setValueMetric(((CtxAttribute)data).getValueMetric());
-			newCtxObject.setValueType(((CtxAttribute)data).getValueType());
+			newCtxObject.setHistoryRecorded(attribute.isHistoryRecorded());
+			newCtxObject.setSourceId(attribute.getSourceId());
+			newCtxObject.setValueMetric(attribute.getValueMetric());
+			newCtxObject.setValueType(attribute.getValueType());
 			// Update
 			newCtxObject.setStringValue(obfuscatedData.getLatitude()+","+obfuscatedData.getLongitude());
 			newCtxObject.getQuality().setPrecision(obfuscatedData.getAccuracy());
@@ -261,45 +279,40 @@ public class DataWrapperFactory {
 	}
 	public static Name retrieveName(DataWrapper dataWrapper) {
 		String dataType = CtxAttributeTypes.NAME;
-		if (!dataType.equals(dataWrapper.getDataType())) {
+		if (null == dataWrapper || !dataType.equals(dataWrapper.getDataType())) {
 			return null;
 		}
 		return (Name) dataWrapper.getData();
 	}
 	public static List<CtxModelObject> retrieveName(DataWrapper obfuscatedDataWrapper, List<CtxModelObject> originalCtxDataList) {
-		Name obfuscatedData = retrieveName(obfuscatedDataWrapper);
-		if (null == obfuscatedData) {
-			return null;
-		}
 		List<CtxModelObject> obfuscatedCtxDataList = new ArrayList<CtxModelObject>();
+		Name obfuscatedData = retrieveName(obfuscatedDataWrapper);
+		if (null == obfuscatedData || null == originalCtxDataList || originalCtxDataList.isEmpty()) {
+			return obfuscatedCtxDataList;
+		}
 		int found = 0;
 		for (CtxModelObject data : originalCtxDataList) {
-			if (!(data instanceof CtxAttribute)) {
+			if (null == data || null == data.getId() || !(data instanceof CtxAttribute)) {
 				continue;
 			}
-			if (CtxAttributeTypes.NAME_FIRST.equals(data.getId().getType())) {
+			if (CtxAttributeTypes.NAME_FIRST.equals(data.getId().getType())
+					|| CtxAttributeTypes.NAME_LAST.equals(data.getId().getType())) {
 				found++;
 				// Copy
+				CtxAttribute attribute = ((CtxAttribute)data);
 				CtxAttribute newCtxObject = new CtxAttribute((CtxAttributeIdentifier)data.getId());
-				newCtxObject.setHistoryRecorded(((CtxAttribute)data).isHistoryRecorded());
-				newCtxObject.setSourceId(((CtxAttribute)data).getSourceId());
-				newCtxObject.setValueMetric(((CtxAttribute)data).getValueMetric());
-				newCtxObject.setValueType(((CtxAttribute)data).getValueType());
+				newCtxObject.setHistoryRecorded(attribute.isHistoryRecorded());
+				newCtxObject.setSourceId(attribute.getSourceId());
+				newCtxObject.setValueMetric(attribute.getValueMetric());
+				newCtxObject.setValueType(attribute.getValueType());
 				// Update
-				newCtxObject.setStringValue(obfuscatedData.getFirstName());
-				newCtxObject.getQuality().setOriginType(CtxOriginType.INFERRED);
-				obfuscatedCtxDataList.add(newCtxObject);
-			}
-			if (CtxAttributeTypes.NAME_LAST.equals(data.getId().getType())) {
-				found++;
-				// Copy
-				CtxAttribute newCtxObject = new CtxAttribute((CtxAttributeIdentifier)data.getId());
-				newCtxObject.setHistoryRecorded(((CtxAttribute)data).isHistoryRecorded());
-				newCtxObject.setSourceId(((CtxAttribute)data).getSourceId());
-				newCtxObject.setValueMetric(((CtxAttribute)data).getValueMetric());
-				newCtxObject.setValueType(((CtxAttribute)data).getValueType());
-				// Update
-				newCtxObject.setStringValue(obfuscatedData.getLastName());
+				if (CtxAttributeTypes.NAME_LAST.equals(data.getId().getType())) {
+					newCtxObject.setStringValue(obfuscatedData.getLastName());
+				}
+				else {
+					newCtxObject.setStringValue(obfuscatedData.getFirstName());
+
+				}
 				newCtxObject.getQuality().setOriginType(CtxOriginType.INFERRED);
 				obfuscatedCtxDataList.add(newCtxObject);
 			}

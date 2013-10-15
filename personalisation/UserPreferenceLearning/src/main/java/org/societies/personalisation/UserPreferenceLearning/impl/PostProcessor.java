@@ -48,7 +48,9 @@ public class PostProcessor
 			ServiceResourceIdentifier serviceId,
 			String serviceType){
 
-		LOG.debug("Converting String to tree: "+treeString);
+		if (LOG.isDebugEnabled()){
+			LOG.debug("Converting String to tree: "+treeString);
+		}
 		System.out.println("Converting String to tree: "+treeString);
 
 		//create root node
@@ -238,7 +240,9 @@ public class PostProcessor
 
 	private IPreferenceCondition createCondition(String temp, CtxIdentifierCache cache){
 
-		LOG.debug("Creating condition from String: "+temp);
+		if (LOG.isDebugEnabled()){
+			LOG.debug("Creating condition from String: "+temp);
+		}
 		String noBars = removeChar(temp, '|');
 		noBars = noBars.trim();
 		String[] tuple = noBars.split("=");
@@ -250,7 +254,9 @@ public class PostProcessor
 
 	private IOutcome createOutcome(String paramName, String value, ServiceResourceIdentifier serviceId, String serviceType){
 
-		LOG.debug("Creating outcome from String: "+value);
+		if (LOG.isDebugEnabled()){
+			LOG.debug("Creating outcome from String: "+value);
+		}
 		IOutcome outcome = new PreferenceOutcome(serviceId, serviceType, paramName, value);
 
 		return outcome;

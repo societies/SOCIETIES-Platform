@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -41,12 +42,11 @@ import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.context.event.CtxChangeEventListener;
-import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAssociation;
-import org.societies.api.context.model.CtxAssociationIdentifier;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
@@ -762,8 +762,7 @@ public class CtxTrustEvidenceMonitor extends EventListener implements CtxChangeE
 	
 	private void registerForMembershipChanges(final String communityId) throws Exception {
 		
-		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving community context entity identifier of CIS '" + communityId + "'");
+		LOG.debug("Retrieving community context entity identifier of CIS '{}'", communityId);
 		final CtxEntityIdentifier communityEntId = ctxBroker.retrieveCommunityEntityId(
 				new Requestor(ownerId), commMgr.getIdManager().fromJid(communityId)).get();
 		if (communityEntId == null) {
@@ -771,26 +770,26 @@ public class CtxTrustEvidenceMonitor extends EventListener implements CtxChangeE
 					+ "': Community context entity identifier is null");
 			return;
 		}
-		if (LOG.isDebugEnabled())
-			LOG.debug("Retrieving community context entity identified as " + communityEntId);
-		final CommunityCtxEntity communityEnt = 
-				(CommunityCtxEntity) ctxBroker.retrieve(communityEntId).get();
-		if (communityEnt == null) {
+
+		LOG.debug("Retrieving HAS_MEMBERS associations of community context entity identified as '{}'",
+				communityEntId);
+		final List<CtxIdentifier> hasMembersIds = ctxBroker.lookup(new Requestor(ownerId),
+				communityEntId, CtxModelType.ASSOCIATION, CtxAssociationTypes.HAS_MEMBERS).get();
+		if (hasMembersIds.isEmpty()) {
 			LOG.error("Failed to register for membership changes of CIS '" + communityEntId.getOwnerId()
-					+ "': Community context entity is null");
+					+ "': Could not retrieve HAS_MEMBERS associations");
 			return;
 		}
-		CtxAssociationIdentifier hasMembersId = null;
+		CtxIdentifier hasMembersId = null;
 		final Set<String> members = new HashSet<String>();
-		for (final CtxAssociationIdentifier foundHasMembersId : communityEnt.getAssociations(CtxAssociationTypes.HAS_MEMBERS)) {
+		for (final CtxIdentifier foundHasMembersId : hasMembersIds) {
 			final CtxAssociation foundHasMembers =
-					(CtxAssociation) ctxBroker.retrieve(foundHasMembersId).get();
+					(CtxAssociation) ctxBroker.retrieve(new Requestor(ownerId), foundHasMembersId).get();
 			if (foundHasMembers != null && communityEntId.equals(foundHasMembers.getParentEntity())) {
 				hasMembersId = foundHasMembersId;
 				for (final CtxEntityIdentifier memberEntId : foundHasMembers.getChildEntities()) {
 					final String memberId = memberEntId.getOwnerId();
-					if (LOG.isDebugEnabled())
-						LOG.debug("Checking existing evidence about '" + memberId + "' being member of community '" + communityId + "'");
+					LOG.debug("Checking existing evidence about '{}' being member of community '{}'", memberId, communityId);
 					if (trustEvidenceRepository.retrieveEvidence(
 							new TrustedEntityId(TrustedEntityType.CSS, memberId), 
 							new TrustedEntityId(TrustedEntityType.CIS, communityId),
@@ -806,10 +805,8 @@ public class CtxTrustEvidenceMonitor extends EventListener implements CtxChangeE
 					+ "': HAS_MEMBERS association not found");
 			return;
 		}
-		if (LOG.isInfoEnabled())
-			LOG.info("Registering for membership changes of CIS '" + communityEntId.getOwnerId() + "'");
-		if (LOG.isDebugEnabled())
-			LOG.debug("hasMembersId=" + hasMembersId + ", members=" + members);
+		LOG.info("Registering for membership changes of CIS '{}'", communityEntId.getOwnerId());
+		LOG.debug("hasMembersId={}, members={}", hasMembersId, members);
 		ctxBroker.registerForChanges(new CommunityHasMembersListener(
 				communityEntId.getOwnerId(), members), hasMembersId);
 	}

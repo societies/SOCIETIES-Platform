@@ -136,7 +136,9 @@ public class AA_AI extends Thread{
 				output.add(nextOutput);
 			}
 		}else{
+			if (LOG.isDebugEnabled()){
 			LOG.debug("No History found for this user!");
+			}
 		}
 		//}
 		//send DPI based output to requestor
@@ -144,7 +146,9 @@ public class AA_AI extends Thread{
 		try{
 			requestor.handleC45Output(output);
 		}catch(Exception e){
-			LOG.debug("The C45 requestor service is not available to handle response");
+			if (LOG.isDebugEnabled()){
+				LOG.debug("The C45 requestor service is not available to handle response");
+			}
 		}
 	}
 
@@ -168,7 +172,9 @@ public class AA_AI extends Thread{
 			outputString = executeAlgorithm(instances);
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.debug("No rules could be learned from the current history set: \nException: "+e.toString());
+			if (LOG.isDebugEnabled()){
+				LOG.debug("No rules could be learned from the current history set: \nException: "+e.toString());
+			}
 			return null;
 		}
 

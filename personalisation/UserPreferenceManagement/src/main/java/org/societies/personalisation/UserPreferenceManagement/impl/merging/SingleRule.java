@@ -88,7 +88,9 @@ public class SingleRule{
 		
 		//CtxAttributeIdentifier ctxId = pc.getCtxIdentifier();
 		String contextType = pc.getname();
-		this.logging.debug("%%%%%%%   Context name: "+contextType+" %%%%%%%%%%%%%%%%");
+		if(this.logging.isDebugEnabled()){
+			this.logging.debug("%%%%%%%   Context name: "+contextType+" %%%%%%%%%%%%%%%%");
+		}
 		String value = pc.getvalue();
 		OperatorConstants op = pc.getoperator();
 		

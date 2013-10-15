@@ -71,20 +71,28 @@ public class PreferenceRetriever {
 					
 					Registry registry = (Registry) SerialisationHelper.deserialise(attr.getBinaryValue(), this.getClass().getClassLoader());
 					if (null==registry){
-						this.logging.debug("Error retrieving binary value from attribute");
+						if(this.logging.isDebugEnabled()){
+							this.logging.debug("Error retrieving binary value from attribute");
+						}
 						return new Registry();
 					}
 					
 					return registry;
 					
 				}
-				this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
+				if(this.logging.isDebugEnabled()){
+					this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
+				}
 				return new Registry();
 			}
-			this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
+			if(this.logging.isDebugEnabled()){
+				this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
+			}
 			return new Registry();
 		} catch (CtxException e) {
-			this.logging.debug("Exception while loading PreferenceRegistry from DB");
+			if(this.logging.isDebugEnabled()){
+				this.logging.debug("Exception while loading PreferenceRegistry from DB");
+			}
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

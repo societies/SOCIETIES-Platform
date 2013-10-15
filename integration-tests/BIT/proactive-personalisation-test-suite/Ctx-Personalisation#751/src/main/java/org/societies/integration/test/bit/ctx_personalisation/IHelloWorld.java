@@ -38,4 +38,6 @@ public interface IHelloWorld {
 	public void setVolume(IIdentity userId, String volume);
 	public String getBackgroundColour(IIdentity userId);
 	public String getVolume(IIdentity userId);
+	public boolean isReceivedAction();
+	public void setReceivedAction(boolean receivedAction);
 }

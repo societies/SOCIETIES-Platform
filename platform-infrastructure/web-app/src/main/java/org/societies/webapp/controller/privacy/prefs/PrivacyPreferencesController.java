@@ -74,6 +74,7 @@ public class PrivacyPreferencesController extends BasePageController{
 
     private PPNPreferenceDetailsBean selectedPPNDetail;
     private AccessControlPreferenceDetailsBean selectedAccCtrlDetail;
+    private DObfPreferenceDetailsBean selecteddobfDetail;
 	private List<PPNPreferenceDetailsBean> ppnPreferenceDetails;
 
 
@@ -87,7 +88,7 @@ public class PrivacyPreferencesController extends BasePageController{
 
 
 	private String ppnUUID;
-
+	private String dobfUUID;
 	private String accCtrlUUID;
 	
     
@@ -99,6 +100,7 @@ public class PrivacyPreferencesController extends BasePageController{
 		this.retrieveDObfPreferences();
 		ppnUUID = UUID.randomUUID().toString();
 		accCtrlUUID = UUID.randomUUID().toString();
+		dobfUUID = UUID.randomUUID().toString();
 	}
 	public void retrievePPNPreferences() {
 		
@@ -108,17 +110,33 @@ public class PrivacyPreferencesController extends BasePageController{
 	}
 	
 	public String storePPNDetailToUtils(){
-		this.logging.debug("Adding ppn preference details bean to util service");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Adding ppn preference details bean to util service");
+		}
 		this.privacyUtilService.setPpnPreferenceDetailsBean(ppnUUID, selectedPPNDetail);
 		return "privacy_ppn_edit.xhtml";
 		
 	}
 	
+
+	
 	public String storeAccCtrlDetailToUtils(){
-		this.logging.debug("Adding accCtrl preference details bean to util service");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Adding accCtrl preference details bean to util service");
+		}
 		this.privacyUtilService.setAccessControlPreferenceDetailsBean(accCtrlUUID, selectedAccCtrlDetail);
 		return "privacy_accCtrl_edit.xhtml";
 	}
+	
+	public String storeDObfDetailToUtils(){
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Adding dobf preference details bean to util service");
+		}
+		this.privacyUtilService.setDObfPreferenceDetailsBean(dobfUUID, this.selecteddobfDetail);
+		return "privacy_dobf_edit.xhtml";
+		
+	}
+	
 	public void retrieveAccCtrlPreferences(){
 		setAccCtrlPreferenceDetails(privPrefmgr.getAccCtrlPreferenceDetails());
 		
@@ -141,23 +159,23 @@ public class PrivacyPreferencesController extends BasePageController{
 	public String toStringRequestor(RequestorBean requestor){
 		
 		if (requestor instanceof RequestorCisBean){
-			return "CIS: "+((RequestorCisBean) requestor).getCisRequestorId();
+			return "\nCIS: "+((RequestorCisBean) requestor).getCisRequestorId();
 			
 		}
 		if (requestor instanceof RequestorServiceBean){
 			String completeStr = ServiceModelUtils.serviceResourceIdentifierToString(((RequestorServiceBean) requestor).getRequestorServiceId());
 			if (null == completeStr) {
-				return "none";
+				return "\nnone";
 			}
 			String[] serviceIdParts = completeStr.split(" ");
 			if (null == serviceIdParts || serviceIdParts.length <= 0) {
-				return "none";
+				return "\nnone";
 			}
-			return "Service id: "+serviceIdParts[0]+(serviceIdParts.length > 1 ? " Instance id: "+serviceIdParts[1] : "");
+			return "\nService id: "+serviceIdParts[0]+(serviceIdParts.length > 1 ? " Instance id: "+serviceIdParts[1] : "");
 			
 		}
 		
-		return "none";
+		return "\nnone";
 		
 		
 	}
@@ -190,7 +208,9 @@ public class PrivacyPreferencesController extends BasePageController{
 		return selectedPPNDetail;
 	}
 	public void setSelectedPPNDetail(PPNPreferenceDetailsBean selectedPPNDetail) {
-		this.logging.debug("Setting selectedPPNDetail: "+selectedPPNDetail.toString());
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Setting selectedPPNDetail: "+selectedPPNDetail.toString());
+		}
 		this.selectedPPNDetail = selectedPPNDetail;
 		
 	}
@@ -224,13 +244,7 @@ public class PrivacyPreferencesController extends BasePageController{
 	public void setPrivacyUtilService(PrivacyUtilService privacyUtilService) {
 		this.privacyUtilService = privacyUtilService;
 	}
-	public String getUuid() {
-		
-		return ppnUUID;
-	}
-	public void setUuid(String uuid) {
-		this.ppnUUID = uuid;
-	}
+
 	public String getPpnUUID() {
 		return ppnUUID;
 	}
@@ -242,6 +256,18 @@ public class PrivacyPreferencesController extends BasePageController{
 	}
 	public void setAccCtrlUUID(String accCtrlUUID) {
 		this.accCtrlUUID = accCtrlUUID;
+	}
+	public String getDobfUUID() {
+		return dobfUUID;
+	}
+	public void setDobfUUID(String dobfUUID) {
+		this.dobfUUID = dobfUUID;
+	}
+	public DObfPreferenceDetailsBean getSelecteddobfDetail() {
+		return selecteddobfDetail;
+	}
+	public void setSelecteddobfDetail(DObfPreferenceDetailsBean selecteddobfDetail) {
+		this.selecteddobfDetail = selecteddobfDetail;
 	}
 
 	

@@ -134,14 +134,10 @@ public class NegotiationClient implements INegotiationClient {
 	@Override
 	public void receiveProviderPolicy(RequestPolicy policy) {
 		try {
-			this.privacyPolicyManager.updatePrivacyPolicy(RequestPolicyUtils
-					.toRequestPolicy(policy, this.idm));
+			this.privacyPolicyManager.updatePrivacyPolicy(policy);
 		} catch (PrivacyException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		this.logging.debug("Received Provider RequestPolicy!");
 		this.logging.debug("Request policy contains: "

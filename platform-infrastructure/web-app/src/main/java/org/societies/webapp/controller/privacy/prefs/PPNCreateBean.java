@@ -31,8 +31,11 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -47,9 +50,14 @@ import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
+import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyConditionsConstantValues;
@@ -60,6 +68,7 @@ import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
@@ -95,6 +104,9 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 
 	@ManagedProperty(value = "#{privPrefMgr}")
 	private IPrivacyPreferenceManager privPrefmgr;
+
+	@ManagedProperty(value="#{internalCtxBroker}")
+	private ICtxBroker ctxBroker;
 
 	private IIdentity userId;
 
@@ -136,16 +148,16 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 	private List<String> deviceTypes;
 
 	private List<String> activityTypes;
-	
+
 	private List<String> resourceTypes = new ArrayList<String>();
-	
+
 	private List<DataIdentifierScheme> schemeList;
 
-	private boolean editableResource;
-	
-	
-	
-	
+	private PPNPrivacyPreferenceTreeModel existingPpnPreference;
+
+
+
+
 
 	public PPNCreateBean() {
 
@@ -159,10 +171,14 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 		preferenceDetails.getRequestor().setRequestorId("");
 		preferenceDetails.setResource(new Resource());
 		preferenceDetails.getResource().setDataType("");
-		
-		setupDataTypes();
-		this.createCtxAttributeTypesList();
+		preferenceDetails.setAction(new Action());
+
 		this.createSchemeList();
+		this.setupDataTypes();
+		this.createCtxAttributeTypesList();
+		this.selectScheme(this.schemeList.get(0));
+		this.handleSchemeTypeChange();
+		
 		setOperators(Arrays.asList(OperatorConstants.values()));
 		setDecisions(Arrays.asList(Decision.values()));
 		this.setupConditions();
@@ -204,14 +220,20 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 		if (requestorType==0){
 
 			try {
-				this.logging.debug("validating cis ID:"+requestorCis);
+				if (logging.isDebugEnabled()){
+					this.logging.debug("validating cis ID:"+requestorCis);
+				}
 				IIdentity cisid = this.commMgr.getIdManager().fromJid(requestorCis);
 				((RequestorCisBean) this.preferenceDetails.getRequestor()).setCisRequestorId(cisid.getBareJid());
 				rType = "cis";
 				specific = "\nid: "+((RequestorCisBean) this.preferenceDetails.getRequestor()).getCisRequestorId();
-				this.logging.debug("successfully validated CIS id");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("successfully validated CIS id");
+				}
 			} catch (InvalidFormatException e) {
-				this.logging.debug("caught exception while validating cis id");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("caught exception while validating cis id");
+				}
 				e.printStackTrace();
 				preferenceDetailsCorrect = false;
 				FacesMessage message = new FacesMessage("CIS Jid is not valid");
@@ -221,15 +243,21 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 
 		}else if (requestorType==1){
 			try{
-				this.logging.debug("validating service id: "+requestorService);
+				if (logging.isDebugEnabled()){
+					this.logging.debug("validating service id: "+requestorService);
+				}
 				serviceID = ServiceModelUtils.generateServiceResourceIdentifierFromString(requestorService);
 				rType = "service";
 				((RequestorServiceBean) this.preferenceDetails.getRequestor()).setRequestorServiceId(serviceID);
 				specific = "\nid: "+((RequestorServiceBean) this.preferenceDetails.getRequestor()).getRequestorServiceId();
-				this.logging.debug("successfully validated service id");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("successfully validated service id");
+				}
 			}
 			catch (Exception e){
-				this.logging.debug("caught exception while generating service resource id");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("caught exception while generating service resource id");
+				}
 				e.printStackTrace();
 				preferenceDetailsCorrect = false;
 				FacesMessage message = new FacesMessage("ServiceID is not valid");
@@ -238,7 +266,9 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 			}
 
 			if (serviceID == null){
-				this.logging.debug("service id is null");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("service id is null");
+				}
 				preferenceDetailsCorrect = false;
 				FacesMessage message = new FacesMessage("ServiceID is not valid");
 				FacesContext.getCurrentInstance().addMessage(null, message);
@@ -246,14 +276,45 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 			}
 		}
 
+		if (preferenceDetails.getResource().getDataType()==null){
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Resource dataType is null");
+			}
+			preferenceDetailsCorrect = false;
+			FacesMessage message = new FacesMessage("Please select a valid resourceType");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			return;
+		}
+
+		if (preferenceDetails.getAction()==null){
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Action is null");
+			}
+			preferenceDetailsCorrect = false;
+			FacesMessage message = new FacesMessage("Please select an action");
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			return;
+		}
+		existingPpnPreference = this.privPrefmgr.getPPNPreference(preferenceDetails);
+		if (existingPpnPreference!=null){
+			RequestContext.getCurrentInstance().execute("pdcd.show();");
+		}
 		RequestContext context = RequestContext.getCurrentInstance();
 		context.execute("prefDetailsDlg.hide()");
-		this.logging.debug("Successfully validated preferenceDetails");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Successfully validated preferenceDetails");
+		}
 		this.preferenceDetailsCorrect = true;
 
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "PPN preference details set", "Set requestor: "+preferenceDetails.getRequestor().getRequestorId()+
 				"\n, type: "+rType+specific+"\nSet resource: "+preferenceDetails.getResource().getDataType());
 		FacesContext.getCurrentInstance().addMessage(null, message);
+	}
+
+	public void loadExistingPreference(){
+		TreeNode node = new DefaultTreeNode("Root!", null);
+		this.root = ModelTranslator.getPrivacyPreference(this.existingPpnPreference.getRootPreference(), node);
+		printTree();
 	}
 	public TreeNode getSelectedNode() {
 		return selectedNode;
@@ -262,9 +323,13 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 	public void setSelectedNode(TreeNode selectedNode) {
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Set selected node"));
 		if (selectedNode==null){
-			this.logging.debug("setting selected node to null!");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("setting selected node to null!");
+			}
 		}else{
-			this.logging.debug("Setting selected node: "+selectedNode.toString());
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Setting selected node: "+selectedNode.toString());
+			}
 		}
 		this.selectedNode = selectedNode;
 		this.printTree();
@@ -273,19 +338,27 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 
 	private void printTree(){
 		if (this.root==null){
-			this.logging.debug("root is null. tree is corrupted");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("root is null. tree is corrupted");
+			}
 			return;
 		}
-		this.logging.debug("********** <TREE **********");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("********** <TREE **********");
+		}
 
 		String tree = "\nRoot: "+root.getData()+" "+root.getChildCount();
 		List<TreeNode> children = this.root.getChildren();
 		for (TreeNode child : children){
 			tree = tree.concat(getChildrenToPrint(child));
 		}
-		this.logging.debug(tree);
+		if (logging.isDebugEnabled()){
+			this.logging.debug(tree);
+		}
 
-		this.logging.debug("******** </TREE> ************");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("******** </TREE> ************");
+		}
 
 	}
 
@@ -333,7 +406,9 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 
 	public void addTrustCondition(){
 		if (selectedNode==null){
-			this.logging.debug("selected node is null - addPrivacyCondition");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("selected node is null - addPrivacyCondition");
+			}
 			return;
 		}
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Adding condition", "wait");
@@ -359,25 +434,37 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 		}
 		TrustPreferenceCondition trustCondition = new TrustPreferenceCondition(trustId, tValue);
 		if (selectedNode.getData() instanceof PPNPOutcome){
-			this.logging.debug("Adding condition to outcome");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Adding condition to outcome");
+			}
 			//get the parent of the outcome node
 			TreeNode parent = selectedNode.getParent();
-			this.logging.debug("parent of selected node is: "+parent);
+			if (logging.isDebugEnabled()){
+				this.logging.debug("parent of selected node is: "+parent);
+			}
 			//remove the outcome from its parent
 			parent.getChildren().remove(selectedNode);
-			this.logging.debug("removed selected node from parent. parent now has "+parent.getChildCount()+" children nodes");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("removed selected node from parent. parent now has "+parent.getChildCount()+" children nodes");
+			}
 			//create the condition node
 			TreeNode conditionNode = new DefaultTreeNode(trustCondition, parent);
-			this.logging.debug("added: "+conditionNode+" to parent: "+parent);
+			if (logging.isDebugEnabled()){
+				this.logging.debug("added: "+conditionNode+" to parent: "+parent);
+			}
 			//add the condition node to the parent node
 			//parent.getChildren().add(conditionNode);
 			//set the condition as parent of the outcome
 			selectedNode.setParent(conditionNode);
-			this.logging.debug("set parent: "+conditionNode+" for selectedNode: "+selectedNode);
+			if (logging.isDebugEnabled()){
+				this.logging.debug("set parent: "+conditionNode+" for selectedNode: "+selectedNode);
+			}
 			//add the outcome node to the condition node;
 			//conditionNode.getChildren().add(selectedNode);
 		}else{
-			this.logging.debug("Adding condition to condition");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Adding condition to condition");
+			}
 			//create the condition node
 			TreeNode conditionNode = new DefaultTreeNode(trustCondition, selectedNode);
 			//add the conditionNode under the selected node
@@ -414,7 +501,9 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 
 	public void addPrivacyCondition(){
 		if (selectedNode==null){
-			this.logging.debug("selected node is null - addPrivacyCondition");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("selected node is null - addPrivacyCondition");
+			}
 			return;
 		}
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Adding condition", "wait");
@@ -427,25 +516,37 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 		PrivacyCondition privacyCondition = new PrivacyCondition(condition); 
 
 		if (selectedNode.getData() instanceof PPNPOutcome){
-			this.logging.debug("Adding condition to outcome");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Adding condition to outcome");
+			}
 			//get the parent of the outcome node
 			TreeNode parent = selectedNode.getParent();
-			this.logging.debug("parent of selected node is: "+parent);
+			if (logging.isDebugEnabled()){
+				this.logging.debug("parent of selected node is: "+parent);
+			}
 			//remove the outcome from its parent
 			parent.getChildren().remove(selectedNode);
-			this.logging.debug("removed selected node from parent. parent now has "+parent.getChildCount()+" children nodes");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("removed selected node from parent. parent now has "+parent.getChildCount()+" children nodes");
+			}
 			//create the condition node
 			TreeNode conditionNode = new DefaultTreeNode(privacyCondition, parent);
-			this.logging.debug("added: "+conditionNode+" to parent: "+parent);
+			if (logging.isDebugEnabled()){
+				this.logging.debug("added: "+conditionNode+" to parent: "+parent);
+			}
 			//add the condition node to the parent node
 			//parent.getChildren().add(conditionNode);
 			//set the condition as parent of the outcome
 			selectedNode.setParent(conditionNode);
-			this.logging.debug("set parent: "+conditionNode+" for selectedNode: "+selectedNode);
+			if (logging.isDebugEnabled()){
+				this.logging.debug("set parent: "+conditionNode+" for selectedNode: "+selectedNode);
+			}
 			//add the outcome node to the condition node;
 			//conditionNode.getChildren().add(selectedNode);
 		}else{
-			this.logging.debug("Adding condition to condition");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Adding condition to condition");
+			}
 			//create the condition node
 			TreeNode conditionNode = new DefaultTreeNode(privacyCondition, selectedNode);
 			//add the conditionNode under the selected node
@@ -460,7 +561,9 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 
 	public void addOutcome(){
 		if (selectedNode==null){
-			this.logging.debug("selected node is null - addOutcome");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("selected node is null - addOutcome");
+			}
 			return;
 		}
 
@@ -485,7 +588,9 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 		TreeNode newNode = new DefaultTreeNode(outcome, selectedNode);
 
 
-		this.logging.debug("Added new outcome : "+newNode+" to selected node: "+selectedNode);
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Added new outcome : "+newNode+" to selected node: "+selectedNode);
+		}
 
 	}
 
@@ -558,7 +663,9 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 	public void savePreference(){
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Saving preference", "Now saving prefernece");
 		FacesContext.getCurrentInstance().addMessage(null, message);
-		this.logging.debug("savePreferences called");
+		if (logging.isDebugEnabled()){
+			this.logging.debug("savePreferences called");
+		}
 
 
 		PrivacyPreference privacyPreference = ModelTranslator.getPrivacyPreference(root);
@@ -568,8 +675,12 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			return;
 		}		
-		this.logging.debug("Printing preference before save: \n"+privacyPreference.toString());
-		this.logging.debug("Saving preferences with details: "+preferenceDetails.toString());
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Printing preference before save: \n"+privacyPreference.toString());
+		}
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Saving preferences with details: "+preferenceDetails.toString());
+		}
 		PPNPrivacyPreferenceTreeModel model = new PPNPrivacyPreferenceTreeModel(preferenceDetails, privacyPreference);
 		if (this.privPrefmgr.storePPNPreference(preferenceDetails, model)){
 			message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "Your new Privacy Policy Negotiation preference has been successfully saved.");
@@ -617,14 +728,24 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 	public TreeNode getRoot() {
 		if (this.root==null){
 			this.root = new DefaultTreeNode("Root", null);
-			this.logging.debug("loading tree with default tree node");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("loading tree with default tree node");
+			}
 			PPNPOutcome outcome = new PPNPOutcome(Decision.PERMIT);
 			TreeNode node0 = new DefaultTreeNode(outcome, root);
 
-			this.logging.debug("((((((((((((((");
-			this.logging.debug("getRoot");
-			this.logging.debug(node0+" ");
-			this.logging.debug("))))))))))))))))))");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("((((((((((((((");
+			}
+			if (logging.isDebugEnabled()){
+				this.logging.debug("getRoot");
+			}
+			if (logging.isDebugEnabled()){
+				this.logging.debug(node0+" ");
+			}
+			if (logging.isDebugEnabled()){
+				this.logging.debug("))))))))))))))))))");
+			}
 		}
 		return root;
 	}
@@ -665,7 +786,9 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 				RequestorCisBean cisBean = new RequestorCisBean();
 				cisBean.setRequestorId(requestorId);
 				this.preferenceDetails.setRequestor(cisBean);
-				this.logging.debug("setting requestor Type :"+requestorType);
+				if (logging.isDebugEnabled()){
+					this.logging.debug("setting requestor Type :"+requestorType);
+				}
 
 				break;
 			case 1:
@@ -673,7 +796,9 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 				RequestorServiceBean serviceBean = new RequestorServiceBean();
 				serviceBean.setRequestorId(requestorId);
 				this.preferenceDetails.setRequestor(serviceBean);
-				this.logging.debug("setting requestor Type :"+requestorType);
+				if (logging.isDebugEnabled()){
+					this.logging.debug("setting requestor Type :"+requestorType);
+				}
 
 
 				break;
@@ -682,12 +807,16 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 				RequestorBean bean = new RequestorBean();
 				bean.setRequestorId(requestorId);
 				this.preferenceDetails.setRequestor(bean);
-				this.logging.debug("setting requestor Type :"+requestorType);
+				if (logging.isDebugEnabled()){
+					this.logging.debug("setting requestor Type :"+requestorType);
+				}
 
 				break;
 			}
 		}else{
-			this.logging.debug("setting requestorType: "+requestorType+" but not changing the preferenceDetails");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("setting requestorType: "+requestorType+" but not changing the preferenceDetails");
+			}
 		}
 		this.requestorType = requestorType;
 	}
@@ -698,7 +827,9 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 
 
 	public boolean isPreferenceDetailsCorrect() {
-		this.logging.debug("preferenceDetailsCorrect: "+preferenceDetailsCorrect);
+		if (logging.isDebugEnabled()){
+			this.logging.debug("preferenceDetailsCorrect: "+preferenceDetailsCorrect);
+		}
 		return preferenceDetailsCorrect;
 	}
 
@@ -788,7 +919,9 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 	}
 
 	public void handlePrivacyTypeChange(){
-		this.logging.debug("handlePrivacyTypeChange for: "+this.selectedPrivacyCondition);
+		if (logging.isDebugEnabled()){
+			this.logging.debug("handlePrivacyTypeChange for: "+this.selectedPrivacyCondition);
+		}
 		this.setPrivacyValues(this.privacyConditionData.get(selectedPrivacyCondition));
 	}
 
@@ -817,6 +950,16 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 	}
 
 
+	public ICtxBroker getCtxBroker() {
+		return ctxBroker;
+	}
+
+
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		this.ctxBroker = ctxBroker;
+	}
+
+
 	public String getDisplaySpecificRequestor() {
 		if (this.preferenceDetails.getRequestor() instanceof RequestorCisBean){
 			displaySpecificRequestor = "Cis: "+((RequestorCisBean) this.preferenceDetails.getRequestor()).getCisRequestorId();
@@ -838,85 +981,105 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 	/**
 	 * utility methods
 	 */
-	
+
 	private void createSchemeList() {
 		this.schemeList = new ArrayList<DataIdentifierScheme>();
-		DataIdentifierScheme[] fields = DataIdentifierScheme.values();
-		
-		ArrayList<String> tempNames = new ArrayList<String>();
-		for (int i=0; i<fields.length; i++){
-			if (!fields[i].name().equalsIgnoreCase("CSS"))
-				this.schemeList.add(fields[i]);
-		}
-		
-		
+
+		this.schemeList.add(DataIdentifierScheme.CONTEXT);
+		this.schemeList.add(DataIdentifierScheme.CIS);
+		this.schemeList.add(DataIdentifierScheme.DEVICE);
+		this.schemeList.add(DataIdentifierScheme.ACTIVITY);
+
+
 	}
 
 	private void createCtxAttributeTypesList() {
-		this.contextTypes = new ArrayList<String>();
-		Field[] fields = CtxAttributeTypes.class.getDeclaredFields();
-		
-		String[] names = new String[fields.length];
-		
-		for (int i=0; i<names.length; i++){
-			names[i] = fields[i].getName();
-			
-			
+		try{
+			this.contextTypes = new ArrayList<String>();
+			IndividualCtxEntity individualCtxEntity = this.ctxBroker.retrieveIndividualEntity(userId).get();
+			Set<CtxAttribute> attributes = individualCtxEntity.getAttributes();
+
+			Iterator<CtxAttribute> iterator = attributes.iterator();
+			this.contextTypes.clear();
+			while(iterator.hasNext()){
+
+				String ctxType = iterator.next().getType();
+
+				if (!this.contextTypes.contains(ctxType)){
+					if (logging.isDebugEnabled()){
+						this.logging.debug("Adding new context type: "+ctxType);
+					}
+					this.contextTypes.add(ctxType);
+				}
+			}
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Found "+this.contextTypes.size()+" context attributes");
+			}
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		this.contextTypes = Arrays.asList(names);
-		
 	}
-	
+
 	private void setupDataTypes() {
 		this.cisTypes = new ArrayList<String>();
 		this.cisTypes.add("cis-member-list");
 		this.cisTypes.add("cis-list");
-		
+
 		this.deviceTypes = new ArrayList<String>();
 		this.deviceTypes.add("meta-data");
-		
+
 		this.activityTypes = new ArrayList<String>();
 		this.activityTypes.add("activityfeed");
-		
-		
+
+
 	}
 
 
 	public void handleSchemeTypeChange(){
 		DataIdentifierScheme scheme = this.preferenceDetails.getResource().getScheme();
 		if (scheme==null){
-			this.logging.debug("handleSchemeTypeChange: selected scheme is null");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("handleSchemeTypeChange: selected scheme is null");
+			}
 			return;
 		}
-		
+		selectScheme(scheme);
+	}
+
+	private void selectScheme(DataIdentifierScheme scheme){
 		switch (scheme)
 		{
 		case ACTIVITY: 
 			this.resourceTypes = this.activityTypes;
-			this.editableResource = false;
+
 			break;
 		case CIS: 
 			this.resourceTypes = this.cisTypes;
-			this.editableResource = false;
+
 			break;
 		case CONTEXT:
 			this.resourceTypes = this.contextTypes;
-			this.editableResource = true;
+
 			break;
-		case CSS: 
-			this.resourceTypes = new ArrayList<String>();
-			this.editableResource = true;
-			break;
+
 		case DEVICE:
 			this.resourceTypes = this.deviceTypes;
-			this.editableResource = false;
+
 			break;
-		case SOCIALPROVIDER: 
+		default: 
 			this.resourceTypes = new ArrayList<String>();
-			this.editableResource = true;
 			break;
 		}
 	}
+
 	public List<String> getContextTypes() {
 		return contextTypes;
 	}
@@ -965,17 +1128,6 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 	public void setActivityTypes(List<String> activityTypes) {
 		this.activityTypes = activityTypes;
 	}
-
-
-	public boolean isEditableResource() {
-		return editableResource;
-	}
-
-
-	public void setEditableResource(boolean editableResource) {
-		this.editableResource = editableResource;
-	}
-
 
 	public List<String> getResourceTypes() {
 		return resourceTypes;

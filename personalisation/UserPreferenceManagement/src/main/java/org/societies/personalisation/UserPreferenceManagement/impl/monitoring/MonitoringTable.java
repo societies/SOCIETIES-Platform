@@ -73,14 +73,20 @@ public class MonitoringTable {
 			
 			MonitoredInfo mInfo = this.mainDataTable.get(id);
 			List<PreferenceDetails> fullPreferenceNames = mInfo.getList();
-			this.logging.debug("found "+fullPreferenceNames.size()+" affected services: ");
+			if(this.logging.isDebugEnabled()){
+				this.logging.debug("found "+fullPreferenceNames.size()+" affected services: ");
+			}
 			for (int i = 0; i <fullPreferenceNames.size(); i++){
-				this.logging.debug("Affected: "+fullPreferenceNames.get(i).getServiceID().toString());
+				if(this.logging.isDebugEnabled()){
+					this.logging.debug("Affected: "+fullPreferenceNames.get(i).getServiceID().toString());
+				}
 			}
 			return fullPreferenceNames;
 		}else{
 			//JOptionPaneshowMessageDialog(null, "CtxID: "+id.toString()+" not found in tables");
-			this.logging.debug("No preferences are affected by this context event");
+			if(this.logging.isDebugEnabled()){
+				this.logging.debug("No preferences are affected by this context event");
+			}
 			return new ArrayList<PreferenceDetails>();
 		}
 	}
@@ -100,9 +106,13 @@ public class MonitoringTable {
 				PreferenceDetails details = new PreferenceDetails(serviceType, serviceID, prefName);
 				//JOptionPaneshowMessageDialog(null, "Adding info to tables\n"+details.toString());
 				this.fullPreferenceNametoServiceID.put(details, serviceID);
-				this.logging.debug("INFO added");
+				if(this.logging.isDebugEnabled()){
+					this.logging.debug("INFO added");
+				}
 			}else{
-				this.logging.debug("INFO already exists");
+				if(this.logging.isDebugEnabled()){
+					this.logging.debug("INFO already exists");
+				}
 			}
 			
 		}else{
@@ -113,7 +123,9 @@ public class MonitoringTable {
 			PreferenceDetails details = new PreferenceDetails(serviceType, serviceID, prefName);
 			//JOptionPaneshowMessageDialog(null, "CtxID exists in tables. Adding info for: "+details.toString());
 			this.fullPreferenceNametoServiceID.put(details, serviceID);
-			this.logging.debug("INFO added");
+			if(this.logging.isDebugEnabled()){
+				this.logging.debug("INFO added");
+			}
 		}
 	}
 	
@@ -137,7 +149,9 @@ public class MonitoringTable {
 	}
 	
 	public IOutcome getLastAction(PreferenceDetails d){
-		this.logging.debug("Checking to see if the same action was sent to Proactivity last time");
+		if(this.logging.isDebugEnabled()){
+			this.logging.debug("Checking to see if the same action was sent to Proactivity last time");
+		}
 		if (this.lastOutcomes.containsKey(d)){
 			return this.lastOutcomes.get(d);
 		}
@@ -180,7 +194,10 @@ public class MonitoringTable {
 	
 	
 	public void printTable(){
-		System.out.println(this.toString());
+		
+		if(this.logging.isDebugEnabled()){
+			logging.debug(this.toString());
+		}
 	}
 	
 	public String toString(){

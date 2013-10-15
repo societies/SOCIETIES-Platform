@@ -1,0 +1,270 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="templates/main_template.xhtml">
+
+	<ui:define name="html_head">
+		<title>Privacy Preferences</title>
+	</ui:define>
+
+	<ui:define name="body">
+		<p:messages id="dobfmessages" showDetail="true" autoUpdate="true" closable="true" />
+		<div class="hr grid_12 clearfix"></div>
+		<!-- Left Column -->
+		<section id="left_col" class="grid_12">
+			<div class="breadcrumbs">
+				<a href="index.xhtml">Home</a> / <a href="privacysettings.xhtml">Privacy
+					Settings</a> / <a href="privacypreferences.xhtml">Privacy
+					Preferences</a> / <a href="privacy_dobf_create.xhtml">Create New
+					Data Obfuscation Preference</a>
+			</div>
+
+			<section class="form_style_main">
+
+				<h4 class="form_title">Create new Data Obfuscation Preference</h4>
+				<div class="hr grid_12 clearfix"></div>
+
+				<h5>Privacy Preference Details</h5>
+				<h:panelGrid columns="2" cellpadding="5">
+
+					<h:outputLabel for="requestorId" value="Requestor:"></h:outputLabel>
+					<h:outputText id="requestorId"
+						value="#{dobfcreateBean.preferenceDetails.requestor.requestorId}"></h:outputText>
+					<h:outputLabel for="specificRequestor" value="For: "></h:outputLabel>
+					<h:outputText id="specificRequestor"
+						value="#{dobfcreateBean.displaySpecificRequestor}" />
+					<h:outputLabel for="resourceType" value="Resource Type: " />
+					<h:outputText id="resourceType"
+						value="#{dobfcreateBean.preferenceDetails.resource.dataType}" />
+
+				</h:panelGrid>
+
+				<p:menubar for="treeSingle">
+					<p:menuitem value="View" update="messages"
+						actionListener="#{dobfcreateBean.displaySelectedSingle}"
+						icon="ui-icon-search" />
+					<p:menuitem value="Delete" update="treeSingle"
+						actionListener="#{dobfcreateBean.deleteNode}" icon="ui-icon-close" />
+					<p:menuitem value="Add Condition"
+						actionListener="#{dobfcreateBean.startAddConditionProcess}"
+						icon="ui-icon-plus" />
+					<p:menuitem value="Add Privacy Condition"
+						actionListener="#{dobfcreateBean.startAddPrivacyConditionProcess}"
+						icon="ui-icon-plus" />
+					<p:menuitem value="Add Trust Condition"
+						actionListener="#{dobfcreateBean.startAddTrustConditionProcess}"
+						icon="ui-icon-plus" />
+					<p:menuitem value="Add Outcome"
+						actionListener="#{dobfcreateBean.startAddOutcomeProcess}"
+						icon="ui-icon-plus" />
+					<p:menuitem value="Edit" update="treeSingle"
+						actionListener="#{dobfcreateBean.editNode}" icon="ui-icon-pencil" />
+				</p:menubar>
+
+				<h:panelGrid columns="1" cellpadding="5">
+					<p:tree id="treeSingle" value="#{dobfcreateBean.root}" var="node"
+						selectionMode="single" selection="#{dobfcreateBean.selectedNode}"
+						cache="false" dynamic="true" expanded="true">
+
+						<p:treeNode>
+							<h:outputText
+								value="#{dobfcreateBean.formatNodeForDisplay(node)}" />
+						</p:treeNode>
+					</p:tree>
+				</h:panelGrid>
+			</section>
+
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:commandButton type="button" value="Save" icon="ui-icon-disk"
+						onclick="cd.show();" />
+
+
+					<p:confirmDialog id="confirmationDialog" widgetVar="cd"
+						global="true"
+						message="Are you sure you want to save this preference permanently?"
+						icon="ui-icon-alert">
+						<p:commandButton value="Yes" styleClass="ui-confirmdialog-yes"
+							icon="ui-icon-check" oncomplete="cd.hide();"
+							actionListener="#{dobfcreateBean.savePreference}" />
+						<p:commandButton value="No" styleClass="ui-confirmdialog-no"
+							icon="ui-icon-close" oncomplete="cd.hide();" />
+					</p:confirmDialog>
+				</p:toolbarGroup>
+			</p:toolbar>
+
+		</section>
+
+		<div class="hr grid_12 clearfix"></div>
+
+
+		<p:dialog id="addConditionDialog" header="Add Condition"
+			widgetVar="addConddlg" resizable="false" dynamic="true">
+			<h:panelGrid columns="2" cellpadding="5" closable="true">
+			</h:panelGrid>
+		</p:dialog>
+
+		<p:dialog id="addTrustConditionDialog" header="Add Trust Condition"
+			widgetVar="addTrustConddlg" resizable="false" dynamic="true" closable="true">
+		</p:dialog>
+
+		<p:dialog id="addPrivacyConditionDialog"
+			header="Add Privacy Condition" widgetVar="addPrivConddlg"
+			resizable="false" dynamic="true" closable="true">
+		</p:dialog>
+
+
+		<p:dialog id="addOutcomeDialog" header="Add Outcome"
+			widgetVar="addOutdlg" resizable="true" dynamic="true" closable="true">
+
+			<h:panelGrid columns="2" cellpadding="5" columnClasses="label, column">
+				<!--Continuous-->
+			    <h:panelGrid rendered="#{dobfcreateBean.obfuscatorInfo.obfuscationLevelType.value() eq 'continuous'}">
+			        <p:outputLabel for="continuousObfuscationLevelSlider" value="How do you want to blur your #{dobfcreateBean.preferenceDetails.resource.dataType}?"/>
+			        <h:outputText id="continuousObfuscationLabel" value="#{dobfcreateBean.continuousObfuscationLevel}% "/>
+			        <p:slider for="continuousObfuscationLevel"
+			                  display="continuousObfuscationLabel"
+			                  displayTemplate="{value}%"
+			                  style="width: 180px;"
+			                  minValue="0"
+			                  maxValue="100"
+			                  id="continuousObfuscationLevelSlider">
+			            <p:ajax event="slideEnd"
+			                    update="continuousObfuscationExample, continuousObfuscationLabel"
+			                    process="continuousObfuscationLevel" />
+			        </p:slider>
+			        <br />
+			        <h:inputHidden id="continuousObfuscationLevel" value="#{dobfcreateBean.continuousObfuscationLevel}"/>
+			        <h:outputText id="continuousObfuscationExample"
+			                      value="Example: #{dobfcreateBean.obfuscatorInfo.getObfuscationExample(dobfcreateBean.obfuscationLevel)}"/>
+			    </h:panelGrid>
+			
+				<!--Discrete-->
+			    <h:panelGrid columns="1" rendered="#{dobfcreateBean.obfuscatorInfo.obfuscationLevelType.value() eq 'discrete'}">
+					<p:outputLabel for="disreteObfuscationLevel" value="How do you want to blur your #{dobfcreateBean.preferenceDetails.resource.dataType}?"/>
+					<p:selectOneRadio id="disreteObfuscationLevel"
+						value="#{dobfcreateBean.disreteObfuscationLevel}"
+						layout="grid" columns="2">
+						 <f:selectItems
+							value="#{dobfcreateBean.obfuscatorInfo.getObfuscationExamplesReversed()}"
+							var="example"
+							itemLabel="#{example.content}"
+							itemValue="#{example.obfuscationLevelStep}" />  
+					</p:selectOneRadio>
+			    </h:panelGrid>
+
+				<f:facet name="footer">
+					<p:commandButton id="AddOutcomeButton" value="Add"
+						oncomplete="#{p:widgetVar('addOutcomeDialog')}.hide()"
+						update="treeSingle" ajax="true"
+						actionListener="#{dobfcreateBean.addOutcome}" />
+				</f:facet>
+			</h:panelGrid>
+		</p:dialog>
+
+		<p:dialog id="preferenceDetailsDialog"
+			header="Enter Data Obfuscation preference details"
+			widgetVar="prefDetailsDlg" resizable="true" modal="true"
+			closable="false" visible="true">
+
+			<h:panelGrid columns="2" cellpadding="5">
+				<h:outputLabel for="requestorId2" value="Requestor JID" />
+
+				<p:selectOneMenu id="requestorId2"
+					value="#{dobfcreateBean.preferenceDetails.requestor.requestorId}">
+					<f:selectItems value="#{RequestorsController.cssAdvertisements}"
+						var="cssAdvertisement" itemLabel="#{cssAdvertisement.name}"
+						itemValue="#{cssAdvertisement.id}" />
+					<p:ajax update="requestorCis,requestorService" />
+				</p:selectOneMenu>
+
+
+
+				<h:outputLabel for="resource" value="Resource type" />
+				<p:selectOneMenu id="resource"
+					value="#{dobfcreateBean.preferenceDetails.resource.dataType}">
+					<f:selectItem itemLabel="Name" itemValue="NAME" />
+					<f:selectItem itemLabel="Location Coordinates"
+						itemValue="LOCATION_COORDINATES" />
+					<f:selectItem itemLabel="Status" itemValue="STATUS" />
+					<f:selectItem itemLabel="Temperature" itemValue="TEMPERATURE" />
+					<f:selectItem itemLabel="Activity" itemValue="ACTION" />
+					<f:selectItem itemLabel="Postal Address"
+						itemValue="ADDRESS_HOME_CITY" />
+				</p:selectOneMenu>
+
+				<p:outputPanel id="customPanel">
+					<p:selectOneRadio id="customRadio"
+						value="#{dobfcreateBean.requestorType}" layout="custom">
+						<f:selectItem itemLabel="Option 1" itemValue="0" />
+						<f:selectItem itemLabel="Option 2" itemValue="1" />
+						<f:selectItem itemLabel="Option 3" itemValue="2" />
+					</p:selectOneRadio>
+
+					<h:panelGrid columns="3">
+						<h:outputLabel for="requestorCisSelected" value="CIS" />
+						<p:radioButton id="requestorCisSelected" for="customRadio"
+							itemIndex="0" />
+
+						<p:selectOneMenu id="requestorCis"
+							value="#{dobfcreateBean.requestorCis}">
+							<f:selectItems
+								value="#{RequestorsController.getCisListByOwner(dobfcreateBean.preferenceDetails.requestor.requestorId)}"
+								var="cisAdvertisement" itemLabel="#{cisAdvertisement.name}"
+								itemValue="#{cisAdvertisement.id}" />
+						</p:selectOneMenu>
+
+
+						<h:outputLabel for="requestorServiceSelected" value="Service" />
+						<p:radioButton id="requestorServiceSelected" for="customRadio"
+							itemIndex="1" />
+
+						<p:selectOneMenu id="requestorService"
+							value="#{dobfcreateBean.requestorService}">
+							<f:selectItems
+								value="#{RequestorsController.getServiceListByOwner(dobfcreateBean.preferenceDetails.requestor.requestorId)}"
+								var="service" itemLabel="#{service.serviceName}"
+								itemValue="#{RequestorsController.getServiceIDAsString(service.serviceIdentifier)}" />
+						</p:selectOneMenu>
+
+						<p:radioButton id="noneSelected" for="customRadio" itemIndex="2" />
+						<h:outputLabel for="noneSelected" value="None" />
+
+					</h:panelGrid>
+
+				</p:outputPanel>
+				<f:facet name="footer">
+					<p:commandButton id="SavePrefDetails" value="Submit"
+						process="preferenceDetailsDialog"
+						update="mainForm:requestorId, mainForm:specificRequestor, mainForm:resourceType"
+						actionListener="#{dobfcreateBean.savePreferenceDetails}">
+					</p:commandButton>
+
+					<p:confirmDialog id="prefDetailsConfirmationDialog" widgetVar="pdcd"
+						global="true"
+						message="There is already a data obfuscation preference for the details you have entered. Do you want to edit the existing preference or replace it with a new one?"
+						icon="ui-icon-alert">
+						<p:commandButton value="Edit the existing one" styleClass="ui-confirmdialog-yes"
+							icon="ui-icon-check" oncomplete="pdcd.hide();"
+							actionListener="#{dobfcreateBean.loadExistingPreference}" update="treeSingle"/>
+						<p:commandButton value="Replace it with a new one" styleClass="ui-confirmdialog-no"
+							icon="ui-icon-close" oncomplete="pdcd.hide();" />
+					</p:confirmDialog>
+				</f:facet>
+			</h:panelGrid>
+
+		</p:dialog>
+
+	</ui:define>
+
+
+
+	<ui:define name="dialogs">
+		<ui:include src="includes/dialogs/privacyPreferencesComponents.xhtml" />
+	</ui:define>
+</ui:composition>
+</html>

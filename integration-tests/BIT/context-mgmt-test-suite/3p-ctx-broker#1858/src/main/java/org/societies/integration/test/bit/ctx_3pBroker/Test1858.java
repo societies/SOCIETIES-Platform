@@ -45,7 +45,7 @@ public class Test1858 extends IntegrationTestCase {
 	
 	public Test1858() {
 		
-		super(1858, new Class[] { TestLocalUserContext.class, TestLocalCommunityContext.class });
+		super(1858, new Class[] { /*TestLocalUserContext.class,*/ TestLocalCommunityContext.class });
 	}
 	
 	public static org.societies.api.internal.context.broker.ICtxBroker getInternalCtxBroker() {
