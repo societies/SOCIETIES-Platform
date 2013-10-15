@@ -60,8 +60,8 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
  */
 public class Tester {
 	
-	private static final String DEFAULT_NAME_VALUE = "Chuck Norris"; 
-	
+	private static final String DEFAULT_FIRST_NAME_VALUE = "Chuck";// Norris"; 
+	private static final String DEFAULT_LAST_NAME_VALUE = "Norris";
 	private IIdentityManager identityManager;
 	private ICtxBroker ctxBroker;
 	private IIdentity userIdentity;
@@ -136,20 +136,35 @@ public class Tester {
 	private void createOrRetrieveNonInferrableAttribute() throws Exception {
 	
 		final Set<CtxAttribute> nameAttrs = 
-				this.cssPersonEntity.getAttributes(CtxAttributeTypes.NAME); 
+				this.cssPersonEntity.getAttributes(CtxAttributeTypes.NAME_FIRST); 
 		if (nameAttrs.iterator().hasNext()) {
 			this.nameAttribute = nameAttrs.iterator().next();
 		} else {
 			Future<CtxAttribute> createAttribute = this.ctxBroker.createAttribute(
-					this.cssPersonEntity.getId(), CtxAttributeTypes.NAME);
+					this.cssPersonEntity.getId(), CtxAttributeTypes.NAME_FIRST);
 			this.nameAttribute = createAttribute.get();
-			this.nameAttribute.setStringValue(DEFAULT_NAME_VALUE);
+			this.nameAttribute.setStringValue(DEFAULT_FIRST_NAME_VALUE);
 			this.nameAttribute = (CtxAttribute) this.ctxBroker.update(
 					this.nameAttribute).get();
 			// Add to set of context data items to be removed in {@link #tearDown}
 			this.testCtxIds.add(this.nameAttribute.getId());
 		}
 		this.nameAttributeValue = nameAttribute.getStringValue();
+		final Set<CtxAttribute> nameLastAttrs = 
+				this.cssPersonEntity.getAttributes(CtxAttributeTypes.NAME_LAST); 
+		if (nameLastAttrs.iterator().hasNext()) {
+			this.nameAttribute = nameLastAttrs.iterator().next();
+		} else {
+			Future<CtxAttribute> createAttribute = this.ctxBroker.createAttribute(
+					this.cssPersonEntity.getId(), CtxAttributeTypes.NAME_LAST);
+			this.nameAttribute = createAttribute.get();
+			this.nameAttribute.setStringValue(DEFAULT_LAST_NAME_VALUE);
+			this.nameAttribute = (CtxAttribute) this.ctxBroker.update(
+					this.nameAttribute).get();
+			// Add to set of context data items to be removed in {@link #tearDown}
+			this.testCtxIds.add(this.nameAttribute.getId());
+		}
+		this.nameAttributeValue.concat(" " + nameAttribute.getStringValue());
 	}
 	
 /*	private void createPPNPreference1(){

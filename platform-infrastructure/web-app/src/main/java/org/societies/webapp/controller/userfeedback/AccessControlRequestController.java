@@ -2,6 +2,7 @@ package org.societies.webapp.controller.userfeedback;
 
 import org.societies.api.internal.privacytrust.privacy.model.dataobfuscation.ObfuscatorInfo;
 import org.societies.api.internal.privacytrust.privacy.util.dataobfuscation.ObfuscatorInfoFactory;
+import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.ObfuscationLevelType;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyConditionsConstantValues;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 @ManagedBean(name = "accessControlController")
@@ -30,16 +32,6 @@ import java.util.List;
 public class AccessControlRequestController extends BasePageController {
 	
 	private boolean obChecked = false;
-
-	private int newObLevel;
-
-	public int getNewObLevel() {
-		return newObLevel;
-	}
-
-	public void setNewObLevel(int newObLevel) {
-		this.newObLevel = newObLevel;
-	}
 
 	public boolean isObChecked() {
 		return obChecked;
@@ -80,10 +72,12 @@ public class AccessControlRequestController extends BasePageController {
     private static String eventID;
     private UserFeedbackAccessControlEvent event;
     private ConditionConstants newConditionToAdd;
+    private HashMap<String, Double> idToObfuscation;
 
     public AccessControlRequestController() {
         if (log.isDebugEnabled())
             log.debug("AccessControlRequestController ctor()");
+        idToObfuscation = new HashMap<String, Double>();
 
     }
 
@@ -174,25 +168,6 @@ public class AccessControlRequestController extends BasePageController {
        
     }
     
-    public double getObscureLevel(AccessControlResponseItemWrapper resposneItem)
-    {
-    	log.debug("CHANGE OBSCURE LEVEL:" + newObLevel);
-    	double value = 0.0;
-    	switch(newObLevel)
-    	{
-    	case 0 : value = 0.0;
-    	break;
-    	case 1 : value = 0.3;
-    	break;
-    	case 2 : value = 0.6;
-    	break;
-    	case 3 : value = 1.0;
-    	break;
-    	}
-    	log.debug("Returning:" + value);
-    	log.debug("SHOULD SHOW " + resposneItem.getRequestItemWrapper().getObfuscatorInfo().getObfuscationExample(value));
-    	return value;
-    }
 
     public UserFeedbackAccessControlEvent getCurrentAccessEvent() {
         return event;

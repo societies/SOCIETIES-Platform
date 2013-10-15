@@ -26,7 +26,7 @@
 			</p:blockUI>
 
 			<p:dataGrid id="dataGrid" columns="1"
-				emptyMessage="This access control request has no items   0.o"
+				emptyMessage="This access control request has no items"
 				value="#{accessControlController.responseItems}" var="responseItem">
 
 				<p:panel>
@@ -52,7 +52,8 @@
                                                              and responseItem.requestItemWrapper.obfuscatorInfo.obfuscable}">
 
 							<p:panelGrid columns="2" visible="true">
-								<h:outputText value="To you want to enable data obfuscation?" />
+								<h:outputText
+									value="To you want to obfuscate your #{responseItem.requestItem.resource.dataType}?" />
 								<p:selectBooleanCheckbox
 									rendered="#{(responseItem.requestItemWrapper.obfuscatorInfo.nbOfObfuscationLevelStep > 1
 								and responseItem.requestItemWrapper.obfuscatorInfo.obfuscationLevelType.value() eq 'discrete') or responseItem.requestItemWrapper.obfuscatorInfo.obfuscationLevelType.value() eq 'continuous'}"
@@ -63,12 +64,9 @@
 
 							<p:panel id="dataObPanel"
 								visible="#{accessControlController.obChecked}">
-								<p:panelGrid columns="2">
-									<p:outputLabel value="Do you want to blur it?" />
-
+								<p:panelGrid columns="1">
 									<h:panelGrid columns="4"
 										rendered="#{responseItem.requestItemWrapper.obfuscatorInfo.obfuscationLevelType.value() eq 'continuous'}">
-										<h:outputLabel value="Full obfuscatory" />
 										<h:outputText id="contObfuscationLabel"
 											value="%#{responseItem.obfuscationLevel}" />
 										<p:slider for="contObfuscationLevel"
@@ -77,7 +75,6 @@
 											<p:ajax event="slideEnd" update="contObfuscationExample"
 												process="contObfuscationLevel" />
 										</p:slider>
-										<h:outputLabel value="No obfuscatory" />
 										<h:inputHidden id="contObfuscationLevel"
 											value="#{responseItem.obfuscationLevel}" />
 										<h:outputText id="contObfuscationExample"
@@ -88,19 +85,17 @@
 										rendered="#{responseItem.requestItemWrapper.obfuscatorInfo.obfuscationLevelType.value() eq 'discrete'}">
 										<h:outputText id="disContObfuscationLabel"
 											value="#{responseItem.obfuscationLevel}" />
-										<h:outputLabel value="Full obfuscatory" />
 										<p:slider for="disContObfuscationLevel"
 											display="disContObfuscationLabel" displayTemplate="{value}"
 											style="width: 200px;" minValue="0"
 											maxValue="#{responseItem.requestItemWrapper.obfuscatorInfo.nbOfObfuscationLevelStep - 1}">
-											<p:ajax event="slideEnd" update="disContObfuscationExample" process="disContObfuscationLevel" />
+											<p:ajax event="slideEnd" update="disContObfuscationExample"
+												process="disContObfuscationLevel" />
 										</p:slider>
-										<h:outputLabel value="No obfuscatory" />
 										<h:inputHidden id="disContObfuscationLevel"
-											value="#{accessControlController.newObLevel}" />
-
+											value="#{responseItem.obfuscationLevel}" />
 										<h:outputText id="disContObfuscationExample"
-											value="#{responseItem.requestItemWrapper.obfuscatorInfo.getObfuscationExample(accessControlController.getObscureLevel(responseItem))}" />
+											value="#{responseItem.requestItemWrapper.obfuscatorInfo.getObfuscationExample(responseItem.obfuscationLevel)}" />
 									</h:panelGrid>
 								</p:panelGrid>
 							</p:panel>
@@ -166,6 +161,7 @@
 				</p:panel>
 
 			</p:dataGrid>
+
 
 			<f:facet name="footer">
 				<p:messages id="validationMessages" />
