@@ -276,7 +276,7 @@
 		  
 		        <p:column id="qualityColumn" headerText="Quality" style="width: 20%">  
 		            <h:outputText value="#{element.qualityBean.originType} - #{element.qualityBean.precision}" />
-		            <p:tooltip for="fade" value="#{element.qualityBean.updateFrequency} - #{element.qualityBean.lastUpdated}" showEffect="fade" hideEffect="fade" />   
+		            <p:tooltip for="qualityColumn" value="#{element.qualityBean.updateFrequency} - #{element.qualityBean.lastUpdated}" showEffect="fade" hideEffect="fade" />   
 		        </p:column>  
 	    	</p:dataTable>  
 	    	
