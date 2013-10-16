@@ -136,9 +136,6 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		this.testBean = testBean;
 	}
 
-	/* (non-Javadoc)
-	 * @see IPrivacyLogAppender#logCommsFw(IIdentity, IIdentity, Object)
-	 */
 	// The type parameter in comms fw is not type of data. It is not even used at the moment.
 	// The only option is to call getClass() on the payload. For any more info the Object payload
 	// should be typecasted and parsed (not feasible).
@@ -147,7 +144,6 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	@Override
 	public boolean logCommsFw(IIdentity sender, IIdentity receiver, Object payload) {
 		
-		//LOG.debug("logCommsFw()");
 		LOG.debug("logCommsFw({}, {}, ...)", sender, receiver);
 
 		String dataType;
@@ -216,12 +212,9 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		
 		DataAccessLogEntry logEntry = new DataAccessLogEntry(
 				new Date(), requestorId, invokerClass, invokerClasses, invokerBundle, owner, dataSize);
-		privacyLog.getDataAccess().add(logEntry);
+		privacyLog.append(logEntry);
 	}
 
-	/* (non-Javadoc)
-	 * @see IPrivacyLogAppender#logSN(String, Date, boolean, IIdentity, IIdentity, ChannelType)
-	 */
 //	@Override
 //	public boolean logSN(String dataType, Date time, boolean sentToGroup, IIdentity sender,
 //			IIdentity receiver, ChannelType channelId) {
@@ -232,9 +225,6 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 //		return true;
 //	}
 
-	/* (non-Javadoc)
-	 * @see IPrivacyLogAppender#log(LogEntry)
-	 */
 	@Override
 	public boolean log(DataTransmissionLogEntry entry) {
 		
@@ -245,14 +235,11 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.IPrivacyLogAppender#log(org.societies.api.internal.privacytrust.privacyprotection.model.privacyassessment.DataAccessLogEntry)
-	 */
 	@Override
 	public void log(DataAccessLogEntry entry) {
 
 		LOG.debug("log(DataAccessLogEntry)");
 
-		privacyLog.getDataAccess().add(entry);
+		privacyLog.append(entry);
 	}
 }

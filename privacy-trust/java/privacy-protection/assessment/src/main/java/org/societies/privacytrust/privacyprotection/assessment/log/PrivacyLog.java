@@ -48,6 +48,7 @@ public class PrivacyLog implements IPrivacyLog {
 
 	private List<DataAccessLogEntry> dataAccess = new ArrayList<DataAccessLogEntry>();
 	private List<DataTransmissionLogEntry> dataTransmission = new ArrayList<DataTransmissionLogEntry>();;
+	private int logLimit;
 
 	private List<IIdentity> senderIds = new ArrayList<IIdentity>();
 	private List<String> senderClassNames = new ArrayList<String>();
@@ -56,6 +57,11 @@ public class PrivacyLog implements IPrivacyLog {
 	public PrivacyLog() {
 
 		LOG.info("Constructor");
+	}
+	
+	public void setLogLimit(int logLimit) {
+		this.logLimit = logLimit;
+		LOG.info("Log limit set to {}", logLimit);
 	}
 
 	/**
@@ -83,10 +89,18 @@ public class PrivacyLog implements IPrivacyLog {
 	}
 
 	public void append(DataAccessLogEntry entry) {
+		
+		if (logLimit > 0 && dataAccess.size() > logLimit) {
+			dataAccess.remove(0);
+		}
 		dataAccess.add(entry);
 	}
 
 	public void append(DataTransmissionLogEntry entry) {
+
+		if (logLimit > 0 && dataTransmission.size() > logLimit) {
+			dataTransmission.remove(0);
+		}
 		dataTransmission.add(entry);
 		
 		IIdentity sender = entry.getSender();
