@@ -33,6 +33,7 @@
         <property name="feedbackHandler" ref="userFeedback"/>
         <property name="eventMgr" ref="eventManager"/>
         <property name="commMgr" ref="commsManager" />
+        <property name="serviceRegistry" ref="serviceRegistry" />
     </bean>
 
     <bean id="conflictResolutionManager"

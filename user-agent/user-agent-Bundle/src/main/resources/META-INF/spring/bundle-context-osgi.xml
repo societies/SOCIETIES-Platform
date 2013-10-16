@@ -29,7 +29,8 @@
             <value>org.societies.useragent.api.feedback.IInternalUserFeedback</value>
         </osgi:interfaces>
     </osgi:service>
-
+    
+    
     <osgi:service ref="uaCommsClient">
         <osgi:interfaces>
             <value>org.societies.useragent.api.remote.IUserAgentRemoteMgr</value>
@@ -62,5 +63,9 @@
     </osgi:reference>
 
     <osgi:reference id="dataSource" interface="javax.sql.DataSource"/>
+    
+    
+    <osgi:reference id="serviceRegistry" interface="org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry">
+    </osgi:reference>
 
 </beans>

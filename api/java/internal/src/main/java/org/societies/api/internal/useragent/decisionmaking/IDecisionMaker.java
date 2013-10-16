@@ -26,7 +26,7 @@
 package org.societies.api.internal.useragent.decisionmaking;
 
 import java.util.List;
-
+import java.lang.Deprecated;
 //import org.societies.personalisation.common.api.model.*;
 import org.societies.api.internal.personalisation.model.IOutcome;
 
@@ -37,7 +37,11 @@ public interface IDecisionMaker{
 	 *  this interface mainly provides a
 	 *  outside view for decision maker
 	 *  @author haoyi.xiong@it-sudparis.eu*/
+	@Deprecated
 	void makeDecision(List<IOutcome> intents,List<IOutcome> preferences);
+	void makeDecision(List<IOutcome> intents,List<IOutcome> preferences, String uuid);
+
+	
 	/*@param intents, the list of IOutcome instances referring intents
 	 *@param preferences, the list of IOutcome instances referring preferences */
 }

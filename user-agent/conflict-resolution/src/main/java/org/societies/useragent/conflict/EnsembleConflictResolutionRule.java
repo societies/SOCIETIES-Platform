@@ -93,7 +93,9 @@ public class EnsembleConflictResolutionRule implements ConflictResolutionRule{
 	@Override
 	public IOutcome tradeoff(IOutcome intention, IOutcome preference) {
 		// TODO Auto-generated method stub
-		return null;
-	}
+		if(this.leftHandSide!=null)
+			return this.leftHandSide.tradeoff(intention,preference);
+		return intention;
+}
 
 }

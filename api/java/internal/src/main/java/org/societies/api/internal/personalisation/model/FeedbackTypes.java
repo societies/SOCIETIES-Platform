@@ -43,6 +43,7 @@ public enum FeedbackTypes {
 	 * receiving the result from the service
 	 */
 	IMPLEMENTED,
+	USER_CHOICE,
 	USER_ABORTED,
 	CONFLICT_RESOLVED,
 	SERVICE_UNREACHABLE,
