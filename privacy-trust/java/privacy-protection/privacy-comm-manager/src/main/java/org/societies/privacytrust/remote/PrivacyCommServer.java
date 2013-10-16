@@ -84,19 +84,19 @@ public class PrivacyCommServer implements IFeatureServer {
 	 * Entry point of the Privacy Comm Manager
 	 */
 	public void initBean() {
-		LOG.info("initBean(): commMgr = {}", commManager.toString());
+		LOG.debug("initBean(): commMgr = {}", commManager.toString());
 
 		try {
 			// Register to the Societies Comm Manager
 			commManager.register(this);
-			LOG.info("initBean(): PrivacyCommServer registered to the Societies Comm Manager");
+			LOG.debug("initBean(): PrivacyCommServer registered to the Societies Comm Manager");
 		} catch (CommunicationException e) {
 			LOG.error("initBean(): ", e);
 		}
 	}
 	
 	public void destroyBean() {
-		LOG.info("destroyBean()");
+		LOG.debug("destroyBean()");
 	}
 
 
@@ -106,10 +106,10 @@ public class PrivacyCommServer implements IFeatureServer {
 	 */
 	@Override
 	public Object getQuery(Stanza stanza, Object payload) throws XMPPError {
-		LOG.info("getQuery({}, {})", stanza, payload);
-		LOG.info("getQuery(): stanza.id   = {}", stanza.getId());
-		LOG.info("getQuery(): stanza.from = {}", stanza.getFrom());
-		LOG.info("getQuery(): stanza.to   = {}", stanza.getTo());
+		LOG.debug("getQuery({}, {})", stanza, payload);
+		LOG.debug("getQuery(): stanza.id   = {}", stanza.getId());
+		LOG.debug("getQuery(): stanza.from = {}", stanza.getFrom());
+		LOG.debug("getQuery(): stanza.to   = {}", stanza.getTo());
 
 		// -- Privacy Data Management
 		if (payload instanceof PrivacyDataManagerBean) {
@@ -140,10 +140,10 @@ public class PrivacyCommServer implements IFeatureServer {
 	 */
 	@Override
 	public Object setQuery(Stanza stanza, Object payload) throws XMPPError {
-		LOG.info("setQuery({}, {})", stanza, payload);
-		LOG.info("setQuery(): stanza.id   = {}", stanza.getId());
-		LOG.info("setQuery(): stanza.from = {}", stanza.getFrom());
-		LOG.info("setQuery(): stanza.to   = {}", stanza.getTo());
+		LOG.debug("setQuery({}, {})", stanza, payload);
+		LOG.debug("setQuery(): stanza.id   = {}", stanza.getId());
+		LOG.debug("setQuery(): stanza.from = {}", stanza.getFrom());
+		LOG.debug("setQuery(): stanza.to   = {}", stanza.getTo());
 
 		// -- Privacy Data Management
 
@@ -164,10 +164,10 @@ public class PrivacyCommServer implements IFeatureServer {
 	 */
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
-		LOG.info("receiveMessage({}, {})", stanza, payload);
-		LOG.info("receiveMessage(): stanza.id   = {}", stanza.getId());
-		LOG.info("receiveMessage(): stanza.from = {}", stanza.getFrom());
-		LOG.info("receiveMessage(): stanza.to   = {}", stanza.getTo());
+		LOG.debug("receiveMessage({}, {})", stanza, payload);
+		LOG.debug("receiveMessage(): stanza.id   = {}", stanza.getId());
+		LOG.debug("receiveMessage(): stanza.from = {}", stanza.getFrom());
+		LOG.debug("receiveMessage(): stanza.to   = {}", stanza.getTo());
 
 		// -- Privacy Data Management
 
@@ -184,23 +184,19 @@ public class PrivacyCommServer implements IFeatureServer {
 
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
-		LOG.info("[DependencyInjection] CommManager injected");
 	}
 	public void setPrivacyDataManagerCommServer(
 			PrivacyDataManagerCommServer privacyDataManagerCommServer) {
 		this.privacyDataManagerCommServer = privacyDataManagerCommServer;
-		LOG.info("[DependencyInjection] PrivacyDataManagerCommServer injected");
 	}
 
 	public void setPrivacyPolicyManagerCommServer(
 			PrivacyPolicyManagerCommServer privacyPolicyManagerCommServer) {
 		this.privacyPolicyManagerCommServer = privacyPolicyManagerCommServer;
-		LOG.info("[DependencyInjection] PrivacyPolicyManagerCommServer injected");
 	}
 	public void setPrivacyAgreementManagerCommServer(
 			PrivacyAgreementManagerCommServer privacyAgreementManagerCommServer) {
 		this.privacyAgreementManagerCommServer = privacyAgreementManagerCommServer;
-		LOG.info("[DependencyInjection] PrivacyAgreementManagerCommServer injected");
 	}
 
 	// -- Getters / Setters

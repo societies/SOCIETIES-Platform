@@ -35,6 +35,9 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.personalisation.model.FeedbackEvent;
 import org.societies.api.internal.personalisation.model.FeedbackTypes;
 import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.internal.useragent.conflict.IConflictResolutionManager;
 import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
@@ -44,6 +47,7 @@ import org.societies.api.internal.useragent.model.ExpProposalType;
 import org.societies.api.internal.useragent.model.ImpProposalContent;
 import org.societies.api.internal.useragent.model.ImpProposalType;
 import org.societies.api.personalisation.model.IAction;
+import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.societies.api.osgi.event.EMSException;
@@ -65,9 +69,10 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 	
 	private IEventMgr eventMgr;
 	
+	private IServiceRegistry serviceRegistry;
 	
 
-	public HashSet<IOutcome> hasBeenChecked = new HashSet<IOutcome>();
+//	public HashSet<IOutcome> hasBeenChecked = new HashSet<IOutcome>();
 
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 
@@ -100,21 +105,31 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 		this.commMgr = commMgr;
 		this.entityID = this.commMgr.getIdManager().getThisNetworkNode();
 	}
-
+	
 	@Override
 	public void makeDecision(List<IOutcome> intents, List<IOutcome> preferences) {
+		makeDecision(intents,preferences,"");
+	}
+
+	@Override
+	public void makeDecision(
+			List<IOutcome> intents, 
+			List<IOutcome> preferences, 
+			String uuid) {
 		// TODO Auto-generated method stub
 		HashSet<IOutcome> conflicts = new HashSet<IOutcome>();
-		logging.debug("start resolving DM");
+		if (logging.isDebugEnabled()){
+			logging.debug("start resolving DM");
+		}
 		if (intents.size() == 0) {
 			for (IOutcome action : preferences) {
-				this.implementIAction(action);
+				this.implementIAction(action,uuid);
 			}
 			return;
 		}
 		if (preferences.size() == 0) {
 			for (IOutcome action : intents) {
-				this.implementIAction(action);
+				this.implementIAction(action,uuid);
 			}
 			return;
 		}
@@ -130,6 +145,7 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 					} else {
 						FeedbackEvent fedb = new FeedbackEvent(entityID,
 								action, true, FeedbackTypes.CONFLICT_RESOLVED);
+						fedb.setUuid(uuid);
 						InternalEvent event = new InternalEvent(
 								EventTypes.UI_EVENT, "feedback",
 								"org/societies/useragent/decisionmaker", fedb);
@@ -145,41 +161,64 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 				}
 			}
 			if (conflicts.size() == 0) {// no unresolved conflicts
-				logging.debug("no unresolved conflicts");
-				this.implementIAction(action);
+				if (logging.isDebugEnabled()){
+					logging.debug("no unresolved conflicts");
+				}
+				this.implementIAction(action,uuid);
 			} else {
+//				boolean resp=getUserFeedback(intent.toString(),intent);
+//				if(resp){
+//					this.implementIAction(intent);
+//				}
+				
 				List<String> options = new ArrayList<String>();
-				options.add(intent.toString());
+				options.add(this.getFriendlyName(intent));
 				for (IOutcome conf : conflicts)
-					options.add(conf.toString());
-				logging.debug("Call Feedback Manager");
+					options.add(this.getFriendlyName(conf));
+				if (logging.isDebugEnabled()){
+					logging.debug("Call Feedback Manager");
+				}
 				ExpProposalContent epc = new ExpProposalContent(
-						"Conflict Detected!",
+						"Please select which option you want to implement",
 						options.toArray(new String[options.size()]));
 				List<String> reply;
 				try {
 					reply = feedbackHandler.getExplicitFB(
 							ExpProposalType.RADIOLIST, epc).get();
-					new DecisionMakingCallback(this, intent, conflicts)
+					new DecisionMakingCallback(this, intent, conflicts,uuid)
 							.handleExpFeedback(reply);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}// ,
-					// new DecisionMakingCallback(this,intent,conflicts));
+//					// new DecisionMakingCallback(this,intent,conflicts));
 			}
 			conflicts.clear();
 		}
-		logging.debug("after resolving DM");
+		if (logging.isDebugEnabled()){
+			logging.debug("after resolving DM");
+		}
 	}
 
-	protected boolean getUserFeedback(String content, IAction action) {
+	protected String getFriendlyName(IOutcome outcome){
+		try {
+			Service service = this.serviceRegistry.retrieveService(outcome.getServiceID());
+			return "Service: "+ service.getServiceName()+". Parameter: "+outcome.getparameterName()+" set to "+outcome.getvalue();
+		} catch (ServiceRetrieveException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return "Service: "+ServiceModelUtils.serviceResourceIdentifierToString(outcome.getServiceID())+". Parameter: "+outcome.getparameterName()+" set to "+outcome.getvalue();
+
+	}
+	protected boolean getUserFeedback(String content, IAction action, String uuid) {
 		try {
 			IOutcome iot = (IOutcome) action;
-			if (hasBeenChecked.contains(iot)) {
-				hasBeenChecked.remove(iot);
-				return true;
-			}
+//			if (hasBeenChecked.contains(iot)) {
+//				hasBeenChecked.remove(iot);
+//				return true;
+//			}
 			if (iot.getConfidenceLevel() > 50) {
 				ImpProposalContent ic = new ImpProposalContent(content, 10);
 				boolean resb = feedbackHandler.getImplicitFB(
@@ -187,6 +226,7 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 				if (resb == false) {
 					FeedbackEvent fedb = new FeedbackEvent(this.entityID,
 							action, resb, FeedbackTypes.USER_ABORTED);
+					fedb.setUuid(uuid);
 					InternalEvent event = new InternalEvent(
 							EventTypes.UI_EVENT, "feedback",
 							"org/societies/useragent/decisionmaker", fedb);
@@ -202,11 +242,26 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 						new String[] { "Yes", "No" });
 				List<String> result = feedbackHandler.getExplicitFB(
 						ExpProposalType.RADIOLIST, epc).get();
+				boolean resb;
 				if (result.get(0).equals("Yes")) {
-					return true;
+					resb = true;
 				} else {
-					return false;
+					resb = false;
 				}
+				/*						DOING FEEDBACK						*/
+				FeedbackEvent fedb = new FeedbackEvent(this.entityID,
+						action, resb, FeedbackTypes.USER_CHOICE);
+				fedb.setUuid(uuid);
+				InternalEvent event = new InternalEvent(
+						EventTypes.UI_EVENT, "feedback",
+						"org/societies/useragent/decisionmaker", fedb);
+				try {
+					this.eventMgr.publishInternalEvent(event);
+				} catch (EMSException e) {
+					e.printStackTrace();
+				}
+				/*						finish FEEDBACK						*/
+				return resb;
 			}
 		} catch (Exception e) {
 			System.err.println(e);
@@ -217,7 +272,7 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 	protected abstract ConflictType detectConflict(IOutcome intent,
 			IOutcome prefernce);
 
-	protected abstract void implementIAction(IAction action);
+	protected abstract void implementIAction(IAction action, String uuid);
 
 	public IEventMgr getEventMgr() {
 		return eventMgr;
@@ -225,5 +280,13 @@ public abstract class AbstractDecisionMaker implements IDecisionMaker {
 
 	public void setEventMgr(IEventMgr eventMgr) {
 		this.eventMgr = eventMgr;
+	}
+
+	public IServiceRegistry getServiceRegistry() {
+		return serviceRegistry;
+	}
+
+	public void setServiceRegistry(IServiceRegistry serviceRegistry) {
+		this.serviceRegistry = serviceRegistry;
 	}
 }

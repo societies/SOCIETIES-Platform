@@ -92,7 +92,7 @@ public class PrivacyPolicyRegistryManager implements IPrivacyPolicyRegistryManag
 			}
 			policy = (RequestPolicy) SerialisationHelper.deserialise(ctxAttr.getBinaryValue(), this.getClass().getClassLoader());
 			if (null == policy) {
-				LOG.error("Can't deserialize the retrieved privacy policy: "+ctxAttr.getBinaryValue().toString());
+				LOG.error("Can't deserialize the retrieved privacy policy: {}", ctxAttr.getBinaryValue().toString());
 				return policy;
 			}
 		} catch (Exception e) {

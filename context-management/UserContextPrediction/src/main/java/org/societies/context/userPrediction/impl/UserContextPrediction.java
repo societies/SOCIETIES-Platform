@@ -582,21 +582,21 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 			List<CtxIdentifier> locationList = this.ctxBroker.lookup(entId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get();
 
 			if(!locationList.isEmpty()){
-				CtxAttribute locationAttr = (CtxAttribute) this.ctxBroker.retrieve(locationList.get(0));
+				CtxAttribute locationAttr = (CtxAttribute) this.ctxBroker.retrieve(locationList.get(0)).get();
 				locationValue = locationAttr.getStringValue();
 			}
 
 			List<CtxIdentifier> temperatureList = this.ctxBroker.lookup(entId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.TEMPERATURE).get();
 
 			if(!locationList.isEmpty()){
-				CtxAttribute tempAttr = (CtxAttribute) this.ctxBroker.retrieve(temperatureList.get(0));
+				CtxAttribute tempAttr = (CtxAttribute) this.ctxBroker.retrieve(temperatureList.get(0)).get();
 				tempValue = tempAttr.getStringValue();
 			}
 			
 			List<CtxIdentifier> activityList = this.ctxBroker.lookup(entId, CtxModelType.ATTRIBUTE, CtxAttributeTypes.ACTION).get();
 
 			if(!activityList.isEmpty()){
-				CtxAttribute actionAttr = (CtxAttribute) this.ctxBroker.retrieve(activityList.get(0));
+				CtxAttribute actionAttr = (CtxAttribute) this.ctxBroker.retrieve(activityList.get(0)).get();
 				activityValue = actionAttr.getStringValue();
 			}
 

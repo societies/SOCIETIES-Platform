@@ -67,6 +67,7 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Request
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Resource;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.privacytrust.privacyprotection.api.IDataObfuscationManager;
+import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ContextPreferenceCondition;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
@@ -95,8 +96,9 @@ public class AccessControlPreferenceManager {
 	private final IPrivacyAgreementManager agreementMgr;
 	private final IIdentityManager idMgr;
 	private final DObfPreferenceCreator dobfPrefCreator;
+	private IPrivacyDataManagerInternal privacyDataManagerInternal;
 	
-	public AccessControlPreferenceManager(PrivatePreferenceCache prefCache, PrivateContextCache contextCache, IUserFeedback userFeedback, ITrustBroker trustBroker, ICtxBroker ctxBroker, IPrivacyAgreementManager agreementMgr, IIdentityManager idMgr, DObfPreferenceCreator dobfPrefCreator){
+	public AccessControlPreferenceManager(PrivatePreferenceCache prefCache, PrivateContextCache contextCache, IUserFeedback userFeedback, ITrustBroker trustBroker, ICtxBroker ctxBroker, IPrivacyAgreementManager agreementMgr, IIdentityManager idMgr, DObfPreferenceCreator dobfPrefCreator, IPrivacyDataManagerInternal privacyDataManagerInternal){
 		this.prefCache = prefCache;
 		this.contextCache = contextCache;
 		this.userFeedback = userFeedback;
@@ -105,6 +107,7 @@ public class AccessControlPreferenceManager {
 		this.agreementMgr = agreementMgr;
 		this.idMgr = idMgr;
 		this.dobfPrefCreator = dobfPrefCreator;
+		this.privacyDataManagerInternal = privacyDataManagerInternal;
 		
 
 	}
@@ -274,6 +277,7 @@ public class AccessControlPreferenceManager {
 			List<AccessControlResponseItem> list = this.userFeedback.getAccessControlFB(RequestorUtils.toRequestor(requestor, idMgr), preferencesDoNotExist).get();
 			for (AccessControlResponseItem item: list){
 				if (item.isRemember()){
+					this.privacyDataManagerInternal.updatePermission(requestor, item);
 					this.storeDecision(requestor, item.getRequestItem().getResource(), item.getRequestItem().getConditions(), action, item.getDecision());
 					this.logging.debug("Stored access control feedback as preference");
 				}else{
@@ -379,6 +383,7 @@ public class AccessControlPreferenceManager {
 				
 				AccessControlResponseItem accessControlResponseItem = resultlist.get(0);
 				if (accessControlResponseItem.isRemember()){
+					this.privacyDataManagerInternal.updatePermission(requestor, accessControlResponseItem);
 					this.storeDecision(requestor, resource, accessControlResponseItem.getRequestItem().getConditions(), action, accessControlResponseItem.getDecision());
 					this.logging.debug("Stored access control feedback as preference");
 				}else{
@@ -720,7 +725,7 @@ public class AccessControlPreferenceManager {
 		return false;
 	}
 	public static void main(String[] args){
-		AccessControlPreferenceManager prefMgr = new AccessControlPreferenceManager(null, null, null, null, null, null, null, null);
+		AccessControlPreferenceManager prefMgr = new AccessControlPreferenceManager(null, null, null, null, null, null, null, null, null);
 
 		List<Condition> conditions = new ArrayList<Condition>();
 		Condition condition = new Condition();

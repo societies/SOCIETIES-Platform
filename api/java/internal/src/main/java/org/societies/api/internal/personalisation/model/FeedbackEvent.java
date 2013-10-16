@@ -44,7 +44,12 @@ public class FeedbackEvent implements IFeedbackEvent, Serializable {
 	
 	private IIdentity user;
 	private IAction action;
-
+	private String uuid;
+	
+	public String getUuid(){return this.uuid;}
+	
+	public void setUuid(String uuid){this.uuid=uuid;}
+	
 	public FeedbackEvent(){
 
 	}
