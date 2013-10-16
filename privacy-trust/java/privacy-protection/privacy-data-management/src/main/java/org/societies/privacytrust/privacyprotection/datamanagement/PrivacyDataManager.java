@@ -198,13 +198,6 @@ public class PrivacyDataManager extends PrivacyDataManagerUtility implements IPr
 			permissions.addAll(ResponseItemUtils.createList(Decision.DENY, requestedItems, true));
 			return permissions; // no storage
 		}
-
-		// -- Store new permission retrieved from PrivacyPreferenceManager
-		try {
-			privacyDataManagerInternal.updatePermissions(requestor, newPermissions);
-		} catch (Exception e) {
-			LOG.error("Error during decisions storage", e);
-		}
 		return permissions;
 	}	
 
@@ -215,6 +208,15 @@ public class PrivacyDataManager extends PrivacyDataManagerUtility implements IPr
 		}
 		return permissions;
 	}
+	/**
+	 * Check CIS Data permission
+	 * Store the result
+	 * @param requestor
+	 * @param dataId
+	 * @param actions
+	 * @return
+	 * @throws PrivacyException
+	 */
 	public List<ResponseItem> checkPermissionCisData(RequestorBean requestor, DataIdentifier dataId, List<Action> actions) throws PrivacyException {
 		// -- Verify parameters
 		if (!isDependencyInjectionDone(3)) {
@@ -340,6 +342,13 @@ public class PrivacyDataManager extends PrivacyDataManagerUtility implements IPr
 		LOG.debug("[CIS access control] No requested items are matching, or an error appears, or anyway they are privates: always DENY");
 		permissions.clear();
 		permissions.add(permissionDeny);
+		
+		// -- Store new permission retrieved from PrivacyPreferenceManager
+		try {
+			privacyDataManagerInternal.updatePermissions(requestor, permissions);
+		} catch (Exception e) {
+			LOG.error("Error during decisions storage", e);
+		}
 		return permissions;
 	}
 
