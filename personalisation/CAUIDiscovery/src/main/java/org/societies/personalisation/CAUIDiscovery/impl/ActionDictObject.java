@@ -14,9 +14,6 @@ public class ActionDictObject implements Serializable{
 	//[C1]=1
 	//key:list(C1,C2) value(int)
 	HashMap<List<String>,Integer> locationContextMap = new HashMap<List<String>,Integer>(); 
-	//HashMap<List<String>,Integer> statusContextMap = new HashMap<List<String>,Integer>();
-	//HashMap<List<String>,Integer> temperatureContextMap = new HashMap<List<String>,Integer>();
-		
 	HashMap<List<String>,Integer> dayOfWeekContextMap = new HashMap<List<String>,Integer>();
 	HashMap<List<String>,Integer> hourOfDayContextMap = new HashMap<List<String>,Integer>();
 	
@@ -44,26 +41,6 @@ public class ActionDictObject implements Serializable{
 	public void setHourOfDayContextMap(HashMap<List<String>, Integer> hourOfDayContextMap) {
 		this.hourOfDayContextMap = hourOfDayContextMap;
 	}
-	
-	
-	/*
-	public HashMap<List<String>, Integer> getStatusContextMap() {
-		return statusContextMap;
-	}
-
-	public void setStatusContextMap(HashMap<List<String>, Integer> statusContextMap) {
-		this.statusContextMap = statusContextMap;
-	}
-
-	public HashMap<List<String>, Integer> getTemperatureContextMap() {
-		return temperatureContextMap;
-	}
-
-	public void setTemperatureContextMap(
-			HashMap<List<String>, Integer> temperatureContextMap) {
-		this.temperatureContextMap = temperatureContextMap;
-	}
-*/
 	
 	public int getTotalOccurences() {
 		return totalOccurences;
