@@ -112,7 +112,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 		this.decisionMaker = decisionMaker;
 		this.idm = this.getCommsMgr().getIdManager();
 		retrieveConfidenceLevels();
-		this.registerForUIMEvents();
+		this.registerForEvents();
 		this.dianne.registerContext();
 		if (this.logging.isDebugEnabled()){
 			this.logging.debug("initialisePersonalisationManager(ICtxBroker broker, IUserPreferenceConditionMonitor pcm, IDIANNE dianne, ICAUIPrediction cauiPrediction, ICRISTUserIntentPrediction cristPrediction, ICommManager commsMgr, IDecisionMaker decisionMaker)");
@@ -125,7 +125,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 		this.prefMgrList = new ArrayList<CtxAttributeIdentifier>();
 		this.cauiList = new ArrayList<CtxAttributeIdentifier>();
 		this.cristList = new ArrayList<CtxAttributeIdentifier>();
-		this.registerForUIMEvents();
+		this.registerForEvents();
 		retrieveConfidenceLevels();
 		this.dianne.registerContext();
 		if (this.logging.isDebugEnabled()){
@@ -135,21 +135,33 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 	}
 
 
-	private void registerForUIMEvents() {
+	private void registerForEvents() {
 		String eventFilter = "(&" +
 				"(" + CSSEventConstants.EVENT_NAME + "=newaction)" +
 				"(" + CSSEventConstants.EVENT_SOURCE + "=org/societies/useragent/monitoring)" +
 				")";
 		this.getEventMgr().subscribeInternalEvent(this, new String[]{EventTypes.UIM_EVENT}, eventFilter);
+		
 		if (this.logging.isDebugEnabled()){
-		this.logging.debug("Subscribed to " + EventTypes.UIM_EVENT + " events");
-		}
+			this.logging.debug("Subscribed to " + EventTypes.UIM_EVENT + " events");
+			}
 
+		String uiEventFilter = "(&" +
+				"(" + CSSEventConstants.EVENT_NAME + "=feedback)" +
+				"(" + CSSEventConstants.EVENT_SOURCE + "=org/societies/useragent/decisionmaker)" +
+				")";
+		
+		this.getEventMgr().subscribeInternalEvent(this, new String[]{EventTypes.UI_EVENT}, uiEventFilter);
+		if (this.logging.isDebugEnabled()){
+			this.logging.debug("Subscribed to " + EventTypes.UI_EVENT + " events");
+			}
 	}
 
 	private void retrieveConfidenceLevels() {
+		
+		IIdentity userId = this.idm.getThisNetworkNode();
 		try {
-			Future<List<CtxIdentifier>> futuredianneConf = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, "dianneConfidenceLevel");
+			Future<List<CtxIdentifier>> futuredianneConf = this.ctxBroker.lookup(userId, CtxModelType.ATTRIBUTE, "dianneConfidenceLevel");
 			List<CtxIdentifier> dianneConfs = futuredianneConf.get();
 			if (dianneConfs.isEmpty()) {
 				this.dianneConfidenceLevel = 50;
@@ -158,7 +170,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 				this.dianneConfidenceLevel = tempAttr.getIntegerValue();
 			}
 
-			Future<List<CtxIdentifier>> futureprefMgrConf = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, "prefMgrConfidenceLevel");
+			Future<List<CtxIdentifier>> futureprefMgrConf = this.ctxBroker.lookup(userId, CtxModelType.ATTRIBUTE, "prefMgrConfidenceLevel");
 			List<CtxIdentifier> prefMgrConf = futureprefMgrConf.get();
 			if (prefMgrConf.isEmpty()) {
 				this.prefMgrConfidenceLevel = 50;
@@ -167,7 +179,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 				this.prefMgrConfidenceLevel = tempAttr.getIntegerValue();
 			}
 
-			Future<List<CtxIdentifier>> futurecauiConf = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, "cauiConfidenceLevel");
+			Future<List<CtxIdentifier>> futurecauiConf = this.ctxBroker.lookup(userId, CtxModelType.ATTRIBUTE, "cauiConfidenceLevel");
 			List<CtxIdentifier> cauiConf = futurecauiConf.get();
 			if (cauiConf.isEmpty()) {
 				this.cauiConfidenceLevel = 50;
@@ -177,7 +189,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 			}
 
 
-			Future<List<CtxIdentifier>> futurecristConf = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, "cristConfidenceLevel");
+			Future<List<CtxIdentifier>> futurecristConf = this.ctxBroker.lookup(userId, CtxModelType.ATTRIBUTE, "cristConfidenceLevel");
 			List<CtxIdentifier> cristConf = futurecauiConf.get();
 			if (cristConf.isEmpty()) {
 				this.cristConfidenceLevel = 50;
@@ -189,14 +201,14 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 			logging.debug("retrieved confidence levels");
 			}
 		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			if (logging.isDebugEnabled()){ logging.error("Error", e); }
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			if (logging.isDebugEnabled()){ logging.error("Error", e); }
 		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			if (logging.isDebugEnabled()){ logging.error("Error", e); }
 		}
 
 
@@ -296,7 +308,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 	 */
 	@Override
 	public void returnFeedback(IFeedbackEvent arg0) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
@@ -327,7 +339,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 
 		} catch (CtxException e) {
 			logging.error(e.getMessage());
-			e.printStackTrace();
+			if (logging.isDebugEnabled()){ logging.error("Error", e); }
 		}
 
 		switch (type) {
@@ -473,11 +485,11 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 				}
 			}
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			if (logging.isDebugEnabled()){ logging.error("Error", e); }
 		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			if (logging.isDebugEnabled()){ logging.error("Error", e); }
 		}
 
 		if (this.logging.isDebugEnabled()){
@@ -545,14 +557,14 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 		try {
 			futureCAUIOuts = this.cauiPrediction.getCurrentIntentAction(ownerID, serviceID, preferenceName);
 		} catch (Exception e) {
-			e.printStackTrace();
+			if (logging.isDebugEnabled()){ logging.error("Error", e); }
 			futureCAUIOuts = new AsyncResult<IUserIntentAction>(null);
 		}
 		Future<CRISTUserAction> futureCRISTOuts;
 		try {
 			futureCRISTOuts = this.cristPrediction.getCurrentUserIntentAction(ownerID, serviceID, preferenceName);
 		} catch (Exception e) {
-			e.printStackTrace();
+			if (logging.isDebugEnabled()){ logging.error("Error", e); }
 			futureCRISTOuts = new AsyncResult<CRISTUserAction>(null);
 		}
 		IAction action;
@@ -581,11 +593,11 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 				return new AsyncResult<IAction>(this.resolveIntentConflicts(cristOut, cauiOut));
 			}
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			if (logging.isDebugEnabled()){ logging.error("Error", e); }
 		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			if (logging.isDebugEnabled()){ logging.error("Error", e); }
 		}
 		return new AsyncResult<IAction>(null);
 	}
@@ -603,7 +615,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 
 	@Override
 	public void onCreation(CtxChangeEvent arg0) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
@@ -631,7 +643,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 								logging.debug("Received event and retrieved value " + ctxAttribute.getStringValue() + " for context attribute: " + ctxAttribute.getType());
 							}
 							CtxAttributeIdentifier ctxId = (CtxAttributeIdentifier) ctxAttribute.getId();
-							IIdentity userId = idm.fromJid(ctxId.getOperatorId());
+							IIdentity userId = idm.fromJid(ctxId.getOwnerId());
 							List<IOutcome> preferenceOutcomes = processPreferences(userId, ctxAttribute);
 							List<IOutcome> intentOutcomes = processIntent(userId, ctxAttribute);
 
@@ -667,17 +679,17 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 						}
 					}
 				} catch (CtxException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					
+					if (logging.isDebugEnabled()){ logging.error("Error", e); }
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					
+					if (logging.isDebugEnabled()){ logging.error("Error", e); }
 				} catch (ExecutionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					
+					if (logging.isDebugEnabled()){ logging.error("Error", e); }
 				} catch (InvalidFormatException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					
+					if (logging.isDebugEnabled()){ logging.error("Error", e); }
 				}
 			}
 		}.start();
@@ -758,11 +770,11 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 				}
 			}
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			if (logging.isDebugEnabled()){ logging.error("Error", e); }
 		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			if (logging.isDebugEnabled()){ logging.error("Error", e); }
 		}
 
 		return results;
@@ -855,11 +867,11 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 				}
 			}
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			if (logging.isDebugEnabled()){ logging.error("Error", e); }
 		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			if (logging.isDebugEnabled()){ logging.error("Error", e); }
 		}
 		return results;
 	}
@@ -1000,20 +1012,20 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 
 	@Override
 	public void onRemoval(CtxChangeEvent arg0) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public void onUpdate(CtxChangeEvent arg0) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public void handleInternalEvent(final InternalEvent event) {
 		if (logging.isDebugEnabled()){
-			this.logging.debug("Received UIM event:");
+			this.logging.debug("Received event:");
 		}
 		if (logging.isDebugEnabled()){
 			this.logging.debug("Event name " + event.geteventName() +
@@ -1168,11 +1180,11 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 					}
 
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					
+					if (logging.isDebugEnabled()){ logging.error("Error", e); }
 				} catch (ExecutionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					
+					if (logging.isDebugEnabled()){ logging.error("Error", e); }
 				}
 
 				if (logging.isDebugEnabled()){
@@ -1234,7 +1246,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 
 	@Override
 	public void handleExternalEvent(CSSEvent arg0) {
-		// TODO Auto-generated method stub
+		
 
 	}
 

@@ -19,7 +19,7 @@ public class ConfidenceTradeoffRule implements ConflictResolutionRule {
 	@Override
 	public IOutcome tradeoff(IOutcome intention, IOutcome preference) {
 		// TODO Auto-generated method stub
-		if (intention.getConfidenceLevel() > preference.getConfidenceLevel())
+		if (intention.getConfidenceLevel() >= preference.getConfidenceLevel())
 			return intention;
 		return preference;
 	}
