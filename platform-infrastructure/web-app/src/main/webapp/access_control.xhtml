@@ -62,8 +62,17 @@
 								</p:selectBooleanCheckbox>
 							</p:panelGrid>
 
+
+
 							<p:panel id="dataObPanel"
 								visible="#{accessControlController.obChecked}">
+
+								<p:blockUI id="blockDataOb" widgetVar="blockDataOb"
+									block="dataObPanel">
+			Loading<br />
+									<p:graphicImage value="/images/ajax-loader.gif" />
+								</p:blockUI>
+
 								<p:panelGrid columns="1">
 									<h:panelGrid columns="4"
 										rendered="#{responseItem.requestItemWrapper.obfuscatorInfo.obfuscationLevelType.value() eq 'continuous'}">
@@ -72,11 +81,18 @@
 										<p:slider for="contObfuscationLevel"
 											display="contObfuscationLabel" displayTemplate="%{value}"
 											style="width: 200px;" minValue="0" maxValue="100">
-											<p:ajax event="slideEnd" update="contObfuscationExample"
-												process="contObfuscationLevel" />
+											<p:ajax event="slideEnd" process="contObfuscationLevel"
+												onstart="blockDataOb.show()"
+												onsuccess="setContinuousOb()" />
 										</p:slider>
 										<h:inputHidden id="contObfuscationLevel"
-											value="#{responseItem.obfuscationLevel}" />
+											value="#{accessControlController.sliderValue}" />
+										<p:remoteCommand name="setContinuousOb"
+											update="contObfuscationExample" onsuccess="blockDataOb.hide()">
+											<f:setPropertyActionListener
+												value="#{responseItem.requestItemWrapper.obfuscatorInfo.computeObfuscationLevel(accessControlController.sliderValue)}"
+												target="#{responseItem.obfuscationLevel}" />
+										</p:remoteCommand>
 										<h:outputText id="contObfuscationExample"
 											value="#{responseItem.requestItemWrapper.obfuscatorInfo.getObfuscationExample(responseItem.obfuscationLevel)}" />
 									</h:panelGrid>
@@ -90,10 +106,19 @@
 											style="width: 200px;" minValue="0"
 											maxValue="#{responseItem.requestItemWrapper.obfuscatorInfo.nbOfObfuscationLevelStep - 1}">
 											<p:ajax event="slideEnd" update="disContObfuscationExample"
-												process="disContObfuscationLevel" />
+												process="disContObfuscationLevel"
+												onstart="blockDataOb.show()"
+												onsuccess="setDiscreteOb(); blockDataOb.hide()" />
 										</p:slider>
 										<h:inputHidden id="disContObfuscationLevel"
-											value="#{responseItem.obfuscationLevel}" />
+											value="#{accessControlController.sliderValue}" />
+										<p:remoteCommand id="setDiscreteOb" name="setDiscreteOb"
+											update="disContObfuscationExample">
+											<f:setPropertyActionListener
+												value="#{responseItem.requestItemWrapper.obfuscatorInfo.computeObfuscationLevel(accessControlController.sliderValue)}"
+												target="#{responseItem.obfuscationLevel}" />
+										</p:remoteCommand>
+
 										<h:outputText id="disContObfuscationExample"
 											value="#{responseItem.requestItemWrapper.obfuscatorInfo.getObfuscationExample(responseItem.obfuscationLevel)}" />
 									</h:panelGrid>

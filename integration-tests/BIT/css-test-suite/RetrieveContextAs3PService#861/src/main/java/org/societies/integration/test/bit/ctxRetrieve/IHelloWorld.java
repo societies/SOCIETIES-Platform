@@ -40,5 +40,5 @@ public interface IHelloWorld {
 
 	public void displayUserLocation();
 
-	List<CtxAttribute> retrieveCtxAttribute(String ctxType);
+	List<CtxAttribute> retrieveCtxAttribute(List<String> types);
 }

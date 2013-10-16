@@ -24,7 +24,9 @@
  */
 package org.societies.integration.test.bit.ctxRetrieve;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 
@@ -67,12 +69,14 @@ public class Tester {
 	private IIdentity userIdentity;
 	private IndividualCtxEntity cssPersonEntity;
 	private CtxAttribute nameAttribute;
+	private CtxAttribute symLocAtt;
 	
 	/** 
 	 * The name attribute value, i.e. either {@link #DEFAULT_NAME_VALUE} or the
 	 * String value of an existing name attribute. 
 	 */
 	private String nameAttributeValue;
+	private String symLocAttValue;
 	private Requestor requestor;
 	private IIdentity serviceIdentity;
 	//private IPrivacyPreferenceManager privPrefMgr;
@@ -112,8 +116,12 @@ public class Tester {
 	}
 	
 	@Test
-	public void testRetrieve(){
-			this.helloWorld.retrieveCtxAttribute(CtxAttributeTypes.NAME);
+	public void testRetrieve(){	
+		List<String> types = new ArrayList<String>();
+		types.add(CtxAttributeTypes.NAME_FIRST);
+		types.add(CtxAttributeTypes.NAME_LAST);
+		types.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
+			this.helloWorld.retrieveCtxAttribute(types);
 			this.helloWorld.displayUserLocation();
 	
 		
@@ -165,6 +173,22 @@ public class Tester {
 			this.testCtxIds.add(this.nameAttribute.getId());
 		}
 		this.nameAttributeValue.concat(" " + nameAttribute.getStringValue());
+		
+		final Set<CtxAttribute> symLoc = 
+				this.cssPersonEntity.getAttributes(CtxAttributeTypes.LOCATION_SYMBOLIC); 
+		if (symLoc.iterator().hasNext()) {
+			this.symLocAtt = symLoc.iterator().next();
+		} else {
+			Future<CtxAttribute> createAttribute = this.ctxBroker.createAttribute(
+					this.cssPersonEntity.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC);
+			this.symLocAtt = createAttribute.get();
+			this.symLocAtt.setStringValue("Puma Lab");
+			this.symLocAtt = (CtxAttribute) this.ctxBroker.update(
+					this.symLocAtt).get();
+			// Add to set of context data items to be removed in {@link #tearDown}
+			this.testCtxIds.add(this.symLocAtt.getId());
+		}
+		this.symLocAttValue = symLocAtt.getStringValue();
 	}
 	
 /*	private void createPPNPreference1(){

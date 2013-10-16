@@ -32,6 +32,15 @@ import java.util.List;
 public class AccessControlRequestController extends BasePageController {
 	
 	private boolean obChecked = false;
+	private int sliderValue;
+
+	public int getSliderValue() {
+		return sliderValue;
+	}
+
+	public void setSliderValue(int sliderValue) {
+		this.sliderValue = sliderValue;
+	}
 
 	public boolean isObChecked() {
 		return obChecked;

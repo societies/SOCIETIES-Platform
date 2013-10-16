@@ -124,22 +124,21 @@ public class HelloWorld implements IHelloWorld{
 	}
 
 	@Override
-	public List<CtxAttribute> retrieveCtxAttribute(String ctxType){
+	public List<CtxAttribute> retrieveCtxAttribute(List<String> types){
 	
 		try {
-			Future<List<CtxIdentifier>> flookupResults = this.ctxBroker.lookup(me, userIdentity, CtxModelType.ATTRIBUTE, ctxType);
-			List<CtxIdentifier> lookupResults = flookupResults.get();
+			List<CtxIdentifier> lookupResults = new ArrayList<CtxIdentifier>();
+			for (String x : types)
+			{
+				Future<List<CtxIdentifier>> flookupResults = this.ctxBroker.lookup(me, userIdentity, CtxModelType.ATTRIBUTE, x);
+				lookupResults.addAll(flookupResults.get());
+			}
 			JOptionPane.showMessageDialog(null, "Retrieved: "+lookupResults.size()+" results from CtxBroker");
 			if (lookupResults.size()==0){
 				return null;
 			}else{
-				
-				for (CtxIdentifier ctxId : lookupResults){
-					CtxAttribute ctxAttr = (CtxAttribute) this.ctxBroker.retrieve(me, ctxId).get();
-					if (ctxAttr!=null){
-						this.retrievedAttributes.add(ctxAttr);
-					}
-				}
+				this.retrievedAttributes = (List<CtxAttribute>) this.ctxBroker.retrieve(me, lookupResults);
+
 				
 			}
 		} catch (InterruptedException e) {
