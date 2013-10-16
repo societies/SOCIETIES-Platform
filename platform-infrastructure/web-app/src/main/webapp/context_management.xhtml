@@ -233,12 +233,6 @@
    					<p:commandButton  id="deleteEntry" icon="ui-icon-trash" actionListener="#{contextManagementController.deleteRow(element.id)}" update=":mainForm:attributeTable"/>  
    				</p:column>
    				
-   				<p:column id="dialogColumn" style="width: 5px">
-   					<p:calendar value="#{contextManagementController.predictedDate}" id="popupButtonCal" showOn="button" >
-   						<p:ajax event="dateSelect" listener="#{contextManagementController.viewPredictedValues(element.id)}"/>
-   					</p:calendar>
-   				</p:column>
-   				
    				<p:column style="width:5%"> 
    					<p:rowEditor />
         		</p:column>  
@@ -276,7 +270,6 @@
 		  
 		        <p:column id="qualityColumn" headerText="Quality" style="width: 20%">  
 		            <h:outputText value="#{element.qualityBean.originType} - #{element.qualityBean.precision}" />
-		            <p:tooltip for="qualityColumn" value="#{element.qualityBean.updateFrequency} - #{element.qualityBean.lastUpdated}" showEffect="fade" hideEffect="fade" />   
 		        </p:column>  
 	    	</p:dataTable>  
 	    	
