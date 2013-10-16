@@ -1,0 +1,169 @@
+/*.button{background-color: pink;}
+.connection_container{background-color: green;}
+.button_container{background-color: red;}
+.connection_area{background-color: yellow;}
+.title{background-color: grey;}
+.connection_area_content{background-color: purple;}
+.user_connected{background-color: blue;}
+.user_image_container{background-color: orange;}
+.social_image_container{background-color: black;}
+.separator{background-color: orange;}
+.toolbox_container{background-color: brown;}
+.toolbox_content{background-color: yellow;}
+.toolbox_item{background-color: red;}
+.messenger_container{background-color : orange;}
+.messenger_buttons_container{background-color: brown;}*/
+
+body{
+	font-family:"Lucida Sans Unicode","Lucida Grande",Sans-Serif
+}
+
+div {
+	padding:2px;
+}
+
+textarea{
+	width: 100%;
+}
+
+img{
+	vertical-align: middle;
+}
+
+.circle {
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border: 5px solid #EEEEEE;
+    border-radius: 99em 99em 99em 99em;
+    box-shadow: 0 3px 2px rgba(0, 0, 0, 0.3);
+    display: block;
+    /*margin: 1em auto;*/
+}
+
+.title{
+	background-color: #9aceff;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.icon{
+	height: 25px;
+}
+
+.button{
+	border: 1px solid #6699CC;
+	background-color: #e7e7e7;
+	padding-left: 10px;
+	padding-right: 10px;
+	cursor: pointer;
+}
+
+.connection_container{
+	width: 650px;
+}
+
+.button_container{
+	padding: 10px;
+	vertical-align:middle;
+	float:left;	
+	margin-top: 50px;
+	border: 1px solid #6699CC;
+	background-color: #e7e7e7;
+}
+
+.button_connector{
+	cursor: pointer;
+}
+
+.connection_area{
+	background-color:#d8d8d8;
+	border: 1px solid #6699CC;
+}
+
+.connection_area_title{
+	padding-left:30px;
+	padding-right:30px;
+	background-color: gray;
+}
+
+.connection_area_content{
+	text-align: center;
+	height:150px;
+	padding: 10px;
+}
+
+.user_connected{
+    float: left;
+    margin-left: 10px;
+    width: 135px;
+}
+
+.user_image_container{
+	position: absolute;
+	background-color: #EEEEEE; 
+	width: 100px; 
+	height: 75px; 
+	overflow: hidden; 
+}
+
+.user_image{
+	width: 100px;
+}
+
+.social_image_container{
+	position: absolute;
+	margin-left:100px;
+}
+
+.separator{
+	clear:both;
+	margin-bottom:20px;
+}
+
+
+.messenger_container{
+	width: 650px;
+	background-color:#d8d8d8;
+	border: 1px solid #6699CC;
+}
+
+.messenger_buttons_container{
+	text-align:right;
+	padding: 7px;
+}
+
+
+.toolbox_container{
+	width: 200px;
+	float: left;
+	margin-left: 5px;
+}
+
+.toolbox_content{
+	margin-left:20px;
+	margin-right:20px;
+	background-color:#d8d8d8;
+	border: 1px solid #6699CC;
+}
+
+.title_container{
+	cursor: pointer;
+}
+
+.disconnected{
+	color: grey;
+}
+
+.arrow{
+	margin-top:5px;
+	float:right;
+}
+
+.entry_container{
+	background-color: #D8D8D8;
+    border: 1px solid #6699CC;
+    margin-top: 10px;
+    width: 550px;
+    margin-left: 30px;
+}

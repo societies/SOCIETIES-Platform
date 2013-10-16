@@ -26,6 +26,8 @@ import org.societies.api.internal.security.policynegotiator.NegotiationException
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.security.digsig.ISignatureMgr;
 import org.societies.security.comms.policynegotiator.CommsClient;
+import org.societies.security.dao.ServiceDao;
+import org.societies.security.model.Service;
 
 public class ProviderServiceMgrTest {
 
@@ -150,6 +152,7 @@ public class ProviderServiceMgrTest {
 		classUnderTest.setClientJarServer(clientJarServer);
 		classUnderTest.setGroupMgr(groupMgr);
 		classUnderTest.setSignatureMgr(signatureMgr);
+		classUnderTest.setServiceDao(mock(ServiceDao.class));
 		
 		serviceId = new ServiceResourceIdentifier();
 		serviceId.setIdentifier(new URI("societies://aaa.bbb.ccc"));

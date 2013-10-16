@@ -101,6 +101,8 @@ public class LoginController extends BasePageController {
         String detail = "User logged out";
 
         userService.logout();
+        
+        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().remove("contextManagementController");
 
         addGlobalMessage(summary, detail, FacesMessage.SEVERITY_INFO);
 

@@ -8,7 +8,12 @@ import javax.faces.context.FacesContext;
 import java.io.Serializable;
 
 public abstract class BasePageController implements Serializable {
-    protected final Logger log = LoggerFactory.getLogger(getClass()); // NB: NOT static
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	protected final Logger log = LoggerFactory.getLogger(getClass()); // NB: NOT static
 
 
     protected void addGlobalMessage(String summary, String detail, FacesMessage.Severity severity) {

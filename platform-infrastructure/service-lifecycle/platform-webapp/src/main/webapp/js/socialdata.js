@@ -1,147 +1,89 @@
-/**  
-   Socialdata JS 
-	private static final String ADD				= "add";
-	private static final String REMOVE			= "remove";
-	private static final String FRIENDS			= "friends";
-	private static final String PROFILES		= "profiles";
-	private static final String GROUPS			= "groups";
-	private static final String ACTIVITIES		= "activities";
-	private static final String LIST			= "list"
+$(function() {
+	$(".button_connector").draggable({
+		containment: "#connection_container",
+		revert: true
+	});
+	$( "#connection_area" ).droppable({
+		drop: function( event, ui ){
+			var socialName="";
+			if(ui.draggable.attr('id') == 'fq_button'){
+				socialName="connect_fq";
+			}else if(ui.draggable.attr('id') == 'fb_button'){
+				socialName="connect_fb";
+			}else if(ui.draggable.attr('id') == 'ln_button'){
+				socialName="connect_lk";
+			}else if(ui.draggable.attr('id') == 'tw_button'){
+				socialName="connect_tw";
+			}
+			//alert(socialName+" connected!");
+			connectSN(socialName);
+		}
+	});
 
+	$('.hover_img').hover(
+			function(){
+				lastImg = $(this).attr("src");
+				$(this).attr("src","images/exit.png");
+				$(this).css("cursor","pointer");
+				$(this).click(function(){
+					disconnectSN($(this).attr("id"));
+					//alert($(this).attr("id"));
+				});
+			},
+			function(){
+				$(this).attr("src",lastImg);
+				$(this).css("cursor","");
+			}
 
-*/
-  
-
-
-function submitform(){
-    token= document.getElementById("token");
-    method= document.getElementById("method");
-    
-    if (method.value==""){
-    	alert("Please add a valid method)");
-    	return;
-    }
-    
-    if (token.value==""){
-    	alert("Please add a valid token (copy from popup)");
-    	w.focus(); 
-    	return;
-    }
-    else {
-    	document.getElementById("addConnector").style.visibility= "hidden";
-    	document.getElementById("popup").style.visibility="visible";
-    	document.sd.submit();
-    }
-}
-
-function countConnectors(){
-   var ul = document.getElementById('listConn');
-   var liNodes = [];
- 
-   for (var i = 0; i < ul.childNodes.length; i++) {
-	if (ul.childNodes[i].nodeName == "LI") {
-		liNodes.push(ul.childNodes[i]);
-	}
-   }
-   
-   return liNodes.length;
-}
-
-  
-  function disconnect(id){
-    document.getElementById("method").value  = "remove";
-    document.getElementById("id").value  = id;
-    if (id==""){
-      alert("Connector id:"+id+ "not Valid!");
-    }
-    else  document.sd.submit();
-  } 
-
-
-  function exe(method){
-  
-     if(countConnectors()>0){
-  	    document.getElementById("method").value  = method;
-  	    document.sd.submit();
-  	 }
-  	 else{
-  	 	alert("Add a connector first!");
-  	 }
-  }
-  
-  function connectSN(sn){
-	   document.getElementById("method").value  = sn;
-	   document.sd.submit();
-//	    w = window.open("http://societies.lucasimone.eu/connect.php?sn=" + sn +"&from=http://societies.lucasimone.eu/print.php", "TEST1", "width=400,height=400,resizeable,scrollbars");
-  }
-  
-  
-
-  function getToken(url, title){
-     w = window.open(url, title, "width=600,height=400,resizeable,scrollbars");
-     document.getElementById("addConnector").style.visibility= "visible"; 
-    // setTimeout(CheckLoginStatus(), 3000);
-    document.getElementById("method").value  = "add";
-    document.getElementById("snName").value  = title;
-    document.getElementById("token").value  = "";
- 
-  }
-  
-  
-  function removeform(){
-    document.getElementById("addConnector").style.visibility= "hidden";
-    }
-
- function CheckLoginStatus() {
-      
-      
-     
-      try {
-      
-      
-      if (document.readyState === "complete"){
-      	alert("You need to copy these params in the form!");
-      }
-      /*
-      var json = JSON.parse(w.document.body.innerHTML);
-      
-      if(json.connector!=""){
-         
-    	 document.getElementById("token").value   = json.connector.access_token;
-         document.getElementById("expires").value = json.connector.expires;
-         document.getElementById("snname").value  = json.connector.from;
-         document.getElementById("method").value  = "add";
-         //document.sdForm.submit();
-         w.close();
-      }
-      */
-      else setTimeout(CheckLoginStatus, 1000);
-   } 
-   catch(e)
-   {
-       //alert(e + " - " + body);
-       setTimeout(CheckLoginStatus, 1000);
-   }
-  	   
- }
- 
- function queryBundleStatus() {
-	  $.ajax({
-	    url: 'status',
-	    success: function(data) {
-	    	$('#status').setVal(data); 
-	    }
-	  });
-	  setTimeout(queryBundleStatus, 5000); // you could choose not to continue on failure...
-	}
-
-	
- 
- $(document).ready(function(){ 
-	 
-	  $('#status').val("Reading status..."); 
-	  setTimeout(queryBundleStatus, 5000);
+	);
 });
 
- 	
- 
+function manageSelection(obj){
+	if($(obj).val() == 'ck_all' && $(obj).is(':checked')){
+		$('.messenger_ck').attr('checked', 'checked');
+	} else {
+		if(!$(obj).is(':checked')){
+			$('#ck_all').attr('checked', false);
+		}
+	}
+}
+
+function connectSN(sn){
+	document.getElementById("method").value  = sn;
+	document.sd.submit();
+}
+
+function disconnectSN(id){
+	document.getElementById("method").value  = "remove";
+	document.getElementById("id").value  = id;
+	document.sd.submit();
+}
+
+function goToSocial(method){
+	document.getElementById("method").value  = method;
+	document.sd.submit();
+}
+
+function sendPost(){
+	if($('#messageToPost').val()==''){
+		alert("Unable to send a post, Message is void");
+		return
+	}
+
+	var ckList = $('.messenger_ck');
+	var par="";
+	for(var i = 0; i< ckList.length ; i++){
+		if($(ckList[i]).is(':checked')){
+			par += "|"+$(ckList[i]).attr('name');
+		}
+	}
+	if(par == ''){
+		alert('Unable to send a post, select a social network!');
+		return;
+	}
+	
+	document.getElementById("method").value  = 'postMessage';
+	document.getElementById("snName").value = par.substring(1,par.length); //remove first pipe char
+	document.getElementById("params").value  = $('#messageToPost').val();
+	document.sd.submit();
+}

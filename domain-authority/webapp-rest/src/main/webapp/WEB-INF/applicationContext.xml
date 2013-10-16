@@ -33,8 +33,11 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
 		http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
-		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">  
-
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx.xsd"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+    >
 	
 	
 	    <!-- Scans the classpath of this application for @Components to deploy as beans --> 
@@ -50,7 +53,47 @@
 	
 	<osgi:reference id="CommManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"/>
 	<osgi:reference id="SignatureManager" interface="org.societies.api.security.digsig.ISignatureMgr"/>
+	<osgi:reference id="dataSource" interface="javax.sql.DataSource" />
 	
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+
+		<property name="dataSource" ref="dataSource" />
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.show_sql">${show_sql:false}</prop>
+				<prop key="hibernate.cache.use_second_level_cache">${cache.use_second_level_cache:false}</prop>
+				<prop key="hibernate.hbm2ddl.auto">${hbm2ddl.auto:update}</prop>
+				<prop key="hibernate.format_sql">${format_sql:true}</prop>
+			</props>
+		</property>
+
+		<property name="annotatedClasses">
+			<list>
+			    <value>org.societies.domainauthority.rest.model.Resource</value>
+			</list>
+		</property>
+
+		<property name="annotatedPackages">
+			<list>
+				<value>org.societies.domainauthority.rest.model</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- enable the configuration of transactional behavior based on annotations -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+
+	<bean id="resourceDao" class="org.societies.domainauthority.rest.dao.ResourceDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+		
 	<bean id="daRestProperties"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
@@ -69,7 +112,8 @@
   		>
   		<property name="sigMgr" ref="SignatureManager"/>
   		<property name="accessControlEnabled" value="${domain_authority.rest.access_control_enabled}" />
-	</bean>
+        <property name="resourceDao" ref="resourceDao"/>
+  	</bean>
 
 	<bean id="DomainAuthorityRestCommsServer"
 		class="org.societies.domainauthority.rest.comms.CommsServer"
