@@ -25,6 +25,7 @@
 
 package org.societies.api.security.digsig;
 
+import java.io.InputStream;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -84,6 +85,12 @@ public interface ISignatureMgr {
 	 * corresponding certificates.
 	 * 
 	 * @throws DigsigException If any signature is invalid
+	 */
+	public HashMap<String, X509Certificate> verifyXml(InputStream xml) throws DigsigException;
+
+	/**
+	 * Same as {@link #verifyXml(InputStream)}, only the {@link InputStream} parameter is generated
+	 * from given {@link String}.
 	 */
 	public HashMap<String, X509Certificate> verifyXml(String xml) throws DigsigException;
 

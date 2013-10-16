@@ -83,7 +83,7 @@ public class XmlDocument extends HttpServlet {
 		
 		LOG.info("HTTP GET: path = {}, signature = " + signature, path);
 		if (path == null || signature == null) {
-			LOG.warn("Missing URL parameters");
+			LOG.warn("HTTP GET: Missing URL parameters");
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
@@ -91,7 +91,7 @@ public class XmlDocument extends HttpServlet {
 		byte[] file;
 
 		if (!XmlDocumentAccess.isAuthorized(path, signature)) {
-			LOG.warn("Invalid filename or key");
+			LOG.warn("HTTP GET: Invalid filename or key");
 			// Return HTTP status code 401 - Unauthorized
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.setHeader("WWW-Authenticate", "Digest realm=\"societies\"");
@@ -100,7 +100,7 @@ public class XmlDocument extends HttpServlet {
 
 		file = XmlDocumentAccess.getDocumentDao().get(path).getXmlDoc();
 
-		LOG.info("Serving {}", path);
+		LOG.info("HTTP GET: Serving {}", path);
 		
 		response.setContentLength(file.length);
 		response.setContentType("application/xml");
@@ -110,7 +110,7 @@ public class XmlDocument extends HttpServlet {
 			stream.flush();
 			response.setStatus(HttpServletResponse.SC_OK);
 		} catch (IOException e) {
-			LOG.warn("Could not write response", e);
+			LOG.warn("HTTP GET: Could not write response", e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return;
 		}
@@ -151,7 +151,7 @@ public class XmlDocument extends HttpServlet {
 				try {
 					minNumSigners = Integer.parseInt(numSignersThreshold);
 				} catch (Exception e) {
-					LOG.warn("Bad parameter: {} = {}", UrlPath.URL_PARAM_NUM_SIGNERS_THRESHOLD, numSignersThreshold);
+					LOG.warn("HTTP PUT: Bad parameter: {} = {}", UrlPath.URL_PARAM_NUM_SIGNERS_THRESHOLD, numSignersThreshold);
 				}
 			}
 			status = putNewDocument(path, cert, endpoint, minNumSigners, is);
@@ -174,7 +174,7 @@ public class XmlDocument extends HttpServlet {
 
 		// TODO: use different authentication for deleting so only the original uploader could delete a doc.
 		if (!XmlDocumentAccess.isAuthorized(path, signature)) {
-			LOG.warn("Invalid filename or key");
+			LOG.warn("HTTP DELETE: Invalid filename or key");
 			// Return HTTP status code 401 - Unauthorized
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.setHeader("WWW-Authenticate", "Digest realm=\"societies\"");
@@ -256,17 +256,9 @@ public class XmlDocument extends HttpServlet {
 	
 	private int mergeDocument(String path, String signature, InputStream is) {
 		
-		byte[] xml;
-		try {
-			xml = IOUtils.toByteArray(is);
-		} catch (IOException e) {
-			LOG.warn("mergeDocument: ", e);
-			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-		}
-		
 		boolean success;
 		try {
-			success = XmlDocumentAccess.mergeDocument(path, xml, signature);
+			success = XmlDocumentAccess.mergeDocument(path, is, signature);
 		} catch (DigsigException e) {
 			LOG.warn("mergeDocument: ", e);
 			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;

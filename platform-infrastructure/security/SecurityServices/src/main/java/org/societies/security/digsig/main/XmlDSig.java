@@ -24,6 +24,7 @@
  */
 package org.societies.security.digsig.main;
 
+import java.io.InputStream;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -168,7 +169,7 @@ public class XmlDSig {
 		return str;
 	}
 
-	public HashMap<String, X509Certificate> verifyXml(String xml) throws DigsigException {
+	public HashMap<String, X509Certificate> verifyXml(InputStream xml) throws DigsigException {
 		
 		LOG.debug("verifyXml()");
 		

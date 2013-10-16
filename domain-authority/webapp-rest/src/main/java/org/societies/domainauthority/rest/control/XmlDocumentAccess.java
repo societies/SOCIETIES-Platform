@@ -26,6 +26,7 @@ package org.societies.domainauthority.rest.control;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -126,7 +127,7 @@ public class XmlDocumentAccess {
 	 * @return True for success, false for error
 	 * @throws DigsigException
 	 */
-	public static boolean mergeDocument(String path, byte[] xml, String signature) throws DigsigException {
+	public static boolean mergeDocument(String path, InputStream xml, String signature) throws DigsigException {
 		
 		Document doc = documentDao.get(path);
 		if (doc == null) {
@@ -158,16 +159,19 @@ public class XmlDocumentAccess {
 		}
 	}
 	
-	private static int merge(byte[] oldXml, byte[] newXml, OutputStream result) throws DigsigException {
+	private static int merge(byte[] oldXml, InputStream newXml, OutputStream result) throws DigsigException {
 		
-		ByteArrayInputStream oldIs = new ByteArrayInputStream(oldXml);
-		ByteArrayInputStream newIs = new ByteArrayInputStream(newXml);
-		Xml old;
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();  // TODO: use pipe or something instead
 		
 		try {
-			old = new Xml(oldIs);
-			int numInsertedNodes = old.addNodeRecursively(newIs, XmlSignature.XML_SIGNATURE_XPATH);
+			Xml old = new Xml(new ByteArrayInputStream(oldXml));
+			int numInsertedNodes = old.addNodeRecursively(newXml, XmlSignature.XML_SIGNATURE_XPATH);
 			LOG.debug("merge: inserted {} new nodes", numInsertedNodes);
+			old.toOutputStream(bos);
+			InputStream is = new ByteArrayInputStream(bos.toByteArray());
+			LOG.debug("merge: verifying signatures");
+			int numValidSigs = sigMgr.verifyXml(is).size();
+			LOG.debug("merge: number of valid signatures in merged document: {}", numValidSigs);
 			old.toOutputStream(result);
 			return numInsertedNodes;
 		} catch (XmlException e) {

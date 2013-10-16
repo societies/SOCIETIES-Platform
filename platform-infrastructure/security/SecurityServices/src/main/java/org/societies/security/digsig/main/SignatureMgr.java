@@ -24,6 +24,7 @@
  */
 package org.societies.security.digsig.main;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -158,8 +159,20 @@ public class SignatureMgr implements ISignatureMgr, ISlaSignatureMgr {
 	}
 	
 	@Override
-	public HashMap<String, X509Certificate> verifyXml(String xml) throws DigsigException {
+	public HashMap<String, X509Certificate> verifyXml(InputStream xml) throws DigsigException {
 		return xmlDSig.verifyXml(xml);
+	}
+	
+	@Override
+	public HashMap<String, X509Certificate> verifyXml(String xml) throws DigsigException {
+
+		InputStream is;
+		try {
+			is = new ByteArrayInputStream(xml.getBytes("utf-8"));
+		} catch (UnsupportedEncodingException e) {
+			throw new DigsigException(e);
+		}
+		return xmlDSig.verifyXml(is);
 	}
 	
 	@Override

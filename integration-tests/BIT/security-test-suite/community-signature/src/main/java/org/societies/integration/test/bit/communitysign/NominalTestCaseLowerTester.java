@@ -124,6 +124,8 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	 */
 	private void t1_uploadDocument() throws Exception {
 		
+		LOG.info("[#2165] t1_uploadDocument()");
+
 		IIdentity id = identityManager.getThisNetworkNode();
 		X509Certificate cert = signatureMgr.getCertificate(id);
 		String certStr = signatureMgr.cert2str(cert);
@@ -150,6 +152,8 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	 */
 	private void t2_downloadOriginalDocument() throws Exception {
 		
+		LOG.info("[#2165] t2_downloadOriginalDocument()");
+
 		byte[] downloaded = download();
 		assertXMLEqual(xml, new String(downloaded));
 	}
@@ -158,7 +162,9 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	 * URL with invalid signature => download should be rejected
 	 */
 	private void t3_downloadDocumentInvalidSig() throws Exception {
-		
+
+		LOG.info("[#2165] t3_downloadDocumentInvalidSig()");
+
 		String urlStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode()));
 		String sigKeyword = UrlPath.URL_PARAM_SIGNATURE + "=";
 		int sigKeywordEnd = urlStr.indexOf(sigKeyword) + sigKeyword.length();
@@ -176,6 +182,8 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	 */
 	private void t4_mergeDocument() throws Exception {
 
+		LOG.info("[#2165] t4_mergeDocument()");
+
 		String uriStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode()));
 		LOG.info("[#2165] t4_mergeDocument(): uploading new document to {}", uriStr);
 		URI uri = new URI(uriStr);
@@ -189,6 +197,9 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	}
 	
 	private void t5_downloadMergedDocument() throws Exception {
+		
+		LOG.info("[#2165] t5_downloadMergedDocument()");
+
 		byte[] downloaded = download();
 		String downloadedXml = new String(downloaded);
 		assertXMLNotEqual(xml, downloadedXml);
