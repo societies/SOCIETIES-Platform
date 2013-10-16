@@ -174,29 +174,32 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		
 		privacyLog.append(logEntry);
 		
+		LOG.debug("logCommsFw({}, {}, ...) finished", sender, receiver);
 		return true;
 	}
 	
 	@Override
 	public void logContext(Requestor requestor, IIdentity owner) {
 		
-		LOG.debug("logContext()");
+		LOG.debug("logContext({}, ...)", requestor);
 		
 		String invokerClass = getInvokerClass();
 		List<String> invokerClasses = getInvokerClasses();
 		
 		logContext(requestor, owner, -1, invokerClass, invokerClasses);
-	}
+		LOG.debug("logContext({}, ...) finished", requestor);
+		}
 
 	@Override
 	public void logContext(Requestor requestor, IIdentity owner, int dataSize) {
 		
-		LOG.debug("logContext({})", dataSize);
+		LOG.debug("logContext({}, {}, ...)", requestor, dataSize);
 
 		String invokerClass = getInvokerClass();
 		List<String> invokerClasses = getInvokerClasses();
 		
 		logContext(requestor, owner, dataSize, invokerClass, invokerClasses);
+		LOG.debug("logContext({}, {}, ...) finished", requestor, dataSize);
 	}
 	
 	private void logContext(Requestor requestor, IIdentity owner, int dataSize, String invokerClass, List<String> invokerClasses) {

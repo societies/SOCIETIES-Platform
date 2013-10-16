@@ -40,6 +40,7 @@
     <!-- Scans the classpath for annotated components that will be auto-registered as Spring beans. -->
     <ctx:component-scan base-package="org.societies.webapp.controller"/>
     <ctx:component-scan base-package="org.societies.webapp.service"/>
+    <ctx:annotation-config/>
 
 
     <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">

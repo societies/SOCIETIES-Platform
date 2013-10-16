@@ -215,6 +215,15 @@ public interface ISignatureMgr {
 	 * @throws DigsigException
 	 */
 	public X509Certificate str2cert(String certStr) throws DigsigException;
+
+	/**
+	 * Convert byte[] representation of X.509 certificate to {@link X509Certificate}
+	 * 
+	 * @param cert byte[] representation of the {@link X509Certificate}
+	 * @return The X.509 certificate
+	 * @throws DigsigException
+	 */
+	public X509Certificate ba2cert(byte[] cert) throws DigsigException;
 	
 	/**
 	 * Convert {@link X509Certificate} to {@link String}
@@ -224,4 +233,13 @@ public interface ISignatureMgr {
 	 * @throws DigsigException if an encoding error occurs
 	 */
 	public String cert2str(X509Certificate cert) throws DigsigException;
+	
+	/**
+	 * Convert {@link X509Certificate} to byte[]
+	 * 
+	 * @param cert The certificate to convert
+	 * @return byte[] representation of the {@link X509Certificate}
+	 * @throws DigsigException if an encoding error occurs
+	 */
+	public byte[] cert2ba(X509Certificate cert) throws DigsigException;
 }

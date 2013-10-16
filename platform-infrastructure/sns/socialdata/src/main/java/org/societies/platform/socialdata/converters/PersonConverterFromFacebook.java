@@ -24,7 +24,7 @@ import org.json.JSONObject;
 
 
 public class PersonConverterFromFacebook implements PersonConverter{
-	
+
 	public static String WORKS 			= "works";
 	public static String ACCOUNTS 		= "accounts";
 	public static String USERNAME 		= "username";
@@ -49,28 +49,28 @@ public class PersonConverterFromFacebook implements PersonConverter{
 	public static String MUSIC		    = "music";
 	public static String BOOKS		    = "books";
 	public static String PICTURE		    = "picture";
-	
+
 	// portable contact ids
 	public static String GIVENAME 		= "givenName";
 	public static String FAMILYNAME		= "familyName";
-	
-	
+
+
 	private JSONObject 	db;
 	private String     	rawData;
 	private Person 		person;
-	
-	
-	
+
+
+
 	public Person load(String  data){
-	
-	   	person = new PersonImpl();
+
+		person = new PersonImpl();
 		this.rawData = data;
-		
+
 		try{
-			
+
 			db = new JSONObject(this.rawData);
 			person.setId("facebook:"+db.getString(ID));
-			
+
 			//if(db.has(UCT)) person.setUtcOffset(db.getLong(UCT));
 			if (db.has(BIO))		person.setAboutMe(db.getString(BIO));
 			if (db.has(SPORTS)) 	 	person.setSports(setSports(db.getString(SPORTS)));
@@ -88,56 +88,63 @@ public class PersonConverterFromFacebook implements PersonConverter{
 			if (db.has(MUSIC))		person.setMusic(jarrayToList(db.getString(MUSIC)));
 			if (db.has(INTERESTS))	        person.setInterests(jarrayToList(db.getString(INTERESTS)));
 			if (db.has(BOOKS))	    	person.setBooks(jarrayToList(db.getString(BOOKS)));					
-			
+
 			if (db.has(PICTURE))		{
-			    try{
-			          person.setThumbnailUrl(db.getJSONObject(PICTURE).getJSONObject("data").getString("url"));
-			    }catch(Exception ex){}
-			    
-			 }
-			
+				try{
+
+					String picture = db.getString(PICTURE);
+					JSONObject pic = new JSONObject(picture);
+					String picData = pic.getString("data");
+					JSONObject url = new JSONObject(picData);
+
+					person.setThumbnailUrl(url.getString("url"));
+					// person.setThumbnailUrl(db.getJSONObject(PICTURE).getJSONObject("data").getString("url"));
+				}catch(Exception ex){}
+
+			}
+
 			setName();
 			setAccount();
 		}
 		catch (JSONException e) {
 			e.printStackTrace();
 		}
-		
-		
+
+
 		person.setActivities(genActivities());
-		
-		
-			
+
+
+
 		return person;
 	}
-	
+
 	private void setName(){
-	    Name name = new NameImpl();
-	    try {
-		
-		String formattedName= "";
-		
-		if (db.has("first_name")){
-		    name.setGivenName(db.getString("first_name"));
-		    formattedName=db.getString("first_name");
+		Name name = new NameImpl();
+		try {
+
+			String formattedName= "";
+
+			if (db.has("first_name")){
+				name.setGivenName(db.getString("first_name"));
+				formattedName=db.getString("first_name");
+			}
+
+			if (db.has("last_name")){
+				name.setFamilyName(db.getString("last_name"));
+				if (formattedName.length()>0) formattedName+=" ";
+				formattedName+= db.getString("last_name");
+			}
+
+			name.setFormatted(formattedName);
+			person.setDisplayName(formattedName);
+
 		}
-		
-		if (db.has("last_name")){
-		    name.setFamilyName(db.getString("last_name"));
-		    if (formattedName.length()>0) formattedName+=" ";
-		    formattedName+= db.getString("last_name");
+		catch (JSONException e) {
+			e.printStackTrace(); 
 		}
-	      
-		name.setFormatted(formattedName);
-		person.setDisplayName(formattedName);
-	      
-	    }
-	    catch (JSONException e) {
-		e.printStackTrace(); 
-	    }
-	    person.setName(name);
+		person.setName(name);
 	}
-	
+
 	private void setAccount(){
 		Account account = new AccountImpl();
 		try{
@@ -148,10 +155,10 @@ public class PersonConverterFromFacebook implements PersonConverter{
 			if(db.has(LASTNAME))
 				name = name + " "+db.getString(LASTNAME);
 			if (db.has(USERNAME))
-			    account.setUsername(db.getString(USERNAME));
+				account.setUsername(db.getString(USERNAME));
 			else
-			    account.setUsername(name);
-			
+				account.setUsername(name);
+
 			account.setUserId(db.getString(ID));
 		}
 		catch (JSONException e) {
@@ -163,19 +170,19 @@ public class PersonConverterFromFacebook implements PersonConverter{
 		accounts.add(account);
 		person.setAccounts(accounts);
 	}
-	
+
 	private List<String> jarrayToList(String data) {
-		
+
 		List<String> list = new ArrayList<String>();
 		try {
 			JSONArray jdata = new JSONArray(data);
 			for(int i=0; i<jdata.length();i++){
 				list.add(jdata.getString(i));
 			}
-			
+
 		}
 		catch (JSONException e) {
-			
+
 		}
 		return list;
 	}
@@ -186,20 +193,20 @@ public class PersonConverterFromFacebook implements PersonConverter{
 			JSONArray json_photos = new JSONArray(data);
 			for(int i=0; i<json_photos.length();i++){
 				JSONObject p = (JSONObject) json_photos.get(i);
-				
+
 				ListField photo = new ListFieldImpl();
 				photo.setPrimary(p.getBoolean("primary"));
 				photo.setType(p.getString("type"));
 				photo.setValue(p.getString("value"));
 				photos.add(photo);
-				
-				
+
+
 			}
 		}
 		catch (JSONException e) {
 			e.printStackTrace();
 		}
-		
+
 		return photos;
 	}
 
@@ -207,8 +214,8 @@ public class PersonConverterFromFacebook implements PersonConverter{
 		DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
 		try {
 			return df.parse(date);
-			} catch (ParseException e) {
-			
+		} catch (ParseException e) {
+
 		}
 		return null;
 
@@ -227,42 +234,42 @@ public class PersonConverterFromFacebook implements PersonConverter{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return works;
 	}
 
 	private List<String> genActivities() {
 		List<String> activities = new ArrayList<String>();
-//		try{
-//			
-//			
-//		}
-//		catch (JSONException e) {
-//			e.printStackTrace();
-//		}
-		
+		//		try{
+		//			
+		//			
+		//		}
+		//		catch (JSONException e) {
+		//			e.printStackTrace();
+		//		}
+
 		return activities;
 	}
 
 	private List<Account> setAccounts(String data){
-		
+
 		List<Account> accounts = new ArrayList<Account>();
-		
+
 		// not usefull!
 		return accounts;
 	}
-	
+
 	private Address setLocation(String data) {
 		Address address = new AddressImpl();
 		try{
-			
+
 			JSONObject loc = new JSONObject(data);
 			address.setFormatted(loc.getString("name"));
-		
-			
+
+
 		}
 		catch(Exception ex){}
-		
+
 		return address;
 	}
 
@@ -270,14 +277,14 @@ public class PersonConverterFromFacebook implements PersonConverter{
 		JSONArray sports = null;
 		List<String> sportList = null;
 		try {
-			
-			 sports = new JSONArray(data);
-			 sportList= new ArrayList<String>();
-			 
-			 for(int i=0; i< sports.length(); i++){
-				 JSONObject sport = sports.getJSONObject(i);
-				 sportList.add(sport.getString(SPORT_NAME));
-			 }
+
+			sports = new JSONArray(data);
+			sportList= new ArrayList<String>();
+
+			for(int i=0; i< sports.length(); i++){
+				JSONObject sport = sports.getJSONObject(i);
+				sportList.add(sport.getString(SPORT_NAME));
+			}
 		} 
 		catch (JSONException e) {
 			e.printStackTrace();
@@ -286,7 +293,7 @@ public class PersonConverterFromFacebook implements PersonConverter{
 	}
 
 	private List<ListField> getMails(String mail){
-		
+
 		List<ListField> emails = new ArrayList<ListField>();
 		ListField email = new ListFieldImpl();
 		email.setPrimary(true);
@@ -295,7 +302,7 @@ public class PersonConverterFromFacebook implements PersonConverter{
 		emails.add(email);
 		return emails;
 	}
-	
+
 	private Name genName(){
 		Name name = null;
 		if (getString(NAME)!=null) {
@@ -304,23 +311,23 @@ public class PersonConverterFromFacebook implements PersonConverter{
 			name.setFormatted(getString(NAME));
 		}
 		if (name==null) name = new NameImpl();
-		
+
 		if (getString(FIRSTNAME)!=null)  name.setGivenName(getString(FIRSTNAME));
 		if (getString(LASTNAME) !=null) name.setFamilyName(getString(LASTNAME));
-		
-		
+
+
 		return name;
 	}
-	
+
 	private Gender gender(String g){
-			if ("male".equals(g))
-				return Gender.male;
-			else
-				return Gender.female;
+		if ("male".equals(g))
+			return Gender.male;
+		else
+			return Gender.female;
 	}
-	
-	
-	
+
+
+
 	private String getString(String key){
 		try {
 			if (db.has(key)){
@@ -333,6 +340,6 @@ public class PersonConverterFromFacebook implements PersonConverter{
 
 	}
 
-	
-	
+
+
 }

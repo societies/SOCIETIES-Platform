@@ -22,72 +22,56 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.policynegotiator.provider;
+package org.societies.security.model;
 
-import java.net.URI;
+import static org.junit.Assert.*;
+
 import java.util.List;
+import java.util.Random;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
- * 
+ * Describe your class here...
  *
- * @author Mitja Vardjan
+ * @author mitjav
  *
  */
-public class Service {
-	
-	private static Logger LOG = LoggerFactory.getLogger(Service.class);
-	
-	private String id;
-	private String slaXmlOptions;
-	private URI fileServerHost;
-	private List<String> files;
+public class ServiceTest {
 
-	public Service(String id, String slaXmlOptions, URI fileServerHost, List<String> files) {
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@Before
+	public void setUp() throws Exception {
+	}
+
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@After
+	public void tearDown() throws Exception {
+	}
+
+	/**
+	 * Test method for {@link org.societies.security.model.Service#cat(java.util.List)}.
+	 */
+	@Test
+	public void testCat() {
 		
-		this.id = id;
-		this.slaXmlOptions = slaXmlOptions;
-		this.fileServerHost = fileServerHost;
-		this.files = files;
+		String foo = "foo";
+		String bar = "bar";
+		String rnd = String.valueOf(new Random().nextInt());
+		String str = foo + Service.delimiter + bar + Service.delimiter + rnd;
 		
-		LOG.debug("Service(" + id + ", ..., " + fileServerHost + ", " + files + ")");
-	}
-	
-	/**
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
-	}
-	
-	/**
-	 * @return the slaXmlOptions
-	 */
-	public String getSlaXmlOptions() {
-		return slaXmlOptions;
+		List<String> decat = Service.decat(str);
+		assertEquals(3, decat.size(), 0.0);
+		assertEquals(str, Service.cat(decat));
+		
+		assertEquals(0, Service.decat("").size(), 0.0);
+		assertEquals(0, Service.decat(null).size(), 0.0);
 	}
 
-	/**
-	 * @return the fileServerHost
-	 */
-	public URI getFileServerHost() {
-		return fileServerHost;
-	}
-
-	/**
-	 * @return relative paths to files
-	 */
-	public List<String> getFiles() {
-		return files;
-	}
-
-	/**
-	 * @return the clientJarServer
-	 */
-//	@Deprecated
-//	public IIdentity getFileServer() {
-//		return fileServer;
-//	}
 }
