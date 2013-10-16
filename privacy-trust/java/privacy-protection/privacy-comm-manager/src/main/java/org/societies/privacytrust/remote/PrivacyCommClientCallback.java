@@ -77,12 +77,12 @@ public class PrivacyCommClientCallback implements ICommCallback {
 	 * Entry point of the Privacy Comm Manager
 	 */
 	public void initBean() {
-		LOG.info("initBean(): commMgr = {}", commManager.toString());
+		LOG.debug("initBean(): commMgr = {}", commManager.toString());
 
 		try {
 			// Register to the Societies Comm Manager
 			commManager.register(this);
-			LOG.info("initBean(): PrivacyCommClientCallback registered to the Societies Comm Manager");
+			LOG.debug("initBean(): PrivacyCommClientCallback registered to the Societies Comm Manager");
 		} catch (CommunicationException e) {
 			LOG.error("initBean(): ", e);
 		}
@@ -94,10 +94,10 @@ public class PrivacyCommClientCallback implements ICommCallback {
 	 */
 	@Override
 	public void receiveResult(Stanza stanza, Object payload) {
-		LOG.info("receiveResult({}, {})", stanza, payload);
-		LOG.info("receiveResult(): stanza.id   = {}", stanza.getId());
-		LOG.info("receiveResult(): stanza.from = {}", stanza.getFrom());
-		LOG.info("receiveResult(): stanza.to   = {}", stanza.getTo());
+		LOG.debug("receiveResult({}, {})", stanza, payload);
+		LOG.debug("receiveResult(): stanza.id   = {}", stanza.getId());
+		LOG.debug("receiveResult(): stanza.from = {}", stanza.getFrom());
+		LOG.debug("receiveResult(): stanza.to   = {}", stanza.getTo());
 
 		// -- Privacy Data Management
 		if (payload instanceof PrivacyDataManagerBeanResult) {
@@ -166,10 +166,10 @@ public class PrivacyCommClientCallback implements ICommCallback {
 	 */
 	@Override
 	public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
-		LOG.info("receiveInfo({}, {})", stanza, info);
-		LOG.info("receiveInfo(): stanza.id   = {}", stanza.getId());
-		LOG.info("receiveInfo(): stanza.from = {}", stanza.getFrom());
-		LOG.info("receiveInfo(): stanza.to   = {}", stanza.getTo());
+		LOG.debug("receiveInfo({}, {})", stanza, info);
+		LOG.debug("receiveInfo(): stanza.id   = {}", stanza.getId());
+		LOG.debug("receiveInfo(): stanza.from = {}", stanza.getFrom());
+		LOG.debug("receiveInfo(): stanza.to   = {}", stanza.getTo());
 
 		// -- Privacy Data Management
 
@@ -187,10 +187,10 @@ public class PrivacyCommClientCallback implements ICommCallback {
 	 */
 	@Override
 	public void receiveError(Stanza stanza, XMPPError info) {
-		LOG.info("receiveError({}, {})", stanza, info);
-		LOG.info("receiveError(): stanza.id   = {}", stanza.getId());
-		LOG.info("receiveError(): stanza.from = {}", stanza.getFrom());
-		LOG.info("receiveError(): stanza.to   = {}", stanza.getTo());
+		LOG.debug("receiveError({}, {})", stanza, info);
+		LOG.debug("receiveError(): stanza.id   = {}", stanza.getId());
+		LOG.debug("receiveError(): stanza.from = {}", stanza.getFrom());
+		LOG.debug("receiveError(): stanza.to   = {}", stanza.getTo());
 
 		// -- Privacy Data Management
 
@@ -209,22 +209,18 @@ public class PrivacyCommClientCallback implements ICommCallback {
 
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
-		LOG.info("[DependencyInjection] CommManager injected");
 	}
 	public void setPrivacyDataManagerCommClientCallback(
 			PrivacyDataManagerCommClientCallback privacyDataManagerCommClientCallback) {
 		this.privacyDataManagerCommClientCallback = privacyDataManagerCommClientCallback;
-		LOG.info("[DependencyInjection] PrivacyDataManagerCommClientCallback injected");
 	}
 	public void setPrivacyPolicyManagerCommClientCallback(
 			PrivacyPolicyManagerCommClientCallback privacyPolicyManagerCommClientCallback) {
 		this.privacyPolicyManagerCommClientCallback = privacyPolicyManagerCommClientCallback;
-		LOG.info("[DependencyInjection] PrivacyPolicyManagerCommClientCallback injected");
 	}
 	public void setPrivacyAgreementManagerCommClientCallback(
 			PrivacyAgreementManagerCommClientCallback privacyAgreementManagerCommClientCallback) {
 		this.privacyAgreementManagerCommClientCallback = privacyAgreementManagerCommClientCallback;
-		LOG.info("[DependencyInjection] PrivacyAgreementManagerCommClientCallback injected");
 	}
 
 	// -- Getters / Setters

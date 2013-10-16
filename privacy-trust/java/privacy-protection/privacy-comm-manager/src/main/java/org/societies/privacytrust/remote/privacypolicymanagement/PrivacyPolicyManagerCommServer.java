@@ -67,38 +67,30 @@ public class PrivacyPolicyManagerCommServer {
 
 		// -- getPrivacyPolicy
 		if (bean.getMethod().equals(MethodType.GET_PRIVACY_POLICY)) {
-			LOG.info("getQuery(): GetPrivacyPolicy remote called");
 			beanResult.setMethod(MethodType.GET_PRIVACY_POLICY);
 			ack = getPrivacyPolicy(bean, beanResult);
-			LOG.info("getQuery(): GetPrivacyPolicy remote response sending");
 		}
 
 		// -- updatePrivacyPolicy
 		else if (bean.getMethod().equals(MethodType.UPDATE_PRIVACY_POLICY)) {
-			LOG.info("getQuery(): updatePrivacyPolicy remote called");
 			beanResult.setMethod(MethodType.UPDATE_PRIVACY_POLICY);
 			ack = updatePrivacyPolicy(bean, beanResult);
-			LOG.info("getQuery(): updatePrivacyPolicy remote response sending");
 		}
 		
 		// -- deletePrivacyPolicy
 		else if (bean.getMethod().equals(MethodType.DELETE_PRIVACY_POLICY)) {
-			LOG.info("getQuery(): deletePrivacyPolicy remote called");
 			beanResult.setMethod(MethodType.DELETE_PRIVACY_POLICY);
 			ack = deletePrivacyPolicy(bean, beanResult);
-			LOG.info("getQuery(): deletePrivacyPolicy remote response sending");
 		}
 		
 		// -- inferPrivacyPolicy
 		else if (bean.getMethod().equals(MethodType.INFER_PRIVACY_POLICY)) {
-			LOG.info("getQuery(): inferPrivacyPolicy remote called");
 			beanResult.setMethod(MethodType.INFER_PRIVACY_POLICY);
 			ack = inferPrivacyPolicy(bean, beanResult);
-			LOG.info("getQuery(): inferPrivacyPolicy remote response sending");
 		}
 		
 		else {
-			LOG.info("getQuery(): Unknown method "+bean.getMethod().name());
+			LOG.error("getQuery(): Unknown method "+bean.getMethod().name());
 			beanResult.setAckMessage("Error Unknown method "+bean.getMethod().name());
 		}
 
@@ -174,10 +166,8 @@ public class PrivacyPolicyManagerCommServer {
 
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
-		LOG.info("[DepencyInjection] CommManager injected");
 	}
 	public void setPrivacyPolicyManager(IPrivacyPolicyManager privacyPolicyManager) {
 		this.privacyPolicyManager = privacyPolicyManager;
-		LOG.info("[DepencyInjection] IPrivacyPolicyManager injected");
 	}
 }

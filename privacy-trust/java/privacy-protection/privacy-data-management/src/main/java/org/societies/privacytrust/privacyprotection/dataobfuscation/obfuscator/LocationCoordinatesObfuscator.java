@@ -314,7 +314,7 @@ public class LocationCoordinatesObfuscator extends DataObfuscator<LocationCoordi
 		// -- Enlarge
 		middleObfuscatedLocationCoordinates = EObfuscation(geolocation, middleObfuscationLevel);
 		middleObfuscatedLocationCoordinates.setObfuscationLevel(middleObfuscationLevel);
-		LOG.debug(middleObfuscatedLocationCoordinates.toJSONString()+",");
+//		LOG.debug(middleObfuscatedLocationCoordinates.toJSONString()+",");
 
 		// -- Shift
 		/* Solve the following system
@@ -367,7 +367,7 @@ public class LocationCoordinatesObfuscator extends DataObfuscator<LocationCoordi
 		// -- Shift
 		middleObfuscatedLocationCoordinates = SObfuscation(geolocation, middleObfuscationLevel, theta);
 		middleObfuscatedLocationCoordinates.setObfuscationLevel(middleObfuscationLevel);
-		LOG.debug(middleObfuscatedLocationCoordinates.toJSONString()+",");
+//		LOG.debug(middleObfuscatedLocationCoordinates.toJSONString()+",");
 
 		// -- Enlarge
 		/* Solve the following system
@@ -414,7 +414,7 @@ public class LocationCoordinatesObfuscator extends DataObfuscator<LocationCoordi
 		// -- Shift
 		middleObfuscatedLocationCoordinates = SObfuscation(geolocation, middleObfuscationLevel, theta);
 		middleObfuscatedLocationCoordinates.setObfuscationLevel(middleObfuscationLevel);
-		LOG.debug(middleObfuscatedLocationCoordinates.toJSONString()+",");
+//		LOG.debug(middleObfuscatedLocationCoordinates.toJSONString()+",");
 
 		// -- Reduce
 		/* Solve the following system

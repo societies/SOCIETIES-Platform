@@ -64,14 +64,12 @@ public class PrivacyAgreementManagerCommServer {
 
 		// -- getPrivacyAgreement
 		if (bean.getMethod().equals(MethodType.GET_PRIVACY_AGREEMENT)) {
-			LOG.info("getQuery(): GetPrivacyAgreement remote called");
 			beanResult.setMethod(MethodType.GET_PRIVACY_AGREEMENT);
 			ack = getPrivacyAgreement(bean, beanResult);
-			LOG.info("getQuery(): GetPrivacyAgreement remote response sending");
 		}
 		
 		else {
-			LOG.info("getQuery(): Unknown method "+bean.getMethod().name());
+			LOG.error("getQuery(): Unknown method "+bean.getMethod().name());
 			beanResult.setAckMessage("Error Unknown method "+bean.getMethod().name());
 		}
 
@@ -100,10 +98,8 @@ public class PrivacyAgreementManagerCommServer {
 
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
-		LOG.info("[DepencyInjection] CommManager injected");
 	}
 	public void setPrivacyAgreementManager(IPrivacyAgreementManager privacyAgreementManager) {
 		this.privacyAgreementManager = privacyAgreementManager;
-		LOG.info("[DepencyInjection] IPrivacyAgreementManager injected");
 	}
 }

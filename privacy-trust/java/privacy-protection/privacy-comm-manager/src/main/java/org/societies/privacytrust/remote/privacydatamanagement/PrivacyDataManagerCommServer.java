@@ -78,7 +78,7 @@ public class PrivacyDataManagerCommServer {
 			ack = obfuscateData(bean, beanResult);
 		}
 		else {
-			LOG.info("getQuery(): Unknown method "+bean.getMethod().name());
+			LOG.error("getQuery(): Unknown method "+bean.getMethod().name());
 			beanResult.setAckMessage("Error Unknown method "+bean.getMethod().name());
 		}
 
@@ -139,10 +139,8 @@ public class PrivacyDataManagerCommServer {
 
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
-		LOG.info("[DepencyInjection] CommManager injected");
 	}
 	public void setPrivacyDataManager(IPrivacyDataManager privacyDataManager) {
 		this.privacyDataManager = privacyDataManager;
-		LOG.info("[DepencyInjection] PrivacyDataManager injected");
 	}
 }
