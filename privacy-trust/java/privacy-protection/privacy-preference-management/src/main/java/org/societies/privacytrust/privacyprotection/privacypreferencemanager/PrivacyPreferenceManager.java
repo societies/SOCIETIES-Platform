@@ -140,7 +140,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 
 	public AccessControlPreferenceManager getAccessControlPreferenceManager(){
 		if (this.accCtrlMgr==null){
-			accCtrlMgr = new AccessControlPreferenceManager(prefCache, contextCache, userFeedback, trustBroker, ctxBroker, getAgreementMgr(), idm, dobfPreferenceCreator);
+			accCtrlMgr = new AccessControlPreferenceManager(prefCache, contextCache, userFeedback, trustBroker, ctxBroker, getAgreementMgr(), idm, dobfPreferenceCreator, privacyDataManagerInternal);
 		}
 		return accCtrlMgr;
 	}
