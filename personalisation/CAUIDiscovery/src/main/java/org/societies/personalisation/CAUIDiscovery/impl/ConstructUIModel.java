@@ -56,7 +56,7 @@ public class ConstructUIModel {
 
 	public UserIntentModelData constructNewModel(LinkedHashMap<List<String>,HashMap<String,Double>> transDictionaryAll, HashMap<String,List<String>> ctxActionsMap, Map<String , ServiceResourceIdentifier> sriMap){
 
-		LOG.debug("constructNewModel ... cauiTaskManager "+cauiTaskManager);
+		if (LOG.isDebugEnabled())LOG.debug("constructNewModel ... cauiTaskManager "+cauiTaskManager);
 		UserIntentModelData modelData = cauiTaskManager.createModel();
 		
 		//create all actions and assign context
@@ -76,12 +76,12 @@ public class ConstructUIModel {
 			}
 			
 			IUserIntentAction userAction = cauiTaskManager.createAction(sri,action[3],action[1],action[2]);
-			LOG.debug("userAction created "+userAction);
-			LOG.debug("userAction service id "+userAction.getServiceID());
-			LOG.debug("userAction service instance id "+userAction.getServiceID().getServiceInstanceIdentifier());
-			LOG.debug("userAction service id "+userAction.getServiceID().getIdentifier());
+			//LOG.debug("userAction created "+userAction);
+			//LOG.debug("userAction service id "+userAction.getServiceID());
+			//LOG.debug("userAction service instance id "+userAction.getServiceID().getServiceInstanceIdentifier());
+			//LOG.debug("userAction service id "+userAction.getServiceID().getIdentifier());
 			
-			LOG.debug("userAction ctxActionsMap"+ctxActionsMap);
+			//LOG.debug("userAction ctxActionsMap"+ctxActionsMap);
 			
 			if(ctxActionsMap.get(actionTemp)!=null){
 				List<String> contexValuesStringList = ctxActionsMap.get(actionTemp);
@@ -96,7 +96,6 @@ public class ConstructUIModel {
 						// if value is hod , store it as integer
 						if(contextType.equals(CtxAttributeTypes.HOUR_OF_DAY)){
 							Integer hodIntValue = Integer.parseInt(contextValue);
-							LOG.debug("escorting action context ... parsing to integer :"+hodIntValue);
 							context.put(contextType, hodIntValue);
 						}else context.put(contextType, contextValue);
 					}

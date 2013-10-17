@@ -53,8 +53,8 @@ public class CACICommunityMembershipChangeMonitor implements CtxChangeEventListe
 		}
 
 		CtxAssociationIdentifier isMemberCISsID = isMemberOfCISsSet.iterator().next();
-		if (LOG.isInfoEnabled())
-			LOG.info("Registering for context changes related to CSS is_member_of association '"
+		if (LOG.isDebugEnabled())
+			LOG.debug("Registering for context changes related to CSS is_member_of association '"
 					+ ownerId + "'");
 		ctxBroker.registerForChanges(this, isMemberCISsID);
 
@@ -91,7 +91,7 @@ public class CACICommunityMembershipChangeMonitor implements CtxChangeEventListe
 	@Override
 	public void onModification(CtxChangeEvent event) {
 		if (CtxAssociationTypes.IS_MEMBER_OF.equals(event.getId().getType())) // TODO change OWNS_COMMUNITIES
-			LOG.info("joined cis event received : event.getId(): "+ event.getId() + " --- event.getSource():"+ event.getSource());
+			if (LOG.isDebugEnabled()) LOG.debug("joined cis event received : event.getId(): "+ event.getId() + " --- event.getSource():"+ event.getSource());
 			this.executorService.execute(new CssJoinedCommunityHandler(event.getId()));
 
 	}
@@ -120,86 +120,6 @@ public class CACICommunityMembershipChangeMonitor implements CtxChangeEventListe
 		}
 	}
 
-	//end of constructor
-	/*
-	private void registerMembershipChanges(IIdentity cisId) {
-
-		CtxEntityIdentifier communityEntId;
-
-		try {
-			communityEntId = ctxBroker.retrieveCommunityEntityId(new Requestor(ownerId),cisId).get();
-			final CommunityCtxEntity communityEnt = (CommunityCtxEntity) ctxBroker.retrieve(communityEntId).get();
-
-			if (communityEnt == null) {
-				LOG.error("Failed to register for membership changes of CIS '" + communityEntId.getOwnerId()
-						+ "': Community context entity is null");
-				return;
-			}
-
-			CtxAssociationIdentifier hasMembersId = communityEnt.getAssociations(CtxAssociationTypes.HAS_MEMBERS).iterator().next();
-
-			if (LOG.isInfoEnabled())
-				LOG.info("Registering for membership changes of CIS '" + communityEntId.getOwnerId() + "'");
-
-			ctxBroker.registerForChanges(new CommunityHasMembersListener(communityEntId), hasMembersId);
-
-
-		} catch (Exception e) {
-			// TODO: handle exception
-			LOG.error("Could not register for membership changes for community: "+ cisId +" "+ e.getLocalizedMessage(),e);
-		}
-
-	}
-
-
-	private class CommunityHasMembersListener implements CtxChangeEventListener {
-		private final CtxEntityIdentifier communityId;
-
-		private CommunityHasMembersListener(final CtxEntityIdentifier communityId) {
-
-			this.communityId = communityId;
-		}
-
-
-		@Override
-		public void onCreation(CtxChangeEvent event) {
-			if (LOG.isDebugEnabled())
-				LOG.debug("Received CREATED event " + event);			
-		}
-
-		@Override
-		public void onUpdate(CtxChangeEvent event) {
-			if (LOG.isDebugEnabled())
-				LOG.debug("Received UPDATED event " + event);			
-		}
-
-		@Override
-		public void onModification(CtxChangeEvent event) {
-			if (LOG.isDebugEnabled())
-				LOG.debug("Received MODIFIED event " + event);
-
-			if (event.getId() == null) {
-				LOG.error("Could not handle MODIFIED event " + event
-						+ ": event.getId can't be null");
-				return;
-			}
-			executorService.execute(new CommunityHasMembersHandler(communityId));
-		}
-
-		@Override
-		public void onRemoval(CtxChangeEvent event) {
-			if (LOG.isDebugEnabled())
-				LOG.debug("Received REMOVED event " + event);			
-		}
-
-	}
-
-
-
-*/
-	
-
-		
 	
 	private class CommunityHasMembersHandler implements Runnable {
 		private final CtxEntityIdentifier communityEntId;
