@@ -29,8 +29,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+
+import javax.swing.JOptionPane;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +41,8 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -49,6 +54,7 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.preferen
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.api.util.PrivacyPreferenceUtils;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.CtxTypes;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager;
 
 /**
  * @author Elizabeth
@@ -59,20 +65,29 @@ public class PreferenceRetriever {
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private ICtxBroker ctxBroker;
 	private final IIdentityManager idMgr; 
+	private IIdentity userIdentity;
 
-	public PreferenceRetriever(ICtxBroker ctxBroker, IIdentityManager idMgr){
-		this.ctxBroker = ctxBroker;
-		this.idMgr = idMgr;
+	public PreferenceRetriever(PrivacyPreferenceManager privPrefMgr){
+		this.ctxBroker = privPrefMgr.getCtxBroker();
+		this.idMgr = privPrefMgr.getIdm();
+		this.userIdentity = privPrefMgr.getUserIdentity();
 	}
 	
 	public Registry retrieveRegistry(){
 		try {
-			Future<List<CtxIdentifier>> futureAttrList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxTypes.PRIVACY_PREFERENCE_REGISTRY); 
-			List<CtxIdentifier> attrList = futureAttrList.get();
-			if (null!=attrList){
+			
+			JOptionPane.showMessageDialog(null, userIdentity==null);
+			IndividualCtxEntity individualCtxEntity = ctxBroker.retrieveIndividualEntity(userIdentity).get();
+			
+			Set<CtxAttribute> attrList = individualCtxEntity.getAttributes(CtxTypes.PRIVACY_PREFERENCE_REGISTRY);
+			
+			
+/*			Future<List<CtxIdentifier>> futureAttrList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxTypes.PRIVACY_PREFERENCE_REGISTRY); 
+			List<CtxIdentifier> attrList = futureAttrList.get();*/
+			
 				if (attrList.size()>0){
-					CtxIdentifier identifier = attrList.get(0);
-					CtxAttribute attr = (CtxAttribute) ctxBroker.retrieve(identifier).get();
+					CtxAttribute attr = attrList.iterator().next();
+					
 					Object obj = this.convertToObject(attr.getBinaryValue());
 					
 					if (obj==null){
@@ -91,9 +106,7 @@ public class PreferenceRetriever {
 				}
 				this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
 				return new Registry();
-			}
-			this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
-			return new Registry();
+			
 		} catch (CtxException e) {
 			this.logging.debug("Exception while loading PreferenceRegistry from DB ");
 			e.printStackTrace();

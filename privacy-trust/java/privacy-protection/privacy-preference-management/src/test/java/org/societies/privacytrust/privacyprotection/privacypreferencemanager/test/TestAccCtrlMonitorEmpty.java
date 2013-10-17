@@ -27,6 +27,8 @@ package org.societies.privacytrust.privacyprotection.privacypreferencemanager.te
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,6 +49,7 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxOriginType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.RequestorCis;
@@ -90,6 +93,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
  */
 public class TestAccCtrlMonitorEmpty {
 
+	private final MyIdentity userId = new MyIdentity(IdentityType.CSS, "xcmanager","societies.local");
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private ICommManager commsMgr = Mockito.mock(ICommManager.class);
 	private IIdentityManager idMgr = Mockito.mock(IIdentityManager.class);
@@ -109,44 +113,28 @@ public class TestAccCtrlMonitorEmpty {
 	private RequestorCisBean requestorCisBean;
 	private RequestPolicy requestPolicy;
 	private ArrayList<ResponseItem> responseItems;
-	private MyIdentity userId;
+	
 	private CtxEntity userCtxEntity;
 	private CtxAttribute locationAttribute;
 	
 	@Before
 	public void setup(){
+		
+
 		this.privPrefMgr  = new PrivacyPreferenceManager();
-		this.privPrefMgr.setCommsMgr(commsMgr);
-		this.privPrefMgr.setIdMgr(idMgr);
-		this.privPrefMgr.setCtxBroker(ctxBroker);
-		this.privPrefMgr.setprivacyDataManagerInternal(privacyDataManagerInternal);
-		this.privPrefMgr.setTrustBroker(trustBroker);
-		this.privPrefMgr.setUserFeedback(userFeedback);
-		this.privPrefMgr.setAgreementMgr(agreementMgr);
-		this.privPrefMgr.setEventMgr(eventManager);
 		this.setupRequestor();
 		this.setupPolicyDetails();
 		this.setupPolicy();
 		this.setupEnvelope();
 		this.setupContext();
-		this.mockCalls();
-		privPrefMgr.initialisePrivacyPreferenceManager();
-		accCtrlMonitor = privPrefMgr.getAccCtrlMonitor();
-
-	}
-	
-	
-
-	
-
-
-	private void mockCalls() {
 		try {
 			/**
 			 * identity
 			 */
+			Mockito.when(idMgr.getThisNetworkNode()).thenReturn((INetworkNode) userId);
 			Mockito.when(this.commsMgr.getIdManager()).thenReturn(this.idMgr);
-			Mockito.when(this.privPrefMgr.getCommsMgr().getIdManager()).thenReturn(this.idMgr);
+			Mockito.when(this.idMgr.getThisNetworkNode()).thenReturn(userId);
+			//Mockito.when(this.privPrefMgr.getCommsMgr().getIdManager()).thenReturn(this.idMgr);
 			Mockito.when(this.idMgr.fromJid(this.requestorCisBean.getRequestorId())).thenReturn(this.requestorCis.getRequestorId());
 			Mockito.when(this.idMgr.fromJid(this.requestorCisBean.getCisRequestorId())).thenReturn(this.requestorCis.getCisRequestorId());
 			
@@ -162,10 +150,19 @@ public class TestAccCtrlMonitorEmpty {
 			e.printStackTrace();
 		}
 		
-		
+		this.privPrefMgr.setCommsMgr(commsMgr);
+		this.privPrefMgr.setUserIdentity(userId);
+		this.privPrefMgr.setCtxBroker(ctxBroker);
+		this.privPrefMgr.setprivacyDataManagerInternal(privacyDataManagerInternal);
+		this.privPrefMgr.setTrustBroker(trustBroker);
+		this.privPrefMgr.setUserFeedback(userFeedback);
+		this.privPrefMgr.setAgreementMgr(agreementMgr);
+		this.privPrefMgr.setEventMgr(eventManager);
+		JOptionPane.showMessageDialog(null, "FFFF" + userId);
+		privPrefMgr.initialisePrivacyPreferenceManager();
+		accCtrlMonitor = privPrefMgr.getAccCtrlMonitor();
+
 	}
-
-
 
 
 
@@ -321,7 +318,7 @@ public class TestAccCtrlMonitorEmpty {
 	}
 	
 	private void setupContext() {
-		this.userId = new MyIdentity(IdentityType.CSS, "xcmanager","societies.local");
+		
 		CtxEntityIdentifier ctxId = new CtxEntityIdentifier(userId.getJid(), "Person", new Long(1));
 		this.userCtxEntity = new CtxEntity(ctxId);
 		CtxAttributeIdentifier id = new CtxAttributeIdentifier(userCtxEntity.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC, new Long(1));

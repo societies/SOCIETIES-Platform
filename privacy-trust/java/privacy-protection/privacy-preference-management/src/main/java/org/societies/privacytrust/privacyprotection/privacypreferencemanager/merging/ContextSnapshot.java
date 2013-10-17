@@ -28,9 +28,14 @@ package org.societies.privacytrust.privacyprotection.privacypreferencemanager.me
 import java.util.ArrayList;
 import java.util.List;
 
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ContextPreferenceCondition;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyPreference;
+import org.societies.privacytrust.privacyprotection.api.model.privacypreference.constants.OperatorConstants;
+
 public class ContextSnapshot {
 
-	List<SingleContextAttributeSnapshot> snapshot;
+	private List<SingleContextAttributeSnapshot> snapshot;
 	
 	public ContextSnapshot(){
 		snapshot = new ArrayList<SingleContextAttributeSnapshot>();
@@ -109,5 +114,14 @@ public class ContextSnapshot {
 			}
 		}
 		return matches;
+	}
+	
+	public static PrivacyPreference getPreference(SingleContextAttributeSnapshot snapshot){
+		CtxAttributeIdentifier id = snapshot.getId();
+		String value = snapshot.getValue();
+		
+		ContextPreferenceCondition condition = new ContextPreferenceCondition(id, OperatorConstants.EQUALS, value);
+		return new PrivacyPreference(condition);
+		
 	}
 }

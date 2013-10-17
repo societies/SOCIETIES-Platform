@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -111,6 +112,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	private AccessControlPreferenceCreator accCtrlPreferenceCreator;
 	private AccCtrlMonitor accCtrlMonitor;
 	private DObfPreferenceCreator dobfPreferenceCreator;
+	private IIdentity userIdentity;
 
 	public PrivacyPreferenceManager(){
 
@@ -121,13 +123,13 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		this.ctxBroker = ctxBroker;
 		this.trustBroker = trustBroker;
 		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, privacyDataManagerInternal, commsMgr);
-		prefCache = new PrivatePreferenceCache(ctxBroker, this.idm);
+		prefCache = new PrivatePreferenceCache(this);
 		contextCache = new PrivateContextCache(ctxBroker);
 
 	}
 
 	public void initialisePrivacyPreferenceManager(){
-		prefCache = new PrivatePreferenceCache(ctxBroker, this.idm);
+		prefCache = new PrivatePreferenceCache(this);
 		contextCache = new PrivateContextCache(ctxBroker);
 		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, this.privacyDataManagerInternal, commsMgr);
 		contextCache = new PrivateContextCache(ctxBroker);
@@ -140,7 +142,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 
 	public AccessControlPreferenceManager getAccessControlPreferenceManager(){
 		if (this.accCtrlMgr==null){
-			accCtrlMgr = new AccessControlPreferenceManager(prefCache, contextCache, userFeedback, trustBroker, ctxBroker, getAgreementMgr(), idm, dobfPreferenceCreator, privacyDataManagerInternal);
+			accCtrlMgr = new AccessControlPreferenceManager(prefCache, contextCache, dobfPreferenceCreator, this);
 		}
 		return accCtrlMgr;
 	}
@@ -509,6 +511,8 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	public void setCommsMgr(ICommManager commsMgr) {
 		this.commsMgr = commsMgr;
 		this.idm = commsMgr.getIdManager();
+		this.userIdentity = this.idm.getThisNetworkNode();
+		JOptionPane.showMessageDialog(null, this.userIdentity);
 	}
 
 	public void setIdMgr(IIdentityManager identityManager){
@@ -562,6 +566,19 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 
 	public AccessControlPreferenceCreator getAccCtrlPreferenceCreator() {
 		return accCtrlPreferenceCreator;
+	}
+
+
+	public IIdentity getUserIdentity() {
+		if (this.userIdentity==null){
+			return this.getIdm().getThisNetworkNode();
+		}
+		return userIdentity;
+	}
+
+
+	public void setUserIdentity(IIdentity userIdentity) {
+		this.userIdentity = userIdentity;
 	}
 
 

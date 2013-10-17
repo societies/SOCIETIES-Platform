@@ -48,6 +48,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ids.IDSPrivacyPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.ppn.PPNPrivacyPreferenceTreeModel;
 import org.societies.privacytrust.privacyprotection.api.util.PrivacyPreferenceUtils;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager;
 
 public class PrivatePreferenceCache {
 
@@ -65,18 +66,19 @@ public class PrivatePreferenceCache {
 	//the key refers to the ctxID of the (accCtrl) preference attribute (not the affected context attribute)
 	private Hashtable<CtxAttributeIdentifier, AccessControlPreferenceTreeModel> accCtrlCtxIDtoModel;
 
-	private IIdentityManager idMgr;
+	private PrivacyPreferenceManager privPrefMgr;
+	
 
 
-
-	public PrivatePreferenceCache(ICtxBroker broker, IIdentityManager idMgr){
-		this.idMgr = idMgr;
+	public PrivatePreferenceCache(PrivacyPreferenceManager privPrefMgr){
+		this.privPrefMgr = privPrefMgr;
+		
 		this.ppnCtxIDtoModel = new Hashtable<CtxAttributeIdentifier,PPNPrivacyPreferenceTreeModel>();
 		this.idsCtxIDtoModel = new Hashtable<CtxAttributeIdentifier, IDSPrivacyPreferenceTreeModel>();
 		this.dobfCtxIDtoModel = new Hashtable<CtxAttributeIdentifier, DObfPreferenceTreeModel>();
 		this.accCtrlCtxIDtoModel = new Hashtable<CtxAttributeIdentifier, AccessControlPreferenceTreeModel>();
-		this.retriever = new PreferenceRetriever(broker, this.idMgr);
-		this.storer = new PreferenceStorer(broker, idMgr);
+		this.retriever = new PreferenceRetriever(privPrefMgr);
+		this.storer = new PreferenceStorer(privPrefMgr);
 		this.registry = retriever.retrieveRegistry();
 
 	}

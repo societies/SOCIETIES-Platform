@@ -148,7 +148,7 @@ public class TestAccCtrlMonitor {
 	private RequestorCisBean requestorCisBean;
 	private RequestPolicy requestPolicy;
 	private ArrayList<ResponseItem> responseItems;
-	private MyIdentity userId;
+	private final MyIdentity userId = new MyIdentity(IdentityType.CSS, "xcmanager","societies.local");
 	private CtxEntity userCtxEntity;
 	private CtxAttribute locationAttribute;
 	private CtxAttribute nameAttribute;
@@ -174,8 +174,12 @@ public class TestAccCtrlMonitor {
 		results.put("home", Decision.PERMIT);
 		results.put("work", Decision.DENY);
 		this.privPrefMgr  = new PrivacyPreferenceManager();
+		Mockito.when(idMgr.getThisNetworkNode()).thenReturn((INetworkNode) userId);
+		Mockito.when(this.commsMgr.getIdManager()).thenReturn(this.idMgr);
+		Mockito.when(this.idMgr.getThisNetworkNode()).thenReturn(userId);
 		this.privPrefMgr.setCommsMgr(commsMgr);
-		this.privPrefMgr.setIdMgr(idMgr);
+		this.privPrefMgr.setUserIdentity(userId);
+		//this.privPrefMgr.setIdMgr(idMgr);
 		this.privPrefMgr.setCtxBroker(ctxBroker);
 		privacyDataManagerInternal = new IPrivacyDataManagerInternalMock();
 		this.privPrefMgr.setprivacyDataManagerInternal(privacyDataManagerInternal);
@@ -206,15 +210,18 @@ public class TestAccCtrlMonitor {
 			/**
 			 * identity
 			 */
-			Mockito.when(this.commsMgr.getIdManager()).thenReturn(this.idMgr);
+			
+			
 			Mockito.when(this.privPrefMgr.getCommsMgr().getIdManager()).thenReturn(this.idMgr);
 			Mockito.when(this.idMgr.fromJid(this.requestorCisBean.getRequestorId())).thenReturn(this.requestorCis.getRequestorId());
 			Mockito.when(this.idMgr.fromJid(this.requestorCisBean.getCisRequestorId())).thenReturn(this.requestorCis.getCisRequestorId());
-			Mockito.when(idMgr.getThisNetworkNode()).thenReturn((INetworkNode) userId);
+			
+			
 			/**
 			 * context
 			 */
-			Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxTypes.PRIVACY_PREFERENCE_REGISTRY)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
+			
+			//Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxTypes.PRIVACY_PREFERENCE_REGISTRY)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
 			List<CtxIdentifier> preferenceEntityList = new ArrayList<CtxIdentifier>();
 			preferenceEntityList.add(this.privacyPreferenceEntity.getId());
 			Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, CtxTypes.PRIVACY_PREFERENCE)).thenReturn(new AsyncResult<List<CtxIdentifier>>(preferenceEntityList));
@@ -523,7 +530,7 @@ public class TestAccCtrlMonitor {
 		return data;
 	}
 	private void setupContext() {
-		this.userId = new MyIdentity(IdentityType.CSS, "xcmanager","societies.local");
+		
 		CtxEntityIdentifier ctxId = new CtxEntityIdentifier(userId.getJid(), "Person", new Long(1));
 		this.userCtxEntity = new CtxEntity(ctxId);
 		CtxAttributeIdentifier id = new CtxAttributeIdentifier(userCtxEntity.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC, new Long(1));

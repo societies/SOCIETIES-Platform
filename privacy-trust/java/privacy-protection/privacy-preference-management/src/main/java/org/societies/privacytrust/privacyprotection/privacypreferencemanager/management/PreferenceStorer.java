@@ -28,8 +28,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+
+import javax.swing.JOptionPane;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +44,7 @@ import org.societies.api.context.model.CtxEntity;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
+import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
@@ -49,6 +53,7 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.preferen
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.RegistryBean;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.CtxTypes;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager;
 
 
 
@@ -60,12 +65,12 @@ public class PreferenceStorer {
 
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private final ICtxBroker ctxBroker;
-	private final IIdentityManager idMgr;
+	private IIdentity userId;
 
 
-	public PreferenceStorer(ICtxBroker broker, IIdentityManager idMgr){
-		this.ctxBroker = broker;
-		this.idMgr = idMgr;	
+	public PreferenceStorer(PrivacyPreferenceManager privPrefMgr){
+		this.ctxBroker = privPrefMgr.getCtxBroker();
+		this.userId = privPrefMgr.getUserIdentity();
 	}
 
 
@@ -218,7 +223,7 @@ public class PreferenceStorer {
 				CtxAssociation assoc = null;
 				if (assocCtxIDs.size()==0){
 					//Has_Preferences association doesn't exist for this identity, so we're going to check if the Person Entity exists and create the association
-					IIdentity userId = this.idMgr.getThisNetworkNode();
+					
 					CtxEntity person = ctxBroker.retrieveIndividualEntity(userId).get();
 
 
@@ -314,12 +319,18 @@ public class PreferenceStorer {
 
 	public void storeRegistry(Registry registry) throws PrivacyException{
 		try {
-			List<CtxIdentifier> attrList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxTypes.PRIVACY_PREFERENCE_REGISTRY).get();
-
-			if (attrList.size()>0){
-				CtxIdentifier identifier = attrList.get(0);
-				CtxAttribute attr = (CtxAttribute) ctxBroker.retrieve(identifier).get();
-
+			
+			JOptionPane.showMessageDialog(null, userId==null);
+			IndividualCtxEntity individualCtxEntity = ctxBroker.retrieveIndividualEntity(userId).get();
+			
+			Set<CtxAttribute> attrList = individualCtxEntity.getAttributes(CtxTypes.PRIVACY_PREFERENCE_REGISTRY);
+			
+			
+/*			Future<List<CtxIdentifier>> futureAttrList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxTypes.PRIVACY_PREFERENCE_REGISTRY); 
+			List<CtxIdentifier> attrList = futureAttrList.get();*/
+			
+				if (attrList.size()>0){
+					CtxAttribute attr = attrList.iterator().next();
 				RegistryBean bean = registry.toRegistryBean();
 				attr = ctxBroker.updateAttribute(attr.getId(), SerialisationHelper.serialise(bean)).get();
 				if (null==attr){
@@ -339,7 +350,7 @@ public class PreferenceStorer {
 					}
 
 					Future<CtxModelObject> futurePerson = ctxBroker.retrieve(personCtxIDs.get(0));*/
-				IIdentity userId = this.idMgr.getThisNetworkNode();
+				
 				CtxEntity person = ctxBroker.retrieveIndividualEntity(userId).get();
 
 				if (person==null){
@@ -348,15 +359,16 @@ public class PreferenceStorer {
 				}
 
 				CtxAttribute attr = ctxBroker.createAttribute(person.getId(), CtxTypes.PRIVACY_PREFERENCE_REGISTRY).get();
-				RegistryBean bean = registry.toRegistryBean();
-				attr.setBinaryValue(SerialisationHelper.serialise(bean));
-				ctxBroker.update(attr);
+
 
 
 				if (null==attr){
 					this.logging.debug("Preference Registry not updated.");
 					throw new PrivacyException("Unable to update privacy registry");
 				}else{
+					RegistryBean bean = registry.toRegistryBean();
+					attr.setBinaryValue(SerialisationHelper.serialise(bean));
+					ctxBroker.update(attr);
 					this.logging.debug("Successfully updated preference registry for private DPI");
 				}
 			}

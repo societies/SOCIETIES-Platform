@@ -80,6 +80,7 @@ import org.societies.privacytrust.privacyprotection.privacypreferencemanager.eva
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PrivateContextCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.management.PrivatePreferenceCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging.DObfPreferenceCreator;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging.PrivacyPreferenceMerger;
 
 /**
  * @author Eliza
@@ -97,23 +98,24 @@ public class AccessControlPreferenceManager {
 	private final IIdentityManager idMgr;
 	private final DObfPreferenceCreator dobfPrefCreator;
 	private IPrivacyDataManagerInternal privacyDataManagerInternal;
-	
-	public AccessControlPreferenceManager(PrivatePreferenceCache prefCache, PrivateContextCache contextCache, IUserFeedback userFeedback, ITrustBroker trustBroker, ICtxBroker ctxBroker, IPrivacyAgreementManager agreementMgr, IIdentityManager idMgr, DObfPreferenceCreator dobfPrefCreator, IPrivacyDataManagerInternal privacyDataManagerInternal){
+	private PrivacyPreferenceManager privPrefMgr;
+
+	public AccessControlPreferenceManager(PrivatePreferenceCache prefCache, PrivateContextCache contextCache, DObfPreferenceCreator dobfPrefCreator, PrivacyPreferenceManager privPrefMgr){
 		this.prefCache = prefCache;
 		this.contextCache = contextCache;
-		this.userFeedback = userFeedback;
-		this.trustBroker = trustBroker;
-		this.ctxBroker = ctxBroker;
-		this.agreementMgr = agreementMgr;
-		this.idMgr = idMgr;
+		this.userFeedback = privPrefMgr.getUserFeedback();
+		this.trustBroker = privPrefMgr.getTrustBroker();
+		this.ctxBroker = privPrefMgr.getCtxBroker();
+		this.agreementMgr = privPrefMgr.getAgreementMgr();
+		this.idMgr = privPrefMgr.getIdm();
 		this.dobfPrefCreator = dobfPrefCreator;
-		this.privacyDataManagerInternal = privacyDataManagerInternal;
-		
+		this.privacyDataManagerInternal = privPrefMgr.getprivacyDataManagerInternal();
+
 
 	}
 
 
-/*	private ResponseItem checkPreferenceForAccessControl(AccessControlPreferenceDetailsBean details, IPrivacyPreferenceTreeModel model, List<Condition> conditions) throws MalformedCtxIdentifierException{
+	/*	private ResponseItem checkPreferenceForAccessControl(AccessControlPreferenceDetailsBean details, IPrivacyPreferenceTreeModel model, List<Condition> conditions) throws MalformedCtxIdentifierException{
 		RequestorBean requestor = details.getRequestor();
 		DataIdentifier dataId = DataIdentifierFactory.fromUri(details.getResource().getDataIdUri());
 		Action action = details.getAction();
@@ -194,7 +196,7 @@ public class AccessControlPreferenceManager {
 			this.logging.debug("requested permission without specifying data identifiers!");
 			throw new PrivacyException("requested permission without specifying data identifiers!");
 		}
-		
+
 		List<String> dataTypes = new ArrayList<String>();
 		for (DataIdentifier dataId : dataIds){
 			dataTypes.add(dataId.getType());
@@ -221,7 +223,7 @@ public class AccessControlPreferenceManager {
 		 * retrieve agreed conditions from agreement.
 		 */
 		try {
-			
+
 			AgreementEnvelope agreementEnv = this.agreementMgr.getAgreement(RequestorUtils.toRequestor(requestor, this.idMgr));
 			if (agreementEnv!=null){
 				IAgreement agreement = agreementEnv.getAgreement();
@@ -238,12 +240,12 @@ public class AccessControlPreferenceManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
-		
+
 		List<DataIdentifier> preferencesExist = new ArrayList<DataIdentifier>();
 		List<AccessControlResponseItem> preferencesDoNotExist = new ArrayList<AccessControlResponseItem>();
-		
+
 		for (DataIdentifier dataId : dataIds){
 			AccessControlPreferenceDetailsBean details = new AccessControlPreferenceDetailsBean();
 			details.setAction(action);
@@ -254,7 +256,7 @@ public class AccessControlPreferenceManager {
 			List<Condition> conditionsListForSingleItem = getConditionsHelperMethod(dataId, conditions.keys());
 			ResponseItem evaluateAccCtrlPreference = this.evaluateAccCtrlPreference(details, conditionsListForSingleItem);
 			if (evaluateAccCtrlPreference==null){
-				
+
 				AccessControlResponseItem respItem = new AccessControlResponseItem();
 				RequestItem reqItem = new RequestItem();
 				reqItem.setConditions(conditionsListForSingleItem);
@@ -272,7 +274,7 @@ public class AccessControlPreferenceManager {
 				permissions.add(evaluateAccCtrlPreference);
 			}
 		}
-		
+
 		try {
 			List<AccessControlResponseItem> list = this.userFeedback.getAccessControlFB(RequestorUtils.toRequestor(requestor, idMgr), preferencesDoNotExist).get();
 			for (AccessControlResponseItem item: list){
@@ -312,7 +314,7 @@ public class AccessControlPreferenceManager {
 		}
 		return new ArrayList<Condition>();
 	}
-	
+
 	/*
 	 * OK
 	 */
@@ -362,25 +364,25 @@ public class AccessControlPreferenceManager {
 		ResponseItem evaluateAccCtrlPreference = this.evaluateAccCtrlPreference(details, conditions);
 
 		if (evaluateAccCtrlPreference==null){			
-				AccessControlResponseItem responseItem = new AccessControlResponseItem();
+			AccessControlResponseItem responseItem = new AccessControlResponseItem();
 
-				RequestItem requestItem = new RequestItem();
-				List<Action> actions = new ArrayList<Action>();
-				actions.add(action);
-				requestItem.setActions(actions);
-				requestItem.setConditions(conditions);
-				requestItem.setResource(resource);
-				responseItem.setRequestItem(requestItem);
-				List<AccessControlResponseItem> responseItems = new ArrayList<AccessControlResponseItem>();
-				responseItems.add(responseItem);
-				
+			RequestItem requestItem = new RequestItem();
+			List<Action> actions = new ArrayList<Action>();
+			actions.add(action);
+			requestItem.setActions(actions);
+			requestItem.setConditions(conditions);
+			requestItem.setResource(resource);
+			responseItem.setRequestItem(requestItem);
+			List<AccessControlResponseItem> responseItems = new ArrayList<AccessControlResponseItem>();
+			responseItems.add(responseItem);
+
 			try{	
 				List<AccessControlResponseItem> resultlist = this.userFeedback.getAccessControlFB(RequestorUtils.toRequestor(requestor, idMgr), responseItems).get();
 				if (resultlist.size()==0){
 					responseItem.setDecision(Decision.DENY);
 					return responseItem;
 				}
-				
+
 				AccessControlResponseItem accessControlResponseItem = resultlist.get(0);
 				if (accessControlResponseItem.isRemember()){
 					this.privacyDataManagerInternal.updatePermission(requestor, accessControlResponseItem);
@@ -446,7 +448,7 @@ public class AccessControlPreferenceManager {
 
 
 	private void storeDecision(RequestorBean requestor, Resource resource, List<Condition> conditions,Action action,  Decision decision){
-
+		//TODO: this should be replaced with merging!!!!
 		List<RequestorBean> requestors = new ArrayList<RequestorBean>();
 		requestors.add(requestor);
 
@@ -458,14 +460,29 @@ public class AccessControlPreferenceManager {
 				outcome = new AccessControlOutcome(PrivacyOutcomeConstantsBean.BLOCK);
 
 			}
-			
-			AccessControlPreferenceDetailsBean detailsBean = new AccessControlPreferenceDetailsBean();
-			AccessControlPreferenceTreeModel model = new AccessControlPreferenceTreeModel(detailsBean, this.createAccessCtrlPrivacyPreference(conditions,action, resource, outcome));
 
+			AccessControlPreferenceDetailsBean detailsBean = new AccessControlPreferenceDetailsBean();
 			detailsBean.setRequestor(requestor);
 			detailsBean.setAction(action);
 			detailsBean.setResource(resource);
-			this.prefCache.addAccCtrlPreference(detailsBean, model);
+
+
+			PrivacyPreference newlyCreatedPreference = this.createAccessCtrlPrivacyPreference(conditions,action, resource, outcome);
+			AccessControlPreferenceTreeModel existingPreference = this.prefCache.getAccCtrlPreference(detailsBean);
+			if (null==existingPreference){
+				AccessControlPreferenceTreeModel model = new AccessControlPreferenceTreeModel(detailsBean, newlyCreatedPreference);
+				this.prefCache.addAccCtrlPreference(detailsBean, model);
+
+			}else{
+				PrivacyPreferenceMerger merger = new PrivacyPreferenceMerger(this.privPrefMgr);
+				IPrivacyPreference merged = merger.mergeAccCtrlPreferenceIncludeContext(((PrivacyPreference) existingPreference.getRootPreference()), newlyCreatedPreference);
+				if (null!=merged){
+					AccessControlPreferenceTreeModel model = new AccessControlPreferenceTreeModel(detailsBean, merged);
+					this.prefCache.addAccCtrlPreference(detailsBean, model);
+				}
+
+			}
+
 		} catch (PrivacyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -474,7 +491,7 @@ public class AccessControlPreferenceManager {
 		//}
 	}
 
-	
+
 	private PrivacyPreference createAccessCtrlPrivacyPreference(List<Condition> conditions, Action action, Resource resource, AccessControlOutcome outcome) throws PrivacyException{
 		PrivacyPreference withAllConditionsPreference = this.createPreferenceWithPrivacyConditions(conditions, action, outcome);
 		if (resource.getScheme().equals(DataIdentifierScheme.CONTEXT)){
@@ -590,8 +607,8 @@ public class AccessControlPreferenceManager {
 		return this.prefCache.removeAccCtrlPreference(details);
 	}
 
-	
-	
+
+
 	public ResponseItem evaluateAccCtrlPreference(
 			AccessControlPreferenceDetailsBean details, List<Condition> conditions) throws PrivacyException {
 
@@ -601,7 +618,7 @@ public class AccessControlPreferenceManager {
 			try {
 				//return this.checkPreferenceForAccessControl(details, model, conditions);
 				IPrivacyOutcome evaluatePreference = this.evaluatePreference(model.getPref(), conditions);
-				
+
 				if (evaluatePreference!=null){
 					if (evaluatePreference instanceof AccessControlOutcome){
 						DataIdentifier dataId = ResourceUtils.getDataIdentifier(details.getResource());
@@ -622,12 +639,12 @@ public class AccessControlPreferenceManager {
 		}
 		this.logging.debug("Could not find preference for given details");
 		return null;
-		
+
 	}
-	
-	
-	
-	
+
+
+
+
 	public AccessControlPreferenceTreeModel getAccCtrlPreference(
 			AccessControlPreferenceDetailsBean details) {
 		return this.prefCache.getAccCtrlPreference(details);
@@ -725,7 +742,7 @@ public class AccessControlPreferenceManager {
 		return false;
 	}
 	public static void main(String[] args){
-		AccessControlPreferenceManager prefMgr = new AccessControlPreferenceManager(null, null, null, null, null, null, null, null, null);
+		AccessControlPreferenceManager prefMgr = new AccessControlPreferenceManager(null, null, null, null);
 
 		List<Condition> conditions = new ArrayList<Condition>();
 		Condition condition = new Condition();

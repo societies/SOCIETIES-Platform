@@ -38,6 +38,7 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.CtxOriginType;
+import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.util.RequestorUtils;
@@ -90,12 +91,12 @@ public class AccessControlPreferenceCreator extends EventListener{
 	private IPrivacyAgreementManager agreementMgr;
 	private ICtxBroker ctxBroker;
 	private IPrivacyDataManagerInternal privacyDataManagerInternal;
-	private IIdentityManager idMgr;
+//	private IIdentityManager idMgr;
 	private final AccessControlPreferenceManager accCtrlPrefMgr;
 	private PrivacyPreferenceManager ppMgr;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private String[] sensedDataTypes;
-
+	private IIdentity userIdentity;
 
 	public AccessControlPreferenceCreator(PrivacyPreferenceManager ppMgr){
 		this.ppMgr = ppMgr;
@@ -103,7 +104,8 @@ public class AccessControlPreferenceCreator extends EventListener{
 		this.agreementMgr = ppMgr.getAgreementMgr();
 		this.ctxBroker = ppMgr.getCtxBroker();
 		this.privacyDataManagerInternal = ppMgr.getprivacyDataManagerInternal();
-		this.idMgr = ppMgr.getCommsMgr().getIdManager();
+//		this.idMgr = ppMgr.getCommsMgr().getIdManager();
+		this.userIdentity = ppMgr.getUserIdentity();
 		this.accCtrlPrefMgr = ppMgr.getAccessControlPreferenceManager();
 		try{
 			this.eventMgr.subscribeInternalEvent(this, new String[]{EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT}, null);
@@ -151,7 +153,7 @@ public class AccessControlPreferenceCreator extends EventListener{
 						}
 
 
-						List<CtxIdentifier> ctxIDList = this.ctxBroker.lookup(this.idMgr.getThisNetworkNode(), CtxModelType.ATTRIBUTE, dataType).get();
+						List<CtxIdentifier> ctxIDList = this.ctxBroker.lookup(this.userIdentity, CtxModelType.ATTRIBUTE, dataType).get();
 						if (ctxIDList.size()==0){
 
 							if (containsCreateAction(item.getRequestItem().getActions())){
@@ -240,8 +242,8 @@ public class AccessControlPreferenceCreator extends EventListener{
 			if (null!=accCtrlPreference){
 				this.logging.debug("Merging! An accessControl preference already exists for these details:\n"+PrivacyPreferenceUtils.toString(details));
 
-				PrivacyPreferenceMerger merger = new PrivacyPreferenceMerger(this.ctxBroker, this.ppMgr);
-				IPrivacyPreference mergePreferences = merger.mergeAccCtrlPreference(details, accCtrlPreference.getPref(), this.createAccCtrlPreference(item, details).getPref());
+				PrivacyPreferenceMerger merger = new PrivacyPreferenceMerger(this.ppMgr);
+				IPrivacyPreference mergePreferences = merger.mergeAccCtrlPreference(accCtrlPreference.getPref(), this.createAccCtrlPreference(item, details).getPref());
 				if (mergePreferences!=null){
 					AccessControlPreferenceTreeModel model = new AccessControlPreferenceTreeModel(details, mergePreferences);
 					this.accCtrlPrefMgr.storeAccCtrlPreference(details, model);
