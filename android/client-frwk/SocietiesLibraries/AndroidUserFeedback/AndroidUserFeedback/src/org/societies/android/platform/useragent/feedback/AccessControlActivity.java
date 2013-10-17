@@ -51,6 +51,7 @@ import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.AccessControlResponseItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 
 import java.util.List;
@@ -118,6 +119,9 @@ public class AccessControlActivity extends Activity implements OnItemSelectedLis
         btnAccept.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+            	for (AccessControlResponseItem item: accessControlEvent.getResponseItems()){
+            		item.setDecision(Decision.PERMIT);
+            	}
                 publishEvent();
                 finish();
             }
@@ -127,6 +131,10 @@ public class AccessControlActivity extends Activity implements OnItemSelectedLis
         btnCancel.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+            	for (AccessControlResponseItem item: accessControlEvent.getResponseItems()){
+            		item.setDecision(Decision.DENY);
+            	}
+            	publishEvent();
                 finish(); //BASICALLY, IGNORE REQUEST
             }
         });
