@@ -47,14 +47,16 @@ public class ConstructUIModel {
 				}
 			}
 		}
-		System.out.println("filterDictionary results for limit "+limit+ "| filtered: "+filtered);
+		//System.out.println("filterDictionary results for limit "+limit+ "| filtered: "+filtered);
+		LOG.debug("filterDictionary results for limit "+limit+ "| filtered: "+filtered);
+		
 		return filtered;
 	}
 
 
 	public UserIntentModelData constructNewModel(LinkedHashMap<List<String>,HashMap<String,Double>> transDictionaryAll, HashMap<String,List<String>> ctxActionsMap, Map<String , ServiceResourceIdentifier> sriMap){
 
-		System.out.println("cauiTaskManager "+cauiTaskManager);
+		LOG.debug("constructNewModel ... cauiTaskManager "+cauiTaskManager);
 		UserIntentModelData modelData = cauiTaskManager.createModel();
 		
 		//create all actions and assign context

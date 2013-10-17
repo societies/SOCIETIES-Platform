@@ -75,7 +75,9 @@ public class StackParser {
 		for (int i = 0; i < stack.length; i++) {
 			
 			// Full class name
-			LOG.debug("STACK[{}] class: {}", i, stack[i].getClassName());
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("STACK[{}] class: {}", i, stack[i].getClassName());
+			}
 			
 			// Java file name without path
 			//LOG.debug("STACK[{}] file: {}", i, stack[i].getFileName());
@@ -190,14 +192,18 @@ public class StackParser {
 				
 				if (stack[k+1].getFileName() == null) {
 					String className = stack[k+2].getClassName();
-					LOG.debug("getNextInvoker(): {}", className);
+					if (LOG.isDebugEnabled()) {
+						LOG.debug("getNextInvoker(): {}", className);
+					}
 					k += 3;
 					return className;
 				}
 			}
 		}
 		
-		LOG.debug("getNextInvoker(): No invoker found");
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("getNextInvoker(): No invoker found");
+		}
 		return null;
 	}
 }

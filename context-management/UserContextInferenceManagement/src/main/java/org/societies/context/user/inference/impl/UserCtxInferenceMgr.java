@@ -203,7 +203,7 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 		CtxAttribute result = null;
 		Date date = new Date();
 		
-		LOG.debug("predict context " +date);
+		if (LOG.isDebugEnabled())LOG.debug("predict context " +date);
 		
 		try {
 			result = this.userPredMgr.predictContext(attrID, date);
@@ -213,7 +213,7 @@ public class UserCtxInferenceMgr implements IUserCtxInferenceMgr {
 			e.printStackTrace();
 		} 
 
-		LOG.debug("retrieveFuture: result={}", result);
+		if (LOG.isDebugEnabled())LOG.debug("retrieveFuture: result={}", result);
 		return result;
 	}
 

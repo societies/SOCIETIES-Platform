@@ -51,8 +51,10 @@ public class Service {
 		this.slaXmlOptions = slaXmlOptions;
 		this.fileServerHost = fileServerHost;
 		this.files = files;
-		
-		LOG.debug("Service(" + id + ", ..., " + fileServerHost + ", " + files + ")");
+
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Service(" + id + ", ..., " + fileServerHost + ", " + files + ")");
+		}
 	}
 	
 	/**

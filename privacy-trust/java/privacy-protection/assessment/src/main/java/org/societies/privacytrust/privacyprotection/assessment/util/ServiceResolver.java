@@ -62,7 +62,9 @@ public class ServiceResolver implements BundleContextAware {
 	private Map<String, List<String>> class2bundleMap = new HashMap<String, List<String>>();
 
 	public ServiceResolver() {
-		LOG.debug("constructor()");
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("constructor()");
+		}
 	}
 	
 	@Override
@@ -71,7 +73,9 @@ public class ServiceResolver implements BundleContextAware {
 	}
 
 	public void init() {
-		LOG.debug("init()");
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("init()");
+		}
 	}
 	
 	/**
@@ -80,12 +84,16 @@ public class ServiceResolver implements BundleContextAware {
 	 * @param serviceDiscovery the serviceDiscovery to set
 	 */
 	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
-		LOG.debug("setServiceDiscovery()");
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("setServiceDiscovery()");
+		}
 		this.serviceDiscovery = serviceDiscovery;
 	}
 	
 	public void setScanAllBundles(boolean scanAllBundles) {
-		LOG.debug("setScanAllBundles({})", scanAllBundles);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("setScanAllBundles({})", scanAllBundles);
+		}
 		this.scanAllBundles = scanAllBundles;
 	}
 
@@ -99,7 +107,9 @@ public class ServiceResolver implements BundleContextAware {
 
 	public List<String> getBundleSymbolicName(String className) {
 		
-		LOG.debug("getBundleSymbolicName({})", className);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("getBundleSymbolicName({})", className);
+		}
 
 		long startTime = new Date().getTime();
 		
@@ -128,7 +138,9 @@ public class ServiceResolver implements BundleContextAware {
 
 			//LOG.debug("Getting entries for bundle ID {}: {}", bundle.getBundleId(), bundle.getSymbolicName());
 			
-			LOG.debug("Bundle ID: {}", bundles[k].getBundleId());
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Bundle ID: {}", bundles[k].getBundleId());
+			}
 
 			entries = bundles[k].findEntries("/", "*.class", true);
 			while (entries != null && entries.hasMoreElements()) {
@@ -151,7 +163,9 @@ public class ServiceResolver implements BundleContextAware {
 				if (className.equals(cn)) {
 					// Can't get anything better than bundle symbolic name.
 					// Method Bundle.getLocation() does not return anything user friendly.
-					LOG.debug("Found matching class name in {}", bundles[k].getSymbolicName());
+					if (LOG.isDebugEnabled()) {
+						LOG.debug("Found matching class name in {}", bundles[k].getSymbolicName());
+					}
 					try {
 						ServiceResourceIdentifier serviceId;
 						serviceId = getServiceId(bundles[k]);
@@ -171,8 +185,10 @@ public class ServiceResolver implements BundleContextAware {
 			LOG.warn("Class {} is present in multiple ({}) bundles", className, result.size());
 		}
 		class2bundleMap.put(className, result);
-		LOG.debug("Stored mapping for class {}. Map size: {}", className, class2bundleMap.size());
-		LOG.debug("getBundleSymbolicName({}) took {} ms", className, new Date().getTime() - startTime);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Stored mapping for class {}. Map size: {}", className, class2bundleMap.size());
+			LOG.debug("getBundleSymbolicName({}) took {} ms", className, new Date().getTime() - startTime);
+		}
 		return result;
 	}
 	
@@ -182,8 +198,10 @@ public class ServiceResolver implements BundleContextAware {
 			// The proxy is not null even if the service is not available, this
 			// is used mainly to trigger ServiceUnavailableException
 			if (serviceDiscovery != null) {
-				LOG.debug("getServiceId(): Using service discovery to map bundle {} to service ID",
-						bundle.getSymbolicName());
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("getServiceId(): Using service discovery to map bundle {} to service ID",
+							bundle.getSymbolicName());
+				}
 				Service service = ServiceModelUtils.getServiceFromBundle(bundle, serviceDiscovery);
 				if (service == null) {
 					throw new AssessmentException("Bundle " + bundle.getSymbolicName() +
@@ -196,8 +214,10 @@ public class ServiceResolver implements BundleContextAware {
 				throw new AssessmentException("Service discovery proxy is null.");				
 			}
 		} catch (ServiceUnavailableException e) {
-			LOG.debug("getServiceId(): Service discovery not available, cannot map bundle {} to service ID",
-					bundle.getSymbolicName());
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("getServiceId(): Service discovery not available, cannot map bundle {} to service ID",
+						bundle.getSymbolicName());
+			}
 			throw new AssessmentException("Service discovery not available, cannot map bundle to service ID");
 		}
 	}

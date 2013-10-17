@@ -76,16 +76,22 @@ public class Assessment implements IAssessment {
 	
 	// Getters and setters for beans
 	public PrivacyLog getPrivacyLog() {
-		LOG.debug("getPrivacyLog()");
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("getPrivacyLog()");
+		}
 		return privacyLog;
 	}
 	public void setPrivacyLog(PrivacyLog privacyLog) {
-		LOG.debug("setPrivacyLog()");
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("setPrivacyLog()");
+		}
 		this.privacyLog = privacyLog;
 	}
 
 	public void init() {
-		LOG.debug("init()");
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("init()");
+		}
 		dataTransferAnalyzer = new DataTransferAnalyzer(privacyLog);
 		dataAccessAnalyzer = new DataAccessAnalyzer(privacyLog.getDataAccess());
 		assessAllNow(null, null);
@@ -106,7 +112,9 @@ public class Assessment implements IAssessment {
 		for (IIdentity sender : privacyLog.getSenderIds()) {
 			try {
 				AssessmentResultIIdentity ass = dataTransferAnalyzer.estimatePrivacyBreach(sender, start, end);
-				LOG.debug("assessAllNow(): updating for identity {}", sender);
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("assessAllNow(): updating for identity {}", sender);
+				}
 				assessmentById.put(sender, ass);
 			} catch (AssessmentException e) {
 				LOG.warn("assessAllNow(): Skipped sender identity " + sender, e);
@@ -116,7 +124,9 @@ public class Assessment implements IAssessment {
 		for (String sender : privacyLog.getSenderClassNames()) {
 			try {
 				AssessmentResultClassName ass = dataTransferAnalyzer.estimatePrivacyBreach(sender, start, end);
-				LOG.debug("assessAllNow(): updating for class {}", sender);
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("assessAllNow(): updating for class {}", sender);
+				}
 				assessmentByClass.put(sender, ass);
 			} catch (AssessmentException e) {
 				LOG.warn("assessAllNow(): Skipped sender class " + sender, e);
@@ -126,7 +136,9 @@ public class Assessment implements IAssessment {
 		for (String sender : privacyLog.getSenderBundles()) {
 			try {
 				AssessmentResultBundle ass = dataTransferAnalyzer.estimatePrivacyBreachForBundle(sender, start, end);
-				LOG.debug("assessAllNow(): updating for bundle {}", sender);
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("assessAllNow(): updating for bundle {}", sender);
+				}
 				assessmentByBundle.put(sender, ass);
 			} catch (AssessmentException e) {
 				LOG.warn("assessAllNow(): Skipped sender bundle " + sender, e);
@@ -405,8 +417,10 @@ public class Assessment implements IAssessment {
 	
 	private void updateResultsIfNeeded(Date start, Date end) {
 		if (!areDatesEqual(start, resultsStart) || !areDatesEqual(end, resultsEnd)) {
-			LOG.debug("Previous results are for different time interval: from {} to {}. Updating...",
-					resultsStart, resultsEnd);
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Previous results are for different time interval: from {} to {}. Updating...",
+						resultsStart, resultsEnd);
+			}
 			assessAllNow(start, end);
 		}
 	}

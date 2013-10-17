@@ -25,6 +25,7 @@
 package org.societies.api.context.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -403,12 +404,13 @@ public final class CtxModelBeanTranslator {
 		// value
 		if (bean.getStringValue() != null)
 			object.setValue(bean.getStringValue());
-		else if (bean.getIntegerValue() != NaI)
+		else if (! NaI.equals(bean.getIntegerValue()))
 			object.setValue(bean.getIntegerValue());
-		else if (bean.getDoubleValue() != NaD)
+		else if (! NaD.equals(bean.getDoubleValue()))
 			object.setValue(bean.getDoubleValue());
-		else if (bean.getBinaryValue() != NaB)
+		else if (!Arrays.equals(NaB, bean.getBinaryValue()))
 			object.setValue(bean.getBinaryValue());
+			
 		// valueType
 		object.setValueType(fromCtxAttributeValueTypeBean(bean.getValueType()));
 		// valueMetric
