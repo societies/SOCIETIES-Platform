@@ -233,6 +233,12 @@
    					<p:commandButton  id="deleteEntry" icon="ui-icon-trash" actionListener="#{contextManagementController.deleteRow(element.id)}" update=":mainForm:attributeTable"/>  
    				</p:column>
    				
+   				<p:column id="dialogColumn" style="width: 5%">
+   					<p:calendar styleClass="calendarInput" value="#{contextManagementController.predictedDate}" id="popupButtonCal" showOn="button" >
+   						<p:ajax event="dateSelect" update=":mainForm:predictedTable" oncomplete="attributeDialog.show();" listener="#{contextManagementController.viewPredictedValues(element.id)}"/>
+   					</p:calendar>
+   				</p:column>
+   				
    				<p:column style="width:5%"> 
    					<p:rowEditor />
         		</p:column>  
@@ -269,20 +275,41 @@
 		        </p:column>  
 		  
 		        <p:column id="qualityColumn" headerText="Quality" style="width: 20%">  
-		            <h:outputText value="#{element.qualityBean.originType} - #{element.qualityBean.precision}" />
+		            <h:outputText value="#{element.qualityBean.originType} - #{element.qualityBean.precision}" 
+		            title="#{element.qualityBean.updateFrequency} - #{element.qualityBean.lastUpdated}"/>
 		        </p:column>  
 	    	</p:dataTable>  
 	    	
 	    	<!-- dialog for predicted value in ATTRIBUTE -->
 	    	<p:dialog id="predictedDialog" header="Predicted Value" widgetVar="attributeDialog" resizable="false"  
               width="300" showEffect="clip" hideEffect="fold" modal="true">  
-  
-		       <h:panelGrid id="displayDialog" columns="2" cellpadding="4">  
-		           <h:outputText value="Value:" />  
-		           <h:outputText value="TEST" />  
-		       </h:panelGrid>  
+              
+              <p:dataTable id="predictedTable" var="element" value="#{contextManagementController.contextModel.predictedAttributeList}"   
+           			emptyMessage="No Predicted Value found"  >  
+		         <p:column id="idColumnPredicted"   
+		                headerText="Id" 
+		                style="width: 5%">  
+		            <h:outputText value="#{element.diplayId}" />  
+		        </p:column>  
+	  
+		        <p:column id="modelColumnPredicted" 
+		        		headerText="Model" 
+		                style="width: 30%">  
+		            <h:outputText value="#{element.model}" />  
+		        </p:column>  
+	  
+		        <p:column id="typeColumnPredicted"  
+		                headerText="Type"  
+		                style="width: 30%">  
+		            <h:outputText value="#{element.type}" />  
+		        </p:column> 
+		        
+		        <p:column id="valueColumnPredicted" headerText="Value" style="width: 30%"> 
+		            <h:outputText value="#{element.value}" />  
+		        </p:column>  
+		       </p:dataTable>
+		       <p:ajax event="close" update=":mainForm:attributeTable" listener="#{contextManagementController.handleClose}"/>
 		   	</p:dialog>  
-
 
 
 			<!-- ASSOCIATION TABLE SECTION -->

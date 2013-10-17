@@ -1,6 +1,5 @@
 package org.societies.webapp.controller;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,10 +15,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 
-import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
@@ -33,8 +30,6 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
-import org.societies.api.context.model.CtxOriginType;
-import org.societies.api.context.model.CtxQuality;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.schema.context.model.CtxOriginTypeBean;
 import org.societies.api.schema.context.model.CtxQualityBean;
@@ -49,7 +44,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 @ManagedBean(name="contextManagementController")
 @SessionScoped
-public class ContextManagementController extends BasePageController implements Serializable {
+public class ContextManagementController extends BasePageController {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -532,6 +527,43 @@ public class ContextManagementController extends BasePageController implements S
 		return ctxBean;
 
 	}	
+	
+	public CtxUIElement serializeCtxAttribute(CtxAttribute attr)
+	{
+		log.info("Ctx Attribute type "+attr.getValueType());
+		
+		CtxUIElement ctxBean = new CtxUIElement();
+
+		if (attr.getValueType().equals(CtxAttributeValueType.STRING)){
+			ctxBean.setValue(""  + attr.getStringValue());
+		}
+		else if (attr.getValueType().equals(CtxAttributeValueType.DOUBLE)){
+			ctxBean.setValue(""+attr.getDoubleValue());
+		}
+		else if (attr.getValueType().equals( CtxAttributeValueType.INTEGER)){
+			ctxBean.setValue(""+attr.getIntegerValue());
+		}
+		else if (attr.getValueType().equals(CtxAttributeValueType.BINARY)){
+			ctxBean.setValue("Binary [" + attr.getBinaryValue().length+"bytes]");
+		}
+		else {
+			ctxBean.setValue(" -- ");
+		}
+
+		CtxQualityBean qualityBean = new CtxQualityBean();
+		qualityBean.setLastUpdated(attr.getQuality().getLastUpdated());
+		if(attr.getQuality().getOriginType() != null)
+			qualityBean.setOriginType(CtxOriginTypeBean.valueOf(attr.getQuality().getOriginType().toString()));
+		qualityBean.setPrecision(attr.getQuality().getPrecision());
+		qualityBean.setUpdateFrequency(attr.getQuality().getUpdateFrequency());
+		
+		ctxBean.setQualityBean(qualityBean);
+		
+		if (attr.getQuality().getPrecision()!=null)
+			ctxBean.setQuality("Precision:" +attr.getQuality().getPrecision());
+		
+		return ctxBean;
+	}
 
 	private String genLink(String id, String label){
 		return "<a href='#' onclick='retrieve(\""+ id +"\");'>"+label+"</a>";
@@ -1408,9 +1440,6 @@ public class ContextManagementController extends BasePageController implements S
 	
 	public void viewPredictedValues(String ctxId)
 	{
-		RequestContext context = RequestContext.getCurrentInstance();
-		log.info("entered");
-		
 		try
 		{
 			
@@ -1427,7 +1456,7 @@ public class ContextManagementController extends BasePageController implements S
 			{
 				ctxDisplayList = new ArrayList<CtxUIElement>();
 				for(CtxAttribute elem : ctxAttributeList)
-					ctxDisplayList.add(serliazeCtxModel(elem));
+					ctxDisplayList.add(serializeCtxAttribute(elem));
 			}
 			contextModel.setPredictedAttributeList(ctxDisplayList);
 			
@@ -1440,7 +1469,11 @@ public class ContextManagementController extends BasePageController implements S
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Error", error.getErrorMessage()));	
 		}
 		
-		context.execute("dialog.show()");
+	}
+	
+	public void handleClose()
+	{
+		predictedDate = null;
 	}
 	
 }
