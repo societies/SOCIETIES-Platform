@@ -62,12 +62,12 @@ public class CAUITaskManager implements ICAUITaskManager{
 	UserIntentModelData activeUserIntentModel = new UserIntentModelData();
 
 	public ICtxBroker getCtxBroker() {
-		LOG.debug(this.getClass().getName()+": Return ctxBroker");
+		//LOG.debug(this.getClass().getName()+": Return ctxBroker");
 		return ctxBroker;
 	}
 
 	public void setCtxBroker(ICtxBroker ctxBroker) {
-		LOG.debug(this.getClass().getName()+": Got ctxBroker");
+		//LOG.debug(this.getClass().getName()+": Got ctxBroker");
 		this.ctxBroker = ctxBroker;
 	}
 
@@ -101,7 +101,22 @@ public class CAUITaskManager implements ICAUITaskManager{
 	public IUserIntentAction createAction(ServiceResourceIdentifier serviceID, String serviceType, String par, String val) {
 
 		
-		//TODO check if parameters contain null values, throw exception   
+		if (serviceID == null) {
+			throw new NullPointerException("serviceID can't be null");
+		}
+		
+		if (serviceType == null) {
+			throw new NullPointerException("serviceType can't be null");
+		}
+		
+		if (par == null) {
+			throw new NullPointerException("action parameter can't be null");
+		}
+		
+		if (val == null) {
+			throw new NullPointerException("action value can't be null");
+		}
+		   
 		IUserIntentAction action = new UserIntentAction (serviceID, serviceType, par,val, UIModelObjectNumberGenerator.getNextValue());
 
 		UserIntentModelData model = retrieveModel();
@@ -136,7 +151,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 			}
 		}
 		if(!actionsMap.keySet().contains(sourceAction)){
-			LOG.debug("Doesn't exists in model, ACTION:"+sourceAction.getActionID());
+			if (LOG.isDebugEnabled())LOG.debug("Doesn't exists in model, ACTION:"+sourceAction.getActionID());
 		}
 		model.setActionModel(actionsMap);
 		updateModel(model);
@@ -455,7 +470,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 						}
 
 					} else {
-						LOG.debug("findBestMatchingAction: context type:"+ctxType +" does not match");
+						if (LOG.isDebugEnabled())LOG.debug("findBestMatchingAction: context type:"+ctxType +" does not match");
 					}
 					//System.out.println("String type :"+ ctxType+" ctxValue:"+ctxValue);
 				}
@@ -503,9 +518,9 @@ public class CAUITaskManager implements ICAUITaskManager{
 		}
 
 
-		LOG.debug("best action list: "+bestActionList );
+		if (LOG.isDebugEnabled())LOG.debug("best action list: "+bestActionList );
 		for(IUserIntentAction action  : bestActionList){
-			LOG.debug("action conf level "+action.getConfidenceLevel() );
+			if (LOG.isDebugEnabled())LOG.debug("action conf level "+action.getConfidenceLevel() );
 		}
 
 		return bestActionList;
