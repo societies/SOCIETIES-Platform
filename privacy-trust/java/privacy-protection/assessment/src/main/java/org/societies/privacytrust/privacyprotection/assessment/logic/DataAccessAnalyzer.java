@@ -166,7 +166,9 @@ public class DataAccessAnalyzer {
 		for (DataAccessLogEntry da : dataAccess) {
 			requestor = da.getRequestor();
 			if (!matches.contains(requestor) && requestor != null) {
-				LOG.debug("getDataAccessRequestors(): Adding identity {}", requestor);
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("getDataAccessRequestors(): Adding identity {}", requestor);
+				}
 				matches.add(requestor);
 			}
 		}
@@ -181,7 +183,9 @@ public class DataAccessAnalyzer {
 		for (DataAccessLogEntry da : dataAccess) {
 			requestor = da.getRequestorClass();
 			if (!matches.contains(requestor) && requestor != null) {
-				LOG.debug("getDataAccessRequestorClasses(): Adding class {}", requestor);
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("getDataAccessRequestorClasses(): Adding class {}", requestor);
+				}
 				matches.add(requestor);
 			}
 		}
@@ -197,7 +201,9 @@ public class DataAccessAnalyzer {
 			requestors = da.getRequestorBundles();
 			for (String requestor : requestors) {
 				if (!matches.contains(requestor) && requestor != null) {
-					LOG.debug("getDataAccessRequestorBundles(): Adding bundle {}", requestor);
+					if (LOG.isDebugEnabled()) {
+						LOG.debug("getDataAccessRequestorBundles(): Adding bundle {}", requestor);
+					}
 					matches.add(requestor);
 				}
 			}

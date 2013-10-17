@@ -123,7 +123,9 @@ public class DataTransferAnalyzer {
 		for (DataTransmissionLogEntry d : privacyLog.getDataTransmission()) {
 			receiver = d.getReceiver();
 			if (!matches.contains(receiver) && receiver != null) {
-				LOG.debug("getDataTransmissionReceivers(): Adding identity {}", receiver);
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("getDataTransmissionReceivers(): Adding identity {}", receiver);
+				}
 				matches.add(receiver);
 			}
 		}

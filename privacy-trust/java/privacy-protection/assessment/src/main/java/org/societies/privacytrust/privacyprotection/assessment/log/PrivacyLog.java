@@ -91,20 +91,26 @@ public class PrivacyLog implements IPrivacyLog {
 		
 		IIdentity sender = entry.getSender();
 		if (!senderIds.contains(sender)) {
-			LOG.debug("append(): Adding new transmission identity {}", sender);
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("append(): Adding new transmission identity {}", sender);
+			}
 			senderIds.add(sender);
 		}
 		
 		String senderClass = entry.getSenderClass();
 		if (!senderClassNames.contains(senderClass)) {
-			LOG.debug("append(): Adding new transmission class {}", senderClass);
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("append(): Adding new transmission class {}", senderClass);
+			}
 			senderClassNames.add(senderClass);
 		}
 		
 		List<String> existingSenderBundles = entry.getSenderBundles();
 		for (String senderBundle : existingSenderBundles) { 
 			if (!this.senderBundles.contains(senderBundle)) {
-				LOG.debug("append(): Adding new transmission bundle {}", senderBundle);
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("append(): Adding new transmission bundle {}", senderBundle);
+				}
 				this.senderBundles.add(senderBundle);
 			}
 		}
@@ -134,7 +140,9 @@ public class PrivacyLog implements IPrivacyLog {
 	@Override
 	public List<DataTransmissionLogEntry> search(PrivacyLogFilter f) {
 
-		LOG.debug("search({})", f);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("search({})", f);
+		}
 
 		if (f == null) {
 			return getAll();
@@ -213,7 +221,9 @@ public class PrivacyLog implements IPrivacyLog {
 	@Override
 	public List<DataTransmissionLogEntry> getAll() {
 
-		LOG.debug("getAll()");
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("getAll()");
+		}
 
 		return dataTransmission;
 	}
