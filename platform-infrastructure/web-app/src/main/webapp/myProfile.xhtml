@@ -28,38 +28,38 @@
                     <h:panelGrid columns="2" cellpadding="5">
                     
                         <h:outputText value="Identity: " />
-                        <h:inputText value="#{profile.record.cssIdentity}" size="40" />
+                        <h:inputText value="#{profile.record.cssIdentity}" size="42" />
 
                         <h:outputText value="First Name: " />
-                        <h:inputText value="#{profile.firstname}" size="40" />
+                        <h:inputText value="#{profile.firstname}" size="42" />
 
                         <h:outputText value="Surname: " />
-                        <h:inputText value="#{profile.surname}" size="40" />
+                        <h:inputText value="#{profile.surname}" size="42" />
 
                         <h:outputText value="E-mail: " />
-                        <h:inputText value="#{profile.email}" size="40" />
+                        <h:inputText value="#{profile.email}" size="42" />
 
                         <h:outputText value="Sex: " />
-                        <h:selectOneMenu value="#{profile.sex}">
+                        <p:selectOneMenu value="#{profile.sex}">
                             <f:selectItem itemValue= "0" itemLabel="Male"/>
                             <f:selectItem itemValue= "1" itemLabel="Female"/>
                             <f:selectItem itemValue= "2" itemLabel="Undefined"/>
-                        </h:selectOneMenu>
+                        </p:selectOneMenu>
 
                         <h:outputText value="Home Location: " />
-                        <h:inputText value="#{profile.homelocation}" size="40" />
+                        <h:inputText title='The city where you live, e.g. "Athens"' value="#{profile.homelocation}" size="42" />
 
                         <h:outputText value="Workplace: " />
-                        <h:inputText value="#{profile.workplace}" size="40" />
+                        <h:inputText title='The city where you work, e.g. "Dublin"' value="#{profile.workplace}" size="42" />
 
                         <h:outputText value="Position: " />
-                        <h:inputText title="E.g. Project Manager" value="#{profile.position}" size="40" />
+                        <h:inputText title='Your work position, e.g. "Project Manager"' value="#{profile.position}" size="42" />
 
                         <h:outputText value="Profile Type: " />
-                        <h:selectOneMenu value="#{profile.entity}">
+                        <p:selectOneMenu value="#{profile.entity}">
                             <f:selectItem itemValue= "1" itemLabel="Organisation"/>
                             <f:selectItem itemValue= "0" itemLabel="Person"/>
-	                </h:selectOneMenu>
+	                </p:selectOneMenu>
 
                     </h:panelGrid>
 
