@@ -8,7 +8,7 @@
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
-        <title>Profile Settings :: SOCIEITES</title>
+        <title>Profile Settings :: SOCIETIES</title>
     </ui:define>
 
     <ui:define name="body">
@@ -21,31 +21,55 @@
 
             <section class="form_style_main">
 
-                <h4 class="form_title">Profile Settings for <h:outputText value="#{loginController.username}"/></h4>
+                <h4 class="form_title">Profile Information for <h:outputText value="#{loginController.username}"/></h4>
 
-                <ul>
+                <p:panel id="basicProfilePanel" header="Basic Informatiom">
                     
-                    <li>Identity: &#160; &#160; &#160; &#160; &#160; <h:inputText value="#{profile.record.cssIdentity}"/></li>
-                    <li>First Name: &#160; &#160; &#160; <h:inputText value="#{profile.firstname}"/></li>
-                    <li>Surname: &#160; &#160; &#160; &#160; <h:inputText value="#{profile.surname}"/></li>
-                    <li>E-mail: &#160; &#160; &#160; &#160; &#160; &#160; <h:inputText value="#{profile.email}"/></li>
-                    <li>Sex: &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; 
-                    				<h:selectOneMenu value="#{profile.sex}">
-	                    				<f:selectItem itemValue= "0" itemLabel="Male"/>
-	                                    <f:selectItem itemValue= "1" itemLabel="Female"/>
-	                                    <f:selectItem itemValue= "2" itemLabel="Undefined"/>
-                                    </h:selectOneMenu></li>
-                    <li>Home Location: <h:inputText value="#{profile.homelocation}"/></li>
-                    <li>Workplace: &#160; &#160; &#160; &#160;<h:inputText value="#{profile.workplace}"/></li>
-                    <li>Position: &#160; &#160; &#160; &#160; &#160; &#160;<h:inputText value="#{profile.position}"/></li>
-                    <li>Entity:  &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;
-                    				<h:selectOneMenu value="#{profile.entity}">
-                    					<f:selectItem itemValue= "1" itemLabel="Organisation"/>
-	                                    <f:selectItem itemValue= "0" itemLabel="Person"/>
-	                                </h:selectOneMenu>
-                    </li>  
-                    <p:commandButton value="Save" action="#{profile.modifyrecord()}"></p:commandButton>
-                </ul>
+                    <h:panelGrid columns="2" cellpadding="5">
+                    
+                        <h:outputText value="Identity: " />
+                        <h:inputText value="#{profile.record.cssIdentity}" size="40" />
+
+                        <h:outputText value="First Name: " />
+                        <h:inputText value="#{profile.firstname}" size="40" />
+
+                        <h:outputText value="Surname: " />
+                        <h:inputText value="#{profile.surname}" size="40" />
+
+                        <h:outputText value="E-mail: " />
+                        <h:inputText value="#{profile.email}" size="40" />
+
+                        <h:outputText value="Sex: " />
+                        <h:selectOneMenu value="#{profile.sex}">
+                            <f:selectItem itemValue= "0" itemLabel="Male"/>
+                            <f:selectItem itemValue= "1" itemLabel="Female"/>
+                            <f:selectItem itemValue= "2" itemLabel="Undefined"/>
+                        </h:selectOneMenu>
+
+                        <h:outputText value="Home Location: " />
+                        <h:inputText value="#{profile.homelocation}" size="40" />
+
+                        <h:outputText value="Workplace: " />
+                        <h:inputText value="#{profile.workplace}" size="40" />
+
+                        <h:outputText value="Position: " />
+                        <h:inputText title="E.g. Project Manager" value="#{profile.position}" size="40" />
+
+                        <h:outputText value="Profile Type: " />
+                        <h:selectOneMenu value="#{profile.entity}">
+                            <f:selectItem itemValue= "1" itemLabel="Organisation"/>
+                            <f:selectItem itemValue= "0" itemLabel="Person"/>
+	                </h:selectOneMenu>
+
+                    </h:panelGrid>
+
+                </p:panel>
+  
+                <p:commandButton id="saveButton" value="Save" icon="ui-icon-disk" actionListener="#{profile.modifyrecord()}"></p:commandButton>
+
+                <p:blockUI block="basicProfilePanel" trigger="saveButton">Saving<br/>
+                    <p:graphicImage value="/images/ajax-loader.gif"/>
+                </p:blockUI>
 
             </section>
         </section>
